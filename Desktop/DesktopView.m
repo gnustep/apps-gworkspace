@@ -71,6 +71,7 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
   TEST_RELEASE (infoPath);
   TEST_RELEASE (nodeInfo);
   RELEASE (icons);
+  RELEASE (mountedVolumes);
   RELEASE (nameEditor);
   RELEASE (horizontalImage);
   RELEASE (verticalImage);
@@ -172,6 +173,8 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
     [self makeIconsGrid];
 
     icons = [NSMutableArray new];
+    
+    mountedVolumes = [NSMutableArray new];
     
     nameEditor = [FSNIconNameEditor new];
     [nameEditor setDelegate: self];  
@@ -365,16 +368,31 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
   }
 }
 
+- (void)showMountedVolumes
+{
+  NSArray *vpaths = [[NSWorkspace sharedWorkspace] mountedLocalVolumePaths];
+  int i;
 
+  DESTROY (mountedVolumes);
+  mountedVolumes = [vpaths mutableCopy];
+  
+  for (i = 0; i < [mountedVolumes count]; i++) {
+    NSString *vpath = [mountedVolumes objectAtIndex: i];
+    FSNode *vnode = [FSNode nodeWithRelativePath: vpath parent: nil];
+  
+    [vnode setMountPoint: YES];
+    [self addRepForSubnode: vnode];
+  }
+  
+/*
+- (NSArray *)mountedRemovableMedia;
 
+- (NSArray *)mountNewRemovableMedia;
 
+- (BOOL)unmountAndEjectDeviceAtPath:(NSString *)path;
+*/
 
-
-
-
-
-
-
+}
 
 - (void)dockPositionDidChange
 {
@@ -974,14 +992,21 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
 {
   NSArray *subNodes = [anode subNodes];
   NSMutableArray *unsorted = [NSMutableArray array];
+  int count = [icons count];
   NSDictionary *indexes;
   int i;
 
-  for (i = 0; i < [icons count]; i++) {
-    [[icons objectAtIndex: i] removeFromSuperview];
-  }
-  [icons removeAllObjects];  
+  for (i = 0; i < count; i++) {
+    FSNIcon *icon = [icons objectAtIndex: i];
   
+    if ([mountedVolumes containsObject: [[icon node] path]] == NO) {
+      [icon removeFromSuperview];
+      [icons removeObject: icon]; 
+      count--;
+      i--;
+    }    
+  }
+   
   if (node) {
     [desktop removeWatcherForPath: [node path]];
   }
@@ -1310,6 +1335,7 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
   NSString *nodePath;
   NSString *prePath;
 	int count;
+  int i;
   
 	isDragTarget = NO;	
     
@@ -1348,6 +1374,9 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
 
   while (1) {
     if ([sourcePaths containsObject: prePath]) {
+    
+    NSLog(@"QUA 2!!! %@", prePath);
+    
       return NSDragOperationNone;
     }
     if ([prePath isEqual: path_separator()]) {
@@ -1360,7 +1389,29 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
   dragPoint = NSZeroPoint;
   DESTROY (dragIcon);
   insertIndex = -1;
-  dragLocalIcon = [nodePath isEqual: fromPath];
+  
+  
+  
+//  dragLocalIcon = NO;
+  
+  for (i = 0; i < [sourcePaths count]; i++) {
+    NSString *srcpath = [sourcePaths objectAtIndex: i];
+  
+  
+  
+  }
+  
+//  if ([sourcePaths count]
+  
+  
+  dragLocalIcon = ([nodePath isEqual: fromPath]);
+  
+  
+  
+  // SE SONO SOLO MOUNT POINTS
+  // SE C'E' UN MOUNT POINT  
+  
+  
   
 	sourceDragMask = [sender draggingSourceOperationMask];
 

@@ -102,7 +102,7 @@ static NSFont *labelFont = nil;
     }
     ASSIGN (highlightPath, [FSNodeRep highlightPathOfSize: hlightRect.size]);
         
-		if ([[node path] isEqual: path_separator()]) {
+		if ([[node path] isEqual: path_separator()] && ([node isMountPoint] == NO)) {
 		  NSHost *host = [NSHost currentHost];
 		  NSString *hname = [host name];
 		  NSRange range = [hname rangeOfString: @"."];
@@ -476,7 +476,7 @@ static NSFont *labelFont = nil;
   ASSIGN (node, anode);
   ASSIGN (icon, [FSNodeRep iconOfSize: icnBounds.size.width forNode: node]);
 
-  if ([[node path] isEqual: path_separator()]) {
+  if ([[node path] isEqual: path_separator()] && ([node isMountPoint] == NO)) {
     NSHost *host = [NSHost currentHost];
     NSString *hname = [host name];
     NSRange range = [hname rangeOfString: @"."];

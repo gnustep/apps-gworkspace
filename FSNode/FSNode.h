@@ -135,6 +135,8 @@
 
 - (BOOL)isMountPoint;
 
+- (void)setMountPoint:(BOOL)value;
+
 - (BOOL)isApplication;
 
 - (BOOL)isPackage;

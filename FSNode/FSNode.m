@@ -396,6 +396,11 @@
   return flags.mountpoint;
 }
 
+- (void)setMountPoint:(BOOL)value
+{
+  flags.mountpoint = value;
+}
+
 - (BOOL)isApplication 
 {
   return flags.application;

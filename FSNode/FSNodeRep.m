@@ -153,6 +153,8 @@ static FSNodeRep *shared = nil;
     
     ASSIGN (multipleSelIcon, [NSImage imageNamed: @"MultipleSelection"]);
     ASSIGN (openFolderIcon, [NSImage imageNamed: @"FolderOpen"]);
+    ASSIGN (hardDiskIcon, [NSImage imageNamed: @"HardDisk"]);
+    ASSIGN (openHardDiskIcon, [NSImage imageNamed: @"HardDiskOpen"]);
     ASSIGN (workspaceIcon, [NSImage imageNamed: @"Workspace"]);
     ASSIGN (trashIcon, [NSImage imageNamed: @"Recycler"]);
     ASSIGN (trashFullIcon, [NSImage imageNamed: @"RecyclerFull"]);
@@ -232,7 +234,11 @@ static FSNodeRep *shared = nil;
   }
 
   if (icon == nil) {
-    icon = [ws iconForFile: nodepath];
+    if ([node isMountPoint]) {
+      icon = hardDiskIcon;
+    } else {
+      icon = [ws iconForFile: nodepath];
+    }
   }
 
   if (icon == nil) {
@@ -275,7 +281,11 @@ static FSNodeRep *shared = nil;
       icon = openFolderIcon;
     }      
   } else {
-    icon = openFolderIcon;
+    if ([node isMountPoint]) {
+      icon = openHardDiskIcon;
+    } else {
+      icon = openFolderIcon;
+    }
   }
 
   icnsize = [icon size];
@@ -732,6 +742,8 @@ static FSNodeRep *shared = nil;
   TEST_RELEASE (thumbnailDir);
   TEST_RELEASE (multipleSelIcon);
   TEST_RELEASE (openFolderIcon);
+  TEST_RELEASE (hardDiskIcon);
+  TEST_RELEASE (openHardDiskIcon);
   TEST_RELEASE (workspaceIcon);
   TEST_RELEASE (trashIcon);
   TEST_RELEASE (trashFullIcon);

@@ -48,6 +48,7 @@ typedef enum BackImageStyle {
   NSString *infoPath;
   NSMutableDictionary *nodeInfo;
   NSMutableArray *icons;
+  NSMutableArray *mountedVolumes;
 
   NSImage *verticalImage;
   NSImage *horizontalImage;
@@ -94,6 +95,8 @@ typedef enum BackImageStyle {
 - (void)fileSystemDidChange:(NSDictionary *)info;
 
 - (void)watchedPathDidChange:(NSDictionary *)info;
+
+- (void)showMountedVolumes;
 
 - (void)dockPositionDidChange;
 

@@ -131,6 +131,7 @@ static Desktop *desktop = nil;
      
   win = [DesktopWindow new];
   [win activate];
+  [[win desktopView] showMountedVolumes];
   [[win desktopView] showContentsOfNode: desktopDir];
   
   [self createTrashPath];
@@ -154,51 +155,27 @@ static Desktop *desktop = nil;
 
 
 
-  {
-    NSArray	*volumes = [ws mountedLocalVolumePaths];
-    int i;
-    
- //   [ws mountedRemovableMedia];
-    
-    
-    
 
-    for (i = 0; i < [volumes count]; i++) {
-      NSString *name = [volumes objectAtIndex: i];
-      BOOL removableFlag;
-      BOOL writableFlag;
-      BOOL unmountableFlag;
-      NSString *description;
-      NSString *fileSystemType;
 
-      [ws getFileSystemInfoForPath: name
-		              isRemovable: &removableFlag
-		              isWritable: &writableFlag
-		              isUnmountable: &unmountableFlag
-		              description: &description
-		              type: &fileSystemType];
-                  
-      NSLog(@"name %@", name);             
 
-      NSLog(@"removableFlag %i", removableFlag);             
-      NSLog(@"writableFlag %i", writableFlag);             
-      NSLog(@"unmountableFlag %i", unmountableFlag);             
 
-      NSLog(@"description %@", description);             
-      NSLog(@"fileSystemType %@", fileSystemType);             
-	  
-    
-    }
-    
- //   volumes = [ws mountNewRemovableMedia];
 
- //   for (i = 0; i < [volumes count]; i++) {
- //     NSString *name = [volumes objectAtIndex: i];
-      
- //     NSLog(@"MOUNTED %@", name);
- //   }    
-  }
-  
+
+
+
+      // CREARE LE ICONE DEI DISCHI IN DesktopView (NON QUA!)
+      // CREARE UNA CLASSE, DesktopViewIcon, subclass of FSNIcon
+      // CON UN METHOD -showMountedVolumes 
+      // QUA, PRIMA DI -showContentsOfNode, USARE -showMountedVolumes
+
+      // da qualche parte si deve pollare mtab con fswatcher !!!!!!!!!!
+
+      // FSNodeRep deve avere le icone per i dischi !!!!!!!!!!!!!!!!!
+
+
+      // NON deletare o duplicare o renomare o muovere le icone dei dischi!!!
+
+
 }
 
 - (BOOL)applicationShouldTerminate:(NSApplication *)app 

@@ -164,6 +164,8 @@ typedef enum FSNSelectionMask {
 
   NSImage *multipleSelIcon;
   NSImage *openFolderIcon;
+  NSImage *hardDiskIcon;
+  NSImage *openHardDiskIcon;
   NSImage *workspaceIcon;
   NSImage *trashIcon;
   NSImage *trashFullIcon;
