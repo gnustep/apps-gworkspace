@@ -629,18 +629,22 @@ static NSString *lsfname = @"LiveSearch.lsf";
     NSRunAlertPanel(NULL, msg, NSLocalizedString(@"Ok", @""), NULL, NULL);  
   } else {
     NSString *lsfpath = [destination stringByAppendingPathComponent: lsfname];
+    NSMutableArray *foundPaths = [NSMutableArray array];
     NSMutableDictionary *lsfdict = [NSMutableDictionary dictionary];
     NSNotificationCenter *dnc = [NSDistributedNotificationCenter defaultCenter];
     NSMutableDictionary *notifDict = [NSMutableDictionary dictionary];		
+    int i;
   
-  
-  
-  
-  
-  
-  
-  
-  
+    for (i = 0; i < [foundObjects count]; i++) {
+      [foundPaths addObject: [[foundObjects objectAtIndex: i] path]];
+    }
+ 
+    [lsfdict setObject: foundPaths forKey: @"paths"];	
+    [lsfdict setObject: searchCriteria forKey: @"criteria"];	
+    [lsfdict setObject: [[NSDate date] description] forKey: @"lastupdate"];	
+ 
+ // + dateWithString:
+    
     [notifDict setObject: @"GWorkspaceCreateFileOperation" 
                   forKey: @"operation"];	
     [notifDict setObject: destination forKey: @"source"];	
@@ -652,111 +656,15 @@ static NSString *lsfname = @"LiveSearch.lsf";
 	 								     object: nil 
                      userInfo: notifDict];
   
-//    if ([lsfdict writeToFile: lsfpath atomically: YES] == NO) {
-//      NSString *msg = NSLocalizedString(@"can't create the Live Search folder", @"");
-//      NSRunAlertPanel(NULL, msg, NSLocalizedString(@"Ok", @""), NULL, NULL);  
-//    }
+    if ([lsfdict writeToFile: lsfpath atomically: YES] == NO) {
+      NSString *msg = NSLocalizedString(@"can't create the Live Search folder", @"");
+      NSRunAlertPanel(NULL, msg, NSLocalizedString(@"Ok", @""), NULL, NULL);  
+    }
 	    
 	  [dnc postNotificationName: @"GWFileSystemDidChangeNotification"
 	 						         object: nil 
                      userInfo: notifDict];  
   }
-  
-
-
-/*
-  NSDictionary *replydict = [NSUnarchiver unarchiveObjectWithData: reply];
-  NSString *destination = [replydict objectForKey: @"destination"];
-  BOOL bookmark = [[replydict objectForKey: @"bookmark"] boolValue];
-  BOOL dndok = [[replydict objectForKey: @"dndok"] boolValue];
-
-  if (dndok == NO) {
-    NSString *msg = [NSString stringWithFormat: @"duplicate file name in '%@'", destination];
-    NSRunAlertPanel(NULL, msg, NSLocalizedString(@"Ok", @""), NULL, NULL);  
-  } else {
-    NSArray *srcPaths;
-    NSString *source;
-    NSMutableArray *files;
-    FileOpInfo *op;
-    int i;
-    
-    srcPaths = [replydict objectForKey: @"paths"];
-    source = [srcPaths objectAtIndex: 0];
-    source = [source stringByDeletingLastPathComponent];    
-    
-    files = [NSMutableArray array];
-    for (i = 0; i < [srcPaths count]; i++) {
-      [files addObject: [[srcPaths objectAtIndex: i] lastPathComponent]];
-    }
-  	
-    if (bookmark) {
-      NSString *bookmarkName;
-      NSString *bookmarkPath;
-      NSMutableDictionary *bmkDict;
-      NSString *path;
-      NSArray	*subStrings;
-      NSString *prgPath;
-      NSDictionary *contents;
-      unsigned count;      
-      
-      bookmarkName = [srcPaths objectAtIndex: 0];
-      bookmarkPath = [destination stringByAppendingPathComponent: bookmarkName];
-      bmkDict = [NSMutableDictionary dictionary];
-      
-      [bmkDict setObject: hostname forKey: @"hostname"];
-      [bmkDict setObject: @"ftp" forKey: @"scheme"];
-      [bmkDict setObject: selectedPaths forKey: @"selection"];
-    
-      if ([selectedPaths count] > 1) {
-        path = [[selectedPaths objectAtIndex: 0] stringByDeletingLastPathComponent];
-      } else {
-        path = [selectedPaths objectAtIndex: 0];
-      }
-
-      subStrings = [path componentsSeparatedByString: pathSeparator];
-	    count = [subStrings count];
- 
-      prgPath = [NSString stringWithString: pathSeparator];
-      contents = [self contentsForPath: prgPath];
-      if (contents) {
-        [bmkDict setObject: contents forKey: prgPath];
-      }
-
-      for (i = 0; i < count; i++) {
-		    NSString *str = [subStrings objectAtIndex: i];
-
-		    if ([str isEqualToString: @""] == NO) {
-          prgPath = [prgPath stringByAppendingPathComponent: str];
-          contents = [self contentsForPath: prgPath];
-          
-          if (contents) {
-            [bmkDict setObject: contents forKey: prgPath];
-          }
-		    }
-	    }
- 
-      if ([bmkDict writeToFile: bookmarkPath atomically: YES] == NO) {
-        NSString *msg = NSLocalizedString(@"can't save the bookmark", @"");
-        NSRunAlertPanel(NULL, msg, NSLocalizedString(@"Ok", @""), NULL, NULL);  
-      }
-
-    } else {    
-      op = [FileOpInfo fileOpInfoForViewer: self
-                                      type: DOWNLOAD
-                                       ref: [self fileOpRef]
-                                    source: source
-                               destination: destination
-                                     files: files
-                                 usewindow: YES
-                                   winrect: [gwnetapp rectForFileOpWindow]];
-
-      if ([self confirmOperation: op]) {
-        [self startOperation: op];
-      }
-    }
-  }   
-*/
-
 }
 
 - (BOOL)windowShouldClose:(id)sender
