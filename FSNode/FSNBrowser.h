@@ -217,8 +217,6 @@
 - (void)stopCellEditing;                
 
 - (void)stopRepNameEditing;                       
-
-- (void)unselectNameEditor;
                 
 - (void)controlTextDidChange:(NSNotification *)aNotification;
 

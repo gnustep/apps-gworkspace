@@ -116,11 +116,9 @@
 
 @interface GWViewerIconsPath (IconNameEditing)
 
-- (void)updateNameEditor;
+- (void)setNameEditorForRep:(id)arep;
 
 - (void)stopRepNameEditing;
-
-- (void)unselectNameEditor;
 
 - (void)controlTextDidChange:(NSNotification *)aNotification;
 

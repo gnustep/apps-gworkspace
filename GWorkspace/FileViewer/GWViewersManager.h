@@ -90,6 +90,13 @@
 
 - (void)watcherNotification:(NSNotification *)notif;
 
+- (void)thumbnailsDidChangeInPaths:(NSArray *)paths;
+
+
+- (BOOL)hasViewerWithWindow:(id)awindow;
+
+- (id)viewerWithWindow:(id)awindow;
+
 @end
 
 #endif // GWVIEWERS_MANAGER_H

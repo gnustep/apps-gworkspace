@@ -375,7 +375,7 @@
     }
   }
   
-  [self updateNameEditor];
+  [self stopRepNameEditing]; 
 }
 
 - (int)firstFreeGridIndex
@@ -708,6 +708,8 @@
 {
   NSWindow *win = [self window];
   GSDisplayServer *srv = GSServerForWindow(win);
+
+  [self stopRepNameEditing];
   
   [srv setinputstate: GSTitleBarKey : [win windowNumber]];
 //  [srv setinputstate: GSTitleBarMain : [win windowNumber]];
@@ -1532,9 +1534,7 @@ int sortDragged(id icn1, id icn2, void *context)
       [self setNeedsDisplayInRect: grid[oldindex]];
       [self setNeedsDisplayInRect: grid[index]];
     }
-    
-    [self updateNameEditor];
-    
+        
     return;
   }
 

@@ -233,8 +233,6 @@ typedef enum FSNSelectionMask {
 
 - (void)stopRepNameEditing;
 
-- (void)unselectNameEditor;
-
 - (void)setBackgroundColor:(NSColor *)acolor;
 
 - (NSColor *)backgroundColor;

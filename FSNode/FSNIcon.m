@@ -459,8 +459,8 @@ static NSImage *branchImage;
     
 	  if ([theEvent clickCount] == 1) {
       if (isSelected == NO) {
-        if ([container respondsToSelector: @selector(unselectNameEditor)]) {
-          [container unselectNameEditor];
+        if ([container respondsToSelector: @selector(stopRepNameEditing)]) {
+          [container stopRepNameEditing];
         }
       }
       
@@ -487,17 +487,17 @@ static NSImage *branchImage;
         }
         
         if (isSelected == NO) {
-          NSTimeInterval interval = ([theEvent timestamp] - editstamp);
-        
 				  [self select];
           
-          if ((interval > DOUBLE_CLICK_LIMIT)
-                                && (interval < EDIT_CLICK_LIMIT)) {
+			  } else {
+          NSTimeInterval interval = ([theEvent timestamp] - editstamp);
+        
+          if (interval > DOUBLE_CLICK_LIMIT) {
             if ([container respondsToSelector: @selector(setNameEditorForRep:)]) {
               [container setNameEditorForRep: self];
             }
           } 
-			  }
+        }
 		  }
     
       if (dndSource) {
@@ -526,6 +526,9 @@ static NSImage *branchImage;
       }
       
       if (startdnd == YES) {  
+        if ([container respondsToSelector: @selector(stopRepNameEditing)]) {
+          [container stopRepNameEditing];
+        }
         [self startExternalDragOnEvent: nextEvent];    
       }
       

@@ -1969,6 +1969,8 @@
               stringValue: [cell shownInfo]
                     index: 0];
 
+      [nameEditor setEditable: YES];
+      [nameEditor setSelectable: YES];	
       [self addSubview: nameEditor];
     }
   }
@@ -1978,9 +1980,12 @@
 {
   if (nameEditor && [[self subviews] containsObject: nameEditor]) {
     [nameEditor abortEditing];
+    [nameEditor setEditable: NO];
+    [nameEditor setSelectable: NO];
     [nameEditor setNode: nil stringValue: @"" index: -1];
     [nameEditor removeFromSuperview];
     [self setNeedsDisplayInRect: [nameEditor frame]];
+    [[NSCursor arrowCursor] set];
   }
 }
 
@@ -1989,17 +1994,78 @@
   [self stopCellEditing];
 }
 
-- (void)unselectNameEditor
-{
-}
-
 - (void)controlTextDidChange:(NSNotification *)aNotification
 {
 }
 
 - (void)controlTextDidEndEditing:(NSNotification *)aNotification
 {
+  FSNode *ednode = [nameEditor node];
 
+#define CLEAREDITING \
+  [self stopCellEditing]; \
+  return 
+
+  if ([ednode isWritable] == NO) {
+    NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
+          [NSString stringWithFormat: @"%@\"%@\"!\n", 
+              NSLocalizedString(@"You have not write permission for ", @""), 
+                    [ednode name]], NSLocalizedString(@"Continue", @""), nil, nil);   
+    CLEAREDITING;
+    
+  } else if ([[ednode parent] isWritable] == NO) {
+    NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
+          [NSString stringWithFormat: @"%@\"%@\"!\n", 
+              NSLocalizedString(@"You have not write permission for ", @""), 
+                  [[ednode parent] name]], NSLocalizedString(@"Continue", @""), nil, nil);   
+    CLEAREDITING;
+    
+  } else {
+    NSString *newname = [nameEditor stringValue];
+    NSString *newpath = [[ednode parentPath] stringByAppendingPathComponent: newname];
+    NSCharacterSet *notAllowSet = [NSCharacterSet characterSetWithCharactersInString: @"/\\*$|~\'\"`^!?"];
+    NSRange range = [newname rangeOfCharacterFromSet: notAllowSet];
+    NSFileManager *fm = [NSFileManager defaultManager];    
+    NSArray *dirContents = [fm directoryContentsAtPath: [ednode parentPath]];
+    NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+    
+    if (range.length > 0) {
+      NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
+                NSLocalizedString(@"Invalid char in name", @""), 
+                          NSLocalizedString(@"Continue", @""), nil, nil);   
+      CLEAREDITING;
+    }	
+
+    if ([dirContents containsObject: newname]) {
+      if ([newname isEqual: [ednode name]]) {
+        CLEAREDITING;
+      } else {
+        NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
+          [NSString stringWithFormat: @"%@\"%@\" %@ ", 
+              NSLocalizedString(@"The name ", @""), 
+              newname, NSLocalizedString(@" is already in use!", @"")], 
+                            NSLocalizedString(@"Continue", @""), nil, nil);   
+        CLEAREDITING;
+      }
+    }
+
+	  [userInfo setObject: @"GWorkspaceRenameOperation" forKey: @"operation"];	
+    [userInfo setObject: [ednode path] forKey: @"source"];	
+    [userInfo setObject: newpath forKey: @"destination"];	
+    [userInfo setObject: [NSArray arrayWithObject: @""] forKey: @"files"];	
+    
+    [[NSDistributedNotificationCenter defaultCenter]
+ 				postNotificationName: @"GWFileSystemWillChangeNotification"
+	 								    object: nil 
+                    userInfo: userInfo];
+
+    [fm movePath: [ednode path] toPath: newpath handler: self];
+
+    [[NSDistributedNotificationCenter defaultCenter]
+ 				postNotificationName: @"GWFileSystemDidChangeNotification"
+	 								    object: nil 
+                    userInfo: userInfo];
+  }
 }
 
 - (BOOL)fileManager:(NSFileManager *)manager 

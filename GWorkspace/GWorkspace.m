@@ -40,6 +40,7 @@
 #include "ViewersWindow.h"
 #include "GWViewersManager.h"
 #include "GWViewer.h"
+#include "GWSpatialViewer.h"
 #include "TShelf/TShelfWin.h"
 #include "TShelf/TShelfView.h"
 #include "TShelf/TShelfViewItem.h"
@@ -1745,7 +1746,11 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   
   [GWLib setUseThumbnails: value];
   
+  [FSNodeRep setUseThumbnails: value];
+  
   usesThumbnails = value;
+  
+  [vwrsManager thumbnailsDidChangeInPaths: nil];
   
   [rootViewer thumbnailsDidChangeInPaths: nil];
   for (i = 0; i < [viewers count]; i++) {
@@ -1781,7 +1786,10 @@ NSLocalizedString(@"OK", @""), nil, nil); \
         }
       }
 
+      [vwrsManager thumbnailsDidChangeInPaths: tmbdirs];
+
       [rootViewer thumbnailsDidChangeInPaths: tmbdirs];
+      
       for (i = 0; i < [viewers count]; i++) {
 		    [[viewers objectAtIndex: i] thumbnailsDidChangeInPaths: tmbdirs];
 	    }
@@ -1810,7 +1818,10 @@ NSLocalizedString(@"OK", @""), nil, nil); \
         }
       }
 
+      [vwrsManager thumbnailsDidChangeInPaths: tmbdirs];
+
       [rootViewer thumbnailsDidChangeInPaths: tmbdirs];
+      
       for (i = 0; i < [viewers count]; i++) {
 		    [[viewers objectAtIndex: i] thumbnailsDidChangeInPaths: tmbdirs];
 	    }
@@ -2793,6 +2804,30 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
           }
         }
       } 
+    
+    } else if ([vwrsManager hasViewerWithWindow: kwin]) {
+      id nodeView = [[vwrsManager viewerWithWindow: kwin] nodeView];
+      NSArray *selection = [nodeView selectedPaths];  
+      NSArray *basesel = [NSArray arrayWithObject: [[nodeView baseNode] path]];
+      
+      if ([selection count] && ([selection isEqual: basesel] == NO)) {
+        NSPasteboard *pb = [NSPasteboard generalPasteboard];
+
+        [pb declareTypes: [NSArray arrayWithObject: NSFilenamesPboardType]
+                   owner: nil];
+
+        if ([pb setPropertyList: selection forType: NSFilenamesPboardType]) {
+          [self connectOperation];
+
+          if (operationsApp) {
+            [(id <OperationProtocol>)operationsApp setFilenamesCutted: YES];
+          } else {
+            NSRunAlertPanel(nil, 
+                NSLocalizedString(@"File operations disabled!", @""), 
+                                    NSLocalizedString(@"OK", @""), nil, nil);                                     
+          }
+        }
+      }
     }
   }
 }
@@ -2835,6 +2870,30 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
           }
         }
       } 
+    
+    } else if ([vwrsManager hasViewerWithWindow: kwin]) {
+      id nodeView = [[vwrsManager viewerWithWindow: kwin] nodeView];
+      NSArray *selection = [nodeView selectedPaths];  
+      NSArray *basesel = [NSArray arrayWithObject: [[nodeView baseNode] path]];
+      
+      if ([selection count] && ([selection isEqual: basesel] == NO)) {
+        NSPasteboard *pb = [NSPasteboard generalPasteboard];
+
+        [pb declareTypes: [NSArray arrayWithObject: NSFilenamesPboardType]
+                   owner: nil];
+
+        if ([pb setPropertyList: selection forType: NSFilenamesPboardType]) {
+          [self connectOperation];
+
+          if (operationsApp) {
+            [(id <OperationProtocol>)operationsApp setFilenamesCutted: NO];
+          } else {
+            NSRunAlertPanel(nil, 
+                NSLocalizedString(@"File operations disabled!", @""), 
+                                    NSLocalizedString(@"OK", @""), nil, nil);                                     
+          }
+        }
+      }
     }
   }
 }
@@ -2905,7 +2964,60 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
           }
         }
       }
-    }
+      
+    } else if ([vwrsManager hasViewerWithWindow: kwin]) {
+      NSPasteboard *pb = [NSPasteboard generalPasteboard];
+
+      if ([[pb types] containsObject: NSFilenamesPboardType]) {
+        NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType];   
+
+        if (sourcePaths) {
+          [self connectOperation];
+
+          if (operationsApp) {
+            id nodeView = [[vwrsManager viewerWithWindow: kwin] nodeView];
+            BOOL cutted = [(id <OperationProtocol>)operationsApp filenamesWasCutted];
+    
+            if ([nodeView validatePasteOfFilenames: sourcePaths
+                                         wasCutted: cutted]) {
+              NSMutableDictionary *opDict = [NSMutableDictionary dictionary];
+              NSString *source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
+              NSString *destination = [[nodeView shownNode] path];
+              NSMutableArray *files = [NSMutableArray array];
+              NSString *operation;
+              int i;
+              
+              for (i = 0; i < [sourcePaths count]; i++) {  
+                NSString *spath = [sourcePaths objectAtIndex: i];
+                [files addObject: [spath lastPathComponent]];
+              }  
+
+              if (cutted) {
+                if ([source isEqual: [self trashPath]]) {
+                  operation = GWorkspaceRecycleOutOperation;
+                } else {
+		              operation = NSWorkspaceMoveOperation;
+                }
+              } else {
+		            operation = NSWorkspaceCopyOperation;
+              }
+
+	            [opDict setObject: operation forKey: @"operation"];
+	            [opDict setObject: source forKey: @"source"];
+	            [opDict setObject: destination forKey: @"destination"];
+	            [opDict setObject: files forKey: @"files"];
+
+	            [self performFileOperationWithDictionary: opDict];	
+            }
+          } else {
+            NSRunAlertPanel(nil, 
+                NSLocalizedString(@"File operations disabled!", @""), 
+                                    NSLocalizedString(@"OK", @""), nil, nil); 
+            return;                                    
+          }
+        }
+      }
+    }    
   }
 }
 

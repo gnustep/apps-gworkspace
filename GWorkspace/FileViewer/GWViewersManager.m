@@ -512,6 +512,63 @@ static GWViewersManager *vwrsmanager = nil;
   [self closeInvalidViewers: viewersToClose]; 
 }
 
+- (void)thumbnailsDidChangeInPaths:(NSArray *)paths
+{
+  int i;  
+
+  for (i = 0; i < [viewers count]; i++) {
+    id viewer = [viewers objectAtIndex: i];
+    
+    if ([viewer invalidated] == NO) {
+      if (paths == nil) {
+        [viewer reloadFromNode: [viewer baseNode]];
+      } else {
+        int j;
+      
+        for (j = 0; j < [paths count]; j++) {
+          NSString *path = [paths objectAtIndex: j];
+
+          if ([viewer isShowingPath: path]) {
+            FSNode *node = [FSNode nodeWithRelativePath: path parent: nil];
+            [viewer reloadFromNode: node];
+          }
+        }
+      }
+    }
+  }
+}
+
+
+- (BOOL)hasViewerWithWindow:(id)awindow
+{
+  int i;  
+
+  for (i = 0; i < [viewers count]; i++) {
+    id viewer = [viewers objectAtIndex: i];
+    
+    if ([viewer win] == awindow) {
+      return YES;
+    }
+  }
+  
+  return NO;
+}
+
+- (id)viewerWithWindow:(id)awindow
+{
+  int i;  
+
+  for (i = 0; i < [viewers count]; i++) {
+    id viewer = [viewers objectAtIndex: i];
+    
+    if ([viewer win] == awindow) {
+      return viewer;
+    }
+  }
+  
+  return nil;
+}
+
 @end
 
 

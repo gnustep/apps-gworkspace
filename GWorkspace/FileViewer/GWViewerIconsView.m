@@ -64,8 +64,6 @@
       ASSIGN (lastSelection, selection);
       [viewer selectionChanged: selection];
     }
-    
-    [self updateNameEditor];
 	}
 }
 
