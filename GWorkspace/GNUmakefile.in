@@ -40,10 +40,7 @@ GWorkspace_RESOURCE_FILES = \
   Resources/Romanian.lproj \
   Resources/Spanish.lproj \
   Resources/Portuguese.lproj \
-  Resources/Dutch.lproj \
-  ../Viewers/BrowserViewer/BrowserViewer.viewer \
-  ../Viewers/IconsViewer/IconsViewer.viewer \
-  ../Viewers/SmallIconsViewer/SmallIconsViewer.viewer \
+  Resources/Dutch.lproj 
 
 GWorkspace_LANGUAGES = Resources/English \
 			                Resources/French \

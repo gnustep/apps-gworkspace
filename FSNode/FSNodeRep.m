@@ -126,7 +126,7 @@ static FSNodeRep *shared = nil;
     
   if (self) {
   	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSBundle *bundle = [NSBundle bundleForClass: [self class]];
+    NSBundle *bundle = [NSBundle bundleForClass: [FSNodeRep class]];
     id defentry;
     NSString *imagepath;
     BOOL isdir;

@@ -19,22 +19,9 @@ Finder_HAS_RESOURCE_BUNDLE = yes
 
 Finder_RESOURCE_FILES = \
     Resources/Images/* \
-    Resources/English.lproj \
-    Modules/FModuleName/FModuleName.finder \
-    Modules/FModuleKind/FModuleKind.finder \
-    Modules/FModuleSize/FModuleSize.finder \
-    Modules/FModuleOwner/FModuleOwner.finder \
-    Modules/FModuleCrDate/FModuleCrDate.finder \
-    Modules/FModuleModDate/FModuleModDate.finder \
-    Modules/FModuleContents/FModuleContents.finder
-
+    Resources/English.lproj 
 
 Finder_LANGUAGES = Resources/English 
-
-#Finder_LOCALIZED_RESOURCE_FILES = Localizable.strings \
-#                                       Finder.gorm \
-#                                       FindView.gorm \
-#                                       ResultsWindow.gorm 
 
 # The Objective-C source files to be compiled
 Finder_OBJC_FILES = main.m \

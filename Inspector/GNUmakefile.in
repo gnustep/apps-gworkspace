@@ -4,7 +4,7 @@ include $(GNUSTEP_MAKEFILES)/common.make
 
 include inspector.make
 
-PACKAGE_NAME = @PACKAGE_NAME@
+PACKAGE_NAME = Inspector
 VERSION = @PACKAGE_VERSION@
 
 GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
@@ -28,35 +28,9 @@ ifneq ($(PDFKIT),no)
   Inspector_GUI_LIBS += -lPDFKit
 endif
 
-ifneq ($(PDFKIT),no)
-  Inspector_RESOURCE_FILES = \
-    Resources/Images/* \
-    Resources/English.lproj \
-    ContentViewers/FolderViewer/FolderViewer.inspector \
-    ContentViewers/ImageViewer/ImageViewer.inspector \
-    ContentViewers/SoundViewer/SoundViewer.inspector \
-    ContentViewers/AppViewer/AppViewer.inspector \
-    ContentViewers/RtfViewer/RtfViewer.inspector \
-    ContentViewers/PdfViewer/PdfViewer.inspector \
-    ContentViewers/NSTIFFViewer/NSTIFFViewer.inspector \
-    ContentViewers/NSRTFViewer/NSRTFViewer.inspector \
-    ContentViewers/NSColorViewer/NSColorViewer.inspector \
-    ContentViewers/IBViewViewer/IBViewViewer.inspector 
-else
-  Inspector_RESOURCE_FILES = \
-    Resources/Images/* \
-    Resources/English.lproj \
-    ContentViewers/FolderViewer/FolderViewer.inspector \
-    ContentViewers/ImageViewer/ImageViewer.inspector \
-    ContentViewers/SoundViewer/SoundViewer.inspector \
-    ContentViewers/AppViewer/AppViewer.inspector \
-    ContentViewers/RtfViewer/RtfViewer.inspector \
-    ContentViewers/PdfViewer/PdfViewer.inspector \
-    ContentViewers/NSTIFFViewer/NSTIFFViewer.inspector \
-    ContentViewers/NSRTFViewer/NSRTFViewer.inspector \
-    ContentViewers/NSColorViewer/NSColorViewer.inspector \
-    ContentViewers/IBViewViewer/IBViewViewer.inspector 
-endif
+Inspector_RESOURCE_FILES = \
+  Resources/Images/* \
+  Resources/English.lproj 
 
 Inspector_LANGUAGES = Resources/English 
 

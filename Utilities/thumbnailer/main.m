@@ -188,10 +188,9 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
 
 - (void)loadThumbnailers
 {
+  NSString *bundlesDir;
 	NSMutableArray *bundlesPaths;
 	NSArray *bPaths;
-	NSArray *libraryPaths;
-  NSString *home;
   int i;
   
   TEST_RELEASE (thumbnailers);
@@ -203,19 +202,14 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
                           inDirectory: [[NSBundle mainBundle] resourcePath]];
 	[bundlesPaths addObjectsFromArray: bPaths];
 
-  home = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
+  bundlesDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
   [bundlesPaths addObjectsFromArray: [self bundlesWithExtension: @"thumb" 
-			                                              inDirectory: home]];
+			                                              inDirectory: bundlesDir]];
 
-  libraryPaths = NSStandardLibraryPaths();
-
-  for (i = 0; i < [libraryPaths count]; i++) {
-    NSString *bundlesDir = [libraryPaths objectAtIndex: i];
-    
-    bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
-    [bundlesPaths addObjectsFromArray: [self bundlesWithExtension: @"thumb" 
-			                                                inDirectory: bundlesDir]];
-  }
+  bundlesDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSSystemDomainMask, YES) lastObject];
+  bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
+  [bundlesPaths addObjectsFromArray: [self bundlesWithExtension: @"thumb" 
+			                                              inDirectory: bundlesDir]];
 
   for (i = 0; i < [bundlesPaths count]; i++) {
 		NSString *bpath = [bundlesPaths objectAtIndex: i];

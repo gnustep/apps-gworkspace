@@ -53,7 +53,7 @@ static NSImage *branchImage;
 
 + (void)initialize
 {
-  NSBundle *bundle = [NSBundle bundleForClass: [self class]];
+  NSBundle *bundle = [NSBundle bundleForClass: [FSNodeRep class]];
   NSString *imagepath = [bundle pathForResource: @"ArrowRight" ofType: @"tiff"];
 
   if (desktopApp == nil) {

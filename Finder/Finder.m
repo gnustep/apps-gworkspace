@@ -324,18 +324,25 @@ static Finder *finder = nil;
 
 - (NSArray *)loadModules
 {
-  NSString *userDir;
+  NSString *bundlesDir;
   BOOL isdir;
   NSMutableArray *bundlesPaths;
   NSArray *bpaths;
   NSMutableArray *loaded;
   int i;
   
-  userDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
-  userDir = [userDir stringByAppendingPathComponent: @"Finder"];  
+  bundlesPaths = [NSMutableArray array];
 
-  if (([fm fileExistsAtPath: userDir isDirectory: &isdir] && isdir) == NO) {
-    if ([fm createDirectoryAtPath: userDir attributes: nil] == NO) {
+  bundlesDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSSystemDomainMask, YES) lastObject];
+  bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
+  bpaths = [self bundlesWithExtension: @"finder" inPath: bundlesDir];
+  [bundlesPaths addObjectsFromArray: bpaths];
+
+  bundlesDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
+  bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Finder"];  
+
+  if (([fm fileExistsAtPath: bundlesDir isDirectory: &isdir] && isdir) == NO) {
+    if ([fm createDirectoryAtPath: bundlesDir attributes: nil] == NO) {
       NSRunAlertPanel(NSLocalizedString(@"error", @""), 
              NSLocalizedString(@"Can't create the Finder user plugins directory! Quiting now.", @""), 
                                     NSLocalizedString(@"OK", @""), nil, nil);                                     
@@ -343,13 +350,9 @@ static Finder *finder = nil;
     }
   }
 
-  bundlesPaths = [NSMutableArray array];
-  bpaths = [self bundlesWithExtension: @"finder" inPath: userDir];
+  bpaths = [self bundlesWithExtension: @"finder" inPath: bundlesDir];
   [bundlesPaths addObjectsFromArray: bpaths];
-  bpaths = [self bundlesWithExtension: @"finder" 
-                               inPath: [[NSBundle mainBundle] resourcePath]];
-  [bundlesPaths addObjectsFromArray: bpaths];
-  
+
   loaded = [NSMutableArray array];
   
   for (i = 0; i < [bundlesPaths count]; i++) {

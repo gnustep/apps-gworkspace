@@ -80,7 +80,7 @@ static NSString *nibName = @"Contents";
   
   if (self) {
     NSMutableArray *bundlesPaths;
-    NSString *home;
+    NSString *bundlesDir;
     BOOL isdir;
     id label;
     unsigned i;
@@ -105,8 +105,8 @@ static NSString *nibName = @"Contents";
         
     r = [[(NSBox *)viewersBox contentView] frame];
 
-    home = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
-    ASSIGN (userDir, [home stringByAppendingPathComponent: @"Inspector"]);  
+    bundlesDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
+    ASSIGN (userDir, [bundlesDir stringByAppendingPathComponent: @"Inspector"]);  
 
     if (([fm fileExistsAtPath: userDir isDirectory: &isdir] && isdir) == NO) {
       if ([fm createDirectoryAtPath: userDir attributes: nil] == NO) {
@@ -134,8 +134,10 @@ static NSString *nibName = @"Contents";
     bundlesPaths = [self bundlesWithExtension: @"inspector" inPath: userDir];
     [self addViewersFromBundlePaths: bundlesPaths userViewers: YES];
 
-    bundlesPaths = [self bundlesWithExtension: @"inspector" 
-                                       inPath: [[NSBundle mainBundle] resourcePath]];
+    bundlesDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSSystemDomainMask, YES) lastObject];
+    bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
+
+    bundlesPaths = [self bundlesWithExtension: @"inspector" inPath: bundlesDir];
     [self addViewersFromBundlePaths: bundlesPaths userViewers: NO];
 
     genericView = [[NSView alloc] initWithFrame: r];		

@@ -1140,9 +1140,9 @@ return [ws openFile: fullPath withApplication: appName]
 
 - (void)makeViewersTemplates
 {
+  NSString *bundlesDir;
 	NSMutableArray *bundlesPaths;
 	NSArray *bPaths;
-  NSString *home;
 	int i;
 	
 #define VERIFY_VIEWERS( x ) \
@@ -1159,16 +1159,20 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   bundlesPaths = [NSMutableArray array];
   
   //load all default Viewers
-  bPaths = [self bundlesWithExtension: @"viewer" 
-                          inDirectory: [[NSBundle mainBundle] resourcePath]];
+  bundlesDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSSystemDomainMask, YES) lastObject];
+  bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
+  [viewersSearchPaths addObject: bundlesDir];
+  bPaths = [self bundlesWithExtension: @"viewer" inDirectory: bundlesDir];
 	[bundlesPaths addObjectsFromArray: bPaths];
   
 	VERIFY_VIEWERS (bundlesPaths && [bundlesPaths count]);																								
 
   //load user Viewers
-  home = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
+  bundlesDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
+  bundlesDir = [bundlesDir stringByAppendingPathComponent: @"GWorkspace"];
+  [viewersSearchPaths addObject: bundlesDir];
   [bundlesPaths addObjectsFromArray: [self bundlesWithExtension: @"viewer" 
-			     inDirectory: [home stringByAppendingPathComponent: @"GWorkspace"]]];
+			                                              inDirectory: bundlesDir]];
               
   for (i = 0; i < [bundlesPaths count]; i++) {
 		NSString *bpath = [bundlesPaths objectAtIndex: i];
@@ -1193,9 +1197,6 @@ NSLocalizedString(@"OK", @""), nil, nil); \
                 	selector: @selector(watcherNotification:) 
                 			name: GWFileWatcherFileDidChangeNotification
                 		object: nil];
-
-  [viewersSearchPaths addObject: [[NSBundle mainBundle] resourcePath]];
-  [viewersSearchPaths addObject: [home stringByAppendingPathComponent: @"GWorkspace"]];
     
   for (i = 0; i < [viewersSearchPaths count]; i++) {
     NSString *spath = [viewersSearchPaths objectAtIndex: i];
