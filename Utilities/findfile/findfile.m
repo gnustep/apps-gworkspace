@@ -96,7 +96,7 @@ BOOL checkType(NSString *str, NSString *path)
 
   if (attributes != nil) {
     NSString *fileType = [attributes fileType];
-
+    
     if ([fileType isEqualToString: @"NSFileTypeRegular"]) {
 	    if ([attributes filePosixPermissions] & PosixExecutePermission) {
         RETURN_IF_EQUAL (@"NSShellCommandFileType");
@@ -373,7 +373,7 @@ if ([[criteria objectForKey: k] intValue]) (findStruct.x) = 1;
     NSString *fullPath = [findPath stringByAppendingPathComponent: currentPath];
     BOOL canContinue = YES;
     BOOL found = YES;
-    
+        
     if (findStruct.findName && found) {    
       found = checkName(name, fullPath);
     }        

@@ -337,9 +337,6 @@ if (sz.height < 0) sz.height = 0
   [modDateStepper setEnabled: NO];  
 #endif
   
-  [self initNameControls];
-  [self initOptions];
-
   /* Internationalization */
   [fWin setTitle: NSLocalizedString(@"Finder", @"")];
   [generallabel setStringValue: NSLocalizedString(@"Search for items whose:", @"")];
@@ -351,6 +348,7 @@ if (sz.height < 0) sz.height = 0
   [datemdlabel setStringValue: NSLocalizedString(@"date modified", @"")];
   [contentslabel setStringValue: NSLocalizedString(@"contents", @"")];
   [includeslabel setStringValue: NSLocalizedString(@"includes", @"")];
+  
   [namePopUp removeAllItems];
   [namePopUp insertItemWithTitle: NSLocalizedString(@"contains", @"")  atIndex: 0];
   [namePopUp insertItemWithTitle: NSLocalizedString(@"is", @"")  atIndex: 1];
@@ -398,6 +396,9 @@ if (sz.height < 0) sz.height = 0
   [modDatePopUp insertItemWithTitle: NSLocalizedString(@"is after", @"")  atIndex: 2];
   [modDatePopUp insertItemWithTitle: NSLocalizedString(@"no value", @"")  atIndex: 3];
   [modDatePopUp selectItemAtIndex: 3]; 
+
+  [self initNameControls];
+  [self initOptions];
 }
        
 - (void)activate
@@ -551,7 +552,6 @@ if (sz.height < 0) sz.height = 0
     [criteria setObject: str forKey: @"contents"];   // CONTROLLARE DI PIU' !!!!     
   }  
 
-
 //
 // here we start the find task
 //
@@ -623,7 +623,7 @@ if (sz.height < 0) sz.height = 0
 
 - (void)initNameControls
 {
-  [namePopUp selectItemAtIndex: NAME_CONTAINS];
+  [namePopUp selectItemAtIndex: NAME_NO_VALUE];
   [nameField setStringValue: @""];
 }
 
@@ -1120,7 +1120,7 @@ if (sz.height < 0) sz.height = 0
 - (void)shelf:(Shelf *)sender setCurrentSelection:(NSArray *)paths
 {
   [self clearLastFound];
-  ASSIGN (currentSelection, paths);
+  ASSIGN (currentSelection, paths);  
 }
 
 - (void)shelf:(Shelf *)sender setCurrentSelection:(NSArray *)paths

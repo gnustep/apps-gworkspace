@@ -42,14 +42,14 @@
   [namelabel setTextColor: [NSColor blackColor]];
 	[container unselectOtherIcons: self];
   [container setCurrentSelection: paths];
-	[self display];
+	[self setNeedsDisplay: YES];
 }
 
 - (void)unselect
 {
 	isSelect = NO;
   [namelabel setTextColor: [NSColor blackColor]];
-	[self display];
+	[self setNeedsDisplay: YES];
 }
 
 - (void)startExternalDragOnEvent:(NSEvent *)event

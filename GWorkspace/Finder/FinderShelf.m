@@ -83,6 +83,11 @@
 	[icons addObjectsFromArray: sortedIcons];
 }
 
+- (void)setCurrentSelection:(NSArray *)paths
+{
+  [delegate shelf: self setCurrentSelection: paths];      
+}
+
 - (void)openCurrentSelection:(NSArray *)paths newViewer:(BOOL)newv
 {
 }
