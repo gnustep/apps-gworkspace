@@ -29,6 +29,12 @@
 @class NSString;
 @class NSMenuItem;
 
+#define gw_debug 1
+
+#define GWDebugLog(format, args...) \
+  do { if (gw_debug) \
+    NSLog(format , ## args); } while (0)
+
 #ifndef MAKE_LABEL
 #define MAKE_LABEL(label, rect, str, align, release, view) { \
 label = [[NSTextField alloc] initWithFrame: rect];	\

@@ -24,7 +24,6 @@
 
 #include <AppKit/AppKit.h>
 #include "NSRTFViewer.h"
-#include "GNUstep.h"
 
 #define STR  0
 #define RTF  1

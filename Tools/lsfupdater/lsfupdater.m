@@ -26,6 +26,12 @@
 #include <AppKit/AppKit.h>
 #include "FinderModulesProtocol.h"
 
+#define gw_debug 1
+
+#define GWDebugLog(format, args...) \
+  do { if (gw_debug) \
+    NSLog(format , ## args); } while (0)
+
 BOOL subPathOfPath(NSString *p1, NSString *p2);
 
 @protocol LSFolderProtocol
@@ -320,7 +326,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
   NSString *infopath = [lsfolder infoPath];
   NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: infopath];
   
-      NSLog(@"setAutoupdate %i", value);  
+  GWDebugLog(@"setAutoupdate %i", value);  
 
   autoupdate = value;
   
@@ -351,8 +357,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
   if (autoupdateTmr && [autoupdateTmr isValid]) {
     [autoupdateTmr invalidate];
     DESTROY (autoupdateTmr);
-    
-    NSLog(@"removing autoupdateTmr");
+    GWDebugLog(@"removing autoupdateTmr");
   }
   
   if (autoupdate > 0) {
@@ -394,10 +399,10 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
     updateInterval = (autoupdate * 1.0) / count;
     interval = (updateInterval == 0) ? 0.1 : updateInterval;
 
-    NSLog(@"\nresetTimer");
-    NSLog(@"autoupdate %i", autoupdate);
-    NSLog(@"dircount %i", dircount);  
-    NSLog(@"updateInterval %.2f", updateInterval);
+    GWDebugLog(@"\nresetTimer");
+    GWDebugLog(@"autoupdate %i", autoupdate);
+    GWDebugLog(@"dircount %i", dircount);  
+    GWDebugLog(@"updateInterval %.2f", updateInterval);
 
     autoupdateTmr = [NSTimer scheduledTimerWithTimeInterval: interval
                                target: self 
@@ -433,11 +438,11 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
   BOOL lsfdone = YES;
   int i;
 
-  NSLog(@"starting fast update");
+  GWDebugLog(@"starting fast update");
 
   [self getFoundPaths];
 
-  NSLog(@"got %i found paths. checking...", [foundPaths count]);
+  GWDebugLog(@"got %i found paths. checking...", [foundPaths count]);
   
   [self checkFoundPaths];
   
@@ -460,7 +465,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
     }
   }
     
-  NSLog(@"fast update done.");
+  GWDebugLog(@"fast update done.");  
 
   if ([searchPaths count]) {
     ASSIGN (lastUpdate, [NSDate date]);
@@ -525,7 +530,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
   CREATE_AUTORELEASE_POOL(arp);
   NSArray *results;
   
-  NSLog(@"getting directories from the db...");
+  GWDebugLog(@"getting directories from the db...");
   
   results = [self ddbdGetDirectoryTreeFromPath: srcpath];
   
@@ -536,8 +541,8 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
         
     results = [results arrayByAddingObject: srcpath];
 
-    NSLog(@"%i directories", [results count]);
-    NSLog(@"updating in %@", srcpath);    
+    GWDebugLog(@"%i directories", [results count]);
+    GWDebugLog(@"updating in %@", srcpath);    
     
     for (i = 0; i <= count; i++) {
       CREATE_AUTORELEASE_POOL(arp1);
@@ -553,7 +558,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
                       && ([foundPaths containsObject: dbpath] == NO)) {
           [foundPaths addObject: dbpath];
           [lsfolder addFoundPath: dbpath];
-          NSLog(@"adding %@", dbpath);
+          GWDebugLog(@"adding %@", dbpath);
         }
         
         contents = [fm directoryContentsAtPath: dbpath];
@@ -568,7 +573,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
                               && ([foundPaths containsObject: fpath] == NO)) {
             [foundPaths addObject: fpath];
             [lsfolder addFoundPath: fpath];
-            NSLog(@"adding %@", fpath);
+            GWDebugLog(@"adding %@", fpath);
           }
 
           if (([attr fileType] == NSFileTypeDirectory) 
@@ -582,7 +587,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
                 if ([foundPaths containsObject: found] == NO) {
                   [foundPaths addObject: found];
                   [lsfolder addFoundPath: found];
-                  NSLog(@"adding %@", found);
+                  GWDebugLog(@"adding %@", found);
                 }
               }
             }
@@ -606,11 +611,11 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
     int i;
     
     if (results == nil) {
-      NSLog(@"%@ not found in the db", srcpath);
+      GWDebugLog(@"%@ not found in the db", srcpath);
     } else {
-      NSLog(@"no found paths");
+      GWDebugLog(@"no found paths");
     }
-    NSLog(@"performing full search in %@", srcpath);
+    GWDebugLog(@"performing full search in %@", srcpath);
   
     founds = [self fullSearchInDirectory: srcpath];
     
@@ -626,7 +631,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
     [self ddbdInsertDirectoryTreesFromPaths: [NSArray arrayWithObject: srcpath]];
   }
   
-  NSLog(@"searching done.");
+  GWDebugLog(@"searching done.");
   
   RELEASE (arp);
 }
@@ -768,7 +773,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
 	    [ddbd setProtocolForProxy: @protocol(DDBd)];
       RETAIN (ddbd);
       
-      NSLog(@"ddbd connected!");     
+      GWDebugLog(@"ddbd connected!");     
                                          
 	  } else {
 	    static BOOL recursion = NO;
@@ -1034,7 +1039,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
       }  
     }
   
-    NSLog(@"dirindex %i", dirindex);
+    GWDebugLog(@"dirindex %i", dirindex);
   
     dirindex++;
     dircounter++;
@@ -1078,8 +1083,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
     } 
 
     fpathindex++;
-
-    NSLog(@"checkNextFoundPath %i", fpathindex);
+    GWDebugLog(@"checkNextFoundPath %i", fpathindex);
   }
 }
 
@@ -1095,6 +1099,7 @@ int main(int argc, char** argv)
     LSFUpdater *updater = [[LSFUpdater alloc] initWithConnectionName: conname];
     
     if (updater) {
+		  [[[NSProcessInfo processInfo] debugSet] addObject: @"dflt"];
       [[NSRunLoop currentRunLoop] run];
     }
   } else {

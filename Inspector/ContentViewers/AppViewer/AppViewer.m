@@ -24,7 +24,6 @@
 
 #include <AppKit/AppKit.h>
 #include "AppViewer.h"
-#include "GNUstep.h"
 
 @implementation AppViewer
 

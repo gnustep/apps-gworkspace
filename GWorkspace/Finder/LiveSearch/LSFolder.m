@@ -674,7 +674,6 @@ BOOL isPathInResults(NSString *path, NSArray *results);
                         selector: @selector(fileSystemDidChange:) 
                 					  name: @"GWFileSystemDidChangeNotification"
                 					object: nil];    
-
   } else {
     NSLog(@"failed to load %@!", nibName);
   }
@@ -684,7 +683,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 {
   if (win && [win isVisible]) {
     forceclose = YES;
-    [win close];
+    [win close]; 
   }
 }
 
@@ -701,54 +700,56 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 
 - (void)saveSizes
 {
-  NSMutableDictionary *columnsDict = [NSMutableDictionary dictionary];
-  NSArray *columns = [resultsView tableColumns];
-  NSString *dictpath = LSF_GEOM([node path]);
-  NSMutableDictionary *sizesDict = nil;  
-  int i;  
-  
-  if ([fm fileExistsAtPath: dictpath]) {
-    NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: dictpath];
-    if (dict) {
-      sizesDict = [dict mutableCopy];
+  if (forceclose == NO) {
+    NSMutableDictionary *columnsDict = [NSMutableDictionary dictionary];
+    NSArray *columns = [resultsView tableColumns];
+    NSString *dictpath = LSF_GEOM([node path]);
+    NSMutableDictionary *sizesDict = nil;  
+    int i;  
+
+    if ([fm fileExistsAtPath: dictpath]) {
+      NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: dictpath];
+      if (dict) {
+        sizesDict = [dict mutableCopy];
+      }
     }
+
+    if (sizesDict == nil) {
+      sizesDict = [NSMutableDictionary new];
+    }
+
+    [sizesDict setObject: [win stringWithSavedFrame] 
+                  forKey: @"win_frame"];
+
+    if (editor) {
+      [sizesDict setObject: [[editor win] stringWithSavedFrame] 
+                    forKey: @"editor_win"];
+    }
+
+    [sizesDict setObject: [NSNumber numberWithInt: ceil(NSHeight([pathsScroll frame]))] 
+                  forKey: @"paths_scr_h"];
+
+    [sizesDict setObject: [NSNumber numberWithInt: currentOrder] 
+                  forKey: @"sorting_order"];
+
+    for (i = 0; i < [columns count]; i++) {
+      NSTableColumn *column = [columns objectAtIndex: i];
+      NSString *identifier = [column identifier];
+      NSNumber *cwidth = [NSNumber numberWithFloat: [column width]];
+      NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+
+      [dict setObject: [NSNumber numberWithInt: i] forKey: @"position"];
+      [dict setObject: cwidth forKey: @"width"];
+
+      [columnsDict setObject: dict forKey: identifier];
+    }
+
+    [sizesDict setObject: columnsDict forKey: @"columns_sizes"];
+
+    [sizesDict writeToFile: dictpath atomically: YES];
+
+    RELEASE (sizesDict);
   }
-  
-  if (sizesDict == nil) {
-    sizesDict = [NSMutableDictionary new];
-  }
-  
-  [sizesDict setObject: [win stringWithSavedFrame] 
-                forKey: @"win_frame"];
-
-  if (editor) {
-    [sizesDict setObject: [[editor win] stringWithSavedFrame] 
-                  forKey: @"editor_win"];
-  }
-  
-  [sizesDict setObject: [NSNumber numberWithInt: ceil(NSHeight([pathsScroll frame]))] 
-                forKey: @"paths_scr_h"];
-
-  [sizesDict setObject: [NSNumber numberWithInt: currentOrder] 
-                forKey: @"sorting_order"];
-
-  for (i = 0; i < [columns count]; i++) {
-    NSTableColumn *column = [columns objectAtIndex: i];
-    NSString *identifier = [column identifier];
-    NSNumber *cwidth = [NSNumber numberWithFloat: [column width]];
-    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-
-    [dict setObject: [NSNumber numberWithInt: i] forKey: @"position"];
-    [dict setObject: cwidth forKey: @"width"];
-
-    [columnsDict setObject: dict forKey: identifier];
-  }
-
-  [sizesDict setObject: columnsDict forKey: @"columns_sizes"];
-
-  [sizesDict writeToFile: dictpath atomically: YES];
-  
-  RELEASE (sizesDict);
 }
 
 - (void)updateShownData
@@ -929,9 +930,10 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 
 - (void)windowWillClose:(NSNotification *)aNotification
 {
-  if (forceclose == NO) {
-    [self saveSizes];
+  if (editor) {
+    [[editor win] close];
   }
+  [self saveSizes];
 }
 
 

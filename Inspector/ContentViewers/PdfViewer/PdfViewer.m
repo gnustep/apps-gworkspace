@@ -27,7 +27,6 @@
 #include <PDFKit/PDFImageRep.h>
 #include <math.h>
 #include "PdfViewer.h"
-#include "GNUstep.h"
 
 #define MAXPAGES 9999
 

@@ -5,7 +5,7 @@
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
  *
- * This file is part of the GNUstep Inspector application
+ * This file is part of the GNUstep GWorkspace application
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,14 +26,16 @@
 #include <AppKit/AppKit.h>
 #include <math.h>
 #include "Attributes.h"
-#include "ContentViewersProtocol.h"
 #include "Inspector.h"
 #include "TimeDateView.h"
 #include "Functions.h"
-#include "GNUstep.h"
+#include "FSNodeRep.h"
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+
+#define SINGLE 0
+#define MULTIPLE 1
 
 #define SET_BUTTON_STATE(b, v) { \
 if ((perms & v) == v) [b setState: NSOnState]; \
@@ -45,7 +47,7 @@ if ([b state] == NSOnState) { \
 perms |= v; \
 } else { \
 if ((oldperms & v) == v) { \
-if ([b image] == multipleImage) perms |= v; \
+if ([b tag] == MULTIPLE) perms |= v; \
 } } \
 }
 
@@ -55,26 +57,7 @@ if ([b image] == multipleImage) perms |= v; \
 	#define S_IXUSR _S_IXUSR
 #endif
 
-#ifndef ICNMAX
-  #define ICNMAX 48
-  
-  #define CHECK_ICON_SIZE(i) \
-  { \
-  NSSize size = [i size]; \
-  if ((size.width > ICNMAX) || (size.height > ICNMAX)) { \
-  NSSize newsize; \
-  if (size.width >= size.height) { \
-  newsize.width = ICNMAX; \
-  newsize.height = floor(ICNMAX * size.height / size.width + 0.5); \
-  } else { \
-  newsize.height = ICNMAX; \
-  newsize.width  = floor(ICNMAX * size.width / size.height + 0.5); \
-  } \
-  [i setScalesWhenResized: YES]; \
-  [i setSize: newsize]; \
-  } \
-  }
-#endif
+#define ICNSIZE 48
 
 static NSString *nibName = @"Attributes";
 
@@ -104,11 +87,13 @@ static BOOL sizeStop = NO;
   self = [super init];
   
   if (self) {
-    NSUserDefaults *defaults;
-    
+    NSBundle *bundle = [NSBundle bundleForClass: [insp class]];
+    NSString *imagepath;
+
     if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
       NSLog(@"failed to load %@!", nibName);
-      [NSApp terminate: self];
+      DESTROY (self);
+      return self;
     } 
 
     RETAIN (mainBox);
@@ -123,46 +108,47 @@ static BOOL sizeStop = NO;
     fm = [NSFileManager defaultManager];	
     nc = [NSNotificationCenter defaultCenter];
     
-    defaults = [NSUserDefaults standardUserDefaults];
-    autocalculate = [defaults boolForKey: @"auto_calculate_sizes"];
+    autocalculate = [[NSUserDefaults standardUserDefaults] boolForKey: @"auto_calculate_sizes"];
     RETAIN (calculateButt);
     
     if (autocalculate) {
       [calculateButt removeFromSuperview];
     }
-    
-    timeDateView = [[TimeDateView alloc] init];
-    [timeDateView setFrame: NSMakeRect(6, 13, 55, 57)];
-    [changedDateBox addSubview: timeDateView];      
-    RELEASE (timeDateView);
-    
-		MAKE_LABEL (yearlabel, NSMakeRect(6, 1, 55, 12), nil, 'l', NO, changedDateBox);
-		[yearlabel setFont: [NSFont systemFontOfSize: 8]];
-		[yearlabel setAlignment: NSCenterTextAlignment];
-    RELEASE (yearlabel);
-
-    ASSIGN (onImage, [NSImage imageNamed: @"switchOn.tiff"]);
-    ASSIGN (offImage, [NSImage imageNamed: @"switchOff.tiff"]);
-    ASSIGN (multipleImage, [NSImage imageNamed: @"switchMultiple.tiff"]);
+        
+    imagepath = [bundle pathForResource: @"switchOn" ofType: @"tiff"];
+    onImage = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
+    imagepath = [bundle pathForResource: @"switchOff" ofType: @"tiff"];
+    offImage = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
+    imagepath = [bundle pathForResource: @"switchMultiple" ofType: @"tiff"];
+    multipleImage = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
 
     [ureadbutt setImage: offImage];
     [ureadbutt setAlternateImage: onImage];           
+    [ureadbutt setTag: SINGLE];           
     [greadbutt setImage: offImage];
-    [greadbutt setAlternateImage: onImage];           
+    [greadbutt setAlternateImage: onImage]; 
+    [greadbutt setTag: SINGLE];               
     [oreadbutt setImage: offImage];
-    [oreadbutt setAlternateImage: onImage];           
+    [oreadbutt setAlternateImage: onImage];  
+    [oreadbutt setTag: SINGLE];             
     [uwritebutt setImage: offImage];
-    [uwritebutt setAlternateImage: onImage];           
+    [uwritebutt setAlternateImage: onImage]; 
+    [uwritebutt setTag: SINGLE];              
     [gwritebutt setImage: offImage];
-    [gwritebutt setAlternateImage: onImage];           
+    [gwritebutt setAlternateImage: onImage]; 
+    [gwritebutt setTag: SINGLE];              
     [owritebutt setImage: offImage];
-    [owritebutt setAlternateImage: onImage];          
+    [owritebutt setAlternateImage: onImage]; 
+    [owritebutt setTag: SINGLE];              
     [uexebutt setImage: offImage];
-    [uexebutt setAlternateImage: onImage];           
+    [uexebutt setAlternateImage: onImage];   
+    [uexebutt setTag: SINGLE];             
     [gexebutt setImage: offImage];
-    [gexebutt setAlternateImage: onImage];           
+    [gexebutt setAlternateImage: onImage];   
+    [gexebutt setTag: SINGLE];             
     [oexebutt setImage: offImage];
-    [oexebutt setAlternateImage: onImage];           
+    [oexebutt setAlternateImage: onImage];     
+    [oexebutt setTag: SINGLE];       
 
 	  [revertButt setEnabled: NO];
 	  [okButt setEnabled: NO];
@@ -208,7 +194,7 @@ static BOOL sizeStop = NO;
   NSDate *tmpdate = nil;
 	NSCalendarDate *cdate;
 	NSDictionary *attrs;
-	int perms;
+	unsigned long perms;
 	BOOL sameOwner, sameGroup;
 	int i;
 
@@ -230,16 +216,16 @@ static BOOL sizeStop = NO;
 	[okButt setEnabled: NO];
   	
 	if (pathscount == 1) {   // Single Selection
-    NSImage *icon = [[NSWorkspace sharedWorkspace] iconForFile: currentPath];
-
-    CHECK_ICON_SIZE (icon);
+    FSNode *node = [FSNode nodeWithPath: currentPath];
+    NSImage *icon = [[FSNodeRep sharedInstance] iconOfSize: ICNSIZE forNode: node];
+    
     [iconView setImage: icon];
     [titleField setStringValue: [currentPath lastPathComponent]];
   
 		usr = [attributes objectForKey: NSFileOwnerAccountName];
 		grp = [attributes objectForKey: NSFileGroupOwnerAccountName];
 		date = [attributes objectForKey: NSFileModificationDate];
-		perms = [[attributes objectForKey: NSFilePosixPermissions] intValue];			
+		perms = [[attributes objectForKey: NSFilePosixPermissions] unsignedLongValue];			
 
 	#ifdef __WIN32__
 		iamRoot = YES;
@@ -253,7 +239,7 @@ static BOOL sizeStop = NO;
 
 		ftype = [attributes objectForKey: NSFileType];
 		if ([ftype isEqual: NSFileTypeDirectory] == NO) {	
-      NSString *fsize = fileSizeDescription([[attributes objectForKey: NSFileSize] intValue]);
+      NSString *fsize = fileSizeDescription([[attributes objectForKey: NSFileSize] unsignedLongLongValue]);
 		  [sizeField setStringValue: fsize]; 
       [calculateButt setEnabled: NO];
       [insideButt	setEnabled: NO];
@@ -294,14 +280,14 @@ static BOOL sizeStop = NO;
 
 		cdate = [date dateWithCalendarFormat: nil timeZone: nil];	
 		[timeDateView setDate: cdate];
-		[yearlabel setStringValue: [NSString stringWithFormat: @"%d", [cdate yearOfCommonEra]]];
 
 	} else {	   // Multiple Selection
+    NSImage *icon = [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: ICNSIZE];
     NSString *items = NSLocalizedString(@"items", @"");
     
     items = [NSString stringWithFormat: @"%i %@", [paths count], items];
 		[titleField setStringValue: items];  
-    [iconView setImage: [NSImage imageNamed: @"MultipleSelection.tiff"]];
+    [iconView setImage: icon];
   
 		ftype = [attributes objectForKey: NSFileType];
 
@@ -320,7 +306,7 @@ static BOOL sizeStop = NO;
 		usr = [attributes objectForKey: NSFileOwnerAccountName];
 		grp = [attributes objectForKey: NSFileGroupOwnerAccountName];
 		date = [attributes objectForKey: NSFileModificationDate];
-		perms = [[attributes objectForKey: NSFilePosixPermissions] intValue];			
+		perms = [[attributes objectForKey: NSFilePosixPermissions] unsignedLongValue];			
 
 		sameOwner = YES;
 		sameGroup = YES;
@@ -368,7 +354,6 @@ static BOOL sizeStop = NO;
 		
 		cdate = [date dateWithCalendarFormat: nil timeZone: nil];	
 		[timeDateView setDate: cdate];
-		[yearlabel setStringValue: [NSString stringWithFormat: @"%d", [cdate yearOfCommonEra]]];	
 	}
 	
 	[mainBox setNeedsDisplay: YES];
@@ -378,17 +363,19 @@ static BOOL sizeStop = NO;
 {
 	if (multiplePaths == YES) {
 		if ([sender state] == NSOffState) {
-			if ([sender image] == multipleImage) 
+			if ([sender tag] == MULTIPLE) {
 				[sender setImage: offImage];	
+				[sender setTag: SINGLE];	
+      }
 		} else {
-			if ([sender image] == offImage) {
+			if ([sender tag] == SINGLE) {
 				[sender setImage: multipleImage];
-				[sender setState: NSOffState];		
+				[sender setTag: MULTIPLE];	
 			}
 		}
 	}	
 
-	if((iamRoot || isMyFile) == NO) {
+	if ((iamRoot || isMyFile) == NO) {
 		return;
 	}
 
@@ -401,7 +388,8 @@ static BOOL sizeStop = NO;
 	NSMutableDictionary *attrs;
 	NSDirectoryEnumerator *enumerator;	
 	NSString *path, *fpath;
-	int oldperms, newperms, i;
+	unsigned long oldperms, newperms;
+  int i;
 	BOOL isdir;
 	BOOL recursive;
   
@@ -410,13 +398,13 @@ static BOOL sizeStop = NO;
 	if (pathscount == 1) {
 		[fm fileExistsAtPath: currentPath isDirectory: &isdir];
 
-		if ((recursive == YES) && (isdir == YES)) {
+		if (recursive && isdir) {
 			enumerator = [fm enumeratorAtPath: currentPath];
 			while ((fpath = [enumerator nextObject])) {
 				fpath = [currentPath stringByAppendingPathComponent: fpath];
 				attrs = [[fm fileAttributesAtPath: fpath traverseLink: NO] mutableCopy];
 				if (attrs) {			
-					oldperms = [[attrs objectForKey: NSFilePosixPermissions] intValue];	
+					oldperms = [[attrs objectForKey: NSFilePosixPermissions] unsignedLongValue];	
 					newperms = [self getPermissions: oldperms];			
 					[attrs setObject: [NSNumber numberWithInt: newperms] forKey: NSFilePosixPermissions];
 					[fm changeFileAttributes: attrs atPath: fpath];
@@ -426,13 +414,13 @@ static BOOL sizeStop = NO;
 			[self setPermissions: 0 isActive: YES];
 
 		} else {
-			oldperms = [[attributes objectForKey: NSFilePosixPermissions] intValue];
+			oldperms = [[attributes objectForKey: NSFilePosixPermissions] unsignedLongValue];
 			newperms = [self getPermissions: oldperms];		
 			attrs = [attributes mutableCopy];
 			[attrs setObject: [NSNumber numberWithInt: newperms] forKey: NSFilePosixPermissions];
 			[fm changeFileAttributes: attrs atPath: currentPath];	
 			ASSIGN (attributes, [fm fileAttributesAtPath: currentPath traverseLink: NO]);	
-			newperms = [[attributes objectForKey: NSFilePosixPermissions] intValue];				
+			newperms = [[attributes objectForKey: NSFilePosixPermissions] unsignedLongValue];				
 			[self setPermissions: newperms isActive: YES];
 		}
 	
@@ -447,7 +435,7 @@ static BOOL sizeStop = NO;
 					fpath = [path stringByAppendingPathComponent: fpath];
 					attrs = [[fm fileAttributesAtPath: fpath traverseLink: NO] mutableCopy];
 					if (attrs) {			
-						oldperms = [[attrs objectForKey: NSFilePosixPermissions] intValue];	
+						oldperms = [[attrs objectForKey: NSFilePosixPermissions] unsignedLongValue];	
 						newperms = [self getPermissions: oldperms];			
 						[attrs setObject: [NSNumber numberWithInt: newperms] forKey: NSFilePosixPermissions];
 						[fm changeFileAttributes: attrs atPath: fpath];
@@ -456,7 +444,7 @@ static BOOL sizeStop = NO;
 				
 			} else {
 				attrs = [[fm fileAttributesAtPath: path traverseLink: NO] mutableCopy];
-				oldperms = [[attrs objectForKey: NSFilePosixPermissions] intValue];	
+				oldperms = [[attrs objectForKey: NSFilePosixPermissions] unsignedLongValue];	
 				newperms = [self getPermissions: oldperms];			
 				[attrs setObject: [NSNumber numberWithInt: newperms] forKey: NSFilePosixPermissions];
 				[fm changeFileAttributes: attrs atPath: path];				
@@ -474,7 +462,7 @@ static BOOL sizeStop = NO;
 - (IBAction)revertToOldPermissions:(id)sender
 {
 	if(pathscount == 1) {
-		int perms = [[attributes objectForKey: NSFilePosixPermissions] intValue];
+		unsigned long perms = [[attributes objectForKey: NSFilePosixPermissions] unsignedLongValue];
 		[self setPermissions: perms isActive: YES];	
 	} else {
 		[self setPermissions: 0 isActive: YES];
@@ -484,7 +472,8 @@ static BOOL sizeStop = NO;
 	[okButt setEnabled: NO];
 }
 
-- (void)setPermissions:(int)perms isActive:(BOOL)active
+- (void)setPermissions:(unsigned long)perms 
+              isActive:(BOOL)active
 {
 	if (active == NO) {
 		[ureadbutt setEnabled: NO];						
@@ -513,49 +502,66 @@ static BOOL sizeStop = NO;
 		[owritebutt setEnabled: YES];			
 		[oexebutt setEnabled: YES];	
 	#endif
-	
 	}
 
 	if (perms == 0) {
 		multiplePaths = YES;
 		[ureadbutt setImage: multipleImage];
 		[ureadbutt setState: NSOffState];
+    [ureadbutt setTag: MULTIPLE];           
 		[uwritebutt setImage: multipleImage];
 		[uwritebutt setState: NSOffState];
+    [uwritebutt setTag: MULTIPLE];               
 		[uexebutt setImage: multipleImage];
 		[uexebutt setState: NSOffState];	
+    [uexebutt setTag: MULTIPLE];           
 
 	#ifndef __WIN32__
 		[greadbutt setImage: multipleImage];
 		[greadbutt setState: NSOffState];
+    [greadbutt setTag: MULTIPLE];               
 		[gwritebutt setImage: multipleImage];
 		[gwritebutt setState: NSOffState];
+    [gwritebutt setTag: MULTIPLE];               
 		[gexebutt setImage: multipleImage];
 		[gexebutt setState: NSOffState];
+    [gexebutt setTag: MULTIPLE];               
 		[oreadbutt setImage: multipleImage];
 		[oreadbutt setState: NSOffState];
+    [oreadbutt setTag: MULTIPLE];               
 		[owritebutt setImage: multipleImage];
 		[owritebutt setState: NSOffState];
+    [owritebutt setTag: MULTIPLE];               
 		[oexebutt setImage: multipleImage];
 		[oexebutt setState: NSOffState];
+    [oexebutt setTag: MULTIPLE];           
 	#endif
 	
 		return;
 	} else {
 		multiplePaths = NO;
 		[ureadbutt setImage: offImage];
+    [ureadbutt setTag: SINGLE];               
 		[uwritebutt setImage: offImage];
+    [uwritebutt setTag: SINGLE];               
 		[uexebutt setImage: offImage];	
+    [uexebutt setTag: SINGLE];           
 
 	#ifndef __WIN32__
 		[greadbutt setImage: offImage];
+    [greadbutt setTag: SINGLE];               
 		[gwritebutt setImage: offImage];
+    [gwritebutt setTag: SINGLE];               
 		[gexebutt setImage: offImage];
+    [gexebutt setTag: SINGLE];               
 		[oreadbutt setImage: offImage];
+    [oreadbutt setTag: SINGLE];               
 		[owritebutt setImage: offImage];
+    [owritebutt setTag: SINGLE];               
 		[oexebutt setImage: offImage];
+    [oexebutt setTag: SINGLE];           
+    
 	#endif
-	
 	}
 
 	SET_BUTTON_STATE (ureadbutt, S_IRUSR);				
@@ -572,9 +578,9 @@ static BOOL sizeStop = NO;
 #endif
 }
 
-- (int)getPermissions:(int)oldperms
+- (unsigned long)getPermissions:(unsigned long)oldperms
 {
-	int perms = 0;
+	unsigned long perms = 0;
 
 	GET_BUTTON_STATE (ureadbutt, S_IRUSR);
 	GET_BUTTON_STATE (uwritebutt, S_IWUSR);
@@ -599,7 +605,7 @@ static BOOL sizeStop = NO;
 	return perms;
 }
 
-- (void)watchedPathDidChange:(NSData *)dirinfo
+- (void)watchedPathDidChange:(NSDictionary *)info
 {
 }
 
@@ -699,7 +705,6 @@ static BOOL sizeStop = NO;
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   [defaults setBool: autocalculate forKey: @"auto_calculate_sizes"];
-  [defaults synchronize];
 }
 
 @end
@@ -750,18 +755,20 @@ static BOOL sizeStop = NO;
 
 - (void)computeSizeOfPaths:(NSArray *)paths
 {
-	float dirsize;
-	int fsize, i;
+	unsigned long long dirsize = 0;
+	unsigned long long fsize = 0;
+  int i;
 	
-	dirsize = 0;
   sizeStop = NO;
   
  	for (i = 0; i < [paths count]; i++) {
+    CREATE_AUTORELEASE_POOL (arp1);
 		NSString *path, *filePath;
 		NSDictionary *fileAttrs;
 		BOOL isdir;
 		
     if (sizeStop) {
+      RELEASE (arp1);
       return;
     }
     
@@ -772,24 +779,32 @@ static BOOL sizeStop = NO;
 			NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: path];
 			
 			while((filePath = [enumerator nextObject])) {
+        CREATE_AUTORELEASE_POOL (arp2);
+        
         if (sizeStop) {
+          RELEASE (arp2);
+          RELEASE (arp1);
           return;
         }
 				filePath = [path stringByAppendingPathComponent: filePath];
 				fileAttrs = [fm fileAttributesAtPath: filePath traverseLink: NO];
 				if (fileAttrs) {
-					fsize = [[fileAttrs objectForKey: NSFileSize] intValue];
+					fsize = [[fileAttrs objectForKey: NSFileSize] unsignedLongLongValue];
 					dirsize += fsize;
 				}
+        
+        RELEASE (arp2);
 			}
 			
 		} else {
 			fileAttrs = [fm fileAttributesAtPath: path traverseLink: NO];
 			if (fileAttrs) {
-				fsize = [[fileAttrs objectForKey: NSFileSize] intValue];
+				fsize = [[fileAttrs objectForKey: NSFileSize] unsignedLongLongValue];
 				dirsize += fsize;
 			}
 		}
+    
+    RELEASE (arp1);
 	}	
 
   if (sizeStop == NO) {

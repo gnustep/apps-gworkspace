@@ -22,12 +22,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
- 
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
 @class NSString;
 @class NSMenuItem;
+
+#define gw_debug 1
+
+#define GWDebugLog(format, args...) \
+  do { if (gw_debug) \
+    NSLog(format , ## args); } while (0)
 
 #ifndef MAKE_LABEL
 #define MAKE_LABEL(label, rect, str, align, release, view) { \

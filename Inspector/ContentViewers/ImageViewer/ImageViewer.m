@@ -25,7 +25,6 @@
 #include <AppKit/AppKit.h>
 #include "ImageViewer.h"
 #include "ImgReader.h"
-#include "GNUstep.h"
 #include <math.h>
 
 @implementation ImageViewer

@@ -37,6 +37,7 @@
 @class GWViewersManager;
 @class GWDesktopManager;
 @class Finder;
+@class Inspector;
 @class GWViewer;
 @class PrefController;
 @class Fiend;
@@ -65,28 +66,6 @@
 
 - (oneway void)client:(id <FSWClientProtocol>)client
                           removeWatcherForPath:(NSString *)path;
-
-@end
-
-
-@protocol	InspectorProtocol
-
-- (oneway void)addViewerWithBundleData:(NSData *)bundleData;
-
-- (oneway void)setPathsData:(NSData *)data;
-
-- (oneway void)showWindow;
-
-- (oneway void)showAttributes;
-
-- (oneway void)showContents;
-
-- (oneway void)showTools;
-
-- (BOOL)canDisplayDataOfType:(NSString *)type;
-
-- (oneway void)showData:(NSData *)data 
-                 ofType:(NSString *)type;
 
 @end
 
@@ -134,7 +113,6 @@
   id fswatcher;
   BOOL fswnotifications;
 	
-  id inspectorApp;
   id operationsApp;
   id recyclerApp;
   
@@ -149,6 +127,7 @@
   GWViewersManager *vwrsManager;
   GWDesktopManager *dtopManager;  
   FileAnnotationsManager *fannManager;
+  Inspector *inspector;
   Finder *finder;
   
   BOOL animateChdir;
@@ -273,10 +252,6 @@
 - (void)connectFSWatcher;
 
 - (void)fswatcherConnectionDidDie:(NSNotification *)notif;
-
-- (void)connectInspector;
-
-- (void)inspectorConnectionDidDie:(NSNotification *)notif;
 
 - (void)connectRecycler;
 

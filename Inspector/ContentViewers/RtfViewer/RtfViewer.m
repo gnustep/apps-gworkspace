@@ -24,7 +24,6 @@
 
 #include <AppKit/AppKit.h>
 #include "RtfViewer.h"
-#include "GNUstep.h"
 
 #define MAXDATA 1000
 

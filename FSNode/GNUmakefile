@@ -34,7 +34,7 @@ FSNode_HEADER_FILES = \
          FSNBrowser.h \
          FSNIcon.h \
          FSNIconsView.h \
-         FSNListView.m 
+         FSNListView.h
         
 FSNode_HAS_RESOURCE_BUNDLE = yes                                          
         

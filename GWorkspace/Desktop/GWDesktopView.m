@@ -1135,6 +1135,7 @@
   NSString *event = [info objectForKey: @"event"];
   NSArray *files = [info objectForKey: @"files"];
   NSString *ndpath = [node path];
+  BOOL needupdate = NO;
   NSString *fname;
   NSString *fpath;
   int i;
@@ -1144,6 +1145,7 @@
       fname = [files objectAtIndex: i];
       fpath = [ndpath stringByAppendingPathComponent: fname];  
       [self removeRepOfSubnodePath: fpath];
+      needupdate = YES;
     }
     
   } else if ([event isEqual: @"GWFileCreatedInWatchedDirectory"]) {
@@ -1153,6 +1155,7 @@
       
       if ([self repOfSubnodePath: fpath] == nil) {
         [self addRepForSubnodePath: fpath];
+        needupdate = YES;
       }
     }
     
@@ -1168,12 +1171,15 @@
   
     if ([fpath isEqual: mtabpath]) {
       [self showMountedVolumes];
+      needupdate = YES;
     }
   }
   
-  [self tile];
-  [self setNeedsDisplay: YES];
-  [self selectionDidChange];
+  if (needupdate) {
+    [self tile];
+    [self setNeedsDisplay: YES];
+    [self selectionDidChange];
+  }
 }
 
 - (void)setShowType:(FSNInfoType)type

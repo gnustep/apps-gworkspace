@@ -31,7 +31,7 @@
 
 @class NSImage;
 @class NSTextField;
-@class ColorView;
+@class ColorsView;
 
 @protocol ContentInspectorProtocol
 
@@ -50,7 +50,7 @@
   NSString *typeDescriprion;
   NSImage *icon;
   
-  ColorView *colorView;
+  ColorsView *colorsView;
   NSTextField *redField;
   NSTextField *greenField;
   NSTextField *blueField;
@@ -62,7 +62,8 @@
 
 @end
 
-@interface ColorView : NSView 
+
+@interface ColorsView : NSView 
 {
   float hue;
   float saturation;

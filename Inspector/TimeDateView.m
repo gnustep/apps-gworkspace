@@ -5,7 +5,7 @@
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
  *
- * This file is part of the GNUstep Inspector application
+ * This file is part of the GNUstep GWorkspace application
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,15 +25,10 @@
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include "TimeDateView.h"
-#include "GNUstep.h"
+#include "Inspector.h"
 
-#define LED_COLON 10
-#define LED_AM    11
-#define LED_PM    12
-#define DATE_COLON 11
-
-static const int tf_posx[11] = {5, 14, 24, 28, 37, 40, 17, 17, 22, 27, 15};
-static const int posy[4]  = {14, 26, 42, 51};
+static const int tf_posx[11] = { 5, 14, 24, 28, 37, 40, 17, 17, 22, 27, 15 };
+static const int posy[4]  = { 1, 13, 29, 38 };
 
 @implementation TimeDateView
 
@@ -52,19 +47,28 @@ static const int posy[4]  = {14, 26, 42, 51};
   [super dealloc];
 }
 
-- (id)init
+- (id)initWithFrame:(NSRect)frameRect
 {
-	self = [super init];
+	self = [super initWithFrame: frameRect];
+  
 	if (self) {
 		maskImage = nil;
+    yearlabel = [NSTextFieldCell new];
+		[yearlabel setFont: [NSFont systemFontOfSize: 8]];
+		[yearlabel setAlignment: NSCenterTextAlignment];    
 	}
+  
 	return self;
 }
 
 - (void)setDate:(NSCalendarDate *)adate
 {
+  CREATE_AUTORELEASE_POOL (pool);
+  NSBundle *bundle;
 	NSString *imgName;
-	int n, hour, minute, dayOfWeek, dayOfMonth, month;
+  NSString *imagepath;
+  NSImage *image;
+ 	int n, hour, minute, dayOfWeek, dayOfMonth, month;
 	
 	hour = [adate hourOfDay];
 	minute = [adate minuteOfHour];
@@ -72,58 +76,91 @@ static const int posy[4]  = {14, 26, 42, 51};
 	dayOfMonth = [adate dayOfMonth];
 	month = [adate monthOfYear];
 
-	ASSIGN (maskImage, [NSImage imageNamed: @"Mask.tiff"]);
-
+  bundle = [NSBundle bundleForClass: [Inspector class]];
+  
+  imagepath = [bundle pathForResource: @"Mask" ofType: @"tiff"];
+  image = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
+	ASSIGN (maskImage, image);
+  RELEASE (image);
+ 
 	//
 	// hour
 	//
 	n = hour/10;
-	imgName = [NSString stringWithFormat: @"LED-%d.tiff", n];		
-	ASSIGN (hour1Image, [NSImage imageNamed: imgName]);
+	imgName = [NSString stringWithFormat: @"LED-%d", n];		
+  imagepath = [bundle pathForResource: imgName ofType: @"tiff"];
+  image = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
+	ASSIGN (hour1Image, image);
+  RELEASE (image);
 	
 	n = hour%10;		
-	imgName = [NSString stringWithFormat: @"LED-%d.tiff", n];
-	ASSIGN (hour2Image, [NSImage imageNamed: imgName]);
+	imgName = [NSString stringWithFormat: @"LED-%d", n];
+  imagepath = [bundle pathForResource: imgName ofType: @"tiff"];
+  image = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
+	ASSIGN (hour2Image, image);
+  RELEASE (image);
   
-	n = LED_COLON;
-	imgName = [NSString stringWithFormat: @"LED-%d.tiff", n];
-	ASSIGN (hour3Image, [NSImage imageNamed: imgName]);
+  imagepath = [bundle pathForResource: @"LED-Colon" ofType: @"tiff"];
+  image = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
+	ASSIGN (hour3Image, image);
+  RELEASE (image);
 
 	//
 	// minute
 	//
 	n = minute/10;
-	imgName = [NSString stringWithFormat: @"LED-%d.tiff", n];
-	ASSIGN (minute1Image, [NSImage imageNamed: imgName]);
+	imgName = [NSString stringWithFormat: @"LED-%d", n];
+  imagepath = [bundle pathForResource: imgName ofType: @"tiff"];
+  image = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
+	ASSIGN (minute1Image, image);
+  RELEASE (image);
 
 	n = minute%10;
-	imgName = [NSString stringWithFormat: @"LED-%d.tiff", n];
-	ASSIGN (minute2Image, [NSImage imageNamed: imgName]);
+	imgName = [NSString stringWithFormat: @"LED-%d", n];
+  imagepath = [bundle pathForResource: imgName ofType: @"tiff"];
+  image = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
+	ASSIGN (minute2Image, image);
+  RELEASE (image);
 
 	//
 	// dayOfWeek
 	//
-	imgName = [NSString stringWithFormat: @"Weekday-%d.tiff", dayOfWeek];
-	ASSIGN (dayweekImage, [NSImage imageNamed: imgName]);
+	imgName = [NSString stringWithFormat: @"Weekday-%d", dayOfWeek];
+  imagepath = [bundle pathForResource: imgName ofType: @"tiff"];
+  image = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
+	ASSIGN (dayweekImage, image);
+  RELEASE (image);
 
 	//
 	// dayOfMonth
 	//
 	n = dayOfMonth/10;
-	imgName = [NSString stringWithFormat: @"Date-%d.tiff", n];
-	ASSIGN (daymont1Image, [NSImage imageNamed: imgName]);
+	imgName = [NSString stringWithFormat: @"Date-%d", n];
+  imagepath = [bundle pathForResource: imgName ofType: @"tiff"];
+  image = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
+	ASSIGN (daymont1Image, image);
+  RELEASE (image);
 
 	n = dayOfMonth%10;
-	imgName = [NSString stringWithFormat: @"Date-%d.tiff", n];
-	ASSIGN (daymont2Image, [NSImage imageNamed: imgName]);
+	imgName = [NSString stringWithFormat: @"Date-%d", n];
+  imagepath = [bundle pathForResource: imgName ofType: @"tiff"];
+  image = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
+	ASSIGN (daymont2Image, image);
+  RELEASE (image);
 
 	//
 	// month
 	//
 	n = month;
-	imgName = [NSString stringWithFormat: @"Month-%d.tiff", n];
-	ASSIGN (monthImage, [NSImage imageNamed: imgName]);
-	
+	imgName = [NSString stringWithFormat: @"Month-%d", n];
+  imagepath = [bundle pathForResource: imgName ofType: @"tiff"];
+  image = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
+	ASSIGN (monthImage, image);
+  RELEASE (image);
+
+  [yearlabel setStringValue: [NSString stringWithFormat: @"%d", [adate yearOfCommonEra]]];
+
+  RELEASE (pool);
 	[self setNeedsDisplay: YES];
 }
 
@@ -134,15 +171,17 @@ static const int posy[4]  = {14, 26, 42, 51};
 	NSPoint p;
 	float h;
 	
-	if(maskImage == nil)
+	if (maskImage == nil) {
 		return;
-		
+	}
+  
   s = [maskImage size];
 	h = s.height;
   r = NSInsetRect(rect, (rect.size.width - s.width)/2, 
 													      (rect.size.height - s.height)/2);
 	p = NSMakePoint(r.origin.x, r.origin.y);
-	[maskImage compositeToPoint: NSZeroPoint operation: NSCompositeSourceOver];
+	[maskImage compositeToPoint: NSMakePoint(0, 13) 
+                    operation: NSCompositeSourceOver];
 
 	//
 	// hour
@@ -185,6 +224,9 @@ static const int posy[4]  = {14, 26, 42, 51};
   p.x = tf_posx[10];
   p.y = h - posy[3];
 	[monthImage compositeToPoint: p operation: NSCompositeSourceOver];
+
+  [yearlabel drawInteriorWithFrame: NSMakeRect(0, 0, rect.size.width, 12)
+		                        inView: self];
 }
 
 @end

@@ -74,7 +74,8 @@ static NSString *nibName = @"LSFEditor";
       DESTROY (self);
       return self;
     }
-    
+
+    [win setTitle: [[folder node] name]];    
     [win setDelegate: self];
            
     sizesDict = [folder getSizes];      

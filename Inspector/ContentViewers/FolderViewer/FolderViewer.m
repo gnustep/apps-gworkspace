@@ -24,7 +24,6 @@
 
 #include <AppKit/AppKit.h>
 #include "FolderViewer.h"
-#include "GNUstep.h"
 
 #define byname 0
 #define bykind 1

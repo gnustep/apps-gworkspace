@@ -5,7 +5,7 @@
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
  *
- * This file is part of the GNUstep Inspector application
+ * This file is part of the GNUstep GWorkspace application
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,9 +27,7 @@
 
 #include <Foundation/Foundation.h>
 
-@class NSTextField;
 @class NSImage;
-@class TimeDateView;
 @class Sizer;
 
 @protocol SizerProtocol
@@ -70,6 +68,7 @@
   IBOutlet id groupField;
 
   IBOutlet id changedDateBox;
+	IBOutlet id timeDateView;
   IBOutlet id permsBox;
 
   IBOutlet id readLabel;
@@ -101,10 +100,7 @@
 	BOOL multiplePaths;
     
 	NSString *currentPath;	
-  
-	TimeDateView *timeDateView;
-	NSTextField *yearlabel;
-  
+    
   NSConnection *sizerConn;
   id sizer;
   BOOL autocalculate;
@@ -126,11 +122,12 @@
 
 - (IBAction)revertToOldPermissions:(id)sender;
 
-- (void)setPermissions:(int)perms isActive:(BOOL)active;
+- (void)setPermissions:(unsigned long)perms 
+              isActive:(BOOL)active;
 
-- (int)getPermissions:(int)oldperms;
+- (unsigned long)getPermissions:(unsigned long)oldperms;
 
-- (void)watchedPathDidChange:(NSData *)dirinfo;
+- (void)watchedPathDidChange:(NSDictionary *)info;
 
 - (void)setCalculateSizes:(BOOL)value;
 

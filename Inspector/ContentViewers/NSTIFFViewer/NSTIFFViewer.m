@@ -24,7 +24,6 @@
 
 #include <AppKit/AppKit.h>
 #include "NSTIFFViewer.h"
-#include "GNUstep.h"
 
 @implementation NSTIFFViewer
 

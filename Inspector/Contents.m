@@ -5,7 +5,7 @@
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
  *
- * This file is part of the GNUstep Inspector application
+ * This file is part of the GNUstep GWorkspace application
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,30 +28,11 @@
 #include "Contents.h"
 #include "ContentViewersProtocol.h"
 #include "Inspector.h"
-#include "Preferences/InspectorPref.h"
 #include "Functions.h"
-#include "GNUstep.h"
+#include "FSNodeRep.h"
+#include "config.h"
 
-#ifndef ICNMAX
-  #define ICNMAX 48
-  
-  #define CHECK_ICON_SIZE(i) \
-  { \
-  NSSize size = [i size]; \
-  if ((size.width > ICNMAX) || (size.height > ICNMAX)) { \
-  NSSize newsize; \
-  if (size.width >= size.height) { \
-  newsize.width = ICNMAX; \
-  newsize.height = floor(ICNMAX * size.height / size.width + 0.5); \
-  } else { \
-  newsize.height = ICNMAX; \
-  newsize.width  = floor(ICNMAX * size.width / size.height + 0.5); \
-  } \
-  [i setScalesWhenResized: YES]; \
-  [i setSize: newsize]; \
-  } \
-  }
-#endif
+#define ICNSIZE 48
 
 static NSString *nibName = @"Contents";
 
@@ -59,18 +40,13 @@ static NSString *nibName = @"Contents";
 
 - (void)dealloc
 {
-  RELEASE (searchPaths);
-  RELEASE (userDir);
-  RELEASE (disabledDir);
   RELEASE (viewers);
-  
   TEST_RELEASE (currentPath);
-  
   TEST_RELEASE (genericView);
   TEST_RELEASE (noContsView);
-  
   TEST_RELEASE (mainBox);
-    
+  TEST_RELEASE (pboardImage);
+      
 	[super dealloc];
 }
 
@@ -79,9 +55,10 @@ static NSString *nibName = @"Contents";
   self = [super init];
   
   if (self) {
-    NSMutableArray *bundlesPaths;
+    NSBundle *bundle;
+    NSString *imagepath;
     NSString *bundlesDir;
-    BOOL isdir;
+    NSArray *bnames;
     id label;
     unsigned i;
     NSRect r;
@@ -95,64 +72,54 @@ static NSString *nibName = @"Contents";
     RELEASE (win);
     
     inspector = insp;
-    searchPaths = [NSMutableArray new];
     viewers = [NSMutableArray new];
     currentPath = nil;
-    viewerTmpRef = (unsigned long)self;
+
     fm = [NSFileManager defaultManager];	
     ws = [NSWorkspace sharedWorkspace];
-    nc = [NSNotificationCenter defaultCenter];
+
+    bundle = [NSBundle bundleForClass: [inspector class]];
+    imagepath = [bundle pathForResource: @"Pboard" ofType: @"tiff"];
+    pboardImage = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
         
     r = [[(NSBox *)viewersBox contentView] frame];
 
-    bundlesDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
-    ASSIGN (userDir, [bundlesDir stringByAppendingPathComponent: @"Inspector"]);  
-
-    if (([fm fileExistsAtPath: userDir isDirectory: &isdir] && isdir) == NO) {
-      if ([fm createDirectoryAtPath: userDir attributes: nil] == NO) {
-        NSRunAlertPanel(NSLocalizedString(@"error", @""), 
-               NSLocalizedString(@"Can't create the user viewers directory! Quiting now.", @""), 
-                                      NSLocalizedString(@"OK", @""), nil, nil);                                     
-        [NSApp terminate: self];
-      }
-    }
-
-    ASSIGN (disabledDir, [userDir stringByAppendingPathComponent: @"Disabled"]);
-
-    if (([fm fileExistsAtPath: disabledDir isDirectory: &isdir] && isdir) == NO) {
-      if ([fm createDirectoryAtPath: disabledDir attributes: nil] == NO) {
-        NSRunAlertPanel(NSLocalizedString(@"error", @""), 
-               NSLocalizedString(@"Can't create the directory for the disabled viewers! Quiting now.", @""), 
-                                      NSLocalizedString(@"OK", @""), nil, nil);                                     
-        [NSApp terminate: self];
-      }
-    }
-
-    [searchPaths addObject: userDir];
-    [searchPaths addObject: [[NSBundle mainBundle] resourcePath]];
-
-    bundlesPaths = [self bundlesWithExtension: @"inspector" inPath: userDir];
-    [self addViewersFromBundlePaths: bundlesPaths userViewers: YES];
-
     bundlesDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSSystemDomainMask, YES) lastObject];
     bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
+    bnames = [fm directoryContentsAtPath: bundlesDir];
 
-    bundlesPaths = [self bundlesWithExtension: @"inspector" inPath: bundlesDir];
-    [self addViewersFromBundlePaths: bundlesPaths userViewers: NO];
+    for (i = 0; i < [bnames count]; i++) {
+      NSString *bname = [bnames objectAtIndex: i];
+    
+      if ([[bname pathExtension] isEqual: @"inspector"]) {
+        NSString *bpath = [bundlesDir stringByAppendingPathComponent: bname];
+        
+        bundle = [NSBundle bundleWithPath: bpath]; 
+      
+        if (bundle) {
+          Class principalClass = [bundle principalClass];
+        
+          if ([principalClass conformsToProtocol: @protocol(ContentViewersProtocol)]) {	
+	          CREATE_AUTORELEASE_POOL (pool);
+            id vwr = [[principalClass alloc] initWithFrame: r inspector: self];
+        
+            [vwr setBundlePath: bpath];     
+            [vwr setIsExternal: NO];   
+            [vwr setIsRemovable: NO];   
+            [viewers addObject: vwr];            
+            RELEASE ((id)vwr);	
+            RELEASE (pool);		
+          }
+        }
+		  }
+    }
 
-    genericView = [[NSView alloc] initWithFrame: r];		
-    MAKE_LABEL (genericField, NSMakeRect(2, 125, 254, 65), nil, 'c', YES, genericView);		  
-    [genericField setFont: [NSFont systemFontOfSize: 18]];
-    [genericField setTextColor: [NSColor grayColor]];				
+    genericView = [[GenericView alloc] initWithFrame: r];					
 
     noContsView = [[NSView alloc] initWithFrame: r];
     MAKE_LOCALIZED_LABEL (label, NSMakeRect(2, 125, 254, 65), @"No Contents Inspector", @"", 'c', YES, noContsView);		  
     [label setFont: [NSFont systemFontOfSize: 18]];
     [label setTextColor: [NSColor grayColor]];				
-
-    for (i = 0; i < [searchPaths count]; i++) {
-      [inspector addWatcherForPath: [searchPaths objectAtIndex: i]];
-    }
 
     currentViewer = nil;
   }
@@ -176,11 +143,12 @@ static NSString *nibName = @"Contents";
     [self showContentsAt: [paths objectAtIndex: 0]];
     
   } else {
+    NSImage *icon = [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: ICNSIZE];
     NSString *items = NSLocalizedString(@"items", @"");
     
     items = [NSString stringWithFormat: @"%i %@", [paths count], items];
 		[titleField setStringValue: items];  
-    [iconView setImage: [NSImage imageNamed: @"MultipleSelection.tiff"]];
+    [iconView setImage: icon];
     
     [(NSBox *)viewersBox setContentView: noContsView];
     currentViewer = noContsView;
@@ -190,216 +158,8 @@ static NSString *nibName = @"Contents";
       DESTROY (currentPath);
     }    
 	
-	  [[inspector inspWin] setTitle: [self winname]];    
+	  [[inspector win] setTitle: [self winname]];    
   }
-}
-
-- (BOOL)prepareToTerminate
-{
-  NSMutableArray *externalVwrs = [NSMutableArray array];
-  int i;
-
-	for (i = 0; i < [viewers count]; i++) {
-		id viewer = [viewers objectAtIndex: i];
-    
-    if ([viewer isExternal]) {
-      [externalVwrs addObject: viewer];
-    }
-  }  
-  
-  if ([externalVwrs count]) {
-    InspectorPref *preferences = [inspector preferences];
-  
-    if (NSRunAlertPanel(nil,
-            NSLocalizedString(@"Do you want to save the external viewers?", @""),
-            NSLocalizedString(@"Yes", @""),
-            NSLocalizedString(@"No", @""),
-            nil)) {
-      if ([[preferences win] isVisible]) {
-        [[preferences win] close];
-      }    
-      [preferences removeAllViewers];
-  
-      for (i = 0; i < [externalVwrs count]; i++) {
-        [preferences addViewer: [externalVwrs objectAtIndex: i]];
-      }
-    
-      [preferences setSaveMode: YES];
-      [NSApp runModalForWindow: [preferences win]];
-    }
-  }
-    		
-	return YES;
-}
-
-- (void)addViewersFromBundlePaths:(NSArray *)bundlesPaths 
-                      userViewers:(BOOL)isuservwr
-{
-  NSRect r = [[(NSBox *)viewersBox contentView] frame];
-  int i;
-
-  for (i = 0; i < [bundlesPaths count]; i++) {
-    NSString *bpath = [bundlesPaths objectAtIndex: i];
-    NSBundle *bundle = [NSBundle bundleWithPath: bpath]; 
-
-    if (bundle) {
-			Class principalClass = [bundle principalClass];
-			if ([principalClass conformsToProtocol: @protocol(ContentViewersProtocol)]) {	
-	      CREATE_AUTORELEASE_POOL (pool);
-        id vwr = [[principalClass alloc] initWithFrame: r inspector: self];
-	  		NSString *name = [vwr winname];
-        BOOL exists = NO;	
-        int j;
-        			
-				for (j = 0; j < [viewers count]; j++) {
-					if ([name isEqual: [[viewers objectAtIndex: j] winname]]) {
-            NSLog(@"duplicate viewer \"%@\" at %@", name, bpath);
-						exists = YES;
-						break;
-					}
-				}
-
-				if (exists == NO) {
-          [vwr setBundlePath: bpath];     
-          [vwr setIsExternal: NO];   
-          [vwr setIsRemovable: isuservwr];   
-          [self addViewer: vwr];            
-        }
-
-	  		RELEASE ((id)vwr);			
-        RELEASE (pool);		
-			}
-    }
-  }
-}
-
-- (NSMutableArray *)bundlesWithExtension:(NSString *)extension 
-																	inPath:(NSString *)path
-{
-  NSMutableArray *bundleList = [NSMutableArray array];
-  NSEnumerator *enumerator;
-  NSString *dir;
-  BOOL isDir;
-  
-  if ((([fm fileExistsAtPath: path isDirectory: &isDir]) && isDir) == NO) {
-		return nil;
-  }
-	  
-  enumerator = [[fm directoryContentsAtPath: path] objectEnumerator];
-  while ((dir = [enumerator nextObject])) {
-    if ([[dir pathExtension] isEqualToString: extension]) {
-			[bundleList addObject: [path stringByAppendingPathComponent: dir]];
-		}
-  }
-  
-  return bundleList;
-}
-
-- (void)addViewer:(id)vwr
-{
-	[viewers addObject: vwr];
-  [[inspector preferences] addViewer: vwr];
-}
-
-- (void)removeViewer:(id)vwr
-{
-  [viewers removeObject: vwr];
-  [[inspector preferences] removeViewer: vwr];
-  if (currentPath) {  
-    [self showContentsAt: currentPath];
-  }
-}
-
-- (void)disableViewer:(id)vwr
-{
-  NSString *vpath = [vwr bundlePath];
-
-  if (vpath) {
-    NSString *vname = [vpath lastPathComponent];
-    NSString *dispath = [disabledDir stringByAppendingPathComponent: vname];
-    
-    if ([fm fileExistsAtPath: dispath] == NO) {
-      [inspector removeWatcherForPath: userDir];
-      
-      if ([fm movePath: vpath toPath: dispath handler: nil]) {
-        [self removeViewer: vwr];
-      }
-      
-      [inspector addWatcherForPath: userDir];
-      
-    } else {
-      NSRunAlertPanel(nil,
-              NSLocalizedString(@"A disabled viewer with this name already exists.", @""),
-              NSLocalizedString(@"Ok", @""),
-              nil, 
-              nil);  
-    }
-  } else if ([vwr isExternal]) {
-    [self removeViewer: vwr];
-  }
-}
-
-- (BOOL)saveExternalViewer:(id)vwr 
-                  withName:(NSString *)vwrname
-{
-  NSString *vname = [vwrname stringByDeletingPathExtension];
-  NSString *vwrpath = [userDir stringByAppendingPathComponent: vname];
-  
-  vwrpath = [vwrpath stringByAppendingPathExtension: @"inspector"];
-
-  if ([fm fileExistsAtPath: vwrpath]) {
-    NSRunAlertPanel(nil,
-            NSLocalizedString(@"A disabled viewer with this name already exists.", @""),
-            NSLocalizedString(@"Ok", @""),
-            nil, 
-            nil); 
-  } else {
-    NSData *data = [vwr dataRepresentation];
-
-    if (data && [self writeDataRepresentation: data toPath: vwrpath]) {
-      return YES;
-    }
-  }
-  
-  NSRunAlertPanel(nil,
-          NSLocalizedString(@"Error saving the viewer!", @""),
-          NSLocalizedString(@"Ok", @""),
-          nil, 
-          nil); 
-   
-  return NO;  
-}
-
-- (id)viewerWithBundlePath:(NSString *)path
-{
-	int i;
-			
-	for (i = 0; i < [viewers count]; i++) {
-		id vwr = [viewers objectAtIndex: i];
-    NSString *bpath = [vwr bundlePath];
-    		
-		if(bpath && [bpath isEqual: path]) {
-			return vwr;	
-    }	
-	}
-
-	return nil;
-}
-
-- (id)viewerWithWindowName:(NSString *)wname
-{
-	int i;
-			
-	for (i = 0; i < [viewers count]; i++) {
-		id vwr = [viewers objectAtIndex: i];
-    NSString *winname = [vwr winname];
-    		
-		if([winname isEqual: wname]) {
-			return vwr;	
-    }	
-	}
-
-	return nil;
 }
 
 - (id)viewerForPath:(NSString *)path
@@ -416,7 +176,7 @@ static NSString *nibName = @"Contents";
   
 	for (i = 0; i < [viewers count]; i++) {
 		id vwr = [viewers objectAtIndex: i];		
-		if([vwr canDisplayPath: path]) {
+		if ([vwr canDisplayPath: path]) {
 			return vwr;
     }				
 	}
@@ -439,114 +199,6 @@ static NSString *nibName = @"Contents";
 	}
   
   return nil;
-}
-
-- (void)addExternalViewerWithBundleData:(NSData *)bundleData
-{
-  id viewer;
-
-  if (NSRunAlertPanel(nil,
-        NSLocalizedString(@"An other process is asking me to add a viever\nMust I accept it?", @""),
-        NSLocalizedString(@"Yes", @""),
-        NSLocalizedString(@"No", @""),
-        nil) != NSAlertDefaultReturn) {
-    return;                
-  }
-
-  viewer = [self viewerFromPackedBundle: bundleData];
-
-  if (viewer) {
-    NSString *name = [viewer winname];
-    BOOL exists = NO;	
-    int i;
-        			
-		for (i = 0; i < [viewers count]; i++) {
-			if ([name isEqual: [[viewers objectAtIndex: i] winname]]) {
-				exists = YES;
-				break;
-			}
-		}
-
-		if (exists == NO) {
-      [viewer setIsExternal: YES]; 
-      [viewer setDataRepresentation: bundleData];
-      [viewer setIsRemovable: YES];
-      [self addViewer: viewer];            
-    } else {
-      NSRunAlertPanel(nil, 
-            NSLocalizedString(@"A viewer for this type already exists!", @""), 
-              NSLocalizedString(@"OK", @""), nil, nil);                                     
-    }
-  } else {
-    NSRunAlertPanel(nil, 
-          NSLocalizedString(@"invalid bundle data!", @""), 
-            NSLocalizedString(@"OK", @""), nil, nil);                                     
-  }
-}                           
-
-- (void)addExternalViewerWithBundlePath:(NSString *)path
-{
-  if (NSRunAlertPanel(nil,
-        NSLocalizedString(@"An other process is asking me to add a viever\nMust I accept it?", @""),
-        NSLocalizedString(@"Yes", @""),
-        NSLocalizedString(@"No", @""),
-        nil) != NSAlertDefaultReturn) {
-    return;                
-  } else {
-    NSBundle *bundle = [NSBundle bundleWithPath: path]; 
-
-    if (bundle) {
-			Class principalClass = [bundle principalClass];
-			if ([principalClass conformsToProtocol: @protocol(ContentViewersProtocol)]) {	
-        NSRect r = [[(NSBox *)viewersBox contentView] frame];
-        CREATE_AUTORELEASE_POOL (pool);
-        id viewer = [[principalClass alloc] initWithFrame: r inspector: self];
-	  		NSString *name = [viewer winname];
-        BOOL exists = NO;		
-        int i;
-        
-				for (i = 0; i < [viewers count]; i++) {
-					if ([name isEqual: [[viewers objectAtIndex: i] winname]]) {
-						exists = YES;
-						break;
-					}
-				}
-
-				if (exists == NO) {
-          NSData *bundleData = [self dataRepresentationAtPath: path];
-          
-          if (bundleData) {
-            [viewer setIsExternal: YES]; 
-            [viewer setIsRemovable: YES];
-            [viewer setDataRepresentation: bundleData];
-            [self addViewer: viewer]; 
-            
-          } else {
-            NSRunAlertPanel(nil, 
-                NSLocalizedString(@"Cannot create the viewer data representation!", @""), 
-                  NSLocalizedString(@"OK", @""), nil, nil);                                     
-          }   
-          
-        } else {
-          NSRunAlertPanel(nil, 
-              NSLocalizedString(@"A viewer for this type already exists!", @""), 
-                NSLocalizedString(@"OK", @""), nil, nil);                                     
-        }
-
-	  		RELEASE ((id)viewer);
-        RELEASE (pool);
-        
-			} else {
-        NSRunAlertPanel(nil, 
-            NSLocalizedString(@"This object doesn't conforms to the ContentViewersProtocol!", @""), 
-                NSLocalizedString(@"OK", @""), nil, nil);                                     
-      }
-    } else {
-      NSRunAlertPanel(nil, 
-            NSLocalizedString(@"invalid bundle data!", @""), 
-                        NSLocalizedString(@"OK", @""), nil, nil);                                     
-    }
-  }
 }
 
 - (void)showContentsAt:(NSString *)path
@@ -578,31 +230,18 @@ static NSString *nibName = @"Contents";
 			  [viewer displayPath: path];
       }
 		} else {
-      NSString *appName, *type;
-      NSImage *icon;
-            
-      [ws getInfoForFile: path application: &appName type: &type];
-      
-      if (type == NSPlainFileType) {
-        NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: NO];
-        NSString *fmtype = [attributes fileType];                                       
-        
-        if (fmtype != NSFileTypeRegular) {
-          type = fmtype;
-        }
-      }
-      
-      [genericField setStringValue: type];
+      FSNode *node = [FSNode nodeWithPath: path];
+      NSImage *icon = [[FSNodeRep sharedInstance] iconOfSize: ICNSIZE forNode: node];
+
+      [iconView setImage: icon];
+      [titleField setStringValue: [node name]];
+
       [(NSBox *)viewersBox setContentView: genericView];
       currentViewer = genericView;
+      [genericView showInfoOfPath: path];
+      
 			winName = NSLocalizedString(@"Contents Inspector", @"");
-      
-      icon = [ws iconForFile: path];
-      CHECK_ICON_SIZE (icon);
-      [iconView setImage: icon];
-      
-      [titleField setStringValue: [path lastPathComponent]];
-		}
+    }
 		
 	} else {  
     [iconView setImage: nil];
@@ -617,19 +256,16 @@ static NSString *nibName = @"Contents";
     }    
 	}
 	
-	[[inspector inspWin] setTitle: winName];
+	[[inspector win] setTitle: winName];
 }
 
 - (void)contentsReadyAt:(NSString *)path
 {
-  NSImage *icon = [ws iconForFile: path];
-        
-  if (icon) {
-    CHECK_ICON_SIZE (icon);
-    [iconView setImage: icon];
-  }
-    
-  [titleField setStringValue: [path lastPathComponent]];
+  FSNode *node = [FSNode nodeWithPath: path];
+  NSImage *icon = [[FSNodeRep sharedInstance] iconOfSize: ICNSIZE forNode: node];
+
+  [iconView setImage: icon];
+  [titleField setStringValue: [node name]];
 
   if (currentPath == nil) {
     ASSIGN (currentPath, path); 
@@ -668,14 +304,14 @@ static NSString *nibName = @"Contents";
     [viewer displayData: data ofType: type];
 
 	} else {	   
-    [iconView setImage: [NSImage imageNamed: @"Pboard"]];
+    [iconView setImage: pboardImage];
     [titleField setStringValue: @""];  
     [(NSBox *)viewersBox setContentView: noContsView];
     currentViewer = noContsView;
 	  winName = NSLocalizedString(@"Data Inspector", @"");
   }
 	
-	[[inspector inspWin] setTitle: winName];
+	[[inspector win] setTitle: winName];
 	[viewersBox setNeedsDisplay: YES];
 }
 
@@ -687,99 +323,20 @@ static NSString *nibName = @"Contents";
 }
 
 
-- (void)watchedPathDidChange:(NSData *)dirinfo
+- (void)watchedPathDidChange:(NSDictionary *)info
 {
-  NSDictionary *info = [NSUnarchiver unarchiveObjectWithData: dirinfo];
   NSString *path = [info objectForKey: @"path"];
   NSString *event = [info objectForKey: @"event"];
-  unsigned i, j, count;
 
-  if ([searchPaths containsObject: path]) {
-    if ([event isEqual: @"GWFileDeletedInWatchedDirectory"]) {
-      NSArray *files = [info objectForKey: @"files"];
-      BOOL removed = NO;
+  if (currentPath && [currentPath isEqual: path]) {
+    if ([event isEqual: @"GWWatchedFileDeleted"]) {
+      [self showContentsAt: nil];
 
-      count = [files count];
-      for (i = 0; i < count; i++) { 
-        NSString *fname = [files objectAtIndex: i];
-        NSString *dpath = [path stringByAppendingPathComponent: fname];
-        id vwr = [self viewerWithBundlePath: dpath];
-
-        if (vwr) { 
-          [self removeViewer: vwr];  
-          removed = YES;  
-          i--;
-          count--;
-          
-          NSRunAlertPanel(nil, 
-                  NSLocalizedString(@"Viewer removed!", @""), 
-                              NSLocalizedString(@"OK", @""), nil, nil);                                     
-        }
-      }
-
-      if (removed && currentPath) {  
-        [self showContentsAt: currentPath];
-      }
-
-    } else if ([event isEqual: @"GWFileCreatedInWatchedDirectory"]) {
-      NSArray *files = [info objectForKey: @"files"];
-      BOOL added = NO;
-
-      for (i = 0; i < [files count]; i++) { 
-        NSString *fname = [files objectAtIndex: i];
-        NSString *bpath = [path stringByAppendingPathComponent: fname];
-        NSBundle *bundle = [NSBundle bundleWithPath: bpath]; 
-        BOOL exists = NO;
-        
-        if (bundle) {
-				  Class principalClass = [bundle principalClass];
-				  if ([principalClass conformsToProtocol: @protocol(ContentViewersProtocol)]) {	
-	  			  NSRect r = [[(NSBox *)viewersBox contentView] frame];
-            CREATE_AUTORELEASE_POOL (pool);
-            id vwr = [[principalClass alloc] initWithFrame: r inspector: self];
-	  			  NSString *name = [vwr winname];
-					
-					  for (j = 0; j < [viewers count]; j++) {
-						  if ([name isEqual: [[viewers objectAtIndex: j] winname]]) {
-							  exists = YES;
-							  break;
-						  }
-					  }
-					
-					  if (exists == NO) {
-              [vwr setBundlePath: bpath];   
-              [vwr setIsExternal: NO];  
-              [vwr setIsRemovable: [userDir isEqual: path]];
-              [self addViewer: vwr];
-              added = YES;
-              
-              NSRunAlertPanel(nil, 
-                  NSLocalizedString(@"Viewer added!", @""), 
-                              NSLocalizedString(@"OK", @""), nil, nil);                                     
-            }
-					
-	  			  RELEASE ((id)vwr);	
-            RELEASE (pool);				
-				  }
-        }
-      }
-      
-      if (added && currentPath) {  
-        [self showContentsAt: currentPath];
-      }
-    }
-    
-  } else {   // viewed file watcher
-    if (currentPath && [currentPath isEqual: path]) {
-      if ([event isEqual: @"GWWatchedFileDeleted"]) {
-        [self showContentsAt: nil];
-        
-      } else if ([event isEqual: @"GWWatchedFileModified"]) {
-        if (currentViewer 
-                && [currentViewer conformsToProtocol: @protocol(ContentViewersProtocol)]) {
-          if ([currentPath isEqual: [currentViewer currentPath]]) {
-            [currentViewer displayLastPath: YES];
-          }
+    } else if ([event isEqual: @"GWWatchedFileModified"]) {
+      if (currentViewer 
+              && [currentViewer conformsToProtocol: @protocol(ContentViewersProtocol)]) {
+        if ([currentPath isEqual: [currentViewer currentPath]]) {
+          [currentViewer displayLastPath: YES];
         }
       }
     }
@@ -789,117 +346,106 @@ static NSString *nibName = @"Contents";
 @end
 
 
-@implementation Contents (PackedBundles)
-//
-// Part of these methods taken from Zillion
-// by Stefan Boehringer <stefan.boehringer@uni-essen.de>.
-// Zillion is a Server application for scheduling tasks on slave machines.
-//
+@implementation GenericView
 
-- (NSData *)dataRepresentationAtPath:(NSString *)path
+- (void)dealloc
 {
-	NSArray *files = [fm directoryContentsAtPath: path];
-	NSMutableDictionary	*contsDict = [NSMutableDictionary dictionary];
-	int	i;
-
-	for (i = 0; i < [files count]; i++) {
-		NSString *file = [files objectAtIndex: i];
-		NSString *filePath = [path stringByAppendingPathComponent: file];
-		NSDictionary *attributes = [fm fileAttributesAtPath: filePath traverseLink: YES];
-    NSMutableDictionary *fileDict = [NSMutableDictionary dictionary];
-    NSData *contsData;
-    
-		if ([attributes fileType] == NSFileTypeDirectory) {	
-			contsData = [self dataRepresentationAtPath: filePath];
-		} else {
-			contsData = [fm contentsAtPath: filePath];
-		}
-
-    [fileDict setObject: attributes forKey: @"attributes"];
-    [fileDict setObject: contsData forKey: @"contents"];
-    
-		[contsDict setObject: fileDict forKey: file];
+  [nc removeObserver: self];
+  if (task && [task isRunning]) {
+    [task terminate];
 	}
-  
-	return [NSArchiver archivedDataWithRootObject: contsDict];
+  TEST_RELEASE (task);
+  TEST_RELEASE (pipe);
+  TEST_RELEASE (shComm);
+  TEST_RELEASE (fileComm);  
+	[super dealloc];
 }
 
-- (BOOL)writeDataRepresentation:(NSData *)data 
-                         toPath:(NSString *)path
+- (id)initWithFrame:(NSRect)frameRect
 {
-  NSDictionary *dirDict = [NSUnarchiver unarchiveObjectWithData: data];
-
-  if (dirDict) {
-	  NSEnumerator *files = [dirDict keyEnumerator];
-    NSString *fname;
-
-    while ((fname = [files nextObject])) {
-		  NSString *filePath = [path stringByAppendingPathComponent: fname];
-      NSDictionary *fileDict = [dirDict objectForKey: fname];
-      NSDictionary *attributes = [fileDict objectForKey: @"attributes"];
-      NSData *contents = [fileDict objectForKey: @"contents"];
- 
-      if ([[attributes fileType] isEqual: NSFileTypeDirectory]) {
-        if ([fm createDirectoryAtPath: filePath attributes: attributes] == NO) {
-          return NO;
-        } 
-			  if ([self writeDataRepresentation: contents toPath: filePath] == NO) {
-          return NO;
-        }
-      } else {
-			  if ([fm createFileAtPath: filePath 
-                        contents: contents attributes: attributes] == NO) {
-          return NO;
-        }
-      }
+	self = [super initWithFrame: frameRect];
+	
+	if (self) {	
+    NSString *comm;
+          
+    shComm = nil;      
+    fileComm = nil;  
+        
+    comm = [NSString stringWithCString: SHPATH];
+    if ([comm isEqual: @"none"] == NO) {
+      ASSIGN (shComm, comm);
+    } 
+    comm = [NSString stringWithCString: FILEPATH];
+    if ([comm isEqual: @"none"] == NO) {
+      ASSIGN (fileComm, comm);
     }
     
-    return YES;
+		nc = [NSNotificationCenter defaultCenter];
+
+    MAKE_LABEL (field, NSMakeRect(2, 125, 254, 65), nil, 'c', YES, self);		  
+    [field setFont: [NSFont systemFontOfSize: 18]];
+    [field setTextColor: [NSColor grayColor]];	
+	}
+	
+	return self;
+}
+
+- (void)showInfoOfPath:(NSString *)path
+{
+  [field setStringValue: @""];
+
+  if (shComm && fileComm) {  
+    CREATE_AUTORELEASE_POOL (pool);
+    NSString *str;
+	  NSFileHandle *handle;  
+  
+    [nc removeObserver: self];
+    if (task && [task isRunning]) {
+		  [task terminate];
+	  }
+    DESTROY (task);		
+    
+    task = [NSTask new]; 
+    [task setLaunchPath: shComm];
+    str = [NSString stringWithFormat: @"%@ -b %@", fileComm, path];
+    [task setArguments: [NSArray arrayWithObjects: @"-c", str, nil]];
+    ASSIGN (pipe, [NSPipe pipe]);
+    [task setStandardOutput: pipe];
+
+    handle = [pipe fileHandleForReading];
+    [nc addObserver: self
+    		   selector: @selector(dataFromTask:)
+    				   name: NSFileHandleReadToEndOfFileCompletionNotification
+    			   object: handle];
+
+    [handle readToEndOfFileInBackgroundAndNotify];    
+
+    [task launch];   
+       
+    RELEASE (pool);   
+  } else {  
+    [field setStringValue: NSLocalizedString(@"No Contents Inspector", @"")];
+  }        
+}
+
+- (void)dataFromTask:(NSNotification *)notif
+{
+  CREATE_AUTORELEASE_POOL (pool);
+  NSDictionary *userInfo = [notif userInfo];
+  NSData *data = [userInfo objectForKey: NSFileHandleNotificationDataItem];
+  
+  if (data && [data length]) {
+    NSString *str = [[NSString alloc] initWithData: data 
+                          encoding: [NSString defaultCStringEncoding]];
+                          
+    [field setStringValue: str];
+    RELEASE (str);
+    
+  } else {
+    [field setStringValue: NSLocalizedString(@"No Contents Inspector", @"")];
   }
   
-  return NO;
+  RELEASE (pool);   
 }
 
-- (NSString *)tempBundleName
-{
-  viewerTmpRef++;
-  return [NSString stringWithFormat: @"%i", viewerTmpRef];
-}
-
-- (id)viewerFromPackedBundle:(NSData *)packedBundle
-{
-	NSString *tempPath = NSTemporaryDirectory();
-
-  tempPath = [tempPath stringByAppendingPathComponent: [self tempBundleName]];
-  
-  if ([fm createDirectoryAtPath: tempPath attributes: nil]) {
-    if ([self writeDataRepresentation: packedBundle toPath: tempPath]) {
-  	  NSBundle *bundle = [NSBundle bundleWithPath: tempPath];
-
-      if (bundle) {
-	      Class bundleClass = [bundle principalClass];
-
-        if ([bundleClass conformsToProtocol: @protocol(ContentViewersProtocol)]) {
-          NSRect r = [[(NSBox *)viewersBox contentView] frame];
-          id viewer = [[bundleClass alloc] initWithFrame: r inspector: self];
-
-          [fm removeFileAtPath: tempPath handler: nil];
-
-          return AUTORELEASE (viewer);
-        }
-      }
-    }
-	}
-  
-	return nil;
-}
-
-@end 
-
-
-
-
-
-
-
-
+@end

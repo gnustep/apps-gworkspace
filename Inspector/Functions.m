@@ -25,7 +25,6 @@
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include "Functions.h"
-#include "GNUstep.h"
 #include <limits.h>
 
 #define ONE_KB 1024

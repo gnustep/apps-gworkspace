@@ -5,7 +5,7 @@
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
  *
- * This file is part of the GNUstep Inspector application
+ * This file is part of the GNUstep GWorkspace application
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,31 +26,11 @@
 #include <AppKit/AppKit.h>
 #include <math.h>
 #include "Tools.h"
-#include "ContentViewersProtocol.h"
 #include "Inspector.h"
 #include "Functions.h"
-#include "GNUstep.h"
+#include "FSNodeRep.h"
 
-#ifndef ICNMAX
-  #define ICNMAX 48
-  
-  #define CHECK_ICON_SIZE(i) \
-  { \
-  NSSize size = [i size]; \
-  if ((size.width > ICNMAX) || (size.height > ICNMAX)) { \
-  NSSize newsize; \
-  if (size.width >= size.height) { \
-  newsize.width = ICNMAX; \
-  newsize.height = floor(ICNMAX * size.height / size.width + 0.5); \
-  } else { \
-  newsize.height = ICNMAX; \
-  newsize.width  = floor(ICNMAX * size.width / size.height + 0.5); \
-  } \
-  [i setScalesWhenResized: YES]; \
-  [i setSize: newsize]; \
-  } \
-  }
-#endif
+#define ICNSIZE 48
 
 static NSString *nibName = @"Tools";
 
@@ -60,8 +40,7 @@ static NSString *nibName = @"Tools";
 {
 	TEST_RELEASE (toolsBox); 
 	TEST_RELEASE (errLabel); 
-	TEST_RELEASE (mainBox); 
-  
+	TEST_RELEASE (mainBox);   
 	TEST_RELEASE (insppaths);
   TEST_RELEASE (extensions);
 	TEST_RELEASE (currentApp);
@@ -79,7 +58,8 @@ static NSString *nibName = @"Tools";
   
     if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
       NSLog(@"failed to load %@!", nibName);
-      [NSApp terminate: self];
+      DESTROY (self);
+      return self;
     } 
     
     RETAIN (mainBox);
@@ -145,7 +125,6 @@ static NSString *nibName = @"Tools";
 
 - (void)activateForPaths:(NSArray *)paths
 {
-  NSFileManager *fm = [NSFileManager defaultManager];
   BOOL toolsok = YES;
 	int pathscount;
 	int i;
@@ -160,26 +139,24 @@ static NSString *nibName = @"Tools";
 	pathscount = [paths count];
 
 	if (pathscount == 1) { 
-    NSString *path = [paths objectAtIndex: 0];
-    [iconView setImage: [ws iconForFile: path]];
-    [titleField setStringValue: [path lastPathComponent]];
+    FSNode *node = [FSNode nodeWithPath: [paths objectAtIndex: 0]];
+    NSImage *icon = [[FSNodeRep sharedInstance] iconOfSize: ICNSIZE forNode: node];
+  
+    [iconView setImage: icon];
+    [titleField setStringValue: [node name]];
   } else {
+    NSImage *icon = [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: ICNSIZE];
     NSString *items = NSLocalizedString(@"items", @"");
     items = [NSString stringWithFormat: @"%i %@", pathscount, items];
 		[titleField setStringValue: items];  
-    [iconView setImage: [NSImage imageNamed: @"MultipleSelection.tiff"]];
+    [iconView setImage: icon];
   }
    
   for (i = 0; i < [paths count]; i++) {
-	  NSString *path = [paths objectAtIndex: i];
-
-    if ([fm fileExistsAtPath: path]) {
-		  NSString *defApp = nil;
-		  NSString *fType = nil;
-    
-		  [ws getInfoForFile: path application: &defApp type: &fType];		
-		  if (([fType isEqual: NSPlainFileType] == NO)
-                         && ([fType isEqual: NSShellCommandFileType] == NO)) {
+    FSNode *node = [FSNode nodeWithPath: [paths objectAtIndex: i]];
+  
+    if ([node isValid]) {
+		  if ([node isPlain] == NO) {
 			  toolsok = NO;		
 			  break;
       }
@@ -329,10 +306,9 @@ static NSString *nibName = @"Tools";
 	if (appsforext) {
 		for (i = 0; i < count; i++) {
 			NSString *appName = [commonApps objectAtIndex: i];
-			NSString *appPath = [ws fullPathForApplication: appName];
-      NSImage *icon = [ws iconForFile: appPath];
-      
-      CHECK_ICON_SIZE (icon);
+      FSNode *node = [FSNode nodeWithPath: [ws fullPathForApplication: appName]];
+      NSImage *icon = [[FSNodeRep sharedInstance] iconOfSize: ICNSIZE forNode: node];
+
 			cell = [matrix cellAtRow: 0 column: i];
 			[cell setImage: icon];
 			[cell setTitle: appName];
@@ -341,7 +317,7 @@ static NSString *nibName = @"Tools";
 		[matrix sizeToCells];
 	}
 	
-	if(currentApp != nil) {
+	if (currentApp != nil) {
 		NSArray *cells = [matrix cells];
 		
 		for(i = 0; i < [cells count]; i++) {
@@ -382,6 +358,7 @@ static NSString *nibName = @"Tools";
   NSArray *cells;
   NSMutableArray *newApps;
   id cell;
+  FSNode *node;
   NSImage *icon;
   int i, count;
   
@@ -417,9 +394,8 @@ static NSString *nibName = @"Tools";
 		cell = [matrix cellAtRow: 0 column: i];
 		app = [newApps objectAtIndex: i];
 		[cell setTitle: app];
-    app = [ws fullPathForApplication: app];
-    icon = [ws iconForFile: app];
-    CHECK_ICON_SIZE (icon);
+    node = [FSNode nodeWithPath: [ws fullPathForApplication: app]];
+    icon = [[FSNodeRep sharedInstance] iconOfSize: ICNSIZE forNode: node];
 		[cell setImage: icon];
 	}
 
@@ -437,7 +413,7 @@ static NSString *nibName = @"Tools";
   }
 }
 
-- (void)watchedPathDidChange:(NSData *)dirinfo
+- (void)watchedPathDidChange:(NSDictionary *)info
 {
 }
 

@@ -25,7 +25,6 @@
 #include <AppKit/AppKit.h>
 #include <math.h>
 #include "NSColorViewer.h"
-#include "GNUstep.h"
 
 #ifndef PI
 #define PI 3.141592653589793
@@ -39,7 +38,7 @@
   TEST_RELEASE (dataRep);
   RELEASE (typeDescriprion);
   RELEASE (icon);
-  RELEASE (colorView);
+  RELEASE (colorsView);
   RELEASE (errLabel);
   
   [super dealloc];
@@ -56,8 +55,8 @@
     r.origin.y += 30;
     r.size.height -= 30;
     
-    colorView = [[ColorView alloc] initWithFrame: r];
-    [self addSubview: colorView]; 
+    colorsView = [[ColorsView alloc] initWithFrame: r];
+    [self addSubview: colorsView]; 
     
     r.origin.y -= 20;
     r.size.width = 62;
@@ -188,17 +187,17 @@
 
   if (c && [c isKindOfClass: [NSColor class]]) {
     NSColor *color = [c colorUsingColorSpaceName: NSDeviceRGBColorSpace];
-    float red, green, blue, alpha;
-    float hue, saturation, brightness;
+    float red = 0.0, green = 0.0, blue = 0.0, alpha = 0.0;
+    float hue = 0.0, saturation = 0.0, brightness = 0.0;
     
     if (valid == NO) {
       valid = YES;
       [errLabel removeFromSuperview];
-      [self addSubview: colorView]; 
+      [self addSubview: colorsView]; 
     }
     
     [color getHue: &hue saturation: &saturation brightness: &brightness alpha: &alpha];
-    [colorView setHue: hue saturation: saturation brightness: brightness];
+    [colorsView setHue: hue saturation: saturation brightness: brightness];
         
     [color getRed: &red green: &green blue: &blue alpha: &alpha];
     [redField setStringValue: [NSString stringWithFormat: @"R: %.2f", red]];
@@ -209,7 +208,7 @@
   } else {
     if (valid == YES) {
       valid = NO;
-      [colorView removeFromSuperview];
+      [colorsView removeFromSuperview];
 			[self addSubview: errLabel];
       [redField setStringValue: @""];
       [greenField setStringValue: @""];
@@ -251,7 +250,7 @@
 @end
 
 
-@implementation ColorView
+@implementation ColorsView
 
 - (void)dealloc
 {

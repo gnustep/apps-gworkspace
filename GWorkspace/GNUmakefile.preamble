@@ -16,16 +16,19 @@ ADDITIONAL_INCLUDE_DIRS += -IFinder -I../Finder
 ADDITIONAL_INCLUDE_DIRS += -IFinder/SearchResults
 ADDITIONAL_INCLUDE_DIRS += -IFinder/LiveSearch
 ADDITIONAL_INCLUDE_DIRS += -IFinder/Modules
+#ADDITIONAL_INCLUDE_DIRS += -IInspector -I../Inspector 
 ADDITIONAL_INCLUDE_DIRS += -IFileViewer -I../FileViewer 
 ADDITIONAL_INCLUDE_DIRS += -IFileAnnotations -I../FileAnnotations 
 ADDITIONAL_INCLUDE_DIRS += -IHistory -I../History 
 ADDITIONAL_INCLUDE_DIRS += -I../FSNode -I../../FSNode -I../../../FSNode
+ADDITIONAL_INCLUDE_DIRS += -I../Inspector -I../../Inspector
 
 # Additional LDFLAGS to pass to the linker
 ADDITIONAL_LDFLAGS +=  
 
 # Additional library directories the linker should search   
 ADDITIONAL_LIB_DIRS += -L../FSNode/FSNode.framework/Versions/Current/$(GNUSTEP_TARGET_LDIR)
+ADDITIONAL_LIB_DIRS += -L../Inspector/Inspector.framework/Versions/Current/$(GNUSTEP_TARGET_LDIR)
 
 ADDITIONAL_TOOL_LIBS +=
 

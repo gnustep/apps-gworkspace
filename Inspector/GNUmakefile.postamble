@@ -1,16 +1,13 @@
 
 # Things to do before compiling
-before-all::
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Dialogs
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Preferences
+#before-all::
 
 # Things to do after compiling
 # after-all::
 
 # Things to do before installing
-before-install::
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Dialogs
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Preferences
+#before-install::
+#before-all::
   
 # Things to do after installing
 # after-install::
@@ -34,8 +31,8 @@ after-clean::
 # Things to do after distcleaning
 after-distclean::
 	rm -rf autom4te*.cache
-	rm -f config.status config.log config.cache TAGS GNUmakefile inspector.make InspectorInfo.plist
-	rm -f config.h 
+	rm -f config.status config.log config.cache TAGS  
+	rm -f config.status config.log config.cache config.h GNUmakefile inspector.make 
 
 # Things to do before checking
 # before-check::

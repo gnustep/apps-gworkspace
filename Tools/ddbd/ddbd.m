@@ -30,6 +30,12 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#define gw_debug 1
+
+#define GWDebugLog(format, args...) \
+  do { if (gw_debug) \
+    NSLog(format , ## args); } while (0)
+
 #ifdef __MINGW__
   #include "process.h"
 #endif
@@ -150,7 +156,7 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
   
       if ((f >= MIN_INTERVAL) && (f <= MAX_INTERVAL)) {
         syncinterval = f;
-        NSLog(@"synchronize interval set to %.2f", syncinterval);
+        GWDebugLog(@"synchronize interval set to %.2f", syncinterval);
       } 
     }
    
@@ -431,14 +437,14 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
                                    userInfo: nil
                                     repeats: YES];
       RETAIN (syncTimer);
-      NSLog(@"synchronize interval set to %.2f", syncinterval);
+      GWDebugLog(@"synchronize interval set to %.2f", syncinterval);
     } 
   }
 }
 
 - (void)threadWillExit:(NSNotification *)notification
 {
-  NSLog(@"db update thread will exit");
+  NSLog(@"db update done");
 }
 
 @end

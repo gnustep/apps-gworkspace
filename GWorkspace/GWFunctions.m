@@ -611,22 +611,3 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
 	return item;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

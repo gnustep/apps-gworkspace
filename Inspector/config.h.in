@@ -1,0 +1,6 @@
+
+/* Path to sh interpreter */
+#undef SHPATH
+
+/* Path to the file command */
+#undef FILEPATH

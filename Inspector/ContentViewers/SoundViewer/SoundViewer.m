@@ -24,7 +24,6 @@
 
 #include <AppKit/AppKit.h>
 #include "SoundViewer.h"
-#include "GNUstep.h"
 
 @implementation SoundViewer
 

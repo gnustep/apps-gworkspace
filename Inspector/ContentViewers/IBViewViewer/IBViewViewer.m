@@ -24,7 +24,6 @@
 
 #include <AppKit/AppKit.h>
 #include "IBViewViewer.h"
-#include "GNUstep.h"
 
 @implementation CustomView 
 

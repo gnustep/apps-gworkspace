@@ -5,7 +5,7 @@
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
  *
- * This file is part of the GNUstep Inspector application
+ * This file is part of the GNUstep GWorkspace application
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,9 @@
 #include <Foundation/Foundation.h>
 
 @class NSWorkspace;
+@class NSImage;
+@class NSView;
+@class GenericView;
 
 @interface Contents : NSObject
 {
@@ -38,23 +41,18 @@
   IBOutlet id titleField;
   IBOutlet id viewersBox;  
 
-  NSMutableArray *searchPaths;
-  NSString *userDir;
-  NSString *disabledDir;
-  
   NSView *noContsView;
-  NSView *genericView;
-  NSTextField *genericField;
+  GenericView *genericView;
 
 	NSMutableArray *viewers;
   id currentViewer;
-  unsigned long viewerTmpRef;
   
   NSString *currentPath;
   
+  NSImage *pboardImage;
+  
   NSFileManager *fm;
 	NSWorkspace *ws;
-  NSNotificationCenter *nc; 
   
   id inspector;
 }
@@ -67,34 +65,9 @@
 
 - (void)activateForPaths:(NSArray *)paths;
 
-- (BOOL)prepareToTerminate;
-
-- (void)addViewersFromBundlePaths:(NSArray *)bundlesPaths 
-                      userViewers:(BOOL)isuservwr;
-
-- (NSMutableArray *)bundlesWithExtension:(NSString *)extension 
-																	inPath:(NSString *)path;
-
-- (void)addViewer:(id)vwr;
-
-- (void)removeViewer:(id)vwr;
-
-- (void)disableViewer:(id)vwr;
-
-- (BOOL)saveExternalViewer:(id)vwr 
-                  withName:(NSString *)vwrname;
-
-- (id)viewerWithBundlePath:(NSString *)path;
-
-- (id)viewerWithWindowName:(NSString *)wname;
-
 - (id)viewerForPath:(NSString *)path;
 
 - (id)viewerForDataOfType:(NSString *)type;
-
-- (void)addExternalViewerWithBundleData:(NSData *)bundleData;
-
-- (void)addExternalViewerWithBundlePath:(NSString *)path;
 
 - (void)showContentsAt:(NSString *)path;
 
@@ -108,19 +81,24 @@
 - (void)dataContentsReadyForType:(NSString *)typeDescr
                          useIcon:(NSImage *)icon;
 
+- (void)watchedPathDidChange:(NSDictionary *)info;
+
 @end
 
 
-@interface Contents (PackedBundles)
+@interface GenericView : NSView
+{
+  NSString *shComm;
+  NSString *fileComm;
+  NSTask *task;
+  NSPipe *pipe;
+  NSTextField *field;
+  NSNotificationCenter *nc;
+}
 
-- (NSData *)dataRepresentationAtPath:(NSString *)path;
+- (void)showInfoOfPath:(NSString *)path;
 
-- (BOOL)writeDataRepresentation:(NSData *)data 
-                         toPath:(NSString *)path;
-
-- (NSString *)tempBundleName;
-
-- (id)viewerFromPackedBundle:(NSData *)packedBundle;
+- (void)dataFromTask:(NSNotification *)notif;
 
 @end
 

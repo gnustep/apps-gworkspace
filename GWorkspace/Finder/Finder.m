@@ -194,7 +194,7 @@ static Finder *finder = nil;
 
         if ([fm fileExistsAtPath: lsfpath]) {
           if ([self addLiveSearchFolderWithPath: lsfpath createIndex: NO] != nil) {
-            NSLog(@"added lsf with path %@", lsfpath);
+            GWDebugLog(@"added lsf with path %@", lsfpath);
           }
         }
       }
@@ -679,12 +679,8 @@ static Finder *finder = nil;
       [placesMatrix getRow: &row column: &col ofCell: cell];
       [placesMatrix removeRow: row];
       [self adjustMatrix]; 
-      
-      
-      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      // FERMARE IL SEARCH !!!!!!!!!!!!!!!!!!!!!!!!
-      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      
+
+      // TODO - STOP SEARCHING IN THIS PATH !
       
       break;
     }
@@ -1017,20 +1013,15 @@ static Finder *finder = nil;
     
     if (found) {
       if (move) {
-      
-        NSLog(@"moved lsf with path %@ to path %@", [node path], [newnode path]);
-      
+        GWDebugLog(@"moved lsf with path %@ to path %@", [node path], [newnode path]);
         [folder setNode: newnode];
         
       } else if (copy) {
-
         [self addLiveSearchFolderWithPath: [newnode path] createIndex: NO];
-        
-        NSLog(@"added lsf with path %@", [newnode path]);
+        GWDebugLog(@"added lsf with path %@", [newnode path]);
         
       } else if (remove) {
-        NSLog(@"removed lsf with path %@", [node path]);
-      
+        GWDebugLog(@"removed lsf with path %@", [node path]);
         [self removeLiveSearchFolder: folder];
         count--;
         i--;
@@ -1050,8 +1041,7 @@ static Finder *finder = nil;
     LSFolder *folder = [self lsfolderWithPath: [info objectForKey: @"path"]];
     
     if (folder) {
-      NSLog(@"removed (watcher) lsf with path %@", [[folder node] path]);
-    
+      GWDebugLog(@"removed (watcher) lsf with path %@", [[folder node] path]);
       [self removeLiveSearchFolder: folder];
     }
   }
@@ -1199,7 +1189,7 @@ static Finder *finder = nil;
   }
   
   if (index) {
-    NSLog(@"creating trees for lsf at %@", path);
+    GWDebugLog(@"creating trees for lsf at %@", path);
   }
   
   return folder;

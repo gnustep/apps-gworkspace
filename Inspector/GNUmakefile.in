@@ -1,70 +1,54 @@
 PACKAGE_NEEDS_CONFIGURE = YES
 
-include $(GNUSTEP_MAKEFILES)/common.make
-
-include inspector.make
-
-PACKAGE_NAME = Inspector
-VERSION = @PACKAGE_VERSION@
+GNUSTEP_MAKEFILES = $(GNUSTEP_SYSTEM_ROOT)/Makefiles
 
 GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
 
-ifeq ($(FOUNDATION_LIB), apple)
-  GNUSTEP_INSTALLATION_DIR = /
-endif
+include $(GNUSTEP_MAKEFILES)/common.make
+include inspector.make
 
 SUBPROJECTS = ContentViewers
 
-#
-# MAIN APP
-#
-APP_NAME = Inspector
-Inspector_PRINCIPAL_CLASS = Inspector
-Inspector_APPLICATION_ICON=Inspector.tiff
+FRAMEWORK_NAME = Inspector
+include Version
 
+Inspector_PRINCIPAL_CLASS = Inspector
 Inspector_HAS_RESOURCE_BUNDLE = yes
 
 ifneq ($(PDFKIT),no)
   Inspector_GUI_LIBS += -lPDFKit
+  ADDITIONAL_LDFLAGS = -lPDFKit
 endif
 
 Inspector_RESOURCE_FILES = \
-  Resources/Images/* \
-  Resources/English.lproj 
+    Resources/Images/* \
+    Resources/English.lproj 
 
 Inspector_LANGUAGES = Resources/English 
 
 # The Objective-C source files to be compiled
 
-ifneq ($(FOUNDATION_LIB), apple)
-  Inspector_OBJC_FILES = main.m \
-                         Functions.m \
-                         Inspector.m \
-                         Contents.m \
-                         Attributes.m \
-                         TimeDateView.m \
-                         Tools.m \
-                         Preferences/InspectorPref.m \
-                         Dialogs/StartAppWin.m
-else
-  Inspector_OBJC_FILES = main.m \
-                         Functions.m \
-                         Inspector.m \
-                         Contents.m \
-                         Attributes.m \
-                         TimeDateView.m \  
-                         Tools.m \
-                         Preferences/InspectorPref.m \
-                         Dialogs/StartAppWin.m
-                         
-endif
-						 
+Inspector_OBJC_FILES = \
+         Inspector.m \
+         Attributes.m \
+         Contents.m \
+         Tools.m \
+         TimeDateView.m \
+         Functions.m
+
+Inspector_HEADER_FILES = \
+         Inspector.h 
+					 
 -include GNUmakefile.preamble
 
 -include GNUmakefile.local
 
+include $(GNUSTEP_MAKEFILES)/framework.make
+
 include $(GNUSTEP_MAKEFILES)/aggregate.make
 
-include $(GNUSTEP_MAKEFILES)/application.make
-
 -include GNUmakefile.postamble
+
+
+# ADDITIONAL_LDFLAGS = -lPDFKit
+# ViewPDF_GUI_LIBS = -lPDFKit

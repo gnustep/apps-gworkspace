@@ -158,7 +158,6 @@ static NSString *nibName = @"ClipBookWindow.gorm";
         pbDescr = [arr mutableCopy];
       }
             
-            
       ASSIGN (dataTypes, ([NSArray arrayWithObjects: NSStringPboardType,
                                                     NSRTFPboardType,
                                                     NSRTFDPboardType,

@@ -5,7 +5,7 @@
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
  *
- * This file is part of the GNUstep Inspector application
+ * This file is part of the GNUstep GWorkspace application
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,35 +26,13 @@
 #define INSPECTOR_H
 
 #include <Foundation/Foundation.h>
+#include "FSNodeRep.h"
 
-@class StartAppWin;
-@class InspectorPref;
 @class Attributes;
 @class Contents;
 @class Tools;
 
-@protocol	FSWClientProtocol
-
-- (void)watchedPathDidChange:(NSData *)dirinfo;
-
-@end
-
-@protocol	FSWatcherProtocol
-
-- (oneway void)registerClient:(id <FSWClientProtocol>)client;
-
-- (oneway void)unregisterClient:(id <FSWClientProtocol>)client;
-
-- (oneway void)client:(id <FSWClientProtocol>)client
-                          addWatcherForPath:(NSString *)path;
-
-- (oneway void)client:(id <FSWClientProtocol>)client
-                          removeWatcherForPath:(NSString *)path;
-
-@end
-
-
-@interface Inspector : NSObject <FSWClientProtocol>
+@interface Inspector : NSObject 
 {
   IBOutlet id win;
   IBOutlet id popUp;
@@ -64,24 +42,23 @@
 	id currentInspector;
 
 	NSArray *currentPaths;
-
-  id fswatcher;
-  BOOL fswnotifications;
   NSString *watchedPath;
-  
-  InspectorPref *preferences;
-  StartAppWin *startAppWin;
-  
+    
   NSNotificationCenter *nc; 
+
+  id <DesktopApplication> desktopApp;
 }
 
-+ (Inspector *)inspector;
+- (void)activate;
+
+- (void)setCurrentSelection:(NSArray *)selection;
+
+- (BOOL)canDisplayDataOfType:(NSString *)type;
+
+- (void)showData:(NSData *)data 
+          ofType:(NSString *)type;
 
 - (IBAction)activateInspector:(id)sender;
-
-- (void)setPathsData:(NSData *)data;
-
-- (void)showWindow;
 
 - (void)showAttributes;
 
@@ -95,57 +72,15 @@
 
 - (id)tools;
 
-- (NSWindow *)inspWin;
-
-- (InspectorPref *)preferences;
+- (NSWindow *)win;
 
 - (void)updateDefaults;
-
-
-//
-// FSWatcher methods 
-//
-- (void)connectFSWatcher;
-
-- (void)fswatcherConnectionDidDie:(NSNotification *)notif;
 
 - (void)addWatcherForPath:(NSString *)path;
 
 - (void)removeWatcherForPath:(NSString *)path;
 
-
-//
-// Contents Inspector methods 
-//
-- (BOOL)canDisplayDataOfType:(NSString *)type;
-
-- (void)showData:(NSData *)data 
-          ofType:(NSString *)type;
-
-- (id)contentViewerWithWindowName:(NSString *)wname;
-
-- (void)disableContentViewer:(id)vwr;
-
-- (void)addExternalViewerWithBundleData:(NSData *)bundleData;
-
-- (void)addExternalViewerWithBundlePath:(NSString *)path;
-
-- (BOOL)saveExternalContentViewer:(id)vwr 
-                         withName:(NSString *)vwrname;
-
-
-//
-// Menu Operations 
-//
-- (void)closeMainWin:(id)sender;
-
-- (void)showPreferences:(id)sender;
-
-- (void)showInfo:(id)sender;
-
-#ifndef GNUSTEP
-- (void)terminate:(id)sender;
-#endif
+- (void)watcherNotification:(NSNotification *)notif;
 
 @end
 

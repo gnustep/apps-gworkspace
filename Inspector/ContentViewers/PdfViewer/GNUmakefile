@@ -7,7 +7,6 @@ PdfViewer_HAS_RESOURCE_BUNDLE = yes
 
 OBJCFLAGS += -Wall
 
-#ADDITIONAL_GUI_LIBS += -framework GWorkspace
 PdfViewer_GUI_LIBS += -lPDFKit
 
 PdfViewer_OBJC_FILES = PdfViewer.m 
