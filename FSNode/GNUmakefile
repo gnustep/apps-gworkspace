@@ -14,15 +14,17 @@ FSNode_OBJC_FILES = \
          FSNFunctions.m \
          FSNTextCell.m \
          FSNBrowserCell.m \
-         FSNIcon.m 
-        
+         FSNIcon.m \
+         FSNIconContainer.m 
+                
 FSNode_HEADER_FILES = \
          FSNode.h \
          FSNodeRep.h \
          FSNFunctions.h \
          FSNTextCell.h \
          FSNBrowserCell.h \
-         FSNIcon.h 
+         FSNIcon.h \
+         FSNIconContainer.h 
         
 FSNode_HAS_RESOURCE_BUNDLE = yes                                          
         
@@ -39,5 +41,3 @@ FSNode_LANGUAGES = Resources/English
 include $(GNUSTEP_MAKEFILES)/framework.make
 
 -include GNUmakefile.postamble
-
-
