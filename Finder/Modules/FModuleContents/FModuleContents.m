@@ -143,9 +143,12 @@ static NSString *nibName = @"FModuleContents";
 
     if (fileType == NSFileTypeRegular) {
       NSData *contents = [NSData dataWithContentsOfFile: path];
-      const char *bytesStr = (const char *)[contents bytes];
+      
+      if (contents && [contents length]) {
+        const char *bytesStr = (const char *)[contents bytes];
     
-      return (strstr(bytesStr, [contentsStr lossyCString]) != NULL);
+        return (strstr(bytesStr, [contentsStr lossyCString]) != NULL);
+      }
     }
   }
   
