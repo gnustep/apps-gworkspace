@@ -364,6 +364,16 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 	[delegate clickedIcon: self];
 }
 
+- (void)mouseUp:(NSEvent *)theEvent
+{
+  CHECK_LOCK;
+	
+	if([theEvent clickCount] > 1) {
+		unsigned int modifier = [theEvent modifierFlags];		
+		[delegate doubleClickedIcon: self newViewer: (modifier == NSControlKeyMask)];
+	}  
+}
+
 - (void)mouseDown:(NSEvent *)theEvent
 {
 	NSEvent *nextEvent;
@@ -380,43 +390,38 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
     return;  
   }
 
-	if ([theEvent clickCount] > 1) { 
-		unsigned int modifier = [theEvent modifierFlags];
-		
-		[delegate doubleClickedIcon: self newViewer: (modifier == NSControlKeyMask)];
-    return;
-	}  
-    
-  if (isSelect == NO) {  
-    [self select];
-    [delegate unselectNameEditor];
-  }
-   
-  while (1) {
-	  nextEvent = [[self window] nextEventMatchingMask:
-    							            NSLeftMouseUpMask | NSLeftMouseDraggedMask];
+	if ([theEvent clickCount] == 1) { 
+    if (isSelect == NO) {  
+      [self select];
+      [delegate unselectNameEditor];
+    }
 
-    if ([nextEvent type] == NSLeftMouseUp) {
-			[delegate clickedIcon: self];
-      break;
+    while (1) {
+	    nextEvent = [[self window] nextEventMatchingMask:
+    							              NSLeftMouseUpMask | NSLeftMouseDraggedMask];
 
-    } else if ([nextEvent type] == NSLeftMouseDragged) {
-	    if(dragdelay < 5) {
-        dragdelay++;
-      } else {        
-        NSPoint p = [nextEvent locationInWindow];
-
-        p = [self convertPoint: p fromView: nil];
-        offset = NSMakeSize(p.x - location.x, p.y - location.y); 
-        startdnd = YES;        
+      if ([nextEvent type] == NSLeftMouseUp) {
+			  [delegate clickedIcon: self];
         break;
+
+      } else if ([nextEvent type] == NSLeftMouseDragged) {
+	      if(dragdelay < 5) {
+          dragdelay++;
+        } else {        
+          NSPoint p = [nextEvent locationInWindow];
+
+          p = [self convertPoint: p fromView: nil];
+          offset = NSMakeSize(p.x - location.x, p.y - location.y); 
+          startdnd = YES;        
+          break;
+        }
       }
     }
-  }
-  
-  if (startdnd == YES) {  
-    [self startExternalDragOnEvent: nextEvent withMouseOffset: offset];    
-  }               
+
+    if (startdnd == YES) {  
+      [self startExternalDragOnEvent: nextEvent withMouseOffset: offset];    
+    } 
+  }              
 }
 
 - (NSMenu *)menuForEvent:(NSEvent *)theEvent

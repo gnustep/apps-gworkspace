@@ -241,10 +241,10 @@
   }
   
 	isSelect = YES;
-	[namelabel setBackgroundColor: [NSColor whiteColor]]; 	
-	[delegate unselectOtherIcons: self];
 	[self setNeedsDisplay: YES];
+	[namelabel setBackgroundColor: [NSColor whiteColor]]; 	
   [namelabel setNeedsDisplay: YES];
+	[delegate unselectOtherIcons: self];
 }
 
 - (void)unselect
@@ -385,7 +385,7 @@
 - (void)mouseUp:(NSEvent *)theEvent
 {
   CHECK_LOCK;
-	
+  
 	if([theEvent clickCount] > 1) {
 		unsigned int modifier = [theEvent modifierFlags];		
 		[delegate doubleClickOnIcon: self newViewer: (modifier == NSControlKeyMask)];
@@ -400,11 +400,11 @@
   BOOL startdnd = NO;
 	
 	CHECK_LOCK;
-		
+		    
 	if (dimmed) {
 		return;
 	}
-	
+	  
   location = [theEvent locationInWindow];
   location = [self convertPoint: location fromView: nil];
   

@@ -1,3 +1,15 @@
+2004-01-23 Enrico Sersale  <enrico@imago.ro>
+  
+  * GWorkspace/GWSplitView.m
+    -updateDiskSpaceInfo: rewritten.
+
+  * Viewers/IconsViewer/PathIcon.m
+    -mouseUp: implemented.
+
+  * GWLib/Browser2.m
+    in -unselectNameEditor redraw the editor rect only if nameEditor
+    exists in the subviews.
+
 2004-01-22 Enrico Sersale  <enrico@imago.ro>
   
   * GWorkspace/Inspectors/Tools.m

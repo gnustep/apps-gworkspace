@@ -96,7 +96,14 @@
   } else {
     DESTROY (diskInfoString);
   }
-  [self setNeedsDisplayInRect: diskInfoRect];
+
+	if (diskInfoString) {
+  	[diskInfoField setStringValue: diskInfoString]; 
+	} else {
+  	[diskInfoField setStringValue: @""]; 
+  }
+   
+  [diskInfoField drawWithFrame: diskInfoRect inView: self];
 }
 
 - (void)updateFileOpInfo:(NSString *)info

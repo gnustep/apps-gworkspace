@@ -604,8 +604,17 @@
 
 - (void)unselectNameEditor
 {
-  [nameEditor setBackgroundColor: [NSColor windowBackgroundColor]];
-  [self setNeedsDisplayInRect: [nameEditor frame]];
+  #ifdef GNUSTEP 
+    [nameEditor setBackgroundColor: [NSColor windowBackgroundColor]];
+  #endif
+  
+  if ([[self subviews] containsObject: nameEditor]) {
+    NSRect r = NSIntersectionRect([self visibleRect], [nameEditor frame]);
+
+    if (NSEqualRects(r, NSZeroRect) == NO) {
+      [self setNeedsDisplayInRect: r];
+    }
+  }
 }
 
 - (void)restoreSelectionAfterDndOfIcon:(id)dndicon

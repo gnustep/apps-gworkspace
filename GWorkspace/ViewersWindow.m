@@ -827,19 +827,23 @@ if (rct.size.height < 0) rct.size.height = 0; \
 
 - (void)becomeMainWindow
 {
-  NSArray *selPaths;
+  [super becomeMainWindow];
 
-  if (viewer && (selPaths = [viewer selectedPaths])) {
-	  ASSIGN (selectedPaths, selPaths);
-    [gw setSelectedPaths: selPaths];
-    [gw setCurrentViewer: self];  
-    [self updateInfoString]; 
-	  historyWin = [gw historyWindow];
-	  [historyWin setViewer: self];
-	  [self tuneHistory];
-	  [historyWin setHistoryPaths: ViewerHistory];
-	  [self setCurrentHistoryPosition: currHistoryPos];
-    [self makeFirstResponder: [viewer viewerView]];  
+  if (viewer) {
+    NSArray *selPaths = [viewer selectedPaths];
+    
+    if (selPaths) {
+	    ASSIGN (selectedPaths, selPaths);
+      [gw setSelectedPaths: selPaths];
+      [gw setCurrentViewer: self];  
+	    historyWin = [gw historyWindow];
+	    [historyWin setViewer: self];
+	    [self tuneHistory];
+	    [historyWin setHistoryPaths: ViewerHistory];
+	    [self setCurrentHistoryPosition: currHistoryPos];
+      [self makeFirstResponder: [viewer viewerView]];  
+      [self updateInfoString]; 
+    }
   }
 }
 
@@ -1254,7 +1258,8 @@ currHistoryPos = (currHistoryPos >= count) ? (count - 1) : currHistoryPos
   [viewer setCurrentSelection: paths];
 }
 
-- (void)shelf:(Shelf *)sender openCurrentSelection:(NSArray *)paths newViewer:(BOOL)newv
+- (void)shelf:(Shelf *)sender openCurrentSelection:(NSArray *)paths 
+    newViewer:(BOOL)newv
 {
   [viewer setSelectedPaths: paths];
   [gw openSelectedPaths: paths newViewer: newv];   
