@@ -145,7 +145,7 @@
 	isSelect = NO;
 	[namelabel setBackgroundColor: [NSColor windowBackgroundColor]];
 	[self setNeedsDisplay: YES];
-	[delegate setTheCurrentSelection: [NSArray array]];	
+//	[delegate setTheCurrentSelection: [NSArray array]];	
   [(NSView *)delegate setNeedsDisplayInRect: [namelabel frame]];
 }
 
@@ -258,6 +258,7 @@
 			[delegate setShiftClickValue: YES];     
 			if (isSelect == YES) {
 				[self unselect];
+        [delegate setTheCurrentSelection: [NSArray array]];	
 				return;
       } else {
 				[self select];

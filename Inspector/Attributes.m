@@ -290,10 +290,10 @@ static BOOL sizeStop = NO;
 			tmpdate = [date earlierDate: [attrs objectForKey: NSFileModificationDate]];
 		}
 		
-		if(!sameOwner) {
+		if(sameOwner == NO) {
 			usr = @"-";
 		}
-		if(!sameGroup) {
+		if(sameGroup == NO) {
 			grp = @"-";
 		}
 
@@ -326,6 +326,7 @@ static BOOL sizeStop = NO;
       [self startSizer];
     } else {
       sizeStop = YES;
+      [sizeField setStringValue: NSLocalizedString(@"calculating...", @"")]; 
       [sizer computeSizeOfPaths: insppaths];
     }
 	}
@@ -347,7 +348,7 @@ static BOOL sizeStop = NO;
 		}
 	}	
 
-	if(!(iamRoot || isMyFile)) {
+	if((iamRoot || isMyFile) == NO) {
 		return;
 	}
 
@@ -374,17 +375,11 @@ static BOOL sizeStop = NO;
 			while ((fpath = [enumerator nextObject])) {
 				fpath = [currentPath stringByAppendingPathComponent: fpath];
 				attrs = [[fm fileAttributesAtPath: fpath traverseLink: NO] mutableCopy];
-				if (attrs != nil) {			
+				if (attrs) {			
 					oldperms = [[attrs objectForKey: NSFilePosixPermissions] intValue];	
 					newperms = [self getPermissions: oldperms];			
 					[attrs setObject: [NSNumber numberWithInt: newperms] forKey: NSFilePosixPermissions];
 					[fm changeFileAttributes: attrs atPath: fpath];
-					ftype = [attrs objectForKey: NSFileType];
-					if ([ftype isEqualToString: NSFileTypeDirectory]) {		
-						[[NSDistributedNotificationCenter defaultCenter]
- 									postNotificationName: @"GWDidSetFileAttributesNotification"
-	 					  							    object: (id)fpath];
-					}
 				}
 			}
 			ASSIGN (attributes, [fm fileAttributesAtPath: currentPath traverseLink: NO]);	
@@ -412,17 +407,11 @@ static BOOL sizeStop = NO;
 				while ((fpath = [enumerator nextObject])) {
 					fpath = [path stringByAppendingPathComponent: fpath];
 					attrs = [[fm fileAttributesAtPath: fpath traverseLink: NO] mutableCopy];
-					if (attrs != nil) {			
+					if (attrs) {			
 						oldperms = [[attrs objectForKey: NSFilePosixPermissions] intValue];	
 						newperms = [self getPermissions: oldperms];			
 						[attrs setObject: [NSNumber numberWithInt: newperms] forKey: NSFilePosixPermissions];
 						[fm changeFileAttributes: attrs atPath: fpath];
-						ftype = [attrs objectForKey: NSFileType];
-						if ([ftype isEqualToString: NSFileTypeDirectory]) {		
-							[[NSDistributedNotificationCenter defaultCenter]
- 										postNotificationName: @"GWDidSetFileAttributesNotification"
-	 					  								    object: (id)fpath];
-						}
 					}
 				}
 				
@@ -438,10 +427,6 @@ static BOOL sizeStop = NO;
 		ASSIGN (attributes, [fm fileAttributesAtPath: currentPath traverseLink: NO]);	
 		[self setPermissions: 0 isActive: YES];
 	}
-
-	[[NSDistributedNotificationCenter defaultCenter]
- 		postNotificationName: @"GWDidSetFileAttributesNotification"
-	 					      object: (id)[currentPath stringByDeletingLastPathComponent]];
 
 	[okButt setEnabled: NO];
 	[revertButt setEnabled: NO];
@@ -720,7 +705,7 @@ static BOOL sizeStop = NO;
         }
 				filePath = [path stringByAppendingPathComponent: filePath];
 				fileAttrs = [fm fileAttributesAtPath: filePath traverseLink: NO];
-				if(fileAttrs != nil) {
+				if (fileAttrs) {
 					fsize = [[fileAttrs objectForKey: NSFileSize] intValue];
 					dirsize += fsize;
 				}
@@ -728,7 +713,7 @@ static BOOL sizeStop = NO;
 			
 		} else {
 			fileAttrs = [fm fileAttributesAtPath: path traverseLink: NO];
-			if (fileAttrs != nil) {
+			if (fileAttrs) {
 				fsize = [[fileAttrs objectForKey: NSFileSize] intValue];
 				dirsize += fsize;
 			}

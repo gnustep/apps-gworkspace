@@ -160,7 +160,7 @@
   [namelabel setEditable: NO];
   [namelabel setSelectable: NO];  
 	[(NSView *)delegate setNeedsDisplayInRect: [namelabel frame]];
-	[delegate setTheCurrentSelection];	
+//	[delegate setTheCurrentSelection];	
 }
 
 - (void)clickOnLabel
@@ -342,6 +342,7 @@
 			[delegate setShiftClickValue: YES];     
 			if (isSelect == YES) {
 				[self unselect];
+        [delegate setTheCurrentSelection];	
 				return;
       } else {
 				[self select];
