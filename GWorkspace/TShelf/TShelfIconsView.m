@@ -64,13 +64,13 @@
 
 @interface TShelfPBIcon (TShelfIconsViewSorting)
 
-- (NSComparisonResult)iconCompare:(id)other;
+- (NSComparisonResult)pbiconCompare:(id)other;
 
 @end
 
 @implementation TShelfPBIcon (TShelfIconsViewSorting)
 
-- (NSComparisonResult)iconCompare:(id)other
+- (NSComparisonResult)pbiconCompare:(id)other
 {
 	if ([other gridindex] > [self gridindex]) {
 		return NSOrderedAscending;	
@@ -339,9 +339,12 @@
 
 - (void)sortIcons
 {
-	NSArray *sortedIcons = [icons sortedArrayUsingSelector: @selector(iconCompare:)];	
+  SEL sel = (iconsType == FILES_TAB) ? @selector(iconCompare:) : @selector(pbiconCompare:);
+	NSArray *sortedIcons = [icons sortedArrayUsingSelector: sel];	
+  RETAIN (sortedIcons);
 	[icons removeAllObjects];
 	[icons addObjectsFromArray: sortedIcons];
+  RELEASE (sortedIcons);
 }
 
 - (NSArray *)icons
@@ -525,11 +528,7 @@
   if (iconsType == DATA_TAB) {
     int count = [icons count];
     
-    if (event == GWWatchedDirectoryDeleted) { 
-      for (i = 0; i < count; i++) {
-        [self removeIcon: [icons objectAtIndex: 0]];
-      }
-    } else if (event == GWFileDeletedInWatchedDirectory) { 
+    if (event == GWFileDeletedInWatchedDirectory) { 
       NSArray *files = [notifdict objectForKey: @"files"];
     
       for (i = 0; i < count; i++) {
