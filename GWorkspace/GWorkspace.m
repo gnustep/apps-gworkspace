@@ -263,17 +263,20 @@ return [ws openFile: fullPath withApplication: appName]
 	}
 	
 	paths = [NSArray arrayWithObject: fullPath];
-	[self setSelectedPaths: paths];
 	
 	if (newViewer) {
-		ViewersWindow *viewer;
-		NSString *app, *type;
-	
-		[ws getInfoForFile: rootFullpath application: &app type: &type];
-		viewer = [self newViewerAtPath: rootFullpath canViewApps: (type == NSApplicationFileType)];
-		[viewer setViewerSelection: paths];
+		ViewersWindow *viewer = [self viewerRootedAtPath: rootFullpath];
+    
+    if (viewer == nil) {
+      NSString *app, *type;
+		  [ws getInfoForFile: rootFullpath application: &app type: &type];
+		  viewer = [self newViewerAtPath: rootFullpath canViewApps: (type == NSApplicationFileType)];
+		}
+    
+    [viewer setViewerSelection: paths];
 		[viewer orderFrontRegardless];
 	} else {
+	  [self setSelectedPaths: paths];
 		[rootViewer setViewerSelection: paths];
 	}
 				
@@ -1139,7 +1142,22 @@ return [ws openFile: fullPath withApplication: appName]
 {
   return rootViewer;
 }
- 
+
+- (ViewersWindow *)viewerRootedAtPath:(NSString *)vpath
+{
+  int i;
+  
+  for (i = 0; i < [viewers count]; i++) {
+    ViewersWindow *viewer = [viewers objectAtIndex: i];
+    
+    if ([[viewer rootPath] isEqual: vpath]) {
+      return viewer;
+    }
+  }  
+  
+  return nil;
+}
+
 - (id)desktopView
 {
   if (desktopWindow != nil) {

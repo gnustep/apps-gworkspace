@@ -149,6 +149,8 @@
 
 - (id)rootViewer;
 
+- (ViewersWindow *)viewerRootedAtPath:(NSString *)vpath;
+
 - (void)changeDefaultEditor:(NSString *)editor;
 
 - (void)changeDefaultXTerm:(NSString *)xterm arguments:(NSString *)args;

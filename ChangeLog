@@ -1,3 +1,9 @@
+2003-08-26 Enrico Sersale  <enrico@imago.ro>
+
+  * GWorkspace/GWorkspace.m
+    -viewerRootedAtPath: new method.
+    in -selectFile:inFileViewerRootedAtPath: uses the new method.
+
 2003-08-11 Enrico Sersale  <enrico@imago.ro>
 
   * in many places: changed "DeskTop" with Desktop"
