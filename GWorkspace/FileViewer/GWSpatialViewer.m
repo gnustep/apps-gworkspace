@@ -410,6 +410,7 @@
 
 - (void)unselectAllReps
 {
+  [nodeView stopRepNameEditing];
   [nodeView unselectOtherReps: nil];
   [nodeView selectionDidChange];
 }

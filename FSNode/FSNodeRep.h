@@ -444,5 +444,21 @@ typedef enum FSNSelectionMask {
 
 @end
 
+
+@interface FSNodeRep (Icons)
+
+- (NSImage *)resizedIcon:(NSImage *)icon 
+                  ofSize:(int)size;
+
+- (NSImage *)lighterIcon:(NSImage *)icon;
+
+- (NSImage *)darkerIcon:(NSImage *)icon;
+
+- (void)prepareThumbnailsCache;
+
+- (NSImage *)thumbnailForPath:(NSString *)apath;
+
+@end
+
 #endif // FSNODE_REP_H
 

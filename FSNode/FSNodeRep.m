@@ -28,7 +28,6 @@
 #include "FSNodeRep.h"
 #include "FSNFunctions.h"
 #include "ExtendedInfo.h"
-#include "GNUstep.h"
 
 #define LABEL_W_FACT (8.0)
 
@@ -37,16 +36,6 @@ static FSNodeRep *shared = nil;
 @interface FSNodeRep (PrivateMethods)
 
 - (id)initSharedInstance;
-
-- (NSImage *)resizedIcon:(NSImage *)icon 
-                  ofSize:(int)size;
-
-- (NSImage *)icon:(NSImage *)icon 
-      dissolvedBy:(float)delta;
-
-- (void)prepareThumbnailsCache;
-
-- (NSImage *)thumbnailForPath:(NSString *)apath;
 
 - (void)loadExtendedInfoModules;
 
@@ -61,7 +50,7 @@ static FSNodeRep *shared = nil;
 + (void)initialize
 {
   if ([self class] == [FSNodeRep class]) {
-    [FSNodeRep sharedInstance];              
+    [FSNodeRep sharedInstance];     
   }
 }
 
@@ -120,166 +109,6 @@ static FSNodeRep *shared = nil;
   }
     
   return self;
-}
-
-- (NSImage *)resizedIcon:(NSImage *)icon 
-                  ofSize:(int)size
-{
-  if (oldresize == NO) {
-    CREATE_AUTORELEASE_POOL(arp);
-    NSSize icnsize = [icon size];
-	  NSRect srcr = NSZeroRect;
-	  NSRect dstr = NSZeroRect;  
-    float fact;
-    NSSize newsize;	
-    NSImage *newIcon;
-    NSBitmapImageRep *rep;
-
-    if (icnsize.width >= icnsize.height) {
-      fact = icnsize.width / size;
-    } else {
-      fact = icnsize.height / size;
-    }
-
-    newsize = NSMakeSize(icnsize.width / fact, icnsize.height / fact);
-	  srcr.size = icnsize;
-	  dstr.size = newsize;
-
-    newIcon = [[NSImage alloc] initWithSize: newsize];
-
-    NS_DURING
-      {
-		    [newIcon lockFocus];
-
-        [icon drawInRect: dstr 
-                fromRect: srcr 
-               operation: NSCompositeSourceOver 
-                fraction: 1.0];
-
-        rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect: dstr];
-
-        if (rep) {
-          [newIcon addRepresentation: rep];
-          RELEASE (rep); 
-        }
-
-		    [newIcon unlockFocus];
-      }
-    NS_HANDLER
-      {
-        newIcon = [icon copy];
-	      [newIcon setScalesWhenResized: YES];
-	      [newIcon setSize: newsize];  
-      }
-    NS_ENDHANDLER
-
-    RELEASE (arp);
-
-    return [newIcon autorelease];  
-  
-  } else {
-    CREATE_AUTORELEASE_POOL(arp);
-    NSImage *newIcon = [icon copy];
-    NSSize icnsize = [icon size];
-    float fact;
-    NSSize newsize;
-
-    if (icnsize.width >= icnsize.height) {
-      fact = icnsize.width / size;
-    } else {
-      fact = icnsize.height / size;
-    }
-
-    newsize = NSMakeSize(icnsize.width / fact, icnsize.height / fact);
-
-	  [newIcon setScalesWhenResized: YES];
-	  [newIcon setSize: newsize];  
-    RELEASE (arp);
-
-    return [newIcon autorelease];  
-  }
-
-  return nil;
-}
-
-- (NSImage *)icon:(NSImage *)icon 
-      dissolvedBy:(float)delta
-{
-  if (oldresize == NO) {
-    CREATE_AUTORELEASE_POOL(arp);
-    NSSize sz = [icon size];
-    NSImage *newIcon = [[NSImage alloc] initWithSize: sz];
-    NSBitmapImageRep *rep;
-    NSRect r = NSZeroRect;
-    
-    NS_DURING
-      {
-		    [newIcon lockFocus];
-        
-        [icon dissolveToPoint: NSZeroPoint fraction: delta];
-        r.size = sz;
-        rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect: r];
-
-        if (rep) {
-          [newIcon addRepresentation: rep];
-          RELEASE (rep); 
-        }
-
-		    [newIcon unlockFocus];
-      }
-    NS_HANDLER
-      {
-        newIcon = [icon copy];
-      }
-    NS_ENDHANDLER
-
-    RELEASE (arp);
-
-    return [newIcon autorelease];  
-    
-  } else {
-    return icon;
-  }
-}
-
-- (void)prepareThumbnailsCache
-{
-  NSString *dictName = @"thumbnails.plist";
-  NSString *dictPath = [thumbnailDir stringByAppendingPathComponent: dictName];
-  NSDictionary *tdict;
-  
-  DESTROY (tumbsCache);
-  tumbsCache = [NSMutableDictionary new];
-  
-  tdict = [NSDictionary dictionaryWithContentsOfFile: dictPath];
-    
-  if (tdict) {
-    NSArray *keys = [tdict allKeys];
-    int i;
-
-    for (i = 0; i < [keys count]; i++) {
-      NSString *key = [keys objectAtIndex: i];
-      NSString *tumbname = [tdict objectForKey: key];
-      NSString *tumbpath = [thumbnailDir stringByAppendingPathComponent: tumbname]; 
-
-      if ([fm fileExistsAtPath: tumbpath]) {
-        NSImage *tumb = [[NSImage alloc] initWithContentsOfFile: tumbpath];
-        
-        if (tumb) {
-          [tumbsCache setObject: tumb forKey: key];
-          RELEASE (tumb);
-        }
-      }
-    }
-  } 
-}
-
-- (NSImage *)thumbnailForPath:(NSString *)apath
-{
-  if (usesThumbnails && tumbsCache) {
-    return [tumbsCache objectForKey: apath];
-  }
-  return nil;
 }
 
 - (void)loadExtendedInfoModules
@@ -486,16 +315,17 @@ static FSNodeRep *shared = nil;
       icon = AUTORELEASE (img);
     } else {
       if ([node isApplication]) {
-        icon = [self icon: [self iconOfSize: size forNode: node] dissolvedBy: 0.7];
+        icon = [self lighterIcon: [self iconOfSize: size forNode: node]];
       } else {
         icon = openFolderIcon;
       }
     }      
   } else {
-    if ([node isMountPoint]) {
-      icon = openHardDiskIcon;
+    if (([node isMountPoint] && [volumes containsObject: [node path]])
+                                    || [volumes containsObject: [node path]]) {
+      icon = [self lighterIcon: hardDiskIcon];
     } else if ([node isApplication]) {    
-      icon = [self icon: [self iconOfSize: size forNode: node] dissolvedBy: 0.7];
+      icon = [self lighterIcon: [self iconOfSize: size forNode: node]];
     } else {
       icon = openFolderIcon;
     }

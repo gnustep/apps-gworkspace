@@ -1,10 +1,6 @@
 
 GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
 
-ifeq ($(FOUNDATION_LIB), apple)
-  GNUSTEP_INSTALLATION_DIR = /
-endif
-
 include $(GNUSTEP_MAKEFILES)/common.make
 
 # The application to be compiled

@@ -1,6 +1,4 @@
 
-GNUSTEP_MAKEFILES = $(GNUSTEP_SYSTEM_ROOT)/Makefiles
-
 GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
 
 include $(GNUSTEP_MAKEFILES)/common.make
@@ -11,6 +9,7 @@ FRAMEWORK_NAME = FSNode
 FSNode_OBJC_FILES = \
          FSNode.m \
          FSNodeRep.m \
+         FSNodeRepIcons.m \
          FSNFunctions.m \
          FSNTextCell.m \
          FSNBrowserCell.m \

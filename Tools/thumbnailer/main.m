@@ -25,7 +25,7 @@
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include <math.h>
-#include "GNUstep.h"
+#include <limits.h>
 
 #define TMBMAX (48.0)
 #define RESZLIM 4
