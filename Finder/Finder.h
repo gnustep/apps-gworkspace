@@ -43,9 +43,11 @@
 
 @protocol	LSFdProtocol
 
-- (void)registerFinder:(id <LSFdClientProtocol>)fndr;
+- (oneway void)registerFinder:(id <LSFdClientProtocol>)fndr;
 
-- (void)unregisterFinder:(id <LSFdClientProtocol>)fndr;
+- (oneway void)unregisterFinder:(id <LSFdClientProtocol>)fndr;
+
+- (oneway void)addLiveSearchFolderWithPath:(NSString *)path;
 
 @end
 
@@ -152,6 +154,8 @@
 - (void)openFoundSelection:(NSArray *)selection;
 
 - (void)updateDefaults;
+
+- (void)liveSearchFolderCreatedAtPath:(NSString *)path;
 
 - (void)connectLSFd;
 

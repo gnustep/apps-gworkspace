@@ -23,6 +23,9 @@
  */
 
 #include "lsfd.h"
+#include "lsfolder.h"
+#include "FSNode.h"
+#include "FinderModulesProtocol.h"
 
 #include <stdio.h>
 #include <unistd.h>
@@ -54,6 +57,9 @@
 	  DESTROY (finder);                
   }
 
+  RELEASE (modules);
+  RELEASE (lsfolders);
+
   [super dealloc];
 }
 
@@ -81,10 +87,74 @@
 	           object: conn];
              
     finderconn = nil;           
-    finder = nil;           
+    finder = nil; 
+    
+    lsfolders = [NSMutableArray new];
+    [self loadModules];
   }
   
   return self;    
+}
+
+- (void)loadModules
+{
+  NSString *bundlesDir;
+  NSArray *bpaths;
+  NSMutableArray *bundlesPaths;
+  BOOL isdir;
+  int i;
+  
+  bundlesPaths = [NSMutableArray array];
+
+  bundlesDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSSystemDomainMask, YES) lastObject];
+  bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
+  bpaths = [self bundlesWithExtension: @"finder" inPath: bundlesDir];
+  [bundlesPaths addObjectsFromArray: bpaths];
+
+  bundlesDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
+  bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Finder"];  
+
+  if ([fm fileExistsAtPath: bundlesDir isDirectory: &isdir] && isdir) {
+    bpaths = [self bundlesWithExtension: @"finder" inPath: bundlesDir];
+    [bundlesPaths addObjectsFromArray: bpaths];
+  }
+  
+  modules = [NSMutableArray new];
+
+  for (i = 0; i < [bundlesPaths count]; i++) {
+    NSString *bpath = [bundlesPaths objectAtIndex: i];
+    NSBundle *bundle = [NSBundle bundleWithPath: bpath];
+     
+    if (bundle) {
+			Class principalClass = [bundle principalClass];
+
+			if ([principalClass conformsToProtocol: @protocol(FinderModulesProtocol)]) {	
+	      [modules addObject: principalClass];
+			}
+    }
+  }
+}
+
+- (NSArray *)bundlesWithExtension:(NSString *)extension 
+													 inPath:(NSString *)path
+{
+  NSMutableArray *bundleList = [NSMutableArray array];
+  NSEnumerator *enumerator;
+  NSString *dir;
+  BOOL isDir;
+  
+  if ((([fm fileExistsAtPath: path isDirectory: &isDir]) && isDir) == NO) {
+		return nil;
+  }
+	  
+  enumerator = [[fm directoryContentsAtPath: path] objectEnumerator];
+  while ((dir = [enumerator nextObject])) {
+    if ([[dir pathExtension] isEqualToString: extension]) {
+			[bundleList addObject: [path stringByAppendingPathComponent: dir]];
+		}
+  }
+  
+  return bundleList;
 }
 
 - (BOOL)connection:(NSConnection *)ancestor
@@ -138,6 +208,19 @@
               
   DESTROY (finderconn);
   DESTROY (finder);
+}
+
+- (void)addLiveSearchFolderWithPath:(NSString *)path
+{
+  LSFolder *folder = [[LSFolder alloc] initWithPath: path];
+
+  if (folder) {
+    [lsfolders addObject: folder];
+    RELEASE (folder);  
+    
+    
+    [folder updateFoundPaths];
+  }
 }
 
 @end

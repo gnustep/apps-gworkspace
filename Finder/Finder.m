@@ -35,6 +35,7 @@
 #include "FSNode.h"
 #include "FSNodeRep.h"
 #include "Functions.h"
+#include "config.h"
 #include "GNUstep.h"
 
 #define WINH (184.0)
@@ -303,7 +304,10 @@ static Finder *finder = nil;
   startAppWin = [[StartAppWin alloc] init];
 
   lsfd = nil;
-  [self connectLSFd];
+  
+  if (SQLITE) {
+    [self connectLSFd];
+  }
 }
 
 - (BOOL)application:(NSApplication *)application 
@@ -996,6 +1000,13 @@ static Finder *finder = nil;
         [ws launchApplication: [node path]];    
       }
     }
+  }
+}
+
+- (void)liveSearchFolderCreatedAtPath:(NSString *)path
+{
+  if (lsfd) {
+    [lsfd addLiveSearchFolderWithPath: path];
   }
 }
 

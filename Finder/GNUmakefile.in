@@ -1,3 +1,6 @@
+PACKAGE_NEEDS_CONFIGURE = YES
+
+SQLITE=@have_sqlite@
 
 include $(GNUSTEP_MAKEFILES)/common.make
 
@@ -6,8 +9,12 @@ VERSION = 0.7
 
 GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
 
-SUBPROJECTS = Modules \
+ifneq ($(SQLITE),no)
+  SUBPROJECTS = Modules \
                 LiveSearch/lsfd
+else 
+  SUBPROJECTS = Modules
+endif
 
 #
 # MAIN APP

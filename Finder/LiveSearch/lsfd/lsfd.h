@@ -40,29 +40,33 @@
 
 - (void)unregisterFinder:(id <LSFdClientProtocol>)fndr;
 
+- (void)addLiveSearchFolderWithPath:(NSString *)path;
+
 @end
 
 
-@interface LSFd: NSObject 
+@interface LSFd: NSObject <LSFdProtocol>
 {
   NSConnection *conn;
   NSConnection *finderconn;
   id <LSFdClientProtocol> finder;
-  
-//  NSMutableArray *wpaths;
+
+  NSMutableArray *modules;
+  NSMutableArray *lsfolders;
   
   NSFileManager *fm;
   NSNotificationCenter *nc; 
 }
 
+- (void)loadModules;
+
+- (NSArray *)bundlesWithExtension:(NSString *)extension 
+													 inPath:(NSString *)path;
+
 - (BOOL)connection:(NSConnection *)ancestor
             shouldMakeNewConnection:(NSConnection *)newConn;
 
 - (void)connectionBecameInvalid:(NSNotification *)notification;
-
-- (void)registerFinder:(id <LSFdClientProtocol>)fndr;
-
-- (void)unregisterFinder:(id <LSFdClientProtocol>)fndr;
       
 @end
 

@@ -8,7 +8,7 @@ TOOL_NAME = lsfd
 
 # The Objective-C source files to be compiled
 
-lsfd_OBJC_FILES = lsfd.m 
+lsfd_OBJC_FILES = lsfd.m lsfolder.m updater.m
 
 # The Resource files to be copied into the app's resources directory
 

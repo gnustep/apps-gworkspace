@@ -34,10 +34,9 @@ after-clean::
 # before-distclean::
 
 # Things to do after distcleaning
-#after-distclean::
-#	rm -rf autom4te*.cache
-#	rm -f config.status config.log config.cache TAGS GNUmakefile inspector.make InspectorInfo.plist
-#	rm -f config.h 
+after-distclean::
+	rm -f GNUmakefile 
+	rm -f config.h 
 
 # Things to do before checking
 # before-check::
