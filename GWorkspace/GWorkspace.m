@@ -1949,12 +1949,12 @@ NSLocalizedString(@"OK", @""), nil, nil); \
         
         [startAppWin showWindowWithTitle: @"GWorkspace"
                                  appName: @"fswatcher"
-                            maxProgValue: 50.0];
+                            maxProgValue: 40.0];
 
 	      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
         RELEASE (cmd);
         
-        for (i = 1; i <= 50; i++) {
+        for (i = 1; i <= 40; i++) {
           [startAppWin updateProgressBy: 1 * 1.0];
 	        [[NSRunLoop currentRunLoop] runUntilDate:
 		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];

@@ -1,3 +1,13 @@
+2004-02-02 Enrico Sersale  <enrico@imago.ro>
+  
+  * Utilities/fswatcher
+    new subproject.
+    the fswatcher tool is a daemon that notifies the registered applications 
+    when the contents of a directory have changed.
+
+  * GWLib/FSWatcher.[h m]
+    removed.
+
 2004-01-25 Enrico Sersale  <enrico@imago.ro>
   
   * GWNet
