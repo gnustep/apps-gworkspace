@@ -343,7 +343,8 @@ static GWorkspace *gworkspace = nil;
     RELEASE (viewer);
     
   } else {
-    viewer = [vwrsManager newViewerForPath: path closeOldViewer: nil];
+    FSNode *node = [FSNode nodeWithRelativePath: path parent: nil];
+    viewer = [vwrsManager newViewerOfType: 1 forNode: node closeOldViewer: nil];
   }
   
   return viewer;

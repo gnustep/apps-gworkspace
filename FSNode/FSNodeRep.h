@@ -184,7 +184,7 @@ typedef enum FSNSelectionMask {
 
 - (void)removeRep:(id)arep;
 
-- (void)unloadFromPath:(NSString *)path;
+- (void)unloadFromNode:(FSNode *)anode;
 
 - (void)repSelected:(id)arep;
 

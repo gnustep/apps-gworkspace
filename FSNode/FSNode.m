@@ -389,6 +389,12 @@
       } 
 
     } else if (fileType == NSFileTypeSymbolicLink) {
+      NSDictionary *attrs = [fm fileAttributesAtPath: path traverseLink: YES];
+
+      if (attrs) {
+        [self setFlagsForSymLink: attrs];
+      }
+
       flags.link = 1;
     } else if (fileType == NSFileTypeSocket) {
       flags.socket = 1;
@@ -402,6 +408,45 @@
   } else {
     flags.unknown = 1;
   }
+}
+
+- (void)setFlagsForSymLink:(NSDictionary *)attrs
+{  
+  NSString *ftype = [attrs fileType];
+
+  if (ftype == NSFileTypeRegular) {
+    flags.plain = 1;
+
+  } else if (ftype == NSFileTypeDirectory) {
+	  NSString *defApp, *type;
+
+	  [ws getInfoForFile: path application: &defApp type: &type]; 
+
+    flags.directory = 1;
+
+	  if (type == NSApplicationFileType) {
+      flags.application = 1;
+      flags.package = 1;
+	  } else if (type == NSPlainFileType) {
+      flags.package = 1;
+    } else if (type == NSFilesystemFileType) {
+      flags.mountpoint = 1;
+    } 
+
+  } else if (ftype == NSFileTypeSymbolicLink) {
+    attrs = [fm fileAttributesAtPath: path traverseLink: YES];
+    if (attrs) {
+      [self setFlagsForSymLink: attrs];
+    }
+  } else if (ftype == NSFileTypeSocket) {
+    flags.socket = 1;
+  } else if (ftype == NSFileTypeCharacterSpecial) {
+    flags.charspecial = 1;
+  } else if (ftype == NSFileTypeBlockSpecial) {
+    flags.blockspecial = 1;
+  } else {
+    flags.unknown = 1;
+  } 
 }
 
 - (NSString *)typeDescription
@@ -499,29 +544,30 @@
 
 - (NSString *)sizeDescription
 {
+  unsigned long long fsize = [self fileSize];
 	NSString *sizeStr;
 	char *sign = "";
     
-	if (filesize == 1) {
+	if (fsize == 1) {
 		sizeStr = @"1 byte";
-	} else if (filesize < 0) {
+	} else if (fsize < 0) {
 		sign = "-";
-		filesize = -filesize;
+		fsize = -fsize;
 	} 
   
-	if (filesize == 0) {
+	if (fsize == 0) {
 		sizeStr = @"0 bytes";
-	} else if (filesize < (10 * ONE_KB)) {
-		sizeStr = [NSString stringWithFormat: @"%s%d bytes", sign, filesize];
-	} else if(filesize < (100 * ONE_KB)) {
+	} else if (fsize < (10 * ONE_KB)) {
+		sizeStr = [NSString stringWithFormat: @"%s%d bytes", sign, fsize];
+	} else if(fsize < (100 * ONE_KB)) {
  		sizeStr = [NSString stringWithFormat: @"%s%3.2f KB", sign,
-                          					  ((double)filesize / (double)(ONE_KB))];
-	} else if(filesize < (100 * ONE_MB)) {
+                          					  ((double)fsize / (double)(ONE_KB))];
+	} else if(fsize < (100 * ONE_MB)) {
 		sizeStr = [NSString stringWithFormat: @"%s%3.2f MB", sign,
-                          					  ((double)filesize / (double)(ONE_MB))];
+                          					  ((double)fsize / (double)(ONE_MB))];
 	} else {
  		sizeStr = [NSString stringWithFormat:@"%s%3.2f GB", sign,
-                          					  ((double)filesize / (double)(ONE_GB))];
+                          					  ((double)fsize / (double)(ONE_GB))];
 	}
 
 	return sizeStr;

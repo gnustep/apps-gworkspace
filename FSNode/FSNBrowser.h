@@ -173,7 +173,7 @@
 - (void)removeRepOfSubnode:(FSNode *)anode;
 - (void)removeRepOfSubnodePath:(NSString *)apath;
 - (void)removeRep:(id)arep;
-- (void)unloadFromPath:(NSString *)path;
+- (void)unloadFromNode:(FSNode *)anode;
 - (void)repSelected:(id)arep;
 - (void)unselectOtherReps:(id)arep;
 - (void)selectReps:(NSArray *)reps;

@@ -29,7 +29,6 @@
 #include <AppKit/NSView.h>
 #include "FSNodeRep.h"
 
-// @class PathIcon;
 
 @interface GWViewerIconsPath : NSView
 {

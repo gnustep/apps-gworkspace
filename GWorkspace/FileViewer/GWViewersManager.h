@@ -26,42 +26,68 @@
 #define GWVIEWERS_MANAGER_H
 
 #include <Foundation/Foundation.h>
+#include "FSNodeRep.h"
 
-@class GWSpatialViewer;
+#define BROWSING 0
+#define SPATIAL  1
+
 @class GWorkspace;
 
 @interface GWViewersManager : NSObject
 {
   NSMutableArray *viewers;
+  BOOL orderingViewers;
   GWorkspace *gworkspace;
   NSNotificationCenter *nc;    
 }
 
 + (GWViewersManager *)viewersManager;
 
-- (id)newViewerForPath:(NSString *)path
-        closeOldViewer:(id)oldvwr;
-- (id)viewerWithBasePath:(NSString *)path;
-- (id)viewerForPath:(NSString *)path;
-- (id)parentOfViewer:(id)aviewer;
+
+- (id)newViewerOfType:(unsigned)vtype
+              forNode:(FSNode *)node
+       closeOldViewer:(id)oldvwr;
+       
+- (void)setBehaviour:(NSString *)behaviour 
+           forViewer:(id)aviewer;
+           
+- (NSArray *)viewersForBaseNode:(FSNode *)node;
+
+- (id)viewerOfType:(unsigned)type
+      withBaseNode:(FSNode *)node; 
+
+- (id)viewerOfType:(unsigned)type
+       showingNode:(FSNode *)node; 
+
+- (id)parentOfSpatialViewer:(id)aviewer;
+
 
 - (void)viewerWillClose:(id)aviewer;
+
 - (void)closeInvalidViewers:(NSArray *)vwrs;
-- (void)closeViewerWithBasePath:(NSString *)path;
 
-- (void)viewerSelected:(id)aviewer;
-- (void)unselectOtherViewers:(id)aviewer;
 
-- (void)viewer:(id)aviewer didShowPath:(NSString *)apath;
-- (void)selectionDidChangeInViewer:(id)aviewer;
+- (void)selectedSpatialViewerChanged:(id)aviewer;
+
+- (void)reflectInParentSelectedViewer:(id)aviewer;
+
+- (void)viewer:(id)aviewer didShowNode:(FSNode *)node;
+
+
 - (void)selectionChanged:(NSArray *)selection;
+
 - (void)openSelectionInViewer:(id)viewer
                   closeSender:(BOOL)close;
+                  
 - (void)openAsFolderSelectionInViewer:(id)viewer;
 
+
 - (void)sortTypeDidChange:(NSNotification *)notif;
+
 - (void)fileSystemWillChange:(NSNotification *)notif;
+
 - (void)fileSystemDidChange:(NSNotification *)notif;
+
 - (void)watcherNotification:(NSNotification *)notif;
 
 @end

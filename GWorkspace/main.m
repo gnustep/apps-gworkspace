@@ -59,7 +59,7 @@ void createMenu()
 {
   NSMenu *mainMenu;
 	NSMenu *info, *file, *edit, *view, *tools;
-	NSMenu *inspmenu, *fiendmenu, *tshelfmenu, *hismenu;
+	NSMenu *viewersmenu, *inspmenu, *fiendmenu, *tshelfmenu, *hismenu;
 	NSMenu *windows, *services;  
 	NSMenuItem *menuItem;
 
@@ -109,6 +109,13 @@ void createMenu()
 	tools = AUTORELEASE ([NSMenu new]);
 	[mainMenu setSubmenu: tools forItem: menuItem];	
 	addItemToMenu(tools, @"Viewer", @"", @"showViewer:", @"V");	
+  
+		menuItem = addItemToMenu(tools, @"Viewer behaviour", @"", nil, @"");
+		viewersmenu = AUTORELEASE ([NSMenu new]);
+		[tools setSubmenu: viewersmenu forItem: menuItem];	
+		addItemToMenu(viewersmenu, @"Browsing", @"", @"setViewerBehaviour:", @"B");
+		addItemToMenu(viewersmenu, @"Spatial", @"", @"setViewerBehaviour:", @"S");
+  
 		menuItem = addItemToMenu(tools, @"Inspectors", @"", nil, @"");
 		inspmenu = AUTORELEASE ([NSMenu new]);
 		[tools setSubmenu: inspmenu forItem: menuItem];	

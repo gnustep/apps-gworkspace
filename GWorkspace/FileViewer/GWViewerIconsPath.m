@@ -167,6 +167,9 @@
   for (i = 0; i < [components count]; i++) {
     FSNode *component = [components objectAtIndex: i];
   
+        NSLog(@"showPathComponents %@", [component path]);
+  
+  
     if (i < icncount) {
       icon = [icons objectAtIndex: i];
       [icon setNode: component];

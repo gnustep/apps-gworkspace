@@ -26,6 +26,7 @@
 #include "GWViewerIconsView.h"
 #include "FSNIcon.h"
 #include "GWSpatialViewer.h"
+#include "GWViewer.h"
 #include "GWViewersManager.h"
 
 @implementation GWViewerIconsView
@@ -54,14 +55,14 @@
 		
     if ([selection count] == 0) {
       selection = [NSArray arrayWithObject: [node path]];
-    } else {
-      [manager selectionDidChangeInViewer: viewer];
+    } else if (([viewer vtype] == SPATIAL) 
+                        && [(NSWindow *)[viewer win] isKeyWindow]) {
+      [manager selectedSpatialViewerChanged: viewer];
     }
 
     if ((lastSelection == nil) || ([selection isEqual: lastSelection] == NO)) {
       ASSIGN (lastSelection, selection);
       [viewer selectionChanged: selection];
-      [desktopApp selectionChanged: selection];
     }
     
     [self updateNameEditor];
@@ -84,7 +85,10 @@
     DESTROY (lastSelection);
     [self selectionDidChange];
     
-    [manager viewerSelected: viewer];
+    if ([viewer vtype] == SPATIAL) {
+      [manager selectedSpatialViewerChanged: viewer];
+      [manager reflectInParentSelectedViewer: viewer];
+    }
 	}
 }
 

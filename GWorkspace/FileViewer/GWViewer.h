@@ -66,17 +66,19 @@
   BOOL invalidated;
 }
 
-- (id)initForNode:(FSNode *)node;
+- (id)initForNode:(FSNode *)node
+         inWindow:(GWViewerWindow *)win;
 - (void)createSubviews;
 - (FSNode *)shownNode;
 - (void)reloadNodeContents;
-- (void)unloadFromPath:(NSString *)path;
+- (void)unloadFromNode:(FSNode *)anode;
 
-- (NSWindow *)win;
+- (GWViewerWindow *)win;
 - (id)nodeView;
 - (NSString *)viewType;
 - (BOOL)isRootViewer;
 - (BOOL)isSpatial;
+- (int)vtype;
 
 - (void)activate;
 - (void)deactivate;
@@ -85,7 +87,7 @@
 - (BOOL)invalidated;
 
 - (void)setOpened:(BOOL)opened 
-        repOfPath:(NSString *)path;
+        repOfNode:(FSNode *)anode;
 - (void)unselectAllReps;
 - (void)selectionChanged:(NSArray *)newsel;
 - (void)pathsViewDidSelectIcon:(id)icon;
@@ -117,6 +119,7 @@
 - (void)newFile;
 - (void)duplicateFiles;
 - (void)deleteFiles;
+- (void)setViewerBehaviour:(id)sender;
 - (void)setViewerType:(id)sender;
 - (void)selectAllInViewer;
 - (void)showTerminal;

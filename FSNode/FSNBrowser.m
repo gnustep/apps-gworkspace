@@ -1591,9 +1591,9 @@
   [self removeRepOfSubnode: [arep node]];
 }
 
-- (void)unloadFromPath:(NSString *)path
+- (void)unloadFromNode:(FSNode *)anode
 {
-  FSNBrowserColumn *bc = [self columnWithPath: path];
+  FSNBrowserColumn *bc = [self columnWithNode: anode];
 
 	if (bc) {
     FSNBrowserColumn *col = [self columnBeforeColumn: bc];
@@ -1635,6 +1635,7 @@
   
   if (bc) {
     [bc setLeaf: YES];
+    [[bc cmatrix] deselectAllCells];
   }
 }
 

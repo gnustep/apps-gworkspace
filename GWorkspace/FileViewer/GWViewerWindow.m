@@ -74,6 +74,11 @@
   [delegate deleteFiles];
 }
 
+- (void)setViewerBehaviour:(id)sender
+{
+  [delegate setViewerBehaviour: sender];
+}
+
 - (void)setViewerType:(id)sender
 {
   [delegate setViewerType: sender];

@@ -35,4 +35,6 @@ int compareWithExtType(id *r1, id *r2, void *context);
 
 NSString *sizeDescription(unsigned long long size);
 
+NSArray *makePathsSelection(NSArray *selnodes);
+
 #endif // FSN_FUNCTIONS_H

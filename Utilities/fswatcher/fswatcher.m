@@ -328,6 +328,8 @@
                 format: @"adding watcher for unregistered client"];
   }
 
+  NSLog(@"addWatcherForPath %@", path);
+  
   if (watcher) {
     [info addWatchedPath: path];
     [watcher addListener]; 
@@ -358,6 +360,8 @@
     [NSException raise: NSInternalInconsistencyException
                 format: @"removing watcher for unregistered client"];
   }  
+  
+  NSLog(@"removeWatcherForPath %@", path);
   
   if (watcher && ([watcher isOld] == NO)) {
     [info removeWatchedPath: path];

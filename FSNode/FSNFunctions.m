@@ -143,5 +143,16 @@ NSString *sizeDescription(unsigned long long size)
 	return sizeStr;
 }
 
+NSArray *makePathsSelection(NSArray *selnodes)
+{
+  NSMutableArray *selpaths = [NSMutableArray array]; 
+  int i;
+
+  for (i = 0; i < [selnodes count]; i++) {
+    [selpaths addObject: [[selnodes objectAtIndex: i] path]];
+  }
+  
+  return selpaths;
+}
 
 

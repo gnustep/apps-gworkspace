@@ -1411,9 +1411,9 @@ pp.x = NSMaxX([self bounds]) - 1
   [icons removeObject: arep];
 }
 
-- (void)unloadFromPath:(NSString *)path
+- (void)unloadFromNode:(FSNode *)anode
 {
-  if ([[node path] isEqual: path]) {
+  if ([node isEqual: anode]) {
     int i;
     
     for (i = 0; i < [icons count]; i++) {

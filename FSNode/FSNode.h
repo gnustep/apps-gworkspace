@@ -129,6 +129,8 @@
 
 - (void)setTypeFlags;
 
+- (void)setFlagsForSymLink:(NSDictionary *)attrs;
+
 - (NSString *)typeDescription;
 
 - (NSDate *)creationDate;

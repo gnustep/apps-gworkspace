@@ -867,9 +867,10 @@ filename =  [fileinfo objectForKey: @"name"]
 	  GET_FILENAME;    
     
     if ((samename == NO) || (samename && [self removeExisting: fileinfo])) {
-	    [fm linkPath: [source stringByAppendingPathComponent: filename]
-				    toPath: [destination stringByAppendingPathComponent: filename]
-	 	      handler: self];
+      NSString *dst = [destination stringByAppendingPathComponent: filename];
+      NSString *src = [source stringByAppendingPathComponent: filename];
+  
+      [fm createSymbolicLinkAtPath: dst pathContent: src];
       [procfiles addObject: filename];	      
     }
 	  [files removeObject: fileinfo];	    

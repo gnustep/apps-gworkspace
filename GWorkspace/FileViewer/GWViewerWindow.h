@@ -47,6 +47,8 @@
 
 - (void)deleteFiles:(id)sender;
 
+- (void)setViewerBehaviour:(id)sender;
+
 - (void)setViewerType:(id)sender;
 
 - (void)selectAllInViewer:(id)sender;
@@ -71,6 +73,8 @@
 - (void)duplicateFiles;
 
 - (void)deleteFiles;
+
+- (void)setViewerBehaviour:(id)sender;
 
 - (void)setViewerType:(id)sender;
 

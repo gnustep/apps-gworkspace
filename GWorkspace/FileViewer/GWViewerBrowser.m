@@ -59,20 +59,18 @@
 
 - (void)notifySelectionChange:(NSArray *)newsel
 {
-  if (newsel) {
-    if ([newsel count] == 0) {
-      newsel = [NSArray arrayWithObject: [baseNode path]]; 
-    } else {
-      [manager selectionDidChangeInViewer: viewer];
-    }
-
-    if ((lastSelection == nil) || ([newsel isEqual: lastSelection] == NO)) {
-      ASSIGN (lastSelection, newsel);
-      [viewer selectionChanged: newsel];
-      [self synchronizeViewer];
-      [desktopApp selectionChanged: newsel];
-    }      
+  if ([newsel count] == 0) {
+    newsel = [NSArray arrayWithObject: [baseNode path]]; 
+  } else if (([viewer vtype] == SPATIAL) 
+                    && [(NSWindow *)[viewer win] isKeyWindow]) {
+    [manager selectedSpatialViewerChanged: viewer];
   }
+
+  if ((lastSelection == nil) || ([newsel isEqual: lastSelection] == NO)) {
+    ASSIGN (lastSelection, newsel);
+    [viewer selectionChanged: newsel];
+    [self synchronizeViewer];
+  }      
 }
 
 - (void)synchronizeViewer
@@ -104,7 +102,7 @@
   
     if ([node isDirectory] && ([node isPackage] == NO)) {
       [self addAndLoadColumnForNode: node];
-      [manager viewer: viewer didShowPath: [node path]];
+      [manager viewer: viewer didShowNode: node];
     
     } else {
       if ((last == NO) || selColumn) {
