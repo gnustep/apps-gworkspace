@@ -95,6 +95,8 @@ typedef enum BackImageStyle {
 
 - (void)watchedPathDidChange:(NSDictionary *)info;
 
+- (void)thumbnailsDidChange;
+
 - (void)newVolumeMountedAtPath:(NSString *)vpath;
 
 - (void)workspaceWillUnmountVolumeAtPath:(NSString *)vpath;

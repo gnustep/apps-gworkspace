@@ -61,6 +61,13 @@ static Desktop *desktop = nil;
   [defaults synchronize];
 }
 
++ (void)registerForServices
+{
+  NSArray *sendTypes = [NSArray arrayWithObjects: NSFilenamesPboardType, nil];	
+  NSArray *returnTypes = [NSArray arrayWithObjects: NSFilenamesPboardType, nil];	
+  [NSApp registerServicesMenuSendTypes: sendTypes returnTypes: returnTypes];
+}
+
 - (void)dealloc
 {
   if (fswatcher && [[(NSDistantObject *)fswatcher connectionForProxy] isValid]) {
@@ -101,8 +108,10 @@ static Desktop *desktop = nil;
 {
   NSString *home;
   BOOL isdir;
-  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
+  NSUserDefaults *defaults;	
   id defentry;
+
+  [isa registerForServices];
 
   home = NSHomeDirectory();
   home = [home stringByAppendingPathComponent: @"Desktop"];  
@@ -117,6 +126,8 @@ static Desktop *desktop = nil;
   }
 
   ASSIGN (desktopDir, [FSNode nodeWithRelativePath: home parent: nil]);
+
+  defaults = [NSUserDefaults standardUserDefaults];	
 
   defentry = [defaults objectForKey: @"dockposition"];
   dockPosition = defentry ? [defentry intValue] : DockPositionRight;
@@ -168,6 +179,11 @@ static Desktop *desktop = nil;
   [[ws notificationCenter] addObserver: self 
                 				selector: @selector(mountedVolumeDidUnmount:) 
                 					  name: NSWorkspaceDidUnmountNotification
+                					object: nil];
+
+  [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
+                				selector: @selector(thumbnailsDidChange:) 
+                					  name: @"GWThumbnailsDidChangeNotification"
                 					object: nil];
 }
 
@@ -774,6 +790,11 @@ static Desktop *desktop = nil;
   [[self desktopView] workspaceDidUnmountVolumeAtPath: volpath];
 }
 
+- (void)thumbnailsDidChange:(NSNotification *)notif
+{
+  [[self desktopView] thumbnailsDidChange];
+}
+
 - (void)createTrashPath
 {
 	NSString *basePath, *tpath; 
@@ -820,6 +841,48 @@ static Desktop *desktop = nil;
   [dock updateDefaults];
   [[win desktopView] updateDefaults];
   [preferences updateDefaults];
+}
+
+
+//
+// NSServicesRequests protocol
+//
+- (id)validRequestorForSendType:(NSString *)sendType
+                     returnType:(NSString *)returnType
+{	
+  BOOL sendOK = ((sendType == nil) || ([sendType isEqual: NSFilenamesPboardType]));
+  BOOL returnOK = ((returnType == nil) || [returnType isEqual: NSFilenamesPboardType]);
+
+  if (sendOK && returnOK) {
+		return self;
+	}
+		
+	return nil;
+}
+	
+- (BOOL)readSelectionFromPasteboard:(NSPasteboard *)pboard
+{
+  return ([[pboard types] indexOfObject: NSFilenamesPboardType] != NSNotFound);
+}
+
+- (BOOL)writeSelectionToPasteboard:(NSPasteboard *)pboard
+                             types:(NSArray *)types
+{
+	if ([types containsObject: NSFilenamesPboardType]) {
+		NSArray *typesDeclared = [NSArray arrayWithObject: NSFilenamesPboardType];
+    NSArray *selectedPaths = [[win desktopView] selectedPaths];
+
+    if ([selectedPaths count] == 0) {
+      selectedPaths = [NSArray arrayWithObject: [desktopDir path]];
+    }
+
+		[pboard declareTypes: typesDeclared owner: self];
+		
+		return [pboard setPropertyList: selectedPaths 
+									  		   forType: NSFilenamesPboardType];
+	}
+	
+	return NO;
 }
 
 

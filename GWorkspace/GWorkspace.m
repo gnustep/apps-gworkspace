@@ -1054,7 +1054,7 @@ return [ws openFile: fullPath withApplication: appName]
 	
 	if ([title isEqual: NSLocalizedString(@"Empty Recycler", @"")]) {
 		return YES;
-//		return [recycler isFull];
+    return (desktopApp != nil);
 
 	} else if ([title isEqual: NSLocalizedString(@"Open With...", @"")]) {
     BOOL found = NO;
@@ -2304,24 +2304,13 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 //
 // NSServicesRequests protocol
 //
-
 - (id)validRequestorForSendType:(NSString *)sendType
                      returnType:(NSString *)returnType
 {	
-  BOOL sendOK = NO;
-  BOOL returnOK = NO;
-
-  if (sendType == nil) {
-		sendOK = YES;
-	} else if ([sendType isEqual: NSFilenamesPboardType] && (selectedPaths != nil)) {
-		sendOK = YES;
-	}
-
-  if (returnType == nil) {
-		returnOK = YES;
-	} else if ([returnType isEqual: NSFilenamesPboardType]) {
-		returnOK = YES;
-	}
+  BOOL sendOK = ((sendType == nil) || ([sendType isEqual: NSFilenamesPboardType]));
+  BOOL returnOK = ((returnType == nil) 
+                      || ([returnType isEqual: NSFilenamesPboardType] 
+                                              && (selectedPaths != nil)));
 
   if (sendOK && returnOK) {
 		return self;
@@ -2332,17 +2321,13 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 	
 - (BOOL)readSelectionFromPasteboard:(NSPasteboard *)pboard
 {
-	if ([[pboard types] indexOfObject: NSFilenamesPboardType] != NSNotFound) {
-		return YES;
-	}
-	
-	return NO;
+  return ([[pboard types] indexOfObject: NSFilenamesPboardType] != NSNotFound);
 }
 
 - (BOOL)writeSelectionToPasteboard:(NSPasteboard *)pboard
                              types:(NSArray *)types
 {
-	if ([types containsObject: NSFilenamesPboardType] == YES) {
+	if ([types containsObject: NSFilenamesPboardType]) {
 		NSArray *typesDeclared = [NSArray arrayWithObject: NSFilenamesPboardType];
 
 		[pboard declareTypes: typesDeclared owner: self];
@@ -2712,7 +2697,9 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 
 - (void)emptyRecycler:(id)sender
 {
-	
+  if (desktopApp) {
+    [desktopApp emptyTrash: nil];
+  }	
 }
 
 #ifndef GNUSTEP

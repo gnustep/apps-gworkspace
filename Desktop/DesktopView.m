@@ -190,6 +190,8 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
                                                 NSFilenamesPboardType, 
                                                 @"GWRemoteFilenamesPboardType", 
                                                 nil]];    
+                                                
+    [FSNodeRep setUseThumbnails: YES];
   }
    
   return self;
@@ -339,6 +341,17 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
   [self tile];
   [self setNeedsDisplay: YES];
   [self selectionDidChange];
+}
+
+- (void)thumbnailsDidChange
+{
+  int i;
+  
+  for (i = 0; i < [icons count]; i++) {
+    FSNIcon *icon = [icons objectAtIndex: i];
+    FSNode *inode = [icon node];
+    [icon setNode: inode];
+  }  
 }
 
 - (void)newVolumeMountedAtPath:(NSString *)vpath

@@ -631,19 +631,14 @@ static FSNodeRep *shared = nil;
 
 - (void)setUseThumbnails:(BOOL)value
 {
-  NSUserDefaults *defaults;
-  
-  if (usesThumbnails == value) {
-    return;
-  }
-  
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];  
+    
   usesThumbnails = value;
   
   if (usesThumbnails) {
     [self prepareThumbnailsCache];
   }
   
-  defaults = [NSUserDefaults standardUserDefaults];  
   [defaults setBool: usesThumbnails forKey: @"use_thumbnails"];
   [defaults synchronize];
 }

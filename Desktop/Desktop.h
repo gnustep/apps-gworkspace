@@ -133,6 +133,8 @@ typedef enum DockPosition {
 
 + (Desktop *)desktop;
 
++ (void)registerForServices;
+
 - (NSWindow *)desktopWindow;
 
 - (DesktopView *)desktopView;
@@ -177,9 +179,24 @@ typedef enum DockPosition {
 
 - (void)mountedVolumeDidUnmount:(NSNotification *)notif;
 
+- (void)thumbnailsDidChange:(NSNotification *)notif;
+
 - (void)createTrashPath;
 
 - (void)updateDefaults;
+
+
+//
+// NSServicesRequests protocol
+//
+- (id)validRequestorForSendType:(NSString *)sendType
+                     returnType:(NSString *)returnType;
+
+- (BOOL)readSelectionFromPasteboard:(NSPasteboard *)pboard;
+
+
+- (BOOL)writeSelectionToPasteboard:(NSPasteboard *)pboard
+                             types:(NSArray *)types;
 
 
 //

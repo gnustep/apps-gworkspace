@@ -108,6 +108,7 @@
 
 @protocol	DesktopAppProtocol
 
+- (oneway void)emptyTrash:(id)sender;
 
 @end
 
@@ -290,8 +291,18 @@
 
 - (id)connectApplication:(NSString *)appName;
 
+//
+// NSServicesRequests protocol
+//
 - (id)validRequestorForSendType:(NSString *)sendType
                      returnType:(NSString *)returnType;
+
+- (BOOL)readSelectionFromPasteboard:(NSPasteboard *)pboard;
+
+
+- (BOOL)writeSelectionToPasteboard:(NSPasteboard *)pboard
+                             types:(NSArray *)types;
+                             
 										 
 //
 // Menu Operations
