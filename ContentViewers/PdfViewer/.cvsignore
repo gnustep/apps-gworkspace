@@ -1,8 +1,0 @@
-
-config.status 
-config.log
-autom4te*.cache
-*obj
-*.app
-*.debug
-*.bundle
