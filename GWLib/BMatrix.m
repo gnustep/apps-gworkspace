@@ -53,14 +53,6 @@
                         numberOfRows: numRows numberOfColumns: numColumns];
 
   if (self) {
-    #ifdef GNUSTEP 
-		  Class gwclass = [[NSBundle mainBundle] principalClass];
-    #else
-		  Class gwclass = [[NSBundle mainBundle] classNamed: @"GWorkspace"];
-    #endif
-
-		gworkspace = (id<GWProtocol>)[gwclass gworkspace];
-  
     column = col;
     browser = [column browser];
     dndTarget = nil;
@@ -303,9 +295,9 @@
       dragIcon = [NSImage imageNamed: @"MultipleSelection.tiff"];
     } else {
       NSString *path = [paths objectAtIndex: 0];
-      NSString *type = [gworkspace typeOfFileAt: path];
+      NSString *type = [GWLib typeOfFileAt: path];
 
-      dragIcon = [gworkspace iconForFile: path ofType: type]; 
+      dragIcon = [GWLib iconForFile: path ofType: type]; 
     }
   }   
 
@@ -315,7 +307,7 @@
             event: event
        pasteboard: pb
            source: self
-        slideBack: [gworkspace animateSlideBack]];
+        slideBack: [[GWLib workspaceApp] animateSlideBack]];
 }
 
 - (void)draggedImage:(NSImage *)anImage 

@@ -141,7 +141,6 @@ ifneq ($(FOUNDATION_LIB), apple)
   GWorkspace.m \
   IconViewsIcon.m \
   GWSplitView.m \
-  Watchers/Watcher.m \
   FileOperations/FileOperation.m \
   ViewersWindow.m \
   Shelf/Shelf.m \
@@ -188,7 +187,6 @@ else
   GWorkspace.m \
   IconViewsIcon.m \
   GWSplitView.m \
-  Watchers/Watcher.m \
   FileOperations/FileOperation.m \
   ViewersWindow.m \
   Shelf/Shelf.m \

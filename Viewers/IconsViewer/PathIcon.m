@@ -73,14 +73,6 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
   self = [super init];
   
   if (self) {
-    #ifdef GNUSTEP 
-		  Class gwclass = [[NSBundle mainBundle] principalClass];
-    #else
-		  Class gwclass = [[NSBundle mainBundle] classNamed: @"GWorkspace"];
-    #endif
-
-		gworkspace = (id<GWProtocol>)[gwclass gworkspace];
-
     fm = [NSFileManager defaultManager];
 		ws = [NSWorkspace sharedWorkspace];
 		
@@ -98,7 +90,7 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 		[namelabel setAlignment: NSCenterTextAlignment];
 	  [namelabel setBackgroundColor: [NSColor windowBackgroundColor]];
 
-    contestualMenu = [gworkspace usesContestualMenu];
+    contestualMenu = [[GWLib workspaceApp] usesContestualMenu];
 
 		hostname = nil;
     isbranch = NO;
@@ -154,7 +146,7 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 		}
     [ws getInfoForFile: fullpath application: &defapp type: &t];      
     ASSIGN (type, t);
-		isPakage = [gworkspace isPakageAtPath: fullpath];
+		isPakage = [GWLib isPakageAtPath: fullpath];
 		
   } else {
     singlepath = NO;
@@ -165,7 +157,7 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
   }
 
   if (singlepath == YES) {
-    ASSIGN (icon, [gworkspace iconForFile: fullpath ofType: type]);    
+    ASSIGN (icon, [GWLib iconForFile: fullpath ofType: type]);    
   } else {
     ASSIGN (icon, [NSImage imageNamed: @"MultipleSelection.tiff"]);
   }
@@ -196,7 +188,7 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
   for (i = 0; i < [paths count]; i++) {
     NSString *path = [paths objectAtIndex: i];
 
-    if ([gworkspace isLockedPath: path]) {
+    if ([GWLib isLockedPath: path]) {
       [self setLocked: YES];
       break;
     }
@@ -263,7 +255,7 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 - (void)renewIcon
 {
   if (singlepath == YES) {
-    ASSIGN (icon, [gworkspace iconForFile: fullpath ofType: type]);    
+    ASSIGN (icon, [GWLib iconForFile: fullpath ofType: type]);    
   } else {
     ASSIGN (icon, [NSImage imageNamed: @"MultipleSelection.tiff"]);
   }
@@ -280,7 +272,7 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 
 - (void)openWith:(id)sender
 {
-  [gworkspace openSelectedPathsWith];
+  [[GWLib workspaceApp] openSelectedPathsWith];
 }
 
 - (BOOL)isSelect
@@ -553,7 +545,7 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
             event: event
        pasteboard: pb
            source: self
-        slideBack: [gworkspace animateSlideBack]];
+        slideBack: [[GWLib workspaceApp] animateSlideBack]];
 }
 
 - (void)declareAndSetShapeOnPasteboard:(NSPasteboard *)pb
@@ -703,7 +695,7 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 {
   if (isDragTarget == YES) {
     isDragTarget = NO;  
-    ASSIGN (icon, [gworkspace iconForFile: fullpath ofType: type]);
+    ASSIGN (icon, [GWLib iconForFile: fullpath ofType: type]);
     [self setNeedsDisplay: YES];   
   }
 }
@@ -733,7 +725,7 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 
 	CHECK_LOCK;
 	
-  ASSIGN (icon, [gworkspace iconForFile: fullpath ofType: type]);
+  ASSIGN (icon, [GWLib iconForFile: fullpath ofType: type]);
   [self setNeedsDisplay: YES];
 	isDragTarget = NO;  
 
@@ -742,7 +734,7 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
   sourcePaths = [pb propertyListForType: NSFilenamesPboardType];   
   source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
 
-	trashPath = [gworkspace trashPath];
+	trashPath = [[GWLib workspaceApp] trashPath];
 
 	if ([source isEqualToString: trashPath]) {
 		operation = GWorkspaceRecycleOutOperation;
@@ -767,7 +759,7 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 	[opDict setObject: fullpath forKey: @"destination"];
 	[opDict setObject: files forKey: @"files"];
 	
-	[gworkspace performFileOperationWithDictionary: opDict];	
+	[[GWLib workspaceApp] performFileOperationWithDictionary: opDict];	
 }
 
 @end

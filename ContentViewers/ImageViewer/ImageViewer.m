@@ -57,14 +57,7 @@
   self = [super init];
   
   if(self) {
-    #ifdef GNUSTEP 
-		  Class gwclass = [[NSBundle mainBundle] principalClass];
-    #else
-		  Class gwclass = [[NSBundle mainBundle] classNamed: @"GWorkspace"];
-    #endif  
     NSTextField *widthLabel, *heightLabel;
-
-		gworkspace = (id<GWProtocol>)[gwclass gworkspace];
 
     [self setFrame: frame];
     panel = (id<InspectorsProtocol>)apanel;
@@ -73,7 +66,7 @@
     
     index = idx;
     
-    ASSIGN (extsarr, [gworkspace imageExtensions]);
+    ASSIGN (extsarr, [GWLib imageExtensions]);
      
     imrect = NSMakeRect(0, 30, 257, 215);
     imview = [[NSImageView alloc] initWithFrame: imrect];

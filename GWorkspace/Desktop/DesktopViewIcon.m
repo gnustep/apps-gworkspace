@@ -26,9 +26,11 @@
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
   #ifdef GNUSTEP 
+#include "GWLib.h"
 #include "GWFunctions.h"
 #include "GWNotifications.h"
   #else
+#include <GWorkspace/GWLib.h>
 #include <GWorkspace/GWFunctions.h>
 #include <GWorkspace/GWNotifications.h>
   #endif
@@ -340,7 +342,7 @@
   if(isDragTarget == YES) {
     isDragTarget = NO;
     if (onSelf == NO) {      
-      ASSIGN (icon, [gw iconForFile: fullPath ofType: type]);
+      ASSIGN (icon, [GWLib iconForFile: fullPath ofType: type]);
       [self setNeedsDisplay: YES];
     }
     onSelf = NO;
@@ -375,7 +377,7 @@
     return;
   }
   
-  ASSIGN (icon, [gw iconForFile: fullPath ofType: type]);
+  ASSIGN (icon, [GWLib iconForFile: fullPath ofType: type]);
   [self setNeedsDisplay: YES];
 
 	sourceDragMask = [sender draggingSourceOperationMask];  

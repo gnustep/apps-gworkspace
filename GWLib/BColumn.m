@@ -73,16 +73,9 @@ if (sz.height < 0) sz.height = 0
   self = [super init];
   
   if (self) {
-    #ifdef GNUSTEP 
-		  Class gwclass = [[NSBundle mainBundle] principalClass];
-    #else
-		  Class gwclass = [[NSBundle mainBundle] classNamed: @"GWorkspace"];
-    #endif
 	  NSRect rect = NSMakeRect(0, 0, 150, 100);
     styleMask = mask;
-    
-		gworkspace = (id<GWProtocol>)[gwclass gworkspace];
-        
+            
     fm = [NSFileManager defaultManager];
     ws = [NSWorkspace sharedWorkspace];
     
@@ -216,7 +209,7 @@ if (sz.height < 0) sz.height = 0
 		  for (i = 0; i < [iconPaths count]; i++) {
         NSString *ipath = [iconPaths objectAtIndex: i];
 
-			  if ([gworkspace isLockedPath: ipath]) {
+			  if ([GWLib isLockedPath: ipath]) {
 				  [icon setLocked: YES];
 				  break;
 			  }
@@ -293,10 +286,10 @@ if (sz.height < 0) sz.height = 0
   int i, count;
   BOOL is_dir; 
 
-  if ([gworkspace existsAndIsDirectoryFileAtPath: path] == NO) {	
+  if ([GWLib existsAndIsDirectoryFileAtPath: path] == NO) {	
     return;
   } else {
-		if ([gworkspace isPakageAtPath: path] && (!(styleMask & GWViewsPaksgesMask))) {
+		if ([GWLib isPakageAtPath: path] && (!(styleMask & GWViewsPaksgesMask))) {
     	return;
 		}
   }
@@ -315,8 +308,8 @@ if (sz.height < 0) sz.height = 0
 	[matrix setDoubleAction: @selector(doDoubleClick:)];
 	[scroll setDocumentView: matrix];
 
-  files = [gworkspace sortedDirectoryContentsAtPath: path];
-  files = [gworkspace checkHiddenFiles: files atPath: path];
+  files = [GWLib sortedDirectoryContentsAtPath: path];
+  files = [GWLib checkHiddenFiles: files atPath: path];
   
   count = [files count];
   if (count == 0) {
@@ -343,21 +336,21 @@ if (sz.height < 0) sz.height = 0
       [cell setStringValue: [files objectAtIndex: i]];
     }
     
-    is_dir = [gworkspace existsAndIsDirectoryFileAtPath: s];
+    is_dir = [GWLib existsAndIsDirectoryFileAtPath: s];
     if (is_dir == YES) {     
-      [cell setLeaf: (([gworkspace isPakageAtPath: s]) 
+      [cell setLeaf: (([GWLib isPakageAtPath: s]) 
                               ? (!(styleMask & GWViewsPaksgesMask)) : NO)];
     } else {
 		  [cell setLeaf: YES];
     }
 		
-    [cell setEnabled: !([gworkspace isLockedPath: s])];	  
+    [cell setEnabled: !([GWLib isLockedPath: s])];	  
   }
 }
 
 - (void)addMatrixCellsWithNames:(NSArray *)names
 {
-  NSArray *files = [gworkspace checkHiddenFiles: names atPath: path];
+  NSArray *files = [GWLib checkHiddenFiles: names atPath: path];
 
   if ([files count]) {
 	  BCell *cell;
@@ -375,7 +368,7 @@ if (sz.height < 0) sz.height = 0
       NSString *name = [names objectAtIndex: i];
       NSString *cellpath = [path stringByAppendingPathComponent: name];
 
-      isdir = [gworkspace existsAndIsDirectoryFileAtPath: cellpath];
+      isdir = [GWLib existsAndIsDirectoryFileAtPath: cellpath];
       
 		  cell = [self cellWithName: name];    
       if (cell == nil) {
@@ -389,7 +382,7 @@ if (sz.height < 0) sz.height = 0
         }
         
         if (isdir) {     
-          [cell setLeaf: (([gworkspace isPakageAtPath: cellpath]) 
+          [cell setLeaf: (([GWLib isPakageAtPath: cellpath]) 
                                 ? (!(styleMask & GWViewsPaksgesMask)) : NO)];
         } else {
 		      [cell setLeaf: YES];
@@ -405,7 +398,7 @@ if (sz.height < 0) sz.height = 0
 
     [matrix setCellSize: NSMakeSize([scroll contentSize].width, cellsHeight)];  
 
-	  stype = [gworkspace sortTypeForDirectoryAtPath: path];			
+	  stype = [GWLib sortTypeForDirectoryAtPath: path];			
 	  sortDict = [NSMutableDictionary dictionaryWithCapacity: 1];
 	  [sortDict setObject: path forKey: @"path"];
 	  [sortDict setObject: [NSNumber numberWithInt: stype] forKey: @"type"];
@@ -423,7 +416,7 @@ if (sz.height < 0) sz.height = 0
 
 - (void)addDimmedMatrixCellsWithNames:(NSArray *)names
 {
-  NSArray *files = [gworkspace checkHiddenFiles: names atPath: path];
+  NSArray *files = [GWLib checkHiddenFiles: names atPath: path];
 
   if ([files count]) {
 	  BCell *cell;
@@ -1007,7 +1000,7 @@ if (sz.height < 0) sz.height = 0
   sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
   source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
   targetPath = [path stringByAppendingPathComponent: [cell stringValue]];
-  trashPath = [gworkspace trashPath];
+  trashPath = [[GWLib workspaceApp] trashPath];
 
 	if ([source isEqualToString: trashPath]) {
 		operation = GWorkspaceRecycleOutOperation;
@@ -1032,7 +1025,7 @@ if (sz.height < 0) sz.height = 0
 	[opDict setObject: targetPath forKey: @"destination"];
 	[opDict setObject: files forKey: @"files"];
 
-  [gworkspace performFileOperationWithDictionary: opDict];
+  [[GWLib workspaceApp] performFileOperationWithDictionary: opDict];
 }
 
 - (void)setFrame:(NSRect)frameRect

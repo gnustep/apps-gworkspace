@@ -71,13 +71,6 @@ if (rct.size.height < 0) rct.size.height = 0; \
 	self = [super initWithFrame: NSZeroRect];
 	
 	if (self) {
-    #ifdef GNUSTEP 
-		  Class gwclass = [[NSBundle mainBundle] principalClass];
-    #else
-		  Class gwclass = [[NSBundle mainBundle] classNamed: @"GWorkspace"];
-    #endif
-
-		gworkspace = (id<GWProtocol>)[gwclass gworkspace];	
   	rootPath = nil;
     lastPath = nil;
   	currentPath = nil;
@@ -253,7 +246,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
   if ((isDir == NO) || ([paths count] > 1)) {
     newPath = [newPath stringByDeletingLastPathComponent];
   } else {
-		if (([gworkspace isPakageAtPath: newPath]) && (viewsapps == NO)) {
+		if (([GWLib isPakageAtPath: newPath]) && (viewsapps == NO)) {
 			newPath = [newPath stringByDeletingLastPathComponent];
 		}
 	}
@@ -341,7 +334,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
       path = [path stringByDeletingLastPathComponent];
       selection = [NSArray arrayWithArray: selectedPaths];
     } else {
-			if ([gworkspace isPakageAtPath: path] && (viewsapps == NO)) {
+			if ([GWLib isPakageAtPath: path] && (viewsapps == NO)) {
 				path = [path stringByDeletingLastPathComponent];
         selection = [NSArray arrayWithArray: selectedPaths];
 			} else {
@@ -722,12 +715,12 @@ if (rct.size.height < 0) rct.size.height = 0; \
 
 - (void)setWatcherForPath:(NSString *)path
 {
-	[gworkspace addWatcherForPath: path];
+	[GWLib addWatcherForPath: path];
 }
 
 - (void)unsetWatcherForPath:(NSString *)path
 {
-	[gworkspace removeWatcherForPath: path];
+	[GWLib removeWatcherForPath: path];
 }
 
 - (void)unsetWatchersFromPath:(NSString *)path
@@ -770,7 +763,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
 - (void)openCurrentSelection:(NSArray *)paths newViewer:(BOOL)newv
 {
   if (newv == YES) {    		
-    [gworkspace openSelectedPaths: paths newViewer: YES];
+    [[GWLib workspaceApp] openSelectedPaths: paths newViewer: YES];
     return;
     
   } else {
@@ -794,7 +787,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
 
       if (([type isEqualToString: NSDirectoryFileType])
                         || ([type isEqualToString: NSFilesystemFileType])) { 
-        if ([gworkspace isPakageAtPath: fpath] == NO) {
+        if ([GWLib isPakageAtPath: fpath] == NO) {
           [dirs addObject: fpath]; 
           [allfiles removeObject: fpath];
           count--;
@@ -804,7 +797,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
     }
     
     if ([allfiles count]) {      
-      [gworkspace openSelectedPaths: allfiles newViewer: newv];
+      [[GWLib workspaceApp] openSelectedPaths: allfiles newViewer: newv];
     }      
 
     if ([dirs count] == 1) {  

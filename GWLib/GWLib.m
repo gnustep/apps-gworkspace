@@ -35,16 +35,6 @@
   #include "OSXCompatibility.h"
 #endif
 
-#define CHECKGW \
-if (gwapp == nil) \
-gwapp = (id <GWProtocol>)[[GWLib class] gworkspaceApplication]; \
-if (gwapp == nil) return
-
-#define CHECKGW_RET(x) \
-if (gwapp == nil) \
-gwapp = (id <GWProtocol>)[[GWLib class] gworkspaceApplication]; \
-if (gwapp == nil) return x
-
 #ifndef CACHED_MAX
   #define CACHED_MAX 20
 #endif
@@ -58,8 +48,6 @@ if (gwapp == nil) return x
 #endif
 
 id instance = nil;
-static id gwapp = nil;
-static NSString *gwName = @"GWorkspace";
 
 @interface GWLib (PrivateMethods)
 
@@ -142,6 +130,8 @@ static NSString *gwName = @"GWorkspace";
 
 - (NSArray *)imageExtensions;
 
+- (id)workspaceApp;
+
 @end
 
 @implementation GWLib (PrivateMethods)
@@ -175,7 +165,7 @@ static NSString *gwName = @"GWorkspace";
   self = [super init];
 
   if (self) {
-    BOOL isdir;
+	  BOOL isdir;
     
     fm = [NSFileManager defaultManager];
     ws = [NSWorkspace sharedWorkspace];
@@ -189,10 +179,9 @@ static NSString *gwName = @"GWorkspace";
     watchers = [NSMutableArray new];	
 	  watchTimers = [NSMutableArray new];	
     watchedPaths = [NSMutableArray new];
-
 	  lockedPaths = [NSMutableArray new];	
-
     tumbsCache = [NSMutableDictionary new];
+    
     thumbnailDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
     thumbnailDir = [thumbnailDir stringByAppendingPathComponent: @"Thumbnails"];
     RETAIN (thumbnailDir);
@@ -215,6 +204,8 @@ static NSString *gwName = @"GWorkspace";
                         selector: @selector(thumbnailsDidChange:) 
                 					  name: GWThumbnailsDidChangeNotification
                           object: nil];
+                          
+    workspaceApp = [self workspaceApp];                        
   }
   
   return self;
@@ -226,7 +217,6 @@ static NSString *gwName = @"GWorkspace";
   
   if (contentsDict) {
     return [contentsDict objectForKey: @"files"];
-    
   } else {
     NSArray *files = [fm directoryContentsAtPath: path];
     int stype = [self sortTypeForDirectoryAtPath: path]; 
@@ -841,6 +831,41 @@ static NSString *gwName = @"GWorkspace";
                                     @"xpm", nil];
 }
 
+- (id)workspaceApp
+{
+  if (workspaceApp == nil) {
+    NSUserDefaults *defaults;
+    NSString *appName;
+    NSString *selName;
+    Class wkspclass;
+    SEL sel;
+    
+    defaults = [NSUserDefaults standardUserDefaults];
+    
+    appName = [defaults stringForKey: @"GSWorkspaceApplication"];
+    if (appName == nil) {
+      appName = @"GWorkspace";
+    }
+
+    selName = [defaults stringForKey: @"GSWorkspaceSelName"];
+    if (selName == nil) {
+      selName = @"gworkspace";
+    }
+  
+    #ifdef GNUSTEP 
+		  wkspclass = [[NSBundle mainBundle] principalClass];
+    #else
+		  wkspclass = [[NSBundle mainBundle] classNamed: appName];
+    #endif
+    
+    sel = NSSelectorFromString(selName);
+    
+    workspaceApp = [wkspclass performSelector: sel];
+  }  
+
+  return workspaceApp;
+}
+
 @end
 
 
@@ -961,132 +986,9 @@ static NSString *gwName = @"GWorkspace";
   return [[self instance] imageExtensions];
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-+ (id)gworkspaceApplication
++ (id)workspaceApp
 {
-	if (gwapp == nil) {
-    NSString *host;
-    NSString *port;
-    NSDate *when = nil;
-    BOOL done = NO;
-
-    while (done == NO) {
-      host = [[NSUserDefaults standardUserDefaults] stringForKey: @"NSHost"];
-      
-      if (host == nil) {
-	      host = @"";        
-	    } else {
-	      NSHost *h = [NSHost hostWithName: host];
-        
-	      if ([h isEqual: [NSHost currentHost]]) {
-	        host = @"";
-	      }
-	    }
-      
-      port = gwName;
-
-      NS_DURING
-        {
-	    gwapp = (id <GWProtocol>)[NSConnection rootProxyForConnectionWithRegisteredName: port host: host];
-	    RETAIN (gwapp);  
-        }
-      NS_HANDLER
-	      {
-	    gwapp = nil;
-	      }
-      NS_ENDHANDLER
-      
-      if (gwapp) {
-        done = YES;
-      }
-            
-      if (gwapp == nil) {
-	      [[NSWorkspace sharedWorkspace] launchApplication: gwName];
-        
-	      if (when == nil) {
-		      when = [[NSDate alloc] init];
-		      done = NO;
-		    } else if ([when timeIntervalSinceNow] > 5.0) {
-		      int result;
-
-		      DESTROY (when);
-		      result = NSRunAlertPanel(gwName,
-		                @"Application seems to have hung",
-		                      @"Continue", @"Terminate", @"Wait");
-
-		      if (result == NSAlertDefaultReturn) {
-		        done = YES;
-		      } else if (result == NSAlertOtherReturn) {
-		        done = NO;
-		      } else {
-		        done = YES;
-		      }
-		    }
-
-	      if (done == NO) {
-		      NSDate *limit = [[NSDate alloc] initWithTimeIntervalSinceNow: 0.5];
-		      [[NSRunLoop currentRunLoop] runUntilDate: limit];
-		      RELEASE(limit);
-		    }
-	    }
-    }
-  
-    TEST_RELEASE (when);
- 	}	
-  
-  return gwapp;
-}
-
-+ (BOOL)selectFile:(NSString *)fullPath
-							inFileViewerRootedAtPath:(NSString *)rootFullpath
-{
-  CHECKGW_RET(NO);
-  return [gwapp selectFile: fullPath inFileViewerRootedAtPath: rootFullpath];
-  return NO;
-}
-
-+ (oneway void)rootViewerSelectFiles:(NSArray *)paths
-{
-  CHECKGW;
-  [gwapp rootViewerSelectFiles: paths];
-}
-
-+ (oneway void)openSelectedPaths:(NSArray *)paths
-{
-  CHECKGW;
-  [gwapp openSelectedPaths: paths];
-}
-
-+ (oneway void)performFileOperationWithDictionary:(NSDictionary *)dict
-{
-  CHECKGW;
-  [gwapp performFileOperationWithDictionary: dict];
-}
-
-+ (oneway void)performServiceWithName:(NSString *)sname 
-                           pasteboard:(NSPasteboard *)pboard
-{
-  NSPerformService(sname, pboard);
-}
-
-+ (NSString *)trashPath
-{
-  CHECKGW_RET(nil);
-  return [gwapp trashPath];
-  return nil;
+  return [[self instance] workspaceApp];
 }
 
 @end

@@ -99,14 +99,6 @@ if (rct.size.height < 0) rct.size.height = 0; \
   self = [super initWithFrame: NSZeroRect];
   
   if (self) {
-    #ifdef GNUSTEP 
-		  Class gwclass = [[NSBundle mainBundle] principalClass];
-    #else
-		  Class gwclass = [[NSBundle mainBundle] classNamed: @"GWorkspace"];
-    #endif
-
-		gworkspace = (id<GWProtocol>)[gwclass gworkspace];
-
     fm = [NSFileManager defaultManager];
 
     ASSIGN (currentPath, path);
@@ -136,7 +128,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
     charBuffer = nil;
     selectInProgress = NO;
     
-    contestualMenu = [gworkspace usesContestualMenu];
+    contestualMenu = [[GWLib workspaceApp] usesContestualMenu];
     
   	[self registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, nil]];
 
@@ -240,7 +232,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
 	} else {
     hiddenFiles = nil;
   }
-	hideSysFiles = [gworkspace hideSysFiles];
+	hideSysFiles = [GWLib hideSysFiles];
 	
 	if (hiddenFiles != nil  ||  hideSysFiles) {	
 		NSMutableArray *mutableFiles = AUTORELEASE ([files mutableCopy]);
@@ -286,8 +278,8 @@ if (rct.size.height < 0) rct.size.height = 0; \
   [icons removeAllObjects];
   edIcon = nil;
   
-  files = [gworkspace sortedDirectoryContentsAtPath: currentPath];
-  files = [gworkspace checkHiddenFiles: files atPath: currentPath];  
+  files = [GWLib sortedDirectoryContentsAtPath: currentPath];
+  files = [GWLib checkHiddenFiles: files atPath: currentPath];  
   		
   count = [files count];
   if (count == 0) {
@@ -305,7 +297,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
     NSString *ipath = [paths objectAtIndex: i];
     IconsViewerIcon *icon = [[IconsViewerIcon alloc] initForPath: ipath 
                                                         delegate: self];
-    [icon setLocked: [gworkspace isLockedPath: ipath]]; 
+    [icon setLocked: [GWLib isLockedPath: ipath]]; 
     [icons addObject: icon];  
     RELEASE (icon);
   }  
@@ -323,7 +315,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
 - (void)sortIcons
 {
   NSMutableDictionary *sortDict = [NSMutableDictionary dictionaryWithCapacity: 1];
-	int stype = [gworkspace sortTypeForDirectoryAtPath: currentPath];
+	int stype = [GWLib sortTypeForDirectoryAtPath: currentPath];
 
 	[sortDict setObject: currentPath forKey: @"path"];
 	[sortDict setObject: [NSString stringWithFormat: @"%i", stype] forKey: @"type"];
@@ -765,7 +757,7 @@ if (s.height > maxr.size.height) s.height = maxr.size.height
 
 - (void)openSelectionWith:(id)sender
 {
-  [gworkspace openSelectedPathsWith];
+  [[GWLib workspaceApp] openSelectedPathsWith];
 }
 
 - (void)addIconWithPath:(NSString *)iconpath dimmed:(BOOL)isdimmed
@@ -1655,7 +1647,7 @@ pp.x = NSMaxX([self bounds]) - 1
   sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
   source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
 
-	trashPath = [gworkspace trashPath];
+	trashPath = [[GWLib workspaceApp] trashPath];
 	if ([source isEqualToString: trashPath]) {
 		operation = GWorkspaceRecycleOutOperation;
 	} else {
@@ -1679,7 +1671,7 @@ pp.x = NSMaxX([self bounds]) - 1
 	[opDict setObject: currentPath forKey: @"destination"];
 	[opDict setObject: files forKey: @"files"];
 	
-	[gworkspace performFileOperationWithDictionary: opDict];	
+	[[GWLib workspaceApp] performFileOperationWithDictionary: opDict];	
 }
 
 @end

@@ -63,7 +63,6 @@
 	NSMutableArray *savedSelection;	
   NSMutableArray *watchedPaths;
 	id delegate;
-	id gworkspace;
   NSFileManager *fm;
 }
 

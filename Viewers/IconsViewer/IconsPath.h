@@ -45,7 +45,6 @@
   NSFont *editorFont;
   float columnsWidth;
 	id delegate;
-	id gworkspace;
 }
 
 - (id)initWithRootAtPath:(NSString *)rpath 

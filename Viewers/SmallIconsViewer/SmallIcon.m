@@ -60,15 +60,8 @@
 {
   self = [super init];
   if (self) {
-    #ifdef GNUSTEP 
-		  Class gwclass = [[NSBundle mainBundle] principalClass];
-    #else
-		  Class gwclass = [[NSBundle mainBundle] classNamed: @"GWorkspace"];
-    #endif
     NSString *defApp = nil, *t = nil;
 
-		gworkspace = (id<GWProtocol>)[gwclass gworkspace];
-		
 		ASSIGN (path, apath);
 		[self setDelegate: adelegate];
 
@@ -84,9 +77,9 @@
                                       application: &defApp 
                                              type: &t];      
 		ASSIGN (type, t);
-		isPakage = [gworkspace isPakageAtPath: path];
+		isPakage = [GWLib isPakageAtPath: path];
 		
-		ASSIGN (icon, [gworkspace smallIconForFile: path]); 
+		ASSIGN (icon, [GWLib smallIconForFile: path]); 
     ASSIGN (highlight, [NSImage imageNamed: @"SmallCellHighlight.tiff"]);
 
     namelabel = [[SmallIconLabel alloc] initForIcon: self];
@@ -126,13 +119,13 @@
   NSString *defApp = nil, *t = nil;
 
 	ASSIGN (path, apath);
-	ASSIGN (icon, [gworkspace smallIconForFile: path]);        
+	ASSIGN (icon, [GWLib smallIconForFile: path]);        
 		
 	[[NSWorkspace sharedWorkspace] getInfoForFile: path 
 														        application: &defApp 
 																		       type: &t];      
 	ASSIGN (type, t);
-	isPakage = [gworkspace isPakageAtPath: path];
+	isPakage = [GWLib isPakageAtPath: path];
 	ASSIGN (name, [path lastPathComponent]);
 	[namelabel setStringValue: name];
   [self setLabelFrame]; 
@@ -549,7 +542,7 @@
   if ([selection count] > 1) {
     dragIcon = [NSImage imageNamed: @"MultipleSelection.tiff"];
   } else {
-    dragIcon = [gworkspace iconForFile: path ofType: type]; 
+    dragIcon = [GWLib iconForFile: path ofType: type]; 
   }   
 
   [self dragImage: dragIcon
@@ -558,7 +551,7 @@
             event: event
        pasteboard: pb
            source: self
-        slideBack: [gworkspace animateSlideBack]];
+        slideBack: [[GWLib workspaceApp] animateSlideBack]];
 }
 
 - (void)draggedImage:(NSImage *)anImage 
@@ -720,7 +713,7 @@
   if(isDragTarget == YES) {
     isDragTarget = NO;
     if (onSelf == NO) {      
-      ASSIGN (icon, [gworkspace smallIconForFile: path]);
+      ASSIGN (icon, [GWLib smallIconForFile: path]);
       [self setNeedsDisplay: YES];
     }
     onSelf = NO;
@@ -759,7 +752,7 @@
     return;
   }
   
-  ASSIGN (icon, [gworkspace smallIconForFile: path]);
+  ASSIGN (icon, [GWLib smallIconForFile: path]);
   [self setNeedsDisplay: YES];
 
 	sourceDragMask = [sender draggingSourceOperationMask];  
@@ -767,7 +760,7 @@
   sourcePaths = [pb propertyListForType: NSFilenamesPboardType];   
   source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
 
-	trashPath = [gworkspace trashPath];
+	trashPath = [[GWLib workspaceApp] trashPath];
 
 	if ([source isEqualToString: trashPath]) {
 		operation = GWorkspaceRecycleOutOperation;
@@ -792,7 +785,7 @@
 	[opDict setObject: path forKey: @"destination"];
 	[opDict setObject: files forKey: @"files"];
 	
-	[gworkspace performFileOperationWithDictionary: opDict];	
+	[[GWLib workspaceApp] performFileOperationWithDictionary: opDict];	
 }
 
 @end

@@ -144,7 +144,7 @@ static NSString *nibName = @"ShelfPref";
         ASSIGN (fname, [fpath lastPathComponent]);
         
         [ws getInfoForFile: fpath application: &defApp type: &type];      
-        [imView setImage: [gw iconForFile: fpath ofType: type]]; 		
+        [imView setImage: [GWLib iconForFile: fpath ofType: type]]; 		
       } else {
         fname = [[NSString alloc] initWithFormat: @"%i items", count];    
         [imView setImage: [NSImage imageNamed: @"MultipleSelection.tiff"]];
@@ -218,7 +218,7 @@ static NSString *nibName = @"ShelfPref";
 
     ASSIGN (fname, [fpath lastPathComponent]);
     [ws getInfoForFile: fpath application: &defApp type: &type];      
-    [imView setImage: [gw iconForFile: fpath ofType: type]]; 		
+    [imView setImage: [GWLib iconForFile: fpath ofType: type]]; 		
   } else {
     fname = [[NSString alloc] initWithFormat: @"%i items", count];    
     [imView setImage: [NSImage imageNamed: @"MultipleSelection.tiff"]];

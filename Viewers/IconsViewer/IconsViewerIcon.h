@@ -52,7 +52,6 @@
   int labelWidth;
 
   id delegate;
-	id gworkspace;
   int dragdelay;
   BOOL isDragTarget;
   BOOL onSelf;

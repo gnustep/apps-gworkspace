@@ -63,7 +63,6 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 	BIconLabel *namelabel;	
       
   id delegate;
-	id gworkspace;
   
   BOOL isSelect;
   BOOL contestualMenu;

@@ -161,7 +161,7 @@ static GWorkspace *gworkspace = nil;
                     && [fm fileExistsAtPath: filename isDirectory: &isDir]) {
     if (isDir) {
       id viewer = [self newViewerAtPath: filename
-                            canViewApps: [self isPakageAtPath: filename]];
+                            canViewApps: [GWLib isPakageAtPath: filename]];
       [viewer orderFrontRegardless];
       return YES;
     } else {
@@ -184,7 +184,7 @@ static GWorkspace *gworkspace = nil;
   NSString *type;
 
   [ws getInfoForFile: fullPath application: &defApp type: &type];
-	image = [self iconForFile: fullPath ofType: type];
+	image = [GWLib iconForFile: fullPath ofType: type];
   
 	return [self openFile: fullPath fromImage: image at: p inView: aview];
 }
@@ -299,56 +299,6 @@ return [ws openFile: fullPath withApplication: appName]
 	[[NSWorkspace sharedWorkspace] slideImage: image from: fromPoint to: toPoint];
 }
 
-- (void)noteFileSystemChanged
-{
-
-}
-
-- (void)noteFileSystemChanged:(NSString *)path
-{
-
-}
-
-- (BOOL)existsAndIsDirectoryFileAtPath:(NSString *)path            
-{
-  return [GWLib existsAndIsDirectoryFileAtPath: path];
-}
-
-- (NSString *)typeOfFileAt:(NSString *)path
-{
-  return [GWLib typeOfFileAt: path];
-}
-
-- (BOOL)isWritableFileAtPath:(NSString *)path
-{
-  return [fm isWritableFileAtPath: path];
-}
-
-- (BOOL)isPakageAtPath:(NSString *)path
-{
-  return [GWLib isPakageAtPath: path];
-}
-
-- (NSArray *)sortedDirectoryContentsAtPath:(NSString *)path
-{
-  return [GWLib sortedDirectoryContentsAtPath: path];
-}
-
-- (NSArray *)checkHiddenFiles:(NSArray *)files atPath:(NSString *)path
-{
-  return [GWLib checkHiddenFiles: files atPath: path];
-}
-
-- (int)sortTypeForDirectoryAtPath:(NSString *)aPath
-{
-  return [GWLib sortTypeForDirectoryAtPath: aPath];
-}
-
-- (void)setSortType:(int)type forDirectoryAtPath:(NSString *)aPath
-{
-  [GWLib setSortType: type forDirectoryAtPath: aPath];
-}
-
 - (void)openSelectedPaths:(NSArray *)paths newViewer:(BOOL)newv
 {
   NSString *apath;
@@ -368,7 +318,7 @@ return [ws openFile: fullPath withApplication: appName]
       }
     } else if ((type == NSPlainFileType) 
                         || ([type isEqual: NSShellCommandFileType])) {
-      if ([self isPakageAtPath: apath]) {
+      if ([GWLib isPakageAtPath: apath]) {
         if (newv) {    
           [self newViewerAtPath: apath canViewApps: YES];    
         } else {
@@ -431,26 +381,6 @@ return [ws openFile: fullPath withApplication: appName]
 	return [viewers objectAtIndex: [viewers count] -1];
 }
 
-- (NSImage *)iconForFile:(NSString *)fullPath ofType:(NSString *)type
-{
-  return [GWLib iconForFile: fullPath ofType: type];
-}
-
-- (NSImage *)smallIconForFile:(NSString*)aPath
-{
-  return [GWLib smallIconForFile: aPath];
-}
-
-- (NSImage *)smallIconForFiles:(NSArray*)pathArray
-{
-  return [GWLib smallIconForFiles: pathArray];
-}
-
-- (NSImage *)smallHighlightIcon
-{
-  return [GWLib smallHighlightIcon];
-}
-
 - (NSArray *)getSelectedPaths
 {
   return selectedPaths;
@@ -464,41 +394,6 @@ return [ws openFile: fullPath withApplication: appName]
 - (NSArray *)viewersSearchPaths
 {
   return viewersSearchPaths;
-}
-
-- (NSArray *)imageExtensions
-{
-  return [GWLib imageExtensions];
-}
-
-- (void)lockFiles:(NSArray *)files inDirectoryAtPath:(NSString *)path
-{
-  [GWLib lockFiles: files inDirectoryAtPath: path];
-}
-
-- (void)unLockFiles:(NSArray *)files inDirectoryAtPath:(NSString *)path
-{
-  [GWLib unLockFiles: files inDirectoryAtPath: path];
-}
-
-- (BOOL)isLockedPath:(NSString *)path
-{
-	return [GWLib isLockedPath: path];
-}
-
-- (void)addWatcherForPath:(NSString *)path
-{
-  [GWLib addWatcherForPath: path];
-}
-
-- (void)removeWatcherForPath:(NSString *)path
-{
-  [GWLib removeWatcherForPath: path];
-}
-
-- (BOOL)hideSysFiles
-{
-  return [GWLib hideSysFiles];
 }
 
 - (BOOL)animateChdir
@@ -560,9 +455,9 @@ return [ws openFile: fullPath withApplication: appName]
   TEST_RELEASE (fiend);
 	TEST_RELEASE (history);
 	TEST_RELEASE (recycler);
+  TEST_RELEASE (trashPath);
   RELEASE (openWithController);
   RELEASE (runExtController);
-	RELEASE (trashPath);
   RELEASE (operations);
   TEST_RELEASE (desktopWindow);
   TEST_RELEASE (tshelfWin);
@@ -738,7 +633,7 @@ return [ws openFile: fullPath withApplication: appName]
   for (i = 0; i < [viewersPaths count]; i++) {
     path = [viewersPaths objectAtIndex: i];    
     [self newViewerAtPath: path 
-              canViewApps: ([self isPakageAtPath: path] ? YES : NO)];
+              canViewApps: ([GWLib isPakageAtPath: path] ? YES : NO)];
   }
     
   result = [defaults objectForKey: @"cachedmax"];
@@ -1039,8 +934,8 @@ return [ws openFile: fullPath withApplication: appName]
 			[[NSApplication sharedApplication] terminate: self];
 		}
 	}
-
-	ASSIGN (trashPath, tpath);
+  
+  ASSIGN (trashPath, tpath);
 	recycler = [[Recycler alloc] initWithTrashPath: trashPath];
 	[recycler activate];
 }
@@ -1157,7 +1052,7 @@ NSLocalizedString(@"OK", @""), nil, nil); \
     
   for (i = 0; i < [viewersSearchPaths count]; i++) {
     NSString *spath = [viewersSearchPaths objectAtIndex: i];
-    [self addWatcherForPath: spath];
+    [GWLib addWatcherForPath: spath];
   }
 }
 
@@ -1384,7 +1279,7 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 						 || opPtr == NSWorkspaceRecycleOperation
 							 || opPtr == GWorkspaceRecycleOutOperation) { 
     if ([viewersSearchPaths containsObject: destination] == NO) {
-      [self lockFiles: files inDirectoryAtPath: destination];
+      [GWLib lockFiles: files inDirectoryAtPath: destination];
     }
   }
 
@@ -1394,7 +1289,7 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 				|| opPtr == GWorkspaceRecycleOutOperation
 				|| opPtr == GWorkspaceEmptyRecyclerOperation) {
     if ([viewersSearchPaths containsObject: source] == NO) {
-      [self lockFiles: files inDirectoryAtPath: source];
+      [GWLib lockFiles: files inDirectoryAtPath: source];
     }
   }
 
@@ -1442,7 +1337,7 @@ NSLocalizedString(@"OK", @""), nil, nil); \
            || opPtr == NSWorkspaceDuplicateOperation
 						 || opPtr == NSWorkspaceRecycleOperation
 							 || opPtr == GWorkspaceRecycleOutOperation) { 
-		[self unLockFiles: files inDirectoryAtPath: destination];	
+		[GWLib unLockFiles: files inDirectoryAtPath: destination];	
   }
 
   if (opPtr == NSWorkspaceMoveOperation 
@@ -1450,7 +1345,7 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 				|| opPtr == NSWorkspaceRecycleOperation
 				|| opPtr == GWorkspaceRecycleOutOperation
 				|| opPtr == GWorkspaceEmptyRecyclerOperation) {
-    [self unLockFiles: files inDirectoryAtPath: source];
+    [GWLib unLockFiles: files inDirectoryAtPath: source];
   }
 
 	[dict setObject: opPtr forKey: @"operation"];	

@@ -87,7 +87,7 @@ if (sz.height < 0) sz.height = 0
         [fm fileExistsAtPath: path isDirectory: &isdir];    
         if (isdir == NO) {
           path = [path stringByDeletingLastPathComponent];     
-        } else if ([gw isPakageAtPath: path]) {
+        } else if ([GWLib isPakageAtPath: path]) {
           path = [path stringByDeletingLastPathComponent];         
         }
       }
@@ -95,7 +95,7 @@ if (sz.height < 0) sz.height = 0
       ASSIGN (currentPath, path);
 
       [ws getInfoForFile: currentPath application: &defApp type: &type];      
-      [iconView setImage: [gw iconForFile: currentPath ofType: type]]; 		
+      [iconView setImage: [GWLib iconForFile: currentPath ofType: type]]; 		
       
       cellPrototipe = [NSBrowserCell new];
 
@@ -158,7 +158,7 @@ if (sz.height < 0) sz.height = 0
     [fm fileExistsAtPath: path isDirectory: &isdir];    
     if (isdir == NO) {
       path = [path stringByDeletingLastPathComponent];     
-    } else if ([gw isPakageAtPath: path]) {
+    } else if ([GWLib isPakageAtPath: path]) {
       path = [path stringByDeletingLastPathComponent];         
     }
   }
@@ -166,7 +166,7 @@ if (sz.height < 0) sz.height = 0
   ASSIGN (currentPath, path);
 
   [ws getInfoForFile: currentPath application: &defApp type: &type];      
-  [iconView setImage: [gw iconForFile: currentPath ofType: type]]; 		
+  [iconView setImage: [GWLib iconForFile: currentPath ofType: type]]; 		
 
   [pathField setStringValue: [currentPath lastPathComponent]]; 
 
@@ -253,7 +253,7 @@ if (sz.height < 0) sz.height = 0
   } else {
     hiddenFiles = nil;
   }
-	hideSysFiles = [gw hideSysFiles];
+	hideSysFiles = [GWLib hideSysFiles];
 	
 	if (hiddenFiles != nil  ||  hideSysFiles) {	
 		NSMutableArray *mutableFiles = AUTORELEASE ([files mutableCopy]);

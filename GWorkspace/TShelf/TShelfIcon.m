@@ -94,7 +94,7 @@
 			
       [ws getInfoForFile: fullPath application: &defApp type: &t];      
       ASSIGN (type, t);			
-			isPakage = [gw isPakageAtPath: fullPath];
+			isPakage = [GWLib isPakageAtPath: fullPath];
 			
     } else {
       fullPath = nil;
@@ -106,7 +106,7 @@
     }
 
     if (singlepath == YES) {
-      ASSIGN (icon, [gw iconForFile: fullPath ofType: type]);    
+      ASSIGN (icon, [GWLib iconForFile: fullPath ofType: type]);    
     } else {
       ASSIGN (icon, [NSImage imageNamed: @"MultipleSelection.tiff"]);
     }
@@ -188,7 +188,7 @@
 		}
     [ws getInfoForFile: fullPath application: &defApp type: &t];      
     ASSIGN (type, t);
-		isPakage = [gw isPakageAtPath: fullPath];
+		isPakage = [GWLib isPakageAtPath: fullPath];
   } else {
     TEST_RELEASE (fullPath);
     fullPath = nil;
@@ -200,7 +200,7 @@
   }
 
   if (singlepath == YES) {
-    ASSIGN (icon, [gw iconForFile: fullPath ofType: type]);    
+    ASSIGN (icon, [GWLib iconForFile: fullPath ofType: type]);    
   } else {
     ASSIGN (icon, [NSImage imageNamed: @"MultipleSelection.tiff"]);
   }
@@ -270,7 +270,7 @@
 - (void)renewIcon
 {
   if (singlepath == YES) {
-    ASSIGN (icon, [gw iconForFile: fullPath ofType: type]);    
+    ASSIGN (icon, [GWLib iconForFile: fullPath ofType: type]);    
   } else {
     ASSIGN (icon, [NSImage imageNamed: @"MultipleSelection.tiff"]);
   }
@@ -659,7 +659,7 @@
   if(isDragTarget == YES) {
     isDragTarget = NO;
     if (onSelf == NO) {      
-      ASSIGN (icon, [gw iconForFile: fullPath ofType: type]);
+      ASSIGN (icon, [GWLib iconForFile: fullPath ofType: type]);
       [self setNeedsDisplay: YES];
     }
     onSelf = NO;
@@ -693,7 +693,7 @@
     return;
   }
   
-  ASSIGN (icon, [gw iconForFile: fullPath ofType: type]);
+  ASSIGN (icon, [GWLib iconForFile: fullPath ofType: type]);
   [self setNeedsDisplay: YES];
 
 	sourceDragMask = [sender draggingSourceOperationMask];  

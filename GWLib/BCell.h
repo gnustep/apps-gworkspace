@@ -35,7 +35,6 @@
   NSImage *highlight;
   BOOL locked;
   BOOL iconSelected;
-  id gworkspace;
 }
 
 - (id)initIconCell;

@@ -92,7 +92,6 @@ typedef int (*intIMP)(id, SEL, id);
   int alphaNumericalLastColumn;
 	
   id delegate;
-  id gworkspace;
 
 	SEL createEmptySel;
 	IMP createEmpty;

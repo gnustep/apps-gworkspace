@@ -24,6 +24,7 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
+#include "GWLib.h"
 #include "GWProtocol.h"
 #include "GWFunctions.h"
 #include "GWNotifications.h"
@@ -93,11 +94,6 @@ double myrintf(double a)
   self = [super init];
 	
 	if (self) {
-    #ifdef GNUSTEP 
-		  Class gwclass = [[NSBundle mainBundle] principalClass];
-    #else
-		  Class gwclass = [[NSBundle mainBundle] classNamed: @"GWorkspace"];
-    #endif
 		NSRect rect = NSMakeRect(0, 0, 600, 200);
   	NSSize bs = BEZEL_BORDER_SIZE;
 		int i;
@@ -116,8 +112,6 @@ double myrintf(double a)
 
     setPathsSel = @selector(setCurrentPaths:);
     setPaths = [[BColumn class] instanceMethodForSelector: setPathsSel];
-
-		gworkspace = (id<GWProtocol>)[gwclass gworkspace];
 		
 		[self setFrame: rect];
 		visibleColumns = vcols;
@@ -828,10 +822,10 @@ double myrintf(double a)
       NSString *cpath = [col currentPath];
       BOOL is_dir = NO; 
     
-      is_dir = [gworkspace existsAndIsDirectoryFileAtPath: cpath];
+      is_dir = [GWLib existsAndIsDirectoryFileAtPath: cpath];
       
       if (is_dir) {	
-        if (([gworkspace isPakageAtPath: cpath] == NO) 
+        if (([GWLib isPakageAtPath: cpath] == NO) 
                                         || (styleMask & GWViewsPaksgesMask)) {
           return cpath;                  
         } else if (i > 0) {

@@ -94,7 +94,7 @@
   
 	Recycler *recycler;
 	NSString *trashPath;
-	  
+    
   OpenWithController *openWithController;
   RunExternalController *runExtController;
     

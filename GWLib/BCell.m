@@ -25,7 +25,7 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-#include "GWProtocol.h"
+#include "GWLib.h"
 #include "GWFunctions.h"
 #include "BCell.h"
 #include "GNUstep.h"
@@ -59,13 +59,6 @@
   self = [super init];
 
   if (self) {
-    #ifdef GNUSTEP 
-		  Class gwclass = [[NSBundle mainBundle] principalClass];
-    #else
-		  Class gwclass = [[NSBundle mainBundle] classNamed: @"GWorkspace"];
-    #endif
-
-		gworkspace = (id<GWProtocol>)[gwclass gworkspace];  
     paths = nil;
     path = nil;
     icon = nil;
@@ -84,14 +77,14 @@
   if ([paths count] == 1) {
     ASSIGN (path, [paths objectAtIndex: 0]);
     [self setStringValue: [path lastPathComponent]];
-    ASSIGN (icon, [gworkspace smallIconForFile: path]);  
+    ASSIGN (icon, [GWLib smallIconForFile: path]);  
     iconSelected = NO;
   } else {
     DESTROY (path);
-    ASSIGN (icon, [gworkspace smallIconForFiles: paths]);  
+    ASSIGN (icon, [GWLib smallIconForFiles: paths]);  
   }
   
-  ASSIGN (highlight, [gworkspace smallHighlightIcon]);
+  ASSIGN (highlight, [GWLib smallHighlightIcon]);
 }
 
 - (NSArray *)paths

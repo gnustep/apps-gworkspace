@@ -76,7 +76,6 @@ static NSString *nibName = @"ContentsPanel";
 
       fm = [NSFileManager defaultManager];
       ws = [NSWorkspace sharedWorkspace];
-		  gw = [GWorkspace gworkspace];
 
       winName = NSLocalizedString(@"Contents Inspector", @"");
 
@@ -136,7 +135,7 @@ static NSString *nibName = @"ContentsPanel";
 
       for (i = 0; i < [searchPaths count]; i++) {
         NSString *spath = [searchPaths objectAtIndex: i];
-        [gw addWatcherForPath: spath];
+        [GWLib addWatcherForPath: spath];
       }
 
       genericView = [[NSView alloc] initWithFrame: NSMakeRect(0, 0, 257, 245)];		

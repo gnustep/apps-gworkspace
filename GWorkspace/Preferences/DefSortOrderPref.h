@@ -46,7 +46,6 @@
   IBOutlet id setButt;
 
 	int sortType;	
-  GWorkspace *gw;  
 }
 
 - (IBAction)changeType:(id)sender;

@@ -26,11 +26,13 @@
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
   #ifdef GNUSTEP 
+#include "GWLib.h"
 #include "GWFunctions.h"
 #include "GWNotifications.h"
 #include "GWProtocol.h"
 #include "Browser2.h"
   #else
+#include <GWorkspace/GWLib.h>
 #include <GWorkspace/GWFunctions.h>
 #include <GWorkspace/GWNotifications.h>
 #include <GWorkspace/GWProtocol.h>
@@ -63,13 +65,6 @@ if (rct.size.height < 0) rct.size.height = 0
 	self = [super initWithFrame: NSZeroRect];
 	
 	if (self) {
-    #ifdef GNUSTEP 
-		  Class gwclass = [[NSBundle mainBundle] principalClass];
-    #else
-		  Class gwclass = [[NSBundle mainBundle] classNamed: @"GWorkspace"];
-    #endif
-
-		gworkspace = (id<GWProtocol>)[gwclass gworkspace];
     usesShelf = YES;
     cellsIcons = NO;
     browser = nil;
@@ -240,7 +235,7 @@ if (rct.size.height < 0) rct.size.height = 0
   if ((isDir == NO) || ([paths count] > 1)) {
     newPath = [newPath stringByDeletingLastPathComponent];
   } else {
-		if (([gworkspace isPakageAtPath: newPath]) && (viewsapps == NO)) {
+		if (([GWLib isPakageAtPath: newPath]) && (viewsapps == NO)) {
 			newPath = [newPath stringByDeletingLastPathComponent];
 		}
 	}
@@ -686,12 +681,12 @@ if (rct.size.height < 0) rct.size.height = 0
 
 - (void)setWatcherForPath:(NSString *)path
 {
-	[gworkspace addWatcherForPath: path];
+	[GWLib addWatcherForPath: path];
 }
 
 - (void)unsetWatcherForPath:(NSString *)path
 {
-	[gworkspace removeWatcherForPath: path];
+	[GWLib removeWatcherForPath: path];
 }
 
 - (void)unsetWatchersFromPath:(NSString *)path
@@ -787,7 +782,7 @@ if (rct.size.height < 0) rct.size.height = 0
 - (void)openSelectedPaths:(NSArray *)paths newViewer:(BOOL)isnew
 {
 	[self setSelectedPaths: paths];	
-	[gworkspace openSelectedPaths: paths newViewer: isnew]; 
+	[[GWLib workspaceApp] openSelectedPaths: paths newViewer: isnew]; 
 }
 
 @end

@@ -43,7 +43,6 @@
   NSString *myPath;
 	id panel;
 	id buttCancel, buttOk;
-  id gworkspace;
 	id ws;
 	NSBox *sortBox;
 	NSMatrix* matrix;

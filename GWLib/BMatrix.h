@@ -35,7 +35,6 @@
 {
   BColumn *column;
   Browser2 *browser;
-  id gworkspace;
   BOOL acceptDnd;
   NSCell *dndTarget;
   unsigned int dragOperation;

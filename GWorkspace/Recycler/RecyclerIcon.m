@@ -63,7 +63,7 @@
 		ASSIGN (path, apath);
 		ASSIGN (name, [path lastPathComponent]);    
     [ws getInfoForFile: path application: &defApp type: &type];      
-		ASSIGN (icon, [[GWorkspace gworkspace] iconForFile: path ofType: type]);    
+		ASSIGN (icon, [GWLib iconForFile: path ofType: type]);    
     ASSIGN (highlight, [NSImage imageNamed: @"CellHighlight.tiff"]);
     iconsView = (IconsView *)aview;  
 
@@ -216,7 +216,7 @@
 	dragdelay = 0;
 
   [ws getInfoForFile: path application: &defApp type: &type];      
-	dragIcon = [[GWorkspace gworkspace] iconForFile: path ofType: type];
+	dragIcon = [GWLib iconForFile: path ofType: type];
 	
   [self dragImage: dragIcon
                at: dragPoint 

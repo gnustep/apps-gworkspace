@@ -51,7 +51,6 @@
   NSString *editPath;
   NSString *bundlePath;
   NSString *localizedStr;
-  id gworkspace;
   id fm;
   id ws;
 }

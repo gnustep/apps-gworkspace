@@ -59,59 +59,17 @@
 							from:(NSPoint)fromPoint 
 								to:(NSPoint)toPoint;
 
-- (void)noteFileSystemChanged;
-
-- (void)noteFileSystemChanged:(NSString *)path;
-
-- (BOOL)existsAndIsDirectoryFileAtPath:(NSString *)path;
-
-- (NSString *)typeOfFileAt:(NSString *)path;  
-
-- (BOOL)isWritableFileAtPath:(NSString *)path;
-
-- (BOOL)isPakageAtPath:(NSString *)path;
-
-- (NSArray *)sortedDirectoryContentsAtPath:(NSString *)path;
-
-- (NSArray *)checkHiddenFiles:(NSArray *)files atPath:(NSString *)path;
-
-- (int)sortTypeForDirectoryAtPath:(NSString *)aPath;
-
-- (void)setSortType:(int)type forDirectoryAtPath:(NSString *)aPath;
-
 - (void)openSelectedPaths:(NSArray *)paths newViewer:(BOOL)newv;
 
 - (void)openSelectedPathsWith;
 
 - (ViewersWindow *)newViewerAtPath:(NSString *)path canViewApps:(BOOL)viewapps;
 
-- (NSImage *)iconForFile:(NSString *)fullPath ofType:(NSString *)type;
-
-- (NSImage *)smallIconForFile:(NSString*)aPath;
-
-- (NSImage *)smallIconForFiles:(NSArray*)pathArray;
-
-- (NSImage *)smallHighlightIcon;
-
 - (NSArray *)getSelectedPaths;
 
 - (NSString *)trashPath;
 
 - (NSArray *)viewersSearchPaths;
-
-- (NSArray *)imageExtensions;
-
-- (void)lockFiles:(NSArray *)files inDirectoryAtPath:(NSString *)path;
-
-- (void)unLockFiles:(NSArray *)files inDirectoryAtPath:(NSString *)path;
-
-- (BOOL)isLockedPath:(NSString *)path;
-
-- (void)addWatcherForPath:(NSString *)path;
-
-- (void)removeWatcherForPath:(NSString *)path;
-
-- (BOOL)hideSysFiles;
 
 - (BOOL)animateChdir;
 

@@ -65,7 +65,6 @@
   NSMutableArray *watchedPaths;
   IconsViewerPref *prefs;
 	id delegate;
-	id gworkspace;
   NSFileManager *fm;
 }
 

@@ -69,13 +69,6 @@
 	self = [super initWithFrame: NSZeroRect];
 	
 	if (self) {
-    #ifdef GNUSTEP 
-		  Class gwclass = [[NSBundle mainBundle] principalClass];
-    #else
-		  Class gwclass = [[NSBundle mainBundle] classNamed: @"GWorkspace"];
-    #endif
-
-		gworkspace = (id<GWProtocol>)[gwclass gworkspace];
     usesShelf = YES;
   	rootPath = nil;
     lastPath = nil;
@@ -271,7 +264,7 @@
   if ((isDir == NO) || ([paths count] > 1)) {
     newPath = [newPath stringByDeletingLastPathComponent];
   } else {
-		if (([gworkspace isPakageAtPath: newPath]) && (viewsapps == NO)) {
+		if (([GWLib isPakageAtPath: newPath]) && (viewsapps == NO)) {
 			newPath = [newPath stringByDeletingLastPathComponent];
 		}
 	}
@@ -353,7 +346,7 @@
       path = [path stringByDeletingLastPathComponent];
       selection = [NSArray arrayWithArray: selectedPaths];
     } else {
-			if ([gworkspace isPakageAtPath: path] && (viewsapps == NO)) {
+			if ([GWLib isPakageAtPath: path] && (viewsapps == NO)) {
 				path = [path stringByDeletingLastPathComponent];
         selection = [NSArray arrayWithArray: selectedPaths];
 			} else {
@@ -743,12 +736,12 @@
 
 - (void)setWatcherForPath:(NSString *)path
 {
-	[gworkspace addWatcherForPath: path];
+	[GWLib addWatcherForPath: path];
 }
 
 - (void)unsetWatcherForPath:(NSString *)path
 {
-	[gworkspace removeWatcherForPath: path];
+	[GWLib removeWatcherForPath: path];
 }
 
 - (void)unsetWatchersFromPath:(NSString *)path
@@ -902,7 +895,7 @@
   [self setSelectedPaths: paths];
 
   if (newv == YES) {    		
-    [gworkspace openSelectedPaths: paths newViewer: YES];
+    [[GWLib workspaceApp] openSelectedPaths: paths newViewer: YES];
     return;
     
   } else {
@@ -924,7 +917,7 @@
 
       if (([type isEqualToString: NSDirectoryFileType])
                         || ([type isEqualToString: NSFilesystemFileType])) { 
-        if ([gworkspace isPakageAtPath: fpath] == NO) {
+        if ([GWLib isPakageAtPath: fpath] == NO) {
           [dirs addObject: fpath]; 
           [allfiles removeObject: fpath];
           count--;
@@ -934,7 +927,7 @@
     }
     
     if ([allfiles count]) {      
-      [gworkspace openSelectedPaths: allfiles newViewer: newv];
+      [[GWLib workspaceApp] openSelectedPaths: allfiles newViewer: newv];
     }      
 
     if ([dirs count] == 1) {  

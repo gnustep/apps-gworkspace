@@ -117,9 +117,9 @@
     
     [ws getInfoForFile: myPath application: &defApp type: &type];      
     ASSIGN (myType, type);
-		isPakage = [gw isPakageAtPath: myPath];
+		isPakage = [GWLib isPakageAtPath: myPath];
 		
-    ASSIGN (icon, [gw iconForFile: myPath ofType: myType]); 
+    ASSIGN (icon, [GWLib iconForFile: myPath ofType: myType]); 
     
     if ([myType isEqualToString: NSApplicationFileType] == NO) {
 			NSString *name;
@@ -502,7 +502,7 @@
   if(isDragTarget == YES) {
     isDragTarget = NO;  
     if ([myType isEqualToString: NSApplicationFileType] == NO) {
-      ASSIGN (icon, [gw iconForFile: myPath ofType: myType]);
+      ASSIGN (icon, [GWLib iconForFile: myPath ofType: myType]);
       [self setNeedsDisplay: YES];
     }
   }
@@ -530,7 +530,7 @@
     NSMutableArray *files;
     int tag;
 
-    ASSIGN (icon, [gw iconForFile: myPath ofType: myType]);
+    ASSIGN (icon, [GWLib iconForFile: myPath ofType: myType]);
     [self setNeedsDisplay: YES];
 
     source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];

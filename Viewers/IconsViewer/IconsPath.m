@@ -27,11 +27,13 @@
 #include <AppKit/AppKit.h>
 #include <math.h>
   #ifdef GNUSTEP 
+#include "GWLib.h"
 #include "GWProtocol.h"
 #include "GWFunctions.h"
 #include "GWNotifications.h"
 #include "BNameEditor.h"
   #else
+#include <GWorkspace/GWLib.h>
 #include <GWorkspace/GWProtocol.h>
 #include <GWorkspace/GWFunctions.h>
 #include <GWorkspace/GWNotifications.h>
@@ -39,7 +41,7 @@
   #endif
 #include "IconsPath.h"
 #include "PathIcon.h"
-#include "GNUstep.h"
+#include "GNUstep.h" 
 
 #define LABEL_MARGIN 8
 #define EDIT_MARGIN 4
@@ -71,13 +73,6 @@
   self = [super init];
   
   if (self) {
-    #ifdef GNUSTEP 
-		  Class gwclass = [[NSBundle mainBundle] principalClass];
-    #else
-		  Class gwclass = [[NSBundle mainBundle] classNamed: @"GWorkspace"];
-    #endif
-
-		gworkspace = (id<GWProtocol>)[gwclass gworkspace];
     ASSIGN (root, rpath);
     columnsWidth = cwidth;
 		[self setDelegate: adelegate];

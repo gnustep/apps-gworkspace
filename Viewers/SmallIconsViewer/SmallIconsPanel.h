@@ -39,7 +39,6 @@
 @interface SmallIconsPanel : NSView 
 {
   id delegate;
-  id gworkspace;
   NSString *currentPath;
 
 	NSMutableArray *icons; 

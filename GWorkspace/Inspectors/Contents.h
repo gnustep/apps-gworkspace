@@ -59,7 +59,6 @@
   
 	NSMutableArray *viewers;
   id currentViewer;
-  GWorkspace *gw;
 	NSFileManager *fm;
 	NSWorkspace *ws;
 	NSString *winName;

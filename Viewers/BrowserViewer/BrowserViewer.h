@@ -57,7 +57,6 @@
   NSMutableArray *watchedPaths;  
   BrowserViewerPref *prefs;
 	id delegate;
-	id gworkspace;
   NSFileManager *fm;
 }
 

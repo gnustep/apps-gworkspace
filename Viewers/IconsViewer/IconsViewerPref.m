@@ -127,11 +127,6 @@ static NSString *nibName = @"IconsViewerPref";
 		if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
       NSLog(@"failed to load %@!", nibName);
     } else { 
-    #ifdef GNUSTEP 
-		  Class gwclass = [[NSBundle mainBundle] principalClass];
-    #else
-		  Class gwclass = [[NSBundle mainBundle] classNamed: @"GWorkspace"];
-    #endif
       NSUserDefaults *defaults; 
       NSString *widthStr; 
       NSArray *selPaths;
@@ -140,12 +135,11 @@ static NSString *nibName = @"IconsViewerPref";
       RETAIN (prefbox);
       RELEASE (win);
 
-		  gw = (id<GWProtocol>)[gwclass gworkspace];
 		  ws = [NSWorkspace sharedWorkspace];
 
       [imView setImageScaling: NSScaleProportionally];
 
-      selPaths = [gw getSelectedPaths];
+      selPaths = [[GWLib workspaceApp] getSelectedPaths];
       count = [selPaths count];
       if (count == 1) {          
         NSString *fpath = [selPaths objectAtIndex: 0];
@@ -155,7 +149,7 @@ static NSString *nibName = @"IconsViewerPref";
         ASSIGN (fname, [fpath lastPathComponent]);
         
         [ws getInfoForFile: fpath application: &defApp type: &type];      
-        [imView setImage: [gw iconForFile: fpath ofType: type]];
+        [imView setImage: [GWLib iconForFile: fpath ofType: type]];
       } else {
         fname = [[NSString alloc] initWithFormat: @"%i items", count];    
         [imView setImage: [NSImage imageNamed: @"MultipleSelection.tiff"]];
@@ -226,7 +220,7 @@ static NSString *nibName = @"IconsViewerPref";
 
 - (void)selectionChanged:(NSNotification *)n
 {
-  NSArray *selPaths = [gw getSelectedPaths];
+  NSArray *selPaths = [[GWLib workspaceApp] getSelectedPaths];
   int count = [selPaths count];
   
   if (count == 1) { 
@@ -237,7 +231,7 @@ static NSString *nibName = @"IconsViewerPref";
     ASSIGN (fname, [fpath lastPathComponent]);
         
     [ws getInfoForFile: fpath application: &defApp type: &type];      
-    [imView setImage: [gw iconForFile: fpath ofType: type]];
+    [imView setImage: [GWLib iconForFile: fpath ofType: type]];
   } else {
     fname = [[NSString alloc] initWithFormat: @"%i items", count];    
     [imView setImage: [NSImage imageNamed: @"MultipleSelection.tiff"]];

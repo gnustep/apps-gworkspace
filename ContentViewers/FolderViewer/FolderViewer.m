@@ -59,14 +59,6 @@
 {
 	self = [super init];
 	if(self) {
-    #ifdef GNUSTEP 
-		  Class gwclass = [[NSBundle mainBundle] principalClass];
-    #else
-		  Class gwclass = [[NSBundle mainBundle] classNamed: @"GWorkspace"];
-    #endif
-    
-		gworkspace = (id<GWProtocol>)[gwclass gworkspace];
-
 		panel = (id<InspectorsProtocol>)apanel;
 		ws = [NSWorkspace sharedWorkspace];
 		[self setFrame: frame];
@@ -119,7 +111,7 @@
   ASSIGN (myPath, path);    
   writable = [[NSFileManager defaultManager] isWritableFileAtPath: myPath];
   
-	oldSortType = [gworkspace sortTypeForDirectoryAtPath: path];
+	oldSortType = [GWLib sortTypeForDirectoryAtPath: path];
 	newSortType = oldSortType;  
 
 	if (matrix != nil) {
@@ -200,7 +192,7 @@
 	
 	if ([fileType isEqual: NSFilesystemFileType]
           						|| [fileType isEqual: NSDirectoryFileType]) {
-		if ([gworkspace isPakageAtPath: path] == NO) {
+		if ([GWLib isPakageAtPath: path] == NO) {
 			return YES;
 		}
   } 
@@ -231,7 +223,7 @@
 		return;
 	}
 	oldSortType = newSortType;
-  [gworkspace setSortType: newSortType forDirectoryAtPath: myPath];
+  [GWLib setSortType: newSortType forDirectoryAtPath: myPath];
 	[buttCancel setEnabled: NO];
 	[buttOk setEnabled: NO];	
 }

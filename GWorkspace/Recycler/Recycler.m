@@ -26,9 +26,11 @@
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
   #ifdef GNUSTEP 
+#include "GWLib.h"
 #include "GWFunctions.h"
 #include "GWNotifications.h"
   #else
+#include <GWorkspace/GWLib.h>
 #include <GWorkspace/GWFunctions.h>
 #include <GWorkspace/GWNotifications.h>
   #endif
@@ -289,7 +291,7 @@
 
 - (void)setWatcher
 {
-	[gw addWatcherForPath: trashPath];
+	[GWLib addWatcherForPath: trashPath];
 	watching = YES;
 }
 
@@ -298,7 +300,7 @@
   [[NSNotificationCenter defaultCenter] removeObserver: self 
                 name: GWFileWatcherFileDidChangeNotification object: nil];
 
-	[gw removeWatcherForPath: trashPath];
+	[GWLib removeWatcherForPath: trashPath];
 	
 	watching = NO;
 }

@@ -39,7 +39,7 @@
   NSMutableArray *watchedPaths;  
 
 	NSMutableArray *lockedPaths;
-
+  
   NSMutableDictionary *tumbsCache;
   NSString *thumbnailDir;
   BOOL usesThumbnails;    
@@ -47,6 +47,8 @@
   NSFileManager *fm;
   NSWorkspace *ws;
   NSNotificationCenter *nc;
+  
+  id workspaceApp;
 }
 
 + (NSArray *)sortedDirectoryContentsAtPath:(NSString *)path;
@@ -95,31 +97,9 @@
 
 + (NSArray *)imageExtensions;
 
-
-
-
-
-
-
-
-
-
-+ (id)gworkspaceApplication;
-
-+ (BOOL)selectFile:(NSString *)fullPath
-							inFileViewerRootedAtPath:(NSString *)rootFullpath;
-
-+ (oneway void)rootViewerSelectFiles:(NSArray *)paths;
-
-+ (oneway void)openSelectedPaths:(NSArray *)paths;
-
-+ (oneway void)performFileOperationWithDictionary:(NSDictionary *)dict;
-
-+ (oneway void)performServiceWithName:(NSString *)sname 
-                           pasteboard:(NSPasteboard *)pboard;
-
-+ (NSString *)trashPath;
++ (id)workspaceApp;
 
 @end
 
 #endif // GWLIB_H
+

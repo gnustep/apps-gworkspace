@@ -24,6 +24,11 @@
 
 
 #include <AppKit/AppKit.h>
+  #ifdef GNUSTEP 
+#include "GWLib.h"
+  #else
+#include <GWorkspace/GWLib.h>
+  #endif
 #include "TShelfView.h"
 #include "TShelfViewItem.h"
 #include "GWorkspace.h"

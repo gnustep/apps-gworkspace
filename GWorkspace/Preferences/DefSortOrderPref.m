@@ -26,8 +26,10 @@
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
   #ifdef GNUSTEP 
+#include "GWLib.h"
 #include "GWFunctions.h"
   #else
+#include <GWorkspace/GWLib.h>
 #include <GWorkspace/GWFunctions.h>
   #endif
 #include "DefSortOrderPref.h"
@@ -60,8 +62,7 @@ static NSString *nibName = @"DefSortOrderPref";
       RETAIN (prefbox);
       RELEASE (win);
 
-      gw = [GWorkspace gworkspace];	
-		  sortType = [gw defaultSortType];
+		  sortType = [GWLib defSortType];
 		  [matrix selectCellAtRow: sortType column: 0];	
       
       [setButt setEnabled: NO];	
@@ -100,7 +101,7 @@ static NSString *nibName = @"DefSortOrderPref";
 
 - (void)setNewSortType:(id)sender
 {
-  [gw setDefaultSortType: sortType];
+  [GWLib setDefSortType: sortType];
 	[setButt setEnabled: NO];
 }
 

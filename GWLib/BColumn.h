@@ -54,7 +54,6 @@
   
   Browser2 *browser;
 
-  id gworkspace;
   id fm;
   id ws;
 }

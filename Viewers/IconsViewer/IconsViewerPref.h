@@ -74,7 +74,6 @@ typedef enum {
   NSString *fname;    
   int cellsWidth;
 	NSWorkspace *ws;
-  id gw;
 }
 
 - (void)tile;

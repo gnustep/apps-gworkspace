@@ -56,7 +56,6 @@
 	PathIconLabel *namelabel;	
       
   id delegate;
-  id gworkspace;
   
   BOOL isSelect;
 

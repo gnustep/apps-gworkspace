@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include "GWProtocol.h"
@@ -58,14 +57,6 @@
   self = [super init];
   
   if (self) {
-    #ifdef GNUSTEP 
-		  Class gwclass = [[NSBundle mainBundle] principalClass];
-    #else
-		  Class gwclass = [[NSBundle mainBundle] classNamed: @"GWorkspace"];
-    #endif
-
-		gworkspace = (id<GWProtocol>)[gwclass gworkspace];
-
     fm = [NSFileManager defaultManager];
 
     ASSIGN (highlight, [NSImage imageNamed: @"CellHighlight.tiff"]);
@@ -79,7 +70,7 @@
 		[namelabel setAlignment: NSCenterTextAlignment];
 	  [namelabel setBackgroundColor: [NSColor windowBackgroundColor]];
 		
-    contestualMenu = [gworkspace usesContestualMenu];
+    contestualMenu = [[GWLib workspaceApp] usesContestualMenu];
     
 		paths = nil;
 		fullpath = nil;
@@ -143,8 +134,8 @@
 			isRootIcon = NO;
 		}
     
-    ASSIGN (type, [gworkspace typeOfFileAt: fullpath]);
-    isPakage = [gworkspace isPakageAtPath: fullpath];    
+    ASSIGN (type, [GWLib typeOfFileAt: fullpath]);
+    isPakage = [GWLib isPakageAtPath: fullpath];    
 		
   } else {
 		fullpath = nil;
@@ -156,7 +147,7 @@
   }
 
   if (singlepath == YES) {
-    ASSIGN (icon, [gworkspace iconForFile: fullpath ofType: type]);    
+    ASSIGN (icon, [GWLib iconForFile: fullpath ofType: type]);    
   } else {
     ASSIGN (icon, [NSImage imageNamed: @"MultipleSelection.tiff"]);
   }
@@ -187,7 +178,7 @@
   for (i = 0; i < [paths count]; i++) {
     NSString *path = [paths objectAtIndex: i];
 
-    if ([gworkspace isLockedPath: path]) {
+    if ([GWLib isLockedPath: path]) {
       [self setLocked: YES];
       break;
     }
@@ -251,7 +242,7 @@
 - (void)renewIcon
 {
   if (singlepath == YES) {
-    ASSIGN (icon, [gworkspace iconForFile: fullpath ofType: type]);    
+    ASSIGN (icon, [GWLib iconForFile: fullpath ofType: type]);    
   } else {
     ASSIGN (icon, [NSImage imageNamed: @"MultipleSelection.tiff"]);
   }
@@ -268,7 +259,7 @@
 
 - (void)openWith:(id)sender
 {
-  [gworkspace openSelectedPathsWith];
+  [[GWLib workspaceApp] openSelectedPathsWith];
 }
 
 - (BOOL)isSelect
@@ -581,7 +572,7 @@ active. preventWindowOrdering is sent automatically by NSView's dragImage:... an
             event: nextEvent
        pasteboard: pb
            source: self
-        slideBack: [gworkspace animateSlideBack]];
+        slideBack: [[GWLib workspaceApp] animateSlideBack]];
 }
 
 - (void)declareAndSetShapeOnPasteboard:(NSPasteboard *)pb
@@ -743,7 +734,7 @@ active. preventWindowOrdering is sent automatically by NSView's dragImage:... an
   if(isDragTarget == YES) {
     isDragTarget = NO;  
 		onSelf = NO;
-    ASSIGN (icon, [gworkspace iconForFile: fullpath ofType: type]); 
+    ASSIGN (icon, [GWLib iconForFile: fullpath ofType: type]); 
     [self setNeedsDisplay: YES];   
   }
 }
@@ -780,7 +771,7 @@ active. preventWindowOrdering is sent automatically by NSView's dragImage:... an
     return;
   }
 
-  ASSIGN (icon, [gworkspace iconForFile: fullpath ofType: type]); 
+  ASSIGN (icon, [GWLib iconForFile: fullpath ofType: type]); 
   [self setNeedsDisplay: YES];
 
 	sourceDragMask = [sender draggingSourceOperationMask];
@@ -790,7 +781,7 @@ active. preventWindowOrdering is sent automatically by NSView's dragImage:... an
 
   source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
   
-	trashPath = [gworkspace trashPath];
+	trashPath = [[GWLib workspaceApp] trashPath];
 
 	if ([source isEqual: trashPath]) {
 		operation = GWorkspaceRecycleOutOperation;
@@ -815,7 +806,7 @@ active. preventWindowOrdering is sent automatically by NSView's dragImage:... an
 	[opDict setObject: fullpath forKey: @"destination"];
 	[opDict setObject: files forKey: @"files"];
 
-  [gworkspace performFileOperationWithDictionary: opDict];
+  [[GWLib workspaceApp] performFileOperationWithDictionary: opDict];
 }
 
 @end

@@ -41,7 +41,6 @@
 @interface IconsPanel : NSView 
 {
   id delegate;
-	id gworkspace;
   NSString *currentPath;
 
 	NSMutableArray *icons; 
