@@ -43,6 +43,7 @@ typedef NSString *(*cutIMP)(id, SEL, id, float);
   NSString *uncuttedTitle; 
   
   NSImage *icon;
+  NSImage *openicon;
   int icnsize;
   
   NSBezierPath *highlightPath;
@@ -64,6 +65,10 @@ typedef NSString *(*cutIMP)(id, SEL, id, float);
 - (void)setIcon;
 
 - (NSString *)path;
+
+- (BOOL)selectIcon;
+
+- (BOOL)unselectIcon;
 
 - (NSString *)cutTitle:(NSString *)title 
             toFitWidth:(float)width;

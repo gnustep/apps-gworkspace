@@ -270,7 +270,6 @@ static FSNodeRep *shared = nil;
 {
   NSString *ipath = [[node path] stringByAppendingPathComponent: @".opendir.tiff"];
   NSImage *icon = nil;
-	NSSize icnsize;
 
   if ([fm isReadableFileAtPath: ipath]) {
     NSImage *img = [[NSImage alloc] initWithContentsOfFile: ipath];
@@ -288,12 +287,14 @@ static FSNodeRep *shared = nil;
     }
   }
 
-  icnsize = [icon size];
+  if (icon) {
+    NSSize icnsize = [icon size];
 
-  if ((icnsize.width > size) || (icnsize.height > size)) {
-    return [self resizedIcon: icon ofSize: size];
-  }  
-
+    if ((icnsize.width > size) || (icnsize.height > size)) {
+      return [self resizedIcon: icon ofSize: size];
+    }  
+  }
+  
   return icon;
 }
 

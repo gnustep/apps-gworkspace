@@ -45,6 +45,7 @@ static NSDictionary *fontAttr = nil;
   TEST_RELEASE (selectionTitle);
   TEST_RELEASE (uncuttedTitle);
   TEST_RELEASE (icon); 
+  TEST_RELEASE (openicon); 
   TEST_RELEASE (highlightPath);
   RELEASE (dots);
   
@@ -70,7 +71,7 @@ static NSDictionary *fontAttr = nil;
 {
   self = [super init];
   
-  if (self) {    
+  if (self) {
     if (fontAttr == nil) {
       fontAttr = [NSDictionary dictionaryWithObject: [self font] 
                                              forKey: NSFontAttributeName];
@@ -83,7 +84,7 @@ static NSDictionary *fontAttr = nil;
        
     node = nil;
     selection = nil;
-    selectionTitle = nil;    
+    selectionTitle = nil;
     icon = nil;
     icnsize = DEFAULT_ISIZE;
     highlightPath = nil;
@@ -100,6 +101,8 @@ static NSDictionary *fontAttr = nil;
 - (void)setIcon
 {
   if (node) {
+    NSImage *icn = [FSNodeRep openFolderIconOfSize: icnsize forNode: node];
+  
     hlightRect = NSZeroRect;
     hlightRect.size.width = ceil(icnsize / 3 * 4);
     hlightRect.size.height = ceil(hlightRect.size.width * HLIGHT_H_FACT);
@@ -108,6 +111,10 @@ static NSDictionary *fontAttr = nil;
     }
     ASSIGN (highlightPath, [FSNodeRep highlightPathOfSize: hlightRect.size]);
     ASSIGN (icon, [FSNodeRep iconOfSize: icnsize forNode: node]);
+    
+    if (icn) {
+      ASSIGN (openicon, icn);
+    }
   }
 }
 
@@ -117,6 +124,24 @@ static NSDictionary *fontAttr = nil;
     return [node path];
   }
   return nil;
+}
+
+- (BOOL)selectIcon
+{
+  if (iconSelected) {
+    return NO;
+  }
+  iconSelected = YES;
+  return YES;
+}
+
+- (BOOL)unselectIcon
+{
+  if (iconSelected == NO) {
+    return NO;
+  }
+  iconSelected = NO;
+  return YES;
 }
 
 - (NSString *)cutTitle:(NSString *)title 
@@ -240,9 +265,8 @@ static NSDictionary *fontAttr = nil;
       if (iconSelected) {
         [[self highlightColorInView: controlView] set];
         [highlightPath fill];
-      
-    //   [openicon compositeToPoint: icon_rect.origin 
-	  //                     operation: NSCompositeSourceOver];
+        [openicon compositeToPoint: icon_rect.origin 
+	                       operation: NSCompositeSourceOver];
                          
       } else {
         [icon compositeToPoint: icon_rect.origin 

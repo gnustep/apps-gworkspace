@@ -2372,8 +2372,8 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   [d setObject: @"GWorkspace" forKey: @"ApplicationName"];
   [d setObject: NSLocalizedString(@"GNUstep Workspace Manager", @"")
       	forKey: @"ApplicationDescription"];
-  [d setObject: @"GWorkspace 0.6.3" forKey: @"ApplicationRelease"];
-  [d setObject: @"01 2004" forKey: @"FullVersionID"];
+  [d setObject: @"GWorkspace 0.6.5" forKey: @"ApplicationRelease"];
+  [d setObject: @"06 2004" forKey: @"FullVersionID"];
   [d setObject: [NSArray arrayWithObjects: 
       @"Enrico Sersale <enrico@imago.ro>.\n\
 InspectorViewer, PlistViewer, StringsViewer\n\

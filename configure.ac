@@ -1,5 +1,5 @@
 AC_PREREQ(2.52)
-AC_INIT([GWorkspace], [0.6.3], [enrico@imago.ro])
+AC_INIT([GWorkspace], [0.6.5], [enrico@imago.ro])
 
 if test -z "$GNUSTEP_SYSTEM_ROOT"; then
   AC_MSG_ERROR([You must run the GNUstep initialization script first!])
