@@ -75,25 +75,10 @@ static NSString *nibName = @"LoginWindow";
   if (entry && [entry count]) {
     [serversNames addObjectsFromArray: entry];
 
-
     for (i = 0; i < [serversNames count]; i++) {
       [popUp addItemWithTitle: [serversNames objectAtIndex: i]];
     }
     
-    
-/*
-    while ([[popUp itemArray] count] > [serversNames count]) {
-      [popUp removeItemAtIndex: ([[popUp itemArray] count] -1)];
-    }
-    while ([[popUp itemArray] count] < [serversNames count]) {
-      [popUp addItemWithTitle: @""];
-    }
-
-    for (i = 0; i < [serversNames count]; i++) {
-      [[popUp itemAtIndex: i] setTitle: [serversNames objectAtIndex: i]];
-    }
-*/
-
     entry = [defaults objectForKey: @"currentserver"];
     if (entry) {
       [popUp selectItemWithTitle: entry];
@@ -101,7 +86,6 @@ static NSString *nibName = @"LoginWindow";
     }
   } else {
     [popUp addItemWithTitle: NSLocalizedString(@"no servers", @"")];
-//    [[popUp itemAtIndex: 0] setTitle: NSLocalizedString(@"no servers", @"")];
   }
 
   [win makeKeyAndOrderFront: nil];

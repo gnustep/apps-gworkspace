@@ -138,7 +138,9 @@
 	    "useStandardKerning:",
 	    "useStandardLigatures:",
 	    "yank:",
-	    "zoom:"
+	    "zoom:",
+	    "chooseServer:",
+	    "tryLogin:"
 	);
 	Super = NSObject;
     };
