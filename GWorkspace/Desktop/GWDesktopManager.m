@@ -436,7 +436,6 @@ static GWDesktopManager *desktopManager = nil;
   NSDictionary *opinfo = (NSDictionary *)[notif object];  
 
   if ([dskNode involvedByFileOperation: opinfo]) {
- //   dskWatcherSuspended = YES;
     [[self desktopView] nodeContentsWillChange: opinfo];
   }
 }
@@ -459,7 +458,6 @@ static GWDesktopManager *desktopManager = nil;
   }
   
   [dock nodeContentsDidChange: opinfo];  
- // dskWatcherSuspended = NO;
 }
 
 - (void)watcherNotification:(NSNotification *)notif
@@ -481,7 +479,7 @@ static GWDesktopManager *desktopManager = nil;
   } else if ([event isEqual: @"GWWatchedFileModified"]) {
     [[self desktopView] watchedPathChanged: info];
     
-  } else if ([path isEqual: [dskNode path]] && (dskWatcherSuspended == NO)) {
+  } else if ([path isEqual: [dskNode path]]) {
     [[self desktopView] watchedPathChanged: info];
   }    
 

@@ -1105,10 +1105,8 @@ static GWorkspace *gworkspace = nil;
   NSString *source = [info objectForKey: @"source"];
   NSString *destination = [info objectForKey: @"destination"];
   NSArray *files = [info objectForKey: @"files"];
-  NSMutableArray *paths = [NSMutableArray array];
 	NSMutableDictionary *dict = [NSMutableDictionary dictionary];		
   NSString *opPtr = nil;
-  int i;
   
   if ([operation isEqual: NSWorkspaceMoveOperation]) {
     opPtr = NSWorkspaceMoveOperation;    
@@ -1134,33 +1132,6 @@ static GWorkspace *gworkspace = nil;
     opPtr = GWorkspaceEmptyRecyclerOperation;    
   }
 
-  if (opPtr == NSWorkspaceMoveOperation   
-     || opPtr == NSWorkspaceCopyOperation 
-        || opPtr == NSWorkspaceLinkOperation
-           || opPtr == NSWorkspaceDuplicateOperation
-						   || opPtr == NSWorkspaceRecycleOperation
-							   || opPtr == GWorkspaceRecycleOutOperation) { 
-    for (i = 0; i < [files count]; i++) {
-      NSString *fname = [files objectAtIndex: i];
-      NSString *fullpath = [destination stringByAppendingPathComponent: fname];
-      [paths addObject: fullpath];
-    }
-  }
-
-  if (opPtr == NSWorkspaceMoveOperation 
-        || opPtr == NSWorkspaceDestroyOperation
-				|| opPtr == NSWorkspaceRecycleOperation
-				|| opPtr == GWorkspaceRecycleOutOperation
-				|| opPtr == GWorkspaceEmptyRecyclerOperation) {
-    for (i = 0; i < [files count]; i++) {
-      NSString *fname = [files objectAtIndex: i];
-      NSString *fullpath = [source stringByAppendingPathComponent: fname];
-      [paths addObject: fullpath];
-    }
-  }
-
-//  [fsnodeRep lockPaths: paths];
-
 	[dict setObject: opPtr forKey: @"operation"];	
   [dict setObject: source forKey: @"source"];	
   [dict setObject: destination forKey: @"destination"];	
@@ -1168,7 +1139,7 @@ static GWorkspace *gworkspace = nil;
 
   [[NSNotificationCenter defaultCenter]
  				postNotificationName: GWFileSystemWillChangeNotification
-	 								    object: [NSDictionary dictionaryWithDictionary: dict]];
+	 								    object: [dict makeImmutableCopyOnFail: NO]];
 }
 
 - (void)fileSystemDidChange:(NSNotification *)notif
@@ -1178,11 +1149,9 @@ static GWorkspace *gworkspace = nil;
   NSString *source = [info objectForKey: @"source"];
   NSString *destination = [info objectForKey: @"destination"];
   NSArray *files = [info objectForKey: @"files"];
-  NSMutableArray *paths = [NSMutableArray array];
   NSArray *origfiles = [info objectForKey: @"origfiles"];
 	NSMutableDictionary *dict = [NSMutableDictionary dictionary];		
   NSString *opPtr = nil;
-  int i;
   
   if ([operation isEqual: NSWorkspaceMoveOperation]) { 
     opPtr = NSWorkspaceMoveOperation;                                 
@@ -1207,33 +1176,6 @@ static GWorkspace *gworkspace = nil;
   } else if ([operation isEqual: GWorkspaceEmptyRecyclerOperation]) { 
     opPtr = GWorkspaceEmptyRecyclerOperation;                         
   }
-
-  if (opPtr == NSWorkspaceMoveOperation 
-     || opPtr == NSWorkspaceCopyOperation
-        || opPtr == NSWorkspaceLinkOperation
-           || opPtr == NSWorkspaceDuplicateOperation
-						     || opPtr == NSWorkspaceRecycleOperation
-							     || opPtr == GWorkspaceRecycleOutOperation) { 
-    for (i = 0; i < [origfiles count]; i++) {
-      NSString *fname = [origfiles objectAtIndex: i];
-      NSString *fullpath = [destination stringByAppendingPathComponent: fname];
-      [paths addObject: fullpath];
-    }
-  }
-
-  if (opPtr == NSWorkspaceMoveOperation 
-        || opPtr == NSWorkspaceDestroyOperation
-				|| opPtr == NSWorkspaceRecycleOperation
-				|| opPtr == GWorkspaceRecycleOutOperation
-				|| opPtr == GWorkspaceEmptyRecyclerOperation) {        
-    for (i = 0; i < [origfiles count]; i++) {
-      NSString *fname = [origfiles objectAtIndex: i];
-      NSString *fullpath = [source stringByAppendingPathComponent: fname];
-      [paths addObject: fullpath];
-    }
-  }
-
-//  [fsnodeRep unlockPaths: paths];
 
 	[dict setObject: opPtr forKey: @"operation"];	
   [dict setObject: source forKey: @"source"];	

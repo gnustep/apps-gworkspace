@@ -60,7 +60,6 @@
   RELEASE (baseNode);
   TEST_RELEASE (lastSelection);
   RELEASE (watchedNodes);
-  RELEASE (watchedSuspended);
   RELEASE (vwrwin);
   RELEASE (viewType);
   RELEASE (history);
@@ -86,7 +85,6 @@
     history = [NSMutableArray new];
     historyPosition = 0;
     watchedNodes = [NSMutableArray new];
-    watchedSuspended = [NSMutableArray new];
     manager = [GWViewersManager viewersManager];
     gworkspace = [GWorkspace gworkspace];
     nc = [NSNotificationCenter defaultCenter];
@@ -639,41 +637,6 @@
 
 - (void)nodeContentsWillChange:(NSDictionary *)info
 {
-  NSString *operation = [info objectForKey: @"operation"];
-  NSString *source = [info objectForKey: @"source"];
-  NSString *destination = [info objectForKey: @"destination"];
-  NSArray *files = [info objectForKey: @"files"];
-    
-  if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
-    files = [NSArray arrayWithObject: [destination lastPathComponent]];
-    destination = [destination stringByDeletingLastPathComponent]; 
-  }
-
-  if ([operation isEqual: @"NSWorkspaceMoveOperation"] 
-        || [operation isEqual: @"NSWorkspaceCopyOperation"]
-        || [operation isEqual: @"NSWorkspaceLinkOperation"]
-        || [operation isEqual: @"NSWorkspaceDuplicateOperation"]
-        || [operation isEqual: @"GWorkspaceCreateDirOperation"]
-        || [operation isEqual: @"GWorkspaceCreateFileOperation"]
-        || [operation isEqual: @"GWorkspaceRenameOperation"]
-			  || [operation isEqual: @"GWorkspaceRecycleOutOperation"]) { 
-    if ([self isShowingPath: destination]
-                    || [baseNode isSubnodeOfPath: destination]) {
-  //    [self suspendWatchersFromPath: destination];
-    }
-  }
-
-  if ([operation isEqual: @"NSWorkspaceMoveOperation"]
-        || [operation isEqual: @"NSWorkspaceDestroyOperation"]
-				|| [operation isEqual: @"NSWorkspaceRecycleOperation"]
-				|| [operation isEqual: @"GWorkspaceRecycleOutOperation"]
-				|| [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]) {
-    if ([self isShowingPath: source]
-                    || [baseNode isSubnodeOfPath: source]) {
- //     [self suspendWatchersFromPath: source];
-    }
-  }
-
   [nodeView nodeContentsWillChange: info];
 }
 
@@ -709,13 +672,6 @@
       FSNode *node = [FSNode nodeWithPath: destination];
       [nodeView reloadFromNode: node];
     }
-        
-    if ([self isShowingPath: destination]
-                        || [baseNode isSubnodeOfPath: destination]) {
- //     [self reactivateWatchersFromPath: destination];
-    }
-    
-  //  [self clearSuspendedWatchersFromPath: destination];
   }
 
   if ([operation isEqual: @"NSWorkspaceMoveOperation"]
@@ -727,71 +683,6 @@
       FSNode *node = [FSNode nodeWithPath: source];
       [nodeView reloadFromNode: node];
     }
-        
-    if ([self isShowingPath: source] || [baseNode isSubnodeOfPath: source]) {
- //     [self reactivateWatchersFromPath: source];
-    }
-    
- //   [self clearSuspendedWatchersFromPath: source];
-  }
-}
-
-- (void)suspendWatchersFromPath:(NSString *)path
-{
-  NSString *start = [baseNode isSubnodeOfPath: path] ? [baseNode path] : path;
-  unsigned index = [FSNode indexOfNodeWithPath: start 
-                                  inComponents: watchedNodes];
-    
-  if (index != NSNotFound) {
-    int i;
-
-    for (i = index; i < [watchedNodes count]; i++) { 
-      NSString *path = [[watchedNodes objectAtIndex: i] path];
-         
-      [gworkspace removeWatcherForPath: path];
-      [watchedSuspended addObject: path];
-    }
-  } 
-}
-
-- (void)reactivateWatchersFromPath:(NSString *)path
-{
-  NSString *start = [baseNode isSubnodeOfPath: path] ? [baseNode path] : path;
-  unsigned index = [FSNode indexOfNodeWithPath: start 
-                                  inComponents: watchedNodes];
-
-  if (index != NSNotFound) {
-    int count = [watchedNodes count];
-    int i;
-    
-    for (i = index; i < count; i++) {
-      FSNode *node = [watchedNodes objectAtIndex: i];
-      NSString *path = [node path];
-      
-      if ([node isValid] && [node isDirectory]) {
-        [gworkspace addWatcherForPath: path];
-      } else {
-        [watchedNodes removeObjectAtIndex: i];
-        count--;
-        i--;
-      }
-    }
-  }
-}
-
-- (void)clearSuspendedWatchersFromPath:(NSString *)path
-{
-  int count = [watchedSuspended count];
-  int i;
-
-  for (i = 0; i < count; i++) {
-    NSString *suspended = [watchedSuspended objectAtIndex: i];
-
-    if ([suspended isEqual: path] || isSubpathOfPath(path, suspended)) {
-      [watchedSuspended removeObjectAtIndex: i];
-      count--;
-      i--;
-    }
   }
 }
 
@@ -800,24 +691,22 @@
   if (invalidated == NO) {
     NSString *path = [info objectForKey: @"path"];
   
-    if ([watchedSuspended containsObject: path] == NO) { 
-      if ([nodeView isSingleNode] == NO) {
-        [nodeView watchedPathChanged: info];
-        
-      } else {
-        NSString *event = [info objectForKey: @"event"];
-        
-        if ([event isEqual: @"GWWatchedDirectoryDeleted"]) {
-          NSString *s = [path stringByDeletingLastPathComponent];
+    if ([nodeView isSingleNode] == NO) {
+      [nodeView watchedPathChanged: info];
 
-          if ([self isShowingPath: s]) {
-            FSNode *node = [FSNode nodeWithPath: s];
-            [nodeView reloadFromNode: node];
-          }
-          
-        } else if ([nodeView isShowingPath: path]) {
-          [nodeView watchedPathChanged: info];
+    } else {
+      NSString *event = [info objectForKey: @"event"];
+
+      if ([event isEqual: @"GWWatchedDirectoryDeleted"]) {
+        NSString *s = [path stringByDeletingLastPathComponent];
+
+        if ([self isShowingPath: s]) {
+          FSNode *node = [FSNode nodeWithPath: s];
+          [nodeView reloadFromNode: node];
         }
+
+      } else if ([nodeView isShowingPath: path]) {
+        [nodeView watchedPathChanged: info];
       }
     }
   }

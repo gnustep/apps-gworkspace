@@ -59,7 +59,6 @@
   FSNode *baseNode;
   NSArray *lastSelection;  
   NSMutableArray *watchedNodes;
-  NSMutableArray *watchedSuspended;
 
   NSMutableArray *history;
   int historyPosition;
@@ -112,9 +111,6 @@
 - (void)nodeContentsWillChange:(NSDictionary *)info;
 - (void)nodeContentsDidChange:(NSDictionary *)info;
 
-- (void)suspendWatchersFromPath:(NSString *)path;
-- (void)reactivateWatchersFromPath:(NSString *)path;
-- (void)clearSuspendedWatchersFromPath:(NSString *)path;
 - (void)watchedPathChanged:(NSDictionary *)info;
 - (NSArray *)watchedNodes;
 

@@ -40,7 +40,6 @@ typedef enum DockPosition {
 @interface GWDesktopManager : NSObject
 {
   FSNode *dskNode;
-  BOOL dskWatcherSuspended;
   id win;
   BOOL usexbundle;
   

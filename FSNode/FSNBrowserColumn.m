@@ -444,6 +444,9 @@ static id <DesktopApplication> desktopApp = nil;
       updated = YES;  			
     }
   }
+
+  [matrix sizeToCells];
+  [matrix setNeedsDisplay: YES];
   
   if (updated) {
 	  if ([selectedCells count] > 0) {    
@@ -468,16 +471,12 @@ static id <DesktopApplication> desktopApp = nil;
         [browser setLastColumn: index];
       }
 	  }
-        
-    [matrix sizeToCells];
-    [matrix setNeedsDisplay: YES];
-
-    if ([visibleNodes count]) {
-      cell = [self cellOfNode: [visibleNodes objectAtIndex: 0]];
-      [matrix scrollToFirstPositionCell: cell withScrollTune: scrollTune];
-    }
+    
+  } else if ([visibleNodes count]) {
+    cell = [self cellOfNode: [visibleNodes objectAtIndex: 0]];
+    [matrix scrollToFirstPositionCell: cell withScrollTune: scrollTune];
   }
-  
+
   TEST_RELEASE (selectedCells); 
   TEST_RELEASE (visibleNodes);
   RELEASE (arp);
