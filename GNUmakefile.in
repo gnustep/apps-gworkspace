@@ -21,6 +21,8 @@ endif
 SUBPROJECTS = Utilities \
 	      			  Inspector \
 	      			  Operation \
+                FSNode \
+                Finder \
 	      			  GWLib \
 	      			  Viewers \
 	      			  GWorkspace 

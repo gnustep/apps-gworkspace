@@ -1,0 +1,8 @@
+{
+    NSIcon = "Finder.tiff";
+    NSRole = "NSNone";
+    ApplicationDescription = "Finder";
+    ApplicationIcon = "Finder.tiff";
+    ApplicationName = "Finder";
+    ApplicationRelease = "0.7.0";
+}
