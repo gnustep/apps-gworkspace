@@ -183,9 +183,13 @@ typedef enum DockPosition {
 
 - (void)thumbnailsDidChange:(NSNotification *)notif;
 
++ (void)mountRemovableMedia;
+
 - (void)createTrashPath;
 
 - (void)updateDefaults;
+
+- (void)threadWillExit:(NSNotification *)notif;
 
 
 //

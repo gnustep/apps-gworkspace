@@ -185,6 +185,11 @@ static Desktop *desktop = nil;
                 				selector: @selector(thumbnailsDidChange:) 
                 					  name: @"GWThumbnailsDidChangeNotification"
                 					object: nil];
+
+  [nc addObserver: self
+         selector: @selector(threadWillExit:)
+             name: NSThreadWillExitNotification
+           object: nil];
 }
 
 - (BOOL)applicationShouldTerminate:(NSApplication *)app 
@@ -800,6 +805,21 @@ static Desktop *desktop = nil;
   [[self desktopView] thumbnailsDidChange];
 }
 
++ (void)mountRemovableMedia
+{
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	  
+  [[NSWorkspace sharedWorkspace] mountNewRemovableMedia];
+  
+  [[NSRunLoop currentRunLoop] run];
+  [pool release];
+}
+
+- (void)threadWillExit:(NSNotification *)notif
+{
+  NSLog(@"mount thread will exit");
+}
+
 - (void)createTrashPath
 {
 	NSString *basePath, *tpath; 
@@ -1177,7 +1197,17 @@ static Desktop *desktop = nil;
 
 - (void)checkNewRemovableMedia:(id)sender
 {
-  [ws mountNewRemovableMedia];
+  NS_DURING
+  {
+    [NSThread detachNewThreadSelector: @selector(mountRemovableMedia)
+                             toTarget: [self class]
+                           withObject: nil];
+  }
+  NS_HANDLER
+  {
+    NSLog(@"Error! A fatal error occured while detaching the thread.");
+  }
+  NS_ENDHANDLER
 }
 
 - (void)showPreferences:(id)sender
