@@ -126,12 +126,21 @@
 
 - (void)addNode:(FSNode *)node toHistoryOfViewer:(id)viewer;
 
-- (void)tuneHistory:(NSMutableArray *)history
-           position:(int *)pos;
+- (void)removeDuplicatesInHistory:(NSMutableArray *)history
+                         position:(int *)pos;
            
 - (void)changeHistoryOwner:(id)viewer;
 
-- (void)viewer:(id)viewer goToHistoryPosition:(int)pos;
+- (void)goToHistoryPosition:(int)pos 
+                   ofViewer:(id)viewer;
+
+- (void)goBackwardInHistoryOfViewer:(id)viewer;
+
+- (void)goForwardInHistoryOfViewer:(id)viewer;
+
+- (void)setPosition:(int)position
+          inHistory:(NSMutableArray *)history
+           ofViewer:(id)viewer;
 
 @end
 

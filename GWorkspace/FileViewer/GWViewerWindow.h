@@ -35,40 +35,24 @@
   id delegate;
 }
 
-- (id)init;
-
 - (void)openSelection:(id)sender;
-
 - (void)openSelectionAsFolder:(id)sender;
-
 - (void)newFolder:(id)sender;
-
 - (void)newFile:(id)sender;
-
 - (void)duplicateFiles:(id)sender;
-
 - (void)deleteFiles:(id)sender;
-
+- (void)goBackwardInHistory:(id)sender;
+- (void)goForwardInHistory:(id)sender;
 - (void)setViewerBehaviour:(id)sender;
-
 - (void)setViewerType:(id)sender;
-
 - (void)setShownType:(id)sender;
-
 - (void)setExtendedShownType:(id)sender;
-
 - (void)setIconsSize:(id)sender;
-
 - (void)setIconsPosition:(id)sender;
-
 - (void)setLabelSize:(id)sender;
-
 - (void)chooseLabelColor:(id)sender;
-
 - (void)chooseBackColor:(id)sender;
-
 - (void)selectAllInViewer:(id)sender;
-
 - (void)showTerminal:(id)sender;
 
 @end
@@ -77,39 +61,24 @@
 @interface NSObject (GWViewerWindowDelegateMethods)
 
 - (BOOL)validateItem:(id)menuItem;
-
 - (void)openSelectionInNewViewer:(BOOL)newv;
-
 - (void)openSelectionAsFolder;
-
 - (void)newFolder;
-
 - (void)newFile;
-
 - (void)duplicateFiles;
-
 - (void)deleteFiles;
-
+- (void)goBackwardInHistory;
+- (void)goForwardInHistory;
 - (void)setViewerBehaviour:(id)sender;
-
 - (void)setViewerType:(id)sender;
-
 - (void)setShownType:(id)sender;
-
 - (void)setExtendedShownType:(id)sender;
-
 - (void)setIconsSize:(id)sender;
-
 - (void)setIconsPosition:(id)sender;
-
 - (void)setLabelSize:(id)sender;
-
 - (void)chooseLabelColor:(id)sender;
-
 - (void)chooseBackColor:(id)sender;
-
 - (void)selectAllInViewer;
-
 - (void)showTerminal;
 
 @end

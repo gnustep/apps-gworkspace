@@ -2663,9 +2663,51 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 }
 
 - (void)concludeRemoteFilesDragOperation:(NSData *)opinfo
-                             atLocalPath:(NSString *)localdest
+                             atLocalPath:(NSString *)localPath
 {
+  NSDictionary *infoDict = [NSUnarchiver unarchiveObjectWithData: opinfo];
+  NSArray *srcPaths = [infoDict objectForKey: @"paths"];
+  BOOL bookmark = [[infoDict objectForKey: @"bookmark"] boolValue];
+  NSString *connName = [infoDict objectForKey: @"dndconn"];
+	NSArray *locContents = [fm directoryContentsAtPath: localPath];
+  BOOL samename = NO;
+  int i;
 
+  if (locContents) {
+    NSConnection *conn;
+    id remote;
+  
+    for (i = 0; i < [srcPaths count]; i++) {
+      NSString *name = [[srcPaths objectAtIndex: i] lastPathComponent];
+
+      if ([locContents containsObject: name]) {
+        samename = YES;
+        break;
+      }
+    }
+    
+    conn = [NSConnection connectionWithRegisteredName: connName host: @""];
+  
+    if (conn) {
+      remote = [conn rootProxy];
+      
+      if (remote) {
+        NSMutableDictionary *reply = [NSMutableDictionary dictionary];
+        NSData *rpdata;
+      
+        [reply setObject: localPath forKey: @"destination"];
+        [reply setObject: srcPaths forKey: @"paths"];
+        [reply setObject: [NSNumber numberWithBool: bookmark] forKey: @"bookmark"];  
+        [reply setObject: [NSNumber numberWithBool: !samename] forKey: @"dndok"];
+        rpdata = [NSArchiver archivedDataWithRootObject: reply];
+      
+        [remote setProtocolForProxy: @protocol(GWRemoteFilesDraggingInfo)];
+        remote = (id <GWRemoteFilesDraggingInfo>)remote;
+      
+        [remote remoteDraggingDestinationReply: rpdata];
+      }
+    }
+  }
 }
 
 // - (void)addWatcherForPath:(NSString *)path // already in GWProtocol
@@ -2682,4 +2724,30 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 @end
 
 
+/*
+FROM GWNET
+- (void)declareAndSetShapeOnPasteboard:(NSPasteboard *)pb
+{
+  NSArray *dndtypes;
+  NSData *pbData;
+  NSMutableDictionary *pbDict;	
+  BOOL bookmark;
+    
+  dndtypes = [NSArray arrayWithObject: GWRemoteFilenamesPboardType];
+  [pb declareTypes: dndtypes owner: nil]; 
 
+  pbDict = [NSMutableDictionary dictionary];      
+  bookmark = (dndMask == NSDragOperationLink) ? YES : NO;
+  if (bookmark) {
+    NSString *bookmarkName = [remoteHostName stringByAppendingString: @".bmk"];
+    [pbDict setObject: [NSArray arrayWithObject: bookmarkName] forKey: @"paths"];  
+  } else {
+    [pbDict setObject: paths forKey: @"paths"];  
+  }
+  [pbDict setObject: [NSNumber numberWithBool: bookmark] forKey: @"bookmark"];  
+  [pbDict setObject: [[browser delegate] dndConnName] forKey: @"dndconn"];
+      
+  pbData = [NSArchiver archivedDataWithRootObject: pbDict];
+  [pb setData: pbData forType: GWRemoteFilenamesPboardType];
+}
+*/

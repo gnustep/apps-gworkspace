@@ -138,9 +138,9 @@ void createMenu()
 	  addItemToMenu(subenu, @"15", @"", @"setLabelSize:", @"");
 	  addItemToMenu(subenu, @"16", @"", @"setLabelSize:", @"");
       
-	  addItemToMenu(menu, @"Label Color...", @"", @"chooseLabelColor:", @"");
+//	  addItemToMenu(menu, @"Label Color...", @"", @"chooseLabelColor:", @"");
 	  
-    addItemToMenu(menu, @"Background Color...", @"", @"chooseBackColor:", @"");
+//    addItemToMenu(menu, @"Background Color...", @"", @"chooseBackColor:", @"");
       
 	// Tools
 	menuItem = addItemToMenu(mainMenu, @"Tools", @"", nil, @"");

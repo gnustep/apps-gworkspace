@@ -375,7 +375,7 @@
 - (void)performFileOperation:(NSDictionary *)opinfo;
 
 - (void)concludeRemoteFilesDragOperation:(NSData *)opinfo
-                             atLocalPath:(NSString *)localdest;
+                             atLocalPath:(NSString *)localPath;
 
 // - (void)addWatcherForPath:(NSString *)path; // already in GWProtocol
 

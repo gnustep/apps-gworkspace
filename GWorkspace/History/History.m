@@ -154,8 +154,8 @@
 
 	  [matrix getRow: &row column: &col ofCell: [matrix selectedCell]];
 
-    [[GWViewersManager viewersManager] viewer: viewer 
-                          goToHistoryPosition: row];
+    [[GWViewersManager viewersManager] goToHistoryPosition: row 
+                                                  ofViewer: viewer];
 	}
 }
 

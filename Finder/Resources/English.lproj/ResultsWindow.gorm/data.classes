@@ -158,7 +158,8 @@
 	    progBox,
 	    elementsLabel,
 	    restartButt,
-	    stopButt
+	    stopButt,
+	    dragIconBox
 	);
 	Super = NSObject;
     };

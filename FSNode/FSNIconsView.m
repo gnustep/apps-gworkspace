@@ -1258,7 +1258,8 @@ pp.x = NSMaxX([self bounds]) - 1
       }
     }
   }
-  
+
+  [self sortIcons];
   [self tile];
   [self setNeedsDisplay: YES];  
   [self selectionDidChange];

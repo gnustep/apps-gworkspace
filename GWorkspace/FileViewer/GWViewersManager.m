@@ -213,19 +213,6 @@ static GWViewersManager *vwrsmanager = nil;
   }
 }
 
-  //
-  //
-  // UNIFICARE .dirinfo (usato dai FSNodeRepContainer 
-  // e da GWorkspace
-  // E .gwdir (usato dai Viewers (vecchi e nuovi) e da questa classe)
-  //
-  //
-  
-
-
-
-
-
 - (id)newViewerOfType:(unsigned)vtype
               forNode:(FSNode *)node
         showSelection:(BOOL)showsel
@@ -817,7 +804,6 @@ static GWViewersManager *vwrsmanager = nil;
 
     while ([history count] > cachemax) {
       [history removeObjectAtIndex: 0];
-  
       if (position > 0) {
         position--;
       }
@@ -849,7 +835,7 @@ static GWViewersManager *vwrsmanager = nil;
 		  }
 	  }
 
-    [self tuneHistory: history position: &position];
+    [self removeDuplicatesInHistory: history position: &position];
 
     if (spatial) {
       spvHistoryPos = position;
@@ -864,8 +850,8 @@ static GWViewersManager *vwrsmanager = nil;
   }
 }
 
-- (void)tuneHistory:(NSMutableArray *)history
-           position:(int *)pos
+- (void)removeDuplicatesInHistory:(NSMutableArray *)history
+                         position:(int *)pos
 {
   int count = [history count];
   int i;
@@ -943,96 +929,88 @@ if (*pos >= i) *pos -= n; \
   [historyWindow setViewer: viewer];  
 }
 
-- (void)viewer:(id)viewer goToHistoryPosition:(int)pos
+- (void)goToHistoryPosition:(int)pos 
+                   ofViewer:(id)viewer
 {
   if (viewer) {
     BOOL spatial = [viewer isSpatial];
     NSMutableArray *history = (spatial ? spatialViewersHistory: [viewer history]);
     int position = (spatial ? spvHistoryPos : [viewer historyPosition]);
  
-    [self tuneHistory: history position: &position];
+    [self removeDuplicatesInHistory: history position: &position];
 
 	  if ((pos >= 0) && (pos < [history count])) {
-      FSNode *node = [history objectAtIndex: pos];
-    
-      settingHistoryPath = YES;
-      
-      if (spatial == NO) {
-        FSNode *base = [FSNode nodeWithPath: [node parentPath]];
-        NSArray *selection = [NSArray arrayWithObject: node];
-        id nodeView = [viewer nodeView];
-      
-        [nodeView showContentsOfNode: base];
-        [nodeView selectRepsOfSubnodes: selection];
-      
-        if ([nodeView respondsToSelector: @selector(scrollSelectionToVisible)]) {
-          [nodeView scrollSelectionToVisible];
-        }
-      } else {
-        [self newViewerOfType: SPATIAL
-                      forNode: node
-                showSelection: YES
-               closeOldViewer: nil
-                     forceNew: NO];
-      }
-    
-      if (spatial) {
-        spvHistoryPos = pos;
-      } else {
-        [viewer setHistoryPosition: pos];
-      }
-      
-      [historyWindow setHistoryPosition: pos];
-      
-      settingHistoryPath = NO;
+      [self setPosition: pos inHistory: history ofViewer: viewer];
     }
   }
 }
 
-@end
-
-
-
-
-/*
-- (void)goBackwardInHistory:(id)sender
+- (void)goBackwardInHistoryOfViewer:(id)viewer
 {
-	[self tuneHistory];
-  if (currHistoryPos > 0) {
-    NSString *newpath = [ViewerHistory objectAtIndex: (currHistoryPos - 1)];
-		[self setCurrentHistoryPosition: currHistoryPos - 1];
-    [viewer setCurrentSelection: [NSArray arrayWithObject: newpath]];
+  BOOL spatial = [viewer isSpatial];
+  NSMutableArray *history = (spatial ? spatialViewersHistory: [viewer history]);
+  int position = (spatial ? spvHistoryPos : [viewer historyPosition]);
+
+  [self removeDuplicatesInHistory: history position: &position];
+
+  if ((position > 0) && (position < [history count])) {
+    position--;
+    [self setPosition: position inHistory: history ofViewer: viewer];
   }
 }
 
-- (void)goForwardInHistory:(id)sender
+- (void)goForwardInHistoryOfViewer:(id)viewer
 {
-	[self tuneHistory];
-  if (currHistoryPos < ([ViewerHistory count] - 1)) {
-		NSString *newpath = [ViewerHistory objectAtIndex: (currHistoryPos + 1)];
-		[self setCurrentHistoryPosition: currHistoryPos + 1];					
-    [viewer setCurrentSelection: [NSArray arrayWithObject: newpath]];  
-  } 
+  BOOL spatial = [viewer isSpatial];
+  NSMutableArray *history = (spatial ? spatialViewersHistory: [viewer history]);
+  int position = (spatial ? spvHistoryPos : [viewer historyPosition]);
+
+  [self removeDuplicatesInHistory: history position: &position];
+  
+  if ((position >= 0) && (position < ([history count] - 1))) {
+    position++;
+    [self setPosition: position inHistory: history ofViewer: viewer];
+  }
 }
-*/
 
+- (void)setPosition:(int)position
+          inHistory:(NSMutableArray *)history
+           ofViewer:(id)viewer
+{
+  FSNode *node = [history objectAtIndex: position];
+  BOOL spatial = [viewer isSpatial];
 
+  settingHistoryPath = YES;
 
+  if (spatial == NO) {
+    FSNode *base = [FSNode nodeWithPath: [node parentPath]];
+    NSArray *selection = [NSArray arrayWithObject: node];
+    id nodeView = [viewer nodeView];
 
+    [nodeView showContentsOfNode: base];
+    [nodeView selectRepsOfSubnodes: selection];
 
+    if ([nodeView respondsToSelector: @selector(scrollSelectionToVisible)]) {
+      [nodeView scrollSelectionToVisible];
+    }
+  } else {
+    [self newViewerOfType: SPATIAL
+                  forNode: node
+            showSelection: YES
+           closeOldViewer: nil
+                 forceNew: NO];
+  }
 
+  if (spatial) {
+    spvHistoryPos = position;
+  } else {
+    [viewer setHistoryPosition: position];
+  }
 
+  [historyWindow setHistoryPosition: position];
 
+  settingHistoryPath = NO;
+}
 
-
-
-
-
-
-
-
-
-
-
-
+@end
 

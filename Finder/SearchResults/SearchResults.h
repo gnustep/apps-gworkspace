@@ -70,6 +70,7 @@
   IBOutlet id elementsLabel;
   IBOutlet id stopButt;
   IBOutlet id restartButt;
+  IBOutlet id dragIconBox;
   
   IBOutlet id splitView;
   

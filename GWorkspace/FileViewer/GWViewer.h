@@ -140,6 +140,8 @@
 - (void)newFile;
 - (void)duplicateFiles;
 - (void)deleteFiles;
+- (void)goBackwardInHistory;
+- (void)goForwardInHistory;
 - (void)setViewerBehaviour:(id)sender;
 - (void)setViewerType:(id)sender;
 - (void)setShownType:(id)sender;

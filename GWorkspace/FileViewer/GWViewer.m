@@ -1050,6 +1050,16 @@
   [gworkspace deleteFiles];
 }
 
+- (void)goBackwardInHistory
+{
+  [manager goBackwardInHistoryOfViewer: self];
+}
+
+- (void)goForwardInHistory
+{
+  [manager goForwardInHistoryOfViewer: self];
+}
+
 - (void)setViewerBehaviour:(id)sender
 {
   [manager setBehaviour: [sender title] forViewer: self];
@@ -1223,14 +1233,12 @@
 {
   if ([nodeView respondsToSelector: @selector(setTextColor:)]) {
 
-
   }
 }
 
 - (void)chooseBackColor:(id)sender
 {
   if ([nodeView respondsToSelector: @selector(setBackgroundColor:)]) {
-
 
   }
 }

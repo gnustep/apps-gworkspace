@@ -86,6 +86,16 @@
   [delegate deleteFiles];
 }
 
+- (void)goBackwardInHistory:(id)sender
+{
+  [delegate goBackwardInHistory];
+}
+
+- (void)goForwardInHistory:(id)sender
+{
+  [delegate goForwardInHistory];
+}
+
 - (void)setViewerBehaviour:(id)sender
 {
   [delegate setViewerBehaviour: sender];
@@ -141,25 +151,35 @@
   [delegate showTerminal];
 }
 
+- (void)keyDown:(NSEvent *)theEvent 
+{
+	NSString *characters = [theEvent characters];
+	unichar character = 0;
+		
+  if ([characters length] > 0) {
+		character = [characters characterAtIndex: 0];
+	}
+		
+	switch (character) {
+    case NSLeftArrowFunctionKey:
+			if ([theEvent modifierFlags] & NSControlKeyMask) {
+        [delegate goBackwardInHistory];
+			}
+      return;
+
+    case NSRightArrowFunctionKey:			
+			if ([theEvent modifierFlags] & NSControlKeyMask) {
+        [delegate goForwardInHistory];
+	    } 
+			return;
+	}
+	
+	[super keyDown: theEvent];
+}
+
 - (void)print:(id)sender
 {
 	[super print: sender];
 }
 
 @end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
