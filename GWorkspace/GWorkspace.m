@@ -547,7 +547,7 @@ return [ws openFile: fullPath withApplication: appName]
     [GWLib setDefSortType: [result intValue]];
 	}
 
-  showFileOpStatus = [defaults boolForKey: @"showfopstatus"];
+  showFileOpStatus = (![defaults boolForKey: @"fopstatusnotshown"]);
 
   result = [defaults objectForKey: @"GSFileBrowserHideDotFiles"];
   if (result) {
@@ -1412,7 +1412,7 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   if (showFileOpStatus != value) {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];     
     showFileOpStatus = value;  
-    [defaults setBool: showFileOpStatus forKey: @"showfopstatus"];
+    [defaults setBool: !showFileOpStatus forKey: @"fopstatusnotshown"];
     [defaults synchronize];
   }
 }
