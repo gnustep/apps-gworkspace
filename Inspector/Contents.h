@@ -31,6 +31,7 @@
 @class NSImage;
 @class NSView;
 @class GenericView;
+@class NSTextView;
 
 @interface Contents : NSObject
 {
@@ -92,13 +93,15 @@
   NSString *fileComm;
   NSTask *task;
   NSPipe *pipe;
-  NSTextField *field;
+  NSTextView *textview;
   NSNotificationCenter *nc;
 }
 
 - (void)showInfoOfPath:(NSString *)path;
 
 - (void)dataFromTask:(NSNotification *)notif;
+
+- (void)showString:(NSString *)str;
 
 @end
 

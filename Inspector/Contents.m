@@ -364,6 +364,7 @@ static NSString *nibName = @"Contents";
 	
 	if (self) {	
     NSString *comm;
+    NSRect r;
           
     shComm = nil;      
     fileComm = nil;  
@@ -378,10 +379,18 @@ static NSString *nibName = @"Contents";
     }
     
 		nc = [NSNotificationCenter defaultCenter];
-
-    MAKE_LABEL (field, NSMakeRect(2, 125, 254, 65), nil, 'c', YES, self);		  
-    [field setFont: [NSFont systemFontOfSize: 18]];
-    [field setTextColor: [NSColor grayColor]];	
+    
+    r = NSMakeRect(0, 60, frameRect.size.width, 140);
+    textview = [[NSTextView alloc] initWithFrame: r];
+    [[textview textContainer] setContainerSize: [textview frame].size];
+		[textview setDrawsBackground: NO];
+    [textview setRichText: NO];
+    [textview setSelectable: NO];
+    [textview setVerticallyResizable: NO];
+    [textview setHorizontallyResizable: NO];
+    
+    [self addSubview: textview];
+    RELEASE (textview);
 	}
 	
 	return self;
@@ -389,7 +398,7 @@ static NSString *nibName = @"Contents";
 
 - (void)showInfoOfPath:(NSString *)path
 {
-  [field setStringValue: @""];
+  [self showString: @""];
 
   if (shComm && fileComm) {  
     CREATE_AUTORELEASE_POOL (pool);
@@ -421,7 +430,7 @@ static NSString *nibName = @"Contents";
        
     RELEASE (pool);   
   } else {  
-    [field setStringValue: NSLocalizedString(@"No Contents Inspector", @"")];
+    [self showString: NSLocalizedString(@"No Contents Inspector", @"")];
   }        
 }
 
@@ -430,19 +439,54 @@ static NSString *nibName = @"Contents";
   CREATE_AUTORELEASE_POOL (pool);
   NSDictionary *userInfo = [notif userInfo];
   NSData *data = [userInfo objectForKey: NSFileHandleNotificationDataItem];
+  NSString *str;
   
   if (data && [data length]) {
-    NSString *str = [[NSString alloc] initWithData: data 
-                          encoding: [NSString defaultCStringEncoding]];
-                          
-    [field setStringValue: str];
-    RELEASE (str);
-    
+    str = [[NSString alloc] initWithData: data 
+                                encoding: [NSString defaultCStringEncoding]];
   } else {
-    [field setStringValue: NSLocalizedString(@"No Contents Inspector", @"")];
+    str = [[NSString alloc] initWithString: NSLocalizedString(@"No Contents Inspector", @"")];
   }
   
+  [self showString: str];
+  
+  RELEASE (str);
+  RELEASE (pool);   
+}
+
+- (void)showString:(NSString *)str
+{
+  CREATE_AUTORELEASE_POOL (pool);
+  NSAttributedString *attrstr = [[NSAttributedString alloc] initWithString: str];      
+  NSRange range = NSMakeRange(0, [attrstr length]);
+  NSTextStorage *storage = [textview textStorage];
+  NSMutableParagraphStyle *style = [NSMutableParagraphStyle new];
+  
+  [storage setAttributedString: attrstr];
+  
+  [style setParagraphStyle: [NSParagraphStyle defaultParagraphStyle]];   
+  [style setAlignment: NSCenterTextAlignment];
+  
+  [storage addAttribute: NSParagraphStyleAttributeName 
+                  value: style 
+                  range: range];
+  
+  [storage addAttribute: NSFontAttributeName 
+                  value: [NSFont systemFontOfSize: 18] 
+                  range: range];
+
+	[storage addAttribute: NSForegroundColorAttributeName 
+										value: [NSColor darkGrayColor] 
+										range: range];			
+
+  RELEASE (attrstr);
+  RELEASE (style);
   RELEASE (pool);   
 }
 
 @end
+
+
+
+
+
