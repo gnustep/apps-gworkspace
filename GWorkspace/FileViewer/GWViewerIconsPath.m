@@ -143,6 +143,8 @@
 		[nameEditor setAlignment: NSCenterTextAlignment];
 	  [nameEditor setBackgroundColor: backColor];
 	  [nameEditor setTextColor: textColor];
+    [nameEditor setEditable: NO];
+    [nameEditor setSelectable: NO];
     editIcon = nil;
 
     [self calculateGridSize];
@@ -167,6 +169,8 @@
   FSNIcon *icon;
   int icncount;
   int i;
+
+  [self stopRepNameEditing]; 
     
   while ([icons count] > count) {
     icon = [self lastIcon];
@@ -279,7 +283,7 @@
     highlightSize.height = iconSize + 4;
   }
 
-  labelSize.height = rintf([labelFont defaultLineHeightForFont]);
+  labelSize.height = myrintf([labelFont defaultLineHeightForFont]);
   gridSize.height = highlightSize.height + labelSize.height;
 }
 
@@ -296,7 +300,7 @@
     float y = [clip bounds].origin.y;
     float posx = 0.0;
     
-    gridSize.width = rintf(vwidth / visibleIcons);
+    gridSize.width = myrintf(vwidth / visibleIcons);
     [(NSScrollView *)[clip superview] setLineScroll: gridSize.width];
   
     for (i = 0; i < count; i++) {
@@ -322,7 +326,7 @@
 
   } else {
     vwidth -= visibleIcons;
-    gridSize.width = rintf(vwidth / visibleIcons);
+    gridSize.width = myrintf(vwidth / visibleIcons);
   
     for (i = 0; i < count; i++) {
       int n = i - firstVisibleIcon;
@@ -351,7 +355,7 @@
     }
   }
 
-  [self stopRepNameEditing]; 
+  [self updateNameEditor]; 
     
   [self setNeedsDisplay: YES];
 }
@@ -370,17 +374,24 @@
 {
   int x = (int)[clip bounds].origin.x;
   int y = (int)[clip bounds].origin.y;
-  int rem = x % (int)(rintf(gridSize.width));
+  int rem = x % (int)(myrintf(gridSize.width));
+
+  [self stopRepNameEditing]; 
 
   if (rem != 0) {
     if (rem <= gridSize.width / 2) {
       x -= rem;
     } else {
-      x += rintf(gridSize.width) - rem;
+      x += myrintf(gridSize.width) - rem;
     }
-
-    [clip scrollToPoint: NSMakePoint(x, y)];    
+    
+    [clip scrollToPoint: NSMakePoint(x, y)];      
     [self setNeedsDisplay: YES];
+  }
+  
+  editIcon = [self lastIcon];
+  if (editIcon && NSContainsRect([editIcon visibleRect], [editIcon iconBounds])) {
+    [self updateNameEditor]; 
   }
 }
 
@@ -548,40 +559,24 @@
 
 @implementation GWViewerIconsPath (IconNameEditing)
 
-- (void)setNameEditorForRep:(id)arep
+- (void)updateNameEditor
 {
-  FSNode *node = [arep node];
-  BOOL canedit = (([arep isLocked] == NO) 
-                      && ([arep isShowingSelection] == NO)
-                      && ([node isMountPoint] == NO) 
-                      && (infoType == FSNInfoNameType));
-
   [self stopRepNameEditing];
 
-  if (canedit) {   
-    NSString *nodeDescr = [arep shownInfo];
-    NSRect icnr = [arep frame];
+  editIcon = [self lastIcon];
+
+  if (editIcon && NSContainsRect([editIcon visibleRect], [editIcon iconBounds])) {
+    FSNode *ednode = [editIcon node];
+    NSString *nodeDescr = [editIcon shownInfo];
+    NSRect icnr = [editIcon frame];
     float centerx = icnr.origin.x + (icnr.size.width / 2);    
-    NSRect labr = [arep labelRect];
+    NSRect labr = [editIcon labelRect];
     int margin = [fsnodeRep labelMargin];
     float bw = [self bounds].size.width - EDIT_MARGIN;
     float edwidth = 0.0; 
-    NSFontManager *fmanager = [NSFontManager sharedFontManager];
-    NSFont *edfont = [nameEditor font];
     NSRect edrect;
-    
-    editIcon = arep;    
+
     [editIcon setNameEdited: YES];
-    
-    if ([editIcon nodeInfoShowType] == FSNInfoExtendedType) {
-      edfont = [fmanager convertFont: edfont 
-                         toHaveTrait: NSItalicFontMask];
-    } else {
-      edfont = [fmanager convertFont: edfont 
-                      toNotHaveTrait: NSItalicFontMask];
-    }
-    
-    [nameEditor setFont: edfont];
 
     edwidth = [[nameEditor font] widthOfString: nodeDescr];
     edwidth += margin;
@@ -596,20 +591,24 @@
     edrect.origin.x = centerx - (edwidth / 2);
     edrect.size.width = edwidth;
     edrect = NSIntegralRect(edrect);
-    
+
     [nameEditor setFrame: edrect];
     [nameEditor setAlignment: NSCenterTextAlignment];
 
-    [nameEditor setNode: node 
+    [nameEditor setNode: ednode 
             stringValue: nodeDescr
                   index: 0];
 
     [nameEditor setBackgroundColor: [NSColor selectedControlColor]];
-    
-    [nameEditor setEditable: YES];
-    [nameEditor setSelectable: YES];	
+
+    [nameEditor setEditable: NO];
+    [nameEditor setSelectable: NO];	
     [self addSubview: nameEditor];  
   }
+}
+
+- (void)setNameEditorForRep:(id)arep
+{
 }
 
 - (void)stopRepNameEditing
@@ -632,6 +631,14 @@
   }
   
   editIcon = nil;
+}
+
+- (BOOL)canStartRepNameEditing
+{
+  return (editIcon && ([editIcon isLocked] == NO) 
+                && ([editIcon isShowingSelection] == NO)
+                && ([[editIcon node] isMountPoint] == NO) 
+                && (infoType == FSNInfoNameType));
 }
 
 - (void)controlTextDidChange:(NSNotification *)aNotification
@@ -722,10 +729,10 @@
     [userInfo setObject: newpath forKey: @"destination"];	
     [userInfo setObject: [NSArray arrayWithObject: @""] forKey: @"files"];	
 
-    [[NSDistributedNotificationCenter defaultCenter]
- 				postNotificationName: @"GWFileSystemWillChangeNotification"
-	 								    object: nil 
-                    userInfo: userInfo];
+//    [[NSDistributedNotificationCenter defaultCenter]
+// 				postNotificationName: @"GWFileSystemWillChangeNotification"
+//	 								    object: nil 
+//                    userInfo: userInfo];
 
     [fm movePath: [ednode path] toPath: newpath handler: self];
 

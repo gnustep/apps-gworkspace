@@ -177,6 +177,11 @@ static NSString *nibName = @"FModuleOwner";
   return NSOrderedSame;
 }
 
+- (BOOL)needsFullCheck
+{
+  return YES;
+}
+
 @end
 
 

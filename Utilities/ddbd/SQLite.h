@@ -45,9 +45,11 @@ NSString *stringForQuery(NSString *str);
 
 - (void)closedb;
 
-- (sqlite3 *)sqlite;
+- (sqlite3 *)sq3;
 
 - (NSArray *)performQuery:(NSString *)query;
+
+- (BOOL)performWriteQuery:(NSString *)query;
 
 - (NSString *)blobFromData:(NSData *)data;
 

@@ -122,7 +122,7 @@
 
 
   #ifdef HAVE_SQLITE  
-    if (SQLITE) {     // TOGLIERE "SQLITE" PERCHE' E' INUTILE !!!!!!!!
+    {
       NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
       NSNumber *version = [defaults objectForKey: @"db_version"];
       NSString *db_path;
@@ -177,6 +177,7 @@
       }
     } 
   #endif
+  
   }
   
   return self;    
@@ -193,10 +194,14 @@
   NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: NO];
 
   if (sqlite && attributes) {
+    NSString *type = [attributes fileType];
     NSDate *date = [attributes fileModificationDate];
     NSString *query = [NSString stringWithFormat:
-                @"REPLACE INTO files (path, moddate) VALUES('%@', '%@')", 
-                     stringForQuery(path), stringForQuery([date description])];
+       @"REPLACE INTO files (path, moddate, type) VALUES('%@', '%@', '%@')", 
+                                        stringForQuery(path), 
+                                        stringForQuery([date description]),
+                                        stringForQuery(type)];
+
     if ([self performWriteQuery: query] == NO) {
       NSLog(@"error accessing the Desktop database (-insertPath:)");
       NSLog(@"error at path: %@", path);
@@ -210,7 +215,52 @@
   return NO; 
 }
 
-- (void)insertTreeFromPaths:(NSData *)info
+- (BOOL)removePath:(NSString *)path
+{
+#ifdef HAVE_SQLITE
+  if (sqlite) {
+    NSString *query = [NSString stringWithFormat:
+                           @"DELETE FROM files WHERE path = '%@'", 
+                                                    stringForQuery(path)];
+    if ([self performWriteQuery: query] == NO) {
+      NSLog(@"error accessing the Desktop database (-removePath:)");
+      NSLog(@"error at path: %@", path);
+      return NO;
+    }
+        
+    return YES;
+  }
+#endif
+
+  return NO; 
+}
+
+- (oneway void)removePaths:(NSArray *)paths
+{
+#ifdef HAVE_SQLITE
+  NSMutableString *query = [NSMutableString string];
+  int i;
+
+  [query appendString: @"DELETE FROM files "];
+
+  for (i = 0; i < [paths count]; i++) {
+    NSString *path = stringForQuery([paths objectAtIndex: i]);  
+
+    if (i == 0) {
+      [query appendFormat: @"WHERE path = '%@' ", path];
+    } else {
+      [query appendFormat: @"OR path = '%@' ", path];
+    }
+  }
+
+  if ([self performWriteQuery: query] == NO) {
+    NSLog(@"error accessing the Desktop database (-removePaths:)");
+  }  
+  
+#endif
+}
+
+- (void)insertTreesFromPaths:(NSData *)info
 {
 #ifdef HAVE_SQLITE
   NSArray *paths = [NSUnarchiver unarchiveObjectWithData: info];
@@ -238,24 +288,86 @@
 #endif
 }
 
-- (BOOL)removePath:(NSString *)path
+- (void)removeTreesFromPaths:(NSData *)info
+{
+#ifdef HAVE_SQLITE
+  NSArray *paths = [NSUnarchiver unarchiveObjectWithData: info];
+  NSMutableDictionary *updaterInfo = [NSMutableDictionary dictionary];
+  NSDictionary *pathsdict = [NSDictionary dictionaryWithObject: paths 
+                                                        forKey: @"paths"];
+
+  [updaterInfo setObject: dbpath forKey: @"dbpath"];
+  [updaterInfo setObject: [NSNumber numberWithInt: DDBdRemoveTreeUpdate] 
+                  forKey: @"type"];
+  [updaterInfo setObject: pathsdict forKey: @"taskdict"];
+
+  NS_DURING
+    {
+      [NSThread detachNewThreadSelector: @selector(updaterForTask:)
+		                           toTarget: [DDBdUpdater class]
+		                         withObject: updaterInfo];
+    }
+  NS_HANDLER
+    {
+      NSLog(@"A fatal error occured while detaching the thread!");
+    }
+  NS_ENDHANDLER
+
+#endif
+}
+
+- (NSData *)treeFromPath:(NSData *)pathinfo
 {
 #ifdef HAVE_SQLITE
   if (sqlite) {
-    NSString *query = [NSString stringWithFormat:
-                           @"DELETE FROM files WHERE path = '%@'", 
-                                                    stringForQuery(path)];
-    if ([self performWriteQuery: query] == NO) {
-      NSLog(@"error accessing the Desktop database (-removePath:)");
-      NSLog(@"error at path: %@", path);
-      return NO;
+    NSDictionary *info = [NSUnarchiver unarchiveObjectWithData: pathinfo];
+    NSString *path = [info objectForKey: @"path"];
+    NSArray *columns = [info objectForKey: @"columns"];
+    NSArray *criteria = [info objectForKey: @"criteria"];
+    NSMutableString *query = [NSMutableString string];
+    NSArray *results = nil;
+    int i, count;
+  
+    [query appendString: @"SELECT "];
+    
+    count = [columns count];
+    
+    for (i = 0; i < count; i++) {
+      [query appendFormat: @"%@ ", [columns objectAtIndex: i]];
+      if (i < (count - 1)) {
+        [query appendString: @", "];
+      }
     }
     
-    return YES;
+    [query appendFormat: @"FROM files WHERE path = '%@' ", stringForQuery(path)];
+    [query appendFormat: @"OR path GLOB '%@", stringForQuery(path)];
+
+    if ([path isEqual: path_separator()] == NO) {
+      [query appendFormat: @"%@*' ", path_separator()];
+    } else {
+      [query appendString: @"*' "];
+    }
+    
+    count = [criteria count];
+    
+    for (i = 0; i < count; i++) {
+      NSDictionary *dict = [criteria objectAtIndex: i];
+      NSString *type = [dict objectForKey: @"type"];
+      NSString *operator = [dict objectForKey: @"operator"];
+      NSString *arg = [dict objectForKey: @"arg"];
+    
+      [query appendFormat: @"AND %@ %@ '%@' ", type, operator, stringForQuery(arg)];
+    }
+    
+    results = [sqlite performQuery: query];
+    
+    if (results && [results count]) {  
+      return [NSArchiver archivedDataWithRootObject: results];    
+    }
   }
 #endif
 
-  return NO; 
+  return nil;
 }
 
 - (NSString *)annotationsForPath:(NSString *)path
@@ -354,7 +466,6 @@
       NSMutableArray *keys = [NSMutableArray arrayWithArray: [dict allKeys]]; 
       int i, count;
       
-      
       [keys removeObject: @"path"];
       count = [keys count];
 
@@ -397,53 +508,19 @@
   return resok;
 }
 
-- (BOOL)duplicateInfoOfPaths:(NSData *)info
-{
-  NSArray *pathsinfo = [NSUnarchiver unarchiveObjectWithData: info];
-  int i;
-  
-  for (i = 0; i < [pathsinfo count]; i++) {
-    NSDictionary *dict = [pathsinfo objectAtIndex: i];
-  
-    if ([self setInfoOfPath: [dict objectForKey: @"src"]
-                     toPath: [dict objectForKey: @"dst"]] == NO) {
-      return NO;
-    }
-  }
-
-  return YES;
-}
-
-- (BOOL)removeInfoOfPaths:(NSData *)info
-{
-  NSArray *paths = [NSUnarchiver unarchiveObjectWithData: info];
-  int i;
-  
-  for (i = 0; i < [paths count]; i++) {
-    if ([self removePath: [paths objectAtIndex: i]] == NO) {
-      return NO;
-    }
-  }
-  
-  return YES;
-}
-
 - (BOOL)performWriteQuery:(NSString *)query 
 {
 #ifdef HAVE_SQLITE
   [lock lock];
-  [sqlite performQuery: @"BEGIN"];
-  if ([sqlite performQuery: query] == nil) {
+  if ([sqlite performWriteQuery: query] == NO) {
     [lock unlock];
 	  return NO;
   }
-  [sqlite performQuery: @"COMMIT"];
   [lock unlock];
 
   return YES;
 #endif
 }
-
 
 - (NSData *)infoOfType:(NSString *)type
                forPath:(NSString *)path
@@ -477,7 +554,7 @@
           stringForQuery(type), stringForQuery(info), stringForQuery(path)]; 
     
     if ([self checkPath: path] == NO) {
-      [self insertPath: path];      
+      [self insertPath: path]; 
     }
     
     if ([self performWriteQuery: query] == NO) {

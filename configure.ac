@@ -1,5 +1,5 @@
 AC_PREREQ(2.52)
-AC_INIT([GWorkspace], [0.6.5], [enrico@imago.ro])
+AC_INIT
 
 if test -z "$GNUSTEP_SYSTEM_ROOT"; then
   AC_MSG_ERROR([You must run the GNUstep initialization script first!])
@@ -69,12 +69,9 @@ if test "$have_sqlite" = yes; then
   AC_DEFINE_UNQUOTED([HAVE_SQLITE], [], [])
 else
   AC_DEFINE_UNQUOTED([SQLITE], [0], [])
-  AC_MSG_NOTICE([The SQLite library can't be found.])
-  AC_MSG_NOTICE([The live search folders will not be built.])  
 fi
 
 AC_SUBST(have_sqlite)
-
 
 AC_CONFIG_FILES([GNUmakefile \
 									Utilities/ddbd/GNUmakefile \
@@ -86,3 +83,16 @@ AC_CONFIG_FILES([GNUmakefile \
                   Inspector/inspector.make \
                   Finder/GNUmakefile])
 AC_OUTPUT
+
+if test "$have_sqlite" = no; then
+  echo ""
+  echo "*******************************************************************"
+  echo "*                                                                 *"
+  echo "* The sqlite3 library can't be found.                             *"
+  echo "* The Live Search Folders and the File Annotations will not work. *"
+  echo "* To enable these features you must install SQLite 3.0 that can   *"
+  echo "* be downloaded by visiting http://www.sqlite.org                 *"
+  echo "*                                                                 *"
+  echo "*******************************************************************"
+  echo ""
+fi

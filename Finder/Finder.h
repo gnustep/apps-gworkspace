@@ -77,9 +77,15 @@
 
 - (oneway void)insertPath:(NSString *)path;
 
-- (oneway void)insertTreeFromPaths:(NSData *)info;
-
 - (oneway void)removePath:(NSString *)path;
+
+- (oneway void)removePaths:(NSArray *)paths;
+
+- (oneway void)insertTreesFromPaths:(NSData *)info;
+
+- (oneway void)removeTreesFromPaths:(NSData *)info;
+
+- (NSData *)treeFromPath:(NSData *)pathinfo;
 
 - (NSString *)annotationsForPath:(NSString *)path;
 
@@ -233,9 +239,15 @@
 
 - (void)ddbdInsertPath:(NSString *)path;
 
-- (void)ddbdInsertTreeFromPaths:(NSArray *)paths;
+- (void)ddbdInsertTreesFromPaths:(NSArray *)paths;
+
+- (void)ddbdRemoveTreesFromPaths:(NSArray *)paths;
+
+- (NSArray *)ddbdGetTreeFromPath:(NSDictionary *)pathinfo;
 
 - (void)ddbdRemovePath:(NSString *)path;
+
+- (void)ddbdRemovePaths:(NSArray *)paths;
 
 - (NSString *)ddbdGetAnnotationsForPath:(NSString *)path;
 

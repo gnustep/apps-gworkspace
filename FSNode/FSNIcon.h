@@ -151,6 +151,7 @@
 {
   FSNode *node;
   int index;
+  NSView <FSNodeRepContainer> *container;
 }  
 
 - (void)setNode:(FSNode *)anode 

@@ -64,6 +64,8 @@
       ASSIGN (lastSelection, selection);
       [viewer selectionChanged: selection];
     }
+    
+    [self updateNameEditor];
 	}
 }
 
@@ -74,8 +76,6 @@
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-  [self stopRepNameEditing];
-
   if ([theEvent modifierFlags] != NSShiftKeyMask) {
     selectionMask = NSSingleSelectionMask;
     selectionMask |= FSNCreatingSelectionMask;
@@ -84,6 +84,7 @@
     
     DESTROY (lastSelection);
     [self selectionDidChange];
+    [self stopRepNameEditing];
     
     if ([viewer vtype] == SPATIAL) {
       [manager selectedSpatialViewerChanged: viewer];

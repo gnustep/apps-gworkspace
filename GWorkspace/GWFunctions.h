@@ -117,4 +117,6 @@ NSRect rectForWindow(NSArray *otherwins, NSRect proposedRect, BOOL checkKey);
 NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str, 
 														NSString *comm, NSString *sel, NSString *key);
 
+double myrintf(double a);
+
 #endif

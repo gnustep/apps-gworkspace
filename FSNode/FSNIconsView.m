@@ -170,6 +170,8 @@ if (rct.size.height < 0) rct.size.height = 0; \
 		[nameEditor setAlignment: NSCenterTextAlignment];
 	  [nameEditor setBackgroundColor: backColor];
 	  [nameEditor setTextColor: textColor];
+    [nameEditor setEditable: NO];
+    [nameEditor setSelectable: NO];
     editIcon = nil;
     
     isDragTarget = NO;
@@ -460,8 +462,10 @@ if (rct.size.height < 0) rct.size.height = 0; \
   if ([selection count]) {
     [self scrollIconToVisible: [selection objectAtIndex: 0]];
   } 
-  
-  [self stopRepNameEditing]; 
+
+  if ([[self subviews] containsObject: nameEditor]) {  
+    [self updateNameEditor]; 
+  }
 }
 
 - (void)scrollIconToVisible:(FSNIcon *)icon
@@ -579,8 +583,6 @@ if (rct.size.height < 0) rct.size.height = 0; \
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-  [self stopRepNameEditing];
-
   if ([theEvent modifierFlags] != NSShiftKeyMask) {
     selectionMask = NSSingleSelectionMask;
     selectionMask |= FSNCreatingSelectionMask;
@@ -589,6 +591,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
     
     DESTROY (lastSelection);
     [self selectionDidChange];
+    [self stopRepNameEditing];
 	}
 }
 
@@ -1682,6 +1685,8 @@ pp.x = NSMaxX([self bounds]) - 1
       ASSIGN (lastSelection, selection);
       [desktopApp selectionChanged: selection];
     }
+    
+    [self updateNameEditor];
 	}
 }
 
@@ -2023,26 +2028,27 @@ pp.x = NSMaxX([self bounds]) - 1
 
 @implementation FSNIconsView (IconNameEditing)
 
-- (void)setNameEditorForRep:(id)arep
+- (void)updateNameEditor
 {
-  FSNode *repnode = [arep node];
-  BOOL canedit = (([arep isLocked] == NO) && ([repnode isMountPoint] == NO));
-
   [self stopRepNameEditing];
-
-  if (canedit) {   
-    NSString *nodeDescr = [arep shownInfo];
-    NSRect icnr = [arep frame];
-    NSRect labr = [arep labelRect];
-    int ipos = [arep iconPosition];
+  
+  if (lastSelection && ([lastSelection count] == 1)) {
+    editIcon = [self repOfSubnodePath: [lastSelection objectAtIndex: 0]]; 
+  } 
+  
+  if (editIcon) {
+    FSNode *ednode = [editIcon node];
+    NSString *nodeDescr = [editIcon shownInfo];    
+    NSRect icnr = [editIcon frame];
+    NSRect labr = [editIcon labelRect];
+    int ipos = [editIcon iconPosition];
     int margin = [fsnodeRep labelMargin];
     float bw = [self bounds].size.width - EDIT_MARGIN;
     float edwidth = 0.0; 
     NSRect edrect;
-    
-    editIcon = arep;    
+
     [editIcon setNameEdited: YES];
-    
+
     edwidth = [[nameEditor font] widthOfString: nodeDescr];
     edwidth += margin;
 
@@ -2054,40 +2060,50 @@ pp.x = NSMaxX([self bounds]) - 1
       } else if ((centerx - (edwidth / 2)) < margin) {
         centerx += fabs(centerx - (edwidth / 2)) + margin;
       }    
- 
+
       edrect = [self convertRect: labr fromView: editIcon];
       edrect.origin.x = centerx - (edwidth / 2);
       edrect.size.width = edwidth;
-      
+
     } else if (ipos == NSImageLeft) {
       edrect = [self convertRect: labr fromView: editIcon];
       edrect.size.width = edwidth;
-    
+
       if ((edrect.origin.x + edwidth) >= bw) {
         edrect.size.width = bw - edrect.origin.x;
       }    
     }
-    
+
     edrect = NSIntegralRect(edrect);
-    
+
     [nameEditor setFrame: edrect];
 
     if (ipos == NSImageAbove) {
-		  [nameEditor setAlignment: NSCenterTextAlignment];
+  	  [nameEditor setAlignment: NSCenterTextAlignment];
     } else if (ipos == NSImageLeft) {
 		  [nameEditor setAlignment: NSLeftTextAlignment];
     }
 
-    [nameEditor setNode: repnode 
+    [nameEditor setNode: ednode 
             stringValue: nodeDescr
                   index: 0];
 
     [nameEditor setBackgroundColor: [NSColor selectedControlColor]];
-    
-    [nameEditor setEditable: YES];
-    [nameEditor setSelectable: YES];	
+
+    if ([editIcon isLocked] == NO) {
+      [nameEditor setTextColor: [NSColor controlTextColor]];    
+    } else {
+      [nameEditor setTextColor: [NSColor disabledControlTextColor]];    
+    }
+
+    [nameEditor setEditable: NO];
+    [nameEditor setSelectable: NO];	
     [self addSubview: nameEditor];  
-  }
+  }  
+}
+
+- (void)setNameEditorForRep:(id)arep
+{
 }
 
 - (void)stopRepNameEditing
@@ -2110,6 +2126,12 @@ pp.x = NSMaxX([self bounds]) - 1
   }
 
   editIcon = nil;
+}
+
+- (BOOL)canStartRepNameEditing
+{
+  return (editIcon && ([editIcon isLocked] == NO) 
+                  && ([[editIcon node] isMountPoint] == NO));
 }
 
 - (void)controlTextDidChange:(NSNotification *)aNotification
@@ -2214,10 +2236,10 @@ pp.x = NSMaxX([self bounds]) - 1
     
     [desktopApp removeWatcherForPath: [node path]];
   
-    [[NSDistributedNotificationCenter defaultCenter]
- 				postNotificationName: @"GWFileSystemWillChangeNotification"
-	 								    object: nil 
-                    userInfo: userInfo];
+//    [[NSDistributedNotificationCenter defaultCenter]
+// 				postNotificationName: @"GWFileSystemWillChangeNotification"
+//	 								    object: nil 
+//                    userInfo: userInfo];
 
     [fm movePath: [ednode path] toPath: newpath handler: self];
 

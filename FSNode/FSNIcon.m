@@ -339,8 +339,8 @@ static NSImage *branchImage;
       labelRect = NSIntegralRect(labelRect);
     } 
         
-    hlx = rintf((frameRect.size.width - hlightRect.size.width) / 2);
-    hly = rintf(frameRect.size.height - hlightRect.size.height);
+    hlx = myrintf((frameRect.size.width - hlightRect.size.width) / 2);
+    hly = myrintf(frameRect.size.height - hlightRect.size.height);
 
     if ((hlightRect.origin.x != hlx) || (hlightRect.origin.y != hly)) {
       NSAffineTransform *transform = [NSAffineTransform transform];
@@ -358,8 +358,8 @@ static NSImage *branchImage;
     icnBounds.origin.y = hlightRect.origin.y + ((hlightRect.size.height - iconSize) / 2);
     icnBounds = NSIntegralRect(icnBounds);
 
-    icnPoint.x = rintf(hlightRect.origin.x + ((hlightRect.size.width - sz.width) / 2));
-    icnPoint.y = rintf(hlightRect.origin.y + ((hlightRect.size.height - sz.height) / 2));
+    icnPoint.x = myrintf(hlightRect.origin.x + ((hlightRect.size.width - sz.width) / 2));
+    icnPoint.y = myrintf(hlightRect.origin.y + ((hlightRect.size.height - sz.height) / 2));
 
   } else if (icnPosition == NSImageLeft) {
     float icnspacew = hlightRect.size.width;
@@ -369,7 +369,7 @@ static NSImage *branchImage;
       icnspacew += BRANCH_SIZE;
     }
     
-    labelRect.size.width = rintf([label uncuttedTitleLenght] + lblmargin);
+    labelRect.size.width = myrintf([label uncuttedTitleLenght] + lblmargin);
     
     if (labelRect.size.width >= (frameRect.size.width - icnspacew)) {
       labelRect.size.width = (frameRect.size.width - icnspacew);
@@ -398,7 +398,7 @@ static NSImage *branchImage;
       float lbsh = labelRect.size.height + infoRect.size.height;
 
       if (lbsh > hlightRect.size.height) {
-        hryorigin = rintf((lbsh - hlightRect.size.height) / 2);
+        hryorigin = myrintf((lbsh - hlightRect.size.height) / 2);
       }
     }
 
@@ -418,8 +418,8 @@ static NSImage *branchImage;
     icnBounds.origin.y = hlightRect.origin.y + ((hlightRect.size.height - iconSize) / 2);
     icnBounds = NSIntegralRect(icnBounds);
 
-    icnPoint.x = rintf((hlightRect.size.width - sz.width) / 2);
-    icnPoint.y = rintf(hlightRect.origin.y + ((hlightRect.size.height - sz.height) / 2));
+    icnPoint.x = myrintf((hlightRect.size.width - sz.width) / 2);
+    icnPoint.y = myrintf(hlightRect.origin.y + ((hlightRect.size.height - sz.height) / 2));
 
     labelRect.origin.x = hlightRect.size.width;
     infoRect.origin.x = hlightRect.size.width;
@@ -453,8 +453,8 @@ static NSImage *branchImage;
 
   } else if (icnPosition == NSImageOnly) {
     if (selectable) {
-      float hlx = rintf((frameRect.size.width - hlightRect.size.width) / 2);
-      float hly = rintf((frameRect.size.height - hlightRect.size.height) / 2);
+      float hlx = myrintf((frameRect.size.width - hlightRect.size.width) / 2);
+      float hly = myrintf((frameRect.size.height - hlightRect.size.height) / 2);
     
       if ((hlightRect.origin.x != hlx) || (hlightRect.origin.y != hly)) {
         NSAffineTransform *transform = [NSAffineTransform transform];
@@ -473,12 +473,12 @@ static NSImage *branchImage;
     icnBounds.origin.y = (frameRect.size.height - iconSize) / 2;
     icnBounds = NSIntegralRect(icnBounds);
 
-    icnPoint.x = rintf((frameRect.size.width - sz.width) / 2);
-    icnPoint.y = rintf((frameRect.size.height - sz.height) / 2);
+    icnPoint.x = myrintf((frameRect.size.width - sz.width) / 2);
+    icnPoint.y = myrintf((frameRect.size.height - sz.height) / 2);
   } 
     
   brImgBounds.origin.x = frameRect.size.width - ARROW_ORIGIN_X;
-  brImgBounds.origin.y = rintf(icnBounds.origin.y + (icnBounds.size.height / 2) - (BRANCH_SIZE / 2));
+  brImgBounds.origin.y = myrintf(icnBounds.origin.y + (icnBounds.size.height / 2) - (BRANCH_SIZE / 2));
   brImgBounds = NSIntegralRect(brImgBounds);
   
   [self setNeedsDisplay: YES]; 
@@ -820,8 +820,8 @@ static NSImage *branchImage;
 
   [infolabel setFont: infoFont];
 
-  labelRect.size.width = rintf([label uncuttedTitleLenght] + lblmargin);
-  labelRect.size.height = rintf([[label font] defaultLineHeightForFont]);
+  labelRect.size.width = myrintf([label uncuttedTitleLenght] + lblmargin);
+  labelRect.size.height = myrintf([[label font] defaultLineHeightForFont]);
   labelRect = NSIntegralRect(labelRect);
 
   infoRect = NSZeroRect;
@@ -863,8 +863,8 @@ static NSImage *branchImage;
   }
   drawicon = icon;
   DESTROY (openicon);
-  hlightRect.size.width = rintf(iconSize / 3 * 4);
-  hlightRect.size.height = rintf(hlightRect.size.width * [fsnodeRep highlightHeightFactor]);
+  hlightRect.size.width = myrintf(iconSize / 3 * 4);
+  hlightRect.size.height = myrintf(hlightRect.size.width * [fsnodeRep highlightHeightFactor]);
   if ((hlightRect.size.height - iconSize) < 4) {
     hlightRect.size.height = iconSize + 4;
   }
@@ -1404,13 +1404,25 @@ static NSImage *branchImage;
   return index;
 }
 
-- (void)mouseDown:(NSEvent*)theEvent
+- (void)viewDidMoveToSuperview
 {
-  if ([self isEditable]) {
-	  [self setAlignment: NSLeftTextAlignment];
-    [[self window] makeFirstResponder: self];
+  [super viewDidMoveToSuperview];
+  container = (NSView <FSNodeRepContainer> *)[self superview];
+}
+
+- (void)mouseDown:(NSEvent *)theEvent
+{
+  if ([self isEditable] == NO) {
+    if ([container respondsToSelector: @selector(canStartRepNameEditing)]
+                                      && [container canStartRepNameEditing]) {  
+      [self setAlignment: NSLeftTextAlignment];  
+      [self setSelectable: YES];  
+      [self setEditable: YES];  
+    }
+    
+  } else {
+    [super mouseDown: theEvent];
   }
-  [super mouseDown: theEvent];
 }
 
 @end

@@ -110,7 +110,7 @@ NSString *stringForQuery(NSString *str)
   }
 }
 
-- (sqlite3 *)sqlite
+- (sqlite3 *)sq3
 {
   return sqlite;
 }
@@ -174,6 +174,52 @@ NSString *stringForQuery(NSString *str)
   return YES;
 }
 
+- (BOOL)performWriteQuery:(NSString *)query
+{
+  const char *qbuff = [query UTF8String];
+  struct sqlite3_stmt *stmt;
+  int retry = 0;
+  int err;
+  
+  err = sqlite3_prepare(sqlite, qbuff, strlen(qbuff), &stmt, NULL);
+  
+  if (err != SQLITE_OK) {
+    NSLog(@"%s", sqlite3_errmsg(sqlite));
+    return NO;
+  }
+  
+  while (1) {
+    err = sqlite3_step(stmt);
+
+    if (err == SQLITE_DONE) {
+      break;
+      
+    } else if (err == SQLITE_BUSY) {
+      CREATE_AUTORELEASE_POOL(arp); 
+      NSDate *when = [NSDate dateWithTimeIntervalSinceNow: 0.1];
+
+      [NSThread sleepUntilDate: when];
+      NSLog(@"retry %i", retry);
+      RELEASE (arp);
+
+      if (retry++ > MAX_RETRY) {
+        NSLog(@"%s", sqlite3_errmsg(sqlite));
+        sqlite3_finalize(stmt);
+		    return NO;
+      }
+
+    } else {
+      NSLog(@"%s", sqlite3_errmsg(sqlite));
+      sqlite3_finalize(stmt);
+      return NO;
+    }
+  }
+
+  sqlite3_finalize(stmt);
+  
+  return YES;
+}
+
 - (NSArray *)performQuery:(NSString *)query
 {
   CREATE_AUTORELEASE_POOL(pool);
@@ -198,7 +244,7 @@ NSString *stringForQuery(NSString *str)
 
         sqlite3_free_table(results);
         [NSThread sleepUntilDate: when];
-        NSLog(@"error %i retry %i", err, retry);
+        NSLog(@"retry %i", retry);
         RELEASE (arp);
 
         if (retry++ > MAX_RETRY) {
@@ -256,7 +302,7 @@ NSString *stringForQuery(NSString *str)
   sqlite3_free_table(results);
   RETAIN (queryResult);
   RELEASE (pool);
-
+  
   return queryResult;
 }
 

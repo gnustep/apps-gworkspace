@@ -415,4 +415,9 @@ static NSString *nibName = @"FModuleCrDate";
   return NSOrderedSame;
 }
 
+- (BOOL)needsFullCheck
+{
+  return YES;
+}
+
 @end

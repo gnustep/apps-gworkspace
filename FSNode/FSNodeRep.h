@@ -239,6 +239,8 @@ typedef enum FSNSelectionMask {
 
 - (void)stopRepNameEditing;
 
+- (BOOL)canStartRepNameEditing;
+
 - (void)setBackgroundColor:(NSColor *)acolor;
 
 - (NSColor *)backgroundColor;

@@ -381,7 +381,7 @@
     }
   }
   
-  [self stopRepNameEditing]; 
+  [self updateNameEditor]; 
 }
 
 - (int)firstFreeGridIndex
@@ -725,8 +725,6 @@
 {
   NSWindow *win = [self window];
   GSDisplayServer *srv = GSServerForWindow(win);
-
-  [self stopRepNameEditing];
   
   [srv setinputstate: GSTitleBarKey : [win windowNumber]];
 //  [srv setinputstate: GSTitleBarMain : [win windowNumber]];

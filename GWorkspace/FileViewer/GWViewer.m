@@ -307,7 +307,7 @@
   [lowBox addSubview: pathsScroll];
   RELEASE (pathsScroll);
 
-  visibleCols = rintf(r.size.width / [vwrwin resizeIncrements].width);  
+  visibleCols = myrintf(r.size.width / [vwrwin resizeIncrements].width);  
   
   r = [[pathsScroll documentView] frame];
   pathsView = [[GWViewerIconsPath alloc] initWithFrame: r 
@@ -976,13 +976,14 @@
 - (void)windowDidBecomeKey:(NSNotification *)aNotification
 {
   NSArray *selection = [nodeView selectedPaths];  
+  
+  [vwrwin makeFirstResponder: nodeView];  
 
   if ([selection count] == 0) {
     selection = [NSArray arrayWithObject: [[nodeView shownNode] path]];
   }
 
   [self selectionChanged: selection];
-  [vwrwin makeFirstResponder: nodeView];  
   [manager changeHistoryOwner: self];
 }
 
@@ -994,7 +995,7 @@
 
     if ([nodeView isSingleNode]) {
       NSRect r = [[vwrwin contentView] frame];
-      int cols = rintf(r.size.width / [vwrwin resizeIncrements].width);  
+      int cols = myrintf(r.size.width / [vwrwin resizeIncrements].width);  
 
       if (cols != visibleCols) {
         [self setSelectableNodesRange: NSMakeRange(0, cols)];

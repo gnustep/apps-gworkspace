@@ -175,11 +175,12 @@
       return; 
     }
 
+    [column stopCellEditing];
+    
     clickCount = [theEvent clickCount];
 
     if (clickCount >= 2) {
       editindex = -1;
-      [column stopCellEditing];
       [self sendDoubleAction];
       return;
     }
@@ -191,8 +192,6 @@
     if ([self getRow: &row column: &col forPoint: lastLocation]) {
       FSNBrowserCell *cell = [[self cells] objectAtIndex: row];
       NSRect rect = [self cellFrameAtRow: row column: col];
-      
-      [column stopCellEditing];
       
       if ([cell isEnabled]) {
         int sz = [cell iconSize];

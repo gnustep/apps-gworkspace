@@ -26,6 +26,7 @@
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include "GWFunctions.h"
+#include <math.h>
 #include <limits.h>
 
 #define ONE_KB 1024
@@ -601,6 +602,10 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
 	return item;
 }
 
+double myrintf(double a)
+{
+	return (floor(a + 0.5));         
+}
 
 
 

@@ -356,11 +356,16 @@ static Finder *finder = nil;
 
       NSLog(@"(open file) added lsf with path %@", fileName);
     }
+  } else {
+ 
+    NSLog(@"(open file) found lsf with path %@\nUPDATING", fileName);
+    
+    [folder update];
   }
 
  // [folder sdlkfsldf
 
-  NSLog(@"(open file) found lsf with path %@", fileName);
+  
 
   return YES;
 }
@@ -1092,7 +1097,7 @@ static Finder *finder = nil;
   if (index) {
         NSLog(@"creating trees for lsf at %@", path);
     
-    [self ddbdInsertTreeFromPaths: [info objectForKey: @"searchpaths"]];
+    [self ddbdInsertTreesFromPaths: [info objectForKey: @"searchpaths"]];
   }
   
   return folder;
@@ -1523,12 +1528,35 @@ static Finder *finder = nil;
   }
 }
 
-- (void)ddbdInsertTreeFromPaths:(NSArray *)paths
+- (void)ddbdInsertTreesFromPaths:(NSArray *)paths
 {
   [self connectDDBd];
   if (ddbdactive) {
-    [ddbd insertTreeFromPaths: [NSArchiver archivedDataWithRootObject: paths]];
+    [ddbd insertTreesFromPaths: [NSArchiver archivedDataWithRootObject: paths]];
   }
+}
+
+- (void)ddbdRemoveTreesFromPaths:(NSArray *)paths
+{
+  [self connectDDBd];
+  if (ddbdactive) {
+    [ddbd removeTreesFromPaths: [NSArchiver archivedDataWithRootObject: paths]];
+  }
+}
+
+- (NSArray *)ddbdGetTreeFromPath:(NSDictionary *)pathinfo
+{
+  [self connectDDBd];
+  if (ddbdactive) {
+    NSData *infodata = [NSArchiver archivedDataWithRootObject: pathinfo];  
+    NSData *data = [ddbd treeFromPath: infodata];  
+    
+    if (data) {
+      return [NSUnarchiver unarchiveObjectWithData: data];
+    }
+  }
+  
+  return nil;
 }
 
 - (void)ddbdRemovePath:(NSString *)path
@@ -1536,6 +1564,14 @@ static Finder *finder = nil;
   [self connectDDBd];
   if (ddbdactive) {
     [ddbd removePath: path];
+  }
+}
+
+- (void)ddbdRemovePaths:(NSArray *)paths
+{
+  [self connectDDBd];
+  if (ddbdactive) {
+    [ddbd removePaths: paths];
   }
 }
 

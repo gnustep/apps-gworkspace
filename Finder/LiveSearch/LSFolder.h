@@ -28,19 +28,22 @@
 #include <Foundation/Foundation.h>
 #include "FSNodeRep.h"
 
-//@class Finder;
-
 @interface LSFolder : NSObject 
 {
   FSNode *node;
 
-  NSArray *searchPaths;
+  NSMutableArray *searchPaths;
   NSDictionary *searchCriteria;
   NSMutableArray *foundPaths;
   NSDate *lastUpdate;
-
+  
+  NSMutableArray *fullCheckModules;
+  NSMutableArray *dbCheckModules;
+  
   id finder;
   BOOL watcherSuspended;
+  
+  NSFileManager *fm;
 }
 
 - (id)initForNode:(FSNode *)anode
@@ -53,6 +56,25 @@
 - (BOOL)watcherSuspended;
 
 - (void)setWatcherSuspended:(BOOL)value;
+
+
+- (void)update;
+
+- (void)loadModules;
+
+- (void)checkFoundPaths;
+
+- (void)searchInSearchPath:(NSString *)srcpath;
+
+- (NSArray *)fullSearchInDirectory:(NSString *)dirpath;
+
+- (void)check:(NSString *)path;
+
+- (BOOL)checkPath:(NSString *)path 
+      withModules:(NSArray *)modules;
+
+- (void)insertShorterPath:(NSString *)path 
+                  inArray:(NSMutableArray *)array;
 
 @end
 

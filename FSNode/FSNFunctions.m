@@ -24,6 +24,7 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
+#include <math.h>
 #include "FSNFunctions.h"
 #include "FSNodeRep.h"
 #include "GNUstep.h"
@@ -158,4 +159,8 @@ NSArray *makePathsSelection(NSArray *selnodes)
   return selpaths;
 }
 
+double myrintf(double a)
+{
+	return (floor(a + 0.5));         
+}
 

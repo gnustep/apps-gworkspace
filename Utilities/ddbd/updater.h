@@ -53,6 +53,8 @@
 
 - (void)insertTrees;
 
+- (void)removeTrees;
+
 - (void)fileSystemDidChange;
 
 - (void)daylyUpdate;

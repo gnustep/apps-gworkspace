@@ -29,6 +29,7 @@
 
 enum {   
   DDBdInsertTreeUpdate,
+  DDBdRemoveTreeUpdate,
   DDBdFileOperationUpdate,
   DDBdDaylyUpdate
 };
@@ -39,9 +40,15 @@ enum {
 
 - (BOOL)insertPath:(NSString *)path;
 
-- (void)insertTreeFromPaths:(NSData *)info;
-
 - (BOOL)removePath:(NSString *)path;
+
+- (oneway void)removePaths:(NSArray *)paths;
+
+- (void)insertTreesFromPaths:(NSData *)info;
+
+- (void)removeTreesFromPaths:(NSData *)info;
+
+- (NSData *)treeFromPath:(NSData *)pathinfo;
 
 - (NSString *)annotationsForPath:(NSString *)path;
 
@@ -65,10 +72,6 @@ enum {
 
 - (BOOL)setInfoOfPath:(NSString *)src
                toPath:(NSString *)dst;
-
-- (BOOL)duplicateInfoOfPaths:(NSData *)info;
-
-- (BOOL)removeInfoOfPaths:(NSData *)info;
 
 - (BOOL)performWriteQuery:(NSString *)query;
 

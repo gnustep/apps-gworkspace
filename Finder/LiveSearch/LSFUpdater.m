@@ -1,9 +1,9 @@
-/* FinderModulesProtocol.h
+/* LSFUpdater.m
  *  
  * Copyright (C) 2004 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
- * Date: March 2004
+ * Date: October 2004
  *
  * This file is part of the GNUstep Finder application
  *
@@ -21,37 +21,3 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-
-#ifndef FINDER_MODULES_PROTOCOL_H
-#define FINDER_MODULES_PROTOCOL_H
-
-@protocol FinderModulesProtocol
-
-- (id)initInterface;
-
-- (id)initWithSearchCriteria:(NSDictionary *)criteria;
-
-- (id)controls;
-
-- (NSString *)moduleName;
-
-- (BOOL)used;
-
-- (void)setInUse:(BOOL)value;
-
-- (int)index;
-
-- (void)setIndex:(int)idx;
-
-- (NSDictionary *)searchCriteria;
-
-- (BOOL)checkPath:(NSString *)path;
-
-- (int)compareModule:(id <FinderModulesProtocol>)module;
-
-- (BOOL)needsFullCheck;
-
-@end 
-
-#endif // FINDER_MODULES_PROTOCOL_H
-

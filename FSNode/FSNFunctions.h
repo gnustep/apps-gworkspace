@@ -37,4 +37,6 @@ NSString *sizeDescription(unsigned long long size);
 
 NSArray *makePathsSelection(NSArray *selnodes);
 
+double myrintf(double a);
+
 #endif // FSN_FUNCTIONS_H

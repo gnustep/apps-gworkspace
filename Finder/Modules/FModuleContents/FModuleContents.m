@@ -169,5 +169,10 @@ static NSString *nibName = @"FModuleContents";
   return NSOrderedSame;
 }
 
+- (BOOL)needsFullCheck
+{
+  return NO;
+}
+
 @end
 

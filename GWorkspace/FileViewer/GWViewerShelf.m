@@ -338,7 +338,7 @@
     highlightSize.height = iconSize + 4;
   }
 
-  labelSize.height = rintf([labelFont defaultLineHeightForFont]);
+  labelSize.height = myrintf([labelFont defaultLineHeightForFont]);
   labelSize.width = gridSize.width;
   gridSize.height = highlightSize.height + labelSize.height;
 }

@@ -209,6 +209,11 @@ static NSString *nibName = @"FModuleKind";
   return NSOrderedSame;
 }
 
+- (BOOL)needsFullCheck
+{
+  return YES;
+}
+
 @end
 
 

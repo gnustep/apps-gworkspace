@@ -185,6 +185,11 @@ static NSString *nibName = @"FModuleSize";
   return NSOrderedSame;
 }
 
+- (BOOL)needsFullCheck
+{
+  return YES;
+}
+
 @end
 
 

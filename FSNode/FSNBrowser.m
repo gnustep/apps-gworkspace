@@ -711,7 +711,7 @@
     int i;
 
     columnSize.height = r.size.height;
-    columnSize.width = rintf(frameWidth / visibleColumns);
+    columnSize.width = myrintf(frameWidth / visibleColumns);
     
     [window disableFlushWindow];
     
@@ -781,7 +781,7 @@
 	  		float f = [sender floatValue];
 	  		float n = lastColumnLoaded + 1 - visibleColumns;
 				
-	  		[self scrollColumnToVisible: rintf(f * n) + visibleColumns - 1];
+	  		[self scrollColumnToVisible: myrintf(f * n) + visibleColumns - 1];
 				
         if (currentshift > 0) {
           [self setLastColumn: (lastColumnLoaded - currentshift)];			
@@ -1364,7 +1364,7 @@
 - (void)resizeWithOldSuperviewSize:(NSSize)oldBoundsSize
 {
   NSRect r = [[self superview] bounds];
-  int ncols = rintf(r.size.width / columnSize.width);
+  int ncols = myrintf(r.size.width / columnSize.width);
 
   [self setFrame: r];
   
@@ -1462,7 +1462,11 @@
 
 - (void)nodeContentsWillChange:(NSDictionary *)info
 {
-  [self checkLockedReps];
+  NSString *operation = [info objectForKey: @"operation"];
+  
+  if ([operation isEqual: @"GWorkspaceRenameOperation"] == NO) {
+    [self checkLockedReps];
+  }
 }
 
 - (void)nodeContentsDidChange:(NSDictionary *)info
@@ -1489,17 +1493,30 @@
         || [operation isEqual: @"GWorkspaceCreateFileOperation"]
         || [operation isEqual: @"GWorkspaceRenameOperation"]
 			  || [operation isEqual: @"GWorkspaceRecycleOutOperation"]) { 
-    if ([self isShowingPath: destination]) {
-      [self reloadFromColumnWithPath: destination];     
-      
-      if ([operation isEqual: @"GWorkspaceCreateFileOperation"]
-                    || [operation isEqual: @"GWorkspaceCreateDirOperation"]
-                    || [operation isEqual: @"GWorkspaceRenameOperation"]) {  
-        if ([[self window] isKeyWindow]) {
-          [self selectCellsWithNames: files
-                    inColumnWithPath: destination
-                          sendAction: YES];
+    FSNBrowserColumn *bc = [self columnWithPath: destination];        
+   
+    if (bc) {
+      BOOL selectCell = NO;
+    
+      if ([[self window] isKeyWindow]) {
+        if ([operation isEqual: @"GWorkspaceCreateFileOperation"]
+                || [operation isEqual: @"GWorkspaceCreateDirOperation"]) {  
+          selectCell = YES;
+          
+        } else if ([operation isEqual: @"GWorkspaceRenameOperation"]) { 
+          FSNBrowserCell *cell = [bc cellWithPath: source];  
+          NSMatrix *matrix = [bc cmatrix];
+          
+          selectCell = (cell && ([[matrix selectedCells] containsObject: cell]));
         }
+      }
+      
+      [self reloadFromColumn: bc];     
+      
+      if (selectCell) {
+        [self selectCellsWithNames: files
+                  inColumnWithPath: destination
+                        sendAction: YES];
       }
     }
   }
@@ -2052,7 +2069,7 @@
 #define CLEAREDITING \
   [self stopCellEditing]; \
   return 
-
+    
   if ([ednode isWritable] == NO) {
     NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
           [NSString stringWithFormat: @"%@\"%@\"!\n", 
@@ -2101,10 +2118,10 @@
     [userInfo setObject: newpath forKey: @"destination"];	
     [userInfo setObject: [NSArray arrayWithObject: @""] forKey: @"files"];	
     
-    [[NSDistributedNotificationCenter defaultCenter]
- 				postNotificationName: @"GWFileSystemWillChangeNotification"
-	 								    object: nil 
-                    userInfo: userInfo];
+//    [[NSDistributedNotificationCenter defaultCenter]
+// 				postNotificationName: @"GWFileSystemWillChangeNotification"
+//	 								    object: nil 
+//                    userInfo: userInfo];
 
     [fm movePath: [ednode path] toPath: newpath handler: self];
 

@@ -279,7 +279,7 @@
   [mainView addSubview: scroll];
   RELEASE (scroll);
 
-  visibleCols = rintf(r.size.width / [vwrwin resizeIncrements].width);  
+  visibleCols = myrintf(r.size.width / [vwrwin resizeIncrements].width);  
   
   [vwrwin setContentView: mainView];
   RELEASE (mainView);
