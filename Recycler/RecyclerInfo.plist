@@ -1,0 +1,8 @@
+{
+    NSIcon = "Recycler.tiff";
+    NSRole = "NSNone";
+    ApplicationDescription = "Recycler";
+    ApplicationIcon = "Recycler.tiff";
+    ApplicationName = "Recycler";
+    ApplicationRelease = "0.7.0";
+}

@@ -1,0 +1,241 @@
+/* RecyclerIcon.m
+ *  
+ * Copyright (C) 2004 Free Software Foundation, Inc.
+ *
+ * Author: Enrico Sersale <enrico@imago.ro>
+ * Date: June 2004
+ *
+ * This file is part of the GNUstep Recycler application
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ */
+
+#include <Foundation/Foundation.h>
+#include <AppKit/AppKit.h>
+#include "RecyclerIcon.h"
+#include "Recycler.h"
+#include "GNUstep.h"
+
+#define ISIZE 48
+
+static id <DesktopApplication> desktopApp = nil;
+
+@implementation RecyclerIcon
+
+- (void)dealloc
+{
+  TEST_RELEASE (trashFullIcon);
+  [super dealloc];
+}
+
++ (void)initialize
+{
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  NSString *appname = [defaults stringForKey: @"DesktopApplicationName"];
+  NSString *selname = [defaults stringForKey: @"DesktopApplicationSelName"];
+
+  if (appname && selname) {
+		Class desktopAppClass = [[NSBundle mainBundle] principalClass];
+    SEL sel = NSSelectorFromString(selname);
+
+    desktopApp = [desktopAppClass performSelector: sel];
+  }
+}
+
+- (id)initWithRecyclerNode:(FSNode *)anode
+{
+  self = [super initForNode: anode
+               nodeInfoType: FSNInfoNameType
+               extendedType: nil
+                   iconSize: ISIZE
+               iconPosition: NSImageOnly
+                  labelFont: [NSFont systemFontOfSize: 12]
+                  gridIndex: 0
+                  dndSource: NO
+                  acceptDnd: YES];
+
+  if (self) {
+    NSArray *subNodes = [node subNodes];
+    int count = [subNodes count];
+    int i;
+    
+    ASSIGN (icon, [FSNodeRep trashIconOfSize: icnBounds.size.width]);
+    ASSIGN (trashFullIcon, [FSNodeRep trashFullIconOfSize: icnBounds.size.width]);
+
+    for (i = 0; i < [subNodes count]; i++) {
+      FSNode *subNode = [subNodes objectAtIndex: i];
+
+      if ([[subNode name] hasPrefix: @"."]) {
+        count--;
+      }
+    }
+    
+    trashFull = (count != 0);
+      
+    [self registerForDraggedTypes: [NSArray arrayWithObject: NSFilenamesPboardType]];    
+  }
+
+  return self;
+}
+
+- (void)setTrashFull:(BOOL)value
+{
+  trashFull = value;
+  [self setNeedsDisplay: YES];
+}
+
+- (void)mouseDown:(NSEvent *)theEvent
+{
+  if ([theEvent clickCount] == 1) {
+    if ([(Recycler *)desktopApp isDocked] == NO) {
+      NSWindow *win = [self window];
+      NSPoint	lastLocation = [theEvent locationInWindow];
+      NSPoint	location;
+      NSDate *theDistantFuture = [NSDate distantFuture];
+      BOOL done = NO;
+      unsigned eventMask = NSLeftMouseDownMask | NSLeftMouseUpMask
+	                | NSPeriodicMask | NSOtherMouseUpMask | NSRightMouseUpMask;
+
+      [NSEvent startPeriodicEventsAfterDelay: 0.02 withPeriod: 0.02];
+
+      while (done == NO) {
+        theEvent = [NSApp nextEventMatchingMask: eventMask
+					                            untilDate: theDistantFuture
+					                               inMode: NSEventTrackingRunLoopMode
+					                              dequeue: YES];
+
+        switch ([theEvent type]) {
+          case NSRightMouseUp:
+          case NSOtherMouseUp:
+          case NSLeftMouseUp:
+		        done = YES;
+		        break;
+
+          case NSPeriodic:
+		        location = [win mouseLocationOutsideOfEventStream];
+
+            if (NSEqualPoints(location, lastLocation) == NO) {
+		          NSPoint	origin = [win frame].origin;
+		          origin.x += (location.x - lastLocation.x);
+		          origin.y += (location.y - lastLocation.y);
+		          [win setFrameOrigin: origin];
+		        }
+		        break;
+
+          default:
+		        break;
+        }
+      }
+
+      [NSEvent stopPeriodicEvents];
+    }
+  } else {  
+    id <workspaceAppProtocol> workspaceApp = [desktopApp workspaceApplication];
+
+    if (workspaceApp) {
+      NSString *path = [node path];
+      [workspaceApp selectFile: path inFileViewerRootedAtPath: path];
+    }      
+  }
+}
+
+- (void)drawRect:(NSRect)rect
+{   
+  if (trashFull) {
+    [trashFullIcon compositeToPoint: icnPoint operation: NSCompositeSourceOver];
+  } else {
+    [icon compositeToPoint: icnPoint operation: NSCompositeSourceOver];
+  }
+}
+
+@end
+
+
+@implementation RecyclerIcon (DraggingDestination)
+
+- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
+{
+  NSPasteboard *pb = [sender draggingPasteboard];
+              
+  if ([[pb types] containsObject: NSFilenamesPboardType]) {
+    isDragTarget = YES;  
+    return NSDragOperationAll;
+  }
+  
+  isDragTarget = NO; 
+  return NSDragOperationNone;
+}
+
+- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
+{
+  NSPasteboard *pb = [sender draggingPasteboard];
+
+  if ([[pb types] containsObject: NSFilenamesPboardType]) {
+    isDragTarget = YES;  
+    [self select];
+    return NSDragOperationAll;
+  }
+  
+  isDragTarget = NO; 
+  return NSDragOperationNone;
+}
+
+- (void)draggingExited:(id <NSDraggingInfo>)sender
+{
+  isDragTarget = NO;  
+}
+
+- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
+{
+  return isDragTarget;
+}
+
+- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
+{
+  return isDragTarget;
+}
+
+- (void)concludeDragOperation:(id <NSDraggingInfo>)sender
+{
+  NSPasteboard *pb = [sender draggingPasteboard];
+
+  [self unselect];
+  isDragTarget = NO;
+        
+  if ([[pb types] containsObject: NSFilenamesPboardType]) {
+    NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
+    NSMutableArray *files = [NSMutableArray array];
+    NSMutableDictionary *opinfo = [NSMutableDictionary dictionary];
+    int i;
+
+    for (i = 0; i < [sourcePaths count]; i++) {
+      NSString *srcpath = [sourcePaths objectAtIndex: i];
+      [files addObject: [srcpath lastPathComponent]];
+    }
+
+    if ([files count]) {
+      [opinfo setObject: @"NSWorkspaceRecycleOperation" forKey: @"operation"];
+      [opinfo setObject: [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent]
+                 forKey: @"source"];
+      [opinfo setObject: [node path] forKey: @"destination"];
+      [opinfo setObject: files forKey: @"files"];
+
+      [desktopApp performFileOperation: opinfo];
+    }
+  }
+}
+
+@end
+

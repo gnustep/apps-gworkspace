@@ -35,17 +35,28 @@
   [super dealloc];
 }
 
+- (void)_initDefaults
+{
+  [super _initDefaults];
+  [self setReleasedWhenClosed: NO];
+  [self setExcludedFromWindowsMenu: YES];
+  _windowLevel = NSDesktopWindowLevel;
+}
+
 - (id)init
 {	
 	self = [super initWithContentRect: [[NSScreen mainScreen] frame]
                           styleMask: NSBorderlessWindowMask
 				  						      backing: NSBackingStoreBuffered
-                              defer: NO];
+                              defer: YES];
 	if (self) {
     [self setReleasedWhenClosed: NO]; 
     desktopView = [DesktopView new];
     [self setContentView: desktopView];
     RELEASE (desktopView);
+    
+    
+    NSLog(@"windowNumber %i", [self windowNumber]);
 	}
   
 	return self;
@@ -65,6 +76,12 @@
 - (DesktopView *)desktopView
 {
   return desktopView;
+}
+
+- (void)orderWindow:(NSWindowOrderingMode)place relativeTo:(int)otherWin
+{
+  [super orderWindow: place relativeTo: otherWin];
+  [self setLevel: NSDesktopWindowLevel];
 }
 
 - (BOOL)canBecomeKeyWindow
