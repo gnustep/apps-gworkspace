@@ -1,0 +1,28 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {
+                closeMainWin = id; 
+                deleteFiles = id; 
+                duplicateFiles = id; 
+                logout = id; 
+                newFile = id; 
+                newFolder = id; 
+                openRemoteTerminal = id; 
+                openSelection = id; 
+                openSelectionAsFolder = id; 
+                saveRemoteFile = id; 
+                selectAllInViewer = id; 
+                showFindWin = id; 
+                showInfo = id; 
+                showLoginWindow = id; 
+                showPreferences = id; 
+                showViewer = id; 
+            }; 
+            CLASS = FirstResponder; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

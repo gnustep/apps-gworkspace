@@ -1,0 +1,26 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {pauseOperation = id; stopOperation = id; }; 
+            CLASS = FileOpProgress; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                fromField = id; 
+                pauseButt = id; 
+                progressBox = id; 
+                stopButt = id; 
+                toField = id; 
+                win = id; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {animate = id; }; 
+            CLASS = ProgressView; 
+            LANGUAGE = ObjC; 
+            SUPERCLASS = NSView; 
+        }
+    ); 
+    IBVersion = 1; 
+}

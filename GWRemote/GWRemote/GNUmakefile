@@ -1,4 +1,3 @@
-PACKAGE_NEEDS_CONFIGURE = YES
 
 include $(GNUSTEP_MAKEFILES)/common.make
 
@@ -6,6 +5,10 @@ PACKAGE_NAME = GWRemote
 VERSION = 0.2
 
 GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
+
+ifeq ($(FOUNDATION_LIB), apple)
+  GNUSTEP_INSTALLATION_DIR = /
+endif
 
 #
 # MAIN APP
@@ -22,13 +25,27 @@ GWRemote_RESOURCE_FILES = \
     
 GWRemote_LANGUAGES = Resources/English 
 
-GWRemote_LOCALIZED_RESOURCE_FILES = Localizable.strings \
-                                    LoginWindow.gorm \
-                                    RemoteEditor.gorm \
-                                    FindWindow.gorm \
-                                    FileOperationWin.gorm \
-                                    PrefWindow.gorm \
-                                    GWSDServerPref.gorm 
+ifeq ($(FOUNDATION_LIB), apple)
+  GWRemote_LOCALIZED_RESOURCE_FILES = Localizable.strings \
+                                      LoginWindow.nib \
+                                      RemoteEditor.nib \
+                                      FindWindow.nib \
+                                      FileOperationWin.nib \
+                                      PrefWindow.nib \
+                                      GWSDServerPref.nib 
+else
+  GWRemote_LOCALIZED_RESOURCE_FILES = Localizable.strings \
+                                      LoginWindow.gorm \
+                                      RemoteEditor.gorm \
+                                      FindWindow.gorm \
+                                      FileOperationWin.gorm \
+                                      PrefWindow.gorm \
+                                      GWSDServerPref.gorm 
+endif
+
+ifeq ($(FOUNDATION_LIB), apple)
+  Position_LOCALIZED_RESOURCE_FILES += MainMenu.nib
+endif            
 
 # The Objective-C source files to be compiled
 

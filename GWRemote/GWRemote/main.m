@@ -29,7 +29,9 @@
 #include "Functions.h"
 #include "GNUstep.h"
 
+  #ifdef GNUSTEP 
 void createMenu();
+  #endif
   
 int main(int argc, char **argv, char **env)
 {
@@ -37,7 +39,11 @@ int main(int argc, char **argv, char **env)
   GWRemote *gw = [GWRemote gwremote];
 	NSApplication *app = [NSApplication sharedApplication];
   
+#ifdef GNUSTEP
 	createMenu();
+#else
+  [NSBundle loadNibNamed: @"MainMenu" owner: gw];
+#endif
 	
   [app setDelegate: gw];    
 	[app run];
@@ -46,6 +52,7 @@ int main(int argc, char **argv, char **env)
   return 0;
 }
 
+#ifdef GNUSTEP 
 void createMenu()
 {
   NSMenu *mainMenu;
@@ -121,4 +128,4 @@ void createMenu()
 	[[NSApplication sharedApplication] setWindowsMenu: windows];
 	[[NSApplication sharedApplication] setMainMenu: mainMenu];		
 }
-
+#endif

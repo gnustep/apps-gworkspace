@@ -64,6 +64,9 @@
   NSString *fopInfoString;   
   NSRect fopInfoRect;
   NSMutableArray *indicators; 
+#ifndef GNUSTEP
+	NSColor *_backgroundColor;
+#endif  
 }
 
 - (id)initWithFrame:(NSRect)frameRect viewer:(id)viewer;
@@ -77,6 +80,11 @@
 - (void)stopIndicatorForOperation:(NSString *)operation;
 
 - (FileOpIndicator *)firstIndicatorForOperation:(NSString *)operation;
+
+#ifndef GNUSTEP
+	- (NSColor*)backgroundColor;
+	- (void)setBackgroundColor:(NSColor *)aColor;
+#endif
 
 @end
 

@@ -17,9 +17,11 @@ ADDITIONAL_LDFLAGS +=
 # Additional library directories the linker should search
 ADDITIONAL_LIB_DIRS += 
 
-ADDITIONAL_TOOL_LIBS += 
-
-gwsd_TOOL_LIBS += -lgnustep-gui $(SYSTEM_LIBS)
+ifeq ($(FOUNDATION_LIB), apple)
+  ADDITIONAL_TOOL_LIBS += -framework AppKit
+else
+  gwsd_TOOL_LIBS += -lgnustep-gui $(SYSTEM_LIBS)
+endif
 
 #
 # Flags dealing with installing and uninstalling

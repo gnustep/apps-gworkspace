@@ -1,0 +1,13 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {Find = id; saveRemoteFile = id; showFindWin = id; }; 
+            CLASS = RemoteEditorView; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {findButt = id; findField = id; findWin = id; }; 
+            SUPERCLASS = NSTextView; 
+        }
+    ); 
+    IBVersion = 1; 
+}
