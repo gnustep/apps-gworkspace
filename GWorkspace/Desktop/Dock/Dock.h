@@ -36,8 +36,6 @@
 
 @interface Dock : NSView 
 {
-  id win;
-  BOOL usexbundle;
   DockPosition position;
 
   NSMutableArray *icons;
@@ -59,14 +57,6 @@
 }
 
 - (id)initForManager:(id)mngr;
-
-- (void)activate;
-
-- (void)deactivate;
-
-- (void)setUsesXBundle:(BOOL)value;
-
-- (id)loadXWinBundle;
 
 - (void)createWorkspaceIcon;
 
@@ -105,8 +95,6 @@
 - (void)tile;
 
 - (void)updateDefaults;
-
-- (id)win;
 
 @end
 

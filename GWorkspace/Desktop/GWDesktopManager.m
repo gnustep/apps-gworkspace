@@ -152,17 +152,14 @@ static GWDesktopManager *desktopManager = nil;
   [[win desktopView] showContentsOfNode: dskNode];
   [self addWatcherForPath: [dskNode path]];
     
-  if (hidedock == NO) {
-    [dock activate];
-    [win orderBack: nil];
+  if ((hidedock == NO) && ([dock superview] == nil)) {
+    [[win desktopView] addSubview: dock];
+    [dock tile];
   }
 }
 
 - (void)deactivateDesktop
 {
-  if ([[dock win] isVisible]) {
-    [dock deactivate];
-  }
   [win deactivate];
   [self removeWatcherForPath: [dskNode path]];
 }
@@ -249,12 +246,6 @@ static GWDesktopManager *desktopManager = nil;
       RELEASE (window);
       
       [win activate];
-      
-      [dock setUsesXBundle: usexbundle];
-      
-      if (hidedock == NO) {
-        [win orderBack: nil];
-      }
     }
   }
 }
@@ -313,11 +304,14 @@ static GWDesktopManager *desktopManager = nil;
 - (void)setDockActive:(BOOL)value
 {
   hidedock = !value;
-
-  if (hidedock && [[dock win] isVisible]) {
-    [dock deactivate];
-  } else {
-    [dock activate];
+  
+  if (hidedock && [dock superview]) {
+    [dock removeFromSuperview];
+    [[win desktopView] setNeedsDisplayInRect: dockReservedFrame];
+    
+  } else if ([dock superview] == nil) {
+    [[win desktopView] addSubview: dock];
+    [[win desktopView] setNeedsDisplayInRect: dockReservedFrame];
   }
 }
 

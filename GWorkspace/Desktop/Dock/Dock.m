@@ -26,7 +26,6 @@
 #include <AppKit/AppKit.h>
 #include <math.h>
 #include "Dock.h"
-#include "DockWindow.h"
 #include "DockIcon.h"
 #include "GWDesktopView.h"
 
@@ -42,7 +41,6 @@
   RELEASE (icons);
   RELEASE (backColor);
   TEST_RELEASE (backImage);
-  RELEASE (win);
   
 	[super dealloc];
 }
@@ -53,33 +51,11 @@
   
   if (self) {
 	  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
-    id window = nil;
     NSArray *launched;
     id appsdict;
     NSArray *pbTypes;
     int i;
 
-    usexbundle = [defaults boolForKey: @"xbundle"];
-
-    if (usexbundle) {
-      window = [self loadXWinBundle];
-    }
-
-    if (window == nil) {
-      usexbundle = NO;
-	    window = [[DockWindow alloc] initWithContentRect: NSZeroRect
-					                          styleMask: NSBorderlessWindowMask  
-                                      backing: NSBackingStoreBuffered 
-                                        defer: NO];
-    }
-
-    win = RETAIN (window);
-    RELEASE (window);
-
-    [win setReleasedWhenClosed: NO];
-    [win setExcludedFromWindowsMenu: YES];
-    [(NSWindow *)win setContentView: self];	
-    
     manager = mngr;
     position = [manager dockPosition];
     
@@ -145,76 +121,6 @@
   }
   
   return self;  
-}
-
-- (void)activate
-{
-  [win setBackgroundColor: backColor];  
-  [self setUseBackImage: [[manager desktopView] useBackImage]];
-  [self tile];
-  [win activate];
-}
-
-- (void)deactivate
-{
-  [win orderOut: nil];
-}
-
-- (void)setUsesXBundle:(BOOL)value
-{
-  BOOL active = [win isVisible];
-  id window = nil;  
-
-  usexbundle = value;
-
-  if (usexbundle) {
-    window = [self loadXWinBundle];
-  } 
-  
-  if (window == nil) {
-	  window = [[DockWindow alloc] initWithContentRect: NSZeroRect
-					                        styleMask: NSBorderlessWindowMask  
-                                    backing: NSBackingStoreBuffered 
-                                      defer: NO];
-  }  
-
-  RETAIN (self);
-  [self removeFromSuperview];
-  
-  [win close];
-  DESTROY (win);
-  
-  win = RETAIN (window);
-  RELEASE (window);
-  
-  [win setReleasedWhenClosed: NO];
-  [win setExcludedFromWindowsMenu: YES];  
-  [(NSWindow *)win setContentView: self];	
-
-  if (active) {
-    [self activate];
-  }
-}
-
-- (id)loadXWinBundle
-{
-  NSString *bpath;
-  NSBundle *bundle;
-  
-  bpath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSSystemDomainMask, YES) lastObject];
-  bpath = [bpath stringByAppendingPathComponent: @"Bundles"];
-  bpath = [bpath stringByAppendingPathComponent: @"XDockWindow.bundle"];
-
-  bundle = [NSBundle bundleWithPath: bpath];
-  
-  if (bundle) {
-    return [[[bundle principalClass] alloc] initWithContentRect: NSZeroRect
-					                      styleMask: NSBorderlessWindowMask  
-                                  backing: NSBackingStoreBuffered 
-                                    defer: NO];
-  }
-
-  return nil;
 }
 
 - (void)createWorkspaceIcon;
@@ -439,12 +345,12 @@
   DESTROY (backImage);
 
   if (image) {
-    NSSize size = [win frame].size;
+    NSSize size = [self frame].size;
     
     backImage = [[NSImage alloc] initWithSize: size];
     [backImage lockFocus]; 
     [image compositeToPoint: NSZeroPoint 
-                   fromRect: [win frame]
+                   fromRect: [self frame]
                   operation: NSCompositeCopy];
     [backImage unlockFocus];
     [self setNeedsDisplay: YES];
@@ -469,11 +375,12 @@
 
 - (void)tile
 {
+  NSView *view = [self superview];
   NSRect scrrect = [[NSScreen mainScreen] frame];
   int oldIcnSize = iconSize;
   float maxheight = scrrect.size.height;
   NSRect icnrect = NSZeroRect;  
-  NSRect winRect = NSZeroRect;
+  NSRect rect = NSZeroRect;
   int i;
 
   iconSize = MAX_ICN_SIZE;
@@ -483,21 +390,21 @@
   icnrect.size.width = ceil(iconSize / 3 * 4);
   icnrect.size.height = icnrect.size.width;
     
-  winRect.size.height = [icons count] * icnrect.size.height;
+  rect.size.height = [icons count] * icnrect.size.height;
   if (targetIndex != -1) {
-    winRect.size.height += icnrect.size.height;
+    rect.size.height += icnrect.size.height;
   }
   
   maxheight -= (icnrect.size.height * 2);  
   
-  while (winRect.size.height > maxheight) {
+  while (rect.size.height > maxheight) {
     iconSize -= ICN_INCR;
     icnrect.size.height = ceil(iconSize / 3 * 4);
     icnrect.size.width = icnrect.size.height;
-    winRect.size.height = [icons count] * icnrect.size.height;
+    rect.size.height = [icons count] * icnrect.size.height;
 
     if (targetIndex != -1) {
-      winRect.size.height += icnrect.size.height;
+      rect.size.height += icnrect.size.height;
     }
       
     if (iconSize <= MIN_ICN_SIZE) {
@@ -505,15 +412,17 @@
     }
   }
 
-  winRect.size.width = icnrect.size.width;
-  winRect.origin.x = (position == DockPositionLeft) ? 0 : scrrect.size.width - winRect.size.width;
-  winRect.origin.y = (scrrect.size.height - winRect.size.height) / 2;
+  rect.size.width = icnrect.size.width;
+  rect.origin.x = (position == DockPositionLeft) ? 0 : scrrect.size.width - rect.size.width;
+  rect.origin.y = (scrrect.size.height - rect.size.height) / 2;
   
-  [win setFrame: winRect display: YES];
-  [self setFrame: [[win contentView] frame]];
+  if (view) {
+    [view setNeedsDisplayInRect: [self frame]];
+  }
+  [self setFrame: rect];
   [self setBackImage];
   
-  icnrect.origin.y = winRect.size.height;
+  icnrect.origin.y = rect.size.height;
   
   for (i = 0; i < [icons count]; i++) {
     DockIcon *icon = [icons objectAtIndex: i];
@@ -533,6 +442,9 @@
   } 
   
   [self setNeedsDisplay: YES];
+  if (view) {
+    [view setNeedsDisplayInRect: [self frame]];
+  }
 }
 
 - (void)updateDefaults
@@ -565,11 +477,6 @@
   if (backImage && useBackImage) {
     [backImage dissolveToPoint: NSZeroPoint fraction: 0.5];
   }
-}
-
-- (id)win
-{
-  return win;
 }
 
 @end
@@ -772,19 +679,16 @@
 - (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
 {
   NSPoint location = [sender draggingLocation];
-  DockIcon *icon = [self iconContainingPoint: location];
+  DockIcon *icon;
         
   isDragTarget = YES;  
   targetIndex = -1;
   targetRect = NSZeroRect;
   dragdelay = 0;     
-                 
-//  if (icon == nil) {
-//    location = [win convertScreenToBase: location];
-//    location.y -= [win frame].size.height;
-//    icon = [self iconContainingPoint: location];
-//  }
 
+  location = [self convertPoint: location fromView: nil];
+  icon = [self iconContainingPoint: location];
+                 
   if (icon) {
     int index = [icons indexOfObjectIdenticalTo: icon];
         
@@ -867,8 +771,7 @@
     }
   }
   
-  location = [win convertScreenToBase: location];
-  location.y -= [win frame].size.height;
+  location = [self convertPoint: location fromView: nil];
   
   if (NSPointInRect(location, NSInsetRect(targetRect, 0.0, 2.0))) {
     return NSDragOperationAll;
@@ -899,7 +802,6 @@
         if ((targetIndex != index) && ([icon isTrashIcon] == NO)) {
           targetIndex = index;
           [self tile]; 
-          [win flushWindow];
           return NSDragOperationAll;
         }
 
@@ -974,15 +876,12 @@
     } else if ([[pb types] containsObject: NSFilenamesPboardType]) {
       NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
       NSPoint location = [sender draggingLocation];
-      DockIcon *icon = [self iconContainingPoint: location];
+      DockIcon *icon;
       BOOL concluded = NO;
 
-  //    if (icon == nil) {
-  //      location = [win convertScreenToBase: location];
-  //      location.y -= [win frame].size.height;
-  //      icon = [self iconContainingPoint: location];
-  //    }
-      
+      location = [self convertPoint: location fromView: nil];
+      icon = [self iconContainingPoint: location];
+
       if ([sourcePaths count] == 1) {
         NSString *path = [sourcePaths objectAtIndex: 0];
         FSNode *node = [FSNode nodeWithPath: path];
