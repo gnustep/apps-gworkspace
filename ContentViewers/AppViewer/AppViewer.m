@@ -65,13 +65,13 @@
   	[label setBezeled: NO];
   	[label setEditable: NO];
   	[label setSelectable: NO];
-		[label setFrame: NSMakeRect(30, 125, 197, 20)];
+		[label setFrame: NSMakeRect(30, 132, 197, 20)];
 		[label setFont: [NSFont systemFontOfSize: 12]];
 		localizedStr = NSLocalizedString(@"Open these kinds of documents:", @"");
 		[label setStringValue: localizedStr];
   	[self addSubview: label];
 		
-    scroll = [[NSScrollView alloc] initWithFrame: NSMakeRect(30, 35, 197, 87)];
+    scroll = [[NSScrollView alloc] initWithFrame: NSMakeRect(30, 35, 196, 94)];
     [scroll setBorderType: NSBezelBorder];
     [scroll setHasHorizontalScroller: YES];
     [scroll setHasVerticalScroller: NO]; 
@@ -80,13 +80,13 @@
 		
     cell = AUTORELEASE ([NSButtonCell new]);
     [cell setButtonType: NSPushOnPushOffButton];
-    [cell setImagePosition: NSImageOnly]; 
+    [cell setImagePosition: NSImageAbove]; 
 				
     matrix = [[NSMatrix alloc] initWithFrame: NSZeroRect
 				            				mode: NSRadioModeMatrix prototype: cell
 			       												numberOfRows: 0 numberOfColumns: 0];
     [matrix setIntercellSpacing: NSZeroSize];
-    [matrix setCellSize: NSMakeSize(64, 64)];
+    [matrix setCellSize: NSMakeSize(64, 71)];
 		[matrix setAllowsEmptySelection: YES];
 		[scroll setDocumentView: matrix];	
 				
@@ -162,7 +162,7 @@
     }
 
 		if (valid == NO) {
-			[label setFrame: NSMakeRect(30, 125, 197, 20)];
+			[label setFrame: NSMakeRect(30, 132, 197, 20)];
 			[label setFont: [NSFont systemFontOfSize: 12]];
 			localizedStr = NSLocalizedString(@"Open these kinds of documents:", @"");
 			[label setStringValue: localizedStr];
@@ -189,7 +189,7 @@
 		(NSArray *)extensions = [iconsdict allKeys];
 		count = [extensions count];
 		
-		[scroll setFrame: NSMakeRect(30, 35, 197, 87)];
+		[scroll setFrame: NSMakeRect(30, 35, 196, 94)];
 		[matrix renewRows: 1 columns: count];
 		[matrix sizeToCells];
 		
