@@ -1,4 +1,4 @@
-/* GWSpatialViewer.h
+/* GWSVIconsView.h
  *  
  * Copyright (C) 2004 Free Software Foundation, Inc.
  *
@@ -22,36 +22,21 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef GW_SPATIAL_VIEWER_H
-#define GW_SPATIAL_VIEWER_H
+#ifndef GW_SV_ICONS_VIEW_H
+#define GW_SV_ICONS_VIEW_H
 
 #include <Foundation/Foundation.h>
+#include "FSNIconsView.h"
 
-@class GWViewersManager;
-@class GWSVIconsView;
-@class FSNode;
+@class GWSpatialViewer;
 
-@interface GWSpatialViewer : NSObject
+@interface GWSVIconsView : FSNIconsView
 {
-  IBOutlet id win;
-  IBOutlet id topBox;
-  IBOutlet id elementsLabel;
-  IBOutlet id spaceLabel;
-  IBOutlet id pathsPopUp;
-  IBOutlet id scroll;
-  
-  GWSVIconsView *iconsView;
-
+  GWSpatialViewer *viewer;
 }
 
-- (id)initForNode:(FSNode *)node;
-
-- (void)activate;
-
-- (IBAction)popUpAction:(id)sender;
-
-- (FSNode *)shownNode;
+- (id)initForViewer:(GWSpatialViewer *)vwr;
 
 @end
 
-#endif // GW_SPATIAL_VIEWER_H
+#endif // GW_SV_ICONS_VIEW_H

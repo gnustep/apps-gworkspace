@@ -374,7 +374,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
 	for (i = 0; i < count; i++) {
     px += gridSize.width;      
     
-    if (px >= (svr.size.width - X_MARGIN)) {
+    if (px >= (svr.size.width - gridSize.width)) {
       px = X_MARGIN; 
       py += (gridSize.height + Y_MARGIN);  
 
@@ -389,7 +389,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
 		irects[i] = NSMakeRect(px, py, gridSize.width, gridSize.height);		
 	}
 
-	py += (gridSize.height / 2);  
+	py += Y_MARGIN;  
   py = (py < svr.size.height) ? svr.size.height : py;
 
   SETRECT (self, r.origin.x, r.origin.y, svr.size.width, py);

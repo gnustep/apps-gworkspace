@@ -23,74 +23,29 @@
  */
 
 #include <AppKit/AppKit.h>
-#include "GWSpatialViewer.h"
-#include "GWViewersManager.h"
 #include "GWSVIconsView.h"
-#include "FSNodeRep.h"
-#include "FSNFunctions.h"
+#include "GWSpatialViewer.h"
 
-static NSString *nibName = @"ViewerWindow";
-
-
-@implementation GWSpatialViewer
+@implementation GWSVIconsView
 
 - (void)dealloc
 {
-  TEST_RELEASE (win);
-  TEST_RELEASE (iconsView);
-  
 	[super dealloc];
 }
 
-- (id)initForNode:(FSNode *)node
+- (id)initForViewer:(GWSpatialViewer *)vwr
 {
   self = [super init];
   
   if (self) {
-		if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
-      NSLog(@"failed to load %@!", nibName);
-      DESTROY (self);
-      return self;
-    } else {
-  //    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
-  //    id dictEntry;
-
-        
-        
-
-
-      [scroll setBorderType: NSBezelBorder];
-      [scroll setHasHorizontalScroller: YES];
-      [scroll setHasVerticalScroller: YES]; 
-
-      iconsView = [[GWSVIconsView alloc] initForViewer: self];
-	    [scroll setDocumentView: iconsView];	
-      
-      [self activate];
-      
-      [iconsView showContentsOfNode: node];
-
-      // [win setDelegate: self];
-
-    }
+		viewer = vwr;
   }
   
   return self;
 }
 
-- (void)activate
-{
-  [win makeKeyAndOrderFront: nil];
-}
-
-- (IBAction)popUpAction:(id)sender
-{
-
-}
-
-- (FSNode *)shownNode
-{
-  return [iconsView shownNode];
-}
-
 @end
+
+
+
+
