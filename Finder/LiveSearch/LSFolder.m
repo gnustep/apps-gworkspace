@@ -205,8 +205,8 @@ BOOL isPathInResults(NSString *path, NSArray *results);
       return;
     }
 
-    [foundObjects removeAllObjects];
-    ASSIGN (sortedObjects, [NSArray array]);
+ //   [foundObjects removeAllObjects];
+ //   ASSIGN (sortedObjects, [NSArray array]);
     [resultsView noteNumberOfRowsChanged];
     [updateButt setEnabled: NO];
     [progView start];
@@ -292,8 +292,8 @@ BOOL isPathInResults(NSString *path, NSArray *results);
     updaterbusy = YES;
     
     if (nextSelector == @selector(fastUpdate)) {
-      [foundObjects removeAllObjects];
-      ASSIGN (sortedObjects, [NSArray array]);
+  //    [foundObjects removeAllObjects];
+  //    ASSIGN (sortedObjects, [NSArray array]);
       [resultsView noteNumberOfRowsChanged];
       [updateButt setEnabled: NO];
       [progView start];
@@ -307,16 +307,35 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   }
 }
 
+- (void)updaterError:(NSString *)err
+{
+  NSRunAlertPanel(nil, err, NSLocalizedString(@"Continue", @""), nil, nil);
+  [self endUpdate];
+}
+
 - (void)addFoundPath:(NSString *)path
 {
   FSNode *nd = [FSNode nodeWithPath: path];
+  
+  if ([foundObjects containsObject: nd] == NO) {
+    NSString *elmstr = NSLocalizedString(@"elements", @"");
+  
+    [foundObjects addObject: nd];
+    elmstr = [NSString stringWithFormat: @"%i %@", [foundObjects count], elmstr];
+    [elementsLabel setStringValue: elmstr];
+    [resultsView noteNumberOfRowsChanged];
+  } 
+}
+
+- (void)removeFoundPath:(NSString *)path
+{
+  FSNode *nd = [FSNode nodeWithPath: path];
   NSString *elmstr = NSLocalizedString(@"elements", @"");
-  
-  [foundObjects addObject: nd];
-  [resultsView noteNumberOfRowsChanged];
-  
+    
+  [foundObjects removeObject: nd];
   elmstr = [NSString stringWithFormat: @"%i %@", [foundObjects count], elmstr];
   [elementsLabel setStringValue: elmstr];
+  [resultsView noteNumberOfRowsChanged];
 }
 
 - (void)endUpdate

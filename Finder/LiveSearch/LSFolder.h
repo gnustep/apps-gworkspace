@@ -124,7 +124,11 @@
 
 - (void)updaterDidEndAction;
 
+- (void)updaterError:(NSString *)err;
+
 - (void)addFoundPath:(NSString *)path;
+
+- (void)removeFoundPath:(NSString *)path;
 
 - (void)endUpdate;
 

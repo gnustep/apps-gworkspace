@@ -79,8 +79,10 @@
   if (self) {    
     fm = [NSFileManager defaultManager];	
     nc = [NSNotificationCenter defaultCenter];
-    
+
+  #ifdef HAVE_SQLITE    
     db = NULL;
+  #endif
     
     conn = [NSConnection defaultConnection];
     [conn setRootObject: self];
@@ -181,7 +183,11 @@
 
 - (BOOL)dbactive
 {
+#ifdef HAVE_SQLITE
   return (db != NULL);
+#else
+  return NO;
+#endif
 }
 
 - (BOOL)insertPath:(NSString *)path
@@ -506,7 +512,8 @@
   CREATE_AUTORELEASE_POOL(pool);
   NSDictionary *attrs = [fm fileAttributesAtPath: dst traverseLink: NO];
   BOOL resok = NO;
-  
+
+#ifdef HAVE_SQLITE  
   if (attrs) {
     NSMutableString *query = [NSMutableString string];
     NSArray *results = nil;
@@ -556,6 +563,7 @@
       resok = [self performWriteQuery: query];
     }
   }
+#endif
   
   RELEASE (pool);
   
@@ -622,7 +630,11 @@
 
 - (BOOL)checkPath:(NSString *)path
 {
+#ifdef HAVE_SQLITE
   return ((db != NULL) && checkPathInDb(db, path));
+#else
+  return NO;
+#endif
 }
 
 - (void)connectionBecameInvalid:(NSNotification *)notification
@@ -717,6 +729,7 @@
 
 - (void)testCreateDB
 {
+#ifdef HAVE_SQLITE
   NSString *dbPath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
   NSString *testpath = @"/home/enrico/Butt/GNUstep/CopyPix";
   NSString *imgpath = @"/home/enrico/Butt/GNUstep/CopyPix/Calculator.tiff";
@@ -767,6 +780,7 @@
   
   NSLog(@"DONE");
   exit(0);
+#endif
 }
 
 - (void)testWriteImage

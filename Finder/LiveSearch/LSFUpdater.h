@@ -33,7 +33,11 @@
 
 - (oneway void)updaterDidEndAction;
 
+- (oneway void)updaterError:(NSString *)err;
+
 - (oneway void)addFoundPath:(NSString *)path;
+
+- (oneway void)removeFoundPath:(NSString *)path;
 
 - (NSString *)infoPath;
 
@@ -88,12 +92,23 @@
 @interface LSFUpdater: NSObject
 {
   NSMutableArray *searchPaths;
-  NSDictionary *searchCriteria;
-  NSMutableArray *foundPaths;
-  NSDate *lastUpdate;
-  NSMutableArray *modules;
-  BOOL autoupdate;
+  NSTimer *srchPathsTmr;
+  int spathindex;
+  
+  NSMutableArray *directories;
+  int dirindex;
 
+  NSMutableArray *modules;  
+  NSDictionary *searchCriteria;
+  
+  NSMutableArray *foundPaths;
+  NSTimer *fndPathsTmr;
+  int fpathindex;
+  
+  NSDate *lastUpdate;
+  NSDate *startSearch;
+  BOOL autoupdate;
+  
   id <LSFolderProtocol> lsfolder;
   id ddbd;
   BOOL ddbdactive;
@@ -105,12 +120,11 @@
 
 - (id)initWithLSFolderInfo:(NSDictionary *)info;
 
+- (void)setAutoupdate:(BOOL)value;
+
 - (void)notifyEndAction:(id)sender;
 
 - (void)exitThread;
-
-- (void)setAutoupdate:(BOOL)value;
-
 
 
 - (void)fastUpdate;
@@ -119,15 +133,17 @@
 
 - (void)checkFoundPaths;
 
-- (void)searchInSearchPath:(NSString *)srcpath;
+- (void)updateSearchPath:(NSString *)srcpath;
+
+- (BOOL)saveResults;
+
 
 - (NSArray *)fullSearchInDirectory:(NSString *)dirpath;
 
-- (void)check:(NSString *)path;
+- (BOOL)checkPath:(NSString *)path;
 
 - (BOOL)checkPath:(NSString *)path 
-       attributes:(NSDictionary *)attrs
-        fullCheck:(BOOL)fullck;
+       attributes:(NSDictionary *)attrs;
 
 - (BOOL)checkPath:(NSString *)path 
        attributes:(NSDictionary *)attrs
@@ -136,11 +152,14 @@
 - (void)insertShorterPath:(NSString *)path 
                   inArray:(NSMutableArray *)array;
 
+@end
 
 
+@interface LSFUpdater (ddbd)
 
+- (void)connectDDBd;
 
-
+- (void)ddbdConnectionDidDie:(NSNotification *)notif;
 
 - (void)ddbdInsertTrees;
 
@@ -150,9 +169,14 @@
 
 - (void)ddbdRemoveTreesFromPaths:(NSArray *)paths;
 
-- (void)connectDDBd;
+@end
 
-- (void)ddbdConnectionDidDie:(NSNotification *)notif;
+
+@interface LSFUpdater (scheduled)
+
+- (void)checkNextFoundPath:(id)sender;
+
+- (void)searchInNextDirectory:(id)sender;
 
 @end
 

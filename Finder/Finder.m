@@ -136,7 +136,7 @@ static Finder *finder = nil;
   return self;
 }
 
-- (void)applicationDidFinishLaunching:(NSNotification *)aNotification
+- (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
   NSUserDefaults *defaults;
   id defentry;
@@ -315,12 +315,14 @@ static Finder *finder = nil;
   } 
   
   startAppWin = [[StartAppWin alloc] init];
+}
 
-  fswatcher = nil;
-  fswnotifications = YES;
-  [self connectFSWatcher];
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification
+{
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  id defentry = [defaults objectForKey: @"lsfolders_paths"];
+  int i;
   
-  defentry = [defaults objectForKey: @"lsfolders_paths"];
   if (defentry) {
     for (i = 0; i < [defentry count]; i++) {
       NSString *lsfpath = [defentry objectAtIndex: i];
@@ -332,6 +334,10 @@ static Finder *finder = nil;
       }
     }
   }
+
+  fswatcher = nil;
+  fswnotifications = YES;
+  [self connectFSWatcher];
   
   [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
                 				selector: @selector(fileSystemWillChange:) 
