@@ -21,3 +21,24 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
+
+#ifndef GWVIEWERS_MANAGER_H
+#define GWVIEWERS_MANAGER_H
+
+#include <Foundation/Foundation.h>
+
+// @class NSWindow;
+
+@interface GWViewersManager : NSObject
+{
+
+}
+
++ (GWViewersManager *)viewersManager;
+
+- (id)viewerAtPath:(NSString *)path 
+     viewsPackages:(BOOL)viewspkg;
+
+@end
+
+#endif // GWVIEWERS_MANAGER_H

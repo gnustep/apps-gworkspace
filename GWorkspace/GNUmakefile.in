@@ -9,10 +9,6 @@ VERSION = @PACKAGE_VERSION@
 
 GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
 
-ifeq ($(FOUNDATION_LIB), apple)
-  GNUSTEP_INSTALLATION_DIR = /
-endif
-
 #
 # MAIN APP
 #
@@ -25,11 +21,7 @@ GWorkspace_HAS_RESOURCE_BUNDLE = yes
 #
 # Additional libraries
 #
-ifeq ($(FOUNDATION_LIB), apple)
-  ADDITIONAL_GUI_LIBS += -framework GWorkspace
-else
-  ADDITIONAL_GUI_LIBS += -lGWorkspace
-endif
+ADDITIONAL_GUI_LIBS += -lGWorkspace -lFSNode
 
 GWorkspace_RESOURCE_FILES = \
   Resources/Icons/* \
@@ -52,68 +44,36 @@ GWorkspace_LANGUAGES = Resources/English \
                       Resources/Dutch
 
 # The Objective-C source files to be compiled
-
-ifneq ($(FOUNDATION_LIB), apple)
-  GWorkspace_OBJC_FILES = main.m \
-  GWorkspace.m \
-  IconViewsIcon.m \
-  GWSplitView.m \
-  ViewersWindow.m \
-  GWSpatialViewer.m \
-  GWViewersManager.m \
-  Shelf/Shelf.m \
-  Shelf/ShelfIcon.m \
-  TShelf/TShelfWin.m \
-  TShelf/TShelfView.m \
-  TShelf/TShelfViewItem.m \
-  TShelf/TShelfIconsView.m \
-  TShelf/TShelfIcon.m \
-  TShelf/TShelfPBIcon.m \
-  Preferences/PrefController.m \
-  Preferences/DefEditorPref.m \
-  Preferences/XTermPref.m \
-  Preferences/DefSortOrderPref.m \
-  Preferences/ShelfPref.m \
-  Preferences/IconsPref.m \
-  Preferences/HiddenFilesPref.m \
-  History/History.m \
-  Dialogs/Dialogs.m \
-  Dialogs/OpenWithController.m \
-  Dialogs/RunExternalController.m \
-  Dialogs/CompletionField.m \
-  Dialogs/StartAppWin.m \
-  Fiend/Fiend.m \
-  Fiend/FiendLeaf.m 
-else
-  GWorkspace_OBJC_FILES = main.m \
-  GWorkspace.m \
-  IconViewsIcon.m \
-  GWSplitView.m \
-  ViewersWindow.m \
-  Shelf/Shelf.m \
-  Shelf/ShelfIcon.m \
-  TShelf/TShelfWin.m \
-  TShelf/TShelfView.m \
-  TShelf/TShelfViewItem.m \
-  TShelf/TShelfIconsView.m \
-  TShelf/TShelfIcon.m \
-  TShelf/TShelfPBIcon.m \
-  Preferences/PrefController.m \
-  Preferences/DefEditorPref.m \
-  Preferences/XTermPref.m \
-  Preferences/DefSortOrderPref.m \
-  Preferences/ShelfPref.m \
-  Preferences/IconsPref.m \
-  Preferences/HiddenFilesPref.m \
-  History/History.m \
-  Dialogs/Dialogs.m \
-  Dialogs/OpenWithController.m \
-  Dialogs/RunExternalController.m \
-  Dialogs/CompletionField.m \
-  Dialogs/StartAppWin.m \
-  Fiend/Fiend.m \
-  Fiend/FiendLeaf.m 
-endif
+GWorkspace_OBJC_FILES = main.m \
+GWorkspace.m \
+IconViewsIcon.m \
+GWSplitView.m \
+ViewersWindow.m \
+GWSpatialViewer.m \
+GWViewersManager.m \
+Shelf/Shelf.m \
+Shelf/ShelfIcon.m \
+TShelf/TShelfWin.m \
+TShelf/TShelfView.m \
+TShelf/TShelfViewItem.m \
+TShelf/TShelfIconsView.m \
+TShelf/TShelfIcon.m \
+TShelf/TShelfPBIcon.m \
+Preferences/PrefController.m \
+Preferences/DefEditorPref.m \
+Preferences/XTermPref.m \
+Preferences/DefSortOrderPref.m \
+Preferences/ShelfPref.m \
+Preferences/IconsPref.m \
+Preferences/HiddenFilesPref.m \
+History/History.m \
+Dialogs/Dialogs.m \
+Dialogs/OpenWithController.m \
+Dialogs/RunExternalController.m \
+Dialogs/CompletionField.m \
+Dialogs/StartAppWin.m \
+Fiend/Fiend.m \
+Fiend/FiendLeaf.m 
 						 
 -include GNUmakefile.preamble
 

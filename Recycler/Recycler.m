@@ -536,7 +536,7 @@ static Recycler *recycler = nil;
 
   if (operationsApp) {  
     NSData *data = [NSArchiver archivedDataWithRootObject: opinfo];
-    [(id <OperationProtocol>)operationsApp performFileOperation: data];
+    [(id <OperationProtocol>)operationsApp performOperation: data];
   } else {
     NSRunAlertPanel(nil, 
         NSLocalizedString(@"File operations disabled!", @""), 

@@ -21,3 +21,43 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
+
+#include <AppKit/AppKit.h>
+#include "GWViewersManager.h"
+#include "FSNodeRep.h"
+#include "FSNFunctions.h"
+
+static GWViewersManager *vwrsmanager = nil;
+
+@implementation GWViewersManager
+
++ (GWViewersManager *)viewersManager
+{
+	if (vwrsmanager == nil) {
+		vwrsmanager = [[GWViewersManager alloc] init];
+	}	
+  return vwrsmanager;
+}
+
+- (void)dealloc
+{
+	[super dealloc];
+}
+
+- (id)init
+{
+  self = [super init];
+  
+  if (self) {
+  }
+  
+  return self;
+}
+
+- (id)viewerAtPath:(NSString *)path 
+     viewsPackages:(BOOL)viewspkg
+{
+  return nil;
+}
+
+@end

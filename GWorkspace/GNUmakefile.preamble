@@ -10,22 +10,17 @@ ADDITIONAL_CFLAGS += -Wall
 
 # Additional include directories the compiler should search
 ADDITIONAL_INCLUDE_DIRS += -IGWorkspace -I../GWorkspace -I../../GWorkspace
-
-ifneq ($(FOUNDATION_LIB), apple)
-  ADDITIONAL_INCLUDE_DIRS += -IGWLib -I../GWLib -I../../GWLib
-else
-  ADDITIONAL_INCLUDE_DIRS += -framework GWorkspace
-endif
+ADDITIONAL_INCLUDE_DIRS += -IGWLib -I../GWLib -I../../GWLib
+ADDITIONAL_INCLUDE_DIRS += -I../FSNode
 
 # Additional LDFLAGS to pass to the linker
 ADDITIONAL_LDFLAGS +=  
 
 # Additional library directories the linker should search
-ifneq ($(FOUNDATION_LIB), apple)
-  ADDITIONAL_LIB_DIRS += -LGWLib/$(GNUSTEP_OBJ_DIR) \
+ADDITIONAL_LIB_DIRS += -LGWLib/$(GNUSTEP_OBJ_DIR) \
                       -L../GWLib/$(GNUSTEP_OBJ_DIR) \
                       -L../../GWLib/$(GNUSTEP_OBJ_DIR)   
-endif
+ADDITIONAL_LIB_DIRS += -L../FSNode/FSNode.framework/Versions/Current/$(GNUSTEP_TARGET_LDIR)
 
 ADDITIONAL_TOOL_LIBS +=
 

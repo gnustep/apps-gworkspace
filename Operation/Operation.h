@@ -57,7 +57,7 @@ enum {
 
 - (BOOL)filenamesWasCutted;
 
-- (void)performFileOperation:(NSData *)opinfo;
+- (void)performOperation:(NSData *)opinfo;
 
 - (BOOL)isLockedAction:(int)action
                 onPath:(NSString *)path ;

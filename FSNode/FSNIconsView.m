@@ -68,6 +68,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
 {
   TEST_RELEASE (node);
   TEST_RELEASE (infoPath);
+  TEST_RELEASE (nodeInfo);
   TEST_RELEASE (extInfoType);
   RELEASE (icons);
   RELEASE (labelFont);
@@ -207,13 +208,15 @@ if (rct.size.height < 0) rct.size.height = 0; \
 
 - (NSDictionary *)readNodeInfo
 {
+  NSDictionary *nodeDict = nil;
+  
   ASSIGN (infoPath, [[node path] stringByAppendingPathComponent: @".dirinfo"]);
   
   if ([[NSFileManager defaultManager] fileExistsAtPath: infoPath]) {
-    NSDictionary *nodeInfo = [NSDictionary dictionaryWithContentsOfFile: infoPath];
+    nodeDict = [NSDictionary dictionaryWithContentsOfFile: infoPath];
 
-    if (nodeInfo) {
-      id entry = [nodeInfo objectForKey: @"backcolor"];
+    if (nodeDict) {
+      id entry = [nodeDict objectForKey: @"backcolor"];
       
       if (entry) {
         float red = [[entry objectForKey: @"red"] floatValue];
@@ -227,7 +230,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
                                                      alpha: alpha]);
       }
 
-      entry = [nodeInfo objectForKey: @"textcolor"];
+      entry = [nodeDict objectForKey: @"textcolor"];
       
       if (entry) {
         float red = [[entry objectForKey: @"red"] floatValue];
@@ -243,24 +246,24 @@ if (rct.size.height < 0) rct.size.height = 0; \
         ASSIGN (disabledTextColor, [textColor highlightWithLevel: NSDarkGray]);      
       }
 
-      entry = [nodeInfo objectForKey: @"iconsize"];
+      entry = [nodeDict objectForKey: @"iconsize"];
       iconSize = entry ? [entry intValue] : iconSize;
 
-      entry = [nodeInfo objectForKey: @"labeltxtsize"];
+      entry = [nodeDict objectForKey: @"labeltxtsize"];
       if (entry) {
         labelTextSize = [entry intValue];
         ASSIGN (labelFont, [NSFont systemFontOfSize: labelTextSize]);      
       }
 
-      entry = [nodeInfo objectForKey: @"iconposition"];
+      entry = [nodeDict objectForKey: @"iconposition"];
       iconPosition = entry ? [entry intValue] : iconPosition;
 
-      entry = [nodeInfo objectForKey: @"fsn_info_type"];
+      entry = [nodeDict objectForKey: @"fsn_info_type"];
       infoType = entry ? [entry intValue] : infoType;
 
       if (infoType == FSNInfoExtendedType) {
         DESTROY (extInfoType);
-        entry = [nodeInfo objectForKey: @"ext_info_type"];
+        entry = [nodeDict objectForKey: @"ext_info_type"];
 
         if (entry) {
           NSArray *availableTypes = [FSNodeRep availableExtendedInfoNames];
@@ -274,18 +277,21 @@ if (rct.size.height < 0) rct.size.height = 0; \
           infoType = FSNInfoNameType;
         }
       }
-    
-      return nodeInfo;
     }
   }
     
-  return nil;
+  if (nodeDict) {
+    nodeInfo = [nodeDict mutableCopy];
+  } else {
+    nodeInfo = [NSMutableDictionary new];
+  }
+    
+  return nodeDict;
 }
 
 - (void)updateNodeInfo
 {
   if ([node isWritable]) {
-    NSMutableDictionary *nodeInfo = [NSMutableDictionary dictionary];
     NSMutableDictionary *backColorDict = [NSMutableDictionary dictionary];
     NSMutableDictionary *txtColorDict = [NSMutableDictionary dictionary];
     float red, green, blue, alpha;

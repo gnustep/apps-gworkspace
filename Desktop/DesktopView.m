@@ -150,13 +150,15 @@
 
 - (NSDictionary *)readNodeInfo
 {
+  NSDictionary *nodeDict = nil;
+
   ASSIGN (infoPath, [[node path] stringByAppendingPathComponent: @".dirinfo"]);
   
   if ([[NSFileManager defaultManager] fileExistsAtPath: infoPath]) {
-    NSDictionary *nodeInfo = [NSDictionary dictionaryWithContentsOfFile: infoPath];
+    nodeDict = [NSDictionary dictionaryWithContentsOfFile: infoPath];
 
-    if (nodeInfo) {
-      id entry = [nodeInfo objectForKey: @"backcolor"];
+    if (nodeDict) {
+      id entry = [nodeDict objectForKey: @"backcolor"];
       
       if (entry) {
         float red = [[entry objectForKey: @"red"] floatValue];
@@ -170,7 +172,7 @@
                                                      alpha: alpha]);
       }
 
-      entry = [nodeInfo objectForKey: @"textcolor"];
+      entry = [nodeDict objectForKey: @"textcolor"];
       
       if (entry) {
         float red = [[entry objectForKey: @"red"] floatValue];
@@ -186,10 +188,10 @@
         ASSIGN (disabledTextColor, [textColor highlightWithLevel: NSDarkGray]);      
       }
 
-      entry = [nodeInfo objectForKey: @"imagestyle"];
+      entry = [nodeDict objectForKey: @"imagestyle"];
       backImageStyle = entry ? [entry intValue] : backImageStyle;
 
-      entry = [nodeInfo objectForKey: @"imagepath"];
+      entry = [nodeDict objectForKey: @"imagepath"];
       if (entry) {
         NSImage *image = [[NSImage alloc] initWithContentsOfFile: entry];
 
@@ -200,27 +202,27 @@
         }
       }
 
-      entry = [nodeInfo objectForKey: @"usebackimage"];
+      entry = [nodeDict objectForKey: @"usebackimage"];
       useBackImage = entry ? [entry boolValue] : NO;      
       
-      entry = [nodeInfo objectForKey: @"iconsize"];
+      entry = [nodeDict objectForKey: @"iconsize"];
       iconSize = entry ? [entry intValue] : iconSize;
 
-      entry = [nodeInfo objectForKey: @"labeltxtsize"];
+      entry = [nodeDict objectForKey: @"labeltxtsize"];
       if (entry) {
         labelTextSize = [entry intValue];
         ASSIGN (labelFont, [NSFont systemFontOfSize: labelTextSize]);      
       }
 
-      entry = [nodeInfo objectForKey: @"iconposition"];
+      entry = [nodeDict objectForKey: @"iconposition"];
       iconPosition = entry ? [entry intValue] : iconPosition;
 
-      entry = [nodeInfo objectForKey: @"fsn_info_type"];
+      entry = [nodeDict objectForKey: @"fsn_info_type"];
       infoType = entry ? [entry intValue] : infoType;
 
       if (infoType == FSNInfoExtendedType) {
         DESTROY (extInfoType);
-        entry = [nodeInfo objectForKey: @"ext_info_type"];
+        entry = [nodeDict objectForKey: @"ext_info_type"];
 
         if (entry) {
           NSArray *availableTypes = [FSNodeRep availableExtendedInfoNames];
@@ -234,18 +236,21 @@
           infoType = FSNInfoNameType;
         }
       }
-      
-      return nodeInfo;
     }
   }
   
-  return nil;
+  if (nodeDict) {
+    nodeInfo = [nodeDict mutableCopy];
+  } else {
+    nodeInfo = [NSMutableDictionary new];
+  }
+    
+  return nodeDict;
 }
 
 - (void)updateNodeInfo
 {
   if ([node isWritable]) {
-    NSMutableDictionary *nodeInfo = [NSMutableDictionary dictionary];
     NSMutableDictionary *indexes = [NSMutableDictionary dictionary];
     NSMutableDictionary *backColorDict = [NSMutableDictionary dictionary];
     NSMutableDictionary *txtColorDict = [NSMutableDictionary dictionary];
@@ -879,7 +884,7 @@
   NSArray *subNodes = [anode subNodes];
   NSMutableArray *unsorted = [NSMutableArray array];
   int count = [icons count];
-  NSDictionary *nodeInfo;
+  NSDictionary *nodeDict;
   int i;
 
   for (i = 0; i < count; i++) {
@@ -898,7 +903,7 @@
   }
   
   ASSIGN (node, anode);
-  nodeInfo = [self readNodeInfo];
+  nodeDict = [self readNodeInfo];
   [desktopApp addWatcherForPath: [node path]];
     
   for (i = 0; i < [subNodes count]; i++) {
@@ -918,8 +923,8 @@
     RELEASE (icon);
   }
   
-  if (nodeInfo) {
-    NSDictionary *indexes = [nodeInfo objectForKey: @"indexes"];
+  if (nodeDict) {
+    NSDictionary *indexes = [nodeDict objectForKey: @"indexes"];
 
     if (indexes) {
       for (i = 0; i < [unsorted count]; i++) {

@@ -68,7 +68,7 @@
 
 @protocol	OperationProtocol
 
-- (oneway void)performFileOperation:(NSData *)opinfo;
+- (oneway void)performOperation:(NSData *)opinfo;
 
 - (oneway void)setFilenamesCutted:(BOOL)value;
 

@@ -100,7 +100,7 @@ static Operation *operation = nil;
   return filenamesCutted;
 }
 
-- (void)performFileOperation:(NSData *)opinfo
+- (void)performOperation:(NSData *)opinfo
 {
   NSDictionary *opdict = [NSUnarchiver unarchiveObjectWithData: opinfo];
 	NSString *operation = [opdict objectForKey: @"operation"];

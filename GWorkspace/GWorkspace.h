@@ -43,6 +43,7 @@
 @class NSTimer;
 @class NSFileManager;
 @class NSWorkspace;
+@class GWViewersManager;
 @class ViewersWindow;
 @class PrefController;
 @class Fiend;
@@ -125,7 +126,7 @@
 
 @protocol	OperationProtocol
 
-- (oneway void)performFileOperation:(NSData *)opinfo;
+- (oneway void)performOperation:(NSData *)opinfo;
 
 - (oneway void)setFilenamesCutted:(BOOL)value;
 
@@ -155,6 +156,7 @@
 	
   ViewersWindow *rootViewer;	
   NSMutableArray *viewers;
+  GWViewersManager *vwrsManager;
   NSMutableArray *viewersSearchPaths;
 	NSMutableArray *viewersTemplates;
 
@@ -209,7 +211,7 @@
 
 - (id)rootViewer;
 
-- (ViewersWindow *)viewerRootedAtPath:(NSString *)vpath;
+- (id)viewerRootedAtPath:(NSString *)vpath;
 
 - (void)changeDefaultEditor:(NSString *)editor;
 
@@ -304,6 +306,7 @@
 
 - (id)connectApplication:(NSString *)appName;
 
+
 //
 // NSServicesRequests protocol
 //
@@ -376,9 +379,28 @@
 
 - (void)emptyRecycler:(id)sender;
 
-#ifndef GNUSTEP
-- (void)terminate:(id)sender;
-#endif
+
+//
+// DesktopApplication protocol
+//
+- (void)selectionChanged:(NSArray *)newsel;
+
+- (void)openSelectionInNewViewer:(BOOL)newv;
+
+- (void)openSelectionWithApp:(id)sender;
+
+- (void)performFileOperation:(NSDictionary *)opinfo;
+
+- (void)concludeRemoteFilesDragOperation:(NSData *)opinfo
+                             atLocalPath:(NSString *)localdest;
+
+// - (void)addWatcherForPath:(NSString *)path; // already in GWProtocol
+
+// - (void)removeWatcherForPath:(NSString *)path; // already in GWProtocol
+
+// - (NSString *)trashPath; // already in GWProtocol
+
+- (id)workspaceApplication;
 
 @end
 

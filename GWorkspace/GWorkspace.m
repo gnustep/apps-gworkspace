@@ -25,17 +25,10 @@
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include <math.h>
-  #ifdef GNUSTEP 
 #include "GWLib.h"
 #include "GWFunctions.h"
 #include "GWNotifications.h"
 #include "ViewersProtocol.h"
-  #else
-#include <GWorkspace/GWLib.h>
-#include <GWorkspace/GWFunctions.h>
-#include <GWorkspace/GWNotifications.h>
-#include <GWorkspace/ViewersProtocol.h>
-  #endif
 #include "GWorkspace.h"
 #include "Dialogs/Dialogs.h"
 #include "Dialogs/OpenWithController.h"
@@ -44,6 +37,7 @@
 #include "Preferences/PrefController.h"
 #include "Fiend/Fiend.h"
 #include "ViewersWindow.h"
+#include "GWViewersManager.h"
 #include "TShelf/TShelfWin.h"
 #include "TShelf/TShelfView.h"
 #include "TShelf/TShelfViewItem.h"
@@ -110,7 +104,7 @@ static GWorkspace *gworkspace = nil;
 
   data = [NSArchiver archivedDataWithRootObject: opdict];
 
-  [operationsApp performFileOperation: data];
+  [operationsApp performOperation: data];
   
   return YES;
 }
@@ -198,7 +192,7 @@ static GWorkspace *gworkspace = nil;
 	paths = [NSArray arrayWithObject: fullPath];
 	
 	if (newViewer) {
-		ViewersWindow *viewer = [self viewerRootedAtPath: rootFullpath];
+    id viewer = [self viewerRootedAtPath: rootFullpath];
     
     if ((viewer == nil) || ([rootFullpath isEqual: fixPath(@"/", 0)])) {
       NSString *app, *type;
@@ -207,7 +201,7 @@ static GWorkspace *gworkspace = nil;
 		}
     
     [viewer setViewerSelection: paths];
-		[viewer orderFrontRegardless];
+		[viewer activate];
 	} else {
 	  [self setSelectedPaths: paths];
 		[rootViewer setViewerSelection: paths];
@@ -303,7 +297,7 @@ static GWorkspace *gworkspace = nil;
 
  	    [ws getInfoForFile: spath application: &defApp type: &fileType];
 
-      if((fileType != NSPlainFileType) && (fileType != NSShellCommandFileType)) {
+      if ((fileType != NSPlainFileType) && (fileType != NSShellCommandFileType)) {
         found = YES;
       }
 
@@ -325,14 +319,32 @@ static GWorkspace *gworkspace = nil;
           canViewApps:(BOOL)viewapps
 {
   BOOL setSelection = starting ? YES : ([path isEqual: fixPath(@"/", 0)] ? YES : NO);
-	ViewersWindow *viewer = [[ViewersWindow alloc] initWithViewerTemplates: viewersTemplates
+  NSString *infoPath = [path stringByAppendingPathComponent: @".dirinfo"];
+  BOOL spatial = NO;
+  id viewer = nil;
+  
+  if ([fm fileExistsAtPath: infoPath]) {
+    NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: infoPath];
+
+    if (dict) {
+      id entry = [dict objectForKey: @"spatial"];
+      spatial = entry ? [entry boolValue] : NO;      
+    }
+  }
+
+//  if ((spatial == NO) || (starting && [path isEqual: fixPath(@"/", 0)])) {
+    viewer = [[ViewersWindow alloc] initWithViewerTemplates: viewersTemplates
                                    forPath: path viewPakages: viewapps 
                                         isRootViewer: NO onStart: setSelection];
-  [viewer activate];
-  [viewers addObject: viewer];
-  RELEASE (viewer);
-	
-	return [viewers objectAtIndex: [viewers count] -1];
+    [viewer activate];
+    [viewers addObject: viewer];
+    RELEASE (viewer);
+    
+//  } else {
+//    viewer = [vwrsManager viewerAtPath: path viewsPackages: viewapps];
+//  }
+  
+  return viewer;
 }
 
 - (NSArray *)getSelectedPaths
@@ -390,13 +402,12 @@ static GWorkspace *gworkspace = nil;
 
 + (void)initialize
 {
-	static BOOL initialized = NO;
-	
-	if (initialized == YES) {
-		return;
-  }
-	
-	initialized = YES;
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  [defaults setObject: @"GWorkspace" 
+               forKey: @"DesktopApplicationName"];
+  [defaults setObject: @"gworkspace" 
+               forKey: @"DesktopApplicationSelName"];
+  [defaults synchronize];
 }
 
 + (void)registerForServices
@@ -603,6 +614,8 @@ static GWorkspace *gworkspace = nil;
   viewersSearchPaths = [[NSMutableArray alloc] initWithCapacity: 1];
 	[self makeViewersTemplates];
 
+  vwrsManager = [GWViewersManager viewersManager];
+
   rootViewer = nil;
   [self showViewer: nil];
   
@@ -792,7 +805,7 @@ static GWorkspace *gworkspace = nil;
   return rootViewer;
 }
 
-- (ViewersWindow *)viewerRootedAtPath:(NSString *)vpath
+- (id)viewerRootedAtPath:(NSString *)vpath
 {
   int i;
   
@@ -2440,7 +2453,7 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 
 - (void)showViewer:(id)sender
 {
-	if(rootViewer == nil) {
+	if (rootViewer == nil) {
     rootViewer = [[ViewersWindow alloc] initWithViewerTemplates: viewersTemplates
                                 forPath: fixPath(@"/", 0) viewPakages: NO  
                                             isRootViewer: YES onStart: starting];
@@ -2872,12 +2885,56 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
   }
 }
 
-#ifndef GNUSTEP
-- (void)terminate:(id)sender
+
+//
+// DesktopApplication protocol
+//
+- (void)selectionChanged:(NSArray *)newsel
 {
-  [NSApp terminate: self];
+  [self setSelectedPaths: newsel];
 }
-#endif
+
+- (void)openSelectionInNewViewer:(BOOL)newv
+{
+  if (selectedPaths && [selectedPaths count]) {
+    [self openSelectedPaths: selectedPaths newViewer: newv];
+  }  
+}
+
+- (void)openSelectionWithApp:(id)sender
+{
+  NSString *appName = (NSString *)[sender representedObject];
+    
+  if (selectedPaths && [selectedPaths count]) {
+    int i;
+    
+    for (i = 0; i < [selectedPaths count]; i++) {
+      [ws openFile: [selectedPaths objectAtIndex: i] withApplication: appName];
+    }
+  }
+}
+
+- (void)performFileOperation:(NSDictionary *)opinfo
+{
+  [self performFileOperationWithDictionary: opinfo];
+}
+
+- (void)concludeRemoteFilesDragOperation:(NSData *)opinfo
+                             atLocalPath:(NSString *)localdest
+{
+
+}
+
+// - (void)addWatcherForPath:(NSString *)path // already in GWProtocol
+
+// - (void)removeWatcherForPath:(NSString *)path // already in GWProtocol
+
+// - (NSString *)trashPath // already in GWProtocol
+
+- (id)workspaceApplication
+{
+  return [GWorkspace gworkspace];
+}
 
 @end
 

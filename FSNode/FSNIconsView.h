@@ -39,6 +39,7 @@
 {
   FSNode *node;
   NSString *infoPath;
+  NSMutableDictionary *nodeInfo;
   NSMutableArray *icons;
   FSNInfoType infoType;
   NSString *extInfoType;
