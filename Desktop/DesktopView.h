@@ -48,7 +48,6 @@ typedef enum BackImageStyle {
   NSString *infoPath;
   NSMutableDictionary *nodeInfo;
   NSMutableArray *icons;
-  NSMutableArray *mountedVolumes;
 
   NSImage *verticalImage;
   NSImage *horizontalImage;
@@ -95,6 +94,12 @@ typedef enum BackImageStyle {
 - (void)fileSystemDidChange:(NSDictionary *)info;
 
 - (void)watchedPathDidChange:(NSDictionary *)info;
+
+- (void)newVolumeMountedAtPath:(NSString *)vpath;
+
+- (void)workspaceWillUnmountVolumeAtPath:(NSString *)vpath;
+
+- (void)workspaceDidUnmountVolumeAtPath:(NSString *)vpath;
 
 - (void)showMountedVolumes;
 
@@ -153,8 +158,6 @@ typedef enum BackImageStyle {
 @interface DesktopView (IconNameEditing)
 
 - (void)updateNameEditor;
-
-- (void)editorAction:(id)sender;
 
 - (void)controlTextDidChange:(NSNotification *)aNotification;
 

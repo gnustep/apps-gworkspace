@@ -169,6 +169,14 @@ typedef enum DockPosition {
 
 - (void)fileSystemDidChange:(NSNotification *)notif;
 
+- (void)watchedPathDidChange:(NSData *)dirinfo;
+
+- (void)newVolumeMounted:(NSNotification *)notif;
+
+- (void)mountedVolumeWillUnmount:(NSNotification *)notif;
+
+- (void)mountedVolumeDidUnmount:(NSNotification *)notif;
+
 - (void)createTrashPath;
 
 - (void)updateDefaults;

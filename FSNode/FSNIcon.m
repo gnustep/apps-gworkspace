@@ -980,8 +980,10 @@ static NSFont *labelFont = nil;
 
 - (void)mouseDown:(NSEvent*)theEvent
 {
-	[self setAlignment: NSLeftTextAlignment];
-  [[self window] makeFirstResponder: self];
+  if ([self isEditable]) {
+	  [self setAlignment: NSLeftTextAlignment];
+    [[self window] makeFirstResponder: self];
+  }
   [super mouseDown: theEvent];
 }
 

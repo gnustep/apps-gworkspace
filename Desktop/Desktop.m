@@ -32,6 +32,7 @@
 #include "Dialogs/StartAppWin.h"
 #include "FSNode.h"
 #include "FSNodeRep.h"
+#include "FSNFunctions.h"
 #include "GNUstep.h"
 
 #define CHECKSIZE(sz) \
@@ -67,6 +68,7 @@ static Desktop *desktop = nil;
     DESTROY (fswatcher);
   }
   [[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
+  [[ws notificationCenter] removeObserver: self];
   DESTROY (workspaceApplication);
   DESTROY (inspectorApp);
   DESTROY (operationsApp);
@@ -153,29 +155,20 @@ static Desktop *desktop = nil;
                 					  name: @"GWFileSystemDidChangeNotification"
                 					object: nil];
 
+  [[ws notificationCenter] addObserver: self 
+                				selector: @selector(newVolumeMounted:) 
+                					  name: NSWorkspaceDidMountNotification
+                					object: nil];
 
+  [[ws notificationCenter] addObserver: self 
+                				selector: @selector(mountedVolumeWillUnmount:) 
+                					  name: NSWorkspaceWillUnmountNotification
+                					object: nil];
 
-
-
-
-
-
-
-
-
-      // CREARE LE ICONE DEI DISCHI IN DesktopView (NON QUA!)
-      // CREARE UNA CLASSE, DesktopViewIcon, subclass of FSNIcon
-      // CON UN METHOD -showMountedVolumes 
-      // QUA, PRIMA DI -showContentsOfNode, USARE -showMountedVolumes
-
-      // da qualche parte si deve pollare mtab con fswatcher !!!!!!!!!!
-
-      // FSNodeRep deve avere le icone per i dischi !!!!!!!!!!!!!!!!!
-
-
-      // NON deletare o duplicare o renomare o muovere le icone dei dischi!!!
-
-
+  [[ws notificationCenter] addObserver: self 
+                				selector: @selector(mountedVolumeDidUnmount:) 
+                					  name: NSWorkspaceDidUnmountNotification
+                					object: nil];
 }
 
 - (BOOL)applicationShouldTerminate:(NSApplication *)app 
@@ -729,6 +722,58 @@ static Desktop *desktop = nil;
   [dock fileSystemDidChange: dict];  
 }
 
+- (void)watchedPathDidChange:(NSData *)dirinfo
+{
+  NSDictionary *info = [NSUnarchiver unarchiveObjectWithData: dirinfo];
+  NSString *path = [info objectForKey: @"path"];
+  NSString *event = [info objectForKey: @"event"];
+  
+  if ([event isEqual: @"GWWatchedDirectoryDeleted"]) {
+    if ([path isEqual: [desktopDir path]]) {
+      NSRunAlertPanel(nil, 
+                      NSLocalizedString(@"The Desktop directory has been deleted! Quiting now!", @""), 
+                      NSLocalizedString(@"OK", @""), 
+                      nil, 
+                      nil);                                     
+      [NSApp terminate: self];
+    }
+    
+  } else if ([event isEqual: @"GWWatchedFileModified"]) {
+    [[self desktopView] watchedPathDidChange: info];
+    
+  } else if ([path isEqual: [desktopDir path]]) {
+    [[self desktopView] watchedPathDidChange: info];
+  }    
+
+  [dock watchedPathDidChange: info];  
+}
+
+- (void)newVolumeMounted:(NSNotification *)notif
+{
+  NSDictionary *dict = [notif userInfo];  
+  NSString *volpath = [dict objectForKey: @"NSDevicePath"];
+
+  [[self desktopView] newVolumeMountedAtPath: volpath];
+}
+
+- (void)mountedVolumeWillUnmount:(NSNotification *)notif
+{
+  NSDictionary *dict = [notif userInfo];  
+  NSString *volpath = [dict objectForKey: @"NSDevicePath"];
+
+  [FSNodeRep lockPaths: [NSArray arrayWithObject: volpath]];
+  [[self desktopView] workspaceWillUnmountVolumeAtPath: volpath];
+}
+
+- (void)mountedVolumeDidUnmount:(NSNotification *)notif
+{
+  NSDictionary *dict = [notif userInfo];  
+  NSString *volpath = [dict objectForKey: @"NSDevicePath"];
+
+  [FSNodeRep unlockPaths: [NSArray arrayWithObject: volpath]];
+  [[self desktopView] workspaceDidUnmountVolumeAtPath: volpath];
+}
+
 - (void)createTrashPath
 {
 	NSString *basePath, *tpath; 
@@ -775,32 +820,6 @@ static Desktop *desktop = nil;
   [dock updateDefaults];
   [[win desktopView] updateDefaults];
   [preferences updateDefaults];
-}
-
-//
-// FSWClientProtocol
-//
-- (void)watchedPathDidChange:(NSData *)dirinfo
-{
-  NSDictionary *info = [NSUnarchiver unarchiveObjectWithData: dirinfo];
-  NSString *path = [info objectForKey: @"path"];
-  NSString *event = [info objectForKey: @"event"];
-  
-  if ([event isEqual: @"GWWatchedDirectoryDeleted"]) {
-    if ([path isEqual: [desktopDir path]]) {
-      NSRunAlertPanel(nil, 
-                      NSLocalizedString(@"The Desktop directory has been deleted! Quiting now!", @""), 
-                      NSLocalizedString(@"OK", @""), 
-                      nil, 
-                      nil);                                     
-      [NSApp terminate: self];
-    }
-    
-  } else if ([path isEqual: [desktopDir path]]) {
-    [[self desktopView] watchedPathDidChange: info];
-  }
-
-  [dock watchedPathDidChange: info];  
 }
 
 
@@ -917,8 +936,21 @@ static Desktop *desktop = nil;
 
 - (void)duplicateFiles:(id)sender
 {
-  NSArray *selpaths = [[win desktopView] selectedPaths];
+  NSMutableArray *selpaths = [[[win desktopView] selectedPaths] mutableCopy];
+  int count = [selpaths count];
+  int i;
+  
+  for (i = 0; i < count; i++) {
+    NSString *spath = [selpaths objectAtIndex: i];
+    FSNode *node = [FSNode nodeWithRelativePath: spath parent: nil];
     
+    if ([node isMountPoint] || [spath isEqual: path_separator()]) {
+      [selpaths removeObject: spath];
+      count--;
+      i--;
+    }
+  }
+  
   if ([selpaths count]) {
     NSString *desktopPath = [desktopDir path];
     NSMutableArray *files = [NSMutableArray array];
@@ -937,11 +969,26 @@ static Desktop *desktop = nil;
 
     [self performFileOperation: opinfo];
   }
+  
+  RELEASE (selpaths);
 }
 
 - (void)moveToTrash:(id)sender
 {
-  NSArray *selpaths = [[win desktopView] selectedPaths];
+  NSMutableArray *selpaths = [[[win desktopView] selectedPaths] mutableCopy];
+  int count = [selpaths count];
+  int i;
+  
+  for (i = 0; i < count; i++) {
+    NSString *spath = [selpaths objectAtIndex: i];
+    FSNode *node = [FSNode nodeWithRelativePath: spath parent: nil];
+    
+    if ([node isMountPoint] || [spath isEqual: path_separator()]) {
+      [selpaths removeObject: spath];
+      count--;
+      i--;
+    }
+  }
     
   if ([selpaths count]) {
     NSString *desktopPath = [desktopDir path];
@@ -961,6 +1008,8 @@ static Desktop *desktop = nil;
 
     [self performFileOperation: opinfo];
   }
+  
+  RELEASE (selpaths);
 }
 
 - (void)emptyTrash:(id)sender
@@ -1348,7 +1397,7 @@ static Desktop *desktop = nil;
          return NO;
       } else {
         userinfo = [NSDictionary dictionaryWithObject: media 
-                                                forKey: @"NSDevicePath"];
+                                               forKey: @"NSDevicePath"];
 
         [[self notificationCenter] postNotificationName: NSWorkspaceDidMountNotification
                                   object: self

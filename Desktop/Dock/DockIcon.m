@@ -516,7 +516,7 @@ x += 6; \
       [self select]; 
       return NSDragOperationAll;
       
-    } else if (isTrashIcon) {    
+    } else if (isTrashIcon) {
       isDragTarget = YES;  
       [self select];
       return NSDragOperationAll;
@@ -601,20 +601,34 @@ x += 6; \
       }
 
     } else if (isTrashIcon) {
+      NSArray *vpaths = [ws mountedLocalVolumePaths];
       NSMutableArray *files = [NSMutableArray array];
+      NSMutableArray *umountPaths = [NSMutableArray array];
       NSMutableDictionary *opinfo = [NSMutableDictionary dictionary];
 
       for (i = 0; i < [sourcePaths count]; i++) {
-        [files addObject: [[sourcePaths objectAtIndex: i] lastPathComponent]];
+        NSString *srcpath = [sourcePaths objectAtIndex: i];
+      
+        if ([vpaths containsObject: srcpath]) {
+          [umountPaths addObject: srcpath];
+        } else {
+          [files addObject: [srcpath lastPathComponent]];
+        }
       }
       
-      [opinfo setObject: @"NSWorkspaceRecycleOperation" forKey: @"operation"];
-      [opinfo setObject: [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent]
-                 forKey: @"source"];
-      [opinfo setObject: [node path] forKey: @"destination"];
-      [opinfo setObject: files forKey: @"files"];
+      for (i = 0; i < [umountPaths count]; i++) {
+        [ws unmountAndEjectDeviceAtPath: [umountPaths objectAtIndex: i]];
+      }
+      
+      if ([files count]) {
+        [opinfo setObject: @"NSWorkspaceRecycleOperation" forKey: @"operation"];
+        [opinfo setObject: [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent]
+                   forKey: @"source"];
+        [opinfo setObject: [node path] forKey: @"destination"];
+        [opinfo setObject: files forKey: @"files"];
 
-      [desktopApp performFileOperation: opinfo];
+        [desktopApp performFileOperation: opinfo];
+      }
     }
   }
 }

@@ -71,7 +71,6 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
   TEST_RELEASE (infoPath);
   TEST_RELEASE (nodeInfo);
   RELEASE (icons);
-  RELEASE (mountedVolumes);
   RELEASE (nameEditor);
   RELEASE (horizontalImage);
   RELEASE (verticalImage);
@@ -173,13 +172,9 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
     [self makeIconsGrid];
 
     icons = [NSMutableArray new];
-    
-    mountedVolumes = [NSMutableArray new];
-    
+        
     nameEditor = [FSNIconNameEditor new];
     [nameEditor setDelegate: self];  
-//    [nameEditor setTarget: self]; 
-//    [nameEditor setAction: @selector(editorAction:)];  
 		[nameEditor setFont: [FSNIcon labelFont]];
 		[nameEditor setBezeled: NO];
 		[nameEditor setAlignment: NSCenterTextAlignment];
@@ -325,11 +320,50 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
         [self addRepForSubnodePath: fpath];
       }
     }
-  }
+    
+  } else if ([event isEqual: @"GWWatchedFileModified"]) {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString *mtabpath = [defaults stringForKey: @"GSMtabPath"];
 
+    if (mtabpath == nil) {
+      mtabpath = @"/etc/mtab";
+    }
+  
+    fpath = [info objectForKey: @"path"];
+  
+    if ([fpath isEqual: mtabpath]) {
+      [self showMountedVolumes];
+    }
+  }
+  
   [self tile];
   [self setNeedsDisplay: YES];
   [self selectionDidChange];
+}
+
+- (void)newVolumeMountedAtPath:(NSString *)vpath
+{
+  FSNode *vnode = [FSNode nodeWithRelativePath: vpath parent: nil];
+
+  [vnode setMountPoint: YES];
+  [self removeRepOfSubnode: vnode];
+  [self addRepForSubnode: vnode]; 
+  [self tile];
+}
+
+- (void)workspaceWillUnmountVolumeAtPath:(NSString *)vpath
+{
+  [self checkLockedReps];
+}
+
+- (void)workspaceDidUnmountVolumeAtPath:(NSString *)vpath
+{
+  FSNIcon *icon = [self repOfSubnodePath: vpath];
+   
+  if (icon) {
+    [self removeRep: icon];
+    [self tile];
+  }
 }
 
 - (void)readNodeInfo
@@ -370,28 +404,39 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
 
 - (void)showMountedVolumes
 {
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  NSString *mtabpath = [defaults stringForKey: @"GSMtabPath"];
   NSArray *vpaths = [[NSWorkspace sharedWorkspace] mountedLocalVolumePaths];
+  int count = [icons count];
   int i;
 
-  DESTROY (mountedVolumes);
-  mountedVolumes = [vpaths mutableCopy];
+  if (mtabpath == nil) {
+    mtabpath = @"/etc/mtab";
+  }
+
+  [desktop removeWatcherForPath: mtabpath];
+
+  for (i = 0; i < count; i++) {
+    FSNIcon *icon = [icons objectAtIndex: i];
   
-  for (i = 0; i < [mountedVolumes count]; i++) {
-    NSString *vpath = [mountedVolumes objectAtIndex: i];
+    if ([[icon node] isMountPoint]) {
+      [self removeRep: icon];
+      count--;
+      i--;
+    }
+  }
+
+  for (i = 0; i < [vpaths count]; i++) {
+    NSString *vpath = [vpaths objectAtIndex: i];
     FSNode *vnode = [FSNode nodeWithRelativePath: vpath parent: nil];
   
     [vnode setMountPoint: YES];
     [self addRepForSubnode: vnode];
   }
   
-/*
-- (NSArray *)mountedRemovableMedia;
-
-- (NSArray *)mountNewRemovableMedia;
-
-- (BOOL)unmountAndEjectDeviceAtPath:(NSString *)path;
-*/
-
+  [self tile];  
+  
+  [desktop addWatcherForPath: mtabpath];
 }
 
 - (void)dockPositionDidChange
@@ -999,12 +1044,12 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
   for (i = 0; i < count; i++) {
     FSNIcon *icon = [icons objectAtIndex: i];
   
-    if ([mountedVolumes containsObject: [[icon node] path]] == NO) {
+    if ([[icon node] isMountPoint] == NO) {
       [icon removeFromSuperview];
       [icons removeObject: icon]; 
       count--;
       i--;
-    }    
+    }
   }
    
   if (node) {
@@ -1331,7 +1376,6 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
 	NSPasteboard *pb;
   NSDragOperation sourceDragMask;
 	NSArray *sourcePaths;
-	NSString *fromPath;
   NSString *nodePath;
   NSString *prePath;
 	int count;
@@ -1357,13 +1401,29 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
 	if (count == 0) {
 		return NSDragOperationNone;
   } 
+    
+  dragLocalIcon = YES;    
+    
+  for (i = 0; i < [sourcePaths count]; i++) {
+    NSString *srcpath = [sourcePaths objectAtIndex: i];
+  
+    if ([self repOfSubnodePath: srcpath] == nil) {
+      dragLocalIcon = NO;
+    }
+  }    
+    
+  if (dragLocalIcon) {  
+    isDragTarget = YES;	
+    dragPoint = NSZeroPoint;
+    DESTROY (dragIcon);
+    insertIndex = -1;
+    return NSDragOperationAll;
+  }
 
   if ([node isWritable] == NO) {
     return NSDragOperationNone;
   }
     
-	fromPath = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
-
   nodePath = [node path];
 
   if ([sourcePaths containsObject: nodePath]) {
@@ -1374,9 +1434,6 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
 
   while (1) {
     if ([sourcePaths containsObject: prePath]) {
-    
-    NSLog(@"QUA 2!!! %@", prePath);
-    
       return NSDragOperationNone;
     }
     if ([prePath isEqual: path_separator()]) {
@@ -1389,30 +1446,7 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
   dragPoint = NSZeroPoint;
   DESTROY (dragIcon);
   insertIndex = -1;
-  
-  
-  
-//  dragLocalIcon = NO;
-  
-  for (i = 0; i < [sourcePaths count]; i++) {
-    NSString *srcpath = [sourcePaths objectAtIndex: i];
-  
-  
-  
-  }
-  
-//  if ([sourcePaths count]
-  
-  
-  dragLocalIcon = ([nodePath isEqual: fromPath]);
-  
-  
-  
-  // SE SONO SOLO MOUNT POINTS
-  // SE C'E' UN MOUNT POINT  
-  
-  
-  
+    
 	sourceDragMask = [sender draggingSourceOperationMask];
 
 	if (sourceDragMask == NSDragOperationCopy) {
@@ -1423,14 +1457,23 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
 		return NSDragOperationAll;
 	}		
 
+  isDragTarget = NO;	
   return NSDragOperationNone;
 }
 
 - (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
 {
-  NSDragOperation sourceDragMask = [sender draggingSourceOperationMask];
-  NSPoint dpoint = [sender draggingLocation];
-  int index = [self indexOfGridRectContainingPoint: dpoint];
+  NSDragOperation sourceDragMask;
+  NSPoint dpoint;
+  int index;
+
+	if (isDragTarget == NO) {
+		return NSDragOperationNone;
+	}
+  
+  sourceDragMask = [sender draggingSourceOperationMask];
+  dpoint = [sender draggingLocation];
+  index = [self indexOfGridRectContainingPoint: dpoint];
   
   if ((index != -1) && ([self isFreeGridIndex: index])) {
     NSImage *img = [sender draggedImage];
@@ -1459,7 +1502,6 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
     }
     
     insertIndex = index;
-    isDragTarget = YES;
     
   } else {
     DESTROY (dragIcon);
@@ -1467,12 +1509,10 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
       [self setNeedsDisplayInRect: grid[insertIndex]];
     }
     insertIndex = -1;
-    isDragTarget = NO;
+    return NSDragOperationNone;
   }
   
-  if (isDragTarget == NO) {
-    return NSDragOperationNone;
-  } else if (sourceDragMask == NSDragOperationCopy) {
+  if (sourceDragMask == NSDragOperationCopy) {
 		return NSDragOperationCopy;
 	} else if (sourceDragMask == NSDragOperationLink) {
 		return NSDragOperationLink;
@@ -1526,11 +1566,12 @@ int sortDragged(id icn1, id icn2, void *context)
 {
 	NSPasteboard *pb;
   NSDragOperation sourceDragMask;
-	NSArray *sourcePaths;
+	NSMutableArray *sourcePaths;
   NSString *operation, *source;
   NSMutableArray *files;
 	NSMutableDictionary *opDict;
 	NSString *trashPath;
+  int count;
   int i;
 
   DESTROY (dragIcon);
@@ -1550,8 +1591,9 @@ int sortDragged(id icn1, id icn2, void *context)
     return;
   }
     
-  sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
-
+  sourcePaths = [[pb propertyListForType: NSFilenamesPboardType] mutableCopy];
+  AUTORELEASE (sourcePaths);
+  
   if (dragLocalIcon && (insertIndex != -1)) {
     NSMutableArray *removed = [NSMutableArray array];
     NSArray *sorted = nil;
@@ -1625,6 +1667,23 @@ int sortDragged(id icn1, id icn2, void *context)
     return;
   }
 
+  count = [sourcePaths count];
+
+  for (i = 0; i < count; i++) {
+    NSString *srcpath = [sourcePaths objectAtIndex: i];
+    FSNIcon *icon = [self repOfSubnodePath: srcpath];
+    
+    if (icon && [[icon node] isMountPoint]) {
+      [sourcePaths removeObject: srcpath];
+      count--;
+      i--;
+    }
+  }    
+  
+  if ([sourcePaths count] == 0) {
+    return;
+  }
+  
   source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
   
   trashPath = [desktop trashPath];
@@ -1686,6 +1745,7 @@ int sortDragged(id icn1, id icn2, void *context)
   if (editIcon) {
     FSNode *iconnode = [editIcon node];
     BOOL locked = [editIcon isLocked];
+    BOOL mpoint = [iconnode isMountPoint];
     NSRect icnr = [editIcon frame];
     NSRect labr = [editIcon labelRect];
     int ipos = [editIcon iconPosition];
@@ -1741,14 +1801,10 @@ int sortDragged(id icn1, id icn2, void *context)
       [nameEditor setTextColor: [NSColor disabledControlTextColor]];    
     }
 
-    [nameEditor setEditable: (locked == NO)];
-    [nameEditor setSelectable: (locked == NO)];	
+    [nameEditor setEditable: ((locked == NO) && (mpoint == NO))];
+    [nameEditor setSelectable: ((locked == NO) && (mpoint == NO))];	
     [self addSubview: nameEditor];
   }
-}
-
-- (void)editorAction:(id)sender
-{
 }
 
 - (void)controlTextDidChange:(NSNotification *)aNotification
