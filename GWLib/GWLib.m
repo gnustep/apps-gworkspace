@@ -541,7 +541,7 @@ id instance = nil;
   
   [self removeCachedRepresentationForPath: path];
   
-	[[NSNotificationCenter defaultCenter]
+	[[NSDistributedNotificationCenter defaultCenter]
  				 postNotificationName: GWSortTypeDidChangeNotification
 	 								     object: (id)path];  
 }
@@ -559,7 +559,7 @@ id instance = nil;
 	  
     [self clearCache];
       
-		[[NSNotificationCenter defaultCenter]
+		[[NSDistributedNotificationCenter defaultCenter]
 	 				 postNotificationName: GWSortTypeDidChangeNotification
 		 								     object: nil]; 
 	}
@@ -604,7 +604,7 @@ id instance = nil;
 
     hideSysFiles = hideDot;
 
-    [[NSNotificationCenter defaultCenter]
+    [[NSDistributedNotificationCenter defaultCenter]
 	 		 postNotificationName: GWSortTypeDidChangeNotification
 		 								 object: nil];  
   }

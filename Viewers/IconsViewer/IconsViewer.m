@@ -174,6 +174,11 @@
                 					  name: GWSortTypeDidChangeNotification
                 					object: nil];
 
+  [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
+                				selector: @selector(sortTypeDidChange:) 
+                					  name: GWSortTypeDidChangeNotification
+                					object: nil];
+
 	if (watchedPaths != nil) {
 		[self unsetWatchers];
 		DESTROY (watchedPaths);

@@ -196,11 +196,7 @@
 - (void)displayLastPath:(BOOL)forced
 {
   if (currentPath) {
-    if (currentPath) {
-      [self displayPath: currentPath];
-    } else {
-      [inspector contentsReadyAt: currentPath];
-    }
+    [self displayPath: currentPath];
   }
 }
 
