@@ -243,7 +243,7 @@
           }
 
           if (startdnd) {  
-            [self startExternalDragOnEvent: nextEvent];    
+            [self startExternalDragOnEvent: theEvent];    
           } 
                         
         } else {
@@ -290,14 +290,14 @@
 		
   if ([selectedCells count] > 1) {
     dragIcon = [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: iconSize];
-  
   } else {
     FSNode *node = [[selectedCells objectAtIndex: 0] node];
-  
     dragIcon = [[FSNodeRep sharedInstance] iconOfSize: iconSize forNode: node];
   }   
 
   dragPoint = [self convertPoint: dragPoint fromView: nil];
+  dragPoint.x -= (iconSize / 2);
+  dragPoint.y += (iconSize / 2);
 
   [self dragImage: dragIcon
                at: dragPoint 

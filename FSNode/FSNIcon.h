@@ -114,7 +114,8 @@
 
 @interface FSNIcon (DraggingSource)
 
-- (void)startExternalDragOnEvent:(NSEvent *)event;
+- (void)startExternalDragOnEvent:(NSEvent *)event
+                 withMouseOffset:(NSSize)offset;
 
 - (unsigned int)draggingSourceOperationMaskForLocal:(BOOL)flag;
 

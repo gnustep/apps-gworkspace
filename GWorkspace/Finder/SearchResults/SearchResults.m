@@ -1070,7 +1070,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
     }
 
     if (startdnd == YES) {  
-      [self startExternalDragOnEvent: nextEvent];    
+      [self startExternalDragOnEvent: theEvent];    
     } 
   }              
 }
@@ -1084,7 +1084,6 @@ static NSString *lsfname = @"LiveSearch.lsf";
 
 - (void)startExternalDragOnEvent:(NSEvent *)event
 {
-  NSPoint dragPoint = [event locationInWindow];
   NSPasteboard *pb = [NSPasteboard pasteboardWithName: NSDragPboard];	
   NSArray *dndtypes = [NSArray arrayWithObject: @"GWLSFolderPboardType"];
   NSMutableDictionary *pbDict = [NSMutableDictionary dictionary];
@@ -1101,7 +1100,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
   [pb setData: pbData forType: @"GWLSFolderPboardType"];
 
   [self dragImage: icon
-               at: [self convertPoint: dragPoint fromView: nil] 
+               at: NSZeroPoint 
            offset: NSZeroSize
             event: event
        pasteboard: pb

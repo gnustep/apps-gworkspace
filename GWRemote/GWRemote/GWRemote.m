@@ -34,7 +34,6 @@
 #include "Functions.h"
 #include "Notifications.h"
 #include "GNUstep.h"
-#include <GWorkspace/GWProtocol.h>
 
 static GWRemote *gwremote = nil;
 

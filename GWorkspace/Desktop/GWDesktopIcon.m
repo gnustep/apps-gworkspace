@@ -31,17 +31,17 @@
 - (void)mouseDown:(NSEvent *)theEvent
 {
   NSPoint location = [theEvent locationInWindow];
+  NSPoint selfloc = [self convertPoint: location fromView: nil];
   BOOL onself = NO;
 	NSEvent *nextEvent = nil;
   BOOL startdnd = NO;
-
-  location = [self convertPoint: location fromView: nil];
+  NSSize offset;
 
   if (icnPosition == NSImageOnly) {
-    onself = [self mouse: location inRect: icnBounds];
+    onself = [self mouse: selfloc inRect: icnBounds];
   } else {
-    onself = ([self mouse: location inRect: icnBounds]
-                        || [self mouse: location inRect: labelRect]);
+    onself = ([self mouse: selfloc inRect: icnBounds]
+                        || [self mouse: selfloc inRect: labelRect]);
   }
 
   if (onself) {
@@ -76,7 +76,7 @@
 			  }
 		  }
     
-      if (dndSource) {
+      if (dndSource && [self mouse: selfloc inRect: icnBounds]) {
         while (1) {
 	        nextEvent = [[self window] nextEventMatchingMask:
     							                  NSLeftMouseUpMask | NSLeftMouseDraggedMask];
@@ -89,6 +89,8 @@
 	          if (dragdelay < 5) {
               dragdelay++;
             } else {     
+              NSPoint p = [nextEvent locationInWindow];
+              offset = NSMakeSize(p.x - location.x, p.y - location.y); 
               startdnd = YES;        
               break;
             }
@@ -98,7 +100,7 @@
       
       if (startdnd == YES) {  
         [container stopRepNameEditing];
-        [self startExternalDragOnEvent: nextEvent];    
+        [self startExternalDragOnEvent: theEvent withMouseOffset: offset];   
       }
       
       editstamp = [theEvent timestamp];       

@@ -397,7 +397,7 @@
     }
 
     if (startdnd == YES) {  
-      [self startExternalDragOnEvent: nextEvent];    
+      [self startExternalDragOnEvent: theEvent];    
     } 
   }              
 }
@@ -456,28 +456,18 @@
 
 - (void)startExternalDragOnEvent:(NSEvent *)event
 {
-	NSEvent *nextEvent;
-  NSPoint dragPoint;
+  NSSize fs = [self frame].size;
+  NSSize is = [icon size];
+  NSPoint dragPoint = NSMakePoint((fs.width - is.width) / 2, (fs.height - is.height) / 2);	
   NSPasteboard *pb;
-
-	nextEvent = [[self window] nextEventMatchingMask:
-    							NSLeftMouseUpMask | NSLeftMouseDraggedMask];
-
-  if([nextEvent type] != NSLeftMouseDragged) {
-    [self unselect];
-   	return;
-  }
   
-  dragPoint = [nextEvent locationInWindow];
-  dragPoint = [self convertPoint: dragPoint fromView: nil];
-
 	pb = [NSPasteboard pasteboardWithName: NSDragPboard];	
   [self declareAndSetShapeOnPasteboard: pb];
 	      
   [self dragImage: icon
                at: dragPoint 
            offset: NSZeroSize
-            event: nextEvent
+            event: event
        pasteboard: pb
            source: self
         slideBack: YES];

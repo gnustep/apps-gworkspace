@@ -375,12 +375,13 @@
     }
 
     if (startdnd == YES) {  
-      [self startExternalDragOnEvent: nextEvent];    
+      [self startExternalDragOnEvent: theEvent withMouseOffset: NSZeroSize];
     } 
 	} 
 }
 
 - (void)startExternalDragOnEvent:(NSEvent *)event
+                 withMouseOffset:(NSSize)offset
 {
   NSPasteboard *pb = [NSPasteboard pasteboardWithName: NSDragPboard];	
   NSMutableDictionary *dict = [NSMutableDictionary dictionary];
@@ -396,13 +397,19 @@
     
   if ([pb setData: [NSArchiver archivedDataWithRootObject: dict] 
           forType: @"DockIconPboardType"]) {
+    NSPoint dragPoint = [event locationInWindow]; 
+    NSSize fs = [self frame].size; 
+ 
+    dragPoint.x -= ((fs.width - icnPoint.x) / 2);
+    dragPoint.y -= ((fs.height - icnPoint.y) / 2);
+      
     [self unselect];  
     [self setIsDndSourceIcon: YES];
     [(Dock *)container setDndSourceIcon: self];
     [(Dock *)container tile];
     
     [[self window] dragImage: dragIcon
-                          at: NSZeroPoint 
+                          at: dragPoint 
                       offset: NSZeroSize
                        event: event
                   pasteboard: pb

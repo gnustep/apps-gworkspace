@@ -501,17 +501,17 @@ static NSImage *branchImage;
 - (void)mouseDown:(NSEvent *)theEvent
 {
   NSPoint location = [theEvent locationInWindow];
+  NSPoint selfloc = [self convertPoint: location fromView: nil];
   BOOL onself = NO;
 	NSEvent *nextEvent = nil;
   BOOL startdnd = NO;
-
-  location = [self convertPoint: location fromView: nil];
+  NSSize offset;
 
   if (icnPosition == NSImageOnly) {
-    onself = [self mouse: location inRect: icnBounds];
+    onself = [self mouse: selfloc inRect: icnBounds];
   } else {
-    onself = ([self mouse: location inRect: icnBounds]
-                        || [self mouse: location inRect: labelRect]);
+    onself = ([self mouse: selfloc inRect: icnBounds]
+                        || [self mouse: selfloc inRect: labelRect]);
   }
 
   if (onself) {
@@ -563,7 +563,7 @@ static NSImage *branchImage;
         }
 		  }
     
-      if (dndSource) {
+      if (dndSource && [self mouse: selfloc inRect: icnBounds]) {
         while (1) {
 	        nextEvent = [[self window] nextEventMatchingMask:
     							                  NSLeftMouseUpMask | NSLeftMouseDraggedMask];
@@ -580,7 +580,9 @@ static NSImage *branchImage;
           } else if ([nextEvent type] == NSLeftMouseDragged) {
 	          if (dragdelay < 5) {
               dragdelay++;
-            } else {     
+            } else {    
+              NSPoint p = [nextEvent locationInWindow];
+              offset = NSMakeSize(p.x - location.x, p.y - location.y); 
               startdnd = YES;        
               break;
             }
@@ -588,11 +590,11 @@ static NSImage *branchImage;
         }
       }
       
-      if (startdnd == YES) {  
+      if (startdnd) {  
         if ([container respondsToSelector: @selector(stopRepNameEditing)]) {
           [container stopRepNameEditing];
         }
-        [self startExternalDragOnEvent: nextEvent];    
+        [self startExternalDragOnEvent: theEvent withMouseOffset: offset];
       }
       
       editstamp = [theEvent timestamp];       
@@ -1095,6 +1097,7 @@ static NSImage *branchImage;
 @implementation FSNIcon (DraggingSource)
 
 - (void)startExternalDragOnEvent:(NSEvent *)event
+                 withMouseOffset:(NSSize)offset
 {
   if ([container respondsToSelector: @selector(selectedPaths)]) {
     NSArray *selectedPaths = [container selectedPaths];
@@ -1105,7 +1108,6 @@ static NSImage *branchImage;
 
     if ([pb setPropertyList: selectedPaths forType: NSFilenamesPboardType]) {
       NSImage *dragIcon;
-      NSPoint dragPoint;
 
       if ([selectedPaths count] == 1) {
         dragIcon = icon;
@@ -1113,12 +1115,9 @@ static NSImage *branchImage;
         dragIcon = [fsnodeRep multipleSelectionIconOfSize: iconSize];
       }     
 
-      dragPoint = [event locationInWindow];      
-      dragPoint = [self convertPoint: dragPoint fromView: nil];
-
       [self dragImage: dragIcon
-                   at: dragPoint 
-               offset: NSZeroSize
+                   at: icnPoint
+               offset: offset
                 event: event
            pasteboard: pb
                source: self
