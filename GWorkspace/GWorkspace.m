@@ -37,7 +37,6 @@
 #include <GWorkspace/ViewersProtocol.h>
   #endif
 #include "GWorkspace.h"
-#include "Watchers/Watcher.h"
 #include "FileOperations/FileOperation.h"
 #include "Dialogs/Dialogs.h"
 #include "Dialogs/OpenWithController.h"
@@ -58,8 +57,6 @@
 NSString *defaulteditor = @"nedit.app";
 NSString *defaultxterm = @"xterm";
 
-NSFileManager *fmanager = nil;
-
 static GWorkspace *gworkspace = nil;
 
 @implementation GWorkspace
@@ -73,7 +70,7 @@ static GWorkspace *gworkspace = nil;
 #endif
 
 #ifndef CACHED_MAX
-  #define CACHED_MAX 20;
+  #define CACHED_MAX 20
 #endif
 
 //
@@ -314,15 +311,12 @@ return [ws openFile: fullPath withApplication: appName]
 
 - (BOOL)existsAndIsDirectoryFileAtPath:(NSString *)path            
 {
-  BOOL isDir;
-  return ([fm fileExistsAtPath: path isDirectory: &isDir] && isDir);
+  return [GWLib existsAndIsDirectoryFileAtPath: path];
 }
 
 - (NSString *)typeOfFileAt:(NSString *)path
 {
-  NSString *defApp, *type;
-  [ws getInfoForFile: path application: &defApp type: &type];
-  return type;
+  return [GWLib typeOfFileAt: path];
 }
 
 - (BOOL)isWritableFileAtPath:(NSString *)path
@@ -332,151 +326,27 @@ return [ws openFile: fullPath withApplication: appName]
 
 - (BOOL)isPakageAtPath:(NSString *)path
 {
-	NSString *defApp, *type;
-	BOOL isdir;
-		
-	[ws getInfoForFile: path application: &defApp type: &type];  
-	
-	if (type == NSApplicationFileType) {
-		return YES;
-	} else if (type == NSPlainFileType) {
-	  if ((([fm fileExistsAtPath: path isDirectory: &isdir]) && isdir)) {
-		  return YES;
-	  }  
-  }
-	
-  return NO;
+  return [GWLib isPakageAtPath: path];
 }
 
 - (NSArray *)sortedDirectoryContentsAtPath:(NSString *)path
 {
-  NSMutableDictionary *contentsDict = [self cachedRepresentationForPath: path];
-  
-  if (contentsDict) {
-    return [contentsDict objectForKey: @"files"];
-    
-  } else {
-    NSArray *files = [fm directoryContentsAtPath: path];
-    int stype = [self sortTypeForDirectoryAtPath: path]; 
-    int count = [files count];
-    NSMutableArray *paths = [NSMutableArray arrayWithCapacity: count];
-    NSMutableArray *sortfiles = [NSMutableArray arrayWithCapacity: count];
-    NSArray *sortPaths = nil;
-    NSDictionary *attributes = nil;
-    NSDate *date = nil;
-    SEL appendPathCompSel = @selector(stringByAppendingPathComponent:);
-    IMP appendPathComp = [[NSString class] instanceMethodForSelector: appendPathCompSel];
-    SEL lastPathCompSel = @selector(lastPathComponent);
-    IMP lastPathComp = [[NSString class] instanceMethodForSelector: lastPathCompSel];  
-    int i;
-
-    for (i = 0; i < count; i++) {
-      NSString *s = (*appendPathComp)(path, appendPathCompSel, [files objectAtIndex: i]);
-      [paths addObject: s];
-    }
-
-    sortPaths = [paths sortedArrayUsingFunction: (int (*)(id, id, void*))comparePaths
-                                        context: (void *)stype];
-
-    for (i = 0; i < count; i++) {
-      NSString *s = (*lastPathComp)([sortPaths objectAtIndex: i], lastPathCompSel);
-      [sortfiles addObject: s];
-    }
-
-    contentsDict = [NSMutableDictionary dictionary];
-    [contentsDict setObject: [NSDate date] forKey: @"datestamp"];
-    attributes = [fm fileAttributesAtPath: path traverseLink: YES];
-    date = [attributes fileModificationDate];
-    [contentsDict setObject: date forKey: @"moddate"];
-    [contentsDict setObject: sortfiles forKey: @"files"];
-    
-    if ([cachedContents count] >= cachedMax) {
-      [self removeOlderCache];
-    }
-    
-    [self addCachedRepresentation: contentsDict ofDirectory: path];
-   
-    return sortfiles;
-  }
-  
-  return nil;
+  return [GWLib sortedDirectoryContentsAtPath: path];
 }
 
 - (NSArray *)checkHiddenFiles:(NSArray *)files atPath:(NSString *)path
 {
-  NSArray *checkedFiles;
-  NSArray *hiddenFiles;
-  NSString *h; 
-			
-	h = [path stringByAppendingPathComponent: @".hidden"];
-  if ([fm fileExistsAtPath: h]) {
-	  h = [NSString stringWithContentsOfFile: h];
-	  hiddenFiles = [h componentsSeparatedByString: @"\n"];
-	} else {
-    hiddenFiles = nil;
-  }
-	
-	if (hiddenFiles != nil  ||  hideSysFiles) {	
-		NSMutableArray *mutableFiles = AUTORELEASE ([files mutableCopy]);
-	
-		if (hiddenFiles != nil) {
-	    [mutableFiles removeObjectsInArray: hiddenFiles];
-	  }
-	
-		if (hideSysFiles) {
-	    int j = [mutableFiles count] - 1;
-	    
-	    while (j >= 0) {
-				NSString *file = (NSString *)[mutableFiles objectAtIndex: j];
-
-				if ([file hasPrefix: @"."]) {
-		    	[mutableFiles removeObjectAtIndex: j];
-		  	}
-				j--;
-			}
-	  }		
-    
-		checkedFiles = mutableFiles;
-    
-	} else {
-    checkedFiles = files;
-  }
-
-  return checkedFiles;
+  return [GWLib checkHiddenFiles: files atPath: path];
 }
 
 - (int)sortTypeForDirectoryAtPath:(NSString *)aPath
 {
-  if ([fm isWritableFileAtPath: aPath]) {
-    NSString *dictPath = [aPath stringByAppendingPathComponent: @".gwsort"];
-    
-    if ([fm fileExistsAtPath: dictPath]) {
-      NSDictionary *sortDict = [NSDictionary dictionaryWithContentsOfFile: dictPath];
-       
-      if (sortDict) {
-        return [[sortDict objectForKey: @"sort"] intValue];
-      }   
-    }
-  } 
-  
-	return defSortType;
+  return [GWLib sortTypeForDirectoryAtPath: aPath];
 }
 
 - (void)setSortType:(int)type forDirectoryAtPath:(NSString *)aPath
 {
-  if ([fm isWritableFileAtPath: aPath]) {
-    NSString *sortstr = [NSString stringWithFormat: @"%i", type];
-    NSDictionary *dict = [NSDictionary dictionaryWithObject: sortstr 
-                                                     forKey: @"sort"];
-    [dict writeToFile: [aPath stringByAppendingPathComponent: @".gwsort"] 
-           atomically: YES];
-  }
-  
-  [self removeCachedRepresentationForPath: aPath];
-  
-	[[NSNotificationCenter defaultCenter]
- 				 postNotificationName: GWSortTypeDidChangeNotification
-	 								     object: (id)aPath];  
+  [GWLib setSortType: type forDirectoryAtPath: aPath];
 }
 
 - (void)openSelectedPaths:(NSArray *)paths newViewer:(BOOL)newv
@@ -563,61 +433,22 @@ return [ws openFile: fullPath withApplication: appName]
 
 - (NSImage *)iconForFile:(NSString *)fullPath ofType:(NSString *)type
 {
-  NSImage *icon;
-	NSSize size;
-  
-  if (usesThumbnails) {
-    icon = [self thumbnailForPath: fullPath];
-    
-    if (icon) {
-      return icon;
-    }    
-  }
-
-  icon = [ws iconForFile: fullPath];
-  size = [icon size];
-  
-  if ((size.width > ICNMAX) || (size.height > ICNMAX)) {
-    NSSize newsize;
-  
-    if (size.width >= size.height) {
-      newsize.width = ICNMAX;
-      newsize.height = floor(ICNMAX * size.height / size.width + 0.5);
-    } else {
-      newsize.height = ICNMAX;
-      newsize.width  = floor(ICNMAX * size.width / size.height + 0.5);
-    }
-    
-	  [icon setScalesWhenResized: YES];
-	  [icon setSize: newsize];  
-  }
-  
-  return icon;
+  return [GWLib iconForFile: fullPath ofType: type];
 }
 
 - (NSImage *)smallIconForFile:(NSString*)aPath
 {
-	NSImage *icon = [[self iconForFile: aPath ofType: nil] copy];
-  NSSize size = [icon size];
-  [icon setScalesWhenResized: YES];
-  [icon setSize: NSMakeSize(size.width / 2, size.height / 2)];
-
-  return AUTORELEASE (icon);
+  return [GWLib smallIconForFile: aPath];
 }
 
 - (NSImage *)smallIconForFiles:(NSArray*)pathArray
 {
-	NSImage *icon = [NSImage imageNamed: @"MultipleSelection.tiff"];
-  NSSize size = [icon size];
-  [icon setScalesWhenResized: YES];
-  [icon setSize: NSMakeSize(size.width / 2, size.height / 2)];
-	
-	return icon;
+  return [GWLib smallIconForFiles: pathArray];
 }
 
 - (NSImage *)smallHighlightIcon
 {
-  return [NSImage imageNamed: @"SmallCellHighlightSmall.tiff"];
+  return [GWLib smallHighlightIcon];
 }
 
 - (NSArray *)getSelectedPaths
@@ -637,94 +468,37 @@ return [ws openFile: fullPath withApplication: appName]
 
 - (NSArray *)imageExtensions
 {
-  return [NSArray arrayWithObjects: @"tiff", @"tif", @"TIFF", @"TIF", 
-                                    @"png", @"PNG", @"jpeg", @"jpg", 
-                                    @"JPEG", @"JPG", @"gif", @"GIF", 
-                                    @"xpm", nil];
+  return [GWLib imageExtensions];
 }
 
 - (void)lockFiles:(NSArray *)files inDirectoryAtPath:(NSString *)path
 {
-	int i;
-	  
-	for (i = 0; i < [files count]; i++) {
-		NSString *file = [files objectAtIndex: i];
-		NSString *fpath = [path stringByAppendingPathComponent: file];    
-    
-		if ([lockedPaths containsObject: fpath] == NO) {
-			[lockedPaths addObject: fpath];
-		} 
-	}
+  [GWLib lockFiles: files inDirectoryAtPath: path];
 }
 
 - (void)unLockFiles:(NSArray *)files inDirectoryAtPath:(NSString *)path
 {
-	int i;
-	  
-	for (i = 0; i < [files count]; i++) {
-		NSString *file = [files objectAtIndex: i];
-		NSString *fpath = [path stringByAppendingPathComponent: file];
-	
-		if ([lockedPaths containsObject: fpath]) {
-			[lockedPaths removeObject: fpath];
-		} 
-	}
+  [GWLib unLockFiles: files inDirectoryAtPath: path];
 }
 
 - (BOOL)isLockedPath:(NSString *)path
 {
-	int i;  
-  
-	if ([lockedPaths containsObject: path]) {
-		return YES;
-	}
-	
-	for (i = 0; i < [lockedPaths count]; i++) {
-		NSString *lpath = [lockedPaths objectAtIndex: i];
-	
-    if (subPathOfPath(lpath, path)) {
-			return YES;
-		}
-	}
-	
-	return NO;
+	return [GWLib isLockedPath: path];
 }
 
 - (void)addWatcherForPath:(NSString *)path
 {
-  Watcher *watcher = [self watcherForPath: path];
-	  
-  if ((watcher != nil) && ([watcher isOld] == NO)) { 
-    [watcher addListener];   
-    return;
-  } else {
-    BOOL isdir;
-    
-    if ([fm fileExistsAtPath: path isDirectory: &isdir] && isdir) {
-		  NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval: 1.0 
-												  target: self selector: @selector(watcherTimeOut:) 
-																								  userInfo: path repeats: YES];
-		  [watchTimers addObject: timer];
-																								
-  	  watcher = [[Watcher alloc] initForWatchAtPath: path];      
-  	  [watchers addObject: watcher];
-  	  RELEASE (watcher);  
-    }
-	}
+  [GWLib addWatcherForPath: path];
 }
 
 - (void)removeWatcherForPath:(NSString *)path
 {
-  Watcher *watcher = [self watcherForPath: path];
-	
-  if ((watcher != nil) && ([watcher isOld] == NO)) {
-  	[watcher removeListener];   
-  }
+  [GWLib removeWatcherForPath: path];
 }
 
 - (BOOL)hideSysFiles
 {
-  return hideSysFiles;
+  return [GWLib hideSysFiles];
 }
 
 - (BOOL)animateChdir
@@ -789,13 +563,6 @@ return [ws openFile: fullPath withApplication: appName]
   RELEASE (openWithController);
   RELEASE (runExtController);
 	RELEASE (trashPath);
-	RELEASE (lockedPaths);
-	RELEASE (watchers);
-	RELEASE (watchTimers);
-  RELEASE (watchedPaths);
-  RELEASE (thumbnailDir);
-  TEST_RELEASE (tumbsCache);
-  RELEASE (cachedContents);
   RELEASE (operations);
   TEST_RELEASE (desktopWindow);
   TEST_RELEASE (tshelfWin);
@@ -812,12 +579,11 @@ return [ws openFile: fullPath withApplication: appName]
 	id result;
 	NSArray *keys;
 	NSMutableDictionary *viewersPrefs;
-  BOOL isdir;
+  BOOL hideSysFiles;
   int i, count;
   
 	[isa registerForServices];
   
-	fmanager = [NSFileManager defaultManager];	
   fm = [NSFileManager defaultManager];
 	ws = [NSWorkspace sharedWorkspace];
 	    
@@ -856,9 +622,9 @@ return [ws openFile: fullPath withApplication: appName]
 	result = [defaults objectForKey: @"defaultsorttype"];	
 	if (result == nil) { 
 		[defaults setObject: @"0" forKey: @"defaultsorttype"];
-		defSortType = byname;
+    [GWLib setDefSortType: byname];
 	} else {
-		defSortType = [result intValue];
+    [GWLib setDefSortType: [result intValue]];
 	}
 
   showFileOpStatus = [defaults boolForKey: @"showfopstatus"];
@@ -876,6 +642,7 @@ return [ws openFile: fullPath withApplication: appName]
       hideSysFiles = NO;
     }
   }
+  [GWLib setHideSysFiles: hideSysFiles];
   
   animateChdir = ![defaults boolForKey: @"nochdiranim"];
   animateLaunck = ![defaults boolForKey: @"nolaunchanim"];
@@ -883,19 +650,9 @@ return [ws openFile: fullPath withApplication: appName]
   
   contestualMenu = [defaults boolForKey: @"UsesContestualMenu"];
 
-  thumbnailDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
-  thumbnailDir = [thumbnailDir stringByAppendingPathComponent: @"Thumbnails"];
-  RETAIN (thumbnailDir);
-
-  if (([fm fileExistsAtPath: thumbnailDir isDirectory: &isdir] && isdir) == NO) {
-    [fm createDirectoryAtPath: thumbnailDir attributes: nil];
-  }
-
   usesThumbnails = [defaults boolForKey: @"usesthumbnails"];
-  if (usesThumbnails) {
-    [self prepareThumbnailsCache];
-  }
-  
+  [GWLib setUseThumbnails: usesThumbnails];
+
 	result = [defaults dictionaryForKey: @"viewersprefs"];
 	if (result) { 
 		viewersPrefs = [result mutableCopy];
@@ -937,9 +694,6 @@ return [ws openFile: fullPath withApplication: appName]
   [defaults setObject: viewersPaths forKey: @"viewerspaths"];
   RELEASE (viewersPaths);
   
-  watchers = [[NSMutableArray alloc] initWithCapacity: 1];	
-	watchTimers = [[NSMutableArray alloc] initWithCapacity: 1];	
-  watchedPaths = [NSMutableArray new];
 	selectedPaths = [[NSArray alloc] initWithObjects: NSHomeDirectory(), nil];
 
   operations = [NSMutableArray new];	
@@ -971,9 +725,7 @@ return [ws openFile: fullPath withApplication: appName]
   
   openWithController = [[OpenWithController alloc] init];
   runExtController = [[RunExternalController alloc] init];
-  
-	lockedPaths = [[NSMutableArray alloc] initWithCapacity: 1];
-	
+  	
   starting = YES;
   viewers = [[NSMutableArray alloc] initWithCapacity: 1];
   viewersSearchPaths = [[NSMutableArray alloc] initWithCapacity: 1];
@@ -988,15 +740,13 @@ return [ws openFile: fullPath withApplication: appName]
     [self newViewerAtPath: path 
               canViewApps: ([self isPakageAtPath: path] ? YES : NO)];
   }
-  
-  cachedContents = [NSMutableDictionary new];
-  
+    
   result = [defaults objectForKey: @"cachedmax"];
   if (result) {
-    cachedMax = [result intValue];
+    [GWLib setCachedMax: [result intValue]];
   } else {  
-    cachedMax = CACHED_MAX;
-    [defaults setObject: [NSNumber numberWithInt: cachedMax] forKey: @"cachedmax"];
+    [GWLib setCachedMax: CACHED_MAX];
+    [defaults setObject: [NSNumber numberWithInt: CACHED_MAX] forKey: @"cachedmax"];
   }  
   
 	starting = NO;
@@ -1018,11 +768,6 @@ return [ws openFile: fullPath withApplication: appName]
                 					  name: GWIconAnimationChangedNotification
                 					object: nil];
   
-  [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
-                        selector: @selector(setHideDotFiles:) 
-                					  name: GSHideDotFilesDidChangeNotification
-                					object: nil];
-
   [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
                         selector: @selector(thumbnailsDidChange:) 
                 					  name: GWThumbnailsDidChangeNotification
@@ -1242,26 +987,12 @@ return [ws openFile: fullPath withApplication: appName]
 
 - (int)defaultSortType
 {
-	return defSortType;
+	return [GWLib defSortType];
 }
 
 - (void)setDefaultSortType:(int)type
 {
-	if (defSortType == type) {
-		return;
-	} else {
-		NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-		defSortType = type;
-		[defaults setObject: [NSString stringWithFormat: @"%i", defSortType] 
-							   forKey: @"defaultsorttype"];
-		[defaults synchronize];
-	
-    [self clearCache];
-    
-		[[NSNotificationCenter defaultCenter]
-	 				 postNotificationName: GWSortTypeDidChangeNotification
-		 								     object: nil];  
-	}
+  [GWLib setDefSortType: type];
 }
 
 - (int)shelfCellsWidth
@@ -1535,10 +1266,6 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   NSDictionary *notifdict = (NSDictionary *)[notification object];
   NSString *path = [notifdict objectForKey: @"path"];
   NSArray *vpaths = [self viewersPaths];
-
-  if ([self cachedRepresentationForPath: path]) {
-    [self removeCachedRepresentationForPath: path];
-  }
   
   if ([viewersSearchPaths containsObject: path] == NO) {
     return;    
@@ -1596,22 +1323,6 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 - (void)setCurrentViewer:(ViewersWindow *)viewer
 {
   currentViewer = viewer;
-}
-
-- (void)setHideDotFiles:(NSNotification *)notif
-{
-  NSString *hideStr = (NSString *)[notif object];
-  BOOL hideDot = (BOOL)[hideStr intValue];
-  
-  if (hideSysFiles != hideDot) {
-    [self clearCache];
-
-    hideSysFiles = hideDot;
-
-    [[NSNotificationCenter defaultCenter]
-	 		 postNotificationName: GWSortTypeDidChangeNotification
-		 								 object: nil];  
-  }
 }
 
 - (void)iconAnimationChanged:(NSNotification *)notif
@@ -1809,92 +1520,6 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   return selectedPaths;
 }
 
-- (NSMutableDictionary *)cachedRepresentationForPath:(NSString *)path
-{
-  NSMutableDictionary *contents = [cachedContents objectForKey: path];
-
-  if (contents) {
-    NSDate *modDate = [contents objectForKey: @"moddate"];
-    NSDictionary *attributes = [fm fileAttributesAtPath: path 
-                                           traverseLink: YES];  
-    NSDate *date = [attributes fileModificationDate];
-
-    if ([modDate isEqualToDate: date]) {
-      return contents;
-    } else {
-      [cachedContents removeObjectForKey: path];
-    }
-  }
-   
-  return nil;
-}
-
-- (void)addCachedRepresentation:(NSDictionary *)contentsDict
-                    ofDirectory:(NSString *)path
-{
-  [cachedContents setObject: contentsDict forKey: path];
-  
-  if ([watchedPaths containsObject: path] == NO) {
-    [watchedPaths addObject: path];
-    [self addWatcherForPath: path];
-  }
-}
-
-- (void)removeCachedRepresentationForPath:(NSString *)path
-{
-  [cachedContents removeObjectForKey: path];
-  
-  if ([watchedPaths containsObject: path]) {
-    [watchedPaths removeObject: path];
-    [self removeWatcherForPath: path];
-  }
-}
-                                            
-- (void)removeOlderCache
-{
-  NSArray *keys = [cachedContents allKeys];
-  NSDate *date = [NSDate date];
-  NSString *removeKey = nil;
-  int i;
-  
-  if ([keys count]) {
-    for (i = 0; i < [keys count]; i++) {
-      NSString *key = [keys objectAtIndex: i];
-      NSDate *stamp = [[cachedContents objectForKey: key] objectForKey: @"datestamp"];
-      NSDate *d = [date earlierDate: stamp];
-      
-      if ([date isEqualToDate: d] == NO) {
-        date = d;
-        removeKey = key;
-      }
-    }
-    
-    if (removeKey == nil) {
-      removeKey = [keys objectAtIndex: 0];
-    }
-
-    [cachedContents removeObjectForKey: removeKey];
-
-    if ([watchedPaths containsObject: removeKey]) {
-      [watchedPaths removeObject: removeKey];
-      [self removeWatcherForPath: removeKey];
-    }
-  }
-}
-
-- (void)clearCache
-{
-  NSArray *keys = [cachedContents allKeys];
-  int i;
-  
-  for (i = 0; i < [keys count]; i++) {
-    [self removeWatcherForPath: [keys objectAtIndex: i]];
-  }
-
-  DESTROY (cachedContents);
-  cachedContents = [NSMutableDictionary new];
-}
-
 - (void)closeInspectors
 {
 	[inspController release];
@@ -2046,65 +1671,6 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 	return YES;
 }
 
-- (void)removeWatcher:(Watcher *)awatcher
-{
-	NSString *watchedPath = [awatcher watchedPath];
-	NSTimer *timer = [self timerForPath: watchedPath];
-
-	if (timer && [timer isValid]) {
-		[timer invalidate];
-		[watchTimers removeObject: timer];
-	}
-	
-	[watchers removeObject: awatcher];
-}
-
-- (Watcher *)watcherForPath:(NSString *)path
-{
-  int i;
-
-  for (i = 0; i < [watchers count]; i++) {
-    Watcher *watcher = [watchers objectAtIndex: i];    
-    if ([watcher isWathcingPath: path]) { 
-      return watcher;
-    }
-  }
-  
-  return nil;
-}
-
-- (NSTimer *)timerForPath:(NSString *)path
-{
-	int i;
-
-  for (i = 0; i < [watchTimers count]; i++) {
-		NSTimer *t = [watchTimers objectAtIndex: i];    
-	
-		if (([t isValid]) && ([(NSString *)[t userInfo] isEqual: path])) {
-			return t;
-		}
-	}
-	
-	return nil;
-}
-
-- (void)watcherTimeOut:(id)sender
-{
-	NSString *watchedPath = (NSString *)[sender userInfo];
-	
-	if (watchedPath != nil) {
-		Watcher *watcher = [self watcherForPath: watchedPath];
-	
-		if (watcher != nil) {
-			if ([watcher isOld]) {
-				[self removeWatcher: watcher];
-			} else {
-				[watcher watchFile];
-			}
-		}
-	}
-}
-
 - (void)setUsesThumbnails:(BOOL)value
 {
   int i;
@@ -2113,10 +1679,9 @@ NSLocalizedString(@"OK", @""), nil, nil); \
     return;
   }
   
+  [GWLib setUseThumbnails: value];
+  
   usesThumbnails = value;
-  if (usesThumbnails) {
-    [self prepareThumbnailsCache];
-  }
   
   [rootViewer thumbnailsDidChangeInPaths: nil];
   for (i = 0; i < [viewers count]; i++) {
@@ -2133,38 +1698,6 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 	}
 }
 
-- (void)prepareThumbnailsCache
-{
-  NSString *dictName = @"thumbnails.plist";
-  NSString *dictPath = [thumbnailDir stringByAppendingPathComponent: dictName];
-  NSDictionary *tdict;
-  
-  TEST_RELEASE (tumbsCache);
-  tumbsCache = [NSMutableDictionary new];
-  
-  tdict = [NSDictionary dictionaryWithContentsOfFile: dictPath];
-    
-  if (tdict) {
-    NSArray *keys = [tdict allKeys];
-    int i;
-
-    for (i = 0; i < [keys count]; i++) {
-      NSString *key = [keys objectAtIndex: i];
-      NSString *tumbname = [tdict objectForKey: key];
-      NSString *tumbpath = [thumbnailDir stringByAppendingPathComponent: tumbname]; 
-
-      if ([fm fileExistsAtPath: tumbpath]) {
-        NSImage *tumb = [[NSImage alloc] initWithContentsOfFile: tumbpath];
-        
-        if (tumb) {
-          [tumbsCache setObject: tumb forKey: key];
-          RELEASE (tumb);
-        }
-      }
-    }
-  } 
-}
-
 - (void)thumbnailsDidChange:(NSNotification *)notif
 {
   NSDictionary *info = [notif userInfo];
@@ -2175,87 +1708,71 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 
   if (usesThumbnails == NO) {
     return;
-  }
-  
-  if ([deleted count]) {
-    for (i = 0; i < [deleted count]; i++) {
-      NSString *path = [deleted objectAtIndex: i];
-      NSString *dir = [path stringByDeletingLastPathComponent];
-      
-      [tumbsCache removeObjectForKey: path];
-      
-      if ([tmbdirs containsObject: dir] == NO) {
-        [tmbdirs addObject: dir];
-      }
-    }
-    
-    [rootViewer thumbnailsDidChangeInPaths: tmbdirs];
-    for (i = 0; i < [viewers count]; i++) {
-		  [[viewers objectAtIndex: i] thumbnailsDidChangeInPaths: tmbdirs];
-	  }
-    if ((desktopWindow != nil) && ([desktopWindow isVisible])) {
-      [[desktopWindow desktopView] updateIcons]; 
-		}
-    if ((tshelfWin != nil) && ([tshelfWin isVisible])) {
-      [tshelfWin updateIcons]; 
-		}
-	  if (finder != nil) {  
-		  [finder updateIcons]; 
-	  }
-    
-    [tmbdirs removeAllObjects];
-  }
-  
-  if ([created count]) {
-    NSString *dictName = @"thumbnails.plist";
-    NSString *dictPath = [thumbnailDir stringByAppendingPathComponent: dictName];
-    NSDictionary *tdict = [NSDictionary dictionaryWithContentsOfFile: dictPath];
-  
-    for (i = 0; i < [created count]; i++) {
-      NSString *key = [created objectAtIndex: i];
-      NSString *dir = [key stringByDeletingLastPathComponent];
-      NSString *tumbname = [tdict objectForKey: key];
-      NSString *tumbpath = [thumbnailDir stringByAppendingPathComponent: tumbname]; 
+  } else {
+    NSString *thumbnailDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
 
-      if ([fm fileExistsAtPath: tumbpath]) {
-        NSImage *tumb = [[NSImage alloc] initWithContentsOfFile: tumbpath];
-        
-        if (tumb) {
-          [tumbsCache setObject: tumb forKey: key];
-          RELEASE (tumb);
-          
+    thumbnailDir = [thumbnailDir stringByAppendingPathComponent: @"Thumbnails"];
+  
+    if ([deleted count]) {
+      for (i = 0; i < [deleted count]; i++) {
+        NSString *path = [deleted objectAtIndex: i];
+        NSString *dir = [path stringByDeletingLastPathComponent];
+
+        if ([tmbdirs containsObject: dir] == NO) {
+          [tmbdirs addObject: dir];
+        }
+      }
+
+      [rootViewer thumbnailsDidChangeInPaths: tmbdirs];
+      for (i = 0; i < [viewers count]; i++) {
+		    [[viewers objectAtIndex: i] thumbnailsDidChangeInPaths: tmbdirs];
+	    }
+      if ((desktopWindow != nil) && ([desktopWindow isVisible])) {
+        [[desktopWindow desktopView] updateIcons]; 
+		  }
+      if ((tshelfWin != nil) && ([tshelfWin isVisible])) {
+        [tshelfWin updateIcons]; 
+		  }
+	    if (finder != nil) {  
+		    [finder updateIcons]; 
+	    }
+
+      [tmbdirs removeAllObjects];
+    }
+
+    if ([created count]) {
+      NSString *dictName = @"thumbnails.plist";
+      NSString *dictPath = [thumbnailDir stringByAppendingPathComponent: dictName];
+      NSDictionary *tdict = [NSDictionary dictionaryWithContentsOfFile: dictPath];
+
+      for (i = 0; i < [created count]; i++) {
+        NSString *key = [created objectAtIndex: i];
+        NSString *dir = [key stringByDeletingLastPathComponent];
+        NSString *tumbname = [tdict objectForKey: key];
+        NSString *tumbpath = [thumbnailDir stringByAppendingPathComponent: tumbname]; 
+
+        if ([fm fileExistsAtPath: tumbpath]) {        
           if ([tmbdirs containsObject: dir] == NO) {
             [tmbdirs addObject: dir];
           }
         }
       }
+
+      [rootViewer thumbnailsDidChangeInPaths: tmbdirs];
+      for (i = 0; i < [viewers count]; i++) {
+		    [[viewers objectAtIndex: i] thumbnailsDidChangeInPaths: tmbdirs];
+	    }
+      if ((desktopWindow != nil) && ([desktopWindow isVisible])) {
+        [[desktopWindow desktopView] updateIcons]; 
+		  }
+      if ((tshelfWin != nil) && ([tshelfWin isVisible])) {
+        [tshelfWin updateIcons]; 
+		  }
+	    if (finder != nil) {  
+		    [finder updateIcons]; 
+	    }
     }
-    
-    [rootViewer thumbnailsDidChangeInPaths: tmbdirs];
-    for (i = 0; i < [viewers count]; i++) {
-		  [[viewers objectAtIndex: i] thumbnailsDidChangeInPaths: tmbdirs];
-	  }
-    if ((desktopWindow != nil) && ([desktopWindow isVisible])) {
-      [[desktopWindow desktopView] updateIcons]; 
-		}
-    if ((tshelfWin != nil) && ([tshelfWin isVisible])) {
-      [tshelfWin updateIcons]; 
-		}
-	  if (finder != nil) {  
-		  [finder updateIcons]; 
-	  }
   }
-}
-
-- (NSImage *)thumbnailForPath:(NSString *)path
-{
-  if (usesThumbnails == NO) {
-    return nil;
-  } else {
-    return [tumbsCache objectForKey: path];
-  }
-
-  return nil;
 }
 
 - (id)connectApplication:(NSString *)appName

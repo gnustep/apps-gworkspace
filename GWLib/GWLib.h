@@ -32,6 +32,7 @@
   NSMutableDictionary *cachedContents;
   int cachedMax;
   int defSortType;
+  BOOL hideSysFiles;
   
   NSMutableArray *watchers;
 	NSMutableArray *watchTimers;
@@ -48,13 +49,59 @@
   NSNotificationCenter *nc;
 }
 
-+ (GWLib *)instance;
++ (NSArray *)sortedDirectoryContentsAtPath:(NSString *)path;
+
++ (NSArray *)checkHiddenFiles:(NSArray *)files atPath:(NSString *)path;
 
 + (void)setCachedMax:(int)cmax;
 
-+ (void)setDefSortType:(int)type;
++ (void)addWatcherForPath:(NSString *)path;
+
++ (void)removeWatcherForPath:(NSString *)path;
+
++ (void)lockFiles:(NSArray *)files inDirectoryAtPath:(NSString *)path;
+
++ (void)unLockFiles:(NSArray *)files inDirectoryAtPath:(NSString *)path;
 
 + (BOOL)isLockedPath:(NSString *)path;
+
++ (BOOL)existsAndIsDirectoryFileAtPath:(NSString *)path;
+
++ (NSString *)typeOfFileAt:(NSString *)path;  
+
++ (BOOL)isPakageAtPath:(NSString *)path;
+
++ (int)sortTypeForDirectoryAtPath:(NSString *)path;
+
++ (void)setSortType:(int)type forDirectoryAtPath:(NSString *)path;
+
++ (void)setDefSortType:(int)type;
+
++ (int)defSortType;
+
++ (void)setHideSysFiles:(BOOL)value;
+
++ (BOOL)hideSysFiles;
+
++ (NSImage *)iconForFile:(NSString *)fullPath ofType:(NSString *)type;
+
++ (NSImage *)smallIconForFile:(NSString*)aPath;
+
++ (NSImage *)smallIconForFiles:(NSArray*)pathArray;
+
++ (NSImage *)smallHighlightIcon;
+
++ (void)setUseThumbnails:(BOOL)value;
+
++ (NSArray *)imageExtensions;
+
+
+
+
+
+
+
+
 
 
 + (id)gworkspaceApplication;
@@ -65,12 +112,6 @@
 + (oneway void)rootViewerSelectFiles:(NSArray *)paths;
 
 + (oneway void)openSelectedPaths:(NSArray *)paths;
-
-+ (oneway void)addWatcherForPath:(NSString *)path;
-
-+ (oneway void)removeWatcherForPath:(NSString *)path;
-
-+ (BOOL)isPakageAtPath:(NSString *)path;
 
 + (oneway void)performFileOperationWithDictionary:(NSDictionary *)dict;
 

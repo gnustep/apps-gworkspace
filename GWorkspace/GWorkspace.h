@@ -49,7 +49,6 @@
 @class PrefController;
 @class FinderController;
 @class AppsViewer;
-@class Watcher;
 @class Fiend;
 @class Recycler;
 @class History;
@@ -63,13 +62,10 @@
 @interface GWorkspace : NSObject <GWProtocol>
 {
 	NSString *defEditor, *defXterm, *defXtermArgs;
-	int defSortType;
 	
   NSMutableArray *operations;
   int oprefnum;
   BOOL showFileOpStatus;
-
-	NSMutableArray *lockedPaths;
   
   InspectorsController *inspController;
 	NSArray *selectedPaths;
@@ -84,8 +80,6 @@
   NSMutableArray *viewers;
   NSMutableArray *viewersSearchPaths;
 	NSMutableArray *viewersTemplates;
-
-  BOOL hideSysFiles;
 
   BOOL animateChdir;
   BOOL animateLaunck;
@@ -103,17 +97,8 @@
 	  
   OpenWithController *openWithController;
   RunExternalController *runExtController;
-  
-  NSMutableArray *watchers;
-	NSMutableArray *watchTimers;
-  NSMutableArray *watchedPaths;  
-
-  NSMutableDictionary *tumbsCache;
-  
-  NSString *thumbnailDir;
+    
   BOOL usesThumbnails;
-  NSMutableDictionary *cachedContents;
-  int cachedMax;
 	      
   int shelfCellsWidth;
         
@@ -186,8 +171,6 @@
 
 - (void)setCurrentViewer:(ViewersWindow *)viewer;
 
-- (void)setHideDotFiles:(NSNotification *)notif;
-
 - (void)iconAnimationChanged:(NSNotification *)notif;
 
 - (BOOL)showFileOpStatus;
@@ -211,17 +194,6 @@
 
 - (NSArray *)selectedPaths;
 
-- (NSMutableDictionary *)cachedRepresentationForPath:(NSString *)path;
-
-- (void)addCachedRepresentation:(NSDictionary *)contentsDict
-                    ofDirectory:(NSString *)path;
-
-- (void)removeCachedRepresentationForPath:(NSString *)path;
-                                            
-- (void)removeOlderCache;
-
-- (void)clearCache;
-
 - (void)closeInspectors;
 
 - (void)newObjectAtPath:(NSString *)basePath isDirectory:(BOOL)directory;
@@ -232,21 +204,9 @@
 
 - (BOOL)verifyFileAtPath:(NSString *)path;
 
-- (void)removeWatcher:(Watcher *)awatcher;
-
-- (Watcher *)watcherForPath:(NSString *)path;
-
-- (NSTimer *)timerForPath:(NSString *)path;
-
-- (void)watcherTimeOut:(id)sender;
-
 - (void)setUsesThumbnails:(BOOL)value;
 
-- (void)prepareThumbnailsCache;
-
 - (void)thumbnailsDidChange:(NSNotification *)notif;
-
-- (NSImage *)thumbnailForPath:(NSString *)path;
 
 - (id)connectApplication:(NSString *)appName;
 
