@@ -163,9 +163,12 @@
 - (void)clickOnLabel
 {
 	CHECK_LOCK;
-  [self select];
+	[namelabel setBackgroundColor: [NSColor whiteColor]];
 	[namelabel setSelectable: YES];
   [namelabel setEditable: YES];
+  if (isSelect == NO) {
+    [self select];
+  }
 }
 
 - (void)setLabelFrame
@@ -374,6 +377,22 @@
 //
 // SmallIconLabel delegate methods
 //
+- (BOOL)control:(NSControl *)control 
+                textShouldBeginEditing:(NSText *)fieldEditor
+{
+  NSArray *selection = [delegate getTheCurrentSelection];
+  
+  if ([selection count] == 1) {
+    NSString *selected = [[selection objectAtIndex: 0] lastPathComponent];
+
+    if ([selected isEqual: name]) {
+      return YES;
+    } 
+  }
+  
+  return NO;
+}
+
 - (void)controlTextDidChange:(NSNotification *)aNotification
 {
   NSDictionary *info = [aNotification userInfo];

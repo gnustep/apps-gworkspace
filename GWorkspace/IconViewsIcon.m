@@ -37,6 +37,12 @@
 #include "GWorkspace.h"
 #include "GNUstep.h"
 
+#ifdef GNUSTEP 
+  #define LABEL_HEIGHT 14
+#else
+  #define LABEL_HEIGHT 14
+#endif
+
 #define CHECK_LOCK if (locked) return
 #define CHECK_LOCK_RET(x) if (locked) return x
 
@@ -73,7 +79,11 @@
 		[paths addObjectsFromArray: fpaths];
     container = acontainer;  
     labelWidth = [container cellsWidth] - 4;
-    font = [NSFont systemFontOfSize: 12];
+    #ifdef GNUSTEP 
+      font = [NSFont systemFontOfSize: 12];
+    #else
+      font = [NSFont systemFontOfSize: 11];
+    #endif
     isSelect = NO; 
     locked = NO;
     count = [paths count];                    
@@ -300,21 +310,25 @@
 
 - (void)setLabelWidth
 {
-  NSFont *font = [NSFont systemFontOfSize: 12];
+  #ifdef GNUSTEP 
+    NSFont *font = [NSFont systemFontOfSize: 12];
+  #else
+    NSFont *font = [NSFont systemFontOfSize: 11];
+  #endif
   NSRect rect = [namelabel frame];
 	NSString *nstr = isRootIcon ? hostname : name;
   
 	labelWidth = [container cellsWidth] - 8;
 	  
   if (isSelect == YES) {
-    [namelabel setFrame: NSMakeRect(0, 0, [font widthOfString: nstr] + 8, 14)];
+    [namelabel setFrame: NSMakeRect(0, 0, [font widthOfString: nstr] + 8, LABEL_HEIGHT)];
     [namelabel setStringValue: nstr];
   } else {
     int width = (int)[[namelabel font] widthOfString: nstr] + 8;
     if (width > labelWidth) {
       width = labelWidth;
     }
-    [namelabel setFrame: NSMakeRect(0, 0, width, 14)];  
+    [namelabel setFrame: NSMakeRect(0, 0, width, LABEL_HEIGHT)];  
     [namelabel setStringValue: cutFileLabelText(nstr, namelabel, width - 8)];  
   }
 
@@ -388,28 +402,11 @@
   return YES;
 }
 
-- (void)mouseUp:(NSEvent *)theEvent
-{
-	int count = [theEvent clickCount];    
-	
-	if(count > 1) {
-		unsigned int modifier = [theEvent modifierFlags];
-		
-		if (locked == NO) {		
-			[container openCurrentSelection: paths 
-                            newViewer: (modifier == NSControlKeyMask)];   
-		} else {
-			if ((type == NSDirectoryFileType) || (type == NSFilesystemFileType)) {
-				[container openCurrentSelection: paths 
-                              newViewer: (modifier == NSControlKeyMask)];   
-			}
-		}
-	}  
-}
-
 - (void)mouseDown:(NSEvent *)theEvent
 {
 	int count = [theEvent clickCount];    
+
+  CHECK_LOCK;
     
 	if(count == 1) {
 		if([theEvent modifierFlags] == 2)  {
@@ -421,24 +418,43 @@
 				[self select];
 			}
 		} else {
+	    NSEvent *nextEvent;
+      NSPoint location;
+      NSSize offset;
+      BOOL startdnd = NO;
+    
 			[container setShiftClick: NO];      
       if (isSelect == NO) {       
 				[self select];
 			}
+      
+      location = [theEvent locationInWindow];
+      
+      while (1) {
+	      nextEvent = [[self window] nextEventMatchingMask:
+    							              NSLeftMouseUpMask | NSLeftMouseDraggedMask];
+      
+        if ([nextEvent type] == NSLeftMouseUp) {
+          [self unselect];
+          break;
+        } else if ([nextEvent type] == NSLeftMouseDragged) {
+	        if(dragdelay < 5) {
+            dragdelay++;
+          } else {     
+            NSPoint p = [nextEvent locationInWindow];
+
+            offset = NSMakeSize(p.x - location.x, p.y - location.y); 
+            startdnd = YES;        
+            break;
+          }
+        }
+      }
+
+      if (startdnd == YES) {  
+        [self startExternalDragOnEvent: nextEvent withMouseOffset: offset];    
+      }    
 		}
 	}  
-}
-
-- (void)mouseDragged:(NSEvent *)theEvent
-{
-  CHECK_LOCK;
-
-	if(dragdelay < 5) {
-    dragdelay++;
-    return;
-  }
-
-  [self startExternalDragOnEvent: theEvent];
 }
 
 - (NSMenu *)menuForEvent:(NSEvent *)theEvent
@@ -533,22 +549,12 @@
 @implementation IconViewsIcon (DraggingSource)
 
 - (void)startExternalDragOnEvent:(NSEvent *)event
+                 withMouseOffset:(NSSize)offset
 {
-	NSEvent *nextEvent;
   NSPoint dragPoint;
   NSPasteboard *pb;
   NSImage *dragIcon;
   
-	nextEvent = [[self window] nextEventMatchingMask:
-    							NSLeftMouseUpMask | NSLeftMouseDraggedMask];
-
-  if([nextEvent type] != NSLeftMouseDragged) {
-   	return;
-  }
-  
-  dragPoint = [nextEvent locationInWindow];
-  dragPoint = [self convertPoint: dragPoint fromView: nil];
-
 	pb = [NSPasteboard pasteboardWithName: NSDragPboard];	
   [self declareAndSetShapeOnPasteboard: pb];
   
@@ -563,9 +569,11 @@
     dragIcon = [NSImage imageNamed: @"MultipleSelection.tiff"];
   }
 
+  ICONCENTER (self, icon, dragPoint);
+
   [self dragImage: dragIcon
                at: dragPoint 
-           offset: NSZeroSize
+           offset: offset
             event: event
        pasteboard: pb
            source: self

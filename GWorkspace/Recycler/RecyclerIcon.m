@@ -146,19 +146,42 @@
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-	if (isSelect == NO) {
-		[self select];
-	}
-}
+	if ([theEvent clickCount] == 1) {
+	  NSEvent *nextEvent;
+    NSPoint location;
+    NSSize offset;
+    BOOL startdnd = NO;
+    
+    if (isSelect == NO) {  
+      [self select];
+    }
+    
+    location = [theEvent locationInWindow];
 
-- (void)mouseDragged:(NSEvent *)theEvent
-{
-	if(dragdelay < 5) {
-    dragdelay++;
-    return;
+    while (1) {
+	    nextEvent = [[self window] nextEventMatchingMask:
+    							              NSLeftMouseUpMask | NSLeftMouseDraggedMask];
+
+      if ([nextEvent type] == NSLeftMouseUp) {
+        break;
+
+      } else if ([nextEvent type] == NSLeftMouseDragged) {
+	      if(dragdelay < 5) {
+          dragdelay++;
+        } else {     
+          NSPoint p = [nextEvent locationInWindow];
+        
+          offset = NSMakeSize(p.x - location.x, p.y - location.y); 
+          startdnd = YES;        
+          break;
+        }
+      }
+    }
+
+    if (startdnd == YES) {  
+      [self startExternalDragOnEvent: nextEvent withMouseOffset: offset];    
+    }    
   }
-
-  [self startExternalDragOnEvent: theEvent];
 }
 
 - (void)drawRect:(NSRect)rect
@@ -193,39 +216,31 @@
 @implementation RecyclerIcon (DraggingSource)
 
 - (void)startExternalDragOnEvent:(NSEvent *)event
+                 withMouseOffset:(NSSize)offset
 {
-	NSEvent *nextEvent;
-  NSPoint dragPoint;
   NSPasteboard *pb;
+  NSPoint dragPoint;
   NSString *defApp;
   NSString *type;
   NSImage *dragIcon;
   
-	nextEvent = [[self window] nextEventMatchingMask:
-    							NSLeftMouseUpMask | NSLeftMouseDraggedMask];
-
-  if([nextEvent type] != NSLeftMouseDragged) {
-   	return;
-  }
-  
-  dragPoint = [nextEvent locationInWindow];
-  dragPoint = [self convertPoint: dragPoint fromView: nil];
-
 	pb = [NSPasteboard pasteboardWithName: NSDragPboard];	
   [self declareAndSetShapeOnPasteboard: pb];
 
 	dragdelay = 0;
+  
+  ICONCENTER (self, icon, dragPoint);
 
   [ws getInfoForFile: path application: &defApp type: &type];      
 	dragIcon = [GWLib iconForFile: path ofType: type];
 	
   [self dragImage: dragIcon
                at: dragPoint 
-           offset: NSZeroSize
+           offset: offset
             event: event
        pasteboard: pb
            source: self
-        slideBack: NO];
+        slideBack: YES];
 }
 
 - (void)declareAndSetShapeOnPasteboard:(NSPasteboard *)pb

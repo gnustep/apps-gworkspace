@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #ifndef SHELF_H
 #define SHELF_H
 
@@ -33,7 +32,11 @@
 #include <GWorkspace/IconViewsProtocol.h>
   #endif
 
+  #ifdef GNUSTEP 
 #define MAXSHELFHEIGHT  300
+  #else
+#define MAXSHELFHEIGHT  240
+  #endif
 
 #ifndef max
 #define max(a,b) ((a) > (b) ? (a):(b))

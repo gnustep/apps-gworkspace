@@ -71,6 +71,15 @@ toPoint: NSMakePoint(x2, y2)]; \
 }
 #endif
 
+#ifndef ICONCENTER
+#define ICONCENTER(v, i, p) \
+{ \
+  NSSize ss = [v frame].size; \
+  NSSize is = [i size]; \
+  p = NSMakePoint((ss.width - is.width) / 2, (ss.height - is.height) / 2); \
+}
+#endif
+
 #ifndef ICNMAX
 #define ICNMAX 48
 #endif

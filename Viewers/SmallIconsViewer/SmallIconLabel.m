@@ -45,15 +45,20 @@
   return self;  
 }
 
-- (void)mouseDown:(NSEvent*)theEvent
+- (void)mouseDown:(NSEvent *)theEvent
 {
-  if ([icon isSelect] == NO) {
-    [icon clickOnLabel];
+  id iconDelegate = [icon delegate];
+  NSArray *selection = [iconDelegate getTheCurrentSelection];
+
+  if (selection && ([selection count] > 1)) { 
     return;
   }
+  
+  [icon clickOnLabel];
+  [super mouseDown: theEvent];
 }
 
-- (void)mouseDragged:(NSEvent*)theEvent
+- (void)mouseDragged:(NSEvent *)theEvent
 {
   [icon mouseDragged: theEvent];
 }

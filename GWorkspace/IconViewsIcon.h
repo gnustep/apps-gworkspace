@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #ifndef ICONVIEWSICON_H
 #define ICONVIEWSICON_H
 
@@ -33,9 +32,15 @@
 #include <GWorkspace/IconViewsProtocol.h>
   #endif
 
+  #ifdef GNUSTEP 
 #define ONICON(p, s1, s2) ([self mouse: (p) \
 inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 ((int)(s1).height - (int)(s2).height) >> 1, 48, 48)])
+  #else
+#define ONICON(p, s1, s2) ([self mouse: (p) \
+inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
+((int)(s1).height - (int)(s2).height) >> 1, 32, 32)])
+  #endif
 
 @class NSString;
 @class NSArray;
@@ -142,7 +147,8 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 
 @interface IconViewsIcon (DraggingSource)
 
-- (void)startExternalDragOnEvent:(NSEvent *)event;
+- (void)startExternalDragOnEvent:(NSEvent *)event 
+                 withMouseOffset:(NSSize)offset;
 
 - (void)declareAndSetShapeOnPasteboard:(NSPasteboard *)pb;
 

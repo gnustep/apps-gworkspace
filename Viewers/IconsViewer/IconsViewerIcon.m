@@ -241,11 +241,17 @@
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-	int count = [theEvent clickCount];    
+	NSEvent *nextEvent;
+  NSPoint location;
+  NSSize offset;
+  BOOL startdnd = NO;
 
 	CHECK_LOCK;
+
+  location = [theEvent locationInWindow];
+  location = [self convertPoint: location fromView: nil];
 	    
-	if(count == 1) {
+	if ([theEvent clickCount] == 1) {
 		if([theEvent modifierFlags] == 2)  {
 			[delegate setShiftClickValue: YES];     
 			if (isSelect == YES) {
@@ -260,9 +266,34 @@
 				[self select];
 			}
 		}
+    
+    while (1) {
+	    nextEvent = [[self window] nextEventMatchingMask:
+    							              NSLeftMouseUpMask | NSLeftMouseDraggedMask];
+
+      if ([nextEvent type] == NSLeftMouseUp) {
+        break;
+
+      } else if ([nextEvent type] == NSLeftMouseDragged) {
+	      if(dragdelay < 5) {
+          dragdelay++;
+        } else {     
+          NSPoint p = [nextEvent locationInWindow];
+        
+          offset = NSMakeSize(p.x - location.x, p.y - location.y); 
+          startdnd = YES;        
+          break;
+        }
+      }
+    }
+
+    if (startdnd == YES) {  
+      [self startExternalDragOnEvent: nextEvent withMouseOffset: offset];    
+    } 
 	}  
 }
 
+/*
 - (void)mouseDragged:(NSEvent *)theEvent
 {
   if ([fm fileExistsAtPath: path] == NO) {
@@ -274,8 +305,9 @@
     return;
   }
   
-  [self startExternalDragOnEvent: theEvent];
+  [self startExternalDragOnEvent: theEvent withMouseOffset: NSZeroSize];
 }
+*/
 
 - (NSMenu *)menuForEvent:(NSEvent *)theEvent
 {
@@ -320,6 +352,7 @@
 @implementation IconsViewerIcon (DraggingSource)
 
 - (void)startExternalDragOnEvent:(NSEvent *)event
+                 withMouseOffset:(NSSize)offset
 {
 	NSEvent *nextEvent;
   NSPoint dragPoint;

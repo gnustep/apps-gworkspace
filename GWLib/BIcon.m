@@ -392,8 +392,9 @@
 - (void)mouseDown:(NSEvent *)theEvent
 {
 	NSEvent *nextEvent;
+  NSPoint location;
+  NSSize offset;
   BOOL startdnd = NO;
-  NSPoint p;
 	
 	CHECK_LOCK;
 		
@@ -401,10 +402,10 @@
 		return;
 	}
 	
-  p = [theEvent locationInWindow];
-  p = [self convertPoint: p fromView: nil];
+  location = [theEvent locationInWindow];
+  location = [self convertPoint: location fromView: nil];
   
-  if (ONICON(p, [self frame].size, [icon size]) == NO) {    
+  if (ONICON(location, [self frame].size, [icon size]) == NO) {    
     return;  
   }
 
@@ -425,7 +426,10 @@
       } else if ([nextEvent type] == NSLeftMouseDragged) {
 	      if(dragdelay < 5) {
           dragdelay++;
-        } else {        
+        } else {     
+          NSPoint p = [nextEvent locationInWindow];
+        
+          offset = NSMakeSize(p.x - location.x, p.y - location.y); 
           startdnd = YES;        
           break;
         }
@@ -433,7 +437,7 @@
     }
 
     if (startdnd == YES) {  
-      [self startExternalDragOnEvent: nextEvent];    
+      [self startExternalDragOnEvent: nextEvent withMouseOffset: offset];    
     } 
   }              
 }
@@ -566,29 +570,19 @@ active. preventWindowOrdering is sent automatically by NSView's dragImage:... an
 @implementation BIcon (DraggingSource)
 
 - (void)startExternalDragOnEvent:(NSEvent *)event
+                 withMouseOffset:(NSSize)offset
 {
-	NSEvent *nextEvent;
+  NSPasteboard *pb = [NSPasteboard pasteboardWithName: NSDragPboard];	
   NSPoint dragPoint;
-  NSPasteboard *pb;
 
-	nextEvent = [[self window] nextEventMatchingMask:
-    							NSLeftMouseUpMask | NSLeftMouseDraggedMask];
-
-  if([nextEvent type] != NSLeftMouseDragged) {
-    [self unselect];
-   	return;
-  }
-  
-  dragPoint = [nextEvent locationInWindow];
-  dragPoint = [self convertPoint: dragPoint fromView: nil];
-
-	pb = [NSPasteboard pasteboardWithName: NSDragPboard];	
   [self declareAndSetShapeOnPasteboard: pb];
+
+  ICONCENTER (self, icon, dragPoint);
 	      
   [self dragImage: icon
                at: dragPoint 
-           offset: NSZeroSize
-            event: nextEvent
+           offset: offset
+            event: event
        pasteboard: pb
            source: self
         slideBack: [[GWLib workspaceApp] animateSlideBack]];

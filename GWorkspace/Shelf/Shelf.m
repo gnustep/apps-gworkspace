@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
   #ifdef GNUSTEP 
@@ -38,6 +37,24 @@
 #include "IconViewsIcon.h"
 #include "GWorkspace.h"
 #include "GNUstep.h"
+
+#define MARGINX 16
+
+#ifdef GNUSTEP 
+  #define ICON_WIDTH 64
+  #define ICON_HEIGHT 52
+  #define FIRST_LINE_BASE 55
+  #define LINE_SPACE_Y 75
+  #define LABEL_VOFFSET 15
+  #define LABEL_HEIGHT 14  
+#else
+  #define ICON_WIDTH 42
+  #define ICON_HEIGHT 34
+  #define FIRST_LINE_BASE 40
+  #define LINE_SPACE_Y 56
+  #define LABEL_VOFFSET 15
+  #define LABEL_HEIGHT 14  
+#endif
 
 @interface IconViewsIcon (ShelfSorting)
 - (NSComparisonResult)iconCompare:(IconViewsIcon *)other;
@@ -558,15 +575,16 @@
   wdt = [self frame].size.width;
   hgt = [self frame].size.height;
 	
-	pcount = (int)((int)((wdt - 16) / cellsWidth) * (int)(MAXSHELFHEIGHT / 75));
+	pcount = (int)((int)((wdt - MARGINX) / cellsWidth) 
+                                    * (int)(MAXSHELFHEIGHT / LINE_SPACE_Y));
 		
  	if (gpoints != NULL) {
 		NSZoneFree (NSDefaultMallocZone(), gpoints);
 	} 
 	gpoints = NSZoneMalloc (NSDefaultMallocZone(), sizeof(gridpoint) * pcount);		
 	
-  x = 16;
-  y = hgt - 55;
+  x = MARGINX;
+  y = hgt - FIRST_LINE_BASE;
 	posx = 0;
 	posy = 0;
 	
@@ -575,8 +593,8 @@
 			x += cellsWidth;      
     }
     if (x >= (wdt - cellsWidth)) {
-      x = 16;
-      y -= 75;
+      x = MARGINX;
+      y -= LINE_SPACE_Y;
 			posx = 0;
 			posy++;
     }  		
@@ -655,7 +673,7 @@
 		int index = [icon gridindex];		
 		gridpoint gpoint = gpoints[index];
 		NSPoint p = NSMakePoint(gpoint.x, gpoint.y);
-		NSRect r = NSMakeRect(p.x, p.y, 64, 52);
+		NSRect r = NSMakeRect(p.x, p.y, ICON_WIDTH, ICON_HEIGHT);
 
 		[icon setPosition: p];
 		[icon setFrame: r];
@@ -730,7 +748,8 @@
 		labxpos = [icon frame].origin.x - ((labwidth - iconwidth) / 2);
 	}
 	
-	labelRect = NSMakeRect(labxpos, [icon frame].origin.y - 15, labwidth, 14);
+	labelRect = NSMakeRect(labxpos, 
+              [icon frame].origin.y - LABEL_VOFFSET, labwidth, LABEL_HEIGHT);
 	[label setFrame: labelRect];
 }
 

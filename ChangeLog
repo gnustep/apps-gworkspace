@@ -1,3 +1,9 @@
+2003-10-22 Enrico Sersale  <enrico@imago.ro>
+
+  * All the DraggingSources now consider also the offset in
+    -dragImage:at:offset:event:pasteboard:source:slideBack:
+    (on GNUstep this does nothing but I need it for osx)
+
 2003-10-19 Enrico Sersale  <enrico@imago.ro>
 
   * GWorkspace/Resources/Icons

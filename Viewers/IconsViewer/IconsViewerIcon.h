@@ -95,7 +95,8 @@
 
 @interface IconsViewerIcon (DraggingSource)
 
-- (void)startExternalDragOnEvent:(NSEvent *)event;
+- (void)startExternalDragOnEvent:(NSEvent *)event
+                 withMouseOffset:(NSSize)offset;
 
 - (void)declareAndSetShapeOnPasteboard:(NSPasteboard *)pb;
 

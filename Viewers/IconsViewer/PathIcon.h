@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #ifndef PATHICON_H
 #define PATHICON_H
 
@@ -127,7 +126,8 @@
 
 @interface PathIcon (DraggingSource)
 
-- (void)startExternalDragOnEvent:(NSEvent *)event;
+- (void)startExternalDragOnEvent:(NSEvent *)event
+                 withMouseOffset:(NSSize)offset;
 
 - (void)declareAndSetShapeOnPasteboard:(NSPasteboard *)pb;
 

@@ -53,28 +53,18 @@
 }
 
 - (void)startExternalDragOnEvent:(NSEvent *)event
+                 withMouseOffset:(NSSize)offset
 {
-	NSEvent *nextEvent;
+  NSPasteboard *pb = [NSPasteboard pasteboardWithName: NSDragPboard];	
   NSPoint dragPoint;
-  NSPasteboard *pb;
 
-	nextEvent = [[self window] nextEventMatchingMask:
-    							NSLeftMouseUpMask | NSLeftMouseDraggedMask];
-
-  if([nextEvent type] != NSLeftMouseDragged) {
-    [self unselect];
-   	return;
-  }
-  
-  dragPoint = [nextEvent locationInWindow];
-  dragPoint = [self convertPoint: dragPoint fromView: nil];
-
-	pb = [NSPasteboard pasteboardWithName: NSDragPboard];	
   [self declareAndSetShapeOnPasteboard: pb];
+
+  ICONCENTER (self, icon, dragPoint);
 
   [self dragImage: icon
                at: dragPoint 
-           offset: NSZeroSize
+           offset: offset
             event: event
        pasteboard: pb
            source: self

@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
   #ifdef GNUSTEP 
@@ -72,50 +71,21 @@
   [self unselect];
 }
 
-- (void)mouseUp:(NSEvent *)theEvent
-{
-	if ([theEvent clickCount] > 1) { 
-		int i;
-	
-		for (i = 0; i < [paths count]; i++) {
-			NSString *path, *defApp, *tp;
-			
-	  	path = [paths objectAtIndex: i];
-	  	[ws getInfoForFile: path application: &defApp type: &tp]; 
-	 
-	  	if ((tp == NSApplicationFileType) && (locked == NO)) {
-				unsigned int modifier = [theEvent modifierFlags];
-		
-				[container openCurrentSelection: [NSArray arrayWithObject: path] 
-															newViewer: (modifier == NSControlKeyMask)];
-			} else {
-				if (locked == NO) {		
-    			[container openCurrentSelection: [NSArray arrayWithObject: path] 
-																newViewer: YES]; 
-				} else {				
-					if ((tp == NSDirectoryFileType) || (tp == NSFilesystemFileType)) {
-    				[container openCurrentSelection: [NSArray arrayWithObject: path] 
-																	newViewer: YES]; 
-					}				
-				}
-			}
-		}
-		
-		[self unselect];
-		return;
-	}
-}
-
 - (void)mouseDown:(NSEvent *)theEvent
 {
 	NSEvent *nextEvent;
+  NSPoint location;
+  NSSize offset;
   BOOL startdnd = NO;
+
+  location = [theEvent locationInWindow];
 
   [container unselectOtherIcons: self];
   
 	if ([theEvent clickCount] == 1) {     
     nextEvent = [[self window] nextEventMatchingMask:
     							              NSLeftMouseUpMask | NSLeftMouseDraggedMask];
+                                
     if ([nextEvent type] == NSLeftMouseUp) {
       NSSize ss = [self frame].size;
       NSSize is = [icon size];
@@ -136,16 +106,19 @@
 
     while (1) {
 	    nextEvent = [[self window] nextEventMatchingMask:
-    							              NSLeftMouseUpMask | NSLeftMouseDraggedMask];
-
+    							              NSLeftMouseUpMask | NSLeftMouseDraggedMask];  
+    
       if ([nextEvent type] == NSLeftMouseUp) {
         return;
       }
-
+    
       if ([nextEvent type] == NSLeftMouseDragged) {
 	      if(dragdelay < 5) {
           dragdelay++;
-        } else {        
+        } else {    
+          NSPoint p = [nextEvent locationInWindow];
+        
+          offset = NSMakeSize(p.x - location.x, p.y - location.y); 
           startdnd = YES;        
           break;
         }
@@ -153,34 +126,24 @@
     }
 
     if (startdnd == YES) {  
-      [self startExternalDragOnEvent: nextEvent];    
+      [self startExternalDragOnEvent: nextEvent withMouseOffset: offset];    
     }   
   }            
 }
 
 - (void)startExternalDragOnEvent:(NSEvent *)event
+                 withMouseOffset:(NSSize)offset;
 {
-	NSEvent *nextEvent;
+  NSPasteboard *pb = [NSPasteboard pasteboardWithName: NSDragPboard];	
   NSPoint dragPoint;
-  NSPasteboard *pb;
 
-	nextEvent = [[self window] nextEventMatchingMask:
-    							NSLeftMouseUpMask | NSLeftMouseDraggedMask];
-
-  if([nextEvent type] != NSLeftMouseDragged) {
-    [self unselect];
-   	return;
-  }
-  
-  dragPoint = [nextEvent locationInWindow];
-  dragPoint = [self convertPoint: dragPoint fromView: nil];
-
-	pb = [NSPasteboard pasteboardWithName: NSDragPboard];	
   [self declareAndSetShapeOnPasteboard: pb];
+  
+  ICONCENTER (self, icon, dragPoint);
       
   [self dragImage: icon
                at: dragPoint 
-           offset: NSZeroSize
+           offset: offset
             event: event
        pasteboard: pb
            source: self

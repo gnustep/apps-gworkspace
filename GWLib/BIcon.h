@@ -129,7 +129,8 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 
 @interface BIcon (DraggingSource)
 
-- (void)startExternalDragOnEvent:(NSEvent *)event;
+- (void)startExternalDragOnEvent:(NSEvent *)event
+                 withMouseOffset:(NSSize)offset;
 
 - (void)declareAndSetShapeOnPasteboard:(NSPasteboard *)pb;
 

@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #ifndef RECYCLERICON_H
 #define RECYCLERICON_H
 
@@ -71,7 +70,8 @@
 
 @interface RecyclerIcon (DraggingSource)
 
-- (void)startExternalDragOnEvent:(NSEvent *)event;
+- (void)startExternalDragOnEvent:(NSEvent *)event
+                 withMouseOffset:(NSSize)offset;
 
 - (void)declareAndSetShapeOnPasteboard:(NSPasteboard *)pb;
 

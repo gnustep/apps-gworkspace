@@ -58,10 +58,10 @@ if (rct.size.height < 0) rct.size.height = 0; \
   #define MID_LIMIT 110
 #else
   #define MIN_SHELF_HEIGHT 2
-  #define MID_SHELF_HEIGHT 50
-  #define MAX_SHELF_HEIGHT 98
+  #define MID_SHELF_HEIGHT 60
+  #define MAX_SHELF_HEIGHT 120
   #define COLLAPSE_LIMIT 23
-  #define MID_LIMIT 72
+  #define MID_LIMIT 85
 #endif
 
 #define DEFAULT_WIDTH 150

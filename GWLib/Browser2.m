@@ -707,6 +707,10 @@ double myrintf(double a)
 
   // Update the scrollviews
   [self tile];
+  
+  #ifdef GNUSTEP 
+    [self setNeedsDisplay: YES];
+  #endif
 }
 
 - (void)scrollColumnsRightBy:(int)shiftAmount

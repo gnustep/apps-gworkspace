@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
   #ifdef GNUSTEP 
@@ -54,36 +53,20 @@
 	[self setNeedsDisplay: YES];
 }
 
-- (void)mouseUp:(NSEvent *)theEvent
-{
-	if ([theEvent clickCount] > 1) {  
-		unsigned int modifier = [theEvent modifierFlags];
-		
-		if (locked == NO) {				
-			[container openCurrentSelection: paths 
-														newViewer: (modifier == NSControlKeyMask)];
-		} else {
-			if ((type == NSDirectoryFileType) || (type == NSFilesystemFileType)) {
-				[container openCurrentSelection: paths 
-															newViewer: (modifier == NSControlKeyMask)];
-			}
-		}
-													
-    [self unselect];
-    return;
-	}  
-}
-
 - (void)mouseDown:(NSEvent *)theEvent
 {
-	NSEvent *nextEvent;
-  BOOL startdnd = NO;
-
-	if ([theEvent clickCount] == 1) {  
+	if ([theEvent clickCount] == 1) {
+	  NSEvent *nextEvent;
+    NSPoint location;
+    NSSize offset;
+    BOOL startdnd = NO;
+    
     if (isSelect == NO) {  
       [self select];
     }
-
+    
+    location = [theEvent locationInWindow];
+    
     while (1) {
 	    nextEvent = [[self window] nextEventMatchingMask:
     							              NSLeftMouseUpMask | NSLeftMouseDraggedMask];
@@ -106,7 +89,10 @@
       } else if ([nextEvent type] == NSLeftMouseDragged) {
 	      if(dragdelay < 5) {
           dragdelay++;
-        } else {        
+        } else {     
+          NSPoint p = [nextEvent locationInWindow];
+        
+          offset = NSMakeSize(p.x - location.x, p.y - location.y); 
           startdnd = YES;        
           break;
         }
@@ -114,34 +100,24 @@
     }
 
     if (startdnd == YES) {  
-      [self startExternalDragOnEvent: nextEvent];    
+      [self startExternalDragOnEvent: nextEvent withMouseOffset: offset];    
     }    
   }           
 }
 
 - (void)startExternalDragOnEvent:(NSEvent *)event
+                 withMouseOffset:(NSSize)offset
 {
-	NSEvent *nextEvent;
+  NSPasteboard *pb = [NSPasteboard pasteboardWithName: NSDragPboard];	
   NSPoint dragPoint;
-  NSPasteboard *pb;
-
-	nextEvent = [[self window] nextEventMatchingMask:
-    							NSLeftMouseUpMask | NSLeftMouseDraggedMask];
-
-  if([nextEvent type] != NSLeftMouseDragged) {
-    [self unselect];
-   	return;
-  }
-  
-  dragPoint = [nextEvent locationInWindow];
-  dragPoint = [self convertPoint: dragPoint fromView: nil];
-
-	pb = [NSPasteboard pasteboardWithName: NSDragPboard];	
+	
   [self declareAndSetShapeOnPasteboard: pb];
+
+  ICONCENTER (self, icon, dragPoint);
   	  
   [self dragImage: icon
                at: dragPoint 
-           offset: NSZeroSize
+           offset: offset
             event: event
        pasteboard: pb
            source: self
