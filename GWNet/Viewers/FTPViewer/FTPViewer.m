@@ -151,7 +151,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
     
     ASSIGN (dndConnName, ([NSString stringWithFormat: @"gwnet_viewer_dnd_%i", cnref]));
     
-    dndConn = [[NSConnection alloc] initWithReceivePort: (NSSocketPort *)[NSSocketPort port] 
+    dndConn = [[NSConnection alloc] initWithReceivePort: (NSPort *)[NSPort port] 
 																			         sendPort: nil];
     [dndConn enableMultipleThreads];
     [dndConn setRootObject: self];
@@ -170,7 +170,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
     
     dspconnName = [NSString stringWithFormat: @"gwnet_viewer_dsp_%i", cnref];
 
-    dispatcherConn = [[NSConnection alloc] initWithReceivePort: (NSSocketPort *)[NSSocketPort port] 
+    dispatcherConn = [[NSConnection alloc] initWithReceivePort: (NSPort *)[NSPort port] 
 																			                sendPort: nil];
     [dispatcherConn enableMultipleThreads];
     [dispatcherConn setRootObject: self];

@@ -75,7 +75,7 @@
       cmd = @"ftpfileop";
     }
 
-    conn = [[NSConnection alloc] initWithReceivePort: (NSSocketPort *)[NSSocketPort port] 
+    conn = [[NSConnection alloc] initWithReceivePort: (NSPort *)[NSPort port] 
 																			      sendPort: nil];
     [conn enableMultipleThreads];
     [conn setRootObject: self];

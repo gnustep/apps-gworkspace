@@ -69,7 +69,7 @@
      handlerClass:(Class)aClass
        connection:(NSConnection *)aConnection
 {
-  NSSocketPort *port[2];  
+  NSPort *port[2];  
   NSArray *portArray;
 
   [aViewer setProtocolForProxy: @protocol(ViewerProtocol)];
@@ -77,12 +77,12 @@
   
   handler = nil;
 
-  port[0] = (NSSocketPort *)[NSSocketPort port];
-  port[1] = (NSSocketPort *)[NSSocketPort port];
+  port[0] = (NSPort *)[NSPort port];
+  port[1] = (NSPort *)[NSPort port];
   portArray = [NSArray arrayWithObjects: port[1], port[0], nil];
 
-  handlerConn = [[NSConnection alloc] initWithReceivePort: (NSSocketPort *)port[0]
-                                                 sendPort: (NSSocketPort *)port[1]];
+  handlerConn = [[NSConnection alloc] initWithReceivePort: (NSPort *)port[0]
+                                                 sendPort: (NSPort *)port[1]];
   [handlerConn setRootObject: self];
   [handlerConn setDelegate: self];
   [handlerConn enableMultipleThreads];
