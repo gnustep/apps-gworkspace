@@ -578,7 +578,7 @@
 	gpoints = NSZoneMalloc (NSDefaultMallocZone(), sizeof(gridpoint) * pcount);		
 	
   x = 16;
-  y = hgt - 62;
+  y = hgt - 59;
 	posx = 0;
 	posy = 0;
 	

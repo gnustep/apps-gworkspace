@@ -50,6 +50,7 @@
 #include "Desktop/DesktopWindow.h"
 #include "Desktop/DesktopView.h"
 #include "TShelf/TShelfWin.h"
+#include "TShelf/TShelfView.h"
 #include "Recycler/Recycler.h"
 #include "History/History.h"
 #include "GNUstep.h"
@@ -674,6 +675,14 @@ return [ws openFile: fullPath withApplication: appName]
 	int i;
 
 #define TEST_CLOSE(o, w) if ((o) && ([w isVisible])) [w close]
+
+  if (NSRunAlertPanel(NSLocalizedString(@"Quit!", @""),
+                      NSLocalizedString(@"Do you really want to quit?", @""),
+                      NSLocalizedString(@"No", @""),
+                      NSLocalizedString(@"Yes", @""),
+                      nil)) {
+    return NO;
+  }
 
   [self updateDefaults];
 
@@ -1950,7 +1959,11 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
   }
 
 	[menu addItemWithTitle: NSLocalizedString(@"Hide Tabbed Shelf", @"") 
-													action: @selector(hideTShelf:) keyEquivalent: @""];	
+													action: @selector(hideTShelf:) keyEquivalent: @""];
+	[menu addItemWithTitle: NSLocalizedString(@"Maximize/Minimize Tabbed Shelf", @"") 
+													action: @selector(maximizeMinimizeTShelf:) keyEquivalent: @"s"];
+	[menu addItemWithTitle: NSLocalizedString(@"Select Special Tab", @"") 
+													action: @selector(selectSpecialTShelfTab:) keyEquivalent: @"S"];
 	[menu addItemWithTitle: NSLocalizedString(@"Remove Current Tab", @"") 
 										action: @selector(removeTShelfTab:) keyEquivalent: @""];	
 	[menu addItemWithTitle: NSLocalizedString(@"Rename Current Tab", @"") 
@@ -1971,12 +1984,12 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 	NSMenu *menu = [[[NSApp mainMenu] itemWithTitle: NSLocalizedString(@"Tools", @"")] submenu];
 	menu = [[menu itemWithTitle: NSLocalizedString(@"Tabbed Shelf", @"")] submenu];
 
-	 while (1) {
-  	 if ([menu numberOfItems] == 0) {
-    	 break;
-  	 }
-  	 [menu removeItemAtIndex: 0];
-	 }
+  while (1) {
+    if ([menu numberOfItems] == 0) {
+      break;
+    }
+    [menu removeItemAtIndex: 0];
+  }
 
 	[menu addItemWithTitle: NSLocalizedString(@"Show Tabbed Shelf", @"") 
 									action: @selector(showTShelf:) keyEquivalent: @""];		
@@ -1985,6 +1998,24 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
     [tshelfWin saveDefaults]; 
     [tshelfWin deactivate]; 
 	}
+}
+
+- (void)maximizeMinimizeTShelf:(id)sender
+{
+  if ((tshelfWin != nil) && ([tshelfWin isVisible])) {
+    [[tshelfWin shelfView] hideShowTabs: nil];
+  }
+}
+
+- (void)selectSpecialTShelfTab:(id)sender
+{
+  if (tshelfWin != nil) {
+    if ([tshelfWin isVisible] == NO) {
+      [tshelfWin activate];
+    }
+    
+    [[tshelfWin shelfView] selectLastItem];
+  }
 }
 
 - (void)addTShelfTab:(id)sender

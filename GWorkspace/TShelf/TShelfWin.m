@@ -32,7 +32,7 @@
 #include "Dialogs/Dialogs.h"
 #include "GNUstep.h"
 
-#define SHELF_HEIGHT 112
+#define SHELF_HEIGHT 106
 
 @implementation TShelfWin
 
@@ -120,6 +120,11 @@
   }
     
   return self;
+}
+
+- (TShelfView *)shelfView
+{
+  return tView;
 }
 
 - (void)activate

@@ -256,6 +256,10 @@
 
 - (void)hideTShelf:(id)sender;
 
+- (void)maximizeMinimizeTShelf:(id)sender;
+
+- (void)selectSpecialTShelfTab:(id)sender;
+
 - (void)addTShelfTab:(id)sender;
 
 - (void)removeTShelfTab:(id)sender;

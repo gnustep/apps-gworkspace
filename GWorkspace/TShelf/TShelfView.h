@@ -61,6 +61,8 @@
 
 - (void)selectTabItemAtIndex:(int)index;
 
+- (void)selectLastItem;
+
 - (TShelfViewItem *)selectedTabItem;
 
 - (TShelfViewItem *)tabItemAtPoint:(NSPoint)point;

@@ -183,6 +183,13 @@
   }
 }
 
+- (void)selectLastItem
+{
+  if (lastItem) {
+    [self selectTabItem: lastItem];
+  }
+}
+
 - (NSFont *)font
 {
   return font;

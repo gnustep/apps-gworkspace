@@ -1,3 +1,13 @@
+2003-10-07 Enrico Sersale  <enrico@imago.ro>
+
+  * GWorkspace/GWorkspace.m
+    Added a "Do you really want to quit?" dialog 
+    in -applicationShouldTerminate:.
+    Added some keyEquivalents to the tabbed shelf menues.
+
+  * GWorkspace/TShelf/TShelfWin.m
+    Reduced the height of the shelf by 6 pts.
+    
 2003-10-06 Enrico Sersale  <enrico@imago.ro>
 
   * GWorkspace/Desktop/DesktopView.m

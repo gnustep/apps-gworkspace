@@ -41,6 +41,8 @@
   TShelfView *tView;
 }
 
+- (TShelfView *)shelfView;
+
 - (void)activate;
 
 - (void)deactivate;
