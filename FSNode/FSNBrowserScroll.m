@@ -1,0 +1,95 @@
+/* FSNBrowserScroll.h
+ *  
+ * Copyright (C) 2004 Free Software Foundation, Inc.
+ *
+ * Author: Enrico Sersale <enrico@imago.ro>
+ * Date: July 2004
+ *
+ * This file is part of the GNUstep GWorkspace application
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ */
+
+#include <AppKit/AppKit.h>
+#include "FSNBrowserScroll.h"
+#include "FSNBrowserColumn.h"
+
+@implementation FSNBrowserScroll
+
+- (void)dealloc
+{
+  [super dealloc];
+}
+
+- (id)initWithFrame:(NSRect)frameRect
+           inColumn:(FSNBrowserColumn *)col
+{
+  self = [super initWithFrame: frameRect];
+
+  if (self) {
+    [self setBorderType: NSNoBorder];
+    [self setHasHorizontalScroller: NO];
+    [self setHasVerticalScroller: YES]; 
+    column = col;
+    [self registerForDraggedTypes: [NSArray arrayWithObjects: 
+                                                NSFilenamesPboardType, 
+                                                @"GWRemoteFilenamesPboardType", 
+                                                nil]];    
+  }
+  
+  return self;
+}
+
+- (BOOL)acceptsFirstResponder
+{
+  return YES;
+}
+
+@end
+
+
+@implementation FSNBrowserScroll (DraggingDestination)
+
+- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
+{
+  return [column draggingEntered: sender];
+}
+
+- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
+{
+  return [column draggingUpdated: sender];
+}
+
+- (void)draggingExited:(id <NSDraggingInfo>)sender
+{
+  [column draggingExited: sender];
+}
+
+- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
+{
+  return [column prepareForDragOperation: sender];
+}
+
+- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
+{
+  return [column performDragOperation: sender];
+}
+
+- (void)concludeDragOperation:(id <NSDraggingInfo>)sender
+{
+  [column concludeDragOperation: sender];
+}
+
+@end
