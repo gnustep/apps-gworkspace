@@ -31,10 +31,6 @@
 #include "FSNFunctions.h"
 #include "GNUstep.h"
 
-#define HLIGHT_H_FACT (0.8125)
-#define TXT_MARGIN (4.0)
-#define ICN_H_SHIFT (12.0)
-
 static id <DesktopApplication> desktopApp = nil;
 
 static NSFont *labelFont = nil;
@@ -100,7 +96,7 @@ static NSFont *labelFont = nil;
     
     hlightRect = NSZeroRect;
     hlightRect.size.width = ceil(isize / 3 * 4);
-    hlightRect.size.height = ceil(hlightRect.size.width * HLIGHT_H_FACT);
+    hlightRect.size.height = ceil(hlightRect.size.width * [FSNodeRep highlightHeightFactor]);
     if ((isize - hlightRect.size.height) < 2) {
       hlightRect.size.height = isize + 2;
     }
@@ -124,7 +120,7 @@ static NSFont *labelFont = nil;
     [self setNodeInfoShowType: FSNInfoNameType];
     
     labelRect = NSZeroRect;
-    labelRect.size.width = [label uncuttedTitleLenght] + TXT_MARGIN;
+    labelRect.size.width = [label uncuttedTitleLenght] + [FSNodeRep labelMargin];
     labelRect.size.height = [[label font] defaultLineHeightForFont];
 
     icnPosition = ipos;
@@ -230,9 +226,11 @@ static NSFont *labelFont = nil;
 {
   NSRect frameRect = [self frame];
   NSSize sz = [icon size];
-
+  
   if (icnPosition == NSImageAbove) {
-    labelRect.size.width = [label uncuttedTitleLenght] + TXT_MARGIN;
+    float lblmargin = [FSNodeRep labelMargin];
+    
+    labelRect.size.width = [label uncuttedTitleLenght] + lblmargin;
   
     if (labelRect.size.width >= frameRect.size.width) {
       labelRect.size.width = frameRect.size.width;
@@ -263,8 +261,9 @@ static NSFont *labelFont = nil;
       icnBounds.origin.y = hlightRect.origin.y + ((hlightRect.size.height - sz.height) / 2);
     
     } else {
+      float baseShift = [FSNodeRep defaultIconBaseShift];
       icnBounds.origin.x = (frameRect.size.width - sz.width) / 2;
-      icnBounds.origin.y = labelRect.size.height + ICN_H_SHIFT;
+      icnBounds.origin.y = labelRect.size.height + baseShift;
     }
 
   } else if (icnPosition == NSImageLeft) {
@@ -469,7 +468,7 @@ static NSFont *labelFont = nil;
   icnBounds = NSMakeRect(0, 0, isize, isize);
   ASSIGN (icon, [FSNodeRep iconOfSize: isize forNode: node]);
   hlightRect.size.width = isize / 3 * 4;
-  hlightRect.size.height = hlightRect.size.width * HLIGHT_H_FACT;
+  hlightRect.size.height = hlightRect.size.width * [FSNodeRep highlightHeightFactor];
   if ((isize - hlightRect.size.height) < 2) {
     hlightRect.size.height = isize + 2;
   }

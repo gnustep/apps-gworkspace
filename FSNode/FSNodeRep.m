@@ -645,6 +645,21 @@ static FSNodeRep *shared = nil;
   return [[self sharedInstance] highlightPathOfSize: size];
 }
 
++ (float)highlightHeightFactor
+{
+  return 0.8125;
+}
+
++ (float)labelMargin
+{
+  return 4.0;
+}
+
++ (float)defaultIconBaseShift
+{
+  return 12.0;
+}
+
 + (void)setDefaultSortOrder:(int)order
 {
   [[self sharedInstance] setDefaultSortOrder: order];

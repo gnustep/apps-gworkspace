@@ -110,6 +110,12 @@ typedef enum FSNInfoType {
 
 + (NSBezierPath *)highlightPathOfSize:(NSSize)size;
 
++ (float)highlightHeightFactor;
+
++ (float)labelMargin;
+
++ (float)defaultIconBaseShift;
+
 + (void)setDefaultSortOrder:(int)order;
 
 + (unsigned int)defaultSortOrder;
