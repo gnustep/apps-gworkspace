@@ -515,8 +515,8 @@ static Operation *operation = nil;
   [d setObject: @"Operation" forKey: @"ApplicationName"];
   [d setObject: NSLocalizedString(@"-----------------------", @"")
       	forKey: @"ApplicationDescription"];
-  [d setObject: @"Operation 0.7.0" forKey: @"ApplicationRelease"];
-  [d setObject: @"03 2005" forKey: @"FullVersionID"];
+  [d setObject: @"Operation 0.7.1" forKey: @"ApplicationRelease"];
+  [d setObject: @"04 2005" forKey: @"FullVersionID"];
   [d setObject: [NSArray arrayWithObjects: @"Enrico Sersale <enrico@imago.ro>.", nil]
         forKey: @"Authors"];
   [d setObject: NSLocalizedString(@"See http://www.gnustep.it/enrico/gworkspace", @"") forKey: @"URL"];
