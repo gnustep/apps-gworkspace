@@ -204,12 +204,15 @@
   return nil;
 }
 
-- (void)addRepForSubnode:(FSNode *)anode
+- (id)addRepForSubnode:(FSNode *)anode
 {
+  return nil;
 }
 
-- (void)addRepForSubnodePath:(NSString *)apath
+- (id)addRepForSubnodePath:(NSString *)apath
 {
+  FSNode *subnode = [FSNode nodeWithRelativePath: apath parent: nil];
+  return [self addRepForSubnode: subnode];
 }
 
 - (void)removeRepOfSubnode:(FSNode *)anode

@@ -100,9 +100,9 @@ typedef enum FSNSelectionMask {
 
 - (id)repOfSubnodePath:(NSString *)apath;
 
-- (void)addRepForSubnode:(FSNode *)anode;
+- (id)addRepForSubnode:(FSNode *)anode;
 
-- (void)addRepForSubnodePath:(NSString *)apath;
+- (id)addRepForSubnodePath:(NSString *)apath;
 
 - (void)removeRepOfSubnode:(FSNode *)anode;
 
