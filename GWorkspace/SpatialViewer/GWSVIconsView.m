@@ -55,7 +55,7 @@
     if ([selection count] == 0) {
       selection = [NSArray arrayWithObject: [node path]];
     } else {
-      [manager unselectOtherViewers: viewer];
+      [manager selectionDidChangeInViewer: viewer];
     }
 
     if ((lastSelection == nil) || ([selection isEqual: lastSelection] == NO)) {
@@ -83,7 +83,6 @@
     DESTROY (lastSelection);
     [self selectionDidChange];
     
- //   [manager unselectOtherViewers: viewer];
     [manager viewerSelected: viewer];
 	}
 }

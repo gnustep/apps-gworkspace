@@ -91,7 +91,6 @@ static id <DesktopApplication> desktopApp = nil;
     fm = [NSFileManager defaultManager];
     ws = [NSWorkspace sharedWorkspace];
     dragIcon = [icon copy];
-    [self registerForDraggedTypes: [NSArray arrayWithObject: NSFilenamesPboardType]];    
   }
 
   return self;
@@ -379,6 +378,7 @@ static id <DesktopApplication> desktopApp = nil;
     							              NSLeftMouseUpMask | NSLeftMouseDraggedMask];
 
       if ([nextEvent type] == NSLeftMouseUp) {
+        [[self window] postEvent: nextEvent atStart: NO];
 	      [self unselect];
         break;
 
@@ -485,152 +485,79 @@ x += 6; \
   }
 }
 
-@end
-
-
-@implementation DockIcon (DraggingDestination)
-
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
+- (BOOL)acceptsDraggedPaths:(NSArray *)paths
 {
-  NSPasteboard *pb = [sender draggingPasteboard];
-
-  isDragTarget = YES;  
-              
-  if ([[pb types] containsObject: NSFilenamesPboardType]) {
-    NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
-  
-    if ((isTrashIcon == NO) && (isWsIcon == NO)) {
-      int i;
-    
-      for (i = 0; i < [sourcePaths count]; i++) {
-        NSString *path = [sourcePaths objectAtIndex: i];
-        FSNode *nod = [FSNode nodeWithRelativePath: path parent: nil];
-
-        if (([nod isPlain] || ([nod isPackage] && ([nod isApplication] == NO))) == NO) {
-          return NSDragOperationNone;
-        }
-      }
-      
-      isDragTarget = YES; 
-      [self select]; 
-      return NSDragOperationAll;
-      
-    } else if (isTrashIcon) {
-      isDragTarget = YES;  
-      [self select];
-      return NSDragOperationAll;
-    }
-  }
-  
-  isDragTarget = NO; 
-  return NSDragOperationNone;
-}
-
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
-{
-  NSPasteboard *pb = [sender draggingPasteboard];
-
-  isDragTarget = YES;  
-              
-  if ([[pb types] containsObject: NSFilenamesPboardType]) {
-    NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
-  
-    if ((isTrashIcon == NO) && (isWsIcon == NO)) {
-      int i;
-    
-      for (i = 0; i < [sourcePaths count]; i++) {
-        NSString *path = [sourcePaths objectAtIndex: i];
-        FSNode *nod = [FSNode nodeWithRelativePath: path parent: nil];
-
-        if (([nod isPlain] || ([nod isPackage] && ([nod isApplication] == NO))) == NO) {
-          return NSDragOperationNone;
-        }
-      }
-
-      isDragTarget = YES;  
-      [self select];
-      return NSDragOperationAll;
-      
-    } else if (isTrashIcon) {
-      isDragTarget = YES;  
-      [self select];
-      return NSDragOperationAll;
-    }
-  }
-  
-  isDragTarget = NO; 
-  return NSDragOperationNone;
-}
-
-- (void)draggingExited:(id <NSDraggingInfo>)sender
-{
-  [self unselect];
-  isDragTarget = NO;  
-}
-
-- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
-{
-  return isDragTarget;
-}
-
-- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
-{
-  return isDragTarget;
-}
-
-- (void)concludeDragOperation:(id <NSDraggingInfo>)sender
-{
-  NSPasteboard *pb = [sender draggingPasteboard];
-
-  [self unselect];
-  isDragTarget = NO;
-        
-  if ([[pb types] containsObject: NSFilenamesPboardType]) {
-    NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
+  if ([self isSpecialIcon] == NO) {
     int i;
+
+    for (i = 0; i < [paths count]; i++) {
+      NSString *path = [paths objectAtIndex: i];
+      FSNode *nod = [FSNode nodeWithRelativePath: path parent: nil];
+
+      if (([nod isPlain] || ([nod isPackage] && ([nod isApplication] == NO))) == NO) {
+        return NO;
+      }
+    }
+
+    [self select]; 
+    return YES;
+    
+  } else if (isTrashIcon) {
+    [self select];
+    return YES;
+  }
+
+  return NO;
+}
+
+- (void)setDraggedPaths:(NSArray *)paths
+{
+  int i;
   
-    if ([self isSpecialIcon] == NO) {
-      for (i = 0; i < [sourcePaths count]; i++) {
-        NSString *path = [sourcePaths objectAtIndex: i];
-        FSNode *nod = [FSNode nodeWithRelativePath: path parent: nil];
+  [self unselect];
+        
+  if ([self isSpecialIcon] == NO) {
+    for (i = 0; i < [paths count]; i++) {
+      NSString *path = [paths objectAtIndex: i];
+      FSNode *nod = [FSNode nodeWithRelativePath: path parent: nil];
 
-        if ([nod isPlain] || ([nod isPackage] && ([nod isApplication] == NO))) {
-          [ws openFile: [sourcePaths objectAtIndex: i] withApplication: appName];
-        }
+      if ([nod isPlain] || ([nod isPackage] && ([nod isApplication] == NO))) {
+        [ws openFile: [paths objectAtIndex: i] withApplication: appName];
       }
+    }
 
-    } else if (isTrashIcon) {
-      NSArray *vpaths = [ws mountedLocalVolumePaths];
-      NSMutableArray *files = [NSMutableArray array];
-      NSMutableArray *umountPaths = [NSMutableArray array];
-      NSMutableDictionary *opinfo = [NSMutableDictionary dictionary];
+  } else if (isTrashIcon) {
+    NSArray *vpaths = [ws mountedLocalVolumePaths];
+    NSMutableArray *files = [NSMutableArray array];
+    NSMutableArray *umountPaths = [NSMutableArray array];
+    NSMutableDictionary *opinfo = [NSMutableDictionary dictionary];
 
-      for (i = 0; i < [sourcePaths count]; i++) {
-        NSString *srcpath = [sourcePaths objectAtIndex: i];
-      
-        if ([vpaths containsObject: srcpath]) {
-          [umountPaths addObject: srcpath];
-        } else {
-          [files addObject: [srcpath lastPathComponent]];
-        }
-      }
-      
-      for (i = 0; i < [umountPaths count]; i++) {
-        [ws unmountAndEjectDeviceAtPath: [umountPaths objectAtIndex: i]];
-      }
-      
-      if ([files count]) {
-        [opinfo setObject: @"NSWorkspaceRecycleOperation" forKey: @"operation"];
-        [opinfo setObject: [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent]
-                   forKey: @"source"];
-        [opinfo setObject: [node path] forKey: @"destination"];
-        [opinfo setObject: files forKey: @"files"];
+    for (i = 0; i < [paths count]; i++) {
+      NSString *srcpath = [paths objectAtIndex: i];
 
-        [desktopApp performFileOperation: opinfo];
+      if ([vpaths containsObject: srcpath]) {
+        [umountPaths addObject: srcpath];
+      } else {
+        [files addObject: [srcpath lastPathComponent]];
       }
+    }
+
+    for (i = 0; i < [umountPaths count]; i++) {
+      [ws unmountAndEjectDeviceAtPath: [umountPaths objectAtIndex: i]];
+    }
+
+    if ([files count]) {
+      [opinfo setObject: @"NSWorkspaceRecycleOperation" forKey: @"operation"];
+      [opinfo setObject: [[paths objectAtIndex: 0] stringByDeletingLastPathComponent]
+                 forKey: @"source"];
+      [opinfo setObject: [node path] forKey: @"destination"];
+      [opinfo setObject: files forKey: @"files"];
+
+      [desktopApp performFileOperation: opinfo];
     }
   }
 }
 
 @end
+
 

@@ -465,9 +465,9 @@
 - (int)compareAccordingToParent:(FSNode *)aNode
 {
   if ([self parent] == nil) {
-    return ([aNode parent] ? NSOrderedDescending : NSOrderedSame);
+    return ([aNode parent] ? NSOrderedAscending : NSOrderedSame);
   } else if ([aNode parent] == nil) {
-    return NSOrderedAscending;
+    return NSOrderedDescending;
   }
 
   return [[[self parent] name] caseInsensitiveCompare: [[aNode parent] name]];
@@ -497,7 +497,7 @@
     return [[self name] compare: [aNode name]]; 
   }   
 
-  return (i1 < i2 ? NSOrderedAscending : NSOrderedDescending);
+  return (i1 > i2 ? NSOrderedAscending : NSOrderedDescending);
 }
 
 - (int)compareAccordingToDate:(FSNode *)aNode
@@ -507,7 +507,7 @@
 
 - (int)compareAccordingToSize:(FSNode *)aNode
 {
-  return ([self fileSize] >= [aNode fileSize]) ? NSOrderedAscending : NSOrderedDescending;
+  return ([self fileSize] <= [aNode fileSize]) ? NSOrderedAscending : NSOrderedDescending;
 }
 
 - (int)compareAccordingToOwner:(FSNode *)aNode

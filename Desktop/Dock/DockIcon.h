@@ -95,22 +95,9 @@
 
 - (void)setIsDndSourceIcon:(BOOL)value;
 
-@end
+- (BOOL)acceptsDraggedPaths:(NSArray *)paths;
 
-
-@interface DockIcon (DraggingDestination)
-
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender;
-
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender;
-
-- (void)draggingExited:(id <NSDraggingInfo>)sender;
-
-- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender;
-
-- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender;
-
-- (void)concludeDragOperation:(id <NSDraggingInfo>)sender;
+- (void)setDraggedPaths:(NSArray *)paths;
 
 @end
 

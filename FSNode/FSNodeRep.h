@@ -30,11 +30,11 @@
 
 typedef enum FSNInfoType {   
   FSNInfoNameType = 0,
-  FSNInfoParentType = 1,
-  FSNInfoKindType = 2,
-  FSNInfoDateType = 3,
-  FSNInfoSizeType = 4,
-  FSNInfoOwnerType = 5,
+  FSNInfoKindType = 1,
+  FSNInfoDateType = 2,
+  FSNInfoSizeType = 3,
+  FSNInfoOwnerType = 4,
+  FSNInfoParentType = 5,
   FSNInfoExtendedType = 6
 } FSNInfoType;
 

@@ -29,22 +29,14 @@
 #include "Desktop.h"
 #include "FSNodeRep.h"
 
+@class NSWindow;
 @class NSColor;
 @class NSImage;
 @class DockIcon;
 
-@interface DockWindow : NSWindow 
-{
-  id dock;
-}
-
-- (void)setDock:(id)dk;
-
-@end
-
 @interface Dock : NSView <FSNodeRepContainer>
 {
-  DockWindow *win;
+  NSWindow *win;
   DockPosition position;
 
   NSMutableArray *icons;
@@ -123,6 +115,8 @@
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender;
 
 - (void)concludeDragOperation:(id <NSDraggingInfo>)sender;
+
+- (BOOL)isDragTarget;
 
 @end
 

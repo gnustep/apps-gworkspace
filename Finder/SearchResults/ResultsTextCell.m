@@ -30,6 +30,8 @@
 
 - (void)dealloc
 {
+  NSLog(@"ResultsTextCell dealloc");
+
 //  TEST_RELEASE (uncuttedTitle);
 //  RELEASE (fontAttr);
 //  RELEASE (dots);

@@ -858,7 +858,7 @@ static NSImage *branchImage;
 
 - (int)compareAccordingToIndex:(FSNIcon *)aIcon
 {
-  return (gridIndex >= [aIcon gridIndex]) ? NSOrderedAscending : NSOrderedDescending;
+  return (gridIndex <= [aIcon gridIndex]) ? NSOrderedAscending : NSOrderedDescending;
 }
 
 @end

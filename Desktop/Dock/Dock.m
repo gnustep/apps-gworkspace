@@ -33,57 +33,6 @@
 #define MIN_ICN_SIZE 16
 #define ICN_INCR 4
 
-@implementation DockWindow
-
-- (void)setDock:(id)dk
-{
-  dock = dk;
-  [[self contentView] addSubview: dock];		
-}
-
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
-{
-  return [dock draggingEntered: sender];
-}
-
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
-{
-	return [dock draggingUpdated: sender];
-}
-
-- (void)draggingExited:(id <NSDraggingInfo>)sender
-{
-	[dock draggingExited: sender];  
-}
-
-- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
-{
-	return [dock prepareForDragOperation: sender];
-}
-
-- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
-{
-	return [dock performDragOperation: sender];
-}
-
-- (void)concludeDragOperation:(id <NSDraggingInfo>)sender
-{
-  [dock concludeDragOperation: sender];
-}
-
-- (BOOL)canBecomeKeyWindow
-{
-	return YES;
-}
-
-- (BOOL)canBecomeMainWindow
-{
-	return YES;
-}
-
-@end
-
-
 @implementation Dock
 
 - (void)dealloc
@@ -108,13 +57,13 @@
     NSArray *pbTypes;
     int i;
     
-	  win = [[DockWindow alloc] initWithContentRect: NSZeroRect
+	  win = [[NSWindow alloc] initWithContentRect: NSZeroRect
 					                      styleMask: NSBorderlessWindowMask  
                                   backing: NSBackingStoreBuffered 
                                     defer: NO];
 
     [win setReleasedWhenClosed: NO]; 
-    [win setDock: self];
+    [[win contentView] addSubview: self];	
     
     desktop = [Desktop desktop];
     position = [desktop dockPosition];
@@ -168,7 +117,6 @@
                                          @"DockIconPboardType", 
                                          nil];
     [self registerForDraggedTypes: pbTypes];    
-    [win registerForDraggedTypes: pbTypes];    
     
     [wsnc addObserver: self
 	           selector: @selector(applicationWillLaunch:)
@@ -915,11 +863,11 @@
   targetRect = NSZeroRect;
   dragdelay = 0;     
                  
-  if (icon == nil) {
-    location = [win convertScreenToBase: location];
-    location.y -= [win frame].size.height;
-    icon = [self iconContainingPoint: location];
-  }
+//  if (icon == nil) {
+//    location = [win convertScreenToBase: location];
+//    location.y -= [win frame].size.height;
+//    icon = [self iconContainingPoint: location];
+//  }
 
   if (icon) {
     int index = [icons indexOfObjectIdenticalTo: icon];
@@ -953,6 +901,7 @@
           
           for (i = 0; i < [icons count]; i++) {
             if ([[[icons objectAtIndex: i] node] isEqualToNode: node]) {
+              isDragTarget = NO;
               return NSDragOperationNone;
             }
           }
@@ -960,13 +909,18 @@
           targetIndex = index;
           return NSDragOperationAll;
           
-        } else if ([icon isTrashIcon] == NO) {
-          return [icon draggingEntered: sender];
+        } else {
+          if ([icon acceptsDraggedPaths: sourcePaths]) {
+            return NSDragOperationAll;
+          } else {
+            [icon unselect];
+          }
         }
       }
     }
   }
-    
+
+  isDragTarget = NO;    
   return NSDragOperationNone;
 }
 
@@ -1038,9 +992,14 @@
         NSString *path = [sourcePaths objectAtIndex: 0];
         FSNode *node = [FSNode nodeWithRelativePath: path parent: nil];
 
-        if ([node isApplication] == NO) {  // NON SI POSSONO BUTTARE LE APP !!
-          return [icon draggingUpdated: sender];
-          
+        if (([node isApplication] == NO) 
+                          || ([node isApplication] && [icon isTrashIcon])) {
+          if ([icon acceptsDraggedPaths: sourcePaths]) {
+            return NSDragOperationAll;
+          } else {
+            [icon unselect];
+          }
+         
         } else if ((targetIndex != index) && ([icon isTrashIcon] == NO)) { 
           targetIndex = index;
           [self tile]; 
@@ -1098,51 +1057,52 @@
 
     } else if ([[pb types] containsObject: NSFilenamesPboardType]) {
       NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
+      NSPoint location = [sender draggingLocation];
+      DockIcon *icon = [self iconContainingPoint: location];
       BOOL concluded = NO;
+
+  //    if (icon == nil) {
+  //      location = [win convertScreenToBase: location];
+  //      location.y -= [win frame].size.height;
+  //      icon = [self iconContainingPoint: location];
+  //    }
       
       if ([sourcePaths count] == 1) {
         NSString *path = [sourcePaths objectAtIndex: 0];
         FSNode *node = [FSNode nodeWithRelativePath: path parent: nil];
 
         if ([node isApplication]) {
-          BOOL duplicate = NO;
-          int i;
+          if ((icon == nil) || (icon && ([icon isTrashIcon] == NO))) {
+            BOOL duplicate = NO;
+            int i;
 
-          for (i = 0; i < [icons count]; i++) {
-            DockIcon *icon = [icons objectAtIndex: i];
-            
-            if ([[icon node] isEqualToNode: node]) {
-              RETAIN (icon);
-              [icons removeObject: icon];
-              [icons insertObject: icon atIndex: targetIndex];
-              RELEASE (icon);
-              duplicate = YES;      
-              break;
+            for (i = 0; i < [icons count]; i++) {
+              DockIcon *icon = [icons objectAtIndex: i];
+
+              if ([[icon node] isEqualToNode: node]) {
+                RETAIN (icon);
+                [icons removeObject: icon];
+                [icons insertObject: icon atIndex: targetIndex];
+                RELEASE (icon);
+                duplicate = YES;      
+                break;
+              }
             }
-          }
 
-          if (duplicate == NO) {
-            DockIcon *icon = [self addIconForApplicationWithName: [node name] 
-                                                         atIndex: targetIndex];
-            [icon setIsDocked: YES];
+            if (duplicate == NO) {
+              DockIcon *icon = [self addIconForApplicationWithName: [node name] 
+                                                           atIndex: targetIndex];
+              [icon setIsDocked: YES];
+            }
+
+            concluded = YES;
           }
-          
-          concluded = YES;
         }
       } 
       
       if (concluded == NO) {
-        NSPoint location = [sender draggingLocation];
-        DockIcon *icon = [self iconContainingPoint: location];
-
-        if (icon == nil) {
-          location = [win convertScreenToBase: location];
-          location.y -= [win frame].size.height;
-          icon = [self iconContainingPoint: location];
-        }
-      
         if (icon) {
-          [icon concludeDragOperation: sender];
+          [icon setDraggedPaths: sourcePaths];
         }
       }    
     }
@@ -1153,6 +1113,11 @@
   targetRect = NSZeroRect;
   
   [self tile];
+}
+
+- (BOOL)isDragTarget
+{
+  return isDragTarget;
 }
 
 @end

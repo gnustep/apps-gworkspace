@@ -115,17 +115,12 @@ static GWViewersManager *vwrsmanager = nil;
 
 - (void)viewerSelected:(GWSpatialViewer *)aviewer
 {
-  FSNode *node = [aviewer shownNode];
+  GWSpatialViewer *parentViewer = [self parentOfViewer: aviewer];
   
   [self unselectOtherViewers: aviewer];
   
-  if ([[node path] isEqual: path_separator()] == NO) {
-    NSString *parentPath = [node parentPath];
-    GWSpatialViewer *parentViewer = [self viewerForPath: parentPath];
-  
-    if (parentViewer) {
-      [parentViewer setOpened: YES iconOfPath: [node path]];
-    }
+  if (parentViewer) {
+    [parentViewer setOpened: YES iconOfPath: [[aviewer shownNode] path]];
   }
 }
 
@@ -142,20 +137,40 @@ static GWViewersManager *vwrsmanager = nil;
   }  
 }
 
+- (void)selectionDidChangeInViewer:(GWSpatialViewer *)aviewer
+{
+  GWSpatialViewer *parentViewer = [self parentOfViewer: aviewer];
+
+  if (parentViewer) {
+    [parentViewer unselectAllIcons]; 
+  }
+}
+
 - (void)viewerWillClose:(GWSpatialViewer *)aviewer
 {
-  FSNode *node = [aviewer shownNode];
-  
-  if ([[node path] isEqual: path_separator()] == NO) {
-    NSString *parentPath = [node parentPath];
-    GWSpatialViewer *parentViewer = [self viewerForPath: parentPath];
-  
-    if (parentViewer) {
-      [parentViewer setOpened: NO iconOfPath: [node path]];
-    }
+  GWSpatialViewer *parentViewer = [self parentOfViewer: aviewer];
+
+  if (parentViewer) {
+    [parentViewer setOpened: NO iconOfPath: [[aviewer shownNode] path]];
   }
     
   [viewers removeObject: aviewer];
+}
+
+- (GWSpatialViewer *)parentOfViewer:(GWSpatialViewer *)aviewer
+{
+  FSNode *node = [aviewer shownNode];
+
+  if ([[node path] isEqual: path_separator()] == NO) {
+    return [self viewerForPath: [node parentPath]];
+  }
+    
+  return nil;  
+}
+
+- (void)selectionChanged:(NSArray *)selection
+{
+  [gworkspace selectionChanged: selection];
 }
 
 - (void)openSelectionInViewer:(GWSpatialViewer *)viewer

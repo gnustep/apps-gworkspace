@@ -47,7 +47,13 @@
 
 - (void)unselectOtherViewers:(GWSpatialViewer *)aviewer;
 
+- (void)selectionDidChangeInViewer:(GWSpatialViewer *)aviewer;
+
 - (void)viewerWillClose:(GWSpatialViewer *)aviewer;
+
+- (GWSpatialViewer *)parentOfViewer:(GWSpatialViewer *)aviewer;
+
+- (void)selectionChanged:(NSArray *)selection;
 
 - (void)openSelectionInViewer:(GWSpatialViewer *)viewer
                   closeSender:(BOOL)close;

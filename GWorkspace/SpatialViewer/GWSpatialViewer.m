@@ -97,7 +97,6 @@ static NSString *nibName = @"ViewerWindow";
 	    [scroll setDocumentView: iconsView];	
       
       ASSIGN (shownNode, node);
-      [self activate];
       
       [iconsView showContentsOfNode: node];
       
@@ -116,16 +115,6 @@ static NSString *nibName = @"ViewerWindow";
                                             NSLocalizedString(@"free", @"")];
 	    }
       
-      
-      //
-      //
-      // DIVIDERE 'STA ROBA IN PIU' METODI
-      // -updateLabels -updateMenu ecc...
-      // O NO, GIA' CHE NON ESISTERA' -setNode ?
-      //
-      //
-      
-      
       [spaceLabel setStringValue: labelstr];
       
       icons = [iconsView reps];
@@ -141,19 +130,21 @@ static NSString *nibName = @"ViewerWindow";
 - (void)activate
 {
   [win makeKeyAndOrderFront: nil];
-  [manager viewerSelected: self];
 }
 
 - (void)popUpAction:(id)sender
 {
   NSString *path = [[sender selectedItem] representedObject];
-  BOOL close = [sender closeViewer];
+
+  if ([path isEqual: [shownNode path]] == NO) {
+    BOOL close = [sender closeViewer];
   
-  if (close) {
-    [pathsPopUp setTarget: nil];
-  }
+    if (close) {
+      [pathsPopUp setTarget: nil];
+    }
   
-  [manager newViewerForPath: path closeOldViewer: (close ? self : nil)]; 
+    [manager newViewerForPath: path closeOldViewer: (close ? self : nil)];
+  } 
 }
 
 - (void)setOpened:(BOOL)opened 
@@ -200,13 +191,25 @@ static NSString *nibName = @"ViewerWindow";
 
 - (void)windowDidBecomeKey:(NSNotification *)aNotification
 {
-  NSArray *selection = [iconsView selectedReps];
-
-  if (selection && [selection count]) {
-    [iconsView selectionDidChange];
+  if ([iconsView shownNode]) {
+    NSArray *selection = [iconsView selectedPaths];  
+  
+    if (selection && [selection count]) {
+      [manager selectionChanged: selection];
+    
+      if (([selection count] == 1)
+                && ([[selection objectAtIndex: 0] isEqual: [shownNode path]])) {
+        [manager viewerSelected: self];
+      } else {
+        [manager selectionDidChangeInViewer: self];
+      }
+    } else {
+      [manager viewerSelected: self];
+      [manager selectionChanged: [NSArray arrayWithObject: [shownNode path]]];
+    }
   } else {
-//    [manager unselectOtherViewers: self];      
-    [manager viewerSelected: self];              
+    [manager viewerSelected: self];
+    [manager selectionChanged: [NSArray arrayWithObject: [shownNode path]]];
   }
 
   // [self updateInfoString]; 
@@ -226,6 +229,8 @@ static NSString *nibName = @"ViewerWindow";
 
 
 
+
+// - (void)fileSystemDidChange:(NSNotification *)notif
 
 
 @end
