@@ -83,6 +83,10 @@
 	[icons addObjectsFromArray: sortedIcons];
 }
 
+- (void)openCurrentSelection:(NSArray *)paths newViewer:(BOOL)newv
+{
+}
+
 - (void)mouseDown:(NSEvent *)theEvent
 {
   [self unselectOtherIcons: nil];
