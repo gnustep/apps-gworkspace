@@ -27,7 +27,7 @@
 
 #include <Foundation/Foundation.h>
 
-static int dbversion = 2;
+static int dbversion = 1;
 
 static NSString *deftable = @"\
 { \
@@ -36,29 +36,38 @@ fields = ( \
 { \
 name = path; \
 type = TEXT; \
+unique = 1; \
+unique_constr = IGNORE; \
+primary = 1; \
+notnull = 1; \
 }, \
 { \
 name = type; \
 type = TEXT; \
+unique = 0; \
+primary = 0; \
+notnull = 0; \
 }, \
 { \
 name = moddate; \
 type = TEXT;\
+unique = 0; \
+primary = 0; \
+notnull = 0; \
 }, \
 { \
 name = annotations; \
 type = TEXT; \
+unique = 0; \
+primary = 0; \
+notnull = 0; \
 }, \
 { \
 name = icon; \
 type = BLOB; \
-} \
-); \
-indexes = ( \
-{ \
-name = path_ind; \
-fields = path; \
 unique = 0; \
+primary = 0; \
+notnull = 0; \
 } \
 ); \
 }";

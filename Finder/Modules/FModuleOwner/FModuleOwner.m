@@ -155,11 +155,10 @@ static NSString *nibName = @"FModuleOwner";
   return nil;
 }
 
-- (BOOL)checkPath:(NSString *)path
+- (BOOL)checkPath:(NSString *)path 
+   withAttributes:(NSDictionary *)attributes
 {
-  NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: NO];
   BOOL found = [owner isEqual: [attributes fileOwnerAccountName]];
-
   return (how == IS) ? found : !found;
 }
 
@@ -177,9 +176,14 @@ static NSString *nibName = @"FModuleOwner";
   return NSOrderedSame;
 }
 
-- (BOOL)needsFullCheck
+- (BOOL)reliesOnModDate
 {
-  return YES;
+  return NO;
+}
+
+- (BOOL)reliesOnDirModDate
+{
+  return NO;
 }
 
 @end

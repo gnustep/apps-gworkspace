@@ -45,11 +45,14 @@
 
 - (NSDictionary *)searchCriteria;
 
-- (BOOL)checkPath:(NSString *)path;
+- (BOOL)checkPath:(NSString *)path 
+   withAttributes:(NSDictionary *)attributes;
 
 - (int)compareModule:(id <FinderModulesProtocol>)module;
 
-- (BOOL)needsFullCheck;
+- (BOOL)reliesOnModDate;
+
+- (BOOL)reliesOnDirModDate;
 
 @end 
 

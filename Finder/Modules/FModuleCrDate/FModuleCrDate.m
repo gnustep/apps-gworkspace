@@ -363,40 +363,37 @@ static NSString *nibName = @"FModuleCrDate";
   return criteria;
 }
 
-- (BOOL)checkPath:(NSString *)path
+- (BOOL)checkPath:(NSString *)path 
+   withAttributes:(NSDictionary *)attributes
 {
-  NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: NO];
+  NSDate *cd = [attributes fileCreationDate];
 
-  if (attributes) {
-    NSDate *cd = [attributes fileCreationDate];
+  if (how == TODAY) {
+    return (interval <= [cd timeIntervalSinceNow]);
 
-    if (how == TODAY) {
-      return (interval <= [cd timeIntervalSinceNow]);
-      
-    } else if (how == WITHIN) {
-      return (fabs([cd timeIntervalSinceNow]) <= interval);
-      
-    } else if ((how == BEFORE) || (how == AFTER) || (how == EXACTLY)) {      
-      NSCalendarDate *cdate = [cd dateWithCalendarFormat: [date calendarFormat] 
-                                                timeZone: [date timeZone]];
-    
-      if (how == BEFORE) { 
-        if ([[date earlierDate: cd] isEqualToDate: cd]) {
-          return ([cdate dayOfMonth] != [date dayOfMonth]);
-        }
-        
-      } else if (how == AFTER) { 
-        if ([[date earlierDate: cd] isEqualToDate: date]) {
-          return ([cdate dayOfMonth] != [date dayOfMonth]);
-        }
-        
-      } else if (how == EXACTLY) {
-        if (fabs([cd timeIntervalSinceDate: date]) < DAY_TI) {
-          return ([cdate dayOfMonth] == [date dayOfMonth]);
-        }  
+  } else if (how == WITHIN) {
+    return (fabs([cd timeIntervalSinceNow]) <= interval);
+
+  } else if ((how == BEFORE) || (how == AFTER) || (how == EXACTLY)) {      
+    NSCalendarDate *cdate = [cd dateWithCalendarFormat: [date calendarFormat] 
+                                              timeZone: [date timeZone]];
+
+    if (how == BEFORE) { 
+      if ([[date earlierDate: cd] isEqualToDate: cd]) {
+        return ([cdate dayOfMonth] != [date dayOfMonth]);
       }
-    }    
-  }
+
+    } else if (how == AFTER) { 
+      if ([[date earlierDate: cd] isEqualToDate: date]) {
+        return ([cdate dayOfMonth] != [date dayOfMonth]);
+      }
+
+    } else if (how == EXACTLY) {
+      if (fabs([cd timeIntervalSinceDate: date]) < DAY_TI) {
+        return ([cdate dayOfMonth] == [date dayOfMonth]);
+      }  
+    }
+  }    
   
   return NO;
 }
@@ -415,7 +412,12 @@ static NSString *nibName = @"FModuleCrDate";
   return NSOrderedSame;
 }
 
-- (BOOL)needsFullCheck
+- (BOOL)reliesOnModDate
+{
+  return NO;
+}
+
+- (BOOL)reliesOnDirModDate
 {
   return YES;
 }

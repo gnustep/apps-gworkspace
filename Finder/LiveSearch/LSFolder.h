@@ -28,53 +28,120 @@
 #include <Foundation/Foundation.h>
 #include "FSNodeRep.h"
 
+@class NSWindow;
+@class NSView;
+@class ResultsTableView;
+@class NSTableColumn;
+@class ResultsPathsView;
+@class NSImage;
+@class ProgrView;
+
+@protocol LSFUpdaterProtocol
+
++ (void)newUpdater:(NSDictionary *)info;
+
+- (oneway void)ddbdInsertTrees;
+
+- (oneway void)update;
+
+- (oneway void)exitThread;
+
+@end
+
+
 @interface LSFolder : NSObject 
 {
   FSNode *node;
 
-  NSMutableArray *searchPaths;
-  NSDictionary *searchCriteria;
-  NSMutableArray *foundPaths;
-  NSDate *lastUpdate;
-  
-  NSMutableArray *fullCheckModules;
-  NSMutableArray *dbCheckModules;
+  NSDictionary *lsfinfo;
   
   id finder;
   BOOL watcherSuspended;
+
+  NSConnection *updaterconn;
+  id <LSFUpdaterProtocol> updater;
+  SEL nextSelector;
+  BOOL actionPending;
+  BOOL updaterbusy;
   
   NSFileManager *fm;
+  NSNotificationCenter *nc;
+  
+  IBOutlet id win;
+  
+  IBOutlet id topBox;
+  IBOutlet id progBox; 
+  ProgrView *progView;
+  IBOutlet id elementsLabel;
+  IBOutlet id updateButt;
+  
+  IBOutlet id splitView;
+  
+  IBOutlet id resultsScroll;
+  ResultsTableView *resultsView;
+  NSTableColumn *nameColumn;
+  NSTableColumn *parentColumn;
+  NSTableColumn *dateColumn;
+  NSTableColumn *sizeColumn;
+  NSTableColumn *kindColumn;  
+  
+  IBOutlet id pathsScroll;
+  ResultsPathsView *pathsView;
+
+  NSMutableArray *foundObjects;
+  NSArray *sortedObjects;
+  FSNInfoType currentOrder;
 }
 
 - (id)initForNode:(FSNode *)anode
-     contentsInfo:(NSDictionary *)info;
+    needsIndexing:(BOOL)index;
+
+- (void)loadInterface;
 
 - (void)setNode:(FSNode *)anode;
 
 - (FSNode *)node;
 
+- (NSString *)infoPath;
+
+- (NSString *)foundPath;
+
 - (BOOL)watcherSuspended;
 
 - (void)setWatcherSuspended:(BOOL)value;
 
+- (void)startUpdater;
 
-- (void)update;
+- (IBAction)update:(id)sender;
 
-- (void)loadModules;
+- (void)setUpdater:(id)anObject;
 
-- (void)checkFoundPaths;
+- (void)updaterDidEndAction;
 
-- (void)searchInSearchPath:(NSString *)srcpath;
+- (void)endUpdate;
 
-- (NSArray *)fullSearchInDirectory:(NSString *)dirpath;
+- (void)threadWillExit:(NSNotification *)notification;
 
-- (void)check:(NSString *)path;
+@end
 
-- (BOOL)checkPath:(NSString *)path 
-      withModules:(NSArray *)modules;
 
-- (void)insertShorterPath:(NSString *)path 
-                  inArray:(NSMutableArray *)array;
+@interface ProgrView : NSView 
+{
+  NSImage *image;
+  float orx;
+  float rfsh;
+  NSTimer *progTimer;
+  BOOL animating;
+}
+
+- (id)initWithFrame:(NSRect)frameRect 
+    refreshInterval:(float)refresh;
+
+- (void)start;
+
+- (void)stop;
+
+- (void)animate:(id)sender;
 
 @end
 

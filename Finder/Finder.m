@@ -60,6 +60,9 @@
 if (sz.width < 0) sz.width = 0; \
 if (sz.height < 0) sz.height = 0
 
+#define LSF_INFO(x) [x stringByAppendingPathComponent: @"lsf.info"]
+#define LSF_FOUND(x) [x stringByAppendingPathComponent: @"lsf.found"]
+
 static NSString *nibName = @"Finder";
 
 static Finder *finder = nil;
@@ -89,7 +92,6 @@ static Finder *finder = nil;
 {
   [[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
   DESTROY (workspaceApplication);
-  DESTROY (ddbd);
   TEST_RELEASE (win);
   TEST_RELEASE (placesBox);
   TEST_RELEASE (addPlaceButt);
@@ -146,7 +148,7 @@ static Finder *finder = nil;
   [win setTitle: NSLocalizedString(@"Finder", @"")];
   [win setDelegate: self];
   
-  [win setFrameUsingName: @"finder"];
+  [win setFrameUsingName: @"finder" force: YES];
   wrect = [win frame];
   
   if (wrect.size.height != WINH) {
@@ -306,10 +308,6 @@ static Finder *finder = nil;
   fswatcher = nil;
   fswnotifications = YES;
   [self connectFSWatcher];
-
-  ddbd = nil;
-  ddbdactive = NO;
-  [self connectDDBd];
   
   defentry = [defaults objectForKey: @"lsfolders_paths"];
   if (defentry) {
@@ -317,13 +315,7 @@ static Finder *finder = nil;
       NSString *lsfpath = [defentry objectAtIndex: i];
     
       if ([fm fileExistsAtPath: lsfpath]) {
-        NSDictionary *lsfdict = [NSDictionary dictionaryWithContentsOfFile: lsfpath];
-
-        if (lsfdict) {
-          [self addLiveSearchFolderWithPath: lsfpath 
-                               contentsInfo: lsfdict
-                                createIndex: NO];
-        
+        if ([self addLiveSearchFolderWithPath: lsfpath createIndex: NO] != nil) {
           NSLog(@"added lsf with path %@", lsfpath);
         }
       }
@@ -347,20 +339,17 @@ static Finder *finder = nil;
   LSFolder *folder = [self lsfolderWithPath: fileName];
 
   if (folder == nil) {
-    NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: fileName];
-
-    if (dict) {
-      folder = [self addLiveSearchFolderWithPath: fileName 
-                                    contentsInfo: dict
-                                     createIndex: NO];
-
+    folder = [self addLiveSearchFolderWithPath: fileName createIndex: NO];
+    
+    if (folder) {                                 
       NSLog(@"(open file) added lsf with path %@", fileName);
     }
+    
   } else {
  
     NSLog(@"(open file) found lsf with path %@\nUPDATING", fileName);
     
-    [folder update];
+    [folder update: nil];
   }
 
  // [folder sdlkfsldf
@@ -411,17 +400,6 @@ static Finder *finder = nil;
   }
   
   TEST_CLOSE (startAppWin, [startAppWin win]);
-
-  if (ddbd) {
-    NSConnection *ddbdconn = [(NSDistantObject *)ddbd connectionForProxy];
-  
-    if (ddbdconn && [ddbdconn isValid]) {
-      [[NSNotificationCenter defaultCenter] removeObserver: self
-	                        name: NSConnectionDidDieNotification
-	                      object: ddbdconn];
-      DESTROY (ddbd);
-    }
-  }
     		
 	return YES;
 }
@@ -1081,7 +1059,6 @@ static Finder *finder = nil;
 }
 
 - (LSFolder *)addLiveSearchFolderWithPath:(NSString *)path
-                             contentsInfo:(NSDictionary *)info
                               createIndex:(BOOL)index
 {
   LSFolder *folder = [self lsfolderWithPath: path];
@@ -1089,15 +1066,16 @@ static Finder *finder = nil;
   if (folder == nil) {
     FSNode *node = [FSNode nodeWithPath: path];
   
-    folder = [[LSFolder alloc] initForNode: node contentsInfo: info];
-    [lsFolders addObject: folder];
-    RELEASE (folder);
+    folder = [[LSFolder alloc] initForNode: node needsIndexing: index];
+    
+    if (folder) {
+      [lsFolders addObject: folder];
+      RELEASE (folder);
+    }
   }
   
   if (index) {
-        NSLog(@"creating trees for lsf at %@", path);
-    
-    [self ddbdInsertTreesFromPaths: [info objectForKey: @"searchpaths"]];
+    NSLog(@"creating trees for lsf at %@", path);
   }
   
   return folder;
@@ -1105,6 +1083,7 @@ static Finder *finder = nil;
 
 - (void)removeLiveSearchFolder:(LSFolder *)folder
 {
+  [folder endUpdate];
   [lsFolders removeObject: folder];
 }
 
@@ -1258,19 +1237,11 @@ static Finder *finder = nil;
         [folder setNode: newnode];
         
       } else if (copy) {
-        NSString *dictpath = [newnode path];
-        NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: dictpath];
 
-        if (dict) {
-          [self addLiveSearchFolderWithPath: dictpath 
-                               contentsInfo: dict
-                                createIndex: NO];
+        [self addLiveSearchFolderWithPath: [newnode path] createIndex: NO];
         
+        NSLog(@"added lsf with path %@", [newnode path]);
         
-          NSLog(@"added lsf with path %@", [newnode path]);
-        
-        }
-
       } else if (remove) {
         NSLog(@"removed lsf with path %@", [node path]);
       
@@ -1417,237 +1388,6 @@ static Finder *finder = nil;
                     NSLocalizedString(@"Ok", @""),
                     nil, 
                     nil);  
-  }
-}
-
-- (void)connectDDBd
-{
-  if (ddbd == nil) {
-    id db = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
-                                                              host: @""];
-
-    if (db) {
-      NSConnection *c = [db connectionForProxy];
-
-	    [[NSNotificationCenter defaultCenter] addObserver: self
-	                   selector: @selector(ddbdConnectionDidDie:)
-		                     name: NSConnectionDidDieNotification
-		                   object: c];
-      
-      ddbd = db;
-	    [ddbd setProtocolForProxy: @protocol(DDBdProtocol)];
-      RETAIN (ddbd);
-      ddbdactive = [ddbd dbactive];
-                                         
-	  } else {
-	    static BOOL recursion = NO;
-	    static NSString	*cmd = nil;
-
-	    if (recursion == NO) {
-        if (cmd == nil) {
-            cmd = RETAIN ([[NSSearchPathForDirectoriesInDomains(
-                      GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
-                            stringByAppendingPathComponent: @"ddbd"]);
-		    }
-      }
-	  
-      if (recursion == NO && cmd != nil) {
-        int i;
-        
-        [startAppWin showWindowWithTitle: @"Finder"
-                                 appName: @"ddbd"
-                            maxProgValue: 40.0];
-
-	      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
-        DESTROY (cmd);
-        
-        for (i = 1; i <= 40; i++) {
-          [startAppWin updateProgressBy: 1.0];
-	        [[NSRunLoop currentRunLoop] runUntilDate:
-		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
-                           
-          db = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
-                                                                 host: @""];                  
-          if (db) {
-            [startAppWin updateProgressBy: 40.0 - i];
-            break;
-          }
-        }
-        
-        [[startAppWin win] close];
-        
-	      recursion = YES;
-	      [self connectDDBd];
-	      recursion = NO;
-        
-	    } else { 
-        DESTROY (cmd);
-	      recursion = NO;
-        ddbdactive = NO;
-        NSRunAlertPanel(nil,
-                NSLocalizedString(@"unable to contact ddbd.", @""),
-                NSLocalizedString(@"Ok", @""),
-                nil, 
-                nil);  
-      }
-	  }
-  }
-}
-
-- (void)ddbdConnectionDidDie:(NSNotification *)notif
-{
-  id connection = [notif object];
-
-  [[NSNotificationCenter defaultCenter] removeObserver: self
-	                    name: NSConnectionDidDieNotification
-	                  object: connection];
-
-  NSAssert(connection == [ddbd connectionForProxy],
-		                                  NSInternalInconsistencyException);
-  RELEASE (ddbd);
-  ddbd = nil;
-  ddbdactive = NO;
-  
-  NSRunAlertPanel(nil,
-                  NSLocalizedString(@"ddbd connection died.", @""),
-                  NSLocalizedString(@"Ok", @""),
-                  nil,
-                  nil);                
-}
-
-- (BOOL)ddbdactive
-{
-  return ddbdactive;
-}
-
-- (void)ddbdInsertPath:(NSString *)path
-{
-  [self connectDDBd];
-  if (ddbdactive) {
-    [ddbd insertPath: path];
-  }
-}
-
-- (void)ddbdInsertTreesFromPaths:(NSArray *)paths
-{
-  [self connectDDBd];
-  if (ddbdactive) {
-    [ddbd insertTreesFromPaths: [NSArchiver archivedDataWithRootObject: paths]];
-  }
-}
-
-- (void)ddbdRemoveTreesFromPaths:(NSArray *)paths
-{
-  [self connectDDBd];
-  if (ddbdactive) {
-    [ddbd removeTreesFromPaths: [NSArchiver archivedDataWithRootObject: paths]];
-  }
-}
-
-- (NSArray *)ddbdGetTreeFromPath:(NSDictionary *)pathinfo
-{
-  [self connectDDBd];
-  if (ddbdactive) {
-    NSData *infodata = [NSArchiver archivedDataWithRootObject: pathinfo];  
-    NSData *data = [ddbd treeFromPath: infodata];  
-    
-    if (data) {
-      return [NSUnarchiver unarchiveObjectWithData: data];
-    }
-  }
-  
-  return nil;
-}
-
-- (void)ddbdRemovePath:(NSString *)path
-{
-  [self connectDDBd];
-  if (ddbdactive) {
-    [ddbd removePath: path];
-  }
-}
-
-- (void)ddbdRemovePaths:(NSArray *)paths
-{
-  [self connectDDBd];
-  if (ddbdactive) {
-    [ddbd removePaths: paths];
-  }
-}
-
-- (NSString *)ddbdGetAnnotationsForPath:(NSString *)path
-{
-  [self connectDDBd];
-  if (ddbdactive) {
-    return [ddbd annotationsForPath: path];
-  }
-  
-  return nil;
-}
-
-- (void)ddbdSetAnnotations:(NSString *)annotations
-                   forPath:(NSString *)path
-{
-  [self connectDDBd];
-  if (ddbdactive) {
-    [ddbd setAnnotations: annotations forPath: path];
-  }
-}
-
-- (NSString *)ddbdGetFileTypeForPath:(NSString *)path
-{
-  [self connectDDBd];
-  if (ddbdactive) {
-    return [ddbd fileTypeForPath: path];
-  }
-  
-  return nil;
-}
-
-- (void)ddbdSetFileType:(NSString *)type
-                forPath:(NSString *)path
-{
-  [self connectDDBd];
-  if (ddbdactive) {
-    [ddbd setFileType: type forPath: path];
-  }
-}
-
-- (NSString *)ddbdGetModificationDateForPath:(NSString *)path;
-{
-  [self connectDDBd];
-  if (ddbdactive) {
-    return [ddbd modificationDateForPath: path];
-  }
-  
-  return nil;
-}
-
-- (void)ddbdSetModificationDate:(NSString *)datedescr
-                        forPath:(NSString *)path
-{
-  [self connectDDBd];
-  if (ddbdactive) {
-    [ddbd setModificationDate: datedescr forPath: path];
-  }  
-}
-
-- (NSData *)ddbdGetIconDataForPath:(NSString *)path
-{
-  [self connectDDBd];
-  if (ddbdactive) {
-    return [ddbd iconDataForPath: path];
-  }
-  
-  return nil;
-}
-
-- (void)ddbdSetIconData:(NSData *)data
-                forPath:(NSString *)path
-{
-  [self connectDDBd];
-  if (ddbdactive) {
-    [ddbd setIconData: data forPath: path];
   }
 }
 

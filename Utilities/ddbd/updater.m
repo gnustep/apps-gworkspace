@@ -24,16 +24,14 @@
 
 #include "updater.h"
 #include "ddbd.h"
-#include "SQLite.h"
 #include "functions.h"
 
 @implementation	DDBdUpdater
 
 - (void)dealloc
 {
-  if (sqlite) {
-    [sqlite closedb];
-    RELEASE (sqlite);
+  if (db != NULL) {
+    closedb(db);
   }
   RELEASE (updinfo);
   RELEASE (lock);
@@ -74,13 +72,13 @@
   
   ASSIGN (updinfo, dict);
   
-  sqlite = [[SQLite alloc] initWithDatabasePath: dbpath];
-  
   RETAIN (self);
     
   [self connectDDBd];  
   
-  if ([sqlite opendb] == NO) {
+  db = opendbAtPath(dbpath);
+  
+  if (db == NULL) {
     NSLog(@"updater error");
     [self done];
   }
@@ -123,8 +121,7 @@
     }
   }
 
-  [sqlite closedb];
-  DESTROY (sqlite);
+  closedb(db);
   RELEASE (self);
   
   [NSThread exit];
@@ -132,18 +129,18 @@
 
 - (BOOL)checkPath:(NSString *)path
 {
-  return (sqlite && [self infoOfType: @"path" forPath: path]);
+  return ((db != NULL) && checkPathInDb(db, path));
 }
 
 - (NSData *)infoOfType:(NSString *)type
                forPath:(NSString *)path
 {
-  if (sqlite && [fm fileExistsAtPath: path]) {
+  if ((db != NULL) && [fm fileExistsAtPath: path]) {
     NSArray *results = nil;
     NSString *query = [NSString stringWithFormat: 
                           @"SELECT %@ FROM files WHERE path = '%@'", 
                                               type, stringForQuery(path)];
-    results = [sqlite performQuery: query];
+    results = performQueryOnDb(db, query);
     
     if (results && [results count]) {
       NSDictionary *dict = [results objectAtIndex: 0];
@@ -157,18 +154,18 @@
 - (void)connectDDBd
 {
   if (ddbd == nil) {
-    id db = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
-                                                              host: @""];
+    id remote = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
+                                                                   host: @""];
 
-    if (db) {
-      NSConnection *c = [db connectionForProxy];
+    if (remote) {
+      NSConnection *c = [remote connectionForProxy];
 
 	    [[NSNotificationCenter defaultCenter] addObserver: self
 	                   selector: @selector(ddbdConnectionDidDie:)
 		                     name: NSConnectionDidDieNotification
 		                   object: c];
       
-      ddbd = db;
+      ddbd = remote;
 	    [ddbd setProtocolForProxy: @protocol(DDBdProtocol)];
       RETAIN (ddbd);
                                          
@@ -182,9 +179,9 @@
 	        [[NSRunLoop currentRunLoop] runUntilDate:
 		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
                            
-          db = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
-                                                                 host: @""];                  
-          if (db) {
+          remote = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
+                                                                     host: @""];                  
+          if (remote) {
             break;
           }
         }
@@ -231,15 +228,6 @@
     NSString *query;
     NSArray *results;
 
-    query = [NSString stringWithFormat: 
-                  @"SELECT path FROM files WHERE path = '%@'", 
-                                              stringForQuery(base)];
-    results = [sqlite performQuery: query];
-    
-    if ((results == nil) || ([results count] == 0)) {
-      [ddbd insertPath: base];
-    }
-
     if (type == NSFileTypeDirectory) {
       NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: base];
       IMP nxtImp = [enumerator methodForSelector: @selector(nextObject)];  
@@ -249,16 +237,27 @@
         CREATE_AUTORELEASE_POOL(arp1);
         NSString *fullPath = [base stringByAppendingPathComponent: path];        
 
-        query = [NSString stringWithFormat: 
+        if ([[enumerator fileAttributes] fileType] == NSFileTypeDirectory) {
+          query = [NSString stringWithFormat: 
                       @"SELECT path FROM files WHERE path = '%@'", 
                                                   stringForQuery(fullPath)];
-        results = [sqlite performQuery: query];
+          results = performQueryOnDb(db, query);
 
-        if ((results == nil) || ([results count] == 0)) {
-          [ddbd insertPath: fullPath];
+          if ((results == nil) || ([results count] == 0)) {
+            [ddbd insertPath: fullPath];
+          }
         }
-
+        
         DESTROY (arp1);
+      }
+      
+      query = [NSString stringWithFormat: 
+                  @"SELECT path FROM files WHERE path = '%@'", 
+                                              stringForQuery(base)];
+      results = performQueryOnDb(db, query);
+    
+      if ((results == nil) || ([results count] == 0)) {
+        [ddbd insertPath: base];
       }
     } 
     
@@ -270,35 +269,40 @@
 
 - (void)removeTrees
 {
-  CREATE_AUTORELEASE_POOL(arp);
   NSArray *basePaths = [updinfo objectForKey: @"paths"];
-  NSMutableString *query = [NSMutableString string];
   int i;
     
-  [query appendString: @"DELETE FROM files "];
-    
   for (i = 0; i < [basePaths count]; i++) {
+    CREATE_AUTORELEASE_POOL(arp);
     NSString *path = stringForQuery([basePaths objectAtIndex: i]);  
+    NSMutableString *query = [NSMutableString string];
     
-    if (i == 0) {
-      [query appendFormat: @"WHERE path = '%@' ", path];
-    } else {
-      [query appendFormat: @"OR path = '%@' ", path];
-    }
+    [query appendFormat: @"DELETE FROM files WHERE path = '%@'", path];
     
-    [query appendFormat: @"OR path GLOB '%@", path];    
+    if ([ddbd performWriteQuery: query] == NO) {
+      NSLog(@"error accessing the Desktop database (-removeTrees)");
+    }  
+    
+    query = (NSMutableString *)[NSMutableString string];
+    [query appendFormat: @"DELETE FROM files WHERE path > '%@", path];
+    
     if ([path isEqual: path_separator()] == NO) {
-      [query appendFormat: @"%@*' ", path_separator()];
-    } else {
-      [query appendString: @"*' "];
+      [query appendString: path_separator()];
     }
+    [query appendString: @"' "];
+    
+    if ([path isEqual: path_separator()] == NO) {
+      [query appendFormat: @"AND path < '%@0' ", path];
+    } else {
+      [query appendString: @"AND path < '0' "];
+    }
+    
+    if ([ddbd performWriteQuery: query] == NO) {
+      NSLog(@"error accessing the Desktop database (-removeTrees)");
+    }  
+    
+    DESTROY (arp);
   }
-    
-  if ([ddbd performWriteQuery: query] == NO) {
-    NSLog(@"error accessing the Desktop database (-removeTrees)");
-  }  
-    
-  DESTROY (arp);
   
   [self done];
 }
@@ -364,12 +368,12 @@
       query = (NSMutableString *)[NSMutableString string];
       [query appendFormat: @"SELECT path FROM files WHERE path = '%@'", 
                                                     stringForQuery(srcpath)];
-      results = [sqlite performQuery: query];
+      results = performQueryOnDb(db, query);
 
       if (results && [results count]) { 
         if ([ddbd setInfoOfPath: srcpath toPath: dstpath] == NO) {
           NSLog(@"updater: error at path: %@", dstpath);
-          [sqlite closedb];
+          closedb(db);
            RELEASE (pool);
            RELEASE (arp);
           [self done];
@@ -381,7 +385,7 @@
                         @"SELECT path FROM files WHERE path GLOB '%@%@*'", 
                                       stringForQuery(srcpath), path_separator()];
 
-        results = [sqlite performQuery: query];
+        results = performQueryOnDb(db, query);
 
         if (results && [results count]) {                 
           for (j = 0; j < [results count]; j++) {
@@ -396,7 +400,7 @@
             if ([fm fileExistsAtPath: newpath]) {
               if ([ddbd setInfoOfPath: oldpath toPath: newpath] == NO) {
                 NSLog(@"updater: error at path: %@", newpath);
-                [sqlite closedb];
+                closedb(db);
                 RELEASE (pool);
                 RELEASE (arp);
                 [self done];
@@ -412,6 +416,9 @@
   
   if ([pathsToRemove count]) {
     [ddbd removeTreesFromPaths: [NSArchiver archivedDataWithRootObject: pathsToRemove]];
+ 
+      // QUA !!!!!!!!!!!!!!!!
+ 
   }
   
   RELEASE (arp);
@@ -421,22 +428,19 @@
 
 - (void)daylyUpdate
 {
+  CREATE_AUTORELEASE_POOL(arp);
   NSMutableArray *toremove = [NSMutableArray array];
-  sqlite3 *sq3 = [sqlite sq3];
-  const char *query = "SELECT path FROM files";
+  const char *query = "SELECT path FROM files WHERE (pathExists(path) = 0)";
   struct sqlite3_stmt *stmt;
-  
-  if (sqlite3_prepare(sq3, query, strlen(query), &stmt, NULL)) {
+    
+  if (sqlite3_prepare(db, query, strlen(query), &stmt, NULL)) {
     NSLog(@"sqlite3_prepare error");
     [self done];
   }
 
   while(sqlite3_step(stmt) == SQLITE_ROW) { 
     NSString *path = [NSString stringWithUTF8String: sqlite3_column_text(stmt, 0)];
-
-    if ([fm fileExistsAtPath: path] == NO) {
-      [toremove addObject: path];
-    }
+    [toremove addObject: path];
   }
   
   sqlite3_finalize(stmt);
@@ -448,13 +452,14 @@
       NSString *rmpath = [toremove objectAtIndex: i];
 
       if ([ddbd removePath: rmpath]) {
-        NSLog(@"removing unexisting path: %@", rmpath);
+        NSLog(@"removing from db unexisting path: %@", rmpath);
       } else {
         NSLog(@"updater: error at path: %@", rmpath);
       }
     }
   }
-
+  
+  RELEASE (arp);
   [self done];
 }
 

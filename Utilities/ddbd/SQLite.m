@@ -22,105 +22,59 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "SQLite.h"
 #include "ddbd.h"
+#include "functions.h"
 
 #define MAX_RETRY 100
 
 static char basetable[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-NSString *stringForQuery(NSString *str)
+static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv)
 {
-	NSRange range, subRange;
-	NSMutableString *querystr;
+  const unsigned char *path = sqlite3_value_text(argv[0]);
+  int exists = 0;
+  
+  if (path) {
+    struct stat statbuf;  
+    exists = (stat(path, &statbuf) == 0);
+  }
+     
+  sqlite3_result_int(context, exists);
+}
 
-  range = NSMakeRange(0, [str length]);
-	subRange = [str rangeOfString: @"'" options: NSLiteralSearch range: range];
-	
-  if (subRange.location == NSNotFound) {
-		return str;
-	}
-  
-	querystr = [NSMutableString stringWithString: str];
-  
-	while ((subRange.location != NSNotFound) && (range.length > 0)) {
-		subRange = [querystr rangeOfString: @"'" 
-                               options: NSLiteralSearch 
-                                 range: range];
-		
-    if (subRange.location != NSNotFound) {
-			[querystr replaceCharactersInRange: subRange withString: @"''"];
-		}
+sqlite3 *opendbAtPath(NSString *dbpath)
+{
+  sqlite3 *db = NULL;
+  int dberr = sqlite3_open([dbpath fileSystemRepresentation], &db);
     
-		range.location = subRange.location + 2;
-	  
-    if ([querystr length] < range.location) {
-      range.length = 0;
-    } else {
-      range.length = [querystr length] - range.location;
-    }
+  if (dberr != SQLITE_OK) {
+    NSLog(@"%s", sqlite3_errmsg(db));
+		return NULL;	    
   }
-  
-	return querystr;
-}
-
-
-@implementation	SQLite
-
-- (void)dealloc
-{
-  [self closedb];
-	RELEASE (dbpath);
-  
-	[super dealloc];
-}
-
-- (id)initWithDatabasePath:(NSString *)path
-{
-  self = [super init];
-
-  if (self) {
-    ASSIGN (dbpath, path);
-    sqlite = NULL;
-    fm = [NSFileManager defaultManager];
-  }
-  
-  return self;
-}
-
-- (BOOL)opendb
-{
-	if (sqlite == NULL) {
-    int dberr = sqlite3_open([dbpath fileSystemRepresentation], &sqlite);
     
-    if (dberr != SQLITE_OK) {
-      NSLog(@"%s", sqlite3_errmsg(sqlite));
-		  return NO;	    
-    }
-  }
+  sqlite3_create_function(db, "pathExists", 1, 
+                              SQLITE_UTF8, 0, path_Exists, 0, 0);
 
-  return YES;  
+  performWriteQueryOnDb(db, @"PRAGMA synchronous=OFF");
+  
+  return db;  
 }
 
-- (void)closedb
+void closedb(sqlite3 *db)
 {
-	if (sqlite) {
-	  sqlite3_close(sqlite);
-	  sqlite = NULL;
-  }
+  sqlite3_close(db);
 }
 
-- (sqlite3 *)sq3
-{
-  return sqlite;
-}
-
-- (BOOL)createDatabaseWithTable:(NSDictionary *)table
+BOOL createDatabaseWithTable(sqlite3 *db, NSDictionary *table)
 {
   NSMutableString *query = [NSMutableString stringWithCapacity: 1];
   NSString *tname = [table objectForKey: @"tablename"];
   NSArray *fields = [table objectForKey: @"fields"];
-  NSArray *indexes = [table objectForKey: @"indexes"];
   int count;
   int i;
 
@@ -132,8 +86,24 @@ NSString *stringForQuery(NSString *str)
     NSDictionary *fieldict = [fields objectAtIndex: i];
     NSString *fname = [fieldict objectForKey: @"name"];
     NSString *ftype = [fieldict objectForKey: @"type"];
+    BOOL unique = [[fieldict objectForKey: @"unique"] boolValue];
+    BOOL primary = [[fieldict objectForKey: @"primary"] boolValue];
+    BOOL notnull = [[fieldict objectForKey: @"notnull"] boolValue];
 
     [query appendFormat: @"%@ %@", fname, ftype];
+
+    if (unique) {
+      NSString *constraint = [fieldict objectForKey: @"unique_constr"];
+      [query appendFormat: @" UNIQUE ON CONFLICT %@", constraint];
+    }
+    
+    if (primary) {
+      [query appendString: @" PRIMARY KEY"];
+    }
+
+    if (notnull) {
+      [query appendString: @" NOT NULL"];
+    }
 
     if (i < (count - 1)) {
       [query appendString: @", "];
@@ -142,126 +112,52 @@ NSString *stringForQuery(NSString *str)
 
   [query appendString: @")"];
 
-  if ([self performQuery: query] == nil) {
+  if (performQueryOnDb(db, query) == nil) {
     return NO;
   }
 
-  if (indexes) {
-    count = [indexes count];
-
-    for (i = 0; i < [indexes count]; i++) {
-      NSDictionary *indexdict = [indexes objectAtIndex: i];
-      NSString *iname = [indexdict objectForKey: @"name"];
-      NSString *fields = [indexdict objectForKey: @"fields"];
-      BOOL unique = [[indexdict objectForKey: @"unique"] boolValue];
-
-      query = [NSMutableString stringWithCapacity: 1];
-
-      [query appendString: @"CREATE "];
-
-      if (unique) {
-        [query appendString: @"UNIQUE "];
-      }
-
-      [query appendFormat: @"INDEX %@ ON %@ (%@)", iname, tname, fields];
-
-      if ([self performQuery: query] == nil) {
-        return NO;
-      }
-    }
-  }
-  
   return YES;
 }
 
-- (BOOL)performWriteQuery:(NSString *)query
+NSArray *performQueryOnDb(sqlite3 *db, NSString *query)
 {
-  const char *qbuff = [query UTF8String];
-  struct sqlite3_stmt *stmt;
+  CREATE_AUTORELEASE_POOL(pool);
+  NSMutableArray *queryResult = [NSMutableArray array];
   int retry = 0;
-  int err;
-  
-  err = sqlite3_prepare(sqlite, qbuff, strlen(qbuff), &stmt, NULL);
-  
-  if (err != SQLITE_OK) {
-    NSLog(@"%s", sqlite3_errmsg(sqlite));
-    return NO;
-  }
-  
-  while (1) {
-    err = sqlite3_step(stmt);
+	char **results;
+	int err;
+	int cols;
+	int rows;
 
-    if (err == SQLITE_DONE) {
+  while (1) {
+    err = sqlite3_get_table(db, [query UTF8String], 
+                                          &results, &rows, &cols, NULL);
+    if (err == SQLITE_OK) {
       break;
-      
-    } else if (err == SQLITE_BUSY) {
+
+    } else if ((err == SQLITE_BUSY) || (err == SQLITE_LOCKED)) {
       CREATE_AUTORELEASE_POOL(arp); 
       NSDate *when = [NSDate dateWithTimeIntervalSinceNow: 0.1];
 
+      sqlite3_free_table(results);
       [NSThread sleepUntilDate: when];
       NSLog(@"retry %i", retry);
       RELEASE (arp);
 
       if (retry++ > MAX_RETRY) {
-        NSLog(@"%s", sqlite3_errmsg(sqlite));
-        sqlite3_finalize(stmt);
-		    return NO;
-      }
-
-    } else {
-      NSLog(@"%s", sqlite3_errmsg(sqlite));
-      sqlite3_finalize(stmt);
-      return NO;
-    }
-  }
-
-  sqlite3_finalize(stmt);
-  
-  return YES;
-}
-
-- (NSArray *)performQuery:(NSString *)query
-{
-  CREATE_AUTORELEASE_POOL(pool);
-  NSMutableArray *queryResult = [NSMutableArray array];
-	char **results;
-	int err;
-	int cols;
-	int rows;
-  
-	if (sqlite) {
-    int retry = 0;
-
-    while (1) {
-      err = sqlite3_get_table(sqlite, [query UTF8String], 
-                                            &results, &rows, &cols, NULL);
-      if (err == SQLITE_OK) {
-        break;
-
-      } else if ((err == SQLITE_BUSY) || (err == SQLITE_LOCKED)) {
-        CREATE_AUTORELEASE_POOL(arp); 
-        NSDate *when = [NSDate dateWithTimeIntervalSinceNow: 0.1];
-
-        sqlite3_free_table(results);
-        [NSThread sleepUntilDate: when];
-        NSLog(@"retry %i", retry);
-        RELEASE (arp);
-
-        if (retry++ > MAX_RETRY) {
-          NSLog(@"error %i", err);
-          RELEASE (pool);
-		      return nil;
-        }
-
-      } else {
-		    sqlite3_free_table(results);
         NSLog(@"error %i", err);
         RELEASE (pool);
 		    return nil;
       }
+
+    } else {
+		  sqlite3_free_table(results);
+      NSLog(@"error %i", err);
+      RELEASE (pool);
+		  return nil;
     }
   }
-
+  
   if (rows && cols) {
     NSMutableArray *titles = [NSMutableArray array];
     int index, count;
@@ -303,10 +199,110 @@ NSString *stringForQuery(NSString *str)
   RETAIN (queryResult);
   RELEASE (pool);
   
-  return queryResult;
+  return AUTORELEASE (queryResult);
 }
 
-- (NSString *)blobFromData:(NSData *)data
+BOOL performWriteQueryOnDb(sqlite3 *db, NSString *query)
+{
+  const char *qbuff = [query UTF8String];
+  struct sqlite3_stmt *stmt;
+  int retry = 0;
+  int err;
+  
+  err = sqlite3_prepare(db, qbuff, strlen(qbuff), &stmt, NULL);
+  
+  if (err != SQLITE_OK) {
+    NSLog(@"%s", sqlite3_errmsg(db));
+    return NO;
+  }
+  
+  while (1) {
+    err = sqlite3_step(stmt);
+
+    if (err == SQLITE_DONE) {
+      break;
+      
+    } else if (err == SQLITE_BUSY) {
+      CREATE_AUTORELEASE_POOL(arp); 
+      NSDate *when = [NSDate dateWithTimeIntervalSinceNow: 0.1];
+
+      [NSThread sleepUntilDate: when];
+      NSLog(@"retry %i", retry);
+      RELEASE (arp);
+
+      if (retry++ > MAX_RETRY) {
+        NSLog(@"%s", sqlite3_errmsg(db));
+        sqlite3_finalize(stmt);
+		    return NO;
+      }
+
+    } else {
+      NSLog(@"%s", sqlite3_errmsg(db));
+      sqlite3_finalize(stmt);
+      return NO;
+    }
+  }
+
+  sqlite3_finalize(stmt);
+  
+  return YES;
+}
+
+BOOL checkPathInDb(sqlite3 *db, NSString *path)
+{
+  NSString *query;
+  int retry = 0;
+	char **results;
+	int err;
+	int cols;
+	int rows;
+
+  query = [NSString stringWithFormat: 
+                    @"SELECT count() FROM files WHERE path = '%@'", 
+                                                    stringForQuery(path)];
+
+  while (1) {
+    err = sqlite3_get_table(db, [query UTF8String], 
+                                          &results, &rows, &cols, NULL);
+    if (err == SQLITE_OK) {
+      break;
+
+    } else if ((err == SQLITE_BUSY) || (err == SQLITE_LOCKED)) {
+      CREATE_AUTORELEASE_POOL(arp); 
+      NSDate *when = [NSDate dateWithTimeIntervalSinceNow: 0.1];
+
+      sqlite3_free_table(results);
+      [NSThread sleepUntilDate: when];
+      NSLog(@"retry %i", retry);
+      RELEASE (arp);
+
+      if (retry++ > MAX_RETRY) {
+        NSLog(@"error %i", err);
+		    return NO;
+      }
+
+    } else {
+		  sqlite3_free_table(results);
+      NSLog(@"error %i", err);
+		  return NO;
+    }
+  }
+
+  if (rows && cols) {
+    char *entry = *(results + 1);
+    NSData *data = [NSData dataWithBytes: entry length: strlen(entry) + 1];
+
+    sqlite3_free_table(results);
+
+    return ([[NSString stringWithUTF8String: [data bytes]] intValue] != 0);
+  }
+
+  sqlite3_free_table(results);
+
+  return NO;
+}
+
+NSString *blobFromData(NSData *data)
 {
 	int length = [data length];
 	char *bytes = NSZoneMalloc (NSDefaultMallocZone(), length);	
@@ -400,7 +396,7 @@ void decodeBlobUnit(unsigned char *unit, const char *src)
 	unit[0] = (unsigned char)(x & 255);
 }
 
-- (NSData *)dataFromBlob:(const char *)blob
+NSData *dataFromBlob(const char *blob)
 {
 	int blength = 0;
   char *bytes = NSZoneMalloc (NSDefaultMallocZone(), strlen(blob) * 3/4 + 8);
@@ -443,5 +439,38 @@ void decodeBlobUnit(unsigned char *unit, const char *src)
 	return blobData;
 }
 
-@end
+NSString *stringForQuery(NSString *str)
+{
+	NSRange range, subRange;
+	NSMutableString *querystr;
+
+  range = NSMakeRange(0, [str length]);
+	subRange = [str rangeOfString: @"'" options: NSLiteralSearch range: range];
+	
+  if (subRange.location == NSNotFound) {
+		return str;
+	}
+  
+	querystr = [NSMutableString stringWithString: str];
+  
+	while ((subRange.location != NSNotFound) && (range.length > 0)) {
+		subRange = [querystr rangeOfString: @"'" 
+                               options: NSLiteralSearch 
+                                 range: range];
+		
+    if (subRange.location != NSNotFound) {
+			[querystr replaceCharactersInRange: subRange withString: @"''"];
+		}
+    
+		range.location = subRange.location + 2;
+	  
+    if ([querystr length] < range.location) {
+      range.length = 0;
+    } else {
+      range.length = [querystr length] - range.location;
+    }
+  }
+  
+	return querystr;
+}
 

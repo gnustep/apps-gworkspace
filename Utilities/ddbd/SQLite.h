@@ -28,33 +28,24 @@
 #include <Foundation/Foundation.h>
 #include <sqlite3.h>
 
+sqlite3 *opendbAtPath(NSString *dbpath);
+
+void closedb(sqlite3 *db);
+
+BOOL createDatabaseWithTable(sqlite3 *db, NSDictionary *table);
+
+NSArray *performQueryOnDb(sqlite3 *db, NSString *query);
+
+BOOL performWriteQueryOnDb(sqlite3 *db, NSString *query);
+
+BOOL checkPathInDb(sqlite3 *db, NSString *path);
+
+NSString *blobFromData(NSData *data);
+
+void decodeBlobUnit(unsigned char *unit, const char *src);
+
+NSData *dataFromBlob(const char *blob);
+
 NSString *stringForQuery(NSString *str);
-
-@interface SQLite: NSObject
-{
-  sqlite3 *sqlite;
-	NSString *dbpath;
-  NSFileManager *fm;
-}
-
-- (id)initWithDatabasePath:(NSString *)path;
-
-- (BOOL)createDatabaseWithTable:(NSDictionary *)table;
-
-- (BOOL)opendb;
-
-- (void)closedb;
-
-- (sqlite3 *)sq3;
-
-- (NSArray *)performQuery:(NSString *)query;
-
-- (BOOL)performWriteQuery:(NSString *)query;
-
-- (NSString *)blobFromData:(NSData *)data;
-
-- (NSData *)dataFromBlob:(const char *)blob;
-
-@end
 
 #endif // SQLITE_CLIENT_H

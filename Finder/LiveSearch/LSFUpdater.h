@@ -3,7 +3,7 @@
  * Copyright (C) 2004 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
- * Date: October 2004
+ * Date: December 2004
  *
  * This file is part of the GNUstep Finder application
  *
@@ -27,22 +27,125 @@
 
 #include <Foundation/Foundation.h>
 
+@protocol LSFolderProtocol
+
+- (void)setUpdater:(id)anObject;
+
+- (oneway void)updaterDidEndAction;
+
+- (NSString *)infoPath;
+
+- (NSString *)foundPath;
+                          
+@end
 
 
+@protocol	DDBd
+
+- (BOOL)dbactive;
+
+- (oneway void)insertPath:(NSString *)path;
+
+- (oneway void)removePath:(NSString *)path;
+
+- (oneway void)removePaths:(NSArray *)paths;
+
+- (oneway void)insertTreesFromPaths:(NSData *)info;
+
+- (oneway void)removeTreesFromPaths:(NSData *)info;
+
+- (NSData *)treeFromPath:(NSData *)pathinfo;
+
+- (NSString *)annotationsForPath:(NSString *)path;
+
+- (oneway void)setAnnotations:(NSString *)annotations
+                      forPath:(NSString *)path;
+
+- (NSString *)fileTypeForPath:(NSString *)path;
+
+- (oneway void)setFileType:(NSString *)type
+                   forPath:(NSString *)path;
+
+- (NSString *)modificationDateForPath:(NSString *)path;
+
+- (oneway void)setModificationDate:(NSString *)datedescr
+                           forPath:(NSString *)path;
+
+- (NSData *)iconDataForPath:(NSString *)path;
+
+- (oneway void)setIconData:(NSData *)data
+                   forPath:(NSString *)path;
+
+@end
 
 
+@interface LSFUpdater: NSObject
+{
+  NSMutableArray *searchPaths;
+  NSDictionary *searchCriteria;
+  NSMutableArray *foundPaths;
+  NSDate *lastUpdate;
+  NSMutableArray *modules;
 
+  id <LSFolderProtocol> lsfolder;
+  id ddbd;
+  BOOL ddbdactive;
+  NSFileManager *fm;
+  NSNotificationCenter *nc;
+}
 
++ (void)newUpdater:(NSDictionary *)info;
 
+- (void)setLSFolder:(NSDictionary *)info;
 
+- (void)notifyEndAction:(id)sender;
 
+- (void)exitThread;
 
+- (void)update;
 
+- (void)getFoundPaths;
 
+- (void)checkFoundPaths;
 
+- (void)searchInSearchPath:(NSString *)srcpath;
 
+- (NSArray *)fullSearchInDirectory:(NSString *)dirpath;
 
+- (void)check:(NSString *)path;
 
+- (BOOL)checkPath:(NSString *)path 
+       attributes:(NSDictionary *)attrs
+        fullCheck:(BOOL)fullck;
 
+- (BOOL)checkPath:(NSString *)path 
+       attributes:(NSDictionary *)attrs
+       withModule:(id)module;
+
+- (void)insertShorterPath:(NSString *)path 
+                  inArray:(NSMutableArray *)array;
+
+- (void)ddbdInsertTrees;
+
+- (void)ddbdInsertTreesFromPaths:(NSArray *)paths;
+
+- (NSArray *)ddbdGetTreeFromPath:(NSDictionary *)pathinfo;
+
+- (void)ddbdRemoveTreesFromPaths:(NSArray *)paths;
+
+- (void)connectDDBd;
+
+- (void)ddbdConnectionDidDie:(NSNotification *)notif;
+
+@end
 
 #endif // LSF_UPDATER_H
+
+
+
+
+
+
+
+
+

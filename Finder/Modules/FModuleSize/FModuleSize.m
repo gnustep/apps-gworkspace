@@ -157,9 +157,9 @@ static NSString *nibName = @"FModuleSize";
   return nil;
 }
 
-- (BOOL)checkPath:(NSString *)path
+- (BOOL)checkPath:(NSString *)path 
+   withAttributes:(NSDictionary *)attributes
 {
-  NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: NO];
   unsigned long long fs = ([attributes fileSize] >> 10);
 
   if (fs < size) {
@@ -185,9 +185,14 @@ static NSString *nibName = @"FModuleSize";
   return NSOrderedSame;
 }
 
-- (BOOL)needsFullCheck
+- (BOOL)reliesOnModDate
 {
-  return YES;
+  return NO;
+}
+
+- (BOOL)reliesOnDirModDate
+{
+  return NO;
 }
 
 @end

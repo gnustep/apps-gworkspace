@@ -35,9 +35,11 @@
 #include "FSNodeRep.h"
 #include "Functions.h"
 #include "config.h"
-#include "GNUstep.h"
 
 #define CELLS_HEIGHT (28.0)
+
+#define LSF_INFO(x) [x stringByAppendingPathComponent: @"lsf.info"]
+#define LSF_FOUND(x) [x stringByAppendingPathComponent: @"lsf.found"]
 
 static NSString *nibName = @"ResultsWindow";
 
@@ -629,23 +631,12 @@ static NSString *lsfname = @"LiveSearch.lsf";
     NSString *msg = [NSString stringWithFormat: @"a file named \"LiveSearch\" already exists.\nPlease rename it."];
     NSRunAlertPanel(NULL, msg, NSLocalizedString(@"Ok", @""), NULL, NULL);  
   } else {
-    NSString *lsfpath = [destination stringByAppendingPathComponent: lsfname];
-    NSMutableArray *foundPaths = [NSMutableArray array];
-    NSMutableDictionary *lsfdict = [NSMutableDictionary dictionary];
     NSNotificationCenter *dnc = [NSDistributedNotificationCenter defaultCenter];
     NSMutableDictionary *notifDict = [NSMutableDictionary dictionary];		
-    int i;
-
-    for (i = 0; i < [foundObjects count]; i++) {
-      [foundPaths addObject: [[foundObjects objectAtIndex: i] path]];
-    }
-
-    [lsfdict setObject: searchPaths forKey: @"searchpaths"];	
-    [lsfdict setObject: searchCriteria forKey: @"criteria"];	
-    [lsfdict setObject: foundPaths forKey: @"foundpaths"];	
-    [lsfdict setObject: [[NSDate date] description] forKey: @"lastupdate"];	
-
-    [notifDict setObject: @"GWorkspaceCreateFileOperation" 
+    NSString *lsfpath = [destination stringByAppendingPathComponent: lsfname];
+    BOOL lsfdone = YES;
+    
+    [notifDict setObject: @"GWorkspaceCreateDirOperation" 
                   forKey: @"operation"];	
     [notifDict setObject: destination forKey: @"source"];	
     [notifDict setObject: destination forKey: @"destination"];	
@@ -655,11 +646,28 @@ static NSString *lsfname = @"LiveSearch.lsf";
 	  [dnc postNotificationName: @"GWFileSystemWillChangeNotification"
 	 								     object: nil 
                      userInfo: notifDict];
+    
+    if ([fm createDirectoryAtPath: lsfpath attributes: nil]) {
+      NSMutableArray *foundPaths = [NSMutableArray array];
+      NSMutableDictionary *lsfdict = [NSMutableDictionary dictionary];
+      int i;
+   
+      for (i = 0; i < [foundObjects count]; i++) {
+        [foundPaths addObject: [[foundObjects objectAtIndex: i] path]];
+      }
+   
+      [lsfdict setObject: searchPaths forKey: @"searchpaths"];	
+      [lsfdict setObject: searchCriteria forKey: @"criteria"];	
+      [lsfdict setObject: [[NSDate date] description] forKey: @"lastupdate"];	
+   
+      lsfdone = [lsfdict writeToFile: LSF_INFO(lsfpath) atomically: YES];
+      lsfdone = [foundPaths writeToFile: LSF_FOUND(lsfpath) atomically: YES];
+    } else {
+      lsfdone = NO;
+    }
 
-    if ([lsfdict writeToFile: lsfpath atomically: YES]) {
-      [finder addLiveSearchFolderWithPath: lsfpath 
-                             contentsInfo: lsfdict
-                              createIndex: YES];
+    if (lsfdone) {
+      [finder addLiveSearchFolderWithPath: lsfpath createIndex: YES];
     } else {
       NSString *msg = NSLocalizedString(@"can't create the Live Search folder", @"");
       NSRunAlertPanel(NULL, msg, NSLocalizedString(@"Ok", @""), NULL, NULL);  
@@ -995,12 +1003,13 @@ static NSString *lsfname = @"LiveSearch.lsf";
       while ((currentPath = [enumerator nextObject])) {
         CREATE_AUTORELEASE_POOL(arp2);
         NSString *fullPath = [path stringByAppendingPathComponent: currentPath];
+        NSDictionary *attrs = [enumerator fileAttributes];
         BOOL found = YES;
         
         for (j = 0; j < [modules count]; j++) {
           id module = [modules objectAtIndex: j];
   
-          found = [module checkPath: fullPath];
+          found = [module checkPath: fullPath withAttributes: attrs];
           
           if (found == NO) {
             break;
@@ -1031,7 +1040,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
       for (j = 0; j < [modules count]; j++) {
         id module = [modules objectAtIndex: j];
         
-        found = [module checkPath: path];
+        found = [module checkPath: path withAttributes: attributes];
 
         if (found == NO) {
           break;

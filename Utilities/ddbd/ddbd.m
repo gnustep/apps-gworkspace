@@ -28,13 +28,15 @@
 #include "config.h"
 
 #ifdef HAVE_SQLITE
-  #include "SQLite.h"
   #include "updater.h"
   #include "dbversion.h"
 #endif
 
 #include <stdio.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #ifdef __MINGW__
   #include "process.h"
 #endif
@@ -61,9 +63,8 @@
   RELEASE (lock);
   
 #ifdef HAVE_SQLITE
-  if (sqlite) {
-    [sqlite closedb];
-    RELEASE (sqlite);
+  if (db != NULL) {
+    closedb(db);
     RELEASE (dbpath);
   }
 #endif
@@ -79,7 +80,7 @@
     fm = [NSFileManager defaultManager];	
     nc = [NSNotificationCenter defaultCenter];
     
-    sqlite = nil;
+    db = NULL;
     
     conn = [NSConnection defaultConnection];
     [conn setRootObject: self];
@@ -149,30 +150,25 @@
             
       newdb = ([fm fileExistsAtPath: dbpath] == NO);
     
-      sqlite = [[SQLite alloc] initWithDatabasePath: dbpath];
+      db = opendbAtPath(dbpath);
       
-      if ([sqlite opendb]) {
+      if (db != NULL) {
         if (newdb) {
           NSDictionary *table = [deftable propertyList];
           
-          if ([sqlite createDatabaseWithTable: table] == NO) {
-            DESTROY (sqlite);
+          if (createDatabaseWithTable(db, table) == NO) {
             NSLog(@"unable to create the Desktop database");
           } else {
             NSLog(@"Desktop database created");
           }
         }
 
-
         // !!!!!!!!!!!!!!!!!!!! TEST 2 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     //    [self testWriteImage];        
         // !!!!!!!!!!!!!!!!!!!! TEST 2 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-         
-         
-         
+                 
       } else {
-        DESTROY (sqlite);
         NSLog(@"unable to open the Desktop database");
       }
     } 
@@ -185,7 +181,7 @@
 
 - (BOOL)dbactive
 {
-  return (sqlite != nil);
+  return (db != NULL);
 }
 
 - (BOOL)insertPath:(NSString *)path
@@ -193,11 +189,11 @@
 #ifdef HAVE_SQLITE
   NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: NO];
 
-  if (sqlite && attributes) {
+  if ((db != NULL) && attributes) {
     NSString *type = [attributes fileType];
     NSDate *date = [attributes fileModificationDate];
     NSString *query = [NSString stringWithFormat:
-       @"REPLACE INTO files (path, moddate, type) VALUES('%@', '%@', '%@')", 
+       @"INSERT INTO files (path, moddate, type) VALUES('%@', '%@', '%@')", 
                                         stringForQuery(path), 
                                         stringForQuery([date description]),
                                         stringForQuery(type)];
@@ -218,7 +214,7 @@
 - (BOOL)removePath:(NSString *)path
 {
 #ifdef HAVE_SQLITE
-  if (sqlite) {
+  if (db != NULL) {
     NSString *query = [NSString stringWithFormat:
                            @"DELETE FROM files WHERE path = '%@'", 
                                                     stringForQuery(path)];
@@ -319,7 +315,7 @@
 - (NSData *)treeFromPath:(NSData *)pathinfo
 {
 #ifdef HAVE_SQLITE
-  if (sqlite) {
+  if (db != NULL) {
     NSDictionary *info = [NSUnarchiver unarchiveObjectWithData: pathinfo];
     NSString *path = [info objectForKey: @"path"];
     NSArray *columns = [info objectForKey: @"columns"];
@@ -339,15 +335,19 @@
       }
     }
     
-    [query appendFormat: @"FROM files WHERE path = '%@' ", stringForQuery(path)];
-    [query appendFormat: @"OR path GLOB '%@", stringForQuery(path)];
+    [query appendFormat: @"FROM files WHERE path > '%@", stringForQuery(path)];
 
     if ([path isEqual: path_separator()] == NO) {
-      [query appendFormat: @"%@*' ", path_separator()];
-    } else {
-      [query appendString: @"*' "];
+      [query appendString: path_separator()];
     }
+    [query appendString: @"' "];
     
+    if ([path isEqual: path_separator()] == NO) {
+      [query appendFormat: @"AND path < '%@0' ", stringForQuery(path)];
+    } else {
+      [query appendString: @"AND path < '0' "];
+    }
+
     count = [criteria count];
     
     for (i = 0; i < count; i++) {
@@ -358,8 +358,10 @@
     
       [query appendFormat: @"AND %@ %@ '%@' ", type, operator, stringForQuery(arg)];
     }
-    
-    results = [sqlite performQuery: query];
+
+    [query appendString: @"AND pathExists(path)"];
+        
+    results = performQueryOnDb(db, query);
     
     if (results && [results count]) {  
       return [NSArchiver archivedDataWithRootObject: results];    
@@ -427,7 +429,7 @@
   NSData *data = [self infoOfType: @"icon" forPath: path];
 
   if (data) {
-    return [sqlite dataFromBlob: [data bytes]];
+    return dataFromBlob([data bytes]);
   } 
 #endif
   
@@ -438,8 +440,8 @@
                    forPath:(NSString *)path
 {
 #ifdef HAVE_SQLITE
-  if (sqlite) {
-    [self setInfo: [sqlite blobFromData: data] 
+  if (db != NULL) {
+    [self setInfo: blobFromData(data)
            ofType: @"icon" 
           forPath: path];
   }
@@ -459,7 +461,7 @@
     
     [query appendFormat: @"SELECT * FROM files WHERE path = '%@'", 
                                                   stringForQuery(src)];
-    results = [sqlite performQuery: query];
+    results = performQueryOnDb(db, query);
 
     if (results && [results count]) { 
       NSDictionary *dict = [results objectAtIndex: 0];
@@ -512,7 +514,7 @@
 {
 #ifdef HAVE_SQLITE
   [lock lock];
-  if ([sqlite performWriteQuery: query] == NO) {
+  if (performWriteQueryOnDb(db, query) == NO) {
     [lock unlock];
 	  return NO;
   }
@@ -526,12 +528,13 @@
                forPath:(NSString *)path
 {
 #ifdef HAVE_SQLITE
-  if (sqlite && [fm fileExistsAtPath: path]) {
+  if ((db != NULL) && [fm fileExistsAtPath: path]) {
     NSArray *results = nil;
     NSString *query = [NSString stringWithFormat: 
-                          @"SELECT %@ FROM files WHERE path = '%@'", 
-                                              type, stringForQuery(path)];
-    results = [sqlite performQuery: query];
+                    @"SELECT %@ FROM files WHERE path = '%@'", 
+                                                type, stringForQuery(path)];
+                                                 
+    results = performQueryOnDb(db, query);
     
     if (results && [results count]) {
       NSDictionary *dict = [results objectAtIndex: 0];
@@ -548,16 +551,16 @@
         forPath:(NSString *)path
 {
 #ifdef HAVE_SQLITE
-  if (sqlite) {
+  if (db != NULL) {
     NSString *query = [NSString stringWithFormat: 
               @"UPDATE files SET %@ = '%@' WHERE path = '%@'", 
           stringForQuery(type), stringForQuery(info), stringForQuery(path)]; 
     
     if ([self checkPath: path] == NO) {
       [self insertPath: path]; 
-    }
+    }    
     
-    if ([self performWriteQuery: query] == NO) {
+    if (performWriteQueryOnDb(db, query) == NO) {
       NSLog(@"error accessing the Desktop database (-setInfo:ofType:forPath:)");
       NSLog(@"error at path: %@", path);
     }
@@ -567,7 +570,7 @@
 
 - (BOOL)checkPath:(NSString *)path
 {
-  return (sqlite && [self infoOfType: @"path" forPath: path]);
+  return ((db != NULL) && checkPathInDb(db, path));
 }
 
 - (void)connectionBecameInvalid:(NSNotification *)notification
@@ -676,20 +679,18 @@
   dbPath = [dbPath stringByAppendingPathComponent: @"Desktop.db"];
   [fm removeFileAtPath: dbPath handler: nil];
   
-  sqlite = [[SQLite alloc] initWithDatabasePath: dbPath];
+  db = opendbAtPath(dbPath);
   
-  if ([sqlite opendb]) {
+  if (db != NULL) {
     NSDictionary *table = [deftable propertyList];
 
-    if ([sqlite createDatabaseWithTable: table] == NO) {
-      DESTROY (sqlite);
+    if (createDatabaseWithTable(db, table) == NO) {
       NSLog(@"unable to create the Desktop database");
       exit(0);
     } else {
       NSLog(@"Desktop database created");
     }
   } else {
-    DESTROY (sqlite);
     NSLog(@"unable to open the Desktop database");
     exit(0);
   }
@@ -710,8 +711,7 @@
   }
   
   RELEASE (image);
-  [sqlite closedb];
-  RELEASE (sqlite);
+  closedb(db);
   
   NSLog(@"DONE");
   exit(0);

@@ -26,10 +26,11 @@
 #define DDBD_UPDATER_H
 
 #include <Foundation/Foundation.h>
+#include "SQLite.h"
 
 @interface DDBdUpdater: NSObject
 {
-  id sqlite;
+  sqlite3 *db;
   id ddbd;
   NSDictionary *updinfo;
   NSDistributedLock *lock;

@@ -161,9 +161,9 @@ static NSString *nibName = @"FModuleKind";
 
 #define PosixExecutePermission	(0111)
 
-- (BOOL)checkPath:(NSString *)path
+- (BOOL)checkPath:(NSString *)path 
+   withAttributes:(NSDictionary *)attributes
 {
-  NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: NO];
   NSString *fileType = [attributes fileType];
   BOOL found = NO;
   
@@ -209,9 +209,14 @@ static NSString *nibName = @"FModuleKind";
   return NSOrderedSame;
 }
 
-- (BOOL)needsFullCheck
+- (BOOL)reliesOnModDate
 {
-  return YES;
+  return NO;
+}
+
+- (BOOL)reliesOnDirModDate
+{
+  return NO;
 }
 
 @end

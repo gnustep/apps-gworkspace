@@ -72,3 +72,4 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix)
 
   return path;  	
 }
+

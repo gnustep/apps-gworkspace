@@ -71,45 +71,6 @@
 @end
 
 
-@protocol	DDBdProtocol
-
-- (BOOL)dbactive;
-
-- (oneway void)insertPath:(NSString *)path;
-
-- (oneway void)removePath:(NSString *)path;
-
-- (oneway void)removePaths:(NSArray *)paths;
-
-- (oneway void)insertTreesFromPaths:(NSData *)info;
-
-- (oneway void)removeTreesFromPaths:(NSData *)info;
-
-- (NSData *)treeFromPath:(NSData *)pathinfo;
-
-- (NSString *)annotationsForPath:(NSString *)path;
-
-- (oneway void)setAnnotations:(NSString *)annotations
-                      forPath:(NSString *)path;
-
-- (NSString *)fileTypeForPath:(NSString *)path;
-
-- (oneway void)setFileType:(NSString *)type
-                   forPath:(NSString *)path;
-
-- (NSString *)modificationDateForPath:(NSString *)path;
-
-- (oneway void)setModificationDate:(NSString *)datedescr
-                           forPath:(NSString *)path;
-
-- (NSData *)iconDataForPath:(NSString *)path;
-
-- (oneway void)setIconData:(NSData *)data
-                   forPath:(NSString *)path;
-
-@end
-
-
 @interface Finder : NSObject <FSWClientProtocol>
 {
   IBOutlet id win;
@@ -134,8 +95,6 @@
   int searchResh;
   
   NSMutableArray *lsFolders;
-  id ddbd;
-  BOOL ddbdactive;
 
   id fswatcher;
   BOOL fswnotifications;
@@ -205,7 +164,6 @@
 - (void)openFoundSelection:(NSArray *)selection;
 
 - (LSFolder *)addLiveSearchFolderWithPath:(NSString *)path
-                             contentsInfo:(NSDictionary *)info
                               createIndex:(BOOL)index;
 
 - (void)removeLiveSearchFolder:(LSFolder *)folder;
@@ -230,44 +188,6 @@
 - (void)connectFSWatcher;
 
 - (void)fswatcherConnectionDidDie:(NSNotification *)notif;
-
-- (void)connectDDBd;
-
-- (void)ddbdConnectionDidDie:(NSNotification *)notif;
-
-- (BOOL)ddbdactive;
-
-- (void)ddbdInsertPath:(NSString *)path;
-
-- (void)ddbdInsertTreesFromPaths:(NSArray *)paths;
-
-- (void)ddbdRemoveTreesFromPaths:(NSArray *)paths;
-
-- (NSArray *)ddbdGetTreeFromPath:(NSDictionary *)pathinfo;
-
-- (void)ddbdRemovePath:(NSString *)path;
-
-- (void)ddbdRemovePaths:(NSArray *)paths;
-
-- (NSString *)ddbdGetAnnotationsForPath:(NSString *)path;
-
-- (void)ddbdSetAnnotations:(NSString *)annotations
-                   forPath:(NSString *)path;
-
-- (NSString *)ddbdGetFileTypeForPath:(NSString *)path;
-
-- (void)ddbdSetFileType:(NSString *)type
-                forPath:(NSString *)path;
-
-- (NSString *)ddbdGetModificationDateForPath:(NSString *)path;
-
-- (void)ddbdSetModificationDate:(NSString *)datedescr
-                        forPath:(NSString *)path;
-
-- (NSData *)ddbdGetIconDataForPath:(NSString *)path;
-
-- (void)ddbdSetIconData:(NSData *)data
-                forPath:(NSString *)path;
 
 - (void)contactWorkspaceApp;
 

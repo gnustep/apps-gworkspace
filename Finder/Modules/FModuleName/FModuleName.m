@@ -164,7 +164,8 @@ static NSString *nibName = @"FModuleName";
   return nil;
 }
 
-- (BOOL)checkPath:(NSString *)path
+- (BOOL)checkPath:(NSString *)path 
+   withAttributes:(NSDictionary *)attributes
 {
   NSString *fname = [path lastPathComponent];
 
@@ -207,9 +208,14 @@ static NSString *nibName = @"FModuleName";
   return NSOrderedSame;
 }
 
-- (BOOL)needsFullCheck
+- (BOOL)reliesOnModDate
 {
   return NO;
+}
+
+- (BOOL)reliesOnDirModDate
+{
+  return YES;
 }
 
 @end

@@ -26,6 +26,10 @@
 #define DDBD_H
 
 #include <Foundation/Foundation.h>
+#include "config.h"
+#ifdef HAVE_SQLITE
+  #include "SQLite.h"
+#endif
 
 enum {   
   DDBdInsertTreeUpdate,
@@ -79,12 +83,14 @@ enum {
 
 @interface DDBd: NSObject <DDBdProtocol>
 {
-  id sqlite;
   NSString *dbpath;
   NSConnection *conn;
   NSRecursiveLock *lock;
   NSFileManager *fm;
   NSNotificationCenter *nc; 
+#ifdef HAVE_SQLITE
+  sqlite3 *db;
+#endif
 }
 
 - (NSData *)infoOfType:(NSString *)type

@@ -134,21 +134,18 @@ static NSString *nibName = @"FModuleContents";
   return nil;
 }
 
-- (BOOL)checkPath:(NSString *)path
+- (BOOL)checkPath:(NSString *)path 
+   withAttributes:(NSDictionary *)attributes
 {
-  NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: NO];
+  NSString *fileType = [attributes fileType];
 
-  if (attributes) {
-    NSString *fileType = [attributes fileType];
+  if (fileType == NSFileTypeRegular) {
+    NSData *contents = [NSData dataWithContentsOfFile: path];
 
-    if (fileType == NSFileTypeRegular) {
-      NSData *contents = [NSData dataWithContentsOfFile: path];
-      
-      if (contents && [contents length]) {
-        const char *bytesStr = (const char *)[contents bytes];
-    
-        return (strstr(bytesStr, [contentsStr lossyCString]) != NULL);
-      }
+    if (contents && [contents length]) {
+      const char *bytesStr = (const char *)[contents bytes];
+
+      return (strstr(bytesStr, [contentsStr lossyCString]) != NULL);
     }
   }
   
@@ -169,7 +166,12 @@ static NSString *nibName = @"FModuleContents";
   return NSOrderedSame;
 }
 
-- (BOOL)needsFullCheck
+- (BOOL)reliesOnModDate
+{
+  return YES;
+}
+
+- (BOOL)reliesOnDirModDate
 {
   return NO;
 }
