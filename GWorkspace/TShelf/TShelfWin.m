@@ -173,23 +173,16 @@
   }
 
   if (autohidden) {
-    NSDate *future = [NSDate distantFuture];
     int h = -SHELF_HEIGHT;
     int i;
     
     [self setFrameOrigin: NSMakePoint(0, h)];
-    [NSEvent startPeriodicEventsAfterDelay: 0.0 withPeriod: 0.01];
 
-    for (i = 0; i < 20; i++) {
-      [NSApp nextEventMatchingMask: NSPeriodicMask
-                         untilDate: future
-                            inMode: NSEventTrackingRunLoopMode
-                           dequeue: YES];    
-      h += (int)(SHELF_HEIGHT / 20);
+    for (i = 0; i < 50; i++) {
+      h += (int)(SHELF_HEIGHT / 50);
       [self setFrameOrigin: NSMakePoint(0, h)];
     }
     
-    [NSEvent stopPeriodicEvents];
     [self setFrameOrigin: NSMakePoint(0, 0)];
   }
   
@@ -203,23 +196,16 @@
   }
 
   if (autohidden == NO) {
-    NSDate *future = [NSDate distantFuture];
     int h = 0;
     int i;
 
     [self setFrameOrigin: NSMakePoint(0, 0)];
-    [NSEvent startPeriodicEventsAfterDelay: 0.0 withPeriod: 0.01];
     
-    for (i = 0; i < 20; i++) {
-      [NSApp nextEventMatchingMask: NSPeriodicMask
-                         untilDate: future
-                            inMode: NSEventTrackingRunLoopMode
-                           dequeue: YES];    
-      h -= (int)(SHELF_HEIGHT / 20);
+    for (i = 0; i < 50; i++) {
+      h -= (int)(SHELF_HEIGHT / 50);
       [self setFrameOrigin: NSMakePoint(0, h)];
     }
     
-    [NSEvent stopPeriodicEvents];
     [self setFrameOrigin: NSMakePoint(0, -SHELF_HEIGHT)];
   }
   
