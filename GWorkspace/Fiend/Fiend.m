@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include <AppKit/AppKit.h>
@@ -36,6 +35,53 @@
 #include "Dialogs/Dialogs.h"
 #include "GWorkspace.h"
 #include "GNUstep.h"
+
+@implementation FiendWindow
+
+- (id)initWithContentRect:(NSRect)contentRect 
+                styleMask:(unsigned int)styleMask 
+                  backing:(NSBackingStoreType)backingType 
+                    defer:(BOOL)flag
+{
+  self = [super initWithContentRect: contentRect
+                  styleMask: styleMask backing: backingType defer: flag];
+  
+  [self registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, nil]];  
+  
+  return self;
+}
+
+- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
+{
+  return [[self contentView] draggingEntered: sender];
+}
+
+- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
+{
+	return [[self contentView] draggingUpdated: sender];
+}
+
+- (void)draggingExited:(id <NSDraggingInfo>)sender
+{
+	[[self contentView] draggingExited: sender];  
+}
+
+- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
+{
+	return [[self contentView] prepareForDragOperation: sender];
+}
+
+- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
+{
+	return [[self contentView] performDragOperation: sender];
+}
+
+- (void)concludeDragOperation:(id <NSDraggingInfo>)sender
+{
+  [[self contentView] concludeDragOperation: sender];
+}
+
+@end
 
 @implementation Fiend
 
@@ -66,7 +112,7 @@
 	
 	  gw = [GWorkspace gworkspace];
 
-	  myWin = [[NSWindow alloc] initWithContentRect: NSZeroRect
+	  myWin = [[FiendWindow alloc] initWithContentRect: NSZeroRect
 					               styleMask: NSBorderlessWindowMask  
                               backing: NSBackingStoreRetained defer: NO];
 

@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #ifndef FIEND_H
 #define FIEND_H
 
@@ -39,9 +38,12 @@
 @class FiendLeaf;
 @class GWorkspace;
 
+@interface FiendWindow : NSWindow 
+@end
+
 @interface Fiend : NSView 
 {
-  NSWindow *myWin;
+  FiendWindow *myWin;
   NSImage *tile;
   NSImage *leftArr;
   NSImage *rightArr;

@@ -95,11 +95,11 @@
            inFiend:(Fiend *)afiend 
         ghostImage:(NSImage *)ghostimage
 {
-  NSWindow *win;
+  FiendWindow *win;
   
 	self = [super init];
 
-  win = [[NSWindow alloc] initWithContentRect: NSMakeRect(0, 0, 64, 64)
+  win = [[FiendWindow alloc] initWithContentRect: NSMakeRect(0, 0, 64, 64)
 					                  styleMask: NSBorderlessWindowMask  
                               backing: NSBackingStoreRetained defer: NO];
   [self setFrame: [[win contentView] frame]];  

@@ -1,3 +1,9 @@
+2003-11-05 Enrico Sersale  <enrico@imago.ro>
+  
+  * GWorkspace/Fiend/Fiend.m
+    GWorkspace/FiendLeaf/FiendLeaf.m
+    added DraggingDestination methods to the window.
+
 2003-10-30 Enrico Sersale  <enrico@imago.ro>
   
   * GWorkspace/Recycler/Recycler.m
