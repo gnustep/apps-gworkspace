@@ -661,7 +661,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
                   forKey: @"operation"];	
     [notifDict setObject: path forKey: @"source"];	
     [notifDict setObject: path forKey: @"destination"];	
-    [notifDict setObject: [NSArray arrayWithObject: lsfname] 
+    [notifDict setObject: [NSArray arrayWithObject: folderName] 
                   forKey: @"files"];	
 
 	  [dnc postNotificationName: @"GWFileSystemWillChangeNotification"
