@@ -35,12 +35,21 @@
 #include "Browser2.h"
 #include "GNUstep.h"
 
-#define ICON_FRAME_HEIGHT 52
-#define ICON_SIZE_WIDTH 48
-#define ICON_VOFFSET 14
-
-#define CELLS_HEIGHT 15
-#define ICON_CELLS_HEIGHT 30
+#ifdef GNUSTEP 
+  #define ICON_FRAME_HEIGHT 52
+  #define ICON_SIZE_WIDTH 48
+  #define CELLS_HEIGHT 15
+  #define ICON_VOFFSET 14
+  #define LABEL_HEIGHT 14
+  #define ICON_CELLS_HEIGHT 30
+#else
+  #define ICON_FRAME_HEIGHT 34
+  #define ICON_SIZE_WIDTH 32
+  #define CELLS_HEIGHT 16
+  #define ICON_VOFFSET 15
+  #define LABEL_HEIGHT 14
+  #define ICON_CELLS_HEIGHT 30
+#endif
 
 #define CHECKRECT(rct) \
 if (rct.size.width < 0) rct.size.width = 0; \
@@ -1066,7 +1075,7 @@ if (sz.height < 0) sz.height = 0
   
 	icnwidth = [sender frame].size.width;
  	labwidth = [label frame].size.width;
-	labypos = [sender frame].origin.y - 14;
+	labypos = [sender frame].origin.y - ICON_VOFFSET;
 
 	if(icnwidth > labwidth) {
 		labxpos = [sender frame].origin.x + ((icnwidth - labwidth) / 2);
@@ -1074,7 +1083,7 @@ if (sz.height < 0) sz.height = 0
 		labxpos = [sender frame].origin.x - ((labwidth - icnwidth) / 2);
   }
   
-  labRect = NSMakeRect(labxpos, labypos, labwidth, 14);
+  labRect = NSMakeRect(labxpos, labypos, labwidth, LABEL_HEIGHT);
   CHECKRECT (labRect);
 	[label setFrame: labRect];
   [label setNeedsDisplay: YES];

@@ -38,11 +38,22 @@
 
 #define NSBR_VOFFSET 4
 #define BEZEL_BORDER_SIZE NSMakeSize(2, 2)
-#define ICON_FRAME_HEIGHT 52
-#define ICON_SIZE_WIDTH 48
-#define ICON_VOFFSET 14
+
+#ifdef GNUSTEP 
+  #define ICONS_PATH_WIDTH 96
+  #define ICON_FRAME_HEIGHT 52
+  #define ICON_SIZE_WIDTH 48
+  #define ICON_VOFFSET 14
+  #define LABEL_HEIGHT 14
+#else
+  #define ICONS_PATH_WIDTH 76
+  #define ICON_FRAME_HEIGHT 34
+  #define ICON_SIZE_WIDTH 32
+  #define ICON_VOFFSET 15
+  #define LABEL_HEIGHT 14
+#endif
+
 #define LINE_SCROLL 10
-#define LABEL_HEIGHT 14
 #define LABEL_MARGIN 8
 #define EDIT_MARGIN 4
 
@@ -123,7 +134,7 @@ double myrintf(double a)
     colRects = NULL;
   	columnWidth = (rect.size.width / (float)visibleColumns);
 		scrollerWidth = [NSScroller scrollerWidth];
-		iconsPathWidth = 96 - scrollerWidth;
+		iconsPathWidth = ICONS_PATH_WIDTH - scrollerWidth;
     if (styleMask & GWColumnIconMask) {
       columnOriginY = 0;
     } else {
@@ -167,7 +178,11 @@ double myrintf(double a)
     [nameEditor setDelegate: self];  
     [nameEditor setTarget: self]; 
     [nameEditor setAction: @selector(editorAction:)];  
-    ASSIGN (editorFont, [NSFont systemFontOfSize: 12]); 
+    #ifdef GNUSTEP 
+      ASSIGN (editorFont, [NSFont systemFontOfSize: 12]); 
+    #else
+      ASSIGN (editorFont, [NSFont systemFontOfSize: 11]); 
+    #endif
 		[nameEditor setFont: editorFont];
 		[nameEditor setBezeled: NO];
 		[nameEditor setAlignment: NSCenterTextAlignment];
@@ -933,7 +948,9 @@ double myrintf(double a)
 
 - (void)unselectNameEditor
 {
-  [nameEditor setBackgroundColor: [NSColor windowBackgroundColor]];
+  #ifdef GNUSTEP 
+    [nameEditor setBackgroundColor: [NSColor windowBackgroundColor]];
+  #endif
   [self setNeedsDisplayInRect: [nameEditor frame]];
 }
 
@@ -1629,9 +1646,13 @@ double myrintf(double a)
 					 scrollerBorderRect.origin.y + scrollerRect.size.height + 2);
 		p2 = NSMakePoint(scrollerBorderRect.origin.x + scrollerBorderRect.size.width - 2, 
 					 scrollerBorderRect.origin.y + scrollerRect.size.height + 2);
-               
-		NSDrawGrayBezel(scrollerBorderRect, r);
     
+    #ifdef GNUSTEP            
+		  NSDrawGrayBezel(scrollerBorderRect, r);
+    #else
+      NSDrawLightBezel(scrollerBorderRect, r);
+    #endif
+
     if (styleMask & GWColumnIconMask) {
       [[NSColor blackColor] set];
       [NSBezierPath strokeLineFromPoint: p1 toPoint: p2];

@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
   #ifdef GNUSTEP 
@@ -51,12 +50,19 @@ if (rct.size.height < 0) rct.size.height = 0; \
 [o setFrame: rct]; \
 }
 
-#define MIN_SHELF_HEIGHT 2
-#define MID_SHELF_HEIGHT 77
-#define MAX_SHELF_HEIGHT 150
-
-#define COLLAPSE_LIMIT 35
-#define MID_LIMIT 110
+#ifdef GNUSTEP 
+  #define MIN_SHELF_HEIGHT 2
+  #define MID_SHELF_HEIGHT 77
+  #define MAX_SHELF_HEIGHT 150
+  #define COLLAPSE_LIMIT 35
+  #define MID_LIMIT 110
+#else
+  #define MIN_SHELF_HEIGHT 2
+  #define MID_SHELF_HEIGHT 50
+  #define MAX_SHELF_HEIGHT 98
+  #define COLLAPSE_LIMIT 23
+  #define MID_LIMIT 72
+#endif
 
 #define DEFAULT_WIDTH 150
 #define DEFAULT_ICONS_WIDTH 120

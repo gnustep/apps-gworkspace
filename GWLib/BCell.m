@@ -50,6 +50,9 @@
     icon = nil;
     highlight = nil;
     [self setAllowsMixedState: NO];
+    #ifndef GNUSTEP 
+      [self setFont: [NSFont systemFontOfSize: 11]];
+    #endif
   }
   
   return self;
@@ -66,6 +69,9 @@
     highlight = nil;
     iconSelected = NO;
     [self setAllowsMixedState: NO];
+    #ifndef GNUSTEP 
+      [self setFont: [NSFont systemFontOfSize: 11]];
+    #endif
   }
   
   return self;

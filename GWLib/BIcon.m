@@ -32,6 +32,14 @@
 #include "BIconLabel.h"
 #include "GNUstep.h"
 
+#ifdef GNUSTEP 
+  #define ARROW_POS_Y 26
+  #define ARROW_MARGIN_X 11
+#else
+  #define ARROW_POS_Y 26
+  #define ARROW_MARGIN_X 11
+#endif
+
 #define CHECK_LOCK if (locked) return
 #define CHECK_LOCK_RET(x) if (locked) return x
 
@@ -63,13 +71,18 @@
     ASSIGN (arrow, [NSImage imageNamed: @"common_3DArrowRight.tiff"]);
 
     namelabel = [[BIconLabel alloc] initForIcon: self];
-		[namelabel setFont: [NSFont systemFontOfSize: 12]];
 		[namelabel setBezeled: NO];
 		[namelabel setEditable: NO];
 		[namelabel setSelectable: NO];
 		[namelabel setAlignment: NSCenterTextAlignment];
-	  [namelabel setBackgroundColor: [NSColor windowBackgroundColor]];
-		
+    #ifdef GNUSTEP 
+		  [namelabel setFont: [NSFont systemFontOfSize: 12]];
+	    [namelabel setBackgroundColor: [NSColor windowBackgroundColor]];
+		#else
+		  [namelabel setFont: [NSFont systemFontOfSize: 11]];
+	    [namelabel setBackgroundColor: [NSColor whiteColor]];
+    #endif
+    
     contestualMenu = [[GWLib workspaceApp] usesContestualMenu];
     
 		paths = nil;
@@ -234,7 +247,13 @@
 - (void)unselect
 {  
 	isSelect = NO;
-	[namelabel setBackgroundColor: [NSColor windowBackgroundColor]];
+
+  #ifdef GNUSTEP 
+	  [namelabel setBackgroundColor: [NSColor windowBackgroundColor]];
+	#else
+	  [namelabel setBackgroundColor: [NSColor whiteColor]];
+  #endif
+  
 	[self setNeedsDisplay: YES];  
   [namelabel setNeedsDisplay: YES];
 }
@@ -536,7 +555,7 @@ active. preventWindowOrdering is sent automatically by NSView's dragImage:... an
   }
   
   if (isbranch == YES) {
-		[arrow compositeToPoint: NSMakePoint(rect.size.width - 15, 26)
+		[arrow compositeToPoint: NSMakePoint(rect.size.width - ARROW_MARGIN_X, ARROW_POS_Y)
                   operation: NSCompositeSourceOver];
   }
 }
