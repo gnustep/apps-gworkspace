@@ -1466,4 +1466,11 @@ Do you want to save them?", @""),
 	return YES;
 }
 
+#ifndef GNUSTEP
+- (void)terminate:(id)sender
+{
+  [NSApp terminate: self];
+}
+#endif
+
 @end

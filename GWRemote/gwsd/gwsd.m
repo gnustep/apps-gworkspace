@@ -199,7 +199,7 @@ static GWSd *shared = nil;
       ASSIGN (userPassword, passwd);
       ASSIGN (userName, NSUserName());
 
-      firstConn = [[NSConnection alloc] initWithReceivePort: (NSPort *)[NSPort port] 
+      firstConn = [[NSConnection alloc] initWithReceivePort: [NSSocketPort port] 
 																			             sendPort: nil];
       [firstConn enableMultipleThreads];
       [firstConn setRootObject: self];
@@ -236,8 +236,8 @@ static GWSd *shared = nil;
                
   pool = [[NSAutoreleasePool alloc] init];
   
-  connection = [[NSConnection alloc] initWithReceivePort: (NSPort *)[NSPort port] 
-																			          sendPort: (NSPort *)[NSPort port]];
+  connection = [[NSConnection alloc] initWithReceivePort: [NSSocketPort port] 
+																			          sendPort: [NSSocketPort port]];
 
   gwsd = [[GWSd alloc] initWithRemote: remote connection: connection];
 

@@ -351,6 +351,10 @@
 
 - (void)logout:(id)sender;
 
+#ifndef GNUSTEP
+- (void)terminate:(id)sender;
+#endif
+
 @end
 
 #endif // GWREMOTE_H
