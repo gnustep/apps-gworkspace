@@ -724,13 +724,13 @@ static NSString *nibName = @"FileOperationWin";
 		if (([operation isEqual: @"NSWorkspaceMoveOperation"]) 
           || ([operation isEqual: @"NSWorkspaceCopyOperation"])
           || ([operation isEqual: @"NSWorkspaceLinkOperation"])
-          || ([operation isEqual: @"NSWorkspaceRecycleOperation"])
           || ([operation isEqual: @"GWorkspaceRecycleOutOperation"])) {
           
       return YES;
       
 		} else if (([operation isEqual: @"NSWorkspaceDestroyOperation"]) 
           || ([operation isEqual: @"NSWorkspaceDuplicateOperation"])
+          || ([operation isEqual: @"NSWorkspaceRecycleOperation"])
           || ([operation isEqual: @"GWorkspaceEmptyRecyclerOperation"])) {
 			
       return NO;
@@ -791,7 +791,6 @@ static NSString *nibName = @"FileOperationWin";
 	fcount = [files count];
           
 	if ([operation isEqual: @"NSWorkspaceMoveOperation"]
-				|| [operation isEqual: @"NSWorkspaceRecycleOperation"]
 						|| [operation isEqual: @"GWorkspaceRecycleOutOperation"]) {
 		[self doMove];
 	} else if ([operation isEqual: @"NSWorkspaceCopyOperation"]) {  
@@ -803,7 +802,9 @@ static NSString *nibName = @"FileOperationWin";
 		[self doRemove];
 	} else if ([operation isEqual: @"NSWorkspaceDuplicateOperation"]) {
 		[self doDuplicate];
-	}
+	} else if ([operation isEqual: @"NSWorkspaceRecycleOperation"]) {
+		[self doTrash];
+  }
 }
 
 - (NSData *)processedFiles
@@ -936,6 +937,57 @@ filename =  [fileinfo objectForKey: @"name"]
 				  toPath: destpath 
 			   handler: self];
 
+    [procfiles addObject: newname];	 
+	  [files removeObject: fileinfo];	   
+    
+	  CHECK_DONE;
+  }
+  
+  if (([files count] == 0) || stopped) {
+    [self done];
+  }                                             
+}
+
+- (void)doTrash
+{
+  NSString *copystr = NSLocalizedString(@"copy", @"");
+  NSString *ofstr = NSLocalizedString(@"_of_", @"");
+	NSString *destpath;
+	NSString *newname;
+  NSString *ntmp;
+
+  while (1) {    
+	  GET_FILENAME;  
+
+    newname = [NSString stringWithString: filename];
+    destpath = [destination stringByAppendingPathComponent: newname];
+    
+    if ([fm fileExistsAtPath: destpath]) {
+	    newname = [NSString stringWithString: filename];
+      int count = 1;
+
+	    while (1) {
+        if (count == 1) {
+          ntmp = [NSString stringWithFormat: @"%@%@%@", copystr, ofstr, newname];
+        } else {
+          ntmp = [NSString stringWithFormat: @"%@%i%@%@", copystr, count, ofstr, newname];
+        }
+
+		    destpath = [destination stringByAppendingPathComponent: ntmp];
+
+		    if ([fm fileExistsAtPath: destpath] == NO) {
+          newname = ntmp;
+			    break;
+        } else {
+          count++;
+        }
+	    }
+    }
+
+	  [fm movePath: [source stringByAppendingPathComponent: filename]
+				  toPath: destpath 
+			   handler: self];
+    
     [procfiles addObject: newname];	 
 	  [files removeObject: fileinfo];	   
     

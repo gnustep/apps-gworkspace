@@ -241,6 +241,8 @@
 
 - (void)doDuplicate;
 
+- (void)doTrash;
+
 - (BOOL)removeExisting:(NSDictionary *)info;
 
 @end 
