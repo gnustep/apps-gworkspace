@@ -54,7 +54,6 @@
   if (self) {
     NSUserDefaults *defaults;
     NSDictionary *tshelfDict;
-    NSNumber *htabs;
     NSArray *tabsArr;    
 		TShelfViewItem *item;
     TShelfIconsView *view;
@@ -71,14 +70,7 @@
     if (tshelfDict == nil) {
       tshelfDict = [NSDictionary dictionary];
     }
-    
-    htabs = [tshelfDict objectForKey: @"hiddentabs"];
-    if (htabs) {
-      [tView setHiddenTabs: [htabs boolValue]];
-    } else {
-      [tView setHiddenTabs: NO];
-    }
-    
+        
     tabsArr = [tshelfDict objectForKey: @"tabs"];
     
     if (tabsArr) {
@@ -121,7 +113,14 @@
 
 - (void)activate
 {
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
+  NSDictionary *tshelfDict = [defaults objectForKey: @"tabbedshelf"];
+
   [self makeKeyAndOrderFront: nil];
+  
+  if (tshelfDict) {
+    [tView setHiddenTabs: [[tshelfDict objectForKey: @"hiddentabs"] boolValue]];
+  }
 }
 
 - (void)deactivate
