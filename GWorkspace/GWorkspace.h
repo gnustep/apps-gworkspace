@@ -101,6 +101,15 @@
 @end
 
 
+@protocol	FinderAppProtocol
+
+- (oneway void)setSelectionData:(NSData *)data;
+
+- (oneway void)showWindow;
+
+@end
+
+
 @protocol	OperationProtocol
 
 - (oneway void)performFileOperation:(NSData *)opinfo;
@@ -118,8 +127,8 @@
   BOOL fswnotifications;
 	
   id inspectorApp;
-
   id operationsApp;
+  id finderApp;
     
   AppsViewer *appsViewer;
   FinderController *finder;
@@ -282,6 +291,10 @@
 - (void)connectInspector;
 
 - (void)inspectorConnectionDidDie:(NSNotification *)notif;
+
+- (void)connectFinder;
+
+- (void)finderConnectionDidDie:(NSNotification *)notif;
 
 - (void)connectOperation;
 

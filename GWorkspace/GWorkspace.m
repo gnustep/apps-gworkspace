@@ -459,6 +459,7 @@ return [ws openFile: fullPath withApplication: appName]
   [[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
   [[NSNotificationCenter defaultCenter] removeObserver: self];
   DESTROY (inspectorApp);
+  DESTROY (finderApp);
   DESTROY (operationsApp);
 	RELEASE (defEditor);
 	RELEASE (defXterm);
@@ -680,6 +681,8 @@ return [ws openFile: fullPath withApplication: appName]
     [self connectInspector];
   }
   
+  finderApp = nil;
+  
 	[defaults synchronize];
 
   [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
@@ -762,6 +765,17 @@ return [ws openFile: fullPath withApplication: appName]
 	                        name: NSConnectionDidDieNotification
 	                      object: inspconn];
       DESTROY (inspectorApp);
+    }
+  }
+
+  if (finderApp) {
+    NSConnection *fndrconn = [(NSDistantObject *)finderApp connectionForProxy];
+  
+    if (fndrconn && [fndrconn isValid]) {
+      [[NSNotificationCenter defaultCenter] removeObserver: self
+	                        name: NSConnectionDidDieNotification
+	                      object: fndrconn];
+      DESTROY (finderApp);
     }
   }
 
@@ -1556,10 +1570,21 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   if (paths && ([selectedPaths isEqualToArray: paths] == NO)) {
     ASSIGN (selectedPaths, paths);
 
-    if (inspectorApp) {
+    if (inspectorApp || finderApp) {
       NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
-      [inspectorApp setPathsData: data];
+
+      if (inspectorApp) {
+        [inspectorApp setPathsData: data];
+      }
+      
+      if (finderApp) {
+        [finderApp setSelectionData: data];
+      }
     }
+    
+	  [[NSNotificationCenter defaultCenter]
+ 				 postNotificationName: GWCurrentSelectionChangedNotification
+	 								     object: nil];      
   }
 }
 
@@ -1569,10 +1594,17 @@ NSLocalizedString(@"OK", @""), nil, nil); \
     return;
   }
   
-  if (inspectorApp) {
+  if (inspectorApp || finderApp) {
     NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
-    [inspectorApp setPathsData: data];
-  }    
+
+    if (inspectorApp) {
+      [inspectorApp setPathsData: data];
+    }
+
+    if (finderApp) {
+      [finderApp setSelectionData: data];
+    }
+  }
 				
   [[NSNotificationCenter defaultCenter]
  				 postNotificationName: GWCurrentSelectionChangedNotification
@@ -2116,6 +2148,98 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   }
 }
 
+- (void)connectFinder
+{
+  if (finderApp == nil) {
+    id fndr = [NSConnection rootProxyForConnectionWithRegisteredName: @"Finder" 
+                                                                host: @""];
+
+    if (fndr) {
+      NSConnection *c = [fndr connectionForProxy];
+
+	    [[NSNotificationCenter defaultCenter] addObserver: self
+	                   selector: @selector(finderConnectionDidDie:)
+		                     name: NSConnectionDidDieNotification
+		                   object: c];
+      
+      finderApp = fndr;
+	    [finderApp setProtocolForProxy: @protocol(FinderAppProtocol)];
+      RETAIN (finderApp);
+      
+      if (selectedPaths) {
+        NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
+        [finderApp setSelectionData: data];
+      }
+      
+	  } else {
+	    static BOOL recursion = NO;
+	  
+      if (recursion == NO) {
+        int i;
+        
+        [startAppWin showWindowWithTitle: @"GWorkspace"
+                                 appName: @"Finder"
+                            maxProgValue: 40.0];
+
+        [ws launchApplication: @"Finder"];
+
+        for (i = 1; i <= 40; i++) {
+          [startAppWin updateProgressBy: 1.0];
+	        [[NSRunLoop currentRunLoop] runUntilDate:
+		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+          fndr = [NSConnection rootProxyForConnectionWithRegisteredName: @"Finder" 
+                                                                   host: @""];                  
+          if (fndr) {
+            [startAppWin updateProgressBy: 40.0 - i];
+            break;
+          }
+        }
+        
+        [[startAppWin win] close];
+        
+	      recursion = YES;
+	      [self connectFinder];
+	      recursion = NO;
+        
+	    } else { 
+	      recursion = NO;
+        NSRunAlertPanel(nil,
+                NSLocalizedString(@"unable to contact Finder!", @""),
+                NSLocalizedString(@"Ok", @""),
+                nil, 
+                nil);  
+      }
+	  }
+  }
+}
+
+- (void)finderConnectionDidDie:(NSNotification *)notif
+{
+  id connection = [notif object];
+
+  [[NSNotificationCenter defaultCenter] removeObserver: self
+	                    name: NSConnectionDidDieNotification
+	                  object: connection];
+
+  NSAssert(connection == [finderApp connectionForProxy],
+		                                  NSInternalInconsistencyException);
+  RELEASE (finderApp);
+  finderApp = nil;
+
+  if (NSRunAlertPanel(nil,
+                    NSLocalizedString(@"The Finder connection died.\nDo you want to restart it?", @""),
+                    NSLocalizedString(@"Yes", @""),
+                    NSLocalizedString(@"No", @""),
+                    nil)) {
+    [self connectFinder]; 
+     
+    if (finderApp) {
+      NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
+      [finderApp setSelectionData: data];
+    }
+  }
+}
+
 - (void)connectOperation
 {
   if (operationsApp == nil) {
@@ -2406,10 +2530,22 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 
 - (void)showFinder:(id)sender
 {
-  if (finder == nil) {    
-    finder = [[FinderController alloc] init];
+//  if (finder == nil) {    
+//    finder = [[FinderController alloc] init];
+//  }
+//  [finder activate];
+  
+  
+	if (finderApp == nil) {
+    [self connectFinder];
+    if (finderApp) {
+      NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
+      [finderApp setSelectionData: data];
+    }    
   }
-  [finder activate];
+	if (finderApp) {
+    [finderApp showWindow];
+  }   
 }
 
 - (void)showFiend:(id)sender
