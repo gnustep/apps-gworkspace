@@ -1,4 +1,4 @@
-/* GWSVIconsView.m
+/* GWSVPathsPopUp.h
  *  
  * Copyright (C) 2004 Free Software Foundation, Inc.
  *
@@ -22,54 +22,19 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#include <AppKit/AppKit.h>
-#include "GWSVIconsView.h"
-#include "GWSpatialViewer.h"
 
-@implementation GWSVIconsView
+#ifndef GWSP_PATHS_POPUP_H
+#define GWSP_PATHS_POPUP_H
 
-- (void)dealloc
+#include <AppKit/NSPopUpButton.h>
+
+@interface GWSVPathsPopUp : NSPopUpButton 
 {
-	[super dealloc];
+	BOOL newViewer;	
 }
 
-- (id)initForViewer:(GWSpatialViewer *)vwr
-{
-  self = [super init];
-  
-  if (self) {
-		viewer = vwr;
-  }
-  
-  return self;
-}
-
-
-
-
-
-
-- (void)selectionDidChange
-{
-	if (!(selectionMask & FSNCreatingSelectionMask)) {
-    NSArray *selection = [self selectedPaths];
-		
-    if ([selection count] == 0) {
-      selection = [NSArray arrayWithObject: [node path]];
-    }
-
-    if ((lastSelection == nil) || ([selection isEqual: lastSelection] == NO)) {
-      ASSIGN (lastSelection, selection);
-      [desktopApp selectionChanged: selection];
-    }
-    
-    [self updateNameEditor];
-	}
-}
-
+- (BOOL)newViewer;
 
 @end
 
-
-
-
+#endif // GWSP_PATHS_POPUP_H

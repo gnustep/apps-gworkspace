@@ -1,4 +1,4 @@
-/* GWSVIconsView.m
+/* GWSVPathsPopUp.m
  *  
  * Copyright (C) 2004 Free Software Foundation, Inc.
  *
@@ -22,54 +22,30 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
+#include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-#include "GWSVIconsView.h"
-#include "GWSpatialViewer.h"
+#include "GWSVPathsPopUp.h"
 
-@implementation GWSVIconsView
+@implementation GWSVPathsPopUp
 
-- (void)dealloc
+- (id)initWithFrame:(NSRect)frameRect pullsDown:(BOOL)flag
 {
-	[super dealloc];
+	self = [super initWithFrame: frameRect pullsDown: flag];
+	newViewer = NO;
+	return self;
 }
 
-- (id)initForViewer:(GWSpatialViewer *)vwr
+- (void)mouseDown:(NSEvent *)theEvent
 {
-  self = [super init];
-  
-  if (self) {
-		viewer = vwr;
-  }
-  
-  return self;
+  unsigned int mask = [theEvent modifierFlags];
+
+	newViewer = ((mask == NSControlKeyMask) || (mask == NSAlternateKeyMask));
+	[super mouseDown: theEvent];
 }
 
-
-
-
-
-
-- (void)selectionDidChange
+- (BOOL)newViewer
 {
-	if (!(selectionMask & FSNCreatingSelectionMask)) {
-    NSArray *selection = [self selectedPaths];
-		
-    if ([selection count] == 0) {
-      selection = [NSArray arrayWithObject: [node path]];
-    }
-
-    if ((lastSelection == nil) || ([selection isEqual: lastSelection] == NO)) {
-      ASSIGN (lastSelection, selection);
-      [desktopApp selectionChanged: selection];
-    }
-    
-    [self updateNameEditor];
-	}
+	return newViewer;
 }
-
 
 @end
-
-
-
-

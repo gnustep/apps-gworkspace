@@ -26,8 +26,13 @@
 #include "GWSpatialViewer.h"
 #include "GWViewersManager.h"
 #include "GWSVIconsView.h"
+#include "GWSVPathsPopUp.h"
 #include "FSNodeRep.h"
 #include "FSNFunctions.h"
+
+#define DEFAULT_INCR 150
+#define MIN_W_HEIGHT 250
+
 
 static NSString *nibName = @"ViewerWindow";
 
@@ -52,12 +57,22 @@ static NSString *nibName = @"ViewerWindow";
       DESTROY (self);
       return self;
     } else {
-  //    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
-  //    id dictEntry;
+      NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	      
+      id defEntry = [defaults objectForKey: @"browserColsWidth"];
+      
+      if (defEntry) {
+        resizeIncrement = [defEntry intValue];
+      } else {
+        resizeIncrement = DEFAULT_INCR;
+      }
 
-        
-        
+      [win setMinSize: NSMakeSize(resizeIncrement * 2, MIN_W_HEIGHT)];    
+      [win setResizeIncrements: NSMakeSize(resizeIncrement, 1)];
 
+      [win setTitle: [NSString stringWithFormat: @"%@ - %@", [node name], [node parentPath]]];   
+      [win setFrameUsingName: [NSString stringWithFormat: @"spviewer_at_%@", [node path]]];
+
+      [win setDelegate: self];
 
       [scroll setBorderType: NSBezelBorder];
       [scroll setHasHorizontalScroller: YES];
@@ -69,9 +84,6 @@ static NSString *nibName = @"ViewerWindow";
       [self activate];
       
       [iconsView showContentsOfNode: node];
-
-      // [win setDelegate: self];
-
     }
   }
   
@@ -83,7 +95,7 @@ static NSString *nibName = @"ViewerWindow";
   [win makeKeyAndOrderFront: nil];
 }
 
-- (IBAction)popUpAction:(id)sender
+- (void)popUpAction:(id)sender
 {
 
 }
@@ -93,4 +105,53 @@ static NSString *nibName = @"ViewerWindow";
   return [iconsView shownNode];
 }
 
+- (void)updateDefaults
+{
+  FSNode *node = [iconsView shownNode];
+  NSString *wname = [NSString stringWithFormat: @"spviewer_at_%@", [node path]];
+
+  [win saveFrameUsingName: wname];
+}
+
+- (void)windowDidBecomeKey:(NSNotification *)aNotification
+{
+
+}
+
+- (BOOL)windowShouldClose:(id)sender
+{
+	return YES;
+}
+
+- (void)windowWillClose:(NSNotification *)aNotification
+{
+  [self updateDefaults];
+}
+
+
+
+
+
+
+
+
+
+
+
 @end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

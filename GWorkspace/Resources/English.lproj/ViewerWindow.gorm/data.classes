@@ -142,15 +142,14 @@
     };
     GWSpatialViewer = {
 	Actions = (
-	    "popUpAction:"
 	);
 	Outlets = (
 	    win,
 	    topBox,
 	    elementsLabel,
 	    spaceLabel,
-	    pathsPopUp,
-	    scroll
+	    scroll,
+	    popUpBox
 	);
 	Super = NSObject;
     };

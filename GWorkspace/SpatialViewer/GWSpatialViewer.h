@@ -29,6 +29,7 @@
 
 @class GWViewersManager;
 @class GWSVIconsView;
+@class GWSVPathsPopUp;
 @class FSNode;
 
 @interface GWSpatialViewer : NSObject
@@ -37,10 +38,13 @@
   IBOutlet id topBox;
   IBOutlet id elementsLabel;
   IBOutlet id spaceLabel;
-  IBOutlet id pathsPopUp;
+  IBOutlet id popUpBox;
+  GWSVPathsPopUp *pathsPopUp;
   IBOutlet id scroll;
   
   GWSVIconsView *iconsView;
+  
+  int resizeIncrement;
 
 }
 
@@ -48,9 +52,11 @@
 
 - (void)activate;
 
-- (IBAction)popUpAction:(id)sender;
+- (void)popUpAction:(id)sender;
 
 - (FSNode *)shownNode;
+
+- (void)updateDefaults;
 
 @end
 
