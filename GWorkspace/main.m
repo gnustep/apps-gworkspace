@@ -176,6 +176,11 @@ void createMenu()
     menuItem = addItemToMenu(menu, @"Tabbed Shelf", @"", nil, @"");
 		subenu = AUTORELEASE ([NSMenu new]);
 		[menu setSubmenu: subenu forItem: menuItem];    
+		addItemToMenu(subenu, @"Show Tabbed Shelf", @"", @"showTShelf:", @"s");
+		addItemToMenu(subenu, @"Select Special Tab", @"", @"selectSpecialTShelfTab:", @"S");
+		addItemToMenu(subenu, @"Remove Current Tab", @"", @"removeTShelfTab:", @"");
+		addItemToMenu(subenu, @"Rename Current Tab", @"", @"renameTShelfTab:", @"");
+		addItemToMenu(subenu, @"Add Tab...", @"", @"addTShelfTab:", @"");
 
 	addItemToMenu(menu, @"Terminal", @"", @"showTerminal:", @"t");
 	

@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #ifndef TABBED_SHELF_VIEW_H
 #define TABBED_SHELF_VIEW_H
  
@@ -41,8 +40,7 @@
   NSFont *italicFont;
   TShelfViewItem *selected;
   int selectedItem;
-  NSButton *hideButton;
-  BOOL hiddentabs;
+  NSButton *ffButt, *rewButt;
 }
 
 - (void)addTabItem:(TShelfViewItem *)item;
@@ -70,11 +68,9 @@
 
 - (NSArray *)items;
 
-- (void)setHiddenTabs:(BOOL)value;
+- (void)buttonsAction:(id)sender;
 
-- (void)hideShowTabs:(id)sender;
-
-- (BOOL)hiddenTabs;
+- (void)setButtonsEnabled:(BOOL)enabled;
 
 - (NSFont *)font;
 

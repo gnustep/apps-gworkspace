@@ -29,8 +29,10 @@
 #include "GWorkspace.h"
 #include "GNUstep.h"
 
-#define BUTTW 10
-#define SPECIAL_TAB_W 34
+#define SPECIAL_TAB_W 54
+#define BUTTORX 25
+#define BUTTSZ 9
+#define BUTTSPACE 12
 #define TAB_H 24
 #define LAB_MARGIN 13
 #define BEZ_TAB_W 14
@@ -42,6 +44,8 @@
   self = [super initWithFrame: rect];
   
   if (self) {
+    NSRect r = NSZeroRect;
+    
     ASSIGN (items, [NSMutableArray array]);
     
     font = [NSFont fontWithName: @"Helvetica-Bold" size: 12];
@@ -55,17 +59,33 @@
       italicFont = [NSFont boldSystemFontOfSize: 0];
     }
     RETAIN (italicFont);
-            
-    hideButton = [[NSButton alloc] initWithFrame: NSMakeRect (0,0, BUTTW, rect.size.height)];
-    [hideButton setImage: [NSImage imageNamed: @"Dimple.tiff"]];
-    [hideButton setImagePosition: NSImageOnly];
-    [hideButton setTarget: self];
-    [hideButton setAction: @selector (hideShowTabs:)];
-    [self addSubview: hideButton];
-        
+    
+    r.size = NSMakeSize(BUTTSZ, BUTTSZ);
+    r.origin.y = rect.size.height - TAB_H + (int)((TAB_H - BUTTSZ) / 2);
+    r.origin.x = rect.size.width - (BUTTSZ * 2 + BUTTSPACE);
+                  
+    rewButt = [[NSButton alloc] initWithFrame: r];
+		[rewButt setButtonType: NSMomentaryLight];    
+    [rewButt setBordered: NO];    
+    [rewButt setTarget: self];
+    [rewButt setAction: @selector (buttonsAction:)];
+    [self addSubview: rewButt];
+    RELEASE (rewButt);        
+    
+    r.origin.x += BUTTSPACE;
+    
+    ffButt = [[NSButton alloc] initWithFrame: r];
+		[ffButt setButtonType: NSMomentaryLight];    
+    [ffButt setBordered: NO];    
+    [ffButt setTarget: self];
+    [ffButt setAction: @selector (buttonsAction:)];
+    [self addSubview: ffButt];
+    RELEASE (ffButt);        
+
+    [self setButtonsEnabled: NO];   
+                    
     lastItem = nil;
     selected = nil;
-    hiddentabs = NO;
   }
   
   return self;
@@ -76,7 +96,6 @@
   RELEASE (items);
   RELEASE (font);
   RELEASE (italicFont);
-  RELEASE (hideButton);
   
   [super dealloc];
 }
@@ -177,8 +196,10 @@
     }
 	  [[self window] makeFirstResponder: [selected initialFirstResponder]];
   }
+
+  [self setButtonsEnabled: (lastItem && (lastItem == selected))];
       
-  [self setNeedsDisplay: YES];  
+  [self setNeedsDisplay: YES]; 
 }
 
 - (void)selectTabItemAtIndex:(int)index
@@ -212,8 +233,6 @@
   NSRect cRect = [self bounds];
 
   cRect.origin.y += 1; 
-  cRect.origin.x += (0.5 + BUTTW); 
-  cRect.size.width -= (2 + BUTTW);
   cRect.size.height -= 26.5;
 
   return cRect;
@@ -277,7 +296,7 @@ void drawRightTabBezier(NSPoint origin, float tabh,
   NSPoint p = aRect.origin;
   NSSize s = aRect.size;
   int count = [items count];  
-  float itemxspace = (aRect.size.width - SPECIAL_TAB_W - BUTTW) / (count - 1);
+  int itemxspace = (int)((aRect.size.width - SPECIAL_TAB_W) / (count - 1));
   NSImage *backImage = [[GWorkspace gworkspace] tshelfBackground];
   NSColor *scolor;
   NSColor *fcolor;
@@ -307,10 +326,8 @@ void drawRightTabBezier(NSPoint origin, float tabh,
 	  NSPoint ipoint;
     
 	  if (i == (count - 1)) {
-	    ipoint.x = aRect.size.width;
+	    ipoint.x = (int)(aRect.size.width - SPECIAL_TAB_W);
 	    ipoint.y = aRect.size.height;
-
-      ipoint.x = aRect.size.width - SPECIAL_TAB_W;
       
       if ([anItem tabState] == NSSelectedTab) {
         selp[0] = ipoint;
@@ -335,8 +352,7 @@ void drawRightTabBezier(NSPoint origin, float tabh,
       [scolor set];
       [bpath stroke];
       
-      [anItem drawImage: [NSImage imageNamed: @"DragableDocument.tiff"]
-                 inRect: r];
+      [anItem drawImage: nil inRect: r];
 
 	  } else {
 	    ipoint.y = aRect.size.height;
@@ -394,7 +410,7 @@ void drawRightTabBezier(NSPoint origin, float tabh,
 
     bpath = [NSBezierPath bezierPath];
     [bpath setLineWidth: 1];
-    [bpath moveToPoint: NSMakePoint(p.x - 2 + BUTTW, aRect.size.height)];
+    [bpath moveToPoint: NSMakePoint(p.x - 2, aRect.size.height)];
     [bpath lineToPoint: selp[0]];
     [scolor set];
     [bpath stroke];
@@ -429,7 +445,7 @@ void drawRightTabBezier(NSPoint origin, float tabh,
   for (i = 0; i < count; i++) {
     TShelfViewItem *anItem = [items objectAtIndex: i];
 
-    if(NSPointInRect(point, [anItem tabRect])) {
+    if (NSPointInRect(point, [anItem tabRect])) {
 	    return anItem;
     }
   }
@@ -447,53 +463,23 @@ void drawRightTabBezier(NSPoint origin, float tabh,
   return items;
 }
 
-- (void)setHiddenTabs:(BOOL)value
+- (void)buttonsAction:(id)sender
 {
-  NSRect frame = [[self window] frame];
-  NSRect scrframe = [[NSScreen mainScreen] frame];
-  NSRect winrect;
 
-  hiddentabs = value;
-
-  if (hiddentabs == NO) {
-    winrect = NSMakeRect(frame.origin.x, frame.origin.y, 
-                                  scrframe.size.width, frame.size.height);
-	  [[self window]  setFrame: winrect display: YES];
-  } else {
-    winrect = NSMakeRect(frame.origin.x, frame.origin.y, 10, frame.size.height);
-	  [[self window]  setFrame: winrect display: YES];
-  }
 }
 
-- (void)hideShowTabs:(id)sender
+- (void)setButtonsEnabled:(BOOL)enabled
 {
-  NSRect frame = [[self window] frame];
-  NSRect scrframe = [[NSScreen mainScreen] frame];
-  NSRect winrect;
-    
-  if (hiddentabs) {
-    winrect = NSMakeRect(frame.origin.x, frame.origin.y, 
-                                  scrframe.size.width, frame.size.height);
-	  [[self window]  setFrame: winrect display: YES];
-    hiddentabs = NO;
-  } else {
-    if (selected != nil) {
-      TShelfIconsView *selectedView = (TShelfIconsView *)[selected view];
-      if ([selectedView iconsType] == DATA_TAB) {
-        [selectedView unselectOtherIcons: nil];
-        [selectedView setCurrentPBIcon: nil];
-      }
-	  }
-  
-    winrect = NSMakeRect(frame.origin.x, frame.origin.y, 10, frame.size.height);
-	  [[self window]  setFrame: winrect display: YES];
-	  hiddentabs = YES;
-  }
-}
+  [rewButt setEnabled: enabled];  
+  [ffButt setEnabled: enabled];  
 
-- (BOOL)hiddenTabs
-{
-  return hiddentabs;
+  if (enabled) {
+    [rewButt setImage: [NSImage imageNamed: @"REWArrow.tiff"]];
+    [ffButt setImage: [NSImage imageNamed: @"FFArrow.tiff"]];
+  } else {
+    [rewButt setImage: [NSImage imageNamed: @"REWArrow_disabled.tiff"]];
+    [ffButt setImage: [NSImage imageNamed: @"FFArrow_disabled.tiff"]];
+  }
 }
 
 - (void)mouseDown:(NSEvent *)theEvent

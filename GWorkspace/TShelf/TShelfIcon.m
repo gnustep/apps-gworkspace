@@ -47,7 +47,7 @@
 	TEST_RELEASE (node);
 	RELEASE (namelabel);
   RELEASE (icon);
-  RELEASE (highlight);
+  RELEASE (highlightPath);
   [super dealloc];
 }
 
@@ -56,17 +56,12 @@
 {
   self = [super init];
   if (self) {
-    NSArray *pbTypes = [NSArray arrayWithObjects: 
-                                              NSFilenamesPboardType, 
-                                              @"GWLSFolderPboardType", 
-                                              @"GWRemoteFilenamesPboardType", 
-                                              nil];
     NSFont *font;
+    NSRect hlightRect;
     int count;
 
     fsnodeRep = [FSNodeRep sharedInstance];
     fm = [NSFileManager defaultManager];
-		ws = [NSWorkspace sharedWorkspace];
     gw = [GWorkspace gworkspace];
 
     [self setFrame: NSMakeRect(0, 0, 64, 52)];
@@ -103,8 +98,15 @@
     } else {
       ASSIGN (icon, [fsnodeRep multipleSelectionIconOfSize: ICON_SIZE]);
     }
-    
-    ASSIGN (highlight, [NSImage imageNamed: @"CellHighlight.tiff"]);
+        
+    hlightRect = NSZeroRect;
+    hlightRect.size.width = (float)ICON_SIZE / 3 * 4;
+    hlightRect.size.height = hlightRect.size.width * [fsnodeRep highlightHeightFactor];
+    if ((hlightRect.size.height - ICON_SIZE) < 4) {
+      hlightRect.size.height = ICON_SIZE + 4;
+    }
+    hlightRect = NSIntegralRect(hlightRect);
+    ASSIGN (highlightPath, [fsnodeRep highlightPathOfSize: hlightRect.size]);
 
 		if (isRootIcon) {
 			NSHost *host = [NSHost currentHost];
@@ -129,7 +131,11 @@
 	  [namelabel setTextColor: [NSColor blackColor]];
 		[self setLabelWidth]; 
     
-    [self registerForDraggedTypes: pbTypes];
+    [self registerForDraggedTypes: [NSArray arrayWithObjects: 
+                                              NSFilenamesPboardType, 
+                                              @"GWLSFolderPboardType", 
+                                              @"GWRemoteFilenamesPboardType", 
+                                              nil]];
     
 		position = NSMakePoint(0, 0);
 		gridindex = -1;
@@ -338,14 +344,14 @@
 		if (locked == NO) {				
 			[tview openCurrentSelection: paths];
 		} 
-													
     [self unselect];
-    return;
 	}  
 }
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
+  unsigned eventmask = NSAlternateKeyMask | NSCommandKeyMask | NSControlKeyMask;
+
   CHECK_LOCK;
   
 	if ([theEvent clickCount] == 1) { 
@@ -365,12 +371,14 @@
     							              NSLeftMouseUpMask | NSLeftMouseDraggedMask];
 
       if ([nextEvent type] == NSLeftMouseUp) {
-        [tview setCurrentSelection: paths];
+        if ([theEvent modifierFlags] & eventmask) {
+          [tview setCurrentSelection: paths];
+        }
         [self unselect];
         break;
 
       } else if ([nextEvent type] == NSLeftMouseDragged) {
-	      if(dragdelay < 5) {
+	      if (dragdelay < 5) {
           dragdelay++;
         } else {      
           NSPoint p = [nextEvent locationInWindow];
@@ -399,7 +407,8 @@
   NSSize s;
       	
 	if(isSelect) {
-		[highlight compositeToPoint: NSZeroPoint operation: NSCompositeSourceOver];
+    [[NSColor selectedControlColor] set];
+    [highlightPath fill];
 	}
 	
   s = [icon size];
@@ -488,31 +497,35 @@
 	NSArray *sourcePaths;
 	NSString *fromPath;
   NSString *buff;
-	NSString *iconPath;
-	int i, count;
+	unsigned i, count;
 
 	CHECK_LOCK_RET (NSDragOperationNone);
 	
 	isDragTarget = NO;
 
 	pb = [sender draggingPasteboard];
+  sourcePaths = nil;
   
   if ([[pb types] containsObject: NSFilenamesPboardType]) {
     sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
        
   } else if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"]) {
-    NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"]; 
-    NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
+    if ([node isApplication] == NO) {
+      NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"]; 
+      NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
     
-    sourcePaths = [pbDict objectForKey: @"paths"];
-
+      sourcePaths = [pbDict objectForKey: @"paths"];
+    }
   } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {
-    NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
-    NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
+    if ([node isApplication] == NO) {
+      NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
+      NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
     
-    sourcePaths = [pbDict objectForKey: @"paths"];
+      sourcePaths = [pbDict objectForKey: @"paths"];
+    }
+  }
 
-  } else {
+  if (sourcePaths == nil) {
     return NSDragOperationNone;
   }
 
@@ -526,7 +539,8 @@
     return NSDragOperationNone;
   }
   
-  if ((([node isDirectory] == NO) && ([node isMountPoint] == NO)) || [node isPackage]) {
+  if ((([node isDirectory] == NO) && ([node isMountPoint] == NO)) 
+                  || ([node isPackage] && ([node isApplication] == NO))) {
     return NSDragOperationNone;
   }
 
@@ -537,63 +551,65 @@
 		return NSDragOperationNone;
   } 
 
-	if ([node isWritable] == NO) {
-		return NSDragOperationNone;
+	if (([node isWritable] == NO) && ([node isApplication] == NO)) {
+    return NSDragOperationNone;
 	}
 
 	if ([[node path] isEqual: fromPath]) {
 		return NSDragOperationNone;
   }  
 
-	for (i = 0; i < count; i++) {
-		if ([[node path] isEqual: [sourcePaths objectAtIndex: i]]) {
-		  return NSDragOperationNone;
-		}
-	}
+  if ([sourcePaths containsObject: [node path]]) {
+    return NSDragOperationNone;
+  }
 
 	buff = [NSString stringWithString: [node path]];
 	while (1) {
+    CREATE_AUTORELEASE_POOL(arp);
+
 		for (i = 0; i < count; i++) {
 			if ([buff isEqual: [sourcePaths objectAtIndex: i]]) {
+        RELEASE (arp);
  		    return NSDragOperationNone;
 			}
 		}
     if ([buff isEqual: path_separator()]) {
+      RELEASE (arp);
       break;
     }            
 		buff = [buff stringByDeletingLastPathComponent];
-	}
+  }
 
+  if ([node isApplication]) {
+    for (i = 0; i < count; i++) {
+      CREATE_AUTORELEASE_POOL(arp);
+      FSNode *nd = [FSNode nodeWithPath: [sourcePaths objectAtIndex: i]];
+      
+      if (([nd isPlain] == NO) && ([nd isPackage] == NO)) {
+        RELEASE (arp);
+        return NSDragOperationNone;
+      }
+      RELEASE (arp);
+    }
+  }
+  
   isDragTarget = YES;
   forceCopy = NO;
 
-  iconPath =  [[node path] stringByAppendingPathComponent: @".opendir.tiff"];
-
-  if ([fm isReadableFileAtPath: iconPath]) {
-    NSImage *img = [[NSImage alloc] initWithContentsOfFile: iconPath];
-
-    if (img) {
-      ASSIGN (icon, img);
-      RELEASE (img);
-    } else {
-      ASSIGN (icon, [NSImage imageNamed: @"FileIcon_Directory_Open.tiff"]);
-    }      
-  } else {
-	  ASSIGN (icon, [NSImage imageNamed: @"FileIcon_Directory_Open.tiff"]);    
-  }
-
+  ASSIGN (icon, [fsnodeRep openFolderIconOfSize: ICON_SIZE forNode: node]);
   [self setNeedsDisplay: YES];
 
 	sourceDragMask = [sender draggingSourceOperationMask];
 
 	if (sourceDragMask == NSDragOperationCopy) {
-		return NSDragOperationCopy;
+		return ([node isApplication] ? NSDragOperationMove : NSDragOperationCopy);
 	} else if (sourceDragMask == NSDragOperationLink) {
-		return NSDragOperationLink;
+		return ([node isApplication] ? NSDragOperationMove : NSDragOperationLink);
 	} else {
-    if ([[NSFileManager defaultManager] isWritableFileAtPath: fromPath]) {
+    if ([[NSFileManager defaultManager] isWritableFileAtPath: fromPath]
+                                                  || [node isApplication]) {
       return NSDragOperationAll;			
-    } else {
+    } else if ([node isApplication] == NO) {
       forceCopy = YES;
 			return NSDragOperationCopy;			
     }
@@ -610,16 +626,17 @@
     return NSDragOperationNone;
   }
 	
-	if (!isDragTarget || locked || [node isPackage]) {
-		return NSDragOperationNone;
+	if ((isDragTarget == NO) || locked 
+                  || ([node isPackage] && ([node isApplication] == NO))) {
+    return NSDragOperationNone;
 	}
 
 	sourceDragMask = [sender draggingSourceOperationMask];
 	
 	if (sourceDragMask == NSDragOperationCopy) {
-		return NSDragOperationCopy;
+		return ([node isApplication] ? NSDragOperationMove : NSDragOperationCopy);
 	} else if (sourceDragMask == NSDragOperationLink) {
-		return NSDragOperationLink;
+		return ([node isApplication] ? NSDragOperationMove : NSDragOperationLink);
 	} else {
 		return forceCopy ? NSDragOperationCopy : NSDragOperationAll;
 	}
@@ -676,52 +693,63 @@
 	sourceDragMask = [sender draggingSourceOperationMask];  
   pb = [sender draggingPasteboard];
   
-  if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"]) {  
-    NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"]; 
-    
-    [gw concludeRemoteFilesDragOperation: pbData
-                             atLocalPath: [node path]];
-    return;
-  
-  } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {  
-    NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
-    
-    [gw lsfolderDragOperation: pbData
-              concludedAtPath: [node path]];
-    return;
-  }  
-  
-  sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
-  source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
+  if ([node isApplication] == NO) {
+    if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"]) {  
+      NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"]; 
 
-	if ([source isEqual: [gw trashPath]]) {
-		operation = @"GWorkspaceRecycleOutOperation";
-	} else {
-		if (sourceDragMask == NSDragOperationCopy) {
-			operation = NSWorkspaceCopyOperation;
-		} else if (sourceDragMask == NSDragOperationLink) {
-			operation = NSWorkspaceLinkOperation;
-		} else {
-      if ([fm isWritableFileAtPath: source]) {
-			  operation = NSWorkspaceMoveOperation;
-      } else {
-			  operation = NSWorkspaceCopyOperation;
-      }
-		}
+      [gw concludeRemoteFilesDragOperation: pbData
+                               atLocalPath: [node path]];
+      return;
+
+    } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {  
+      NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
+
+      [gw lsfolderDragOperation: pbData
+                concludedAtPath: [node path]];
+      return;
+    }  
   }
+   
+  sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
   
-  files = [NSMutableArray arrayWithCapacity: 1];    
-  for(i = 0; i < [sourcePaths count]; i++) {    
-    [files addObject: [[sourcePaths objectAtIndex: i] lastPathComponent]];
-  }  
+  if ([node isApplication] == NO) {
+    source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
+	  
+    if ([source isEqual: [gw trashPath]]) {
+		  operation = @"GWorkspaceRecycleOutOperation";
+	  } else {
+		  if (sourceDragMask == NSDragOperationCopy) {
+			  operation = NSWorkspaceCopyOperation;
+		  } else if (sourceDragMask == NSDragOperationLink) {
+			  operation = NSWorkspaceLinkOperation;
+		  } else {
+        if ([fm isWritableFileAtPath: source]) {
+			    operation = NSWorkspaceMoveOperation;
+        } else {
+			    operation = NSWorkspaceCopyOperation;
+        }
+		  }
+    }
 
-	opDict = [NSMutableDictionary dictionaryWithCapacity: 4];
-	[opDict setObject: operation forKey: @"operation"];
-	[opDict setObject: source forKey: @"source"];
-	[opDict setObject: [node path] forKey: @"destination"];
-	[opDict setObject: files forKey: @"files"];
-    
-  [gw performFileOperationWithDictionary: opDict];
+    files = [NSMutableArray arrayWithCapacity: 1];    
+    for (i = 0; i < [sourcePaths count]; i++) {    
+      [files addObject: [[sourcePaths objectAtIndex: i] lastPathComponent]];
+    }  
+
+	  opDict = [NSMutableDictionary dictionaryWithCapacity: 4];
+	  [opDict setObject: operation forKey: @"operation"];
+	  [opDict setObject: source forKey: @"source"];
+	  [opDict setObject: [node path] forKey: @"destination"];
+	  [opDict setObject: files forKey: @"files"];
+
+    [gw performFileOperationWithDictionary: opDict];
+
+  } else {  
+    for (i = 0; i < [sourcePaths count]; i++) {    
+      [[NSWorkspace sharedWorkspace] openFile: [sourcePaths objectAtIndex: i] 
+                              withApplication: [node name]];
+    }
+  }
 }
 
 @end

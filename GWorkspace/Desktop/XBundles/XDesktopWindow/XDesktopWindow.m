@@ -45,6 +45,7 @@
 	if (self) {
     [self setReleasedWhenClosed: NO];
     [self setExcludedFromWindowsMenu: YES];
+    [self setAcceptsMouseMovedEvents: YES];
 	}
   
 	return self;

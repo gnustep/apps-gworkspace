@@ -1163,34 +1163,40 @@ static NSImage *branchImage;
 	NSString *fromPath;
   NSString *nodePath;
   NSString *prePath;
-	int count;
-
+	unsigned i, count;
+  
   isDragTarget = NO;
   onSelf = NO;
 	
   if (selection || isLocked || ([node isDirectory] == NO) 
-                    || [node isPackage] || ([node isWritable] == NO)) {
+            || ([node isPackage] && ([node isApplication] == NO))
+            || (([node isWritable] == NO) && ([node isApplication] == NO))) {
     return NSDragOperationNone;
   }
   	
 	pb = [sender draggingPasteboard];
-
+  sourcePaths = nil;
+  
   if ([[pb types] containsObject: NSFilenamesPboardType]) {
     sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
        
   } else if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"]) {
-    NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"]; 
-    NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
-    
-    sourcePaths = [pbDict objectForKey: @"paths"];
+    if ([node isApplication] == NO) {
+      NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"]; 
+      NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
 
+      sourcePaths = [pbDict objectForKey: @"paths"];
+    }
   } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {
-    NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
-    NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
+    if ([node isApplication] == NO) {
+      NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
+      NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
     
-    sourcePaths = [pbDict objectForKey: @"paths"];
-
-  } else {
+      sourcePaths = [pbDict objectForKey: @"paths"];
+    }
+  }
+  
+  if (sourcePaths == nil) {
     return NSDragOperationNone;
   }
   
@@ -1229,13 +1235,30 @@ static NSImage *branchImage;
   prePath = [NSString stringWithString: nodePath];
 
   while (1) {
+    CREATE_AUTORELEASE_POOL(arp);
+    
     if ([sourcePaths containsObject: prePath]) {
+      RELEASE (arp);
       return NSDragOperationNone;
     }
     if ([prePath isEqual: path_separator()]) {
+      RELEASE (arp);
       break;
     }            
     prePath = [prePath stringByDeletingLastPathComponent];
+  }
+
+  if ([node isApplication]) {
+    for (i = 0; i < count; i++) {
+      CREATE_AUTORELEASE_POOL(arp);
+      FSNode *nd = [FSNode nodeWithPath: [sourcePaths objectAtIndex: i]];
+      
+      if (([nd isPlain] == NO) && ([nd isPackage] == NO)) {
+        RELEASE (arp);
+        return NSDragOperationNone;
+      }
+      RELEASE (arp);
+    }
   }
 
   isDragTarget = YES;
@@ -1244,13 +1267,14 @@ static NSImage *branchImage;
 	sourceDragMask = [sender draggingSourceOperationMask];
 
 	if (sourceDragMask == NSDragOperationCopy) {
-		return NSDragOperationCopy;
+		return ([node isApplication] ? NSDragOperationMove : NSDragOperationCopy);
 	} else if (sourceDragMask == NSDragOperationLink) {
-		return NSDragOperationLink;
+		return ([node isApplication] ? NSDragOperationMove : NSDragOperationLink);
 	} else {  
-    if ([[NSFileManager defaultManager] isWritableFileAtPath: fromPath]) {
+    if ([[NSFileManager defaultManager] isWritableFileAtPath: fromPath]
+                                                    || [node isApplication]) {
       return NSDragOperationAll;			
-    } else {
+    } else if ([node isApplication] == NO) {
       forceCopy = YES;
 			return NSDragOperationCopy;			
     }
@@ -1276,7 +1300,7 @@ static NSImage *branchImage;
       ASSIGN (openicon, [fsnodeRep openFolderIconOfSize: iconSize forNode: node]);
     }
   
-    if ((drawicon == icon) && isDragTarget && (onSelf == NO)) {
+    if (openicon && (drawicon == icon) && isDragTarget && (onSelf == NO)) {
       drawicon = openicon;
       [self setNeedsDisplay: YES];
     }
@@ -1285,9 +1309,9 @@ static NSImage *branchImage;
   if (isDragTarget == NO) {
     return NSDragOperationNone;
   } else if (sourceDragMask == NSDragOperationCopy) {
-		return NSDragOperationCopy;
+		return ([node isApplication] ? NSDragOperationMove : NSDragOperationCopy);
 	} else if (sourceDragMask == NSDragOperationLink) {
-		return NSDragOperationLink;
+		return ([node isApplication] ? NSDragOperationMove : NSDragOperationLink);
 	} else {
 		return forceCopy ? NSDragOperationCopy : NSDragOperationAll;
 	}
@@ -1327,7 +1351,7 @@ static NSImage *branchImage;
   NSMutableArray *files;
 	NSMutableDictionary *opDict;
 	NSString *trashPath;
-  int i;
+  unsigned i;
 
 	isDragTarget = NO;  
 
@@ -1346,56 +1370,65 @@ static NSImage *branchImage;
 
 	sourceDragMask = [sender draggingSourceOperationMask];
   pb = [sender draggingPasteboard];
-    
-  if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"]) {  
-    NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"]; 
 
-    [desktopApp concludeRemoteFilesDragOperation: pbData
-                                     atLocalPath: [node path]];
-    return;
-    
-  } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {  
-    NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
+  if ([node isApplication] == NO) {    
+    if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"]) {  
+      NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"]; 
 
-    [desktopApp lsfolderDragOperation: pbData
-                      concludedAtPath: [node path]];
-    return;
+      [desktopApp concludeRemoteFilesDragOperation: pbData
+                                       atLocalPath: [node path]];
+      return;
+
+    } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {  
+      NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
+
+      [desktopApp lsfolderDragOperation: pbData
+                        concludedAtPath: [node path]];
+      return;
+    }
   }
     
   sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
 
-  source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
-  
-  trashPath = [desktopApp trashPath];
+  if ([node isApplication] == NO) {
+    source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
+    trashPath = [desktopApp trashPath];
 
-  if ([source isEqual: trashPath]) {
-    operation = @"GWorkspaceRecycleOutOperation";
-	} else {	
-		if (sourceDragMask == NSDragOperationCopy) {
-			operation = NSWorkspaceCopyOperation;
-		} else if (sourceDragMask == NSDragOperationLink) {
-			operation = NSWorkspaceLinkOperation;
-		} else {
-      if ([[NSFileManager defaultManager] isWritableFileAtPath: source]) {
-			  operation = NSWorkspaceMoveOperation;
-      } else {
+    if ([source isEqual: trashPath]) {
+      operation = @"GWorkspaceRecycleOutOperation";
+	  } else {	
+		  if (sourceDragMask == NSDragOperationCopy) {
 			  operation = NSWorkspaceCopyOperation;
-      }
-		}
+		  } else if (sourceDragMask == NSDragOperationLink) {
+			  operation = NSWorkspaceLinkOperation;
+		  } else {
+        if ([[NSFileManager defaultManager] isWritableFileAtPath: source]) {
+			    operation = NSWorkspaceMoveOperation;
+        } else {
+			    operation = NSWorkspaceCopyOperation;
+        }
+		  }
+    }
+
+    files = [NSMutableArray arrayWithCapacity: 1];    
+    for(i = 0; i < [sourcePaths count]; i++) {    
+      [files addObject: [[sourcePaths objectAtIndex: i] lastPathComponent]];
+    }  
+
+	  opDict = [NSMutableDictionary dictionaryWithCapacity: 4];
+	  [opDict setObject: operation forKey: @"operation"];
+	  [opDict setObject: source forKey: @"source"];
+	  [opDict setObject: [node path] forKey: @"destination"];
+	  [opDict setObject: files forKey: @"files"];
+
+    [desktopApp performFileOperation: opDict];
+
+  } else {
+    for (i = 0; i < [sourcePaths count]; i++) {    
+      [[NSWorkspace sharedWorkspace] openFile: [sourcePaths objectAtIndex: i] 
+                              withApplication: [node name]];
+    }
   }
-  
-  files = [NSMutableArray arrayWithCapacity: 1];    
-  for(i = 0; i < [sourcePaths count]; i++) {    
-    [files addObject: [[sourcePaths objectAtIndex: i] lastPathComponent]];
-  }  
-
-	opDict = [NSMutableDictionary dictionaryWithCapacity: 4];
-	[opDict setObject: operation forKey: @"operation"];
-	[opDict setObject: source forKey: @"source"];
-	[opDict setObject: [node path] forKey: @"destination"];
-	[opDict setObject: files forKey: @"files"];
-
-  [desktopApp performFileOperation: opDict];
 }
 
 @end

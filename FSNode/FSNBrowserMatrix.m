@@ -45,7 +45,7 @@
 - (id)initInColumn:(FSNBrowserColumn *)col
          withFrame:(NSRect)frameRect 
               mode:(int)aMode 
-         prototype:(NSCell *)aCell 
+         prototype:(FSNBrowserCell *)aCell 
       numberOfRows:(int)numRows
    numberOfColumns:(int)numColumns
          acceptDnd:(BOOL)dnd
@@ -344,7 +344,7 @@
 
 @implementation FSNBrowserMatrix (DraggingDestination)
 
-- (unsigned int)checkReturnValueForCell:(NSCell *)acell
+- (unsigned int)checkReturnValueForCell:(FSNBrowserCell *)acell
                        withDraggingInfo:(id <NSDraggingInfo>)sender
 {
   if (dndTarget != acell) {
@@ -401,7 +401,7 @@
   location = [self convertPoint: location fromView: nil];
 
   if ([self getRow: &row column: &col forPoint: location]) {
-    NSCell *cell = [[self cells] objectAtIndex: row];  
+    FSNBrowserCell *cell = [[self cells] objectAtIndex: row];  
     
     [self checkReturnValueForCell: cell withDraggingInfo: sender];
 

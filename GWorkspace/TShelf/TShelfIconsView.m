@@ -413,7 +413,7 @@
 
 - (void)openCurrentSelection:(NSArray *)paths
 {
-  [gw openSelectedPaths: paths newViewer: NO];
+  [gw openSelectedPaths: paths newViewer: YES];
 }
 
 - (void)checkIconsAfterHidingOfPaths:(NSArray *)hpaths
@@ -857,7 +857,7 @@
 		NSRect r = NSMakeRect(p.x, p.y, 64, 52);
 
 		[icon setPosition: p];
-		[icon setFrame: r];
+		[icon setFrame: NSIntegralRect(r)];
 		gpoints[index].used = 1;
     
     if (iconsType == FILES_TAB) {

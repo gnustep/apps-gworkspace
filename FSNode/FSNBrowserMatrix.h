@@ -30,6 +30,7 @@
 #include "FSNodeRep.h"
 
 @class FSNBrowserColumn;
+@class FSNBrowserCell;
 
 @interface FSNBrowserMatrix : NSMatrix
 {
@@ -38,14 +39,14 @@
   NSTimeInterval editstamp;  
   int editindex;  
   BOOL acceptDnd;
-  NSCell *dndTarget;
+  FSNBrowserCell *dndTarget;
   unsigned int dragOperation;
 }
 
 - (id)initInColumn:(FSNBrowserColumn *)col
          withFrame:(NSRect)frameRect 
               mode:(int)aMode 
-         prototype:(NSCell *)aCell 
+         prototype:(FSNBrowserCell *)aCell 
       numberOfRows:(int)numRows
    numberOfColumns:(int)numColumns
          acceptDnd:(BOOL)dnd;
@@ -79,7 +80,7 @@
 
 @interface FSNBrowserMatrix (DraggingDestination)
 
-- (unsigned int)checkReturnValueForCell:(NSCell *)acell
+- (unsigned int)checkReturnValueForCell:(FSNBrowserCell *)acell
                        withDraggingInfo:(id <NSDraggingInfo>)sender;
 
 - (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender;

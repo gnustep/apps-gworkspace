@@ -69,6 +69,7 @@
   IBOutlet id useDockCheck;
   IBOutlet id dockPosLabel;
   IBOutlet id dockPosMatrix;    
+  IBOutlet id hideTShelfCheck;
 
   GWDesktopManager *manager;
   id gworkspace;
@@ -98,6 +99,10 @@
 - (IBAction)setUsesDock:(id)sender;
 
 - (IBAction)setDockPosition:(id)sender;
+
+- (IBAction)setDockPosition:(id)sender;
+
+- (IBAction)setTShelfAutohide:(id)sender;
 
 @end
 

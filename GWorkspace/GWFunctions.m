@@ -224,7 +224,7 @@ static inline int comp_Icons(id *c1, id *c2, void *context)
   return comparePaths((id *)s1, (id *)s2, (void *)stype);
 }
 
-static NSString *fix_path(NSString *s, const char *c)
+static NSString *fxpath(NSString *s, const char *c)
 {
   static NSFileManager *mgr = nil;
   const char *ptr = c;
@@ -249,7 +249,7 @@ static NSString *fix_path(NSString *s, const char *c)
 
 NSString *fixPath(NSString *s, const char *c)
 {
-  return fix_path(s, c);
+  return fxpath(s, c);
 }
 
 /*

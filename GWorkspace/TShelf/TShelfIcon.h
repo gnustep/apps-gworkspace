@@ -36,6 +36,7 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 @class NSPasteboard;
 @class NSTextField;
 @class NSImage;
+@class NSBezierPath;
 @class NSWorkspace;
 @class TShelfIconsView;
 @class FSNode;
@@ -54,8 +55,9 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
   BOOL isSelect;
   BOOL locked;
   
-	NSImage *icon, *highlight;
-	NSTextField *namelabel;
+	NSImage *icon;
+	NSTextField *namelabel;  
+  NSBezierPath *highlightPath;
 	NSPoint position;
 	int gridindex;
   int labelWidth;
@@ -64,7 +66,6 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
   
   FSNodeRep *fsnodeRep;
   NSFileManager *fm;
-	NSWorkspace *ws;
   GWorkspace *gw;
   
   int dragdelay;

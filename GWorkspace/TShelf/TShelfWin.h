@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #ifndef TSHELF_WIN_H
 #define TSHELF_WIN_H
 
@@ -39,6 +38,8 @@
 @interface TShelfWin : NSWindow
 {
   TShelfView *tView;
+  BOOL autohide;
+  BOOL autohidden;
 }
 
 - (TShelfView *)shelfView;
@@ -46,6 +47,14 @@
 - (void)activate;
 
 - (void)deactivate;
+
+- (void)animateShowing;
+
+- (void)animateHiding;
+
+- (void)setAutohide:(BOOL)value;
+
+- (BOOL)autohide;
 
 - (void)addTab;
 

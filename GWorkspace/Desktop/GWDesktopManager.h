@@ -50,6 +50,7 @@ typedef enum DockPosition {
   
   NSRect dockReservedFrame;
   NSRect tshelfReservedFrame;
+  NSRect tshelfActivateFrame;
   
   GWorkspace *gworkspace;
   id ws;
@@ -93,7 +94,13 @@ typedef enum DockPosition {
 
 - (NSRect)tshelfReservedFrame;
 
+- (NSRect)tshelfActivateFrame;
+
 - (NSImage *)tabbedShelfBackground;
+
+- (void)mouseEnteredTShelfActivateFrame;
+
+- (void)mouseExitedTShelfActiveFrame;
 
 - (void)deselectAllIcons;
 

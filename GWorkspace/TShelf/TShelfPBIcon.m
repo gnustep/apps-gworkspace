@@ -24,11 +24,14 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
+#include "FSNodeRep.h"
 #include "GWFunctions.h"
 #include "TShelfPBIcon.h"
 #include "TShelfIconsView.h"
 #include "GWorkspace.h"
 #include "GNUstep.h"
+
+#define ICON_SIZE 48
 
 @implementation TShelfPBIcon
 
@@ -48,7 +51,7 @@
 {
   RELEASE (dataPath);
   RELEASE (dataType);
-  RELEASE (highlight);
+  RELEASE (highlightPath);
   RELEASE (icon);
 
   [super dealloc];
@@ -61,12 +64,21 @@
 {
   self = [super init];
   if (self) {
+    NSRect hlightRect;
+
     [self setFrame: NSMakeRect(0, 0, 64, 52)];
 
     ASSIGN (dataPath, dpath);
     ASSIGN (dataType, type);
 
-    ASSIGN (highlight, [NSImage imageNamed: @"CellHighlight.tiff"]);
+    hlightRect = NSZeroRect;
+    hlightRect.size.width = (float)ICON_SIZE / 3 * 4;
+    hlightRect.size.height = hlightRect.size.width * [[FSNodeRep sharedInstance] highlightHeightFactor];
+    if ((hlightRect.size.height - ICON_SIZE) < 4) {
+      hlightRect.size.height = ICON_SIZE + 4;
+    }
+    hlightRect = NSIntegralRect(hlightRect);
+    ASSIGN (highlightPath, [[FSNodeRep sharedInstance] highlightPathOfSize: hlightRect.size]);
 
     if ([dataType isEqual: NSStringPboardType]) {
       ASSIGN (icon, [NSImage imageNamed: @"stringPboard.tiff"]);
@@ -203,7 +215,8 @@
   NSSize s;
       	
 	if(isSelect) {
-		[highlight compositeToPoint: NSZeroPoint operation: NSCompositeSourceOver];
+    [[NSColor selectedControlColor] set];
+    [highlightPath fill];
 	}
 	
   s = [icon size];

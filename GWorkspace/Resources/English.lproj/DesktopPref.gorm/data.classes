@@ -19,7 +19,8 @@
 	    "setUsesDock:",
 	    "setDockPosition:",
 	    "chooseColor:",
-	    "setOmnipresent:"
+	    "setOmnipresent:",
+	    "setTShelfAutohide:"
 	);
 	Outlets = (
 	    win,
@@ -36,7 +37,8 @@
 	    imagePosMatrix,
 	    chooseImageButt,
 	    setImageButt,
-	    omnipresentCheck
+	    omnipresentCheck,
+	    hideTShelfCheck
 	);
 	Super = NSObject;
     };
@@ -45,12 +47,13 @@
 	    "chooseColor:",
 	    "chooseImage:",
 	    "colorChoosen:",
-	    "setOmnipresent:",
+	    "setTShelfAutohide:",
 	    "orderFrontFontPanel:",
 	    "setColor:",
 	    "setDockPosition:",
 	    "setImage:",
 	    "setImageStyle:",
+	    "setOmnipresent:",
 	    "setUseImage:",
 	    "setUsesDock:"
 	);

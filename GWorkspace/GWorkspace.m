@@ -431,6 +431,7 @@ static GWorkspace *gworkspace = nil;
 	id entry;
   BOOL boolentry;
   NSArray *extendedInfo;
+  NSArray *removables;
   NSMenu *menu;
   int i;
   
@@ -454,6 +455,12 @@ static GWorkspace *gworkspace = nil;
 	defaults = [NSUserDefaults standardUserDefaults];
 	processName = [[NSProcessInfo processInfo] processName];    
 	[defaults setObject: processName forKey: @"GSWorkspaceApplication"];
+
+  removables = [defaults arrayForKey: @"GSRemovableMediaPaths"];
+  if ((removables == nil) || ([removables count] == 0)) {
+    removables = [NSArray arrayWithObjects: @"/mnt/floppy", @"/mnt/cdrom", nil];
+  }
+  [fsnodeRep setVolumes: removables];
         
 	entry = [defaults stringForKey: @"defaulteditor"];
 	if (entry == nil) {
@@ -539,14 +546,7 @@ static GWorkspace *gworkspace = nil;
   [self connectFSWatcher];
   
   operationsApp = nil;
-  
-	history = [[History alloc] init];
-  prefController = [PrefController new];  
-  fiend = nil;
-  
-  openWithController = [[OpenWithController alloc] init];
-  runExtController = [[RunExternalController alloc] init];
-  	  
+
   dtopManager = [GWDesktopManager desktopManager];
 
   if ([defaults boolForKey: @"uses_desktop"]) { 
@@ -557,20 +557,29 @@ static GWorkspace *gworkspace = nil;
     item = [menu itemWithTitle: NSLocalizedString(@"Show Desktop", @"")];
     [item setTitle: NSLocalizedString(@"Hide Desktop", @"")];
   }
+
+  tshelfPBFileNum = 0;
+  [self createTabbedShelf];
+  if ([defaults boolForKey: @"tshelf"]) {
+    [self showTShelf: nil];
+  } else {
+    [self hideTShelf: nil];
+  }
+
+  prefController = [PrefController new];  
   
+	history = [[History alloc] init];
+  fiend = nil;
+  
+  openWithController = [[OpenWithController alloc] init];
+  runExtController = [[RunExternalController alloc] init];
+  	    
   finder = [Finder finder];
   
   if ([defaults boolForKey: @"usefiend"]) {
     [self showFiend: nil];
   } else {
     [self hideFiend: nil];
-  }
-
-  tshelfPBFileNum = 0;
-  if ([defaults boolForKey: @"tshelf"]) {
-    [self showTShelf: nil];
-  } else {
-    [self hideTShelf: nil];
   }
     
   vwrsManager = [GWViewersManager viewersManager];
@@ -754,7 +763,7 @@ static GWorkspace *gworkspace = nil;
 
 - (void)tshelfBackgroundDidChange
 {
-  if (tshelfWin && [tshelfWin isVisible]) {
+  if ([tshelfWin isVisible]) {
     [[tshelfWin shelfView] setNeedsDisplay: YES];
   }  
 }
@@ -809,9 +818,10 @@ static GWorkspace *gworkspace = nil;
 {
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   id entry;
+
+  [tshelfWin saveDefaults];  
    
-	if ((tshelfWin != nil) && ([tshelfWin isVisible])) {
-		[tshelfWin saveDefaults];  
+	if ([tshelfWin isVisible]) {
 		[defaults setBool: YES forKey: @"tshelf"];
 	} else {
 		[defaults setBool: NO forKey: @"tshelf"];
@@ -932,13 +942,11 @@ static GWorkspace *gworkspace = nil;
 
 - (void)createTabbedShelf
 {
-	NSUserDefaults *defaults;  
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   id entry;
   NSString *basePath;
   BOOL isdir;
 
-	defaults = [NSUserDefaults standardUserDefaults];
-			
   entry = [defaults objectForKey: @"tshelfpbfnum"];
   if (entry) {
     tshelfPBFileNum = [entry intValue];
@@ -973,6 +981,11 @@ static GWorkspace *gworkspace = nil;
   RETAIN (tshelfPBDir);
 
   tshelfWin = [[TShelfWin alloc] init];
+}
+
+- (TShelfWin *)tabbedShelf
+{
+  return tshelfWin;
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)anItem 
@@ -1014,6 +1027,12 @@ static GWorkspace *gworkspace = nil;
     }
     
     return !found;
+    
+  } else if ([title isEqual: NSLocalizedString(@"Select Special Tab", @"")]
+              || [title isEqual: NSLocalizedString(@"Remove Current Tab", @"")]
+              || [title isEqual: NSLocalizedString(@"Rename Current Tab", @"")]
+              || [title isEqual: NSLocalizedString(@"Add Tab...", @"")]) {
+    return [tshelfWin isVisible];
   }
   
 	if ([title isEqual: NSLocalizedString(@"Cut", @"")]
@@ -1023,15 +1042,10 @@ static GWorkspace *gworkspace = nil;
 
     if (kwin) {
       if ([kwin isKindOfClass: [TShelfWin class]]) {
-        if ((tshelfWin == nil) || ([tshelfWin isVisible] == NO)) {
+        if ([tshelfWin isVisible] == NO) {
           return NO;
         } else {
-          TShelfView *tview = [tshelfWin shelfView];
           TShelfViewItem *item = [[tshelfWin shelfView] selectedTabItem];
-
-          if ([tview hiddenTabs]) {
-            return NO;
-          }
 
           if (item) {
             TShelfIconsView *iview = (TShelfIconsView *)[item view];
@@ -1069,9 +1083,7 @@ static GWorkspace *gworkspace = nil;
   
 //  [rootViewer checkRootPathAfterHidingOfPaths: paths];
     
-  if (tshelfWin != nil) {
-    [tshelfWin checkIconsAfterHidingOfPaths: paths]; 
-	}
+  [tshelfWin checkIconsAfterHidingOfPaths: paths]; 
 }
 
 - (void)iconAnimationChanged:(NSNotification *)notif
@@ -1464,7 +1476,7 @@ static GWorkspace *gworkspace = nil;
   [vwrsManager thumbnailsDidChangeInPaths: nil];
   [dtopManager thumbnailsDidChangeInPaths: nil];
   
-  if ((tshelfWin != nil) && ([tshelfWin isVisible])) {
+  if ([tshelfWin isVisible]) {
     [tshelfWin updateIcons]; 
 	}
 }
@@ -1499,7 +1511,7 @@ static GWorkspace *gworkspace = nil;
       [vwrsManager thumbnailsDidChangeInPaths: tmbdirs];
       [dtopManager thumbnailsDidChangeInPaths: tmbdirs];
 
-      if ((tshelfWin != nil) && ([tshelfWin isVisible])) {
+      if ([tshelfWin isVisible]) {
         [tshelfWin updateIcons]; 
 		  }
 
@@ -1527,7 +1539,7 @@ static GWorkspace *gworkspace = nil;
       [vwrsManager thumbnailsDidChangeInPaths: tmbdirs];
       [dtopManager thumbnailsDidChangeInPaths: tmbdirs];
       
-      if ((tshelfWin != nil) && ([tshelfWin isVisible])) {
+      if ([tshelfWin isVisible]) {
         [tshelfWin updateIcons]; 
 		  }
     }
@@ -1825,6 +1837,17 @@ static GWorkspace *gworkspace = nil;
                 nil);  
       }
 	  }
+  
+  } else {
+  
+ //   NSImage *image = [operationsApp applicationIconImage];
+  
+//    if (image) {
+//      NSLog(@"C'E");
+//    } else {
+//      NSLog(@"NON C'E");
+//    }
+  
   }
 }
 
@@ -2226,32 +2249,10 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 	NSMenu *menu = [[[NSApp mainMenu] itemWithTitle: NSLocalizedString(@"Tools", @"")] submenu];
 	menu = [[menu itemWithTitle: NSLocalizedString(@"Tabbed Shelf", @"")] submenu];
 
-  while (1) {
-    if ([menu numberOfItems] == 0) {
-      break;
-    }
-    [menu removeItemAtIndex: 0];
-  }
+  [[menu itemAtIndex: 0] setTitle: NSLocalizedString(@"Hide Tabbed Shelf", @"")];
+  [[menu itemAtIndex: 0] setAction: @selector(hideTShelf:)];
 
-	[menu addItemWithTitle: NSLocalizedString(@"Hide Tabbed Shelf", @"") 
-													action: @selector(hideTShelf:) keyEquivalent: @""];
-	[menu addItemWithTitle: NSLocalizedString(@"Maximize/Minimize Tabbed Shelf", @"") 
-													action: @selector(maximizeMinimizeTShelf:) keyEquivalent: @"s"];
-	[menu addItemWithTitle: NSLocalizedString(@"Select Special Tab", @"") 
-													action: @selector(selectSpecialTShelfTab:) keyEquivalent: @"S"];
-	[menu addItemWithTitle: NSLocalizedString(@"Remove Current Tab", @"") 
-										action: @selector(removeTShelfTab:) keyEquivalent: @""];	
-	[menu addItemWithTitle: NSLocalizedString(@"Rename Current Tab", @"") 
-										action: @selector(renameTShelfTab:) keyEquivalent: @""];	
-	[menu addItemWithTitle: NSLocalizedString(@"Add Tab...", @"") 
-										action: @selector(addTShelfTab:) keyEquivalent: @""];		
-                    						
-  if (tshelfWin == nil) {
-    [self createTabbedShelf];
-    [tshelfWin activate];
-  } else if ([tshelfWin isVisible] == NO) {
-		[tshelfWin activate];
-	}
+  [tshelfWin activate];
 }
 
 - (void)hideTShelf:(id)sender
@@ -2259,38 +2260,20 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 	NSMenu *menu = [[[NSApp mainMenu] itemWithTitle: NSLocalizedString(@"Tools", @"")] submenu];
 	menu = [[menu itemWithTitle: NSLocalizedString(@"Tabbed Shelf", @"")] submenu];
 
-  while (1) {
-    if ([menu numberOfItems] == 0) {
-      break;
-    }
-    [menu removeItemAtIndex: 0];
-  }
+  [[menu itemAtIndex: 0] setTitle: NSLocalizedString(@"Show Tabbed Shelf", @"")];
+  [[menu itemAtIndex: 0] setAction: @selector(showTShelf:)];
 
-	[menu addItemWithTitle: NSLocalizedString(@"Show Tabbed Shelf", @"") 
-									action: @selector(showTShelf:) keyEquivalent: @""];		
-
-	if ((tshelfWin != nil) && ([tshelfWin isVisible])) {
-    [tshelfWin saveDefaults]; 
+	if ([tshelfWin isVisible]) {
     [tshelfWin deactivate]; 
 	}
 }
 
-- (void)maximizeMinimizeTShelf:(id)sender
-{
-  if ((tshelfWin != nil) && ([tshelfWin isVisible])) {
-    [[tshelfWin shelfView] hideShowTabs: nil];
-  }
-}
-
 - (void)selectSpecialTShelfTab:(id)sender
 {
-  if (tshelfWin != nil) {
-    if ([tshelfWin isVisible] == NO) {
-      [tshelfWin activate];
-    }
-    
-    [[tshelfWin shelfView] selectLastItem];
+  if ([tshelfWin isVisible] == NO) {
+    [tshelfWin activate];
   }
+  [[tshelfWin shelfView] selectLastItem];
 }
 
 - (void)addTShelfTab:(id)sender

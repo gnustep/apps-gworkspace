@@ -77,7 +77,7 @@ toPoint: NSMakePoint(x2, y2)]; \
 }
 #endif
 
-NSString *fixPath(NSString *s, const char *c);
+NSString *fixpath(NSString *s, const char *c);
 
 NSString *cutFileLabelText(NSString *filename, id label, int lenght);
 

@@ -1305,29 +1305,36 @@ static id <DesktopApplication> desktopApp = nil;
 	NSArray *sourcePaths;
 	NSString *fromPath;
   NSString *prePath;
-	int count;
+	unsigned i, count;
 
   if (([cell isEnabled] == NO) || ([node isDirectory] == NO) 
-                    || [node isPackage] || ([node isWritable] == NO)) {
+            || ([node isPackage] && ([node isApplication] == NO))
+            || (([node isWritable] == NO) && ([node isApplication] == NO))) {
     return NSDragOperationNone;
   }
+
+  sourcePaths = nil;
 
   if ([[pb types] containsObject: NSFilenamesPboardType]) {
     sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
        
   } else if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"]) {
-    NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"]; 
-    NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
+    if ([node isApplication] == NO) {
+      NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"]; 
+      NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
     
-    sourcePaths = [pbDict objectForKey: @"paths"];
-
+      sourcePaths = [pbDict objectForKey: @"paths"];
+    }
   } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {
-    NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
-    NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
+    if ([node isApplication] == NO) {
+      NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
+      NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
     
-    sourcePaths = [pbDict objectForKey: @"paths"];
+      sourcePaths = [pbDict objectForKey: @"paths"];
+    }
+  }
 
-  } else {
+  if (sourcePaths == nil) {
     return NSDragOperationNone;
   }
   
@@ -1349,21 +1356,39 @@ static id <DesktopApplication> desktopApp = nil;
   prePath = [NSString stringWithString: nodePath];
 
   while (1) {
+    CREATE_AUTORELEASE_POOL(arp);
+
     if ([sourcePaths containsObject: prePath]) {
+      RELEASE (arp);
       return NSDragOperationNone;
     }
     if ([prePath isEqual: path_separator()]) {
+      RELEASE (arp);
       break;
     }            
     prePath = [prePath stringByDeletingLastPathComponent];
   }
 
+  if ([node isApplication]) {
+    for (i = 0; i < count; i++) {
+      CREATE_AUTORELEASE_POOL(arp);
+      FSNode *nd = [FSNode nodeWithPath: [sourcePaths objectAtIndex: i]];
+      
+      if (([nd isPlain] == NO) && ([nd isPackage] == NO)) {
+        RELEASE (arp);
+        return NSDragOperationNone;
+      }
+      RELEASE (arp);
+    }
+  }
+
 	if (sourceDragMask == NSDragOperationCopy) {
-		return NSDragOperationCopy;
+		return ([node isApplication] ? NSDragOperationMove : NSDragOperationCopy);
 	} else if (sourceDragMask == NSDragOperationLink) {
-		return NSDragOperationLink;
+		return ([node isApplication] ? NSDragOperationMove : NSDragOperationLink);
 	} else {
-    if ([[NSFileManager defaultManager] isWritableFileAtPath: fromPath]) {
+    if ([[NSFileManager defaultManager] isWritableFileAtPath: fromPath]
+                                                    || [node isApplication]) {
       return NSDragOperationAll;			
     } else {
 			return NSDragOperationCopy;			
@@ -1376,6 +1401,7 @@ static id <DesktopApplication> desktopApp = nil;
 - (void)concludeDragOperation:(id <NSDraggingInfo>)sender
                  inMatrixCell:(id)cell
 {
+  FSNode *node = [cell node];
 	NSPasteboard *pb = [sender draggingPasteboard];
   NSDragOperation sourceDragMask = [sender draggingSourceOperationMask];
 	NSArray *sourcePaths;
@@ -1383,61 +1409,71 @@ static id <DesktopApplication> desktopApp = nil;
   NSMutableArray *files;
 	NSMutableDictionary *opDict;
 	NSString *trashPath;
-  int i;
+  unsigned i;
 
-  if (([cell isEnabled] == NO) || [cell isLeaf]) {
+  if (([cell isEnabled] == NO) 
+                  || ([cell isLeaf] && ([node isApplication] == NO))) {
     return;
   }
 
-  if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"]) {  
-    NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"]; 
+  if ([node isApplication] == NO) {    
+    if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"]) {  
+      NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"]; 
 
-    [desktopApp concludeRemoteFilesDragOperation: pbData
-                                     atLocalPath: [[cell node] path]];
-    return;
-    
-  } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {  
-    NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
+      [desktopApp concludeRemoteFilesDragOperation: pbData
+                                       atLocalPath: [[cell node] path]];
+      return;
 
-    [desktopApp lsfolderDragOperation: pbData
-                      concludedAtPath: [[cell node] path]];
-    return;
+    } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {  
+      NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
+
+      [desktopApp lsfolderDragOperation: pbData
+                        concludedAtPath: [[cell node] path]];
+      return;
+    }
   }
-
+  
   sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
 
-  source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
-  
-  trashPath = [desktopApp trashPath];
+  if ([node isApplication] == NO) {  
+    source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
+    trashPath = [desktopApp trashPath];
 
-  if ([source isEqual: trashPath]) {
-  		operation = @"GWorkspaceRecycleOutOperation";
-	} else {	
-		if (sourceDragMask == NSDragOperationCopy) {
-			operation = NSWorkspaceCopyOperation;
-		} else if (sourceDragMask == NSDragOperationLink) {
-			operation = NSWorkspaceLinkOperation;
-		} else {
-      if ([[NSFileManager defaultManager] isWritableFileAtPath: source]) {
-			  operation = NSWorkspaceMoveOperation;
-      } else {
+    if ([source isEqual: trashPath]) {
+  		  operation = @"GWorkspaceRecycleOutOperation";
+	  } else {	
+		  if (sourceDragMask == NSDragOperationCopy) {
 			  operation = NSWorkspaceCopyOperation;
-      }
-		}
+		  } else if (sourceDragMask == NSDragOperationLink) {
+			  operation = NSWorkspaceLinkOperation;
+		  } else {
+        if ([[NSFileManager defaultManager] isWritableFileAtPath: source]) {
+			    operation = NSWorkspaceMoveOperation;
+        } else {
+			    operation = NSWorkspaceCopyOperation;
+        }
+		  }
+    }
+
+    files = [NSMutableArray arrayWithCapacity: 1];    
+    for(i = 0; i < [sourcePaths count]; i++) {    
+      [files addObject: [[sourcePaths objectAtIndex: i] lastPathComponent]];
+    }  
+
+	  opDict = [NSMutableDictionary dictionaryWithCapacity: 4];
+	  [opDict setObject: operation forKey: @"operation"];
+	  [opDict setObject: source forKey: @"source"];
+	  [opDict setObject: [[cell node] path] forKey: @"destination"];
+	  [opDict setObject: files forKey: @"files"];
+
+    [desktopApp performFileOperation: opDict];
+
+  } else {
+    for (i = 0; i < [sourcePaths count]; i++) {    
+      [[NSWorkspace sharedWorkspace] openFile: [sourcePaths objectAtIndex: i] 
+                              withApplication: [node name]];
+    }
   }
-  
-  files = [NSMutableArray arrayWithCapacity: 1];    
-  for(i = 0; i < [sourcePaths count]; i++) {    
-    [files addObject: [[sourcePaths objectAtIndex: i] lastPathComponent]];
-  }  
-
-	opDict = [NSMutableDictionary dictionaryWithCapacity: 4];
-	[opDict setObject: operation forKey: @"operation"];
-	[opDict setObject: source forKey: @"source"];
-	[opDict setObject: [[cell node] path] forKey: @"destination"];
-	[opDict setObject: files forKey: @"files"];
-
-  [desktopApp performFileOperation: opDict];
 }
 
 @end

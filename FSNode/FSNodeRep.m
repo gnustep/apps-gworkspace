@@ -442,11 +442,17 @@ static FSNodeRep *shared = nil;
     if (img) {
       icon = AUTORELEASE (img);
     } else {
-      icon = openFolderIcon;
+      if ([node isApplication]) {
+        icon = [self iconOfSize: size forNode: node];
+      } else {
+        icon = openFolderIcon;
+      }
     }      
   } else {
     if ([node isMountPoint]) {
       icon = openHardDiskIcon;
+    } else if ([node isApplication]) {    
+      icon = [self iconOfSize: size forNode: node];  
     } else {
       icon = openFolderIcon;
     }

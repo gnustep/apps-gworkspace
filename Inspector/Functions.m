@@ -101,7 +101,7 @@ static NSString *fix_path(NSString *s, const char *c)
   return [mgr stringWithFileSystemRepresentation: ptr length: len]; 
 }
 
-NSString *fixPath(NSString *s, const char *c)
+NSString *fixpath(NSString *s, const char *c)
 {
   return fix_path(s, c);
 }
@@ -121,7 +121,7 @@ NSString *subtractPathComponentToPath(NSString *apath, NSString *firstpart)
 	int pos;
 		
 	if([apath isEqualToString: firstpart] == YES) {
-		return fixPath(@"/", 0);
+		return fixpath(@"/", 0);
   }
 	pos = [apath rangeOfString: firstpart].length +1;
 	secondpart = [apath substringFromIndex: pos];
@@ -161,7 +161,7 @@ NSString *pathFittingInContainer(id container, NSString *fullPath, int margins)
 		return fullPath;
 	}
   
-	cntwidth = cntwidth - [font widthOfString: fixPath(@"../", 0)];
+	cntwidth = cntwidth - [font widthOfString: fixpath(@"../", 0)];
 		
 	pathcomps = [fullPath pathComponents];
 	i = [pathcomps count] - 1;
@@ -174,10 +174,10 @@ NSString *pathFittingInContainer(id container, NSString *fullPath, int margins)
 		} else {
 			break;
     }						
-		path = [NSString stringWithFormat: @"%@%@%@", [pathcomps objectAtIndex: i], fixPath(@"/", 0), path];
+		path = [NSString stringWithFormat: @"%@%@%@", [pathcomps objectAtIndex: i], fixpath(@"/", 0), path];
 	}
 	
-	relpath = [NSString stringWithFormat: @"%@%@", fixPath(@"../", 0), relpath];
+	relpath = [NSString stringWithFormat: @"%@%@", fixpath(@"../", 0), relpath];
 	
 	return relpath;
 }
@@ -198,7 +198,7 @@ NSString *relativePathFittingInContainer(id container, NSString *fullPath)
 		return fullPath;
 	}
   	
-	cntwidth = cntwidth - [font widthOfString: fixPath(@"../", 0)];
+	cntwidth = cntwidth - [font widthOfString: fixpath(@"../", 0)];
 		
 	pathcomps = [fullPath pathComponents];
 	i = [pathcomps count] - 1;
@@ -211,17 +211,17 @@ NSString *relativePathFittingInContainer(id container, NSString *fullPath)
 		} else {
 			break;
     }						
-		path = [NSString stringWithFormat: @"%@%@%@", [pathcomps objectAtIndex: i], fixPath(@"/", 0), path];
+		path = [NSString stringWithFormat: @"%@%@%@", [pathcomps objectAtIndex: i], fixpath(@"/", 0), path];
 	}
 	
-	relpath = [NSString stringWithFormat: @"%@%@", fixPath(@"../", 0), relpath];
+	relpath = [NSString stringWithFormat: @"%@%@", fixpath(@"../", 0), relpath];
 	
 	return relpath;
 }
 
 int pathComponentsToPath(NSString *path)
 {
-  if ([path isEqualToString: fixPath(@"/", 0)]) {
+  if ([path isEqualToString: fixpath(@"/", 0)]) {
     return 0;
   }
   return [[path pathComponents] count] - 1;

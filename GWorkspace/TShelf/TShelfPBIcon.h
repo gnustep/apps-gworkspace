@@ -28,6 +28,7 @@
 #include <AppKit/NSView.h>
 
 @class NSImage;
+@class NSBezierPath;
 @class TShelfIconsView;
 
 @interface TShelfPBIcon : NSView
@@ -36,7 +37,7 @@
   NSString *dataType;
 
 	NSImage *icon;
-  NSImage *highlight;
+  NSBezierPath *highlightPath;
 	NSPoint position;
 	int gridindex;
 

@@ -29,6 +29,7 @@
 #include "GWorkspace.h"
 #include "GWDesktopView.h"
 #include "Dock.h"
+#include "TShelf/TShelfWin.h"
 
 static NSString *nibName = @"DesktopPref";
 
@@ -106,6 +107,7 @@ static NSString *nibName = @"DesktopPref";
       [useDockCheck setState: ([manager dockActive] ? NSOnState : NSOffState)];
       dockpos = [manager dockPosition];
       [dockPosMatrix selectCellAtRow: 0 column: dockpos];
+      [hideTShelfCheck setState: (([[gworkspace tabbedShelf] autohide]) ? NSOnState : NSOffState)];
 
 
       /* Internationalization */
@@ -133,6 +135,8 @@ static NSString *nibName = @"DesktopPref";
       [cell setTitle: NSLocalizedString(@"Left", @"")];
       cell = [dockPosMatrix cellAtRow: 0 column: 1];
       [cell setTitle: NSLocalizedString(@"Right", @"")];
+   
+      [hideTShelfCheck setTitle: NSLocalizedString(@"Autohide Tabbed Shelf", @"")];
     }
   }
 
@@ -254,6 +258,11 @@ static NSString *nibName = @"DesktopPref";
   
   [dockPosMatrix getRow: &row column: &col ofCell: cell];
   [manager setDockPosition: (col == 0) ? DockPositionLeft : DockPositionRight];
+}
+
+- (IBAction)setTShelfAutohide:(id)sender
+{
+  [[gworkspace tabbedShelf] setAutohide: ([sender state] == NSOnState)];
 }
 
 @end

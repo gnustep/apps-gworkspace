@@ -53,6 +53,7 @@
   if (self) {
     NSUserDefaults *defaults;
     NSDictionary *tshelfDict;
+    id entry;
     NSArray *tabsArr;    
 		TShelfViewItem *item;
     TShelfIconsView *view;
@@ -64,11 +65,14 @@
     [self setContentView: tView];		
     
     defaults = [NSUserDefaults standardUserDefaults];	
-    
+        
     tshelfDict = [defaults objectForKey: @"tabshelf"];
     if (tshelfDict == nil) {
       tshelfDict = [NSDictionary dictionary];
     }
+    
+    entry = [tshelfDict objectForKey: @"auto_hide"];
+    autohide = (entry && [entry boolValue]);
         
     tabsArr = [tshelfDict objectForKey: @"tabs"];
     
@@ -154,19 +158,86 @@
 
 - (void)activate
 {
-  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
-  NSDictionary *tshelfDict = [defaults objectForKey: @"tabbedshelf"];
-
   [self makeKeyAndOrderFront: nil];
-  
-  if (tshelfDict) {
-    [tView setHiddenTabs: [[tshelfDict objectForKey: @"hiddentabs"] boolValue]];
-  }
 }
 
 - (void)deactivate
 {
   [self orderOut: nil];
+}
+
+- (void)animateShowing
+{
+  if (([self isVisible] == NO) || (autohide == NO)) {
+    return;
+  }
+
+  if (autohidden) {
+    NSDate *future = [NSDate distantFuture];
+    int h = -SHELF_HEIGHT;
+    int i;
+    
+    [self setFrameOrigin: NSMakePoint(0, h)];
+    [NSEvent startPeriodicEventsAfterDelay: 0.0 withPeriod: 0.01];
+
+    for (i = 0; i < 20; i++) {
+      [NSApp nextEventMatchingMask: NSPeriodicMask
+                         untilDate: future
+                            inMode: NSEventTrackingRunLoopMode
+                           dequeue: YES];    
+      h += (int)(SHELF_HEIGHT / 20);
+      [self setFrameOrigin: NSMakePoint(0, h)];
+    }
+    
+    [NSEvent stopPeriodicEvents];
+    [self setFrameOrigin: NSMakePoint(0, 0)];
+  }
+  
+  autohidden = NO;
+}
+
+- (void)animateHiding
+{
+  if (([self isVisible] == NO) || (autohide == NO)) {
+    return;
+  }
+
+  if (autohidden == NO) {
+    NSDate *future = [NSDate distantFuture];
+    int h = 0;
+    int i;
+
+    [self setFrameOrigin: NSMakePoint(0, 0)];
+    [NSEvent startPeriodicEventsAfterDelay: 0.0 withPeriod: 0.01];
+    
+    for (i = 0; i < 20; i++) {
+      [NSApp nextEventMatchingMask: NSPeriodicMask
+                         untilDate: future
+                            inMode: NSEventTrackingRunLoopMode
+                           dequeue: YES];    
+      h -= (int)(SHELF_HEIGHT / 20);
+      [self setFrameOrigin: NSMakePoint(0, h)];
+    }
+    
+    [NSEvent stopPeriodicEvents];
+    [self setFrameOrigin: NSMakePoint(0, -SHELF_HEIGHT)];
+  }
+  
+  autohidden = YES;
+}
+
+- (void)setAutohide:(BOOL)value
+{
+  autohide = value;
+  if (autohide == NO) {
+    [self setFrameOrigin: NSMakePoint(0, 0)];
+    autohidden = NO;
+  }
+}
+
+- (BOOL)autohide
+{
+  return autohide;
 }
 
 - (void)addTab
@@ -395,9 +466,6 @@
   NSMutableArray *tabsArr = [NSMutableArray array];
   int i;
 
-  [tshelfDict setObject: [NSNumber numberWithBool: [tView hiddenTabs]] 
-                 forKey: @"hiddentabs"];
-
   for (i = 0; i < [items count]; i++) {
     TShelfViewItem *item = [items objectAtIndex: i];
     NSString *label = [item label];
@@ -414,8 +482,10 @@
 
   [tshelfDict setObject: tabsArr forKey: @"tabs"];
 
+  [tshelfDict setObject: [NSNumber numberWithBool: autohide]
+                 forKey: @"auto_hide"];
+
   [defaults setObject: tshelfDict forKey: @"tabshelf"];
-  [defaults synchronize];
 }
 
 - (BOOL)canBecomeKeyWindow

@@ -240,8 +240,10 @@
   } else {
     [[NSColor controlBackgroundColor] set];
   }
-
-  [image compositeToPoint: p operation: NSCompositeSourceOver];
+  
+  if (image) {
+    [image compositeToPoint: p operation: NSCompositeSourceOver];
+  }
 }
 
 @end

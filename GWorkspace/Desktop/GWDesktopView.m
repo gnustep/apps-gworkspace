@@ -930,6 +930,19 @@
   [super keyDown: theEvent];
 }
 
+- (void)mouseMoved:(NSEvent *)theEvent
+{
+  NSPoint p = [theEvent locationInWindow];
+  
+  if (NSPointInRect(p, [manager tshelfActivateFrame])) { 
+    [manager mouseEnteredTShelfActivateFrame];
+  } else if (NSPointInRect(p, [manager tshelfReservedFrame]) == NO) {
+    [manager mouseExitedTShelfActiveFrame];
+  }
+  
+  [super mouseMoved: theEvent];
+}
+
 - (void)drawRect:(NSRect)rect
 {  
   [super drawRect: rect];
@@ -1513,16 +1526,21 @@
 
 - (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
 {
-  NSDragOperation sourceDragMask;
-  NSPoint dpoint;
+  NSDragOperation sourceDragMask = [sender draggingSourceOperationMask];
+  NSPoint dpoint = [sender draggingLocation];
   int index;
+  
+  if (NSPointInRect(dpoint, [manager tshelfActivateFrame])) { 
+    [manager mouseEnteredTShelfActivateFrame];
+    return NSDragOperationNone;
+  } else if (NSPointInRect(dpoint, [manager tshelfReservedFrame]) == NO) {
+    [manager mouseExitedTShelfActiveFrame];
+  }
 
 	if (isDragTarget == NO) {
 		return NSDragOperationNone;
 	}
   
-  sourceDragMask = [sender draggingSourceOperationMask];
-  dpoint = [sender draggingLocation];
   index = [self indexOfGridRectContainingPoint: dpoint];
   
   if ((index != -1) && ([self isFreeGridIndex: index])) {
@@ -1569,11 +1587,17 @@
 
 - (void)draggingExited:(id <NSDraggingInfo>)sender
 {
+  NSPoint dpoint = [sender draggingLocation];
+
   DESTROY (dragIcon);
   if (insertIndex != -1) {
     [self setNeedsDisplayInRect: grid[insertIndex]];
   }
 	isDragTarget = NO;
+
+  if (NSPointInRect(dpoint, [manager tshelfReservedFrame]) == NO) {
+    [manager mouseExitedTShelfActiveFrame];
+  }
 }
 
 - (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender

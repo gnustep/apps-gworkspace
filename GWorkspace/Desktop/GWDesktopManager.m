@@ -30,6 +30,9 @@
 #include "FSNFunctions.h"
 #include "GWorkspace.h"
 #include "GWViewersManager.h"
+#include "TShelf/TShelfWin.h"
+
+#define RESV_MARGIN 10
 
 static GWDesktopManager *desktopManager = nil;
 
@@ -324,15 +327,16 @@ static GWDesktopManager *desktopManager = nil;
   NSRect screenFrame = [[NSScreen mainScreen] frame];
 
   dockReservedFrame.size.height = screenFrame.size.height;
-  dockReservedFrame.size.width = 64 + 10;
+  dockReservedFrame.size.width = 64 + RESV_MARGIN;
   dockReservedFrame.origin.x = 0;
   dockReservedFrame.origin.y = 0;
   
   if (dockPosition == DockPositionRight) {
-    dockReservedFrame.origin.x = screenFrame.size.width - 64 - 10;
+    dockReservedFrame.origin.x = screenFrame.size.width - 64 - RESV_MARGIN;
   }
   
-  tshelfReservedFrame = NSMakeRect(0, 0, screenFrame.size.width, 106 + 10);
+  tshelfReservedFrame = NSMakeRect(0, 0, screenFrame.size.width, 106 + RESV_MARGIN);
+  tshelfActivateFrame = NSMakeRect(0, 0, screenFrame.size.width, 20);
 }
 
 - (NSRect)dockReservedFrame
@@ -345,9 +349,24 @@ static GWDesktopManager *desktopManager = nil;
   return tshelfReservedFrame;
 }
 
+- (NSRect)tshelfActivateFrame
+{
+  return tshelfActivateFrame;
+}
+
 - (NSImage *)tabbedShelfBackground
 {
   return [[win desktopView] tshelfBackground];
+}
+
+- (void)mouseEnteredTShelfActivateFrame
+{
+  [[gworkspace tabbedShelf] animateShowing];
+}
+
+- (void)mouseExitedTShelfActiveFrame
+{
+  [[gworkspace tabbedShelf] animateHiding];
 }
 
 - (void)deselectAllIcons

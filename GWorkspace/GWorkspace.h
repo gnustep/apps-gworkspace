@@ -209,6 +209,8 @@
 
 - (void)createTabbedShelf;
 
+- (TShelfWin *)tabbedShelf;
+
 - (void)checkViewersAfterHidingOfPaths:(NSArray *)paths;
 
 - (void)iconAnimationChanged:(NSNotification *)notif;
@@ -333,8 +335,6 @@
 - (void)showTShelf:(id)sender;
 
 - (void)hideTShelf:(id)sender;
-
-- (void)maximizeMinimizeTShelf:(id)sender;
 
 - (void)selectSpecialTShelfTab:(id)sender;
 
