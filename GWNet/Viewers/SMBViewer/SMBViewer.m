@@ -814,7 +814,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
             
     if ((inftype == DOWNLOAD) || (inftype == UPLOAD)
             || (inftype == DELETE) || (inftype == DUPLICATE)
-                                        || (inftype == NEWFOLDER)) {      
+                                        || (inftype == NEWFOLDER)) {
       if ((optype == RENAME) || (optype == DELETE)) {
         if ([oppaths containsObject: chkbase]) {
           canstart = NO;
@@ -830,11 +830,6 @@ if (rct.size.height < 0) rct.size.height = 0; \
       }
     }
      
-     
-    //   
-    // AGGIUNGERE RENAME !!!!!!!!!!!!!!!    
-    //    
-        
     if (canstart == NO) {
       break;
     }
@@ -857,18 +852,13 @@ if (rct.size.height < 0) rct.size.height = 0; \
 ###  DUPLICATE, dest
  #   RENAME, src
   #  NEWFOLDER dest
-  
-  int optype = [op type];
-  NSString *opsrc = [op source];
-  NSString *opdst = [op destination];
-  NSArray *opfiles = [op files];  
 */    
     
 
     
     
    
-    
+/*    
   if ((optype == DUPLICATE) || (optype == DELETE) 
                 || (optype == UPLOAD) || (optype == DOWNLOAD)) {
     [self lockFiles: opfiles inDirectory: opbase];
@@ -880,6 +870,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
                            fromColumnWithPath: opbase];
     }
   }
+*/
 
   [fileOperations insertObject: op atIndex: [fileOperations count]];
   data = [NSArchiver archivedDataWithRootObject: [op description]];
