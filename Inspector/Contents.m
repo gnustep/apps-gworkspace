@@ -31,7 +31,7 @@
 #include "Functions.h"
 #include "GNUstep.h"
 
-static NSString *nibName = @"Inspector";
+static NSString *nibName = @"Contents";
 
 @implementation Contents
 
