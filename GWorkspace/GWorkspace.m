@@ -1918,8 +1918,6 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 
     if (fsw) {
       NSConnection *c = [fsw connectionForProxy];
-      
-      [c enableMultipleThreads];
 
 	    [[NSNotificationCenter defaultCenter] addObserver: self
 	                   selector: @selector(fswatcherConnectionDidDie:)

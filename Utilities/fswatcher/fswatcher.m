@@ -146,7 +146,7 @@
 {
   self = [super init];
   
-  if (self) {
+  if (self) {    
     fm = [NSFileManager defaultManager];	
     nc = [NSNotificationCenter defaultCenter];
     
@@ -163,7 +163,7 @@
 	    DESTROY (self);
 	    return self;
 	  }
-  
+      
     [nc addObserver: self
            selector: @selector(connectionBecameInvalid:)
 	             name: NSConnectionDidDieNotification
@@ -614,7 +614,7 @@
 
 @end
 
-/*
+
 int main(int argc, char** argv)
 {
 	FSWatcher *fsw;
@@ -644,13 +644,13 @@ int main(int argc, char** argv)
   
   exit(0);
 }
-*/
 
+/*
 static char	ebuf[2048];
 
 #ifdef HAVE_SYSLOG
 
-static int	log_priority;
+static int log_priority;
 
 static void fswatcher_log(int prio)
 {
@@ -776,7 +776,7 @@ int main(int argc, char** argv, char** env)
 
     signal(SIGTERM, ihandler);
 
-    fsw = [[FSWatcher alloc] init];
+    fsw = [FSWatcher new];
 
     [[NSFileHandle fileHandleWithStandardInput] closeFile];
     [[NSFileHandle fileHandleWithStandardOutput] closeFile];
@@ -796,3 +796,4 @@ int main(int argc, char** argv, char** env)
   exit(EXIT_SUCCESS);
 }
 
+*/
