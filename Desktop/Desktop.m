@@ -293,6 +293,11 @@ static Desktop *desktop = nil;
   tshelfReservedFrame = NSMakeRect(0, 0, screenFrame.size.width, 106 + 10);
 }
 
+- (NSData *)tabbedShelfBackground
+{
+  return [[[win desktopView] tshelfBackground] TIFFRepresentation];
+}
+
 - (void)contactWorkspaceApp
 {
   id app = nil;
@@ -1170,6 +1175,11 @@ static Desktop *desktop = nil;
   } 
 }
 
+- (void)checkNewRemovableMedia:(id)sender
+{
+  [ws mountNewRemovableMedia];
+}
+
 - (void)showPreferences:(id)sender
 {
   [preferences activate];
@@ -1433,7 +1443,6 @@ static Desktop *desktop = nil;
   NSArray *mountedMedia = [self mountedRemovableMedia]; 
   NSMutableArray *willMountMedia = [NSMutableArray array];
   NSMutableArray *newlyMountedMedia = [NSMutableArray array];
-  NSDictionary *userinfo;
   int i;
 
   if (removables == nil) {
@@ -1456,11 +1465,9 @@ static Desktop *desktop = nil;
     if (task) {
       [task waitUntilExit];
       
-      if ([task terminationStatus] != 0) {
-         return NO;
-      } else {
-        userinfo = [NSDictionary dictionaryWithObject: media 
-                                               forKey: @"NSDevicePath"];
+      if ([task terminationStatus] == 0) {
+        NSDictionary *userinfo = [NSDictionary dictionaryWithObject: media 
+                                                      forKey: @"NSDevicePath"];
 
         [[self notificationCenter] postNotificationName: NSWorkspaceDidMountNotification
                                   object: self
@@ -1468,8 +1475,6 @@ static Desktop *desktop = nil;
 
         [newlyMountedMedia addObject: media];
       }
-    } else {
-      return NO;
     }
   }
 

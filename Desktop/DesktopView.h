@@ -135,6 +135,8 @@ typedef enum BackImageStyle {
 
 - (void)setIconPosition:(int)pos;
 
+- (NSImage *)tshelfBackground;
+
 - (void)updateDefaults;
 
 @end

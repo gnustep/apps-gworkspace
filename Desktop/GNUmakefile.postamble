@@ -4,7 +4,6 @@ before-all::
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Preferences
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Dock
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Dialogs
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/TShelf
 
 # Things to do after compiling
 # after-all::
@@ -14,7 +13,6 @@ before-install::
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Preferences
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Dock
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Dialogs
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/TShelf
 
 # Things to do after installing
 # after-install::

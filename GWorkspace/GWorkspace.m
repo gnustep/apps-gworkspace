@@ -850,17 +850,14 @@ return [ws openFile: fullPath withApplication: appName]
 
 - (void)makeTshelfBackground
 {
-//  if ((desktopWindow != nil) && ([desktopWindow isVisible])) {
-//    ASSIGN (tshelfBackground, [[desktopWindow desktopView] shelfBackground]);
+//  if (desktopApp) {
+//    NSData *data = [desktopApp tabbedShelfBackground];
+  
+//    if (data) {
+//      DESTROY (tshelfBackground);
+//      tshelfBackground = [[NSImage alloc] initWithData: data];
+//    }  
 //  }
-}
-
-- (NSColor *)tshelfBackColor
-{
-//  if ((desktopWindow != nil) && ([desktopWindow isVisible])) {
-//    return [[desktopWindow desktopView] backColor];
-//  }
-  return nil;
 }
 
 - (NSString *)tshelfPBDir
@@ -1053,10 +1050,12 @@ return [ws openFile: fullPath withApplication: appName]
 	NSString *title = [anItem title];
 	
 	if ([title isEqual: NSLocalizedString(@"Empty Recycler", @"")]) {
-		return YES;
     return (desktopApp != nil);
 
-	} else if ([title isEqual: NSLocalizedString(@"Open With...", @"")]) {
+	} else if ([title isEqual: NSLocalizedString(@"Check for disks", @"")]) {
+    return (desktopApp != nil);
+  
+  } else if ([title isEqual: NSLocalizedString(@"Open With...", @"")]) {
     BOOL found = NO;
     int i;
     
@@ -2693,6 +2692,13 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 	}
   
 	[self startXTermOnDirectory: path];
+}
+
+- (void)checkRemovableMedia:(id)sender
+{
+  if (desktopApp) {
+    [desktopApp checkNewRemovableMedia: nil];
+  }	
 }
 
 - (void)emptyRecycler:(id)sender

@@ -738,6 +738,26 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
   [self setNeedsDisplay: YES];
 }
 
+- (NSImage *)tshelfBackground
+{
+  NSSize size = NSMakeSize([self frame].size.width, 112);
+  NSImage *image = [[NSImage alloc] initWithSize: size];
+  NSCachedImageRep *rep = [[NSCachedImageRep alloc] initWithSize: size
+                                    depth: [NSWindow defaultDepthLimit] 
+                                                separate: YES alpha: YES];
+
+  [image addRepresentation: rep];
+  RELEASE (rep);
+
+  [image lockFocus];  
+  NSCopyBits([[self window] gState], 
+            NSMakeRect(0, 0, size.width, size.height),
+			                              NSMakePoint(0.0, 0.0));
+  [image unlockFocus];
+ 
+  return AUTORELEASE(image);
+}
+
 - (void)updateDefaults
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	

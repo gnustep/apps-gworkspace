@@ -108,6 +108,10 @@
 
 @protocol	DesktopAppProtocol
 
+- (NSData *)tabbedShelfBackground;
+
+- (oneway void)checkNewRemovableMedia:(id)sender;
+
 - (oneway void)emptyTrash:(id)sender;
 
 @end
@@ -189,8 +193,6 @@
 - (NSImage *)tshelfBackground;	
 
 - (void)makeTshelfBackground;
-
-- (NSColor *)tshelfBackColor;	
 
 - (NSString *)tshelfPBDir;
 
@@ -360,6 +362,8 @@
 - (void)runCommand:(id)sender;
 
 - (void)startXTerm:(id)sender;
+
+- (void)checkRemovableMedia:(id)sender;
 
 - (void)emptyRecycler:(id)sender;
 

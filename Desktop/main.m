@@ -80,6 +80,7 @@ void createMenu()
 	addMenuItem(file, @"Duplicate", @"", @"duplicateFiles:", @"u");
 	addMenuItem(file, @"Move to Recycler", @"", @"moveToTrash:", @"");
 	addMenuItem(file, @"Empty Recycler", @"", @"emptyTrash:", @"");
+	addMenuItem(file, @"Check for disks", @"", @"checkNewRemovableMedia:", @"E");
 	addMenuItem(file, @"Print...", @"", @"print:", @"p");
 
 	// Edit

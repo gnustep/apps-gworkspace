@@ -30,12 +30,6 @@ Desktop_OBJC_FILES = main.m \
                      Dock/DockIcon.m \
                      Preferences/DesktopPrefs.m \
                      Dialogs/StartAppWin.m
-                  #   TShelf/TShelfWin.m \
-                  #   TShelf/TShelfView.m \
-                  #   TShelf/TShelfViewItem.m \
-                  #   TShelf/TShelfIconsView.m \
-                  #   TShelf/TShelfIcon.m \
-                  #   TShelf/TShelfPBIcon.m 
 
 ADDITIONAL_GUI_LIBS += -lFSNode
 						 

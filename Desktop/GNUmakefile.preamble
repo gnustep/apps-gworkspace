@@ -10,7 +10,7 @@ ADDITIONAL_CFLAGS += -Wall
 
 # Additional include directories the compiler should search
 ADDITIONAL_INCLUDE_DIRS += -I../ -I../../ \
--I../FSNode -IPreferences -IDialogs -IDock -ITShelf
+-I../FSNode -IPreferences -IDialogs -IDock
 
 # Additional LDFLAGS to pass to the linker
 ADDITIONAL_LDFLAGS +=  

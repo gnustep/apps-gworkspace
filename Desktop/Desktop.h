@@ -151,6 +151,8 @@ typedef enum DockPosition {
 
 - (void)setReservedFrames;
 
+- (NSData *)tabbedShelfBackground;
+
 - (void)contactWorkspaceApp;
 
 - (void)workspaceAppConnectionDidDie:(NSNotification *)notif;
@@ -223,6 +225,8 @@ typedef enum DockPosition {
 - (void)showContentsInspector:(id)sender;
 
 - (void)showToolsInspector:(id)sender;
+
+- (void)checkNewRemovableMedia:(id)sender;
 
 - (void)showPreferences:(id)sender;
 
