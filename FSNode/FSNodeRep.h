@@ -240,6 +240,8 @@ typedef enum FSNSelectionMask {
 
 - (void)setLastShownNode:(FSNode *)anode;
 
+- (BOOL)needsDndProxy;
+
 - (BOOL)involvedByFileOperation:(NSDictionary *)opinfo;
 
 - (BOOL)validatePasteOfFilenames:(NSArray *)names

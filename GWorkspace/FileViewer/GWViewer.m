@@ -330,7 +330,7 @@
   RELEASE (pathsView);
   
   r = NSMakeRect(xmargin, 0, w - (xmargin * 2), h - pathscrh - ymargin);
-  nviewScroll = [[GWViewerScrollView alloc] initWithFrame: r];
+  nviewScroll = [[GWViewerScrollView alloc] initWithFrame: r inViewer: self];
   [nviewScroll setBorderType: NSBezelBorder];
   hasScroller = ([viewType isEqual: @"Icon"] || [viewType isEqual: @"List"]);
   [nviewScroll setHasHorizontalScroller: hasScroller];

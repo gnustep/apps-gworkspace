@@ -1761,6 +1761,11 @@ pp.y = NSMaxY(br) + 1; \
 {
 }
 
+- (BOOL)needsDndProxy
+{
+  return NO;
+}
+
 - (BOOL)involvedByFileOperation:(NSDictionary *)opinfo
 {
   return [node involvedByFileOperation: opinfo];

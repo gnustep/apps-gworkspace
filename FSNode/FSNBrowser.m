@@ -1957,6 +1957,11 @@
   }
 }
 
+- (BOOL)needsDndProxy
+{
+  return NO;
+}
+
 - (BOOL)involvedByFileOperation:(NSDictionary *)opinfo
 {
   int i;

@@ -31,8 +31,29 @@
 
 @interface GWViewerScrollView : NSScrollView
 {
-
+  id viewer;
+  id nodeView;
 }
+
+- (id)initWithFrame:(NSRect)frameRect
+           inViewer:(id)aviewer;
+
+@end
+
+
+@interface GWViewerScrollView (DraggingDestination)
+
+- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender;
+
+- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender;
+
+- (void)draggingExited:(id <NSDraggingInfo>)sender;
+
+- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender;
+
+- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender;
+
+- (void)concludeDragOperation:(id <NSDraggingInfo>)sender;
 
 @end
 

@@ -26,12 +26,95 @@
 #include "FSNFunctions.h"
 #include "GWViewerScrollView.h"
 #include "GWViewer.h"
+#include "GWSpatialViewer.h"
 
 @implementation GWViewerScrollView
 
+- (id)initWithFrame:(NSRect)frameRect
+           inViewer:(id)aviewer
+{
+  self = [super initWithFrame: frameRect];
+
+  if (self) {
+    viewer = aviewer;
+  }
+  
+  return self;
+}
+
+- (void)setDocumentView:(NSView *)aView
+{
+  [super setDocumentView: aView];
+  
+  if (aView != nil) {
+    nodeView = [viewer nodeView];
+    
+    if ([nodeView needsDndProxy]) {
+      [self registerForDraggedTypes: [NSArray arrayWithObjects: 
+                                              NSFilenamesPboardType, 
+                                              @"GWRemoteFilenamesPboardType", 
+                                              nil]];    
+    } else {
+      [self unregisterDraggedTypes];
+    }
+  } else {
+    nodeView = nil;
+    [self unregisterDraggedTypes];
+  }
+}
 
 @end
 
+
+@implementation GWViewerScrollView (DraggingDestination)
+
+- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
+{
+  if (nodeView && [nodeView needsDndProxy]) {
+    return [nodeView draggingEntered: sender];
+  }
+  return NSDragOperationNone;
+}
+
+- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
+{
+  if (nodeView && [nodeView needsDndProxy]) {
+    return [nodeView draggingUpdated: sender];
+  }
+  return NSDragOperationNone;
+}
+
+- (void)draggingExited:(id <NSDraggingInfo>)sender
+{
+  if (nodeView && [nodeView needsDndProxy]) {
+    [nodeView draggingExited: sender];
+  }
+}
+
+- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
+{
+  if (nodeView && [nodeView needsDndProxy]) {
+    return [nodeView prepareForDragOperation: sender];
+  }
+  return NO;
+}
+
+- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
+{
+  if (nodeView && [nodeView needsDndProxy]) {
+    return [nodeView performDragOperation: sender];
+  }
+  return NO;
+}
+
+- (void)concludeDragOperation:(id <NSDraggingInfo>)sender
+{
+  if (nodeView && [nodeView needsDndProxy]) {
+    [nodeView concludeDragOperation: sender];
+  }
+}
+
+@end
 
 
 

@@ -146,6 +146,7 @@
 - (void)openSelectionInNewViewer:(BOOL)newv;
 - (void)restoreLastSelection;
 - (void)setLastShownNode:(FSNode *)anode;
+- (BOOL)needsDndProxy;
 - (BOOL)involvedByFileOperation:(NSDictionary *)opinfo;
 - (BOOL)validatePasteOfFilenames:(NSArray *)names
                        wasCutted:(BOOL)cutted;

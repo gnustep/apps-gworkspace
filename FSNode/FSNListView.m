@@ -1302,6 +1302,11 @@ static NSString *defaultColumns = @"{ \
 {
 }
 
+- (BOOL)needsDndProxy
+{
+  return YES;
+}
+
 - (BOOL)involvedByFileOperation:(NSDictionary *)opinfo
 {
   return [node involvedByFileOperation: opinfo];
@@ -2663,6 +2668,11 @@ static NSString *defaultColumns = @"{ \
 - (void)setLastShownNode:(FSNode *)anode
 {
   [dsource setLastShownNode: anode];
+}
+
+- (BOOL)needsDndProxy
+{
+  return [dsource needsDndProxy];
 }
 
 - (BOOL)involvedByFileOperation:(NSDictionary *)opinfo

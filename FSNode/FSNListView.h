@@ -184,6 +184,7 @@
 - (void)checkLockedReps;
 - (void)openSelectionInNewViewer:(BOOL)newv;
 - (void)setLastShownNode:(FSNode *)anode;
+- (BOOL)needsDndProxy;
 - (BOOL)involvedByFileOperation:(NSDictionary *)opinfo;
 - (BOOL)validatePasteOfFilenames:(NSArray *)names
                        wasCutted:(BOOL)cutted;
@@ -359,6 +360,7 @@
 - (void)checkLockedReps;
 - (void)openSelectionInNewViewer:(BOOL)newv;
 - (void)setLastShownNode:(FSNode *)anode;
+- (BOOL)needsDndProxy;
 - (BOOL)involvedByFileOperation:(NSDictionary *)opinfo;
 - (BOOL)validatePasteOfFilenames:(NSArray *)names
                        wasCutted:(BOOL)cutted;

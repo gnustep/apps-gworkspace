@@ -279,7 +279,7 @@
   RELEASE (spaceLabel);
 
   r = NSMakeRect(margin, 0, w - (margin * 2), h - boxh);
-  scroll = [[GWViewerScrollView alloc] initWithFrame: r];
+  scroll = [[GWViewerScrollView alloc] initWithFrame: r inViewer: self];
   [scroll setBorderType: NSBezelBorder];
   hasScroller = ([viewType isEqual: @"Icon"] || [viewType isEqual: @"List"]);
   [scroll setHasHorizontalScroller: YES];
