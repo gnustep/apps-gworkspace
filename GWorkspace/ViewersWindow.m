@@ -1332,18 +1332,4 @@ currHistoryPos = (currHistoryPos >= count) ? (count - 1) : currHistoryPos
 	return (int)[self frame].size.height;
 }
 
-- (void)startIndicatorForOperation:(NSString *)operation
-{
-  if (usingSplit) {
-    [(GWSplitView *)mainview startIndicatorForOperation: operation];
-  }
-}
-
-- (void)stopIndicatorForOperation:(NSString *)operation
-{
-  if (usingSplit) {
-    [(GWSplitView *)mainview stopIndicatorForOperation: operation];
-  }
-}
-
 @end

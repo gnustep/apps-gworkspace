@@ -31,32 +31,6 @@
 @class NSString;
 @class NSMutableArray;
 @class NSTextFieldCell;
-@class GWSplitView;
-#ifndef GNUSTEP
-	@class NSColor;
-#endif
-
-@interface FileOpIndicator : NSObject 
-{
-  NSString *operation;
-  NSString *statusStr;
-  NSTimer *timer;
-  GWSplitView *gwsplit;
-  BOOL valid;
-}
-
-- (id)initInSplitView:(GWSplitView *)split 
-    withOperationName:(NSString *)opname;
-
-- (void)update:(id)sender;
-
-- (NSString *)operation;
-
-- (void)invalidate;
-
-- (BOOL)isValid;
-
-@end
 
 @interface GWSplitView : NSSplitView 
 {
@@ -64,31 +38,11 @@
   NSTextFieldCell *diskInfoField;
   NSString *diskInfoString;
   NSRect diskInfoRect;
-  NSTextFieldCell *fopInfoField;
-  NSString *fopInfoString;   
-  NSRect fopInfoRect;
-  NSMutableArray *indicators; 
-#ifndef GNUSTEP
-	NSColor *_backgroundColor;
-#endif
 }
 
 - (id)initWithFrame:(NSRect)frameRect viewer:(id)viewer;
 
 - (void)updateDiskSpaceInfo:(NSString *)info;
-
-- (void)updateFileOpInfo:(NSString *)info;
-
-- (void)startIndicatorForOperation:(NSString *)operation;
-
-- (void)stopIndicatorForOperation:(NSString *)operation;
-
-- (FileOpIndicator *)firstIndicatorForOperation:(NSString *)operation;
-
-#ifndef GNUSTEP
-	- (NSColor*)backgroundColor;
-	- (void)setBackgroundColor:(NSColor *)aColor;
-#endif
 
 @end
 

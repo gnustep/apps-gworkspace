@@ -577,8 +577,6 @@ if (rct.size.height < 0) rct.size.height = 0; \
 
   [self validateCurrentPathAfterOperation: dict];     
 
-  [banner startIndicatorForOperation: operation];
-
   if (operation == NSWorkspaceMoveOperation 
      || operation == NSWorkspaceCopyOperation
         || operation == NSWorkspaceLinkOperation
@@ -636,8 +634,6 @@ if (rct.size.height < 0) rct.size.height = 0; \
   source = [dict objectForKey: @"source"];
   destination = [dict objectForKey: @"destination"];
   files = [dict objectForKey: @"files"];
-
-  [banner stopIndicatorForOperation: operation];
 
   if (operation == NSWorkspaceMoveOperation   
      || operation == NSWorkspaceCopyOperation 

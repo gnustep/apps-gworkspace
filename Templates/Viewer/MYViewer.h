@@ -76,10 +76,6 @@
 
 - (int)getWindowFrameHeight;
 
-- (void)startIndicatorForOperation:(NSString *)operation;
-
-- (void)stopIndicatorForOperation:(NSString *)operation;
-
 @end
 
 #endif // MYVIEWER_H

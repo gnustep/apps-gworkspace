@@ -31,48 +31,16 @@
 @class NSDictionary;
 @class NSTextField;
 @class PathsPopUp;
-@class Banner;
-
-@interface FOpIndicator : NSObject 
-{
-  NSString *operation;
-  NSString *statusStr;
-  NSTimer *timer;
-  Banner *banner;
-  BOOL valid;
-}
-
-- (id)initForBanner:(Banner *)abanner operationName:(NSString *)opname;
-
-- (void)update:(id)sender;
-
-- (NSString *)operation;
-
-- (void)invalidate;
-
-- (BOOL)isValid;
-
-@end
 
 @interface Banner : NSView 
 {
 	PathsPopUp *pathsPopUp;
 	NSTextField *leftLabel;
-	NSTextField *rightLabel;
-  NSMutableArray *indicators;   
 }
 
 - (void)updateInfo:(NSString *)infoString;
 
 - (PathsPopUp *)pathsPopUp;
-
-- (void)updateRightLabel:(NSString *)info;
-
-- (void)startIndicatorForOperation:(NSString *)operation;
-
-- (void)stopIndicatorForOperation:(NSString *)operation;
-
-- (FOpIndicator *)firstIndicatorForOperation:(NSString *)operation;
 
 @end
 

@@ -555,8 +555,6 @@ if (rct.size.height < 0) rct.size.height = 0
 	NSArray *files = [dict objectForKey: @"files"];	 
 
   [self validateRootPathAfterOperation: dict];
-
-  [delegate startIndicatorForOperation: operation];
   
   if (operation == NSWorkspaceMoveOperation   
      || operation == NSWorkspaceCopyOperation 
@@ -617,8 +615,6 @@ if (rct.size.height < 0) rct.size.height = 0
 	NSString *destination = [dict objectForKey: @"destination"];	 
 	NSArray *files = [dict objectForKey: @"files"];	 
       
-  [delegate stopIndicatorForOperation: operation];
-
   if (operation == NSWorkspaceMoveOperation 
      || operation == NSWorkspaceCopyOperation
         || operation == NSWorkspaceLinkOperation

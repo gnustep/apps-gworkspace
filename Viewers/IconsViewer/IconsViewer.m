@@ -602,8 +602,6 @@
 
   [self validateRootPathAfterOperation: dict];  
 
-  [delegate startIndicatorForOperation: operation];
-
   if (operation == NSWorkspaceMoveOperation
      || operation == NSWorkspaceCopyOperation
         || operation == NSWorkspaceLinkOperation
@@ -666,8 +664,6 @@
   source = [dict objectForKey: @"source"];
   destination = [dict objectForKey: @"destination"];
   files = [dict objectForKey: @"files"];
-
-  [delegate stopIndicatorForOperation: operation];
   
   if (operation == NSWorkspaceMoveOperation   
      || operation == NSWorkspaceCopyOperation 
