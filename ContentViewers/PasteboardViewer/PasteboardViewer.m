@@ -484,8 +484,10 @@
     [objsView setAutoresizesSubviews: YES];
     
     for (i = 0; i < [checkedObjects count]; i++) {
+      NSRect objr;
+      
       obj = [checkedObjects objectAtIndex: i];
-      NSRect objr = [obj frame];
+      objr = [obj frame];
     
       objr.origin.x = objr.origin.x - orp.x + MARGIN;
       objr.origin.y = objr.origin.y - orp.y + MARGIN;

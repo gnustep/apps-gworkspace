@@ -801,11 +801,8 @@ if (rct.size.height < 0) rct.size.height = 0; \
 
 - (void)keyDown:(NSEvent *)theEvent 
 {
-	NSString *characters;
-	unichar character;
-
-	characters = [theEvent characters];
-	character = 0;
+	NSString *characters = [theEvent characters];
+	unichar character = 0;
 		
   if ([characters length] > 0) {
 		character = [characters characterAtIndex: 0];

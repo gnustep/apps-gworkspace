@@ -1,3 +1,8 @@
+2003-10-28 Enrico Sersale  <enrico@imago.ro>
+
+  * GWorkspace/Resources
+    removed some duplicate files.
+
 2003-10-25 Enrico Sersale  <enrico@imago.ro>
 
   * GWorkspace/TShelf/TShelfIconsView.m

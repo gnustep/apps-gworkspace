@@ -1072,7 +1072,12 @@
     ASSIGN (dragImage, [sender draggedImage]);
 		dragRect = NSMakeRect(dragPoint.x + 8, dragPoint.y, [dragImage size].width, [dragImage size].height);
 		[self setNeedsDisplay: YES];
-    return NSDragOperationAll;
+    
+    if (iconsType == FILES_TAB) { 
+      return NSDragOperationAll;
+    } else {
+      return NSDragOperationCopy;
+    }
   }
     
   isDragTarget = NO;	  
@@ -1121,7 +1126,11 @@
 		}
 	}
   
-	return NSDragOperationAll;
+  if (iconsType == FILES_TAB) { 
+    return NSDragOperationAll;
+  } else {
+    return NSDragOperationCopy;
+  }
 }
 
 - (void)draggingExited:(id <NSDraggingInfo>)sender
