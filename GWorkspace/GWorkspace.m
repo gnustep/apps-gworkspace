@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include <math.h>
@@ -65,13 +64,17 @@ static GWorkspace *gworkspace = nil;
 
 @implementation GWorkspace
 
-#define byname 0
-#define bykind 1
-#define bydate 2
-#define bysize 3
-#define byowner 4
+#ifndef byname
+  #define byname 0
+  #define bykind 1
+  #define bydate 2
+  #define bysize 3
+  #define byowner 4
+#endif
 
-#define CACHED_MAX 20;
+#ifndef CACHED_MAX
+  #define CACHED_MAX 20;
+#endif
 
 //
 // GWProtocol
@@ -309,6 +312,24 @@ return [ws openFile: fullPath withApplication: appName]
 
 }
 
+- (BOOL)existsAndIsDirectoryFileAtPath:(NSString *)path            
+{
+  BOOL isDir;
+  return ([fm fileExistsAtPath: path isDirectory: &isDir] && isDir);
+}
+
+- (NSString *)typeOfFileAt:(NSString *)path
+{
+  NSString *defApp, *type;
+  [ws getInfoForFile: path application: &defApp type: &type];
+  return type;
+}
+
+- (BOOL)isWritableFileAtPath:(NSString *)path
+{
+  return [fm isWritableFileAtPath: path];
+}
+
 - (BOOL)isPakageAtPath:(NSString *)path
 {
 	NSString *defApp, *type;
@@ -325,6 +346,103 @@ return [ws openFile: fullPath withApplication: appName]
   }
 	
   return NO;
+}
+
+- (NSArray *)sortedDirectoryContentsAtPath:(NSString *)path
+{
+  NSMutableDictionary *contentsDict = [self cachedRepresentationForPath: path];
+  
+  if (contentsDict) {
+    return [contentsDict objectForKey: @"files"];
+    
+  } else {
+    NSArray *files = [fm directoryContentsAtPath: path];
+    int stype = [self sortTypeForDirectoryAtPath: path]; 
+    int count = [files count];
+    NSMutableArray *paths = [NSMutableArray arrayWithCapacity: count];
+    NSMutableArray *sortfiles = [NSMutableArray arrayWithCapacity: count];
+    NSArray *sortPaths = nil;
+    NSDictionary *attributes = nil;
+    NSDate *date = nil;
+    SEL appendPathCompSel = @selector(stringByAppendingPathComponent:);
+    IMP appendPathComp = [[NSString class] instanceMethodForSelector: appendPathCompSel];
+    SEL lastPathCompSel = @selector(lastPathComponent);
+    IMP lastPathComp = [[NSString class] instanceMethodForSelector: lastPathCompSel];  
+    int i;
+
+    for (i = 0; i < count; i++) {
+      NSString *s = (*appendPathComp)(path, appendPathCompSel, [files objectAtIndex: i]);
+      [paths addObject: s];
+    }
+
+    sortPaths = [paths sortedArrayUsingFunction: (int (*)(id, id, void*))comparePaths
+                                        context: (void *)stype];
+
+    for (i = 0; i < count; i++) {
+      NSString *s = (*lastPathComp)([sortPaths objectAtIndex: i], lastPathCompSel);
+      [sortfiles addObject: s];
+    }
+
+    contentsDict = [NSMutableDictionary dictionary];
+    [contentsDict setObject: [NSDate date] forKey: @"datestamp"];
+    attributes = [fm fileAttributesAtPath: path traverseLink: YES];
+    date = [attributes fileModificationDate];
+    [contentsDict setObject: date forKey: @"moddate"];
+    [contentsDict setObject: sortfiles forKey: @"files"];
+    
+    if ([cachedContents count] >= cachedMax) {
+      [self removeOlderCache];
+    }
+    
+    [self addCachedRepresentation: contentsDict ofDirectory: path];
+   
+    return sortfiles;
+  }
+  
+  return nil;
+}
+
+- (NSArray *)checkHiddenFiles:(NSArray *)files atPath:(NSString *)path
+{
+  NSArray *checkedFiles;
+  NSArray *hiddenFiles;
+  NSString *h; 
+			
+	h = [path stringByAppendingPathComponent: @".hidden"];
+  if ([fm fileExistsAtPath: h]) {
+	  h = [NSString stringWithContentsOfFile: h];
+	  hiddenFiles = [h componentsSeparatedByString: @"\n"];
+	} else {
+    hiddenFiles = nil;
+  }
+	
+	if (hiddenFiles != nil  ||  hideSysFiles) {	
+		NSMutableArray *mutableFiles = AUTORELEASE ([files mutableCopy]);
+	
+		if (hiddenFiles != nil) {
+	    [mutableFiles removeObjectsInArray: hiddenFiles];
+	  }
+	
+		if (hideSysFiles) {
+	    int j = [mutableFiles count] - 1;
+	    
+	    while (j >= 0) {
+				NSString *file = (NSString *)[mutableFiles objectAtIndex: j];
+
+				if ([file hasPrefix: @"."]) {
+		    	[mutableFiles removeObjectAtIndex: j];
+		  	}
+				j--;
+			}
+	  }		
+    
+		checkedFiles = mutableFiles;
+    
+	} else {
+    checkedFiles = files;
+  }
+
+  return checkedFiles;
 }
 
 - (int)sortTypeForDirectoryAtPath:(NSString *)aPath
@@ -628,193 +746,6 @@ return [ws openFile: fullPath withApplication: appName]
 {
   return contestualMenu;
 }
-
-//
-// GWProtocol methods used (also) by GWRemote
-//
-- (void)performFileOperationWithDictionary:(id)opdict
-                            fromSourceHost:(NSString *)fromName 
-                         toDestinationHost:(NSString *)toName
-{
-  [self performFileOperationWithDictionary: opdict];
-}
-
-- (BOOL)server:(NSString *)serverName isPakageAtPath:(NSString *)path
-{
-  return [self isPakageAtPath: path];
-}
-
-- (BOOL)server:(NSString *)serverName fileExistsAtPath:(NSString *)path 
-{
-  return [fm fileExistsAtPath: path];
-}
-
-- (BOOL)server:(NSString *)serverName isWritableFileAtPath:(NSString *)path
-{
-  return [fm isWritableFileAtPath: path];
-}
-
-- (BOOL)server:(NSString *)serverName 
-            existsAndIsDirectoryFileAtPath:(NSString *)path            
-{
-  BOOL isDir;
-  return ([fm fileExistsAtPath: path isDirectory: &isDir] && isDir);
-}
-
-- (NSString *)server:(NSString *)serverName typeOfFileAt:(NSString *)path 
-{
-  NSString *defApp, *type;
-  [ws getInfoForFile: path application: &defApp type: &type];
-  return type;
-}
-
-- (int)server:(NSString *)serverName sortTypeForPath:(NSString *)aPath
-{
-  return [self sortTypeForDirectoryAtPath: aPath];
-}
-
-- (void)server:(NSString *)serverName                                   
-   setSortType:(int)type 
-        atPath:(NSString *)aPath
-{
-  [self setSortType: type forDirectoryAtPath: aPath];
-}
-
-- (NSArray *)server:(NSString *)serverName 
-   checkHiddenFiles:(NSArray *)files 
-             atPath:(NSString *)path
-{
-  NSArray *checkedFiles;
-  NSArray *hiddenFiles;
-  NSString *h; 
-			
-	h = [path stringByAppendingPathComponent: @".hidden"];
-  if ([fm fileExistsAtPath: h]) {
-	  h = [NSString stringWithContentsOfFile: h];
-	  hiddenFiles = [h componentsSeparatedByString: @"\n"];
-	} else {
-    hiddenFiles = nil;
-  }
-	
-	if (hiddenFiles != nil  ||  hideSysFiles) {	
-		NSMutableArray *mutableFiles = AUTORELEASE ([files mutableCopy]);
-	
-		if (hiddenFiles != nil) {
-	    [mutableFiles removeObjectsInArray: hiddenFiles];
-	  }
-	
-		if (hideSysFiles) {
-	    int j = [mutableFiles count] - 1;
-	    
-	    while (j >= 0) {
-				NSString *file = (NSString *)[mutableFiles objectAtIndex: j];
-
-				if ([file hasPrefix: @"."]) {
-		    	[mutableFiles removeObjectAtIndex: j];
-		  	}
-				j--;
-			}
-	  }		
-    
-		checkedFiles = mutableFiles;
-    
-	} else {
-    checkedFiles = files;
-  }
-
-  return checkedFiles;
-}
-
-- (NSArray *)server:(NSString *)serverName 
-        sortedDirectoryContentsAtPath:(NSString *)path
-{
-  NSMutableDictionary *contentsDict = [self cachedRepresentationForPath: path];
-  
-  if (contentsDict) {
-    return [contentsDict objectForKey: @"files"];
-    
-  } else {
-    NSArray *files = [fm directoryContentsAtPath: path];
-    int stype = [self sortTypeForDirectoryAtPath: path]; 
-    int count = [files count];
-    NSMutableArray *paths = [NSMutableArray arrayWithCapacity: count];
-    NSMutableArray *sortfiles = [NSMutableArray arrayWithCapacity: count];
-    NSArray *sortPaths = nil;
-    NSDictionary *attributes = nil;
-    NSDate *date = nil;
-    SEL appendPathCompSel = @selector(stringByAppendingPathComponent:);
-    IMP appendPathComp = [[NSString class] instanceMethodForSelector: appendPathCompSel];
-    SEL lastPathCompSel = @selector(lastPathComponent);
-    IMP lastPathComp = [[NSString class] instanceMethodForSelector: lastPathCompSel];  
-    int i;
-
-    for (i = 0; i < count; i++) {
-      NSString *s = (*appendPathComp)(path, appendPathCompSel, [files objectAtIndex: i]);
-      [paths addObject: s];
-    }
-
-    sortPaths = [paths sortedArrayUsingFunction: (int (*)(id, id, void*))comparePaths
-                                        context: (void *)stype];
-
-    for (i = 0; i < count; i++) {
-      NSString *s = (*lastPathComp)([sortPaths objectAtIndex: i], lastPathCompSel);
-      [sortfiles addObject: s];
-    }
-
-    contentsDict = [NSMutableDictionary dictionary];
-    [contentsDict setObject: [NSDate date] forKey: @"datestamp"];
-    attributes = [fm fileAttributesAtPath: path traverseLink: YES];
-    date = [attributes fileModificationDate];
-    [contentsDict setObject: date forKey: @"moddate"];
-    [contentsDict setObject: sortfiles forKey: @"files"];
-    
-    if ([cachedContents count] >= cachedMax) {
-      [self removeOlderCache];
-    }
-    
-    [self addCachedRepresentation: contentsDict ofDirectory: path];
-   
-    return sortfiles;
-  }
-  
-  return nil;
-}
-
-- (void)server:(NSString *)serverName setSelectedPaths:(NSArray *)paths
-{
-}
-
-- (NSArray *)selectedPathsForServerWithName:(NSString *)serverName
-{
-  return selectedPaths;
-}
-
-- (NSString *)homeDirectoryForServerWithName:(NSString *)serverName
-{
-  return NSHomeDirectory();
-}
-
-- (BOOL)server:(NSString *)serverName isLockedPath:(NSString *)aPath
-{
-  return [self isLockedPath: aPath];
-}
-
-- (void)server:(NSString *)serverName addWatcherForPath:(NSString *)path
-{
-  [self addWatcherForPath: path];
-}
-
-- (void)server:(NSString *)serverName removeWatcherForPath:(NSString *)path
-{
-  [self removeWatcherForPath: path];
-}
-
-- (void)server:(NSString *)serverName 
-    renamePath:(NSString *)oldname 
-     toNewName:(NSString *)newname
-{
-}
-
 //
 // end of GWProtocol
 //

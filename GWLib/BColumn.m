@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include "GWProtocol.h"
@@ -60,7 +59,6 @@ if (sz.height < 0) sz.height = 0
   TEST_RELEASE (matrix);
   TEST_RELEASE (scroll);
   RELEASE (cellPrototype);
-  TEST_RELEASE (remoteHostName);
   TEST_RELEASE (path);
   TEST_RELEASE (oldpath);
   [super dealloc];
@@ -70,7 +68,6 @@ if (sz.height < 0) sz.height = 0
             atIndex:(int)ind
       cellPrototype:(BCell *)cell
           styleMask:(int)mask
-         remoteHost:(NSString *)rhost
           
 {
   self = [super init];
@@ -85,15 +82,7 @@ if (sz.height < 0) sz.height = 0
     styleMask = mask;
     
 		gworkspace = (id<GWProtocol>)[gwclass gworkspace];
-    
-    if (rhost) {
-      isRemote = YES;
-      ASSIGN (remoteHostName, rhost);
-    } else {
-      isRemote = NO;
-      remoteHostName = nil;
-    }
-    
+        
     fm = [NSFileManager defaultManager];
     ws = [NSWorkspace sharedWorkspace];
     
@@ -126,11 +115,7 @@ if (sz.height < 0) sz.height = 0
     if (styleMask & GWIconCellsMask) {
       cellsHeight = ICON_CELLS_HEIGHT;
       
-      if (isRemote == NO) {
-		    [self registerForDraggedTypes: [NSArray arrayWithObject: NSFilenamesPboardType]];    
-      } else {
-		    [self registerForDraggedTypes: [NSArray arrayWithObject: GWRemoteFilenamesPboardType]];    
-      }
+      [self registerForDraggedTypes: [NSArray arrayWithObject: NSFilenamesPboardType]];    
     } else {
       cellsHeight = CELLS_HEIGHT;
     }
@@ -155,7 +140,7 @@ if (sz.height < 0) sz.height = 0
     for (i = 0; i < [cpaths count]; i++) {
       NSString *ipath = [cpaths objectAtIndex: i];
 
-      if ([gworkspace server: remoteHostName fileExistsAtPath: ipath]) { 
+      if ([fm fileExistsAtPath: ipath]) { 
         [iconPaths addObject: ipath];
       }
     } 
@@ -163,7 +148,7 @@ if (sz.height < 0) sz.height = 0
     if ([iconPaths count]) {
       if ([iconPaths count] == 1) {
         apath = [cpaths objectAtIndex: 0];
-        exists = [gworkspace server: remoteHostName fileExistsAtPath: apath];
+        exists = [fm fileExistsAtPath: apath];
       }
     } else {
       iconPaths = nil;
@@ -216,7 +201,7 @@ if (sz.height < 0) sz.height = 0
     
     if (styleMask & GWColumnIconMask) {
       if (icon == nil) {
-	      icon = [[BIcon alloc] initForRemoteHost: remoteHostName];		
+	      icon = [[BIcon alloc] init];		
 	      [icon setDelegate: self];
 	      [iconView addSubview: icon];
 	      [iconView addSubview: [icon label]];     
@@ -228,16 +213,14 @@ if (sz.height < 0) sz.height = 0
 		    [icon setLocked: NO];
       }
 
-      if (isRemote == NO) {
-		    for (i = 0; i < [iconPaths count]; i++) {
-          NSString *ipath = [iconPaths objectAtIndex: i];
+		  for (i = 0; i < [iconPaths count]; i++) {
+        NSString *ipath = [iconPaths objectAtIndex: i];
 
-			    if ([gworkspace server: remoteHostName isLockedPath: ipath]) {
-				    [icon setLocked: YES];
-				    break;
-			    }
-		    }
-      }
+			  if ([gworkspace isLockedPath: ipath]) {
+				  [icon setLocked: YES];
+				  break;
+			  }
+		  }
     }
     
     [self setLeaf: YES];
@@ -253,7 +236,7 @@ if (sz.height < 0) sz.height = 0
         for (i = 0; i < [savedSelection count]; i++) {
           NSString *savedSel = [savedSelection objectAtIndex: i];
 
-          if ([gworkspace server: remoteHostName fileExistsAtPath: savedSel]) {
+          if ([fm fileExistsAtPath: savedSel]) {
             [savedNames addObject: [savedSel lastPathComponent]];
           }
         }
@@ -310,12 +293,10 @@ if (sz.height < 0) sz.height = 0
   int i, count;
   BOOL is_dir; 
 
-  if ([gworkspace server: remoteHostName 
-                    existsAndIsDirectoryFileAtPath: path] == NO) {	
+  if ([gworkspace existsAndIsDirectoryFileAtPath: path] == NO) {	
     return;
   } else {
-		if ([gworkspace server: remoteHostName isPakageAtPath: path] 
-                                && (!(styleMask & GWViewsPaksgesMask))) {
+		if ([gworkspace isPakageAtPath: path] && (!(styleMask & GWViewsPaksgesMask))) {
     	return;
 		}
   }
@@ -323,8 +304,7 @@ if (sz.height < 0) sz.height = 0
 	matrix = [[BMatrix alloc] initInColumn: self withFrame: [self frame]
 		                      mode: NSListModeMatrix prototype: cellPrototype
 		      					                      numberOfRows: 0 numberOfColumns: 0 
-                                    acceptDnd: (styleMask & GWIconCellsMask) 
-                                                  remoteHost: remoteHostName];
+                                    acceptDnd: (styleMask & GWIconCellsMask)];
   
 	[matrix setIntercellSpacing: NSMakeSize(0, 0)];
   [matrix setCellSize: NSMakeSize([scroll contentSize].width, cellsHeight)];  
@@ -335,11 +315,8 @@ if (sz.height < 0) sz.height = 0
 	[matrix setDoubleAction: @selector(doDoubleClick:)];
 	[scroll setDocumentView: matrix];
 
-  files = [gworkspace server: remoteHostName
-                   sortedDirectoryContentsAtPath: path];
-  files = [gworkspace server: remoteHostName
-            checkHiddenFiles: files 
-                      atPath: path];
+  files = [gworkspace sortedDirectoryContentsAtPath: path];
+  files = [gworkspace checkHiddenFiles: files atPath: path];
   
   count = [files count];
   if (count == 0) {
@@ -366,28 +343,21 @@ if (sz.height < 0) sz.height = 0
       [cell setStringValue: [files objectAtIndex: i]];
     }
     
-    is_dir = [gworkspace server: remoteHostName 
-                              existsAndIsDirectoryFileAtPath: s];
+    is_dir = [gworkspace existsAndIsDirectoryFileAtPath: s];
     if (is_dir == YES) {     
-      [cell setLeaf: (([gworkspace server: remoteHostName isPakageAtPath: s]) 
+      [cell setLeaf: (([gworkspace isPakageAtPath: s]) 
                               ? (!(styleMask & GWViewsPaksgesMask)) : NO)];
     } else {
 		  [cell setLeaf: YES];
     }
 		
-    if (isRemote == NO) {
-		  [cell setEnabled: !([gworkspace server: remoteHostName isLockedPath: s])];	  
-    } else {
-      [cell setEnabled: YES];
-    }
+    [cell setEnabled: !([gworkspace isLockedPath: s])];	  
   }
 }
 
 - (void)addMatrixCellsWithNames:(NSArray *)names
 {
-  NSArray *files = [gworkspace server: remoteHostName
-                     checkHiddenFiles: names 
-                               atPath: path];
+  NSArray *files = [gworkspace checkHiddenFiles: names atPath: path];
 
   if ([files count]) {
 	  BCell *cell;
@@ -405,8 +375,7 @@ if (sz.height < 0) sz.height = 0
       NSString *name = [names objectAtIndex: i];
       NSString *cellpath = [path stringByAppendingPathComponent: name];
 
-      isdir = [gworkspace server: remoteHostName 
-                                  existsAndIsDirectoryFileAtPath: cellpath];
+      isdir = [gworkspace existsAndIsDirectoryFileAtPath: cellpath];
       
 		  cell = [self cellWithName: name];    
       if (cell == nil) {
@@ -420,8 +389,7 @@ if (sz.height < 0) sz.height = 0
         }
         
         if (isdir) {     
-          [cell setLeaf: (([gworkspace server: remoteHostName 
-                               isPakageAtPath: cellpath]) 
+          [cell setLeaf: (([gworkspace isPakageAtPath: cellpath]) 
                                 ? (!(styleMask & GWViewsPaksgesMask)) : NO)];
         } else {
 		      [cell setLeaf: YES];
@@ -437,16 +405,11 @@ if (sz.height < 0) sz.height = 0
 
     [matrix setCellSize: NSMakeSize([scroll contentSize].width, cellsHeight)];  
 
-    if (isRemote == NO) {
-	    stype = [gworkspace sortTypeForDirectoryAtPath: path];			
-	    sortDict = [NSMutableDictionary dictionaryWithCapacity: 1];
-	    [sortDict setObject: path forKey: @"path"];
-	    [sortDict setObject: [NSNumber numberWithInt: stype] forKey: @"type"];
-      [matrix sortUsingFunction: (int (*)(id, id, void*))compareCells context: (void *)sortDict];	
-    } else {
-      [matrix sortUsingFunction: (int (*)(id, id, void*))compareCellsRemote context: (void *)nil];	
-    }
-    
+	  stype = [gworkspace sortTypeForDirectoryAtPath: path];			
+	  sortDict = [NSMutableDictionary dictionaryWithCapacity: 1];
+	  [sortDict setObject: path forKey: @"path"];
+	  [sortDict setObject: [NSNumber numberWithInt: stype] forKey: @"type"];
+    [matrix sortUsingFunction: (int (*)(id, id, void*))compareCells context: (void *)sortDict];	
 	  [self adjustMatrix];
     [matrix sizeToCells];  
 
@@ -460,9 +423,7 @@ if (sz.height < 0) sz.height = 0
 
 - (void)addDimmedMatrixCellsWithNames:(NSArray *)names
 {
-  NSArray *files = [gworkspace server: remoteHostName 
-                     checkHiddenFiles: names 
-                               atPath: path];
+  NSArray *files = [gworkspace checkHiddenFiles: names atPath: path];
 
   if ([files count]) {
 	  BCell *cell;
@@ -708,7 +669,7 @@ if (sz.height < 0) sz.height = 0
       NSString *cellname = [[selected objectAtIndex: i] stringValue];  
       NSString *cellpath = [path stringByAppendingPathComponent: cellname]; 
       
-      if ([gworkspace server: remoteHostName fileExistsAtPath: cellpath]) {   
+      if ([fm fileExistsAtPath: cellpath]) {   
         [selection addObject: cellpath];
         [cellsnames addObject: cellname];
       } else {
@@ -955,7 +916,6 @@ if (sz.height < 0) sz.height = 0
 {
   BCell *cell;
   NSPasteboard *pb;
-	NSData *pbData;    
   NSDragOperation sourceDragMask;
 	NSArray *sourcePaths;
 	NSString *fromPath;
@@ -971,27 +931,11 @@ if (sz.height < 0) sz.height = 0
 	  
   pb = [sender draggingPasteboard];
 
-  if (isRemote == NO) {
-    if ([[pb types] indexOfObject: NSFilenamesPboardType] == NSNotFound) {
-      return NSDragOperationNone;
-    }
-  } else {
-    if ([[pb types] indexOfObject: GWRemoteFilenamesPboardType] == NSNotFound) {
-      return NSDragOperationNone;
-    }
+  if ([[pb types] indexOfObject: NSFilenamesPboardType] == NSNotFound) {
+    return NSDragOperationNone;
   }
 
-  if (isRemote == NO) {
-    sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
-  } else {
-    NSDictionary *dndDict;
-    
-    pbData = [pb dataForType: GWRemoteFilenamesPboardType];
-    dndDict = [NSUnarchiver unarchiveObjectWithData: pbData];
-
-    sourcePaths = [dndDict objectForKey: @"paths"]; 
-  }
-
+  sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
   count = [sourcePaths count];
 
 	if (count == 0) {
@@ -1006,7 +950,7 @@ if (sz.height < 0) sz.height = 0
 		return NSDragOperationNone;
   }  
 
-	if ([gworkspace server: remoteHostName isWritableFileAtPath: targetPath] == NO) {
+	if ([fm isWritableFileAtPath: targetPath] == NO) {
 		return NSDragOperationNone;
 	}
 
@@ -1039,14 +983,12 @@ if (sz.height < 0) sz.height = 0
 {
   NSPasteboard *pb;
   NSDragOperation sourceDragMask;
-	NSData *pbData;
 	NSArray *sourcePaths;
   NSString *targetPath;
   NSString *operation, *source;
   NSMutableArray *files;
 	NSMutableDictionary *opDict;
 	NSString *trashPath;
-  NSString *sourceHost;  
   BCell *cell;
   int i;
 
@@ -1058,48 +1000,18 @@ if (sz.height < 0) sz.height = 0
   sourceDragMask = [sender draggingSourceOperationMask];  
   pb = [sender draggingPasteboard];
 
-  if (isRemote == NO) {
-    if ([[pb types] indexOfObject: NSFilenamesPboardType] == NSNotFound) {
-      return;
-    }
-  } else {
-    if ([[pb types] indexOfObject: GWRemoteFilenamesPboardType] == NSNotFound) {
-      return;
-    }
+  if ([[pb types] indexOfObject: NSFilenamesPboardType] == NSNotFound) {
+    return;
   }
-  
-  sourceHost = nil;
-  
-  if (isRemote == NO) {
-    sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
-  } else {
-    NSDictionary *dndDict;
     
-    pbData = [pb dataForType: GWRemoteFilenamesPboardType];
-    dndDict = [NSUnarchiver unarchiveObjectWithData: pbData];
-
-    sourcePaths = [dndDict objectForKey: @"paths"]; 
-    sourceHost = [dndDict objectForKey: @"host"]; 
-  }
-
+  sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
   source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
   targetPath = [path stringByAppendingPathComponent: [cell stringValue]];
+  trashPath = [gworkspace trashPath];
 
-  if (isRemote == NO) {
-	  trashPath = [gworkspace trashPath];
-
-	  if ([source isEqualToString: trashPath]) {
-		  operation = GWorkspaceRecycleOutOperation;
-	  } else {	
-		  if (sourceDragMask == NSDragOperationCopy) {
-			  operation = NSWorkspaceCopyOperation;
-		  } else if (sourceDragMask == NSDragOperationLink) {
-			  operation = NSWorkspaceLinkOperation;
-		  } else {
-			  operation = NSWorkspaceMoveOperation;
-		  }
-    }
-  } else {
+	if ([source isEqualToString: trashPath]) {
+		operation = GWorkspaceRecycleOutOperation;
+	} else {	
 		if (sourceDragMask == NSDragOperationCopy) {
 			operation = NSWorkspaceCopyOperation;
 		} else if (sourceDragMask == NSDragOperationLink) {
@@ -1120,9 +1032,7 @@ if (sz.height < 0) sz.height = 0
 	[opDict setObject: targetPath forKey: @"destination"];
 	[opDict setObject: files forKey: @"files"];
 
-  [gworkspace performFileOperationWithDictionary: opDict
-                                  fromSourceHost: sourceHost
-                               toDestinationHost: remoteHostName];
+  [gworkspace performFileOperationWithDictionary: opDict];
 }
 
 - (void)setFrame:(NSRect)frameRect

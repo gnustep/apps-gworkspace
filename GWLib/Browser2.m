@@ -82,7 +82,6 @@ double myrintf(double a)
   RELEASE (editorFont);
   TEST_RELEASE (doubleClickSelection);
   TEST_RELEASE (charBuffer);
-  TEST_RELEASE (waitCursor);
   [super dealloc];
 }
 
@@ -90,7 +89,6 @@ double myrintf(double a)
 		  	visibleColumns:(int)vcols 
              styleMask:(int)mask
 					  	delegate:(id)anobject
-            remoteHost:(NSString *)rhost
 {
   self = [super init];
 	
@@ -120,17 +118,6 @@ double myrintf(double a)
     setPaths = [[BColumn class] instanceMethodForSelector: setPathsSel];
 
 		gworkspace = (id<GWProtocol>)[gwclass gworkspace];
-
-    if (rhost) {
-      isRemote = YES;
-      ASSIGN (remoteHostName, rhost);
-      waitCursor = [[NSCursor alloc] initWithImage: [NSImage imageNamed: @"watch.tiff"]];
-      [waitCursor setHotSpot: NSMakePoint(8, 8)];
-      [NSCursor setHiddenUntilMouseMoves: NO];
-    } else {
-      isRemote = NO;
-      remoteHostName = nil;
-    }
 		
 		[self setFrame: rect];
 		visibleColumns = vcols;
@@ -230,9 +217,6 @@ double myrintf(double a)
     canUpdateViews = YES;
     [self tile];
 		[self setNeedsDisplay: YES];
-    if (isRemote) {
-      [[NSCursor arrowCursor] set];
-    }
 		return;
 	}
 	
@@ -333,10 +317,6 @@ double myrintf(double a)
       [[self window] makeFirstResponder: matrix];
 	  }
   }
-  
-  if (isRemote) {
-    [[NSCursor arrowCursor] set];
-  }    
 }
 
 - (void)loadColumnZero
@@ -356,8 +336,7 @@ double myrintf(double a)
   BColumn *bc = [[BColumn alloc] initInBrowser: self
                                        atIndex: [columns count]	
                                  cellPrototype: cellPrototype
-                                     styleMask: style
-                                    remoteHost: remoteHostName];
+                                     styleMask: style];
   [columns addObject: bc];
   [self addSubview: bc];
   if (styleMask & GWColumnIconMask) {
@@ -849,10 +828,10 @@ double myrintf(double a)
       NSString *cpath = [col currentPath];
       BOOL is_dir = NO; 
     
-      is_dir = [gworkspace server: remoteHostName 
-                                existsAndIsDirectoryFileAtPath: cpath];
+      is_dir = [gworkspace existsAndIsDirectoryFileAtPath: cpath];
+      
       if (is_dir) {	
-        if (([gworkspace server: remoteHostName isPakageAtPath: cpath] == NO) 
+        if (([gworkspace isPakageAtPath: cpath] == NO) 
                                         || (styleMask & GWViewsPaksgesMask)) {
           return cpath;                  
         } else if (i > 0) {
@@ -1205,10 +1184,6 @@ double myrintf(double a)
     [self clickOnIcon: [col myIcon] ofColumn: col];
     return;
   }
-
-  if (isRemote) {
-    [waitCursor set];
-  }
 				
   if ((pos == visibleColumns) && (index == ([columns count] -1))) {
     NSTimer *timer;
@@ -1240,10 +1215,6 @@ double myrintf(double a)
   canUpdateViews = YES;
   [self tile];
 
-  if (isRemote) {
-    [[NSCursor arrowCursor] set];
-  }
-
 #ifndef GNUSTEP 
   [[self window] makeFirstResponder: self];
 #endif
@@ -1266,10 +1237,6 @@ double myrintf(double a)
     return;
   }
   
-  if (isRemote) {
-    [waitCursor set];
-  }
-  
   column = [self columnBeforeColumn: col];
 
   if (column) {
@@ -1288,10 +1255,6 @@ double myrintf(double a)
   }
   
   [nameEditor setBackgroundColor: [NSColor whiteColor]];
-
-  if (isRemote) {
-    [[NSCursor arrowCursor] set];
-  }
   
   [[self window] makeFirstResponder: self];
 }
@@ -1413,15 +1376,6 @@ double myrintf(double a)
 #define CLEAREDITING \
 	[self updateNameEditor]; \
   return
-
-  if (isRemote) {
-    [self updateNameEditor];
-  
-    [gworkspace server: remoteHostName 
-            renamePath: oldpath  
-             toNewName: newpath];
-    return;
-  }
   
   isEditingIconName = NO;
   [nameEditor setAlignment: NSCenterTextAlignment];

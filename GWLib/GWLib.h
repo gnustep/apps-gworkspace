@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #ifndef GWLIB_H
 #define GWLIB_H
 
@@ -30,7 +29,33 @@
 
 @interface GWLib : NSObject
 {
+  NSMutableDictionary *cachedContents;
+  int cachedMax;
+  int defSortType;
+  
+  NSMutableArray *watchers;
+	NSMutableArray *watchTimers;
+  NSMutableArray *watchedPaths;  
+
+	NSMutableArray *lockedPaths;
+
+  NSMutableDictionary *tumbsCache;
+  NSString *thumbnailDir;
+  BOOL usesThumbnails;    
+
+  NSFileManager *fm;
+  NSWorkspace *ws;
+  NSNotificationCenter *nc;
 }
+
++ (GWLib *)instance;
+
++ (void)setCachedMax:(int)cmax;
+
++ (void)setDefSortType:(int)type;
+
++ (BOOL)isLockedPath:(NSString *)path;
+
 
 + (id)gworkspaceApplication;
 

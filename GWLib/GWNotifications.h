@@ -65,7 +65,4 @@ extern NSString *GWDesktopViewUnsetImageNotification;
 
 extern NSString *GWIconAnimationChangedNotification;
 
-/* Pasteboard type for GWRemote */
-extern NSString *GWRemoteFilenamesPboardType;
-
 #endif

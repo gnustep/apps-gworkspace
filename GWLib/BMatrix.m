@@ -38,7 +38,6 @@
 
 - (void)dealloc
 {
-  TEST_RELEASE (remoteHostName);
   [super dealloc];
 }
 
@@ -49,7 +48,6 @@
       numberOfRows:(int)numRows
    numberOfColumns:(int)numColumns
          acceptDnd:(BOOL)dnd
-        remoteHost:(NSString *)rhost         
 {
   self = [super initWithFrame: frameRect mode: aMode prototype: aCell 
                         numberOfRows: numRows numberOfColumns: numColumns];
@@ -62,14 +60,6 @@
     #endif
 
 		gworkspace = (id<GWProtocol>)[gwclass gworkspace];
-
-    if (rhost) {
-      isRemote = YES;
-      ASSIGN (remoteHostName, rhost);
-    } else {
-      isRemote = NO;
-      remoteHostName = nil;
-    }
   
     column = col;
     browser = [column browser];
@@ -77,11 +67,7 @@
     acceptDnd = dnd;
     
     if (acceptDnd) {
-      if (isRemote == NO) {
-		    [self registerForDraggedTypes: [NSArray arrayWithObject: NSFilenamesPboardType]];    
-      } else {
-		    [self registerForDraggedTypes: [NSArray arrayWithObject: GWRemoteFilenamesPboardType]];    
-      }
+      [self registerForDraggedTypes: [NSArray arrayWithObject: NSFilenamesPboardType]];    
     }
   }
   
@@ -317,7 +303,7 @@
       dragIcon = [NSImage imageNamed: @"MultipleSelection.tiff"];
     } else {
       NSString *path = [paths objectAtIndex: 0];
-      NSString *type = [gworkspace server: remoteHostName typeOfFileAt: path];
+      NSString *type = [gworkspace typeOfFileAt: path];
 
       dragIcon = [gworkspace iconForFile: path ofType: type]; 
     }
@@ -343,7 +329,6 @@
   NSArray *selectedCells = [self selectedCells];
   NSMutableArray *selection = [NSMutableArray arrayWithCapacity: 1];
   NSArray *dndtypes;
-  NSData *pbData;
   int i; 
 
   for (i = 0; i < [selectedCells count]; i++) {
@@ -351,21 +336,11 @@
     [selection addObjectsFromArray: paths];
   }
   	
-  if (isRemote == NO) {
-    dndtypes = [NSArray arrayWithObject: NSFilenamesPboardType];
-    [pb declareTypes: dndtypes owner: nil];
-    
-    if ([pb setPropertyList: selection forType: NSFilenamesPboardType] == NO) {
-      return;
-    }
-  } else {
-    NSMutableDictionary *pbDict = [NSMutableDictionary dictionary];       
-    dndtypes = [NSArray arrayWithObject: GWRemoteFilenamesPboardType];
-    [pb declareTypes: dndtypes owner: nil];    
-    [pbDict setObject: remoteHostName forKey: @"host"];
-    [pbDict setObject: selection forKey: @"paths"];        
-    pbData = [NSArchiver archivedDataWithRootObject: pbDict];
-    [pb setData: pbData forType: GWRemoteFilenamesPboardType];
+  dndtypes = [NSArray arrayWithObject: NSFilenamesPboardType];
+  [pb declareTypes: dndtypes owner: nil];
+
+  if ([pb setPropertyList: selection forType: NSFilenamesPboardType] == NO) {
+    return;
   }
 }
 

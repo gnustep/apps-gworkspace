@@ -139,8 +139,7 @@ if (rct.size.height < 0) rct.size.height = 0
 	browser = [[Browser2 alloc] initWithBasePath: rootPath
 		  													visibleColumns: columns 
                                      styleMask: style
-																  	  delegate: self
-                                    remoteHost: nil];
+																  	  delegate: self];
 					 
   [browser setAutoresizingMask: NSViewWidthSizable | NSViewHeightSizable];    
   [self addSubview: browser];   

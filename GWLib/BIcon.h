@@ -50,9 +50,6 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
   NSString *fullpath;
   NSString *name;
   NSString *hostname;
-
-  NSString *remoteHostName;    
-  BOOL isRemote;
 	
 	BOOL isRootIcon;	
   BOOL singlepath;
@@ -77,8 +74,6 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 
   NSFileManager *fm;
 }  
-
-- (id)initForRemoteHost:(NSString *)rhost;
 
 - (void)setDelegate:(id)aDelegate;
 

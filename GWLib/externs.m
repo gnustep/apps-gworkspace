@@ -64,6 +64,3 @@ NSString *GWDesktopViewImageChangedNotification = @"GWDesktopViewImageChangedNot
 NSString *GWDesktopViewUnsetImageNotification = @"GWDesktopViewUnsetImageNotification";
 
 NSString *GWIconAnimationChangedNotification = @"GWIconAnimationChangedNotification";
-
-/* Pasteboard type for GWRemote */
-NSString *GWRemoteFilenamesPboardType = @"GWRemoteFilenamesPboardType";

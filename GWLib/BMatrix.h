@@ -39,9 +39,6 @@
   BOOL acceptDnd;
   NSCell *dndTarget;
   unsigned int dragOperation;
-
-  NSString *remoteHostName;    
-  BOOL isRemote;  
 }
 
 - (id)initInColumn:(BColumn *)col
@@ -50,8 +47,7 @@
          prototype:(NSCell *)aCell 
       numberOfRows:(int)numRows
    numberOfColumns:(int)numColumns
-         acceptDnd:(BOOL)dnd
-        remoteHost:(NSString *)rhost;
+         acceptDnd:(BOOL)dnd;
 
 - (NSArray *)getVisibleCellsAndTuneSpace:(float *)tspace;
 

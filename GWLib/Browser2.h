@@ -51,10 +51,6 @@ typedef int (*intIMP)(id, SEL, id);
 
 @interface Browser2 : NSView 
 {
-  NSString *remoteHostName;    
-  BOOL isRemote;
-  NSCursor *waitCursor;
-  
 	NSString *basePath;
   NSString *pathSeparator;
 	BOOL isLoaded;
@@ -117,8 +113,7 @@ typedef int (*intIMP)(id, SEL, id);
 - (id)initWithBasePath:(NSString *)bpath
 		  	visibleColumns:(int)vcols 
              styleMask:(int)mask
-					  	delegate:(id)anobject
-            remoteHost:(NSString *)rhost;
+					  	delegate:(id)anobject;
 
 - (void)setPathAndSelection:(NSArray *)selection;
 

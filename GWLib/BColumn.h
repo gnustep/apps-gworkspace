@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #ifndef BCOLUMN_H_
 #define BCOLUMN_H_
 
@@ -46,10 +45,7 @@
 
   unsigned int styleMask;
   int cellsHeight;
-  
-  NSString *remoteHostName;    
-  BOOL isRemote;
-  
+    
   NSString *path;
   NSString *oldpath;
   int index;
@@ -66,8 +62,7 @@
 - (id)initInBrowser:(Browser2 *)aBrowser
             atIndex:(int)ind
       cellPrototype:(BCell *)cell
-          styleMask:(int)mask
-         remoteHost:(NSString *)rhost;
+          styleMask:(int)mask;
 
 - (void)setCurrentPaths:(NSArray *)cpaths;
 

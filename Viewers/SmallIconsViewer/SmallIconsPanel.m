@@ -261,8 +261,8 @@ if (rct.size.height < 0) rct.size.height = 0
   
   [icons removeAllObjects];
 
-  files = [gworkspace server: nil sortedDirectoryContentsAtPath: currentPath];
-  files = [gworkspace server: nil checkHiddenFiles: files atPath: currentPath];  
+  files = [gworkspace sortedDirectoryContentsAtPath: currentPath];
+  files = [gworkspace checkHiddenFiles: files atPath: currentPath];  
    	
   count = [files count];
   if (count == 0) {

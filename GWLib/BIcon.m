@@ -45,7 +45,6 @@
   TEST_RELEASE (fullpath);
   TEST_RELEASE (name);
 	TEST_RELEASE (hostname);
-	TEST_RELEASE (remoteHostName);
   TEST_RELEASE (type);
   TEST_RELEASE (icon);
 	RELEASE (namelabel);
@@ -54,7 +53,7 @@
   [super dealloc];
 }
 
-- (id)initForRemoteHost:(NSString *)rhost
+- (id)init
 {
   self = [super init];
   
@@ -66,14 +65,6 @@
     #endif
 
 		gworkspace = (id<GWProtocol>)[gwclass gworkspace];
-
-    if (rhost) {
-      isRemote = YES;
-      ASSIGN (remoteHostName, rhost);
-    } else {
-      isRemote = NO;
-      remoteHostName = nil;
-    }
 
     fm = [NSFileManager defaultManager];
 
@@ -105,11 +96,7 @@
 		onSelf = NO;
 		isRootIcon = NO;
 		
-    if (isRemote == NO) {
-		  [self registerForDraggedTypes: [NSArray arrayWithObject: NSFilenamesPboardType]];    
-    } else {
-		  [self registerForDraggedTypes: [NSArray arrayWithObject: GWRemoteFilenamesPboardType]];    
-    }
+    [self registerForDraggedTypes: [NSArray arrayWithObject: NSFilenamesPboardType]];    
   }
   
   return self;
@@ -156,8 +143,8 @@
 			isRootIcon = NO;
 		}
     
-    ASSIGN (type, [gworkspace server: remoteHostName typeOfFileAt: fullpath]);
-    isPakage = [gworkspace server: remoteHostName isPakageAtPath: fullpath];    
+    ASSIGN (type, [gworkspace typeOfFileAt: fullpath]);
+    isPakage = [gworkspace isPakageAtPath: fullpath];    
 		
   } else {
 		fullpath = nil;
@@ -184,20 +171,15 @@
 	if (isRootIcon == NO) {
   	[namelabel setStringValue: cutFileLabelText(name, namelabel, labwidth)];
   } else {
-    if (isRemote == NO) {
-		  NSHost *host = [NSHost currentHost];
-		  NSString *hname = [host name];
-		  NSRange range = [hname rangeOfString: @"."];
-			
-		  if (range.length != 0) {	
-			  hname = [hname substringToIndex: range.location];
-		  } 			
-		  ASSIGN (hostname, hname);
-		  [namelabel setStringValue: hostname];
-    } else {
- 		  ASSIGN (hostname, remoteHostName);
-		  [namelabel setStringValue: remoteHostName];
-   }
+		NSHost *host = [NSHost currentHost];
+		NSString *hname = [host name];
+		NSRange range = [hname rangeOfString: @"."];
+
+		if (range.length != 0) {	
+			hname = [hname substringToIndex: range.location];
+		} 			
+		ASSIGN (hostname, hname);
+		[namelabel setStringValue: hostname];
 	}
 
   [self setLocked: NO];
@@ -205,7 +187,7 @@
   for (i = 0; i < [paths count]; i++) {
     NSString *path = [paths objectAtIndex: i];
 
-    if ([gworkspace server: remoteHostName isLockedPath: path]) {
+    if ([gworkspace isLockedPath: path]) {
       [self setLocked: YES];
       break;
     }
@@ -278,19 +260,15 @@
 
 - (void)openWithApp:(id)sender
 {
-  if (isRemote == NO) {
-    NSString *appName = [[sender representedObject] objectForKey: @"appName"];
-    NSString *fullPath = [[sender representedObject] objectForKey: @"fullPath"];
-  
-    [[NSWorkspace sharedWorkspace] openFile: fullPath withApplication: appName]; 
-  }
+  NSString *appName = [[sender representedObject] objectForKey: @"appName"];
+  NSString *fullPath = [[sender representedObject] objectForKey: @"fullPath"];
+
+  [[NSWorkspace sharedWorkspace] openFile: fullPath withApplication: appName]; 
 }
 
 - (void)openWith:(id)sender
 {
-  if (isRemote == NO) {
-    [gworkspace openSelectedPathsWith];
-  }
+  [gworkspace openSelectedPathsWith];
 }
 
 - (BOOL)isSelect
@@ -457,7 +435,7 @@
   } else if ([theEvent modifierFlags] == NSControlKeyMask) {
     return [super menuForEvent: theEvent];
   }
-  if ((name == nil) || ([[name pathExtension] length] == 0) || isRemote) {
+  if ((name == nil) || ([[name pathExtension] length] == 0)) {
     return [super menuForEvent: theEvent];
   }
   if (contestualMenu == NO) {
@@ -608,24 +586,12 @@ active. preventWindowOrdering is sent automatically by NSView's dragImage:... an
 
 - (void)declareAndSetShapeOnPasteboard:(NSPasteboard *)pb
 {
-  NSArray *dndtypes;
-  NSData *pbData;
-	
-  if (isRemote == NO) {
-    dndtypes = [NSArray arrayWithObject: NSFilenamesPboardType];
-    [pb declareTypes: dndtypes owner: nil];
+  NSArray *dndtypes = [NSArray arrayWithObject: NSFilenamesPboardType];
+  
+  [pb declareTypes: dndtypes owner: nil];
     
-    if ([pb setPropertyList: paths forType: NSFilenamesPboardType] == NO) {
-      return;
-    }
-  } else {
-    NSMutableDictionary *pbDict = [NSMutableDictionary dictionary];       
-    dndtypes = [NSArray arrayWithObject: GWRemoteFilenamesPboardType];
-    [pb declareTypes: dndtypes owner: nil];    
-    [pbDict setObject: remoteHostName forKey: @"host"];
-    [pbDict setObject: paths forKey: @"paths"];        
-    pbData = [NSArchiver archivedDataWithRootObject: pbDict];
-    [pb setData: pbData forType: GWRemoteFilenamesPboardType];
+  if ([pb setPropertyList: paths forType: NSFilenamesPboardType] == NO) {
+    return;
   }
 }
 
@@ -653,7 +619,6 @@ active. preventWindowOrdering is sent automatically by NSView's dragImage:... an
 {
 	NSPasteboard *pb;
   NSDragOperation sourceDragMask;
-	NSData *pbData;
 	NSArray *sourcePaths;
 	NSString *fromPath;
   NSString *buff;
@@ -670,27 +635,12 @@ active. preventWindowOrdering is sent automatically by NSView's dragImage:... an
   }
 
 	pb = [sender draggingPasteboard];
-  
-  if (isRemote == NO) {
-    if ([[pb types] indexOfObject: NSFilenamesPboardType] == NSNotFound) {
-      return NSDragOperationNone;
-    }
-  } else {
-    if ([[pb types] indexOfObject: GWRemoteFilenamesPboardType] == NSNotFound) {
-      return NSDragOperationNone;
-    }
+
+  if ([[pb types] indexOfObject: NSFilenamesPboardType] == NSNotFound) {
+    return NSDragOperationNone;
   }
 
-  if (isRemote == NO) {
-    sourcePaths = [pb propertyListForType: NSFilenamesPboardType];    
-  } else {
-    NSDictionary *dndDict;
-    
-    pbData = [pb dataForType: GWRemoteFilenamesPboardType];
-    dndDict = [NSUnarchiver unarchiveObjectWithData: pbData];
-
-    sourcePaths = [dndDict objectForKey: @"paths"]; 
-  }
+  sourcePaths = [pb propertyListForType: NSFilenamesPboardType];    
   
 	count = [sourcePaths count];
 	fromPath = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
@@ -699,7 +649,7 @@ active. preventWindowOrdering is sent automatically by NSView's dragImage:... an
 		return NSDragOperationNone;
   } 
 
-	if ([gworkspace server: remoteHostName isWritableFileAtPath: fullpath] == NO) {
+	if ([fm isWritableFileAtPath: fullpath] == NO) {
 		return NSDragOperationNone;
 	}
 
@@ -734,7 +684,7 @@ active. preventWindowOrdering is sent automatically by NSView's dragImage:... an
 
   iconPath =  [fullpath stringByAppendingPathComponent: @".opendir.tiff"];
 
-  if ((isRemote == NO) && ([fm isReadableFileAtPath: iconPath])) {
+  if ([fm isReadableFileAtPath: iconPath]) {
     NSImage *img = [[NSImage alloc] initWithContentsOfFile: iconPath];
 
     if (img) {
@@ -814,13 +764,11 @@ active. preventWindowOrdering is sent automatically by NSView's dragImage:... an
 {
 	NSPasteboard *pb;
   NSDragOperation sourceDragMask;
-	NSData *pbData;
 	NSArray *sourcePaths;
   NSString *operation, *source;
   NSMutableArray *files;
 	NSMutableDictionary *opDict;
 	NSString *trashPath;
-  NSString *sourceHost;  
   int i;
 
 	CHECK_LOCK;
@@ -837,38 +785,16 @@ active. preventWindowOrdering is sent automatically by NSView's dragImage:... an
 
 	sourceDragMask = [sender draggingSourceOperationMask];
   pb = [sender draggingPasteboard];
-  
-  sourceHost = nil;
-  
-  if (isRemote == NO) {
-    sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
-  } else {
-    NSDictionary *dndDict;
     
-    pbData = [pb dataForType: GWRemoteFilenamesPboardType];
-    dndDict = [NSUnarchiver unarchiveObjectWithData: pbData];
-
-    sourcePaths = [dndDict objectForKey: @"paths"]; 
-    sourceHost = [dndDict objectForKey: @"host"]; 
-  }
+  sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
 
   source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
   
-  if (isRemote == NO) {
-	  trashPath = [gworkspace trashPath];
+	trashPath = [gworkspace trashPath];
 
-	  if ([source isEqual: trashPath]) {
-		  operation = GWorkspaceRecycleOutOperation;
-	  } else {	
-		  if (sourceDragMask == NSDragOperationCopy) {
-			  operation = NSWorkspaceCopyOperation;
-		  } else if (sourceDragMask == NSDragOperationLink) {
-			  operation = NSWorkspaceLinkOperation;
-		  } else {
-			  operation = NSWorkspaceMoveOperation;
-		  }
-    }
-  } else {
+	if ([source isEqual: trashPath]) {
+		operation = GWorkspaceRecycleOutOperation;
+	} else {	
 		if (sourceDragMask == NSDragOperationCopy) {
 			operation = NSWorkspaceCopyOperation;
 		} else if (sourceDragMask == NSDragOperationLink) {
@@ -889,9 +815,7 @@ active. preventWindowOrdering is sent automatically by NSView's dragImage:... an
 	[opDict setObject: fullpath forKey: @"destination"];
 	[opDict setObject: files forKey: @"files"];
 
-  [gworkspace performFileOperationWithDictionary: opDict
-                                  fromSourceHost: sourceHost
-                               toDestinationHost: remoteHostName];
+  [gworkspace performFileOperationWithDictionary: opDict];
 }
 
 @end
