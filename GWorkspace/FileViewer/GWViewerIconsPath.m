@@ -609,6 +609,7 @@
 
 - (void)setNameEditorForRep:(id)arep
 {
+  [self updateNameEditor];
 }
 
 - (void)stopRepNameEditing

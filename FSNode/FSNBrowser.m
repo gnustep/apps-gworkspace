@@ -1720,6 +1720,7 @@
   
   if (bc) {
     [[bc cmatrix] deselectAllCells];
+    [self notifySelectionChange: [NSArray arrayWithObject: [[bc shownNode] path]]];
   }
 }
 

@@ -131,24 +131,25 @@ static id <DesktopApplication> desktopApp = nil;
 - (void)setShowType:(FSNInfoType)type
 {
   if (infoType != type) {
+    int lineh = floor([[cellPrototype font] defaultLineHeightForFont]);
+    
     infoType = type;
     DESTROY (extInfoType);
+
+    if (cellsIcon) {
+      cellsHeight = ICON_CELL_HEIGHT;
+    } else {
+      cellsHeight = lineh;
+    }
+
+    if (infoType != FSNInfoNameType) {
+      cellsHeight += (lineh +1);
+    }
     
     if (matrix) {
-      int lineh = floor([[cellPrototype font] defaultLineHeightForFont]);
       NSArray *cells = [matrix cells];
       int i;
 
-      if (cellsIcon) {
-        cellsHeight = ICON_CELL_HEIGHT;
-      } else {
-        cellsHeight = lineh;
-      }
-      
-      if (infoType != FSNInfoNameType) {
-        cellsHeight += (lineh +1);
-      }
-      
       [self adjustMatrix];
 
 	    for (i = 0; i < [cells count]; i++) {
@@ -161,21 +162,22 @@ static id <DesktopApplication> desktopApp = nil;
 - (void)setExtendedShowType:(NSString *)type
 {
   if ((extInfoType == nil) || ([extInfoType isEqual: type] == NO)) {
+    int lineh = floor([[cellPrototype font] defaultLineHeightForFont]);  
+  
     infoType = FSNInfoExtendedType;
     ASSIGN (extInfoType, type);
 
+    if (cellsIcon) {
+      cellsHeight = ICON_CELL_HEIGHT;
+    } else {
+      cellsHeight = lineh;
+    }
+
+    cellsHeight += (lineh +1);
+
     if (matrix) {
-      int lineh = floor([[cellPrototype font] defaultLineHeightForFont]);
       NSArray *cells = [matrix cells];
       int i;
-
-      if (cellsIcon) {
-        cellsHeight = ICON_CELL_HEIGHT;
-      } else {
-        cellsHeight = lineh;
-      }
-      
-      cellsHeight += (lineh +1);
       
       [self adjustMatrix];
       
