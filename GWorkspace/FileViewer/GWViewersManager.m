@@ -114,7 +114,9 @@ static GWViewersManager *vwrsmanager = nil;
                                               backing: NSBackingStoreBuffered 
                                                 defer: NO];
     [win setReleasedWhenClosed: NO];
-    viewer = [[c alloc] initForNode: node inWindow: win];   
+    viewer = [[c alloc] initForNode: node 
+                           inWindow: win 
+                      showSelection: NO];   
     [viewers addObject: viewer];
     RELEASE (win);
     RELEASE (viewer);
@@ -149,12 +151,14 @@ static GWViewersManager *vwrsmanager = nil;
   if (vtype != [aviewer vtype]) {
     Class c = (vtype == SPATIAL) ? [GWSpatialViewer class] : [GWViewer class];
     GWViewerWindow *win = RETAIN ([aviewer win]);
-    FSNode *node = RETAIN ([aviewer shownNode]);
+    FSNode *node = RETAIN ([aviewer baseNode]);
     id viewer;
     
     [aviewer windowWillClose: nil];
     
-    viewer = [[c alloc] initForNode: node inWindow: win];   
+    viewer = [[c alloc] initForNode: node 
+                           inWindow: win 
+                      showSelection: YES];   
     [viewers addObject: viewer];
     RELEASE (viewer);
     RELEASE (node);
@@ -173,7 +177,7 @@ static GWViewersManager *vwrsmanager = nil;
   for (i = 0; i < [viewers count]; i++) {
     id viewer = [viewers objectAtIndex: i];
     
-    if ([[viewer shownNode] isEqual: node]) {
+    if ([[viewer baseNode] isEqual: node]) {
       [vwrs addObject: viewer];
     }
   }
@@ -189,7 +193,7 @@ static GWViewersManager *vwrsmanager = nil;
   for (i = 0; i < [viewers count]; i++) {
     id viewer = [viewers objectAtIndex: i];
 
-    if (([viewer vtype] == type) && [[viewer shownNode] isEqual: node]) {
+    if (([viewer vtype] == type) && [[viewer baseNode] isEqual: node]) {
       return viewer;
     }
   }
@@ -205,7 +209,7 @@ static GWViewersManager *vwrsmanager = nil;
   for (i = 0; i < [viewers count]; i++) {
     id viewer = [viewers objectAtIndex: i];
 
-    if (([viewer vtype] == type) && [[viewer nodeView] isShowingNode: node]) {
+    if (([viewer vtype] == type) && [viewer isShowingNode: node]) {
       return viewer;
     }
   }
@@ -216,7 +220,7 @@ static GWViewersManager *vwrsmanager = nil;
 - (id)parentOfSpatialViewer:(id)aviewer
 {
   if ([aviewer isSpatial]) {
-    FSNode *node = [aviewer shownNode];
+    FSNode *node = [aviewer baseNode];
 
     if ([[node path] isEqual: path_separator()] == NO) {
       FSNode *parentNode = [node parent];
@@ -235,7 +239,7 @@ static GWViewersManager *vwrsmanager = nil;
 
 - (void)viewerWillClose:(id)aviewer
 {
-  FSNode *node = [aviewer shownNode];
+  FSNode *node = [aviewer baseNode];
   NSString *path = [node path];
   NSArray *watchedNodes = [aviewer watchedNodes];
   id parentViewer = [self parentOfSpatialViewer: aviewer];
@@ -271,14 +275,14 @@ static GWViewersManager *vwrsmanager = nil;
 
   for (i = 0; i < [vwrs count]; i++) {
     id viewer = [vwrs objectAtIndex: i];
-    NSString *vpath = [[viewer shownNode] path];
+    NSString *vpath = [[viewer baseNode] path];
     NSArray *watchedNodes = [viewer watchedNodes];
     id parentViewer = [self parentOfSpatialViewer: viewer];
     NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", vpath]; 
     NSDictionary *vwrprefs = [defaults dictionaryForKey: prefsname];
     
     if (parentViewer && ([vwrs containsObject: parentViewer] == NO)) {
-      [parentViewer setOpened: NO repOfNode: [viewer shownNode]];
+      [parentViewer setOpened: NO repOfNode: [viewer baseNode]];
     }
 
     if (vwrprefs) {
@@ -301,11 +305,6 @@ static GWViewersManager *vwrsmanager = nil;
     [viewers removeObject: viewer];
   }
 }
-
-
-
-
-
 
 
 /* 
@@ -335,12 +334,12 @@ static GWViewersManager *vwrsmanager = nil;
  * highligts the icon corresponding to the base node of "aviewer"
  * in its parent viewer
  */
-- (void)reflectInParentSelectedViewer:(id)aviewer
+- (void)synchronizeSelectionInParentOfViewer:(id)aviewer
 {
   id parentViewer = [self parentOfSpatialViewer: aviewer];
     
   if (parentViewer) {
-    [parentViewer setOpened: YES repOfNode: [aviewer shownNode]];
+    [parentViewer setOpened: YES repOfNode: [aviewer baseNode]];
   }
 }
 
@@ -357,7 +356,7 @@ static GWViewersManager *vwrsmanager = nil;
       id viewer = [viewers objectAtIndex: i];
 
       if ((viewer != aviewer) && ([viewer isSpatial]) 
-                         && [[viewer nodeView] isShowingNode: node]) {
+                        && [viewer isShowingNode: node]) {
         [viewer unloadFromNode: node];
         break;
       }
@@ -444,7 +443,7 @@ static GWViewersManager *vwrsmanager = nil;
     id viewer = [viewers objectAtIndex: i];
     
     if ([viewer involvedByFileOperation: opinfo]) {
-      if ([[viewer shownNode] willBeValidAfterFileOperation: opinfo] == NO) {
+      if ([[viewer baseNode] willBeValidAfterFileOperation: opinfo] == NO) {
         [viewer invalidate];
         [viewersToClose addObject: viewer];
         
@@ -465,7 +464,7 @@ static GWViewersManager *vwrsmanager = nil;
     
   for (i = 0; i < [viewers count]; i++) {
     id viewer = [viewers objectAtIndex: i];
-    FSNode *vnode = [viewer shownNode];
+    FSNode *vnode = [viewer baseNode];
 
     if (([vnode isValid] == NO) && ([viewer invalidated] == NO)) {
       [viewer invalidate];
@@ -491,21 +490,21 @@ static GWViewersManager *vwrsmanager = nil;
 
   for (i = 0; i < [viewers count]; i++) {
     id viewer = [viewers objectAtIndex: i];
-    FSNode *node = [viewer shownNode];
+    FSNode *node = [viewer baseNode];
     NSArray *watchedNodes = [viewer watchedNodes];
     
     if ([event isEqual: @"GWWatchedDirectoryDeleted"]) {  
       if (([[node path] isEqual: path]) || [node isSubnodeOfPath: path]) { 
         if ([viewer invalidated] == NO) {
-          [viewer invalidate];
-          [viewersToClose addObject: viewer];
+ //         [viewer invalidate];
+ //         [viewersToClose addObject: viewer];
         }
       }
     }
     
     for (j = 0; j < [watchedNodes count]; j++) {
       if ([[[watchedNodes objectAtIndex: j] path] isEqual: path]) {
-        [viewer watchedPathChanged: info];
+ //       [viewer watchedPathChanged: info];
         break;
       }
     }

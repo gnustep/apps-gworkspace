@@ -107,6 +107,10 @@
 + (FSNode *)subnodeWithPath:(NSString *)apath 
                  inSubnodes:(NSArray *)subnodes;
 
++ (BOOL)pathOfNode:(FSNode *)anode
+        isEqualOrDescendentOfPath:(NSString *)apath
+                  containingFiles:(NSArray *)files;
+
 - (FSNode *)parent;
 
 - (NSString *)parentPath;

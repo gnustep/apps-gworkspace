@@ -36,53 +36,6 @@
 #include "GWorkspace.h"
 #include "GNUstep.h"
 
-@implementation FiendWindow
-
-- (id)initWithContentRect:(NSRect)contentRect 
-                styleMask:(unsigned int)styleMask 
-                  backing:(NSBackingStoreType)backingType 
-                    defer:(BOOL)flag
-{
-  self = [super initWithContentRect: contentRect
-                  styleMask: styleMask backing: backingType defer: flag];
-  
-  [self registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, nil]];  
-  
-  return self;
-}
-
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
-{
-  return [[self contentView] draggingEntered: sender];
-}
-
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
-{
-	return [[self contentView] draggingUpdated: sender];
-}
-
-- (void)draggingExited:(id <NSDraggingInfo>)sender
-{
-	[[self contentView] draggingExited: sender];  
-}
-
-- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
-{
-	return [[self contentView] prepareForDragOperation: sender];
-}
-
-- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
-{
-	return [[self contentView] performDragOperation: sender];
-}
-
-- (void)concludeDragOperation:(id <NSDraggingInfo>)sender
-{
-  [[self contentView] concludeDragOperation: sender];
-}
-
-@end
-
 @implementation Fiend
 
 - (void)dealloc
@@ -112,16 +65,19 @@
 	
 	  gw = [GWorkspace gworkspace];
 
-	  myWin = [[FiendWindow alloc] initWithContentRect: NSZeroRect
-					               styleMask: NSBorderlessWindowMask  
-                              backing: NSBackingStoreRetained defer: NO];
+	  myWin = [[NSWindow alloc] initWithContentRect: NSZeroRect
+					                      styleMask: NSBorderlessWindowMask  
+                                    backing: NSBackingStoreBuffered defer: NO];
 
-    if ([myWin setFrameUsingName: @"Fiend"] == NO) {
+    if ([myWin setFrameUsingName: @"fiend_window"] == NO) {
       [myWin setFrame: NSMakeRect(100, 100, 64, 64) display: NO];
     }      
-    [myWin setReleasedWhenClosed: NO]; 
     r = [myWin frame];      
-       
+    r.size = NSMakeSize(64, 64);
+    [myWin setFrame: r display: NO];
+    
+    [myWin setReleasedWhenClosed: NO]; 
+    
     defaults = [NSUserDefaults standardUserDefaults];	
 
     layers = [[NSMutableDictionary alloc] initWithCapacity: 1];
@@ -777,9 +733,8 @@
 
  	[defaults setObject: prefs forKey: @"fiendlayers"];  
   [defaults setObject: currentName forKey: @"fiendcurrentlayer"];  
-	[defaults synchronize];
   
-  [myWin saveFrameUsingName: @"Fiend"];
+  [myWin saveFrameUsingName: @"fiend_window"];
 }
 
 - (void)drawRect:(NSRect)rect

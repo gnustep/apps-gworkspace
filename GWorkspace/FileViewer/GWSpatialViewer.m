@@ -42,9 +42,10 @@
 
 - (void)dealloc
 {
-  RELEASE (shownNode);
+  RELEASE (baseNode);
   TEST_RELEASE (lastSelection);
   RELEASE (watchedNodes);
+  RELEASE (watchedSuspended);
   RELEASE (vwrwin);
   RELEASE (viewType);
   
@@ -53,6 +54,7 @@
 
 - (id)initForNode:(FSNode *)node
          inWindow:(GWViewerWindow *)win
+    showSelection:(BOOL)showsel
 {
   self = [super init];
   
@@ -62,9 +64,10 @@
     NSDictionary *viewerPrefs = nil;
     id defEntry;
 
-    ASSIGN (shownNode, [FSNode nodeWithRelativePath: [node path] parent: nil]);
+    ASSIGN (baseNode, [FSNode nodeWithRelativePath: [node path] parent: nil]);
     lastSelection = nil;
     watchedNodes = [NSMutableArray new];
+    watchedSuspended = [NSMutableArray new];
     manager = [GWViewersManager viewersManager];
     gworkspace = [GWorkspace gworkspace];
     spatial = YES;
@@ -76,11 +79,11 @@
       resizeIncrement = DEFAULT_INCR;
     }
 
-    rootviewer = ([[shownNode path] isEqual: path_separator()]
-                && ([[manager viewersForBaseNode: shownNode] count] == 0));
+    rootviewer = ([[baseNode path] isEqual: path_separator()]
+                && ([[manager viewersForBaseNode: baseNode] count] == 0));
 
-    if ([shownNode isWritable] && (rootviewer == NO)) {
-		  NSString *dictPath = [[shownNode path] stringByAppendingPathComponent: @".gwdir"];
+    if ([baseNode isWritable] && (rootviewer == NO)) {
+		  NSString *dictPath = [[baseNode path] stringByAppendingPathComponent: @".gwdir"];
 
       if ([[NSFileManager defaultManager] fileExistsAtPath: dictPath]) {
         NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: dictPath];
@@ -140,7 +143,7 @@
       nodeView = [[GWViewerIconsView alloc] initForViewer: self];
 
     } else if ([viewType isEqual: @"Browser"]) {
-      nodeView = [[GWViewerBrowser alloc] initWithBaseNode: shownNode
+      nodeView = [[GWViewerBrowser alloc] initWithBaseNode: baseNode
                                       inViewer: self
 		                            visibleColumns: visibleCols
                                       scroller: [scroll horizontalScroller]
@@ -150,15 +153,42 @@
 
 	  [scroll setDocumentView: nodeView];	
     RELEASE (nodeView);                 
-    [nodeView showContentsOfNode: shownNode]; 
+    [nodeView showContentsOfNode: baseNode]; 
+
+    /*
+    * Beeing "spatial", we always set the selection in the browser
+    */      
+    if (showsel || ([nodeView isSingleNode] == NO)) {
+      defEntry = [viewerPrefs objectForKey: @"lastselection"];
+    
+      if (defEntry) {
+        NSFileManager *fm = [NSFileManager defaultManager];
+        NSMutableArray *selection = [defEntry mutableCopy];
+        int count = [selection count];
+        int i;
+
+        for (i = 0; i < count; i++) {
+          NSString *s = [selection objectAtIndex: i];
+
+          if ([fm fileExistsAtPath: s] == NO){
+            [selection removeObject: s];
+            count--;
+            i--;
+          }
+        }
+
+        if ([selection count]) {
+          [nodeView selectRepsOfPaths: selection];
+        }
+
+        RELEASE (selection);
+      }
+    }
 
     [self updeateInfoLabels];
 
-    if ([nodeView isSingleNode]) {
-      NSRect r = [nodeView frame];
-      [nodeView scrollRectToVisible: NSMakeRect(0, r.size.height - 1, 1, 1)];	
-    }
-
+    [self scrollToBeginning];
+    
     RELEASE (viewerPrefs);
   }
   
@@ -208,7 +238,7 @@
   [pathsPopUp setAutoresizingMask: resizeMask];
   [pathsPopUp setTarget: self];
   [pathsPopUp setAction: @selector(popUpAction:)];
-  [pathsPopUp setItemsToNode: shownNode];
+  [pathsPopUp setItemsToNode: baseNode];
   [topBox addSubview: pathsPopUp];
   RELEASE (pathsPopUp);
 
@@ -242,10 +272,19 @@
   RELEASE (mainView);
 }
 
-
-- (FSNode *)shownNode
+- (FSNode *)baseNode
 {
-  return shownNode;
+  return baseNode;
+}
+
+- (BOOL)isShowingNode:(FSNode *)anode
+{
+  return [nodeView isShowingNode: anode];
+}
+
+- (BOOL)isShowingPath:(NSString *)apath
+{
+  return [nodeView isShowingPath: apath];
 }
 
 - (void)reloadNodeContents
@@ -253,9 +292,16 @@
   [nodeView reloadContents];
 }
 
+- (void)reloadFromNode:(FSNode *)anode
+{
+  if ([nodeView isShowingNode: anode]) {
+    [nodeView reloadFromNode: anode];
+  }
+}
+
 - (void)unloadFromNode:(FSNode *)anode
 {
-  if ([shownNode isEqual: anode]) {
+  if ([baseNode isEqual: anode] || [baseNode isSubnodeOfNode: anode]) {
     [self deactivate];
   } else if ([nodeView isShowingNode: anode]) {
     [nodeView unloadFromNode: anode];
@@ -296,12 +342,20 @@
 - (void)activate
 {
   [vwrwin makeKeyAndOrderFront: nil];
-  [manager viewer: self didShowNode: shownNode];
+  [manager viewer: self didShowNode: baseNode];
 }
 
 - (void)deactivate
 {
   [vwrwin close];
+}
+
+- (void)scrollToBeginning
+{
+  if ([nodeView isSingleNode]) {
+    NSRect r = [nodeView frame];
+    [nodeView scrollRectToVisible: NSMakeRect(0, r.size.height - 1, 1, 1)];	
+  }
 }
 
 - (void)invalidate
@@ -353,18 +407,18 @@
   node = [FSNode nodeWithRelativePath: [newsel objectAtIndex: 0] parent: nil];   
     
   if ([nodeView isSingleNode]) {    
-    if ([node isEqual: shownNode] == NO) {
+    if ([node isEqual: baseNode] == NO) {
       return;
     }
   }
  
   if (([node isDirectory] == NO) || [node isPackage] || ([newsel count] > 1)) {
-    if ([node isEqual: shownNode] == NO) { // if shownNode is a package 
+    if ([node isEqual: baseNode] == NO) { // if baseNode is a package 
       node = [FSNode nodeWithRelativePath: [node parentPath] parent: nil];
     }
   } 
     
-  components = [FSNode nodeComponentsFromNode: shownNode toNode: node];
+  components = [FSNode nodeComponentsFromNode: baseNode toNode: node];
   count = [components count];
 
   for (i = 0; i < [watchedNodes count]; i++) {
@@ -392,6 +446,7 @@
   }
   
   [watchedNodes removeAllObjects];
+  [watchedSuspended removeAllObjects];
   [watchedNodes addObjectsFromArray: components];
 }
 
@@ -413,7 +468,7 @@
 
   [elementsLabel setStringValue: labelstr];
 
-  attributes = [[NSFileManager defaultManager] fileSystemAttributesAtPath: [shownNode path]];
+  attributes = [[NSFileManager defaultManager] fileSystemAttributesAtPath: [[nodeView shownNode] path]];
 	freefs = [attributes objectForKey: NSFileSystemFreeSize];
 
 	if (freefs == nil) {  
@@ -431,7 +486,7 @@
 {
   NSString *path = [[sender selectedItem] representedObject];
 
-  if ([path isEqual: [shownNode path]] == NO) {
+  if ([path isEqual: [baseNode path]] == NO) {
     FSNode *node = [FSNode nodeWithRelativePath: path parent: nil];
     BOOL close = [sender closeViewer];
   
@@ -472,8 +527,8 @@
         || [operation isEqual: @"GWorkspaceRenameOperation"]
 			  || [operation isEqual: @"GWorkspaceRecycleOutOperation"]) { 
     if ([nodeView isShowingPath: destination]
-                    || [shownNode isSubnodeOfPath: destination]) {
-      [self unsetWatchersFromPath: destination];
+                    || [baseNode isSubnodeOfPath: destination]) {
+      [self suspendWatchersFromPath: destination];
     }
   }
 
@@ -483,8 +538,8 @@
 				|| [operation isEqual: @"GWorkspaceRecycleOutOperation"]
 				|| [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]) {
     if ([nodeView isShowingPath: source]
-                      || [shownNode isSubnodeOfPath: source]) {
-      [self unsetWatchersFromPath: source]; 
+                      || [baseNode isSubnodeOfPath: source]) {
+      [self suspendWatchersFromPath: source]; 
     }
   }
 
@@ -514,8 +569,8 @@
         || [operation isEqual: @"GWorkspaceRenameOperation"]
 			  || [operation isEqual: @"GWorkspaceRecycleOutOperation"]) { 
     if ([nodeView isShowingPath: destination]
-                        || [shownNode isSubnodeOfPath: destination]) {
-      [self setWatchersFromPath: destination];
+                        || [baseNode isSubnodeOfPath: destination]) {
+      [self reactivateWatchersFromPath: destination];
     }
   }
 
@@ -525,15 +580,33 @@
 				|| [operation isEqual: @"GWorkspaceRecycleOutOperation"]
 				|| [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]) {
     if ([nodeView isShowingPath: source]
-                        || [shownNode isSubnodeOfPath: source]) {
-      [self setWatchersFromPath: source];
+                        || [baseNode isSubnodeOfPath: source]) {
+      [self reactivateWatchersFromPath: source];
     }
   }
 }
 
-- (void)setWatchersFromPath:(NSString *)path
+- (void)suspendWatchersFromPath:(NSString *)path
 {
-  NSString *start = [shownNode isSubnodeOfPath: path] ? [shownNode path] : path;
+  NSString *start = [baseNode isSubnodeOfPath: path] ? [baseNode path] : path;
+  unsigned index = [FSNode indexOfNodeWithPath: start 
+                                  inComponents: watchedNodes];
+
+  if (index != NSNotFound) {
+    int i;
+
+    for (i = index; i < [watchedNodes count]; i++) {  
+      NSString *path = [[watchedNodes objectAtIndex: i] path];
+        
+      [gworkspace removeWatcherForPath: path];
+      [watchedSuspended addObject: path];
+    }
+  } 
+}
+
+- (void)reactivateWatchersFromPath:(NSString *)path
+{
+  NSString *start = [baseNode isSubnodeOfPath: path] ? [baseNode path] : path;
   unsigned index = [FSNode indexOfNodeWithPath: start 
                                   inComponents: watchedNodes];
 
@@ -543,37 +616,33 @@
     
     for (i = index; i < count; i++) {
       FSNode *node = [watchedNodes objectAtIndex: i];
+      NSString *path = [node path];
     
       if ([node isValid] && [node isDirectory]) {
-        [gworkspace addWatcherForPath: [node path]];
+        [gworkspace addWatcherForPath: path];
       } else {
         [watchedNodes removeObjectAtIndex: i];
         count--;
         i--;
-      }  
+      }
+      
+      if ([watchedSuspended containsObject: path]) {
+        [watchedSuspended removeObject: path];
+      }
     }
   }
-}
-
-- (void)unsetWatchersFromPath:(NSString *)path
-{
-  NSString *start = [shownNode isSubnodeOfPath: path] ? [shownNode path] : path;
-  unsigned index = [FSNode indexOfNodeWithPath: start 
-                                  inComponents: watchedNodes];
-
-  if (index != NSNotFound) {
-    int i;
-
-    for (i = index; i < [watchedNodes count]; i++) {      
-      [gworkspace removeWatcherForPath: [[watchedNodes objectAtIndex: i] path]];
-    }
-  } 
 }
 
 - (void)watchedPathChanged:(NSDictionary *)info
 {
   if (invalidated == NO) {
-    [nodeView watchedPathChanged: info];
+    NSString *path = [info objectForKey: @"path"];
+  
+    if ([watchedSuspended containsObject: path] == NO) {
+      if ([nodeView isShowingPath: path]) {
+        [nodeView watchedPathChanged: info];
+      }
+    }
   }
 }
 
@@ -585,13 +654,16 @@
 
 - (void)updateDefaults
 {
-  if ([shownNode isValid]) {
+  if ([baseNode isValid]) {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	      
-    NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", [shownNode path]];
-    NSString *dictPath = [[shownNode path] stringByAppendingPathComponent: @".gwdir"];
+    NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", [baseNode path]];
+    NSString *dictPath = [[baseNode path] stringByAppendingPathComponent: @".gwdir"];
     NSMutableDictionary *updatedprefs = nil;
-
-    if ([shownNode isWritable] && (rootviewer == NO)) {
+    id defEntry;
+    
+    [nodeView updateNodeInfo];
+    
+    if ([baseNode isWritable] && (rootviewer == NO)) {
       if ([[NSFileManager defaultManager] fileExistsAtPath: dictPath]) {
         NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: dictPath];
 
@@ -614,10 +686,15 @@
 
     [updatedprefs setObject: viewType forKey: @"viewtype"];
 
+    defEntry = [nodeView selectedPaths];
+    if (defEntry) {
+      [updatedprefs setObject: defEntry forKey: @"lastselection"];
+    }
+
     [updatedprefs setObject: [vwrwin stringWithSavedFrame] 
                      forKey: @"geometry"];
 
-    if ([shownNode isWritable] && (rootviewer == NO)) {
+    if ([baseNode isWritable] && (rootviewer == NO)) {
       [updatedprefs writeToFile: dictPath atomically: YES];
     } else {
       [defaults setObject: updatedprefs forKey: prefsname];
@@ -645,17 +722,17 @@
   [manager selectedSpatialViewerChanged: self];
 
   if (count == 0) {
-    selection = [NSArray arrayWithObject: [shownNode path]];
-    [manager reflectInParentSelectedViewer: self];
+    selection = [NSArray arrayWithObject: [[nodeView shownNode] path]];
+    [manager synchronizeSelectionInParentOfViewer: self];
   
   } else if (count == 1) {
     if (([nodeView isSingleNode] == NO)
-             || ([[selection objectAtIndex: 0] isEqual: [shownNode path]])) {
-      [manager reflectInParentSelectedViewer: self];
+             || ([[selection objectAtIndex: 0] isEqual: [baseNode path]])) {
+      [manager synchronizeSelectionInParentOfViewer: self];
     }
     
   } else if ([nodeView isSingleNode] == NO) {
-    [manager reflectInParentSelectedViewer: self];
+    [manager synchronizeSelectionInParentOfViewer: self];
   }
   
   [self selectionChanged: selection];
@@ -693,12 +770,14 @@
 
 - (void)newFolder
 {
-  [gworkspace newObjectAtPath: [shownNode path] isDirectory: YES];
+  [gworkspace newObjectAtPath: [[nodeView shownNode] path] 
+                  isDirectory: YES];
 }
 
 - (void)newFile
 {
-  [gworkspace newObjectAtPath: [shownNode path] isDirectory: NO];
+  [gworkspace newObjectAtPath: [[nodeView shownNode] path] 
+                  isDirectory: NO];
 }
 
 - (void)duplicateFiles
@@ -721,13 +800,18 @@
   NSString *title = [sender title];
   
 	if ([title isEqual: NSLocalizedString(viewType, @"")] == NO) {
-    NSArray *selection;
+    NSArray *selection = [nodeView selectedPaths];
     int i;
-      
+    
+    [nodeView updateNodeInfo];
+    if ([nodeView isSingleNode] && ([selection count] == 0)) {
+      selection = [NSArray arrayWithObject: [[nodeView shownNode] path]];
+    }    
+    RETAIN (selection);
     [scroll setDocumentView: nil];	
     
     if ([title isEqual: NSLocalizedString(@"Browser", @"")]) {
-      nodeView = [[GWViewerBrowser alloc] initWithBaseNode: shownNode
+      nodeView = [[GWViewerBrowser alloc] initWithBaseNode: baseNode
                                       inViewer: self
 		                            visibleColumns: visibleCols
                                       scroller: [scroll horizontalScroller]
@@ -749,12 +833,15 @@
 
     [scroll setDocumentView: nodeView];	
     RELEASE (nodeView);                 
-    [nodeView showContentsOfNode: shownNode]; 
+    [nodeView showContentsOfNode: baseNode]; 
     
-    if ([nodeView isSingleNode]) {
-      NSRect r = [nodeView frame];
-      [nodeView scrollRectToVisible: NSMakeRect(0, r.size.height - 1, 1, 1)];	
+    if ([selection count]) {
+      [nodeView selectRepsOfPaths: selection];
     }
+    
+    DESTROY (selection);
+    
+    [self scrollToBeginning];
 
     [vwrwin makeFirstResponder: nodeView]; 
 
@@ -762,12 +849,13 @@
       [gworkspace removeWatcherForPath: [[watchedNodes objectAtIndex: i] path]];
     }
     [watchedNodes removeAllObjects];
+    [watchedSuspended removeAllObjects];
     
     DESTROY (lastSelection);
     selection = [nodeView selectedPaths];
     
-    if ((selection == nil) || ([selection count] == 0)) {
-      selection = [NSArray arrayWithObject: [shownNode path]];
+    if ([selection count] == 0) {
+      selection = [NSArray arrayWithObject: [[nodeView shownNode] path]];
     }
     
     [self selectionChanged: selection];
@@ -784,7 +872,7 @@
   NSString *path;
 
   if ([nodeView isSingleNode]) {
-	  path = [shownNode path];
+	  path = [[nodeView shownNode] path];
     
   } else {
     NSArray *selection = [nodeView selectedNodes];
@@ -804,7 +892,7 @@
         }
       }
     } else {
-      path = [shownNode path];
+      path = [[nodeView shownNode] path];
     }
   }
 

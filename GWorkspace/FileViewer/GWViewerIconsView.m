@@ -87,7 +87,7 @@
     
     if ([viewer vtype] == SPATIAL) {
       [manager selectedSpatialViewerChanged: viewer];
-      [manager reflectInParentSelectedViewer: viewer];
+      [manager synchronizeSelectionInParentOfViewer: viewer];
     }
 	}
 }

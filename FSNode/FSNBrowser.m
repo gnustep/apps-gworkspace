@@ -1352,8 +1352,24 @@
   [self reloadFromColumnWithNode: baseNode];
 }
 
+- (void)reloadFromNode:(FSNode *)anode
+{
+  [self reloadFromColumnWithNode: anode];
+}
+
+- (FSNode *)baseNode
+{
+  return baseNode;
+}
+
 - (FSNode *)shownNode
 {
+  FSNBrowserColumn *bc = [self lastLoadedColumn];
+  
+  if (bc) {
+    return [bc shownNode];
+  }
+  
   return baseNode;
 }
 

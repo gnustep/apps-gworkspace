@@ -142,6 +142,7 @@
 - (void)setOwnsScroller:(BOOL)ownscr
 {
   ownScroller = ownscr;
+  [self setFrame: [[self superview] frame]];
   [self tile];
 }
 
@@ -166,9 +167,6 @@
 
   for (i = 0; i < [components count]; i++) {
     FSNode *component = [components objectAtIndex: i];
-  
-        NSLog(@"showPathComponents %@", [component path]);
-  
   
     if (i < icncount) {
       icon = [icons objectAtIndex: i];
@@ -226,13 +224,8 @@
                          
 - (id)lastIcon
 {
-  int count = [icons count];
-  if (count) {
-    return [icons objectAtIndex: (count - 1)];
-  }
-  return nil;
+  return [icons objectAtIndex: ([icons count] - 1)];
 }
-
 
 - (void)calculateGridSize
 {
@@ -253,7 +246,8 @@
 - (void)tile
 {
   NSClipView *clip = [self superview];
-  float y = [clip frame].origin.y;
+  float x = [clip bounds].origin.x;
+  float y = [clip bounds].origin.y;
   NSScrollView *scroll = [clip superview];
 //  float scrwidth = [scroll frame].size.width;
   float scrwidth = [scroll frame].size.width - (4 + visibleIcons);
@@ -264,44 +258,70 @@
   
   gridSize.width = floor(scrwidth / visibleIcons);
 
-  for (i = 0; i < count; i++) {
-		FSNIcon *icon = [icons objectAtIndex: i];
-    int n = i - firstVisibleIcon;
-    NSRect r = NSZeroRect;
-    
-    r.size = gridSize;
-    
-    if (i <= firstVisibleIcon) {
-      r.origin.x = (n * gridSize.width);
-    } else if (i <= lastVisibleIcon) {
-      r.origin.x = (n * gridSize.width) + n;
-    } else {
-      r.origin.x = (n * gridSize.width) + 8;
-    }
-        
-    if (i == lastVisibleIcon) {
-      r.size.width = scrwidth - r.origin.x;
-	  }
-
-    r.origin.y = 0;
-    posx += gridSize.width;
-    
-    [icon setFrame: r];
-    [icon setNeedsDisplay: YES];
-  }
-  
-  posx += (shift * gridSize.width);
-  
   if (ownScroller) {
+    [scroll setLineScroll: gridSize.width];
+  
+    for (i = 0; i < count; i++) {
+      FSNIcon *icon = [icons objectAtIndex: i];
+      NSRect r = NSZeroRect;
+
+      r.size = gridSize;
+      r.origin.y = 0;
+
+      r.origin.x = posx;
+
+ //     if (i == lastVisibleIcon) { 
+ //       r.size.width = scrwidth - r.origin.x;
+//	    }
+
+      [icon setFrame: r];
+      [icon setNeedsDisplay: YES];
+
+      posx += gridSize.width;
+    }
+    
+    // posx -= LAST_ICON_COMP;
+
     if (posx != fr.size.width) {
-      [self setFrame: NSMakeRect(fr.origin.x, fr.origin.y, posx, fr.size.height)];
+      [self setFrame: NSMakeRect(0, fr.origin.y, posx, fr.size.height)];
     }
 
-    if (count && (firstVisibleIcon < count)) {    
-		  FSNIcon *icon = [icons objectAtIndex: firstVisibleIcon];
-      [clip scrollToPoint: NSMakePoint([icon frame].origin.x, y)];
-    }    
+    if (count > visibleIcons) {    
+      x += gridSize.width * (count - visibleIcons);
+      [clip scrollToPoint: NSMakePoint(x, y)];
+    }
+
+  } else {
+    for (i = 0; i < count; i++) {
+		  FSNIcon *icon = [icons objectAtIndex: i];
+      int n = i - firstVisibleIcon;
+      NSRect r = NSZeroRect;
+
+      r.size = gridSize;
+
+      if (i <= firstVisibleIcon) {
+        r.origin.x = (n * gridSize.width);
+      } else if (i <= lastVisibleIcon) {
+        r.origin.x = (n * gridSize.width) + n;
+      } else {
+        r.origin.x = (n * gridSize.width) + 8;
+      }
+
+      if (i == lastVisibleIcon) {
+        r.size.width = scrwidth - r.origin.x;
+	    }
+
+      r.origin.y = 0;
+      posx += gridSize.width;
+
+      [icon setFrame: r];
+      [icon setNeedsDisplay: YES];
+    }
+    
+    posx += (shift * gridSize.width);
   }
+
+  // [self updateNameEditor];
   
   [self setNeedsDisplay: YES];
 }
@@ -309,6 +329,29 @@
 - (void)resizeWithOldSuperviewSize:(NSSize)oldFrameSize
 {
   [self tile];
+}
+
+//
+// scrollview delegate
+//
+- (void)gwviewerScroll:(GWViewerScroll *)sender 
+    scrollViewScrolled:(NSClipView *)clip
+               hitPart:(NSScrollerPart)hitpart
+{
+  int x = (int)[clip bounds].origin.x;
+  int y = (int)[clip bounds].origin.y;
+  int rem = x % (int)(rintf(gridSize.width));
+
+  if (rem != 0) {
+    if (rem <= gridSize.width / 2) {
+      x -= rem;
+    } else {
+      x += rintf(gridSize.width) - rem;
+    }
+
+    [clip scrollToPoint: NSMakePoint(x, y)];    
+    [self setNeedsDisplay: YES];
+  }
 }
 
 @end
@@ -400,7 +443,7 @@
 
 - (void)repSelected:(id)arep
 {
-  if ([arep isShowingSelection] == NO) {
+  if (([arep isShowingSelection] == NO) && ((arep == [self lastIcon]) == NO)) {
     [viewer pathsViewDidSelectIcon: arep];
   }
 }
@@ -518,6 +561,34 @@
 
 @end
 
+
+@implementation GWViewerScroll
+
+- (void)setDelegate:(id)anObject
+{
+  delegate = anObject;
+}
+
+- (id)delegate
+{
+  return delegate;
+}
+
+- (void)reflectScrolledClipView:(NSClipView *)aClipView
+{
+  [super reflectScrolledClipView: aClipView];  
+
+  if (delegate) {
+    NSScroller *scroller = [self horizontalScroller];
+    NSScrollerPart hitPart = [scroller hitPart];
+
+    [delegate gwviewerScroll: self 
+          scrollViewScrolled: aClipView 
+                     hitPart: hitPart];      
+  }
+}
+
+@end
 
 
 

@@ -102,6 +102,8 @@
 
 - (void)showContentsOfNode:(FSNode *)anode;
 - (void)reloadContents;
+- (void)reloadFromNode:(FSNode *)anode;
+- (FSNode *)baseNode;
 - (FSNode *)shownNode;
 - (BOOL)isSingleNode;
 - (BOOL)isShowingNode:(FSNode *)anode;

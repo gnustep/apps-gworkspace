@@ -69,7 +69,7 @@
 
 - (void)selectedSpatialViewerChanged:(id)aviewer;
 
-- (void)reflectInParentSelectedViewer:(id)aviewer;
+- (void)synchronizeSelectionInParentOfViewer:(id)aviewer;
 
 - (void)viewer:(id)aviewer didShowNode:(FSNode *)node;
 

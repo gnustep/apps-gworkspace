@@ -38,12 +38,9 @@
 @class FiendLeaf;
 @class GWorkspace;
 
-@interface FiendWindow : NSWindow 
-@end
-
 @interface Fiend : NSView 
 {
-  FiendWindow *myWin;
+  NSWindow *myWin;
   NSImage *tile;
   NSImage *leftArr;
   NSImage *rightArr;

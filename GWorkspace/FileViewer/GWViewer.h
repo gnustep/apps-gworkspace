@@ -34,6 +34,7 @@
 @class GWViewerShelf;
 @class NSScrollView;
 @class GWViewerIconsPath;
+@class GWViewerScroll;
 @class NSView;
 @class GWorkspace;
 
@@ -44,7 +45,7 @@
   GWViewerShelf *shelf;
   float shelfHeight;
   NSView *lowBox;
-  NSScrollView *pathsScroll;
+  GWViewerScroll *pathsScroll;
   GWViewerIconsPath *pathsView;
   NSScrollView *nviewScroll;
   id nodeView;
@@ -58,7 +59,7 @@
   FSNode *baseNode;
   NSArray *lastSelection;  
   NSMutableArray *watchedNodes;
-  BOOL watchersSuspended;
+  NSMutableArray *watchedSuspended;
   
   GWViewersManager *manager;
   GWorkspace *gworkspace;
@@ -67,10 +68,14 @@
 }
 
 - (id)initForNode:(FSNode *)node
-         inWindow:(GWViewerWindow *)win;
+         inWindow:(GWViewerWindow *)win
+    showSelection:(BOOL)showsel;
 - (void)createSubviews;
-- (FSNode *)shownNode;
+- (FSNode *)baseNode;
+- (BOOL)isShowingNode:(FSNode *)anode;
+- (BOOL)isShowingPath:(NSString *)apath;
 - (void)reloadNodeContents;
+- (void)reloadFromNode:(FSNode *)anode;
 - (void)unloadFromNode:(FSNode *)anode;
 
 - (GWViewerWindow *)win;
@@ -83,6 +88,7 @@
 - (void)activate;
 - (void)deactivate;
 - (void)tileViews;
+- (void)scrollToBeginning;
 - (void)invalidate;
 - (BOOL)invalidated;
 
@@ -98,8 +104,8 @@
 - (void)nodeContentsWillChange:(NSDictionary *)info;
 - (void)nodeContentsDidChange:(NSDictionary *)info;
 
-- (void)setWatchersFromPath:(NSString *)path;
-- (void)unsetWatchersFromPath:(NSString *)path;
+- (void)suspendWatchersFromPath:(NSString *)path;
+- (void)reactivateWatchersFromPath:(NSString *)path;
 - (void)watchedPathChanged:(NSDictionary *)info;
 - (NSArray *)watchedNodes;
 

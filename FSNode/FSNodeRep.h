@@ -134,6 +134,10 @@ typedef enum FSNSelectionMask {
 
 - (void)reloadContents;
 
+- (void)reloadFromNode:(FSNode *)anode;
+
+- (FSNode *)baseNode;
+
 - (FSNode *)shownNode;
 
 - (BOOL)isSingleNode;

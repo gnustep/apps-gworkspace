@@ -234,17 +234,7 @@
 + (unsigned int)indexOfNode:(FSNode *)anode 
                inComponents:(NSArray *)nodes
 {
-  unsigned int i;
-
-  for (i = 0; i < [nodes count]; i++) {
-    FSNode *node = [nodes objectAtIndex: i];
-
-    if ([node isEqual: anode]) {
-      return i;
-    }
-  }
-  
-  return NSNotFound;
+  return [nodes indexOfObject: anode];
 }
 
 + (unsigned int)indexOfNodeWithPath:(NSString *)apath 
@@ -293,6 +283,36 @@
   }
   
   return nil;
+}
+
++ (BOOL)pathOfNode:(FSNode *)anode
+        isEqualOrDescendentOfPath:(NSString *)apath
+                  containingFiles:(NSArray *)files
+{
+  NSString *nodepath = [anode path];
+  
+  if ([nodepath isEqual: apath]) {
+    return YES;
+  
+  } else if (isSubpathOfPath(apath, nodepath)) {
+    int i;
+    
+    if (files == nil) {
+      return YES;
+      
+    } else {
+      for (i = 0; i < [files count]; i++) {
+        NSString *fname = [files objectAtIndex: i];
+        NSString *fpath = [apath stringByAppendingPathComponent: fname];				
+				
+        if (([fpath isEqual: nodepath]) || (isSubpathOfPath(fpath, nodepath))) {
+          return YES;
+        }
+      }
+    }
+  }
+
+  return NO;
 }
 
 - (FSNode *)parent

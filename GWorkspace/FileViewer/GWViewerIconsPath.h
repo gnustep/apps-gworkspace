@@ -29,6 +29,7 @@
 #include <AppKit/NSView.h>
 #include "FSNodeRep.h"
 
+@class GWViewerScroll;
 
 @interface GWViewerIconsPath : NSView
 {
@@ -71,14 +72,13 @@
 
 - (id)lastIcon;
 
-
-
-
-
-
 - (void)calculateGridSize;
 
 - (void)tile;
+
+- (void)gwviewerScroll:(GWViewerScroll *)sender 
+    scrollViewScrolled:(NSClipView *)clip
+               hitPart:(NSScrollerPart)hitpart;
 
 @end
 
@@ -113,6 +113,26 @@
 - (NSColor *)disabledTextColor;
 
 - (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender;
+
+@end
+
+
+@interface GWViewerScroll : NSScrollView
+{
+  id delegate;
+}
+
+- (void)setDelegate:(id)anObject;
+
+- (id)delegate;
+
+@end
+
+@interface NSObject(GWViewerScrollDelegateMethods)
+
+- (void)gwviewerScroll:(GWViewerScroll *)sender 
+    scrollViewScrolled:(NSClipView *)clip
+               hitPart:(NSScrollerPart)hitpart;
 
 @end
 

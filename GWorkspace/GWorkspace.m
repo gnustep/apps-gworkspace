@@ -344,7 +344,10 @@ static GWorkspace *gworkspace = nil;
     
   } else {
     FSNode *node = [FSNode nodeWithRelativePath: path parent: nil];
-    viewer = [vwrsManager newViewerOfType: 1 forNode: node closeOldViewer: nil];
+    
+    viewer = [vwrsManager newViewerOfType: 1 
+                                  forNode: node 
+                           closeOldViewer: nil];
   }
   
   return viewer;

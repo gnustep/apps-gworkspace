@@ -1006,6 +1006,9 @@ pp.x = NSMaxX([self bounds]) - 1
   [icons addObjectsFromArray: sorted];
   
   [self tile];
+  
+  DESTROY (lastSelection);
+  [self selectionDidChange];
 }
 
 - (void)reloadContents
@@ -1071,6 +1074,33 @@ pp.x = NSMaxX([self bounds]) - 1
   }
 
   [self selectionDidChange];
+}
+
+- (void)reloadFromNode:(FSNode *)anode
+{
+  if ([node isEqual: anode]) {
+    [self reloadContents];
+    
+  } else if ([node isSubnodeOfNode: anode]) {
+    NSArray *components = [FSNode nodeComponentsFromNode: anode toNode: node];
+    int i;
+  
+    for (i = 0; i < [components count]; i++) {
+      FSNode *component = [components objectAtIndex: i];
+    
+      if ([component isValid] == NO) {
+        component = [FSNode nodeWithRelativePath: [component parentPath]
+                                          parent: nil];
+        [self showContentsOfNode: component];
+        break;
+      }
+    }
+  }
+}
+
+- (FSNode *)baseNode
+{
+  return node;
 }
 
 - (FSNode *)shownNode
@@ -1413,16 +1443,9 @@ pp.x = NSMaxX([self bounds]) - 1
 
 - (void)unloadFromNode:(FSNode *)anode
 {
-  if ([node isEqual: anode]) {
-    int i;
-    
-    for (i = 0; i < [icons count]; i++) {
-      [[icons objectAtIndex: i] removeFromSuperview];
-    }
-    
-    [icons removeAllObjects];
-    editIcon = nil;
-  }
+  FSNode *parent = [FSNode nodeWithRelativePath: [anode parentPath]
+                                         parent: nil];
+  [self showContentsOfNode: parent];
 }
 
 - (void)repSelected:(id)arep

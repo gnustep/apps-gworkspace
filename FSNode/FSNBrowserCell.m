@@ -197,11 +197,17 @@ static NSDictionary *fontAttr = nil;
   NSString *cuttitle;  
 
 #define MARGIN (2.0)
+#define LEAF_MARGIN (5.0)
   
   titleRect = cellFrame;
   
   if (icon) {
     textlenght -= ([icon size].width + (MARGIN * 2));
+  }
+  if ([self isLeaf]) {
+    textlenght -= LEAF_MARGIN; 
+  } else {
+    textlenght -= (LEAF_MARGIN * 3); 
   }
   
   textlenght -= MARGIN;

@@ -68,6 +68,9 @@ NSString *path_separator(void)
   return path_sep();
 }
 
+/*
+ * p1 is parent of p2
+ */
 BOOL isSubpathOfPath(NSString *p1, NSString *p2)
 {
   int l1 = [p1 length];
