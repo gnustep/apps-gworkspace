@@ -796,8 +796,9 @@
 
   for (i = 0; i < [icons count]; i++) {
     FSNIcon *icon = [icons objectAtIndex: i];
+    NSRect iconBounds = [self convertRect: [icon iconBounds] fromView: icon];
       
-    if (NSIntersectsRect(r, [icon frame])) {
+    if (NSIntersectsRect(r, iconBounds)) {
       [icon select];
     } 
   }  

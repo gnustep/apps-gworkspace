@@ -62,7 +62,11 @@ typedef enum FSNSelectionMask {
 
 - (void)setFont:(NSFont *)fontObj;
 
+- (NSFont *)labelFont;
+
 - (void)setIconSize:(int)isize;
+
+- (int)iconSize;
 
 - (void)setIconPosition:(unsigned int)ipos;
 

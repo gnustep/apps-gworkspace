@@ -359,7 +359,6 @@ if (rct.size.height < 0) rct.size.height = 0; \
   [self scrollRectToVisible: irect];	
 }
 
-
 - (NSString *)selectIconWithPrefix:(NSString *)prefix
 {
 	int i;
@@ -646,8 +645,9 @@ pp.x = NSMaxX([self bounds]) - 1
   
   for (i = 0; i < [icons count]; i++) {
     FSNIcon *icon = [icons objectAtIndex: i];
-      
-    if (NSIntersectsRect(selrect, [icon frame])) {
+    NSRect iconBounds = [self convertRect: [icon iconBounds] fromView: icon];
+
+    if (NSIntersectsRect(selrect, iconBounds)) {
       [icon select];
     } 
   }  

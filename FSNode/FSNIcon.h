@@ -44,7 +44,9 @@
   NSString *selectionTitle;
   
   NSImage *icon;
+  int iconSize;
   NSRect icnBounds;
+  NSPoint icnPoint;
   unsigned int icnPosition;
 
   NSRect brImgBounds;
@@ -92,6 +94,8 @@
 - (void)unselect;
 
 - (BOOL)isSelected;
+
+- (NSRect)iconBounds;
 
 - (void)tile;
 

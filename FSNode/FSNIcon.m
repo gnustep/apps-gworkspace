@@ -87,15 +87,16 @@ static NSImage *branchImage;
   if (self) {
     NSRect r = NSZeroRect;
     
-    icnBounds = NSMakeRect(0, 0, isize, isize);
-    
+    iconSize = isize;
+    icnBounds = NSMakeRect(0, 0, iconSize, iconSize);
+    icnPoint = NSZeroPoint;
     brImgBounds = NSMakeRect(0, 0, BRANCH_SIZE, BRANCH_SIZE);
     
     ASSIGN (node, anode);
     selection = nil;
     selectionTitle = nil;
     
-    ASSIGN (icon, [FSNodeRep iconOfSize: isize forNode: node]);
+    ASSIGN (icon, [FSNodeRep iconOfSize: iconSize forNode: node]);
     
     dndSource = dndsrc;
     acceptDnd = dndaccept;
@@ -104,11 +105,12 @@ static NSImage *branchImage;
     isLeaf = YES;
     
     hlightRect = NSZeroRect;
-    hlightRect.size.width = ceil(isize / 3 * 4);
-    hlightRect.size.height = ceil(hlightRect.size.width * [FSNodeRep highlightHeightFactor]);
-    if ((hlightRect.size.height - isize) < 4) {
-      hlightRect.size.height = isize + 4;
+    hlightRect.size.width = iconSize / 3 * 4;
+    hlightRect.size.height = hlightRect.size.width * [FSNodeRep highlightHeightFactor];
+    if ((hlightRect.size.height - iconSize) < 4) {
+      hlightRect.size.height = iconSize + 4;
     }
+    hlightRect = NSIntegralRect(hlightRect);
     ASSIGN (highlightPath, [FSNodeRep highlightPathOfSize: hlightRect.size]);
         
 		if ([[node path] isEqual: path_separator()] && ([node isMountPoint] == NO)) {
@@ -129,8 +131,9 @@ static NSImage *branchImage;
     [self setNodeInfoShowType: type];
     
     labelRect = NSZeroRect;
-    labelRect.size.width = ceil([label uncuttedTitleLenght] + [FSNodeRep labelMargin]);
-    labelRect.size.height = floor([[label font] defaultLineHeightForFont]);
+    labelRect.size.width = [label uncuttedTitleLenght] + [FSNodeRep labelMargin];
+    labelRect.size.height = [[label font] defaultLineHeightForFont];
+    labelRect = NSIntegralRect(labelRect);
 
     icnPosition = ipos;
     gridIndex = gindex;
@@ -161,7 +164,7 @@ static NSImage *branchImage;
       r.size = icnBounds.size;
     }
 
-    [self setFrame: r];
+    [self setFrame: NSIntegralRect(r)];
 
     if (acceptDnd) {
       NSArray *pbTypes = [NSArray arrayWithObjects: NSFilenamesPboardType, 
@@ -220,6 +223,11 @@ static NSImage *branchImage;
   return isSelected;
 }
 
+- (NSRect)iconBounds
+{
+  return icnBounds;
+}
+
 - (void)tile
 {
   NSRect frameRect = [self frame];
@@ -227,7 +235,7 @@ static NSImage *branchImage;
   int lblmargin = [FSNodeRep labelMargin];
   
   if (icnPosition == NSImageAbove) {
-    labelRect.size.width = ceil([label uncuttedTitleLenght] + lblmargin);
+    labelRect.size.width = [label uncuttedTitleLenght] + lblmargin;
   
     if (labelRect.size.width >= frameRect.size.width) {
       labelRect.size.width = frameRect.size.width;
@@ -237,11 +245,12 @@ static NSImage *branchImage;
     }
   
     labelRect.origin.y = 0;
-    labelRect.origin.y += ceil(lblmargin / 2);
+    labelRect.origin.y += lblmargin / 2;
+    labelRect = NSIntegralRect(labelRect);
     
     if (selectable) {
-      float hlx = (frameRect.size.width - hlightRect.size.width) / 2;
-      float hly = frameRect.size.height - hlightRect.size.height;
+      float hlx = ceil((frameRect.size.width - hlightRect.size.width) / 2);
+      float hly = ceil(frameRect.size.height - hlightRect.size.height);
     
       if ((hlightRect.origin.x != hlx) || (hlightRect.origin.y != hly)) {
         NSAffineTransform *transform = [NSAffineTransform transform];
@@ -255,13 +264,21 @@ static NSImage *branchImage;
         hlightRect.origin.y = hly;      
       }
             
-      icnBounds.origin.x = hlightRect.origin.x + ((hlightRect.size.width - sz.width) / 2);
-      icnBounds.origin.y = hlightRect.origin.y + ((hlightRect.size.height - sz.height) / 2);
+      icnBounds.origin.x = hlightRect.origin.x + ((hlightRect.size.width - iconSize) / 2);
+      icnBounds.origin.y = hlightRect.origin.y + ((hlightRect.size.height - iconSize) / 2);
+      icnBounds = NSIntegralRect(icnBounds);
+    
+      icnPoint.x = floor(hlightRect.origin.x + ((hlightRect.size.width - sz.width) / 2));
+      icnPoint.y = floor(hlightRect.origin.y + ((hlightRect.size.height - sz.height) / 2));
     
     } else {
       int baseShift = [FSNodeRep defaultIconBaseShift];
-      icnBounds.origin.x = (frameRect.size.width - sz.width) / 2;
+      icnBounds.origin.x = (frameRect.size.width - iconSize) / 2;
       icnBounds.origin.y = labelRect.size.height + baseShift;
+      icnBounds = NSIntegralRect(icnBounds);
+      
+      icnPoint.x = floor((frameRect.size.width - sz.width) / 2);
+      icnPoint.y = labelRect.size.height + baseShift;
     }
 
   } else if (icnPosition == NSImageLeft) {
@@ -272,11 +289,11 @@ static NSImage *branchImage;
     }
     
     labelRect.size.width = ceil([label uncuttedTitleLenght] + lblmargin);
-  
     if (labelRect.size.width >= (frameRect.size.width - icnspacew)) {
       labelRect.size.width = (frameRect.size.width - icnspacew);
     } 
-  
+    labelRect = NSIntegralRect(labelRect);
+
     if (selectable) {
       if ((hlightRect.origin.x != 0) || (hlightRect.origin.y != 0)) {
         NSAffineTransform *transform = [NSAffineTransform transform];
@@ -290,24 +307,30 @@ static NSImage *branchImage;
         hlightRect.origin.y = 0;      
       }
             
-      icnBounds.origin.x = (hlightRect.size.width - sz.width) / 2;
-      icnBounds.origin.y = (hlightRect.size.height - sz.height) / 2;
+      icnBounds.origin.x = (hlightRect.size.width - iconSize) / 2;
+      icnBounds.origin.y = (hlightRect.size.height - iconSize) / 2;
+      icnBounds = NSIntegralRect(icnBounds);
+
+      icnPoint.x = floor((hlightRect.size.width - sz.width) / 2);
+      icnPoint.y = floor((hlightRect.size.height - sz.height) / 2);
             
       labelRect.origin.x = hlightRect.size.width;
       labelRect.origin.y = (hlightRect.size.height - labelRect.size.height) / 2;
-  
+      labelRect = NSIntegralRect(labelRect);
+      
     } else {
       icnBounds.origin.x = 0;
       icnBounds.origin.y = 0;
             
       labelRect.origin.x = icnBounds.size.width;
       labelRect.origin.y = (icnBounds.size.height - labelRect.size.height) / 2;
+      labelRect = NSIntegralRect(labelRect);
     }
         
   } else if (icnPosition == NSImageOnly) {
     if (selectable) {
-      float hlx = (frameRect.size.width - hlightRect.size.width) / 2;
-      float hly = (frameRect.size.height - hlightRect.size.height) / 2;
+      float hlx = ceil((frameRect.size.width - hlightRect.size.width) / 2);
+      float hly = ceil((frameRect.size.height - hlightRect.size.height) / 2);
     
       if ((hlightRect.origin.x != hlx) || (hlightRect.origin.y != hly)) {
         NSAffineTransform *transform = [NSAffineTransform transform];
@@ -322,12 +345,17 @@ static NSImage *branchImage;
       }
     }
     
-    icnBounds.origin.x = (frameRect.size.width - sz.width) / 2;
-    icnBounds.origin.y = (frameRect.size.height - sz.height) / 2;
-  } 
+    icnBounds.origin.x = (frameRect.size.width - iconSize) / 2;
+    icnBounds.origin.y = (frameRect.size.height - iconSize) / 2;
+    icnBounds = NSIntegralRect(icnBounds);
 
+    icnPoint.x = floor((frameRect.size.width - sz.width) / 2);
+    icnPoint.y = floor((frameRect.size.height - sz.height) / 2);
+  } 
+    
   brImgBounds.origin.x = frameRect.size.width - brImgBounds.size.width;
   brImgBounds.origin.y = ceil(icnBounds.origin.y + (icnBounds.size.height / 2) - (BRANCH_SIZE / 2));
+  brImgBounds = NSIntegralRect(brImgBounds);
   
   [self setNeedsDisplay: YES]; 
 }
@@ -463,9 +491,9 @@ static NSImage *branchImage;
   }
 
 	if (isLocked == NO) {	
-    [icon compositeToPoint: icnBounds.origin operation: NSCompositeSourceOver];
+    [icon compositeToPoint: icnPoint operation: NSCompositeSourceOver];
 	} else {						
-    [icon dissolveToPoint: icnBounds.origin fraction: 0.3];
+    [icon dissolveToPoint: icnPoint fraction: 0.3];
 	}
   
   if (isLeaf == NO) {
@@ -548,19 +576,30 @@ static NSImage *branchImage;
   [self tile];
 }
 
+- (NSFont *)labelFont
+{
+  return [label font];
+}
+
 - (void)setIconSize:(int)isize
 {
-  icnBounds = NSMakeRect(0, 0, isize, isize);
-  ASSIGN (icon, [FSNodeRep iconOfSize: isize forNode: node]);
-  hlightRect.size.width = ceil(isize / 3 * 4);
+  iconSize = isize;
+  icnBounds = NSMakeRect(0, 0, iconSize, iconSize);
+  ASSIGN (icon, [FSNodeRep iconOfSize: iconSize forNode: node]);
+  hlightRect.size.width = ceil(iconSize / 3 * 4);
   hlightRect.size.height = ceil(hlightRect.size.width * [FSNodeRep highlightHeightFactor]);
-  if ((hlightRect.size.height - isize) < 4) {
-    hlightRect.size.height = isize + 4;
+  if ((hlightRect.size.height - iconSize) < 4) {
+    hlightRect.size.height = iconSize + 4;
   }
   hlightRect.origin.x = 0;
   hlightRect.origin.y = 0;
   ASSIGN (highlightPath, [FSNodeRep highlightPathOfSize: hlightRect.size]); 
   [self tile];
+}
+
+- (int)iconSize
+{
+  return iconSize;
 }
 
 - (void)setIconPosition:(unsigned int)ipos
@@ -747,7 +786,7 @@ static NSImage *branchImage;
     if ([selectedPaths count] == 1) {
       dragIcon = icon;
     } else {
-      dragIcon = [FSNodeRep multipleSelectionIconOfSize: icnBounds.size.width];
+      dragIcon = [FSNodeRep multipleSelectionIconOfSize: iconSize];
     }     
                   
     dragPoint = [event locationInWindow];      
@@ -858,8 +897,7 @@ static NSImage *branchImage;
     prePath = [prePath stringByDeletingLastPathComponent];
   }
 
-  ASSIGN (icon, [FSNodeRep openFolderIconOfSize: icnBounds.size.width 
-                                        forNode: node]);
+  ASSIGN (icon, [FSNodeRep openFolderIconOfSize: iconSize forNode: node]);
   [self setNeedsDisplay: YES];   
 
   isDragTarget = YES;
@@ -899,7 +937,7 @@ static NSImage *branchImage;
   if (isDragTarget == YES) {
     isDragTarget = NO;  
     if (onSelf == NO) { 
-      ASSIGN (icon, [FSNodeRep iconOfSize: icnBounds.size.width forNode: node]);
+      ASSIGN (icon, [FSNodeRep iconOfSize: iconSize forNode: node]);
       [container setNeedsDisplayInRect: [self frame]];   
       [self setNeedsDisplay: YES];   
     }
@@ -940,7 +978,7 @@ static NSImage *branchImage;
     return;
   }	
 
-  ASSIGN (icon, [FSNodeRep iconOfSize: icnBounds.size.width forNode: node]);
+  ASSIGN (icon, [FSNodeRep iconOfSize: iconSize forNode: node]);
   [self setNeedsDisplay: YES];
 
 	sourceDragMask = [sender draggingSourceOperationMask];

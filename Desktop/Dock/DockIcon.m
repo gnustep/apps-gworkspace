@@ -467,18 +467,18 @@ x += 6; \
   }
   
   if (launching) {		
-	  [icon dissolveToPoint: icnBounds.origin fraction: dissFract];
+	  [icon dissolveToPoint: icnPoint fraction: dissFract];
 	  return;
   }
   
   if (isDndSourceIcon == NO) {
     if (isTrashIcon == NO) {
-      [icon compositeToPoint: icnBounds.origin operation: NSCompositeSourceOver];
+      [icon compositeToPoint: icnPoint operation: NSCompositeSourceOver];
     } else {
       if (trashFull) {
-        [trashFullIcon compositeToPoint: icnBounds.origin operation: NSCompositeSourceOver];
+        [trashFullIcon compositeToPoint: icnPoint operation: NSCompositeSourceOver];
       } else {
-        [icon compositeToPoint: icnBounds.origin operation: NSCompositeSourceOver];
+        [icon compositeToPoint: icnPoint operation: NSCompositeSourceOver];
       }
     }
     

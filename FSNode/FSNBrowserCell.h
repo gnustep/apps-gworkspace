@@ -70,4 +70,21 @@ typedef NSString *(*cutIMP)(id, SEL, id, float);
             
 @end
 
-#endif // SEARCH_PLACES_CELL_H
+
+@interface FSNCellNameEditor : NSTextField
+{
+  FSNode *node;
+  int index;
+}  
+
+- (void)setNode:(FSNode *)anode 
+    stringValue:(NSString *)str
+          index:(int)idx;
+
+- (FSNode *)node;
+
+- (int)index;
+
+@end
+
+#endif // FSN_BROWSER_CELL_H

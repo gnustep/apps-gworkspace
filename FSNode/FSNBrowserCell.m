@@ -324,10 +324,20 @@ static NSDictionary *fontAttr = nil;
   dtslenght = [dots sizeWithAttributes: fontAttr].width;     
 }
 
+- (NSFont *)labelFont
+{
+  return [super font];
+}
+
 - (void)setIconSize:(int)isize
 {
   icnsize = isize;
   [self setIcon];
+}
+
+- (int)iconSize
+{
+  return icnsize;
 }
 
 - (void)setIconPosition:(unsigned int)ipos
@@ -369,6 +379,18 @@ static NSDictionary *fontAttr = nil;
     case FSNInfoOwnerType:
       [self setStringValue: [node owner]];
       break;
+      
+  /*    
+    case FSNInfoOtherType:      
+      {  
+        NSString *str = [FSNodeRep 
+        
+        
+      }
+      break;
+  */      
+      
+      
     default:
       [self setStringValue: [node name]];
       break;
@@ -465,6 +487,47 @@ static NSDictionary *fontAttr = nil;
 
 @end
 
+
+@implementation FSNCellNameEditor
+
+- (void)dealloc
+{
+  TEST_RELEASE (node);
+  [super dealloc];
+}
+
+- (void)setNode:(FSNode *)anode 
+    stringValue:(NSString *)str
+          index:(int)idx
+{
+  DESTROY (node);
+  if (anode) {
+    ASSIGN (node, anode);
+  } 
+  [self setStringValue: str];
+  index = idx;
+}
+
+- (FSNode *)node
+{
+  return node;
+}
+
+- (int)index
+{
+  return index;
+}
+
+- (void)mouseDown:(NSEvent*)theEvent
+{
+  if ([self isEditable]) {
+	  [self setAlignment: NSLeftTextAlignment];
+    [[self window] makeFirstResponder: self];
+  }
+  [super mouseDown: theEvent];
+}
+
+@end
 
 
 
