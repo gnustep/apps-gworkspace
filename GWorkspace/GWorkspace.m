@@ -620,8 +620,7 @@ return [ws openFile: fullPath withApplication: appName]
   fswatcher = nil;
   fswnotifications = YES;
   [self connectFSWatcher];
-
-  inspectorApp = nil;
+  
   operationsApp = nil;
   
   appsViewer = [[AppsViewer alloc] init];
@@ -675,6 +674,11 @@ return [ws openFile: fullPath withApplication: appName]
   }  
   
 	starting = NO;
+
+  inspectorApp = nil;
+  if ([defaults boolForKey: @"uses_inspector"]) {  
+    [self connectInspector];
+  }
   
 	[defaults synchronize];
 
@@ -750,7 +754,7 @@ return [ws openFile: fullPath withApplication: appName]
     }
   }
 
-  if (inspectorApp && useInspector) {
+  if (inspectorApp) {
     NSConnection *inspconn = [(NSDistantObject *)inspectorApp connectionForProxy];
   
     if (inspconn && [inspconn isValid]) {
@@ -962,6 +966,8 @@ return [ws openFile: fullPath withApplication: appName]
   [defaults setBool: !animateSlideBack forKey: @"noslidebackanim"];
 
   [defaults setBool: usesThumbnails forKey: @"usesthumbnails"];
+
+  [defaults setBool: (inspectorApp != nil) forKey: @"uses_inspector"];
 
 	[defaults synchronize];
 }
@@ -1550,7 +1556,7 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   if (paths && ([selectedPaths isEqualToArray: paths] == NO)) {
     ASSIGN (selectedPaths, paths);
 
-    if (inspectorApp && useInspector) {
+    if (inspectorApp) {
       NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
       [inspectorApp setPathsData: data];
     }
@@ -1563,7 +1569,7 @@ NSLocalizedString(@"OK", @""), nil, nil); \
     return;
   }
   
-  if (inspectorApp && useInspector) {
+  if (inspectorApp) {
     NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
     [inspectorApp setPathsData: data];
   }    
@@ -1621,7 +1627,7 @@ NSLocalizedString(@"OK", @""), nil, nil); \
                     ofType:(NSString *)type
                   typeIcon:(NSImage *)icon
 {
-  if (inspectorApp && useInspector) {
+  if (inspectorApp) {
     if ([inspectorApp canDisplayDataOfType: type]) {
       [inspectorApp showData: data ofType: type];
     }
@@ -2035,7 +2041,6 @@ NSLocalizedString(@"OK", @""), nil, nil); \
       inspectorApp = insp;
 	    [inspectorApp setProtocolForProxy: @protocol(InspectorProtocol)];
       RETAIN (inspectorApp);
-      useInspector = YES;
       
       if (selectedPaths) {
         NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
@@ -2074,7 +2079,6 @@ NSLocalizedString(@"OK", @""), nil, nil); \
         
 	    } else { 
 	      recursion = NO;
-        useInspector = NO;
         NSRunAlertPanel(nil,
                 NSLocalizedString(@"unable to contact Inspector!", @""),
                 NSLocalizedString(@"Ok", @""),
@@ -2109,9 +2113,6 @@ NSLocalizedString(@"OK", @""), nil, nil); \
       NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
       [inspectorApp setPathsData: data];
     }
-                  
-  } else {
-    useInspector = NO;
   }
 }
 
@@ -2351,7 +2352,7 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
       [inspectorApp setPathsData: data];
     }    
   }
-	if (inspectorApp && useInspector) {
+	if (inspectorApp) {
     [inspectorApp showWindow];
   } 
 }
@@ -2365,7 +2366,7 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
       [inspectorApp setPathsData: data];
     }
   }
-  if (inspectorApp && useInspector) {  
+  if (inspectorApp) {  
     [inspectorApp showAttributes];
   } 
 }
@@ -2379,7 +2380,7 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
       [inspectorApp setPathsData: data];
     }
   }
-  if (inspectorApp && useInspector) {  
+  if (inspectorApp) {  
     [inspectorApp showContents];
   } 
 }
@@ -2393,7 +2394,7 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
       [inspectorApp setPathsData: data];
     }
   }
-  if (inspectorApp && useInspector) {  
+  if (inspectorApp) {  
     [inspectorApp showTools];
   } 
 }

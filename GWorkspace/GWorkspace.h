@@ -118,7 +118,6 @@
   BOOL fswnotifications;
 	
   id inspectorApp;
-  BOOL useInspector;
 
   id operationsApp;
     
