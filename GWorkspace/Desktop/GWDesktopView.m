@@ -113,8 +113,8 @@
       ASSIGN (backColor, DEF_COLOR);
     }
 
-    [self getDesktopInfo];
     backImageStyle = BackImageCenterStyle;
+    [self getDesktopInfo];
     [self makeIconsGrid];
     dragIcon = nil;
   }
@@ -454,12 +454,6 @@
   CREATE_AUTORELEASE_POOL (pool);
   NSSize size = NSMakeSize([self frame].size.width, 112);
   NSImage *image = [[NSImage alloc] initWithSize: size];
-  NSCachedImageRep *rep = [[NSCachedImageRep alloc] initWithSize: size
-                                    depth: [NSWindow defaultDepthLimit] 
-                                                separate: YES alpha: YES];
-
-  [image addRepresentation: rep];
-  RELEASE (rep);
 
   [image lockFocus];  
   NSCopyBits([[self window] gState], 
@@ -516,6 +510,7 @@
 
     entry = [dskinfo objectForKey: @"imagepath"];
     if (entry) {
+      CREATE_AUTORELEASE_POOL (pool);
       NSImage *image = [[NSImage alloc] initWithContentsOfFile: entry];
 
       if (image) {
@@ -523,6 +518,8 @@
         [self createBackImage: image];
         RELEASE (image);
       }
+      
+      RELEASE (pool);
     }
 
     entry = [dskinfo objectForKey: @"usebackimage"];
@@ -959,6 +956,7 @@
 
 - (void)showContentsOfNode:(FSNode *)anode
 {
+  CREATE_AUTORELEASE_POOL(arp);
   NSArray *subNodes = [anode subNodes];
   NSMutableArray *unsorted = [NSMutableArray array];
   int count = [icons count];
@@ -1035,6 +1033,7 @@
   
   [self tile];
   [self setNeedsDisplay: YES];
+  RELEASE (arp);
 }
 
 - (void)nodeContentsDidChange:(NSDictionary *)info
@@ -1275,8 +1274,25 @@
 
 - (id)addRepForSubnode:(FSNode *)anode
 {
-  FSNIcon *icon = [super addRepForSubnode: anode];
+  CREATE_AUTORELEASE_POOL(arp);
+  GWDesktopIcon *icon = [[GWDesktopIcon alloc] initForNode: anode
+                                        nodeInfoType: infoType
+                                        extendedType: extInfoType
+                                            iconSize: iconSize
+                                        iconPosition: iconPosition
+                                           labelFont: labelFont
+                                           textColor: textColor
+                                           gridIndex: -1
+                                           dndSource: YES
+                                           acceptDnd: YES
+                                           slideBack: YES];
+
   [icon setGridIndex: [self firstFreeGridIndex]];
+  [icons addObject: icon];
+  [self addSubview: icon];
+  RELEASE (icon);
+  RELEASE (arp);
+    
   return icon;
 }
 
@@ -1408,6 +1424,13 @@
     NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
     
     sourcePaths = [pbDict objectForKey: @"paths"];
+
+  } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {
+    NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
+    NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
+    
+    sourcePaths = [pbDict objectForKey: @"paths"];
+
   } else {
     return NSDragOperationNone;
   }
@@ -1609,6 +1632,13 @@ int sortDragged(id icn1, id icn2, void *context)
     [desktopApp concludeRemoteFilesDragOperation: pbData
                                      atLocalPath: [node path]];
     return;
+  
+  } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {  
+    NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
+
+    [desktopApp lsfolderDragOperation: pbData
+                      concludedAtPath: [node path]];
+    return;
   }
     
   sourcePaths = [[pb propertyListForType: NSFilenamesPboardType] mutableCopy];
@@ -1752,6 +1782,7 @@ int sortDragged(id icn1, id icn2, void *context)
 
 - (void)createBackImage:(NSImage *)image
 {
+  CREATE_AUTORELEASE_POOL (pool);
   NSSize imsize = [image size];
   
   if ((imsize.width >= screenFrame.size.width)
@@ -1803,6 +1834,7 @@ int sortDragged(id icn1, id icn2, void *context)
   }
   
   [[manager dock] setBackImage];
+  RELEASE (pool);
 }
 
 - (NSImage *)backImage
@@ -1817,6 +1849,7 @@ int sortDragged(id icn1, id icn2, void *context)
 
 - (void)setBackImageAtPath:(NSString *)impath
 {
+  CREATE_AUTORELEASE_POOL (pool);
   NSImage *image = [[NSImage alloc] initWithContentsOfFile: impath];
 
   if (image) {
@@ -1825,6 +1858,7 @@ int sortDragged(id icn1, id icn2, void *context)
     RELEASE (image);
     [self setNeedsDisplay: YES];
   }
+  RELEASE (pool);
 }
 
 - (BOOL)useBackImage

@@ -44,7 +44,8 @@
   NSString *extInfoType;
 
   NSArray *lastSelection;
-    
+
+  unsigned int mouseFlags;    
 	BOOL isDragTarget;
   FSNListViewNodeRep *dndTarget;
   unsigned int dragOperation;
@@ -72,6 +73,8 @@
 - (NSDictionary *)columnsDescription;
 
 - (void)sortNodeReps;
+
+- (void)setMouseFlags:(unsigned int)flags;
 
 - (void)doubleClickOnListView:(id)sender;
 
@@ -127,6 +130,9 @@
 // NSTableView delegate methods
 //
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification;
+
+- (BOOL)tableView:(NSTableView *)aTableView 
+  shouldSelectRow:(int)rowIndex;
 
 - (void)tableView:(NSTableView *)aTableView 
   willDisplayCell:(id)aCell 

@@ -56,8 +56,11 @@
 {
   self = [super init];
   if (self) {
-    NSArray *pbTypes = [NSArray arrayWithObjects: NSFilenamesPboardType, 
-                                          @"GWRemoteFilenamesPboardType", nil];
+    NSArray *pbTypes = [NSArray arrayWithObjects: 
+                                              NSFilenamesPboardType, 
+                                              @"GWLSFolderPboardType", 
+                                              @"GWRemoteFilenamesPboardType", 
+                                              nil];
     NSFont *font;
     int count;
 
@@ -502,6 +505,13 @@
     NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
     
     sourcePaths = [pbDict objectForKey: @"paths"];
+
+  } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {
+    NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
+    NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
+    
+    sourcePaths = [pbDict objectForKey: @"paths"];
+
   } else {
     return NSDragOperationNone;
   }
@@ -665,6 +675,13 @@
     
     [gw concludeRemoteFilesDragOperation: pbData
                              atLocalPath: [node path]];
+    return;
+  
+  } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {  
+    NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
+    
+    [gw lsfolderDragOperation: pbData
+              concludedAtPath: [node path]];
     return;
   }  
   

@@ -1,0 +1,30 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    FindModuleView = {
+	Actions = (
+	    "setModule:",
+	    "popUpAction:",
+	    "buttonsAction:"
+	);
+	Outlets = (
+	    win,
+	    mainBox,
+	    popUp,
+	    moduleBox,
+	    removeButt,
+	    addButt,
+	    module
+	);
+	Super = NSObject;
+    };
+    FirstResponder = {
+	Actions = (
+	    "buttonsAction:",
+	    "orderFrontFontPanel:",
+	    "popUpAction:",
+	    "setModule:",
+	    "startFind:"
+	);
+	Super = NSObject;
+    };
+}

@@ -182,6 +182,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
     
     [self registerForDraggedTypes: [NSArray arrayWithObjects: 
                                                 NSFilenamesPboardType, 
+                                                @"GWLSFolderPboardType", 
                                                 @"GWRemoteFilenamesPboardType", 
                                                 nil]];    
   }
@@ -728,8 +729,13 @@ pp.y = NSMaxY(br) + 1; \
 	  	return;
       
 		case NSCarriageReturnCharacter:
-      [desktopApp openSelectionInNewViewer: NO];
-      return;
+      {
+        unsigned flags = [theEvent modifierFlags];
+        BOOL closesndr = ((flags == NSAlternateKeyMask) 
+                                  || (flags == NSControlKeyMask));
+        [self openSelectionInNewViewer: closesndr];
+        return;
+      }
 
     default:    
       break;
@@ -868,6 +874,7 @@ pp.y = NSMaxY(br) + 1; \
 
 - (void)showContentsOfNode:(FSNode *)anode
 {
+  CREATE_AUTORELEASE_POOL(arp);
   NSArray *subNodes = [anode subNodes];
   int i;
 
@@ -904,6 +911,7 @@ pp.y = NSMaxY(br) + 1; \
   
   DESTROY (lastSelection);
   [self selectionDidChange];
+  RELEASE (arp);
 }
 
 - (NSDictionary *)readNodeInfo
@@ -1204,7 +1212,7 @@ pp.y = NSMaxY(br) + 1; \
   NSArray *files = [info objectForKey: @"files"];
   NSString *ndpath = [node path];
   int i; 
-
+ 
   if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
     files = [NSArray arrayWithObject: [source lastPathComponent]];
     source = [source stringByDeletingLastPathComponent]; 
@@ -1459,6 +1467,7 @@ pp.y = NSMaxY(br) + 1; \
 
 - (id)addRepForSubnode:(FSNode *)anode
 {
+  CREATE_AUTORELEASE_POOL(arp);
   FSNIcon *icon = [[FSNIcon alloc] initForNode: anode
                                   nodeInfoType: infoType
                                   extendedType: extInfoType
@@ -1473,7 +1482,8 @@ pp.y = NSMaxY(br) + 1; \
   [icons addObject: icon];
   [self addSubview: icon];
   RELEASE (icon);
-  
+  RELEASE (arp);
+    
   return icon;
 }
 
@@ -1870,6 +1880,13 @@ pp.y = NSMaxY(br) + 1; \
     NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
     
     sourcePaths = [pbDict objectForKey: @"paths"];
+
+  } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {
+    NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
+    NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
+    
+    sourcePaths = [pbDict objectForKey: @"paths"];
+
   } else {
     return NSDragOperationNone;
   }
@@ -2027,6 +2044,13 @@ pp.y = NSMaxY(br) + 1; \
 
     [desktopApp concludeRemoteFilesDragOperation: pbData
                                      atLocalPath: [node path]];
+    return;
+    
+  } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {  
+    NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
+
+    [desktopApp lsfolderDragOperation: pbData
+                      concludedAtPath: [node path]];
     return;
   }
     

@@ -79,7 +79,9 @@
 
 - (void)openSelectionInNewViewer:(BOOL)newv
 {
-  [viewer openSelectionInNewViewer: newv];
+  BOOL closesndr = ((mouseFlags == NSAlternateKeyMask) 
+                              || (mouseFlags == NSControlKeyMask));
+  [viewer openSelectionInNewViewer: (closesndr || newv)];
 }
 
 @end

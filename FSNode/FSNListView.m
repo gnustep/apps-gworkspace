@@ -120,7 +120,8 @@ static NSString *defaultColumns = @"{ \
 //	  [nameEditor setFont: [cellPrototype font]];
 		[nameEditor setBezeled: NO];
 		[nameEditor setAlignment: NSLeftTextAlignment];
-
+    
+    mouseFlags = 0;
     isDragTarget = NO;
   }
   
@@ -159,7 +160,7 @@ static NSString *defaultColumns = @"{ \
   int type = [identifier intValue];
   float width = [[info objectForKey: @"width"] floatValue];
   float minwidth = [[info objectForKey: @"minwidth"] floatValue];
-  NSTableColumn *column  = [[NSTableColumn alloc] initWithIdentifier: identifier];
+  NSTableColumn *column = [[NSTableColumn alloc] initWithIdentifier: identifier];
   
   [column setDataCell: AUTORELEASE ([[FSNTextCell alloc] init])];
   [column setEditable: NO];
@@ -281,6 +282,11 @@ static NSString *defaultColumns = @"{ \
   if (column) {
     [listView setHighlightedTableColumn: column];
   }
+}
+
+- (void)setMouseFlags:(unsigned int)flags
+{
+  mouseFlags = flags;
 }
 
 - (void)doubleClickOnListView:(id)sender
@@ -478,7 +484,8 @@ static NSString *defaultColumns = @"{ \
 - (BOOL)tableView:(NSTableView *)aTableView 
   shouldSelectRow:(int)rowIndex
 {
-  return !([[nodeReps objectAtIndex: rowIndex] isLocked]);
+  return ((rowIndex != -1) 
+                && ([[nodeReps objectAtIndex: rowIndex] isLocked] == NO));
 }
 
 - (void)tableView:(NSTableView *)aTableView 
@@ -826,6 +833,8 @@ static NSString *defaultColumns = @"{ \
   BOOL needsreload = NO;
   int i; 
 
+  [self stopRepNameEditing];
+
   if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
     files = [NSArray arrayWithObject: [source lastPathComponent]];
     source = [source stringByDeletingLastPathComponent]; 
@@ -839,7 +848,7 @@ static NSString *defaultColumns = @"{ \
     [self reloadContents];
     return;
   }
-
+  
   if ([ndpath isEqual: source]) {
     if ([operation isEqual: @"NSWorkspaceMoveOperation"]
               || [operation isEqual: @"NSWorkspaceDestroyOperation"]
@@ -1578,13 +1587,20 @@ static NSString *defaultColumns = @"{ \
     pb = [sender draggingPasteboard];
 
     if (pb && [[pb types] containsObject: NSFilenamesPboardType]) {
-    sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
+      sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
 
     } else if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"]) {
       NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"]; 
       NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
 
       sourcePaths = [pbDict objectForKey: @"paths"];
+
+    } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {
+      NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
+      NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
+
+      sourcePaths = [pbDict objectForKey: @"paths"];
+
     } else {
       return NSDragOperationNone;
     }
@@ -1723,6 +1739,16 @@ static NSString *defaultColumns = @"{ \
 
       [desktopApp concludeRemoteFilesDragOperation: pbData
                                        atLocalPath: [node path]];
+      isDragTarget = NO;
+      dndTarget = nil;
+      dndValidRect = NSZeroRect;
+      return;
+      
+    } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {  
+      NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
+
+      [desktopApp lsfolderDragOperation: pbData
+                        concludedAtPath: [node path]];
       isDragTarget = NO;
       dndTarget = nil;
       dndValidRect = NSZeroRect;
@@ -2130,6 +2156,13 @@ static NSString *defaultColumns = @"{ \
     NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
     
     sourcePaths = [pbDict objectForKey: @"paths"];
+
+  } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {
+    NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
+    NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
+    
+    sourcePaths = [pbDict objectForKey: @"paths"];
+
   } else {
     return NSDragOperationNone;
   }
@@ -2195,6 +2228,13 @@ static NSString *defaultColumns = @"{ \
 
     [desktopApp concludeRemoteFilesDragOperation: pbData
                                      atLocalPath: [node path]];
+    return;
+    
+  } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {  
+    NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
+
+    [desktopApp lsfolderDragOperation: pbData
+                      concludedAtPath: [node path]];
     return;
   }
 
@@ -2313,6 +2353,7 @@ static NSString *defaultColumns = @"{ \
   
     [self registerForDraggedTypes: [NSArray arrayWithObjects: 
                                                 NSFilenamesPboardType, 
+                                                @"GWLSFolderPboardType", 
                                                 @"GWRemoteFilenamesPboardType", 
                                                 nil]];    
   }
@@ -2333,6 +2374,8 @@ static NSString *defaultColumns = @"{ \
   NSPoint location;
   int clickCount;
   int row;
+  
+  [dsource setMouseFlags: [theEvent modifierFlags]];
     
   [dsource stopRepNameEditing];
   
@@ -2415,9 +2458,14 @@ static NSString *defaultColumns = @"{ \
       return;
   
 		case NSCarriageReturnCharacter:
-      [dsource openSelectionInNewViewer: NO];
-      return;
-  
+      {
+        unsigned flags = [theEvent modifierFlags];
+        BOOL closesndr = ((flags == NSAlternateKeyMask) 
+                                  || (flags == NSControlKeyMask));
+        [dsource openSelectionInNewViewer: closesndr];
+        return;
+      }
+      
     default:    
       break;
   }

@@ -271,6 +271,7 @@ static id <DesktopApplication> desktopApp = nil;
 
 - (void)createRowsInMatrix
 {
+  CREATE_AUTORELEASE_POOL (pool);
   NSArray *subNodes = [shownNode subNodes];
   int count = [subNodes count];
   SEL compSel = [fsnodeRep compareSelectorForDirectory: [shownNode path]];
@@ -332,6 +333,7 @@ static id <DesktopApplication> desktopApp = nil;
   }
 
   [matrix sortUsingSelector: compSel];
+  RELEASE (pool);
 }
 
 - (void)addCellsWithNames:(NSArray *)names
@@ -1054,8 +1056,13 @@ static id <DesktopApplication> desktopApp = nil;
 
 - (void)setFrame:(NSRect)frameRect
 {
-  NSRect r = NSMakeRect(0, 0, frameRect.size.width, frameRect.size.height);
-
+  NSRect r = NSMakeRect(1, 0, frameRect.size.width -1, frameRect.size.height);
+  
+  if (index == [browser firstVisibleColumn]) {
+    r.origin.x = 0;
+    r.size.width += 1;
+  }
+  
   CHECKRECT (frameRect);
   [super setFrame: frameRect]; 
    
@@ -1072,6 +1079,12 @@ static id <DesktopApplication> desktopApp = nil;
   [super drawRect: rect];
   [backColor set];
   NSRectFill(rect);
+  
+  if (index != [browser firstVisibleColumn]) {
+	  [[NSColor blackColor] set];  
+    [NSBezierPath strokeLineFromPoint: NSMakePoint(0, 0) 
+                              toPoint: NSMakePoint(0, rect.size.height)];
+  }
 }
 
 @end
@@ -1105,6 +1118,13 @@ static id <DesktopApplication> desktopApp = nil;
     NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
     
     sourcePaths = [pbDict objectForKey: @"paths"];
+    
+  } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {
+    NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
+    NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
+    
+    sourcePaths = [pbDict objectForKey: @"paths"];
+    
   } else {
     return NSDragOperationNone;
   }
@@ -1213,6 +1233,13 @@ static id <DesktopApplication> desktopApp = nil;
     [desktopApp concludeRemoteFilesDragOperation: pbData
                                      atLocalPath: [shownNode path]];
     return;
+    
+  } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {  
+    NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
+
+    [desktopApp lsfolderDragOperation: pbData
+                      concludedAtPath: [shownNode path]];
+    return;
   }
     
   sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
@@ -1276,6 +1303,13 @@ static id <DesktopApplication> desktopApp = nil;
     NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
     
     sourcePaths = [pbDict objectForKey: @"paths"];
+
+  } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {
+    NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
+    NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
+    
+    sourcePaths = [pbDict objectForKey: @"paths"];
+
   } else {
     return NSDragOperationNone;
   }
@@ -1339,6 +1373,13 @@ static id <DesktopApplication> desktopApp = nil;
 
     [desktopApp concludeRemoteFilesDragOperation: pbData
                                      atLocalPath: [[cell node] path]];
+    return;
+    
+  } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {  
+    NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
+
+    [desktopApp lsfolderDragOperation: pbData
+                      concludedAtPath: [[cell node] path]];
     return;
   }
 

@@ -1,0 +1,23 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    FModuleContents = {
+	Actions = (
+	);
+	Outlets = (
+	    win,
+	    controlsBox,
+	    textField,
+	    label
+	);
+	Super = NSObject;
+    };
+    FirstResponder = {
+	Actions = (
+	    "orderFrontFontPanel:",
+	    "startFind:",
+	    "popUpAction:",
+	    "buttonsAction:"
+	);
+	Super = NSObject;
+    };
+}

@@ -40,6 +40,7 @@
 #include "GWViewersManager.h"
 #include "GWViewer.h"
 #include "GWSpatialViewer.h"
+#include "Finder.h"
 #include "FileAnnotationsManager.h"
 #include "FileAnnotation.h"
 #include "TShelf/TShelfWin.h"
@@ -131,8 +132,12 @@ static GWorkspace *gworkspace = nil;
   if ([filename isAbsolutePath] 
                     && [fm fileExistsAtPath: filename isDirectory: &isDir]) {
     if (isDir) {
-      [self newViewerAtPath: filename];
-      return YES;
+      if ([[filename pathExtension] isEqual: @"lsf"]) {
+        return [finder openLiveSearchFolderAtPath: filename];
+      } else {
+        [self newViewerAtPath: filename];
+        return YES;
+      }
     } else {
       [self selectFile: filename 
         inFileViewerRootedAtPath: [filename stringByDeletingLastPathComponent]];
@@ -400,7 +405,6 @@ static GWorkspace *gworkspace = nil;
   [[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
   [[NSNotificationCenter defaultCenter] removeObserver: self];
   DESTROY (inspectorApp);
-  DESTROY (finderApp);
   DESTROY (operationsApp);
   DESTROY (recyclerApp);
   DESTROY (ddbd);
@@ -415,9 +419,9 @@ static GWorkspace *gworkspace = nil;
   RELEASE (startAppWin);
   TEST_RELEASE (tshelfWin);
   TEST_RELEASE (tshelfPBDir);
-  TEST_RELEASE (tshelfBackground);
   RELEASE (vwrsManager);
   RELEASE (dtopManager);
+  RELEASE (finder);
   
 	[super dealloc];
 }
@@ -556,8 +560,7 @@ static GWorkspace *gworkspace = nil;
     [item setTitle: NSLocalizedString(@"Hide Desktop", @"")];
   }
   
-  tshelfBackground = nil; 
-  [self makeTshelfBackground];
+  finder = [Finder finder];
   
   if ([defaults boolForKey: @"usefiend"]) {
     [self showFiend: nil];
@@ -579,9 +582,7 @@ static GWorkspace *gworkspace = nil;
   if ([defaults boolForKey: @"uses_inspector"]) {  
     [self connectInspector];
   }
-  
-  finderApp = nil;
-  
+    
   recyclerApp = nil;
   if ([defaults boolForKey: @"uses_recycler"]) {  
     [self connectRecycler];
@@ -671,17 +672,8 @@ static GWorkspace *gworkspace = nil;
     }
   }
 
-  if (finderApp) {
-    NSConnection *fndrconn = [(NSDistantObject *)finderApp connectionForProxy];
+  [finder stopAllSearchs];
   
-    if (fndrconn && [fndrconn isValid]) {
-      [[NSNotificationCenter defaultCenter] removeObserver: self
-	                        name: NSConnectionDidDieNotification
-	                      object: fndrconn];
-      DESTROY (finderApp);
-    }
-  }
-
   if (recyclerApp) {
     NSConnection *rcconn = [(NSDistantObject *)recyclerApp connectionForProxy];
   
@@ -769,27 +761,12 @@ static GWorkspace *gworkspace = nil;
 
 - (NSImage *)tshelfBackground
 {
-  return tshelfBackground;
-}
-
-- (void)makeTshelfBackground
-{
-  DESTROY (tshelfBackground);
-  
-  if ([dtopManager isActive]) {
-    NSImage *image = [dtopManager tabbedShelfBackground];
-    
-    if (image) {   
-      ASSIGN (tshelfBackground, image);
-    }
-  }
+  return ([dtopManager isActive]) ? [dtopManager tabbedShelfBackground] : nil;
 }
 
 - (void)tshelfBackgroundDidChange
 {
-  [self makeTshelfBackground];
-  
-  if ((tshelfWin != nil) && ([tshelfWin isVisible])) {
+  if (tshelfWin && [tshelfWin isVisible]) {
     [[tshelfWin shelfView] setNeedsDisplay: YES];
   }  
 }
@@ -897,6 +874,8 @@ static GWorkspace *gworkspace = nil;
 
   [dtopManager updateDefaults];
   [defaults setBool: [dtopManager isActive] forKey: @"uses_desktop"];
+
+	[finder updateDefaults];
       
 	[defaults setObject: defEditor forKey: @"defaulteditor"];
 	[defaults setObject: defXterm forKey: @"defxterm"];
@@ -1278,17 +1257,12 @@ static GWorkspace *gworkspace = nil;
   if (paths && ([selectedPaths isEqualToArray: paths] == NO)) {
     ASSIGN (selectedPaths, paths);
 
-    if (inspectorApp || finderApp) {
+    if (inspectorApp) {
       NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
-
-      if (inspectorApp) {
-        [inspectorApp setPathsData: data];
-      }
-      
-      if (finderApp) {
-        [finderApp setSelectionData: data];
-      }
+      [inspectorApp setPathsData: data];
     }
+    
+    [finder setCurrentSelection: paths];
     
 	  [[NSNotificationCenter defaultCenter]
  				 postNotificationName: GWCurrentSelectionChangedNotification
@@ -1302,16 +1276,9 @@ static GWorkspace *gworkspace = nil;
     return;
   }
   
-  if (inspectorApp || finderApp) {
+  if (inspectorApp) {
     NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
-
-    if (inspectorApp) {
-      [inspectorApp setPathsData: data];
-    }
-
-    if (finderApp) {
-      [finderApp setSelectionData: data];
-    }
+    [inspectorApp setPathsData: data];
   }
 				
   [[NSNotificationCenter defaultCenter]
@@ -1639,7 +1606,7 @@ static GWorkspace *gworkspace = nil;
 
 	    if (recursion == NO) {
         if (cmd == nil) {
-            cmd = RETAIN ([[NSSearchPathForDirectoriesInDomains(
+          cmd = RETAIN ([[NSSearchPathForDirectoriesInDomains(
                       GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
                             stringByAppendingPathComponent: @"fswatcher"]);
 		    }
@@ -1829,98 +1796,6 @@ static GWorkspace *gworkspace = nil;
     if (inspectorApp) {
       NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
       [inspectorApp setPathsData: data];
-    }
-  }
-}
-
-- (void)connectFinder
-{
-  if (finderApp == nil) {
-    id fndr = [NSConnection rootProxyForConnectionWithRegisteredName: @"Finder" 
-                                                                host: @""];
-
-    if (fndr) {
-      NSConnection *c = [fndr connectionForProxy];
-
-	    [[NSNotificationCenter defaultCenter] addObserver: self
-	                   selector: @selector(finderConnectionDidDie:)
-		                     name: NSConnectionDidDieNotification
-		                   object: c];
-      
-      finderApp = fndr;
-	    [finderApp setProtocolForProxy: @protocol(FinderAppProtocol)];
-      RETAIN (finderApp);
-      
-      if (selectedPaths) {
-        NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
-        [finderApp setSelectionData: data];
-      }
-      
-	  } else {
-	    static BOOL recursion = NO;
-	  
-      if (recursion == NO) {
-        int i;
-        
-        [startAppWin showWindowWithTitle: @"GWorkspace"
-                                 appName: @"Finder"
-                            maxProgValue: 80.0];
-
-        [ws launchApplication: @"Finder"];
-
-        for (i = 1; i <= 80; i++) {
-          [startAppWin updateProgressBy: 1.0];
-	        [[NSRunLoop currentRunLoop] runUntilDate:
-		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
-          fndr = [NSConnection rootProxyForConnectionWithRegisteredName: @"Finder" 
-                                                                   host: @""];                  
-          if (fndr) {
-            [startAppWin updateProgressBy: 80.0 - i];
-            break;
-          }
-        }
-        
-        [[startAppWin win] close];
-        
-	      recursion = YES;
-	      [self connectFinder];
-	      recursion = NO;
-        
-	    } else { 
-	      recursion = NO;
-        NSRunAlertPanel(nil,
-                NSLocalizedString(@"unable to contact Finder!", @""),
-                NSLocalizedString(@"Ok", @""),
-                nil, 
-                nil);  
-      }
-	  }
-  }
-}
-
-- (void)finderConnectionDidDie:(NSNotification *)notif
-{
-  id connection = [notif object];
-
-  [[NSNotificationCenter defaultCenter] removeObserver: self
-	                    name: NSConnectionDidDieNotification
-	                  object: connection];
-
-  NSAssert(connection == [finderApp connectionForProxy],
-		                                  NSInternalInconsistencyException);
-  RELEASE (finderApp);
-  finderApp = nil;
-
-  if (NSRunAlertPanel(nil,
-                    NSLocalizedString(@"The Finder connection died.\nDo you want to restart it?", @""),
-                    NSLocalizedString(@"Yes", @""),
-                    NSLocalizedString(@"No", @""),
-                    nil)) {
-    [self connectFinder]; 
-     
-    if (finderApp) {
-      NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
-      [finderApp setSelectionData: data];
     }
   }
 }
@@ -2419,16 +2294,7 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 
 - (void)showFinder:(id)sender
 {
-	if (finderApp == nil) {
-    [self connectFinder];
-    if (finderApp) {
-      NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
-      [finderApp setSelectionData: data];
-    }    
-  }
-	if (finderApp) {
-    [finderApp showWindow];
-  }   
+  [finder activate];   
 }
 
 - (void)showFiend:(id)sender
@@ -2833,6 +2699,12 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
   [self performFileOperationWithDictionary: opinfo];
 }
 
+- (void)lsfolderDragOperation:(NSData *)opinfo
+              concludedAtPath:(NSString *)path
+{
+  [finder lsfolderDragOperation: opinfo concludedAtPath: path];
+}     
+                          
 - (void)concludeRemoteFilesDragOperation:(NSData *)opinfo
                              atLocalPath:(NSString *)localPath
 {

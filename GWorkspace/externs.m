@@ -68,6 +68,9 @@ NSString *GWOpenFolderIconName = @"FileIcon_Directory_Open.tiff";
 NSString *GWSmallOpenFolderIconName = @"FileIcon_Directory_Open_Small.tiff";
 NSString *GWCellHighlightIconName = @"CellHighlight.tiff";  
 
+/* The name of the pasteboard for the Live Search Folders */
+NSString *GWLSFolderPboardType = @"GWLSFolderPboardType";
+
 /* The name of the pasteboard for GWNet */
 NSString *GWRemoteFilenamesPboardType = @"GWRemoteFilenamesPboardType";
 

@@ -4,6 +4,9 @@ before-all::
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/GWorkspace
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Desktop
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Desktop/Dock
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Finder
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Finder/SearchResults
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Finder/LiveSearch
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/FileViewer
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/FileAnnotations
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/TShelf
@@ -22,6 +25,9 @@ before-all::
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/FileViewer
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Desktop  
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Desktop/Dock
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Finder  
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Finder/SearchResults
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Finder/LiveSearch
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/FileAnnotations
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/TShelf
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Preferences

@@ -98,6 +98,8 @@ NSString *relativePathFittingInContainer(id container, NSString *fullPath);
 
 int pathComponentsToPath(NSString *path);
 
+NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
+
 NSString *commonPrefixInArray(NSArray *a);
 
 int comparePaths(id *p1, id *p2, void *context);

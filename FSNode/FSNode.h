@@ -99,6 +99,8 @@
 + (NSArray *)pathComponentsFromNode:(FSNode *)firstNode 
                              toNode:(FSNode *)secondNode;
 
++ (NSArray *)pathsOfNodes:(NSArray *)nodes;
+
 + (unsigned int)indexOfNode:(FSNode *)anode 
                inComponents:(NSArray *)nodes;
 

@@ -224,6 +224,7 @@ static NSImage *branchImage;
     
     if (acceptDnd) {
       NSArray *pbTypes = [NSArray arrayWithObjects: NSFilenamesPboardType, 
+                                                    @"GWLSFolderPboardType", 
                                                     @"GWRemoteFilenamesPboardType", 
                                                     nil];
       [self registerForDraggedTypes: pbTypes];    
@@ -1180,6 +1181,13 @@ static NSImage *branchImage;
     NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
     
     sourcePaths = [pbDict objectForKey: @"paths"];
+
+  } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {
+    NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
+    NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
+    
+    sourcePaths = [pbDict objectForKey: @"paths"];
+
   } else {
     return NSDragOperationNone;
   }
@@ -1336,6 +1344,13 @@ static NSImage *branchImage;
 
     [desktopApp concludeRemoteFilesDragOperation: pbData
                                      atLocalPath: [node path]];
+    return;
+    
+  } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {  
+    NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
+
+    [desktopApp lsfolderDragOperation: pbData
+                      concludedAtPath: [node path]];
     return;
   }
     

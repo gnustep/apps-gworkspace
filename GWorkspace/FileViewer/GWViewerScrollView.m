@@ -52,6 +52,7 @@
     if ([nodeView needsDndProxy]) {
       [self registerForDraggedTypes: [NSArray arrayWithObjects: 
                                               NSFilenamesPboardType, 
+                                              @"GWLSFolderPboardType", 
                                               @"GWRemoteFilenamesPboardType", 
                                               nil]];    
     } else {

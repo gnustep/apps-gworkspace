@@ -434,8 +434,6 @@
 	  [[self window]  setFrame: winrect display: YES];
 	  hiddentabs = YES;
   }
-  
-  [[GWorkspace gworkspace] makeTshelfBackground];
 }
 
 - (BOOL)hiddenTabs

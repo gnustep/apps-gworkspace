@@ -1,0 +1,30 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    FirstResponder = {
+	Actions = (
+	    "orderFrontFontPanel:",
+	    "stopSearch:",
+	    "restartSearch:"
+	);
+	Super = NSObject;
+    };
+    SearchResults = {
+	Actions = (
+	    "stopSearch:",
+	    "restartSearch:"
+	);
+	Outlets = (
+	    win,
+	    topBox,
+	    progBox,
+	    elementsLabel,
+	    stopButt,
+	    restartButt,
+	    dragIconBox,
+	    splitView,
+	    resultsScroll,
+	    pathsScroll
+	);
+	Super = NSObject;
+    };
+}

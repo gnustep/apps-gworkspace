@@ -61,6 +61,8 @@
 
 - (unsigned int )mouseFlags;
 
+- (void)setMouseFlags:(unsigned int)flags;
+
 @end
 
 

@@ -153,6 +153,7 @@
 
 - (NSArray *)subNodes 
 {
+  CREATE_AUTORELEASE_POOL(arp);
   NSMutableArray *nodes = [NSMutableArray array];
   NSArray *fnames = [fsnodeRep directoryContentsAtPath: path];
   int i;
@@ -165,11 +166,15 @@
     RELEASE (node);
   }
   
-  return nodes;
+  RETAIN (nodes);
+  RELEASE (arp);
+    
+  return [[nodes autorelease] makeImmutableCopyOnFail: NO];
 }
 
 + (NSArray *)nodeComponentsToNode:(FSNode *)anode
 {
+  CREATE_AUTORELEASE_POOL(arp);
   NSArray *pcomps = [self pathComponentsToNode: anode];
   NSMutableArray *components = [NSMutableArray array];
   int i;
@@ -182,7 +187,10 @@
     [components insertObject: node atIndex: [components count]];
   }
   
-  return [NSArray arrayWithArray: components];
+  RETAIN (components);
+  RELEASE (arp);
+  
+  return [[components autorelease] makeImmutableCopyOnFail: NO];
 }
 
 + (NSArray *)pathComponentsToNode:(FSNode *)anode
@@ -237,6 +245,22 @@
   }
   
   return nil;
+}
+
++ (NSArray *)pathsOfNodes:(NSArray *)nodes
+{
+  CREATE_AUTORELEASE_POOL(arp);
+  NSMutableArray *paths = [NSMutableArray array];
+  int i;
+  
+  for (i = 0; i < [nodes count]; i++) {
+    [paths addObject: [[nodes objectAtIndex: i] path]];
+  }
+  
+  RETAIN (paths);
+  RELEASE (arp);
+  
+  return [[paths autorelease] makeImmutableCopyOnFail: NO];
 }
 
 + (unsigned int)indexOfNode:(FSNode *)anode 

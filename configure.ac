@@ -12,7 +12,6 @@ AC_CHECK_HEADERS(dir.h unistd.h)
 AC_CHECK_FUNCS(getpwnam getpwuid geteuid getlogin)
 
 AC_CONFIG_AUX_DIR([$GNUSTEP_MAKEFILES])
-AC_CONFIG_HEADER([Finder/config.h])
 
 #--------------------------------------------------------------------
 # We need sh
@@ -55,12 +54,11 @@ AC_SUBST(have_pdfkit)
 CPPFLAGS="$save_CPPFLAGS"
 
 AC_CONFIG_FILES([GNUmakefile \
-									Utilities/ddbd/GNUmakefile \
+									Tools/ddbd/GNUmakefile \
 									GWorkspace/GNUmakefile \
 									GWorkspace/GWorkspaceInfo.plist \
 									gworkspace.make \
                   Inspector/GNUmakefile \
                   Inspector/InspectorInfo.plist \
-                  Inspector/inspector.make \
-                  Finder/GNUmakefile])
+                  Inspector/inspector.make])
 AC_OUTPUT

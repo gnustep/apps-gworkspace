@@ -47,6 +47,7 @@
     if (dnd) {
       [self registerForDraggedTypes: [NSArray arrayWithObjects: 
                                                 NSFilenamesPboardType, 
+                                                @"GWLSFolderPboardType", 
                                                 @"GWRemoteFilenamesPboardType", 
                                                 nil]];    
     }

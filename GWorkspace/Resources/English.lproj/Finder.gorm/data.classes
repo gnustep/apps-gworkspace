@@ -1,0 +1,40 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    Finder = {
+	Actions = (
+	    "chooseSearchPlacesType:",
+	    "addSearchPlaceFromDialog:",
+	    "removeSearchPlaceButtAction:",
+	    "startFind:"
+	);
+	Outlets = (
+	    win,
+	    searchLabel,
+	    wherePopUp,
+	    placesBox,
+	    addPlaceButt,
+	    removePlaceButt,
+	    itemsLabel,
+	    modulesBox,
+	    findButt
+	);
+	Super = NSObject;
+    };
+    FirstResponder = {
+	Actions = (
+	    "orderFrontFontPanel:",
+	    "startFind:",
+	    "chooseSearchPlacesType:",
+	    "addSearchPlaceFromDialog:",
+	    "removeSearchPlaceButtAction:"
+	);
+	Super = NSObject;
+    };
+    SearchPlacesBox = {
+	Actions = (
+	);
+	Outlets = (
+	);
+	Super = NSBox;
+    };
+}

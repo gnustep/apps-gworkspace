@@ -276,6 +276,9 @@ typedef enum FSNSelectionMask {
 
 - (void)performFileOperation:(NSDictionary *)opinfo;
 
+- (void)lsfolderDragOperation:(NSData *)opinfo
+              concludedAtPath:(NSString *)path;
+
 - (void)concludeRemoteFilesDragOperation:(NSData *)opinfo
                              atLocalPath:(NSString *)localdest;
 

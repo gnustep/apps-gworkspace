@@ -10,6 +10,11 @@ VERSION = @PACKAGE_VERSION@
 GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
 
 #
+# subprojects
+#
+SUBPROJECTS = Finder/Modules 
+
+#
 # MAIN APP
 #
 APP_NAME = GWorkspace
@@ -68,6 +73,15 @@ FileViewer/GWViewerIconsPath.m \
 FileViewer/GWViewerPathsPopUp.m \
 FileAnnotations/FileAnnotationsManager.m \
 FileAnnotations/FileAnnotation.m \
+Finder/Finder.m \
+Finder/FindModuleView.m \
+Finder/SearchPlacesBox.m \
+Finder/SearchPlacesCell.m \
+Finder/SearchResults/SearchResults.m \
+Finder/SearchResults/ResultsTableView.m \
+Finder/SearchResults/ResultsPathsView.m \
+Finder/LiveSearch/LSFolder.m \
+Finder/LiveSearch/LSFUpdater.m \
 TShelf/TShelfWin.m \
 TShelf/TShelfView.m \
 TShelf/TShelfViewItem.m \

@@ -431,6 +431,15 @@ int pathComponentsToPath(NSString *path)
   return [[path pathComponents] count] - 1;
 }
 
+NSString *pathRemovingPrefix(NSString *path, NSString *prefix)
+{
+  if ([path hasPrefix: prefix]) {
+	  return [path substringFromIndex: [path rangeOfString: prefix].length + 1];
+  }
+
+  return path;  	
+}
+
 NSString *commonPrefixInArray(NSArray *a)
 {
   NSString *s = @"";

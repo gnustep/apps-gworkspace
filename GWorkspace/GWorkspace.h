@@ -36,6 +36,7 @@
 @class FSNodeRep;
 @class GWViewersManager;
 @class GWDesktopManager;
+@class Finder;
 @class GWViewer;
 @class PrefController;
 @class Fiend;
@@ -90,15 +91,6 @@
 @end
 
 
-@protocol	FinderAppProtocol
-
-- (oneway void)setSelectionData:(NSData *)data;
-
-- (oneway void)showWindow;
-
-@end
-
-
 @protocol	RecyclerAppProtocol
 
 - (oneway void)emptyTrash:(id)sender;
@@ -144,7 +136,6 @@
 	
   id inspectorApp;
   id operationsApp;
-  id finderApp;
   id recyclerApp;
   
   id ddbd;
@@ -158,6 +149,7 @@
   GWViewersManager *vwrsManager;
   GWDesktopManager *dtopManager;  
   FileAnnotationsManager *fannManager;
+  Finder *finder;
   
   BOOL animateChdir;
   BOOL animateSlideBack;
@@ -167,7 +159,6 @@
   BOOL dontWarnOnQuit;
   
   TShelfWin *tshelfWin;
-  NSImage *tshelfBackground;
   NSString *tshelfPBDir;
   int tshelfPBFileNum;
       
@@ -206,8 +197,6 @@
 - (History *)historyWindow;
 
 - (NSImage *)tshelfBackground;	
-
-- (void)makeTshelfBackground;
 
 - (void)tshelfBackgroundDidChange;
 
@@ -288,10 +277,6 @@
 - (void)connectInspector;
 
 - (void)inspectorConnectionDidDie:(NSNotification *)notif;
-
-- (void)connectFinder;
-
-- (void)finderConnectionDidDie:(NSNotification *)notif;
 
 - (void)connectRecycler;
 
@@ -403,6 +388,9 @@
 
 - (void)performFileOperation:(NSDictionary *)opinfo;
 
+- (void)lsfolderDragOperation:(NSData *)opinfo
+              concludedAtPath:(NSString *)path;
+                          
 - (void)concludeRemoteFilesDragOperation:(NSData *)opinfo
                              atLocalPath:(NSString *)localPath;
 

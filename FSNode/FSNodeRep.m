@@ -150,6 +150,7 @@ static FSNodeRep *shared = nil;
   return AUTORELEASE (newIcon);
 */
 
+  CREATE_AUTORELEASE_POOL(arp);
   NSImage *newIcon = [icon copy];
   NSSize icnsize = [icon size];
   float fact;
@@ -165,8 +166,9 @@ static FSNodeRep *shared = nil;
 
 	[newIcon setScalesWhenResized: YES];
 	[newIcon setSize: newsize];  
-
-  return AUTORELEASE (newIcon);
+  RELEASE (arp);
+  
+  return [newIcon autorelease];  
 }
 
 - (void)prepareThumbnailsCache

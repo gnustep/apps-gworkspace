@@ -9,6 +9,10 @@
     {
       NSUnixExtensions = ( "inspector" );
       NSIcon = "MagnifyGlas.tiff";
-    }    
+    },
+      {
+        NSUnixExtensions = ( "lsf" );
+        NSIcon = "LiveSearchFolder.tiff";
+      }        
   );
 }

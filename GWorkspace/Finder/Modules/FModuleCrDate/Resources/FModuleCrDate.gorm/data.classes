@@ -1,0 +1,28 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    FModuleCrDate = {
+	Actions = (
+	    "popUpAction:",
+	    "stepperAction:"
+	);
+	Outlets = (
+	    win,
+	    controlsBox,
+	    isPopUp,
+	    whenPopUp,
+	    dateField,
+	    dateStepper
+	);
+	Super = NSObject;
+    };
+    FirstResponder = {
+	Actions = (
+	    "orderFrontFontPanel:",
+	    "startFind:",
+	    "popUpAction:",
+	    "buttonsAction:",
+	    "stepperAction:"
+	);
+	Super = NSObject;
+    };
+}

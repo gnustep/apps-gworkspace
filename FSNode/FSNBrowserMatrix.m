@@ -61,6 +61,7 @@
     if (acceptDnd) {
       [self registerForDraggedTypes: [NSArray arrayWithObjects: 
                                             NSFilenamesPboardType, 
+                                            @"GWLSFolderPboardType", 
                                             @"GWRemoteFilenamesPboardType", 
                                             nil]];    
     }
@@ -155,6 +156,11 @@
 - (unsigned int )mouseFlags
 {
   return mouseFlags;
+}
+
+- (void)setMouseFlags:(unsigned int)flags
+{
+  mouseFlags = flags;
 }
 
 - (void)mouseDown:(NSEvent*)theEvent

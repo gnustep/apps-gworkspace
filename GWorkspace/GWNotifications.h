@@ -68,6 +68,9 @@ extern NSString *GWOpenFolderIconName;
 extern NSString *GWSmallOpenFolderIconName;
 extern NSString *GWCellHighlightIconName;
 
+/* The name of the pasteboard for the Live Search Folders */
+extern NSString *GWLSFolderPboardType;
+
 /* The name of the pasteboard for GWNet */
 extern NSString *GWRemoteFilenamesPboardType;
 

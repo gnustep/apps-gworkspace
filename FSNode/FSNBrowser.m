@@ -390,6 +390,7 @@
 
 - (FSNBrowserColumn *)createEmptyColumn
 {
+  CREATE_AUTORELEASE_POOL(arp);
   int count = [columns count];
   FSNBrowserColumn *bc = [[FSNBrowserColumn alloc] initInBrowser: self
                                        atIndex: count
@@ -402,7 +403,8 @@
   [columns insertObject: bc atIndex: count];
   [self addSubview: bc]; 
   RELEASE(bc);
-	
+  RELEASE (arp);
+  	
   return bc;
 }
 
@@ -1129,8 +1131,9 @@
     unsigned int mouseFlags = [(FSNBrowserMatrix *)[col cmatrix] mouseFlags];
     BOOL closesndr = ((mouseFlags == NSAlternateKeyMask) 
                               || (mouseFlags == NSControlKeyMask));
-
-    [manager openSelectionInViewer: viewer closeSender: closesndr];
+    
+    [viewer openSelectionInNewViewer: closesndr];
+//    [manager openSelectionInViewer: viewer closeSender: closesndr];
   } else {
     [desktopApp openSelectionInNewViewer: NO];
   }
@@ -1209,6 +1212,7 @@
 	  	return;
       
 		case NSCarriageReturnCharacter:
+      [(FSNBrowserMatrix *)matrix setMouseFlags: [theEvent modifierFlags]];
       [matrix sendDoubleAction];
       return;
   }  
@@ -1304,6 +1308,7 @@
   }
 }
 
+/*
 - (void)drawRect:(NSRect)rect
 {
   int i;
@@ -1316,6 +1321,7 @@
     [NSBezierPath strokeLineFromPoint: p1 toPoint: p2];
   }  
 }
+*/
 
 @end
 
