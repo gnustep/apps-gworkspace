@@ -106,83 +106,7 @@ NSString *fixpath(NSString *s, const char *c)
   return fix_path(s, c);
 }
 
-NSString *cutFileLabelText(NSString *filename, id label, int lenght)
-{
-	if (lenght > 0) {
-		return cut_Text(filename, label, lenght);
-	}
-  
-	return filename;
-}
-
-NSString *subtractPathComponentToPath(NSString *apath, NSString *firstpart)
-{
-	NSString *secondpart;
-	int pos;
-		
-	if([apath isEqualToString: firstpart] == YES) {
-		return fixpath(@"/", 0);
-  }
-	pos = [apath rangeOfString: firstpart].length +1;
-	secondpart = [apath substringFromIndex: pos];
-
-	return secondpart;
-}
-
-BOOL subPathOfPath(NSString *p1, NSString *p2)
-{
-  int l1 = [p1 length];
-  int l2 = [p2 length];  
-
-  if ((l1 > l2) || ([p1 isEqualToString: p2])) {
-    return NO;
-  } else if ([[p2 substringToIndex: l1] isEqualToString: p1]) {
-    if ([[p2 pathComponents] containsObject: [p1 lastPathComponent]]) {
-      return YES;
-    }
-  }
-
-  return NO;
-}
-
-NSString *pathFittingInContainer(id container, NSString *fullPath, int margins)
-{
-	NSArray *pathcomps;
-	float cntwidth;
-	NSFont *font;	
-	NSString *path;
-  NSString *relpath = nil;		
-	int i;
-						
-	cntwidth = [container frame].size.width - margins;
-	font = [container font];
-
-	if([font widthOfString: fullPath] < cntwidth) {
-		return fullPath;
-	}
-  
-	cntwidth = cntwidth - [font widthOfString: fixpath(@"../", 0)];
-		
-	pathcomps = [fullPath pathComponents];
-	i = [pathcomps count] - 1;
-	path = [NSString stringWithString: [pathcomps objectAtIndex: i]];
-	
-	while(i > 0) {
-		i--;		
-		if([font widthOfString: path] < cntwidth) {
-			relpath = [NSString stringWithString: path];
-		} else {
-			break;
-    }						
-		path = [NSString stringWithFormat: @"%@%@%@", [pathcomps objectAtIndex: i], fixpath(@"/", 0), path];
-	}
-	
-	relpath = [NSString stringWithFormat: @"%@%@", fixpath(@"../", 0), relpath];
-	
-	return relpath;
-}
-
-NSString *relativePathFittingInContainer(id container, NSString *fullPath)
+NSString *relativePathFit(id container, NSString *fullPath)
 {
 	NSArray *pathcomps;
 	float cntwidth;
@@ -219,74 +143,7 @@ NSString *relativePathFittingInContainer(id container, NSString *fullPath)
 	return relpath;
 }
 
-int pathComponentsToPath(NSString *path)
-{
-  if ([path isEqualToString: fixpath(@"/", 0)]) {
-    return 0;
-  }
-  return [[path pathComponents] count] - 1;
-}
-
-NSString *commonPrefixInArray(NSArray *a)
-{
-  NSString *s = @"";
-  unsigned minlngt = INT_MAX;
-  int index = 0;
-  BOOL done = NO;
-  int i, j;
-  
-  if ([a count] == 0) {
-    return nil;
-  }
-  if ([a count] == 1) {
-    return [a objectAtIndex: 0];
-  }
-  
-  for (i = 0; i < [a count]; i++) {
-    unsigned l = [[a objectAtIndex: i] length];
-    if (l < minlngt) {
-      minlngt = l;
-    }
-  }
-  
-  while (index < minlngt) {
-    NSString *s1, *s2;
-    unichar c1, c2;
-    
-    for (i = 0; i < [a count]; i++) {
-      s1 = [a objectAtIndex: i];
-      c1 = [s1 characterAtIndex: index];
-
-      for (j = 0; j < [a count]; j++) {
-        s2 = [a objectAtIndex: j];
-        c2 = [s2 characterAtIndex: index];
-
-        if (i != j) {
-          if (c1 != c2) {
-            done = YES;
-            break;
-          }
-        }
-      }
-    
-      if (done) {
-        break;
-      }
-    } 
-
-    if (done) {
-      break;
-    }
-    
-    s = [s1 substringWithRange: NSMakeRange(0, index + 1)];
-       
-    index++;
-  } 
-  
-  return ([s length] ? s : nil);
-}
-
-NSString *fileSizeDescription(unsigned long long size)
+NSString *fsDescription(unsigned long long size)
 {
 	NSString *sizeStr;
 	char *sign = "";
@@ -315,10 +172,3 @@ NSString *fileSizeDescription(unsigned long long size)
 	return sizeStr;
 }
 
-NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str, 
-																NSString *comm, NSString *sel, NSString *key)
-{
-	NSMenuItem *item = [menu addItemWithTitle: NSLocalizedString(str, comm)
-												action: NSSelectorFromString(sel) keyEquivalent: key]; 
-	return item;
-}

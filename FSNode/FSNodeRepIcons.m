@@ -217,7 +217,6 @@ static unsigned char darkerLUT[256] = {
     unsigned char *dstData;
     unsigned char *psrc;
     unsigned char *pdst;
-    unsigned char alpha;
     unsigned char *limit;
 
     newIcon = [[NSImage alloc] initWithSize: NSMakeSize(pixelsWide, pixelsHigh)];
@@ -247,10 +246,7 @@ static unsigned char darkerLUT[256] = {
       *pdst++ = lighterLUT[*(psrc+0)];  
       *pdst++ = lighterLUT[*(psrc+1)];  
       *pdst++ = lighterLUT[*(psrc+2)];  
-      
-      alpha = (bitsPerPixel == 32) ? *(psrc+3) : 255;
-      *pdst++ = alpha;
-
+      *pdst++ = (bitsPerPixel == 32) ? *(psrc+3) : 255;
       psrc += (bitsPerPixel == 32) ? 4 : 3;
     }
 
@@ -282,7 +278,6 @@ static unsigned char darkerLUT[256] = {
     unsigned char *dstData;
     unsigned char *psrc;
     unsigned char *pdst;
-    unsigned char alpha;
     unsigned char *limit;
 
     newIcon = [[NSImage alloc] initWithSize: NSMakeSize(pixelsWide, pixelsHigh)];
@@ -312,10 +307,7 @@ static unsigned char darkerLUT[256] = {
       *pdst++ = darkerLUT[*(psrc+0)];  
       *pdst++ = darkerLUT[*(psrc+1)];  
       *pdst++ = darkerLUT[*(psrc+2)];  
-
-      alpha = (bitsPerPixel == 32) ? *(psrc+3) : 255;
-      *pdst++ = alpha;
-      
+      *pdst++ = (bitsPerPixel == 32) ? *(psrc+3) : 255;
       psrc += (bitsPerPixel == 32) ? 4 : 3;
     }
 

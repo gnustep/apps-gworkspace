@@ -239,7 +239,7 @@ static BOOL sizeStop = NO;
 
 		ftype = [attributes objectForKey: NSFileType];
 		if ([ftype isEqual: NSFileTypeDirectory] == NO) {	
-      NSString *fsize = fileSizeDescription([[attributes objectForKey: NSFileSize] unsignedLongLongValue]);
+      NSString *fsize = fsDescription([[attributes objectForKey: NSFileSize] unsignedLongLongValue]);
 		  [sizeField setStringValue: fsize]; 
       [calculateButt setEnabled: NO];
       [insideButt	setEnabled: NO];
@@ -263,7 +263,7 @@ static BOOL sizeStop = NO;
 
 		if ([ftype isEqual: NSFileTypeSymbolicLink]) {
 			s = [fm pathContentOfSymbolicLinkAtPath: currentPath];
-			s = relativePathFittingInContainer(linkToField, s);
+			s = relativePathFit(linkToField, s);
 			[linkToField setStringValue: s];
       [linkToLabel setTextColor: [NSColor blackColor]];		
 			[linkToField setTextColor: [NSColor blackColor]];		      
@@ -808,7 +808,7 @@ static BOOL sizeStop = NO;
 	}	
 
   if (sizeStop == NO) {
-    [attributes sizeReady: fileSizeDescription(dirsize)]; 
+    [attributes sizeReady: fsDescription(dirsize)]; 
   }
 }
 

@@ -47,6 +47,8 @@
     NSRect r = [self frame];
     
     extsarr = [[NSArray alloc] initWithObjects: @"rtf", @"rtfd", @"txt", @"text", 
+                                                 @"html", @"htm", @"css", @"csv",
+                                                @"pl", @"sh", @"rb", @"el", @"scm",
                                                 @"c", @"cc", @"C", @"cpp", @"m", 
                                                 @"h", @"java", @"class", @"in", 
                                                 @"log", @"ac", @"diff", 

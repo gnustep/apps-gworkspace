@@ -315,7 +315,7 @@ static FSNodeRep *shared = nil;
       icon = AUTORELEASE (img);
     } else {
       if ([node isApplication]) {
-        icon = [self lighterIcon: [self iconOfSize: size forNode: node]];
+        icon = [self darkerIcon: [self iconOfSize: size forNode: node]];
       } else {
         icon = openFolderIcon;
       }
@@ -323,9 +323,9 @@ static FSNodeRep *shared = nil;
   } else {
     if (([node isMountPoint] && [volumes containsObject: [node path]])
                                     || [volumes containsObject: [node path]]) {
-      icon = [self lighterIcon: hardDiskIcon];
+      icon = [self darkerIcon: hardDiskIcon];
     } else if ([node isApplication]) {    
-      icon = [self lighterIcon: [self iconOfSize: size forNode: node]];
+      icon = [self darkerIcon: [self iconOfSize: size forNode: node]];
     } else {
       icon = openFolderIcon;
     }

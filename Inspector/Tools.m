@@ -332,7 +332,7 @@ static NSString *nibName = @"Tools";
 	  [defAppField setStringValue: [currentApp stringByDeletingPathExtension]];
     s = [ws fullPathForApplication: currentApp];
 		if (s != nil) {
-    	s = relativePathFittingInContainer(defPathField, s);
+    	s = relativePathFit(defPathField, s);
 		} else {
 			s = @"";
 		}
@@ -346,7 +346,7 @@ static NSString *nibName = @"Tools";
 	
 	ASSIGN (currentApp, [[sender selectedCell] title]);	
   s = [ws fullPathForApplication: currentApp];
-  s = relativePathFittingInContainer(defPathField, s);
+  s = relativePathFit(defPathField, s);
 	[defPathField setStringValue: s];
   [defAppField setStringValue: [currentApp stringByDeletingPathExtension]];  
 }

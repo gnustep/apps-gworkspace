@@ -79,23 +79,8 @@ toPoint: NSMakePoint(x2, y2)]; \
 
 NSString *fixpath(NSString *s, const char *c);
 
-NSString *cutFileLabelText(NSString *filename, id label, int lenght);
+NSString *relativePathFit(id container, NSString *fullPath);
 
-NSString *subtractPathComponentToPath(NSString *apath, NSString *firstpart);
-
-BOOL subPathOfPath(NSString *p1, NSString *p2);
-
-NSString *pathFittingInContainer(id container, NSString *fullPath, int margins);
-
-NSString *relativePathFittingInContainer(id container, NSString *fullPath);
-
-int pathComponentsToPath(NSString *path);
-
-NSString *commonPrefixInArray(NSArray *a);
-
-NSString *fileSizeDescription(unsigned long long size);
-
-NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str, 
-														NSString *comm, NSString *sel, NSString *key);
+NSString *fsDescription(unsigned long long size);
 
 #endif
