@@ -1,0 +1,67 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {
+                checkFindFile = id; 
+                choseFile = id; 
+                crDatePopUpAction = id; 
+                crDateStepperAction = id; 
+                kindPopUpAction = id; 
+                kindTypePopUpAction = id; 
+                modDatePopUpAction = id; 
+                modDateStepperAction = id; 
+                namePopUpAction = id; 
+                openFile = id; 
+                ownerPopUpAction = id; 
+                sizePopUpAction = id; 
+                startFind = id; 
+                stopFind = id; 
+            }; 
+            CLASS = FinderController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                closableBox = id; 
+                contentsField = id; 
+                contentslabel = id; 
+                crDateField = id; 
+                crDatePopUp = id; 
+                crDateStepper = id; 
+                datecrlabel = id; 
+                datemdlabel = id; 
+                fWin = id; 
+                filenamelabel = id; 
+                findButt = id; 
+                findfile = id; 
+                foundMatrix = id; 
+                generallabel = id; 
+                iconBox = id; 
+                includeslabel = id; 
+                kindPopUp = id; 
+                kindTypePopUp = id; 
+                kindlabel = id; 
+                lowBox = id; 
+                modDateField = id; 
+                modDatePopUp = id; 
+                modDateStepper = id; 
+                nameField = id; 
+                namePopUp = id; 
+                optionsSplit = id; 
+                ownerField = id; 
+                ownerPopUp = id; 
+                ownerlabel = id; 
+                scrollBox = id; 
+                scrollView = id; 
+                shelfBox = id; 
+                sizeField = id; 
+                sizePopUp = id; 
+                sizelabel = id; 
+                split = id; 
+                stopButt = id; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {CLASS = SelectedFileView; LANGUAGE = ObjC; SUPERCLASS = NSView; }
+    ); 
+    IBVersion = 1; 
+}

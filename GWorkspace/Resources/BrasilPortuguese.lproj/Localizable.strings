@@ -1,0 +1,320 @@
+/* Tradução feita por Tiago Ribeiro <tiagor@mac.com> */
+
+/* ----------------------- menu strings --------------------------- *\
+/* main.m */
+
+"Info" = "Info";
+	"Info Panel..." = "Painel de Informações...";
+	"Preferences..." = "Preferências...";
+	"Help..." = "Ajuda...";
+
+"File" = "Arquivo";
+	"Open" = "Abrir";
+	"Open as Folder" = "Abrir como Pasta";
+	"Edit File" = "Editar Arquivo";
+	"New Folder" = "Nova Pasta";
+	"New File" = "Novo Arquivo";
+	"Duplicate" = "Duplicar";	
+	"Destroy" = "Apagar";
+	"Empty Recycler" = "Esvaziar Lixo";
+
+"Edit" = "Editar";
+	"Cut" = "Cortar";
+	"Copy" = "Copiar";
+	"Paste" = "Colar";
+	"Select All" = "Selecionar Tudo";
+		
+"View" = "Ver";
+	"Browser" = "Navegador";
+	"Icon" = "Icones";
+		
+"Tools" = "Ferramentas";
+	"Viewer" = "Visualizador";
+	"Inspectors" = "Inspetores";
+		"Show Inspectors" = "Mostrar Inspetores";
+		"Attributes" = "Atributos";
+		"Contents" = "Conteúdo";
+		"Tools" = "Ferramentas";	
+		"Permissions" = "Permissões";	
+	"Finder" = "Buscador";
+	"Processes..." = "Processos...";
+	"Fiend" = "Fiend";
+		"Show Fiend" = "Mostrar Fiend"; /* R// Arrumar esto */
+		"Hide Fiend" = "Ocultar Fiend";
+		"Add Layer..." = "Adicionar Camada...";
+		"Remove Current Layer" = "Remover Camada Atual";
+		"Rename Current Layer" = "Renomear Camada Atual";
+		"Layers" = "Camadas";
+	"DeskTop Shelf" = "DeskTop Shelf";	
+	"XTerm" = "XTerm";
+	
+"Windows" = "Janelas";
+	"Arrange in Front" = "Organizar à Frente";
+	"Miniaturize Window" = "Miniaturizar Janela";
+	"Close Window" = "Fechar Janela";
+	
+"Services" = "Serviços";
+
+"Hide" = "Ocultar";
+
+"Quit" = "Encerrar";
+	
+	
+	
+/* ----------------------- File Operations strings --------------------------- *\
+
+/* GWorkspace.m */
+
+"GNUstep Workspace Manager" = "Gerenciador de DeskTop GNUstep";
+"See http://www.gnustep.it/enrico/gworkspace" = "Acesse http://www.gnustep.it/enrico/gworkspace";
+"Released under the GNU General Public License 2.0" = "Distribuido segundo a Licença Pública Geral GNU 2.0";
+"Error" = "Erro";
+"You have not write permission\nfor" = "Não há permissões de escrita\npara"; /* R// ? */
+"Continue" = "Continuar";
+
+
+/* FileOperation.m */
+
+"OK" = "OK";
+"Cancel" = "Cancelar";
+"Move" = "Mover";
+"Move from: " = "Mover de: ";
+"\nto: " = "\npara: ";
+"Copy" = "Copiar";
+"Copy from: " = "Copiar de: ";
+"Link" = "Vincular";
+"Link " = "Vincular ";
+"Delete" = "Apagar";
+"Delete the selected objects?" = "Apagar os objetos selecionados?";
+"Duplicate" = "Duplicar";
+"Duplicate the selected objects?" = "Duplicar os objetos selecionados?";
+"From:" = "De:";
+"To:" = "Para:";
+"In:" = "Em:";
+"Stop" = "Parar";
+"Pause" = "Pausar";
+"Moving" = "Movendo";
+"Copying" = "Copiando";
+"Linking" = "Vinculando";
+"Duplicating" = "Duplicando";
+"Destroying" = "Apagando";
+"File Operation Completed" = "Operação de Arquivos Completada";
+"Backgrounder connection died!" = "Conexção de segundo plano interrompida"; /* R// Jarl */
+"Some items have the same name;\ndo you want to substitute them?" = "Alguns ítems têm o mesmo\nnome; Deseja substituí-los?";
+"Error" = "Erro";
+"File Operation Error!" = "Erro na Operação de Arquivos!";
+
+
+/* ColumnIcon.m */
+
+"You have not write permission\nfor " = "Não há permissões de escrita\npara";
+"The name " = "O nome ";
+" is already in use!" = " já está sendo usado!";
+"Cannot rename " = "Não é possível renomear ";
+"Invalid char in name" = "Caractere inválido no nome";
+
+
+/* ----------------------- Inspectors strings --------------------------- *\
+
+/* InspectorsWin.m */
+
+"Attributes" = "Atributos";
+"Contents" = "Conteúdo";
+"Tools" = "Ferramentas";
+"Access Control" = "Controle de Acesso";
+
+
+/* AttributesPanel.m */
+
+"Attributes" = "Atributos";
+"Attributes Inspector" = "Inspetor de Atributos";
+"Path:" = "Caminho:";
+"Link To:" = "Vincular a:";
+"Size:" = "Tamanho:";
+"Owner:" = "Proprietário:";
+"Group:" = "Grupo:";
+"Changed" = "Mudado";
+"Revert" = "Reverter";
+"OK" = "OK";
+
+
+/* ContentsPanel.m */
+
+"Contents" = "Conteúdo";
+"Contents Inspector" = "Inspetor de Conteúdo";
+"No Contents Inspector" = "Não há Inspetor de Conteúdo";
+"No Contents Inspector\nFor Multiple Selection" = "Não há Inspetor de\nConteúdo para\nmúltiplas seleções";
+
+
+/* FolderViewer.m */
+
+"Sort method applies to the\ncontents of the selected folder,\nNOT to its parent folder"
+  = "O método de ordenação se\naplica ao conteúdo da\npasta selecionada, e não\nà sua pasta mãe";
+"Sort by" = "Ordenar por";
+"Name" = "Nome";
+"Kind" = "Tipo";
+"Date" = "Data";
+"Size" = "Tamanho";
+"Owner" = "Proprietário";
+"Folder Inspector" = "Inspetor de Pastas";	
+
+
+/* ImageViewer.m */
+
+"Image Inspector" = "Inspetor de Imagens";
+
+
+/* AppViewer.m */
+
+"Open these kinds of documents:" = "Abrir estes tipos de documentos:";
+"Invalid Contents" = "Conteúdo Inválido";
+"App Inspector" = "Inspetor de Aplicações";
+
+
+/* PermissionsPanel.m */
+
+"UNIX Permissions" = "Permissões UNIX";
+"Access Control" = "Controle de Acesso";
+"Also apply to files inside selection" = "Aplicar também aos arquivos da seleção";
+
+
+/* ToolsPanel.m */
+
+"Tools" = "Ferramentas";
+"Tools Inspector" = "Inspetor de Ferramentas";
+"No Tools Inspector" = "Não há Inspetor de Ferramentas";
+"Set Default" = "Configurar como Padrão";
+
+
+/* AppsView.m */
+	
+"Double-click to open selected document(s)" =
+"Duplo-clique para abrir documentos selecionados";
+"Default:" = "Padrão:";
+"Path:" = "Caminho:";		
+"Click 'Set Default' to set default application\nfor all documents with this extension" 
+  ="Clique em 'Configurar como Padrão' para configurar a\naplicação a ser usada para todos\nos documentos com esta extensão";
+
+
+/* PermsBox.m */
+
+"Permissions" = "Permissões";
+"Read" = "Leitura";
+"Write" = "Escrita";
+"Execute" = "Execução";
+"Owner" = "Proprietário";
+"Group" = "Grupo";
+"Other" = "Outros";
+
+
+/* ----------------------- Processes strings --------------------------- *\
+
+/* Processes.m */
+
+"Processes" = "Processos";
+"No Background Process" = "Não há Processos en Segundo Plano";
+"Kill" = "Matar";
+"Path: " = "Caminho: ";
+"Status: " = "Estado: ";
+
+
+/* ProcsView.m */
+
+"Applications" = "Aplicações";
+"Background" = "Segundo Plano"; /* R// revisar */
+
+
+/* ----------------------- Finder strings --------------------------- *\
+
+/* Finder.m */
+
+"Finder" = "Buscador";
+"Find items with names that match" = "Buscar ítens com nomes que combinem";
+"Find items with contents that match" = "Buscar ítems com conteúdo que combine";
+"No selection!" = "Não há nenhuma seleção!";
+"No arguments!" = "Não há argumentos!";
+
+
+/* ----------------------- Fiend strings --------------------------- *\
+
+/* Fiend.m */
+
+"New Layer" = "Nova Camada";
+"A layer with this name is already present!" = "Já há uma camada com este nome!";
+"You can't remove the last layer!" = "Não é possível remover a última camada!";
+"Remove layer" = "Remover camada";
+"Are you sure that you want to remove this layer?" = "Você tem certeza de que deseja remover esta camada?";
+"Rename Layer" = "Renomear camada";
+"You can't dock multiple paths!" = "Não é possível agrupar múltiplos caminhos!";
+"This object is already present in this layer!" = "Este objeto já está nesta camada!";
+	
+			
+/* ----------------------- Preference strings --------------------------- *\
+
+/* PreferencesWin.m */
+
+"GWorkspace Preferences" = "Preferências do GWorkspace";
+
+
+/* BackWinPreferences.m */       
+
+"DeskTop Shelf" = "Shelf do DeskTop";	
+"DeskTop Color" = "Cor do DeskTop";
+"red" = "vermelho";
+"green" = "verde";
+"blue" = "azul";
+"Set Color" = "Configurar cor";
+"Push the \"Set Image\" button\nto set your DeskTop image.\nThe image must have the same\nsize of your screen." = "Pressione o botão \"Configurar Imagem\" para configurar sua\nimagem de fundo. A imagem deve ter o\nmesmo tamanho que a tela.";
+
+"Set Image" = "Configurar Imagem";
+"Unset Image" = "Remover Imagem";
+
+	
+/* DefaultXTerm.m */             
+	
+"Set" = "Configurar";	
+
+	
+/* BrowserViewsPreferences.m */  
+
+"Column Width" = "Largura das Colunas";
+"Use Default Settings" = "Usar Ajustes-Padrão";	
+"Browser" = "Navegador";
+	
+	
+/* FileWatchingPreferences.m */  
+
+/* timeout */
+"File System Watching" = "Vigilancia do Sistema de Arquivos";
+"timeout" = "timeout";
+"frequency" = "frequência";
+"Values will apply to the \nnew watchers from now, \nto the existing ones, after the first timeout" = 
+"Os valores se aplicarão aos\n novos vigilantes a partir de agora,\ne aos já existentes, a partir do primeiro timeout";
+	
+	
+/* ShelfPreferences.m */
+	
+"Shelf" = "Shelf";
+	
+	
+/* DefaultEditor.m */            
+
+"Default Editor" = "Editor Padrão";
+"No Default Editor" = "Não há Editor Padrão";
+"Choose..." = "Escolher...";
+
+
+/* IconViewsPreferences.m */
+
+"Title Width" = "Largura do Título";
+"Icon View" = "Visualização por Icones";
+
+
+
+
+
+
+
+
+
+
