@@ -4,18 +4,17 @@
 	Actions = (
 	    "changeFont:",
 	    "orderFrontFontPanel:",
-	    "unscript:",
 	    "stopSearch:",
 	    "restartSearch:",
 	    "updateIfNeeded:",
-	    "setAutoupdate:"
+	    "setAutoupdateCycle:"
 	);
 	Super = NSObject;
     };
     LSFolder = {
 	Actions = (
 	    "updateIfNeeded:",
-	    "setAutoupdate:"
+	    "setAutoupdateCycle:"
 	);
 	Outlets = (
 	    win,
@@ -26,7 +25,8 @@
 	    splitView,
 	    resultsScroll,
 	    pathsScroll,
-	    autoupdateSwch
+	    autoupdatePopUp,
+	    autoupdateLabel
 	);
 	Super = NSObject;
     };

@@ -42,11 +42,11 @@
 
 - (oneway void)ddbdInsertTrees;
 
-- (oneway void)setAutoupdate:(BOOL)value;
+- (oneway void)setAutoupdate:(unsigned)value;
 
 - (oneway void)fastUpdate;
 
-- (oneway void)exitThread;
+- (void)exitThread;
 
 @end
 
@@ -65,7 +65,7 @@
   SEL nextSelector;
   BOOL actionPending;
   BOOL updaterbusy;
-  BOOL autoupdate;
+  unsigned autoupdate;
   
   NSFileManager *fm;
   NSNotificationCenter *nc;
@@ -76,7 +76,8 @@
   IBOutlet id progBox; 
   ProgrView *progView;
   IBOutlet id elementsLabel;
-  IBOutlet id autoupdateSwch;
+  IBOutlet id autoupdateLabel;
+  IBOutlet id autoupdatePopUp;
   IBOutlet id updateButt;
   
   IBOutlet id splitView;
@@ -114,7 +115,7 @@
 
 - (BOOL)isOpen;
 
-- (IBAction)setAutoupdate:(id)sender;
+- (IBAction)setAutoupdateCycle:(id)sender;
 
 - (IBAction)updateIfNeeded:(id)sender;
 
@@ -132,9 +133,9 @@
 
 - (void)endUpdate;
 
-- (void)connectionDidDie:(NSNotification *)notification;
+- (void)updaterThreadWillExit:(NSNotification *)notification;
 
-- (void)threadWillExit:(NSNotification *)notification;
+- (void)connectionDidDie:(NSNotification *)notification;
 
 - (void)loadInterface;
 

@@ -164,7 +164,7 @@ static Finder *finder = nil;
   
   if (wrect.size.height != WINH) {
     if (wrect.size.height > WINH) {
-      wrect.origin.y += (wrect.size.height - WINH);
+//      wrect.origin.y += (wrect.size.height - WINH);
     } else {
       wrect.origin.y -= (WINH - wrect.size.height);
     }
@@ -314,14 +314,7 @@ static Finder *finder = nil;
     searchResh = 0;
   } 
   
-  startAppWin = [[StartAppWin alloc] init];
-}
-
-- (void)applicationDidFinishLaunching:(NSNotification *)aNotification
-{
-  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-  id defentry = [defaults objectForKey: @"lsfolders_paths"];
-  int i;
+  defentry = [defaults objectForKey: @"lsfolders_paths"];
   
   if (defentry) {
     for (i = 0; i < [defentry count]; i++) {
@@ -335,6 +328,7 @@ static Finder *finder = nil;
     }
   }
 
+  startAppWin = [[StartAppWin alloc] init];
   fswatcher = nil;
   fswnotifications = YES;
   [self connectFSWatcher];
@@ -348,6 +342,10 @@ static Finder *finder = nil;
                 				selector: @selector(fileSystemDidChange:) 
                 					  name: @"GWFileSystemDidChangeNotification"
                 					object: nil];
+}
+
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification
+{
 }
 
 - (BOOL)application:(NSApplication *)application 
@@ -407,7 +405,7 @@ static Finder *finder = nil;
   }
   
   TEST_CLOSE (startAppWin, [startAppWin win]);
-    		
+
 	return YES;
 }
 

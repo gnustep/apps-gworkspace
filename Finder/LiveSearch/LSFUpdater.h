@@ -92,22 +92,24 @@
 @interface LSFUpdater: NSObject
 {
   NSMutableArray *searchPaths;
-  NSTimer *srchPathsTmr;
-  int spathindex;
+  unsigned spathindex;
   
   NSMutableArray *directories;
-  int dirindex;
+  unsigned dirindex;
+  unsigned dircounter;
+  unsigned dircount;
 
   NSMutableArray *modules;  
   NSDictionary *searchCriteria;
   
   NSMutableArray *foundPaths;
-  NSTimer *fndPathsTmr;
   int fpathindex;
   
   NSDate *lastUpdate;
   NSDate *startSearch;
-  BOOL autoupdate;
+  unsigned autoupdate;
+  NSTimeInterval updateInterval;
+  NSTimer *autoupdateTmr;
   
   id <LSFolderProtocol> lsfolder;
   id ddbd;
@@ -120,7 +122,9 @@
 
 - (id)initWithLSFolderInfo:(NSDictionary *)info;
 
-- (void)setAutoupdate:(BOOL)value;
+- (void)setAutoupdate:(unsigned)value;
+
+- (void)resetTimer;
 
 - (void)notifyEndAction:(id)sender;
 
@@ -174,9 +178,9 @@
 
 @interface LSFUpdater (scheduled)
 
-- (void)checkNextFoundPath:(id)sender;
-
 - (void)searchInNextDirectory:(id)sender;
+
+- (void)checkNextFoundPath;
 
 @end
 

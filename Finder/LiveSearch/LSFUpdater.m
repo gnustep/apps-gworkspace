@@ -31,13 +31,9 @@
 
 - (void)dealloc
 {
-  if (srchPathsTmr && [srchPathsTmr isValid]) {
-    [srchPathsTmr invalidate];
-    DESTROY (srchPathsTmr);
-  }
-  if (fndPathsTmr && [fndPathsTmr isValid]) {
-    [fndPathsTmr invalidate];
-    DESTROY (fndPathsTmr);
+  if (autoupdateTmr && [autoupdateTmr isValid]) {
+    [autoupdateTmr invalidate];
+    DESTROY (autoupdateTmr);
   }
 
   DESTROY (ddbd);
@@ -54,20 +50,22 @@
 
 + (void)newUpdater:(NSDictionary *)info
 {
-  CREATE_AUTORELEASE_POOL(arp);
-  NSArray *ports = [info objectForKey: @"ports"];
+  NSAutoreleasePool *pool;
+  NSArray *ports;
   NSConnection *conn;
   LSFUpdater *updater;
-                              
+ 
+  pool = [[NSAutoreleasePool alloc] init];
+
+  ports = [info objectForKey: @"ports"];
   conn = [NSConnection connectionWithReceivePort: [ports objectAtIndex: 0]
                                         sendPort: [ports objectAtIndex: 1]];
   updater = [[self alloc] initWithLSFolderInfo: info];
-  [updater connectDDBd]; 
   [(id)[conn rootProxy] setUpdater: updater];
   RELEASE (updater);
                               
   [[NSRunLoop currentRunLoop] run];
-  RELEASE (arp);
+  RELEASE (pool);
 }
 
 - (id)initWithLSFolderInfo:(NSDictionary *)info
@@ -77,7 +75,6 @@
   if (self) {
     NSArray *ports = [info objectForKey: @"ports"];
     NSDictionary *lsfinfo = [info objectForKey: @"lsfinfo"];
-    id entry = [lsfinfo objectForKey: @"autoupdate"];
     NSArray *classNames;
     NSConnection *conn;
     id anObject;
@@ -108,77 +105,104 @@
       [modules addObject: module];
       RELEASE (module); 
     }
-  
-    if (entry) {
-      autoupdate = [entry boolValue];
-    }
-  
+    
     fm = [NSFileManager defaultManager];
     nc = [NSNotificationCenter defaultCenter];
     ddbd = nil;
     ddbdactive = NO;
     
-    if (autoupdate) {
-      [self setAutoupdate: autoupdate];      
-    }
+    autoupdateTmr = nil;
+    autoupdate = 0;
+    updateInterval = 0.0;
+    fpathindex = 0;
+    spathindex = 0;
+    dirindex = 0;
+    dircounter = 0;
+    dircount = 0;
   }
   
   return self;
 }
 
-- (void)setAutoupdate:(BOOL)value
+- (void)setAutoupdate:(unsigned)value
 {
   NSString *infopath = [lsfolder infoPath];
   NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: infopath];
-    
+  
+      NSLog(@"setAutoupdate %i", value);  
+
+  autoupdate = value;
+  
+  if (autoupdate == 0) {
+    fpathindex = 0;
+    spathindex = 0;
+    dirindex = 0;
+    dircounter = 0;
+  }
+
   if (dict) {
     NSMutableDictionary *updated = [dict mutableCopy];
-    [updated setObject: [NSNumber numberWithBool: value] 
+    [updated setObject: [NSNumber numberWithLong: autoupdate] 
                 forKey: @"autoupdate"];	
     [updated writeToFile: infopath atomically: YES];
   }
+
+  if (autoupdateTmr && [autoupdateTmr isValid]) {
+    [autoupdateTmr invalidate];
+    DESTROY (autoupdateTmr);
+    
+    NSLog(@"removing autoupdateTmr");
+  }
   
-  if (value) {
+  if (autoupdate > 0) {
+    NSTimeInterval interval;
+    
     if ([foundPaths count] == 0) {
       [self getFoundPaths];
     }
 
-    if (fndPathsTmr == nil) {
-      fndPathsTmr = [NSTimer scheduledTimerWithTimeInterval: 0.1
-                                       target: self 
-                                     selector: @selector(checkNextFoundPath:) 
-                                     userInfo: nil 
-                                     repeats: YES];
-      RETAIN (fndPathsTmr);
+    if (dircount > 0) {
+      unsigned fcount = [foundPaths count];
+      unsigned count = (fcount > dircount) ? fcount : dircount;
+      updateInterval = (autoupdate * 1.0) / count;
     }
 
-    if (srchPathsTmr == nil) {    
-      srchPathsTmr = [NSTimer scheduledTimerWithTimeInterval: 0.1
-                                       target: self 
-                                     selector: @selector(searchInNextDirectory:) 
-                                     userInfo: nil 
-                                      repeats: YES];
-      RETAIN (srchPathsTmr);
-    }                                    
-                                    
-       // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!                             
-       // CALCOLARE I TEMPI !!!!!!!!!!!!!!!!!!!!!!!!!!
-       // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!                             
-                                    
-                                    
-                                    
-  } else {
-    if (srchPathsTmr && [srchPathsTmr isValid]) {
-      [srchPathsTmr invalidate];
-      DESTROY (srchPathsTmr);
-    }
-    if (fndPathsTmr && [fndPathsTmr isValid]) {
-      [fndPathsTmr invalidate];
-      DESTROY (fndPathsTmr);
-    }
+    interval = (updateInterval == 0) ? 0.1 : updateInterval;
+    
+    autoupdateTmr = [NSTimer scheduledTimerWithTimeInterval: interval
+                               target: self 
+                             selector: @selector(searchInNextDirectory:) 
+                             userInfo: nil 
+                              repeats: YES];
+    RETAIN (autoupdateTmr);
+  } 
+}
+
+- (void)resetTimer
+{
+  if (autoupdateTmr && [autoupdateTmr isValid]) {
+    [autoupdateTmr invalidate];
+    DESTROY (autoupdateTmr);
   }
 
-  autoupdate = value;
+  if (autoupdate > 0) {
+    unsigned fcount = [foundPaths count];
+    unsigned count = (fcount > dircount) ? fcount : dircount;
+
+    updateInterval = (autoupdate * 1.0) / count;
+
+    NSLog(@"\nresetTimer");
+    NSLog(@"autoupdate %i", autoupdate);
+    NSLog(@"dircount %i", dircount);  
+    NSLog(@"updateInterval %.2f", updateInterval);
+
+    autoupdateTmr = [NSTimer scheduledTimerWithTimeInterval: updateInterval
+                               target: self 
+                             selector: @selector(searchInNextDirectory:) 
+                             userInfo: nil 
+                              repeats: YES];
+    RETAIN (autoupdateTmr);
+  }
 }
 
 - (void)notifyEndAction:(id)sender
@@ -190,15 +214,11 @@
 
 - (void)exitThread
 {
-  if (srchPathsTmr && [srchPathsTmr isValid]) {
-    [srchPathsTmr invalidate];
-    DESTROY (srchPathsTmr);
+  if (autoupdateTmr && [autoupdateTmr isValid]) {
+    [autoupdateTmr invalidate];
+    DESTROY (autoupdateTmr);
   }
-  if (fndPathsTmr && [fndPathsTmr isValid]) {
-    [fndPathsTmr invalidate];
-    DESTROY (fndPathsTmr);
-  }
-
+  
   [NSThread exit];
 }
 
@@ -318,12 +338,6 @@
       NSString *dbpath = [results objectAtIndex: i];
       NSDictionary *attributes = [fm fileAttributesAtPath: dbpath traverseLink: NO];
       NSDate *moddate = [attributes fileModificationDate];
-
-
-      if ([dbpath isEqual: @"/home/enrico/Butt/GNUstep/Pixmaps/CartaNuova/CooopyPix/CVS/Startup/config/CVS"]) {
-        NSLog(@"TROVATA!!!!!!!!!!!!!!!!!!!!!!!");
-      }
-            
       
       if ([moddate laterDate: lastUpdate] == moddate) {
         NSArray *contents;
@@ -416,7 +430,7 @@
   [dict setObject: searchPaths forKey: @"searchpaths"];	
   [dict setObject: searchCriteria forKey: @"criteria"];	
   [dict setObject: [lastUpdate description] forKey: @"lastupdate"];	
-  [dict setObject: [NSNumber numberWithBool: autoupdate] 
+  [dict setObject: [NSNumber numberWithLong: autoupdate] 
            forKey: @"autoupdate"];	
 
   if ([dict writeToFile: [lsfolder infoPath] atomically: YES] == NO) {
@@ -660,47 +674,20 @@
 
 @implementation	LSFUpdater (scheduled)
 
-- (void)checkNextFoundPath:(id)sender
-{
-  NSString *path;
-  NSDictionary *attrs;
-  BOOL remove = NO;
-  
-  if (fpathindex >= [foundPaths count]) {
-    fpathindex = 0;
-  }
-  
-  path = [foundPaths objectAtIndex: fpathindex];
-  attrs = [fm fileAttributesAtPath: path traverseLink: NO];  
-  
-  if (attrs) {
-    remove = ([self checkPath: path attributes: attrs] == NO);
-  } else {
-    remove = YES;
-  }
-  
-  if (remove) {
-    [lsfolder removeFoundPath: path];
-    [foundPaths removeObject: path];
-  } 
-  
-  fpathindex++;
-  
-  NSLog(@"checkNextFoundPath %i", fpathindex);
-}
-
 - (void)searchInNextDirectory:(id)sender
 {
   NSString *spath;
   BOOL isdir;
   NSArray *results;
-
+  BOOL reset = NO;
+  
+  [self checkNextFoundPath];
+  
   if (directories == nil) {
     ASSIGN (startSearch, [NSDate date]);
     spathindex = 0;
     dirindex = 0;
-    
-    NSLog(@"searchInNextDirectory START");
+    dircounter = 0;
     
     spath = [searchPaths objectAtIndex: spathindex];
     
@@ -711,9 +698,6 @@
         if (results) {
           directories = [results mutableCopy];
           [directories addObject: spath];
-          
-          NSLog(@"got directories count = %i", [directories count]);
-          
         }
       } else {
         if ([self checkPath: spath]
@@ -734,13 +718,13 @@
     
       if (spathindex >= [searchPaths count]) {
         spathindex = 0;
+        reset = YES;
         
         if ([startSearch laterDate: lastUpdate] == startSearch) {
           lastUpdate = [startSearch copy];
-
-          if ([self saveResults] == NO) {
-            [lsfolder updaterError: NSLocalizedString(@"cannot save the folder!", @"")];
-          }
+        }
+        if ([self saveResults] == NO) {
+          [lsfolder updaterError: NSLocalizedString(@"cannot save the folder!", @"")];
         }
       
         ASSIGN (startSearch, [NSDate date]);
@@ -769,14 +753,13 @@
       }
       
     } else {
+      reset = YES;
+    
       if ([startSearch laterDate: lastUpdate] == startSearch) {
         lastUpdate = [startSearch copy];
-
-        if ([self saveResults] == NO) {
-          [lsfolder updaterError: NSLocalizedString(@"cannot save the folder!", @"")];
-        } else {
-          NSLog(@"AUTOUPDATE CYCLE DONE - AUTOUPDATE CYCLE DONE - AUTOUPDATE CYCLE DONE ");
-        }
+      }
+      if ([self saveResults] == NO) {
+        [lsfolder updaterError: NSLocalizedString(@"cannot save the folder!", @"")];
       }
       
       ASSIGN (startSearch, [NSDate date]);
@@ -840,13 +823,49 @@
     NSLog(@"dirindex %i", dirindex);
   
     dirindex++;
+    dircounter++;
     
     if ([toinsert count]) {
       [self ddbdInsertDirectoryTreesFromPaths: toinsert];
     }
     
+    if (reset) {
+      dircount = dircounter;
+      dircounter = 0;
+      [self resetTimer];
+    }
+    
     RELEASE (arp1);
   }
+}
+
+- (void)checkNextFoundPath
+{
+  NSString *path;
+  NSDictionary *attrs;
+  BOOL remove = NO;
+  
+  if (fpathindex >= [foundPaths count]) {
+    fpathindex = 0;
+  }
+  
+  path = [foundPaths objectAtIndex: fpathindex];
+  attrs = [fm fileAttributesAtPath: path traverseLink: NO];  
+  
+  if (attrs) {
+    remove = ([self checkPath: path attributes: attrs] == NO);
+  } else {
+    remove = YES;
+  }
+  
+  if (remove) {
+    [lsfolder removeFoundPath: path];
+    [foundPaths removeObject: path];
+  } 
+  
+  fpathindex++;
+  
+  NSLog(@"checkNextFoundPath %i", fpathindex);
 }
 
 @end

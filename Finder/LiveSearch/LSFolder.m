@@ -58,7 +58,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
     DESTROY (updater);
     DESTROY (updaterconn);
   }
-    
+        
   if (watcherSuspended == NO) {
     [finder removeWatcherForPath: [node path]];
   }
@@ -85,11 +85,18 @@ BOOL isPathInResults(NSString *path, NSArray *results);
     updater = nil;
     actionPending = NO;
     updaterbusy = NO;
-    autoupdate = NO;
+    autoupdate = 0;
     
     win = nil;
     
     fm = [NSFileManager defaultManager];
+    nc = [NSNotificationCenter defaultCenter];
+    finder = [Finder finder];
+    
+    [nc addObserver: self
+           selector: @selector(updaterThreadWillExit:)
+               name: NSThreadWillExitNotification
+             object: nil];     
     
     if ([anode isValid] && [anode isDirectory]) {
       NSString *dpath = LSF_INFO([anode path]);
@@ -103,18 +110,16 @@ BOOL isPathInResults(NSString *path, NSArray *results);
       id entry = [dict objectForKey: @"autoupdate"];
       
       if (entry) {
-        autoupdate = [entry boolValue];
+        autoupdate = [entry unsignedLongValue];
       }
       
       ASSIGN (node, anode);
       ASSIGN (lsfinfo, dict);
-      
-      finder = [Finder finder];
-      [finder addWatcherForPath: [node path]];
-      watcherSuspended = NO;
-      nc = [NSNotificationCenter defaultCenter];
 
-      if (index || autoupdate) {
+      watcherSuspended = NO;      
+      [finder addWatcherForPath: [node path]];
+
+      if (index || (autoupdate > 0)) {
         if (index) {
           nextSelector = @selector(ddbdInsertTrees);
           actionPending = YES;   
@@ -173,10 +178,11 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   return (win && ([win isVisible]));
 }
 
-- (IBAction)setAutoupdate:(id)sender
+- (IBAction)setAutoupdateCycle:(id)sender
 {
-  autoupdate = ([sender state] == NSOnState);
-  [updater setAutoupdate: autoupdate];
+  id item = [sender selectedItem];
+  unsigned cycle = [[item representedObject] unsignedLongValue];
+  [updater setAutoupdate: cycle];
 }
 
 - (IBAction)updateIfNeeded:(id)sender
@@ -205,11 +211,11 @@ BOOL isPathInResults(NSString *path, NSArray *results);
       return;
     }
 
- //   [foundObjects removeAllObjects];
- //   ASSIGN (sortedObjects, [NSArray array]);
     [resultsView noteNumberOfRowsChanged];
     [updateButt setEnabled: NO];
+    [autoupdatePopUp setEnabled: NO];
     [progView start];
+    updaterbusy = YES;
     [updater fastUpdate];
   }
 }
@@ -227,6 +233,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 
   updaterconn = [[NSConnection alloc] initWithReceivePort: port[0]
 				                                         sendPort: port[1]];
+  [updaterconn enableMultipleThreads];
   [updaterconn setRootObject: self];
   [updaterconn setDelegate: self];
 
@@ -237,12 +244,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 
   [info setObject: ports forKey: @"ports"];
   [info setObject: lsfinfo forKey: @"lsfinfo"];
-  
-  [nc addObserver: self
-         selector: @selector(threadWillExit:)
-             name: NSThreadWillExitNotification
-           object: nil];     
-  
+    
   NS_DURING
     {
       [NSThread detachNewThreadSelector: @selector(newUpdater:)
@@ -275,6 +277,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
     updaterbusy = YES;
     if (nextSelector == @selector(fastUpdate)) {
       [updateButt setEnabled: NO];
+      [autoupdatePopUp setEnabled: NO];
       [progView start];
     }
     [(id)updater performSelector: nextSelector];
@@ -286,16 +289,16 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   updaterbusy = NO;
   [progView stop];
   [updateButt setEnabled: YES];  
+  [autoupdatePopUp setEnabled: YES];
   
   if (actionPending) {
     actionPending = NO;
     updaterbusy = YES;
     
     if (nextSelector == @selector(fastUpdate)) {
-  //    [foundObjects removeAllObjects];
-  //    ASSIGN (sortedObjects, [NSArray array]);
       [resultsView noteNumberOfRowsChanged];
       [updateButt setEnabled: NO];
+      [autoupdatePopUp setEnabled: NO];
       [progView start];
     }
     
@@ -344,17 +347,19 @@ BOOL isPathInResults(NSString *path, NSArray *results);
     [nc removeObserver: self
 	                name: NSConnectionDidDieNotification 
                 object: updaterconn];
-    [updater exitThread];
-    DESTROY (updater);
-    DESTROY (updaterconn);
     
     [nc removeObserver: self
 	                name: NSThreadWillExitNotification 
                 object: nil];
+                
+    actionPending = NO;
+    updaterbusy = NO;
   }
+}
 
-  actionPending = NO;
-  updaterbusy = NO;
+- (void)updaterThreadWillExit:(NSNotification *)notification
+{
+  NSLog(@"lsf update thread will exit");
 }
          
 - (BOOL)connection:(NSConnection*)ancestor 
@@ -386,18 +391,19 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   [self endUpdate];
 }
 
-- (void)threadWillExit:(NSNotification *)notification
-{
-  NSLog(@"lsf update thread will exit");
-}
-
 - (void)loadInterface
 {
+#define MINUT 60
+#define HOUR (MINUT * 60)
+#define DAY (HOUR * 24)
+
   if ([NSBundle loadNibNamed: nibName owner: self]) {
     NSDictionary *sizesDict = [self getSizes];
+    NSArray *items;
     id entry;
     NSRect r;
     int srh;
+    int i;
     
     if (sizesDict) {
       entry = [sizesDict objectForKey: @"win_frame"];
@@ -408,7 +414,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
     }
     
     [win setTitle: [node name]];
-    
+    [win setReleasedWhenClosed: NO];
     [win setDelegate: self];
 
     progView = [[ProgrView alloc] initWithFrame: NSMakeRect(0, 0, 16, 16)
@@ -418,7 +424,45 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 
     [elementsLabel setStringValue: @""];
 
-    [autoupdateSwch setState: (autoupdate ? NSOnState: NSOffState)];
+    [autoupdateLabel setStringValue: NSLocalizedString(@"autoupdate cycle", @"")];
+
+    while ([[autoupdatePopUp itemArray] count] > 0) {
+      [autoupdatePopUp removeItemAtIndex: 0];
+    }
+
+    [autoupdatePopUp addItemWithTitle: NSLocalizedString(@"no autoupdate", @"")];
+    [[autoupdatePopUp lastItem] setRepresentedObject: [NSNumber numberWithLong: 0]];    
+    [autoupdatePopUp addItemWithTitle: NSLocalizedString(@"one minute", @"")];
+    [[autoupdatePopUp lastItem] setRepresentedObject: [NSNumber numberWithLong: MINUT]];
+    [autoupdatePopUp addItemWithTitle: NSLocalizedString(@"5 minutes", @"")];
+    [[autoupdatePopUp lastItem] setRepresentedObject: [NSNumber numberWithLong: MINUT * 5]];
+    [autoupdatePopUp addItemWithTitle: NSLocalizedString(@"10 minutes", @"")];
+    [[autoupdatePopUp lastItem] setRepresentedObject: [NSNumber numberWithLong: MINUT * 10]];
+    [autoupdatePopUp addItemWithTitle: NSLocalizedString(@"30 minutes", @"")];
+    [[autoupdatePopUp lastItem] setRepresentedObject: [NSNumber numberWithLong: MINUT * 30]];
+    [autoupdatePopUp addItemWithTitle: NSLocalizedString(@"one hour", @"")];
+    [[autoupdatePopUp lastItem] setRepresentedObject: [NSNumber numberWithLong: HOUR]];
+    [autoupdatePopUp addItemWithTitle: NSLocalizedString(@"2 hours", @"")];
+    [[autoupdatePopUp lastItem] setRepresentedObject: [NSNumber numberWithLong: HOUR * 2]];
+    [autoupdatePopUp addItemWithTitle: NSLocalizedString(@"3 hours", @"")];
+    [[autoupdatePopUp lastItem] setRepresentedObject: [NSNumber numberWithLong: HOUR * 3]];
+    [autoupdatePopUp addItemWithTitle: NSLocalizedString(@"6 hours", @"")];
+    [[autoupdatePopUp lastItem] setRepresentedObject: [NSNumber numberWithLong: HOUR * 6]];
+    [autoupdatePopUp addItemWithTitle: NSLocalizedString(@"12 hours", @"")];
+    [[autoupdatePopUp lastItem] setRepresentedObject: [NSNumber numberWithLong: HOUR * 12]];
+    [autoupdatePopUp addItemWithTitle: NSLocalizedString(@"a day", @"")];
+    [[autoupdatePopUp lastItem] setRepresentedObject: [NSNumber numberWithLong: DAY]];
+
+    items = [autoupdatePopUp itemArray];
+
+    for (i = 0; i < [items count]; i++) {
+      NSMenuItem * item = [items objectAtIndex: i];
+      
+      if ([[item representedObject] unsignedLongValue] == autoupdate) {
+        [autoupdatePopUp selectItemAtIndex: i];
+        break;
+      }
+    }
 
     [splitView setDelegate: self];
 
@@ -761,6 +805,11 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 //
 // NSWindow delegate
 //
+- (BOOL)windowShouldClose:(id)sender
+{
+	return !updaterbusy;
+}
+
 - (void)windowWillClose:(NSNotification *)aNotification
 {
   [self saveSizes];
@@ -845,7 +894,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 {
   NSArray *nodes = updaterbusy ? foundObjects : sortedObjects;
   FSNode *nd = [nodes objectAtIndex: rowIndex];
-  
+    
   if (aTableColumn == nameColumn) {
     return [nd name];
   } else if (aTableColumn == parentColumn) {
