@@ -27,7 +27,7 @@
 #include <math.h>
 #include "Dock.h"
 #include "DockIcon.h"
-#include "DesktopView.h"
+#include "GWDesktopView.h"
 
 #define MAX_ICN_SIZE 48
 #define MIN_ICN_SIZE 16
