@@ -33,8 +33,6 @@
 
 static id <DesktopApplication> desktopApp = nil;
 
-static NSFont *labelFont = nil;
-
 @implementation FSNIcon
 
 - (void)dealloc
@@ -57,23 +55,17 @@ static NSFont *labelFont = nil;
     NSString *selName = [defaults stringForKey: @"DesktopApplicationSelName"];
 
     if (appName && selName) {
-      #ifdef GNUSTEP 
-		  Class desktopAppClass = [[NSBundle mainBundle] principalClass];
-      #else
 		  Class desktopAppClass = [[NSBundle mainBundle] classNamed: appName];
-      #endif
       SEL sel = NSSelectorFromString(selName);
-
       desktopApp = [desktopAppClass performSelector: sel];
     }
   }
-    
-  ASSIGN (labelFont, [NSFont systemFontOfSize: 12]);
 }
 
 - (id)initForNode:(FSNode *)anode
          iconSize:(int)isize
      iconPosition:(unsigned int)ipos
+        labelFont:(NSFont *)lfont
         gridIndex:(int)gindex
         dndSource:(BOOL)dndsrc
         acceptDnd:(BOOL)dndaccept
@@ -117,7 +109,7 @@ static NSFont *labelFont = nil;
 		} 
     
     label = [FSNTextCell new];
-    [label setFont: [FSNIcon labelFont]];
+    [label setFont: lfont];
 
     [self setNodeInfoShowType: FSNInfoNameType];
     
@@ -177,16 +169,6 @@ static NSFont *labelFont = nil;
   }
   
   return self;
-}
-
-+ (NSFont *)labelFont
-{
-  return labelFont;
-}
-
-+ (void)setLabelFont:(NSFont *)afont
-{
-  ASSIGN (labelFont, afont);
 }
 
 - (void)setSelectable:(BOOL)value

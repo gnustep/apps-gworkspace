@@ -30,6 +30,7 @@
 #include "FSNodeRep.h"
 
 @class NSColor;
+@class NSFont;
 @class FSNode;
 @class FSNIcon;
 @class FSNIconNameEditor;
@@ -53,12 +54,16 @@
 
   int iconSize;
   int labelTextSize;
+  NSFont *labelFont;
   int iconPosition;
 
   NSSize gridSize;
   int colcount;
 
 	BOOL isDragTarget;
+
+  NSString *charBuffer;	
+	NSTimeInterval lastKeyPressed;
   
   NSColor *backColor;
 
@@ -67,14 +72,13 @@
 
 - (void)sortIcons;
 
+- (void)readNodeInfo;
+
+- (void)updateNodeInfo;
+
 - (void)calculateGridSize;
 
 - (void)tile;
-
-
-
-
-
 
 - (void)scrollIconToVisible:(FSNIcon *)icon;
 

@@ -124,6 +124,7 @@
     icon = [[FSNIcon alloc] initForNode: node
                                iconSize: ICN_SIZE
                            iconPosition: NSImageLeft
+                              labelFont: [NSFont systemFontOfSize: 12]
                               gridIndex: 0
                               dndSource: NO
                               acceptDnd: NO];

@@ -58,13 +58,8 @@ static NSDictionary *fontAttr = nil;
     NSString *selName = [defaults stringForKey: @"DesktopApplicationSelName"];
 
     if (appName && selName) {
-      #ifdef GNUSTEP 
-		  Class desktopAppClass = [[NSBundle mainBundle] principalClass];
-      #else
 		  Class desktopAppClass = [[NSBundle mainBundle] classNamed: appName];
-      #endif
       SEL sel = NSSelectorFromString(selName);
-
       desktopApp = [desktopAppClass performSelector: sel];
     }
   }

@@ -80,6 +80,7 @@ static id <DesktopApplication> desktopApp = nil;
   self = [super initForNode: anode
                    iconSize: isize
                iconPosition: NSImageOnly
+                  labelFont: [NSFont systemFontOfSize: 12]
                   gridIndex: 0
                   dndSource: NO
                   acceptDnd: NO];

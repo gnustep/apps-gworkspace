@@ -225,10 +225,6 @@ typedef enum DockPosition {
 //
 - (void)openSelection:(id)sender;
 
-- (void)openSelectionWithApp:(id)sender;
-
-- (void)openSelectionWith:(id)sender;
-
 - (void)newFolder:(id)sender;
 
 - (void)duplicateFiles:(id)sender;
@@ -272,6 +268,8 @@ typedef enum DockPosition {
 - (void)selectionChanged:(NSArray *)newsel;
 
 - (void)openSelectionInNewViewer:(BOOL)newv;
+
+- (void)openSelectionWithApp:(id)sender;
 
 - (void)performFileOperation:(NSDictionary *)opinfo;
 

@@ -70,10 +70,12 @@ if (rct.size.height < 0) rct.size.height = 0; \
   TEST_RELEASE (infoPath);
   TEST_RELEASE (nodeInfo);
   RELEASE (icons);
+  RELEASE (labelFont);
   RELEASE (nameEditor);
   RELEASE (horizontalImage);
   RELEASE (verticalImage);
   TEST_RELEASE (lastSelection);
+  TEST_RELEASE (charBuffer);
   RELEASE (backColor);
 
   [super dealloc];
@@ -90,13 +92,8 @@ if (rct.size.height < 0) rct.size.height = 0; \
     id defentry;
 
     if (appName && selName) {
-      #ifdef GNUSTEP 
-		  Class desktopAppClass = [[NSBundle mainBundle] principalClass];
-      #else
 		  Class desktopAppClass = [[NSBundle mainBundle] classNamed: appName];
-      #endif
       SEL sel = NSSelectorFromString(selName);
-
       desktopApp = [desktopAppClass performSelector: sel];
     }
   
@@ -117,10 +114,10 @@ if (rct.size.height < 0) rct.size.height = 0; \
 
     defentry = [defaults objectForKey: @"iconsize"];
     iconSize = defentry ? [defentry intValue] : DEF_ICN_SIZE;
-    [FSNIcon setLabelFont: [NSFont systemFontOfSize: iconSize]];
 
     defentry = [defaults objectForKey: @"labeltxtsize"];
     labelTextSize = defentry ? [defentry intValue] : DEF_TEXT_SIZE;
+    ASSIGN (labelFont, [NSFont systemFontOfSize: labelTextSize]);
     
     defentry = [defaults objectForKey: @"iconposition"];
     iconPosition = defentry ? [defentry intValue] : DEF_ICN_POS;
@@ -134,22 +131,23 @@ if (rct.size.height < 0) rct.size.height = 0; \
         
     nameEditor = [FSNIconNameEditor new];
     [nameEditor setDelegate: self];  
-		[nameEditor setFont: [FSNIcon labelFont]];
+		[nameEditor setFont: labelFont];
 		[nameEditor setBezeled: NO];
 		[nameEditor setAlignment: NSCenterTextAlignment];
 	  [nameEditor setBackgroundColor: backColor];
     editIcon = nil;
     
     isDragTarget = NO;
+		lastKeyPressed = 0.;
+    charBuffer = nil;
+    selectionMask = NSSingleSelectionMask;
+
+    [self calculateGridSize];
     
     [self registerForDraggedTypes: [NSArray arrayWithObjects: 
                                                 NSFilenamesPboardType, 
                                                 @"GWRemoteFilenamesPboardType", 
                                                 nil]];    
-
-    selectionMask = NSSingleSelectionMask;
-    
-    [self calculateGridSize];
   }
    
   return self;
@@ -163,6 +161,95 @@ if (rct.size.height < 0) rct.size.height = 0; \
   [icons addObjectsFromArray: sorted];
 }
 
+
+
+- (void)readNodeInfo
+{
+/*
+  ASSIGN (infoPath, [[node path] stringByAppendingPathComponent: @".dirinfo"]);
+  DESTROY (nodeInfo);
+  
+  if ([[NSFileManager defaultManager] fileExistsAtPath: infoPath]) {
+    NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: infoPath];
+    id entry;
+
+    if (dict) {
+      nodeInfo = [dict mutableCopy];
+  
+      entry = [nodeInfo objectForKey: @"backcolor"];
+      if (entry) {
+        float red = [[entry objectForKey: @"red"] floatValue];
+        float green = [[entry objectForKey: @"green"] floatValue];
+        float blue = [[entry objectForKey: @"blue"] floatValue];
+        float alpha = [[entry objectForKey: @"alpha"] floatValue];
+
+        ASSIGN (backColor, [NSColor colorWithCalibratedRed: red 
+                                                     green: green 
+                                                      blue: blue 
+                                                     alpha: alpha]);
+      } else {
+        ASSIGN (backColor, [NSColor windowBackgroundColor]);
+      }
+
+      entry = [nodeInfo objectForKey: @"iconsize"];
+      iconSize = entry ? [entry intValue] : DEF_ICN_SIZE;
+
+      entry = [nodeInfo objectForKey: @"labeltxtsize"];
+      labelTextSize = entry ? [entry intValue] : DEF_TEXT_SIZE;
+      ASSIGN (labelFont, [NSFont systemFontOfSize: labelTextSize]);
+
+      entry = [nodeInfo objectForKey: @"iconposition"];
+      iconPosition = entry ? [entry intValue] : DEF_ICN_POS;
+
+      entry = [nodeInfo objectForKey: @"fsn_info_type"];
+      infoType = entry ? [entry intValue] : FSNInfoNameType;
+    
+    
+    
+    
+    
+    } else {
+      nodeInfo = [NSMutableDictionary new];
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    }
+  } else {
+    nodeInfo = [NSMutableDictionary new];
+  }
+  */
+}
+
+- (void)updateNodeInfo
+{
+/*
+  if ([node isWritable]) {
+    NSMutableDictionary *indexes = [NSMutableDictionary dictionary];
+    int i;
+    
+    for (i = 0; i < [icons count]; i++) {
+      FSNIcon *icon = [icons objectAtIndex: i];
+    
+      [indexes setObject: [NSNumber numberWithInt: [icon gridIndex]]
+                  forKey: [[icon node] name]];
+    }
+    
+    [nodeInfo setObject: indexes forKey: @"indexes"];
+    [nodeInfo writeToFile: infoPath atomically: YES];
+  }
+  */
+}
+
+
+
+
+
 - (void)calculateGridSize
 {
   NSSize highlightSize = NSZeroSize;
@@ -174,8 +261,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
     highlightSize.height = iconSize + 4;
   }
 
-  [FSNIcon setLabelFont: [NSFont systemFontOfSize: labelTextSize]];
-  labelSize.height = floor([[FSNIcon labelFont] defaultLineHeightForFont]);
+  labelSize.height = floor([labelFont defaultLineHeightForFont]);
   labelSize.width = LABEL_W_FACT * labelTextSize;
 
   gridSize.height = highlightSize.height;
@@ -277,20 +363,6 @@ if (rct.size.height < 0) rct.size.height = 0; \
   
   [self updateNameEditor];
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 - (void)scrollIconToVisible:(FSNIcon *)icon
 {
@@ -399,21 +471,6 @@ if (rct.size.height < 0) rct.size.height = 0; \
 		}
 	} 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
@@ -614,6 +671,183 @@ pp.x = NSMaxX([self bounds]) - 1
   [self selectionDidChange];
 }
 
+- (void)keyDown:(NSEvent *)theEvent 
+{
+  NSString *characters = [theEvent characters];  
+  unichar character;
+	NSRect vRect, hiddRect;
+	NSPoint p;
+	float x, y, w, h;
+
+	characters = [theEvent characters];
+	character = 0;
+		
+  if ([characters length] > 0) {
+		character = [characters characterAtIndex: 0];
+	}
+	
+  switch (character) {
+    case NSPageUpFunctionKey:
+		  vRect = [self visibleRect];
+		  p = vRect.origin;    
+		  x = p.x;
+		  y = p.y + vRect.size.height;
+		  w = vRect.size.width;
+		  h = vRect.size.height;
+		  hiddRect = NSMakeRect(x, y, w, h);
+		  [self scrollRectToVisible: hiddRect];
+	    return;
+
+    case NSPageDownFunctionKey:
+		  vRect = [self visibleRect];
+		  p = vRect.origin;
+		  x = p.x;
+		  y = p.y - vRect.size.height;
+		  w = vRect.size.width;
+		  h = vRect.size.height;
+		  hiddRect = NSMakeRect(x, y, w, h);
+		  [self scrollRectToVisible: hiddRect];
+	    return;
+
+    case NSUpArrowFunctionKey:
+	    [self selectIconInPrevLine];
+      return;
+
+    case NSDownArrowFunctionKey:
+	    [self selectIconInNextLine];
+      return;
+
+    case NSLeftArrowFunctionKey:
+			{
+				if ([theEvent modifierFlags] & NSControlKeyMask) {
+	      	[super keyDown: theEvent];
+	    	} else {
+	    		[self selectPrevIcon];
+				}
+			}
+      return;
+
+    case NSRightArrowFunctionKey:
+			{
+				if ([theEvent modifierFlags] & NSControlKeyMask) {
+	      	[super keyDown: theEvent];
+	    	} else {
+	    		[self selectNextIcon];
+				}
+			}
+	  	return;
+      
+    case 13:
+      [desktopApp openSelectionInNewViewer: NO];
+      return;
+
+    default:    
+      break;
+  }
+
+  if ((character < 0xF700) && ([characters length] > 0)) {
+		SEL icnwpSel = @selector(selectIconWithPrefix:);
+		IMP icnwp = [self methodForSelector: icnwpSel];
+    
+    if (charBuffer == nil) {
+      charBuffer = [characters substringToIndex: 1];
+      RETAIN (charBuffer);
+      lastKeyPressed = 0.;
+    } else {
+      if ([theEvent timestamp] - lastKeyPressed < 2000.0) {
+        ASSIGN (charBuffer, ([charBuffer stringByAppendingString:
+				    															[characters substringToIndex: 1]]));
+      } else {
+        ASSIGN (charBuffer, ([characters substringToIndex: 1]));
+        lastKeyPressed = 0.;
+      }														
+    }	
+    		
+    lastKeyPressed = [theEvent timestamp];
+
+    if ((*icnwp)(self, icnwpSel, charBuffer)) {
+      return;
+    }
+  }
+  
+  [super keyDown: theEvent];
+}
+
+- (NSMenu *)menuForEvent:(NSEvent *)theEvent
+{
+  NSArray *selnodes;
+  NSMenu *menu;
+  NSMenuItem *menuItem;
+  NSString *firstext; 
+  NSDictionary *apps;
+  NSEnumerator *app_enum;
+  id key; 
+  int i;
+
+  if ([theEvent modifierFlags] == NSControlKeyMask) {
+    return [super menuForEvent: theEvent];
+  } 
+
+  selnodes = [self selectedNodes];
+
+  if ([selnodes count]) {
+    NSAutoreleasePool *pool;
+
+    firstext = [[[selnodes objectAtIndex: 0] path] pathExtension];
+
+    for (i = 0; i < [selnodes count]; i++) {
+      FSNode *snode = [selnodes objectAtIndex: i];
+      NSString *selpath = [snode path];
+      NSString *ext = [selpath pathExtension];   
+
+      if ([ext isEqual: firstext] == NO) {
+        return [super menuForEvent: theEvent];  
+      }
+
+      if ([snode isDirectory] == NO) {
+        if ([snode isPlain] == NO) {
+          return [super menuForEvent: theEvent];
+        }
+      } else {
+        if (([snode isPackage] == NO) || [snode isApplication]) {
+          return [super menuForEvent: theEvent];
+        } 
+      }
+    }
+    
+    menu = [[NSMenu alloc] initWithTitle: NSLocalizedString(@"Open with", @"")];
+    apps = [[NSWorkspace sharedWorkspace] infoForExtension: firstext];
+    app_enum = [[apps allKeys] objectEnumerator];
+
+    pool = [NSAutoreleasePool new];
+
+    while ((key = [app_enum nextObject])) {
+      NSDictionary *dict = [apps objectForKey: key];
+      NSString *role = [dict objectForKey: @"NSRole"];
+
+      menuItem = [NSMenuItem new];    
+
+      if (role) {
+        [menuItem setTitle: [NSString stringWithFormat: @"%@ - %@", key, role]];
+      } else {
+        [menuItem setTitle: [NSString stringWithFormat: @"%@", key]];
+      }
+
+      [menuItem setTarget: desktopApp];      
+      [menuItem setAction: @selector(openSelectionWithApp:)];      
+      [menuItem setRepresentedObject: key];            
+      [menu addItem: menuItem];
+      RELEASE (menuItem);
+    }
+
+    RELEASE (pool);
+    
+    return [menu autorelease];
+  }
+   
+  return [super menuForEvent: theEvent]; 
+}
+
 - (void)resizeWithOldSuperviewSize:(NSSize)oldFrameSize
 {
   [self tile];
@@ -633,6 +867,11 @@ pp.x = NSMaxX([self bounds]) - 1
 }
 
 - (BOOL)acceptsFirstMouse:(NSEvent *)theEvent
+{
+  return YES;
+}
+
+- (BOOL)acceptsFirstResponder
 {
   return YES;
 }
@@ -666,6 +905,7 @@ pp.x = NSMaxX([self bounds]) - 1
     FSNIcon *icon = [[FSNIcon alloc] initForNode: subnode
                                         iconSize: iconSize
                                     iconPosition: iconPosition
+                                       labelFont: labelFont
                                        gridIndex: -1
                                        dndSource: YES
                                        acceptDnd: YES];
@@ -693,12 +933,92 @@ pp.x = NSMaxX([self bounds]) - 1
 
 - (void)nodeContentsDidChange:(NSDictionary *)info
 {
+  NSString *operation = [info objectForKey: @"operation"];
+  NSString *source = [info objectForKey: @"source"];
+  NSString *destination = [info objectForKey: @"destination"];
+  NSArray *files = [info objectForKey: @"files"];
+  int i; 
 
+  if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
+    files = [NSArray arrayWithObject: [source lastPathComponent]];
+    source = [source stringByDeletingLastPathComponent]; 
+  }
+
+  if ([[node path] isEqual: source]
+        && ([operation isEqual: @"NSWorkspaceMoveOperation"]
+            || [operation isEqual: @"NSWorkspaceDestroyOperation"]
+            || [operation isEqual: @"GWorkspaceRenameOperation"]
+			      || [operation isEqual: @"NSWorkspaceRecycleOperation"]
+			      || [operation isEqual: @"GWorkspaceRecycleOutOperation"])) {
+    for (i = 0; i < [files count]; i++) {
+      NSString *fname = [files objectAtIndex: i];
+      FSNode *subnode = [FSNode nodeWithRelativePath: fname parent: node];
+      
+      [self removeRepOfSubnode: subnode];
+    }
+  }
+
+  if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
+    files = [NSArray arrayWithObject: [destination lastPathComponent]];
+    destination = [destination stringByDeletingLastPathComponent]; 
+  }
+
+  if ([[node path] isEqual: destination]
+          && ([operation isEqual: @"NSWorkspaceMoveOperation"]   
+              || [operation isEqual: @"NSWorkspaceCopyOperation"]
+              || [operation isEqual: @"NSWorkspaceLinkOperation"]
+              || [operation isEqual: @"NSWorkspaceDuplicateOperation"]
+              || [operation isEqual: @"GWorkspaceCreateDirOperation"]
+              || [operation isEqual: @"GWorkspaceRenameOperation"]
+				      || [operation isEqual: @"GWorkspaceRecycleOutOperation"])) { 
+    for (i = 0; i < [files count]; i++) {
+      NSString *fname = [files objectAtIndex: i];
+      FSNode *subnode = [FSNode nodeWithRelativePath: fname parent: node];
+      FSNIcon *icon = [self repOfSubnode: subnode];
+      
+      if (icon) {
+        [icon setNode: subnode];
+      } else {
+        [self addRepForSubnode: subnode];
+      }
+    }
+  }
+  
+  [self checkLockedReps];
+  [self tile];
+  [self selectionDidChange];
 }
 
 - (void)watchedPathDidChange:(NSDictionary *)info
 {
+  NSString *event = [info objectForKey: @"event"];
+  NSArray *files = [info objectForKey: @"files"];
+  NSString *ndpath = [node path];
+  int i;
 
+  if ([event isEqual: @"GWFileDeletedInWatchedDirectory"]) {
+    for (i = 0; i < [files count]; i++) {  
+      NSString *fname = [files objectAtIndex: i];
+      NSString *fpath = [ndpath stringByAppendingPathComponent: fname];  
+      [self removeRepOfSubnodePath: fpath];
+    }
+    
+  } else if ([event isEqual: @"GWFileCreatedInWatchedDirectory"]) {
+    for (i = 0; i < [files count]; i++) {  
+      NSString *fname = [files objectAtIndex: i];
+      FSNode *subnode = [FSNode nodeWithRelativePath: fname parent: node];
+      FSNIcon *icon = [self repOfSubnode: subnode];
+      
+      if (icon) {
+        [icon setNode: subnode];
+      } else {
+        [self addRepForSubnode: subnode];
+      }
+    }
+  }
+  
+  [self tile];
+  [self selectionDidChange];
 }
 
 - (void)setShowType:(FSNInfoType)type
@@ -750,14 +1070,15 @@ pp.x = NSMaxX([self bounds]) - 1
   int i;
 
   labelTextSize = size;
+  ASSIGN (labelFont, [NSFont systemFontOfSize: labelTextSize]);  
   [self calculateGridSize];
 
   for (i = 0; i < [icons count]; i++) {
     FSNIcon *icon = [icons objectAtIndex: i];
-    [icon setFont: [FSNIcon labelFont]];
+    [icon setFont: labelFont];
   }
 
-  [nameEditor setFont: [FSNIcon labelFont]];
+  [nameEditor setFont: labelFont];
 
   [self tile];
 }
@@ -833,6 +1154,7 @@ pp.x = NSMaxX([self bounds]) - 1
   FSNIcon *icon = [[FSNIcon alloc] initForNode: anode
                                       iconSize: iconSize
                                   iconPosition: iconPosition
+                                     labelFont: labelFont
                                      gridIndex: -1
                                      dndSource: YES
                                      acceptDnd: YES];
@@ -1339,7 +1661,7 @@ pp.x = NSMaxX([self bounds]) - 1
         break;
     }
  
-    edwidth = [[FSNIcon labelFont] widthOfString: nodeDescr];
+    edwidth = [labelFont widthOfString: nodeDescr];
     edwidth += margin;
     
     if (ipos == NSImageAbove) {
@@ -1396,7 +1718,7 @@ pp.x = NSMaxX([self bounds]) - 1
 {
   NSRect icnr = [editIcon frame];
   int ipos = [editIcon iconPosition];
-  float edwidth = [[FSNIcon labelFont] widthOfString: [nameEditor stringValue]]; 
+  float edwidth = [labelFont widthOfString: [nameEditor stringValue]]; 
   int margin = [FSNodeRep labelMargin];
   float bw = [self bounds].size.width - EDIT_MARGIN;
   NSRect edrect = [nameEditor frame];

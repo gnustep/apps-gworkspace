@@ -160,6 +160,8 @@
 
 - (void)openSelectionInNewViewer:(BOOL)newv;
 
+- (void)openSelectionWithApp:(id)sender;
+
 - (void)performFileOperation:(NSDictionary *)opinfo;
 
 - (void)concludeRemoteFilesDragOperation:(NSData *)opinfo

@@ -30,6 +30,7 @@
 #include "FSNodeRep.h"
 
 @class NSImage;
+@class NSFont;
 @class NSBezierPath;
 @class NSTextField;
 @class FSNode;
@@ -74,13 +75,10 @@
 - (id)initForNode:(FSNode *)anode
          iconSize:(int)isize
      iconPosition:(unsigned int)ipos
+        labelFont:(NSFont *)lfont
         gridIndex:(int)gindex
         dndSource:(BOOL)dndsrc
         acceptDnd:(BOOL)dndaccept;
-
-+ (NSFont *)labelFont;
-
-+ (void)setLabelFont:(NSFont *)afont;
 
 - (void)setSelectable:(BOOL)value;
 

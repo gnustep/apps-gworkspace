@@ -26,11 +26,11 @@
 #define DESKTOP_VIEW_H
 
 #include <AppKit/NSView.h>
-#include "FSNIconGridContainer.h"
 #include "FSNodeRep.h"
 
 @class NSColor;
 @class NSImage;
+@class NSFont;
 @class NSMenu;
 @class Desktop;
 @class FSNode;
@@ -63,6 +63,7 @@ typedef enum BackImageStyle {
 
   int iconSize;
   int labelTextSize;
+  NSFont *labelFont;
   int iconPosition;
 
   NSRect screenFrame;  

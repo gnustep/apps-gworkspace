@@ -999,25 +999,6 @@ static Desktop *desktop = nil;
   [self openSelectionInNewViewer: YES];
 }
 
-- (void)openSelectionWithApp:(id)sender
-{
-  NSString *appName = (NSString *)[sender representedObject];
-  NSArray *selpaths = [[win desktopView] selectedPaths];
-    
-  if ([selpaths count]) {
-    int i;
-    
-    for (i = 0; i < [selpaths count]; i++) {
-      [ws openFile: [selpaths objectAtIndex: i] withApplication: appName];
-    }
-  }
-}
-
-- (void)openSelectionWith:(id)sender
-{
-//  [[GWLib workspaceApp] openSelectedPathsWith];
-}
-
 - (void)newFolder:(id)sender
 {
   NSString *desktopPath = [desktopDir path];
@@ -1446,6 +1427,20 @@ static Desktop *desktop = nil;
       }
     } else if ([node isPlain]) {
       [ws openFile: [node path]];
+    }
+  }
+}
+
+- (void)openSelectionWithApp:(id)sender
+{
+  NSString *appName = (NSString *)[sender representedObject];
+  NSArray *selpaths = [[win desktopView] selectedPaths];
+    
+  if ([selpaths count]) {
+    int i;
+    
+    for (i = 0; i < [selpaths count]; i++) {
+      [ws openFile: [selpaths objectAtIndex: i] withApplication: appName];
     }
   }
 }

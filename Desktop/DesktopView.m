@@ -67,6 +67,7 @@
   TEST_RELEASE (infoPath);
   TEST_RELEASE (nodeInfo);
   RELEASE (icons);
+  RELEASE (labelFont);
   RELEASE (nameEditor);
   RELEASE (horizontalImage);
   RELEASE (verticalImage);
@@ -157,10 +158,10 @@
 
     defentry = [defaults objectForKey: @"iconsize"];
     iconSize = defentry ? [defentry intValue] : DEF_ICN_SIZE;
-    [FSNIcon setLabelFont: [NSFont systemFontOfSize: iconSize]];
     
     defentry = [defaults objectForKey: @"labeltxtsize"];
     labelTextSize = defentry ? [defentry intValue] : DEF_TEXT_SIZE;
+    ASSIGN (labelFont, [NSFont systemFontOfSize: labelTextSize]);
     
     defentry = [defaults objectForKey: @"iconposition"];
     iconPosition = defentry ? [defentry intValue] : DEF_ICN_POS;
@@ -173,7 +174,7 @@
         
     nameEditor = [FSNIconNameEditor new];
     [nameEditor setDelegate: self];  
-		[nameEditor setFont: [FSNIcon labelFont]];
+		[nameEditor setFont: labelFont];
 		[nameEditor setBezeled: NO];
 		[nameEditor setAlignment: NSCenterTextAlignment];
 	  [nameEditor setBackgroundColor: backColor];
@@ -405,7 +406,7 @@
 
   if (iconPosition == NSImageAbove) {  
     hlightRect.origin.x = ceil((gridSize.width - hlightRect.size.width) / 2);   
-    hlightRect.origin.y = floor([[FSNIcon labelFont] defaultLineHeightForFont]);
+    hlightRect.origin.y = floor([labelFont defaultLineHeightForFont]);
   } else {
     hlightRect.origin.x = 0;
     hlightRect.origin.y = 0;
@@ -428,8 +429,7 @@
     highlightSize.height = iconSize + 4;
   }
 
-  [FSNIcon setLabelFont: [NSFont systemFontOfSize: labelTextSize]];
-  labelSize.height = floor([[FSNIcon labelFont] defaultLineHeightForFont]);
+  labelSize.height = floor([labelFont defaultLineHeightForFont]);
   labelSize.width = LABEL_W_FACT * labelTextSize;
 
   gridSize.height = highlightSize.height;
@@ -757,6 +757,8 @@
   selnodes = [self selectedNodes];
 
   if ([selnodes count]) {
+    NSAutoreleasePool *pool;
+        
     firstext = [[[selnodes objectAtIndex: 0] path] pathExtension];
 
     for (i = 0; i < [selnodes count]; i++) {
@@ -783,6 +785,8 @@
     apps = [[NSWorkspace sharedWorkspace] infoForExtension: firstext];
     app_enum = [[apps allKeys] objectEnumerator];
 
+    pool = [NSAutoreleasePool new];
+     
     while ((key = [app_enum nextObject])) {
       NSDictionary *dict = [apps objectForKey: key];
       NSString *role = [dict objectForKey: @"NSRole"];
@@ -801,14 +805,9 @@
       [menu addItem: menuItem];
       RELEASE (menuItem);
     }
-
-    menuItem = [NSMenuItem new]; 
-    [menuItem setTitle:  NSLocalizedString(@"Open with...", @"")];
-    [menuItem setTarget: desktop];      
-    [menuItem setAction: @selector(openSelectionWith:)];          
-    [menu addItem: menuItem];
-    RELEASE (menuItem);
-
+    
+    RELEASE (pool);
+    
     return [menu autorelease];
   }
    
@@ -883,6 +882,7 @@
     FSNIcon *icon = [[FSNIcon alloc] initForNode: subnode
                                         iconSize: iconSize
                                     iconPosition: iconPosition
+                                       labelFont: labelFont
                                        gridIndex: -1
                                        dndSource: YES
                                        acceptDnd: YES];
@@ -1028,7 +1028,6 @@
         [icon setGridIndex: index];
       }
     }
-    
   }
   
   [self checkLockedReps];
@@ -1133,14 +1132,15 @@
   int i;
 
   labelTextSize = size;
+  ASSIGN (labelFont, [NSFont systemFontOfSize: labelTextSize]);
   [self makeIconsGrid];
 
   for (i = 0; i < [icons count]; i++) {
     FSNIcon *icon = [icons objectAtIndex: i];
-    [icon setFont: [FSNIcon labelFont]];
+    [icon setFont: labelFont];
   }
 
-  [nameEditor setFont: [FSNIcon labelFont]];
+  [nameEditor setFont: labelFont];
 
   [self tile];
   [self setNeedsDisplay: YES];
@@ -1218,6 +1218,7 @@
   FSNIcon *icon = [[FSNIcon alloc] initForNode: anode
                                       iconSize: iconSize
                                   iconPosition: iconPosition
+                                     labelFont: labelFont
                                      gridIndex: [self firstFreeGridIndex]
                                      dndSource: YES
                                      acceptDnd: YES];
@@ -1927,7 +1928,7 @@ int sortDragged(id icn1, id icn2, void *context)
         break;
     }
  
-    edwidth = [[FSNIcon labelFont] widthOfString: nodeDescr];
+    edwidth = [labelFont widthOfString: nodeDescr];
     edwidth += margin;
     
     if (ipos == NSImageAbove) {
@@ -1984,7 +1985,7 @@ int sortDragged(id icn1, id icn2, void *context)
 {
   NSRect icnr = [editIcon frame];
   int ipos = [editIcon iconPosition];
-  float edwidth = [[FSNIcon labelFont] widthOfString: [nameEditor stringValue]]; 
+  float edwidth = [labelFont widthOfString: [nameEditor stringValue]]; 
   int margin = [FSNodeRep labelMargin];
   float bw = [self bounds].size.width - EDIT_MARGIN;
   NSRect edrect = [nameEditor frame];
