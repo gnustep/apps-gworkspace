@@ -67,6 +67,7 @@
   [super setFont: fontObj];
   ASSIGN (fontAttr, [NSDictionary dictionaryWithObject: [self font] 
                                                 forKey: NSFontAttributeName]);
+  titlelenght = [[self stringValue] sizeWithAttributes: fontAttr].width; 
   dtslenght = [dots sizeWithAttributes: fontAttr].width;     
 }
 

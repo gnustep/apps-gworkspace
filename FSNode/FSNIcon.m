@@ -223,10 +223,9 @@ static NSFont *labelFont = nil;
 {
   NSRect frameRect = [self frame];
   NSSize sz = [icon size];
+  int lblmargin = [FSNodeRep labelMargin];
   
   if (icnPosition == NSImageAbove) {
-    int lblmargin = [FSNodeRep labelMargin];
-    
     labelRect.size.width = ceil([label uncuttedTitleLenght] + lblmargin);
   
     if (labelRect.size.width >= frameRect.size.width) {
@@ -265,6 +264,14 @@ static NSFont *labelFont = nil;
     }
 
   } else if (icnPosition == NSImageLeft) {
+    float icnspacew = selectable ? hlightRect.size.width : icnBounds.size.width;
+  
+    labelRect.size.width = ceil([label uncuttedTitleLenght] + lblmargin);
+  
+    if (labelRect.size.width >= (frameRect.size.width - icnspacew)) {
+      labelRect.size.width = (frameRect.size.width - icnspacew);
+    } 
+  
     if (selectable) {
       if ((hlightRect.origin.x != 0) || (hlightRect.origin.y != 0)) {
         NSAffineTransform *transform = [NSAffineTransform transform];
