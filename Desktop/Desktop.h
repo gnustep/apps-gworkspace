@@ -107,6 +107,13 @@ typedef enum DockPosition {
 @end
 
 
+@protocol GWRemoteFilesDraggingInfo
+
+- (oneway void)remoteDraggingDestinationReply:(NSData *)reply;
+
+@end 
+
+
 @interface Desktop : NSObject <FSWClientProtocol>
 {
   FSNode *desktopDir;

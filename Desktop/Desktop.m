@@ -1462,6 +1462,49 @@ static Desktop *desktop = nil;
 - (void)concludeRemoteFilesDragOperation:(NSData *)opinfo
                              atLocalPath:(NSString *)localdest
 {
+  NSDictionary *infoDict = [NSUnarchiver unarchiveObjectWithData: opinfo];
+  NSArray *srcPaths = [infoDict objectForKey: @"paths"];
+  BOOL bookmark = [[infoDict objectForKey: @"bookmark"] boolValue];
+  NSString *connName = [infoDict objectForKey: @"dndconn"];
+	NSArray *locContents = [fm directoryContentsAtPath: [desktopDir path]];
+  BOOL samename = NO;
+  int i;
+
+  if (locContents) {
+    NSConnection *conn;
+    id remote;
+  
+    for (i = 0; i < [srcPaths count]; i++) {
+      NSString *name = [[srcPaths objectAtIndex: i] lastPathComponent];
+
+      if ([locContents containsObject: name]) {
+        samename = YES;
+        break;
+      }
+    }
+    
+    conn = [NSConnection connectionWithRegisteredName: connName host: @""];
+  
+    if (conn) {
+      remote = [conn rootProxy];
+      
+      if (remote) {
+        NSMutableDictionary *reply = [NSMutableDictionary dictionary];
+        NSData *rpdata;
+      
+        [reply setObject: [desktopDir path] forKey: @"destination"];
+        [reply setObject: srcPaths forKey: @"paths"];
+        [reply setObject: [NSNumber numberWithBool: bookmark] forKey: @"bookmark"];  
+        [reply setObject: [NSNumber numberWithBool: !samename] forKey: @"dndok"];
+        rpdata = [NSArchiver archivedDataWithRootObject: reply];
+      
+        [remote setProtocolForProxy: @protocol(GWRemoteFilesDraggingInfo)];
+        remote = (id <GWRemoteFilesDraggingInfo>)remote;
+      
+        [remote remoteDraggingDestinationReply: rpdata];
+      }
+    }
+  }
 }
 
 - (void)addWatcherForPath:(NSString *)path
