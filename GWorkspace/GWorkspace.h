@@ -102,6 +102,13 @@
 @end
 
 
+@protocol	OperationProtocol
+
+- (oneway void)performFileOperation:(NSData *)opinfo;
+
+@end
+
+
 @interface GWorkspace : NSObject <GWProtocol, FSWClientProtocol>
 {
 	NSString *defEditor, *defXterm, *defXtermArgs;
@@ -115,9 +122,11 @@
   id fswatcher;
   BOOL fswnotifications;
 	
-  id inspector;
+  id inspectorApp;
   BOOL useInspector;
-  
+
+  id operationsApp;
+    
   AppsViewer *appsViewer;
   FinderController *finder;
   PrefController *prefController;
@@ -283,6 +292,10 @@
 - (void)connectInspector;
 
 - (void)inspectorConnectionDidDie:(NSNotification *)notif;
+
+- (void)connectOperation;
+
+- (void)operationConnectionDidDie:(NSNotification *)notif;
 
 - (id)connectApplication:(NSString *)appName;
 

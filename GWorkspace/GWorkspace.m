@@ -134,6 +134,7 @@ static GWorkspace *gworkspace = nil;
     }
   }
   	
+/*
   op = [[FileOperation alloc] initWithOperation: operation
                                          source: source 
                                     destination: destination 
@@ -143,6 +144,31 @@ static GWorkspace *gworkspace = nil;
                                      windowRect: wrect];
   [operations addObject: op];
   RELEASE (op);
+*/  
+  
+  {
+    NSMutableDictionary *opdict = [NSMutableDictionary dictionary];
+    NSData *data;
+    
+    [self connectOperation];
+
+    if (operationsApp == nil) {  
+      NSRunAlertPanel(nil, 
+          NSLocalizedString(@"File operations disabled!", @""), 
+                              NSLocalizedString(@"OK", @""), nil, nil);                                     
+      return NO;
+    }
+  
+    [opdict setObject: operation forKey: @"operation"];
+    [opdict setObject: source forKey: @"source"];
+    [opdict setObject: destination forKey: @"destination"];
+    [opdict setObject: files forKey: @"files"];
+  
+    data = [NSArchiver archivedDataWithRootObject: opdict];
+  
+    [operationsApp performFileOperation: data];
+  }
+  
   
   return YES;
 }
@@ -485,7 +511,8 @@ return [ws openFile: fullPath withApplication: appName]
   }
   [[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
   [[NSNotificationCenter defaultCenter] removeObserver: self];
-  DESTROY (inspector);
+  DESTROY (inspectorApp);
+  DESTROY (operationsApp);
 	RELEASE (defEditor);
 	RELEASE (defXterm);
 	RELEASE (defXtermArgs);
@@ -653,16 +680,9 @@ return [ws openFile: fullPath withApplication: appName]
   fswnotifications = YES;
   [self connectFSWatcher];
 
-  inspector = nil;
-  useInspector = ![defaults boolForKey: @"noinspector"];
-  if (useInspector) {
-    [self connectInspector];
-    if (inspector) {
-      NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
-      [inspector setPathsData: data];
-    }
-  }
-
+  inspectorApp = nil;
+  operationsApp = nil;
+  
   appsViewer = [[AppsViewer alloc] init];
 	history = [[History alloc] init];
   prefController = [[PrefController alloc] init];  
@@ -789,14 +809,25 @@ return [ws openFile: fullPath withApplication: appName]
     }
   }
 
-  if (inspector && useInspector) {
-    NSConnection *inspconn = [(NSDistantObject *)inspector connectionForProxy];
+  if (inspectorApp && useInspector) {
+    NSConnection *inspconn = [(NSDistantObject *)inspectorApp connectionForProxy];
   
     if (inspconn && [inspconn isValid]) {
       [[NSNotificationCenter defaultCenter] removeObserver: self
 	                        name: NSConnectionDidDieNotification
 	                      object: inspconn];
-      DESTROY (inspector);
+      DESTROY (inspectorApp);
+    }
+  }
+
+  if (operationsApp) {
+    NSConnection *opspconn = [(NSDistantObject *)operationsApp connectionForProxy];
+  
+    if (opspconn && [opspconn isValid]) {
+      [[NSNotificationCenter defaultCenter] removeObserver: self
+	                        name: NSConnectionDidDieNotification
+	                      object: opspconn];
+      DESTROY (operationsApp);
     }
   }
   		
@@ -1597,9 +1628,9 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   if (paths && ([selectedPaths isEqualToArray: paths] == NO)) {
     ASSIGN (selectedPaths, paths);
 
-    if (inspector && useInspector) {
+    if (inspectorApp && useInspector) {
       NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
-      [inspector setPathsData: data];
+      [inspectorApp setPathsData: data];
     }
   }
 }
@@ -1610,9 +1641,9 @@ NSLocalizedString(@"OK", @""), nil, nil); \
     return;
   }
   
-  if (inspector && useInspector) {
+  if (inspectorApp && useInspector) {
     NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
-    [inspector setPathsData: data];
+    [inspectorApp setPathsData: data];
   }    
 				
   [[NSNotificationCenter defaultCenter]
@@ -1668,9 +1699,9 @@ NSLocalizedString(@"OK", @""), nil, nil); \
                     ofType:(NSString *)type
                   typeIcon:(NSImage *)icon
 {
-  if (inspector && useInspector) {
-    if ([inspector canDisplayDataOfType: type]) {
-      [inspector showData: data ofType: type];
+  if (inspectorApp && useInspector) {
+    if ([inspectorApp canDisplayDataOfType: type]) {
+      [inspectorApp showData: data ofType: type];
     }
   }
 }
@@ -1720,7 +1751,7 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 
 	notifObj = [NSMutableDictionary dictionaryWithCapacity: 1];		
 	[notifObj setObject: operation forKey: @"operation"];	
-  [notifObj setObject: @"" forKey: @"source"];	
+  [notifObj setObject: basePath forKey: @"source"];	
   [notifObj setObject: basePath forKey: @"destination"];	
   [notifObj setObject: [NSArray arrayWithObjects: fileName, nil] forKey: @"files"];	
 
@@ -2067,7 +2098,7 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 
 - (void)connectInspector
 {
-  if (inspector == nil) {
+  if (inspectorApp == nil) {
     id insp = [NSConnection rootProxyForConnectionWithRegisteredName: @"Inspector" 
                                                                 host: @""];
 
@@ -2079,10 +2110,15 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 		                     name: NSConnectionDidDieNotification
 		                   object: c];
       
-      inspector = insp;
-	    [inspector setProtocolForProxy: @protocol(InspectorProtocol)];
-      RETAIN (inspector);
+      inspectorApp = insp;
+	    [inspectorApp setProtocolForProxy: @protocol(InspectorProtocol)];
+      RETAIN (inspectorApp);
       useInspector = YES;
+      
+      if (selectedPaths) {
+        NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
+        [inspectorApp setPathsData: data];
+      }
       
 	  } else {
 	    static BOOL recursion = NO;
@@ -2135,10 +2171,10 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 	                    name: NSConnectionDidDieNotification
 	                  object: connection];
 
-  NSAssert(connection == [inspector connectionForProxy],
+  NSAssert(connection == [inspectorApp connectionForProxy],
 		                                  NSInternalInconsistencyException);
-  RELEASE (inspector);
-  inspector = nil;
+  RELEASE (inspectorApp);
+  inspectorApp = nil;
 
   if (NSRunAlertPanel(nil,
                     NSLocalizedString(@"The Inspector connection died.\nDo you want to restart it?", @""),
@@ -2147,14 +2183,92 @@ NSLocalizedString(@"OK", @""), nil, nil); \
                     nil)) {
     [self connectInspector]; 
      
-    if (inspector) {
+    if (inspectorApp) {
       NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
-      [inspector setPathsData: data];
+      [inspectorApp setPathsData: data];
     }
                   
   } else {
     useInspector = NO;
   }
+}
+
+- (void)connectOperation
+{
+  if (operationsApp == nil) {
+    id opr = [NSConnection rootProxyForConnectionWithRegisteredName: @"Operation" 
+                                                               host: @""];
+
+    if (opr) {
+      NSConnection *c = [opr connectionForProxy];
+
+	    [[NSNotificationCenter defaultCenter] addObserver: self
+	                   selector: @selector(operationConnectionDidDie:)
+		                     name: NSConnectionDidDieNotification
+		                   object: c];
+      
+      operationsApp = opr;
+	    [operationsApp setProtocolForProxy: @protocol(OperationProtocol)];
+      RETAIN (operationsApp);
+      
+	  } else {
+	    static BOOL recursion = NO;
+	  
+      if (recursion == NO) {
+        int i;
+        
+        [startAppWin showWindowWithTitle: @"GWorkspace"
+                                 appName: @"Operation"
+                            maxProgValue: 40.0];
+
+        [ws launchApplication: @"Operation"];
+
+        for (i = 1; i <= 40; i++) {
+          [startAppWin updateProgressBy: 1.0];
+	        [[NSRunLoop currentRunLoop] runUntilDate:
+		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+          opr = [NSConnection rootProxyForConnectionWithRegisteredName: @"Operation" 
+                                                                  host: @""];                  
+          if (opr) {
+            [startAppWin updateProgressBy: 40.0 - i];
+            break;
+          }
+        }
+        
+        [[startAppWin win] close];
+        
+	      recursion = YES;
+	      [self connectOperation];
+	      recursion = NO;
+        
+	    } else { 
+	      recursion = NO;
+        NSRunAlertPanel(nil,
+                NSLocalizedString(@"unable to contact Operation!", @""),
+                NSLocalizedString(@"Ok", @""),
+                nil, 
+                nil);  
+      }
+	  }
+  }
+}
+
+- (void)operationConnectionDidDie:(NSNotification *)notif
+{
+  id connection = [notif object];
+
+  [[NSNotificationCenter defaultCenter] removeObserver: self
+	                    name: NSConnectionDidDieNotification
+	                  object: connection];
+
+  NSAssert(connection == [operationsApp connectionForProxy],
+		                                  NSInternalInconsistencyException);
+  RELEASE (operationsApp);
+  operationsApp = nil;
+
+  NSRunAlertPanel(nil, 
+       NSLocalizedString(@"The Operation connection died. File operations disabled!", @""), 
+                              NSLocalizedString(@"OK", @""), nil, nil);                                     
 }
 
 - (id)connectApplication:(NSString *)appName
@@ -2308,57 +2422,57 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 
 - (void)showInspector:(id)sender
 {
-	if (inspector == nil) {
+	if (inspectorApp == nil) {
     [self connectInspector];
-    if (inspector) {
+    if (inspectorApp) {
       NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
-      [inspector setPathsData: data];
+      [inspectorApp setPathsData: data];
     }    
   }
-	if (inspector && useInspector) {
-    [inspector showWindow];
+	if (inspectorApp && useInspector) {
+    [inspectorApp showWindow];
   } 
 }
 
 - (void)showAttributesInspector:(id)sender
 {
-	if (inspector == nil) {
+	if (inspectorApp == nil) {
     [self connectInspector];
-    if (inspector) {
+    if (inspectorApp) {
       NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
-      [inspector setPathsData: data];
+      [inspectorApp setPathsData: data];
     }
   }
-  if (inspector && useInspector) {  
-    [inspector showAttributes];
+  if (inspectorApp && useInspector) {  
+    [inspectorApp showAttributes];
   } 
 }
 
 - (void)showContentsInspector:(id)sender
 {
-	if (inspector == nil) {
+	if (inspectorApp == nil) {
     [self connectInspector];
-    if (inspector) {
+    if (inspectorApp) {
       NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
-      [inspector setPathsData: data];
+      [inspectorApp setPathsData: data];
     }
   }
-  if (inspector && useInspector) {  
-    [inspector showContents];
+  if (inspectorApp && useInspector) {  
+    [inspectorApp showContents];
   } 
 }
 
 - (void)showToolsInspector:(id)sender
 {
-	if (inspector == nil) {
+	if (inspectorApp == nil) {
     [self connectInspector];
-    if (inspector) {
+    if (inspectorApp) {
       NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
-      [inspector setPathsData: data];
+      [inspectorApp setPathsData: data];
     }
   }
-  if (inspector && useInspector) {  
-    [inspector showTools];
+  if (inspectorApp && useInspector) {  
+    [inspectorApp showTools];
   } 
 }
 

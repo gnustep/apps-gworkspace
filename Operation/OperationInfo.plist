@@ -1,0 +1,8 @@
+{
+    NSIcon = "Operation.tiff";
+    NSRole = "NSNone";
+    ApplicationDescription = "Operation";
+    ApplicationIcon = "Operation.tiff";
+    ApplicationName = "Operation";
+    ApplicationRelease = "0.7.0";
+}
