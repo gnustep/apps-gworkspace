@@ -39,6 +39,7 @@ typedef enum FSNInfoType {
 
 @class NSImage;
 @class NSBezierPath;
+@class NSFont;
 
 @protocol FSNodeRep
 
@@ -97,6 +98,8 @@ typedef enum FSNInfoType {
             newViewer:(BOOL)newv;
 
 - (void)restoreLastSelection;
+
+- (NSColor *)backgroundColor;
 
 @end
 

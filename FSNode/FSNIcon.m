@@ -269,9 +269,18 @@ static NSFont *labelFont = nil;
 
   } else if (icnPosition == NSImageLeft) {
     if (selectable) {
-      hlightRect.origin.x = 0;
-      hlightRect.origin.y = 0;
+      if ((hlightRect.origin.x != 0) || (hlightRect.origin.y != 0)) {
+        NSAffineTransform *transform = [NSAffineTransform transform];
+    
+        [transform translateXBy: 0 - hlightRect.origin.x
+                            yBy: 0 - hlightRect.origin.y];
+    
+        [highlightPath transformUsingAffineTransform: transform];
       
+        hlightRect.origin.x = 0;
+        hlightRect.origin.y = 0;      
+      }
+            
       icnBounds.origin.x = (hlightRect.size.width - sz.width) / 2;
       icnBounds.origin.y = (hlightRect.size.height - sz.height) / 2;
             
@@ -290,6 +299,8 @@ static NSFont *labelFont = nil;
     icnBounds.origin.x = (frameRect.size.width - sz.width) / 2;
     icnBounds.origin.y = 0;
   } 
+  
+  [self setNeedsDisplay: YES]; 
 }
 
 - (NSMenu *)menuForEvent:(NSEvent *)theEvent
@@ -390,18 +401,21 @@ static NSFont *labelFont = nil;
 }
 
 - (void)drawRect:(NSRect)rect
-{	      
+{	  
   if (isSelected) {
     [[NSColor selectedControlColor] set];
     [highlightPath fill];
     
     if (icnPosition != NSImageOnly) {
-      NSRectFill(labelRect);
+      NSRectFill(labelRect);  
+      [label drawWithFrame: labelRect inView: self];
     }
-  }
-
-  if (icnPosition != NSImageOnly) {
-    [label drawWithFrame: labelRect inView: self];
+  } else {
+    if (icnPosition != NSImageOnly) {
+      [[container backgroundColor] set];
+      NSRectFill(labelRect);
+      [label drawWithFrame: labelRect inView: self];
+    }  
   }
   
   [icon compositeToPoint: icnBounds.origin operation: NSCompositeSourceOver];
@@ -466,7 +480,10 @@ static NSFont *labelFont = nil;
 
 - (void)setFont:(NSFont *)fontObj
 {
-  [FSNIcon setFont: fontObj];
+  [label setFont: fontObj];
+  labelRect.size.width = [label uncuttedTitleLenght] + [FSNodeRep labelMargin];
+  labelRect.size.height = [[label font] defaultLineHeightForFont];
+  [self tile];
 }
 
 - (void)setIconSize:(float)isize
@@ -760,6 +777,7 @@ static NSFont *labelFont = nil;
     isDragTarget = NO;  
     if (onSelf == NO) { 
       ASSIGN (icon, [FSNodeRep iconOfSize: icnBounds.size.width forNode: node]);
+      [container setNeedsDisplayInRect: [self frame]];   
       [self setNeedsDisplay: YES];   
     }
 		onSelf = NO;
