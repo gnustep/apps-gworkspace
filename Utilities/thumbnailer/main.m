@@ -664,6 +664,7 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
 
 int main(int argc, char** argv, char **env_c)
 {
+  NSAutoreleasePool *pool;
 	Thumbnailer *thumbnailer;
 
 	switch (fork()) {
@@ -679,12 +680,12 @@ int main(int argc, char** argv, char **env_c)
 	    exit(0);
 	}
   
-  CREATE_AUTORELEASE_POOL (pool);
+  pool = [NSAutoreleasePool new];
 	thumbnailer = [Thumbnailer new];
   RELEASE (pool);
   
   if (thumbnailer != nil) {
-	  CREATE_AUTORELEASE_POOL (pool);
+    pool = [NSAutoreleasePool new];
     
     [NSApplication sharedApplication];
     NSRegisterServicesProvider(thumbnailer, @"Thumbnailer");
