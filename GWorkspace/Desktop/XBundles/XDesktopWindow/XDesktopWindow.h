@@ -41,6 +41,7 @@
 - (void)newFolder:(id)sender;
 - (void)newFile:(id)sender;
 - (void)duplicateFiles:(id)sender;
+- (void)recycleFiles:(id)sender;
 - (void)deleteFiles:(id)sender;
 - (void)setShownType:(id)sender;
 - (void)setExtendedShownType:(id)sender;
@@ -64,8 +65,9 @@
 - (void)newFolder;
 - (void)newFile;
 - (void)duplicateFiles;
-- (void)deleteFiles;
+- (void)recycleFiles;
 - (void)emptyTrash;
+- (void)deleteFiles;
 - (void)setShownType:(id)sender;
 - (void)setExtendedShownType:(id)sender;
 - (void)setIconsSize:(id)sender;

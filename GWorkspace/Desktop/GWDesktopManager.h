@@ -155,8 +155,9 @@ typedef enum DockPosition {
 - (void)newFolder;
 - (void)newFile;
 - (void)duplicateFiles;
-- (void)deleteFiles;
+- (void)recycleFiles;
 - (void)emptyTrash;
+- (void)deleteFiles;
 - (void)setShownType:(id)sender;
 - (void)setExtendedShownType:(id)sender;
 - (void)setIconsSize:(id)sender;

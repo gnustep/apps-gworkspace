@@ -108,6 +108,11 @@
   [delegate duplicateFiles];
 }
 
+- (void)recycleFiles:(id)sender
+{
+  [delegate recycleFiles];
+}
+
 - (void)deleteFiles:(id)sender
 {
   [delegate deleteFiles];

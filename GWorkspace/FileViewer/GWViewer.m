@@ -1101,7 +1101,7 @@
   }
 }
 
-- (void)deleteFiles
+- (void)recycleFiles
 {
   NSArray *selection = [nodeView selectedNodes];
 
@@ -1117,6 +1117,19 @@
 - (void)emptyTrash
 {
   [gworkspace emptyRecycler: nil];
+}
+
+- (void)deleteFiles
+{
+  NSArray *selection = [nodeView selectedNodes];
+
+  if (selection && [selection count]) {
+    if ([nodeView isSingleNode]) {
+      [gworkspace deleteFiles];
+    } else if ([selection isEqual: [NSArray arrayWithObject: baseNode]] == NO) {
+      [gworkspace deleteFiles];
+    }
+  }
 }
 
 - (void)goBackwardInHistory

@@ -81,6 +81,11 @@
   [delegate duplicateFiles];
 }
 
+- (void)recycleFiles:(id)sender
+{
+  [delegate recycleFiles];
+}
+
 - (void)deleteFiles:(id)sender
 {
   [delegate deleteFiles];
@@ -178,7 +183,7 @@
       if (flags & NSShiftKeyMask) {
         [delegate emptyTrash];
       } else {
-        [delegate deleteFiles];
+        [delegate recycleFiles];
       }
       return;
 	}

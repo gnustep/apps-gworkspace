@@ -627,7 +627,7 @@ static GWDesktopManager *desktopManager = nil;
   }
 }
 
-- (void)deleteFiles
+- (void)recycleFiles
 {
   if ([[[win desktopView] selectedNodes] count]) {
     [gworkspace moveToTrash];
@@ -637,6 +637,13 @@ static GWDesktopManager *desktopManager = nil;
 - (void)emptyTrash
 {
   [gworkspace emptyRecycler: nil];
+}
+
+- (void)deleteFiles
+{
+  if ([[[win desktopView] selectedNodes] count]) {
+    [gworkspace deleteFiles];
+  }
 }
 
 - (void)setShownType:(id)sender

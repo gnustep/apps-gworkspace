@@ -40,6 +40,7 @@
 - (void)newFolder:(id)sender;
 - (void)newFile:(id)sender;
 - (void)duplicateFiles:(id)sender;
+- (void)recycleFiles:(id)sender;
 - (void)deleteFiles:(id)sender;
 - (void)goBackwardInHistory:(id)sender;
 - (void)goForwardInHistory:(id)sender;
@@ -66,8 +67,9 @@
 - (void)newFolder;
 - (void)newFile;
 - (void)duplicateFiles;
-- (void)deleteFiles;
+- (void)recycleFiles;
 - (void)emptyTrash;
+- (void)deleteFiles;
 - (void)goBackwardInHistory;
 - (void)goForwardInHistory;
 - (void)setViewerBehaviour:(id)sender;

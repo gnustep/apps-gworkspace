@@ -74,7 +74,8 @@ void createMenu()
 	addItemToMenu(menu, @"New Folder", @"", @"newFolder:", @"n");
 	addItemToMenu(menu, @"New File", @"", @"newFile:", @"N");
 	addItemToMenu(menu, @"Duplicate", @"", @"duplicateFiles:", @"u");
-	addItemToMenu(menu, @"Move to Recycler", @"", @"deleteFiles:", @"d");
+	addItemToMenu(menu, @"Move to Recycler", @"", @"recycleFiles:", @"d");
+	addItemToMenu(menu, @"Destroy", @"", @"deleteFiles:", @"r");
 	addItemToMenu(menu, @"Empty Recycler", @"", @"emptyRecycler:", @"");
 	addItemToMenu(menu, @"Check for disks", @"", @"checkRemovableMedia:", @"E");
 	addItemToMenu(menu, @"Run...", @"", @"runCommand:", @"");  
