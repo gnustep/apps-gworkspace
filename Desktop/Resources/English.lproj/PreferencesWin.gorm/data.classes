@@ -10,7 +10,10 @@
 	    "setIconSize:",
 	    "setTextSize:",
 	    "setLabelPosition:",
-	    "setDockPosition:"
+	    "setDockPosition:",
+	    "addMediaMountPoint:",
+	    "removeMediaMountPoint:",
+	    "setMediaMountPoints:"
 	);
 	Outlets = (
 	    win,
@@ -30,7 +33,15 @@
 	    labelLabel,
 	    labelMatrix,
 	    dockPosLabel,
-	    dockPosMatrix
+	    dockPosMatrix,
+	    mtabBox,
+	    mtabField,
+	    mediaBox,
+	    mediaScroll,
+	    mediaField,
+	    remMediaButt,
+	    addMediaButt,
+	    setMediaButt
 	);
 	Super = NSObject;
     };

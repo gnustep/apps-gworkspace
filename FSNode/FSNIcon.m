@@ -520,6 +520,16 @@ static NSFont *labelFont = nil;
   [self tile];
 }
 
+- (BOOL)isShowingSelection
+{
+  return (selection != nil);
+}
+
+- (NSArray *)selection
+{
+  return selection;
+}
+
 - (void)setFont:(NSFont *)fontObj
 {
   [label setFont: fontObj];

@@ -309,6 +309,16 @@ static NSDictionary *fontAttr = nil;
   }
 }
 
+- (BOOL)isShowingSelection
+{
+  return (selection != nil);
+}
+
+- (NSArray *)selection
+{
+  return selection;
+}
+
 - (void)setFont:(NSFont *)fontObj
 {
   [super setFont: fontObj];

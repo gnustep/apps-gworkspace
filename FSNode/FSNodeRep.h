@@ -55,6 +55,10 @@ typedef enum FSNSelectionMask {
 
 - (void)showSelection:(NSArray *)selnodes;
 
+- (BOOL)isShowingSelection;
+
+- (NSArray *)selection;
+
 - (void)setFont:(NSFont *)fontObj;
 
 - (void)setIconSize:(int)isize;

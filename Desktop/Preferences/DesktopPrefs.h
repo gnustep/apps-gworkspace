@@ -29,6 +29,7 @@
 
 @class NSColor;
 @class NSColorPanel;
+@class NSMatrix;
 @class Desktop;
 @class DesktopView;
 
@@ -76,6 +77,17 @@
   // Dock
   IBOutlet id dockPosLabel;
   IBOutlet id dockPosMatrix;    
+
+  // Volumes
+  IBOutlet id mtabBox;
+  IBOutlet id mtabField;
+  IBOutlet id mediaBox;
+  IBOutlet id mediaScroll;
+  NSMatrix *mediaMatrix;
+  IBOutlet id mediaField;
+  IBOutlet id remMediaButt;
+  IBOutlet id addMediaButt;
+  IBOutlet id setMediaButt;
   
   Desktop *desktop;
   DesktopView *desktopView;
@@ -109,6 +121,14 @@
 
 // Dock
 - (IBAction)setDockPosition:(id)sender;
+
+
+// Volumes
+- (IBAction)addMediaMountPoint:(id)sender;
+
+- (IBAction)removeMediaMountPoint:(id)sender;
+
+- (IBAction)setMediaMountPoints:(id)sender;
 
 
 - (void)activate;

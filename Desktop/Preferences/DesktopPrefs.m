@@ -35,6 +35,10 @@ static NSString *nibName = @"PreferencesWin";
 #define ISIZES 9
 static int icnSizes[ISIZES] = { 16, 20, 24, 28, 32, 36, 40, 44, 48 };
 
+#define CHECKSIZE(sz) \
+if (sz.width < 0) sz.width = 0; \
+if (sz.height < 0) sz.height = 0
+
 int nearestIconSize(float sz)
 {
   int isz = floor(sz);
@@ -90,7 +94,12 @@ int nearestIconSize(float sz)
       NSRect r;
       NSString *impath;
       DockPosition dockpos;
-      
+      NSSize cs, ms;
+      NSUserDefaults *defaults;
+      NSString *mtabpath;
+      NSArray *removables;
+      int i;
+            
       [win setFrameUsingName: @"desktopprefs"];
       [win setDelegate: self];
     
@@ -156,8 +165,73 @@ int nearestIconSize(float sz)
       dockpos = [desktop dockPosition];
       [dockPosMatrix selectCellAtRow: 0 column: dockpos];
       
+      // Volumes
+      defaults = [NSUserDefaults standardUserDefaults];
+      mtabpath = [defaults stringForKey: @"GSMtabPath"];
+      
+      if (mtabpath == nil) {
+        mtabpath = @"/etc/mtab";
+        NSRunAlertPanel(nil, 
+               NSLocalizedString(@"The mtab path is not set. Using default value.", @""), 
+               NSLocalizedString(@"OK", @""), 
+               nil, 
+               nil);                                     
+      }
+
+      [mtabField setStringValue: mtabpath];
+      
+      [mediaScroll setBorderType: NSBezelBorder];
+      [mediaScroll setHasHorizontalScroller: NO];
+      [mediaScroll setHasVerticalScroller: YES]; 
+      
+      mediaMatrix = [[NSMatrix alloc] initWithFrame: NSMakeRect(0, 0, 100, 100)
+				            	                mode: NSRadioModeMatrix 
+                                 prototype: [[NSBrowserCell new] autorelease]
+			       							    numberOfRows: 0 
+                           numberOfColumns: 0];
+      [mediaMatrix setIntercellSpacing: NSZeroSize];
+      [mediaMatrix setCellSize: NSMakeSize(1, 16)];
+      [mediaMatrix setAutoscroll: YES];
+	    [mediaMatrix setAllowsEmptySelection: NO];
+      cs = [mediaScroll contentSize];
+      ms = [mediaMatrix cellSize];
+      ms.width = cs.width;
+      CHECKSIZE (ms);
+      [mediaMatrix setCellSize: ms];
+	    [mediaScroll setDocumentView: mediaMatrix];	
+      RELEASE (mediaMatrix);
+      
+      removables = [defaults arrayForKey: @"GSRemovableMediaPaths"];
+      
+      if ((removables == nil) || ([removables count] == 0)) {
+        removables = [NSArray arrayWithObjects: @"/mnt/floppy", @"/mnt/cdrom", nil];
+        NSRunAlertPanel(nil, 
+               NSLocalizedString(@"The mount points for removable media are not defined. Using default values.", @""), 
+               NSLocalizedString(@"OK", @""), 
+               nil, 
+               nil);                                     
+      }
+      
+      for (i = 0; i < [removables count]; i++) {
+        NSString *mpoint = [removables objectAtIndex: i];
+        int count = [[mediaMatrix cells] count];
+
+        [mediaMatrix insertRow: count];
+        cell = [mediaMatrix cellAtRow: count column: 0];   
+        [cell setStringValue: mpoint];
+        [cell setLeaf: YES];  
+      }
+
+      [mediaMatrix sizeToCells]; 
+      
       /* Internationalization */
       [win setTitle: NSLocalizedString(@"Desktop Preferences", @"")];
+
+      [[tabView tabViewItemAtIndex: 0] setLabel: NSLocalizedString(@"Icons", @"")];
+      [[tabView tabViewItemAtIndex: 1] setLabel: NSLocalizedString(@"Back Color", @"")];
+      [[tabView tabViewItemAtIndex: 2] setLabel: NSLocalizedString(@"Back Image", @"")];
+      [[tabView tabViewItemAtIndex: 3] setLabel: NSLocalizedString(@"Dock", @"")];
+      [[tabView tabViewItemAtIndex: 4] setLabel: NSLocalizedString(@"Volumes", @"")];
 
       [textSizeLabel setStringValue: NSLocalizedString(@"Text size:", @"")];
       [labelLabel setStringValue: NSLocalizedString(@"Label position:", @"")];
@@ -185,6 +259,12 @@ int nearestIconSize(float sz)
       [cell setTitle: NSLocalizedString(@"Left", @"")];
       cell = [dockPosMatrix cellAtRow: 0 column: 1];
       [cell setTitle: NSLocalizedString(@"Right", @"")];
+      
+      [mtabBox setTitle: NSLocalizedString(@"mtab path", @"")];
+      [mediaBox setTitle: NSLocalizedString(@"mount points for removable media", @"")];
+      [remMediaButt setTitle: NSLocalizedString(@"remove", @"")];  
+      [addMediaButt setTitle: NSLocalizedString(@"add", @"")];  
+      [setMediaButt setTitle: NSLocalizedString(@"Set", @"")];  
 	  }			
   }
   
@@ -317,9 +397,88 @@ int nearestIconSize(float sz)
 }
 
 
+// Volumes
+- (IBAction)addMediaMountPoint:(id)sender
+{
+  NSString *mpoint = [mediaField stringValue];
+  NSArray *cells = [mediaMatrix cells];
+  BOOL isdir;
+  int count;
+  id cell;
+  int i;
+  
+  if ([mpoint length] == 0) {
+    return;
+  }
+  if ([mpoint isAbsolutePath] == NO) {
+    return;
+  }
+  if (([[NSFileManager defaultManager] fileExistsAtPath: mpoint 
+                                isDirectory: &isdir] && isdir) == NO) {
+    return;
+  }
+
+  count = [cells count];
+  
+  for (i = 0; i < count; i++) {
+    if ([[[cells objectAtIndex: i] stringValue] isEqual: mpoint]) {
+      return;
+    }
+  }
+  
+  [mediaMatrix insertRow: count];
+  cell = [mediaMatrix cellAtRow: count column: 0];   
+  [cell setStringValue: mpoint];
+  [cell setLeaf: YES];  
+  [mediaMatrix sizeToCells]; 
+  [mediaMatrix selectCellAtRow: count column: 0]; 
+  [mediaField setStringValue: @""];  
+}
+
+- (IBAction)removeMediaMountPoint:(id)sender
+{
+  id cell = [mediaMatrix selectedCell];
+  
+  if (cell) {
+    int row, col;
+    [mediaMatrix getRow: &row column: &col ofCell: cell];
+    [mediaMatrix removeRow: row];
+    [mediaMatrix sizeToCells]; 
+  }
+}
+
+- (IBAction)setMediaMountPoints:(id)sender
+{
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  NSString *mtabpath = [mtabField stringValue];
+  NSArray *cells = [mediaMatrix cells];
+  NSMutableArray *mpoints = [NSMutableArray array];
+  int i;
+  
+  if ([mtabpath length] && [mtabpath isAbsolutePath]) {
+    BOOL isdir;
+      
+    if ([[NSFileManager defaultManager] fileExistsAtPath: mtabpath 
+                                             isDirectory: &isdir]) {
+      if (isdir == NO) {
+        [defaults setObject: mtabpath forKey: @"GSMtabPath"];
+      }
+    }
+  }
+
+  for (i = 0; i < [cells count]; i++) {
+    [mpoints addObject: [[cells objectAtIndex: i] stringValue]];
+  }
+  
+  [defaults setObject: mpoints forKey: @"GSRemovableMediaPaths"];
+  
+  [defaults synchronize];
+}
+
 - (void)activate
 {
   [win orderFrontRegardless];
+  [tabView selectTabViewItemAtIndex: 0];
 }
 
 - (void)updateDefaults
