@@ -27,7 +27,6 @@
 #include <math.h>
 #include "ImgReader.h"
 #include "resize.h"
-#include "GNUstep.h"
 
 @implementation ImgReader
 
