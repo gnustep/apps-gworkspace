@@ -28,7 +28,6 @@
 #include "ResultsPathsView.h"
 #include "Finder.h"
 #include "FSNIcon.h"
-#include "FSNode.h"
 #include "FSNFunctions.h"
 #include "GNUstep.h"
 
@@ -137,68 +136,6 @@
   [self tile];
 }
 
-- (void)unselectOtherIcons:(id)anIcon
-{
-  int i;
-  
-  for (i = 0; i < [icons count]; i++) {
-    FSNIcon *icon = [icons objectAtIndex: i];
-
-    if (icon != anIcon) {
-      [icon unselect];
-    }
-  }
-}
-
-- (NSArray *)selectedNodes
-{
-  NSMutableArray *selectedNodes = [NSMutableArray array];
-  int i;
-  
-  for (i = 0; i < [icons count]; i++) {
-    FSNIcon *icon = [icons objectAtIndex: i];
-
-    if ([icon isSelected]) {
-      [selectedNodes addObject: [icon node]];
-    }
-  }
-
-  return selectedNodes;
-}
-
-- (NSArray *)selectedPaths
-{
-  NSMutableArray *selectedPaths = [NSMutableArray array];
-  int i;
-  
-  for (i = 0; i < [icons count]; i++) {
-    FSNIcon *icon = [icons objectAtIndex: i];
-
-    if ([icon isSelected]) {
-      [selectedPaths addObject: [[icon node] path]];
-    }
-  }
-
-  return selectedPaths;
-}
-
-- (void)openSelectionInNewViewer:(BOOL)newv
-{
-  int i;
-  
-  for (i = 0; i < [icons count]; i++) {
-    FSNIcon *icon = [icons objectAtIndex: i];
-
-    if ([icon isSelected]) {
-      [finder openFoundSelection: [NSArray arrayWithObject: [icon node]]];
-    }
-  }
-}
-
-- (void)restoreSelectionAfterDndOfIcon:(id)aIcon
-{
-}
-
 - (void)tile
 {
   float sfw = [[self superview] frame].size.width;
@@ -242,6 +179,79 @@
 - (void)resizeWithOldSuperviewSize:(NSSize)oldFrameSize
 {
   [self tile];
+}
+
+
+//
+// FSNodeRepContainer protocol
+//
+- (void)showContentsOfNode:(FSNode *)anode
+{
+}
+
+- (FSNode *)shownNode
+{
+  return nil;
+}
+
+- (void)unselectOtherReps:(id)arep
+{
+  int i;
+  
+  for (i = 0; i < [icons count]; i++) {
+    FSNIcon *icon = [icons objectAtIndex: i];
+
+    if (icon != arep) {
+      [icon unselect];
+    }
+  }
+}
+
+- (NSArray *)selectedNodes
+{
+  NSMutableArray *selectedNodes = [NSMutableArray array];
+  int i;
+  
+  for (i = 0; i < [icons count]; i++) {
+    FSNIcon *icon = [icons objectAtIndex: i];
+
+    if ([icon isSelected]) {
+      [selectedNodes addObject: [icon node]];
+    }
+  }
+
+  return selectedNodes;
+}
+
+- (NSArray *)selectedPaths
+{
+  NSMutableArray *selectedPaths = [NSMutableArray array];
+  int i;
+  
+  for (i = 0; i < [icons count]; i++) {
+    FSNIcon *icon = [icons objectAtIndex: i];
+
+    if ([icon isSelected]) {
+      [selectedPaths addObject: [[icon node] path]];
+    }
+  }
+
+  return selectedPaths;
+}
+
+- (void)openSelection:(NSArray *)selection
+            newViewer:(BOOL)newv
+{
+  int i;
+  
+  for (i = 0; i < [selection count]; i++) {
+    FSNode *node = [selection objectAtIndex: i];
+    [finder openFoundSelection: [NSArray arrayWithObject: node]];
+  }
+}
+
+- (void)restoreLastSelection
+{
 }
 
 @end

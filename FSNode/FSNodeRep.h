@@ -81,6 +81,26 @@ typedef enum FSNInfoType {
 @end
 
 
+@protocol FSNodeRepContainer
+
+- (void)showContentsOfNode:(FSNode *)anode;
+
+- (FSNode *)shownNode;
+
+- (void)unselectOtherReps:(id)arep;
+
+- (NSArray *)selectedNodes;
+
+- (NSArray *)selectedPaths;
+
+- (void)openSelection:(NSArray *)selection
+            newViewer:(BOOL)newv;
+
+- (void)restoreLastSelection;
+
+@end
+
+
 @interface FSNodeRep : NSObject 
 {
   FSNInfoType defSortOrder;

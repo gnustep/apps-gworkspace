@@ -46,21 +46,6 @@
 @end
 
 
-@protocol FSNIconContainer
-
-- (void)unselectOtherIcons:(id)aIcon;
-
-- (NSArray *)selectedNodes;
-
-- (NSArray *)selectedPaths;
-
-- (void)openSelectionInNewViewer:(BOOL)newv;
-
-- (void)restoreSelectionAfterDndOfIcon:(id)aIcon;
-
-@end
-
-
 @interface FSNIcon : NSView <FSNodeRep>
 {
   FSNode *node;
@@ -92,7 +77,7 @@
   BOOL isDragTarget;
   BOOL onSelf;
   
-  NSView <FSNIconContainer> *container;
+  NSView <FSNodeRepContainer> *container;
 }
 
 - (id)initForNode:(FSNode *)anode

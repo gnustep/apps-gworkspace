@@ -27,10 +27,11 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/NSView.h>
+#include "FSNodeRep.h"
 
 @class Finder;
 
-@interface ResultsPathsView : NSView 
+@interface ResultsPathsView : NSView <FSNodeRepContainer>
 {
 	NSMutableArray *icons; 
   NSString *pathSeparator;
@@ -40,16 +41,6 @@
 - (id)initWithFrame:(NSRect)frameRect;
 
 - (void)showComponentsOfSelection:(NSArray *)selection;
-
-- (void)unselectOtherIcons:(id)anIcon;
-
-- (NSArray *)selectedNodes;
-
-- (NSArray *)selectedPaths;
-
-- (void)openSelectionInNewViewer:(BOOL)newv;
-
-- (void)restoreSelectionAfterDndOfIcon:(id)aIcon;
 
 - (void)tile;
 

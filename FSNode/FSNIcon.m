@@ -201,7 +201,7 @@ static NSFont *labelFont = nil;
   isSelected = YES;
   
   if (container) {
-    [container unselectOtherIcons: self];	
+    [container unselectOtherReps: self];	
   }
   
   [self setNeedsDisplay: YES]; 
@@ -240,6 +240,7 @@ static NSFont *labelFont = nil;
     }
   
     labelRect.origin.y = 0;
+    labelRect.origin.y += (lblmargin / 2);
     
     if (selectable) {
       float hlx = (frameRect.size.width - hlightRect.size.width) / 2;
@@ -302,14 +303,15 @@ static NSFont *labelFont = nil;
 - (void)viewDidMoveToSuperview
 {
   [super viewDidMoveToSuperview];
-  container = (NSView <FSNIconContainer> *)[self superview];
+  container = (NSView <FSNodeRepContainer> *)[self superview];
 }
 
 - (void)mouseUp:(NSEvent *)theEvent
 {
 	if ([node isLocked] == NO) {
 	  if([theEvent clickCount] > 1) {  
-		  [container openSelectionInNewViewer: YES];
+		  [container openSelection: [container selectedNodes] 
+                     newViewer: YES];
 	  }  
   }  
 }
@@ -341,24 +343,26 @@ static NSFont *labelFont = nil;
      //   [container unselectNameEditor];
       }
     
-      while (1) {
-	      nextEvent = [[self window] nextEventMatchingMask:
-    							                NSLeftMouseUpMask | NSLeftMouseDraggedMask];
+      if (dndSource) {
+        while (1) {
+	        nextEvent = [[self window] nextEventMatchingMask:
+    							                  NSLeftMouseUpMask | NSLeftMouseDraggedMask];
 
-        if ([nextEvent type] == NSLeftMouseUp) {
-	  //		  [delegate clickOnIcon: self];
-          break;
-
-        } else if ([nextEvent type] == NSLeftMouseDragged) {
-	        if(dragdelay < 5) {
-            dragdelay++;
-          } else {     
-            startdnd = YES;        
+          if ([nextEvent type] == NSLeftMouseUp) {
+	    //		  [delegate clickOnIcon: self];
             break;
+
+          } else if ([nextEvent type] == NSLeftMouseDragged) {
+	          if(dragdelay < 5) {
+              dragdelay++;
+            } else {     
+              startdnd = YES;        
+              break;
+            }
           }
         }
       }
-    
+      
       if (startdnd == YES) {  
         [self startExternalDragOnEvent: nextEvent];    
       } 
@@ -630,7 +634,7 @@ static NSFont *labelFont = nil;
 {
 	dragdelay = 0;
   onSelf = NO;
-  [container restoreSelectionAfterDndOfIcon: self];
+  [container restoreLastSelection];
 }
 
 @end
