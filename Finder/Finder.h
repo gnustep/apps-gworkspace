@@ -161,6 +161,8 @@
 - (void)concludeRemoteFilesDragOperation:(NSData *)opinfo
                              atLocalPath:(NSString *)localdest;
 
+- (id)workspaceApplication;
+
 @end
 
 #endif // FINDER_H

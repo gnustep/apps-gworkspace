@@ -332,7 +332,7 @@ static NSFont *labelFont = nil;
 - (void)mouseUp:(NSEvent *)theEvent
 {
 	if ([node isLocked] == NO) {
-	  if([theEvent clickCount] > 1) {  
+	  if ([theEvent clickCount] > 1) {  
 		  [container openSelection: [container selectedNodes] 
                      newViewer: YES];
 	  }  
@@ -376,7 +376,7 @@ static NSFont *labelFont = nil;
             break;
 
           } else if ([nextEvent type] == NSLeftMouseDragged) {
-	          if(dragdelay < 5) {
+	          if (dragdelay < 5) {
               dragdelay++;
             } else {     
               startdnd = YES;        

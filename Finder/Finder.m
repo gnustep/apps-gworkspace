@@ -1177,6 +1177,13 @@ static Finder *finder = nil;
 {
 }
 
+- (id)workspaceApplication
+{
+  if (workspaceApplication == nil) {
+    [self contactWorkspaceApp];
+  }
+  return workspaceApplication;
+}
 
 @end
 

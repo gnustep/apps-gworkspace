@@ -43,6 +43,8 @@
 - (void)concludeRemoteFilesDragOperation:(NSData *)opinfo
                              atLocalPath:(NSString *)localdest;
 
+- (id)workspaceApplication;
+
 @end
 
 

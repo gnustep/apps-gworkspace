@@ -31,8 +31,14 @@
 
 @protocol DesktopApplication
 
+- (NSString *)trashPath;
+
+- (void)performFileOperation:(NSDictionary *)opinfo;
+
 - (void)concludeRemoteFilesDragOperation:(NSData *)opinfo
                              atLocalPath:(NSString *)localdest;
+
+- (id)workspaceApplication;
 
 @end
 
