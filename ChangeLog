@@ -3,6 +3,9 @@
   * in many files: changed some occourrencies of the macro "new" with
     [[ alloc] init] due of problems with the Apple gcc.
 
+  * GWRemote/gwsd/gwsd.m in -initWithRemote:connection:
+    calls -enableMultipleThreads on the first connection.
+
 2003-09-01 Enrico Sersale  <enrico@imago.ro>
 
   * GWorkspace/GWorkspace.m

@@ -201,6 +201,7 @@ static GWSd *shared = nil;
 
       firstConn = [[NSConnection alloc] initWithReceivePort: (NSPort *)[NSPort port] 
 																			             sendPort: nil];
+      [firstConn enableMultipleThreads];
       [firstConn setRootObject: self];
       [firstConn registerName: @"gwsd"];
       [firstConn setRequestTimeout: LONG_DELAY];
