@@ -49,9 +49,10 @@
   self = [super init];
   
   if (self) { 
-		NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: YES];
+		NSDictionary *attributes;
 				
 		fm = [NSFileManager defaultManager];	
+    attributes = [fm fileAttributesAtPath: path traverseLink: YES];
     ASSIGN (watchedPath, path);    
 		ASSIGN (pathContents, ([fm directoryContentsAtPath: watchedPath]));
 		ASSIGN (date, [attributes fileModificationDate]);		

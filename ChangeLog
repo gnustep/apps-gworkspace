@@ -1,3 +1,8 @@
+2004-01-25 Enrico Sersale  <enrico@imago.ro>
+  
+  * GWNet
+    changed NSSocketPort with NSPort in all the places.
+
 2004-01-24 Enrico Sersale  <enrico@imago.ro>
   
   * GWNet
