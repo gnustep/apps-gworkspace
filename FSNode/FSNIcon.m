@@ -214,6 +214,72 @@ static id <DesktopApplication> desktopApp = nil;
   return isSelected;
 }
 
+- (void)tile
+{
+  NSRect frameRect = [self frame];
+  NSSize sz = [icon size];
+
+  if (icnPosition == NSImageAbove) {
+    labelRect.size.width = [label uncuttedTitleLenght] + TXT_MARGIN;
+  
+    if (labelRect.size.width >= frameRect.size.width) {
+      labelRect.size.width = frameRect.size.width;
+      labelRect.origin.x = 0;
+    } else {
+      labelRect.origin.x = (frameRect.size.width - labelRect.size.width) / 2;
+    }
+  
+    labelRect.origin.y = 0;
+    
+    if (selectable) {
+      float hlx = (frameRect.size.width - hlightRect.size.width) / 2;
+      float hly = labelRect.size.height;
+    
+      if ((hlightRect.origin.x != hlx) || (hlightRect.origin.y != hly)) {
+        NSAffineTransform *transform = [NSAffineTransform transform];
+    
+        [transform translateXBy: hlx - hlightRect.origin.x
+                            yBy: hly - hlightRect.origin.y];
+    
+        [highlightPath transformUsingAffineTransform: transform];
+      
+        hlightRect.origin.x = hlx;
+        hlightRect.origin.y = hly;      
+      }
+            
+      icnBounds.origin.x = hlightRect.origin.x + ((hlightRect.size.width - sz.width) / 2);
+      icnBounds.origin.y = hlightRect.origin.y + ((hlightRect.size.height - sz.height) / 2);
+    
+    } else {
+      icnBounds.origin.x = (frameRect.size.width - sz.width) / 2;
+      icnBounds.origin.y = labelRect.size.height + ICN_H_SHIFT;
+    }
+
+  } else if (icnPosition == NSImageLeft) {
+    if (selectable) {
+      hlightRect.origin.x = 0;
+      hlightRect.origin.y = 0;
+      
+      icnBounds.origin.x = (hlightRect.size.width - sz.width) / 2;
+      icnBounds.origin.y = (hlightRect.size.height - sz.height) / 2;
+            
+      labelRect.origin.x = hlightRect.size.width;
+      labelRect.origin.y = (hlightRect.size.height - labelRect.size.height) / 2;
+  
+    } else {
+      icnBounds.origin.x = 0;
+      icnBounds.origin.y = 0;
+            
+      labelRect.origin.x = icnBounds.size.width;
+      labelRect.origin.y = (icnBounds.size.height - labelRect.size.height) / 2;
+    }
+    
+  } else if (icnPosition == NSImageOnly) {
+    icnBounds.origin.x = (frameRect.size.width - sz.width) / 2;
+    icnBounds.origin.y = 0;
+  } 
+}
+
 - (void)viewDidMoveToSuperview
 {
   [super viewDidMoveToSuperview];
@@ -284,70 +350,15 @@ static id <DesktopApplication> desktopApp = nil;
   }
 }
 
+- (void)setFrame:(NSRect)frameRect
+{
+  [super setFrame: frameRect];
+  [self tile];
+}
+
 - (void)resizeWithOldSuperviewSize:(NSSize)oldBoundsSize
 {
-  NSRect frameRect = [self frame];
-  NSSize sz = [icon size];
-
-  if (icnPosition == NSImageAbove) {
-    labelRect.size.width = [label uncuttedTitleLenght] + TXT_MARGIN;
-  
-    if (labelRect.size.width >= frameRect.size.width) {
-      labelRect.size.width = frameRect.size.width;
-      labelRect.origin.x = 0;
-    } else {
-      labelRect.origin.x = (frameRect.size.width - labelRect.size.width) / 2;
-    }
-  
-    labelRect.origin.y = 0;
-    
-    if (selectable) {
-      float hlx = (frameRect.size.width - hlightRect.size.width) / 2;
-      float hly = labelRect.size.height;
-    
-      if ((hlightRect.origin.x != hlx) || (hlightRect.origin.y != hly)) {
-        NSAffineTransform *transform = [NSAffineTransform transform];
-    
-        [transform translateXBy: hlx - hlightRect.origin.x
-                            yBy: hly - hlightRect.origin.y];
-    
-        [highlightPath transformUsingAffineTransform: transform];
-      
-        hlightRect.origin.x = hlx;
-        hlightRect.origin.y = hly;      
-      }
-            
-      icnBounds.origin.x = hlightRect.origin.x + ((hlightRect.size.width - sz.width) / 2);
-      icnBounds.origin.y = hlightRect.origin.y + ((hlightRect.size.height - sz.height) / 2);
-    
-    } else {
-      icnBounds.origin.x = (frameRect.size.width - sz.width) / 2;
-      icnBounds.origin.y = labelRect.size.height + ICN_H_SHIFT;
-    }
-
-  } else if (icnPosition == NSImageLeft) {
-    if (selectable) {
-      hlightRect.origin.x = 0;
-      hlightRect.origin.y = 0;
-      
-      icnBounds.origin.x = (hlightRect.size.width - sz.width) / 2;
-      icnBounds.origin.y = (hlightRect.size.height - sz.height) / 2;
-            
-      labelRect.origin.x = hlightRect.size.width;
-      labelRect.origin.y = (hlightRect.size.height - labelRect.size.height) / 2;
-  
-    } else {
-      icnBounds.origin.x = 0;
-      icnBounds.origin.y = 0;
-            
-      labelRect.origin.x = icnBounds.size.width;
-      labelRect.origin.y = (icnBounds.size.height - labelRect.size.height) / 2;
-    }
-    
-  } else if (icnPosition == NSImageOnly) {
-    icnBounds.origin.x = (frameRect.size.width - sz.width) / 2;
-    icnBounds.origin.y = 0;
-  } 
+  [self tile];
 }
 
 - (void)drawRect:(NSRect)rect

@@ -104,6 +104,8 @@
 
 - (BOOL)isSelected;
 
+- (void)tile;
+
 @end
 
 

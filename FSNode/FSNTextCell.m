@@ -5,7 +5,7 @@
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
  *
- * This file is part of the GNUstep FSNode framework
+ * This file is part of the GNUstep Finder application
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,14 +26,13 @@
 #include <AppKit/AppKit.h>
 #include "FSNTextCell.h"
 
-static NSString *dots = @"...";
-static NSDictionary *fontAttr = nil;
-static float dtslenght = 0.0;  
-
 @implementation FSNTextCell
 
 - (void)dealloc
 {
+  RELEASE (fontAttr);
+  RELEASE (dots);
+
   TEST_RELEASE (icon);  
   [super dealloc];
 }
@@ -43,13 +42,10 @@ static float dtslenght = 0.0;
   self = [super init];
 
   if (self) {
-    if (fontAttr == nil) {
-      fontAttr = [NSDictionary dictionaryWithObject: [self font] 
-                                             forKey: NSFontAttributeName];
-      RETAIN (fontAttr);
-      dtslenght = [dots sizeWithAttributes: fontAttr].width;     
-    }
-
+    ASSIGN (fontAttr, [NSDictionary dictionaryWithObject: [self font] 
+                                                  forKey: NSFontAttributeName]);
+    ASSIGN (dots, [NSString stringWithString: @"..."]);
+    dtslenght = [dots sizeWithAttributes: fontAttr].width; 
     titlelenght = 0.0;
     icon = nil;
     dateCell = NO;

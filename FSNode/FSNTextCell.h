@@ -5,7 +5,7 @@
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
  *
- * This file is part of the GNUstep FSNode framework
+ * This file is part of the GNUstep Finder application
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,10 @@ typedef NSString *(*cutIMP)(id, SEL, id, float);
 
 @interface FSNTextCell : NSTextFieldCell 
 {
+  NSDictionary *fontAttr;
+  NSString *dots;
   float titlelenght;
+  float dtslenght;
   BOOL dateCell;
 	SEL cutTitleSel;
 	cutIMP cutTitle;
