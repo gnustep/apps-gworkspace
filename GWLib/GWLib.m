@@ -167,6 +167,12 @@ if (gwapp == nil) return x
   [gwapp performFileOperationWithDictionary: dict];
 }
 
++ (oneway void)performServiceWithName:(NSString *)sname 
+                           pasteboard:(NSPasteboard *)pboard
+{
+  NSPerformService(sname, pboard);
+}
+
 + (NSString *)trashPath
 {
   CHECKGW_RET(nil);

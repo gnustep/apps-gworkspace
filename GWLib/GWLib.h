@@ -49,6 +49,9 @@
 
 + (oneway void)performFileOperationWithDictionary:(NSDictionary *)dict;
 
++ (oneway void)performServiceWithName:(NSString *)sname 
+                           pasteboard:(NSPasteboard *)pboard;
+
 + (NSString *)trashPath;
 
 @end

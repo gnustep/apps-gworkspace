@@ -267,7 +267,7 @@ return [ws openFile: fullPath withApplication: appName]
 	if (newViewer) {
 		ViewersWindow *viewer = [self viewerRootedAtPath: rootFullpath];
     
-    if (viewer == nil) {
+    if ((viewer == nil) || ([rootFullpath isEqual: fixPath(@"/", 0)])) {
       NSString *app, *type;
 		  [ws getInfoForFile: rootFullpath application: &app type: &type];
 		  viewer = [self newViewerAtPath: rootFullpath canViewApps: (type == NSApplicationFileType)];
@@ -449,22 +449,6 @@ return [ws openFile: fullPath withApplication: appName]
     if (thumb) {
       return thumb;
     }    
-    
-/*
-    NSPasteboard *pb;    
-    NSData *data;  
-      
-    data = [NSSerializer serializePropertyList: [NSArray arrayWithObject: fullPath]];  
-    pb = [NSPasteboard pasteboardByFilteringData: data
-					                                ofType: NSFilenamesPboardType];      
-      
-    data = [pb dataForType: NSTIFFPboardType];
-    
-    if (data) {
-      NSImage *thumb = [[NSImage alloc] initWithData: data];
-      return AUTORELEASE (thumb);
-    }  
-*/
   }
 
   return [ws iconForFile: fullPath];
