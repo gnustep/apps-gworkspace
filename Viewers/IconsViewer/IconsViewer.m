@@ -169,11 +169,6 @@
                 					  name: GWFileSystemDidChangeNotification
                 					object: nil];
 
-  [[NSNotificationCenter defaultCenter] addObserver: self 
-                				selector: @selector(sortTypeDidChange:) 
-                					  name: GWSortTypeDidChangeNotification
-                					object: nil];
-
   [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
                 				selector: @selector(sortTypeDidChange:) 
                 					  name: GWSortTypeDidChangeNotification
@@ -694,10 +689,11 @@
 
 - (void)sortTypeDidChange:(NSNotification *)notification
 {
-	NSString *notifPath = [notification object];
+	NSString *notifPath = (NSString *)[notification object];
 
-	if (notifPath != nil) {
-		if ([[panel currentPath] isEqualToString: notifPath]) {
+	if (notifPath) {
+    NSString *ntfPath = [NSString stringWithString: notifPath];
+		if ([[panel currentPath] isEqual: ntfPath]) {
 			[panel makeFileIcons];
 		}
 	} else {

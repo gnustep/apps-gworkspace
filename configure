@@ -309,7 +309,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP GS_PATH SH_PATH FILE_PATH LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP SH_PATH FILE_PATH LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -842,7 +842,6 @@ if test -n "$ac_init_help"; then
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-ghostscript=PROG  Use PROG as ghostscript interpreter
   --with-sh=PROG  Use PROG as sh interpreter
   --with-file=PROG  Use PROG as file
 
@@ -1245,7 +1244,6 @@ ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
 
 
 
@@ -2883,76 +2881,6 @@ ac_configure="$SHELL $ac_aux_dir/configure" # This should be Cygnus configure.
 
           ac_config_headers="$ac_config_headers GWLib/config.h"
 
-          ac_config_headers="$ac_config_headers ContentViewers/PdfViewer/config.h"
-
-          ac_config_headers="$ac_config_headers GWorkspace/Inspectors/config.h"
-
-
-#--------------------------------------------------------------------
-# We need ghostscript for viewing Pdf's
-#--------------------------------------------------------------------
-
-# Check whether --with-ghostscript or --without-ghostscript was given.
-if test "${with_ghostscript+set}" = set; then
-  withval="$with_ghostscript"
-  GS_PATH=$withval
-else
-  GS_PATH=none
-fi;
-
-if test "x$GS_PATH" = "xnone"; then
-	for ac_prog in gs ghostscript
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
-echo "$as_me:$LINENO: checking for $ac_word" >&5
-echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_path_GS_PATH+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  case $GS_PATH in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_GS_PATH="$GS_PATH" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
-    ac_cv_path_GS_PATH="$as_dir/$ac_word$ac_exec_ext"
-    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-
-  ;;
-esac
-fi
-GS_PATH=$ac_cv_path_GS_PATH
-
-if test -n "$GS_PATH"; then
-  echo "$as_me:$LINENO: result: $GS_PATH" >&5
-echo "${ECHO_T}$GS_PATH" >&6
-else
-  echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-
-  test -n "$GS_PATH" && break
-done
-test -n "$GS_PATH" || GS_PATH="none"
-
-fi
-
-
-cat >>confdefs.h <<_ACEOF
-#define GSPATH "$GS_PATH"
-_ACEOF
-
 
 #--------------------------------------------------------------------
 # We need sh
@@ -3087,7 +3015,31 @@ _ACEOF
 
 
 
-                                                  ac_config_files="$ac_config_files GNUmakefile GWLib/GNUmakefile GWorkspace/GNUmakefile GWorkspace/GWorkspaceInfo.plist gworkspace.make"
+#--------------------------------------------------------------------
+# We need PDFKit
+#--------------------------------------------------------------------
+PDFKIT="0"
+
+HDIR=$GNUSTEP_LOCAL_ROOT/Library/Headers/PDFKit
+
+if test -d $HDIR; then
+  if test -f "$HDIR/PDFDocument.h"; then
+    if test -f "$HDIR/PDFImageRep.h"; then
+      PDFKIT="1"
+    fi
+  fi
+fi
+
+if test  $PDFKIT = "0"; then
+  echo ""
+  echo "The PDFKit framework can't be found."
+  echo "The pdf viewer will not be built"
+  echo ""
+fi
+
+
+
+                                                                                ac_config_files="$ac_config_files GNUmakefile GWLib/GNUmakefile GWorkspace/GNUmakefile GWorkspace/GWorkspaceInfo.plist gworkspace.make Inspector/GNUmakefile Inspector/InspectorInfo.plist Inspector/inspector.make"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -3617,9 +3569,10 @@ do
   "GWorkspace/GNUmakefile" ) CONFIG_FILES="$CONFIG_FILES GWorkspace/GNUmakefile" ;;
   "GWorkspace/GWorkspaceInfo.plist" ) CONFIG_FILES="$CONFIG_FILES GWorkspace/GWorkspaceInfo.plist" ;;
   "gworkspace.make" ) CONFIG_FILES="$CONFIG_FILES gworkspace.make" ;;
+  "Inspector/GNUmakefile" ) CONFIG_FILES="$CONFIG_FILES Inspector/GNUmakefile" ;;
+  "Inspector/InspectorInfo.plist" ) CONFIG_FILES="$CONFIG_FILES Inspector/InspectorInfo.plist" ;;
+  "Inspector/inspector.make" ) CONFIG_FILES="$CONFIG_FILES Inspector/inspector.make" ;;
   "GWLib/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS GWLib/config.h" ;;
-  "ContentViewers/PdfViewer/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS ContentViewers/PdfViewer/config.h" ;;
-  "GWorkspace/Inspectors/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS GWorkspace/Inspectors/config.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
    { (exit 1); exit 1; }; };;
@@ -3713,7 +3666,6 @@ s,@EXEEXT@,$EXEEXT,;t t
 s,@OBJEXT@,$OBJEXT,;t t
 s,@CPP@,$CPP,;t t
 s,@EGREP@,$EGREP,;t t
-s,@GS_PATH@,$GS_PATH,;t t
 s,@SH_PATH@,$SH_PATH,;t t
 s,@FILE_PATH@,$FILE_PATH,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t

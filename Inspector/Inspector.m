@@ -28,13 +28,14 @@
 #include "ContentViewersProtocol.h"
 #include "Contents.h"
 #include "Attributes.h"
+#include "Tools.h"
 #include "Preferences/InspectorPref.h"
 #include "Dialogs/StartAppWin.h"
 #include "Functions.h"
 #include "GNUstep.h"
 
-#define CONTENTS   0
-#define ATTRIBUTES 1
+#define ATTRIBUTES 0
+#define CONTENTS   1
 #define TOOLS      2
 
 static Inspector *inspector = nil;
@@ -112,31 +113,27 @@ static NSString *nibName = @"InspectorWin";
     [popUp removeItemAtIndex: 0];
   }
 
-
-
-
+  currentInspector = [[Attributes alloc] initForInspector: self];
+  [inspectors insertObject: currentInspector atIndex: ATTRIBUTES]; 
+  [popUp insertItemWithTitle: NSLocalizedString(@"Attributes", @"") 
+                     atIndex: ATTRIBUTES];
+  [[popUp itemAtIndex: ATTRIBUTES] setKeyEquivalent: @"1"];
+  DESTROY (currentInspector);
 
   currentInspector = [[Contents alloc] initForInspector: self];
   [inspectors insertObject: currentInspector atIndex: CONTENTS]; 
   [popUp insertItemWithTitle: NSLocalizedString(@"Contents", @"") 
                      atIndex: CONTENTS];
+  [[popUp itemAtIndex: CONTENTS] setKeyEquivalent: @"2"];
   DESTROY (currentInspector);
   contents = [inspectors objectAtIndex: CONTENTS];
 
-  currentInspector = [[Attributes alloc] initForInspector: self];
-  [inspectors insertObject: currentInspector atIndex: ATTRIBUTES]; 
-  [popUp insertItemWithTitle: NSLocalizedString(@"Attributes", @"") 
-                     atIndex: ATTRIBUTES];
+  currentInspector = [[Tools alloc] initForInspector: self];
+  [inspectors insertObject: currentInspector atIndex: TOOLS]; 
+  [popUp insertItemWithTitle: NSLocalizedString(@"Tools", @"") 
+                     atIndex: TOOLS];
+  [[popUp itemAtIndex: TOOLS] setKeyEquivalent: @"3"];
   DESTROY (currentInspector);
-
-
-
-
-
-
-
-
-
     
   [win makeKeyAndOrderFront: nil];
   [popUp selectItemAtIndex: 0];
@@ -198,20 +195,34 @@ static NSString *nibName = @"InspectorWin";
   }
 }
 
-- (void)showContents
+- (void)showWindow
 {
-  [popUp selectItemAtIndex: CONTENTS];
-  [self activateInspector: popUp];
+  [win makeKeyAndOrderFront: nil];
 }
 
 - (void)showAttributes
 {
+  if ([win isVisible] == NO) {
+    [self showWindow];
+  }
   [popUp selectItemAtIndex: ATTRIBUTES];
+  [self activateInspector: popUp];
+}
+
+- (void)showContents
+{
+  if ([win isVisible] == NO) {
+    [self showWindow];
+  }
+  [popUp selectItemAtIndex: CONTENTS];
   [self activateInspector: popUp];
 }
 
 - (void)showTools
 {
+  if ([win isVisible] == NO) {
+    [self showWindow];
+  }
   [popUp selectItemAtIndex: TOOLS];
   [self activateInspector: popUp];
 }

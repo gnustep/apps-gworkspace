@@ -57,8 +57,6 @@
 
   IBOutlet id okButt;
 
-
-
 	NSArray *insppaths;
   NSString *currentApp;
   NSMutableArray *extensions;

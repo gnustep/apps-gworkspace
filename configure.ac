@@ -1,7 +1,6 @@
 AC_PREREQ(2.52)
 AC_INIT([GWorkspace], [0.6.3], [enrico@imago.ro])
 
-
 if test -z "$GNUSTEP_SYSTEM_ROOT"; then
   AC_MSG_ERROR([You must run the GNUstep initialization script first!])
 fi
@@ -14,19 +13,6 @@ AC_CHECK_FUNCS(getpwnam getpwuid geteuid getlogin)
 
 AC_CONFIG_AUX_DIR([$GNUSTEP_MAKEFILES])
 AC_CONFIG_HEADER([GWLib/config.h])
-AC_CONFIG_HEADER([ContentViewers/PdfViewer/config.h])
-AC_CONFIG_HEADER([GWorkspace/Inspectors/config.h])
-
-#--------------------------------------------------------------------
-# We need ghostscript for viewing Pdf's
-#--------------------------------------------------------------------
-AC_ARG_WITH([ghostscript], [  --with-ghostscript=PROG  Use PROG as ghostscript interpreter], [GS_PATH=$withval], [GS_PATH=none])
-
-if test "x$GS_PATH" = "xnone"; then
-	AC_PATH_PROGS([GS_PATH], [gs ghostscript], [none])
-fi
-
-AC_DEFINE_UNQUOTED([GSPATH], ["$GS_PATH"], [Path to ghostscript interpreter])
 
 #--------------------------------------------------------------------
 # We need sh
@@ -51,9 +37,36 @@ fi
 AC_DEFINE_UNQUOTED([FILEPATH], ["$FILE_PATH"], [Path to file])
 
 
+#--------------------------------------------------------------------
+# We need PDFKit
+#--------------------------------------------------------------------
+PDFKIT="0"
+
+HDIR=$GNUSTEP_LOCAL_ROOT/Library/Headers/PDFKit
+
+if test -d $HDIR; then
+  if test -f "$HDIR/PDFDocument.h"; then
+    if test -f "$HDIR/PDFImageRep.h"; then
+      PDFKIT="1"
+    fi
+  fi
+fi
+
+if test  $PDFKIT = "0"; then
+  echo ""
+  echo "The PDFKit framework can't be found."
+  echo "The pdf viewer will not be built"
+  echo ""
+fi
+
+
+
 AC_CONFIG_FILES([GNUmakefile \
 									GWLib/GNUmakefile \
 									GWorkspace/GNUmakefile \
 									GWorkspace/GWorkspaceInfo.plist \
-									gworkspace.make])
+									gworkspace.make \
+                  Inspector/GNUmakefile \
+                  Inspector/InspectorInfo.plist \
+                  Inspector/inspector.make])
 AC_OUTPUT

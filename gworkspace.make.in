@@ -2,6 +2,5 @@
 #   Makefile flags and configs to build with the bundle
 #
 
-GS_PATH=@GS_PATH@
 SH_PATH=@SH_PATH@
 FILE_PATH=@FILE_PATH@

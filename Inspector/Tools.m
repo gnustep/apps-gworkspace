@@ -30,95 +30,128 @@
 #include "Functions.h"
 #include "GNUstep.h"
 
-#define TOOLS_INDEX 1
-#define NO_TOOLS_INDEX 0
-
 static NSString *nibName = @"Tools";
 
 @implementation Tools
 
 - (void)dealloc
 {
-	TEST_RELEASE (inspBox);  
-	TEST_RELEASE (matrix);
+	TEST_RELEASE (toolsBox); 
+	TEST_RELEASE (errLabel); 
+	TEST_RELEASE (mainBox); 
+  
 	TEST_RELEASE (insppaths);
   TEST_RELEASE (extensions);
 	TEST_RELEASE (currentApp);
+  
   [super dealloc];
 }
 
-- (id)init
+- (id)initForInspector:(id)insp
 {
-	self = [super init];
+  self = [super init];
   
-	if(self) {
-		if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
-      NSLog(@"Attribute Inspector: failed to load %@!", nibName);
-    } else { 
-      id cell;
+  if (self) {
+    NSRect r;
+    id cell;
+  
+    if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
+      NSLog(@"failed to load %@!", nibName);
+      [NSApp terminate: self];
+    } 
+    
+    RETAIN (mainBox);
+    RETAIN (toolsBox);
+    RELEASE (win); 
 
-      RETAIN (inspBox);
-      RELEASE (win); 
-       
- 		  ws = [NSWorkspace sharedWorkspace];
+    inspector = insp;
+    ws = [NSWorkspace sharedWorkspace];
 
-      [scrollView setBorderType: NSBezelBorder];
-      [scrollView setHasHorizontalScroller: YES];
-      [scrollView setHasVerticalScroller: NO]; 
+    [scrollView setBorderType: NSBezelBorder];
+    [scrollView setHasHorizontalScroller: YES];
+    [scrollView setHasVerticalScroller: NO]; 
 
-  	  cell = AUTORELEASE ([NSButtonCell new]);
-  	  [cell setButtonType: NSPushOnPushOffButton];
-  	  [cell setImagePosition: NSImageOnly]; 
+  	cell = [NSButtonCell new];
+  	[cell setButtonType: NSPushOnPushOffButton];
+  	[cell setImagePosition: NSImageAbove]; 
 
-  	  matrix = [[NSMatrix alloc] initWithFrame: NSZeroRect
-			      	  					  mode: NSRadioModeMatrix prototype: cell
-		       							    			  numberOfRows: 0 numberOfColumns: 0];
-		  [matrix setIntercellSpacing: NSZeroSize];
-		  [matrix setCellSize: NSMakeSize(64, 64)];
-  	  [matrix setTarget: self];		
-  	  [matrix setAction: @selector(setCurrentApplication:)];		
-  	  [matrix setDoubleAction: @selector(openFile:)];		    
-		  [scrollView setDocumentView: matrix];	
+  	matrix = [[NSMatrix alloc] initWithFrame: NSZeroRect
+			      	  					mode: NSRadioModeMatrix prototype: cell
+		       							    			numberOfRows: 0 numberOfColumns: 0];
+    RELEASE (cell);
+		[matrix setIntercellSpacing: NSZeroSize];
+    [matrix setCellSize: NSMakeSize(64, [[scrollView contentView] frame].size.height)];
+		[matrix setAllowsEmptySelection: YES];
+  	[matrix setTarget: self];		
+  	[matrix setAction: @selector(setCurrentApplication:)];		
+  	[matrix setDoubleAction: @selector(openFile:)];		    
+		[scrollView setDocumentView: matrix];	
+    RELEASE (matrix);
 
-      [tabView selectTabViewItemAtIndex: NO_TOOLS_INDEX];
+    r = [toolsBox frame];
+    r.origin.y = 165;
+    r.size.height = 25;
+  	errLabel = [[NSTextField alloc] initWithFrame: r];	
+  	[errLabel setAlignment: NSCenterTextAlignment];
+		[errLabel setFont: [NSFont systemFontOfSize: 18]];
+  	[errLabel setBackgroundColor: [NSColor windowBackgroundColor]];
+  	[errLabel setTextColor: [NSColor darkGrayColor]];	
+  	[errLabel setBezeled: NO];
+  	[errLabel setEditable: NO];
+  	[errLabel setSelectable: NO];
+		[errLabel setStringValue: NSLocalizedString(@"No Tools Inspector", @"")];
 
-		  currentApp = nil;
-
-      [cancelButt setEnabled: NO];         
-      [okButt setEnabled: NO]; 
-
-		  valid = NO;
-    }
+    insppaths = nil;
+		currentApp = nil;
+    extensions = nil;
+		valid = YES;
+    [okButt setEnabled: NO]; 
 	}
   
 	return self;
 }
 
-- (id)inspView
+- (NSView *)inspView
 {
-  return inspBox;
+  return mainBox;
+}
+
+- (NSString *)winname
+{
+  return NSLocalizedString(@"Tools Inspector", @"");
 }
 
 - (void)activateForPaths:(NSArray *)paths
 {
 	int pathscount;
-  NSString *currentPath;  
   BOOL toolsok;
 	int i;
 
-	[okButt setEnabled: NO];		
-	[cancelButt setEnabled: NO];
+  if (paths == nil) {
+    DESTROY (insppaths);
+    return;
+  }
 
 	pathscount = [paths count];
-  currentPath = [paths objectAtIndex: 0];
+
+	if (pathscount == 1) { 
+    NSString *path = [paths objectAtIndex: 0];
+    [iconView setImage: [ws iconForFile: path]];
+    [titleField setStringValue: [path lastPathComponent]];
+  } else {
+    NSString *items = NSLocalizedString(@"items", @"");
+    items = [NSString stringWithFormat: @"%i %@", pathscount, items];
+		[titleField setStringValue: items];  
+    [iconView setImage: [NSImage imageNamed: @"MultipleSelection.tiff"]];
+  }
 
   toolsok = YES; 
   for (i = 0; i < [paths count]; i++) {
+	  NSString *path = [paths objectAtIndex: i];
 		NSString *defApp = nil;
 		NSString *fType = nil;
 
-	  currentPath = [paths objectAtIndex: i];
-		[ws getInfoForFile: currentPath application: &defApp type: &fType];		
+		[ws getInfoForFile: path application: &defApp type: &fType];		
 		if (([fType isEqual: NSPlainFileType] == NO)
                        && ([fType isEqual: NSShellCommandFileType] == NO)) {
 			toolsok = NO;		
@@ -128,49 +161,21 @@ static NSString *nibName = @"Tools";
     
 	if (toolsok == YES) {		  	
 		if (valid == NO) {
-      [tabView selectTabViewItemAtIndex: TOOLS_INDEX];
+      [errLabel removeFromSuperview];
+      [mainBox addSubview: toolsBox];
 			valid = YES;
 		}
     [self findApplicationsForPaths: paths];
 		
 	} else {
 		if (valid == YES) {
-      [tabView selectTabViewItemAtIndex: NO_TOOLS_INDEX];
+      [toolsBox removeFromSuperview];
+      [mainBox addSubview: errLabel];
 			valid = NO;
 		}
 	}
-	
-	[inspBox setNeedsDisplay: YES];	
-}
-
-- (void)showPasteboardData:(NSData *)data 
-                    ofType:(NSString *)type
-{
-}
-
-- (void)deactivate
-{
-  [inspBox removeFromSuperview];
-}
-
-- (NSString *)inspname
-{
-	return NSLocalizedString(@"Tools", @"");
-}
-
-- (NSString *)winname
-{
-	return NSLocalizedString(@"Tools Inspector", @"");
-}
-
-- (NSButton *)revertButton
-{
-	return cancelButt;
-}
-
-- (NSButton *)okButton
-{
-	return okButt;
+  
+	[okButt setEnabled: NO];		  
 }
 
 - (void)findApplicationsForPaths:(NSArray *)paths
@@ -185,8 +190,8 @@ static NSString *nibName = @"Tools";
   ASSIGN (insppaths, paths);
 
 	TEST_RELEASE (extensions);
-  extensions = [[NSMutableArray alloc] initWithCapacity: 1];
-  extensionsAndApps = [NSMutableDictionary dictionaryWithCapacity: 1];
+  extensions = [NSMutableArray new];
+  extensionsAndApps = [NSMutableDictionary dictionary];
 
 	DESTROY (currentApp);
 	[defAppField setStringValue: @""];
@@ -298,27 +303,12 @@ static NSString *nibName = @"Tools";
 			NSString *appName = [commonApps objectAtIndex: i];
 			NSString *appPath = [ws fullPathForApplication: appName];
       NSImage *icon = [ws iconForFile: appPath];
-	    NSSize size = [icon size];
-
-      if ((size.width > ICNMAX) || (size.height > ICNMAX)) {
-        NSSize newsize;
-
-        if (size.width >= size.height) {
-          newsize.width = ICNMAX;
-          newsize.height = floor(ICNMAX * size.height / size.width + 0.5);
-        } else {
-          newsize.height = ICNMAX;
-          newsize.width  = floor(ICNMAX * size.width / size.height + 0.5);
-        }
-
-	      [icon setScalesWhenResized: YES];
-	      [icon setSize: newsize];  
-      }
       
 			cell = [matrix cellAtRow: 0 column: i];
 			[cell setImage: icon];
 			[cell setTitle: appName];
 		}
+    
 		[matrix sizeToCells];
 	}
 	
@@ -345,7 +335,7 @@ static NSString *nibName = @"Tools";
 	}
 }
 
-- (IBAction)setCurrentApplication:(id)sender
+- (void)setCurrentApplication:(id)sender
 {
   NSString *s;
 	
@@ -363,7 +353,6 @@ static NSString *nibName = @"Tools";
   NSMutableArray *newApps;
   id cell;
   NSImage *icon;
-  NSSize size;
   int i, count;
   
   for (i = 0; i < [extensions count]; i++) {
@@ -389,22 +378,6 @@ static NSString *nibName = @"Tools";
 		app = [newApps objectAtIndex: i];
     app = [ws fullPathForApplication: app];
     icon = [ws iconForFile: app];
-    size = [icon size];
-
-    if ((size.width > ICNMAX) || (size.height > ICNMAX)) {
-      NSSize newsize;
-
-      if (size.width >= size.height) {
-        newsize.width = ICNMAX;
-        newsize.height = floor(ICNMAX * size.height / size.width + 0.5);
-      } else {
-        newsize.height = ICNMAX;
-        newsize.width  = floor(ICNMAX * size.width / size.height + 0.5);
-      }
-
-	    [icon setScalesWhenResized: YES];
-	    [icon setSize: newsize];  
-    }
     
 		cell = [matrix cellAtRow: 0 column: i];
 		[cell setTitle: app];
@@ -416,7 +389,7 @@ static NSString *nibName = @"Tools";
   [matrix selectCellAtRow: 0 column: 0];
 }
 
-- (IBAction)openFile:(id)sender
+- (void)openFile:(id)sender
 {
   int i;
   
@@ -426,23 +399,7 @@ static NSString *nibName = @"Tools";
   }
 }
 
-//
-// NSTabView delegate Methods
-//
-- (BOOL)tabView:(NSTabView *)tabView shouldSelectTabViewItem:(NSTabViewItem *)tabViewItem
-{
-  return YES;
-}
-
-- (void)tabView:(NSTabView *)tabView willSelectTabViewItem:(NSTabViewItem *)tabViewItem
-{
-}
-
-- (void)tabView:(NSTabView *)tabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem
-{
-}
-
-- (void)tabViewDidChangeNumberOfTabViewItems:(NSTabView *)TabView
+- (void)watchedPathDidChange:(NSData *)dirinfo
 {
 }
 

@@ -24,7 +24,9 @@ Inspector_APPLICATION_ICON=Inspector.tiff
 
 Inspector_HAS_RESOURCE_BUNDLE = yes
 
-Inspector_GUI_LIBS += -lPDFKit
+ifneq ($(PDFKIT), 0)
+  Inspector_GUI_LIBS += -lPDFKit
+endif
 
 ifneq ($(PDFKIT), 0)
   Inspector_RESOURCE_FILES = \
@@ -64,6 +66,7 @@ ifeq ($(FOUNDATION_LIB), apple)
                                        InspectorWin.gorm \
                                         Contents.nib \ 
                                         Attributes.nib \ 
+                                        Tools.nib \ 
                                         PreferencesWin.nib \
                                         StartAppWin.nib 
                                         
@@ -72,6 +75,7 @@ else
                                        InspectorWin.gorm \
                                        Contents.gorm \
                                        Attributes.gorm \
+                                       Tools.gorm \
                                      PreferencesWin.gorm \
                                      StartAppWin.gorm 
 endif
@@ -85,6 +89,7 @@ ifneq ($(FOUNDATION_LIB), apple)
                          Contents.m \
                          Attributes.m \
                          TimeDateView.m \
+                         Tools.m \
                          Preferences/InspectorPref.m \
                          Dialogs/StartAppWin.m
 else
@@ -93,7 +98,8 @@ else
                          Inspector.m \
                          Contents.m \
                          Attributes.m \
-                         TimeDateView.m \                         
+                         TimeDateView.m \  
+                         Tools.m \
                          Preferences/InspectorPref.m \
                          Dialogs/StartAppWin.m
                          

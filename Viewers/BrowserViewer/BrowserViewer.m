@@ -149,11 +149,6 @@ if (rct.size.height < 0) rct.size.height = 0
                 				selector: @selector(fileSystemDidChange:) 
                 					  name: GWFileSystemDidChangeNotification
                 					object: nil];
-
-  [[NSNotificationCenter defaultCenter] addObserver: self 
-                				selector: @selector(sortTypeDidChange:) 
-                					  name: GWSortTypeDidChangeNotification
-                					object: nil];
                           
   [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
                 				selector: @selector(sortTypeDidChange:) 
@@ -643,10 +638,10 @@ if (rct.size.height < 0) rct.size.height = 0
 
 - (void)sortTypeDidChange:(NSNotification *)notification
 {
-	NSString *notifPath = [notification object];
+	NSString *notifPath = (NSString *)[notification object];
   
-	if (notifPath != nil) {
-  	[browser reloadColumnWithPath: notifPath];
+	if (notifPath) {
+  	[browser reloadColumnWithPath: [NSString stringWithString: notifPath]];
 	} else {	
 		[self renewAll];
 	}

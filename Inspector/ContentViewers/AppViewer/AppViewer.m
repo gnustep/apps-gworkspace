@@ -30,7 +30,6 @@
 
 - (void)dealloc
 {
-	TEST_RELEASE (matrix);
 	RELEASE (scroll);
 	RELEASE (explField);
   RELEASE (errLabel);
@@ -93,6 +92,7 @@
     [matrix setCellSize: NSMakeSize(64, h)];
 		[matrix setAllowsEmptySelection: YES];
 		[scroll setDocumentView: matrix];	
+    RELEASE (matrix);
 
     x = 5;
     y = r.origin.y + 162;

@@ -82,9 +82,11 @@
 
 - (void)setPaths:(NSArray *)paths;
 
-- (void)showContents;
+- (void)showWindow;
 
 - (void)showAttributes;
+
+- (void)showContents;
 
 - (void)showTools;
 

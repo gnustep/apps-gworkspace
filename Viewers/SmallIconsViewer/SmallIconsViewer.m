@@ -157,11 +157,6 @@ if (rct.size.height < 0) rct.size.height = 0; \
                 					  name: GWFileSystemDidChangeNotification
                 					object: nil];
 
-  [[NSNotificationCenter defaultCenter] addObserver: self 
-                				selector: @selector(sortTypeDidChange:) 
-                					  name: GWSortTypeDidChangeNotification
-                					object: nil];
-
   [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
                 				selector: @selector(sortTypeDidChange:) 
                 					  name: GWSortTypeDidChangeNotification
@@ -661,10 +656,11 @@ if (rct.size.height < 0) rct.size.height = 0; \
 
 - (void)sortTypeDidChange:(NSNotification *)notification
 {
-	NSString *notifPath = [notification object];
+	NSString *notifPath = (NSString *)[notification object];
 
-	if (notifPath != nil) {
-		if ([currentPath isEqualToString: notifPath]) {
+	if (notifPath) {
+    NSString *ntfPath = [NSString stringWithString: notifPath];
+		if ([currentPath isEqual: ntfPath]) {
 			[panel makeFileIcons];
 			[panel resizeWithOldSuperviewSize: [panel frame].size];  
 		}

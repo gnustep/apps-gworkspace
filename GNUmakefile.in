@@ -22,7 +22,6 @@ SUBPROJECTS = Utilities \
 	      			  Inspector \
 	      			  GWLib \
 	      			  Viewers \
-	      			  ContentViewers \
 	      			  GWorkspace 
 						 
 -include GNUmakefile.preamble
