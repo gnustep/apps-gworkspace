@@ -1,7 +1,0 @@
-{
-   Name = "Rtf Inspector";
-   Author = "Enrico Sersale <enrico@imago.ro>";
-   Version = "1.0";	
-   Description = "This Inspector allow you view the content of an Rtf ot txt file";
-}
-
