@@ -62,6 +62,9 @@ static NSString *nibName = @"ToolsPanel";
       NSLog(@"Attribute Inspector: failed to load %@!", nibName);
     } else { 
       id cell;
+
+      RETAIN (inspBox);
+      RELEASE (win); 
        
  		  ws = [NSWorkspace sharedWorkspace];
 

@@ -77,19 +77,19 @@ static NSString *nibName = @"InspectorsWin";
 		  inspectors = [[NSMutableArray alloc] initWithCapacity: 1];
 
       currentInspector = (id<InspectorsProtocol>)[[Attributes alloc] init];	
-      [inspectors addObject: currentInspector]; 
+      [inspectors insertObject: currentInspector atIndex: 0]; 
       DESTROY (currentInspector);
 
       currentInspector = (id<InspectorsProtocol>)[[Contents alloc] init];	
-      [inspectors addObject: currentInspector]; 
+      [inspectors insertObject: currentInspector atIndex: 1]; 
       DESTROY (currentInspector);
 
       currentInspector = (id<InspectorsProtocol>)[[Tools alloc] init];	
-      [inspectors addObject: currentInspector]; 
+      [inspectors insertObject: currentInspector atIndex: 2]; 
       DESTROY (currentInspector);
 
       currentInspector = (id<InspectorsProtocol>)[[Permissions alloc] init];	
-      [inspectors addObject: currentInspector]; 
+      [inspectors insertObject: currentInspector atIndex: 3]; 
       DESTROY (currentInspector);
       
       showingPb = NO;
@@ -181,8 +181,7 @@ static NSString *nibName = @"InspectorsWin";
   if ([inspectors count] <= index) {
     return;
   }
-	if (currentInspector 
-        && (currentInspector == [inspectors objectAtIndex: index])) {
+	if (currentInspector && (currentInspector == [inspectors objectAtIndex: index])) {
     return;
 	}
 
@@ -192,7 +191,7 @@ static NSString *nibName = @"InspectorsWin";
 
   currentInspector = [inspectors objectAtIndex: index];
 	[win setTitle: [currentInspector winname]];
-	[lowBox addSubview: [currentInspector inspView]];	 
+	[[(NSBox *)lowBox contentView] addSubview: [currentInspector inspView]];	 
   
   if (showingPb) {
     [self setPaths: currentPaths];
