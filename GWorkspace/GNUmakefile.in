@@ -109,7 +109,8 @@ ifeq ($(FOUNDATION_LIB), apple)
                                         PermissionsPanel.nib \
                                         FileOperationWin.nib \
                                         OpenWith.nib \
-                                        RunExternal.nib 
+                                        RunExternal.nib \
+                                        StartAppWin.nib 
 else 
   GWorkspace_LOCALIZED_RESOURCE_FILES = Localizable.strings \
 			                		              Finder.gorm \
@@ -129,7 +130,8 @@ else
                                         PermissionsPanel.gorm \
                                         FileOperationWin.gorm \
                                         OpenWith.gorm \
-                                        RunExternal.gorm                                         
+                                        RunExternal.gorm \
+                                        StartAppWin.gorm 
 endif
 
 # The Objective-C source files to be compiled
@@ -179,6 +181,7 @@ ifneq ($(FOUNDATION_LIB), apple)
   Dialogs/OpenWithController.m \
   Dialogs/RunExternalController.m \
   Dialogs/CompletionField.m \
+  Dialogs/StartAppWin.m \
   Fiend/Fiend.m \
   Fiend/FiendLeaf.m 
 else
@@ -226,6 +229,7 @@ else
   Dialogs/OpenWithController.m \
   Dialogs/RunExternalController.m \
   Dialogs/CompletionField.m \
+  Dialogs/StartAppWin.m \
   Fiend/Fiend.m \
   Fiend/FiendLeaf.m 
 endif

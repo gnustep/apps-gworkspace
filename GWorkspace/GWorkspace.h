@@ -57,6 +57,7 @@
 @class FileOperation;
 @class OpenWithController;
 @class RunExternalController;
+@class StartAppWin;
 
 @protocol	FSWClientProtocol
 
@@ -90,6 +91,9 @@
   
   InspectorsController *inspController;
 	NSArray *selectedPaths;
+
+  id fswatcher;
+  BOOL fswnotifications;
 	
   AppsViewer *appsViewer;
   FinderController *finder;
@@ -122,14 +126,13 @@
     
   OpenWithController *openWithController;
   RunExternalController *runExtController;
+  
+  StartAppWin *startAppWin;
     
   BOOL usesThumbnails;
 	      
   int shelfCellsWidth;
-  
-  id fswatcher;
-  BOOL fswnotifications;
-        
+          
   NSFileManager *fm;
   NSWorkspace *ws;
   

@@ -41,6 +41,7 @@
 #include "Dialogs/Dialogs.h"
 #include "Dialogs/OpenWithController.h"
 #include "Dialogs/RunExternalController.h"
+#include "Dialogs/StartAppWin.h"
 #include "Inspectors/InspectorsController.h"
 #include "Apps/Apps.h"
 #include "Finder/FinderController.h"
@@ -503,6 +504,7 @@ return [ws openFile: fullPath withApplication: appName]
   TEST_RELEASE (trashPath);
   RELEASE (openWithController);
   RELEASE (runExtController);
+  RELEASE (startAppWin);
   RELEASE (operations);
   TEST_RELEASE (desktopWindow);
   TEST_RELEASE (tshelfWin);
@@ -532,11 +534,7 @@ return [ws openFile: fullPath withApplication: appName]
 	defaults = [NSUserDefaults standardUserDefaults];
 	processName = [[NSProcessInfo processInfo] processName];    
 	[defaults setObject: processName forKey: @"GSWorkspaceApplication"];
-  
-  fswatcher = nil;
-  fswnotifications = YES;
-  [self connectFSWatcher];
-      
+        
 	result = [defaults stringForKey: @"defaulteditor"];
 	if (result == nil) {
 		defEditor = [[NSString alloc] initWithString: defaulteditor];
@@ -652,6 +650,11 @@ return [ws openFile: fullPath withApplication: appName]
   operations = [NSMutableArray new];	
   oprefnum = 0;
 
+  startAppWin = [[StartAppWin alloc] init];
+  fswatcher = nil;
+  fswnotifications = YES;
+  [self connectFSWatcher];
+
   appsViewer = [[AppsViewer alloc] init];
 	history = [[History alloc] init];
   prefController = [[PrefController alloc] init];  
@@ -761,6 +764,7 @@ return [ws openFile: fullPath withApplication: appName]
 	TEST_CLOSE (history, [history myWin]); 
 	TEST_CLOSE (desktopWindow, desktopWindow);
 	TEST_CLOSE (tshelfWin, tshelfWin);
+  TEST_CLOSE (startAppWin, [startAppWin win]);
 
   if (fswatcher) {
     NSConnection *fswconn = [(NSDistantObject *)fswatcher connectionForProxy];
@@ -1932,10 +1936,6 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 	    static BOOL recursion = NO;
 	    static NSString	*cmd = nil;
 
-
-            // cmd is not released !!!!!!!!!!!!!!!!!!
-            
-
 	    if (recursion == NO) {
         if (cmd == nil) {
           cmd = RETAIN ([[NSSearchPathForDirectoriesInDomains(
@@ -1945,26 +1945,35 @@ NSLocalizedString(@"OK", @""), nil, nil); \
       }
 	  
       if (recursion == NO && cmd != nil) {
-	      NSLog(@"\nI couldn't contact the fswatcher server -\n"
-@"so I'm attempting to to start it - which will take a few seconds.\n");
+        int i;
+        
+        [startAppWin showWindowWithTitle: @"GWorkspace"
+                                 appName: @"fswatcher"
+                            maxProgValue: 50.0];
 
 	      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
+        RELEASE (cmd);
         
-	      [NSTimer scheduledTimerWithTimeInterval: 5.0
-					   invocation: nil
-					      repeats: NO];
-                
-	      [[NSRunLoop currentRunLoop] runUntilDate:
-		                        [NSDate dateWithTimeIntervalSinceNow: 5.0]];
+        for (i = 1; i <= 50; i++) {
+          [startAppWin updateProgressBy: 1 * 1.0];
+	        [[NSRunLoop currentRunLoop] runUntilDate:
+		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+        }
+        
+        [[startAppWin win] close];
+        
 	      recursion = YES;
 	      [self connectFSWatcher];
 	      recursion = NO;
         
 	    } else { 
 	      recursion = NO;
-	      [NSException raise: NSInternalInconsistencyException
-			              format: @"unable to contact fswatcher -\n"
-		                  @"please check that the fswatcher process is running."];
+        fswnotifications = NO;
+        NSRunAlertPanel(nil,
+                NSLocalizedString(@"unable to contact fswatcher\nfswatcher notifications disabled!", @""),
+                NSLocalizedString(@"Ok", @""),
+                nil, 
+                nil);  
       }
 	  }
   }
@@ -1993,7 +2002,7 @@ NSLocalizedString(@"OK", @""), nil, nil); \
     fswnotifications = NO;
     NSRunAlertPanel(nil,
                     NSLocalizedString(@"fswatcher notifications disabled!", @""),
-                    NSLocalizedString(@"Yes", @""),
+                    NSLocalizedString(@"Ok", @""),
                     nil, 
                     nil);  
   }
