@@ -341,8 +341,9 @@ static NSFont *labelFont = nil;
 - (void)mouseUp:(NSEvent *)theEvent
 {
 	if ([node isLocked] == NO) {
-	  if ([theEvent clickCount] > 1) {  
-		  [container openSelectionInNewViewer: YES];
+	  if ([theEvent clickCount] > 1) { 
+      BOOL newv = ([theEvent modifierFlags] & NSControlKeyMask);
+		  [container openSelectionInNewViewer: newv];
 	  }  
   }  
 }

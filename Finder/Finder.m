@@ -1167,6 +1167,10 @@ static Finder *finder = nil;
 {
 }
 
+- (void)openSelectionInNewViewer:(BOOL)newv
+{
+}
+
 - (void)performFileOperation:(NSDictionary *)opinfo
 {
 }

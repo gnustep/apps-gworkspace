@@ -33,6 +33,8 @@
 
 - (void)selectionChanged:(NSArray *)newsel;
 
+- (void)openSelectionInNewViewer:(BOOL)newv;
+
 - (void)performFileOperation:(NSDictionary *)opinfo;
 
 - (void)concludeRemoteFilesDragOperation:(NSData *)opinfo

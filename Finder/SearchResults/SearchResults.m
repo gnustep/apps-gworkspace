@@ -421,6 +421,7 @@ static NSString *nibName = @"ResultsWindow";
 
   ASSIGN (sortedObjects, [foundObjects sortedArrayUsingSelector: sortingSel]);
   [resultsView setHighlightedTableColumn: column];
+  [resultsView reloadData];
 }
 
 - (void)setCurrentOrder:(FSNInfoType)order
