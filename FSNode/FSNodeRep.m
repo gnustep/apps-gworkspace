@@ -24,6 +24,7 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
+#include <math.h>
 #include "FSNodeRep.h"
 #include "FSNFunctions.h"
 #include "GNUstep.h"
@@ -216,15 +217,16 @@ static FSNodeRep *shared = nil;
 
   if ((icnsize.width > size) || (icnsize.height > size)) {
     NSImage *newIcon = [icon copy];
+    float fact;
     NSSize newsize;
     
     if (icnsize.width >= icnsize.height) {
-      newsize.width = size;
-      newsize.height = icnsize.height * newsize.width / icnsize.width;
+      fact = icnsize.width / size;
     } else {
-      newsize.height = size;
-      newsize.width  = icnsize.width * newsize.height / icnsize.height;
+      fact = icnsize.height / size;
     }
+
+    newsize = NSMakeSize(icnsize.width / fact, icnsize.height / fact);
 
 	  [newIcon setScalesWhenResized: YES];
 	  [newIcon setSize: newsize];  
@@ -241,15 +243,16 @@ static FSNodeRep *shared = nil;
 
   if ((icnsize.width > size) || (icnsize.height > size)) {
     NSImage *newIcon = [multipleSelIcon copy];
+    float fact;
     NSSize newsize;
     
     if (icnsize.width >= icnsize.height) {
-      newsize.width = size;
-      newsize.height = icnsize.height * newsize.width / icnsize.width;
+      fact = icnsize.width / size;
     } else {
-      newsize.height = size;
-      newsize.width  = icnsize.width * newsize.height / icnsize.height;
+      fact = icnsize.height / size;
     }
+
+    newsize = NSMakeSize(icnsize.width / fact, icnsize.height / fact);
 
 	  [newIcon setScalesWhenResized: YES];
 	  [newIcon setSize: newsize];  
@@ -287,10 +290,10 @@ static FSNodeRep *shared = nil;
     
     if (icnsize.width >= icnsize.height) {
       newsize.width = size;
-      newsize.height = icnsize.height * newsize.width / icnsize.width;
+      newsize.height = floor(icnsize.height * newsize.width / icnsize.width + 0.5);
     } else {
       newsize.height = size;
-      newsize.width  = icnsize.width * newsize.height / icnsize.height;
+      newsize.width  = floor(icnsize.width * newsize.height / icnsize.height + 0.5);
     }
 
 	  [newIcon setScalesWhenResized: YES];

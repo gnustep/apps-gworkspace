@@ -97,8 +97,8 @@ static NSFont *labelFont = nil;
     hlightRect = NSZeroRect;
     hlightRect.size.width = ceil(isize / 3 * 4);
     hlightRect.size.height = ceil(hlightRect.size.width * [FSNodeRep highlightHeightFactor]);
-    if ((hlightRect.size.height - isize) < 2) {
-      hlightRect.size.height = isize + 2;
+    if ((hlightRect.size.height - isize) < 4) {
+      hlightRect.size.height = isize + 4;
     }
     ASSIGN (highlightPath, [FSNodeRep highlightPathOfSize: hlightRect.size]);
         
@@ -244,7 +244,7 @@ static NSFont *labelFont = nil;
     
     if (selectable) {
       float hlx = (frameRect.size.width - hlightRect.size.width) / 2;
-      float hly = labelRect.size.height;
+      float hly = frameRect.size.height - hlightRect.size.height;
     
       if ((hlightRect.origin.x != hlx) || (hlightRect.origin.y != hly)) {
         NSAffineTransform *transform = [NSAffineTransform transform];
@@ -299,7 +299,7 @@ static NSFont *labelFont = nil;
     icnBounds.origin.x = (frameRect.size.width - sz.width) / 2;
     icnBounds.origin.y = 0;
   } 
-  
+   
   [self setNeedsDisplay: YES]; 
 }
 
@@ -404,15 +404,18 @@ static NSFont *labelFont = nil;
 {	  
   if (isSelected) {
     [[NSColor selectedControlColor] set];
+//    [highlightPath stroke];
     [highlightPath fill];
     
     if (icnPosition != NSImageOnly) {
+      NSFrameRect(labelRect);
       NSRectFill(labelRect);  
       [label drawWithFrame: labelRect inView: self];
     }
   } else {
     if (icnPosition != NSImageOnly) {
       [[container backgroundColor] set];
+      NSFrameRect(labelRect);
       NSRectFill(labelRect);
       [label drawWithFrame: labelRect inView: self];
     }  
@@ -492,10 +495,12 @@ static NSFont *labelFont = nil;
   ASSIGN (icon, [FSNodeRep iconOfSize: isize forNode: node]);
   hlightRect.size.width = isize / 3 * 4;
   hlightRect.size.height = hlightRect.size.width * [FSNodeRep highlightHeightFactor];
-  if ((isize - hlightRect.size.height) < 2) {
-    hlightRect.size.height = isize + 2;
+  if ((hlightRect.size.height - isize) < 4) {
+    hlightRect.size.height = isize + 4;
   }
-  ASSIGN (highlightPath, [FSNodeRep highlightPathOfSize: hlightRect.size]);  
+  hlightRect.origin.x = 0;
+  hlightRect.origin.y = 0;
+  ASSIGN (highlightPath, [FSNodeRep highlightPathOfSize: hlightRect.size]); 
   [self tile];
 }
 
