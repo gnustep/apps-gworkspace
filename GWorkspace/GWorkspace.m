@@ -272,7 +272,6 @@ return [ws openFile: fullPath withApplication: appName]
 		viewer = [self newViewerAtPath: rootFullpath canViewApps: (type == NSApplicationFileType)];
 		[viewer setViewerSelection: paths];
 		[viewer makeKeyAndOrderFront: nil];
-		// [GSCurrentContext() flush];
 	} else {
 		[rootViewer setViewerSelection: paths];
 	}

@@ -189,7 +189,7 @@ else
   IconViewsIcon.m \
   GWSplitView.m \
   Watchers/Watcher.m \
-  FileOperations/FileOperation.m \  
+  FileOperations/FileOperation.m \
   ViewersWindow.m \
   Shelf/Shelf.m \
   Shelf/ShelfIcon.m \

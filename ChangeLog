@@ -1,3 +1,8 @@
+2003-07-17 Enrico Sersale  <enrico@imago.ro>
+
+  * GWorkspace/TShelf/TShelfView.m
+    in -drawRect: uses NSBezierPath instead of ps operators.
+
 2003-07-13 Enrico Sersale  <enrico@imago.ro>
 
   * Utilities/findfile/findfile.m

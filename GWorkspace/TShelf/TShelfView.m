@@ -183,7 +183,6 @@
 
 - (void)drawRect:(NSRect)rect
 {
-  NSGraphicsContext *ctxt = GSCurrentContext();
   float borderThickness;
   int howMany = [items count];
   int i;
@@ -196,8 +195,6 @@
   float lastxspace = 34;
   float itemxspace = (aRect.size.width - lastxspace - buttw) / (howMany - 1);
   NSImage *backImage = [[GWorkspace gworkspace] tshelfBackground];
-  
-  DPSgsave(ctxt);
   
   if (backImage) {  
     [backImage compositeToPoint: NSMakePoint (0.0, 0.0) 
@@ -222,7 +219,8 @@
 	  NSPoint iP;
 	  TShelfViewItem *anItem = [items objectAtIndex: i];
 	  NSTabState itemState;
-
+    NSBezierPath *bpath;
+    
 	  itemState = [anItem tabState];
 
 	  if (i == (howMany - 1)) {
@@ -266,13 +264,14 @@
 	    r.origin.y = aRect.size.height;
 	    r.size.width = lastxspace - 13;
 	    r.size.height = 23;
-
-	    DPSsetlinewidth(ctxt, 1);
-	    DPSsetgray(ctxt, 1);
-	    DPSmoveto(ctxt, r.origin.x, r.origin.y + 24);
-	    DPSrlineto(ctxt, r.size.width, 0);
-	    DPSstroke(ctxt);      
-
+      
+      bpath = [NSBezierPath bezierPath];
+      [bpath setLineWidth: 1];
+      [bpath moveToPoint: NSMakePoint(r.origin.x, r.origin.y + 24)];
+      [bpath relativeLineToPoint: NSMakePoint(r.size.width, 0)];
+      [[NSColor whiteColor] set];
+      [bpath stroke];
+      
       [anItem drawImage: [NSImage imageNamed: @"DragableDocument.tiff"]
                  inRect: r];
 
@@ -311,17 +310,19 @@
 	      r.size.height = 23;
       }
 
-	    DPSsetlinewidth(ctxt, 1);
-	    DPSsetgray(ctxt, 1);
-	    DPSmoveto(ctxt, r.origin.x, r.origin.y + 24);
-	    DPSrlineto(ctxt, r.size.width, 0);
-	    DPSstroke(ctxt);      
+//	    DPSsetgray(ctxt, 1);
+
+      bpath = [NSBezierPath bezierPath];
+      [bpath setLineWidth: 1];
+      [bpath moveToPoint: NSMakePoint(r.origin.x, r.origin.y + 24)];
+      [bpath relativeLineToPoint: NSMakePoint(r.size.width, 0)];
+      [[NSColor whiteColor] set];
+      [bpath stroke];
       
 	    [anItem drawLabelInRect: r];
 	  }  
 	}
   
-  DPSgrestore(ctxt);
   NSZoneFree (NSDefaultMallocZone(), states);
 }
 

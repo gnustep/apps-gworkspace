@@ -170,7 +170,6 @@
 
 - (void)drawLabelInRect:(NSRect)tabRect
 {
-  NSGraphicsContext *ctxt = GSCurrentContext();
   NSRect lRect;
   NSRect fRect;
   NSDictionary *attr;
@@ -191,9 +190,7 @@
   labw = [self sizeOfLabel: string].width;
   lRect.origin.x += (maxw - labw) / 2;
   lRect.size.width = labw;
-
-  DPSgsave(ctxt);
-
+  
   if (state == NSSelectedTab) {
     fRect.origin.y -= 1;
     fRect.size.height += 1;
@@ -212,13 +209,10 @@
 			                nil];
   
   [string drawInRect: lRect withAttributes: attr];
-
-  DPSgrestore(ctxt);
 }
 
 - (void)drawImage:(NSImage *)image inRect:(NSRect)tabRect
 {
-  NSGraphicsContext *ctxt = GSCurrentContext();
   NSRect fRect;
   NSPoint p;
   
@@ -228,8 +222,6 @@
   p.x += 2;
   p.y += 4;
   
-  DPSgsave(ctxt);
-
   if (state == NSSelectedTab) {
     fRect.origin.y -= 1;
     fRect.size.height += 1;
@@ -243,8 +235,6 @@
   }
 
   [image compositeToPoint: p operation: NSCompositeSourceOver];
-
-  DPSgrestore(ctxt);  
 }
 
 @end

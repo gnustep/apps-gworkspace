@@ -156,7 +156,6 @@
 - (void)activate
 {
 	[win orderFront: nil]; 
-//	[GSCurrentContext() flush];
 }
 
 - (NSWindow *)myWin
@@ -491,10 +490,8 @@
 	[tile compositeToPoint: NSZeroPoint operation: NSCompositeSourceOver]; 
 	if (isFull) {
 		[fullImg compositeToPoint: NSMakePoint(8, 8) operation: NSCompositeSourceOver]; 
-	//	[GSCurrentContext() flush];
 	} else {
 		[emptyImg compositeToPoint: NSMakePoint(8, 8) operation: NSCompositeSourceOver]; 
-	//	[GSCurrentContext() flush];
 	}
   [self unlockFocus];  
 }
