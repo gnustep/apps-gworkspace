@@ -50,7 +50,7 @@ typedef NSString *(*cutIMP)(id, SEL, id, float);
   NSString *selectionTitle; 
   
   NSImage *icon;
-  float icnsize;
+  int icnsize;
   
   NSBezierPath *highlightPath;
   NSRect hlightRect;

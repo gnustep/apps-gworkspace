@@ -28,7 +28,7 @@
 #include "FSNBrowserCell.h"
 #include "FSNode.h"
 
-#define DEFAULT_ISIZE (24.0)
+#define DEFAULT_ISIZE (24)
 #define HLIGHT_H_FACT (0.8125)
 
 static id <DesktopApplication> desktopApp = nil;
@@ -306,7 +306,7 @@ static NSDictionary *fontAttr = nil;
   [super setFont: fontObj];
 }
 
-- (void)setIconSize:(float)isize
+- (void)setIconSize:(int)isize
 {
   icnsize = isize;
   [self setIcon];

@@ -199,11 +199,7 @@ static NSFont *labelFont = nil;
     return;
   }
   isSelected = YES;
-  
-  if (container) {
-    [container unselectOtherReps: self];	
-  }
-  
+  [container unselectOtherReps: self];	
   [self setNeedsDisplay: YES]; 
 }
 
@@ -213,7 +209,6 @@ static NSFont *labelFont = nil;
     return;
   }
 	isSelected = NO;
-  
   [self setNeedsDisplay: YES];
 }
 
@@ -401,7 +396,36 @@ static NSFont *labelFont = nil;
 }
 
 - (void)drawRect:(NSRect)rect
-{	  
+{	 
+
+/*
+  rect.origin.x = floor(rect.origin.x);
+  rect.origin.y = floor(rect.origin.y);
+  rect.size.width = ceil(rect.size.width) + 1;
+  rect.size.height = ceil(rect.size.height) + 1;
+
+  [[NSColor windowBackgroundColor] set];
+  NSRectFill(rect);
+*/
+
+/*
+NSRect
+NSIntegralRect(NSRect aRect)
+{
+  NSRect	rect;
+
+  if (NSIsEmptyRect(aRect))
+    return NSMakeRect(0, 0, 0, 0);
+
+  rect.origin.x = floor(NSMinX(aRect));
+  rect.origin.y = floor(NSMinY(aRect));
+  rect.size.width = ceil(NSMaxX(aRect)) - rect.origin.x;
+  rect.size.height = ceil(NSMaxY(aRect)) - rect.origin.y;
+  return rect;
+}
+*/
+
+ 
   if (isSelected) {
     [[NSColor selectedControlColor] set];
 //    [highlightPath stroke];
@@ -489,7 +513,7 @@ static NSFont *labelFont = nil;
   [self tile];
 }
 
-- (void)setIconSize:(float)isize
+- (void)setIconSize:(int)isize
 {
   icnBounds = NSMakeRect(0, 0, isize, isize);
   ASSIGN (icon, [FSNodeRep iconOfSize: isize forNode: node]);

@@ -51,7 +51,7 @@ typedef enum FSNInfoType {
 
 - (void)setFont:(NSFont *)fontObj;
 
-- (void)setIconSize:(float)isize;
+- (void)setIconSize:(int)isize;
 
 - (void)setIconPosition:(unsigned int)ipos;
 

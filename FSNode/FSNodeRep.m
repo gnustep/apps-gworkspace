@@ -307,8 +307,9 @@ static FSNodeRep *shared = nil;
 
 - (NSBezierPath *)highlightPathOfSize:(NSSize)size
 {
+  NSSize intsize = NSMakeSize(ceil(size.width), ceil(size.height));
   NSBezierPath *bpath = [NSBezierPath bezierPath];
-  float clenght = size.height / 4;
+  float clenght = intsize.height / 4;
   NSPoint p, cp1, cp2;
   
   p = NSMakePoint(clenght, 0);
@@ -319,28 +320,28 @@ static FSNodeRep *shared = nil;
   cp2 = NSMakePoint(0, 0);
   [bpath curveToPoint: p controlPoint1: cp1 controlPoint2: cp2];
 
-  p = NSMakePoint(0, size.height - clenght);
+  p = NSMakePoint(0, intsize.height - clenght);
   [bpath lineToPoint: p];
 
-  p = NSMakePoint(clenght, size.height);
-  cp1 = NSMakePoint(0, size.height);
-  cp2 = NSMakePoint(0, size.height);
+  p = NSMakePoint(clenght, intsize.height);
+  cp1 = NSMakePoint(0, intsize.height);
+  cp2 = NSMakePoint(0, intsize.height);
   [bpath curveToPoint: p controlPoint1: cp1 controlPoint2: cp2];
 
-  p = NSMakePoint(size.width - clenght, size.height);
+  p = NSMakePoint(intsize.width - clenght, intsize.height);
   [bpath lineToPoint: p];
 
-  p = NSMakePoint(size.width, size.height - clenght);
-  cp1 = NSMakePoint(size.width, size.height);
-  cp2 = NSMakePoint(size.width, size.height);
+  p = NSMakePoint(intsize.width, intsize.height - clenght);
+  cp1 = NSMakePoint(intsize.width, intsize.height);
+  cp2 = NSMakePoint(intsize.width, intsize.height);
   [bpath curveToPoint: p controlPoint1: cp1 controlPoint2: cp2];
 
-  p = NSMakePoint(size.width, clenght);
+  p = NSMakePoint(intsize.width, clenght);
   [bpath lineToPoint: p];
 
-  p = NSMakePoint(size.width - clenght, 0);
-  cp1 = NSMakePoint(size.width, 0);
-  cp2 = NSMakePoint(size.width, 0);
+  p = NSMakePoint(intsize.width - clenght, 0);
+  cp1 = NSMakePoint(intsize.width, 0);
+  cp2 = NSMakePoint(intsize.width, 0);
   [bpath curveToPoint: p controlPoint1: cp1 controlPoint2: cp2];
 
   [bpath closePath];

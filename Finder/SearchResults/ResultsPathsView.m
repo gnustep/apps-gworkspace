@@ -254,6 +254,11 @@
 {
 }
 
+- (NSColor *)backgroundColor
+{
+  return [NSColor windowBackgroundColor];
+}
+
 @end
 
 
