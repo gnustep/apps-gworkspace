@@ -122,6 +122,7 @@
     node = [FSNode nodeWithRelativePath: [newSelection objectAtIndex: i] 
                                  parent: ((i == 0) ? nil : node)];
     icon = [[FSNIcon alloc] initForNode: node
+                           nodeInfoType: FSNInfoNameType
                                iconSize: ICN_SIZE
                            iconPosition: NSImageLeft
                               labelFont: [NSFont systemFontOfSize: 12]

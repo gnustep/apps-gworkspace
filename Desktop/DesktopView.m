@@ -199,6 +199,8 @@
 
       entry = [nodeInfo objectForKey: @"fsn_info_type"];
       infoType = entry ? [entry intValue] : infoType;
+      
+      return nodeInfo;
     }
   }
   
@@ -847,11 +849,13 @@
   }
   
   ASSIGN (node, anode);
+  nodeInfo = [self readNodeInfo];
   [desktopApp addWatcherForPath: [node path]];
     
   for (i = 0; i < [subNodes count]; i++) {
     FSNode *subnode = [subNodes objectAtIndex: i];
     FSNIcon *icon = [[FSNIcon alloc] initForNode: subnode
+                                    nodeInfoType: infoType
                                         iconSize: iconSize
                                     iconPosition: iconPosition
                                        labelFont: labelFont
@@ -861,8 +865,6 @@
     [unsorted addObject: icon];
     RELEASE (icon);
   }
-
-  nodeInfo = [self readNodeInfo];
   
   if (nodeInfo) {
     NSDictionary *indexes = [nodeInfo objectForKey: @"indexes"];
@@ -1054,22 +1056,6 @@
   FSNIcon *icon = [super addRepForSubnode: anode];
   [icon setGridIndex: [self firstFreeGridIndex]];
   return icon;
-}
-
-- (NSArray *)selectedReps
-{
-  NSMutableArray *selectedReps = [NSMutableArray array];
-  int i;
-  
-  for (i = 0; i < [icons count]; i++) {
-    FSNIcon *icon = [icons objectAtIndex: i];
-
-    if ([icon isSelected]) {
-      [selectedReps addObject: icon];
-    }
-  }
-
-  return selectedReps;
 }
 
 - (BOOL)validatePasteOfFilenames:(NSArray *)names

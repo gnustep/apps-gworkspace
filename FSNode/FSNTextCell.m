@@ -30,9 +30,9 @@
 
 - (void)dealloc
 {
+  TEST_RELEASE (uncuttedTitle);
   RELEASE (fontAttr);
   RELEASE (dots);
-
   TEST_RELEASE (icon);  
   [super dealloc];
 }
@@ -187,7 +187,6 @@
 {
   NSRect title_rect = cellFrame;
   float textlenght = title_rect.size.width;
-  NSString *title = [[self stringValue] copy];
   NSString *cuttitle;  
 
 #define MARGIN (2.0)
@@ -197,7 +196,8 @@
   }
   
   textlenght -= MARGIN;
-  cuttitle = (*cutTitle)(self, cutTitleSel, title, textlenght);
+  ASSIGN (uncuttedTitle, [self stringValue]);
+  cuttitle = (*cutTitle)(self, cutTitleSel, uncuttedTitle, textlenght);
   [self setStringValue: cuttitle];        
 
   if (icon == nil) {
@@ -223,8 +223,7 @@
 	               operation: NSCompositeSourceOver];
   }
   
-  [self setStringValue: title];          
-  RELEASE (title);  
+  [self setStringValue: uncuttedTitle];          
 }
 
 @end

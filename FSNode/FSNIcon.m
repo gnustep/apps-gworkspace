@@ -63,6 +63,7 @@ static id <DesktopApplication> desktopApp = nil;
 }
 
 - (id)initForNode:(FSNode *)anode
+     nodeInfoType:(FSNInfoType)type
          iconSize:(int)isize
      iconPosition:(unsigned int)ipos
         labelFont:(NSFont *)lfont
@@ -111,7 +112,7 @@ static id <DesktopApplication> desktopApp = nil;
     label = [FSNTextCell new];
     [label setFont: lfont];
 
-    [self setNodeInfoShowType: FSNInfoNameType];
+    [self setNodeInfoShowType: type];
     
     labelRect = NSZeroRect;
     labelRect.size.width = ceil([label uncuttedTitleLenght] + [FSNodeRep labelMargin]);
@@ -594,6 +595,11 @@ static id <DesktopApplication> desktopApp = nil;
 - (FSNInfoType)nodeInfoShowType
 {
   return showType;
+}
+
+- (NSString *)shownInfo
+{
+  return [label stringValue];
 }
 
 - (void)setNameEdited:(BOOL)value

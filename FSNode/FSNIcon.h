@@ -73,6 +73,7 @@
 }
 
 - (id)initForNode:(FSNode *)anode
+     nodeInfoType:(FSNInfoType)type
          iconSize:(int)isize
      iconPosition:(unsigned int)ipos
         labelFont:(NSFont *)lfont

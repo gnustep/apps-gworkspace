@@ -40,6 +40,7 @@ typedef NSString *(*cutIMP)(id, SEL, id, float);
   float titlelenght;
   float dtslenght;
   BOOL dateCell;
+  NSString *uncuttedTitle; 
 	SEL cutTitleSel;
 	cutIMP cutTitle;
   NSImage *icon;

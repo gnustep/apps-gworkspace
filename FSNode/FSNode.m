@@ -336,15 +336,15 @@
 	if (filesize == 0) {
 		sizeStr = @"0 bytes";
 	} else if (filesize < (10 * ONE_KB)) {
-		sizeStr = [NSString stringWithFormat: @"%s %d bytes", sign, filesize];
+		sizeStr = [NSString stringWithFormat: @"%s%d bytes", sign, filesize];
 	} else if(filesize < (100 * ONE_KB)) {
- 		sizeStr = [NSString stringWithFormat: @"%s %3.2f KB", sign,
+ 		sizeStr = [NSString stringWithFormat: @"%s%3.2f KB", sign,
                           					  ((double)filesize / (double)(ONE_KB))];
 	} else if(filesize < (100 * ONE_MB)) {
-		sizeStr = [NSString stringWithFormat: @"%s %3.2f MB", sign,
+		sizeStr = [NSString stringWithFormat: @"%s%3.2f MB", sign,
                           					  ((double)filesize / (double)(ONE_MB))];
 	} else {
- 		sizeStr = [NSString stringWithFormat:@"%s %3.2f GB", sign,
+ 		sizeStr = [NSString stringWithFormat:@"%s%3.2f GB", sign,
                           					  ((double)filesize / (double)(ONE_GB))];
 	}
 

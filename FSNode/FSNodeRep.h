@@ -34,7 +34,8 @@ typedef enum FSNInfoType {
   FSNInfoKindType = 2,
   FSNInfoDateType = 3,
   FSNInfoSizeType = 4,
-  FSNInfoOwnerType = 5
+  FSNInfoOwnerType = 5,
+  FSNInfoOtherType = 6
 } FSNInfoType;
 
 typedef enum FSNSelectionMask {   
@@ -72,6 +73,8 @@ typedef enum FSNSelectionMask {
 - (void)setNodeInfoShowType:(FSNInfoType)type;
 
 - (FSNInfoType)nodeInfoShowType;
+
+- (NSString *)shownInfo;
 
 - (void)setNameEdited:(BOOL)value;
 

@@ -40,6 +40,7 @@ typedef NSString *(*cutIMP)(id, SEL, id, float);
   FSNode *node;
   NSArray *selection;
   NSString *selectionTitle; 
+  NSString *uncuttedTitle; 
   
   NSImage *icon;
   int icnsize;

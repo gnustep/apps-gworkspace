@@ -43,6 +43,7 @@ static NSDictionary *fontAttr = nil;
 {
   TEST_RELEASE (selection);
   TEST_RELEASE (selectionTitle);
+  TEST_RELEASE (uncuttedTitle);
   TEST_RELEASE (icon); 
   TEST_RELEASE (highlightPath);
   RELEASE (dots);
@@ -167,7 +168,6 @@ static NSDictionary *fontAttr = nil;
 {
   float textlenght = cellFrame.size.width;
   BOOL showsFirstResponder = [self showsFirstResponder];
-  NSString *title = [[self stringValue] copy];
   NSString *cuttitle;  
 
 #define MARGIN (2.0)
@@ -179,7 +179,8 @@ static NSDictionary *fontAttr = nil;
   }
   
   textlenght -= MARGIN;
-  cuttitle = (*cutTitle)(self, cutTitleSel, title, textlenght);
+  ASSIGN (uncuttedTitle, [self stringValue]);
+  cuttitle = (*cutTitle)(self, cutTitleSel, uncuttedTitle, textlenght);
   [self setStringValue: cuttitle];        
 
   if (icon == nil) {
@@ -259,8 +260,7 @@ static NSDictionary *fontAttr = nil;
     [controlView unlockFocus];
   }
 
-  [self setStringValue: title];          
-  RELEASE (title);  
+  [self setStringValue: uncuttedTitle];          
 }
 
 
@@ -378,6 +378,11 @@ static NSDictionary *fontAttr = nil;
 - (FSNInfoType)nodeInfoShowType
 {
   return showType;
+}
+
+- (NSString *)shownInfo
+{
+  return [self stringValue];
 }
 
 - (void)setNameEdited:(BOOL)value

@@ -365,7 +365,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
 
 	for (i = 0; i < [icons count]; i++) {
 		FSNIcon *icon = [icons objectAtIndex: i];
-    NSString *name = [[icon node] name];
+    NSString *name = [icon shownInfo];
     
 		if ([name hasPrefix: prefix]) {
       [icon select];
@@ -883,11 +883,13 @@ pp.x = NSMaxX([self bounds]) - 1
   }
   
   ASSIGN (node, anode);
+  [self readNodeInfo];
   [desktopApp addWatcherForPath: [node path]];
     
   for (i = 0; i < [subNodes count]; i++) {
     FSNode *subnode = [subNodes objectAtIndex: i];
     FSNIcon *icon = [[FSNIcon alloc] initForNode: subnode
+                                    nodeInfoType: infoType
                                         iconSize: iconSize
                                     iconPosition: iconPosition
                                        labelFont: labelFont
@@ -1137,6 +1139,7 @@ pp.x = NSMaxX([self bounds]) - 1
 - (id)addRepForSubnode:(FSNode *)anode
 {
   FSNIcon *icon = [[FSNIcon alloc] initForNode: anode
+                                  nodeInfoType: infoType
                                       iconSize: iconSize
                                   iconPosition: iconPosition
                                      labelFont: labelFont
