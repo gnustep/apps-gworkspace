@@ -89,6 +89,10 @@
 
 - (NSString *)parentPath;
 
+- (BOOL)isSubnodeOfNode:(FSNode *)anode;
+
+- (BOOL)isParentOfNode:(FSNode *)anode;
+
 - (NSString *)path;
 
 - (NSString *)relativePath;

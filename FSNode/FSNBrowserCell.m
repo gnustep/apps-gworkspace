@@ -359,6 +359,11 @@ static NSDictionary *fontAttr = nil;
 	[self setEnabled: isLocked];
 }
 
+- (void)checkLocked
+{
+  [self setLocked: [node isLocked]];
+}
+
 - (BOOL)isLocked
 {
 	return isLocked;

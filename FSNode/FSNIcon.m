@@ -447,8 +447,12 @@ static NSFont *labelFont = nil;
       [label drawWithFrame: labelRect inView: self];
     }  
   }
-  
-  [icon compositeToPoint: icnBounds.origin operation: NSCompositeSourceOver];
+
+	if (isLocked == NO) {	
+    [icon compositeToPoint: icnBounds.origin operation: NSCompositeSourceOver];
+	} else {						
+    [icon dissolveToPoint: icnBounds.origin fraction: 0.3];
+	}
 }
 
 
@@ -584,6 +588,11 @@ static NSFont *labelFont = nil;
 	[label setTextColor: (isLocked ? [NSColor disabledControlTextColor] 
 																							: [NSColor controlTextColor])];
 	[self setNeedsDisplay: YES];		
+}
+
+- (void)checkLocked
+{
+  [self setLocked: [node isLocked]];
 }
 
 - (BOOL)isLocked

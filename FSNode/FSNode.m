@@ -213,6 +213,16 @@
   return [path stringByDeletingLastPathComponent];
 }
 
+- (BOOL)isSubnodeOfNode:(FSNode *)anode
+{
+  return isSubpathOfPath([anode path], path);
+}
+
+- (BOOL)isParentOfNode:(FSNode *)anode
+{
+  return isSubpathOfPath(path, [anode path]);
+}
+
 - (NSString *)path
 {
   return path;

@@ -72,7 +72,11 @@ static FSNodeRep *shared = nil;
 
 - (void)setSortOrder:(int)order forDirectory:(NSString *)dirpath;
 
+- (void)lockNode:(FSNode *)node;
+
 - (void)lockNodes:(NSArray *)nodes;
+
+- (void)unlockNode:(FSNode *)node;
 
 - (void)unlockNodes:(NSArray *)nodes;
 
@@ -482,6 +486,15 @@ static FSNodeRep *shared = nil;
 	 								     object: (id)dirpath];  
 }
 
+- (void)lockNode:(FSNode *)node
+{
+  NSString *path = [node path];
+    
+	if ([lockedPaths containsObject: path] == NO) {
+		[lockedPaths addObject: path];
+	} 
+}
+
 - (void)lockNodes:(NSArray *)nodes
 {
 	int i;
@@ -493,6 +506,15 @@ static FSNodeRep *shared = nil;
 			[lockedPaths addObject: path];
 		} 
 	}
+}
+
+- (void)unlockNode:(FSNode *)node
+{
+  NSString *path = [node path];
+
+	if ([lockedPaths containsObject: path]) {
+		[lockedPaths removeObject: path];
+	} 
 }
 
 - (void)unlockNodes:(NSArray *)nodes
@@ -735,9 +757,19 @@ static FSNodeRep *shared = nil;
   [[self sharedInstance] setSortOrder: order forDirectory: dirpath];
 }
 
++ (void)lockNode:(FSNode *)node
+{
+  [[self sharedInstance] lockNode: node];
+}
+
 + (void)lockNodes:(NSArray *)nodes
 {
   [[self sharedInstance] lockNodes: nodes];
+}
+
++ (void)unlockNode:(FSNode *)node
+{
+  [[self sharedInstance] unlockNode: node];
 }
 
 + (void)unlockNodes:(NSArray *)nodes

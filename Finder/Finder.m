@@ -1163,9 +1163,8 @@ static Finder *finder = nil;
 //
 // DesktopApplication protocol
 //
-- (NSString *)trashPath
+- (void)selectionChanged:(NSArray *)newsel
 {
-  return [NSString string];
 }
 
 - (void)performFileOperation:(NSDictionary *)opinfo
@@ -1183,6 +1182,11 @@ static Finder *finder = nil;
 
 - (void)removeWatcherForPath:(NSString *)path
 {
+}
+
+- (NSString *)trashPath
+{
+  return [NSString string];
 }
 
 - (id)workspaceApplication

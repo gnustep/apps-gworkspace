@@ -156,7 +156,7 @@
 //
 // DesktopApplication protocol
 //
-- (NSString *)trashPath;
+- (void)selectionChanged:(NSArray *)newsel;
 
 - (void)performFileOperation:(NSDictionary *)opinfo;
 
@@ -166,6 +166,8 @@
 - (void)addWatcherForPath:(NSString *)path;
 
 - (void)removeWatcherForPath:(NSString *)path;
+
+- (NSString *)trashPath;
 
 - (id)workspaceApplication;
 

@@ -40,7 +40,7 @@ typedef enum FSNInfoType {
 typedef enum FSNSelectionMask {   
   NSSingleSelectionMask = 0,
   FSNMultipleSelectionMask = 1,
-  FSNSelectingSelectionMask = 2
+  FSNCreatingSelectionMask = 2
 } FSNSelectionMask;
 
 @class NSImage;
@@ -66,6 +66,8 @@ typedef enum FSNSelectionMask {
 - (void)setLocked:(BOOL)value;
 
 - (BOOL)isLocked;
+
+- (void)checkLocked;
 
 - (void)setGridIndex:(int)index;
 
@@ -176,7 +178,11 @@ typedef enum FSNSelectionMask {
 + (void)setSortOrder:(int)order 
         forDirectory:(NSString *)dirpath;
 
++ (void)lockNode:(FSNode *)node;
+
 + (void)lockNodes:(NSArray *)nodes;
+
++ (void)unlockNode:(FSNode *)node;
 
 + (void)unlockNodes:(NSArray *)nodes;
 
