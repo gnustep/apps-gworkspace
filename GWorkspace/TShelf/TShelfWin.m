@@ -231,7 +231,13 @@
     return;
   }
 
-  [tView removeTabItem: item];
+  if ([tView removeTabItem: item] == NO) {
+		msg = NSLocalizedString(@"You can't remove this tab!", @"");
+		buttstr = NSLocalizedString(@"Continue", @"");		
+    NSRunAlertPanel(nil, msg, buttstr, nil, nil);  
+    return;
+  }
+  
   [tView selectTabItem: [tView lastTabItem]];  
   
   [self saveDefaults];
@@ -288,9 +294,9 @@
 
   duplicate = NO;
   for (i = 0; i < [items count]; i++) {
-    item = [items objectAtIndex: i];
+    TShelfViewItem *itm = [items objectAtIndex: i];
 
-    if ([[item label] isEqual: tabName]) {
+    if ([[itm label] isEqual: tabName]) {
       duplicate = YES;
       break;
     }
@@ -302,11 +308,8 @@
     NSRunAlertPanel(nil, msg, buttstr, nil, nil);  
     return;
   }
-  
+    
   [item setLabel: tabName];
-  [item setTShelfView: nil];
-  [tView removeTabItem: item];
-  [tView insertTabItem: item atIndex: index];
   [tView selectTabItemAtIndex: index];  
   
   [self saveDefaults];

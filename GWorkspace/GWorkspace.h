@@ -142,6 +142,8 @@
 
 - (NSImage *)tshelfBackground;	
 
+- (void)makeTshelfBackground;
+
 - (NSColor *)tshelfBackColor;	
 
 - (id)rootViewer;

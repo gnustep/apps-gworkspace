@@ -1157,11 +1157,7 @@ return [ws openFile: fullPath withApplication: appName]
   	} else if ([desktopWindow isVisible] == NO) {
 			[desktopWindow activate];
 		}
-    
-    
- //   ASSIGN (tshelfBackground, [[desktopWindow desktopView] shelfBackground]);
-
-
+    [self makeTshelfBackground];
 	} else {
 		if ((desktopWindow != nil) && ([desktopWindow isVisible])) {
       [[desktopWindow desktopView] saveDefaults]; 
@@ -1173,6 +1169,13 @@ return [ws openFile: fullPath withApplication: appName]
 - (NSImage *)tshelfBackground
 {
   return tshelfBackground;
+}
+
+- (void)makeTshelfBackground
+{
+  if ((desktopWindow != nil) && ([desktopWindow isVisible])) {
+    ASSIGN (tshelfBackground, [[desktopWindow desktopView] shelfBackground]);
+  }
 }
 
 - (NSColor *)tshelfBackColor

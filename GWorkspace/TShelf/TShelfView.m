@@ -92,18 +92,6 @@
 
 - (void)setLastTabItem:(TShelfViewItem *)item
 {
-  int i;
-  
-  lastItem = nil;
-  
-  for (i = 0; i < [items count]; i++) {
-    TShelfViewItem *itm = [items objectAtIndex: i];
-    if (itm == item) {
-      lastItem = itm;
-      return;
-    }
-  }
-
   lastItem = item;
   [item setTShelfView: self];
   [items insertObject: item atIndex: [items count]];
@@ -118,6 +106,7 @@
   }
   
   if ([item isEqual: selected]) {
+    [[selected view] removeFromSuperview];
     selected = nil;
   }
 
@@ -146,9 +135,6 @@
 
   if (selected != nil) {
     [selected setTabState: NSBackgroundTab];
-
-	  /* NB: If [selected view] is nil this does nothing, which
-             is fine.  */
 	  [[selected view] removeFromSuperview];
 	}
 
@@ -166,7 +152,6 @@
 	  [[self window] makeFirstResponder: [selected initialFirstResponder]];
   }
       
-  /* FIXME - only mark the contentRect as needing redisplay! */
   [self setNeedsDisplay: YES];  
 }
 
@@ -210,19 +195,13 @@
   NSRect buttRect = NSMakeRect(p.x - 2 + buttw, p.y, s.width + 4 - buttw, s.height - 24);
   float lastxspace = 34;
   float itemxspace = (aRect.size.width - lastxspace - buttw) / (howMany - 1);
-//  NSImage *backImage = [[GWorkspace gworkspace] tshelfBackground];
-  NSColor *backColor = [[GWorkspace gworkspace] tshelfBackColor];
+  NSImage *backImage = [[GWorkspace gworkspace] tshelfBackground];
   
   DPSgsave(ctxt);
   
-//  if (backImage) {  
-//    [backImage compositeToPoint: NSMakePoint (0.0, 0.0) 
-//                      operation: NSCompositeSourceOver];
-//  }
-  
-  if (backColor) {
-    [backColor set];
-    NSRectFill(aRect);
+  if (backImage) {  
+    [backImage compositeToPoint: NSMakePoint (0.0, 0.0) 
+                      operation: NSCompositeSourceOver];
   }
   
 	aRect.size.height -= 24;
@@ -414,6 +393,8 @@
 	  [[self window]  setFrame: winrect display: YES];
 	  hiddentabs = YES;
   }
+  
+  [[GWorkspace gworkspace] makeTshelfBackground];
 }
 
 - (BOOL)hiddenTabs
