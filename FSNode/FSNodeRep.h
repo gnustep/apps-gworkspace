@@ -221,6 +221,8 @@ typedef enum FSNSelectionMask {
 
 @interface FSNodeRep : NSObject 
 {
+  NSArray *extInfoModules;
+  
   FSNInfoType defSortOrder;
   BOOL hideSysFiles;
 

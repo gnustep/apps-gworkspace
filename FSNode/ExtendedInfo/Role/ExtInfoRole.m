@@ -35,12 +35,12 @@
 
 - (NSString *)menuName
 {
-  return nil;
+  return NSLocalizedString(@"Role", @"");
 }
 
 - (NSDictionary *)extendedInfoForNode:(FSNode *)anode
 {
-  return nil;
+  return [NSDictionary dictionary];
 }
 
 @end

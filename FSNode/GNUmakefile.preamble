@@ -1,0 +1,20 @@
+
+# Additional flags to pass to the preprocessor
+ADDITIONAL_CPPFLAGS += 
+
+# Additional flags to pass to the Objective-C compiler
+ADDITIONAL_OBJCFLAGS += -Wall 
+
+# Additional flags to pass to the C compiler
+ADDITIONAL_CFLAGS += -Wall 
+
+# Additional include directories the compiler should search
+ADDITIONAL_INCLUDE_DIRS += -IExtendedInfo
+
+#
+# Flags dealing with installing and uninstalling
+#
+
+# Additional directories to be created during installation
+ADDITIONAL_INSTALL_DIRS +=
+
