@@ -26,6 +26,7 @@
 #include <AppKit/AppKit.h>
 #include "InspectorPref.h"
 #include "Inspector.h"
+#include "Attributes.h"
 #include "ContentViewersProtocol.h"
 #include "Functions.h"
 #include "GNUstep.h"
@@ -33,6 +34,9 @@
 #define CHECKSIZE(sz) \
 if (sz.width < 0) sz.width = 0; \
 if (sz.height < 0) sz.height = 0
+
+#define GENERAL  0 
+#define CONTENTS 1
 
 static NSString *nibName = @"PreferencesWin";
 
@@ -57,6 +61,8 @@ static NSString *nibName = @"PreferencesWin";
       DESTROY (self);
       return self;
     } else {
+      NSUserDefaults *defaults;
+      BOOL autocalculate;
       NSSize cs, ms;
     
       [win setFrameUsingName: @"inspectorprefs"];
@@ -66,8 +72,14 @@ static NSString *nibName = @"PreferencesWin";
       RETAIN (nameLabel);
       RETAIN (nameField);
       RETAIN (cancelButt);
-      
+            
       inspector = insp;
+
+      defaults = [NSUserDefaults standardUserDefaults];
+      autocalculate = [defaults boolForKey: @"auto_calculate_sizes"];
+      [sizesCheck setState: (autocalculate ? NSOnState: NSOffState)];
+      
+      [tabView setFrame: [[win contentView] frame]];
       
       [scroll setBorderType: NSBezelBorder];
       [scroll setHasHorizontalScroller: NO];
@@ -93,6 +105,9 @@ static NSString *nibName = @"PreferencesWin";
       RELEASE (matrix);
                
       /* Internationalization */
+      [[tabView tabViewItemAtIndex: GENERAL] setLabel: NSLocalizedString(@"General", @"")];  
+      [sizesCheck setTitle: NSLocalizedString(@"Calculate sizes", @"")]; 
+      [[tabView tabViewItemAtIndex: CONTENTS] setLabel: NSLocalizedString(@"Contents", @"")];  
       [descrLabel setStringValue: NSLocalizedString(@"Description", @"")];      
       [[descrView textStorage] setAttributedString: nil];      
       [locLabel setStringValue: NSLocalizedString(@"Bundle location", @"")];      
@@ -125,6 +140,9 @@ static NSString *nibName = @"PreferencesWin";
   savemode = mode;
 
   if (savemode) {
+    [tabView selectTabViewItemAtIndex: CONTENTS]; 
+    [tabView setTabViewType: NSNoTabsNoBorder];
+  
     if ([nameLabel superview] == nil) {
       [[win contentView] addSubview: nameLabel];
     }
@@ -138,6 +156,9 @@ static NSString *nibName = @"PreferencesWin";
     [changeButt setTitle: NSLocalizedString(@"Save", @"")]; 
      
   } else {
+    [tabView selectTabViewItemAtIndex: GENERAL]; 
+    [tabView setTabViewType: NSTopTabsBezelBorder];
+  
     if ([nameLabel superview]) {
       [nameLabel removeFromSuperview];
     }
@@ -270,6 +291,12 @@ static NSString *nibName = @"PreferencesWin";
       }
     }
   }
+}
+
+- (IBAction)csizesAction:(id)sender
+{
+  BOOL autocalc = ([sender state] == NSOnState) ? YES : NO;
+  [(Attributes *)[inspector attributes] setCalculateSizes: autocalc];
 }
 
 - (void)updateDefaults

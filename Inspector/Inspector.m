@@ -102,13 +102,13 @@ static NSString *nibName = @"InspectorWin";
 
   [win setFrameUsingName: @"inspector"];
   [win setDelegate: self];
-  
+
   preferences = [[InspectorPref alloc] initForInspector: self];
   startAppWin = [[StartAppWin alloc] init];
   fswatcher = nil;
   fswnotifications = YES;
   [self connectFSWatcher];
-  
+    
   while ([[popUp itemArray] count] > 0) {
     [popUp removeItemAtIndex: 0];
   }
@@ -126,7 +126,6 @@ static NSString *nibName = @"InspectorWin";
                      atIndex: CONTENTS];
   [[popUp itemAtIndex: CONTENTS] setKeyEquivalent: @"2"];
   DESTROY (currentInspector);
-  contents = [inspectors objectAtIndex: CONTENTS];
 
   currentInspector = [[Tools alloc] initForInspector: self];
   [inspectors insertObject: currentInspector atIndex: TOOLS]; 
@@ -134,7 +133,7 @@ static NSString *nibName = @"InspectorWin";
                      atIndex: TOOLS];
   [[popUp itemAtIndex: TOOLS] setKeyEquivalent: @"3"];
   DESTROY (currentInspector);
-    
+        
   [win makeKeyAndOrderFront: nil];
   [popUp selectItemAtIndex: 0];
   [self activateInspector: popUp];
@@ -144,7 +143,7 @@ static NSString *nibName = @"InspectorWin";
 {
 #define TEST_CLOSE(o, w) if ((o) && ([w isVisible])) [w close]
   
-  if ([contents prepareToTerminate] == NO) {
+  if ([[self contents] prepareToTerminate] == NO) {
     return NO;
   }
   
@@ -206,6 +205,11 @@ static NSString *nibName = @"InspectorWin";
   [self activateInspector: popUp];
 }
 
+- (id)attributes
+{
+  return [inspectors objectAtIndex: ATTRIBUTES];
+}
+
 - (void)showContents
 {
   if ([win isVisible] == NO) {
@@ -215,6 +219,11 @@ static NSString *nibName = @"InspectorWin";
   [self activateInspector: popUp];
 }
 
+- (id)contents
+{
+  return [inspectors objectAtIndex: CONTENTS];
+}
+
 - (void)showTools
 {
   if ([win isVisible] == NO) {
@@ -222,6 +231,11 @@ static NSString *nibName = @"InspectorWin";
   }
   [popUp selectItemAtIndex: TOOLS];
   [self activateInspector: popUp];
+}
+
+- (id)tools
+{
+  return [inspectors objectAtIndex: TOOLS];
 }
 
 - (NSWindow *)inspWin
@@ -236,6 +250,7 @@ static NSString *nibName = @"InspectorWin";
 
 - (void)updateDefaults
 {
+  [[self attributes] updateDefaults];
   [preferences updateDefaults];
   [win saveFrameUsingName: @"inspector"];
 }
@@ -252,39 +267,39 @@ static NSString *nibName = @"InspectorWin";
 //
 - (BOOL)canDisplayDataOfType:(NSString *)type
 {
-  return [contents canDisplayDataOfType: type];
+  return [[self contents] canDisplayDataOfType: type];
 }
 
 - (void)showData:(NSData *)data 
           ofType:(NSString *)type
 {
-  [contents showData: data ofType: type];
+  [[self contents] showData: data ofType: type];
 }
 
 - (id)contentViewerWithWindowName:(NSString *)wname
 {
-  return [contents viewerWithWindowName: wname];
+  return [[self contents] viewerWithWindowName: wname];
 }
 
 - (void)disableContentViewer:(id)vwr
 {
-  [contents disableViewer: vwr];
+  [[self contents] disableViewer: vwr];
 }
 
 - (void)addExternalViewerWithBundleData:(NSData *)bundleData
 {
-  [contents addExternalViewerWithBundleData: bundleData];
+  [[self contents] addExternalViewerWithBundleData: bundleData];
 }
 
 - (void)addExternalViewerWithBundlePath:(NSString *)path
 {
-  [contents addExternalViewerWithBundlePath: path];
+  [[self contents] addExternalViewerWithBundlePath: path];
 }
 
 - (BOOL)saveExternalContentViewer:(id)vwr 
                          withName:(NSString *)vwrname
 {
-  return [contents saveExternalViewer: vwr withName: vwrname];
+  return [[self contents] saveExternalViewer: vwr withName: vwrname];
 }
 
 

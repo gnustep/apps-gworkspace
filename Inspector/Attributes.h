@@ -63,6 +63,7 @@
   
   IBOutlet id sizeLabel;
   IBOutlet id sizeField;
+  IBOutlet id calculateButt;
   IBOutlet id ownerLabel;
   IBOutlet id ownerField;
   IBOutlet id groupLabel;
@@ -106,6 +107,7 @@
   
   NSConnection *sizerConn;
   id sizer;
+  BOOL autocalculate;
   id inspector;
   
 	NSFileManager *fm;
@@ -130,6 +132,10 @@
 
 - (void)watchedPathDidChange:(NSData *)dirinfo;
 
+- (void)setCalculateSizes:(BOOL)value;
+
+- (IBAction)calculateSizes:(id)sender;
+
 - (void)startSizer;
 
 - (void)sizerConnDidDie:(NSNotification *)notification;
@@ -137,6 +143,8 @@
 - (void)setSizer:(id)anObject;
 
 - (void)sizeReady:(NSString *)sizeStr;
+
+- (void)updateDefaults;
 
 @end
 

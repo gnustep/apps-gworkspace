@@ -62,7 +62,6 @@
 
   NSMutableArray *inspectors;
 	id currentInspector;
-  Contents *contents;
 
 	NSArray *currentPaths;
 
@@ -86,9 +85,15 @@
 
 - (void)showAttributes;
 
+- (id)attributes;
+
 - (void)showContents;
 
+- (id)contents;
+
 - (void)showTools;
+
+- (id)tools;
 
 - (NSWindow *)inspWin;
 

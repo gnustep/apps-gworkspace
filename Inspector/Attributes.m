@@ -88,6 +88,7 @@ static BOOL sizeStop = NO;
   DESTROY (sizerConn);
   DESTROY (sizer);
 	TEST_RELEASE (mainBox);
+  TEST_RELEASE (calculateButt);
 	TEST_RELEASE (insppaths);
 	TEST_RELEASE (attributes);
 	TEST_RELEASE (currentPath);
@@ -103,6 +104,8 @@ static BOOL sizeStop = NO;
   self = [super init];
   
   if (self) {
+    NSUserDefaults *defaults;
+    
     if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
       NSLog(@"failed to load %@!", nibName);
       [NSApp terminate: self];
@@ -119,6 +122,14 @@ static BOOL sizeStop = NO;
     
     fm = [NSFileManager defaultManager];	
     nc = [NSNotificationCenter defaultCenter];
+    
+    defaults = [NSUserDefaults standardUserDefaults];
+    autocalculate = [defaults boolForKey: @"auto_calculate_sizes"];
+    RETAIN (calculateButt);
+    
+    if (autocalculate) {
+      [calculateButt removeFromSuperview];
+    }
     
     timeDateView = [[TimeDateView alloc] init];
     [timeDateView setFrame: NSMakeRect(6, 13, 55, 57)];
@@ -159,6 +170,7 @@ static BOOL sizeStop = NO;
     /* Internationalization */
     [linkToLabel setStringValue: NSLocalizedString(@"Link to:", @"")];
     [sizeLabel setStringValue: NSLocalizedString(@"Size:", @"")];
+    [calculateButt setTitle: NSLocalizedString(@"Calculate", @"")];
     [ownerLabel setStringValue: NSLocalizedString(@"Owner:", @"")];
     [groupLabel setStringValue: NSLocalizedString(@"Group:", @"")];
     [changedDateBox setTitle: NSLocalizedString(@"Changed", @"")];
@@ -243,14 +255,21 @@ static BOOL sizeStop = NO;
 		if ([ftype isEqual: NSFileTypeDirectory] == NO) {	
       NSString *fsize = fileSizeDescription([[attributes objectForKey: NSFileSize] intValue]);
 		  [sizeField setStringValue: fsize]; 
+      [calculateButt setEnabled: NO];
       [insideButt	setEnabled: NO];
     } else {
-      if (sizer == nil) {
-        [self startSizer];
+      [sizeField setStringValue: @"--"]; 
+
+      if (autocalculate) {
+        if (sizer == nil) {
+          [self startSizer];
+        } else {
+          [sizer computeSizeOfPaths: insppaths];
+        }
       } else {
-        [sizeField setStringValue: NSLocalizedString(@"calculating...", @"")]; 
-        [sizer computeSizeOfPaths: insppaths];
+        [calculateButt setEnabled: YES];
       }
+
       [insideButt	setEnabled: YES];
 		}
 
@@ -285,14 +304,19 @@ static BOOL sizeStop = NO;
     [iconView setImage: [NSImage imageNamed: @"MultipleSelection.tiff"]];
   
 		ftype = [attributes objectForKey: NSFileType];
-    
-    if (sizer == nil) {
-      [self startSizer];
-    } else {
-      [sizeField setStringValue: NSLocalizedString(@"calculating...", @"")]; 
-      [sizer computeSizeOfPaths: insppaths];
-    }
 
+    [sizeField setStringValue: @"--"]; 
+
+    if (autocalculate) {
+      if (sizer == nil) {
+        [self startSizer];
+      } else {
+        [sizer computeSizeOfPaths: insppaths];
+      }
+    } else {
+      [calculateButt setEnabled: YES];
+    }
+    
 		usr = [attributes objectForKey: NSFileOwnerAccountName];
 		grp = [attributes objectForKey: NSFileGroupOwnerAccountName];
 		date = [attributes objectForKey: NSFileModificationDate];
@@ -579,6 +603,32 @@ static BOOL sizeStop = NO;
 {
 }
 
+- (void)setCalculateSizes:(BOOL)value
+{
+  autocalculate = value;
+  
+  if (autocalculate) {
+    if ([calculateButt superview]) {
+      [calculateButt removeFromSuperview];
+    }
+  } else {
+    if ([calculateButt superview] == nil) {
+      [mainBox addSubview: calculateButt];
+    }
+  }
+}
+
+- (IBAction)calculateSizes:(id)sender
+{
+  if (sizer == nil) {
+    [self startSizer];
+  } else {
+    [sizeField setStringValue: @"--"]; 
+    [sizer computeSizeOfPaths: insppaths];
+  }
+  [calculateButt setEnabled: NO];
+}
+
 - (void)startSizer
 {
   NSPort *port[2];  
@@ -634,7 +684,7 @@ static BOOL sizeStop = NO;
     RETAIN (sizer);
     if (insppaths) {
       sizeStop = YES;
-      [sizeField setStringValue: NSLocalizedString(@"calculating...", @"")];
+      [sizeField setStringValue: @"--"];
       [sizer computeSizeOfPaths: insppaths];
     }
   }
@@ -643,6 +693,13 @@ static BOOL sizeStop = NO;
 - (void)sizeReady:(NSString *)sizeStr
 {
 	[sizeField setStringValue: sizeStr]; 
+}
+
+- (void)updateDefaults
+{
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  [defaults setBool: autocalculate forKey: @"auto_calculate_sizes"];
+  [defaults synchronize];
 }
 
 @end

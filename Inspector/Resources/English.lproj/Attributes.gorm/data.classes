@@ -3,7 +3,8 @@
 	Actions = (
 	    "permsButtonsAction:",
 	    "changePermissions:",
-	    "revertToOldPermissions:"
+	    "revertToOldPermissions:",
+	    "calculateSizes:"
 	);
 	Outlets = (
 	    win,
@@ -38,7 +39,8 @@
 	    oexebutt,
 	    insideButt,
 	    revertButt,
-	    okButt
+	    okButt,
+	    calculateButt
 	);
 	Super = NSObject;
     };
@@ -188,7 +190,8 @@
 	    "computeSize:",
 	    "permsButtonsAction:",
 	    "changePermissions:",
-	    "revertToOldPermissions:"
+	    "revertToOldPermissions:",
+	    "calculateSizes:"
 	);
 	Super = NSObject;
     };

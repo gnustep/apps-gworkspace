@@ -32,6 +32,8 @@
 @interface InspectorPref: NSObject
 {
   IBOutlet id win;
+  IBOutlet id tabView;
+  IBOutlet id sizesCheck;
   IBOutlet id scroll;
   NSMatrix *matrix;
   IBOutlet id descrLabel;
@@ -63,6 +65,8 @@
 - (void)matrixAction:(id)sender;
 
 - (IBAction)buttonAction:(id)sender;
+
+- (IBAction)csizesAction:(id)sender;
 
 - (void)updateDefaults;
 
