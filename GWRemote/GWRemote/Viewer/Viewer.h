@@ -33,12 +33,12 @@
 @class NSFileManager;
 @class NSDictionary;
 @class NSNotification;
-@class Browser2;
+@class Browser;
 
 @interface Viewer : NSView 
 {
   NSString *serverName;
-  Browser2 *browser;
+  Browser *browser;
   int resizeIncrement;
   int columns;
   float columnsWidth;  

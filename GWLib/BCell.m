@@ -88,7 +88,6 @@
     iconSelected = NO;
   } else {
     DESTROY (path);
-//    [self setStringValue: [path lastPathComponent]];
     ASSIGN (icon, [gworkspace smallIconForFiles: paths]);  
   }
   

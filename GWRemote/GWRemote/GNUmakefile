@@ -3,7 +3,7 @@ PACKAGE_NEEDS_CONFIGURE = YES
 include $(GNUSTEP_MAKEFILES)/common.make
 
 PACKAGE_NAME = GWRemote
-VERSION = 0.1
+VERSION = 0.2
 
 GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
 
@@ -15,11 +15,6 @@ GWRemote_PRINCIPAL_CLASS = GWRemote
 GWRemote_APPLICATION_ICON=GWRemote.tiff
 
 GWRemote_HAS_RESOURCE_BUNDLE = yes
-
-#
-# Additional libraries
-#
-ADDITIONAL_GUI_LIBS += -lGWorkspace
 
 GWRemote_RESOURCE_FILES = \
     Resources/Icons/* \
@@ -46,6 +41,13 @@ GWRemote_OBJC_FILES = main.m \
                       Viewer/Viewer.m \
                       Viewer/Shelf.m \
                       Viewer/ShelfIcon.m \
+                      Viewer/Browser.m \
+                      Viewer/Cell.m \
+                      Viewer/Column.m \
+                      Viewer/IconLabel.m \
+                      Viewer/Icon.m \
+                      Viewer/Matrix.m \
+                      Viewer/NameEditor.m \
                       FileOpProgress.m \
                       LoginWindow.m \
                       RemoteEditor/RemoteEditor.m \
@@ -54,8 +56,6 @@ GWRemote_OBJC_FILES = main.m \
                       RemoteTerminal/RemoteTerminalView.m \
                       Preferences/PrefController.m \
                       Preferences/GWSDServerPref.m
-
-
 						 
 -include GNUmakefile.preamble
 

@@ -30,7 +30,7 @@
 #include "Viewer.h"
 #include "Functions.h"
 #include "Notifications.h"
-#include <GWorkspace/Browser2.h>
+#include "Browser.h"
 
 #define CHECKRECT(rct) \
 if (rct.size.width < 0) rct.size.width = 0; \
@@ -75,7 +75,6 @@ if (rct.size.height < 0) rct.size.height = 0
              server:(NSString *)sname
 {
 	int colswidth, winwidth;
-  unsigned int style = 0;
   
 	[self setDelegate: adelegate];
   ASSIGN (serverName, sname);
@@ -97,15 +96,9 @@ if (rct.size.height < 0) rct.size.height = 0
 		[browser removeFromSuperview];
 		RELEASE (browser);
 	}
-  
-  style = GWColumnIconMask;
-  if (viewsapps) {
-    style |= GWViewsPaksgesMask;
-  }
-  
-	browser = [[Browser2 alloc] initWithBasePath: rootPath
+    
+	browser = [[Browser alloc] initWithBasePath: rootPath
 		  												 visibleColumns: columns 
-                                    styleMask: style
 																  	 delegate: self
                                    remoteHost: serverName];
 
