@@ -56,6 +56,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
   TEST_RELEASE (searchCriteria);
   TEST_RELEASE (foundObjects);
   TEST_RELEASE (searchPaths);
+  RELEASE (elementsStr);
   DESTROY (engineConn);
   DESTROY (engine);
   RELEASE (dndConnName);
@@ -95,6 +96,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
     RELEASE (documentIcon);
     
     [elementsLabel setStringValue: @""];
+    ASSIGN (elementsStr, NSLocalizedString(@"elements", @""));
     
     [stopButt setImage: [NSImage imageNamed: @"stop_small"]];
     [stopButt setEnabled: NO];
@@ -276,6 +278,8 @@ static NSString *lsfname = @"LiveSearch.lsf";
              name: NSConnectionDidDieNotification
            object: engineConn];    
 
+  visibleRows = (int)([resultsScroll frame].size.height / CELLS_HEIGHT + 1);
+
   NS_DURING
     {
       [NSThread detachNewThreadSelector: @selector(engineThreadWithPorts:)
@@ -358,14 +362,18 @@ static NSString *lsfname = @"LiveSearch.lsf";
                             
 - (void)nextResult:(NSString *)path
 {
+  CREATE_AUTORELEASE_POOL(pool);
   FSNode *node = [FSNode nodeWithPath: path];
-  NSString *elmstr = NSLocalizedString(@"elements", @"");
   
   [foundObjects addObject: node];
-  [resultsView noteNumberOfRowsChanged];
   
-  elmstr = [NSString stringWithFormat: @"%i %@", [foundObjects count], elmstr];
-  [elementsLabel setStringValue: elmstr];
+  if ([foundObjects count] <= visibleRows) {
+    [resultsView noteNumberOfRowsChanged];
+  }
+  
+  [elementsLabel setStringValue: [NSString stringWithFormat: @"%i %@", 
+                                          [foundObjects count], elementsStr]];
+  RELEASE (pool);
 }
 
 - (void)endOfSearch

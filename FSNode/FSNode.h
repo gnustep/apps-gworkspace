@@ -204,19 +204,19 @@
 
 @interface FSNode (Comparing)
 
-- (int)compareAccordingToName:(FSNode *)aNode;
+- (NSComparisonResult)compareAccordingToName:(FSNode *)aNode;
 
-- (int)compareAccordingToParent:(FSNode *)aNode;
+- (NSComparisonResult)compareAccordingToParent:(FSNode *)aNode;
 
-- (int)compareAccordingToKind:(FSNode *)aNode;
+- (NSComparisonResult)compareAccordingToKind:(FSNode *)aNode;
 
-- (int)compareAccordingToDate:(FSNode *)aNode;
+- (NSComparisonResult)compareAccordingToDate:(FSNode *)aNode;
 
-- (int)compareAccordingToSize:(FSNode *)aNode;
+- (NSComparisonResult)compareAccordingToSize:(FSNode *)aNode;
 
-- (int)compareAccordingToOwner:(FSNode *)aNode;
+- (NSComparisonResult)compareAccordingToOwner:(FSNode *)aNode;
 
-- (int)compareAccordingToGroup:(FSNode *)aNode;
+- (NSComparisonResult)compareAccordingToGroup:(FSNode *)aNode;
 
 @end
 

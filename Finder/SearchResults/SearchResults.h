@@ -70,6 +70,7 @@
   IBOutlet id progBox; 
   ProgressView *progView;
   IBOutlet id elementsLabel;
+  NSString *elementsStr;
   IBOutlet id stopButt;
   IBOutlet id restartButt;
   IBOutlet id dragIconBox;
@@ -87,7 +88,8 @@
   
   IBOutlet id pathsScroll;
   ResultsPathsView *pathsView;
-
+  int visibleRows;
+  
   NSMutableArray *foundObjects;
   FSNInfoType currentOrder;
   

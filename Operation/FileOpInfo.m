@@ -29,6 +29,8 @@
 #include "Functions.h"
 #include "GNUstep.h"
 
+#define PROGR_STEPS (100.0)
+
 static NSString *nibName = @"FileOperationWin";
 
 @implementation FileOpInfo
@@ -344,19 +346,17 @@ static NSString *nibName = @"FileOperationWin";
 
 - (void)setNumFiles:(int)n
 {
-  filescount = n;
   [progView stop];  
   [(NSBox *)progBox setContentView: progInd];
   [progInd setMinValue: 0.0];
-  [progInd setMaxValue: filescount];
+  [progInd setMaxValue: n];
   [progInd setDoubleValue: 0.0];
-  
   [executor performOperation]; 
 }
 
-- (void)updateProgressIndicator
+- (void)setProgIndicatorValue:(int)n
 {
-  [progInd incrementBy: 1.0];
+  [progInd setDoubleValue: n];
 }
 
 - (void)endOperation
@@ -484,7 +484,6 @@ static NSString *nibName = @"FileOperationWin";
     [self showProgressWin];
   }
 
-  filescount = -1;
   [self sendWillChangeNotification];  
   [executor calculateNumFiles];
 }
@@ -719,7 +718,7 @@ static NSString *nibName = @"FileOperationWin";
 	BOOL isDir;
   NSDirectoryEnumerator *enumerator;
   NSString *dirEntry;
-  int i;
+  int i, fnum = 0;
 
   for (i = 0; i < [files count]; i++) {
     NSDictionary *dict = [files objectAtIndex: i];
@@ -734,10 +733,10 @@ static NSString *nibName = @"FileOperationWin";
         if (stopped) {
           break;
         }
-			  fcount++;
+			  fnum++;
       }
 	  } else {
-		  fcount++;
+		  fnum++;
 	  }
     
     if (stopped) {
@@ -749,7 +748,16 @@ static NSString *nibName = @"FileOperationWin";
     [self done];
   }
 
-  [fileOp setNumFiles: fcount];
+  fcount = 0;
+  stepcount = 0;
+  
+  if (fnum < PROGR_STEPS) {
+    progstep = 1.0;
+  } else {
+    progstep = fnum / PROGR_STEPS;
+  }
+  
+  [fileOp setNumFiles: fnum];
 }
 
 - (oneway void)performOperation
@@ -757,7 +765,6 @@ static NSString *nibName = @"FileOperationWin";
 	canupdate = YES; 
   stopped = NO;
   paused = NO;
-	fcount = [files count];
           
 	if ([operation isEqual: @"NSWorkspaceMoveOperation"]
 						|| [operation isEqual: @"GWorkspaceRecycleOutOperation"]) {
@@ -1100,7 +1107,13 @@ filename =  [fileinfo objectForKey: @"name"]
 - (void)fileManager:(NSFileManager *)manager willProcessPath:(NSString *)path
 {
   if (canupdate) {
-    [fileOp updateProgressIndicator];
+    fcount++;
+    stepcount++;
+    
+    if (stepcount >= progstep) {
+      stepcount = 0;
+      [fileOp setProgIndicatorValue: fcount];
+    }
   }
 }
 

@@ -700,7 +700,7 @@
   } else {
     NSString *newname = [nameEditor stringValue];
     NSString *newpath = [[ednode parentPath] stringByAppendingPathComponent: newname];
-    NSCharacterSet *notAllowSet = [NSCharacterSet characterSetWithCharactersInString: @"/\\*$|~\'\"`^!?"];
+    NSCharacterSet *notAllowSet = [NSCharacterSet characterSetWithCharactersInString: @"/\\*:?"];
     NSRange range = [newname rangeOfCharacterFromSet: notAllowSet];
     NSArray *dirContents = [fm directoryContentsAtPath: [ednode parentPath]];
     NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];

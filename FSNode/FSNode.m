@@ -883,7 +883,7 @@
 
 @implementation FSNode (Comparing)
 
-- (int)compareAccordingToName:(FSNode *)aNode
+- (NSComparisonResult)compareAccordingToName:(FSNode *)aNode
 {
   NSString *n1 = [self name];
   NSString *n2 = [aNode name];
@@ -899,15 +899,17 @@
   return [n1 caseInsensitiveCompare: n2];
 }
 
-- (int)compareAccordingToParent:(FSNode *)aNode
+- (NSComparisonResult)compareAccordingToParent:(FSNode *)aNode
 {
-  NSString *n1 = [[self parentPath] lastPathComponent];
-  NSString *n2 = [[aNode parentPath] lastPathComponent];
-
-  return [n1 caseInsensitiveCompare: n2];
+  CREATE_AUTORELEASE_POOL(pool);
+  NSString *p1 = [self parentPath];
+  NSString *p2 = [aNode parentPath];
+  NSComparisonResult result = [p1 compare: p2];
+  RELEASE (pool);
+  return result;
 }
 
-- (int)compareAccordingToKind:(FSNode *)aNode
+- (NSComparisonResult)compareAccordingToKind:(FSNode *)aNode
 {
   unsigned i1, i2;
 
@@ -927,29 +929,31 @@
     i2 = 0; 
   } 
 
-  if (i1 == i2) {			
-    return [[self name] compare: [aNode name]]; 
+  if (i1 == i2) {	
+    return [self compareAccordingToName: aNode];
   }   
 
-  return (i1 > i2 ? NSOrderedAscending : NSOrderedDescending);
+  return ((i1 > i2) ? NSOrderedAscending : NSOrderedDescending);
 }
 
-- (int)compareAccordingToDate:(FSNode *)aNode
+- (NSComparisonResult)compareAccordingToDate:(FSNode *)aNode
 {
   return [[self modificationDate] compare: [aNode modificationDate]]; 
 }
 
-- (int)compareAccordingToSize:(FSNode *)aNode
+- (NSComparisonResult)compareAccordingToSize:(FSNode *)aNode
 {
-  return ([self fileSize] <= [aNode fileSize]) ? NSOrderedAscending : NSOrderedDescending;
+  unsigned long long fs1 = [self fileSize];  
+  unsigned long long fs2 = [aNode fileSize];  
+  return (fs1 > fs2) ? NSOrderedAscending : NSOrderedDescending;
 }
 
-- (int)compareAccordingToOwner:(FSNode *)aNode
+- (NSComparisonResult)compareAccordingToOwner:(FSNode *)aNode
 {
   return [[self owner] compare: [aNode owner]]; 
 }
 
-- (int)compareAccordingToGroup:(FSNode *)aNode
+- (NSComparisonResult)compareAccordingToGroup:(FSNode *)aNode
 {
   return [[self group] compare: [aNode group]]; 
 }

@@ -36,6 +36,7 @@
 #include "Dialogs/StartAppWin.h"
 #include "Preferences/PrefController.h"
 #include "Fiend/Fiend.h"
+#include "GWDesktopManager.h"
 #include "GWViewersManager.h"
 #include "GWViewer.h"
 #include "GWSpatialViewer.h"
@@ -401,7 +402,6 @@ static GWorkspace *gworkspace = nil;
   DESTROY (inspectorApp);
   DESTROY (finderApp);
   DESTROY (operationsApp);
-  DESTROY (desktopApp);
   DESTROY (recyclerApp);
   DESTROY (ddbd);
 	RELEASE (defEditor);
@@ -416,6 +416,8 @@ static GWorkspace *gworkspace = nil;
   TEST_RELEASE (tshelfWin);
   TEST_RELEASE (tshelfPBDir);
   TEST_RELEASE (tshelfBackground);
+  RELEASE (vwrsManager);
+  RELEASE (dtopManager);
   
 	[super dealloc];
 }
@@ -537,8 +539,22 @@ static GWorkspace *gworkspace = nil;
   operationsApp = nil;
   
 	history = [[History alloc] init];
-  prefController = [[PrefController alloc] init];  
+  prefController = [PrefController new];  
   fiend = nil;
+  
+  openWithController = [[OpenWithController alloc] init];
+  runExtController = [[RunExternalController alloc] init];
+  	  
+  dtopManager = [GWDesktopManager desktopManager];
+
+  if ([defaults boolForKey: @"uses_desktop"]) { 
+    id item;
+   
+    [dtopManager activateDesktop];
+    menu = [[[NSApp mainMenu] itemWithTitle: NSLocalizedString(@"Tools", @"")] submenu];
+    item = [menu itemWithTitle: NSLocalizedString(@"Show Desktop", @"")];
+    [item setTitle: NSLocalizedString(@"Hide Desktop", @"")];
+  }
 
   tshelfBackground = nil; 
   
@@ -554,10 +570,7 @@ static GWorkspace *gworkspace = nil;
   } else {
     [self hideTShelf: nil];
   }
-  
-  openWithController = [[OpenWithController alloc] init];
-  runExtController = [[RunExternalController alloc] init];
-  	
+    
   vwrsManager = [GWViewersManager viewersManager];
   [vwrsManager showViewers];
         
@@ -568,11 +581,6 @@ static GWorkspace *gworkspace = nil;
   
   finderApp = nil;
   
-  desktopApp = nil;
-  if ([defaults boolForKey: @"uses_desktop"]) {  
-    [self connectDesktop];
-  }  
-
   recyclerApp = nil;
   if ([defaults boolForKey: @"uses_recycler"]) {  
     [self connectRecycler];
@@ -673,17 +681,6 @@ static GWorkspace *gworkspace = nil;
     }
   }
 
-  if (desktopApp) {
-    NSConnection *dskconn = [(NSDistantObject *)desktopApp connectionForProxy];
-  
-    if (dskconn && [dskconn isValid]) {
-      [[NSNotificationCenter defaultCenter] removeObserver: self
-	                        name: NSConnectionDidDieNotification
-	                      object: dskconn];
-      DESTROY (desktopApp);
-    }
-  }
-
   if (recyclerApp) {
     NSConnection *rcconn = [(NSDistantObject *)recyclerApp connectionForProxy];
   
@@ -766,14 +763,15 @@ static GWorkspace *gworkspace = nil;
 
 - (void)makeTshelfBackground
 {
-//  if (desktopApp) {
-//    NSData *data = [desktopApp tabbedShelfBackground];
+  if ([dtopManager isActive]) {
+    NSImage *image = [dtopManager tabbedShelfBackground];
   
-//    if (data) {
-//      DESTROY (tshelfBackground);
-//      tshelfBackground = [[NSImage alloc] initWithData: data];
-//    }  
-//  }
+    if (image) {
+      ASSIGN (tshelfBackground, image);
+    }  
+  } else {
+    DESTROY (tshelfBackground);
+  }
 }
 
 - (NSString *)tshelfPBDir
@@ -876,6 +874,9 @@ static GWorkspace *gworkspace = nil;
   [defaults setObject: entry forKey: @"default_sortorder"];
   
   [vwrsManager updateDefaults];
+
+  [dtopManager updateDefaults];
+  [defaults setBool: [dtopManager isActive] forKey: @"uses_desktop"];
       
 	[defaults setObject: defEditor forKey: @"defaulteditor"];
 	[defaults setObject: defXterm forKey: @"defxterm"];
@@ -898,8 +899,6 @@ static GWorkspace *gworkspace = nil;
   [defaults setObject: entry forKey: @"history_cache"];
 
   [defaults setBool: (inspectorApp != nil) forKey: @"uses_inspector"];
-
-  [defaults setBool: (desktopApp != nil) forKey: @"uses_desktop"];
 
   [defaults setBool: (recyclerApp != nil) forKey: @"uses_recycler"];
 
@@ -1002,12 +1001,12 @@ static GWorkspace *gworkspace = nil;
 	NSString *title = [anItem title];
 	
 	if ([title isEqual: NSLocalizedString(@"Empty Recycler", @"")]) {
-    if ((desktopApp != nil) || (recyclerApp != nil)) {
+    if ([dtopManager isActive] || (recyclerApp != nil)) {
       return ([[fm directoryContentsAtPath: [self trashPath]] count] != 0);
     }
     
 	} else if ([title isEqual: NSLocalizedString(@"Check for disks", @"")]) {
-    return (desktopApp != nil);
+    return [dtopManager isActive];
   
   } else if ([title isEqual: NSLocalizedString(@"Open With...", @"")]) {
     BOOL found = NO;
@@ -1498,6 +1497,7 @@ static GWorkspace *gworkspace = nil;
   [fsnodeRep setUseThumbnails: value];
   
   [vwrsManager thumbnailsDidChangeInPaths: nil];
+  [dtopManager thumbnailsDidChangeInPaths: nil];
   
   if ((tshelfWin != nil) && ([tshelfWin isVisible])) {
     [tshelfWin updateIcons]; 
@@ -1532,6 +1532,7 @@ static GWorkspace *gworkspace = nil;
       }
 
       [vwrsManager thumbnailsDidChangeInPaths: tmbdirs];
+      [dtopManager thumbnailsDidChangeInPaths: tmbdirs];
 
       if ((tshelfWin != nil) && ([tshelfWin isVisible])) {
         [tshelfWin updateIcons]; 
@@ -1559,6 +1560,7 @@ static GWorkspace *gworkspace = nil;
       }
 
       [vwrsManager thumbnailsDidChangeInPaths: tmbdirs];
+      [dtopManager thumbnailsDidChangeInPaths: tmbdirs];
       
       if ((tshelfWin != nil) && ([tshelfWin isVisible])) {
         [tshelfWin updateIcons]; 
@@ -1900,88 +1902,6 @@ static GWorkspace *gworkspace = nil;
       NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
       [finderApp setSelectionData: data];
     }
-  }
-}
-
-- (void)connectDesktop
-{
-  if (desktopApp == nil) {
-    id dsk = [NSConnection rootProxyForConnectionWithRegisteredName: @"Desktop" 
-                                                               host: @""];
-
-    if (dsk) {
-      NSConnection *c = [dsk connectionForProxy];
-
-	    [[NSNotificationCenter defaultCenter] addObserver: self
-	                   selector: @selector(desktopConnectionDidDie:)
-		                     name: NSConnectionDidDieNotification
-		                   object: c];
-      
-      desktopApp = dsk;
-	    [desktopApp setProtocolForProxy: @protocol(DesktopAppProtocol)];
-      RETAIN (desktopApp);
-      
-	  } else {
-	    static BOOL recursion = NO;
-	  
-      if (recursion == NO) {
-        int i;
-        
-        [startAppWin showWindowWithTitle: @"GWorkspace"
-                                 appName: @"Desktop"
-                            maxProgValue: 80.0];
-
-        [ws launchApplication: @"Desktop"];
-
-        for (i = 1; i <= 80; i++) {
-          [startAppWin updateProgressBy: 1.0];
-	        [[NSRunLoop currentRunLoop] runUntilDate:
-		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
-          dsk = [NSConnection rootProxyForConnectionWithRegisteredName: @"Desktop" 
-                                                                  host: @""];                  
-          if (dsk) {
-            [startAppWin updateProgressBy: 80.0 - i];
-            break;
-          }
-        }
-        
-        [[startAppWin win] close];
-        
-	      recursion = YES;
-	      [self connectDesktop];
-	      recursion = NO;
-        
-	    } else { 
-	      recursion = NO;
-        NSRunAlertPanel(nil,
-                NSLocalizedString(@"unable to contact Desktop!", @""),
-                NSLocalizedString(@"Ok", @""),
-                nil, 
-                nil);  
-      }
-	  }
-  }
-}
-
-- (void)desktopConnectionDidDie:(NSNotification *)notif
-{
-  id connection = [notif object];
-
-  [[NSNotificationCenter defaultCenter] removeObserver: self
-	                    name: NSConnectionDidDieNotification
-	                  object: connection];
-
-  NSAssert(connection == [desktopApp connectionForProxy],
-		                                  NSInternalInconsistencyException);
-  RELEASE (desktopApp);
-  desktopApp = nil;
-
-  if (NSRunAlertPanel(nil,
-                    NSLocalizedString(@"The Desktop connection died.\nDo you want to restart it?", @""),
-                    NSLocalizedString(@"Yes", @""),
-                    NSLocalizedString(@"No", @""),
-                    nil)) {
-    [self connectDesktop]; 
   }
 }
 
@@ -2456,9 +2376,18 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 
 - (void)showDesktop:(id)sender
 {
-	if (desktopApp == nil) {
-    [self connectDesktop];
-  }   
+  NSMenu *menu = [[[NSApp mainMenu] itemWithTitle: NSLocalizedString(@"Tools", @"")] submenu];
+  id item;
+
+  if ([dtopManager isActive] == NO) {
+    [dtopManager activateDesktop];
+    item = [menu itemWithTitle: NSLocalizedString(@"Show Desktop", @"")];
+    [item setTitle: NSLocalizedString(@"Hide Desktop", @"")];
+  } else {
+    [dtopManager deactivateDesktop];
+    item = [menu itemWithTitle: NSLocalizedString(@"Hide Desktop", @"")];
+    [item setTitle: NSLocalizedString(@"Show Desktop", @"")];
+  }
 }
 
 - (void)showRecycler:(id)sender
@@ -2644,10 +2573,20 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
         [iview doCut];    
       }
       
-    } else if ([vwrsManager hasViewerWithWindow: kwin]) {
-      id nodeView = [[vwrsManager viewerWithWindow: kwin] nodeView];
-      NSArray *selection = [nodeView selectedPaths];  
-      NSArray *basesel = [NSArray arrayWithObject: [[nodeView baseNode] path]];
+    } else if ([vwrsManager hasViewerWithWindow: kwin]
+                                  || [dtopManager hasWindow: kwin]) {
+      id nodeView;
+      NSArray *selection;
+      NSArray *basesel;
+      
+      if ([vwrsManager hasViewerWithWindow: kwin]) {
+        nodeView = [[vwrsManager viewerWithWindow: kwin] nodeView];
+      } else {
+        nodeView = [dtopManager desktopView];
+      }
+    
+      selection = [nodeView selectedPaths];  
+      basesel = [NSArray arrayWithObject: [[nodeView baseNode] path]];
       
       if ([selection count] && ([selection isEqual: basesel] == NO)) {
         NSPasteboard *pb = [NSPasteboard generalPasteboard];
@@ -2667,7 +2606,7 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
           }
         }
       }
-    }
+    } 
   }
 }
 
@@ -2684,10 +2623,20 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
         [iview doCopy];    
       }
       
-    } else if ([vwrsManager hasViewerWithWindow: kwin]) {
-      id nodeView = [[vwrsManager viewerWithWindow: kwin] nodeView];
-      NSArray *selection = [nodeView selectedPaths];  
-      NSArray *basesel = [NSArray arrayWithObject: [[nodeView baseNode] path]];
+    } else if ([vwrsManager hasViewerWithWindow: kwin]
+                                  || [dtopManager hasWindow: kwin]) {
+      id nodeView;
+      NSArray *selection;
+      NSArray *basesel;
+      
+      if ([vwrsManager hasViewerWithWindow: kwin]) {
+        nodeView = [[vwrsManager viewerWithWindow: kwin] nodeView];
+      } else {
+        nodeView = [dtopManager desktopView];
+      }
+    
+      selection = [nodeView selectedPaths];  
+      basesel = [NSArray arrayWithObject: [[nodeView baseNode] path]];
       
       if ([selection count] && ([selection isEqual: basesel] == NO)) {
         NSPasteboard *pb = [NSPasteboard generalPasteboard];
@@ -2724,7 +2673,8 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
         [iview doPaste];    
       }
       
-    } else if ([vwrsManager hasViewerWithWindow: kwin]) {
+    } else if ([vwrsManager hasViewerWithWindow: kwin]
+                                  || [dtopManager hasWindow: kwin]) {
       NSPasteboard *pb = [NSPasteboard generalPasteboard];
 
       if ([[pb types] containsObject: NSFilenamesPboardType]) {
@@ -2734,8 +2684,14 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
           [self connectOperation];
 
           if (operationsApp) {
-            id nodeView = [[vwrsManager viewerWithWindow: kwin] nodeView];
             BOOL cutted = [(id <OperationProtocol>)operationsApp filenamesWasCutted];
+            id nodeView;
+    
+            if ([vwrsManager hasViewerWithWindow: kwin]) {
+              nodeView = [[vwrsManager viewerWithWindow: kwin] nodeView];
+            } else {
+              nodeView = [dtopManager desktopView];
+            }
     
             if ([nodeView validatePasteOfFilenames: sourcePaths
                                          wasCutted: cutted]) {
@@ -2792,17 +2748,32 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 
 - (void)checkRemovableMedia:(id)sender
 {
-  if (desktopApp) {
-    [desktopApp checkNewRemovableMedia: nil];
+  if ([dtopManager isActive]) {
+    [dtopManager checkNewRemovableMedia];
   }	
 }
 
 - (void)emptyRecycler:(id)sender
 {
-  if (desktopApp) {
-    [desktopApp emptyTrash: nil];
-  }	else if (recyclerApp) {
-    [recyclerApp emptyTrash: nil];
+  NSString *trashPath = [self trashPath];
+  FSNode *node = [FSNode nodeWithPath: trashPath];
+  NSArray *subNodes = [node subNodes];
+  
+  if ([subNodes count]) {
+    NSMutableArray *files = [NSMutableArray array];
+    NSMutableDictionary *opinfo = [NSMutableDictionary dictionary];
+    int i;  
+
+    for (i = 0; i < [subNodes count]; i++) {
+      [files addObject: [(FSNode *)[subNodes objectAtIndex: i] name]];
+    }
+
+    [opinfo setObject: @"GWorkspaceEmptyRecyclerOperation" forKey: @"operation"];
+    [opinfo setObject: trashPath forKey: @"source"];
+    [opinfo setObject: trashPath forKey: @"destination"];
+    [opinfo setObject: files forKey: @"files"];
+
+    [self performFileOperation: opinfo];
   }
 }
 

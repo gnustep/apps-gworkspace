@@ -316,7 +316,8 @@ typedef enum FSNSelectionMask {
 
 	NSMutableArray *lockedPaths;
   NSArray *hiddenPaths;
-
+  NSMutableSet *volumes;
+  
   NSMutableDictionary *tumbsCache;
   NSString *thumbnailDir;
   BOOL usesThumbnails;  
@@ -403,6 +404,12 @@ typedef enum FSNSelectionMask {
 - (BOOL)isNodeLocked:(FSNode *)node;
 
 - (BOOL)isPathLocked:(NSString *)path;
+
+- (void)setVolumes:(NSArray *)vls;
+
+- (void)addVolumeAt:(NSString *)path;
+
+- (void)removeVolumeAt:(NSString *)path;
 
 - (void)setUseThumbnails:(BOOL)value;
 

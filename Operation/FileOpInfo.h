@@ -42,7 +42,7 @@
 
 - (void)setNumFiles:(int)n;
 
-- (void)updateProgressIndicator;
+- (void)setProgIndicatorValue:(int)n;
 
 - (void)sendDidChangeNotification;
 
@@ -69,9 +69,9 @@
 
 - (NSData *)processedFiles;
 
-- (void)Pause;
+- (oneway void)Pause;
 
-- (void)Stop;
+- (oneway void)Stop;
 
 - (BOOL)isPaused;
 
@@ -93,7 +93,6 @@
   NSMutableDictionary *operationDict;
   NSMutableArray *notifNames;
   
-  int filescount;
   BOOL confirm;
   BOOL showwin;
   BOOL opdone;
@@ -154,7 +153,7 @@
 
 - (void)setNumFiles:(int)n;
 
-- (void)updateProgressIndicator;
+- (void)setProgIndicatorValue:(int)n;
 
 - (void)endOperation;
 
@@ -194,7 +193,9 @@
 	NSMutableArray *procfiles;
 	NSDictionary *fileinfo;
 	NSString *filename;
-	int fcount;
+  int fcount;
+  float progstep;
+  int stepcount;
 	BOOL stopped;
 	BOOL paused;
 	BOOL canupdate;

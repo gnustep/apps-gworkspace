@@ -35,6 +35,7 @@
 @class NSWorkspace;
 @class FSNodeRep;
 @class GWViewersManager;
+@class GWDesktopManager;
 @class GWViewer;
 @class PrefController;
 @class Fiend;
@@ -98,17 +99,6 @@
 @end
 
 
-@protocol	DesktopAppProtocol
-
-- (NSData *)tabbedShelfBackground;
-
-- (oneway void)checkNewRemovableMedia:(id)sender;
-
-- (oneway void)emptyTrash:(id)sender;
-
-@end
-
-
 @protocol	RecyclerAppProtocol
 
 - (oneway void)emptyTrash:(id)sender;
@@ -155,7 +145,6 @@
   id inspectorApp;
   id operationsApp;
   id finderApp;
-  id desktopApp;
   id recyclerApp;
   
   id ddbd;
@@ -167,7 +156,7 @@
 	int maxHistoryCache;
     
   GWViewersManager *vwrsManager;
-  
+  GWDesktopManager *dtopManager;  
   FileAnnotationsManager *fannManager;
   
   BOOL animateChdir;
@@ -297,10 +286,6 @@
 - (void)connectFinder;
 
 - (void)finderConnectionDidDie:(NSNotification *)notif;
-
-- (void)connectDesktop;
-
-- (void)desktopConnectionDidDie:(NSNotification *)notif;
 
 - (void)connectRecycler;
 

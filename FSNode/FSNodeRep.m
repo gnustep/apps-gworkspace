@@ -109,6 +109,7 @@ static FSNodeRep *shared = nil;
       
     lockedPaths = [NSMutableArray new];	
     hiddenPaths = [NSArray new];
+    volumes = [[NSMutableSet alloc] initWithCapacity: 1];
     
     [self loadExtendedInfoModules];
   }
@@ -289,6 +290,7 @@ static FSNodeRep *shared = nil;
 {
   TEST_RELEASE (extInfoModules);
 	TEST_RELEASE (lockedPaths);
+  TEST_RELEASE (volumes);
   TEST_RELEASE (hiddenPaths);
   TEST_RELEASE (tumbsCache);
   TEST_RELEASE (thumbnailDir);
@@ -366,7 +368,8 @@ static FSNodeRep *shared = nil;
   }
 
   if (icon == nil) {
-    if ([node isMountPoint]) {
+    if (([node isMountPoint] && [volumes containsObject: nodepath])
+                                  || [volumes containsObject: nodepath]) {
       icon = hardDiskIcon;
     } else {
       icon = [ws iconForFile: nodepath];
@@ -757,6 +760,22 @@ static FSNodeRep *shared = nil;
 	}
 	
 	return NO;
+}
+
+- (void)setVolumes:(NSArray *)vls
+{
+  [volumes removeAllObjects];
+  [volumes addObjectsFromArray: vls];
+}
+
+- (void)addVolumeAt:(NSString *)path
+{
+  [volumes addObject: path];
+}
+
+- (void)removeVolumeAt:(NSString *)path
+{
+  [volumes removeObject: path];
 }
 
 - (void)setUseThumbnails:(BOOL)value

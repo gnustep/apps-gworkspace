@@ -1430,7 +1430,7 @@ static NSString *defaultColumns = @"{ \
   } else {
     NSString *newname = [nameEditor stringValue];
     NSString *newpath = [[ednode parentPath] stringByAppendingPathComponent: newname];
-    NSCharacterSet *notAllowSet = [NSCharacterSet characterSetWithCharactersInString: @"/\\*$|~\'\"`^!?"];
+    NSCharacterSet *notAllowSet = [NSCharacterSet characterSetWithCharactersInString: @"/\\*:?"];
     NSRange range = [newname rangeOfCharacterFromSet: notAllowSet];
     NSFileManager *fm = [NSFileManager defaultManager];    
     NSArray *dirContents = [fm directoryContentsAtPath: [ednode parentPath]];

@@ -167,31 +167,35 @@ static NSString *nibName = @"FModuleName";
 - (BOOL)checkPath:(NSString *)path 
    withAttributes:(NSDictionary *)attributes
 {
+  CREATE_AUTORELEASE_POOL(pool);
   NSString *fname = [path lastPathComponent];
-
+  BOOL pathok = NO;
+  
   switch(how) {
     case IS:
-      return [fname isEqual: searchStr]; 
+      pathok = [fname isEqual: searchStr]; 
       break;
   
     case NOT_CONTAINS:
-      return ([fname rangeOfString: searchStr].location == NSNotFound); 
+      pathok = ([fname rangeOfString: searchStr].location == NSNotFound); 
       break;
 
     case CONTAINS:
-      return ([fname rangeOfString: searchStr].location != NSNotFound); 
+      pathok = ([fname rangeOfString: searchStr].location != NSNotFound); 
       break;
 
     case STARTS:
-      return [fname hasPrefix: searchStr];
+      pathok = [fname hasPrefix: searchStr];
       break;
 
     case ENDS:
-      return [fname hasSuffix: searchStr];
+      pathok = [fname hasSuffix: searchStr];
       break;
   }
-
-  return NO;
+  
+  RELEASE (pool);
+  
+  return pathok;
 }
 
 - (int)compareModule:(id <FinderModulesProtocol>)module

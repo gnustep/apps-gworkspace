@@ -27,6 +27,8 @@
 #include "FinderModulesProtocol.h"
 #include "GNUstep.h"
 
+#define MAXFSIZE 600000
+
 static NSString *nibName = @"FModuleContents";
 
 @interface FModuleContents : NSObject <FinderModulesProtocol>
@@ -39,6 +41,7 @@ static NSString *nibName = @"FModuleContents";
   BOOL used;
 
   NSString *contentsStr;
+  const char *contentsPtr;
   NSFileManager *fm;
 }
 
@@ -87,6 +90,7 @@ static NSString *nibName = @"FModuleContents";
 
   if (self) {
     ASSIGN (contentsStr, [criteria objectForKey: @"what"]);
+    contentsPtr = [contentsStr UTF8String];
     fm = [NSFileManager defaultManager];
   }
   
@@ -137,19 +141,22 @@ static NSString *nibName = @"FModuleContents";
 - (BOOL)checkPath:(NSString *)path 
    withAttributes:(NSDictionary *)attributes
 {
-  NSString *fileType = [attributes fileType];
-
-  if (fileType == NSFileTypeRegular) {
+  BOOL contains = NO;
+  
+  if (([attributes fileSize] < MAXFSIZE) 
+            && ([attributes fileType] == NSFileTypeRegular)) {
+    CREATE_AUTORELEASE_POOL(pool);
     NSData *contents = [NSData dataWithContentsOfFile: path];
 
     if (contents && [contents length]) {
       const char *bytesStr = (const char *)[contents bytes];
-
-      return (strstr(bytesStr, [contentsStr lossyCString]) != NULL);
+      contains = (strstr(bytesStr, contentsPtr) != NULL);
     }
+    
+    RELEASE (pool);
   }
   
-  return NO;
+  return contains;
 }
 
 - (int)compareModule:(id <FinderModulesProtocol>)module

@@ -310,7 +310,7 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
   enumerator = [dirsSet objectEnumerator];
     
   while ((path = [enumerator nextObject])) {
-    if ((*existsImp)(fm, existsSel, path) && subpathOfPath(apath, path)) {
+    if (subpathOfPath(apath, path) && (*existsImp)(fm, existsSel, path)) {
       [directories addObject: path];
     }
   }   
@@ -514,16 +514,37 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
     NSLog(@"unable to create the database files.");
     exit(EXIT_FAILURE);
   }
-    
+
+  fprintf(stderr, "reading directories... "); 
   if (readDirectories() == NO) {
-    NSLog(@"unable to read from the db.");
+    NSLog(@"\nunable to read from the db.");
     exit(EXIT_FAILURE);
   }
-    
-  synchronizeDirectories();
+  fprintf(stderr, "done\n");
   
+  fprintf(stderr, "checking directories... ");
+  checkDirectories();  
+  fprintf(stderr, "done\n");
+  
+  fprintf(stderr, "synchronizing directories... ");
+  synchronizeDirectories();
+  fprintf(stderr, "done\n");
+
+  fprintf(stderr, "reading paths... ");   
   readPaths();
+  fprintf(stderr, "done\n");
+  
+  fprintf(stderr, "checking paths... ");   
+  checkPaths();  
+  fprintf(stderr, "done\n"); 
+  
+  fprintf(stderr, "synchronizing paths... ");
   synchronizePaths(); 
+  fprintf(stderr, "done\n");
+
+  fprintf(stderr, "checking file annotations... ");   
+  checkAnnotations();
+  fprintf(stderr, "done\n");
   
   inited = YES;
   
@@ -1620,10 +1641,10 @@ void checkAnnotations()
         [written setObject: dict forKey: path];
         
       } else {
-        changed = YES; 
-        
         if ([annsHandle offsetInFile] == annsize) {
           [handle writeData: data]; 
+        } else {
+          changed = YES;
         }
       }
       

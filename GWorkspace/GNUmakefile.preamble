@@ -10,10 +10,12 @@ ADDITIONAL_CFLAGS += -Wall
 
 # Additional include directories the compiler should search
 ADDITIONAL_INCLUDE_DIRS += -IGWorkspace -I../GWorkspace -I../../GWorkspace
+ADDITIONAL_INCLUDE_DIRS += -IDesktop -I../Desktop 
+ADDITIONAL_INCLUDE_DIRS += -IDesktop/Dock
 ADDITIONAL_INCLUDE_DIRS += -IFileViewer -I../FileViewer 
 ADDITIONAL_INCLUDE_DIRS += -IFileAnnotations -I../FileAnnotations 
 ADDITIONAL_INCLUDE_DIRS += -IHistory -I../History 
-ADDITIONAL_INCLUDE_DIRS += -I../FSNode -I../../FSNode
+ADDITIONAL_INCLUDE_DIRS += -I../FSNode -I../../FSNode -I../../../FSNode
 
 # Additional LDFLAGS to pass to the linker
 ADDITIONAL_LDFLAGS +=  

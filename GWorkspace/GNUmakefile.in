@@ -48,6 +48,11 @@ GWorkspace_OBJC_FILES = main.m \
 externs.m \
 GWFunctions.m \
 GWorkspace.m \
+Desktop/GWDesktopManager.m \
+Desktop/GWDesktopWindow.m \
+Desktop/GWDesktopView.m \
+Desktop/Dock/Dock.m \
+Desktop/Dock/DockIcon.m \
 FileViewer/GWViewersManager.m \
 FileViewer/GWViewer.m \
 FileViewer/GWSpatialViewer.m \
@@ -76,6 +81,8 @@ Preferences/IconsPref.m \
 Preferences/HiddenFilesPref.m \
 Preferences/HistoryPref.m \
 Preferences/BrowserViewerPref.m \
+Preferences/VolumesPref.m \
+Preferences/DesktopPref.m \
 History/History.m \
 Dialogs/Dialogs.m \
 Dialogs/OpenWithController.m \

@@ -1,8 +1,0 @@
-{
-    NSIcon = "Desktop.tiff";
-    NSRole = "NSNone";
-    ApplicationDescription = "Desktop";
-    ApplicationIcon = "Desktop.tiff";
-    ApplicationName = "Desktop";
-    ApplicationRelease = "0.7.0";
-}

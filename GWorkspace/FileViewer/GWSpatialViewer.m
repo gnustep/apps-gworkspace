@@ -1043,16 +1043,12 @@
 - (void)chooseLabelColor:(id)sender
 {
   if ([nodeView respondsToSelector: @selector(setTextColor:)]) {
-
-
   }
 }
 
 - (void)chooseBackColor:(id)sender
 {
   if ([nodeView respondsToSelector: @selector(setBackgroundColor:)]) {
-
-
   }
 }
 

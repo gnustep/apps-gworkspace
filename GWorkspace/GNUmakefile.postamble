@@ -2,6 +2,8 @@
 # Things to do before compiling
 before-all::
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/GWorkspace
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Desktop
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Desktop/Dock
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/FileViewer
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/FileAnnotations
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/TShelf
@@ -18,6 +20,8 @@ before-install::
 before-all::
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/GWorkspace
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/FileViewer
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Desktop  
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Desktop/Dock
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/FileAnnotations
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/TShelf
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Preferences
