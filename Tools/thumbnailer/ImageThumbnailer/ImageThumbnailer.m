@@ -45,18 +45,7 @@
 - (NSData *)makeThumbnailForPath:(NSString *)path
 {
   CREATE_AUTORELEASE_POOL(arp);
-  NSImage *image;
-
-	NS_DURING
-		{
-			image = [[NSImage alloc] initWithContentsOfFile: path];
-		}
-	NS_HANDLER
-		{
-      RELEASE (arp);
-			return nil;
-	  }
-	NS_ENDHANDLER
+  NSImage *image = [[NSImage alloc] initWithContentsOfFile: path];
 
   if (image && [image isValid]) {
     NSSize size = [image size];

@@ -113,23 +113,108 @@
   exit(0);
 }
 
+/*
 - (void)readImageAtPath:(NSString *)path
                 setSize:(NSSize)imsize
 {
+  CREATE_AUTORELEASE_POOL(arp);
   NSMutableDictionary *info = [NSMutableDictionary dictionary];
-  NSImage *image = nil;
+  NSImage *srcImage = [[NSImage alloc] initWithContentsOfFile: path];
+
+  if (srcImage && [srcImage isValid]) {
+    NSData *srcData = [srcImage TIFFRepresentation];
+    NSBitmapImageRep *srcRep = [NSBitmapImageRep imageRepWithData: srcData];
+    NSSize srcsize = NSMakeSize([srcRep pixelsWide], [srcRep pixelsHigh]);
+
+    [info setObject: [NSNumber numberWithFloat: srcsize.width] forKey: @"width"];
+    [info setObject: [NSNumber numberWithFloat: srcsize.height] forKey: @"height"];
+
+    if ((imsize.width < srcsize.width) || (imsize.height < srcsize.height)) {
+      int spp = [srcRep samplesPerPixel];
+      int bpp = [srcRep bitsPerPixel] / 8;
+      BOOL isColor = [srcRep hasAlpha] ? (spp > 2) : (spp > 1);
+      NSString *colorSpaceName = isColor ? NSCalibratedRGBColorSpace : NSCalibratedWhiteColorSpace;
+      NSSize dstsize;
+      float xratio, yratio;
+      NSBitmapImageRep *dstRep;
+      NSData *tiffData;
+      unsigned char *srcData;
+      unsigned char *destData;
+      unsigned x, y, i;
+      
+      if ((imsize.width / srcsize.width) <= (imsize.height / srcsize.height)) {
+        dstsize.width = floor(imsize.width + 0.5);
+        dstsize.height = floor(dstsize.width * srcsize.height / srcsize.width + 0.5);
+      } else {
+        dstsize.height = floor(imsize.height + 0.5);
+        dstsize.width = floor(dstsize.height * srcsize.width / srcsize.height + 0.5);    
+      }
+
+      xratio = srcsize.width / dstsize.width * 1.0;
+      yratio = srcsize.height / dstsize.height * 1.0;
+
+      dstRep = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: NULL
+                              pixelsWide: (int)dstsize.width
+                              pixelsHigh: (int)dstsize.height
+                              bitsPerSample: 8
+                              samplesPerPixel: (isColor ? 3 : 1)
+                              hasAlpha: NO
+                              isPlanar: NO
+                              colorSpaceName: colorSpaceName
+                              bytesPerRow: 0
+                              bitsPerPixel: 0];
+    
+      srcData = [srcRep bitmapData];
+      destData = [dstRep bitmapData];
+
+      for (y = 0; y < (int)dstsize.height; y++) {
+        for (x = 0; x < (int)dstsize.width; x++) {
+          for (i = 0; i < bpp; i++) {
+            int dstidx = (int)(bpp * (y * dstsize.width + x) + i);
+            int srcidx = (int)(bpp * (floor(y * yratio) * srcsize.width + floor(x * xratio)) + i);
+          
+            destData[dstidx] = srcData[srcidx];
+          }
+        }
+      }
+
+      NS_DURING
+		    {
+          tiffData = [dstRep TIFFRepresentation];
+		    }
+	    NS_HANDLER
+		    {
+			    tiffData = nil;
+	      }
+	    NS_ENDHANDLER
+      
+      if (tiffData) {
+        [info setObject: tiffData forKey: @"imgdata"];
+      } 
+      
+      RELEASE (dstRep);
+
+    } else {
+      [info setObject: srcData forKey: @"imgdata"];
+    }
+    
+    RELEASE (srcImage);
+  }
+  
+  [viewer imageReady: [NSArchiver archivedDataWithRootObject: info]];
+  
+  RELEASE (arp);
+}
+*/
+
+- (void)readImageAtPath:(NSString *)path
+                setSize:(NSSize)imsize
+{
+  CREATE_AUTORELEASE_POOL(arp);
+  NSMutableDictionary *info = [NSMutableDictionary dictionary];
+  NSImage *image = [[NSImage alloc] initWithContentsOfFile: path];
   NSImageRep *rep = nil;  
   NSData *data = nil;
-
-	NS_DURING
-		{
-			image = [[NSImage alloc] initWithContentsOfFile: path];
-		}
-	NS_HANDLER
-		{
-			[viewer imageReady: [NSArchiver archivedDataWithRootObject: info]];
-	  }
-	NS_ENDHANDLER
 
   if (image && [image isValid]) {
     NSSize size = [image size];
@@ -140,7 +225,6 @@
     if ((imsize.width < size.width) || (imsize.height < size.height)) {
       int rpw; 
       commonInfo *comInfo;
-      float rw, rh;
       float xfactor, yfactor;  
 	    NSSize newsize;
       commonInfo *newInfo;
@@ -179,15 +263,12 @@
 		    comInfo->pixbits = [(NSBitmapImageRep *)rep bitsPerPixel];
 	    }
     
-      rw = imsize.width / size.width;
-      rh = imsize.height / size.height;
-
-      if (rw <= rh) {
-        newsize.width = size.width * rw;
-        newsize.height = floor(imsize.width * size.height / size.width + 0.5);
+      if ((imsize.width / size.width) <= (imsize.height / size.height)) {
+        newsize.width = floor(imsize.width + 0.5);
+        newsize.height = floor(newsize.width * size.height / size.width + 0.5);
       } else {
-        newsize.height = size.height * rh;
-        newsize.width = floor(imsize.height * size.width / size.height + 0.5);    
+        newsize.height = floor(imsize.height + 0.5);
+        newsize.width = floor(newsize.height * size.width / size.height + 0.5);    
       }
 
       xfactor = newsize.width / size.width;
@@ -242,6 +323,7 @@
   }
     
   [viewer imageReady: [NSArchiver archivedDataWithRootObject: info]];
+  RELEASE (arp);
 }
 
 - (void)terminate

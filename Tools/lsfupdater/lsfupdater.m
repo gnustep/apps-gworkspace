@@ -563,27 +563,6 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
   }
 }
 
-
-
-
-
-
-
-
-/*
-2005-03-01 15:17:40.000 GWorkspace[29107] 
-Exception when sending exception back to client 
-- <NSException: 88c8498> NAME:NSInvalidArgumentException 
-REASON:conditionally encoding without root object
-*/
-
-
-
-
-
-
-
-
 - (void)updateSearchPath:(NSString *)srcpath
 {
   CREATE_AUTORELEASE_POOL(arp);
@@ -685,8 +664,8 @@ REASON:conditionally encoding without root object
     NSArray *founds;
     int i;
     
-    GWDebugLog(@"%@ not found in the db", srcpath);
-    GWDebugLog(@"performing full search in %@", srcpath);
+    NSLog(@"%@ not found in the db", srcpath);
+    NSLog(@"performing full search in %@", srcpath);
   
     founds = [self fullSearchInDirectory: srcpath];
     

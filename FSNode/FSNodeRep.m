@@ -164,7 +164,9 @@ static FSNodeRep *shared = nil;
       }
     NS_HANDLER
       {
-        ASSIGN (newIcon, icon);
+        newIcon = [icon copy];
+	      [newIcon setScalesWhenResized: YES];
+	      [newIcon setSize: newsize];  
       }
     NS_ENDHANDLER
 
