@@ -781,6 +781,12 @@ double myrintf(double a)
     selCol = (*getImp)(columns, getSel, index - 1);
     [delegate currentSelectedPaths: [selCol selection]];	
     [[self window] makeFirstResponder: [selCol cmatrix]];
+    
+    [nameEditor setBackgroundColor: [NSColor whiteColor]];
+    if (styleMask & GWColumnIconMask) {
+      [self updateNameEditor];
+    }
+
   }
 }
 
