@@ -143,13 +143,14 @@ static NSString *nibName = @"Inspector";
 
 - (NSString *)winname
 {
-  return NSLocalizedString(@"Contents", @"");
+  return NSLocalizedString(@"Contents Inspector", @"");
 }
 
 - (void)activateForPaths:(NSArray *)paths
 {
   if ([paths count] == 1) {
     [self showContentsAt: [paths objectAtIndex: 0]];
+    
   } else {
     NSString *items = NSLocalizedString(@"items", @"");
     
@@ -165,7 +166,7 @@ static NSString *nibName = @"Inspector";
       DESTROY (currentPath);
     }    
 	
-	  [[inspector inspWin] setTitle: NSLocalizedString(@"Contents Inspector", @"")];    
+	  [[inspector inspWin] setTitle: [self winname]];    
   }
 }
 
@@ -588,7 +589,6 @@ static NSString *nibName = @"Inspector";
 	}
 	
 	[[inspector inspWin] setTitle: winName];
-  [viewersBox setNeedsDisplay: YES];
 }
 
 - (void)contentsReadyAt:(NSString *)path

@@ -189,6 +189,10 @@
   NSArray	*objects = [NSUnarchiver unarchiveObjectWithData: data];
 
 #define MARGIN 10
+
+  if ([self superview]) { 
+    [inspector dataContentsReadyForType: typeDescriprion useIcon: icon];
+  }
   
   if (objects) {
     NSMutableArray *checkedObjects = [NSMutableArray array];

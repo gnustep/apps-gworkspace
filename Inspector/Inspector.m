@@ -62,7 +62,8 @@ static NSString *nibName = @"InspectorWin";
     [fswatcher unregisterClient: (id <FSWClientProtocol>)self];
     DESTROY (fswatcher);
   }
-
+  
+  TEST_RELEASE (watchedPath);
   TEST_RELEASE (currentPaths);
   RELEASE (inspectors);
   TEST_RELEASE (win);
@@ -78,9 +79,8 @@ static NSString *nibName = @"InspectorWin";
   
   if (self) {
     inspectors = [NSMutableArray new];
+    watchedPath = nil;
     currentPaths = nil;
-    fm = [NSFileManager defaultManager];	
-    ws = [NSWorkspace sharedWorkspace];
     nc = [NSNotificationCenter defaultCenter];
   }
   
@@ -95,7 +95,6 @@ static NSString *nibName = @"InspectorWin";
   } 
 
   [win setFrameUsingName: @"inspector"];
-  [win setTitle: NSLocalizedString(@"Inspector", @"")];
   [win setDelegate: self];
   
   preferences = [[InspectorPref alloc] initForInspector: self];
@@ -120,6 +119,16 @@ static NSString *nibName = @"InspectorWin";
 
 
 
+
+
+
+    //
+    //
+    //
+    //      STOPPARE I CONTENTS  !!!!!!!!!!!!!!!!!!!!!!!!!!
+    //
+    //
+    //
 
 
 
@@ -157,30 +166,30 @@ static NSString *nibName = @"InspectorWin";
 	return YES;
 }
 
+- (IBAction)activateInspector:(id)sender
+{
+  id insp = [inspectors objectAtIndex: [sender indexOfSelectedItem]];
+  
+	if (currentInspector != insp) {
+    currentInspector = insp;
+	  [win setTitle: [insp winname]];
+	  [(NSBox *)inspBox setContentView: [insp inspView]];	 
+	}
+  
+  if (currentPaths) {
+	  [insp activateForPaths: currentPaths];
+  }
+}
+
 - (void)setPaths:(NSArray *)paths
 {
   if (paths) {
     ASSIGN (currentPaths, paths);
-    [currentInspector activateForPaths: currentPaths];
+    if (currentInspector) {
+      [currentInspector activateForPaths: currentPaths];
+    }
   } else {
     DESTROY (currentPaths);
-  }
-}
-
-- (IBAction)activateInspector:(id)sender
-{
-  int index = [sender indexOfSelectedItem];
-  
-	if (currentInspector && (currentInspector == [inspectors objectAtIndex: index])) {
-    return;
-	}
-
-  currentInspector = [inspectors objectAtIndex: index];
-	[win setTitle: [currentInspector winname]];
-	[(NSBox *)inspBox setContentView: [currentInspector inspView]];	 
-  
-  if (currentPaths) {
-	  [currentInspector activateForPaths: currentPaths];
   }
 }
 
@@ -223,19 +232,18 @@ static NSString *nibName = @"InspectorWin";
 
 - (id)contentViewerWithWindowName:(NSString *)wname
 {
-  return nil;
+  return [contents viewerWithWindowName: wname];
 }
 
 - (void)disableContentViewer:(id)vwr
 {
-
+  [contents disableViewer: vwr];
 }
 
 - (BOOL)saveExternalContentViewer:(id)vwr 
                          withName:(NSString *)vwrname
 {
-
-  return NO;
+  return [contents saveExternalViewer: vwr withName: vwrname];
 }
 
 
@@ -342,7 +350,11 @@ static NSString *nibName = @"InspectorWin";
 {
   if (fswnotifications) {
     [self connectFSWatcher];
-    [fswatcher client: self addWatcherForPath: path];
+    
+    if ((watchedPath == nil) || ([watchedPath isEqual: path] == NO)) {
+      ASSIGN (watchedPath, path);
+      [fswatcher client: self addWatcherForPath: path];
+    }
   }
 }
 
@@ -357,7 +369,6 @@ static NSString *nibName = @"InspectorWin";
 - (void)watchedPathDidChange:(NSData *)dirinfo
 {
   int i;
-  
   for (i = 0; i< [inspectors count]; i++) {
     [[inspectors objectAtIndex: i] watchedPathDidChange: dirinfo];
   }

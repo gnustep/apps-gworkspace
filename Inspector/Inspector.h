@@ -68,20 +68,19 @@
 
   id fswatcher;
   BOOL fswnotifications;
+  NSString *watchedPath;
   
   InspectorPref *preferences;
   StartAppWin *startAppWin;
   
-  NSFileManager *fm;
-	NSWorkspace *ws;
   NSNotificationCenter *nc; 
 }
 
 + (Inspector *)inspector;
 
-- (void)setPaths:(NSArray *)paths;
-
 - (IBAction)activateInspector:(id)sender;
+
+- (void)setPaths:(NSArray *)paths;
 
 - (NSWindow *)inspWin;
 
