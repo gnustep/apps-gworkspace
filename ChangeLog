@@ -1,3 +1,11 @@
+2003-10-13 Enrico Sersale  <enrico@imago.ro>
+  
+  * ContentViewers/PasteboardViewer/PasteboardViewer.m
+    Added a dummy implementation of
+    GormNSBrowser, GormNSTableView, GormNSOutlineView, GormNSMenu,
+    GormNSPopUpButtonCell and GormNSPopUpButton
+    Now the viewer seems to works with all the Gorm objects.
+
 2003-10-10 Enrico Sersale  <enrico@imago.ro>
   
   * ContentViewers/PasteboardViewer/PasteboardViewer.m

@@ -89,6 +89,24 @@
 
 @end
 
+@interface GormNSBrowser : NSBrowser
+@end
+
+@interface GormNSTableView : NSTableView
+@end
+
+@interface GormNSOutlineView : NSOutlineView
+@end
+
+@interface GormNSMenu : NSMenu
+@end
+
+@interface GormNSPopUpButtonCell : NSPopUpButtonCell
+@end
+
+@interface GormNSPopUpButton : NSPopUpButton
+@end
+
 @interface IBViewPboardViewer : NSView 
 {
   NSScrollView *scroll;

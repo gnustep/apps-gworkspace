@@ -395,6 +395,24 @@
 
 @end
 
+@implementation GormNSBrowser
+@end
+
+@implementation GormNSTableView
+@end
+
+@implementation GormNSOutlineView
+@end
+
+@implementation GormNSMenu
+@end
+
+@implementation GormNSPopUpButtonCell 
+@end
+
+@implementation GormNSPopUpButton
+@end
+
 @implementation IBViewPboardViewer
 
 - (void)dealloc
@@ -428,30 +446,6 @@
   id obj;
   NSPoint orp, szp;
   int i;
-
-
-/*
-	IBCellPboardType, IBMenuPboardType, IBMenuCellPboardType,
-	IBObjectPboardType, IBViewPboardType, IBWindowPboardType,
-        IBFormatterPboardType
-
-
-
-
-
-*/
-
-
-
-
-
-
-
-
-
-
-
-
 
 #define MARGIN 10
 

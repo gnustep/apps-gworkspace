@@ -869,6 +869,7 @@
     [self removeIcon: icon];
     [fm removeFileAtPath: dataPath handler: nil];
     RELEASE (dataPath);
+    [gw resetSelectedPaths];
   }
 }
 
