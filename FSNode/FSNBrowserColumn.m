@@ -114,7 +114,8 @@ static id <DesktopApplication> desktopApp = nil;
       isDragTarget = NO;
       cellsHeight = ICON_CELL_HEIGHT;
     } else {
-      cellsHeight = CELL_HEIGHT;
+      cellsHeight = floor([[cellPrototype font] defaultLineHeightForFont]);
+    //  cellsHeight = CELL_HEIGHT;
     }
   }
   
@@ -789,6 +790,16 @@ static id <DesktopApplication> desktopApp = nil;
   if (matrix) {
     [matrix deselectAllCells];
   }
+}
+
+- (void)setEditorForCell:(FSNBrowserCell *)cell
+{
+  [browser setEditorForCell: cell inColumn: self];
+}
+
+- (void)stopCellEditing
+{
+  [browser stopCellEditing];
 }
 
 - (void)checkLockedReps

@@ -45,6 +45,7 @@
   TEST_RELEASE (extInfoType);  
   TEST_RELEASE (lastSelection);
   RELEASE (columns);
+  TEST_RELEASE (nameEditor);
   RELEASE (cellPrototype);
   TEST_RELEASE (charBuffer);
   RELEASE (backColor);
@@ -56,6 +57,7 @@
 		    visibleColumns:(int)vcols 
               scroller:(NSScroller *)scrl
             cellsIcons:(BOOL)cicns
+         editableCells:(BOOL)edcells
        selectionColumn:(BOOL)selcol
 {
   self = [super init];
@@ -128,6 +130,20 @@
     cellPrototype = [FSNBrowserCell new];
   
   	columns = [NSMutableArray new];
+  
+    nameEditor = nil;
+  
+    if (edcells) {
+      nameEditor = [FSNCellNameEditor new];
+   //   [nameEditor setDelegate: self];  
+      [nameEditor setEditable: YES];
+      [nameEditor setSelectable: YES];	   
+	//	  [nameEditor setFont: labelFont];
+		  [nameEditor setBezeled: NO];
+		  [nameEditor setAlignment: NSLeftTextAlignment];
+	    [nameEditor setBackgroundColor: [NSColor redColor]];
+  //	  [nameEditor setTextColor: textColor];
+    }  
   
 		for (i = 0; i < visibleColumns; i++) {
       [self createEmptyColumn];
@@ -675,39 +691,52 @@
 - (void)tile
 {
   if (updateViewsLock == 0) {
+    NSWindow *window = [self window];
     NSRect r = [self frame];
-    float frameWidth = r.size.width - (4 + visibleColumns);
+    float frameWidth = r.size.width - visibleColumns;
     int count = [columns count];
     NSRect colrect;
     int i;
 
     columnSize.height = r.size.height;
-    columnSize.width = floor(frameWidth / visibleColumns);
-
+    columnSize.width = rintf(frameWidth / visibleColumns);
+    
+    [window disableFlushWindow];
+    
     for (i = 0; i < count; i++) {
+      FSNBrowserColumn *bc = [columns objectAtIndex: i];
+    
       int n = i - firstVisibleColumn;
 
       colrect = NSZeroRect;
       colrect.size = columnSize;
       colrect.origin.y = 0;
 
-      if (i <= firstVisibleColumn) {
-        colrect.origin.x = (n * columnSize.width);
-      } else if (i <= lastVisibleColumn) {
-        colrect.origin.x = (n * columnSize.width) + n;
+      if (i < firstVisibleColumn) {
+        colrect.origin.x = (n * columnSize.width) - 8;
       } else {
-        colrect.origin.x = (n * columnSize.width) + 8;
-      }
+        if (i == firstVisibleColumn) {
+          colrect.origin.x = (n * columnSize.width);
+        } else if (i <= lastVisibleColumn) {
+          colrect.origin.x = (n * columnSize.width) + n;
+        } else {
+          colrect.origin.x = (n * columnSize.width) + n + 8;
+        }
+	    }
 
       if (i == lastVisibleColumn) {
-        colrect.size.width = [self bounds].size.width - (colrect.origin.x);
+        colrect.size.width = [self bounds].size.width - colrect.origin.x;
 	    }
-    
-      [[columns objectAtIndex: i] setFrame: colrect];
+          
+      [bc setFrame: colrect];
     }
     
     [self synchronizeViewer];
     [self updateScroller];
+    [self stopCellEditing];
+        
+    [window enableFlushWindow];
+    [window flushWindowIfNeeded];
   }
 }
 
@@ -914,7 +943,6 @@
   updateViewsLock--;
   [self tile];
 }
-
 
 - (FSNode *)nodeOfLastColumn
 {
@@ -1317,26 +1345,6 @@
   }  
 }
 
-- (BOOL)fileManager:(NSFileManager *)manager 
-              shouldProceedAfterError:(NSDictionary *)errorDict
-{
-	NSString *title = NSLocalizedString(@"Error", @"");
-	NSString *msg1 = NSLocalizedString(@"Cannot rename ", @"");
-
-//  NSString *name = [nameEditor name];
-  NSString *name = @"sdkljgzasdgfro;zdfhozdfzhdhz"; // ATTENZIONE !!!!!!!!!!!!!!
-
-	NSString *msg2 = NSLocalizedString(@"Continue", @"");
-
-  NSRunAlertPanel(title, [NSString stringWithFormat: @"%@'%@'!", msg1, name], msg2, nil, nil);   
-
-	return NO;
-}
-
-- (void)fileManager:(NSFileManager *)manager willProcessPath:(NSString *)path
-{
-}
-
 @end
 
 
@@ -1537,28 +1545,25 @@
 
 - (id)repOfSubnode:(FSNode *)anode
 {
-  FSNBrowserColumn *bc = [self columnWithNode: anode];
-  
-  if (bc) {
-    int index = [bc index];
+  if ([[anode path] isEqual: path_separator()] == NO) {
+    FSNBrowserColumn *bc = [self columnWithPath: [anode parentPath]];
     
-    if (index > 0) {
-      return [[self columnBeforeColumn: bc] cellOfNode: anode];
+    if (bc) {
+      return [bc cellOfNode: anode];
     }
   }
-
+  
   return nil;
 }
 
 - (id)repOfSubnodePath:(NSString *)apath
 {
-  FSNBrowserColumn *bc = [self columnWithPath: apath];
-  
-  if (bc) {
-    int index = [bc index];
+  if ([apath isEqual: path_separator()] == NO) {
+    NSString *parentPath = [apath stringByDeletingLastPathComponent];
+    FSNBrowserColumn *bc = [self columnWithPath: parentPath];
     
-    if (index > 0) {
-      return [[self columnBeforeColumn: bc] cellWithPath: apath];
+    if (bc) {
+      return [bc cellWithPath: apath];
     }
   }
 
@@ -1693,7 +1698,7 @@
       FSNBrowserColumn *bc = [self columnWithPath: [basepath stringByDeletingLastPathComponent]];
     
       if (bc) {
-        [bc selectCellsWithPaths: paths sendAction: NO];
+        [bc selectCellsWithPaths: paths sendAction: YES];
       } else {
         [self showPathsSelection: paths];
       }
@@ -1890,6 +1895,11 @@
   return YES;
 }
 
+- (void)stopRepNameEditing
+{
+  [self stopCellEditing];
+}
+
 - (void)setBackgroundColor:(NSColor *)acolor
 {
   int i;
@@ -1919,6 +1929,86 @@
 - (NSColor *)disabledTextColor
 {
   return [NSColor disabledControlTextColor];
+}
+
+@end
+
+
+@implementation FSNBrowser (IconNameEditing)
+
+- (void)setEditorForCell:(FSNBrowserCell *)cell 
+                inColumn:(FSNBrowserColumn *)col
+{
+  if (nameEditor) {
+    FSNode *cellnode = [cell node];
+    BOOL canedit = (([cell isLocked] == NO) 
+                        && ([cellnode isMountPoint] == NO) 
+                        && (infoType == FSNInfoNameType));
+    
+    [self stopCellEditing];
+
+    if (canedit) {   
+      NSMatrix *matrix = [col cmatrix];
+      NSFontManager *fmanager = [NSFontManager sharedFontManager];
+      NSFont *edfont = [nameEditor font];
+      NSRect r = [cell labelRect];
+      
+      if ([cell nodeInfoShowType] == FSNInfoExtendedType) {
+        edfont = [fmanager convertFont: edfont 
+                           toHaveTrait: NSItalicFontMask];
+      } else {
+        edfont = [fmanager convertFont: edfont 
+                        toNotHaveTrait: NSItalicFontMask];
+      }
+    
+      [nameEditor setFont: edfont];
+
+      r = [matrix convertRect: r toView: self];
+      [nameEditor setFrame: r];
+
+      [nameEditor setNode: cellnode 
+              stringValue: [cell shownInfo]
+                    index: 0];
+
+      [self addSubview: nameEditor];
+    }
+  }
+}
+
+- (void)stopCellEditing
+{
+  if (nameEditor && [[self subviews] containsObject: nameEditor]) {
+    [nameEditor abortEditing];
+    [nameEditor setNode: nil stringValue: @"" index: -1];
+    [nameEditor removeFromSuperview];
+    [self setNeedsDisplayInRect: [nameEditor frame]];
+  }
+}
+
+- (void)controlTextDidChange:(NSNotification *)aNotification
+{
+}
+
+- (void)controlTextDidEndEditing:(NSNotification *)aNotification
+{
+
+}
+
+- (BOOL)fileManager:(NSFileManager *)manager 
+              shouldProceedAfterError:(NSDictionary *)errorDict
+{
+	NSString *title = NSLocalizedString(@"Error", @"");
+	NSString *msg1 = NSLocalizedString(@"Cannot rename ", @"");
+  NSString *name = [[nameEditor node] name];
+	NSString *msg2 = NSLocalizedString(@"Continue", @"");
+
+  NSRunAlertPanel(title, [NSString stringWithFormat: @"%@'%@'!", msg1, name], msg2, nil, nil);   
+
+	return NO;
+}
+
+- (void)fileManager:(NSFileManager *)manager willProcessPath:(NSString *)path
+{
 }
 
 @end

@@ -236,7 +236,6 @@ static GWViewersManager *vwrsmanager = nil;
   return nil;  
 }
 
-
 - (void)viewerWillClose:(id)aviewer
 {
   FSNode *node = [aviewer baseNode];
@@ -496,15 +495,15 @@ static GWViewersManager *vwrsmanager = nil;
     if ([event isEqual: @"GWWatchedDirectoryDeleted"]) {  
       if (([[node path] isEqual: path]) || [node isSubnodeOfPath: path]) { 
         if ([viewer invalidated] == NO) {
- //         [viewer invalidate];
- //         [viewersToClose addObject: viewer];
+          [viewer invalidate];
+          [viewersToClose addObject: viewer];
         }
       }
     }
     
     for (j = 0; j < [watchedNodes count]; j++) {
       if ([[[watchedNodes objectAtIndex: j] path] isEqual: path]) {
- //       [viewer watchedPathChanged: info];
+        [viewer watchedPathChanged: info];
         break;
       }
     }

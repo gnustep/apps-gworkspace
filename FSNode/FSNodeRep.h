@@ -229,6 +229,8 @@ typedef enum FSNSelectionMask {
 - (BOOL)validatePasteOfFilenames:(NSArray *)names
                        wasCutted:(BOOL)cutted;
 
+- (void)stopRepNameEditing;
+
 - (void)setBackgroundColor:(NSColor *)acolor;
 
 - (NSColor *)backgroundColor;

@@ -32,7 +32,7 @@
 #include "GNUstep.h"
 
 #define BRANCH_SIZE 7
-#define ARROW_MARGIN_X 11
+#define ARROW_ORIGIN_X (BRANCH_SIZE + 4)
 
 static id <DesktopApplication> desktopApp = nil;
 
@@ -373,7 +373,7 @@ static NSImage *branchImage;
     icnPoint.y = floor((frameRect.size.height - sz.height) / 2);
   } 
     
-  brImgBounds.origin.x = frameRect.size.width - ARROW_MARGIN_X;
+  brImgBounds.origin.x = frameRect.size.width - ARROW_ORIGIN_X;
   brImgBounds.origin.y = ceil(icnBounds.origin.y + (icnBounds.size.height / 2) - (BRANCH_SIZE / 2));
   brImgBounds = NSIntegralRect(brImgBounds);
   

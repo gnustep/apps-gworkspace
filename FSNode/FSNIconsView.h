@@ -150,6 +150,7 @@
 - (BOOL)involvedByFileOperation:(NSDictionary *)opinfo;
 - (BOOL)validatePasteOfFilenames:(NSArray *)names
                        wasCutted:(BOOL)cutted;
+- (void)stopRepNameEditing;
 - (void)setBackgroundColor:(NSColor *)acolor;
 - (NSColor *)backgroundColor;
 - (void)setTextColor:(NSColor *)acolor;

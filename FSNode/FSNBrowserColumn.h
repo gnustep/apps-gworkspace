@@ -117,6 +117,10 @@
 
 - (void)unselectAllCells;
 
+- (void)setEditorForCell:(FSNBrowserCell *)cell;
+
+- (void)stopCellEditing;
+
 - (void)checkLockedReps;
            
 - (void)lockCellsOfNodes:(NSArray *)nodes;

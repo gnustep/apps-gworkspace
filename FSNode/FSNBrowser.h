@@ -31,6 +31,7 @@
 
 @class FSNBrowserColumn;
 @class FSNBrowserCell;
+@class FSNCellNameEditor;
 @class NSScroller;
 
 @interface FSNBrowser : NSView 
@@ -47,6 +48,8 @@
   NSScroller *scroller;
   BOOL skipUpdateScroller;
   int updateViewsLock;
+
+  FSNCellNameEditor *nameEditor;
 
   BOOL cellsIcon;
   BOOL selColumn;
@@ -76,6 +79,7 @@
 		    visibleColumns:(int)vcols 
               scroller:(NSScroller *)scrl
             cellsIcons:(BOOL)cicns
+         editableCells:(BOOL)edcells
        selectionColumn:(BOOL)selcol;
 
 - (void)setBaseNode:(FSNode *)node;
@@ -196,11 +200,31 @@
 - (BOOL)involvedByFileOperation:(NSDictionary *)opinfo;
 - (BOOL)validatePasteOfFilenames:(NSArray *)names
                        wasCutted:(BOOL)cutted;
+- (void)stopRepNameEditing;                       
 - (void)setBackgroundColor:(NSColor *)acolor;
 - (NSColor *)backgroundColor;
 - (void)setTextColor:(NSColor *)acolor;
 - (NSColor *)textColor;
 - (NSColor *)disabledTextColor;
+
+@end
+
+
+@interface FSNBrowser (IconNameEditing)
+
+- (void)setEditorForCell:(FSNBrowserCell *)cell 
+                inColumn:(FSNBrowserColumn *)col;
+                
+- (void)stopCellEditing;                
+                
+- (void)controlTextDidChange:(NSNotification *)aNotification;
+
+- (void)controlTextDidEndEditing:(NSNotification *)aNotification;
+
+- (BOOL)fileManager:(NSFileManager *)manager 
+              shouldProceedAfterError:(NSDictionary *)errorDict;
+
+- (void)fileManager:(NSFileManager *)manager willProcessPath:(NSString *)path;
 
 @end
 

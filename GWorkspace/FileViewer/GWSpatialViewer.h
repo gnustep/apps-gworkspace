@@ -103,6 +103,7 @@
 
 - (void)suspendWatchersFromPath:(NSString *)path;
 - (void)reactivateWatchersFromPath:(NSString *)path;
+- (void)clearSuspendedWatchersFromPath:(NSString *)path;
 - (void)watchedPathChanged:(NSDictionary *)info;
 - (NSArray *)watchedNodes;
 

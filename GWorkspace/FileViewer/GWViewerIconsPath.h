@@ -30,10 +30,15 @@
 #include "FSNodeRep.h"
 
 @class GWViewerScroll;
+@class FSNIcon;
+@class FSNIconNameEditor;
 
 @interface GWViewerIconsPath : NSView
 {
   NSMutableArray *icons;
+
+  FSNIconNameEditor *nameEditor;
+  FSNIcon *editIcon;
   
   int iconSize;
   int labelTextSize;
@@ -113,6 +118,24 @@
 - (NSColor *)disabledTextColor;
 
 - (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender;
+
+@end
+
+
+@interface GWViewerIconsPath (IconNameEditing)
+
+- (void)updateNameEditor;
+
+- (void)stopNameEditing;
+
+- (void)controlTextDidChange:(NSNotification *)aNotification;
+
+- (void)controlTextDidEndEditing:(NSNotification *)aNotification;
+
+- (BOOL)fileManager:(NSFileManager *)manager 
+              shouldProceedAfterError:(NSDictionary *)errorDict;
+
+- (void)fileManager:(NSFileManager *)manager willProcessPath:(NSString *)path;
 
 @end
 

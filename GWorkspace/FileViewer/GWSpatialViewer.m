@@ -148,6 +148,7 @@
 		                            visibleColumns: visibleCols
                                       scroller: [scroll horizontalScroller]
                                     cellsIcons: YES
+                                 editableCells: YES       
                                selectionColumn: NO];
     }
 
@@ -446,7 +447,6 @@
   }
   
   [watchedNodes removeAllObjects];
-  [watchedSuspended removeAllObjects];
   [watchedNodes addObjectsFromArray: components];
 }
 
@@ -571,7 +571,9 @@
     if ([nodeView isShowingPath: destination]
                         || [baseNode isSubnodeOfPath: destination]) {
       [self reactivateWatchersFromPath: destination];
-    }
+    } 
+    
+    [self clearSuspendedWatchersFromPath: destination];
   }
 
   if ([operation isEqual: @"NSWorkspaceMoveOperation"]
@@ -582,7 +584,9 @@
     if ([nodeView isShowingPath: source]
                         || [baseNode isSubnodeOfPath: source]) {
       [self reactivateWatchersFromPath: source];
-    }
+    } 
+    
+    [self clearSuspendedWatchersFromPath: source];
   }
 }
 
@@ -625,10 +629,22 @@
         count--;
         i--;
       }
-      
-      if ([watchedSuspended containsObject: path]) {
-        [watchedSuspended removeObject: path];
-      }
+    }
+  }
+}
+
+- (void)clearSuspendedWatchersFromPath:(NSString *)path
+{
+  int count = [watchedSuspended count];
+  int i;
+
+  for (i = 0; i < count; i++) {
+    NSString *suspended = [watchedSuspended objectAtIndex: i];
+
+    if ([suspended isEqual: path] || isSubpathOfPath(path, suspended)) {
+      [watchedSuspended removeObjectAtIndex: i];
+      count--;
+      i--;
     }
   }
 }
@@ -753,8 +769,12 @@
 
 - (void)windowDidResize:(NSNotification *)aNotification
 {
-  if ([nodeView isKindOfClass: [GWViewerBrowser class]]) { 
-    [nodeView updateScroller];
+  if (nodeView) {
+    [nodeView stopRepNameEditing];
+    
+    if ([nodeView isKindOfClass: [GWViewerBrowser class]]) { 
+      [nodeView updateScroller];
+    }
   }
 }
 
@@ -816,6 +836,7 @@
 		                            visibleColumns: visibleCols
                                       scroller: [scroll horizontalScroller]
                                     cellsIcons: YES
+                                 editableCells: YES   
                                selectionColumn: NO]; 
       
       
@@ -849,7 +870,6 @@
       [gworkspace removeWatcherForPath: [[watchedNodes objectAtIndex: i] path]];
     }
     [watchedNodes removeAllObjects];
-    [watchedSuspended removeAllObjects];
     
     DESTROY (lastSelection);
     selection = [nodeView selectedPaths];

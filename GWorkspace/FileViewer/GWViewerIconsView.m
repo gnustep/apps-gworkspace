@@ -76,6 +76,8 @@
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
+  [self stopRepNameEditing];
+
   if ([theEvent modifierFlags] != NSShiftKeyMask) {
     selectionMask = NSSingleSelectionMask;
     selectionMask |= FSNCreatingSelectionMask;

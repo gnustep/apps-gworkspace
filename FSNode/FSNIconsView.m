@@ -564,6 +564,8 @@ if (rct.size.height < 0) rct.size.height = 0; \
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
+  [self stopRepNameEditing];
+
   if ([theEvent modifierFlags] != NSShiftKeyMask) {
     selectionMask = NSSingleSelectionMask;
     selectionMask |= FSNCreatingSelectionMask;
@@ -1707,6 +1709,23 @@ pp.x = NSMaxX([self bounds]) - 1
   }
 
   return YES;
+}
+
+- (void)stopRepNameEditing
+{
+  if ([[self subviews] containsObject: nameEditor]) {
+    NSRect edrect = [nameEditor frame];
+    [nameEditor abortEditing];
+    [nameEditor setNode: nil stringValue: @"" index: -1];
+    [nameEditor removeFromSuperview];
+    [self setNeedsDisplayInRect: edrect];
+  }
+
+  if (editIcon) {
+    [editIcon setNameEdited: NO];
+  }
+
+  editIcon = nil;
 }
 
 - (void)setBackgroundColor:(NSColor *)acolor

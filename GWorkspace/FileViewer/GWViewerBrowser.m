@@ -41,12 +41,14 @@
 		    visibleColumns:(int)vcols 
               scroller:(NSScroller *)scrl
             cellsIcons:(BOOL)cicns
+         editableCells:(BOOL)edcells
        selectionColumn:(BOOL)selcol
 {
   self = [super initWithBaseNode: bsnode
 		              visibleColumns: vcols 
                         scroller: scrl
                       cellsIcons: cicns
+                   editableCells: edcells    
                  selectionColumn: selcol];
 
   if (self) {

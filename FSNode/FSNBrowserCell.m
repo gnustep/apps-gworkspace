@@ -227,7 +227,7 @@ static NSDictionary *fontAttr = nil;
 
     [controlView lockFocus];
 
-    if (([self isHighlighted] || [self state]) && (nameEdited == NO)) {
+    if ([self isHighlighted] || [self state]) {
 	    [[self highlightColorInView: controlView] set];
     } else {
       [backcolor set];

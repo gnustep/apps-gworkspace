@@ -35,8 +35,8 @@
 
 - (void)setDelegate:(id)adelegate
 {
-  [super setDelegate: adelegate];
   delegate = adelegate;
+  [super setDelegate: adelegate];
 }
 
 - (BOOL)validateMenuItem:(id <NSMenuItem>)menuItem

@@ -133,6 +133,15 @@
 
     icons = [NSMutableArray new];
 
+    nameEditor = [FSNIconNameEditor new];
+    [nameEditor setDelegate: self];  
+		[nameEditor setFont: labelFont];
+		[nameEditor setBezeled: NO];
+		[nameEditor setAlignment: NSCenterTextAlignment];
+	  [nameEditor setBackgroundColor: backColor];
+	  [nameEditor setTextColor: textColor];
+    editIcon = nil;
+
     [self calculateGridSize];
   }
   
@@ -155,7 +164,7 @@
   FSNIcon *icon;
   int icncount;
   int i;
-
+  
   while ([icons count] > count) {
     icon = [self lastIcon];
     if (icon) {
@@ -176,6 +185,8 @@
     }
     
     [icon setLeaf: NO];
+    [icon setNameEdited: NO];
+    [icon setGridIndex: i];
   }
 
   if ([node isEqual: [components objectAtIndex: (count -1)]] == NO) {
@@ -198,6 +209,8 @@
   icon = [self lastIcon];
   [icon setLeaf: YES];
   [icon select];
+
+  editIcon = nil;
   
   [self tile];
 }
@@ -224,7 +237,8 @@
                          
 - (id)lastIcon
 {
-  return [icons objectAtIndex: ([icons count] - 1)];
+  int count = [icons count];
+  return (count ? [icons objectAtIndex: (count - 1)] : nil);
 }
 
 - (void)calculateGridSize
@@ -238,28 +252,25 @@
     highlightSize.height = iconSize + 4;
   }
 
-  labelSize.height = floor([labelFont defaultLineHeightForFont]);
-
+  labelSize.height = rintf([labelFont defaultLineHeightForFont]);
   gridSize.height = highlightSize.height + labelSize.height;
 }
 
 - (void)tile
 {
   NSClipView *clip = [self superview];
-  float x = [clip bounds].origin.x;
-  float y = [clip bounds].origin.y;
-  NSScrollView *scroll = [clip superview];
-//  float scrwidth = [scroll frame].size.width;
-  float scrwidth = [scroll frame].size.width - (4 + visibleIcons);
-  NSRect fr = [self frame];
-  float posx = 0.0;
+  float vwidth = [clip visibleRect].size.width;
 	int count = [icons count];
   int i;
-  
-  gridSize.width = floor(scrwidth / visibleIcons);
-
+    
   if (ownScroller) {
-    [scroll setLineScroll: gridSize.width];
+    NSRect fr = [self frame];
+    float x = [clip bounds].origin.x;
+    float y = [clip bounds].origin.y;
+    float posx = 0.0;
+    
+    gridSize.width = rintf(vwidth / visibleIcons);
+    [(NSScrollView *)[clip superview] setLineScroll: gridSize.width];
   
     for (i = 0; i < count; i++) {
       FSNIcon *icon = [icons objectAtIndex: i];
@@ -267,61 +278,55 @@
 
       r.size = gridSize;
       r.origin.y = 0;
-
       r.origin.x = posx;
 
- //     if (i == lastVisibleIcon) { 
- //       r.size.width = scrwidth - r.origin.x;
-//	    }
-
       [icon setFrame: r];
-      [icon setNeedsDisplay: YES];
 
       posx += gridSize.width;
     }
     
-    // posx -= LAST_ICON_COMP;
-
     if (posx != fr.size.width) {
       [self setFrame: NSMakeRect(0, fr.origin.y, posx, fr.size.height)];
     }
 
     if (count > visibleIcons) {    
-      x += gridSize.width * (count - visibleIcons);
+      x += gridSize.width * count;
       [clip scrollToPoint: NSMakePoint(x, y)];
     }
 
   } else {
+    vwidth -= visibleIcons;
+    gridSize.width = rintf(vwidth / visibleIcons);
+  
     for (i = 0; i < count; i++) {
 		  FSNIcon *icon = [icons objectAtIndex: i];
       int n = i - firstVisibleIcon;
       NSRect r = NSZeroRect;
 
       r.size = gridSize;
+      r.origin.y = 0;
 
-      if (i <= firstVisibleIcon) {
-        r.origin.x = (n * gridSize.width);
-      } else if (i <= lastVisibleIcon) {
-        r.origin.x = (n * gridSize.width) + n;
+      if (i < firstVisibleIcon) {
+        r.origin.x = (n * gridSize.width) - 8;
       } else {
-        r.origin.x = (n * gridSize.width) + 8;
-      }
-
-      if (i == lastVisibleIcon) {
-        r.size.width = scrwidth - r.origin.x;
+        if (i == firstVisibleIcon) {
+          r.origin.x = (n * gridSize.width);
+        } else if (i <= lastVisibleIcon) {
+          r.origin.x = (n * gridSize.width) + n;
+        } else {
+          r.origin.x = (n * gridSize.width) + n + 8;
+        }
 	    }
 
-      r.origin.y = 0;
-      posx += gridSize.width;
+      if (i == lastVisibleIcon) {
+        r.size.width = [[self superview] visibleRect].size.width - r.origin.x;
+	    }
 
       [icon setFrame: r];
-      [icon setNeedsDisplay: YES];
     }
-    
-    posx += (shift * gridSize.width);
   }
 
-  // [self updateNameEditor];
+  [self updateNameEditor];
   
   [self setNeedsDisplay: YES];
 }
@@ -434,9 +439,9 @@
 
 - (void)removeRep:(id)arep
 {
-//  if (arep == editIcon) {
-//    editIcon = nil;
-//  }
+  if (arep == editIcon) {
+    editIcon = nil;
+  }
   [arep removeFromSuperviewWithoutNeedingDisplay];
   [icons removeObject: arep];
 }
@@ -557,6 +562,235 @@
 - (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
 {
   return NSDragOperationNone;
+}
+
+@end
+
+
+@implementation GWViewerIconsPath (IconNameEditing)
+
+- (void)updateNameEditor
+{
+  FSNIcon *lastIcon = [self lastIcon];
+  NSRect edrect;
+
+  if ([[self subviews] containsObject: nameEditor]) {
+    edrect = [nameEditor frame];
+    [nameEditor abortEditing];
+    [nameEditor setNode: nil stringValue: @"" index: -1];
+    [nameEditor removeFromSuperview];
+    [self setNeedsDisplayInRect: edrect];
+  }
+
+  if (editIcon) {
+    [editIcon setNameEdited: NO];
+  }
+
+  editIcon = nil;
+  
+  if (lastIcon && [lastIcon isSelected] && ([lastIcon isShowingSelection] == NO)) {
+    editIcon = lastIcon; 
+  } 
+
+  if (editIcon) {
+    FSNode *iconnode = [editIcon node];
+    NSString *nodeDescr = [editIcon shownInfo];
+    BOOL locked = [editIcon isLocked];
+    BOOL mpoint = [iconnode isMountPoint];
+    NSRect icnr = [editIcon frame];
+    float centerx = icnr.origin.x + (icnr.size.width / 2);    
+    NSRect labr = [editIcon labelRect];
+    int margin = [FSNodeRep labelMargin];
+    float bw = [self bounds].size.width - EDIT_MARGIN;
+    float edwidth = 0.0; 
+    NSFontManager *fmanager = [NSFontManager sharedFontManager];
+    NSFont *edfont = [nameEditor font];
+    BOOL editable = NO;
+    
+    [editIcon setNameEdited: YES];
+  
+    if ([editIcon nodeInfoShowType] == FSNInfoExtendedType) {
+      edfont = [fmanager convertFont: edfont 
+                         toHaveTrait: NSItalicFontMask];
+    } else {
+      edfont = [fmanager convertFont: edfont 
+                      toNotHaveTrait: NSItalicFontMask];
+    }
+    
+    [nameEditor setFont: edfont];
+
+    edwidth = [[nameEditor font] widthOfString: nodeDescr];
+    edwidth += margin;
+
+    if ((centerx + (edwidth / 2)) >= bw) {
+      centerx -= (centerx + (edwidth / 2) - bw);
+    } else if ((centerx - (edwidth / 2)) < margin) {
+      centerx += fabs(centerx - (edwidth / 2)) + margin;
+    }    
+
+    edrect = [self convertRect: labr fromView: editIcon];
+    edrect.origin.x = centerx - (edwidth / 2);
+    edrect.size.width = edwidth;
+    edrect = NSIntegralRect(edrect);
+    
+    [nameEditor setFrame: edrect];
+    [nameEditor setAlignment: NSCenterTextAlignment];
+
+    [nameEditor setNode: iconnode 
+            stringValue: nodeDescr
+                  index: 0];
+
+    [nameEditor setBackgroundColor: [NSColor selectedControlColor]];
+    
+    if (locked == NO) {
+      [nameEditor setTextColor: textColor];    
+    } else {
+      [nameEditor setTextColor: [self disabledTextColor]];    
+    }
+
+    editable = ([editIcon gridIndex] != 0) && (locked == NO)
+                 && (infoType == FSNInfoNameType) && (mpoint == NO);
+    
+    [nameEditor setEditable: editable];
+    [nameEditor setSelectable: editable];	
+    [self addSubview: nameEditor];
+  }
+}
+
+- (void)stopNameEditing
+{
+  if ([[self subviews] containsObject: nameEditor]) {
+    NSRect edrect = [nameEditor frame];
+    [nameEditor abortEditing];
+    [nameEditor setNode: nil stringValue: @"" index: -1];
+    [nameEditor removeFromSuperview];
+    [self setNeedsDisplayInRect: edrect];
+  }
+
+  if (editIcon) {
+    [editIcon setNameEdited: NO];
+  }
+
+  editIcon = nil;
+}
+
+- (void)controlTextDidChange:(NSNotification *)aNotification
+{
+  NSRect icnr = [editIcon frame];
+  float centerx = icnr.origin.x + (icnr.size.width / 2);
+  float edwidth = [[nameEditor font] widthOfString: [nameEditor stringValue]]; 
+  int margin = [FSNodeRep labelMargin];
+  float bw = [self bounds].size.width - EDIT_MARGIN;
+  NSRect edrect = [nameEditor frame];
+  
+  edwidth += margin;
+
+  while ((centerx + (edwidth / 2)) > bw) {
+    centerx --;  
+    if (centerx < EDIT_MARGIN) {
+      break;
+    }
+  }
+
+  while ((centerx - (edwidth / 2)) < EDIT_MARGIN) {
+    centerx ++;  
+    if (centerx >= bw) {
+      break;
+    }
+  }
+
+  edrect.origin.x = centerx - (edwidth / 2);
+  edrect.size.width = edwidth;
+
+  [self setNeedsDisplayInRect: [nameEditor frame]];
+  [nameEditor setFrame: NSIntegralRect(edrect)];
+}
+
+- (void)controlTextDidEndEditing:(NSNotification *)aNotification
+{
+  NSFileManager *fm = [NSFileManager defaultManager];
+  FSNode *ednode = [nameEditor node];
+
+#define CLEAREDITING \
+	[self updateNameEditor]; \
+  return
+ 
+  if ([ednode isWritable] == NO) {
+    NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
+          [NSString stringWithFormat: @"%@\"%@\"!\n", 
+              NSLocalizedString(@"You have not write permission for ", @""), 
+                    [ednode name]], NSLocalizedString(@"Continue", @""), nil, nil);   
+    CLEAREDITING;
+    
+  } else if ([fm isWritableFileAtPath: [ednode parentPath]] == NO) {
+    NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
+          [NSString stringWithFormat: @"%@\"%@\"!\n", 
+              NSLocalizedString(@"You have not write permission for ", @""), 
+                  [[ednode parent] name]], NSLocalizedString(@"Continue", @""), nil, nil);   
+    CLEAREDITING;
+    
+  } else {
+    NSString *newname = [nameEditor stringValue];
+    NSString *newpath = [[ednode parentPath] stringByAppendingPathComponent: newname];
+    NSCharacterSet *notAllowSet = [NSCharacterSet characterSetWithCharactersInString: @"/\\*$|~\'\"`^!?"];
+    NSRange range = [newname rangeOfCharacterFromSet: notAllowSet];
+    NSArray *dirContents = [fm directoryContentsAtPath: [ednode parentPath]];
+    NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+    
+    if (range.length > 0) {
+      NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
+                NSLocalizedString(@"Invalid char in name", @""), 
+                          NSLocalizedString(@"Continue", @""), nil, nil);   
+      CLEAREDITING;
+    }	
+
+    if ([dirContents containsObject: newname]) {
+      if ([newname isEqual: [ednode name]]) {
+        CLEAREDITING;
+      } else {
+        NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
+          [NSString stringWithFormat: @"%@\"%@\" %@ ", 
+              NSLocalizedString(@"The name ", @""), 
+              newname, NSLocalizedString(@" is already in use!", @"")], 
+                            NSLocalizedString(@"Continue", @""), nil, nil);   
+        CLEAREDITING;
+      }
+    }
+
+	  [userInfo setObject: @"GWorkspaceRenameOperation" forKey: @"operation"];	
+    [userInfo setObject: [ednode path] forKey: @"source"];	
+    [userInfo setObject: newpath forKey: @"destination"];	
+    [userInfo setObject: [NSArray arrayWithObject: @""] forKey: @"files"];	
+
+    [[NSDistributedNotificationCenter defaultCenter]
+ 				postNotificationName: @"GWFileSystemWillChangeNotification"
+	 								    object: nil 
+                    userInfo: userInfo];
+
+    [fm movePath: [ednode path] toPath: newpath handler: self];
+
+    [[NSDistributedNotificationCenter defaultCenter]
+ 				postNotificationName: @"GWFileSystemDidChangeNotification"
+	 								    object: nil 
+                    userInfo: userInfo];
+  }
+}
+
+- (BOOL)fileManager:(NSFileManager *)manager 
+              shouldProceedAfterError:(NSDictionary *)errorDict
+{
+	NSString *title = NSLocalizedString(@"Error", @"");
+	NSString *msg1 = NSLocalizedString(@"Cannot rename ", @"");
+  NSString *name = [[nameEditor node] name];
+	NSString *msg2 = NSLocalizedString(@"Continue", @"");
+
+  NSRunAlertPanel(title, [NSString stringWithFormat: @"%@'%@'!", msg1, name], msg2, nil, nil);   
+
+	return NO;
+}
+
+- (void)fileManager:(NSFileManager *)manager willProcessPath:(NSString *)path
+{
 }
 
 @end

@@ -174,6 +174,7 @@
 		                            visibleColumns: visibleCols
                                       scroller: [pathsScroll horizontalScroller]
                                     cellsIcons: NO
+                                 editableCells: NO   
                                selectionColumn: YES];
     }
 
@@ -370,7 +371,6 @@
   return (spatial ? SPATIAL : BROWSING);
 }
 
-
 - (void)activate
 {
   [vwrwin makeKeyAndOrderFront: nil];
@@ -410,7 +410,6 @@
 {
   return invalidated;
 }
-
 
 - (void)setOpened:(BOOL)opened 
         repOfNode:(FSNode *)anode
@@ -495,7 +494,6 @@
   }
   
   [watchedNodes removeAllObjects];
-  [watchedSuspended removeAllObjects];
   [watchedNodes addObjectsFromArray: components];
 }
 
@@ -508,7 +506,6 @@
       [nodeView showContentsOfNode: node];
       [self scrollToBeginning];
       [self selectionChanged: [NSArray arrayWithObject: [node path]]];
-      // ATTENZIONE!!! AGGIUNTO DI NOTTE! CONTROLLARE!!!!!!!!
       
     } else {
       [nodeView setLastShownNode: node];
@@ -628,6 +625,8 @@
                         || [baseNode isSubnodeOfPath: destination]) {
       [self reactivateWatchersFromPath: destination];
     }
+    
+    [self clearSuspendedWatchersFromPath: destination];
   }
 
   if ([operation isEqual: @"NSWorkspaceMoveOperation"]
@@ -643,6 +642,8 @@
     if ([self isShowingPath: source] || [baseNode isSubnodeOfPath: source]) {
       [self reactivateWatchersFromPath: source];
     }
+    
+    [self clearSuspendedWatchersFromPath: source];
   }
 }
 
@@ -685,10 +686,22 @@
         count--;
         i--;
       }
-      
-      if ([watchedSuspended containsObject: path]) {
-        [watchedSuspended removeObject: path];
-      }
+    }
+  }
+}
+
+- (void)clearSuspendedWatchersFromPath:(NSString *)path
+{
+  int count = [watchedSuspended count];
+  int i;
+
+  for (i = 0; i < count; i++) {
+    NSString *suspended = [watchedSuspended objectAtIndex: i];
+
+    if ([suspended isEqual: path] || isSubpathOfPath(path, suspended)) {
+      [watchedSuspended removeObjectAtIndex: i];
+      count--;
+      i--;
     }
   }
 }
@@ -698,25 +711,24 @@
   if (invalidated == NO) {
     NSString *path = [info objectForKey: @"path"];
   
-    if ([watchedSuspended containsObject: path] == NO) {  
-      if ([nodeView isSingleNode]) {
+    if ([watchedSuspended containsObject: path] == NO) { 
+      if ([nodeView isSingleNode] == NO) {
+        [nodeView watchedPathChanged: info];
+        
+      } else {
         NSString *event = [info objectForKey: @"event"];
         
         if ([event isEqual: @"GWWatchedDirectoryDeleted"]) {
-          FSNode *lastNode = [nodeView shownNode];
-          NSArray *components = [FSNode pathComponentsFromNode: baseNode 
-                                                        toNode: lastNode];
-    
-          if (components && [components containsObject: path]) {
-            [self unloadFromNode: [FSNode nodeWithRelativePath: path parent: nil]];
+          NSString *s = [path stringByDeletingLastPathComponent];
+
+          if ([self isShowingPath: s]) {
+            FSNode *node = [FSNode nodeWithRelativePath: s parent: nil];
+            [nodeView reloadFromNode: node];
           }
           
         } else if ([nodeView isShowingPath: path]) {
           [nodeView watchedPathChanged: info];
         }
-
-      } else if ([nodeView isShowingPath: path]) {
-        [nodeView watchedPathChanged: info];
       }
     }
   }
@@ -726,7 +738,6 @@
 {
   return watchedNodes;
 }
-
 
 - (void)updateDefaults
 {
@@ -858,6 +869,23 @@
   [vwrwin makeFirstResponder: nodeView];  
 }
 
+- (void)windowDidResize:(NSNotification *)aNotification
+{
+  if (nodeView) {
+    [nodeView stopRepNameEditing];  
+    [pathsView stopNameEditing];  
+
+    if ([nodeView isSingleNode]) {
+      NSRect r = [[vwrwin contentView] frame];
+      int cols = rintf(r.size.width / [vwrwin resizeIncrements].width);  
+
+      if (cols != visibleCols) {
+        [self setSelectableNodesRange: NSMakeRange(0, cols)];
+      }
+    }
+  }
+}
+
 - (BOOL)windowShouldClose:(id)sender
 {
 	return YES;
@@ -957,6 +985,7 @@
 		                            visibleColumns: visibleCols
                                       scroller: [pathsScroll horizontalScroller]
                                     cellsIcons: NO
+                                 editableCells: NO
                                selectionColumn: YES];
       
       ASSIGN (viewType, @"Browser");
@@ -1015,7 +1044,6 @@
       [gworkspace removeWatcherForPath: [[watchedNodes objectAtIndex: i] path]];
     }
     [watchedNodes removeAllObjects];
-    [watchedSuspended removeAllObjects];
     
     DESTROY (lastSelection);
     selection = [nodeView selectedPaths];

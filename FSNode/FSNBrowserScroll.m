@@ -52,6 +52,14 @@
   return self;
 }
 
+- (void)reflectScrolledClipView:(NSClipView *)aClipView
+{
+  if (aClipView == [self contentView]) {
+    [column stopCellEditing];
+    [super reflectScrolledClipView: aClipView];
+  }
+}
+
 - (BOOL)acceptsFirstResponder
 {
   return YES;

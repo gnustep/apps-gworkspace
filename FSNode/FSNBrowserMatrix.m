@@ -32,6 +32,9 @@
 #include "FSNFunctions.h"
 #include "GNUstep.h"
 
+#define DOUBLE_CLICK_LIMIT  300
+#define EDIT_CLICK_LIMIT   1000
+
 @implementation FSNBrowserMatrix
 
 - (void)dealloc
@@ -61,6 +64,8 @@
                                             @"GWRemoteFilenamesPboardType", 
                                             nil]];    
     }
+    editstamp = 0.0;
+    editindex = -1;
   }
   
   return self;
@@ -173,6 +178,8 @@
     clickCount = [theEvent clickCount];
 
     if (clickCount >= 2) {
+      editindex = -1;
+      [column stopCellEditing];
       [self sendDoubleAction];
       return;
     }
@@ -185,6 +192,8 @@
       FSNBrowserCell *cell = [[self cells] objectAtIndex: row];
       NSRect rect = [self cellFrameAtRow: row column: col];
       
+      [column stopCellEditing];
+      
       if ([cell isEnabled]) {
         int sz = [cell iconSize];
         NSSize size = NSMakeSize(sz, sz);
@@ -196,9 +205,14 @@
 	        NSEvent *nextEvent;
           BOOL startdnd = NO;
           int dragdelay = 0;
-          
+                    
           if (!([theEvent modifierFlags] & NSShiftKeyMask)) {
             [self deselectAllCells];   
+            if (editindex != row) {
+              editindex = row;
+            }
+          } else {
+            editindex = -1;
           }
                     
           [self selectCellAtRow: row column: col]; 
@@ -213,9 +227,10 @@
               break;
 
             } else if ([nextEvent type] == NSLeftMouseDragged) {
-	            if(dragdelay < 5) {
+	            if (dragdelay < 5) {
                 dragdelay++;
-              } else {        
+              } else {      
+                editindex = -1;  
                 startdnd = YES;        
                 break;
               }
@@ -224,10 +239,25 @@
 
           if (startdnd) {  
             [self startExternalDragOnEvent: nextEvent];    
-          }               
+          } 
+                        
         } else {
           [super mouseDown: theEvent];
+          
+          if (editindex != row) {
+            editindex = row;
+            
+          } else {
+            NSTimeInterval interval = ([theEvent timestamp] - editstamp);
+          
+            if ((interval > DOUBLE_CLICK_LIMIT)
+                                && (interval < EDIT_CLICK_LIMIT)) {
+              [column setEditorForCell: cell];
+            } 
+          }
         }
+        
+        editstamp = [theEvent timestamp];
       }
     }
   }

@@ -35,6 +35,8 @@
 {
   FSNBrowserColumn *column;
   unsigned int mouseFlags;
+  NSTimeInterval editstamp;  
+  int editindex;  
   BOOL acceptDnd;
   NSCell *dndTarget;
   unsigned int dragOperation;

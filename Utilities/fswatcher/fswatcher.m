@@ -270,6 +270,7 @@
     Watcher *watcher = [self watcherForPath: wpath];
 
     if (watcher) {
+      NSLog(@"removing listener for: %@", wpath);
       [watcher removeListener];
     }
   }  
