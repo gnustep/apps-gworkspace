@@ -2,6 +2,7 @@ include $(GNUSTEP_MAKEFILES)/common.make
 
 ifneq ($(FOUNDATION_LIB), apple)
   SUBPROJECTS = \
+       fswatcher \
        findfile \
        thumbnailer \
        wopen 

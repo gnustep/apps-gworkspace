@@ -439,6 +439,22 @@ return [ws openFile: fullPath withApplication: appName]
 {
   return contestualMenu;
 }
+
+- (void)addWatcherForPath:(NSString *)path
+{
+  if (fswnotifications) {
+    [self connectFSWatcher];
+    [fswatcher client: self addWatcherForPath: path];
+  }
+}
+
+- (void)removeWatcherForPath:(NSString *)path
+{
+  if (fswnotifications) {
+    [self connectFSWatcher];
+    [fswatcher client: self removeWatcherForPath: path];
+  }
+}
 //
 // end of GWProtocol
 //
@@ -463,6 +479,11 @@ return [ws openFile: fullPath withApplication: appName]
 
 - (void)dealloc
 {
+  if (fswatcher && [[(NSDistantObject *)fswatcher connectionForProxy] isValid]) {
+    [fswatcher unregisterClient: (id <FSWClientProtocol>)self];
+    DESTROY (fswatcher);
+  }
+
   [[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
   [[NSNotificationCenter defaultCenter] removeObserver: self];
 	RELEASE (defEditor);
@@ -487,6 +508,7 @@ return [ws openFile: fullPath withApplication: appName]
   TEST_RELEASE (tshelfWin);
   TEST_RELEASE (tshelfPBDir);
   TEST_RELEASE (tshelfBackground);
+  
 	[super dealloc];
 }
 
@@ -510,6 +532,10 @@ return [ws openFile: fullPath withApplication: appName]
 	defaults = [NSUserDefaults standardUserDefaults];
 	processName = [[NSProcessInfo processInfo] processName];    
 	[defaults setObject: processName forKey: @"GSWorkspaceApplication"];
+  
+  fswatcher = nil;
+  fswnotifications = YES;
+  [self connectFSWatcher];
       
 	result = [defaults stringForKey: @"defaulteditor"];
 	if (result == nil) {
@@ -735,7 +761,19 @@ return [ws openFile: fullPath withApplication: appName]
 	TEST_CLOSE (history, [history myWin]); 
 	TEST_CLOSE (desktopWindow, desktopWindow);
 	TEST_CLOSE (tshelfWin, tshelfWin);
-		
+
+  if (fswatcher) {
+    NSConnection *fswconn = [(NSDistantObject *)fswatcher connectionForProxy];
+  
+    if ([fswconn isValid]) {
+      [[NSNotificationCenter defaultCenter] removeObserver: self
+	                        name: NSConnectionDidDieNotification
+	                      object: fswconn];
+      [fswatcher unregisterClient: (id <FSWClientProtocol>)self];  
+      DESTROY (fswatcher);
+    }
+  }
+  		
 	return YES;
 }
 
@@ -1866,6 +1904,123 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 	    }
     }
   }
+}
+
+- (void)connectFSWatcher
+{
+  if (fswatcher == nil) {
+    id fsw = [NSConnection rootProxyForConnectionWithRegisteredName: @"fswatcher" 
+                                                               host: @""];
+
+    if (fsw) {
+      NSConnection *c = [fsw connectionForProxy];
+      
+      [c enableMultipleThreads];
+
+	    [[NSNotificationCenter defaultCenter] addObserver: self
+	                   selector: @selector(fswatcherConnectionDidDie:)
+		                     name: NSConnectionDidDieNotification
+		                   object: c];
+      
+      fswatcher = fsw;
+	    [fswatcher setProtocolForProxy: @protocol(FSWatcherProtocol)];
+      RETAIN (fswatcher);
+                                   
+	    [fswatcher registerClient: (id <FSWClientProtocol>)self];
+      
+	  } else {
+	    static BOOL recursion = NO;
+	    static NSString	*cmd = nil;
+
+
+            // cmd is not released !!!!!!!!!!!!!!!!!!
+            
+
+	    if (recursion == NO) {
+        if (cmd == nil) {
+          cmd = RETAIN ([[NSSearchPathForDirectoriesInDomains(
+                    GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
+                          stringByAppendingPathComponent: @"fswatcher"]);
+		    }
+      }
+	  
+      if (recursion == NO && cmd != nil) {
+	      NSLog(@"\nI couldn't contact the fswatcher server -\n"
+@"so I'm attempting to to start it - which will take a few seconds.\n");
+
+	      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
+        
+	      [NSTimer scheduledTimerWithTimeInterval: 5.0
+					   invocation: nil
+					      repeats: NO];
+                
+	      [[NSRunLoop currentRunLoop] runUntilDate:
+		                        [NSDate dateWithTimeIntervalSinceNow: 5.0]];
+	      recursion = YES;
+	      [self connectFSWatcher];
+	      recursion = NO;
+        
+	    } else { 
+	      recursion = NO;
+	      [NSException raise: NSInternalInconsistencyException
+			              format: @"unable to contact fswatcher -\n"
+		                  @"please check that the fswatcher process is running."];
+      }
+	  }
+  }
+}
+
+- (void)fswatcherConnectionDidDie:(NSNotification *)notif
+{
+  id connection = [notif object];
+
+  [[NSNotificationCenter defaultCenter] removeObserver: self
+	                    name: NSConnectionDidDieNotification
+	                  object: connection];
+
+  NSAssert(connection == [fswatcher connectionForProxy],
+		                                  NSInternalInconsistencyException);
+  RELEASE (fswatcher);
+  fswatcher = nil;
+
+  if (NSRunAlertPanel(nil,
+                    NSLocalizedString(@"The fswatcher connection died.\nDo you want to restart it?", @""),
+                    NSLocalizedString(@"Yes", @""),
+                    NSLocalizedString(@"No", @""),
+                    nil)) {
+    [self connectFSWatcher];                
+  } else {
+    fswnotifications = NO;
+    NSRunAlertPanel(nil,
+                    NSLocalizedString(@"fswatcher notifications disabled!", @""),
+                    NSLocalizedString(@"Yes", @""),
+                    nil, 
+                    nil);  
+  }
+}
+
+- (void)watchedDirectoryDidChange:(NSData *)dirinfo
+{
+  NSMutableDictionary *info = [[NSUnarchiver unarchiveObjectWithData: dirinfo] mutableCopy];
+  NSString *event = [info objectForKey: @"event"];
+
+  if ([event isEqual: @"GWWatchedDirectoryDeleted"]) {
+    [info setObject: GWWatchedDirectoryDeleted forKey: @"event"];
+  }
+
+  if ([event isEqual: @"GWFileDeletedInWatchedDirectory"]) {
+    [info setObject: GWFileDeletedInWatchedDirectory forKey: @"event"];
+  }
+
+  if ([event isEqual: @"GWFileCreatedInWatchedDirectory"]) {
+    [info setObject: GWFileCreatedInWatchedDirectory forKey: @"event"];
+  }
+
+	[[NSNotificationCenter defaultCenter]
+ 				 postNotificationName: GWFileWatcherFileDidChangeNotification
+	 								     object: info];  
+                       
+  RELEASE (info);
 }
 
 - (id)connectApplication:(NSString *)appName

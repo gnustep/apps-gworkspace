@@ -424,8 +424,15 @@ id instance = nil;
 
 - (void)addWatcherForPath:(NSString *)path
 {
-  FSWatcher *watcher = [self watcherForPath: path];
+//  FSWatcher *watcher = [self watcherForPath: path];
 	  
+    
+  [workspaceApp addWatcherForPath: path];
+//  NSLog(@"addWatcherForPath: %@", path);  
+  
+  printf("addWatcherForPath: %s\n", [path cString]);
+  
+/*    
   if ((watcher != nil) && ([watcher isOld] == NO)) { 
     [watcher addListener];   
     return;
@@ -438,15 +445,24 @@ id instance = nil;
   	  RELEASE (watcher);  
     }
 	}
+  */
 }
 
 - (void)removeWatcherForPath:(NSString *)path
 {
-  FSWatcher *watcher = [self watcherForPath: path];
+//  FSWatcher *watcher = [self watcherForPath: path];
+
   
+  [workspaceApp removeWatcherForPath: path];
+//  NSLog(@"removeWatcherForPath: %@", path);  
+
+  printf("removeWatcherForPath: %s\n", [path cString]);
+
+/*  
   if (watcher && ([watcher isOld] == NO)) {
   	[watcher removeListener];   
   }
+*/
 }
 
 - (void)watcherTimeOut:(id)sender

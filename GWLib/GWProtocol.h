@@ -79,6 +79,10 @@
 
 - (BOOL)usesContestualMenu;
 
+- (void)addWatcherForPath:(NSString *)path;
+
+- (void)removeWatcherForPath:(NSString *)path;
+
 @end 
 
 #endif // GWPROTOCOL_H

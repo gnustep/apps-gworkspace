@@ -58,7 +58,29 @@
 @class OpenWithController;
 @class RunExternalController;
 
-@interface GWorkspace : NSObject <GWProtocol>
+@protocol	FSWClientProtocol
+
+- (void)watchedDirectoryDidChange:(NSData *)dirinfo;
+
+@end
+
+
+@protocol	FSWatcherProtocol
+
+- (oneway void)registerClient:(id <FSWClientProtocol>)client;
+
+- (oneway void)unregisterClient:(id <FSWClientProtocol>)client;
+
+- (oneway void)client:(id <FSWClientProtocol>)client
+                          addWatcherForPath:(NSString *)path;
+
+- (oneway void)client:(id <FSWClientProtocol>)client
+                          removeWatcherForPath:(NSString *)path;
+
+@end
+
+
+@interface GWorkspace : NSObject <GWProtocol, FSWClientProtocol>
 {
 	NSString *defEditor, *defXterm, *defXtermArgs;
 	
@@ -104,6 +126,9 @@
   BOOL usesThumbnails;
 	      
   int shelfCellsWidth;
+  
+  id fswatcher;
+  BOOL fswnotifications;
         
   NSFileManager *fm;
   NSWorkspace *ws;
@@ -224,6 +249,10 @@
 - (void)setUsesThumbnails:(BOOL)value;
 
 - (void)thumbnailsDidChange:(NSNotification *)notif;
+
+- (void)connectFSWatcher;
+
+- (void)fswatcherConnectionDidDie:(NSNotification *)notif;
 
 - (id)connectApplication:(NSString *)appName;
 

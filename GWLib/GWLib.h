@@ -27,7 +27,7 @@
 
 #include <Foundation/Foundation.h>
 
-@interface GWLib : NSObject
+@interface GWLib: NSObject
 {
   NSMutableDictionary *cachedContents;
   int cachedMax;
