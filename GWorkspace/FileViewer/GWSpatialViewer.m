@@ -701,6 +701,7 @@
   [scroll setDocumentView: nodeView];	
   RELEASE (nodeView); 
   [nodeView resizeWithOldSuperviewSize: [nodeView bounds].size];
+  [self scrollToBeginning];
 }
 
 - (void)updateDefaults

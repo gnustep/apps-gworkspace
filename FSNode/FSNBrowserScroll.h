@@ -36,7 +36,8 @@
 }
 
 - (id)initWithFrame:(NSRect)frameRect
-           inColumn:(FSNBrowserColumn *)col;
+           inColumn:(FSNBrowserColumn *)col
+          acceptDnd:(BOOL)dnd;
 
 @end
 

@@ -657,21 +657,25 @@ static NSImage *branchImage;
     [[NSColor selectedControlColor] set];
     [highlightPath fill];
     
-    if ((icnPosition != NSImageOnly) && (nameEdited == NO)) {
-      NSFrameRect(labelRect);
-      NSRectFill(labelRect);  
-      [label drawWithFrame: labelRect inView: self];
+    if (icnPosition != NSImageOnly) {
+      if (nameEdited == NO) {
+        NSFrameRect(labelRect);
+        NSRectFill(labelRect);  
+        [label drawWithFrame: labelRect inView: self];
+      }
       
       if ((showType != FSNInfoNameType) && [[infolabel stringValue] length]) {
         [infolabel drawWithFrame: infoRect inView: self];
       }
     }
   } else {
-    if ((icnPosition != NSImageOnly) && (nameEdited == NO)) {
-      [[container backgroundColor] set];
-      NSFrameRect(labelRect);
-      NSRectFill(labelRect);
-      [label drawWithFrame: labelRect inView: self];
+    if (icnPosition != NSImageOnly) {
+      if (nameEdited == NO) {
+        [[container backgroundColor] set];
+        NSFrameRect(labelRect);
+        NSRectFill(labelRect);
+        [label drawWithFrame: labelRect inView: self];
+      }
       
       if ((showType != FSNInfoNameType) && [[infolabel stringValue] length]) {
         [infolabel drawWithFrame: infoRect inView: self];

@@ -86,7 +86,6 @@ static NSString *nibName = @"BrowserViewerPref";
     } else { 
       NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
       NSString *widthStr = [defaults objectForKey: @"browserColsWidth"];
-      BOOL entry;
       
       RETAIN (prefbox);
       RELEASE (win);
@@ -104,18 +103,8 @@ static NSString *nibName = @"BrowserViewerPref";
       resizer = [[Resizer alloc] initForController: self];
       [resizer setFrame: NSMakeRect(0, 0, RESIZER_W, RESIZER_W)];
 	    [(NSBox *)resizerBox setContentView: resizer]; 
-      
-      entry = [defaults boolForKey: @"browserCellsIcons"];
-      [cellIconButt setState: (entry ? NSOnState : NSOffState)];
-      
-      entry = [defaults boolForKey: @"viewersDontUsesShelf"];
-      [shelfButt setState: (entry ? NSOffState : NSOnState)];
-      
+            
       /* Internationalization */
-      [aspectBox setTitle: NSLocalizedString(@"Aspect", @"")];  
-      [cellIconButt setTitle: NSLocalizedString(@"Icons in Browser Cells", @"")];  
-      [shelfButt setTitle: NSLocalizedString(@"Uses Shelf", @"")];  
-      
       [controlsbox setTitle: NSLocalizedString(@"Columns Width", @"")];  
       [setButt setTitle: NSLocalizedString(@"Use Default Settings", @"")];  
     }
@@ -209,32 +198,6 @@ static NSString *nibName = @"BrowserViewerPref";
   [self setNewWidth: columnsWidth];
   [self tile];
   [setButt setEnabled: NO];
-}
-
-- (IBAction)setIcons:(id)sender
-{
-  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-
-  [defaults setBool: (([sender state] == NSOnState) ? YES : NO)
-             forKey: @"browserCellsIcons"];
-  [defaults synchronize]; 
-  
-	[[NSNotificationCenter defaultCenter]
- 				 postNotificationName: @"GWBrowserCellsIconsDidChangeNotification"
-	 								     object: nil];  
-}
-
-- (IBAction)setShelf:(id)sender
-{
-  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-
-  [defaults setBool: (([sender state] == NSOnState) ? NO : YES)
-             forKey: @"viewersDontUsesShelf"];
-  [defaults synchronize]; 
-  
-	[[NSNotificationCenter defaultCenter]
- 				 postNotificationName: @"GWViewersUseShelfDidChangeNotification"
-	 								     object: nil];  
 }
 
 @end

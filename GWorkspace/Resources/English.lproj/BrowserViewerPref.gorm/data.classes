@@ -1,16 +1,11 @@
 {
     BrowserViewerPref = {
 	Actions = (
-	    "setDefaultWidth:",
-	    "setIcons:",
-	    "setShelf:"
+	    "setDefaultWidth:"
 	);
 	Outlets = (
 	    win,
 	    prefbox,
-	    aspectBox,
-	    cellIconButt,
-	    shelfButt,
 	    controlsbox,
 	    colExample,
 	    resizerBox,
@@ -159,9 +154,7 @@
 	    "yank:",
 	    "zoom:",
 	    "initForController:",
-	    "setDefaultWidth:",
-	    "setIcons:",
-	    "setShelf:"
+	    "setDefaultWidth:"
 	);
 	Super = NSObject;
     };

@@ -49,10 +49,6 @@
   IBOutlet id win;
   IBOutlet id prefbox;
 
-  IBOutlet id aspectBox;
-  IBOutlet id cellIconButt;
-  IBOutlet id shelfButt;
-
   IBOutlet id controlsbox;
   IBOutlet id colExample;
   IBOutlet id resizerBox;
@@ -70,10 +66,6 @@
 - (void)setNewWidth:(int)w;
 
 - (IBAction)setDefaultWidth:(id)sender;
-
-- (IBAction)setIcons:(id)sender;
-
-- (IBAction)setShelf:(id)sender;
 
 @end
 

@@ -77,6 +77,10 @@
 
 - (void)setSelectableIconsRange:(NSRange)range;
 
+- (int)firstVisibleIcon;
+
+- (int)lastVisibleIcon;
+
 - (id)lastIcon;
 
 - (void)updateLastIcon;

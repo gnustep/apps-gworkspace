@@ -107,7 +107,8 @@ static id <DesktopApplication> desktopApp = nil;
     
     fsnodeRep = [FSNodeRep sharedInstance];
     
-    scroll = [[FSNBrowserScroll alloc] initWithFrame: rect inColumn: self];
+    scroll = [[FSNBrowserScroll alloc] initWithFrame: rect 
+                                    inColumn: self acceptDnd: cellsIcon];
     [self addSubview: scroll];
     RELEASE (scroll);
     

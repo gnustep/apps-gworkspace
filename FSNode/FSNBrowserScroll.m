@@ -35,6 +35,7 @@
 
 - (id)initWithFrame:(NSRect)frameRect
            inColumn:(FSNBrowserColumn *)col
+          acceptDnd:(BOOL)dnd
 {
   self = [super initWithFrame: frameRect];
 
@@ -43,10 +44,12 @@
     [self setHasHorizontalScroller: NO];
     [self setHasVerticalScroller: YES]; 
     column = col;
-    [self registerForDraggedTypes: [NSArray arrayWithObjects: 
+    if (dnd) {
+      [self registerForDraggedTypes: [NSArray arrayWithObjects: 
                                                 NSFilenamesPboardType, 
                                                 @"GWRemoteFilenamesPboardType", 
                                                 nil]];    
+    }
   }
   
   return self;

@@ -204,13 +204,14 @@
 
         if ([selection count]) {
           if ([nodeView isSingleNode]) {
-            NSString *base;
-            FSNode *basenode;
+            NSString *base = [selection objectAtIndex: 0];
+            FSNode *basenode = [FSNode nodeWithPath: base];
           
-            base = [selection objectAtIndex: 0];
-            base = [base stringByDeletingLastPathComponent];
-            basenode = [FSNode nodeWithPath: base];
-          
+            if (([basenode isDirectory] == NO) || [basenode isPackage]) {
+              base = [base stringByDeletingLastPathComponent];
+              basenode = [FSNode nodeWithPath: base];
+            }
+            
             [nodeView showContentsOfNode: basenode];
             [nodeView selectRepsOfPaths: selection];
           
@@ -778,20 +779,32 @@
 - (void)columnsWidthChanged:(NSNotification *)notification
 {
   NSRect r = [vwrwin frame];
-  
+  NSRange range;
+    
   RETAIN (nodeView);  
   [nodeView removeFromSuperviewWithoutNeedingDisplay];
   [nviewScroll setDocumentView: nil];	
-  
+
+  RETAIN (pathsView);  
+  [pathsView removeFromSuperviewWithoutNeedingDisplay];
+  [pathsScroll setDocumentView: nil];	  
+
   resizeIncrement = [(NSNumber *)[notification object] intValue];
   r.size.width = (visibleCols * resizeIncrement);
   [vwrwin setFrame: r display: YES];  
   [vwrwin setMinSize: NSMakeSize(resizeIncrement * 2, MIN_W_HEIGHT)];    
   [vwrwin setResizeIncrements: NSMakeSize(resizeIncrement, 1)];
 
+  [pathsScroll setDocumentView: pathsView];	
+  RELEASE (pathsView); 
+  range = NSMakeRange([pathsView firstVisibleIcon], [pathsView lastVisibleIcon]);
+  [pathsView setSelectableIconsRange: range];
+
   [nviewScroll setDocumentView: nodeView];	
   RELEASE (nodeView); 
   [nodeView resizeWithOldSuperviewSize: [nodeView bounds].size];
+
+  [self windowDidResize: nil];
 }
 
 - (void)updateDefaults
@@ -842,6 +855,9 @@
 
     defEntry = [nodeView selectedPaths];
     if (defEntry) {
+      if ([defEntry count] == 0) {
+        defEntry = [NSArray arrayWithObject: [[nodeView shownNode] path]];
+      }
       [updatedprefs setObject: defEntry forKey: @"lastselection"];
     }
     

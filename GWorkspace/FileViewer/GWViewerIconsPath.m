@@ -236,6 +236,16 @@
   
   [self tile];
 }
+
+- (int)firstVisibleIcon
+{
+  return firstVisibleIcon;
+}
+
+- (int)lastVisibleIcon
+{
+  return lastVisibleIcon;
+}
                          
 - (id)lastIcon
 {

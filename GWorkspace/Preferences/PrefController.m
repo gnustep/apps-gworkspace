@@ -30,6 +30,7 @@
 #include "DefSortOrderPref.h"
 #include "IconsPref.h"
 #include "HiddenFilesPref.h"
+#include "BrowserViewerPref.h"
 #include "GWorkspace.h"
 #include "GNUstep.h"
 
@@ -78,6 +79,7 @@ RELEASE (currentPref)
 
   ADD_PREF_VIEW ([DefEditorPref class]);
   ADD_PREF_VIEW ([XTermPref class]);
+  ADD_PREF_VIEW ([BrowserViewerPref class]);
   ADD_PREF_VIEW ([DefSortOrderPref class]);		
   ADD_PREF_VIEW ([IconsPref class]);
   ADD_PREF_VIEW ([HiddenFilesPref class]);
