@@ -41,6 +41,7 @@
   NSString *infoPath;
   NSMutableArray *icons;
   FSNInfoType infoType;
+  NSString *extInfoType;
   
   NSImage *verticalImage;
   NSImage *horizontalImage;

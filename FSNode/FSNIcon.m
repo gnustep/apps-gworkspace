@@ -45,6 +45,7 @@ static NSImage *branchImage;
 	TEST_RELEASE (hostname);
   TEST_RELEASE (selection);
   TEST_RELEASE (selectionTitle);
+  TEST_RELEASE (extInfoType);
   RELEASE (icon);
   RELEASE (highlightPath);
   RELEASE (label);
@@ -78,6 +79,7 @@ static NSImage *branchImage;
 
 - (id)initForNode:(FSNode *)anode
      nodeInfoType:(FSNInfoType)type
+     extendedType: (NSString *)exttype
          iconSize:(int)isize
      iconPosition:(unsigned int)ipos
         labelFont:(NSFont *)lfont
@@ -130,8 +132,15 @@ static NSImage *branchImage;
     
     label = [FSNTextCell new];
     [label setFont: lfont];
-
-    [self setNodeInfoShowType: type];
+    
+    if ((type == FSNInfoExtendedType) && (exttype != nil)) {
+      [self setExtendedShowType: exttype];  
+    } else {
+      if (type == FSNInfoExtendedType) {
+        type = FSNInfoNameType;
+      }
+      [self setNodeInfoShowType: type];  
+    }
     
     labelRect = NSZeroRect;
     labelRect.size.width = [label uncuttedTitleLenght] + [FSNodeRep labelMargin];
@@ -529,7 +538,12 @@ static NSImage *branchImage;
     ASSIGN (hostname, hname);
   } 
 
-  [self setNodeInfoShowType: showType];  
+  if ((showType == FSNInfoExtendedType) && (extInfoType != nil)) {
+    [self setExtendedShowType: extInfoType];  
+  } else {
+    [self setNodeInfoShowType: showType];  
+  }
+  
   [self setLocked: [node isLocked]];
   [self tile];
 }
@@ -631,6 +645,7 @@ static NSImage *branchImage;
 - (void)setNodeInfoShowType:(FSNInfoType)type
 {
   showType = type;
+  DESTROY (extInfoType);
 
   if (selection) {
     [label setStringValue: selectionTitle];
@@ -658,6 +673,46 @@ static NSImage *branchImage;
   /*    
     case FSNInfoExtendedType:      
       {  
+        NSString *str = [FSNodeRep 
+        
+        
+        + (NSArray *)availableExtendedInfoNames
+        
+        // RITORNARE SOLO I NOMI DA METTERE NEL MENU (TUTTI I NOMI)
+        // I NOMI VENGONO DALLA DESCRIZIONE DEI BUNDLE CHE SONO PRESENTI.
+        // MA LA COSA SI APPLICA SOLO AI NODES DOVE HA SENSO
+        // (IN QUESTO CASO LA LABEL E' IN CORSIVO)
+        // ALTRIMENTI NON FA NESSUN EFFETTO
+        // E L'ICONA CONTINUA AD USARE IL current showType
+        // NON POSSIAMO PENSARE CHE IN UNA DIRECTORY
+        // CI SIANO SOLO OGGETTI DI UN SOLO TIPO!!!!!
+
+        + (NSDictionary *)extendedInfoOfType:(NSString *)type
+                                     forNode:(FSNode *)anode
+
+        // NON SI DEVE RITORNARE TUTTA LA INFO
+        // MA SOLO DELLE SPECIE DI KEYS
+        // PERCHE' PUO' ESSERE TROPPA ROBA
+        // (RIGUARDO ALLA ROBA, NON FARE L'ERRORE DI PENSARE AI CONTENTS)
+        // MA, FORSE, CI PUO' ESSERE, AD ESEMPIO, UNA NSView PER
+        // VEDERLI. 
+        
+        // USARE NOMI DI selector ???? NSInvocation ????
+        // USARE NOMI DI selector ???? NSInvocation ????
+        // USARE NOMI DI selector ???? NSInvocation ????
+        // USARE NOMI DI selector ???? NSInvocation ????
+        
+        // USARE IL SUBMENU O NO ????????????????
+                
+        
+        @protocol ExtendedInfo
+
+          - (NSString *)menuName;
+
+          - (NSDictionary *)extendedInfoForNode:(FSNode *)anode;
+
+        @end
+
 
       }
       break;
@@ -668,6 +723,21 @@ static NSImage *branchImage;
       [label setStringValue: [node name]];
       break;
   }
+}
+
+- (void)setExtendedShowType:(NSString *)type
+{
+  if (selection == nil) {
+    NSDictionary *info = [FSNodeRep extendedInfoOfType: type forNode: node];
+
+    if (info) {
+      NSString *labelstr = [info objectForKey: @"labelstr"];
+    
+      [label setStringValue: labelstr]; 
+      showType = FSNInfoExtendedType;   
+      ASSIGN (extInfoType, type);
+    }
+  } 
 }
 
 - (FSNInfoType)nodeInfoShowType

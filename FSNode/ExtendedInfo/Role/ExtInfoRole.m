@@ -40,7 +40,11 @@
 
 - (NSDictionary *)extendedInfoForNode:(FSNode *)anode
 {
-  return [NSDictionary dictionary];
+  NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+
+  [dict setObject: @"TEST" forKey: @"labelstr"];
+  
+  return dict;
 }
 
 @end

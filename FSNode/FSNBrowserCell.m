@@ -44,6 +44,7 @@ static NSDictionary *fontAttr = nil;
   TEST_RELEASE (selection);
   TEST_RELEASE (selectionTitle);
   TEST_RELEASE (uncuttedTitle);
+  TEST_RELEASE (extInfoType);
   TEST_RELEASE (icon); 
   TEST_RELEASE (openicon); 
   TEST_RELEASE (highlightPath);
@@ -85,6 +86,7 @@ static NSDictionary *fontAttr = nil;
     node = nil;
     selection = nil;
     selectionTitle = nil;
+    extInfoType = nil;
     icon = nil;
     icnsize = DEFAULT_ISIZE;
     highlightPath = nil;
@@ -299,7 +301,13 @@ static NSDictionary *fontAttr = nil;
   if (icon) {
     [self setIcon];
   }
-  [self setNodeInfoShowType: showType];  
+  
+  if ((showType == FSNInfoExtendedType) && (extInfoType != nil)) {
+    [self setExtendedShowType: extInfoType];  
+  } else {
+    [self setNodeInfoShowType: showType];  
+  }
+  
   [self setLocked: [node isLocked]];
 }
 
@@ -381,7 +389,8 @@ static NSDictionary *fontAttr = nil;
 - (void)setNodeInfoShowType:(FSNInfoType)type
 {
   showType = type;
-
+  DESTROY (extInfoType);
+  
   if (selection) {
     [self setStringValue: selectionTitle];
     return;
@@ -403,22 +412,25 @@ static NSDictionary *fontAttr = nil;
     case FSNInfoOwnerType:
       [self setStringValue: [node owner]];
       break;
-      
-  /*    
-    case FSNInfoExtendedType:      
-      {  
-        NSString *str = [FSNodeRep 
-        
-        
-      }
-      break;
-  */      
-      
-      
     default:
       [self setStringValue: [node name]];
       break;
   }
+}
+
+- (void)setExtendedShowType:(NSString *)type
+{
+  if (selection == nil) {
+    NSDictionary *info = [FSNodeRep extendedInfoOfType: type forNode: node];
+
+    if (info) {
+      NSString *labelstr = [info objectForKey: @"labelstr"];
+    
+      showType = FSNInfoExtendedType;   
+      ASSIGN (extInfoType, type);
+      [self setStringValue: labelstr]; 
+    }
+  } 
 }
 
 - (FSNInfoType)nodeInfoShowType

@@ -68,6 +68,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
 {
   TEST_RELEASE (node);
   TEST_RELEASE (infoPath);
+  TEST_RELEASE (extInfoType);
   RELEASE (icons);
   RELEASE (labelFont);
   RELEASE (nameEditor);
@@ -123,6 +124,23 @@ if (rct.size.height < 0) rct.size.height = 0; \
         
     defentry = [defaults objectForKey: @"fsn_info_type"];
     infoType = defentry ? [defentry intValue] : FSNInfoNameType;
+    extInfoType = nil;
+    
+    if (infoType == FSNInfoExtendedType) {
+      defentry = [defaults objectForKey: @"extended_info_type"];
+
+      if (defentry) {
+        NSArray *availableTypes = [FSNodeRep availableExtendedInfoNames];
+      
+        if ([availableTypes containsObject: defentry]) {
+          ASSIGN (extInfoType, defentry);
+        }
+      }
+      
+      if (extInfoType == nil) {
+        infoType = FSNInfoNameType;
+      }
+    }
 
     [FSNodeRep setUseThumbnails: [defaults boolForKey: @"use_thumbnails"]];
     
@@ -196,6 +214,23 @@ if (rct.size.height < 0) rct.size.height = 0; \
 
       entry = [nodeInfo objectForKey: @"fsn_info_type"];
       infoType = entry ? [entry intValue] : infoType;
+
+      if (infoType == FSNInfoExtendedType) {
+        DESTROY (extInfoType);
+        entry = [nodeInfo objectForKey: @"ext_info_type"];
+
+        if (entry) {
+          NSArray *availableTypes = [FSNodeRep availableExtendedInfoNames];
+
+          if ([availableTypes containsObject: entry]) {
+            ASSIGN (extInfoType, entry);
+          }
+        }
+
+        if (extInfoType == nil) {
+          infoType = FSNInfoNameType;
+        }
+      }
     
       return nodeInfo;
     }
@@ -231,6 +266,10 @@ if (rct.size.height < 0) rct.size.height = 0; \
     [nodeInfo setObject: [NSNumber numberWithInt: infoType] 
                  forKey: @"fsn_info_type"];
 
+    if (infoType == FSNInfoExtendedType) {
+      [nodeInfo setObject: extInfoType forKey: @"ext_info_type"];
+    }
+    
     [nodeInfo writeToFile: infoPath atomically: YES];
   }
 }
@@ -891,6 +930,7 @@ pp.x = NSMaxX([self bounds]) - 1
     FSNode *subnode = [subNodes objectAtIndex: i];
     FSNIcon *icon = [[FSNIcon alloc] initForNode: subnode
                                     nodeInfoType: infoType
+                                    extendedType: extInfoType
                                         iconSize: iconSize
                                     iconPosition: iconPosition
                                        labelFont: labelFont
@@ -1015,6 +1055,7 @@ pp.x = NSMaxX([self bounds]) - 1
     int i;
     
     infoType = type;
+    DESTROY (extInfoType);
     
     for (i = 0; i < [icons count]; i++) {
       FSNIcon *icon = [icons objectAtIndex: i];
@@ -1023,6 +1064,7 @@ pp.x = NSMaxX([self bounds]) - 1
       [icon tile];
     }
     
+    [self sortIcons];
     [self updateNameEditor];
     [self tile];
   }
@@ -1030,6 +1072,23 @@ pp.x = NSMaxX([self bounds]) - 1
 
 - (void)setExtendedShowType:(NSString *)type
 {
+  if ((extInfoType == nil) || ([extInfoType isEqual: type] == NO)) {
+    int i;
+    
+    infoType = FSNInfoExtendedType;
+    ASSIGN (extInfoType, type);
+
+    for (i = 0; i < [icons count]; i++) {
+      FSNIcon *icon = [icons objectAtIndex: i];
+      
+      [icon setExtendedShowType: extInfoType];
+      [icon tile];
+    }
+    
+    [self sortIcons];
+    [self updateNameEditor];
+    [self tile];
+  }
 }
 
 - (FSNInfoType)showType
@@ -1145,6 +1204,7 @@ pp.x = NSMaxX([self bounds]) - 1
 {
   FSNIcon *icon = [[FSNIcon alloc] initForNode: anode
                                   nodeInfoType: infoType
+                                  extendedType: extInfoType
                                       iconSize: iconSize
                                   iconPosition: iconPosition
                                      labelFont: labelFont
@@ -1671,6 +1731,13 @@ pp.x = NSMaxX([self bounds]) - 1
       case FSNInfoOwnerType:
         nodeDescr = [iconnode owner];
         break;
+      case FSNInfoExtendedType:
+        {
+          NSDictionary *info = [FSNodeRep extendedInfoOfType: extInfoType 
+                                                     forNode: iconnode];
+          nodeDescr = [info objectForKey: @"labelstr"];
+          break;
+        }
       default:
         nodeDescr = [iconnode name];
         break;

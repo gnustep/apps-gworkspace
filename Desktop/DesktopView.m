@@ -199,6 +199,23 @@
 
       entry = [nodeInfo objectForKey: @"fsn_info_type"];
       infoType = entry ? [entry intValue] : infoType;
+
+      if (infoType == FSNInfoExtendedType) {
+        DESTROY (extInfoType);
+        entry = [nodeInfo objectForKey: @"ext_info_type"];
+
+        if (entry) {
+          NSArray *availableTypes = [FSNodeRep availableExtendedInfoNames];
+
+          if ([availableTypes containsObject: entry]) {
+            ASSIGN (extInfoType, entry);
+          }
+        }
+
+        if (extInfoType == nil) {
+          infoType = FSNInfoNameType;
+        }
+      }
       
       return nodeInfo;
     }
@@ -245,6 +262,10 @@
 
     [nodeInfo setObject: [NSNumber numberWithInt: infoType] 
                  forKey: @"fsn_info_type"];
+
+    if (infoType == FSNInfoExtendedType) {
+      [nodeInfo setObject: extInfoType forKey: @"ext_info_type"];
+    }
     
     for (i = 0; i < [icons count]; i++) {
       FSNIcon *icon = [icons objectAtIndex: i];
@@ -857,6 +878,7 @@
     FSNode *subnode = [subNodes objectAtIndex: i];
     FSNIcon *icon = [[FSNIcon alloc] initForNode: subnode
                                     nodeInfoType: infoType
+                                    extendedType: extInfoType
                                         iconSize: iconSize
                                     iconPosition: iconPosition
                                        labelFont: labelFont

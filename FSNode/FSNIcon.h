@@ -42,6 +42,7 @@
   NSString *hostname;
   NSArray *selection;
   NSString *selectionTitle;
+  NSString *extInfoType;
   
   NSImage *icon;
   int iconSize;
@@ -80,6 +81,7 @@
 
 - (id)initForNode:(FSNode *)anode
      nodeInfoType:(FSNInfoType)type
+     extendedType: (NSString *)exttype
          iconSize:(int)isize
      iconPosition:(unsigned int)ipos
         labelFont:(NSFont *)lfont

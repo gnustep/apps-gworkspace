@@ -123,6 +123,7 @@
                                  parent: ((i == 0) ? nil : node)];
     icon = [[FSNIcon alloc] initForNode: node
                            nodeInfoType: FSNInfoNameType
+                           extendedType: nil
                                iconSize: ICN_SIZE
                            iconPosition: NSImageLeft
                               labelFont: [NSFont systemFontOfSize: 12]

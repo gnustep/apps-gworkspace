@@ -41,6 +41,7 @@ typedef NSString *(*cutIMP)(id, SEL, id, float);
   NSArray *selection;
   NSString *selectionTitle; 
   NSString *uncuttedTitle; 
+  NSString *extInfoType;
   
   NSImage *icon;
   NSImage *openicon;
