@@ -70,7 +70,7 @@
 
 - (void)openSelectionInNewViewer:(BOOL)newv
 {
-  [manager openSelectionInViewer: viewer closeSender: newv];
+  [viewer openSelectionInNewViewer: newv];
 }
 
 - (void)mouseDown:(NSEvent *)theEvent

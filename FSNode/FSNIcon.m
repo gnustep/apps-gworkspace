@@ -469,6 +469,7 @@ static NSImage *branchImage;
 
           if ([nextEvent type] == NSLeftMouseUp) {
             [[self window] postEvent: nextEvent atStart: NO];
+            [container repSelected: self];
             break;
 
           } else if ([nextEvent type] == NSLeftMouseDragged) {

@@ -1425,6 +1425,10 @@ pp.x = NSMaxX([self bounds]) - 1
   }
 }
 
+- (void)repSelected:(id)arep
+{
+}
+
 - (void)unselectOtherReps:(id)arep
 {
   int i;
@@ -1634,6 +1638,10 @@ pp.x = NSMaxX([self bounds]) - 1
   if (lastSelection) {
     [self selectRepsOfPaths: lastSelection];
   }
+}
+
+- (void)setLastShownNode:(FSNode *)anode
+{
 }
 
 - (BOOL)involvedByFileOperation:(NSDictionary *)opinfo

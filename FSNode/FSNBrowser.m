@@ -1625,6 +1625,10 @@
   }  
 }
 
+- (void)repSelected:(id)arep
+{
+}
+
 - (void)unselectOtherReps:(id)arep
 {
   FSNBrowserColumn *bc = [self lastLoadedColumn];
@@ -1785,6 +1789,34 @@
 {
   if (lastSelection) {
     [self selectRepsOfPaths: lastSelection];
+  }
+}
+
+- (void)setLastShownNode:(FSNode *)anode
+{
+  FSNBrowserColumn *bc = [self columnWithNode: anode];
+
+  if (bc) {
+    FSNBrowserColumn *prev = [self columnBeforeColumn: bc];
+
+    updateViewsLock++;
+        
+    if (prev) {
+      if ([prev selectCellOfNode: anode sendAction: YES] == nil) {
+        [self setLastColumn: [prev index]];
+        [self notifySelectionChange: [NSArray arrayWithObject: [[prev shownNode] path]]];
+      }
+    } else {
+      [self setLastColumn: 0];
+      [bc unselectAllCells];
+      [self notifySelectionChange: [NSArray arrayWithObject: [baseNode path]]];
+      
+    
+          // FIRST RESPONDER ???????????
+    }
+    
+    updateViewsLock--;
+    [self tile];    
   }
 }
 

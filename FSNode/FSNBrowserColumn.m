@@ -784,6 +784,13 @@ static id <DesktopApplication> desktopApp = nil;
   }
 }
 
+- (void)unselectAllCells
+{
+  if (matrix) {
+    [matrix deselectAllCells];
+  }
+}
+
 - (void)checkLockedReps
 {
   NSArray *cells = [matrix cells];

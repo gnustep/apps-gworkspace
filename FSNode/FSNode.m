@@ -36,6 +36,7 @@
   TEST_RELEASE (path);
   TEST_RELEASE (relativePath);  
   TEST_RELEASE (name);  
+  TEST_RELEASE (attributes);  
   TEST_RELEASE (fileType);
   TEST_RELEASE (typeDescription);
   TEST_RELEASE (crDate);
@@ -63,8 +64,6 @@
   self = [super init];
     
   if (self) {
-    NSDictionary *attributes;
-        
     fm = [NSFileManager defaultManager];
     ws = [NSWorkspace sharedWorkspace];
     
@@ -84,71 +83,38 @@
       ASSIGN (path, relativePath);
     }
         
-    flags.readable = [fm isReadableFileAtPath: path];
-    flags.writable = [fm isWritableFileAtPath: path];
-    flags.executable = [fm isExecutableFileAtPath: path];
-    flags.deletable = [fm isDeletableFileAtPath: path];
-    flags.plain = NO;
-    flags.directory = NO;
-    flags.link = NO;
-    flags.socket = NO;
-    flags.charspecial = NO;
-    flags.blockspecial = NO;
-    flags.mountpoint = NO;
-    flags.application = NO;
-    flags.package = NO;
-    flags.unknown = NO;
-    
+    flags.readable = -1;
+    flags.writable = -1;
+    flags.executable = -1;
+    flags.deletable = -1;
+    flags.plain = -1;
+    flags.directory = -1;
+    flags.link = -1;
+    flags.socket = -1;
+    flags.charspecial = -1;
+    flags.blockspecial = -1;
+    flags.mountpoint = -1;
+    flags.application = -1;
+    flags.package = -1;
+    flags.unknown = -1;
+
+    crDate = nil;
+    modDate = nil;
+    owner = nil;
+    ownerId = nil;
+    group = nil;
+    groupId = nil;
+
     filesize = 0;
     permissions = 0;
+    
+    fileType = nil;    
+    typeDescription = nil;
                                       
     attributes = [fm fileAttributesAtPath: path traverseLink: NO];
                                               
     if (attributes) {
-      ASSIGN (fileType, [attributes fileType]);
-      
-      if (fileType == NSFileTypeRegular) {
-        flags.plain = YES;
-
-      } else if (fileType == NSFileTypeDirectory) {
-	      NSString *defApp, *type;
-
-	      [ws getInfoForFile: path application: &defApp type: &type]; 
-        
-        flags.directory = YES;
-
-	      if (type == NSApplicationFileType) {
-          flags.application = YES;
-          flags.package = YES;
-	      } else if (type == NSPlainFileType) {
-          flags.package = YES;
-        } else if (type == NSFilesystemFileType) {
-          flags.mountpoint = YES;
-        } 
-
-      } else if (fileType == NSFileTypeSymbolicLink) {
-        flags.link = YES;
-      } else if (fileType == NSFileTypeSocket) {
-        flags.socket = YES;
-      } else if (fileType == NSFileTypeCharacterSpecial) {
-        flags.charspecial = YES;
-      } else if (fileType == NSFileTypeBlockSpecial) {
-        flags.blockspecial = YES;
-      } else {
-        flags.unknown = YES;
-      } 
-      
-      typeDescription = nil;
-      
-      filesize = [attributes fileSize];
-      permissions = [attributes filePosixPermissions];
-      
-      ASSIGN (crDate, [attributes fileCreationDate]);
-      ASSIGN (modDate, [attributes fileModificationDate]);
-      ASSIGN (owner, [attributes fileOwnerAccountName]);
-      ASSIGN (ownerId, [attributes objectForKey: NSFileOwnerAccountID]);
-      ASSIGN (group, [attributes fileGroupOwnerAccountName]);
-      ASSIGN (groupId, [attributes objectForKey: NSFileGroupOwnerAccountID]);
+      RETAIN (attributes);
     }
   }
     
@@ -379,31 +345,87 @@
 
 - (NSString *)fileType
 {
+  if (attributes && (fileType == nil)) {
+    ASSIGN (fileType, [attributes fileType]);
+  }
   return (fileType ? fileType : [NSString string]);
+}
+
+- (void)setTypeFlags
+{  
+  flags.plain = 0;
+  flags.directory = 0;
+  flags.link = 0;
+  flags.socket = 0;
+  flags.charspecial = 0;
+  flags.blockspecial = 0;
+  flags.mountpoint = 0;
+  flags.application = 0;
+  flags.package = 0;
+  flags.unknown = 0;
+
+  if (fileType == nil) {
+    [self fileType];
+  }
+  
+  if (fileType) {
+    if (fileType == NSFileTypeRegular) {
+      flags.plain = 1;
+
+    } else if (fileType == NSFileTypeDirectory) {
+	    NSString *defApp, *type;
+
+	    [ws getInfoForFile: path application: &defApp type: &type]; 
+
+      flags.directory = 1;
+
+	    if (type == NSApplicationFileType) {
+        flags.application = 1;
+        flags.package = 1;
+	    } else if (type == NSPlainFileType) {
+        flags.package = 1;
+      } else if (type == NSFilesystemFileType) {
+        flags.mountpoint = 1;
+      } 
+
+    } else if (fileType == NSFileTypeSymbolicLink) {
+      flags.link = 1;
+    } else if (fileType == NSFileTypeSocket) {
+      flags.socket = 1;
+    } else if (fileType == NSFileTypeCharacterSpecial) {
+      flags.charspecial = 1;
+    } else if (fileType == NSFileTypeBlockSpecial) {
+      flags.blockspecial = 1;
+    } else {
+      flags.unknown = 1;
+    } 
+  } else {
+    flags.unknown = 1;
+  }
 }
 
 - (NSString *)typeDescription
 {
   if (typeDescription == nil) {
-    if (flags.plain) {
+    if ([self isPlain]) {
       ASSIGN (typeDescription, NSLocalizedString(@"plain file", @""));
-    } else if (flags.directory) {
-      if (flags.application) {
+    } else if ([self isDirectory]) {
+      if ([self isApplication]) {
         ASSIGN (typeDescription, NSLocalizedString(@"application", @""));
-      } else if (flags.package) {
+      } else if ([self isPackage]) {
         ASSIGN (typeDescription, NSLocalizedString(@"plain file", @""));
-      } else if (flags.mountpoint) {
+      } else if ([self isMountPoint]) {
         ASSIGN (typeDescription, NSLocalizedString(@"mount point", @""));
       } else {
         ASSIGN (typeDescription, NSLocalizedString(@"directory", @""));
       }
-    } else if (flags.link) {
+    } else if ([self isLink]) {
       ASSIGN (typeDescription, NSLocalizedString(@"symbolic link", @""));
-    } else if (flags.socket) {
+    } else if ([self isSocket]) {
       ASSIGN (typeDescription, NSLocalizedString(@"socket", @""));
-    } else if (flags.charspecial) {
+    } else if ([self isCharspecial]) {
       ASSIGN (typeDescription, NSLocalizedString(@"character special", @""));
-    } else if (flags.blockspecial) {
+    } else if ([self isBlockspecial]) {
       ASSIGN (typeDescription, NSLocalizedString(@"block special", @""));
     } else {
       ASSIGN (typeDescription, NSLocalizedString(@"unknown", @""));
@@ -415,14 +437,19 @@
 
 - (NSDate *)creationDate
 {
+  if (attributes && (crDate == nil)) {
+    ASSIGN (crDate, [attributes fileCreationDate]);
+  }
   return (crDate ? crDate : [NSDate date]);
 }
 
 - (NSString *)crDateDescription
 {
-  if (crDate) {
+  NSDate *date = [self creationDate];
+  
+  if (date) {
     if (crDateDescription == nil) {
-      NSString *descr = [crDate descriptionWithCalendarFormat: @"%b %d %Y" 
+      NSString *descr = [date descriptionWithCalendarFormat: @"%b %d %Y" 
                             timeZone: [NSTimeZone localTimeZone] locale: nil];
 
       ASSIGN (crDateDescription, descr);   
@@ -436,14 +463,19 @@
 
 - (NSDate *)modificationDate
 {
+  if (attributes && (modDate == nil)) {
+    ASSIGN (modDate, [attributes fileModificationDate]);
+  }
   return (modDate ? modDate : [NSDate date]);
 }
 
 - (NSString *)modDateDescription
 {
-  if (modDate) {
+  NSDate *date = [self modificationDate];
+
+  if (date) {
     if (modDateDescription == nil) {
-      NSString *descr = [crDate descriptionWithCalendarFormat: @"%b %d %Y" 
+      NSString *descr = [date descriptionWithCalendarFormat: @"%b %d %Y" 
                             timeZone: [NSTimeZone localTimeZone] locale: nil];
       ASSIGN (modDateDescription, descr);   
     }
@@ -455,6 +487,9 @@
 
 - (unsigned long long)fileSize
 {
+  if ((filesize == 0) && attributes) {
+    filesize = [attributes fileSize];
+  }
   return filesize;
 }
 
@@ -494,46 +529,97 @@
 
 - (NSString *)owner
 {
+  if (attributes && (owner == nil)) {
+    ASSIGN (owner, [attributes fileOwnerAccountName]);
+  }
   return (owner ? owner : [NSString string]);
 }
 
 - (NSNumber *)ownerId
 {
+  if (attributes && (ownerId == nil)) {
+    ASSIGN (ownerId, [attributes objectForKey: NSFileOwnerAccountID]);
+  }
   return (ownerId ? ownerId : [NSNumber numberWithInt: 0]);
 }
 
 - (NSString *)group
 {
+  if (attributes && (group == nil)) {
+    ASSIGN (group, [attributes fileGroupOwnerAccountName]);
+  }
   return (group ? group : [NSString string]);
 }
 
 - (NSNumber *)groupId
 {
+  if (attributes && (groupId == nil)) {
+    ASSIGN (groupId, [attributes objectForKey: NSFileGroupOwnerAccountID]);
+  }
   return (groupId ? groupId : [NSNumber numberWithInt: 0]);
 }
 
 - (unsigned long)permissions
 {
+  if ((permissions == 0) && attributes) {
+    permissions = [attributes filePosixPermissions];
+  }
   return permissions;
 }
 
 - (BOOL)isPlain 
 {
+  if (flags.plain == -1) {
+    [self setTypeFlags];
+  }
   return flags.plain;
 }
 
 - (BOOL)isDirectory 
 {
+  if (flags.directory == -1) {
+    [self setTypeFlags];
+  }
   return flags.directory;
 }
 
 - (BOOL)isLink 
 {
+  if (flags.link == -1) {
+    [self setTypeFlags];
+  }
   return flags.link;
+}
+
+- (BOOL)isSocket
+{
+  if (flags.socket == -1) {
+    [self setTypeFlags];
+  }
+  return flags.socket;
+}
+
+- (BOOL)isCharspecial
+{
+  if (flags.charspecial == -1) {
+    [self setTypeFlags];
+  }
+  return flags.charspecial;
+}
+
+- (BOOL)isBlockspecial
+{
+  if (flags.blockspecial == -1) {
+    [self setTypeFlags];
+  }
+  return flags.blockspecial;
 }
 
 - (BOOL)isMountPoint
 {
+  if (flags.mountpoint == -1) {
+    [self setTypeFlags];
+  }
   return flags.mountpoint;
 }
 
@@ -544,31 +630,49 @@
 
 - (BOOL)isApplication 
 {
+  if (flags.application == -1) {
+    [self setTypeFlags];
+  }
   return flags.application;
 }
 
 - (BOOL)isPackage
 {
+  if (flags.package == -1) {
+    [self setTypeFlags];
+  }
   return flags.package;
 }
 
 - (BOOL)isReadable 
 {
+  if (flags.readable == -1) {
+    flags.readable = [fm isReadableFileAtPath: path];
+  }
   return flags.readable;
 }
 
 - (BOOL)isWritable 
 {
+  if (flags.writable == -1) {
+    flags.writable = [fm isWritableFileAtPath: path];
+  }
   return flags.writable;
 }
 
 - (BOOL)isExecutable
 {
+  if (flags.executable == -1) {
+    flags.executable = [fm isExecutableFileAtPath: path];
+  }
   return flags.executable;
 }
 
 - (BOOL)isDeletable
 {
+  if (flags.deletable == -1) {
+    flags.deletable = [fm isDeletableFileAtPath: path];
+  }
   return flags.deletable;
 }
 
@@ -625,10 +729,10 @@
 
         if ([path isEqual: fpath]) {
           NSString *srcpath = [source stringByAppendingPathComponent: fname];
-          NSDictionary *attributes = [fm fileAttributesAtPath: srcpath 
-                                                 traverseLink: NO];
-          if ((attributes == nil) 
-                      || ([[attributes fileType] isEqual: fileType] == NO)) {
+          NSDictionary *attrs = [fm fileAttributesAtPath: srcpath 
+                                            traverseLink: NO];
+          if ((attrs == nil) 
+                      || ([[attrs fileType] isEqual: [self fileType]] == NO)) {
             return NO;
           }
 
@@ -639,10 +743,10 @@
           srcpath = [srcpath stringByAppendingPathComponent: ppart];
 
           if ([fm fileExistsAtPath: srcpath]) {
-            NSDictionary *attributes = [fm fileAttributesAtPath: srcpath  
-                                                   traverseLink: NO];
-            if ((attributes == nil) 
-                        || ([[attributes fileType] isEqual: fileType] == NO)) {
+            NSDictionary *attrs = [fm fileAttributesAtPath: srcpath  
+                                              traverseLink: NO];
+            if ((attrs == nil) 
+                        || ([[attrs fileType] isEqual: [self fileType]] == NO)) {
               return NO;
             }
           } else {

@@ -48,15 +48,23 @@
   int lastVisibleIcon;	
   int shift;  
   NSSize gridSize;
-
+  
+  BOOL ownScroller;
+  
   NSColor *backColor;
   NSColor *textColor;
   NSColor *disabledTextColor;
+  
+  id viewer;
 }
 
 - (id)initWithFrame:(NSRect)frameRect
-       visibleIcons:(int)vicns;
-     
+       visibleIcons:(int)vicns
+          forViewer:(id)vwr
+       ownsScroller:(BOOL)ownscr;
+
+- (void)setOwnsScroller:(BOOL)ownscr;
+
 - (void)showPathComponents:(NSArray *)components
                  selection:(NSArray *)selection;
 
@@ -88,6 +96,7 @@
 - (void)removeRepOfSubnodePath:(NSString *)apath;
 - (void)removeRep:(id)arep;
 
+- (void)repSelected:(id)arep;
 - (void)unselectOtherReps:(id)arep;
 - (NSArray *)reps;
 - (NSArray *)selectedReps;

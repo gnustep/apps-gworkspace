@@ -27,6 +27,7 @@
 #include "FSNIcon.h"
 #include "FSNFunctions.h"
 #include "GWViewerIconsPath.h"
+#include "GWViewer.h"
 
 #define DEF_ICN_SIZE 48
 #define DEF_TEXT_SIZE 12
@@ -53,6 +54,8 @@
 
 - (id)initWithFrame:(NSRect)frameRect
        visibleIcons:(int)vicns
+          forViewer:(id)vwr
+       ownsScroller:(BOOL)ownscr
 {
   self = [super initWithFrame: frameRect]; 
   
@@ -61,6 +64,9 @@
     id defentry;
     
     visibleIcons = vicns;
+    viewer = vwr;
+    ownScroller = ownscr;
+    
     firstVisibleIcon = 0;
     lastVisibleIcon = visibleIcons - 1;
     shift = 0;
@@ -131,6 +137,12 @@
   }
   
   return self;
+}
+
+- (void)setOwnsScroller:(BOOL)ownscr
+{
+  ownScroller = ownscr;
+  [self tile];
 }
 
 - (void)showPathComponents:(NSArray *)components
@@ -276,16 +288,18 @@
   }
   
   posx += (shift * gridSize.width);
+  
+  if (ownScroller) {
+    if (posx != fr.size.width) {
+      [self setFrame: NSMakeRect(fr.origin.x, fr.origin.y, posx, fr.size.height)];
+    }
 
-  if (posx != fr.size.width) {
-//    [self setFrame: NSMakeRect(fr.origin.x, fr.origin.y, posx, fr.size.height)];
+    if (count && (firstVisibleIcon < count)) {    
+		  FSNIcon *icon = [icons objectAtIndex: firstVisibleIcon];
+      [clip scrollToPoint: NSMakePoint([icon frame].origin.x, y)];
+    }    
   }
-
-  if (count && (firstVisibleIcon < count)) {    
-		FSNIcon *icon = [icons objectAtIndex: firstVisibleIcon];
-//    [clip scrollToPoint: NSMakePoint([icon frame].origin.x, y)];
-  }    
-
+  
   [self setNeedsDisplay: YES];
 }
 
@@ -379,6 +393,13 @@
 //  }
   [arep removeFromSuperviewWithoutNeedingDisplay];
   [icons removeObject: arep];
+}
+
+- (void)repSelected:(id)arep
+{
+  if ([arep isShowingSelection] == NO) {
+    [viewer pathsViewDidSelectIcon: arep];
+  }
 }
 
 - (void)unselectOtherReps:(id)arep

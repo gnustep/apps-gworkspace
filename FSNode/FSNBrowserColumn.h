@@ -115,6 +115,8 @@
 
 - (void)selectAll;
 
+- (void)unselectAllCells;
+
 - (void)checkLockedReps;
            
 - (void)lockCellsOfNodes:(NSArray *)nodes;

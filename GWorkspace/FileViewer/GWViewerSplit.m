@@ -41,7 +41,7 @@
   [diskInfoField setFont: [NSFont systemFontOfSize: 10]];
   [diskInfoField setBordered: NO];
   [diskInfoField setAlignment: NSLeftTextAlignment];
-  [diskInfoField setTextColor: [NSColor darkGrayColor]];		
+  [diskInfoField setTextColor: [NSColor controlShadowColor]];		
   
   diskInfoRect = NSZeroRect;
       

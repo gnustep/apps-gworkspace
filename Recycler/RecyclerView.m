@@ -267,6 +267,10 @@
   }
 }
 
+- (void)repSelected:(id)arep
+{
+}
+
 - (void)unselectOtherReps:(id)arep
 {
 }

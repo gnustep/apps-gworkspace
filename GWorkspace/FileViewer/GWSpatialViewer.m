@@ -47,7 +47,6 @@
   RELEASE (watchedNodes);
   RELEASE (vwrwin);
   RELEASE (viewType);
-  RELEASE (browserSroll);
   
 	[super dealloc];
 }
@@ -156,7 +155,7 @@
       nodeView = [[GWViewerBrowser alloc] initWithBaseNode: shownNode
                                       inViewer: self
 		                            visibleColumns: visibleCols
-                                      scroller: browserSroll
+                                      scroller: [scroll horizontalScroller]
                                     cellsIcons: YES
                                selectionColumn: NO];
     }
@@ -242,8 +241,6 @@
   r = NSMakeRect(margin, 0, w - (margin * 2), h - boxh);
   scroll = [[NSScrollView alloc] initWithFrame: r];
   [scroll setBorderType: NSBezelBorder];
-  browserSroll = [NSScroller new];
-  [scroll setHorizontalScroller: browserSroll];
   [scroll setHasHorizontalScroller: YES];
   [scroll setHasVerticalScroller: [viewType isEqual: @"Icon"]];
   resizeMask = NSViewNotSizable | NSViewWidthSizable | NSViewHeightSizable;
@@ -409,30 +406,6 @@
 - (void)setSelectableNodesRange:(NSRange)range
 {
   visibleCols = range.length;
-
-/*
-  if ([nodeView isKindOfClass: [GWViewerBrowser class]]) { 
-    int lastColumnLoaded = [nodeView lastColumnLoaded];
-    int lastVisibleColumn = [nodeView lastVisibleColumn];
-    
-    if ((lastColumnLoaded == 0) || (lastColumnLoaded <= (visibleCols - 1))) {
-		  [browserSroll setEnabled: NO];
-    
-    } else {
-      float prop = (float)visibleCols / (float)(lastColumnLoaded + 1);
-      float i = lastColumnLoaded - visibleCols + 1;
-      float f = 1 + ((lastVisibleColumn - lastColumnLoaded) / i);
-  
-	    if (lastVisibleColumn > lastColumnLoaded) {   
-        prop = (float)visibleCols / (float)(lastVisibleColumn + 1);
-      }
-  
-      [browserSroll setFloatValue: f knobProportion: prop];
-    }
-    
-    [browserSroll setEnabled: YES];
-  }
-*/
 }
 
 - (void)updeateInfoLabels
@@ -719,6 +692,13 @@
   }
 }
 
+- (void)windowDidResize:(NSNotification *)aNotification
+{
+  if ([nodeView isKindOfClass: [GWViewerBrowser class]]) { 
+    [nodeView updateScroller];
+  }
+}
+
 - (void)openSelectionInNewViewer:(BOOL)newv
 {
   [manager openSelectionInViewer: self closeSender: newv];
@@ -762,7 +742,7 @@
       nodeView = [[GWViewerBrowser alloc] initWithBaseNode: shownNode
                                       inViewer: self
 		                            visibleColumns: visibleCols
-                                      scroller: browserSroll
+                                      scroller: [scroll horizontalScroller]
                                     cellsIcons: YES
                                selectionColumn: NO]; 
       

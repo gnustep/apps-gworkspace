@@ -34,7 +34,6 @@
 @class GWorkspace;
 @class NSView;
 @class NSTextField;
-@class NSScroller;
 @class NSScrollView;
 
 @interface GWSpatialViewer : NSObject
@@ -46,7 +45,6 @@
   NSTextField *spaceLabel;
   GWViewerPathsPopUp *pathsPopUp;
   NSScrollView *scroll;
-  NSScroller *browserSroll;
   id nodeView;
   
   NSString *viewType;

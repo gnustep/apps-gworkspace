@@ -55,7 +55,7 @@
 
   int visibleCols;
     
-  FSNode *shownNode;
+  FSNode *baseNode;
   NSArray *lastSelection;  
   NSMutableArray *watchedNodes;
   BOOL watchersSuspended;
@@ -88,6 +88,7 @@
         repOfPath:(NSString *)path;
 - (void)unselectAllReps;
 - (void)selectionChanged:(NSArray *)newsel;
+- (void)pathsViewDidSelectIcon:(id)icon;
 - (void)setSelectableNodesRange:(NSRange)range;
 - (void)updeateInfoLabels;
 

@@ -186,6 +186,8 @@ typedef enum FSNSelectionMask {
 
 - (void)unloadFromPath:(NSString *)path;
 
+- (void)repSelected:(id)arep;
+
 - (void)unselectOtherReps:(id)arep;
 
 - (void)selectReps:(NSArray *)reps;
@@ -215,6 +217,8 @@ typedef enum FSNSelectionMask {
 - (void)openSelectionInNewViewer:(BOOL)newv;
 
 - (void)restoreLastSelection;
+
+- (void)setLastShownNode:(FSNode *)anode;
 
 - (BOOL)involvedByFileOperation:(NSDictionary *)opinfo;
 

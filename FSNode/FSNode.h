@@ -36,6 +36,7 @@
   NSString *path;
   NSString *relativePath;
   NSString *name;
+  NSDictionary *attributes;
   NSString *fileType;
   NSString *typeDescription;
   
@@ -126,6 +127,8 @@
 
 - (NSString *)fileType;
 
+- (void)setTypeFlags;
+
 - (NSString *)typeDescription;
 
 - (NSDate *)creationDate;
@@ -155,6 +158,12 @@
 - (BOOL)isDirectory;
 
 - (BOOL)isLink;
+
+- (BOOL)isSocket;
+
+- (BOOL)isCharspecial;
+
+- (BOOL)isBlockspecial;
 
 - (BOOL)isMountPoint;
 

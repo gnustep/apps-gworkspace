@@ -174,6 +174,7 @@
 - (void)removeRepOfSubnodePath:(NSString *)apath;
 - (void)removeRep:(id)arep;
 - (void)unloadFromPath:(NSString *)path;
+- (void)repSelected:(id)arep;
 - (void)unselectOtherReps:(id)arep;
 - (void)selectReps:(NSArray *)reps;
 - (void)selectRepsOfSubnodes:(NSArray *)nodes;
@@ -189,6 +190,7 @@
 - (FSNSelectionMask)selectionMask;
 - (void)openSelectionInNewViewer:(BOOL)newv;
 - (void)restoreLastSelection;
+- (void)setLastShownNode:(FSNode *)anode;
 - (BOOL)involvedByFileOperation:(NSDictionary *)opinfo;
 - (BOOL)validatePasteOfFilenames:(NSArray *)names
                        wasCutted:(BOOL)cutted;
