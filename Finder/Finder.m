@@ -1072,6 +1072,7 @@ static Finder *finder = nil;
 
 - (void)connectLSFd
 {
+/*
   if (lsfd == nil) {
     id remote = [NSConnection rootProxyForConnectionWithRegisteredName: @"lsfd" 
                                                                   host: @""];
@@ -1143,6 +1144,7 @@ static Finder *finder = nil;
       }
 	  }
   }
+  */
 }
 
 - (void)lsfdConnectionDidDie:(NSNotification *)notif
