@@ -1,0 +1,41 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {
+                closeMainWin = id; 
+                deleteFiles = id; 
+                duplicateFiles = id; 
+                emptyRecycler = id; 
+                goBackwardInHistory = id; 
+                goForwardInHistory = id; 
+                hide = id; 
+                newFile = id; 
+                newFolder = id; 
+                openSelection = id; 
+                openSelectionAsFolder = id; 
+                openWith = id; 
+                print = id; 
+                putAway = id; 
+                runCommand = id; 
+                selectAllInViewer = id; 
+                showApps = id; 
+                showAttributesInspector = id; 
+                showContentsInspector = id; 
+                showFileOps = id; 
+                showFinder = id; 
+                showHistory = id; 
+                showInfo = id; 
+                showPermissionsInspector = id; 
+                showPreferences = id; 
+                showToolsInspector = id; 
+                showViewer = id; 
+                startXTerm = id; 
+                terminate = id; 
+            }; 
+            CLASS = NSObject; 
+            LANGUAGE = ObjC; 
+        }
+    ); 
+    IBVersion = 1; 
+}

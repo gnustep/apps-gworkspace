@@ -6,7 +6,7 @@
                 chooseImage = id; 
                 makeColor = id; 
                 setColor = id; 
-                setState = id; 
+                setDeskState = id; 
                 unsetImage = id; 
             }; 
             CLASS = DeskTopPref; 
@@ -14,14 +14,17 @@
             OUTLETS = {
                 blueField = id; 
                 blueSlider = id; 
-                chooseButt = id; 
+                bluelabel = id; 
+                chooseDeskButt = id; 
                 colorsBox = id; 
                 controlsbox = id; 
                 greenField = id; 
                 greenSlider = id; 
+                greenlabel = id; 
                 prefbox = id; 
                 redField = id; 
                 redSlider = id; 
+                redlabel = id; 
                 setColorButt = id; 
                 setImageButt = id; 
                 win = id; 
