@@ -175,9 +175,6 @@
 
 + (GWRemote *)gwremote;
 
-//
-// Login methods
-//
 - (void)serversListChanged;
 
 - (void)tryLoginOnServer:(NSString *)servername 
@@ -186,54 +183,7 @@
 
 - (void)checkConnection:(id)sender;
 
-
-
-- (void)performFileOperationWithDictionary:(id)opdict
-                            fromSourceHost:(NSString *)fromName 
-                         toDestinationHost:(NSString *)toName;
-
-- (BOOL)server:(NSString *)serverName isPakageAtPath:(NSString *)path;
-
-- (BOOL)server:(NSString *)serverName fileExistsAtPath:(NSString *)path;  
-
-- (BOOL)server:(NSString *)serverName isWritableFileAtPath:(NSString *)path;
-
-- (BOOL)server:(NSString *)serverName 
-            existsAndIsDirectoryFileAtPath:(NSString *)path;              
-
-- (NSString *)server:(NSString *)serverName typeOfFileAt:(NSString *)path;  
-
-- (int)server:(NSString *)serverName sortTypeForPath:(NSString *)aPath; 
-
-- (void)server:(NSString *)serverName                                   
-   setSortType:(int)type 
-        atPath:(NSString *)aPath;
-
-- (NSArray *)server:(NSString *)serverName 
-   checkHiddenFiles:(NSArray *)files 
-             atPath:(NSString *)path;
-
-- (NSArray *)server:(NSString *)serverName 
-        sortedDirectoryContentsAtPath:(NSString *)path;
-
-- (void)server:(NSString *)serverName setSelectedPaths:(NSArray *)paths;
-
-- (NSArray *)selectedPathsForServerWithName:(NSString *)serverName;
-
-- (NSString *)homeDirectoryForServerWithName:(NSString *)serverName;
-
-- (BOOL)server:(NSString *)serverName isLockedPath:(NSString *)aPath;
-
-- (void)server:(NSString *)serverName addWatcherForPath:(NSString *)path;
-
-- (void)server:(NSString *)serverName removeWatcherForPath:(NSString *)path;
-
-- (void)server:(NSString *)serverName removeWatcherForPath:(NSString *)path;
-
-- (void)server:(NSString *)serverName 
-    renamePath:(NSString *)oldname 
-     toNewName:(NSString *)newname;
-
+- (void)connectionDidDie:(NSNotification *)notification;
 
 - (void)readDefaultsForServer:(NSString *)serverName;
 
@@ -247,17 +197,93 @@
 
 - (NSArray *)viewersOfServer:(NSString *)serverName;
 
+- (NSString *)homeDirectoryForServerWithName:(NSString *)serverName;
+
+- (BOOL)server:(NSString *)serverName fileExistsAtPath:(NSString *)path;  
+
+- (BOOL)server:(NSString *)serverName 
+            existsAndIsDirectoryFileAtPath:(NSString *)path;              
+
+- (NSString *)server:(NSString *)serverName typeOfFileAt:(NSString *)path;  
+
+- (BOOL)server:(NSString *)serverName isWritableFileAtPath:(NSString *)path;
+
+- (BOOL)server:(NSString *)serverName isPakageAtPath:(NSString *)path;
+
+- (BOOL)server:(NSString *)serverName isLockedPath:(NSString *)aPath;
+
 - (NSDictionary *)server:(NSString *)serverName 
             fileSystemAttributesAtPath:(NSString *)path;
 
-- (NSImage *)iconForFile:(NSString *)fullPath ofType:(NSString *)type;
+- (int)server:(NSString *)serverName sortTypeForPath:(NSString *)aPath; 
 
-- (NSImage *)getImageWithName:(NSString*)name
-		                alternate:(NSString *)alternate;
+- (void)server:(NSString *)serverName                                   
+   setSortType:(int)type 
+        atPath:(NSString *)aPath;
 
-- (NSImage *)unknownFiletypeImage;
+- (BOOL)server:(NSString *)serverName verifyFileAtPath:(NSString *)path;
 
-- (NSImage *)folderImage;
+- (NSArray *)server:(NSString *)serverName 
+        sortedDirectoryContentsAtPath:(NSString *)path;
+
+- (NSArray *)server:(NSString *)serverName 
+   checkHiddenFiles:(NSArray *)files 
+             atPath:(NSString *)path;
+
+- (NSMutableDictionary *)cachedRepresentationForPath:(NSString *)path
+                                            onServer:(NSString *)serverName;
+
+- (void)addCachedRepresentation:(NSDictionary *)contentsDict
+                    ofDirectory:(NSString *)path
+                       onServer:(NSString *)serverName;
+
+- (void)removeCachedRepresentationForPath:(NSString *)path
+                                 onServer:(NSString *)serverName;
+                                            
+- (void)removeOlderCachedForServer:(NSString *)serverName;
+                                            
+- (int)entriesInCacheOfServer:(NSString *)serverName;
+
+- (NSArray *)selectedPathsForServerWithName:(NSString *)serverName;
+
+- (void)server:(NSString *)serverName setSelectedPaths:(NSArray *)paths;
+
+- (void)server:(NSString *)serverName 
+      openSelectedPaths:(NSArray *)paths 
+              newViewer:(BOOL)newv;
+
+- (void)server:(NSString *)serverName 
+        newObjectAtPath:(NSString *)basePath 
+            isDirectory:(BOOL)directory;
+
+- (void)duplicateFilesOnServerName:(NSString *)serverName;
+
+- (void)deleteFilesOnServerName:(NSString *)serverName;
+
+- (void)server:(NSString *)serverName 
+    renamePath:(NSString *)oldname 
+     toNewName:(NSString *)newname;
+
+- (void)performFileOperationWithDictionary:(id)opdict
+                            fromSourceHost:(NSString *)fromName 
+                         toDestinationHost:(NSString *)toName;
+
+- (BOOL)pauseFileOperationWithRef:(int)ref 
+                 onServerWithName:(NSString *)serverName;
+
+- (BOOL)continueFileOperationWithRef:(int)ref
+                    onServerWithName:(NSString *)serverName;
+
+- (BOOL)stopFileOperationWithRef:(int)ref
+                onServerWithName:(NSString *)serverName;
+
+- (void)fileSystemWillChangeNotification:(NSNotification *)notif;
+
+- (void)fileSystemDidChangeNotification:(NSNotification *)notif;
+                      
+- (void)server:(NSString *)serverName addWatcherForPath:(NSString *)path;
+
+- (void)server:(NSString *)serverName removeWatcherForPath:(NSString *)path;
 
 - (ViewerWindow *)server:(NSString *)serverName
           newViewerAtPath:(NSString *)path 
@@ -268,10 +294,6 @@
 - (id)rootViewer;
 
 - (void)viewerHasClosed:(id)sender;
-
-- (void)server:(NSString *)serverName 
-      openSelectedPaths:(NSArray *)paths 
-              newViewer:(BOOL)newv;
 
 - (BOOL)editor:(RemoteEditor *)editor
       didEditContents:(NSString *)contents
@@ -294,43 +316,14 @@
 
 - (NSNumber *)remoteTerminalRef;
 
-- (NSMutableDictionary *)cachedRepresentationForPath:(NSString *)path
-                                            onServer:(NSString *)serverName;
+- (NSImage *)iconForFile:(NSString *)fullPath ofType:(NSString *)type;
 
-- (void)addCachedRepresentation:(NSDictionary *)contentsDict
-                    ofDirectory:(NSString *)path
-                       onServer:(NSString *)serverName;
+- (NSImage *)getImageWithName:(NSString*)name
+		                alternate:(NSString *)alternate;
 
-- (void)removeCachedRepresentationForPath:(NSString *)path
-                                 onServer:(NSString *)serverName;
-                                            
-- (void)removeOlderCachedForServer:(NSString *)serverName;
-                                            
-- (int)entriesInCacheOfServer:(NSString *)serverName;
+- (NSImage *)unknownFiletypeImage;
 
-
-- (BOOL)server:(NSString *)serverName verifyFileAtPath:(NSString *)path;
-
-- (void)fileSystemWillChangeNotification:(NSNotification *)notif;
-
-- (void)fileSystemDidChangeNotification:(NSNotification *)notif;
-                      
-- (void)server:(NSString *)serverName 
-        newObjectAtPath:(NSString *)basePath 
-            isDirectory:(BOOL)directory;
-
-- (void)duplicateFilesOnServerName:(NSString *)serverName;
-
-- (void)deleteFilesOnServerName:(NSString *)serverName;
-
-- (BOOL)pauseFileOperationWithRef:(int)ref 
-                 onServerWithName:(NSString *)serverName;
-
-- (BOOL)continueFileOperationWithRef:(int)ref
-                    onServerWithName:(NSString *)serverName;
-
-- (BOOL)stopFileOperationWithRef:(int)ref
-                onServerWithName:(NSString *)serverName;
+- (NSImage *)folderImage;
 
 - (int)shelfCellsWidth; 
 
@@ -339,8 +332,6 @@
 - (void)setShelfCellsWidth:(int)w; 
 
 - (void)updateDefaults;
-
-- (void)connectionDidDie:(NSNotification *)notification;
 
 
 //

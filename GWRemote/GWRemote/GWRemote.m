@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include "GWRemote.h"
@@ -204,63 +203,6 @@ Do you want to save them?", @""),
 }
 
 //
-// Login methods
-//
-- (void)serversListChanged
-{
-  haveServersList = YES;
-}
-
-- (void)tryLoginOnServer:(NSString *)servername 
-            withUserName:(NSString *)usrname 
-            userPassword:(NSString *)userpass
-{
-  id server;
-
-  [[loginWindow myWin] close];  
-  
-  if ([serversDict objectForKey: servername]) {
-    NSString *message = [NSString stringWithFormat: @"%@ %@!", 
-                NSLocalizedString(@"already connected to", @""), servername];
-    NSRunAlertPanel(NULL, message, NSLocalizedString(@"OK", @""), NULL, NULL);   
-    return;
-  }
-
-  ASSIGN (loginServer, servername);
-  ASSIGN (userName, usrname);
-  ASSIGN (userPassword, userpass);
-
-  server = [NSConnection rootProxyForConnectionWithRegisteredName: @"gwsd"  
-                                                             host: servername];
-  if (server != nil) {
-    connectTimer = [NSTimer scheduledTimerWithTimeInterval: 10.0 target: self 
-          		 selector: @selector(checkConnection:) userInfo: nil repeats: NO];                                             
-    
-    [server setProtocolForProxy: @protocol(GWSDProtocol)];
-    server = (id <GWSDProtocol>)server;
-
-    [server registerRemoteClient: self];          
-  } else {
-    NSRunAlertPanel(NULL, NSLocalizedString(@"Can't contact the server!", @""),
-                                      NSLocalizedString(@"OK", @""), NULL, NULL);   
-    DESTROY (loginServer);
-    DESTROY (userName);
-    DESTROY (userPassword);
-  }
-}
-
-- (void)checkConnection:(id)sender
-{
-  if (loginServer != nil) {
-    NSRunAlertPanel(NULL, NSLocalizedString(@"Time out contacting the server!", @""),
-                                      NSLocalizedString(@"OK", @""), NULL, NULL);   
-    DESTROY (loginServer);
-    DESTROY (userName);
-    DESTROY (userPassword);
-  }
-}
-
-//
 // GWSdClientProtocol
 //
 - (void)setServerConnection:(NSConnection *)conn
@@ -407,156 +349,92 @@ Do you want to save them?", @""),
 {
   [self _remoteShellWithRef: ref hasAvailableData: data];
 }
-
 //
-// ex GWProtocol (GWRemote methods)
+// GWSdClientProtocol (end)
 //
-- (void)performFileOperationWithDictionary:(id)opdict
-                            fromSourceHost:(NSString *)fromName 
-                         toDestinationHost:(NSString *)toName
-{
-  if ([fromName isEqual: toName]) {
-    id <GWSDProtocol> server = [self serverWithName: toName];
 
-    if (server) {
-      [server performLocalFileOperationWithDictionary: opdict];
-    }  
-  }
+
+- (void)serversListChanged
+{
+  haveServersList = YES;
 }
 
-- (BOOL)server:(NSString *)serverName isPakageAtPath:(NSString *)path
+- (void)tryLoginOnServer:(NSString *)servername 
+            withUserName:(NSString *)usrname 
+            userPassword:(NSString *)userpass
 {
-  return NO;
-}
+  id server;
 
-- (BOOL)server:(NSString *)serverName fileExistsAtPath:(NSString *)path
-{
-  return [[self serverWithName: serverName] existsFileAtPath: path];
-}
-
-- (BOOL)server:(NSString *)serverName isWritableFileAtPath:(NSString *)path
-{
-  return [[self serverWithName: serverName] isWritableFileAtPath: path];
-}
-
-- (BOOL)server:(NSString *)serverName 
-            existsAndIsDirectoryFileAtPath:(NSString *)path
-{
-  return [[self serverWithName: serverName] existsAndIsDirectoryFileAtPath: path];
-}
-
-- (NSString *)server:(NSString *)serverName typeOfFileAt:(NSString *)path
-{
-  return [[self serverWithName: serverName] typeOfFileAt: path];
-}
-
-- (int)server:(NSString *)serverName sortTypeForPath:(NSString *)aPath
-{
-  return byname;
-}
-
-- (void)server:(NSString *)serverName  
-   setSortType:(int)type 
-        atPath:(NSString *)aPath
-{
-  [[self serverWithName: serverName] setSortType: type 
-                              forDirectoryAtPath: aPath];
-}
-
-- (NSArray *)server:(NSString *)serverName 
-   checkHiddenFiles:(NSArray *)files 
-             atPath:(NSString *)path
-{
-  return files;
-}
-
-- (NSArray *)server:(NSString *)serverName 
-        sortedDirectoryContentsAtPath:(NSString *)path
-{
-  id <GWSDProtocol>server = [self serverWithName: serverName];
+  [[loginWindow myWin] close];  
   
-  if (server) {
-    NSDictionary *contentsDict = [self cachedRepresentationForPath: path 
-                                                          onServer: serverName];
-    if (contentsDict) {
-      return [contentsDict objectForKey: @"files"];
-    }
-   
-    contentsDict = [server directoryContentsAtPath: path];
+  if ([serversDict objectForKey: servername]) {
+    NSString *message = [NSString stringWithFormat: @"%@ %@!", 
+                NSLocalizedString(@"already connected to", @""), servername];
+    NSRunAlertPanel(NULL, message, NSLocalizedString(@"OK", @""), NULL, NULL);   
+    return;
+  }
+
+  ASSIGN (loginServer, servername);
+  ASSIGN (userName, usrname);
+  ASSIGN (userPassword, userpass);
+
+  server = [NSConnection rootProxyForConnectionWithRegisteredName: @"gwsd"  
+                                                             host: servername];
+  if (server != nil) {
+    connectTimer = [NSTimer scheduledTimerWithTimeInterval: 10.0 target: self 
+          		 selector: @selector(checkConnection:) userInfo: nil repeats: NO];                                             
     
-    if (contentsDict) {
-      if ([self entriesInCacheOfServer: serverName] >= cachedMax) {
-        [self removeOlderCachedForServer: serverName];
-      }
+    [server setProtocolForProxy: @protocol(GWSDProtocol)];
+    server = (id <GWSDProtocol>)server;
 
-      [self addCachedRepresentation: contentsDict
-                        ofDirectory: path
-                           onServer: serverName];
-
-      return [contentsDict objectForKey: @"files"];
-    }
-  }
- 
-  return nil;
-}
-
-- (void)server:(NSString *)serverName setSelectedPaths:(NSArray *)paths
-{
-  NSMutableDictionary *dict = [self dictionaryForServer: serverName];
-
-  [dict setObject: paths forKey: @"selectedPaths"];
-}
-
-- (NSArray *)selectedPathsForServerWithName:(NSString *)serverName
-{
-  return [[self dictionaryForServer: serverName] objectForKey: @"selectedPaths"];
-}
-
-- (NSString *)homeDirectoryForServerWithName:(NSString *)serverName
-{
-  NSDictionary *serverDict = [self dictionaryForServer: serverName];
-  id <GWSDProtocol> server = [serverDict objectForKey: @"server"];
-
-  return [server homeDirectory];
-}
-
-- (BOOL)server:(NSString *)serverName isLockedPath:(NSString *)aPath
-{
-  return NO;
-}
-
-- (void)server:(NSString *)serverName addWatcherForPath:(NSString *)path
-{
-  [[self serverWithName: serverName] addWatcherForPath: path];
-}
-
-- (void)server:(NSString *)serverName removeWatcherForPath:(NSString *)path
-{
-  [[self serverWithName: serverName] removeWatcherForPath: path];
-}
-
-- (void)server:(NSString *)serverName 
-    renamePath:(NSString *)oldname 
-     toNewName:(NSString *)newname
-{
-  [[self serverWithName: serverName] renamePath: oldname toNewName: newname];
-}
-
-- (NSImage *)iconForFile:(NSString *)fullPath ofType:(NSString *)type
-{
-  NSImage *icon = nil;
-
-  if ([type isEqual: NSDirectoryFileType] 
-                || [type isEqual: NSFilesystemFileType]
-                    || [type isEqual: NSApplicationFileType]) {
-    icon = [self folderImage];
+    [server registerRemoteClient: self];          
   } else {
-    icon = [self unknownFiletypeImage];
+    NSRunAlertPanel(NULL, NSLocalizedString(@"Can't contact the server!", @""),
+                                      NSLocalizedString(@"OK", @""), NULL, NULL);   
+    DESTROY (loginServer);
+    DESTROY (userName);
+    DESTROY (userPassword);
   }
-
-  return icon;
 }
 
+- (void)checkConnection:(id)sender
+{
+  if (loginServer != nil) {
+    NSRunAlertPanel(NULL, NSLocalizedString(@"Time out contacting the server!", @""),
+                                      NSLocalizedString(@"OK", @""), NULL, NULL);   
+    DESTROY (loginServer);
+    DESTROY (userName);
+    DESTROY (userPassword);
+  }
+}
+
+- (void)connectionDidDie:(NSNotification *)notification
+{
+	id diedconn = [notification object];
+	id <GWSDProtocol> server = [self serverWithConnection: diedconn];
+  
+  [[NSNotificationCenter defaultCenter] removeObserver: self
+	                      name: NSConnectionDidDieNotification object: diedconn];
+
+  if (server) {
+    NSString *name = [self nameOfServer: server];
+    NSArray *sviewers = [self viewersOfServer: name];
+    int i;
+    
+    for (i = 0; i < [sviewers count]; i++) {
+      ViewerWindow *viewer = [sviewers objectAtIndex: i];
+      
+      [viewer updateDefaults];
+      [viewer close];
+    }
+    
+    [serversDict removeObjectForKey: name];
+    
+    NSRunAlertPanel(NULL, 
+        [NSString stringWithFormat: @"the connection with %@ died!", name],
+                                                          @"OK", NULL, NULL);   
+  }  
+}
 
 - (void)readDefaultsForServer:(NSString *)serverName
 {
@@ -753,79 +631,241 @@ Do you want to save them?", @""),
   return nil;
 }
 
+- (NSString *)homeDirectoryForServerWithName:(NSString *)serverName
+{
+  NSDictionary *serverDict = [self dictionaryForServer: serverName];
+  id <GWSDProtocol> server = [serverDict objectForKey: @"server"];
+
+  return [server homeDirectory];
+}
+
+- (BOOL)server:(NSString *)serverName fileExistsAtPath:(NSString *)path
+{
+  return [[self serverWithName: serverName] existsFileAtPath: path];
+}
+
+- (BOOL)server:(NSString *)serverName 
+            existsAndIsDirectoryFileAtPath:(NSString *)path
+{
+  return [[self serverWithName: serverName] existsAndIsDirectoryFileAtPath: path];
+}
+
+- (NSString *)server:(NSString *)serverName typeOfFileAt:(NSString *)path
+{
+  return [[self serverWithName: serverName] typeOfFileAt: path];
+}
+
+- (BOOL)server:(NSString *)serverName isWritableFileAtPath:(NSString *)path
+{
+  return [[self serverWithName: serverName] isWritableFileAtPath: path];
+}
+
+- (BOOL)server:(NSString *)serverName isPakageAtPath:(NSString *)path
+{
+  return NO;
+}
+
+- (BOOL)server:(NSString *)serverName isLockedPath:(NSString *)aPath
+{
+  return NO;
+}
+
 - (NSDictionary *)server:(NSString *)serverName 
             fileSystemAttributesAtPath:(NSString *)path
 {
   return [[self serverWithName: serverName] fileSystemAttributesAtPath: path];
 }
 
-- (NSImage *)getImageWithName:(NSString *)name
-		                alternate:(NSString *)alternate
+- (int)server:(NSString *)serverName sortTypeForPath:(NSString *)aPath
 {
-  NSImage	*image = nil;
-
-  image = [NSImage imageNamed: name];
-  
-  if (image == nil) {
-    image = [NSImage imageNamed: alternate];
-  }
-  
-  return image;
+  return byname;
 }
 
-- (NSImage *)folderImage
+- (void)server:(NSString *)serverName  
+   setSortType:(int)type 
+        atPath:(NSString *)aPath
 {
-  static NSImage *image = nil;
-
-  if (image == nil) {
-    image = RETAIN ([self getImageWithName: @"Folder.tiff"
-				                         alternate: @"common_Folder.tiff"]);
-  }
-
-  return image;
+  [[self serverWithName: serverName] setSortType: type 
+                              forDirectoryAtPath: aPath];
 }
 
-- (NSImage *)unknownFiletypeImage
+- (BOOL)server:(NSString *)serverName verifyFileAtPath:(NSString *)path
 {
-  static NSImage *image = nil;
+	if ([[self serverWithName: serverName] existsFileAtPath: path] == NO) {
+		NSString *err = NSLocalizedString(@"Error", @"");
+		NSString *msg = NSLocalizedString(@": no such file or directory!", @"");
+		NSString *buttstr = NSLocalizedString(@"Continue", @"");
+		NSMutableDictionary *notifObj = [NSMutableDictionary dictionaryWithCapacity: 1];		
+		NSString *basePath = [path stringByDeletingLastPathComponent];
+		
+    NSRunAlertPanel(err, [NSString stringWithFormat: @"%@%@", path, msg], buttstr, nil, nil);   
 
-  if (image == nil) {
-    image = RETAIN([self getImageWithName: @"Unknown.tiff"
-				                        alternate: @"common_Unknown.tiff"]);
-  }
+		[notifObj setObject: NSWorkspaceDestroyOperation forKey: @"operation"];	
+  	[notifObj setObject: basePath forKey: @"source"];	
+  	[notifObj setObject: basePath forKey: @"destination"];	
+  	[notifObj setObject: [NSArray arrayWithObjects: path, nil] forKey: @"files"];	
 
-  return image;
-}
+		[nc postNotificationName: GWFileSystemWillChangeNotification
+	 									  object: notifObj];
 
-- (ViewerWindow *)server:(NSString *)serverName
-          newViewerAtPath:(NSString *)path 
-              canViewApps:(BOOL)viewapps
-{
-  ViewerWindow *viewer = [[ViewerWindow alloc] initForPath: path
-                                  onServer: currentServer viewPakages: viewapps 
-                                        isRootViewer: NO onStart: starting];
-  [viewer activate];
-  [viewers addObject: viewer];
-  RELEASE (viewer);
+		[nc postNotificationName: GWFileSystemDidChangeNotification
+	 									object: notifObj];
+		return NO;
+	}
 	
-	return [viewers objectAtIndex: [viewers count] -1];
+	return YES;
 }
 
-- (void)setCurrentViewer:(ViewerWindow *)viewer
+- (NSArray *)server:(NSString *)serverName 
+        sortedDirectoryContentsAtPath:(NSString *)path
 {
-  currentViewer = viewer;
-}
+  id <GWSDProtocol>server = [self serverWithName: serverName];
+  
+  if (server) {
+    NSDictionary *contentsDict = [self cachedRepresentationForPath: path 
+                                                          onServer: serverName];
+    if (contentsDict) {
+      return [contentsDict objectForKey: @"files"];
+    }
+   
+    contentsDict = [server directoryContentsAtPath: path];
+    
+    if (contentsDict) {
+      if ([self entriesInCacheOfServer: serverName] >= cachedMax) {
+        [self removeOlderCachedForServer: serverName];
+      }
 
-- (id)rootViewer
-{
-  return rootViewer;
-}
+      [self addCachedRepresentation: contentsDict
+                        ofDirectory: path
+                           onServer: serverName];
 
-- (void)viewerHasClosed:(id)sender
-{
-  if (sender != rootViewer) {
-    [viewers removeObject: sender];
+      return [contentsDict objectForKey: @"files"];
+    }
   }
+ 
+  return nil;
+}
+
+- (NSArray *)server:(NSString *)serverName 
+   checkHiddenFiles:(NSArray *)files 
+             atPath:(NSString *)path
+{
+  return files;
+}
+
+- (NSMutableDictionary *)cachedRepresentationForPath:(NSString *)path
+                                            onServer:(NSString *)serverName 
+{
+  NSMutableDictionary *serverCache = [cachedContents objectForKey: serverName];
+
+  if (serverCache == nil) {
+    [cachedContents setObject: [NSMutableDictionary dictionary] 
+                       forKey: serverName];
+    return nil;
+    
+  } else {
+    NSMutableDictionary *contents = [serverCache objectForKey: path];
+
+    if (contents) {
+      NSDate *modDate = [contents objectForKey: @"moddate"];
+      id <GWSDProtocol>server = [self serverWithName: serverName];
+      NSDate *date = [server modificationDateForPath: path];
+
+      if ([modDate isEqualToDate: date]) {
+        return contents;
+      } else {
+        [serverCache removeObjectForKey: path];
+      }
+    }
+  }
+  
+  return nil;
+}
+
+- (void)addCachedRepresentation:(NSDictionary *)contentsDict
+                    ofDirectory:(NSString *)path
+                       onServer:(NSString *)serverName
+{
+  NSMutableDictionary *serverCache = [cachedContents objectForKey: serverName];
+  NSMutableArray *watchedPaths = [[self dictionaryForServer: serverName] 
+                                               objectForKey: @"watchedpaths"];
+
+  [serverCache setObject: contentsDict forKey: path];
+  
+  if ([watchedPaths containsObject: path] == NO) {
+    [watchedPaths addObject: path];
+    [self server: serverName addWatcherForPath: path];
+  }
+}
+
+- (void)removeCachedRepresentationForPath:(NSString *)path
+                                 onServer:(NSString *)serverName
+{
+  NSMutableDictionary *serverCache = [cachedContents objectForKey: serverName];
+  NSMutableArray *watchedPaths = [[self dictionaryForServer: serverName] 
+                                               objectForKey: @"watchedpaths"];
+
+  [serverCache removeObjectForKey: path];
+  
+  if ([watchedPaths containsObject: path]) {
+    [self server: serverName removeWatcherForPath: path];
+    [watchedPaths removeObject: path];
+  }
+}
+
+- (void)removeOlderCachedForServer:(NSString *)serverName
+{
+  NSMutableDictionary *serverCache = [cachedContents objectForKey: serverName];
+  NSMutableArray *watchedPaths = [[self dictionaryForServer: serverName] 
+                                               objectForKey: @"watchedpaths"];
+
+  if (serverCache) {
+    NSArray *keys = [serverCache allKeys];
+    NSDate *date = [NSDate date];
+    NSString *removeKey = nil;
+    int i;
+  
+    if ([keys count]) {
+      for (i = 0; i < [keys count]; i++) {
+        NSString *key = [keys objectAtIndex: i];
+        NSDate *stamp = [[serverCache objectForKey: key] objectForKey: @"datestamp"];
+        NSDate *d = [date earlierDate: stamp];
+
+        if ([date isEqualToDate: d] == NO) {
+          date = d;
+          removeKey = key;
+        }
+      }
+     
+      if (removeKey == nil) {
+        removeKey = [keys objectAtIndex: 0];
+      }
+      
+      [serverCache removeObjectForKey: removeKey];
+ 
+      if ([watchedPaths containsObject: removeKey]) {
+        [self server: serverName removeWatcherForPath: removeKey];
+        [watchedPaths removeObject: removeKey];
+      }
+    }
+  }
+}
+
+- (int)entriesInCacheOfServer:(NSString *)serverName
+{
+  return [[cachedContents objectForKey: serverName] count];
+}
+
+- (NSArray *)selectedPathsForServerWithName:(NSString *)serverName
+{
+  return [[self dictionaryForServer: serverName] objectForKey: @"selectedPaths"];
+}
+
+- (void)server:(NSString *)serverName setSelectedPaths:(NSArray *)paths
+{
+  NSMutableDictionary *dict = [self dictionaryForServer: serverName];
+
+  [dict setObject: paths forKey: @"selectedPaths"];
 }
 
 - (void)server:(NSString *)serverName 
@@ -892,6 +932,162 @@ Do you want to save them?", @""),
    //     [ws launchApplication: apath];
       }
     }
+  }
+}
+
+- (void)server:(NSString *)serverName 
+        newObjectAtPath:(NSString *)basePath 
+            isDirectory:(BOOL)directory
+{
+  id <GWSDProtocol> server = [self serverWithName: serverName];
+
+  if (server) {
+    [server newObjectAtPath: basePath isDirectory: directory];
+  }
+}
+
+- (void)duplicateFilesOnServerName:(NSString *)serverName
+{
+  id <GWSDProtocol> server = [self serverWithName: serverName];
+
+  if (server) {
+    NSArray *selection = [self selectedPathsForServerWithName: serverName];
+    NSString *basePath = [NSString stringWithString: [selection objectAtIndex: 0]];
+    NSMutableArray *files = [NSMutableArray array];
+    int i;
+
+    basePath = [basePath stringByDeletingLastPathComponent];
+
+    for (i = 0; i < [selection count]; i++) {
+      [files addObject: [[selection objectAtIndex: i] lastPathComponent]];
+    }
+
+    [server duplicateFiles: files inDirectory: basePath];
+  }
+}
+
+- (void)deleteFilesOnServerName:(NSString *)serverName
+{
+  id <GWSDProtocol> server = [self serverWithName: serverName];
+
+  if (server) {
+    NSArray *selection = [self selectedPathsForServerWithName: serverName];
+    NSString *basePath = [NSString stringWithString: [selection objectAtIndex: 0]];
+    NSMutableArray *files = [NSMutableArray array];
+    int i;
+
+    basePath = [basePath stringByDeletingLastPathComponent];
+
+    for (i = 0; i < [selection count]; i++) {
+      [files addObject: [[selection objectAtIndex: i] lastPathComponent]];
+    }
+
+    [server deleteFiles: files inDirectory: basePath];
+  }
+}
+
+- (void)server:(NSString *)serverName 
+    renamePath:(NSString *)oldname 
+     toNewName:(NSString *)newname
+{
+  [[self serverWithName: serverName] renamePath: oldname toNewName: newname];
+}
+
+- (void)performFileOperationWithDictionary:(id)opdict
+                            fromSourceHost:(NSString *)fromName 
+                         toDestinationHost:(NSString *)toName
+{
+  if ([fromName isEqual: toName]) {
+    id <GWSDProtocol> server = [self serverWithName: toName];
+
+    if (server) {
+      [server performLocalFileOperationWithDictionary: opdict];
+    }  
+  }
+}
+
+- (BOOL)pauseFileOperationWithRef:(int)ref 
+                 onServerWithName:(NSString *)serverName
+{
+  id <GWSDProtocol> server = [self serverWithName: serverName];
+
+  if (server) {
+    return [server pauseFileOpeRationWithRef: ref];
+  }
+  
+  return NO;  
+}
+
+- (BOOL)continueFileOperationWithRef:(int)ref
+                    onServerWithName:(NSString *)serverName
+{
+  id <GWSDProtocol> server = [self serverWithName: serverName];
+
+  if (server) {
+    return [server continueFileOpeRationWithRef: ref];
+  }
+
+  return NO;
+}
+
+- (BOOL)stopFileOperationWithRef:(int)ref
+                onServerWithName:(NSString *)serverName
+{
+  id <GWSDProtocol> server = [self serverWithName: serverName];
+
+  if (server) {
+    return [server stopFileOpeRationWithRef: ref];
+  }
+
+  return NO;
+}
+
+- (void)fileSystemWillChangeNotification:(NSNotification *)notif
+{
+}
+
+- (void)fileSystemDidChangeNotification:(NSNotification *)notif
+{
+}
+
+- (void)server:(NSString *)serverName addWatcherForPath:(NSString *)path
+{
+  [[self serverWithName: serverName] addWatcherForPath: path];
+}
+
+- (void)server:(NSString *)serverName removeWatcherForPath:(NSString *)path
+{
+  [[self serverWithName: serverName] removeWatcherForPath: path];
+}
+
+- (ViewerWindow *)server:(NSString *)serverName
+          newViewerAtPath:(NSString *)path 
+              canViewApps:(BOOL)viewapps
+{
+  ViewerWindow *viewer = [[ViewerWindow alloc] initForPath: path
+                                  onServer: currentServer viewPakages: viewapps 
+                                        isRootViewer: NO onStart: starting];
+  [viewer activate];
+  [viewers addObject: viewer];
+  RELEASE (viewer);
+	
+	return [viewers objectAtIndex: [viewers count] -1];
+}
+
+- (void)setCurrentViewer:(ViewerWindow *)viewer
+{
+  currentViewer = viewer;
+}
+
+- (id)rootViewer
+{
+  return rootViewer;
+}
+
+- (void)viewerHasClosed:(id)sender
+{
+  if (sender != rootViewer) {
+    [viewers removeObject: sender];
   }
 }
 
@@ -1017,229 +1213,57 @@ Do you want to save them?", @""),
   return remoteTermRef;
 }
 
-- (NSMutableDictionary *)cachedRepresentationForPath:(NSString *)path
-                                            onServer:(NSString *)serverName 
+- (NSImage *)iconForFile:(NSString *)fullPath ofType:(NSString *)type
 {
-  NSMutableDictionary *serverCache = [cachedContents objectForKey: serverName];
+  NSImage *icon = nil;
 
-  if (serverCache == nil) {
-    [cachedContents setObject: [NSMutableDictionary dictionary] 
-                       forKey: serverName];
-    return nil;
-    
+  if ([type isEqual: NSDirectoryFileType] 
+                || [type isEqual: NSFilesystemFileType]
+                    || [type isEqual: NSApplicationFileType]) {
+    icon = [self folderImage];
   } else {
-    NSMutableDictionary *contents = [serverCache objectForKey: path];
+    icon = [self unknownFiletypeImage];
+  }
 
-    if (contents) {
-      NSDate *modDate = [contents objectForKey: @"moddate"];
-      id <GWSDProtocol>server = [self serverWithName: serverName];
-      NSDate *date = [server modificationDateForPath: path];
+  return icon;
+}
 
-      if ([modDate isEqualToDate: date]) {
-        return contents;
-      } else {
-        [serverCache removeObjectForKey: path];
-      }
-    }
+- (NSImage *)getImageWithName:(NSString *)name
+		                alternate:(NSString *)alternate
+{
+  NSImage	*image = nil;
+
+  image = [NSImage imageNamed: name];
+  
+  if (image == nil) {
+    image = [NSImage imageNamed: alternate];
   }
   
-  return nil;
+  return image;
 }
 
-- (void)addCachedRepresentation:(NSDictionary *)contentsDict
-                    ofDirectory:(NSString *)path
-                       onServer:(NSString *)serverName
+- (NSImage *)folderImage
 {
-  NSMutableDictionary *serverCache = [cachedContents objectForKey: serverName];
-  NSMutableArray *watchedPaths = [[self dictionaryForServer: serverName] 
-                                               objectForKey: @"watchedpaths"];
+  static NSImage *image = nil;
 
-  [serverCache setObject: contentsDict forKey: path];
-  
-  if ([watchedPaths containsObject: path] == NO) {
-    [watchedPaths addObject: path];
-    [self server: serverName addWatcherForPath: path];
-  }
-}
-
-- (void)removeCachedRepresentationForPath:(NSString *)path
-                                 onServer:(NSString *)serverName
-{
-  NSMutableDictionary *serverCache = [cachedContents objectForKey: serverName];
-  NSMutableArray *watchedPaths = [[self dictionaryForServer: serverName] 
-                                               objectForKey: @"watchedpaths"];
-
-  [serverCache removeObjectForKey: path];
-  
-  if ([watchedPaths containsObject: path]) {
-    [self server: serverName removeWatcherForPath: path];
-    [watchedPaths removeObject: path];
-  }
-}
-
-- (void)removeOlderCachedForServer:(NSString *)serverName
-{
-  NSMutableDictionary *serverCache = [cachedContents objectForKey: serverName];
-  NSMutableArray *watchedPaths = [[self dictionaryForServer: serverName] 
-                                               objectForKey: @"watchedpaths"];
-
-  if (serverCache) {
-    NSArray *keys = [serverCache allKeys];
-    NSDate *date = [NSDate date];
-    NSString *removeKey = nil;
-    int i;
-  
-    if ([keys count]) {
-      for (i = 0; i < [keys count]; i++) {
-        NSString *key = [keys objectAtIndex: i];
-        NSDate *stamp = [[serverCache objectForKey: key] objectForKey: @"datestamp"];
-        NSDate *d = [date earlierDate: stamp];
-
-        if ([date isEqualToDate: d] == NO) {
-          date = d;
-          removeKey = key;
-        }
-      }
-     
-      if (removeKey == nil) {
-        removeKey = [keys objectAtIndex: 0];
-      }
-      
-      [serverCache removeObjectForKey: removeKey];
- 
-      if ([watchedPaths containsObject: removeKey]) {
-        [self server: serverName removeWatcherForPath: removeKey];
-        [watchedPaths removeObject: removeKey];
-      }
-    }
-  }
-}
-
-- (int)entriesInCacheOfServer:(NSString *)serverName
-{
-  return [[cachedContents objectForKey: serverName] count];
-}
-
-- (BOOL)server:(NSString *)serverName verifyFileAtPath:(NSString *)path
-{
-	if ([[self serverWithName: serverName] existsFileAtPath: path] == NO) {
-		NSString *err = NSLocalizedString(@"Error", @"");
-		NSString *msg = NSLocalizedString(@": no such file or directory!", @"");
-		NSString *buttstr = NSLocalizedString(@"Continue", @"");
-		NSMutableDictionary *notifObj = [NSMutableDictionary dictionaryWithCapacity: 1];		
-		NSString *basePath = [path stringByDeletingLastPathComponent];
-		
-    NSRunAlertPanel(err, [NSString stringWithFormat: @"%@%@", path, msg], buttstr, nil, nil);   
-
-		[notifObj setObject: NSWorkspaceDestroyOperation forKey: @"operation"];	
-  	[notifObj setObject: basePath forKey: @"source"];	
-  	[notifObj setObject: basePath forKey: @"destination"];	
-  	[notifObj setObject: [NSArray arrayWithObjects: path, nil] forKey: @"files"];	
-
-		[nc postNotificationName: GWFileSystemWillChangeNotification
-	 									  object: notifObj];
-
-		[nc postNotificationName: GWFileSystemDidChangeNotification
-	 									object: notifObj];
-		return NO;
-	}
-	
-	return YES;
-}
-
-- (void)fileSystemWillChangeNotification:(NSNotification *)notif
-{
-}
-
-- (void)fileSystemDidChangeNotification:(NSNotification *)notif
-{
-}
-
-- (void)server:(NSString *)serverName 
-        newObjectAtPath:(NSString *)basePath 
-            isDirectory:(BOOL)directory
-{
-  id <GWSDProtocol> server = [self serverWithName: serverName];
-
-  if (server) {
-    [server newObjectAtPath: basePath isDirectory: directory];
-  }
-}
-
-- (void)duplicateFilesOnServerName:(NSString *)serverName
-{
-  id <GWSDProtocol> server = [self serverWithName: serverName];
-
-  if (server) {
-    NSArray *selection = [self selectedPathsForServerWithName: serverName];
-    NSString *basePath = [NSString stringWithString: [selection objectAtIndex: 0]];
-    NSMutableArray *files = [NSMutableArray array];
-    int i;
-
-    basePath = [basePath stringByDeletingLastPathComponent];
-
-    for (i = 0; i < [selection count]; i++) {
-      [files addObject: [[selection objectAtIndex: i] lastPathComponent]];
-    }
-
-    [server duplicateFiles: files inDirectory: basePath];
-  }
-}
-
-- (void)deleteFilesOnServerName:(NSString *)serverName
-{
-  id <GWSDProtocol> server = [self serverWithName: serverName];
-
-  if (server) {
-    NSArray *selection = [self selectedPathsForServerWithName: serverName];
-    NSString *basePath = [NSString stringWithString: [selection objectAtIndex: 0]];
-    NSMutableArray *files = [NSMutableArray array];
-    int i;
-
-    basePath = [basePath stringByDeletingLastPathComponent];
-
-    for (i = 0; i < [selection count]; i++) {
-      [files addObject: [[selection objectAtIndex: i] lastPathComponent]];
-    }
-
-    [server deleteFiles: files inDirectory: basePath];
-  }
-}
-
-- (BOOL)pauseFileOperationWithRef:(int)ref 
-                 onServerWithName:(NSString *)serverName
-{
-  id <GWSDProtocol> server = [self serverWithName: serverName];
-
-  if (server) {
-    return [server pauseFileOpeRationWithRef: ref];
-  }
-  
-  return NO;  
-}
-
-- (BOOL)continueFileOperationWithRef:(int)ref
-                    onServerWithName:(NSString *)serverName
-{
-  id <GWSDProtocol> server = [self serverWithName: serverName];
-
-  if (server) {
-    return [server continueFileOpeRationWithRef: ref];
+  if (image == nil) {
+    image = RETAIN ([self getImageWithName: @"Folder.tiff"
+				                         alternate: @"common_Folder.tiff"]);
   }
 
-  return NO;
+  return image;
 }
 
-- (BOOL)stopFileOperationWithRef:(int)ref
-                onServerWithName:(NSString *)serverName
+- (NSImage *)unknownFiletypeImage
 {
-  id <GWSDProtocol> server = [self serverWithName: serverName];
+  static NSImage *image = nil;
 
-  if (server) {
-    return [server stopFileOpeRationWithRef: ref];
+  if (image == nil) {
+    image = RETAIN([self getImageWithName: @"Unknown.tiff"
+				                        alternate: @"common_Unknown.tiff"]);
   }
 
-  return NO;
+  return image;
 }
 
 - (int)shelfCellsWidth
@@ -1334,35 +1358,6 @@ Do you want to save them?", @""),
   }
 }
 
-- (void)connectionDidDie:(NSNotification *)notification
-{
-	id diedconn = [notification object];
-	id <GWSDProtocol> server = [self serverWithConnection: diedconn];
-  
-  [[NSNotificationCenter defaultCenter] removeObserver: self
-	                      name: NSConnectionDidDieNotification object: diedconn];
-
-  if (server) {
-    NSString *name = [self nameOfServer: server];
-    NSArray *sviewers = [self viewersOfServer: name];
-    int i;
-    
-    for (i = 0; i < [sviewers count]; i++) {
-      ViewerWindow *viewer = [sviewers objectAtIndex: i];
-      
-      [viewer updateDefaults];
-      [viewer close];
-    }
-    
-    [serversDict removeObjectForKey: name];
-    
-    NSRunAlertPanel(NULL, 
-        [NSString stringWithFormat: @"the connection with %@ died!", name],
-                                                          @"OK", NULL, NULL);   
-  }  
-}
-
-
 //
 // Menu Operations
 //
@@ -1435,17 +1430,15 @@ Do you want to save them?", @""),
   [d setObject: @"GWRemote" forKey: @"ApplicationName"];
   [d setObject: NSLocalizedString(@"GNUstep Remote Workspace Manager", @"")
       	forKey: @"ApplicationDescription"];
-  [d setObject: @"GWRemote 0.1" forKey: @"ApplicationRelease"];
+  [d setObject: @"GWRemote 0.2" forKey: @"ApplicationRelease"];
   [d setObject: @"06 2003" forKey: @"FullVersionID"];
-  [d setObject: [NSArray arrayWithObjects: 
-      @"Enrico Sersale <enrico@imago.ro>.",
-      nil]
-     forKey: @"Authors"];
+  [d setObject: [NSArray arrayWithObjects: @"Enrico Sersale <enrico@imago.ro>.", nil]
+        forKey: @"Authors"];
   [d setObject: NSLocalizedString(@"See http://www.gnustep.it/enrico/gwremote", @"") forKey: @"URL"];
-  [d setObject: @"Copyright (C) 2003 Enrico Sersale."
-     forKey: @"Copyright"];
+  [d setObject: @"Copyright (C) 2003 Free Software Foundation, Inc."
+        forKey: @"Copyright"];
   [d setObject: NSLocalizedString(@"Released under the GNU General Public License 2.0", @"")
-     forKey: @"CopyrightDescription"];
+        forKey: @"CopyrightDescription"];
   
 #ifdef GNUSTEP	
   [NSApp orderFrontStandardInfoPanelWithOptions: d];
