@@ -958,10 +958,10 @@ filename =  [fileinfo objectForKey: @"name"]
     if ([fm fileExistsAtPath: destpath]) {
       NSString *ext = [filename pathExtension]; 
       NSString *base = [filename stringByDeletingPathExtension]; 
-
-      newname = [NSString stringWithString: filename];
       int count = 1;
-
+      
+      newname = [NSString stringWithString: filename];
+      
 	    while (1) {
         if (count == 1) {
           ntmp = [NSString stringWithFormat: @"%@%@", base, copystr];

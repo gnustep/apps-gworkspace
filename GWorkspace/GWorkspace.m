@@ -802,27 +802,7 @@ static GWorkspace *gworkspace = nil;
 
 - (void)setUseTerminalService:(BOOL)value
 {
-	NSMenu *menu = [[[NSApp mainMenu] itemWithTitle: NSLocalizedString(@"Tools", @"")] submenu];
-  NSString *title = NSLocalizedString(@"XTerm", @"");
-  id item;
-
   teminalService = value;
-
-  if (teminalService) {
-    item = [menu itemWithTitle: title];
-
-    if (item) {
-      [menu removeItem: item];
-    }
-  } else {
-    item = [menu itemWithTitle: title];
-
-    if (item == nil) {
-	    [menu addItemWithTitle: title
-											action: @selector(showTerminal:) 
-               keyEquivalent: @"t"];	
-    }
-  }
 }
 
 - (void)updateDefaults
@@ -894,18 +874,30 @@ static GWorkspace *gworkspace = nil;
 
 - (void)startXTermOnDirectory:(NSString *)dirPath
 {
-	NSTask *task = [NSTask new];
-  
-	AUTORELEASE (task);
-	[task setCurrentDirectoryPath: dirPath];			
-	[task setLaunchPath: defXterm];
-  
-  if (defXtermArgs) {
-	  NSArray *args = [defXtermArgs componentsSeparatedByString: @" "];
-	  [task setArguments: args];
+  if (teminalService) {
+    NSPasteboard *pboard = [NSPasteboard pasteboardWithUniqueName];
+    NSArray *types = [NSArray arrayWithObject: NSFilenamesPboardType];
+
+    [pboard declareTypes: types owner: self];
+    [pboard setPropertyList: [NSArray arrayWithObject: dirPath]
+									  forType: NSFilenamesPboardType];
+                    
+    NSPerformService(@"Terminal/Open shell here", pboard);  
+                      
+  } else {  
+	  NSTask *task = [NSTask new];
+
+	  AUTORELEASE (task);
+	  [task setCurrentDirectoryPath: dirPath];			
+	  [task setLaunchPath: defXterm];
+
+    if (defXtermArgs) {
+	    NSArray *args = [defXtermArgs componentsSeparatedByString: @" "];
+	    [task setArguments: args];
+    }
+
+	  [task launch];
   }
-  
-	[task launch];
 }
 
 - (int)defaultSortType

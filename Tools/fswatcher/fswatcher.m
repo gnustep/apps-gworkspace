@@ -632,8 +632,6 @@
 
 int main(int argc, char** argv)
 {
-	FSWatcher *fsw;
-
 	switch (fork()) {
 	  case -1:
 	    fprintf(stderr, "fswatcher - fork failed - bye.\n");
@@ -647,96 +645,18 @@ int main(int argc, char** argv)
 	    exit(0);
 	}
   
-  CREATE_AUTORELEASE_POOL (pool);
-	fsw = [[FSWatcher alloc] init];
-  RELEASE (pool);
+  {
+    CREATE_AUTORELEASE_POOL (pool);
+    FSWatcher *fsw = [[FSWatcher alloc] init];
+    RELEASE (pool);
   
-  if (fsw != nil) {
-	  CREATE_AUTORELEASE_POOL (pool);
-    [[NSRunLoop currentRunLoop] run];
-  	RELEASE (pool);
-  }
-  
-  exit(0);
-}
-
-/*
-static void init(int argc, char** argv, char **env)
-{
-  NSProcessInfo *pInfo = [NSProcessInfo processInfo];
-  NSMutableArray *args = [pInfo arguments];
-  BOOL shouldFork = YES;
-
-  if (([args count] > 1) && [[args objectAtIndex: 1] isEqual: @"--daemon"]) {
-    NSLog(@"beccato --daemon");
-    shouldFork = NO;
-  }
-      
-  if (shouldFork) {
-    NSFileHandle *nullHandle;
-    NSTask *task;
-    
-    NS_DURING
-	    {
-        task = [NSTask new];
-	      [task setLaunchPath: [[NSBundle mainBundle] executablePath]];
-	      [task setArguments: [NSArray arrayWithObject: @"--daemon"]];
-	      [task setEnvironment: [pInfo environment]];
-	      nullHandle = [NSFileHandle fileHandleWithNullDevice];
-	      [task setStandardInput: nullHandle];
-	      [task setStandardOutput: nullHandle];
-	      [task setStandardError: nullHandle];
-	      [task launch];
-	      DESTROY(task);
-      }
-    NS_HANDLER
-      {
-	      DESTROY(task);
-	    }
-    NS_ENDHANDLER
-    
-    NSLog(@"QUA 1");
-    
-    exit(0);
-  }
-
-    NSLog(@"QUA 2 (daemon)");
-}
-
-int main(int argc, char** argv, char **env)
-{
-  CREATE_AUTORELEASE_POOL (pool);
-  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-	FSWatcher *fsw;
-
-  init(argc, argv, env);
-
- defaults = [NSUserDefaults standardUserDefaults];
-    [defaults registerDefaults: [NSDictionary dictionaryWithObjectsAndKeys:
-      @"YES", @"GSLogSyslog", nil]];
-  
-	fsw = [[FSWatcher alloc] init];
-
-
-    [[NSFileHandle fileHandleWithStandardInput] closeFile];
-    [[NSFileHandle fileHandleWithStandardOutput] closeFile];
-#ifndef __MINGW__
-//    if (debugging == NO)
- //     {
-	[[NSFileHandle fileHandleWithStandardError] closeFile];
- //     }
-#endif
-
-
-  RELEASE (pool);
-  
-  if (fsw != nil) {
-    CREATE_AUTORELEASE_POOL(pool);
-    [[NSRunLoop currentRunLoop] run];
-    RELEASE(pool);
+    if (fsw != nil) {
+	    CREATE_AUTORELEASE_POOL (pool);
+      [[NSRunLoop currentRunLoop] run];
+  	  RELEASE (pool);
+    }
   }
     
   exit(EXIT_SUCCESS);
 }
 
-*/

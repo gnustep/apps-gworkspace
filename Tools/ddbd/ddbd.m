@@ -1799,8 +1799,6 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix)
 
 int main(int argc, char** argv)
 {
-	DDBd *ddbd;
-
 	switch (fork()) {
 	  case -1:
 	    fprintf(stderr, "ddbd - fork failed - bye.\n");
@@ -1814,17 +1812,19 @@ int main(int argc, char** argv)
 	    exit(0);
 	}
   
-  CREATE_AUTORELEASE_POOL (pool);
-	ddbd = [[DDBd alloc] init];
-  RELEASE (pool);
-  
-  if (ddbd != nil) {
-	  CREATE_AUTORELEASE_POOL (pool);
-    [ddbd prepareDb];
-    [[NSRunLoop currentRunLoop] run];
-  	RELEASE (pool);
+  {
+    CREATE_AUTORELEASE_POOL (pool);
+	  DDBd *ddbd = [[DDBd alloc] init];
+    RELEASE (pool);
+
+    if (ddbd != nil) {
+	    CREATE_AUTORELEASE_POOL (pool);
+      [ddbd prepareDb];
+      [[NSRunLoop currentRunLoop] run];
+  	  RELEASE (pool);
+    }
   }
-  
-  exit(0);
+    
+  exit(EXIT_SUCCESS);
 }
 
