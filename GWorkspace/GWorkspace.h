@@ -86,6 +86,8 @@
 
   BOOL contestualMenu;
 
+  BOOL dontWarnOnQuit;
+
   DesktopWindow *desktopWindow;
   
   TShelfWin *tshelfWin;

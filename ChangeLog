@@ -1,4 +1,9 @@
 2003-10-29 Enrico Sersale  <enrico@imago.ro>
+  
+  * Version 0.6.2
+
+  * GWorkspace/GWorkspace.m
+    check the defaults for "NoWarnOnQuit"
 
   * ClipBook/ClipBookWindow.m
     added the DraggingDestination methods and removed them from the subviews.

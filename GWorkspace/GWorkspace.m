@@ -575,6 +575,8 @@ return [ws openFile: fullPath withApplication: appName]
   
   contestualMenu = [defaults boolForKey: @"UsesContestualMenu"];
 
+  dontWarnOnQuit = [defaults boolForKey: @"NoWarnOnQuit"];
+
   usesThumbnails = [defaults boolForKey: @"usesthumbnails"];
   [GWLib setUseThumbnails: usesThumbnails];
 
@@ -705,13 +707,15 @@ return [ws openFile: fullPath withApplication: appName]
 	int i;
 
 #define TEST_CLOSE(o, w) if ((o) && ([w isVisible])) [w close]
-
-  if (NSRunAlertPanel(NSLocalizedString(@"Quit!", @""),
+  
+  if (dontWarnOnQuit == NO) {
+    if (NSRunAlertPanel(NSLocalizedString(@"Quit!", @""),
                       NSLocalizedString(@"Do you really want to quit?", @""),
                       NSLocalizedString(@"No", @""),
                       NSLocalizedString(@"Yes", @""),
                       nil)) {
-    return NO;
+      return NO;
+    }
   }
 
   [self updateDefaults];
@@ -1964,7 +1968,7 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   [d setObject: @"GWorkspace" forKey: @"ApplicationName"];
   [d setObject: NSLocalizedString(@"GNUstep Workspace Manager", @"")
       	forKey: @"ApplicationDescription"];
-  [d setObject: @"GWorkspace 0.6.1" forKey: @"ApplicationRelease"];
+  [d setObject: @"GWorkspace 0.6.2" forKey: @"ApplicationRelease"];
   [d setObject: @"10 2003" forKey: @"FullVersionID"];
   [d setObject: [NSArray arrayWithObjects: 
       @"Enrico Sersale <enrico@imago.ro>.\n\
