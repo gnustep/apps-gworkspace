@@ -31,6 +31,8 @@
 
 - (void)dealloc
 {
+	[nc removeObserver: self];
+  
   if (autoupdateTmr && [autoupdateTmr isValid]) {
     [autoupdateTmr invalidate];
     DESTROY (autoupdateTmr);
@@ -227,6 +229,8 @@
     DESTROY (autoupdateTmr);
   }
   
+  [nc removeObserver: self];
+  DESTROY (ddbd);
   [NSThread exit];
 }
 
@@ -418,9 +422,11 @@
     
     for (i = 0; i < [founds count]; i++) {
       NSString *found = [founds objectAtIndex: i];
-
-      [foundPaths addObject: found];
-      [lsfolder addFoundPath: found];
+      
+      if ([foundPaths containsObject: found] == NO) {
+        [foundPaths addObject: found];
+        [lsfolder addFoundPath: found];
+      }
     }
     
     [self ddbdInsertDirectoryTreesFromPaths: [NSArray arrayWithObject: srcpath]];

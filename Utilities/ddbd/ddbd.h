@@ -51,6 +51,8 @@
 
 @interface DDBd: NSObject <DDBdProtocol>
 {
+  NSTimer *syncTimer;
+  NSTimeInterval syncinterval;
   NSConnection *conn;
   NSNotificationCenter *nc; 
 }
@@ -61,7 +63,7 @@
 
 - (void)fileSystemDidChange:(NSNotification *)notif;
 
-- (void)performDaylyUpdate:(id)sender;
+- (void)synchronize:(id)sender;
 
 - (void)threadWillExit:(NSNotification *)notification;
             
@@ -88,7 +90,7 @@
 
 - (void)fileSystemDidChange;
 
-- (void)daylyUpdate;
+- (void)synchronize;
 
 @end
 

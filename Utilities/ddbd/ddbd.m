@@ -39,6 +39,10 @@
 #endif
 #include <signal.h>
 
+#define SYNC_INTERVAL (3600.0)
+#define MIN_INTERVAL (60.0)
+#define MAX_INTERVAL (86400.0)
+
 #define PATHSIZE 512
 #define ANNSIZE 8192
 
@@ -58,7 +62,7 @@ enum {
   DDBdInsertTreeUpdate,
   DDBdRemoveTreeUpdate,
   DDBdFileOperationUpdate,
-  DDBdDaylyUpdate
+  DDBdSynchronize
 };
 
 static BOOL inited = NO;
@@ -79,21 +83,32 @@ static NSFileHandle *annsHandle = nil;
 static NSRecursiveLock *annslock = nil; 
 
 static NSFileManager *fm = nil;
+static SEL existsSel = @selector(fileExistsAtPath:);
+typedef BOOL (*boolIMP)(id, SEL, id);
+boolIMP existsImp;  
 
 BOOL createDb(void);
+
 BOOL readDirectories(void);
 BOOL writeDirectories(void);
 void addDirectory(NSString *path);
 void removeDirectory(NSString *path);
+void checkDirectories(void);
 void synchronizeDirectories(void);
+
 void readPaths(void);
 BOOL writePaths(void);    
 NSMutableDictionary *addPath(NSString *path);
 void removePath(NSString *path);
 void pathUpdated(NSString *path);
+void checkPaths(void);
 void synchronizePaths(void);
+
 NSString *annotationsForPath(NSString *path);
 void setAnnotationsForPath(NSString *annotations, NSString *path);
+NSString *pathForAnnotationsOffset(unsigned long long offset);
+void checkAnnotations(void);
+
 void duplicatePathInfo(NSString *srcpath, NSString *dstpath);
 BOOL subpathOfPath(NSString *p1, NSString *p2);
 NSString *path_separator(void);
@@ -103,6 +118,11 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
 
 - (void)dealloc
 {
+  if (syncTimer && [syncTimer isValid]) {
+    [syncTimer invalidate];
+    DESTROY (syncTimer);
+  }
+
   [[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
 
   if (conn) {
@@ -119,8 +139,23 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
 {
   self = [super init];
   
-  if (self) {    
+  if (self) {   
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	      
+    id interval = [defaults objectForKey: @"sync-interval"];
+    
+    syncinterval = SYNC_INTERVAL;
+    
+    if (interval) {
+      float f = [interval floatValue];
+  
+      if ((f >= MIN_INTERVAL) && (f <= MAX_INTERVAL)) {
+        syncinterval = f;
+        NSLog(@"synchronize interval set to %.2f", syncinterval);
+      } 
+    }
+   
     fm = [NSFileManager defaultManager];	
+    existsImp = (boolIMP)[fm methodForSelector: existsSel];  
     nc = [NSNotificationCenter defaultCenter];
     
     dirslock = [NSRecursiveLock new];
@@ -129,7 +164,7 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
    
     dirsSet = [[NSMutableSet alloc] initWithCapacity: 1];
     pathsDict = [NSMutableDictionary new];   
-       
+           
     conn = [NSConnection defaultConnection];
     [conn setRootObject: self];
     [conn setDelegate: self];
@@ -155,12 +190,13 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
                 					    name: @"GWFileSystemDidChangeNotification"
                 					  object: nil];
 
-    [NSTimer scheduledTimerWithTimeInterval: 3600.0
+    syncTimer = [NSTimer scheduledTimerWithTimeInterval: syncinterval
                                      target: self
-                                   selector: @selector(performDaylyUpdate:)
+                                   selector: @selector(synchronize:)
                                    userInfo: nil
                                     repeats: YES];
- 
+    RETAIN (syncTimer);
+    
     NSLog(@"ddbd started");
   }
   
@@ -198,18 +234,9 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
   NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: NO];
 
   if (attributes) {
-    [pathslock lock];
-    if ([pathsDict objectForKey: path] == nil) {
-      addPath(path);
-    }
-    [pathslock unlock];
-  
+    addPath(path);
     if ([attributes fileType] == NSFileTypeDirectory) {
-      [dirslock lock];
-      if ([dirsSet containsObject: path] == NO) {
-        addDirectory(path);
-      }
-      [dirslock unlock];
+      addDirectory(path);
     }
   }
 
@@ -218,18 +245,9 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
 
 - (BOOL)removePath:(NSString *)path
 {
-  [pathslock lock];
-  if ([pathsDict objectForKey: path]) {
-    removePath(path);
-  }
-  [pathslock unlock];
-
-  [dirslock lock];
-  if ([dirsSet containsObject: path]) {
-    removeDirectory(path);
-  }
-  [dirslock unlock];
-
+  removePath(path);
+  removeDirectory(path);
+  
   return YES; 
 }
 
@@ -292,7 +310,7 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
   enumerator = [dirsSet objectEnumerator];
     
   while ((path = [enumerator nextObject])) {
-    if (subpathOfPath(apath, path)) {
+    if ((*existsImp)(fm, existsSel, path) && subpathOfPath(apath, path)) {
       [directories addObject: path];
     }
   }   
@@ -373,11 +391,12 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
   NS_ENDHANDLER
 }
 
-- (void)performDaylyUpdate:(id)sender
+- (void)synchronize:(id)sender
 {
   NSMutableDictionary *updaterInfo = [NSMutableDictionary dictionary];
+  id interval;
     
-  [updaterInfo setObject: [NSNumber numberWithInt: DDBdDaylyUpdate] 
+  [updaterInfo setObject: [NSNumber numberWithInt: DDBdSynchronize] 
                   forKey: @"type"];
   [updaterInfo setObject: [NSDictionary dictionary] forKey: @"taskdict"];
 
@@ -392,6 +411,29 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
       NSLog(@"A fatal error occured while detaching the thread!");
     }
   NS_ENDHANDLER
+  
+  interval = [[NSUserDefaults standardUserDefaults] objectForKey: @"sync-interval"];
+
+  if (interval) {
+    float f = [interval floatValue];
+
+    if ((f != syncinterval) && (f >= MIN_INTERVAL) && (f <= MAX_INTERVAL)) {
+      syncinterval = f;
+
+      if (syncTimer && [syncTimer isValid]) {
+        [syncTimer invalidate];
+        DESTROY (syncTimer);
+      }
+
+      syncTimer = [NSTimer scheduledTimerWithTimeInterval: syncinterval
+                                     target: self
+                                   selector: @selector(synchronize:)
+                                   userInfo: nil
+                                    repeats: YES];
+      RETAIN (syncTimer);
+      NSLog(@"synchronize interval set to %.2f", syncinterval);
+    } 
+  }
 }
 
 - (void)threadWillExit:(NSNotification *)notification
@@ -431,7 +473,7 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
   
   RETAIN (self);
     
-  NSLog(@"starting Desktop database update");
+  NSLog(@"starting db update");
 
   switch(type) {
     case DDBdPrepareDbUpdate:
@@ -450,8 +492,8 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
       [self fileSystemDidChange];
       break;
 
-    case DDBdDaylyUpdate:
-      [self daylyUpdate];
+    case DDBdSynchronize:
+      [self synchronize];
       break;
 
     default:
@@ -479,6 +521,7 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
   }
     
   synchronizeDirectories();
+  
   readPaths();
   synchronizePaths(); 
   
@@ -505,24 +548,15 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
         
       while ((path = (*nxtImp)(enumerator, @selector(nextObject))) != nil) {
         CREATE_AUTORELEASE_POOL(arp1);
-        NSString *fullPath = [base stringByAppendingPathComponent: path];        
 
         if ([[enumerator fileAttributes] fileType] == NSFileTypeDirectory) {
-          [dirslock lock];
-          if ([dirsSet containsObject: fullPath] == NO) {
-            addDirectory(fullPath);
-          }
-          [dirslock unlock];
+          addDirectory([base stringByAppendingPathComponent: path]);
         }
         
         DESTROY (arp1);
       } 
       
-      [dirslock lock];
-      if ([dirsSet containsObject: base] == NO) {
-        addDirectory(base);
-      }
-      [dirslock unlock];
+      addDirectory(base);
     }
     
     DESTROY (arp); 
@@ -587,65 +621,53 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
 
 - (void)fileSystemDidChange
 {
-  CREATE_AUTORELEASE_POOL(arp);
   NSString *operation = [updinfo objectForKey: @"operation"];
-  NSString *source = [updinfo objectForKey: @"source"];
-  NSString *destination = [updinfo objectForKey: @"destination"];
-  NSArray *files = [updinfo objectForKey: @"files"];
-  NSArray *origfiles = [updinfo objectForKey: @"origfiles"];
-  NSMutableArray *srcpaths = [NSMutableArray array];
-  NSMutableArray *dstpaths = [NSMutableArray array];
-  NSMutableArray *pathsToRemove = [NSMutableArray array];
-  NSArray *keys;
-  NSEnumerator *enumerator;
-  BOOL copy, remove; 
-  int i, j;
   
-  if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
-    srcpaths = [NSArray arrayWithObject: source];
-    dstpaths = [NSArray arrayWithObject: destination];
-  } else {
-    if ([operation isEqual: @"NSWorkspaceDuplicateOperation"]
-            || [operation isEqual: @"NSWorkspaceRecycleOperation"]) { 
-      for (i = 0; i < [files count]; i++) {
-        NSString *fname = [origfiles objectAtIndex: i];
-        [srcpaths addObject: [source stringByAppendingPathComponent: fname]];
-        fname = [files objectAtIndex: i];
-        [dstpaths addObject: [destination stringByAppendingPathComponent: fname]];
-      }
-    } else {  
-      for (i = 0; i < [files count]; i++) {
-        NSString *fname = [files objectAtIndex: i];
-        [srcpaths addObject: [source stringByAppendingPathComponent: fname]];
-        [dstpaths addObject: [destination stringByAppendingPathComponent: fname]];
-      }
-    }
-  }
-
-  copy = ([operation isEqual: @"NSWorkspaceMoveOperation"] 
+  if ([operation isEqual: @"NSWorkspaceMoveOperation"] 
                 || [operation isEqual: @"NSWorkspaceCopyOperation"]
                 || [operation isEqual: @"NSWorkspaceDuplicateOperation"]
-                || [operation isEqual: @"GWorkspaceRenameOperation"]); 
-      
-  remove = ([operation isEqual: @"NSWorkspaceMoveOperation"]
-                || [operation isEqual: @"NSWorkspaceDestroyOperation"]
-				        || [operation isEqual: @"NSWorkspaceRecycleOperation"]);
-  
-  [pathslock lock]; 
-  keys = [pathsDict allKeys];
-  enumerator = [keys objectEnumerator];
-  [pathslock unlock]; 
+                || [operation isEqual: @"GWorkspaceRenameOperation"]) {
+    CREATE_AUTORELEASE_POOL(arp);
+    NSString *source = [updinfo objectForKey: @"source"];
+    NSString *destination = [updinfo objectForKey: @"destination"];
+    NSArray *files = [updinfo objectForKey: @"files"];
+    NSArray *origfiles = [updinfo objectForKey: @"origfiles"];
+    NSMutableArray *srcpaths = [NSMutableArray array];
+    NSMutableArray *dstpaths = [NSMutableArray array];
+    NSArray *keys;
+    NSEnumerator *enumerator;
+    int i;
 
-  for (i = 0; i < [srcpaths count]; i++) {
-    NSString *srcpath = [srcpaths objectAtIndex: i];
-    NSString *dstpath = [dstpaths objectAtIndex: i];
-
-    if (remove && ([fm fileExistsAtPath: srcpath] == NO)) {
-      [pathsToRemove addObject: srcpath];
+    if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
+      srcpaths = [NSArray arrayWithObject: source];
+      dstpaths = [NSArray arrayWithObject: destination];
+    } else {
+      if ([operation isEqual: @"NSWorkspaceDuplicateOperation"]) { 
+        for (i = 0; i < [files count]; i++) {
+          NSString *fname = [origfiles objectAtIndex: i];
+          [srcpaths addObject: [source stringByAppendingPathComponent: fname]];
+          fname = [files objectAtIndex: i];
+          [dstpaths addObject: [destination stringByAppendingPathComponent: fname]];
+        }
+      } else {  
+        for (i = 0; i < [files count]; i++) {
+          NSString *fname = [files objectAtIndex: i];
+          [srcpaths addObject: [source stringByAppendingPathComponent: fname]];
+          [dstpaths addObject: [destination stringByAppendingPathComponent: fname]];
+        }
+      }
     }
 
-    if (copy) {
+    [pathslock lock]; 
+    keys = [pathsDict allKeys];
+    RETAIN (keys);
+    enumerator = [keys objectEnumerator];
+    [pathslock unlock]; 
+
+    for (i = 0; i < [srcpaths count]; i++) {
       CREATE_AUTORELEASE_POOL(pool);
+      NSString *srcpath = [srcpaths objectAtIndex: i];
+      NSString *dstpath = [dstpaths objectAtIndex: i];
       NSDictionary *attrs = [fm fileAttributesAtPath: dstpath traverseLink: NO];
 
       if ([keys containsObject: srcpath]) {
@@ -653,50 +675,40 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
       }
 
       if ([attrs fileType] == NSFileTypeDirectory) {
-        NSMutableArray *toadd = [NSMutableArray array];
         NSString *path;
-        
+
         while ((path = [enumerator nextObject])) {
           if (subpathOfPath(srcpath, path)) {
-            [toadd addObject: path];
+            NSString *newpath = pathRemovingPrefix(path, srcpath);
+            
+            newpath = [dstpath stringByAppendingPathComponent: newpath];
+          
+            if ((*existsImp)(fm, existsSel, newpath)) {
+              duplicatePathInfo(path, newpath);  
+            }
           }
         }   
-
-        for (j = 0; j < [toadd count]; j++) {
-          NSString *oldpath = [toadd objectAtIndex: j];
-          NSString *newpath;
-
-          newpath = pathRemovingPrefix(oldpath, srcpath);
-          newpath = [dstpath stringByAppendingPathComponent: newpath];
-
-          if ([fm fileExistsAtPath: newpath]) {
-            duplicatePathInfo(oldpath, newpath);  
-          }
-        }
       }
 
       RELEASE (pool);
     }
+    
+    RELEASE (keys);
+    RELEASE (arp);
   }
   
-  if ([pathsToRemove count]) {
-    NSDictionary *dict = [NSDictionary dictionaryWithObject: pathsToRemove 
-                                                     forKey: @"paths"];
-    RETAIN (dict);
-    RELEASE (arp);
-    ASSIGN (updinfo, [dict autorelease]);
-    [self removeTrees];
-  } else {
-    RELEASE (arp);
-    [self done];
-  }
+  [self done];
 }
 
-- (void)daylyUpdate
+- (void)synchronize
 {
-
-
-
+  checkAnnotations();
+  
+  checkDirectories();
+  synchronizeDirectories();
+  
+  checkPaths();
+  synchronizePaths(); 
 
   [self done];
 }
@@ -856,7 +868,7 @@ BOOL writeDirectories()
 {
   NSString *dirspath = [dbdir stringByAppendingPathComponent: @"dirs"];
   NSString *path = [dirspath stringByAppendingPathExtension: @"tmp"];
-  NSEnumerator *enumerator = [dirsSet objectEnumerator];
+  NSEnumerator *enumerator;
   NSString *directory;
   NSFileHandle *handle;
   
@@ -870,7 +882,9 @@ BOOL writeDirectories()
   }
     
   handle = [NSFileHandle fileHandleForWritingAtPath: path];
-
+  
+  enumerator = [dirsSet objectEnumerator];
+  
   while ((directory = [enumerator nextObject])) {
     CREATE_AUTORELEASE_POOL(pool);
     const char *buf = [directory UTF8String];
@@ -936,6 +950,27 @@ void removeDirectory(NSString *path)
   }
 
   [dirslock unlock];
+}
+
+void checkDirectories()
+{
+  NSArray *dirs;
+  int i;
+  
+  [dirslock lock];
+  dirs = [dirsSet allObjects];
+  RETAIN (dirs);
+  [dirslock unlock];
+  
+  for (i = 0; i < [dirs count]; i++) {
+    NSString *dir = [dirs objectAtIndex: i];
+    
+    if ((*existsImp)(fm, existsSel, dir) == NO) {
+      removeDirectory(dir);
+    }
+  }
+  
+  RELEASE (dirs);  
 }
 
 void synchronizeDirectories()
@@ -1187,13 +1222,13 @@ void removePath(NSString *path)
   
   if (dict) {
     const char *buf = [path UTF8String]; 
+    NSNumber *num = [dict objectForKey: @"annoffset"];
     dbpath dbp;
     NSData *data;
-  
+
     memset(dbp.path, 0, sizeof(dbp.path));
     memcpy(dbp.path, buf, strlen(buf));
-  
-    dbp.annoffset = [[dict objectForKey: @"annoffset"] unsignedLongLongValue];
+    dbp.annoffset = [num unsignedLongLongValue];
     dbp.timestamp = [[NSDate date] timeIntervalSinceReferenceDate];
   
     data = [NSData dataWithBytes: &dbp length: sizeof(dbpath)];
@@ -1211,7 +1246,7 @@ void removePath(NSString *path)
 void pathUpdated(NSString *path)
 {
   const char *buf = [path UTF8String];
-  NSDictionary *dict;
+  NSMutableDictionary *dict;
   NSNumber *num;
   unsigned long long offset;
   dbpath dbp;  
@@ -1228,12 +1263,36 @@ void pathUpdated(NSString *path)
   dbp.annoffset = offset;
   dbp.timestamp = [[NSDate date] timeIntervalSinceReferenceDate];
 
+  [dict setObject: [NSNumber numberWithDouble: dbp.timestamp]
+           forKey: @"timestamp"];
+
   data = [NSData dataWithBytes: &dbp length: sizeof(dbpath)];
 
   [pathsAddHandle seekToEndOfFile];
   [pathsAddHandle writeData: data];
 //  [pathsAddHandle synchronizeFile];
   [pathslock unlock];
+}
+
+void checkPaths()
+{
+  NSArray *paths;
+  int i;
+  
+  [pathslock lock];
+  paths = [pathsDict allKeys];
+  RETAIN (paths);
+  [pathslock unlock];
+  
+  for (i = 0; i < [paths count]; i++) {
+    NSString *path = [paths objectAtIndex: i];
+    
+    if ((*existsImp)(fm, existsSel, path) == NO) {
+      removePath(path);
+    }
+  }
+  
+  RELEASE (paths);  
 }
 
 void synchronizePaths()
@@ -1355,17 +1414,13 @@ void synchronizePaths()
 
   for (i = 0; i < [paths count]; i++) {
     NSString *path = [paths objectAtIndex: i];
-    NSDictionary *dict = [toadd objectForKey: path];
+    NSMutableDictionary *dict = [toadd objectForKey: path];
     
     [pathsDict setObject: dict forKey: path];
   }
 
   for (i = 0; i < [toremove count]; i++) {
     [pathsDict removeObjectForKey: [toremove objectAtIndex: i]];
-    
-      // TOGLIERE ANCHE DALLE ANNOTATIONS 
-      // E UPDATARE annoffset IN TUTTI GLI ALTRI
-      // NO! METTERE IN daylyUpdate PRENDENDO LE PATH DALLE ANNOTATIONS
   }
 
   if (writePaths()) {
@@ -1391,16 +1446,26 @@ NSString *annotationsForPath(NSString *path)
     NSNumber *num = [dict objectForKey: @"annoffset"];
     unsigned long long offset = [num unsignedLongLongValue];
 
-    if (offset != 0) {
+    [annsHandle seekToEndOfFile];
+    
+    if ((offset != 0) 
+          && (offset <= ([annsHandle offsetInFile] - sizeof(annotation)))) {
       annotation annot;
       NSData *data;
       
       [annsHandle seekToFileOffset: offset];
-      data = [annsHandle readDataOfLength: sizeof(annotation)];
-      [data getBytes: &annot.ann range: NSMakeRange(0, sizeof(annot.ann) - 1)];
-      [annslock unlock];
       
-      return [NSString stringWithUTF8String: annot.ann];
+      data = [annsHandle readDataOfLength: sizeof(annotation)];
+      
+      if ([data length] == sizeof(annotation)) {
+        [data getBytes: &annot.ann range: NSMakeRange(0, sizeof(annot.ann) - 1)];
+        [data getBytes: &annot.path 
+                 range: NSMakeRange(sizeof(annot.ann), sizeof(annot.path) - 1)];
+      
+        [annslock unlock];
+        
+        return [NSString stringWithUTF8String: annot.ann];
+      }
     }
   }
   
@@ -1427,9 +1492,11 @@ void setAnnotationsForPath(NSString *annotations, NSString *path)
   
   num = [dict objectForKey: @"annoffset"];
   offset = [num unsignedLongLongValue];
+
+  [annsHandle seekToEndOfFile];
   
-  if (offset == 0) {
-    [annsHandle seekToEndOfFile];
+  if ((offset == 0) 
+        || (offset > ([annsHandle offsetInFile] - sizeof(annotation)))) {
     offset = [annsHandle offsetInFile];
     num = [NSNumber numberWithUnsignedLongLong: offset];
     [dict setObject: num forKey: @"annoffset"];
@@ -1451,6 +1518,143 @@ void setAnnotationsForPath(NSString *annotations, NSString *path)
   [annsHandle synchronizeFile];
   
   [annslock unlock];
+}
+
+NSString *pathForAnnotationsOffset(unsigned long long offset)
+{
+  NSArray *paths;
+  int i;
+  
+  [pathslock lock]; 
+  paths = [pathsDict allKeys];  
+
+  for (i = 0; i < [paths count]; i++) {
+    NSString *path = [paths objectAtIndex: i];
+    NSDictionary *dict = [pathsDict objectForKey: path];
+      
+    if ([[dict objectForKey: @"annoffset"] unsignedLongLongValue] == offset) {
+      [pathslock unlock];
+      return path;
+    }
+  }
+  
+  [pathslock unlock];
+  
+  return nil;
+}
+
+void checkAnnotations()
+{
+  CREATE_AUTORELEASE_POOL(arp);
+  NSString *fpath = [dbdir stringByAppendingPathComponent: @"annotations.tmp"];
+  NSFileHandle *handle; 
+  NSMutableDictionary *written;
+  annotation annot;
+  unsigned annsize;
+  NSData *data;
+  NSString *path;
+  BOOL changed;
+  
+  if ([fm fileExistsAtPath: fpath]) {
+    if ([fm removeFileAtPath: fpath handler: nil] == NO) {
+      NSLog(@"unable to remove the annotations tmp file");
+      RELEASE (arp);
+      return;    
+    }
+  }
+
+  if ([fm createFileAtPath: fpath contents: nil attributes: nil] == NO) { 
+    NSLog(@"unable to create the annotations tmp file");
+    RELEASE (arp);
+    return;
+  }
+
+  handle = [NSFileHandle fileHandleForUpdatingAtPath: fpath];  
+  written = [NSMutableDictionary dictionary];
+   
+  [annslock lock];
+  changed = NO;
+  
+  [annsHandle synchronizeFile];
+  [annsHandle seekToFileOffset: 0];
+  annsize = sizeof(annotation);
+
+  while (1) {
+    data = [annsHandle readDataOfLength: annsize];
+    
+    if ([data length] == annsize) {
+      NSMutableDictionary *dict;
+      
+      memset(annot.ann, 0, sizeof(annot.ann));
+      memset(annot.path, 0, sizeof(annot.path));
+
+      [data getBytes: &annot.ann range: NSMakeRange(0, sizeof(annot.ann) - 1)];
+      [data getBytes: &annot.path 
+               range: NSMakeRange(sizeof(annot.ann), sizeof(annot.path) - 1)];
+    
+      path = [NSString stringWithUTF8String: annot.path];
+      dict = [pathsDict objectForKey: path];
+      
+      if (dict) {
+        NSDictionary *wrdict = [written objectForKey: path];
+        unsigned long long newoffset;
+        NSNumber *newoffnum;
+
+        if (wrdict) {
+          newoffnum = [wrdict objectForKey: @"annoffset"];
+          newoffset = [newoffnum unsignedLongLongValue];
+          [handle seekToFileOffset: newoffset];
+        } else {
+          [handle seekToEndOfFile];
+          newoffset = [handle offsetInFile];
+          newoffnum = [NSNumber numberWithUnsignedLongLong: newoffset];
+        } 
+
+        if ([[dict objectForKey: @"annoffset"] isEqual: newoffnum] == NO) {
+          [dict setObject: newoffnum forKey: @"annoffset"];
+          pathUpdated(path);
+          changed = YES;
+        }
+
+        [handle writeData: data]; 
+        [written setObject: dict forKey: path];
+        
+      } else {
+        changed = YES; 
+        
+        if ([annsHandle offsetInFile] == annsize) {
+          [handle writeData: data]; 
+        }
+      }
+      
+    } else {
+      break;
+    }
+  }
+    
+  [handle synchronizeFile];
+  [handle seekToFileOffset: 0];
+  
+  if (changed) {
+    [annsHandle truncateFileAtOffset: 0];
+
+    while (1) {
+      data = [handle readDataOfLength: sizeof(annotation)];
+
+      if ([data length] == sizeof(annotation)) {
+        [annsHandle writeData: data];
+      } else {
+        break;
+      }
+    }
+    
+    [annsHandle synchronizeFile];
+  }
+
+  [handle closeFile];
+  [fm removeFileAtPath: fpath handler: nil];
+  [annslock unlock];
+  RELEASE (arp);
 }
 
 void duplicatePathInfo(NSString *srcpath, NSString *dstpath)
@@ -1562,57 +1766,18 @@ int main(int argc, char** argv)
 
 
 
-
-
-
-
-
-
 /*
-    NSLog(@"QUA 1");
-    {
-      char buf[BUFSIZ];   
-      char *s;
-      FILE *fp = fopen("/home/enrico/Butt/GNUstep/CopyPix/AA/test.txt", "r");
+  CREATE_AUTORELEASE_POOL(arp);
+  NSString *base = @"/home/enrico/Butt/GNUstep/CopyPix";  
+  NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: base];
+  NSString *path;    
 
-      while (fgets(buf, sizeof(buf), fp) != NULL) {
-        CREATE_AUTORELEASE_POOL(pool);
-        NSString *str;
-      
-	      s = strchr(buf, '\n');
-	      if (s) {
-	        *s = '\0';
-        }
-        
-        str = [NSString stringWithUTF8String: buf];
-        addDirectory(str);
-        
-        addPath(str);
-        
-        RELEASE (pool);
-      }
-      
-      fclose(fp);
-            
-      NSLog(@"QUA 2");
+  while ((path = [enumerator nextObject])) {
+    if ([[enumerator fileAttributes] fileType] == NSFileTypeDirectory) {
+      addDirectory([base stringByAppendingPathComponent: path]);
     }
+    addPath([base stringByAppendingPathComponent: path]);
+  } 
 
-
-    removeDirectory(@"/home");
-    removeDirectory(@"/home/enrico");
-    removeDirectory(@"/home/enrico/Butt");
-    removeDirectory(@"/home/enrico/Butt/GNUstep");
-    removeDirectory(@"/home/enrico/Butt/GNUstep/CopyPix");
-    removeDirectory(@"/home/enrico/Butt/GNUstep/CopyPix/AA");
-    
-    synchronizeDirectories();
-    
-    removePath(@"/home");
-    removePath(@"/home/enrico");
-    removePath(@"/home/enrico/Butt");
-    removePath(@"/home/enrico/Butt/GNUstep");
-    removePath(@"/home/enrico/Butt/GNUstep/CopyPix");
-    removePath(@"/home/enrico/Butt/GNUstep/CopyPix/AA");
-    
-    synchronizePaths(); 
+  DESTROY (arp); 
 */
