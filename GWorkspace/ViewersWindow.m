@@ -555,6 +555,17 @@ if (rct.size.height < 0) rct.size.height = 0; \
   return rootPath;
 }
 
+- (void)checkRootPathAfterHidingOfPaths:(NSArray *)hpaths
+{
+  [self tuneHistory];
+  
+  if (shelf) {
+    [shelf checkIconsAfterHidingOfPaths: hpaths];
+  }
+  
+  [viewer checkRootPathAfterHidingOfPaths: hpaths];
+}
+
 - (NSString *)currentViewedPath
 {  
   return [viewer currentViewedPath];
@@ -1038,6 +1049,7 @@ return
 
 - (void)tuneHistory
 {
+  NSArray *hiddenPaths = [GWLib hiddenPaths];
 	int i, count = [ViewerHistory count];
 	BOOL changed = NO;
 	
@@ -1051,7 +1063,8 @@ currHistoryPos = (currHistoryPos >= count) ? (count - 1) : currHistoryPos
 		NSString *hpath = [ViewerHistory objectAtIndex: i];
 		BOOL isdir;
 		
-		if (([fm fileExistsAtPath: hpath isDirectory: &isdir] && isdir) == NO) {
+		if ((([fm fileExistsAtPath: hpath isDirectory: &isdir] && isdir) == NO)
+                                    || [hiddenPaths containsObject: hpath]) {
 			[ViewerHistory removeObjectAtIndex: i];
 			changed = YES;
 			CHECK_POSITION (1);		

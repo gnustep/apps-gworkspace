@@ -130,6 +130,8 @@
     	iconsArr = [desktopViewPrefs objectForKey: @"icons"];      
 
     	if (iconsArr != nil) {
+        NSArray *hiddenPaths = [GWLib hiddenPaths];
+      
       	for (i = 0; i < [iconsArr count]; i++) {   
         	NSDictionary *idict = [iconsArr objectAtIndex: i];
         	NSArray *ipaths = [idict objectForKey: @"paths"];
@@ -140,7 +142,7 @@
 					
         	for (j = 0; j < [ipaths count]; j++) {   
           	NSString *p = [ipaths objectAtIndex: j];
-          	if ([fm fileExistsAtPath: p] == NO)  {
+          	if (([fm fileExistsAtPath: p] == NO) || [hiddenPaths containsObject: p])  {
             	canadd = NO;
             	break;
           	} 
@@ -313,6 +315,44 @@
   DESTROY (backImage);
 	DESTROY (imagePath);
   [self setNeedsDisplay: YES];
+}
+
+- (void)checkIconsAfterHidingOfPaths:(NSArray *)hpaths
+{
+  int count = [icons count]; 
+  int i;
+    
+	for (i = 0; i < count; i++) {
+    BOOL deleted = NO;
+		DesktopViewIcon *icon = [icons objectAtIndex: i];
+    NSArray *iconpaths = [icon paths];
+    int j;
+    
+	  for (j = 0; j < [iconpaths count]; j++) {
+      NSString *op = [iconpaths objectAtIndex: j];
+      int m;
+      
+	    for (m = 0; m < [hpaths count]; m++) {
+        NSString *fp = [hpaths objectAtIndex: m]; 
+
+        if (subPathOfPath(fp, op) || [fp isEqualToString: op]) {  
+          [self removeIcon: icon];
+          count--;
+          i--;
+          deleted = YES;
+          break;
+        }
+
+        if (deleted) {
+          break;
+        } 
+      }
+
+      if (deleted) {
+        break;
+      }       
+    }
+	}
 }
 
 - (void)fileSystemWillChange:(NSNotification *)notification

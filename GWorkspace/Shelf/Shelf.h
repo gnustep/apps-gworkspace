@@ -97,6 +97,8 @@ typedef gridpoint *(*GridPointIMP)(id, SEL, NSPoint);
 
 - (void)cellsWidthChanged:(NSNotification *)notification;
 
+- (void)checkIconsAfterHidingOfPaths:(NSArray *)hpaths;
+
 - (void)fileSystemWillChange:(NSNotification *)notification;
 
 - (void)fileSystemDidChange:(NSNotification *)notification;

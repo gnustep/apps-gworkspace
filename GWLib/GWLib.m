@@ -110,6 +110,10 @@ id instance = nil;
 
 - (BOOL)hideSysFiles;
 
+- (void)setHiddenPaths:(NSArray *)paths;
+
+- (NSArray *)hiddenPaths;
+
 - (void)setHideDotFiles:(NSNotification *)notif;
 
 - (NSImage *)iconForFile:(NSString *)fullPath ofType:(NSString *)type;
@@ -154,6 +158,7 @@ id instance = nil;
 	RELEASE (watchTimers);
   RELEASE (watchedPaths);
 	RELEASE (lockedPaths);
+	RELEASE (hiddenPaths);
   RELEASE (tumbsCache);
   RELEASE (thumbnailDir);
 
@@ -179,6 +184,7 @@ id instance = nil;
     watchers = [NSMutableArray new];	
 	  watchTimers = [NSMutableArray new];	
     watchedPaths = [NSMutableArray new];
+    hiddenPaths = [NSArray new];
 	  lockedPaths = [NSMutableArray new];	
     tumbsCache = [NSMutableDictionary new];
     
@@ -269,7 +275,8 @@ id instance = nil;
   NSArray *checkedFiles;
   NSArray *hiddenFiles;
   NSString *h; 
-			
+	int i;
+  		
 	h = [path stringByAppendingPathComponent: @".hidden"];
   if ([fm fileExistsAtPath: h]) {
 	  h = [NSString stringWithContentsOfFile: h];
@@ -278,7 +285,7 @@ id instance = nil;
     hiddenFiles = nil;
   }
 	
-	if (hiddenFiles != nil  ||  hideSysFiles) {	
+	if (hiddenFiles != nil  ||  hideSysFiles || [hiddenPaths count]) {	
 		NSMutableArray *mutableFiles = AUTORELEASE ([files mutableCopy]);
 	
 		if (hiddenFiles != nil) {
@@ -286,17 +293,31 @@ id instance = nil;
 	  }
 	
 		if (hideSysFiles) {
-	    int j = [mutableFiles count] - 1;
+      i = [mutableFiles count] - 1;
 	    
-	    while (j >= 0) {
-				NSString *file = (NSString *)[mutableFiles objectAtIndex: j];
+	    while (i >= 0) {
+				NSString *file = [mutableFiles objectAtIndex: i];
 
 				if ([file hasPrefix: @"."]) {
-		    	[mutableFiles removeObjectAtIndex: j];
+		    	[mutableFiles removeObjectAtIndex: i];
 		  	}
-				j--;
+				i--;
 			}
 	  }		
+    
+    if ([hiddenPaths count]) {
+      i = [mutableFiles count] - 1;
+    
+	    while (i >= 0) {
+				NSString *file = [mutableFiles objectAtIndex: i];
+        NSString *fullPath = [path stringByAppendingPathComponent: file];
+
+        if ([hiddenPaths containsObject: fullPath]) {
+		    	[mutableFiles removeObjectAtIndex: i];
+        }
+				i--;
+			}
+    }
     
 		checkedFiles = mutableFiles;
     
@@ -654,6 +675,16 @@ id instance = nil;
   return hideSysFiles;
 }
 
+- (void)setHiddenPaths:(NSArray *)paths
+{
+  ASSIGN (hiddenPaths, paths);
+}
+
+- (NSArray *)hiddenPaths
+{
+  return hiddenPaths;
+}
+
 - (void)setHideDotFiles:(NSNotification *)notif
 {
   NSString *hideStr = (NSString *)[notif object];
@@ -956,6 +987,16 @@ id instance = nil;
 + (BOOL)hideSysFiles
 {
   return [[self instance] hideSysFiles];
+}
+
++ (void)setHiddenPaths:(NSArray *)paths
+{
+  [[self instance] setHiddenPaths: paths];
+}
+
++ (NSArray *)hiddenPaths
+{
+  return [[self instance] hiddenPaths];
 }
 
 + (NSImage *)iconForFile:(NSString *)fullPath ofType:(NSString *)type

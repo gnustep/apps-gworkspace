@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #ifndef HIDDEN_FILES_PREF_H
 #define HIDDEN_FILES_PREF_H
 
@@ -65,8 +64,6 @@
 
   NSString *currentPath;
 
-
-
   IBOutlet id hiddenDirslabel;
   IBOutlet id hiddenDirsScroll;
   NSMatrix *dirsMatrix;
@@ -74,9 +71,7 @@
   IBOutlet id removeDirButt;
   IBOutlet id setDirButt;
 
-
-
-
+  NSMutableArray *hiddenPaths;
 
 	NSFileManager *fm;
   NSWorkspace *ws;
@@ -91,19 +86,11 @@
 
 - (IBAction)activateChanges:(id)sender;
 
-
-
-
-
 - (IBAction)addDir:(id)sender;
 
 - (IBAction)removeDir:(id)sender;
 
 - (IBAction)activateDirChanges:(id)sender;
-
-
-
-
 
 - (void)selectionChanged:(NSNotification *)n;
 

@@ -52,6 +52,8 @@
 
 - (NSArray *)selectedPaths;
 
+- (NSString *)rootPath;
+
 - (NSString *)currentViewedPath;
 
 - (NSPoint)locationOfIconForPath:(NSString *)path;
@@ -66,11 +68,15 @@
 
 - (void)setAutoSynchronize:(BOOL)value;
 
+- (void)thumbnailsDidChangeInPaths:(NSArray *)paths;
+
 - (id)viewerView;
 
 - (BOOL)viewsApps;
 
 - (void)selectAll;
+
+- (void)closeViewer;
 
 - (id)delegate;
 

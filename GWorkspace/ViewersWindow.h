@@ -87,6 +87,8 @@
 
 - (NSString *)rootPath;
 
+- (void)checkRootPathAfterHidingOfPaths:(NSArray *)hpaths;
+
 - (NSString *)currentViewedPath;
 
 - (NSPoint)locationOfIconForPath:(NSString *)apath;

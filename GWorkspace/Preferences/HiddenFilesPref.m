@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
   #ifdef GNUSTEP 
@@ -51,8 +50,10 @@ if (sz.height < 0) sz.height = 0
 	[[NSNotificationCenter defaultCenter] removeObserver: self];
   TEST_RELEASE (prefbox);
   RELEASE (currentPath);
+  RELEASE (hiddenPaths);
   TEST_RELEASE (leftMatrix);
   TEST_RELEASE (rightMatrix); 
+  TEST_RELEASE (dirsMatrix); 
   RELEASE (cellPrototipe); 
   [super dealloc];
 }
@@ -65,6 +66,7 @@ if (sz.height < 0) sz.height = 0
 		if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
       NSLog(@"failed to load %@!", nibName);
     } else {
+      NSArray *hpaths;
       NSArray *selection;
       NSString *path;  
       NSString *defApp;
@@ -119,12 +121,62 @@ if (sz.height < 0) sz.height = 0
                 					  selector: @selector(selectionChanged:) 
                 						    name: GWCurrentSelectionChangedNotification
                 					    object: nil];
+                              
+      [hiddenDirsScroll setBorderType: NSBezelBorder];
+		  [hiddenDirsScroll setHasHorizontalScroller: NO];
+  	  [hiddenDirsScroll setHasVerticalScroller: YES]; 
+                    
+      hiddenPaths = [NSMutableArray new];
+      hpaths = [GWLib hiddenPaths];
+      
+      if ([hpaths count]) { 
+        NSSize cs, ms;
+        int i;
+       
+        [hiddenPaths addObjectsFromArray: hpaths];
+        
+        dirsMatrix = [[NSMatrix alloc] initWithFrame: NSMakeRect(0, 0, 100, 100)
+				            			        mode: NSListModeMatrix prototype: cellPrototipe
+			       											              numberOfRows: 0 numberOfColumns: 0];
+        [dirsMatrix setIntercellSpacing: NSZeroSize];
+        [dirsMatrix setCellSize: NSMakeSize(130, 14)];
+        [dirsMatrix setAutoscroll: YES];
+	      [dirsMatrix setAllowsEmptySelection: YES];
+        cs = [hiddenDirsScroll contentSize];
+        ms = [dirsMatrix cellSize];
+        ms.width = cs.width;
+        CHECKSIZE (ms);
+        [dirsMatrix setCellSize: ms];
+	      [hiddenDirsScroll setDocumentView: dirsMatrix];	
+        
+        [dirsMatrix addColumn];   
+        for (i = 0; i < [hiddenPaths count]; ++i) {
+          id cell;
+
+          if (i != 0) {
+		        [dirsMatrix insertRow: i];
+          }     
+          cell = [dirsMatrix cellAtRow: i column: 0];   
+          [cell setStringValue: [hiddenPaths objectAtIndex: i]];
+          [cell setLeaf: YES];
+        }  
+        [dirsMatrix sizeToCells]; 
+      } else {
+        dirsMatrix = nil;
+      }     
+      
+      [setDirButt setEnabled: NO];
+                                                            
       /* Internationalization */
       [setButt setTitle: NSLocalizedString(@"Activate changes", @"")];
       [loadButt setTitle: NSLocalizedString(@"Load", @"")];
       [hiddenlabel setStringValue: NSLocalizedString(@"Hidden files", @"")];
       [shownlabel setStringValue: NSLocalizedString(@"Shown files", @"")];
       [labelinfo setStringValue: NSLocalizedString(@"Select and move the files to hide or to show", @"")];
+      [hiddenDirslabel setStringValue: NSLocalizedString(@"Hidden directories", @"")];
+      [addDirButt setTitle: NSLocalizedString(@"add", @"")];
+      [removeDirButt setTitle: NSLocalizedString(@"remove", @"")];
+      [setDirButt setTitle: NSLocalizedString(@"Activate changes", @"")];
     }
   }
   
@@ -396,41 +448,93 @@ if (sz.height < 0) sz.height = 0
   }
 }
 
-
-
-
-
-
-
-
-
-
-
 - (IBAction)addDir:(id)sender
 {
+	NSOpenPanel *openPanel;
+	NSString *hidePath;
+	int result;
+     
+	openPanel = [NSOpenPanel openPanel];
+	[openPanel setTitle: @"hide"];	
+  [openPanel setAllowsMultipleSelection: NO];
+  [openPanel setCanChooseFiles: NO];
+  [openPanel setCanChooseDirectories: YES];
 
+  result = [openPanel runModalForDirectory: @"/" file: nil types: nil];
+	if(result != NSOKButton) {
+		return;
+  }
+  
+	hidePath = [NSString stringWithString: [openPanel filename]];
+
+  if ([hiddenPaths containsObject: hidePath] == NO) {
+    NSSize cs, ms;
+    int i;
+        
+    [hiddenPaths addObject: hidePath];
+
+    if (dirsMatrix) {
+      [dirsMatrix removeFromSuperview];  
+      [hiddenDirsScroll setDocumentView: nil];	  
+      DESTROY (dirsMatrix);
+    }
+
+    dirsMatrix = [[NSMatrix alloc] initWithFrame: NSMakeRect(0, 0, 100, 100)
+				            			    mode: NSListModeMatrix prototype: cellPrototipe
+			       											          numberOfRows: 0 numberOfColumns: 0];
+    [dirsMatrix setIntercellSpacing: NSZeroSize];
+    [dirsMatrix setCellSize: NSMakeSize(130, 14)];
+    [dirsMatrix setAutoscroll: YES];
+	  [dirsMatrix setAllowsEmptySelection: YES];
+    cs = [hiddenDirsScroll contentSize];
+    ms = [dirsMatrix cellSize];
+    ms.width = cs.width;
+    CHECKSIZE (ms);
+    [dirsMatrix setCellSize: ms];
+	  [hiddenDirsScroll setDocumentView: dirsMatrix];	
+
+    [dirsMatrix addColumn];   
+    for (i = 0; i < [hiddenPaths count]; ++i) {
+      id cell;
+
+      if (i != 0) {
+		    [dirsMatrix insertRow: i];
+      }     
+      cell = [dirsMatrix cellAtRow: i column: 0];   
+      [cell setStringValue: [hiddenPaths objectAtIndex: i]];
+      [cell setLeaf: YES];
+    }  
+    [dirsMatrix sizeToCells]; 
+    
+    [setDirButt setEnabled: YES];
+  }
 }
 
 - (IBAction)removeDir:(id)sender
 {
+  NSArray *cells = [dirsMatrix selectedCells];
 
+  if (cells) {
+    NSMutableArray *paths = [NSMutableArray arrayWithCapacity: 1];
+    int i;
+    
+    for (i = 0; i < [cells count]; i++) {
+      NSString *path = [[cells objectAtIndex: i] stringValue];  
+      [hiddenPaths removeObject: path];
+      [paths addObject: path];
+    }
+    
+    [self removeCellsWithNames: paths inMatrix: dirsMatrix];
+    [setDirButt setEnabled: YES];
+  }
 }
 
 - (IBAction)activateDirChanges:(id)sender
 {
-
+  [GWLib setHiddenPaths: hiddenPaths];
+  [gw checkViewersAfterHidingOfPaths: hiddenPaths];
+  [setDirButt setEnabled: NO];
 }
-
-
-
-
-
-
-
-
-
-
-
 
 - (void)addCellsWithNames:(NSArray *)names inMatrix:(NSMatrix *)matrix
 {

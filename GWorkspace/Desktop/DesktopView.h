@@ -82,6 +82,8 @@
 
 - (void)unsetBackImage:(NSNotification *)notification;
 
+- (void)checkIconsAfterHidingOfPaths:(NSArray *)hpaths;
+
 - (void)fileSystemWillChange:(NSNotification *)notification;
 
 - (void)fileSystemDidChange:(NSNotification *)notification;

@@ -176,6 +176,8 @@
 
 - (void)updateIcons;
 
+- (void)checkIconsAfterHidingOfPaths:(NSArray *)hpaths;
+
 - (void)tile;
 
 - (void)updateDefaults;

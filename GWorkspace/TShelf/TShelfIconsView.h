@@ -118,6 +118,8 @@ typedef gridpoint *(*GridPointIMP)(id, SEL, NSPoint);
 
 - (void)openCurrentSelection:(NSArray *)paths;
 
+- (void)checkIconsAfterHidingOfPaths:(NSArray *)hpaths;
+
 - (void)fileSystemWillChange:(NSNotification *)notification;
 
 - (void)fileSystemDidChange:(NSNotification *)notification;

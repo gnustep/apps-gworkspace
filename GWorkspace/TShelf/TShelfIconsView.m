@@ -105,6 +105,7 @@
 	self = [super init];
   
   if (self) {
+    NSArray *hiddenPaths = [GWLib hiddenPaths];
     int i, j;
 
     fm = [NSFileManager defaultManager];
@@ -136,7 +137,7 @@
 
           for (j = 0; j < [iconpaths count]; j++) {
             NSString *p = [iconpaths objectAtIndex: j];
-            if ([fm fileExistsAtPath: p] == NO) {
+            if (([fm fileExistsAtPath: p] == NO) || [hiddenPaths containsObject: p]) {
               canadd = NO;
               break;
             } 
@@ -388,6 +389,46 @@
 - (void)openCurrentSelection:(NSArray *)paths
 {
   [gw openSelectedPaths: paths newViewer: NO];
+}
+
+- (void)checkIconsAfterHidingOfPaths:(NSArray *)hpaths
+{
+  if (iconsType == FILES_TAB) {
+    int count = [icons count]; 
+    int i;
+
+	  for (i = 0; i < count; i++) {
+      BOOL deleted = NO;
+		  TShelfIcon *icon = [icons objectAtIndex: i];
+      NSArray *iconpaths = [icon paths];
+      int j;
+
+	    for (j = 0; j < [iconpaths count]; j++) {
+        NSString *op = [iconpaths objectAtIndex: j];
+        int m;
+
+	      for (m = 0; m < [hpaths count]; m++) {
+          NSString *fp = [hpaths objectAtIndex: m]; 
+
+          if (subPathOfPath(fp, op) || [fp isEqualToString: op]) {  
+            [self removeIcon: icon];
+            count--;
+            i--;
+            deleted = YES;
+            break;
+          }
+
+          if (deleted) {
+            break;
+          } 
+        }
+
+        if (deleted) {
+          break;
+        }       
+      }
+	  }
+  }
 }
 
 - (void)fileSystemWillChange:(NSNotification *)notification

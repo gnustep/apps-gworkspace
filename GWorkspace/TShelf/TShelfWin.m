@@ -347,6 +347,19 @@
 
 }
 
+- (void)checkIconsAfterHidingOfPaths:(NSArray *)hpaths
+{
+  NSArray *items = [tView items];
+  int i;
+  
+  for (i = 0; i < [items count]; i++) {
+    TShelfViewItem *item = [items objectAtIndex: i];
+    TShelfIconsView *iview = (TShelfIconsView *)[item view];
+
+    [iview checkIconsAfterHidingOfPaths: hpaths];
+  }  
+}
+
 - (void)saveDefaults
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	

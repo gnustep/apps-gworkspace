@@ -52,7 +52,11 @@
 
 - (NSArray *)selectedPaths;
 
+- (NSString *)rootPath;
+
 - (NSString *)currentViewedPath;
+
+- (void)checkRootPathAfterHidingOfPaths:(NSArray *)hpaths;
 
 - (NSPoint)locationOfIconForPath:(NSString *)path;
 

@@ -995,6 +995,11 @@ if (sz.height < 0) sz.height = 0
   [shelf updateIcons];
 }
 
+- (void)checkIconsAfterHidingOfPaths:(NSArray *)hpaths
+{
+  [shelf checkIconsAfterHidingOfPaths: hpaths];
+}
+
 - (float)splitView:(NSSplitView *)sender
           constrainSplitPosition:(float)proposedPosition 
                                         ofSubviewAt:(int)offset

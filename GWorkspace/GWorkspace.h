@@ -174,6 +174,8 @@
 
 - (NSArray *)viewersPaths;
 
+- (void)checkViewersAfterHidingOfPaths:(NSArray *)paths;
+
 - (void)viewerHasClosed:(id)sender;
 
 - (void)setCurrentViewer:(ViewersWindow *)viewer;

@@ -379,9 +379,38 @@
   return selectedPaths;
 }
 
+- (NSString *)rootPath
+{
+  return rootPath;
+}
+
 - (NSString *)currentViewedPath
 {
   return [panel currentPath];
+}
+
+- (void)checkRootPathAfterHidingOfPaths:(NSArray *)hpaths
+{
+  NSArray *newsel = [NSArray arrayWithObject: rootPath];
+  int i;
+
+	[self setRootPath: rootPath
+         viewedPath: nil
+          selection: newsel 
+           delegate: delegate 
+           viewApps: viewsapps];
+
+	[self setCurrentSelection: newsel];
+	[self resizeWithOldSuperviewSize: [self frame].size];
+	[delegate setTheSelectedPaths: newsel];
+
+  for (i = 0; i < [hpaths count]; i++) {
+    NSString *hpath = [hpaths objectAtIndex: i];
+      
+    if (subPathOfPath(hpath, rootPath) || [hpath isEqualToString: rootPath]) {
+      [self closeNicely];                            
+    }
+  }
 }
 
 - (NSPoint)locationOfIconForPath:(NSString *)path

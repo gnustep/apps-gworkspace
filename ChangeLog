@@ -1,3 +1,8 @@
+2003-10-14 Enrico Sersale  <enrico@imago.ro>
+  
+  * Info->Preferences->Hidden files
+    It is now possible to define directories as hidden.
+
 2003-10-13 Enrico Sersale  <enrico@imago.ro>
   
   * ContentViewers/PasteboardViewer/PasteboardViewer.m
@@ -27,7 +32,7 @@
     New files. 
 
   * GWorkspace/Resources/Icons/
-    Added: Pboard.tiff, colorPboard.tiff, filecontsPboard.tiff, 
+    Added: Pboard.tiff, colorPboard.tiff, filecontsPboard.tiff Files, 
     gormPboard.tiff, rtfPboard.tiff, rtfdPboard.tiff, stringPboard.tiff, 
     tiffPboard.tiff.
 

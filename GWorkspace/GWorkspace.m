@@ -563,6 +563,11 @@ return [ws openFile: fullPath withApplication: appName]
   }
   [GWLib setHideSysFiles: hideSysFiles];
   
+	result = [defaults objectForKey: @"hiddendirs"];
+	if (result) {
+    [GWLib setHiddenPaths: result];
+	} 
+  
   animateChdir = ![defaults boolForKey: @"nochdiranim"];
   animateLaunck = ![defaults boolForKey: @"nolaunchanim"];
   animateSlideBack = ![defaults boolForKey: @"noslidebackanim"];
@@ -895,6 +900,8 @@ return [ws openFile: fullPath withApplication: appName]
 	[history updateDefaults];
   [rootViewer updateDefaults];
   
+  [defaults setObject: [GWLib hiddenPaths] forKey: @"hiddendirs"];
+
 	viewersPaths = [NSMutableArray arrayWithCapacity: 1];
   for (i = 0; i < [viewers count]; i++) {
     ViewersWindow *viewer = [viewers objectAtIndex: i];
@@ -1289,6 +1296,32 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 	}
 	
 	return vpaths;
+}
+
+- (void)checkViewersAfterHidingOfPaths:(NSArray *)paths
+{
+  int i = [viewers count] - 1;
+  
+	while (i >= 0) {
+		id viewer = [viewers objectAtIndex: i];
+    
+    [viewer checkRootPathAfterHidingOfPaths: paths];
+    i--;
+	}
+  
+  [rootViewer checkRootPathAfterHidingOfPaths: paths];
+  
+  if (desktopWindow != nil) {
+    [[desktopWindow desktopView] checkIconsAfterHidingOfPaths: paths]; 
+	}
+  
+  if (tshelfWin != nil) {
+    [tshelfWin checkIconsAfterHidingOfPaths: paths]; 
+	}
+  
+	if (finder != nil) {  
+		[finder checkIconsAfterHidingOfPaths: paths]; 
+	}  
 }
 
 - (void)watcherNotification:(NSNotification *)notification

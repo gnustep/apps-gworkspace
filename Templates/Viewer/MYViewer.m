@@ -139,9 +139,19 @@
   return selectedPaths;
 }
 
+- (NSString *)rootPath
+{
+  return rootPath;
+}
+
 - (NSString *)currentViewedPath
 {  
   return nil;
+}
+
+- (void)checkRootPathAfterHidingOfPaths:(NSArray *)hpaths
+{
+
 }
 
 - (NSPoint)locationOfIconForPath:(NSString *)path

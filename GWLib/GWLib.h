@@ -39,6 +39,7 @@
   NSMutableArray *watchedPaths;  
 
 	NSMutableArray *lockedPaths;
+	NSArray *hiddenPaths;
   
   NSMutableDictionary *tumbsCache;
   NSString *thumbnailDir;
@@ -84,6 +85,10 @@
 + (void)setHideSysFiles:(BOOL)value;
 
 + (BOOL)hideSysFiles;
+
++ (void)setHiddenPaths:(NSArray *)paths;
+
++ (NSArray *)hiddenPaths;
 
 + (NSImage *)iconForFile:(NSString *)fullPath ofType:(NSString *)type;
 

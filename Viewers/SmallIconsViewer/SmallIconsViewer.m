@@ -365,9 +365,28 @@ if (rct.size.height < 0) rct.size.height = 0; \
   return selectedPaths;
 }
 
+- (NSString *)rootPath
+{
+  return rootPath;
+}
+
 - (NSString *)currentViewedPath
 {
   return [panel currentPath];
+}
+
+- (void)checkRootPathAfterHidingOfPaths:(NSArray *)hpaths
+{
+  int i;
+
+  for (i = 0; i < [hpaths count]; i++) {
+    NSString *hpath = [hpaths objectAtIndex: i];
+      
+    if (subPathOfPath(hpath, currentPath) 
+                            || [hpath isEqualToString: currentPath]) {
+      [self closeNicely];                            
+    }
+  }
 }
 
 - (NSPoint)locationOfIconForPath:(NSString *)path

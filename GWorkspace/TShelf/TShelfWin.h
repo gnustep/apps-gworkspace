@@ -55,6 +55,8 @@
 
 - (void)updateIcons;
 
+- (void)checkIconsAfterHidingOfPaths:(NSArray *)hpaths;
+
 - (void)saveDefaults;
 
 @end

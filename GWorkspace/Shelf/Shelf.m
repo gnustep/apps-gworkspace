@@ -78,6 +78,7 @@
 {	
 	self = [super init];
   if (self) {
+    NSArray *hiddenPaths = [GWLib hiddenPaths];
     int i, j;
 
     fm = [NSFileManager defaultManager];
@@ -109,8 +110,8 @@
                 
       for (j = 0; j < [iconpaths count]; j++) {
         NSString *p = [iconpaths objectAtIndex: j];
-        if ([fm fileExistsAtPath: p] == YES) {
-                  
+        
+        if ([fm fileExistsAtPath: p] && ([hiddenPaths containsObject: p] == NO)) {
           if (viewerPath != nil) {
             if ((subPathOfPath(viewerPath, p) == NO)
                               && ([viewerPath isEqualToString: p] == NO)) {
@@ -237,6 +238,44 @@
     [[icons objectAtIndex: i] setLabelWidth];
   }  
   [self resizeWithOldSuperviewSize: [self frame].size];
+}
+
+- (void)checkIconsAfterHidingOfPaths:(NSArray *)hpaths
+{
+  int count = [icons count]; 
+  int i;
+    
+	for (i = 0; i < count; i++) {
+    BOOL deleted = NO;
+		IconViewsIcon *icon = [icons objectAtIndex: i];
+    NSArray *iconpaths = [icon paths];
+    int j;
+    
+	  for (j = 0; j < [iconpaths count]; j++) {
+      NSString *op = [iconpaths objectAtIndex: j];
+      int m;
+      
+	    for (m = 0; m < [hpaths count]; m++) {
+        NSString *fp = [hpaths objectAtIndex: m]; 
+
+        if (subPathOfPath(fp, op) || [fp isEqualToString: op]) {  
+          [self removeIcon: icon];
+          count--;
+          i--;
+          deleted = YES;
+          break;
+        }
+
+        if (deleted) {
+          break;
+        } 
+      }
+
+      if (deleted) {
+        break;
+      }       
+    }
+	}
 }
 
 - (void)fileSystemWillChange:(NSNotification *)notification
