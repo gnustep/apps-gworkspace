@@ -602,10 +602,6 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
 	return item;
 }
 
-double myrintf(double a)
-{
-	return (floor(a + 0.5));         
-}
 
 
 
