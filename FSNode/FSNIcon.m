@@ -97,11 +97,11 @@ static NSFont *labelFont = nil;
     hlightRect = NSZeroRect;
     hlightRect.size.width = ceil(isize / 3 * 4);
     hlightRect.size.height = ceil(hlightRect.size.width * [FSNodeRep highlightHeightFactor]);
-    if ((isize - hlightRect.size.height) < 2) {
+    if ((hlightRect.size.height - isize) < 2) {
       hlightRect.size.height = isize + 2;
     }
     ASSIGN (highlightPath, [FSNodeRep highlightPathOfSize: hlightRect.size]);
-    
+        
 		if ([[node path] isEqual: path_separator()]) {
 		  NSHost *host = [NSHost currentHost];
 		  NSString *hname = [host name];
@@ -369,6 +369,11 @@ static NSFont *labelFont = nil;
   }
 }
 
+- (BOOL)acceptsFirstMouse:(NSEvent *)theEvent
+{
+  return YES;
+}
+
 - (void)setFrame:(NSRect)frameRect
 {
   [super setFrame: frameRect];
@@ -382,9 +387,6 @@ static NSFont *labelFont = nil;
 
 - (void)drawRect:(NSRect)rect
 {	      
-  [[NSColor windowBackgroundColor] set];
-  NSRectFill(rect);
-    
   if (isSelected) {
     [[NSColor selectedControlColor] set];
     [highlightPath fill];
