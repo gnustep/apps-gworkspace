@@ -338,7 +338,23 @@ return [ws openFile: fullPath withApplication: appName]
       if (newv) {    
         [self newViewerAtPath: apath canViewApps: YES];    
       } else {
-        [ws launchApplication: apath];
+//        NSArray *launched = [ws launchedApplications];
+//        BOOL found = NO;
+//        int i;
+            
+//        for (i = 0; i < [launched count]; i++) {
+//          NSDictionary *dict = [launched objectAtIndex: i];
+//          NSString *applname = [dict objectForKey: @"NSApplicationName"]; 
+            
+//          if ([applname isEqual: apath]) {
+//            found = YES;
+//            break;
+//          }
+//        }
+      
+//        if (found == NO) {
+          [ws launchApplication: apath];
+//        }
       }
     }
   }

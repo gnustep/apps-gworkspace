@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
   #ifdef GNUSTEP 
@@ -42,8 +41,10 @@
 
 - (void)dealloc
 {
+  TEST_RELEASE (bundlePath);
   RELEASE (RTFViewer);
   RELEASE (TIFFViewer);
+  RELEASE (IBViewViewer);
   RELEASE (label);
   
   [super dealloc];
@@ -54,16 +55,13 @@
   self = [super init];
   
   if(self) {
-    NSRect rect;
-  
     [self setFrame: frame];
     panel = (id<InspectorsProtocol>)apanel;
     index = idx;
-
-    rect = [self bounds];
     
-    RTFViewer = [[NSRTFPboardViewer alloc] initWithFrame: rect];
-    TIFFViewer = [[NSTIFFPboardViewer alloc] initWithFrame: rect];
+    RTFViewer = [[NSRTFPboardViewer alloc] initWithFrame: [self bounds]];
+    TIFFViewer = [[NSTIFFPboardViewer alloc] initWithFrame: [self bounds]];
+    IBViewViewer = [[IBViewPboardViewer alloc] initWithFrame: [self bounds]];
     currentViewer = nil;    
     
     //label if error
@@ -120,6 +118,8 @@
     currentViewer = RTFViewer;
   } else if ([type isEqual: NSTIFFPboardType]) {
     currentViewer = TIFFViewer;
+  } else if ([type isEqual: @"IBViewPboardType"]) {
+    currentViewer = IBViewViewer;
   } else {
     currentViewer = nil;
   }
@@ -161,7 +161,8 @@
   if ([type isEqual: NSTIFFPboardType] 
             || [type isEqual: NSRTFPboardType]
             || [type isEqual: NSRTFDPboardType]
-            || [type isEqual: NSStringPboardType]) {
+            || [type isEqual: NSStringPboardType]
+            || [type isEqual: @"IBViewPboardType"]) {
     return YES;
   }
   
@@ -363,5 +364,117 @@
 }
 
 @end
+
+
+@implementation IBViewPboardViewer
+
+- (void)dealloc
+{
+  [super dealloc];
+}
+
+- (id)initWithFrame:(NSRect)frame
+{
+  self = [super initWithFrame: frame];
+  
+  if(self) {
+
+  }
+	
+	return self;
+}
+
+- (BOOL)displayData:(NSData *)data ofType:(NSString *)type
+{
+  NSUnarchiver *u;
+  NSArray	*objects;
+  id obj;
+  NSRect r;
+
+
+  return NO;
+
+  
+  if ([self subviews] && [[self subviews] count]) {
+    [[[self subviews] objectAtIndex: 0] removeFromSuperview];
+  }
+  
+  
+  u = [[NSUnarchiver alloc] initForReadingWithData: data];
+
+
+/*
+  [u decodeClassName: @"GSNibContainer" 
+     asClassName: @"GormDocument"];
+  [u decodeClassName: @"GSNibItem" 
+     asClassName: @"GormObjectProxy"];
+  [u decodeClassName: @"GSCustomView" 
+     asClassName: @"GormCustomView"];
+
+  // classes
+  [u decodeClassName: @"NSMenu" 
+     asClassName: @"GormNSMenu"];
+  [u decodeClassName: @"NSWindow" 
+     asClassName: @"GormNSWindow"];
+  [u decodeClassName: @"NSPanel" 
+     asClassName: @"GormNSPanel"];
+  [u decodeClassName: @"NSPopUpButton" 
+     asClassName: @"GormNSPopUpButton"];
+  [u decodeClassName: @"NSPopUpButtonCell"
+     asClassName: @"GormNSPopUpButtonCell"];
+  [u decodeClassName: @"NSBrowser" 
+     asClassName: @"GormNSBrowser"];
+  [u decodeClassName: @"NSTableView" 
+     asClassName: @"GormNSTableView"];
+  [u decodeClassName: @"NSOutlineView" 
+     asClassName: @"GormNSOutlineView"];
+
+
+ [u decodeClassName: @"GSCustomView" 
+     asClassName: @"GormCustomView"];
+ 
+
+*/
+
+ [u decodeClassName: @"GormCustomView" 
+        asClassName: @"NSObject"];
+
+
+
+
+  objects = [u decodeObject];
+  obj = [objects objectAtIndex: 0];
+  r = [obj frame];
+  r.origin = NSMakePoint(5, 5);
+  [obj setFrame: r];
+  
+  [self addSubview: obj];
+  
+  RELEASE (u);
+  return YES;
+  
+
+  return NO;
+}
+
+@end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

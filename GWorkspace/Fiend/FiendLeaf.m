@@ -255,8 +255,25 @@
 	
 	if ([theEvent clickCount] > 1) {   
     if ([myType isEqualToString: NSApplicationFileType]) {
-      [ws launchApplication: myPath];
-			[self startDissolve];
+//      NSArray *launched = [ws launchedApplications];
+//      BOOL found = NO;
+//      int i;
+
+//      for (i = 0; i < [launched count]; i++) {
+//        NSDictionary *dict = [launched objectAtIndex: i];
+//        NSString *applname = [dict objectForKey: @"NSApplicationName"]; 
+
+//        if ([applname isEqual: myPath]) {
+//          found = YES;
+//          break;
+//        }
+//      }
+
+//      if (found == NO) {
+        [ws launchApplication: myPath];
+        [self startDissolve];
+//      }
+    
     } else if ([myType isEqualToString: NSPlainFileType]
             			|| [myType isEqualToString: NSDirectoryFileType]
             					|| [myType isEqualToString: NSFilesystemFileType]) { 

@@ -905,7 +905,7 @@
   if ((types == nil) || ([types count] == 0)) {
     return NO;
   }
-  
+
   for (i = 0; i < [types count]; i++) {
     type = [types objectAtIndex: 0];
     data = [pboard dataForType: type];
