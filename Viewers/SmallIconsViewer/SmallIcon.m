@@ -659,10 +659,10 @@
         ASSIGN (icon, img);
         RELEASE (img);
       } else {
-        ASSIGN (icon, [NSImage imageNamed: @"FileIcon_Directory_Open_Small.tiff"]);
+        ASSIGN (icon, [NSImage imageNamed: GWSmallOpenFolderIconName]);
       }      
     } else {
-	    ASSIGN (icon, [NSImage imageNamed: @"FileIcon_Directory_Open_Small.tiff"]);    
+	    ASSIGN (icon, [NSImage imageNamed: GWSmallOpenFolderIconName]);    
     }
 
     [self setNeedsDisplay: YES];

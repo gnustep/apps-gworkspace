@@ -32,6 +32,7 @@
   NSArray *paths;
   NSString *path;
   NSImage *icon;
+  NSImage *openicon;
   NSImage *highlight;
   BOOL locked;
   BOOL iconSelected;

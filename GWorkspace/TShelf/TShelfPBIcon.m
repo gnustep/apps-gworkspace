@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
   #ifdef GNUSTEP 
@@ -63,7 +62,7 @@
     ASSIGN (dataPath, dpath);
     ASSIGN (dataType, type);
 
-    ASSIGN (highlight, [NSImage imageNamed: @"CellHighlight.tiff"]);
+    ASSIGN (highlight, [NSImage imageNamed: GWCellHighlightIconName]);
 
     if ([dataType isEqual: NSStringPboardType]) {
       ASSIGN (icon, [NSImage imageNamed: @"stringPboard.tiff"]);

@@ -64,4 +64,8 @@ extern NSString *GWDesktopViewUnsetImageNotification;
 
 extern NSString *GWIconAnimationChangedNotification;
 
+extern NSString *GWOpenFolderIconName;
+extern NSString *GWSmallOpenFolderIconName;
+extern NSString *GWCellHighlightIconName;
+
 #endif

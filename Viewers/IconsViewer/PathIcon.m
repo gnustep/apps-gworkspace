@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
   #ifdef GNUSTEP 
@@ -78,7 +77,7 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 		
     [self setDelegate: aDelegate];    
 		
-    ASSIGN (highlight, [NSImage imageNamed: @"CellHighlight.tiff"]);
+    ASSIGN (highlight, [NSImage imageNamed: GWCellHighlightIconName]);
     ASSIGN (arrow, [NSImage imageNamed: @"common_3DArrowRight.tiff"]);
     icon = nil;
 
@@ -643,10 +642,10 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
         ASSIGN (icon, img);
         RELEASE (img);
       } else {
-        ASSIGN (icon, [NSImage imageNamed: @"FileIcon_Directory_Open.tiff"]);
+        ASSIGN (icon, [NSImage imageNamed: GWOpenFolderIconName]);
       }      
     } else {
-	    ASSIGN (icon, [NSImage imageNamed: @"FileIcon_Directory_Open.tiff"]);    
+	    ASSIGN (icon, [NSImage imageNamed: GWOpenFolderIconName]);    
     }
 
     [self setNeedsDisplay: YES];   

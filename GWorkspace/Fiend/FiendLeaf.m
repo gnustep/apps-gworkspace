@@ -443,7 +443,7 @@
 
       isDragTarget = YES;
 			
-      ASSIGN (icon, [NSImage imageNamed: @"FileIcon_Directory_Open.tiff"]);
+      ASSIGN (icon, [NSImage imageNamed: GWOpenFolderIconName]);
       [self setNeedsDisplay: YES];
 			
 			sourceDragMask = [sender draggingSourceOperationMask];

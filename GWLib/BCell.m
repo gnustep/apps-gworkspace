@@ -22,11 +22,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include "GWLib.h"
 #include "GWFunctions.h"
+#include "GWNotifications.h"
 #include "BCell.h"
 #include "GNUstep.h"
 
@@ -37,6 +37,7 @@
   TEST_RELEASE (paths);
   TEST_RELEASE (path);
   TEST_RELEASE (icon);  
+  TEST_RELEASE (openicon);  
   TEST_RELEASE (highlight);    
   [super dealloc];
 }
@@ -84,6 +85,7 @@
     ASSIGN (icon, [GWLib smallIconForFiles: paths]);  
   }
   
+  ASSIGN (openicon, [NSImage imageNamed: GWSmallOpenFolderIconName]);
   ASSIGN (highlight, [GWLib smallHighlightIcon]);
 }
 
@@ -219,8 +221,13 @@
     }
     
     if ([self isEnabled]) {
-      [icon compositeToPoint: icon_rect.origin 
-	                 operation: NSCompositeSourceOver];
+      if (iconSelected) {
+        [openicon compositeToPoint: icon_rect.origin 
+	                       operation: NSCompositeSourceOver];
+      } else {
+        [icon compositeToPoint: icon_rect.origin 
+	                   operation: NSCompositeSourceOver];
+      }
     } else {
 			[icon dissolveToPoint: icon_rect.origin fraction: 0.3];
     }

@@ -22,15 +22,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
   #ifdef GNUSTEP 
 #include "GWLib.h"
 #include "GWFunctions.h"
+#include "GWNotifications.h"
   #else
 #include <GWorkspace/GWLib.h>
 #include <GWorkspace/GWFunctions.h>
+#include <GWorkspace/GWNotifications.h>
   #endif
 #include "RecyclerIcon.h"
 #include "RecyclerViews.h"
@@ -64,7 +65,7 @@
 		ASSIGN (name, [path lastPathComponent]);    
     [ws getInfoForFile: path application: &defApp type: &type];      
 		ASSIGN (icon, [GWLib iconForFile: path ofType: type]);    
-    ASSIGN (highlight, [NSImage imageNamed: @"CellHighlight.tiff"]);
+    ASSIGN (highlight, [NSImage imageNamed: GWCellHighlightIconName]);
     iconsView = (IconsView *)aview;  
 
     namelabel = [NSTextField new];

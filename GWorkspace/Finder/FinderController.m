@@ -22,14 +22,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
   #ifdef GNUSTEP 
 #include "GWFunctions.h"
+#include "GWNotifications.h"
 #include "GWLib.h"
   #else
 #include <GWorkspace/GWFunctions.h>
+#include <GWorkspace/GWNotifications.h>
 #include <GWorkspace/GWLib.h>
   #endif
 #include "FinderController.h"
@@ -159,7 +160,7 @@ if (sz.height < 0) sz.height = 0
 	  [nameField setSelectable: NO];
     [self addSubview: nameField];
     
-    ASSIGN (highlightImage, [NSImage imageNamed: @"CellHighlight.tiff"]);
+    ASSIGN (highlightImage, [NSImage imageNamed: GWCellHighlightIconName]);
 		        
     isactive = NO;
   }

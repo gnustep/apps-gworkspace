@@ -59,7 +59,7 @@
   if (self) {
     fm = [NSFileManager defaultManager];
 
-    ASSIGN (highlight, [NSImage imageNamed: @"CellHighlight.tiff"]);
+    ASSIGN (highlight, [NSImage imageNamed: GWCellHighlightIconName]);
     ASSIGN (arrow, [NSImage imageNamed: @"common_3DArrowRight.tiff"]);
 
     namelabel = [[BIconLabel alloc] initForIcon: self];
@@ -682,10 +682,10 @@ active. preventWindowOrdering is sent automatically by NSView's dragImage:... an
       ASSIGN (icon, img);
       RELEASE (img);
     } else {
-      ASSIGN (icon, [NSImage imageNamed: @"FileIcon_Directory_Open.tiff"]);
+      ASSIGN (icon, [NSImage imageNamed: GWOpenFolderIconName]);
     }      
   } else {
-	  ASSIGN (icon, [NSImage imageNamed: @"FileIcon_Directory_Open.tiff"]);    
+	  ASSIGN (icon, [NSImage imageNamed: GWOpenFolderIconName]);    
   }
 
   [self setNeedsDisplay: YES];   

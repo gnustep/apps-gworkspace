@@ -294,10 +294,10 @@
         ASSIGN (icon, img);
         RELEASE (img);
       } else {
-        ASSIGN (icon, [NSImage imageNamed: @"FileIcon_Directory_Open.tiff"]);
+        ASSIGN (icon, [NSImage imageNamed: GWOpenFolderIconName]);
       }      
     } else {
-	    ASSIGN (icon, [NSImage imageNamed: @"FileIcon_Directory_Open.tiff"]);    
+	    ASSIGN (icon, [NSImage imageNamed: GWOpenFolderIconName]);    
     }
 
     [self setNeedsDisplay: YES];
