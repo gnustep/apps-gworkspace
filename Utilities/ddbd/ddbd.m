@@ -68,6 +68,8 @@
     RELEASE (dbpath);
   }
 #endif
+
+  RELEASE (skipSet);
   
   [super dealloc];
 }
@@ -77,6 +79,8 @@
   self = [super init];
   
   if (self) {    
+    NSCharacterSet *set;  
+  
     fm = [NSFileManager defaultManager];	
     nc = [NSNotificationCenter defaultCenter];
 
@@ -117,13 +121,21 @@
                                    userInfo: nil
                                     repeats: YES];
 
-/*
-60
-3600
-86400
-*/
+    skipSet = [NSMutableCharacterSet new];
+    set = [NSCharacterSet controlCharacterSet];
+    [skipSet formUnionWithCharacterSet: set];
+    set = [NSCharacterSet illegalCharacterSet];
+    [skipSet formUnionWithCharacterSet: set];
+    set = [NSCharacterSet punctuationCharacterSet];
+    [skipSet formUnionWithCharacterSet: set];
+    set = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+    [skipSet formUnionWithCharacterSet: set];
+    set = [NSCharacterSet decimalDigitCharacterSet];
+    [skipSet formUnionWithCharacterSet: set];
 
-
+    set = [NSCharacterSet characterSetWithCharactersInString: @"+-=<>&@$*%#\"\'^`|~_"];
+    [skipSet formUnionWithCharacterSet: set];  
+    
   #ifdef HAVE_SQLITE  
     {
       NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -143,33 +155,20 @@
       version = [NSNumber numberWithInt: dbversion];
       [defaults setObject: version forKey: @"db_version"];
       [defaults synchronize];
-            
-            
-      // !!!!!!!!!!!!!!!!!!!! TEST 1 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  //    [self testCreateDB];          
-      // !!!!!!!!!!!!!!!!!!!! TEST 1 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            
-            
+                                   
       newdb = ([fm fileExistsAtPath: dbpath] == NO);
     
       db = opendbAtPath(dbpath);
       
       if (db != NULL) {
         if (newdb) {
-          NSDictionary *table = [deftable propertyList];
-          
-          if (createDatabaseWithTable(db, table) == NO) {
+          if (addTablesToDb(db, dbschema) == NO) {
             NSLog(@"unable to create the Desktop database");
           } else {
             NSLog(@"Desktop database created");
           }
         }
 
-        // !!!!!!!!!!!!!!!!!!!! TEST 2 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    //    [self testWriteImage];        
-        // !!!!!!!!!!!!!!!!!!!! TEST 2 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-                 
       } else {
         NSLog(@"unable to open the Desktop database");
       }
@@ -417,7 +416,9 @@
         [directories addObject: [NSString stringWithUTF8String: [pathdata bytes]]];
       }
       
-      data = [NSArchiver archivedDataWithRootObject: directories]; 
+      if ([directories count]) {  
+        data = [NSArchiver archivedDataWithRootObject: directories]; 
+      }
     }
 
     TEST_RETAIN (data);
@@ -631,7 +632,7 @@
 - (BOOL)checkPath:(NSString *)path
 {
 #ifdef HAVE_SQLITE
-  return ((db != NULL) && checkPathInDb(db, path));
+  return ((db != NULL) && checkEntryInDb(db, @"files", @"path", path));
 #else
   return NO;
 #endif
@@ -720,84 +721,94 @@
   NSLog(@"db update thread will exit");
 }
 
+@end
 
 
+@implementation	DDBd (indexing)
 
-
-
-
-
-- (void)testCreateDB
+- (void)indexContentsOfFile:(NSString *)path
 {
 #ifdef HAVE_SQLITE
-  NSString *dbPath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
-  NSString *testpath = @"/home/enrico/Butt/GNUstep/CopyPix";
-  NSString *imgpath = @"/home/enrico/Butt/GNUstep/CopyPix/Calculator.tiff";
-  NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: testpath];
-  NSImage *image;
-  NSData *imdata;  
-  NSDictionary *attributes;
-  NSString *type;
-  NSDate *date;
-  NSString *path;
-        
-  dbPath = [dbPath stringByAppendingPathComponent: @"Desktop.db"];
-  [fm removeFileAtPath: dbPath handler: nil];
-  
-  db = opendbAtPath(dbPath);
-  
-  if (db != NULL) {
-    NSDictionary *table = [deftable propertyList];
+#define DLENGTH 256
+#define MAXFSIZE 600000
+#define TRY_QUERY(q) \
+if (performWriteQueryOnDb(db, q) == NO) { \
+NSLog(@"error accessing the Desktop database (-indexContentsOfFile:)"); \
+RELEASE (arp); \
+return; \
+}
 
-    if (createDatabaseWithTable(db, table) == NO) {
-      NSLog(@"unable to create the Desktop database");
-      exit(0);
-    } else {
-      NSLog(@"Desktop database created");
+  CREATE_AUTORELEASE_POOL(arp);  
+  NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: NO];
+
+  if (attributes 
+          && ([attributes fileType] == NSFileTypeRegular)
+                                    && ([attributes fileSize] < MAXFSIZE)) {
+    NSFileHandle *handle = [NSFileHandle fileHandleForReadingAtPath: path];
+    NSData *data = [handle readDataOfLength: DLENGTH];
+    BOOL binary = NO;      
+    int i;
+
+    if (data) {
+      const char *bytes = (const char *)[data bytes];
+      unsigned length = [data length];
+
+      for (i = 0; i < length; i++) {
+        char c = bytes[i];
+
+        if (c == 0x00) {
+          binary = YES;
+          break;
+        } 
+      }
     }
-  } else {
-    NSLog(@"unable to open the Desktop database");
-    exit(0);
+
+    [handle closeFile];
+
+    if (binary == NO) {
+      NSString *contents = [NSString stringWithContentsOfFile: path];
+      
+      if (contents && [contents length]) {
+        NSScanner *scanner;
+        SEL scanSel;
+        IMP scanImp;
+        NSString *word;
+        NSString *query;
+        
+        query = [NSString stringWithFormat: 
+                    @"INSERT INTO cpaths(path) VALUES('%@')", 
+                                                  stringForQuery(path)];
+        
+        TRY_QUERY (@"BEGIN");
+        TRY_QUERY (query);
+        
+        scanner = [NSScanner scannerWithString: contents];
+        [scanner setCharactersToBeSkipped: skipSet];
+        
+        scanSel = @selector(scanUpToCharactersFromSet:intoString:);
+        scanImp = [scanner methodForSelector: scanSel];
+
+        while ([scanner isAtEnd] == NO) {
+          (*scanImp)(scanner, scanSel, skipSet, &word);
+          
+          if ([word length] > 2) {
+            word = stringForQuery([word lowercaseString]);
+                      
+            query = [NSString stringWithFormat: 
+                          @"INSERT INTO words(word) VALUES('%@')", word];
+            
+            TRY_QUERY (query);
+          }
+        }
+        
+        TRY_QUERY (@"COMMIT")
+      }
+    }
   }
 
-  image = [[NSImage alloc] initWithContentsOfFile: imgpath];
-  imdata = [image TIFFRepresentation];
-
-  while ((path = [enumerator nextObject])) {
-    attributes = [enumerator fileAttributes];
-    type = [attributes fileType];
-    date = [attributes fileModificationDate];
-    path = [testpath stringByAppendingPathComponent: path];
-    
-    [self setFileType: type forPath: path];
-    [self setModificationDate: [date description] forPath: path];
-    [self setAnnotations: @"testo di test" forPath: path];
-    [self setIconData: imdata forPath: path];
-  }
-  
-  RELEASE (image);
-  closedb(db);
-  
-  NSLog(@"DONE");
-  exit(0);
+RELEASE (arp);
 #endif
 }
-
-- (void)testWriteImage
-{      
-  NSString *imgoutpath = @"/home/enrico/Butt/GNUstep/CopyPix/Calculator2.tiff";
-  NSString *path = @"/home/enrico/Butt/GNUstep/Pixmaps/AA";
-  NSData *imdata = [self iconDataForPath: path];
-  NSImage *image;
-  NSData *data;
-
-  [fm removeFileAtPath: imgoutpath handler: nil];
-  image = [[NSImage alloc] initWithData: imdata];
-  data = [image TIFFRepresentation];
-  [data writeToFile: imgoutpath atomically: NO];
-  RELEASE (image);
-}
-        
 
 @end
 

@@ -70,7 +70,6 @@ static NSString *nibName = @"Finder";
 {
   NSNumber *p1 = [self objectForKey: @"position"];
   NSNumber *p2 = [dict objectForKey: @"position"];
-
   return [p1 compare: p2];
 }
 

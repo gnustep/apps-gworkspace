@@ -99,6 +99,12 @@ typedef enum FSNSelectionMask {
 
 - (BOOL)isLeaf;
 
+- (void)select;
+
+- (void)unselect;
+
+- (BOOL)isSelected;
+
 - (void)setOpened:(BOOL)value;
 
 - (BOOL)isOpened;
@@ -133,6 +139,10 @@ typedef enum FSNSelectionMask {
 @protocol FSNodeRepContainer
 
 - (void)showContentsOfNode:(FSNode *)anode;
+
+- (NSDictionary *)readNodeInfo;
+
+- (void)updateNodeInfo;
 
 - (void)reloadContents;
 

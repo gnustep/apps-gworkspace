@@ -28,6 +28,7 @@
 #include "GWViewersManager.h"
 #include "GWViewerBrowser.h"
 #include "GWViewerIconsView.h"
+#include "GWViewerListView.h"
 #include "GWViewerWindow.h"
 #include "GWViewerSplit.h"
 #include "GWViewerShelf.h"
@@ -129,6 +130,7 @@
       viewType = @"Browser";
     }
     if (([viewType isEqual: @"Icon"] == NO)
+              && ([viewType isEqual: @"List"] == NO)
               && ([viewType isEqual: @"Browser"] == NO)) {
       viewType = @"Browser";
     }
@@ -191,6 +193,13 @@
       
       [pathsScroll setDelegate: pathsView];
       
+    } else if ([viewType isEqual: @"List"]) { 
+      NSRect r = [[nviewScroll contentView] frame];
+      
+      nodeView = [[GWViewerListView alloc] initWithFrame: r forViewer: self];
+       
+      [pathsScroll setDelegate: pathsView];
+       
     } else if ([viewType isEqual: @"Browser"]) {    
       nodeView = [[GWViewerBrowser alloc] initWithBaseNode: baseNode
                                       inViewer: self
@@ -272,6 +281,7 @@
   int ymargin = 6;
   int pathscrh = 98;
   unsigned int resizeMask;
+  BOOL hasScroller;
   
   split = [[GWViewerSplit alloc] initWithFrame: r];
   [split setAutoresizingMask: (NSViewWidthSizable | NSViewHeightSizable)];
@@ -321,8 +331,9 @@
   r = NSMakeRect(xmargin, 0, w - (xmargin * 2), h - pathscrh - ymargin);
   nviewScroll = [[NSScrollView alloc] initWithFrame: r];
   [nviewScroll setBorderType: NSBezelBorder];
-  [nviewScroll setHasHorizontalScroller: [viewType isEqual: @"Icon"]];
-  [nviewScroll setHasVerticalScroller: [viewType isEqual: @"Icon"]];
+  hasScroller = ([viewType isEqual: @"Icon"] || [viewType isEqual: @"List"]);
+  [nviewScroll setHasHorizontalScroller: hasScroller];
+  [nviewScroll setHasVerticalScroller: hasScroller];
   resizeMask = NSViewNotSizable | NSViewWidthSizable | NSViewHeightSizable;
   [nviewScroll setAutoresizingMask: resizeMask];
   [lowBox addSubview: nviewScroll];
@@ -555,15 +566,32 @@
 - (void)shelfDidSelectIcon:(id)icon
 {
   FSNode *node = [icon node];
-  FSNode *base = [FSNode nodeWithPath: [node parentPath]];
   NSArray *selection = [icon selection];
-
-  if (selection == nil) {
-    selection = [NSArray arrayWithObject: node];
-  }
+  FSNode *nodetoshow;
   
-  [nodeView showContentsOfNode: base];
-  [nodeView selectRepsOfSubnodes: selection];
+  if (selection && ([selection count] > 1)) {
+    nodetoshow = [FSNode nodeWithPath: [node parentPath]];
+  } else {
+    if ([node isDirectory] && ([node isPackage] == NO)) {
+      nodetoshow = node;
+      
+      if ([viewType isEqual: @"Browser"] == NO) {
+        selection = nil;
+      } else {
+        selection = [NSArray arrayWithObject: node];
+      }
+    
+    } else {
+      nodetoshow = [FSNode nodeWithPath: [node parentPath]];
+      selection = [NSArray arrayWithObject: node];
+    }
+  }
+
+  [nodeView showContentsOfNode: nodetoshow];
+  
+  if (selection) {
+    [nodeView selectRepsOfSubnodes: selection];
+  }
 
   if ([nodeView respondsToSelector: @selector(scrollSelectionToVisible)]) {
     [nodeView scrollSelectionToVisible];
@@ -1156,8 +1184,28 @@
       nodeView = [[GWViewerIconsView alloc] initForViewer: self];
       
       ASSIGN (viewType, @"Icon");
-    }
+      
+    } else if ([title isEqual: NSLocalizedString(@"List", @"")]) {
+      NSRect r = [[nviewScroll contentView] frame];
 
+      NSScroller *scroller = RETAIN ([pathsScroll horizontalScroller]);
+
+      [pathsScroll setHasHorizontalScroller: NO];
+      [pathsScroll setHorizontalScroller: scroller]; 
+      [pathsScroll setHasHorizontalScroller: YES];
+      RELEASE (scroller);
+      
+      [pathsView setOwnsScroller: YES];
+      [pathsScroll setDelegate: pathsView];
+
+      [nviewScroll setHasVerticalScroller: YES];
+      [nviewScroll setHasHorizontalScroller: YES];
+
+      nodeView = [[GWViewerListView alloc] initWithFrame: r forViewer: self];
+
+      ASSIGN (viewType, @"List");
+    }
+    
     [nviewScroll setDocumentView: nodeView];	
     RELEASE (nodeView); 
     [nodeView showContentsOfNode: baseNode]; 

@@ -59,13 +59,12 @@ if (rct.size.height < 0) rct.size.height = 0; \
 [o setFrame: NSIntegralRect(rct)]; \
 }
 
+
 @implementation FSNIconsView
 
 - (void)dealloc
 {
   TEST_RELEASE (node);
-  TEST_RELEASE (infoPath);
-  TEST_RELEASE (nodeInfo);
   TEST_RELEASE (extInfoType);
   RELEASE (icons);
   RELEASE (labelFont);
@@ -192,142 +191,11 @@ if (rct.size.height < 0) rct.size.height = 0; \
 
 - (void)sortIcons
 {
-  SEL compSel = [fsnodeRep compareSelectorForDirectory: [node path]];
-  NSArray *sorted = [icons sortedArrayUsingSelector: compSel];
-
   if (infoType == FSNInfoExtendedType) {
-    NSArray *extsorted = [sorted sortedArrayUsingFunction: (int (*)(id, id, void*))compareWithExtType
-                                                  context: (void *)NULL];
-    sorted = extsorted;
-  }
-  
-  [icons removeAllObjects];
-  [icons addObjectsFromArray: sorted];
-}
-
-- (NSDictionary *)readNodeInfo
-{
-  NSDictionary *nodeDict = nil;
-  
-  ASSIGN (infoPath, [[node path] stringByAppendingPathComponent: @".dirinfo"]);
-  
-  if ([[NSFileManager defaultManager] fileExistsAtPath: infoPath]) {
-    nodeDict = [NSDictionary dictionaryWithContentsOfFile: infoPath];
-
-    if (nodeDict) {
-      id entry = [nodeDict objectForKey: @"backcolor"];
-      
-      if (entry) {
-        float red = [[entry objectForKey: @"red"] floatValue];
-        float green = [[entry objectForKey: @"green"] floatValue];
-        float blue = [[entry objectForKey: @"blue"] floatValue];
-        float alpha = [[entry objectForKey: @"alpha"] floatValue];
-
-        ASSIGN (backColor, [NSColor colorWithCalibratedRed: red 
-                                                     green: green 
-                                                      blue: blue 
-                                                     alpha: alpha]);
-      }
-
-      entry = [nodeDict objectForKey: @"textcolor"];
-      
-      if (entry) {
-        float red = [[entry objectForKey: @"red"] floatValue];
-        float green = [[entry objectForKey: @"green"] floatValue];
-        float blue = [[entry objectForKey: @"blue"] floatValue];
-        float alpha = [[entry objectForKey: @"alpha"] floatValue];
-
-        ASSIGN (textColor, [NSColor colorWithCalibratedRed: red 
-                                                     green: green 
-                                                      blue: blue 
-                                                     alpha: alpha]);
-                                                     
-        ASSIGN (disabledTextColor, [textColor highlightWithLevel: NSDarkGray]);      
-      }
-
-      entry = [nodeDict objectForKey: @"iconsize"];
-      iconSize = entry ? [entry intValue] : iconSize;
-
-      entry = [nodeDict objectForKey: @"labeltxtsize"];
-      if (entry) {
-        labelTextSize = [entry intValue];
-        ASSIGN (labelFont, [NSFont systemFontOfSize: labelTextSize]);      
-      }
-
-      entry = [nodeDict objectForKey: @"iconposition"];
-      iconPosition = entry ? [entry intValue] : iconPosition;
-
-      entry = [nodeDict objectForKey: @"fsn_info_type"];
-      infoType = entry ? [entry intValue] : infoType;
-      
-      if (infoType == FSNInfoExtendedType) {
-        DESTROY (extInfoType);
-        entry = [nodeDict objectForKey: @"ext_info_type"];
-
-        if (entry) {
-          NSArray *availableTypes = [fsnodeRep availableExtendedInfoNames];
-
-          if ([availableTypes containsObject: entry]) {
-            ASSIGN (extInfoType, entry);
-          }
-        }
-
-        if (extInfoType == nil) {
-          infoType = FSNInfoNameType;
-        }
-      }
-    }
-  }
-    
-  if (nodeDict) {
-    nodeInfo = [nodeDict mutableCopy];
+    [icons sortUsingFunction: (int (*)(id, id, void*))compareWithExtType
+                     context: (void *)NULL];
   } else {
-    nodeInfo = [NSMutableDictionary new];
-  }
-    
-  return nodeDict;
-}
-
-- (void)updateNodeInfo
-{
-  if ([node isWritable]) {
-    NSMutableDictionary *backColorDict = [NSMutableDictionary dictionary];
-    NSMutableDictionary *txtColorDict = [NSMutableDictionary dictionary];
-    float red, green, blue, alpha;
-	
-    [backColor getRed: &red green: &green blue: &blue alpha: &alpha];
-    [backColorDict setObject: [NSNumber numberWithFloat: red] forKey: @"red"];
-    [backColorDict setObject: [NSNumber numberWithFloat: green] forKey: @"green"];
-    [backColorDict setObject: [NSNumber numberWithFloat: blue] forKey: @"blue"];
-    [backColorDict setObject: [NSNumber numberWithFloat: alpha] forKey: @"alpha"];
-
-    [nodeInfo setObject: backColorDict forKey: @"backcolor"];
-
-    [textColor getRed: &red green: &green blue: &blue alpha: &alpha];
-    [txtColorDict setObject: [NSNumber numberWithFloat: red] forKey: @"red"];
-    [txtColorDict setObject: [NSNumber numberWithFloat: green] forKey: @"green"];
-    [txtColorDict setObject: [NSNumber numberWithFloat: blue] forKey: @"blue"];
-    [txtColorDict setObject: [NSNumber numberWithFloat: alpha] forKey: @"alpha"];
-
-    [nodeInfo setObject: txtColorDict forKey: @"textcolor"];
-    
-    [nodeInfo setObject: [NSNumber numberWithInt: iconSize] 
-                 forKey: @"iconsize"];
-
-    [nodeInfo setObject: [NSNumber numberWithInt: labelTextSize] 
-                 forKey: @"labeltxtsize"];
-
-    [nodeInfo setObject: [NSNumber numberWithInt: iconPosition] 
-                 forKey: @"iconposition"];
-
-    [nodeInfo setObject: [NSNumber numberWithInt: infoType] 
-                 forKey: @"fsn_info_type"];
-
-    if (infoType == FSNInfoExtendedType) {
-      [nodeInfo setObject: extInfoType forKey: @"ext_info_type"];
-    }
-    
-    [nodeInfo writeToFile: infoPath atomically: YES];
+    [icons sortUsingSelector: [fsnodeRep compareSelectorForDirectory: [node path]]];
   }
 }
 
@@ -650,7 +518,7 @@ pp.x = NSMaxX([self bounds]) - 1
     
     visibleRect = [self visibleRect];
     
-    if ([self mouse: pp inRect: [self visibleRect]] == NO) {
+    if ([self mouse: pp inRect: visibleRect] == NO) {
       scrollPointToVisible(pp);
       CONVERT_CHECK;
       visibleRect = [self visibleRect];
@@ -789,7 +657,7 @@ pp.x = NSMaxX([self bounds]) - 1
 - (void)keyDown:(NSEvent *)theEvent 
 {
   NSString *characters = [theEvent characters];  
-  unichar character;
+  unichar character = 0;
 	NSRect vRect, hiddRect;
 	NSPoint p;
 	float x, y, w, h;
@@ -860,7 +728,7 @@ pp.x = NSMaxX([self bounds]) - 1
       break;
   }
 
-  if ((character < 0xF700) && ([characters length] > 0)) {
+  if (([characters length] > 0) && (character < 0xF700)) {
 		SEL icnwpSel = @selector(selectIconWithPrefix:);
 		IMP icnwp = [self methodForSelector: icnwpSel];
     
@@ -994,9 +862,6 @@ pp.x = NSMaxX([self bounds]) - 1
 - (void)showContentsOfNode:(FSNode *)anode
 {
   NSArray *subNodes = [anode subNodes];
-  NSMutableArray *unsorted = [NSMutableArray array];
-  SEL compSel;
-  NSArray *sorted;
   int i;
 
   for (i = 0; i < [icons count]; i++) {
@@ -1022,19 +887,183 @@ pp.x = NSMaxX([self bounds]) - 1
                                        dndSource: YES
                                        acceptDnd: YES
                                        slideBack: YES];
-    [unsorted addObject: icon];
+    [icons addObject: icon];
     [self addSubview: icon];
     RELEASE (icon);
   }
 
-  compSel = [fsnodeRep compareSelectorForDirectory: [node path]];
-  sorted = [unsorted sortedArrayUsingSelector: compSel];
-  [icons addObjectsFromArray: sorted];
-  
+  [icons sortUsingSelector: [fsnodeRep compareSelectorForDirectory: [node path]]];
   [self tile];
   
   DESTROY (lastSelection);
   [self selectionDidChange];
+}
+
+- (NSDictionary *)readNodeInfo
+{  
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	      
+  NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", [node path]];
+  NSDictionary *nodeDict = nil;
+
+  if ([node isWritable]) {
+    NSString *infoPath = [[node path] stringByAppendingPathComponent: @".gwdir"];
+  
+    if ([[NSFileManager defaultManager] fileExistsAtPath: infoPath]) {
+      NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: infoPath];
+
+      if (dict) {
+        nodeDict = [NSDictionary dictionaryWithDictionary: dict];
+      }   
+    }
+  }
+  
+  if (nodeDict == nil) {
+    id defEntry = [defaults dictionaryForKey: prefsname];
+
+    if (defEntry) {
+      nodeDict = [NSDictionary dictionaryWithDictionary: defEntry];
+    }
+  }
+  
+  if (nodeDict) {
+    id entry = [nodeDict objectForKey: @"backcolor"];
+
+    if (entry) {
+      float red = [[entry objectForKey: @"red"] floatValue];
+      float green = [[entry objectForKey: @"green"] floatValue];
+      float blue = [[entry objectForKey: @"blue"] floatValue];
+      float alpha = [[entry objectForKey: @"alpha"] floatValue];
+
+      ASSIGN (backColor, [NSColor colorWithCalibratedRed: red 
+                                                   green: green 
+                                                    blue: blue 
+                                                   alpha: alpha]);
+    }
+
+    entry = [nodeDict objectForKey: @"textcolor"];
+
+    if (entry) {
+      float red = [[entry objectForKey: @"red"] floatValue];
+      float green = [[entry objectForKey: @"green"] floatValue];
+      float blue = [[entry objectForKey: @"blue"] floatValue];
+      float alpha = [[entry objectForKey: @"alpha"] floatValue];
+
+      ASSIGN (textColor, [NSColor colorWithCalibratedRed: red 
+                                                   green: green 
+                                                    blue: blue 
+                                                   alpha: alpha]);
+
+      ASSIGN (disabledTextColor, [textColor highlightWithLevel: NSDarkGray]);      
+    }
+
+    entry = [nodeDict objectForKey: @"iconsize"];
+    iconSize = entry ? [entry intValue] : iconSize;
+
+    entry = [nodeDict objectForKey: @"labeltxtsize"];
+    if (entry) {
+      labelTextSize = [entry intValue];
+      ASSIGN (labelFont, [NSFont systemFontOfSize: labelTextSize]);      
+    }
+
+    entry = [nodeDict objectForKey: @"iconposition"];
+    iconPosition = entry ? [entry intValue] : iconPosition;
+
+    entry = [nodeDict objectForKey: @"fsn_info_type"];
+    infoType = entry ? [entry intValue] : infoType;
+
+    if (infoType == FSNInfoExtendedType) {
+      DESTROY (extInfoType);
+      entry = [nodeDict objectForKey: @"ext_info_type"];
+
+      if (entry) {
+        NSArray *availableTypes = [fsnodeRep availableExtendedInfoNames];
+
+        if ([availableTypes containsObject: entry]) {
+          ASSIGN (extInfoType, entry);
+        }
+      }
+
+      if (extInfoType == nil) {
+        infoType = FSNInfoNameType;
+      }
+    }
+  }
+        
+  return nodeDict;
+}
+
+- (void)updateNodeInfo
+{
+  if ([node isValid]) {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	      
+    NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", [node path]];
+    NSString *infoPath = [[node path] stringByAppendingPathComponent: @".gwdir"];
+    NSMutableDictionary *updatedInfo = nil;
+    NSMutableDictionary *backColorDict = [NSMutableDictionary dictionary];
+    NSMutableDictionary *txtColorDict = [NSMutableDictionary dictionary];
+    float red, green, blue, alpha;
+
+    if ([node isWritable]) {
+      if ([[NSFileManager defaultManager] fileExistsAtPath: infoPath]) {
+        NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: infoPath];
+
+        if (dict) {
+          updatedInfo = [dict mutableCopy];
+        }   
+      }
+  
+    } else { 
+      NSDictionary *prefs = [defaults dictionaryForKey: prefsname];
+  
+      if (prefs) {
+        updatedInfo = [prefs mutableCopy];
+      }
+    }
+
+    if (updatedInfo == nil) {
+      updatedInfo = [NSMutableDictionary new];
+    }
+	
+    [backColor getRed: &red green: &green blue: &blue alpha: &alpha];
+    [backColorDict setObject: [NSNumber numberWithFloat: red] forKey: @"red"];
+    [backColorDict setObject: [NSNumber numberWithFloat: green] forKey: @"green"];
+    [backColorDict setObject: [NSNumber numberWithFloat: blue] forKey: @"blue"];
+    [backColorDict setObject: [NSNumber numberWithFloat: alpha] forKey: @"alpha"];
+
+    [updatedInfo setObject: backColorDict forKey: @"backcolor"];
+
+    [textColor getRed: &red green: &green blue: &blue alpha: &alpha];
+    [txtColorDict setObject: [NSNumber numberWithFloat: red] forKey: @"red"];
+    [txtColorDict setObject: [NSNumber numberWithFloat: green] forKey: @"green"];
+    [txtColorDict setObject: [NSNumber numberWithFloat: blue] forKey: @"blue"];
+    [txtColorDict setObject: [NSNumber numberWithFloat: alpha] forKey: @"alpha"];
+
+    [updatedInfo setObject: txtColorDict forKey: @"textcolor"];
+    
+    [updatedInfo setObject: [NSNumber numberWithInt: iconSize] 
+                    forKey: @"iconsize"];
+
+    [updatedInfo setObject: [NSNumber numberWithInt: labelTextSize] 
+                    forKey: @"labeltxtsize"];
+
+    [updatedInfo setObject: [NSNumber numberWithInt: iconPosition] 
+                    forKey: @"iconposition"];
+
+    [updatedInfo setObject: [NSNumber numberWithInt: infoType] 
+                    forKey: @"fsn_info_type"];
+
+    if (infoType == FSNInfoExtendedType) {
+      [updatedInfo setObject: extInfoType forKey: @"ext_info_type"];
+    }
+    
+    if ([node isWritable]) {
+      [updatedInfo writeToFile: infoPath atomically: YES];
+    } else {
+      [defaults setObject: updatedInfo forKey: prefsname];
+    }
+    
+    RELEASE (updatedInfo);
+  }
 }
 
 - (void)reloadContents
@@ -1912,6 +1941,7 @@ pp.x = NSMaxX([self bounds]) - 1
     sc = (abs(xsc) >= abs(ysc)) ? xsc : ysc;
           
     for (i = 0; i < abs(sc / margin); i++) {
+      CREATE_AUTORELEASE_POOL (pool);
       NSDate *limit = [NSDate dateWithTimeIntervalSinceNow: 0.01];
       int x = (abs(xsc) >= i) ? (xsc > 0 ? margin : -margin) : 0;
       int y = (abs(ysc) >= i) ? (ysc > 0 ? margin : -margin) : 0;
@@ -1930,6 +1960,7 @@ pp.x = NSMaxX([self bounds]) - 1
       }
       
       [[NSRunLoop currentRunLoop] runUntilDate: limit];
+      RELEASE (pool);
     }
   }
   

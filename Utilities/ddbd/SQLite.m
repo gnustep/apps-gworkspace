@@ -60,7 +60,11 @@ sqlite3 *opendbAtPath(NSString *dbpath)
   sqlite3_create_function(db, "pathExists", 1, 
                               SQLITE_UTF8, 0, path_Exists, 0, 0);
 
-  performWriteQueryOnDb(db, @"PRAGMA synchronous=OFF");
+  performWriteQueryOnDb(db, @"PRAGMA temp_store=MEMORY");
+  performWriteQueryOnDb(db, @"PRAGMA cache_size=20000");
+  performWriteQueryOnDb(db, @"PRAGMA count_changes=OFF");
+  performWriteQueryOnDb(db, @"PRAGMA synchronous=NORMAL");
+//  performWriteQueryOnDb(db, @"PRAGMA synchronous=OFF");
   
   return db;  
 }
@@ -70,52 +74,11 @@ void closedb(sqlite3 *db)
   sqlite3_close(db);
 }
 
-BOOL createDatabaseWithTable(sqlite3 *db, NSDictionary *table)
+BOOL addTablesToDb(sqlite3 *db, NSString *schema)
 {
-  NSMutableString *query = [NSMutableString stringWithCapacity: 1];
-  NSString *tname = [table objectForKey: @"tablename"];
-  NSArray *fields = [table objectForKey: @"fields"];
-  int count;
-  int i;
-
-  [query appendFormat: @"CREATE TABLE %@ (", tname];
-
-  count = [fields count];
-
-  for (i = 0; i < count; i++) {
-    NSDictionary *fieldict = [fields objectAtIndex: i];
-    NSString *fname = [fieldict objectForKey: @"name"];
-    NSString *ftype = [fieldict objectForKey: @"type"];
-    BOOL unique = [[fieldict objectForKey: @"unique"] boolValue];
-    BOOL primary = [[fieldict objectForKey: @"primary"] boolValue];
-    BOOL notnull = [[fieldict objectForKey: @"notnull"] boolValue];
-
-    [query appendFormat: @"%@ %@", fname, ftype];
-
-    if (unique) {
-      NSString *constraint = [fieldict objectForKey: @"unique_constr"];
-      [query appendFormat: @" UNIQUE ON CONFLICT %@", constraint];
-    }
-    
-    if (primary) {
-      [query appendString: @" PRIMARY KEY"];
-    }
-
-    if (notnull) {
-      [query appendString: @" NOT NULL"];
-    }
-
-    if (i < (count - 1)) {
-      [query appendString: @", "];
-    }
-  }    
-
-  [query appendString: @")"];
-
-  if (performQueryOnDb(db, query) == nil) {
+  if (performQueryOnDb(db, schema) == nil) {
     return NO;
   }
-
   return YES;
 }
 
@@ -229,7 +192,9 @@ BOOL performWriteQueryOnDb(sqlite3 *db, NSString *query)
       [NSThread sleepUntilDate: when];
       NSLog(@"retry %i", retry);
       RELEASE (arp);
-
+      
+  //    sqlite3_reset(stmt);
+      
       if (retry++ > MAX_RETRY) {
         NSLog(@"%s", sqlite3_errmsg(db));
         sqlite3_finalize(stmt);
@@ -248,7 +213,7 @@ BOOL performWriteQueryOnDb(sqlite3 *db, NSString *query)
   return YES;
 }
 
-BOOL checkPathInDb(sqlite3 *db, NSString *path)
+BOOL checkEntryInDb(sqlite3 *db, NSString *tab, NSString *col, NSString *entry)
 {
   NSString *query;
   int retry = 0;
@@ -258,8 +223,8 @@ BOOL checkPathInDb(sqlite3 *db, NSString *path)
 	int rows;
 
   query = [NSString stringWithFormat: 
-                    @"SELECT count() FROM files WHERE path = '%@'", 
-                                                    stringForQuery(path)];
+                    @"SELECT count() FROM %@ WHERE %@ = '%@'", 
+                                          tab, col, stringForQuery(entry)];
 
   while (1) {
     err = sqlite3_get_table(db, [query UTF8String], 

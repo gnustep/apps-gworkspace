@@ -19,7 +19,8 @@ FSNode_OBJC_FILES = \
          FSNBrowserColumn.m \
          FSNBrowser.m \
          FSNIcon.m \
-         FSNIconsView.m 
+         FSNIconsView.m \
+         FSNListView.m 
                 
 FSNode_HEADER_FILES = \
          FSNode.h \
@@ -32,7 +33,8 @@ FSNode_HEADER_FILES = \
          FSNBrowserColumn.h \
          FSNBrowser.h \
          FSNIcon.h \
-         FSNIconsView.h 
+         FSNIconsView.h \
+         FSNListView.m 
         
 FSNode_HAS_RESOURCE_BUNDLE = yes                                          
         

@@ -96,6 +96,7 @@ static int infoheight = 0;
     showType = FSNInfoNameType;
     extInfoType = nil;
     icon = nil;
+    openicon = nil;
     icnsize = DEFAULT_ISIZE;
     
     isLocked = NO;
@@ -574,6 +575,19 @@ static int infoheight = 0;
 - (BOOL)isLeaf
 {
   return [super isLeaf];
+}
+
+- (void)select
+{
+}
+
+- (void)unselect
+{
+}
+
+- (BOOL)isSelected
+{
+  return NO;
 }
 
 - (void)setOpened:(BOOL)value

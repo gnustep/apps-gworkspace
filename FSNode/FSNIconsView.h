@@ -38,8 +38,6 @@
 @interface FSNIconsView : NSView
 {
   FSNode *node;
-  NSString *infoPath;
-  NSMutableDictionary *nodeInfo;
   NSMutableArray *icons;
   FSNInfoType infoType;
   NSString *extInfoType;
@@ -77,10 +75,6 @@
 
 - (void)sortIcons;
 
-- (NSDictionary *)readNodeInfo;
-
-- (void)updateNodeInfo;
-
 - (void)calculateGridSize;
 
 - (void)tile;
@@ -103,6 +97,8 @@
 @interface FSNIconsView (NodeRepContainer)
 
 - (void)showContentsOfNode:(FSNode *)anode;
+- (NSDictionary *)readNodeInfo;
+- (void)updateNodeInfo;
 - (void)reloadContents;
 - (void)reloadFromNode:(FSNode *)anode;
 - (FSNode *)baseNode;

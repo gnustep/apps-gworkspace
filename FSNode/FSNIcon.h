@@ -104,12 +104,6 @@
 
 - (void)setSelectable:(BOOL)value;
 
-- (void)select;
-
-- (void)unselect;
-
-- (BOOL)isSelected;
-
 - (NSRect)iconBounds;
 
 - (void)tile;

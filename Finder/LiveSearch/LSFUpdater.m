@@ -142,6 +142,15 @@
 
   if (dict) {
     NSMutableDictionary *updated = [dict mutableCopy];
+    
+    if (dircount == 0) {
+      id countnmb = [dict objectForKey: @"dircount"];
+    
+      if (countnmb) {
+        dircount = [countnmb unsignedLongValue];
+      }
+    }
+    
     [updated setObject: [NSNumber numberWithLong: autoupdate] 
                 forKey: @"autoupdate"];	
     [updated writeToFile: infopath atomically: YES];
@@ -432,7 +441,11 @@
   [dict setObject: [lastUpdate description] forKey: @"lastupdate"];	
   [dict setObject: [NSNumber numberWithLong: autoupdate] 
            forKey: @"autoupdate"];	
-
+  if (dircount > 0) {
+    [dict setObject: [NSNumber numberWithLong: dircount] 
+            forKey: @"dircount"];	
+  }
+  
   if ([dict writeToFile: [lsfolder infoPath] atomically: YES] == NO) {
     return NO;
   }
@@ -718,6 +731,8 @@
     
       if (spathindex >= [searchPaths count]) {
         spathindex = 0;
+        dircount = dircounter;
+        dircounter = 0;
         reset = YES;
         
         if ([startSearch laterDate: lastUpdate] == startSearch) {
@@ -753,6 +768,8 @@
       }
       
     } else {
+      dircount = dircounter;
+      dircounter = 0;
       reset = YES;
     
       if ([startSearch laterDate: lastUpdate] == startSearch) {
@@ -830,8 +847,6 @@
     }
     
     if (reset) {
-      dircount = dircounter;
-      dircounter = 0;
       [self resetTimer];
     }
     

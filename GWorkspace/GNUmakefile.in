@@ -54,6 +54,7 @@ FileViewer/GWSpatialViewer.m \
 FileViewer/GWViewerWindow.m \
 FileViewer/GWViewerBrowser.m \
 FileViewer/GWViewerIconsView.m \
+FileViewer/GWViewerListView.m \
 FileViewer/GWViewerShelf.m \
 FileViewer/GWViewerSplit.m \
 FileViewer/GWViewerIconsPath.m \

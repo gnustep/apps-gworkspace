@@ -1,9 +1,9 @@
-/* SQLite.h
+/* GWViewerListView.h
  *  
  * Copyright (C) 2004 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
- * Date: October 2004
+ * Date: December 2004
  *
  * This file is part of the GNUstep GWorkspace application
  *
@@ -22,30 +22,34 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef SQLITE_CLIENT_H
-#define SQLITE_CLIENT_H
+#ifndef GW_VIEWER_LIST_VIEW_H
+#define GW_VIEWER_LIST_VIEW_H
 
 #include <Foundation/Foundation.h>
-#include <sqlite3.h>
+#include "FSNListView.h"
 
-sqlite3 *opendbAtPath(NSString *dbpath);
+@class GWViewersManager;
 
-void closedb(sqlite3 *db);
+@interface GWViewerListViewDataSource : FSNListViewDataSource
+{
+  id viewer;
+  id manager;
+}
 
-BOOL addTablesToDb(sqlite3 *db, NSString *schema);
+- (void)setViewer:(id)vwr;
 
-NSArray *performQueryOnDb(sqlite3 *db, NSString *query);
+@end
 
-BOOL performWriteQueryOnDb(sqlite3 *db, NSString *query);
 
-BOOL checkEntryInDb(sqlite3 *db, NSString *tab, NSString *col, NSString *entry);
+@interface GWViewerListView : FSNListView
+{
+  id viewer;
+  id manager;
+}
 
-NSString *blobFromData(NSData *data);
+- (id)initWithFrame:(NSRect)rect 
+          forViewer:(id)vwr;
 
-void decodeBlobUnit(unsigned char *unit, const char *src);
+@end
 
-NSData *dataFromBlob(const char *blob);
-
-NSString *stringForQuery(NSString *str);
-
-#endif // SQLITE_CLIENT_H
+#endif // GW_VIEWER_LIST_VIEW_H

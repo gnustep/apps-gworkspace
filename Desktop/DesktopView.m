@@ -147,10 +147,9 @@
 
 - (NSDictionary *)readNodeInfo
 {
+  NSString *infoPath = [[node path] stringByAppendingPathComponent: @".gwdir"];
   NSDictionary *nodeDict = nil;
   FSNInfoType itype;
-
-  ASSIGN (infoPath, [[node path] stringByAppendingPathComponent: @".dirinfo"]);
   
   if ([[NSFileManager defaultManager] fileExistsAtPath: infoPath]) {
     nodeDict = [NSDictionary dictionaryWithContentsOfFile: infoPath];
@@ -243,23 +242,31 @@
     }
   }
   
-  if (nodeDict) {
-    nodeInfo = [nodeDict mutableCopy];
-  } else {
-    nodeInfo = [NSMutableDictionary new];
-  }
-    
   return nodeDict;
 }
 
 - (void)updateNodeInfo
 {
   if ([node isWritable]) {
+    NSString *infoPath = [[node path] stringByAppendingPathComponent: @".gwdir"];
+    NSMutableDictionary *updatedInfo = nil;
     NSMutableDictionary *indexes = [NSMutableDictionary dictionary];
     NSMutableDictionary *backColorDict = [NSMutableDictionary dictionary];
     NSMutableDictionary *txtColorDict = [NSMutableDictionary dictionary];
     float red, green, blue, alpha;
     int i;
+
+    if ([[NSFileManager defaultManager] fileExistsAtPath: infoPath]) {
+      NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: infoPath];
+
+      if (dict) {
+        updatedInfo = [dict mutableCopy];
+      }
+    }
+
+    if (updatedInfo == nil) {
+      updatedInfo = [NSMutableDictionary new];
+    }
 	
     [backColor getRed: &red green: &green blue: &blue alpha: &alpha];
     [backColorDict setObject: [NSNumber numberWithFloat: red] forKey: @"red"];
@@ -267,7 +274,7 @@
     [backColorDict setObject: [NSNumber numberWithFloat: blue] forKey: @"blue"];
     [backColorDict setObject: [NSNumber numberWithFloat: alpha] forKey: @"alpha"];
 
-    [nodeInfo setObject: backColorDict forKey: @"backcolor"];
+    [updatedInfo setObject: backColorDict forKey: @"backcolor"];
 
     [textColor getRed: &red green: &green blue: &blue alpha: &alpha];
     [txtColorDict setObject: [NSNumber numberWithFloat: red] forKey: @"red"];
@@ -275,32 +282,32 @@
     [txtColorDict setObject: [NSNumber numberWithFloat: blue] forKey: @"blue"];
     [txtColorDict setObject: [NSNumber numberWithFloat: alpha] forKey: @"alpha"];
 
-    [nodeInfo setObject: txtColorDict forKey: @"textcolor"];
+    [updatedInfo setObject: txtColorDict forKey: @"textcolor"];
 
-    [nodeInfo setObject: [NSNumber numberWithBool: useBackImage] 
-                 forKey: @"usebackimage"];
+    [updatedInfo setObject: [NSNumber numberWithBool: useBackImage] 
+                    forKey: @"usebackimage"];
 
-    [nodeInfo setObject: [NSNumber numberWithInt: backImageStyle] 
-                 forKey: @"imagestyle"];
+    [updatedInfo setObject: [NSNumber numberWithInt: backImageStyle] 
+                    forKey: @"imagestyle"];
 
     if (backImage) {
-      [nodeInfo setObject: imagePath forKey: @"imagepath"];
+      [updatedInfo setObject: imagePath forKey: @"imagepath"];
     }
 
-    [nodeInfo setObject: [NSNumber numberWithInt: iconSize] 
-                 forKey: @"iconsize"];
+    [updatedInfo setObject: [NSNumber numberWithInt: iconSize] 
+                    forKey: @"iconsize"];
 
-    [nodeInfo setObject: [NSNumber numberWithInt: labelTextSize] 
-                 forKey: @"labeltxtsize"];
+    [updatedInfo setObject: [NSNumber numberWithInt: labelTextSize] 
+                    forKey: @"labeltxtsize"];
 
-    [nodeInfo setObject: [NSNumber numberWithInt: iconPosition] 
-                 forKey: @"iconposition"];
+    [updatedInfo setObject: [NSNumber numberWithInt: iconPosition] 
+                    forKey: @"iconposition"];
 
-    [nodeInfo setObject: [NSNumber numberWithInt: infoType] 
-                 forKey: @"fsn_info_type"];
+    [updatedInfo setObject: [NSNumber numberWithInt: infoType] 
+                    forKey: @"fsn_info_type"];
 
     if (infoType == FSNInfoExtendedType) {
-      [nodeInfo setObject: extInfoType forKey: @"ext_info_type"];
+      [updatedInfo setObject: extInfoType forKey: @"ext_info_type"];
     }
     
     for (i = 0; i < [icons count]; i++) {
@@ -310,8 +317,9 @@
                   forKey: [[icon node] name]];
     }
     
-    [nodeInfo setObject: indexes forKey: @"indexes"];
-    [nodeInfo writeToFile: infoPath atomically: YES];
+    [updatedInfo setObject: indexes forKey: @"indexes"];
+    [updatedInfo writeToFile: infoPath atomically: YES];
+    RELEASE (updatedInfo);
   }
 }
 

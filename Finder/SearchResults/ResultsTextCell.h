@@ -26,41 +26,12 @@
 #define RESULTS_TEXT_CELL_H
 
 #include <Foundation/Foundation.h>
-#include <AppKit/NSTextFieldCell.h>
+#include "FSNTextCell.h"
 #include "FSNodeRep.h"
 
-typedef NSString *(*cutIMP)(id, SEL, id, float);
-
-@class NSImage;
-
-@interface ResultsTextCell : NSTextFieldCell 
+@interface ResultsTextCell : FSNTextCell 
 {
-  NSDictionary *fontAttr;
-  NSString *dots;
-  float titlelenght;
-  float dtslenght;
-  BOOL dateCell;
-  NSString *uncuttedTitle; 
-	SEL cutTitleSel;
-	cutIMP cutTitle;
-  NSImage *icon;
 }
-
-- (void)setIcon:(NSImage *)icn;
-
-- (NSImage *)icon;
-
-- (float)uncuttedTitleLenght;
-
-- (void)setDateCell:(BOOL)value;
-
-- (BOOL)isDateCell;
-
-- (NSString *)cutTitle:(NSString *)title 
-            toFitWidth:(float)width;
-
-- (NSString *)cutDateTitle:(NSString *)title 
-                toFitWidth:(float)width;
 
 @end
 

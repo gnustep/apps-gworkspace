@@ -95,6 +95,7 @@ void createMenu()
 	[mainMenu setSubmenu: menu forItem: menuItem];	
 	addItemToMenu(menu, @"Browser", @"", @"setViewerType:", @"b");
 	addItemToMenu(menu, @"Icon", @"", @"setViewerType:", @"i");
+	addItemToMenu(menu, @"List", @"", @"setViewerType:", @"l");
 	  menuItem = addItemToMenu(menu, @"Viewer behaviour", @"", nil, @"");
 	  subenu = AUTORELEASE ([NSMenu new]);
 	  [menu setSubmenu: subenu forItem: menuItem];	

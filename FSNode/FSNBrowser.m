@@ -45,8 +45,6 @@
 - (void)dealloc
 {
   RELEASE (baseNode);
-  TEST_RELEASE (infoPath);
-  TEST_RELEASE (nodeInfo);
   TEST_RELEASE (extInfoType);  
   TEST_RELEASE (lastSelection);
   RELEASE (columns);
@@ -178,87 +176,6 @@
   [self loadColumnZero];
   [self notifySelectionChange: [NSArray arrayWithObject: [node path]]];
 }
-
-- (NSDictionary *)readNodeInfo
-{
-  NSDictionary *nodeDict = nil;
-  
-  ASSIGN (infoPath, [[baseNode path] stringByAppendingPathComponent: @".dirinfo"]);
-  
-  if ([[NSFileManager defaultManager] fileExistsAtPath: infoPath]) {
-    nodeDict = [NSDictionary dictionaryWithContentsOfFile: infoPath];
-
-    if (nodeDict) {
-      id entry = [nodeDict objectForKey: @"backcolor"];
-      
-      if (entry) {
-        float red = [[entry objectForKey: @"red"] floatValue];
-        float green = [[entry objectForKey: @"green"] floatValue];
-        float blue = [[entry objectForKey: @"blue"] floatValue];
-        float alpha = [[entry objectForKey: @"alpha"] floatValue];
-
-        ASSIGN (backColor, [NSColor colorWithCalibratedRed: red 
-                                                     green: green 
-                                                      blue: blue 
-                                                     alpha: alpha]);
-      }
-
-      entry = [nodeDict objectForKey: @"fsn_info_type"];
-      infoType = entry ? [entry intValue] : infoType;
-
-      if (infoType == FSNInfoExtendedType) {
-        DESTROY (extInfoType);
-        entry = [nodeDict objectForKey: @"ext_info_type"];
-
-        if (entry) {
-          NSArray *availableTypes = [[FSNodeRep sharedInstance] availableExtendedInfoNames];
-
-          if ([availableTypes containsObject: entry]) {
-            ASSIGN (extInfoType, entry);
-          }
-        }
-
-        if (extInfoType == nil) {
-          infoType = FSNInfoNameType;
-        }
-      }
-    }
-  }
-    
-  if (nodeDict) {
-    nodeInfo = [nodeDict mutableCopy];
-  } else {
-    nodeInfo = [NSMutableDictionary new];
-  }
-    
-  return nodeDict;
-}
-
-- (void)updateNodeInfo
-{
-  if ([baseNode isWritable]) {
-    NSMutableDictionary *backColorDict = [NSMutableDictionary dictionary];
-    float red, green, blue, alpha;
-	
-    [backColor getRed: &red green: &green blue: &blue alpha: &alpha];
-    [backColorDict setObject: [NSNumber numberWithFloat: red] forKey: @"red"];
-    [backColorDict setObject: [NSNumber numberWithFloat: green] forKey: @"green"];
-    [backColorDict setObject: [NSNumber numberWithFloat: blue] forKey: @"blue"];
-    [backColorDict setObject: [NSNumber numberWithFloat: alpha] forKey: @"alpha"];
-
-    [nodeInfo setObject: backColorDict forKey: @"backcolor"];
-    
-    [nodeInfo setObject: [NSNumber numberWithInt: infoType] 
-                 forKey: @"fsn_info_type"];
-
-    if (infoType == FSNInfoExtendedType) {
-      [nodeInfo setObject: extInfoType forKey: @"ext_info_type"];
-    }
-    
-    [nodeInfo writeToFile: infoPath atomically: YES];
-  }
-}
-
 
 - (void)setUsesCellsIcons:(BOOL)cicns
 {
@@ -1296,7 +1213,7 @@
       return;
   }  
   
-  if ((character < 0xF700) && ([characters length] > 0)) {														
+  if (([characters length] > 0) && (character < 0xF700)) {														
     column = [self lastLoadedColumn];
     
 		if (column) {
@@ -1408,6 +1325,127 @@
 - (void)showContentsOfNode:(FSNode *)anode
 {
   [self showSubnode: anode];
+}
+
+- (NSDictionary *)readNodeInfo
+{
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	      
+  NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", [baseNode path]];
+  NSDictionary *nodeDict = nil;
+
+  if ([baseNode isWritable]) {
+    NSString *infoPath = [[baseNode path] stringByAppendingPathComponent: @".gwdir"];
+  
+    if ([[NSFileManager defaultManager] fileExistsAtPath: infoPath]) {
+      NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: infoPath];
+
+      if (dict) {
+        nodeDict = [NSDictionary dictionaryWithDictionary: dict];
+      }   
+    }
+  }
+
+  if (nodeDict == nil) {
+    id defEntry = [defaults dictionaryForKey: prefsname];
+
+    if (defEntry) {
+      nodeDict = [NSDictionary dictionaryWithDictionary: defEntry];
+    }
+  }
+
+  if (nodeDict) {
+    id entry = [nodeDict objectForKey: @"backcolor"];
+
+    if (entry) {
+      float red = [[entry objectForKey: @"red"] floatValue];
+      float green = [[entry objectForKey: @"green"] floatValue];
+      float blue = [[entry objectForKey: @"blue"] floatValue];
+      float alpha = [[entry objectForKey: @"alpha"] floatValue];
+
+      ASSIGN (backColor, [NSColor colorWithCalibratedRed: red 
+                                                   green: green 
+                                                    blue: blue 
+                                                   alpha: alpha]);
+    }
+
+    entry = [nodeDict objectForKey: @"fsn_info_type"];
+    infoType = entry ? [entry intValue] : infoType;
+
+    if (infoType == FSNInfoExtendedType) {
+      DESTROY (extInfoType);
+      entry = [nodeDict objectForKey: @"ext_info_type"];
+
+      if (entry) {
+        NSArray *availableTypes = [[FSNodeRep sharedInstance] availableExtendedInfoNames];
+
+        if ([availableTypes containsObject: entry]) {
+          ASSIGN (extInfoType, entry);
+        }
+      }
+
+      if (extInfoType == nil) {
+        infoType = FSNInfoNameType;
+      }
+    }
+  }
+        
+  return nodeDict;
+}
+
+- (void)updateNodeInfo
+{
+  if ([baseNode isValid]) {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	      
+    NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", [baseNode path]];
+    NSString *infoPath = [[baseNode path] stringByAppendingPathComponent: @".gwdir"];
+    NSMutableDictionary *updatedInfo = nil;
+    NSMutableDictionary *backColorDict = [NSMutableDictionary dictionary];
+    float red, green, blue, alpha;
+
+    if ([baseNode isWritable]) {
+      if ([[NSFileManager defaultManager] fileExistsAtPath: infoPath]) {
+        NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: infoPath];
+
+        if (dict) {
+          updatedInfo = [dict mutableCopy];
+        }   
+      }
+  
+    } else { 
+      NSDictionary *prefs = [defaults dictionaryForKey: prefsname];
+  
+      if (prefs) {
+        updatedInfo = [prefs mutableCopy];
+      }
+    }
+
+    if (updatedInfo == nil) {
+      updatedInfo = [NSMutableDictionary new];
+    }
+	
+    [backColor getRed: &red green: &green blue: &blue alpha: &alpha];
+    [backColorDict setObject: [NSNumber numberWithFloat: red] forKey: @"red"];
+    [backColorDict setObject: [NSNumber numberWithFloat: green] forKey: @"green"];
+    [backColorDict setObject: [NSNumber numberWithFloat: blue] forKey: @"blue"];
+    [backColorDict setObject: [NSNumber numberWithFloat: alpha] forKey: @"alpha"];
+
+    [updatedInfo setObject: backColorDict forKey: @"backcolor"];
+    
+    [updatedInfo setObject: [NSNumber numberWithInt: infoType] 
+                    forKey: @"fsn_info_type"];
+
+    if (infoType == FSNInfoExtendedType) {
+      [updatedInfo setObject: extInfoType forKey: @"ext_info_type"];
+    }
+    
+    if ([baseNode isWritable]) {
+      [updatedInfo writeToFile: infoPath atomically: YES];
+    } else {
+      [defaults setObject: updatedInfo forKey: prefsname];
+    }
+
+    RELEASE (updatedInfo);
+  }
 }
 
 - (void)reloadContents

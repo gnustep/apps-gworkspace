@@ -129,7 +129,7 @@
 
 - (BOOL)checkPath:(NSString *)path
 {
-  return ((db != NULL) && checkPathInDb(db, path));
+  return ((db != NULL) && checkEntryInDb(db, @"files", @"path", path));
 }
 
 - (NSData *)infoOfType:(NSString *)type
@@ -416,9 +416,6 @@
   
   if ([pathsToRemove count]) {
     [ddbd removeTreesFromPaths: [NSArchiver archivedDataWithRootObject: pathsToRemove]];
- 
-      // QUA !!!!!!!!!!!!!!!!
- 
   }
   
   RELEASE (arp);

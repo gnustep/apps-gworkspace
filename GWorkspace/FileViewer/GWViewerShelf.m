@@ -568,7 +568,7 @@
 
 - (void)repSelected:(id)arep
 {
-  [viewer shelfDidSelectIcon: arep];
+  [viewer shelfDidSelectIcon: arep]; 
   [arep unselect];
 }
 

@@ -366,11 +366,7 @@
 - (void)sortIcons
 {
   SEL sel = (iconsType == FILES_TAB) ? @selector(iconCompare:) : @selector(pbiconCompare:);
-	NSArray *sortedIcons = [icons sortedArrayUsingSelector: sel];	
-  RETAIN (sortedIcons);
-	[icons removeAllObjects];
-	[icons addObjectsFromArray: sortedIcons];
-  RELEASE (sortedIcons);
+  [icons sortUsingSelector: sel];
 }
 
 - (NSArray *)icons

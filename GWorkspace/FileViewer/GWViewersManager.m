@@ -999,12 +999,14 @@ if (*pos >= i) *pos -= n; \
   settingHistoryPath = YES;
 
   if (spatial == NO) {
-    FSNode *base = [FSNode nodeWithPath: [node parentPath]];
-    NSArray *selection = [NSArray arrayWithObject: node];
     id nodeView = [viewer nodeView];
-
-    [nodeView showContentsOfNode: base];
-    [nodeView selectRepsOfSubnodes: selection];
+  
+    if ([[viewer viewType] isEqual: @"Browser"] == NO) {
+      [nodeView showContentsOfNode: node];
+    } else {
+      [nodeView showContentsOfNode: [FSNode nodeWithPath: [node parentPath]]];
+      [nodeView selectRepsOfSubnodes: [NSArray arrayWithObject: node]];
+    }
 
     if ([nodeView respondsToSelector: @selector(scrollSelectionToVisible)]) {
       [nodeView scrollSelectionToVisible];

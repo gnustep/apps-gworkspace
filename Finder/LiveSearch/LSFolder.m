@@ -69,7 +69,6 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   TEST_RELEASE (win);
   
   TEST_RELEASE (foundObjects);
-  TEST_RELEASE (sortedObjects);
          
   [super dealloc];
 }
@@ -126,7 +125,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 
     } else {
       DESTROY (self);
-    }    
+    } 
   }
   
 	return self;
@@ -582,7 +581,6 @@ BOOL isPathInResults(NSString *path, NSArray *results);
     [resultsView setDoubleAction: @selector(doubleClickOnResultsView:)];
 
     foundObjects = [NSMutableArray new];
-    sortedObjects = [NSArray new];
 
     if (sizesDict) {
       entry = [sizesDict objectForKey: @"sorting_order"];
@@ -722,7 +720,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
       break;
   }
 
-  ASSIGN (sortedObjects, [foundObjects sortedArrayUsingSelector: sortingSel]);
+  [foundObjects sortUsingSelector: sortingSel];
   [resultsView setHighlightedTableColumn: column];
   [resultsView reloadData];
 }
@@ -734,13 +732,12 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 
 - (NSArray *)selectedObjects
 {
-  NSArray *nodes = updaterbusy ? foundObjects : sortedObjects;
   NSMutableArray *selected = [NSMutableArray array];
   NSEnumerator *enumerator = [resultsView selectedRowEnumerator];
   NSNumber *row;
   
   while ((row = [enumerator nextObject])) {
-	  FSNode *nd = [nodes objectAtIndex: [row intValue]];
+	  FSNode *nd = [foundObjects objectAtIndex: [row intValue]];
     if ([nd isValid]) {
       [selected addObject: nd];
     } else {
@@ -813,7 +810,6 @@ BOOL isPathInResults(NSString *path, NSArray *results);
     
     [resultsView deselectAll: self];
     [self updateShownData];
-    [resultsView reloadData];
   }
 }
 
@@ -905,16 +901,14 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 //
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView
 {
-  NSArray *nodes = updaterbusy ? foundObjects : sortedObjects;
-  return [nodes count];
+  return [foundObjects count];
 }
 
 - (id)tableView:(NSTableView *)aTableView
           objectValueForTableColumn:(NSTableColumn *)aTableColumn
                                 row:(int)rowIndex
 {
-  NSArray *nodes = updaterbusy ? foundObjects : sortedObjects;
-  FSNode *nd = [nodes objectAtIndex: rowIndex];
+  FSNode *nd = [foundObjects objectAtIndex: rowIndex];
     
   if (aTableColumn == nameColumn) {
     return [nd name];
@@ -935,14 +929,13 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 	      writeRows:(NSArray *)rows
      toPasteboard:(NSPasteboard *)pboard
 {
-  NSArray *nodes = updaterbusy ? foundObjects : sortedObjects;
   NSMutableArray *paths = [NSMutableArray array];
   NSMutableArray *parentPaths = [NSMutableArray array];
   int i;
 
   for (i = 0; i < [rows count]; i++) {
     int index = [[rows objectAtIndex: i] intValue];
-    FSNode *nd = [nodes objectAtIndex: index];        
+    FSNode *nd = [foundObjects objectAtIndex: index];        
     NSString *parentPath = [nd parentPath];
     
     if (([parentPaths containsObject: parentPath] == NO) && (i != 0)) {
@@ -986,8 +979,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 {
   if (aTableColumn == nameColumn) {
     ResultsTextCell *cell = (ResultsTextCell *)[nameColumn dataCell];
-    NSArray *nodes = updaterbusy ? foundObjects : sortedObjects;
-    FSNode *nd = [nodes objectAtIndex: rowIndex];
+    FSNode *nd = [foundObjects objectAtIndex: rowIndex];
 
     [cell setIcon: [[FSNodeRep sharedInstance] iconOfSize: 24 forNode: nd]];
     
@@ -1017,7 +1009,6 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   if (newOrder != currentOrder) {
     currentOrder = newOrder;
     [self updateShownData];
-    [resultsView reloadData];
   }
 
   [tableView setHighlightedTableColumn: tableColumn];
@@ -1031,8 +1022,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
     return [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: 24];
   } else {
     int index = [[dragRows objectAtIndex: 0] intValue];
-    NSArray *nodes = updaterbusy ? foundObjects : sortedObjects;
-    FSNode *nd = [nodes objectAtIndex: index];
+    FSNode *nd = [foundObjects objectAtIndex: index];
     
     return [[FSNodeRep sharedInstance] iconOfSize: 24 forNode: nd];
   }

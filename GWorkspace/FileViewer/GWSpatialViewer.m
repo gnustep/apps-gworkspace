@@ -29,6 +29,7 @@
 #include "GWViewerWindow.h"
 #include "GWViewerBrowser.h"
 #include "GWViewerIconsView.h"
+#include "GWViewerListView.h"
 #include "GWViewerPathsPopUp.h"
 #include "GWorkspace.h"
 #include "FileAnnotationsManager.h"
@@ -115,6 +116,7 @@
       viewType = @"Icon";
     }
     if (([viewType isEqual: @"Icon"] == NO)
+              && ([viewType isEqual: @"List"] == NO)
               && ([viewType isEqual: @"Browser"] == NO)) {
       viewType = @"Icon";
     }
@@ -148,6 +150,11 @@
 
     if ([viewType isEqual: @"Icon"]) {
       nodeView = [[GWViewerIconsView alloc] initForViewer: self];
+
+    } else if ([viewType isEqual: @"List"]) { 
+      NSRect r = [[scroll contentView] frame];
+      
+      nodeView = [[GWViewerListView alloc] initWithFrame: r forViewer: self];
 
     } else if ([viewType isEqual: @"Browser"]) {
       nodeView = [[GWViewerBrowser alloc] initWithBaseNode: baseNode
@@ -218,6 +225,7 @@
   int labelh = 20;
   int margin = 8;
   unsigned int resizeMask;
+  BOOL hasScroller;
 
   mainView = [[NSView alloc] initWithFrame: r];
   [mainView setAutoresizingMask: (NSViewWidthSizable | NSViewHeightSizable)];
@@ -272,8 +280,9 @@
   r = NSMakeRect(margin, 0, w - (margin * 2), h - boxh);
   scroll = [[NSScrollView alloc] initWithFrame: r];
   [scroll setBorderType: NSBezelBorder];
+  hasScroller = ([viewType isEqual: @"Icon"] || [viewType isEqual: @"List"]);
   [scroll setHasHorizontalScroller: YES];
-  [scroll setHasVerticalScroller: [viewType isEqual: @"Icon"]];
+  [scroll setHasVerticalScroller: hasScroller];
   resizeMask = NSViewNotSizable | NSViewWidthSizable | NSViewHeightSizable;
   [scroll setAutoresizingMask: resizeMask];
   [mainView addSubview: scroll];
@@ -927,8 +936,15 @@
       nodeView = [[GWViewerIconsView alloc] initForViewer: self];
       [scroll setHasVerticalScroller: YES];
       ASSIGN (viewType, @"Icon");
-    }
+      
+    } else if ([title isEqual: NSLocalizedString(@"List", @"")]) {
+      NSRect r = [[scroll contentView] frame];
 
+      nodeView = [[GWViewerListView alloc] initWithFrame: r forViewer: self];
+      [scroll setHasVerticalScroller: YES];
+      ASSIGN (viewType, @"List");
+    }
+    
     [scroll setDocumentView: nodeView];	
     RELEASE (nodeView);                 
     [nodeView showContentsOfNode: baseNode]; 

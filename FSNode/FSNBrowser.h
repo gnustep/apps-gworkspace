@@ -37,8 +37,6 @@
 @interface FSNBrowser : NSView 
 {
   FSNode *baseNode;
-  NSString *infoPath;
-  NSMutableDictionary *nodeInfo;
   FSNInfoType infoType;
   NSString *extInfoType;
   
@@ -87,8 +85,6 @@
        selectionColumn:(BOOL)selcol;
 
 - (void)setBaseNode:(FSNode *)node;
-- (NSDictionary *)readNodeInfo;
-- (void)updateNodeInfo;
 
 - (void)setUsesCellsIcons:(BOOL)cicns;
 - (void)setUsesSelectionColumn:(BOOL)selcol;
@@ -156,6 +152,8 @@
 @interface FSNBrowser (NodeRepContainer)
 
 - (void)showContentsOfNode:(FSNode *)anode;
+- (NSDictionary *)readNodeInfo;
+- (void)updateNodeInfo;
 - (void)reloadContents;
 - (void)reloadFromNode:(FSNode *)anode;
 - (FSNode *)baseNode;

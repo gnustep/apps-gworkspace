@@ -89,7 +89,6 @@
   ResultsPathsView *pathsView;
 
   NSMutableArray *foundObjects;
-  NSArray *sortedObjects;
   FSNInfoType currentOrder;
   
   Finder *finder;

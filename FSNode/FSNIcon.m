@@ -254,37 +254,6 @@ static NSImage *branchImage;
   }
 }
 
-- (void)select
-{
-  if (isSelected) {
-    return;
-  }
-  isSelected = YES;
-  
-  if ([container respondsToSelector: @selector(unselectOtherReps:)]) {
-    [container unselectOtherReps: self];
-  }
-  if ([container respondsToSelector: @selector(selectionDidChange)]) {
-    [container selectionDidChange];	
-  }
-  
-  [self setNeedsDisplay: YES]; 
-}
-
-- (void)unselect
-{
-  if (isSelected == NO) {
-    return;
-  }
-	isSelected = NO;
-  [self setNeedsDisplay: YES];
-}
-
-- (BOOL)isSelected
-{
-  return isSelected;
-}
-
 - (NSRect)iconBounds
 {
   return icnBounds;
@@ -987,6 +956,37 @@ static NSImage *branchImage;
 - (BOOL)isLeaf
 {
   return isLeaf;
+}
+
+- (void)select
+{
+  if (isSelected) {
+    return;
+  }
+  isSelected = YES;
+  
+  if ([container respondsToSelector: @selector(unselectOtherReps:)]) {
+    [container unselectOtherReps: self];
+  }
+  if ([container respondsToSelector: @selector(selectionDidChange)]) {
+    [container selectionDidChange];	
+  }
+  
+  [self setNeedsDisplay: YES]; 
+}
+
+- (void)unselect
+{
+  if (isSelected == NO) {
+    return;
+  }
+	isSelected = NO;
+  [self setNeedsDisplay: YES];
+}
+
+- (BOOL)isSelected
+{
+  return isSelected;
 }
 
 - (void)setOpened:(BOOL)value

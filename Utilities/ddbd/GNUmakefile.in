@@ -31,6 +31,8 @@ endif
 
 -include GNUmakefile.local
 
+include $(GNUSTEP_MAKEFILES)/aggregate.make
+
 include $(GNUSTEP_MAKEFILES)/tool.make
 
 -include GNUmakefile.postamble

@@ -119,6 +119,36 @@ static FSNodeRep *shared = nil;
 - (NSImage *)resizedIcon:(NSImage *)icon 
                   ofSize:(int)size
 {
+/*
+  NSSize icnsize = [icon size];
+  float fact;
+  NSSize newsize;
+  NSImage *newIcon;
+
+  if (icnsize.width >= icnsize.height) {
+    fact = icnsize.width / size;
+  } else {
+    fact = icnsize.height / size;
+  }
+
+  newsize = NSMakeSize(icnsize.width / fact, icnsize.height / fact);
+  
+  newIcon = [[NSImage alloc] initWithSize: newsize];
+  [newIcon lockFocus];
+
+	[icon setScalesWhenResized: YES];
+	[icon setSize: newsize];  
+
+  [icon compositeToPoint: NSZeroPoint 
+               operation: NSCompositeSourceOver];
+
+  [newIcon unlockFocus];
+  
+  [icon setSize: icnsize];  
+    
+  return AUTORELEASE (newIcon);
+*/
+
   NSImage *newIcon = [icon copy];
   NSSize icnsize = [icon size];
   float fact;

@@ -38,6 +38,9 @@ enum {
   DDBdDaylyUpdate
 };
 
+typedef BOOL (*boolIMP)(id, SEL, id);
+typedef char *(*charIMP)(id, SEL, id);
+
 @protocol	DDBdProtocol
 
 - (BOOL)dbactive;
@@ -83,6 +86,7 @@ enum {
 
 @end
 
+
 @interface DDBd: NSObject <DDBdProtocol>
 {
   NSString *dbpath;
@@ -90,6 +94,9 @@ enum {
   NSRecursiveLock *lock;
   NSFileManager *fm;
   NSNotificationCenter *nc; 
+
+  NSMutableCharacterSet *skipSet;
+  
 #ifdef HAVE_SQLITE
   sqlite3 *db;
 #endif
@@ -111,16 +118,14 @@ enum {
 - (void)performDaylyUpdate:(id)sender;
 
 - (void)threadWillExit:(NSNotification *)notification;
-      
-      
-      
-      
-      
-      
-- (void)testCreateDB;
+            
+@end
 
-- (void)testWriteImage;
-      
+
+@interface DDBd (indexing)
+
+- (void)indexContentsOfFile:(NSString *)path;
+
 @end
 
 #endif // DDBD_H
