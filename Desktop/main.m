@@ -55,7 +55,7 @@ NSMenuItem *addMenuItem(NSMenu *menu, NSString *str,
 void createMenu()
 {
   NSMenu *mainMenu;
-	NSMenu *info, *file, *edit, *tools;
+	NSMenu *info, *file, *edit, *view, *tools;
 	NSMenu *inspmenu;
 	NSMenu *windows, *services;  
 	NSMenuItem *menuItem;
@@ -91,6 +91,16 @@ void createMenu()
 	addMenuItem(edit, @"Copy", @"", @"copy:", @"c");
 	addMenuItem(edit, @"Paste", @"", @"paste:", @"v");
 	addMenuItem(edit, @"Select All", @"", @"selectAll:", @"a");
+
+	// View
+	menuItem = addMenuItem(mainMenu, @"View", @"", nil, @"");
+	view = AUTORELEASE ([NSMenu new]);
+	[mainMenu setSubmenu: view forItem: menuItem];	
+	addMenuItem(view, @"Name", @"", @"setShowType:", @"");
+	addMenuItem(view, @"Kind", @"", @"setShowType:", @"");
+	addMenuItem(view, @"Size", @"", @"setShowType:", @"");
+	addMenuItem(view, @"Modification date", @"", @"setShowType:", @"");
+	addMenuItem(view, @"Owner", @"", @"setShowType:", @"");
 				
 	// Tools
 	menuItem = addMenuItem(mainMenu, @"Tools", @"", nil, @"");

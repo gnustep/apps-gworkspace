@@ -168,7 +168,9 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
     
     defentry = [defaults objectForKey: @"iconposition"];
     iconPosition = defentry ? [defentry intValue] : DEF_ICN_POS;
-
+    
+    infoType = FSNInfoNameType;
+    
     [self makeIconsGrid];
 
     icons = [NSMutableArray new];
@@ -1152,6 +1154,30 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
   return node;
 }
 
+- (void)setShowType:(FSNInfoType)type
+{
+  if (infoType != type) {
+    int i;
+    
+    infoType = type;
+
+    for (i = 0; i < [icons count]; i++) {
+      FSNIcon *icon = [icons objectAtIndex: i];
+      
+      [icon setNodeInfoShowType: infoType];
+      [icon tile];
+    }
+    
+    [self updateNameEditor];
+    [self tile];
+  }
+}
+
+- (FSNInfoType)showType
+{
+  return infoType;
+}
+
 - (id)repOfSubnode:(FSNode *)anode
 {
   int i;
@@ -1292,6 +1318,27 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
     } 
   }  
 
+  selectionMask = NSSingleSelectionMask;
+
+  [self selectionDidChange];
+}
+
+- (void)selectAll
+{
+	int i;
+
+  selectionMask = NSSingleSelectionMask;
+  selectionMask |= FSNCreatingSelectionMask;
+  
+	[self unselectOtherReps: nil];
+  
+  selectionMask = FSNMultipleSelectionMask;
+  selectionMask |= FSNCreatingSelectionMask;
+  
+	for (i = 0; i < [icons count]; i++) {
+    [[icons objectAtIndex: i] select];
+	}
+  
   selectionMask = NSSingleSelectionMask;
 
   [self selectionDidChange];
@@ -1777,17 +1824,40 @@ int sortDragged(id icn1, id icn2, void *context)
   
   if (editIcon) {
     FSNode *iconnode = [editIcon node];
+    NSString *nodeDescr = nil;
     BOOL locked = [editIcon isLocked];
     BOOL mpoint = [iconnode isMountPoint];
     NSRect icnr = [editIcon frame];
     NSRect labr = [editIcon labelRect];
     int ipos = [editIcon iconPosition];
-    float edwidth = [[FSNIcon labelFont] widthOfString: [iconnode name]]; 
     int margin = [FSNodeRep labelMargin];
     float bw = [self bounds].size.width - EDIT_MARGIN;
+    float edwidth = 0.0; 
     
     [editIcon setNameEdited: YES];
  
+    switch(infoType) {
+      case FSNInfoNameType:
+        nodeDescr = [iconnode name];
+        break;
+      case FSNInfoKindType:
+        nodeDescr = [iconnode typeDescription];
+        break;
+      case FSNInfoDateType:
+        nodeDescr = [iconnode modDateDescription];
+        break;
+      case FSNInfoSizeType:
+        nodeDescr = [iconnode sizeDescription];
+        break;
+      case FSNInfoOwnerType:
+        nodeDescr = [iconnode owner];
+        break;
+      default:
+        nodeDescr = [iconnode name];
+        break;
+    }
+ 
+    edwidth = [[FSNIcon labelFont] widthOfString: nodeDescr];
     edwidth += margin;
     
     if (ipos == NSImageAbove) {
@@ -1821,9 +1891,9 @@ int sortDragged(id icn1, id icn2, void *context)
     } else if (ipos == NSImageLeft) {
 		  [nameEditor setAlignment: NSLeftTextAlignment];
     }
-    
+        
     [nameEditor setNode: iconnode 
-            stringValue: [iconnode name] 
+            stringValue: nodeDescr
                   index: 0];
 
     [nameEditor setBackgroundColor: [NSColor selectedControlColor]];
@@ -1834,8 +1904,8 @@ int sortDragged(id icn1, id icn2, void *context)
       [nameEditor setTextColor: [NSColor disabledControlTextColor]];    
     }
 
-    [nameEditor setEditable: ((locked == NO) && (mpoint == NO))];
-    [nameEditor setSelectable: ((locked == NO) && (mpoint == NO))];	
+    [nameEditor setEditable: ((locked == NO) && (mpoint == NO) && (infoType == FSNInfoNameType))];
+    [nameEditor setSelectable: ((locked == NO) && (mpoint == NO) && (infoType == FSNInfoNameType))];	
     [self addSubview: nameEditor];
   }
 }

@@ -48,7 +48,8 @@ typedef enum BackImageStyle {
   NSString *infoPath;
   NSMutableDictionary *nodeInfo;
   NSMutableArray *icons;
-
+  FSNInfoType infoType;
+  
   NSImage *verticalImage;
   NSImage *horizontalImage;
 

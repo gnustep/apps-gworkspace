@@ -182,6 +182,11 @@ static Desktop *desktop = nil;
                 					object: nil];
 
   [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
+                        selector: @selector(applicationForExtensionsDidChange:) 
+                					  name: @"GWAppForExtensionDidChangeNotification"
+                					object: nil];
+
+  [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
                 				selector: @selector(thumbnailsDidChange:) 
                 					  name: @"GWThumbnailsDidChangeNotification"
                 					object: nil];
@@ -774,6 +779,20 @@ static Desktop *desktop = nil;
   [dock watchedPathDidChange: info];  
 }
 
+- (void)applicationForExtensionsDidChange:(NSNotification *)notif
+{
+  NSDictionary *changedInfo = [notif userInfo];
+  NSString *app = [changedInfo objectForKey: @"app"];
+  NSArray *extensions = [changedInfo objectForKey: @"exts"];
+  int i;
+
+  for (i = 0; i < [extensions count]; i++) {
+    [ws setBestApp: app
+            inRole: nil 
+      forExtension: [extensions objectAtIndex: i]];  
+  }
+}
+
 - (void)newVolumeMounted:(NSNotification *)notif
 {
   NSDictionary *dict = [notif userInfo];  
@@ -808,11 +827,18 @@ static Desktop *desktop = nil;
 + (void)mountRemovableMedia
 {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	  
-  [[NSWorkspace sharedWorkspace] mountNewRemovableMedia];
+	Desktop *dskt = [Desktop new];  
+  
+  [dskt mountRemovableMedia];
   
   [[NSRunLoop currentRunLoop] run];
   [pool release];
+}
+
+- (void)mountRemovableMedia
+{
+  [[NSWorkspace sharedWorkspace] mountNewRemovableMedia];
+  [NSThread exit];
 }
 
 - (void)threadWillExit:(NSNotification *)notif
@@ -1193,6 +1219,31 @@ static Desktop *desktop = nil;
   if (inspectorApp) {  
     [inspectorApp showTools];
   } 
+}
+
+- (void)selectAll:(id)sender
+{
+  [[win desktopView] selectAll];
+}
+
+- (void)setShowType:(id)sender
+{
+  NSString *title = [sender title];
+  FSNInfoType type = FSNInfoNameType;
+
+  if ([title isEqual: NSLocalizedString(@"Name", @"")]) {
+    type = FSNInfoNameType;
+  } else if ([title isEqual: NSLocalizedString(@"Kind", @"")]) {
+    type = FSNInfoKindType;
+  } else if ([title isEqual: NSLocalizedString(@"Size", @"")]) {
+    type = FSNInfoSizeType;
+  } else if ([title isEqual: NSLocalizedString(@"Modification date", @"")]) {
+    type = FSNInfoDateType;
+  } else if ([title isEqual: NSLocalizedString(@"Owner", @"")]) {
+    type = FSNInfoOwnerType;
+  }  
+
+  [[win desktopView] setShowType: type];
 }
 
 - (void)checkNewRemovableMedia:(id)sender

@@ -194,6 +194,15 @@
   return nil;
 }
 
+- (void)setShowType:(FSNInfoType)type
+{
+}
+
+- (FSNInfoType)showType
+{
+  return FSNInfoNameType;
+}
+
 - (id)repOfSubnode:(FSNode *)anode
 {
   return nil;
@@ -245,6 +254,10 @@
 }
 
 - (void)selectRepsOfPaths:(NSArray *)paths
+{
+}
+
+- (void)selectAll
 {
 }
 
