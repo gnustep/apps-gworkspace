@@ -42,6 +42,8 @@
 
 - (void)dealloc
 {
+  [nc removeObserver: self];
+  
   RELEASE (baseNode);
   TEST_RELEASE (lastSelection);
   RELEASE (watchedNodes);
@@ -70,6 +72,7 @@
     watchedSuspended = [NSMutableArray new];
     manager = [GWViewersManager viewersManager];
     gworkspace = [GWorkspace gworkspace];
+    nc = [NSNotificationCenter defaultCenter];
     spatial = YES;
 
     defEntry = [defaults objectForKey: @"browserColsWidth"];
@@ -191,6 +194,11 @@
     [self scrollToBeginning];
     
     RELEASE (viewerPrefs);
+    
+    [nc addObserver: self 
+           selector: @selector(columnsWidthChanged:) 
+               name: @"GWBrowserColumnWidthChangedNotification"
+             object: nil];
   }
   
   return self;
@@ -667,6 +675,24 @@
   return watchedNodes;
 }
 
+- (void)columnsWidthChanged:(NSNotification *)notification
+{
+  NSRect r = [vwrwin frame];
+  
+  RETAIN (nodeView);  
+  [nodeView removeFromSuperviewWithoutNeedingDisplay];
+  [scroll setDocumentView: nil];	
+  
+  resizeIncrement = [(NSNumber *)[notification object] intValue];
+  r.size.width = (visibleCols * resizeIncrement);
+  [vwrwin setFrame: r display: YES];  
+  [vwrwin setMinSize: NSMakeSize(resizeIncrement * 2, MIN_W_HEIGHT)];    
+  [vwrwin setResizeIncrements: NSMakeSize(resizeIncrement, 1)];
+
+  [scroll setDocumentView: nodeView];	
+  RELEASE (nodeView); 
+  [nodeView resizeWithOldSuperviewSize: [nodeView bounds].size];
+}
 
 - (void)updateDefaults
 {

@@ -671,6 +671,20 @@
 
 
 
+
+
+
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// THUMBNAILS
+// CUT & PASTE
+// 
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+
+
+
+
 - (void)controlTextDidEndEditing:(NSNotification *)aNotification
 {
   NSFileManager *fm = [NSFileManager defaultManager];

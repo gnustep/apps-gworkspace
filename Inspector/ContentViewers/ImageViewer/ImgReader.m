@@ -75,11 +75,21 @@
                 setSize:(NSSize)imsize
 {
   NSMutableDictionary *info = [NSMutableDictionary dictionary];
-  NSImage *image = [[NSImage alloc] initWithContentsOfFile: path];
+  NSImage *image = nil;
   NSImageRep *rep = nil;  
   NSData *data = nil;
-  
-  if (image) {
+
+	NS_DURING
+		{
+			image = [[NSImage alloc] initWithContentsOfFile: path];
+		}
+	NS_HANDLER
+		{
+			[viewer imageReady: [NSArchiver archivedDataWithRootObject: info]];
+	  }
+	NS_ENDHANDLER
+
+  if (image && [image isValid]) {
     NSSize size = [image size];
     
     [info setObject: [NSNumber numberWithFloat: size.width] forKey: @"width"];

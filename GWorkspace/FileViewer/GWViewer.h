@@ -55,16 +55,19 @@
   BOOL spatial;
 
   int visibleCols;
+  int resizeIncrement;
     
   FSNode *baseNode;
   NSArray *lastSelection;  
   NSMutableArray *watchedNodes;
   NSMutableArray *watchedSuspended;
+
+  BOOL invalidated;
   
   GWViewersManager *manager;
   GWorkspace *gworkspace;
-    
-  BOOL invalidated;
+
+  NSNotificationCenter *nc;        
 }
 
 - (id)initForNode:(FSNode *)node
@@ -109,6 +112,8 @@
 - (void)clearSuspendedWatchersFromPath:(NSString *)path;
 - (void)watchedPathChanged:(NSDictionary *)info;
 - (NSArray *)watchedNodes;
+
+- (void)columnsWidthChanged:(NSNotification *)notification;
 
 - (void)updateDefaults;
 

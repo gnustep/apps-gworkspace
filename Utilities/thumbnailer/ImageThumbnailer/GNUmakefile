@@ -11,9 +11,7 @@ OBJCFLAGS += -Wall
 #
 # We are creating a bundle
 #
-ImageThumbnailer_OBJC_FILES = ImageThumbnailer.m \
-                              resize.m \
-                              getpixel.m 
+ImageThumbnailer_OBJC_FILES = ImageThumbnailer.m
 
 ImageThumbnailer_PRINCIPAL_CLASS = ImageThumbnailer
 

@@ -22,14 +22,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-#include <math.h>
-#include <unistd.h>
-#include <limits.h>
 #include "ImageThumbnailer.h"
-#include "resize.h"
 
 #define TMBMAX (48.0)
 #define RESZLIM 4
@@ -38,201 +33,81 @@
 
 - (void)dealloc
 {
-  RELEASE (imageExtensions);
 	[super dealloc];
-}
-
-- (id)init
-{
-  self = [super init];
-
-  if (self) {
-    NSArray *exts;
-
-    fm = [NSFileManager defaultManager];
-
-    exts = [NSArray arrayWithObjects: @"tiff", @"tif", @"TIFF", @"TIF", 
-                                      @"png", @"PNG", @"jpeg", @"jpg", 
-                                      @"JPEG", @"JPG", nil];
-    ASSIGN (imageExtensions, exts);
-  }
-
-  return self;
 }
 
 - (BOOL)canProvideThumbnailForPath:(NSString *)path
 {
   NSString *ext = [path pathExtension];
-  return (ext && [imageExtensions containsObject: ext]);
+  return (ext && [[NSImage imageFileTypes] containsObject: ext]);
 }
 
 - (NSData *)makeThumbnailForPath:(NSString *)path
 {
   NSImage *image;
-	NSImageRep *rep;  
-	NSSize size;
-  int rpw;  
-	NSSize newsize;
-  float xfactor;
-  float yfactor;
-  commonInfo *comInfo;
-  commonInfo *newInfo;
-  unsigned char *map[MAXPLANE];
-  unsigned char *newmap[MAXPLANE];
-  NSBitmapImageRep* newBitmapImageRep;
-  NSData *data;
 
+	NS_DURING
+		{
+			image = [[NSImage alloc] initWithContentsOfFile: path];
+		}
+	NS_HANDLER
+		{
+			return nil;
+	  }
+	NS_ENDHANDLER
 
+  if (image && [image isValid]) {
+    NSSize size = [image size];
+    NSRect r = NSZeroRect;
+    NSImageRep *rep = [image bestRepresentationForDevice: nil];
+    NSImage *newimage = nil;
+    NSBitmapImageRep *newBitmapImageRep = nil;
+    NSData *data = nil;
 
-/*
-  image = [[NSImage alloc] initWithContentsOfFile: path];
-  
-  if (image == nil) {
-    return nil;
-  }
-
-	rep = [image bestRepresentationForDevice: nil];
-  rpw = [rep pixelsWide];
-	size = [image size];
-	if ((rpw != NSImageRepMatchesDevice) && (rpw != size.width)) {
-		size.width = rpw;
-		size.height = [rep pixelsHigh];
-	}  
-
-	[image setScalesWhenResized: YES];
-	[image setSize: size];
-	[image setCacheDepthMatchesImageDepth: YES];
-	[image recache];
-
-  if ((size.width <= TMBMAX) && (size.height <= TMBMAX) 
-                      && (size.width >= (TMBMAX - RESZLIM)) 
-                          && (size.height >= (TMBMAX - RESZLIM))) {
- 	  if ([rep isKindOfClass: [NSBitmapImageRep class]]) {
-      data = [(NSBitmapImageRep *)rep TIFFRepresentation];
-      if (data) {
-        RELEASE (image);
-        return data;
+    if ((size.width <= TMBMAX) && (size.height <= TMBMAX) 
+                            && (size.width >= (TMBMAX - RESZLIM)) 
+                                    && (size.height >= (TMBMAX - RESZLIM))) {
+ 	    if ([rep isKindOfClass: [NSBitmapImageRep class]]) {
+        data = [(NSBitmapImageRep *)rep TIFFRepresentation];
+        if (data) {
+          RELEASE (image);
+          return data;
+        }
       }
     }
-  }
-  
-  if (size.width >= size.height) {
-    newsize.width = TMBMAX;
-    newsize.height = floor(TMBMAX * size.height / size.width + 0.5);
-  } else {
-    newsize.height = TMBMAX;
-    newsize.width  = floor(TMBMAX * size.width / size.height + 0.5);
-  }
 
-  [image setSize: newsize];
-
-  NSImage *newimage = [[NSImage alloc] initWithSize: size];
-  [newimage lockFocus];
-
-		[image compositeToPoint: NSZeroPoint 
-                      operation: NSCompositeSourceOver];
-
-  newBitmapImageRep = [[NSBitmapImageRep alloc]
-                        initWithFocusedViewRect:
-                          NSMakeRect(0, 0, newsize.width, newsize.height)];
-  [newimage unlockFocus];
-
-
-  data = [newBitmapImageRep TIFFRepresentation];
-  
-  RELEASE (image);
-  RELEASE (newimage);
-  
-  return data;
-*/
-
-
-
-
-  image = [[NSImage alloc] initWithContentsOfFile: path];
-  
-  if (image == nil) {
-    return nil;
-  }
-  
-	rep = [image bestRepresentationForDevice: nil];
-  rpw = [rep pixelsWide];
-	size = [image size];
-	if ((rpw != NSImageRepMatchesDevice) && (rpw != size.width)) {
-		size.width = rpw;
-		size.height = [rep pixelsHigh];
-	}  
-
-	[image setScalesWhenResized: YES];
-	[image setSize: size];
-	[image setCacheDepthMatchesImageDepth: YES];
-	[image recache];
-
-  if ((size.width <= TMBMAX) && (size.height <= TMBMAX) 
-                          && (size.width >= (TMBMAX - RESZLIM)) 
-                                  && (size.height >= (TMBMAX - RESZLIM))) {
- 	  if ([rep isKindOfClass: [NSBitmapImageRep class]]) {
-      data = [(NSBitmapImageRep *)rep TIFFRepresentation];
-      if (data) {
-        RELEASE (image);
-        return data;
-      }
-    }
-  }
-  
-  if (size.width >= size.height) {
-    newsize.width = TMBMAX;
-    newsize.height = floor(TMBMAX * size.height / size.width + 0.5);
-  } else {
-    newsize.height = TMBMAX;
-    newsize.width  = floor(TMBMAX * size.width / size.height + 0.5);
-  }
-  
-  xfactor = newsize.width / size.width;
-  yfactor = newsize.height / size.height;
+    if (size.width >= size.height) {
+      r.size.width = TMBMAX;
+      r.size.height = TMBMAX * size.height / size.width;
+    } else {
+      r.size.height = TMBMAX;
+      r.size.width = TMBMAX * size.width / size.height;
+    }  
+      
+    r = NSIntegralRect(r);   
     
-  comInfo = NSZoneMalloc(NSDefaultMallocZone(), sizeof(commonInfo));	
+    [image setScalesWhenResized: YES];
+    [image setSize: r.size];
+
+    newimage = [[NSImage alloc] initWithSize: r.size];
+    [newimage lockFocus];
+
+    [image compositeToPoint: NSZeroPoint 
+                operation: NSCompositeSourceOver];
+
+    newBitmapImageRep = [[NSBitmapImageRep alloc] initWithFocusedViewRect: r];
+    [newimage unlockFocus];
+
+    data = [newBitmapImageRep TIFFRepresentation];
   
-	comInfo->width	= size.width;
-	comInfo->height	= size.height;
-	comInfo->bits	= [rep bitsPerSample];
-	comInfo->numcolors = NSNumberOfColorComponents([rep colorSpaceName]);
-	comInfo->alpha	= [rep hasAlpha];
-	comInfo->palette = NULL;
-	comInfo->palsteps = 0;
-	comInfo->memo[0] = 0;
-  
-	if ([rep isKindOfClass: [NSBitmapImageRep class]]) {
-		NSString *w = [(NSBitmapImageRep *)rep colorSpaceName];
-    comInfo->cspace	= colorSpaceIdForColorSpaceName(w);
-		comInfo->xbytes	= [(NSBitmapImageRep *)rep bytesPerRow];
-		comInfo->isplanar = [(NSBitmapImageRep *)rep isPlanar];
-		comInfo->pixbits = [(NSBitmapImageRep *)rep bitsPerPixel];
-	}
-  
-  [(NSBitmapImageRep *)rep getBitmapDataPlanes: &map[0]];
-  
-  newInfo = makeBilinearResizedMap(xfactor, yfactor, comInfo, map, newmap);  
+    RELEASE (image);
+    RELEASE (newimage);
+    RELEASE (newBitmapImageRep);
     
-  newBitmapImageRep = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: &newmap[0]
-	pixelsWide: newInfo->width
-	pixelsHigh: newInfo->height
-	bitsPerSample: newInfo->bits
-	samplesPerPixel: [(NSBitmapImageRep *)rep samplesPerPixel]
-	hasAlpha: newInfo->alpha
-	isPlanar: newInfo->isplanar
-	colorSpaceName: [(NSBitmapImageRep *)rep colorSpaceName]
-	bytesPerRow: newInfo->xbytes
-	bitsPerPixel: newInfo->pixbits];
-    
-  data = RETAIN ([newBitmapImageRep TIFFRepresentation]);
+    return data;
+  }
   
-  RELEASE (image);
-  RELEASE (newBitmapImageRep);
-  NSZoneFree (NSDefaultMallocZone(), comInfo);  
-  NSZoneFree (NSDefaultMallocZone(), newInfo);  
-  
-  return AUTORELEASE (data);
+  return nil;
 }
 
 - (NSString *)fileNameExtension

@@ -39,8 +39,6 @@
 
 @interface ImageThumbnailer: NSObject <TMBProtocol>
 {
-  NSArray *imageExtensions;
-  NSFileManager *fm;
 }
 
 @end

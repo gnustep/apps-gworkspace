@@ -25,29 +25,16 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-  #ifdef GNUSTEP 
 #include "GWFunctions.h"
 #include "GWNotifications.h"
-  #else
-#include <GWorkspace/GWFunctions.h>
-#include <GWorkspace/GWNotifications.h>
-  #endif
 #include "BrowserViewerPref.h"
 #include "GNUstep.h"
 
-  #ifdef GNUSTEP 
 #define EXAMPLE_X 10
 #define EXAMPLE_Y 6
 #define EXAMPLE_H 99  
 #define RESIZER_W 16
 #define RESIZER_Y 48
-  #else
-#define EXAMPLE_X 10
-#define EXAMPLE_Y 6
-#define EXAMPLE_H 107  
-#define RESIZER_W 16
-#define RESIZER_Y 51
-  #endif
 
 #define DEFAULT_WIDTH 150
 

@@ -52,6 +52,8 @@
 
 - (void)dealloc
 {
+  [nc removeObserver: self];
+
   RELEASE (baseNode);
   TEST_RELEASE (lastSelection);
   RELEASE (watchedNodes);
@@ -73,7 +75,6 @@
     NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", [node path]];
     NSDictionary *viewerPrefs = nil;
     id defEntry;
-    int resincr;
     
     ASSIGN (baseNode, [FSNode nodeWithRelativePath: [node path] parent: nil]);
     lastSelection = nil;
@@ -81,13 +82,14 @@
     watchedSuspended = [NSMutableArray new];
     manager = [GWViewersManager viewersManager];
     gworkspace = [GWorkspace gworkspace];
+    nc = [NSNotificationCenter defaultCenter];
     spatial = NO;
     
     defEntry = [defaults objectForKey: @"browserColsWidth"];
     if (defEntry) {
-      resincr = [defEntry intValue];
+      resizeIncrement = [defEntry intValue];
     } else {
-      resincr = DEFAULT_INCR;
+      resizeIncrement = DEFAULT_INCR;
     }
 
     rootviewer = ([[baseNode path] isEqual: path_separator()]
@@ -137,15 +139,15 @@
        
     ASSIGN (vwrwin, win);
     [vwrwin setDelegate: self];
-    [vwrwin setMinSize: NSMakeSize(resincr * 2, MIN_W_HEIGHT)];    
-    [vwrwin setResizeIncrements: NSMakeSize(resincr, 1)];
+    [vwrwin setMinSize: NSMakeSize(resizeIncrement * 2, MIN_W_HEIGHT)];    
+    [vwrwin setResizeIncrements: NSMakeSize(resizeIncrement, 1)];
 
     defEntry = [viewerPrefs objectForKey: @"geometry"];
     
     if (defEntry) {
       [vwrwin setFrameFromString: defEntry];
     } else {
-      [vwrwin setFrame: NSMakeRect(200, 200, resincr * 3, 400) 
+      [vwrwin setFrame: NSMakeRect(200, 200, resizeIncrement * 3, 400) 
                display: NO];
     }
 
@@ -228,6 +230,11 @@
     [self scrollToBeginning];
     
     RELEASE (viewerPrefs);
+    
+    [nc addObserver: self 
+           selector: @selector(columnsWidthChanged:) 
+               name: @"GWBrowserColumnWidthChangedNotification"
+             object: nil];
   }
   
   return self;
@@ -737,6 +744,25 @@
 - (NSArray *)watchedNodes
 {
   return watchedNodes;
+}
+
+- (void)columnsWidthChanged:(NSNotification *)notification
+{
+  NSRect r = [vwrwin frame];
+  
+  RETAIN (nodeView);  
+  [nodeView removeFromSuperviewWithoutNeedingDisplay];
+  [nviewScroll setDocumentView: nil];	
+  
+  resizeIncrement = [(NSNumber *)[notification object] intValue];
+  r.size.width = (visibleCols * resizeIncrement);
+  [vwrwin setFrame: r display: YES];  
+  [vwrwin setMinSize: NSMakeSize(resizeIncrement * 2, MIN_W_HEIGHT)];    
+  [vwrwin setResizeIncrements: NSMakeSize(resizeIncrement, 1)];
+
+  [nviewScroll setDocumentView: nodeView];	
+  RELEASE (nodeView); 
+  [nodeView resizeWithOldSuperviewSize: [nodeView bounds].size];
 }
 
 - (void)updateDefaults
