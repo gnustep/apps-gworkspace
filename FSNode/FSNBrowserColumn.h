@@ -55,6 +55,8 @@
   
   FSNBrowser *browser;
   NSColor *backColor;
+  
+  FSNodeRep *fsnodeRep;
 }
 
 - (id)initInBrowser:(FSNBrowser *)abrowser

@@ -22,16 +22,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-  #ifdef GNUSTEP 
-#include "GWLib.h"
-#include "GWFunctions.h"
-  #else
-#include <GWorkspace/GWLib.h>
-#include <GWorkspace/GWFunctions.h>
-  #endif
 #include "XTermPref.h"
 #include "GWorkspace.h"
 #include "GNUstep.h"

@@ -25,13 +25,6 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-  #ifdef GNUSTEP 
-#include "GWLib.h"
-#include "GWFunctions.h"
-  #else
-#include <GWorkspace/GWLib.h>
-#include <GWorkspace/GWFunctions.h>
-  #endif
 #include "DefEditorPref.h"
 #include "GWorkspace.h"
 #include "GNUstep.h"

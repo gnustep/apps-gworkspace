@@ -90,7 +90,9 @@ if (rct.size.height < 0) rct.size.height = 0; \
     NSString *appName = [defaults stringForKey: @"DesktopApplicationName"];
     NSString *selName = [defaults stringForKey: @"DesktopApplicationSelName"];
     id defentry;
-
+    
+    fsnodeRep = [FSNodeRep sharedInstance];
+    
     if (appName && selName) {
 		  Class desktopAppClass = [[NSBundle mainBundle] classNamed: appName];
       SEL sel = NSSelectorFromString(selName);
@@ -147,7 +149,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
       defentry = [defaults objectForKey: @"extended_info_type"];
 
       if (defentry) {
-        NSArray *availableTypes = [FSNodeRep availableExtendedInfoNames];
+        NSArray *availableTypes = [fsnodeRep availableExtendedInfoNames];
       
         if ([availableTypes containsObject: defentry]) {
           ASSIGN (extInfoType, defentry);
@@ -158,8 +160,6 @@ if (rct.size.height < 0) rct.size.height = 0; \
         infoType = FSNInfoNameType;
       }
     }
-
-    [FSNodeRep setUseThumbnails: [defaults boolForKey: @"use_thumbnails"]];
     
     icons = [NSMutableArray new];
         
@@ -190,7 +190,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
 
 - (void)sortIcons
 {
-  SEL compSel = [FSNodeRep compareSelectorForDirectory: [node path]];
+  SEL compSel = [fsnodeRep compareSelectorForDirectory: [node path]];
   NSArray *sorted = [icons sortedArrayUsingSelector: compSel];
 
   if (infoType == FSNInfoExtendedType) {
@@ -269,7 +269,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
         entry = [nodeDict objectForKey: @"ext_info_type"];
 
         if (entry) {
-          NSArray *availableTypes = [FSNodeRep availableExtendedInfoNames];
+          NSArray *availableTypes = [fsnodeRep availableExtendedInfoNames];
 
           if ([availableTypes containsObject: entry]) {
             ASSIGN (extInfoType, entry);
@@ -340,16 +340,16 @@ if (rct.size.height < 0) rct.size.height = 0; \
 {
   NSSize highlightSize = NSZeroSize;
   NSSize labelSize = NSZeroSize;
-  int lblmargin = [FSNodeRep labelMargin];
+  int lblmargin = [fsnodeRep labelMargin];
   
   highlightSize.width = ceil(iconSize / 3 * 4);
-  highlightSize.height = ceil(highlightSize.width * [FSNodeRep highlightHeightFactor]);
+  highlightSize.height = ceil(highlightSize.width * [fsnodeRep highlightHeightFactor]);
   if ((highlightSize.height - iconSize) < 4) {
     highlightSize.height = iconSize + 4;
   }
 
   labelSize.height = floor([labelFont defaultLineHeightForFont]);
-  labelSize.width = [FSNodeRep labelWFactor] * labelTextSize;
+  labelSize.width = [fsnodeRep labelWFactor] * labelTextSize;
 
   gridSize.height = highlightSize.height;
 
@@ -1030,7 +1030,7 @@ pp.x = NSMaxX([self bounds]) - 1
     RELEASE (icon);
   }
 
-  compSel = [FSNodeRep compareSelectorForDirectory: [node path]];
+  compSel = [fsnodeRep compareSelectorForDirectory: [node path]];
   sorted = [unsorted sortedArrayUsingSelector: compSel];
   [icons addObjectsFromArray: sorted];
   
@@ -1118,8 +1118,7 @@ pp.x = NSMaxX([self bounds]) - 1
       FSNode *component = [components objectAtIndex: i];
     
       if ([component isValid] == NO) {
-        component = [FSNode nodeWithRelativePath: [component parentPath]
-                                          parent: nil];
+        component = [FSNode nodeWithPath: [component parentPath]];
         [self showContentsOfNode: component];
         break;
       }
@@ -1485,8 +1484,7 @@ pp.x = NSMaxX([self bounds]) - 1
 
 - (void)unloadFromNode:(FSNode *)anode
 {
-  FSNode *parent = [FSNode nodeWithRelativePath: [anode parentPath]
-                                         parent: nil];
+  FSNode *parent = [FSNode nodeWithPath: [anode parentPath]];
   [self showContentsOfNode: parent];
 }
 
@@ -1601,6 +1599,18 @@ pp.x = NSMaxX([self bounds]) - 1
   selectionMask = NSSingleSelectionMask;
 
   [self selectionDidChange];
+}
+
+- (void)scrollSelectionToVisible
+{
+  NSArray *selection = [self selectedReps];
+  
+  if ([selection count]) {
+    [self scrollIconToVisible: [selection objectAtIndex: 0]];
+  } else {
+    NSRect r = [self frame];
+    [self scrollRectToVisible: NSMakeRect(0, r.size.height - 1, 1, 1)];	
+  }
 }
 
 - (NSArray *)reps
@@ -2036,26 +2046,14 @@ pp.x = NSMaxX([self bounds]) - 1
     NSRect icnr = [arep frame];
     NSRect labr = [arep labelRect];
     int ipos = [arep iconPosition];
-    int margin = [FSNodeRep labelMargin];
+    int margin = [fsnodeRep labelMargin];
     float bw = [self bounds].size.width - EDIT_MARGIN;
     float edwidth = 0.0; 
-    NSFontManager *fmanager = [NSFontManager sharedFontManager];
-    NSFont *edfont = [nameEditor font];
     NSRect edrect;
     
     editIcon = arep;    
     [editIcon setNameEdited: YES];
     
-    if ([editIcon nodeInfoShowType] == FSNInfoExtendedType) {
-      edfont = [fmanager convertFont: edfont 
-                         toHaveTrait: NSItalicFontMask];
-    } else {
-      edfont = [fmanager convertFont: edfont 
-                      toNotHaveTrait: NSItalicFontMask];
-    }
-    
-    [nameEditor setFont: edfont];
-
     edwidth = [[nameEditor font] widthOfString: nodeDescr];
     edwidth += margin;
 
@@ -2130,7 +2128,7 @@ pp.x = NSMaxX([self bounds]) - 1
   NSRect icnr = [editIcon frame];
   int ipos = [editIcon iconPosition];
   float edwidth = [[nameEditor font] widthOfString: [nameEditor stringValue]]; 
-  int margin = [FSNodeRep labelMargin];
+  int margin = [fsnodeRep labelMargin];
   float bw = [self bounds].size.width - EDIT_MARGIN;
   NSRect edrect = [nameEditor frame];
   
@@ -2170,6 +2168,7 @@ pp.x = NSMaxX([self bounds]) - 1
 
 - (void)controlTextDidEndEditing:(NSNotification *)aNotification
 {
+  NSFileManager *fm = [NSFileManager defaultManager];
   FSNode *ednode = [nameEditor node];
 
 #define CLEAREDITING \
@@ -2183,11 +2182,11 @@ pp.x = NSMaxX([self bounds]) - 1
                     [ednode name]], NSLocalizedString(@"Continue", @""), nil, nil);   
     CLEAREDITING;
     
-  } else if ([[ednode parent] isWritable] == NO) {
+  } else if ([fm isWritableFileAtPath: [ednode parentPath]] == NO) {
     NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
           [NSString stringWithFormat: @"%@\"%@\"!\n", 
               NSLocalizedString(@"You have not write permission for ", @""), 
-                  [[ednode parent] name]], NSLocalizedString(@"Continue", @""), nil, nil);   
+                  [ednode parentName]], NSLocalizedString(@"Continue", @""), nil, nil);   
     CLEAREDITING;
     
   } else {

@@ -60,14 +60,9 @@
 
 - (void)openSelectedPathsWith;
 
-- (id)newViewerAtPath:(NSString *)path 
-          canViewApps:(BOOL)viewapps;
-
 - (NSArray *)getSelectedPaths;
 
 - (NSString *)trashPath;
-
-- (NSArray *)viewersSearchPaths;
 
 - (BOOL)animateChdir;
 

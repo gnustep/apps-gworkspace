@@ -103,7 +103,7 @@
 
     recycler = [Recycler recycler];
     path = [recycler trashPath];
-    node = [FSNode nodeWithRelativePath: path parent: nil];
+    node = [FSNode nodeWithPath: path];
     
     icon = [[RecyclerIcon alloc] initWithRecyclerNode: node];
     [icon setFrame: [self frame]];
@@ -309,7 +309,7 @@
 
   for (i = 0; i < count; i++) {
     NSString *srcpath = [sourcePaths objectAtIndex: i];
-    FSNode *nd = [FSNode nodeWithRelativePath: srcpath parent: nil];
+    FSNode *nd = [FSNode nodeWithPath: srcpath];
        
     if ([nd isMountPoint]) {
       [sourcePaths removeObject: srcpath];

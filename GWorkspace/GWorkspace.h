@@ -25,27 +25,17 @@
 #ifndef GWORKSPACE_H
 #define GWORKSPACE_H
 
+#include <Foundation/Foundation.h>
 #include <AppKit/NSApplication.h>
-  #ifdef GNUSTEP 
 #include "GWProtocol.h"
-  #else
-#include <GWorkspace/GWProtocol.h>
-  #endif
 
 #define NOEDIT 0
 #define NOXTERM 1
 
-@class NSString;
-@class NSArray;
-@class NSMutableArray;
-@class NSMutableDictionary;
-@class NSNotification;
-@class NSTimer;
-@class NSFileManager;
 @class NSWorkspace;
+@class FSNodeRep;
 @class GWViewersManager;
 @class GWViewer;
-@class ViewersWindow;
 @class PrefController;
 @class Fiend;
 @class History;
@@ -139,7 +129,9 @@
 @interface GWorkspace : NSObject <GWProtocol, FSWClientProtocol>
 {
 	NSString *defEditor, *defXterm, *defXtermArgs;
-	  
+	
+  FSNodeRep *fsnodeRep;
+  
 	NSArray *selectedPaths;
 
   id fswatcher;
@@ -154,12 +146,8 @@
   PrefController *prefController;
   Fiend *fiend;
   History *history;
-	
-  ViewersWindow *rootViewer;	
-  NSMutableArray *viewers;
+	  
   GWViewersManager *vwrsManager;
-  NSMutableArray *viewersSearchPaths;
-	NSMutableArray *viewersTemplates;
 
   BOOL animateChdir;
   BOOL animateSlideBack;
@@ -177,9 +165,7 @@
   RunExternalController *runExtController;
   
   StartAppWin *startAppWin;
-    
-  BOOL usesThumbnails;
-	      
+    	      
   int shelfCellsWidth;
           
   NSFileManager *fm;
@@ -212,7 +198,7 @@
 
 - (id)rootViewer;
 
-- (id)viewerRootedAtPath:(NSString *)vpath;
+- (void)newViewerAtPath:(NSString *)path;
 
 - (void)changeDefaultEditor:(NSString *)editor;
 
@@ -234,29 +220,14 @@
 
 - (void)createTabbedShelf;
 
-- (void)makeViewersTemplates;
-
-- (void)addViewer:(id)vwr withBundlePath:(NSString *)bpath;
-
-- (void)removeViewerWithBundlePath:(NSString *)bpath;
-
-- (NSMutableArray *)bundlesWithExtension:(NSString *)extension 
-											       inDirectory:(NSString *)dirpath;
-
-- (NSArray *)viewersPaths;
-
 - (void)checkViewersAfterHidingOfPaths:(NSArray *)paths;
-
-- (void)viewerHasClosed:(id)sender;
 
 - (void)iconAnimationChanged:(NSNotification *)notif;
 
 - (void)fileSystemWillChange:(NSNotification *)notif;
 
 - (void)fileSystemDidChange:(NSNotification *)notif;
-           
-- (void)watcherNotification:(NSNotification *)notification;           
-           
+                      
 - (void)setSelectedPaths:(NSArray *)paths;
 
 - (void)resetSelectedPaths;
@@ -267,7 +238,8 @@
                     ofType:(NSString *)type
                   typeIcon:(NSImage *)icon;
 
-- (void)newObjectAtPath:(NSString *)basePath isDirectory:(BOOL)directory;
+- (void)newObjectAtPath:(NSString *)basePath 
+            isDirectory:(BOOL)directory;
 
 - (void)duplicateFiles;
 

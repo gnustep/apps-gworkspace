@@ -26,16 +26,12 @@
 #ifndef XTERM_PREF_H
 #define XTERM_PREF_H
 
-#include <Foundation/NSObject.h>
-  #ifdef GNUSTEP 
-#include "PreferencesProtocol.h"
-  #else
-#include <GWorkspace/PreferencesProtocol.h>
-  #endif
+#include <Foundation/Foundation.h>
+#include "PrefProtocol.h"
 
 @class GWorkspace;
 
-@interface XTermPref : NSObject <PreferencesProtocol>
+@interface XTermPref : NSObject <PrefProtocol>
 {
   IBOutlet id win;
   IBOutlet id prefbox;

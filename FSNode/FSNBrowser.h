@@ -165,11 +165,8 @@
 - (void)setShowType:(FSNInfoType)type;
 - (void)setExtendedShowType:(NSString *)type;
 - (FSNInfoType)showType;
-- (void)setIconSize:(int)size;
 - (int)iconSize;
-- (void)setLabelTextSize:(int)size;
 - (int)labelTextSize;
-- (void)setIconPosition:(int)pos;
 - (int)iconPosition;
 - (void)updateIcons;
 - (id)repOfSubnode:(FSNode *)anode;
@@ -200,9 +197,7 @@
 - (BOOL)involvedByFileOperation:(NSDictionary *)opinfo;
 - (BOOL)validatePasteOfFilenames:(NSArray *)names
                        wasCutted:(BOOL)cutted;
-- (void)setBackgroundColor:(NSColor *)acolor;
 - (NSColor *)backgroundColor;
-- (void)setTextColor:(NSColor *)acolor;
 - (NSColor *)textColor;
 - (NSColor *)disabledTextColor;
 

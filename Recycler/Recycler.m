@@ -573,7 +573,7 @@ static Recycler *recycler = nil;
 //
 - (void)emptyTrash:(id)sender
 {
-  FSNode *node = [FSNode nodeWithRelativePath: trashPath parent: nil];
+  FSNode *node = [FSNode nodeWithPath: trashPath];
   NSArray *subNodes = [node subNodes];
   
   if ([subNodes count]) {

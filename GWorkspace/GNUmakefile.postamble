@@ -5,7 +5,6 @@ before-all::
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/FileViewer
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/SpatialViewer
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Viewer
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/GWLib	
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Watchers
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Viewers
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Shelf
@@ -28,7 +27,6 @@ before-install::
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/FileViewer
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/SpatialViewer
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Viewer
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/GWLib	
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Watchers
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Viewers
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Shelf

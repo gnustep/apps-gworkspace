@@ -26,7 +26,6 @@
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include "GWFunctions.h"
-#include "GWProtocol.h"
 #include <limits.h>
 
 #define ONE_KB 1024

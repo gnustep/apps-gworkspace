@@ -33,6 +33,18 @@
   [super dealloc];
 }
 
+- (id)init
+{
+  unsigned int style = NSTitledWindowMask | NSClosableWindowMask 
+				                  | NSMiniaturizableWindowMask | NSResizableWindowMask;
+
+  self = [super initWithContentRect: NSZeroRect
+                          styleMask: style
+                            backing: NSBackingStoreBuffered 
+                              defer: NO];
+  return self; 
+}
+
 - (void)setDelegate:(id)adelegate
 {
   delegate = adelegate;
@@ -82,6 +94,41 @@
 - (void)setViewerType:(id)sender
 {
   [delegate setViewerType: sender];
+}
+
+- (void)setShownType:(id)sender
+{
+  [delegate setShownType: sender];
+}
+
+- (void)setExtendedShownType:(id)sender
+{
+  [delegate setExtendedShownType: sender];
+}
+
+- (void)setIconsSize:(id)sender
+{
+  [delegate setIconsSize: sender];
+}
+
+- (void)setIconsPosition:(id)sender
+{
+  [delegate setIconsPosition: sender];
+}
+
+- (void)setLabelSize:(id)sender
+{
+  [delegate setLabelSize: sender];
+}
+
+- (void)chooseLabelColor:(id)sender
+{
+  [delegate chooseLabelColor: sender];
+}
+
+- (void)chooseBackColor:(id)sender
+{
+  [delegate chooseBackColor: sender];
 }
 
 - (void)selectAllInViewer:(id)sender

@@ -22,16 +22,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-  #ifdef GNUSTEP 
 #include "GWFunctions.h"
-#include "GWLib.h"
-  #else
-#include <GWorkspace/GWFunctions.h>
-#include <GWorkspace/GWLib.h>
-  #endif
+#include "FSNFunctions.h"
 #include "CompletionField.h"
 #include "GNUstep.h"
 
@@ -84,7 +78,7 @@ if ([path hasSuffix: pathSeparator] == NO) \
   }
   
   if ([eventstr isEqual: @"\t"] && [str length]) {
-    NSString *pathSeparator = fixPath(@"/", 0);
+    NSString *pathSeparator = path_separator();
     NSArray *components = [str componentsSeparatedByString: pathSeparator];
     NSMutableString *path = [NSMutableString string];
     int i, j, m, n;

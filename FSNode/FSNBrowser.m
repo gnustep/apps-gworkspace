@@ -99,7 +99,7 @@
       defentry = [defaults objectForKey: @"extended_info_type"];
 
       if (defentry) {
-        NSArray *availableTypes = [FSNodeRep availableExtendedInfoNames];
+        NSArray *availableTypes = [[FSNodeRep sharedInstance] availableExtendedInfoNames];
       
         if ([availableTypes containsObject: defentry]) {
           ASSIGN (extInfoType, defentry);
@@ -110,10 +110,8 @@
         infoType = FSNInfoNameType;
       }
     }
-
-    [FSNodeRep setUseThumbnails: [defaults boolForKey: @"use_thumbnails"]];
     
-    ASSIGN (baseNode, [FSNode nodeWithRelativePath: [bsnode path] parent: nil]);	    
+    ASSIGN (baseNode, [FSNode nodeWithPath: [bsnode path]]);	    
     [self readNodeInfo];
     
     lastSelection = nil;
@@ -129,7 +127,8 @@
     updateViewsLock = 0;
    
     cellPrototype = [FSNBrowserCell new];
-  
+    [cellPrototype setFont: [NSFont systemFontOfSize: 12]];
+    
   	columns = [NSMutableArray new];
   
     nameEditor = nil;
@@ -139,7 +138,7 @@
       [nameEditor setDelegate: self];  
       [nameEditor setEditable: YES];
       [nameEditor setSelectable: YES];	   
-	//	  [nameEditor setFont: labelFont];
+		  [nameEditor setFont: [cellPrototype font]];
 		  [nameEditor setBezeled: NO];
 		  [nameEditor setAlignment: NSLeftTextAlignment];
   //	  [nameEditor setTextColor: textColor];
@@ -169,7 +168,7 @@
 
 - (void)setBaseNode:(FSNode *)node
 {
-  ASSIGN (baseNode, [FSNode nodeWithRelativePath: [node path] parent: nil]);
+  ASSIGN (baseNode, [FSNode nodeWithPath: [node path]]);
   [self readNodeInfo];
   [self loadColumnZero];
   [self notifySelectionChange: [NSArray arrayWithObject: [node path]]];
@@ -207,7 +206,7 @@
         entry = [nodeDict objectForKey: @"ext_info_type"];
 
         if (entry) {
-          NSArray *availableTypes = [FSNodeRep availableExtendedInfoNames];
+          NSArray *availableTypes = [[FSNodeRep sharedInstance] availableExtendedInfoNames];
 
           if ([availableTypes containsObject: entry]) {
             ASSIGN (extInfoType, entry);
@@ -423,7 +422,7 @@
 - (void)showPathsSelection:(NSArray *)selpaths
 {
   if (selpaths && [selpaths count]) {
-    FSNode *node = [FSNode nodeWithRelativePath: [selpaths objectAtIndex: 0] parent: nil];      
+    FSNode *node = [FSNode nodeWithPath: [selpaths objectAtIndex: 0]];      
     FSNBrowserColumn *bc;
     NSArray *selPaths;
 
@@ -582,8 +581,14 @@
   
   if (col) {
     FSNBrowserColumn *parentCol = [self columnBeforeColumn: col];
-    FSNode *node = [FSNode nodeWithRelativePath: path 
-                                         parent: (parentCol ? [parentCol shownNode] : nil)];  
+    FSNode *node;  
+    
+    if (parentCol) {
+      node = [FSNode nodeWithRelativePath: path parent: [parentCol shownNode]];      
+    } else {
+      node = [FSNode nodeWithPath: path];      
+    }
+    
     [col showContentsOfNode: node];    
   }
 }
@@ -1520,26 +1525,14 @@
   return infoType;
 }
 
-- (void)setIconSize:(int)size
-{
-}
-
 - (int)iconSize
 {
   return DEFAULT_ISIZE;
 }
 
-- (void)setLabelTextSize:(int)size
-{
-}
-
 - (int)labelTextSize
 {
   return 12;
-}
-
-- (void)setIconPosition:(int)pos
-{
 }
 
 - (int)iconPosition
@@ -1915,6 +1908,7 @@
   return YES;
 }
 
+/*
 - (void)setBackgroundColor:(NSColor *)acolor
 {
   int i;
@@ -1926,14 +1920,11 @@
   
   [self setNeedsDisplay: YES];
 }
+*/
 
 - (NSColor *)backgroundColor
 {
   return backColor;
-}
-
-- (void)setTextColor:(NSColor *)acolor
-{
 }
 
 - (NSColor *)textColor
@@ -1957,28 +1948,16 @@
   if (nameEditor) {
     FSNode *cellnode = [cell node];
     BOOL canedit = (([cell isLocked] == NO) 
-                        && ([cellnode isMountPoint] == NO) 
-                        && (infoType == FSNInfoNameType));
+                        && ([cellnode isMountPoint] == NO));
     
     [self stopCellEditing];
 
     if (canedit) {   
       NSMatrix *matrix = [col cmatrix];
-      NSFontManager *fmanager = [NSFontManager sharedFontManager];
       NSFont *edfont = [nameEditor font];
       float fnheight = [edfont defaultLineHeightForFont];
       NSRect r = [cell labelRect];
       
-      if ([cell nodeInfoShowType] == FSNInfoExtendedType) {
-        edfont = [fmanager convertFont: edfont 
-                           toHaveTrait: NSItalicFontMask];
-      } else {
-        edfont = [fmanager convertFont: edfont 
-                        toNotHaveTrait: NSItalicFontMask];
-      }
-    
-      [nameEditor setFont: edfont];
-
       r = [matrix convertRect: r toView: self];
       r.origin.y += ((r.size.height - fnheight) / 2);
       r.size.height = fnheight;
@@ -2021,6 +2000,7 @@
 
 - (void)controlTextDidEndEditing:(NSNotification *)aNotification
 {
+  NSFileManager *fm = [NSFileManager defaultManager];
   FSNode *ednode = [nameEditor node];
 
 #define CLEAREDITING \
@@ -2034,11 +2014,11 @@
                     [ednode name]], NSLocalizedString(@"Continue", @""), nil, nil);   
     CLEAREDITING;
     
-  } else if ([[ednode parent] isWritable] == NO) {
+  } else if ([fm isWritableFileAtPath: [ednode parentPath]] == NO) {
     NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
           [NSString stringWithFormat: @"%@\"%@\"!\n", 
               NSLocalizedString(@"You have not write permission for ", @""), 
-                  [[ednode parent] name]], NSLocalizedString(@"Continue", @""), nil, nil);   
+                  [ednode parentName]], NSLocalizedString(@"Continue", @""), nil, nil);   
     CLEAREDITING;
     
   } else {

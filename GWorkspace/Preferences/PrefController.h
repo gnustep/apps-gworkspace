@@ -26,12 +26,8 @@
 #ifndef PREF_CONTROLLER_H
 #define PREF_CONTROLLER_H
 
-#include <Foundation/NSObject.h>
-  #ifdef GNUSTEP 
-#include "PreferencesProtocol.h"
-  #else
-#include <GWorkspace/PreferencesProtocol.h>
-  #endif
+#include <Foundation/Foundation.h>
+#include "PrefProtocol.h"
 
 @class NSMutableArray;
 @class NSView;
@@ -48,9 +44,9 @@
 
 - (void)activate;
 
-- (void)addPreference:(id <PreferencesProtocol>)anobject;
+- (void)addPreference:(id <PrefProtocol>)anobject;
 
-- (void)removePreference:(id <PreferencesProtocol>)anobject;
+- (void)removePreference:(id <PrefProtocol>)anobject;
 
 - (IBAction)activatePrefView:(id)sender;
 

@@ -24,21 +24,16 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-  #ifdef GNUSTEP 
 #include "GWFunctions.h"
-#include "GWNotifications.h"
-#include "GWLib.h"
-  #else
-#include <GWorkspace/GWFunctions.h>
-#include <GWorkspace/GWNotifications.h>
-#include <GWorkspace/GWLib.h>
-  #endif
 #include "FiendLeaf.h"
 #include "Fiend.h"
 #include "GWorkspace.h"
+#include "FSNodeRep.h"
+#include "FSNFunctions.h"
 #include "GNUstep.h"
 #include <math.h>
 
+#define ICON_SIZE 48
 #define INTERVALS 40.0
 
 @implementation LeafPosition
@@ -79,8 +74,7 @@
 
 - (void)dealloc
 {
-  TEST_RELEASE (myPath);
-  TEST_RELEASE (myType);
+  TEST_RELEASE (node);
   RELEASE (tile);
   TEST_RELEASE (hightile);	
   TEST_RELEASE (icon);
@@ -107,24 +101,19 @@
   [self setPosX: px posY: py relativeToPoint: p];
   
   if (apath != nil) {
-    NSString *defApp, *type;
-    
     fm = [NSFileManager defaultManager];
     ws = [NSWorkspace sharedWorkspace];
 		gw = [GWorkspace gworkspace];
 
-    ASSIGN (myPath, apath);
+    ASSIGN (node, [FSNode nodeWithPath: apath]);
     
-    [ws getInfoForFile: myPath application: &defApp type: &type];      
-    ASSIGN (myType, type);
-		isPakage = [GWLib isPakageAtPath: myPath];
-		
-    ASSIGN (icon, [GWLib iconForFile: myPath ofType: myType]); 
+    ASSIGN (icon, [[FSNodeRep sharedInstance] iconOfSize: ICON_SIZE 
+                                                 forNode: node]); 
     
-    if ([myType isEqualToString: NSApplicationFileType] == NO) {
+    if ([node isApplication] == NO) {
 			NSString *name;
 			
-			if ([myPath isEqualToString: fixPath(@"/", 0)]) {
+			if ([[node path] isEqual: path_separator()]) {
 				NSHost *host = [NSHost currentHost];
 				NSString *hname = [host name];
 				NSRange range = [hname rangeOfString: @"."];
@@ -133,7 +122,7 @@
 				} 						
 				name = hname;
 			} else {
-    		name = [myPath lastPathComponent];
+    		name = [node name];
 			}
 			
       namelabel = [NSTextFieldCell new];
@@ -201,14 +190,9 @@
 	return YES;
 }
 
-- (NSString *)myPath
+- (FSNode *)node
 {
-  return myPath;
-}
-
-- (NSString *)myType
-{
-	return myType;
+  return node;
 }
 
 - (NSImage *)icon
@@ -254,30 +238,12 @@
 	[fiend orderFrontLeaves];
 	
 	if ([theEvent clickCount] > 1) {   
-    if ([myType isEqualToString: NSApplicationFileType]) {
-//      NSArray *launched = [ws launchedApplications];
-//      BOOL found = NO;
-//      int i;
-
-//      for (i = 0; i < [launched count]; i++) {
-//        NSDictionary *dict = [launched objectAtIndex: i];
-//        NSString *applname = [dict objectForKey: @"NSApplicationName"]; 
-
-//        if ([applname isEqual: myPath]) {
-//          found = YES;
-//          break;
-//        }
-//      }
-
-//      if (found == NO) {
-        [ws launchApplication: myPath];
-        [self startDissolve];
-//      }
+    if ([node isApplication]) {
+      [ws launchApplication: [node path]];
+      [self startDissolve];
     
-    } else if ([myType isEqualToString: NSPlainFileType]
-            			|| [myType isEqualToString: NSDirectoryFileType]
-            					|| [myType isEqualToString: NSFilesystemFileType]) { 
-      NSArray *paths = [NSArray arrayWithObjects: myPath, nil];    
+    } else if ([node isPlain] || [node isDirectory] || [node isMountPoint]) { 
+      NSArray *paths = [NSArray arrayWithObjects: [node path], nil];    
       [gw openSelectedPaths: paths newViewer: YES];   
     }    
     return;
@@ -331,7 +297,7 @@
   if (icon != nil) {
     iconSize = [icon size];
 
-    if (isGhost || ([myType isEqualToString: NSApplicationFileType] == YES)) {
+    if (isGhost || [node isApplication]) {
       iconPosn = NSMakePoint((64 - iconSize.width) / 2.0, (64 - iconSize.height) / 2.0);
     } else {
       iconPosn = NSMakePoint((64 - iconSize.width) / 2.0, 13);
@@ -395,14 +361,13 @@
 
   [fiend verifyDraggingExited: self];
 
-  if ((([myType isEqual: NSDirectoryFileType] == NO)
-          && ([myType isEqual: NSFilesystemFileType] == NO)
-          && ([myType isEqual: NSApplicationFileType] == NO))
-          || (isPakage && ([myType isEqual: NSApplicationFileType] == NO))) {
+  if ((([node isDirectory] == NO) && ([node isMountPoint] == NO) && ([node isApplication] == NO))
+            || ([node isPackage] && ([node isApplication] == NO))) {
     return NSDragOperationNone;  
   }
 
 	pb = [sender draggingPasteboard];
+  
   if([[pb types] indexOfObject: NSFilenamesPboardType] != NSNotFound) {
     sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
 	  count = [sourcePaths count];
@@ -412,30 +377,30 @@
 		  return NSDragOperationNone;
     } 
 
-    if ([myType isEqualToString: NSApplicationFileType] == NO) {
-
-	    if ([fm isWritableFileAtPath: myPath] == NO) {
+    if ([node isApplication] == NO) {
+	    if ([node isWritable] == NO) {
 		    return NSDragOperationNone;
 	    }
 
-	    if ([myPath isEqualToString: fromPath]) {
+	    if ([[node path] isEqual: fromPath]) {
 		    return NSDragOperationNone;
       }  
 
 	    for (i = 0; i < count; i++) {
-		    if ([myPath isEqualToString: [sourcePaths objectAtIndex: i]]) {
+		    if ([[node path] isEqual: [sourcePaths objectAtIndex: i]]) {
 		      return NSDragOperationNone;
 		    }
 	    }
 
-	    buff = [NSString stringWithString: myPath];
+	    buff = [NSString stringWithString: [node path]];
+      
 	    while (1) {
 		    for (i = 0; i < count; i++) {
-			    if ([buff isEqualToString: [sourcePaths objectAtIndex: i]]) {
+			    if ([buff isEqual: [sourcePaths objectAtIndex: i]]) {
  		        return NSDragOperationNone;
 			    }
 		    }
-        if ([buff isEqualToString: fixPath(@"/", 0)] == YES) {
+        if ([buff isEqual: path_separator()]) {
           break;
         }            
 		    buff = [buff stringByDeletingLastPathComponent];
@@ -443,7 +408,7 @@
 
       isDragTarget = YES;
 			
-      ASSIGN (icon, [NSImage imageNamed: GWOpenFolderIconName]);
+      ASSIGN (icon, [NSImage imageNamed: @"FileIcon_Directory_Open.tiff"]);
       [self setNeedsDisplay: YES];
 			
 			sourceDragMask = [sender draggingSourceOperationMask];
@@ -463,12 +428,9 @@
 			}
 
 	    for (i = 0; i < [sourcePaths count]; i++) {
-				NSString *fpath, *app, *type;
-
-				fpath = [sourcePaths objectAtIndex: i];
-				[ws getInfoForFile: fpath application: &app type: &type];
-
-				if (type != NSPlainFileType) {
+        FSNode *fnode = [FSNode nodeWithPath: [sourcePaths objectAtIndex: i]];
+        
+				if ([fnode isPlain] == NO) {
 					return NSDragOperationNone;
 				}
 	    }
@@ -489,14 +451,12 @@
 		return NSDragOperationNone;
 	}
 
-  if ((([myType isEqual: NSDirectoryFileType] == NO)
-          && ([myType isEqual: NSFilesystemFileType] == NO)
-          && ([myType isEqual: NSApplicationFileType] == NO))
-          || (isPakage && ([myType isEqual: NSApplicationFileType] == NO))) {
+  if ((([node isDirectory] == NO) && ([node isMountPoint] == NO) && ([node isApplication] == NO))
+            || ([node isPackage] && ([node isApplication] == NO))) {
     return NSDragOperationNone;  
   }
 
-	if ([myType isEqualToString: NSApplicationFileType] == NO) {
+	if ([node isApplication] == NO) {
 		if (sourceDragMask == NSDragOperationCopy) {
 			return NSDragOperationCopy;
 		} else if (sourceDragMask == NSDragOperationLink) {
@@ -516,10 +476,11 @@
 
 - (void)draggingExited:(id <NSDraggingInfo>)sender
 {
-  if(isDragTarget == YES) {
+  if (isDragTarget) {
     isDragTarget = NO;  
-    if ([myType isEqualToString: NSApplicationFileType] == NO) {
-      ASSIGN (icon, [GWLib iconForFile: myPath ofType: myType]);
+    if ([node isApplication] == NO) {
+      ASSIGN (icon, [[FSNodeRep sharedInstance] iconOfSize: ICON_SIZE 
+                                                   forNode: node]);
       [self setNeedsDisplay: YES];
     }
   }
@@ -542,25 +503,26 @@
   NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
 	int i = 0;
 	
-  if ([myType isEqualToString: NSApplicationFileType] == NO) {
+  if ([node isApplication] == NO) {
     NSString *operation, *source;
     NSMutableArray *files;
     int tag;
-
-    ASSIGN (icon, [GWLib iconForFile: myPath ofType: myType]);
+    
+    ASSIGN (icon, [[FSNodeRep sharedInstance] iconOfSize: ICON_SIZE 
+                                                 forNode: node]);
     [self setNeedsDisplay: YES];
 
     source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
 
-		if ([source isEqualToString: [gw trashPath]]) {
-			operation = GWorkspaceRecycleOutOperation;
+		if ([source isEqual: [gw trashPath]]) {
+			operation = @"GWorkspaceRecycleOutOperation";
 		} else {
 			if (sourceDragMask == NSDragOperationCopy) {
-				operation = NSWorkspaceCopyOperation;
+				operation = @"NSWorkspaceCopyOperation";
 			} else if (sourceDragMask == NSDragOperationLink) {
-				operation = NSWorkspaceLinkOperation;
+				operation = @"NSWorkspaceLinkOperation";
 			} else {
-				operation = NSWorkspaceMoveOperation;
+				operation = @"NSWorkspaceMoveOperation";
 			}
   	}
   
@@ -570,16 +532,14 @@
     }  
 
     [gw performFileOperation: operation source: source
-							          destination: myPath files: files tag: &tag];
+							          destination: [node path] files: files tag: &tag];
 
   } else {     
 	  for(i = 0; i < [sourcePaths count]; i++) {   
-      NSString *path, *defApp, *type;
+      FSNode *draggednode = [FSNode nodeWithPath: [sourcePaths objectAtIndex: i]];
       
-      path = [sourcePaths objectAtIndex: i]; 
-      [ws getInfoForFile: path application: &defApp type: &type];    
-      if ([type isEqualToString: NSPlainFileType] == YES) {
-        [ws openFile: path withApplication: myPath];
+      if ([draggednode isPlain]) {
+        [ws openFile: [draggednode path] withApplication: [node path]];
       }
     }
   }

@@ -22,26 +22,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-  #ifdef GNUSTEP 
-#include "GWFunctions.h"
-#include "GWLib.h"
-  #else
-#include <GWorkspace/GWFunctions.h>
-#include <GWorkspace/GWLib.h>
-  #endif
 #include "OpenWithController.h"
 #include "CompletionField.h"
 #include "GWorkspace.h"
 #include "GNUstep.h"
 
-#ifdef GNUSTEP 
-  static NSString *nibName = @"OpenWith.gorm";
-#else
-  static NSString *nibName = @"OpenWith.nib";
-#endif
+static NSString *nibName = @"OpenWith";
 
 @implementation OpenWithController
 

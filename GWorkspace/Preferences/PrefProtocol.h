@@ -1,4 +1,4 @@
-/* BNameEditor.m
+/* PrefProtocol.h
  *  
  * Copyright (C) 2003 Free Software Foundation, Inc.
  *
@@ -23,68 +23,15 @@
  */
 
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "BNameEditor.h"
+#ifndef PREF_PROTOCOL_H
+#define PREF_PROTOCOL_H
 
-@implementation BNameEditor
+@protocol PrefProtocol
 
-- (void)dealloc
-{
-  TEST_RELEASE (paths);
-  TEST_RELEASE (name);
-  [super dealloc];
-}
+- (NSView *)prefView;
 
-- (id)init
-{
-  self = [super init];
+- (NSString *)prefName;
 
-  if (self) {
-    paths = nil;
-    name = nil;
-  }
-  
-  return self;
-}
+@end 
 
-- (void)setName:(NSString *)n paths:(NSArray *)p index:(int)i
-{
-  if (n) {
-    ASSIGN (name, n);
-    [super setStringValue: name];
-  } else {
-    DESTROY (name);
-  }
-  
-  if (p) {
-    ASSIGN (paths, p);
-  } else {
-    DESTROY (paths);
-  }
-  
-  index = i;
-}
-
-- (NSString *)name
-{
-  return name;
-}
-
-- (NSArray *)paths 
-{
-  return paths;
-}
-
-- (int)index
-{
-  return index;
-}
-
-- (void)mouseDown:(NSEvent*)theEvent
-{
-	[self setAlignment: NSLeftTextAlignment];
-  [super mouseDown: theEvent];
-}
-
-@end
+#endif // PREF_PROTOCOL_H

@@ -116,8 +116,8 @@ static id <DesktopApplication> desktopApp = nil;
       NSArray *subNodes;
       int i, count;
 
-      ASSIGN (icon, [FSNodeRep trashIconOfSize: ceil(icnBounds.size.width)]);
-      ASSIGN (trashFullIcon, [FSNodeRep trashFullIconOfSize: ceil(icnBounds.size.width)]);
+      ASSIGN (icon, [fsnodeRep trashIconOfSize: ceil(icnBounds.size.width)]);
+      ASSIGN (trashFullIcon, [fsnodeRep trashFullIconOfSize: ceil(icnBounds.size.width)]);
       
       subNodes = [node subNodes];
       count = [subNodes count];
@@ -133,7 +133,7 @@ static id <DesktopApplication> desktopApp = nil;
       [self setTrashFull: !(count == 0)];
     
     } else {
-      ASSIGN (icon, [FSNodeRep iconOfSize: ceil(icnBounds.size.width) 
+      ASSIGN (icon, [fsnodeRep iconOfSize: ceil(icnBounds.size.width) 
                                   forNode: node]);
     }
   }
@@ -324,20 +324,20 @@ static id <DesktopApplication> desktopApp = nil;
 {
   icnBounds = NSMakeRect(0, 0, isize, isize);
   if (isTrashIcon) {
-    ASSIGN (icon, [FSNodeRep trashIconOfSize: ceil(icnBounds.size.width)]);
-    ASSIGN (trashFullIcon, [FSNodeRep trashFullIconOfSize: ceil(icnBounds.size.width)]);
+    ASSIGN (icon, [fsnodeRep trashIconOfSize: ceil(icnBounds.size.width)]);
+    ASSIGN (trashFullIcon, [fsnodeRep trashFullIconOfSize: ceil(icnBounds.size.width)]);
   } else {
-    ASSIGN (icon, [FSNodeRep iconOfSize: ceil(icnBounds.size.width) 
+    ASSIGN (icon, [fsnodeRep iconOfSize: ceil(icnBounds.size.width) 
                                 forNode: node]);
   }
   hlightRect.size.width = ceil(isize / 3 * 4);
-  hlightRect.size.height = ceil(hlightRect.size.width * [FSNodeRep highlightHeightFactor]);
+  hlightRect.size.height = ceil(hlightRect.size.width * [fsnodeRep highlightHeightFactor]);
   if ((hlightRect.size.height - isize) < 4) {
     hlightRect.size.height = isize + 4;
   }
   hlightRect.origin.x = 0;
   hlightRect.origin.y = 0;
-  ASSIGN (highlightPath, [FSNodeRep highlightPathOfSize: hlightRect.size]); 
+  ASSIGN (highlightPath, [fsnodeRep highlightPathOfSize: hlightRect.size]); 
   [self tile];
 }
 
@@ -495,7 +495,7 @@ x += 6; \
 
     for (i = 0; i < [paths count]; i++) {
       NSString *path = [paths objectAtIndex: i];
-      FSNode *nod = [FSNode nodeWithRelativePath: path parent: nil];
+      FSNode *nod = [FSNode nodeWithPath: path];
 
       if (([nod isPlain] || ([nod isPackage] && ([nod isApplication] == NO))) == NO) {
         return NO;
@@ -522,7 +522,7 @@ x += 6; \
   if ([self isSpecialIcon] == NO) {
     for (i = 0; i < [paths count]; i++) {
       NSString *path = [paths objectAtIndex: i];
-      FSNode *nod = [FSNode nodeWithRelativePath: path parent: nil];
+      FSNode *nod = [FSNode nodeWithPath: path];
 
       if ([nod isPlain] || ([nod isPackage] && ([nod isApplication] == NO))) {
         [ws openFile: [paths objectAtIndex: i] withApplication: appName];

@@ -24,19 +24,15 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-  #ifdef GNUSTEP 
+#include "FSNodeRep.h"
+#include "FSNFunctions.h"
 #include "GWFunctions.h"
-#include "GWNotifications.h"
-#include "GWLib.h"
-  #else
-#include <GWorkspace/GWFunctions.h>
-#include <GWorkspace/GWNotifications.h>
-#include <GWorkspace/GWLib.h>
-  #endif
 #include "TShelfIcon.h"
 #include "TShelfIconsView.h"
 #include "GWorkspace.h"
 #include "GNUstep.h"
+
+#define ICON_SIZE 48
 
 #define CHECK_LOCK if (locked) return
 #define CHECK_LOCK_RET(x) if (locked) return x
@@ -46,10 +42,9 @@
 - (void)dealloc
 {
   RELEASE (paths);
-  TEST_RELEASE (fullPath);
   RELEASE (name);
 	TEST_RELEASE (hostname);
-  RELEASE (type);
+	TEST_RELEASE (node);
 	RELEASE (namelabel);
   RELEASE (icon);
   RELEASE (highlight);
@@ -62,17 +57,17 @@
   self = [super init];
   if (self) {
     NSArray *pbTypes = [NSArray arrayWithObjects: NSFilenamesPboardType, 
-                                          GWRemoteFilenamesPboardType, nil];
+                                          @"GWRemoteFilenamesPboardType", nil];
     NSFont *font;
-    NSString *defApp = nil, *t = nil;
     int count;
 
+    fsnodeRep = [FSNodeRep sharedInstance];
     fm = [NSFileManager defaultManager];
 		ws = [NSWorkspace sharedWorkspace];
     gw = [GWorkspace gworkspace];
 
     [self setFrame: NSMakeRect(0, 0, 64, 52)];
-		paths = [[NSMutableArray alloc] initWithCapacity: 1];
+		paths = [NSMutableArray new];
 		[paths addObjectsFromArray: fpaths];
     tview = aview;  
     labelWidth = [tview cellsWidth] - 4;
@@ -83,38 +78,32 @@
 
     if (count == 1) {
       singlepath = YES;
-      ASSIGN (fullPath, [paths objectAtIndex: 0]);
-			
-			if ([fullPath isEqualToString: fixPath(@"/", 0)]) {
-				ASSIGN (name, fullPath);
+      ASSIGN (node, [FSNode nodeWithPath: [paths objectAtIndex: 0]]);
+    
+			if ([[node path] isEqual: path_separator()]) {
+				ASSIGN (name, [node path]);
 				isRootIcon = YES;
 			} else {
-    		ASSIGN (name, [fullPath lastPathComponent]);
+    		ASSIGN (name, [node name]);
 				isRootIcon = NO;
 			}
-			
-      [ws getInfoForFile: fullPath application: &defApp type: &t];      
-      ASSIGN (type, t);			
-			isPakage = [GWLib isPakageAtPath: fullPath];
-			
+      
     } else {
-      fullPath = nil;
+      node = nil;
       singlepath = NO;
-      type = nil;
 			isRootIcon = NO;
-			isPakage = NO;
       name = [[NSString alloc] initWithFormat: @"%i items", count];
     }
 
-    if (singlepath == YES) {
-      ASSIGN (icon, [GWLib iconForFile: fullPath ofType: type]);    
+    if (singlepath) {
+      ASSIGN (icon, [fsnodeRep iconOfSize: ICON_SIZE forNode: node]);    
     } else {
-      ASSIGN (icon, [NSImage imageNamed: @"MultipleSelection.tiff"]);
+      ASSIGN (icon, [fsnodeRep multipleSelectionIconOfSize: ICON_SIZE]);
     }
     
-    ASSIGN (highlight, [NSImage imageNamed: GWCellHighlightIconName]);
+    ASSIGN (highlight, [NSImage imageNamed: @"CellHighlight.tiff"]);
 
-		if (isRootIcon == YES) {
+		if (isRootIcon) {
 			NSHost *host = [NSHost currentHost];
 			NSString *hname = [host name];
 			NSRange range = [hname rangeOfString: @"."];
@@ -169,44 +158,41 @@
 
 - (void)setPaths:(NSArray *)fpaths
 {
-  NSString *defApp = nil, *t = nil;
   int count;
 
 	TEST_RELEASE (paths);
+	TEST_RELEASE (node);
 	paths = [[NSMutableArray alloc] initWithCapacity: 1];
 	[paths addObjectsFromArray: fpaths];
   count = [paths count];                    
 
   if (count == 1) {
     singlepath = YES;
-    ASSIGN (fullPath, [paths objectAtIndex: 0]);
-		if ([fullPath isEqualToString: fixPath(@"/", 0)]) {
-			ASSIGN (name, fullPath);
+    
+    ASSIGN (node, [FSNode nodeWithPath: [paths objectAtIndex: 0]]);
+
+		if ([[node path] isEqual: path_separator()]) {
+			ASSIGN (name, [node path]);
 			isRootIcon = YES;
 		} else {
-    	ASSIGN (name, [fullPath lastPathComponent]);
+    	ASSIGN (name, [node name]);
 			isRootIcon = NO;
 		}
-    [ws getInfoForFile: fullPath application: &defApp type: &t];      
-    ASSIGN (type, t);
-		isPakage = [GWLib isPakageAtPath: fullPath];
+    
   } else {
-    TEST_RELEASE (fullPath);
-    fullPath = nil;
+    DESTROY (node);
     singlepath = NO;
-    type = nil;
 		isRootIcon = NO;
-		isPakage = NO;
     name = [[NSString alloc] initWithFormat: @"%i items", count];
   }
 
-  if (singlepath == YES) {
-    ASSIGN (icon, [GWLib iconForFile: fullPath ofType: type]);    
+  if (singlepath) {
+    ASSIGN (icon, [fsnodeRep iconOfSize: ICON_SIZE forNode: node]);    
   } else {
-    ASSIGN (icon, [NSImage imageNamed: @"MultipleSelection.tiff"]);
+    ASSIGN (icon, [fsnodeRep multipleSelectionIconOfSize: ICON_SIZE]);
   }
 
-	if (isRootIcon == YES) {
+	if (isRootIcon) {
 		NSHost *host = [NSHost currentHost];
 		NSString *hname = [host name];
 		NSRange range = [hname rangeOfString: @"."];
@@ -270,10 +256,10 @@
 
 - (void)renewIcon
 {
-  if (singlepath == YES) {
-    ASSIGN (icon, [GWLib iconForFile: fullPath ofType: type]);    
+  if (singlepath) {
+    ASSIGN (icon, [fsnodeRep iconOfSize: ICON_SIZE forNode: node]);    
   } else {
-    ASSIGN (icon, [NSImage imageNamed: @"MultipleSelection.tiff"]);
+    ASSIGN (icon, [fsnodeRep multipleSelectionIconOfSize: ICON_SIZE]);
   }
   [self setNeedsDisplay: YES];
 }
@@ -286,7 +272,7 @@
   
 	labelWidth = [tview cellsWidth] - 8;
 	  
-  if (isSelect == YES) {
+  if (isSelect) {
     [namelabel setFrame: NSMakeRect(0, 0, [font widthOfString: nstr] + 8, 14)];
     [namelabel setStringValue: nstr];
   } else {
@@ -306,24 +292,9 @@
   return namelabel;
 }
 
-- (NSString *)type
-{
-  return type;
-}
-
 - (NSArray *)paths
 {
   return paths;
-}
-
-- (NSString *)name
-{
-  return name;
-}
-
-- (NSString *)hostname
-{
-	return hostname;
 }
 
 - (BOOL)isSinglePath
@@ -351,16 +322,6 @@
 - (BOOL)isLocked
 {
   return locked;
-}
-
-- (BOOL)isRootIcon
-{
-	return isRootIcon;
-}
-
-- (BOOL)isPakage
-{
-	return isPakage;
 }
 
 - (BOOL)acceptsFirstMouse:(NSEvent *)theEvent 
@@ -418,7 +379,7 @@
       }
     }
 
-    if (startdnd == YES) {  
+    if (startdnd) {  
       [self startExternalDragOnEvent: nextEvent withMouseOffset: offset];    
     }    
   }           
@@ -536,8 +497,8 @@
   if ([[pb types] containsObject: NSFilenamesPboardType]) {
     sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
        
-  } else if ([[pb types] containsObject: GWRemoteFilenamesPboardType]) {
-    NSData *pbData = [pb dataForType: GWRemoteFilenamesPboardType]; 
+  } else if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"]) {
+    NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"]; 
     NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
     
     sourcePaths = [pbDict objectForKey: @"paths"];
@@ -550,9 +511,12 @@
     isDragTarget = YES;
     return NSDragOperationAll;
   }
-
-  if ((([type isEqualToString: NSDirectoryFileType] == NO)
-      && ([type isEqualToString: NSFilesystemFileType] == NO)) || isPakage) {
+  
+  if (node == nil) {
+    return NSDragOperationNone;
+  }
+  
+  if ((([node isDirectory] == NO) && ([node isMountPoint] == NO)) || [node isPackage]) {
     return NSDragOperationNone;
   }
 
@@ -563,28 +527,28 @@
 		return NSDragOperationNone;
   } 
 
-	if ([fm isWritableFileAtPath: fullPath] == NO) {
+	if ([node isWritable] == NO) {
 		return NSDragOperationNone;
 	}
 
-	if ([fullPath isEqualToString: fromPath]) {
+	if ([[node path] isEqual: fromPath]) {
 		return NSDragOperationNone;
   }  
 
 	for (i = 0; i < count; i++) {
-		if ([fullPath isEqualToString: [sourcePaths objectAtIndex: i]]) {
+		if ([[node path] isEqual: [sourcePaths objectAtIndex: i]]) {
 		  return NSDragOperationNone;
 		}
 	}
 
-	buff = [NSString stringWithString: fullPath];
+	buff = [NSString stringWithString: [node path]];
 	while (1) {
 		for (i = 0; i < count; i++) {
-			if ([buff isEqualToString: [sourcePaths objectAtIndex: i]]) {
+			if ([buff isEqual: [sourcePaths objectAtIndex: i]]) {
  		    return NSDragOperationNone;
 			}
 		}
-    if ([buff isEqualToString: fixPath(@"/", 0)] == YES) {
+    if ([buff isEqual: path_separator()]) {
       break;
     }            
 		buff = [buff stringByDeletingLastPathComponent];
@@ -592,7 +556,7 @@
 
   isDragTarget = YES;
 
-  iconPath =  [fullPath stringByAppendingPathComponent: @".opendir.tiff"];
+  iconPath =  [[node path] stringByAppendingPathComponent: @".opendir.tiff"];
 
   if ([fm isReadableFileAtPath: iconPath]) {
     NSImage *img = [[NSImage alloc] initWithContentsOfFile: iconPath];
@@ -601,10 +565,10 @@
       ASSIGN (icon, img);
       RELEASE (img);
     } else {
-      ASSIGN (icon, [NSImage imageNamed: GWOpenFolderIconName]);
+      ASSIGN (icon, [NSImage imageNamed: @"FileIcon_Directory_Open.tiff"]);
     }      
   } else {
-	  ASSIGN (icon, [NSImage imageNamed: GWOpenFolderIconName]);    
+	  ASSIGN (icon, [NSImage imageNamed: @"FileIcon_Directory_Open.tiff"]);    
   }
 
   [self setNeedsDisplay: YES];
@@ -619,15 +583,18 @@
 		return NSDragOperationAll;
 	}
   
-      
   return NSDragOperationNone;
 }
 
 - (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
 {
   NSDragOperation sourceDragMask;
+
+  if (node == nil) {
+    return NSDragOperationNone;
+  }
 	
-	if (!isDragTarget || locked || isPakage) {
+	if (!isDragTarget || locked || [node isPackage]) {
 		return NSDragOperationNone;
 	}
 
@@ -646,11 +613,13 @@
 
 - (void)draggingExited:(id <NSDraggingInfo>)sender
 {
-  if (isDragTarget == YES) {
+  if (isDragTarget) {
     isDragTarget = NO;
-    if (onSelf == NO) {      
-      ASSIGN (icon, [GWLib iconForFile: fullPath ofType: type]);
-      [self setNeedsDisplay: YES];
+    if (onSelf == NO) {  
+      if (node) {    
+        ASSIGN (icon, [fsnodeRep iconOfSize: ICON_SIZE forNode: node]);
+        [self setNeedsDisplay: YES];
+      }
     }
     onSelf = NO;
   }
@@ -678,30 +647,32 @@
 
   isDragTarget = NO;
 
-  if (onSelf == YES) {
+  if (onSelf) {
     onSelf = NO;
     return;
   }
   
-  ASSIGN (icon, [GWLib iconForFile: fullPath ofType: type]);
-  [self setNeedsDisplay: YES];
+  if (node) {    
+    ASSIGN (icon, [fsnodeRep iconOfSize: ICON_SIZE forNode: node]);
+    [self setNeedsDisplay: YES];
+  }
 
 	sourceDragMask = [sender draggingSourceOperationMask];  
   pb = [sender draggingPasteboard];
   
-  if ([[pb types] containsObject: GWRemoteFilenamesPboardType]) {  
-    NSData *pbData = [pb dataForType: GWRemoteFilenamesPboardType]; 
+  if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"]) {  
+    NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"]; 
     
-    [GWLib concludeRemoteFilesDragOperation: pbData
-                                atLocalPath: fullPath];
+    [gw concludeRemoteFilesDragOperation: pbData
+                             atLocalPath: [node path]];
     return;
   }  
   
   sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
   source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
 
-	if ([source isEqualToString: [gw trashPath]]) {
-		operation = GWorkspaceRecycleOutOperation;
+	if ([source isEqual: [gw trashPath]]) {
+		operation = @"GWorkspaceRecycleOutOperation";
 	} else {
 		if (sourceDragMask == NSDragOperationCopy) {
 			operation = NSWorkspaceCopyOperation;
@@ -720,7 +691,7 @@
 	opDict = [NSMutableDictionary dictionaryWithCapacity: 4];
 	[opDict setObject: operation forKey: @"operation"];
 	[opDict setObject: source forKey: @"source"];
-	[opDict setObject: fullPath forKey: @"destination"];
+	[opDict setObject: [node path] forKey: @"destination"];
 	[opDict setObject: files forKey: @"files"];
     
   [gw performFileOperationWithDictionary: opDict];

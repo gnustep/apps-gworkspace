@@ -25,17 +25,15 @@
 #ifndef FIENDLEAF_H
 #define FIENDLEAF_H
 
-#include <Foundation/NSObject.h>
+#include <Foundation/Foundation.h>
 #include <AppKit/NSView.h>
 
-@class NSString;
 @class NSImage;
 @class NSTextFieldCell;
-@class NSTimer;
 @class Fiend;
-@class NSFileManager;
 @class NSWorkspace;
 @class GWorkspace;
+@class FSNode;
 
 @interface LeafPosition : NSObject 
 {
@@ -58,17 +56,11 @@
 
 @interface FiendLeaf : NSView
 {
-  Fiend *fiend;
-  NSString *myPath, *myType;
+  FSNode *node;
   NSImage *tile, *hightile, *icon;
 	NSTextFieldCell *namelabel;
   	
-  NSFileManager *fm;
-	NSWorkspace *ws;
-  GWorkspace *gw;
-	
 	BOOL isGhost;
-	BOOL isPakage;
   BOOL isDragTarget;
   int posx, posy;
 	
@@ -76,6 +68,11 @@
   float dissFraction;	
 	int dissCounter;
 	BOOL dissolving;
+
+  NSFileManager *fm;
+	NSWorkspace *ws;
+  GWorkspace *gw;
+  Fiend *fiend;
 }
 
 - (id)initWithPosX:(int)px
@@ -93,9 +90,7 @@
 
 - (NSPoint)iconPosition;
 
-- (NSString *)myPath;
-
-- (NSString *)myType;
+- (FSNode *)node;
 
 - (NSImage *)icon;
 

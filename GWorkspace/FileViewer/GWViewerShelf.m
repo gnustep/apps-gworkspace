@@ -67,7 +67,9 @@
   if (self) {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	      
     id defentry;
-  
+    
+    fsnodeRep = [FSNodeRep sharedInstance];
+    
     defentry = [defaults dictionaryForKey: @"backcolor"];
     if (defentry) {
       float red = [[defentry objectForKey: @"red"] floatValue];
@@ -116,7 +118,7 @@
       defentry = [defaults objectForKey: @"extended_info_type"];
 
       if (defentry) {
-        NSArray *availableTypes = [FSNodeRep availableExtendedInfoNames];
+        NSArray *availableTypes = [fsnodeRep availableExtendedInfoNames];
       
         if ([availableTypes containsObject: defentry]) {
           ASSIGN (extInfoType, defentry);
@@ -162,8 +164,7 @@
     int j;
     
     for (j = 0; j < [paths count]; j++) {
-      FSNode *node = [FSNode nodeWithRelativePath: [paths objectAtIndex: j] 
-                                           parent: nil];
+      FSNode *node = [FSNode nodeWithPath: [paths objectAtIndex: j]];
     
       if ([node isValid] && [baseNode isParentOfNode: node]) {
         [icnnodes addObject: node]; 
@@ -332,7 +333,7 @@
   NSSize labelSize = NSZeroSize;
   
   highlightSize.width = ceil(iconSize / 3 * 4);
-  highlightSize.height = ceil(highlightSize.width * [FSNodeRep highlightHeightFactor]);
+  highlightSize.height = ceil(highlightSize.width * [fsnodeRep highlightHeightFactor]);
   if ((highlightSize.height - iconSize) < 4) {
     highlightSize.height = iconSize + 4;
   }
@@ -460,7 +461,7 @@
   NSRect hlightRect = NSZeroRect;
   
   hlightRect.size.width = ceil(iconSize / 3 * 4);
-  hlightRect.size.height = ceil(hlightRect.size.width * [FSNodeRep highlightHeightFactor]);
+  hlightRect.size.height = ceil(hlightRect.size.width * [fsnodeRep highlightHeightFactor]);
   hlightRect.origin.x = ceil((gridSize.width - hlightRect.size.width) / 2);   
   hlightRect.origin.y = floor([labelFont defaultLineHeightForFont]);
   
@@ -631,7 +632,7 @@
            
       if ([icon isShowingSelection] == NO) {   
         if ([[[icon node] path] isEqual: source]) {
-          [icon setNode: [FSNode nodeWithRelativePath: destination parent: nil]];
+          [icon setNode: [FSNode nodeWithPath: destination]];
           break;
         }
       }          
@@ -1016,8 +1017,7 @@
       int i;
     
       for (i = 0; i < [sourcePaths count]; i++) {
-        FSNode *node = [FSNode nodeWithRelativePath: [sourcePaths objectAtIndex: i] 
-                                             parent: nil];
+        FSNode *node = [FSNode nodeWithPath: [sourcePaths objectAtIndex: i]];
 
         if ([node isValid] && [baseNode isParentOfNode: node]) {
           [icnnodes addObject: node]; 

@@ -24,20 +24,15 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-  #ifdef GNUSTEP 
-#include "GWLib.h"
-#include "GWFunctions.h"
-#include "GWNotifications.h"
-  #else
-#include <GWorkspace/GWLib.h>
-#include <GWorkspace/GWFunctions.h>
-#include <GWorkspace/GWNotifications.h>
-  #endif
+#include "FSNodeRep.h"
+#include "FSNFunctions.h"
 #include "HiddenFilesPref.h"
 #include "GWorkspace.h"
 #include "GNUstep.h"
 
 static NSString *nibName = @"HiddenFilesPref";
+
+#define ICON_SIZE 48
 
 #define CHECKSIZE(sz) \
 if (sz.width < 0) sz.width = 0; \
@@ -49,7 +44,7 @@ if (sz.height < 0) sz.height = 0
 {
 	[[NSNotificationCenter defaultCenter] removeObserver: self];
   TEST_RELEASE (prefbox);
-  RELEASE (currentPath);
+  RELEASE (currentNode);
   RELEASE (hiddenPaths);
   TEST_RELEASE (leftMatrix);
   TEST_RELEASE (rightMatrix); 
@@ -68,11 +63,9 @@ if (sz.height < 0) sz.height = 0
     } else {
       NSArray *hpaths;
       NSArray *selection;
-      NSString *path;  
-      NSString *defApp;
-      NSString *type;
-      BOOL isdir;
-
+      FSNode *node;
+      NSImage *icon;
+      
       RETAIN (prefbox);
       RELEASE (win); 
 
@@ -81,23 +74,23 @@ if (sz.height < 0) sz.height = 0
       ws = [NSWorkspace sharedWorkspace];
 
       selection = [gw selectedPaths];
-      path = [selection objectAtIndex: 0];
+      node = [FSNode nodeWithPath: [selection objectAtIndex: 0]];
 
       if ([selection count] > 1) {
-        path = [path stringByDeletingLastPathComponent];     
+        node = [FSNode nodeWithPath: [node parentPath]];
       } else {
-        [fm fileExistsAtPath: path isDirectory: &isdir];    
-        if (isdir == NO) {
-          path = [path stringByDeletingLastPathComponent];     
-        } else if ([GWLib isPakageAtPath: path]) {
-          path = [path stringByDeletingLastPathComponent];         
+        if ([node isDirectory] == NO) {
+          node = [FSNode nodeWithPath: [node parentPath]];
+        } else if ([node isPackage]) {
+          node = [FSNode nodeWithPath: [node parentPath]];
         }
       }
 
-      ASSIGN (currentPath, path);
+      ASSIGN (currentNode, node);
 
-      [ws getInfoForFile: currentPath application: &defApp type: &type];      
-      [iconView setImage: [GWLib iconForFile: currentPath ofType: type]]; 		
+      icon = [[FSNodeRep sharedInstance] iconOfSize: ICON_SIZE 
+                                            forNode: currentNode];
+      [iconView setImage: icon]; 		
       
       cellPrototipe = [NSBrowserCell new];
 
@@ -119,7 +112,7 @@ if (sz.height < 0) sz.height = 0
 
       [[NSNotificationCenter defaultCenter] addObserver: self 
                 					  selector: @selector(selectionChanged:) 
-                						    name: GWCurrentSelectionChangedNotification
+                						    name: @"GWCurrentSelectionChangedNotification"
                 					    object: nil];
                               
       [hiddenDirsScroll setBorderType: NSBezelBorder];
@@ -127,7 +120,7 @@ if (sz.height < 0) sz.height = 0
   	  [hiddenDirsScroll setHasVerticalScroller: YES]; 
                     
       hiddenPaths = [NSMutableArray new];
-      hpaths = [GWLib hiddenPaths];
+      hpaths = [[FSNodeRep sharedInstance] hiddenPaths];
       
       if ([hpaths count]) { 
         NSSize cs, ms;
@@ -196,31 +189,29 @@ if (sz.height < 0) sz.height = 0
 - (void)selectionChanged:(NSNotification *)n
 {
   NSArray *selection;
-  NSString *path;  
-  NSString *defApp;
-  NSString *type;
-  BOOL isdir;
+  FSNode *node;
+  NSImage *icon;
 
   selection = [gw selectedPaths];
-  path = [selection objectAtIndex: 0];
+  node = [FSNode nodeWithPath: [selection objectAtIndex: 0]];
 
   if ([selection count] > 1) {
-    path = [path stringByDeletingLastPathComponent];     
+    node = [FSNode nodeWithPath: [node parentPath]];
   } else {
-    [fm fileExistsAtPath: path isDirectory: &isdir];    
-    if (isdir == NO) {
-      path = [path stringByDeletingLastPathComponent];     
-    } else if ([GWLib isPakageAtPath: path]) {
-      path = [path stringByDeletingLastPathComponent];         
+    if ([node isDirectory] == NO) {
+      node = [FSNode nodeWithPath: [node parentPath]];
+    } else if ([node isPackage]) {
+      node = [FSNode nodeWithPath: [node parentPath]];
     }
   }
 
-  ASSIGN (currentPath, path);
+  ASSIGN (currentNode, node);
 
-  [ws getInfoForFile: currentPath application: &defApp type: &type];      
-  [iconView setImage: [GWLib iconForFile: currentPath ofType: type]]; 		
+  icon = [[FSNodeRep sharedInstance] iconOfSize: ICON_SIZE 
+                                            forNode: currentNode];
+  [iconView setImage: icon]; 		
 
-  [pathField setStringValue: [currentPath lastPathComponent]]; 
+  [pathField setStringValue: [currentNode name]]; 
 
   [self clearAll];
 
@@ -276,7 +267,7 @@ if (sz.height < 0) sz.height = 0
 
 - (IBAction)loadContents:(id)sender
 {
-  NSArray *files;
+  NSArray *subNodes;
   NSMutableArray *hiddenFiles;
 	BOOL hideSysFiles;
   NSString *h; 
@@ -284,9 +275,10 @@ if (sz.height < 0) sz.height = 0
 
   [self clearAll];
 	
-  files = [fm directoryContentsAtPath: currentPath];
+  subNodes = [currentNode subNodes];
 
-	h = [currentPath stringByAppendingPathComponent: @".hidden"];
+	h = [[currentNode path] stringByAppendingPathComponent: @".hidden"];
+  
   if ([fm fileExistsAtPath: h]) {
 	  h = [NSString stringWithContentsOfFile: h];
 	  hiddenFiles = [[h componentsSeparatedByString: @"\n"] mutableCopy];
@@ -305,32 +297,42 @@ if (sz.height < 0) sz.height = 0
   } else {
     hiddenFiles = nil;
   }
-	hideSysFiles = [GWLib hideSysFiles];
+	hideSysFiles = [[FSNodeRep sharedInstance] hideSysFiles];
 	
 	if (hiddenFiles != nil  ||  hideSysFiles) {	
-		NSMutableArray *mutableFiles = AUTORELEASE ([files mutableCopy]);
-	
-		if (hiddenFiles != nil) {
-	    [mutableFiles removeObjectsInArray: hiddenFiles];
-	  }
-	
+		NSMutableArray *mutableNodes = AUTORELEASE ([subNodes mutableCopy]);
+    
+    if (hiddenFiles) {
+      int count = [mutableNodes count];
+      
+      for (i = 0; i < count; i++) {
+        FSNode *node = [mutableNodes objectAtIndex: i];
+        
+        if ([hiddenFiles containsObject: [node name]]) {
+          [mutableNodes removeObject: node];
+          count--;
+          i--;
+        }
+      }
+    }
+    
 		if (hideSysFiles) {
-	    int j = [mutableFiles count] - 1;
+	    int j = [mutableNodes count] - 1;
 	    
 	    while (j >= 0) {
-				NSString *file = (NSString *)[mutableFiles objectAtIndex: j];
+				NSString *file = [(FSNode *)[mutableNodes objectAtIndex: j] name];
 
 				if ([file hasPrefix: @"."]) {
-		    	[mutableFiles removeObjectAtIndex: j];
+		    	[mutableNodes removeObjectAtIndex: j];
 		  	}
 				j--;
 			}
 	  }
 		
-		files = mutableFiles;
+		subNodes = mutableNodes;
 	}
 
-  count = [files count];
+  count = [subNodes count];
   if (count == 0) {
     TEST_RELEASE (hiddenFiles);
 		return;
@@ -344,7 +346,7 @@ if (sz.height < 0) sz.height = 0
 		  [rightMatrix insertRow: i];
     }     
     cell = [rightMatrix cellAtRow: i column: 0];   
-    [cell setStringValue: [files objectAtIndex: i]];
+    [cell setStringValue: [(FSNode *)[subNodes objectAtIndex: i] name]];
     [cell setLeaf: YES];
   }  
   [rightMatrix sizeToCells]; 
@@ -415,9 +417,9 @@ if (sz.height < 0) sz.height = 0
 
 - (IBAction)activateChanges:(id)sender
 {
-  if ([fm isWritableFileAtPath: currentPath] == NO) {
+  if ([currentNode isWritable] == NO) {
     NSString *message = @"You have not write access to ";
-    message = [message stringByAppendingString: [currentPath lastPathComponent]]; 
+    message = [message stringByAppendingString: [currentNode name]]; 
     
     NSRunAlertPanel(NSLocalizedString(@"error", @""), 
                         NSLocalizedString(message, @""), 
@@ -440,7 +442,7 @@ if (sz.height < 0) sz.height = 0
       }
       
       hconts = [names componentsJoinedByString: @"\n"];      
-      h = [currentPath stringByAppendingPathComponent: @".hidden"];
+      h = [[currentNode path] stringByAppendingPathComponent: @".hidden"];
       [hconts writeToFile: h atomically: YES];
       
       [setButt setEnabled: NO];
@@ -460,7 +462,9 @@ if (sz.height < 0) sz.height = 0
   [openPanel setCanChooseFiles: NO];
   [openPanel setCanChooseDirectories: YES];
 
-  result = [openPanel runModalForDirectory: fixPath(@"/", 0) file: nil types: nil];
+  result = [openPanel runModalForDirectory: path_separator() 
+                                      file: nil 
+                                     types: nil];
 	if(result != NSOKButton) {
 		return;
   }
@@ -531,7 +535,7 @@ if (sz.height < 0) sz.height = 0
 
 - (IBAction)activateDirChanges:(id)sender
 {
-  [GWLib setHiddenPaths: hiddenPaths];
+  [[FSNodeRep sharedInstance] setHiddenPaths: hiddenPaths];
   [gw checkViewersAfterHidingOfPaths: hiddenPaths];
   [setDirButt setEnabled: NO];
 }

@@ -84,6 +84,8 @@
   BOOL onSelf;
   
   NSView <FSNodeRepContainer> *container;
+  
+  FSNodeRep *fsnodeRep;
 }
 
 + (NSImage *)branchImage;

@@ -72,55 +72,6 @@
   }
 }
 
-/*
-- (void)clickInMatrixOfColumn:(FSNBrowserColumn *)col
-{
-  int index = [col index];
-  int pos = index - firstVisibleColumn + 1;  
-  BOOL last = (index == lastVisibleColumn) || (index == ([columns count] -1));
-  BOOL mustshift = (firstVisibleColumn > 0);
-  NSArray *selection = [col selectedNodes];
-  
-  if ((selection == nil) || ([selection count] == 0)) {
-    [self notifySelectionChange: [NSArray arrayWithObject: [[col shownNode] path]]];
-    return;
-  }
-
-  currentshift = 0;
-  updateViewsLock++;
-  
-  [self setLastColumn: index];
-  
-  if ([selection count] == 1) {
-    FSNode *node = [selection objectAtIndex: 0];
-  
-    if ([node isDirectory] && ([node isPackage] == NO)) {
-      [self addAndLoadColumnForNode: node];
-      [manager viewer: viewer didShowNode: node];
-    
-    } else {
-      if ((last == NO) || selColumn) {
-        [self addFillingColumn];
-      } 
-    }  
-    
-  } else {
-    if ((last == NO) || selColumn) {
-      [self addFillingColumn];
-    }
-  } 
-    
-  if (mustshift && (pos < (visibleColumns - 1))) { 
-		[self setShift: visibleColumns - pos - 1];
-	}
-  
-  updateViewsLock--;
-  [self tile];
-  
-  [self notifySelectionChange: [col selectedPaths]];		  
-}
-*/
-
 @end
 
 

@@ -25,11 +25,8 @@
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include <AppKit/AppKit.h>
-  #ifdef GNUSTEP 
+#include "FSNode.h"
 #include "GWFunctions.h"
-  #else
-#include <GWorkspace/GWFunctions.h>
-  #endif
 #include "Fiend.h"
 #include "FiendLeaf.h"
 #include "Dialogs/Dialogs.h"
@@ -172,28 +169,6 @@
   return myWin;
 }
 
-- (id)fiendLeafOfType:(NSString *)type withName:(NSString *)name
-{
-  NSArray *leaves = [layers objectForKey: currentName];
-  int i;
-        
-	if (leaveshidden == YES) {
-		return nil;
-	}
-	
-  for (i = 0; i < [leaves count]; i++) {
-    id leaf = [leaves objectAtIndex: i];
-		NSString *ltype = [leaf myType];
-		NSString *lname = [[leaf myPath] lastPathComponent];
-		
-		if (([ltype isEqual: type]) && ([lname isEqual: name])) {
-			return leaf;
-		}
-	}
-	
-	return nil;
-}
-
 - (NSPoint)positionOfLeaf:(id)aleaf
 {
 	return [aleaf iconPosition];
@@ -315,7 +290,7 @@
   }  
   
   layerName = [dialog getEditFieldText];
-  if ([layerName isEqualToString: currentName]) {  
+  if ([layerName isEqual: currentName]) {  
     return;
   }
   
@@ -725,7 +700,7 @@
       id leaf = [leaves objectAtIndex: j];
       [dict setObject: [NSString stringWithFormat: @"%i", [leaf posx]] forKey: @"posx"];      
       [dict setObject: [NSString stringWithFormat: @"%i", [leaf posy]] forKey: @"posy"];      
-      [pathsAndRects setObject: dict forKey: [leaf myPath]];
+      [pathsAndRects setObject: dict forKey: [[leaf node] path]];
     }
     
     [prefs setObject: pathsAndRects forKey: name];    
@@ -833,7 +808,7 @@
   
   for (i = 0; i < [leaves count]; i++) {
     leaf = [leaves objectAtIndex: i];    
-    if ([[leaf myPath] isEqualToString: path] == YES) {
+    if ([[[leaf node] path] isEqual: path] == YES) {
 			NSString *msg = NSLocalizedString(@"This object is already present in this layer!", @"");
 			NSString *buttstr = NSLocalizedString(@"Continue", @"");		
       NSRunAlertPanel(nil, msg, buttstr, nil, nil);

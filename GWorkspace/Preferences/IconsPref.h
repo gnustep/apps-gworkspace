@@ -26,12 +26,12 @@
 #ifndef ICONS_PREF_H
 #define ICONS_PREF_H
 
-#include <Foundation/NSObject.h>
-#include "PreferencesProtocol.h"
+#include <Foundation/Foundation.h>
+#include "PrefProtocol.h"
 
 @class GWorkspace;
 
-@interface IconsPref : NSObject <PreferencesProtocol>
+@interface IconsPref : NSObject <PrefProtocol>
 {
   IBOutlet id win;
   IBOutlet id prefbox;

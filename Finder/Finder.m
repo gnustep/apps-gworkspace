@@ -184,6 +184,8 @@ static Finder *finder = nil;
 	[placesScroll setDocumentView: placesMatrix];	
   RELEASE (placesMatrix);
 
+  [[FSNodeRep sharedInstance] setUseThumbnails: YES];
+  
   defaults = [NSUserDefaults standardUserDefaults];
   
   defentry = [defaults objectForKey: @"saved_places"];
@@ -719,8 +721,8 @@ static Finder *finder = nil;
   }
   
   if (found == NO) {
-    FSNode *node = [FSNode nodeWithRelativePath: spath parent: nil];
-    SEL compareSel = [FSNodeRep defaultCompareSelector];
+    FSNode *node = [FSNode nodeWithPath: spath];
+    SEL compareSel = [[FSNodeRep sharedInstance] defaultCompareSelector];
     FSNBrowserCell *cell;
       
     if (count == 0) {

@@ -25,35 +25,32 @@
 #ifndef TSHELF_ICON_H
 #define TSHELF_ICON_H
 
+#include <Foundation/Foundation.h>
 #include <AppKit/NSView.h>
 
 #define ONICON(p, s1, s2) ([self mouse: (p) \
 inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 ((int)(s1).height - (int)(s2).height) >> 1, 48, 48)])
 
-@class NSString;
-@class NSArray;
-@class NSMutableArray;
-@class NSNotification;
 @class NSEvent;
 @class NSPasteboard;
 @class NSTextField;
 @class NSImage;
-@class NSFileManager;
 @class NSWorkspace;
 @class TShelfIconsView;
+@class FSNode;
+@class FSNodeRep;
 @class GWorkspace;
 
 @interface TShelfIcon : NSView
 {
   NSMutableArray *paths;
-  NSString *fullPath;
   NSString *name;
 	NSString *hostname;
+  FSNode *node;
   BOOL singlepath;
 	BOOL isRootIcon;	
 	BOOL isPakage;	
-  NSString *type;
   BOOL isSelect;
   BOOL locked;
   
@@ -65,6 +62,7 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 
   TShelfIconsView *tview;
   
+  FSNodeRep *fsnodeRep;
   NSFileManager *fm;
 	NSWorkspace *ws;
   GWorkspace *gw;
@@ -107,13 +105,7 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 
 - (NSTextField *)myLabel;
 
-- (NSString *)type;
-
 - (NSArray *)paths;
-
-- (NSString *)name;
-
-- (NSString *)hostname;
 
 - (BOOL)isSinglePath;
 
@@ -122,10 +114,6 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 - (void)setLocked:(BOOL)value;
 
 - (BOOL)isLocked;
-
-- (BOOL)isRootIcon;
-
-- (BOOL)isPakage;
 
 @end
 

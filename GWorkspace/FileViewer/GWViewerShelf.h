@@ -61,6 +61,8 @@
   NSColor *textColor;
   NSColor *disabledTextColor;
 
+  FSNodeRep *fsnodeRep;
+
   id viewer;
   GWorkspace *gworkspace;
 }

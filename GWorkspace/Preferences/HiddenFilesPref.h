@@ -26,17 +26,14 @@
 #define HIDDEN_FILES_PREF_H
 
 #include <Foundation/Foundation.h>
-  #ifdef GNUSTEP 
-#include "PreferencesProtocol.h"
-  #else
-#include <GWorkspace/PreferencesProtocol.h>
-  #endif
+#include "PrefProtocol.h"
 
 @class NSFileManager;
 @class NSWorkspace;
 @class GWorkspace;
+@class FSNode;
 
-@interface HiddenFilesPref : NSObject <PreferencesProtocol>
+@interface HiddenFilesPref : NSObject <PrefProtocol>
 {
   IBOutlet id win;
   IBOutlet id prefbox;
@@ -62,7 +59,7 @@
   NSMatrix *leftMatrix, *rightMatrix;
   id cellPrototipe;
 
-  NSString *currentPath;
+  FSNode *currentNode;
 
   IBOutlet id hiddenDirslabel;
   IBOutlet id hiddenDirsScroll;

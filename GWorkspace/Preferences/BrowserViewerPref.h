@@ -1,4 +1,4 @@
-/* ContentViewersProtocol.h
+/* BrowserViewerPref.h
  *  
  * Copyright (C) 2003 Free Software Foundation, Inc.
  *
@@ -22,36 +22,59 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef CONTENTVIEWERSPROTOCOL_H
-#define CONTENTVIEWERSPROTOCOL_H
 
-@protocol ContentViewersProtocol
+#ifndef BROWSERVIEWERPREF_H
+#define BROWSERVIEWERPREF_H
 
-- (id)initInPanel:(id)apanel withFrame:(NSRect)frame index:(int)idx;
+#include <AppKit/NSView.h>
 
-- (void)setBundlePath:(NSString *)path;
+#include <Foundation/Foundation.h>
+#include "PrefProtocol.h"
 
-- (NSString *)bundlePath;
+@class NSEvent;
 
-- (void)setIndex:(int)idx;
+@interface Resizer : NSView
+{
+  NSImage *arrow;
+  id prefview;
+  id controller;  
+}
 
-- (void)activateForPath:(NSString *)path;
+- (id)initForController:(id)acontroller;
 
-- (BOOL)displayData:(NSData *)data ofType:(NSString *)type;
+@end
 
-- (BOOL)stopTasks;
+@interface BrowserViewerPref : NSObject <PrefProtocol>
+{
+  IBOutlet id win;
+  IBOutlet id prefbox;
 
-- (void)deactivate;
+  IBOutlet id aspectBox;
+  IBOutlet id cellIconButt;
+  IBOutlet id shelfButt;
 
-- (BOOL)canDisplayFileAtPath:(NSString *)path;
+  IBOutlet id controlsbox;
+  IBOutlet id colExample;
+  IBOutlet id resizerBox;
 
-- (BOOL)canDisplayData:(NSData *)data ofType:(NSString *)type;
+  IBOutlet id setButt;
 
-- (int)index;
+  Resizer *resizer;
+  int columnsWidth;
+}
 
-- (NSString *)winname;
+- (void)tile;
 
-@end 
+- (void)mouseDownOnResizer:(NSEvent *)theEvent;
 
-#endif // CONTENTVIEWERSPROTOCOL_H
+- (void)setNewWidth:(int)w;
 
+- (IBAction)setDefaultWidth:(id)sender;
+
+- (IBAction)setIcons:(id)sender;
+
+- (IBAction)setShelf:(id)sender;
+
+@end
+
+#endif // BROWSERVIEWERPREF_H

@@ -206,6 +206,8 @@ typedef enum FSNSelectionMask {
 
 - (void)selectAll;
 
+- (void)scrollSelectionToVisible;
+
 - (NSArray *)reps;
 
 - (NSArray *)selectedReps;
@@ -299,7 +301,8 @@ typedef enum FSNSelectionMask {
   BOOL hideSysFiles;
 
 	NSMutableArray *lockedPaths;
-  
+  NSArray *hiddenPaths;
+
   NSMutableDictionary *tumbsCache;
   NSString *thumbnailDir;
   BOOL usesThumbnails;  
@@ -319,72 +322,83 @@ typedef enum FSNSelectionMask {
   id ws;    
 }
 
-+ (NSArray *)directoryContentsAtPath:(NSString *)path;
++ (FSNodeRep *)sharedInstance;
 
-+ (NSImage *)iconOfSize:(int)size 
+- (NSArray *)directoryContentsAtPath:(NSString *)path;
+
+- (NSImage *)iconOfSize:(int)size 
                 forNode:(FSNode *)node;
 
-+ (NSImage *)multipleSelectionIconOfSize:(int)size;
+- (NSImage *)multipleSelectionIconOfSize:(int)size;
 
-+ (NSImage *)openFolderIconOfSize:(int)size 
+- (NSImage *)openFolderIconOfSize:(int)size 
                           forNode:(FSNode *)node;
 
-+ (NSImage *)workspaceIconOfSize:(int)size;
+- (NSImage *)workspaceIconOfSize:(int)size;
 
-+ (NSImage *)trashIconOfSize:(int)size;
+- (NSImage *)trashIconOfSize:(int)size;
 
-+ (NSImage *)trashFullIconOfSize:(int)size;
+- (NSImage *)trashFullIconOfSize:(int)size;
 
-+ (NSBezierPath *)highlightPathOfSize:(NSSize)size;
+- (NSBezierPath *)highlightPathOfSize:(NSSize)size;
 
-+ (float)highlightHeightFactor;
+- (float)highlightHeightFactor;
 
-+ (int)labelMargin;
+- (int)labelMargin;
 
-+ (float)labelWFactor;
+- (float)labelWFactor;
 
-+ (void)setLabelWFactor:(float)f;
+- (void)setLabelWFactor:(float)f;
 
-+ (int)defaultIconBaseShift;
+- (int)defaultIconBaseShift;
 
-+ (void)setDefaultSortOrder:(int)order;
+- (void)setDefaultSortOrder:(int)order;
 
-+ (unsigned int)defaultSortOrder;
+- (unsigned int)defaultSortOrder;
 
-+ (SEL)defaultCompareSelector;
+- (SEL)defaultCompareSelector;
 
-+ (unsigned int)sortOrderForDirectory:(NSString *)dirpath;
+- (unsigned int)sortOrderForDirectory:(NSString *)dirpath;
 
-+ (SEL)compareSelectorForDirectory:(NSString *)dirpath;
+- (SEL)compareSelectorForDirectory:(NSString *)dirpath;
 
-+ (void)setSortOrder:(int)order 
-        forDirectory:(NSString *)dirpath;
+- (void)setHideSysFiles:(BOOL)value;
 
-+ (void)lockNode:(FSNode *)node;
+- (BOOL)hideSysFiles;
 
-+ (void)lockPath:(NSString *)path;
+- (void)setHiddenPaths:(NSArray *)paths;
 
-+ (void)lockNodes:(NSArray *)nodes;
+- (NSArray *)hiddenPaths;
 
-+ (void)lockPaths:(NSArray *)paths;
+- (void)lockNode:(FSNode *)node;
 
-+ (void)unlockNode:(FSNode *)node;
+- (void)lockPath:(NSString *)path;
 
-+ (void)unlockPath:(NSString *)path;
+- (void)lockNodes:(NSArray *)nodes;
 
-+ (void)unlockNodes:(NSArray *)nodes;
+- (void)lockPaths:(NSArray *)paths;
 
-+ (void)unlockPaths:(NSArray *)paths;
+- (void)unlockNode:(FSNode *)node;
 
-+ (BOOL)isNodeLocked:(FSNode *)node;
+- (void)unlockPath:(NSString *)path;
 
-+ (BOOL)isPathLocked:(NSString *)path;
+- (void)unlockNodes:(NSArray *)nodes;
 
-+ (void)setUseThumbnails:(BOOL)value;
+- (void)unlockPaths:(NSArray *)paths;
 
-+ (NSArray *)availableExtendedInfoNames;
+- (BOOL)isNodeLocked:(FSNode *)node;
 
-+ (NSDictionary *)extendedInfoOfType:(NSString *)type
+- (BOOL)isPathLocked:(NSString *)path;
+
+- (void)setUseThumbnails:(BOOL)value;
+
+- (BOOL)usesThumbnails;
+
+- (void)thumbnailsDidChange:(NSDictionary *)info;
+
+- (NSArray *)availableExtendedInfoNames;
+
+- (NSDictionary *)extendedInfoOfType:(NSString *)type
                              forNode:(FSNode *)anode;
 
 @end

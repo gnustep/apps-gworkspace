@@ -73,8 +73,8 @@ static id <DesktopApplication> desktopApp = nil;
     int count = [subNodes count];
     int i;
     
-    ASSIGN (icon, [FSNodeRep trashIconOfSize: icnBounds.size.width]);
-    ASSIGN (trashFullIcon, [FSNodeRep trashFullIconOfSize: icnBounds.size.width]);
+    ASSIGN (icon, [fsnodeRep trashIconOfSize: icnBounds.size.width]);
+    ASSIGN (trashFullIcon, [fsnodeRep trashFullIconOfSize: icnBounds.size.width]);
 
     for (i = 0; i < [subNodes count]; i++) {
       FSNode *subNode = [subNodes objectAtIndex: i];
@@ -226,7 +226,7 @@ static id <DesktopApplication> desktopApp = nil;
 
     for (i = 0; i < [sourcePaths count]; i++) {
       NSString *srcpath = [sourcePaths objectAtIndex: i];
-      FSNode *nd = [FSNode nodeWithRelativePath: srcpath parent: nil];
+      FSNode *nd = [FSNode nodeWithPath: srcpath];
       
       
       

@@ -62,8 +62,6 @@
 
 - (NSWindow *)myWin;
 
-- (id)fiendLeafOfType:(NSString *)type withName:(NSString *)name;
-
 - (NSPoint)positionOfLeaf:(id)aleaf;
 
 - (BOOL)dissolveLeaf:(id)aleaf;

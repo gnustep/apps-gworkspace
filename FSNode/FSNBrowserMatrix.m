@@ -284,12 +284,12 @@
   [self declareAndSetShapeOnPasteboard: pb];
 		
   if ([selectedCells count] > 1) {
-    dragIcon = [FSNodeRep multipleSelectionIconOfSize: iconSize];
+    dragIcon = [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: iconSize];
   
   } else {
     FSNode *node = [[selectedCells objectAtIndex: 0] node];
   
-    dragIcon = [FSNodeRep iconOfSize: iconSize forNode: node];
+    dragIcon = [[FSNodeRep sharedInstance] iconOfSize: iconSize forNode: node];
   }   
 
   dragPoint = [self convertPoint: dragPoint fromView: nil];

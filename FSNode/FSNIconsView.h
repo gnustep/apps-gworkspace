@@ -70,6 +70,8 @@
   NSColor *textColor;
   NSColor *disabledTextColor;
 
+  FSNodeRep *fsnodeRep;
+
   id <DesktopApplication> desktopApp;
 }
 
@@ -136,6 +138,7 @@
 - (void)selectRepsOfSubnodes:(NSArray *)nodes;
 - (void)selectRepsOfPaths:(NSArray *)paths;
 - (void)selectAll;
+- (void)scrollSelectionToVisible;
 - (NSArray *)reps;
 - (NSArray *)selectedReps;
 - (NSArray *)selectedNodes;

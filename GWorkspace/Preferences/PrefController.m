@@ -22,15 +22,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-#include "GWFunctions.h"
 #include "PrefController.h"
 #include "DefEditorPref.h"
 #include "XTermPref.h"
 #include "DefSortOrderPref.h"
-#include "ShelfPref.h"
 #include "IconsPref.h"
 #include "HiddenFilesPref.h"
 #include "GWorkspace.h"
@@ -63,7 +60,7 @@ static NSString *nibName = @"PrefWindow";
 - (void)awakeFromNib
 {
 #define ADD_PREF_VIEW(c) \
-currentPref = (id<PreferencesProtocol>)[[c alloc] init]; \
+currentPref = (id<PrefProtocol>)[[c alloc] init]; \
 [popUp addItemWithTitle: [currentPref prefName]]; \
 [preferences addObject: currentPref]; \
 RELEASE (currentPref)
@@ -82,7 +79,6 @@ RELEASE (currentPref)
   ADD_PREF_VIEW ([DefEditorPref class]);
   ADD_PREF_VIEW ([XTermPref class]);
   ADD_PREF_VIEW ([DefSortOrderPref class]);		
-  ADD_PREF_VIEW ([ShelfPref class]);
   ADD_PREF_VIEW ([IconsPref class]);
   ADD_PREF_VIEW ([HiddenFilesPref class]);
 
@@ -100,13 +96,13 @@ RELEASE (currentPref)
   [win makeKeyAndOrderFront: nil];
 }
 
-- (void)addPreference:(id <PreferencesProtocol>)anobject
+- (void)addPreference:(id <PrefProtocol>)anobject
 {
   [preferences addObject: anobject]; 
   [popUp addItemWithTitle: [anobject prefName]];
 }
 
-- (void)removePreference:(id <PreferencesProtocol>)anobject
+- (void)removePreference:(id <PrefProtocol>)anobject
 {
   NSString *prefName = [anobject prefName];
   int i = 0;
@@ -136,7 +132,7 @@ RELEASE (currentPref)
   }
 	
   for (i = 0; i < [preferences count]; i++) {
-    id <PreferencesProtocol>pref = [preferences objectAtIndex: i];		
+    id <PrefProtocol>pref = [preferences objectAtIndex: i];		
     if([[pref prefName] isEqualToString: prefName]) {
       currentPref = pref;
       break;

@@ -33,7 +33,7 @@ typedef NSString *(*cutIMP)(id, SEL, id, float);
 
 @class FSNode;
 @class NSImage;
-@class NSBezierPath;
+@class NSTextFieldCell;
 
 @interface FSNBrowserCell : NSBrowserCell <FSNodeRep>
 {
@@ -42,17 +42,16 @@ typedef NSString *(*cutIMP)(id, SEL, id, float);
   NSString *selectionTitle; 
   NSString *uncuttedTitle; 
   NSString *extInfoType;
+
+  FSNInfoType showType;
+  NSCell *infoCell;
+  NSRect titleRect;
+  NSRect infoRect;
   
   NSImage *icon;
   NSImage *openicon;
   int icnsize;
   float icnh;
-  
-  NSRect hlightRect;
-  
-  NSRect titleRect;
-  
-  FSNInfoType showType;
   
   BOOL isLocked;
   BOOL iconSelected;
@@ -62,6 +61,8 @@ typedef NSString *(*cutIMP)(id, SEL, id, float);
   
 	SEL cutTitleSel;
 	cutIMP cutTitle;
+  
+  FSNodeRep *fsnodeRep;  
 }
 
 - (void)setIcon;

@@ -102,6 +102,8 @@ static NSImage *branchImage;
     NSFont *infoFont;
     NSRect r = NSZeroRect;
     
+    fsnodeRep = [FSNodeRep sharedInstance];
+    
     iconSize = isize;
     icnBounds = NSMakeRect(0, 0, iconSize, iconSize);
     icnPoint = NSZeroPoint;
@@ -111,7 +113,7 @@ static NSImage *branchImage;
     selection = nil;
     selectionTitle = nil;
     
-    ASSIGN (icon, [FSNodeRep iconOfSize: iconSize forNode: node]);
+    ASSIGN (icon, [fsnodeRep iconOfSize: iconSize forNode: node]);
     drawicon = icon;
     openicon = nil;
     
@@ -124,12 +126,12 @@ static NSImage *branchImage;
     
     hlightRect = NSZeroRect;
     hlightRect.size.width = iconSize / 3 * 4;
-    hlightRect.size.height = hlightRect.size.width * [FSNodeRep highlightHeightFactor];
+    hlightRect.size.height = hlightRect.size.width * [fsnodeRep highlightHeightFactor];
     if ((hlightRect.size.height - iconSize) < 4) {
       hlightRect.size.height = iconSize + 4;
     }
     hlightRect = NSIntegralRect(hlightRect);
-    ASSIGN (highlightPath, [FSNodeRep highlightPathOfSize: hlightRect.size]);
+    ASSIGN (highlightPath, [fsnodeRep highlightPathOfSize: hlightRect.size]);
         
 		if ([[node path] isEqual: path_separator()] && ([node isMountPoint] == NO)) {
 		  NSHost *host = [NSHost currentHost];
@@ -163,13 +165,13 @@ static NSImage *branchImage;
     }
     
     labelRect = NSZeroRect;
-    labelRect.size.width = [label uncuttedTitleLenght] + [FSNodeRep labelMargin];
+    labelRect.size.width = [label uncuttedTitleLenght] + [fsnodeRep labelMargin];
     labelRect.size.height = [[label font] defaultLineHeightForFont];
     labelRect = NSIntegralRect(labelRect);
 
     infoRect = NSZeroRect;
     if ((showType != FSNInfoNameType) && [[infolabel stringValue] length]) {
-      infoRect.size.width = [infolabel uncuttedTitleLenght] + [FSNodeRep labelMargin];
+      infoRect.size.width = [infolabel uncuttedTitleLenght] + [fsnodeRep labelMargin];
     } else {
       infoRect.size.width = labelRect.size.width;
     }
@@ -292,7 +294,7 @@ static NSImage *branchImage;
 {
   NSRect frameRect = [self frame];
   NSSize sz = [icon size];
-  int lblmargin = [FSNodeRep labelMargin];
+  int lblmargin = [fsnodeRep labelMargin];
   BOOL hasinfo = ([[infolabel stringValue] length] > 0);
     
   if (icnPosition == NSImageAbove) {
@@ -584,7 +586,8 @@ static NSImage *branchImage;
 			  } else {
           NSTimeInterval interval = ([theEvent timestamp] - editstamp);
         
-          if (interval > DOUBLE_CLICK_LIMIT) {
+          if ((interval > DOUBLE_CLICK_LIMIT) 
+                            && [self mouse: location inRect: labelRect]) {
             if ([container respondsToSelector: @selector(setNameEditorForRep:)]) {
               [container setNameEditorForRep: self];
             }
@@ -702,7 +705,7 @@ static NSImage *branchImage;
   DESTROY (hostname);
   
   ASSIGN (node, anode);
-  ASSIGN (icon, [FSNodeRep iconOfSize: iconSize forNode: node]);
+  ASSIGN (icon, [fsnodeRep iconOfSize: iconSize forNode: node]);
   drawicon = icon;
   DESTROY (openicon);
   
@@ -754,7 +757,7 @@ static NSImage *branchImage;
   ASSIGN (selection, selnodes);
   ASSIGN (selectionTitle, ([NSString stringWithFormat: @"%i %@", 
                   [selection count], NSLocalizedString(@"elements", @"")]));
-  ASSIGN (icon, [FSNodeRep multipleSelectionIconOfSize: iconSize]);
+  ASSIGN (icon, [fsnodeRep multipleSelectionIconOfSize: iconSize]);
   drawicon = icon;
   DESTROY (openicon);
   
@@ -763,7 +766,7 @@ static NSImage *branchImage;
   
   [self setLocked: NO];
   for (i = 0; i < [selnodes count]; i++) {
-    if ([FSNodeRep isNodeLocked: [selnodes objectAtIndex: i]]) {
+    if ([fsnodeRep isNodeLocked: [selnodes objectAtIndex: i]]) {
       [self setLocked: YES];
       break;
     }
@@ -801,7 +804,7 @@ static NSImage *branchImage;
 - (void)setFont:(NSFont *)fontObj
 {
   NSFontManager *fmanager = [NSFontManager sharedFontManager];
-  int lblmargin = [FSNodeRep labelMargin];
+  int lblmargin = [fsnodeRep labelMargin];
   NSFont *infoFont;
 
   [label setFont: fontObj];
@@ -850,20 +853,20 @@ static NSImage *branchImage;
   iconSize = isize;
   icnBounds = NSMakeRect(0, 0, iconSize, iconSize);
   if (selection == nil) {
-    ASSIGN (icon, [FSNodeRep iconOfSize: iconSize forNode: node]);
+    ASSIGN (icon, [fsnodeRep iconOfSize: iconSize forNode: node]);
   } else {
-    ASSIGN (icon, [FSNodeRep multipleSelectionIconOfSize: iconSize]);
+    ASSIGN (icon, [fsnodeRep multipleSelectionIconOfSize: iconSize]);
   }
   drawicon = icon;
   DESTROY (openicon);
   hlightRect.size.width = rintf(iconSize / 3 * 4);
-  hlightRect.size.height = rintf(hlightRect.size.width * [FSNodeRep highlightHeightFactor]);
+  hlightRect.size.height = rintf(hlightRect.size.width * [fsnodeRep highlightHeightFactor]);
   if ((hlightRect.size.height - iconSize) < 4) {
     hlightRect.size.height = iconSize + 4;
   }
   hlightRect.origin.x = 0;
   hlightRect.origin.y = 0;
-  ASSIGN (highlightPath, [FSNodeRep highlightPathOfSize: hlightRect.size]); 
+  ASSIGN (highlightPath, [fsnodeRep highlightPathOfSize: hlightRect.size]); 
   [self tile];
 }
 
@@ -940,7 +943,7 @@ static NSImage *branchImage;
   [self setNodeInfoShowType: showType];
 
   if (selection == nil) {
-    NSDictionary *info = [FSNodeRep extendedInfoOfType: type forNode: node];
+    NSDictionary *info = [fsnodeRep extendedInfoOfType: type forNode: node];
 
     if (info) {
       [infolabel setStringValue: [info objectForKey: @"labelstr"]]; 
@@ -1100,7 +1103,7 @@ static NSImage *branchImage;
       if ([selectedPaths count] == 1) {
         dragIcon = icon;
       } else {
-        dragIcon = [FSNodeRep multipleSelectionIconOfSize: iconSize];
+        dragIcon = [fsnodeRep multipleSelectionIconOfSize: iconSize];
       }     
 
       dragPoint = [event locationInWindow];      
@@ -1250,7 +1253,7 @@ static NSImage *branchImage;
     
   } else {
     if ((openicon == nil) && isDragTarget && (onSelf == NO)) {
-      ASSIGN (openicon, [FSNodeRep openFolderIconOfSize: iconSize forNode: node]);
+      ASSIGN (openicon, [fsnodeRep openFolderIconOfSize: iconSize forNode: node]);
     }
   
     if ((drawicon == icon) && isDragTarget && (onSelf == NO)) {

@@ -35,6 +35,8 @@
   id delegate;
 }
 
+- (id)init;
+
 - (void)openSelection:(id)sender;
 
 - (void)openSelectionAsFolder:(id)sender;
@@ -50,6 +52,20 @@
 - (void)setViewerBehaviour:(id)sender;
 
 - (void)setViewerType:(id)sender;
+
+- (void)setShownType:(id)sender;
+
+- (void)setExtendedShownType:(id)sender;
+
+- (void)setIconsSize:(id)sender;
+
+- (void)setIconsPosition:(id)sender;
+
+- (void)setLabelSize:(id)sender;
+
+- (void)chooseLabelColor:(id)sender;
+
+- (void)chooseBackColor:(id)sender;
 
 - (void)selectAllInViewer:(id)sender;
 
@@ -77,6 +93,20 @@
 - (void)setViewerBehaviour:(id)sender;
 
 - (void)setViewerType:(id)sender;
+
+- (void)setShownType:(id)sender;
+
+- (void)setExtendedShownType:(id)sender;
+
+- (void)setIconsSize:(id)sender;
+
+- (void)setIconsPosition:(id)sender;
+
+- (void)setLabelSize:(id)sender;
+
+- (void)chooseLabelColor:(id)sender;
+
+- (void)chooseBackColor:(id)sender;
 
 - (void)selectAllInViewer;
 

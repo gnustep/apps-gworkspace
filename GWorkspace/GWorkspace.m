@@ -25,11 +25,10 @@
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include <math.h>
-#include "GWLib.h"
 #include "GWFunctions.h"
 #include "GWNotifications.h"
 #include "FSNodeRep.h"
-#include "ViewersProtocol.h"
+#include "FSNFunctions.h"
 #include "GWorkspace.h"
 #include "Dialogs/Dialogs.h"
 #include "Dialogs/OpenWithController.h"
@@ -37,7 +36,6 @@
 #include "Dialogs/StartAppWin.h"
 #include "Preferences/PrefController.h"
 #include "Fiend/Fiend.h"
-#include "ViewersWindow.h"
 #include "GWViewersManager.h"
 #include "GWViewer.h"
 #include "GWSpatialViewer.h"
@@ -132,9 +130,7 @@ static GWorkspace *gworkspace = nil;
   if ([filename isAbsolutePath] 
                     && [fm fileExistsAtPath: filename isDirectory: &isDir]) {
     if (isDir) {
-      id viewer = [self newViewerAtPath: filename
-                            canViewApps: [GWLib isPakageAtPath: filename]];
-      [viewer orderFrontRegardless];
+      [self newViewerAtPath: filename];
       return YES;
     } else {
       [self selectFile: filename 
@@ -164,65 +160,103 @@ static GWorkspace *gworkspace = nil;
 - (BOOL)selectFile:(NSString *)fullPath
 											inFileViewerRootedAtPath:(NSString *)rootFullpath
 {
-	NSArray *paths;
-	int l1, l2;
-	BOOL isdirRoot, isdirFpath;
-	BOOL newViewer = YES;
-
-	if ([fm fileExistsAtPath: fullPath isDirectory: &isdirFpath] == NO) {
-		return NO;
-	}
-	
-	if ((rootFullpath == nil) || ([rootFullpath length] == 0)) {
-		newViewer = NO;
-	} else if (([fm fileExistsAtPath: rootFullpath isDirectory: &isdirRoot] && isdirRoot) == NO) {
-		return NO;
-	}
-	
-	l1 = [rootFullpath length];
-	l2 = [fullPath length];  
-
-	if ((l1 > l2) || ((l1 == l2) && (isdirFpath == NO))) {
-		return NO;
-	}
-
-	if (newViewer) {
-		if ([[fullPath substringToIndex: l1] isEqualToString: rootFullpath] == NO) {
-			return NO;
-		}
-	}
-	
-	paths = [NSArray arrayWithObject: fullPath];
-	
-	if (newViewer) {
-    id viewer = [self viewerRootedAtPath: rootFullpath];
+  FSNode *node = [FSNode nodeWithPath: fullPath];
+  
+  if (node && [node isValid]) {
+    FSNode *base;
+  
+    if ((rootFullpath == nil) || ([rootFullpath length] == 0)) {
+      base = [FSNode nodeWithPath: path_separator()];
+    } else {
+      base = [FSNode nodeWithPath: rootFullpath];
+    }
+  
+    if (base && [base isValid]) {
+      if (([base isDirectory] == NO) || [base isPackage]) {
+        return NO;
+      }
     
-    if ((viewer == nil) || ([rootFullpath isEqual: fixPath(@"/", 0)])) {
-      NSString *app, *type;
-		  [ws getInfoForFile: rootFullpath application: &app type: &type];
-		  viewer = [self newViewerAtPath: rootFullpath canViewApps: (type == NSApplicationFileType)];
-		}
-    
-    [viewer setViewerSelection: paths];
-		[viewer activate];
-	} else {
-	  [self setSelectedPaths: paths];
-		[rootViewer setViewerSelection: paths];
-	}
-				
-	return YES;
+      [vwrsManager selectRepOfNode: node inViewerWithBaseNode: base];
+      return YES;
+    }
+  }
+   
+  return NO;
 }
 
 - (void)showRootViewer
 {
-  [rootViewer makeKeyAndOrderFront: nil];
+  id viewer = [vwrsManager rootViewer];
+  
+  if (viewer == nil) {
+    [vwrsManager showRootViewer];
+  } else {
+    [viewer activate];
+  }
 }
 
 - (void)rootViewerSelectFiles:(NSArray *)paths
 {
-  [rootViewer makeKeyAndOrderFront: nil];
-  [self setSelectedPaths: paths];
-  [rootViewer setViewerSelection: paths];
+  NSString *path = [[paths objectAtIndex: 0] stringByDeletingLastPathComponent];
+  FSNode *parentnode = [FSNode nodeWithPath: path];
+  NSArray *selection = [NSArray arrayWithArray: paths];
+  id viewer = [vwrsManager rootViewer];
+  id nodeView = nil;
+  BOOL newviewer = NO;
+
+  if ([paths count] == 1) {
+    FSNode *node = [FSNode nodeWithPath: [paths objectAtIndex: 0]];
+  
+    if ([node isDirectory] && ([node isPackage] == NO)) {
+      parentnode = [FSNode nodeWithPath: [node path]];
+      selection = [NSArray arrayWithObject: [node path]];
+    }
+  }
+    
+  if (viewer == nil) {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString *path = path_separator();
+    NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", path];
+    NSDictionary *viewerPrefs = [defaults objectForKey: prefsname];
+    int type = BROWSING;
+    
+    if (viewerPrefs) {
+      id entry = [viewerPrefs objectForKey: @"spatial"];
+   
+      if (entry) {
+        type = ([entry boolValue] ? SPATIAL : BROWSING);
+      }
+    }
+  
+    if (type == BROWSING) {
+      viewer = [vwrsManager showRootViewer];
+    } else {
+      newviewer = YES;
+    }
+    
+  } else if ([viewer vtype] == SPATIAL) {
+    newviewer = YES;
+  } 
+  
+  if (newviewer) {
+    viewer = [vwrsManager newViewerOfType: SPATIAL
+                                  forNode: parentnode
+                            showSelection: NO
+                           closeOldViewer: NO
+                                 forceNew: NO];
+  }
+  
+  nodeView = [viewer nodeView];
+  
+  if ([viewer vtype] == BROWSING) {
+    [nodeView showContentsOfNode: parentnode];
+  }
+  
+  [nodeView selectRepsOfPaths: selection];
+  
+  if ([nodeView respondsToSelector: @selector(scrollSelectionToVisible)]) {
+    [nodeView scrollSelectionToVisible];
+  }
 }
 
 - (void)slideImage:(NSImage *)image 
@@ -247,41 +281,14 @@ static GWorkspace *gworkspace = nil;
     
     if ((type == NSDirectoryFileType) || (type == NSFilesystemFileType)) {
       if (newv) {    
-        [self newViewerAtPath: apath canViewApps: NO];    
+        [self newViewerAtPath: apath];    
       }
     } else if ((type == NSPlainFileType) 
                         || ([type isEqual: NSShellCommandFileType])) {
-      if ([GWLib isPakageAtPath: apath]) {
-        if (newv) {    
-          [self newViewerAtPath: apath canViewApps: YES];    
-        } else {
-          [self openFile: apath];
-        }
-      } else {
-        [self openFile: apath];
-      }
-    } else if (type == NSApplicationFileType) {
-      if (newv) {    
-        [self newViewerAtPath: apath canViewApps: YES];    
-      } else {
-//        NSArray *launched = [ws launchedApplications];
-//        BOOL found = NO;
-//        int i;
-            
-//        for (i = 0; i < [launched count]; i++) {
-//          NSDictionary *dict = [launched objectAtIndex: i];
-//          NSString *applname = [dict objectForKey: @"NSApplicationName"]; 
-            
-//          if ([applname isEqual: apath]) {
-//            found = YES;
-//            break;
-//          }
-//        }
+      [self openFile: apath];
       
-//        if (found == NO) {
-          [ws launchApplication: apath];
-//        }
-      }
+    } else if (type == NSApplicationFileType) {
+      [ws launchApplication: apath];
     }
   }
 }
@@ -318,42 +325,6 @@ static GWorkspace *gworkspace = nil;
   }
 }
 
-- (id)newViewerAtPath:(NSString *)path 
-          canViewApps:(BOOL)viewapps
-{
-  BOOL setSelection = starting ? YES : ([path isEqual: fixPath(@"/", 0)] ? YES : NO);
-  NSString *infoPath = [path stringByAppendingPathComponent: @".dirinfo"];
-  BOOL spatial = [[NSUserDefaults standardUserDefaults] boolForKey: @"spatialviewers"];
-  id viewer = nil;
-  
-  if ([fm fileExistsAtPath: infoPath]) {
-    NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: infoPath];
-
-    if (dict) {
-      id entry = [dict objectForKey: @"spatial"];
-      spatial = entry ? [entry boolValue] : NO;      
-    }
-  }
-
-  if ((spatial == NO) || (starting && [path isEqual: fixPath(@"/", 0)])) {
-    viewer = [[ViewersWindow alloc] initWithViewerTemplates: viewersTemplates
-                                   forPath: path viewPakages: viewapps 
-                                        isRootViewer: NO onStart: setSelection];
-    [viewer activate];
-    [viewers addObject: viewer];
-    RELEASE (viewer);
-    
-  } else {
-    FSNode *node = [FSNode nodeWithRelativePath: path parent: nil];
-    
-    viewer = [vwrsManager newViewerOfType: 1 
-                                  forNode: node 
-                           closeOldViewer: nil];
-  }
-  
-  return viewer;
-}
-
 - (NSArray *)getSelectedPaths
 {
   return selectedPaths;
@@ -366,11 +337,6 @@ static GWorkspace *gworkspace = nil;
   tpath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
   tpath = [tpath stringByAppendingPathComponent: @"Desktop"];
   return [tpath stringByAppendingPathComponent: @".Trash"];
-}
-
-- (NSArray *)viewersSearchPaths
-{
-  return viewersSearchPaths;
 }
 
 - (BOOL)animateChdir
@@ -441,10 +407,6 @@ static GWorkspace *gworkspace = nil;
 	RELEASE (defXterm);
 	RELEASE (defXtermArgs);
   RELEASE (selectedPaths);
-  TEST_RELEASE (rootViewer);
-  RELEASE (viewers);  
-  TEST_RELEASE (viewersTemplates);
-  TEST_RELEASE (viewersSearchPaths);
   TEST_RELEASE (fiend);
 	TEST_RELEASE (history);
   RELEASE (openWithController);
@@ -459,81 +421,91 @@ static GWorkspace *gworkspace = nil;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-	NSUserDefaults *defaults;
 	NSString *processName;
-  NSMutableArray *viewersPaths;
-  NSString *path;
-	id result;
-	NSArray *keys;
-	NSMutableDictionary *viewersPrefs;
-  BOOL hideSysFiles;
-  int i, count;
+	NSUserDefaults *defaults;
+	id entry;
+  BOOL boolentry;
+  NSArray *extendedInfo;
+  NSMenu *menu;
+  int i;
   
 	[isa registerForServices];
-  
+    
   fm = [NSFileManager defaultManager];
 	ws = [NSWorkspace sharedWorkspace];
+
+  fsnodeRep = [FSNodeRep sharedInstance];
+
+  extendedInfo = [fsnodeRep availableExtendedInfoNames];
+  menu = [[[NSApp mainMenu] itemWithTitle: NSLocalizedString(@"View", @"")] submenu];
+  menu = [[menu itemWithTitle: NSLocalizedString(@"Show", @"")] submenu];
+
+  for (i = 0; i < [extendedInfo count]; i++) {
+	  [menu addItemWithTitle: [extendedInfo objectAtIndex: i] 
+										action: @selector(setExtendedShownType:) 
+             keyEquivalent: @""];
+  }
 	    
 	defaults = [NSUserDefaults standardUserDefaults];
 	processName = [[NSProcessInfo processInfo] processName];    
 	[defaults setObject: processName forKey: @"GSWorkspaceApplication"];
         
-	result = [defaults stringForKey: @"defaulteditor"];
-	if (result == nil) {
+	entry = [defaults stringForKey: @"defaulteditor"];
+	if (entry == nil) {
 		defEditor = [[NSString alloc] initWithString: defaulteditor];
 	} else {
-		ASSIGN (defEditor, result);
+		ASSIGN (defEditor, entry);
   }
 
-	result = [defaults stringForKey: @"defxterm"];
-	if (result == nil) {
+	entry = [defaults stringForKey: @"defxterm"];
+	if (entry == nil) {
 		defXterm = [[NSString alloc] initWithString: defaultxterm];
 	} else {
-		ASSIGN (defXterm, result);
+		ASSIGN (defXterm, entry);
   }
 
-	result = [defaults stringForKey: @"defaultxtermargs"];
-	if (result == nil) {
+	entry = [defaults stringForKey: @"defaultxtermargs"];
+	if (entry == nil) {
 		defXtermArgs = nil;
 	} else {
-		ASSIGN (defXtermArgs, result);
+		ASSIGN (defXtermArgs, entry);
   }
   
-	result = [defaults objectForKey: @"shelfcellswidth"];
-	if (result == nil) {
+	entry = [defaults objectForKey: @"shelfcellswidth"];
+	if (entry == nil) {
     shelfCellsWidth = 90;
 	} else {
-    shelfCellsWidth = [result intValue];
+    shelfCellsWidth = [entry intValue];
   }
 		
-	result = [defaults objectForKey: @"defaultsorttype"];	
-	if (result == nil) { 
-		[defaults setObject: @"0" forKey: @"defaultsorttype"];
-    [GWLib setDefSortType: byname];
+	entry = [defaults objectForKey: @"default_sortorder"];	
+	if (entry == nil) { 
+		[defaults setObject: @"0" forKey: @"default_sortorder"];
+    [fsnodeRep setDefaultSortOrder: byname];
 	} else {
-    [GWLib setDefSortType: [result intValue]];
+    [fsnodeRep setDefaultSortOrder: [entry intValue]];
 	}
 
-  result = [defaults objectForKey: @"GSFileBrowserHideDotFiles"];
-  if (result) {
-    hideSysFiles = [result boolValue];
+  entry = [defaults objectForKey: @"GSFileBrowserHideDotFiles"];
+  if (entry) {
+    boolentry = [entry boolValue];
   } else {  
     NSDictionary *domain = [defaults persistentDomainForName: NSGlobalDomain];
     
-    result = [domain objectForKey: @"GSFileBrowserHideDotFiles"];
-    if (result) {
-      hideSysFiles = [result boolValue];
+    entry = [domain objectForKey: @"GSFileBrowserHideDotFiles"];
+    if (entry) {
+      boolentry = [entry boolValue];
     } else {  
-      hideSysFiles = NO;
+      boolentry = NO;
     }
   }
-  [GWLib setHideSysFiles: hideSysFiles];
-  
-	result = [defaults objectForKey: @"hiddendirs"];
-	if (result) {
-    [GWLib setHiddenPaths: result];
+  [fsnodeRep setHideSysFiles: boolentry];
+
+	entry = [defaults objectForKey: @"hiddendirs"];
+	if (entry) {
+    [fsnodeRep setHiddenPaths: entry];
 	} 
-  
+
   animateChdir = ![defaults boolForKey: @"nochdiranim"];
   animateSlideBack = ![defaults boolForKey: @"noslidebackanim"];
   
@@ -541,49 +513,8 @@ static GWorkspace *gworkspace = nil;
 
   dontWarnOnQuit = [defaults boolForKey: @"NoWarnOnQuit"];
 
-  usesThumbnails = [defaults boolForKey: @"usesthumbnails"];
-  [GWLib setUseThumbnails: usesThumbnails];
-
-	result = [defaults dictionaryForKey: @"viewersprefs"];
-	if (result) { 
-		viewersPrefs = [result mutableCopy];
-	} else {
-		viewersPrefs = [[NSMutableDictionary alloc] initWithCapacity: 1];
-	}
-	keys = [viewersPrefs allKeys];
-  for (i = 0; i < [keys count]; i++) {
-    BOOL exists, isdir;
-		NSString *key = [keys objectAtIndex: i];	
-    
-    if ([key isEqual: @"rootViewer"] == NO) {
-		  exists = [fm fileExistsAtPath: key isDirectory: &isdir];    
-		  if((exists == NO) || (isdir == NO)) {
-        [viewersPrefs removeObjectForKey: key];
-      }
-    }
-  }  
-	[defaults setObject: viewersPrefs forKey: @"viewersprefs"];
-	RELEASE (viewersPrefs);
-
-	result = [defaults objectForKey: @"viewerspaths"];
-	if (result == nil) {
-		viewersPaths = [NSMutableArray new];
-	} else {
-		viewersPaths = [result mutableCopy];
-  }
-  count = [viewersPaths count];
-  for (i = 0; i < count; i++) {
-    BOOL exists, isdir;
-    NSString *path = [viewersPaths objectAtIndex: i];
-		exists = [fm fileExistsAtPath: path isDirectory: &isdir];    
-		if((exists == NO) || (isdir == NO)) {
-      [viewersPaths removeObjectAtIndex: i];
-      i--;
-      count--;
-    }
-  }  
-  [defaults setObject: viewersPaths forKey: @"viewerspaths"];
-  RELEASE (viewersPaths);
+  boolentry = [defaults boolForKey: @"use_thumbnails"];
+  [fsnodeRep setUseThumbnails: boolentry];
   
 	selectedPaths = [[NSArray alloc] initWithObjects: NSHomeDirectory(), nil];
 
@@ -617,30 +548,10 @@ static GWorkspace *gworkspace = nil;
   runExtController = [[RunExternalController alloc] init];
   	
   starting = YES;
-  viewers = [[NSMutableArray alloc] initWithCapacity: 1];
-  viewersSearchPaths = [[NSMutableArray alloc] initWithCapacity: 1];
-	[self makeViewersTemplates];
 
   vwrsManager = [GWViewersManager viewersManager];
-
-  rootViewer = nil;
-  [self showViewer: nil];
-  
-	viewersPaths = [defaults objectForKey: @"viewerspaths"];
-  for (i = 0; i < [viewersPaths count]; i++) {
-    path = [viewersPaths objectAtIndex: i];    
-    [self newViewerAtPath: path 
-              canViewApps: ([GWLib isPakageAtPath: path] ? YES : NO)];
-  }
-    
-  result = [defaults objectForKey: @"cachedmax"];
-  if (result) {
-    [GWLib setCachedMax: [result intValue]];
-  } else {  
-    [GWLib setCachedMax: CACHED_MAX];
-    [defaults setObject: [NSNumber numberWithInt: CACHED_MAX] forKey: @"cachedmax"];
-  }  
-  
+  [vwrsManager showViewers];
+        
 	starting = NO;
 
   inspectorApp = nil;
@@ -690,8 +601,6 @@ static GWorkspace *gworkspace = nil;
 
 - (BOOL)applicationShouldTerminate:(NSApplication *)app 
 {
-	int i;
-
 #define TEST_CLOSE(o, w) if ((o) && ([w isVisible])) [w close]
   
   if (dontWarnOnQuit == NO) {
@@ -703,14 +612,11 @@ static GWorkspace *gworkspace = nil;
       return NO;
     }
   }
-
+  
+  fswnotifications = NO;
+  
   [self updateDefaults];
 
-	TEST_CLOSE (rootViewer, rootViewer);
-	for (i = 0; i < [viewers count]; i++) {
-		id vwr = [viewers objectAtIndex: i];
-		TEST_CLOSE (vwr, vwr);
-	}
 	TEST_CLOSE (prefController, [prefController myWin]);
 	TEST_CLOSE (fiend, [fiend myWin]);
 	TEST_CLOSE (history, [history myWin]); 
@@ -809,22 +715,19 @@ static GWorkspace *gworkspace = nil;
 
 - (id)rootViewer
 {
-  return rootViewer;
+  return nil;
 }
 
-- (id)viewerRootedAtPath:(NSString *)vpath
+- (void)newViewerAtPath:(NSString *)path
 {
-  int i;
-  
-  for (i = 0; i < [viewers count]; i++) {
-    ViewersWindow *viewer = [viewers objectAtIndex: i];
-    
-    if ([[viewer rootPath] isEqual: vpath]) {
-      return viewer;
-    }
-  }  
-  
-  return nil;
+  FSNode *node = [FSNode nodeWithPath: path];
+  unsigned type = [vwrsManager typeOfViewerForNode: node];
+
+  [vwrsManager newViewerOfType: type 
+                       forNode: node 
+                 showSelection: NO
+                closeOldViewer: nil
+                      forceNew: NO];
 }
 
 - (NSImage *)tshelfBackground
@@ -878,9 +781,8 @@ static GWorkspace *gworkspace = nil;
 - (void)updateDefaults
 {
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-  NSMutableArray *viewersPaths;
-  int i;
- 
+  id entry;
+   
 	if ((tshelfWin != nil) && ([tshelfWin isVisible])) {
 		[tshelfWin saveDefaults];  
 		[defaults setBool: YES forKey: @"tshelf"];
@@ -902,18 +804,14 @@ static GWorkspace *gworkspace = nil;
 	}
   
 	[history updateDefaults];
-  [rootViewer updateDefaults];
   
-  [defaults setObject: [GWLib hiddenPaths] forKey: @"hiddendirs"];
+  [defaults setObject: [fsnodeRep hiddenPaths] 
+               forKey: @"hiddendirs"];
 
-	viewersPaths = [NSMutableArray arrayWithCapacity: 1];
-  for (i = 0; i < [viewers count]; i++) {
-    ViewersWindow *viewer = [viewers objectAtIndex: i];
-    [viewer updateDefaults];
-    [viewersPaths addObject: [viewer rootPath]];
-  }  
-	
-	[defaults setObject: viewersPaths forKey: @"viewerspaths"];
+  entry = [NSNumber numberWithInt: [fsnodeRep defaultSortOrder]];
+  [defaults setObject: entry forKey: @"default_sortorder"];
+  
+  [vwrsManager updateDefaults];
       
 	[defaults setObject: defEditor forKey: @"defaulteditor"];
 	[defaults setObject: defXterm forKey: @"defxterm"];
@@ -927,7 +825,8 @@ static GWorkspace *gworkspace = nil;
   [defaults setBool: !animateChdir forKey: @"nochdiranim"];
   [defaults setBool: !animateSlideBack forKey: @"noslidebackanim"];
 
-  [defaults setBool: usesThumbnails forKey: @"usesthumbnails"];
+  [defaults setBool: [fsnodeRep usesThumbnails]  
+             forKey: @"use_thumbnails"];
 
   [defaults setBool: (inspectorApp != nil) forKey: @"uses_inspector"];
 
@@ -953,12 +852,12 @@ static GWorkspace *gworkspace = nil;
 
 - (int)defaultSortType
 {
-	return [GWLib defSortType];
+	return [fsnodeRep defaultSortOrder];
 }
 
 - (void)setDefaultSortType:(int)type
 {
-  [GWLib setDefSortType: type];
+  [fsnodeRep setDefaultSortOrder: type];
 }
 
 - (int)shelfCellsWidth
@@ -1098,268 +997,29 @@ static GWorkspace *gworkspace = nil;
             return NO;
           }
         }
-
-      } else if ([kwin isKindOfClass: [ViewersWindow class]]) {
-        id viewer = [(ViewersWindow *)kwin viewer];
-        NSArray *selection = [viewer selectedPaths];  
-        NSString *vpath = [(ViewersWindow *)kwin currentViewedPath]; 
-
-        if (selection && [selection count] && vpath) {
-          if ([selection isEqual: [NSArray arrayWithObject: vpath]]) {
-            return ([title isEqual: NSLocalizedString(@"Paste", @"")]);
-          } 
-
-        } else {
-          return ([title isEqual: NSLocalizedString(@"Paste", @"")]);
-        }
-      }
+      } 
     }
   }
   
 	return YES;
 }
 
-- (void)makeViewersTemplates
-{
-  NSString *bundlesDir;
-	NSMutableArray *bundlesPaths;
-	NSArray *bPaths;
-	int i;
-	
-#define VERIFY_VIEWERS( x ) \
-if (!x) { \
-NSRunAlertPanel(NSLocalizedString(@"error", @""), \
-NSLocalizedString(@"No Viewer found! Quitting now.", @""), \
-NSLocalizedString(@"OK", @""), nil, nil); \
-[[NSApplication sharedApplication] terminate: nil];	\
-} 
-
-	TEST_RELEASE (viewersTemplates);
-  viewersTemplates = [[NSMutableArray alloc] initWithCapacity: 1];
-  
-  bundlesPaths = [NSMutableArray array];
-  
-  //load all default Viewers
-  bundlesDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSSystemDomainMask, YES) lastObject];
-  bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
-  [viewersSearchPaths addObject: bundlesDir];
-  bPaths = [self bundlesWithExtension: @"viewer" inDirectory: bundlesDir];
-	[bundlesPaths addObjectsFromArray: bPaths];
-  
-	VERIFY_VIEWERS (bundlesPaths && [bundlesPaths count]);																								
-
-  //load user Viewers
-  bundlesDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
-  bundlesDir = [bundlesDir stringByAppendingPathComponent: @"GWorkspace"];
-  [viewersSearchPaths addObject: bundlesDir];
-  [bundlesPaths addObjectsFromArray: [self bundlesWithExtension: @"viewer" 
-			                                              inDirectory: bundlesDir]];
-              
-  for (i = 0; i < [bundlesPaths count]; i++) {
-		NSString *bpath = [bundlesPaths objectAtIndex: i];
-		NSBundle *bundle = [NSBundle bundleWithPath: bpath]; 
-		
-		if (bundle) {
-			Class principalClass = [bundle principalClass];
-			
-			if (principalClass) {
-				if ([principalClass conformsToProtocol: @protocol(ViewersProtocol)]) {	
-					id<ViewersProtocol> vwr = AUTORELEASE ([[principalClass alloc] init]);
-
-          [self addViewer: vwr withBundlePath: bpath];
-				}
-			}
-  	}
-	}
-	
-	VERIFY_VIEWERS([viewersTemplates count]);
-  
-  [[NSNotificationCenter defaultCenter] addObserver: self 
-                	selector: @selector(watcherNotification:) 
-                			name: GWFileWatcherFileDidChangeNotification
-                		object: nil];
-    
-  for (i = 0; i < [viewersSearchPaths count]; i++) {
-    NSString *spath = [viewersSearchPaths objectAtIndex: i];
-    [GWLib addWatcherForPath: spath];
-  }
-}
-
-- (void)addViewer:(id)vwr withBundlePath:(NSString *)bpath
-{
-	NSString *name = [vwr menuName];
-  BOOL found = NO;
-  int i = 0;
-  
-	for (i = 0; i < [viewersTemplates count]; i++) {
-		NSDictionary *vdict = [viewersTemplates objectAtIndex: i];
-    NSString *vname = [vdict objectForKey: @"name"];
-    
-    if ([vname isEqual: name]) {
-      found = YES;
-      break;
-    }
-	}
-  
-  if (found == NO) {
-	  NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity: 1];
-
-    [dict setObject: vwr forKey: @"viewer"];
-	  [dict setObject: name forKey: @"name"];
-    [dict setObject: bpath forKey: @"path"];
-    [viewersTemplates addObject: dict];
-    
-    if ([vwr hasPreferences]) {
-      [prefController addPreference: [vwr prefController]];
-    }
-
-	  [[NSNotificationCenter defaultCenter]
- 				  postNotificationName: GWViewersListDidChangeNotification
-	 								      object: viewersTemplates];  
-  }
-}
-
-- (void)removeViewerWithBundlePath:(NSString *)bpath
-{
-  int i, count;
-  
-  count = [viewersTemplates count];
-	for (i = 0; i < count; i++) {
-		NSDictionary *vdict = [viewersTemplates objectAtIndex: i];
-    id vwr = [vdict objectForKey: @"viewer"];
-    NSString *path = [vdict objectForKey: @"path"];
-    
-    if ([path isEqual: bpath]) {
-      if ((count - 1) == 0) {
-        NSRunAlertPanel(NSLocalizedString(@"error", @""), 
-             NSLocalizedString(@"No Viewer found! Quitting now.", @""), 
-                                    NSLocalizedString(@"OK", @""), nil, nil);                                     
-        [[NSApplication sharedApplication] terminate: nil];
-      }
-      
-      if ([vwr hasPreferences]) {
-        [prefController removePreference: [vwr prefController]];
-      }
-      
-      [viewersTemplates removeObject: vdict];
-      [[NSNotificationCenter defaultCenter]
-              postNotificationName: GWViewersListDidChangeNotification
-                            object: viewersTemplates];  
-      break;
-    }
-  }
-}
-
-- (NSMutableArray *)bundlesWithExtension:(NSString *)extension 
-											       inDirectory:(NSString *)dirpath
-{
-  NSMutableArray *bundleList = [NSMutableArray array];
-  NSEnumerator *enumerator;
-  NSString *dir;
-  BOOL isDir;
-  
-  if (!(([fm fileExistsAtPath: dirpath isDirectory: &isDir]) && isDir)) {
-		return nil;
-  }
-	  
-  enumerator = [[fm directoryContentsAtPath: dirpath] objectEnumerator];
-  while ((dir = [enumerator nextObject])) {
-    if ([[dir pathExtension] isEqualToString: extension]) {
-			[bundleList addObject: [dirpath stringByAppendingPathComponent: dir]];
-		}
-  }
-  
-  return bundleList;
-}
-
-- (NSArray *)viewersPaths
-{
-	NSMutableArray *vpaths = [NSMutableArray arrayWithCapacity: 1];
-	int i;
-
-	for (i = 0; i < [viewersTemplates count]; i++) {
-		NSDictionary *vdict = [viewersTemplates objectAtIndex: i];
-		[vpaths addObject: [vdict objectForKey: @"path"]];
-	}
-	
-	return vpaths;
-}
-
 - (void)checkViewersAfterHidingOfPaths:(NSArray *)paths
 {
-  int i = [viewers count] - 1;
+//  int i = [viewers count] - 1;
   
-	while (i >= 0) {
-		id viewer = [viewers objectAtIndex: i];
+//	while (i >= 0) {
+//		id viewer = [viewers objectAtIndex: i];
     
-    [viewer checkRootPathAfterHidingOfPaths: paths];
-    i--;
-	}
+//    [viewer checkRootPathAfterHidingOfPaths: paths];
+//    i--;
+//	}
   
-  [rootViewer checkRootPathAfterHidingOfPaths: paths];
+//  [rootViewer checkRootPathAfterHidingOfPaths: paths];
     
   if (tshelfWin != nil) {
     [tshelfWin checkIconsAfterHidingOfPaths: paths]; 
 	}
-}
-
-- (void)watcherNotification:(NSNotification *)notification
-{
-  NSDictionary *notifdict = (NSDictionary *)[notification object];
-  NSString *path = [notifdict objectForKey: @"path"];
-  NSArray *vpaths = [self viewersPaths];
-  
-  if ([viewersSearchPaths containsObject: path] == NO) {
-    return;    
-
-  } else {
-    NSString *event = [notifdict objectForKey: @"event"];
-    int i, count;
-
-    if (event == GWFileDeletedInWatchedDirectory) {
-      NSArray *files = [notifdict objectForKey: @"files"];
-
-      count = [files count];
-      for (i = 0; i < count; i++) { 
-        NSString *fname = [files objectAtIndex: i];
-        NSString *bpath = [path stringByAppendingPathComponent: fname];
-        
-        if ([vpaths containsObject: bpath]) { 
-          [self removeViewerWithBundlePath: bpath];      
-          i--;
-          count--;
-        }
-      }
-
-    } else if (event == GWFileCreatedInWatchedDirectory) {
-      NSArray *files = [notifdict objectForKey: @"files"];
-      
-      for (i = 0; i < [files count]; i++) { 
-        NSString *fname = [files objectAtIndex: i];
-        NSString *bpath = [path stringByAppendingPathComponent: fname];
-        NSBundle *bundle = [NSBundle bundleWithPath: bpath]; 
-		
-		    if (bundle) {
-			    Class principalClass = [bundle principalClass];
-
-			    if (principalClass) {
-				    if ([principalClass conformsToProtocol: @protocol(ViewersProtocol)]) {	
-					    id<ViewersProtocol> vwr = AUTORELEASE ([[principalClass alloc] init]);
-
-              [self addViewer: vwr withBundlePath: bpath];
-				    }
-			    }
-  	    }
-      }
-    }
-  }
-}
-
-- (void)viewerHasClosed:(id)sender
-{
-  if (sender != rootViewer) {
-    [viewers removeObject: sender];
-  }
 }
 
 - (void)iconAnimationChanged:(NSNotification *)notif
@@ -1417,10 +1077,6 @@ NSLocalizedString(@"OK", @""), nil, nil); \
       NSString *fullpath = [destination stringByAppendingPathComponent: fname];
       [paths addObject: fullpath];
     }
-
-    if ([viewersSearchPaths containsObject: destination] == NO) {
-      [GWLib lockFiles: files inDirectoryAtPath: destination];
-    }
   }
 
   if (opPtr == NSWorkspaceMoveOperation 
@@ -1433,13 +1089,9 @@ NSLocalizedString(@"OK", @""), nil, nil); \
       NSString *fullpath = [source stringByAppendingPathComponent: fname];
       [paths addObject: fullpath];
     }
-
-    if ([viewersSearchPaths containsObject: source] == NO) {
-      [GWLib lockFiles: files inDirectoryAtPath: source];
-    }
   }
 
-  [FSNodeRep lockPaths: paths];
+  [fsnodeRep lockPaths: paths];
 
 	[dict setObject: opPtr forKey: @"operation"];	
   [dict setObject: source forKey: @"source"];	
@@ -1499,8 +1151,6 @@ NSLocalizedString(@"OK", @""), nil, nil); \
       NSString *fullpath = [destination stringByAppendingPathComponent: fname];
       [paths addObject: fullpath];
     }
-
-		[GWLib unLockFiles: origfiles inDirectoryAtPath: destination];	
   }
 
   if (opPtr == NSWorkspaceMoveOperation 
@@ -1513,11 +1163,9 @@ NSLocalizedString(@"OK", @""), nil, nil); \
       NSString *fullpath = [source stringByAppendingPathComponent: fname];
       [paths addObject: fullpath];
     }
-
-    [GWLib unLockFiles: origfiles inDirectoryAtPath: source];
   }
 
-  [FSNodeRep unlockPaths: paths];
+  [fsnodeRep unlockPaths: paths];
 
 	[dict setObject: opPtr forKey: @"operation"];	
   [dict setObject: source forKey: @"source"];	
@@ -1594,7 +1242,8 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   }
 }
 
-- (void)newObjectAtPath:(NSString *)basePath isDirectory:(BOOL)directory
+- (void)newObjectAtPath:(NSString *)basePath 
+            isDirectory:(BOOL)directory
 {
   NSString *fullPath;
 	NSString *fileName;
@@ -1740,25 +1389,15 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 }
 
 - (void)setUsesThumbnails:(BOOL)value
-{
-  int i;
-  
-  if (usesThumbnails == value) {
+{  
+  if ([fsnodeRep usesThumbnails] == value) {
     return;
   }
   
-  [GWLib setUseThumbnails: value];
-  
-  [FSNodeRep setUseThumbnails: value];
-  
-  usesThumbnails = value;
+  [fsnodeRep setUseThumbnails: value];
   
   [vwrsManager thumbnailsDidChangeInPaths: nil];
   
-  [rootViewer thumbnailsDidChangeInPaths: nil];
-  for (i = 0; i < [viewers count]; i++) {
-		[[viewers objectAtIndex: i] thumbnailsDidChangeInPaths: nil];
-	}
   if ((tshelfWin != nil) && ([tshelfWin isVisible])) {
     [tshelfWin updateIcons]; 
 	}
@@ -1772,7 +1411,9 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   NSMutableArray *tmbdirs = [NSMutableArray array];
   int i;
 
-  if (usesThumbnails == NO) {
+  [fsnodeRep thumbnailsDidChange: info];
+
+  if ([fsnodeRep usesThumbnails] == NO) {
     return;
   } else {
     NSString *thumbnailDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
@@ -1791,11 +1432,6 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 
       [vwrsManager thumbnailsDidChangeInPaths: tmbdirs];
 
-      [rootViewer thumbnailsDidChangeInPaths: tmbdirs];
-      
-      for (i = 0; i < [viewers count]; i++) {
-		    [[viewers objectAtIndex: i] thumbnailsDidChangeInPaths: tmbdirs];
-	    }
       if ((tshelfWin != nil) && ([tshelfWin isVisible])) {
         [tshelfWin updateIcons]; 
 		  }
@@ -1822,12 +1458,7 @@ NSLocalizedString(@"OK", @""), nil, nil); \
       }
 
       [vwrsManager thumbnailsDidChangeInPaths: tmbdirs];
-
-      [rootViewer thumbnailsDidChangeInPaths: tmbdirs];
       
-      for (i = 0; i < [viewers count]; i++) {
-		    [[viewers objectAtIndex: i] thumbnailsDidChangeInPaths: tmbdirs];
-	    }
       if ((tshelfWin != nil) && ([tshelfWin isVisible])) {
         [tshelfWin updateIcons]; 
 		  }
@@ -2517,18 +2148,7 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 
 - (void)showViewer:(id)sender
 {
-	if (rootViewer == nil) {
-    rootViewer = [[ViewersWindow alloc] initWithViewerTemplates: viewersTemplates
-                                forPath: fixPath(@"/", 0) viewPakages: NO  
-                                            isRootViewer: YES onStart: starting];
-    [rootViewer activate];
-  } else {
-    if ([rootViewer isVisible] == NO) {
-  	  [rootViewer activate];
-    } else {
-      [self newViewerAtPath: fixPath(@"/", 0) canViewApps: NO];
-    }
-  }
+  [vwrsManager showRootViewer];
 }
 
 - (void)showHistory:(id)sender
@@ -2782,32 +2402,6 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
         [iview doCut];    
       }
       
-    } else if ([kwin isKindOfClass: [ViewersWindow class]]) {
-      id viewer = [(ViewersWindow *)kwin viewer];
-      NSArray *selection = [viewer selectedPaths];  
-      NSString *vpath = [(ViewersWindow *)kwin currentViewedPath]; 
-  
-      if (selection && [selection count]) {
-        if ([selection isEqual: [NSArray arrayWithObject: vpath]] == NO) {
-          NSPasteboard *pb = [NSPasteboard generalPasteboard];
-
-          [pb declareTypes: [NSArray arrayWithObject: NSFilenamesPboardType]
-                     owner: nil];
-
-          if ([pb setPropertyList: selection forType: NSFilenamesPboardType]) {
-            [self connectOperation];
-
-            if (operationsApp) {
-              [(id <OperationProtocol>)operationsApp setFilenamesCutted: YES];
-            } else {
-              NSRunAlertPanel(nil, 
-                  NSLocalizedString(@"File operations disabled!", @""), 
-                                      NSLocalizedString(@"OK", @""), nil, nil);                                     
-            }
-          }
-        }
-      } 
-    
     } else if ([vwrsManager hasViewerWithWindow: kwin]) {
       id nodeView = [[vwrsManager viewerWithWindow: kwin] nodeView];
       NSArray *selection = [nodeView selectedPaths];  
@@ -2848,32 +2442,6 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
         [iview doCopy];    
       }
       
-    } else if ([kwin isKindOfClass: [ViewersWindow class]]) {
-      id viewer = [(ViewersWindow *)kwin viewer];
-      NSArray *selection = [viewer selectedPaths];  
-      NSString *vpath = [(ViewersWindow *)kwin currentViewedPath]; 
-  
-      if (selection && [selection count]) {
-        if ([selection isEqual: [NSArray arrayWithObject: vpath]] == NO) {
-          NSPasteboard *pb = [NSPasteboard generalPasteboard];
-
-          [pb declareTypes: [NSArray arrayWithObject: NSFilenamesPboardType]
-                     owner: nil];
-
-          if ([pb setPropertyList: selection forType: NSFilenamesPboardType]) {
-            [self connectOperation];
-
-            if (operationsApp) {
-              [(id <OperationProtocol>)operationsApp setFilenamesCutted: NO];
-            } else {
-              NSRunAlertPanel(nil, 
-                  NSLocalizedString(@"File operations disabled!", @""), 
-                                      NSLocalizedString(@"OK", @""), nil, nil);                                     
-            }
-          }
-        }
-      } 
-    
     } else if ([vwrsManager hasViewerWithWindow: kwin]) {
       id nodeView = [[vwrsManager viewerWithWindow: kwin] nodeView];
       NSArray *selection = [nodeView selectedPaths];  
@@ -2912,60 +2480,6 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
       if (item) {
         TShelfIconsView *iview = (TShelfIconsView *)[item view];
         [iview doPaste];    
-      }
-      
-    } else if ([kwin isKindOfClass: [ViewersWindow class]]) {
-      NSPasteboard *pb = [NSPasteboard generalPasteboard];
-
-      if ([[pb types] containsObject: NSFilenamesPboardType]) {
-        NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType];   
-
-        if (sourcePaths) {
-          [self connectOperation];
-
-          if (operationsApp) {
-            id viewer = [(ViewersWindow *)kwin viewer];
-            BOOL cutted = [(id <OperationProtocol>)operationsApp filenamesWasCutted];
-
-            if ([viewer validatePasteOfFilenames: sourcePaths
-                                       wasCutted: cutted]) {
-              NSMutableDictionary *opDict = [NSMutableDictionary dictionary];
-              NSString *source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
-              NSString *destination = [(ViewersWindow *)kwin currentViewedPath];
-              NSMutableArray *files = [NSMutableArray array];
-              NSString *operation;
-              int i;
-              
-              for (i = 0; i < [sourcePaths count]; i++) {  
-                NSString *spath = [sourcePaths objectAtIndex: i];
-                [files addObject: [spath lastPathComponent]];
-              }  
-
-              if (cutted) {
-                if ([source isEqual: [self trashPath]]) {
-                  operation = GWorkspaceRecycleOutOperation;
-                } else {
-		              operation = NSWorkspaceMoveOperation;
-                }
-              } else {
-		            operation = NSWorkspaceCopyOperation;
-              }
-
-	            [opDict setObject: operation forKey: @"operation"];
-	            [opDict setObject: source forKey: @"source"];
-	            [opDict setObject: destination forKey: @"destination"];
-	            [opDict setObject: files forKey: @"files"];
-
-	            [self performFileOperationWithDictionary: opDict];	
-            }
-
-          } else {
-            NSRunAlertPanel(nil, 
-                NSLocalizedString(@"File operations disabled!", @""), 
-                                    NSLocalizedString(@"OK", @""), nil, nil); 
-            return;                                    
-          }
-        }
       }
       
     } else if ([vwrsManager hasViewerWithWindow: kwin]) {

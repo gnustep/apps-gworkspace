@@ -31,7 +31,6 @@
 #include "FSNBrowser.h"
 #include "FSNFunctions.h"
 
-#define CELL_HEIGHT 15
 #define ICON_CELL_HEIGHT 28
 
 #define CHECKRECT(rct) \
@@ -85,6 +84,7 @@ static id <DesktopApplication> desktopApp = nil;
   
   if (self) {
 	  NSRect rect = NSMakeRect(0, 0, 150, 100);
+    int lineh = floor([[acell font] defaultLineHeightForFont]);
                 
     browser = abrowser;
     index = ind;
@@ -105,17 +105,23 @@ static id <DesktopApplication> desktopApp = nil;
     
     [self setFrame: rect];
     
+    fsnodeRep = [FSNodeRep sharedInstance];
+    
     scroll = [[FSNBrowserScroll alloc] initWithFrame: rect inColumn: self];
     [self addSubview: scroll];
     RELEASE (scroll);
     
     if (cellsIcon) {
-      isDragTarget = NO;
       cellsHeight = ICON_CELL_HEIGHT;
     } else {
-      cellsHeight = floor([[cellPrototype font] defaultLineHeightForFont]);
-    //  cellsHeight = CELL_HEIGHT;
+      cellsHeight = lineh;
     }
+    
+    if (infoType != FSNInfoNameType) {
+      cellsHeight += (lineh +1);
+    }
+    
+    isDragTarget = NO;
   }
   
   return self;
@@ -128,23 +134,28 @@ static id <DesktopApplication> desktopApp = nil;
     DESTROY (extInfoType);
     
     if (matrix) {
+      int lineh = floor([[cellPrototype font] defaultLineHeightForFont]);
       NSArray *cells = [matrix cells];
-      SEL compSel = [FSNodeRep compareSelectorForDirectory: [shownNode path]];
       int i;
+
+      if (cellsIcon) {
+        cellsHeight = ICON_CELL_HEIGHT;
+      } else {
+        cellsHeight = lineh;
+      }
+      
+      if (infoType != FSNInfoNameType) {
+        cellsHeight += (lineh +1);
+      }
+      
+      [self adjustMatrix];
 
 	    for (i = 0; i < [cells count]; i++) {
         [[cells objectAtIndex: i] setNodeInfoShowType: infoType];
       }
-
-      [matrix sortUsingSelector: compSel];
     }   
   }
 }
-
-
-// cellsHeight
-
-
 
 - (void)setExtendedShowType:(NSString *)type
 {
@@ -153,16 +164,24 @@ static id <DesktopApplication> desktopApp = nil;
     ASSIGN (extInfoType, type);
 
     if (matrix) {
+      int lineh = floor([[cellPrototype font] defaultLineHeightForFont]);
       NSArray *cells = [matrix cells];
       int i;
 
+      if (cellsIcon) {
+        cellsHeight = ICON_CELL_HEIGHT;
+      } else {
+        cellsHeight = lineh;
+      }
+      
+      cellsHeight += (lineh +1);
+      
+      [self adjustMatrix];
+      
 	    for (i = 0; i < [cells count]; i++) {
         FSNBrowserCell *cell = [cells objectAtIndex: i];
         [cell setExtendedShowType: extInfoType];
       }
-
-      [matrix sortUsingFunction: (int (*)(id, id, void*))compareWithExtType
-                        context: (void *)NULL];
     }   
   }
 }
@@ -210,7 +229,6 @@ static id <DesktopApplication> desktopApp = nil;
     ASSIGN (shownNode, anode);    
         
     [self createRowsInMatrix];
-    [matrix setCellSize: NSMakeSize([scroll contentSize].width, cellsHeight)];  
     [self adjustMatrix];
 
     if (savedSelection) {
@@ -252,6 +270,7 @@ static id <DesktopApplication> desktopApp = nil;
 {
   NSArray *subNodes = [shownNode subNodes];
   int count = [subNodes count];
+  SEL compSel = [fsnodeRep compareSelectorForDirectory: [shownNode path]];
   int i;
 
 	matrix = [[FSNBrowserMatrix alloc] initInColumn: self 
@@ -309,13 +328,7 @@ static id <DesktopApplication> desktopApp = nil;
     [cell checkLocked];	
   }
 
-  if (infoType == FSNInfoExtendedType) {
-    [matrix sortUsingFunction: (int (*)(id, id, void*))compareWithExtType
-                      context: (void *)NULL];
-  } else {
-    SEL compSel = [FSNodeRep compareSelectorForDirectory: [shownNode path]];
-    [matrix sortUsingSelector: compSel];
-  }
+  [matrix sortUsingSelector: compSel];
 }
 
 - (void)addCellsWithNames:(NSArray *)names
@@ -324,6 +337,7 @@ static id <DesktopApplication> desktopApp = nil;
 
   if ([subNodes count]) {
     NSArray *selectedCells = [matrix selectedCells];
+    SEL compSel = [fsnodeRep compareSelectorForDirectory: [shownNode path]];
     int i;
 
     [matrix setIntercellSpacing: NSMakeSize(0, 0)];
@@ -362,18 +376,8 @@ static id <DesktopApplication> desktopApp = nil;
       }
     }
 
-    [matrix setCellSize: NSMakeSize([scroll contentSize].width, cellsHeight)];  
-
-    if (infoType == FSNInfoExtendedType) {
-      [matrix sortUsingFunction: (int (*)(id, id, void*))compareWithExtType
-                        context: (void *)NULL];
-    } else {
-      SEL compSel = [FSNodeRep compareSelectorForDirectory: [shownNode path]];
-      [matrix sortUsingSelector: compSel];
-    }
-    
+    [matrix sortUsingSelector: compSel];
 	  [self adjustMatrix];
-    [matrix sizeToCells];  
 
 	  if (selectedCells) {
       [self selectCells: selectedCells sendAction: NO];
@@ -447,7 +451,7 @@ static id <DesktopApplication> desktopApp = nil;
       if (index != 0) {		
         if ((index - 1) >= [browser firstVisibleColumn]) {
           col = [browser columnBeforeColumn: self];
-          cell = [col cellOfNode: [shownNode parent]];
+          cell = [col cellWithPath: [shownNode parentPath]];
 
           [col selectCell: cell sendAction: YES];
         }

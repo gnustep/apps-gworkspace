@@ -24,15 +24,8 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-  #ifdef GNUSTEP 
-#include "GWLib.h"
-#include "GWFunctions.h"
-#include "GWNotifications.h"
-  #else
-#include <GWorkspace/GWLib.h>
-#include <GWorkspace/GWFunctions.h>
-#include <GWorkspace/GWNotifications.h>
-  #endif
+#include "FSNodeRep.h"
+#include "FSNFunctions.h"
 #include "TShelfIconsView.h"
 #include "TShelfIcon.h"
 #include "TShelfPBIcon.h"
@@ -105,7 +98,7 @@
 	self = [super init];
   
   if (self) {
-    NSArray *hiddenPaths = [GWLib hiddenPaths];
+    NSArray *hiddenPaths = [[FSNodeRep sharedInstance] hiddenPaths];
     int i, j;
 
     fm = [NSFileManager defaultManager];
@@ -172,13 +165,13 @@
 		    [[NSNotificationCenter defaultCenter] 
                    addObserver: self 
                 	    selector: @selector(fileSystemWillChange:) 
-                			    name: GWFileSystemWillChangeNotification
+                			    name: @"GWFileSystemWillChangeNotification"
                 		    object: nil];
 
 		    [[NSNotificationCenter defaultCenter] 
                    addObserver: self 
                 	    selector: @selector(fileSystemDidChange:) 
-                			    name: GWFileSystemDidChangeNotification
+                			    name: @"GWFileSystemDidChangeNotification"
                 		    object: nil];                     
       } else {
         NSArray *types = [NSArray arrayWithObjects: NSStringPboardType,
@@ -196,7 +189,7 @@
 		  [[NSNotificationCenter defaultCenter] 
                  addObserver: self 
                     selector: @selector(watcherNotification:) 
-                		    name: GWFileWatcherFileDidChangeNotification
+                		    name: @"GWFileWatcherFileDidChangeNotification"
                 	    object: nil];
 	  }
   }
@@ -442,7 +435,7 @@
 	      for (m = 0; m < [hpaths count]; m++) {
           NSString *fp = [hpaths objectAtIndex: m]; 
 
-          if (subPathOfPath(fp, op) || [fp isEqualToString: op]) {  
+          if (isSubpathOfPath(fp, op) || [fp isEqual: op]) {  
             [self removeIcon: icon];
             count--;
             i--;
@@ -465,19 +458,19 @@
 
 - (void)fileSystemWillChange:(NSNotification *)notification
 {
-  NSDictionary *dict = [notification userInfo];
+  NSDictionary *dict = [notification object];
   NSString *operation = [dict objectForKey: @"operation"];
 	NSString *source = [dict objectForKey: @"source"];	  
 	NSArray *files = [dict objectForKey: @"files"];	 
 
   if ([operation isEqual: NSWorkspaceMoveOperation] 
         || [operation isEqual: NSWorkspaceDestroyOperation]
-				|| [operation isEqual: GWorkspaceRenameOperation]
+				|| [operation isEqual: @"GWorkspaceRenameOperation"]
 				|| [operation isEqual: NSWorkspaceRecycleOperation]
-				|| [operation isEqual: GWorkspaceRecycleOutOperation]
-				|| [operation isEqual: GWorkspaceEmptyRecyclerOperation]) {
-    
-    NSMutableArray *paths = [NSMutableArray arrayWithCapacity: 1];
+				|| [operation isEqual: @"GWorkspaceRecycleOutOperation"]
+				|| [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]) {
+
+    NSMutableArray *paths = [NSMutableArray array];
     NSArray *iconpaths;
     int i, j, m;
 
@@ -518,17 +511,17 @@
   int count;
 	int i, j, m;
   
-  dict = [notification userInfo];
+  dict = [notification object];
   operation = [dict objectForKey: @"operation"];
   source = [dict objectForKey: @"source"];
   destination = [dict objectForKey: @"destination"];
   files = [dict objectForKey: @"files"];
 		                    
-  if ([operation isEqual: GWorkspaceRenameOperation]) {      
+  if ([operation isEqual: @"GWorkspaceRenameOperation"]) {      
     for (i = 0; i < [icons count]; i++) {
       icon = [icons objectAtIndex: i];      
       if ([icon isSinglePath] == YES) {      
-        if ([[[icon paths] objectAtIndex: 0] isEqualToString: source]) {     
+        if ([[[icon paths] objectAtIndex: 0] isEqual: source]) {     
           [icon setPaths: [NSArray arrayWithObject: destination]];
           [icon setNeedsDisplay: YES];
 					[self resizeWithOldSuperviewSize: [self frame].size];  
@@ -538,17 +531,17 @@
     }        
   }  
 
-  if ([operation isEqual: GWorkspaceRenameOperation]) {
+  if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
 		files = [NSArray arrayWithObject: [source lastPathComponent]];
     source = [source stringByDeletingLastPathComponent];
   }	
 		                    
   if ([operation isEqual: NSWorkspaceMoveOperation] 
         || [operation isEqual: NSWorkspaceDestroyOperation]
-				|| [operation isEqual: GWorkspaceRenameOperation]
+				|| [operation isEqual: @"GWorkspaceRenameOperation"]
 				|| [operation isEqual: NSWorkspaceRecycleOperation]
-				|| [operation isEqual: GWorkspaceRecycleOutOperation]
-				|| [operation isEqual: GWorkspaceEmptyRecyclerOperation]) {
+				|| [operation isEqual: @"GWorkspaceRecycleOutOperation"]
+				|| [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]) {
 
     paths = [NSMutableArray arrayWithCapacity: 1];
     for (i = 0; i < [files count]; i++) {
@@ -579,7 +572,6 @@
           if (deleted) {
             break;
           } 
-
         }
 
         if (deleted) {
@@ -601,7 +593,7 @@
   if (iconsType == DATA_TAB) {
     int count = [icons count];
     
-    if (event == GWFileDeletedInWatchedDirectory) { 
+    if ([event isEqual: @"GWFileDeletedInWatchedDirectory"]) { 
       NSArray *files = [notifdict objectForKey: @"files"];
     
       for (i = 0; i < count; i++) {
@@ -613,7 +605,7 @@
           NSString *fname = [files objectAtIndex: j];
           NSString *fullPath = [path stringByAppendingPathComponent: fname];
 
-          if ([fullPath isEqualToString: dataPath]) {
+          if ([fullPath isEqual: dataPath]) {
             [self removeIcon: icon];
             count--;
             i--;
@@ -622,13 +614,13 @@
       }
     }
   } else {
-	  if (event == GWFileCreatedInWatchedDirectory) {
+	  if ([event isEqual: @"GWFileCreatedInWatchedDirectory"]) {
 		  return;
 	  }
 
 	  for (i = 0; i < [watchedPaths count]; i++) {
 		  NSString *wpath = [watchedPaths objectAtIndex: i];
-		  if (([wpath isEqualToString: path]) || (subPathOfPath(path, wpath))) {
+		  if (([wpath isEqual: path]) || (isSubpathOfPath(path, wpath))) {
 			  contained = YES;
 			  break;
 		  }
@@ -640,13 +632,13 @@
 		  NSString *ipath;
 		  int count = [icons count];
 
-		  if (event == GWWatchedDirectoryDeleted) {		
+		  if ([event isEqual: @"GWWatchedDirectoryDeleted"]) {		
 			  for (i = 0; i < count; i++) {
 				  icon = [icons objectAtIndex: i];
 				  ipaths = [icon paths];
 				  ipath = [ipaths objectAtIndex: 0];
 
-				  if (subPathOfPath(path, ipath)) {
+				  if (isSubpathOfPath(path, ipath)) {
 					  [self removeIcon: icon];
 					  count--;
 					  i--;
@@ -655,7 +647,7 @@
 			  return;
 		  }		
 
-		  if (event == GWFileDeletedInWatchedDirectory) { 
+		  if ([event isEqual: @"GWFileDeletedInWatchedDirectory"]) { 
 			  NSArray *files = [notifdict objectForKey: @"files"];
 
 			  for (i = 0; i < count; i++) {
@@ -671,8 +663,8 @@
 						  NSString *fname = [files objectAtIndex: j];
 						  NSString *fullPath = [path stringByAppendingPathComponent: fname];
 
-						  if ((subPathOfPath(fullPath, ipath))
-															  || ([ipath isEqualToString: fullPath])) {
+						  if ((isSubpathOfPath(fullPath, ipath))
+															  || ([ipath isEqual: fullPath])) {
 							  [self removeIcon: icon];
 							  count--;
 							  i--;
@@ -693,7 +685,7 @@
 						  }
 
 						  ipath = [ipaths objectAtIndex: 0];
-						  if (subPathOfPath(fullPath, ipath)) {
+						  if (isSubpathOfPath(fullPath, ipath)) {
 							  [self removeIcon: icon];
 							  count--;
 							  i--;
@@ -703,7 +695,7 @@
 						  for (m = 0; m < [ipaths count]; m++) {
 							  ipath = [ipaths objectAtIndex: m];
 
-							  if ([ipath isEqualToString: fullPath]) {
+							  if ([ipath isEqual: fullPath]) {
 								  NSMutableArray *newpaths;
 
 								  if ([ipaths count] == 1) {
@@ -741,7 +733,7 @@
 
 - (void)setWatcherForPath:(NSString *)path
 {
-	[GWLib addWatcherForPath: path];
+	[gw addWatcherForPath: path];
 }
 
 - (void)unsetWatchers
@@ -755,7 +747,7 @@
 
 - (void)unsetWatcherForPath:(NSString *)path
 {
-	[GWLib removeWatcherForPath: path];
+	[gw removeWatcherForPath: path];
 }
 
 - (void)makePositions

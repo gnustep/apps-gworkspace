@@ -22,12 +22,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-#include "GWLib.h"
-#include "GWFunctions.h"
-#include "GWNotifications.h"
 #include "IconsPref.h"
 #include "GWorkspace.h"
 #include "GNUstep.h"
@@ -115,7 +111,7 @@ static NSString *nibName = @"IconsPref";
   [defaults synchronize];
   
 	[[NSNotificationCenter defaultCenter]
- 				postNotificationName: GWIconAnimationChangedNotification
+ 				postNotificationName: @"GWIconAnimationChangedNotification"
 	 								    object: nil];	
   
 	[actChangesButt setEnabled: NO];

@@ -8,7 +8,7 @@ ADDITIONAL_OBJCFLAGS += -Wall
 ADDITIONAL_CFLAGS += -Wall
 
 # Additional include directories the compiler should search
-ADDITIONAL_INCLUDE_DIRS += -I../../GWLib
+#ADDITIONAL_INCLUDE_DIRS 
 
 # Additional LDFLAGS to pass to the linker
 ADDITIONAL_LDFLAGS += 

@@ -64,6 +64,8 @@
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	      
     id defentry;
     
+    fsnodeRep = [FSNodeRep sharedInstance];
+    
     visibleIcons = vicns;
     viewer = vwr;
     ownScroller = ownscr;
@@ -120,7 +122,7 @@
       defentry = [defaults objectForKey: @"extended_info_type"];
 
       if (defentry) {
-        NSArray *availableTypes = [FSNodeRep availableExtendedInfoNames];
+        NSArray *availableTypes = [fsnodeRep availableExtendedInfoNames];
       
         if ([availableTypes containsObject: defentry]) {
           ASSIGN (extInfoType, defentry);
@@ -160,7 +162,7 @@
                  selection:(NSArray *)selection
 {
   NSString *firstsel = [selection objectAtIndex: 0];
-  FSNode *node = [FSNode nodeWithRelativePath: firstsel parent: nil];
+  FSNode *node = [FSNode nodeWithPath: firstsel];
   int count = [components count];
   FSNIcon *icon;
   int icncount;
@@ -198,7 +200,7 @@
     
       for (i = 0; i < [selection count]; i++) {
         NSString *selpath = [selection objectAtIndex: i];
-        FSNode *selnode = [FSNode nodeWithRelativePath: selpath parent: nil];
+        FSNode *selnode = [FSNode nodeWithPath: selpath];
         [selnodes addObject: selnode];
       }
       
@@ -262,7 +264,7 @@
   NSSize labelSize = NSZeroSize;
   
   highlightSize.width = ceil(iconSize / 3 * 4);
-  highlightSize.height = ceil(highlightSize.width * [FSNodeRep highlightHeightFactor]);
+  highlightSize.height = ceil(highlightSize.width * [fsnodeRep highlightHeightFactor]);
   if ((highlightSize.height - iconSize) < 4) {
     highlightSize.height = iconSize + 4;
   }
@@ -429,7 +431,7 @@
 
 - (id)addRepForSubnodePath:(NSString *)apath
 {
-  FSNode *subnode = [FSNode nodeWithRelativePath: apath parent: nil];
+  FSNode *subnode = [FSNode nodeWithPath: apath];
   return [self addRepForSubnode: subnode];
 }
 
@@ -500,6 +502,11 @@
   return NSSingleSelectionMask;
 }
 
+- (void)openSelectionInNewViewer:(BOOL)newv
+{
+  [viewer openSelectionInNewViewer: newv];
+}
+
 - (void)restoreLastSelection
 {
   [[self lastIcon] select];
@@ -546,7 +553,7 @@
     NSRect icnr = [arep frame];
     float centerx = icnr.origin.x + (icnr.size.width / 2);    
     NSRect labr = [arep labelRect];
-    int margin = [FSNodeRep labelMargin];
+    int margin = [fsnodeRep labelMargin];
     float bw = [self bounds].size.width - EDIT_MARGIN;
     float edwidth = 0.0; 
     NSFontManager *fmanager = [NSFontManager sharedFontManager];
@@ -622,7 +629,7 @@
   NSRect icnr = [editIcon frame];
   float centerx = icnr.origin.x + (icnr.size.width / 2);
   float edwidth = [[nameEditor font] widthOfString: [nameEditor stringValue]]; 
-  int margin = [FSNodeRep labelMargin];
+  int margin = [fsnodeRep labelMargin];
   float bw = [self bounds].size.width - EDIT_MARGIN;
   NSRect edrect = [nameEditor frame];
   
@@ -669,7 +676,7 @@
     NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
           [NSString stringWithFormat: @"%@\"%@\"!\n", 
               NSLocalizedString(@"You have not write permission for ", @""), 
-                  [[ednode parent] name]], NSLocalizedString(@"Continue", @""), nil, nil);   
+                  [ednode parentName]], NSLocalizedString(@"Continue", @""), nil, nil);   
     CLEAREDITING;
     
   } else {

@@ -339,7 +339,7 @@ static NSString *nibName = @"ResultsWindow";
                             
 - (void)nextResult:(NSString *)path
 {
-  FSNode *node = [FSNode nodeWithRelativePath: path parent: nil];
+  FSNode *node = [FSNode nodeWithPath: path];
   NSString *elmstr = NSLocalizedString(@"elements", @"");
   
   [foundObjects addObject: node];
@@ -741,7 +741,7 @@ static NSString *nibName = @"ResultsWindow";
     ResultsTextCell *cell = (ResultsTextCell *)[nameColumn dataCell];
     FSNode *node = [sortedObjects objectAtIndex: rowIndex];
 
-    [cell setIcon: [FSNodeRep iconOfSize: 24 forNode: node]];
+    [cell setIcon: [[FSNodeRep sharedInstance] iconOfSize: 24 forNode: node]];
     
   } else if (aTableColumn == dateColumn) {
     [(ResultsTextCell *)[dateColumn dataCell] setDateCell: YES];
@@ -780,12 +780,12 @@ static NSString *nibName = @"ResultsWindow";
       dragImageForRows:(NSArray *)dragRows
 {
   if ([dragRows count] > 1) {
-    return [FSNodeRep multipleSelectionIconOfSize: 24];
+    return [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: 24];
   } else {
     int index = [[dragRows objectAtIndex: 0] intValue];
     FSNode *node = [sortedObjects objectAtIndex: index];
     
-    return [FSNodeRep iconOfSize: 24 forNode: node];
+    return [[FSNodeRep sharedInstance] iconOfSize: 24 forNode: node];
   }
 
   return nil;

@@ -37,6 +37,10 @@ static NSString *dots = @"...";
 static float dtslenght = 0.0;  
 static NSDictionary *fontAttr = nil;
 
+static NSFont *infoFont = nil;
+static int infoheight = 0;
+
+
 @implementation FSNBrowserCell
 
 - (void)dealloc
@@ -45,6 +49,7 @@ static NSDictionary *fontAttr = nil;
   TEST_RELEASE (selectionTitle);
   TEST_RELEASE (uncuttedTitle);
   TEST_RELEASE (extInfoType);
+  TEST_RELEASE (infoCell); 
   TEST_RELEASE (icon); 
   TEST_RELEASE (openicon); 
   RELEASE (dots);
@@ -64,6 +69,16 @@ static NSDictionary *fontAttr = nil;
       SEL sel = NSSelectorFromString(selName);
       desktopApp = [desktopAppClass performSelector: sel];
     }
+    
+    fontAttr = [NSDictionary dictionaryWithObject: [NSFont systemFontOfSize: 12]
+                                           forKey: NSFontAttributeName];
+    RETAIN (fontAttr);
+    dtslenght = [dots sizeWithAttributes: fontAttr].width;     
+    infoFont = [NSFont systemFontOfSize: 10];
+    infoFont = [[NSFontManager sharedFontManager] convertFont: infoFont 
+                                                  toHaveTrait: NSItalicFontMask];
+    RETAIN (infoFont);
+    infoheight = floor([infoFont defaultLineHeightForFont]);
   }
 }
 
@@ -72,13 +87,6 @@ static NSDictionary *fontAttr = nil;
   self = [super init];
   
   if (self) {
-    if (fontAttr == nil) {
-      fontAttr = [NSDictionary dictionaryWithObject: [self font] 
-                                             forKey: NSFontAttributeName];
-      RETAIN (fontAttr);
-      dtslenght = [dots sizeWithAttributes: fontAttr].width;     
-    }
-    
     cutTitleSel = @selector(cutTitle:toFitWidth:);
     cutTitle = (cutIMP)[self methodForSelector: cutTitleSel]; 
        
@@ -96,6 +104,8 @@ static NSDictionary *fontAttr = nil;
     nameEdited = NO;
     
     [self setAllowsMixedState: NO];
+    
+    fsnodeRep = [FSNodeRep sharedInstance];
   }
 
   return self;
@@ -104,7 +114,7 @@ static NSDictionary *fontAttr = nil;
 - (void)setIcon
 {
   if (node) {
-    ASSIGN (icon, [FSNodeRep iconOfSize: icnsize forNode: node]);
+    ASSIGN (icon, [fsnodeRep iconOfSize: icnsize forNode: node]);
     icnh = [icon size].height;
     DESTROY (openicon);
   }
@@ -125,7 +135,7 @@ static NSDictionary *fontAttr = nil;
   }
   
   if (openicon == nil) {
-    NSImage *opicn = [FSNodeRep openFolderIconOfSize: icnsize forNode: node];
+    NSImage *opicn = [fsnodeRep openFolderIconOfSize: icnsize forNode: node];
 
     if (opicn) {
       ASSIGN (openicon, opicn);
@@ -217,17 +227,50 @@ static NSDictionary *fontAttr = nil;
   cuttitle = (*cutTitle)(self, cutTitleSel, uncuttedTitle, textlenght);
   [self setStringValue: cuttitle];        
 
+  [self setShowsFirstResponder: NO];
+
   if (icon == nil) {
     if (nameEdited == NO) {
-      [super drawInteriorWithFrame: titleRect inView: controlView];
+      if (infoCell) {
+        if (([self isHighlighted] || [self state]) && (nameEdited == NO)) {
+	        [[self highlightColorInView: controlView] set];
+          NSRectFill(cellFrame);
+        }
+      
+        titleRect.size.height -= infoheight;
+        
+        if ([controlView isFlipped]) {
+          titleRect.origin.y += cellFrame.size.height;
+          titleRect.origin.y -= (titleRect.size.height + infoheight);
+        } else {
+          titleRect.origin.y += infoheight;
+        }
+     
+        [super drawInteriorWithFrame: titleRect inView: controlView];
+
+      } else {
+        [super drawInteriorWithFrame: titleRect inView: controlView];
+      }
+      
     } else {
       [backcolor set];
       NSRectFill(cellFrame);
     }
+    
+    if (infoCell) {
+      infoRect = NSMakeRect(cellFrame.origin.x + 2, cellFrame.origin.y + 3,
+                                      cellFrame.size.width - 2, infoheight);
+
+      if ([controlView isFlipped]) {
+	      infoRect.origin.y += (cellFrame.size.height - infoRect.size.height);
+        infoRect.origin.y -= 6;
+      }
+
+      [infoCell drawInteriorWithFrame: infoRect inView: controlView];
+    } 
+    
   } else {
     NSRect icon_rect;    
-
-    [controlView lockFocus];
 
     if (([self isHighlighted] || [self state]) && (nameEdited == NO)) {
 	    [[self highlightColorInView: controlView] set];
@@ -236,13 +279,28 @@ static NSDictionary *fontAttr = nil;
 	  }
 	  NSRectFill(cellFrame);
 
-    [self setShowsFirstResponder: NO];
-    
-    icon_rect.origin = cellFrame.origin;
+    if (infoCell) {
+      titleRect.size.height -= infoheight;
+
+      if ([controlView isFlipped]) {
+        titleRect.origin.y += cellFrame.size.height;
+        titleRect.origin.y -= (titleRect.size.height + infoheight);
+      } else {
+        titleRect.origin.y += infoheight;
+      }
+    }
+  
+    icon_rect.origin = titleRect.origin;
     icon_rect.size = NSMakeSize(icnsize, icnh);
     icon_rect.origin.x += MARGIN;
-    icon_rect.origin.y += ((cellFrame.size.height - icon_rect.size.height) / 2.0);
+    icon_rect.origin.y += ((titleRect.size.height - icon_rect.size.height) / 2.0);
+
     if ([controlView isFlipped]) {
+      if (infoCell) {
+        icon_rect.origin.y += cellFrame.size.height;
+        icon_rect.origin.y -= (titleRect.size.height + infoheight);
+      }
+
 	    icon_rect.origin.y += icon_rect.size.height;
     }
     
@@ -252,6 +310,20 @@ static NSDictionary *fontAttr = nil;
     if (nameEdited == NO) {        
       [super drawInteriorWithFrame: titleRect inView: controlView];
     }
+
+    if (infoCell) {
+      infoRect = NSMakeRect(cellFrame.origin.x + 2, cellFrame.origin.y + 3,
+                                      cellFrame.size.width - 2, infoheight);
+
+      if ([controlView isFlipped]) {
+	      infoRect.origin.y += (cellFrame.size.height - infoRect.size.height);
+        infoRect.origin.y -= 6;
+      }
+
+      [infoCell drawInteriorWithFrame: infoRect inView: controlView];
+    }
+    
+    [controlView lockFocus];
         
     if ([self isEnabled]) {
       if (iconSelected) {
@@ -273,12 +345,12 @@ static NSDictionary *fontAttr = nil;
 			[icon dissolveToPoint: icon_rect.origin fraction: 0.3];
     }
 
-    if (showsFirstResponder) {
-      [self setShowsFirstResponder: showsFirstResponder];
-      NSDottedFrameRect(cellFrame);
-    }
-
     [controlView unlockFocus];
+  }
+
+  if (showsFirstResponder) {
+    [self setShowsFirstResponder: showsFirstResponder];
+    NSDottedFrameRect(cellFrame);
   }
 
   [self setStringValue: uncuttedTitle];          
@@ -297,15 +369,9 @@ static NSDictionary *fontAttr = nil;
     [self setIcon];
   }
   
-  if ((showType == FSNInfoExtendedType) && (extInfoType != nil)) {
-    if ([self setExtendedShowType: extInfoType] == NO) {
-      showType = FSNInfoNameType;
-      [self setNodeInfoShowType: showType];  
-    }
+  if (extInfoType) {
+    [self setExtendedShowType: extInfoType];
   } else {
-    if (showType == FSNInfoExtendedType) {
-      showType = FSNInfoNameType;
-    }
     [self setNodeInfoShowType: showType];  
   }
   
@@ -316,13 +382,13 @@ static NSDictionary *fontAttr = nil;
    nodeInfoType:(FSNInfoType)type
    extendedType:(NSString *)exttype
 {
-  showType = type;
-  
-  if (exttype) {
-    ASSIGN (extInfoType, exttype);
-  }
-
   [self setNode: anode];
+
+  if (exttype) {
+    [self setExtendedShowType: exttype];
+  } else {
+    [self setNodeInfoShowType: type];  
+  }
 }
 
 - (FSNode *)node
@@ -337,7 +403,7 @@ static NSDictionary *fontAttr = nil;
   ASSIGN (node, [selnodes objectAtIndex: 0]);
   ASSIGN (selection, selnodes);
   if (icon) {
-    ASSIGN (icon, [FSNodeRep multipleSelectionIconOfSize: icnsize]);
+    ASSIGN (icon, [fsnodeRep multipleSelectionIconOfSize: icnsize]);
     icnh = [icon size].height;
   }  
   ASSIGN (selectionTitle, ([NSString stringWithFormat: @"%i %@", 
@@ -346,7 +412,7 @@ static NSDictionary *fontAttr = nil;
 
   [self setLocked: NO];
   for (i = 0; i < [selnodes count]; i++) {
-    if ([FSNodeRep isNodeLocked: [selnodes objectAtIndex: i]]) {
+    if ([fsnodeRep isNodeLocked: [selnodes objectAtIndex: i]]) {
       [self setLocked: YES];
       break;
     }
@@ -428,63 +494,56 @@ static NSDictionary *fontAttr = nil;
 
 - (void)setNodeInfoShowType:(FSNInfoType)type
 {
-  if (showType == FSNInfoExtendedType) {
-    NSFontManager *fmanager = [NSFontManager sharedFontManager];
-    NSFont *font = [fmanager convertFont: [self font] 
-                          toNotHaveTrait: NSItalicFontMask];
-    [self setFont: font];
-  }
-
   showType = type;
   DESTROY (extInfoType);
   
   if (selection) {
     [self setStringValue: selectionTitle];
+    if (infoCell) {
+      [infoCell setStringValue: @""];
+    }
     return;
   }
-
+  
+  [self setStringValue: [node name]];
+  
+  if (showType == FSNInfoNameType) {
+    DESTROY (infoCell);
+  } else if (infoCell == nil) {
+    infoCell = [NSCell new];
+    [infoCell setFont: infoFont];
+  }
+  
   switch(showType) {
-    case FSNInfoNameType:
-      [self setStringValue: [node name]];
-      break;
     case FSNInfoKindType:
-      [self setStringValue: [node typeDescription]];
+      [infoCell setStringValue: [node typeDescription]];
       break;
     case FSNInfoDateType:
-      [self setStringValue: [node modDateDescription]];
+      [infoCell setStringValue: [node modDateDescription]];
       break;
     case FSNInfoSizeType:
-      [self setStringValue: [node sizeDescription]];
+      [infoCell setStringValue: [node sizeDescription]];
       break;
     case FSNInfoOwnerType:
-      [self setStringValue: [node owner]];
+      [infoCell setStringValue: [node owner]];
       break;
     default:
-      [self setStringValue: [node name]];
       break;
   }
 }
 
 - (BOOL)setExtendedShowType:(NSString *)type
 {
+  ASSIGN (extInfoType, type);
+  showType = FSNInfoExtendedType;   
+
+  [self setNodeInfoShowType: showType];
+
   if (selection == nil) {
-    NSDictionary *info = [FSNodeRep extendedInfoOfType: type forNode: node];
+    NSDictionary *info = [fsnodeRep extendedInfoOfType: type forNode: node];
 
     if (info) {
-      NSString *labelstr = [info objectForKey: @"labelstr"];
-
-      [self setStringValue: labelstr]; 
-
-      if (showType != FSNInfoExtendedType) {
-        NSFontManager *fmanager = [NSFontManager sharedFontManager];
-        NSFont *font = [fmanager convertFont: [self font] 
-                                 toHaveTrait: NSItalicFontMask];
-        [self setFont: font];
-      }
-    
-      showType = FSNInfoExtendedType;   
-      ASSIGN (extInfoType, type);
-      
+      [infoCell setStringValue: [info objectForKey: @"labelstr"]]; 
       return YES;
     }
   } 

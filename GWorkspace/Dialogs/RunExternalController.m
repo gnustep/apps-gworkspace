@@ -25,23 +25,12 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-  #ifdef GNUSTEP 
-#include "GWFunctions.h"
-#include "GWLib.h"
-  #else
-#include <GWorkspace/GWFunctions.h>
-#include <GWorkspace/GWLib.h>
-  #endif
 #include "RunExternalController.h"
 #include "CompletionField.h"
 #include "GWorkspace.h"
 #include "GNUstep.h"
 
-#ifdef GNUSTEP 
-  static NSString *nibName = @"RunExternal.gorm";
-#else
-  static NSString *nibName = @"RunExternal.nib";
-#endif
+static NSString *nibName = @"RunExternal";
 
 @implementation RunExternalController
 

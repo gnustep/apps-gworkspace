@@ -25,13 +25,8 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-  #ifdef GNUSTEP 
 #include "GWFunctions.h"
-  #else
-#include <GWorkspace/GWFunctions.h>
-  #endif
 #include "History.h"
-#include "ViewersWindow.h"
 #include "GNUstep.h"
 
 @implementation History
@@ -181,7 +176,7 @@
 
 	[matrix getRow: &row column: &col ofCell: [matrix selectedCell]];
 	if (viewer) {
-		[viewer goToHistoryPosition: row];
+//		[viewer goToHistoryPosition: row];
 	}
 }
 

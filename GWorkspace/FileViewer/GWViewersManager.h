@@ -44,9 +44,19 @@
 + (GWViewersManager *)viewersManager;
 
 
+- (void)showViewers;
+
+- (id)showRootViewer;
+
+- (void)selectRepOfNode:(FSNode *)node
+          inViewerWithBaseNode:(FSNode *)base;
+            
+
 - (id)newViewerOfType:(unsigned)vtype
               forNode:(FSNode *)node
-       closeOldViewer:(id)oldvwr;
+        showSelection:(BOOL)showsel
+       closeOldViewer:(id)oldvwr
+             forceNew:(BOOL)force;
        
 - (void)setBehaviour:(NSString *)behaviour 
            forViewer:(id)aviewer;
@@ -58,6 +68,10 @@
 
 - (id)viewerOfType:(unsigned)type
        showingNode:(FSNode *)node; 
+
+- (id)rootViewer;
+
+- (int)typeOfViewerForNode:(FSNode *)node;
 
 - (id)parentOfSpatialViewer:(id)aviewer;
 
@@ -96,6 +110,9 @@
 - (BOOL)hasViewerWithWindow:(id)awindow;
 
 - (id)viewerWithWindow:(id)awindow;
+
+
+- (void)updateDefaults;
 
 @end
 

@@ -51,6 +51,11 @@
   [super dealloc];
 }
 
++ (FSNode *)nodeWithPath:(NSString *)apath
+{
+  return AUTORELEASE ([[FSNode alloc] initWithRelativePath: apath parent: nil]);
+}
+
 + (FSNode *)nodeWithRelativePath:(NSString *)rpath
                           parent:(FSNode *)aparent
 {
@@ -64,6 +69,7 @@
   self = [super init];
     
   if (self) {
+    fsnodeRep = [FSNodeRep sharedInstance];
     fm = [NSFileManager defaultManager];
     ws = [NSWorkspace sharedWorkspace];
     
@@ -148,13 +154,15 @@
 - (NSArray *)subNodes 
 {
   NSMutableArray *nodes = [NSMutableArray array];
-  NSArray *fnames = [FSNodeRep directoryContentsAtPath: path];
+  NSArray *fnames = [fsnodeRep directoryContentsAtPath: path];
   int i;
   
   for (i = 0; i < [fnames count]; i++) {
-    FSNode *node = [FSNode nodeWithRelativePath: [fnames objectAtIndex: i] 
-                                         parent: self];
+    NSString *fname = [fnames objectAtIndex: i] ;
+    FSNode *node = [[FSNode alloc] initWithRelativePath: fname parent: self];
+
     [nodes addObject: node];
+    RELEASE (node);
   }
   
   return nodes;
@@ -194,7 +202,7 @@
     FSNode *node;
     int i;
     
-    node = [self nodeWithRelativePath: p1 parent: nil];
+    node = [self nodeWithPath: p1];
     [components addObject: node];
     
     for (i = 0; i < [pcomps count]; i++) {
@@ -315,17 +323,17 @@
   return NO;
 }
 
-- (FSNode *)parent
-{
-  return parent;
-}
-
 - (NSString *)parentPath
 {
   if (parent) {
     return [parent path];
   } 
   return [path stringByDeletingLastPathComponent];
+}
+
+- (NSString *)parentName
+{
+  return [[self parentPath] lastPathComponent];
 }
 
 - (BOOL)isSubnodeOfNode:(FSNode *)anode
@@ -744,7 +752,7 @@
 
 - (BOOL)isLocked
 {
-  return [FSNodeRep isNodeLocked: self];
+  return [fsnodeRep isNodeLocked: self];
 }
 
 - (BOOL)isValid
@@ -896,13 +904,10 @@
 
 - (int)compareAccordingToParent:(FSNode *)aNode
 {
-  if ([self parent] == nil) {
-    return ([aNode parent] ? NSOrderedAscending : NSOrderedSame);
-  } else if ([aNode parent] == nil) {
-    return NSOrderedDescending;
-  }
+  NSString *n1 = [[self parentPath] lastPathComponent];
+  NSString *n2 = [[aNode parentPath] lastPathComponent];
 
-  return [[[self parent] name] caseInsensitiveCompare: [[aNode parent] name]];
+  return [n1 caseInsensitiveCompare: n2];
 }
 
 - (int)compareAccordingToKind:(FSNode *)aNode

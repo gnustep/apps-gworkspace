@@ -115,7 +115,6 @@
     backImageStyle = BackImageCenterStyle;
     dragIcon = nil;
     [self makeIconsGrid];
-    [FSNodeRep setUseThumbnails: YES];
   }
    
   return self;
@@ -123,7 +122,7 @@
 
 - (void)newVolumeMountedAtPath:(NSString *)vpath
 {
-  FSNode *vnode = [FSNode nodeWithRelativePath: vpath parent: nil];
+  FSNode *vnode = [FSNode nodeWithPath: vpath];
 
   [vnode setMountPoint: YES];
   [self removeRepOfSubnode: vnode];
@@ -229,7 +228,7 @@
         entry = [nodeDict objectForKey: @"ext_info_type"];
 
         if (entry) {
-          NSArray *availableTypes = [FSNodeRep availableExtendedInfoNames];
+          NSArray *availableTypes = [fsnodeRep availableExtendedInfoNames];
 
           if ([availableTypes containsObject: entry]) {
             ASSIGN (extInfoType, entry);
@@ -343,7 +342,7 @@
   }
 
   if ([lvpaths containsObject: root]) {
-    FSNode *vnode = [FSNode nodeWithRelativePath: root parent: nil];
+    FSNode *vnode = [FSNode nodeWithPath: root];
     
     [vnode setMountPoint: YES];
     [self addRepForSubnode: vnode];
@@ -351,7 +350,7 @@
 
   for (i = 0; i < [rvpaths count]; i++) {
     NSString *vpath = [rvpaths objectAtIndex: i];
-    FSNode *vnode = [FSNode nodeWithRelativePath: vpath parent: nil];
+    FSNode *vnode = [FSNode nodeWithPath: vpath];
   
     [vnode setMountPoint: YES];
     [self addRepForSubnode: vnode];
@@ -473,7 +472,7 @@
   NSRect hlightRect = NSZeroRect;
   
   hlightRect.size.width = ceil(iconSize / 3 * 4);
-  hlightRect.size.height = ceil(hlightRect.size.width * [FSNodeRep highlightHeightFactor]);
+  hlightRect.size.height = ceil(hlightRect.size.width * [fsnodeRep highlightHeightFactor]);
   if ((hlightRect.size.height - iconSize) < 2) {
     hlightRect.size.height = iconSize + 2;
   }

@@ -59,6 +59,8 @@
   NSColor *backColor;
   NSColor *textColor;
   NSColor *disabledTextColor;
+
+  FSNodeRep *fsnodeRep;
   
   id viewer;
 }
@@ -106,6 +108,7 @@
 
 - (void)checkLockedReps;
 - (FSNSelectionMask)selectionMask;
+- (void)openSelectionInNewViewer:(BOOL)newv;
 - (void)restoreLastSelection;
 
 - (NSColor *)backgroundColor;

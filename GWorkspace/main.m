@@ -22,18 +22,13 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-  #ifdef GNUSTEP 
 #include "GWFunctions.h"
-  #endif
 #include "GWorkspace.h"
 #include "GNUstep.h"
 
-  #ifdef GNUSTEP 
 void createMenu();
-  #endif
   
 int main(int argc, char **argv, char **env)
 {
@@ -41,11 +36,7 @@ int main(int argc, char **argv, char **env)
   GWorkspace *gw = [GWorkspace gworkspace];
 	NSApplication *app = [NSApplication sharedApplication];
   
-#ifdef GNUSTEP
 	createMenu();
-#else
-  [NSBundle loadNibNamed: @"MainMenu"  owner: gw];
-#endif
 	
   [app setDelegate: gw];    
 	[app run];
@@ -54,12 +45,11 @@ int main(int argc, char **argv, char **env)
   return 0;
 }
 
-#ifdef GNUSTEP 
 void createMenu()
 {
   NSMenu *mainMenu;
-	NSMenu *info, *file, *edit, *view, *tools;
-	NSMenu *viewersmenu, *inspmenu, *fiendmenu, *tshelfmenu, *hismenu;
+  NSMenu *menu;
+  NSMenu *subenu;
 	NSMenu *windows, *services;  
 	NSMenuItem *menuItem;
 
@@ -68,77 +58,124 @@ void createMenu()
     	
 	// Info 	
 	menuItem = addItemToMenu(mainMenu, @"Info", @"", nil, @"");
-	info = AUTORELEASE ([NSMenu new]);
-	[mainMenu setSubmenu: info forItem: menuItem];	
-	addItemToMenu(info, @"Info Panel...", @"", @"showInfo:", @"");
-	addItemToMenu(info, @"Preferences...", @"", @"showPreferences:", @"");
-	addItemToMenu(info, @"Help...", @"", nil, @"?");
+	menu = AUTORELEASE ([NSMenu new]);
+	[mainMenu setSubmenu: menu forItem: menuItem];	
+	addItemToMenu(menu, @"Info Panel...", @"", @"showInfo:", @"");
+	addItemToMenu(menu, @"Preferences...", @"", @"showPreferences:", @"");
+	addItemToMenu(menu, @"Help...", @"", nil, @"?");
 	 
 	// File
 	menuItem = addItemToMenu(mainMenu, @"File", @"", nil, @"");
-	file = AUTORELEASE ([NSMenu new]);
-	[mainMenu setSubmenu: file forItem: menuItem];		
-	addItemToMenu(file, @"Open", @"", @"openSelection:", @"o");
-	addItemToMenu(file, @"Open as Folder", @"", @"openSelectionAsFolder:", @"O");
-	addItemToMenu(file, @"Open With...", @"", @"openWith:", @"");
-	addItemToMenu(file, @"New Folder", @"", @"newFolder:", @"n");
-	addItemToMenu(file, @"New File", @"", @"newFile:", @"N");
-	addItemToMenu(file, @"Duplicate", @"", @"duplicateFiles:", @"u");
-	addItemToMenu(file, @"Destroy", @"", @"deleteFiles:", @"d");
-	addItemToMenu(file, @"Empty Recycler", @"", @"emptyRecycler:", @"");
-	addItemToMenu(file, @"Check for disks", @"", @"checkRemovableMedia:", @"E");
-	addItemToMenu(file, @"Run...", @"", @"runCommand:", @"");  
-	addItemToMenu(file, @"Print...", @"", @"print:", @"p");
+	menu = AUTORELEASE ([NSMenu new]);
+	[mainMenu setSubmenu: menu forItem: menuItem];		
+	addItemToMenu(menu, @"Open", @"", @"openSelection:", @"o");
+	addItemToMenu(menu, @"Open as Folder", @"", @"openSelectionAsFolder:", @"O");
+	addItemToMenu(menu, @"Open With...", @"", @"openWith:", @"");
+	addItemToMenu(menu, @"New Folder", @"", @"newFolder:", @"n");
+	addItemToMenu(menu, @"New File", @"", @"newFile:", @"N");
+	addItemToMenu(menu, @"Duplicate", @"", @"duplicateFiles:", @"u");
+	addItemToMenu(menu, @"Destroy", @"", @"deleteFiles:", @"d");
+	addItemToMenu(menu, @"Empty Recycler", @"", @"emptyRecycler:", @"");
+	addItemToMenu(menu, @"Check for disks", @"", @"checkRemovableMedia:", @"E");
+	addItemToMenu(menu, @"Run...", @"", @"runCommand:", @"");  
+	addItemToMenu(menu, @"Print...", @"", @"print:", @"p");
 
 	// Edit
 	menuItem = addItemToMenu(mainMenu, @"Edit", @"", nil, @"");
-	edit = AUTORELEASE ([NSMenu new]);
-	[mainMenu setSubmenu: edit forItem: menuItem];	
-	addItemToMenu(edit, @"Cut", @"", @"cut:", @"x");
-	addItemToMenu(edit, @"Copy", @"", @"copy:", @"c");
-	addItemToMenu(edit, @"Paste", @"", @"paste:", @"v");
-	addItemToMenu(edit, @"Select All", @"", @"selectAllInViewer:", @"a");
+	menu = AUTORELEASE ([NSMenu new]);
+	[mainMenu setSubmenu: menu forItem: menuItem];	
+	addItemToMenu(menu, @"Cut", @"", @"cut:", @"x");
+	addItemToMenu(menu, @"Copy", @"", @"copy:", @"c");
+	addItemToMenu(menu, @"Paste", @"", @"paste:", @"v");
+	addItemToMenu(menu, @"Select All", @"", @"selectAllInViewer:", @"a");
 
 	// View
 	menuItem = addItemToMenu(mainMenu, @"View", @"", nil, @"");
-	view = AUTORELEASE ([NSMenu new]);
-	[mainMenu setSubmenu: view forItem: menuItem];	
-				
+	menu = AUTORELEASE ([NSMenu new]);
+	[mainMenu setSubmenu: menu forItem: menuItem];	
+	addItemToMenu(menu, @"Browser", @"", @"setViewerType:", @"b");
+	addItemToMenu(menu, @"Icon", @"", @"setViewerType:", @"i");
+	  menuItem = addItemToMenu(menu, @"Viewer behaviour", @"", nil, @"");
+	  subenu = AUTORELEASE ([NSMenu new]);
+	  [menu setSubmenu: subenu forItem: menuItem];	
+	  addItemToMenu(subenu, @"Browsing", @"", @"setViewerBehaviour:", @"B");
+	  addItemToMenu(subenu, @"Spatial", @"", @"setViewerBehaviour:", @"S");
+	
+    menuItem = addItemToMenu(menu, @"Show", @"", nil, @"");
+	  subenu = AUTORELEASE ([NSMenu new]);
+	  [menu setSubmenu: subenu forItem: menuItem];	
+	  addItemToMenu(subenu, @"Name only", @"", @"setShownType:", @"");
+	  addItemToMenu(subenu, @"Kind", @"", @"setShownType:", @"");
+	  addItemToMenu(subenu, @"Size", @"", @"setShownType:", @"");
+	  addItemToMenu(subenu, @"Modification date", @"", @"setShownType:", @"");
+	  addItemToMenu(subenu, @"Owner", @"", @"setShownType:", @"");
+      
+    menuItem = addItemToMenu(menu, @"Icon Size", @"", nil, @"");
+	  subenu = AUTORELEASE ([NSMenu new]);
+	  [menu setSubmenu: subenu forItem: menuItem];	
+	  addItemToMenu(subenu, @"24", @"", @"setIconsSize:", @"");
+	  addItemToMenu(subenu, @"28", @"", @"setIconsSize:", @"");
+	  addItemToMenu(subenu, @"32", @"", @"setIconsSize:", @"");
+	  addItemToMenu(subenu, @"36", @"", @"setIconsSize:", @"");
+	  addItemToMenu(subenu, @"40", @"", @"setIconsSize:", @"");
+	  addItemToMenu(subenu, @"44", @"", @"setIconsSize:", @"");
+	  addItemToMenu(subenu, @"48", @"", @"setIconsSize:", @"");
+      
+    menuItem = addItemToMenu(menu, @"Icon Position", @"", nil, @"");
+	  subenu = AUTORELEASE ([NSMenu new]);
+	  [menu setSubmenu: subenu forItem: menuItem];	
+	  addItemToMenu(subenu, @"Up", @"", @"setIconsPosition:", @"");
+	  addItemToMenu(subenu, @"Left", @"", @"setIconsPosition:", @"");
+      
+    menuItem = addItemToMenu(menu, @"Label Size", @"", nil, @"");
+	  subenu = AUTORELEASE ([NSMenu new]);
+	  [menu setSubmenu: subenu forItem: menuItem];	
+	  addItemToMenu(subenu, @"10", @"", @"setLabelSize:", @"");
+	  addItemToMenu(subenu, @"11", @"", @"setLabelSize:", @"");
+	  addItemToMenu(subenu, @"12", @"", @"setLabelSize:", @"");
+	  addItemToMenu(subenu, @"13", @"", @"setLabelSize:", @"");
+	  addItemToMenu(subenu, @"14", @"", @"setLabelSize:", @"");
+	  addItemToMenu(subenu, @"15", @"", @"setLabelSize:", @"");
+	  addItemToMenu(subenu, @"16", @"", @"setLabelSize:", @"");
+      
+	  addItemToMenu(menu, @"Label Color...", @"", @"chooseLabelColor:", @"");
+	  
+    addItemToMenu(menu, @"Background Color...", @"", @"chooseBackColor:", @"");
+      
 	// Tools
 	menuItem = addItemToMenu(mainMenu, @"Tools", @"", nil, @"");
-	tools = AUTORELEASE ([NSMenu new]);
-	[mainMenu setSubmenu: tools forItem: menuItem];	
-	addItemToMenu(tools, @"Viewer", @"", @"showViewer:", @"V");	
-  
-		menuItem = addItemToMenu(tools, @"Viewer behaviour", @"", nil, @"");
-		viewersmenu = AUTORELEASE ([NSMenu new]);
-		[tools setSubmenu: viewersmenu forItem: menuItem];	
-		addItemToMenu(viewersmenu, @"Browsing", @"", @"setViewerBehaviour:", @"B");
-		addItemToMenu(viewersmenu, @"Spatial", @"", @"setViewerBehaviour:", @"S");
-  
-		menuItem = addItemToMenu(tools, @"Inspectors", @"", nil, @"");
-		inspmenu = AUTORELEASE ([NSMenu new]);
-		[tools setSubmenu: inspmenu forItem: menuItem];	
-		addItemToMenu(inspmenu, @"Show Inspectors", @"", nil, @"");
-		addItemToMenu(inspmenu, @"Attributes", @"", @"showAttributesInspector:", @"1");
-		addItemToMenu(inspmenu, @"Contents", @"", @"showContentsInspector:", @"2");
-		addItemToMenu(inspmenu, @"Tools", @"", @"showToolsInspector:", @"3");
-		menuItem = addItemToMenu(tools, @"History", @"", nil, @"");
-		hismenu = AUTORELEASE ([NSMenu new]);
-		[tools setSubmenu: hismenu forItem: menuItem];
-		addItemToMenu(hismenu, @"Show History", @"", @"showHistory:", @"H");
-		addItemToMenu(hismenu, @"Go backward", @"", @"goBackwardInHistory:", @"");
-		addItemToMenu(hismenu, @"Go forward", @"", @"goForwardInHistory:", @"");
-	addItemToMenu(tools, @"Show Desktop", @"", @"showDesktop:", @"");
-	addItemToMenu(tools, @"Show Recycler", @"", @"showRecycler:", @"");
-	addItemToMenu(tools, @"Finder", @"", @"showFinder:", @"f");
-		menuItem = addItemToMenu(tools, @"Fiend", @"", nil, @"");
-		fiendmenu = AUTORELEASE ([NSMenu new]);
-		[tools setSubmenu: fiendmenu forItem: menuItem];
-		menuItem = addItemToMenu(tools, @"Tabbed Shelf", @"", nil, @"");
-		tshelfmenu = AUTORELEASE ([NSMenu new]);
-		[tools setSubmenu: tshelfmenu forItem: menuItem];    
-	addItemToMenu(tools, @"XTerm", @"", @"showTerminal:", @"t");
+	menu = AUTORELEASE ([NSMenu new]);
+	[mainMenu setSubmenu: menu forItem: menuItem];	
+	addItemToMenu(menu, @"Viewer", @"", @"showViewer:", @"V");	
+		
+    menuItem = addItemToMenu(menu, @"Inspectors", @"", nil, @"");
+		subenu = AUTORELEASE ([NSMenu new]);
+		[menu setSubmenu: subenu forItem: menuItem];	
+		addItemToMenu(subenu, @"Show Inspectors", @"", nil, @"");
+		addItemToMenu(subenu, @"Attributes", @"", @"showAttributesInspector:", @"1");
+		addItemToMenu(subenu, @"Contents", @"", @"showContentsInspector:", @"2");
+		addItemToMenu(subenu, @"Tools", @"", @"showToolsInspector:", @"3");
+		
+    menuItem = addItemToMenu(menu, @"History", @"", nil, @"");
+		subenu = AUTORELEASE ([NSMenu new]);
+		[menu setSubmenu: subenu forItem: menuItem];
+		addItemToMenu(subenu, @"Show History", @"", @"showHistory:", @"H");
+		addItemToMenu(subenu, @"Go backward", @"", @"goBackwardInHistory:", @"");
+		addItemToMenu(subenu, @"Go forward", @"", @"goForwardInHistory:", @"");
+	
+  addItemToMenu(menu, @"Show Desktop", @"", @"showDesktop:", @"");
+	addItemToMenu(menu, @"Show Recycler", @"", @"showRecycler:", @"");
+	addItemToMenu(menu, @"Finder", @"", @"showFinder:", @"f");
+		
+    menuItem = addItemToMenu(menu, @"Fiend", @"", nil, @"");
+		subenu = AUTORELEASE ([NSMenu new]);
+		[menu setSubmenu: subenu forItem: menuItem];
+		
+    menuItem = addItemToMenu(menu, @"Tabbed Shelf", @"", nil, @"");
+		subenu = AUTORELEASE ([NSMenu new]);
+		[menu setSubmenu: subenu forItem: menuItem];    
+	
+  addItemToMenu(menu, @"XTerm", @"", @"showTerminal:", @"t");
 
 	// Windows
 	menuItem = addItemToMenu(mainMenu, @"Windows", @"", nil, @"");
@@ -165,5 +202,4 @@ void createMenu()
 	[[NSApplication sharedApplication] setWindowsMenu: windows];
 	[[NSApplication sharedApplication] setMainMenu: mainMenu];		
 }
-#endif
 

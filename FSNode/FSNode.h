@@ -29,6 +29,7 @@
 
 @class NSImage;
 @class NSBezierPath;
+@class FSNodeRep;
 
 @interface FSNode : NSObject 
 {
@@ -69,11 +70,14 @@
     unsigned package;
     unsigned unknown;
   } flags;
-
+  
+  FSNodeRep *fsnodeRep;
   NSNotificationCenter *nc;
   NSFileManager *fm;
   id ws;
 }
+
++ (FSNode *)nodeWithPath:(NSString *)apath;
 
 + (FSNode *)nodeWithRelativePath:(NSString *)rpath
                           parent:(FSNode *)aparent;
@@ -111,9 +115,9 @@
         isEqualOrDescendentOfPath:(NSString *)apath
                   containingFiles:(NSArray *)files;
 
-- (FSNode *)parent;
-
 - (NSString *)parentPath;
+
+- (NSString *)parentName;
 
 - (BOOL)isSubnodeOfNode:(FSNode *)anode;
 

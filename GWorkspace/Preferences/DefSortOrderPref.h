@@ -26,16 +26,12 @@
 #ifndef DEF_SORTORDER_PREF_H
 #define DEF_SORTORDER_PREF_H
 
-#include <Foundation/NSObject.h>
-  #ifdef GNUSTEP 
-#include "PreferencesProtocol.h"
-  #else
-#include <GWorkspace/PreferencesProtocol.h>
-  #endif
+#include <Foundation/Foundation.h>
+#include "PrefProtocol.h"
 
 @class GWorkspace;
 
-@interface DefSortOrderPref : NSObject <PreferencesProtocol>
+@interface DefSortOrderPref : NSObject <PrefProtocol>
 {
   IBOutlet id win;
   IBOutlet id prefbox;  

@@ -25,7 +25,6 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-#include "GWProtocol.h"
 
 int main(int argc, char** argv, char **env_c)
 {
@@ -72,8 +71,6 @@ int main(int argc, char** argv, char **env_c)
       exit(0);
     } 
     
-    gworkspace = (id <GWProtocol>)gworkspace;
-
     [gworkspace application: gworkspace openFile: fullPath];    
   }
   

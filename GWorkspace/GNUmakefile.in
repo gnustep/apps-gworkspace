@@ -21,7 +21,7 @@ GWorkspace_HAS_RESOURCE_BUNDLE = yes
 #
 # Additional libraries
 #
-ADDITIONAL_GUI_LIBS += -lGWorkspace -lFSNode
+ADDITIONAL_GUI_LIBS += -lFSNode
 
 GWorkspace_RESOURCE_FILES = \
   Resources/Icons/* \
@@ -45,10 +45,9 @@ GWorkspace_LANGUAGES = Resources/English \
 
 # The Objective-C source files to be compiled
 GWorkspace_OBJC_FILES = main.m \
+externs.m \
+GWFunctions.m \
 GWorkspace.m \
-IconViewsIcon.m \
-GWSplitView.m \
-ViewersWindow.m \
 FileViewer/GWViewersManager.m \
 FileViewer/GWViewer.m \
 FileViewer/GWSpatialViewer.m \
@@ -59,8 +58,6 @@ FileViewer/GWViewerShelf.m \
 FileViewer/GWViewerSplit.m \
 FileViewer/GWViewerIconsPath.m \
 FileViewer/GWViewerPathsPopUp.m \
-Shelf/Shelf.m \
-Shelf/ShelfIcon.m \
 TShelf/TShelfWin.m \
 TShelf/TShelfView.m \
 TShelf/TShelfViewItem.m \
@@ -71,7 +68,6 @@ Preferences/PrefController.m \
 Preferences/DefEditorPref.m \
 Preferences/XTermPref.m \
 Preferences/DefSortOrderPref.m \
-Preferences/ShelfPref.m \
 Preferences/IconsPref.m \
 Preferences/HiddenFilesPref.m \
 History/History.m \

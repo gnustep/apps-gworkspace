@@ -24,15 +24,7 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-  #ifdef GNUSTEP 
 #include "GWFunctions.h"
-#include "GWNotifications.h"
-#include "GWLib.h"
-  #else
-#include <GWorkspace/GWFunctions.h>
-#include <GWorkspace/GWNotifications.h>
-#include <GWorkspace/GWLib.h>
-  #endif
 #include "TShelfPBIcon.h"
 #include "TShelfIconsView.h"
 #include "GWorkspace.h"
@@ -74,7 +66,7 @@
     ASSIGN (dataPath, dpath);
     ASSIGN (dataType, type);
 
-    ASSIGN (highlight, [NSImage imageNamed: GWCellHighlightIconName]);
+    ASSIGN (highlight, [NSImage imageNamed: @"CellHighlight.tiff"]);
 
     if ([dataType isEqual: NSStringPboardType]) {
       ASSIGN (icon, [NSImage imageNamed: @"stringPboard.tiff"]);

@@ -109,6 +109,7 @@ static Desktop *desktop = nil;
   BOOL isdir;
   NSUserDefaults *defaults;	
   id defentry;
+  BOOL hideSysFiles;
   NSArray *extendedInfo;
   NSMenu *menu;
   int i;
@@ -132,7 +133,7 @@ static Desktop *desktop = nil;
                   atomically: YES];
   }
 
-  ASSIGN (desktopDir, [FSNode nodeWithRelativePath: home parent: nil]);
+  ASSIGN (desktopDir, [FSNode nodeWithPath: home]);
 
   defaults = [NSUserDefaults standardUserDefaults];	
 
@@ -148,7 +149,31 @@ static Desktop *desktop = nil;
   if ([defaults boolForKey: @"uses_inspector"]) {  
     [self connectInspector];
   }
-     
+  
+  [[FSNodeRep sharedInstance] setUseThumbnails: YES];
+
+	defentry = [defaults objectForKey: @"default_sortorder"];	
+	if (defentry == nil) { 
+    [[FSNodeRep sharedInstance] setDefaultSortOrder: 0];
+	} else {
+    [[FSNodeRep sharedInstance] setDefaultSortOrder: [defentry intValue]];
+	}
+
+  defentry = [defaults objectForKey: @"GSFileBrowserHideDotFiles"];
+  if (defentry) {
+    hideSysFiles = [defentry boolValue];
+  } else {  
+    NSDictionary *domain = [defaults persistentDomainForName: NSGlobalDomain];
+    
+    defentry = [domain objectForKey: @"GSFileBrowserHideDotFiles"];
+    if (defentry) {
+      hideSysFiles = [defentry boolValue];
+    } else {  
+      hideSysFiles = NO;
+    }
+  }
+  [[FSNodeRep sharedInstance] setHideSysFiles: hideSysFiles];
+
   win = [DesktopWindow new];
   [win activate];
   [[win desktopView] showMountedVolumes];
@@ -164,7 +189,7 @@ static Desktop *desktop = nil;
 
   startAppWin = [[StartAppWin alloc] init];
   
-  extendedInfo = [FSNodeRep availableExtendedInfoNames];
+  extendedInfo = [[FSNodeRep sharedInstance] availableExtendedInfoNames];
   menu = [[[NSApp mainMenu] itemWithTitle: NSLocalizedString(@"View", @"")] submenu];
   
   for (i = 0; i < [extendedInfo count]; i++) {
@@ -723,7 +748,7 @@ static Desktop *desktop = nil;
         [paths addObject: fullpath];
       }
     
-      [FSNodeRep lockPaths: paths];
+      [[FSNodeRep sharedInstance] lockPaths: paths];
       [[self desktopView] nodeContentsWillChange: dict];
     }
   }  
@@ -772,7 +797,7 @@ static Desktop *desktop = nil;
         [paths addObject: fullpath];
       }
     
-      [FSNodeRep unlockPaths: paths];
+      [[FSNodeRep sharedInstance] unlockPaths: paths];
       [[self desktopView] nodeContentsDidChange: dict];
     }
   }  
@@ -833,7 +858,7 @@ static Desktop *desktop = nil;
   NSDictionary *dict = [notif userInfo];  
   NSString *volpath = [dict objectForKey: @"NSDevicePath"];
 
-  [FSNodeRep lockPaths: [NSArray arrayWithObject: volpath]];
+  [[FSNodeRep sharedInstance] lockPaths: [NSArray arrayWithObject: volpath]];
   [[self desktopView] workspaceWillUnmountVolumeAtPath: volpath];
 }
 
@@ -842,12 +867,13 @@ static Desktop *desktop = nil;
   NSDictionary *dict = [notif userInfo];  
   NSString *volpath = [dict objectForKey: @"NSDevicePath"];
 
-  [FSNodeRep unlockPaths: [NSArray arrayWithObject: volpath]];
+  [[FSNodeRep sharedInstance] unlockPaths: [NSArray arrayWithObject: volpath]];
   [[self desktopView] workspaceDidUnmountVolumeAtPath: volpath];
 }
 
 - (void)thumbnailsDidChange:(NSNotification *)notif
 {
+  [(FSNodeRep *)[FSNodeRep sharedInstance] thumbnailsDidChange: [notif userInfo]];
   [[self desktopView] updateIcons];
 }
 
@@ -982,7 +1008,7 @@ static Desktop *desktop = nil;
     return YES;
 
   } else if ([title isEqual: NSLocalizedString(@"Empty Recycler", @"")]) {
-    return [[FSNodeRep directoryContentsAtPath: trashPath] count] ? YES : NO;
+    return [[[FSNodeRep sharedInstance] directoryContentsAtPath: trashPath] count] ? YES : NO;
 
   } else if ([title isEqual: NSLocalizedString(@"New Folder", @"")]) {
     return ([[[win desktopView] selectedPaths] count] == 0);
@@ -1069,7 +1095,7 @@ static Desktop *desktop = nil;
   
   for (i = 0; i < count; i++) {
     NSString *spath = [selpaths objectAtIndex: i];
-    FSNode *node = [FSNode nodeWithRelativePath: spath parent: nil];
+    FSNode *node = [FSNode nodeWithPath: spath];
     
     if ([node isMountPoint] || [spath isEqual: path_separator()]) {
       [selpaths removeObject: spath];
@@ -1108,7 +1134,7 @@ static Desktop *desktop = nil;
   
   for (i = 0; i < count; i++) {
     NSString *spath = [selpaths objectAtIndex: i];
-    FSNode *node = [FSNode nodeWithRelativePath: spath parent: nil];
+    FSNode *node = [FSNode nodeWithPath: spath];
     
     if ([node isMountPoint] || [spath isEqual: path_separator()]) {
       [selpaths removeObject: spath];
@@ -1141,7 +1167,7 @@ static Desktop *desktop = nil;
 
 - (void)emptyTrash:(id)sender
 {
-  FSNode *node = [FSNode nodeWithRelativePath: trashPath parent: nil];
+  FSNode *node = [FSNode nodeWithPath: trashPath];
   NSArray *subNodes = [node subNodes];
   
   if ([subNodes count]) {

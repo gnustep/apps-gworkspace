@@ -22,11 +22,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-#include "GWFunctions.h"
-#include "GWNotifications.h"
 #include "BrowserViewerPref.h"
 #include "GNUstep.h"
 
@@ -200,7 +197,7 @@ static NSString *nibName = @"BrowserViewerPref";
   columnsWidth = w;
   
 	[[NSNotificationCenter defaultCenter]
- 				 postNotificationName: GWBrowserColumnWidthChangedNotification
+ 				 postNotificationName: @"GWBrowserColumnWidthChangedNotification"
 	 								     object: [NSNumber numberWithInt: w]];  
                        
   [defaults synchronize];                           
@@ -223,7 +220,7 @@ static NSString *nibName = @"BrowserViewerPref";
   [defaults synchronize]; 
   
 	[[NSNotificationCenter defaultCenter]
- 				 postNotificationName: GWBrowserCellsIconsDidChangeNotification
+ 				 postNotificationName: @"GWBrowserCellsIconsDidChangeNotification"
 	 								     object: nil];  
 }
 
@@ -236,7 +233,7 @@ static NSString *nibName = @"BrowserViewerPref";
   [defaults synchronize]; 
   
 	[[NSNotificationCenter defaultCenter]
- 				 postNotificationName: GWViewersUseShelfDidChangeNotification
+ 				 postNotificationName: @"GWViewersUseShelfDidChangeNotification"
 	 								     object: nil];  
 }
 

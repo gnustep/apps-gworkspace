@@ -155,7 +155,7 @@
   }
 
   path = [ws fullPathForApplication: wsname];
-  node = [FSNode nodeWithRelativePath: path parent: nil];
+  node = [FSNode nodeWithPath: path];
   
   icon = [[DockIcon alloc] initForNode: node iconSize: iconSize];
   [icon setWsIcon: YES];   
@@ -168,7 +168,7 @@
 - (void)createTrashIcon
 {
   NSString *path = [desktop trashPath];
-  FSNode *node = [FSNode nodeWithRelativePath: path parent: nil];
+  FSNode *node = [FSNode nodeWithPath: path];
   DockIcon *icon = [[DockIcon alloc] initForNode: node iconSize: iconSize];
   
   [icon setTrashIcon: YES];  
@@ -186,7 +186,7 @@
   NSString *path = [ws fullPathForApplication: name];
 
   if (path) {
-    FSNode *node = [FSNode nodeWithRelativePath: path parent: nil];
+    FSNode *node = [FSNode nodeWithPath: path];
     
     if ([node isApplication]) {
       DockIcon *icon = [[DockIcon alloc] initForNode: node iconSize: iconSize];
@@ -738,7 +738,7 @@
       } else if ([[pb types] containsObject: NSFilenamesPboardType]) {
         NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
         NSString *path = [sourcePaths objectAtIndex: 0];
-        FSNode *node = [FSNode nodeWithRelativePath: path parent: nil];
+        FSNode *node = [FSNode nodeWithPath: path];
       
         if ([node isApplication] && ([icon isSpecialIcon] == NO)) {
           int i;
@@ -834,7 +834,7 @@
       } else if (pb && [[pb types] containsObject: NSFilenamesPboardType]) {
         NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
         NSString *path = [sourcePaths objectAtIndex: 0];
-        FSNode *node = [FSNode nodeWithRelativePath: path parent: nil];
+        FSNode *node = [FSNode nodeWithPath: path];
 
         if (([node isApplication] == NO) 
                           || ([node isApplication] && [icon isTrashIcon])) {
@@ -913,7 +913,7 @@
       
       if ([sourcePaths count] == 1) {
         NSString *path = [sourcePaths objectAtIndex: 0];
-        FSNode *node = [FSNode nodeWithRelativePath: path parent: nil];
+        FSNode *node = [FSNode nodeWithPath: path];
 
         if ([node isApplication]) {
           if ((icon == nil) || (icon && ([icon isTrashIcon] == NO))) {

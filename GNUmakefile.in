@@ -7,13 +7,7 @@ include gworkspace.make
 PACKAGE_NAME = @PACKAGE_NAME@
 VERSION = @PACKAGE_VERSION@
 
-ifeq ($(FOUNDATION_LIB), gnu)
-  GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
-endif
-
-ifeq ($(FOUNDATION_LIB), apple)
-  GNUSTEP_INSTALLATION_DIR = /
-endif
+GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
 
 #
 # subprojects
@@ -25,8 +19,6 @@ SUBPROJECTS = FSNode \
                 Finder \
 	      			  Desktop \
 	      			  Recycler \
-	      			  GWLib \
-	      			  Viewers \
 	      			  GWorkspace 
 						 
 -include GNUmakefile.preamble

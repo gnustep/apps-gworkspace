@@ -76,14 +76,13 @@
     NSDictionary *viewerPrefs = nil;
     id defEntry;
     
-    ASSIGN (baseNode, [FSNode nodeWithRelativePath: [node path] parent: nil]);
+    ASSIGN (baseNode, [FSNode nodeWithPath: [node path]]);
     lastSelection = nil;
     watchedNodes = [NSMutableArray new];
     watchedSuspended = [NSMutableArray new];
     manager = [GWViewersManager viewersManager];
     gworkspace = [GWorkspace gworkspace];
     nc = [NSNotificationCenter defaultCenter];
-    spatial = NO;
     
     defEntry = [defaults objectForKey: @"browserColsWidth"];
     if (defEntry) {
@@ -120,7 +119,7 @@
     viewType = [viewerPrefs objectForKey: @"viewtype"];
     
     if (viewType == nil) {
-      viewType = @"Icon";
+      viewType = @"Browser";
     }
     if (([viewType isEqual: @"Icon"] == NO)
               && ([viewType isEqual: @"Browser"] == NO)) {
@@ -210,7 +209,7 @@
           
             base = [selection objectAtIndex: 0];
             base = [base stringByDeletingLastPathComponent];
-            basenode = [FSNode nodeWithRelativePath: base parent: nil];
+            basenode = [FSNode nodeWithPath: base];
           
             [nodeView showContentsOfNode: basenode];
             [nodeView selectRepsOfPaths: selection];
@@ -324,7 +323,7 @@
 
 - (BOOL)isShowingPath:(NSString *)apath
 {
-  FSNode *node = [FSNode nodeWithRelativePath: apath parent: nil];
+  FSNode *node = [FSNode nodeWithPath: apath];
   return [self isShowingNode: node];
 }
 
@@ -379,12 +378,12 @@
 
 - (BOOL)isSpatial
 {
-  return spatial;
+  return NO;
 }
 
 - (int)vtype
 {
-  return (spatial ? SPATIAL : BROWSING);
+  return BROWSING;
 }
 
 - (void)activate
@@ -464,11 +463,11 @@
   ASSIGN (lastSelection, newsel);
   [self updeateInfoLabels]; 
     
-  node = [FSNode nodeWithRelativePath: [newsel objectAtIndex: 0] parent: nil];   
+  node = [FSNode nodeWithPath: [newsel objectAtIndex: 0]];   
      
   if (([node isDirectory] == NO) || [node isPackage] || ([newsel count] > 1)) {
     if ([node isEqual: baseNode] == NO) { // if baseNode is a package 
-      node = [FSNode nodeWithRelativePath: [node parentPath] parent: nil];
+      node = [FSNode nodeWithPath: [node parentPath]];
     }
   }
     
@@ -478,7 +477,7 @@
 
   if ([node isDirectory] && ([newsel count] == 1)) {
     if ([nodeView isSingleNode] && ([node isEqual: [nodeView shownNode]] == NO)) {
-      node = [FSNode nodeWithRelativePath: [node parentPath] parent: nil];
+      node = [FSNode nodeWithPath: [node parentPath]];
       components = [FSNode nodeComponentsFromNode: baseNode toNode: node];
     }
   }
@@ -532,7 +531,7 @@
 - (void)shelfDidSelectIcon:(id)icon
 {
   FSNode *node = [icon node];
-  FSNode *base = [FSNode nodeWithRelativePath: [node parentPath] parent: nil];
+  FSNode *base = [FSNode nodeWithPath: [node parentPath]];
   NSArray *selection = [icon selection];
 
   if (selection == nil) {
@@ -541,6 +540,10 @@
   
   [nodeView showContentsOfNode: base];
   [nodeView selectRepsOfSubnodes: selection];
+
+  if ([nodeView respondsToSelector: @selector(scrollSelectionToVisible)]) {
+    [nodeView scrollSelectionToVisible];
+  }
 }
 
 - (void)setSelectableNodesRange:(NSRange)range
@@ -651,7 +654,7 @@
         || [operation isEqual: @"GWorkspaceRenameOperation"]
 			  || [operation isEqual: @"GWorkspaceRecycleOutOperation"]) { 
     if ([nodeView isSingleNode]) {
-      FSNode *node = [FSNode nodeWithRelativePath: destination parent: nil];
+      FSNode *node = [FSNode nodeWithPath: destination];
       [nodeView reloadFromNode: node];
     }
         
@@ -669,7 +672,7 @@
 				|| [operation isEqual: @"GWorkspaceRecycleOutOperation"]
 				|| [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]) {
     if ([nodeView isSingleNode]) {
-      FSNode *node = [FSNode nodeWithRelativePath: source parent: nil];
+      FSNode *node = [FSNode nodeWithPath: source];
       [nodeView reloadFromNode: node];
     }
         
@@ -756,7 +759,7 @@
           NSString *s = [path stringByDeletingLastPathComponent];
 
           if ([self isShowingPath: s]) {
-            FSNode *node = [FSNode nodeWithRelativePath: s parent: nil];
+            FSNode *node = [FSNode nodeWithPath: s];
             [nodeView reloadFromNode: node];
           }
           
@@ -823,6 +826,12 @@
     if (updatedprefs == nil) {
       updatedprefs = [NSMutableDictionary new];
     }
+
+    [updatedprefs setObject: [NSNumber numberWithBool: NO]
+                     forKey: @"spatial"];
+
+    [updatedprefs setObject: [NSNumber numberWithBool: [nodeView isSingleNode]]
+                     forKey: @"singlenode"];
 
     [updatedprefs setObject: viewType forKey: @"viewtype"];
 
@@ -1077,7 +1086,7 @@
           base = [base stringByDeletingLastPathComponent];
         }
         
-        basend = [FSNode nodeWithRelativePath: base parent: nil];
+        basend = [FSNode nodeWithPath: base];
 
         [nodeView showContentsOfNode: basend];
         [nodeView selectRepsOfPaths: selection];
@@ -1106,6 +1115,78 @@
     }
     
     [self selectionChanged: selection];
+    
+    [self updateDefaults];
+  }
+}
+
+- (void)setShownType:(id)sender
+{
+  NSString *title = [sender title];
+  FSNInfoType type = FSNInfoNameType;
+
+  if ([title isEqual: NSLocalizedString(@"Name", @"")]) {
+    type = FSNInfoNameType;
+  } else if ([title isEqual: NSLocalizedString(@"Kind", @"")]) {
+    type = FSNInfoKindType;
+  } else if ([title isEqual: NSLocalizedString(@"Size", @"")]) {
+    type = FSNInfoSizeType;
+  } else if ([title isEqual: NSLocalizedString(@"Modification date", @"")]) {
+    type = FSNInfoDateType;
+  } else if ([title isEqual: NSLocalizedString(@"Owner", @"")]) {
+    type = FSNInfoOwnerType;
+  } else {
+    type = FSNInfoNameType;
+  } 
+
+  [(id <FSNodeRepContainer>)nodeView setShowType: type];  
+}
+
+- (void)setExtendedShownType:(id)sender
+{
+  [(id <FSNodeRepContainer>)nodeView setExtendedShowType: [sender title]];  
+}
+
+- (void)setIconsSize:(id)sender
+{
+  if ([nodeView respondsToSelector: @selector(setIconSize:)]) {
+    [(id <FSNodeRepContainer>)nodeView setIconSize: [[sender title] intValue]];
+  }
+}
+
+- (void)setIconsPosition:(id)sender
+{
+  if ([nodeView respondsToSelector: @selector(setIconPosition:)]) {
+    NSString *title = [sender title];
+    
+    if ([title isEqual: NSLocalizedString(@"Left", @"")]) {
+      [(id <FSNodeRepContainer>)nodeView setIconPosition: NSImageLeft];
+    } else {
+      [(id <FSNodeRepContainer>)nodeView setIconPosition: NSImageAbove];
+    }
+  }
+}
+
+- (void)setLabelSize:(id)sender
+{
+  if ([nodeView respondsToSelector: @selector(setLabelTextSize:)]) {
+    [nodeView setLabelTextSize: [[sender title] intValue]];
+  }
+}
+
+- (void)chooseLabelColor:(id)sender
+{
+  if ([nodeView respondsToSelector: @selector(setTextColor:)]) {
+
+
+  }
+}
+
+- (void)chooseBackColor:(id)sender
+{
+  if ([nodeView respondsToSelector: @selector(setBackgroundColor:)]) {
+
+
   }
 }
 
@@ -1148,6 +1229,29 @@
 
 - (BOOL)validateItem:(id)menuItem
 {
+  NSString *itemTitle = [menuItem title];
+  NSString *menuTitle = [[menuItem menu] title];
+
+  if ([menuTitle isEqual: NSLocalizedString(@"Icon Size", @"")]) {
+    return [nodeView respondsToSelector: @selector(setIconSize:)];
+  }
+
+  if ([menuTitle isEqual: NSLocalizedString(@"Icon Position", @"")]) {
+    return [nodeView respondsToSelector: @selector(setIconPosition:)];
+  }
+
+  if ([menuTitle isEqual: NSLocalizedString(@"Label Size", @"")]) {
+    return [nodeView respondsToSelector: @selector(setLabelTextSize:)];
+  }
+
+  if ([itemTitle isEqual: NSLocalizedString(@"Label Color...", @"")]) {
+    return [nodeView respondsToSelector: @selector(setTextColor:)];
+  }
+
+  if ([itemTitle isEqual: NSLocalizedString(@"Background Color...", @"")]) {
+    return [nodeView respondsToSelector: @selector(setBackgroundColor:)];
+  }
+
   return YES;
 }
 

@@ -26,18 +26,14 @@
 #ifndef DEF_EDITOR_PREF_H
 #define DEF_EDITOR_PREF_H
 
-#include <Foundation/NSObject.h>
-  #ifdef GNUSTEP 
-#include "PreferencesProtocol.h"
-  #else
-#include <GWorkspace/PreferencesProtocol.h>
-  #endif
+#include <Foundation/Foundation.h>
+#include "PrefProtocol.h"
 
 @class NSWorkspace;
 @class GWorkspace;
 @class NSFont;
 
-@interface DefEditorPref : NSObject <PreferencesProtocol>
+@interface DefEditorPref : NSObject <PrefProtocol>
 {
   IBOutlet id win;
   IBOutlet id prefbox;

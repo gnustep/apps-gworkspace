@@ -22,25 +22,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-  #ifdef GNUSTEP 
-#include "GWLib.h"
-#include "GWFunctions.h"
-  #else
-#include <GWorkspace/GWLib.h>
-#include <GWorkspace/GWFunctions.h>
-  #endif
+#include "FSNodeRep.h"
 #include "DefSortOrderPref.h"
 #include "GWorkspace.h"
 #include "GNUstep.h"
-
-#define byname 0
-#define bykind 1
-#define bydate 2
-#define bysize 3
-#define byowner 4
 
 static NSString *nibName = @"DefSortOrderPref";
 
@@ -62,7 +49,7 @@ static NSString *nibName = @"DefSortOrderPref";
       RETAIN (prefbox);
       RELEASE (win);
 
-		  sortType = [GWLib defSortType];
+		  sortType = [[FSNodeRep sharedInstance] defaultSortOrder];
 		  [matrix selectCellAtRow: sortType column: 0];	
       
       [setButt setEnabled: NO];	
@@ -101,8 +88,13 @@ static NSString *nibName = @"DefSortOrderPref";
 
 - (void)setNewSortType:(id)sender
 {
-  [GWLib setDefSortType: sortType];
+  [[FSNodeRep sharedInstance] setDefaultSortOrder: sortType];
 	[setButt setEnabled: NO];
+
+  [[NSDistributedNotificationCenter defaultCenter]
+          postNotificationName: @"GWSortTypeDidChangeNotification"
+                        object: nil
+                      userInfo: nil];
 }
 
 @end

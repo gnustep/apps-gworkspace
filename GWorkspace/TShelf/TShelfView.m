@@ -23,11 +23,6 @@
  */
 
 #include <AppKit/AppKit.h>
-  #ifdef GNUSTEP 
-#include "GWLib.h"
-  #else
-#include <GWorkspace/GWLib.h>
-  #endif
 #include "TShelfView.h"
 #include "TShelfViewItem.h"
 #include "TShelfIconsView.h"
@@ -348,8 +343,6 @@
 	      r.size.width = itemxspace;
 	      r.size.height = 23;
       }
-
-//	    DPSsetgray(ctxt, 1);
 
       bpath = [NSBezierPath bezierPath];
       [bpath setLineWidth: 1];
