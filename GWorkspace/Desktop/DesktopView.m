@@ -911,7 +911,7 @@
 
 - (void)setCurrentSelection:(NSArray *)paths
 {
-  [gw setSelectedPaths: paths fromDeskTopView: self];
+  [gw setSelectedPaths: paths fromDesktopView: self];
 }
 
 - (void)setCurrentSelection:(NSArray *)paths 
@@ -919,7 +919,7 @@
             startingAtPoint:(NSPoint)startp
 {
   [gw setSelectedPaths: paths
-       fromDeskTopView: self
+       fromDesktopView: self
           animateImage: image
        startingAtPoint: startp];
 }

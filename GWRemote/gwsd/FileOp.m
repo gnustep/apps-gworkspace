@@ -116,23 +116,23 @@
         unsigned result;
         
 		    if ([operation isEqual: @"NSWorkspaceMoveOperation"]) {	
-			    msg = @"Some items have the same name;\ndo you want to sobstitute them?";
+			    msg = @"Some items have the same name;\ndo you want to replace them?";
 			    title = @"Move";
 
 		    } else if ([operation isEqual: @"NSWorkspaceCopyOperation"]) {
-			    msg = @"Some items have the same name;\ndo you want to sobstitute them?";
+			    msg = @"Some items have the same name;\ndo you want to replace them?";
 			    title = @"Copy";
 
 		    } else if([operation isEqual: @"NSWorkspaceLinkOperation"]) {
-			    msg = @"Some items have the same name;\ndo you want to sobstitute them?";
+			    msg = @"Some items have the same name;\ndo you want to replace them?";
 			    title = @"Link";
 
 		    } else if([operation isEqual: @"NSWorkspaceRecycleOperation"]) {
-			    msg = @"Some items have the same name;\ndo you want to sobstitute them?";
+			    msg = @"Some items have the same name;\ndo you want to replace them?";
 			    title = @"Recycle";
 
 		    } else if([operation isEqual: @"GWorkspaceRecycleOutOperation"]) {
-			    msg = @"Some items have the same name;\ndo you want to sobstitute them?";
+			    msg = @"Some items have the same name;\ndo you want to replace them?";
 			    title = @"Recycle";
 		    }
 

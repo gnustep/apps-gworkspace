@@ -199,10 +199,10 @@
            
 - (void)setSelectedPaths:(NSArray *)paths;
 
-- (void)setSelectedPaths:(NSArray *)paths fromDeskTopView:(DesktopView *)view;
+- (void)setSelectedPaths:(NSArray *)paths fromDesktopView:(DesktopView *)view;
 
 - (void)setSelectedPaths:(NSArray *)paths 
-         fromDeskTopView:(DesktopView *)view
+         fromDesktopView:(DesktopView *)view
             animateImage:(NSImage *)image 
          startingAtPoint:(NSPoint)startp;
 

@@ -172,7 +172,7 @@ static NSString *nibName = @"DeskTopPref";
 
 - (NSString *)prefName
 {
-  return NSLocalizedString(@"DeskTop", @"");
+  return NSLocalizedString(@"Desktop", @"");
 }
 
 - (IBAction)setDeskState:(id)sender
