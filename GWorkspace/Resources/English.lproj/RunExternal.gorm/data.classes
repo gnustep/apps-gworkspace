@@ -10,7 +10,6 @@
 	    "cancel:",
 	    "capitalizeWord:",
 	    "changeColor:",
-	    "changeFont:",
 	    "checkSpelling:",
 	    "close:",
 	    "complete:",
@@ -62,12 +61,12 @@
 	    "moveWordForwardAndModifySelection:",
 	    "newDocument:",
 	    "ok:",
+	    "open:",
 	    "openDocument:",
 	    "orderBack:",
 	    "orderFront:",
 	    "orderFrontColorPanel:",
 	    "orderFrontDataLinkPanel:",
-	    "orderFrontFontPanel:",
 	    "orderFrontHelpPanel:",
 	    "orderFrontStandardAboutPanel:",
 	    "orderFrontStandardInfoPanel:",
@@ -101,7 +100,6 @@
 	    "selectNextKeyView:",
 	    "selectParagraph:",
 	    "selectPreviousKeyView:",
-	    "selectText:",
 	    "selectText:",
 	    "selectToMark:",
 	    "selectWord:",
@@ -138,9 +136,7 @@
 	    "useStandardKerning:",
 	    "useStandardLigatures:",
 	    "yank:",
-	    "zoom:",
-	    "cancelButtAction:",
-	    "okButtAction:"
+	    "zoom:"
 	);
 	Super = NSObject;
     };

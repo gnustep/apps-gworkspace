@@ -33,6 +33,8 @@
 @interface GWViewersManager : NSObject
 {
   NSMutableArray *viewers;
+  // GWSpatialViewer *
+  
   GWorkspace *gworkspace;
 }
 
