@@ -1,5 +1,8 @@
 2003-10-28 Enrico Sersale  <enrico@imago.ro>
 
+  * ClipBook
+    new subproject.
+
   * GWorkspace/Resources
     removed some duplicate files.
 
