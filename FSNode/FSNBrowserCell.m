@@ -312,6 +312,10 @@ static NSDictionary *fontAttr = nil;
   [self setIcon];
 }
 
+- (void)setIconPosition:(unsigned int)ipos
+{
+}
+
 - (void)setNodeInfoShowType:(FSNInfoType)type
 {
   showType = type;

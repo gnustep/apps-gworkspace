@@ -37,6 +37,8 @@
 
 static id <DesktopApplication> desktopApp = nil;
 
+static NSFont *labelFont = nil;
+
 @implementation FSNIcon
 
 - (void)dealloc
@@ -67,13 +69,14 @@ static id <DesktopApplication> desktopApp = nil;
 
     desktopApp = [desktopAppClass performSelector: sel];
   }
+  
+  ASSIGN (labelFont, [NSFont systemFontOfSize: 12]);
 }
 
 - (id)initForNode:(FSNode *)anode
          iconSize:(float)isize
      iconPosition:(unsigned int)ipos
         gridIndex:(int)gindex
-        labelFont:(NSFont *)labfont
         dndSource:(BOOL)dndsrc
         acceptDnd:(BOOL)dndaccept
 {
@@ -116,11 +119,8 @@ static id <DesktopApplication> desktopApp = nil;
 		} 
     
     label = [FSNTextCell new];
-    if (labfont) {
-      [label setFont: labfont];
-    } else {
-      [label setFont: [NSFont systemFontOfSize: 12]];
-    }
+    [label setFont: [FSNIcon labelFont]];
+
     [self setNodeInfoShowType: FSNInfoNameType];
     
     labelRect = NSZeroRect;
@@ -179,11 +179,21 @@ static id <DesktopApplication> desktopApp = nil;
   return self;
 }
 
++ (NSFont *)labelFont
+{
+  return labelFont;
+}
+
++ (void)setLabelFont:(NSFont *)afont
+{
+  ASSIGN (labelFont, afont);
+}
+
 - (void)setSelectable:(BOOL)value
 {
   if (selectable != value) {
     selectable = value;
-    [self resizeWithOldSuperviewSize: [self frame].size];
+    [self tile];
   }
 }
 
@@ -419,7 +429,7 @@ static id <DesktopApplication> desktopApp = nil;
 
   [self setNodeInfoShowType: showType];  
   [self setLocked: [node isLocked]];
-  [self resizeWithOldSuperviewSize: [self frame].size];
+  [self tile];
 }
 
 - (FSNode *)node
@@ -446,12 +456,12 @@ static id <DesktopApplication> desktopApp = nil;
     }
   }
 
-  [self resizeWithOldSuperviewSize: [self frame].size];
+  [self tile];
 }
 
 - (void)setFont:(NSFont *)fontObj
 {
-  [label setFont: fontObj];
+  [FSNIcon setFont: fontObj];
 }
 
 - (void)setIconSize:(float)isize
@@ -464,7 +474,20 @@ static id <DesktopApplication> desktopApp = nil;
     hlightRect.size.height = isize + 2;
   }
   ASSIGN (highlightPath, [FSNodeRep highlightPathOfSize: hlightRect.size]);  
-  [self resizeWithOldSuperviewSize: [self frame].size];
+  [self tile];
+}
+
+- (void)setIconPosition:(unsigned int)ipos
+{
+  icnPosition = ipos;
+
+  if (icnPosition == NSImageLeft) {
+    [label setAlignment: NSLeftTextAlignment];
+  } else if (icnPosition == NSImageAbove) {
+    [label setAlignment: NSCenterTextAlignment];
+  } 
+  
+  [self tile];
 }
 
 - (void)setNodeInfoShowType:(FSNInfoType)type

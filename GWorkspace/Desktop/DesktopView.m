@@ -993,6 +993,16 @@
   return delegate;
 }
 
+- (BOOL)acceptsFirstMouse:(NSEvent *)theEvent
+{
+  return YES;
+}
+
+- (void)mouseDown:(NSEvent *)theEvent
+{
+
+}
+
 @end
 
 @implementation DesktopView (DraggingDestination)

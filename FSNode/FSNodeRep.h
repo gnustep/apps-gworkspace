@@ -52,6 +52,8 @@ typedef enum FSNInfoType {
 
 - (void)setIconSize:(float)isize;
 
+- (void)setIconPosition:(unsigned int)ipos;
+
 - (void)setNodeInfoShowType:(FSNInfoType)type;
 
 - (void)setLocked:(BOOL)value;

@@ -126,7 +126,6 @@
                                iconSize: ICN_SIZE
                            iconPosition: NSImageLeft
                               gridIndex: 0
-                              labelFont: nil
                               dndSource: NO
                               acceptDnd: NO];
 

@@ -56,6 +56,11 @@ i = 0; \
 #define bysize 3
 #define byowner 4
 
+static NSString *dots = @"...";
+static float dtslenght = 0.0;  
+static NSFont *lablfont = nil;
+static NSDictionary *fontAttr = nil;
+
 @protocol IconsProtocol
 
 - (NSString *)myName;
@@ -248,10 +253,68 @@ NSString *fixPath(NSString *s, const char *c)
   return fix_path(s, c);
 }
 
+/*
 NSString *cutFileLabelText(NSString *filename, id label, int lenght)
 {
 	if (lenght > 0) {
 		return cut_Text(filename, label, lenght);
+	}
+  
+	return filename;
+}
+*/
+
+NSString *cutFileLabelText(NSString *filename, id label, int lenght)
+{
+	if (lenght > 0) {
+	  NSFont *font = [label font];
+  
+    if ((lablfont == nil) || ([lablfont isEqual: font] == NO)) {
+      ASSIGN (lablfont, font);
+      ASSIGN (fontAttr, [NSDictionary dictionaryWithObject: lablfont 
+                                                    forKey: NSFontAttributeName]);
+      dtslenght = [dots sizeWithAttributes: fontAttr].width;     
+    }
+
+    if ([filename sizeWithAttributes: fontAttr].width > lenght) {
+      int tl = [filename cStringLength];
+
+      if (tl <= 5) {
+        return dots;
+      } else {
+        int fpto = (tl / 2) - 2;
+        int spfr = fpto + 3;
+        NSString *fp = [filename substringToIndex: fpto];
+        NSString *sp = [filename substringFromIndex: spfr];
+        NSString *dotted = [NSString stringWithFormat: @"%@%@%@", fp, dots, sp];
+        int dl = [dotted cStringLength];
+        float dotl = [dotted sizeWithAttributes: fontAttr].width;
+        int p = 0;
+
+        while (dotl > lenght) {
+          if (dl <= 5) {
+            return dots;
+          }        
+
+          if (p) {
+            fpto--;
+          } else {
+            spfr++;
+          }
+          p = !p;
+
+          fp = [filename substringToIndex: fpto];
+          sp = [filename substringFromIndex: spfr];
+          dotted = [NSString stringWithFormat: @"%@%@%@", fp, dots, sp];
+          dotl = [dotted sizeWithAttributes: fontAttr].width;
+          dl = [dotted cStringLength];
+        }      
+
+        return dotted;
+      }
+    }
+
+    return filename;
 	}
   
 	return filename;

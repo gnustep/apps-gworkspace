@@ -99,9 +99,12 @@
          iconSize:(float)isize
      iconPosition:(unsigned int)ipos
         gridIndex:(int)gindex
-        labelFont:(NSFont *)labfont
         dndSource:(BOOL)dndsrc
         acceptDnd:(BOOL)dndaccept;
+
++ (NSFont *)labelFont;
+
++ (void)setLabelFont:(NSFont *)afont;
 
 - (void)setSelectable:(BOOL)value;
 

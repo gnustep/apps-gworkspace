@@ -517,7 +517,7 @@ id instance = nil;
   if ([fm isWritableFileAtPath: path]) {
     NSString *dictPath = [path stringByAppendingPathComponent: @".gwsort"];
     
-    if ([fm fileExistsAtPath: dictPath]) {
+    if ([fm isReadableFileAtPath: dictPath] && [fm fileExistsAtPath: dictPath]) {
       NSDictionary *sortDict = [NSDictionary dictionaryWithContentsOfFile: dictPath];
        
       if (sortDict) {
