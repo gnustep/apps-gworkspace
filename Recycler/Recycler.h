@@ -101,8 +101,6 @@
 
 - (BOOL)isDocked;
 
-- (void)fileSystemWillChange:(NSNotification *)notif;
-
 - (void)fileSystemDidChange:(NSNotification *)notif;
 
 - (void)watchedPathDidChange:(NSData *)dirinfo;

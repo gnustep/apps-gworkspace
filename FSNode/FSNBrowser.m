@@ -1894,11 +1894,6 @@
   return YES;
 }
 
-- (void)stopRepNameEditing
-{
-  [self stopCellEditing];
-}
-
 - (void)setBackgroundColor:(NSColor *)acolor
 {
   int i;
@@ -1987,6 +1982,15 @@
     [nameEditor removeFromSuperview];
     [self setNeedsDisplayInRect: [nameEditor frame]];
   }
+}
+
+- (void)stopRepNameEditing
+{
+  [self stopCellEditing];
+}
+
+- (void)unselectNameEditor
+{
 }
 
 - (void)controlTextDidChange:(NSNotification *)aNotification

@@ -145,11 +145,6 @@ static Recycler *recycler = nil;
   [self addWatcherForPath: trashPath];
   
   [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
-                				selector: @selector(fileSystemWillChange:) 
-                					  name: @"GWFileSystemWillChangeNotification"
-                					object: nil];
-
-  [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
                 				selector: @selector(fileSystemDidChange:) 
                 					  name: @"GWFileSystemDidChangeNotification"
                 					object: nil];
@@ -199,12 +194,6 @@ static Recycler *recycler = nil;
 - (BOOL)isDocked
 {
   return docked;
-}
-
-- (void)fileSystemWillChange:(NSNotification *)notif
-{
-  NSDictionary *dict = [notif userInfo];  
-  [recview nodeContentsWillChange: dict];
 }
 
 - (void)fileSystemDidChange:(NSNotification *)notif

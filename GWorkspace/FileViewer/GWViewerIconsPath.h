@@ -36,7 +36,7 @@
 @interface GWViewerIconsPath : NSView
 {
   NSMutableArray *icons;
-
+  
   FSNIconNameEditor *nameEditor;
   FSNIcon *editIcon;
   
@@ -96,21 +96,13 @@
 - (id)addRepForSubnode:(FSNode *)anode;
 - (id)addRepForSubnodePath:(NSString *)apath;
 
-- (void)removeRepOfSubnode:(FSNode *)anode;
-- (void)removeRepOfSubnodePath:(NSString *)apath;
 - (void)removeRep:(id)arep;
 
 - (void)repSelected:(id)arep;
 - (void)unselectOtherReps:(id)arep;
-- (NSArray *)reps;
-- (NSArray *)selectedReps;
-- (NSArray *)selectedNodes;
 - (NSArray *)selectedPaths;  
 
-- (void)selectionDidChange;  
 - (void)checkLockedReps;
-- (void)setSelectionMask:(FSNSelectionMask)mask;
-- (void)openSelectionInNewViewer:(BOOL)newv;
 - (void)restoreLastSelection;
 
 - (NSColor *)backgroundColor;
@@ -126,7 +118,9 @@
 
 - (void)updateNameEditor;
 
-- (void)stopNameEditing;
+- (void)stopRepNameEditing;
+
+- (void)unselectNameEditor;
 
 - (void)controlTextDidChange:(NSNotification *)aNotification;
 

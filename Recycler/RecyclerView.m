@@ -169,10 +169,6 @@
 
 @implementation RecyclerView (NodeRepContainer)
 
-- (void)nodeContentsWillChange:(NSDictionary *)info
-{
-}
-
 - (void)nodeContentsDidChange:(NSDictionary *)info
 {
   NSString *operation = [info objectForKey: @"operation"];
@@ -267,38 +263,9 @@
   }
 }
 
-- (void)repSelected:(id)arep
-{
-}
-
-- (void)unselectOtherReps:(id)arep
-{
-}
-
-- (NSArray *)selectedPaths
-{
-  return [NSArray array];
-}
-
-- (void)selectionDidChange
-{
-}
-
-- (void)setSelectionMask:(FSNSelectionMask)mask
-{
-}
-
 - (FSNSelectionMask)selectionMask
 {
   return NSSingleSelectionMask;
-}
-
-- (void)openSelectionInNewViewer:(BOOL)newv
-{
-}
-
-- (void)restoreLastSelection
-{
 }
 
 - (BOOL)validatePasteOfFilenames:(NSArray *)names

@@ -202,10 +202,6 @@
 {
 }
 
-- (void)repSelected:(id)arep
-{
-}
-
 - (void)unselectOtherReps:(id)arep
 {
   int i;
@@ -267,14 +263,6 @@
   return selectedPaths;
 }
 
-- (void)selectionDidChange
-{
-}
-
-- (void)setSelectionMask:(FSNSelectionMask)mask
-{
-}
-
 - (FSNSelectionMask)selectionMask
 {
   return NSSingleSelectionMask;
@@ -289,16 +277,6 @@
     FSNode *node = [selection objectAtIndex: i];
     [finder openFoundSelection: [NSArray arrayWithObject: node]];
   }
-}
-
-- (void)restoreLastSelection
-{
-}
-
-- (BOOL)validatePasteOfFilenames:(NSArray *)names
-                       wasCutted:(BOOL)cutted
-{
-  return NO;
 }
 
 - (NSColor *)backgroundColor

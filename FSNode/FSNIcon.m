@@ -34,6 +34,9 @@
 #define BRANCH_SIZE 7
 #define ARROW_ORIGIN_X (BRANCH_SIZE + 4)
 
+#define DOUBLE_CLICK_LIMIT  300
+#define EDIT_CLICK_LIMIT   1000
+
 static id <DesktopApplication> desktopApp = nil;
 
 static NSImage *branchImage;
@@ -201,6 +204,7 @@ static NSImage *branchImage;
     isSelected = NO; 
     isOpened = NO;
     nameEdited = NO;
+    editstamp = 0.0;
     
     dragdelay = 0;
     isDragTarget = NO;
@@ -224,8 +228,14 @@ static NSImage *branchImage;
     return;
   }
   isSelected = YES;
-  [container unselectOtherReps: self];	
-  [container selectionDidChange];	
+  
+  if ([container respondsToSelector: @selector(unselectOtherReps:)]) {
+    [container unselectOtherReps: self];
+  }
+  if ([container respondsToSelector: @selector(selectionDidChange)]) {
+    [container selectionDidChange];	
+  }
+  
   [self setNeedsDisplay: YES]; 
 }
 
@@ -407,14 +417,19 @@ static NSImage *branchImage;
     onself = ([self mouse: location inRect: icnBounds]
                         || [self mouse: location inRect: labelRect]);
   }
-
-  [container setSelectionMask: NSSingleSelectionMask];   
+     
+  if ([container respondsToSelector: @selector(setSelectionMask:)]) {
+    [container setSelectionMask: NSSingleSelectionMask];
+  }
 
   if (onself) {
 	  if (([node isLocked] == NO) && ([theEvent clickCount] > 1)) {
-      BOOL newv = (([theEvent modifierFlags] & NSControlKeyMask)
+      if ([container respondsToSelector: @selector(openSelectionInNewViewer:)]) {
+        BOOL newv = (([theEvent modifierFlags] & NSControlKeyMask)
                         || ([theEvent modifierFlags] & NSAlternateKeyMask));
-		  [container openSelectionInNewViewer: newv];
+
+        [container openSelectionInNewViewer: newv];
+      }
     }  
   } else {
     [container mouseUp: theEvent];
@@ -443,22 +458,45 @@ static NSImage *branchImage;
     }
     
 	  if ([theEvent clickCount] == 1) {
+      if (isSelected == NO) {
+        if ([container respondsToSelector: @selector(unselectNameEditor)]) {
+          [container unselectNameEditor];
+        }
+      }
+      
 		  if ([theEvent modifierFlags] & NSShiftKeyMask) {
-			  [container setSelectionMask: FSNMultipleSelectionMask];    
+        if ([container respondsToSelector: @selector(setSelectionMask:)]) {
+          [container setSelectionMask: FSNMultipleSelectionMask];
+        }
          
 			  if (isSelected) {
-				  [self unselect];
-          [container selectionDidChange];
-				  return;
+          if ([container selectionMask] == FSNMultipleSelectionMask) {
+				    [self unselect];
+            if ([container respondsToSelector: @selector(selectionDidChange)]) {
+              [container selectionDidChange];	
+            }
+				    return;
+          }
         } else {
 				  [self select];
 			  }
         
 		  } else {
-			  [container setSelectionMask: NSSingleSelectionMask];
+        if ([container respondsToSelector: @selector(setSelectionMask:)]) {
+          [container setSelectionMask: NSSingleSelectionMask];
+        }
         
         if (isSelected == NO) {
+          NSTimeInterval interval = ([theEvent timestamp] - editstamp);
+        
 				  [self select];
+          
+          if ((interval > DOUBLE_CLICK_LIMIT)
+                                && (interval < EDIT_CLICK_LIMIT)) {
+            if ([container respondsToSelector: @selector(setNameEditorForRep:)]) {
+              [container setNameEditorForRep: self];
+            }
+          } 
 			  }
 		  }
     
@@ -469,7 +507,11 @@ static NSImage *branchImage;
 
           if ([nextEvent type] == NSLeftMouseUp) {
             [[self window] postEvent: nextEvent atStart: NO];
-            [container repSelected: self];
+            
+            if ([container respondsToSelector: @selector(repSelected:)]) {
+              [container repSelected: self];
+            }
+            
             break;
 
           } else if ([nextEvent type] == NSLeftMouseDragged) {
@@ -485,7 +527,9 @@ static NSImage *branchImage;
       
       if (startdnd == YES) {  
         [self startExternalDragOnEvent: nextEvent];    
-      } 
+      }
+      
+      editstamp = [theEvent timestamp];       
 	  } 
     
   } else {
@@ -896,32 +940,34 @@ static NSImage *branchImage;
 
 - (void)startExternalDragOnEvent:(NSEvent *)event
 {
-  NSPasteboard *pb = [NSPasteboard pasteboardWithName: NSDragPboard];	
-  NSArray *selectedPaths = [container selectedPaths];
+  if ([container respondsToSelector: @selector(selectedPaths)]) {
+    NSArray *selectedPaths = [container selectedPaths];
+    NSPasteboard *pb = [NSPasteboard pasteboardWithName: NSDragPboard];	
 
-  [pb declareTypes: [NSArray arrayWithObject: NSFilenamesPboardType] 
-             owner: nil];
-  
-  if ([pb setPropertyList: selectedPaths forType: NSFilenamesPboardType]) {
-    NSImage *dragIcon;
-    NSPoint dragPoint;
-                  
-    if ([selectedPaths count] == 1) {
-      dragIcon = icon;
-    } else {
-      dragIcon = [FSNodeRep multipleSelectionIconOfSize: iconSize];
-    }     
-                  
-    dragPoint = [event locationInWindow];      
-    dragPoint = [self convertPoint: dragPoint fromView: nil];
+    [pb declareTypes: [NSArray arrayWithObject: NSFilenamesPboardType] 
+               owner: nil];
 
-    [self dragImage: dragIcon
-                 at: dragPoint 
-             offset: NSZeroSize
-              event: event
-         pasteboard: pb
-             source: self
-          slideBack: YES];
+    if ([pb setPropertyList: selectedPaths forType: NSFilenamesPboardType]) {
+      NSImage *dragIcon;
+      NSPoint dragPoint;
+
+      if ([selectedPaths count] == 1) {
+        dragIcon = icon;
+      } else {
+        dragIcon = [FSNodeRep multipleSelectionIconOfSize: iconSize];
+      }     
+
+      dragPoint = [event locationInWindow];      
+      dragPoint = [self convertPoint: dragPoint fromView: nil];
+
+      [self dragImage: dragIcon
+                   at: dragPoint 
+               offset: NSZeroSize
+                event: event
+           pasteboard: pb
+               source: self
+            slideBack: YES];
+    }
   }
 }
 
@@ -936,7 +982,10 @@ static NSImage *branchImage;
 {
 	dragdelay = 0;
   onSelf = NO;
-  [container restoreLastSelection];
+  
+  if ([container respondsToSelector: @selector(restoreLastSelection)]) {
+    [container restoreLastSelection];
+  }
 }
 
 @end

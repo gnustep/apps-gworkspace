@@ -1715,23 +1715,6 @@ pp.x = NSMaxX([self bounds]) - 1
   return YES;
 }
 
-- (void)stopRepNameEditing
-{
-  if ([[self subviews] containsObject: nameEditor]) {
-    NSRect edrect = [nameEditor frame];
-    [nameEditor abortEditing];
-    [nameEditor setNode: nil stringValue: @"" index: -1];
-    [nameEditor removeFromSuperview];
-    [self setNeedsDisplayInRect: edrect];
-  }
-
-  if (editIcon) {
-    [editIcon setNameEdited: NO];
-  }
-
-  editIcon = nil;
-}
-
 - (void)setBackgroundColor:(NSColor *)acolor
 {
   ASSIGN (backColor, acolor);
@@ -2095,6 +2078,27 @@ pp.x = NSMaxX([self bounds]) - 1
   }
 }
 
+- (void)stopRepNameEditing
+{
+  if ([[self subviews] containsObject: nameEditor]) {
+    NSRect edrect = [nameEditor frame];
+    [nameEditor abortEditing];
+    [nameEditor setNode: nil stringValue: @"" index: -1];
+    [nameEditor removeFromSuperview];
+    [self setNeedsDisplayInRect: edrect];
+  }
+
+  if (editIcon) {
+    [editIcon setNameEdited: NO];
+  }
+
+  editIcon = nil;
+}
+
+- (void)unselectNameEditor
+{
+}
+
 - (void)controlTextDidChange:(NSNotification *)aNotification
 {
   NSRect icnr = [editIcon frame];
@@ -2143,8 +2147,8 @@ pp.x = NSMaxX([self bounds]) - 1
   FSNode *ednode = [nameEditor node];
 
 #define CLEAREDITING \
-	[self updateNameEditor]; \
-  return
+  [self stopRepNameEditing]; \
+  return 
  
   if ([ednode isWritable] == NO) {
     NSRunAlertPanel(NSLocalizedString(@"Error", @""), 

@@ -503,10 +503,6 @@
 
 @implementation Dock (NodeRepContainer)
 
-- (void)nodeContentsWillChange:(NSDictionary *)info
-{
-}
-
 - (void)nodeContentsDidChange:(NSDictionary *)info
 {
   NSString *operation = [info objectForKey: @"operation"];
@@ -646,10 +642,6 @@
   }
 }
 
-- (void)repSelected:(id)arep
-{
-}
-
 - (void)unselectOtherReps:(id)arep
 {
   int i;
@@ -663,36 +655,9 @@
   }
 }
 
-- (NSArray *)selectedPaths
-{
-  return [NSArray array];
-}
-
-- (void)selectionDidChange
-{
-}
-
-- (void)setSelectionMask:(FSNSelectionMask)mask
-{
-}
-
 - (FSNSelectionMask)selectionMask
 {
   return NSSingleSelectionMask;
-}
-
-- (void)openSelectionInNewViewer:(BOOL)newv
-{
-}
-
-- (void)restoreLastSelection
-{
-}
-
-- (BOOL)validatePasteOfFilenames:(NSArray *)names
-                       wasCutted:(BOOL)cutted
-{
-  return NO;
 }
 
 - (void)setBackgroundColor:(NSColor *)acolor
@@ -713,10 +678,6 @@
 - (NSColor *)backgroundColor
 {
   return backColor;
-}
-
-- (void)setTextColor:(NSColor *)acolor
-{
 }
 
 - (NSColor *)textColor

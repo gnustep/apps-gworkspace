@@ -200,7 +200,6 @@
 - (BOOL)involvedByFileOperation:(NSDictionary *)opinfo;
 - (BOOL)validatePasteOfFilenames:(NSArray *)names
                        wasCutted:(BOOL)cutted;
-- (void)stopRepNameEditing;                       
 - (void)setBackgroundColor:(NSColor *)acolor;
 - (NSColor *)backgroundColor;
 - (void)setTextColor:(NSColor *)acolor;
@@ -216,6 +215,10 @@
                 inColumn:(FSNBrowserColumn *)col;
                 
 - (void)stopCellEditing;                
+
+- (void)stopRepNameEditing;                       
+
+- (void)unselectNameEditor;
                 
 - (void)controlTextDidChange:(NSNotification *)aNotification;
 

@@ -72,6 +72,8 @@
   BOOL isLeaf;
   BOOL isLocked;
   
+  NSTimeInterval editstamp;  
+
   BOOL dndSource;
   BOOL acceptDnd;
   int dragdelay;

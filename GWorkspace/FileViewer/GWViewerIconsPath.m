@@ -164,7 +164,7 @@
   FSNIcon *icon;
   int icncount;
   int i;
-  
+    
   while ([icons count] > count) {
     icon = [self lastIcon];
     if (icon) {
@@ -419,24 +419,6 @@
   return [self addRepForSubnode: subnode];
 }
 
-- (void)removeRepOfSubnode:(FSNode *)anode
-{
-  FSNIcon *icon = [self repOfSubnode: anode];
-
-  if (icon) {
-    [self removeRep: icon];
-  } 
-}
-
-- (void)removeRepOfSubnodePath:(NSString *)apath
-{
-  FSNIcon *icon = [self repOfSubnodePath: apath];
-
-  if (icon) {
-    [self removeRep: icon];
-  }
-}
-
 - (void)removeRep:(id)arep
 {
   if (arep == editIcon) {
@@ -466,43 +448,6 @@
   }
 }
 
-- (NSArray *)reps
-{
-  return icons;
-}
-
-- (NSArray *)selectedReps
-{
-  NSMutableArray *selectedReps = [NSMutableArray array];
-  int i;
-  
-  for (i = 0; i < [icons count]; i++) {
-    FSNIcon *icon = [icons objectAtIndex: i];
-
-    if ([icon isSelected]) {
-      [selectedReps addObject: icon];
-    }
-  }
-
-  return [NSArray arrayWithArray: selectedReps];
-}
-
-- (NSArray *)selectedNodes
-{
-  NSMutableArray *selectedNodes = [NSMutableArray array];
-  int i;
-  
-  for (i = 0; i < [icons count]; i++) {
-    FSNIcon *icon = [icons objectAtIndex: i];
-
-    if ([icon isSelected]) {
-      [selectedNodes addObject: [icon node]];
-    }
-  }
-
-  return [NSArray arrayWithArray: selectedNodes];
-}
-
 - (NSArray *)selectedPaths
 {
   NSMutableArray *selectedPaths = [NSMutableArray array];
@@ -519,10 +464,6 @@
   return [NSArray arrayWithArray: selectedPaths];
 }
 
-- (void)selectionDidChange
-{
-}
-
 - (void)checkLockedReps
 {
   int i;
@@ -532,16 +473,16 @@
   }
 }
 
-- (void)setSelectionMask:(FSNSelectionMask)mask
+- (FSNSelectionMask)selectionMask
 {
-}
-
-- (void)openSelectionInNewViewer:(BOOL)newv
-{
+  return NSSingleSelectionMask;
 }
 
 - (void)restoreLastSelection
 {
+  [[self lastIcon] select];
+  [nameEditor setBackgroundColor: [NSColor selectedControlColor]];
+  [self updateNameEditor];
 }
 
 - (NSColor *)backgroundColor
@@ -571,7 +512,7 @@
 
 - (void)updateNameEditor
 {
-  FSNIcon *lastIcon = [self lastIcon];
+  FSNIcon *lastIcon;
   NSRect edrect;
 
   if ([[self subviews] containsObject: nameEditor]) {
@@ -588,9 +529,18 @@
 
   editIcon = nil;
   
-  if (lastIcon && [lastIcon isSelected] && ([lastIcon isShowingSelection] == NO)) {
-    editIcon = lastIcon; 
-  } 
+  lastIcon = [self lastIcon];
+  
+  if (lastIcon) {
+    int index = [icons indexOfObject: lastIcon];
+  
+    index = (index < lastVisibleIcon) ? index : lastVisibleIcon;
+    lastIcon = [icons objectAtIndex: index];
+    
+    if ([lastIcon isSelected] && ([lastIcon isShowingSelection] == NO)) {
+      editIcon = lastIcon; 
+    } 
+  }
 
   if (editIcon) {
     FSNode *iconnode = [editIcon node];
@@ -606,7 +556,7 @@
     NSFontManager *fmanager = [NSFontManager sharedFontManager];
     NSFont *edfont = [nameEditor font];
     BOOL editable = NO;
-    
+        
     [editIcon setNameEdited: YES];
   
     if ([editIcon nodeInfoShowType] == FSNInfoExtendedType) {
@@ -657,7 +607,7 @@
   }
 }
 
-- (void)stopNameEditing
+- (void)stopRepNameEditing
 {
   if ([[self subviews] containsObject: nameEditor]) {
     NSRect edrect = [nameEditor frame];
@@ -672,6 +622,19 @@
   }
 
   editIcon = nil;
+}
+
+- (void)unselectNameEditor
+{
+  [nameEditor setBackgroundColor: [self backgroundColor]];
+  
+  if ([[self subviews] containsObject: nameEditor]) {
+    NSRect r = NSIntersectionRect([self visibleRect], [nameEditor frame]);
+
+    if (NSEqualRects(r, NSZeroRect) == NO) {
+      [self setNeedsDisplayInRect: r];
+    }
+  }
 }
 
 - (void)controlTextDidChange:(NSNotification *)aNotification
@@ -706,15 +669,17 @@
   [nameEditor setFrame: NSIntegralRect(edrect)];
 }
 
+
+
 - (void)controlTextDidEndEditing:(NSNotification *)aNotification
 {
   NSFileManager *fm = [NSFileManager defaultManager];
   FSNode *ednode = [nameEditor node];
 
 #define CLEAREDITING \
-	[self updateNameEditor]; \
-  return
- 
+  [self stopRepNameEditing]; \
+  return 
+  
   if ([ednode isWritable] == NO) {
     NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
           [NSString stringWithFormat: @"%@\"%@\"!\n", 

@@ -873,7 +873,7 @@
 {
   if (nodeView) {
     [nodeView stopRepNameEditing];  
-    [pathsView stopNameEditing];  
+    [pathsView stopRepNameEditing];  
 
     if ([nodeView isSingleNode]) {
       NSRect r = [[vwrwin contentView] frame];

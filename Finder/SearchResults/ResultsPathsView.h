@@ -55,8 +55,6 @@
 
 - (void)watchedPathChanged:(NSDictionary *)info;
 
-- (void)repSelected:(id)arep;
-
 - (void)unselectOtherReps:(id)arep;
 
 - (NSArray *)selectedReps;
@@ -65,18 +63,9 @@
 
 - (NSArray *)selectedPaths;
 
-- (void)selectionDidChange;
-
-- (void)setSelectionMask:(FSNSelectionMask)mask;
-
 - (FSNSelectionMask)selectionMask;
 
 - (void)openSelectionInNewViewer:(BOOL)newv;
-
-- (void)restoreLastSelection;
-
-- (BOOL)validatePasteOfFilenames:(NSArray *)names
-                       wasCutted:(BOOL)cutted;
 
 - (NSColor *)backgroundColor;
 
