@@ -264,6 +264,11 @@ return [ws openFile: fullPath withApplication: appName]
 	return YES;
 }
 
+- (void)showRootViewer
+{
+  [rootViewer makeKeyAndOrderFront: nil];
+}
+
 - (void)rootViewerSelectFiles:(NSArray *)paths
 {
   [rootViewer makeKeyAndOrderFront: nil];

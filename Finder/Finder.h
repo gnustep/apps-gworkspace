@@ -35,6 +35,8 @@
 
 @protocol workspaceAppProtocol
 
+- (void)showRootViewer;
+
 - (BOOL)openFile:(NSString *)fullPath;
 
 - (BOOL)selectFile:(NSString *)fullPath

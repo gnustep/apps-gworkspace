@@ -53,6 +53,8 @@
 - (BOOL)selectFile:(NSString *)fullPath
 							inFileViewerRootedAtPath:(NSString *)rootFullpath;
 
+- (void)showRootViewer;
+
 - (void)rootViewerSelectFiles:(NSArray *)paths;
 
 - (void)slideImage:(NSImage *)image 
