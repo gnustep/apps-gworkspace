@@ -485,11 +485,18 @@ sr.size.width = sr.size.height = 1.0; \
 }
 
 #define CONVERT_CHECK \
+{ \
+NSRect br = [self bounds]; \
 pp = [self convertPoint: p fromView: nil]; \
 if (pp.x < 1) \
 pp.x = 1; \
-if (pp.x >= NSMaxX([self bounds])) \
-pp.x = NSMaxX([self bounds]) - 1
+if (pp.x >= NSMaxX(br)) \
+pp.x = NSMaxX(br) - 1; \
+if (pp.y < 0) \
+pp.y = -1; \
+if (pp.y > NSMaxY(br)) \
+pp.y = NSMaxY(br) + 1; \
+}
 
   p = [theEvent locationInWindow];
   sp = [self convertPoint: p  fromView: nil];
