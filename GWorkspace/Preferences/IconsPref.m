@@ -100,9 +100,9 @@ static NSString *nibName = @"IconsPref";
       /* Internationalization */
       [thumbbox setTitle: NSLocalizedString(@"Thumbnails", @"")];
       [thumbCheck setTitle: NSLocalizedString(@"use thumbnails", @"")];
-      [[animMatrix cellAtRow:0 column:0] setStringValue: NSLocalizedString(@"when changing a path", @"")];
-      [[animMatrix cellAtRow:1 column:0] setStringValue: NSLocalizedString(@"when opening a file", @"")];
-      [[animMatrix cellAtRow:2 column:0] setStringValue: NSLocalizedString(@"sliding back after file operation", @"")];       
+      [[animMatrix cellAtRow:0 column:0] setTitle: NSLocalizedString(@"when changing a path", @"")];
+      [[animMatrix cellAtRow:1 column:0] setTitle: NSLocalizedString(@"when opening a file", @"")];
+      [[animMatrix cellAtRow:2 column:0] setTitle: NSLocalizedString(@"sliding back after file operation", @"")];       
       [selectbox setTitle: NSLocalizedString(@"Animate icons", @"")];
       [actChangesButt setTitle: NSLocalizedString(@"Activate changes", @"")];
     }  

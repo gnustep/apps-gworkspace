@@ -150,7 +150,7 @@
     }
     
     cell = [matrix cellAtRow: i column: 0];  
-    [cell setStringValue: title];
+    [cell setTitle: title];
 	}
 
 	[matrix sizeToCells];

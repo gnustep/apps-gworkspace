@@ -72,11 +72,11 @@ static NSString *nibName = @"DefSortOrderPref";
 	    [selectbox setTitle: NSLocalizedString(@"Sort by", @"")];
 	    [sortinfo1 setStringValue: NSLocalizedString(@"The method will apply to all the folders", @"")];
 	    [sortinfo2 setStringValue: NSLocalizedString(@"that have no order specified", @"")]; 
-	    [[matrix cellAtRow:0 column:0] setStringValue: NSLocalizedString(@"Name", @"")];
-	    [[matrix cellAtRow:1 column:0] setStringValue: NSLocalizedString(@"Kind", @"")];
-	    [[matrix cellAtRow:2 column:0] setStringValue: NSLocalizedString(@"Date", @"")];
-	    [[matrix cellAtRow:3 column:0] setStringValue: NSLocalizedString(@"Size", @"")];
-	    [[matrix cellAtRow:4 column:0] setStringValue: NSLocalizedString(@"Owner", @"")];
+      [[matrix cellAtRow:0 column:0] setTitle: NSLocalizedString(@"Name", @"")];
+      [[matrix cellAtRow:1 column:0] setTitle: NSLocalizedString(@"Kind", @"")];
+      [[matrix cellAtRow:2 column:0] setTitle: NSLocalizedString(@"Date", @"")];
+      [[matrix cellAtRow:3 column:0] setTitle: NSLocalizedString(@"Size", @"")];
+      [[matrix cellAtRow:4 column:0] setTitle: NSLocalizedString(@"Owner", @"")];
     }
 	}
 	
