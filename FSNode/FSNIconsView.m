@@ -206,7 +206,6 @@ if (rct.size.height < 0) rct.size.height = 0; \
 - (NSDictionary *)readNodeInfo
 {
   NSDictionary *nodeDict = nil;
-  FSNInfoType itype;
   
   ASSIGN (infoPath, [[node path] stringByAppendingPathComponent: @".dirinfo"]);
   
@@ -257,13 +256,8 @@ if (rct.size.height < 0) rct.size.height = 0; \
       iconPosition = entry ? [entry intValue] : iconPosition;
 
       entry = [nodeDict objectForKey: @"fsn_info_type"];
-      itype = entry ? [entry intValue] : infoType;
-      if (infoType != itype) {
-        infoType = itype;
-        [self calculateGridSize];
-      }
-      infoType = itype;
-
+      infoType = entry ? [entry intValue] : infoType;
+      
       if (infoType == FSNInfoExtendedType) {
         DESTROY (extInfoType);
         entry = [nodeDict objectForKey: @"ext_info_type"];
@@ -278,7 +272,6 @@ if (rct.size.height < 0) rct.size.height = 0; \
 
         if (extInfoType == nil) {
           infoType = FSNInfoNameType;
-          [self calculateGridSize];
         }
       }
     }
@@ -1011,6 +1004,7 @@ pp.x = NSMaxX([self bounds]) - 1
     
   ASSIGN (node, anode);
   [self readNodeInfo];
+  [self calculateGridSize];
     
   for (i = 0; i < [subNodes count]; i++) {
     FSNode *subnode = [subNodes objectAtIndex: i];
@@ -1273,15 +1267,12 @@ pp.x = NSMaxX([self bounds]) - 1
 - (void)setShowType:(FSNInfoType)type
 {
   if (infoType != type) {
-    BOOL newgrid = ((infoType == FSNInfoNameType) || (type == FSNInfoNameType));
     int i;
     
     infoType = type;
     DESTROY (extInfoType);
     
-    if (newgrid) {
-      [self calculateGridSize];
-    }
+    [self calculateGridSize];
     
     for (i = 0; i < [icons count]; i++) {
       FSNIcon *icon = [icons objectAtIndex: i];
@@ -1298,15 +1289,12 @@ pp.x = NSMaxX([self bounds]) - 1
 - (void)setExtendedShowType:(NSString *)type
 {
   if ((extInfoType == nil) || ([extInfoType isEqual: type] == NO)) {
-    BOOL newgrid = (infoType == FSNInfoNameType);
     int i;
     
     infoType = FSNInfoExtendedType;
     ASSIGN (extInfoType, type);
 
-    if (newgrid) {
-      [self calculateGridSize];
-    }
+    [self calculateGridSize];
 
     for (i = 0; i < [icons count]; i++) {
       FSNIcon *icon = [icons objectAtIndex: i];

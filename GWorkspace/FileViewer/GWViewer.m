@@ -411,8 +411,7 @@
 - (void)scrollToBeginning
 {
   if ([nodeView isSingleNode]) {
-    NSRect r = [nodeView frame];
-    [nodeView scrollRectToVisible: NSMakeRect(0, r.size.height - 1, 1, 1)];	
+    [nodeView scrollSelectionToVisible];
   }
 }
 
@@ -1081,12 +1080,15 @@
         FSNode *basend;
 
         base = [selection objectAtIndex: 0];
+        basend = [FSNode nodeWithPath: base];
         
         if ([base isEqual: [baseNode path]] == NO) {
-          base = [base stringByDeletingLastPathComponent];
+          if (([selection count] > 1) 
+                || (([basend isDirectory] == NO) || ([basend isPackage]))) {
+            base = [base stringByDeletingLastPathComponent];
+            basend = [FSNode nodeWithPath: base];
+          }
         }
-        
-        basend = [FSNode nodeWithPath: base];
 
         [nodeView showContentsOfNode: basend];
         [nodeView selectRepsOfPaths: selection];
@@ -1139,18 +1141,21 @@
     type = FSNInfoNameType;
   } 
 
-  [(id <FSNodeRepContainer>)nodeView setShowType: type];  
+  [(id <FSNodeRepContainer>)nodeView setShowType: type]; 
+  [self scrollToBeginning]; 
 }
 
 - (void)setExtendedShownType:(id)sender
 {
   [(id <FSNodeRepContainer>)nodeView setExtendedShowType: [sender title]];  
+  [self scrollToBeginning];
 }
 
 - (void)setIconsSize:(id)sender
 {
   if ([nodeView respondsToSelector: @selector(setIconSize:)]) {
     [(id <FSNodeRepContainer>)nodeView setIconSize: [[sender title] intValue]];
+    [self scrollToBeginning];
   }
 }
 
@@ -1164,6 +1169,8 @@
     } else {
       [(id <FSNodeRepContainer>)nodeView setIconPosition: NSImageAbove];
     }
+    
+    [self scrollToBeginning];
   }
 }
 
@@ -1171,6 +1178,7 @@
 {
   if ([nodeView respondsToSelector: @selector(setLabelTextSize:)]) {
     [nodeView setLabelTextSize: [[sender title] intValue]];
+    [self scrollToBeginning];
   }
 }
 

@@ -1,3 +1,9 @@
+2004-09-22 Enrico Sersale  <enrico@imago.ro>
+  
+  * The old file viewers have been removed. Activated the new FSNode based
+    viewers.
+    GWLib removed.
+
 2004-06-15 Enrico Sersale  <enrico@imago.ro>
   
   * Recycler

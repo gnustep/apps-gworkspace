@@ -366,8 +366,7 @@
 - (void)scrollToBeginning
 {
   if ([nodeView isSingleNode]) {
-    NSRect r = [nodeView frame];
-    [nodeView scrollRectToVisible: NSMakeRect(0, r.size.height - 1, 1, 1)];	
+    [nodeView scrollSelectionToVisible];
   }
 }
 
@@ -942,17 +941,20 @@
   } 
 
   [(id <FSNodeRepContainer>)nodeView setShowType: type];  
+  [self scrollToBeginning];
 }
 
 - (void)setExtendedShownType:(id)sender
 {
-  [(id <FSNodeRepContainer>)nodeView setExtendedShowType: [sender title]];  
+  [(id <FSNodeRepContainer>)nodeView setExtendedShowType: [sender title]]; 
+  [self scrollToBeginning]; 
 }
 
 - (void)setIconsSize:(id)sender
 {
   if ([nodeView respondsToSelector: @selector(setIconSize:)]) {
     [(id <FSNodeRepContainer>)nodeView setIconSize: [[sender title] intValue]];
+    [self scrollToBeginning];
   }
 }
 
@@ -966,6 +968,8 @@
     } else {
       [(id <FSNodeRepContainer>)nodeView setIconPosition: NSImageAbove];
     }
+    
+    [self scrollToBeginning];
   }
 }
 
@@ -973,6 +977,7 @@
 {
   if ([nodeView respondsToSelector: @selector(setLabelTextSize:)]) {
     [nodeView setLabelTextSize: [[sender title] intValue]];
+    [self scrollToBeginning];
   }
 }
 
