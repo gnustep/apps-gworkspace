@@ -152,60 +152,16 @@ static GWorkspace *gworkspace = nil;
 
 - (BOOL)openFile:(NSString *)fullPath
 {
-	NSPoint p = [currentViewer locationOfIconForPath: fullPath];
-	NSView *aview = [currentViewer viewer];
-	NSImage *image;
-  NSString *defApp; 
-  NSString *type;
-
-  [ws getInfoForFile: fullPath application: &defApp type: &type];
-	image = [GWLib iconForFile: fullPath ofType: type];
-  
-	return [self openFile: fullPath fromImage: image at: p inView: aview];
-}
-
-- (BOOL)openFile:(NSString *)fullPath 
-			 fromImage:(NSImage *)anImage 
-			  			at:(NSPoint)point 
-					inView:(NSView *)aView
-{
 	NSString *appName;
   NSString *type;
-	id fiendLeaf;
-	id app;
-	NSPoint toPoint;
-	BOOL dissolved;
-	
-#define RETURN_OPEN \
-return [ws openFile: fullPath withApplication: appName]
   
   [ws getInfoForFile: fullPath application: &appName type: &type];
-	
+  
 	if (appName == nil) {
 		appName = defEditor;
 	}		
-
-	if (animateLaunck == NO)  RETURN_OPEN;
   
-  if ((fiend == nil) || ([[fiend myWin] isVisible] == NO)) RETURN_OPEN;
-	
-	fiendLeaf = [fiend fiendLeafOfType: NSApplicationFileType withName: appName];
-	if (fiendLeaf == nil) RETURN_OPEN;
-	
-	app = [self connectApplication: appName];
-	if (app == nil) {
-		dissolved = [fiend dissolveLeaf: fiendLeaf];
-	}
-	
-	if (point.x <= 0 || point.y <= 0) RETURN_OPEN;
-
-	toPoint = [fiend positionOfLeaf: fiendLeaf];
-	if (toPoint.x <= 0 || toPoint.y <= 0) RETURN_OPEN;
-			
-	point = [[aView window] convertBaseToScreen: point];
-	[self slideImage: anImage from: point to: toPoint];
-	
-	RETURN_OPEN;
+  return [ws openFile: fullPath withApplication: appName];
 }
 
 - (BOOL)selectFile:(NSString *)fullPath
@@ -365,7 +321,8 @@ return [ws openFile: fullPath withApplication: appName]
   }
 }
 
-- (ViewersWindow *)newViewerAtPath:(NSString *)path canViewApps:(BOOL)viewapps
+- (id)newViewerAtPath:(NSString *)path 
+          canViewApps:(BOOL)viewapps
 {
   BOOL setSelection = starting ? YES : ([path isEqual: fixPath(@"/", 0)] ? YES : NO);
 	ViewersWindow *viewer = [[ViewersWindow alloc] initWithViewerTemplates: viewersTemplates
@@ -400,11 +357,6 @@ return [ws openFile: fullPath withApplication: appName]
 - (BOOL)animateChdir
 {
   return animateChdir;
-}
-
-- (BOOL)animateLaunck
-{
-  return animateLaunck;
 }
 
 - (BOOL)animateSlideBack
@@ -565,7 +517,6 @@ return [ws openFile: fullPath withApplication: appName]
 	} 
   
   animateChdir = ![defaults boolForKey: @"nochdiranim"];
-  animateLaunck = ![defaults boolForKey: @"nolaunchanim"];
   animateSlideBack = ![defaults boolForKey: @"noslidebackanim"];
   
   contestualMenu = [defaults boolForKey: @"UsesContestualMenu"];
@@ -954,7 +905,6 @@ return [ws openFile: fullPath withApplication: appName]
                forKey: @"shelfcellswidth"];
 
   [defaults setBool: !animateChdir forKey: @"nochdiranim"];
-  [defaults setBool: !animateLaunck forKey: @"nolaunchanim"];
   [defaults setBool: !animateSlideBack forKey: @"noslidebackanim"];
 
   [defaults setBool: usesThumbnails forKey: @"usesthumbnails"];
@@ -1402,7 +1352,6 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];     
   
   animateChdir = ![defaults boolForKey: @"nochdiranim"];
-  animateLaunck = ![defaults boolForKey: @"nolaunchanim"];
   animateSlideBack = ![defaults boolForKey: @"noslidebackanim"];
 }
            

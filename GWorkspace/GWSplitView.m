@@ -27,7 +27,6 @@
 #include "GWFunctions.h"
 #include "GWNotifications.h"
 #include "GWSplitView.h"
-#include "ViewersWindow.h"
 #include "GNUstep.h"
 
 @implementation GWSplitView 
@@ -44,8 +43,6 @@
 {
   self = [super initWithFrame: frameRect]; 
  		
-  vwr = (ViewersWindow *)viewer;
-  
   diskInfoField = [NSTextFieldCell new];
   [diskInfoField setFont: [NSFont systemFontOfSize: 10]];
   [diskInfoField setBordered: NO];

@@ -461,22 +461,6 @@
   return YES;
 }
 
-- (NSPoint)locationOfIconForPath:(NSString *)path
-{
-	if ([selectedPaths containsObject: path]) {
-		NSPoint p = [iconsPath positionOfLastIcon];   
-    
-    if (p.x > ([self frame].size.width - ICNWIDTH)) {
-      return NSZeroPoint;
-    }
-     
-    p.y += [pathsScroll frame].origin.y;
-    return [self convertPoint: p toView: nil];
-	}
-	
-	return NSZeroPoint;
-}
-
 - (void)unsetWatchers
 {
   int i;

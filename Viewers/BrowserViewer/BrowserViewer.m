@@ -400,21 +400,6 @@ if (rct.size.height < 0) rct.size.height = 0
   return YES;
 }
 
-- (NSPoint)locationOfIconForPath:(NSString *)path   
-{
-	if ([selectedPaths containsObject: path]) {
-		NSPoint p = [browser positionOfLastIcon];
-    
-    if (NSEqualPoints(p, NSZeroPoint) == NO) {
-		  return [self convertPoint: p toView: nil];
-    }
-    
-    return NSZeroPoint;
-	}
-	
-	return NSZeroPoint;
-}
-
 - (void)unsetWatchers
 {
   int i;

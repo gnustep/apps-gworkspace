@@ -25,22 +25,15 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-  #ifdef GNUSTEP 
 #include "GWLib.h"
 #include "GWFunctions.h"
 #include "GWNotifications.h"
-  #else
-#include <GWorkspace/GWLib.h>
-#include <GWorkspace/GWFunctions.h>
-#include <GWorkspace/GWNotifications.h>
-  #endif
 #include "IconsPref.h"
 #include "GWorkspace.h"
 #include "GNUstep.h"
 
 #define ANIM_CHPAT 0
-#define ANIM_OPEN 1
-#define ANIM_SLIDEBACK 2
+#define ANIM_SLIDEBACK 1
 
 static NSString *nibName = @"IconsPref";
 
@@ -62,9 +55,7 @@ static NSString *nibName = @"IconsPref";
       NSLog(@"failed to load %@!", nibName);
     } else {  
       NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults]; 
-      NSArray *cells = [animMatrix cells];
-      id result;
-      unsigned int state;
+      id cell;
 
       RETAIN (prefbox);
       RELEASE (win); 
@@ -73,36 +64,17 @@ static NSString *nibName = @"IconsPref";
   
       [thumbCheck setState: [defaults boolForKey: @"usesthumbnails"] ? NSOnState : NSOffState];  
 
-	    result = [defaults objectForKey: @"nochdiranim"];
-      if (result) {
-        state = ([result isEqual: @"1"]) ? NSOffState : NSOnState;
-      } else {
-        state = NSOnState;
-      }
-      [[cells objectAtIndex: ANIM_CHPAT] setState: state];    
-  
-	    result = [defaults objectForKey: @"nolaunchanim"];
-      if (result) {
-        state = ([result isEqual: @"1"]) ? NSOffState : NSOnState;
-      } else {
-        state = NSOnState;
-      }
-      [[cells objectAtIndex: ANIM_OPEN] setState: state];    
-      
-	    result = [defaults objectForKey: @"noslidebackanim"];
-      if (result) {
-        state = ([result isEqual: @"1"]) ? NSOffState : NSOnState;
-      } else {
-        state = NSOnState;
-      }
-      [[cells objectAtIndex: ANIM_SLIDEBACK] setState: state];   
+      cell = [animMatrix cellAtRow: ANIM_CHPAT column: 0];
+      [cell setState: [defaults boolForKey: @"nochdiranim"] ? NSOffState : NSOnState];  
+
+      cell = [animMatrix cellAtRow: ANIM_SLIDEBACK column: 0];
+      [cell setState: [defaults boolForKey: @"noslidebackanim"] ? NSOffState : NSOnState];  
       
       /* Internationalization */
       [thumbbox setTitle: NSLocalizedString(@"Thumbnails", @"")];
       [thumbCheck setTitle: NSLocalizedString(@"use thumbnails", @"")];
-      [[animMatrix cellAtRow:0 column:0] setTitle: NSLocalizedString(@"when changing a path", @"")];
-      [[animMatrix cellAtRow:1 column:0] setTitle: NSLocalizedString(@"when opening a file", @"")];
-      [[animMatrix cellAtRow:2 column:0] setTitle: NSLocalizedString(@"sliding back after file operation", @"")];       
+      [[animMatrix cellAtRow: ANIM_CHPAT column: 0] setTitle: NSLocalizedString(@"when changing a path", @"")];
+      [[animMatrix cellAtRow: ANIM_SLIDEBACK column: 0] setTitle: NSLocalizedString(@"sliding back after file operation", @"")];       
       [selectbox setTitle: NSLocalizedString(@"Animate icons", @"")];
       [actChangesButt setTitle: NSLocalizedString(@"Activate changes", @"")];
     }  
@@ -133,16 +105,12 @@ static NSString *nibName = @"IconsPref";
   unsigned int state;
   
   state = [[cells objectAtIndex: ANIM_CHPAT] state];
-  [defaults setObject: ((state == NSOnState) ? @"0" : @"1") 
-               forKey: @"nochdiranim"];
-
-  state = [[cells objectAtIndex: ANIM_OPEN] state];
-  [defaults setObject: ((state == NSOnState) ? @"0" : @"1") 
-               forKey: @"nolaunchanim"];
+  [defaults setBool: ((state == NSOnState) ? NO : YES) 
+             forKey: @"nochdiranim"];
 
   state = [[cells objectAtIndex: ANIM_SLIDEBACK] state];
-  [defaults setObject: ((state == NSOnState) ? @"0" : @"1") 
-               forKey: @"noslidebackanim"];
+  [defaults setBool: ((state == NSOnState) ? NO : YES) 
+             forKey: @"noslidebackanim"];
 
   [defaults synchronize];
   

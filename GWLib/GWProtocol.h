@@ -26,7 +26,6 @@
 #define GWPROTOCOL_H
 
 @class GWorkspace;
-@class ViewersWindow;
 
 @protocol GWProtocol
 
@@ -45,11 +44,6 @@
 
 - (BOOL)openFile:(NSString *)fullPath;
 
-- (BOOL)openFile:(NSString *)fullPath 
-			 fromImage:(NSImage *)anImage 
-			  			at:(NSPoint)point 
-					inView:(NSView *)aView;
-
 - (BOOL)selectFile:(NSString *)fullPath
 							inFileViewerRootedAtPath:(NSString *)rootFullpath;
 
@@ -61,11 +55,13 @@
 							from:(NSPoint)fromPoint 
 								to:(NSPoint)toPoint;
 
-- (void)openSelectedPaths:(NSArray *)paths newViewer:(BOOL)newv;
+- (void)openSelectedPaths:(NSArray *)paths 
+                newViewer:(BOOL)newv;
 
 - (void)openSelectedPathsWith;
 
-- (ViewersWindow *)newViewerAtPath:(NSString *)path canViewApps:(BOOL)viewapps;
+- (id)newViewerAtPath:(NSString *)path 
+          canViewApps:(BOOL)viewapps;
 
 - (NSArray *)getSelectedPaths;
 
@@ -74,8 +70,6 @@
 - (NSArray *)viewersSearchPaths;
 
 - (BOOL)animateChdir;
-
-- (BOOL)animateLaunck;
 
 - (BOOL)animateSlideBack;
 

@@ -34,7 +34,6 @@
 
 @interface GWSplitView : NSSplitView 
 {
-  id vwr;
   NSTextFieldCell *diskInfoField;
   NSString *diskInfoString;
   NSRect diskInfoRect;

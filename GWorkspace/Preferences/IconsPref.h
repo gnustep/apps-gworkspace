@@ -27,11 +27,7 @@
 #define ICONS_PREF_H
 
 #include <Foundation/NSObject.h>
-  #ifdef GNUSTEP 
 #include "PreferencesProtocol.h"
-  #else
-#include <GWorkspace/PreferencesProtocol.h>
-  #endif
 
 @class GWorkspace;
 

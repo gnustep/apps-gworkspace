@@ -159,7 +159,6 @@
 	NSMutableArray *viewersTemplates;
 
   BOOL animateChdir;
-  BOOL animateLaunck;
   BOOL animateSlideBack;
 
   BOOL contestualMenu;

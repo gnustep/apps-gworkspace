@@ -436,37 +436,6 @@ if (rct.size.height < 0) rct.size.height = 0; \
   return YES;
 }
 
-- (NSPoint)locationOfIconForPath:(NSString *)path
-{	
-	NSString *name = [path lastPathComponent];
-	NSPoint p = [panel locationOfIconWithName: name];
-	
-	if ((p.x == 0) && (p.y == 0)) {
-		return p;
-		
-	} else { 
-		NSView *sview = [[self window] contentView];
-		NSRect r = [self visibleRect];
-		NSPoint lim1 = r.origin;
-		NSPoint lim2 = NSMakePoint(lim1.x + r.size.width, lim1.y + r.size.height);
-
-		p = [sview convertPoint: p fromView: panel];
-		lim1 = [sview convertPoint: lim1 fromView: self];
-		lim2 = [sview convertPoint: lim2 fromView: self];
-
-		if (p.x < lim1.x) p.x = lim1.x;
-		if (p.y < lim1.y) p.y = lim1.y;
-
-		if (p.x >= lim2.x) p.x = lim2.x - 60;
-		if (p.y >= lim2.y) p.y = lim2.y - 60;
-
-		if (p.x == 0) p.x = 1;
-		if (p.y == 0) p.y = 1;
-	}
-	
-	return p;
-}
-
 - (void)unsetWatchers
 {
   int i;

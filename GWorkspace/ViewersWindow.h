@@ -91,8 +91,6 @@
 
 - (NSString *)currentViewedPath;
 
-- (NSPoint)locationOfIconForPath:(NSString *)apath;
-
 - (void)activate;
 
 - (void)setViewerSelection:(NSArray *)selPaths;

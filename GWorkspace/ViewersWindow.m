@@ -604,11 +604,6 @@ if (rct.size.height < 0) rct.size.height = 0; \
   return [viewer currentViewedPath];
 }
 
-- (NSPoint)locationOfIconForPath:(NSString *)apath
-{
-	return [viewer locationOfIconForPath: apath];
-}
-
 - (void)activate
 {
   [self makeKeyAndOrderFront: nil];
