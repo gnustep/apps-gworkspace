@@ -1,0 +1,5 @@
+#!/bin/sh
+
+#galeon $*
+
+galeon "$2" &

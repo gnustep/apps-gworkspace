@@ -1,0 +1,20 @@
+{
+  NSExecutable = "xsox";
+  NSIcon = "xsox.tiff";
+  NSRole = "Editor";
+	XAppWrapper = YES;
+  NSTypes = (
+    {
+      NSUnixExtensions = ( "aiff" );
+      NSIcon = "FileIcon_.aiff.tiff";
+    },
+    {
+      NSUnixExtensions = ( "wav" , "wave" );
+      NSIcon = "FileIcon_.wav.tiff";
+    },
+    {
+      NSUnixExtensions = ( "au" );
+      NSIcon = "FileIcon_.au.tiff";
+    }
+  );
+}

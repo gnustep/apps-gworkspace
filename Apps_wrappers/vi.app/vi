@@ -1,0 +1,30 @@
+#!/bin/sh
+# Usage: vi [ -GSFilePath file ]
+# simple GNUstep launch script for emacs/xemacs
+#
+#
+#--FUNCTIONS
+#
+usage()
+{
+echo Usage: `basename $0` '[ -GSFilePath file ]'
+exit 2
+}
+#-- MAIN
+#
+# -- establish name of file to be opened
+#
+if [ $# -eq 2 ] ; then
+  if [ "$1" = "-GSFilePath" ] ; then
+    file="$2"
+  else
+    usage
+  fi
+elif [ $# -eq 0 ] ; then
+  file=
+else
+  usage
+fi
+# -- run vi
+xterm -e vi $file &
+# -- you may want to echo 2>/dev/console if permissioned for it

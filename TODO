@@ -1,0 +1,6 @@
+1- See InspectorViewer.m
+2- See ThemeViewer.m 
+3- Fix scroll/refresh during File Operations
+4- Add a cache system for Inspector ?
+5- Add nice Icons
+6- Rewrite/remove some Prefs

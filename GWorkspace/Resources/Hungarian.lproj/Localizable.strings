@@ -1,0 +1,323 @@
+/* ----------------------- menu strings --------------------------- */		
+/* Magyar szöveg: REUSS András <tinstall@freemail.hu> 
+ */
+/* main.m */
+
+
+"Info" = "Adatok";
+	"Info Panel..." = "Névjegy...";
+	"Preferences..." = "Beállítások...";
+	"Help..." = "Segítség...";
+
+"File" = "Fájl";
+	"Open" = "Megnyitás";
+	"Open as Folder" = "Megnyitás új ablakban";
+	"Edit File" = "Fájl szerkesztése";
+	"New Folder" = "Új könyvtár";
+	"New File" = "Új fájl";
+	"Duplicate" = "Duplikálás";	
+	"Destroy" = "Törlés";
+	"Empty Recycler" = "Szemetes ürítése";
+
+"Edit" = "Szerkesztés";
+	"Cut" = "Kivágás";
+	"Copy" = "Másolás";
+	"Paste" = "Beillesztés";
+	"Select All" = "Mindent kijelöl";
+		
+"View" = "Megjelenítés";
+	"Browser" = "Fájlnézet";
+	"Icon" = "Ikonnézet";
+		
+"Tools" = "Eszközök";
+	"Viewer" = "Böngész?";
+	"Inspectors" = "Beállítópanelek";
+		"Show Inspectors" = "Beállítópanelek megjelenítése";
+		"Attributes" = "Tulajdonságok";
+		"Contents" = "Tartalom";
+		"Tools" = "Eszközök";	
+		"Permissions" = "Hozzáférés";	
+	"Finder" = "Fájl keresése";
+	"Processes..." = "Folyamatok...";
+	"Fiend" = "Pult";
+		"Show Fiend" = "Pult megmutatása";
+		"Hide Fiend" = "Pult elrejtése";
+		"Add Layer..." = "Munkaasztal hozzáadása...";
+		"Remove Current Layer" = "Jelenlegi munkaasztal megszüntetése";
+		"Rename Current Layer" = "Jelenlegi munkaasztal átnevezése";
+		"Layers" = "Munkaasztalok";
+	"DeskTop Shelf" = "Asztali polc";	
+	"XTerm" = "XTerm";
+	
+"Windows" = "Ablakok";
+	"Arrange in Front" = "El?térbe hozás";
+	"Miniaturize Window" = "Ablak kicsinyítése";
+	"Close Window" = "Ablak bezárása";
+	
+"Services" = "Szolgáltatások";
+
+"Hide" = "Elrejtés";
+
+"Quit" = "Kilépés";
+	
+	
+/* ----------------------- File Operations strings --------------------------- *\
+
+/* GWorkspace.m */
+
+"GNUstep Workspace Manager" = "GNUstep fájlkezel?";
+"See http://www.gnustep.it/enrico/gworkspace" = "http://www.gnustep.it/enrico/gworkspace";
+"Released under the GNU General Public License 2.0" = "Terjesztési jog: GNU General Public License 2.0";
+"Error" = "Hiba";
+"You have not write permission\nfor" = "Nincs írási jogosultsága \na következ?höz:";
+"Continue" = "Tovább";
+
+
+/* FileOperation.m */
+
+"OK" = "Ok";
+"Cancel" = "Mégsem";
+"Move" = "Áthelyezés";
+"Move from: " = "Áthelyezés a következ?b?l: ";
+"\nto: " = "\nide: ";
+"Copy" = "Másolás";
+"Copy from: " = "Másolás a következ?b?l: ";
+"Link" = "Lánc létrehozása";
+"Link " = "Lánc létrehozása";
+"Delete" = "Törlés";
+"Delete the selected objects?" = "Törli a kijelölt elemeket?";
+"Duplicate" = "Duplikálás";
+"Duplicate the selected objects?" = "Duplikálja a kijelölt elemeket?";
+"From:" = "Innen:";
+"To:" = "Ide:";
+"In:" = "Ebbe:";
+"Stop" = "Leállítás";
+"Pause" = "Felfüggesztés";
+"Moving" = "Áthelyezés folyamatban";
+"Copying" = "Másolás folyamatban";
+"Linking" = "Láncolás folyamatban";
+"Duplicating" = "Duplikálás folyamatban";
+"Destroying" = "Törlés folyamatban";
+"File Operation Completed" = "A fájlm?velet befejez?dött";
+"Backgrounder connection died!" = "A kapcsolat a háttérfolyamattal megszakadt!";
+"Some items have the same name;\ndo you want to sobstitute them?" = "Egyes elemeknek azonos a nevük;\nmeg akarja változtatni?";
+"Error" = "Hiba";
+"File Operation Error!" = "Hiba a fájlm?velet során!";
+
+
+/* ColumnIcon.m */
+
+"You have not write permission\nfor " = "Nincs írási jogosultsága\n ";
+"The name " = "A következõ név ";
+" is already in use!" = "már foglalt!";
+"Cannot rename " = "Nem lehet átnevezni";
+"Invalid char in name" = "A név nem elfogadható írásjelet tartalmaz";
+
+
+/* ----------------------- Inspectors strings --------------------------- *\
+
+/* InspectorsWin.m */
+
+"Attributes" = "Tulajdonságok";
+"Contents" = "Tartalom";
+"Tools" = "Eszközök";
+"Access Control" = "Hozzáférés szabályozása";
+
+
+/* AttributesPanel.m */
+
+"Attributes" = "Tulajdonságok";
+"Attributes Inspector" = "Tulajdonság-panel";
+"Path:" = "Teljes elérési út:";
+"Link To:" = "Láncolva a következõhöz:";
+"Size:" = "Méret:";
+"Owner:" = "Tulajdonos:";
+"Group:" = "Csoport:";
+"Changed" = "Módosítva";
+"Revert" = "Visszaállítás";
+"OK" = "Ok";
+
+
+/* ContentsPanel.m */
+
+"Contents" = "Tartalom";
+"Contents Inspector" = "Tartalom-panel";
+"No Contents Inspector" = "Nincs tartalom-panel";
+"No Contents Inspector\nFor Multiple Selection" = "Nincs tartalom-panel\ntöbbszörös kijelöléshez";
+
+
+/* FolderViewer.m */
+
+"Sort method applies to the\ncontents of the selected folder,\nNOT to its parent folder"
+  = "A sorbarendezés a\nkijelölt könyvtárak tartalmát érinti,\nNEM pedig magukat a könyvtárakat";
+"Sort by" = "Rendezés a következõk alapján";
+"Name" = "Név";
+"Kind" = "Típus";
+"Date" = "Dátum";
+"Size" = "Méret";
+"Owner" = "Tulajdonos";
+"Folder Inspector" = "Könyvtár-panel";	
+
+
+/* ImageViewer.m */
+
+"Image Inspector" = "Kép-panel";
+
+
+/* AppViewer.m */
+
+"Open these kinds of documents:" = "A következõ típusú dokumentum megnyitása:";
+"Invalid Contents" = "Érvénytelen tartalom";
+"App Inspector" = "Alkalmazás-panel";
+
+
+/* PermissionsPanel.m */
+
+"UNIX Permissions" = "UNIX jogosultságok";
+"Access Control" = "Hozzáférés szabályozása";
+"Also apply to files inside selection" = "A kiválasztott fájlokon kerül alkalmazásra";
+
+
+/* ToolsPanel.m */
+
+"Tools" = "Eszközök";
+"Tools Inspector" = "Eszköz-panel";
+"No Tools Inspector" = "Nincs eszköz-panel";
+"Set Default" = "Alapbeállításként elment";
+
+
+/* AppsView.m */
+	
+"Double-click to open selected document(s)" = "Dupla kattintás a kijelölt dokumentum(ok) megnyitásához";	
+"Default:" = "Alapbeállítás:";
+"Path:" = "Teljes elérési út:";		
+"Click 'Set Default' to set default application\nfor all documents with this extension" 
+  = "Kattintson az "Alapbeállításként elment" gombra, hogy minden ilyen kiterjesztésû\ndokumentumhoz ezt az alkalmazást rendelje";
+
+
+/* PermsBox.m */
+
+"Permissions" = "Hozzáférés";
+"Read" = "Olvasás";
+"Write" = "Írás";
+"Execute" = "Végrehajtás";
+"Owner" = "Tulajdonos";
+"Group" = "Csoport";
+"Other" = "Egyéb";
+
+
+/* ----------------------- Processes strings --------------------------- *\
+
+/* Processes.m */
+
+"Processes" = "Folyamatok";
+"No Background Process" = "Nincs háttérfolyamat";
+"Kill" = "Leállít";
+"Path: " = "Teljes elérési út: ";
+"Status: " = "Állapot: ";
+
+
+/* ProcsView.m */
+
+"Applications" = "Alkalmazások";
+"Background" = "Háttér";
+
+
+/* ----------------------- Finder strings --------------------------- *\
+
+/* Finder.m */
+
+"Finder" = "Keresés";
+"Find items with names that match" = "Keresés névegyezés alapján";
+"Find items with contents that match" = "Keresés tartalom alapján ";
+"No selection!" = "Nincs kijelölés!";
+"No arguments!" = "Nincs semmi megadva!";
+
+
+/* ----------------------- Fiend strings --------------------------- *\
+
+/* Fiend.m */
+
+"New Layer" = "Új munkaasztal";
+"A layer with this name is already present!" = "Már van ilyen nevû munkaasztal!";
+"You can't remove the last layer!" = "Az utolsó munkaasztalt nem lehet megszüntetni!";
+"Remove layer" = "Munkaasztal megszüntetése";
+"Are you sure that you want to remove this layer?" = "Biztos, hogy meg akarja szüntetni ezt a munkaasztalt?";
+"Rename Layer" = "Munkaasztal átnevezése";
+"You can't dock multiple paths!" = "Nem lehet többféle elérési utat megadni!";
+"This object is already present in this layer!" = "Ez az elem már szerepel ezen a munkaasztalon!";
+	
+			
+/* ----------------------- Preferences strings --------------------------- *\
+
+/* PreferencesWin.m */
+
+"GWorkspace Preferences" = "GWorkspace beállítása";
+
+
+/* BackWinPreferences.m */       
+
+"DeskTop Shelf" = "Asztali polc";	
+"DeskTop Color" = "Asztal színe";
+"red" = "piros";
+"green" = "zöld";
+"blue" = "kék";
+"Set Color" = "Szín alkalmazása";
+ 193:  "Push the \"Set Image\" button\nto set your DeskTop image.\nThe image must have the same\nsize of your screen." =
+"Nyomja meg a\"Kép alkalmazása\" gombot\naz írasztal háttérképének beállításához.\nA kép méretének meg kell egyeznie a\nképernyõ méretével." = 
+"Set Image" = "Kép alkalmazása";
+"Unset Image" = "Kép visszavonása";
+
+	
+/* DefaultXTerm.m */             
+	
+"Set" = "Beállítás";	
+
+	
+/* BrowserViewsPreferences.m */  
+
+"Column Width" = "Oszlopszélesség";
+"Use Default Settings" = "Alapbeállítások alkalmazása";	
+"Browser" = "Böngészõ";
+	
+	
+/* FileWatchingPreferences.m */  
+	
+"File System Watching" = "Fájlrendszer megtekintése";
+"timeout" = "idõtúllépés";
+"frequency" = "gyakoriság";
+"Values will apply to the \nnew watchers from now, \nto the existing ones, after the first timeout" = 
+   "A továbbiakban az új elemekre már az új beállítások\nkerülnek alkalmazásra";
+
+	
+/* ShelfPreferences.m */
+	
+"Shelf" = "Polc";
+	
+	
+/* DefaultEditor.m */            
+
+"Default Editor" = "Alapértelmezett szerkesztõprogram";
+"No Default Editor" = "Nincs alapértelmezett szerkesztõprogram";
+"Choose..." = "Kijelölés...";
+
+
+/* IconViewsPreferences.m */
+
+"Title Width" = "Címszélesség";
+"Icon View" = "Ikonnézet";
+
+/* Recycler strings */
+
+"Recycle: " = "Áthelyezés a szemetesbe: ";
+"Recycler: " = "Szemetes: ";
+"Recycler" = "Szemetes";
+"the Recycler" = "a szemetes";
+"\nto the Recycler" = "\nva szemetesbe";
+"Move from the Recycler " = "Kivétel a szemetesbõl";
+"In" = "Benne";
+"Empty Recycler" = "Szemetes ürítése";
+"Empty the Recycler?" = "Kiürítsük a szemetest?";
+"Put Away" = "kidobás";
+
+

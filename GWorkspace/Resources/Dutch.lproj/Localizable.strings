@@ -1,0 +1,320 @@
+/* ----------------------- menu strings --------------------------- */
+/* Vertaling door David Bekaert david.bekaert@pandora.be
+ *
+ */
+/* main.m */
+
+
+"Info" = "Info";
+	"Info Panel..." = "Info scherm...";
+	"Preferences..." = "Configuratie...";
+	"Help..." = "Help...";
+
+"File" = "Bestand";
+	"Open" = "Openen";
+	"Open as Folder" = "Open als Map";
+	"Edit File" = "Edit Bestand";
+	"New Folder" = "Nieuwe Map";
+	"New File" = "Nieuw Bestand";
+	"Duplicate" = "Dupliceer";
+	"Destroy" = "Vernietig";
+	"Empty Recycler" = "Prullenmand Leegmaken";
+
+"Edit" = "Bewerken";
+	"Cut" = "Knippen";
+	"Copy" = "Kopieren";
+	"Paste" = "Plakken";
+	"Select All" = "Selecteer Alles";
+
+"View" = "Beeld";
+	"Browser" = "Browser";
+	"Icon" = "Icoon";
+
+"Tools" = "Hulpmiddelen";
+	"Viewer" = "Viewer";
+	"Inspectors" = "Inspectors";
+		"Show Inspectors" = "Toon Inspectors";
+		"Attributes" = "Attributen";
+		"Contents" = "Inhoud";
+		"Tools" = "Hulpmiddelen";
+		"Permissions" = "Rechten";
+	"Finder" = "Zoeker";
+	"Processes..." = "Processen...";
+	"Fiend" = "Clip";
+		"Show Fiend" = "Toon Clip";
+		"Hide Fiend" = "Verberg Clip";
+		"Add Layer..." = "Voeg Laag Toe...";
+		"Remove Current Layer" = "Verwijder Huidige Laag";
+		"Rename Current Layer" = "Hernoem Huidige Laag";
+		"Layers" = "Lagen";
+	"DeskTop Shelf" = "Bureaublad";
+	"XTerm" = "XTerm";
+
+"Windows" = "Vensters";
+	"Arrange in Front" = "Toon Vooraan";
+	"Miniaturize Window" = "Minimaliseer Venster";
+	"Close Window" = "Sluit Venster";
+
+"Services" = "Services";
+
+"Hide" = "Verberg";
+
+"Quit" = "Afsluiten";
+
+
+/* ----------------------- File Operations strings ---------------------------
+*\
+
+/* GWorkspace.m */
+
+"GNUstep Workspace Manager" = "GNUstep Workspace Manager";
+"See http://www.gnustep.it/enrico/gworkspace" = "Zie http://www.gnustep.it/enrico/gworkspace";
+"Released under the GNU General Public License 2.0" = "Gepubliceerd onder de GNU General Public License 2.0";
+"Error" = "Fout";
+"You have not write permission\nfor" = "Je hebt geen schrijfrechten\nvoor";
+"Continue" = "Verder";
+
+
+/* FileOperation.m */
+
+"OK" = "Ok";
+"Cancel" = "Annuleren";
+"Move" = "Verplaats";
+"Move from: " = "Verplaats van: ";
+"\nto: " = "\nnaar : ";
+"Copy" = "Kopieer";
+"Copy from: " = "Kopieer van: ";
+"Link" = "Link";
+"Link " = "Link ";
+"Delete" = "Verwijder";
+"Delete the selected objects?" = "Verwijder de Geselecteerde Objecten?";
+"Duplicate" = "Dupliceer";
+"Duplicate the selected objects?" = "Dupliceer de Geselecteerde Objecten?";
+"From:" = "Van:";
+"To:" = "Naar:";
+"In:" = "In:";
+"Stop" = "Stop";
+"Pause" = "Pause";
+"Moving" = "Bezig met Verplaatsen";
+"Copying" = "Bezig met Kopiëren";
+"Linking" = "Bezig met Linken";
+"Duplicating" = "Bezig met Dupliceren";
+"Destroying" = "Bezig met Verwijderen";
+"File Operation Completed" = "Bestandoperatie Afgewerkt";
+"Backgrounder connection died!" = "Verbinding Verbroken!";
+"Some items have the same name;\ndo you want to substitute them?" = "Enkele elementen hebben dezelfde naam;\nwil je ze vervangen?";
+"Error" = "Fout";
+"File Operation Error!" = "Fout bij Bestandmanipulatie!";
+
+
+/* ColumnIcon.m */
+
+"You have not write permission\nfor " = "Je hebt geen schrijfrechten\nvoor";
+"The name " = "De naam ";
+" is already in use!" = " is al in gebruik!";
+"Cannot rename " = "Hernoemen mislukt ";
+"Invalid char in name" = "Er is een ongeldig karakter in de naam";
+
+
+/* ----------------------- Inspectors strings --------------------------- *\
+
+/* InspectorsWin.m */
+
+"Attributes" = "Attributen";
+"Contents" = "Inhoud";
+"Tools" = "Hulpmiddelen";
+"Access Control" = "Toegangscontrole";
+
+
+/* AttributesPanel.m */
+
+"Attributes" = "Attributen";
+"Attributes Inspector" = "Attributen Inspector";
+"Path:" = "Pad :";
+"Link To:" = "Link Naar :";
+"Size:" = "Grootte :";
+"Owner:" = "Eigenaar :";
+"Group:" = "Groep :";
+"Changed" = "Verandert";
+"Revert" = "Terug";
+"OK" = "Ok";
+
+
+/* ContentsPanel.m */
+
+"Contents" = "Inhoud";
+"Contents Inspector" = "Inhoud Inspector";
+"No Contents Inspector" = "Geen Inhoud Inspector";
+"No Contents Inspector\nFor Multiple Selection" = "Geen Inhoud Inspector\nvoor meerdere selecties";
+
+
+/* FolderViewer.m */
+
+"Sort method applies to the\ncontents of the selected folder,\nNOT to its parent folder"  = "Sorteren slaat op de \ninhoud van de Map,\nNIET op de bovenliggende Map";
+"Sort by" = "Sorteer op";
+"Name" = "Naam";
+"Kind" = "Type";
+"Date" = "Datum";
+"Size" = "Grootte";
+"Owner" = "Eigenaar";
+"Folder Inspector" = "Map Inspector";
+
+
+/* ImageViewer.m */
+
+"Image Inspector" = "Beelden Inspector";
+
+
+/* AppViewer.m */
+
+"Open these kinds of documents:" = "Open dit soort documenten:";
+"Invalid Contents" = "Verkeerde Inhoud";
+"App Inspector" = "Toepassing Inspector";
+
+
+/* PermissionsPanel.m */
+
+"UNIX Permissions" = "UNIX Rechten";
+"Access Control" = "Toegangscontrole";
+"Also apply to files inside selection" = "Pas tevens toe op geselecteerde bestanden"; 
+
+
+/* ToolsPanel.m */
+
+"Tools" = "Hulpmiddelen";
+"Tools Inspector" = "Hulpmiddelen Inspector";
+"No Tools Inspector" = "Geen Hulpmiddelen Inspector";
+"Set Default" = "Zet als Standaard";
+
+
+/* AppsView.m */
+	
+"Double-click to open selected document(s)" = "Dubbelklik om de geselecteerde documenten te openen";
+"Default:" = "Standaard:";
+"Path:" = "Pad:";		
+"Click 'Set Default' to set default application\nfor all documents with this extension" = "Klik 'Zet Standaard' om de standaardtoepassing\nvoor alle documenten met deze extensie";
+
+/* PermsBox.m */
+
+"Permissions" = "Rechten";
+"Read" = "Lezen";
+"Write" = "Schrijven";
+"Execute" = "Starten";
+"Owner" = "Eigenaar";
+"Group" = "Groep";
+"Other" = "Andere";
+
+
+/* ----------------------- Processes strings --------------------------- *\
+
+/* Processes.m */
+
+"Processes" = "Processen";
+"No Background Process" = "Geen Achtergrond Processen";
+"Kill" = "Kill";
+"Path: " = "Pad: ";
+"Status: " = "Status: ";
+
+
+/* ProcsView.m */
+
+"Applications" = "Toepassingen";
+"Background" = "Achtergrond";
+
+
+/* ----------------------- Finder strings --------------------------- *\
+
+/* Finder.m */
+
+"Finder" = "Zoeker";
+"Find items with names that match" = "Zoek items met de namen";
+"Find items with contents that match" = "Zoek items met de inhoud"; 
+"No selection!" = "Geen selectie!";
+"No arguments!" = "Geen argumenten!";
+
+
+/* ----------------------- Fiend strings --------------------------- *\
+
+/* Fiend.m */
+
+"New Layer" = "Nieuwe Laag";
+"A layer with this name is already present!" = "Een laag met die naam is al in gebruik!"; 
+"You can't remove the last layer!" = "Je kan de laatste laag niet verwijderen!";
+"Remove layer" = "Verwijder laag";
+"Are you sure that you want to remove this layer?" = "Ben je zeker dat je deze laag wilt verwijderen?"; 
+"Rename Layer" = "Hernoem Laag";
+"You can't dock multiple paths!" = "Je kan geen meerdere paden dokken!"; 
+"This object is already present in this layer!" = "Dit object zit al in de laag!"; 
+	
+			
+/* ----------------------- Preferences strings --------------------------- *\
+
+/* PreferencesWin.m */
+
+"GWorkspace Preferences" = "Configuratie van GWorkspace";
+
+
+/* BackWinPreferences.m */       
+
+"DeskTop Shelf" = "Bureaublad";	
+"DeskTop Color" = "Kleur van Bureaublad";
+"red" = "rood";
+"green" = "groen";
+"blue" = "blauw";
+"Set Color" = "Gebruik kleur";
+"Push the \"Set Image\" button\nto set your DeskTop image.\nThe image must have the same\nsize of your screen." = "Klik op \"Gebruik beeld\" \nom het beeld als achtergrond te grbuiken.\nHet beeld moet evengroot zijn\nals de afmetingen van je scherm.";
+"Set Image" = "Gebruik beeld";
+"Unset Image" = "Gebruik beeld niet meer";
+
+	
+/* DefaultXTerm.m */             
+	
+"Set" = "Zet";	
+
+	
+/* BrowserViewsPreferences.m */  
+
+"Column Width" = "Kolombreedte";
+"Use Default Settings" = "Gebruik Standaard Instellingen";	
+"Browser" = "Browser";
+	
+	
+/* FileWatchingPreferences.m */  
+	
+"File System Watching" = "File Sytem bekijken";
+"timeout" = "timeout";
+"frequency" = "frequentie";
+"Values will apply to the \nnew watchers from now, \nto the existing ones, after the first timeout" = "De waarde worden vanaf nu \ntoegepast op de nieuwe watchers,\nde bestaande na de eerste timeout";
+
+
+/* ShelfPreferences.m */
+	
+"Shelf" = "Shelf";
+	
+	
+/* DefaultEditor.m */            
+
+"Default Editor" = "Standaard editor";
+"No Default Editor" = "Geen Standaard Editor";
+"Choose..." = "Kies...";
+
+
+/* IconViewsPreferences.m */
+
+"Title Width" = "Titelbreedte";
+"Icon View" = "Icoon view";
+
+/* Recycler strings */
+
+"Recycle: " = "Steek in de prullenmand: ";
+"Recycler: " = "Prullenmand : ";
+"Recycler" = "Prullenmand";
+"the Recycler" = "de Prullenmand";
+"\nto the Recycler" = "\nin de Prullenmand";
+"Move from the Recycler " = "Haal uit de prullenmand ";
+"In" = "In";
+"Empty Recycler" = "Ledig de Prullenmand";
+"Empty the Recycler?" = "Ledig de Prullenmand?";
+"Put Away" = "Doe Weg";
+
+

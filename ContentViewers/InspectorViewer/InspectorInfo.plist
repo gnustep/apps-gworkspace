@@ -1,0 +1,14 @@
+{
+   InspectorDescription = "See the description of a content Inspector";
+   InspectorName = "Inspector Inspector";
+   InspectorRelease = "0.6";
+   InspectorURL = "http://www.gnustep-apps.org";
+   Authors  = "Fabien VALLON";
+   Copyright = "Copyright 2002 Fabien VALLON <fabien.vallon@fr.alcove.com>";	
+   CopyrightDescription = "GNU GPL 2.0.";   
+}
+
+
+
+   
+

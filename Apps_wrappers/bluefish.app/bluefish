@@ -1,0 +1,5 @@
+#!/bin/sh
+
+#bluefish $*
+
+bluefish "$2" &

@@ -1,0 +1,5 @@
+#
+#   Makefile flags and configs to build with the bundle
+#
+
+GS_PATH=@GS_PATH@

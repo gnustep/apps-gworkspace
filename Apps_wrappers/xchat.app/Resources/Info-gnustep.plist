@@ -1,0 +1,7 @@
+{
+  NSExecutable = "xchat";
+  NSIcon = "xchat.png";
+	XAppWrapper = YES;
+  NSTypes = (
+  );
+}

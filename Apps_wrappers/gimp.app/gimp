@@ -1,0 +1,5 @@
+#!/bin/sh
+
+#gimp $*
+
+gimp "$2" &

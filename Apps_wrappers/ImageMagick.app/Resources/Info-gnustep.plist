@@ -1,0 +1,35 @@
+{
+  NSExecutable = "ImageMagick";
+  NSIcon = "display.tiff";
+	XAppWrapper = YES;
+  NSTypes = (
+    {
+      NSUnixExtensions = ( "gif" );
+      NSIcon = "FileIcon_.gif.tiff";
+    },
+    {
+      NSUnixExtensions = ( "jpeg", "jpg" );
+      NSIcon = "FileIcon_.jpg.tiff";
+    },
+    {
+      NSUnixExtensions = ( "png" );
+      NSIcon = "FileIcon_.png.tiff";
+    },
+    {
+      NSUnixExtensions = ( "tga" );
+      NSIcon = "FileIcon_.tga.tiff";
+    },
+    {
+      NSUnixExtensions = ( "tiff", "tif" );
+      NSIcon = "FileIcon_.tiff.tiff";
+    },
+    {
+      NSUnixExtensions = ( "xcf" );
+      NSIcon = "FileIcon_.xcf.tiff";
+    },        
+    {
+      NSUnixExtensions = ( "xpm" );
+      NSIcon = "FileIcon_.xpm.tiff";
+    }
+  );
+}

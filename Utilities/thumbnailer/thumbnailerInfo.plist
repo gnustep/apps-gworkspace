@@ -1,0 +1,28 @@
+  NSServices = (
+    {
+      NSPortName = Thumbnailer;
+      NSMessage = makeThumbnail;
+      NSSendTypes=(NSFilenamesPboardType);
+      NSMenuItem = { 
+	      default = "Make thumbnail(s)";
+	      English = "Make thumbnail(s)";
+	      Italian = "Crea thumbnail";
+      };
+    },
+    {
+      NSPortName = Thumbnailer;
+      NSMessage = removeThumbnail;
+      NSSendTypes=(NSFilenamesPboardType);
+      NSMenuItem = { 
+	      default = "Remove thumbnail(s)";
+	      English = "Remove thumbnail(s)";
+	      Italian = "Rimuovi thumbnail";
+      };
+    },
+    {
+      NSPortName = Thumbnailer;
+      NSFilter = thumbnailData;
+      NSSendTypes=(NSFilenamesPboardType);
+      NSReturnTypes=(NSTIFFPboardType);
+    }
+  );

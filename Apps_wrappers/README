@@ -1,0 +1,14 @@
+XMMS and Xine App Wrappers
+---------------------------
+
+Copy xmms.app and xine.app to an Apps directory 
+(e.g. GNUstep/Local/Apps).
+
+NOTE: The Workspace will prefer xine.app also for mp3 files and such 
+because of the alphabetical order. So, you might want to set XMMS as
+default by  selecting a mp3 file in GWorkspace, opening the Tools 
+Inspector, clicking the XMMS icon and then clicking "Set Default".
+
+
+
+

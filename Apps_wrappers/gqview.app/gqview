@@ -1,0 +1,5 @@
+#!/bin/sh
+
+#gqview $*
+
+gqview "$2" &

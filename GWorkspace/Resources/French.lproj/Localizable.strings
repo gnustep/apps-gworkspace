@@ -1,0 +1,409 @@
+/* ----------------------- menu strings --------------------------- */
+/* Traduction réalisée par Stéphane PERON <speron@telys.com> 
+ * et Xavier BARRIER <xavier.barrier@proxyware.fr> 
+ */
+/* main.m */
+
+
+"Info" = "Informations";
+	"Info Panel..." = "À propos...";
+	"Preferences..." = "Préférences...";
+	"Help..." = "Aide...";
+
+"File" = "Fichier";
+	"Open" = "Ouvrir";
+	"Open as Folder" = "Ouvrir le dossier";
+	"Open With..." = "Ouvrir avec ...";
+	"Edit File" = "Éditer le fichier";
+	"New Folder" = "Nouveau dossier";
+	"New File" = "Nouveau fichier";
+	"Duplicate" = "Dupliquer";	
+	"Destroy" = "Supprimer";
+	"Empty Recycler" = "Vider la corbeille";
+	"Put Away" = "Jeter";
+	"Run..." = "Démarrer ...";
+	"Print..." = "Imprimer ...";
+
+"Edit" = "Edition";
+	"Cut" = "Couper";
+	"Copy" = "Copier";
+	"Paste" = "Coller";
+	"Select All" = "Tout sélectionner";
+		
+"View" = "Affichage";
+	"Browser" = "Liste";
+	"Icon" = "Icône";
+	"Small Icon" = "Mini-icône";
+		
+"Tools" = "Outils";
+	"Viewer" = "Visualisateur";
+	"Inspectors" = "Inspecteurs";
+		"Show Inspectors" = "Afficher les inspecteurs";
+		"Attributes" = "Attributs";
+		"Contents" = "Contenus";
+		"Tools" = "Outils";	
+		"Permissions" = "Droits";
+	"History" = "Historique";
+	"Show History" = "Voir l'historique";	
+	"Go backward" = "Revenir en arrière";	
+	"Go forward" = "Avancer";	
+	"Finder" = "Chercher un fichier";
+	"Applications..." = "Applications ...";
+	"File Operations..." = "Opérations sur fichier";
+
+	"Processes..." = "Processus...";
+	"Fiend" = "Fiend";
+		"Show Fiend" = "Montrer le Fiend";
+		"Hide Fiend" = "Masquer le Fiend";
+		"Add Layer..." = "Ajouter un espace de travail...";
+		"Remove Current Layer" = "Supprimer l'espace de travail courant";
+		"Rename Current Layer" = "Renommer l'espace de travail courant";
+		"Layers" = "Espaces de travail";
+	"DeskTop Shelf" = "Etagère du bureau";	
+	"XTerm" = "XTerm";
+	
+"Windows" = "Fenêtre";
+	"Arrange in Front" = "Mettre au premier plan";
+	"Miniaturize Window" = "Réduire la fenêtre";
+	"Close Window" = "Fermer la fenêtre";
+	"Window" = "Fenêtre";	
+
+"Services" = "Services";
+
+"Hide" = "Masquer";
+
+"Quit" = "Quitter";
+	
+	
+/* ----------------------- File Operations strings --------------------------- *\
+
+/* GWorkspace.m */
+
+"GNUstep Workspace Manager" = "Gestionnaire de bureau de GNUstep";
+"See http://www.gnustep.it/enrico/gworkspace" = "http://www.gnustep.it/enrico/gworkspace";
+"Released under the GNU General Public License 2.0" = "Mise à disposition sous licence : GNU General Public License 2.0";
+"Error" = "Erreur";
+"You have not write permission\nfor" = "Vous n'avez pas les droits d'écrire\npour";
+"Continue" = "Continuer";
+
+
+/* FileOperation.m */
+
+"OK" = "Ok";
+"Cancel" = "Annuler";
+"Move" = "Déplacer";
+"Move from: " = "Déplacer depuis : ";
+"\nto: " = "\nvers : ";
+"Copy" = "Copier";
+"Copy from: " = "Copie depuis : ";
+"Link" = "Lier";
+"Link " = "Lier ";
+"Delete" = "Supprimer";
+"Delete the selected objects?" = "Supprimer les objets sélectionnés ?";
+"Duplicate" = "Dupliquer";
+"Duplicate the selected objects?" = "Dupliquer les objets sélectionnés ?";
+"From:" = "De :";
+"To:" = "À:";
+"In:" = "Dans :";
+"Stop" = "Stop";
+"Pause" = "Pause";
+"Moving" = "Déplacement en cours";
+"Copying" = "Copie en cours";
+"Linking" = "Liaison en cours";
+"Duplicating" = "Duplication en cours";
+"Destroying" = "Suppression en cours";
+"File Operation Completed" = "Opération sur fichier terminée";
+"Backgrounder connection died!" = "Interruption de la connexion !";
+"Some items have the same name;\ndo you want to sobstitute them?" = "Des éléments ont le même nom ;\nvoulez-vous en remplacer le nom ?";
+"Error" = "Erreur";
+"File Operation Error!" = "Erreur de manipulation de fichier !";
+
+
+/* ColumnIcon.m */
+
+"You have not write permission\nfor " = "Vous n'avez pas les droits d'écriture\n ";
+"The name " = "Le nom ";
+" is already in use!" = " est déja utilisé!";
+"Cannot rename " = "Impossible de renommer ";
+"Invalid char in name" = "Le nom contient un caractère invalide";
+
+
+/* ----------------------- Inspectors strings --------------------------- *\
+
+/* InspectorsWin.m */
+
+"Attributes" = "Attributs";
+"Contents" = "Contenus";
+"Tools" = "Outils";
+"Access Control" = "Contrôle des accès";
+
+
+/* AttributesPanel.m */
+
+"Attributes" = "Attributs";
+"Attributes Inspector" = "Inspecteur d'attributs";
+"Path:" = "Nom complet :";
+"Link To:" = "Lié à :";
+"Size:" = "Taille :";
+"Owner:" = "Propriétaire :";
+"Group:" = "Groupe :";
+"Changed" = "Modifié";
+"Revert" = "Revenir";
+"OK" = "Ok";
+
+
+/* ContentsPanel.m */
+
+"Contents" = "Contenus";
+"Contents Inspector" = "Inspecteur de contenus";
+"No Contents Inspector" = "Pas d'inspecteur de contenus";
+"No Contents Inspector\nFor Multiple Selection" = "Pas d'inspecteur de contenus\npour des sélections multiples";
+
+
+/* FolderViewer.m */
+
+"Sort method applies to the\ncontents of the selected folder,\nNOT to its parent folder"
+  = "La méthode de tri s'applique aux\ncontenus des dossiers sélectionnés,\nPAS aux dossiers parents";
+"Sort by" = "Trier par";
+"Name" = "Nom";
+"Kind" = "Type";
+"Date" = "Date";
+"Size" = "Taille";
+"Owner" = "Propriétaire";
+"Folder Inspector" = "Inspecteur de dossiers";	
+/* Ajouts 25052003 */
+"%@ available on hard disk"= "%@ disponibles sur le disque dur";
+"available on hard disk"= "disponibles sur le disque dur";
+"unknown volume size" = "Taille du lecteur inconnue";
+"File Viewer" = "Fichiers";
+/* Fin ajouts */
+
+/* ImageViewer.m */
+
+"Image Inspector" = "Inspecteur d'images";
+
+
+/* AppViewer.m */
+
+"Open these kinds of documents:" = "Ouvrir ce type de document :";
+"Invalid Contents" = "Contenu invalide";
+"App Inspector" = "Inspecteur d'application";
+
+
+/* PermissionsPanel.m */
+
+"UNIX Permissions" = "Droits UNIX";
+"Access Control" = "Contrôle des accès";
+"Also apply to files inside selection" = "S'applique aussi aux fichiers sélectionnés";
+
+
+/* ToolsPanel.m */
+
+"Tools" = "Outils";
+"Tools Inspector" = "Inspecteur d'outils";
+"No Tools Inspector" = "Pas d'inspecteur d'outils";
+"Set Default" = "Définir par défaut";
+
+
+/* AppsView.m */
+	
+"Double-click to open selected document(s)" = "Double-cliquez pour ouvrir le ou les document(s) sélectionné(s)";	
+"Default:" = "Défaut :";
+"Path:" = "Nom complet :";		
+"Click 'Set Default' to set default application\nfor all documents with this extension" 
+  = "Cliquez sur 'Définir par défaut' pour définir l'application \nqui sera associée à tous les documents ayant cette extension";
+
+
+/* PermsBox.m */
+
+"Permissions" = "Droits";
+"Read" = "Lire";
+"Write" = "Ecrire";
+"Execute" = "Executer";
+"Owner" = "Propriétaire";
+"Group" = "Groupe";
+"Other" = "Autre";
+
+
+/* ----------------------- Processes strings --------------------------- *\
+
+/* Processes.m */
+
+"Processes" = "Processus";
+"No Background Process" = "Pas de tâche de fond";
+"Kill" = "Tuer";
+"Path: " = "Nom complet : ";
+"Status: " = "Etat : ";
+
+
+/* ProcsView.m */
+
+"Applications" = "Applications";
+"Background" = "Fond d'écran";
+
+
+/* ----------------------- Finder strings --------------------------- *\
+
+/* Finder.m */
+
+"Finder" = "Rechercher";
+"Find items with names that match" = "Rechercher les éléments nommés";
+"Find items with contents that match" = "Rechercher les éléments contenant le texte";
+"No selection!" = "Pas de sélection!";
+"No arguments!" = "Pas d'argument!";
+"Search for items whose:"="Recherche de fichiers à partir des critères ci-dessous :";
+"file name" = "Nom";
+"kind" = "Type";
+"size (KB)" = "Taille (KB)";
+"owner" = "Propriétaire";
+"date created" = "Date création";
+"date modified" = "Date modif.";
+"contents" = "Contenu";
+"includes" = "contient";
+"contains" = "contenant";
+"doesn't contain" = "ne contenant pas";
+"is" = "est";
+"is not" = "est différent";
+"starts with" = "commence par";
+"ends with" = "finit par";
+"no value" = "n'est pas un critère";
+"plain file" = "fichier commun";
+"directory" = "répertoire";
+"shell executable" ="exécutable de shell";
+"symbolic link" = "lien symbolique";
+"application" = "application";
+"is less than" = "est inférieure à";
+"is greater than"= "est supérieure à";
+
+/* ----------------------- Fiend strings --------------------------- *\
+
+/* Fiend.m */
+
+"New Layer" = "Nouvel espace de travail";
+"A layer with this name is already present!" = "Un espace de travail possède déja ce nom !";
+"You can't remove the last layer!" = "Vous ne pouvez supprimer le dernier espace de travail !";
+"Remove layer" = "Supprimer cet espace de travail";
+"Are you sure that you want to remove this layer?" = "Êtes-vous sûr de vouloir supprimer cet espace de travail ?";
+"Rename Layer" = "Renommer cet espace de travail";
+"You can't dock multiple paths!" = "Vous ne pouvez pas stocker plusieurs chemins d'accès !";
+"This object is already present in this layer!" = "Cet objet est déja présent dans cet espace de travail !";
+	
+			
+/* ----------------------- Preferences strings --------------------------- *\
+
+/* PreferencesWin.m */
+
+"GWorkspace Preferences" = "Préférences de GWorkspace";
+
+
+/* BackWinPreferences.m */       
+
+"DeskTop Shelf" = "Etagère du bureau";	
+"DeskTop Color" = "Couleur du bureau";
+"red" = "rouge";
+"green" = "vert";
+"blue" = "bleu";
+"Set Color" = "Appliquer la couleur";
+"Push the \"Set Image\" button\nto set your DeskTop image.\nThe image must have the same\nsize of your screen." = 
+  "Cliquez sur le bouton\"Appliquer l'image\"\npour installer l'image sur votre bureau.\nCette image doit avoir la même\ntaille que l'écran.";
+"Set Image" = "Appliquer l'image";
+"Unset Image" = "Retirer l'image";
+"Push the 'Set Image' button" = "Cliquez sur le bouton 'Appliquer l'image'";
+"to set you Destop image" = "pour appliquer l'image au fonds de votre bureau." ;
+"The image must have the same" = "L'image doit avoir la même taille";
+"size as your screen." = "que votre écran.";
+	
+/* DefaultXTerm.m */             
+	
+"Set" = "Définir";	
+
+	
+/* BrowserViewsPreferences.m */  
+
+"Columns Width" = "Largeur des colonnes";
+"Use Default Settings" = "Param. par défaut";	
+"Browser" = "Liste";
+"Browser View" = "Affichage liste";
+	
+	
+/* FileWatchingPreferences.m */  
+	
+"File System Watching" = "Consultation du système de fichier";
+"timeout" = "délai d'attente dépassé";
+"frequency" = "fréquence";
+"Values will apply to the \nnew watchers from now, \nto the existing ones, after the first timeout" = 
+   "A partir de maintenant, les paramètres seront \nappliquées aux nouveaux arrivants";
+
+	
+/* ShelfPreferences.m */
+	
+"Shelf" = "Etagère";
+	
+	
+/* DefaultEditor.m */            
+
+"Default Editor" = "Editeur par défaut";
+"No Default Editor" = "Pas d'éditeur par défaut";
+"Choose..." = "Sélectionner...";
+"Choose" = "Sélectionner...";
+"Editor" = "Editeur de texte";
+"XTerminal" = "Console X";
+"Sorting Order" = "Ordre de tri";
+"Sort by" = "Trier par";
+"Name" = "Nom";
+"Kind" = "Type";
+"Date" = "Date";
+"Size" = "Taille";
+"Owner" = "Propriétaire";
+"Set" = "Appliquer";
+"Icons Animation" = "Animation d'icônes";
+"Hidden Files" = "Fichiers cachés";
+"File Operations" = "Opérations sur fichier";
+"DeskTop" = "Bureau";
+"failed to load %@!" = "Impossible de charger %@ !";
+"Xterm" = "Terminal xterm";
+"Arguments" = "Arguments";
+"Desktop Color" = "Couleur du bureau";
+"Deactivate" = "Désactiver";
+"Activate" = "Activer";
+"Activate changes" = "Appliquer";
+"Default" = "Standard";
+"Status Window" = "Fenêtre de progression";
+"Confirmation" = "Confirmation";
+"Show status window" ="Afficher la progression";
+"Load" = "Charg.";
+
+"Uncheck the buttons to allow automatic confirmation" = "Décochez les buttons pour une confirmation systématique";
+"of file operations" = "des opérations sur fichier" ;
+
+"The method will apply to all the folders" = "Cette méthode s'appliquera à tous les dossiers";
+"that have no order specified" = "qui n'ont pas d'ordre de tri spécifié" ;
+"Check this option to show a status window" = "Cochez cette option pour voir une fenêtre de progression";
+"during the file operations"  = "lors des opérations sur fichier";
+
+"when changing a path" = "en changeant de répertoire";
+"when opening a file" = "en ouvrant un fichier";
+"sliding back after file operation" = "en revenant en arrière" ;
+"Animate icons" = "Animation des icônes";
+"Shown files" = "Fichiers visibles";
+"Hidden files" = "Fichiers cachés";
+"Select and move the files to hide or to show" = "Selectionnez et déplacez les fichiers à cacher ou afficher";
+
+/* IconViewsPreferences.m */
+"Title Width" = "Largeur du titre";
+"Icon View" = "Affichage icône";
+
+/* Recycler strings */
+
+"Recycle: " = "Envoyer dans la Corbeille : ";
+"Recycler: " = "Corbeille : ";
+"Recycler" = "Corbeille";
+"the Recycler" = "la Corbeille";
+"\nto the Recycler" = "\nvers la Corbeille";
+"Move from the Recycler " = "Déplacer depuis la Corbeille ";
+"In" = "Dedans";
+"Empty Recycler" = "Vider la Corbeille";
+"Empty the Recycler?" = "Vider la Corbeille ?";
+"Put Away" = "Jeter";
+
+

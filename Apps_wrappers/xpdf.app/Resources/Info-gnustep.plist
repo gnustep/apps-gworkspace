@@ -1,0 +1,12 @@
+{
+    NSExecutable = xpdf;
+    NSIcon = "xpdf.tiff";
+    NSRole = "Editor";
+		XAppWrapper = YES;
+    NSTypes = (
+            {
+              NSUnixExtensions = ( "pdf" );
+              NSIcon = "FileIcon_.pdf.tiff";
+            }
+    );
+}

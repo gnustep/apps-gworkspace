@@ -1,0 +1,5 @@
+#!/bin/sh
+
+#abiword $*
+
+abiword "$2" &

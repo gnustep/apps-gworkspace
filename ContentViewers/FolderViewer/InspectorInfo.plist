@@ -1,0 +1,7 @@
+{
+   Name = "Folder Inspector";
+   Author = "Enrico Sersale <enrico@imago.ro>";
+   Version = "1.0";	
+   Description = "This Inspector allow you to sort the contents of a Folder";
+}
+

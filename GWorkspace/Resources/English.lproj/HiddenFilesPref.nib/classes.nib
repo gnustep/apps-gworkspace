@@ -1,0 +1,30 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {
+                activateChanges = id; 
+                loadContents = id; 
+                moveToHidden = id; 
+                moveToShown = id; 
+            }; 
+            CLASS = HiddenFilesPref; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                addButt = id; 
+                cellPrototipe = id; 
+                iconView = id; 
+                leftScroll = id; 
+                loadButt = id; 
+                pathField = id; 
+                prefbox = id; 
+                removeButt = id; 
+                rightScroll = id; 
+                setButt = id; 
+                win = id; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

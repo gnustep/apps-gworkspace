@@ -1,0 +1,16 @@
+{
+    NSExecutable = ggv;
+    NSIcon = "ggv.tiff";
+    NSRole = "Editor";
+		XAppWrapper = YES;
+    NSTypes = (
+            {
+              NSUnixExtensions = ( "ps",  "eps");
+              NSIcon = "FileIcon_.ps.tiff";
+            },
+            {
+              NSUnixExtensions = ( "pdf" );
+              NSIcon = "FileIcon_.pdf.tiff";
+            }
+    );
+}

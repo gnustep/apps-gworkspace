@@ -1,0 +1,12 @@
+{
+    NSExecutable = xfig;
+    NSIcon = "draw.tiff";
+    NSRole = "Editor";
+		XAppWrapper = YES;
+    NSTypes = (
+            {
+              NSUnixExtensions = ( "fig" );
+              NSIcon = "draw.tiff";
+            }
+    );
+}

@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<!DOCTYPE gsmarkup>
+
+<gsmarkup>
+  <objects>
+
+    <!-- application menu -->
+    <menu type="main">
+
+      <menu title="GWorkspace" type="apple">
+	      <menuItem title="About Calculator" action="showInfo:" key=""/>
+	      <menuItem title="Preferences..." action="showPreferences:" key=""/>
+	      <menuItem title="Help..." action="showHelp:" key="?"/>
+      
+        <menuSeparator/>
+	
+	      <menu title="Services" type="services"/>
+
+	      <menuSeparator/>
+	
+	      <menuItem title="Hide GWorkspace" action="hide:" key="h"/>
+	      <menuItem title="Hide Others" action="hideOtherApplications:" key=""/>
+	      <menuItem title="Show All" action="unhideAllApplications:" key=""/>
+	
+	      <menuSeparator/>
+	
+	      <menuItem title="Quit GWorkspace" action="terminate:" key="q"/>
+      </menu>
+      
+      <menu title="File">
+	      <menuItem title="Open" action="openSelection:" key="o"/>
+	      <menuItem title="Open as Folder" action="openSelectionAsFolder:" key="O"/>
+	      <menuItem title="New Folder" action="newFolder:" key="n"/>
+	      <menuItem title="New File" action="newFile:" key="N"/>
+	      <menuItem title="Duplicate" action="duplicateFiles:" key="u"/>
+	      <menuItem title="Destroy" action="deleteFiles:" key="d"/>
+	      <menuItem title="Empty Recycler" action="emptyRecycler:" key=""/>
+	      <menuItem title="Put Away" action="putAway:" key=""/>
+	      <menuItem title="Print..." action="print:" key="p"/>
+      </menu>
+
+      <menu title="Edit">
+	      <menuItem title="Cut" action="cut:" key="x"/>
+	      <menuItem title="Copy" action="Copy:" key="c"/>
+	      <menuItem title="Paste" action="paste:" key="v"/>
+	      <menuItem title="Select All" action="selectAllInViewer:" key="a"/>
+      </menu>
+
+      <menu title="View">
+      </menu>
+
+      <menu title="Tools">
+	      <menuItem title="Viewer" action="showViewer:" key="V"/>
+      
+        <menu title="Tools">
+	        <menuItem title="Show Inspectors" action="" key=""/>
+ 	        <menuItem title="Attributes" action="showAttributesInspector:" key="1"/>
+ 	        <menuItem title="Contents" action="showContentsInspector:" key="2"/>
+ 	        <menuItem title="Tools" action="showAttributesInspector:" key="3"/>
+ 	        <menuItem title="Permissions" action="showAttributesInspector:" key="4"/>
+        </menu>
+
+        <menu title="History">
+ 	        <menuItem title="Show History" action="showHistory:" key="H"/>
+ 	        <menuItem title="Go backward" action="goBackwardInHistory:" key=""/>
+ 	        <menuItem title="Go forward" action="goForwardInHistory:" key=""/>
+        </menu>
+        
+	      <menuItem title="Finder" action="showFinder:" key="f"/>
+	      <menuItem title="Applications..." action="showApps:" key=""/>
+	      <menuItem title="File Operations..." action="showBackgrounder:" key=""/>
+     
+        <menu title="Fiend">
+        </menu>
+      
+	      <menuItem title="XTerm" action="startXTerm:" key="t"/>
+      </menu>
+
+      <menu title="Window" type="windows">
+	      <menuItem title="Arrange in Front" action="arrangeInFront:" key=""/>
+	      <menuItem title="Miniaturize Window" action="performMiniaturize:" key="m"/>
+	      <menuItem title="Close Window" action="closeMainWin:" key="w"/>
+        <menuSeparator/>
+       </menu>
+      
+    </menu>
+    
+  </objects>
+</gsmarkup>
+
+

@@ -1,0 +1,23 @@
+{
+  NSExecutable = "abiword";
+  NSIcon = "abiword.tiff";
+	XAppWrapper = YES;
+  NSTypes = (
+    {
+      NSUnixExtensions = ( "abw", "awt", "zabw", "bzabw", "doc", "jot", "wpd", "rtf" );
+      NSIcon = "FileIcon_.abw.tiff";
+    },
+    {
+      NSUnixExtensions = ( "txt", "text", "dbk" );
+      NSIcon = "FileIcon_.txt.tiff";
+    },
+    {
+      NSUnixExtensions = ( "pdb", "prc" );
+      NSIcon = "FileIcon_.pdb.tiff";
+    },
+    {
+      NSUnixExtensions = ( "html", "htm", "xhtml" );
+      NSIcon = "FileIcon_.html.tiff";
+    }
+  );
+}

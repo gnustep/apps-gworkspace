@@ -1,0 +1,12 @@
+{
+  NSExecutable = "realplay";
+  NSIcon = "FileIcon_.ram.tiff";
+  NSRole = "Viewer";
+	XAppWrapper = YES;
+  NSTypes = (
+    {
+      NSUnixExtensions = ( "ram", "rm" );
+      NSIcon = "FileIcon_.ram.tiff";
+    }
+  );
+}

@@ -1,0 +1,15 @@
+{
+  NSExecutable = "gnumeric";
+  NSRole = "Editor";
+  NSIcon = "gnumeric.png";
+  NSTypes = (
+    {
+	NSUnixExtensions = ( "xls" );
+	NSIcon = "FileIcon_.xls.png";
+    },
+    {
+	NSUnixExtensions = ( "gnumeric" );
+	NSIcon = "FileIcon_.gnumeric.png";
+    }
+  );
+}

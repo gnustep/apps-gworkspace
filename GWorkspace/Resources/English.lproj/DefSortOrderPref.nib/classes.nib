@@ -1,0 +1,13 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {changeType = id; setNewSortType = id; }; 
+            CLASS = DefSortOrderPref; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {matrix = id; prefbox = id; setButt = id; win = id; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
+    ); 
+    IBVersion = 1; 
+}

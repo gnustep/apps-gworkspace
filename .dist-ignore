@@ -1,0 +1,5 @@
+autom4te*.cache
+GNUmakefile
+gworkspace.make
+GWorkspace/GWorkspaceInfo.plist
+GWorkspace/Inspectors/Viewers/PdfViewer/config.h

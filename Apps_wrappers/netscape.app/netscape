@@ -1,0 +1,42 @@
+#!/bin/sh
+# Usage: netscape [ -GSFilePath file ]
+# simple GNUstep launch script for netscape navigator
+#
+# -- NETSCAPE should be the name you use to launch navigator from
+# -- the command line
+NETSCAPE=/usr/local/netscape/netscape
+# -- NETSCAPE_NAME is the (beginning of the) name which is shown 
+# -- under ps or top.
+NETSCAPE_NAME=netscape-bin
+#
+#--FUNCTIONS
+#
+usage()
+{
+echo Usage: `basename $0` '[ -GSFilePath file ]'
+exit 2
+}
+#-- MAIN
+#
+# -- establish name of file to be opened
+#
+if [ $# -eq 2 ] ; then
+  if [ "$1" = "-GSFilePath" ] ; then
+    file="$2"
+  else
+    usage
+  fi
+elif [ $# -eq 0 ] ; then
+  file=
+else
+  usage
+fi
+# -- check if netscape is running
+# -- is running
+ps -a | grep $NETSCAPE_NAME
+if [ $? -eq 0 ] ; then
+  test -z "$file" || $NETSCAPE -noraise -remote "openURL(file:${file},new-window)"
+else
+  $NETSCAPE $file &
+fi
+

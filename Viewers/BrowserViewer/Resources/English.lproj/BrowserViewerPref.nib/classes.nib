@@ -1,0 +1,26 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {setDefaultWidth = id; }; 
+            CLASS = BrowserViewerPref; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                colExample = id; 
+                controlsbox = id; 
+                prefbox = id; 
+                resizerBox = id; 
+                setButt = id; 
+                win = id; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            CLASS = Resizer; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {controller = id; prefview = id; }; 
+            SUPERCLASS = NSView; 
+        }
+    ); 
+    IBVersion = 1; 
+}

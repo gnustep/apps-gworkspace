@@ -1,0 +1,23 @@
+{
+    NSExecutable = gnochive;
+    NSIcon = "gnochive.tiff";
+    NSRole = "Viewer";
+    NSTypes = (
+            {
+              NSUnixExtensions = ( "bz2" );
+              NSIcon = "FileIcon_.bz2.tiff";
+            },
+            {
+              NSUnixExtensions = ( "gz", "tgz" );
+              NSIcon = "FileIcon_.gz.tiff";
+            },
+            {
+              NSUnixExtensions = ( "tar" );
+              NSIcon = "FileIcon_.tar.tiff";
+            },
+            {
+              NSUnixExtensions = ( "zip" );
+              NSIcon = "FileIcon_.zip.tiff";
+            }
+    );
+}

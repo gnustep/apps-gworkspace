@@ -1,0 +1,7 @@
+{
+   Name = "PDF Inspector";
+   Author = "Enrico Sersale <enrico@imago.ro>";
+   Version = "0.5";	
+   Description = "This Inspector allow you View the content of a PDF file";
+}
+

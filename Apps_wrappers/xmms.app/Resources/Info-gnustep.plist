@@ -1,0 +1,40 @@
+{
+  NSExecutable = "xmms";
+  NSIcon = "xmms.tiff";
+  NSRole = "Viewer";
+	XAppWrapper = YES;
+  NSTypes = (
+    {
+      NSUnixExtensions = ( "aiff" );
+      NSIcon = "FileIcon_.aiff.tiff";
+    },
+    {
+      NSUnixExtensions = ( "avi" );
+      NSIcon = "FileIcon_.avi.tiff";
+    },
+    {
+      NSUnixExtensions = ( "mp2" , "mp3" );
+      NSIcon = "FileIcon_.mp3.tiff";
+    },
+    {
+      NSUnixExtensions = ( "mpg" );
+      NSIcon = "FileIcon_.mpg.tiff";
+    },
+    {
+      NSUnixExtensions = ( "ogg" );
+      NSIcon = "FileIcon_.ogg.tiff";
+    },    
+    {
+      NSUnixExtensions = ( "wav" , "wave" );
+      NSIcon = "FileIcon_.wav.tiff";
+    },
+    {
+      NSUnixExtensions = ( "au" );
+      NSIcon = "FileIcon_.au.tiff";
+    },
+    {
+      NSUnixExtensions = ( "m3u" , "pls" , "cin" , "mod" , "s3m");
+      NSIcon = "FileIcon_GenericSound.tiff";
+    }
+  );
+}

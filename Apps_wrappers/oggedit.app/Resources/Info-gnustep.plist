@@ -1,0 +1,12 @@
+{
+  NSExecutable = "oggedit";
+  NSIcon = "FileIcon_.ogg.tiff";
+  NSRole = "Viewer";
+	XAppWrapper = YES;
+  NSTypes = (
+    {
+      NSUnixExtensions = ( "ogg" );
+      NSIcon = "FileIcon_.ogg.tiff";
+    }    
+  );
+}

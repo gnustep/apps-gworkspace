@@ -1,0 +1,74 @@
+
+# Things to do before compiling
+before-all::
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/GWorkspace
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/GWLib	
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Watchers
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Viewers
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Shelf
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/TShelf
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Inspectors
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Apps
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/FileOperations
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Finder
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Desktop
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Recycler
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Preferences
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Dialogs
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Fiend
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/History
+
+# Things to do after compiling
+# after-all::
+
+# Things to do before installing
+before-install::
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/GWorkspace
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/GWLib	
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Watchers
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Viewers
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Shelf
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/TShelf
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Inspectors
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Apps
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/FileOperations
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Finder
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Desktop
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Recycler
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Preferences
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Dialogs
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Fiend
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/History
+  
+# Things to do after installing
+# after-install::
+
+# Things to do before uninstalling
+# before-uninstall::
+
+# Things to do after uninstalling
+# after-uninstall::
+
+# Things to do before cleaning
+# before-clean::
+
+# Things to do after cleaning
+after-clean::
+#	rm -rf GWorkspace/Inspectors/Viewers/Library
+
+# Things to do before distcleaning
+# before-distclean::
+
+# Things to do after distcleaning
+after-distclean::
+#	rm -rf Inspectors/Viewers/Library
+	rm -rf autom4te*.cache
+	rm -f config.status config.log config.cache TAGS GNUmakefile gworkspace.make GWorkspace/GWorkspaceInfo.plist
+	rm -f Inspectors/config.h 
+
+# Things to do before checking
+# before-check::
+
+# Things to do after checking
+# after-check::
+

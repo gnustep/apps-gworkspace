@@ -1,0 +1,39 @@
+#!/bin/sh
+# Usage: emacs [ -GSFilePath file ]
+# simple GNUstep launch script for emacs/xemacs
+#
+EMACS=emacs
+GNUCLIENT=gnuclient
+#
+#--FUNCTIONS
+#
+usage()
+{
+echo Usage: `basename $0` '[ -GSFilePath file ]'
+exit 2
+}
+#-- MAIN
+#
+# -- establish name of file to be opened
+#
+if [ $# -eq 2 ] ; then
+  if [ "$1" = "-GSFilePath" ] ; then
+    file="$2"
+  else
+    usage
+  fi
+elif [ $# -eq 0 ] ; then
+  file=
+else
+  usage
+fi
+# -- check if gnuserv (emacs remote file opener)
+# -- is running
+ps -Ac | fgrep -q gnuserv
+if [ $? -eq 0 ] ; then
+  if [ -z "$file" ] ; then file='*UNTITLED*' ; fi
+	$GNUCLIENT $file &
+else
+  $EMACS $file &
+fi
+

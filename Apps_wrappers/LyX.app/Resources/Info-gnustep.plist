@@ -1,0 +1,12 @@
+{
+    NSExecutable = lyx;
+    NSIcon = "LyX.tiff";
+    NSRole = "Editor";
+		XAppWrapper = YES;
+    NSTypes = (
+            {
+              NSUnixExtensions = ( "lyx" );
+              NSIcon = "FileIcon_.lyx.tiff";
+            }
+    );
+}

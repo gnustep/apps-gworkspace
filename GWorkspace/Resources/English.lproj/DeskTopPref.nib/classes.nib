@@ -1,0 +1,34 @@
+{
+    IBClasses = (
+        {CLASS = ColorView; LANGUAGE = ObjC; SUPERCLASS = NSView; }, 
+        {
+            ACTIONS = {
+                chooseImage = id; 
+                makeColor = id; 
+                setColor = id; 
+                setState = id; 
+                unsetImage = id; 
+            }; 
+            CLASS = DeskTopPref; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                blueField = id; 
+                blueSlider = id; 
+                chooseButt = id; 
+                colorsBox = id; 
+                controlsbox = id; 
+                greenField = id; 
+                greenSlider = id; 
+                prefbox = id; 
+                redField = id; 
+                redSlider = id; 
+                setColorButt = id; 
+                setImageButt = id; 
+                win = id; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
+    ); 
+    IBVersion = 1; 
+}

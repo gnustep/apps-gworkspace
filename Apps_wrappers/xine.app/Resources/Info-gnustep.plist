@@ -1,0 +1,28 @@
+{
+  NSExecutable = "xine";
+  NSIcon = "xine.tiff";
+  NSRole = "Viewer";
+	XAppWrapper = YES;
+  NSTypes = (
+    {
+      NSUnixExtensions = ( "mpg", "mpeg", "mpv", "m2v" );
+      NSIcon = "FileIcon_.mpg.tiff";
+    },
+    {
+      NSUnixExtensions = ( "mp2", "mp3" );
+      NSIcon = "FileIcon_.mp3.tiff";
+    },
+    {
+      NSUnixExtensions = ( "avi" );
+      NSIcon = "FileIcon_.avi.tiff";
+    },
+    {
+      NSUnixExtensions = ( "mov" );
+      NSIcon = "FileIcon_.mov.tiff";
+    },
+    {
+      NSUnixExtensions = ( "ogg" );
+      NSIcon = "FileIcon_GenericVideo.tiff";
+    }
+  );
+}

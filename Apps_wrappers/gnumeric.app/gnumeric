@@ -1,0 +1,5 @@
+#!/bin/sh
+
+#gnumeric $*
+
+gnumeric "$2" &

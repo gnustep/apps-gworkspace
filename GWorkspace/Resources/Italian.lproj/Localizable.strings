@@ -1,0 +1,321 @@
+/* ----------------------- menu strings --------------------------- *\
+/* main.m */
+
+"Info" = "Info";
+	"Info Panel..." = "Pannello Informazioni...";
+	"Preferences..." = "Preferenze...";
+	"Help..." = "Aiuto...";
+
+"File" = "Archivio";
+	"Open" = "Apri";
+	"Open as Folder" = "Apri come Cartella";
+	"Edit File" = "Edita File";
+	"New Folder" = "Nuova Cartella";
+	"New File" = "Nuovo File";
+	"Duplicate" = "Duplica";	
+	"Destroy" = "Distruggi";
+	"Empty Recycler" = "Vuota il Cestino";
+
+"Edit" = "Edit";
+	"Cut" = "Taglia";
+	"Copy" = "Copia";
+	"Paste" = "Incolla";
+	"Select All" = "Seleziona tutto";
+		
+"View" = "Vista";
+	"Browser" = "Browser";
+	"Icon" = "Icone";
+		
+"Tools" = "Strumenti";
+	"Viewer" = "Viewer";
+	"Inspectors" = "Ispettori";
+		"Show Inspectors" = "Mostra gli Ispettori";
+		"Attributes" = "Attributi";
+		"Contents" = "Contenuto";
+		"Tools" = "Strumenti";	
+		"Permissions" = "Permissioni";	
+	"Finder" = "Finder";
+	"Processes..." = "Processi...";
+	"Fiend" = "Fiend";
+		"Show Fiend" = "Mostra il Fiend";
+		"Hide Fiend" = "Nascondi il Fiend";
+		"Add Layer..." = "Aggiungi un Layer...";
+		"Remove Current Layer" = "Rimuovi il Layer corrente";
+		"Rename Current Layer" = "Rinomina il Layer corrente";
+		"Layers" = "Layers";
+	"DeskTop Shelf" = "DeskTop Shelf";	
+	"XTerm" = "XTerm";
+	
+"Windows" = "Finestre";
+	"Arrange in Front" = "Porta davanti";
+	"Miniaturize Window" = "Miniaturizza la Finestra";
+	"Close Window" = "Chiudi Finestra";
+	
+"Services" = "Servizi";
+
+"Hide" = "Nascondi";
+
+"Quit" = "Esci";
+
+/* ----------------------- File Operations strings --------------------------- *\
+
+/* GWorkspace.m */
+
+"GNUstep Workspace Manager" = "Workspace Manager per GNUstep";
+"See http://www.gnustep.it/enrico/gworkspace" = "Vai a http://www.gnustep.it/enrico/gworkspace";
+"Released under the GNU General Public License 2.0" = "Rilasciato sotto la GNU General Public License 2.0";
+
+"Error" = "Errore";
+"You have not write permission\nfor" = "Non hai permesso di scrittura\nper";
+"Continue" = "Continua";
+
+
+/* FileOperation.m */
+
+"OK" = "OK";
+"Cancel" = "Annulla";
+"Move" = "Muovi";
+"Move from: " = "Muovo da: ";
+"\nto: " = "\na: ";
+"Copy" = "Copia";
+"Copy from: " = "Copio da: ";
+"Link" = "Collega";
+"Link " = "Collega ";
+"Delete" = "Cancella";
+"Delete the selected objects?" = "Cancello gli oggetti selezionati?";
+"Duplicate" = "Duplica";
+"Duplicate the selected objects?" = "Duplico gli oggetti selezionati?";
+"From:" = "Da:";
+"To:" = "A:";
+"In:" = "In:";
+"Stop" = "Stop";
+"Pause" = "Pausa";
+"Moving" = "Muovo";
+"Copying" = "Copio";
+"Linking" = "Collego";
+"Duplicating" = "Duplico";
+"Destroying" = "Cancello";
+"File Operation Completed" = "Operazione Terminata";
+"Backgrounder connection died!" = "La connessione con Backgrounder e caduta!";
+"Some items have the same name;\ndo you want to sobstitute them?" = "Alcuni elementi hanno lo stesso nome;\nvuoi sostituirli?";
+"Error" = "Errore";
+"File Operation Error!" = "Errore nell'operazione sui files!";
+
+
+/* ColumnIcon.m */
+
+"You have not write permission\nfor " = "Non hai permesso di scrittura\nper ";
+"The name " = "Il nome ";
+" is already in use!" = " e già in uso!";
+"Cannot rename " = "Non posso rinominare ";
+"Invalid char in name" = "Carattere non valido nel nome";
+
+
+/* ----------------------- Inspectors strings --------------------------- *\
+
+/* InspectorsWin.m */
+
+"Attributes" = "Attributi";
+"Contents" = "Contenuti";
+"Tools" = "Strumenti";
+"Access Control" = "Controllo Accesso";
+
+
+/* AttributesPanel.m */
+
+"Attributes" = "Attributi";
+"Attributes Inspector" = "Ispettore Attributi";
+"Path:" = "Path:";
+"Link To:" = "Link a:";
+"Size:" = "Dimensioni:";
+"Owner:" = "Proprietario:";
+"Group:" = "Gruppo:";
+"Changed" = "Modificato";
+"Revert" = "Annulla";
+"OK" = "OK";
+
+
+/* ContentsPanel.m */
+
+"Contents" = "Contenuti";
+"Contents Inspector" = "Ispettore Contenuti";
+"No Contents Inspector" = "Nessun Ispettore";
+"No Contents Inspector\nFor Multiple Selection" = "Nessun Ispettore\nper una selezione multipla";
+
+
+/* FolderViewer.m */
+
+"Sort method applies to the\ncontents of the selected folder,\nNOT to its parent folder"
+  = "L'odinamento si applica al\ncontenuto della cartella selezionata,\nNON alla directory che la contiene";
+"Sort by" = "Ordinamento";
+"Name" = "Nome";
+"Kind" = "Tipo";
+"Date" = "Data";
+"Size" = "Dimensioni";
+"Owner" = "Propr.";
+"Folder Inspector" = "Ispettore Cartelle";	
+
+
+/* ImageViewer.m */
+
+"Image Inspector" = "Ispettore Immagini";
+
+
+/* AppViewer.m */
+
+"Open these kinds of documents:" = "Apre questo tipo di documenti:";
+"Invalid Contents" = "Contenuto non valido";
+"App Inspector" = "Ispettore App";
+
+
+/* PermissionsPanel.m */
+
+"UNIX Permissions" = "Permissioni UNIX";
+"Access Control" = "Controllo Accesso";
+"Also apply to files inside selection" = "Applica anche ai files nella selezione";
+
+
+/* ToolsPanel.m */
+
+"Tools" = "Strumenti";
+"Tools Inspector" = "Ispettore Strumenti";
+"No Tools Inspector" = "Nessun Ispettore";
+"Set Default" = "Set Default";
+
+
+/* AppsView.m */
+	
+"Double-click to open selected document(s)" = "Due-click per aprire i documenti selezionati";	
+"Default:" = "Default:";	
+"Path:" = "Path:";
+"Click 'Set Default' to set default application\nfor all documents with this extension" 
+  = "'Set Default' per settare l'app default\nper tutti i documenti con questa estensione";
+
+
+/* PermsBox.m */
+
+"Permissions" = "Permissioni";
+"Read" = "Leggi";
+"Write" = "Scrivi";
+"Execute" = "Esegui";
+"Owner" = "Propr.";
+"Group" = "Gruppo";
+"Other" = "Altri";
+
+
+/* ----------------------- Processes strings --------------------------- *\
+
+/* Processes.m */
+
+"Processes" = "Processi";
+"No Background Process" = "Nessun processo in background";
+"Kill" = "Kill";
+"Path: " = "Path: ";
+"Status: " = "Stato: ";
+
+
+/* ProcsView.m */
+
+"Applications" = "Applicazioni";
+"Background" = "Background";
+
+
+/* ----------------------- Finder strings --------------------------- *\
+
+/* Finder.m */
+
+"Finder" = "Finder";
+"Find items with names that match" = "Cerca elementi con nome adeguato";
+"Find items with contents that match" = "Cerca elementi con contenuto adeguato";
+"No selection!" = "Nessuna selezione!";
+"No arguments!" = "Nessun argomento!";
+
+
+/* ----------------------- Fiend strings --------------------------- *\
+
+/* Fiend.m */
+
+"New Layer" = "Nuovo Layer";
+"A layer with this name is already present!" = "E' già presente un layer con lo stesso nome!";
+"You can't remove the last layer!" = "Non si puo eliminare l'ultimo layer!";
+"Remove layer" = "Remove layer";
+"Are you sure that you want to remove this layer?" = "Sei sicuro di voler rimuovere questo layer?";
+"Rename Layer" = "Rename Layer";
+"You can't dock multiple paths!" = "Non puoi aggiungere path multiple!";
+"This object is already present in this layer!" = "Questo oggetto e già presente in questo layer!";
+
+
+/* ----------------------- Preferences strings --------------------------- *\
+
+/* PreferencesWin.m */
+
+"GWorkspace Preferences" = "Preferenze di GWorkspace";
+
+
+/* BackWinPreferences.m */       
+
+"DeskTop Shelf" = "Shelf della Scrivania";	
+"DeskTop Color" = "Colore Scrivania";
+"red" = "rosso";
+"green" = "verde";
+"blue" = "blu";
+"Set Color" = "Scegli Colore";
+"Push the \"Set Image\" button\nto set your DeskTop image.\nThe image must have the same\nsize of your screen." = 
+  "Click su \"Scegli un immagine\"\nper scegliere l'immagine di sfondo.\nL'immagine deve avere le\ndimensioni dello schermo.";
+"Set Image" = "Scegli un immagine";
+"Unset Image" = "Togli l'immagine";
+
+	
+/* DefaultXTerm.m */             
+	
+"Set" = "Scegli";
+	
+	
+/* BrowserViewsPreferences.m */  
+	
+"Column Width" = "Larg. Colonne";
+"Use Default Settings" = "Usa i valori default";	
+"Browser" = "Browser";
+	
+	
+/* FileWatchingPreferences.m */  
+	
+"File System Watching" = "Controllo File System";
+"timeout" = "scadenza";
+"frequency" = "frequenza";
+"Values will apply to the \nnew watchers from now, \nto the existing ones, after the first timeout" = 
+  "I valori si applicheranno ai\nnuovi watchers da adesso, \na quelli esistenti, dopo la prima scadenza";
+	
+	
+/* ShelfPreferences.m */
+	
+"Shelf" = "Shelf";
+	
+	
+/* DefaultEditor.m */            
+
+"Default Editor" = "Editore Default";
+"No Default Editor" = "Nessun Editore Default";
+"Choose..." = "Scegli...";
+
+
+/* IconViewsPreferences.m */
+
+"Title Width" = "Larg. Titolo";
+"Icon View" = "Vista per Icone";
+
+/* Recycler strings */
+
+"Recycle: " = "Recicla: ";
+"Recycler: " = "Reciclatore: ";
+"Recycler" = "Reciclatore";
+"the Recycler" = "il reciclatore";
+"\nto the Recycler" = "\nnel reciclatore";
+"Move from the Recycler " = "Sposto dal reciclatore ";
+"In" = "In";
+"Empty Recycler" = "Vuota il reciclatore";
+"Empty the Recycler?" = "Vuoto il reciclatore?";
+"Put Away" = "Rimetti a posto";
+
+/* ì (i') à (a') */
+

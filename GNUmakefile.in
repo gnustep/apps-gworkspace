@@ -1,0 +1,33 @@
+PACKAGE_NEEDS_CONFIGURE = YES
+
+include $(GNUSTEP_MAKEFILES)/common.make
+
+include gworkspace.make
+
+PACKAGE_NAME = @PACKAGE_NAME@
+VERSION = @PACKAGE_VERSION@
+
+ifeq ($(FOUNDATION_LIB), gnu)
+  GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
+endif
+
+ifeq ($(FOUNDATION_LIB), apple)
+  GNUSTEP_INSTALLATION_DIR = /
+endif
+
+#
+# subprojects
+#
+SUBPROJECTS = Utilities \
+	      			  GWLib \
+	      			  Viewers \
+	      			  ContentViewers \
+	      			  GWorkspace 
+						 
+-include GNUmakefile.preamble
+
+-include GNUmakefile.local
+
+include $(GNUSTEP_MAKEFILES)/aggregate.make
+
+-include GNUmakefile.postamble

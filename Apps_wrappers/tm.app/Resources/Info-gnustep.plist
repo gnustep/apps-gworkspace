@@ -1,0 +1,16 @@
+{
+    NSExecutable = tm;
+    NSIcon = "viewer.tiff";
+    NSRole = "Viewer";
+		XAppWrapper = YES;
+    NSTypes = (
+            {
+              NSUnixExtensions = ( "txt", "text", "readme", "README", "me", "doc" );
+              NSIcon = "FileIcon_.txt.tiff";
+            },
+            {
+              NSUnixExtensions = ( "html", "htm", "xhtml" );
+              NSIcon = "FileIcon_.html.tiff";
+            }
+    );
+}

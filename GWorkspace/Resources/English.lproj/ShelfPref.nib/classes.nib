@@ -1,0 +1,28 @@
+{
+    IBClasses = (
+        {
+            CLASS = ArrResizer; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {controller = id; }; 
+            SUPERCLASS = NSView; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {setDefaultWidth = id; }; 
+            CLASS = ShelfPref; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                iconbox = id; 
+                imView = id; 
+                leftResBox = id; 
+                nameField = id; 
+                prefbox = id; 
+                rightResBox = id; 
+                setButt = id; 
+                win = id; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

@@ -1,0 +1,20 @@
+{
+  NSExecutable = "vi";
+  NSRole = "Editor";
+  NSIcon = "vi.tiff";
+	XAppWrapper = YES;
+  NSTypes = (
+    {
+      NSUnixExtensions = ( "h" );
+      NSIcon = "FileIcon_.h.tiff";
+    },
+    {
+      NSUnixExtensions = ( "m" );
+      NSIcon = "FileIcon_.m.tiff";
+    },
+    {
+      NSUnixExtensions = ( "c" );
+      NSIcon = "FileIcon_.c.tiff";
+    }
+  );
+}

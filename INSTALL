@@ -1,0 +1,13 @@
+Installing GWorkspace
+=========================
+
+GWorkspace requires GNUstep to be installed. Make sure that you have an
+up to date version on your system installed! 
+
+		cd GWorkspace
+    ./configure
+		make install
+
+		If you want to do make; make install, make sure that you
+		first make; make install GWLib, and *then* the rest of the
+		sources!

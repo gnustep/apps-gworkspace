@@ -1,0 +1,30 @@
+{
+    IBClasses = (
+        {
+            ACTIONS = {
+                activateFileOpChanges = id; 
+                activateStatWinChanges = id; 
+                setUnsetFileOp = id; 
+                setUnsetStatWin = id; 
+            }; 
+            CLASS = FileOpsPref; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                confActivButt = id; 
+                confMatrix = id; 
+                confirmBox = id; 
+                confirmItem = id; 
+                prefbox = id; 
+                statActivButt = id; 
+                statChooseButt = id; 
+                statusBox = id; 
+                statusItem = id; 
+                tabView = id; 
+                win = id; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
+    ); 
+    IBVersion = 1; 
+}

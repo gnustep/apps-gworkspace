@@ -1,0 +1,294 @@
+ /*  -*-objc-*-
+ *  ShelfPref.m: Implementation of the ShelfPref Class 
+ *  of the GNUstep GWorkspace application
+ *
+ *  Copyright (c) 2001 Enrico Sersale <enrico@imago.ro>
+ *  
+ *  Author: Enrico Sersale
+ *  Date: August 2001
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ */
+
+#include <Foundation/Foundation.h>
+#include <AppKit/AppKit.h>
+  #ifdef GNUSTEP 
+#include "GWLib.h"
+#include "GWFunctions.h"
+#include "GWNotifications.h"
+  #else
+#include <GWorkspace/GWLib.h>
+#include <GWorkspace/GWFunctions.h>
+#include <GWorkspace/GWNotifications.h>
+  #endif
+#include "ShelfPref.h"
+#include "GWorkspace.h"
+#include "GNUstep.h"
+
+  #ifdef GNUSTEP 
+#define BOX_W 197
+#define NAME_OR_Y 5
+#define NAME_W 16
+#define NAME_MARGIN 6
+  #else
+#define BOX_W 197
+#define NAME_OR_Y 5
+#define NAME_W 16
+#define NAME_MARGIN 6
+  #endif
+
+#ifndef max
+#define max(a,b) ((a) > (b) ? (a):(b))
+#endif
+
+#ifndef min
+#define min(a,b) ((a) < (b) ? (a):(b))
+#endif
+
+static NSString *nibName = @"ShelfPref";
+
+@implementation ArrResizer
+
+- (void)dealloc
+{
+  RELEASE (arrow);
+  [super dealloc];
+}
+
+- (id)initForController:(id)acontroller 
+           withPosition:(ArrowPosition)pos
+{
+  self = [super init];
+  [self setFrame: NSMakeRect(0, 0, 16, 16)];	  
+  position = pos;
+  controller = acontroller;
+  
+  if (position == leftarrow) {
+    ASSIGN (arrow, [NSImage imageNamed: @"LeftArr.tiff"]);
+  } else {
+    ASSIGN (arrow, [NSImage imageNamed: @"RightArr.tiff"]);
+  }
+  
+  return self;
+}
+
+- (ArrowPosition)position
+{
+  return position;
+}
+
+- (void)mouseDown:(NSEvent *)e
+{
+  [controller startMouseEvent: e onResizer: self];
+}
+
+- (void)drawRect:(NSRect)rect
+{
+  [super drawRect: rect];
+	[arrow compositeToPoint: NSZeroPoint operation: NSCompositeSourceOver];
+}
+
+@end
+
+
+@implementation ShelfPref
+
+- (void)dealloc
+{
+	[[NSNotificationCenter defaultCenter] removeObserver: self];
+  TEST_RELEASE (prefbox);
+  RELEASE (leftResizer);
+  RELEASE (rightResizer);  
+  RELEASE (fname);
+  [super dealloc];
+}
+
+- (id)init
+{
+  self = [super init];
+  
+  if (self) {    
+		if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
+      NSLog(@"failed to load %@!", nibName);
+    } else { 
+      NSArray *selPaths;
+      int orx, count;
+
+      RETAIN (prefbox);
+      RELEASE (win);
+
+      gw = [GWorkspace gworkspace];    
+		  ws = [NSWorkspace sharedWorkspace];
+
+      selPaths = [gw selectedPaths];
+      count = [selPaths count];
+      if (count == 1) {    
+        NSString *fpath = [selPaths objectAtIndex: 0];
+        NSString *defApp;
+        NSString *type;
+
+        ASSIGN (fname, [fpath lastPathComponent]);
+        
+        [ws getInfoForFile: fpath application: &defApp type: &type];      
+        [imView setImage: [gw iconForFile: fpath ofType: type]]; 		
+      } else {
+        fname = [[NSString alloc] initWithFormat: @"%i items", count];    
+        [imView setImage: [NSImage imageNamed: @"MultipleSelection.tiff"]];
+      }
+
+      cellsWidth = [gw shelfCellsWidth];
+
+      orx = (int)((BOX_W - cellsWidth) / 2);
+
+      leftResizer = [[ArrResizer alloc] initForController: self 
+                                             withPosition: leftarrow];
+      [leftResizer setFrame: NSMakeRect(0, 0, NAME_W, NAME_W)];  
+	    [(NSBox *)leftResBox setContentView: leftResizer]; 
+      [leftResBox setFrame: NSMakeRect(orx - NAME_W, NAME_OR_Y, NAME_W, NAME_W)];  
+
+      rightResizer = [[ArrResizer alloc] initForController: self 
+                                              withPosition: rightarrow];
+      [rightResizer setFrame: NSMakeRect(0, 0, NAME_W, NAME_W)];
+	    [(NSBox *)rightResBox setContentView: rightResizer]; 
+      [rightResBox setFrame: NSMakeRect(orx + cellsWidth, NAME_OR_Y, NAME_W, NAME_W)];  
+
+      [nameField setFrame: NSMakeRect(orx, NAME_OR_Y, cellsWidth, NAME_W)];    
+	    [nameField setStringValue: cutFileLabelText(fname, nameField, cellsWidth -NAME_MARGIN)];
+
+      [[NSNotificationCenter defaultCenter] addObserver: self 
+                					  selector: @selector(selectionChanged:) 
+                						    name: GWCurrentSelectionChangedNotification
+                					    object: nil];
+                              
+      /* Internationalization */
+      [setButt setTitle: NSLocalizedString(@"Default", @"")];
+      [iconbox setTitle: NSLocalizedString(@"Title Width", @"")];
+    }                              
+  }
+  
+  return self;
+}
+
+- (NSView *)prefView
+{
+  return prefbox;
+}
+
+- (NSString *)prefName
+{
+  return NSLocalizedString(@"Shelf", @"");
+}
+
+- (void)tile
+{
+  int orx = (int)((BOX_W - cellsWidth) / 2);
+
+  [nameField setFrame: NSMakeRect(orx, NAME_OR_Y, cellsWidth, NAME_W)];    
+	[nameField setStringValue: cutFileLabelText(fname, nameField, cellsWidth -NAME_MARGIN)];  
+
+  [leftResBox setFrame: NSMakeRect(orx - NAME_W, NAME_OR_Y, NAME_W, NAME_W)];  
+  [rightResBox setFrame: NSMakeRect(orx + cellsWidth, NAME_OR_Y, NAME_W, NAME_W)];  
+  
+  [iconbox setNeedsDisplay: YES];
+}
+
+- (void)selectionChanged:(NSNotification *)n
+{
+  NSArray *selPaths = [gw selectedPaths];
+  int count = [selPaths count];
+  
+  if (count == 1) {    
+    NSString *fpath = [selPaths objectAtIndex: 0];
+    NSString *defApp;
+    NSString *type;
+
+    ASSIGN (fname, [fpath lastPathComponent]);
+    [imView setImage: [ws iconForFile: fpath]];
+    [ws getInfoForFile: fpath application: &defApp type: &type];      
+    [imView setImage: [gw iconForFile: fpath ofType: type]]; 		
+  } else {
+    fname = [[NSString alloc] initWithFormat: @"%i items", count];    
+    [imView setImage: [NSImage imageNamed: @"MultipleSelection.tiff"]];
+  }
+
+  cellsWidth = [gw shelfCellsWidth];
+  [self tile];
+}
+
+- (void)startMouseEvent:(NSEvent *)event onResizer:(ArrResizer *)resizer
+{
+  NSApplication	*app = [NSApplication sharedApplication];
+  NSDate *farAway = [NSDate distantFuture];
+  ArrowPosition pos = [resizer position];
+  int orx = (int)[prefbox convertPoint: [event locationInWindow] fromView: nil].x;
+  NSView *resbox1 = (pos == leftarrow) ? leftResBox : rightResBox;
+  NSView *resbox2 = (pos == leftarrow) ? rightResBox : leftResBox;
+  unsigned int eventMask = NSLeftMouseUpMask | NSLeftMouseDraggedMask;
+  NSEvent	*e;
+
+  [prefbox lockFocus];
+  [[NSRunLoop currentRunLoop] limitDateForMode: NSEventTrackingRunLoopMode];
+
+  e = [app nextEventMatchingMask: eventMask
+		                   untilDate: farAway
+			                    inMode: NSEventTrackingRunLoopMode
+			                   dequeue: YES];
+
+  while ([e type] != NSLeftMouseUp) {
+    int x = (int)[prefbox convertPoint: [e locationInWindow] fromView: nil].x;
+    int diff = x - orx;
+    int orx1 = (int)[resbox1 frame].origin.x;
+    int orx2 = (int)[resbox2 frame].origin.x;
+
+    if ((max(orx1 + diff, orx2 - diff) - min(orx1 + diff, orx2 - diff)) < 160
+        && (max(orx1 + diff, orx2 - diff) - min(orx1 + diff, orx2 - diff)) > 70) {      
+      int fieldwdt = max(orx1 + diff, orx2 - diff) - min(orx1 + diff, orx2 - diff) - NAME_W;
+      int nameforx = (int)((BOX_W - fieldwdt) / 2);
+      
+      [resbox1 setFrameOrigin: NSMakePoint(orx1 + diff, NAME_OR_Y)];
+      [resbox2 setFrameOrigin: NSMakePoint(orx2 - diff, NAME_OR_Y)];
+      
+      [nameField setFrame: NSMakeRect(nameforx, NAME_OR_Y, fieldwdt, NAME_W)];    
+      [nameField setStringValue: cutFileLabelText(fname, nameField, fieldwdt -NAME_MARGIN)];
+
+      [iconbox setNeedsDisplay: YES];
+       
+      orx = x;
+    }
+    e = [app nextEventMatchingMask: eventMask
+		                     untilDate: farAway
+			                      inMode: NSEventTrackingRunLoopMode
+			                     dequeue: YES];
+  }
+  [prefbox unlockFocus];
+  
+  [self setNewWidth: (int)[nameField frame].size.width];
+  
+  [setButt setEnabled: YES];
+}
+
+- (void)setNewWidth:(int)w
+{
+  [gw setShelfCellsWidth: w];
+}
+
+- (void)setDefaultWidth:(id)sender
+{
+  cellsWidth = [gw defaultShelfCellsWidth];
+  [self tile];
+  [setButt setEnabled: NO];
+}
+
+@end

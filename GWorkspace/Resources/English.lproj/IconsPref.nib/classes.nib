@@ -1,0 +1,13 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {activateChanges = id; setUnsetAnimation = id; }; 
+            CLASS = IconsAnimationPref; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {actChangesButt = id; animMatrix = id; prefbox = id; win = id; }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}

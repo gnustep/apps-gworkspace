@@ -1,0 +1,10 @@
+{
+   InspectorDescription = "See the content of property list file";
+   InspectorName = "Plist Inspector";
+   InspectorRelease = "0.4";
+   InspectorURL = "http://www.gnustep-apps.org";
+   Authors  = "Fabien VALLON";
+   Copyright = "Copyright 2002 Fabien VALLON <fabien.vallon@fr.alcove.com>";	
+   CopyrightDescription = "GNU GPL 2.0.";   
+}
+

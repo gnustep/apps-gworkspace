@@ -1,0 +1,16 @@
+{
+  NSExecutable = "galeon";
+  NSRole = "Viewer";
+  NSIcon = "galeon.tiff";
+	XAppWrapper = YES;
+  NSTypes = (
+    {
+      NSUnixExtensions = ( "html" );
+      NSIcon = "FileIcon_.html.tiff";
+    },
+    {
+      NSUnixExtensions = ( "htm" );
+      NSIcon = "FileIcon_.html.tiff";
+    }
+  );
+}

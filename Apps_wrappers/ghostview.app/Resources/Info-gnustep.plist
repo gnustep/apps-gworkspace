@@ -1,0 +1,12 @@
+{
+    NSExecutable = ghostview;
+    NSIcon = "ps.tiff";
+    NSRole = "Editor";
+		XAppWrapper = YES;
+    NSTypes = (
+            {
+              NSUnixExtensions = ( "ps",  "eps");
+              NSIcon = "ps.tiff";
+            }
+    );
+}

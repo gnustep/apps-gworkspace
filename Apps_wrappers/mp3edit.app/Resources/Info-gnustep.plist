@@ -1,0 +1,12 @@
+{
+  NSExecutable = "mp3edit";
+  NSIcon = "FileIcon_.mp3.tiff";
+  NSRole = "Viewer";
+	XAppWrapper = YES;
+  NSTypes = (
+    {
+      NSUnixExtensions = ( "mp3" );
+      NSIcon = "FileIcon_.mp3.tiff";
+    }    
+  );
+}
