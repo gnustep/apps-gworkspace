@@ -112,6 +112,18 @@ typedef enum FSNSelectionMask {
 
 - (FSNInfoType)showType;
 
+- (void)setIconSize:(int)size;
+
+- (int)iconSize;
+
+- (void)setLabelTextSize:(int)size;
+
+- (int)labelTextSize;
+
+- (void)setIconPosition:(int)pos;
+
+- (int)iconPosition;
+
 - (id)repOfSubnode:(FSNode *)anode;
 
 - (id)repOfSubnodePath:(NSString *)apath;
@@ -155,7 +167,31 @@ typedef enum FSNSelectionMask {
 - (BOOL)validatePasteOfFilenames:(NSArray *)names
                        wasCutted:(BOOL)cutted;
 
+- (void)setBackgroundColor:(NSColor *)acolor;
+
 - (NSColor *)backgroundColor;
+
+@end
+
+
+@protocol DesktopApplication
+
+- (void)selectionChanged:(NSArray *)newsel;
+
+- (void)openSelectionInNewViewer:(BOOL)newv;
+
+- (void)performFileOperation:(NSDictionary *)opinfo;
+
+- (void)concludeRemoteFilesDragOperation:(NSData *)opinfo
+                             atLocalPath:(NSString *)localdest;
+
+- (void)addWatcherForPath:(NSString *)path;
+
+- (void)removeWatcherForPath:(NSString *)path;
+
+- (NSString *)trashPath;
+
+- (id)workspaceApplication;
 
 @end
 

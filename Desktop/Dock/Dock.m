@@ -712,6 +712,34 @@
   return FSNInfoNameType;
 }
 
+
+- (void)setIconSize:(int)size
+{
+}
+
+- (int)iconSize
+{
+  return MAX_ICN_SIZE;
+}
+
+- (void)setLabelTextSize:(int)size
+{
+}
+
+- (int)labelTextSize
+{
+  return 12;
+}
+
+- (void)setIconPosition:(int)pos
+{
+}
+
+- (int)iconPosition
+{
+  return NSImageOnly;
+}
+
 - (id)repOfSubnode:(FSNode *)anode
 {
   return nil;
@@ -814,6 +842,21 @@
                        wasCutted:(BOOL)cutted
 {
   return NO;
+}
+
+- (void)setBackgroundColor:(NSColor *)acolor
+{
+  NSColor *hlgtcolor = [acolor highlightWithLevel: 0.2];
+  int i;
+  
+  for (i = 0; i < [icons count]; i++) {
+    [[icons objectAtIndex: i] setHighlightColor: hlgtcolor];
+  }
+  
+  ASSIGN (backColor, hlgtcolor);
+  if ([self superview]) {
+    [self tile];
+  }
 }
 
 - (NSColor *)backgroundColor

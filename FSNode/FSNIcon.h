@@ -35,28 +35,6 @@
 @class FSNode;
 @class FSNTextCell;
 
-@protocol DesktopApplication
-
-- (void)selectionChanged:(NSArray *)newsel;
-
-- (void)openSelectionInNewViewer:(BOOL)newv;
-
-- (void)performFileOperation:(NSDictionary *)opinfo;
-
-- (void)concludeRemoteFilesDragOperation:(NSData *)opinfo
-                             atLocalPath:(NSString *)localdest;
-
-- (void)addWatcherForPath:(NSString *)path;
-
-- (void)removeWatcherForPath:(NSString *)path;
-
-- (NSString *)trashPath;
-
-- (id)workspaceApplication;
-
-@end
-
-
 @interface FSNIcon : NSView <FSNodeRep>
 {
   FSNode *node;

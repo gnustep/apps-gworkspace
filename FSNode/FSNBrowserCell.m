@@ -52,19 +52,21 @@ static NSDictionary *fontAttr = nil;
 
 + (void)initialize
 {
-  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-  NSString *appName = [defaults stringForKey: @"DesktopApplicationName"];
-  NSString *selName = [defaults stringForKey: @"DesktopApplicationSelName"];
+  if (desktopApp == nil) {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString *appName = [defaults stringForKey: @"DesktopApplicationName"];
+    NSString *selName = [defaults stringForKey: @"DesktopApplicationSelName"];
 
-  if (appName && selName) {
-    #ifdef GNUSTEP 
-		Class desktopAppClass = [[NSBundle mainBundle] principalClass];
-    #else
-		Class desktopAppClass = [[NSBundle mainBundle] classNamed: appName];
-    #endif
-    SEL sel = NSSelectorFromString(selName);
+    if (appName && selName) {
+      #ifdef GNUSTEP 
+		  Class desktopAppClass = [[NSBundle mainBundle] principalClass];
+      #else
+		  Class desktopAppClass = [[NSBundle mainBundle] classNamed: appName];
+      #endif
+      SEL sel = NSSelectorFromString(selName);
 
-    desktopApp = [desktopAppClass performSelector: sel];
+      desktopApp = [desktopAppClass performSelector: sel];
+    }
   }
 }
 

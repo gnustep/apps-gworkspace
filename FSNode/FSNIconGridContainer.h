@@ -31,14 +31,8 @@
 
 @class NSImage;
 
-@interface FSNIconGridContainer : FSNIconContainer <FSNodeRepContainer>
+@interface FSNIconGridContainer : FSNIconContainer 
 {
-  NSSize gridSize;
-  NSRect *grid;
-  int rowcount;
-  int colcount;
-  int gridcount;
-
 	NSImage *dragIcon;
   NSPoint dragPoint;
   int insertIndex;

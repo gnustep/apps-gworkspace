@@ -126,18 +126,6 @@ typedef enum BackImageStyle {
 
 - (void)makeIconsGrid;
 
-- (int)iconSize;
-
-- (void)setIconSize:(int)size;
-
-- (int)labelTextSize;
-
-- (void)setLabelTextSize:(int)size;
-
-- (int)iconPosition;
-
-- (void)setIconPosition:(int)pos;
-
 - (NSImage *)tshelfBackground;
 
 - (void)updateDefaults;

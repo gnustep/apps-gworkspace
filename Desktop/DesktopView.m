@@ -60,8 +60,21 @@
 
 - (void)dealloc
 {
+	if (grid != NULL) {
+		NSZoneFree (NSDefaultMallocZone(), grid);
+	}
+  TEST_RELEASE (node);
+  TEST_RELEASE (infoPath);
+  TEST_RELEASE (nodeInfo);
+  RELEASE (icons);
+  RELEASE (nameEditor);
+  RELEASE (horizontalImage);
+  RELEASE (verticalImage);
+  TEST_RELEASE (lastSelection);
+  RELEASE (backColor);
   TEST_RELEASE (backImage);
   TEST_RELEASE (imagePath);
+  TEST_RELEASE (dragIcon);
 
   [super dealloc];
 }
@@ -667,71 +680,6 @@
   }
 }
 
-- (int)iconSize
-{
-  return iconSize;
-}
-
-- (void)setIconSize:(int)size
-{
-  int i;
-  
-  iconSize = size;
-  [self makeIconsGrid];
-  
-  for (i = 0; i < [icons count]; i++) {
-    FSNIcon *icon = [icons objectAtIndex: i];
-    [icon setIconSize: iconSize];
-  }
-  
-  [self tile];
-  [self setNeedsDisplay: YES];
-}
-
-- (int)labelTextSize
-{
-  return labelTextSize;
-}
-
-- (void)setLabelTextSize:(int)size
-{
-  int i;
-
-  labelTextSize = size;
-  [self makeIconsGrid];
-
-  for (i = 0; i < [icons count]; i++) {
-    FSNIcon *icon = [icons objectAtIndex: i];
-    [icon setFont: [FSNIcon labelFont]];
-  }
-
-  [nameEditor setFont: [FSNIcon labelFont]];
-
-  [self tile];
-  [self setNeedsDisplay: YES];
-}
-
-- (int)iconPosition
-{
-  return iconPosition;
-}
-
-- (void)setIconPosition:(int)pos
-{
-  int i;
-  
-  iconPosition = pos;
-  [self makeIconsGrid];
-  
-  for (i = 0; i < [icons count]; i++) {
-    FSNIcon *icon = [icons objectAtIndex: i];
-    [icon setIconPosition: iconPosition];
-  }
-    
-  [self tile];
-  [self setNeedsDisplay: YES];
-}
-
 - (NSImage *)tshelfBackground
 {
   NSSize size = NSMakeSize([self frame].size.width, 112);
@@ -1170,6 +1118,71 @@
   return infoType;
 }
 
+- (void)setIconSize:(int)size
+{
+  int i;
+  
+  iconSize = size;
+  [self makeIconsGrid];
+  
+  for (i = 0; i < [icons count]; i++) {
+    FSNIcon *icon = [icons objectAtIndex: i];
+    [icon setIconSize: iconSize];
+  }
+  
+  [self tile];
+  [self setNeedsDisplay: YES];
+}
+
+- (int)iconSize
+{
+  return iconSize;
+}
+
+- (void)setLabelTextSize:(int)size
+{
+  int i;
+
+  labelTextSize = size;
+  [self makeIconsGrid];
+
+  for (i = 0; i < [icons count]; i++) {
+    FSNIcon *icon = [icons objectAtIndex: i];
+    [icon setFont: [FSNIcon labelFont]];
+  }
+
+  [nameEditor setFont: [FSNIcon labelFont]];
+
+  [self tile];
+  [self setNeedsDisplay: YES];
+}
+
+- (int)labelTextSize
+{
+  return labelTextSize;
+}
+
+- (void)setIconPosition:(int)pos
+{
+  int i;
+  
+  iconPosition = pos;
+  [self makeIconsGrid];
+  
+  for (i = 0; i < [icons count]; i++) {
+    FSNIcon *icon = [icons objectAtIndex: i];
+    [icon setIconPosition: iconPosition];
+  }
+    
+  [self tile];
+  [self setNeedsDisplay: YES];
+}
+
+- (int)iconPosition
+{
+  return iconPosition;
+}
+
 - (id)repOfSubnode:(FSNode *)anode
 {
   int i;
@@ -1488,6 +1501,14 @@
   }
 
   return YES;
+}
+
+- (void)setBackgroundColor:(NSColor *)acolor
+{
+  ASSIGN (backColor, acolor);
+  [[self window] setBackgroundColor: backColor];
+  [self setNeedsDisplay: YES];
+  [[desktop dock] setBackColor: backColor];
 }
                        
 - (NSColor *)backgroundColor

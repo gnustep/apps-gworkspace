@@ -203,6 +203,40 @@
   return FSNInfoNameType;
 }
 
+
+
+
+
+- (void)setIconSize:(int)size
+{
+}
+
+- (int)iconSize
+{
+  return ICN_SIZE;
+}
+
+- (void)setLabelTextSize:(int)size
+{
+}
+
+- (int)labelTextSize
+{
+  return 12;
+}
+
+- (void)setIconPosition:(int)pos
+{
+}
+
+- (int)iconPosition
+{
+  return NSImageLeft;
+}
+
+
+
+
 - (id)repOfSubnode:(FSNode *)anode
 {
   return nil;
@@ -345,6 +379,10 @@
                        wasCutted:(BOOL)cutted
 {
   return NO;
+}
+
+- (void)setBackgroundColor:(NSColor *)acolor
+{
 }
 
 - (NSColor *)backgroundColor

@@ -34,7 +34,7 @@
 @class FSNIcon;
 @class FSNIconNameEditor;
 
-@interface FSNIconContainer : NSView
+@interface FSNIconContainer : NSView <FSNodeRepContainer>
 {
   FSNode *node;
   NSString *infoPath;
@@ -55,15 +55,38 @@
   int labelTextSize;
   int iconPosition;
 
+  NSSize gridSize;
+  int colcount;
+
 	BOOL isDragTarget;
   
   NSColor *backColor;
+
+  id <DesktopApplication> desktopApp;
 }
 
 
+- (void)sortIcons;
 
+- (void)calculateGridSize;
 
 - (void)tile;
+
+@end
+
+
+@interface FSNIconContainer (IconNameEditing)
+
+- (void)updateNameEditor;
+
+- (void)controlTextDidChange:(NSNotification *)aNotification;
+
+- (void)controlTextDidEndEditing:(NSNotification *)aNotification;
+
+- (BOOL)fileManager:(NSFileManager *)manager 
+              shouldProceedAfterError:(NSDictionary *)errorDict;
+
+- (void)fileManager:(NSFileManager *)manager willProcessPath:(NSString *)path;
 
 @end
 
