@@ -150,7 +150,9 @@ if (rct.size.height < 0) rct.size.height = 0; \
 		[ViewerHistory addObject: path];
 		currHistoryPos = 0;
 
-    if ([fm isWritableFileAtPath: rootPath] && (isRootViewer == NO)) {
+    if ([fm isWritableFileAtPath: rootPath] 
+                       && (isRootViewer == NO) 
+                       && ([rootPath isEqual: fixPath(@"/", 0)] == NO)) {
 		  NSString *dictPath = [rootPath stringByAppendingPathComponent: @".gwdir"];
     
       if ([fm fileExistsAtPath: dictPath]) {
@@ -171,7 +173,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
         viewersPrefs = [[NSMutableDictionary alloc] initWithCapacity: 1];
       }
 
-      if (isRootViewer) {
+      if (isRootViewer || [rootPath isEqual: fixPath(@"/", 0)]) {
         defEntry = [viewersPrefs objectForKey: @"rootViewer"];
       } else {
         defEntry = [viewersPrefs objectForKey: rootPath];
@@ -193,14 +195,19 @@ if (rct.size.height < 0) rct.size.height = 0; \
       }    
       
     } else {
-      if (isRootViewer == NO) {
+      if ((isRootViewer == NO) && ([rootPath isEqual: fixPath(@"/", 0)] == NO)) {
         if ([self setFrameUsingName: [NSString stringWithFormat: @"Viewer at %@", path]] == NO) {
           [self setFrame: NSMakeRect(200, 200, resizeIncrement * 3, 500) display: NO];
-        }   
+        }  
       } else {
         if ([self setFrameUsingName: @"rootViewer"] == NO) {
           [self setFrame: NSMakeRect(200, 200, resizeIncrement * 3, 500) display: NO];
-        }         
+        } else if (isRootViewer == NO) {
+          NSPoint fop = [self frame].origin;
+          fop.x += 30;
+          fop.y -= 30;
+          [self setFrameOrigin: fop];
+        }       
       } 
     }
     			
@@ -216,7 +223,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
 			NSMutableDictionary *dict = [NSMutableDictionary dictionary];
       NSArray *arr;
 
-      if (isRootViewer) {
+      if (isRootViewer || [rootPath isEqual: fixPath(@"/", 0)]) {
         arr = [NSArray arrayWithObject: NSHomeDirectory()];
       } else {         
         arr = [NSArray arrayWithObject: rootPath]; 
@@ -302,11 +309,13 @@ if (rct.size.height < 0) rct.size.height = 0; \
                
     TEST_RELEASE (selection);
     
-    if ([fm isWritableFileAtPath: rootPath] && (isRootViewer == NO)) {
+    if ([fm isWritableFileAtPath: rootPath] 
+                      && (isRootViewer == NO)
+                      && ([rootPath isEqual: fixPath(@"/", 0)] == NO)) {
       NSString *dictPath = [rootPath stringByAppendingPathComponent: @".gwdir"];
       [myPrefs writeToFile: dictPath atomically: YES];
     } else {
-      if (isRootViewer == NO) {
+      if ((isRootViewer == NO) && ([rootPath isEqual: fixPath(@"/", 0)] == NO)) {
 	      [viewersPrefs setObject: myPrefs forKey: rootPath];
       } else {
 	      [viewersPrefs setObject: myPrefs forKey: @"rootViewer"];
@@ -686,14 +695,16 @@ if (rct.size.height < 0) rct.size.height = 0; \
   NSString *viewedPath;
   NSArray *selection;
 
-  if ([fm isWritableFileAtPath: rootPath] && (isRootViewer == NO)) {
+  if ([fm isWritableFileAtPath: rootPath] 
+                      && (isRootViewer == NO)
+                      && ([rootPath isEqual: fixPath(@"/", 0)] == NO)) {
     myPrefs = [[NSMutableDictionary alloc] initWithCapacity: 1];
     [myPrefs setObject: [self stringWithSavedFrame] forKey: @"geometry"];
   
   } else {
     id dictEntry;
     
-    if (isRootViewer == NO) {
+    if ((isRootViewer == NO) && ([rootPath isEqual: fixPath(@"/", 0)] == NO)) {
       [self saveFrameUsingName: [NSString stringWithFormat: @"Viewer at %@", rootPath]];
     } else {
       [self saveFrameUsingName: @"rootViewer"];
@@ -702,7 +713,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
     defaults = [NSUserDefaults standardUserDefaults];	
     viewersPrefs = [[defaults dictionaryForKey: @"viewersprefs"] mutableCopy];
 	
-    if (isRootViewer == NO) {
+    if ((isRootViewer == NO) && ([rootPath isEqual: fixPath(@"/", 0)] == NO)) {
       dictEntry = [viewersPrefs objectForKey: rootPath];
     } else {
       dictEntry = [viewersPrefs objectForKey: @"rootViewer"];
@@ -742,13 +753,15 @@ if (rct.size.height < 0) rct.size.height = 0; \
     [myPrefs setObject: selection forKey: @"lastselection"];
   }
 
-  if ([fm isWritableFileAtPath: rootPath] && (isRootViewer == NO)) {
+  if ([fm isWritableFileAtPath: rootPath] 
+                      && (isRootViewer == NO)
+                      && ([rootPath isEqual: fixPath(@"/", 0)] == NO)) {
     NSString *dictPath = [rootPath stringByAppendingPathComponent: @".gwdir"];
 
     [myPrefs writeToFile: dictPath atomically: YES];
 
   } else {
-    if (isRootViewer == NO) {
+    if ((isRootViewer == NO) && ([rootPath isEqual: fixPath(@"/", 0)] == NO)) {
 	    [viewersPrefs setObject: myPrefs forKey: rootPath];
     } else {
 	    [viewersPrefs setObject: myPrefs forKey: @"rootViewer"];

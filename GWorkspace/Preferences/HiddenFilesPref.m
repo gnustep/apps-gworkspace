@@ -460,7 +460,7 @@ if (sz.height < 0) sz.height = 0
   [openPanel setCanChooseFiles: NO];
   [openPanel setCanChooseDirectories: YES];
 
-  result = [openPanel runModalForDirectory: @"/" file: nil types: nil];
+  result = [openPanel runModalForDirectory: fixPath(@"/", 0) file: nil types: nil];
 	if(result != NSOKButton) {
 		return;
   }

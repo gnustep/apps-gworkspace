@@ -1993,11 +1993,21 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
     rootViewer = [[ViewersWindow alloc] initWithViewerTemplates: viewersTemplates
                                 forPath: fixPath(@"/", 0) viewPakages: NO  
                                             isRootViewer: YES onStart: starting];
+    [rootViewer activate];
   } else {
-    [self newViewerAtPath: fixPath(@"/", 0) canViewApps: NO];
+    if([rootViewer isVisible] == NO) {
+  	  [rootViewer activate];
+    } else {
+      ViewersWindow *viewer;
+      NSArray *selpaths;
+    
+      [rootViewer updateDefaults];
+      selpaths = [rootViewer selectedPaths];
+      viewer = [self newViewerAtPath: fixPath(@"/", 0) canViewApps: NO];
+      [viewer setViewerSelection: selpaths];
+      [viewer activate];
+    }
   }
-   
-	[rootViewer activate];
 }
 
 - (void)showHistory:(id)sender
