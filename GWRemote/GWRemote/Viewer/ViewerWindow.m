@@ -252,7 +252,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
       selection = nil;
     }
     
-    viewer = [Viewer new];
+    viewer = [[Viewer alloc] init];
     
    [viewer setRootPath: rootPath 
         viewedPath: viewedPath

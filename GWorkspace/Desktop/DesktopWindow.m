@@ -50,7 +50,7 @@
                               defer: NO];
 	if(self) {
     [self setReleasedWhenClosed: NO]; 
-    desktopView = [DesktopView new];
+    desktopView = [[DesktopView alloc] init];
     [self setContentView: desktopView];
 	}
 	return self;

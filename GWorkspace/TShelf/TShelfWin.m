@@ -80,7 +80,7 @@
         NSString *label = [[dict allKeys] objectAtIndex: 0];
         NSArray *iconsDicts = [dict objectForKey: label];
     
-        item = [TShelfViewItem new];
+        item = [[TShelfViewItem alloc] init];
         [item setLabel: label];
         view = [[TShelfIconsView alloc] initWithIconsDicts: iconsDicts];
         [view setFrame: NSMakeRect(0, 0, sizew, 80)];    
@@ -97,7 +97,7 @@
       }
       
     } else {
-      item = [TShelfViewItem new];
+      item = [[TShelfViewItem alloc] init];
       [item setLabel: @"last"];
       view = [[TShelfIconsView alloc] initWithIconsDicts: nil];
       [view setFrame: NSMakeRect(0, 0, sizew, 80)];
@@ -187,7 +187,7 @@
   item = [tView selectedTabItem];
   index = [tView indexOfItem: item];
   
-  item = [TShelfViewItem new];
+  item = [[TShelfViewItem alloc] init];
   [item setLabel: tabName];
   view = [[TShelfIconsView alloc] initWithIconsDicts: nil];
   [view setFrame: NSMakeRect(0, 0, [[NSScreen mainScreen] frame].size.width, 80)];

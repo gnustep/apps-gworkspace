@@ -83,6 +83,73 @@
   NSBitmapImageRep* newBitmapImageRep;
   NSData *data;
 
+
+
+/*
+  image = [[NSImage alloc] initWithContentsOfFile: path];
+  
+  if (image == nil) {
+    return nil;
+  }
+
+	rep = [image bestRepresentationForDevice: nil];
+  rpw = [rep pixelsWide];
+	size = [image size];
+	if ((rpw != NSImageRepMatchesDevice) && (rpw != size.width)) {
+		size.width = rpw;
+		size.height = [rep pixelsHigh];
+	}  
+
+	[image setScalesWhenResized: YES];
+	[image setSize: size];
+	[image setCacheDepthMatchesImageDepth: YES];
+	[image recache];
+
+  if ((size.width <= TMBMAX) && (size.height <= TMBMAX) 
+                      && (size.width >= (TMBMAX - RESZLIM)) 
+                          && (size.height >= (TMBMAX - RESZLIM))) {
+ 	  if ([rep isKindOfClass: [NSBitmapImageRep class]]) {
+      data = [(NSBitmapImageRep *)rep TIFFRepresentation];
+      if (data) {
+        RELEASE (image);
+        return data;
+      }
+    }
+  }
+  
+  if (size.width >= size.height) {
+    newsize.width = TMBMAX;
+    newsize.height = floor(TMBMAX * size.height / size.width + 0.5);
+  } else {
+    newsize.height = TMBMAX;
+    newsize.width  = floor(TMBMAX * size.width / size.height + 0.5);
+  }
+
+  [image setSize: newsize];
+
+  NSImage *newimage = [[NSImage alloc] initWithSize: size];
+  [newimage lockFocus];
+
+		[image compositeToPoint: NSZeroPoint 
+                      operation: NSCompositeSourceOver];
+
+  newBitmapImageRep = [[NSBitmapImageRep alloc]
+                        initWithFocusedViewRect:
+                          NSMakeRect(0, 0, newsize.width, newsize.height)];
+  [newimage unlockFocus];
+
+
+  data = [newBitmapImageRep TIFFRepresentation];
+  
+  RELEASE (image);
+  RELEASE (newimage);
+  
+  return data;
+*/
+
+
+
+
   image = [[NSImage alloc] initWithContentsOfFile: path];
   
   if (image == nil) {
@@ -159,13 +226,14 @@
 	bytesPerRow: newInfo->xbytes
 	bitsPerPixel: newInfo->pixbits];
     
-  data = [newBitmapImageRep TIFFRepresentation];
+  data = RETAIN ([newBitmapImageRep TIFFRepresentation]);
   
   RELEASE (image);
+  RELEASE (newBitmapImageRep);
   NSZoneFree (NSDefaultMallocZone(), comInfo);  
   NSZoneFree (NSDefaultMallocZone(), newInfo);  
   
-  return data;
+  return AUTORELEASE (data);
 }
 
 - (NSString *)fileNameExtension

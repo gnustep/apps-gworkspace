@@ -1014,9 +1014,9 @@ return [ws openFile: fullPath withApplication: appName]
   operations = [NSMutableArray new];	
   oprefnum = 0;
 
-  appsViewer = [AppsViewer new];
-	history = [History new];
-  prefController = [PrefController new];  
+  appsViewer = [[AppsViewer alloc] init];
+	history = [[History alloc] init];
+  prefController = [[PrefController alloc] init];  
   inspController = nil; 
   finder = nil;
   fiend = nil;
@@ -1038,8 +1038,8 @@ return [ws openFile: fullPath withApplication: appName]
 
 	[self createRecycler];
   
-  openWithController = [OpenWithController new];
-  runExtController = [RunExternalController new];
+  openWithController = [[OpenWithController alloc] init];
+  runExtController = [[RunExternalController alloc] init];
   
 	lockedPaths = [[NSMutableArray alloc] initWithCapacity: 1];
 	
@@ -2526,7 +2526,7 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 - (void)showFinder:(id)sender
 {
   if (finder == nil) {    
-    finder = [FinderController new];
+    finder = [[FinderController alloc] init];
   }
   [finder activate];
 }
@@ -2615,7 +2615,7 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 										action: @selector(addTShelfTab:) keyEquivalent: @""];		
                     						
   if (tshelfWin == nil) {
-    tshelfWin = [TShelfWin new];
+    tshelfWin = [[TShelfWin alloc] init];
     [tshelfWin activate];
   } else if ([tshelfWin isVisible] == NO) {
 		[tshelfWin activate];

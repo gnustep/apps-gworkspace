@@ -131,7 +131,7 @@ static GWRemote *gwremote = nil;
   remoteTermRef = [NSNumber numberWithInt: 0];
   fileOpIndicators = [NSMutableArray new];
   
-  prefController = [PrefController new];  
+  prefController = [[PrefController alloc] init];  
    
 	entry = [defaults objectForKey: @"serversnames"];
   if (entry && [entry count]) {
@@ -147,7 +147,7 @@ You must choose one from the preferences!", @""),
     [self showPreferences: nil];
   }
   
-  loginWindow = [LoginWindow new];
+  loginWindow = [[LoginWindow alloc] init];
 
   animateChdir = ![defaults boolForKey: @"nochdiranim"];
   animateLaunck = ![defaults boolForKey: @"nolaunchanim"];

@@ -130,7 +130,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
 		RELEASE (banner);
 	}
 
-	banner = [Banner new];
+	banner = [[Banner alloc] init];
 	pathsPopUp = [banner pathsPopUp];
 	[pathsPopUp setTarget: self];
 	[pathsPopUp setAction: @selector(popUpAction:)];

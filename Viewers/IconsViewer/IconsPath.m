@@ -84,7 +84,7 @@
     [self setAutoresizingMask: (NSViewWidthSizable)];
     icons = [[NSMutableArray alloc] initWithCapacity: 1];
         
-    nameEditor = [BNameEditor new];
+    nameEditor = [[BNameEditor alloc] init];
     [nameEditor setDelegate: self];  
     [nameEditor setTarget: self]; 
     [nameEditor setAction: @selector(editorAction:)];  

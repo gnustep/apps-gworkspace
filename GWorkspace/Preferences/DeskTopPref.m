@@ -138,7 +138,7 @@ static NSString *nibName = @"DeskTopPref";
     	  ASSIGN (color, [NSColor windowBackgroundColor]);
 		  }
 
-      colorsView = [ColorView new];
+      colorsView = [[ColorView alloc] init];
       [colorsView setFrame: NSMakeRect(0, 0, 64, 64)];  
       [colorsView setColor: color];      
 		  [colorsBox addSubview: colorsView]; 

@@ -213,7 +213,7 @@ if (rct.size.height < 0) rct.size.height = 0
 - (id)prefController
 {
   if (prefs == nil) {
-    prefs = [BrowserViewerPref new];
+    prefs = [[BrowserViewerPref alloc] init];
   }
 
   return prefs;

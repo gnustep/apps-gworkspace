@@ -681,7 +681,7 @@ int main(int argc, char** argv, char **env_c)
 	}
   
   pool = [NSAutoreleasePool new];
-	thumbnailer = [Thumbnailer new];
+	thumbnailer = [[Thumbnailer alloc] init];
   RELEASE (pool);
   
   if (thumbnailer != nil) {

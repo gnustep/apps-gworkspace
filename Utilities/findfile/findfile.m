@@ -434,7 +434,7 @@ int main(int argc, char** argv)
 	FindFile *findfile;
   
   CREATE_AUTORELEASE_POOL (pool);
-	findfile = [FindFile new];
+	findfile = [[FindFile alloc] init];
   
   if (findfile) {
     [findfile registerWithFinder];

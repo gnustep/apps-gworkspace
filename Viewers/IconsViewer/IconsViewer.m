@@ -132,7 +132,7 @@
 		RELEASE (pathsScroll);
 	}
 	
-	pathsScroll = [GWScrollView new];
+	pathsScroll = [[GWScrollView alloc] init];
   [pathsScroll setBorderType: NSBezelBorder];
   [pathsScroll setHasHorizontalScroller: YES];
   [pathsScroll setHasVerticalScroller: NO]; 
@@ -241,7 +241,7 @@
 - (id)prefController
 {
    if (prefs == nil) {
-    prefs = [IconsViewerPref new];
+    prefs = [[IconsViewerPref alloc] init];
   }
 
   return prefs;

@@ -154,7 +154,7 @@ double myrintf(double a)
     if (styleMask & GWIconCellsMask) {
       cellPrototype = [[BCell alloc] initIconCell];
     } else {
-      cellPrototype = [BCell new];
+      cellPrototype = [[BCell alloc] init];
     }
     
   	columns = [[NSMutableArray alloc] init];
@@ -182,7 +182,7 @@ double myrintf(double a)
       (*createEmpty)(self, createEmptySel);
 		}
 		
-    nameEditor = [BNameEditor new];
+    nameEditor = [[BNameEditor alloc] init];
     [nameEditor setDelegate: self];  
     [nameEditor setTarget: self]; 
     [nameEditor setAction: @selector(editorAction:)];  

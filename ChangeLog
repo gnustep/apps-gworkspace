@@ -1,3 +1,8 @@
+2003-09-26 Enrico Sersale  <enrico@imago.ro>
+
+  * in many files: changed some occourrencies of the macro "new" with
+    [[ alloc] init] due of problems with the Apple gcc.
+
 2003-09-01 Enrico Sersale  <enrico@imago.ro>
 
   * GWorkspace/GWorkspace.m
