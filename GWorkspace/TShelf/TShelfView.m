@@ -30,6 +30,7 @@
   #endif
 #include "TShelfView.h"
 #include "TShelfViewItem.h"
+#include "TShelfIconsView.h"
 #include "GWorkspace.h"
 #include "GNUstep.h"
 
@@ -149,10 +150,14 @@
 
 - (void)selectTabItem:(TShelfViewItem *)item
 {
-  NSView *selectedView;
+  TShelfIconsView *selectedView;
 
   if (selected != nil) {
     [selected setTabState: NSBackgroundTab];
+    selectedView = (TShelfIconsView *)[selected view];
+    if ([selectedView iconsType] == DATA_TAB) {
+      [selectedView setCurrentPBIcon: nil];
+    }
 	  [[selected view] removeFromSuperview];
 	}
 
@@ -161,12 +166,16 @@
   selectedItem = [items indexOfObject: selected];
   [selected setTabState: NSSelectedTab];
 
-  selectedView = [selected view];
+  selectedView = (TShelfIconsView *)[selected view];
 
   if (selectedView != nil) {
 	  [self addSubview: selectedView];
 	  [selectedView setFrame: [self contentRect]];
   	[selectedView resizeWithOldSuperviewSize: [selectedView frame].size]; 
+    [selectedView unselectOtherIcons: nil];
+    if ([selectedView iconsType] == DATA_TAB) {
+      [selectedView setCurrentPBIcon: nil];
+    }
 	  [[self window] makeFirstResponder: [selected initialFirstResponder]];
   }
       

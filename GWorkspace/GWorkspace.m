@@ -1544,6 +1544,10 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 
 - (void)resetSelectedPaths
 {
+  if (selectedPaths == nil) {
+    return;
+  }
+  
   if (inspController != nil) {
     [inspController setPaths: selectedPaths];
   }    

@@ -1,3 +1,9 @@
+2003-10-24 Enrico Sersale  <enrico@imago.ro>
+
+  * GWorkspace/TShelf/TShelfView.m
+    reset the current selection when changing from a pasteboard tab
+    to a normal one.
+
 2003-10-23 Enrico Sersale  <enrico@imago.ro>
 
   * GWorkspace/FileOperations/FileOperation.m
