@@ -194,6 +194,36 @@
   return nil;
 }
 
+- (id)repOfSubnode:(FSNode *)anode
+{
+  return nil;
+}
+
+- (id)repOfSubnodePath:(NSString *)apath
+{
+  return nil;
+}
+
+- (void)addRepForSubnode:(FSNode *)anode
+{
+}
+
+- (void)addRepForSubnodePath:(NSString *)apath
+{
+}
+
+- (void)removeRepOfSubnode:(FSNode *)anode
+{
+}
+
+- (void)removeRepOfSubnodePath:(NSString *)apath
+{
+}
+
+- (void)removeRep:(id)arep
+{
+}
+
 - (void)unselectOtherReps:(id)arep
 {
   int i;
@@ -205,6 +235,14 @@
       [icon unselect];
     }
   }
+}
+
+- (void)selectRepsOfSubnodes:(NSArray *)nodes
+{
+}
+
+- (void)selectRepsOfPaths:(NSArray *)paths
+{
 }
 
 - (NSArray *)selectedReps

@@ -74,13 +74,23 @@ static FSNodeRep *shared = nil;
 
 - (void)lockNode:(FSNode *)node;
 
+- (void)lockPath:(NSString *)path;
+
 - (void)lockNodes:(NSArray *)nodes;
+
+- (void)lockPaths:(NSArray *)paths;
 
 - (void)unlockNode:(FSNode *)node;
 
+- (void)unlockPath:(NSString *)path;
+
 - (void)unlockNodes:(NSArray *)nodes;
 
+- (void)unlockPaths:(NSArray *)paths;
+
 - (BOOL)isNodeLocked:(FSNode *)node;
+
+- (BOOL)isPathLocked:(NSString *)path;
 
 - (void)setUseThumbnails:(BOOL)value;
 
@@ -495,6 +505,13 @@ static FSNodeRep *shared = nil;
 	} 
 }
 
+- (void)lockPath:(NSString *)path
+{
+	if ([lockedPaths containsObject: path] == NO) {
+		[lockedPaths addObject: path];
+	} 
+}
+
 - (void)lockNodes:(NSArray *)nodes
 {
 	int i;
@@ -508,10 +525,30 @@ static FSNodeRep *shared = nil;
 	}
 }
 
+- (void)lockPaths:(NSArray *)paths
+{
+	int i;
+	  
+	for (i = 0; i < [paths count]; i++) {
+    NSString *path = [paths objectAtIndex: i];
+    
+		if ([lockedPaths containsObject: path] == NO) {
+			[lockedPaths addObject: path];
+		} 
+	}
+}
+
 - (void)unlockNode:(FSNode *)node
 {
   NSString *path = [node path];
 
+	if ([lockedPaths containsObject: path]) {
+		[lockedPaths removeObject: path];
+	} 
+}
+
+- (void)unlockPath:(NSString *)path
+{
 	if ([lockedPaths containsObject: path]) {
 		[lockedPaths removeObject: path];
 	} 
@@ -530,9 +567,41 @@ static FSNodeRep *shared = nil;
 	}
 }
 
+- (void)unlockPaths:(NSArray *)paths
+{
+	int i;
+	  
+	for (i = 0; i < [paths count]; i++) {
+    NSString *path = [paths objectAtIndex: i];
+	
+		if ([lockedPaths containsObject: path]) {
+			[lockedPaths removeObject: path];
+		} 
+	}
+}
+
 - (BOOL)isNodeLocked:(FSNode *)node
 {
   NSString *path = [node path];
+	int i;  
+  
+	if ([lockedPaths containsObject: path]) {
+		return YES;
+	}
+	
+	for (i = 0; i < [lockedPaths count]; i++) {
+		NSString *lpath = [lockedPaths objectAtIndex: i];
+	
+    if (isSubpathOfPath(lpath, path)) {
+			return YES;
+		}
+	}
+	
+	return NO;
+}
+
+- (BOOL)isPathLocked:(NSString *)path
+{
 	int i;  
   
 	if ([lockedPaths containsObject: path]) {
@@ -762,9 +831,19 @@ static FSNodeRep *shared = nil;
   [[self sharedInstance] lockNode: node];
 }
 
++ (void)lockPath:(NSString *)path
+{
+  [[self sharedInstance] lockPath: path];
+}
+
 + (void)lockNodes:(NSArray *)nodes
 {
   [[self sharedInstance] lockNodes: nodes];
+}
+
++ (void)lockPaths:(NSArray *)paths
+{
+  [[self sharedInstance] lockPaths: paths];
 }
 
 + (void)unlockNode:(FSNode *)node
@@ -772,14 +851,29 @@ static FSNodeRep *shared = nil;
   [[self sharedInstance] unlockNode: node];
 }
 
++ (void)unlockPath:(NSString *)path
+{
+  [[self sharedInstance] unlockPath: path];
+}
+
 + (void)unlockNodes:(NSArray *)nodes
 {
   [[self sharedInstance] unlockNodes: nodes];
 }
 
++ (void)unlockPaths:(NSArray *)paths
+{
+  [[self sharedInstance] unlockPaths: paths];
+}
+
 + (BOOL)isNodeLocked:(FSNode *)node
 {
   return [[self sharedInstance] isNodeLocked: node];
+}
+
++ (BOOL)isPathLocked:(NSString *)path
+{
+  return [[self sharedInstance] isPathLocked: path];
 }
 
 + (void)setUseThumbnails:(BOOL)value

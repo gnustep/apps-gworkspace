@@ -96,7 +96,25 @@ typedef enum FSNSelectionMask {
 
 - (FSNode *)shownNode;
 
+- (id)repOfSubnode:(FSNode *)anode;
+
+- (id)repOfSubnodePath:(NSString *)apath;
+
+- (void)addRepForSubnode:(FSNode *)anode;
+
+- (void)addRepForSubnodePath:(NSString *)apath;
+
+- (void)removeRepOfSubnode:(FSNode *)anode;
+
+- (void)removeRepOfSubnodePath:(NSString *)apath;
+
+- (void)removeRep:(id)arep;
+
 - (void)unselectOtherReps:(id)arep;
+
+- (void)selectRepsOfSubnodes:(NSArray *)nodes;
+
+- (void)selectRepsOfPaths:(NSArray *)paths;
 
 - (NSArray *)selectedReps;
 
@@ -180,13 +198,23 @@ typedef enum FSNSelectionMask {
 
 + (void)lockNode:(FSNode *)node;
 
++ (void)lockPath:(NSString *)path;
+
 + (void)lockNodes:(NSArray *)nodes;
+
++ (void)lockPaths:(NSArray *)paths;
 
 + (void)unlockNode:(FSNode *)node;
 
++ (void)unlockPath:(NSString *)path;
+
 + (void)unlockNodes:(NSArray *)nodes;
 
++ (void)unlockPaths:(NSArray *)paths;
+
 + (BOOL)isNodeLocked:(FSNode *)node;
+
++ (BOOL)isPathLocked:(NSString *)path;
 
 + (void)setUseThumbnails:(BOOL)value;
 

@@ -175,8 +175,22 @@
   return self;
 }
 
+- (BOOL)isEqual:(id)other
+{
+  if (other == self) {
+    return YES;
+  }
+  if ([other isKindOfClass: [FSNode class]]) {
+    return [self isEqualToNode: (FSNode *)other];
+  }
+  return NO;
+}
+
 - (BOOL)isEqualToNode:(FSNode *)anode
 {
+  if (anode == self) {
+    return YES;
+  }
   return [path isEqualToString: [anode path]];
 }
 
