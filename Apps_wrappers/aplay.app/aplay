@@ -1,2 +1,9 @@
 #!/bin/sh
-aplay "$2" &
+
+APP=aplay
+
+if [ $# -eq 2 ] ; then
+  $APP "$2" &
+else
+  $APP &
+fi

@@ -1,5 +1,9 @@
 #!/bin/sh
 
-#gqview $*
+APP=gqview
 
-gqview "$2" &
+if [ $# -eq 2 ] ; then
+  $APP "$2" &
+else
+  $APP &
+fi

@@ -1,3 +1,9 @@
 #!/bin/sh
 
-gedit "$2" &
+APP=gedit
+
+if [ $# -eq 2 ] ; then
+  $APP "$2" &
+else
+  $APP &
+fi
