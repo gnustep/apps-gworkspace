@@ -93,10 +93,11 @@
 
 @interface ProgressView : NSView 
 {
-  NSImage *image;
-  float orx;
+  NSMutableArray *images;
+  int index;
   float rfsh;
   NSTimer *progTimer;
+  BOOL animating;
 }
 
 - (id)initWithFrame:(NSRect)frameRect 

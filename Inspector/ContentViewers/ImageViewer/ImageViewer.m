@@ -103,10 +103,10 @@
     [errLabel setSelectable: NO];
     [errLabel setStringValue: NSLocalizedString(@"Invalid Contents", @"")];
 
-    r.origin.x = 10;
-    r.origin.y = 18;
-    r.size.width = 115;
-    r.size.height = 10;
+    r.origin.x = 6;
+    r.origin.y = 16;
+    r.size.width = 16;
+    r.size.height = 16;
     progView = [[ProgressView alloc] initWithFrame: r refreshInterval: 0.05];
 
     r.origin.x = 141;
@@ -424,14 +424,11 @@
 
 @implementation ProgressView
 
-#define PROG_IND_MAX (-40)
+#define IMAGES 8
 
 - (void)dealloc
 {
-  if (progTimer && [progTimer isValid]) {
-    [progTimer invalidate];
-  }
-  RELEASE (image);
+  RELEASE (images);
   [super dealloc];
 }
 
@@ -441,9 +438,17 @@
   self = [super initWithFrame: frameRect];
 
   if (self) {
-    ASSIGN (image, [NSImage imageNamed: @"progind10.tiff"]);
+    int i;
+  
+    images = [NSMutableArray new];
+  
+    for (i = 0; i < IMAGES; i++) {
+      NSString *imname = [NSString stringWithFormat: @"anim-logo-%d.tiff", i];
+      [images addObject: [NSImage imageNamed: imname]];    
+    }
+  
     rfsh = refresh;
-    orx = PROG_IND_MAX;
+    animating = NO;
   }
 
   return self;
@@ -451,6 +456,8 @@
 
 - (void)start
 {
+  index = 0;
+  animating = YES;
   progTimer = [NSTimer scheduledTimerWithTimeInterval: rfsh 
 						            target: self selector: @selector(animate:) 
 																					userInfo: nil repeats: YES];
@@ -458,25 +465,30 @@
 
 - (void)stop
 {
+  animating = NO;
   if (progTimer && [progTimer isValid]) {
     [progTimer invalidate];
   }
+  [self setNeedsDisplay: YES];
 }
 
 - (void)animate:(id)sender
 {
-  orx++;
   [self setNeedsDisplay: YES];
-  
-  if (orx == 0) {
-    orx = PROG_IND_MAX;
+  index++;
+  if (index == [images count]) {
+    index = 0;
   }
 }
 
 - (void)drawRect:(NSRect)rect
 {
-  [image compositeToPoint: NSMakePoint(orx, 0) 
-                operation: NSCompositeSourceOver];
+  [super drawRect: rect];
+  
+  if (animating) {
+    [[images objectAtIndex: index] compositeToPoint: NSMakePoint(0, 0) 
+                                          operation: NSCompositeSourceOver];
+  }
 }
 
 @end
