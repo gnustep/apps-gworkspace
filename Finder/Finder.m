@@ -129,6 +129,7 @@ static Finder *finder = nil;
   NSNumber *srh;
   NSRect wrect;
   NSRect brect;
+  id cell;
   NSSize cs, ms;
   
   if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
@@ -163,13 +164,15 @@ static Finder *finder = nil;
   placesScroll = [[SearchPlacesScroll alloc] initWithFrame: brect];
   [(NSBox *)placesBox setContentView: placesScroll];
   RELEASE (placesScroll);  
-    
+  
+  cell = [[FSNBrowserCell alloc] init];
   placesMatrix = [[SearchPlacesMatrix alloc] initWithFrame: NSMakeRect(0, 0, 100, 100)
 				            	            mode: NSListModeMatrix 
-                             prototype: [[FSNBrowserCell new] autorelease]
+                             prototype: cell
 			       							numberOfRows: 0 
                        numberOfColumns: 0
                             scrollView: placesScroll];
+  RELEASE (cell);
   [placesMatrix setTarget: self];
   [placesMatrix setAction: @selector(placesMatrixAction:)];
   [placesMatrix setIntercellSpacing: NSZeroSize];

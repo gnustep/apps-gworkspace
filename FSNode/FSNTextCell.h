@@ -35,10 +35,7 @@ typedef NSString *(*cutIMP)(id, SEL, id, float);
 
 @interface FSNTextCell : NSTextFieldCell 
 {
-  NSDictionary *fontAttr;
-  NSString *dots;
   float titlelenght;
-  float dtslenght;
   BOOL dateCell;
 	SEL cutTitleSel;
 	cutIMP cutTitle;

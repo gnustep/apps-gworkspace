@@ -60,9 +60,6 @@ typedef NSString *(*cutIMP)(id, SEL, id, float);
   BOOL isLocked;
   BOOL iconSelected;
     
-  NSDictionary *fontAttr;
-  NSString *dots;
-  float dtslenght;  
 	SEL cutTitleSel;
 	cutIMP cutTitle;
 }

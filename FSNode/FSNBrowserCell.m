@@ -33,16 +33,18 @@
 
 static id <DesktopApplication> desktopApp = nil;
 
+static NSString *dots = @"...";
+static float dtslenght = 0.0;  
+static NSDictionary *fontAttr = nil;
+
 @implementation FSNBrowserCell
 
 - (void)dealloc
 {
-  TEST_RELEASE (node); 
   TEST_RELEASE (selection);
   TEST_RELEASE (selectionTitle);
   TEST_RELEASE (icon); 
   TEST_RELEASE (highlightPath);
-  RELEASE (fontAttr);
   RELEASE (dots);
   
   [super dealloc];
@@ -70,12 +72,14 @@ static id <DesktopApplication> desktopApp = nil;
 {
   self = [super init];
   
-  if (self) {
-    icnsize = DEFAULT_ISIZE;
-    ASSIGN (fontAttr, [NSDictionary dictionaryWithObject: [self font] 
-                                                  forKey: NSFontAttributeName]);
-    ASSIGN (dots, [NSString stringWithString: @"..."]);
-    dtslenght = [dots sizeWithAttributes: fontAttr].width;     
+  if (self) {    
+    if (fontAttr == nil) {
+      fontAttr = [NSDictionary dictionaryWithObject: [self font] 
+                                             forKey: NSFontAttributeName];
+      RETAIN (fontAttr);
+      dtslenght = [dots sizeWithAttributes: fontAttr].width;     
+    }
+    
     cutTitleSel = @selector(cutTitle:toFitWidth:);
     cutTitle = (cutIMP)[self methodForSelector: cutTitleSel]; 
        
@@ -83,6 +87,7 @@ static id <DesktopApplication> desktopApp = nil;
     selection = nil;
     selectionTitle = nil;    
     icon = nil;
+    icnsize = DEFAULT_ISIZE;
     highlightPath = nil;
     hlightRect = NSZeroRect;
     
