@@ -46,7 +46,7 @@
 {
   self = [super initWithFrame: frameRect];
   
-  if(self) {
+  if (self) {
     NSRect r = [self frame];
     
     extsarr = [[NSArray alloc] initWithObjects: @"rtf", @"rtfd", @"txt", @"text", 

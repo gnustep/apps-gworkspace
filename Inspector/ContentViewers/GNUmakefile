@@ -4,6 +4,7 @@ include ../inspector.make
 
 ifneq ($(PDFKIT), 0)
 SUBPROJECTS = \
+  FolderViewer \
   ImageViewer \
   SoundViewer \
   AppViewer \
@@ -15,6 +16,7 @@ SUBPROJECTS = \
   IBViewViewer
 else
 SUBPROJECTS = \
+  FolderViewer \
   ImageViewer \
   SoundViewer \
   AppViewer \

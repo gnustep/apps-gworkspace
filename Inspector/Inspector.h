@@ -82,6 +82,12 @@
 
 - (void)setPaths:(NSArray *)paths;
 
+- (void)showContents;
+
+- (void)showAttributes;
+
+- (void)showTools;
+
 - (NSWindow *)inspWin;
 
 - (InspectorPref *)preferences;
@@ -112,6 +118,10 @@
 - (id)contentViewerWithWindowName:(NSString *)wname;
 
 - (void)disableContentViewer:(id)vwr;
+
+- (void)addExternalViewerWithBundleData:(NSData *)bundleData;
+
+- (void)addExternalViewerWithBundlePath:(NSString *)path;
 
 - (BOOL)saveExternalContentViewer:(id)vwr 
                          withName:(NSString *)vwrname;

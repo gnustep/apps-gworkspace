@@ -32,6 +32,10 @@
 #include "Functions.h"
 #include "GNUstep.h"
 
+#define CONTENTS   0
+#define ATTRIBUTES 1
+#define TOOLS      2
+
 static Inspector *inspector = nil;
 static NSString *nibName = @"InspectorWin";
 
@@ -112,23 +116,17 @@ static NSString *nibName = @"InspectorWin";
 
 
   currentInspector = [[Contents alloc] initForInspector: self];
-  [inspectors insertObject: currentInspector atIndex: 0]; 
-  [popUp insertItemWithTitle: NSLocalizedString(@"Contents", @"") atIndex: 0];
+  [inspectors insertObject: currentInspector atIndex: CONTENTS]; 
+  [popUp insertItemWithTitle: NSLocalizedString(@"Contents", @"") 
+                     atIndex: CONTENTS];
   DESTROY (currentInspector);
-  contents = [inspectors objectAtIndex: 0];
+  contents = [inspectors objectAtIndex: CONTENTS];
 
 
 
 
 
 
-    //
-    //
-    //
-    //      STOPPARE I CONTENTS  !!!!!!!!!!!!!!!!!!!!!!!!!!
-    //
-    //
-    //
 
 
 
@@ -193,6 +191,24 @@ static NSString *nibName = @"InspectorWin";
   }
 }
 
+- (void)showContents
+{
+  [popUp selectItemAtIndex: CONTENTS];
+  [self activateInspector: popUp];
+}
+
+- (void)showAttributes
+{
+  [popUp selectItemAtIndex: ATTRIBUTES];
+  [self activateInspector: popUp];
+}
+
+- (void)showTools
+{
+  [popUp selectItemAtIndex: TOOLS];
+  [self activateInspector: popUp];
+}
+
 - (NSWindow *)inspWin
 {
   return win;
@@ -238,6 +254,16 @@ static NSString *nibName = @"InspectorWin";
 - (void)disableContentViewer:(id)vwr
 {
   [contents disableViewer: vwr];
+}
+
+- (void)addExternalViewerWithBundleData:(NSData *)bundleData
+{
+  [contents addExternalViewerWithBundleData: bundleData];
+}
+
+- (void)addExternalViewerWithBundlePath:(NSString *)path
+{
+  [contents addExternalViewerWithBundlePath: path];
 }
 
 - (BOOL)saveExternalContentViewer:(id)vwr 

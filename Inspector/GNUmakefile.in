@@ -30,6 +30,7 @@ ifneq ($(PDFKIT), 0)
   Inspector_RESOURCE_FILES = \
     Resources/Images/* \
     Resources/English.lproj \
+    ContentViewers/FolderViewer/FolderViewer.inspector \
     ContentViewers/ImageViewer/ImageViewer.inspector \
     ContentViewers/SoundViewer/SoundViewer.inspector \
     ContentViewers/AppViewer/AppViewer.inspector \
@@ -43,6 +44,7 @@ else
   Inspector_RESOURCE_FILES = \
     Resources/Images/* \
     Resources/English.lproj \
+    ContentViewers/FolderViewer/FolderViewer.inspector \
     ContentViewers/ImageViewer/ImageViewer.inspector \
     ContentViewers/SoundViewer/SoundViewer.inspector \
     ContentViewers/AppViewer/AppViewer.inspector \
