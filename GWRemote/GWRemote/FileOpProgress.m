@@ -24,9 +24,9 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-#include <GWorkspace/GWFunctions.h>
 #include "FileOpProgress.h"
 #include "GWRemote.h"
+#include "Functions.h"
 #include "GNUstep.h"
 
 static NSString *nibName = @"FileOperationWin";

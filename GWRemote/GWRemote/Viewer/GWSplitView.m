@@ -27,9 +27,9 @@
 #include <AppKit/AppKit.h>
 #include "GWSplitView.h"
 #include "ViewerWindow.h"
+#include "Functions.h"
 #include "GNUstep.h"
 #include <GWorkspace/GWNotifications.h>
-#include <GWorkspace/GWFunctions.h>
 
 @implementation GWSplitView 
 

@@ -28,8 +28,8 @@
 #include "GWRemote.h"
 #include "RemoteEditor.h"
 #include "RemoteEditorView.h"
+#include "Functions.h"
 #include <GWorkspace/GWNotifications.h>
-#include <GWorkspace/GWFunctions.h>
 
 static NSString *nibName = @"RemoteEditor";
 

@@ -26,17 +26,16 @@
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include "GWRemote.h"
-//#include "Dialogs/Dialogs.h"
 #include "Preferences/PrefController.h"
 #include "LoginWindow.h"
 #include "ViewerWindow.h"
 #include "RemoteEditor.h"
 #include "FileOpProgress.h"
 #include "RemoteTerminal.h"
+#include "Functions.h"
 #include "GNUstep.h"
 #include <GWorkspace/GWProtocol.h>
 #include <GWorkspace/GWNotifications.h>
-#include <GWorkspace/GWFunctions.h>
 
 static GWRemote *gwremote = nil;
 

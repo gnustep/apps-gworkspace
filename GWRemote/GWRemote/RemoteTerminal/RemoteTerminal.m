@@ -28,8 +28,8 @@
 #include "GWRemote.h"
 #include "RemoteTerminal.h"
 #include "RemoteTerminalView.h"
+#include "Functions.h"
 #include <GWorkspace/GWNotifications.h>
-#include <GWorkspace/GWFunctions.h>
 
 static NSString *nibName = @"RemoteTerminal";
 

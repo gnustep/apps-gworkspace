@@ -25,8 +25,8 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-#include <GWorkspace/GWFunctions.h>
 #include "GWRemote.h"
+#include "Functions.h"
 #include "GNUstep.h"
 
 void createMenu();

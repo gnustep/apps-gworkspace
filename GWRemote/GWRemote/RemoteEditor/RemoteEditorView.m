@@ -27,9 +27,9 @@
 #include "GNUstep.h"
 #include "GWRemote.h"
 #include <GWorkspace/GWNotifications.h>
-#include <GWorkspace/GWFunctions.h>
 #include "RemoteEditorView.h"
 #include "RemoteEditor.h"
+#include "Functions.h"
 
 static NSString *nibName = @"FindWindow";
 

@@ -38,6 +38,7 @@ GWRemote_LOCALIZED_RESOURCE_FILES = Localizable.strings \
 # The Objective-C source files to be compiled
 
 GWRemote_OBJC_FILES = main.m \
+                      Functions.m \
                       GWRemote.m \
                       Viewer/ViewerWindow.m \
                       Viewer/GWSplitView.m \

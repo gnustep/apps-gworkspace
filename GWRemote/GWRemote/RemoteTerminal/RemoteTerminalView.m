@@ -27,9 +27,9 @@
 #include "GNUstep.h"
 #include "GWRemote.h"
 #include <GWorkspace/GWNotifications.h>
-#include <GWorkspace/GWFunctions.h>
 #include "RemoteTerminalView.h"
 #include "RemoteTerminal.h"
+#include "Functions.h"
 
 @implementation RemoteTerminalView
 
