@@ -49,6 +49,15 @@ static FSNodeRep *shared = nil;
 - (NSImage *)openFolderIconOfSize:(float)size 
                           forNode:(FSNode *)node;
 
+- (NSImage *)workspaceIconOfSize:(float)size;
+
+- (NSImage *)trashIconOfSize:(float)size;
+
+- (NSImage *)trashFullIconOfSize:(float)size;
+
+- (NSImage *)resizedIcon:(NSImage *)icon 
+                  ofSize:(float)size;
+
 - (NSBezierPath *)highlightPathOfSize:(NSSize)size;
 
 - (void)setDefaultSortOrder:(int)order;
@@ -130,6 +139,9 @@ static FSNodeRep *shared = nil;
     
     ASSIGN (multipleSelIcon, [NSImage imageNamed: @"MultipleSelection"]);
     ASSIGN (openFolderIcon, [NSImage imageNamed: @"FolderOpen"]);
+    ASSIGN (workspaceIcon, [NSImage imageNamed: @"Workspace"]);
+    ASSIGN (trashIcon, [NSImage imageNamed: @"Recycler"]);
+    ASSIGN (trashFullIcon, [NSImage imageNamed: @"RecyclerFull"]);
     
     thumbnailDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
     thumbnailDir = [thumbnailDir stringByAppendingPathComponent: @"Thumbnails"];
@@ -216,22 +228,7 @@ static FSNodeRep *shared = nil;
   icnsize = [icon size];
 
   if ((icnsize.width > size) || (icnsize.height > size)) {
-    NSImage *newIcon = [icon copy];
-    float fact;
-    NSSize newsize;
-    
-    if (icnsize.width >= icnsize.height) {
-      fact = icnsize.width / size;
-    } else {
-      fact = icnsize.height / size;
-    }
-
-    newsize = NSMakeSize(icnsize.width / fact, icnsize.height / fact);
-
-	  [newIcon setScalesWhenResized: YES];
-	  [newIcon setSize: newsize];  
-          
-    return AUTORELEASE (newIcon);
+    return [self resizedIcon: icon ofSize: size];
   }  
 
   return icon;
@@ -242,22 +239,7 @@ static FSNodeRep *shared = nil;
   NSSize icnsize = [multipleSelIcon size];
 
   if ((icnsize.width > size) || (icnsize.height > size)) {
-    NSImage *newIcon = [multipleSelIcon copy];
-    float fact;
-    NSSize newsize;
-    
-    if (icnsize.width >= icnsize.height) {
-      fact = icnsize.width / size;
-    } else {
-      fact = icnsize.height / size;
-    }
-
-    newsize = NSMakeSize(icnsize.width / fact, icnsize.height / fact);
-
-	  [newIcon setScalesWhenResized: YES];
-	  [newIcon setSize: newsize];  
-          
-    return AUTORELEASE (newIcon);
+    return [self resizedIcon: multipleSelIcon ofSize: size];
   }  
   
   return multipleSelIcon;
@@ -285,24 +267,65 @@ static FSNodeRep *shared = nil;
   icnsize = [icon size];
 
   if ((icnsize.width > size) || (icnsize.height > size)) {
-    NSImage *newIcon = [icon copy];
-    NSSize newsize;
-    
-    if (icnsize.width >= icnsize.height) {
-      newsize.width = size;
-      newsize.height = floor(icnsize.height * newsize.width / icnsize.width + 0.5);
-    } else {
-      newsize.height = size;
-      newsize.width  = floor(icnsize.width * newsize.height / icnsize.height + 0.5);
-    }
-
-	  [newIcon setScalesWhenResized: YES];
-	  [newIcon setSize: newsize];  
-          
-    return AUTORELEASE (newIcon);
+    return [self resizedIcon: icon ofSize: size];
   }  
 
   return icon;
+}
+
+- (NSImage *)workspaceIconOfSize:(float)size
+{
+  NSSize icnsize = [workspaceIcon size];
+
+  if ((icnsize.width > size) || (icnsize.height > size)) {
+    return [self resizedIcon: workspaceIcon ofSize: size];
+  }  
+  
+  return workspaceIcon;
+}
+
+- (NSImage *)trashIconOfSize:(float)size
+{
+  NSSize icnsize = [trashIcon size];
+
+  if ((icnsize.width > size) || (icnsize.height > size)) {
+    return [self resizedIcon: trashIcon ofSize: size];
+  }  
+  
+  return trashIcon;
+}
+
+- (NSImage *)trashFullIconOfSize:(float)size
+{
+  NSSize icnsize = [trashFullIcon size];
+
+  if ((icnsize.width > size) || (icnsize.height > size)) {
+    return [self resizedIcon: trashFullIcon ofSize: size];
+  }  
+  
+  return trashFullIcon;
+}
+
+- (NSImage *)resizedIcon:(NSImage *)icon 
+                  ofSize:(float)size
+{
+  NSImage *newIcon = [icon copy];
+  NSSize icnsize = [icon size];
+  float fact;
+  NSSize newsize;
+
+  if (icnsize.width >= icnsize.height) {
+    fact = icnsize.width / size;
+  } else {
+    fact = icnsize.height / size;
+  }
+
+  newsize = NSMakeSize(icnsize.width / fact, icnsize.height / fact);
+
+	[newIcon setScalesWhenResized: YES];
+	[newIcon setSize: newsize];  
+
+  return AUTORELEASE (newIcon);
 }
 
 - (NSBezierPath *)highlightPathOfSize:(NSSize)size
@@ -618,6 +641,9 @@ static FSNodeRep *shared = nil;
   TEST_RELEASE (thumbnailDir);
   TEST_RELEASE (multipleSelIcon);
   TEST_RELEASE (openFolderIcon);
+  TEST_RELEASE (workspaceIcon);
+  TEST_RELEASE (trashIcon);
+  TEST_RELEASE (trashFullIcon);
         
   [super dealloc];
 }
@@ -642,6 +668,21 @@ static FSNodeRep *shared = nil;
                           forNode:(FSNode *)node
 {
   return [[self sharedInstance] openFolderIconOfSize: size forNode: node];
+}
+
++ (NSImage *)workspaceIconOfSize:(float)size
+{
+  return [[self sharedInstance] workspaceIconOfSize: size];
+}
+
++ (NSImage *)trashIconOfSize:(float)size
+{
+  return [[self sharedInstance] trashIconOfSize: size];
+}
+
++ (NSImage *)trashFullIconOfSize:(float)size
+{
+  return [[self sharedInstance] trashFullIconOfSize: size];
 }
 
 + (NSBezierPath *)highlightPathOfSize:(NSSize)size

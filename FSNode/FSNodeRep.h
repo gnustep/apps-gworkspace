@@ -117,6 +117,9 @@ typedef enum FSNInfoType {
 
   NSImage *multipleSelIcon;
   NSImage *openFolderIcon;
+  NSImage *workspaceIcon;
+  NSImage *trashIcon;
+  NSImage *trashFullIcon;
   
   NSNotificationCenter *nc;
   NSFileManager *fm;
@@ -132,6 +135,12 @@ typedef enum FSNInfoType {
 
 + (NSImage *)openFolderIconOfSize:(float)size 
                           forNode:(FSNode *)node;
+
++ (NSImage *)workspaceIconOfSize:(float)size;
+
++ (NSImage *)trashIconOfSize:(float)size;
+
++ (NSImage *)trashFullIconOfSize:(float)size;
 
 + (NSBezierPath *)highlightPathOfSize:(NSSize)size;
 
