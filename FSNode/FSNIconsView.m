@@ -34,8 +34,6 @@
 #define DEF_TEXT_SIZE 12
 #define DEF_ICN_POS NSImageAbove
 
-#define LABEL_W_FACT (8)
-
 #define X_MARGIN (10)
 #define Y_MARGIN (12)
 
@@ -344,7 +342,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
   }
 
   labelSize.height = floor([labelFont defaultLineHeightForFont]);
-  labelSize.width = LABEL_W_FACT * labelTextSize;
+  labelSize.width = [FSNodeRep labelWFactor] * labelTextSize;
 
   gridSize.height = highlightSize.height;
 

@@ -37,8 +37,6 @@
 #define DEF_TEXT_SIZE 12
 #define DEF_ICN_POS NSImageAbove
 
-#define LABEL_W_FACT (8)
-
 #define X_MARGIN (10)
 #define Y_MARGIN (12)
 

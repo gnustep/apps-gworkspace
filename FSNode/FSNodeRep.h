@@ -255,6 +255,8 @@ typedef enum FSNSelectionMask {
   NSImage *trashIcon;
   NSImage *trashFullIcon;
   
+  float labelWFactor;
+  
   NSNotificationCenter *nc;
   NSFileManager *fm;
   id ws;    
@@ -281,6 +283,10 @@ typedef enum FSNSelectionMask {
 + (float)highlightHeightFactor;
 
 + (int)labelMargin;
+
++ (float)labelWFactor;
+
++ (void)setLabelWFactor:(float)f;
 
 + (int)defaultIconBaseShift;
 

@@ -53,6 +53,7 @@ static GWViewersManager *vwrsmanager = nil;
   
   if (self) {
     viewers = [NSMutableArray new];
+    [FSNodeRep setLabelWFactor: 9.0];
   }
   
   return self;

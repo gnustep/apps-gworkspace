@@ -30,6 +30,8 @@
 #include "ExtendedInfo.h"
 #include "GNUstep.h"
 
+#define LABEL_W_FACT (8.0)
+
 static FSNodeRep *shared = nil;
 
 @interface FSNodeRep (PrivateMethods)
@@ -60,6 +62,10 @@ static FSNodeRep *shared = nil;
                   ofSize:(float)size;
 
 - (NSBezierPath *)highlightPathOfSize:(NSSize)size;
+
+- (float)labelWFactor;
+
+- (void)setLabelWFactor:(float)f;
 
 - (void)setDefaultSortOrder:(int)order;
 
@@ -163,6 +169,8 @@ static FSNodeRep *shared = nil;
         hideSysFiles = NO;
       }
     }
+    
+    labelWFactor = LABEL_W_FACT;
     
     imagepath = [bundle pathForResource: @"MultipleSelection" ofType: @"tiff"];
     multipleSelIcon = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
@@ -417,6 +425,16 @@ static FSNodeRep *shared = nil;
   [bpath closePath];
   
   return bpath;
+}
+
+- (float)labelWFactor
+{
+  return labelWFactor;  
+}
+
+- (void)setLabelWFactor:(float)f
+{
+  labelWFactor = f;
 }
 
 - (void)setDefaultSortOrder:(int)order
@@ -927,6 +945,16 @@ static FSNodeRep *shared = nil;
 + (int)labelMargin
 {
   return 4;
+}
+
++ (float)labelWFactor
+{
+  return [[self sharedInstance] labelWFactor];
+}
+
++ (void)setLabelWFactor:(float)f
+{
+  [[self sharedInstance] setLabelWFactor: f];
 }
 
 + (int)defaultIconBaseShift
