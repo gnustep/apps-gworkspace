@@ -115,6 +115,7 @@
 
 - (void)selectAll;
 
+
 //
 // Menu operations
 //
@@ -133,6 +134,8 @@
 - (void)setViewerType:(id)sender;
 
 - (void)selectAllInViewer:(id)sender;
+
+- (void)showTerminal:(id)sender;
 
 - (void)print:(id)sender;
 

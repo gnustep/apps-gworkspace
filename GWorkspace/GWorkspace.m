@@ -1342,11 +1342,6 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   }
 }
 
-- (void)setCurrentViewer:(ViewersWindow *)viewer
-{
-  currentViewer = viewer;
-}
-
 - (void)iconAnimationChanged:(NSNotification *)notif
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];     
@@ -2451,7 +2446,7 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
                                             isRootViewer: YES onStart: starting];
     [rootViewer activate];
   } else {
-    if([rootViewer isVisible] == NO) {
+    if ([rootViewer isVisible] == NO) {
   	  [rootViewer activate];
     } else {
       [self newViewerAtPath: fixPath(@"/", 0) canViewApps: NO];
@@ -2859,28 +2854,6 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 - (void)runCommand:(id)sender
 {
   [runExtController activate];
-}
-
-- (void)startXTerm:(id)sender
-{
-  NSString *path;  
-  BOOL isdir;
-  
-  path = [currentViewer currentViewedPath];
-  
-  if (path == nil) {
-    if ([selectedPaths count] > 1) {
-      path = [[selectedPaths objectAtIndex: 0] stringByDeletingLastPathComponent];
-    } else {
-      path = [selectedPaths objectAtIndex: 0];
-      [fm fileExistsAtPath: path isDirectory: &isdir];    
-      if (isdir == NO) {
-        path = [path stringByDeletingLastPathComponent];
-      }
-    }
-	}
-  
-	[self startXTermOnDirectory: path];
 }
 
 - (void)checkRemovableMedia:(id)sender

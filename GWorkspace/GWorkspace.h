@@ -153,7 +153,7 @@
   Fiend *fiend;
   History *history;
 	
-  ViewersWindow *rootViewer, *currentViewer;	
+  ViewersWindow *rootViewer;	
   NSMutableArray *viewers;
   NSMutableArray *viewersSearchPaths;
 	NSMutableArray *viewersTemplates;
@@ -245,8 +245,6 @@
 - (void)checkViewersAfterHidingOfPaths:(NSArray *)paths;
 
 - (void)viewerHasClosed:(id)sender;
-
-- (void)setCurrentViewer:(ViewersWindow *)viewer;
 
 - (void)iconAnimationChanged:(NSNotification *)notif;
 
@@ -373,8 +371,6 @@
 - (void)openWith:(id)sender;
 
 - (void)runCommand:(id)sender;
-
-- (void)startXTerm:(id)sender;
 
 - (void)checkRemovableMedia:(id)sender;
 

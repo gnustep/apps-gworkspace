@@ -835,7 +835,6 @@ if (rct.size.height < 0) rct.size.height = 0; \
     if (selPaths) {
 	    ASSIGN (selectedPaths, selPaths);
       [gw setSelectedPaths: selPaths];
-      [gw setCurrentViewer: self];  
 	    historyWin = [gw historyWindow];
 	    [historyWin setViewer: self];
 	    [self tuneHistory];
@@ -988,10 +987,34 @@ if (rct.size.height < 0) rct.size.height = 0; \
   [self setMiniwindowImage: [viewer miniicon]];
 }
 
+- (void)showTerminal:(id)sender
+{
+  NSString *path = [viewer currentViewedPath];
+  
+  if (path == nil) {
+    if ([selectedPaths count] > 1) {
+      path = [[selectedPaths objectAtIndex: 0] stringByDeletingLastPathComponent];
+    
+    } else {
+      BOOL isdir;
+    
+      path = [selectedPaths objectAtIndex: 0];
+      [fm fileExistsAtPath: path isDirectory: &isdir]; 
+         
+      if (isdir == NO) {
+        path = [path stringByDeletingLastPathComponent];
+      }
+    }
+	}
+  
+	[gw startXTermOnDirectory: path];
+}
+
 - (void)print:(id)sender
 {
 	[super print: sender];
 }
+
 
 //
 // splitView delegate methods

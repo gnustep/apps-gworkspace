@@ -131,7 +131,7 @@ void createMenu()
 		menuItem = addItemToMenu(tools, @"Tabbed Shelf", @"", nil, @"");
 		tshelfmenu = AUTORELEASE ([NSMenu new]);
 		[tools setSubmenu: tshelfmenu forItem: menuItem];    
-	addItemToMenu(tools, @"XTerm", @"", @"startXTerm:", @"t");
+	addItemToMenu(tools, @"XTerm", @"", @"showTerminal:", @"t");
 
 	// Windows
 	menuItem = addItemToMenu(mainMenu, @"Windows", @"", nil, @"");
