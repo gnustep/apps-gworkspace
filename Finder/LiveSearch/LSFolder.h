@@ -46,7 +46,7 @@
 
 - (oneway void)fastUpdate;
 
-- (void)exitThread;
+- (oneway void)exitThread;
 
 @end
 
@@ -71,6 +71,7 @@
   NSNotificationCenter *nc;
   
   IBOutlet id win;
+  BOOL forceclose;
   
   IBOutlet id topBox;
   IBOutlet id progBox; 
@@ -138,6 +139,8 @@
 - (void)connectionDidDie:(NSNotification *)notification;
 
 - (void)loadInterface;
+
+- (void)closeWindow;
 
 - (NSDictionary *)getSizes;
 

@@ -405,7 +405,7 @@ static Finder *finder = nil;
   }
   
   TEST_CLOSE (startAppWin, [startAppWin win]);
-
+    		
 	return YES;
 }
 
@@ -1088,6 +1088,7 @@ static Finder *finder = nil;
 
 - (void)removeLiveSearchFolder:(LSFolder *)folder
 {
+  [folder closeWindow];
   [folder endUpdate];
   [lsFolders removeObject: folder];
 }
@@ -1167,7 +1168,8 @@ static Finder *finder = nil;
     srcpaths = [NSArray arrayWithObject: source];
     dstpaths = [NSArray arrayWithObject: destination];
   } else {
-    if ([operation isEqual: @"NSWorkspaceDuplicateOperation"]) { 
+    if ([operation isEqual: @"NSWorkspaceDuplicateOperation"]
+                || [operation isEqual: @"NSWorkspaceRecycleOperation"]) { 
       for (i = 0; i < [files count]; i++) {
         NSString *fname = [origfiles objectAtIndex: i];
         [srcpaths addObject: [source stringByAppendingPathComponent: fname]];
@@ -1199,7 +1201,7 @@ static Finder *finder = nil;
     FSNode *node = [folder node];
     FSNode *newnode = nil;
     BOOL found = NO;
-    
+        
     for (j = 0; j < [srcpaths count]; j++) {
       NSString *srcpath = [srcpaths objectAtIndex: j];
       NSString *dstpath = [dstpaths objectAtIndex: j];

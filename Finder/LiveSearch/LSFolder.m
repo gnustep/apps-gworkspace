@@ -82,22 +82,20 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   if (self) {
     NSDictionary *dict = nil;
 
+    ASSIGN (node, anode);
+    
     updater = nil;
     actionPending = NO;
     updaterbusy = NO;
     autoupdate = 0;
     
     win = nil;
+    forceclose = NO;
     
     fm = [NSFileManager defaultManager];
     nc = [NSNotificationCenter defaultCenter];
     finder = [Finder finder];
-    
-    [nc addObserver: self
-           selector: @selector(updaterThreadWillExit:)
-               name: NSThreadWillExitNotification
-             object: nil];     
-    
+        
     if ([anode isValid] && [anode isDirectory]) {
       NSString *dpath = LSF_INFO([anode path]);
       
@@ -113,7 +111,6 @@ BOOL isPathInResults(NSString *path, NSArray *results);
         autoupdate = [entry unsignedLongValue];
       }
       
-      ASSIGN (node, anode);
       ASSIGN (lsfinfo, dict);
 
       watcherSuspended = NO;      
@@ -233,7 +230,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 
   updaterconn = [[NSConnection alloc] initWithReceivePort: port[0]
 				                                         sendPort: port[1]];
-  [updaterconn enableMultipleThreads];
+//  [updaterconn enableMultipleThreads];
   [updaterconn setRootObject: self];
   [updaterconn setDelegate: self];
 
@@ -265,6 +262,11 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 
 - (void)setUpdater:(id)anObject
 {
+  [nc addObserver: self
+         selector: @selector(updaterThreadWillExit:)
+             name: NSThreadWillExitNotification
+           object: nil];     
+
   [anObject setProtocolForProxy: @protocol(LSFUpdaterProtocol)];
   updater = (id <LSFUpdaterProtocol>)[anObject retain];
   
@@ -347,13 +349,16 @@ BOOL isPathInResults(NSString *path, NSArray *results);
     [nc removeObserver: self
 	                name: NSConnectionDidDieNotification 
                 object: updaterconn];
+
+    [updater exitThread];
+    DESTROY (updater);
+    DESTROY (updaterconn);
+    actionPending = NO;
+    updaterbusy = NO;
     
     [nc removeObserver: self
 	                name: NSThreadWillExitNotification 
                 object: nil];
-                
-    actionPending = NO;
-    updaterbusy = NO;
   }
 }
 
@@ -630,6 +635,14 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   }
 }
 
+- (void)closeWindow
+{
+  if (win && [win isVisible]) {
+    forceclose = YES;
+    [win close];
+  }
+}
+
 - (NSDictionary *)getSizes
 {
   NSString *dictPath = LSF_GEOM([node path]);
@@ -646,32 +659,35 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   NSMutableDictionary *sizesDict = [NSMutableDictionary dictionary];
   NSMutableDictionary *columnsDict = [NSMutableDictionary dictionary];
   NSArray *columns = [resultsView tableColumns];
+  NSString *dictpath = LSF_GEOM([node path]);
   int i;  
+  
+  if ([fm fileExistsAtPath: dictpath]) {
+    [sizesDict setObject: [win stringWithSavedFrame] 
+                  forKey: @"win_frame"];
 
-  [sizesDict setObject: [win stringWithSavedFrame] 
-                forKey: @"win_frame"];
+    [sizesDict setObject: [NSNumber numberWithInt: ceil(NSHeight([pathsScroll frame]))] 
+                  forKey: @"paths_scr_h"];
 
-  [sizesDict setObject: [NSNumber numberWithInt: ceil(NSHeight([pathsScroll frame]))] 
-                forKey: @"paths_scr_h"];
+    [sizesDict setObject: [NSNumber numberWithInt: currentOrder] 
+                  forKey: @"sorting_order"];
 
-  [sizesDict setObject: [NSNumber numberWithInt: currentOrder] 
-                forKey: @"sorting_order"];
+    for (i = 0; i < [columns count]; i++) {
+      NSTableColumn *column = [columns objectAtIndex: i];
+      NSString *identifier = [column identifier];
+      NSNumber *cwidth = [NSNumber numberWithFloat: [column width]];
+      NSMutableDictionary *dict = [NSMutableDictionary dictionary];
 
-  for (i = 0; i < [columns count]; i++) {
-    NSTableColumn *column = [columns objectAtIndex: i];
-    NSString *identifier = [column identifier];
-    NSNumber *cwidth = [NSNumber numberWithFloat: [column width]];
-    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-    
-    [dict setObject: [NSNumber numberWithInt: i] forKey: @"position"];
-    [dict setObject: cwidth forKey: @"width"];
-    
-    [columnsDict setObject: dict forKey: identifier];
+      [dict setObject: [NSNumber numberWithInt: i] forKey: @"position"];
+      [dict setObject: cwidth forKey: @"width"];
+
+      [columnsDict setObject: dict forKey: identifier];
+    }
+
+    [sizesDict setObject: columnsDict forKey: @"columns_sizes"];
+
+    [sizesDict writeToFile: dictpath atomically: YES];
   }
-
-  [sizesDict setObject: columnsDict forKey: @"columns_sizes"];
-
-  [sizesDict writeToFile: LSF_GEOM([node path]) atomically: YES];
 }
 
 - (void)updateShownData
@@ -807,12 +823,17 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 //
 - (BOOL)windowShouldClose:(id)sender
 {
+  if (forceclose) {
+    return YES;
+  }
 	return !updaterbusy;
 }
 
 - (void)windowWillClose:(NSNotification *)aNotification
 {
-  [self saveSizes];
+  if (forceclose == NO) {
+    [self saveSizes];
+  }
 }
 
 
