@@ -39,8 +39,6 @@
 @class RemoteEditor;
 @class RemoteTerminal;
 
-#include <GWorkspace/GWProtocol.h>
-
 @protocol GWSdClientProtocol
 
 - (void)setServerConnection:(NSConnection *)conn;
@@ -132,7 +130,7 @@
         
 @end 
 
-@interface GWRemote : NSObject <GWProtocol, GWSdClientProtocol>
+@interface GWRemote : NSObject <GWSdClientProtocol>
 {
   NSMutableDictionary *serversDict;
   NSMutableArray *serversNames;
@@ -176,7 +174,6 @@
 }
 
 + (GWRemote *)gwremote;
-+ (id)gworkspace;
 
 //
 // Login methods
@@ -189,6 +186,53 @@
 
 - (void)checkConnection:(id)sender;
 
+
+
+- (void)performFileOperationWithDictionary:(id)opdict
+                            fromSourceHost:(NSString *)fromName 
+                         toDestinationHost:(NSString *)toName;
+
+- (BOOL)server:(NSString *)serverName isPakageAtPath:(NSString *)path;
+
+- (BOOL)server:(NSString *)serverName fileExistsAtPath:(NSString *)path;  
+
+- (BOOL)server:(NSString *)serverName isWritableFileAtPath:(NSString *)path;
+
+- (BOOL)server:(NSString *)serverName 
+            existsAndIsDirectoryFileAtPath:(NSString *)path;              
+
+- (NSString *)server:(NSString *)serverName typeOfFileAt:(NSString *)path;  
+
+- (int)server:(NSString *)serverName sortTypeForPath:(NSString *)aPath; 
+
+- (void)server:(NSString *)serverName                                   
+   setSortType:(int)type 
+        atPath:(NSString *)aPath;
+
+- (NSArray *)server:(NSString *)serverName 
+   checkHiddenFiles:(NSArray *)files 
+             atPath:(NSString *)path;
+
+- (NSArray *)server:(NSString *)serverName 
+        sortedDirectoryContentsAtPath:(NSString *)path;
+
+- (void)server:(NSString *)serverName setSelectedPaths:(NSArray *)paths;
+
+- (NSArray *)selectedPathsForServerWithName:(NSString *)serverName;
+
+- (NSString *)homeDirectoryForServerWithName:(NSString *)serverName;
+
+- (BOOL)server:(NSString *)serverName isLockedPath:(NSString *)aPath;
+
+- (void)server:(NSString *)serverName addWatcherForPath:(NSString *)path;
+
+- (void)server:(NSString *)serverName removeWatcherForPath:(NSString *)path;
+
+- (void)server:(NSString *)serverName removeWatcherForPath:(NSString *)path;
+
+- (void)server:(NSString *)serverName 
+    renamePath:(NSString *)oldname 
+     toNewName:(NSString *)newname;
 
 
 - (void)readDefaultsForServer:(NSString *)serverName;
@@ -205,6 +249,8 @@
 
 - (NSDictionary *)server:(NSString *)serverName 
             fileSystemAttributesAtPath:(NSString *)path;
+
+- (NSImage *)iconForFile:(NSString *)fullPath ofType:(NSString *)type;
 
 - (NSImage *)getImageWithName:(NSString*)name
 		                alternate:(NSString *)alternate;

@@ -514,7 +514,7 @@
             event: event
        pasteboard: pb
            source: self
-        slideBack: [gw animateSlideBack]];   
+        slideBack: NO];   
 }
 
 - (void)draggedImage:(NSImage *)anImage 

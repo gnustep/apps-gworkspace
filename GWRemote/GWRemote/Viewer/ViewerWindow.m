@@ -33,7 +33,6 @@
 #include "GWRemote.h"
 #include "Functions.h"
 #include "Notifications.h"
-#include <GWorkspace/GWProtocol.h>
 #include "GNUstep.h"
 
 #define SETRECT(o, x, y, w, h) { \
@@ -97,7 +96,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
     NSMutableArray *selection = nil;
 		float shfwidth = 0.0;   
     
-		gw = (id <GWProtocol>)[GWRemote gwremote];
+		gw = [GWRemote gwremote];
 		ASSIGN (serverName, server);
 		
 		[self setReleasedWhenClosed: NO];
@@ -664,12 +663,6 @@ if (rct.size.height < 0) rct.size.height = 0; \
 - (void)shelf:(Shelf *)sender setCurrentSelection:(NSArray *)paths
               animateImage:(NSImage *)image startingAtPoint:(NSPoint)startp
 {
-  NSPoint endp = [viewer positionForSlidedImage];
-
-  if ((NSEqualPoints(endp, NSZeroPoint) == NO) && [gw animateChdir]) {
-    [gw slideImage: image from: startp to: endp];
-  }
-  
   [viewer setCurrentSelection: paths];
 }
 
