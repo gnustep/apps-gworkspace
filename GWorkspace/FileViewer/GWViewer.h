@@ -80,6 +80,7 @@
 - (void)reloadNodeContents;
 - (void)reloadFromNode:(FSNode *)anode;
 - (void)unloadFromNode:(FSNode *)anode;
+- (void)updateShownSelection;
 
 - (GWViewerWindow *)win;
 - (id)nodeView;

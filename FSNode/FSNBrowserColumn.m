@@ -102,7 +102,6 @@ static id <DesktopApplication> desktopApp = nil;
     oldNode = nil;
     matrix = nil;
     isLoaded = NO;
-    isLeaf = YES;
     
     [self setFrame: rect];
     
@@ -141,6 +140,11 @@ static id <DesktopApplication> desktopApp = nil;
     }   
   }
 }
+
+
+// cellsHeight
+
+
 
 - (void)setExtendedShowType:(NSString *)type
 {
@@ -199,15 +203,12 @@ static id <DesktopApplication> desktopApp = nil;
   DESTROY (oldNode);
   isLoaded = NO;
 
-  if ([anode isValid]) {
+  if (anode && [anode isValid]) {
     id cell = nil;
-    FSNBrowserColumn *col = nil;
     
     ASSIGN (oldNode, anode);    
     ASSIGN (shownNode, anode);    
         
-    [self setLeaf: YES];
-    
     [self createRowsInMatrix];
     [matrix setCellSize: NSMakeSize([scroll contentSize].width, cellsHeight)];  
     [self adjustMatrix];
@@ -236,11 +237,6 @@ static id <DesktopApplication> desktopApp = nil;
     }
                
     isLoaded = YES;
-        
-    col = [browser columnBeforeColumn: self];
-    if (col) {
-      [col setLeaf: NO];
-    }
   }
   
   TEST_RELEASE (savedSelection);
@@ -1014,16 +1010,6 @@ static id <DesktopApplication> desktopApp = nil;
 - (void)doDoubleClick:(id)sender
 {
   [browser doubleClickInMatrixOfColumn: self];
-}
-
-- (void)setLeaf:(BOOL)value
-{
-  isLeaf = value;
-}
-
-- (BOOL)isLeaf
-{
-  return isLeaf;
 }
 
 - (NSMatrix *)cmatrix

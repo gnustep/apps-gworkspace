@@ -554,7 +554,12 @@ static GWViewersManager *vwrsmanager = nil;
 
           if ([viewer isShowingPath: path]) {
             FSNode *node = [FSNode nodeWithRelativePath: path parent: nil];
+            
             [viewer reloadFromNode: node];
+            
+            if ([viewer respondsToSelector: @selector(updateShownSelection)]) {
+              [viewer updateShownSelection];
+            }
           }
         }
       }

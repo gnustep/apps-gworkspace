@@ -56,18 +56,20 @@
 
 - (void)notifySelectionChange:(NSArray *)newsel
 {
-  if ([newsel count] == 0) {
-    newsel = [NSArray arrayWithObject: [baseNode path]]; 
-  } else if (([viewer vtype] == SPATIAL) 
-                    && [(NSWindow *)[viewer win] isKeyWindow]) {
-    [manager selectedSpatialViewerChanged: viewer];
-  }
+  if (newsel) {
+    if ([newsel count] == 0) {
+      newsel = [NSArray arrayWithObject: [baseNode path]]; 
+    } else if (([viewer vtype] == SPATIAL) 
+                      && [(NSWindow *)[viewer win] isKeyWindow]) {
+      [manager selectedSpatialViewerChanged: viewer];
+    }
 
-  if ((lastSelection == nil) || ([newsel isEqual: lastSelection] == NO)) {
-    ASSIGN (lastSelection, newsel);
-    [viewer selectionChanged: newsel];
-    [self synchronizeViewer];
-  }      
+    if ((lastSelection == nil) || ([newsel isEqual: lastSelection] == NO)) {
+      ASSIGN (lastSelection, newsel);
+      [viewer selectionChanged: newsel];
+      [self synchronizeViewer];
+    } 
+  }
 }
 
 /*

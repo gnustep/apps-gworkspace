@@ -149,6 +149,7 @@
 - (NSDictionary *)readNodeInfo
 {
   NSDictionary *nodeDict = nil;
+  FSNInfoType itype;
 
   ASSIGN (infoPath, [[node path] stringByAppendingPathComponent: @".dirinfo"]);
   
@@ -216,8 +217,13 @@
       iconPosition = entry ? [entry intValue] : iconPosition;
 
       entry = [nodeDict objectForKey: @"fsn_info_type"];
-      infoType = entry ? [entry intValue] : infoType;
-
+      itype = entry ? [entry intValue] : infoType;
+      if (infoType != itype) {
+        infoType = itype;
+        [self makeIconsGrid];
+      }
+      infoType = itype;
+      
       if (infoType == FSNInfoExtendedType) {
         DESTROY (extInfoType);
         entry = [nodeDict objectForKey: @"ext_info_type"];
@@ -232,6 +238,7 @@
 
         if (extInfoType == nil) {
           infoType = FSNInfoNameType;
+          [self makeIconsGrid];
         }
       }
     }
@@ -473,7 +480,11 @@
 
   if (iconPosition == NSImageAbove) {  
     hlightRect.origin.x = ceil((gridSize.width - hlightRect.size.width) / 2);   
-    hlightRect.origin.y = floor([labelFont defaultLineHeightForFont]);
+    if (infoType != FSNInfoNameType) {
+      hlightRect.origin.y = floor([labelFont defaultLineHeightForFont] * 2 - 2);
+    } else {
+      hlightRect.origin.y = floor([labelFont defaultLineHeightForFont]);
+    }
   } else {
     hlightRect.origin.x = 0;
     hlightRect.origin.y = 0;
@@ -482,7 +493,7 @@
   icnBounds.origin.x += hlightRect.origin.x + ((hlightRect.size.width - iconSize) / 2);
   icnBounds.origin.y += hlightRect.origin.y + ((hlightRect.size.height - iconSize) / 2);
 
-  return icnBounds;
+  return NSIntegralRect(icnBounds);
 }
 
 - (void)makeIconsGrid
@@ -490,6 +501,7 @@
   NSRect dckr = [desktop dockReservedFrame];
   NSRect tshfr = [desktop tshelfReservedFrame];
   NSRect gridrect = screenFrame;
+  int ymargin;
   NSPoint gpnt;
   int i;
   
@@ -506,8 +518,14 @@
     gridrect.origin.x += dckr.size.width;
   }
   
+  if (infoType != FSNInfoNameType) {
+    ymargin = 2;
+  } else {
+    ymargin = Y_MARGIN;
+  }
+  
   colcount = (int)(gridrect.size.width / (gridSize.width + X_MARGIN));  
-  rowcount = (int)(gridrect.size.height / (gridSize.height + Y_MARGIN));
+  rowcount = (int)(gridrect.size.height / (gridSize.height + ymargin));
 	gridcount = colcount * rowcount;
 
 	grid = NSZoneMalloc (NSDefaultMallocZone(), sizeof(NSRect) * gridcount);	
@@ -518,11 +536,11 @@
   gpnt.x -= (gridSize.width + X_MARGIN);
   
   for (i = 0; i < gridcount; i++) {
-    gpnt.y -= (gridSize.height + Y_MARGIN);
+    gpnt.y -= (gridSize.height + ymargin);
     
     if (gpnt.y <= gridrect.origin.y) {
       gpnt.y = gridrect.size.height + gridrect.origin.y;    
-      gpnt.y -= (gridSize.height + Y_MARGIN);
+      gpnt.y -= (gridSize.height + ymargin);
       gpnt.x -= (gridSize.width + X_MARGIN);
     }
   
@@ -546,8 +564,8 @@
     }
   }
   
-  if (gpnt.y != (gridrect.origin.y + Y_MARGIN)) {
-    float diffy = gpnt.y - (gridrect.origin.y + Y_MARGIN);
+  if (gpnt.y != (gridrect.origin.y + ymargin)) {
+    float diffy = gpnt.y - (gridrect.origin.y + ymargin);
     float yshft = 0.0;
     
     diffy /= rowcount;  
@@ -1108,6 +1126,56 @@
   [self tile];
   [self setNeedsDisplay: YES];
   [self selectionDidChange];
+}
+
+- (void)setShowType:(FSNInfoType)type
+{
+  if (infoType != type) {
+    BOOL newgrid = ((infoType == FSNInfoNameType) || (type == FSNInfoNameType));
+    int i;
+    
+    infoType = type;
+    DESTROY (extInfoType);
+    
+    if (newgrid) {
+      [self makeIconsGrid];
+    }
+    
+    for (i = 0; i < [icons count]; i++) {
+      FSNIcon *icon = [icons objectAtIndex: i];
+      
+      [icon setNodeInfoShowType: infoType];
+      [icon tile];
+    }
+    
+    [self sortIcons];
+    [self tile];
+  }
+}
+
+- (void)setExtendedShowType:(NSString *)type
+{
+  if ((extInfoType == nil) || ([extInfoType isEqual: type] == NO)) {
+    BOOL newgrid = (infoType == FSNInfoNameType);
+    int i;
+    
+    infoType = FSNInfoExtendedType;
+    ASSIGN (extInfoType, type);
+
+    if (newgrid) {
+      [self makeIconsGrid];
+    }
+
+    for (i = 0; i < [icons count]; i++) {
+      FSNIcon *icon = [icons objectAtIndex: i];
+      
+      [icon setExtendedShowType: extInfoType];
+      [icon tile];
+    }
+    
+    [self sortIcons];
+    [self tile];
+  }
 }
 
 - (void)setIconSize:(int)size

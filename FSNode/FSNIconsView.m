@@ -206,6 +206,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
 - (NSDictionary *)readNodeInfo
 {
   NSDictionary *nodeDict = nil;
+  FSNInfoType itype;
   
   ASSIGN (infoPath, [[node path] stringByAppendingPathComponent: @".dirinfo"]);
   
@@ -256,7 +257,12 @@ if (rct.size.height < 0) rct.size.height = 0; \
       iconPosition = entry ? [entry intValue] : iconPosition;
 
       entry = [nodeDict objectForKey: @"fsn_info_type"];
-      infoType = entry ? [entry intValue] : infoType;
+      itype = entry ? [entry intValue] : infoType;
+      if (infoType != itype) {
+        infoType = itype;
+        [self calculateGridSize];
+      }
+      infoType = itype;
 
       if (infoType == FSNInfoExtendedType) {
         DESTROY (extInfoType);
@@ -272,6 +278,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
 
         if (extInfoType == nil) {
           infoType = FSNInfoNameType;
+          [self calculateGridSize];
         }
       }
     }
@@ -333,6 +340,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
 {
   NSSize highlightSize = NSZeroSize;
   NSSize labelSize = NSZeroSize;
+  int lblmargin = [FSNodeRep labelMargin];
   
   highlightSize.width = ceil(iconSize / 3 * 4);
   highlightSize.height = ceil(highlightSize.width * [FSNodeRep highlightHeightFactor]);
@@ -345,11 +353,25 @@ if (rct.size.height < 0) rct.size.height = 0; \
 
   gridSize.height = highlightSize.height;
 
-  if (iconPosition == NSImageAbove) {
-    gridSize.height += labelSize.height;
-    gridSize.width = labelSize.width;
+  if (infoType != FSNInfoNameType) {
+    float lbsh = (labelSize.height * 2) - 2;
+  
+    if (iconPosition == NSImageAbove) {
+      gridSize.height += lbsh;
+      gridSize.width = labelSize.width;
+    } else {
+      if (lbsh > gridSize.height) {
+        gridSize.height = lbsh;
+      }
+      gridSize.width = highlightSize.width + labelSize.width + lblmargin;
+    }
   } else {
-    gridSize.width = highlightSize.width + labelSize.width + [FSNodeRep labelMargin];
+    if (iconPosition == NSImageAbove) {
+      gridSize.height += labelSize.height;
+      gridSize.width = labelSize.width;
+    } else {
+      gridSize.width = highlightSize.width + labelSize.width + lblmargin;
+    }
   }
 }
 
@@ -1122,12 +1144,12 @@ pp.x = NSMaxX([self bounds]) - 1
 
 - (BOOL)isShowingNode:(FSNode *)anode
 {
-  return ([node isEqual: anode] ? YES : NO);
+  return [node isEqual: anode];
 }
 
 - (BOOL)isShowingPath:(NSString *)path
 {
-  return ([[node path] isEqual: path] ? YES : NO);
+  return [[node path] isEqual: path];
 }
 
 - (void)sortTypeChangedAtPath:(NSString *)path
@@ -1252,10 +1274,15 @@ pp.x = NSMaxX([self bounds]) - 1
 - (void)setShowType:(FSNInfoType)type
 {
   if (infoType != type) {
+    BOOL newgrid = ((infoType == FSNInfoNameType) || (type == FSNInfoNameType));
     int i;
     
     infoType = type;
     DESTROY (extInfoType);
+    
+    if (newgrid) {
+      [self calculateGridSize];
+    }
     
     for (i = 0; i < [icons count]; i++) {
       FSNIcon *icon = [icons objectAtIndex: i];
@@ -1272,10 +1299,15 @@ pp.x = NSMaxX([self bounds]) - 1
 - (void)setExtendedShowType:(NSString *)type
 {
   if ((extInfoType == nil) || ([extInfoType isEqual: type] == NO)) {
+    BOOL newgrid = (infoType == FSNInfoNameType);
     int i;
     
     infoType = FSNInfoExtendedType;
     ASSIGN (extInfoType, type);
+
+    if (newgrid) {
+      [self calculateGridSize];
+    }
 
     for (i = 0; i < [icons count]; i++) {
       FSNIcon *icon = [icons objectAtIndex: i];
@@ -1995,9 +2027,7 @@ pp.x = NSMaxX([self bounds]) - 1
 - (void)setNameEditorForRep:(id)arep
 {
   FSNode *repnode = [arep node];
-  BOOL canedit = (([arep isLocked] == NO) 
-                      && ([repnode isMountPoint] == NO) 
-                      && (infoType == FSNInfoNameType));
+  BOOL canedit = (([arep isLocked] == NO) && ([repnode isMountPoint] == NO));
 
   [self stopRepNameEditing];
 

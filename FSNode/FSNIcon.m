@@ -54,6 +54,7 @@ static NSImage *branchImage;
   TEST_RELEASE (openicon);
   RELEASE (highlightPath);
   RELEASE (label);
+  RELEASE (infolabel);
   [super dealloc];
 }
 
@@ -97,6 +98,8 @@ static NSImage *branchImage;
   self = [super init];
 
   if (self) {
+    NSFontManager *fmanager = [NSFontManager sharedFontManager];
+    NSFont *infoFont;
     NSRect r = NSZeroRect;
     
     iconSize = isize;
@@ -143,16 +146,19 @@ static NSImage *branchImage;
     label = [FSNTextCell new];
     [label setFont: lfont];
     [label setTextColor: tcolor];
-    
-    if ((type == FSNInfoExtendedType) && (exttype != nil)) {
-      if ([self setExtendedShowType: exttype] == NO) {
-        type = FSNInfoNameType;
-        [self setNodeInfoShowType: type];  
-      }
+
+    infoFont = [fmanager convertFont: lfont 
+                              toSize: ([lfont pointSize] - 2)];
+    infoFont = [fmanager convertFont: infoFont 
+                         toHaveTrait: NSItalicFontMask];
+
+    infolabel = [FSNTextCell new];
+    [infolabel setFont: infoFont];
+    [infolabel setTextColor: tcolor];
+
+    if (exttype) {
+      [self setExtendedShowType: exttype];
     } else {
-      if (type == FSNInfoExtendedType) {
-        type = FSNInfoNameType;
-      }
       [self setNodeInfoShowType: type];  
     }
     
@@ -161,37 +167,59 @@ static NSImage *branchImage;
     labelRect.size.height = [[label font] defaultLineHeightForFont];
     labelRect = NSIntegralRect(labelRect);
 
+    infoRect = NSZeroRect;
+    if ((showType != FSNInfoNameType) && [[infolabel stringValue] length]) {
+      infoRect.size.width = [infolabel uncuttedTitleLenght] + [FSNodeRep labelMargin];
+    } else {
+      infoRect.size.width = labelRect.size.width;
+    }
+    infoRect.size.height = [[infolabel font] defaultLineHeightForFont];
+    infoRect = NSIntegralRect(infoRect);
+
     icnPosition = ipos;
     gridIndex = gindex;
     
     if (icnPosition == NSImageLeft) {
       [label setAlignment: NSLeftTextAlignment];
-      r.size.width = hlightRect.size.width + labelRect.size.width;
+      [infolabel setAlignment: NSLeftTextAlignment];
+      
+      r.size.width = hlightRect.size.width + labelRect.size.width;    
       r.size.height = hlightRect.size.height;
+
+      if (showType != FSNInfoNameType) {
+        float lbsh = labelRect.size.height + infoRect.size.height;
+
+        if (lbsh > hlightRect.size.height) {
+          r.size.height = lbsh;
+        }
+      } 
     
     } else if (icnPosition == NSImageAbove) {
       [label setAlignment: NSCenterTextAlignment];
+      [infolabel setAlignment: NSCenterTextAlignment];
+      
       if (labelRect.size.width > hlightRect.size.width) {
         r.size.width = labelRect.size.width;
       } else {
         r.size.width = hlightRect.size.width;
       }
-      r.size.height = labelRect.size.width + hlightRect.size.width;
-
-    } else if (icnPosition == NSImageOnly) {
-      if (selectable) {
-        r.size.width = hlightRect.size.width;
-        r.size.height = hlightRect.size.height;
-      } else {
-        r.size = icnBounds.size;
+      
+      r.size.height = labelRect.size.height + hlightRect.size.height;
+      
+      if (showType != FSNInfoNameType) {
+        r.size.height += infoRect.size.height;
       }
+      
+    } else if (icnPosition == NSImageOnly) {
+      r.size.width = hlightRect.size.width;
+      r.size.height = hlightRect.size.height;
       
     } else {
       r.size = icnBounds.size;
     }
 
     [self setFrame: NSIntegralRect(r)];
-
+    
     if (acceptDnd) {
       NSArray *pbTypes = [NSArray arrayWithObjects: NSFilenamesPboardType, 
                                                     @"GWRemoteFilenamesPboardType", 
@@ -218,7 +246,7 @@ static NSImage *branchImage;
 
 - (void)setSelectable:(BOOL)value
 {
-  if (selectable != value) {
+  if ((icnPosition == NSImageOnly) && (selectable != value)) {
     selectable = value;
     [self tile];
   }
@@ -265,8 +293,11 @@ static NSImage *branchImage;
   NSRect frameRect = [self frame];
   NSSize sz = [icon size];
   int lblmargin = [FSNodeRep labelMargin];
-  
+  BOOL hasinfo = ([[infolabel stringValue] length] > 0);
+    
   if (icnPosition == NSImageAbove) {
+    float hlx, hly;
+
     labelRect.size.width = [label uncuttedTitleLenght] + lblmargin;
   
     if (labelRect.size.width >= frameRect.size.width) {
@@ -275,94 +306,153 @@ static NSImage *branchImage;
     } else {
       labelRect.origin.x = (frameRect.size.width - labelRect.size.width) / 2;
     }
-  
-    labelRect.origin.y = 0;
-    labelRect.origin.y += lblmargin / 2;
-    labelRect = NSIntegralRect(labelRect);
-    
-    if (selectable) {
-      float hlx = ceil((frameRect.size.width - hlightRect.size.width) / 2);
-      float hly = ceil(frameRect.size.height - hlightRect.size.height);
-    
-      if ((hlightRect.origin.x != hlx) || (hlightRect.origin.y != hly)) {
-        NSAffineTransform *transform = [NSAffineTransform transform];
-    
-        [transform translateXBy: hlx - hlightRect.origin.x
-                            yBy: hly - hlightRect.origin.y];
-    
-        [highlightPath transformUsingAffineTransform: transform];
-      
-        hlightRect.origin.x = hlx;
-        hlightRect.origin.y = hly;      
+
+    if (showType != FSNInfoNameType) {
+      if (hasinfo) {
+        infoRect.size.width = [infolabel uncuttedTitleLenght] + lblmargin;
+      } else {
+        infoRect.size.width = labelRect.size.width;
       }
-            
-      icnBounds.origin.x = hlightRect.origin.x + ((hlightRect.size.width - iconSize) / 2);
-      icnBounds.origin.y = hlightRect.origin.y + ((hlightRect.size.height - iconSize) / 2);
-      icnBounds = NSIntegralRect(icnBounds);
-    
-      icnPoint.x = floor(hlightRect.origin.x + ((hlightRect.size.width - sz.width) / 2));
-      icnPoint.y = floor(hlightRect.origin.y + ((hlightRect.size.height - sz.height) / 2));
-    
-    } else {
-      int baseShift = [FSNodeRep defaultIconBaseShift];
-      icnBounds.origin.x = (frameRect.size.width - iconSize) / 2;
-      icnBounds.origin.y = labelRect.size.height + baseShift;
-      icnBounds = NSIntegralRect(icnBounds);
       
-      icnPoint.x = floor((frameRect.size.width - sz.width) / 2);
-      icnPoint.y = labelRect.size.height + baseShift;
+      if (infoRect.size.width >= frameRect.size.width) {
+        infoRect.size.width = frameRect.size.width;
+        infoRect.origin.x = 0;
+      } else {
+        infoRect.origin.x = (frameRect.size.width - infoRect.size.width) / 2;
+      }
     }
 
+    if (showType == FSNInfoNameType) {
+      labelRect.origin.y = 0;
+      labelRect.origin.y += lblmargin / 2;
+      labelRect = NSIntegralRect(labelRect);
+      infoRect = labelRect;
+      
+    } else {
+      infoRect.origin.y = 0;
+      infoRect.origin.y += lblmargin / 2;
+      infoRect = NSIntegralRect(infoRect);
+    
+      labelRect.origin.y = infoRect.origin.y + infoRect.size.height;
+      labelRect = NSIntegralRect(labelRect);
+    } 
+        
+    hlx = rintf((frameRect.size.width - hlightRect.size.width) / 2);
+    hly = rintf(frameRect.size.height - hlightRect.size.height);
+
+    if ((hlightRect.origin.x != hlx) || (hlightRect.origin.y != hly)) {
+      NSAffineTransform *transform = [NSAffineTransform transform];
+
+      [transform translateXBy: hlx - hlightRect.origin.x
+                          yBy: hly - hlightRect.origin.y];
+
+      [highlightPath transformUsingAffineTransform: transform];
+
+      hlightRect.origin.x = hlx;
+      hlightRect.origin.y = hly;      
+    }
+
+    icnBounds.origin.x = hlightRect.origin.x + ((hlightRect.size.width - iconSize) / 2);
+    icnBounds.origin.y = hlightRect.origin.y + ((hlightRect.size.height - iconSize) / 2);
+    icnBounds = NSIntegralRect(icnBounds);
+
+    icnPoint.x = rintf(hlightRect.origin.x + ((hlightRect.size.width - sz.width) / 2));
+    icnPoint.y = rintf(hlightRect.origin.y + ((hlightRect.size.height - sz.height) / 2));
+
   } else if (icnPosition == NSImageLeft) {
-    float icnspacew = selectable ? hlightRect.size.width : icnBounds.size.width;
-  
+    float icnspacew = hlightRect.size.width;
+    float hryorigin = 0;
+    
     if (isLeaf == NO) {
       icnspacew += BRANCH_SIZE;
     }
     
-    labelRect.size.width = ceil([label uncuttedTitleLenght] + lblmargin);
+    labelRect.size.width = rintf([label uncuttedTitleLenght] + lblmargin);
+    
     if (labelRect.size.width >= (frameRect.size.width - icnspacew)) {
       labelRect.size.width = (frameRect.size.width - icnspacew);
     } 
+    
     labelRect = NSIntegralRect(labelRect);
 
-    if (selectable) {
-      if ((hlightRect.origin.x != 0) || (hlightRect.origin.y != 0)) {
-        NSAffineTransform *transform = [NSAffineTransform transform];
-    
-        [transform translateXBy: 0 - hlightRect.origin.x
-                            yBy: 0 - hlightRect.origin.y];
-    
-        [highlightPath transformUsingAffineTransform: transform];
-      
-        hlightRect.origin.x = 0;
-        hlightRect.origin.y = 0;      
+    if (showType != FSNInfoNameType) {
+      if (hasinfo) {
+        infoRect.size.width = [infolabel uncuttedTitleLenght] + lblmargin;
+      } else {
+        infoRect.size.width = labelRect.size.width;
       }
-            
-      icnBounds.origin.x = (hlightRect.size.width - iconSize) / 2;
-      icnBounds.origin.y = (hlightRect.size.height - iconSize) / 2;
-      icnBounds = NSIntegralRect(icnBounds);
+      
+      if (infoRect.size.width >= (frameRect.size.width - icnspacew)) {
+        infoRect.size.width = (frameRect.size.width - icnspacew);
+      }
+       
+    } else {
+      infoRect.size.width = labelRect.size.width;
+    }
+    
+    infoRect = NSIntegralRect(infoRect);
 
-      icnPoint.x = floor((hlightRect.size.width - sz.width) / 2);
-      icnPoint.y = floor((hlightRect.size.height - sz.height) / 2);
-            
-      labelRect.origin.x = hlightRect.size.width;
-      labelRect.origin.y = (hlightRect.size.height - labelRect.size.height) / 2;
-      labelRect = NSIntegralRect(labelRect);
+    if (showType != FSNInfoNameType) {
+      float lbsh = labelRect.size.height + infoRect.size.height;
+
+      if (lbsh > hlightRect.size.height) {
+        hryorigin = rintf((lbsh - hlightRect.size.height) / 2);
+      }
+    }
+
+    if ((hlightRect.origin.x != 0) || (hlightRect.origin.y != hryorigin)) {
+      NSAffineTransform *transform = [NSAffineTransform transform];
+
+      [transform translateXBy: 0 - hlightRect.origin.x
+                          yBy: hryorigin - hlightRect.origin.y];
+
+      [highlightPath transformUsingAffineTransform: transform];
+
+      hlightRect.origin.x = 0;
+      hlightRect.origin.y = hryorigin;      
+    }
+
+    icnBounds.origin.x = (hlightRect.size.width - iconSize) / 2;
+    icnBounds.origin.y = hlightRect.origin.y + ((hlightRect.size.height - iconSize) / 2);
+    icnBounds = NSIntegralRect(icnBounds);
+
+    icnPoint.x = rintf((hlightRect.size.width - sz.width) / 2);
+    icnPoint.y = rintf(hlightRect.origin.y + ((hlightRect.size.height - sz.height) / 2));
+
+    labelRect.origin.x = hlightRect.size.width;
+    infoRect.origin.x = hlightRect.size.width;
+
+    if (showType != FSNInfoNameType) {
+      float lbsh = labelRect.size.height + infoRect.size.height;
+
+      infoRect.origin.y = 0;
+    
+      if (hasinfo) {
+        if (hlightRect.size.height > lbsh) {
+          infoRect.origin.y = (hlightRect.size.height - lbsh) / 2;
+        }
+
+        labelRect.origin.y = infoRect.origin.y + infoRect.size.height;
+        
+      } else {
+        if (hlightRect.size.height > lbsh) {
+          labelRect.origin.y = (hlightRect.size.height - labelRect.size.height) / 2;
+        } else {
+          labelRect.origin.y = (lbsh - labelRect.size.height) / 2;
+        }
+      }
       
     } else {
-      icnBounds.origin.x = 0;
-      icnBounds.origin.y = 0;
-            
-      labelRect.origin.x = icnBounds.size.width;
-      labelRect.origin.y = (icnBounds.size.height - labelRect.size.height) / 2;
-      labelRect = NSIntegralRect(labelRect);
+      labelRect.origin.y = (hlightRect.size.height - labelRect.size.height) / 2;
     }
-        
+
+    infoRect = NSIntegralRect(infoRect);
+    labelRect = NSIntegralRect(labelRect);
+
   } else if (icnPosition == NSImageOnly) {
     if (selectable) {
-      float hlx = ceil((frameRect.size.width - hlightRect.size.width) / 2);
-      float hly = ceil((frameRect.size.height - hlightRect.size.height) / 2);
+      float hlx = rintf((frameRect.size.width - hlightRect.size.width) / 2);
+      float hly = rintf((frameRect.size.height - hlightRect.size.height) / 2);
     
       if ((hlightRect.origin.x != hlx) || (hlightRect.origin.y != hly)) {
         NSAffineTransform *transform = [NSAffineTransform transform];
@@ -381,12 +471,12 @@ static NSImage *branchImage;
     icnBounds.origin.y = (frameRect.size.height - iconSize) / 2;
     icnBounds = NSIntegralRect(icnBounds);
 
-    icnPoint.x = floor((frameRect.size.width - sz.width) / 2);
-    icnPoint.y = floor((frameRect.size.height - sz.height) / 2);
+    icnPoint.x = rintf((frameRect.size.width - sz.width) / 2);
+    icnPoint.y = rintf((frameRect.size.height - sz.height) / 2);
   } 
     
   brImgBounds.origin.x = frameRect.size.width - ARROW_ORIGIN_X;
-  brImgBounds.origin.y = ceil(icnBounds.origin.y + (icnBounds.size.height / 2) - (BRANCH_SIZE / 2));
+  brImgBounds.origin.y = rintf(icnBounds.origin.y + (icnBounds.size.height / 2) - (BRANCH_SIZE / 2));
   brImgBounds = NSIntegralRect(brImgBounds);
   
   [self setNeedsDisplay: YES]; 
@@ -568,6 +658,10 @@ static NSImage *branchImage;
       NSFrameRect(labelRect);
       NSRectFill(labelRect);  
       [label drawWithFrame: labelRect inView: self];
+      
+      if ((showType != FSNInfoNameType) && [[infolabel stringValue] length]) {
+        [infolabel drawWithFrame: infoRect inView: self];
+      }
     }
   } else {
     if ((icnPosition != NSImageOnly) && (nameEdited == NO)) {
@@ -575,6 +669,10 @@ static NSImage *branchImage;
       NSFrameRect(labelRect);
       NSRectFill(labelRect);
       [label drawWithFrame: labelRect inView: self];
+      
+      if ((showType != FSNInfoNameType) && [[infolabel stringValue] length]) {
+        [infolabel drawWithFrame: infoRect inView: self];
+      }
     }  
   }
 
@@ -619,16 +717,10 @@ static NSImage *branchImage;
       
     ASSIGN (hostname, hname);
   } 
-
-  if ((showType == FSNInfoExtendedType) && (extInfoType != nil)) {
-    if ([self setExtendedShowType: extInfoType] == NO) {
-      showType = FSNInfoNameType;
-      [self setNodeInfoShowType: showType];  
-    }
+  
+  if (extInfoType) {
+    [self setExtendedShowType: extInfoType];
   } else {
-    if (showType == FSNInfoExtendedType) {
-      showType = FSNInfoNameType;
-    }
     [self setNodeInfoShowType: showType];  
   }
   
@@ -640,13 +732,13 @@ static NSImage *branchImage;
    nodeInfoType:(FSNInfoType)type
    extendedType:(NSString *)exttype
 {
-  showType = type;
-  
-  if (exttype) {
-    ASSIGN (extInfoType, exttype);
-  }
-
   [self setNode: anode];
+
+  if (exttype) {
+    [self setExtendedShowType: exttype];
+  } else {
+    [self setNodeInfoShowType: type];  
+  }
 }
 
 - (FSNode *)node
@@ -665,8 +757,10 @@ static NSImage *branchImage;
   ASSIGN (icon, [FSNodeRep multipleSelectionIconOfSize: iconSize]);
   drawicon = icon;
   DESTROY (openicon);
+  
   [label setStringValue: selectionTitle];
-
+  [infolabel setStringValue: @""];
+  
   [self setLocked: NO];
   for (i = 0; i < [selnodes count]; i++) {
     if ([FSNodeRep isNodeLocked: [selnodes objectAtIndex: i]]) {
@@ -706,9 +800,32 @@ static NSImage *branchImage;
 
 - (void)setFont:(NSFont *)fontObj
 {
+  NSFontManager *fmanager = [NSFontManager sharedFontManager];
+  int lblmargin = [FSNodeRep labelMargin];
+  NSFont *infoFont;
+
   [label setFont: fontObj];
-  labelRect.size.width = ceil([label uncuttedTitleLenght] + [FSNodeRep labelMargin]);
-  labelRect.size.height = floor([[label font] defaultLineHeightForFont]);
+
+  infoFont = [fmanager convertFont: fontObj 
+                            toSize: ([fontObj pointSize] - 2)];
+  infoFont = [fmanager convertFont: infoFont 
+                       toHaveTrait: NSItalicFontMask];
+
+  [infolabel setFont: infoFont];
+
+  labelRect.size.width = rintf([label uncuttedTitleLenght] + lblmargin);
+  labelRect.size.height = rintf([[label font] defaultLineHeightForFont]);
+  labelRect = NSIntegralRect(labelRect);
+
+  infoRect = NSZeroRect;
+  if ((showType != FSNInfoNameType) && [[infolabel stringValue] length]) {
+    infoRect.size.width = [infolabel uncuttedTitleLenght] + lblmargin;
+  } else {
+    infoRect.size.width = labelRect.size.width;
+  }
+  infoRect.size.height = [infoFont defaultLineHeightForFont];
+  infoRect = NSIntegralRect(infoRect);
+
   [self tile];
 }
 
@@ -720,6 +837,7 @@ static NSImage *branchImage;
 - (void)setLabelTextColor:(NSColor *)acolor
 {
   [label setTextColor: acolor];
+  [infolabel setTextColor: acolor];
 }
 
 - (NSColor *)labelTextColor
@@ -738,8 +856,8 @@ static NSImage *branchImage;
   }
   drawicon = icon;
   DESTROY (openicon);
-  hlightRect.size.width = ceil(iconSize / 3 * 4);
-  hlightRect.size.height = ceil(hlightRect.size.width * [FSNodeRep highlightHeightFactor]);
+  hlightRect.size.width = rintf(iconSize / 3 * 4);
+  hlightRect.size.height = rintf(hlightRect.size.width * [FSNodeRep highlightHeightFactor]);
   if ((hlightRect.size.height - iconSize) < 4) {
     hlightRect.size.height = iconSize + 4;
   }
@@ -760,8 +878,10 @@ static NSImage *branchImage;
 
   if (icnPosition == NSImageLeft) {
     [label setAlignment: NSLeftTextAlignment];
+    [infolabel setAlignment: NSLeftTextAlignment];
   } else if (icnPosition == NSImageAbove) {
     [label setAlignment: NSCenterTextAlignment];
+    [infolabel setAlignment: NSCenterTextAlignment];
   } 
   
   [self tile];
@@ -779,63 +899,51 @@ static NSImage *branchImage;
 
 - (void)setNodeInfoShowType:(FSNInfoType)type
 {
-  if (showType == FSNInfoExtendedType) {
-    NSFontManager *fmanager = [NSFontManager sharedFontManager];
-    NSFont *font = [fmanager convertFont: [label font] 
-                          toNotHaveTrait: NSItalicFontMask];
-    [label setFont: font];
-  }
-  
   showType = type;
   DESTROY (extInfoType);
 
   if (selection) {
     [label setStringValue: selectionTitle];
+    [infolabel setStringValue: @""];
     return;
   }
-  
+   
+  [label setStringValue: (hostname ? hostname : [node name])];
+   
   switch(showType) {
     case FSNInfoNameType:
-      [label setStringValue: (hostname ? hostname : [node name])];
+      [infolabel setStringValue: @""];
       break;
     case FSNInfoKindType:
-      [label setStringValue: [node typeDescription]];
+      [infolabel setStringValue: [node typeDescription]];
       break;
     case FSNInfoDateType:
-      [label setStringValue: [node modDateDescription]];
+      [infolabel setStringValue: [node modDateDescription]];
       break;
     case FSNInfoSizeType:
-      [label setStringValue: [node sizeDescription]];
+      [infolabel setStringValue: [node sizeDescription]];
       break;
     case FSNInfoOwnerType:
-      [label setStringValue: [node owner]];
+      [infolabel setStringValue: [node owner]];
       break;
     default:
-      [label setStringValue: [node name]];
+      [infolabel setStringValue: @""];
       break;
   }
 }
 
 - (BOOL)setExtendedShowType:(NSString *)type
 {
+  ASSIGN (extInfoType, type);
+  showType = FSNInfoExtendedType;   
+
+  [self setNodeInfoShowType: showType];
+
   if (selection == nil) {
     NSDictionary *info = [FSNodeRep extendedInfoOfType: type forNode: node];
 
     if (info) {
-      NSString *labelstr = [info objectForKey: @"labelstr"];
-    
-      [label setStringValue: labelstr]; 
-    
-      if (showType != FSNInfoExtendedType) {
-        NSFontManager *fmanager = [NSFontManager sharedFontManager];
-        NSFont *font = [fmanager convertFont: [label font] 
-                                 toHaveTrait: NSItalicFontMask];
-        [label setFont: font];
-      }
-    
-      showType = FSNInfoExtendedType;   
-      ASSIGN (extInfoType, type);
-      
+      [infolabel setStringValue: [info objectForKey: @"labelstr"]]; 
       return YES;
     }
   }
@@ -896,6 +1004,9 @@ static NSImage *branchImage;
 	isLocked = value;
 	[label setTextColor: (isLocked ? [container disabledTextColor] 
                                             : [container textColor])];
+	[infolabel setTextColor: (isLocked ? [container disabledTextColor] 
+                                            : [container textColor])];
+                                                
 	[self setNeedsDisplay: YES];		
 }
 

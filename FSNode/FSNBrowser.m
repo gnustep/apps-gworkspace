@@ -387,7 +387,8 @@
 {
   if (selection && [selection count]) {
     FSNBrowserColumn *bc;
-
+    NSArray *selPaths;
+    
     updateViewsLock++;
 
     [self showSubnode: [selection objectAtIndex: 0]];
@@ -411,7 +412,11 @@
     updateViewsLock--;
     [self tile];
 
-    [self notifySelectionChange: [bc selectedPaths]];
+    selPaths = [bc selectedPaths];
+    if (selPaths == nil) {
+      selPaths = [NSArray arrayWithObject: [[bc shownNode] path]];
+    }
+    [self notifySelectionChange: selPaths];
   }
 }
 
@@ -420,6 +425,7 @@
   if (selpaths && [selpaths count]) {
     FSNode *node = [FSNode nodeWithRelativePath: [selpaths objectAtIndex: 0] parent: nil];      
     FSNBrowserColumn *bc;
+    NSArray *selPaths;
 
     updateViewsLock++;
 
@@ -442,7 +448,11 @@
     updateViewsLock--;
     [self tile];
 
-    [self notifySelectionChange: [bc selectedPaths]];
+    selPaths = [bc selectedPaths];
+    if (selPaths == nil) {
+      selPaths = [NSArray arrayWithObject: [[bc shownNode] path]];
+    }
+    [self notifySelectionChange: selPaths];
   }
 }
 
@@ -503,7 +513,6 @@
 
 - (void)addFillingColumn 
 {
-  FSNBrowserColumn *bc;
   int i;
 			
   if (lastColumnLoaded + 1 >= [columns count]) {
@@ -511,12 +520,6 @@
 	} else {
     i = lastColumnLoaded + 1;
 	}
-
-  bc = [columns objectAtIndex: i];
-  bc = [self columnBeforeColumn: bc];
-  if (bc && [bc isLoaded]) {
-    [bc setLeaf: YES];
-  } 
         
   updateViewsLock++;
   [self setLastColumn: i];
@@ -649,16 +652,15 @@
     if (index < firstVisibleColumn) {
       [self scrollColumnToVisible: index];      
     }
+    
+    [[self window] makeFirstResponder: [col cmatrix]];
 
     if (selection) {
       [self notifySelectionChange: selection];	
 
     } else {
       FSNode *node = [col shownNode];
-
-      if (node) {
-        [self notifySelectionChange: [NSArray arrayWithObject: [node path]]];
-      }
+      [self notifySelectionChange: [NSArray arrayWithObject: [node path]]];
     }
   }
 }
@@ -944,24 +946,10 @@
 
 - (FSNode *)nodeOfLastColumn
 {
-  int i;
-  
-  for (i = 0; i < [columns count]; i++) {
-    FSNBrowserColumn *col = [columns objectAtIndex: i];
-  
-    if ([col isLeaf]) {
-      FSNode *node = [col shownNode];
-    
-      if ([node isDirectory]) {	
-        if ([node isPackage] == NO) {
-          return node;                  
-        } else if (i > 0) {
-          return [[columns objectAtIndex: i-1] shownNode];      
-        }        
-      } else if (i > 0) {
-        return [[columns objectAtIndex: i-1] shownNode];   
-      }
-    }
+  FSNBrowserColumn *col = [self lastLoadedColumn];
+
+  if (col) {
+    return [col shownNode];
   }
   
   return nil;
@@ -1080,7 +1068,7 @@
   for (i = [columns count] - 1; i >= 0; i--) {
     FSNBrowserColumn *col = [columns objectAtIndex: i];
   
-    if ([col isLoaded] && [col isLeaf]) {
+    if ([col isLoaded]) {
       return col;        
     }
   }
@@ -1675,7 +1663,6 @@
   FSNBrowserColumn *bc = [self lastLoadedColumn];
   
   if (bc) {
-    [bc setLeaf: YES];
     [[bc cmatrix] deselectAllCells];
   }
 }

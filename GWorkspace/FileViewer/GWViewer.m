@@ -324,9 +324,8 @@
 
 - (BOOL)isShowingPath:(NSString *)apath
 {
-  NSArray *comps = [FSNode pathComponentsFromNode: baseNode 
-                                           toNode: [nodeView shownNode]];
-  return [comps containsObject: apath];
+  FSNode *node = [FSNode nodeWithRelativePath: apath parent: nil];
+  return [self isShowingNode: node];
 }
 
 - (void)reloadNodeContents
@@ -346,6 +345,11 @@
   } else {
     [nodeView unloadFromNode: anode];
   }
+}
+
+- (void)updateShownSelection
+{
+  [pathsView updateLastIcon];
 }
 
 - (GWViewerWindow *)win

@@ -59,6 +59,8 @@
   
   FSNTextCell *label;
   NSRect labelRect;
+  FSNTextCell *infolabel;
+  NSRect infoRect;
   FSNInfoType showType;
 
   unsigned int gridIndex;

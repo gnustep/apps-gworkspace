@@ -150,11 +150,7 @@
 - (void)doClick:(id)sender;
 
 - (void)doDoubleClick:(id)sender;
-                
-- (void)setLeaf:(BOOL)value;                
-                
-- (BOOL)isLeaf;
-                
+                                
 - (NSMatrix *)cmatrix;
                 
 - (int)index;                

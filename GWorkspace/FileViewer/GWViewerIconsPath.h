@@ -77,6 +77,8 @@
 
 - (id)lastIcon;
 
+- (void)updateLastIcon;
+
 - (void)calculateGridSize;
 
 - (void)tile;

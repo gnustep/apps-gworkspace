@@ -241,6 +241,21 @@
   return (count ? [icons objectAtIndex: (count - 1)] : nil);
 }
 
+- (void)updateLastIcon
+{
+  FSNIcon *icon = [self lastIcon];
+  
+  if (icon) {
+    NSArray *selection = [icon selection];
+
+    if (selection) {
+      [icon showSelection: selection];
+    } else {
+      [icon setNode: [icon node]];
+    }
+  }
+}
+
 - (void)calculateGridSize
 {
   NSSize highlightSize = NSZeroSize;
@@ -633,25 +648,6 @@
   [self setNeedsDisplayInRect: [nameEditor frame]];
   [nameEditor setFrame: NSIntegralRect(edrect)];
 }
-
-
-
-
-
-
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// THUMBNAILS
-// RESIZE DELLE COLONNE
-// CUT & PASTE
-//
-// KEYDOWN !!!!!!!!!!!!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-
-
-
-
 
 - (void)controlTextDidEndEditing:(NSNotification *)aNotification
 {

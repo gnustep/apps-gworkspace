@@ -225,7 +225,7 @@
     return [[p2 substringFromIndex: index] pathComponents];
     
   } else if ([secondNode isEqual: firstNode]) {
-    return [NSArray arrayWithObject: [firstNode path]];
+    return [NSArray arrayWithObject: [firstNode name]];
   }
   
   return nil;
