@@ -31,10 +31,10 @@
 #include "FSNFunctions.h"
 #include "GNUstep.h"
 
-#define ICN_H (28.0)
-#define ICN_SIZE (24.0)
-#define ICN_INDT (24.0)
-#define MARGIN (2.0)
+#define ICN_H (28)
+#define ICN_SIZE (24)
+#define ICN_INDT (24)
+#define MARGIN (2)
 
 @implementation ResultsPathsView
 

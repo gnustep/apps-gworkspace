@@ -81,7 +81,7 @@
 }
 
 - (id)initForNode:(FSNode *)anode
-         iconSize:(float)isize
+         iconSize:(int)isize
      iconPosition:(unsigned int)ipos
         gridIndex:(int)gindex
         dndSource:(BOOL)dndsrc

@@ -70,7 +70,7 @@ static NSFont *labelFont = nil;
 }
 
 - (id)initForNode:(FSNode *)anode
-         iconSize:(float)isize
+         iconSize:(int)isize
      iconPosition:(unsigned int)ipos
         gridIndex:(int)gindex
         dndSource:(BOOL)dndsrc
@@ -517,8 +517,8 @@ NSIntegralRect(NSRect aRect)
 {
   icnBounds = NSMakeRect(0, 0, isize, isize);
   ASSIGN (icon, [FSNodeRep iconOfSize: isize forNode: node]);
-  hlightRect.size.width = isize / 3 * 4;
-  hlightRect.size.height = hlightRect.size.width * [FSNodeRep highlightHeightFactor];
+  hlightRect.size.width = ceil(isize / 3 * 4);
+  hlightRect.size.height = ceil(hlightRect.size.width * [FSNodeRep highlightHeightFactor]);
   if ((hlightRect.size.height - isize) < 4) {
     hlightRect.size.height = isize + 4;
   }
