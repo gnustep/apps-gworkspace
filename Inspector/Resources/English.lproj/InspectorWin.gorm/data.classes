@@ -141,20 +141,19 @@
 	    "zoom:",
 	    "closeMainWin:",
 	    "showInfo:",
-	    "okLoginAction:"
+	    "okLoginAction:",
+	    "activateInspector:"
 	);
 	Super = NSObject;
     };
     Inspector = {
 	Actions = (
+	    "activateInspector:"
 	);
 	Outlets = (
 	    win,
-	    topBox,
-	    iconView,
-	    titleField,
-	    viewersBox,
-	    mainBox
+	    popUp,
+	    inspBox
 	);
 	Super = NSObject;
     };

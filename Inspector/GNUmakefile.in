@@ -76,12 +76,14 @@ ifneq ($(FOUNDATION_LIB), apple)
   Inspector_OBJC_FILES = main.m \
                          Functions.m \
                          Inspector.m \
+                         Contents.m \
                          Preferences/InspectorPref.m \
                          Dialogs/StartAppWin.m
 else
   Inspector_OBJC_FILES = main.m \
                          Functions.m \
                          Inspector.m \
+                         Contents.m \
                          Preferences/InspectorPref.m \
                          Dialogs/StartAppWin.m
                          

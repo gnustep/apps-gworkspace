@@ -185,7 +185,7 @@
 
 - (void)stopReading
 {
-  [NSThread exit];
+ // [NSThread exit];
 }
 
 @end

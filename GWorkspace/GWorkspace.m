@@ -1596,9 +1596,11 @@ NSLocalizedString(@"OK", @""), nil, nil); \
                           
                           
     if (inspector && useInspector) {
-      if ([selectedPaths count] == 1) {
-        [inspector showContentsAt: [selectedPaths objectAtIndex: 0]];
-      }
+//      if ([selectedPaths count] == 1) {
+//        [inspector showContentsAt: [selectedPaths objectAtIndex: 0]];
+//      }
+
+      [inspector setPaths: selectedPaths];
     }
     
     

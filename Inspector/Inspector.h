@@ -1,4 +1,4 @@
-/* GWNet.h
+/* Inspector.h
  *  
  * Copyright (C) 2004 Free Software Foundation, Inc.
  *
@@ -29,6 +29,9 @@
 
 @class StartAppWin;
 @class InspectorPref;
+@class Attributes;
+@class Contents;
+@class Tools;
 
 @protocol	FSWClientProtocol
 
@@ -54,28 +57,17 @@
 @interface Inspector : NSObject <FSWClientProtocol>
 {
   IBOutlet id win;
-  IBOutlet id topBox;
-  IBOutlet id iconView;
-  IBOutlet id titleField;
-  IBOutlet id viewersBox;  
+  IBOutlet id popUp;
+  IBOutlet id inspBox;
 
-  NSMutableArray *searchPaths;
-  NSString *userDir;
-  NSString *disabledDir;
-  
-  NSView *noContsView;
-  NSView *genericView;
-  NSTextField *genericField;
+  NSMutableArray *inspectors;
+	id currentInspector;
+  Contents *contents;
 
-	NSMutableArray *viewers;
-  id currentViewer;
-  unsigned long viewerTmpRef;
-  
-  NSConnection *conn;
+	NSArray *currentPaths;
 
   id fswatcher;
   BOOL fswnotifications;
-  NSString *currentPath;
   
   InspectorPref *preferences;
   StartAppWin *startAppWin;
@@ -87,31 +79,20 @@
 
 + (Inspector *)inspector;
 
-- (void)addViewersFromBundlePaths:(NSArray *)bundlesPaths 
-                      userViewers:(BOOL)isuservwr;
+- (void)setPaths:(NSArray *)paths;
 
-- (NSMutableArray *)bundlesWithExtension:(NSString *)extension 
-																	inPath:(NSString *)path;
+- (IBAction)activateInspector:(id)sender;
 
-- (void)addViewer:(id)vwr;
+- (NSWindow *)inspWin;
 
-- (void)removeViewer:(id)vwr;
-
-- (void)disableViewer:(id)vwr;
-
-- (BOOL)saveExternalViewer:(id)vwr 
-                  withName:(NSString *)vwrname;
-
-- (id)viewerWithBundlePath:(NSString *)path;
-
-- (id)viewerWithWindowName:(NSString *)wname;
-
-- (id)viewerForPath:(NSString *)path;
-
-- (id)viewerForDataOfType:(NSString *)type;
+- (InspectorPref *)preferences;
 
 - (void)updateDefaults;
 
+
+//
+// FSWatcher methods 
+//
 - (void)connectFSWatcher;
 
 - (void)fswatcherConnectionDidDie:(NSNotification *)notif;
@@ -120,21 +101,21 @@
 
 - (void)removeWatcherForPath:(NSString *)path;
 
-- (void)addExternalViewerWithBundleData:(NSData *)bundleData;
 
-- (void)addExternalViewerWithBundlePath:(NSString *)path;
-
-- (void)showContentsAt:(NSString *)path;
-
-- (void)contentsReadyAt:(NSString *)path;
-
+//
+// Contents Inspector methods 
+//
 - (BOOL)canDisplayDataOfType:(NSString *)type;
 
 - (void)showData:(NSData *)data 
           ofType:(NSString *)type;
 
-- (void)dataContentsReadyForType:(NSString *)typeDescr
-                         useIcon:(NSImage *)icon;
+- (id)contentViewerWithWindowName:(NSString *)wname;
+
+- (void)disableContentViewer:(id)vwr;
+
+- (BOOL)saveExternalContentViewer:(id)vwr 
+                         withName:(NSString *)vwrname;
 
 
 //
@@ -149,20 +130,6 @@
 #ifndef GNUSTEP
 - (void)terminate:(id)sender;
 #endif
-
-@end
-
-
-@interface Inspector (PackedBundles)
-
-- (NSData *)dataRepresentationAtPath:(NSString *)path;
-
-- (BOOL)writeDataRepresentation:(NSData *)data 
-                         toPath:(NSString *)path;
-
-- (NSString *)tempBundleName;
-
-- (id)viewerFromPackedBundle:(NSData *)packedBundle;
 
 @end
 

@@ -203,7 +203,7 @@ static NSString *nibName = @"PreferencesWin";
 {
   while ([matrix cells] && [[matrix cells] count]) {
     NSString *name = [[[matrix cells] objectAtIndex: 0] stringValue];
-    id viewer = [inspector viewerWithWindowName: name];  
+    id viewer = [inspector contentViewerWithWindowName: name];  
     [self removeViewer: viewer];
   }
 }
@@ -211,7 +211,7 @@ static NSString *nibName = @"PreferencesWin";
 - (void)matrixAction:(id)sender
 {
   id vname = [[matrix selectedCell] stringValue];
-  id viewer = [inspector viewerWithWindowName: vname];
+  id viewer = [inspector contentViewerWithWindowName: vname];
   
   if (viewer) {
     NSString *str;
@@ -237,11 +237,11 @@ static NSString *nibName = @"PreferencesWin";
 - (IBAction)buttonAction:(id)sender
 {
   id vname = [[matrix selectedCell] stringValue];
-  id viewer = [inspector viewerWithWindowName: vname];  
+  id viewer = [inspector contentViewerWithWindowName: vname];  
 
   if (viewer) {
     if (savemode == NO) {
-      [inspector disableViewer: viewer];
+      [inspector disableContentViewer: viewer];
       
     } else {
       if (sender == cancelButt) {
@@ -251,7 +251,7 @@ static NSString *nibName = @"PreferencesWin";
         NSString *newname = [nameField stringValue];
 
         if ([newname length]) {
-          if ([inspector saveExternalViewer: viewer withName: newname]) {
+          if ([inspector saveExternalContentViewer: viewer withName: newname]) {
             [self removeViewer: viewer];
             [nameField setStringValue: @""];
           }
