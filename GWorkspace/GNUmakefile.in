@@ -157,7 +157,6 @@ ifneq ($(FOUNDATION_LIB), apple)
   Inspectors/Tools.m \
   Inspectors/Permissions.m \
   Inspectors/TimeDateView.m \
-  Inspectors/GenericContsView.m \
   Apps/Apps.m \
   Finder/FinderShelf.m \
   Finder/FinderShelfIcon.m \
@@ -205,7 +204,6 @@ else
   Inspectors/Tools.m \
   Inspectors/Permissions.m \
   Inspectors/TimeDateView.m \
-  Inspectors/GenericContsView.m \
   Apps/Apps.m \
   Finder/FinderShelf.m \
   Finder/FinderShelfIcon.m \

@@ -36,7 +36,6 @@
 #include <GWorkspace/ContentViewersProtocol.h>
   #endif
 #include "Contents.h"
-#include "GenericContsView.h"
 #include "GWorkspace.h"
 #include "GNUstep.h"
 
@@ -51,7 +50,6 @@ static NSString *nibName = @"ContentsPanel";
   TEST_RELEASE (searchPaths);
 	TEST_RELEASE (insppaths);
 	TEST_RELEASE (currentPath);
-	TEST_RELEASE (genericContsView);
   TEST_RELEASE (genericView);
   TEST_RELEASE (noContsView);
 	TEST_RELEASE (viewers);
@@ -141,15 +139,9 @@ static NSString *nibName = @"ContentsPanel";
       }
 
       genericView = [[NSView alloc] initWithFrame: NSMakeRect(0, 0, 257, 245)];		
-      genericContsView = [[GenericContsView alloc] initWithFrame: NSMakeRect(2, 80, 253, 90)];
-      [genericContsView setMinSize: [genericContsView frame].size];
-      [genericContsView setMaxSize: [genericContsView frame].size];
-      [genericContsView setSelectable: YES];
-      [genericContsView setVerticallyResizable: NO];
-      [genericContsView setHorizontallyResizable: NO];
-      [[genericContsView textContainer] setContainerSize: [genericContsView frame].size];
-
-      [genericView addSubview: genericContsView];
+      MAKE_LABEL (genericField, NSMakeRect(2, 103, 255, 65), nil, 'c', YES, genericView);		  
+      [genericField setFont: [NSFont systemFontOfSize: 18]];
+      [genericField setTextColor: [NSColor grayColor]];				
 
       noContsView = [[NSView alloc] initWithFrame: NSMakeRect(0, 0, 257, 245)];
       MAKE_LOCALIZED_LABEL (label, NSMakeRect(2, 103, 255, 65), @"No Contents Inspector\nFor Multiple Selection", @"", 'c', YES, noContsView);		  
@@ -309,8 +301,24 @@ static NSString *nibName = @"ContentsPanel";
       [(NSBox *)vwrsBox setContentView: viewer];
 			[viewer activateForPath: currentPath];
 		} else {		
+      NSString *appName, *type;
+      
+      [ws getInfoForFile: [insppaths objectAtIndex: 0] 
+             application: &appName type: &type];
+      
       currentViewer = nil;
-			[genericContsView findContentsAtPath: [insppaths objectAtIndex: 0]];
+      
+      if (type == NSPlainFileType) {
+        NSDictionary *attributes = [fm fileAttributesAtPath: [insppaths objectAtIndex: 0] 
+                                               traverseLink: NO];
+        NSString *fmtype = [attributes fileType];                                       
+        
+        if (fmtype != NSFileTypeRegular) {
+          type = fmtype;
+        }
+      }
+      
+      [genericField setStringValue: type];
       [(NSBox *)vwrsBox setContentView: genericView];
 			winName = NSLocalizedString(@"Contents Inspector", @"");
 		}
