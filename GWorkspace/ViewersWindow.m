@@ -938,6 +938,36 @@ if (rct.size.height < 0) rct.size.height = 0; \
 	[viewer selectAll];
 }
 
+- (void)miniaturize:(id)sender
+{
+  if (selectedPaths && [selectedPaths count]) {
+    if ([selectedPaths count] == 1) {
+      NSString *path = [selectedPaths objectAtIndex: 0];
+      NSString *defApp, *type;
+    
+	    [[NSWorkspace sharedWorkspace] getInfoForFile: path 
+															          application: &defApp 
+																		           type: &type]; 
+      [self setMiniwindowImage: [GWLib iconForFile: path ofType: type]];
+      [self setMiniwindowTitle: [path lastPathComponent]];
+    } else {
+      NSString *minititle = [NSString stringWithFormat: @"%i %@", 
+                    [selectedPaths count], NSLocalizedString(@"elements", @"")];
+      
+      [self setMiniwindowTitle: minititle];
+      [self setMiniwindowImage: [NSImage imageNamed: @"MultipleSelection.tiff"]];
+    }
+  }
+  
+  [super miniaturize: sender];
+}
+
+- (void)deminiaturize:(id)sender
+{
+  [super deminiaturize: sender];
+  [self setMiniwindowImage: [viewer miniicon]];
+}
+
 - (void)print:(id)sender
 {
 	[super print: sender];

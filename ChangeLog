@@ -1,7 +1,10 @@
 2003-10-15 Enrico Sersale  <enrico@imago.ro>
+
+  * now the miniwindow icons reflect current directory icon 
+    instead of view type.
   
   * a new root viewer created has now the same shelf content of the first one.
-
+ 
 2003-10-14 Enrico Sersale  <enrico@imago.ro>
   
   * Info->Preferences->Hidden files
