@@ -274,6 +274,8 @@
 
 - (void)thumbnailsDidChange:(NSNotification *)notif;
 
+- (void)applicationForExtensionsDidChange:(NSNotification *)notif;
+
 - (void)connectFSWatcher;
 
 - (void)fswatcherConnectionDidDie:(NSNotification *)notif;

@@ -227,7 +227,7 @@ static NSString *nibName = @"Tools";
     if ([extensions containsObject: ext] == NO) { 
 		  NSDictionary *extinfo = [ws infoForExtension: ext];
 			
-      if (extinfo != nil) {
+      if (extinfo) {
 		    NSMutableArray *appsnames = [NSMutableArray arrayWithCapacity: 1];
 				[appsnames addObjectsFromArray: [extinfo allKeys]];
         [extensionsAndApps setObject: appsnames forKey: ext];
@@ -372,6 +372,7 @@ static NSString *nibName = @"Tools";
 - (IBAction)setDefaultApplication:(id)sender
 {
   NSString *ext, *app;
+  NSDictionary *changedInfo;
   NSArray *cells;
   NSMutableArray *newApps;
   id cell;
@@ -380,8 +381,17 @@ static NSString *nibName = @"Tools";
   
   for (i = 0; i < [extensions count]; i++) {
     ext = [extensions objectAtIndex: i];  		
-    [ws setBestApp: currentApp inRole: nil forExtension: ext];    
+    [ws setBestApp: currentApp inRole: nil forExtension: ext];  
   }
+
+  changedInfo = [NSDictionary dictionaryWithObjectsAndKeys: 
+                                                  currentApp, @"app", 
+                                                  extensions, @"exts", nil];
+  
+	[[NSDistributedNotificationCenter defaultCenter]
+ 				   postNotificationName: @"GWAppForExtensionDidChangeNotification"
+	 								       object: nil
+                       userInfo: changedInfo];  
   
   newApps = [NSMutableArray arrayWithCapacity: 1];
   [newApps addObject: currentApp];
@@ -398,12 +408,12 @@ static NSString *nibName = @"Tools";
 	[matrix renewRows: 1 columns: count];
   
   for (i = 0; i < count; i++) {
+		cell = [matrix cellAtRow: 0 column: i];
 		app = [newApps objectAtIndex: i];
+		[cell setTitle: app];
     app = [ws fullPathForApplication: app];
     icon = [ws iconForFile: app];
     CHECK_ICON_SIZE (icon);
-		cell = [matrix cellAtRow: 0 column: i];
-		[cell setTitle: app];
 		[cell setImage: icon];
 	}
 

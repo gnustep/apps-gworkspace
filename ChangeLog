@@ -1,4 +1,10 @@
 
+2004-02-29 Enrico Sersale  <enrico@imago.ro>
+  
+  * Inspector
+    new application that takes the place of the Inspectors Panel.
+    GWorkspace/Inspectors/* removed.
+
 2004-02-07 Enrico Sersale  <enrico@imago.ro>
   
   * Utilities/thumbnailer/ImageThumbnailer/ImageThumbnailer.

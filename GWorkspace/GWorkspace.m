@@ -736,6 +736,11 @@ return [ws openFile: fullPath withApplication: appName]
                         selector: @selector(thumbnailsDidChange:) 
                 					  name: GWThumbnailsDidChangeNotification
                 					object: nil];
+
+  [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
+                        selector: @selector(applicationForExtensionsDidChange:) 
+                					  name: @"GWAppForExtensionDidChangeNotification"
+                					object: nil];
 }
 
 - (BOOL)applicationShouldTerminate:(NSApplication *)app 
@@ -1916,6 +1921,20 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 		    [finder updateIcons]; 
 	    }
     }
+  }
+}
+
+- (void)applicationForExtensionsDidChange:(NSNotification *)notif
+{
+  NSDictionary *changedInfo = [notif userInfo];
+  NSString *app = [changedInfo objectForKey: @"app"];
+  NSArray *extensions = [changedInfo objectForKey: @"exts"];
+  int i;
+
+  for (i = 0; i < [extensions count]; i++) {
+    [[NSWorkspace sharedWorkspace] setBestApp: app
+                                       inRole: nil 
+                                 forExtension: [extensions objectAtIndex: i]];  
   }
 }
 
