@@ -1,5 +1,13 @@
 2003-10-16 Enrico Sersale  <enrico@imago.ro>
 
+  * Utilities/thumbnailer/thumbnailerInfo.plist
+    moved "Make thumbnail(s)" and "Remove thumbnail(s)" in a submenu.
+    they are now "Thumbnails/Make thumbnail(s)" and "Thumbnails/Remove thumbnail(s)".
+    German translation by Martin Brecher <martin@mb-itconsulting.com>.
+
+  * GWorkspace/Resources/German.lproj
+    updated German Localized.strings (by Martin Brecher <martin@mb-itconsulting.com>)
+
   * ContentViewers/AppViewer/AppViewer.m
     shows also the extensions.
 

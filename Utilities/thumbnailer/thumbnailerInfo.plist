@@ -4,9 +4,10 @@
       NSMessage = makeThumbnail;
       NSSendTypes=(NSFilenamesPboardType);
       NSMenuItem = { 
-	      default = "Make thumbnail(s)";
-	      English = "Make thumbnail(s)";
-	      Italian = "Crea thumbnail";
+	      default = "Thumbnails/Make thumbnail(s)";
+	      English = "Thumbnails/Make thumbnail(s)";
+	      Italian = "Thumbnails/Crea thumbnail";
+              German =  "Thumbnails/Thumbnail(s) anlegen";
       };
     },
     {
@@ -14,9 +15,10 @@
       NSMessage = removeThumbnail;
       NSSendTypes=(NSFilenamesPboardType);
       NSMenuItem = { 
-	      default = "Remove thumbnail(s)";
-	      English = "Remove thumbnail(s)";
-	      Italian = "Rimuovi thumbnail";
+	      default = "Thumbnails/Remove thumbnail(s)";
+	      English = "Thumbnails/Remove thumbnail(s)";
+	      Italian = "Thumbnails/Rimuovi thumbnail";
+              German  = "Thumbnails/Thumbnail(s) entfernen";
       };
     },
     {

@@ -17,6 +17,8 @@
 	"Empty Recycler" = "Recycler entleeren";
 	"Put Away" = "Wiederherstellen";
 	"Print..." = "Drucken...";
+	"Open With..." = "Öffnen mit...";
+	"Run..." = "Ausführen...";
 
 "Edit" = "Bearbeiten";
 	"Cut" = "Ausschneiden";
@@ -27,7 +29,7 @@
 		
 "View" = "Übersicht";
 	"Browser" = "Browser";
-	"Icon" = "Symbol";
+	"Icon" = "Symbole";
 	"Small Icon" = "Kleine Symbole";
 		
 "Tools" = "Werkzeuge";
@@ -39,10 +41,13 @@
 		"Tools" = "Werkzeuge";	
 		"Permissions" = "Dateirechte";	
 	"History" = "Verlauf";
+		"Show History" = "Verlauf anzeigen";
 		"Go backward" = "Zurück";
 		"Go forward" = "Vorwärts";
 	"Finder" = "Dateisuche";
-	"Processes..." = "Prozesse...";
+	/*"Processes..." = "Prozesse..."; */
+	"Applications..." = "Anwendungen...";
+	"File Operations..." = "Dateioperationen...";
 	"Fiend" = "Fiend";
 		"Show Fiend" = "Fiend anzeigen";
 		"Hide Fiend" = "Fiend ausblenden";
@@ -50,6 +55,12 @@
 		"Remove Current Layer" = "Aktuelle Schicht entfernen";
 		"Rename Current Layer" = "Aktuelle Schicht umbenennen";
 		"Layers" = "Schichten";
+	"Tabbed Shelf" = "Tabbed Shelf";
+		"Show Tabbed Shelf" = "Tabbed Shelf anzeigen";
+		"Hide Tabbed Shelf" = "Tabbed Shelf ausblenden";
+		"Remove Current Tab" = "Aktuellen Tab entfernen";
+		"Rename Current Tab" = "Aktuellen Tab umbenennen";
+		"Add Tab..." = "Tab hinzufügen...";
 	"DeskTop Shelf" = "Desktop Shelf";	
 	"XTerm" = "XTerm";
 	
@@ -70,6 +81,7 @@
 
 /* GWorkspace.m */
 
+"Author" = "Autor";
 "GNUstep Workspace Manager" = "GNUstep Workspace Manager";
 "See http://www.gnustep.it/enrico/gworkspace" = "Siehe http://www.gnustep.it/enrico/gworkspace";
 "Released under the GNU General Public License 2.0" = "Veröffentlicht unter der GNU General Public License 2.0";
@@ -272,8 +284,8 @@ which ends in "kann <the file> nicht umbenennen"
 
 /* BackWinPreferences.m */       
 
-"DeskTop Shelf" = "Desktop Shelf";	
-"DeskTop Color" = "Desktop-Farbe";
+"Desktop Shelf" = "Desktop Shelf";	
+"Desktop Color" = "Desktop-Farbe";
 "red" = "rot";
 "green" = "grün";
 "blue" = "blau";
@@ -282,11 +294,13 @@ which ends in "kann <the file> nicht umbenennen"
   "Klicken Sie den \"Bild setzen\"-Button,\num Ihr Desktop-Bild zu setzen.\nDas Bild muss die gleiche\nGröße wie Ihr Bildschirm haben.";
 "Set Image" = "Bild setzen";
 "Unset Image" = "Bild aufheben";
-
+"Activate desktop" = "Desktop aktivieren";
 	
 /* DefaultXTerm.m */             
 	
 "Set" = "Setzen";	
+"xterm" = "xterm";
+"arguments" = "Argumente";
 
 	
 /* BrowserViewsPreferences.m */  
@@ -308,6 +322,7 @@ which ends in "kann <the file> nicht umbenennen"
 /* ShelfPreferences.m */
 	
 "Shelf" = "Shelf";
+"Default" = "Standard";
 	
 	
 /* DefaultEditor.m */            
@@ -315,11 +330,46 @@ which ends in "kann <the file> nicht umbenennen"
 "Default Editor" = "Standard-Editor";
 "No Default Editor" = "Kein Standard-Editor";
 "Choose..." = "Auswählen...";
-
+"Choose" = "Auswählen";
 
 /* IconViewsPreferences.m */
 
 "Title Width" = "Titelbreite";
 "Icon View" = "Symbolansicht";
 
+/* Sorting order */
+"Sorting Order" = "Sortierreihenfolge";
+"Sort by" = "Sortieren nach";
+"This sort method will apply to all the folders\nthat have no sorting order specified" = "Diese Sortiermethode gilt für alle Ordner, für die\nkeine Reihenfolge festgelegt ist";
+
+/* File Operations */
+"File Operations" = "Dateioperationen";
+"Status Window" = "Statusfenster";
+"Confirmation" = "Bestätigung";
+"Show status window" = "Statusfenster zeigen";
+"Check this option to show a status window\nduring the file operations" = "Setze diese Option, um ein Statusfenster\nwährend Dateioperationen zu zeigen";
+
+/* Icons */
+
+"Icons" = "Symbole";
+"Thumbnails" = "Thumbnails";
+"use thumbnails" = "Thumbnails verwenden";
+"Animate icons" = "Symbole animieren";
+"when changing a path" = "beim Pfadwechsel";
+"when opening a file" = "beim Dateiöffnen";
+"sliding back after file operation" = "Nach Dateioperation zurückrutschen";
+"Activate changes" = "Änderungen aktivieren";
+
+/* Hidden Files */
+"Hidden Files" = "Versteckte Dateien";
+"Hidden files" = "Versteckte Dateien";
+"Shown files" = "Sichtbare Dateien";
+"Load" = "Laden";
+"Select and move the files to hide or to show" = "Dateien zum zeigen oder verstecken auswählen und verschieben";
+
+/* Browser */
+"Aspect" = "Aspekt";
+"Icons in Browser Cells" = "Symbole in Browserzellen zeigen";
+"Uses Shelf" = "Shelf verwenden";
+"Columns Width" = "Spaltenbreite";
 
