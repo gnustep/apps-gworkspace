@@ -1,6 +1,8 @@
 
 include $(GNUSTEP_MAKEFILES)/common.make
 
+GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
+
 BUNDLE_NAME = ImageThumbnailer
 BUNDLE_EXTENSION = .thumb
 

@@ -39,13 +39,13 @@
 @protocol FindFileProtocol
 
 - (oneway void)findAtPath:(NSString *)apath 
-             withCriteria:(NSDictionary *)crit;
+             withCriteria:(NSString *)crit;
 
 @end 
 
 @protocol FinderProtocol
 
-- (void)registerFindFile:(id<FindFileProtocol>)anObject;
+- (void)registerFindFile:(id)anObject;
 
 - (BOOL)getFoundPath:(NSString *)fpath;
 
