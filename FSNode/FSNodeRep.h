@@ -60,6 +60,8 @@ typedef enum FSNInfoType {
 
 - (BOOL)isLocked;
 
+- (void)setGridIndex:(int)index;
+
 - (int)gridIndex;
 
 - (int)compareAccordingToName:(id)aObject;

@@ -536,6 +536,11 @@ static NSFont *labelFont = nil;
 	return isLocked;
 }
 
+- (void)setGridIndex:(int)index
+{
+  gridIndex = index;
+}
+
 - (int)gridIndex
 {
   return gridIndex;

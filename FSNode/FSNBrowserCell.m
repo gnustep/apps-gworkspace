@@ -361,6 +361,10 @@ static NSDictionary *fontAttr = nil;
 	return isLocked;
 }
 
+- (void)setGridIndex:(int)index
+{
+}
+
 - (int)gridIndex
 {
   return 0;
