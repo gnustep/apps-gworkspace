@@ -1938,9 +1938,14 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 
 	    if (recursion == NO) {
         if (cmd == nil) {
-          cmd = RETAIN ([[NSSearchPathForDirectoriesInDomains(
-                    GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
-                          stringByAppendingPathComponent: @"fswatcher"]);
+          #ifdef GNUSTEP	
+            cmd = RETAIN ([[NSSearchPathForDirectoriesInDomains(
+                      GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
+                            stringByAppendingPathComponent: @"fswatcher"]);
+          #else
+            cmd = @"/usr/local/bin/fswatcher";
+            RETAIN (cmd);
+          #endif
 		    }
       }
 	  

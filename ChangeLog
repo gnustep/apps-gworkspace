@@ -1,3 +1,9 @@
+2004-02-03 Enrico Sersale  <enrico@imago.ro>
+  
+  * configure.ac
+    check for $GNUSTEP_SYSTEM_ROOT to be sure GNUstep.sh has been sourced.
+    (patch by Dennis Leeuw <dleeuw@made-it.com>)
+
 2004-02-02 Enrico Sersale  <enrico@imago.ro>
   
   * Utilities/fswatcher

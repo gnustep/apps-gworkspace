@@ -23,6 +23,7 @@
  */
 
 #include "fswatcher.h"
+#include "GNUstep.h"
 
 #include <stdio.h>
 #include <unistd.h>
