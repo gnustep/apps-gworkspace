@@ -72,7 +72,6 @@
   self = [super init];
     
   if (self) {
-    NSColor *color;
     NSSize size;
     NSCachedImageRep *rep;
 
@@ -107,11 +106,7 @@
     [verticalImage addRepresentation: rep];
     RELEASE (rep);
     
-    color = [NSColor windowBackgroundColor];
-    color = [color colorUsingColorSpaceName: NSDeviceRGBColorSpace];
-    if ([backColor isEqual: color]) {
-      ASSIGN (backColor, DEF_COLOR);
-    }
+    ASSIGN (backColor, DEF_COLOR);
 
     backImageStyle = BackImageCenterStyle;
     [self getDesktopInfo];

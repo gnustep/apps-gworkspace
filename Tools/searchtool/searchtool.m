@@ -26,6 +26,12 @@
 #include <AppKit/AppKit.h>
 #include "FinderModulesProtocol.h"
 
+#define gw_debug 1
+
+#define GWDebugLog(format, args...) \
+  do { if (gw_debug) \
+    NSLog(format , ## args); } while (0)
+
 @protocol	Finder
 
 - (oneway void)registerSearchTool:(id)tool;
@@ -37,11 +43,20 @@
 @end
 
 
+@protocol	DDBd
+
+- (BOOL)dbactive;
+- (NSString *)annotationsForPath:(NSString *)path;
+
+@end
+
+
 @interface SearchTool: NSObject 
 {
   BOOL stopped;  
   BOOL done;
   id finder;
+  id ddbd;
   NSFileManager *fm;
   NSNotificationCenter *nc; 
 }
@@ -62,12 +77,22 @@
 @end
 
 
+@interface SearchTool (ddbd)
+
+- (void)connectDDBd;
+- (void)ddbdConnectionDidDie:(NSNotification *)notif;
+- (NSString *)ddbdGetAnnotationsForPath:(NSString *)path;
+
+@end
+
+
 @implementation	SearchTool
 
 - (void)dealloc
 {
   [nc removeObserver: self];
 	DESTROY (finder);
+  DESTROY (ddbd);
   [super dealloc];
 }
 
@@ -159,7 +184,8 @@
 
       if ([classNames containsObject: className]) {
         NSDictionary *moduleCriteria = [criteria objectForKey: className];
-        id module = [[principalClass alloc] initWithSearchCriteria: moduleCriteria];
+        id module = [[principalClass alloc] initWithSearchCriteria: moduleCriteria
+                                                        searchTool: self];
 
         [modules addObject: module];
         RELEASE (module);  
@@ -279,6 +305,97 @@
   }
   
   return bundleList;
+}
+
+@end
+
+
+@implementation	SearchTool (ddbd)
+
+- (void)connectDDBd
+{
+  if (ddbd == nil) {
+    id db = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
+                                                              host: @""];
+
+    if (db) {
+      NSConnection *c = [db connectionForProxy];
+
+	    [nc addObserver: self
+	           selector: @selector(ddbdConnectionDidDie:)
+		             name: NSConnectionDidDieNotification
+		           object: c];
+      
+      ddbd = db;
+	    [ddbd setProtocolForProxy: @protocol(DDBd)];
+      RETAIN (ddbd);
+      
+      GWDebugLog(@"ddbd connected!");     
+                                         
+	  } else {
+	    static BOOL recursion = NO;
+	    static NSString	*cmd = nil;
+
+	    if (recursion == NO) {
+        if (cmd == nil) {
+            cmd = RETAIN ([[NSSearchPathForDirectoriesInDomains(
+                      GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
+                            stringByAppendingPathComponent: @"ddbd"]);
+		    }
+      }
+	  
+      if (recursion == NO && cmd != nil) {
+        int i;
+        
+	      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
+        DESTROY (cmd);
+        
+        for (i = 1; i <= 40; i++) {
+	        [[NSRunLoop currentRunLoop] runUntilDate:
+		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+                           
+          db = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
+                                                                 host: @""];                  
+          if (db) {
+            break;
+          }
+        }
+        
+	      recursion = YES;
+	      [self connectDDBd];
+	      recursion = NO;
+        
+	    } else { 
+        DESTROY (cmd);
+	      recursion = NO;
+        ddbd = nil;
+        NSLog(@"unable to contact ddbd.");
+      }
+	  }
+  }
+}
+
+- (void)ddbdConnectionDidDie:(NSNotification *)notif
+{
+  id connection = [notif object];
+
+  [nc removeObserver: self
+	              name: NSConnectionDidDieNotification
+	            object: connection];
+
+  NSAssert(connection == [ddbd connectionForProxy],
+		                                  NSInternalInconsistencyException);
+  RELEASE (ddbd);
+  ddbd = nil;
+}
+
+- (NSString *)ddbdGetAnnotationsForPath:(NSString *)path
+{
+  [self connectDDBd];
+  if (ddbd && [ddbd dbactive]) {
+    return [ddbd annotationsForPath: path];
+  }
+  return nil;
 }
 
 @end

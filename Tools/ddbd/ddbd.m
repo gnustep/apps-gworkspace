@@ -107,6 +107,7 @@ BOOL writePaths(void);
 NSMutableDictionary *addPath(NSString *path);
 void removePath(NSString *path);
 void pathUpdated(NSString *path);
+NSTimeInterval timestampOfPath(NSString *path);
 void checkPaths(void);
 void synchronizePaths(void);
 
@@ -348,6 +349,11 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
   setAnnotationsForPath(annotations, path);
 }
 
+- (NSTimeInterval)timestampOfPath:(NSString *)path
+{
+  return timestampOfPath(path);
+}
+
 - (void)connectionBecameInvalid:(NSNotification *)notification
 {
   id connection = [notification object];
@@ -560,7 +566,7 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
 - (void)insertTrees
 {
   NSArray *basePaths = [updinfo objectForKey: @"paths"];
-  int i;
+  unsigned i;
 
   for (i = 0; i < [basePaths count]; i++) {
     CREATE_AUTORELEASE_POOL(arp);
@@ -595,7 +601,7 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
 - (void)removeTrees
 {
   NSArray *basePaths = [updinfo objectForKey: @"paths"];
-  int i, j;
+  unsigned i, j;
   
   for (i = 0; i < [basePaths count]; i++) {  
     CREATE_AUTORELEASE_POOL(arp);
@@ -663,7 +669,7 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
     NSMutableArray *dstpaths = [NSMutableArray array];
     NSArray *keys;
     NSEnumerator *enumerator;
-    int i;
+    unsigned i;
 
     if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
       srcpaths = [NSArray arrayWithObject: source];
@@ -982,7 +988,7 @@ void removeDirectory(NSString *path)
 void checkDirectories()
 {
   NSArray *dirs;
-  int i;
+  unsigned i;
   
   [dirslock lock];
   dirs = [dirsSet allObjects];
@@ -1010,7 +1016,7 @@ void synchronizeDirectories()
   unsigned bufind;
   NSString *path;
   BOOL isdir;
-  int i;
+  unsigned i;
   
   [dirslock lock];
   
@@ -1158,7 +1164,7 @@ BOOL writePaths()
     NSArray *keys = [pathsDict allKeys];
     NSFileHandle *handle = [NSFileHandle fileHandleForWritingAtPath: path];
     dbpath dbp;
-    int i;
+    unsigned i;
 
     for (i = 0; i < [keys count]; i++) {
       CREATE_AUTORELEASE_POOL(pool);
@@ -1220,7 +1226,7 @@ NSMutableDictionary *addPath(NSString *path)
 
     [pathsAddHandle seekToEndOfFile];
     [pathsAddHandle writeData: data];
-//    [pathsAddHandle synchronizeFile];
+    [pathsAddHandle synchronizeFile];
     
     dict = [NSMutableDictionary dictionary];
     
@@ -1262,7 +1268,7 @@ void removePath(NSString *path)
   
     [pathsRmvHandle seekToEndOfFile];
     [pathsRmvHandle writeData: data];
-//    [pathsRmvHandle synchronizeFile];
+    [pathsRmvHandle synchronizeFile];
 
     [pathsDict removeObjectForKey: path];  
   }
@@ -1297,14 +1303,29 @@ void pathUpdated(NSString *path)
 
   [pathsAddHandle seekToEndOfFile];
   [pathsAddHandle writeData: data];
-//  [pathsAddHandle synchronizeFile];
+  [pathsAddHandle synchronizeFile];
   [pathslock unlock];
+}
+
+NSTimeInterval timestampOfPath(NSString *path)
+{
+  NSDictionary *dict;
+  
+  [pathslock lock];
+  dict = [pathsDict objectForKey: path];
+  [pathslock unlock];
+
+  if (dict) {
+    return [[dict objectForKey: @"timestamp"] doubleValue];
+  }
+
+  return 0.0;
 }
 
 void checkPaths()
 {
   NSArray *paths;
-  int i;
+  unsigned i;
   
   [pathslock lock];
   paths = [pathsDict allKeys];
@@ -1331,7 +1352,7 @@ void synchronizePaths()
   NSArray *paths;
   dbpath dbp;
   NSData *data;
-  int i;
+  unsigned i;
   
   [pathslock lock];
   
@@ -1467,7 +1488,9 @@ NSString *annotationsForPath(NSString *path)
   NSDictionary *dict;
   
   [annslock lock];
+  [pathslock lock];
   dict = [pathsDict objectForKey: path];
+  [pathslock unlock];
   
   if (dict) {
     NSNumber *num = [dict objectForKey: @"annoffset"];
@@ -1509,9 +1532,11 @@ void setAnnotationsForPath(NSString *annotations, NSString *path)
   unsigned long long offset;
   const char *buf;
   NSData *data;
-  
+    
   [annslock lock];
+  [pathslock lock];
   dict = [pathsDict objectForKey: path];
+  [pathslock unlock];
   
   if (dict == nil) {
     dict = addPath(path);
@@ -1545,12 +1570,26 @@ void setAnnotationsForPath(NSString *annotations, NSString *path)
   [annsHandle synchronizeFile];
   
   [annslock unlock];
+  
+  if ([path isEqual: path_separator()] == NO) {
+    NSString *parent = [path stringByDeletingLastPathComponent];
+  
+    [pathslock lock];
+    dict = [pathsDict objectForKey: parent];
+    [pathslock unlock];
+  
+    if (dict == nil) {
+      addPath(parent);
+    } else {
+      pathUpdated(parent);
+    }
+  }
 }
 
 NSString *pathForAnnotationsOffset(unsigned long long offset)
 {
   NSArray *paths;
-  int i;
+  unsigned i;
   
   [pathslock lock]; 
   paths = [pathsDict allKeys];  

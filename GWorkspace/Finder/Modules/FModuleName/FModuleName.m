@@ -100,7 +100,12 @@ static NSString *nibName = @"FModuleName";
 	return self;
 }
 
+- (IBAction)popUpAction:(id)sender
+{
+}
+
 - (id)initWithSearchCriteria:(NSDictionary *)criteria
+                  searchTool:(id)tool
 {
 	self = [super init];
 
@@ -110,10 +115,6 @@ static NSString *nibName = @"FModuleName";
   }
   
 	return self;
-}
-
-- (IBAction)popUpAction:(id)sender
-{
 }
 
 - (void)setControlsState:(NSDictionary *)info
@@ -230,9 +231,9 @@ static NSString *nibName = @"FModuleName";
   return NO;
 }
 
-- (BOOL)reliesOnDirModDate
+- (BOOL)metadataModule
 {
-  return YES;
+  return NO;
 }
 
 @end

@@ -1,0 +1,25 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    FModuleAnnotations = {
+	Actions = (
+	    "popUpAction:"
+	);
+	Outlets = (
+	    win,
+	    controlsBox,
+	    textField,
+	    popUp
+	);
+	Super = NSObject;
+    };
+    FirstResponder = {
+	Actions = (
+	    "buttonsAction:",
+	    "newAction:",
+	    "orderFrontFontPanel:",
+	    "popUpAction:",
+	    "startFind:"
+	);
+	Super = NSObject;
+    };
+}

@@ -115,6 +115,10 @@ static NSString *nibName = @"Annotations";
       if (contents) {
         [textView setString: contents];
       } 
+      
+      [okButt setEnabled: YES];
+    } else {
+      [okButt setEnabled: NO];
     }
     
   } else {

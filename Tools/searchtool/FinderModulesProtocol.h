@@ -29,7 +29,8 @@
 
 - (id)initInterface;
 
-- (id)initWithSearchCriteria:(NSDictionary *)criteria;
+- (id)initWithSearchCriteria:(NSDictionary *)criteria
+                  searchTool:(id)tool;
 
 - (void)setControlsState:(NSDictionary *)info;
 
@@ -54,9 +55,16 @@
 
 - (BOOL)reliesOnModDate;
 
-- (BOOL)reliesOnDirModDate;
+- (BOOL)metadataModule;
 
 @end 
+
+
+@protocol	SearchTool
+
+- (NSString *)ddbdGetAnnotationsForPath:(NSString *)path;
+
+@end
 
 #endif // FINDER_MODULES_PROTOCOL_H
 

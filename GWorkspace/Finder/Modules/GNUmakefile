@@ -7,7 +7,8 @@ SUBPROJECTS = \
     FModuleOwner \
     FModuleCrDate \
     FModuleModDate \
-    FModuleContents
+    FModuleContents \
+    FModuleAnnotations
 
 
 -include GNUmakefile.preamble

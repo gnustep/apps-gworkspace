@@ -78,20 +78,7 @@
       desktopApp = [desktopAppClass performSelector: sel];
     }
     
-    defentry = [defaults dictionaryForKey: @"backcolor"];
-    if (defentry) {
-      float red = [[defentry objectForKey: @"red"] floatValue];
-      float green = [[defentry objectForKey: @"green"] floatValue];
-      float blue = [[defentry objectForKey: @"blue"] floatValue];
-      float alpha = [[defentry objectForKey: @"alpha"] floatValue];
-    
-      ASSIGN (backColor, [NSColor colorWithCalibratedRed: red 
-                                                   green: green 
-                                                    blue: blue 
-                                                   alpha: alpha]);
-    } else {
-      ASSIGN (backColor, [[NSColor windowBackgroundColor] colorUsingColorSpaceName: NSDeviceRGBColorSpace]);
-    }
+    ASSIGN (backColor, [NSColor windowBackgroundColor]);
   
     defentry = [defaults objectForKey: @"fsn_info_type"];
     infoType = defentry ? [defentry intValue] : FSNInfoNameType;
@@ -1360,21 +1347,7 @@
   }
 
   if (nodeDict) {
-    id entry = [nodeDict objectForKey: @"backcolor"];
-
-    if (entry) {
-      float red = [[entry objectForKey: @"red"] floatValue];
-      float green = [[entry objectForKey: @"green"] floatValue];
-      float blue = [[entry objectForKey: @"blue"] floatValue];
-      float alpha = [[entry objectForKey: @"alpha"] floatValue];
-
-      ASSIGN (backColor, [NSColor colorWithCalibratedRed: red 
-                                                   green: green 
-                                                    blue: blue 
-                                                   alpha: alpha]);
-    }
-
-    entry = [nodeDict objectForKey: @"fsn_info_type"];
+    id entry = [nodeDict objectForKey: @"fsn_info_type"];
     infoType = entry ? [entry intValue] : infoType;
 
     if (infoType == FSNInfoExtendedType) {
@@ -1405,8 +1378,6 @@
     NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", [baseNode path]];
     NSString *infoPath = [[baseNode path] stringByAppendingPathComponent: @".gwdir"];
     NSMutableDictionary *updatedInfo = nil;
-    NSMutableDictionary *backColorDict = [NSMutableDictionary dictionary];
-    float red, green, blue, alpha;
 
     if ([baseNode isWritable]) {
       if ([[NSFileManager defaultManager] fileExistsAtPath: infoPath]) {
@@ -1429,14 +1400,6 @@
       updatedInfo = [NSMutableDictionary new];
     }
 	
-    [backColor getRed: &red green: &green blue: &blue alpha: &alpha];
-    [backColorDict setObject: [NSNumber numberWithFloat: red] forKey: @"red"];
-    [backColorDict setObject: [NSNumber numberWithFloat: green] forKey: @"green"];
-    [backColorDict setObject: [NSNumber numberWithFloat: blue] forKey: @"blue"];
-    [backColorDict setObject: [NSNumber numberWithFloat: alpha] forKey: @"alpha"];
-
-    [updatedInfo setObject: backColorDict forKey: @"backcolor"];
-    
     [updatedInfo setObject: [NSNumber numberWithInt: infoType] 
                     forKey: @"fsn_info_type"];
 
@@ -2022,20 +1985,6 @@
 
   return YES;
 }
-
-/*
-- (void)setBackgroundColor:(NSColor *)acolor
-{
-  int i;
-  
-  ASSIGN (backColor, acolor);
-  for (i = 0; i < [columns count]; i++) {
-    [[columns objectAtIndex: i] setBackgroundColor: backColor];
-  }
-  
-  [self setNeedsDisplay: YES];
-}
-*/
 
 - (NSColor *)backgroundColor
 {

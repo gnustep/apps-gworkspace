@@ -88,6 +88,7 @@ static NSString *nibName = @"FModuleSize";
 }
 
 - (id)initWithSearchCriteria:(NSDictionary *)criteria
+                  searchTool:(id)tool
 {
 	self = [super init];
 
@@ -202,7 +203,7 @@ static NSString *nibName = @"FModuleSize";
   return NO;
 }
 
-- (BOOL)reliesOnDirModDate
+- (BOOL)metadataModule
 {
   return NO;
 }

@@ -46,6 +46,8 @@
 - (oneway void)setAnnotations:(NSString *)annotations
                       forPath:(NSString *)path;
 
+- (NSTimeInterval)timestampOfPath:(NSString *)path;
+
 @end
 
 

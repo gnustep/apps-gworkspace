@@ -56,6 +56,8 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
 - (oneway void)insertDirectoryTreesFromPaths:(NSData *)info;
 - (oneway void)removeTreesFromPaths:(NSData *)info;
 - (NSData *)directoryTreeFromPath:(NSString *)path;
+- (NSString *)annotationsForPath:(NSString *)path;
+- (NSTimeInterval)timestampOfPath:(NSString *)path;
 
 @end
 
@@ -71,6 +73,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
   unsigned dircount;
 
   NSMutableArray *modules;  
+  BOOL metadataModule;
   NSDictionary *searchCriteria;
   BOOL newcriteria;
   
@@ -127,6 +130,8 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
 - (void)ddbdInsertDirectoryTreesFromPaths:(NSArray *)paths;
 - (NSArray *)ddbdGetDirectoryTreeFromPath:(NSString *)path;
 - (void)ddbdRemoveTreesFromPaths:(NSArray *)paths;
+- (NSString *)ddbdGetAnnotationsForPath:(NSString *)path;
+- (NSTimeInterval)ddbdGetTimestampOfPath:(NSString *)path;
 
 @end
 
@@ -277,7 +282,9 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
 
   [modules removeAllObjects];
   classNames = [searchCriteria allKeys];
-
+  
+  metadataModule = NO;
+  
   for (i = 0; i < [bundlesPaths count]; i++) {
     NSString *bpath = [bundlesPaths objectAtIndex: i];
     NSBundle *bundle = [NSBundle bundleWithPath: bpath];
@@ -288,8 +295,13 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
 
       if ([classNames containsObject: className]) {
         NSDictionary *moduleCriteria = [searchCriteria objectForKey: className];
-        id module = [[principalClass alloc] initWithSearchCriteria: moduleCriteria];
+        id module = [[principalClass alloc] initWithSearchCriteria: moduleCriteria
+                                                        searchTool: self];
 
+        if ([module metadataModule]) {
+          metadataModule = YES;
+        }
+        
         [modules addObject: module];
         RELEASE (module);  
       }
@@ -536,8 +548,8 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
   
   if (results && [foundPaths count]) {
     NSMutableArray *toinsert = [NSMutableArray array];
-    int count = [results count];
-    int i;
+    unsigned count = [results count];
+    unsigned i;
         
     results = [results arrayByAddingObject: srcpath];
 
@@ -549,10 +561,21 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
       NSString *dbpath = [results objectAtIndex: i];
       NSDictionary *attributes = [fm fileAttributesAtPath: dbpath traverseLink: NO];
       NSDate *moddate = [attributes fileModificationDate];
+      BOOL mustcheck;
       
-      if (([moddate laterDate: lastUpdate] == moddate) || newcriteria) {
+      mustcheck = (([moddate laterDate: lastUpdate] == moddate) || newcriteria);
+      
+      if ((mustcheck == NO) && metadataModule) {
+        NSTimeInterval interval = [lastUpdate timeIntervalSinceReferenceDate];
+        mustcheck = ([self ddbdGetTimestampOfPath: dbpath] > interval);      
+        if (mustcheck) {
+          GWDebugLog(@"metadata modification date changed at %@", dbpath);
+        }
+      }
+      
+      if (mustcheck) {
         NSArray *contents;
-        int j, m;
+        unsigned j, m;
 
         if ([self checkPath: dbpath attributes: attributes]
                       && ([foundPaths containsObject: dbpath] == NO)) {
@@ -882,6 +905,24 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
   }
 }
 
+- (NSString *)ddbdGetAnnotationsForPath:(NSString *)path
+{
+  [self connectDDBd];
+  if (ddbd && [ddbd dbactive]) {
+    return [ddbd annotationsForPath: path];
+  }
+  return nil;
+}
+
+- (NSTimeInterval)ddbdGetTimestampOfPath:(NSString *)path
+{
+  [self connectDDBd];
+  if (ddbd && [ddbd dbactive]) {
+    return [ddbd timestampOfPath: path];
+  }
+  return 0.0;
+}
+
 @end
 
 
@@ -989,8 +1030,19 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
     NSString *directory = [directories objectAtIndex: dirindex];
     NSDictionary *attributes = [fm fileAttributesAtPath: directory traverseLink: NO];
     NSDate *moddate = [attributes fileModificationDate];
+    BOOL mustcheck;
+
+    mustcheck = (([moddate laterDate: lastUpdate] == moddate) || newcriteria);
+
+    if ((mustcheck == NO) && metadataModule) {
+      NSTimeInterval interval = [lastUpdate timeIntervalSinceReferenceDate];
+      mustcheck = ([self ddbdGetTimestampOfPath: directory] > interval);
+      if (mustcheck) {
+        GWDebugLog(@"metadata modification date changed at %@", directory);
+      }
+    }
   
-    if (([moddate laterDate: lastUpdate] == moddate) || newcriteria) {
+    if (mustcheck) {
       NSArray *contents;
       int j, m;
       

@@ -170,6 +170,7 @@ static NSString *nibName = @"FModuleCrDate";
 }
 
 - (id)initWithSearchCriteria:(NSDictionary *)criteria
+                  searchTool:(id)tool
 {
 	self = [super init];
 
@@ -473,9 +474,9 @@ static NSString *nibName = @"FModuleCrDate";
   return NO;
 }
 
-- (BOOL)reliesOnDirModDate
+- (BOOL)metadataModule
 {
-  return YES;
+  return NO;
 }
 
 @end

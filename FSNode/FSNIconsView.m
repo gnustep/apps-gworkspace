@@ -98,37 +98,9 @@ if (rct.size.height < 0) rct.size.height = 0; \
       desktopApp = [desktopAppClass performSelector: sel];
     }
   
-    defentry = [defaults dictionaryForKey: @"backcolor"];
-    if (defentry) {
-      float red = [[defentry objectForKey: @"red"] floatValue];
-      float green = [[defentry objectForKey: @"green"] floatValue];
-      float blue = [[defentry objectForKey: @"blue"] floatValue];
-      float alpha = [[defentry objectForKey: @"alpha"] floatValue];
-    
-      ASSIGN (backColor, [NSColor colorWithCalibratedRed: red 
-                                                   green: green 
-                                                    blue: blue 
-                                                   alpha: alpha]);
-    } else {
-      ASSIGN (backColor, [[NSColor windowBackgroundColor] colorUsingColorSpaceName: NSDeviceRGBColorSpace]);
-    }
-
-    defentry = [defaults dictionaryForKey: @"textcolor"];
-    if (defentry) {
-      float red = [[defentry objectForKey: @"red"] floatValue];
-      float green = [[defentry objectForKey: @"green"] floatValue];
-      float blue = [[defentry objectForKey: @"blue"] floatValue];
-      float alpha = [[defentry objectForKey: @"alpha"] floatValue];
-    
-      ASSIGN (textColor, [NSColor colorWithCalibratedRed: red 
-                                                   green: green 
-                                                    blue: blue 
-                                                   alpha: alpha]);
-    } else {
-      ASSIGN (textColor, [[NSColor controlTextColor] colorUsingColorSpaceName: NSDeviceRGBColorSpace]);
-    }
-
-    ASSIGN (disabledTextColor, [textColor highlightWithLevel: NSDarkGray]);
+    ASSIGN (backColor, [NSColor windowBackgroundColor]);
+    ASSIGN (textColor, [NSColor controlTextColor]);
+    ASSIGN (disabledTextColor, [NSColor disabledControlTextColor]);
     
     defentry = [defaults objectForKey: @"iconsize"];
     iconSize = defentry ? [defentry intValue] : DEF_ICN_SIZE;
@@ -941,37 +913,7 @@ pp.y = NSMaxY(br) + 1; \
   }
   
   if (nodeDict) {
-    id entry = [nodeDict objectForKey: @"backcolor"];
-
-    if (entry) {
-      float red = [[entry objectForKey: @"red"] floatValue];
-      float green = [[entry objectForKey: @"green"] floatValue];
-      float blue = [[entry objectForKey: @"blue"] floatValue];
-      float alpha = [[entry objectForKey: @"alpha"] floatValue];
-
-      ASSIGN (backColor, [NSColor colorWithCalibratedRed: red 
-                                                   green: green 
-                                                    blue: blue 
-                                                   alpha: alpha]);
-    }
-
-    entry = [nodeDict objectForKey: @"textcolor"];
-
-    if (entry) {
-      float red = [[entry objectForKey: @"red"] floatValue];
-      float green = [[entry objectForKey: @"green"] floatValue];
-      float blue = [[entry objectForKey: @"blue"] floatValue];
-      float alpha = [[entry objectForKey: @"alpha"] floatValue];
-
-      ASSIGN (textColor, [NSColor colorWithCalibratedRed: red 
-                                                   green: green 
-                                                    blue: blue 
-                                                   alpha: alpha]);
-
-      ASSIGN (disabledTextColor, [textColor highlightWithLevel: NSDarkGray]);      
-    }
-
-    entry = [nodeDict objectForKey: @"iconsize"];
+    id entry = [nodeDict objectForKey: @"iconsize"];
     iconSize = entry ? [entry intValue] : iconSize;
 
     entry = [nodeDict objectForKey: @"labeltxtsize"];
@@ -1014,9 +956,6 @@ pp.y = NSMaxY(br) + 1; \
     NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", [node path]];
     NSString *infoPath = [[node path] stringByAppendingPathComponent: @".gwdir"];
     NSMutableDictionary *updatedInfo = nil;
-    NSMutableDictionary *backColorDict = [NSMutableDictionary dictionary];
-    NSMutableDictionary *txtColorDict = [NSMutableDictionary dictionary];
-    float red, green, blue, alpha;
 
     if ([node isWritable]) {
       if ([[NSFileManager defaultManager] fileExistsAtPath: infoPath]) {
@@ -1038,23 +977,7 @@ pp.y = NSMaxY(br) + 1; \
     if (updatedInfo == nil) {
       updatedInfo = [NSMutableDictionary new];
     }
-	
-    [backColor getRed: &red green: &green blue: &blue alpha: &alpha];
-    [backColorDict setObject: [NSNumber numberWithFloat: red] forKey: @"red"];
-    [backColorDict setObject: [NSNumber numberWithFloat: green] forKey: @"green"];
-    [backColorDict setObject: [NSNumber numberWithFloat: blue] forKey: @"blue"];
-    [backColorDict setObject: [NSNumber numberWithFloat: alpha] forKey: @"alpha"];
-
-    [updatedInfo setObject: backColorDict forKey: @"backcolor"];
-
-    [textColor getRed: &red green: &green blue: &blue alpha: &alpha];
-    [txtColorDict setObject: [NSNumber numberWithFloat: red] forKey: @"red"];
-    [txtColorDict setObject: [NSNumber numberWithFloat: green] forKey: @"green"];
-    [txtColorDict setObject: [NSNumber numberWithFloat: blue] forKey: @"blue"];
-    [txtColorDict setObject: [NSNumber numberWithFloat: alpha] forKey: @"alpha"];
-
-    [updatedInfo setObject: txtColorDict forKey: @"textcolor"];
-    
+	    
     [updatedInfo setObject: [NSNumber numberWithInt: iconSize] 
                     forKey: @"iconsize"];
 

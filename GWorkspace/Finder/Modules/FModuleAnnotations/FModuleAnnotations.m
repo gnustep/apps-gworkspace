@@ -1,4 +1,4 @@
-/* FModuleOwner.m
+/* FModuleAnnotations.m
  *  
  * Copyright (C) 2004 Free Software Foundation, Inc.
  *
@@ -26,9 +26,9 @@
 #include <AppKit/AppKit.h>
 #include "FinderModulesProtocol.h"
 
-static NSString *nibName = @"FModuleOwner";
+static NSString *nibName = @"FModuleAnnotations";
 
-@interface FModuleOwner : NSObject <FinderModulesProtocol>
+@interface FModuleAnnotations : NSObject <FinderModulesProtocol>
 {  
   IBOutlet id win;
   IBOutlet id controlsBox;
@@ -37,24 +37,27 @@ static NSString *nibName = @"FModuleOwner";
   int index;
   BOOL used;
 
-  NSFileManager *fm;
-  NSString *owner;
+  NSString *contentsStr;
   int how;
+  
+  id searchtool;
 }
 
 - (IBAction)popUpAction:(id)sender; 
 
 @end
 
-@implementation FModuleOwner
+@implementation FModuleAnnotations
 
-#define IS     0               
-#define IS_NOT 1         
+#define ONE_WORD      0
+#define ALL_WORDS     1
+#define EXACT_PHRASE  2
+#define WITHOUT_WORDS 3
 
 - (void)dealloc
 {
   TEST_RELEASE (controlsBox);
-  TEST_RELEASE (owner);
+  TEST_RELEASE (contentsStr);
   [super dealloc];
 }
 
@@ -75,18 +78,29 @@ static NSString *nibName = @"FModuleOwner";
     used = NO;
     index = 0;
     
-    owner = nil;
+    contentsStr = nil;
     
     [textField setStringValue: @""];
 
     /* Internationalization */    
     [popUp removeAllItems];
-    [popUp insertItemWithTitle: NSLocalizedString(@"is", @"") atIndex: 0];
-    [popUp insertItemWithTitle: NSLocalizedString(@"is not", @"") atIndex: 2];
-    [popUp selectItemAtIndex: 0]; 
+    [popUp insertItemWithTitle: NSLocalizedString(@"with one of the words", @"") 
+                       atIndex: ONE_WORD];
+    [popUp insertItemWithTitle: NSLocalizedString(@"with all the words", @"") 
+                       atIndex: ALL_WORDS];
+    [popUp insertItemWithTitle: NSLocalizedString(@"with the exact phrase", @"") 
+                       atIndex: EXACT_PHRASE];
+    [popUp insertItemWithTitle: NSLocalizedString(@"without the words", @"") 
+                       atIndex: WITHOUT_WORDS];
+                       
+    [popUp selectItemAtIndex: ONE_WORD]; 
   }
   
 	return self;
+}
+
+- (IBAction)popUpAction:(id)sender
+{
 }
 
 - (id)initWithSearchCriteria:(NSDictionary *)criteria
@@ -95,16 +109,12 @@ static NSString *nibName = @"FModuleOwner";
 	self = [super init];
 
   if (self) {
-    ASSIGN (owner, [criteria objectForKey: @"what"]);
+    ASSIGN (contentsStr, [criteria objectForKey: @"what"]);
     how = [[criteria objectForKey: @"how"] intValue];
-    fm = [NSFileManager defaultManager];
+    searchtool = tool;
   }
   
 	return self;
-}
-
-- (IBAction)popUpAction:(id)sender
-{
 }
 
 - (void)setControlsState:(NSDictionary *)info
@@ -118,7 +128,7 @@ static NSString *nibName = @"FModuleOwner";
   
   if (str && [str length]) {
     [textField setStringValue: str];
-  }    
+  }
 }
 
 - (id)controls
@@ -128,7 +138,7 @@ static NSString *nibName = @"FModuleOwner";
 
 - (NSString *)moduleName
 {
-  return NSLocalizedString(@"owner", @"");
+  return NSLocalizedString(@"annotations", @"");
 }
 
 - (BOOL)used
@@ -171,8 +181,54 @@ static NSString *nibName = @"FModuleOwner";
 - (BOOL)checkPath:(NSString *)path 
    withAttributes:(NSDictionary *)attributes
 {
-  BOOL found = [owner isEqual: [attributes fileOwnerAccountName]];
-  return (how == IS) ? found : !found;
+  CREATE_AUTORELEASE_POOL(pool);
+  NSString *annotations = [searchtool ddbdGetAnnotationsForPath: path];
+  NSRange range;
+  BOOL found = NO;
+  
+  if (annotations) {
+    if (how == EXACT_PHRASE) {
+      range = [annotations rangeOfString: contentsStr
+                                 options: NSCaseInsensitiveSearch];
+      found = (range.location != NSNotFound);    
+    } else {
+      NSArray *words = [contentsStr componentsSeparatedByString: @" "];
+      unsigned i;
+
+      for (i = 0; i < [words count]; i++) {
+        NSString *word = [words objectAtIndex: i];
+
+        if ([word length] && ([word isEqual: @" "] == NO)) {
+          range = [annotations rangeOfString: word
+                                     options: NSCaseInsensitiveSearch];
+          if (how == ONE_WORD) {
+            if (range.location != NSNotFound) {
+              found = YES;
+              break;
+            }
+
+          } else if (how == ALL_WORDS) {
+            found = YES;
+            if (range.location == NSNotFound) {
+              found = NO;
+              break;
+            }
+
+          } else if (how == WITHOUT_WORDS) {
+            found = YES;
+            if (range.location != NSNotFound) {
+              found = NO;
+              break;
+            }
+          }      
+        }
+      }    
+    }
+  }
+  
+  RELEASE (pool);
+    
+  return found;
 }
 
 - (int)compareModule:(id <FinderModulesProtocol>)module
@@ -196,22 +252,8 @@ static NSString *nibName = @"FModuleOwner";
 
 - (BOOL)metadataModule
 {
-  return NO;
+  return YES;
 }
 
 @end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

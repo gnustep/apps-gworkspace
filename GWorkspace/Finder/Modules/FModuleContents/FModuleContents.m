@@ -84,6 +84,7 @@ static NSString *nibName = @"FModuleContents";
 }
 
 - (id)initWithSearchCriteria:(NSDictionary *)criteria
+                  searchTool:(id)tool
 {
 	self = [super init];
 
@@ -186,7 +187,7 @@ static NSString *nibName = @"FModuleContents";
   return YES;
 }
 
-- (BOOL)reliesOnDirModDate
+- (BOOL)metadataModule
 {
   return NO;
 }
