@@ -155,7 +155,8 @@
 
   panel = [[IconsPanel alloc] initAtPath: rootPath delegate: self];
   [panelScroll setDocumentView: panel];	
-
+  [panel setPath:rootPath];
+  
 	[[NSNotificationCenter defaultCenter] removeObserver: self];
 
   [[NSNotificationCenter defaultCenter] addObserver: self 

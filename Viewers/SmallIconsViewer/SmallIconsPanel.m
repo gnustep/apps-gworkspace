@@ -113,7 +113,6 @@ if (rct.size.height < 0) rct.size.height = 0
                 					  object: nil];
 
 		fm = [NSFileManager defaultManager];
-    [self makeFileIcons];
   }
 	
   return self;

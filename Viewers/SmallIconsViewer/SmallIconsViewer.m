@@ -143,6 +143,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
 
   panel = [[SmallIconsPanel alloc] initAtPath: currentPath delegate: self];
   [panelScroll setDocumentView: panel];	
+  [panel setPath: currentPath];
 
 	[[NSNotificationCenter defaultCenter] removeObserver: self];
 

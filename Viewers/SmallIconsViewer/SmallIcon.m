@@ -66,13 +66,12 @@
 		ASSIGN (path, apath);
 		[self setDelegate: adelegate];
 
-    [self setFrame: NSMakeRect(0, 0, 32, 26)];
-    isSelect = NO; 
-    locked = NO;
-
     fm = [NSFileManager defaultManager];
 		
 		ASSIGN (name, [path lastPathComponent]);
+
+    isSelect = NO; 
+    locked = NO;
 			
 		[[NSWorkspace sharedWorkspace] getInfoForFile: path 
                                       application: &defApp 
@@ -92,6 +91,8 @@
 	  [namelabel setBackgroundColor: [NSColor windowBackgroundColor]];
 	  [namelabel setTextColor: [NSColor controlTextColor]];
 		[namelabel setStringValue: name];
+    
+    [self setFrame: NSMakeRect(0, 0, 32, 26)];
     
     [self registerForDraggedTypes: pbTypes];
 

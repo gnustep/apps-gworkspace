@@ -139,8 +139,6 @@ if (rct.size.height < 0) rct.size.height = 0; \
                 				  selector: @selector(cellsWidthChanged:) 
                 					    name: GWIconsCellsWidthChangedNotification
                 					  object: nil];
-
-    [self makeFileIcons];
   }
   
   return self;
