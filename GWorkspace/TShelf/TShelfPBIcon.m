@@ -85,6 +85,7 @@
     gridindex = index;
 		position = NSMakePoint(0, 0);
     isSelect = NO; 
+    dragdelay = 0;
     tview = aview;  
   }
   
@@ -99,6 +100,11 @@
 - (NSString *)dataType
 {
   return dataType;
+}
+
+- (NSData *)data
+{
+  return [NSData dataWithContentsOfFile: dataPath];
 }
 
 - (NSImage *)icon
@@ -152,7 +158,39 @@
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-  [self select];
+	if ([theEvent clickCount] == 1) { 
+	  NSEvent *nextEvent;
+    NSPoint location;
+    NSSize offset;
+    BOOL startdnd = NO;
+   
+    [self select];
+
+    location = [theEvent locationInWindow];
+    
+    while (1) {
+	    nextEvent = [[self window] nextEventMatchingMask:
+    							              NSLeftMouseUpMask | NSLeftMouseDraggedMask];
+
+      if ([nextEvent type] == NSLeftMouseUp) {
+        break;
+      } else if ([nextEvent type] == NSLeftMouseDragged) {
+	      if(dragdelay < 5) {
+          dragdelay++;
+        } else {      
+          NSPoint p = [nextEvent locationInWindow];
+        
+          offset = NSMakeSize(p.x - location.x, p.y - location.y); 
+          startdnd = YES;        
+          break;
+        }
+      }
+    }
+
+    if (startdnd == YES) {  
+      [self startExternalDragOnEvent: nextEvent withMouseOffset: offset];    
+    }    
+  }           
 }
 
 - (void)drawRect:(NSRect)rect
@@ -167,6 +205,51 @@
   s = [icon size];
   p = NSMakePoint((rect.size.width - s.width) / 2, (rect.size.height - s.height) / 2);	
   [icon compositeToPoint: p operation: NSCompositeSourceOver];
+}
+
+@end
+
+@implementation TShelfPBIcon (DraggingSource)
+
+- (void)startExternalDragOnEvent:(NSEvent *)event
+                 withMouseOffset:(NSSize)offset
+{
+  NSPasteboard *pb = [NSPasteboard pasteboardWithName: NSDragPboard];	
+  NSPoint dragPoint;
+	
+  [self declareAndSetShapeOnPasteboard: pb];
+
+  ICONCENTER (self, icon, dragPoint);
+  	  
+  [self dragImage: icon
+               at: dragPoint 
+           offset: offset
+            event: event
+       pasteboard: pb
+           source: self
+        slideBack: NO];
+}
+
+- (void)declareAndSetShapeOnPasteboard:(NSPasteboard *)pb
+{
+  NSData *data = [NSData dataWithContentsOfFile: dataPath];
+
+  if (data) {
+    [pb declareTypes: [NSArray arrayWithObject: dataType] owner: nil];
+    [pb setData: data forType: dataType];
+  }
+}
+
+- (void)draggedImage:(NSImage *)anImage 
+						 endedAt:(NSPoint)aPoint 
+					 deposited:(BOOL)flag
+{
+  dragdelay = 0;
+}
+
+- (unsigned int)draggingSourceOperationMaskForLocal:(BOOL)flag
+{
+  return NSDragOperationAll;
 }
 
 @end

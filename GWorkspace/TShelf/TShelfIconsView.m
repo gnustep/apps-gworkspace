@@ -165,32 +165,41 @@
 		isDragTarget = NO;
 		dragImage = nil;
 		
-    if ((isLastView == NO) && (iconsType == FILES_TAB)) {
-  	  [self registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, nil]];
+    if (isLastView == NO) {
+      if (iconsType == FILES_TAB) {
+  	    [self registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, nil]];
     
-		  [[NSNotificationCenter defaultCenter] 
-                 addObserver: self 
-                	  selector: @selector(fileSystemWillChange:) 
-                			  name: GWFileSystemWillChangeNotification
-                		  object: nil];
+		    [[NSNotificationCenter defaultCenter] 
+                   addObserver: self 
+                	    selector: @selector(fileSystemWillChange:) 
+                			    name: GWFileSystemWillChangeNotification
+                		    object: nil];
 
+		    [[NSNotificationCenter defaultCenter] 
+                   addObserver: self 
+                	    selector: @selector(fileSystemDidChange:) 
+                			    name: GWFileSystemDidChangeNotification
+                		    object: nil];                     
+      } else {
+        NSArray *types = [NSArray arrayWithObjects: NSStringPboardType,
+                                                    NSRTFPboardType,
+                                                    NSRTFDPboardType,
+                                                    NSTIFFPboardType,
+                                                    NSFileContentsPboardType,
+                                                    NSColorPboardType,
+                                                    @"IBViewPboardType",
+                                                    nil];
+  	    [self registerForDraggedTypes: types];
+        [self setWatcherForPath: [gw tshelfPBDir]];
+      }
+    
 		  [[NSNotificationCenter defaultCenter] 
                  addObserver: self 
-                	  selector: @selector(fileSystemDidChange:) 
-                			  name: GWFileSystemDidChangeNotification
-                		  object: nil];                     
-    }
-    
-		[[NSNotificationCenter defaultCenter] 
-               addObserver: self 
-                  selector: @selector(watcherNotification:) 
-                		  name: GWFileWatcherFileDidChangeNotification
-                	  object: nil];
-    
-    if (iconsType == DATA_TAB) {
-      [self setWatcherForPath: [gw tshelfPBDir]];
-    }
-	}
+                    selector: @selector(watcherNotification:) 
+                		    name: GWFileWatcherFileDidChangeNotification
+                	    object: nil];
+	  }
+  }
   
   return self;	
 }
@@ -248,9 +257,9 @@
 	}
 }
 
-- (void)addPBIconForDataAtPath:(NSString *)dpath 
-                      dataType:(NSString *)dtype
-					       withGridIndex:(int)index 
+- (TShelfPBIcon *)addPBIconForDataAtPath:(NSString *)dpath 
+                                dataType:(NSString *)dtype
+					                 withGridIndex:(int)index 
 {
   TShelfPBIcon *icon = [[TShelfPBIcon alloc] initForPBDataAtPath: dpath
                             ofType: dtype gridIndex: index inIconsView: self];
@@ -265,7 +274,9 @@
 	[self addSubview: icon];
 	RELEASE (icon);    
 	[self sortIcons];	
-	[self resizeWithOldSuperviewSize: [self frame].size];  
+	[self resizeWithOldSuperviewSize: [self frame].size]; 
+  
+  return icon; 
 }
 
 - (void)removeIcon:(id)anIcon
@@ -287,6 +298,27 @@
   [icons removeObject: anIcon];
   gpoints[index].used = 0;
   [self resizeWithOldSuperviewSize: [self frame].size];  
+}
+
+- (void)removePBIconsWithData:(NSData *)data ofType:(NSString *)type
+{
+  int count = [icons count];
+  int i;
+
+  for (i = count - 1; i >= 0; i--) {
+    TShelfPBIcon *icon = [icons objectAtIndex: i];
+
+    if ([[icon dataType] isEqual: type]) {
+      if ([[icon data] isEqual: data]) {
+        NSString *dataPath = [icon dataPath];
+  
+        RETAIN (dataPath);
+        [self removeIcon: icon];
+        [fm removeFileAtPath: dataPath handler: nil];
+        RELEASE (dataPath);
+      }
+    }
+  }
 }
 
 - (void)setLabelRectOfIcon:(id)anIcon
@@ -934,47 +966,31 @@
 
 - (void)doPaste
 {
-  [self readSelectionFromPasteboard: [NSPasteboard generalPasteboard]];
-}
-
-- (BOOL)readSelectionFromPasteboard:(NSPasteboard *)pboard
-{
-  NSArray *types = [pboard types];
   NSData *data;
   NSString *type;
-  int i;
   
-  if ((types == nil) || ([types count] == 0)) {
-    return NO;
-  }
-
-  for (i = 0; i < [types count]; i++) {
-    type = [types objectAtIndex: 0];
-    data = [pboard dataForType: type];
-    if (data) {
-      break;
-    }
-  }
-  
-  if (data) {
+  data = [self readSelectionFromPasteboard: [NSPasteboard generalPasteboard]
+                                    ofType: &type];
+     
+  if (data) {         
     NSString *dpath = [gw tshelfPBFilePath];
 		int index = -1; 
     int i;
-  
+    
 	  for (i = 0; i < pcount; i++) {
 		  if (gpoints[i].used == 0) {
         index = i;
 		    break;
       }
     }
-  
+    
     if (index == -1) {
       NSRunAlertPanel(NSLocalizedString(@"Error!", @""),
                         NSLocalizedString(@"No space left on this tab", @""),
                         NSLocalizedString(@"Ok", @""),
                         nil,
                         nil);
-      return YES;
+      return;
     }
   
     if ([data writeToFile: dpath atomically: YES]) {
@@ -983,8 +999,30 @@
 					           withGridIndex: index];
     }
   }
+}
+
+- (NSData *)readSelectionFromPasteboard:(NSPasteboard *)pboard 
+                                 ofType:(NSString **)pbtype
+{
+  NSArray *types = [pboard types];
+  NSData *data;
+  NSString *type;
+  int i;
   
-  return YES;
+  if ((types == nil) || ([types count] == 0)) {
+    return nil;
+  }
+
+  for (i = 0; i < [types count]; i++) {
+    type = [types objectAtIndex: 0];
+    data = [pboard dataForType: type];
+    if (data) {
+      *pbtype = type;
+      return data;
+    }
+  }
+  
+  return nil;
 }
 
 @end
@@ -993,16 +1031,37 @@
 
 - (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
 {
-	NSPasteboard *pb = [sender draggingPasteboard];
+  NSPasteboard *pb = [sender draggingPasteboard];
   NSDragOperation sourceDragMask = [sender draggingSourceOperationMask];
-	gridpoint *gpoint;
-	
-	if ((sourceDragMask == NSDragOperationCopy) 
-												|| (sourceDragMask == NSDragOperationLink)) {
-		return NSDragOperationNone;
-	}
-	  
-  if ([[pb types] indexOfObject: NSFilenamesPboardType] != NSNotFound) {
+  BOOL found = YES;
+  gridpoint *gpoint;
+  
+  if (iconsType == FILES_TAB) {
+	  if ((sourceDragMask == NSDragOperationCopy) 
+												  || (sourceDragMask == NSDragOperationLink)) {
+		  return NSDragOperationNone;
+	  }
+  }
+  
+  if (iconsType == FILES_TAB) {  
+    if ([[pb types] indexOfObject: NSFilenamesPboardType] == NSNotFound) {
+      found = NO;
+    }
+  } else {
+    NSArray *types = [pb types];
+    
+    if (([types indexOfObject: NSStringPboardType] == NSNotFound)
+          && ([types indexOfObject: NSRTFPboardType] == NSNotFound)
+          && ([types indexOfObject: NSRTFDPboardType] == NSNotFound)
+          && ([types indexOfObject: NSTIFFPboardType] == NSNotFound)
+          && ([types indexOfObject: NSFileContentsPboardType] == NSNotFound)
+          && ([types indexOfObject: NSColorPboardType] == NSNotFound)
+          && ([types indexOfObject: @"IBViewPboardType"] == NSNotFound)) {
+      found = NO;
+    }
+  }   
+    
+  if (found) {
     isDragTarget = YES;	
 		DESTROY (dragImage);
 		dragPoint = [sender draggedImageLocation];	
@@ -1015,7 +1074,8 @@
 		[self setNeedsDisplay: YES];
     return NSDragOperationAll;
   }
-	isDragTarget = NO;	
+    
+  isDragTarget = NO;	  
   return NSDragOperationNone;
 }
 
@@ -1024,33 +1084,35 @@
   NSDragOperation sourceDragMask = [sender draggingSourceOperationMask];
 	NSPoint p = [sender draggedImageLocation];
 	p = [self convertPoint: p fromView: [[self window] contentView]];
-	
+
 	if (isDragTarget == NO) {
 		return NSDragOperationNone;
 	}
 
-	if ((sourceDragMask == NSDragOperationCopy) 
-												|| (sourceDragMask == NSDragOperationLink)) {
-		return NSDragOperationNone;
-	}	
-	
+  if (iconsType == FILES_TAB) {
+	  if ((sourceDragMask == NSDragOperationCopy) 
+												  || (sourceDragMask == NSDragOperationLink)) {
+		  return NSDragOperationNone;
+	  }	
+  }
+
 	if (NSEqualPoints(dragPoint, p) == NO) {
 		gridpoint *gpoint;
-		
+
     if ([self isFreePosition: dragPoint]) {
 		  [self setNeedsDisplayInRect: dragRect];
     }
-		
+
 		gpoint = gridPoint(self, gridPointSel, p);
 		dragPoint = NSMakePoint(gpoint->x, gpoint->y);
-				
+
 		if (gpoint->used == 0) {
 			dragRect = NSMakeRect(dragPoint.x + 8, dragPoint.y, [dragImage size].width, [dragImage size].height);
 			if (dragImage == nil) {
 				ASSIGN (dragImage, [sender draggedImage]);
 			}
 			[self setNeedsDisplayInRect: dragRect];
-			
+
 		} else {
 			if (dragImage != nil) {
 				DESTROY (dragImage);
@@ -1058,7 +1120,7 @@
 			return NSDragOperationNone;
 		}
 	}
-
+  
 	return NSDragOperationAll;
 }
 
@@ -1084,41 +1146,65 @@
 
 - (void)concludeDragOperation:(id <NSDraggingInfo>)sender
 {
-	NSPasteboard *pb = [sender draggingPasteboard];
-  NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
+  NSPasteboard *pb = [sender draggingPasteboard];
+  NSPoint p = [sender draggedImageLocation];
+  gridpoint *gpoint;
+  int index;
+  int i;
 
   isDragTarget = NO;
 
-	if (dragImage != nil) {
-		DESTROY (dragImage);
-		[self setNeedsDisplay: YES];
-	}
-		
-	if (sourcePaths) {
-    NSPoint p = [sender draggedImageLocation];
-		gridpoint *gpoint;
-		int index, i;
-				            
-		p = [self convertPoint: p fromView: [[self window] contentView]];
-		gpoint = [self gridPointNearestToPoint: p];
-		p = NSMakePoint(gpoint->x, gpoint->y);
-		index = gpoint->index;
-		
-		if (gpoint->used == 0) {
-    	for (i = 0; i < [icons count]; i++) {
-      	TShelfIcon *icon = [icons objectAtIndex: i];
-      	if ([[icon paths] isEqualToArray: sourcePaths]) {
-					gpoints[[icon gridindex]].used = 0;
-					gpoint->used = 1;					  
-					[icon setGridIndex: index];
-        	[self resizeWithOldSuperviewSize: [self frame].size];
-        	return;
-      	}
-    	}
-			
-			[self addIconWithPaths: sourcePaths withGridIndex: index];
-    }
-	}
+  if (dragImage != nil) {
+    DESTROY (dragImage);
+    [self setNeedsDisplay: YES];
+  }
+
+  p = [self convertPoint: p fromView: [[self window] contentView]];
+  gpoint = [self gridPointNearestToPoint: p];
+  p = NSMakePoint(gpoint->x, gpoint->y);
+  index = gpoint->index;
+
+  if (gpoint->used == 0) {
+    if (iconsType == FILES_TAB) {
+      NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
+      sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
+
+	    if (sourcePaths) {
+    	  for (i = 0; i < [icons count]; i++) {
+      	  TShelfIcon *icon = [icons objectAtIndex: i];
+      	  if ([[icon paths] isEqualToArray: sourcePaths]) {
+					  gpoints[[icon gridindex]].used = 0;
+					  gpoint->used = 1;					  
+					  [icon setGridIndex: index];
+        	  [self resizeWithOldSuperviewSize: [self frame].size];
+        	  return;
+      	  }
+    	  }
+
+			  [self addIconWithPaths: sourcePaths withGridIndex: index];
+	    }
+    } else {
+      NSData *data;
+      NSString *type;
+      
+      data = [self readSelectionFromPasteboard: pb ofType: &type];
+
+      if (data) {   
+        NSString *dpath = [gw tshelfPBFilePath];
+        
+        if ([data writeToFile: dpath atomically: YES]) {
+          TShelfPBIcon *icon;
+          
+          [self removePBIconsWithData: data ofType: type];
+        
+          icon = [self addPBIconForDataAtPath: dpath
+                                     dataType: type
+					                      withGridIndex: index];
+          [icon select];                      
+        }
+      }
+    }  
+  }
 }
 
 @end

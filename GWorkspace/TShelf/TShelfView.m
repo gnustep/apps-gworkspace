@@ -429,6 +429,14 @@
 	  [[self window]  setFrame: winrect display: YES];
     hiddentabs = NO;
   } else {
+    if (selected != nil) {
+      TShelfIconsView *selectedView = (TShelfIconsView *)[selected view];
+      if ([selectedView iconsType] == DATA_TAB) {
+        [selectedView unselectOtherIcons: nil];
+        [selectedView setCurrentPBIcon: nil];
+      }
+	  }
+  
     winrect = NSMakeRect(frame.origin.x, frame.origin.y, 10, frame.size.height);
 	  [[self window]  setFrame: winrect display: YES];
 	  hiddentabs = YES;

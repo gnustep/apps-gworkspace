@@ -1,3 +1,8 @@
+2003-10-25 Enrico Sersale  <enrico@imago.ro>
+
+  * GWorkspace/TShelf/TShelfIconsView.m
+    creates pasteboard icons also from dnd.
+
 2003-10-24 Enrico Sersale  <enrico@imago.ro>
 
   * GWorkspace/TShelf/TShelfView.m

@@ -22,9 +22,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #ifndef TSHELF_PB_ICON_H
-#define TSHELF_ICON_H
+#define TSHELF_PB_ICON_H
 
 #include <AppKit/NSView.h>
 
@@ -44,6 +43,8 @@
   TShelfIconsView *tview;
 
   BOOL isSelect;
+  
+  int dragdelay;
 }
 
 - (id)initForPBDataAtPath:(NSString *)dpath
@@ -54,6 +55,8 @@
 - (NSString *)dataPath;
 
 - (NSString *)dataType;
+
+- (NSData *)data;
 
 - (NSImage *)icon;
 
@@ -70,6 +73,21 @@
 - (void)setGridIndex:(int)index;
 
 - (int)gridindex;
+
+@end
+
+@interface TShelfPBIcon (DraggingSource)
+
+- (void)startExternalDragOnEvent:(NSEvent *)event
+                 withMouseOffset:(NSSize)offset;
+
+- (void)declareAndSetShapeOnPasteboard:(NSPasteboard *)pb;
+
+- (unsigned int)draggingSourceOperationMaskForLocal:(BOOL)flag;
+
+- (void)draggedImage:(NSImage *)anImage 
+						 endedAt:(NSPoint)aPoint 
+					 deposited:(BOOL)flag;
 
 @end
 

@@ -399,15 +399,7 @@
     							              NSLeftMouseUpMask | NSLeftMouseDraggedMask];
 
       if ([nextEvent type] == NSLeftMouseUp) {
-        NSSize ss = [self frame].size;
-        NSSize is = [icon size];
-        NSPoint p = NSMakePoint((ss.width - is.width) / 2, (ss.height - is.height) / 2);	
-
-        p = [self convertPoint: p toView: nil];
-        p = [[self window] convertBaseToScreen: p];
-
         [tview setCurrentSelection: paths];
-
         [self unselect];
         break;
 
@@ -642,7 +634,7 @@
 
 - (void)draggingExited:(id <NSDraggingInfo>)sender
 {
-  if(isDragTarget == YES) {
+  if (isDragTarget == YES) {
     isDragTarget = NO;
     if (onSelf == NO) {      
       ASSIGN (icon, [GWLib iconForFile: fullPath ofType: type]);
