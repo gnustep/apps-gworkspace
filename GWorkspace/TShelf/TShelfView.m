@@ -26,6 +26,7 @@
 #include "TShelfView.h"
 #include "TShelfViewItem.h"
 #include "GWorkspace.h"
+#include "GNUstep.h"
 
 @implementation TShelfView
 

@@ -29,6 +29,7 @@
 #include "TShelfViewItem.h"
 #include "TShelfIconsView.h"
 #include "Dialogs/Dialogs.h"
+#include "GNUstep.h"
 
 #define SHELF_HEIGHT 112
 

@@ -25,6 +25,7 @@
 #include <AppKit/AppKit.h>
 #include "TShelfViewItem.h"
 #include "TShelfView.h"
+#include "GNUstep.h"
 
 @implementation TShelfViewItem
 
