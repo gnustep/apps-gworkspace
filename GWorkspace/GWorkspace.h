@@ -140,21 +140,6 @@
 - (oneway void)setAnnotations:(NSString *)annotations
                       forPath:(NSString *)path;
 
-- (NSString *)fileTypeForPath:(NSString *)path;
-
-- (oneway void)setFileType:(NSString *)type
-                   forPath:(NSString *)path;
-
-- (NSString *)modificationDateForPath:(NSString *)path;
-
-- (oneway void)setModificationDate:(NSString *)datedescr
-                           forPath:(NSString *)path;
-
-- (NSData *)iconDataForPath:(NSString *)path;
-
-- (oneway void)setIconData:(NSData *)data
-                   forPath:(NSString *)path;
-
 @end
 
 
@@ -174,7 +159,6 @@
   id recyclerApp;
   
   id ddbd;
-  BOOL ddbdactive;
   
   PrefController *prefController;
   Fiend *fiend;
@@ -340,21 +324,6 @@
 
 - (void)ddbdSetAnnotations:(NSString *)annotations
                    forPath:(NSString *)path;
-
-- (NSString *)ddbdGetFileTypeForPath:(NSString *)path;
-
-- (void)ddbdSetFileType:(NSString *)type
-                forPath:(NSString *)path;
-
-- (NSString *)ddbdGetModificationDateForPath:(NSString *)path;
-
-- (void)ddbdSetModificationDate:(NSString *)datedescr
-                        forPath:(NSString *)path;
-
-- (NSData *)ddbdGetIconDataForPath:(NSString *)path;
-
-- (void)ddbdSetIconData:(NSData *)data
-                forPath:(NSString *)path;
 
 - (id)connectApplication:(NSString *)appName;
 

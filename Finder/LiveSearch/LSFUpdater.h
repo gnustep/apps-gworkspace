@@ -54,37 +54,11 @@
 
 - (oneway void)insertPath:(NSString *)path;
 
-- (oneway void)removePath:(NSString *)path;
-
-- (oneway void)removePaths:(NSArray *)paths;
-
 - (oneway void)insertDirectoryTreesFromPaths:(NSData *)info;
 
 - (oneway void)removeTreesFromPaths:(NSData *)info;
 
-- (NSData *)treeFromPath:(NSData *)pathinfo;
-
 - (NSData *)directoryTreeFromPath:(NSString *)path;
-
-- (NSString *)annotationsForPath:(NSString *)path;
-
-- (oneway void)setAnnotations:(NSString *)annotations
-                      forPath:(NSString *)path;
-
-- (NSString *)fileTypeForPath:(NSString *)path;
-
-- (oneway void)setFileType:(NSString *)type
-                   forPath:(NSString *)path;
-
-- (NSString *)modificationDateForPath:(NSString *)path;
-
-- (oneway void)setModificationDate:(NSString *)datedescr
-                           forPath:(NSString *)path;
-
-- (NSData *)iconDataForPath:(NSString *)path;
-
-- (oneway void)setIconData:(NSData *)data
-                   forPath:(NSString *)path;
 
 @end
 
@@ -113,7 +87,6 @@
   
   id <LSFolderProtocol> lsfolder;
   id ddbd;
-  BOOL ddbdactive;
   NSFileManager *fm;
   NSNotificationCenter *nc;
 }

@@ -579,7 +579,6 @@ static GWorkspace *gworkspace = nil;
   }  
 
   ddbd = nil;
-  ddbdactive = NO;
   [self connectDDBd];
   fannManager = [FileAnnotationsManager fannmanager];
   
@@ -2163,7 +2162,6 @@ static GWorkspace *gworkspace = nil;
       ddbd = db;
 	    [ddbd setProtocolForProxy: @protocol(DDBdProtocol)];
       RETAIN (ddbd);
-      ddbdactive = [ddbd dbactive];
                                          
 	  } else {
 	    static BOOL recursion = NO;
@@ -2209,7 +2207,7 @@ static GWorkspace *gworkspace = nil;
 	    } else { 
         DESTROY (cmd);
 	      recursion = NO;
-        ddbdactive = NO;
+        ddbd = nil;
         NSRunAlertPanel(nil,
                 NSLocalizedString(@"unable to contact ddbd.", @""),
                 NSLocalizedString(@"Ok", @""),
@@ -2232,7 +2230,6 @@ static GWorkspace *gworkspace = nil;
 		                                  NSInternalInconsistencyException);
   RELEASE (ddbd);
   ddbd = nil;
-  ddbdactive = NO;
   [fannManager closeAll];
   
   NSRunAlertPanel(nil,
@@ -2244,26 +2241,26 @@ static GWorkspace *gworkspace = nil;
 
 - (BOOL)ddbdactive
 {
-  return ddbdactive;
+  return (ddbd && [ddbd dbactive]);
 }
 
 - (void)ddbdInsertPath:(NSString *)path
 {
-  if (ddbdactive) {
+  if (ddbd && [ddbd dbactive]) {
     [ddbd insertPath: path];
   }
 }
 
 - (void)ddbdRemovePath:(NSString *)path
 {
-  if (ddbdactive) {
+  if (ddbd && [ddbd dbactive]) {
     [ddbd removePath: path];
   }
 }
 
 - (NSString *)ddbdGetAnnotationsForPath:(NSString *)path
 {
-  if (ddbdactive) {
+  if (ddbd && [ddbd dbactive]) {
     return [ddbd annotationsForPath: path];
   }
   
@@ -2273,59 +2270,8 @@ static GWorkspace *gworkspace = nil;
 - (void)ddbdSetAnnotations:(NSString *)annotations
                    forPath:(NSString *)path
 {
-  if (ddbdactive) {
+  if (ddbd && [ddbd dbactive]) {
     [ddbd setAnnotations: annotations forPath: path];
-  }
-}
-
-- (NSString *)ddbdGetFileTypeForPath:(NSString *)path
-{
-  if (ddbdactive) {
-    return [ddbd fileTypeForPath: path];
-  }
-  
-  return nil;
-}
-
-- (void)ddbdSetFileType:(NSString *)type
-                forPath:(NSString *)path
-{
-  if (ddbdactive) {
-    [ddbd setFileType: type forPath: path];
-  }
-}
-
-- (NSString *)ddbdGetModificationDateForPath:(NSString *)path;
-{
-  if (ddbdactive) {
-    return [ddbd modificationDateForPath: path];
-  }
-  
-  return nil;
-}
-
-- (void)ddbdSetModificationDate:(NSString *)datedescr
-                        forPath:(NSString *)path
-{
-  if (ddbdactive) {
-    [ddbd setModificationDate: datedescr forPath: path];
-  }  
-}
-
-- (NSData *)ddbdGetIconDataForPath:(NSString *)path
-{
-  if (ddbdactive) {
-    return [ddbd iconDataForPath: path];
-  }
-  
-  return nil;
-}
-
-- (void)ddbdSetIconData:(NSData *)data
-                forPath:(NSString *)path
-{
-  if (ddbdactive) {
-    [ddbd setIconData: data forPath: path];
   }
 }
 

@@ -13,7 +13,6 @@ AC_CHECK_FUNCS(getpwnam getpwuid geteuid getlogin)
 
 AC_CONFIG_AUX_DIR([$GNUSTEP_MAKEFILES])
 AC_CONFIG_HEADER([Finder/config.h])
-AC_CONFIG_HEADER([Utilities/ddbd/config.h])
 
 #--------------------------------------------------------------------
 # We need sh
@@ -55,24 +54,6 @@ AC_SUBST(have_pdfkit)
 
 CPPFLAGS="$save_CPPFLAGS"
 
-
-#--------------------------------------------------------------------
-# We need SQLite
-#--------------------------------------------------------------------
-AC_CHECK_HEADERS(sqlite3.h, have_sqlite=yes, have_sqlite=no)
-if test "$have_sqlite" = yes; then
-  AC_CHECK_LIB(sqlite3, sqlite3_open, have_sqlite=yes, have_sqlite=no)
-fi
-
-if test "$have_sqlite" = yes; then
-  AC_DEFINE_UNQUOTED([SQLITE], [1], [])
-  AC_DEFINE_UNQUOTED([HAVE_SQLITE], [], [])
-else
-  AC_DEFINE_UNQUOTED([SQLITE], [0], [])
-fi
-
-AC_SUBST(have_sqlite)
-
 AC_CONFIG_FILES([GNUmakefile \
 									Utilities/ddbd/GNUmakefile \
 									GWorkspace/GNUmakefile \
@@ -83,16 +64,3 @@ AC_CONFIG_FILES([GNUmakefile \
                   Inspector/inspector.make \
                   Finder/GNUmakefile])
 AC_OUTPUT
-
-if test "$have_sqlite" = no; then
-  echo ""
-  echo "*******************************************************************"
-  echo "*                                                                 *"
-  echo "* The sqlite3 library can't be found.                             *"
-  echo "* The Live Search Folders and the File Annotations will not work. *"
-  echo "* To enable these features you must install SQLite 3.0 that can   *"
-  echo "* be downloaded by visiting http://www.sqlite.org                 *"
-  echo "*                                                                 *"
-  echo "*******************************************************************"
-  echo ""
-fi

@@ -72,7 +72,7 @@
   
   IBOutlet id win;
   BOOL forceclose;
-  
+
   IBOutlet id topBox;
   IBOutlet id progBox; 
   ProgrView *progView;

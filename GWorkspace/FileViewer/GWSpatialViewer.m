@@ -810,8 +810,10 @@
   
   [self selectionChanged: selection];
 
-  [manager addNode: baseNode toHistoryOfViewer: self];     
-  [manager changeHistoryOwner: self];
+  if (invalidated == NO) {
+    [manager addNode: baseNode toHistoryOfViewer: self];     
+    [manager changeHistoryOwner: self];
+  }
 }
 
 - (BOOL)windowShouldClose:(id)sender

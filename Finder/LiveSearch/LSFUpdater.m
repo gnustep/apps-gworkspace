@@ -109,7 +109,6 @@
     fm = [NSFileManager defaultManager];
     nc = [NSNotificationCenter defaultCenter];
     ddbd = nil;
-    ddbdactive = NO;
     
     autoupdateTmr = nil;
     autoupdate = 0;
@@ -569,10 +568,8 @@
       ddbd = db;
 	    [ddbd setProtocolForProxy: @protocol(DDBd)];
       RETAIN (ddbd);
-      ddbdactive = [ddbd dbactive];
       
-      NSLog(@"ddbd connected!");
-      
+      NSLog(@"ddbd connected!");     
                                          
 	  } else {
 	    static BOOL recursion = NO;
@@ -610,7 +607,7 @@
 	    } else { 
         DESTROY (cmd);
 	      recursion = NO;
-        ddbdactive = NO;
+        ddbd = nil;
         
         [lsfolder updaterError: @"unable to contact ddbd."];
       }
@@ -630,7 +627,6 @@
 		                                  NSInternalInconsistencyException);
   RELEASE (ddbd);
   ddbd = nil;
-  ddbdactive = NO;
 
   [lsfolder updaterError: @"ddbd connection died!"];
 }
@@ -638,7 +634,7 @@
 - (void)ddbdInsertTrees
 {
   [self connectDDBd];
-  if (ddbdactive) {
+  if (ddbd && [ddbd dbactive]) {
     NSData *info = [NSArchiver archivedDataWithRootObject: searchPaths];
     
     [NSTimer scheduledTimerWithTimeInterval: 10
@@ -654,7 +650,7 @@
 - (void)ddbdInsertDirectoryTreesFromPaths:(NSArray *)paths
 {
   [self connectDDBd];
-  if (ddbdactive) {
+  if (ddbd && [ddbd dbactive]) {
     NSData *info = [NSArchiver archivedDataWithRootObject: paths];
     [ddbd insertDirectoryTreesFromPaths: info];
   }
@@ -663,7 +659,7 @@
 - (NSArray *)ddbdGetDirectoryTreeFromPath:(NSString *)path
 {
   [self connectDDBd];
-  if (ddbdactive) {
+  if (ddbd && [ddbd dbactive]) {
     NSData *data = [ddbd directoryTreeFromPath: path];  
 
     if (data) {
@@ -677,7 +673,7 @@
 - (void)ddbdRemoveTreesFromPaths:(NSArray *)paths
 {
   [self connectDDBd];
-  if (ddbdactive) {
+  if (ddbd && [ddbd dbactive]) {
     [ddbd removeTreesFromPaths: [NSArchiver archivedDataWithRootObject: paths]];
   }
 }

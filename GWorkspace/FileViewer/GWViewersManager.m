@@ -810,7 +810,7 @@ static GWViewersManager *vwrsmanager = nil;
 
 - (void)addNode:(FSNode *)node toHistoryOfViewer:(id)viewer
 {
-  if (settingHistoryPath == NO) {
+  if ([node isValid] && (settingHistoryPath == NO)) {
     BOOL spatial = [viewer isSpatial];
     NSMutableArray *history = (spatial ? spatialViewersHistory: [viewer history]);
     int position = (spatial ? spvHistoryPos : [viewer historyPosition]);

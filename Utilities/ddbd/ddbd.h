@@ -26,20 +26,6 @@
 #define DDBD_H
 
 #include <Foundation/Foundation.h>
-#include "config.h"
-#ifdef HAVE_SQLITE
-  #include "SQLite.h"
-#endif
-
-enum {   
-  DDBdInsertTreeUpdate,
-  DDBdRemoveTreeUpdate,
-  DDBdFileOperationUpdate,
-  DDBdDaylyUpdate
-};
-
-typedef BOOL (*boolIMP)(id, SEL, id);
-typedef char *(*charIMP)(id, SEL, id);
 
 @protocol	DDBdProtocol
 
@@ -49,67 +35,27 @@ typedef char *(*charIMP)(id, SEL, id);
 
 - (BOOL)removePath:(NSString *)path;
 
-- (oneway void)removePaths:(NSArray *)paths;
-
 - (void)insertDirectoryTreesFromPaths:(NSData *)info;
 
 - (void)removeTreesFromPaths:(NSData *)info;
 
-- (NSData *)treeFromPath:(NSData *)pathinfo;
-
-- (NSData *)directoryTreeFromPath:(NSString *)path;
+- (NSData *)directoryTreeFromPath:(NSString *)apath;
 
 - (NSString *)annotationsForPath:(NSString *)path;
 
 - (oneway void)setAnnotations:(NSString *)annotations
                       forPath:(NSString *)path;
 
-- (NSString *)fileTypeForPath:(NSString *)path;
-
-- (oneway void)setFileType:(NSString *)type
-                   forPath:(NSString *)path;
-
-- (NSString *)modificationDateForPath:(NSString *)path;
-
-- (oneway void)setModificationDate:(NSString *)datedescr
-                           forPath:(NSString *)path;
-
-- (NSData *)iconDataForPath:(NSString *)path;
-
-- (oneway void)setIconData:(NSData *)data
-                   forPath:(NSString *)path;
-
-- (BOOL)setInfoOfPath:(NSString *)src
-               toPath:(NSString *)dst;
-
-- (BOOL)performWriteQuery:(NSString *)query;
-
 @end
 
 
 @interface DDBd: NSObject <DDBdProtocol>
 {
-  NSString *dbpath;
   NSConnection *conn;
-  NSRecursiveLock *lock;
-  NSFileManager *fm;
   NSNotificationCenter *nc; 
-
-  NSMutableCharacterSet *skipSet;
-  
-#ifdef HAVE_SQLITE
-  sqlite3 *db;
-#endif
 }
 
-- (NSData *)infoOfType:(NSString *)type
-               forPath:(NSString *)path;
-
-- (void)setInfo:(NSString *)info
-         ofType:(NSString *)type
-        forPath:(NSString *)path;
-
-- (BOOL)checkPath:(NSString *)path;
+- (void)prepareDb;
                                                      
 - (void)connectionBecameInvalid:(NSNotification *)notification;
 
@@ -122,9 +68,27 @@ typedef char *(*charIMP)(id, SEL, id);
 @end
 
 
-@interface DDBd (indexing)
+@interface DBUpdater: NSObject
+{
+  id ddbd;
+  NSDictionary *updinfo;
+}
 
-- (void)indexContentsOfFile:(NSString *)path;
++ (void)updaterForTask:(NSDictionary *)info;
+
+- (void)setUpdaterTask:(NSDictionary *)info;
+
+- (void)done;
+
+- (void)prepareDb;
+
+- (void)insertTrees;
+
+- (void)removeTrees;
+
+- (void)fileSystemDidChange;
+
+- (void)daylyUpdate;
 
 @end
 
