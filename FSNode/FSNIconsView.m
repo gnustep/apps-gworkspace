@@ -849,14 +849,14 @@ pp.x = NSMaxX([self bounds]) - 1
     if (charBuffer == nil) {
       charBuffer = [characters substringToIndex: 1];
       RETAIN (charBuffer);
-      lastKeyPressed = 0.;
+      lastKeyPressed = 0.0;
     } else {
-      if ([theEvent timestamp] - lastKeyPressed < 2000.0) {
+      if ([theEvent timestamp] - lastKeyPressed < 500.0) {
         ASSIGN (charBuffer, ([charBuffer stringByAppendingString:
 				    															[characters substringToIndex: 1]]));
       } else {
         ASSIGN (charBuffer, ([characters substringToIndex: 1]));
-        lastKeyPressed = 0.;
+        lastKeyPressed = 0.0;
       }														
     }	
     		
@@ -1001,7 +1001,8 @@ pp.x = NSMaxX([self bounds]) - 1
                                        textColor: textColor
                                        gridIndex: -1
                                        dndSource: YES
-                                       acceptDnd: YES];
+                                       acceptDnd: YES
+                                       slideBack: YES];
     [unsorted addObject: icon];
     [self addSubview: icon];
     RELEASE (icon);
@@ -1154,6 +1155,10 @@ pp.x = NSMaxX([self bounds]) - 1
     files = [NSArray arrayWithObject: [source lastPathComponent]];
     source = [source stringByDeletingLastPathComponent]; 
   }
+
+  if ([operation isEqual: @"NSWorkspaceRecycleOperation"]) {
+		files = [info objectForKey: @"origfiles"];
+  }	
 
   if (([ndpath isEqual: source] == NO) && ([ndpath isEqual: destination] == NO)) {
     [self reloadContents];
@@ -1404,7 +1409,8 @@ pp.x = NSMaxX([self bounds]) - 1
                                      textColor: textColor
                                      gridIndex: -1
                                      dndSource: YES
-                                     acceptDnd: YES];
+                                     acceptDnd: YES
+                                     slideBack: YES];
   [icons addObject: icon];
   [self addSubview: icon];
   RELEASE (icon);
@@ -1595,7 +1601,13 @@ pp.x = NSMaxX([self bounds]) - 1
     FSNIcon *icon = [icons objectAtIndex: i];
 
     if ([icon isSelected]) {
-      [selectedNodes addObject: [icon node]];
+      NSArray *selection = [icon selection];
+      
+      if (selection) {
+        [selectedNodes addObjectsFromArray: selection];
+      } else {
+        [selectedNodes addObject: [icon node]];
+      }
     }
   }
 
@@ -1605,13 +1617,21 @@ pp.x = NSMaxX([self bounds]) - 1
 - (NSArray *)selectedPaths
 {
   NSMutableArray *selectedPaths = [NSMutableArray array];
-  int i;
+  int i, j;
   
   for (i = 0; i < [icons count]; i++) {
     FSNIcon *icon = [icons objectAtIndex: i];
 
     if ([icon isSelected]) {
-      [selectedPaths addObject: [[icon node] path]];
+      NSArray *selection = [icon selection];
+    
+      if (selection) {
+        for (j = 0; j < [selection count]; j++) {
+          [selectedPaths addObject: [[selection objectAtIndex: j] path]];
+        }
+      } else {
+        [selectedPaths addObject: [[icon node] path]];
+      }
     }
   }
 

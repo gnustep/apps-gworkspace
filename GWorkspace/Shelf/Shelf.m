@@ -109,7 +109,7 @@
 		
     cellsWidth = [gw shelfCellsWidth];
     
-    if (rpath != nil) {
+    if (rpath) {
       ASSIGN (viewerPath, rpath);
     } else {
       viewerPath = nil;
@@ -129,7 +129,7 @@
         NSString *p = [iconpaths objectAtIndex: j];
         
         if ([fm fileExistsAtPath: p] && ([hiddenPaths containsObject: p] == NO)) {
-          if (viewerPath != nil) {
+          if (viewerPath) {
             if ((subPathOfPath(viewerPath, p) == NO)
                               && ([viewerPath isEqualToString: p] == NO)) {
               canadd = NO;

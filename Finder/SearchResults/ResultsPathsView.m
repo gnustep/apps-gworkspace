@@ -130,7 +130,8 @@
                               textColor: [NSColor controlTextColor]
                               gridIndex: 0
                               dndSource: NO
-                              acceptDnd: NO];
+                              acceptDnd: NO
+                              slideBack: YES];
 
     [self addSubview: icon];
     [icons insertObject: icon atIndex: [icons count]];

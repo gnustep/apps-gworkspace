@@ -918,7 +918,8 @@
                                        textColor: textColor
                                        gridIndex: -1
                                        dndSource: YES
-                                       acceptDnd: YES];
+                                       acceptDnd: YES
+                                       slideBack: YES];
                                        
     [unsorted addObject: icon];
     RELEASE (icon);

@@ -105,6 +105,7 @@ static NSDictionary *fontAttr = nil;
 {
   if (node) {
     ASSIGN (icon, [FSNodeRep iconOfSize: icnsize forNode: node]);
+    icnh = [icon size].height;
     DESTROY (openicon);
   }
 }
@@ -128,6 +129,7 @@ static NSDictionary *fontAttr = nil;
 
     if (opicn) {
       ASSIGN (openicon, opicn);
+      icnh = [openicon size].height;
     }
   }
   
@@ -237,7 +239,7 @@ static NSDictionary *fontAttr = nil;
     [self setShowsFirstResponder: NO];
     
     icon_rect.origin = cellFrame.origin;
-    icon_rect.size = NSMakeSize(icnsize, icnsize);
+    icon_rect.size = NSMakeSize(icnsize, icnh);
     icon_rect.origin.x += MARGIN;
     icon_rect.origin.y += ((cellFrame.size.height - icon_rect.size.height) / 2.0);
     if ([controlView isFlipped]) {
@@ -336,6 +338,7 @@ static NSDictionary *fontAttr = nil;
   ASSIGN (selection, selnodes);
   if (icon) {
     ASSIGN (icon, [FSNodeRep multipleSelectionIconOfSize: icnsize]);
+    icnh = [icon size].height;
   }  
   ASSIGN (selectionTitle, ([NSString stringWithFormat: @"%i %@", 
                   [selection count], NSLocalizedString(@"elements", @"")]));
@@ -358,6 +361,22 @@ static NSDictionary *fontAttr = nil;
 - (NSArray *)selection
 {
   return selection;
+}
+
+- (NSArray *)pathsSelection
+{
+  if (selection) {
+    NSMutableArray *selpaths = [NSMutableArray array];
+    int i;
+
+    for (i = 0; i < [selection count]; i++) {
+      [selpaths addObject: [[selection objectAtIndex: i] path]];
+    }
+
+    return [NSArray arrayWithArray: selpaths];
+  }
+
+  return nil;
 }
 
 - (void)setFont:(NSFont *)fontObj

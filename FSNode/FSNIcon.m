@@ -92,6 +92,7 @@ static NSImage *branchImage;
         gridIndex:(int)gindex
         dndSource:(BOOL)dndsrc
         acceptDnd:(BOOL)dndaccept
+        slideBack:(BOOL)slback
 {
   self = [super init];
 
@@ -113,6 +114,7 @@ static NSImage *branchImage;
     
     dndSource = dndsrc;
     acceptDnd = dndaccept;
+    slideBack = slback;
     
     selectable = YES;
     isLeaf = YES;
@@ -686,6 +688,22 @@ static NSImage *branchImage;
   return selection;
 }
 
+- (NSArray *)pathsSelection
+{
+  if (selection) {
+    NSMutableArray *selpaths = [NSMutableArray array];
+    int i;
+
+    for (i = 0; i < [selection count]; i++) {
+      [selpaths addObject: [[selection objectAtIndex: i] path]];
+    }
+
+    return [NSArray arrayWithArray: selpaths];
+  }
+  
+  return nil;
+}
+
 - (void)setFont:(NSFont *)fontObj
 {
   [label setFont: fontObj];
@@ -883,7 +901,21 @@ static NSImage *branchImage;
 
 - (void)checkLocked
 {
-  [self setLocked: [node isLocked]];
+  if (selection == nil) {
+    [self setLocked: [node isLocked]];
+    
+  } else {
+    int i;
+    
+    [self setLocked: NO];
+    
+    for (i = 0; i < [selection count]; i++) {
+      if ([[selection objectAtIndex: i] isLocked]) {
+        [self setLocked: YES];
+        break;
+      }
+    }
+  }
 }
 
 - (BOOL)isLocked
@@ -969,7 +1001,7 @@ static NSImage *branchImage;
                 event: event
            pasteboard: pb
                source: self
-            slideBack: YES];
+            slideBack: slideBack];
     }
   }
 }
@@ -988,6 +1020,12 @@ static NSImage *branchImage;
   
   if ([container respondsToSelector: @selector(restoreLastSelection)]) {
     [container restoreLastSelection];
+  }
+  
+  if (flag == NO) {
+    if ([container respondsToSelector: @selector(removeUndepositedRep:)]) {
+      [container removeUndepositedRep: self];
+    }
   }
 }
 

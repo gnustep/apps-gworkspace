@@ -76,6 +76,7 @@
 
   BOOL dndSource;
   BOOL acceptDnd;
+  BOOL slideBack;
   int dragdelay;
   BOOL isDragTarget;
   BOOL onSelf;
@@ -94,7 +95,8 @@
         textColor:(NSColor *)tcolor
         gridIndex:(int)gindex
         dndSource:(BOOL)dndsrc
-        acceptDnd:(BOOL)dndaccept;
+        acceptDnd:(BOOL)dndaccept
+        slideBack:(BOOL)slback;
 
 - (void)setSelectable:(BOOL)value;
 

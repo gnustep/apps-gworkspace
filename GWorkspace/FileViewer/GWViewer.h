@@ -83,6 +83,7 @@
 
 - (GWViewerWindow *)win;
 - (id)nodeView;
+- (id)shelf;
 - (NSString *)viewType;
 - (BOOL)isRootViewer;
 - (BOOL)isSpatial;
@@ -100,6 +101,7 @@
 - (void)unselectAllReps;
 - (void)selectionChanged:(NSArray *)newsel;
 - (void)pathsViewDidSelectIcon:(id)icon;
+- (void)shelfDidSelectIcon:(id)icon;
 - (void)setSelectableNodesRange:(NSRange)range;
 - (void)updeateInfoLabels;
 

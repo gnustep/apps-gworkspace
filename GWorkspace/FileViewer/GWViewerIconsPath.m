@@ -45,6 +45,7 @@
 {
   RELEASE (icons);
   TEST_RELEASE (extInfoType);
+  RELEASE (labelFont);
   RELEASE (backColor);
   RELEASE (textColor);
   RELEASE (disabledTextColor);
@@ -197,8 +198,7 @@
     
       for (i = 0; i < [selection count]; i++) {
         NSString *selpath = [selection objectAtIndex: i];
-        FSNode *selnode = [FSNode nodeWithRelativePath: [selpath lastPathComponent] 
-                                                parent: node];
+        FSNode *selnode = [FSNode nodeWithRelativePath: selpath parent: nil];
         [selnodes addObject: selnode];
       }
       
@@ -403,7 +403,8 @@
                                      textColor: textColor
                                      gridIndex: -1
                                      dndSource: YES
-                                     acceptDnd: YES];
+                                     acceptDnd: YES
+                                     slideBack: YES];
   [icons addObject: icon];
   [self addSubview: icon];
   RELEASE (icon);
@@ -449,13 +450,21 @@
 - (NSArray *)selectedPaths
 {
   NSMutableArray *selectedPaths = [NSMutableArray array];
-  int i;
+  int i, j;
   
   for (i = 0; i < [icons count]; i++) {
     FSNIcon *icon = [icons objectAtIndex: i];
 
     if ([icon isSelected]) {
-      [selectedPaths addObject: [[icon node] path]];
+      NSArray *selection = [icon selection];
+    
+      if (selection) {
+        for (j = 0; j < [selection count]; j++) {
+          [selectedPaths addObject: [[selection objectAtIndex: j] path]];
+        }
+      } else {
+        [selectedPaths addObject: [[icon node] path]];
+      }
     }
   }
 
@@ -630,6 +639,13 @@
 
 
 
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// THUMBNAILS
+// RESIZE DELLE COLONNE
+// CUT & PASTE
+//
+// KEYDOWN !!!!!!!!!!!!!
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
 

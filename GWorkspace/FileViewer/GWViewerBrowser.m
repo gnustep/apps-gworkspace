@@ -31,11 +31,6 @@
 
 @implementation GWViewerBrowser
 
-- (void)dealloc
-{
-	[super dealloc];
-}
-
 - (id)initWithBaseNode:(FSNode *)bsnode
               inViewer:(id)vwr
 		    visibleColumns:(int)vcols 
@@ -75,12 +70,7 @@
   }      
 }
 
-- (void)synchronizeViewer
-{
-  NSRange range = NSMakeRange(firstVisibleColumn, visibleColumns);
-  [viewer setSelectableNodesRange: range];
-}
-
+/*
 - (void)clickInMatrixOfColumn:(FSNBrowserColumn *)col
 {
   int index = [col index];
@@ -127,15 +117,7 @@
   
   [self notifySelectionChange: [col selectedPaths]];		  
 }
-
-- (void)doubleClickInMatrixOfColumn:(FSNBrowserColumn *)col
-{
-  unsigned int mouseFlags = [(FSNBrowserMatrix *)[col cmatrix] mouseFlags];
-  BOOL closesndr = ((mouseFlags == NSAlternateKeyMask) 
-                              || (mouseFlags == NSControlKeyMask));
-
-  [manager openSelectionInViewer: viewer closeSender: closesndr];
-}
+*/
 
 @end
 

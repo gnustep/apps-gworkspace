@@ -162,7 +162,7 @@
     defEntry = [viewerPrefs objectForKey: @"shelfdicts"];
     
     if (defEntry) {
-   //   [shelf setContents: defEntry];
+      [shelf setContents: defEntry];
     }
         
     if ([viewType isEqual: @"Icon"]) {
@@ -258,7 +258,7 @@
   d = [split dividerThickness];
   
   r = NSMakeRect(0, 0, w, shelfHeight);  
-  shelf = [[GWViewerShelf alloc] initWithFrame: r];
+  shelf = [[GWViewerShelf alloc] initWithFrame: r forViewer: self];
   [split addSubview: shelf];
   RELEASE (shelf);
   
@@ -356,6 +356,11 @@
 - (id)nodeView
 {
   return nodeView;
+}
+
+- (id)shelf
+{
+  return shelf;
 }
 
 - (NSString *)viewType
@@ -520,6 +525,20 @@
   }
 }
 
+- (void)shelfDidSelectIcon:(id)icon
+{
+  FSNode *node = [icon node];
+  FSNode *base = [FSNode nodeWithRelativePath: [node parentPath] parent: nil];
+  NSArray *selection = [icon selection];
+
+  if (selection == nil) {
+    selection = [NSArray arrayWithObject: node];
+  }
+  
+  [nodeView showContentsOfNode: base];
+  [nodeView selectRepsOfSubnodes: selection];
+}
+
 - (void)setSelectableNodesRange:(NSRange)range
 {
   visibleCols = range.length;
@@ -614,6 +633,10 @@
     files = [NSArray arrayWithObject: [destination lastPathComponent]];
     destination = [destination stringByDeletingLastPathComponent]; 
   }
+
+  if ([operation isEqual: @"NSWorkspaceRecycleOperation"]) {
+		files = [info objectForKey: @"origfiles"];
+  }	
 
   if ([operation isEqual: @"NSWorkspaceMoveOperation"] 
         || [operation isEqual: @"NSWorkspaceCopyOperation"]
@@ -802,8 +825,8 @@
     [updatedprefs setObject: [NSNumber numberWithFloat: shelfHeight]
                      forKey: @"shelfheight"];
 
-//    [updatedprefs setObject: [shelf contentsInfo]
-//                     forKey: @"shelfdicts"];
+    [updatedprefs setObject: [shelf contentsInfo]
+                     forKey: @"shelfdicts"];
 
     defEntry = [nodeView selectedPaths];
     if (defEntry) {

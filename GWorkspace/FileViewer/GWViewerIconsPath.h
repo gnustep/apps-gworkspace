@@ -103,6 +103,7 @@
 - (NSArray *)selectedPaths;  
 
 - (void)checkLockedReps;
+- (FSNSelectionMask)selectionMask;
 - (void)restoreLastSelection;
 
 - (NSColor *)backgroundColor;

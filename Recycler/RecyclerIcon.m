@@ -65,7 +65,8 @@ static id <DesktopApplication> desktopApp = nil;
                   textColor: [NSColor controlTextColor]
                   gridIndex: 0
                   dndSource: NO
-                  acceptDnd: YES];
+                  acceptDnd: YES
+                  slideBack: NO];
 
   if (self) {
     NSArray *subNodes = [node subNodes];

@@ -265,7 +265,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
 	[self makePopUp: components];
 	
   wpaths = [NSMutableArray arrayWithCapacity: 1];  
-  s = [NSString string];        
+  s = [NSString string];  
    
   for (i = 0; i < [components count]; i++) {  
     s = [s stringByAppendingPathComponent: [components objectAtIndex: i]];

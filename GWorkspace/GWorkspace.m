@@ -1523,7 +1523,10 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   [dict setObject: source forKey: @"source"];	
   [dict setObject: destination forKey: @"destination"];	
   [dict setObject: files forKey: @"files"];	
-
+  if (origfiles) {
+    [dict setObject: origfiles forKey: @"origfiles"];	
+  }
+  
 	[[NSNotificationCenter defaultCenter]
  				postNotificationName: GWFileSystemDidChangeNotification
 	 								    object: dict];

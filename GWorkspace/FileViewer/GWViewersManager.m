@@ -450,6 +450,14 @@ static GWViewersManager *vwrsmanager = nil;
         [viewer nodeContentsWillChange: opinfo];
       }
     }
+    
+    if ([viewer invalidated] == NO) {
+      id shelf = [viewer shelf];
+      
+      if (shelf) {
+        [shelf nodeContentsWillChange: opinfo];
+      }
+    }
   }
   
   [self closeInvalidViewers: viewersToClose];
@@ -472,6 +480,14 @@ static GWViewersManager *vwrsmanager = nil;
     } else {
       if ([viewer involvedByFileOperation: opinfo]) {
         [viewer nodeContentsDidChange: opinfo];
+      }
+    }
+    
+    if ([viewer invalidated] == NO) {
+      id shelf = [viewer shelf];
+      
+      if (shelf) {
+        [shelf nodeContentsDidChange: opinfo];
       }
     }
   }
@@ -505,6 +521,14 @@ static GWViewersManager *vwrsmanager = nil;
       if ([[[watchedNodes objectAtIndex: j] path] isEqual: path]) {
         [viewer watchedPathChanged: info];
         break;
+      }
+    }
+    
+    if ([viewer invalidated] == NO) {
+      id shelf = [viewer shelf];
+      
+      if (shelf) {
+        [shelf watchedPathChanged: info];
       }
     }
   }

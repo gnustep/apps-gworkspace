@@ -27,6 +27,7 @@
 #include <math.h>
 #include "FSNBrowser.h"
 #include "FSNBrowserColumn.h"
+#include "FSNBrowserMatrix.h"
 #include "FSNBrowserCell.h"
 #include "FSNIcon.h"
 #include "FSNFunctions.h"
@@ -703,10 +704,8 @@
     [window disableFlushWindow];
     
     for (i = 0; i < count; i++) {
-      FSNBrowserColumn *bc = [columns objectAtIndex: i];
-    
       int n = i - firstVisibleColumn;
-
+    
       colrect = NSZeroRect;
       colrect.size = columnSize;
       colrect.origin.y = 0;
@@ -726,8 +725,8 @@
       if (i == lastVisibleColumn) {
         colrect.size.width = [self bounds].size.width - colrect.origin.x;
 	    }
-          
-      [bc setFrame: colrect];
+      
+      [[columns objectAtIndex: i] setFrame: colrect];
     }
     
     [self synchronizeViewer];
@@ -752,9 +751,9 @@
 		case NSScrollerDecrementPage:        
 			[self scrollColumnsLeftBy: 1];
 			if (currentshift > 0) {
-				[self setLastColumn: (lastColumnLoaded - currentshift)];
+        [self setLastColumn: (lastColumnLoaded - currentshift)];
         [self setShift: currentshift - 1];
-			}
+      }
 			break;
       
 		// Scroll to the right
@@ -1018,6 +1017,10 @@
 
 - (void)synchronizeViewer
 {
+  if (viewer) {
+    NSRange range = NSMakeRange(firstVisibleColumn, visibleColumns);
+    [viewer setSelectableNodesRange: range];
+  }
 }
 
 - (void)addCellsWithNames:(NSArray *)names 
@@ -1142,8 +1145,8 @@
 {
   int index = [col index];
   int pos = index - firstVisibleColumn + 1;  
-  BOOL last = (index == lastVisibleColumn) || (index == ([columns count] -1));
   BOOL mustshift = (firstVisibleColumn > 0);
+  int added = 0;
   NSArray *selection = [col selectedNodes];
   
   if ((selection == nil) || ([selection count] == 0)) {
@@ -1161,23 +1164,29 @@
   
     if ([node isDirectory] && ([node isPackage] == NO)) {
       [self addAndLoadColumnForNode: node];
-    
-    } else {
-      if ((last == NO) || selColumn) {
-        [self addFillingColumn];
-      } 
-    }
-    
-  } else {
-    if ((last == NO) || selColumn) {
+      if (manager) {
+        [manager viewer: viewer didShowNode: node];
+      }
+      added = 1;
+      
+    } else if (selColumn) {
       [self addFillingColumn];
-    }
-  } 
+    }  
     
-  if (mustshift && (pos < (visibleColumns - 1))) { 
-		[self setShift: visibleColumns - pos - 1];
-	}
+  } else if (selColumn) {
+    [self addFillingColumn];
+  } 
   
+  if (selColumn == NO) {
+    if (mustshift && (pos < visibleColumns)) { 
+		  [self setShift: visibleColumns - pos - added];
+	  }
+  } else {
+    if (mustshift && (pos < (visibleColumns - 1))) { 
+		  [self setShift: visibleColumns - pos - 1];
+	  }
+  }
+    
   updateViewsLock--;
   [self tile];
   
@@ -1186,7 +1195,15 @@
 
 - (void)doubleClickInMatrixOfColumn:(FSNBrowserColumn *)col
 {
-  [desktopApp openSelectionInNewViewer: NO];
+  if (manager) {
+    unsigned int mouseFlags = [(FSNBrowserMatrix *)[col cmatrix] mouseFlags];
+    BOOL closesndr = ((mouseFlags == NSAlternateKeyMask) 
+                              || (mouseFlags == NSControlKeyMask));
+
+    [manager openSelectionInViewer: viewer closeSender: closesndr];
+  } else {
+    [desktopApp openSelectionInNewViewer: NO];
+  }
 }
 
 - (void)keyDown:(NSEvent *)theEvent
@@ -1256,7 +1273,7 @@
 	      charBuffer = [characters substringToIndex: 1];
 	      RETAIN (charBuffer);
 	    } else {
-	      if (([theEvent timestamp] - lastKeyPressed < 2000.0)
+	      if (([theEvent timestamp] - lastKeyPressed < 500.0)
 		  											      && (alphaNumericalLastColumn == index)) {
 		  		ASSIGN (charBuffer, ([charBuffer stringByAppendingString:
 				    																[characters substringToIndex: 1]]));
@@ -1274,7 +1291,7 @@
       }
 		}
 		
-		lastKeyPressed = 0.;			
+		lastKeyPressed = 0.0;			
 	}  
   
   [super keyDown: theEvent];
@@ -1351,7 +1368,7 @@
 
 - (void)showContentsOfNode:(FSNode *)anode
 {
-  [self setBaseNode: anode];
+  [self showSubnode: anode];
 }
 
 - (void)reloadContents
@@ -1420,6 +1437,10 @@
     files = [NSArray arrayWithObject: [destination lastPathComponent]];
     destination = [destination stringByDeletingLastPathComponent]; 
   }
+
+  if ([operation isEqual: @"NSWorkspaceRecycleOperation"]) {
+		files = [info objectForKey: @"origfiles"];
+  }	
 
   if ([operation isEqual: @"NSWorkspaceMoveOperation"] 
         || [operation isEqual: @"NSWorkspaceCopyOperation"]
@@ -1667,6 +1688,7 @@
     
     if (bc) {
       [bc selectCells: reps sendAction: NO];
+      [[self window] makeFirstResponder: [bc cmatrix]];
     }
   }
 }
@@ -1680,10 +1702,15 @@
       FSNBrowserColumn *bc = [self columnWithPath: [node parentPath]];
     
       if (bc) {
-        [bc selectCellsOfNodes: nodes sendAction: NO];
+        [bc selectCellsOfNodes: nodes sendAction: YES];
       } else {
         [self showSelection: nodes];
       }
+      
+      bc = [self lastLoadedColumn];
+      if (bc) {
+        [[self window] makeFirstResponder: [bc cmatrix]];
+      }  
     }
   }
 }
@@ -1701,6 +1728,11 @@
       } else {
         [self showPathsSelection: paths];
       }
+      
+      bc = [self lastLoadedColumn];
+      if (bc) {
+        [[self window] makeFirstResponder: [bc cmatrix]];
+      }  
     }
   }
 }
@@ -1831,13 +1863,15 @@
       [self setLastColumn: 0];
       [bc unselectAllCells];
       [self notifySelectionChange: [NSArray arrayWithObject: [baseNode path]]];
-      
-    
-          // FIRST RESPONDER ???????????
     }
     
     updateViewsLock--;
     [self tile];    
+
+    bc = [self lastLoadedColumn];
+    if (bc) {
+      [[self window] makeFirstResponder: [bc cmatrix]];
+    }
   }
 }
 

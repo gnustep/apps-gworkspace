@@ -327,6 +327,11 @@
   return nodeView;
 }
 
+- (id)shelf
+{
+  return nil;
+}
+
 - (NSString *)viewType
 {
   return viewType;
@@ -567,6 +572,10 @@
     files = [NSArray arrayWithObject: [destination lastPathComponent]];
     destination = [destination stringByDeletingLastPathComponent]; 
   }
+
+  if ([operation isEqual: @"NSWorkspaceRecycleOperation"]) {
+		files = [info objectForKey: @"origfiles"];
+  }	
 
   if ([operation isEqual: @"NSWorkspaceMoveOperation"] 
         || [operation isEqual: @"NSWorkspaceCopyOperation"]

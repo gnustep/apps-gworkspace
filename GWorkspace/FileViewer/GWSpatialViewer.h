@@ -80,6 +80,7 @@
 
 - (GWViewerWindow *)win;
 - (id)nodeView;
+- (id)shelf;
 - (NSString *)viewType;
 - (BOOL)isRootViewer;
 - (BOOL)isSpatial;

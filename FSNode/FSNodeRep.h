@@ -65,6 +65,8 @@ typedef enum FSNSelectionMask {
 
 - (NSArray *)selection;
 
+- (NSArray *)pathsSelection;
+
 - (void)setFont:(NSFont *)fontObj;
 
 - (NSFont *)labelFont;
@@ -188,6 +190,8 @@ typedef enum FSNSelectionMask {
 
 - (void)removeRep:(id)arep;
 
+- (void)removeUndepositedRep:(id)arep;
+
 - (void)unloadFromNode:(FSNode *)anode;
 
 - (void)repSelected:(id)arep;
@@ -267,6 +271,23 @@ typedef enum FSNSelectionMask {
 
 - (id)workspaceApplication;
 
+@end
+
+
+@protocol FSNViewer
+
+- (void)setSelectableNodesRange:(NSRange)range;
+
+@end
+
+
+@protocol FSNViewerManager
+
+- (void)viewer:(id)aviewer didShowNode:(FSNode *)node;
+
+- (void)openSelectionInViewer:(id)viewer
+                  closeSender:(BOOL)close;
+                  
 @end
 
 

@@ -81,7 +81,8 @@ static id <DesktopApplication> desktopApp = nil;
                   textColor: [NSColor controlTextColor]
                   gridIndex: 0
                   dndSource: NO
-                  acceptDnd: NO];
+                  acceptDnd: NO
+                  slideBack: NO];
 
   if (self) {
     ASSIGN (appName, [[node name] stringByDeletingPathExtension]);

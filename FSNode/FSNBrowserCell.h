@@ -46,6 +46,7 @@ typedef NSString *(*cutIMP)(id, SEL, id, float);
   NSImage *icon;
   NSImage *openicon;
   int icnsize;
+  float icnh;
   
   NSRect hlightRect;
   
