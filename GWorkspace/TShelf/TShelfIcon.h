@@ -160,25 +160,5 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 
 @end
 
-@interface ShelfIcon : TShelfIcon
-{
-}
-
-@end
-
-@interface FinderShelfIcon : TShelfIcon
-{
-}
-
-@end
-
-@interface DesktopViewIcon : ShelfIcon
-{
-}
-
-- (void)unselectFromTimer:(id)sender;
-
-@end
-
 #endif // TSHELF_ICON_H
 

@@ -146,6 +146,7 @@ ifneq ($(FOUNDATION_LIB), apple)
   TShelf/TShelfViewItem.m \
   TShelf/TShelfIconsView.m \
   TShelf/TShelfIcon.m \
+  TShelf/TShelfPBIcon.m \
   Inspectors/InspectorsController.m \
   Inspectors/Attributes.m \
   Inspectors/Contents.m \
@@ -192,6 +193,7 @@ else
   TShelf/TShelfViewItem.m \
   TShelf/TShelfIconsView.m \
   TShelf/TShelfIcon.m \
+  TShelf/TShelfPBIcon.m \
   Inspectors/InspectorsController.m \
   Inspectors/Attributes.m \
   Inspectors/Contents.m \

@@ -36,6 +36,7 @@
   #endif
 #include "TShelfIconsView.h"
 #include "TShelfIcon.h"
+#include "TShelfPBIcon.h"
 #include "GWorkspace.h"
 #include "GNUstep.h"
 

@@ -1,5 +1,8 @@
 2003-10-07 Enrico Sersale  <enrico@imago.ro>
 
+  * GWorkspace/TShelf/TShelfPBIcon.h GWorkspace/TShelf/TShelfPBIcon.m
+    New files. 
+
   * GWorkspace/Resources/Icons/
     Added: Pboard.tiff, colorPboard.tiff, filecontsPboard.tiff, 
     gormPboard.tiff, rtfPboard.tiff, rtfdPboard.tiff, stringPboard.tiff, 

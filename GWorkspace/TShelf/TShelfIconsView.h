@@ -59,6 +59,7 @@ typedef gridpoint *(*GridPointIMP)(id, SEL, NSPoint);
 @class NSImage;
 @class NSMenu;
 @class TShelfIcon;
+@class TShelfPBIcon;
 @class NSFileManager;
 @class GWorkspace;
 
