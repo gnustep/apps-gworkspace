@@ -590,6 +590,7 @@ static GWorkspace *gworkspace = nil;
   [self connectDDBd];
   
 	[defaults synchronize];
+  terminating = NO;
 
   [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
                 				selector: @selector(fileSystemWillChange:) 
@@ -637,7 +638,8 @@ static GWorkspace *gworkspace = nil;
   }
   
   fswnotifications = NO;
-  
+  terminating = YES;
+
   [self updateDefaults];
 
 	TEST_CLOSE (prefController, [prefController myWin]);
@@ -1947,7 +1949,7 @@ static GWorkspace *gworkspace = nil;
 
 - (BOOL)ddbdactive
 {
-  return (ddbd && [ddbd dbactive]);
+  return ((terminating == NO) && (ddbd && [ddbd dbactive]));
 }
 
 - (void)ddbdInsertPath:(NSString *)path
@@ -2013,6 +2015,7 @@ static GWorkspace *gworkspace = nil;
 
 	return app;
 }
+
 
 //
 // NSServicesRequests protocol
@@ -2629,6 +2632,11 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 - (id)workspaceApplication
 {
   return [GWorkspace gworkspace];
+}
+
+- (BOOL)terminating
+{
+  return terminating;
 }
 
 @end

@@ -50,7 +50,7 @@
 
 @end
 
-
+    
 @interface DDBd: NSObject <DDBdProtocol>
 {
   NSTimer *syncTimer;

@@ -1529,18 +1529,12 @@
     NSImage *img = [sender draggedImage];
     NSSize sz = [img size];
     NSRect irect = [self iconBoundsInGridAtIndex: index];
-     
+    
     dragPoint.x = ceil(irect.origin.x + ((irect.size.width - sz.width) / 2));
     dragPoint.y = ceil(irect.origin.y + ((irect.size.height - sz.height) / 2));
     
     if (dragIcon == nil) {
-      NSImageRep *rep = [img bestRepresentationForDevice: nil];
-    
-      if ([rep isKindOfClass: [NSBitmapImageRep class]]) {
-        NSData *data = [(NSBitmapImageRep *)rep TIFFRepresentation];
-      
-        dragIcon = [[NSImage alloc] initWithData: data];
-      }
+      ASSIGN (dragIcon, img); 
     }
   
     if (insertIndex != index) {

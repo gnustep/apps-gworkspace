@@ -24,7 +24,6 @@
 
 #include <AppKit/AppKit.h>
 #include "ImageViewer.h"
-#include "ImgReader.h"
 #include <math.h>
 
 @implementation ImageViewer
@@ -32,8 +31,15 @@
 - (void)dealloc
 {
   [nc removeObserver: self];  
-  DESTROY (readerConn);
-  DESTROY (reader);
+
+  if (resizerConn != nil) {
+    if (resizer != nil) {
+      [resizer terminate];
+    }
+    DESTROY (resizer);    
+    DESTROY (resizerConn);
+  }
+
   TEST_RELEASE (imagePath);	
   TEST_RELEASE (nextPath);	
   TEST_RELEASE (editPath);	
@@ -41,6 +47,7 @@
   RELEASE (imview);
   RELEASE (errLabel);
   RELEASE (progView);
+  DESTROY (conn);
   [super dealloc];
 }
 
@@ -131,7 +138,8 @@
         
     valid = YES;
     
-    reader = nil;
+    resizer = nil;
+    waitingResizer = NO;
     imagePath = nil;
     nextPath = nil;
     editPath = nil;
@@ -152,41 +160,40 @@
   
   ASSIGN (imagePath, path);
 
-  if (reader == nil) {
-    NSPort *port[2];  
-    NSArray *portArray;
+  if (conn == nil) {
+    NSString *cname = [NSString stringWithFormat: @"search_%i", (unsigned long)self];
+
+    conn = [[NSConnection alloc] initWithReceivePort: (NSPort *)[NSPort port] 
+																			      sendPort: nil];
+    [conn setRootObject: self];
+    [conn registerName: cname];
+    [conn setDelegate: self];
+
+    [nc addObserver: self
+           selector: @selector(connectionDidDie:)
+               name: NSConnectionDidDieNotification
+             object: conn];    
+  }
   
-    port[0] = (NSPort *)[NSPort port];
-    port[1] = (NSPort *)[NSPort port];
-    portArray = [NSArray arrayWithObjects: port[1], port[0], nil];
+  if ((resizer == nil) && (waitingResizer == NO)) {
+    NSString *cname = [NSString stringWithFormat: @"search_%i", (unsigned long)self];
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(GSToolsDirectory, NSSystemDomainMask, YES);
+    NSString *cmd = [[paths objectAtIndex: 0] stringByAppendingPathComponent: @"resizer"];
 
-    readerConn = [[NSConnection alloc] initWithReceivePort: (NSPort *)port[0]
-                                                  sendPort: (NSPort *)port[1]];
-    [readerConn setRootObject: self];
-    [readerConn setDelegate: self];
-    [readerConn enableMultipleThreads];
+    waitingResizer = YES;
 
-    [nc addObserver: self 
-				   selector: @selector(readerConnDidDie:)
-	    			   name: NSConnectionDidDieNotification 
-             object: readerConn];
+    [NSTimer scheduledTimerWithTimeInterval: 5.0 
+						                         target: self
+                                   selector: @selector(checkResizer:) 
+																   userInfo: nil 
+                                    repeats: NO];
 
-    NS_DURING
-    {
-      [NSThread detachNewThreadSelector: @selector(createReaderWithPorts:)
-                               toTarget: [ImgReader class]
-                             withObject: portArray];
-    }
-    NS_HANDLER
-    {
-      NSLog(@"Error! A fatal error occured while detaching the thread.");
-    }
-    NS_ENDHANDLER
-    
+    [NSTask launchedTaskWithLaunchPath: cmd 
+                             arguments: [NSArray arrayWithObject: cname]];
   } else {
     [self addSubview: progView]; 
     [progView start];
-    [reader readImageAtPath: imagePath setSize: [imview frame].size];
+    [resizer readImageAtPath: imagePath setSize: [imview frame].size];
   }
 }
 
@@ -201,29 +208,75 @@
   }
 }
 
-- (void)setReader:(id)anObject
+- (void)checkResizer:(id)sender
 {
-  if (reader == nil) {
-    [anObject setProtocolForProxy: @protocol(ImageReaderProtocol)];
-    reader = (id <ImageReaderProtocol>)anObject;
-    RETAIN (reader);
-    [self addSubview: progView]; 
-    [progView start];    
-    [reader readImageAtPath: imagePath setSize: [imview frame].size];
+  if (waitingResizer && (resizer == nil)) {
+    NSRunAlertPanel(nil, 
+                    NSLocalizedString(@"unable to launch the resizer task.", @""), 
+                    NSLocalizedString(@"Continue", @""), 
+                    nil, 
+                    nil);
   }
 }
 
-- (void)readerConnDidDie:(NSNotification *)notification
+- (void)setResizer:(id)anObject
+{
+  if (resizer == nil) {
+    [anObject setProtocolForProxy: @protocol(ImageResizerProtocol)];
+    resizer = (id <ImageResizerProtocol>)anObject;
+    RETAIN (resizer);
+    waitingResizer = NO;
+    [self addSubview: progView]; 
+    [progView start];    
+    [resizer readImageAtPath: imagePath setSize: [imview frame].size];
+  }
+}
+
+- (BOOL)connection:(NSConnection *)ancestor 
+								shouldMakeNewConnection:(NSConnection *)newConn
+{
+	if (ancestor == conn) {
+    ASSIGN (resizerConn, newConn);
+  	[resizerConn setDelegate: self];
+    
+  	[nc addObserver: self 
+					 selector: @selector(connectionDidDie:)
+	    				 name: NSConnectionDidDieNotification 
+             object: resizerConn];
+	}
+		
+  return YES;
+}
+
+- (void)connectionDidDie:(NSNotification *)notification
 {
 	id diedconn = [notification object];
 
-  if (diedconn == readerConn) {
-    [nc removeObserver: self
-	                name: NSConnectionDidDieNotification 
-                object: readerConn];
-    DESTROY (reader);
-    DESTROY (readerConn);
-    NSLog(@"reader connection died", @"");
+  [nc removeObserver: self
+	              name: NSConnectionDidDieNotification 
+              object: diedconn];
+
+  if ((diedconn == conn) || (resizerConn && (diedconn == resizerConn))) {
+    DESTROY (resizer);
+    DESTROY (resizerConn);
+    waitingResizer = NO;
+    
+    if ([[self subviews] containsObject: progView]) {
+      [progView stop];
+      [progView removeFromSuperview];  
+    }
+
+    if (diedconn == conn) {
+      DESTROY (conn);
+    } 
+    
+    DESTROY (imagePath);
+
+    NSRunAlertPanel(nil, 
+                    NSLocalizedString(@"resizer connection died.", @""), 
+                    NSLocalizedString(@"Continue", @""), 
+                    nil, 
+                    nil);
   }
 }
 
@@ -326,7 +379,7 @@
 	[ws getInfoForFile: path application: &defApp type: &fileType];
 	extension = [path pathExtension];
 	
-  if(([fileType isEqual: NSPlainFileType] == NO)
+  if (([fileType isEqual: NSPlainFileType] == NO)
                   && ([fileType isEqual: NSShellCommandFileType] == NO)) {
 		return NO;
 	}
@@ -410,11 +463,13 @@
 
 - (void)stop
 {
-  animating = NO;
-  if (progTimer && [progTimer isValid]) {
-    [progTimer invalidate];
+  if (animating) {
+    animating = NO;
+    if (progTimer && [progTimer isValid]) {
+      [progTimer invalidate];
+    }
+    [self setNeedsDisplay: YES];
   }
-  [self setNeedsDisplay: YES];
 }
 
 - (void)animate:(id)sender
@@ -424,6 +479,11 @@
   if (index == [images count]) {
     index = 0;
   }
+}
+
+- (BOOL)animating
+{
+  return animating;
 }
 
 - (void)drawRect:(NSRect)rect

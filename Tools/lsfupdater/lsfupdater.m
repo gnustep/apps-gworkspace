@@ -1151,7 +1151,6 @@ int main(int argc, char** argv)
     LSFUpdater *updater = [[LSFUpdater alloc] initWithConnectionName: conname];
     
     if (updater) {
-		  [[[NSProcessInfo processInfo] debugSet] addObject: @"dflt"];
       [[NSRunLoop currentRunLoop] run];
     }
   } else {

@@ -403,7 +403,7 @@ void drawRightTabBezier(NSPoint origin, float tabh,
   if (NSEqualPoints(selp[1], NSZeroPoint) == NO) {
     scolor = [NSColor blackColor];
     drawRightTabBezier(selp[1], TAB_H, scolor, fcolor, YES);
-    
+        
     scolor = [NSColor whiteColor];
     bpath = [NSBezierPath bezierPath];
     [bpath setLineWidth: 1];

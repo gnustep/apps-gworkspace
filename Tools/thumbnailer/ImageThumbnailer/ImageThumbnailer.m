@@ -44,6 +44,7 @@
 
 - (NSData *)makeThumbnailForPath:(NSString *)path
 {
+  CREATE_AUTORELEASE_POOL(arp);
   NSImage *image;
 
 	NS_DURING
@@ -52,13 +53,15 @@
 		}
 	NS_HANDLER
 		{
+      RELEASE (arp);
 			return nil;
 	  }
 	NS_ENDHANDLER
 
   if (image && [image isValid]) {
     NSSize size = [image size];
-    NSRect r = NSZeroRect;
+    NSRect srcr = NSMakeRect(0, 0, size.width, size.height);
+	  NSRect dstr = NSZeroRect;  
     NSImageRep *rep = [image bestRepresentationForDevice: nil];
     NSImage *newimage = nil;
     NSBitmapImageRep *newBitmapImageRep = nil;
@@ -71,42 +74,46 @@
         data = [(NSBitmapImageRep *)rep TIFFRepresentation];
         if (data) {
           RELEASE (image);
-          return data;
+          RETAIN (data);
+          RELEASE (arp);
+          
+          return [data autorelease];
         }
       }
     }
 
     if (size.width >= size.height) {
-      r.size.width = TMBMAX;
-      r.size.height = TMBMAX * size.height / size.width;
+      dstr.size.width = TMBMAX;
+      dstr.size.height = TMBMAX * size.height / size.width;
     } else {
-      r.size.height = TMBMAX;
-      r.size.width = TMBMAX * size.width / size.height;
+      dstr.size.height = TMBMAX;
+      dstr.size.width = TMBMAX * size.width / size.height;
     }  
-      
-    r = NSIntegralRect(r);   
-    
-    [image setScalesWhenResized: YES];
-    [image setSize: r.size];
-
-    newimage = [[NSImage alloc] initWithSize: r.size];
+          
+    newimage = [[NSImage alloc] initWithSize: dstr.size];
     [newimage lockFocus];
 
-    [image compositeToPoint: NSZeroPoint 
-                operation: NSCompositeSourceOver];
+    [image drawInRect: dstr 
+             fromRect: srcr 
+            operation: NSCompositeSourceOver 
+             fraction: 1.0];
 
-    newBitmapImageRep = [[NSBitmapImageRep alloc] initWithFocusedViewRect: r];
+    newBitmapImageRep = [[NSBitmapImageRep alloc] initWithFocusedViewRect: dstr];
     [newimage unlockFocus];
 
     data = [newBitmapImageRep TIFFRepresentation];
-  
+    RETAIN (data);
+    
     RELEASE (image);
     RELEASE (newimage);
     RELEASE (newBitmapImageRep);
+    RELEASE (arp);
     
-    return data;
+    return [data autorelease];
   }
-  
+
+  RELEASE (arp);
+    
   return nil;
 }
 

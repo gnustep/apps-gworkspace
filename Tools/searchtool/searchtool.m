@@ -61,6 +61,8 @@
   NSNotificationCenter *nc; 
 }
 
+- (id)initWithConnectionName:(NSString *)cname;
+
 - (void)connectionDidDie:(NSNotification *)notification;
 
 - (void)searchWithInfo:(NSData *)srcinfo;
@@ -143,7 +145,7 @@
 
   if (done == NO) {
     NSLog(@"finder connection has been destroyed.");
-    exit(EXIT_FAILURE);
+    exit(0);
   }
 }
 

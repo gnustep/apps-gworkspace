@@ -134,6 +134,7 @@
   BOOL contestualMenu;
 
   BOOL dontWarnOnQuit;
+  BOOL terminating;
   
   TShelfWin *tshelfWin;
   NSString *tshelfPBDir;
@@ -376,6 +377,8 @@
 // - (NSString *)trashPath; // already in GWProtocol
 
 - (id)workspaceApplication;
+
+- (BOOL)terminating;
 
 @end
 

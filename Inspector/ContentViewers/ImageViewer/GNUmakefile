@@ -1,6 +1,10 @@
 
 include $(GNUSTEP_MAKEFILES)/common.make
 
+GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
+
+SUBPROJECTS = resizer 
+
 BUNDLE_NAME = ImageViewer
 BUNDLE_EXTENSION = .inspector
 
@@ -11,10 +15,7 @@ OBJCFLAGS += -Wall
 #
 # We are creating a bundle
 #
-ImageViewer_OBJC_FILES = ImageViewer.m \
-                         ImgReader.m \
-                         getpixel.m \
-                         resize.m
+ImageViewer_OBJC_FILES = ImageViewer.m 
 
 ImageViewer_PRINCIPAL_CLASS = ImageViewer
 
@@ -25,6 +26,8 @@ ImageViewer_PRINCIPAL_CLASS = ImageViewer
 ImageViewer_RESOURCE_FILES = InspectorInfo.plist
 
 -include GNUmakefile.preamble
+
+include $(GNUSTEP_MAKEFILES)/aggregate.make
 
 include $(GNUSTEP_MAKEFILES)/bundle.make
 

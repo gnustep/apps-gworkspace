@@ -1,9 +1,9 @@
-/* ImgReader.m
+/* Resizer.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2005 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
- * Date: January 2004
+ * Date: January 2005
  *
  * This file is part of the GNUstep Inspector application
  *
@@ -25,49 +25,93 @@
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include <math.h>
-#include "ImgReader.h"
 #include "resize.h"
 
-@implementation ImgReader
+#define gw_debug 1
+
+#define GWDebugLog(format, args...) \
+  do { if (gw_debug) \
+    NSLog(format , ## args); } while (0)
+
+@protocol ImageViewerProtocol
+
+- (oneway void)setResizer:(id)anObject;
+
+- (oneway void)imageReady:(NSData *)data;
+
+@end
+
+
+@interface Resizer : NSObject
+{
+  id viewer;
+  NSNotificationCenter *nc; 
+}
+
+- (id)initWithConnectionName:(NSString *)cname;
+
+- (void)connectionDidDie:(NSNotification *)notification;
+
+- (void)readImageAtPath:(NSString *)path
+                setSize:(NSSize)imsize;
+
+- (void)terminate;
+
+@end
+
+
+@implementation Resizer
 
 - (void)dealloc
 {
+  [nc removeObserver: self];
+	DESTROY (viewer);
   [super dealloc];
 }
 
-+ (void)createReaderWithPorts:(NSArray *)portArray
-{
-  NSAutoreleasePool *pool;
-  id vwr;
-  NSConnection *conn;
-  NSPort *port[2];
-  ImgReader *reader;
-	
-  pool = [[NSAutoreleasePool alloc] init];
-	  
-  port[0] = [portArray objectAtIndex: 0];
-  port[1] = [portArray objectAtIndex: 1];
-  conn = [NSConnection connectionWithReceivePort: port[0] sendPort: port[1]];
-  vwr = (id)[conn rootProxy];
-  reader = [[ImgReader alloc] initWithViewerConnection: conn];
-  [vwr setReader: reader];
-  RELEASE (reader);
-	
-  [[NSRunLoop currentRunLoop] run];
-  [pool release];
-}
-
-- (id)initWithViewerConnection:(NSConnection *)conn
+- (id)initWithConnectionName:(NSString *)cname
 {
   self = [super init];
   
   if (self) {
-    id vwr = (id)[conn rootProxy];
-    [vwr setProtocolForProxy: @protocol(ImageViewerProtocol)];
-    viewer = (id <ImageViewerProtocol>)vwr;
+    NSConnection *conn;
+    id anObject;
+
+    nc = [NSNotificationCenter defaultCenter];
+            
+    conn = [NSConnection connectionWithRegisteredName: cname host: nil];
+    
+    if (conn == nil) {
+      NSLog(@"failed to contact the Image Viewer - bye.");
+	    exit(1);           
+    } 
+
+    [nc addObserver: self
+           selector: @selector(connectionDidDie:)
+               name: NSConnectionDidDieNotification
+             object: conn];    
+    
+    anObject = [conn rootProxy];
+    [anObject setProtocolForProxy: @protocol(ImageViewerProtocol)];
+    viewer = (id <ImageViewerProtocol>)anObject;
+    RETAIN (viewer);
+
+    [viewer setResizer: self];
   }
   
   return self;
+}
+
+- (void)connectionDidDie:(NSNotification *)notification
+{
+  id conn = [notification object];
+
+  [nc removeObserver: self
+	              name: NSConnectionDidDieNotification
+	            object: conn];
+
+  NSLog(@"Image Viewer connection has been destroyed.");
+  exit(0);
 }
 
 - (void)readImageAtPath:(NSString *)path
@@ -103,7 +147,7 @@
       commonInfo *newInfo;
       unsigned char *map[MAXPLANE];
       unsigned char *newmap[MAXPLANE];
-      NSBitmapImageRep* newBitmapImageRep;
+      NSBitmapImageRep *newBitmapImageRep;
     
 	    [image setScalesWhenResized: YES];
 	    [image setDataRetained: YES];
@@ -167,7 +211,16 @@
 	                  bitsPerPixel: newInfo->pixbits];
         
         if (newBitmapImageRep) {
-          data = [newBitmapImageRep TIFFRepresentation];
+          NS_DURING
+		        {
+			        data = [newBitmapImageRep TIFFRepresentation];
+		        }
+	        NS_HANDLER
+		        {
+			        [viewer imageReady: [NSArchiver archivedDataWithRootObject: info]];
+	          }
+	        NS_ENDHANDLER
+          
           [info setObject: data forKey: @"imgdata"];
           RELEASE (newBitmapImageRep);
         }
@@ -192,9 +245,29 @@
   [viewer imageReady: [NSArchiver archivedDataWithRootObject: info]];
 }
 
-- (void)stopReading
+- (void)terminate
 {
- // [NSThread exit];
+  exit(0);
 }
 
 @end
+
+
+int main(int argc, char** argv)
+{
+  CREATE_AUTORELEASE_POOL (pool);
+  
+  if (argc > 1) {
+    NSString *conname = [NSString stringWithCString: argv[1]];
+    Resizer *resizer = [[Resizer alloc] initWithConnectionName: conname];
+    
+    if (resizer) {
+      [[NSRunLoop currentRunLoop] run];
+    }
+  } else {
+    NSLog(@"no connection name.");
+  }
+  
+  RELEASE (pool);  
+  exit(0);
+}

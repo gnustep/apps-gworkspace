@@ -41,12 +41,12 @@
 
 @end 
 
-@protocol ImageReaderProtocol
+@protocol ImageResizerProtocol
 
 - (oneway void)readImageAtPath:(NSString *)path
                        setSize:(NSSize)imsize;
 
-- (oneway void)stopReading;
+- (oneway void)terminate;
 
 @end
 
@@ -65,8 +65,11 @@
   NSString *imagePath;
   NSString *nextPath;
   NSString *editPath;
-  NSConnection *readerConn;
-  id reader;
+  
+  NSConnection *conn;  
+  NSConnection *resizerConn;
+  BOOL waitingResizer;
+  id resizer;
   
   id <ContentInspectorProtocol>inspector;
   NSFileManager *fm;
@@ -74,9 +77,14 @@
   NSWorkspace *ws;
 }
 
-- (void)setReader:(id)anObject;
+- (void)checkResizer:(id)sender;
 
-- (void)readerConnDidDie:(NSNotification *)notification;
+- (void)setResizer:(id)anObject;
+
+- (BOOL)connection:(NSConnection *)ancestor 
+								shouldMakeNewConnection:(NSConnection *)newConn;
+
+- (void)connectionDidDie:(NSNotification *)notification;
 
 - (void)imageReady:(NSData *)data;
 
@@ -102,6 +110,8 @@
 - (void)stop;
 
 - (void)animate:(id)sender;
+
+- (BOOL)animating;
 
 @end
 

@@ -105,7 +105,7 @@ static NSString *nibName = @"Annotations";
     
     [textView setString: @""];
 
-    if ([desktopApp ddbdactive] == NO) {
+    if (([desktopApp ddbdactive] == NO) && ([desktopApp terminating] == NO)) {
       [desktopApp connectDDBd];
     }
 

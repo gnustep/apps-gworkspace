@@ -49,7 +49,6 @@ static NSString *lsfname = @"LiveSearch.lsf";
 - (void)dealloc
 {
   [nc removeObserver: self];
-  [[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
 
   if (toolConn != nil) {
     if (searchtool != nil) {

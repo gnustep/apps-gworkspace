@@ -523,9 +523,14 @@
                showSelection: NO
               closeOldViewer: (close ? self : nil)
                     forceNew: NO];
-  } 
+  } else {
+    [nodeView showContentsOfNode: baseNode]; 
+    [self scrollToBeginning];
+    [vwrwin makeFirstResponder: nodeView];
+    [manager selectedSpatialViewerChanged: self];
+    [manager synchronizeSelectionInParentOfViewer: self];
+  }
 }
-
 
 - (BOOL)involvedByFileOperation:(NSDictionary *)opinfo
 {
