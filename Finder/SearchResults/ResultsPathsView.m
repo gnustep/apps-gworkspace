@@ -207,6 +207,22 @@
   }
 }
 
+- (NSArray *)selectedReps
+{
+  NSMutableArray *selectedReps = [NSMutableArray array];
+  int i;
+  
+  for (i = 0; i < [icons count]; i++) {
+    FSNIcon *icon = [icons objectAtIndex: i];
+
+    if ([icon isSelected]) {
+      [selectedReps addObject: icon];
+    }
+  }
+
+  return selectedReps;
+}
+
 - (NSArray *)selectedNodes
 {
   NSMutableArray *selectedNodes = [NSMutableArray array];
@@ -239,9 +255,22 @@
   return selectedPaths;
 }
 
-- (void)openSelection:(NSArray *)selection
-            newViewer:(BOOL)newv
+- (void)selectionDidChange
 {
+}
+
+- (void)setSelectionMask:(FSNSelectionMask)mask
+{
+}
+
+- (FSNSelectionMask)selectionMask
+{
+  return NSSingleSelectionMask;
+}
+
+- (void)openSelectionInNewViewer:(BOOL)newv
+{
+  NSArray *selection = [self selectedNodes];
   int i;
   
   for (i = 0; i < [selection count]; i++) {

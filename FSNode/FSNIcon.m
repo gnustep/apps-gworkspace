@@ -200,6 +200,7 @@ static NSFont *labelFont = nil;
   }
   isSelected = YES;
   [container unselectOtherReps: self];	
+  [container selectionDidChange];	
   [self setNeedsDisplay: YES]; 
 }
 
@@ -209,6 +210,7 @@ static NSFont *labelFont = nil;
     return;
   }
 	isSelected = NO;
+  [container selectionDidChange];	
   [self setNeedsDisplay: YES];
 }
 
@@ -333,8 +335,7 @@ static NSFont *labelFont = nil;
 {
 	if ([node isLocked] == NO) {
 	  if ([theEvent clickCount] > 1) {  
-		  [container openSelection: [container selectedNodes] 
-                     newViewer: YES];
+		  [container openSelectionInNewViewer: YES];
 	  }  
   }  
 }
@@ -361,10 +362,25 @@ static NSFont *labelFont = nil;
     }
     
 	  if ([theEvent clickCount] == 1) {
-      if (isSelected == NO) {  
-        [self select];
-     //   [container unselectNameEditor];
-      }
+		  if ([theEvent modifierFlags] & NSShiftKeyMask) {
+			  [container setSelectionMask: FSNMultipleSelectionMask];    
+         
+			  if (isSelected) {
+				  [self unselect];
+				  return;
+        } else {
+				  [self select];
+          //   [container unselectNameEditor];
+			  }
+        
+		  } else {
+			  [container setSelectionMask: NSSingleSelectionMask];
+        
+        if (isSelected == NO) {
+				  [self select];
+          //   [container unselectNameEditor];
+			  }
+		  }
     
       if (dndSource) {
         while (1) {
@@ -372,7 +388,6 @@ static NSFont *labelFont = nil;
     							                  NSLeftMouseUpMask | NSLeftMouseDraggedMask];
 
           if ([nextEvent type] == NSLeftMouseUp) {
-	    //		  [delegate clickOnIcon: self];
             break;
 
           } else if ([nextEvent type] == NSLeftMouseDragged) {

@@ -37,6 +37,12 @@ typedef enum FSNInfoType {
   FSNInfoOwnerType = 5
 } FSNInfoType;
 
+typedef enum FSNSelectionMask {   
+  NSSingleSelectionMask = 0,
+  FSNMultipleSelectionMask = 1,
+  FSNSelectingSelectionMask = 2
+} FSNSelectionMask;
+
 @class NSImage;
 @class NSBezierPath;
 @class NSFont;
@@ -90,12 +96,19 @@ typedef enum FSNInfoType {
 
 - (void)unselectOtherReps:(id)arep;
 
+- (NSArray *)selectedReps;
+
 - (NSArray *)selectedNodes;
 
 - (NSArray *)selectedPaths;
 
-- (void)openSelection:(NSArray *)selection
-            newViewer:(BOOL)newv;
+- (void)selectionDidChange;
+
+- (void)setSelectionMask:(FSNSelectionMask)mask;
+
+- (FSNSelectionMask)selectionMask;
+
+- (void)openSelectionInNewViewer:(BOOL)newv;
 
 - (void)restoreLastSelection;
 
