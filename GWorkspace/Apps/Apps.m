@@ -25,6 +25,7 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
+#include <math.h>
   #ifdef GNUSTEP 
 #include "GWFunctions.h"
 #include "GWLib.h"
@@ -146,6 +147,8 @@
 - (void)setApplicationInfo:(id)sender
 {
   NSString *appName, *appPath;
+  NSImage *icon;
+	NSSize size;  
   id cell;
 
   [appButt setImage: nil];	  
@@ -159,7 +162,26 @@
 
   appName = [cell title];  
   appPath = [ws fullPathForApplication: [appName stringByDeletingPathExtension]];
-  [appButt setImage: [ws iconForFile: appPath]];	  
+  
+  icon = [ws iconForFile: appPath];
+  size = [icon size];
+  
+  if ((size.width > ICNMAX) || (size.height > ICNMAX)) {
+    NSSize newsize;
+  
+    if (size.width >= size.height) {
+      newsize.width = ICNMAX;
+      newsize.height = floor(ICNMAX * size.height / size.width + 0.5);
+    } else {
+      newsize.height = ICNMAX;
+      newsize.width  = floor(ICNMAX * size.width / size.height + 0.5);
+    }
+    
+	  [icon setScalesWhenResized: YES];
+	  [icon setSize: newsize];  
+  }
+  
+  [appButt setImage: icon];	  
 
   [appNameField setStringValue: [appName stringByDeletingPathExtension]];
 

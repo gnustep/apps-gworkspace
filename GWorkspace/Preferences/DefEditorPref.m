@@ -35,6 +35,7 @@
 #include "DefEditorPref.h"
 #include "GWorkspace.h"
 #include "GNUstep.h"
+#include <math.h>
 
 #ifdef GNUSTEP 
   #define LABEL_MARGIN 8
@@ -80,6 +81,8 @@ static NSString *nibName = @"DefEditorPref";
       gw = [GWorkspace gworkspace];
       defEditor = nil;
       
+      [imView setImageScaling: NSScaleProportionally];
+
       defaults = [NSUserDefaults standardUserDefaults];      
 	    defEditor = [defaults stringForKey: @"defaulteditor"];
       if (defEditor != nil) {
@@ -164,6 +167,7 @@ static NSString *nibName = @"DefEditorPref";
   
   fullPath = [ws fullPathForApplication: defEditor];
   image = [ws iconForFile: fullPath];
+
   [imView setImage: image];
       
   [nameLabel setStringValue: defEditor];

@@ -1,3 +1,9 @@
+2003-09-01 Enrico Sersale  <enrico@imago.ro>
+
+  * GWorkspace/GWorkspace.m
+    in -iconForFile:ofType: handled the case of a 128x128 thumbnail icon
+    returned by NSWorkspace.
+
 2003-08-26 Enrico Sersale  <enrico@imago.ro>
 
   * GWorkspace/GWorkspace.m

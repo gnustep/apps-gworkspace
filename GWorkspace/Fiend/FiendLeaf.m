@@ -119,7 +119,7 @@
     ASSIGN (myType, type);
 		isPakage = [gw isPakageAtPath: myPath];
 		
-    ASSIGN (icon, [ws iconForFile: myPath]);    
+    ASSIGN (icon, [gw iconForFile: myPath ofType: myType]); 
     
     if ([myType isEqualToString: NSApplicationFileType] == NO) {
 			NSString *name;
@@ -502,7 +502,7 @@
   if(isDragTarget == YES) {
     isDragTarget = NO;  
     if ([myType isEqualToString: NSApplicationFileType] == NO) {
-      ASSIGN (icon, [ws iconForFile: myPath]);
+      ASSIGN (icon, [gw iconForFile: myPath ofType: myType]);
       [self setNeedsDisplay: YES];
     }
   }
@@ -530,7 +530,7 @@
     NSMutableArray *files;
     int tag;
 
-    ASSIGN (icon, [ws iconForFile: myPath]);
+    ASSIGN (icon, [gw iconForFile: myPath ofType: myType]);
     [self setNeedsDisplay: YES];
 
     source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];

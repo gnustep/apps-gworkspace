@@ -25,6 +25,7 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
+#include <math.h>
   #ifdef GNUSTEP 
 #include "GWLib.h"
 #include "GWFunctions.h"
@@ -444,15 +445,36 @@ return [ws openFile: fullPath withApplication: appName]
 
 - (NSImage *)iconForFile:(NSString *)fullPath ofType:(NSString *)type
 {
+  NSImage *icon;
+	NSSize size;
+  
   if (usesThumbnails) {
-    NSImage *thumb = [self thumbnailForPath: fullPath];
+    icon = [self thumbnailForPath: fullPath];
     
-    if (thumb) {
-      return thumb;
+    if (icon) {
+      return icon;
     }    
   }
 
-  return [ws iconForFile: fullPath];
+  icon = [ws iconForFile: fullPath];
+  size = [icon size];
+  
+  if ((size.width > ICNMAX) || (size.height > ICNMAX)) {
+    NSSize newsize;
+  
+    if (size.width >= size.height) {
+      newsize.width = ICNMAX;
+      newsize.height = floor(ICNMAX * size.height / size.width + 0.5);
+    } else {
+      newsize.height = ICNMAX;
+      newsize.width  = floor(ICNMAX * size.width / size.height + 0.5);
+    }
+    
+	  [icon setScalesWhenResized: YES];
+	  [icon setSize: newsize];  
+  }
+  
+  return icon;
 }
 
 - (NSImage *)smallIconForFile:(NSString*)aPath

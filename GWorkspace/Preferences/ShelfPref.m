@@ -132,6 +132,8 @@ static NSString *nibName = @"ShelfPref";
       gw = [GWorkspace gworkspace];    
 		  ws = [NSWorkspace sharedWorkspace];
 
+      [imView setImageScaling: NSScaleProportionally];
+      
       selPaths = [gw selectedPaths];
       count = [selPaths count];
       if (count == 1) {    
@@ -215,7 +217,6 @@ static NSString *nibName = @"ShelfPref";
     NSString *type;
 
     ASSIGN (fname, [fpath lastPathComponent]);
-    [imView setImage: [ws iconForFile: fpath]];
     [ws getInfoForFile: fpath application: &defApp type: &type];      
     [imView setImage: [gw iconForFile: fpath ofType: type]]; 		
   } else {

@@ -37,6 +37,7 @@
 #include "GWorkspace.h"
 #include "GNUstep.h"
 #include <limits.h>
+#include <math.h>
 
 #define NAME_NO_VALUE 5         
 #define NAME_IS 1               
@@ -167,7 +168,25 @@ if (sz.height < 0) sz.height = 0
 
 - (void)activateForFileAtPath:(NSString *)fpath
 {
-  ASSIGN (icon, [[NSWorkspace sharedWorkspace] iconForFile: fpath]);
+  NSImage *icn = [[NSWorkspace sharedWorkspace] iconForFile: fpath];
+  NSSize size = [icn size];
+  
+  if ((size.width > ICNMAX) || (size.height > ICNMAX)) {
+    NSSize newsize;
+  
+    if (size.width >= size.height) {
+      newsize.width = ICNMAX;
+      newsize.height = floor(ICNMAX * size.height / size.width + 0.5);
+    } else {
+      newsize.height = ICNMAX;
+      newsize.width  = floor(ICNMAX * size.width / size.height + 0.5);
+    }
+    
+	  [icn setScalesWhenResized: YES];
+	  [icn setSize: newsize];  
+  }
+
+  ASSIGN (icon, icn);
   [nameField setStringValue: cutFileLabelText([fpath lastPathComponent], nameField, 64)];
   isactive = YES;
   [self setNeedsDisplay: YES];

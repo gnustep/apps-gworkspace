@@ -25,6 +25,7 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
+#include <math.h>
   #ifdef GNUSTEP 
 #include "GWFunctions.h"
 #include "InspectorsProtocol.h"
@@ -119,7 +120,25 @@ static NSString *nibName = @"InspectorsWin";
   count = [currentPaths count];
 
   if (count == 1) {
-    [iconView setImage: [[NSWorkspace sharedWorkspace] iconForFile: path]]; 		
+    NSImage *icon = [[NSWorkspace sharedWorkspace] iconForFile: path];
+	  NSSize size = [icon size];
+  
+    if ((size.width > ICNMAX) || (size.height > ICNMAX)) {
+      NSSize newsize;
+
+      if (size.width >= size.height) {
+        newsize.width = ICNMAX;
+        newsize.height = floor(ICNMAX * size.height / size.width + 0.5);
+      } else {
+        newsize.height = ICNMAX;
+        newsize.width  = floor(ICNMAX * size.width / size.height + 0.5);
+      }
+
+	    [icon setScalesWhenResized: YES];
+	    [icon setSize: newsize];  
+    }
+  
+    [iconView setImage: icon]; 		
     [nameField setStringValue: [path lastPathComponent]];    
 		s = [path stringByDeletingLastPathComponent];
 		s = relativePathFittingInContainer(pathField, s);

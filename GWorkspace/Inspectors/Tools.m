@@ -25,6 +25,7 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
+#include <math.h>
   #ifdef GNUSTEP 
 #include "GWLib.h"
 #include "GWFunctions.h"
@@ -294,8 +295,26 @@ static NSString *nibName = @"ToolsPanel";
 		for(i = 0; i < count; i++) {
 			NSString *appName = [commonApps objectAtIndex: i];
 			NSString *appPath = [ws fullPathForApplication: appName];
+      NSImage *icon = [ws iconForFile: appPath];
+	    NSSize size = [icon size];
+
+      if ((size.width > ICNMAX) || (size.height > ICNMAX)) {
+        NSSize newsize;
+
+        if (size.width >= size.height) {
+          newsize.width = ICNMAX;
+          newsize.height = floor(ICNMAX * size.height / size.width + 0.5);
+        } else {
+          newsize.height = ICNMAX;
+          newsize.width  = floor(ICNMAX * size.width / size.height + 0.5);
+        }
+
+	      [icon setScalesWhenResized: YES];
+	      [icon setSize: newsize];  
+      }
+      
 			cell = [matrix cellAtRow: 0 column: i];
-			[cell setImage: [ws iconForFile: appPath]];
+			[cell setImage: icon];
 			[cell setTitle: appName];
 		}
 		[matrix sizeToCells];
@@ -341,6 +360,8 @@ static NSString *nibName = @"ToolsPanel";
   NSArray *cells;
   NSMutableArray *newApps;
   id cell;
+  NSImage *icon;
+  NSSize size;
   int i, count;
   
   for (i = 0; i < [extensions count]; i++) {
@@ -364,10 +385,28 @@ static NSString *nibName = @"ToolsPanel";
   
   for(i = 0; i < count; i++) {
 		app = [newApps objectAtIndex: i];
+    icon = [ws iconForFile: app];
+    size = [icon size];
+
+    if ((size.width > ICNMAX) || (size.height > ICNMAX)) {
+      NSSize newsize;
+
+      if (size.width >= size.height) {
+        newsize.width = ICNMAX;
+        newsize.height = floor(ICNMAX * size.height / size.width + 0.5);
+      } else {
+        newsize.height = ICNMAX;
+        newsize.width  = floor(ICNMAX * size.width / size.height + 0.5);
+      }
+
+	    [icon setScalesWhenResized: YES];
+	    [icon setSize: newsize];  
+    }
+    
 		cell = [matrix cellAtRow: 0 column: i];
 		[cell setTitle: app];
 		app = [ws fullPathForApplication: app];
-		[cell setImage: [ws iconForFile: app]];
+		[cell setImage: icon];
 	}
 
   [matrix selectCellAtRow: 0 column: 0];

@@ -141,8 +141,9 @@ static NSString *nibName = @"IconsViewerPref";
       RELEASE (win);
 
 		  gw = (id<GWProtocol>)[gwclass gworkspace];
-
 		  ws = [NSWorkspace sharedWorkspace];
+
+      [imView setImageScaling: NSScaleProportionally];
 
       selPaths = [gw getSelectedPaths];
       count = [selPaths count];

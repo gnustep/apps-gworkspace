@@ -29,6 +29,7 @@
 @class NSString;
 @class NSMenuItem;
 
+#ifndef MAKE_LABEL
 #define MAKE_LABEL(label, rect, str, align, release, view) { \
 label = [[NSTextField alloc] initWithFrame: rect];	\
 [label setFont: [NSFont systemFontOfSize: 12]]; \
@@ -43,7 +44,9 @@ if (str) [label setStringValue: str]; \
 [view addSubview: label]; \
 if (release) RELEASE (label); \
 }
+#endif
 
+#ifndef MAKE_LOCALIZED_LABEL
 #define MAKE_LOCALIZED_LABEL(label, rect, str, comm, align, release, view) { \
 label = [[NSTextField alloc] initWithFrame: rect];	\
 [label setFont: [NSFont systemFontOfSize: 12]]; \
@@ -58,12 +61,19 @@ if (str) [label setStringValue: NSLocalizedString(str, comm)]; \
 [view addSubview: label]; \
 if (release) RELEASE (label); \
 }
+#endif
 
+#ifndef STROKE_LINE
 #define STROKE_LINE(c, x1, y1, x2, y2) { \
 [[NSColor c] set]; \
 [NSBezierPath strokeLineFromPoint: NSMakePoint(x1, y1) \
 toPoint: NSMakePoint(x2, y2)]; \
 }
+#endif
+
+#ifndef ICNMAX
+#define ICNMAX 48
+#endif
 
 NSString *fixPath(NSString *s, const char *c);
 
