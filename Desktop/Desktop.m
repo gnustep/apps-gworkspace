@@ -117,12 +117,17 @@ static Desktop *desktop = nil;
   home = [home stringByAppendingPathComponent: @"Desktop"];  
 
   if (([fm fileExistsAtPath: home isDirectory: &isdir] && isdir) == NO) {
+    NSString *hiddenNames = @".gwsort\n.gwdir\n.dirinfo\n.hidden\n";
+  
     if ([fm createDirectoryAtPath: home attributes: nil] == NO) {
       NSRunAlertPanel(NSLocalizedString(@"error", @""), 
              NSLocalizedString(@"Can't create the Desktop directory! Quiting now.", @""), 
                                     NSLocalizedString(@"OK", @""), nil, nil);                                     
       [NSApp terminate: self];
     }
+    
+    [hiddenNames writeToFile: [home stringByAppendingPathComponent: @".hidden"]
+                  atomically: YES];
   }
 
   ASSIGN (desktopDir, [FSNode nodeWithRelativePath: home parent: nil]);

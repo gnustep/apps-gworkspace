@@ -421,7 +421,7 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   NSString *mtabpath = [defaults stringForKey: @"GSMtabPath"];
-  NSArray *vpaths = [[NSWorkspace sharedWorkspace] mountedLocalVolumePaths];
+  NSArray *vpaths = [[NSWorkspace sharedWorkspace] mountedRemovableMedia];
   int count = [icons count];
   int i;
 
