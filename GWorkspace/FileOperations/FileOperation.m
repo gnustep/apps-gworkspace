@@ -96,6 +96,7 @@ static NSString *nibName = @"FileOperationWin";
   TEST_RELEASE (win);
   
   DESTROY (executor);
+  DESTROY (execconn);
   
   [super dealloc];
 }
@@ -164,11 +165,21 @@ static NSString *nibName = @"FileOperationWin";
         [self endOperation];
         return self; 
       } else {
-        NSMessagePort *port[2];
+        #ifdef GNUSTEP
+          NSMessagePort *port[2];
+        #else
+          NSPort *port[2];
+        #endif
         NSArray *ports;
 
-        port[0] = (NSMessagePort *)[NSMessagePort port];
-        port[1] = (NSMessagePort *)[NSMessagePort port];
+        #ifdef GNUSTEP
+          port[0] = (NSMessagePort *)[NSMessagePort port];
+          port[1] = (NSMessagePort *)[NSMessagePort port];
+        #else
+          port[0] = (NSPort *)[NSPort port];
+          port[1] = (NSPort *)[NSPort port];
+        #endif
+        
         ports = [NSArray arrayWithObjects: port[1], port[0], nil];
 
         execconn = [[NSConnection alloc] initWithReceivePort: port[0]
@@ -411,7 +422,7 @@ static NSString *nibName = @"FileOperationWin";
 - (int)showErrorAlertWithMessage:(NSString *)message
 {
   return NSRunAlertPanel(nil, NSLocalizedString(message, @""), 
-																NSLocalizedString(@"Continue", @""), nil, nil);
+													NSLocalizedString(@"Continue", @""), nil, nil);
 }
 
 - (void)setNumFiles:(int)n
@@ -424,9 +435,8 @@ static NSString *nibName = @"FileOperationWin";
   [progInd incrementBy: 1.0];
 }
 
-- (void)endOperation
-{  
-  DESTROY (executor);
+- (oneway void)endOperation
+{
   if (showwin) {
     [win saveFrameUsingName: @"fileopprogress"];
     [win close];
@@ -583,7 +593,11 @@ static NSString *nibName = @"FileOperationWin";
 + (void)setPorts:(NSArray *)thePorts
 {
   NSAutoreleasePool *pool;
-  NSMessagePort *port[2];
+  #ifdef GNUSTEP
+    NSMessagePort *port[2];
+  #else
+    NSPort *port[2];
+  #endif
   NSConnection *conn;
   FileOpExecutor *executor;
                
@@ -591,9 +605,14 @@ static NSString *nibName = @"FileOperationWin";
                
   port[0] = [thePorts objectAtIndex: 0];             
   port[1] = [thePorts objectAtIndex: 1];             
-               
-  conn = [NSConnection connectionWithReceivePort: (NSMessagePort *)port[0]
-                                        sendPort: (NSMessagePort *)port[1]];
+
+  #ifdef GNUSTEP               
+    conn = [NSConnection connectionWithReceivePort: (NSMessagePort *)port[0]
+                                          sendPort: (NSMessagePort *)port[1]];
+  #else
+    conn = [NSConnection connectionWithReceivePort: (NSPort *)port[0]
+                                          sendPort: (NSPort *)port[1]];
+  #endif
   
   executor = [[self alloc] init];
   [executor setFileop: thePorts];
@@ -630,15 +649,24 @@ static NSString *nibName = @"FileOperationWin";
 
 - (void)setFileop:(NSArray *)thePorts
 {
-  NSMessagePort *port[2];
+  #ifdef GNUSTEP
+    NSMessagePort *port[2];
+  #else
+    NSPort *port[2];
+  #endif
   NSConnection *conn;
   id anObject;
   
   port[0] = [thePorts objectAtIndex: 0];             
   port[1] = [thePorts objectAtIndex: 1];             
 
-  conn = [NSConnection connectionWithReceivePort: (NSMessagePort *)port[0]
-                                        sendPort: (NSMessagePort *)port[1]];
+  #ifdef GNUSTEP
+    conn = [NSConnection connectionWithReceivePort: (NSMessagePort *)port[0]
+                                          sendPort: (NSMessagePort *)port[1]];
+  #else
+    conn = [NSConnection connectionWithReceivePort: (NSPort *)port[0]
+                                          sendPort: (NSPort *)port[1]];
+  #endif
 
   anObject = (id)[conn rootProxy];
   [anObject setProtocolForProxy: @protocol(FileOpProtocol)];

@@ -4,15 +4,21 @@
         {
             ACTIONS = {
                 activateChanges = id; 
+                activateDirChanges = id; 
+                addDir = id; 
                 loadContents = id; 
                 moveToHidden = id; 
                 moveToShown = id; 
+                removeDir = id; 
             }; 
             CLASS = HiddenFilesPref; 
             LANGUAGE = ObjC; 
             OUTLETS = {
                 addButt = id; 
+                addDirButt = id; 
                 cellPrototipe = id; 
+                hiddenDirsScroll = id; 
+                hiddenDirslabel = id; 
                 hiddenlabel = id; 
                 iconView = id; 
                 labelinfo = id; 
@@ -21,9 +27,12 @@
                 pathField = id; 
                 prefbox = id; 
                 removeButt = id; 
+                removeDirButt = id; 
                 rightScroll = id; 
                 setButt = id; 
+                setDirButt = id; 
                 shownlabel = id; 
+                tabView = id; 
                 win = id; 
             }; 
             SUPERCLASS = NSObject; 

@@ -1,3 +1,11 @@
+2003-10-18 Enrico Sersale  <enrico@imago.ro>
+
+  * GWorkspace/FileOperations/FileOperation.m
+    Now works on Mac OS X, too.
+  
+  * GWorkspace/Resources/English.lproj
+    Modified some .nib files.
+
 2003-10-17 Enrico Sersale  <enrico@imago.ro>
 
   * A new Viewer opened on "/" now saves in the defaults its own shelf content 

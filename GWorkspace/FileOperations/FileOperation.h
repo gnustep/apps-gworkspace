@@ -51,7 +51,7 @@
 
 - (int)sendDidChangeNotification;
 
-- (void)endOperation;
+- (oneway void)endOperation;
 
 @end
 

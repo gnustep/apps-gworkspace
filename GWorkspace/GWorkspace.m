@@ -2288,6 +2288,13 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 	[recycler putAway];
 }
 
+#ifndef GNUSTEP
+- (void)terminate:(id)sender
+{
+  [NSApp terminate: self];
+}
+#endif
+
 @end
 
 

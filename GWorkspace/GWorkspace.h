@@ -291,6 +291,10 @@
 
 - (void)putAway:(id)sender;
 
+#ifndef GNUSTEP
+- (void)terminate:(id)sender;
+#endif
+
 @end
 
 @interface GWorkspace (FileOperations)
