@@ -259,10 +259,6 @@ typedef enum DockPosition {
 
 - (void)showInfo:(id)sender;
 
-#ifndef GNUSTEP
-- (void)terminate:(id)sender;
-#endif
-
 
 //
 // DesktopApplication protocol

@@ -25,7 +25,6 @@
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include "Desktop.h"
-#include "GNUstep.h"
 
 void createMenu();
 

@@ -29,7 +29,6 @@
 #include "PBViewer.h"
 #include "ClipBook.h"
 #include "Functions.h"
-#include "GNUstep.h"
 
 #define WINHEIGHT 415
 #define VWRHEIGHT 300

@@ -32,7 +32,6 @@
 #include "DesktopView.h"
 #include "Desktop.h"
 #include "Dock.h"
-#include "GNUstep.h"
 
 #define DEF_ICN_SIZE 48
 #define DEF_TEXT_SIZE 12

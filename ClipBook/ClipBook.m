@@ -208,11 +208,7 @@ static ClipBook *clipbook = nil;
   [d setObject: NSLocalizedString(@"Released under the GNU General Public License 2.0", @"")
         forKey: @"CopyrightDescription"];
   
-#ifdef GNUSTEP	
   [NSApp orderFrontStandardInfoPanelWithOptions: d];
-#else
-	[NSApp orderFrontStandardAboutPanel: d];
-#endif
 }
 
 @end

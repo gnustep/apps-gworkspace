@@ -28,7 +28,6 @@
 #include "DesktopPrefs.h"
 #include "Desktop.h"
 #include "DesktopView.h"
-#include "GNUstep.h"
 
 static NSString *nibName = @"PreferencesWin";
 

@@ -26,7 +26,6 @@
 #include <AppKit/AppKit.h>
 #include "PBViewer.h"
 #include "ClipBook.h"
-#include "GNUstep.h"
 #include <math.h>
 
 #define BORDERW 2

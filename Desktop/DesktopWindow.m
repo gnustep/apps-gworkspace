@@ -26,7 +26,6 @@
 #include <AppKit/AppKit.h>
 #include "DesktopWindow.h"
 #include "DesktopView.h"
-#include "GNUstep.h"
 
 @implementation DesktopWindow
 

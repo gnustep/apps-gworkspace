@@ -26,7 +26,6 @@
 #include <AppKit/AppKit.h>
 #include "Functions.h"
 #include "ClipBook.h"
-#include "GNUstep.h"
 
 void createMenu();
   

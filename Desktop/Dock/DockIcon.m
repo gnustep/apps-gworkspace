@@ -27,7 +27,6 @@
 #include <math.h>
 #include "DockIcon.h"
 #include "Dock.h"
-#include "GNUstep.h"
 
 static id <DesktopApplication> desktopApp = nil;
 
@@ -63,11 +62,7 @@ static id <DesktopApplication> desktopApp = nil;
   NSString *selname = [defaults stringForKey: @"DesktopApplicationSelName"];
 
   if (appname && selname) {
-    #ifdef GNUSTEP 
 		Class desktopAppClass = [[NSBundle mainBundle] principalClass];
-    #else
-		Class desktopAppClass = [[NSBundle mainBundle] classNamed: appname];
-    #endif
     SEL sel = NSSelectorFromString(selname);
 
     desktopApp = [desktopAppClass performSelector: sel];

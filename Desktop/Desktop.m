@@ -33,7 +33,6 @@
 #include "FSNode.h"
 #include "FSNodeRep.h"
 #include "FSNFunctions.h"
-#include "GNUstep.h"
 
 #define CHECKSIZE(sz) \
 if (sz.width < 0) sz.width = 0; \
@@ -1395,19 +1394,8 @@ static Desktop *desktop = nil;
   [d setObject: NSLocalizedString(@"Released under the GNU General Public License 2.0", @"")
         forKey: @"CopyrightDescription"];
   
-#ifdef GNUSTEP	
   [NSApp orderFrontStandardInfoPanelWithOptions: d];
-#else
-	[NSApp orderFrontStandardAboutPanel: d];
-#endif
 }
-
-#ifndef GNUSTEP
-- (void)terminate:(id)sender
-{
-  [NSApp terminate: self];
-}
-#endif
 
 
 //
