@@ -658,9 +658,7 @@ static NSImage *branchImage;
   /*    
     case FSNInfoExtendedType:      
       {  
-        NSString *str = [FSNodeRep 
-        
-        
+
       }
       break;
   */      

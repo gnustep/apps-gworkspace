@@ -127,6 +127,8 @@ typedef enum FSNSelectionMask {
 
 - (void)setShowType:(FSNInfoType)type;
 
+- (void)setExtendedShowType:(NSString *)type;
+
 - (FSNInfoType)showType;
 
 - (void)setIconSize:(int)size;
@@ -303,6 +305,11 @@ typedef enum FSNSelectionMask {
 + (BOOL)isPathLocked:(NSString *)path;
 
 + (void)setUseThumbnails:(BOOL)value;
+
++ (NSArray *)availableExtendedInfoNames;
+
++ (NSDictionary *)extendedInfoOfType:(NSString *)type
+                             forNode:(FSNode *)anode;
 
 @end
 

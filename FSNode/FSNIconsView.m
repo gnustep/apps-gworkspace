@@ -1028,6 +1028,10 @@ pp.x = NSMaxX([self bounds]) - 1
   }
 }
 
+- (void)setExtendedShowType:(NSString *)type
+{
+}
+
 - (FSNInfoType)showType
 {
   return infoType;

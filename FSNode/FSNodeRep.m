@@ -40,11 +40,6 @@ static FSNodeRep *shared = nil;
 
 - (id)initSharedInstance;
 
-- (void)loadExtendedInfoModules;
-
-- (NSArray *)bundlesWithExtension:(NSString *)extension 
-												   inPath:(NSString *)path;
-
 - (NSArray *)directoryContentsAtPath:(NSString *)path;
 
 - (NSImage *)iconOfSize:(float)size 
@@ -105,6 +100,16 @@ static FSNodeRep *shared = nil;
 - (void)thumbnailsDidChange:(NSNotification *)notif;
 
 - (NSImage *)thumbnailForPath:(NSString *)apath;
+
+- (void)loadExtendedInfoModules;
+
+- (NSArray *)bundlesWithExtension:(NSString *)extension 
+												   inPath:(NSString *)path;
+
+- (NSArray *)availableExtendedInfoNames;
+
+- (NSDictionary *)extendedInfoOfType:(NSString *)type
+                             forNode:(FSNode *)anode;
 
 @end
 
@@ -199,78 +204,6 @@ static FSNodeRep *shared = nil;
   }
     
   return self;
-}
-
-- (void)loadExtendedInfoModules
-{
-  NSString *bundlesDir;
-  NSArray *bundlesPaths;
-  NSMutableArray *loaded;
-  int i;
-  
-  bundlesPaths = [NSMutableArray array];
-
-  bundlesDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSSystemDomainMask, YES) lastObject];
-  bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
-  bundlesPaths = [self bundlesWithExtension: @"extinfo" inPath: bundlesDir];
-
-  loaded = [NSMutableArray array];
-  
-  for (i = 0; i < [bundlesPaths count]; i++) {
-    NSString *bpath = [bundlesPaths objectAtIndex: i];
-    NSBundle *bundle = [NSBundle bundleWithPath: bpath];
-     
-    if (bundle) {
-			Class principalClass = [bundle principalClass];
-
-			if ([principalClass conformsToProtocol: @protocol(ExtendedInfo)]) {	
-	      CREATE_AUTORELEASE_POOL (pool);
-        id module = [[principalClass alloc] init];
-	  		NSString *name = [module menuName];
-        BOOL exists = NO;	
-        int j;
-        			
-				for (j = 0; j < [loaded count]; j++) {
-					if ([name isEqual: [[loaded objectAtIndex: j] menuName]]) {
-            NSLog(@"duplicate module \"%@\" at %@", name, bpath);
-						exists = YES;
-						break;
-					}
-				}
-
-				if (exists == NO) {
-          [loaded addObject: module];
-        }
-
-	  		RELEASE ((id)module);			
-        RELEASE (pool);		
-			}
-    }
-  }
-  
-  ASSIGN (extInfoModules, loaded);
-}
-
-- (NSArray *)bundlesWithExtension:(NSString *)extension 
-													 inPath:(NSString *)path
-{
-  NSMutableArray *bundleList = [NSMutableArray array];
-  NSEnumerator *enumerator;
-  NSString *dir;
-  BOOL isDir;
-  
-  if ((([fm fileExistsAtPath: path isDirectory: &isDir]) && isDir) == NO) {
-		return nil;
-  }
-	  
-  enumerator = [[fm directoryContentsAtPath: path] objectEnumerator];
-  while ((dir = [enumerator nextObject])) {
-    if ([[dir pathExtension] isEqualToString: extension]) {
-			[bundleList addObject: [path stringByAppendingPathComponent: dir]];
-		}
-  }
-  
-  return bundleList;
 }
 
 - (NSArray *)directoryContentsAtPath:(NSString *)path
@@ -817,6 +750,108 @@ static FSNodeRep *shared = nil;
   return nil;
 }
 
+- (void)loadExtendedInfoModules
+{
+  NSString *bundlesDir;
+  NSArray *bundlesPaths;
+  NSMutableArray *loaded;
+  int i;
+  
+  bundlesPaths = [NSMutableArray array];
+
+  bundlesDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSSystemDomainMask, YES) lastObject];
+  bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
+  bundlesPaths = [self bundlesWithExtension: @"extinfo" inPath: bundlesDir];
+
+  loaded = [NSMutableArray array];
+  
+  for (i = 0; i < [bundlesPaths count]; i++) {
+    NSString *bpath = [bundlesPaths objectAtIndex: i];
+    NSBundle *bundle = [NSBundle bundleWithPath: bpath];
+     
+    if (bundle) {
+			Class principalClass = [bundle principalClass];
+
+			if ([principalClass conformsToProtocol: @protocol(ExtendedInfo)]) {	
+	      CREATE_AUTORELEASE_POOL (pool);
+        id module = [[principalClass alloc] init];
+	  		NSString *name = [module menuName];
+        BOOL exists = NO;	
+        int j;
+        			
+				for (j = 0; j < [loaded count]; j++) {
+					if ([name isEqual: [[loaded objectAtIndex: j] menuName]]) {
+            NSLog(@"duplicate module \"%@\" at %@", name, bpath);
+						exists = YES;
+						break;
+					}
+				}
+
+				if (exists == NO) {
+          [loaded addObject: module];
+        }
+
+	  		RELEASE ((id)module);			
+        RELEASE (pool);		
+			}
+    }
+  }
+  
+  ASSIGN (extInfoModules, loaded);
+}
+
+- (NSArray *)bundlesWithExtension:(NSString *)extension 
+													 inPath:(NSString *)path
+{
+  NSMutableArray *bundleList = [NSMutableArray array];
+  NSEnumerator *enumerator;
+  NSString *dir;
+  BOOL isDir;
+  
+  if ((([fm fileExistsAtPath: path isDirectory: &isDir]) && isDir) == NO) {
+		return nil;
+  }
+	  
+  enumerator = [[fm directoryContentsAtPath: path] objectEnumerator];
+  while ((dir = [enumerator nextObject])) {
+    if ([[dir pathExtension] isEqualToString: extension]) {
+			[bundleList addObject: [path stringByAppendingPathComponent: dir]];
+		}
+  }
+  
+  return bundleList;
+}
+
+- (NSArray *)availableExtendedInfoNames
+{
+  NSMutableArray *names = [NSMutableArray array];
+  int i;
+  
+  for (i = 0; i < [extInfoModules count]; i++) {
+    id module = [extInfoModules objectAtIndex: i];
+    [names addObject: NSLocalizedString([module menuName], @"")];
+  }
+  
+  return names;
+}
+
+- (NSDictionary *)extendedInfoOfType:(NSString *)type
+                             forNode:(FSNode *)anode
+{
+  int i;
+
+  for (i = 0; i < [extInfoModules count]; i++) {
+    id module = [extInfoModules objectAtIndex: i];
+    NSString *mname = NSLocalizedString([module menuName], @"");
+  
+    if ([mname isEqual: type]) {
+      return [module extendedInfoForNode: anode];
+    }
+  }
+  
+  return nil;
+}
+
 @end
 
 
@@ -982,6 +1017,17 @@ static FSNodeRep *shared = nil;
 + (void)setUseThumbnails:(BOOL)value
 {
   [[self sharedInstance] setUseThumbnails: value];
+}
+
++ (NSArray *)availableExtendedInfoNames
+{
+  return [[self sharedInstance] availableExtendedInfoNames];
+}
+
++ (NSDictionary *)extendedInfoOfType:(NSString *)type
+                             forNode:(FSNode *)anode
+{
+  return [[self sharedInstance] extendedInfoOfType: type forNode: anode];
 }
 
 @end

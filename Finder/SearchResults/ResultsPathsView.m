@@ -212,6 +212,10 @@
 {
 }
 
+- (void)setExtendedShowType:(NSString *)type
+{
+}
+
 - (FSNInfoType)showType
 {
   return FSNInfoNameType;

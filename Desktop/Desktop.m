@@ -110,7 +110,10 @@ static Desktop *desktop = nil;
   BOOL isdir;
   NSUserDefaults *defaults;	
   id defentry;
-
+  NSArray *extendedInfo;
+  NSMenu *menu;
+  int i;
+  
   [isa registerForServices];
 
   home = NSHomeDirectory();
@@ -160,6 +163,16 @@ static Desktop *desktop = nil;
   preferences = [DesktopPrefs new];
 
   startAppWin = [[StartAppWin alloc] init];
+  
+  extendedInfo = [FSNodeRep availableExtendedInfoNames];
+  menu = [[[NSApp mainMenu] itemWithTitle: NSLocalizedString(@"View", @"")] submenu];
+	menu = [[menu itemWithTitle: NSLocalizedString(@"Other", @"")] submenu];
+  
+  for (i = 0; i < [extendedInfo count]; i++) {
+	  [menu addItemWithTitle: [extendedInfo objectAtIndex: i] 
+										action: @selector(setExtendedShownType:) 
+             keyEquivalent: @""];
+  }
   
   [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
                 				selector: @selector(fileSystemWillChange:) 
@@ -1340,6 +1353,11 @@ static Desktop *desktop = nil;
   } 
 
   [[win desktopView] setShowType: type];
+}
+
+- (void)setExtendedShownType:(id)sender
+{
+  [[win desktopView] setExtendedShowType: [sender title]];
 }
 
 - (void)checkNewRemovableMedia:(id)sender

@@ -56,6 +56,7 @@ void createMenu()
 {
   NSMenu *mainMenu;
 	NSMenu *info, *file, *edit, *view, *tools;
+	NSMenu *infomenu;
 	NSMenu *inspmenu;
 	NSMenu *windows, *services;  
 	NSMenuItem *menuItem;
@@ -101,7 +102,10 @@ void createMenu()
 	addMenuItem(view, @"Size", @"", @"setShownType:", @"");
 	addMenuItem(view, @"Modification date", @"", @"setShownType:", @"");
 	addMenuItem(view, @"Owner", @"", @"setShownType:", @"");
-				
+    menuItem = addMenuItem(view, @"Other", @"", nil, @"");			
+    infomenu = AUTORELEASE ([NSMenu new]);
+		[view setSubmenu: infomenu forItem: menuItem];	
+        
 	// Tools
 	menuItem = addMenuItem(mainMenu, @"Tools", @"", nil, @"");
 	tools = AUTORELEASE ([NSMenu new]);

@@ -1549,7 +1549,6 @@ int sortDragged(id icn1, id icn2, void *context)
   }
   
   if (backImageStyle == BackImageFitStyle) {
-    CREATE_AUTORELEASE_POOL (pool);
     NSImage *newImage = [[NSImage alloc] initWithSize: screenFrame.size];
   
 	  [image setScalesWhenResized: YES];
@@ -1560,10 +1559,8 @@ int sortDragged(id icn1, id icn2, void *context)
     [newImage unlockFocus];
     ASSIGN (backImage, newImage);
     RELEASE (newImage);
-    RELEASE (pool);
     
   } else if (backImageStyle == BackImageTileStyle) {
-	  CREATE_AUTORELEASE_POOL (pool);
     NSImage *newImage = [[NSImage alloc] initWithSize: screenFrame.size];
     float x = 0;
     float y = screenFrame.size.width - imsize.width;
@@ -1585,7 +1582,6 @@ int sortDragged(id icn1, id icn2, void *context)
     imagePoint = NSZeroPoint;
     ASSIGN (backImage, newImage);
     RELEASE (newImage);
-    RELEASE (pool);
     
   } else {
     imagePoint.x = ((screenFrame.size.width - imsize.width) / 2);
@@ -1608,7 +1604,6 @@ int sortDragged(id icn1, id icn2, void *context)
 
 - (void)setBackImageAtPath:(NSString *)impath
 {
-  CREATE_AUTORELEASE_POOL (pool);
   NSImage *image = [[NSImage alloc] initWithContentsOfFile: impath];
 
   if (image) {
@@ -1617,7 +1612,6 @@ int sortDragged(id icn1, id icn2, void *context)
     RELEASE (image);
     [self setNeedsDisplay: YES];
   }
-  RELEASE (pool);
 }
 
 - (BOOL)useBackImage
