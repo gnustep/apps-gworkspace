@@ -243,7 +243,7 @@ return [ws openFile: fullPath withApplication: appName]
 		return NO;
 	}
 	
-	if (!rootFullpath || ([rootFullpath length] == 0)) {
+	if ((rootFullpath == nil) || ([rootFullpath length] == 0)) {
 		newViewer = NO;
 	} else if (([fm fileExistsAtPath: rootFullpath isDirectory: &isdirRoot] && isdirRoot) == NO) {
 		return NO;
@@ -256,7 +256,7 @@ return [ws openFile: fullPath withApplication: appName]
 		return NO;
 	}
 
-	if (newViewer == YES) {
+	if (newViewer) {
 		if ([[fullPath substringToIndex: l1] isEqualToString: rootFullpath] == NO) {
 			return NO;
 		}
@@ -265,14 +265,14 @@ return [ws openFile: fullPath withApplication: appName]
 	paths = [NSArray arrayWithObject: fullPath];
 	[self setSelectedPaths: paths];
 	
-	if (newViewer == YES) {
+	if (newViewer) {
 		ViewersWindow *viewer;
 		NSString *app, *type;
 	
 		[ws getInfoForFile: rootFullpath application: &app type: &type];
 		viewer = [self newViewerAtPath: rootFullpath canViewApps: (type == NSApplicationFileType)];
 		[viewer setViewerSelection: paths];
-		[viewer makeKeyAndOrderFront: nil];
+		[viewer orderFrontRegardless];
 	} else {
 		[rootViewer setViewerSelection: paths];
 	}
