@@ -138,13 +138,15 @@
 	    "useStandardKerning:",
 	    "useStandardLigatures:",
 	    "yank:",
-	    "zoom:"
+	    "zoom:",
+	    "setUseService:"
 	);
 	Super = NSObject;
     };
     XTermPref = {
 	Actions = (
-	    "setXTerm:"
+	    "setXTerm:",
+	    "setUseService:"
 	);
 	Outlets = (
 	    win,
@@ -152,7 +154,11 @@
 	    fieldsBox,
 	    xtermLabel,
 	    argsLabel,
-	    setButt
+	    setButt,
+	    serviceBox,
+	    serviceCheck,
+	    xtermField,
+	    argsField
 	);
 	Super = NSObject;
     };

@@ -134,6 +134,8 @@ typedef enum DockPosition {
   
   NSString *trashPath;
   
+  NSString *defEditor;
+  
   id fswatcher;
   BOOL fswnotifications;
 
@@ -201,6 +203,8 @@ typedef enum DockPosition {
 - (void)mountRemovableMedia;
 
 - (void)createTrashPath;
+
+- (void)changeDefaultEditor:(NSNotification *)notif;
 
 - (void)updateDefaults;
 

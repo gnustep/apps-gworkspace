@@ -37,18 +37,11 @@
   IBOutlet id prefbox;
   IBOutlet id thumbbox; 
   IBOutlet id thumbCheck; 
-  IBOutlet id selectbox; 
-  IBOutlet id animMatrix;
-  IBOutlet id actChangesButt;  
   
   GWorkspace *gw;  
 }
 
 - (IBAction)setUnsetThumbnails:(id)sender;
-
-- (IBAction)setUnsetAnimation:(id)sender;
-
-- (IBAction)activateChanges:(id)sender;
 
 @end
 

@@ -38,6 +38,8 @@
 if (sz.width < 0) sz.width = 0; \
 if (sz.height < 0) sz.height = 0
 
+static NSString *defaulteditor = @"nedit.app";
+
 static Desktop *desktop = nil;
 
 @implementation Desktop
@@ -79,6 +81,7 @@ static Desktop *desktop = nil;
   DESTROY (inspectorApp);
   DESTROY (operationsApp);
   RELEASE (trashPath);
+  RELEASE (defEditor);
   TEST_RELEASE (desktopDir);
   DESTROY (workspaceApplication);
   RELEASE (dock);
@@ -174,6 +177,13 @@ static Desktop *desktop = nil;
   }
   [[FSNodeRep sharedInstance] setHideSysFiles: hideSysFiles];
 
+	defentry = [defaults stringForKey: @"defaulteditor"];
+	if (defentry == nil) {
+		defEditor = [[NSString alloc] initWithString: defaulteditor];
+	} else {
+		ASSIGN (defEditor, defentry);
+  }
+
   win = [DesktopWindow new];
   [win activate];
   [[win desktopView] showMountedVolumes];
@@ -206,6 +216,11 @@ static Desktop *desktop = nil;
   [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
                 				selector: @selector(fileSystemDidChange:) 
                 					  name: @"GWFileSystemDidChangeNotification"
+                					object: nil];
+
+  [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
+                				selector: @selector(changeDefaultEditor:) 
+                					  name: @"GWDefaultEditorChangedNotification"
                 					object: nil];
 
   [[ws notificationCenter] addObserver: self 
@@ -931,6 +946,15 @@ static Desktop *desktop = nil;
   ASSIGN (trashPath, tpath);
 }
 
+- (void)changeDefaultEditor:(NSNotification *)notif
+{
+  NSString *editor = [notif object];
+
+  if (editor) {
+    ASSIGN (defEditor, editor);
+  }
+}
+
 - (void)updateDefaults
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -939,6 +963,8 @@ static Desktop *desktop = nil;
                forKey: @"dockposition"];
                
   [defaults setBool: (inspectorApp != nil) forKey: @"uses_inspector"];
+
+	[defaults setObject: defEditor forKey: @"defaulteditor"];
                
   [defaults synchronize];
   
@@ -1461,7 +1487,12 @@ static Desktop *desktop = nil;
           [workspaceApp selectFile: [node path] inFileViewerRootedAtPath: [node path]];
         } else {
           if ([node isApplication] == NO) {
-            [ws openFile: [node path]];
+            NSString *appName, *type;
+          
+            [ws getInfoForFile: [node path] application: &appName type: &type];
+            appName = (appName == nil) ? defEditor : appName;
+            [ws openFile: [node path] withApplication: appName];
+            
           } else {
             [ws launchApplication: [node path]];
           }
@@ -1470,7 +1501,11 @@ static Desktop *desktop = nil;
         [workspaceApp selectFile: [node path] inFileViewerRootedAtPath: [node path]];
       }
     } else if ([node isPlain]) {
-      [ws openFile: [node path]];
+      NSString *appName, *type;
+
+      [ws getInfoForFile: [node path] application: &appName type: &type];
+      appName = (appName == nil) ? defEditor : appName;
+      [ws openFile: [node path] withApplication: appName];
     }
   }
 }

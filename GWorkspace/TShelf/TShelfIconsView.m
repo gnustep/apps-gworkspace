@@ -388,7 +388,11 @@
   int i;
 
   for (i = 0; i < [icons count]; i++) {
-    [[icons objectAtIndex: i] renewIcon];
+    id icon = [icons objectAtIndex: i];
+    
+    if ([icon respondsToSelector: @selector(renewIcon)]) {
+      [icon renewIcon];
+    }
   }  
 }
 

@@ -58,7 +58,7 @@
 
   NSMatrix *leftMatrix, *rightMatrix;
   id cellPrototipe;
-
+  
   FSNode *currentNode;
 
   IBOutlet id hiddenDirslabel;

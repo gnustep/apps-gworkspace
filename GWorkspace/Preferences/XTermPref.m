@@ -49,27 +49,43 @@ static NSString *nibName = @"XTermPref";
       NSLog(@"failed to load %@!", nibName);
     } else {
 	    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];      
-
+      id entry;
+      
       RETAIN (prefbox);
       RELEASE (win);
 
-	    xterm = [defaults stringForKey: @"defxterm"];
-      if (xterm != nil) {
-        RETAIN (xterm);
-		    [xtermLabel setStringValue: xterm];
+	    useService = [defaults boolForKey: @"terminal_services"];
+      
+      if (useService) {
+        [xtermField setSelectable: NO];
+        [argsField setSelectable: NO];
+        [setButt setEnabled: NO];
+        [serviceCheck setState: NSOnState];
+      } else {
+        [serviceCheck setState: NSOffState];
+      }
+      
+	    entry = [defaults stringForKey: @"defxterm"];
+      if (entry) {
+        ASSIGN (xterm, entry);
+		    [xtermField setStringValue: xterm];
       }
 
-	    xtermArgs = [defaults stringForKey: @"defaultxtermargs"];
-      if (xtermArgs != nil) {
-        RETAIN (xtermArgs);
-		    [argsLabel setStringValue: xtermArgs];
+	    entry = [defaults stringForKey: @"defaultxtermargs"];
+      if (entry) {
+        ASSIGN (xtermArgs, entry);
+		    [argsField setStringValue: xtermArgs];
       }
       
       gw = [GWorkspace gworkspace]; 
   
       /* Internationalization */
+      [serviceBox setTitle: NSLocalizedString(@"Terminal.app", @"")];
+      [serviceCheck setTitle: NSLocalizedString(@"Use Terminal service", @"")];
+      [xtermLabel setStringValue: NSLocalizedString(@"xterm", @"")];
+      [argsLabel setStringValue: NSLocalizedString(@"arguments", @"")];
       [setButt setTitle: NSLocalizedString(@"Set", @"")];
-      [fieldsBox setTitle: NSLocalizedString(@"XTerminal", @"")];
+      [fieldsBox setTitle: NSLocalizedString(@"Terminal", @"")];
     }
   }
   
@@ -83,27 +99,79 @@ static NSString *nibName = @"XTermPref";
 
 - (NSString *)prefName
 {
-  return @"XTerminal";
+  return NSLocalizedString(@"Terminal", @"");
+}
+
+- (IBAction)setUseService:(id)sender
+{
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];      
+
+	useService = ([sender state] == NSOnState);
+
+  if (useService) {
+    [xtermField setSelectable: NO];
+    [argsField setSelectable: NO];
+    [setButt setEnabled: NO];
+  } else {
+    [xtermField setSelectable: YES];
+    [argsField setSelectable: YES];
+    [setButt setEnabled: YES];
+  }
+
+  [defaults setBool: useService forKey: @"terminal_services"];
+  [gw setUseTerminalService: useService];
 }
 
 - (IBAction)setXTerm:(id)sender
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];      
-  NSString *xt = [xtermLabel stringValue];
-  NSString *xtargs = [argsLabel stringValue];
+  NSString *xt = [xtermField stringValue];
+  NSString *xtargs = [argsField stringValue];
+  int lngt;
   
   if ([xterm isEqual: xt] && [xtermArgs isEqual: xtargs]) { 
     return;
   }
   
-  ASSIGN (xterm, xt);
-  ASSIGN (xtermArgs, xtargs);
-
-	[defaults setObject: xterm forKey: @"defxterm"];
-	[defaults setObject: xtermArgs forKey: @"defaultxtermargs"];
-	[defaults synchronize];
+  lngt = [xt length];
   
-  [gw changeDefaultXTerm: xterm arguments: xtermArgs];
+  if (lngt) {
+    BOOL xtok = YES;
+    int i;
+    
+    for (i = 0; i < lngt; i++) {
+      unichar c = [xt characterAtIndex: i];
+    
+      if (c == ' ') {
+        xtok = NO;
+      }
+    }
+  
+    if (xtok) {
+      lngt = [xtargs length];
+      xtok = (lngt == 0) ? YES : NO;
+
+      for (i = 0; i < lngt; i++) {
+        unichar c = [xtargs characterAtIndex: i];
+
+        if (c != ' ') {
+          xtok = YES;
+          break;
+        }
+      }
+    }
+  
+    if (xtok) {
+      ASSIGN (xterm, xt);
+      ASSIGN (xtermArgs, xtargs);
+
+	    [defaults setObject: xterm forKey: @"defxterm"];
+	    [defaults setObject: xtermArgs forKey: @"defaultxtermargs"];
+	    [defaults synchronize];
+  
+      [gw changeDefaultXTerm: xterm arguments: xtermArgs];
+    }
+  }
 }
 
 @end

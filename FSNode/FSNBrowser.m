@@ -35,6 +35,10 @@
 
 #define DEFAULT_ISIZE 24
 
+#ifndef max
+  #define max(a,b) ((a) >= (b) ? (a):(b))
+  #define min(a,b) ((a) <= (b) ? (a):(b))
+#endif
 
 @implementation FSNBrowser
 
@@ -157,6 +161,7 @@
   	skipUpdateScroller = NO;
 		lastKeyPressed = 0.;
   	charBuffer = nil;
+    simulatingDoubleClick = NO;    
   	isLoaded = NO;	
 
     viewer = nil;
@@ -1133,7 +1138,6 @@
   return nil;
 }
 
-
 - (void)clickInMatrixOfColumn:(FSNBrowserColumn *)col
 {
   int index = [col index];
@@ -1145,6 +1149,22 @@
   if ((selection == nil) || ([selection count] == 0)) {
     [self notifySelectionChange: [NSArray arrayWithObject: [[col shownNode] path]]];
     return;
+  }
+
+  if (selColumn) {
+    if ((pos == visibleColumns) && (index == ([columns count] -1))) {
+      NSPoint p = [[self window] mouseLocationOutsideOfEventStream];
+      
+      mousePointX = p.x;
+      mousePointY = p.y;
+      simulatingDoubleClick = YES;
+
+      [NSTimer scheduledTimerWithTimeInterval: 0.3
+											                 target: self 
+                                     selector: @selector(doubleClikTimeOut:) 
+																		 userInfo: nil 
+                                      repeats: NO];
+    }
   }
 
   currentshift = 0;
@@ -1197,6 +1217,29 @@
   } else {
     [desktopApp openSelectionInNewViewer: NO];
   }
+}
+
+- (void)doubleClikTimeOut:(id)sender
+{
+  simulatingDoubleClick = NO;
+}
+
+- (void)mouseDown:(NSEvent*)theEvent
+{
+  if (simulatingDoubleClick) {
+    NSPoint p = [[self window] mouseLocationOutsideOfEventStream];
+      
+    if ((max(p.x, mousePointX) - min(p.x, mousePointX)) <= 3
+            && (max(p.y, mousePointY) - min(p.y, mousePointY)) <= 3) {
+      if (manager) {
+        [manager openSelectionInViewer: viewer closeSender: NO];
+      } else {
+        [desktopApp openSelectionInNewViewer: NO];
+      }
+    }
+  }
+  
+  [super mouseDown: theEvent];
 }
 
 - (void)keyDown:(NSEvent *)theEvent

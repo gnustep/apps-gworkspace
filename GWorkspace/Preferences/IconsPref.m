@@ -28,9 +28,6 @@
 #include "GWorkspace.h"
 #include "GNUstep.h"
 
-#define ANIM_CHPAT 0
-#define ANIM_SLIDEBACK 1
-
 static NSString *nibName = @"IconsPref";
 
 @implementation IconsPref
@@ -51,7 +48,6 @@ static NSString *nibName = @"IconsPref";
       NSLog(@"failed to load %@!", nibName);
     } else {  
       NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults]; 
-      id cell;
 
       RETAIN (prefbox);
       RELEASE (win); 
@@ -59,20 +55,10 @@ static NSString *nibName = @"IconsPref";
       gw = [GWorkspace gworkspace];
   
       [thumbCheck setState: [defaults boolForKey: @"usesthumbnails"] ? NSOnState : NSOffState];  
-
-      cell = [animMatrix cellAtRow: ANIM_CHPAT column: 0];
-      [cell setState: [defaults boolForKey: @"nochdiranim"] ? NSOffState : NSOnState];  
-
-      cell = [animMatrix cellAtRow: ANIM_SLIDEBACK column: 0];
-      [cell setState: [defaults boolForKey: @"noslidebackanim"] ? NSOffState : NSOnState];  
       
       /* Internationalization */
       [thumbbox setTitle: NSLocalizedString(@"Thumbnails", @"")];
       [thumbCheck setTitle: NSLocalizedString(@"use thumbnails", @"")];
-      [[animMatrix cellAtRow: ANIM_CHPAT column: 0] setTitle: NSLocalizedString(@"when changing a path", @"")];
-      [[animMatrix cellAtRow: ANIM_SLIDEBACK column: 0] setTitle: NSLocalizedString(@"sliding back after file operation", @"")];       
-      [selectbox setTitle: NSLocalizedString(@"Animate icons", @"")];
-      [actChangesButt setTitle: NSLocalizedString(@"Activate changes", @"")];
     }  
   }
   
@@ -87,34 +73,6 @@ static NSString *nibName = @"IconsPref";
 - (NSString *)prefName
 {
   return NSLocalizedString(@"Icons", @"");
-}
-
-- (IBAction)setUnsetAnimation:(id)sender
-{
-	[actChangesButt setEnabled: YES];
-}
-
-- (IBAction)activateChanges:(id)sender
-{
-  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults]; 
-  NSArray *cells = [animMatrix cells];
-  unsigned int state;
-  
-  state = [[cells objectAtIndex: ANIM_CHPAT] state];
-  [defaults setBool: ((state == NSOnState) ? NO : YES) 
-             forKey: @"nochdiranim"];
-
-  state = [[cells objectAtIndex: ANIM_SLIDEBACK] state];
-  [defaults setBool: ((state == NSOnState) ? NO : YES) 
-             forKey: @"noslidebackanim"];
-
-  [defaults synchronize];
-  
-	[[NSNotificationCenter defaultCenter]
- 				postNotificationName: @"GWIconAnimationChangedNotification"
-	 								    object: nil];	
-  
-	[actChangesButt setEnabled: NO];
 }
 
 - (IBAction)setUnsetThumbnails:(id)sender

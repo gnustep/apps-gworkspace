@@ -343,7 +343,12 @@
 
 - (void)updateIcons
 {
-
+  NSArray *items = [tView items];
+  int i;
+  
+  for (i = 0; i < [items count]; i++) {
+    [(TShelfIconsView *)[[items objectAtIndex: i] view] updateIcons];
+  }  
 }
 
 - (void)checkIconsAfterHidingOfPaths:(NSArray *)hpaths

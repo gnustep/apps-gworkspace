@@ -35,15 +35,25 @@
 {
   IBOutlet id win;
   IBOutlet id prefbox;
+  
+  IBOutlet id serviceBox;
+  IBOutlet id serviceCheck;
+  
   IBOutlet id fieldsBox;
   IBOutlet id xtermLabel;
+  IBOutlet id xtermField;
   IBOutlet id argsLabel;
+  IBOutlet id argsField;
   IBOutlet id setButt;
-
+  
+  BOOL useService;
+  
   NSString *xterm;
   NSString *xtermArgs;
   GWorkspace *gw;  
 }
+
+- (IBAction)setUseService:(id)sender;
 
 - (IBAction)setXTerm:(id)sender;
 

@@ -64,6 +64,10 @@
 
   NSSize columnSize;
   
+  BOOL simulatingDoubleClick;
+  float mousePointX;
+  float mousePointY;
+  
   NSString *charBuffer;	
 	NSTimeInterval lastKeyPressed;
   int alphaNumericalLastColumn;
@@ -144,6 +148,7 @@
 
 - (void)clickInMatrixOfColumn:(FSNBrowserColumn *)col;
 - (void)doubleClickInMatrixOfColumn:(FSNBrowserColumn *)col;
+- (void)doubleClikTimeOut:(id)sender;
 
 @end
 

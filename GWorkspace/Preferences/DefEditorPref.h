@@ -31,6 +31,8 @@
 
 @class NSWorkspace;
 @class GWorkspace;
+@class FSNode;
+@class FSNodeRep;
 @class NSFont;
 
 @interface DefEditorPref : NSObject <PrefProtocol>
@@ -42,14 +44,14 @@
   IBOutlet id nameLabel;
   IBOutlet id chooseButt;
 
-  NSString *defEditor;
   NSString *noEditorStr;
+  FSNode *ednode;
   NSFont *font;
   float iconBoxWidth;
   float labelHeight;
   NSPoint labelOrigin;
+  FSNodeRep *fsnodeRep;
 	NSWorkspace *ws;
-  GWorkspace *gw;  
 }
 
 - (IBAction)chooseEditor:(id)sender;

@@ -33,6 +33,7 @@
 static NSString *nibName = @"HiddenFilesPref";
 
 #define ICON_SIZE 48
+#define LINEH 20
 
 #define CHECKSIZE(sz) \
 if (sz.width < 0) sz.width = 0; \
@@ -93,7 +94,7 @@ if (sz.height < 0) sz.height = 0
       [iconView setImage: icon]; 		
       
       cellPrototipe = [NSBrowserCell new];
-
+      
       [leftScroll setBorderType: NSBezelBorder];
 		  [leftScroll setHasHorizontalScroller: NO];
   	  [leftScroll setHasVerticalScroller: YES]; 
@@ -132,7 +133,7 @@ if (sz.height < 0) sz.height = 0
 				            			        mode: NSListModeMatrix prototype: cellPrototipe
 			       											              numberOfRows: 0 numberOfColumns: 0];
         [dirsMatrix setIntercellSpacing: NSZeroSize];
-        [dirsMatrix setCellSize: NSMakeSize(130, 14)];
+        [dirsMatrix setCellSize: NSMakeSize(130, LINEH)];
         [dirsMatrix setAutoscroll: YES];
 	      [dirsMatrix setAllowsEmptySelection: YES];
         cs = [hiddenDirsScroll contentSize];
@@ -232,7 +233,7 @@ if (sz.height < 0) sz.height = 0
 				            			    mode: NSListModeMatrix prototype: cellPrototipe
 			       											          numberOfRows: 0 numberOfColumns: 0];
   [leftMatrix setIntercellSpacing: NSZeroSize];
-  [leftMatrix setCellSize: NSMakeSize(130, 14)];
+  [leftMatrix setCellSize: NSMakeSize(130, LINEH)];
   [leftMatrix setAutoscroll: YES];
 	[leftMatrix setAllowsEmptySelection: YES];
   cs = [leftScroll contentSize];
@@ -252,7 +253,7 @@ if (sz.height < 0) sz.height = 0
 				            			    mode: NSListModeMatrix prototype: cellPrototipe
 			       											          numberOfRows: 0 numberOfColumns: 0];
   [rightMatrix setIntercellSpacing: NSZeroSize];
-  [rightMatrix setCellSize: NSMakeSize(130, 14)];
+  [rightMatrix setCellSize: NSMakeSize(130, LINEH)];
   [rightMatrix setAutoscroll: YES];
 	[rightMatrix setAllowsEmptySelection: YES];
   cs = [rightScroll contentSize];
@@ -487,7 +488,7 @@ if (sz.height < 0) sz.height = 0
 				            			    mode: NSListModeMatrix prototype: cellPrototipe
 			       											          numberOfRows: 0 numberOfColumns: 0];
     [dirsMatrix setIntercellSpacing: NSZeroSize];
-    [dirsMatrix setCellSize: NSMakeSize(130, 14)];
+    [dirsMatrix setCellSize: NSMakeSize(130, LINEH)];
     [dirsMatrix setAutoscroll: YES];
 	  [dirsMatrix setAllowsEmptySelection: YES];
     cs = [hiddenDirsScroll contentSize];

@@ -127,9 +127,7 @@
 
 
 @interface GWorkspace : NSObject <GWProtocol, FSWClientProtocol>
-{
-	NSString *defEditor, *defXterm, *defXtermArgs;
-	
+{	
   FSNodeRep *fsnodeRep;
   
 	NSArray *selectedPaths;
@@ -167,11 +165,14 @@
   StartAppWin *startAppWin;
     	      
   int shelfCellsWidth;
+
+	NSString *defEditor;
+  NSString *defXterm;
+  NSString *defXtermArgs;
+  BOOL teminalService;
           
   NSFileManager *fm;
   NSWorkspace *ws;
-  
-  BOOL starting;
 }
 
 + (void)registerForServices;
@@ -200,9 +201,12 @@
 
 - (void)newViewerAtPath:(NSString *)path;
 
-- (void)changeDefaultEditor:(NSString *)editor;
+- (void)changeDefaultEditor:(NSNotification *)notif;
 
-- (void)changeDefaultXTerm:(NSString *)xterm arguments:(NSString *)args;
+- (void)changeDefaultXTerm:(NSString *)xterm 
+                 arguments:(NSString *)args;
+             
+- (void)setUseTerminalService:(BOOL)value;             
                              
 - (void)updateDefaults;
 					 

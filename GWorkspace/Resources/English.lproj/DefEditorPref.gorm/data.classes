@@ -9,7 +9,6 @@
 	    iconbox,
 	    imView,
 	    nameLabel,
-	    noEditLabel,
 	    chooseButt
 	);
 	Super = NSObject;

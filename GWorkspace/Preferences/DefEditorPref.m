@@ -22,19 +22,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
+#include "FSNodeRep.h"
 #include "DefEditorPref.h"
 #include "GWorkspace.h"
 #include "GNUstep.h"
 #include <math.h>
 
-#ifdef GNUSTEP 
-  #define LABEL_MARGIN 8
-#else
-  #define LABEL_MARGIN 8
-#endif
+#define LABEL_MARGIN 8
+#define ICON_SIZE 48
 
 static NSString *nibName = @"DefEditorPref";
 
@@ -43,7 +40,7 @@ static NSString *nibName = @"DefEditorPref";
 - (void)dealloc
 {
   TEST_RELEASE (prefbox);
-  TEST_RELEASE (defEditor);
+  TEST_RELEASE (ednode);
   RELEASE (noEditorStr);
   RELEASE (font);
   [super dealloc];
@@ -60,9 +57,8 @@ static NSString *nibName = @"DefEditorPref";
 		if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
       NSLog(@"failed to load %@!", nibName);
     } else {
-	    NSUserDefaults *defaults;
-      NSString *fullPath;
-      NSImage *image;      
+	    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];   
+      NSString *editor = [defaults stringForKey: @"defaulteditor"];
       
       RETAIN (prefbox);
       iconBoxWidth = [iconbox frame].size.width;
@@ -70,23 +66,27 @@ static NSString *nibName = @"DefEditorPref";
       labelOrigin = [nameLabel frame].origin;      
       RELEASE (win);
       
+      fsnodeRep = [FSNodeRep sharedInstance];
 		  ws = [NSWorkspace sharedWorkspace];
-      gw = [GWorkspace gworkspace];
-      defEditor = nil;
       
       [imView setImageScaling: NSScaleProportionally];
+      
+      if (editor) {
+        NSString *path = [ws fullPathForApplication: editor];
+        
+        if (path) {
+          NSImage *image;      
 
-      defaults = [NSUserDefaults standardUserDefaults];      
-	    defEditor = [defaults stringForKey: @"defaulteditor"];
-      if (defEditor != nil) {
-		    RETAIN (defEditor);
+		      ASSIGN (ednode, [FSNode nodeWithPath: path]);
+          image = [fsnodeRep iconOfSize: ICON_SIZE forNode: ednode];
+          [imView setImage: image];
 
-        fullPath = [ws fullPathForApplication: defEditor];
-        image = [ws iconForFile: fullPath];
-        [imView setImage: image];
-
-	      [nameLabel setStringValue: defEditor];
-        [self tile];
+	        [nameLabel setStringValue: [ednode name]];
+          [self tile];
+        } else {
+	        [nameLabel setStringValue: noEditorStr];
+          [self tile];
+        }
       } else {
 	      [nameLabel setStringValue: noEditorStr];
         [self tile];
@@ -113,15 +113,11 @@ static NSString *nibName = @"DefEditorPref";
 
 - (IBAction)chooseEditor:(id)sender
 {
-	NSOpenPanel *openPanel;
-	NSArray *fileTypes;
-	NSString *appName;
-  NSString *app, *type;
+	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+	NSArray *fileTypes = [NSArray arrayWithObjects: @"app", @"debug", nil];
+	FSNode *node;
 	int result;
 
-	fileTypes = [NSArray arrayWithObjects: @"app", @"debug", nil];
-  
-	openPanel = [NSOpenPanel openPanel];
 	[openPanel setTitle: @"open"];	
   [openPanel setAllowsMultipleSelection: NO];
   [openPanel setCanChooseFiles: YES];
@@ -132,56 +128,67 @@ static NSString *nibName = @"DefEditorPref";
 		return;
   }
   
-	appName = [NSString stringWithString: [openPanel filename]];
+	node = [FSNode nodeWithPath: [openPanel filename]];
   
-  [ws getInfoForFile: appName application: &app type: &type];
-  
-  if ([type isEqualToString: NSApplicationFileType] == NO) {
+  if ([node isApplication] == NO) {
     NSRunAlertPanel(nil, 
-        [NSString stringWithFormat: @"%@ is not a valid application!", appName], 
+        [NSString stringWithFormat: @"%@ is not a valid application!", [node name]], 
                             @"Continue", nil, nil);  
     return;
   }	
       
-  [self setEditor: [appName lastPathComponent]];
+  [self setEditor: [node name]];
 }
 
 - (void)setEditor:(NSString *)editor
 {
-  NSUserDefaults *defaults;
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];     
+  NSString *path;
   NSImage *image;
-  NSString *fullPath;
   
-  if ([editor isEqualToString: defEditor] == YES) {
+  if ([editor isEqual: [ednode name]]) {
     return;
   }
   
-  ASSIGN (defEditor, editor);
-  
-  fullPath = [ws fullPathForApplication: defEditor];
-  image = [ws iconForFile: fullPath];
-
-  [imView setImage: image];
-      
-  [nameLabel setStringValue: defEditor];
-  [self tile];
+  path = [ws fullPathForApplication: editor];
         
-  defaults = [NSUserDefaults standardUserDefaults];      
-	[defaults setObject: defEditor forKey: @"defaulteditor"];
-	[defaults synchronize];
+  ASSIGN (ednode, [FSNode nodeWithPath: path]);
+  image = [fsnodeRep iconOfSize: ICON_SIZE forNode: ednode];
+  [imView setImage: image];
   
-  [gw changeDefaultEditor: defEditor];
+  [nameLabel setStringValue: [ednode name]];
+  [self tile];
+   
+	[defaults setObject: [ednode name] forKey: @"defaulteditor"];
+	[defaults synchronize];
+
+	[[NSDistributedNotificationCenter defaultCenter]
+ 				postNotificationName: @"GWDefaultEditorChangedNotification"
+	 								    object: [ednode name] 
+                    userInfo: nil];
 }
 
 - (void)tile
 {
-  NSRect r;
-  NSPoint p;
-
-  r = NSMakeRect(0, 0, [font widthOfString: [nameLabel stringValue]] + LABEL_MARGIN, labelHeight);
-  [nameLabel setFrame: r];        
-  p = NSMakePoint((iconBoxWidth - [nameLabel frame].size.width) / 2, labelOrigin.y);        
+  NSRect r = [nameLabel frame];
+  int labw = (int)[font widthOfString: [nameLabel stringValue]] + LABEL_MARGIN;
+  NSPoint p = NSMakePoint(0, labelOrigin.y);
+  
+  r.size.width = labw;
+  [nameLabel setFrame: r];
+          
+  p.x = ((iconBoxWidth - [nameLabel frame].size.width) / 2);        
   [nameLabel setFrameOrigin: p]; 
+
+  [iconbox setNeedsDisplay: YES];
 }
 
 @end
+
+
+
+
+
+
+
+

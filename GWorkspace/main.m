@@ -175,8 +175,6 @@ void createMenu()
 		subenu = AUTORELEASE ([NSMenu new]);
 		[menu setSubmenu: subenu forItem: menuItem];    
 	
-  addItemToMenu(menu, @"XTerm", @"", @"showTerminal:", @"t");
-
 	// Windows
 	menuItem = addItemToMenu(mainMenu, @"Windows", @"", nil, @"");
 	windows = AUTORELEASE ([NSMenu new]);

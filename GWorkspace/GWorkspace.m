@@ -46,8 +46,8 @@
 #include "History/History.h"
 #include "GNUstep.h"
 
-NSString *defaulteditor = @"nedit.app";
-NSString *defaultxterm = @"xterm";
+static NSString *defaulteditor = @"nedit.app";
+static NSString *defaultxterm = @"xterm";
 
 static GWorkspace *gworkspace = nil;
 
@@ -471,6 +471,9 @@ static GWorkspace *gworkspace = nil;
 		ASSIGN (defXtermArgs, entry);
   }
   
+  teminalService = [defaults boolForKey: @"terminal_services"];
+  [self setUseTerminalService: teminalService];
+  
 	entry = [defaults objectForKey: @"shelfcellswidth"];
 	if (entry == nil) {
     shelfCellsWidth = 90;
@@ -547,13 +550,9 @@ static GWorkspace *gworkspace = nil;
   openWithController = [[OpenWithController alloc] init];
   runExtController = [[RunExternalController alloc] init];
   	
-  starting = YES;
-
   vwrsManager = [GWViewersManager viewersManager];
   [vwrsManager showViewers];
         
-	starting = NO;
-
   inspectorApp = nil;
   if ([defaults boolForKey: @"uses_inspector"]) {  
     [self connectInspector];
@@ -581,6 +580,11 @@ static GWorkspace *gworkspace = nil;
   [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
                 				selector: @selector(fileSystemDidChange:) 
                 					  name: GWFileSystemDidChangeNotification
+                					object: nil];
+
+  [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
+                				selector: @selector(changeDefaultEditor:) 
+                					  name: @"GWDefaultEditorChangedNotification"
                 					object: nil];
 
 	[[NSNotificationCenter defaultCenter] addObserver: self 
@@ -767,15 +771,50 @@ static GWorkspace *gworkspace = nil;
   return [tshelfPBDir stringByAppendingPathComponent: tshelfPBFileNName];
 }
 
-- (void)changeDefaultEditor:(NSString *)editor
+- (void)changeDefaultEditor:(NSNotification *)notif
 {
-  ASSIGN (defEditor, editor);
+  NSString *editor = [notif object];
+
+  if (editor) {
+    ASSIGN (defEditor, editor);
+  }
 }
 
-- (void)changeDefaultXTerm:(NSString *)xterm arguments:(NSString *)args
+- (void)changeDefaultXTerm:(NSString *)xterm 
+                 arguments:(NSString *)args
 {
   ASSIGN (defXterm, xterm);
-  ASSIGN (defXtermArgs, args);
+  
+  if ([args length]) {
+    ASSIGN (defXtermArgs, args);
+  } else {
+    DESTROY (defXtermArgs);
+  }
+}
+
+- (void)setUseTerminalService:(BOOL)value
+{
+	NSMenu *menu = [[[NSApp mainMenu] itemWithTitle: NSLocalizedString(@"Tools", @"")] submenu];
+  NSString *title = NSLocalizedString(@"XTerm", @"");
+  id item;
+
+  teminalService = value;
+
+  if (teminalService) {
+    item = [menu itemWithTitle: title];
+
+    if (item) {
+      [menu removeItem: item];
+    }
+  } else {
+    item = [menu itemWithTitle: title];
+
+    if (item == nil) {
+	    [menu addItemWithTitle: title
+											action: @selector(showTerminal:) 
+               keyEquivalent: @"t"];	
+    }
+  }
 }
 
 - (void)updateDefaults
@@ -818,6 +857,8 @@ static GWorkspace *gworkspace = nil;
   if (defXtermArgs != nil) {
 	  [defaults setObject: defXtermArgs forKey: @"defaultxtermargs"];
   }
+
+  [defaults setBool: teminalService forKey: @"terminal_services"];
 	
   [defaults setObject: [NSString stringWithFormat: @"%i", shelfCellsWidth]
                forKey: @"shelfcellswidth"];
@@ -840,13 +881,16 @@ static GWorkspace *gworkspace = nil;
 - (void)startXTermOnDirectory:(NSString *)dirPath
 {
 	NSTask *task = [NSTask new];
+  
 	AUTORELEASE (task);
 	[task setCurrentDirectoryPath: dirPath];			
 	[task setLaunchPath: defXterm];
-  if (defXtermArgs != nil) {
-	  NSArray *args = [defXtermArgs componentsSeparatedByString:@" "];
+  
+  if (defXtermArgs) {
+	  NSArray *args = [defXtermArgs componentsSeparatedByString: @" "];
 	  [task setArguments: args];
   }
+  
 	[task launch];
 }
 

@@ -139,26 +139,19 @@
 	    "useStandardLigatures:",
 	    "yank:",
 	    "zoom:",
-	    "setUnsetThumbnails:",
-	    "setUnsetAnimation:",
-	    "activateChanges:"
+	    "setUnsetThumbnails:"
 	);
 	Super = NSObject;
     };
     IconsPref = {
 	Actions = (
-	    "setUnsetThumbnails:",
-	    "setUnsetAnimation:",
-	    "activateChanges:"
+	    "setUnsetThumbnails:"
 	);
 	Outlets = (
 	    win,
 	    prefbox,
 	    thumbbox,
-	    thumbCheck,
-	    selectbox,
-	    animMatrix,
-	    actChangesButt
+	    thumbCheck
 	);
 	Super = NSObject;
     };
