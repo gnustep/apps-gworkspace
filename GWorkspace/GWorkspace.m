@@ -466,6 +466,7 @@ return [ws openFile: fullPath withApplication: appName]
   DESTROY (inspectorApp);
   DESTROY (finderApp);
   DESTROY (operationsApp);
+  DESTROY (desktopApp);
 	RELEASE (defEditor);
 	RELEASE (defXterm);
 	RELEASE (defXtermArgs);
@@ -680,6 +681,11 @@ return [ws openFile: fullPath withApplication: appName]
   
   finderApp = nil;
   
+  desktopApp = nil;
+  if ([defaults boolForKey: @"uses_desktop"]) {  
+    [self connectDesktop];
+  }  
+  
 	[defaults synchronize];
 
   [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
@@ -769,6 +775,17 @@ return [ws openFile: fullPath withApplication: appName]
 	                        name: NSConnectionDidDieNotification
 	                      object: fndrconn];
       DESTROY (finderApp);
+    }
+  }
+
+  if (desktopApp) {
+    NSConnection *dskconn = [(NSDistantObject *)desktopApp connectionForProxy];
+  
+    if (dskconn && [dskconn isValid]) {
+      [[NSNotificationCenter defaultCenter] removeObserver: self
+	                        name: NSConnectionDidDieNotification
+	                      object: dskconn];
+      DESTROY (desktopApp);
     }
   }
 
@@ -937,6 +954,8 @@ return [ws openFile: fullPath withApplication: appName]
   [defaults setBool: usesThumbnails forKey: @"usesthumbnails"];
 
   [defaults setBool: (inspectorApp != nil) forKey: @"uses_inspector"];
+
+  [defaults setBool: (desktopApp != nil) forKey: @"uses_desktop"];
 
 	[defaults synchronize];
 }
@@ -2028,18 +2047,18 @@ NSLocalizedString(@"OK", @""), nil, nil); \
         
         [startAppWin showWindowWithTitle: @"GWorkspace"
                                  appName: @"Finder"
-                            maxProgValue: 40.0];
+                            maxProgValue: 80.0];
 
         [ws launchApplication: @"Finder"];
 
-        for (i = 1; i <= 40; i++) {
+        for (i = 1; i <= 80; i++) {
           [startAppWin updateProgressBy: 1.0];
 	        [[NSRunLoop currentRunLoop] runUntilDate:
 		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
           fndr = [NSConnection rootProxyForConnectionWithRegisteredName: @"Finder" 
                                                                    host: @""];                  
           if (fndr) {
-            [startAppWin updateProgressBy: 40.0 - i];
+            [startAppWin updateProgressBy: 80.0 - i];
             break;
           }
         }
@@ -2086,6 +2105,88 @@ NSLocalizedString(@"OK", @""), nil, nil); \
       NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
       [finderApp setSelectionData: data];
     }
+  }
+}
+
+- (void)connectDesktop
+{
+  if (desktopApp == nil) {
+    id dsk = [NSConnection rootProxyForConnectionWithRegisteredName: @"Desktop" 
+                                                               host: @""];
+
+    if (dsk) {
+      NSConnection *c = [dsk connectionForProxy];
+
+	    [[NSNotificationCenter defaultCenter] addObserver: self
+	                   selector: @selector(desktopConnectionDidDie:)
+		                     name: NSConnectionDidDieNotification
+		                   object: c];
+      
+      desktopApp = dsk;
+	    [desktopApp setProtocolForProxy: @protocol(DesktopAppProtocol)];
+      RETAIN (desktopApp);
+      
+	  } else {
+	    static BOOL recursion = NO;
+	  
+      if (recursion == NO) {
+        int i;
+        
+        [startAppWin showWindowWithTitle: @"GWorkspace"
+                                 appName: @"Desktop"
+                            maxProgValue: 80.0];
+
+        [ws launchApplication: @"Desktop"];
+
+        for (i = 1; i <= 80; i++) {
+          [startAppWin updateProgressBy: 1.0];
+	        [[NSRunLoop currentRunLoop] runUntilDate:
+		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+          dsk = [NSConnection rootProxyForConnectionWithRegisteredName: @"Desktop" 
+                                                                  host: @""];                  
+          if (dsk) {
+            [startAppWin updateProgressBy: 80.0 - i];
+            break;
+          }
+        }
+        
+        [[startAppWin win] close];
+        
+	      recursion = YES;
+	      [self connectDesktop];
+	      recursion = NO;
+        
+	    } else { 
+	      recursion = NO;
+        NSRunAlertPanel(nil,
+                NSLocalizedString(@"unable to contact Desktop!", @""),
+                NSLocalizedString(@"Ok", @""),
+                nil, 
+                nil);  
+      }
+	  }
+  }
+}
+
+- (void)desktopConnectionDidDie:(NSNotification *)notif
+{
+  id connection = [notif object];
+
+  [[NSNotificationCenter defaultCenter] removeObserver: self
+	                    name: NSConnectionDidDieNotification
+	                  object: connection];
+
+  NSAssert(connection == [desktopApp connectionForProxy],
+		                                  NSInternalInconsistencyException);
+  RELEASE (desktopApp);
+  desktopApp = nil;
+
+  if (NSRunAlertPanel(nil,
+                    NSLocalizedString(@"The Desktop connection died.\nDo you want to restart it?", @""),
+                    NSLocalizedString(@"Yes", @""),
+                    NSLocalizedString(@"No", @""),
+                    nil)) {
+    [self connectDesktop]; 
   }
 }
 
@@ -2375,6 +2476,13 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 - (void)showApps:(id)sender
 {
   [appsViewer activate]; 
+}
+
+- (void)showDesktop:(id)sender
+{
+	if (desktopApp == nil) {
+    [self connectDesktop];
+  }   
 }
 
 - (void)showFinder:(id)sender

@@ -121,6 +121,7 @@ void createMenu()
 		addItemToMenu(hismenu, @"Show History", @"", @"showHistory:", @"H");
 		addItemToMenu(hismenu, @"Go backward", @"", @"goBackwardInHistory:", @"");
 		addItemToMenu(hismenu, @"Go forward", @"", @"goForwardInHistory:", @"");
+	addItemToMenu(tools, @"Show Desktop", @"", @"showDesktop:", @"");
 	addItemToMenu(tools, @"Finder", @"", @"showFinder:", @"f");
 	addItemToMenu(tools, @"Applications...", @"", @"showApps:", @"");
 		menuItem = addItemToMenu(tools, @"Fiend", @"", nil, @"");

@@ -106,6 +106,12 @@
 @end
 
 
+@protocol	DesktopAppProtocol
+
+
+@end
+
+
 @protocol	OperationProtocol
 
 - (oneway void)performFileOperation:(NSData *)opinfo;
@@ -125,6 +131,7 @@
   id inspectorApp;
   id operationsApp;
   id finderApp;
+  id desktopApp;
     
   AppsViewer *appsViewer;
   PrefController *prefController;
@@ -273,6 +280,10 @@
 
 - (void)finderConnectionDidDie:(NSNotification *)notif;
 
+- (void)connectDesktop;
+
+- (void)desktopConnectionDidDie:(NSNotification *)notif;
+
 - (void)connectOperation;
 
 - (void)operationConnectionDidDie:(NSNotification *)notif;
@@ -304,6 +315,8 @@
 - (void)showToolsInspector:(id)sender;
 
 - (void)showApps:(id)sender;
+
+- (void)showDesktop:(id)sender;
 
 - (void)showFinder:(id)sender;
 
