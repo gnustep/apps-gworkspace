@@ -24,11 +24,11 @@ Inspector_APPLICATION_ICON=Inspector.tiff
 
 Inspector_HAS_RESOURCE_BUNDLE = yes
 
-ifneq ($(PDFKIT), 0)
+ifneq ($(PDFKIT),no)
   Inspector_GUI_LIBS += -lPDFKit
 endif
 
-ifneq ($(PDFKIT), 0)
+ifneq ($(PDFKIT),no)
   Inspector_RESOURCE_FILES = \
     Resources/Images/* \
     Resources/English.lproj \

@@ -2,4 +2,4 @@
 #   Makefile flags and configs to build with the bundle
 #
 
-PDFKIT=@PDFKIT@
+PDFKIT=@have_pdfkit@

@@ -2,7 +2,7 @@ include $(GNUSTEP_MAKEFILES)/common.make
 
 include ../inspector.make
 
-ifneq ($(PDFKIT), 0)
+ifneq ($(PDFKIT),no)
 SUBPROJECTS = \
   FolderViewer \
   ImageViewer \

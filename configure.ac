@@ -40,26 +40,19 @@ AC_DEFINE_UNQUOTED([FILEPATH], ["$FILE_PATH"], [Path to file])
 #--------------------------------------------------------------------
 # We need PDFKit
 #--------------------------------------------------------------------
-PDFKIT="0"
+save_CPPFLAGS="$CPPFLAGS"
+CPPFLAGS="$CPPFLAGS -x objective-c -I$GNUSTEP_SYSTEM_ROOT/Library/Headers -I$GNUSTEP_LOCAL_ROOT/Library/Headers"
 
-HDIR=$GNUSTEP_LOCAL_ROOT/Library/Headers/PDFKit
+AC_CHECK_HEADERS(PDFKit/PDFDocument.h, have_pdfkit=yes, have_pdfkit=no)
 
-if test -d $HDIR; then
-  if test -f "$HDIR/PDFDocument.h"; then
-    if test -f "$HDIR/PDFImageRep.h"; then
-      PDFKIT="1"
-    fi
-  fi
+if test "$have_pdfkit" = no; then
+  AC_MSG_NOTICE([The PDFKit framework can't be found.])
+  AC_MSG_NOTICE([The pdf viewer will not be built.])  
 fi
 
-if test  $PDFKIT = "0"; then
-  echo ""
-  echo "The PDFKit framework can't be found."
-  echo "The pdf viewer will not be built"
-  echo ""
-fi
+AC_SUBST(have_pdfkit)
 
-
+CPPFLAGS="$save_CPPFLAGS"
 
 AC_CONFIG_FILES([GNUmakefile \
 									GWLib/GNUmakefile \

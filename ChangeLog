@@ -1,4 +1,9 @@
 
+2004-03-31 Enrico Sersale  <enrico@imago.ro>
+  
+  * configure.ac
+    better detection of PDFKit.
+
 2004-03-08 Enrico Sersale  <enrico@imago.ro>
   
   * Operation
