@@ -24,16 +24,15 @@
 
 #include <AppKit/AppKit.h>
 #include "ddbd.h"
+#include "config.h"
 
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#define gw_debug 1
-
 #define GWDebugLog(format, args...) \
-  do { if (gw_debug) \
+  do { if (GW_DEBUG_LOG) \
     NSLog(format , ## args); } while (0)
 
 #ifdef __MINGW__

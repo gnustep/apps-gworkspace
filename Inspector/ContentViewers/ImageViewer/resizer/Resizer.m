@@ -26,11 +26,10 @@
 #include <AppKit/AppKit.h>
 #include <math.h>
 #include "resize.h"
-
-#define gw_debug 1
+#include "config.h"
 
 #define GWDebugLog(format, args...) \
-  do { if (gw_debug) \
+  do { if (GW_DEBUG_LOG) \
     NSLog(format , ## args); } while (0)
 
 @protocol ImageViewerProtocol

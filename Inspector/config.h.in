@@ -4,3 +4,6 @@
 
 /* Path to the file command */
 #undef FILEPATH
+
+/* gworkspace debug log */
+#undef GW_DEBUG_LOG

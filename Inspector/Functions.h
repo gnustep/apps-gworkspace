@@ -26,13 +26,13 @@
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
 
+#include "config.h"
+
 @class NSString;
 @class NSMenuItem;
 
-#define gw_debug 1
-
 #define GWDebugLog(format, args...) \
-  do { if (gw_debug) \
+  do { if (GW_DEBUG_LOG) \
     NSLog(format , ## args); } while (0)
 
 #ifndef MAKE_LABEL

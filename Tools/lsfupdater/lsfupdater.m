@@ -25,11 +25,10 @@
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include "FinderModulesProtocol.h"
-
-#define gw_debug 1
+#include "config.h"
 
 #define GWDebugLog(format, args...) \
-  do { if (gw_debug) \
+  do { if (GW_DEBUG_LOG) \
     NSLog(format , ## args); } while (0)
 
 BOOL subPathOfPath(NSString *p1, NSString *p2);
@@ -563,6 +562,27 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
     }
   }
 }
+
+
+
+
+
+
+
+
+/*
+2005-03-01 15:17:40.000 GWorkspace[29107] 
+Exception when sending exception back to client 
+- <NSException: 88c8498> NAME:NSInvalidArgumentException 
+REASON:conditionally encoding without root object
+*/
+
+
+
+
+
+
+
 
 - (void)updateSearchPath:(NSString *)srcpath
 {

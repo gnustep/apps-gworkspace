@@ -13,7 +13,27 @@ AC_CHECK_FUNCS(getpwnam getpwuid geteuid getlogin)
 
 AC_CONFIG_AUX_DIR([$GNUSTEP_MAKEFILES])
 
+AC_CONFIG_HEADER([GWorkspace/config.h])
+AC_CONFIG_HEADER([Tools/ddbd/config.h])
+AC_CONFIG_HEADER([Tools/searchtool/config.h])
+AC_CONFIG_HEADER([Tools/lsfupdater/config.h])
+
 AC_CONFIG_SUBDIRS(Inspector)
+
+#--------------------------------------------------------------------
+# Debug logging
+#--------------------------------------------------------------------
+AC_ARG_ENABLE(debug_log,
+  [  --enable-debug-log  		Enable debug logging],,
+      enable_debug_log=no)
+
+if test "$enable_debug_log" = "no"; then
+ GW_DEBUG_LOG=0
+else
+ GW_DEBUG_LOG=1
+fi
+
+AC_DEFINE_UNQUOTED([GW_DEBUG_LOG], [$GW_DEBUG_LOG], [debug logging])
 
 AC_CONFIG_FILES([GNUmakefile \
 									Tools/ddbd/GNUmakefile \
@@ -21,5 +41,3 @@ AC_CONFIG_FILES([GNUmakefile \
 									GWorkspace/GWorkspaceInfo.plist \
 									gworkspace.make])
 AC_OUTPUT
-
-
