@@ -243,6 +243,7 @@
   BOOL isLocked;
   BOOL iconSelected;
   BOOL isOpened;
+  BOOL wasOpened;
   BOOL nameEdited;
   BOOL isDragTarget;
   
@@ -261,9 +262,7 @@
 
 - (NSImage *)spatialOpenIcon;
 
-- (BOOL)selectIcon;
-
-- (BOOL)unselectIcon;
+- (BOOL)selectIcon:(BOOL)value;
 
 - (BOOL)iconSelected;
 

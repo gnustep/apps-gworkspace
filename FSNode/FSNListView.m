@@ -300,7 +300,7 @@ static NSString *defaultColumns = @"{ \
 
 - (void)selectIconOfRep:(id)aRep
 {
-  if ([aRep selectIcon]) {
+  if ([aRep selectIcon: YES]) {
     [self redisplayRep: aRep];
     [self unSelectIconsOfRepsDifferentFrom: aRep];    
   } 
@@ -313,7 +313,7 @@ static NSString *defaultColumns = @"{ \
   for (i = 0; i < [nodeReps count]; i++) {
     FSNListViewNodeRep *rep = [nodeReps objectAtIndex: i];  
   
-    if ((rep != aRep) && [rep unselectIcon]) {
+    if ((rep != aRep) && [rep selectIcon: NO]) {
       [self redisplayRep: rep];
     }
   }
@@ -475,6 +475,12 @@ static NSString *defaultColumns = @"{ \
   [self selectionDidChange];
 }
 
+- (BOOL)tableView:(NSTableView *)aTableView 
+  shouldSelectRow:(int)rowIndex
+{
+  return !([[nodeReps objectAtIndex: rowIndex] isLocked]);
+}
+
 - (void)tableView:(NSTableView *)aTableView 
   willDisplayCell:(id)aCell 
    forTableColumn:(NSTableColumn *)aTableColumn 
@@ -487,27 +493,22 @@ static NSString *defaultColumns = @"{ \
   if (ident == FSNInfoNameType) {
     if ([rep iconSelected]) {
       [cell setIcon: [rep openIcon]];
-    
     } else if ([rep isLocked]) {
       [cell setIcon: [rep lockedIcon]];
-    
     } else if ([rep isOpened]) {
       [cell setIcon: [rep spatialOpenIcon]];
-    
     } else {
       [cell setIcon: [rep icon]];
     }
-    
   } else if (ident == FSNInfoDateType) {
     [cell setDateCell: YES];
   }
 
-
-  // isLocked
-  // iconSelected (dnd)
-  // isOpened (spatial)
-
-
+  if ([rep isLocked]) {
+    [cell setTextColor: [NSColor disabledControlTextColor]];
+  } else {
+    [cell setTextColor: [NSColor controlTextColor]];
+  }
 }
 
 - (void)tableView:(NSTableView *)tableView 
@@ -834,7 +835,7 @@ static NSString *defaultColumns = @"{ \
 		files = [info objectForKey: @"origfiles"];
   }	
 
-  if (([ndpath isEqual: source] == NO) && ([ndpath isEqual: destination] == NO)) {
+  if (([ndpath isEqual: source] == NO) && ([ndpath isEqual: destination] == NO)) {    
     [self reloadContents];
     return;
   }
@@ -882,11 +883,12 @@ static NSString *defaultColumns = @"{ \
       }
     }
     needsreload = YES;
-    [self sortNodeReps];
   }
 
   [self checkLockedReps];
+  
   if (needsreload) {
+    [self sortNodeReps];
     [listView reloadData];
     
     if ([[listView window] isKeyWindow]) {
@@ -895,14 +897,18 @@ static NSString *defaultColumns = @"{ \
             || [operation isEqual: @"GWorkspaceCreateFileOperation"]) {
         NSString *fname = [files objectAtIndex: 0];
         NSString *fpath = [destination stringByAppendingPathComponent: fname];
-        FSNListViewNodeRep *rep = [self repOfSubnodePath: fpath];   
-        int index = [nodeReps indexOfObjectIdenticalTo: rep];
+        FSNListViewNodeRep *rep = [self repOfSubnodePath: fpath]; 
         
-        [self selectReps: [NSArray arrayWithObject: rep]];
-        [listView scrollRowToVisible: index];
+        if (rep) {  
+          int index = [nodeReps indexOfObjectIdenticalTo: rep];
+        
+          [self selectReps: [NSArray arrayWithObject: rep]];
+          [listView scrollRowToVisible: index];
+        }
       }
     }
   }  
+  
   [listView setNeedsDisplay: YES];  
   [self selectionDidChange];
 }
@@ -940,6 +946,7 @@ static NSString *defaultColumns = @"{ \
 
   [self sortNodeReps];
   if (needsreload) {
+    [listView deselectAll: self];
     [listView reloadData];
   }
   [listView setNeedsDisplay: YES];  
@@ -1448,15 +1455,24 @@ static NSString *defaultColumns = @"{ \
     [userInfo setObject: [ednode path] forKey: @"source"];	
     [userInfo setObject: newpath forKey: @"destination"];	
     [userInfo setObject: [NSArray arrayWithObject: @""] forKey: @"files"];	
+
+    [desktopApp removeWatcherForPath: [node path]];
+
+//    [[NSDistributedNotificationCenter defaultCenter]
+// 				postNotificationName: @"GWFileSystemWillChangeNotification"
+//	 								    object: nil 
+//                    userInfo: userInfo];
     
     [fm movePath: [ednode path] toPath: newpath handler: self];
     
-    CLEAREDITING;
-
     [[NSDistributedNotificationCenter defaultCenter]
  				postNotificationName: @"GWFileSystemDidChangeNotification"
 	 								    object: nil 
                     userInfo: userInfo];
+                    
+    [desktopApp addWatcherForPath: [node path]];
+
+    CLEAREDITING;
   }
 }
 
@@ -1788,6 +1804,7 @@ static NSString *defaultColumns = @"{ \
     isLocked = NO;
     iconSelected = NO;
     isOpened = NO;
+    wasOpened = NO;
     nameEdited = NO;
   }
 
@@ -1814,31 +1831,26 @@ static NSString *defaultColumns = @"{ \
   return spopenicon;
 }
 
-- (BOOL)selectIcon
+- (BOOL)selectIcon:(BOOL)value
 {
-  if (iconSelected) {
-    return NO;
-  }
-  
-  if (openicon == nil) {
-    NSImage *opicn = [fsnodeRep openFolderIconOfSize: ICNSIZE forNode: node];
+  if ((iconSelected != value) || (isOpened != wasOpened)) {
+    iconSelected = value;
 
-    if (opicn) {
-      ASSIGN (openicon, opicn);
+    if (iconSelected && ((openicon == nil) || (isOpened != wasOpened))) {
+      NSImage *opicn = [fsnodeRep openFolderIconOfSize: ICNSIZE forNode: node];
+
+      if (isOpened) {
+        DESTROY (openicon);
+        openicon = [[NSImage alloc] initWithSize: [opicn size]];
+        [openicon lockFocus];
+        [opicn dissolveToPoint: NSZeroPoint fraction: 0.5];
+        [openicon unlockFocus];
+      } else {
+        ASSIGN (openicon, opicn);
+      }
     }
   }
   
-  iconSelected = YES;
-  
-  return YES;
-}
-
-- (BOOL)unselectIcon
-{
-  if (iconSelected == NO) {
-    return NO;
-  }
-  iconSelected = NO;
   return YES;
 }
 
@@ -1989,6 +2001,8 @@ static NSString *defaultColumns = @"{ \
 
 - (void)setOpened:(BOOL)value
 {
+  wasOpened = isOpened;
+
   if (isOpened != value) {
     isOpened = value;
 
@@ -1999,6 +2013,7 @@ static NSString *defaultColumns = @"{ \
       [spopenicon unlockFocus];
     } 
     
+    [self selectIcon: iconSelected];
     [dataSource redisplayRep: self];
   }
 }

@@ -30,6 +30,7 @@
 #include "GWViewerIconsView.h"
 #include "GWViewerListView.h"
 #include "GWViewerWindow.h"
+#include "GWViewerScrollView.h"
 #include "GWViewerSplit.h"
 #include "GWViewerShelf.h"
 #include "GWViewerIconsPath.h"
@@ -307,7 +308,7 @@
   h = r.size.height; 
   
   r = NSMakeRect(xmargin, h - pathscrh, w - (xmargin * 2), pathscrh);
-  pathsScroll = [[GWViewerScroll alloc] initWithFrame: r];
+  pathsScroll = [[GWViewerPathsScroll alloc] initWithFrame: r];
   [pathsScroll setBorderType: NSBezelBorder];
   [pathsScroll setHasHorizontalScroller: YES];
   [pathsScroll setHasVerticalScroller: NO];
@@ -329,7 +330,7 @@
   RELEASE (pathsView);
   
   r = NSMakeRect(xmargin, 0, w - (xmargin * 2), h - pathscrh - ymargin);
-  nviewScroll = [[NSScrollView alloc] initWithFrame: r];
+  nviewScroll = [[GWViewerScrollView alloc] initWithFrame: r];
   [nviewScroll setBorderType: NSBezelBorder];
   hasScroller = ([viewType isEqual: @"Icon"] || [viewType isEqual: @"List"]);
   [nviewScroll setHasHorizontalScroller: hasScroller];

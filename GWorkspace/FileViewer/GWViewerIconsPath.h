@@ -29,7 +29,7 @@
 #include <AppKit/NSView.h>
 #include "FSNodeRep.h"
 
-@class GWViewerScroll;
+@class GWViewerPathsScroll;
 @class FSNIcon;
 @class FSNIconNameEditor;
 
@@ -89,9 +89,9 @@
 
 - (void)tile;
 
-- (void)gwviewerScroll:(GWViewerScroll *)sender 
-    scrollViewScrolled:(NSClipView *)clip
-               hitPart:(NSScrollerPart)hitpart;
+- (void)gwviewerPathsScroll:(GWViewerPathsScroll *)sender 
+         scrollViewScrolled:(NSClipView *)clip
+                    hitPart:(NSScrollerPart)hitpart;
 
 @end
 
@@ -146,7 +146,7 @@
 @end
 
 
-@interface GWViewerScroll : NSScrollView
+@interface GWViewerPathsScroll : NSScrollView
 {
   id delegate;
 }
@@ -157,11 +157,11 @@
 
 @end
 
-@interface NSObject(GWViewerScrollDelegateMethods)
+@interface NSObject(GWViewerPathsScrollDelegateMethods)
 
-- (void)gwviewerScroll:(GWViewerScroll *)sender 
-    scrollViewScrolled:(NSClipView *)clip
-               hitPart:(NSScrollerPart)hitpart;
+- (void)gwviewerPathsScroll:(GWViewerPathsScroll *)sender 
+         scrollViewScrolled:(NSClipView *)clip
+                    hitPart:(NSScrollerPart)hitpart;
 
 @end
 

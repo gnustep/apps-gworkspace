@@ -1,4 +1,4 @@
-/* GWViewerIconsPath.h
+/* GWViewerIconsPath.m
  *  
  * Copyright (C) 2004 Free Software Foundation, Inc.
  *
@@ -368,9 +368,9 @@
 //
 // scrollview delegate
 //
-- (void)gwviewerScroll:(GWViewerScroll *)sender 
-    scrollViewScrolled:(NSClipView *)clip
-               hitPart:(NSScrollerPart)hitpart
+- (void)gwviewerPathsScroll:(GWViewerPathsScroll *)sender 
+         scrollViewScrolled:(NSClipView *)clip
+                    hitPart:(NSScrollerPart)hitpart
 {
   int x = (int)[clip bounds].origin.x;
   int y = (int)[clip bounds].origin.y;
@@ -764,7 +764,7 @@
 @end
 
 
-@implementation GWViewerScroll
+@implementation GWViewerPathsScroll
 
 - (void)setDelegate:(id)anObject
 {
@@ -784,9 +784,9 @@
     NSScroller *scroller = [self horizontalScroller];
     NSScrollerPart hitPart = [scroller hitPart];
 
-    [delegate gwviewerScroll: self 
-          scrollViewScrolled: aClipView 
-                     hitPart: hitPart];      
+    [delegate gwviewerPathsScroll: self 
+               scrollViewScrolled: aClipView 
+                          hitPart: hitPart];      
   }
 }
 

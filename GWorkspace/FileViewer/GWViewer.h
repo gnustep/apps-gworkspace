@@ -32,9 +32,9 @@
 @class GWViewerWindow;
 @class GWViewerSplit;
 @class GWViewerShelf;
-@class NSScrollView;
+@class GWViewerScrollView;
 @class GWViewerIconsPath;
-@class GWViewerScroll;
+@class GWViewerPathsScroll;
 @class NSView;
 @class GWorkspace;
 @class FileAnnotationsManager;
@@ -46,9 +46,9 @@
   GWViewerShelf *shelf;
   float shelfHeight;
   NSView *lowBox;
-  GWViewerScroll *pathsScroll;
+  GWViewerPathsScroll *pathsScroll;
   GWViewerIconsPath *pathsView;
-  NSScrollView *nviewScroll;
+  GWViewerScrollView *nviewScroll;
   id nodeView;
   
   NSString *viewType;

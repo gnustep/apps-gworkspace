@@ -35,7 +35,7 @@
 @class FileAnnotationsManager;
 @class NSView;
 @class NSTextField;
-@class NSScrollView;
+@class GWViewerScrollView;
 
 @interface GWSpatialViewer : NSObject
 {
@@ -45,7 +45,7 @@
   NSTextField *elementsLabel;
   NSTextField *spaceLabel;
   GWViewerPathsPopUp *pathsPopUp;
-  NSScrollView *scroll;
+  GWViewerScrollView *scroll;
   id nodeView;
   
   NSString *viewType;

@@ -27,6 +27,7 @@
 #include "GWSpatialViewer.h"
 #include "GWViewersManager.h"
 #include "GWViewerWindow.h"
+#include "GWViewerScrollView.h"
 #include "GWViewerBrowser.h"
 #include "GWViewerIconsView.h"
 #include "GWViewerListView.h"
@@ -278,7 +279,7 @@
   RELEASE (spaceLabel);
 
   r = NSMakeRect(margin, 0, w - (margin * 2), h - boxh);
-  scroll = [[NSScrollView alloc] initWithFrame: r];
+  scroll = [[GWViewerScrollView alloc] initWithFrame: r];
   [scroll setBorderType: NSBezelBorder];
   hasScroller = ([viewType isEqual: @"Icon"] || [viewType isEqual: @"List"]);
   [scroll setHasHorizontalScroller: YES];
@@ -581,7 +582,7 @@
   NSArray *files = [info objectForKey: @"files"];
 
   [nodeView nodeContentsDidChange: info];
-  
+    
   if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
     files = [NSArray arrayWithObject: [destination lastPathComponent]];
     destination = [destination stringByDeletingLastPathComponent]; 

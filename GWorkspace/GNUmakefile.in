@@ -57,6 +57,7 @@ FileViewer/GWViewerIconsView.m \
 FileViewer/GWViewerListView.m \
 FileViewer/GWViewerShelf.m \
 FileViewer/GWViewerSplit.m \
+FileViewer/GWViewerScrollView.m \
 FileViewer/GWViewerIconsPath.m \
 FileViewer/GWViewerPathsPopUp.m \
 FileAnnotations/FileAnnotationsManager.m \
