@@ -257,7 +257,10 @@
 - (void)newSortType:(id)sender
 {
 	sortType = [[sender selectedCell] tag];
-	[okButt setEnabled: YES];
+  
+  [self setNewSortType: nil];
+  
+//	[okButt setEnabled: YES];
 }
 
 - (void)setNewSortType:(id)sender
@@ -276,7 +279,7 @@
                       userInfo: dict];
   }
 	
-  [okButt setEnabled: NO];	
+//  [okButt setEnabled: NO];	
 }
 
 @end

@@ -3,16 +3,8 @@
 before-all::
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/GWorkspace
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/FileViewer
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/SpatialViewer
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Viewer
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Watchers
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Viewers
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Shelf
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/FileAnnotations
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/TShelf
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Apps
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Finder
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Desktop
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Recycler
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Preferences
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Dialogs
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Fiend
@@ -23,18 +15,11 @@ before-all::
 
 # Things to do before installing
 before-install::
+before-all::
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/GWorkspace
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/FileViewer
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/SpatialViewer
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Viewer
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Watchers
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Viewers
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Shelf
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/FileAnnotations
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/TShelf
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Apps
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Finder
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Desktop
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Recycler
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Preferences
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Dialogs
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Fiend

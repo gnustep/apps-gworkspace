@@ -112,6 +112,8 @@ int compIcons(id *c1, id *c2, void *context);
 
 NSString *fileSizeDescription(unsigned long long size);
 
+NSRect rectForWindow(NSArray *otherwins, NSRect proposedRect, BOOL checkKey);
+
 NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str, 
 														NSString *comm, NSString *sel, NSString *key);
 

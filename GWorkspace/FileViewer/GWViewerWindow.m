@@ -146,6 +146,11 @@
   [delegate selectAllInViewer];
 }
 
+- (void)showAnnotationWindows:(id)sender
+{
+  [delegate showAnnotationWindows];
+}
+
 - (void)showTerminal:(id)sender
 {
   [delegate showTerminal];
@@ -153,8 +158,9 @@
 
 - (void)keyDown:(NSEvent *)theEvent 
 {
+  unsigned flags = [theEvent modifierFlags];
 	NSString *characters = [theEvent characters];
-	unichar character = 0;
+  unichar character = 0;
 		
   if ([characters length] > 0) {
 		character = [characters characterAtIndex: 0];
@@ -162,16 +168,24 @@
 		
 	switch (character) {
     case NSLeftArrowFunctionKey:
-			if ([theEvent modifierFlags] & NSControlKeyMask) {
+			if ((flags & NSCommandKeyMask) || (flags & NSControlKeyMask)) {
         [delegate goBackwardInHistory];
 			}
       return;
 
     case NSRightArrowFunctionKey:			
-			if ([theEvent modifierFlags] & NSControlKeyMask) {
+			if ((flags & NSCommandKeyMask) || (flags & NSControlKeyMask)) {
         [delegate goForwardInHistory];
 	    } 
 			return;
+      
+    case NSBackspaceKey:			
+      if (flags & NSShiftKeyMask) {
+        [delegate emptyTrash];
+      } else {
+        [delegate deleteFiles];
+      }
+      return;
 	}
 	
 	[super keyDown: theEvent];

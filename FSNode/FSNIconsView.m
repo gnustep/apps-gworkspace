@@ -849,7 +849,7 @@ pp.x = NSMaxX([self bounds]) - 1
 			}
 	  	return;
       
-    case 13:
+		case NSCarriageReturnCharacter:
       [desktopApp openSelectionInNewViewer: NO];
       return;
 

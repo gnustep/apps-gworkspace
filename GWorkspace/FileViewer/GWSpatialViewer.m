@@ -31,6 +31,8 @@
 #include "GWViewerIconsView.h"
 #include "GWViewerPathsPopUp.h"
 #include "GWorkspace.h"
+#include "FileAnnotationsManager.h"
+#include "GWFunctions.h"
 #include "FSNodeRep.h"
 #include "FSNIcon.h"
 #include "FSNFunctions.h"
@@ -72,6 +74,7 @@
     watchedSuspended = [NSMutableArray new];
     manager = [GWViewersManager viewersManager];
     gworkspace = [GWorkspace gworkspace];
+    fannManager = [FileAnnotationsManager fannmanager];
     nc = [NSNotificationCenter defaultCenter];
 
     defEntry = [defaults objectForKey: @"browserColsWidth"];
@@ -129,7 +132,9 @@
     if (defEntry) {
       [vwrwin setFrameFromString: defEntry];
     } else {
-      [vwrwin setFrame: NSMakeRect(200, 200, resizeIncrement * 3, 400) 
+      NSRect r = NSMakeRect(200, 200, resizeIncrement * 3, 300);
+    
+      [vwrwin setFrame: rectForWindow([manager viewerWindows], r, YES) 
                display: NO];
     }
 
@@ -847,12 +852,33 @@
 
 - (void)duplicateFiles
 {
-  [gworkspace duplicateFiles];
+  NSArray *selection = [nodeView selectedNodes];
+
+  if (selection && [selection count]) {
+    if ([nodeView isSingleNode]) {
+      [gworkspace duplicateFiles];
+    } else if ([selection isEqual: [NSArray arrayWithObject: baseNode]] == NO) {
+      [gworkspace duplicateFiles];
+    }
+  }
 }
 
 - (void)deleteFiles
 {
-  [gworkspace deleteFiles];
+  NSArray *selection = [nodeView selectedNodes];
+
+  if (selection && [selection count]) {
+    if ([nodeView isSingleNode]) {
+      [gworkspace moveToTrash];
+    } else if ([selection isEqual: [NSArray arrayWithObject: baseNode]] == NO) {
+      [gworkspace moveToTrash];
+    }
+  }
+}
+
+- (void)emptyTrash
+{
+  [gworkspace emptyRecycler: nil];
 }
 
 - (void)goBackwardInHistory
@@ -1016,6 +1042,19 @@
 	[nodeView selectAll];
 }
 
+- (void)showAnnotationWindows
+{
+  NSArray *selection = [nodeView selectedNodes];
+
+  if (selection && [selection count]) {
+    if ([nodeView isSingleNode]) {    
+      [fannManager showAnnotationsForNodes: selection];
+    } else if ([selection isEqual: [NSArray arrayWithObject: baseNode]] == NO) {
+      [fannManager showAnnotationsForNodes: selection];
+    }
+  }
+}
+
 - (void)showTerminal
 {
   NSString *path;
@@ -1055,22 +1094,42 @@
 
   if ([menuTitle isEqual: NSLocalizedString(@"Icon Size", @"")]) {
     return [nodeView respondsToSelector: @selector(setIconSize:)];
-  }
-
-  if ([menuTitle isEqual: NSLocalizedString(@"Icon Position", @"")]) {
+  } else if ([menuTitle isEqual: NSLocalizedString(@"Icon Position", @"")]) {
     return [nodeView respondsToSelector: @selector(setIconPosition:)];
-  }
-
-  if ([menuTitle isEqual: NSLocalizedString(@"Label Size", @"")]) {
+  } else if ([menuTitle isEqual: NSLocalizedString(@"Label Size", @"")]) {
     return [nodeView respondsToSelector: @selector(setLabelTextSize:)];
-  }
-
-  if ([itemTitle isEqual: NSLocalizedString(@"Label Color...", @"")]) {
+  } else if ([itemTitle isEqual: NSLocalizedString(@"Label Color...", @"")]) {
     return [nodeView respondsToSelector: @selector(setTextColor:)];
-  }
-
-  if ([itemTitle isEqual: NSLocalizedString(@"Background Color...", @"")]) {
+  } else if ([itemTitle isEqual: NSLocalizedString(@"Background Color...", @"")]) {
     return [nodeView respondsToSelector: @selector(setBackgroundColor:)];
+  
+  } else if ([itemTitle isEqual: NSLocalizedString(@"Duplicate", @"")]
+       || [itemTitle isEqual: NSLocalizedString(@"Move to Recycler", @"")]) {
+    NSArray *selection = [nodeView selectedNodes];
+
+    if (selection && [selection count]) {
+      if ([nodeView isSingleNode]) {
+        return YES;
+      } else if ([selection isEqual: [NSArray arrayWithObject: baseNode]] == NO) {
+        return YES;
+      }
+    }
+    
+    return NO;
+
+  } else if ([itemTitle isEqual: NSLocalizedString(@"File Annotations", @"")]) {
+    NSArray *selection = [nodeView selectedNodes];
+    
+    if ((selection == nil) || ([selection count] == 0)) {
+      return NO;
+    }
+    
+    if ([nodeView isSingleNode]
+          || ([selection isEqual: [NSArray arrayWithObject: baseNode]] == NO)) {
+      return YES;
+    }
+    
+    return NO;
   }
 
   return YES;

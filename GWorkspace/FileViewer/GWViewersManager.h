@@ -116,6 +116,8 @@
 
 - (id)viewerWithWindow:(id)awindow;
 
+- (NSArray *)viewerWindows;
+
 
 - (void)updateDefaults;
 

@@ -1,15 +1,10 @@
 include $(GNUSTEP_MAKEFILES)/common.make
 
-ifneq ($(FOUNDATION_LIB), apple)
-  SUBPROJECTS = \
-       fswatcher \
-       findfile \
-       thumbnailer \
-       wopen 
-else
-  SUBPROJECTS = \
-       findfile 
-endif
+SUBPROJECTS = \
+        fswatcher \
+        ddbd \
+        thumbnailer \
+        wopen 
 
 -include GNUmakefile.preamble
 

@@ -39,6 +39,7 @@
 @class PrefController;
 @class Fiend;
 @class History;
+@class FileAnnotationsManager;
 @class TShelfWin;
 @class OpenWithController;
 @class RunExternalController;
@@ -126,6 +127,37 @@
 @end
 
 
+@protocol	DDBdProtocol
+
+- (BOOL)dbactive;
+
+- (oneway void)insertPath:(NSString *)path;
+
+- (oneway void)removePath:(NSString *)path;
+
+- (NSString *)annotationsForPath:(NSString *)path;
+
+- (oneway void)setAnnotations:(NSString *)annotations
+                      forPath:(NSString *)path;
+
+- (NSString *)fileTypeForPath:(NSString *)path;
+
+- (oneway void)setFileType:(NSString *)type
+                   forPath:(NSString *)path;
+
+- (NSString *)modificationDateForPath:(NSString *)path;
+
+- (oneway void)setModificationDate:(NSString *)datedescr
+                           forPath:(NSString *)path;
+
+- (NSData *)iconDataForPath:(NSString *)path;
+
+- (oneway void)setIconData:(NSData *)data
+                   forPath:(NSString *)path;
+
+@end
+
+
 @interface GWorkspace : NSObject <GWProtocol, FSWClientProtocol>
 {	
   FSNodeRep *fsnodeRep;
@@ -140,7 +172,10 @@
   id finderApp;
   id desktopApp;
   id recyclerApp;
-    
+  
+  id ddbd;
+  BOOL ddbdactive;
+  
   PrefController *prefController;
   Fiend *fiend;
   
@@ -148,7 +183,9 @@
 	int maxHistoryCache;
     
   GWViewersManager *vwrsManager;
-
+  
+  FileAnnotationsManager *fannManager;
+  
   BOOL animateChdir;
   BOOL animateSlideBack;
 
@@ -251,6 +288,8 @@
 
 - (void)deleteFiles;
 
+- (void)moveToTrash;
+
 - (BOOL)verifyFileAtPath:(NSString *)path;
 
 - (void)setUsesThumbnails:(BOOL)value;
@@ -286,6 +325,36 @@
 - (void)connectOperation;
 
 - (void)operationConnectionDidDie:(NSNotification *)notif;
+
+- (void)connectDDBd;
+
+- (void)ddbdConnectionDidDie:(NSNotification *)notif;
+
+- (BOOL)ddbdactive;
+
+- (void)ddbdInsertPath:(NSString *)path;
+
+- (void)ddbdRemovePath:(NSString *)path;
+
+- (NSString *)ddbdGetAnnotationsForPath:(NSString *)path;
+
+- (void)ddbdSetAnnotations:(NSString *)annotations
+                   forPath:(NSString *)path;
+
+- (NSString *)ddbdGetFileTypeForPath:(NSString *)path;
+
+- (void)ddbdSetFileType:(NSString *)type
+                forPath:(NSString *)path;
+
+- (NSString *)ddbdGetModificationDateForPath:(NSString *)path;
+
+- (void)ddbdSetModificationDate:(NSString *)datedescr
+                        forPath:(NSString *)path;
+
+- (NSData *)ddbdGetIconDataForPath:(NSString *)path;
+
+- (void)ddbdSetIconData:(NSData *)data
+                forPath:(NSString *)path;
 
 - (id)connectApplication:(NSString *)appName;
 

@@ -1,0 +1,5 @@
+
+
+#undef HAVE_SQLITE
+#undef SQLITE
+

@@ -236,17 +236,20 @@ static Operation *operation = nil;
       [opdstpaths addObject: [opdst stringByAppendingPathComponent: opfile]];
     
     } else {
-      NSString *copystr = NSLocalizedString(@"copy", @"");
-      NSString *ofstr = NSLocalizedString(@"_of_", @"");
+      NSString *copystr = NSLocalizedString(@"_copy", @"");
+      NSString *ext = [opfile pathExtension]; 
+      NSString *base = [opfile stringByDeletingPathExtension];       
       NSString *ntmp;
       NSString *destpath;
       int count = 1;
     
 			while(1) {
         if (count == 1) {
-          ntmp = [NSString stringWithFormat: @"%@%@%@", copystr, ofstr, opfile];
+          ntmp = [NSString stringWithFormat: @"%@%@", base, copystr];
+          ntmp = [ntmp stringByAppendingPathExtension: ext];
         } else {
-          ntmp = [NSString stringWithFormat: @"%@%i%@%@", copystr, count, ofstr, opfile];
+          ntmp = [NSString stringWithFormat: @"%@%@%i", base, copystr, count];
+          ntmp = [ntmp stringByAppendingPathExtension: ext];
         }
         
 				destpath = [opdst stringByAppendingPathComponent: ntmp];  

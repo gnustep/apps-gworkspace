@@ -74,7 +74,7 @@ void createMenu()
 	addItemToMenu(menu, @"New Folder", @"", @"newFolder:", @"n");
 	addItemToMenu(menu, @"New File", @"", @"newFile:", @"N");
 	addItemToMenu(menu, @"Duplicate", @"", @"duplicateFiles:", @"u");
-	addItemToMenu(menu, @"Destroy", @"", @"deleteFiles:", @"d");
+	addItemToMenu(menu, @"Move to Recycler", @"", @"deleteFiles:", @"d");
 	addItemToMenu(menu, @"Empty Recycler", @"", @"emptyRecycler:", @"");
 	addItemToMenu(menu, @"Check for disks", @"", @"checkRemovableMedia:", @"E");
 	addItemToMenu(menu, @"Run...", @"", @"runCommand:", @"");  
@@ -147,6 +147,7 @@ void createMenu()
 	menu = AUTORELEASE ([NSMenu new]);
 	[mainMenu setSubmenu: menu forItem: menuItem];	
 	addItemToMenu(menu, @"Viewer", @"", @"showViewer:", @"V");	
+  addItemToMenu(menu, @"File Annotations", @"", @"showAnnotationWindows:", @"I");
 		
     menuItem = addItemToMenu(menu, @"Inspectors", @"", nil, @"");
 		subenu = AUTORELEASE ([NSMenu new]);

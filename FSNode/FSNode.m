@@ -325,9 +325,6 @@
 
 - (NSString *)parentPath
 {
-  if (parent) {
-    return [parent path];
-  } 
   return [path stringByDeletingLastPathComponent];
 }
 
@@ -768,6 +765,11 @@
   NSArray *files = [opinfo objectForKey: @"files"];
   int i;
 
+  if ([operation isEqual: @"GWorkspaceRenameOperation"]) {      
+    files = [NSArray arrayWithObject: [source lastPathComponent]]; 
+    source = [source stringByDeletingLastPathComponent];            
+  } 
+
   if ([self isSubnodeOfPath: source]) {
     if ([operation isEqual: @"NSWorkspaceMoveOperation"]
         || [operation isEqual: @"NSWorkspaceDestroyOperation"]
@@ -775,11 +777,6 @@
 			  || [operation isEqual: @"NSWorkspaceRecycleOperation"]
 			  || [operation isEqual: @"GWorkspaceRecycleOutOperation"]
 			  || [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]) { 
-      if ([operation isEqual: @"GWorkspaceRenameOperation"]) {      
-        files = [NSArray arrayWithObject: [source lastPathComponent]]; 
-        source = [source stringByDeletingLastPathComponent];            
-      } 
-
       for (i = 0; i < [files count]; i++) {
         NSString *fname = [files objectAtIndex: i];
         NSString *fpath = [source stringByAppendingPathComponent: fname];

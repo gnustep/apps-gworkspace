@@ -58,6 +58,8 @@ FileViewer/GWViewerShelf.m \
 FileViewer/GWViewerSplit.m \
 FileViewer/GWViewerIconsPath.m \
 FileViewer/GWViewerPathsPopUp.m \
+FileAnnotations/FileAnnotationsManager.m \
+FileAnnotations/FileAnnotation.m \
 TShelf/TShelfWin.m \
 TShelf/TShelfView.m \
 TShelf/TShelfViewItem.m \

@@ -1250,12 +1250,14 @@
 	NSMatrix *matrix;
 	
 	if (column == nil) {
+    [super keyDown: theEvent];
 		return;
 	}
   
   matrix = [column cmatrix];
   
 	if (matrix == nil) {
+    [super keyDown: theEvent];
 		return;
 	}
 		
@@ -1266,6 +1268,7 @@
 	switch (character) {
 		case NSUpArrowFunctionKey:
 		case NSDownArrowFunctionKey:
+      [super keyDown: theEvent];
 	  	return;
 	
 		case NSLeftArrowFunctionKey:
@@ -1288,7 +1291,7 @@
 			}
 	  	return;
       
-		case 13:
+		case NSCarriageReturnCharacter:
       [matrix sendDoubleAction];
       return;
   }  

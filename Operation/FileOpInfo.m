@@ -383,48 +383,17 @@ static NSString *nibName = @"FileOperationWin";
 
 - (void)sendWillChangeNotification
 {
-  NSString *destpath;
-	NSMutableDictionary *dict;
+	NSMutableDictionary *dict = [NSMutableDictionary dictionary];	
   int i;
     
   notifNames = [NSMutableArray new];
   
-  if ([type isEqual: @"NSWorkspaceDuplicateOperation"]) { 
-    NSString *copystr = NSLocalizedString(@"copy", @"");
-    NSString *ofstr = NSLocalizedString(@"_of_", @"");
-        
-    for (i = 0; i < [files count]; i++) {
-      NSDictionary *dict = [files objectAtIndex: i];
-      NSString *name = [dict objectForKey: @"name"]; 
-      NSString *ntmp;
-      int count = 1;
-          
-			while(1) {
-        if (count == 1) {
-          ntmp = [NSString stringWithFormat: @"%@%@%@", copystr, ofstr, name];
-        } else {
-          ntmp = [NSString stringWithFormat: @"%@%i%@%@", copystr, count, ofstr, name];
-        }
-        
-				destpath = [destination stringByAppendingPathComponent: ntmp];        
-				if ([fm fileExistsAtPath: destpath] == NO) {  
-          [notifNames addObject: ntmp];
-					break;
-        } else {
-          count++;
-        }
-			}
-    }
-  } else {
-    for (i = 0; i < [files count]; i++) {
-      NSDictionary *dict = [files objectAtIndex: i];
-      NSString *name = [dict objectForKey: @"name"]; 
-
-      [notifNames addObject: name];
-    }
+  for (i = 0; i < [files count]; i++) {
+    NSDictionary *fdict = [files objectAtIndex: i];
+    NSString *name = [fdict objectForKey: @"name"]; 
+    [notifNames addObject: name];
   }
   
-	dict = [NSMutableDictionary dictionary];		
 	[dict setObject: type forKey: @"operation"];	
   [dict setObject: source forKey: @"source"];	
   [dict setObject: destination forKey: @"destination"];	
@@ -904,8 +873,9 @@ filename =  [fileinfo objectForKey: @"name"]
 
 - (void)doDuplicate
 {
-  NSString *copystr = NSLocalizedString(@"copy", @"");
-  NSString *ofstr = NSLocalizedString(@"_of_", @"");
+  NSString *copystr = NSLocalizedString(@"_copy", @"");
+  NSString *base;
+  NSString *ext;
 	NSString *destpath;
 	NSString *newname;
   NSString *ntmp;
@@ -916,12 +886,20 @@ filename =  [fileinfo objectForKey: @"name"]
 	  GET_FILENAME;  
 
 	  newname = [NSString stringWithString: filename];
-
+    ext = [newname pathExtension]; 
+    base = [newname stringByDeletingPathExtension];
+    
 	  while (1) {
       if (count == 1) {
-        ntmp = [NSString stringWithFormat: @"%@%@%@", copystr, ofstr, newname];
+        ntmp = [NSString stringWithFormat: @"%@%@", base, copystr];
+        if ([ext length]) {
+          ntmp = [ntmp stringByAppendingPathExtension: ext];
+        }
       } else {
-        ntmp = [NSString stringWithFormat: @"%@%i%@%@", copystr, count, ofstr, newname];
+        ntmp = [NSString stringWithFormat: @"%@%@%i", base, copystr, count];
+        if ([ext length]) {
+          ntmp = [ntmp stringByAppendingPathExtension: ext];
+        }
       }
       
 		  destpath = [destination stringByAppendingPathComponent: ntmp];
@@ -951,8 +929,7 @@ filename =  [fileinfo objectForKey: @"name"]
 
 - (void)doTrash
 {
-  NSString *copystr = NSLocalizedString(@"copy", @"");
-  NSString *ofstr = NSLocalizedString(@"_of_", @"");
+  NSString *copystr = NSLocalizedString(@"_copy", @"");
 	NSString *destpath;
 	NSString *newname;
   NSString *ntmp;
@@ -964,14 +941,23 @@ filename =  [fileinfo objectForKey: @"name"]
     destpath = [destination stringByAppendingPathComponent: newname];
     
     if ([fm fileExistsAtPath: destpath]) {
-	    newname = [NSString stringWithString: filename];
+      NSString *ext = [filename pathExtension]; 
+      NSString *base = [filename stringByDeletingPathExtension]; 
+
+      newname = [NSString stringWithString: filename];
       int count = 1;
 
 	    while (1) {
         if (count == 1) {
-          ntmp = [NSString stringWithFormat: @"%@%@%@", copystr, ofstr, newname];
+          ntmp = [NSString stringWithFormat: @"%@%@", base, copystr];
+          if ([ext length]) {
+            ntmp = [ntmp stringByAppendingPathExtension: ext];
+          }
         } else {
-          ntmp = [NSString stringWithFormat: @"%@%i%@%@", copystr, count, ofstr, newname];
+          ntmp = [NSString stringWithFormat: @"%@%@%i", base, copystr, count];
+          if ([ext length]) {
+            ntmp = [ntmp stringByAppendingPathExtension: ext];
+          }
         }
 
 		    destpath = [destination stringByAppendingPathComponent: ntmp];

@@ -33,6 +33,8 @@
 #include "GWViewerShelf.h"
 #include "GWViewerIconsPath.h"
 #include "GWorkspace.h"
+#include "FileAnnotationsManager.h"
+#include "GWFunctions.h"
 #include "FSNBrowser.h"
 #include "FSNIconsView.h"
 #include "FSNodeRep.h"
@@ -40,7 +42,7 @@
 #include "FSNFunctions.h"
 
 #define DEFAULT_INCR 150
-#define MIN_W_HEIGHT 180
+#define MIN_WIN_H 300
 
 #define MIN_SHELF_HEIGHT 2.0
 #define MID_SHELF_HEIGHT 77.0
@@ -76,6 +78,7 @@
     NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", [node path]];
     NSDictionary *viewerPrefs = nil;
     id defEntry;
+    NSRect r;
     
     ASSIGN (baseNode, [FSNode nodeWithPath: [node path]]);
     lastSelection = nil;
@@ -85,6 +88,7 @@
     watchedSuspended = [NSMutableArray new];
     manager = [GWViewersManager viewersManager];
     gworkspace = [GWorkspace gworkspace];
+    fannManager = [FileAnnotationsManager fannmanager];
     nc = [NSNotificationCenter defaultCenter];
     
     defEntry = [defaults objectForKey: @"browserColsWidth"];
@@ -141,17 +145,32 @@
        
     ASSIGN (vwrwin, win);
     [vwrwin setDelegate: self];
-    [vwrwin setMinSize: NSMakeSize(resizeIncrement * 2, MIN_W_HEIGHT)];    
-    [vwrwin setResizeIncrements: NSMakeSize(resizeIncrement, 1)];
 
     defEntry = [viewerPrefs objectForKey: @"geometry"];
     
     if (defEntry) {
       [vwrwin setFrameFromString: defEntry];
     } else {
-      [vwrwin setFrame: NSMakeRect(200, 200, resizeIncrement * 3, 400) 
+      r = NSMakeRect(200, 200, resizeIncrement * 3, 350);
+      [vwrwin setFrame: rectForWindow([manager viewerWindows], r, YES) 
                display: NO];
     }
+    
+    r = [vwrwin frame];
+    
+    if (r.size.height < MIN_WIN_H) {
+      r.origin.y -= (MIN_WIN_H - r.size.height);
+      r.size.height = MIN_WIN_H;
+    
+      if (r.origin.y < 0) {
+        r.origin.y = 5;
+      }
+      
+      [vwrwin setFrame: r display: NO];
+    }
+
+    [vwrwin setMinSize: NSMakeSize(resizeIncrement * 2, MIN_WIN_H)];    
+    [vwrwin setResizeIncrements: NSMakeSize(resizeIncrement, 1)];
 
     if (rootviewer) {
       [vwrwin setTitle: NSLocalizedString(@"File Viewer", @"")];
@@ -812,7 +831,7 @@
   resizeIncrement = [(NSNumber *)[notification object] intValue];
   r.size.width = (visibleCols * resizeIncrement);
   [vwrwin setFrame: r display: YES];  
-  [vwrwin setMinSize: NSMakeSize(resizeIncrement * 2, MIN_W_HEIGHT)];    
+  [vwrwin setMinSize: NSMakeSize(resizeIncrement * 2, MIN_WIN_H)];    
   [vwrwin setResizeIncrements: NSMakeSize(resizeIncrement, 1)];
 
   [pathsScroll setDocumentView: pathsView];	
@@ -1042,12 +1061,33 @@
 
 - (void)duplicateFiles
 {
-  [gworkspace duplicateFiles];
+  NSArray *selection = [nodeView selectedNodes];
+
+  if (selection && [selection count]) {
+    if ([nodeView isSingleNode]) {
+      [gworkspace duplicateFiles];
+    } else if ([selection isEqual: [NSArray arrayWithObject: baseNode]] == NO) {
+      [gworkspace duplicateFiles];
+    }
+  }
 }
 
 - (void)deleteFiles
 {
-  [gworkspace deleteFiles];
+  NSArray *selection = [nodeView selectedNodes];
+
+  if (selection && [selection count]) {
+    if ([nodeView isSingleNode]) {
+      [gworkspace moveToTrash];
+    } else if ([selection isEqual: [NSArray arrayWithObject: baseNode]] == NO) {
+      [gworkspace moveToTrash];
+    }
+  }
+}
+
+- (void)emptyTrash
+{
+  [gworkspace emptyRecycler: nil];
 }
 
 - (void)goBackwardInHistory
@@ -1248,6 +1288,19 @@
 	[nodeView selectAll];
 }
 
+- (void)showAnnotationWindows
+{
+  NSArray *selection = [nodeView selectedNodes];
+
+  if (selection && [selection count]) {
+    if ([nodeView isSingleNode]) {    
+      [fannManager showAnnotationsForNodes: selection];
+    } else if ([selection isEqual: [NSArray arrayWithObject: baseNode]] == NO) {
+      [fannManager showAnnotationsForNodes: selection];
+    }
+  }
+}
+
 - (void)showTerminal
 {
   NSString *path;
@@ -1287,22 +1340,42 @@
 
   if ([menuTitle isEqual: NSLocalizedString(@"Icon Size", @"")]) {
     return [nodeView respondsToSelector: @selector(setIconSize:)];
-  }
-
-  if ([menuTitle isEqual: NSLocalizedString(@"Icon Position", @"")]) {
+  } else if ([menuTitle isEqual: NSLocalizedString(@"Icon Position", @"")]) {
     return [nodeView respondsToSelector: @selector(setIconPosition:)];
-  }
-
-  if ([menuTitle isEqual: NSLocalizedString(@"Label Size", @"")]) {
+  } else if ([menuTitle isEqual: NSLocalizedString(@"Label Size", @"")]) {
     return [nodeView respondsToSelector: @selector(setLabelTextSize:)];
-  }
-
-  if ([itemTitle isEqual: NSLocalizedString(@"Label Color...", @"")]) {
+  } else if ([itemTitle isEqual: NSLocalizedString(@"Label Color...", @"")]) {
     return [nodeView respondsToSelector: @selector(setTextColor:)];
-  }
-
-  if ([itemTitle isEqual: NSLocalizedString(@"Background Color...", @"")]) {
+  } else if ([itemTitle isEqual: NSLocalizedString(@"Background Color...", @"")]) {
     return [nodeView respondsToSelector: @selector(setBackgroundColor:)];
+
+  } else if ([itemTitle isEqual: NSLocalizedString(@"Duplicate", @"")]
+       || [itemTitle isEqual: NSLocalizedString(@"Move to Recycler", @"")]) {
+    NSArray *selection = [nodeView selectedNodes];
+
+    if (selection && [selection count]) {
+      if ([nodeView isSingleNode]) {
+        return YES;
+      } else if ([selection isEqual: [NSArray arrayWithObject: baseNode]] == NO) {
+        return YES;
+      }
+    }
+    
+    return NO;
+    
+  } else if ([itemTitle isEqual: NSLocalizedString(@"File Annotations", @"")]) {
+    NSArray *selection = [nodeView selectedNodes];
+    
+    if ((selection == nil) || ([selection count] == 0)) {
+      return NO;
+    }
+    
+    if ([nodeView isSingleNode]
+          || ([selection isEqual: [NSArray arrayWithObject: baseNode]] == NO)) {
+      return YES;
+    }
+    
+    return NO;
   }
 
   return YES;

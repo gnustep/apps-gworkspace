@@ -763,6 +763,22 @@ static GWViewersManager *vwrsmanager = nil;
   return nil;
 }
 
+- (NSArray *)viewerWindows
+{
+  NSMutableArray *wins = [NSMutableArray array];
+  int i;  
+
+  for (i = 0; i < [viewers count]; i++) {
+    id viewer = [viewers objectAtIndex: i];
+    
+    if ([viewer invalidated] == NO) {
+      [wins addObject: [viewer win]];
+    }
+  }
+
+  return wins;
+}
+
 
 - (void)updateDefaults
 {

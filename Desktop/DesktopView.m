@@ -883,6 +883,30 @@
   [self selectionDidChange];
 }
 
+- (void)keyDown:(NSEvent *)theEvent 
+{
+  unsigned flags = [theEvent modifierFlags];
+  
+  if ((flags & NSCommandKeyMask) || (flags & NSControlKeyMask)) {
+    NSString *characters = [theEvent characters];  
+
+    if ([characters length] > 0) {
+		  unichar character = [characters characterAtIndex: 0];
+      
+      if (character == NSBackspaceKey) {
+        if (flags & NSShiftKeyMask) {
+          [desktop emptyTrash: nil];
+        } else {
+          [desktop moveToTrash: nil];
+        }
+        return;
+      }
+	  }
+  }
+
+  [super keyDown: theEvent];
+}
+
 - (void)drawRect:(NSRect)rect
 {  
   [super drawRect: rect];

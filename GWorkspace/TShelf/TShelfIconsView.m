@@ -473,7 +473,6 @@
 				|| [operation isEqual: NSWorkspaceRecycleOperation]
 				|| [operation isEqual: @"GWorkspaceRecycleOutOperation"]
 				|| [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]) {
-
     NSMutableArray *paths = [NSMutableArray array];
     NSArray *iconpaths;
     int i, j, m;
@@ -520,7 +519,8 @@
   source = [dict objectForKey: @"source"];
   destination = [dict objectForKey: @"destination"];
   files = [dict objectForKey: @"files"];
-		                    
+
+/*		                    
   if ([operation isEqual: @"GWorkspaceRenameOperation"]) {      
     for (i = 0; i < [icons count]; i++) {
       icon = [icons objectAtIndex: i];      
@@ -534,7 +534,7 @@
       }          
     }        
   }  
-
+*/
   if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
 		files = [NSArray arrayWithObject: [source lastPathComponent]];
     source = [source stringByDeletingLastPathComponent];

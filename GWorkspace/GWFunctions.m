@@ -323,7 +323,7 @@ NSString *subtractPathComponentToPath(NSString *apath, NSString *firstpart)
 	NSString *secondpart;
 	int pos;
 		
-	if ([apath isEqualToString: firstpart]) {
+	if ([apath isEqual: firstpart]) {
 		return fixPath(@"/", 0);
   }
 	pos = [apath rangeOfString: firstpart].length +1;
@@ -337,9 +337,9 @@ BOOL subPathOfPath(NSString *p1, NSString *p2)
   int l1 = [p1 length];
   int l2 = [p2 length];  
 
-  if ((l1 > l2) || ([p1 isEqualToString: p2])) {
+  if ((l1 > l2) || ([p1 isEqual: p2])) {
     return NO;
-  } else if ([[p2 substringToIndex: l1] isEqualToString: p1]) {
+  } else if ([[p2 substringToIndex: l1] isEqual: p1]) {
     if ([[p2 pathComponents] containsObject: [p1 lastPathComponent]]) {
       return YES;
     }
@@ -424,7 +424,7 @@ NSString *relativePathFittingInContainer(id container, NSString *fullPath)
 
 int pathComponentsToPath(NSString *path)
 {
-  if ([path isEqualToString: fixPath(@"/", 0)]) {
+  if ([path isEqual: fixPath(@"/", 0)]) {
     return 0;
   }
   return [[path pathComponents] count] - 1;
@@ -547,6 +547,52 @@ NSString *fileSizeDescription(unsigned long long size)
 	return sizeStr;
 }
 
+NSRect rectForWindow(NSArray *otherwins, NSRect proposedRect, BOOL checkKey)
+{
+  NSRect scr = [[NSScreen mainScreen] visibleFrame];
+  NSRect wr = proposedRect;
+  int margin = 50;
+  int shift = 100;
+  NSPoint p = wr.origin;
+  int i;  
+
+	for (i = [otherwins count] - 1; i >= 0; i--) {
+    NSWindow *window = [otherwins objectAtIndex: i];
+
+    if ([window isKeyWindow] || (checkKey == NO)) {
+      p = [window frame].origin;
+      p.x += shift;
+      p.y -= shift;
+      p.y = (p.y < margin) ? margin : p.y;
+      if ((p.x + proposedRect.size.width) > (scr.size.width - margin)) {
+        p.x -= (shift * 2);
+      }
+      wr.origin = p;
+    }
+  }
+
+	for (i = 0; i < [otherwins count]; i++) {
+    NSRect r = [[otherwins objectAtIndex: i] frame];
+
+    if (NSEqualRects(wr, r)) {
+      p.x += shift;
+      p.y -= shift;
+      p.y = (p.y < margin) ? margin : p.y;
+      if ((p.x + proposedRect.size.width) > (scr.size.width - margin)) {
+        p.x -= (shift * 2);
+      }
+      wr.origin = p;
+    }
+  }
+  
+  if (NSEqualRects(wr, proposedRect)) {
+    wr.origin.x = scr.origin.x + shift;
+    wr.origin.y = scr.size.height - wr.size.height - shift;
+  }  
+  
+  return NSIntegralRect(wr);
+}
+
 NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str, 
 																NSString *comm, NSString *sel, NSString *key)
 {
@@ -554,3 +600,23 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
 												action: NSSelectorFromString(sel) keyEquivalent: key]; 
 	return item;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -39,6 +39,8 @@
 #include "GWViewersManager.h"
 #include "GWViewer.h"
 #include "GWSpatialViewer.h"
+#include "FileAnnotationsManager.h"
+#include "FileAnnotation.h"
 #include "TShelf/TShelfWin.h"
 #include "TShelf/TShelfView.h"
 #include "TShelf/TShelfViewItem.h"
@@ -401,6 +403,7 @@ static GWorkspace *gworkspace = nil;
   DESTROY (operationsApp);
   DESTROY (desktopApp);
   DESTROY (recyclerApp);
+  DESTROY (ddbd);
 	RELEASE (defEditor);
 	RELEASE (defXterm);
 	RELEASE (defXtermArgs);
@@ -574,6 +577,11 @@ static GWorkspace *gworkspace = nil;
   if ([defaults boolForKey: @"uses_recycler"]) {  
     [self connectRecycler];
   }  
+
+  ddbd = nil;
+  ddbdactive = NO;
+  [self connectDDBd];
+  fannManager = [FileAnnotationsManager fannmanager];
   
 	[defaults synchronize];
 
@@ -696,6 +704,19 @@ static GWorkspace *gworkspace = nil;
 	                        name: NSConnectionDidDieNotification
 	                      object: opspconn];
       DESTROY (operationsApp);
+    }
+  }
+
+  [fannManager closeAll];
+  
+  if (ddbd) {
+    NSConnection *ddbdconn = [(NSDistantObject *)ddbd connectionForProxy];
+  
+    if (ddbdconn && [ddbdconn isValid]) {
+      [[NSNotificationCenter defaultCenter] removeObserver: self
+	                        name: NSConnectionDidDieNotification
+	                      object: ddbdconn];
+      DESTROY (ddbd);
     }
   }
   		
@@ -982,8 +1003,10 @@ static GWorkspace *gworkspace = nil;
 	NSString *title = [anItem title];
 	
 	if ([title isEqual: NSLocalizedString(@"Empty Recycler", @"")]) {
-    return ((desktopApp != nil) || (recyclerApp != nil));
-
+    if ((desktopApp != nil) || (recyclerApp != nil)) {
+      return ([[fm directoryContentsAtPath: [self trashPath]] count] != 0);
+    }
+    
 	} else if ([title isEqual: NSLocalizedString(@"Check for disks", @"")]) {
     return (desktopApp != nil);
   
@@ -1152,7 +1175,7 @@ static GWorkspace *gworkspace = nil;
 
   [[NSNotificationCenter defaultCenter]
  				postNotificationName: GWFileSystemWillChangeNotification
-	 								        object: dict];
+	 								    object: [NSDictionary dictionaryWithDictionary: dict]];
 }
 
 - (void)fileSystemDidChange:(NSNotification *)notif
@@ -1229,7 +1252,7 @@ static GWorkspace *gworkspace = nil;
   
 	[[NSNotificationCenter defaultCenter]
  				postNotificationName: GWFileSystemDidChangeNotification
-	 								    object: dict];
+	 								    object: [NSDictionary dictionaryWithDictionary: dict]];
 }
 
 - (void)setSelectedPaths:(NSArray *)paths
@@ -1409,6 +1432,33 @@ static GWorkspace *gworkspace = nil;
 
   [self performFileOperation: NSWorkspaceDestroyOperation 
               source: basePath destination: basePath files: files tag: &tag];
+}
+
+- (void)moveToTrash
+{
+  NSString *basePath;
+  NSMutableArray *files;
+  int tag, i;
+
+  basePath = [NSString stringWithString: [selectedPaths objectAtIndex: 0]];
+  basePath = [basePath stringByDeletingLastPathComponent];
+
+	if ([fm isWritableFileAtPath: basePath] == NO) {
+		NSString *err = NSLocalizedString(@"Error", @"");
+		NSString *msg = NSLocalizedString(@"You have not write permission\nfor", @"");
+		NSString *buttstr = NSLocalizedString(@"Continue", @"");
+    NSRunAlertPanel(err, [NSString stringWithFormat: @"%@ \"%@\"!\n", msg, basePath], buttstr, nil, nil);   
+		return;
+	}
+
+  files = [NSMutableArray arrayWithCapacity: 1];
+  for (i = 0; i < [selectedPaths count]; i++) {
+    [files addObject: [[selectedPaths objectAtIndex: i] lastPathComponent]];
+  }
+
+  [self performFileOperation: @"NSWorkspaceRecycleOperation"
+                  source: basePath destination: [self trashPath] 
+                                            files: files tag: &tag];
 }
 
 - (BOOL)verifyFileAtPath:(NSString *)path
@@ -2094,6 +2144,189 @@ static GWorkspace *gworkspace = nil;
   NSRunAlertPanel(nil, 
        NSLocalizedString(@"The Operation connection died. File operations disabled!", @""), 
                               NSLocalizedString(@"OK", @""), nil, nil);                                     
+}
+
+- (void)connectDDBd
+{
+  if (ddbd == nil) {
+    id db = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
+                                                              host: @""];
+
+    if (db) {
+      NSConnection *c = [db connectionForProxy];
+
+	    [[NSNotificationCenter defaultCenter] addObserver: self
+	                   selector: @selector(ddbdConnectionDidDie:)
+		                     name: NSConnectionDidDieNotification
+		                   object: c];
+      
+      ddbd = db;
+	    [ddbd setProtocolForProxy: @protocol(DDBdProtocol)];
+      RETAIN (ddbd);
+      ddbdactive = [ddbd dbactive];
+                                         
+	  } else {
+	    static BOOL recursion = NO;
+	    static NSString	*cmd = nil;
+
+	    if (recursion == NO) {
+        if (cmd == nil) {
+            cmd = RETAIN ([[NSSearchPathForDirectoriesInDomains(
+                      GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
+                            stringByAppendingPathComponent: @"ddbd"]);
+		    }
+      }
+	  
+      if (recursion == NO && cmd != nil) {
+        int i;
+        
+        [startAppWin showWindowWithTitle: @"GWorkspace"
+                                 appName: @"ddbd"
+                            maxProgValue: 40.0];
+
+	      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
+        DESTROY (cmd);
+        
+        for (i = 1; i <= 40; i++) {
+          [startAppWin updateProgressBy: 1.0];
+	        [[NSRunLoop currentRunLoop] runUntilDate:
+		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+                           
+          db = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
+                                                                  host: @""];                  
+          if (db) {
+            [startAppWin updateProgressBy: 40.0 - i];
+            break;
+          }
+        }
+        
+        [[startAppWin win] close];
+        
+	      recursion = YES;
+	      [self connectDDBd];
+	      recursion = NO;
+        
+	    } else { 
+        DESTROY (cmd);
+	      recursion = NO;
+        ddbdactive = NO;
+        NSRunAlertPanel(nil,
+                NSLocalizedString(@"unable to contact ddbd.", @""),
+                NSLocalizedString(@"Ok", @""),
+                nil, 
+                nil);  
+      }
+	  }
+  }
+}
+
+- (void)ddbdConnectionDidDie:(NSNotification *)notif
+{
+  id connection = [notif object];
+
+  [[NSNotificationCenter defaultCenter] removeObserver: self
+	                    name: NSConnectionDidDieNotification
+	                  object: connection];
+
+  NSAssert(connection == [ddbd connectionForProxy],
+		                                  NSInternalInconsistencyException);
+  RELEASE (ddbd);
+  ddbd = nil;
+  ddbdactive = NO;
+  [fannManager closeAll];
+  
+  NSRunAlertPanel(nil,
+                  NSLocalizedString(@"ddbd connection died.", @""),
+                  NSLocalizedString(@"Ok", @""),
+                  nil,
+                  nil);                
+}
+
+- (BOOL)ddbdactive
+{
+  return ddbdactive;
+}
+
+- (void)ddbdInsertPath:(NSString *)path
+{
+  if (ddbdactive) {
+    [ddbd insertPath: path];
+  }
+}
+
+- (void)ddbdRemovePath:(NSString *)path
+{
+  if (ddbdactive) {
+    [ddbd removePath: path];
+  }
+}
+
+- (NSString *)ddbdGetAnnotationsForPath:(NSString *)path
+{
+  if (ddbdactive) {
+    return [ddbd annotationsForPath: path];
+  }
+  
+  return nil;
+}
+
+- (void)ddbdSetAnnotations:(NSString *)annotations
+                   forPath:(NSString *)path
+{
+  if (ddbdactive) {
+    [ddbd setAnnotations: annotations forPath: path];
+  }
+}
+
+- (NSString *)ddbdGetFileTypeForPath:(NSString *)path
+{
+  if (ddbdactive) {
+    return [ddbd fileTypeForPath: path];
+  }
+  
+  return nil;
+}
+
+- (void)ddbdSetFileType:(NSString *)type
+                forPath:(NSString *)path
+{
+  if (ddbdactive) {
+    [ddbd setFileType: type forPath: path];
+  }
+}
+
+- (NSString *)ddbdGetModificationDateForPath:(NSString *)path;
+{
+  if (ddbdactive) {
+    return [ddbd modificationDateForPath: path];
+  }
+  
+  return nil;
+}
+
+- (void)ddbdSetModificationDate:(NSString *)datedescr
+                        forPath:(NSString *)path
+{
+  if (ddbdactive) {
+    [ddbd setModificationDate: datedescr forPath: path];
+  }  
+}
+
+- (NSData *)ddbdGetIconDataForPath:(NSString *)path
+{
+  if (ddbdactive) {
+    return [ddbd iconDataForPath: path];
+  }
+  
+  return nil;
+}
+
+- (void)ddbdSetIconData:(NSData *)data
+                forPath:(NSString *)path
+{
+  if (ddbdactive) {
+    [ddbd setIconData: data forPath: path];
+  }
 }
 
 - (id)connectApplication:(NSString *)appName

@@ -270,7 +270,7 @@
     Watcher *watcher = [self watcherForPath: wpath];
 
     if (watcher) {
-      NSLog(@"removing listener for: %@", wpath);
+  //    NSLog(@"removing listener for: %@", wpath);
       [watcher removeListener];
     }
   }  
@@ -329,7 +329,7 @@
                 format: @"adding watcher for unregistered client"];
   }
 
-  NSLog(@"addWatcherForPath %@", path);
+ // NSLog(@"addWatcherForPath %@", path);
   
   if (watcher) {
     [info addWatchedPath: path];
@@ -362,7 +362,7 @@
                 format: @"removing watcher for unregistered client"];
   }  
   
-  NSLog(@"removeWatcherForPath %@", path);
+ // NSLog(@"removeWatcherForPath %@", path);
   
   if (watcher && ([watcher isOld] == NO)) {
     [info removeWatchedPath: path];
