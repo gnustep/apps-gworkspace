@@ -739,8 +739,14 @@ id instance = nil;
 {
 	NSImage *icon = [[self iconForFile: aPath ofType: nil] copy];
   NSSize size = [icon size];
+  #ifdef GNUSTEP 
+    float fact = 2.0;
+  #else
+    float fact = 1.33;
+  #endif
+
   [icon setScalesWhenResized: YES];
-  [icon setSize: NSMakeSize(size.width / 2, size.height / 2)];
+  [icon setSize: NSMakeSize(size.width / fact, size.height / fact)];
 
   return AUTORELEASE (icon);
 }

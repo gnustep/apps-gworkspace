@@ -57,9 +57,9 @@
   [super mouseDown: theEvent];
 }
 
-- (void)mouseDragged:(NSEvent *)theEvent
-{
-  [icon mouseDragged: theEvent];
-}
+//- (void)mouseDragged:(NSEvent *)theEvent
+//{
+//  [icon mouseDragged: theEvent];
+//}
 
 @end

@@ -435,7 +435,6 @@
     							              NSLeftMouseUpMask | NSLeftMouseDraggedMask];
       
         if ([nextEvent type] == NSLeftMouseUp) {
-          [self unselect];
           break;
         } else if ([nextEvent type] == NSLeftMouseDragged) {
 	        if(dragdelay < 5) {

@@ -23,6 +23,7 @@ thumbnailer_RESOURCE_FILES = ImageThumbnailer/ImageThumbnailer.thumb
 
 include $(GNUSTEP_MAKEFILES)/tool.make
 include $(GNUSTEP_MAKEFILES)/service.make
+include $(GNUSTEP_MAKEFILES)/bundle.make
 include $(GNUSTEP_MAKEFILES)/aggregate.make
 
 -include GNUmakefile.local.service
