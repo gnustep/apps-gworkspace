@@ -396,6 +396,42 @@ if (sz.height < 0) sz.height = 0
   }
 }
 
+
+
+
+
+
+
+
+
+
+
+- (IBAction)addDir:(id)sender
+{
+
+}
+
+- (IBAction)removeDir:(id)sender
+{
+
+}
+
+- (IBAction)activateDirChanges:(id)sender
+{
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
 - (void)addCellsWithNames:(NSArray *)names inMatrix:(NSMatrix *)matrix
 {
 	id cell;

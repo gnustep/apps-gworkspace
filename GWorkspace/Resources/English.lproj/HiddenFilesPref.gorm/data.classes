@@ -138,7 +138,14 @@
 	    "useStandardKerning:",
 	    "useStandardLigatures:",
 	    "yank:",
-	    "zoom:"
+	    "zoom:",
+	    "loadContents:",
+	    "moveToHidden:",
+	    "moveToShown:",
+	    "activateChanges:",
+	    "addDir:",
+	    "removeDir:",
+	    "activateDirChanges:"
 	);
 	Super = NSObject;
     };
@@ -147,23 +154,32 @@
 	    "loadContents:",
 	    "moveToHidden:",
 	    "moveToShown:",
-	    "activateChanges:"
+	    "activateChanges:",
+	    "addDir:",
+	    "removeDir:",
+	    "activateDirChanges:"
 	);
 	Outlets = (
 	    win,
 	    prefbox,
+	    tabView,
 	    iconView,
 	    pathField,
+	    hiddenlabel,
 	    leftScroll,
+	    shownlabel,
 	    rightScroll,
 	    addButt,
 	    removeButt,
 	    loadButt,
+	    labelinfo,
 	    setButt,
 	    cellPrototipe,
-	    hiddenlabel,
-	    shownlabel,
-	    labelinfo
+	    hiddenDirslabel,
+	    hiddenDirsScroll,
+	    addDirButt,
+	    removeDirButt,
+	    setDirButt
 	);
 	Super = NSObject;
     };

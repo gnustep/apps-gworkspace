@@ -42,6 +42,8 @@
   IBOutlet id win;
   IBOutlet id prefbox;
 
+  IBOutlet id tabView;
+
   IBOutlet id iconView;
   IBOutlet id pathField;
 
@@ -63,6 +65,19 @@
 
   NSString *currentPath;
 
+
+
+  IBOutlet id hiddenDirslabel;
+  IBOutlet id hiddenDirsScroll;
+  NSMatrix *dirsMatrix;
+  IBOutlet id addDirButt;
+  IBOutlet id removeDirButt;
+  IBOutlet id setDirButt;
+
+
+
+
+
 	NSFileManager *fm;
   NSWorkspace *ws;
   GWorkspace *gw;
@@ -75,6 +90,20 @@
 - (IBAction)moveToShown:(id)sender;
 
 - (IBAction)activateChanges:(id)sender;
+
+
+
+
+
+- (IBAction)addDir:(id)sender;
+
+- (IBAction)removeDir:(id)sender;
+
+- (IBAction)activateDirChanges:(id)sender;
+
+
+
+
 
 - (void)selectionChanged:(NSNotification *)n;
 
