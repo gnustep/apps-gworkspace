@@ -1574,6 +1574,8 @@
     for (i = 0; i < [columns count]; i++) {
       [[columns objectAtIndex: i] setShowType: infoType];
     }
+    
+    [self tile];
   }
 }
 
@@ -1589,6 +1591,8 @@
       FSNBrowserColumn *col = [columns objectAtIndex: i];
       [col setExtendedShowType: extInfoType];
     }
+    
+    [self tile];
   }
 }
 
