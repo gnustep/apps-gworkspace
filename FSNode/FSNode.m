@@ -159,7 +159,7 @@
   int i;
   
   for (i = 0; i < [fnames count]; i++) {
-    NSString *fname = [fnames objectAtIndex: i] ;
+    NSString *fname = [fnames objectAtIndex: i];
     FSNode *node = [[FSNode alloc] initWithRelativePath: fname parent: self];
 
     [nodes addObject: node];
@@ -170,6 +170,38 @@
   RELEASE (arp);
     
   return [[nodes autorelease] makeImmutableCopyOnFail: NO];
+}
+
+- (NSArray *)subNodeNames 
+{
+  return [fsnodeRep directoryContentsAtPath: path];
+}
+
+- (NSArray *)subNodesOfParent
+{
+  CREATE_AUTORELEASE_POOL(arp);
+  NSMutableArray *nodes = [NSMutableArray array];
+  NSArray *fnames = [fsnodeRep directoryContentsAtPath: [self parentPath]];
+  FSNode *pnd = (parent != nil) ? [parent parent] : nil;
+  int i;
+  
+  for (i = 0; i < [fnames count]; i++) {
+    NSString *fname = [fnames objectAtIndex: i];
+    FSNode *node = [[FSNode alloc] initWithRelativePath: fname parent: pnd];
+
+    [nodes addObject: node];
+    RELEASE (node);
+  }
+  
+  RETAIN (nodes);
+  RELEASE (arp);
+    
+  return [[nodes autorelease] makeImmutableCopyOnFail: NO];
+}
+
+- (NSArray *)subNodeNamesOfParent
+{
+  return [fsnodeRep directoryContentsAtPath: [self parentPath]];
 }
 
 + (NSArray *)nodeComponentsToNode:(FSNode *)anode
@@ -349,6 +381,11 @@
   }
 
   return NO;
+}
+
+- (FSNode *)parent
+{
+  return parent;
 }
 
 - (NSString *)parentPath
@@ -759,6 +796,11 @@
   return flags.writable;
 }
 
+- (BOOL)isParentWritable
+{
+  return [fm isWritableFileAtPath: [self parentPath]];
+}
+
 - (BOOL)isExecutable
 {
   if (flags.executable == -1) {
@@ -887,9 +929,11 @@
       }
     }
   }
-
-  if ([operation isEqual: @"GWorkspaceRenameOperation"]) { 
+    
+  if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
+    destination = [opinfo objectForKey: @"destination"];	 
     files = [NSArray arrayWithObject: [destination lastPathComponent]]; 
+    destination = [destination stringByDeletingLastPathComponent];  
   } 
   
   if (isSubpathOfPath(destination, path)) {

@@ -74,7 +74,8 @@ enum {
 
 - (NSRect)rectForFileOpWindow;
 
-- (BOOL)verifyFileAt:(NSString *)path;
+- (BOOL)verifyFileAtPath:(NSString *)path
+            forOperation:(NSString *)operation;
 
 - (BOOL)ascendentOfPath:(NSString *)path 
                 inPaths:(NSArray *)paths;

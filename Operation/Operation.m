@@ -122,7 +122,16 @@ static Operation *operation = nil;
   if (files == nil) {
     files = [NSArray arrayWithObject: @""];
   }
-  
+
+  opfiles = files;
+
+  if ([operation isEqual: @"GWorkspaceRenameOperation"]
+               || [operation isEqual: @"GWorkspaceCreateDirOperation"]
+               || [operation isEqual: @"GWorkspaceCreateFileOperation"]) {    
+    confirm = NO;
+    usewin = NO;
+  }
+   
   if ([operation isEqual: @"NSWorkspaceMoveOperation"]
          || [operation isEqual: @"NSWorkspaceCopyOperation"]
          || [operation isEqual: @"NSWorkspaceLinkOperation"]
@@ -133,6 +142,11 @@ static Operation *operation = nil;
     opbase = destination;
   }
 
+  if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
+    opfiles = [NSArray arrayWithObject: [source lastPathComponent]];
+    opbase = [source stringByDeletingLastPathComponent];
+  }
+  
   if ([operation isEqual: @"NSWorkspaceMoveOperation"]
                || [operation isEqual: @"NSWorkspaceRecycleOperation"]
                || [operation isEqual: @"GWorkspaceRecycleOutOperation"]) {    
@@ -144,11 +158,14 @@ static Operation *operation = nil;
                 || [operation isEqual: @"NSWorkspaceLinkOperation"]
                 || [operation isEqual: @"NSWorkspaceDuplicateOperation"]) {
     action = COPY;
+  } else if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
+    action = RENAME;
+  } else if ([operation isEqual: @"GWorkspaceCreateDirOperation"] 
+            || [operation isEqual: @"GWorkspaceCreateFileOperation"]) {
+    action = CREATE;
   }
 
-  opfiles = files;
-
-	if ([self verifyFileAt: opbase] == NO) {
+	if ([self verifyFileAtPath: opbase forOperation: nil] == NO) {
 		return;
 	}
 
@@ -159,7 +176,7 @@ static Operation *operation = nil;
 		NSString *opfile = [opfiles objectAtIndex: i];
 		NSString *oppath = [opbase stringByAppendingPathComponent: opfile];
 
-		if ([self verifyFileAt: oppath]) {
+		if ([self verifyFileAtPath: oppath forOperation: operation]) {
       NSDictionary *attributes = [fm fileAttributesAtPath: oppath traverseLink: NO];
       NSData *date = [attributes objectForKey: NSFileModificationDate];
       NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys: opfile, @"name", date, @"date", nil]; 
@@ -264,6 +281,10 @@ static Operation *operation = nil;
     }
   }
 
+  if (action == CREATE) {    
+    path = [path stringByDeletingLastPathComponent];
+  }
+
   if ([optype isEqual: @"NSWorkspaceMoveOperation"]
                     || [optype isEqual: @"NSWorkspaceRecycleOperation"]
                     || [optype isEqual: @"GWorkspaceRecycleOutOperation"]) {
@@ -279,7 +300,8 @@ static Operation *operation = nil;
     //             
     // destination
     //
-    if ((action == MOVE) || (action == RENAME) || (action == DESTROY)) {
+    if ((action == MOVE) || (action == RENAME) 
+                              || (action == DESTROY) || (action == CREATE)) {
       if ([self descendentOfPath: path inPaths: opdstpaths]) {
         return YES;
       }
@@ -298,7 +320,8 @@ static Operation *operation = nil;
     //
     // source
     //    
-    if ((action == MOVE) || (action == RENAME) || (action == DESTROY)) {
+    if ((action == MOVE) || (action == RENAME) 
+                              || (action == DESTROY) || (action == CREATE)) {
       if ([opsrcpaths containsObject: path]
               || [self descendentOfPath: path inPaths: opsrcpaths]
                     || [self ascendentOfPath: path inPaths: opsrcpaths]) {
@@ -309,7 +332,8 @@ static Operation *operation = nil;
     //             
     // destination
     //
-    if ((action == MOVE) || (action == RENAME) || (action == DESTROY)) {
+    if ((action == MOVE) || (action == RENAME) 
+                              || (action == DESTROY) || (action == CREATE)) {
       if ([self descendentOfPath: path inPaths: opdstpaths]) {
         return YES;
       }
@@ -402,21 +426,30 @@ static Operation *operation = nil;
   return wrect;
 }
 
-- (BOOL)verifyFileAt:(NSString *)path
+- (BOOL)verifyFileAtPath:(NSString *)path
+            forOperation:(NSString *)operation
 {
-	if ([fm fileExistsAtPath: path] == NO) {
+  NSString *chpath = path;
+  
+  if (operation && ([operation isEqual: @"GWorkspaceCreateDirOperation"]
+                  || [operation isEqual: @"GWorkspaceCreateFileOperation"])) {    
+    chpath = [path stringByDeletingLastPathComponent];
+  }
+
+	if ([fm fileExistsAtPath: chpath] == NO) {
 		NSString *err = NSLocalizedString(@"Error", @"");
 		NSString *msg = NSLocalizedString(@": no such file or directory!", @"");
 		NSString *buttstr = NSLocalizedString(@"Continue", @"");
 		NSMutableDictionary *notifObj = [NSMutableDictionary dictionaryWithCapacity: 1];		
-		NSString *basePath = [path stringByDeletingLastPathComponent];
+		NSString *basePath = [chpath stringByDeletingLastPathComponent];
 		
-    NSRunAlertPanel(err, [NSString stringWithFormat: @"%@%@", path, msg], buttstr, nil, nil);   
+    NSRunAlertPanel(err, [NSString stringWithFormat: @"%@%@", chpath, msg], buttstr, nil, nil);   
 
 		[notifObj setObject: @"NSWorkspaceDestroyOperation" forKey: @"operation"];	
   	[notifObj setObject: basePath forKey: @"source"];	
   	[notifObj setObject: basePath forKey: @"destination"];	
-  	[notifObj setObject: [NSArray arrayWithObjects: path, nil] forKey: @"files"];	
+  	[notifObj setObject: [NSArray arrayWithObject: [chpath lastPathComponent]] 
+                 forKey: @"files"];	
 
     [[NSDistributedNotificationCenter defaultCenter]
  				postNotificationName: @"GWFileSystemWillChangeNotification"

@@ -436,7 +436,7 @@ static GWDesktopManager *desktopManager = nil;
   NSDictionary *opinfo = (NSDictionary *)[notif object];  
 
   if ([dskNode involvedByFileOperation: opinfo]) {
-    dskWatcherSuspended = YES;
+ //   dskWatcherSuspended = YES;
     [[self desktopView] nodeContentsWillChange: opinfo];
   }
 }
@@ -459,7 +459,7 @@ static GWDesktopManager *desktopManager = nil;
   }
   
   [dock nodeContentsDidChange: opinfo];  
-  dskWatcherSuspended = NO;
+ // dskWatcherSuspended = NO;
 }
 
 - (void)watcherNotification:(NSNotification *)notif

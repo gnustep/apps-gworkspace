@@ -46,6 +46,7 @@
 @class OpenWithController;
 @class RunExternalController;
 @class StartAppWin;
+@class NSCursor;
 
 @protocol	FSWClientProtocol
 
@@ -151,6 +152,8 @@
   NSString *defXterm;
   NSString *defXtermArgs;
   BOOL teminalService;
+
+  NSCursor *waitCursor;
           
   NSFileManager *fm;
   NSWorkspace *ws;

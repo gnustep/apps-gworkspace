@@ -646,7 +646,6 @@ static NSString *nibName = @"FileOperationWin";
 {
   NSDictionary *opDict = [NSUnarchiver unarchiveObjectWithData: opinfo];
   id dictEntry;
-  int i;
 
   dictEntry = [opDict objectForKey: @"operation"];
   if (dictEntry) {
@@ -666,9 +665,7 @@ static NSString *nibName = @"FileOperationWin";
   files = [NSMutableArray new];
   dictEntry = [opDict objectForKey: @"files"];
   if (dictEntry) {
-    for (i = 0; i < [dictEntry count]; i++) {
-      [files addObject: [dictEntry objectAtIndex: i]];
-    }
+    [files addObjectsFromArray: dictEntry];
   }		
   
   procfiles = [NSMutableArray new];
@@ -682,7 +679,14 @@ static NSString *nibName = @"FileOperationWin";
 	int i;
     
 	samename = NO;
-	
+
+  if (([operation isEqual: @"GWorkspaceRenameOperation"])
+        || ([operation isEqual: @"GWorkspaceCreateDirOperation"])
+        || ([operation isEqual: @"GWorkspaceCreateFileOperation"])) {
+    /* already checked by GWorkspace */
+	  return NO;
+  }
+  
 	if (destination && [files count]) {
 		dirContents = [fm directoryContentsAtPath: destination];
 		for (i = 0; i < [files count]; i++) {
@@ -701,14 +705,12 @@ static NSString *nibName = @"FileOperationWin";
           || ([operation isEqual: @"NSWorkspaceCopyOperation"])
           || ([operation isEqual: @"NSWorkspaceLinkOperation"])
           || ([operation isEqual: @"GWorkspaceRecycleOutOperation"])) {
-          
       return YES;
       
 		} else if (([operation isEqual: @"NSWorkspaceDestroyOperation"]) 
           || ([operation isEqual: @"NSWorkspaceDuplicateOperation"])
           || ([operation isEqual: @"NSWorkspaceRecycleOperation"])
           || ([operation isEqual: @"GWorkspaceEmptyRecyclerOperation"])) {
-			
       return NO;
 		} 
 	}
@@ -788,6 +790,12 @@ static NSString *nibName = @"FileOperationWin";
 		[self doDuplicate];
 	} else if ([operation isEqual: @"NSWorkspaceRecycleOperation"]) {
 		[self doTrash];
+	} else if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
+		[self doRename];
+	} else if ([operation isEqual: @"GWorkspaceCreateDirOperation"]) {
+		[self doNewFolder];
+	} else if ([operation isEqual: @"GWorkspaceCreateFileOperation"]) {
+		[self doNewFile];
   }
 }
 
@@ -942,6 +950,45 @@ filename =  [fileinfo objectForKey: @"name"]
   }                                             
 }
 
+- (void)doRename
+{
+	GET_FILENAME;    
+
+	[fm movePath: source toPath: destination handler: self];
+         
+  [procfiles addObject: filename];	
+	[files removeObject: fileinfo];	
+
+  [self done];
+}
+
+- (void)doNewFolder
+{
+	GET_FILENAME;  
+
+	[fm createDirectoryAtPath: [destination stringByAppendingPathComponent: filename]
+				         attributes: nil];
+
+  [procfiles addObject: filename];	 
+	[files removeObject: fileinfo];	
+
+  [self done];
+}
+
+- (void)doNewFile
+{
+	GET_FILENAME;  
+
+	[fm createFileAtPath: [destination stringByAppendingPathComponent: filename]
+				      contents: nil
+            attributes: nil];
+
+  [procfiles addObject: filename];	 
+	[files removeObject: fileinfo];	
+
+  [self done];
+}
+
 - (void)doTrash
 {
   NSString *copystr = NSLocalizedString(@"_copy", @"");
@@ -1076,7 +1123,7 @@ filename =  [fileinfo objectForKey: @"name"]
 
   result = [fileOp requestUserConfirmationWithMessage: msg title: @"Error"];
     
-	if(result != NSAlertDefaultReturn) {
+  if (result != NSAlertDefaultReturn) {
     [fileOp sendDidChangeNotification];
     [fileOp endOperation];
     
@@ -1099,7 +1146,7 @@ filename =  [fileinfo objectForKey: @"name"]
       fname = [path lastPathComponent];
     }   
     
-    if (found == YES) {
+    if (found) {
       [self performOperation]; 
     } else {
       result = [fileOp showErrorAlertWithMessage: @"File Operation Error!"];

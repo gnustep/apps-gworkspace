@@ -420,6 +420,7 @@ static GWorkspace *gworkspace = nil;
   RELEASE (vwrsManager);
   RELEASE (dtopManager);
   RELEASE (finder);
+  RELEASE (waitCursor);
   
 	[super dealloc];
 }
@@ -600,6 +601,9 @@ static GWorkspace *gworkspace = nil;
   
 	[defaults synchronize];
   terminating = NO;
+
+  waitCursor = [[NSCursor alloc] initWithImage: [NSImage imageNamed: @"watch.tiff"]];
+  [waitCursor setHotSpot: NSMakePoint(8, 8)];
 
   [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
                 				selector: @selector(fileSystemWillChange:) 
@@ -1155,7 +1159,7 @@ static GWorkspace *gworkspace = nil;
     }
   }
 
-  [fsnodeRep lockPaths: paths];
+//  [fsnodeRep lockPaths: paths];
 
 	[dict setObject: opPtr forKey: @"operation"];	
   [dict setObject: source forKey: @"source"];	
@@ -1229,7 +1233,7 @@ static GWorkspace *gworkspace = nil;
     }
   }
 
-  [fsnodeRep unlockPaths: paths];
+//  [fsnodeRep unlockPaths: paths];
 
 	[dict setObject: opPtr forKey: @"operation"];	
   [dict setObject: source forKey: @"source"];	
@@ -1238,10 +1242,14 @@ static GWorkspace *gworkspace = nil;
   if (origfiles) {
     [dict setObject: origfiles forKey: @"origfiles"];	
   }
+
+ // [waitCursor set];
   
 	[[NSNotificationCenter defaultCenter]
  				postNotificationName: GWFileSystemDidChangeNotification
-	 								    object: [NSDictionary dictionaryWithDictionary: dict]];
+	 								    object: [dict makeImmutableCopyOnFail: NO]];
+                      
+ // [[NSCursor arrowCursor] set];
 }
 
 - (void)setSelectedPaths:(NSArray *)paths
@@ -1313,7 +1321,7 @@ static GWorkspace *gworkspace = nil;
 		return;
 	}
 
-  if (directory == YES) {
+  if (directory) {
     fileName = @"NewFolder";
     operation = GWorkspaceCreateDirOperation;
   } else {
@@ -1340,21 +1348,9 @@ static GWorkspace *gworkspace = nil;
 	[notifObj setObject: operation forKey: @"operation"];	
   [notifObj setObject: basePath forKey: @"source"];	
   [notifObj setObject: basePath forKey: @"destination"];	
-  [notifObj setObject: [NSArray arrayWithObjects: fileName, nil] forKey: @"files"];	
+  [notifObj setObject: [NSArray arrayWithObject: fileName] forKey: @"files"];	
 
-	[[NSNotificationCenter defaultCenter]
- 				 postNotificationName: GWFileSystemWillChangeNotification
-	 								object: notifObj];
-
-  if (directory == YES) {
-    [fm createDirectoryAtPath: fullPath attributes: nil];
-  } else {
-	  [fm createFileAtPath: fullPath contents: nil attributes: nil];
-  }
-
-	[[NSNotificationCenter defaultCenter]
- 				 postNotificationName: GWFileSystemDidChangeNotification
-	 								object: notifObj];
+  [self performFileOperation: notifObj];
 }
 
 - (void)duplicateFiles
@@ -1374,7 +1370,7 @@ static GWorkspace *gworkspace = nil;
 		return;
 	}
 
-  files = [NSMutableArray arrayWithCapacity: 1];
+  files = [NSMutableArray array];
   for (i = 0; i < [selectedPaths count]; i++) {
     [files addObject: [[selectedPaths objectAtIndex: i] lastPathComponent]];
   }

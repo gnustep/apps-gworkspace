@@ -407,7 +407,7 @@ static id <DesktopApplication> desktopApp = nil;
   FSNBrowserColumn *col = nil;
   id cell = nil;
   float scrollTune = 0;
-  BOOL updatesel = NO;
+  BOOL updated = NO;
   int i;
   
   selcells = [matrix selectedCells];
@@ -430,26 +430,24 @@ static id <DesktopApplication> desktopApp = nil;
     if (cell) {
       FSNode *node = [cell node];
 			int row, col;
-
+      
 			if (visibleNodes && [visibleNodes containsObject: node]) {
 				[visibleNodes removeObject: node];
 			}
 			
 			if (selectedCells && [selectedCells containsObject: cell]) {
 				[selectedCells removeObject: cell];
-        updatesel = YES;
 			}
       
       [matrix getRow: &row column: &col ofCell: cell];  
-      [matrix removeRow: row];    			
+      [matrix removeRow: row];  
+      updated = YES;  			
     }
   }
-
-  [matrix sizeToCells];
-  [matrix setNeedsDisplay: YES];
   
-  if (updatesel) {
-	  if ([selectedCells count] > 0) {      
+  if (updated) {
+	  if ([selectedCells count] > 0) {    
+    
       [self selectCells: selectedCells sendAction: NO];    
       [matrix setNeedsDisplay: YES];
       
@@ -470,10 +468,14 @@ static id <DesktopApplication> desktopApp = nil;
         [browser setLastColumn: index];
       }
 	  }
-    
-  } else if ([visibleNodes count]) {
-    cell = [self cellOfNode: [visibleNodes objectAtIndex: 0]];
-    [matrix scrollToFirstPositionCell: cell withScrollTune: scrollTune];
+        
+    [matrix sizeToCells];
+    [matrix setNeedsDisplay: YES];
+
+    if ([visibleNodes count]) {
+      cell = [self cellOfNode: [visibleNodes objectAtIndex: 0]];
+      [matrix scrollToFirstPositionCell: cell withScrollTune: scrollTune];
+    }
   }
   
   TEST_RELEASE (selectedCells); 

@@ -89,6 +89,12 @@
 
 - (NSArray *)subNodes;
 
+- (NSArray *)subNodeNames;
+
+- (NSArray *)subNodesOfParent;
+
+- (NSArray *)subNodeNamesOfParent;
+
 + (NSArray *)nodeComponentsToNode:(FSNode *)anode;
 
 + (NSArray *)pathComponentsToNode:(FSNode *)anode;
@@ -116,6 +122,8 @@
 + (BOOL)pathOfNode:(FSNode *)anode
         isEqualOrDescendentOfPath:(NSString *)apath
                   containingFiles:(NSArray *)files;
+
+- (FSNode *)parent;
 
 - (NSString *)parentPath;
 
@@ -188,6 +196,8 @@
 - (BOOL)isReadable;
 
 - (BOOL)isWritable;
+
+- (BOOL)isParentWritable;
 
 - (BOOL)isExecutable;
 

@@ -28,6 +28,7 @@
 #include "FSNFunctions.h"
 #include "GWViewerIconsPath.h"
 #include "GWViewer.h"
+#include "GWorkspace.h"
 
 #define DEF_ICN_SIZE 48
 #define DEF_TEXT_SIZE 12
@@ -676,7 +677,6 @@
 
 - (void)controlTextDidEndEditing:(NSNotification *)aNotification
 {
-  NSFileManager *fm = [NSFileManager defaultManager];
   FSNode *ednode = [nameEditor node];
 
 #define CLEAREDITING \
@@ -690,7 +690,7 @@
                     [ednode name]], NSLocalizedString(@"Continue", @""), nil, nil);   
     CLEAREDITING;
     
-  } else if ([fm isWritableFileAtPath: [ednode parentPath]] == NO) {
+  } else if ([ednode isParentWritable] == NO) {
     NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
           [NSString stringWithFormat: @"%@\"%@\"!\n", 
               NSLocalizedString(@"You have not write permission for ", @""), 
@@ -702,8 +702,8 @@
     NSString *newpath = [[ednode parentPath] stringByAppendingPathComponent: newname];
     NSCharacterSet *notAllowSet = [NSCharacterSet characterSetWithCharactersInString: @"/\\*:?"];
     NSRange range = [newname rangeOfCharacterFromSet: notAllowSet];
-    NSArray *dirContents = [fm directoryContentsAtPath: [ednode parentPath]];
-    NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+    NSArray *dirContents = [ednode subNodeNamesOfParent];
+    NSMutableDictionary *opinfo = [NSMutableDictionary dictionary];
     
     if (range.length > 0) {
       NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
@@ -725,42 +725,14 @@
       }
     }
         
-	  [userInfo setObject: @"GWorkspaceRenameOperation" forKey: @"operation"];	
-    [userInfo setObject: [ednode path] forKey: @"source"];	
-    [userInfo setObject: newpath forKey: @"destination"];	
-    [userInfo setObject: [NSArray arrayWithObject: @""] forKey: @"files"];	
+	  [opinfo setObject: @"GWorkspaceRenameOperation" forKey: @"operation"];	
+    [opinfo setObject: [ednode path] forKey: @"source"];	
+    [opinfo setObject: newpath forKey: @"destination"];	
+    [opinfo setObject: [NSArray arrayWithObject: @""] forKey: @"files"];	
 
     [self stopRepNameEditing];
-
-//    [[NSDistributedNotificationCenter defaultCenter]
-// 				postNotificationName: @"GWFileSystemWillChangeNotification"
-//	 								    object: nil 
-//                    userInfo: userInfo];
-
-    [fm movePath: [ednode path] toPath: newpath handler: self];
-
-    [[NSDistributedNotificationCenter defaultCenter]
- 				postNotificationName: @"GWFileSystemDidChangeNotification"
-	 								    object: nil 
-                    userInfo: userInfo];
+    [[GWorkspace gworkspace] performFileOperation: opinfo];         
   }
-}
-
-- (BOOL)fileManager:(NSFileManager *)manager 
-              shouldProceedAfterError:(NSDictionary *)errorDict
-{
-	NSString *title = NSLocalizedString(@"Error", @"");
-	NSString *msg1 = NSLocalizedString(@"Cannot rename ", @"");
-  NSString *name = [[nameEditor node] name];
-	NSString *msg2 = NSLocalizedString(@"Continue", @"");
-
-  NSRunAlertPanel(title, [NSString stringWithFormat: @"%@'%@'!", msg1, name], msg2, nil, nil);   
-
-	return NO;
-}
-
-- (void)fileManager:(NSFileManager *)manager willProcessPath:(NSString *)path
-{
 }
 
 @end

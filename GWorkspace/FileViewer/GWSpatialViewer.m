@@ -560,7 +560,7 @@
 			  || [operation isEqual: @"GWorkspaceRecycleOutOperation"]) { 
     if ([nodeView isShowingPath: destination]
                     || [baseNode isSubnodeOfPath: destination]) {
-      [self suspendWatchersFromPath: destination];
+   //   [self suspendWatchersFromPath: destination];
     }
   }
 
@@ -571,7 +571,7 @@
 				|| [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]) {
     if ([nodeView isShowingPath: source]
                       || [baseNode isSubnodeOfPath: source]) {
-      [self suspendWatchersFromPath: source]; 
+ //     [self suspendWatchersFromPath: source]; 
     }
   }
 
@@ -606,10 +606,10 @@
 			  || [operation isEqual: @"GWorkspaceRecycleOutOperation"]) { 
     if ([nodeView isShowingPath: destination]
                         || [baseNode isSubnodeOfPath: destination]) {
-      [self reactivateWatchersFromPath: destination];
+ //     [self reactivateWatchersFromPath: destination];
     } 
     
-    [self clearSuspendedWatchersFromPath: destination];
+//    [self clearSuspendedWatchersFromPath: destination];
   }
 
   if ([operation isEqual: @"NSWorkspaceMoveOperation"]
@@ -619,10 +619,10 @@
 				|| [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]) {
     if ([nodeView isShowingPath: source]
                         || [baseNode isSubnodeOfPath: source]) {
-      [self reactivateWatchersFromPath: source];
+ //     [self reactivateWatchersFromPath: source];
     } 
     
-    [self clearSuspendedWatchersFromPath: source];
+//    [self clearSuspendedWatchersFromPath: source];
   }
 }
 

@@ -242,6 +242,12 @@
 
 - (void)doDuplicate;
 
+- (void)doRename;
+
+- (void)doNewFolder;
+
+- (void)doNewFile;
+
 - (void)doTrash;
 
 - (BOOL)removeExisting:(NSDictionary *)info;

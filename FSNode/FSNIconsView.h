@@ -191,11 +191,6 @@
 
 - (void)controlTextDidEndEditing:(NSNotification *)aNotification;
 
-- (BOOL)fileManager:(NSFileManager *)manager 
-              shouldProceedAfterError:(NSDictionary *)errorDict;
-
-- (void)fileManager:(NSFileManager *)manager willProcessPath:(NSString *)path;
-
 @end
 
 #endif // FSN_ICONS_VIEW_H

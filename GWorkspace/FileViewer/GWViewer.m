@@ -659,7 +659,7 @@
 			  || [operation isEqual: @"GWorkspaceRecycleOutOperation"]) { 
     if ([self isShowingPath: destination]
                     || [baseNode isSubnodeOfPath: destination]) {
-      [self suspendWatchersFromPath: destination];
+  //    [self suspendWatchersFromPath: destination];
     }
   }
 
@@ -670,7 +670,7 @@
 				|| [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]) {
     if ([self isShowingPath: source]
                     || [baseNode isSubnodeOfPath: source]) {
-      [self suspendWatchersFromPath: source];
+ //     [self suspendWatchersFromPath: source];
     }
   }
 
@@ -712,10 +712,10 @@
         
     if ([self isShowingPath: destination]
                         || [baseNode isSubnodeOfPath: destination]) {
-      [self reactivateWatchersFromPath: destination];
+ //     [self reactivateWatchersFromPath: destination];
     }
     
-    [self clearSuspendedWatchersFromPath: destination];
+  //  [self clearSuspendedWatchersFromPath: destination];
   }
 
   if ([operation isEqual: @"NSWorkspaceMoveOperation"]
@@ -729,10 +729,10 @@
     }
         
     if ([self isShowingPath: source] || [baseNode isSubnodeOfPath: source]) {
-      [self reactivateWatchersFromPath: source];
+ //     [self reactivateWatchersFromPath: source];
     }
     
-    [self clearSuspendedWatchersFromPath: source];
+ //   [self clearSuspendedWatchersFromPath: source];
   }
 }
 
@@ -1004,7 +1004,7 @@
 - (void)windowDidBecomeKey:(NSNotification *)aNotification
 {
   NSArray *selection = [nodeView selectedPaths];  
-  
+    
   [vwrwin makeFirstResponder: nodeView];  
 
   if ([selection count] == 0) {
