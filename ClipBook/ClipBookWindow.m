@@ -86,7 +86,7 @@ static NSString *nibName = @"ClipBookWindow.gorm";
             
       [win setDelegate: self];  
       clipbook = [ClipBook clipbook];
-  	  [[win contentView] registerForDraggedTypes: [clipbook pbTypes]];
+  	  [win registerForDraggedTypes: [clipbook pbTypes]];
             
       RETAIN (viewersBox);
 

@@ -33,14 +33,17 @@
 @class NSTextView;
 @class NSScrollView;
 @class NSBox;
+@class NSColor;
 @class NSRTFPboardViewer;
 @class NSTIFFPboardViewer;
+@class NSColorboardViewer;
 @class IBViewPboardViewer;
 
 @interface PBViewer : NSObject
 {
   NSRTFPboardViewer *RTFViewer;
   NSTIFFPboardViewer *TIFFViewer;
+  NSColorboardViewer *ColorViewer;
   IBViewPboardViewer *IBViewViewer;
 }
 
@@ -64,6 +67,18 @@
   NSImageView *imview;
   NSRect imrect;
   NSTextField *widthResult, *heightResult;
+}
+
+- (BOOL)displayData:(NSData *)data 
+             ofType:(NSString *)type;
+
+@end
+
+@interface NSColorboardViewer : NSView 
+{
+  NSRect colorRect;
+  NSColor *color;
+  NSTextField *redField, *greenField, *blueField, *alphaField;
 }
 
 - (BOOL)displayData:(NSData *)data 

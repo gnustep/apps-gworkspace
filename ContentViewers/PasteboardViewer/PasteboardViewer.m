@@ -37,6 +37,8 @@
 #include "GNUstep.h"
 #include <math.h>
 
+#define BORDERW 2
+
 @implementation PasteboardViewer
 
 - (void)dealloc
@@ -44,6 +46,7 @@
   TEST_RELEASE (bundlePath);
   RELEASE (RTFViewer);
   RELEASE (TIFFViewer);
+  RELEASE (ColorViewer);
   RELEASE (IBViewViewer);
   RELEASE (label);
   
@@ -61,6 +64,7 @@
     
     RTFViewer = [[NSRTFPboardViewer alloc] initWithFrame: [self bounds]];
     TIFFViewer = [[NSTIFFPboardViewer alloc] initWithFrame: [self bounds]];
+    ColorViewer = [[NSColorboardViewer alloc] initWithFrame: [self bounds]];
     IBViewViewer = [[IBViewPboardViewer alloc] initWithFrame: [self bounds]];
     currentViewer = nil;    
     
@@ -118,6 +122,8 @@
     currentViewer = RTFViewer;
   } else if ([type isEqual: NSTIFFPboardType]) {
     currentViewer = TIFFViewer;
+  } else if ([type isEqual: NSColorPboardType]) {
+    currentViewer = ColorViewer;
   } else if ([type isEqual: @"IBViewPboardType"]) {
     currentViewer = IBViewViewer;
   } else {
@@ -159,6 +165,7 @@
 - (BOOL)canDisplayData:(NSData *)data ofType:(NSString *)type
 {
   if ([type isEqual: NSTIFFPboardType] 
+            || [type isEqual: NSColorPboardType]
             || [type isEqual: NSRTFPboardType]
             || [type isEqual: NSRTFDPboardType]
             || [type isEqual: NSStringPboardType]
@@ -361,6 +368,120 @@
   }
   
   return NO;
+}
+
+@end
+
+
+@implementation NSColorboardViewer
+
+- (void)dealloc
+{
+  TEST_RELEASE (color);
+  TEST_RELEASE (redField);
+  TEST_RELEASE (greenField);
+  TEST_RELEASE (blueField);
+  TEST_RELEASE (alphaField);
+  [super dealloc];
+}
+
+- (id)initWithFrame:(NSRect)frame
+{
+  self = [super initWithFrame: frame];
+  
+  if(self) {
+    NSView *view;
+    NSRect r;
+    
+    [self setFrame: frame];
+    
+    color = nil;
+    colorRect = [self bounds];
+    colorRect.size.height -= 30 + BORDERW;
+    colorRect.origin.y += 30;
+    colorRect.origin.x += BORDERW;
+    colorRect.size.width -= BORDERW * 2;
+    
+    r = [self frame];
+    r.size.height = 20;
+
+    view = [[NSView alloc] initWithFrame: r];
+        
+    redField = [[NSTextField alloc] initWithFrame: NSMakeRect(5, 2, 55, 20)];	
+    [redField setBackgroundColor: [NSColor windowBackgroundColor]];
+    [redField setBezeled: NO];
+    [redField setEditable: NO];
+    [redField setSelectable: NO];
+    [redField setStringValue: @""];
+    [view addSubview: redField]; 
+
+    greenField = [[NSTextField alloc] initWithFrame: NSMakeRect(63, 2, 60, 20)];	
+    [greenField setBackgroundColor: [NSColor windowBackgroundColor]];
+    [greenField setBezeled: NO];
+    [greenField setEditable: NO];
+    [greenField setSelectable: NO];
+    [greenField setStringValue: @""];
+    [view addSubview: greenField]; 
+
+    blueField = [[NSTextField alloc] initWithFrame: NSMakeRect(130, 2, 55, 20)];	
+    [blueField setBackgroundColor: [NSColor windowBackgroundColor]];
+    [blueField setBezeled: NO];
+    [blueField setEditable: NO];
+    [blueField setSelectable: NO];
+    [blueField setStringValue: @""];
+    [view addSubview: blueField]; 
+
+    alphaField = [[NSTextField alloc] initWithFrame: NSMakeRect(195, 2, 60, 20)];	
+    [alphaField setBackgroundColor: [NSColor windowBackgroundColor]];
+    [alphaField setBezeled: NO];
+    [alphaField setEditable: NO];
+    [alphaField setSelectable: NO];
+    [alphaField setStringValue: @""];
+    [view addSubview: alphaField]; 
+    
+    [self addSubview: view];
+    RELEASE (view);
+  }
+	
+	return self;
+}
+
+- (BOOL)displayData:(NSData *)data ofType:(NSString *)type
+{
+  id c = [NSUnarchiver unarchiveObjectWithData: data];
+    
+  if (c && [c isKindOfClass: [NSColor class]]) {
+    float red, green, blue, alpha;
+    
+    ASSIGN (color, [c colorUsingColorSpaceName: NSDeviceRGBColorSpace]);
+    [color getRed: &red green: &green blue: &blue alpha: &alpha];
+    
+    [redField setStringValue: [NSString stringWithFormat: @"red: %.2f", red]];
+    [greenField setStringValue: [NSString stringWithFormat: @"green: %.2f", green]];
+    [blueField setStringValue: [NSString stringWithFormat: @"blue: %.2f", blue]];
+    [alphaField setStringValue: [NSString stringWithFormat: @"alpha: %.2f", alpha]];
+    
+    [self setNeedsDisplay: YES];    
+
+    return YES;    	
+  } 
+  
+  return NO;
+}
+
+- (void)drawRect:(NSRect)rect
+{
+  NSRect borderRect = [self bounds];
+  NSRect r = NSIntersectionRect(borderRect, rect);
+  
+  [[[self window] backgroundColor] set];
+  NSRectFill(r);
+  NSDrawGrayBezel(borderRect, rect);
+  
+  if (color) {
+    [color set];
+    NSRectFill(colorRect);
+  }
 }
 
 @end

@@ -1964,7 +1964,7 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   [d setObject: @"GWorkspace" forKey: @"ApplicationName"];
   [d setObject: NSLocalizedString(@"GNUstep Workspace Manager", @"")
       	forKey: @"ApplicationDescription"];
-  [d setObject: @"GWorkspace 0.6" forKey: @"ApplicationRelease"];
+  [d setObject: @"GWorkspace 0.6.1" forKey: @"ApplicationRelease"];
   [d setObject: @"10 2003" forKey: @"FullVersionID"];
   [d setObject: [NSArray arrayWithObjects: 
       @"Enrico Sersale <enrico@imago.ro>.\n\

@@ -40,6 +40,7 @@
 @class NSScrollView;
 @class NSRTFPboardViewer;
 @class NSTIFFPboardViewer;
+@class NSColorboardViewer;
 @class IBViewPboardViewer;
 
 @interface PasteboardViewer : NSView <ContentViewersProtocol>
@@ -51,6 +52,7 @@
   NSString *bundlePath;
   NSRTFPboardViewer *RTFViewer;
   NSTIFFPboardViewer *TIFFViewer;
+  NSColorboardViewer *ColorViewer;
   IBViewPboardViewer *IBViewViewer;
   id currentViewer;
 }
@@ -73,6 +75,18 @@
   NSImageView *imview;
   NSRect imrect;
   NSTextField *widthResult, *heightResult;
+}
+
+- (BOOL)displayData:(NSData *)data 
+             ofType:(NSString *)type;
+
+@end
+
+@interface NSColorboardViewer : NSView 
+{
+  NSRect colorRect;
+  NSColor *color;
+  NSTextField *redField, *greenField, *blueField, *alphaField;
 }
 
 - (BOOL)displayData:(NSData *)data 

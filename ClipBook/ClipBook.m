@@ -54,6 +54,7 @@ static ClipBook *clipbook = nil;
   [pbtypes addObject: NSRTFPboardType];
   [pbtypes addObject: NSRTFDPboardType];
   [pbtypes addObject: NSTIFFPboardType];
+  [pbtypes addObject: NSColorPboardType];
   [pbtypes addObject: @"IBViewPboardType"];
 
 	[NSApp registerServicesMenuSendTypes: pbtypes returnTypes: pbtypes];

@@ -29,6 +29,8 @@
 #include "GNUstep.h"
 #include <math.h>
 
+#define BORDERW 2
+
 static NSRect vrect = { { 0, 0 }, { 260, 300 } };
 
 @implementation PBViewer
@@ -37,6 +39,7 @@ static NSRect vrect = { { 0, 0 }, { 260, 300 } };
 {
   RELEASE (RTFViewer);
   RELEASE (TIFFViewer);
+  RELEASE (ColorViewer);
   RELEASE (IBViewViewer);
   
   [super dealloc];
@@ -49,6 +52,7 @@ static NSRect vrect = { { 0, 0 }, { 260, 300 } };
   if(self) {
     RTFViewer = [[NSRTFPboardViewer alloc] initWithFrame: vrect];
     TIFFViewer = [[NSTIFFPboardViewer alloc] initWithFrame: vrect];
+    ColorViewer = [[NSColorboardViewer alloc] initWithFrame: vrect];
     IBViewViewer = [[IBViewPboardViewer alloc] initWithFrame: vrect];
   }
 	
@@ -57,7 +61,7 @@ static NSRect vrect = { { 0, 0 }, { 260, 300 } };
 
 - (id)viewerForData:(NSData *)data ofType:(NSString *)type
 {
-  id viewer;
+  id viewer = nil;
 
   if ([type isEqual: NSStringPboardType] ||
                 [type isEqual: NSRTFPboardType] ||
@@ -65,6 +69,8 @@ static NSRect vrect = { { 0, 0 }, { 260, 300 } };
     viewer = RTFViewer;
   } else if ([type isEqual: NSTIFFPboardType]) {
     viewer = TIFFViewer;
+  } else if ([type isEqual: NSColorPboardType]) {
+    viewer = ColorViewer;
   } else if ([type isEqual: @"IBViewPboardType"]) {
     viewer = IBViewViewer;
   }
@@ -120,8 +126,6 @@ static NSRect vrect = { { 0, 0 }, { 260, 300 } };
     [[textView textContainer] setWidthTracksTextView: YES];
     [textView setUsesRuler: NO];
     [scrollView setDocumentView: textView];
-    [textView unregisterDraggedTypes];
-    [textView registerForDraggedTypes: [[ClipBook clipbook] pbTypes]];    
   }
 	
 	return self;
@@ -196,8 +200,6 @@ static NSRect vrect = { { 0, 0 }, { 260, 300 } };
     [imview setEditable: NO];
     [imview setImageFrameStyle: NSImageFrameNone];
     [imview setImageAlignment: NSImageAlignCenter];
-    [imview unregisterDraggedTypes];
-    [imview registerForDraggedTypes: [[ClipBook clipbook] pbTypes]];
     [view addSubview: imview]; 
     
     widthLabel = [[NSTextField alloc] initWithFrame: NSMakeRect(5, 2, 40, 20)];	
@@ -271,6 +273,120 @@ static NSRect vrect = { { 0, 0 }, { 260, 300 } };
   }
   
   return NO;
+}
+
+@end
+
+
+@implementation NSColorboardViewer
+
+- (void)dealloc
+{
+  TEST_RELEASE (color);
+  TEST_RELEASE (redField);
+  TEST_RELEASE (greenField);
+  TEST_RELEASE (blueField);
+  TEST_RELEASE (alphaField);
+  [super dealloc];
+}
+
+- (id)initWithFrame:(NSRect)frame
+{
+  self = [super initWithFrame: frame];
+  
+  if(self) {
+    NSView *view;
+    NSRect r;
+    
+    [self setFrame: frame];
+    
+    color = nil;
+    colorRect = [self bounds];
+    colorRect.size.height -= 30 + BORDERW;
+    colorRect.origin.y += 30;
+    colorRect.origin.x += BORDERW;
+    colorRect.size.width -= BORDERW * 2;
+    
+    r = [self frame];
+    r.size.height = 20;
+
+    view = [[NSView alloc] initWithFrame: r];
+        
+    redField = [[NSTextField alloc] initWithFrame: NSMakeRect(5, 2, 55, 20)];	
+    [redField setBackgroundColor: [NSColor windowBackgroundColor]];
+    [redField setBezeled: NO];
+    [redField setEditable: NO];
+    [redField setSelectable: NO];
+    [redField setStringValue: @""];
+    [view addSubview: redField]; 
+
+    greenField = [[NSTextField alloc] initWithFrame: NSMakeRect(63, 2, 60, 20)];	
+    [greenField setBackgroundColor: [NSColor windowBackgroundColor]];
+    [greenField setBezeled: NO];
+    [greenField setEditable: NO];
+    [greenField setSelectable: NO];
+    [greenField setStringValue: @""];
+    [view addSubview: greenField]; 
+
+    blueField = [[NSTextField alloc] initWithFrame: NSMakeRect(130, 2, 55, 20)];	
+    [blueField setBackgroundColor: [NSColor windowBackgroundColor]];
+    [blueField setBezeled: NO];
+    [blueField setEditable: NO];
+    [blueField setSelectable: NO];
+    [blueField setStringValue: @""];
+    [view addSubview: blueField]; 
+
+    alphaField = [[NSTextField alloc] initWithFrame: NSMakeRect(195, 2, 60, 20)];	
+    [alphaField setBackgroundColor: [NSColor windowBackgroundColor]];
+    [alphaField setBezeled: NO];
+    [alphaField setEditable: NO];
+    [alphaField setSelectable: NO];
+    [alphaField setStringValue: @""];
+    [view addSubview: alphaField]; 
+    
+    [self addSubview: view];
+    RELEASE (view);
+  }
+	
+	return self;
+}
+
+- (BOOL)displayData:(NSData *)data ofType:(NSString *)type
+{
+  id c = [NSUnarchiver unarchiveObjectWithData: data];
+    
+  if (c && [c isKindOfClass: [NSColor class]]) {
+    float red, green, blue, alpha;
+    
+    ASSIGN (color, [c colorUsingColorSpaceName: NSDeviceRGBColorSpace]);
+    [color getRed: &red green: &green blue: &blue alpha: &alpha];
+    
+    [redField setStringValue: [NSString stringWithFormat: @"red: %.2f", red]];
+    [greenField setStringValue: [NSString stringWithFormat: @"green: %.2f", green]];
+    [blueField setStringValue: [NSString stringWithFormat: @"blue: %.2f", blue]];
+    [alphaField setStringValue: [NSString stringWithFormat: @"alpha: %.2f", alpha]];
+    
+    [self setNeedsDisplay: YES];    
+
+    return YES;    	
+  } 
+  
+  return NO;
+}
+
+- (void)drawRect:(NSRect)rect
+{
+  NSRect borderRect = [self bounds];
+  NSRect r = NSIntersectionRect(borderRect, rect);
+  
+  [[[self window] backgroundColor] set];
+  NSRectFill(r);
+  NSDrawGrayBezel(borderRect, rect);
+  
+  if (color) {
+    [color set];
+    NSRectFill(colorRect);
+  }
 }
 
 @end
@@ -426,7 +542,6 @@ static NSRect vrect = { { 0, 0 }, { 260, 300 } };
     objsrect = NSMakeRect(0, 0, szp.x - orp.x + MARGIN * 2, szp.y - orp.y + MARGIN * 2);
     objsView = [[GormObjectsView alloc] initWithFrame: objsrect];
     [objsView setAutoresizesSubviews: YES];
-    [objsView registerForDraggedTypes: [[ClipBook clipbook] pbTypes]];
     
     for (i = 0; i < [checkedObjects count]; i++) {
       obj = [checkedObjects objectAtIndex: i];
@@ -449,84 +564,3 @@ static NSRect vrect = { { 0, 0 }, { 260, 300 } };
 }
 
 @end
-
-
-@implementation NSImageView (DraggingDestination)
-
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
-{
-  return [[[self window] delegate] draggingEntered: sender];
-}
-
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
-{
-  return [[[self window] delegate] draggingUpdated: sender];
-}
-
-- (void)draggingExited:(id <NSDraggingInfo>)sender
-{
-  return [[[self window] delegate] draggingExited: sender];
-}
-
-- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
-{
-  return [[[self window] delegate] prepareForDragOperation: sender];
-}
-
-- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
-{
-  return [[[self window] delegate] performDragOperation: sender];
-}
-
-- (void)concludeDragOperation:(id <NSDraggingInfo>)sender
-{
-  return [[[self window] delegate] concludeDragOperation: sender];
-}
-
-@end
-
-@implementation NSTextView (DraggingDestination)
-
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
-{
-  return [[[self window] delegate] draggingEntered: sender];
-}
-
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
-{
-  return [[[self window] delegate] draggingUpdated: sender];
-}
-
-- (void)draggingExited:(id <NSDraggingInfo>)sender
-{
-  return [[[self window] delegate] draggingExited: sender];
-}
-
-- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
-{
-  return [[[self window] delegate] prepareForDragOperation: sender];
-}
-
-- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
-{
-  return [[[self window] delegate] performDragOperation: sender];
-}
-
-- (void)concludeDragOperation:(id <NSDraggingInfo>)sender
-{
-  return [[[self window] delegate] concludeDragOperation: sender];
-}
-
-@end
-
-
-
-
-
-
-
-
-
-
-
-
