@@ -37,7 +37,6 @@
 #include <GWorkspace/ViewersProtocol.h>
   #endif
 #include "GWorkspace.h"
-#include "FileOperations/FileOperation.h"
 #include "Dialogs/Dialogs.h"
 #include "Dialogs/OpenWithController.h"
 #include "Dialogs/RunExternalController.h"
@@ -97,78 +96,26 @@ static GWorkspace *gworkspace = nil;
                        files:(NSArray *)files 
                          tag:(int *)tag
 {
-  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-  NSString *confirmString = [operation stringByAppendingString: @"Confirm"];
-  BOOL confirm = !([defaults boolForKey: confirmString]);
-  NSRect scr = [[NSScreen mainScreen] visibleFrame];
-  NSRect wrect = NSZeroRect;
-  FileOperation *op;
-  NSRect wr;
-  int i;
+  NSMutableDictionary *opdict = [NSMutableDictionary dictionary];
+  NSData *data;
 
-#define WMARGIN 50
-#define WSHIFT 10
-  
-  scr.origin.x += WMARGIN;
-  scr.origin.y += WMARGIN;
-  scr.size.width -= (WMARGIN * 2);
-  scr.size.height -= (WMARGIN * 2);
+  [self connectOperation];
 
-  for (i = 0; i < [operations count]; i++) {
-    op = [operations objectAtIndex: i];
-    wr = [op winRect];
-    
-    if (NSEqualRects(wr, NSZeroRect) == NO) {
-      wrect = NSMakeRect(wr.origin.x + WSHIFT, 
-                         wr.origin.y - wr.size.height - WSHIFT,
-                         wr.size.width,
-                         wr.size.height);
-      
-      if (NSContainsRect(scr, wrect) == NO) {
-        wrect = NSMakeRect(scr.origin.x, 
-                           scr.size.height - wr.size.height,
-                           wr.size.width, 
-                           wr.size.height);
-        break;
-      }
-    }
+  if (operationsApp == nil) {  
+    NSRunAlertPanel(nil, 
+        NSLocalizedString(@"File operations disabled!", @""), 
+                            NSLocalizedString(@"OK", @""), nil, nil);                                     
+    return NO;
   }
-  	
-/*
-  op = [[FileOperation alloc] initWithOperation: operation
-                                         source: source 
-                                    destination: destination 
-                                          files: files
-                                useConfirmation: confirm 
-                                     showWindow: showFileOpStatus 
-                                     windowRect: wrect];
-  [operations addObject: op];
-  RELEASE (op);
-*/  
-  
-  {
-    NSMutableDictionary *opdict = [NSMutableDictionary dictionary];
-    NSData *data;
-    
-    [self connectOperation];
 
-    if (operationsApp == nil) {  
-      NSRunAlertPanel(nil, 
-          NSLocalizedString(@"File operations disabled!", @""), 
-                              NSLocalizedString(@"OK", @""), nil, nil);                                     
-      return NO;
-    }
-  
-    [opdict setObject: operation forKey: @"operation"];
-    [opdict setObject: source forKey: @"source"];
-    [opdict setObject: destination forKey: @"destination"];
-    [opdict setObject: files forKey: @"files"];
-  
-    data = [NSArchiver archivedDataWithRootObject: opdict];
-  
-    [operationsApp performFileOperation: data];
-  }
-  
+  [opdict setObject: operation forKey: @"operation"];
+  [opdict setObject: source forKey: @"source"];
+  [opdict setObject: destination forKey: @"destination"];
+  [opdict setObject: files forKey: @"files"];
+
+  data = [NSArchiver archivedDataWithRootObject: opdict];
+
+  [operationsApp performFileOperation: data];
   
   return YES;
 }
@@ -530,7 +477,6 @@ return [ws openFile: fullPath withApplication: appName]
   RELEASE (openWithController);
   RELEASE (runExtController);
   RELEASE (startAppWin);
-  RELEASE (operations);
   TEST_RELEASE (desktopWindow);
   TEST_RELEASE (tshelfWin);
   TEST_RELEASE (tshelfPBDir);
@@ -595,8 +541,6 @@ return [ws openFile: fullPath withApplication: appName]
 	} else {
     [GWLib setDefSortType: [result intValue]];
 	}
-
-  showFileOpStatus = (![defaults boolForKey: @"fopstatusnotshown"]);
 
   result = [defaults objectForKey: @"GSFileBrowserHideDotFiles"];
   if (result) {
@@ -671,9 +615,6 @@ return [ws openFile: fullPath withApplication: appName]
   RELEASE (viewersPaths);
   
 	selectedPaths = [[NSArray alloc] initWithObjects: NSHomeDirectory(), nil];
-
-  operations = [NSMutableArray new];	
-  oprefnum = 0;
 
   startAppWin = [[StartAppWin alloc] init];
   fswatcher = nil;
@@ -1162,10 +1103,6 @@ return [ws openFile: fullPath withApplication: appName]
 		return NO;	
 	}
 
-	if ([title isEqual: NSLocalizedString(@"File Operations...", @"")]) {
-    return [operations count];
-  }
-
 	if ([title isEqual: NSLocalizedString(@"Open With...", @"")]) {
     BOOL found = NO;
     int i;
@@ -1492,22 +1429,7 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   animateLaunck = ![defaults boolForKey: @"nolaunchanim"];
   animateSlideBack = ![defaults boolForKey: @"noslidebackanim"];
 }
-
-- (BOOL)showFileOpStatus
-{
-  return showFileOpStatus;
-}
            
-- (void)setShowFileOpStatus:(BOOL)value
-{
-  if (showFileOpStatus != value) {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];     
-    showFileOpStatus = value;  
-    [defaults setBool: !showFileOpStatus forKey: @"fopstatusnotshown"];
-    [defaults synchronize];
-  }
-}
-
 - (void)fileSystemWillChange:(NSNotification *)notif
 {
   NSDictionary *info = [notif userInfo];
@@ -2479,19 +2401,6 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 - (void)showApps:(id)sender
 {
   [appsViewer activate]; 
-}
-
-- (void)showFileOps:(id)sender
-{
-  int i;
-  
-  for (i = 0; i < [operations count]; i++) {
-    FileOperation *op = [operations objectAtIndex: i];
-    
-    if ([op showsWindow] == NO) {
-      [op showProgressWin];
-    }
-  }
 }
 
 - (void)showFinder:(id)sender

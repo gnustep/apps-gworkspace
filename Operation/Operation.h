@@ -44,6 +44,7 @@ enum {
   int fopRef;
   
   OperationPrefs *preferences;
+  
   NSFileManager *fm;  
   NSNotificationCenter *nc; 
 }

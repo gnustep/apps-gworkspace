@@ -124,7 +124,6 @@ void createMenu()
 		addItemToMenu(hismenu, @"Go forward", @"", @"goForwardInHistory:", @"");
 	addItemToMenu(tools, @"Finder", @"", @"showFinder:", @"f");
 	addItemToMenu(tools, @"Applications...", @"", @"showApps:", @"");
-	addItemToMenu(tools, @"File Operations...", @"", @"showFileOps:", @"");    
 		menuItem = addItemToMenu(tools, @"Fiend", @"", nil, @"");
 		fiendmenu = AUTORELEASE ([NSMenu new]);
 		[tools setSubmenu: fiendmenu forItem: menuItem];

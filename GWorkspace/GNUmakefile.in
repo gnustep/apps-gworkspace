@@ -64,10 +64,8 @@ ifeq ($(FOUNDATION_LIB), apple)
                                         DefSortOrderPref.nib \
                                         ShelfPref.nib \
                                         DeskTopPref.nib \
-                                        FileOpsPref.nib \
                                         IconsPref.nib \
                                         HiddenFilesPref.nib \
-                                        FileOperationWin.nib \
                                         OpenWith.nib \
                                         RunExternal.nib \
                                         StartAppWin.nib 
@@ -80,10 +78,8 @@ else
                                         DefSortOrderPref.gorm \
                                         ShelfPref.gorm \
                                         DeskTopPref.gorm \
-                                        FileOpsPref.gorm \
                                         IconsPref.gorm \
                                         HiddenFilesPref.gorm \
-                                        FileOperationWin.gorm \
                                         OpenWith.gorm \
                                         RunExternal.gorm \
                                         StartAppWin.gorm 
@@ -96,7 +92,6 @@ ifneq ($(FOUNDATION_LIB), apple)
   GWorkspace.m \
   IconViewsIcon.m \
   GWSplitView.m \
-  FileOperations/FileOperation.m \
   ViewersWindow.m \
   Shelf/Shelf.m \
   Shelf/ShelfIcon.m \
@@ -122,7 +117,6 @@ ifneq ($(FOUNDATION_LIB), apple)
   Preferences/DefSortOrderPref.m \
   Preferences/ShelfPref.m \
   Preferences/DeskTopPref.m \
-  Preferences/FileOpsPref.m \
   Preferences/IconsPref.m \
   Preferences/HiddenFilesPref.m \
   History/History.m \
@@ -138,7 +132,6 @@ else
   GWorkspace.m \
   IconViewsIcon.m \
   GWSplitView.m \
-  FileOperations/FileOperation.m \
   ViewersWindow.m \
   Shelf/Shelf.m \
   Shelf/ShelfIcon.m \
@@ -164,7 +157,6 @@ else
   Preferences/DefSortOrderPref.m \
   Preferences/ShelfPref.m \
   Preferences/DeskTopPref.m \
-  Preferences/FileOpsPref.m \
   Preferences/IconsPref.m \
   Preferences/HiddenFilesPref.m \
   History/History.m \

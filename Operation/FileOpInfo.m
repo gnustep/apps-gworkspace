@@ -953,6 +953,7 @@ filename =  [fileinfo objectForKey: @"name"]
 	NSString *destpath = [destination stringByAppendingPathComponent: fname]; 
     
 	canupdate = NO; 
+  
 	if ([fm fileExistsAtPath: destpath]) {
     if (onlyolder) {
       NSDictionary *attributes = [fm fileAttributesAtPath: destpath traverseLink: NO];
@@ -964,11 +965,15 @@ filename =  [fileinfo objectForKey: @"name"]
           canupdate = YES;
           return NO;
         }
+      } else {
+        canupdate = YES;
+        return NO;
       }
     }
   
 		[fm removeFileAtPath: destpath handler: self]; 
 	}
+  
 	canupdate = YES;
   
   return YES;

@@ -53,7 +53,6 @@
 @class DesktopWindow;
 @class DesktopView;
 @class TShelfWin;
-@class FileOperation;
 @class OpenWithController;
 @class RunExternalController;
 @class StartAppWin;
@@ -112,11 +111,7 @@
 @interface GWorkspace : NSObject <GWProtocol, FSWClientProtocol>
 {
 	NSString *defEditor, *defXterm, *defXtermArgs;
-	
-  NSMutableArray *operations;
-  int oprefnum;
-  BOOL showFileOpStatus;
-  
+	  
 	NSArray *selectedPaths;
 
   id fswatcher;
@@ -244,10 +239,6 @@
 
 - (void)iconAnimationChanged:(NSNotification *)notif;
 
-- (BOOL)showFileOpStatus;
-
-- (void)setShowFileOpStatus:(BOOL)value;
-
 - (void)fileSystemWillChange:(NSNotification *)notif;
 
 - (void)fileSystemDidChange:(NSNotification *)notif;
@@ -325,8 +316,6 @@
 
 - (void)showApps:(id)sender;
 
-- (void)showFileOps:(id)sender;
-
 - (void)showFinder:(id)sender;
 
 - (void)showFiend:(id)sender;
@@ -366,16 +355,6 @@
 #ifndef GNUSTEP
 - (void)terminate:(id)sender;
 #endif
-
-@end
-
-@interface GWorkspace (FileOperations)
-
-- (int)fileOperationRef;
-
-- (FileOperation *)fileOpWithRef:(int)ref;
-
-- (void)endOfFileOperation:(FileOperation *)op;
 
 @end
 
