@@ -1174,6 +1174,10 @@ pp.x = NSMaxX([self bounds]) - 1
     h = (h == 0) ? 1 : h;
 
     r = NSMakeRect(x, y, w, h);
+
+    if (NSEqualRects(visibleRect, [self frame])) {
+      r = NSIntersectionRect(r, visibleRect);
+    }
     
     wr = [self convertRect: r toView: nil];
   

@@ -135,13 +135,12 @@
   
     if (edcells) {
       nameEditor = [FSNCellNameEditor new];
-   //   [nameEditor setDelegate: self];  
+      [nameEditor setDelegate: self];  
       [nameEditor setEditable: YES];
       [nameEditor setSelectable: YES];	   
 	//	  [nameEditor setFont: labelFont];
 		  [nameEditor setBezeled: NO];
 		  [nameEditor setAlignment: NSLeftTextAlignment];
-	    [nameEditor setBackgroundColor: [NSColor redColor]];
   //	  [nameEditor setTextColor: textColor];
     }  
   
@@ -1951,6 +1950,7 @@
       NSMatrix *matrix = [col cmatrix];
       NSFontManager *fmanager = [NSFontManager sharedFontManager];
       NSFont *edfont = [nameEditor font];
+      float fnheight = [edfont defaultLineHeightForFont];
       NSRect r = [cell labelRect];
       
       if ([cell nodeInfoShowType] == FSNInfoExtendedType) {
@@ -1964,6 +1964,10 @@
       [nameEditor setFont: edfont];
 
       r = [matrix convertRect: r toView: self];
+      r.origin.y += ((r.size.height - fnheight) / 2);
+      r.size.height = fnheight;
+      r = NSIntegralRect(r);  
+      
       [nameEditor setFrame: r];
 
       [nameEditor setNode: cellnode 

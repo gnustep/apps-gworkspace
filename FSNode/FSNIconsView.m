@@ -594,7 +594,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
 { \
 NSRect sr; \
 sr.origin = p; \
-sr.size.width = sr.size.height = 0.1; \
+sr.size.width = sr.size.height = 1.0; \
 [self scrollRectToVisible: sr]; \
 }
 
@@ -656,6 +656,10 @@ pp.x = NSMaxX([self bounds]) - 1
     h = (h == 0) ? 1 : h;
 
     r = NSMakeRect(x, y, w, h);
+    
+    if (NSEqualRects(visibleRect, [self frame])) {
+      r = NSIntersectionRect(r, visibleRect);
+    }
     
     wr = [self convertRect: r toView: nil];
   
