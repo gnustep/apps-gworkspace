@@ -306,6 +306,7 @@
       if ([icon isSinglePath] == YES) {      
         if ([[[icon paths] objectAtIndex: 0] isEqualToString: source]) {     
           [icon setPaths: [NSArray arrayWithObject: destination]];
+          [icon setLocked: NO]; 
           [icon setNeedsDisplay: YES];
 					[self resizeWithOldSuperviewSize: [self frame].size];  
           break;

@@ -1,3 +1,9 @@
+2003-10-06 Enrico Sersale  <enrico@imago.ro>
+
+  * GWorkspace/Desktop/DesktopView.m
+    GWorkspace/Shelf/Shelf.m  
+    in -fileSystemDidChange: fixed a bug that leaved a renamed icon locked. 
+
 2003-10-03 Enrico Sersale  <enrico@imago.ro>
 
   * GWorkspace/FileOperations/FileOperation.m
