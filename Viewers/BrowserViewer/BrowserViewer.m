@@ -685,13 +685,13 @@ if (rct.size.height < 0) rct.size.height = 0
 
 - (void)sortTypeDidChange:(NSNotification *)notification
 {
-	NSString *notifPath = (NSString *)[notification object];
-  
-	if (notifPath) {
-  	[browser reloadColumnWithPath: [NSString stringWithString: notifPath]];
-	} else {	
-		[self renewAll];
-	}
+  NSString *notifPath = [notification object];
+
+  if (notifPath) {
+    [browser reloadColumnWithPath: notifPath];
+  } else {
+    [self renewAll];
+  }
 }
 
 - (void)watcherNotification:(NSNotification *)notification

@@ -29,9 +29,20 @@
 #include <AppKit/NSView.h>
 #include "FSNIconContainer.h"
 
-@interface FSNIconGridContainer : FSNIconContainer
-{
+@class NSImage;
 
+@interface FSNIconGridContainer : FSNIconContainer <FSNodeRepContainer>
+{
+  NSSize gridSize;
+  NSRect *grid;
+  int rowcount;
+  int colcount;
+  int gridcount;
+
+	NSImage *dragIcon;
+  NSPoint dragPoint;
+  int insertIndex;
+	BOOL dragLocalIcon;
 }
 
 @end

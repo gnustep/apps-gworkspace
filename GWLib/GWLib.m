@@ -531,19 +531,23 @@ id instance = nil;
 
 - (void)setSortType:(int)type forDirectoryAtPath:(NSString *)path
 {
+  NSString *sortstr; 
+  NSDictionary *dict;
+
   if ([fm isWritableFileAtPath: path]) {
-    NSString *sortstr = [NSString stringWithFormat: @"%i", type];
-    NSDictionary *dict = [NSDictionary dictionaryWithObject: sortstr 
-                                                     forKey: @"sort"];
+    sortstr = [NSString stringWithFormat: @"%i", type];
+    dict = [NSDictionary dictionaryWithObject: sortstr forKey: @"sort"];
     [dict writeToFile: [path stringByAppendingPathComponent: @".gwsort"] 
            atomically: YES];
   }
   
   [self removeCachedRepresentationForPath: path];
   
-	[[NSDistributedNotificationCenter defaultCenter]
- 				 postNotificationName: GWSortTypeDidChangeNotification
-	 								     object: (id)path];  
+  [[NSDistributedNotificationCenter defaultCenter]
+        postNotificationName: @"GWSortTypeDidChangeNotification"
+                      object: path
+                    userInfo: dict];
+
 }
 
 - (void)setDefSortType:(int)type
@@ -559,9 +563,10 @@ id instance = nil;
 	  
     [self clearCache];
       
-		[[NSDistributedNotificationCenter defaultCenter]
-	 				 postNotificationName: GWSortTypeDidChangeNotification
-		 								     object: nil]; 
+    [[NSDistributedNotificationCenter defaultCenter]
+            postNotificationName: @"GWSortTypeDidChangeNotification"
+                          object: nil
+                        userInfo: nil];
 	}
 }
 
@@ -605,8 +610,9 @@ id instance = nil;
     hideSysFiles = hideDot;
 
     [[NSDistributedNotificationCenter defaultCenter]
-	 		 postNotificationName: GWSortTypeDidChangeNotification
-		 								 object: nil];  
+            postNotificationName: @"GWSortTypeDidChangeNotification"
+                          object: nil
+                        userInfo: nil];
   }
 }
 

@@ -703,18 +703,17 @@ if (rct.size.height < 0) rct.size.height = 0; \
 
 - (void)sortTypeDidChange:(NSNotification *)notification
 {
-	NSString *notifPath = (NSString *)[notification object];
+  NSString *notifPath = [notification object];
 
-	if (notifPath) {
-    NSString *ntfPath = [NSString stringWithString: notifPath];
-		if ([currentPath isEqual: ntfPath]) {
+  if (notifPath) {
+		if (currentPath && [currentPath isEqual: notifPath]) {
 			[panel makeFileIcons];
-			[panel resizeWithOldSuperviewSize: [panel frame].size];  
 		}
-	} else {
-		[panel makeFileIcons];
-		[panel resizeWithOldSuperviewSize: [panel frame].size];  
-	}
+  } else {
+    [panel makeFileIcons];
+  }
+
+  [panel resizeWithOldSuperviewSize: [panel frame].size];
 }
 
 - (void)watcherNotification:(NSNotification *)notification

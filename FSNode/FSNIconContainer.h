@@ -29,10 +29,41 @@
 #include <AppKit/NSView.h>
 #include "FSNodeRep.h"
 
+@class NSColor;
+@class FSNode;
+@class FSNIcon;
+@class FSNIconNameEditor;
+
 @interface FSNIconContainer : NSView
 {
+  FSNode *node;
+  NSString *infoPath;
+  NSMutableDictionary *nodeInfo;
+  NSMutableArray *icons;
+  FSNInfoType infoType;
+  
+  NSImage *verticalImage;
+  NSImage *horizontalImage;
 
+  FSNSelectionMask selectionMask;
+  NSArray *lastSelection;
+
+  FSNIconNameEditor *nameEditor;
+  FSNIcon *editIcon;
+
+  int iconSize;
+  int labelTextSize;
+  int iconPosition;
+
+	BOOL isDragTarget;
+  
+  NSColor *backColor;
 }
+
+
+
+
+- (void)tile;
 
 @end
 

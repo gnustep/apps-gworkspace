@@ -26,6 +26,7 @@
 #include <AppKit/AppKit.h>
 #include <GNUstepGUI/GSDisplayServer.h>
 #include <math.h>
+#include "FSNodeRep.h"
 #include "FSNIcon.h"
 #include "FSNFunctions.h"
 #include "DesktopView.h"
@@ -54,30 +55,11 @@
 
 #define DEF_COLOR [NSColor colorWithCalibratedRed: 0.39 green: 0.51 blue: 0.57 alpha: 1.00]
 
-NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str, 
-																NSString *comm, NSString *sel, NSString *key)
-{
-	NSMenuItem *item = [menu addItemWithTitle: NSLocalizedString(str, comm)
-												action: NSSelectorFromString(sel) keyEquivalent: key]; 
-	return item;
-}
-
 
 @implementation DesktopView
 
 - (void)dealloc
 {
-  TEST_RELEASE (node);
-  TEST_RELEASE (infoPath);
-  TEST_RELEASE (nodeInfo);
-  RELEASE (icons);
-  RELEASE (nameEditor);
-  RELEASE (horizontalImage);
-  RELEASE (verticalImage);
-  TEST_RELEASE (lastSelection);
-	NSZoneFree (NSDefaultMallocZone(), grid);
-  TEST_RELEASE (dragIcon);
-  RELEASE (backColor);
   TEST_RELEASE (backImage);
   TEST_RELEASE (imagePath);
 
@@ -162,7 +144,8 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
 
     defentry = [defaults objectForKey: @"iconsize"];
     iconSize = defentry ? [defentry intValue] : DEF_ICN_SIZE;
-
+    [FSNIcon setLabelFont: [NSFont systemFontOfSize: iconSize]];
+    
     defentry = [defaults objectForKey: @"labeltxtsize"];
     labelTextSize = defentry ? [defentry intValue] : DEF_TEXT_SIZE;
     
@@ -421,7 +404,9 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   NSString *mtabpath = [defaults stringForKey: @"GSMtabPath"];
-  NSArray *vpaths = [[NSWorkspace sharedWorkspace] mountedRemovableMedia];
+  NSArray *lvpaths = [[NSWorkspace sharedWorkspace] mountedLocalVolumePaths];
+  NSString *root = path_separator();
+  NSArray *rvpaths = [[NSWorkspace sharedWorkspace] mountedRemovableMedia];
   int count = [icons count];
   int i;
 
@@ -441,8 +426,15 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
     }
   }
 
-  for (i = 0; i < [vpaths count]; i++) {
-    NSString *vpath = [vpaths objectAtIndex: i];
+  if ([lvpaths containsObject: root]) {
+    FSNode *vnode = [FSNode nodeWithRelativePath: root parent: nil];
+    
+    [vnode setMountPoint: YES];
+    [self addRepForSubnode: vnode];
+  }
+
+  for (i = 0; i < [rvpaths count]; i++) {
+    NSString *vpath = [rvpaths objectAtIndex: i];
     FSNode *vnode = [FSNode nodeWithRelativePath: vpath parent: nil];
   
     [vnode setMountPoint: YES];

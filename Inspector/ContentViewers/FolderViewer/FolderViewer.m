@@ -270,9 +270,10 @@
     [dict writeToFile: [currentPath stringByAppendingPathComponent: @".gwsort"] 
            atomically: YES];
 
-	  [[NSDistributedNotificationCenter defaultCenter]
- 				     postNotificationName: @"GWSortTypeDidChangeNotification"
-	 								         object: (id)currentPath];  
+    [[NSDistributedNotificationCenter defaultCenter]
+          postNotificationName: @"GWSortTypeDidChangeNotification"
+                        object: currentPath
+                      userInfo: dict];
   }
 	
   [okButt setEnabled: NO];	

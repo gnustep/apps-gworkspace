@@ -406,9 +406,10 @@ static FSNodeRep *shared = nil;
 							   forKey: @"default_sortorder"];
 		[defaults synchronize];
 	  
-		[[NSDistributedNotificationCenter defaultCenter]
-	 				 postNotificationName: @"GWSortTypeDidChangeNotification"
-		 								     object: nil]; 
+    [[NSDistributedNotificationCenter defaultCenter]
+          postNotificationName: @"GWSortTypeDidChangeNotification"
+                        object: nil
+                      userInfo: nil];
 	}
 }
 
@@ -493,6 +494,9 @@ static FSNodeRep *shared = nil;
 
 - (void)setSortOrder:(int)order forDirectory:(NSString *)dirpath
 {
+  NSDictionary *userInfo = [NSDictionary dictionaryWithObject: dirpath 
+                                                       forKey: @"path"];
+
   if ([fm isWritableFileAtPath: dirpath]) {
     NSNumber *sortnum = [NSNumber numberWithInt: order];
     NSDictionary *dict = [NSDictionary dictionaryWithObject: sortnum 
@@ -500,10 +504,11 @@ static FSNodeRep *shared = nil;
     [dict writeToFile: [dirpath stringByAppendingPathComponent: @".gwsort"] 
            atomically: YES];
   }
-  
-	[[NSDistributedNotificationCenter defaultCenter]
- 				 postNotificationName: @"GWSortTypeDidChangeNotification"
-	 								     object: (id)dirpath];  
+ 
+  [[NSDistributedNotificationCenter defaultCenter]
+        postNotificationName: @"GWSortTypeDidChangeNotification"
+                      object: nil
+                    userInfo: userInfo];
 }
 
 - (void)lockNode:(FSNode *)node

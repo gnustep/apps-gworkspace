@@ -736,16 +736,18 @@
 
 - (void)sortTypeDidChange:(NSNotification *)notification
 {
-	NSString *notifPath = (NSString *)[notification object];
+  NSString *notifPath = [notification object];
 
-	if (notifPath) {
-    NSString *ntfPath = [NSString stringWithString: notifPath];
-		if ([[panel currentPath] isEqual: ntfPath]) {
+  if (notifPath) {
+    NSString *currpath = [panel currentPath];
+
+		if (currpath && [currpath isEqual: notifPath]) {
 			[panel makeFileIcons];
 		}
-	} else {
+  } else {
     [panel makeFileIcons];
-	}
+  }
+
   [panel resizeWithOldSuperviewSize: [panel frame].size];
 }
 
