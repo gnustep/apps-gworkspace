@@ -32,8 +32,8 @@
 #include "Viewer.h"
 #include "GWRemote.h"
 #include "Functions.h"
+#include "Notifications.h"
 #include <GWorkspace/GWProtocol.h>
-#include <GWorkspace/GWNotifications.h>
 #include "GNUstep.h"
 
 #define SETRECT(o, x, y, w, h) { \

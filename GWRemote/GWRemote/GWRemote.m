@@ -33,9 +33,9 @@
 #include "FileOpProgress.h"
 #include "RemoteTerminal.h"
 #include "Functions.h"
+#include "Notifications.h"
 #include "GNUstep.h"
 #include <GWorkspace/GWProtocol.h>
-#include <GWorkspace/GWNotifications.h>
 
 static GWRemote *gwremote = nil;
 

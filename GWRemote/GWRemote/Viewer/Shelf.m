@@ -25,11 +25,11 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-#include <GWorkspace/GWNotifications.h>
 #include "Shelf.h"
 #include "ShelfIcon.h"
 #include "GWRemote.h"
 #include "Functions.h"
+#include "Notifications.h"
 #include "GNUstep.h"
 
 @interface ShelfIcon (ShelfSorting)

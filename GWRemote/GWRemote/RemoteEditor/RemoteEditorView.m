@@ -26,10 +26,10 @@
 #include <AppKit/AppKit.h>
 #include "GNUstep.h"
 #include "GWRemote.h"
-#include <GWorkspace/GWNotifications.h>
 #include "RemoteEditorView.h"
 #include "RemoteEditor.h"
 #include "Functions.h"
+#include "Notifications.h"
 
 static NSString *nibName = @"FindWindow";
 

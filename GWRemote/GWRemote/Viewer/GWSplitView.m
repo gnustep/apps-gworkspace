@@ -28,8 +28,8 @@
 #include "GWSplitView.h"
 #include "ViewerWindow.h"
 #include "Functions.h"
+#include "Notifications.h"
 #include "GNUstep.h"
-#include <GWorkspace/GWNotifications.h>
 
 @implementation GWSplitView 
 

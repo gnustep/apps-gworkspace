@@ -29,7 +29,7 @@
 #include "GWRemote.h"
 #include "Viewer.h"
 #include "Functions.h"
-#include <GWorkspace/GWNotifications.h>
+#include "Notifications.h"
 #include <GWorkspace/Browser2.h>
 
 #define CHECKRECT(rct) \

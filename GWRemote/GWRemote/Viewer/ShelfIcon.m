@@ -25,11 +25,11 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-#include <GWorkspace/GWNotifications.h>
 #include "ShelfIcon.h"
 #include "Shelf.h"
 #include "GWRemote.h"
 #include "Functions.h"
+#include "Notifications.h"
 #include "GNUstep.h"
 
 #define CHECK_LOCK if (locked) return

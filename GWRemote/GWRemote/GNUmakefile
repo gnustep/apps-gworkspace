@@ -39,6 +39,7 @@ GWRemote_LOCALIZED_RESOURCE_FILES = Localizable.strings \
 
 GWRemote_OBJC_FILES = main.m \
                       Functions.m \
+                      externs.m \
                       GWRemote.m \
                       Viewer/ViewerWindow.m \
                       Viewer/GWSplitView.m \

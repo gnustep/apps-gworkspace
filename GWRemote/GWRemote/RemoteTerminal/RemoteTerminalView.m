@@ -26,10 +26,10 @@
 #include <AppKit/AppKit.h>
 #include "GNUstep.h"
 #include "GWRemote.h"
-#include <GWorkspace/GWNotifications.h>
 #include "RemoteTerminalView.h"
 #include "RemoteTerminal.h"
 #include "Functions.h"
+#include "Notifications.h"
 
 @implementation RemoteTerminalView
 
