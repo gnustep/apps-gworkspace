@@ -563,7 +563,7 @@ static NSImage *branchImage;
         }
 		  }
     
-      if (dndSource && [self mouse: selfloc inRect: icnBounds]) {
+      if (dndSource) {
         while (1) {
 	        nextEvent = [[self window] nextEventMatchingMask:
     							                  NSLeftMouseUpMask | NSLeftMouseDraggedMask];
@@ -577,7 +577,8 @@ static NSImage *branchImage;
             
             break;
 
-          } else if ([nextEvent type] == NSLeftMouseDragged) {
+          } else if (([nextEvent type] == NSLeftMouseDragged)
+                            && ([self mouse: selfloc inRect: icnBounds])) {
 	          if (dragdelay < 5) {
               dragdelay++;
             } else {    
@@ -586,9 +587,9 @@ static NSImage *branchImage;
               startdnd = YES;        
               break;
             }
-          }
+          } 
         }
-      }
+      } 
       
       if (startdnd) {  
         if ([container respondsToSelector: @selector(stopRepNameEditing)]) {

@@ -27,15 +27,6 @@
 #include "FileOp.h"
 #include "externs.h"
 #include "Functions.h"
-#include "GNUstep.h"
-#include <stdio.h>
-#include <unistd.h>
-#include <limits.h>
-#include <pwd.h>	
-
-#ifndef LONG_DELAY
-  #define LONG_DELAY 86400.0
-#endif
 
 #define byname 0
 #define bykind 1
@@ -199,13 +190,11 @@ static GWSd *shared = nil;
       ASSIGN (userPassword, passwd);
       ASSIGN (userName, NSUserName());
 
-      firstConn = [[NSConnection alloc] initWithReceivePort: [NSSocketPort port] 
+      firstConn = [[NSConnection alloc] initWithReceivePort: (NSPort *)[NSSocketPort port] 
 																			             sendPort: nil];
       [firstConn enableMultipleThreads];
       [firstConn setRootObject: self];
       [firstConn registerName: @"gwsd"];
-      [firstConn setRequestTimeout: LONG_DELAY];
-      [firstConn setReplyTimeout: LONG_DELAY];
       [firstConn setDelegate: self];
 
       [[NSNotificationCenter defaultCenter] addObserver: self
@@ -236,8 +225,8 @@ static GWSd *shared = nil;
                
   pool = [[NSAutoreleasePool alloc] init];
   
-  connection = [[NSConnection alloc] initWithReceivePort: [NSSocketPort port] 
-																			          sendPort: [NSSocketPort port]];
+  connection = [[NSConnection alloc] initWithReceivePort: (NSPort *)[NSSocketPort port] 
+																			          sendPort: (NSPort *)[NSSocketPort port]];
 
   gwsd = [[GWSd alloc] initWithRemote: remote connection: connection];
 
@@ -842,6 +831,58 @@ static GWSd *shared = nil;
 
 int main(int argc, char** argv)
 {
+  CREATE_AUTORELEASE_POOL(pool);
+  NSProcessInfo *info = [NSProcessInfo processInfo];
+  NSMutableArray *args = AUTORELEASE ([[info arguments] mutableCopy]);
+  static BOOL	is_daemon = NO;
+  BOOL subtask = YES;
+
+  if ([[info arguments] containsObject: @"--daemon"]) {
+    subtask = NO;
+    is_daemon = YES;
+  }
+
+  if (subtask) {
+    NSTask *task = [NSTask new];
+    
+    NS_DURING
+	    {
+	      [args removeObjectAtIndex: 0];
+	      [args addObject: @"--daemon"];
+	      [task setLaunchPath: [[NSBundle mainBundle] executablePath]];
+	      [task setArguments: args];
+	      [task setEnvironment: [info environment]];
+	      [task launch];
+	      DESTROY (task);
+	    }
+    NS_HANDLER
+	    {
+	      fprintf (stderr, "unable to launch the fswatcher task. exiting.\n");
+	      DESTROY (task);
+	    }
+    NS_ENDHANDLER
+      
+    exit(EXIT_FAILURE);
+  }
+  
+  RELEASE(pool);
+
+  {
+    CREATE_AUTORELEASE_POOL (pool);
+    GWSd *gwsd = [[GWSd alloc] initWithRemote: nil connection: nil];
+    RELEASE (pool);
+  
+    if (gwsd != nil) {
+	    CREATE_AUTORELEASE_POOL (pool);
+      [[NSRunLoop currentRunLoop] run];
+  	  RELEASE (pool);
+    }
+  }
+    
+  exit(EXIT_SUCCESS);
+
+
+/*
 	GWSd *gwsd;
 
 	switch (fork()) {
@@ -869,5 +910,6 @@ int main(int argc, char** argv)
   }
   
   exit(0);
+*/
 }
 

@@ -100,6 +100,7 @@ void createMenu()
 	tools = AUTORELEASE ([NSMenu new]);
 	[mainMenu setSubmenu: tools forItem: menuItem];	
 	addItemToMenu(tools, @"Viewer", @"", @"showViewer:", @"V");	
+	addItemToMenu(tools, @"Remote Console", @"", @"openRemoteTerminal:", @"t");	
 	addItemToMenu(tools, @"Login", @"", @"showLoginWindow:", @"");	
 	addItemToMenu(tools, @"Logout", @"", @"logout:", @"");	
 

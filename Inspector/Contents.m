@@ -33,6 +33,7 @@
 #include "config.h"
 
 #define ICNSIZE 48
+#define MAXDATA 1000
 
 static NSString *nibName = @"Contents";
 
@@ -111,6 +112,7 @@ static NSString *nibName = @"Contents";
 		  }
     }
 
+    textViewer = [[TextViewer alloc] initWithFrame: r forInspector: self];					
     genericView = [[GenericView alloc] initWithFrame: r];					
 
     noContsView = [[NSView alloc] initWithFrame: r];
@@ -233,11 +235,17 @@ static NSString *nibName = @"Contents";
       [iconView setImage: icon];
       [titleField setStringValue: [node name]];
 
-      [(NSBox *)viewersBox setContentView: genericView];
-      currentViewer = genericView;
-      [genericView showInfoOfPath: path];
+      if ([textViewer tryToDisplayPath: path]) {
+        [(NSBox *)viewersBox setContentView: textViewer];
+        currentViewer = textViewer;
+			  winName = NSLocalizedString(@"Text Inspector", @"");
       
-			winName = NSLocalizedString(@"Contents Inspector", @"");
+      } else {
+        [(NSBox *)viewersBox setContentView: genericView];
+        currentViewer = genericView;
+        [genericView showInfoOfPath: path];
+			  winName = NSLocalizedString(@"Contents Inspector", @"");
+      }  
     }
 		
 	} else {  
@@ -319,7 +327,6 @@ static NSString *nibName = @"Contents";
   [titleField setStringValue: typeDescr];
 }
 
-
 - (void)watchedPathDidChange:(NSDictionary *)info
 {
   NSString *path = [info objectForKey: @"path"];
@@ -337,6 +344,167 @@ static NSString *nibName = @"Contents";
         }
       }
     }
+  }
+}
+
+- (id)inspector
+{
+  return inspector;
+}
+
+@end
+
+
+@implementation TextViewer
+
+- (void)dealloc
+{
+  TEST_RELEASE (editPath);	
+  [super dealloc];
+}
+
+- (id)initWithFrame:(NSRect)frameRect
+       forInspector:(id)insp
+{
+  self = [super initWithFrame: frameRect];
+  
+  if (self) {
+    NSRect r = [self frame];
+        
+    r.origin.y += 45;
+    r.size.height -= 45;
+    scrollView = [[NSScrollView alloc] initWithFrame: r];
+    [scrollView setBorderType: NSBezelBorder];
+    [scrollView setHasHorizontalScroller: NO];
+    [scrollView setHasVerticalScroller: YES]; 
+    [scrollView setAutoresizingMask: NSViewHeightSizable | NSViewWidthSizable];
+    [[scrollView contentView] setAutoresizingMask: NSViewHeightSizable | NSViewWidthSizable];
+    [[scrollView contentView] setAutoresizesSubviews: YES];
+    [self addSubview: scrollView]; 
+    RELEASE (scrollView);
+    
+    r = [[scrollView contentView] frame];
+    textView = [[NSTextView alloc] initWithFrame: r];
+    [textView setBackgroundColor: [NSColor whiteColor]];
+    [textView setRichText: YES];
+    [textView setEditable: NO];
+    [textView setSelectable: NO];
+    [textView setHorizontallyResizable: NO];
+    [textView setVerticallyResizable: YES];
+    [textView setMinSize: NSMakeSize (0, 0)];
+    [textView setMaxSize: NSMakeSize (1E7, 1E7)];
+    [textView setAutoresizingMask: NSViewHeightSizable | NSViewWidthSizable];
+    [[textView textContainer] setContainerSize: NSMakeSize(r.size.width, 1e7)];
+    [[textView textContainer] setWidthTracksTextView: YES];
+    [textView setUsesRuler: NO];
+    [scrollView setDocumentView: textView];
+    RELEASE (textView);
+    
+    r.origin.x = 141;
+    r.origin.y = 10;
+    r.size.width = 115;
+    r.size.height = 25;
+	  editButt = [[NSButton alloc] initWithFrame: r];
+	  [editButt setButtonType: NSMomentaryLight];
+    [editButt setImage: [NSImage imageNamed: @"common_ret.tiff"]];
+    [editButt setImagePosition: NSImageRight];
+	  [editButt setTitle: NSLocalizedString(@"Edit", @"")];
+	  [editButt setTarget: self];
+	  [editButt setAction: @selector(editFile:)];	
+    [editButt setEnabled: NO];		
+		[self addSubview: editButt]; 
+    RELEASE (editButt);
+    
+    contsinsp = insp;
+    editPath = nil;
+    ws = [NSWorkspace sharedWorkspace];
+  }
+	
+	return self;
+}
+
+- (BOOL)tryToDisplayPath:(NSString *)path
+{
+  NSFileManager *fm = [NSFileManager defaultManager];
+  NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: YES];
+  
+  DESTROY (editPath);
+  [editButt setEnabled: NO];	
+
+  if (attributes && ([attributes fileType] != NSFileTypeDirectory)) {
+	  NSString *app, *type;
+    
+    [ws getInfoForFile: path application: &app type: &type];
+    
+    if ((type == NSPlainFileType) || (type == NSShellCommandFileType)) {
+      NSData *data = [self textContentsAtPath: path withAttributes: attributes];
+
+      if (data) {
+        CREATE_AUTORELEASE_POOL (pool);
+        NSString *str = [[NSString alloc] initWithData: data
+                                  encoding: [NSString defaultCStringEncoding]];
+        NSAttributedString *attrstr = [[NSAttributedString alloc] initWithString: str];
+
+        [[textView textStorage] setAttributedString: attrstr];
+		    [[textView textStorage] addAttribute: NSFontAttributeName 
+                                       value: [NSFont systemFontOfSize: 8.0] 
+                                       range: NSMakeRange(0, [attrstr length])];
+        RELEASE (str);
+        RELEASE (attrstr);
+        [editButt setEnabled: YES];			
+        ASSIGN (editPath, path);
+        RELEASE (pool);
+
+        return YES;
+      }
+    }
+  }                                                     
+    
+  return NO;
+}
+
+- (NSData *)textContentsAtPath:(NSString *)path 
+                withAttributes:(NSDictionary *)attributes
+{
+  unsigned long long nbytes = [attributes fileSize];
+  NSFileHandle *handle = [NSFileHandle fileHandleForReadingAtPath: path];
+  NSData *data;
+    
+  nbytes = ((nbytes > MAXDATA) ? MAXDATA : nbytes);
+  
+  NS_DURING
+    {
+      data = [handle readDataOfLength: nbytes];
+    }
+  NS_HANDLER
+    {
+      [handle closeFile];
+	    return nil;
+    }
+  NS_ENDHANDLER
+  
+  [handle closeFile];
+  
+  if (data) {
+    const char *bytes = [data bytes];
+    int i;
+    
+    for (i = 0; i < nbytes; i++) {
+      if (!isascii(bytes[i])) {
+        return nil;
+      }
+    }
+    
+    return data;
+  }
+
+  return nil;
+}
+
+- (void)editFile:(id)sender
+{
+  if (editPath) {
+    [[[contsinsp inspector] desktopApp] openFile: editPath];
   }
 }
 

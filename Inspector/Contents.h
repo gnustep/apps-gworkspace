@@ -30,8 +30,12 @@
 @class NSWorkspace;
 @class NSImage;
 @class NSView;
+@class TextViewer;
 @class GenericView;
 @class NSTextView;
+@class NSScrollView;
+@class NSTextField;
+@class NSButton;
 
 @interface Contents : NSObject
 {
@@ -47,6 +51,8 @@
 
 	NSMutableArray *viewers;
   id currentViewer;
+  
+  TextViewer *textViewer;
   
   NSString *currentPath;
   
@@ -83,6 +89,32 @@
                          useIcon:(NSImage *)icon;
 
 - (void)watchedPathDidChange:(NSDictionary *)info;
+
+- (id)inspector;
+
+@end
+
+
+@interface TextViewer : NSView
+{
+  NSScrollView *scrollView;
+  NSTextView *textView;
+  NSTextField *errLabel;
+  NSButton *editButt;
+  NSString *editPath;
+  NSWorkspace *ws;
+  id contsinsp;
+}
+
+- (id)initWithFrame:(NSRect)frameRect
+       forInspector:(id)insp;
+
+- (BOOL)tryToDisplayPath:(NSString *)path;
+
+- (NSData *)textContentsAtPath:(NSString *)path 
+                withAttributes:(NSDictionary *)attributes;
+
+- (void)editFile:(id)sender;
 
 @end
 

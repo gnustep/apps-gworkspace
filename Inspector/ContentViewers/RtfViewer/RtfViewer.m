@@ -124,6 +124,7 @@
 
 - (void)displayPath:(NSString *)path
 {
+  CREATE_AUTORELEASE_POOL (pool);
   NSString *ext = [path pathExtension];
   NSData *data = nil;
   NSString *s = nil;
@@ -210,6 +211,8 @@
 			[editButt setEnabled: NO];			
     }
   }
+  
+  RELEASE (pool);
 }
 
 - (void)displayLastPath:(BOOL)forced

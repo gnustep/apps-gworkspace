@@ -76,7 +76,7 @@
 			  }
 		  }
     
-      if (dndSource && [self mouse: selfloc inRect: icnBounds]) {
+      if (dndSource) {
         while (1) {
 	        nextEvent = [[self window] nextEventMatchingMask:
     							                  NSLeftMouseUpMask | NSLeftMouseDraggedMask];
@@ -85,7 +85,8 @@
             [[self window] postEvent: nextEvent atStart: NO];
             break;
 
-          } else if ([nextEvent type] == NSLeftMouseDragged) {
+          } else if (([nextEvent type] == NSLeftMouseDragged)
+                            && ([self mouse: selfloc inRect: icnBounds])) {
 	          if (dragdelay < 5) {
               dragdelay++;
             } else {     

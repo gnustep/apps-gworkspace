@@ -37,7 +37,7 @@
 #define ICON_FRAME_HEIGHT 52
 #define ICON_VOFFSET 14
 
-#define CELLS_HEIGHT 15
+#define CELLS_HEIGHT 17
 
 #define CHECKRECT(rct) \
 if (rct.size.width < 0) rct.size.width = 0; \

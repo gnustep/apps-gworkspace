@@ -369,7 +369,7 @@
 
 	pb = [sender draggingPasteboard];
   
-  if([[pb types] indexOfObject: NSFilenamesPboardType] != NSNotFound) {
+  if ([[pb types] indexOfObject: NSFilenamesPboardType] != NSNotFound) {
     sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
 	  count = [sourcePaths count];
 	  fromPath = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
@@ -410,7 +410,8 @@
       isDragTarget = YES;
       forceCopy = NO;
 			
-      ASSIGN (icon, [NSImage imageNamed: @"FileIcon_Directory_Open.tiff"]);
+      ASSIGN (icon, [[FSNodeRep sharedInstance] openFolderIconOfSize: ICON_SIZE 
+                                                             forNode: node]);
       [self setNeedsDisplay: YES];
 			
 			sourceDragMask = [sender draggingSourceOperationMask];
@@ -442,6 +443,9 @@
 				}
 	    }
 
+      ASSIGN (icon, [[FSNodeRep sharedInstance] openFolderIconOfSize: ICON_SIZE 
+                                                             forNode: node]);
+      [self setNeedsDisplay: YES];
       isDragTarget = YES;
   	  return NSDragOperationAll;  
     }
@@ -485,11 +489,9 @@
 {
   if (isDragTarget) {
     isDragTarget = NO;  
-    if ([node isApplication] == NO) {
-      ASSIGN (icon, [[FSNodeRep sharedInstance] iconOfSize: ICON_SIZE 
-                                                   forNode: node]);
-      [self setNeedsDisplay: YES];
-    }
+    ASSIGN (icon, [[FSNodeRep sharedInstance] iconOfSize: ICON_SIZE 
+                                                 forNode: node]);
+    [self setNeedsDisplay: YES];
   }
 }
 
@@ -509,16 +511,16 @@
   NSPasteboard *pb = [sender draggingPasteboard];  
   NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
 	int i = 0;
+
+  ASSIGN (icon, [[FSNodeRep sharedInstance] iconOfSize: ICON_SIZE 
+                                               forNode: node]);
+  [self setNeedsDisplay: YES];
 	
   if ([node isApplication] == NO) {
     NSString *operation, *source;
     NSMutableArray *files;
     int tag;
     
-    ASSIGN (icon, [[FSNodeRep sharedInstance] iconOfSize: ICON_SIZE 
-                                                 forNode: node]);
-    [self setNeedsDisplay: YES];
-
     source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
 
 		if ([source isEqual: [gw trashPath]]) {
