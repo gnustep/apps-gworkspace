@@ -42,10 +42,6 @@
 
 @interface AppViewer : NSView <ContentViewersProtocol>
 {
-	NSString *bundlePath;
-  BOOL removable;
-  NSData *dataRep;
-  BOOL external;
   NSString *currentPath;
 	BOOL valid;
 

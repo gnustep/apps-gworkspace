@@ -43,10 +43,6 @@
 
 @interface RtfViewer: NSView <ContentViewersProtocol>
 {
-  NSString *bundlePath;
-  NSData *dataRep;
-  BOOL removable;
-  BOOL external;
   NSString *editPath;
   BOOL valid;	
   NSArray *extsarr;

@@ -44,10 +44,6 @@
 
 @interface SoundViewer : NSView <ContentViewersProtocol>
 {
-  NSString *bundlePath;
-  NSData *dataRep;
-  BOOL removable;
-  BOOL external;
 	NSString *soundPath;
 	NSSound *sound;
 	BOOL valid;

@@ -223,7 +223,7 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
 					id<TMBProtocol> tmb = [[principalClass alloc] init];
 
           [self addThumbnailer: tmb];
-          RELEASE (tmb);
+          RELEASE ((id)tmb);
 				}
 			}
   	}

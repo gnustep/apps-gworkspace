@@ -204,6 +204,13 @@
   }  
   
   layerName = [dialog getEditFieldText];
+
+  if ([layerName length] == 0) {
+		NSString *msg = NSLocalizedString(@"No name supplied!", @"");
+		NSString *buttstr = NSLocalizedString(@"Continue", @"");		
+    NSRunAlertPanel(nil, msg, buttstr, nil, nil);  
+    return;
+  }
   
   if ([[layers allKeys] containsObject: layerName]) {
 		NSString *msg = NSLocalizedString(@"A layer with this name is already present!", @"");

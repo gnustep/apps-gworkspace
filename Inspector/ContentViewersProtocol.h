@@ -30,22 +30,6 @@
 - (id)initWithFrame:(NSRect)frameRect
           inspector:(id)insp;
 
-- (void)setBundlePath:(NSString *)path;
-
-- (NSString *)bundlePath;
-
-- (void)setDataRepresentation:(NSData *)rep;
-
-- (NSData *)dataRepresentation;
-
-- (void)setIsRemovable:(BOOL)value;
-
-- (BOOL)isRemovable;
-
-- (void)setIsExternal:(BOOL)value;
-
-- (BOOL)isExternal;
-
 - (void)displayPath:(NSString *)path;
 
 - (void)displayLastPath:(BOOL)forced;

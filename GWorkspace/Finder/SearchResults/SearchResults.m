@@ -34,6 +34,7 @@
 #include "FSNode.h"
 #include "FSNodeRep.h"
 #include "GWFunctions.h"
+#include "Dialogs/Dialogs.h"
 
 #define CELLS_HEIGHT (28.0)
 
@@ -41,9 +42,7 @@
 #define LSF_FOUND(x) [x stringByAppendingPathComponent: @"lsf.found"]
 
 static NSString *nibName = @"SearchResults";
-
 static NSString *lsfname = @"LiveSearch.lsf";
-
 
 @implementation SearchResults
 
@@ -623,12 +622,39 @@ static NSString *lsfname = @"LiveSearch.lsf";
 
 - (void)createLiveSearchFolderAtPath:(NSString *)path
 {
-	NSArray *contents = [fm directoryContentsAtPath: path];
+  SympleDialog *dialog;
+  NSString *folderName;
+	NSArray *contents;
+  int result;
 
-  if ([contents containsObject: lsfname] == NO) {
+	dialog = [[SympleDialog alloc] initWithTitle: NSLocalizedString(@"New Live Search", @"") 
+                                      editText: lsfname
+                                   switchTitle: nil];
+  AUTORELEASE (dialog);
+	[dialog center];
+  [dialog makeKeyWindow];
+  [dialog orderFrontRegardless];
+
+  result = [dialog runModal];
+	if (result != NSAlertDefaultReturn) {
+    return;
+  }  
+
+  folderName = [dialog getEditFieldText];
+
+  if ([folderName length] == 0) {
+		NSString *msg = NSLocalizedString(@"No name supplied!", @"");
+		NSString *buttstr = NSLocalizedString(@"Continue", @"");		
+    NSRunAlertPanel(nil, msg, buttstr, nil, nil);  
+    return;
+  }
+
+  contents = [fm directoryContentsAtPath: path];
+  
+  if ([contents containsObject: folderName] == NO) {
     NSNotificationCenter *dnc = [NSDistributedNotificationCenter defaultCenter];
     NSMutableDictionary *notifDict = [NSMutableDictionary dictionary];		
-    NSString *lsfpath = [path stringByAppendingPathComponent: lsfname];
+    NSString *lsfpath = [path stringByAppendingPathComponent: folderName];
     BOOL lsfdone = YES;
 
     [notifDict setObject: @"GWorkspaceCreateDirOperation" 
@@ -672,7 +698,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
 	 						         object: nil 
                      userInfo: notifDict];  
   } else {
-    NSString *msg = [NSString stringWithFormat: @"a file named \"%@\" already exists.\nPlease rename it.", lsfname];
+    NSString *msg = [NSString stringWithFormat: @"a file named \"%@\" already exists.\nPlease rename it.", folderName];
     NSRunAlertPanel(NULL, msg, NSLocalizedString(@"Ok", @""), NULL, NULL);  
   }
 }

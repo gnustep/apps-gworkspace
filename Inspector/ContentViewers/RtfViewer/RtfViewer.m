@@ -34,8 +34,6 @@
   RELEASE (extsarr);
   RELEASE (scrollView);
   RELEASE (errLabel);
-  TEST_RELEASE (bundlePath);
-  TEST_RELEASE (dataRep);
   TEST_RELEASE (editPath);	
   [super dealloc];
 }
@@ -111,8 +109,6 @@
 		[self addSubview: editButt]; 
     RELEASE (editButt);
 
-    bundlePath = nil;
-    dataRep = nil;
     editPath = nil;
 
     inspector = insp;
@@ -122,46 +118,6 @@
   }
 	
 	return self;
-}
-
-- (void)setBundlePath:(NSString *)path
-{
-  ASSIGN (bundlePath, path);
-}
-
-- (NSString *)bundlePath
-{
-  return bundlePath;
-}
-
-- (void)setDataRepresentation:(NSData *)rep
-{
-  ASSIGN (dataRep, rep);
-}
-
-- (NSData *)dataRepresentation
-{
-  return dataRep;
-}
-
-- (void)setIsRemovable:(BOOL)value
-{
-  removable = value;
-}
-
-- (BOOL)isRemovable
-{
-  return removable;
-}
-
-- (void)setIsExternal:(BOOL)value
-{
-  external = value;
-}
-
-- (BOOL)isExternal
-{
-  return external;
 }
 
 - (void)displayPath:(NSString *)path

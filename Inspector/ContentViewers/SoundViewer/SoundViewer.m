@@ -29,8 +29,6 @@
 
 - (void)dealloc
 {
-	TEST_RELEASE (bundlePath);
-  TEST_RELEASE (dataRep);
 	TEST_RELEASE (soundPath);
 	TEST_RELEASE (sound);
   RELEASE (playBox);  
@@ -121,8 +119,6 @@
   	[errLabel setSelectable: NO];
 		[errLabel setStringValue: NSLocalizedString(@"Invalid Contents", @"")];
     
-    bundlePath = nil;
-    dataRep = nil;
     soundPath = nil;
 		sound = nil;
                 
@@ -133,46 +129,6 @@
 	}
 	
 	return self;
-}
-
-- (void)setBundlePath:(NSString *)path
-{
-  ASSIGN (bundlePath, path);
-}
-
-- (NSString *)bundlePath
-{
-  return bundlePath;
-}
-
-- (void)setDataRepresentation:(NSData *)rep
-{
-  ASSIGN (dataRep, rep);
-}
-
-- (NSData *)dataRepresentation
-{
-  return dataRep;
-}
-
-- (void)setIsRemovable:(BOOL)value
-{
-  removable = value;
-}
-
-- (BOOL)isRemovable
-{
-  return removable;
-}
-
-- (void)setIsExternal:(BOOL)value
-{
-  external = value;
-}
-
-- (BOOL)isExternal
-{
-  return external;
 }
 
 - (void)buttonsAction:(id)sender

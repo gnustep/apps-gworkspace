@@ -42,13 +42,8 @@
 
 @interface FolderViewer : NSView <ContentViewersProtocol>
 {
-  NSString *bundlePath;
-  NSData *dataRep;
-  BOOL removable;
-  BOOL external;
   NSString *currentPath;
   BOOL valid;	
-
 	int sortType;
   
 	NSBox *sortBox;

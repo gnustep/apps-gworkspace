@@ -44,10 +44,6 @@
 
 @interface NSRTFViewer : NSView <ContentViewersProtocol>
 {
-  NSString *bundlePath;
-  NSData *dataRep;
-  BOOL removable;
-  BOOL external;
 	BOOL valid;
   NSArray *typesDescriprion;
   NSArray *typeIcons;

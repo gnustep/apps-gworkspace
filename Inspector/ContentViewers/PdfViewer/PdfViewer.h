@@ -52,10 +52,6 @@
 
 @interface PdfViewer : NSView <ContentViewersProtocol>
 {
-  NSString *bundlePath;
-  NSData *dataRep;
-  BOOL removable;
-  BOOL external;
 	BOOL valid;
   
 	NSButton *backButt, *nextButt;

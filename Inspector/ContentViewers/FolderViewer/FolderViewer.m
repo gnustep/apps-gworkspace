@@ -38,7 +38,6 @@
 - (void)dealloc
 {
   TEST_RELEASE (currentPath);
-  RELEASE (bundlePath);
   [super dealloc];
 }
 
@@ -119,8 +118,6 @@
 		[self addSubview: okButt]; 
     RELEASE (okButt);
     
-    bundlePath = nil;
-    dataRep = nil;
     currentPath = nil;
 
     inspector = insp;
@@ -131,46 +128,6 @@
 	}
   
 	return self;
-}
-
-- (void)setBundlePath:(NSString *)path
-{
-  ASSIGN (bundlePath, path);
-}
-
-- (NSString *)bundlePath
-{
-  return bundlePath;
-}
-
-- (void)setDataRepresentation:(NSData *)rep
-{
-  ASSIGN (dataRep, rep);
-}
-
-- (NSData *)dataRepresentation
-{
-  return dataRep;
-}
-
-- (void)setIsRemovable:(BOOL)value
-{
-  removable = value;
-}
-
-- (BOOL)isRemovable
-{
-  return removable;
-}
-
-- (void)setIsExternal:(BOOL)value
-{
-  external = value;
-}
-
-- (BOOL)isExternal
-{
-  return external;
 }
 
 - (void)displayPath:(NSString *)path

@@ -42,10 +42,6 @@
 
 @interface NSColorViewer : NSView <ContentViewersProtocol>
 {
-  NSString *bundlePath;
-  NSData *dataRep;
-  BOOL removable;
-  BOOL external;
 	BOOL valid;
   NSString *typeDescriprion;
   NSImage *icon;

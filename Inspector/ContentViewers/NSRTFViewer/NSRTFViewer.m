@@ -33,8 +33,6 @@
 
 - (void)dealloc
 {
-  TEST_RELEASE (bundlePath);
-  TEST_RELEASE (dataRep);
   RELEASE (typesDescriprion);
   RELEASE (typeIcons);
   RELEASE (scrollView);
@@ -96,8 +94,6 @@
 
     inspector = insp;
     valid = YES;
-    bundlePath = nil;
-    dataRep = nil;
     
     ASSIGN (typesDescriprion, ([NSArray arrayWithObjects:
                                NSLocalizedString(@"NSString data", @""),
@@ -110,46 +106,6 @@
   }
 	
 	return self;
-}
-
-- (void)setBundlePath:(NSString *)path
-{
-  ASSIGN (bundlePath, path);
-}
-
-- (NSString *)bundlePath
-{
-  return bundlePath;
-}
-
-- (void)setDataRepresentation:(NSData *)rep
-{
-  ASSIGN (dataRep, rep);
-}
-
-- (NSData *)dataRepresentation
-{
-  return dataRep;
-}
-
-- (void)setIsRemovable:(BOOL)value
-{
-  removable = value;
-}
-
-- (BOOL)isRemovable
-{
-  return removable;
-}
-
-- (void)setIsExternal:(BOOL)value
-{
-  external = value;
-}
-
-- (BOOL)isExternal
-{
-  return external;
 }
 
 - (void)displayPath:(NSString *)path

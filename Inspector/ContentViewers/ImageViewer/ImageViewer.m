@@ -34,8 +34,6 @@
   [nc removeObserver: self];  
   DESTROY (readerConn);
   DESTROY (reader);
-  TEST_RELEASE (bundlePath);
-  TEST_RELEASE (dataRep);
   TEST_RELEASE (imagePath);	
   TEST_RELEASE (nextPath);	
   TEST_RELEASE (editPath);	
@@ -134,64 +132,12 @@
     valid = YES;
     
     reader = nil;
-    bundlePath = nil;
-    dataRep = nil;
     imagePath = nil;
     nextPath = nil;
     editPath = nil;
-    
-    [nc addObserver: self
-           selector: @selector(threadWillExit:)
-               name: NSThreadWillExitNotification
-             object: nil];
   }
 	
 	return self;
-}
-
-- (void)threadWillExit:(NSNotification *)notification
-{
-  NSLog(@"thread will exit");
-}
-
-- (void)setBundlePath:(NSString *)path
-{
-  ASSIGN (bundlePath, path);
-}
-
-- (NSString *)bundlePath
-{
-  return bundlePath;
-}
-
-- (void)setDataRepresentation:(NSData *)rep
-{
-  ASSIGN (dataRep, rep);
-}
-
-- (NSData *)dataRepresentation
-{
-  return dataRep;
-}
-
-- (void)setIsRemovable:(BOOL)value
-{
-  removable = value;
-}
-
-- (BOOL)isRemovable
-{
-  return removable;
-}
-
-- (void)setIsExternal:(BOOL)value
-{
-  external = value;
-}
-
-- (BOOL)isExternal
-{
-  return external;
 }
 
 - (void)displayPath:(NSString *)path

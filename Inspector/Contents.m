@@ -103,9 +103,6 @@ static NSString *nibName = @"Contents";
 	          CREATE_AUTORELEASE_POOL (pool);
             id vwr = [[principalClass alloc] initWithFrame: r inspector: self];
         
-            [vwr setBundlePath: bpath];     
-            [vwr setIsExternal: NO];   
-            [vwr setIsRemovable: NO];   
             [viewers addObject: vwr];            
             RELEASE ((id)vwr);	
             RELEASE (pool);		

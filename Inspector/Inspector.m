@@ -132,25 +132,6 @@ static NSString *nibName = @"InspectorWin";
   }
 }
 
-/*
-- (BOOL)applicationShouldTerminate:(NSApplication *)app 
-{
-  
-  if ([[self contents] prepareToTerminate] == NO) {
-    return NO;
-  }
-  
-  [self updateDefaults];
-}
-*/
-
-/*
-	GSAppKitUserBundles = (
-	    "/usr/GNUstep/Local/Library/Bundles/Camaelon.themeEngine"
-	);
-*/
-
-
 - (void)setCurrentSelection:(NSArray *)selection
 {
   if (selection) {

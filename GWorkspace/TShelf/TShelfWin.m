@@ -172,7 +172,7 @@
   [dialog orderFrontRegardless];
 
   result = [dialog runModal];
-	if(result != NSAlertDefaultReturn) {
+	if (result != NSAlertDefaultReturn) {
     return;
   }  
 

@@ -52,10 +52,6 @@
 
 @interface ImageViewer : NSView <ContentViewersProtocol>
 {
-  NSString *bundlePath;
-  NSData *dataRep;
-  BOOL removable;
-  BOOL external;
   NSArray *extsarr;
   BOOL valid;	
   
@@ -77,8 +73,6 @@
   NSNotificationCenter *nc;
   NSWorkspace *ws;
 }
-
-- (void)threadWillExit:(NSNotification *)notification; 
 
 - (void)setReader:(id)anObject;
 
