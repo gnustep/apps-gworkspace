@@ -34,24 +34,15 @@
 #include "BCell.h"
 #include "BIcon.h"
 #include "BNameEditor.h"
-#include "GNUstep.h"
 
 #define NSBR_VOFFSET 4
 #define BEZEL_BORDER_SIZE NSMakeSize(2, 2)
 
-#ifdef GNUSTEP 
-  #define ICONS_PATH_WIDTH 96
-  #define ICON_FRAME_HEIGHT 52
-  #define ICON_SIZE_WIDTH 48
-  #define ICON_VOFFSET 14
-  #define LABEL_HEIGHT 14
-#else
-  #define ICONS_PATH_WIDTH 76
-  #define ICON_FRAME_HEIGHT 34
-  #define ICON_SIZE_WIDTH 32
-  #define ICON_VOFFSET 15
-  #define LABEL_HEIGHT 14
-#endif
+#define ICONS_PATH_WIDTH 96
+#define ICON_FRAME_HEIGHT 52
+#define ICON_SIZE_WIDTH 48
+#define ICON_VOFFSET 14
+#define LABEL_HEIGHT 14
 
 #define LINE_SCROLL 10
 #define LABEL_MARGIN 8
@@ -178,11 +169,7 @@ double myrintf(double a)
     [nameEditor setDelegate: self];  
     [nameEditor setTarget: self]; 
     [nameEditor setAction: @selector(editorAction:)];  
-    #ifdef GNUSTEP 
-      ASSIGN (editorFont, [NSFont systemFontOfSize: 12]); 
-    #else
-      ASSIGN (editorFont, [NSFont systemFontOfSize: 11]); 
-    #endif
+    ASSIGN (editorFont, [NSFont systemFontOfSize: 12]); 
 		[nameEditor setFont: editorFont];
 		[nameEditor setBezeled: NO];
 		[nameEditor setAlignment: NSCenterTextAlignment];
@@ -708,9 +695,7 @@ double myrintf(double a)
   // Update the scrollviews
   [self tile];
   
-  #ifdef GNUSTEP 
-    [self setNeedsDisplay: YES];
-  #endif
+  [self setNeedsDisplay: YES];
 }
 
 - (void)scrollColumnsRightBy:(int)shiftAmount
@@ -958,9 +943,7 @@ double myrintf(double a)
 
 - (void)unselectNameEditor
 {
-  #ifdef GNUSTEP 
-    [nameEditor setBackgroundColor: [NSColor windowBackgroundColor]];
-  #endif
+  [nameEditor setBackgroundColor: [NSColor windowBackgroundColor]];
   
   if ([[self subviews] containsObject: nameEditor]) {
     NSRect r = NSIntersectionRect([self visibleRect], [nameEditor frame]);
@@ -1242,10 +1225,6 @@ double myrintf(double a)
   
   canUpdateViews = YES;
   [self tile];
-
-#ifndef GNUSTEP 
-  [[self window] makeFirstResponder: self];
-#endif
 }
 
 - (void)doubleClickInMatrixOfColumn:(BColumn *)col
@@ -1664,11 +1643,7 @@ double myrintf(double a)
 		p2 = NSMakePoint(scrollerBorderRect.origin.x + scrollerBorderRect.size.width - 2, 
 					 scrollerBorderRect.origin.y + scrollerRect.size.height + 2);
     
-    #ifdef GNUSTEP            
-		  NSDrawGrayBezel(scrollerBorderRect, r);
-    #else
-      NSDrawLightBezel(scrollerBorderRect, r);
-    #endif
+    NSDrawGrayBezel(scrollerBorderRect, r);
 
     if (styleMask & GWColumnIconMask) {
       [[NSColor blackColor] set];

@@ -64,15 +64,9 @@ NSString *GWDesktopViewUnsetImageNotification = @"GWDesktopViewUnsetImageNotific
 
 NSString *GWIconAnimationChangedNotification = @"GWIconAnimationChangedNotification";
 
-#ifdef GNUSTEP 
-  NSString *GWOpenFolderIconName = @"FileIcon_Directory_Open.tiff";
-  NSString *GWSmallOpenFolderIconName = @"FileIcon_Directory_Open_Small.tiff";
-  NSString *GWCellHighlightIconName = @"CellHighlight.tiff";  
-#else
-  NSString *GWOpenFolderIconName = @"FileIcon_Directory_Open_osx.tiff";
-  NSString *GWSmallOpenFolderIconName = @"FileIcon_Directory_Open_Small_osx.tiff";
-  NSString *GWCellHighlightIconName = @"CellHighlight_osx.tiff";  
-#endif
+NSString *GWOpenFolderIconName = @"FileIcon_Directory_Open.tiff";
+NSString *GWSmallOpenFolderIconName = @"FileIcon_Directory_Open_Small.tiff";
+NSString *GWCellHighlightIconName = @"CellHighlight.tiff";  
 
 /* The name of the pasteboard for GWNet */
 NSString *GWRemoteFilenamesPboardType = @"GWRemoteFilenamesPboardType";

@@ -28,7 +28,6 @@
 #include "GWFunctions.h"
 #include "GWNotifications.h"
 #include "BCell.h"
-#include "GNUstep.h"
 
 @implementation BCell
 
@@ -50,9 +49,6 @@
     icon = nil;
     highlight = nil;
     [self setAllowsMixedState: NO];
-    #ifndef GNUSTEP 
-      [self setFont: [NSFont systemFontOfSize: 11]];
-    #endif
   }
   
   return self;
@@ -69,9 +65,6 @@
     highlight = nil;
     iconSelected = NO;
     [self setAllowsMixedState: NO];
-    #ifndef GNUSTEP 
-      [self setFont: [NSFont systemFontOfSize: 11]];
-    #endif
   }
   
   return self;

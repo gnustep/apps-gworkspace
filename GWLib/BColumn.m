@@ -33,23 +33,13 @@
 #include "BCell.h"
 #include "BIcon.h"
 #include "Browser2.h"
-#include "GNUstep.h"
 
-#ifdef GNUSTEP 
-  #define ICON_FRAME_HEIGHT 52
-  #define ICON_SIZE_WIDTH 48
-  #define CELLS_HEIGHT 15
-  #define ICON_VOFFSET 14
-  #define LABEL_HEIGHT 14
-  #define ICON_CELLS_HEIGHT 30
-#else
-  #define ICON_FRAME_HEIGHT 34
-  #define ICON_SIZE_WIDTH 32
-  #define CELLS_HEIGHT 16
-  #define ICON_VOFFSET 15
-  #define LABEL_HEIGHT 14
-  #define ICON_CELLS_HEIGHT 30
-#endif
+#define ICON_FRAME_HEIGHT 52
+#define ICON_SIZE_WIDTH 48
+#define CELLS_HEIGHT 15
+#define ICON_VOFFSET 14
+#define LABEL_HEIGHT 14
+#define ICON_CELLS_HEIGHT 30
 
 #define CHECKRECT(rct) \
 if (rct.size.width < 0) rct.size.width = 0; \

@@ -31,7 +31,6 @@
 #include "BColumn.h"
 #include "BCell.h"
 #include "Browser2.h"
-#include "GNUstep.h"
 
 @implementation BMatrix
 

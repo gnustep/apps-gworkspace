@@ -27,7 +27,6 @@
 #include <AppKit/AppKit.h>
 #include "GWFunctions.h"
 #include "GWProtocol.h"
-#include "GNUstep.h"
 #include <limits.h>
 
 #define ONE_KB 1024

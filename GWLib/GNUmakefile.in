@@ -2,13 +2,8 @@
 include $(GNUSTEP_MAKEFILES)/common.make
 include $(GNUSTEP_MAKEFILES)/aggregate.make
 
-ifeq ($(FOUNDATION_LIB), gnu)
-  CURRENT_VERSION_NAME=@PACKAGE_VERSION@
-  DEPLOY_WITH_CURRENT_VERSION=yes
-else
-  XXX_CURRENT_VERSION_NAME=@PACKAGE_VERSION@
-  XXX_DEPLOY_WITH_CURRENT_VERSION=yes
-endif
+CURRENT_VERSION_NAME=@PACKAGE_VERSION@
+DEPLOY_WITH_CURRENT_VERSION=yes
 
 PACKAGE_NAME=GWorkspace
 LIBRARY_VAR=GWORKSPACE
@@ -18,78 +13,33 @@ srcdir = .
 
 GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
 
-ifeq ($(FOUNDATION_LIB), apple)
-  GNUSTEP_INSTALLATION_DIR = /
-endif
+libGWorkspace_OBJC_FILES = GWLib.m \
+                         GWFunctions.m \
+                         externs.m \
+                         Browser2.m \
+                         BColumn.m \
+                         BMatrix.m \
+                         BCell.m \
+                         BIcon.m \
+                         BIconLabel.m \
+                         BNameEditor.m 
 
-ifeq ($(FOUNDATION_LIB), apple)
-  libGWorkspace_OBJC_FILES = GWLib.m \
-                           GWFunctions.m \
-                           externs.m \
-                           Browser2.m \
-                           BColumn.m \
-                           BMatrix.m \
-                           BCell.m \
-                           BIcon.m \
-                           BIconLabel.m \
-                           BNameEditor.m \
-                           OSXCompatibility.m
-else
-  libGWorkspace_OBJC_FILES = GWLib.m \
-                           GWFunctions.m \
-                           externs.m \
-                           Browser2.m \
-                           BColumn.m \
-                           BMatrix.m \
-                           BCell.m \
-                           BIcon.m \
-                           BIconLabel.m \
-                           BNameEditor.m 
-endif
-
-ifeq ($(FOUNDATION_LIB), apple)
-  libGWorkspace_HEADER_FILES= GWLib.h \
-  ContentViewersProtocol.h \
-  ViewersProtocol.h \
-  InspectorsProtocol.h \
-  IconViewsProtocol.h \
-  PreferencesProtocol.h \
-  GWFunctions.h \
-  GWNotifications.h \
-  GWProtocol.h \
-  Browser2.h \
-  BNameEditor.h \
-  OSXCompatibility.h
-else
-  libGWorkspace_HEADER_FILES= GWLib.h \
-  ContentViewersProtocol.h \
-  ViewersProtocol.h \
-  InspectorsProtocol.h \
-  IconViewsProtocol.h \
-  PreferencesProtocol.h \
-  GWFunctions.h \
-  GWNotifications.h \
-  GWProtocol.h \
-  Browser2.h \
-  BNameEditor.h
-endif
+libGWorkspace_HEADER_FILES= GWLib.h \
+ContentViewersProtocol.h \
+ViewersProtocol.h \
+InspectorsProtocol.h \
+IconViewsProtocol.h \
+PreferencesProtocol.h \
+GWFunctions.h \
+GWNotifications.h \
+GWProtocol.h \
+Browser2.h \
+BNameEditor.h
 
 libGWorkspace_HEADER_FILES_DIR=.
 libGWorkspace_HEADER_FILES_INSTALL_DIR=/GWorkspace
                         
-ifeq ($(FOUNDATION_LIB), gnu)
-  include $(GNUSTEP_MAKEFILES)/library.make
-else
-  # Build it as a framework on Apple Mac OS X
-  FRAMEWORK_NAME = GWorkspace
-
-  GWorkspace_SUBPROJECTS  = $(libGWorkspace_SUBPROJECTS)
-  GWorkspace_HEADER_FILES = $(libGWorkspace_HEADER_FILES)
-  GWorkspace_HEADER_FILES_INSTALL_DIR = $(libGWorkspace_HEADER_FILES_INSTALL_DIR)
-  GWorkspace_OBJC_FILES = $(libGWorkspace_OBJC_FILES)
-  
-  include $(GNUSTEP_MAKEFILES)/framework.make
-endif
+include $(GNUSTEP_MAKEFILES)/library.make
 
 -include GNUmakefile.preamble
 -include GNUmakefile.local

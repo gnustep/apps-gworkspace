@@ -26,7 +26,6 @@
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include "BNameEditor.h"
-#include "GNUstep.h"
 
 @implementation BNameEditor
 

@@ -29,10 +29,6 @@
 #include "GWFunctions.h"
 #include "GWNotifications.h"
 #include "GWProtocol.h"
-#include "GNUstep.h"
-#ifndef GNUSTEP 
-  #include "OSXCompatibility.h"
-#endif
 
 #ifndef CACHED_MAX
   #define CACHED_MAX 20
@@ -654,11 +650,7 @@ id instance = nil;
 {
 	NSImage *icon = [[self iconForFile: aPath ofType: nil] copy];
   NSSize size = [icon size];
-  #ifdef GNUSTEP 
-    float fact = 2.0;
-  #else
-    float fact = 1.33;
-  #endif
+  float fact = 2.0;
 
   [icon setScalesWhenResized: YES];
   [icon setSize: NSMakeSize(size.width / fact, size.height / fact)];
@@ -806,14 +798,8 @@ id instance = nil;
       selName = @"gworkspace";
     }
   
-    #ifdef GNUSTEP 
-		  wkspclass = [[NSBundle mainBundle] principalClass];
-    #else
-		  wkspclass = [[NSBundle mainBundle] classNamed: appName];
-    #endif
-    
+    wkspclass = [[NSBundle mainBundle] principalClass];
     sel = NSSelectorFromString(selName);
-    
     workspaceApp = [wkspclass performSelector: sel];
   }  
 

@@ -26,7 +26,6 @@
 #include <AppKit/AppKit.h>
 #include "BIconLabel.h"
 #include "BIcon.h"
-#include "GNUstep.h"
 
 @implementation BIconLabel
 

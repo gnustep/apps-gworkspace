@@ -30,15 +30,9 @@
 #include "GWLib.h"
 #include "BIcon.h"
 #include "BIconLabel.h"
-#include "GNUstep.h"
 
-#ifdef GNUSTEP 
-  #define ARROW_POS_Y 26
-  #define ARROW_MARGIN_X 11
-#else
-  #define ARROW_POS_Y 26
-  #define ARROW_MARGIN_X 11
-#endif
+#define ARROW_POS_Y 26
+#define ARROW_MARGIN_X 11
 
 #define CHECK_LOCK if (locked) return
 #define CHECK_LOCK_RET(x) if (locked) return x
@@ -78,13 +72,8 @@
 		[namelabel setEditable: NO];
 		[namelabel setSelectable: NO];
 		[namelabel setAlignment: NSCenterTextAlignment];
-    #ifdef GNUSTEP 
-		  [namelabel setFont: [NSFont systemFontOfSize: 12]];
-	    [namelabel setBackgroundColor: [NSColor windowBackgroundColor]];
-		#else
-		  [namelabel setFont: [NSFont systemFontOfSize: 11]];
-	    [namelabel setBackgroundColor: [NSColor whiteColor]];
-    #endif
+		[namelabel setFont: [NSFont systemFontOfSize: 12]];
+	  [namelabel setBackgroundColor: [NSColor windowBackgroundColor]];
     
     contestualMenu = [[GWLib workspaceApp] usesContestualMenu];
     
@@ -250,13 +239,7 @@
 - (void)unselect
 {  
 	isSelect = NO;
-
-  #ifdef GNUSTEP 
-	  [namelabel setBackgroundColor: [NSColor windowBackgroundColor]];
-	#else
-	  [namelabel setBackgroundColor: [NSColor whiteColor]];
-  #endif
-  
+  [namelabel setBackgroundColor: [NSColor windowBackgroundColor]];
 	[self setNeedsDisplay: YES];  
   [namelabel setNeedsDisplay: YES];
 }
