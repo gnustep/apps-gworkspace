@@ -13,7 +13,9 @@
 	    "setDockPosition:",
 	    "addMediaMountPoint:",
 	    "removeMediaMountPoint:",
-	    "setMediaMountPoints:"
+	    "setMediaMountPoints:",
+	    "chooseTextColor:",
+	    "setTextColor:"
 	);
 	Outlets = (
 	    win,
@@ -41,7 +43,9 @@
 	    mediaField,
 	    remMediaButt,
 	    addMediaButt,
-	    setMediaButt
+	    setMediaButt,
+	    textColorLabel,
+	    textColorButt
 	);
 	Super = NSObject;
     };

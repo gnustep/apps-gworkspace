@@ -1221,7 +1221,13 @@
   [super setBackgroundColor: acolor];
   [[desktop dock] setBackColor: backColor];
 }
-                       
+          
+- (void)setTextColor:(NSColor *)acolor
+{
+  [super setTextColor: acolor];
+  [self setNeedsDisplay: YES];
+}
+
 @end
 
 

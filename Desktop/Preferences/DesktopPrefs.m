@@ -117,6 +117,8 @@ int nearestIconSize(float sz)
       itemindex = [textSizePopUp indexOfItemWithTag: txtsize];
       [textSizePopUp selectItemAtIndex: (itemindex != -1) ? itemindex : 0];      
       
+      [textColorLabel setTextColor: [desktopView textColor]];
+      
       iconpos = [desktopView iconPosition];
       [labelMatrix selectCellAtRow: 0 column: (iconpos == NSImageAbove) ? 0 : 1];
       
@@ -132,9 +134,7 @@ int nearestIconSize(float sz)
                                   | NSColorPanelColorListModeMask];
       [NSColorPanel setPickerMode: NSWheelModeColorPanel];
       panel = [NSColorPanel sharedColorPanel];
-      [panel setColor: [colorView color]];
       [panel setTarget: self];
-      [panel setAction: @selector(colorChoosen:)];
       [panel setContinuous: YES];
       
       // Background image  
@@ -234,6 +234,8 @@ int nearestIconSize(float sz)
       [[tabView tabViewItemAtIndex: 4] setLabel: NSLocalizedString(@"Volumes", @"")];
 
       [textSizeLabel setStringValue: NSLocalizedString(@"Text size:", @"")];
+      [textColorLabel setStringValue: NSLocalizedString(@"Text color", @"")];
+      [textColorButt setTitle: NSLocalizedString(@"Choose", @"")];
       [labelLabel setStringValue: NSLocalizedString(@"Label position:", @"")];
       cell = [labelMatrix cellAtRow: 0 column: 0];
       [cell setTitle: NSLocalizedString(@"Bottom", @"")];
@@ -293,6 +295,21 @@ int nearestIconSize(float sz)
   [desktopView setLabelTextSize: [[sender selectedItem] tag]];
 }
 
+- (IBAction)chooseTextColor:(id)sender
+{
+  [panel setAction: @selector(setTextColor:)];
+  [panel setColor: [desktopView textColor]];
+  [NSApp orderFrontColorPanel: nil];
+}
+
+- (IBAction)setTextColor:(id)sender
+{
+  NSColor *color = [sender color];
+
+  [textColorLabel setTextColor: color];
+  [desktopView setTextColor: color];
+}
+
 - (IBAction)setLabelPosition:(id)sender
 {
   id cell = [labelMatrix selectedCell];
@@ -308,6 +325,8 @@ int nearestIconSize(float sz)
 //
 - (IBAction)chooseColor:(id)sender
 {
+  [panel setAction: @selector(colorChoosen:)];
+  [panel setColor: [colorView color]];
   [NSApp orderFrontColorPanel: nil];
 }
 

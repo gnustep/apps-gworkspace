@@ -55,6 +55,8 @@
   IBOutlet id icnSizeSlider;
   IBOutlet id textSizeLabel;
   IBOutlet id textSizePopUp;
+  IBOutlet id textColorLabel;
+  IBOutlet id textColorButt;
   IBOutlet id labelLabel;
   IBOutlet id labelMatrix;
 
@@ -97,6 +99,10 @@
 - (IBAction)setIconSize:(id)sender;
 
 - (IBAction)setTextSize:(id)sender;
+
+- (IBAction)chooseTextColor:(id)sender;
+
+- (IBAction)setTextColor:(id)sender;
 
 - (IBAction)setLabelPosition:(id)sender;
 

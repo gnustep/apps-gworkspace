@@ -227,7 +227,8 @@ static Operation *operation = nil;
   int i;
 
   for (i = 0; i < [opfiles count]; i++) {
-    NSString *opfile = [opfiles objectAtIndex: i];
+    NSDictionary *fdict = [opfiles objectAtIndex: i];
+    NSString *opfile = [fdict objectForKey: @"name"];
   
     [opsrcpaths addObject: [opsrc stringByAppendingPathComponent: opfile]];
     
