@@ -150,6 +150,17 @@
 - (void)terminate:(id)sender;
 #endif
 
+
+//
+// DesktopApplication protocol
+//
+- (NSString *)trashPath;
+
+- (void)performFileOperation:(NSDictionary *)opinfo;
+
+- (void)concludeRemoteFilesDragOperation:(NSData *)opinfo
+                             atLocalPath:(NSString *)localdest;
+
 @end
 
 #endif // FINDER_H

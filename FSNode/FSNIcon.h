@@ -36,6 +36,10 @@
 
 @protocol DesktopApplication
 
+- (NSString *)trashPath;
+
+- (void)performFileOperation:(NSDictionary *)opinfo;
+
 - (void)concludeRemoteFilesDragOperation:(NSData *)opinfo
                              atLocalPath:(NSString *)localdest;
 
@@ -67,13 +71,15 @@
   NSImage *icon;
   NSRect icnBounds;
   unsigned int icnPosition;
-  
+    
   NSBezierPath *highlightPath;
   NSRect hlightRect;
   
   FSNTextCell *label;
   NSRect labelRect;
   FSNInfoType showType;
+
+  unsigned int gridIndex;
   
   BOOL isSelected;
   BOOL selectable;
@@ -92,6 +98,7 @@
 - (id)initForNode:(FSNode *)anode
          iconSize:(float)isize
      iconPosition:(unsigned int)ipos
+        gridIndex:(int)gindex
         labelFont:(NSFont *)labfont
         dndSource:(BOOL)dndsrc
         acceptDnd:(BOOL)dndaccept;

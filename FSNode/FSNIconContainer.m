@@ -21,3 +21,34 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
+
+#include <Foundation/Foundation.h>
+#include <AppKit/AppKit.h>
+#include <math.h>
+#include "FSNIconContainer.h"
+#include "FSNIcon.h"
+#include "FSNFunctions.h"
+#include "GNUstep.h"
+
+@implementation FSNIconContainer
+
+- (void)dealloc
+{
+  [super dealloc];
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@end

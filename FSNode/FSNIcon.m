@@ -72,6 +72,7 @@ static id <DesktopApplication> desktopApp = nil;
 - (id)initForNode:(FSNode *)anode
          iconSize:(float)isize
      iconPosition:(unsigned int)ipos
+        gridIndex:(int)gindex
         labelFont:(NSFont *)labfont
         dndSource:(BOOL)dndsrc
         acceptDnd:(BOOL)dndaccept
@@ -127,6 +128,7 @@ static id <DesktopApplication> desktopApp = nil;
     labelRect.size.height = [[label font] defaultLineHeightForFont];
 
     icnPosition = ipos;
+    gridIndex = gindex;
     
     if (icnPosition == NSImageLeft) {
       [label setAlignment: NSLeftTextAlignment];
@@ -278,6 +280,14 @@ static id <DesktopApplication> desktopApp = nil;
     icnBounds.origin.x = (frameRect.size.width - sz.width) / 2;
     icnBounds.origin.y = 0;
   } 
+}
+
+- (NSMenu *)menuForEvent:(NSEvent *)theEvent
+{
+  if (([theEvent type] == NSRightMouseDown) && isSelected) {
+    return [container menuForEvent: theEvent];
+  }
+  return [super menuForEvent: theEvent]; 
 }
 
 - (void)viewDidMoveToSuperview
@@ -504,6 +514,11 @@ static id <DesktopApplication> desktopApp = nil;
 	return isLocked;
 }
 
+- (int)gridIndex
+{
+  return gridIndex;
+}
+
 - (int)compareAccordingToName:(FSNIcon *)aIcon
 {
   return [node compareAccordingToName: [aIcon node]];
@@ -532,6 +547,11 @@ static id <DesktopApplication> desktopApp = nil;
 - (int)compareAccordingToGroup:(FSNIcon *)aIcon
 {
   return [node compareAccordingToGroup: [aIcon node]];
+}
+
+- (int)compareAccordingToIndex:(FSNIcon *)aIcon
+{
+  return (gridIndex >= [aIcon gridIndex]) ? NSOrderedAscending : NSOrderedDescending;
 }
 
 @end
@@ -597,7 +617,7 @@ static id <DesktopApplication> desktopApp = nil;
 	NSString *fromPath;
   NSString *nodePath;
   NSString *prePath;
-	int i, count;
+	int count;
 
   isDragTarget = NO;
   onSelf = NO;
@@ -755,8 +775,8 @@ static id <DesktopApplication> desktopApp = nil;
   if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"]) {  
     NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"]; 
 
-//    [GWLib concludeRemoteFilesDragOperation: pbData
-//                                atLocalPath: fullpath];
+    [desktopApp concludeRemoteFilesDragOperation: pbData
+                                     atLocalPath: [node path]];
     return;
   }
     
@@ -764,11 +784,11 @@ static id <DesktopApplication> desktopApp = nil;
 
   source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
   
-//	trashPath = [[GWLib workspaceApp] trashPath];
+  trashPath = [desktopApp trashPath];
 
-//	if ([source isEqual: trashPath]) {
-//		operation = GWorkspaceRecycleOutOperation;
-//	} else {	
+  if ([source isEqual: trashPath]) {
+  		operation = @"GWorkspaceRecycleOutOperation";
+	} else {	
 		if (sourceDragMask == NSDragOperationCopy) {
 			operation = NSWorkspaceCopyOperation;
 		} else if (sourceDragMask == NSDragOperationLink) {
@@ -776,7 +796,7 @@ static id <DesktopApplication> desktopApp = nil;
 		} else {
 			operation = NSWorkspaceMoveOperation;
 		}
-//  }
+  }
   
   files = [NSMutableArray arrayWithCapacity: 1];    
   for(i = 0; i < [sourcePaths count]; i++) {    
@@ -789,7 +809,7 @@ static id <DesktopApplication> desktopApp = nil;
 	[opDict setObject: [node path] forKey: @"destination"];
 	[opDict setObject: files forKey: @"files"];
 
-//  [[GWLib workspaceApp] performFileOperationWithDictionary: opDict];
+  [desktopApp performFileOperation: opDict];
 }
 
 @end

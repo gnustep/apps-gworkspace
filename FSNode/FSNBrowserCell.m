@@ -357,6 +357,11 @@ static NSDictionary *fontAttr = nil;
 	return isLocked;
 }
 
+- (int)gridIndex
+{
+  return 0;
+}
+
 - (int)compareAccordingToName:(FSNBrowserCell *)aCell
 {
   return [node compareAccordingToName: [aCell node]];
@@ -385,6 +390,11 @@ static NSDictionary *fontAttr = nil;
 - (int)compareAccordingToGroup:(FSNBrowserCell *)aCell
 {
   return [node compareAccordingToGroup: [aCell node]];
+}
+
+- (int)compareAccordingToIndex:(FSNBrowserCell *)aCell
+{
+  return NSOrderedSame;
 }
 
 @end

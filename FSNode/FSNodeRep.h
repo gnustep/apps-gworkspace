@@ -58,6 +58,8 @@ typedef enum FSNInfoType {
 
 - (BOOL)isLocked;
 
+- (int)gridIndex;
+
 - (int)compareAccordingToName:(id)aObject;
 
 - (int)compareAccordingToKind:(id)aObject;
@@ -69,6 +71,8 @@ typedef enum FSNInfoType {
 - (int)compareAccordingToOwner:(id)aObject;
 
 - (int)compareAccordingToGroup:(id)aObject;
+
+- (int)compareAccordingToIndex:(id)aObject;
 
 @end
 

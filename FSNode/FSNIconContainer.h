@@ -21,3 +21,28 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
+
+#ifndef FSN_ICON_CONTAINER_H
+#define FSN_ICON_CONTAINER_H
+
+#include <Foundation/Foundation.h>
+#include <AppKit/NSView.h>
+#include "FSNodeRep.h"
+
+@interface FSNIconContainer : NSView
+{
+
+
+}
+
+
+
+
+
+
+
+
+
+@end
+
+#endif // FSN_ICON_CONTAINER_H

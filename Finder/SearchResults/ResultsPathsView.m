@@ -125,9 +125,10 @@
     icon = [[FSNIcon alloc] initForNode: node
                                iconSize: ICN_SIZE
                            iconPosition: NSImageLeft
+                              gridIndex: 0
                               labelFont: nil
-                              dndSource: YES
-                              acceptDnd: YES];
+                              dndSource: NO
+                              acceptDnd: NO];
 
     [self addSubview: icon];
     [icons insertObject: icon atIndex: [icons count]];

@@ -1159,4 +1159,31 @@ static Finder *finder = nil;
 }
 #endif
 
+
+//
+// DesktopApplication protocol
+//
+- (NSString *)trashPath
+{
+  return [NSString string];
+}
+
+- (void)performFileOperation:(NSDictionary *)opinfo
+{
+}
+
+- (void)concludeRemoteFilesDragOperation:(NSData *)opinfo
+                             atLocalPath:(NSString *)localdest
+{
+}
+
+
 @end
+
+
+
+
+
+
+
+
