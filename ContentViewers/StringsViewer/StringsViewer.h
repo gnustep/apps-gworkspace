@@ -2,10 +2,11 @@
  *  StringsViewer.h: Interface and declarations for the StringsViewer Class 
  *  of the GNUstep GWorkspace application
  *
- *  Copyright (c) 2001 Enrico Sersale <enrico@imago.ro>
- *  
- *  Author: Enrico Sersale
- *  Date: August 2001
+ *  Copyright (c) 2002 Fabien VALLON <fabien.vallon@fr.alcove.com>
+ *                     Alcove <http://www.alcove.com>
+ *
+ *  Author: Fabien VALLON <fabien.vallon@fr.alcove.com>
+ *  Date: August 2002
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
