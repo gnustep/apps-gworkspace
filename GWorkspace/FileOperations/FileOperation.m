@@ -316,8 +316,14 @@ static NSString *nibName = @"FileOperationWin";
       return;   
 		}
   } 
+    
+  filescount = -1;
+  [executor calculateNumFiles];
+  while (filescount == -1) {
+    [[NSRunLoop currentRunLoop] 
+        runUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.01]];
+  }
   
-  filescount = [executor calculateNumFiles];  
   if (showwin) {
     [self showProgressWin];
   }
@@ -408,6 +414,11 @@ static NSString *nibName = @"FileOperationWin";
 																NSLocalizedString(@"Continue", @""), nil, nil);
 }
 
+- (void)setNumFiles:(int)n
+{
+  filescount = n;
+}
+
 - (void)updateProgressIndicator
 {
   [progInd incrementBy: 1.0];
@@ -429,7 +440,7 @@ static NSString *nibName = @"FileOperationWin";
 	NSMutableDictionary *dict;
   int i;
     
-  notifNames = [[NSMutableArray alloc] initWithCapacity: 1];
+  notifNames = [NSMutableArray new];
   
   if ([operation isEqual: @"NSWorkspaceDuplicateOperation"]) {       
     for(i = 0; i < [files count]; i++) {
@@ -465,8 +476,19 @@ static NSString *nibName = @"FileOperationWin";
 	[notifObj setObject: operation forKey: @"operation"];	
   [notifObj setObject: source forKey: @"source"];	
   [notifObj setObject: destination forKey: @"destination"];	
-  [notifObj setObject: notifNames forKey: @"files"];	
+  
+  if (executor) {
+    NSString *procFilesStr = [executor processedFiles];
 
+    if (procFilesStr) {
+      [notifObj setObject: [procFilesStr propertyList] forKey: @"files"];	
+      [notifObj setObject: notifNames forKey: @"origfiles"];	
+    }
+  } else {
+    [notifObj setObject: notifNames forKey: @"files"];
+    [notifObj setObject: notifNames forKey: @"origfiles"];	
+  }
+  
   opdone = YES;			
 
 	[dnc postNotificationName: GWFileSystemDidChangeNotification
@@ -588,6 +610,7 @@ static NSString *nibName = @"FileOperationWin";
   TEST_RELEASE (source);
   TEST_RELEASE (destination);
   TEST_RELEASE (files);
+  TEST_RELEASE (procfiles);
 	[super dealloc];
 }
 
@@ -642,13 +665,15 @@ static NSString *nibName = @"FileOperationWin";
     ASSIGN (destination, dictEntry);
   }  
 
-  files = [[NSMutableArray alloc] initWithCapacity: 1];
+  files = [NSMutableArray new];
   dictEntry = [opDict objectForKey: @"files"];
   if (dictEntry != nil) {
     for (i = 0; i < [dictEntry count]; i++) {
       [files addObject: [dictEntry objectAtIndex: i]];
     }
   }		
+  
+  procfiles = [NSMutableArray new];
   
   return YES;
 }
@@ -690,7 +715,7 @@ static NSString *nibName = @"FileOperationWin";
   return NO;
 }
 
-- (int)calculateNumFiles
+- (oneway void)calculateNumFiles
 {
 	BOOL isDir;
   NSDirectoryEnumerator *enumerator;
@@ -712,7 +737,7 @@ static NSString *nibName = @"FileOperationWin";
 	  }
   }
 
-  return fcount;	
+  [fileOp setNumFiles: fcount];
 }
 
 - (oneway void)performOperation
@@ -738,9 +763,13 @@ static NSString *nibName = @"FileOperationWin";
 	}
 }
 
+- (NSString *)processedFiles
+{
+  return [procfiles description];
+}
+
 #define CHECK_DONE \
-if (![files count] || stopped) [self done]; \
-if (paused) break 
+if (([files count] == 0) || stopped || paused) break
 
 #define GET_FILENAME filename = [files objectAtIndex: 0]
 
@@ -754,7 +783,6 @@ runUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.01]]
 - (void)doMove
 {
   while (1) {
-	  CHECK_DONE;	
 	  GET_FILENAME;    
 	  CHECK_SAME_NAME;
 
@@ -762,15 +790,21 @@ runUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.01]]
 				  toPath: [destination stringByAppendingPathComponent: filename]
 	 		   handler: self];
 
-	  [files removeObject: filename];	    
+    [procfiles addObject: filename];	 
+	  [files removeObject: filename];	
+    
+	  CHECK_DONE;	
     WAIT; 
-  }                                          
+  }
+  
+  if (([files count] == 0) || stopped) {
+    [self done];
+  }
 }
 
 - (void)doCopy
 {
   while (1) {
-	  CHECK_DONE;	
 	  GET_FILENAME;   
 	  CHECK_SAME_NAME;
 
@@ -778,15 +812,21 @@ runUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.01]]
 				  toPath: [destination stringByAppendingPathComponent: filename]
 	 		   handler: self];
 
+    [procfiles addObject: filename];	 
 	  [files removeObject: filename];	 
+    
+	  CHECK_DONE;	
     WAIT;    
-  }                                        
+  }
+
+  if (([files count] == 0) || stopped) {
+    [self done];
+  }                                          
 }
 
 - (void)doLink
 {
   while (1) {
-	  CHECK_DONE;	
 	  GET_FILENAME;    
 	  CHECK_SAME_NAME;
 
@@ -794,22 +834,35 @@ runUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.01]]
 				  toPath: [destination stringByAppendingPathComponent: filename]
 	 	     handler: self];
 
-	  [files removeObject: filename];	     
+    [procfiles addObject: filename];	 
+	  [files removeObject: filename];	    
+    
+	  CHECK_DONE;	
     WAIT;
+  }
+
+  if (([files count] == 0) || stopped) {
+    [self done];
   }                                            
 }
 
 - (void)doRemove
 {
   while (1) {
-	  CHECK_DONE;	
 	  GET_FILENAME;  
 	
 	  [fm removeFileAtPath: [destination stringByAppendingPathComponent: filename]
 				          handler: self];
 
+    [procfiles addObject: filename];	 
 	  [files removeObject: filename];	
+    
+	  CHECK_DONE;	
     WAIT;     
+  }
+
+  if (([files count] == 0) || stopped) {
+    [self done];
   }                                       
 }
 
@@ -819,7 +872,6 @@ runUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.01]]
 	NSString *newname;
 
   while (1) {
-	  CHECK_DONE;
 	  GET_FILENAME;  
 
 	  newname = [NSString stringWithString: filename];
@@ -837,8 +889,15 @@ runUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.01]]
 				  toPath: fulldestpath 
 			  handler: self];
 
+    [procfiles addObject: newname];	 
 	  [files removeObject: filename];	   
+    
+	  CHECK_DONE;
     WAIT;  
+  }
+  
+  if (([files count] == 0) || stopped) {
+    [self done];
   }                                             
 }
 

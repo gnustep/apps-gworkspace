@@ -1,5 +1,14 @@
 2003-10-03 Enrico Sersale  <enrico@imago.ro>
 
+  * GWorkspace/FileOperations/FileOperation.m
+    -calculateNumFiles doesn't block anymore.
+    the stop button now works.
+
+  * Viewers/SmallIconsViewer/SmallIconsPanel.m
+    in -selectIconWithPath: now the view scroll to show the icon.
+    
+2003-10-03 Enrico Sersale  <enrico@imago.ro>
+
   * GWorkspace/Inspectors/Tools.m
     after setting the default application, the applications icons
     are now shown correctly.

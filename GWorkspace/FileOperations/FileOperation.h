@@ -45,6 +45,8 @@
 
 - (int)showErrorAlertWithMessage:(NSString *)message;
 
+- (void)setNumFiles:(int)n;
+
 - (void)updateProgressIndicator;
 
 - (int)sendDidChangeNotification;
@@ -63,9 +65,11 @@
 
 - (BOOL)checkSameName;
 
-- (int)calculateNumFiles;
+- (oneway void)calculateNumFiles;
 
 - (oneway void)performOperation;
+
+- (NSString *)processedFiles;
 
 - (void)Pause;
 
@@ -142,6 +146,7 @@
 	NSString *source;
 	NSString *destination;
 	NSMutableArray *files;
+	NSMutableArray *procfiles;
 	NSString *filename;
 	int fcount;
 	BOOL stopped;

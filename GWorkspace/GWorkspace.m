@@ -649,12 +649,12 @@ return [ws openFile: fullPath withApplication: appName]
 	[defaults synchronize];
 
   [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
-                				selector: @selector(fileSystemWillChangeNotification:) 
+                				selector: @selector(fileSystemWillChange:) 
                 					  name: GWFileSystemWillChangeNotification
                 					object: nil];
 
   [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
-                				selector: @selector(fileSystemDidChangeNotification:) 
+                				selector: @selector(fileSystemDidChange:) 
                 					  name: GWFileSystemDidChangeNotification
                 					object: nil];
 
@@ -1244,7 +1244,7 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   }
 }
 
-- (void)fileSystemWillChangeNotification:(NSNotification *)notif
+- (void)fileSystemWillChange:(NSNotification *)notif
 {
   NSDictionary *info = [notif userInfo];
   NSString *operation = [info objectForKey: @"operation"];
@@ -1303,13 +1303,14 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 	 								        object: dict];
 }
 
-- (void)fileSystemDidChangeNotification:(NSNotification *)notif
+- (void)fileSystemDidChange:(NSNotification *)notif
 {
   NSDictionary *info = [notif userInfo];
   NSString *operation = [info objectForKey: @"operation"];
   NSString *source = [info objectForKey: @"source"];
   NSString *destination = [info objectForKey: @"destination"];
   NSArray *files = [info objectForKey: @"files"];
+  NSArray *origfiles = [info objectForKey: @"origfiles"];
 	NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity: 1];		
   NSString *opPtr = nil;
 
@@ -1337,7 +1338,7 @@ NSLocalizedString(@"OK", @""), nil, nil); \
            || opPtr == NSWorkspaceDuplicateOperation
 						 || opPtr == NSWorkspaceRecycleOperation
 							 || opPtr == GWorkspaceRecycleOutOperation) { 
-		[GWLib unLockFiles: files inDirectoryAtPath: destination];	
+		[GWLib unLockFiles: origfiles inDirectoryAtPath: destination];	
   }
 
   if (opPtr == NSWorkspaceMoveOperation 
@@ -1345,7 +1346,7 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 				|| opPtr == NSWorkspaceRecycleOperation
 				|| opPtr == GWorkspaceRecycleOutOperation
 				|| opPtr == GWorkspaceEmptyRecyclerOperation) {
-    [GWLib unLockFiles: files inDirectoryAtPath: source];
+    [GWLib unLockFiles: origfiles inDirectoryAtPath: source];
   }
 
 	[dict setObject: opPtr forKey: @"operation"];	
@@ -1355,7 +1356,7 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 
 	[[NSNotificationCenter defaultCenter]
  				postNotificationName: GWFileSystemDidChangeNotification
-	 								        object: dict];
+	 								    object: dict];
 }
 
 - (void)setSelectedPaths:(NSArray *)paths
@@ -1469,6 +1470,7 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   [notifObj setObject: @"" forKey: @"source"];	
   [notifObj setObject: basePath forKey: @"destination"];	
   [notifObj setObject: [NSArray arrayWithObjects: fileName, nil] forKey: @"files"];	
+  [notifObj setObject: [NSArray arrayWithObjects: fileName, nil] forKey: @"origfiles"];	
 
 	[[NSNotificationCenter defaultCenter]
  				 postNotificationName: GWFileSystemWillChangeNotification
@@ -1552,6 +1554,7 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   	[notifObj setObject: basePath forKey: @"source"];	
   	[notifObj setObject: basePath forKey: @"destination"];	
   	[notifObj setObject: [NSArray arrayWithObjects: path, nil] forKey: @"files"];	
+  	[notifObj setObject: [NSArray arrayWithObjects: path, nil] forKey: @"origfiles"];	
 
 		[[NSNotificationCenter defaultCenter]
  					 postNotificationName: GWFileSystemWillChangeNotification

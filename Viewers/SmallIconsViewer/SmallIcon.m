@@ -415,6 +415,7 @@
   	[notifObj setObject: basePath forKey: @"source"];	
   	[notifObj setObject: basePath forKey: @"destination"];	
   	[notifObj setObject: [NSArray arrayWithObjects: path, nil] forKey: @"files"];	
+  	[notifObj setObject: [NSArray arrayWithObjects: path, nil] forKey: @"origfiles"];	
 
 	  [[NSNotificationCenter defaultCenter]
  				   postNotificationName: GWFileSystemWillChangeNotification
@@ -481,6 +482,7 @@
   [notifObj setObject: path forKey: @"source"];	
   [notifObj setObject: newpath forKey: @"destination"];	
   [notifObj setObject: [NSArray arrayWithObjects: @"", nil] forKey: @"files"];	
+  [notifObj setObject: [NSArray arrayWithObjects: @"", nil] forKey: @"origfiles"];	
 
 	[[NSNotificationCenter defaultCenter]
  				 postNotificationName: GWFileSystemWillChangeNotification

@@ -177,9 +177,9 @@
 
 - (void)setShowFileOpStatus:(BOOL)value;
 
-- (void)fileSystemWillChangeNotification:(NSNotification *)notif;
+- (void)fileSystemWillChange:(NSNotification *)notif;
 
-- (void)fileSystemDidChangeNotification:(NSNotification *)notif;
+- (void)fileSystemDidChange:(NSNotification *)notif;
            
 - (void)watcherNotification:(NSNotification *)notification;           
            

@@ -493,7 +493,11 @@ if (s.height > maxr.size.height) s.height = maxr.size.height
     SmallIcon *icon = [icons objectAtIndex: i];    
     
     if ([[icon path] isEqual: path]) {
+      NSRect irect = [icon frame];  
+      irect.origin.y -= ICON_FRAME_MARGIN;
+      irect.size.height += ICON_FRAME_MARGIN * 2;
       [icon select];
+			[self scrollRectToVisible: irect];	      
       return;
     }
   }
