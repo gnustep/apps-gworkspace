@@ -25,8 +25,6 @@
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include <math.h>
-#include <unistd.h>
-#include <limits.h>
 #include "GNUstep.h"
 
 #define TMBMAX (48.0)
@@ -656,37 +654,60 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
 
 @end
 
-int main(int argc, char** argv, char **env_c)
+int main(int argc, char** argv)
 {
-  NSAutoreleasePool *pool;
-	Thumbnailer *thumbnailer;
+  CREATE_AUTORELEASE_POOL(pool);
+  NSProcessInfo *info = [NSProcessInfo processInfo];
+  NSMutableArray *args = AUTORELEASE ([[info arguments] mutableCopy]);
+  static BOOL	is_daemon = NO;
+  BOOL subtask = YES;
 
-	switch (fork()) {
-	  case -1:
-	    fprintf(stderr, "Thumbnailer - fork failed - bye.\n");
-	    exit(1);
+  if ([[info arguments] containsObject: @"--daemon"]) {
+    subtask = NO;
+    is_daemon = YES;
+  }
 
-	  case 0:
-	    setsid();
-	    break;
-
-	  default:
-	    exit(0);
-	}
-  
-  pool = [NSAutoreleasePool new];
-	thumbnailer = [[Thumbnailer alloc] init];
-  RELEASE (pool);
-  
-  if (thumbnailer != nil) {
-    pool = [NSAutoreleasePool new];
+  if (subtask) {
+    NSTask *task = [NSTask new];
     
-    [NSApplication sharedApplication];
-    NSRegisterServicesProvider(thumbnailer, @"Thumbnailer");
-    [[NSRunLoop currentRunLoop] run];
-    
-  	RELEASE (pool);
+    NS_DURING
+	    {
+	      [args removeObjectAtIndex: 0];
+	      [args addObject: @"--daemon"];
+	      [task setLaunchPath: [[NSBundle mainBundle] executablePath]];
+	      [task setArguments: args];
+	      [task setEnvironment: [info environment]];
+	      [task launch];
+	      DESTROY (task);
+	    }
+    NS_HANDLER
+	    {
+	      fprintf (stderr, "unable to launch the fswatcher task. exiting.\n");
+	      DESTROY (task);
+	    }
+    NS_ENDHANDLER
+      
+    exit(EXIT_FAILURE);
   }
   
-  exit(0);
+  RELEASE(pool);
+
+  {
+    CREATE_AUTORELEASE_POOL (pool);
+	  Thumbnailer *thumbnailer = [[Thumbnailer alloc] init];
+    RELEASE (pool);
+
+    if (thumbnailer != nil) {
+	    CREATE_AUTORELEASE_POOL (pool);
+
+      [NSApplication sharedApplication];
+      NSRegisterServicesProvider(thumbnailer, @"Thumbnailer");
+      [[NSRunLoop currentRunLoop] run];
+
+  	  RELEASE (pool);
+    }
+  }
+    
+  exit(EXIT_SUCCESS);
 }
+

@@ -26,23 +26,9 @@
 #include "ddbd.h"
 #include "config.h"
 
-#include <stdio.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-
 #define GWDebugLog(format, args...) \
   do { if (GW_DEBUG_LOG) \
     NSLog(format , ## args); } while (0)
-
-#ifdef __MINGW__
-  #include "process.h"
-#endif
-#include <fcntl.h>
-#ifdef HAVE_SYSLOG_H
-  #include <syslog.h>
-#endif
-#include <signal.h>
 
 #define SYNC_INTERVAL (3600.0)
 #define MIN_INTERVAL (60.0)
@@ -1797,21 +1783,45 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix)
 }
 
 
+
 int main(int argc, char** argv)
 {
-	switch (fork()) {
-	  case -1:
-	    fprintf(stderr, "ddbd - fork failed - bye.\n");
-	    exit(1);
+  CREATE_AUTORELEASE_POOL(pool);
+  NSProcessInfo *info = [NSProcessInfo processInfo];
+  NSMutableArray *args = AUTORELEASE ([[info arguments] mutableCopy]);
+  static BOOL	is_daemon = NO;
+  BOOL subtask = YES;
 
-	  case 0:
-	    setsid();
-	    break;
+  if ([[info arguments] containsObject: @"--daemon"]) {
+    subtask = NO;
+    is_daemon = YES;
+  }
 
-	  default:
-	    exit(0);
-	}
+  if (subtask) {
+    NSTask *task = [NSTask new];
+    
+    NS_DURING
+	    {
+	      [args removeObjectAtIndex: 0];
+	      [args addObject: @"--daemon"];
+	      [task setLaunchPath: [[NSBundle mainBundle] executablePath]];
+	      [task setArguments: args];
+	      [task setEnvironment: [info environment]];
+	      [task launch];
+	      DESTROY (task);
+	    }
+    NS_HANDLER
+	    {
+	      fprintf (stderr, "unable to launch the fswatcher task. exiting.\n");
+	      DESTROY (task);
+	    }
+    NS_ENDHANDLER
+      
+    exit(EXIT_FAILURE);
+  }
   
+  RELEASE(pool);
+
   {
     CREATE_AUTORELEASE_POOL (pool);
 	  DDBd *ddbd = [[DDBd alloc] init];

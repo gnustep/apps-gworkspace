@@ -41,6 +41,9 @@ static FSNodeRep *shared = nil;
 - (NSImage *)resizedIcon:(NSImage *)icon 
                   ofSize:(int)size;
 
+- (NSImage *)icon:(NSImage *)icon 
+      dissolvedBy:(float)delta;
+
 - (void)prepareThumbnailsCache;
 
 - (NSImage *)thumbnailForPath:(NSString *)apath;
@@ -197,6 +200,46 @@ static FSNodeRep *shared = nil;
   }
 
   return nil;
+}
+
+- (NSImage *)icon:(NSImage *)icon 
+      dissolvedBy:(float)delta
+{
+  if (oldresize == NO) {
+    CREATE_AUTORELEASE_POOL(arp);
+    NSSize sz = [icon size];
+    NSImage *newIcon = [[NSImage alloc] initWithSize: sz];
+    NSBitmapImageRep *rep;
+    NSRect r = NSZeroRect;
+    
+    NS_DURING
+      {
+		    [newIcon lockFocus];
+        
+        [icon dissolveToPoint: NSZeroPoint fraction: delta];
+        r.size = sz;
+        rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect: r];
+
+        if (rep) {
+          [newIcon addRepresentation: rep];
+          RELEASE (rep); 
+        }
+
+		    [newIcon unlockFocus];
+      }
+    NS_HANDLER
+      {
+        newIcon = [icon copy];
+      }
+    NS_ENDHANDLER
+
+    RELEASE (arp);
+
+    return [newIcon autorelease];  
+    
+  } else {
+    return icon;
+  }
 }
 
 - (void)prepareThumbnailsCache
@@ -443,7 +486,7 @@ static FSNodeRep *shared = nil;
       icon = AUTORELEASE (img);
     } else {
       if ([node isApplication]) {
-        icon = [self iconOfSize: size forNode: node];
+        icon = [self icon: [self iconOfSize: size forNode: node] dissolvedBy: 0.7];
       } else {
         icon = openFolderIcon;
       }
@@ -452,7 +495,7 @@ static FSNodeRep *shared = nil;
     if ([node isMountPoint]) {
       icon = openHardDiskIcon;
     } else if ([node isApplication]) {    
-      icon = [self iconOfSize: size forNode: node];  
+      icon = [self icon: [self iconOfSize: size forNode: node] dissolvedBy: 0.7];
     } else {
       icon = openFolderIcon;
     }
