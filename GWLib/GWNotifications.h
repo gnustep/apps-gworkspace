@@ -56,7 +56,6 @@ extern NSString *GWorkspaceRenameOperation;
 extern NSString *GWorkspaceRecycleOutOperation;
 extern NSString *GWorkspaceEmptyRecyclerOperation;
 
-
 extern NSString *GSHideDotFilesDidChangeNotification;
 
 extern NSString *GWDesktopViewColorChangedNotification;
