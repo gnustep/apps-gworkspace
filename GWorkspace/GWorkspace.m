@@ -37,7 +37,7 @@
 #include "Preferences/PrefController.h"
 #include "Fiend/Fiend.h"
 #include "ViewersWindow.h"
-#include "GWViewersManager.h"
+#include "SpatialViewer/GWViewersManager.h"
 #include "TShelf/TShelfWin.h"
 #include "TShelf/TShelfView.h"
 #include "TShelf/TShelfViewItem.h"
@@ -320,7 +320,7 @@ static GWorkspace *gworkspace = nil;
 {
   BOOL setSelection = starting ? YES : ([path isEqual: fixPath(@"/", 0)] ? YES : NO);
   NSString *infoPath = [path stringByAppendingPathComponent: @".dirinfo"];
-  BOOL spatial = NO;
+  BOOL spatial = [[NSUserDefaults standardUserDefaults] boolForKey: @"spatialviewers"];
   id viewer = nil;
   
   if ([fm fileExistsAtPath: infoPath]) {
@@ -341,7 +341,7 @@ static GWorkspace *gworkspace = nil;
     RELEASE (viewer);
     
 //  } else {
-//    viewer = [vwrsManager viewerAtPath: path viewsPackages: viewapps];
+//    viewer = [vwrsManager newViewerForPath: path viewsPackages: viewapps];
 //  }
   
   return viewer;

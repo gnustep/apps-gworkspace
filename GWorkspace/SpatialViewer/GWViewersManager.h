@@ -22,42 +22,25 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#include <AppKit/AppKit.h>
-#include "GWViewersManager.h"
-#include "FSNodeRep.h"
-#include "FSNFunctions.h"
+#ifndef GWVIEWERS_MANAGER_H
+#define GWVIEWERS_MANAGER_H
 
-static GWViewersManager *vwrsmanager = nil;
+#include <Foundation/Foundation.h>
 
-@implementation GWViewersManager
+// @class NSWindow;
 
-+ (GWViewersManager *)viewersManager
+@interface GWViewersManager : NSObject
 {
-	if (vwrsmanager == nil) {
-		vwrsmanager = [[GWViewersManager alloc] init];
-	}	
-  return vwrsmanager;
+  NSMutableArray *viewers;
 }
 
-- (void)dealloc
-{
-	[super dealloc];
-}
++ (GWViewersManager *)viewersManager;
 
-- (id)init
-{
-  self = [super init];
-  
-  if (self) {
-  }
-  
-  return self;
-}
+- (id)newViewerForPath:(NSString *)path 
+         viewsPackages:(BOOL)viewspkg;
 
-- (id)viewerAtPath:(NSString *)path 
-     viewsPackages:(BOOL)viewspkg
-{
-  return nil;
-}
+- (id)viewerForPath:(NSString *)path;
 
 @end
+
+#endif // GWVIEWERS_MANAGER_H

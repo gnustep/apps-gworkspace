@@ -49,8 +49,8 @@ GWorkspace.m \
 IconViewsIcon.m \
 GWSplitView.m \
 ViewersWindow.m \
-GWSpatialViewer.m \
-GWViewersManager.m \
+SpatialViewer/GWSpatialViewer.m \
+SpatialViewer/GWViewersManager.m \
 Shelf/Shelf.m \
 Shelf/ShelfIcon.m \
 TShelf/TShelfWin.m \

@@ -21,3 +21,37 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
+
+#ifndef GW_SPATIAL_VIEWER_H
+#define GW_SPATIAL_VIEWER_H
+
+#include <Foundation/Foundation.h>
+
+@class GWViewersManager;
+@class FSNIconsView;
+@class FSNode;
+
+@interface GWSpatialViewer : NSObject
+{
+  IBOutlet id win;
+  IBOutlet id topBox;
+  IBOutlet id elementsLabel;
+  IBOutlet id spaceLabel;
+  IBOutlet id pathsPopUp;
+  IBOutlet id scroll;
+  
+  FSNIconsView *iconsView;
+
+}
+
+- (id)initForNode:(FSNode *)node;
+
+- (void)activate;
+
+- (IBAction)popUpAction:(id)sender;
+
+- (FSNode *)shownNode;
+
+@end
+
+#endif // GW_SPATIAL_VIEWER_H

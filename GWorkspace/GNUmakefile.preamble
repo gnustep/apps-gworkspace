@@ -11,7 +11,7 @@ ADDITIONAL_CFLAGS += -Wall
 # Additional include directories the compiler should search
 ADDITIONAL_INCLUDE_DIRS += -IGWorkspace -I../GWorkspace -I../../GWorkspace
 ADDITIONAL_INCLUDE_DIRS += -IGWLib -I../GWLib -I../../GWLib
-ADDITIONAL_INCLUDE_DIRS += -I../FSNode
+ADDITIONAL_INCLUDE_DIRS += -I../FSNode -I../../FSNode
 
 # Additional LDFLAGS to pass to the linker
 ADDITIONAL_LDFLAGS +=  

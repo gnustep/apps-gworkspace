@@ -2,6 +2,7 @@
 # Things to do before compiling
 before-all::
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/GWorkspace
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/SpatialViewer
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/GWLib	
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Watchers
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Viewers
@@ -22,6 +23,7 @@ before-all::
 # Things to do before installing
 before-install::
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/GWorkspace
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/SpatialViewer
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/GWLib	
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Watchers
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Viewers

@@ -24,17 +24,10 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-  #ifdef GNUSTEP 
 #include "GWFunctions.h"
 #include "GWLib.h"
 #include "GWNotifications.h"
 #include "ViewersProtocol.h"
-  #else
-#include <GWorkspace/GWFunctions.h>
-#include <GWorkspace/GWLib.h>
-#include <GWorkspace/GWNotifications.h>
-#include <GWorkspace/ViewersProtocol.h>
-  #endif
 #include "ViewersWindow.h"
 #include "GWSplitView.h"
 #include "Shelf/Shelf.h"
@@ -50,19 +43,11 @@ if (rct.size.height < 0) rct.size.height = 0; \
 [o setFrame: rct]; \
 }
 
-#ifdef GNUSTEP 
-  #define MIN_SHELF_HEIGHT 2
-  #define MID_SHELF_HEIGHT 77
-  #define MAX_SHELF_HEIGHT 150
-  #define COLLAPSE_LIMIT 35
-  #define MID_LIMIT 110
-#else
-  #define MIN_SHELF_HEIGHT 2
-  #define MID_SHELF_HEIGHT 60
-  #define MAX_SHELF_HEIGHT 120
-  #define COLLAPSE_LIMIT 23
-  #define MID_LIMIT 85
-#endif
+#define MIN_SHELF_HEIGHT 2
+#define MID_SHELF_HEIGHT 77
+#define MAX_SHELF_HEIGHT 150
+#define COLLAPSE_LIMIT 35
+#define MID_LIMIT 110
 
 #define DEFAULT_WIDTH 150
 #define DEFAULT_ICONS_WIDTH 120

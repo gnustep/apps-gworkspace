@@ -30,7 +30,7 @@
 @class NSImage;
 @class Desktop;
 
-typedef enum BackImageStyle {   
+typedef enum BackImageStyle {
   BackImageCenterStyle = 0,
   BackImageFitStyle = 1,
   BackImageTileStyle = 2

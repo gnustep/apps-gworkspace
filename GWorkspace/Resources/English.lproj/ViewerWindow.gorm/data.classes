@@ -140,4 +140,18 @@
 	);
 	Super = NSObject;
     };
+    GWSpatialViewer = {
+	Actions = (
+	    "popUpAction:"
+	);
+	Outlets = (
+	    win,
+	    topBox,
+	    elementsLabel,
+	    spaceLabel,
+	    pathsPopUp,
+	    scroll
+	);
+	Super = NSObject;
+    };
 }
