@@ -298,6 +298,10 @@
   }
 }
 
+- (void)selectReps:(NSArray *)reps
+{
+}
+
 - (void)selectRepsOfSubnodes:(NSArray *)nodes
 {
 }

@@ -1204,6 +1204,27 @@ pp.x = NSMaxX([self bounds]) - 1
   }
 }
 
+- (void)selectReps:(NSArray *)reps
+{
+  int i;
+  
+  selectionMask = NSSingleSelectionMask;
+  selectionMask |= FSNCreatingSelectionMask;
+  
+	[self unselectOtherReps: nil];
+  
+  selectionMask = FSNMultipleSelectionMask;
+  selectionMask |= FSNCreatingSelectionMask;
+
+  for (i = 0; i < [reps count]; i++) {
+    [[reps objectAtIndex: i] select];
+  }  
+
+  selectionMask = NSSingleSelectionMask;
+
+  [self selectionDidChange];
+}
+
 - (void)selectRepsOfSubnodes:(NSArray *)nodes
 {
   int i;

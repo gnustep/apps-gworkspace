@@ -159,6 +159,8 @@ typedef enum FSNSelectionMask {
 
 - (void)unselectOtherReps:(id)arep;
 
+- (void)selectReps:(NSArray *)reps;
+
 - (void)selectRepsOfSubnodes:(NSArray *)nodes;
 
 - (void)selectRepsOfPaths:(NSArray *)paths;
