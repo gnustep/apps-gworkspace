@@ -709,6 +709,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
       if ([path isEqualToString: [panel currentPath]]) {
         [panel addIconsWithNames: [notifdict objectForKey: @"files"] 
                           dimmed: NO];
+        [panel tile];                 
       }
     }
   }

@@ -725,7 +725,7 @@ if (s.height > maxr.size.height) s.height = maxr.size.height
 {
   if ([currentPath isEqual: bpath]) {
     [self addIconsWithNames: files dimmed: YES];
-
+    [self tile];
   } else if (subPathOfPath(bpath, currentPath)) {
     int i;
 

@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
   #ifdef GNUSTEP 
@@ -70,8 +69,13 @@
   NSMutableDictionary *notifdict;
 
 #define FW_NOTIFY(o) { \
-[[NSNotificationCenter defaultCenter] \
-postNotificationName: GWFileWatcherFileDidChangeNotification object: o]; \
+NSNotification *notif = [NSNotification notificationWithName: \
+GWFileWatcherFileDidChangeNotification object: o]; \
+[[NSNotificationQueue defaultQueue] \
+enqueueNotification: notif postingStyle: NSPostASAP \
+coalesceMask: NSNotificationNoCoalescing \
+forModes: nil]; \
+AUTORELEASE (o); \
 } 
  
 	if (isOld) {
@@ -84,7 +88,7 @@ postNotificationName: GWFileWatcherFileDidChangeNotification object: o]; \
     notifdict = [NSMutableDictionary dictionaryWithCapacity: 1];
     [notifdict setObject: GWWatchedDirectoryDeleted forKey: @"event"];
     [notifdict setObject: watchedPath forKey: @"path"];
-    FW_NOTIFY (notifdict);
+    FW_NOTIFY ([notifdict copy]);
 		isOld = YES;
     return;
   }
@@ -92,24 +96,29 @@ postNotificationName: GWFileWatcherFileDidChangeNotification object: o]; \
   moddate = [attributes fileModificationDate];
 
   if ([date isEqualToDate: moddate] == NO) {
-    NSArray *newconts = [fm directoryContentsAtPath: watchedPath];
-    NSMutableArray *diffFiles = [NSMutableArray arrayWithCapacity: 1];
+    NSArray *oldconts = [pathContents copy];
+    NSArray *newconts = [fm directoryContentsAtPath: watchedPath];	
+    NSMutableArray *diffFiles = [NSMutableArray array];
     int i;
 
-    notifdict = [NSMutableDictionary dictionaryWithCapacity: 1];
+    ASSIGN (date, moddate);	
+    ASSIGN (pathContents, newconts);
+
+    notifdict = [NSMutableDictionary dictionary];
     [notifdict setObject: watchedPath forKey: @"path"];
 
 		/* if there is an error in fileAttributesAtPath */
 		/* or watchedPath doesn't exist anymore         */
 		if (newconts == nil) {		
 			[notifdict setObject: GWWatchedDirectoryDeleted forKey: @"event"];
-    	FW_NOTIFY (notifdict);
+    	FW_NOTIFY ([notifdict copy]);
+      RELEASE (oldconts);
 			isOld = YES;
     	return;
 		}
 		
-    for (i = 0; i < [pathContents count]; i++) {
-      NSString *fname = [pathContents objectAtIndex: i];
+    for (i = 0; i < [oldconts count]; i++) {
+      NSString *fname = [oldconts objectAtIndex: i];
       if ((newconts) && ([newconts containsObject: fname] == NO)) {
         [diffFiles addObject: fname];
       }
@@ -131,16 +140,18 @@ postNotificationName: GWFileWatcherFileDidChangeNotification object: o]; \
 			if (locked == NO) {
       	[notifdict setObject: GWFileDeletedInWatchedDirectory forKey: @"event"];
       	[notifdict setObject: diffFiles forKey: @"files"];
-      	FW_NOTIFY (notifdict);
+      	FW_NOTIFY ([notifdict copy]);
+        RELEASE (oldconts);
+        return;
 			}
     }
 
-    [diffFiles removeAllObjects];
+    diffFiles = [NSMutableArray array];
 
 		if (newconts) {
     	for (i = 0; i < [newconts count]; i++) {
       	NSString *fname = [newconts objectAtIndex: i];
-      	if ([pathContents containsObject: fname] == NO) {   
+      	if ([oldconts containsObject: fname] == NO) {   
         	[diffFiles addObject: fname];
       	}
     	}
@@ -163,12 +174,13 @@ postNotificationName: GWFileWatcherFileDidChangeNotification object: o]; \
       	[notifdict setObject: watchedPath forKey: @"path"];
       	[notifdict setObject: GWFileCreatedInWatchedDirectory forKey: @"event"];
       	[notifdict setObject: diffFiles forKey: @"files"];
-      	FW_NOTIFY (notifdict);
+      	FW_NOTIFY ([notifdict copy]);
+        RELEASE (oldconts);
+        return;        
 			}
     }
-		
-		ASSIGN (pathContents, newconts);
-    ASSIGN (date, moddate);		
+    
+    TEST_RELEASE (oldconts);		
 	}   
 }
 
