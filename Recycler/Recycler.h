@@ -156,29 +156,4 @@
 
 @end
 
-
-@interface NSApplication (Recycler)
-
-- (void)setRecyclerIcon:(id)icn;
-
-- (void)unsetRecyclerIcon;
-
-@end
-
-
-@interface NSAppIconWindow : NSWindow
-{
-  id recyclerIcon;
-}
-
-- (void)setRecyclerIcon:(id)icn;
-
-- (void)unsetRecyclerIcon;
-
-@end
-
-
-@interface NSAppIconView : NSView
-@end
-
 #endif // RECYCLER_H

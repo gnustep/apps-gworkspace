@@ -33,7 +33,6 @@
 #include "FSNFunctions.h"
 #include "GNUstep.h"
 
-
 static Recycler *recycler = nil;
 
 @implementation Recycler
@@ -126,12 +125,8 @@ static Recycler *recycler = nil;
   docked = [[NSUserDefaults standardUserDefaults] boolForKey: @"docked"];
 
   if (docked) {
-    NSWindow *appwin = [NSApp iconWindow];
-
     recview = [[RecyclerView alloc] init];
-    [NSApp setRecyclerIcon: [recview trashIcon]];
-    [appwin registerForDraggedTypes: [NSArray arrayWithObject: NSFilenamesPboardType]];    
-  
+    [[[NSApp iconWindow] contentView] addSubview: recview];
   } else {
     [NSApp setApplicationIconImage: [NSApp applicationIconImage]];
     recview = [[RecyclerView alloc] initWithWindow];
@@ -175,16 +170,12 @@ static Recycler *recycler = nil;
   docked = value;
 
   if (docked) {
-    NSWindow *appwin = [NSApp iconWindow];
-
     [[recview window] close];
     DESTROY (recview);
     recview = [[RecyclerView alloc] init];
-    [NSApp setRecyclerIcon: [recview trashIcon]];
-    [appwin registerForDraggedTypes: [NSArray arrayWithObject: NSFilenamesPboardType]];    
-  
+    [[[NSApp iconWindow] contentView] addSubview: recview];
+
   } else {
-    [NSApp unsetRecyclerIcon];
     DESTROY (recview);
     recview = [[RecyclerView alloc] initWithWindow];
     [recview activate];
@@ -674,145 +665,4 @@ static Recycler *recycler = nil;
 
 @end
 
-
-@implementation	NSAppIconWindow
-
-- (void)dealloc
-{
-  TEST_RELEASE (recyclerIcon);
-	[super dealloc];
-}
-
-- (BOOL)canBecomeMainWindow
-{
-  return NO;
-}
-
-- (BOOL)canBecomeKeyWindow
-{
-  return NO;
-}
-
-- (BOOL)worksWhenModal
-{
-  return YES;
-}
-
-- (void)_initDefaults
-{
-  [super _initDefaults];
-  [self setTitle: [[NSProcessInfo processInfo] processName]];
-  [self setExcludedFromWindowsMenu: YES];
-  [self setReleasedWhenClosed: NO];
-	[self setLevel: NSDockWindowLevel];
-  recyclerIcon = nil;
-}
-
-- (void)setRecyclerIcon:(id)icn
-{
-  ASSIGN (recyclerIcon, icn);
-  [self setContentView: [recyclerIcon superview]];	
-}
-
-- (void)unsetRecyclerIcon
-{
-  [[recyclerIcon superview] removeFromSuperview];
-  DESTROY (recyclerIcon);
-  [self setContentView: nil];
-}
-
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
-{
-  if (recyclerIcon) {
-    return [recyclerIcon draggingEntered: sender];
-  }
-  return NSDragOperationNone;
-}
-
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
-{
-  if (recyclerIcon) {
-	  return [recyclerIcon draggingUpdated: sender];
-  }
-  return NSDragOperationNone;
-}
-
-- (void)draggingExited:(id <NSDraggingInfo>)sender
-{
-  if (recyclerIcon) {
-	  [recyclerIcon draggingExited: sender];  
-  }
-}
-
-- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
-{
-  if (recyclerIcon) {
-	  return [recyclerIcon prepareForDragOperation: sender];
-  }
-  return NO;
-}
-
-- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
-{
-  if (recyclerIcon) {
-	  return [recyclerIcon performDragOperation: sender];
-  }
-  return NO;
-}
-
-- (void)concludeDragOperation:(id <NSDraggingInfo>)sender
-{
-  if (recyclerIcon) {
-    [recyclerIcon concludeDragOperation: sender];
-  }
-}
-
-@end
-
-
-@implementation NSAppIconView
-@end
-
-
-@implementation	NSApplication (Recycler)
-
-- (id)_appIconInit
-{
-  NSAppIconView	*iv;
-  
-  if (_app_icon == nil) {
-    [self setApplicationIconImage: [NSImage imageNamed: @"GNUstep"]];
-  }
-
-  _app_icon_window = [[NSAppIconWindow alloc] initWithContentRect: NSMakeRect(0,0,64,64)
-				                          styleMask: NSIconWindowMask
-				                            backing: NSBackingStoreRetained
-				                              defer: NO
-				                             screen: nil];
-  
-  iv = [[NSAppIconView alloc] initWithFrame: NSMakeRect(0, 0, 64, 64)];
-  [_app_icon_window setContentView: iv];
-  RELEASE(iv);
-  
-  [_app_icon_window orderFrontRegardless];
-  
-  return self;
-}
-
-- (void)setRecyclerIcon:(id)icn
-{
-  [(NSAppIconWindow *)_app_icon_window setRecyclerIcon: icn];
-}
-
-- (void)unsetRecyclerIcon
-{
-  NSAppIconView	*iv = [[NSAppIconView alloc] initWithFrame: NSMakeRect(0, 0, 64, 64)];
-
-  [(NSAppIconWindow *)_app_icon_window unsetRecyclerIcon];
-  [_app_icon_window setContentView: iv];
-  [self setApplicationIconImage: _app_icon];
-  RELEASE(iv);
-}
-
-@end
 

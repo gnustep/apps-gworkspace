@@ -89,7 +89,7 @@
 - (void)dealloc
 {
   RELEASE (tile);
-  RELEASE (win);
+  TEST_RELEASE (win);
 	[super dealloc];
 }
 
@@ -121,12 +121,12 @@
   self = [self init];
 
   if (self) {
-	  win = [[RecyclerWindow alloc] initWithContentRect: NSZeroRect
+	  win = [[RecyclerWindow alloc] initWithContentRect: NSMakeRect(0, 0, WIN_SIZE, WIN_SIZE)
 					                      styleMask: NSBorderlessWindowMask  
                                   backing: NSBackingStoreBuffered 
                                     defer: NO];
 
-    if ([win setFrameUsingName: @"recycler"] == NO) {
+    if ([win setFrameUsingName: @"recycler_win"] == NO) {
 			NSRect r = [[NSScreen mainScreen] frame];
       [win setFrame: NSMakeRect(r.size.width - WIN_SIZE, 0, WIN_SIZE, WIN_SIZE) 
             display: NO];
@@ -155,7 +155,7 @@
 - (void)updateDefaults
 {
 	if (win && [win isVisible]) {
-  	[win saveFrameUsingName: @"recycler"];
+  	[win saveFrameUsingName: @"recycler_win"];
 	}
 }
 
