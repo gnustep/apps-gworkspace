@@ -34,7 +34,6 @@
   int defSortType;
   BOOL hideSysFiles;
   
-  NSMutableArray *watchers;
   NSMutableArray *watchedPaths;  
 
 	NSMutableArray *lockedPaths;

@@ -28,7 +28,6 @@
 #include "GWLib.h"
 #include "GWFunctions.h"
 #include "GWNotifications.h"
-#include "FSWatcher.h"
 #include "GWProtocol.h"
 #include "GNUstep.h"
 #ifndef GNUSTEP 
@@ -73,12 +72,6 @@ id instance = nil;
 - (void)addWatcherForPath:(NSString *)path;
 
 - (void)removeWatcherForPath:(NSString *)path;
-
-- (void)watcherTimeOut:(id)sender;
-
-- (void)removeWatcher:(FSWatcher *)awatcher;
-
-- (FSWatcher *)watcherForPath:(NSString *)path;
 
 - (void)watcherNotification:(NSNotification *)notification;
 
@@ -155,7 +148,6 @@ id instance = nil;
   [nc removeObserver: self];
 
   RELEASE (cachedContents);
-	RELEASE (watchers);
   RELEASE (watchedPaths);
 	RELEASE (lockedPaths);
 	RELEASE (hiddenPaths);
@@ -181,7 +173,6 @@ id instance = nil;
     defSortType = byname;
     hideSysFiles = NO;
     
-    watchers = [NSMutableArray new];	
     watchedPaths = [NSMutableArray new];
     hiddenPaths = [NSArray new];
 	  lockedPaths = [NSMutableArray new];	
@@ -211,10 +202,6 @@ id instance = nil;
                           object: nil];
                           
     workspaceApp = [self workspaceApp];                        
-
-    [NSTimer scheduledTimerWithTimeInterval: 1.0 
-											target: self selector: @selector(watcherTimeOut:) 
-																								 userInfo: nil repeats: YES];
   }
   
   return self;
@@ -424,86 +411,12 @@ id instance = nil;
 
 - (void)addWatcherForPath:(NSString *)path
 {
-//  FSWatcher *watcher = [self watcherForPath: path];
-	  
-    
   [workspaceApp addWatcherForPath: path];
-//  NSLog(@"addWatcherForPath: %@", path);  
-  
-  printf("addWatcherForPath: %s\n", [path cString]);
-  
-/*    
-  if ((watcher != nil) && ([watcher isOld] == NO)) { 
-    [watcher addListener];   
-    return;
-  } else {
-    BOOL isdir;
-    
-    if ([fm fileExistsAtPath: path isDirectory: &isdir] && isdir) {
-  	  watcher = [[FSWatcher alloc] initForWatchAtPath: path];      
-  	  [watchers addObject: watcher];
-  	  RELEASE (watcher);  
-    }
-	}
-  */
 }
 
 - (void)removeWatcherForPath:(NSString *)path
 {
-//  FSWatcher *watcher = [self watcherForPath: path];
-
-  
   [workspaceApp removeWatcherForPath: path];
-//  NSLog(@"removeWatcherForPath: %@", path);  
-
-  printf("removeWatcherForPath: %s\n", [path cString]);
-
-/*  
-  if (watcher && ([watcher isOld] == NO)) {
-  	[watcher removeListener];   
-  }
-*/
-}
-
-- (void)watcherTimeOut:(id)sender
-{
-  int count = [watchers count];
-  int i;
-  
-  for (i = 0; i < count; i++) {
-    FSWatcher *watcher = [watchers objectAtIndex: i];    
-
-    if ([watcher isOld]) {
-      [self removeWatcher: watcher];
-      count--;
-      i--;
-    } else {
-      [watcher watchFile];
-      
-//      [[NSRunLoop currentRunLoop] 
-//          runUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.001]];
-
-    }
-  }
-}
-
-- (void)removeWatcher:(FSWatcher *)awatcher
-{
-	[watchers removeObject: awatcher];
-}
-
-- (FSWatcher *)watcherForPath:(NSString *)path
-{
-  int i;
-
-  for (i = 0; i < [watchers count]; i++) {
-    FSWatcher *watcher = [watchers objectAtIndex: i];    
-    if ([watcher isWathcingPath: path]) { 
-      return watcher;
-    }
-  }
-  
-  return nil;
 }
 
 - (void)watcherNotification:(NSNotification *)notification

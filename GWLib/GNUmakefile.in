@@ -32,7 +32,6 @@ ifeq ($(FOUNDATION_LIB), apple)
                            BCell.m \
                            BIcon.m \
                            BIconLabel.m \
-                           FSWatcher.m \
                            BNameEditor.m \
                            OSXCompatibility.m
 else
@@ -45,7 +44,6 @@ else
                            BCell.m \
                            BIcon.m \
                            BIconLabel.m \
-                           FSWatcher.m \
                            BNameEditor.m 
 endif
 
