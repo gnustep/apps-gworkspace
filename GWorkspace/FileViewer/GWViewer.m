@@ -225,7 +225,7 @@
         for (i = 0; i < count; i++) {
           NSString *s = [selection objectAtIndex: i];
 
-          if ([fm fileExistsAtPath: s] == NO){
+          if ([fm fileExistsAtPath: s] == NO) {
             [selection removeObject: s];
             count--;
             i--;
@@ -318,7 +318,7 @@
 
   visibleCols = myrintf(r.size.width / [vwrwin resizeIncrements].width);  
   
-  r = [[pathsScroll documentView] frame];
+  r = [[pathsScroll contentView] frame];
   pathsView = [[GWViewerIconsPath alloc] initWithFrame: r 
                    visibleIcons: visibleCols forViewer: self
                    ownsScroller: ([viewType isEqual: @"Browser"] == NO)];
