@@ -366,10 +366,41 @@
 @end
 
 
+@implementation CustomView 
+
+- (id)initWithFrame:(NSRect)frameRect
+{
+  self = [super initWithFrame: frameRect];
+
+  [self setBackgroundColor: [NSColor darkGrayColor]];
+  [self setTextColor: [NSColor whiteColor]];
+  [self setDrawsBackground: YES];
+  [self setAlignment: NSCenterTextAlignment];
+  [self setFont: [NSFont boldSystemFontOfSize: 12]];
+  [self setEditable: NO];
+  [self setClassName: @"CustomView"];
+  
+  return self;
+}
+
+- (void)setClassName:(NSString *)aName
+{
+  [self setStringValue: aName];
+}
+
+- (NSString *)className
+{
+  return [self stringValue];
+}
+
+@end
+
 @implementation IBViewPboardViewer
 
 - (void)dealloc
 {
+  RELEASE (scroll);
+  
   [super dealloc];
 }
 
@@ -378,7 +409,12 @@
   self = [super initWithFrame: frame];
   
   if(self) {
-
+		scroll = [[NSScrollView alloc] initWithFrame: [self bounds]];
+    [scroll setBorderType: NSBezelBorder];
+		[scroll setHasHorizontalScroller: YES];
+  	[scroll setHasVerticalScroller: YES]; 
+		[scroll setAutoresizingMask: NSViewHeightSizable | NSViewWidthSizable];
+  	[self addSubview: scroll]; 
   }
 	
 	return self;
@@ -388,71 +424,87 @@
 {
   NSUnarchiver *u;
   NSArray	*objects;
+  NSMutableArray *checkedObjects;
   id obj;
-  NSRect r;
-
-
-  return NO;
-
-  
-  if ([self subviews] && [[self subviews] count]) {
-    [[[self subviews] objectAtIndex: 0] removeFromSuperview];
-  }
-  
-  
-  u = [[NSUnarchiver alloc] initForReadingWithData: data];
+  NSPoint orp, szp;
+  int i;
 
 
 /*
-  [u decodeClassName: @"GSNibContainer" 
-     asClassName: @"GormDocument"];
-  [u decodeClassName: @"GSNibItem" 
-     asClassName: @"GormObjectProxy"];
-  [u decodeClassName: @"GSCustomView" 
-     asClassName: @"GormCustomView"];
+	IBCellPboardType, IBMenuPboardType, IBMenuCellPboardType,
+	IBObjectPboardType, IBViewPboardType, IBWindowPboardType,
+        IBFormatterPboardType
 
-  // classes
-  [u decodeClassName: @"NSMenu" 
-     asClassName: @"GormNSMenu"];
-  [u decodeClassName: @"NSWindow" 
-     asClassName: @"GormNSWindow"];
-  [u decodeClassName: @"NSPanel" 
-     asClassName: @"GormNSPanel"];
-  [u decodeClassName: @"NSPopUpButton" 
-     asClassName: @"GormNSPopUpButton"];
-  [u decodeClassName: @"NSPopUpButtonCell"
-     asClassName: @"GormNSPopUpButtonCell"];
-  [u decodeClassName: @"NSBrowser" 
-     asClassName: @"GormNSBrowser"];
-  [u decodeClassName: @"NSTableView" 
-     asClassName: @"GormNSTableView"];
-  [u decodeClassName: @"NSOutlineView" 
-     asClassName: @"GormNSOutlineView"];
-
-
- [u decodeClassName: @"GSCustomView" 
-     asClassName: @"GormCustomView"];
- 
-
-*/
-
- [u decodeClassName: @"GormCustomView" 
-        asClassName: @"NSObject"];
 
 
 
 
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+#define MARGIN 10
+
+  orp = NSMakePoint(10000, 10000);
+  szp = NSMakePoint(0, 0);
+  
+  u = [[NSUnarchiver alloc] initForReadingWithData: data];
   objects = [u decodeObject];
-  obj = [objects objectAtIndex: 0];
-  r = [obj frame];
-  r.origin = NSMakePoint(5, 5);
-  [obj setFrame: r];
-  
-  [self addSubview: obj];
-  
   RELEASE (u);
-  return YES;
-  
+
+  checkedObjects = [NSMutableArray array];
+
+  for (i = 0; i < [objects count]; i++) {
+    obj = [objects objectAtIndex: i];
+
+    if ([obj respondsToSelector: @selector(frame)]) {
+      NSRect objr = [obj frame];
+      
+      orp.x = (objr.origin.x < orp.x) ? objr.origin.x : orp.x;
+      orp.y = (objr.origin.y < orp.y) ? objr.origin.y : orp.y;
+      szp.x = ((objr.origin.x + objr.size.width) > szp.x) ? 
+                          (objr.origin.x + objr.size.width) : szp.x;
+      szp.y = ((objr.origin.y + objr.size.height) > szp.y) ? 
+                          (objr.origin.y + objr.size.height) : szp.y;
+
+      [checkedObjects addObject: obj];
+    }
+  }
+
+  if ([checkedObjects count]) {
+    NSView *objsView;
+    NSRect objsrect;
+    
+    objsrect = NSMakeRect(0, 0, szp.x - orp.x + MARGIN * 2, szp.y - orp.y + MARGIN * 2);
+    objsView = [[NSView alloc] initWithFrame: objsrect];
+    [objsView setAutoresizesSubviews: YES];
+    
+    for (i = 0; i < [checkedObjects count]; i++) {
+      obj = [checkedObjects objectAtIndex: i];
+      NSRect objr = [obj frame];
+    
+      objr.origin.x = objr.origin.x - orp.x + MARGIN;
+      objr.origin.y = objr.origin.y - orp.y + MARGIN;
+      [obj setFrame: objr];
+      [objsView addSubview: obj];
+    }
+    
+    [scroll setDocumentView: objsView];
+
+    RELEASE (objsView);
+    
+    return YES;
+  }
 
   return NO;
 }

@@ -1,5 +1,11 @@
 2003-10-10 Enrico Sersale  <enrico@imago.ro>
   
+  * ContentViewers/PasteboardViewer/PasteboardViewer.m
+    Enabled. Actually it works with many Gorm objects.
+    Problems with: NSBrowser, NSTableView, NSOutlineView and NSPopUpMenu.
+
+2003-10-10 Enrico Sersale  <enrico@imago.ro>
+  
   * ContentViewers/PasteboardViewer
     New contents viewer inspector.
 

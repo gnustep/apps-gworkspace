@@ -80,8 +80,18 @@
 
 @end
 
+@interface CustomView : NSTextField
+{
+}
+
+- (void)setClassName:(NSString *)aName;
+- (NSString *)className;
+
+@end
+
 @interface IBViewPboardViewer : NSView 
 {
+  NSScrollView *scroll;
 }
 
 - (BOOL)displayData:(NSData *)data 
