@@ -812,24 +812,41 @@ static GWViewersManager *vwrsmanager = nil;
     NSMutableArray *history = (spatial ? spatialViewersHistory: [viewer history]);
     int position = (spatial ? spvHistoryPos : [viewer historyPosition]);
     id hisviewer = [historyWindow viewer];
+    int cachemax = [gworkspace maxHistoryCache];
+    int count;
 
-	  if (position == ([history count] - 1)) {
+    while ([history count] > cachemax) {
+      [history removeObjectAtIndex: 0];
+  
+      if (position > 0) {
+        position--;
+      }
+    }
+    
+    count = [history count];
+    
+	  if (position == (count - 1)) {
 		  if ([[history lastObject] isEqual: node] == NO) {
-			  [history insertObject: node atIndex: [history count]];
+			  [history insertObject: node atIndex: count];
 		  }
       position = [history count] - 1;
 
-    } else if ([history count] > (position + 1)) {
-		  if (([[history objectAtIndex: position + 1] isEqual: node] == NO)
-				    && ([[history objectAtIndex: position] isEqual: node] == NO)) {
+    } else if (count > (position + 1)) {
+      BOOL equalpos = [[history objectAtIndex: position] isEqual: node];
+      BOOL equalnext = [[history objectAtIndex: position + 1] isEqual: node];
+    
+		  if (((equalpos == NO) && (equalnext == NO)) || equalnext) {
 			  position++;
-			  [history insertObject: node atIndex: position];
-
+        
+        if (equalnext == NO) {
+			    [history insertObject: node atIndex: position];
+        }
+        
 			  while ((position + 1) < [history count]) {
 				  int last = [history count] - 1;
 				  [history removeObjectAtIndex: last];
 			  }
-		  }	
+		  }
 	  }
 
     [self tuneHistory: history position: &position];
@@ -906,7 +923,7 @@ if (*pos >= i) *pos -= n; \
 			}
 		}
 	}
-  
+    
   CHECK_POSITION (0);
 }
 

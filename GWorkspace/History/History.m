@@ -105,20 +105,14 @@
 
 - (void)setHistoryNodes:(NSArray *)nodes
 {
+  int count = (nodes ? [nodes count] : 0);
 	int i;
-	  	    
-  while (1) {
-    if ([[matrix cells] count] == 0) {
-      break;
-    }
-    [matrix removeRow: 0];
-  }
+
+  [matrix renewRows: count columns: 1];
 	  
-	if ((nodes == nil) || ([nodes count] == 0)) {
+	if ((nodes == nil) || (count == 0)) {
 		[matrix sizeToCells];
-		if ([win isVisible]) {
-  		[matrix setNeedsDisplay: YES];  
-		}
+    [matrix setNeedsDisplay: [win isVisible]];  
 		return;
 	}
 
@@ -127,28 +121,21 @@
 		NSString *base = [node parentPath];		
 		NSString *name = [node name];
 		NSString *title = [NSString stringWithFormat: @"%@ - %@", name, base];
-    id cell;
-
-    [matrix insertRow: i];
-    cell = [matrix cellAtRow: i column: 0];  
+    id cell = [matrix cellAtRow: i column: 0];  
+    
     [cell setTitle: title];
     [cell setLeaf: YES]; 
 	}
 
 	[self setMatrixWidth];
 	[matrix sizeToCells];
-	
-	if ([win isVisible]) {
-  	[matrix setNeedsDisplay: YES];  
-	}
+  [matrix setNeedsDisplay: [win isVisible]];  
 }
 
 - (void)setHistoryPosition:(int)position
 {
   if ((position >= 0) && (position < [[matrix cells] count])) {
-    NSRect rect = [matrix cellFrameAtRow: position column: 0];
-	  rect = NSMakeRect(rect.origin.x, rect.origin.y, 10, 10);
-	  [matrix scrollRectToVisible: rect];	
+    [matrix scrollCellToVisibleAtRow: position column: 0];
 	  [matrix selectCellAtRow: position column: 0];
   }
 }

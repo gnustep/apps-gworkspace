@@ -143,8 +143,10 @@
     
   PrefController *prefController;
   Fiend *fiend;
+  
   History *history;
-	  
+	int maxHistoryCache;
+    
   GWViewersManager *vwrsManager;
 
   BOOL animateChdir;
@@ -256,6 +258,10 @@
 - (void)thumbnailsDidChange:(NSNotification *)notif;
 
 - (void)applicationForExtensionsDidChange:(NSNotification *)notif;
+
+- (int)maxHistoryCache;
+
+- (void)setMaxHistoryCache:(int)value;
 
 - (void)connectFSWatcher;
 

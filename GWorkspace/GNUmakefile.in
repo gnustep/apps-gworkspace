@@ -70,6 +70,7 @@ Preferences/XTermPref.m \
 Preferences/DefSortOrderPref.m \
 Preferences/IconsPref.m \
 Preferences/HiddenFilesPref.m \
+Preferences/HistoryPref.m \
 Preferences/BrowserViewerPref.m \
 History/History.m \
 Dialogs/Dialogs.m \

@@ -61,9 +61,7 @@ static GWorkspace *gworkspace = nil;
   #define byowner 4
 #endif
 
-#ifndef CACHED_MAX
-  #define CACHED_MAX 20
-#endif
+#define HISTORT_CACHE_MAX 20
 
 #ifndef TSHF_MAXF
   #define TSHF_MAXF 999
@@ -509,6 +507,13 @@ static GWorkspace *gworkspace = nil;
     [fsnodeRep setHiddenPaths: entry];
 	} 
 
+	entry = [defaults objectForKey: @"history_cache"];
+	if (entry) {
+    maxHistoryCache = [entry intValue];
+	} else {
+    maxHistoryCache = HISTORT_CACHE_MAX;
+  }
+
   animateChdir = ![defaults boolForKey: @"nochdiranim"];
   animateSlideBack = ![defaults boolForKey: @"noslidebackanim"];
   
@@ -868,6 +873,9 @@ static GWorkspace *gworkspace = nil;
 
   [defaults setBool: [fsnodeRep usesThumbnails]  
              forKey: @"use_thumbnails"];
+
+  entry = [NSNumber numberWithInt: maxHistoryCache];
+  [defaults setObject: entry forKey: @"history_cache"];
 
   [defaults setBool: (inspectorApp != nil) forKey: @"uses_inspector"];
 
@@ -1522,6 +1530,16 @@ static GWorkspace *gworkspace = nil;
                                        inRole: nil 
                                  forExtension: [extensions objectAtIndex: i]];  
   }
+}
+
+- (int)maxHistoryCache
+{
+  return maxHistoryCache;
+}
+
+- (void)setMaxHistoryCache:(int)value
+{
+  maxHistoryCache = value;
 }
 
 - (void)connectFSWatcher
