@@ -20,6 +20,7 @@ endif
 #
 SUBPROJECTS = Utilities \
 	      			  Inspector \
+	      			  Operation \
 	      			  GWLib \
 	      			  Viewers \
 	      			  GWorkspace 
