@@ -1,4 +1,4 @@
-/* FSNIconContainer.h
+/* FSNIconsView.h
  *  
  * Copyright (C) 2004 Free Software Foundation, Inc.
  *
@@ -22,8 +22,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef FSN_ICON_CONTAINER_H
-#define FSN_ICON_CONTAINER_H
+#ifndef FSN_ICONS_VIEW_H
+#define FSN_ICONS_VIEW_H
 
 #include <Foundation/Foundation.h>
 #include <AppKit/NSView.h>
@@ -35,7 +35,7 @@
 @class FSNIcon;
 @class FSNIconNameEditor;
 
-@interface FSNIconContainer : NSView <FSNodeRepContainer>
+@interface FSNIconsView : NSView <FSNodeRepContainer>
 {
   FSNode *node;
   NSString *infoPath;
@@ -94,7 +94,7 @@
 @end
 
 
-@interface FSNIconContainer (DraggingDestination)
+@interface FSNIconsView (DraggingDestination)
 
 - (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender;
 
@@ -111,7 +111,7 @@
 @end
 
 
-@interface FSNIconContainer (IconNameEditing)
+@interface FSNIconsView (IconNameEditing)
 
 - (void)updateNameEditor;
 
@@ -126,4 +126,4 @@
 
 @end
 
-#endif // FSN_ICON_CONTAINER_H
+#endif // FSN_ICONS_VIEW_H

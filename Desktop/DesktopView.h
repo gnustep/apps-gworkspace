@@ -25,7 +25,7 @@
 #ifndef DESKTOP_VIEW_H
 #define DESKTOP_VIEW_H
 
-#include "FSNIconContainer.h"
+#include "FSNIconsView.h"
 
 @class NSImage;
 @class Desktop;
@@ -37,7 +37,7 @@ typedef enum BackImageStyle {
 } BackImageStyle;
 
 
-@interface DesktopView : FSNIconContainer
+@interface DesktopView : FSNIconsView
 {
   NSRect screenFrame;  
   NSRect *grid;

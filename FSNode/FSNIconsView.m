@@ -1,4 +1,4 @@
-/* FSNIconContainer.m
+/* FSNIconsView.m
  *  
  * Copyright (C) 2004 Free Software Foundation, Inc.
  *
@@ -25,7 +25,7 @@
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include <math.h>
-#include "FSNIconContainer.h"
+#include "FSNIconsView.h"
 #include "FSNIcon.h"
 #include "FSNFunctions.h"
 #include "GNUstep.h"
@@ -62,7 +62,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
 [o setFrame: NSIntegralRect(rct)]; \
 }
 
-@implementation FSNIconContainer
+@implementation FSNIconsView
 
 - (void)dealloc
 {
@@ -358,6 +358,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
   irect.size.height += border * 2;
   [self scrollRectToVisible: irect];	
 }
+
 
 - (NSString *)selectIconWithPrefix:(NSString *)prefix
 {
@@ -1423,7 +1424,7 @@ pp.x = NSMaxX([self bounds]) - 1
 @end
 
 
-@implementation FSNIconContainer (DraggingDestination)
+@implementation FSNIconsView (DraggingDestination)
 
 - (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
 {
@@ -1590,7 +1591,7 @@ pp.x = NSMaxX([self bounds]) - 1
 @end
 
 
-@implementation FSNIconContainer (IconNameEditing)
+@implementation FSNIconsView (IconNameEditing)
 
 - (void)updateNameEditor
 {
