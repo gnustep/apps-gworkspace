@@ -141,7 +141,7 @@
 	if (w > lenght) {
 		i = 0;
 		while (cw <= (lenght - dotslenght)) {
-			if (i == [label cStringLength]) {
+			if (i == [label length]) {
 				break;
       }
 			cutname = [label substringToIndex: i];
@@ -150,7 +150,7 @@
 			i++;
 		}	
 		if ([cutname isEqual: label] == NO) {      
-			if ([reststr cStringLength] <= 3) { 
+			if ([reststr length] <= 3) { 
 				return label;
 			} else {
 				cutname = [cutname stringByAppendingString: dots];

@@ -196,7 +196,7 @@
   if ([secondNode isSubnodeOfNode: firstNode]) {
     NSString *p1 = [firstNode path];
     NSString *p2 = [secondNode path];
-    int index = ([p1 isEqual: path_separator()]) ? [p1 cStringLength] : ([p1 cStringLength] +1);
+    int index = ([p1 isEqual: path_separator()]) ? [p1 length] : ([p1 length] +1);
     NSArray *pcomps = [[p2 substringFromIndex: index] pathComponents];
     NSMutableArray *components = [NSMutableArray array];
     FSNode *node;
@@ -228,7 +228,7 @@
   if ([secondNode isSubnodeOfNode: firstNode]) {
     NSString *p1 = [firstNode path];
     NSString *p2 = [secondNode path];
-    int index = ([p1 isEqual: path_separator()]) ? [p1 cStringLength] : ([p1 cStringLength] +1);
+    int index = ([p1 isEqual: path_separator()]) ? [p1 length] : ([p1 length] +1);
     
     return [[p2 substringFromIndex: index] pathComponents];
     

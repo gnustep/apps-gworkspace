@@ -88,7 +88,7 @@ static inline NSString *cut_Text(NSString *filename, id label, int lenght)
 	if (w > lenght) {
 		i = 0;
 		while (cw <= (lenght - dotslenght)) {
-			if (i == [filename cStringLength]) {
+			if (i == [filename length]) {
 				break;
       }
 			cutname = [filename substringToIndex: i];
@@ -97,7 +97,7 @@ static inline NSString *cut_Text(NSString *filename, id label, int lenght)
 			i++;
 		}	
 		if ([cutname isEqual: filename] == NO) {      
-			if ([reststr cStringLength] <= 3) { 
+			if ([reststr length] <= 3) { 
 				return filename;
 			} else {
 				cutname = [cutname stringByAppendingString: dots];
@@ -275,7 +275,7 @@ NSString *cutFileLabelText(NSString *filename, id label, int lenght)
     }
 
     if ([filename sizeWithAttributes: fontAttr].width > lenght) {
-      int tl = [filename cStringLength];
+      int tl = [filename length];
 
       if (tl <= 5) {
         return dots;
@@ -285,7 +285,7 @@ NSString *cutFileLabelText(NSString *filename, id label, int lenght)
         NSString *fp = [filename substringToIndex: fpto];
         NSString *sp = [filename substringFromIndex: spfr];
         NSString *dotted = [NSString stringWithFormat: @"%@%@%@", fp, dots, sp];
-        int dl = [dotted cStringLength];
+        int dl = [dotted length];
         float dotl = [dotted sizeWithAttributes: fontAttr].width;
         int p = 0;
 
@@ -305,7 +305,7 @@ NSString *cutFileLabelText(NSString *filename, id label, int lenght)
           sp = [filename substringFromIndex: spfr];
           dotted = [NSString stringWithFormat: @"%@%@%@", fp, dots, sp];
           dotl = [dotted sizeWithAttributes: fontAttr].width;
-          dl = [dotted cStringLength];
+          dl = [dotted length];
         }      
 
         return dotted;

@@ -160,7 +160,7 @@ static int infoheight = 0;
             toFitWidth:(float)width
 {
   if ([title sizeWithAttributes: fontAttr].width > width) {
-    int tl = [title cStringLength];
+    int tl = [title length];
   
     if (tl <= 5) {
       return dots;
@@ -170,7 +170,7 @@ static int infoheight = 0;
       NSString *fp = [title substringToIndex: fpto];
       NSString *sp = [title substringFromIndex: spfr];
       NSString *dotted = [NSString stringWithFormat: @"%@%@%@", fp, dots, sp];
-      int dl = [dotted cStringLength];
+      int dl = [dotted length];
       float dotl = [dotted sizeWithAttributes: fontAttr].width;
       int p = 0;
 
@@ -190,7 +190,7 @@ static int infoheight = 0;
         sp = [title substringFromIndex: spfr];
         dotted = [NSString stringWithFormat: @"%@%@%@", fp, dots, sp];
         dotl = [dotted sizeWithAttributes: fontAttr].width;
-        dl = [dotted cStringLength];
+        dl = [dotted length];
       }      
       
       return dotted;

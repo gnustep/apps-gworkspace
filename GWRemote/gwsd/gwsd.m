@@ -191,7 +191,7 @@ static GWSd *shared = nil;
 
       passwd = [args objectAtIndex: 1];
 
-      if ([passwd cStringLength] < 8) {
+      if ([passwd length] < 8) {
         NSLog(@"Invalid password\nThe password must have altmost 8 characters");
         exit(0);
       }

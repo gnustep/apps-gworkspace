@@ -35,7 +35,6 @@
 #endif
 #include <signal.h>
 
-
 @implementation	LSFd
 
 - (void)dealloc

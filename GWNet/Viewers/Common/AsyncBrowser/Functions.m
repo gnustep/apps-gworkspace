@@ -80,7 +80,7 @@ static inline NSString *cut_label_text(NSString *filename, id label, int lenght)
 	if (w > lenght) {
 		i = 0;
 		while (cw <= (lenght - dotslenght)) {
-			if (i == [filename cStringLength]) {
+			if (i == [filename length]) {
 				break;
       }
 			cutname = [filename substringToIndex: i];
@@ -89,7 +89,7 @@ static inline NSString *cut_label_text(NSString *filename, id label, int lenght)
 			i++;
 		}	
 		if ([cutname isEqual: filename] == NO) {      
-			if ([reststr cStringLength] <= 3) { 
+			if ([reststr length] <= 3) { 
 				return filename;
 			} else {
 				cutname = [cutname stringByAppendingString: dots];

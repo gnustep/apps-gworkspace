@@ -224,7 +224,7 @@ double myrintf(double a)
 			subStrings = [path componentsSeparatedByString: pathSeparator];
 					
 		} else {
-			NSString *rpath = [path substringFromIndex: [basePath cStringLength]];
+			NSString *rpath = [path substringFromIndex: [basePath length]];
 			subStrings = [rpath componentsSeparatedByString: pathSeparator];
 		}
 		
