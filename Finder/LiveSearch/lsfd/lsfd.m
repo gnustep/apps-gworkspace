@@ -96,8 +96,10 @@
          selector: @selector(connectionBecameInvalid:)
 	           name: NSConnectionDidDieNotification
 	         object: newConn];
-           
-  ASSIGN (finderconn, newConn);
+
+  if ((ancestor == conn) && (finder == nil)) {
+    ASSIGN (finderconn, newConn);
+  }
   
   return YES;
 }
@@ -122,42 +124,18 @@
 
 - (void)registerFinder:(id <LSFdClientProtocol>)fndr
 {
-	NSConnection *connection = [(NSDistantObject *)fndr connectionForProxy];
-
-  if (connection != finderconn) {
-    [NSException raise: NSInternalInconsistencyException
-		            format: @"registration with unknown connection"];
-  }
-
-  if (finder != nil) { 
-    [NSException raise: NSInternalInconsistencyException
-		            format: @"registration with registered client"];
-  }
-
-  if ([(id)fndr isProxy]) {
-    [(id)fndr setProtocolForProxy: @protocol(LSFdClientProtocol)];
-    ASSIGN (finder, fndr);
-  }
+  [(id)fndr setProtocolForProxy: @protocol(LSFdClientProtocol)];
+  ASSIGN (finder, fndr);
 }
 
 - (void)unregisterFinder:(id <LSFdClientProtocol>)fndr
 {
 	NSConnection *connection = [(NSDistantObject *)fndr connectionForProxy];
 
-	if (connection != finderconn) {
-    [NSException raise: NSInternalInconsistencyException
-		            format: @"unregistration with unknown connection"];
-  }
-
-  if (finder == nil) { 
-    [NSException raise: NSInternalInconsistencyException
-                format: @"unregistration with unregistered client"];
-  }
-
   [nc removeObserver: self
 	              name: NSConnectionDidDieNotification
 	            object: connection];
-
+              
   DESTROY (finderconn);
   DESTROY (finder);
 }
