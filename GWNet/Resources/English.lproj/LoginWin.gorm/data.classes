@@ -1,18 +1,4 @@
 {
-    FileOpInfo = {
-	Actions = (
-	    "stopAction:"
-	);
-	Outlets = (
-	    win,
-	    nameField,
-	    globProgInd,
-	    stopButt,
-	    sizeField,
-	    fileProgInd
-	);
-	Super = NSObject;
-    };
     FirstResponder = {
 	Actions = (
 	    "activateContextHelpMode:",
@@ -153,11 +139,24 @@
 	    "useStandardLigatures:",
 	    "yank:",
 	    "zoom:",
-	    "pause:",
-	    "initForViewer:",
-	    "stopAction:",
-	    "indicatorForViewer:",
-	    "newAction:"
+	    "cancelLoginAction:",
+	    "okLoginAction:"
+	);
+	Super = NSObject;
+    };
+    OpenUrlDlog = {
+	Actions = (
+	    "cancelLoginAction:",
+	    "okLoginAction:"
+	);
+	Outlets = (
+	    loginWin,
+	    userLabel,
+	    userField,
+	    passwdLabel,
+	    passwdField,
+	    buttCancelLogin,
+	    buttOkLogin
 	);
 	Super = NSObject;
     };
