@@ -232,9 +232,19 @@
   return isSubpathOfPath([anode path], path);
 }
 
+- (BOOL)isSubnodeOfPath:(NSString *)apath
+{
+  return isSubpathOfPath(apath, path);
+}
+
 - (BOOL)isParentOfNode:(FSNode *)anode
 {
   return isSubpathOfPath(path, [anode path]);
+}
+
+- (BOOL)isParentOfPath:(NSString *)apath
+{
+  return isSubpathOfPath(path, apath);
 }
 
 - (NSString *)path

@@ -297,6 +297,10 @@
 {
 }
 
+- (void)checkLockedReps
+{
+}
+
 - (void)setSelectionMask:(FSNSelectionMask)mask
 {
 }

@@ -91,7 +91,11 @@
 
 - (BOOL)isSubnodeOfNode:(FSNode *)anode;
 
+- (BOOL)isSubnodeOfPath:(NSString *)apath;
+
 - (BOOL)isParentOfNode:(FSNode *)anode;
+
+- (BOOL)isParentOfPath:(NSString *)apath;
 
 - (NSString *)path;
 

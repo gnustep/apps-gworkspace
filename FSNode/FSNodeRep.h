@@ -124,6 +124,8 @@ typedef enum FSNSelectionMask {
 
 - (void)selectionDidChange;
 
+- (void)checkLockedReps;
+
 - (void)setSelectionMask:(FSNSelectionMask)mask;
 
 - (FSNSelectionMask)selectionMask;
