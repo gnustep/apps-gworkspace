@@ -153,9 +153,7 @@
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-  if (isSelect == NO) {  
-    [self select];
-  }
+  [self select];
 }
 
 - (void)drawRect:(NSRect)rect

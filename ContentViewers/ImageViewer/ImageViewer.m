@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
   #ifdef GNUSTEP 
@@ -193,46 +192,7 @@
 
 - (BOOL)displayData:(NSData *)data ofType:(NSString *)type
 {
-  NSImage *image = [[NSImage alloc] initWithData: data];
-  
-  buttOk = [panel okButton];
-  if (buttOk) {
-    [buttOk setEnabled: NO];			
-  }
-
-  if (image != nil) {
-    NSSize is = [image size];
-    NSSize rs = imrect.size;
-    NSSize size;
-            
-    if (valid == NO) {
-      valid = YES;
-      [label removeFromSuperview];
-      [self addSubview: imview]; 
-    }
-    
-    if ((is.width <= rs.width) && (is.height <= rs.height)) {
-      [imview setImageScaling: NSScaleNone];
-    } 
-    else {
-      [imview setImageScaling: NSScaleProportionally];
-    }
-    
-    [imview setImage: image];
-    size = [image size];
-    [widthResult setStringValue: [[NSNumber numberWithInt: size.width] stringValue]];
-    [heightResult setStringValue:[[NSNumber numberWithInt: size.height] stringValue]];
-    
-    RELEASE (image);
-    return YES;    	
-  } else {
-    if (valid == YES) {
-      valid = NO;
-      [imview removeFromSuperview];
-			[self addSubview: label];
-    }
-    return NO;
-  }
+  return NO;
 }
 
 - (BOOL)stopTasks
@@ -273,9 +233,6 @@
 
 - (BOOL)canDisplayData:(NSData *)data ofType:(NSString *)type
 {
-  if ([type isEqual: NSTIFFPboardType]) {
-    return YES;
-  }
   return NO;
 }
 

@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
   #ifdef GNUSTEP 
@@ -352,7 +351,6 @@ static NSString *nibName = @"ContentsPanel";
   [revertButt setEnabled: NO];
 	
   [(NSBox *)vwrsBox setContentView: nil];
-  winName = NSLocalizedString(@"Pasteboard Inspector", @"");
 
   viewer = [self viewerForData: data ofType: type];
   
@@ -362,12 +360,14 @@ static NSString *nibName = @"ContentsPanel";
     }
     
     currentViewer = viewer;
+    winName = [viewer winname];
     [(NSBox *)vwrsBox setContentView: viewer];
     
     if ([viewer displayData: data ofType: type] == NO) {
 		  [(NSBox *)vwrsBox setContentView: nil];
       [genericField setStringValue: NSLocalizedString(@"no data inspector", @"")];
       [(NSBox *)vwrsBox setContentView: genericView];
+      winName = NSLocalizedString(@"Pasteboard Inspector", @"");
     }
 	} else {	   
     if (currentViewer) {
@@ -376,7 +376,8 @@ static NSString *nibName = @"ContentsPanel";
     }   
     [genericField setStringValue: NSLocalizedString(@"no data inspector", @"")];
     [(NSBox *)vwrsBox setContentView: genericView];
-	}
+	  winName = NSLocalizedString(@"Pasteboard Inspector", @"");
+  }
 	
   w = [inspBox window];	
 	[w setTitle: winName];

@@ -112,9 +112,9 @@ static NSString *nibName = @"InspectorsWin";
 	if (paths == nil) {
 		return;
 	}
-	if(([currentPaths isEqualToArray: paths]) && (showingPb == NO)) {
-		return;
-	}
+//	if(([currentPaths isEqualToArray: paths]) && (showingPb == NO)) {
+//		return;
+//	}
   
   if (showingPb && currentInspector) {
     [win setTitle: [currentInspector winname]];

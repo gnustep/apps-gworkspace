@@ -11,8 +11,9 @@ SUBPROJECTS = \
   RtfViewer \
   PlistViewer \
   StringsViewer \
+  PdfViewer \
+  PasteboardViewer \
   InspectorViewer \
-  PdfViewer 
 else
 SUBPROJECTS = \
   FolderViewer \
@@ -22,7 +23,8 @@ SUBPROJECTS = \
   RtfViewer \
   PlistViewer \
   StringsViewer \
-  InspectorViewer
+  PasteboardViewer \
+  InspectorViewer 
 endif
 
 -include GNUmakefile.preamble

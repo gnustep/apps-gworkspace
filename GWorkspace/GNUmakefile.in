@@ -53,7 +53,8 @@ ifneq ($(GS_PATH), none)
     ../ContentViewers/InspectorViewer/InspectorViewer.inspector \
     ../ContentViewers/StringsViewer/StringsViewer.inspector \
     ../ContentViewers/PlistViewer/PlistViewer.inspector \
-    ../ContentViewers/PdfViewer/PdfViewer.inspector 
+    ../ContentViewers/PdfViewer/PdfViewer.inspector \
+    ../ContentViewers/PasteboardViewer/PasteboardViewer.inspector 
 else
   GWorkspace_RESOURCE_FILES = \
     Resources/Icons/* \
@@ -75,6 +76,7 @@ else
     ../ContentViewers/RtfViewer/RtfViewer.inspector \
     ../ContentViewers/StringsViewer/StringsViewer.inspector \
     ../ContentViewers/PlistViewer/PlistViewer.inspector \
+    ../ContentViewers/PasteboardViewer/PasteboardViewer.inspector \
     ../ContentViewers/InspectorViewer/InspectorViewer.inspector 
 endif
 

@@ -1,5 +1,10 @@
-2003-10-09 Enrico Sersale  <enrico@imago.ro>
+2003-10-10 Enrico Sersale  <enrico@imago.ro>
+  
+  * ContentViewers/PasteboardViewer
+    New contents viewer inspector.
 
+2003-10-09 Enrico Sersale  <enrico@imago.ro>
+  
   * Added support for cut, copy and paste operation to the Tabbed Shelf. 
 
 2003-10-07 Enrico Sersale  <enrico@imago.ro>

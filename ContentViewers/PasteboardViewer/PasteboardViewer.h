@@ -1,9 +1,9 @@
-/* ImageViewer.h
+/* PasteboardViewer.h
  *  
  * Copyright (C) 2003 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
- * Date: August 2001
+ * Date: Octomber 2003
  *
  * This file is part of the GNUstep GWorkspace application
  *
@@ -22,8 +22,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef IMAGEVIEWER_H
-#define IMAGEVIEWER_H
+#ifndef PASTEBOARDVIEWER_H
+#define PASTEBOARDVIEWER_H
 
   #ifdef GNUSTEP 
 #include "ContentViewersProtocol.h"
@@ -35,27 +35,46 @@
 @class NSArray;
 @class NSImageView;
 @class NSTextField;
+@class NSAttributedString;
+@class NSTextView;
+@class NSScrollView;
+@class NSRTFPboardViewer;
+@class NSTIFFPboardViewer;
+// @class IBViewPboardViewer;
 
-@interface ImageViewer : NSView <ContentViewersProtocol>
+@interface PasteboardViewer : NSView <ContentViewersProtocol>
 {
   id panel;
-  id buttOk;
-  NSArray *extsarr;
-  NSImageView *imview;
-  NSRect imrect;
   NSTextField *label;
-  NSTextField *widthResult,*heightResult;
-  BOOL valid;	
+  id buttOk;
   int index;
-  NSString *editPath;
   NSString *bundlePath;
-  NSString *localizedStr;
-  id fm;
-  id ws;
+  NSRTFPboardViewer *RTFViewer;
+  NSTIFFPboardViewer *TIFFViewer;
+  id currentViewer;
 }
-
-- (void)editFile:(id)sender;
 
 @end
 
-#endif // IMAGEVIEWER_H
+@interface NSRTFPboardViewer : NSView 
+{
+  NSScrollView *scrollView;
+  NSTextView *textView;
+}
+
+- (BOOL)displayData:(NSData *)data ofType:(NSString *)type;
+
+@end
+
+@interface NSTIFFPboardViewer : NSView 
+{
+  NSImageView *imview;
+  NSRect imrect;
+  NSTextField *widthResult, *heightResult;
+}
+
+- (BOOL)displayData:(NSData *)data ofType:(NSString *)type;
+
+@end
+
+#endif // PASTEBOARDVIEWER_H
