@@ -394,9 +394,10 @@ return [ws openFile: fullPath withApplication: appName]
 
 - (ViewersWindow *)newViewerAtPath:(NSString *)path canViewApps:(BOOL)viewapps
 {
+  BOOL setSelection = starting ? YES : ([path isEqual: fixPath(@"/", 0)] ? YES : NO);
 	ViewersWindow *viewer = [[ViewersWindow alloc] initWithViewerTemplates: viewersTemplates
-                                        forPath: path viewPakages: viewapps 
-                                           isRootViewer: NO onStart: starting];
+                                   forPath: path viewPakages: viewapps 
+                                        isRootViewer: NO onStart: setSelection];
   [viewer activate];
   [viewers addObject: viewer];
   RELEASE (viewer);
@@ -1998,14 +1999,7 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
     if([rootViewer isVisible] == NO) {
   	  [rootViewer activate];
     } else {
-      ViewersWindow *viewer;
-      NSArray *selpaths;
-    
-      [rootViewer updateDefaults];
-      selpaths = [rootViewer selectedPaths];
-      viewer = [self newViewerAtPath: fixPath(@"/", 0) canViewApps: NO];
-      [viewer setViewerSelection: selpaths];
-      [viewer activate];
+      [self newViewerAtPath: fixPath(@"/", 0) canViewApps: NO];
     }
   }
 }

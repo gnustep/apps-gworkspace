@@ -134,7 +134,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
 
     isRootViewer = rootviewer;
 		
-    if (isRootViewer) {
+    if (isRootViewer || [path isEqual: fixPath(@"/", 0)]) {
       [self setTitle: NSLocalizedString(@"File Viewer", @"")];
     } else {
 			NSString *pth = [path stringByDeletingLastPathComponent];
@@ -195,22 +195,40 @@ if (rct.size.height < 0) rct.size.height = 0; \
       }    
       
     } else {
-      if ((isRootViewer == NO) && ([rootPath isEqual: fixPath(@"/", 0)] == NO)) {
+      if (isRootViewer == NO) {
         if ([self setFrameUsingName: [NSString stringWithFormat: @"Viewer at %@", path]] == NO) {
-          [self setFrame: NSMakeRect(200, 200, resizeIncrement * 3, 500) display: NO];
+          if ([rootPath isEqual: fixPath(@"/", 0)]) {
+            if ([self setFrameUsingName: @"rootViewer"] == NO) {
+              [self setFrame: NSMakeRect(200, 200, resizeIncrement * 3, 500) display: NO];
+            } else {
+              NSPoint fop = [self frame].origin;
+              fop.x += 30;
+              fop.y -= 30;
+              [self setFrameOrigin: fop];
+            }
+          } else {
+            [self setFrame: NSMakeRect(200, 200, resizeIncrement * 3, 500) display: NO];
+          }
         }  
       } else {
         if ([self setFrameUsingName: @"rootViewer"] == NO) {
           [self setFrame: NSMakeRect(200, 200, resizeIncrement * 3, 500) display: NO];
-        } else if (isRootViewer == NO) {
-          NSPoint fop = [self frame].origin;
-          fop.x += 30;
-          fop.y -= 30;
-          [self setFrameOrigin: fop];
-        }       
+        }      
       } 
     }
-    			
+    
+    if ((isRootViewer == NO) && [rootPath isEqual: fixPath(@"/", 0)]) {    
+      RELEASE (myPrefs);
+    
+      defEntry = [viewersPrefs objectForKey: rootPath];
+    
+      if (defEntry) { 
+ 		    myPrefs = [defEntry mutableCopy];
+      } else {
+        myPrefs = [[NSMutableDictionary alloc] initWithCapacity: 1];
+      }
+    }
+
 		/* ************* */
 		/*     shelf     */
 		/* ************* */
@@ -315,10 +333,10 @@ if (rct.size.height < 0) rct.size.height = 0; \
       NSString *dictPath = [rootPath stringByAppendingPathComponent: @".gwdir"];
       [myPrefs writeToFile: dictPath atomically: YES];
     } else {
-      if ((isRootViewer == NO) && ([rootPath isEqual: fixPath(@"/", 0)] == NO)) {
+      if (isRootViewer == NO) {
 	      [viewersPrefs setObject: myPrefs forKey: rootPath];
       } else {
-	      [viewersPrefs setObject: myPrefs forKey: @"rootViewer"];
+        [viewersPrefs setObject: myPrefs forKey: @"rootViewer"];
       }
 	    [defaults setObject: viewersPrefs forKey: @"viewersprefs"];
       [defaults synchronize];    
@@ -441,7 +459,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
   NSString *selpath;  
 	NSRect r;
       
-  if (isRootViewer) {
+  if (isRootViewer || [rootPath isEqual: fixPath(@"/", 0)]) {
     [self setTitle: NSLocalizedString(@"File Viewer", @"")];
   } else {
 		NSString *pth = [rootPath stringByDeletingLastPathComponent];
@@ -704,7 +722,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
   } else {
     id dictEntry;
     
-    if ((isRootViewer == NO) && ([rootPath isEqual: fixPath(@"/", 0)] == NO)) {
+    if (isRootViewer == NO) {
       [self saveFrameUsingName: [NSString stringWithFormat: @"Viewer at %@", rootPath]];
     } else {
       [self saveFrameUsingName: @"rootViewer"];
@@ -713,7 +731,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
     defaults = [NSUserDefaults standardUserDefaults];	
     viewersPrefs = [[defaults dictionaryForKey: @"viewersprefs"] mutableCopy];
 	
-    if ((isRootViewer == NO) && ([rootPath isEqual: fixPath(@"/", 0)] == NO)) {
+    if (isRootViewer == NO) {
       dictEntry = [viewersPrefs objectForKey: rootPath];
     } else {
       dictEntry = [viewersPrefs objectForKey: @"rootViewer"];
@@ -761,7 +779,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
     [myPrefs writeToFile: dictPath atomically: YES];
 
   } else {
-    if ((isRootViewer == NO) && ([rootPath isEqual: fixPath(@"/", 0)] == NO)) {
+    if (isRootViewer == NO) {
 	    [viewersPrefs setObject: myPrefs forKey: rootPath];
     } else {
 	    [viewersPrefs setObject: myPrefs forKey: @"rootViewer"];
@@ -1263,7 +1281,7 @@ currHistoryPos = (currHistoryPos >= count) ? (count - 1) : currHistoryPos
 	ASSIGN (selectedPaths, paths);
 	[gw setSelectedPaths: paths];
 	
-  if ([apath isEqualToString: fixPath(@"/", 0)] == YES) {
+  if ([apath isEqualToString: fixPath(@"/", 0)]) {
     [self setTitle: NSLocalizedString(@"File Viewer", @"")];
   } else {
 		NSString *pth = [apath stringByDeletingLastPathComponent];
