@@ -775,7 +775,7 @@
   NSArray *selection = [nodeView selectedPaths];  
   int count = [selection count];
   
-  [vwrwin makeFirstResponder: nodeView];  
+  [vwrwin makeFirstResponder: nodeView]; 
 
   [manager selectedSpatialViewerChanged: self];
 
@@ -794,6 +794,9 @@
   }
   
   [self selectionChanged: selection];
+
+  [manager addNode: baseNode toHistoryOfViewer: self];     
+  [manager changeHistoryOwner: self];
 }
 
 - (BOOL)windowShouldClose:(id)sender

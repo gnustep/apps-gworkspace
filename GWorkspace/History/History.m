@@ -22,19 +22,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-#include "GWFunctions.h"
 #include "History.h"
+#include "GWViewersManager.h"
+#include "GWFunctions.h"
 #include "GNUstep.h"
 
 @implementation History
 
 - (void)dealloc
 {
-  RELEASE (matrix);
-	RELEASE (scrollView);
   RELEASE (win);
   [super dealloc];
 }
@@ -44,7 +42,7 @@
 	self = [super init];
   
   if (self) {
-		id cell;
+		NSSize ms;
 	  unsigned int style = NSTitledWindowMask | NSClosableWindowMask				
 							                                    | NSResizableWindowMask;
 
@@ -65,25 +63,27 @@
     [scrollView setHasVerticalScroller: YES]; 
   	[scrollView setAutoresizingMask: (NSViewWidthSizable | NSViewHeightSizable)];
 		[scrollView setFrame: [[win contentView] frame]];
-    [[win contentView] addSubview: scrollView];
-
-    cell = AUTORELEASE ([NSButtonCell new]);
-    [cell setButtonType: NSPushOnPushOffButton];
-    [cell setBordered: NO];
-    [cell setFont: [NSFont systemFontOfSize: 12]];
-    [cell setAlignment: NSLeftTextAlignment]; 
-
-    matrix = [[NSMatrix alloc] initWithFrame: NSZeroRect
-			      	    mode: NSRadioModeMatrix prototype: cell
-		       							        numberOfRows: 0 numberOfColumns: 0];
-
+    [win setContentView: scrollView];
+    RELEASE (scrollView);
+    
+    matrix = [[NSMatrix alloc] initWithFrame: NSMakeRect(0, 0, 100, 100)
+				            	                mode: NSRadioModeMatrix 
+                                 prototype: [[NSBrowserCell new] autorelease]
+			       						      numberOfRows: 0 
+                           numberOfColumns: 0];
+    [matrix setTarget: self];
+    [matrix setDoubleAction: @selector(matrixAction:)];
     [matrix setIntercellSpacing: NSZeroSize];
-    [matrix setTarget: self];		
-    [matrix setDoubleAction: @selector(setViewerPath:)];	
-    [scrollView setDocumentView: matrix];
+    ms.width = [[scrollView contentView] frame].size.width;
+    ms.height = [[NSFont systemFontOfSize: 12] defaultLineHeightForFont];
+    [matrix setCellSize: ms];
+    [matrix setAutoscroll: YES];
+	  [matrix setAllowsEmptySelection: YES];
+	  [scrollView setDocumentView: matrix];	
+    RELEASE (matrix);
 
 		viewer = nil;
-}
+  }
 
   return self;
 }
@@ -98,26 +98,23 @@
 	viewer = aviewer;
 }
 
-- (void)setHistoryPaths:(NSArray *)paths
+- (id)viewer
 {
-	NSArray *cellList;
-	BOOL isnew;
+	return viewer;
+}
+
+- (void)setHistoryNodes:(NSArray *)nodes
+{
 	int i;
-		
-	cellList = [matrix cells];
-  isnew = (cellList == nil);
-				
-  if((!isnew) && ([cellList count] > 0)) { 
-    while (1) {
-      int count = [[matrix cells] count];
-      if (count == 0) {
-        break;
-      }
-      [matrix removeRow: count - 1];
+	  	    
+  while (1) {
+    if ([[matrix cells] count] == 0) {
+      break;
     }
+    [matrix removeRow: 0];
   }
-	
-	if ((paths == nil) || ([paths count] == 0)) {
+	  
+	if ((nodes == nil) || ([nodes count] == 0)) {
 		[matrix sizeToCells];
 		if ([win isVisible]) {
   		[matrix setNeedsDisplay: YES];  
@@ -125,31 +122,21 @@
 		return;
 	}
 
-	if (isnew) {
-		[matrix addColumn]; 
-	}
-	
-  for (i = 0; i < [paths count]; ++i) {
-		NSString *fullpath = [paths objectAtIndex: i];	
-		NSString *basepath = [fullpath stringByDeletingLastPathComponent];		
-		NSString *name = [fullpath lastPathComponent];
-		NSString *title = [NSString stringWithFormat: @"%@ - %@", name, basepath];
+  for (i = 0; i < [nodes count]; i++) {
+    FSNode *node = [nodes objectAtIndex: i];
+		NSString *base = [node parentPath];		
+		NSString *name = [node name];
+		NSString *title = [NSString stringWithFormat: @"%@ - %@", name, base];
     id cell;
 
-		if (isnew) {
-      if (i != 0) {
-		    [matrix insertRow: i];
-			} 
-    } else {
-      [matrix insertRow: i];
-    }
-    
+    [matrix insertRow: i];
     cell = [matrix cellAtRow: i column: 0];  
     [cell setTitle: title];
+    [cell setLeaf: YES]; 
 	}
 
-	[matrix sizeToCells];
 	[self setMatrixWidth];
+	[matrix sizeToCells];
 	
 	if ([win isVisible]) {
   	[matrix setNeedsDisplay: YES];  
@@ -158,25 +145,30 @@
 
 - (void)setHistoryPosition:(int)position
 {
-	NSRect rect = [matrix cellFrameAtRow: position column: 0];
-	rect = NSMakeRect(rect.origin.x, rect.origin.y, 10, 10);
-	[matrix scrollRectToVisible: rect];	
-	[matrix selectCellAtRow: position column: 0];
+  if ((position >= 0) && (position < [[matrix cells] count])) {
+    NSRect rect = [matrix cellFrameAtRow: position column: 0];
+	  rect = NSMakeRect(rect.origin.x, rect.origin.y, 10, 10);
+	  [matrix scrollRectToVisible: rect];	
+	  [matrix selectCellAtRow: position column: 0];
+  }
 }
 
-- (void)setHistoryPaths:(NSArray *)paths position:(int)position
+- (void)setHistoryNodes:(NSArray *)nodes
+               position:(int)position
 {
-	[self setHistoryPaths: paths];
+	[self setHistoryNodes: nodes];
 	[self setHistoryPosition: position];
 }
 
-- (void)setViewerPath:(id)sender
+- (void)matrixAction:(id)sender
 {
-	int row, col;
-
-	[matrix getRow: &row column: &col ofCell: [matrix selectedCell]];
 	if (viewer) {
-//		[viewer goToHistoryPosition: row];
+	  int row, col;
+
+	  [matrix getRow: &row column: &col ofCell: [matrix selectedCell]];
+
+    [[GWViewersManager viewersManager] viewer: viewer 
+                          goToHistoryPosition: row];
 	}
 }
 
@@ -184,17 +176,19 @@
 {
 	NSFont *font = [NSFont systemFontOfSize: 12];
 	NSArray *cells = [matrix cells];
-	float mh = [font defaultLineHeightForFont];
+	float mh = [matrix cellSize].height;
 	float maxw = [[scrollView contentView] frame].size.width;
 	int i;
 	
 	for (i = 0; i < [cells count]; i++) {
 		NSString *s = [[cells objectAtIndex: i] stringValue];
-		float w = [font widthOfString: s];
+		float w = [font widthOfString: s] + 10;
 		maxw = (maxw < w) ? w : maxw;
 	}
 	
-	[matrix setCellSize: NSMakeSize(maxw, mh)];
+  if ([matrix cellSize].width != maxw) {
+	  [matrix setCellSize: NSMakeSize(maxw, mh)];
+  }
 }
 
 - (void)updateDefaults
@@ -207,11 +201,6 @@
 - (NSWindow *)myWin
 {
 	return win;
-}
-
-- (id)viewer
-{
-	return viewer;
 }
 
 - (void)windowDidResize:(NSNotification *)aNotification

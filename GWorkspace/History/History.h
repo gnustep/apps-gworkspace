@@ -22,22 +22,20 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
- 
 #ifndef HISTORY_H
 #define HISTORY_H
 
-#include <Foundation/NSObject.h>
+#include <Foundation/Foundation.h>
 
 @class NSWindow;
 @class NSScrollView;
 @class NSMatrix;
-@class NSMutableArray;
 
 @interface History : NSObject 
 {
   NSWindow *win;
 	NSScrollView *scrollView;
-  NSMatrix *matrix; 
+  NSMatrix *matrix;
 	id viewer;
 }
 
@@ -45,21 +43,22 @@
 
 - (void)setViewer:(id)aviewer;
 
-- (void)setHistoryPaths:(NSArray *)paths;
+- (id)viewer;
+
+- (void)setHistoryNodes:(NSArray *)nodes;
 
 - (void)setHistoryPosition:(int)position;
 
-- (void)setHistoryPaths:(NSArray *)paths position:(int)position;
+- (void)setHistoryNodes:(NSArray *)nodes 
+               position:(int)position;
 
-- (void)setViewerPath:(id)sender;
+- (void)matrixAction:(id)sender;
 
 - (void)setMatrixWidth;
 
 - (void)updateDefaults;
 
 - (NSWindow *)myWin;
-
-- (id)viewer;
 
 @end
 

@@ -60,6 +60,7 @@
   RELEASE (watchedSuspended);
   RELEASE (vwrwin);
   RELEASE (viewType);
+  RELEASE (history);
   
   [super dealloc];
 }
@@ -78,6 +79,8 @@
     
     ASSIGN (baseNode, [FSNode nodeWithPath: [node path]]);
     lastSelection = nil;
+    history = [NSMutableArray new];
+    historyPosition = 0;
     watchedNodes = [NSMutableArray new];
     watchedSuspended = [NSMutableArray new];
     manager = [GWViewersManager viewersManager];
@@ -510,6 +513,8 @@
   
   [watchedNodes removeAllObjects];
   [watchedNodes addObjectsFromArray: components];
+
+  [manager addNode: node toHistoryOfViewer: self];
 }
 
 - (void)pathsViewDidSelectIcon:(id)icon
@@ -771,6 +776,21 @@
   }
 }
 
+- (NSMutableArray *)history
+{
+  return history;
+}
+
+- (int)historyPosition
+{
+  return historyPosition;
+}
+
+- (void)setHistoryPosition:(int)pos
+{
+  historyPosition = pos;
+}
+
 - (NSArray *)watchedNodes
 {
   return watchedNodes;
@@ -944,6 +964,7 @@
 
   [self selectionChanged: selection];
   [vwrwin makeFirstResponder: nodeView];  
+  [manager changeHistoryOwner: self];
 }
 
 - (void)windowDidResize:(NSNotification *)aNotification

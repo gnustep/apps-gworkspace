@@ -61,6 +61,9 @@
   NSMutableArray *watchedNodes;
   NSMutableArray *watchedSuspended;
 
+  NSMutableArray *history;
+  int historyPosition;
+  
   BOOL invalidated;
   
   GWViewersManager *manager;
@@ -114,6 +117,10 @@
 - (void)clearSuspendedWatchersFromPath:(NSString *)path;
 - (void)watchedPathChanged:(NSDictionary *)info;
 - (NSArray *)watchedNodes;
+
+- (NSMutableArray *)history;
+- (int)historyPosition;
+- (void)setHistoryPosition:(int)pos;
 
 - (void)columnsWidthChanged:(NSNotification *)notification;
 

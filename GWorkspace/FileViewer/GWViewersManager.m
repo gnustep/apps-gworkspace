@@ -27,11 +27,11 @@
 #include "GWViewer.h"
 #include "GWSpatialViewer.h"
 #include "GWViewerWindow.h"
+#include "History.h"
 #include "FSNFunctions.h"
 #include "GWorkspace.h"
 
 static GWViewersManager *vwrsmanager = nil;
-
 
 @implementation GWViewersManager
 
@@ -48,6 +48,7 @@ static GWViewersManager *vwrsmanager = nil;
   [[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
   [nc removeObserver: self];
   RELEASE (viewers);
+  RELEASE (spatialViewersHistory);
     
 	[super dealloc];
 }
@@ -57,8 +58,11 @@ static GWViewersManager *vwrsmanager = nil;
   self = [super init];
   
   if (self) {
-    viewers = [NSMutableArray new];
     gworkspace = [GWorkspace gworkspace];
+    viewers = [NSMutableArray new];
+    spatialViewersHistory = [NSMutableArray new]; 
+    spvHistoryPos = 0;  
+    historyWindow = [gworkspace historyWindow]; 
     nc = [NSNotificationCenter defaultCenter];
 
     [nc addObserver: self 
@@ -425,7 +429,11 @@ static GWViewersManager *vwrsmanager = nil;
   for (i = 0; i < [watchedNodes count]; i++) {
     [gworkspace removeWatcherForPath: [[watchedNodes objectAtIndex: i] path]];
   }
-    
+
+  if (aviewer == [historyWindow viewer]) {
+    [self changeHistoryOwner: nil];
+  }
+      
   [viewers removeObject: aviewer];
 }
 
@@ -461,6 +469,10 @@ static GWViewersManager *vwrsmanager = nil;
     id viewer = [vwrs objectAtIndex: i];
     NSDate *limit = [NSDate dateWithTimeIntervalSinceNow: 0.1];
     
+    if (viewer == [historyWindow viewer]) {
+      [self changeHistoryOwner: nil];
+    }
+
     [viewer deactivate];
 	  [[NSRunLoop currentRunLoop] runUntilDate: limit];
     [viewers removeObject: viewer];
@@ -789,6 +801,218 @@ static GWViewersManager *vwrsmanager = nil;
 }
 
 @end
+
+
+@implementation GWViewersManager (History)
+
+- (void)addNode:(FSNode *)node toHistoryOfViewer:(id)viewer
+{
+  if (settingHistoryPath == NO) {
+    BOOL spatial = [viewer isSpatial];
+    NSMutableArray *history = (spatial ? spatialViewersHistory: [viewer history]);
+    int position = (spatial ? spvHistoryPos : [viewer historyPosition]);
+    id hisviewer = [historyWindow viewer];
+
+	  if (position == ([history count] - 1)) {
+		  if ([[history lastObject] isEqual: node] == NO) {
+			  [history insertObject: node atIndex: [history count]];
+		  }
+      position = [history count] - 1;
+
+    } else if ([history count] > (position + 1)) {
+		  if (([[history objectAtIndex: position + 1] isEqual: node] == NO)
+				    && ([[history objectAtIndex: position] isEqual: node] == NO)) {
+			  position++;
+			  [history insertObject: node atIndex: position];
+
+			  while ((position + 1) < [history count]) {
+				  int last = [history count] - 1;
+				  [history removeObjectAtIndex: last];
+			  }
+		  }	
+	  }
+
+    [self tuneHistory: history position: &position];
+
+    if (spatial) {
+      spvHistoryPos = position;
+    } else {
+      [viewer setHistoryPosition: position];
+    }
+
+    if ((viewer == hisviewer) 
+                || (spatial && (hisviewer && [hisviewer isSpatial]))) {
+      [historyWindow setHistoryNodes: history position: position];
+    }
+  }
+}
+
+- (void)tuneHistory:(NSMutableArray *)history
+           position:(int *)pos
+{
+  int count = [history count];
+  int i;
+  
+#define CHECK_POSITION(n) \
+if (*pos >= i) *pos -= n; \
+*pos = (*pos < 0) ? 0 : *pos; \
+*pos = (*pos >= count) ? (count - 1) : *pos	
+  
+	for (i = 0; i < count; i++) {
+		FSNode *node = [history objectAtIndex: i];
+		
+		if ([node isValid] == NO) {
+			[history removeObjectAtIndex: i];
+			CHECK_POSITION (1);		
+			count--;
+			i--;
+		}
+	}
+
+	for (i = 0; i < count; i++) {
+		FSNode *node = [history objectAtIndex: i];
+
+		if (i < ([history count] - 1)) {
+			FSNode *next = [history objectAtIndex: i + 1];
+			
+			if ([next isEqual: node]) {
+				[history removeObjectAtIndex: i + 1];
+				CHECK_POSITION (1);
+				count--;
+				i--;
+			}
+		}
+	}
+  
+	if ([history count] > 4) {
+		FSNode *na[2], *nb[2];
+	
+		count = [history count];
+		
+		for (i = 0; i < count; i++) {
+			if (i < ([history count] - 3)) {
+				na[0] = [history objectAtIndex: i];
+				na[1] = [history objectAtIndex: i + 1];
+				nb[0] = [history objectAtIndex: i + 2];
+				nb[1] = [history objectAtIndex: i + 3];
+		
+				if (([na[0] isEqual: nb[0]]) && ([na[1] isEqual: nb[1]])) {
+					[history removeObjectAtIndex: i + 3];
+					[history removeObjectAtIndex: i + 2];
+					CHECK_POSITION (2);
+					count -= 2;
+					i--;
+				}
+			}
+		}
+	}
+  
+  CHECK_POSITION (0);
+}
+
+- (void)changeHistoryOwner:(id)viewer
+{
+  if (viewer && (viewer != [historyWindow viewer])) {
+    BOOL spatial = [viewer isSpatial];
+    NSMutableArray *history = (spatial ? spatialViewersHistory: [viewer history]);
+    int position = (spatial ? spvHistoryPos : [viewer historyPosition]);
+  
+    [historyWindow setHistoryNodes: history position: position];
+
+  } else if (viewer == nil) {
+    [historyWindow setHistoryNodes: nil];
+  }
+
+  [historyWindow setViewer: viewer];  
+}
+
+- (void)viewer:(id)viewer goToHistoryPosition:(int)pos
+{
+  if (viewer) {
+    BOOL spatial = [viewer isSpatial];
+    NSMutableArray *history = (spatial ? spatialViewersHistory: [viewer history]);
+    int position = (spatial ? spvHistoryPos : [viewer historyPosition]);
+ 
+    [self tuneHistory: history position: &position];
+
+	  if ((pos >= 0) && (pos < [history count])) {
+      FSNode *node = [history objectAtIndex: pos];
+    
+      settingHistoryPath = YES;
+      
+      if (spatial == NO) {
+        FSNode *base = [FSNode nodeWithPath: [node parentPath]];
+        NSArray *selection = [NSArray arrayWithObject: node];
+        id nodeView = [viewer nodeView];
+      
+        [nodeView showContentsOfNode: base];
+        [nodeView selectRepsOfSubnodes: selection];
+      
+        if ([nodeView respondsToSelector: @selector(scrollSelectionToVisible)]) {
+          [nodeView scrollSelectionToVisible];
+        }
+      } else {
+        [self newViewerOfType: SPATIAL
+                      forNode: node
+                showSelection: YES
+               closeOldViewer: nil
+                     forceNew: NO];
+      }
+    
+      if (spatial) {
+        spvHistoryPos = pos;
+      } else {
+        [viewer setHistoryPosition: pos];
+      }
+      
+      [historyWindow setHistoryPosition: pos];
+      
+      settingHistoryPath = NO;
+    }
+  }
+}
+
+@end
+
+
+
+
+/*
+- (void)goBackwardInHistory:(id)sender
+{
+	[self tuneHistory];
+  if (currHistoryPos > 0) {
+    NSString *newpath = [ViewerHistory objectAtIndex: (currHistoryPos - 1)];
+		[self setCurrentHistoryPosition: currHistoryPos - 1];
+    [viewer setCurrentSelection: [NSArray arrayWithObject: newpath]];
+  }
+}
+
+- (void)goForwardInHistory:(id)sender
+{
+	[self tuneHistory];
+  if (currHistoryPos < ([ViewerHistory count] - 1)) {
+		NSString *newpath = [ViewerHistory objectAtIndex: (currHistoryPos + 1)];
+		[self setCurrentHistoryPosition: currHistoryPos + 1];					
+    [viewer setCurrentSelection: [NSArray arrayWithObject: newpath]];  
+  } 
+}
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

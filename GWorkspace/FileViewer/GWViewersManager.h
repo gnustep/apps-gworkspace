@@ -32,13 +32,18 @@
 #define SPATIAL  1
 
 @class GWorkspace;
+@class History;
 
 @interface GWViewersManager : NSObject
 {
   NSMutableArray *viewers;
   BOOL orderingViewers;
   GWorkspace *gworkspace;
-  NSNotificationCenter *nc;    
+  History *historyWindow;
+  NSMutableArray *spatialViewersHistory;
+  int spvHistoryPos;  
+  BOOL settingHistoryPath;
+  NSNotificationCenter *nc;      
 }
 
 + (GWViewersManager *)viewersManager;
@@ -113,6 +118,20 @@
 
 
 - (void)updateDefaults;
+
+@end
+
+
+@interface GWViewersManager (History)
+
+- (void)addNode:(FSNode *)node toHistoryOfViewer:(id)viewer;
+
+- (void)tuneHistory:(NSMutableArray *)history
+           position:(int *)pos;
+           
+- (void)changeHistoryOwner:(id)viewer;
+
+- (void)viewer:(id)viewer goToHistoryPosition:(int)pos;
 
 @end
 
