@@ -229,7 +229,7 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
         FSNIcon *icon = [self repOfSubnode: subnode];
         
         if (icon) {
-          dragIndex = [icon gridIndex];
+          insertIndex = [icon gridIndex];
         }
       }
       
@@ -257,11 +257,11 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
       int index;
 
       if (i == 0) {
-        if (dragIndex != -1) {
-          if ([self isFreeGridIndex: dragIndex]) {
-            index = dragIndex;
+        if (insertIndex != -1) {
+          if ([self isFreeGridIndex: insertIndex]) {
+            index = insertIndex;
           } else {
-            index = [self firstFreeGridIndexAfterIndex: dragIndex];
+            index = [self firstFreeGridIndexAfterIndex: insertIndex];
 
             if (index == -1) {
               index = [self firstFreeGridIndex];
@@ -1359,7 +1359,7 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
   isDragTarget = YES;	
   dragPoint = NSZeroPoint;
   DESTROY (dragIcon);
-  dragIndex = -1;
+  insertIndex = -1;
   dragLocalIcon = [nodePath isEqual: fromPath];
   
 	sourceDragMask = [sender draggingSourceOperationMask];
@@ -1399,23 +1399,23 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
       }
     }
   
-    if (dragIndex != index) {
+    if (insertIndex != index) {
       [self setNeedsDisplayInRect: grid[index]];
       
-      if (dragIndex != -1) {
-        [self setNeedsDisplayInRect: grid[dragIndex]];
+      if (insertIndex != -1) {
+        [self setNeedsDisplayInRect: grid[insertIndex]];
       }
     }
     
-    dragIndex = index;
+    insertIndex = index;
     isDragTarget = YES;
     
   } else {
     DESTROY (dragIcon);
-    if (dragIndex != -1) {
-      [self setNeedsDisplayInRect: grid[dragIndex]];
+    if (insertIndex != -1) {
+      [self setNeedsDisplayInRect: grid[insertIndex]];
     }
-    dragIndex = -1;
+    insertIndex = -1;
     isDragTarget = NO;
   }
   
@@ -1435,8 +1435,8 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
 - (void)draggingExited:(id <NSDraggingInfo>)sender
 {
   DESTROY (dragIcon);
-  if (dragIndex != -1) {
-    [self setNeedsDisplayInRect: grid[dragIndex]];
+  if (insertIndex != -1) {
+    [self setNeedsDisplayInRect: grid[insertIndex]];
   }
 	isDragTarget = NO;
 }
@@ -1483,8 +1483,8 @@ int sortDragged(id icn1, id icn2, void *context)
   int i;
 
   DESTROY (dragIcon);
-  if ((dragIndex != -1) && ([self isFreeGridIndex: dragIndex])) {
-    [self setNeedsDisplayInRect: grid[dragIndex]];
+  if ((insertIndex != -1) && ([self isFreeGridIndex: insertIndex])) {
+    [self setNeedsDisplayInRect: grid[insertIndex]];
   }
 	isDragTarget = NO;  
 
@@ -1501,7 +1501,7 @@ int sortDragged(id icn1, id icn2, void *context)
     
   sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
 
-  if (dragLocalIcon && (dragIndex != -1)) {
+  if (dragLocalIcon && (insertIndex != -1)) {
     NSMutableArray *removed = [NSMutableArray array];
     NSArray *sorted = nil;
     NSMutableArray *sortIndexes = [NSMutableArray array];
@@ -1537,14 +1537,14 @@ int sortDragged(id icn1, id icn2, void *context)
       int shift;
     
       if (i == 0) {
-        index = dragIndex;
+        index = insertIndex;
         shift = oldindex - index;
 
       } else {
         index = oldindex - shift;
 
         if ((index < 0) || (index >= gridcount)) {
-          index = [self firstFreeGridIndexAfterIndex: dragIndex];
+          index = [self firstFreeGridIndexAfterIndex: insertIndex];
         }
 
         if (index == -1) {

@@ -71,7 +71,7 @@ typedef enum BackImageStyle {
 
 	NSImage *dragIcon;
   NSPoint dragPoint;
-  int dragIndex;
+  int insertIndex;
 	BOOL isDragTarget;
 	BOOL dragLocalIcon;
   

@@ -380,7 +380,6 @@ static NSFont *labelFont = nil;
 				  return;
         } else {
 				  [self select];
-          //   [container unselectNameEditor];
 			  }
         
 		  } else {
@@ -388,7 +387,6 @@ static NSFont *labelFont = nil;
         
         if (isSelected == NO) {
 				  [self select];
-          //   [container unselectNameEditor];
 			  }
 		  }
     
