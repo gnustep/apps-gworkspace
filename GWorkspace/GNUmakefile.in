@@ -54,37 +54,6 @@ GWorkspace_LANGUAGES = Resources/English \
 			                Resources/Portuguese \
                       Resources/Dutch
 
-ifeq ($(FOUNDATION_LIB), apple)
-  GWorkspace_LOCALIZED_RESOURCE_FILES = MainMenu.nib \
-			                		              Localizable.strings \
-			                		              Finder.nib \
-                                        PrefWindow.nib \
-                                        DefEditorPref.nib \
-                                        XTermPref.nib \
-                                        DefSortOrderPref.nib \
-                                        ShelfPref.nib \
-                                        DeskTopPref.nib \
-                                        IconsPref.nib \
-                                        HiddenFilesPref.nib \
-                                        OpenWith.nib \
-                                        RunExternal.nib \
-                                        StartAppWin.nib 
-else 
-  GWorkspace_LOCALIZED_RESOURCE_FILES = Localizable.strings \
-			                		              Finder.gorm \
-                                        PrefWindow.gorm \
-                                        DefEditorPref.gorm \
-                                        XTermPref.gorm \
-                                        DefSortOrderPref.gorm \
-                                        ShelfPref.gorm \
-                                        DeskTopPref.gorm \
-                                        IconsPref.gorm \
-                                        HiddenFilesPref.gorm \
-                                        OpenWith.gorm \
-                                        RunExternal.gorm \
-                                        StartAppWin.gorm 
-endif
-
 # The Objective-C source files to be compiled
 
 ifneq ($(FOUNDATION_LIB), apple)
@@ -102,9 +71,6 @@ ifneq ($(FOUNDATION_LIB), apple)
   TShelf/TShelfIcon.m \
   TShelf/TShelfPBIcon.m \
   Apps/Apps.m \
-  Finder/FinderShelf.m \
-  Finder/FinderShelfIcon.m \
-  Finder/FinderController.m \
   Desktop/DesktopWindow.m \
   Desktop/DesktopView.m \
   Desktop/DesktopViewIcon.m \
@@ -142,9 +108,6 @@ else
   TShelf/TShelfIcon.m \
   TShelf/TShelfPBIcon.m \
   Apps/Apps.m \
-  Finder/FinderShelf.m \
-  Finder/FinderShelfIcon.m \
-  Finder/FinderController.m \
   Desktop/DesktopWindow.m \
   Desktop/DesktopView.m \
   Desktop/DesktopViewIcon.m \

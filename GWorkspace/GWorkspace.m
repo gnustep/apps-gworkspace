@@ -42,7 +42,6 @@
 #include "Dialogs/RunExternalController.h"
 #include "Dialogs/StartAppWin.h"
 #include "Apps/Apps.h"
-#include "Finder/FinderController.h"
 #include "Preferences/PrefController.h"
 #include "Fiend/Fiend.h"
 #include "ViewersWindow.h"
@@ -470,7 +469,6 @@ return [ws openFile: fullPath withApplication: appName]
   TEST_RELEASE (viewersTemplates);
   TEST_RELEASE (viewersSearchPaths);
   TEST_RELEASE (appsViewer);
-  TEST_RELEASE (finder);
   TEST_RELEASE (fiend);
 	TEST_RELEASE (history);
 	TEST_RELEASE (recycler);
@@ -627,7 +625,6 @@ return [ws openFile: fullPath withApplication: appName]
   appsViewer = [[AppsViewer alloc] init];
 	history = [[History alloc] init];
   prefController = [[PrefController alloc] init];  
-  finder = nil;
   fiend = nil;
 
   tshelfBackground = nil; 
@@ -735,7 +732,6 @@ return [ws openFile: fullPath withApplication: appName]
 		TEST_CLOSE (vwr, vwr);
 	}
 	TEST_CLOSE (appsViewer, [appsViewer myWin]);
-	TEST_CLOSE (finder, [finder myWin]);
 	TEST_CLOSE (prefController, [prefController myWin]);
 	TEST_CLOSE (fiend, [fiend myWin]);
 	TEST_CLOSE (recycler, [recycler myWin]);
@@ -935,11 +931,7 @@ return [ws openFile: fullPath withApplication: appName]
 	if ([[appsViewer myWin] isVisible]) {  
 		[appsViewer updateDefaults]; 
 	}
-	
-	if (finder != nil) {  
-		[finder updateDefaults]; 
-	}
-	
+		
 	if ([[prefController myWin] isVisible]) {  
 		[prefController updateDefaults]; 
 	}
@@ -1371,10 +1363,6 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   if (tshelfWin != nil) {
     [tshelfWin checkIconsAfterHidingOfPaths: paths]; 
 	}
-  
-	if (finder != nil) {  
-		[finder checkIconsAfterHidingOfPaths: paths]; 
-	}  
 }
 
 - (void)watcherNotification:(NSNotification *)notification
@@ -1833,9 +1821,6 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   if ((tshelfWin != nil) && ([tshelfWin isVisible])) {
     [tshelfWin updateIcons]; 
 	}
-	if (finder != nil) {  
-		[finder updateIcons]; 
-	}
 }
 
 - (void)thumbnailsDidChange:(NSNotification *)notif
@@ -1873,9 +1858,6 @@ NSLocalizedString(@"OK", @""), nil, nil); \
       if ((tshelfWin != nil) && ([tshelfWin isVisible])) {
         [tshelfWin updateIcons]; 
 		  }
-	    if (finder != nil) {  
-		    [finder updateIcons]; 
-	    }
 
       [tmbdirs removeAllObjects];
     }
@@ -1908,9 +1890,6 @@ NSLocalizedString(@"OK", @""), nil, nil); \
       if ((tshelfWin != nil) && ([tshelfWin isVisible])) {
         [tshelfWin updateIcons]; 
 		  }
-	    if (finder != nil) {  
-		    [finder updateIcons]; 
-	    }
     }
   }
 }
@@ -2087,18 +2066,18 @@ NSLocalizedString(@"OK", @""), nil, nil); \
         
         [startAppWin showWindowWithTitle: @"GWorkspace"
                                  appName: @"Inspector"
-                            maxProgValue: 40.0];
+                            maxProgValue: 80.0];
 
         [ws launchApplication: @"Inspector"];
 
-        for (i = 1; i <= 40; i++) {
+        for (i = 1; i <= 80; i++) {
           [startAppWin updateProgressBy: 1.0];
 	        [[NSRunLoop currentRunLoop] runUntilDate:
 		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
           insp = [NSConnection rootProxyForConnectionWithRegisteredName: @"Inspector" 
                                                                    host: @""];                  
           if (insp) {
-            [startAppWin updateProgressBy: 40.0 - i];
+            [startAppWin updateProgressBy: 80.0 - i];
             break;
           }
         }
@@ -2266,18 +2245,18 @@ NSLocalizedString(@"OK", @""), nil, nil); \
         
         [startAppWin showWindowWithTitle: @"GWorkspace"
                                  appName: @"Operation"
-                            maxProgValue: 40.0];
+                            maxProgValue: 80.0];
 
         [ws launchApplication: @"Operation"];
 
-        for (i = 1; i <= 40; i++) {
+        for (i = 1; i <= 80; i++) {
           [startAppWin updateProgressBy: 1.0];
 	        [[NSRunLoop currentRunLoop] runUntilDate:
 		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
           opr = [NSConnection rootProxyForConnectionWithRegisteredName: @"Operation" 
                                                                   host: @""];                  
           if (opr) {
-            [startAppWin updateProgressBy: 40.0 - i];
+            [startAppWin updateProgressBy: 80.0 - i];
             break;
           }
         }
@@ -2530,12 +2509,6 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 
 - (void)showFinder:(id)sender
 {
-//  if (finder == nil) {    
-//    finder = [[FinderController alloc] init];
-//  }
-//  [finder activate];
-  
-  
 	if (finderApp == nil) {
     [self connectFinder];
     if (finderApp) {

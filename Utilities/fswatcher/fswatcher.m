@@ -168,8 +168,6 @@
            selector: @selector(connectionBecameInvalid:)
 	             name: NSConnectionDidDieNotification
 	           object: conn];
-             
-    NSLog(@"fswatcher started");
   }
   
   return self;    
@@ -183,7 +181,6 @@
   [info setConnection: newConn];
   [clientsInfo addObject: info];
   RELEASE (info);
-  NSLog(@"new client connection");
 
   [nc addObserver: self
          selector: @selector(connectionBecameInvalid:)
@@ -224,7 +221,6 @@
       }  
     
 			[clientsInfo removeObject: info];
-			NSLog(@"removed client with died connection");
 		}
 	}
 }
@@ -247,7 +243,6 @@
   if ([(id)client isProxy] == YES) {
     [(id)client setProtocolForProxy: @protocol(FSWClientProtocol)];
     [info setClient: client];  
-    NSLog(@"new client registered");
   }
 }
 
@@ -283,9 +278,7 @@
 	              name: NSConnectionDidDieNotification
 	            object: connection];
 
-  [clientsInfo removeObject: info];
-  
-  NSLog(@"client unregistered");
+  [clientsInfo removeObject: info];  
 }
 
 - (FSWClientInfo *)clientInfoWithConnection:(NSConnection *)connection
@@ -338,18 +331,13 @@
   if (watcher) {
     [info addWatchedPath: path];
     [watcher addListener]; 
-    
-    NSLog(@"addWatcherForPath: %@ (LISTENER)", path);
-    
+        
   } else {
     if ([fm fileExistsAtPath: path]) {
       [info addWatchedPath: path];
   	  watcher = [[Watcher alloc] initWithWatchedPath: path fswatcher: self];      
   	  [watchers addObject: watcher];
   	  RELEASE (watcher);  
-      
-      NSLog(@"addWatcherForPath: %@ (NEW)", path);
-//      NSLog(@"watchers: %i", [watchers count]);
     }
   }
 }
@@ -374,9 +362,6 @@
   if (watcher && ([watcher isOld] == NO)) {
     [info removeWatchedPath: path];
   	[watcher removeListener];  
-    
-    NSLog(@"removeWatcherForPath: %@", path); 
-//    NSLog(@"watchers: %i", [watchers count]);
   }
 }
 
@@ -413,13 +398,7 @@
 		[timer invalidate];
 	}
   
-  NSLog(@"WATCHER DESTROYED: %@", [watcher watchedPath]);
-  
-  
   [watchers removeObject: watcher];
-  
-  
-//  NSLog(@"watchers: %i", [watchers count]);
 }
 
 - (void)watcherNotification:(NSDictionary *)info

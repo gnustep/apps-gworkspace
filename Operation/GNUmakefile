@@ -27,17 +27,6 @@ Operation_RESOURCE_FILES = \
 
 Operation_LANGUAGES = Resources/English 
 
-ifeq ($(FOUNDATION_LIB), apple)
-  Operation_LOCALIZED_RESOURCE_FILES = Localizable.strings \
-                                       MainMenu.nib \
-                                       FileOperationWin.nib \
-                                       OperationPrefs.nib 
-else 
-  Operation_LOCALIZED_RESOURCE_FILES = Localizable.strings \
-                                       FileOperationWin.gorm \
-                                       OperationPrefs.gorm
-endif
-
 # The Objective-C source files to be compiled
 
 Operation_OBJC_FILES = main.m \

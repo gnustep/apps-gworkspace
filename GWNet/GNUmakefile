@@ -24,11 +24,6 @@ GWNet_RESOURCE_FILES = \
     
 GWNet_LANGUAGES = Resources/English 
 
-GWNet_LOCALIZED_RESOURCE_FILES = Localizable.strings \
-                                      OpenUrlDialog.gorm \
-                                      LoginWin.gorm \
-                                      FileOpIndicator.gorm 
-
 # The Objective-C source files to be compiled
 
 GWNet_OBJC_FILES = main.m \

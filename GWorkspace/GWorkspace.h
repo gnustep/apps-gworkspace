@@ -45,7 +45,6 @@
 @class NSWorkspace;
 @class ViewersWindow;
 @class PrefController;
-@class FinderController;
 @class AppsViewer;
 @class Fiend;
 @class Recycler;
@@ -131,7 +130,6 @@
   id finderApp;
     
   AppsViewer *appsViewer;
-  FinderController *finder;
   PrefController *prefController;
   Fiend *fiend;
   History *history;
