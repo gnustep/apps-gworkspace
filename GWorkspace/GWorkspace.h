@@ -45,7 +45,6 @@
 @class NSWorkspace;
 @class ViewersWindow;
 @class PrefController;
-@class AppsViewer;
 @class Fiend;
 @class History;
 @class TShelfWin;
@@ -150,7 +149,6 @@
   id desktopApp;
   id recyclerApp;
     
-  AppsViewer *appsViewer;
   PrefController *prefController;
   Fiend *fiend;
   History *history;
@@ -342,8 +340,6 @@
 - (void)showContentsInspector:(id)sender;
 
 - (void)showToolsInspector:(id)sender;
-
-- (void)showApps:(id)sender;
 
 - (void)showDesktop:(id)sender;
 

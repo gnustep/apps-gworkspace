@@ -41,7 +41,6 @@
 #include "Dialogs/OpenWithController.h"
 #include "Dialogs/RunExternalController.h"
 #include "Dialogs/StartAppWin.h"
-#include "Apps/Apps.h"
 #include "Preferences/PrefController.h"
 #include "Fiend/Fiend.h"
 #include "ViewersWindow.h"
@@ -476,7 +475,6 @@ return [ws openFile: fullPath withApplication: appName]
   RELEASE (viewers);  
   TEST_RELEASE (viewersTemplates);
   TEST_RELEASE (viewersSearchPaths);
-  TEST_RELEASE (appsViewer);
   TEST_RELEASE (fiend);
 	TEST_RELEASE (history);
   RELEASE (openWithController);
@@ -627,7 +625,6 @@ return [ws openFile: fullPath withApplication: appName]
   
   operationsApp = nil;
   
-  appsViewer = [[AppsViewer alloc] init];
 	history = [[History alloc] init];
   prefController = [[PrefController alloc] init];  
   fiend = nil;
@@ -743,7 +740,6 @@ return [ws openFile: fullPath withApplication: appName]
 		id vwr = [viewers objectAtIndex: i];
 		TEST_CLOSE (vwr, vwr);
 	}
-	TEST_CLOSE (appsViewer, [appsViewer myWin]);
 	TEST_CLOSE (prefController, [prefController myWin]);
 	TEST_CLOSE (fiend, [fiend myWin]);
 	TEST_CLOSE (history, [history myWin]); 
@@ -922,10 +918,6 @@ return [ws openFile: fullPath withApplication: appName]
 	}
   [defaults setObject: [NSString stringWithFormat: @"%i", tshelfPBFileNum]
                forKey: @"tshelfpbfnum"];
-
-	if ([[appsViewer myWin] isVisible]) {  
-		[appsViewer updateDefaults]; 
-	}
 		
 	if ([[prefController myWin] isVisible]) {  
 		[prefController updateDefaults]; 
@@ -2577,11 +2569,6 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
   if (inspectorApp) {  
     [inspectorApp showTools];
   } 
-}
-
-- (void)showApps:(id)sender
-{
-  [appsViewer activate]; 
 }
 
 - (void)showDesktop:(id)sender

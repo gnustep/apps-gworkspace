@@ -67,7 +67,6 @@ ifneq ($(FOUNDATION_LIB), apple)
   TShelf/TShelfIconsView.m \
   TShelf/TShelfIcon.m \
   TShelf/TShelfPBIcon.m \
-  Apps/Apps.m \
   Preferences/PrefController.m \
   Preferences/DefEditorPref.m \
   Preferences/XTermPref.m \
@@ -97,7 +96,6 @@ else
   TShelf/TShelfIconsView.m \
   TShelf/TShelfIcon.m \
   TShelf/TShelfPBIcon.m \
-  Apps/Apps.m \
   Preferences/PrefController.m \
   Preferences/DefEditorPref.m \
   Preferences/XTermPref.m \

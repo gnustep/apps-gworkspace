@@ -125,7 +125,6 @@ void createMenu()
 	addItemToMenu(tools, @"Show Desktop", @"", @"showDesktop:", @"");
 	addItemToMenu(tools, @"Show Recycler", @"", @"showRecycler:", @"");
 	addItemToMenu(tools, @"Finder", @"", @"showFinder:", @"f");
-	addItemToMenu(tools, @"Applications...", @"", @"showApps:", @"");
 		menuItem = addItemToMenu(tools, @"Fiend", @"", nil, @"");
 		fiendmenu = AUTORELEASE ([NSMenu new]);
 		[tools setSubmenu: fiendmenu forItem: menuItem];
