@@ -1065,6 +1065,8 @@ double myrintf(double a)
     [nameEditor setEditable: canedit];
     [nameEditor setSelectable: canedit];	
     [self addSubview: nameEditor];
+    
+    [[NSCursor arrowCursor] set];
   } 
 }
 

@@ -274,6 +274,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
   [self makeKeyAndOrderFront: nil];
   [self adjustSubviews];	
   [self makeFirstResponder: browser];  
+  [[NSCursor arrowCursor] set];
 }
 
 - (void)adjustSubviews
@@ -882,21 +883,6 @@ if (rct.size.height < 0) rct.size.height = 0; \
     return;
   }
    
-   
-/*    
-  if ((optype == DUPLICATE) || (optype == DELETE) 
-                || (optype == UPLOAD) || (optype == DOWNLOAD)) {
-    [self lockFiles: opfiles inDirectory: opbase];
-
-    if ([browser isShowingPath: opbase]) {
-      [browser lockCellsWithNames: opfiles
-                 inColumnWithPath: opbase];
-      [browser extendSelectionWithDimmedFiles: opfiles 
-                           fromColumnWithPath: opbase];
-    }
-  }
-*/
-
   [fileOperations insertObject: op atIndex: [fileOperations count]];
   data = [NSArchiver archivedDataWithRootObject: [op description]];
   [dispatcher startFileOperation: data];
@@ -1008,42 +994,37 @@ if (rct.size.height < 0) rct.size.height = 0; \
 
   if (op) {
     NSWindow *win = [op win];
+    NSString *opbase = nil;
     NSString *source = [op source];
     NSString *destination = [op destination];
-    NSArray *files = [op files];
     int type = [op type];
-
+    
     if (win) {
       [op closeWindow];
     }
 
-    if ((type == DUPLICATE) || (type == DELETE) || (type == UPLOAD)) {
-      [self unlockFiles: files inDirectory: destination];
-    } else if (type == DOWNLOAD) {
-      [self unlockFiles: files inDirectory: source];
-    }
-    
     if (type == RENAME) {
       destination = [destination stringByDeletingLastPathComponent];
     }
- 
+
     if ((type == UPLOAD) || (type == DELETE) || (type == NEWFOLDER) 
                             || (type == DUPLICATE) || (type == RENAME)) {
+      opbase = destination;
       [self removeCachedContentsStartingAt: destination];
-      
-      if ([browser isShowingPath: destination]) {
-        [browser reloadFromColumnWithPath: destination];   
-      } 
     } else if (type == DOWNLOAD) {
-      if ([browser isShowingPath: source]) {
-        [browser reloadFromColumnWithPath: source];   
-      }     
+      opbase = source;
     }
 
-      // SE UN PATH MODIFICATO INTERFERISCE CON LA SELEZIONE CURRENTE
-      // BISOGNA TAGLIARE IL BROWSER ALLA COLONNA CON "destination"
-      // ALTRIMENTI E' SUFFICIENTE RELOADARE SOLO QUELLA COLONNA
-  
+    if (opbase) {
+      if ([browser isShowingPath: opbase]) {
+        NSString *selPath = [selectedPaths objectAtIndex: 0];
+        
+        if ([selPath isEqual: opbase] || subPathOfPath(opbase, selPath)) {
+          [browser reloadFromColumnWithPath: opbase]; 
+        }  
+      } 
+    }
+
     if ([fileOperations containsObject: op]) {
       [fileOperations removeObject: op];
     }
@@ -1200,6 +1181,8 @@ if (rct.size.height < 0) rct.size.height = 0; \
 {
   NSArray *paths = [[cachedContents allKeys] copy];
   int i;
+  
+  [self setPreContents: cachedContents];
   
   [self removeCachedContentsForPath: apath];
   
@@ -1397,7 +1380,6 @@ if (rct.size.height < 0) rct.size.height = 0; \
   DESTROY (progrPath);
   DESTROY (nextSelection[0]);
   DESTROY (nextSelection[1]);
-  [self removePreContents];  
   loadingSelection = NO;
 }
 
