@@ -175,6 +175,11 @@
   return self;
 }
 
+- (unsigned)hash
+{
+  return [path hash];
+}
+
 - (BOOL)isEqual:(id)other
 {
   if (other == self) {
