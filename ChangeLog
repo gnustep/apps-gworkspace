@@ -1,3 +1,9 @@
+2003-10-03 Enrico Sersale  <enrico@imago.ro>
+
+  * GWorkspace/Inspectors/Tools.m
+    after setting the default application, the applications icons
+    are now shown correctly.
+
 2003-10-01 Enrico Sersale  <enrico@imago.ro>
 
   * Version 0.6

@@ -376,7 +376,7 @@ static NSString *nibName = @"ToolsPanel";
 	for(i = 0; i < [cells count]; i++) {
     app = [[cells objectAtIndex: i] title];
 		if([app isEqualToString: currentApp] == NO) {
-      [newApps addObject: app];
+      [newApps insertObject: app atIndex: [newApps count]];
 		}
   }
   
@@ -385,6 +385,7 @@ static NSString *nibName = @"ToolsPanel";
   
   for(i = 0; i < count; i++) {
 		app = [newApps objectAtIndex: i];
+    app = [ws fullPathForApplication: app];
     icon = [ws iconForFile: app];
     size = [icon size];
 
@@ -409,6 +410,7 @@ static NSString *nibName = @"ToolsPanel";
 		[cell setImage: icon];
 	}
 
+  [matrix scrollCellToVisibleAtRow: 0 column: 0];
   [matrix selectCellAtRow: 0 column: 0];
 }
 
