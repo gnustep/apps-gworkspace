@@ -702,7 +702,7 @@ static Desktop *desktop = nil;
       }
     
       [FSNodeRep lockPaths: paths];
-      [[self desktopView] fileSystemWillChange: dict];
+      [[self desktopView] nodeContentsWillChange: dict];
     }
   }  
 }
@@ -751,11 +751,11 @@ static Desktop *desktop = nil;
       }
     
       [FSNodeRep unlockPaths: paths];
-      [[self desktopView] fileSystemDidChange: dict];
+      [[self desktopView] nodeContentsDidChange: dict];
     }
   }  
   
-  [dock fileSystemDidChange: dict];  
+  [dock nodeContentsDidChange: dict];  
 }
 
 - (void)watchedPathDidChange:(NSData *)dirinfo
@@ -826,7 +826,7 @@ static Desktop *desktop = nil;
 
 - (void)thumbnailsDidChange:(NSNotification *)notif
 {
-  [[self desktopView] thumbnailsDidChange];
+  [[self desktopView] updateIcons];
 }
 
 + (void)mountRemovableMedia

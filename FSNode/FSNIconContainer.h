@@ -65,12 +65,45 @@
   id <DesktopApplication> desktopApp;
 }
 
-
 - (void)sortIcons;
 
 - (void)calculateGridSize;
 
 - (void)tile;
+
+
+
+
+
+
+- (void)scrollIconToVisible:(FSNIcon *)icon;
+
+- (NSString *)selectIconWithPrefix:(NSString *)prefix;
+
+- (void)selectIconInPrevLine;
+
+- (void)selectIconInNextLine;
+
+- (void)selectPrevIcon;
+
+- (void)selectNextIcon;
+
+@end
+
+
+@interface FSNIconContainer (DraggingDestination)
+
+- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender;
+
+- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender;
+
+- (void)draggingExited:(id <NSDraggingInfo>)sender;
+
+- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender;
+
+- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender;
+
+- (void)concludeDragOperation:(id <NSDraggingInfo>)sender;
 
 @end
 

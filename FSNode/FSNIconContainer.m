@@ -155,21 +155,10 @@ if (rct.size.height < 0) rct.size.height = 0; \
   return self;
 }
 
-
-
-
-
-
-
-
-
-
-
 - (void)sortIcons
 {
   SEL compSel = [FSNodeRep compareSelectorForDirectory: [node path]];
   NSArray *sorted = [icons sortedArrayUsingSelector: compSel];
-
   [icons removeAllObjects];
   [icons addObjectsFromArray: sorted];
 }
@@ -289,6 +278,342 @@ if (rct.size.height < 0) rct.size.height = 0; \
   [self updateNameEditor];
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+- (void)scrollIconToVisible:(FSNIcon *)icon
+{
+  NSRect irect = [icon frame];  
+  float border = floor(irect.size.height * 0.5);
+        
+  irect.origin.y -= border;
+  irect.size.height += border * 2;
+  [self scrollRectToVisible: irect];	
+}
+
+- (NSString *)selectIconWithPrefix:(NSString *)prefix
+{
+	int i;
+
+	for (i = 0; i < [icons count]; i++) {
+		FSNIcon *icon = [icons objectAtIndex: i];
+    NSString *name = [[icon node] name];
+    
+		if ([name hasPrefix: prefix]) {
+      [icon select];
+      [self scrollIconToVisible: icon];
+      
+			return name;
+		}
+	}
+  
+  return nil;
+}
+
+- (void)selectIconInPrevLine
+{
+	FSNIcon *icon;
+	int i, pos = -1;
+  
+	for (i = 0; i < [icons count]; i++) {
+		icon = [icons objectAtIndex: i];
+    
+		if ([icon isSelected]) {
+			pos = i - colcount;
+			break;
+		}
+	}
+  
+	if (pos >= 0) {
+		icon = [icons objectAtIndex: pos];
+		[icon select];
+    [self scrollIconToVisible: icon];
+	}
+}
+
+- (void)selectIconInNextLine
+{
+	FSNIcon *icon;
+	int i, pos = [icons count];
+    
+	for (i = 0; i < [icons count]; i++) {
+		icon = [icons objectAtIndex: i];
+    
+		if ([icon isSelected]) {
+			pos = i + colcount;
+			break;
+		}
+	}
+  
+	if (pos <= ([icons count] -1)) {
+		icon = [icons objectAtIndex: pos];
+		[icon select];
+    [self scrollIconToVisible: icon];
+	}
+}
+
+- (void)selectPrevIcon
+{
+	int i;
+    
+	for (i = 0; i < [icons count]; i++) {
+		FSNIcon *icon = [icons objectAtIndex: i];
+    
+		if ([icon isSelected]) {
+			if (i > 0) {
+        icon = [icons objectAtIndex: i - 1];  
+        [icon select];
+        [self scrollIconToVisible: icon];
+			} 
+      break;
+		}
+	}
+}
+
+- (void)selectNextIcon
+{
+  int count = [icons count];
+	int i;
+    
+	for (i = 0; i < count; i++) {
+		FSNIcon *icon = [icons objectAtIndex: i];
+    
+		if ([icon isSelected]) {
+			if (i < (count - 1)) {
+				icon = [icons objectAtIndex: i + 1];
+        [icon select];
+        [self scrollIconToVisible: icon];
+			} 
+      break;
+		}
+	} 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+- (void)mouseDown:(NSEvent *)theEvent
+{
+  if ([theEvent modifierFlags] != NSShiftKeyMask) {
+    selectionMask = NSSingleSelectionMask;
+    selectionMask |= FSNCreatingSelectionMask;
+		[self unselectOtherReps: nil];
+    selectionMask = NSSingleSelectionMask;
+    
+    DESTROY (lastSelection);
+    [self selectionDidChange];
+	}
+}
+
+- (void)mouseDragged:(NSEvent *)theEvent
+{
+  unsigned int eventMask = NSLeftMouseUpMask | NSLeftMouseDraggedMask | NSPeriodicMask;
+  NSDate *future = [NSDate distantFuture];
+  NSPoint	startp, sp;
+  NSPoint	p, pp;
+  NSRect visibleRect;
+  NSRect oldRect; 
+  NSRect r, wr;
+  NSRect selrect;
+  float x, y, w, h;
+  int i;
+  
+#define scrollPointToVisible(p) \
+{ \
+NSRect sr; \
+sr.origin = p; \
+sr.size.width = sr.size.height = 0.1; \
+[self scrollRectToVisible: sr]; \
+}
+
+#define CONVERT_CHECK \
+pp = [self convertPoint: p fromView: nil]; \
+if (pp.x < 1) \
+pp.x = 1; \
+if (pp.x >= NSMaxX([self bounds])) \
+pp.x = NSMaxX([self bounds]) - 1
+
+  p = [theEvent locationInWindow];
+  sp = [self convertPoint: p  fromView: nil];
+  startp = [self convertPoint: p fromView: nil];
+  
+  oldRect = NSZeroRect;  
+
+	[[self window] disableFlushWindow];
+  [self lockFocus];
+
+  [NSEvent startPeriodicEventsAfterDelay: 0.02 withPeriod: 0.05];
+
+  while ([theEvent type] != NSLeftMouseUp) {
+    CREATE_AUTORELEASE_POOL (arp);
+
+    theEvent = [NSApp nextEventMatchingMask: eventMask
+                                  untilDate: future
+                                     inMode: NSEventTrackingRunLoopMode
+                                    dequeue: YES];
+
+    if ([theEvent type] != NSPeriodic) {
+      p = [theEvent locationInWindow];
+    }
+    
+    CONVERT_CHECK;
+    
+    visibleRect = [self visibleRect];
+    
+    if (NSPointInRect(pp, [self visibleRect]) == NO) {
+      scrollPointToVisible(pp);
+      CONVERT_CHECK;
+      visibleRect = [self visibleRect];
+    }
+
+    if ((sp.y < visibleRect.origin.y)
+          || (sp.y > (visibleRect.origin.y + visibleRect.size.height))) {
+      if (sp.y < visibleRect.origin.y) {
+        sp.y = visibleRect.origin.y - 1;
+      }
+      if (sp.y > (visibleRect.origin.y + visibleRect.size.height)) {
+        sp.y = (visibleRect.origin.y + visibleRect.size.height + 1);
+      }
+    } 
+
+    x = (pp.x >= sp.x) ? sp.x : pp.x;
+    y = (pp.y >= sp.y) ? sp.y : pp.y;
+    w = max(pp.x, sp.x) - min(pp.x, sp.x);
+    w = (w == 0) ? 1 : w;
+    h = max(pp.y, sp.y) - min(pp.y, sp.y);
+    h = (h == 0) ? 1 : h;
+
+    r = NSMakeRect(x, y, w, h);
+    
+    wr = [self convertRect: r toView: nil];
+  
+    sp = startp;
+
+    if (NSEqualRects(oldRect, NSZeroRect) == NO) {
+		  [verticalImage compositeToPoint: NSMakePoint(NSMinX(oldRect), NSMinY(oldRect))
+		                         fromRect: NSMakeRect(0.0, 0.0, 1.0, oldRect.size.height)
+		                        operation: NSCompositeCopy];
+
+		  [verticalImage compositeToPoint: NSMakePoint(NSMaxX(oldRect)-1, NSMinY(oldRect))
+		                         fromRect: NSMakeRect(1.0, 0.0, 1.0, oldRect.size.height)
+		                        operation: NSCompositeCopy];
+
+		  [horizontalImage compositeToPoint: NSMakePoint(NSMinX(oldRect), NSMinY(oldRect))
+		                           fromRect: NSMakeRect(0.0, 0.0, oldRect.size.width, 1.0)
+		                          operation: NSCompositeCopy];
+
+      [horizontalImage compositeToPoint: NSMakePoint(NSMinX(oldRect), NSMaxY(oldRect)-1)
+		                           fromRect: NSMakeRect(0.0, 1.0, oldRect.size.width, 1.0)
+		                          operation: NSCompositeCopy];
+    }
+    [self displayIfNeeded];
+
+    [verticalImage lockFocus];
+    NSCopyBits([[self window] gState], 
+            NSMakeRect(NSMinX(wr), NSMinY(wr), 
+                          1.0, r.size.height),
+			                          NSMakePoint(0.0, 0.0));
+    NSCopyBits([[self window] gState],
+			      NSMakeRect(NSMaxX(wr) -1, NSMinY(wr),
+				                  1.0, r.size.height),
+			                          NSMakePoint(1.0, 0.0));
+    [verticalImage unlockFocus];
+
+    [horizontalImage lockFocus];
+    NSCopyBits([[self window] gState],
+			      NSMakeRect(NSMinX(wr), NSMinY(wr),
+				                  r.size.width, 1.0),
+			                          NSMakePoint(0.0, 0.0));
+    NSCopyBits([[self window] gState],
+			      NSMakeRect(NSMinX(wr), NSMaxY(wr) -1,
+				                  r.size.width, 1.0),
+			                          NSMakePoint(0.0, 1.0));
+    [horizontalImage unlockFocus];
+
+    [[NSColor darkGrayColor] set];
+    NSFrameRect(r);
+    oldRect = r;
+
+    [[self window] enableFlushWindow];
+    [[self window] flushWindow];
+    [[self window] disableFlushWindow];
+
+    DESTROY (arp);
+  }
+  
+  [NSEvent stopPeriodicEvents];
+  [[self window] postEvent: theEvent atStart: NO];
+  
+  if (NSEqualRects(oldRect, NSZeroRect) == NO) {
+		[verticalImage compositeToPoint: NSMakePoint(NSMinX(oldRect), NSMinY(oldRect))
+		                       fromRect: NSMakeRect(0.0, 0.0, 1.0, oldRect.size.height)
+		                      operation: NSCompositeCopy];
+
+		[verticalImage compositeToPoint: NSMakePoint(NSMaxX(oldRect)-1, NSMinY(oldRect))
+		                       fromRect: NSMakeRect(1.0, 0.0, 1.0, oldRect.size.height)
+		                      operation: NSCompositeCopy];
+
+		[horizontalImage compositeToPoint: NSMakePoint(NSMinX(oldRect), NSMinY(oldRect))
+		                         fromRect: NSMakeRect(0.0, 0.0, oldRect.size.width, 1.0)
+		                        operation: NSCompositeCopy];
+
+    [horizontalImage compositeToPoint: NSMakePoint(NSMinX(oldRect), NSMaxY(oldRect)-1)
+		                         fromRect: NSMakeRect(0.0, 1.0, oldRect.size.width, 1.0)
+		                        operation: NSCompositeCopy];
+  }
+  
+  [[self window] enableFlushWindow];
+  [[self window] flushWindow];
+  [self unlockFocus];
+
+  selectionMask = FSNMultipleSelectionMask;
+  selectionMask |= FSNCreatingSelectionMask;
+
+  x = (pp.x >= startp.x) ? startp.x : pp.x;
+  y = (pp.y >= startp.y) ? startp.y : pp.y;
+  w = max(pp.x, startp.x) - min(pp.x, startp.x);
+  w = (w == 0) ? 1 : w;
+  h = max(pp.y, startp.y) - min(pp.y, startp.y);
+  h = (h == 0) ? 1 : h;
+
+  selrect = NSMakeRect(x, y, w, h);
+  
+  for (i = 0; i < [icons count]; i++) {
+    FSNIcon *icon = [icons objectAtIndex: i];
+      
+    if (NSIntersectsRect(selrect, [icon frame])) {
+      [icon select];
+    } 
+  }  
+  
+  selectionMask = NSSingleSelectionMask;
+  
+  [self selectionDidChange];
+}
+
 - (void)resizeWithOldSuperviewSize:(NSSize)oldFrameSize
 {
   [self tile];
@@ -359,6 +684,21 @@ if (rct.size.height < 0) rct.size.height = 0; \
 - (FSNode *)shownNode
 {
   return node;
+}
+
+- (void)nodeContentsWillChange:(NSDictionary *)info
+{
+  [self checkLockedReps];
+}
+
+- (void)nodeContentsDidChange:(NSDictionary *)info
+{
+
+}
+
+- (void)watchedPathDidChange:(NSDictionary *)info
+{
+
 }
 
 - (void)setShowType:(FSNInfoType)type
@@ -445,6 +785,17 @@ if (rct.size.height < 0) rct.size.height = 0; \
 - (int)iconPosition
 {
   return iconPosition;
+}
+
+- (void)updateIcons
+{
+  int i;
+  
+  for (i = 0; i < [icons count]; i++) {
+    FSNIcon *icon = [icons objectAtIndex: i];
+    FSNode *inode = [icon node];
+    [icon setNode: inode];
+  }  
 }
 
 - (id)repOfSubnode:(FSNode *)anode
@@ -757,6 +1108,173 @@ if (rct.size.height < 0) rct.size.height = 0; \
 - (NSColor *)backgroundColor
 {
   return backColor;
+}
+
+@end
+
+
+@implementation FSNIconContainer (DraggingDestination)
+
+- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
+{
+	NSPasteboard *pb;
+  NSDragOperation sourceDragMask;
+	NSArray *sourcePaths;
+  NSString *nodePath;
+  NSString *prePath;
+	int count;
+  
+	isDragTarget = NO;	
+    
+ 	pb = [sender draggingPasteboard];
+
+  if (pb && [[pb types] containsObject: NSFilenamesPboardType]) {
+    sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
+       
+  } else if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"]) {
+    NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"]; 
+    NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
+    
+    sourcePaths = [pbDict objectForKey: @"paths"];
+  } else {
+    return NSDragOperationNone;
+  }
+
+	count = [sourcePaths count];
+	if (count == 0) {
+		return NSDragOperationNone;
+  } 
+    
+  if ([node isWritable] == NO) {
+    return NSDragOperationNone;
+  }
+    
+  nodePath = [node path];
+
+  if ([sourcePaths containsObject: nodePath]) {
+    return NSDragOperationNone;
+  }
+
+  prePath = [NSString stringWithString: nodePath];
+
+  while (1) {
+    if ([sourcePaths containsObject: prePath]) {
+      return NSDragOperationNone;
+    }
+    if ([prePath isEqual: path_separator()]) {
+      break;
+    }            
+    prePath = [prePath stringByDeletingLastPathComponent];
+  }
+
+  isDragTarget = YES;	
+    
+	sourceDragMask = [sender draggingSourceOperationMask];
+
+	if (sourceDragMask == NSDragOperationCopy) {
+		return NSDragOperationCopy;
+	} else if (sourceDragMask == NSDragOperationLink) {
+		return NSDragOperationLink;
+	} else {
+		return NSDragOperationAll;
+	}		
+
+  isDragTarget = NO;	
+  return NSDragOperationNone;
+}
+
+- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
+{
+  NSDragOperation sourceDragMask = [sender draggingSourceOperationMask];
+	
+	if (isDragTarget == NO) {
+		return NSDragOperationNone;
+	}
+
+	if (sourceDragMask == NSDragOperationCopy) {
+		return NSDragOperationCopy;
+	} else if (sourceDragMask == NSDragOperationLink) {
+		return NSDragOperationLink;
+	} else {
+		return NSDragOperationAll;
+	}
+
+	return NSDragOperationNone;
+}
+
+- (void)draggingExited:(id <NSDraggingInfo>)sender
+{
+	isDragTarget = NO;
+}
+
+- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
+{
+	return isDragTarget;
+}
+
+- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
+{
+	return YES;
+}
+
+- (void)concludeDragOperation:(id <NSDraggingInfo>)sender
+{
+	NSPasteboard *pb;
+  NSDragOperation sourceDragMask;
+	NSArray *sourcePaths;
+  NSString *operation, *source;
+  NSMutableArray *files;
+	NSMutableDictionary *opDict;
+	NSString *trashPath;
+  int i;
+
+	isDragTarget = NO;  
+
+	sourceDragMask = [sender draggingSourceOperationMask];
+  pb = [sender draggingPasteboard];
+    
+  if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"]) {  
+    NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"]; 
+
+    [desktopApp concludeRemoteFilesDragOperation: pbData
+                                     atLocalPath: [node path]];
+    return;
+  }
+    
+  sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
+  
+  if ([sourcePaths count] == 0) {
+    return;
+  }
+  
+  source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
+  
+  trashPath = [desktopApp trashPath];
+
+  if ([source isEqual: trashPath]) {
+    operation = @"GWorkspaceRecycleOutOperation";
+	} else {	
+		if (sourceDragMask == NSDragOperationCopy) {
+			operation = NSWorkspaceCopyOperation;
+		} else if (sourceDragMask == NSDragOperationLink) {
+			operation = NSWorkspaceLinkOperation;
+		} else {
+			operation = NSWorkspaceMoveOperation;
+		}
+  }
+
+  files = [NSMutableArray array];    
+  for(i = 0; i < [sourcePaths count]; i++) {    
+    [files addObject: [[sourcePaths objectAtIndex: i] lastPathComponent]];
+  }  
+
+	opDict = [NSMutableDictionary dictionary];
+	[opDict setObject: operation forKey: @"operation"];
+	[opDict setObject: source forKey: @"source"];
+	[opDict setObject: [node path] forKey: @"destination"];
+	[opDict setObject: files forKey: @"files"];
+
+  [desktopApp performFileOperation: opDict];
 }
 
 @end

@@ -93,10 +93,6 @@
 
 - (void)applicationLaunched:(NSNotification *)notif;
 
-- (void)fileSystemDidChange:(NSDictionary *)info;
-
-- (void)watchedPathDidChange:(NSDictionary *)info;
-
 - (void)setPosition:(DockPosition)pos;
 
 - (void)setBackColor:(NSColor *)color;

@@ -108,6 +108,12 @@ typedef enum FSNSelectionMask {
 
 - (FSNode *)shownNode;
 
+- (void)nodeContentsWillChange:(NSDictionary *)info;
+
+- (void)nodeContentsDidChange:(NSDictionary *)info;
+
+- (void)watchedPathDidChange:(NSDictionary *)info;
+
 - (void)setShowType:(FSNInfoType)type;
 
 - (FSNInfoType)showType;
@@ -123,6 +129,8 @@ typedef enum FSNSelectionMask {
 - (void)setIconPosition:(int)pos;
 
 - (int)iconPosition;
+
+- (void)updateIcons;
 
 - (id)repOfSubnode:(FSNode *)anode;
 

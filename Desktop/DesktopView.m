@@ -195,163 +195,6 @@
   return self;
 }
 
-- (void)fileSystemWillChange:(NSDictionary *)info
-{
-  [self checkLockedReps];
-}
-
-- (void)fileSystemDidChange:(NSDictionary *)info
-{
-  NSString *operation = [info objectForKey: @"operation"];
-  NSString *source = [info objectForKey: @"source"];
-  NSString *destination = [info objectForKey: @"destination"];
-  NSArray *files = [info objectForKey: @"files"];
-  int i; 
-
-  if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
-    files = [NSArray arrayWithObject: [source lastPathComponent]];
-    source = [source stringByDeletingLastPathComponent]; 
-  }
-
-  if ([[node path] isEqual: source]
-        && ([operation isEqual: @"NSWorkspaceMoveOperation"]
-            || [operation isEqual: @"NSWorkspaceDestroyOperation"]
-            || [operation isEqual: @"GWorkspaceRenameOperation"]
-			      || [operation isEqual: @"NSWorkspaceRecycleOperation"]
-			      || [operation isEqual: @"GWorkspaceRecycleOutOperation"])) {
-    for (i = 0; i < [files count]; i++) {
-      NSString *fname = [files objectAtIndex: i];
-      FSNode *subnode = [FSNode nodeWithRelativePath: fname parent: node];
-      
-      if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
-        FSNIcon *icon = [self repOfSubnode: subnode];
-        
-        if (icon) {
-          insertIndex = [icon gridIndex];
-        }
-      }
-      
-      [self removeRepOfSubnode: subnode];
-    }
-  }
-
-  if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
-    files = [NSArray arrayWithObject: [destination lastPathComponent]];
-    destination = [destination stringByDeletingLastPathComponent]; 
-  }
-
-  if ([[node path] isEqual: destination]
-          && ([operation isEqual: @"NSWorkspaceMoveOperation"]   
-              || [operation isEqual: @"NSWorkspaceCopyOperation"]
-              || [operation isEqual: @"NSWorkspaceLinkOperation"]
-              || [operation isEqual: @"NSWorkspaceDuplicateOperation"]
-              || [operation isEqual: @"GWorkspaceCreateDirOperation"]
-              || [operation isEqual: @"GWorkspaceRenameOperation"]
-				      || [operation isEqual: @"GWorkspaceRecycleOutOperation"])) { 
-    for (i = 0; i < [files count]; i++) {
-      NSString *fname = [files objectAtIndex: i];
-      FSNode *subnode = [FSNode nodeWithRelativePath: fname parent: node];
-      FSNIcon *icon = [self repOfSubnode: subnode];
-      int index;
-
-      if (i == 0) {
-        if (insertIndex != -1) {
-          if ([self isFreeGridIndex: insertIndex]) {
-            index = insertIndex;
-          } else {
-            index = [self firstFreeGridIndexAfterIndex: insertIndex];
-
-            if (index == -1) {
-              index = [self firstFreeGridIndex];
-            }
-          }
-        
-        } else {
-          index = [self firstFreeGridIndex];
-        }
-        
-      } else {
-        index = [self firstFreeGridIndexAfterIndex: index];
-        
-        if (index == -1) {
-          index = [self firstFreeGridIndex];
-        }
-      }
-      
-      if (icon) {
-        [icon setNode: subnode];
-        [icon setGridIndex: index];
-      } else {
-        icon = [self addRepForSubnode: subnode];
-        [icon setGridIndex: index];
-      }
-    }
-    
-  }
-  
-  [self checkLockedReps];
-  [self tile];
-  [self setNeedsDisplay: YES];
-  [self selectionDidChange];
-}
-
-- (void)watchedPathDidChange:(NSDictionary *)info
-{
-  NSString *event = [info objectForKey: @"event"];
-  NSArray *files = [info objectForKey: @"files"];
-  NSString *ndpath = [node path];
-  NSString *fname;
-  NSString *fpath;
-  int i;
-
-  if ([event isEqual: @"GWFileDeletedInWatchedDirectory"]) {
-    for (i = 0; i < [files count]; i++) {  
-      fname = [files objectAtIndex: i];
-      fpath = [ndpath stringByAppendingPathComponent: fname];  
-      [self removeRepOfSubnodePath: fpath];
-    }
-    
-  } else if ([event isEqual: @"GWFileCreatedInWatchedDirectory"]) {
-    for (i = 0; i < [files count]; i++) {  
-      fname = [files objectAtIndex: i];
-      fpath = [ndpath stringByAppendingPathComponent: fname];  
-      
-      if ([self repOfSubnodePath: fpath] == nil) {
-        [self addRepForSubnodePath: fpath];
-      }
-    }
-    
-  } else if ([event isEqual: @"GWWatchedFileModified"]) {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSString *mtabpath = [defaults stringForKey: @"GSMtabPath"];
-
-    if (mtabpath == nil) {
-      mtabpath = @"/etc/mtab";
-    }
-  
-    fpath = [info objectForKey: @"path"];
-  
-    if ([fpath isEqual: mtabpath]) {
-      [self showMountedVolumes];
-    }
-  }
-  
-  [self tile];
-  [self setNeedsDisplay: YES];
-  [self selectionDidChange];
-}
-
-- (void)thumbnailsDidChange
-{
-  int i;
-  
-  for (i = 0; i < [icons count]; i++) {
-    FSNIcon *icon = [icons objectAtIndex: i];
-    FSNode *inode = [icon node];
-    [icon setNode: inode];
-  }  
-}
-
 - (void)newVolumeMountedAtPath:(NSString *)vpath
 {
   FSNode *vnode = [FSNode nodeWithRelativePath: vpath parent: nil];
@@ -1094,6 +937,152 @@
   return node;
 }
 
+- (void)nodeContentsWillChange:(NSDictionary *)info
+{
+  [self checkLockedReps];
+}
+
+- (void)nodeContentsDidChange:(NSDictionary *)info
+{
+  NSString *operation = [info objectForKey: @"operation"];
+  NSString *source = [info objectForKey: @"source"];
+  NSString *destination = [info objectForKey: @"destination"];
+  NSArray *files = [info objectForKey: @"files"];
+  int i; 
+
+  if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
+    files = [NSArray arrayWithObject: [source lastPathComponent]];
+    source = [source stringByDeletingLastPathComponent]; 
+  }
+
+  if ([[node path] isEqual: source]
+        && ([operation isEqual: @"NSWorkspaceMoveOperation"]
+            || [operation isEqual: @"NSWorkspaceDestroyOperation"]
+            || [operation isEqual: @"GWorkspaceRenameOperation"]
+			      || [operation isEqual: @"NSWorkspaceRecycleOperation"]
+			      || [operation isEqual: @"GWorkspaceRecycleOutOperation"])) {
+    for (i = 0; i < [files count]; i++) {
+      NSString *fname = [files objectAtIndex: i];
+      FSNode *subnode = [FSNode nodeWithRelativePath: fname parent: node];
+      
+      if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
+        FSNIcon *icon = [self repOfSubnode: subnode];
+        
+        if (icon) {
+          insertIndex = [icon gridIndex];
+        }
+      }
+      
+      [self removeRepOfSubnode: subnode];
+    }
+  }
+
+  if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
+    files = [NSArray arrayWithObject: [destination lastPathComponent]];
+    destination = [destination stringByDeletingLastPathComponent]; 
+  }
+
+  if ([[node path] isEqual: destination]
+          && ([operation isEqual: @"NSWorkspaceMoveOperation"]   
+              || [operation isEqual: @"NSWorkspaceCopyOperation"]
+              || [operation isEqual: @"NSWorkspaceLinkOperation"]
+              || [operation isEqual: @"NSWorkspaceDuplicateOperation"]
+              || [operation isEqual: @"GWorkspaceCreateDirOperation"]
+              || [operation isEqual: @"GWorkspaceRenameOperation"]
+				      || [operation isEqual: @"GWorkspaceRecycleOutOperation"])) { 
+    for (i = 0; i < [files count]; i++) {
+      NSString *fname = [files objectAtIndex: i];
+      FSNode *subnode = [FSNode nodeWithRelativePath: fname parent: node];
+      FSNIcon *icon = [self repOfSubnode: subnode];
+      int index;
+
+      if (i == 0) {
+        if (insertIndex != -1) {
+          if ([self isFreeGridIndex: insertIndex]) {
+            index = insertIndex;
+          } else {
+            index = [self firstFreeGridIndexAfterIndex: insertIndex];
+
+            if (index == -1) {
+              index = [self firstFreeGridIndex];
+            }
+          }
+        
+        } else {
+          index = [self firstFreeGridIndex];
+        }
+        
+      } else {
+        index = [self firstFreeGridIndexAfterIndex: index];
+        
+        if (index == -1) {
+          index = [self firstFreeGridIndex];
+        }
+      }
+      
+      if (icon) {
+        [icon setNode: subnode];
+        [icon setGridIndex: index];
+      } else {
+        icon = [self addRepForSubnode: subnode];
+        [icon setGridIndex: index];
+      }
+    }
+    
+  }
+  
+  [self checkLockedReps];
+  [self tile];
+  [self setNeedsDisplay: YES];
+  [self selectionDidChange];
+}
+
+- (void)watchedPathDidChange:(NSDictionary *)info
+{
+  NSString *event = [info objectForKey: @"event"];
+  NSArray *files = [info objectForKey: @"files"];
+  NSString *ndpath = [node path];
+  NSString *fname;
+  NSString *fpath;
+  int i;
+
+  if ([event isEqual: @"GWFileDeletedInWatchedDirectory"]) {
+    for (i = 0; i < [files count]; i++) {  
+      fname = [files objectAtIndex: i];
+      fpath = [ndpath stringByAppendingPathComponent: fname];  
+      [self removeRepOfSubnodePath: fpath];
+    }
+    
+  } else if ([event isEqual: @"GWFileCreatedInWatchedDirectory"]) {
+    for (i = 0; i < [files count]; i++) {  
+      fname = [files objectAtIndex: i];
+      fpath = [ndpath stringByAppendingPathComponent: fname];  
+      
+      if ([self repOfSubnodePath: fpath] == nil) {
+        [self addRepForSubnodePath: fpath];
+      }
+    }
+    
+  } else if ([event isEqual: @"GWWatchedFileModified"]) {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString *mtabpath = [defaults stringForKey: @"GSMtabPath"];
+
+    if (mtabpath == nil) {
+      mtabpath = @"/etc/mtab";
+    }
+  
+    fpath = [info objectForKey: @"path"];
+  
+    if ([fpath isEqual: mtabpath]) {
+      [self showMountedVolumes];
+    }
+  }
+  
+  [self tile];
+  [self setNeedsDisplay: YES];
+  [self selectionDidChange];
+}
+
 - (void)setShowType:(FSNInfoType)type
 {
   if (infoType != type) {
@@ -1181,6 +1170,17 @@
 - (int)iconPosition
 {
   return iconPosition;
+}
+
+- (void)updateIcons
+{
+  int i;
+  
+  for (i = 0; i < [icons count]; i++) {
+    FSNIcon *icon = [icons objectAtIndex: i];
+    FSNode *inode = [icon node];
+    [icon setNode: inode];
+  }  
 }
 
 - (id)repOfSubnode:(FSNode *)anode

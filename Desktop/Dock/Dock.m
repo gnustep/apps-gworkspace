@@ -388,145 +388,6 @@
   }
 }
 
-- (void)fileSystemDidChange:(NSDictionary *)info
-{
-  NSString *operation = [info objectForKey: @"operation"];
-	NSString *source = [info objectForKey: @"source"];	  
-	NSString *destination = [info objectForKey: @"destination"];	 
-	NSArray *files = [info objectForKey: @"files"];	 
-  int i, count;
-  
-  if ([operation isEqual: NSWorkspaceMoveOperation]
-        || [operation isEqual: NSWorkspaceDestroyOperation]
-		    || [operation isEqual: NSWorkspaceRecycleOperation]
-        || [operation isEqual: @"GWorkspaceRenameOperation"]) {
-    count = [icons count];
-    
-    for (i = 0; i < count; i++) {
-      DockIcon *icon = [icons objectAtIndex: i];
-      FSNode *node = [icon node];
-      
-      if ([source isEqual: [node parentPath]]) {
-        if ([files containsObject: [node name]]) {
-          if ([icon isSpecialIcon] == NO) {
-            [self removeIcon: icon];
-            count--;
-            i--;
-          }
-        }
-      }
-    }
-  }  
-  
-  if ([operation isEqual: NSWorkspaceMoveOperation]
-      || [operation isEqual: NSWorkspaceCopyOperation]
-			|| [operation isEqual: NSWorkspaceRecycleOperation]) { 
-    DockIcon *icon = [self trashIcon];
-    NSString *trashPath = [[icon node] path];
-    
-    if ([destination isEqual: trashPath]) {
-      [icon setTrashFull: YES];
-    }
-  }
-
-  if ([operation isEqual: @"GWorkspaceRecycleOutOperation"]
-			    || [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]
-          || [operation isEqual: NSWorkspaceMoveOperation]
-          || [operation isEqual: NSWorkspaceDestroyOperation]) { 
-    DockIcon *icon = [self trashIcon];
-    FSNode *node = [icon node];
-    NSString *trashPath = [node path];
-    NSString *basePath;
-    
-    if ([operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]
-                || [operation isEqual: NSWorkspaceDestroyOperation]) { 
-      basePath = destination;  
-    } else {
-      basePath = source;  
-    }
-    
-    if ([basePath isEqual: trashPath]) {
-      NSArray *subNodes = [node subNodes];
-      int count = [subNodes count];
-    
-      for (i = 0; i < [subNodes count]; i++) {
-        FSNode *subNode = [subNodes objectAtIndex: i];
-        
-        if ([[subNode name] hasPrefix: @"."]) {
-          count --;
-        }
-      }
-      
-      if (count == 0) {
-        [icon setTrashFull: NO];
-      }
-    }
-  }
-}
-
-- (void)watchedPathDidChange:(NSDictionary *)info
-{
-  NSString *event = [info objectForKey: @"event"];
-  NSString *path = [info objectForKey: @"path"];
-    
-  if ([event isEqual: @"GWWatchedDirectoryDeleted"]) {
-    int count = [icons count];
-    int i;
-
-    for (i = 0; i < count; i++) {
-      DockIcon *icon = [icons objectAtIndex: i];
-      
-      if ([icon isSpecialIcon] == NO) {
-        FSNode *node = [icon node];
-        
-        if ([path isEqual: [node path]]) {
-          [self removeIcon: icon];
-          count--;
-          i--;
-        }
-      }
-    }
-    
-  } else if ([event isEqual: @"GWFileDeletedInWatchedDirectory"]) {
-    if ([path isEqual: [desktop trashPath]]) {
-      DockIcon *icon = [self trashIcon];  
-      FSNode *node = [icon node];
-      NSArray *subNodes = [node subNodes];
-      int count = [subNodes count];
-      int i;
-
-      for (i = 0; i < [subNodes count]; i++) {
-        FSNode *subNode = [subNodes objectAtIndex: i];
-        
-        if ([[subNode name] hasPrefix: @"."]) {
-          count --;
-        }
-      }
-      
-      if (count == 0) {
-        [icon setTrashFull: NO];
-      }
-    }
-    
-  } else if ([event isEqual: @"GWFileCreatedInWatchedDirectory"]) {
-    if ([path isEqual: [desktop trashPath]]) {
-      DockIcon *icon = [self trashIcon];  
-      FSNode *node = [icon node];
-      NSArray *subNodes = [node subNodes];
-      int i;
-
-      for (i = 0; i < [subNodes count]; i++) {
-        FSNode *subNode = [subNodes objectAtIndex: i];
-        
-        if ([[subNode name] hasPrefix: @"."] == NO) {
-          [icon setTrashFull: YES];
-          break;
-        }
-      }
-    }
-  }
-}
-
 - (void)setPosition:(DockPosition)pos
 {
   position = pos;
@@ -703,6 +564,149 @@
   return nil;
 }
 
+- (void)nodeContentsWillChange:(NSDictionary *)info
+{
+}
+
+- (void)nodeContentsDidChange:(NSDictionary *)info
+{
+  NSString *operation = [info objectForKey: @"operation"];
+	NSString *source = [info objectForKey: @"source"];	  
+	NSString *destination = [info objectForKey: @"destination"];	 
+	NSArray *files = [info objectForKey: @"files"];	 
+  int i, count;
+  
+  if ([operation isEqual: NSWorkspaceMoveOperation]
+        || [operation isEqual: NSWorkspaceDestroyOperation]
+		    || [operation isEqual: NSWorkspaceRecycleOperation]
+        || [operation isEqual: @"GWorkspaceRenameOperation"]) {
+    count = [icons count];
+    
+    for (i = 0; i < count; i++) {
+      DockIcon *icon = [icons objectAtIndex: i];
+      FSNode *node = [icon node];
+      
+      if ([source isEqual: [node parentPath]]) {
+        if ([files containsObject: [node name]]) {
+          if ([icon isSpecialIcon] == NO) {
+            [self removeIcon: icon];
+            count--;
+            i--;
+          }
+        }
+      }
+    }
+  }  
+  
+  if ([operation isEqual: NSWorkspaceMoveOperation]
+      || [operation isEqual: NSWorkspaceCopyOperation]
+			|| [operation isEqual: NSWorkspaceRecycleOperation]) { 
+    DockIcon *icon = [self trashIcon];
+    NSString *trashPath = [[icon node] path];
+    
+    if ([destination isEqual: trashPath]) {
+      [icon setTrashFull: YES];
+    }
+  }
+
+  if ([operation isEqual: @"GWorkspaceRecycleOutOperation"]
+			    || [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]
+          || [operation isEqual: NSWorkspaceMoveOperation]
+          || [operation isEqual: NSWorkspaceDestroyOperation]) { 
+    DockIcon *icon = [self trashIcon];
+    FSNode *node = [icon node];
+    NSString *trashPath = [node path];
+    NSString *basePath;
+    
+    if ([operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]
+                || [operation isEqual: NSWorkspaceDestroyOperation]) { 
+      basePath = destination;  
+    } else {
+      basePath = source;  
+    }
+    
+    if ([basePath isEqual: trashPath]) {
+      NSArray *subNodes = [node subNodes];
+      int count = [subNodes count];
+    
+      for (i = 0; i < [subNodes count]; i++) {
+        FSNode *subNode = [subNodes objectAtIndex: i];
+        
+        if ([[subNode name] hasPrefix: @"."]) {
+          count --;
+        }
+      }
+      
+      if (count == 0) {
+        [icon setTrashFull: NO];
+      }
+    }
+  }
+}
+
+- (void)watchedPathDidChange:(NSDictionary *)info
+{
+  NSString *event = [info objectForKey: @"event"];
+  NSString *path = [info objectForKey: @"path"];
+    
+  if ([event isEqual: @"GWWatchedDirectoryDeleted"]) {
+    int count = [icons count];
+    int i;
+
+    for (i = 0; i < count; i++) {
+      DockIcon *icon = [icons objectAtIndex: i];
+      
+      if ([icon isSpecialIcon] == NO) {
+        FSNode *node = [icon node];
+        
+        if ([path isEqual: [node path]]) {
+          [self removeIcon: icon];
+          count--;
+          i--;
+        }
+      }
+    }
+    
+  } else if ([event isEqual: @"GWFileDeletedInWatchedDirectory"]) {
+    if ([path isEqual: [desktop trashPath]]) {
+      DockIcon *icon = [self trashIcon];  
+      FSNode *node = [icon node];
+      NSArray *subNodes = [node subNodes];
+      int count = [subNodes count];
+      int i;
+
+      for (i = 0; i < [subNodes count]; i++) {
+        FSNode *subNode = [subNodes objectAtIndex: i];
+        
+        if ([[subNode name] hasPrefix: @"."]) {
+          count --;
+        }
+      }
+      
+      if (count == 0) {
+        [icon setTrashFull: NO];
+      }
+    }
+    
+  } else if ([event isEqual: @"GWFileCreatedInWatchedDirectory"]) {
+    if ([path isEqual: [desktop trashPath]]) {
+      DockIcon *icon = [self trashIcon];  
+      FSNode *node = [icon node];
+      NSArray *subNodes = [node subNodes];
+      int i;
+
+      for (i = 0; i < [subNodes count]; i++) {
+        FSNode *subNode = [subNodes objectAtIndex: i];
+        
+        if ([[subNode name] hasPrefix: @"."] == NO) {
+          [icon setTrashFull: YES];
+          break;
+        }
+      }
+    }
+  }
+}
+
 - (void)setShowType:(FSNInfoType)type
 {
 }
@@ -738,6 +742,10 @@
 - (int)iconPosition
 {
   return NSImageOnly;
+}
+
+- (void)updateIcons
+{
 }
 
 - (id)repOfSubnode:(FSNode *)anode

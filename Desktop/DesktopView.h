@@ -92,14 +92,6 @@ typedef enum BackImageStyle {
 
 - (void)updateNodeInfo;
 
-- (void)fileSystemWillChange:(NSDictionary *)info;
-
-- (void)fileSystemDidChange:(NSDictionary *)info;
-
-- (void)watchedPathDidChange:(NSDictionary *)info;
-
-- (void)thumbnailsDidChange;
-
 - (void)newVolumeMountedAtPath:(NSString *)vpath;
 
 - (void)workspaceWillUnmountVolumeAtPath:(NSString *)vpath;
@@ -133,7 +125,7 @@ typedef enum BackImageStyle {
 @end
 
 
-@interface DesktopView(DraggingDestination)
+@interface DesktopView (DraggingDestination)
 
 - (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender;
 

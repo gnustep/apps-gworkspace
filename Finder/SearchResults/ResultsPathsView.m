@@ -194,6 +194,18 @@
   return nil;
 }
 
+- (void)nodeContentsWillChange:(NSDictionary *)info
+{
+}
+
+- (void)nodeContentsDidChange:(NSDictionary *)info
+{
+}
+
+- (void)watchedPathDidChange:(NSDictionary *)info
+{
+}
+
 - (void)setShowType:(FSNInfoType)type
 {
 }
@@ -234,8 +246,9 @@
   return NSImageLeft;
 }
 
-
-
+- (void)updateIcons
+{
+}
 
 - (id)repOfSubnode:(FSNode *)anode
 {
