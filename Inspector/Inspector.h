@@ -72,6 +72,10 @@
 
 - (id)tools;
 
+- (void)showAnnotations;
+
+- (id)annotations;
+
 - (NSWindow *)win;
 
 - (void)updateDefaults;
@@ -81,6 +85,8 @@
 - (void)removeWatcherForPath:(NSString *)path;
 
 - (void)watcherNotification:(NSNotification *)notif;
+
+- (id)desktopApp;
 
 @end
 

@@ -148,7 +148,6 @@ void createMenu()
 	menu = AUTORELEASE ([NSMenu new]);
 	[mainMenu setSubmenu: menu forItem: menuItem];	
 	addItemToMenu(menu, @"Viewer", @"", @"showViewer:", @"V");	
-  addItemToMenu(menu, @"File Annotations", @"", @"showAnnotationWindows:", @"I");
 		
     menuItem = addItemToMenu(menu, @"Inspectors", @"", nil, @"");
 		subenu = AUTORELEASE ([NSMenu new]);
@@ -157,6 +156,7 @@ void createMenu()
 		addItemToMenu(subenu, @"Attributes", @"", @"showAttributesInspector:", @"1");
 		addItemToMenu(subenu, @"Contents", @"", @"showContentsInspector:", @"2");
 		addItemToMenu(subenu, @"Tools", @"", @"showToolsInspector:", @"3");
+		addItemToMenu(subenu, @"Annotations", @"", @"showAnnotationsInspector:", @"4");
 		
     menuItem = addItemToMenu(menu, @"History", @"", nil, @"");
 		subenu = AUTORELEASE ([NSMenu new]);

@@ -32,7 +32,6 @@
 @class FSNode;
 @class GWViewerWindow;
 @class GWorkspace;
-@class FileAnnotationsManager;
 @class NSView;
 @class NSTextField;
 @class GWViewerScrollView;
@@ -63,7 +62,6 @@
 
   GWViewersManager *manager;
   GWorkspace *gworkspace;
-  FileAnnotationsManager *fannManager;
   
   NSNotificationCenter *nc;    
 }
@@ -142,7 +140,6 @@
 - (void)chooseLabelColor:(id)sender;
 - (void)chooseBackColor:(id)sender;
 - (void)selectAllInViewer;
-- (void)showAnnotationWindows;
 - (void)showTerminal;
 - (BOOL)validateItem:(id)menuItem;
 

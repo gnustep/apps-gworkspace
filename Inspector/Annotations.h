@@ -1,9 +1,9 @@
-/* FileAnnotation.h
+/* Annotations.h
  *  
- * Copyright (C) 2003 Free Software Foundation, Inc.
+ * Copyright (C) 2005 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
- * Date: October 2004
+ * Date: February 2005
  *
  * This file is part of the GNUstep GWorkspace application
  *
@@ -22,46 +22,41 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef FILE_ANNOTATION_H
-#define FILE_ANNOTATION_H
+#ifndef ANNOTATION_H
+#define ANNOTATION_H
 
 #include <Foundation/Foundation.h>
 
 @class FSNode;
+@class NSView;
 
-@interface FileAnnotation: NSObject
+@interface Annotations: NSObject
 {
-  FSNode *node;
-  id manager;
-  BOOL invalidated;
   IBOutlet id win;
+  IBOutlet id mainBox;
   IBOutlet id topBox;
-  IBOutlet id imview;
-  IBOutlet id nameField;
+  IBOutlet id iconView;
+  IBOutlet id titleField;
+  IBOutlet id toolsBox;
   IBOutlet id textView;
+  IBOutlet id okButt;
+
+  NSString *currentPath;
+  NSView *noContsView; 
+  id inspector;
+  id desktopApp;
 }
 
-- (id)initForNode:(FSNode *)anode 
-          annotationContents:(NSString *)contents;
+- (id)initForInspector:(id)insp;
 
-- (NSString *)annotationContents;
+- (NSView *)inspView;
 
-- (void)setAnnotationContents:(NSString *)contents;
+- (NSString *)winname;
 
-- (FSNode *)node;
+- (void)activateForPaths:(NSArray *)paths;
 
-- (void)setNode:(FSNode *)anode;
-
-- (void)activate;
-
-- (void)invalidate;
-
-- (BOOL)invalidated;
-
-- (id)win;
-
-- (void)updateDefaults;
+- (IBAction)setAnnotations:(id)sender;
 
 @end
 
-#endif // FILE_ANNOTATION_H
+#endif // ANNOTATION_H

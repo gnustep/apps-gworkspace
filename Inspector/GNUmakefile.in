@@ -33,6 +33,7 @@ Inspector_OBJC_FILES = \
          Attributes.m \
          Contents.m \
          Tools.m \
+         Annotations.m \
          TimeDateView.m \
          Functions.m
 

@@ -53,7 +53,6 @@
 - (void)chooseLabelColor:(id)sender;
 - (void)chooseBackColor:(id)sender;
 - (void)selectAllInViewer:(id)sender;
-- (void)showAnnotationWindows:(id)sender;
 - (void)showTerminal:(id)sender;
 
 @end
@@ -81,7 +80,6 @@
 - (void)chooseLabelColor:(id)sender;
 - (void)chooseBackColor:(id)sender;
 - (void)selectAllInViewer;
-- (void)showAnnotationWindows;
 - (void)showTerminal;
 
 @end

@@ -1,0 +1,30 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    Annotations = {
+	Actions = (
+	    "setAnnotations:"
+	);
+	Outlets = (
+	    win,
+	    mainBox,
+	    topBox,
+	    iconView,
+	    titleField,
+	    textView,
+	    okButt,
+	    toolsBox
+	);
+	Super = NSObject;
+    };
+    FirstResponder = {
+	Actions = (
+	    "closeMainWin:",
+	    "okLoginAction:",
+	    "orderFrontFontPanel:",
+	    "setAnnotations:",
+	    "setDefaultApplication:",
+	    "showInfo:"
+	);
+	Super = NSObject;
+    };
+}

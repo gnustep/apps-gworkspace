@@ -42,8 +42,6 @@
 #include "GWSpatialViewer.h"
 #include "Finder.h"
 #include "Inspector.h"
-#include "FileAnnotationsManager.h"
-#include "FileAnnotation.h"
 #include "TShelf/TShelfWin.h"
 #include "TShelf/TShelfView.h"
 #include "TShelf/TShelfViewItem.h"
@@ -590,7 +588,6 @@ static GWorkspace *gworkspace = nil;
 
   ddbd = nil;
   [self connectDDBd];
-  fannManager = [FileAnnotationsManager fannmanager];
   
 	[defaults synchronize];
 
@@ -686,8 +683,6 @@ static GWorkspace *gworkspace = nil;
       DESTROY (operationsApp);
     }
   }
-
-  [fannManager closeAll];
   
   if (ddbd) {
     NSConnection *ddbdconn = [(NSDistantObject *)ddbd connectionForProxy];
@@ -1942,7 +1937,6 @@ static GWorkspace *gworkspace = nil;
 		                                  NSInternalInconsistencyException);
   RELEASE (ddbd);
   ddbd = nil;
-  [fannManager closeAll];
   
   NSRunAlertPanel(nil,
                   NSLocalizedString(@"ddbd connection died.", @""),
@@ -2134,6 +2128,12 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 {
   [self showInspector: nil]; 
   [inspector showTools];
+}
+
+- (void)showAnnotationsInspector:(id)sender
+{
+  [self showInspector: nil]; 
+  [inspector showAnnotations];
 }
 
 - (void)showDesktop:(id)sender

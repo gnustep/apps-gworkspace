@@ -1,4 +1,4 @@
-/* Inspector.m
+/* Contents.m
  *  
  * Copyright (C) 2004 Free Software Foundation, Inc.
  *

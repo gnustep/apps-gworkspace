@@ -286,6 +286,19 @@ typedef enum FSNSelectionMask {
 
 - (void)removeWatcherForPath:(NSString *)path;
 
+- (void)connectDDBd;
+
+- (BOOL)ddbdactive;
+
+- (void)ddbdInsertPath:(NSString *)path;
+
+- (void)ddbdRemovePath:(NSString *)path;
+
+- (NSString *)ddbdGetAnnotationsForPath:(NSString *)path;
+
+- (void)ddbdSetAnnotations:(NSString *)annotations
+                   forPath:(NSString *)path;
+
 - (NSString *)trashPath;
 
 - (id)workspaceApplication;

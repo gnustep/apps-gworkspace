@@ -29,11 +29,13 @@
 #include "Contents.h"
 #include "Attributes.h"
 #include "Tools.h"
+#include "Annotations.h"
 #include "Functions.h"
 
-#define ATTRIBUTES 0
-#define CONTENTS   1
-#define TOOLS      2
+#define ATTRIBUTES   0
+#define CONTENTS     1
+#define TOOLS        2
+#define ANNOTATIONS  3
 
 static NSString *nibName = @"InspectorWin";
 
@@ -102,6 +104,13 @@ static NSString *nibName = @"InspectorWin";
     [popUp insertItemWithTitle: NSLocalizedString(@"Tools", @"") 
                        atIndex: TOOLS];
     [[popUp itemAtIndex: TOOLS] setKeyEquivalent: @"3"];
+    DESTROY (currentInspector);
+
+    currentInspector = [[Annotations alloc] initForInspector: self];
+    [inspectors insertObject: currentInspector atIndex: ANNOTATIONS]; 
+    [popUp insertItemWithTitle: NSLocalizedString(@"Annotations", @"") 
+                       atIndex: ANNOTATIONS];
+    [[popUp itemAtIndex: ANNOTATIONS] setKeyEquivalent: @"4"];
     DESTROY (currentInspector);
 
     [nc addObserver: self 
@@ -220,6 +229,20 @@ static NSString *nibName = @"InspectorWin";
   return [inspectors objectAtIndex: TOOLS];
 }
 
+- (void)showAnnotations
+{
+  if ([win isVisible] == NO) {
+    [self activate];
+  }
+  [popUp selectItemAtIndex: ANNOTATIONS];
+  [self activateInspector: popUp];
+}
+
+- (id)annotations
+{
+  return [inspectors objectAtIndex: ANNOTATIONS];
+}
+
 - (NSWindow *)win
 {
   return win;
@@ -265,6 +288,11 @@ static NSString *nibName = @"InspectorWin";
       [[inspectors objectAtIndex: i] watchedPathDidChange: info];
     }
   }
+}
+
+- (id)desktopApp
+{
+  return desktopApp;
 }
 
 @end

@@ -28,7 +28,6 @@
 #include "GWDesktopView.h"
 #include "Dock.h"
 #include "FSNFunctions.h"
-#include "FileAnnotationsManager.h"
 #include "GWorkspace.h"
 #include "GWViewersManager.h"
 
@@ -541,8 +540,7 @@ static GWDesktopManager *desktopManager = nil;
     GWDesktopView *desktopView = [win desktopView];
 
     if ([itemTitle isEqual: NSLocalizedString(@"Duplicate", @"")]
-        || [itemTitle isEqual: NSLocalizedString(@"Move to Recycler", @"")]
-        || [itemTitle isEqual: NSLocalizedString(@"File Annotations", @"")]) {
+        || [itemTitle isEqual: NSLocalizedString(@"Move to Recycler", @"")]) {
       return ([[desktopView selectedNodes] count] > 0);
     }
 
@@ -673,15 +671,6 @@ static GWDesktopManager *desktopManager = nil;
 - (void)selectAllInViewer
 {
 	[[win desktopView] selectAll];
-}
-
-- (void)showAnnotationWindows
-{
-  NSArray *selection = [[win desktopView] selectedNodes];
-
-  if ([selection count]) {
-    [[FileAnnotationsManager fannmanager] showAnnotationsForNodes: selection];
-  }
 }
 
 - (void)showTerminal

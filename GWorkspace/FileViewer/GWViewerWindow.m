@@ -146,11 +146,6 @@
   [delegate selectAllInViewer];
 }
 
-- (void)showAnnotationWindows:(id)sender
-{
-  [delegate showAnnotationWindows];
-}
-
 - (void)showTerminal:(id)sender
 {
   [delegate showTerminal];

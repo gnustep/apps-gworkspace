@@ -156,7 +156,6 @@ typedef enum DockPosition {
 - (void)setIconsPosition:(id)sender;
 - (void)setLabelSize:(id)sender;
 - (void)selectAllInViewer;
-- (void)showAnnotationWindows;
 - (void)showTerminal;
 
 @end

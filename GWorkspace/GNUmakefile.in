@@ -72,8 +72,6 @@ FileViewer/GWViewerSplit.m \
 FileViewer/GWViewerScrollView.m \
 FileViewer/GWViewerIconsPath.m \
 FileViewer/GWViewerPathsPopUp.m \
-FileAnnotations/FileAnnotationsManager.m \
-FileAnnotations/FileAnnotation.m \
 Finder/Finder.m \
 Finder/FindModuleView.m \
 Finder/SearchPlacesBox.m \

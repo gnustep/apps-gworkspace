@@ -66,6 +66,14 @@
   id inspector;
 }
 
+- (id)initForInspector:(id)insp;
+
+- (NSView *)inspView;
+
+- (NSString *)winname;
+
+- (void)activateForPaths:(NSArray *)paths;
+
 - (void)findApplicationsForPaths:(NSArray *)paths;   
 
 - (IBAction)setDefaultApplication:(id)sender;

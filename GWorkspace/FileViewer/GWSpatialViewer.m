@@ -33,7 +33,6 @@
 #include "GWViewerListView.h"
 #include "GWViewerPathsPopUp.h"
 #include "GWorkspace.h"
-#include "FileAnnotationsManager.h"
 #include "GWFunctions.h"
 #include "FSNodeRep.h"
 #include "FSNIcon.h"
@@ -76,7 +75,6 @@
     watchedSuspended = [NSMutableArray new];
     manager = [GWViewersManager viewersManager];
     gworkspace = [GWorkspace gworkspace];
-    fannManager = [FileAnnotationsManager fannmanager];
     nc = [NSNotificationCenter defaultCenter];
 
     defEntry = [defaults objectForKey: @"browserColsWidth"];
@@ -1057,19 +1055,6 @@
 	[nodeView selectAll];
 }
 
-- (void)showAnnotationWindows
-{
-  NSArray *selection = [nodeView selectedNodes];
-
-  if (selection && [selection count]) {
-    if ([nodeView isSingleNode]) {    
-      [fannManager showAnnotationsForNodes: selection];
-    } else if ([selection isEqual: [NSArray arrayWithObject: baseNode]] == NO) {
-      [fannManager showAnnotationsForNodes: selection];
-    }
-  }
-}
-
 - (void)showTerminal
 {
   NSString *path;
@@ -1131,21 +1116,7 @@
     }
     
     return NO;
-
-  } else if ([itemTitle isEqual: NSLocalizedString(@"File Annotations", @"")]) {
-    NSArray *selection = [nodeView selectedNodes];
-    
-    if ((selection == nil) || ([selection count] == 0)) {
-      return NO;
-    }
-    
-    if ([nodeView isSingleNode]
-          || ([selection isEqual: [NSArray arrayWithObject: baseNode]] == NO)) {
-      return YES;
-    }
-    
-    return NO;
-  }
+  } 
 
   return YES;
 }

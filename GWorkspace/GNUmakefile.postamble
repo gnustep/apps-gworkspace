@@ -8,7 +8,6 @@ before-all::
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Finder/SearchResults
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Finder/LiveSearch
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/FileViewer
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/FileAnnotations
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/TShelf
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Preferences
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Dialogs
@@ -28,7 +27,6 @@ before-all::
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Finder  
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Finder/SearchResults
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Finder/LiveSearch
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/FileAnnotations
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/TShelf
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Preferences
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Dialogs

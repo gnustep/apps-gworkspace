@@ -42,7 +42,6 @@
 @class PrefController;
 @class Fiend;
 @class History;
-@class FileAnnotationsManager;
 @class TShelfWin;
 @class OpenWithController;
 @class RunExternalController;
@@ -126,7 +125,6 @@
     
   GWViewersManager *vwrsManager;
   GWDesktopManager *dtopManager;  
-  FileAnnotationsManager *fannManager;
   Inspector *inspector;
   Finder *finder;
   
@@ -312,6 +310,8 @@
 - (void)showContentsInspector:(id)sender;
 
 - (void)showToolsInspector:(id)sender;
+
+- (void)showAnnotationsInspector:(id)sender;
 
 - (void)showDesktop:(id)sender;
 
