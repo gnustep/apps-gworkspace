@@ -291,8 +291,25 @@ static NSFont *labelFont = nil;
     }
     
   } else if (icnPosition == NSImageOnly) {
+    if (selectable) {
+      float hlx = (frameRect.size.width - hlightRect.size.width) / 2;
+      float hly = (frameRect.size.height - hlightRect.size.height) / 2;
+    
+      if ((hlightRect.origin.x != hlx) || (hlightRect.origin.y != hly)) {
+        NSAffineTransform *transform = [NSAffineTransform transform];
+    
+        [transform translateXBy: hlx - hlightRect.origin.x
+                            yBy: hly - hlightRect.origin.y];
+    
+        [highlightPath transformUsingAffineTransform: transform];
+      
+        hlightRect.origin.x = hlx;
+        hlightRect.origin.y = hly;      
+      }
+    }
+    
     icnBounds.origin.x = (frameRect.size.width - sz.width) / 2;
-    icnBounds.origin.y = 0;
+    icnBounds.origin.y = (frameRect.size.height - sz.height) / 2;
   } 
    
   [self setNeedsDisplay: YES]; 
