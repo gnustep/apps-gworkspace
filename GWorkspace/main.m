@@ -151,7 +151,7 @@ void createMenu()
 	addItemToMenu(mainMenu, @"Hide", @"", @"hide:", @"h");
 	
 	// Quit
-	addItemToMenu(mainMenu, @"Quit", @"", @"terminate:", @"q");
+	addItemToMenu(mainMenu, @"Quit", @"", @"terminate:", @"Q");
 
 	[mainMenu update];
 

@@ -558,8 +558,6 @@ static NSString *nibName = @"ClipBookWindow.gorm";
   [self setEditable: NO];
   [self setImageFrameStyle: NSImageFrameNone];
   [self setImageAlignment: NSImageAlignCenter];
-  [self unregisterDraggedTypes];
-  [self registerForDraggedTypes: [[ClipBook clipbook] pbTypes]];
   dragdelay = 0;
   
   return self;
@@ -645,36 +643,3 @@ static NSString *nibName = @"ClipBookWindow.gorm";
 
 @end
 
-@implementation PBIconView (DraggingDestination)
-
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
-{
-  return [[[self window] delegate] draggingEntered: sender];
-}
-
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
-{
-  return [[[self window] delegate] draggingUpdated: sender];
-}
-
-- (void)draggingExited:(id <NSDraggingInfo>)sender
-{
-  return [[[self window] delegate] draggingExited: sender];
-}
-
-- (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
-{
-  return [[[self window] delegate] prepareForDragOperation: sender];
-}
-
-- (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
-{
-  return [[[self window] delegate] performDragOperation: sender];
-}
-
-- (void)concludeDragOperation:(id <NSDraggingInfo>)sender
-{
-  return [[[self window] delegate] concludeDragOperation: sender];
-}
-
-@end

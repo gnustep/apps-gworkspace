@@ -274,6 +274,7 @@
 	args = [NSMutableArray arrayWithCapacity: 1];		
 	[args addObject: @"-dQUIET"];
 	[args addObject: @"-dSAFER"];
+  [args addObject: @"-dDELAYSAFER"];	
 	[args addObject: @"-dSHORTERRORS"];
 	[args addObject: @"-dDOINTERPOLATE"];	
 	[args addObject: [NSString stringWithFormat: @"-dDEVICEXRESOLUTION=%i", (int)resolution]];	
@@ -351,6 +352,7 @@
 	args = [NSMutableArray arrayWithCapacity: 1];		
 	[args addObject: @"-dQUIET"];
 	[args addObject: @"-dSAFER"];
+  [args addObject: @"-dDELAYSAFER"];	
 	[args addObject: @"-dSHORTERRORS"];
 	[args addObject: @"-dDOINTERPOLATE"];	
 	[args addObject: [NSString stringWithFormat: @"-dDEVICEXRESOLUTION=%i", (int)resolution]];	

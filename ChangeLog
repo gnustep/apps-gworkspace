@@ -1,3 +1,15 @@
+2003-10-30 Enrico Sersale  <enrico@imago.ro>
+  
+  * GWorkspace/Recycler/Recycler.m
+    the DraggingDestination is now the window.
+
+  * ContentViewers/PdfViewer/PdfViewer.m
+    applied a patch (by Charles Philip Chan <cpchan@sympatico.ca>) 
+    to make the pdf Inspector work with Ghostscript 8.
+
+  * GWorkspace/main.m
+    the key equivalent for "Quit" is now "Q".
+    
 2003-10-29 Enrico Sersale  <enrico@imago.ro>
   
   * Version 0.6.2

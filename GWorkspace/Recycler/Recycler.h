@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #ifndef RECYCLER_H
 #define RECYCLER_H
 
@@ -40,9 +39,12 @@
 @class NSFileManager;
 @class GWorkspace;
 
+@interface RecyclerWindow : NSWindow 
+@end
+
 @interface Recycler : NSView 
 {
-  NSWindow *win;
+  RecyclerWindow *win;
   NSImage *tile, *emptyImg, *fullImg;
 	BOOL isFull;
 	BOOL isOpen;
