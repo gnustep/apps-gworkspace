@@ -88,6 +88,10 @@
   NSLog(@"starting Desktop database update");
 
   switch(type) {
+    case DDBdInsertTreeUpdate:
+      [self insertTrees];
+      break;
+
     case DDBdFileOperationUpdate:
       [self fileSystemDidChange];
       break;
@@ -207,6 +211,56 @@
   RELEASE (ddbd);
   ddbd = nil;
   NSLog(@"updater: ddbd connection died");
+  [self done];
+}
+
+- (void)insertTrees
+{
+  NSArray *basePaths = [updinfo objectForKey: @"paths"];
+  int i;
+
+  for (i = 0; i < [basePaths count]; i++) {
+    CREATE_AUTORELEASE_POOL(arp);
+    NSString *base = [basePaths objectAtIndex: i];  
+    NSDictionary *attributes = [fm fileAttributesAtPath: base traverseLink: NO];
+    NSString *type = [attributes fileType];
+    NSString *query;
+    NSArray *results;
+
+    query = [NSString stringWithFormat: 
+                  @"SELECT path FROM files WHERE path = '%@'", 
+                                              stringForQuery(base)];
+    results = [sqlite performQuery: query];
+    
+    if ((results == nil) || ([results count] == 0)) {
+      [ddbd insertPath: base];
+    }
+
+    if (type == NSFileTypeDirectory) {
+      NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: base];
+      IMP nxtImp = [enumerator methodForSelector: @selector(nextObject)];  
+      NSString *path;    
+        
+      while ((path = (*nxtImp)(enumerator, @selector(nextObject))) != nil) {
+        CREATE_AUTORELEASE_POOL(arp1);
+        NSString *fullPath = [base stringByAppendingPathComponent: path];        
+
+        query = [NSString stringWithFormat: 
+                      @"SELECT path FROM files WHERE path = '%@'", 
+                                                  stringForQuery(fullPath)];
+        results = [sqlite performQuery: query];
+
+        if ((results == nil) || ([results count] == 0)) {
+          [ddbd insertPath: fullPath];
+        }
+
+        DESTROY (arp1);
+      }
+
+      DESTROY (arp);
+    } 
+  }
+  
   [self done];
 }
 

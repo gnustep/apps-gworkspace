@@ -77,6 +77,8 @@
 
 - (oneway void)insertPath:(NSString *)path;
 
+- (oneway void)insertTreeFromPaths:(NSData *)info;
+
 - (oneway void)removePath:(NSString *)path;
 
 - (NSString *)annotationsForPath:(NSString *)path;
@@ -197,7 +199,8 @@
 - (void)openFoundSelection:(NSArray *)selection;
 
 - (LSFolder *)addLiveSearchFolderWithPath:(NSString *)path
-                             contentsInfo:(NSDictionary *)info;
+                             contentsInfo:(NSDictionary *)info
+                              createIndex:(BOOL)index;
 
 - (void)removeLiveSearchFolder:(LSFolder *)folder;
 
@@ -229,6 +232,8 @@
 - (BOOL)ddbdactive;
 
 - (void)ddbdInsertPath:(NSString *)path;
+
+- (void)ddbdInsertTreeFromPaths:(NSArray *)paths;
 
 - (void)ddbdRemovePath:(NSString *)path;
 

@@ -1,11 +1,11 @@
-/* updater.h
+/* LSFolder.h
  *  
  * Copyright (C) 2004 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: October 2004
  *
- * This file is part of the GNUstep GWorkspace application
+ * This file is part of the GNUstep Finder application
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,41 +22,38 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef DDBD_UPDATER_H
-#define DDBD_UPDATER_H
+#ifndef LS_FOLDER_H
+#define LS_FOLDER_H
 
 #include <Foundation/Foundation.h>
+#include "FSNodeRep.h"
 
-@interface DDBdUpdater: NSObject
+//@class Finder;
+
+@interface LSFolder : NSObject 
 {
-  id sqlite;
-  id ddbd;
-  NSDictionary *updinfo;
-  NSDistributedLock *lock;
-  NSFileManager *fm;
+  FSNode *node;
+
+  NSArray *searchPaths;
+  NSDictionary *searchCriteria;
+  NSMutableArray *foundPaths;
+  NSDate *lastUpdate;
+
+  id finder;
+  BOOL watcherSuspended;
 }
 
-+ (void)updaterForTask:(NSDictionary *)info;
+- (id)initForNode:(FSNode *)anode
+     contentsInfo:(NSDictionary *)info;
 
-- (void)setUpdaterTask:(NSDictionary *)info;
+- (void)setNode:(FSNode *)anode;
 
-- (void)done;
+- (FSNode *)node;
 
-- (BOOL)checkPath:(NSString *)path;
+- (BOOL)watcherSuspended;
 
-- (NSData *)infoOfType:(NSString *)type
-               forPath:(NSString *)path;
-               
-- (void)connectDDBd;
-
-- (void)ddbdConnectionDidDie:(NSNotification *)notif;
-
-- (void)insertTrees;
-
-- (void)fileSystemDidChange;
-
-- (void)daylyUpdate;
+- (void)setWatcherSuspended:(BOOL)value;
 
 @end
 
-#endif // DDBD_UPDATER_H
+#endif // LS_FOLDER_H

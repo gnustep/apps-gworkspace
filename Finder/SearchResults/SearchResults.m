@@ -657,7 +657,9 @@ static NSString *lsfname = @"LiveSearch.lsf";
                      userInfo: notifDict];
 
     if ([lsfdict writeToFile: lsfpath atomically: YES]) {
-      [finder addLiveSearchFolderWithPath: lsfpath contentsInfo: lsfdict];
+      [finder addLiveSearchFolderWithPath: lsfpath 
+                             contentsInfo: lsfdict
+                              createIndex: YES];
     } else {
       NSString *msg = NSLocalizedString(@"can't create the Live Search folder", @"");
       NSRunAlertPanel(NULL, msg, NSLocalizedString(@"Ok", @""), NULL, NULL);  
@@ -959,6 +961,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
 
 - (void)searchWithInfo:(NSData *)srcinfo
 {
+  CREATE_AUTORELEASE_POOL(arp);
   NSDictionary *srcdict = [NSUnarchiver unarchiveObjectWithData: srcinfo];
   NSArray *paths = [srcdict objectForKey: @"paths"];
   NSDictionary *criteria = [srcdict objectForKey: @"criteria"];
@@ -985,10 +988,12 @@ static NSString *lsfname = @"LiveSearch.lsf";
     int j;
     
     if (type == NSFileTypeDirectory) {
+      CREATE_AUTORELEASE_POOL(arp1);
       NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: path];
       NSString *currentPath;
       
       while ((currentPath = [enumerator nextObject])) {
+        CREATE_AUTORELEASE_POOL(arp2);
         NSString *fullPath = [path stringByAppendingPathComponent: currentPath];
         BOOL found = YES;
         
@@ -1011,10 +1016,15 @@ static NSString *lsfname = @"LiveSearch.lsf";
         }
         
         if (stopped) {
+          DESTROY (arp2);
           break;
         }
+        
+        DESTROY (arp2);
       }
-  
+      
+      DESTROY (arp1);
+      
     } else {
       BOOL found = YES;
       
@@ -1042,6 +1052,8 @@ static NSString *lsfname = @"LiveSearch.lsf";
     }
   }
 
+  RELEASE (arp);
+  
   [self done];
 }
 

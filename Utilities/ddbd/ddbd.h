@@ -28,6 +28,7 @@
 #include <Foundation/Foundation.h>
 
 enum {   
+  DDBdInsertTreeUpdate,
   DDBdFileOperationUpdate,
   DDBdDaylyUpdate
 };
@@ -37,6 +38,8 @@ enum {
 - (BOOL)dbactive;
 
 - (BOOL)insertPath:(NSString *)path;
+
+- (void)insertTreeFromPaths:(NSData *)info;
 
 - (BOOL)removePath:(NSString *)path;
 

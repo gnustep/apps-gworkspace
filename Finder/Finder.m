@@ -320,7 +320,9 @@ static Finder *finder = nil;
         NSDictionary *lsfdict = [NSDictionary dictionaryWithContentsOfFile: lsfpath];
 
         if (lsfdict) {
-          [self addLiveSearchFolderWithPath: lsfpath contentsInfo: lsfdict];
+          [self addLiveSearchFolderWithPath: lsfpath 
+                               contentsInfo: lsfdict
+                                createIndex: NO];
         
           NSLog(@"added lsf with path %@", lsfpath);
         }
@@ -348,7 +350,9 @@ static Finder *finder = nil;
     NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: fileName];
 
     if (dict) {
-      folder = [self addLiveSearchFolderWithPath: fileName contentsInfo: dict];
+      folder = [self addLiveSearchFolderWithPath: fileName 
+                                    contentsInfo: dict
+                                     createIndex: NO];
 
       NSLog(@"(open file) added lsf with path %@", fileName);
     }
@@ -1073,15 +1077,22 @@ static Finder *finder = nil;
 
 - (LSFolder *)addLiveSearchFolderWithPath:(NSString *)path
                              contentsInfo:(NSDictionary *)info
+                              createIndex:(BOOL)index
 {
   LSFolder *folder = [self lsfolderWithPath: path];
 
   if (folder == nil) {
     FSNode *node = [FSNode nodeWithPath: path];
   
-    folder = [[LSFolder alloc] initForNode: node];
+    folder = [[LSFolder alloc] initForNode: node contentsInfo: info];
     [lsFolders addObject: folder];
     RELEASE (folder);
+  }
+  
+  if (index) {
+        NSLog(@"creating trees for lsf at %@", path);
+    
+    [self ddbdInsertTreeFromPaths: [info objectForKey: @"searchpaths"]];
   }
   
   return folder;
@@ -1246,7 +1257,9 @@ static Finder *finder = nil;
         NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: dictpath];
 
         if (dict) {
-          [self addLiveSearchFolderWithPath: dictpath contentsInfo: dict];
+          [self addLiveSearchFolderWithPath: dictpath 
+                               contentsInfo: dict
+                                createIndex: NO];
         
         
           NSLog(@"added lsf with path %@", [newnode path]);
@@ -1504,13 +1517,23 @@ static Finder *finder = nil;
 
 - (void)ddbdInsertPath:(NSString *)path
 {
+  [self connectDDBd];
   if (ddbdactive) {
     [ddbd insertPath: path];
   }
 }
 
+- (void)ddbdInsertTreeFromPaths:(NSArray *)paths
+{
+  [self connectDDBd];
+  if (ddbdactive) {
+    [ddbd insertTreeFromPaths: [NSArchiver archivedDataWithRootObject: paths]];
+  }
+}
+
 - (void)ddbdRemovePath:(NSString *)path
 {
+  [self connectDDBd];
   if (ddbdactive) {
     [ddbd removePath: path];
   }
@@ -1518,6 +1541,7 @@ static Finder *finder = nil;
 
 - (NSString *)ddbdGetAnnotationsForPath:(NSString *)path
 {
+  [self connectDDBd];
   if (ddbdactive) {
     return [ddbd annotationsForPath: path];
   }
@@ -1528,6 +1552,7 @@ static Finder *finder = nil;
 - (void)ddbdSetAnnotations:(NSString *)annotations
                    forPath:(NSString *)path
 {
+  [self connectDDBd];
   if (ddbdactive) {
     [ddbd setAnnotations: annotations forPath: path];
   }
@@ -1535,6 +1560,7 @@ static Finder *finder = nil;
 
 - (NSString *)ddbdGetFileTypeForPath:(NSString *)path
 {
+  [self connectDDBd];
   if (ddbdactive) {
     return [ddbd fileTypeForPath: path];
   }
@@ -1545,6 +1571,7 @@ static Finder *finder = nil;
 - (void)ddbdSetFileType:(NSString *)type
                 forPath:(NSString *)path
 {
+  [self connectDDBd];
   if (ddbdactive) {
     [ddbd setFileType: type forPath: path];
   }
@@ -1552,6 +1579,7 @@ static Finder *finder = nil;
 
 - (NSString *)ddbdGetModificationDateForPath:(NSString *)path;
 {
+  [self connectDDBd];
   if (ddbdactive) {
     return [ddbd modificationDateForPath: path];
   }
@@ -1562,6 +1590,7 @@ static Finder *finder = nil;
 - (void)ddbdSetModificationDate:(NSString *)datedescr
                         forPath:(NSString *)path
 {
+  [self connectDDBd];
   if (ddbdactive) {
     [ddbd setModificationDate: datedescr forPath: path];
   }  
@@ -1569,6 +1598,7 @@ static Finder *finder = nil;
 
 - (NSData *)ddbdGetIconDataForPath:(NSString *)path
 {
+  [self connectDDBd];
   if (ddbdactive) {
     return [ddbd iconDataForPath: path];
   }
@@ -1579,6 +1609,7 @@ static Finder *finder = nil;
 - (void)ddbdSetIconData:(NSData *)data
                 forPath:(NSString *)path
 {
+  [self connectDDBd];
   if (ddbdactive) {
     [ddbd setIconData: data forPath: path];
   }

@@ -190,10 +190,13 @@
 - (BOOL)insertPath:(NSString *)path
 {
 #ifdef HAVE_SQLITE
-  if (sqlite && [fm fileExistsAtPath: path]) {
+  NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: NO];
+
+  if (sqlite && attributes) {
+    NSDate *date = [attributes fileModificationDate];
     NSString *query = [NSString stringWithFormat:
-                           @"REPLACE INTO files (path) VALUES('%@')", 
-                                                    stringForQuery(path)];
+                @"REPLACE INTO files (path, moddate) VALUES('%@', '%@')", 
+                     stringForQuery(path), stringForQuery([date description])];
     if ([self performWriteQuery: query] == NO) {
       NSLog(@"error accessing the Desktop database (-insertPath:)");
       NSLog(@"error at path: %@", path);
@@ -205,6 +208,34 @@
 #endif 
 
   return NO; 
+}
+
+- (void)insertTreeFromPaths:(NSData *)info
+{
+#ifdef HAVE_SQLITE
+  NSArray *paths = [NSUnarchiver unarchiveObjectWithData: info];
+  NSMutableDictionary *updaterInfo = [NSMutableDictionary dictionary];
+  NSDictionary *pathsdict = [NSDictionary dictionaryWithObject: paths 
+                                                        forKey: @"paths"];
+    
+  [updaterInfo setObject: dbpath forKey: @"dbpath"];
+  [updaterInfo setObject: [NSNumber numberWithInt: DDBdInsertTreeUpdate] 
+                  forKey: @"type"];
+  [updaterInfo setObject: pathsdict forKey: @"taskdict"];
+
+  NS_DURING
+    {
+      [NSThread detachNewThreadSelector: @selector(updaterForTask:)
+		                           toTarget: [DDBdUpdater class]
+		                         withObject: updaterInfo];
+    }
+  NS_HANDLER
+    {
+      NSLog(@"A fatal error occured while detaching the thread!");
+    }
+  NS_ENDHANDLER
+  
+#endif
 }
 
 - (BOOL)removePath:(NSString *)path

@@ -233,7 +233,7 @@
 			  }
 		  }
 
-		  (NSArray *)extensions = [iconsdict allKeys];
+		  extensions = [NSMutableArray arrayWithArray: [iconsdict allKeys]];
 		  count = [extensions count];
 
 		  [matrix renewRows: 1 columns: count];
