@@ -46,25 +46,6 @@ static NSString *nibName = @"ResultsWindow";
 static NSString *lsfname = @"LiveSearch.lsf";
 
 
-@interface NSDictionary (ColumnsSort)
-
-- (int)compareColInfo:(NSDictionary *)dict;
-
-@end
-
-@implementation NSDictionary (ColumnsSort)
-
-- (int)compareColInfo:(NSDictionary *)dict
-{
-  NSNumber *p1 = [self objectForKey: @"position"];
-  NSNumber *p2 = [dict objectForKey: @"position"];
-
-  return [p1 compare: p2];
-}
-
-@end
-
-
 @implementation SearchResults
 
 - (void)dealloc
@@ -104,7 +85,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
     [win setFrameUsingName: @"search_results"];
     [win setDelegate: self];
     
-    progView = [[ProgressView alloc] initWithFrame: NSMakeRect(0, 0, 115, 10)
+    progView = [[ProgressView alloc] initWithFrame: NSMakeRect(0, 0, 16, 16)
                                    refreshInterval: 0.05];
     [(NSBox *)progBox setContentView: progView]; 
     RELEASE (progView);
@@ -383,11 +364,9 @@ static NSString *lsfname = @"LiveSearch.lsf";
   NSString *elmstr = NSLocalizedString(@"elements", @"");
   
   [foundObjects addObject: node];
-  ASSIGN (sortedObjects, [NSArray arrayWithArray: foundObjects]);
-//  [resultsView reloadData];
   [resultsView noteNumberOfRowsChanged];
   
-  elmstr = [NSString stringWithFormat: @"%i %@", [sortedObjects count], elmstr];
+  elmstr = [NSString stringWithFormat: @"%i %@", [foundObjects count], elmstr];
   [elementsLabel setStringValue: elmstr];
 }
 
@@ -477,13 +456,19 @@ static NSString *lsfname = @"LiveSearch.lsf";
 
 - (NSArray *)selectedObjects
 {
+  NSArray *nodes = (engine != nil) ? foundObjects : sortedObjects;
   NSMutableArray *selected = [NSMutableArray array];
   NSEnumerator *enumerator = [resultsView selectedRowEnumerator];
   NSNumber *row;
   
   while ((row = [enumerator nextObject])) {
-	  FSNode *node = [sortedObjects objectAtIndex: [row intValue]];
-    [selected addObject: node];
+	  FSNode *node = [nodes objectAtIndex: [row intValue]];
+    if ([node isValid]) {
+      [selected addObject: node];
+    } else {
+      [foundObjects removeObject: node];
+      [resultsView noteNumberOfRowsChanged];
+    }
   }
 
   return selected;  
@@ -496,11 +481,12 @@ static NSString *lsfname = @"LiveSearch.lsf";
 
 - (void)selectObjects:(NSArray *)objects
 {
+  NSArray *nodes = (engine != nil) ? foundObjects : sortedObjects;
   int i;
   
   for (i = 0; i < [objects count]; i++) {
     FSNode *node = [objects objectAtIndex: i];
-    int index = [sortedObjects indexOfObject: node];
+    int index = [nodes indexOfObject: node];
     
     [resultsView selectRow: index byExtendingSelection: (i != 0)];
   }
@@ -511,9 +497,19 @@ static NSString *lsfname = @"LiveSearch.lsf";
   NSDictionary *info = [notif userInfo];
   NSString *operation = [info objectForKey: @"operation"];
   NSString *source = [info objectForKey: @"source"];
+  NSString *destination = [info objectForKey: @"destination"];
   NSArray *files = [info objectForKey: @"files"];
   NSMutableArray *deletedObjects = [NSMutableArray array];
   int i, j;
+
+  if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
+    files = [NSArray arrayWithObject: [destination lastPathComponent]];
+    destination = [destination stringByDeletingLastPathComponent]; 
+  }
+
+  if ([operation isEqual: @"NSWorkspaceRecycleOperation"]) {
+		files = [info objectForKey: @"origfiles"];
+  }	
   
   if ([operation isEqual: @"NSWorkspaceMoveOperation"] 
         || [operation isEqual: @"NSWorkspaceDestroyOperation"]
@@ -776,14 +772,16 @@ static NSString *lsfname = @"LiveSearch.lsf";
 //
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView
 {
-  return [sortedObjects count];
+  NSArray *nodes = (engine != nil) ? foundObjects : sortedObjects;
+  return [nodes count];
 }
 
 - (id)tableView:(NSTableView *)aTableView
           objectValueForTableColumn:(NSTableColumn *)aTableColumn
                                 row:(int)rowIndex
 {
-  FSNode *node = [sortedObjects objectAtIndex: rowIndex];
+  NSArray *nodes = (engine != nil) ? foundObjects : sortedObjects;
+  FSNode *node = [nodes objectAtIndex: rowIndex];
   
   if (aTableColumn == nameColumn) {
     return [node name];
@@ -804,13 +802,14 @@ static NSString *lsfname = @"LiveSearch.lsf";
 	      writeRows:(NSArray *)rows
      toPasteboard:(NSPasteboard *)pboard
 {
+  NSArray *nodes = (engine != nil) ? foundObjects : sortedObjects;
   NSMutableArray *paths = [NSMutableArray array];
   NSMutableArray *parentPaths = [NSMutableArray array];
   int i;
 
   for (i = 0; i < [rows count]; i++) {
     int index = [[rows objectAtIndex: i] intValue];
-    FSNode *node = [sortedObjects objectAtIndex: index];
+    FSNode *node = [nodes objectAtIndex: index];
     NSString *parentPath = [node parentPath];
     
     if (([parentPaths containsObject: parentPath] == NO) && (i != 0)) {
@@ -819,8 +818,10 @@ static NSString *lsfname = @"LiveSearch.lsf";
       return NO;
     }
     
-    [paths addObject: [node path]];
-    [parentPaths addObject: parentPath];
+    if ([node isValid]) {
+      [paths addObject: [node path]];
+      [parentPaths addObject: parentPath];
+    }
   }
 
   [pboard declareTypes: [NSArray arrayWithObject: NSFilenamesPboardType] 
@@ -852,7 +853,8 @@ static NSString *lsfname = @"LiveSearch.lsf";
 {
   if (aTableColumn == nameColumn) {
     ResultsTextCell *cell = (ResultsTextCell *)[nameColumn dataCell];
-    FSNode *node = [sortedObjects objectAtIndex: rowIndex];
+    NSArray *nodes = (engine != nil) ? foundObjects : sortedObjects;
+    FSNode *node = [nodes objectAtIndex: rowIndex];
 
     [cell setIcon: [[FSNodeRep sharedInstance] iconOfSize: 24 forNode: node]];
     
@@ -896,7 +898,8 @@ static NSString *lsfname = @"LiveSearch.lsf";
     return [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: 24];
   } else {
     int index = [[dragRows objectAtIndex: 0] intValue];
-    FSNode *node = [sortedObjects objectAtIndex: index];
+    NSArray *nodes = (engine != nil) ? foundObjects : sortedObjects;
+    FSNode *node = [nodes objectAtIndex: index];
     
     return [[FSNodeRep sharedInstance] iconOfSize: 24 forNode: node];
   }
@@ -1086,11 +1089,11 @@ static NSString *lsfname = @"LiveSearch.lsf";
 
 @implementation ProgressView
 
-#define PROG_IND_MAX (-40)
+#define IMAGES 8
 
 - (void)dealloc
 {
-  RELEASE (image);
+  RELEASE (images);
   [super dealloc];
 }
 
@@ -1100,9 +1103,16 @@ static NSString *lsfname = @"LiveSearch.lsf";
   self = [super initWithFrame: frameRect];
 
   if (self) {
-    ASSIGN (image, [NSImage imageNamed: @"progind"]);
+    int i;
+  
+    images = [NSMutableArray new];
+  
+    for (i = 0; i < IMAGES; i++) {
+      NSString *imname = [NSString stringWithFormat: @"anim-logo-%d.tiff", i];
+      [images addObject: [NSImage imageNamed: imname]];    
+    }
+  
     rfsh = refresh;
-    orx = PROG_IND_MAX;
     animating = NO;
   }
 
@@ -1111,6 +1121,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
 
 - (void)start
 {
+  index = 0;
   animating = YES;
   progTimer = [NSTimer scheduledTimerWithTimeInterval: rfsh 
 						            target: self selector: @selector(animate:) 
@@ -1128,11 +1139,10 @@ static NSString *lsfname = @"LiveSearch.lsf";
 
 - (void)animate:(id)sender
 {
-  orx++;
   [self setNeedsDisplay: YES];
-  
-  if (orx == 0) {
-    orx = PROG_IND_MAX;
+  index++;
+  if (index == [images count]) {
+    index = 0;
   }
 }
 
@@ -1141,12 +1151,13 @@ static NSString *lsfname = @"LiveSearch.lsf";
   [super drawRect: rect];
   
   if (animating) {
-    [image compositeToPoint: NSMakePoint(orx, 0) 
-                  operation: NSCompositeSourceOver];
+    [[images objectAtIndex: index] compositeToPoint: NSMakePoint(0, 0) 
+                                          operation: NSCompositeSourceOver];
   }
 }
 
 @end
+
 
 
 @implementation DocumentIcon

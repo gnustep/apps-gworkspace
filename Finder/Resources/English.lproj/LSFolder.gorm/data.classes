@@ -2,33 +2,20 @@
     "## Comment" = "Do NOT change this file, Gorm maintains it";
     FirstResponder = {
 	Actions = (
-	    "capitalizeWord:",
 	    "changeFont:",
-	    "delete:",
-	    "deleteWordBackward:",
-	    "loosenKerning:",
-	    "moveDown:",
-	    "moveToBeginningOfParagraph:",
-	    "moveWordForward:",
-	    "orderFrontDataLinkPanel:",
 	    "orderFrontFontPanel:",
-	    "pasteAsPlainText:",
-	    "raiseBaseline:",
-	    "scrollLineDown:",
-	    "selectParagraph:",
-	    "showWindow:",
-	    "takeObjectValueFrom:",
-	    "toggleTraditionalCharacterShape:",
 	    "unscript:",
 	    "stopSearch:",
 	    "restartSearch:",
-	    "update:"
+	    "updateIfNeeded:",
+	    "setAutoupdate:"
 	);
 	Super = NSObject;
     };
     LSFolder = {
 	Actions = (
-	    "update:"
+	    "updateIfNeeded:",
+	    "setAutoupdate:"
 	);
 	Outlets = (
 	    win,
@@ -38,7 +25,8 @@
 	    updateButt,
 	    splitView,
 	    resultsScroll,
-	    pathsScroll
+	    pathsScroll,
+	    autoupdateSwch
 	);
 	Super = NSObject;
     };

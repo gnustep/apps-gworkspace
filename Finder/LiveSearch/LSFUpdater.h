@@ -33,9 +33,13 @@
 
 - (oneway void)updaterDidEndAction;
 
+- (oneway void)addFoundPath:(NSString *)path;
+
 - (NSString *)infoPath;
 
 - (NSString *)foundPath;
+
+- (BOOL)isOpen;
                           
 @end
 
@@ -50,11 +54,13 @@
 
 - (oneway void)removePaths:(NSArray *)paths;
 
-- (oneway void)insertTreesFromPaths:(NSData *)info;
+- (oneway void)insertDirectoryTreesFromPaths:(NSData *)info;
 
 - (oneway void)removeTreesFromPaths:(NSData *)info;
 
 - (NSData *)treeFromPath:(NSData *)pathinfo;
+
+- (NSData *)directoryTreeFromPath:(NSString *)path;
 
 - (NSString *)annotationsForPath:(NSString *)path;
 
@@ -86,6 +92,7 @@
   NSMutableArray *foundPaths;
   NSDate *lastUpdate;
   NSMutableArray *modules;
+  BOOL autoupdate;
 
   id <LSFolderProtocol> lsfolder;
   id ddbd;
@@ -96,13 +103,17 @@
 
 + (void)newUpdater:(NSDictionary *)info;
 
-- (void)setLSFolder:(NSDictionary *)info;
+- (id)initWithLSFolderInfo:(NSDictionary *)info;
 
 - (void)notifyEndAction:(id)sender;
 
 - (void)exitThread;
 
-- (void)update;
+- (void)setAutoupdate:(BOOL)value;
+
+
+
+- (void)fastUpdate;
 
 - (void)getFoundPaths;
 
@@ -125,11 +136,17 @@
 - (void)insertShorterPath:(NSString *)path 
                   inArray:(NSMutableArray *)array;
 
+
+
+
+
+
+
 - (void)ddbdInsertTrees;
 
-- (void)ddbdInsertTreesFromPaths:(NSArray *)paths;
+- (void)ddbdInsertDirectoryTreesFromPaths:(NSArray *)paths;
 
-- (NSArray *)ddbdGetTreeFromPath:(NSDictionary *)pathinfo;
+- (NSArray *)ddbdGetDirectoryTreeFromPath:(NSString *)path;
 
 - (void)ddbdRemoveTreesFromPaths:(NSArray *)paths;
 

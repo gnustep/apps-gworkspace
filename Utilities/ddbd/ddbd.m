@@ -256,7 +256,7 @@
 #endif
 }
 
-- (void)insertTreesFromPaths:(NSData *)info
+- (void)insertDirectoryTreesFromPaths:(NSData *)info
 {
 #ifdef HAVE_SQLITE
   NSArray *paths = [NSUnarchiver unarchiveObjectWithData: info];
@@ -366,6 +366,58 @@
     if (results && [results count]) {  
       return [NSArchiver archivedDataWithRootObject: results];    
     }
+  }
+#endif
+
+  return nil;
+}
+
+- (NSData *)directoryTreeFromPath:(NSString *)path
+{
+#ifdef HAVE_SQLITE
+  if (db != NULL) {
+    CREATE_AUTORELEASE_POOL(pool);
+    NSMutableArray *directories = [NSMutableArray array];  
+    NSMutableString *query = [NSMutableString string];
+    NSString *qpath = stringForQuery(path);
+    NSArray *results = nil;
+    NSData *data = nil;
+    
+    [query appendFormat: @"SELECT path FROM files WHERE path > '%@", qpath];
+
+    if ([path isEqual: path_separator()] == NO) {
+      [query appendString: path_separator()];
+    }
+    [query appendString: @"' "];
+    
+    if ([path isEqual: path_separator()] == NO) {
+      [query appendFormat: @"AND path < '%@0' ", qpath];
+    } else {
+      [query appendString: @"AND path < '0' "];
+    }
+
+    [query appendFormat: @"AND type = 'NSFileTypeDirectory' "];
+    [query appendString: @"AND pathExists(path)"];
+
+    results = performQueryOnDb(db, query);
+
+    if (results) { 
+      int i;
+
+      for (i = 0; i < [results count]; i++) {   
+        NSDictionary *entry = [results objectAtIndex: i];
+        NSData *pathdata = [entry objectForKey: @"path"];    
+    
+        [directories addObject: [NSString stringWithUTF8String: [pathdata bytes]]];
+      }
+      
+      data = [NSArchiver archivedDataWithRootObject: directories]; 
+    }
+
+    TEST_RETAIN (data);
+    RELEASE (pool);
+  
+    return TEST_AUTORELEASE (data);
   }
 #endif
 

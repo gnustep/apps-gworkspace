@@ -87,7 +87,7 @@
 
   switch(type) {
     case DDBdInsertTreeUpdate:
-      [self insertTrees];
+      [self insertDirectoryTrees];
       break;
 
     case DDBdRemoveTreeUpdate:
@@ -215,7 +215,7 @@
   [self done];
 }
 
-- (void)insertTrees
+- (void)insertDirectoryTrees
 {
   NSArray *basePaths = [updinfo objectForKey: @"paths"];
   int i;

@@ -42,7 +42,9 @@
 
 - (oneway void)ddbdInsertTrees;
 
-- (oneway void)update;
+- (oneway void)setAutoupdate:(BOOL)value;
+
+- (oneway void)fastUpdate;
 
 - (oneway void)exitThread;
 
@@ -63,6 +65,7 @@
   SEL nextSelector;
   BOOL actionPending;
   BOOL updaterbusy;
+  BOOL autoupdate;
   
   NSFileManager *fm;
   NSNotificationCenter *nc;
@@ -73,6 +76,7 @@
   IBOutlet id progBox; 
   ProgrView *progView;
   IBOutlet id elementsLabel;
+  IBOutlet id autoupdateSwch;
   IBOutlet id updateButt;
   
   IBOutlet id splitView;
@@ -96,8 +100,6 @@
 - (id)initForNode:(FSNode *)anode
     needsIndexing:(BOOL)index;
 
-- (void)loadInterface;
-
 - (void)setNode:(FSNode *)anode;
 
 - (FSNode *)node;
@@ -110,25 +112,49 @@
 
 - (void)setWatcherSuspended:(BOOL)value;
 
-- (void)startUpdater;
+- (BOOL)isOpen;
 
-- (IBAction)update:(id)sender;
+- (IBAction)setAutoupdate:(id)sender;
+
+- (IBAction)updateIfNeeded:(id)sender;
+
+- (void)startUpdater;
 
 - (void)setUpdater:(id)anObject;
 
 - (void)updaterDidEndAction;
 
+- (void)addFoundPath:(NSString *)path;
+
 - (void)endUpdate;
 
+- (void)connectionDidDie:(NSNotification *)notification;
+
 - (void)threadWillExit:(NSNotification *)notification;
+
+- (void)loadInterface;
+
+- (NSDictionary *)getSizes;
+
+- (void)saveSizes;
+
+- (void)updateShownData;
+
+- (void)setCurrentOrder:(FSNInfoType)order;
+
+- (NSArray *)selectedObjects;
+
+- (void)doubleClickOnResultsView:(id)sender;
+
+- (void)fileSystemDidChange:(NSNotification *)notif;
 
 @end
 
 
 @interface ProgrView : NSView 
 {
-  NSImage *image;
-  float orx;
+  NSMutableArray *images;
+  int index;
   float rfsh;
   NSTimer *progTimer;
   BOOL animating;

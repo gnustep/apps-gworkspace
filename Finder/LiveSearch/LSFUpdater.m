@@ -27,20 +27,16 @@
 #include "FinderModulesProtocol.h"
 #include "Functions.h"
 
-
-BOOL isPathInResults(NSString *path, NSArray *results);
-
-
 @implementation LSFUpdater
 
 - (void)dealloc
 {
   DESTROY (ddbd);
-  TEST_RELEASE (searchPaths);
-  TEST_RELEASE (searchCriteria);
-  TEST_RELEASE (foundPaths);
-  TEST_RELEASE (lastUpdate);
-  TEST_RELEASE (modules);
+  RELEASE (searchPaths);
+  RELEASE (searchCriteria);
+  RELEASE (foundPaths);
+  RELEASE (lastUpdate);
+  RELEASE (modules);
   
 	[super dealloc];
 }
@@ -54,14 +50,63 @@ BOOL isPathInResults(NSString *path, NSArray *results);
                               
   conn = [NSConnection connectionWithReceivePort: [ports objectAtIndex: 0]
                                         sendPort: [ports objectAtIndex: 1]];
-  updater = [[self alloc] init];
-  [updater setLSFolder: info];
+  updater = [[self alloc] initWithLSFolderInfo: info];
   [updater connectDDBd]; 
   [(id)[conn rootProxy] setUpdater: updater];
   RELEASE (updater);
                               
   [[NSRunLoop currentRunLoop] run];
   RELEASE (arp);
+}
+
+- (id)initWithLSFolderInfo:(NSDictionary *)info
+{
+  self = [super init];
+  
+  if (self) {
+    NSArray *ports = [info objectForKey: @"ports"];
+    NSDictionary *lsfinfo = [info objectForKey: @"lsfinfo"];
+    id entry = [lsfinfo objectForKey: @"autoupdate"];
+    NSArray *classNames;
+    NSConnection *conn;
+    id anObject;
+    int i;
+  
+    conn = [NSConnection connectionWithReceivePort: [ports objectAtIndex: 0]
+                                          sendPort: [ports objectAtIndex: 1]];
+    anObject = (id)[conn rootProxy];
+    [anObject setProtocolForProxy: @protocol(LSFolderProtocol)];
+    lsfolder = (id <LSFolderProtocol>)anObject;
+
+    searchPaths = [[lsfinfo objectForKey: @"searchpaths"] mutableCopy];
+    ASSIGN (searchCriteria, [lsfinfo objectForKey: @"criteria"]);
+    ASSIGN (lastUpdate, [NSDate dateWithString: [lsfinfo objectForKey: @"lastupdate"]]);
+    foundPaths = [NSMutableArray new];
+    
+    modules = [NSMutableArray new];
+    classNames = [searchCriteria allKeys];
+
+    for (i = 0; i < [classNames count]; i++) {
+      NSString *className = [classNames objectAtIndex: i];
+      NSDictionary *moduleCriteria = [searchCriteria objectForKey: className];
+      Class moduleClass = NSClassFromString(className);
+      id module = [[moduleClass alloc] initWithSearchCriteria: moduleCriteria];
+
+      [modules addObject: module];
+      RELEASE (module); 
+    }
+  
+    if (entry) {
+      autoupdate = [entry boolValue];
+    }
+  
+    fm = [NSFileManager defaultManager];
+    nc = [NSNotificationCenter defaultCenter];
+    ddbd = nil;
+    ddbdactive = NO;
+  }
+  
+  return self;
 }
 
 - (id)init
@@ -78,39 +123,6 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   return self;
 }
 
-- (void)setLSFolder:(NSDictionary *)info
-{
-  NSArray *ports = [info objectForKey: @"ports"];
-  NSDictionary *lsfinfo = [info objectForKey: @"lsfinfo"];
-  NSArray *classNames;
-  NSConnection *conn;
-  id anObject;
-  int i;
-  
-  conn = [NSConnection connectionWithReceivePort: [ports objectAtIndex: 0]
-                                        sendPort: [ports objectAtIndex: 1]];
-  anObject = (id)[conn rootProxy];
-  [anObject setProtocolForProxy: @protocol(LSFolderProtocol)];
-  lsfolder = (id <LSFolderProtocol>)anObject;
-
-  searchPaths = [[lsfinfo objectForKey: @"searchpaths"] mutableCopy];
-  ASSIGN (searchCriteria, [lsfinfo objectForKey: @"criteria"]);
-  ASSIGN (lastUpdate, [NSDate dateWithString: [lsfinfo objectForKey: @"lastupdate"]]);
-  foundPaths = [NSMutableArray new];
-
-  classNames = [searchCriteria allKeys];
-
-  for (i = 0; i < [classNames count]; i++) {
-    NSString *className = [classNames objectAtIndex: i];
-    NSDictionary *moduleCriteria = [searchCriteria objectForKey: className];
-    Class moduleClass = NSClassFromString(className);
-    id module = [[moduleClass alloc] initWithSearchCriteria: moduleCriteria];
-
-    [modules addObject: module];
-    RELEASE (module); 
-  }
-}
-
 - (void)notifyEndAction:(id)sender
 {
   if (lsfolder) {
@@ -123,82 +135,101 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   [NSThread exit];
 }
 
-
-- (void)update
+- (void)setAutoupdate:(BOOL)value
 {
-  if (lsfolder) {
-    int count = [searchPaths count];
-    BOOL lsfdone = YES;
-    int i;
-
-    NSLog(@"QUA -1");
-
-    [self getFoundPaths];
-
-    NSLog(@"QUA 0");
-
-    [self checkFoundPaths];
-
-    for (i = 0; i < count; i++) {
-      NSString *spath = [searchPaths objectAtIndex: i];
-
-      if ([fm fileExistsAtPath: spath]) {
-        [self searchInSearchPath: spath];
-      } else {
-        [searchPaths removeObjectAtIndex: i];
-        count--;
-        i--;
-      }
-    }
-
-    NSLog(@"END");
-
-    if ([searchPaths count]) {
-      NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-
-      [dict setObject: searchPaths forKey: @"searchpaths"];	
-      [dict setObject: searchCriteria forKey: @"criteria"];	
-      ASSIGN (lastUpdate, [NSDate date]);
-      [dict setObject: [lastUpdate description] forKey: @"lastupdate"];	
-
-      lsfdone = [dict writeToFile: [lsfolder infoPath] atomically: YES];
-      lsfdone = [foundPaths writeToFile: [lsfolder foundPath] atomically: YES];
-    } else {
-      lsfdone = NO;
-    }  
-
-    if (lsfdone == NO) {
-      NSLog(@"AAAAAAAAARRRRRRRRRRRGGGGGGGGGGGGGGG!!!!!!!!");
-
-      // RIMUOVERE IL FILE
-      // AVVISARE IL FINDER
-      // ECC.
-    }
-
-  //  [self endUpdate];
-  
-    [self notifyEndAction: nil];
+  NSString *infopath = [lsfolder infoPath];
+  NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: infopath];
+    
+  if (dict) {
+    NSMutableDictionary *updated = [dict mutableCopy];
+    [updated setObject: [NSNumber numberWithBool: value] 
+                forKey: @"autoupdate"];	
+    [updated writeToFile: infopath atomically: YES];
   }
+  
+  autoupdate = value;
+}
+
+
+
+
+- (void)fastUpdate
+{
+  int count = [searchPaths count];
+  BOOL lsfdone = YES;
+  int i;
+
+  NSLog(@"QUA -1");
+
+  [self getFoundPaths];
+
+  NSLog(@"QUA 0");
+
+  [self checkFoundPaths];
+
+  for (i = 0; i < count; i++) {
+    NSString *spath = [searchPaths objectAtIndex: i];
+
+    if ([fm fileExistsAtPath: spath]) {
+      [self searchInSearchPath: spath];
+    } else {
+      [searchPaths removeObjectAtIndex: i];
+      count--;
+      i--;
+    }
+  }
+
+  NSLog(@"END");
+
+  if ([searchPaths count]) {
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+
+    [dict setObject: searchPaths forKey: @"searchpaths"];	
+    [dict setObject: searchCriteria forKey: @"criteria"];	
+    ASSIGN (lastUpdate, [NSDate date]);
+    [dict setObject: [lastUpdate description] forKey: @"lastupdate"];	
+    [dict setObject: [NSNumber numberWithBool: autoupdate] 
+             forKey: @"autoupdate"];	
+
+    lsfdone = [dict writeToFile: [lsfolder infoPath] atomically: YES];
+    lsfdone = [foundPaths writeToFile: [lsfolder foundPath] atomically: YES];
+  } else {
+    lsfdone = NO;
+  }  
+
+  if (lsfdone == NO) {
+  
+  
+    NSLog(@"AAAAAAAAARRRRRRRRRRRGGGGGGGGGGGGGGG!!!!!!!!");
+
+    // RIMUOVERE IL FILE
+    // AVVISARE IL FINDER
+    // ECC.
+  }
+
+//  [self endUpdate];
+
+  [self notifyEndAction: nil];
 }
 
 - (void)getFoundPaths
 {
-  if (lsfolder) {
-    NSString *fpath = [lsfolder foundPath];
+  NSString *fpath = [lsfolder foundPath];
 
-    [foundPaths removeAllObjects];
-  
-    if ([fm fileExistsAtPath: fpath]) {
-      NSArray *founds = [NSArray arrayWithContentsOfFile: fpath];
-  
-      if (founds) {
-        [foundPaths addObjectsFromArray: founds];
-  
-        NSLog(@"getFoundPaths: %i found", [foundPaths count]);
-      } else {
-        NSLog(@"NO FOUNDPATS FOUND!!!");
-      }
+  [foundPaths removeAllObjects];
+
+  if ([fm fileExistsAtPath: fpath]) {
+    NSArray *founds = [NSArray arrayWithContentsOfFile: fpath];
+
+    if (founds) {
+      [foundPaths addObjectsFromArray: founds];
+
+      NSLog(@"getFoundPaths: %i found", [foundPaths count]);
+    } else {
+      NSLog(@"NO FOUNDPATS FOUND!!!");
     }
+  } else {
+    NSLog(@"NO FOUNDPATS FOUND!!!");
   }
 }
 
@@ -208,7 +239,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   int i;
   
   NSLog(@"%i foundPaths", count);
-  
+    
   for (i = 0; i < count; i++) {
     NSString *path = [foundPaths objectAtIndex: i];
     NSDictionary *attrs = [fm fileAttributesAtPath: path traverseLink: NO];   
@@ -224,6 +255,8 @@ BOOL isPathInResults(NSString *path, NSArray *results);
       [foundPaths removeObjectAtIndex: i];
       count--;
       i--;
+    } else {
+      [lsfolder addFoundPath: path];
     }
   }
 }
@@ -231,27 +264,13 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 - (void)searchInSearchPath:(NSString *)srcpath
 {
   CREATE_AUTORELEASE_POOL(arp);
-  NSMutableDictionary *pathInfo = [NSMutableDictionary dictionary];
-  NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-  NSArray *results;
-
-  [pathInfo setObject: srcpath forKey: @"path"];
-  [pathInfo setObject: [NSArray arrayWithObject: @"path"] forKey: @"columns"];
-
-  [dict setObject: @"type" forKey: @"type"];
-  [dict setObject: @"=" forKey: @"operator"];
-  [dict setObject: @"NSFileTypeDirectory" forKey: @"arg"];
-  [pathInfo setObject: [NSArray arrayWithObject: dict] forKey: @"criteria"];
-
-  NSLog(@"QUA 1");
-
-  results = [self ddbdGetTreeFromPath: pathInfo];
+          NSLog(@"QUA 1");
+  NSArray *results = [self ddbdGetDirectoryTreeFromPath: srcpath];
   
   NSLog(@"QUA 2");
   
-  if (results && [foundPaths count]) {  
+  if (results && [foundPaths count]) {
     NSMutableArray *toinsert = [NSMutableArray array];
-    NSMutableArray *toremove = [NSMutableArray array];
     int count = [results count];
     int i;
     
@@ -259,94 +278,76 @@ BOOL isPathInResults(NSString *path, NSArray *results);
     
     for (i = 0; i <= count; i++) {
       CREATE_AUTORELEASE_POOL(arp1);
-      NSString *dbpath;
-      NSDictionary *attributes;
-      
-      if (i == count) {
-        dbpath = [results objectAtIndex: i];
-      } else {
-        NSDictionary *entry = [results objectAtIndex: i];
-        NSData *pathdata = [entry objectForKey: @"path"];
-        
-        dbpath = [NSString stringWithUTF8String: [pathdata bytes]];
-      }
-      
-      
+      NSString *dbpath = [results objectAtIndex: i];
+      NSDictionary *attributes = [fm fileAttributesAtPath: dbpath traverseLink: NO];
+      NSDate *moddate = [attributes fileModificationDate];
+
+
       if ([dbpath isEqual: @"/home/enrico/Butt/GNUstep/Pixmaps/CartaNuova/CooopyPix/CVS/Startup/config/CVS"]) {
         NSLog(@"TROVATA!!!!!!!!!!!!!!!!!!!!!!!");
       }
-      
-      
-      attributes = [fm fileAttributesAtPath: dbpath traverseLink: NO];
-
-      if (attributes) {  
-        NSDate *moddate = [attributes fileModificationDate];
-        
-        if ([moddate laterDate: lastUpdate] == moddate) {
-          NSArray *contents = [fm directoryContentsAtPath: dbpath];
-          int j;
-
-    //      NSLog(@"found changed dir at %@", dbpath);
-          
-          [self check: dbpath];
-          
-          for (j = 0; j < [contents count]; j++) {
-            CREATE_AUTORELEASE_POOL(arp2);
-            NSString *fname = [contents objectAtIndex: j];
-            NSString *fpath = [dbpath stringByAppendingPathComponent: fname];
-            NSDictionary *attr = [fm fileAttributesAtPath: fpath traverseLink: NO];
-            NSString *type = [attr fileType];
-            NSDate *lastmod = [attr fileModificationDate];
-                        
-            if (type == NSFileTypeDirectory) { 
-              NSArray *founds = [self fullSearchInDirectory: fpath];
-
-        //      NSLog(@"adding %i elements from %@", [founds count], fpath);
-
-              [foundPaths addObjectsFromArray: founds];
-              
-              [self insertShorterPath: fpath inArray: toinsert];
-              
-              [self check: fpath];
-
-            } else {
-              [self check: fpath];
-            }
             
-            RELEASE (arp2);
+      
+      if ([moddate laterDate: lastUpdate] == moddate) {
+        NSArray *contents = [fm directoryContentsAtPath: dbpath];
+        int j;
+
+   //     NSLog(@"found changed dir at %@", dbpath);
+
+        [self check: dbpath];
+
+        for (j = 0; j < [contents count]; j++) {
+          CREATE_AUTORELEASE_POOL(arp2);
+          NSString *fname = [contents objectAtIndex: j];
+          NSString *fpath = [dbpath stringByAppendingPathComponent: fname];
+          NSDictionary *attr = [fm fileAttributesAtPath: fpath traverseLink: NO];
+          NSString *type = [attr fileType];
+
+          if ((type == NSFileTypeDirectory) 
+                                && ([results containsObject: fpath] == NO)) { 
+            NSArray *founds = [self fullSearchInDirectory: fpath];
+
+      //      NSLog(@"adding %i elements from %@", [founds count], fpath);
+
+            [foundPaths addObjectsFromArray: founds];
+
+            [self insertShorterPath: fpath inArray: toinsert];
+
+            [self check: fpath];
+
+          } else {
+            [self check: fpath];
           }
+
+          RELEASE (arp2);
         }
-      } else {
-       
-        NSLog(@"%@ NOT FOUND!", dbpath);
-      
-        [toremove addObject: dbpath];
-      
-    //    [self insertShorterPath: dbpath inArray: toremove];
       }
       
       RELEASE (arp1);
     }
      
     if ([toinsert count]) {
-      [self ddbdInsertTreesFromPaths: toinsert];
-    }
-
-    if ([toremove count]) {
-      [self ddbdRemoveTreesFromPaths: toremove]; 
+      [self ddbdInsertDirectoryTreesFromPaths: toinsert];
     }
 
   } else {
-    NSLog(@"%@ not found in the db", srcpath);
+    NSArray *founds;
+    
+    if (results == nil) {
+      NSLog(@"%@ not found in the db", srcpath);
+    } else {
+      NSLog(@"no found paths");
+    }
     NSLog(@"performing full search at %@", srcpath);
   
-    NSArray *founds = [self fullSearchInDirectory: srcpath];
+    founds = [self fullSearchInDirectory: srcpath];
     
     [foundPaths addObjectsFromArray: founds];
-    [self ddbdInsertTreesFromPaths: [NSArray arrayWithObject: srcpath]];
+    [self ddbdInsertDirectoryTreesFromPaths: [NSArray arrayWithObject: srcpath]];
   }
   
   NSLog(@"QUA 3");
+  
   RELEASE (arp);
 }
 
@@ -363,7 +364,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
     NSString *fullPath = [dirpath stringByAppendingPathComponent: path];
     NSDictionary *attrs = [enumerator fileAttributes];
     
-    if ([self checkPath: fullPath attributes: attrs fullCheck: YES]) {
+    if ([self checkPath: fullPath attributes: attrs fullCheck: YES]) {    
       [founds addObject: fullPath];
     }
     
@@ -386,6 +387,10 @@ BOOL isPathInResults(NSString *path, NSArray *results);
     if ([self checkPath: path attributes: attrs fullCheck: YES]) {
       [foundPaths addObject: path];
       
+      if (lsfolder) {
+        [lsfolder addFoundPath: path];
+      }
+      
   //    NSLog(@"adding %@ to the found paths", path);      
     }
   }
@@ -404,6 +409,8 @@ BOOL isPathInResults(NSString *path, NSArray *results);
     if (fullck == NO) {
       if ([module reliesOnDirModDate]) {
         found = [self checkPath: path attributes: attrs withModule: module];       
+      } else {
+        found = NO;
       }
     } else {
       found = [self checkPath: path attributes: attrs withModule: module];
@@ -414,7 +421,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
     }
   }
   
-  return found;  
+  return ([modules count] == 0) ? NO : found;  
 }
 
 - (BOOL)checkPath:(NSString *)path 
@@ -426,13 +433,15 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 
     if ([lastmod laterDate: lastUpdate] == lastmod) {
       return [module checkPath: path withAttributes: attrs];
+    } else {
+      return [foundPaths containsObject: path];
     }
 
   } else {
     return [module checkPath: path withAttributes: attrs];
   }
   
-  return YES;
+  return NO;
 }
 
 - (void)insertShorterPath:(NSString *)path 
@@ -454,34 +463,56 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   [array addObject: path];
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 - (void)ddbdInsertTrees
 {
   [self connectDDBd];
   if (ddbdactive) {
+    NSData *info = [NSArchiver archivedDataWithRootObject: searchPaths];
+    
     [NSTimer scheduledTimerWithTimeInterval: 10
                                      target: self 
                                    selector: @selector(notifyEndAction:) 
                                    userInfo: nil 
                                     repeats: NO];
-    [ddbd insertTreesFromPaths: [NSArchiver archivedDataWithRootObject: searchPaths]];
+                                    
+    [ddbd insertDirectoryTreesFromPaths: info];
   }
 }
 
-- (void)ddbdInsertTreesFromPaths:(NSArray *)paths
+- (void)ddbdInsertDirectoryTreesFromPaths:(NSArray *)paths
 {
   [self connectDDBd];
   if (ddbdactive) {
-    [ddbd insertTreesFromPaths: [NSArchiver archivedDataWithRootObject: paths]];
+    NSData *info = [NSArchiver archivedDataWithRootObject: paths];
+    [ddbd insertDirectoryTreesFromPaths: info];
   }
 }
 
-- (NSArray *)ddbdGetTreeFromPath:(NSDictionary *)pathinfo
+- (NSArray *)ddbdGetDirectoryTreeFromPath:(NSString *)path
 {
   [self connectDDBd];
   if (ddbdactive) {
-    NSData *infodata = [NSArchiver archivedDataWithRootObject: pathinfo];  
-    NSData *data = [ddbd treeFromPath: infodata];  
-    
+    NSData *data = [ddbd directoryTreeFromPath: path];  
+
     if (data) {
       return [NSUnarchiver unarchiveObjectWithData: data];
     }
@@ -585,17 +616,3 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 @end
 
 
-BOOL isPathInResults(NSString *path, NSArray *results)
-{
-  int i;
-
-  for (i = 0; i < [results count]; i++) {
-    NSData *pdata = [[results objectAtIndex: i] objectForKey: @"path"];
- 
-    if (strcmp([pdata bytes], [path UTF8String]) == 0) {
-      return YES;
-    }
-  }
-  
-  return NO;
-}              

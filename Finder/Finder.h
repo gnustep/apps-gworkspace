@@ -236,4 +236,11 @@
 
 @end
 
+
+@interface NSDictionary (ColumnsSort)
+
+- (int)compareColInfo:(NSDictionary *)dict;
+
+@end
+
 #endif // FINDER_H

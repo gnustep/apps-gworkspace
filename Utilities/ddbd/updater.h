@@ -52,7 +52,7 @@
 
 - (void)ddbdConnectionDidDie:(NSNotification *)notif;
 
-- (void)insertTrees;
+- (void)insertDirectoryTrees;
 
 - (void)removeTrees;
 

@@ -48,11 +48,13 @@ enum {
 
 - (oneway void)removePaths:(NSArray *)paths;
 
-- (void)insertTreesFromPaths:(NSData *)info;
+- (void)insertDirectoryTreesFromPaths:(NSData *)info;
 
 - (void)removeTreesFromPaths:(NSData *)info;
 
 - (NSData *)treeFromPath:(NSData *)pathinfo;
+
+- (NSData *)directoryTreeFromPath:(NSString *)path;
 
 - (NSString *)annotationsForPath:(NSString *)path;
 

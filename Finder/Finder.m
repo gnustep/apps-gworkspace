@@ -60,13 +60,24 @@
 if (sz.width < 0) sz.width = 0; \
 if (sz.height < 0) sz.height = 0
 
-#define LSF_INFO(x) [x stringByAppendingPathComponent: @"lsf.info"]
-#define LSF_FOUND(x) [x stringByAppendingPathComponent: @"lsf.found"]
 
 static NSString *nibName = @"Finder";
 
-static Finder *finder = nil;
 
+@implementation NSDictionary (ColumnsSort)
+
+- (int)compareColInfo:(NSDictionary *)dict
+{
+  NSNumber *p1 = [self objectForKey: @"position"];
+  NSNumber *p2 = [dict objectForKey: @"position"];
+
+  return [p1 compare: p2];
+}
+
+@end
+
+
+static Finder *finder = nil;
 
 @implementation Finder
 
@@ -340,21 +351,11 @@ static Finder *finder = nil;
 
   if (folder == nil) {
     folder = [self addLiveSearchFolderWithPath: fileName createIndex: NO];
-    
-    if (folder) {                                 
-      NSLog(@"(open file) added lsf with path %@", fileName);
-    }
-    
-  } else {
- 
-    NSLog(@"(open file) found lsf with path %@\nUPDATING", fileName);
-    
-    [folder update: nil];
   }
 
- // [folder sdlkfsldf
-
-  
+  if (folder) {                                 
+    [folder updateIfNeeded: nil];
+  }
 
   return YES;
 }
