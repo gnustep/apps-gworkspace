@@ -10,6 +10,7 @@ ADDITIONAL_CFLAGS += -Wall
 
 # Additional include directories the compiler should search
 ADDITIONAL_INCLUDE_DIRS += -IGWorkspace -I../GWorkspace -I../../GWorkspace
+ADDITIONAL_INCLUDE_DIRS += -IFileViewer -I../FileViewer 
 ADDITIONAL_INCLUDE_DIRS += -IGWLib -I../GWLib -I../../GWLib
 ADDITIONAL_INCLUDE_DIRS += -I../FSNode -I../../FSNode
 

@@ -1,4 +1,4 @@
-/* GWSVPathsPopUp.h
+/* GWViewerIconsView.h
  *  
  * Copyright (C) 2004 Free Software Foundation, Inc.
  *
@@ -22,24 +22,22 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef GWSP_PATHS_POPUP_H
-#define GWSP_PATHS_POPUP_H
+#ifndef GW_VIEWER_ICONS_VIEW_H
+#define GW_VIEWER_ICONS_VIEW_H
 
-#include <AppKit/NSPopUpButton.h>
+#include <Foundation/Foundation.h>
+#include "FSNIconsView.h"
 
-@class FSNode;
+@class GWViewersManager;
 
-@interface GWSVPathsPopUp : NSPopUpButton 
+@interface GWViewerIconsView : FSNIconsView
 {
-	BOOL closeViewer;	
+  id viewer;
+  id manager;
 }
 
-- (void)setItemsToNode:(FSNode *)node;
-
-- (void)setItemsEnabled:(BOOL)enabled;
-
-- (BOOL)closeViewer;
+- (id)initForViewer:(id)vwr;
 
 @end
 
-#endif // GWSP_PATHS_POPUP_H
+#endif // GW_VIEWER_ICONS_VIEW_H

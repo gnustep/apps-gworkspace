@@ -24,7 +24,7 @@
 
 #include <AppKit/AppKit.h>
 #include "GWViewersManager.h"
-#include "Viewer/GWViewer.h"
+#include "GWViewer.h"
 #include "GWSpatialViewer.h"
 #include "FSNodeRep.h"
 #include "FSNFunctions.h"

@@ -1,9 +1,9 @@
-/* GWSVIconsView.h
+/* GWViewer.h
  *  
  * Copyright (C) 2004 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
- * Date: June 2004
+ * Date: July 2004
  *
  * This file is part of the GNUstep GWorkspace application
  *
@@ -22,22 +22,62 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef GW_SV_ICONS_VIEW_H
-#define GW_SV_ICONS_VIEW_H
+#ifndef GWVIEWER_WINDOW_H
+#define GWVIEWER_WINDOW_H
 
 #include <Foundation/Foundation.h>
-#include "FSNIconsView.h"
+#include <AppKit/NSWindow.h>
 
-@class GWViewersManager;
+@class GWorkspace;
 
-@interface GWSVIconsView : FSNIconsView
+@interface GWViewerWindow : NSWindow
 {
-  id viewer;
-  id manager;
+  id delegate;
 }
 
-- (id)initForViewer:(id)vwr;
+- (void)openSelection:(id)sender;
+
+- (void)openSelectionAsFolder:(id)sender;
+
+- (void)newFolder:(id)sender;
+
+- (void)newFile:(id)sender;
+
+- (void)duplicateFiles:(id)sender;
+
+- (void)deleteFiles:(id)sender;
+
+- (void)setViewerType:(id)sender;
+
+- (void)selectAllInViewer:(id)sender;
+
+- (void)showTerminal:(id)sender;
 
 @end
 
-#endif // GW_SV_ICONS_VIEW_H
+
+@interface NSObject (GWViewerWindowDelegateMethods)
+
+- (BOOL)validateItem:(id)menuItem;
+
+- (void)openSelectionInNewViewer:(BOOL)newv;
+
+- (void)openSelectionAsFolder;
+
+- (void)newFolder;
+
+- (void)newFile;
+
+- (void)duplicateFiles;
+
+- (void)deleteFiles;
+
+- (void)setViewerType:(id)sender;
+
+- (void)selectAllInViewer;
+
+- (void)showTerminal;
+
+@end
+
+#endif // GWVIEWER_WINDOW_H

@@ -26,11 +26,11 @@
 #include <math.h>
 #include "GWSpatialViewer.h"
 #include "GWViewersManager.h"
-#include "Viewer/GWViewerWindow.h"
+#include "GWViewerWindow.h"
+#include "GWViewerBrowser.h"
+#include "GWViewerIconsView.h"
+#include "GWViewerPathsPopUp.h"
 #include "GWorkspace.h"
-#include "GWSVBrowser.h"
-#include "GWSVIconsView.h"
-#include "GWSVPathsPopUp.h"
 #include "FSNodeRep.h"
 #include "FSNIcon.h"
 #include "FSNFunctions.h"
@@ -150,10 +150,10 @@
     [self createSubviews];
 
     if ([viewType isEqual: @"Icon"]) {
-      nodeView = [[GWSVIconsView alloc] initForViewer: self];
+      nodeView = [[GWViewerIconsView alloc] initForViewer: self];
 
     } else if ([viewType isEqual: @"Browser"]) {
-      nodeView = [[GWSVBrowser alloc] initWithBaseNode: shownNode
+      nodeView = [[GWViewerBrowser alloc] initWithBaseNode: shownNode
                                       inViewer: self
 		                            visibleColumns: visibleCols
                                       scroller: browserSroll
@@ -216,7 +216,7 @@
 
   r = NSMakeRect(0, margin - 2, labelw, labelh);
   r.origin.x = (w / 2) - (labelw / 2);
-  pathsPopUp = [[GWSVPathsPopUp alloc] initWithFrame: r pullsDown: NO];
+  pathsPopUp = [[GWViewerPathsPopUp alloc] initWithFrame: r pullsDown: NO];
   resizeMask = NSViewNotSizable | NSViewMinXMargin | NSViewMaxXMargin;
   [pathsPopUp setAutoresizingMask: resizeMask];
   [pathsPopUp setTarget: self];
@@ -411,7 +411,7 @@
   visibleCols = range.length;
 
 /*
-  if ([nodeView isKindOfClass: [GWSVBrowser class]]) { 
+  if ([nodeView isKindOfClass: [GWViewerBrowser class]]) { 
     int lastColumnLoaded = [nodeView lastColumnLoaded];
     int lastVisibleColumn = [nodeView lastVisibleColumn];
     
@@ -759,7 +759,7 @@
     [scroll setDocumentView: nil];	
     
     if ([title isEqual: NSLocalizedString(@"Browser", @"")]) {
-      nodeView = [[GWSVBrowser alloc] initWithBaseNode: shownNode
+      nodeView = [[GWViewerBrowser alloc] initWithBaseNode: shownNode
                                       inViewer: self
 		                            visibleColumns: visibleCols
                                       scroller: browserSroll
@@ -774,7 +774,7 @@
       ASSIGN (viewType, @"Browser");
       
     } else if ([title isEqual: NSLocalizedString(@"Icon", @"")]) {
-      nodeView = [[GWSVIconsView alloc] initForViewer: self];
+      nodeView = [[GWViewerIconsView alloc] initForViewer: self];
       [scroll setHasVerticalScroller: YES];
       ASSIGN (viewType, @"Icon");
     }

@@ -1,4 +1,4 @@
-/* GWSVPathsPopUp.m
+/* GWViewerPathsPopUp.m
  *  
  * Copyright (C) 2004 Free Software Foundation, Inc.
  *
@@ -25,9 +25,9 @@
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include "FSNode.h"
-#include "GWSVPathsPopUp.h"
+#include "GWViewerPathsPopUp.h"
 
-@implementation GWSVPathsPopUp
+@implementation GWViewerPathsPopUp
 
 - (void)setItemsToNode:(FSNode *)node
 {

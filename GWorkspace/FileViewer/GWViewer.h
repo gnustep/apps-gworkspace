@@ -1,9 +1,9 @@
-/* GWSpatialViewer.h
+/* GWViewer.h
  *  
  * Copyright (C) 2004 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
- * Date: June 2004
+ * Date: July 2004
  *
  * This file is part of the GNUstep GWorkspace application
  *
@@ -22,31 +22,31 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef GW_SPATIAL_VIEWER_H
-#define GW_SPATIAL_VIEWER_H
+#ifndef GWVIEWER_H
+#define GWVIEWER_H
 
 #include <Foundation/Foundation.h>
 
 @class GWViewersManager;
-@class GWSVPathsPopUp;
 @class FSNode;
 @class GWViewerWindow;
-@class GWorkspace;
-@class NSView;
-@class NSTextField;
-@class NSScroller;
+@class GWViewerSplit;
+@class GWViewerShelf;
 @class NSScrollView;
+@class GWViewerIconsPath;
+@class NSView;
+@class GWorkspace;
 
-@interface GWSpatialViewer : NSObject
+@interface GWViewer : NSObject
 {
   GWViewerWindow *vwrwin;
-  NSView *mainView;
-  NSView *topBox;
-  NSTextField *elementsLabel;
-  NSTextField *spaceLabel;
-  GWSVPathsPopUp *pathsPopUp;
-  NSScrollView *scroll;
-  NSScroller *browserSroll;
+  GWViewerSplit *split;
+  GWViewerShelf *shelf;
+  float shelfHeight;
+  NSView *lowBox;
+  NSScrollView *pathsScroll;
+  GWViewerIconsPath *pathsView;
+  NSScrollView *nviewScroll;
   id nodeView;
   
   NSString *viewType;
@@ -59,8 +59,7 @@
   NSArray *lastSelection;  
   NSMutableArray *watchedNodes;
   BOOL watchersSuspended;
-  int resizeIncrement;
-
+  
   GWViewersManager *manager;
   GWorkspace *gworkspace;
     
@@ -81,6 +80,7 @@
 
 - (void)activate;
 - (void)deactivate;
+- (void)tileViews;
 - (void)invalidate;
 - (BOOL)invalidated;
 
@@ -90,7 +90,6 @@
 - (void)selectionChanged:(NSArray *)newsel;
 - (void)setSelectableNodesRange:(NSRange)range;
 - (void)updeateInfoLabels;
-- (void)popUpAction:(id)sender;
 
 - (BOOL)involvedByFileOperation:(NSDictionary *)opinfo;
 - (void)nodeContentsWillChange:(NSDictionary *)info;
@@ -109,7 +108,7 @@
 //
 // GWViewerWindow Delegate Methods
 //
-@interface GWSpatialViewer (GWViewerWindowDelegateMethods)
+@interface GWViewer (GWViewerWindowDelegateMethods)
 
 - (void)openSelectionInNewViewer:(BOOL)newv;
 - (void)openSelectionAsFolder;
@@ -124,4 +123,4 @@
 
 @end
 
-#endif // GW_SPATIAL_VIEWER_H
+#endif // GWVIEWER_H

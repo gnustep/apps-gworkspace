@@ -1,4 +1,4 @@
-/* GWSVIconsView.m
+/* GWViewerIconsView.m
  *  
  * Copyright (C) 2004 Free Software Foundation, Inc.
  *
@@ -23,12 +23,12 @@
  */
 
 #include <AppKit/AppKit.h>
-#include "GWSVIconsView.h"
+#include "GWViewerIconsView.h"
 #include "FSNIcon.h"
 #include "GWSpatialViewer.h"
 #include "GWViewersManager.h"
 
-@implementation GWSVIconsView
+@implementation GWViewerIconsView
 
 - (void)dealloc
 {
