@@ -26,10 +26,10 @@
 #include <AppKit/AppKit.h>
 #include <math.h>
 #include "LSFolder.h"
-#include "LSFUpdater.h"
 #include "ResultsTableView.h"
 #include "FSNTextCell.h"
 #include "ResultsPathsView.h"
+#include "LSFEditor.h"
 #include "Finder.h"
 #include "FinderModulesProtocol.h"
 #include "GWorkspace.h"
@@ -53,9 +53,11 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   [[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
 	[nc removeObserver: self];
 
-  if (updater) {
-    [updater exitThread];
-    DESTROY (updater);
+  if (updaterconn != nil) {
+    if (updater != nil) {
+      [updater terminate];
+    }
+    DESTROY (updater);    
     DESTROY (updaterconn);
   }
         
@@ -65,11 +67,12 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   
   TEST_RELEASE (node);
   TEST_RELEASE (lsfinfo);
-
   TEST_RELEASE (win);
-  
   TEST_RELEASE (foundObjects);
-         
+  TEST_RELEASE (editor);      
+  RELEASE (elementsStr);
+  DESTROY (conn);
+   
   [super dealloc];
 }
 
@@ -87,6 +90,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
     updater = nil;
     actionPending = NO;
     updaterbusy = NO;
+    waitingUpdater = NO;
     autoupdate = 0;
     
     win = nil;
@@ -97,6 +101,8 @@ BOOL isPathInResults(NSString *path, NSArray *results);
     fm = [NSFileManager defaultManager];
     nc = [NSNotificationCenter defaultCenter];
     gworkspace = [GWorkspace gworkspace];
+    
+    ASSIGN (elementsStr, NSLocalizedString(@"elements", @""));
         
     if ([anode isValid] && [anode isDirectory]) {
       NSString *dpath = LSF_INFO([anode path]);
@@ -113,7 +119,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
         autoupdate = [entry unsignedLongValue];
       }
       
-      ASSIGN (lsfinfo, dict);
+      lsfinfo = [dict mutableCopy];
 
       watcherSuspended = NO;      
       [gworkspace addWatcherForPath: [node path]];
@@ -196,6 +202,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
       needupdate = YES;
     }
     [win makeKeyAndOrderFront: nil];
+    visibleRows = (int)([resultsScroll frame].size.height / CELLS_HEIGHT + 1);
   } else {  
     needupdate = YES;
   }
@@ -221,60 +228,76 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 
 - (void)startUpdater
 {
-  NSMutableDictionary *info = [NSMutableDictionary dictionary];
-  NSPort *port[2];
-  NSArray *ports;
+  NSString *cname;
+  NSArray *paths;
+  NSString *cmd;
 
-  port[0] = (NSPort *)[NSPort port];
-  port[1] = (NSPort *)[NSPort port];
+  cname = [NSString stringWithFormat: @"search_%i", (unsigned long)self];
 
-  ports = [NSArray arrayWithObjects: port[1], port[0], nil];
+  if (conn == nil) {
+    conn = [[NSConnection alloc] initWithReceivePort: (NSPort *)[NSPort port] 
+																			      sendPort: nil];
+    [conn setRootObject: self];
+    [conn registerName: cname];
+    [conn setDelegate: self];
 
-  updaterconn = [[NSConnection alloc] initWithReceivePort: port[0]
-				                                         sendPort: port[1]];
-  [updaterconn setRootObject: self];
-  [updaterconn setDelegate: self];
+    [nc addObserver: self
+           selector: @selector(connectionDidDie:)
+               name: NSConnectionDidDieNotification
+             object: conn];    
+  }
 
-  [nc addObserver: self
-         selector: @selector(connectionDidDie:)
-             name: NSConnectionDidDieNotification
-           object: updaterconn];    
-
-  [info setObject: ports forKey: @"ports"];
-  [info setObject: lsfinfo forKey: @"lsfinfo"];
+  if (updaterconn != nil) {
+    if (updater != nil) {
+      [updater terminate];
+    }
+        
+    DESTROY (updater);
     
-  NS_DURING
-    {
-      [NSThread detachNewThreadSelector: @selector(newUpdater:)
-		                           toTarget: [LSFUpdater class]
-		                         withObject: info];
-    }
-  NS_HANDLER
-    {
-      NSRunAlertPanel(nil, 
-                      NSLocalizedString(@"A fatal error occured while detaching the thread!", @""), 
-                      NSLocalizedString(@"Continue", @""), 
-                      nil, 
-                      nil);
-      [self endUpdate];
-    }
-  NS_ENDHANDLER
+    [nc removeObserver: self
+	                name: NSConnectionDidDieNotification 
+                object: updaterconn];
+    
+    [updaterconn invalidate];
+    DESTROY (updaterconn);
+  }
+  
+  updater = nil;
+  waitingUpdater = YES;  
+
+  [NSTimer scheduledTimerWithTimeInterval: 5.0 
+						                       target: self
+                                 selector: @selector(checkUpdater:) 
+																 userInfo: nil 
+                                  repeats: NO];
+
+  paths = NSSearchPathForDirectoriesInDomains(GSToolsDirectory, NSSystemDomainMask, YES);
+  cmd = [[paths objectAtIndex: 0] stringByAppendingPathComponent: @"lsfupdater"];
+
+  [NSTask launchedTaskWithLaunchPath: cmd 
+                           arguments: [NSArray arrayWithObject: cname]];
 }
 
+- (void)checkUpdater:(id)sender
+{
+  if (waitingUpdater && (updater == nil)) {
+    NSRunAlertPanel(nil, 
+                    NSLocalizedString(@"unable to launch the updater task.", @""), 
+                    NSLocalizedString(@"Continue", @""), 
+                    nil, 
+                    nil);
+  }
+}
+  
 - (void)setUpdater:(id)anObject
 {
-  [nc addObserver: self
-         selector: @selector(updaterThreadWillExit:)
-             name: NSThreadWillExitNotification
-           object: nil];     
-
+  NSData *info = [NSArchiver archivedDataWithRootObject: lsfinfo];
+    
   [anObject setProtocolForProxy: @protocol(LSFUpdaterProtocol)];
   updater = (id <LSFUpdaterProtocol>)[anObject retain];
-  
-  NSLog(@"updater registered");
-  
+  [updater setFolderInfo: info];   
   [updater setAutoupdate: autoupdate];
-
+  
   if (actionPending) {
     actionPending = NO;
     updaterbusy = YES;
@@ -319,28 +342,40 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   [self endUpdate];
 }
 
-- (void)addFoundPath:(NSString *)path
+- (void)addFoundPath:(NSString *)path 
 {
+  CREATE_AUTORELEASE_POOL(pool);
   FSNode *nd = [FSNode nodeWithPath: path];
   
   if ([foundObjects containsObject: nd] == NO) {
-    NSString *elmstr = NSLocalizedString(@"elements", @"");
-  
     [foundObjects addObject: nd];
-    elmstr = [NSString stringWithFormat: @"%i %@", [foundObjects count], elmstr];
-    [elementsLabel setStringValue: elmstr];
-    [resultsView noteNumberOfRowsChanged];
+
+    if ([foundObjects count] <= visibleRows) {
+      [resultsView noteNumberOfRowsChanged];
+    }
+
+    [elementsLabel setStringValue: [NSString stringWithFormat: @"%i %@", 
+                                          [foundObjects count], elementsStr]];
   } 
+
+  RELEASE (pool);
 }
 
 - (void)removeFoundPath:(NSString *)path
 {
-  FSNode *nd = [FSNode nodeWithPath: path];
-  NSString *elmstr = NSLocalizedString(@"elements", @"");
-    
-  [foundObjects removeObject: nd];
-  elmstr = [NSString stringWithFormat: @"%i %@", [foundObjects count], elmstr];
-  [elementsLabel setStringValue: elmstr];
+  CREATE_AUTORELEASE_POOL(pool);
+  [foundObjects removeObject: [FSNode nodeWithPath: path]];
+  [elementsLabel setStringValue: [NSString stringWithFormat: @"%i %@", 
+                                        [foundObjects count], elementsStr]];
+  [resultsView noteNumberOfRowsChanged];
+  RELEASE (pool);
+}
+
+- (void)clearFoundPaths
+{
+  [foundObjects removeAllObjects];
+  [elementsLabel setStringValue: [NSString stringWithFormat: @"%i %@", 
+                                        [foundObjects count], elementsStr]];
   [resultsView noteNumberOfRowsChanged];
 }
 
@@ -349,52 +384,60 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   if (updater) {
     [nc removeObserver: self
 	                name: NSConnectionDidDieNotification 
-                object: updaterconn];
-
-    [updater exitThread];
+                object: conn];
+    [updater terminate];
     DESTROY (updater);
-    DESTROY (updaterconn);
+    DESTROY (conn);
     actionPending = NO;
     updaterbusy = NO;
-    
-    [nc removeObserver: self
-	                name: NSThreadWillExitNotification 
-                object: nil];
+    [progView stop];
   }
-}
-
-- (void)updaterThreadWillExit:(NSNotification *)notification
-{
-  NSLog(@"lsf update thread will exit");
 }
          
 - (BOOL)connection:(NSConnection*)ancestor 
 								shouldMakeNewConnection:(NSConnection*)newConn
 {
-	if (ancestor == updaterconn) {
-  	[newConn setDelegate: self];
-  	[nc addObserver: self 
-					 selector: @selector(connectionDidDie:)
-	    				 name: NSConnectionDidDieNotification 
-             object: newConn];
-  	return YES;
+	if (ancestor == conn) {
+    ASSIGN (updaterconn, newConn);
+    [updaterconn setDelegate: self];
+
+    [nc addObserver: self 
+			     selector: @selector(connectionDidDie:)
+	    		     name: NSConnectionDidDieNotification 
+             object: updaterconn];
 	}
-		
-  return NO;
+
+  return YES;
 }
 
 - (void)connectionDidDie:(NSNotification *)notification
 {
+	id diedconn = [notification object];
+
   [nc removeObserver: self
 	              name: NSConnectionDidDieNotification 
-              object: [notification object]];
+              object: diedconn];
 
-  NSRunAlertPanel(nil, 
-                  NSLocalizedString(@"updater connection died!", @""), 
-                  NSLocalizedString(@"Continue", @""), 
-                  nil, 
-                  nil);
-  [self endUpdate];
+  if ((diedconn == conn) || (updaterconn && (diedconn == updaterconn))) {
+    DESTROY (updater);
+    DESTROY (updaterconn);
+    
+    if (diedconn == conn) {
+      DESTROY (conn);
+    } 
+    
+    actionPending = NO;
+    updaterbusy = NO;
+    [progView stop];
+    [updateButt setEnabled: YES];  
+    [autoupdatePopUp setEnabled: YES];
+
+    NSRunAlertPanel(nil, 
+                    NSLocalizedString(@"updater connection died!", @""), 
+                    NSLocalizedString(@"Continue", @""), 
+                    nil, 
+                    nil);
+  }
 }
 
 - (void)loadInterface
@@ -429,9 +472,9 @@ BOOL isPathInResults(NSString *path, NSArray *results);
     RELEASE (progView);
 
     [elementsLabel setStringValue: @""];
-
-    [autoupdateLabel setStringValue: NSLocalizedString(@"autoupdate cycle", @"")];
-
+    
+    [editButt setTitle: NSLocalizedString(@"Edit", @"")];
+    
     while ([[autoupdatePopUp itemArray] count] > 0) {
       [autoupdatePopUp removeItemAtIndex: 0];
     }
@@ -469,6 +512,8 @@ BOOL isPathInResults(NSString *path, NSArray *results);
         break;
       }
     }
+
+    [updateButt setTitle: NSLocalizedString(@"Update now", @"")];
 
     [splitView setDelegate: self];
 
@@ -656,38 +701,54 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 
 - (void)saveSizes
 {
-  NSMutableDictionary *sizesDict = [NSMutableDictionary dictionary];
   NSMutableDictionary *columnsDict = [NSMutableDictionary dictionary];
   NSArray *columns = [resultsView tableColumns];
   NSString *dictpath = LSF_GEOM([node path]);
+  NSMutableDictionary *sizesDict = nil;  
   int i;  
   
   if ([fm fileExistsAtPath: dictpath]) {
-    [sizesDict setObject: [win stringWithSavedFrame] 
-                  forKey: @"win_frame"];
-
-    [sizesDict setObject: [NSNumber numberWithInt: ceil(NSHeight([pathsScroll frame]))] 
-                  forKey: @"paths_scr_h"];
-
-    [sizesDict setObject: [NSNumber numberWithInt: currentOrder] 
-                  forKey: @"sorting_order"];
-
-    for (i = 0; i < [columns count]; i++) {
-      NSTableColumn *column = [columns objectAtIndex: i];
-      NSString *identifier = [column identifier];
-      NSNumber *cwidth = [NSNumber numberWithFloat: [column width]];
-      NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-
-      [dict setObject: [NSNumber numberWithInt: i] forKey: @"position"];
-      [dict setObject: cwidth forKey: @"width"];
-
-      [columnsDict setObject: dict forKey: identifier];
+    NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: dictpath];
+    if (dict) {
+      sizesDict = [dict mutableCopy];
     }
-
-    [sizesDict setObject: columnsDict forKey: @"columns_sizes"];
-
-    [sizesDict writeToFile: dictpath atomically: YES];
   }
+  
+  if (sizesDict == nil) {
+    sizesDict = [NSMutableDictionary new];
+  }
+  
+  [sizesDict setObject: [win stringWithSavedFrame] 
+                forKey: @"win_frame"];
+
+  if (editor) {
+    [sizesDict setObject: [[editor win] stringWithSavedFrame] 
+                  forKey: @"editor_win"];
+  }
+  
+  [sizesDict setObject: [NSNumber numberWithInt: ceil(NSHeight([pathsScroll frame]))] 
+                forKey: @"paths_scr_h"];
+
+  [sizesDict setObject: [NSNumber numberWithInt: currentOrder] 
+                forKey: @"sorting_order"];
+
+  for (i = 0; i < [columns count]; i++) {
+    NSTableColumn *column = [columns objectAtIndex: i];
+    NSString *identifier = [column identifier];
+    NSNumber *cwidth = [NSNumber numberWithFloat: [column width]];
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+
+    [dict setObject: [NSNumber numberWithInt: i] forKey: @"position"];
+    [dict setObject: cwidth forKey: @"width"];
+
+    [columnsDict setObject: dict forKey: identifier];
+  }
+
+  [sizesDict setObject: columnsDict forKey: @"columns_sizes"];
+
+  [sizesDict writeToFile: dictpath atomically: YES];
+  
+  RELEASE (sizesDict);
 }
 
 - (void)updateShownData
@@ -754,6 +815,36 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 - (void)doubleClickOnResultsView:(id)sender
 {
   [finder openFoundSelection: [self selectedObjects]];
+}
+
+- (IBAction)openEditor:(id)sender
+{
+  if (editor == nil) {
+    editor = [[LSFEditor alloc] initForFolder: self];
+  }
+  [editor activate];
+}
+
+- (NSArray *)searchPaths
+{
+  return [lsfinfo objectForKey: @"searchpaths"];
+}
+
+- (NSDictionary *)searchCriteria
+{
+  return [lsfinfo objectForKey: @"criteria"];
+}
+
+- (void)setSearchCriteria:(NSDictionary *)criteria
+{
+  if ([[lsfinfo objectForKey: @"criteria"] isEqual: criteria] == NO) {  
+    [lsfinfo setObject: criteria forKey: @"criteria"];
+
+    if (updater) {
+      NSData *info = [NSArchiver archivedDataWithRootObject: criteria];
+      [updater updateSearchCriteria: info];
+    }
+  }
 }
 
 - (void)fileSystemDidChange:(NSNotification *)notif
@@ -903,6 +994,10 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 
 - (void)splitViewDidResizeSubviews:(NSNotification *)aNotification
 {
+  visibleRows = (int)([resultsScroll frame].size.height / CELLS_HEIGHT + 1);
+  if ([foundObjects count] <= visibleRows) {
+    [resultsView noteNumberOfRowsChanged];
+  }
   [finder setSearchResultsHeight: ceil(NSHeight([pathsScroll frame]))]; 
 }
 
@@ -975,8 +1070,6 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification
 {
   NSArray *selected = [self selectedObjects];
-
-  NSLog(@"selected %i", [selected count]);
   
   if ([selected count]) {
     [pathsView showComponentsOfSelection: selected];
@@ -1088,11 +1181,13 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 
 - (void)stop
 {
-  animating = NO;
-  if (progTimer && [progTimer isValid]) {
-    [progTimer invalidate];
+  if (animating) {
+    animating = NO;
+    if (progTimer && [progTimer isValid]) {
+      [progTimer invalidate];
+    }
+    [self setNeedsDisplay: YES];
   }
-  [self setNeedsDisplay: YES];
 }
 
 - (void)animate:(id)sender

@@ -3,6 +3,7 @@ include $(GNUSTEP_MAKEFILES)/common.make
 SUBPROJECTS = \
         fswatcher \
         searchtool \
+        lsfupdater \
         ddbd \
         thumbnailer \
         wopen 

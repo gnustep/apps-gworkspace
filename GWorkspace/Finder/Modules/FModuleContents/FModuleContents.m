@@ -96,6 +96,15 @@ static NSString *nibName = @"FModuleContents";
 	return self;
 }
 
+- (void)setControlsState:(NSDictionary *)info
+{
+  NSString *str = [info objectForKey: @"what"];
+  
+  if (str && [str length]) {
+    [textField setStringValue: str];
+  }
+}
+
 - (id)controls
 {
   return controlsBox;

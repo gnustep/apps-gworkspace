@@ -104,7 +104,20 @@ static NSString *nibName = @"FModuleOwner";
 
 - (IBAction)popUpAction:(id)sender
 {
+}
 
+- (void)setControlsState:(NSDictionary *)info
+{
+  NSNumber *num = [info objectForKey: @"how"];
+  NSString *str = [info objectForKey: @"what"];
+
+  if (num) {
+    [popUp selectItemAtIndex: [num intValue]];
+  }
+  
+  if (str && [str length]) {
+    [textField setStringValue: str];
+  }    
 }
 
 - (id)controls

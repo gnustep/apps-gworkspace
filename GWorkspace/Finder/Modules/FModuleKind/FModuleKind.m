@@ -115,7 +115,21 @@ static NSString *nibName = @"FModuleKind";
 
 - (IBAction)popUpAction:(id)sender
 {
+}
 
+- (void)setControlsState:(NSDictionary *)info
+{
+  NSNumber *num = [info objectForKey: @"how"];
+  
+  if (num) {
+    [isPopUp selectItemAtIndex: [num intValue]];
+  }
+  
+  num = [info objectForKey: @"what"];  
+  
+  if (num) {
+    [typePopUp selectItemAtIndex: [num intValue]];
+  }  
 }
 
 - (id)controls

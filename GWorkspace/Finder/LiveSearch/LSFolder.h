@@ -40,13 +40,17 @@
 
 + (void)newUpdater:(NSDictionary *)info;
 
+- (oneway void)setFolderInfo:(NSData *)data;
+
+- (oneway void)updateSearchCriteria:(NSData *)data;
+
 - (oneway void)ddbdInsertTrees;
 
 - (oneway void)setAutoupdate:(unsigned)value;
 
 - (oneway void)fastUpdate;
 
-- (oneway void)exitThread;
+- (oneway void)terminate;
 
 @end
 
@@ -55,14 +59,18 @@
 {
   FSNode *node;
 
-  NSDictionary *lsfinfo;
+  NSMutableDictionary *lsfinfo;
   
   id finder;
   id gworkspace;
+  id editor;
+  
   BOOL watcherSuspended;
 
+  NSConnection *conn;
   NSConnection *updaterconn;
   id <LSFUpdaterProtocol> updater;
+  BOOL waitingUpdater;
   SEL nextSelector;
   BOOL actionPending;
   BOOL updaterbusy;
@@ -78,7 +86,8 @@
   IBOutlet id progBox; 
   ProgrView *progView;
   IBOutlet id elementsLabel;
-  IBOutlet id autoupdateLabel;
+  NSString *elementsStr;
+  IBOutlet id editButt;
   IBOutlet id autoupdatePopUp;
   IBOutlet id updateButt;
   
@@ -94,6 +103,7 @@
   
   IBOutlet id pathsScroll;
   ResultsPathsView *pathsView;
+  int visibleRows;
 
   NSMutableArray *foundObjects;
   FSNInfoType currentOrder;
@@ -122,6 +132,8 @@
 - (IBAction)updateIfNeeded:(id)sender;
 
 - (void)startUpdater;
+          
+- (void)checkUpdater:(id)sender;
 
 - (void)setUpdater:(id)anObject;
 
@@ -133,9 +145,9 @@
 
 - (void)removeFoundPath:(NSString *)path;
 
-- (void)endUpdate;
+- (void)clearFoundPaths;
 
-- (void)updaterThreadWillExit:(NSNotification *)notification;
+- (void)endUpdate;
 
 - (void)connectionDidDie:(NSNotification *)notification;
 
@@ -154,6 +166,14 @@
 - (NSArray *)selectedObjects;
 
 - (void)doubleClickOnResultsView:(id)sender;
+
+- (IBAction)openEditor:(id)sender;
+
+- (NSArray *)searchPaths;
+
+- (NSDictionary *)searchCriteria;
+
+- (void)setSearchCriteria:(NSDictionary *)criteria;
 
 - (void)fileSystemDidChange:(NSNotification *)notif;
 

@@ -1,9 +1,9 @@
-/* FindModuleView.h
+/* LSFEditor.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2005 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
- * Date: March 2004
+ * Date: January 2005
  *
  * This file is part of the GNUstep GWorkspace application
  *
@@ -22,45 +22,60 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef FIND_MODULE_VIEW_H
-#define FIND_MODULE_VIEW_H
+#ifndef LSF_EDITOR_H
+#define LSF_EDITOR_H
 
 #include <Foundation/Foundation.h>
 
-@class NSBox;
+@class NSMatrix;
+@class LSFolder;
+@class FindModuleView;
 
-@interface FindModuleView : NSObject 
+@interface LSFEditor : NSObject 
 {
   IBOutlet id win;
-  IBOutlet id mainBox;
-  IBOutlet id popUp;
-  IBOutlet id moduleBox;
-  IBOutlet id removeButt;
-  IBOutlet id addButt;
+  IBOutlet id searchLabel;
+  IBOutlet id placesScroll;
+  NSMatrix *placesMatrix;  
+  IBOutlet id modulesLabel;
+  IBOutlet id modulesBox;
+  IBOutlet id cancelButt;
+  IBOutlet id saveButt;
 
-  id delegate;
-  id module;
-  NSMutableArray *usedModulesNames;
+  NSMutableArray *modules;
+  NSMutableArray *fmviews;
+
+  id folder;
+  id finder;
 }
 
-- (id)initWithDelegate:(id)anobject;
+- (id)initForFolder:(id)fldr;
 
-- (NSBox *)mainBox;
+- (void)setModules;
 
-- (void)setModule:(id)mdl;
+- (void)activate;
 
-- (void)updateMenuForModules:(NSArray *)modules;
+- (NSArray *)modules;
 
-- (void)setAddEnabled:(BOOL)value;
+- (NSArray *)usedModules;
 
-- (void)setRemoveEnabled:(BOOL)value;
+- (id)firstUnusedModule;
 
-- (id)module;
+- (id)moduleWithName:(NSString *)mname;
 
-- (IBAction)popUpAction:(id)sender;
+- (void)addModule:(FindModuleView *)aview;
+
+- (void)removeModule:(FindModuleView *)aview;
+
+- (void)findModuleView:(FindModuleView *)aview 
+        changeModuleTo:(NSString *)mname;
 
 - (IBAction)buttonsAction:(id)sender;
 
+- (void)tile;
+
+- (NSWindow *)win;
+
 @end
 
-#endif // FIND_MODULE_VIEW_H
+#endif // LSF_EDITOR_H

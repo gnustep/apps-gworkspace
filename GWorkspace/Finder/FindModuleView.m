@@ -26,6 +26,7 @@
 #include <AppKit/AppKit.h>
 #include "FindModuleView.h"
 #include "Finder.h"
+#include "LSFEditor.h"
 #include "FinderModulesProtocol.h"
 
 static NSString *nibName = @"FindModuleView";
@@ -39,12 +40,12 @@ static NSString *nibName = @"FindModuleView";
   [super dealloc];
 }
 
-- (id)initForFinder:(id)fndr 
-            modules:(NSArray *)modules
+- (id)initWithDelegate:(id)anobject 
 {
 	self = [super init];
 
   if (self) {
+    NSArray *modules;
     int i;
     
 		if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
@@ -59,7 +60,8 @@ static NSString *nibName = @"FindModuleView";
     [removeButt setImage: [NSImage imageNamed: @"remove"]];
     [addButt setImage: [NSImage imageNamed: @"add"]];
     
-    finder = fndr;
+    delegate = anobject;
+    modules = [delegate modules];
     module = nil;
     
     usedModulesNames = [NSMutableArray new];
@@ -131,7 +133,7 @@ static NSString *nibName = @"FindModuleView";
   NSString *title = [sender titleOfSelectedItem];
   
   if ([title isEqual: [module moduleName]] == NO) {
-    [finder findModuleView: self changeModuleTo: title];
+    [delegate findModuleView: self changeModuleTo: title];
   }
 }
 
@@ -151,9 +153,9 @@ static NSString *nibName = @"FindModuleView";
 - (IBAction)buttonsAction:(id)sender
 {
   if (sender == addButt) {
-    [finder addModule: self];
+    [delegate addModule: self];
   } else {
-    [finder removeModule: self];
+    [delegate removeModule: self];
   }
 }
 

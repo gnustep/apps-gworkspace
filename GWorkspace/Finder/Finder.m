@@ -165,7 +165,7 @@ static Finder *finder = nil;
  
     for (i = 0; i < [usedModules count]; i++) {
       id module = [usedModules objectAtIndex: i];
-      id fmview = [[FindModuleView alloc] initForFinder: self modules: modules];
+      id fmview = [[FindModuleView alloc] initWithDelegate: self];
 
       [fmview setModule: module];
 
@@ -378,6 +378,11 @@ static Finder *finder = nil;
   return bundleList;
 }
 
+- (NSArray *)modules
+{
+  return modules;
+}
+
 - (NSArray *)usedModules
 {
   NSMutableArray *used = [NSMutableArray array];
@@ -431,7 +436,7 @@ static Finder *finder = nil;
   if ([usedModules count] < [modules count]) {
     int index = [fmviews indexOfObjectIdenticalTo: aview];  
     id module = [self firstUnusedModule];
-    id fmview = [[FindModuleView alloc] initForFinder: self modules: modules];
+    id fmview = [[FindModuleView alloc] initWithDelegate: self];
     int count;
     int i;
     

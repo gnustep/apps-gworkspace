@@ -551,8 +551,9 @@
 - (void)pathsViewDidSelectIcon:(id)icon
 {
   FSNode *node = [icon node];
-
-  if ([node isDirectory] && ([node isPackage] == NO)) {
+  int index = [icon gridIndex];
+  
+  if ([node isDirectory] && (([node isPackage] == NO) || (index == 0))) {
     if ([nodeView isSingleNode]) {
       [nodeView showContentsOfNode: node];
       [self scrollToBeginning];

@@ -81,7 +81,7 @@ Finder/SearchResults/SearchResults.m \
 Finder/SearchResults/ResultsTableView.m \
 Finder/SearchResults/ResultsPathsView.m \
 Finder/LiveSearch/LSFolder.m \
-Finder/LiveSearch/LSFUpdater.m \
+Finder/LiveSearch/LSFEditor.m \
 TShelf/TShelfWin.m \
 TShelf/TShelfView.m \
 TShelf/TShelfViewItem.m \

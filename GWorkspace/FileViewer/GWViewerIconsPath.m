@@ -730,6 +730,8 @@
     [userInfo setObject: newpath forKey: @"destination"];	
     [userInfo setObject: [NSArray arrayWithObject: @""] forKey: @"files"];	
 
+    [self stopRepNameEditing];
+
 //    [[NSDistributedNotificationCenter defaultCenter]
 // 				postNotificationName: @"GWFileSystemWillChangeNotification"
 //	 								    object: nil 

@@ -85,6 +85,7 @@
   
   NSArray *searchPaths;
   NSDictionary *searchCriteria;
+  NSConnection *conn;
   NSConnection *toolConn;
   id <SearchToolProtocol> searchtool;
   BOOL searching;

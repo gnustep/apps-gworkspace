@@ -532,7 +532,7 @@
     if (selection && ([selection count] == 1)) {
       FSNode *node = [selection objectAtIndex: 0];
     
-      if ([node isDirectory]) {
+      if ([node isDirectory] && (([node isPackage] == NO) || (i == 0))) {
         [nextcol showContentsOfNode: node]; 
       } else {
         done = YES;
@@ -1540,27 +1540,29 @@
     FSNBrowserColumn *bc = [self columnWithPath: destination];        
    
     if (bc) {
-      BOOL selectCell = NO;
-    
+      [self reloadFromColumn: bc];     
+      
       if ([[self window] isKeyWindow]) {
+        BOOL selectCell = NO;
+      
         if ([operation isEqual: @"GWorkspaceCreateFileOperation"]
                 || [operation isEqual: @"GWorkspaceCreateDirOperation"]) {  
           selectCell = YES;
           
         } else if ([operation isEqual: @"GWorkspaceRenameOperation"]) { 
-          FSNBrowserCell *cell = [bc cellWithPath: source];  
-          NSMatrix *matrix = [bc cmatrix];
+          NSString *newname = [files objectAtIndex: 0];
+          NSString *newpath = [destination stringByAppendingPathComponent: newname];
           
-          selectCell = (cell && ([[matrix selectedCells] containsObject: cell]));
+          NSLog(@"newpath %@", newpath);
+          
+          selectCell = ([bc cellWithPath: newpath] != nil);
         }
-      }
-      
-      [self reloadFromColumn: bc];     
-      
-      if (selectCell) {
-        [self selectCellsWithNames: files
-                  inColumnWithPath: destination
-                        sendAction: YES];
+        
+        if (selectCell) {
+          [self selectCellsWithNames: files
+                    inColumnWithPath: destination
+                          sendAction: YES];
+        }
       }
     }
   }

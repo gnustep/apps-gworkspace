@@ -260,6 +260,63 @@ static NSString *nibName = @"FModuleCrDate";
   } 
 }
 
+- (void)setControlsState:(NSDictionary *)info
+{
+  NSNumber *num = [info objectForKey: @"how"];
+  
+  if (num) {
+    int idx = [num intValue];
+
+    [isPopUp selectItemAtIndex: idx];
+    [self popUpAction: isPopUp];
+
+    if (idx == WITHIN) {
+      NSNumber *limnum = [info objectForKey: @"limit"];
+      int whenidx = 0;
+
+      if (limnum) {
+        double limit = [limnum doubleValue];
+      
+        if (limit == DAY_TI) {
+          whenidx = LAST_DAY;
+        } else if (limit == DAYS2_TI) {
+          whenidx = LAST_2DAYS;
+        } else if (limit == DAYS3_TI) {
+          whenidx = LAST_3DAYS;
+        } else if (limit == WEEK_TI) {
+          whenidx = LAST_WEEK;
+        } else if (limit == WEEK2_TI) {
+          whenidx = LAST_2WEEKS;
+        } else if (limit == WEEK3_TI) {
+          whenidx = LAST_3WEEKS;
+        } else if (limit == MONTH_TI) {
+          whenidx = LAST_MONTH;
+        } else if (limit == MONTH2_TI) {
+          whenidx = LAST_2MONTHS;
+        } else if (limit == MONTH3_TI) {
+          whenidx = LAST_3MONTHS;
+        } else if (limit == MONTH6_TI) {
+          whenidx = LAST_6MONTHS;
+        } 
+      }
+
+      [whenPopUp selectItemAtIndex: whenidx];
+    
+    } else if ((idx == BEFORE) || (idx == AFTER) || (idx == EXACTLY)) {
+      NSCalendarDate *cdate = [info objectForKey: @"date"];
+
+      if (cdate) {
+        int month = [cdate monthOfYear];
+        int day = [cdate dayOfMonth];
+        int year = [cdate yearOfCommonEra];
+        NSString *str = [NSString stringWithFormat: @"%i %i %i", month, day, year];
+      
+        [dateField setStringValue: str];
+      }
+    }    
+  }  
+}
+
 - (id)controls
 {
   return controlsBox;

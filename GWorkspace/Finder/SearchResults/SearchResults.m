@@ -51,13 +51,21 @@ static NSString *lsfname = @"LiveSearch.lsf";
 {
   [nc removeObserver: self];
   [[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
+
+  if (toolConn != nil) {
+    if (searchtool != nil) {
+      [searchtool terminate];
+    }
+    DESTROY (searchtool);    
+    DESTROY (toolConn);
+  }
+
   TEST_RELEASE (win);
   TEST_RELEASE (searchCriteria);
   TEST_RELEASE (foundObjects);
   TEST_RELEASE (searchPaths);
   RELEASE (elementsStr);
-  DESTROY (toolConn);
-  DESTROY (searchtool);
+  DESTROY (conn);
         
   [super dealloc];
 }
@@ -238,17 +246,35 @@ static NSString *lsfname = @"LiveSearch.lsf";
   ASSIGN (searchPaths, selection);
   ASSIGN (searchCriteria, criteria);
 
-  toolConn = [[NSConnection alloc] initWithReceivePort: (NSPort *)[NSPort port] 
-																			        sendPort: nil];
-  [toolConn setRootObject: self];
   cname = [NSString stringWithFormat: @"search_%i", [self memAddress]];
-  [toolConn registerName: cname];
-  [toolConn setDelegate: self];
 
-  [nc addObserver: self
-         selector: @selector(connectionDidDie:)
-             name: NSConnectionDidDieNotification
-           object: toolConn];    
+  if (conn == nil) {
+    conn = [[NSConnection alloc] initWithReceivePort: (NSPort *)[NSPort port] 
+																			      sendPort: nil];
+    [conn setRootObject: self];
+    [conn registerName: cname];
+    [conn setDelegate: self];
+
+    [nc addObserver: self
+           selector: @selector(connectionDidDie:)
+               name: NSConnectionDidDieNotification
+             object: conn];    
+  }
+
+  if (toolConn != nil) {
+    if (searchtool != nil) {
+      [searchtool terminate];
+    }
+        
+    DESTROY (searchtool);
+    
+    [nc removeObserver: self
+	                name: NSConnectionDidDieNotification 
+                object: toolConn];
+    
+    [toolConn invalidate];
+    DESTROY (toolConn);
+  }
 
   searchtool = nil;
   searching = YES;  
@@ -269,13 +295,14 @@ static NSString *lsfname = @"LiveSearch.lsf";
 - (BOOL)connection:(NSConnection *)ancestor 
 								shouldMakeNewConnection:(NSConnection *)newConn
 {
-	if (ancestor == toolConn) {
-  	[newConn setDelegate: self];
+	if (ancestor == conn) {
+    ASSIGN (toolConn, newConn);
+  	[toolConn setDelegate: self];
     
   	[nc addObserver: self 
 					 selector: @selector(connectionDidDie:)
 	    				 name: NSConnectionDidDieNotification 
-             object: newConn];
+             object: toolConn];
 	}
 		
   return YES;
@@ -289,14 +316,21 @@ static NSString *lsfname = @"LiveSearch.lsf";
 	              name: NSConnectionDidDieNotification 
               object: diedconn];
 
-  if (diedconn == toolConn) {
+  if ((diedconn == conn) || (toolConn && (diedconn == toolConn))) {
+    DESTROY (searchtool);
+    DESTROY (toolConn);
+    
+    if (diedconn == conn) {
+      DESTROY (conn);
+    } 
+    
     if (searching) {
+      [self endOfSearch];
       NSRunAlertPanel(nil, 
                       NSLocalizedString(@"the search tool connection died!", @""), 
                       NSLocalizedString(@"Continue", @""), 
                       nil, 
                       nil);
-      [self endOfSearch];
     }
   }
 }
@@ -304,15 +338,12 @@ static NSString *lsfname = @"LiveSearch.lsf";
 - (void)checkSearchTool:(id)sender
 {
   if (searching && (searchtool == nil)) {
+    [self endOfSearch];
     NSRunAlertPanel(nil, 
                     NSLocalizedString(@"unable to launch the search task.", @""), 
                     NSLocalizedString(@"Continue", @""), 
                     nil, 
                     nil);
-    [nc removeObserver: self
-	                name: NSConnectionDidDieNotification 
-                object: toolConn];
-    [self endOfSearch];
   }
 }
 

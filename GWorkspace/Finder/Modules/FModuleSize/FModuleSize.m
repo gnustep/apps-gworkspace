@@ -102,7 +102,20 @@ static NSString *nibName = @"FModuleSize";
 
 - (IBAction)popUpAction:(id)sender
 {
+}
 
+- (void)setControlsState:(NSDictionary *)info
+{
+  NSNumber *idxnum = [info objectForKey: @"how"];
+  NSNumber *sizenum = [info objectForKey: @"what"];
+
+  if (idxnum) {
+    [popUp selectItemAtIndex: [idxnum intValue]];
+  }
+
+  if (sizenum) {
+    [textField setStringValue: [sizenum stringValue]];
+  }    
 }
 
 - (id)controls

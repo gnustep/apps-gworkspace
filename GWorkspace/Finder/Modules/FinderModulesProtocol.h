@@ -31,6 +31,8 @@
 
 - (id)initWithSearchCriteria:(NSDictionary *)criteria;
 
+- (void)setControlsState:(NSDictionary *)info;
+
 - (id)controls;
 
 - (NSString *)moduleName;

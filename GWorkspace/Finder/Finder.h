@@ -74,6 +74,8 @@
 - (NSArray *)bundlesWithExtension:(NSString *)extension 
 													 inPath:(NSString *)path;
                            
+- (NSArray *)modules;
+
 - (NSArray *)usedModules;
 
 - (id)firstUnusedModule;
