@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #ifndef GWORKSPACE_H
 #define GWORKSPACE_H
 
@@ -91,6 +90,8 @@
   
   TShelfWin *tshelfWin;
   NSImage *tshelfBackground;
+  NSString *tshelfPBDir;
+  int tshelfPBFileNum;
   
 	Recycler *recycler;
 	NSString *trashPath;
@@ -132,6 +133,10 @@
 
 - (NSColor *)tshelfBackColor;	
 
+- (NSString *)tshelfPBDir;
+
+- (NSString *)tshelfPBFilePath;
+
 - (id)rootViewer;
 
 - (ViewersWindow *)viewerRootedAtPath:(NSString *)vpath;
@@ -155,6 +160,8 @@
 - (void)setShelfCellsWidth:(int)w; 
 
 - (void)createRecycler;
+
+- (void)createTabbedShelf;
 
 - (void)makeViewersTemplates;
 
@@ -185,6 +192,8 @@
            
 - (void)setSelectedPaths:(NSArray *)paths;
 
+- (void)resetSelectedPaths;
+
 - (void)setSelectedPaths:(NSArray *)paths fromDesktopView:(DesktopView *)view;
 
 - (void)setSelectedPaths:(NSArray *)paths 
@@ -193,6 +202,10 @@
          startingAtPoint:(NSPoint)startp;
 
 - (NSArray *)selectedPaths;
+
+- (void)showPasteboardData:(NSData *)data 
+                    ofType:(NSString *)type
+                  typeIcon:(NSImage *)icon;
 
 - (void)closeInspectors;
 

@@ -39,12 +39,137 @@
 #include "GWorkspace.h"
 #include "GNUstep.h"
 
-
 @implementation TShelfPBIcon
 
 - (void)dealloc
 {
+  RELEASE (dataPath);
+  RELEASE (dataType);
+  RELEASE (highlight);
+  RELEASE (icon);
+
   [super dealloc];
+}
+
+- (id)initForPBDataAtPath:(NSString *)dpath
+                   ofType:(NSString *)type
+				        gridIndex:(int)index
+              inIconsView:(TShelfIconsView *)aview
+{
+  self = [super init];
+  if (self) {
+    [self setFrame: NSMakeRect(0, 0, 64, 52)];
+
+    ASSIGN (dataPath, dpath);
+    ASSIGN (dataType, type);
+
+    ASSIGN (highlight, [NSImage imageNamed: @"CellHighlight.tiff"]);
+
+    if ([dataType isEqual: NSStringPboardType]) {
+      ASSIGN (icon, [NSImage imageNamed: @"stringPboard.tiff"]);
+    } else if ([dataType isEqual: NSRTFPboardType]) {
+      ASSIGN (icon, [NSImage imageNamed: @"rtfPboard.tiff"]);
+    } else if ([dataType isEqual: NSRTFDPboardType]) {
+      ASSIGN (icon, [NSImage imageNamed: @"rtfdPboard.tiff"]);
+    } else if ([dataType isEqual: NSTIFFPboardType]) {
+      ASSIGN (icon, [NSImage imageNamed: @"tiffPboard.tiff"]);
+    } else if ([dataType isEqual: NSFileContentsPboardType]) {
+      ASSIGN (icon, [NSImage imageNamed: @"filecontsPboard.tiff"]);
+    } else if ([dataType isEqual: NSColorPboardType]) {
+      ASSIGN (icon, [NSImage imageNamed: @"colorPboard.tiff"]);
+    } else if ([dataType isEqual: @"IBViewPboardType"]) {
+      ASSIGN (icon, [NSImage imageNamed: @"gormPboard.tiff"]);
+    } else {
+      ASSIGN (icon, [NSImage imageNamed: @"Pboard.tiff"]);
+    }
+    
+    gridindex = index;
+		position = NSMakePoint(0, 0);
+    isSelect = NO; 
+    tview = aview;  
+  }
+  
+  return self;
+}
+
+- (NSString *)dataPath
+{
+  return dataPath;
+}
+
+- (NSString *)dataType
+{
+  return dataType;
+}
+
+- (NSImage *)icon
+{
+  return icon;
+}
+
+- (void)select
+{
+  [tview unselectOtherIcons: self];
+  [tview setCurrentPBIcon: self];
+	isSelect = YES;
+  [self setNeedsDisplay: YES];
+}
+
+- (void)unselect
+{
+	isSelect = NO;
+	[self setNeedsDisplay: YES];
+}
+
+- (BOOL)isSelect
+{
+  return isSelect;
+}
+
+- (void)setPosition:(NSPoint)pos
+{
+  position = NSMakePoint(pos.x, pos.y);
+}
+
+- (NSPoint)position
+{
+  return position;
+}
+
+- (void)setGridIndex:(int)index
+{
+	gridindex = index;
+}
+
+- (int)gridindex
+{
+  return gridindex;
+}
+
+- (BOOL)acceptsFirstMouse:(NSEvent *)theEvent 
+{
+  return YES;
+}
+
+- (void)mouseDown:(NSEvent *)theEvent
+{
+  if (isSelect == NO) {  
+    [self select];
+  }
+}
+
+- (void)drawRect:(NSRect)rect
+{
+	NSPoint p;
+  NSSize s;
+      	
+	if(isSelect) {
+		[highlight compositeToPoint: NSZeroPoint operation: NSCompositeSourceOver];
+	}
+	
+  s = [icon size];
+  p = NSMakePoint((rect.size.width - s.width) / 2, (rect.size.height - s.height) / 2);	
+  [icon compositeToPoint: p operation: NSCompositeSourceOver];
 }
 
 @end

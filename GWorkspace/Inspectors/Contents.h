@@ -77,6 +77,8 @@
 
 - (id)viewerForFileAtPath:(NSString *)path;
 
+- (id)viewerForData:(NSData *)data ofType:(NSString *)type;
+
 - (IBAction)doNothing:(id)sender;
 
 @end

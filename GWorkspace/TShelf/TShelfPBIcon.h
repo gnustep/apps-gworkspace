@@ -28,18 +28,48 @@
 
 #include <AppKit/NSView.h>
 
-#ifndef ONICON
-#define ONICON(p, s1, s2) ([self mouse: (p) \
-inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
-((int)(s1).height - (int)(s2).height) >> 1, 48, 48)])
-#endif
-
 @class NSImage;
+@class TShelfIconsView;
 
 @interface TShelfPBIcon : NSView
 {
+  NSString *dataPath;
+  NSString *dataType;
 
+	NSImage *icon;
+  NSImage *highlight;
+	NSPoint position;
+	int gridindex;
+
+  TShelfIconsView *tview;
+
+  BOOL isSelect;
 }
+
+- (id)initForPBDataAtPath:(NSString *)dpath
+                   ofType:(NSString *)type
+				        gridIndex:(int)index
+              inIconsView:(TShelfIconsView *)aview;
+
+- (NSString *)dataPath;
+
+- (NSString *)dataType;
+
+- (NSImage *)icon;
+
+- (void)select;
+
+- (void)unselect;
+
+- (BOOL)isSelect;
+
+- (void)setPosition:(NSPoint)pos;
+
+- (NSPoint)position;
+
+- (void)setGridIndex:(int)index;
+
+- (int)gridindex;
 
 @end
 

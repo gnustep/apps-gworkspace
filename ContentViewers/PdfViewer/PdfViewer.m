@@ -717,6 +717,11 @@ return; \
 	}
 }
 
+- (BOOL)displayData:(NSData *)data ofType:(NSString *)type
+{
+  return NO;
+}
+
 - (BOOL)stopTasks
 {
   if (task && [task isRunning]) {
@@ -766,6 +771,11 @@ return; \
 	}
 
 	return NO;
+}
+
+- (BOOL)canDisplayData:(NSData *)data ofType:(NSString *)type
+{
+  return NO;
 }
 
 - (int)index

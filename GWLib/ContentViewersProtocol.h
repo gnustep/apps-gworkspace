@@ -37,11 +37,15 @@
 
 - (void)activateForPath:(NSString *)path;
 
+- (BOOL)displayData:(NSData *)data ofType:(NSString *)type;
+
 - (BOOL)stopTasks;
 
 - (void)deactivate;
 
 - (BOOL)canDisplayFileAtPath:(NSString *)path;
+
+- (BOOL)canDisplayData:(NSData *)data ofType:(NSString *)type;
 
 - (int)index;
 

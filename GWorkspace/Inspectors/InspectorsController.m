@@ -91,7 +91,9 @@ static NSString *nibName = @"InspectorsWin";
       currentInspector = (id<InspectorsProtocol>)[[Permissions alloc] init];	
       [inspectors addObject: currentInspector]; 
       DESTROY (currentInspector);
-
+      
+      showingPb = NO;
+      
       [self activateInspector: popUp];
       
       [self setPaths: paths];
@@ -106,16 +108,20 @@ static NSString *nibName = @"InspectorsWin";
   NSString *path;
   NSString *s;
   int count;
-
+  
 	if (paths == nil) {
 		return;
 	}
-	if([currentPaths isEqualToArray: paths]) {
+	if(([currentPaths isEqualToArray: paths]) && (showingPb == NO)) {
 		return;
 	}
   
-	ASSIGN (currentPaths, paths);
+  if (showingPb && currentInspector) {
+    [win setTitle: [currentInspector winname]];
+  }
   
+	ASSIGN (currentPaths, paths);
+  showingPb = NO;
   path = [currentPaths objectAtIndex: 0];
   count = [currentPaths count];
 
@@ -154,6 +160,20 @@ static NSString *nibName = @"InspectorsWin";
 	[currentInspector activateForPaths: currentPaths];
 }
 
+- (void)showPasteboardData:(NSData *)data 
+                    ofType:(NSString *)type
+                  typeIcon:(NSImage *)icon
+{
+	if (currentInspector && [currentInspector isKindOfClass: [Contents class]]) {
+    [win setTitle: NSLocalizedString(@"Pasteboard Inspector", @"")];
+    [iconView setImage: icon]; 	
+    [nameField setStringValue: type];   
+    [pathField setStringValue: @""];
+    [currentInspector showPasteboardData: data ofType: type];
+    showingPb = YES;
+	}
+}
+
 - (IBAction)activateInspector:(id)sender
 {
   int index = [sender indexOfSelectedItem];
@@ -172,7 +192,12 @@ static NSString *nibName = @"InspectorsWin";
 
   currentInspector = [inspectors objectAtIndex: index];
 	[win setTitle: [currentInspector winname]];
-	[lowBox addSubview: [currentInspector inspView]];	  
+	[lowBox addSubview: [currentInspector inspView]];	 
+  
+  if (showingPb) {
+    [self setPaths: currentPaths];
+  }
+   
 	[currentInspector activateForPaths: currentPaths];
 }
 

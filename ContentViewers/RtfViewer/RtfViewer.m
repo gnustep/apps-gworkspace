@@ -216,6 +216,59 @@
   }
 }
 
+- (BOOL)displayData:(NSData *)data ofType:(NSString *)type
+{
+  NSAttributedString *attrstr = nil;
+  NSFont *font = nil;  
+
+  buttOk = [panel okButton];
+  if (buttOk) {
+    [buttOk setEnabled: NO];			
+  }
+
+  if ([type isEqual: NSRTFPboardType]) {    
+    attrstr = [[NSAttributedString alloc] initWithRTF: data
+						                       documentAttributes: NULL];
+    AUTORELEASE (attrstr);
+  } else if ([type isEqual: NSRTFDPboardType]) { 
+    attrstr = [[NSAttributedString alloc] initWithRTFD: data
+						                        documentAttributes: NULL];
+    AUTORELEASE (attrstr);
+  } else if ([type isEqual: NSStringPboardType]) { 
+    NSString *str = [[NSString alloc] initWithData: data
+                           encoding: [NSString defaultCStringEncoding]];
+    
+    if (str) {
+      attrstr = [[NSAttributedString alloc] initWithString: str];
+      RELEASE (str);
+      AUTORELEASE (attrstr);
+    }
+  }
+
+  if (attrstr) {
+    if (valid == NO) {
+      valid = YES;
+      [label removeFromSuperview];
+      [self addSubview: scrollView]; 
+    }
+  
+    [[textView textStorage] setAttributedString: attrstr];
+    font = [NSFont systemFontOfSize: 8.0];
+		[[textView textStorage] addAttribute: NSFontAttributeName 
+                                   value: font 
+                                   range: NSMakeRange(0, [attrstr length])];
+    return YES;
+  } else {
+    if (valid == YES) {
+      valid = NO;
+      [scrollView removeFromSuperview];
+			[self addSubview: label];
+    }
+  }
+
+  return NO;
+}
+
 - (BOOL)stopTasks
 {
   return YES;
@@ -251,6 +304,16 @@
   }
   
 	return NO;
+}
+
+- (BOOL)canDisplayData:(NSData *)data ofType:(NSString *)type
+{
+  if ([type isEqual: NSRTFPboardType]
+                  || [type isEqual: NSRTFDPboardType]
+                  || [type isEqual: NSStringPboardType]) {
+    return YES;
+  }
+  return NO;
 }
 
 - (int)index

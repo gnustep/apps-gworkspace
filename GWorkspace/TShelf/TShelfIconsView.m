@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
   #ifdef GNUSTEP 
@@ -44,13 +43,34 @@
 
 @interface TShelfIcon (TShelfIconsViewSorting)
 
-- (NSComparisonResult)iconCompare:(TShelfIcon *)other;
+- (NSComparisonResult)iconCompare:(id)other;
 
 @end
 
 @implementation TShelfIcon (TShelfIconsViewSorting)
 
-- (NSComparisonResult)iconCompare:(TShelfIcon *)other
+- (NSComparisonResult)iconCompare:(id)other
+{
+	if ([other gridindex] > [self gridindex]) {
+		return NSOrderedAscending;	
+	} else {
+		return NSOrderedDescending;	
+	}
+
+	return NSOrderedSame;
+}
+
+@end
+
+@interface TShelfPBIcon (TShelfIconsViewSorting)
+
+- (NSComparisonResult)iconCompare:(id)other;
+
+@end
+
+@implementation TShelfPBIcon (TShelfIconsViewSorting)
+
+- (NSComparisonResult)iconCompare:(id)other
 {
 	if ([other gridindex] > [self gridindex]) {
 		return NSOrderedAscending;	
@@ -89,7 +109,7 @@
 
     fm = [NSFileManager defaultManager];
     gw = [GWorkspace gworkspace];
-				
+				        
 		makePosSel = @selector(makePositions);
 		makePos = (IMP)[self methodForSelector: makePosSel];
 
@@ -108,20 +128,33 @@
     if (idescr && [idescr count]) {    
       for (i = 0; i < [idescr count]; i++) { 
 			  NSDictionary *iconDict = [idescr objectAtIndex: i];
-        NSArray *iconpaths = [iconDict objectForKey: @"paths"];
 			  int index = [[iconDict objectForKey: @"index"] intValue];
-        BOOL canadd = YES;
+        
+        if (iconsType == FILES_TAB) {
+          NSArray *iconpaths = [iconDict objectForKey: @"paths"];
+          BOOL canadd = YES;
 
-        for (j = 0; j < [iconpaths count]; j++) {
-          NSString *p = [iconpaths objectAtIndex: j];
-          if ([fm fileExistsAtPath: p] == NO) {
-            canadd = NO;
-            break;
-          } 
-        }
+          for (j = 0; j < [iconpaths count]; j++) {
+            NSString *p = [iconpaths objectAtIndex: j];
+            if ([fm fileExistsAtPath: p] == NO) {
+              canadd = NO;
+              break;
+            } 
+          }
 
-        if ((canadd == YES) && (index != -1)) {
-				  [self addIconWithPaths: iconpaths withGridIndex: index];
+          if ((canadd == YES) && (index != -1)) {
+				    [self addIconWithPaths: iconpaths withGridIndex: index];
+          }
+          
+        } else {
+          NSString *dataPath = [iconDict objectForKey: @"datapath"];
+          NSString *dataType = [iconDict objectForKey: @"datatype"];
+                    
+          if ([fm fileExistsAtPath: dataPath]) {
+            [self addPBIconForDataAtPath: dataPath
+                                dataType: dataType
+					                 withGridIndex: index];
+          }
         }
       }
 		}
@@ -145,12 +178,16 @@
                 	  selector: @selector(fileSystemDidChange:) 
                 			  name: GWFileSystemDidChangeNotification
                 		  object: nil];                     
-
-		  [[NSNotificationCenter defaultCenter] 
-                 addObserver: self 
-                    selector: @selector(watcherNotification:) 
-                		    name: GWFileWatcherFileDidChangeNotification
-                	    object: nil];
+    }
+    
+		[[NSNotificationCenter defaultCenter] 
+               addObserver: self 
+                  selector: @selector(watcherNotification:) 
+                		  name: GWFileWatcherFileDidChangeNotification
+                	  object: nil];
+    
+    if (iconsType == DATA_TAB) {
+      [self setWatcherForPath: [gw tshelfPBDir]];
     }
 	}
   
@@ -164,13 +201,20 @@
 	  
 	for (i = 0; i < [icons count]; i++) {
 		NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity: 1];
-		TShelfIcon *icon = [icons objectAtIndex: i];
-		int index;
-		
-		[dict setObject: [icon paths] forKey: @"paths"];
-		index = [icon gridindex];
-		[dict setObject: [NSNumber numberWithInt: index] forKey: @"index"];
+    id icon;
+    int index;
 
+    icon = [icons objectAtIndex: i];
+    index = [icon gridindex];
+    [dict setObject: [NSNumber numberWithInt: index] forKey: @"index"];
+		
+    if (iconsType == FILES_TAB) {
+		  [dict setObject: [icon paths] forKey: @"paths"];
+    } else {
+		  [dict setObject: [icon dataPath] forKey: @"datapath"];
+		  [dict setObject: [icon dataType] forKey: @"datatype"];      
+    }
+    
     [arr addObject: dict];
   }
   
@@ -203,22 +247,45 @@
 	}
 }
 
+- (void)addPBIconForDataAtPath:(NSString *)dpath 
+                      dataType:(NSString *)dtype
+					       withGridIndex:(int)index 
+{
+  TShelfPBIcon *icon = [[TShelfPBIcon alloc] initForPBDataAtPath: dpath
+                            ofType: dtype gridIndex: index inIconsView: self];
+              
+	if (gpoints != NULL) {
+		if (index < pcount) {
+			gpoints[index].used = 1;
+		}
+	}
+
+	[icons addObject: icon];  
+	[self addSubview: icon];
+	RELEASE (icon);    
+	[self sortIcons];	
+	[self resizeWithOldSuperviewSize: [self frame].size];  
+}
+
 - (void)removeIcon:(id)anIcon
 {
-	TShelfIcon *icon = (TShelfIcon *)anIcon;
-	int index = [icon gridindex];	
-	NSString *watched = [[[icon paths] objectAtIndex: 0] stringByDeletingLastPathComponent];
+  int index = [anIcon gridindex];	
 
-	if ([watchedPaths containsObject: watched]) {
-		[watchedPaths removeObject: watched];
-		[self unsetWatcherForPath: watched];
-	}
+  if (iconsType == FILES_TAB) {
+	  NSString *watched = [[[anIcon paths] objectAtIndex: 0] stringByDeletingLastPathComponent];
+
+	  if ([watchedPaths containsObject: watched]) {
+		  [watchedPaths removeObject: watched];
+		  [self unsetWatcherForPath: watched];
+	  }
   
-	gpoints[index].used = 0;
-  [[icon myLabel] removeFromSuperview];
-  [icon removeFromSuperview];
-  [icons removeObject: icon];
-	[self resizeWithOldSuperviewSize: [self frame].size];  
+    [[anIcon myLabel] removeFromSuperview];
+  }
+  
+  [anIcon removeFromSuperview];
+  [icons removeObject: anIcon];
+  gpoints[index].used = 0;
+  [self resizeWithOldSuperviewSize: [self frame].size];  
 }
 
 - (void)setLabelRectOfIcon:(id)anIcon
@@ -294,6 +361,20 @@
   for (i = 0; i < [icons count]; i++) {
     [[icons objectAtIndex: i] renewIcon];
   }  
+}
+
+- (id)selectedIcon
+{
+  int i;
+  
+  for (i = 0; i < [icons count]; i++) {
+    id icon = [icons objectAtIndex: i];
+    if ([icon isSelect]) {  
+      return icon;
+    }
+  }  
+
+  return nil;
 }
 
 - (void)setCurrentSelection:(NSArray *)paths
@@ -440,112 +521,141 @@
 	NSString *event = [notifdict objectForKey: @"event"];
 	BOOL contained = NO;
 	int i;
+  
+  if (iconsType == DATA_TAB) {
+    int count = [icons count];
+    
+    if (event == GWWatchedDirectoryDeleted) { 
+      for (i = 0; i < count; i++) {
+        [self removeIcon: [icons objectAtIndex: 0]];
+      }
+    } else if (event == GWFileDeletedInWatchedDirectory) { 
+      NSArray *files = [notifdict objectForKey: @"files"];
+    
+      for (i = 0; i < count; i++) {
+        TShelfPBIcon *icon = [icons objectAtIndex: i];
+        NSString *dataPath = [icon dataPath];
+        int j;
+				  
+        for (j = 0; j < [files count]; j++) {
+          NSString *fname = [files objectAtIndex: j];
+          NSString *fullPath = [path stringByAppendingPathComponent: fname];
 
-	if (event == GWFileCreatedInWatchedDirectory) {
-		return;
-	}
-	
-	for (i = 0; i < [watchedPaths count]; i++) {
-		NSString *wpath = [watchedPaths objectAtIndex: i];
-		if (([wpath isEqualToString: path]) || (subPathOfPath(path, wpath))) {
-			contained = YES;
-			break;
-		}
-	}
+          if ([fullPath isEqualToString: dataPath]) {
+            [self removeIcon: icon];
+            count--;
+            i--;
+          }
+        }
+      }
+    }
+  } else {
+	  if (event == GWFileCreatedInWatchedDirectory) {
+		  return;
+	  }
 
-  if (contained) {
-		id icon;
-		NSArray *ipaths;
-		NSString *ipath;
-		int count = [icons count];
+	  for (i = 0; i < [watchedPaths count]; i++) {
+		  NSString *wpath = [watchedPaths objectAtIndex: i];
+		  if (([wpath isEqualToString: path]) || (subPathOfPath(path, wpath))) {
+			  contained = YES;
+			  break;
+		  }
+	  }
 
-		if (event == GWWatchedDirectoryDeleted) {		
-			for (i = 0; i < count; i++) {
-				icon = [icons objectAtIndex: i];
-				ipaths = [icon paths];
-				ipath = [ipaths objectAtIndex: 0];
-				
-				if (subPathOfPath(path, ipath)) {
-					[self removeIcon: icon];
-					count--;
-					i--;
-				}
-			}
-			return;
-		}		
-		
-		if (event == GWFileDeletedInWatchedDirectory) { 
-			NSArray *files = [notifdict objectForKey: @"files"];
-						
-			for (i = 0; i < count; i++) {
-				int j;
-				
-				icon = [icons objectAtIndex: i];
-				ipaths = [icon paths];				
-				
-				if ([ipaths count] == 1) {
-					ipath = [ipaths objectAtIndex: 0];
-					
-					for (j = 0; j < [files count]; j++) {
-						NSString *fname = [files objectAtIndex: j];
-						NSString *fullPath = [path stringByAppendingPathComponent: fname];
-		
-						if ((subPathOfPath(fullPath, ipath))
-															|| ([ipath isEqualToString: fullPath])) {
-							[self removeIcon: icon];
-							count--;
-							i--;
-							break;
-						}
-					}
-					
-				} else {
-				
-					for (j = 0; j < [files count]; j++) {
-						NSString *fname = [files objectAtIndex: j];
-						NSString *fullPath = [path stringByAppendingPathComponent: fname];
-						BOOL deleted = NO;
-						int m;
-						
-						if (deleted) {
-							break;
-						}
-						
-						ipath = [ipaths objectAtIndex: 0];
-						if (subPathOfPath(fullPath, ipath)) {
-							[self removeIcon: icon];
-							count--;
-							i--;
-							break;
-						}
-						
-						for (m = 0; m < [ipaths count]; m++) {
-							ipath = [ipaths objectAtIndex: m];
-				
-							if ([ipath isEqualToString: fullPath]) {
-								NSMutableArray *newpaths;
-							
-								if ([ipaths count] == 1) {
-									[self removeIcon: icon];
-									count--;
-									i--;			
-									deleted = YES;
-									break;	
-								}
-								
-								newpaths = [ipaths mutableCopy];
-								[newpaths removeObject: ipath];
-								[icon setPaths: newpaths];
-								ipaths = [icon paths];
-								RELEASE (newpaths);
-							}
-						}
-						
-					}
-				}
-			}
-		}
-	}
+    if (contained) {
+		  id icon;
+		  NSArray *ipaths;
+		  NSString *ipath;
+		  int count = [icons count];
+
+		  if (event == GWWatchedDirectoryDeleted) {		
+			  for (i = 0; i < count; i++) {
+				  icon = [icons objectAtIndex: i];
+				  ipaths = [icon paths];
+				  ipath = [ipaths objectAtIndex: 0];
+
+				  if (subPathOfPath(path, ipath)) {
+					  [self removeIcon: icon];
+					  count--;
+					  i--;
+				  }
+			  }
+			  return;
+		  }		
+
+		  if (event == GWFileDeletedInWatchedDirectory) { 
+			  NSArray *files = [notifdict objectForKey: @"files"];
+
+			  for (i = 0; i < count; i++) {
+				  int j;
+
+				  icon = [icons objectAtIndex: i];
+				  ipaths = [icon paths];				
+
+				  if ([ipaths count] == 1) {
+					  ipath = [ipaths objectAtIndex: 0];
+
+					  for (j = 0; j < [files count]; j++) {
+						  NSString *fname = [files objectAtIndex: j];
+						  NSString *fullPath = [path stringByAppendingPathComponent: fname];
+
+						  if ((subPathOfPath(fullPath, ipath))
+															  || ([ipath isEqualToString: fullPath])) {
+							  [self removeIcon: icon];
+							  count--;
+							  i--;
+							  break;
+						  }
+					  }
+
+				  } else {
+
+					  for (j = 0; j < [files count]; j++) {
+						  NSString *fname = [files objectAtIndex: j];
+						  NSString *fullPath = [path stringByAppendingPathComponent: fname];
+						  BOOL deleted = NO;
+						  int m;
+
+						  if (deleted) {
+							  break;
+						  }
+
+						  ipath = [ipaths objectAtIndex: 0];
+						  if (subPathOfPath(fullPath, ipath)) {
+							  [self removeIcon: icon];
+							  count--;
+							  i--;
+							  break;
+						  }
+
+						  for (m = 0; m < [ipaths count]; m++) {
+							  ipath = [ipaths objectAtIndex: m];
+
+							  if ([ipath isEqualToString: fullPath]) {
+								  NSMutableArray *newpaths;
+
+								  if ([ipaths count] == 1) {
+									  [self removeIcon: icon];
+									  count--;
+									  i--;			
+									  deleted = YES;
+									  break;	
+								  }
+
+								  newpaths = [ipaths mutableCopy];
+								  [newpaths removeObject: ipath];
+								  [icon setPaths: newpaths];
+								  ipaths = [icon paths];
+								  RELEASE (newpaths);
+							  }
+						  }
+
+					  }
+				  }
+			  }
+		  }
+	  }
+  }
 }
 
 - (void)setWatchers
@@ -579,13 +689,12 @@
 - (void)makePositions
 {
   float wdt, hgt, x, y;
-	int posx, posy;
 	int i;
   
   wdt = [self frame].size.width;
   hgt = [self frame].size.height;
 	
-	pcount = (int)((int)((wdt - 16) / cellsWidth) * (int)(MAXSHELFHEIGHT / 75));
+	pcount = (int)((wdt - 16) / cellsWidth);
 		
  	if (gpoints != NULL) {
 		NSZoneFree (NSDefaultMallocZone(), gpoints);
@@ -594,26 +703,20 @@
 	
   x = 16;
   y = hgt - 59;
-	posx = 0;
-	posy = 0;
 	
 	for (i = 0; i < pcount; i++) {
 		if (i > 0) {
 			x += cellsWidth;      
     }
-    if (x >= (wdt - cellsWidth)) {
-      x = 16;
-      y -= 75;
-			posx = 0;
-			posy++;
-    }  		
-	
-		gpoints[i].x = x;
-		gpoints[i].y = y;
-		gpoints[i].index = i;
-		gpoints[i].used = 0;
-		
-		posx++;
+    gpoints[i].x = x;
+    gpoints[i].y = y;
+    gpoints[i].index = i;
+    
+    if (x < (wdt - cellsWidth)) {
+      gpoints[i].used = 0;
+    } else {
+		  gpoints[i].used = 1;
+    }
 	}
 }
 
@@ -692,7 +795,10 @@
 		[icon setPosition: p];
 		[icon setFrame: r];
 		gpoints[index].used = 1;
-		[self setLabelRectOfIcon: icon];		
+    
+    if (iconsType == FILES_TAB) {
+		  [self setLabelRectOfIcon: icon];		
+    }
 	}
 	
 	[self sortIcons];
@@ -702,6 +808,10 @@
 - (void)mouseDown:(NSEvent *)theEvent
 {
   [self unselectOtherIcons: nil];
+  
+  if (iconsType == DATA_TAB) {
+    [self setCurrentPBIcon: nil];
+  }
 }
 
 - (void)drawRect:(NSRect)rect
@@ -732,14 +842,53 @@
 
 @implementation TShelfIconsView(PBoardOperations)
 
+- (void)setCurrentPBIcon:(id)anIcon
+{
+  if (anIcon) {
+    NSString *dataPath = [anIcon dataPath];
+    NSString *dataType = [anIcon dataType];
+    NSImage *icn = [anIcon icon];
+    NSData *data = [NSData dataWithContentsOfFile: dataPath];
+    
+    if (data) {
+      [gw showPasteboardData: data ofType: dataType typeIcon: icn];
+    }
+  } else {
+    [gw resetSelectedPaths];
+  }
+}
+
 - (void)doCut
 {
-  NSLog(@"cut");
+  TShelfPBIcon *icon = [self selectedIcon];
+
+  if (icon) {
+    NSString *dataPath = [icon dataPath];
+  
+    RETAIN (dataPath);
+    [self doCopy];
+    [self removeIcon: icon];
+    [fm removeFileAtPath: dataPath handler: nil];
+    RELEASE (dataPath);
+  }
 }
 
 - (void)doCopy
 {
-  NSLog(@"copy");
+  TShelfPBIcon *icon = [self selectedIcon];
+
+  if (icon) {
+    NSString *dataPath = [icon dataPath];
+    NSString *dataType = [icon dataType];
+    NSData *data = [NSData dataWithContentsOfFile: dataPath];
+
+    if (data) {
+      NSPasteboard *pb = [NSPasteboard generalPasteboard];
+      
+      [pb declareTypes: [NSArray arrayWithObject: dataType] owner: self];
+      [pb setData: data forType: dataType];
+    }
+  }
 }
 
 - (void)doPaste
@@ -750,91 +899,51 @@
 - (BOOL)readSelectionFromPasteboard:(NSPasteboard *)pboard
 {
   NSArray *types = [pboard types];
+  NSData *data;
   NSString *type;
+  int i;
   
   if ((types == nil) || ([types count] == 0)) {
     return NO;
   }
   
-  type = [types objectAtIndex: 0];
+  for (i = 0; i < [types count]; i++) {
+    type = [types objectAtIndex: 0];
+    data = [pboard dataForType: type];
+    if (data) {
+      break;
+    }
+  }
   
-  if ([type isEqual: NSStringPboardType]) {
-    NSString *str = [pboard stringForType: NSStringPboardType];
+  if (data) {
+    NSString *dpath = [gw tshelfPBFilePath];
+		int index = -1; 
+    int i;
   
-    NSLog(str);
+	  for (i = 0; i < pcount; i++) {
+		  if (gpoints[i].used == 0) {
+        index = i;
+		    break;
+      }
+    }
   
-  } else if ([type isEqual: NSRTFPboardType]) {
-    // NSData *d = [pboard dataForType: NSRTFPboardType];
+    if (index == -1) {
+      NSRunAlertPanel(NSLocalizedString(@"Error!", @""),
+                        NSLocalizedString(@"No space left on this tab", @""),
+                        NSLocalizedString(@"Ok", @""),
+                        nil,
+                        nil);
+      return YES;
+    }
   
-
-  } else if ([type isEqual: NSRTFDPboardType]) {
-    // NSData *d = [pboard dataForType: NSRTFDPboardType];
-
-  
-  } else if ([type isEqual: NSTIFFPboardType]) {
-	  // NSData *d = [pboard dataForType: NSTIFFPboardType];
-
-  
-  } else if ([type isEqual: NSFileContentsPboardType]) {
-    // NSFileWrapper *wrapper = [pboard readFileWrapper];
-    // NSTextAttachment *attachment = [[NSTextAttachment alloc] initWithFileWrapper: wrapper];
-	  // NSAttributedString *as = [NSAttributedString attributedStringWithAttachment: attachment];
-
-    // RELEASE (attachment);
-    
-  } else if ([type isEqual: NSColorPboardType]) {
-    // NSColor *color = [NSColor colorFromPasteboard: pboard];
-
-  
-  } else {
-    NSBeep();
+    if ([data writeToFile: dpath atomically: YES]) {
+      [self addPBIconForDataAtPath: dpath
+                          dataType: type
+					           withGridIndex: index];
+    }
   }
   
   return YES;
-}
-
-- (BOOL)writeSelectionToPasteboard:(NSPasteboard *)pboard
-			                        type:(NSString *)type
-{
-  BOOL ret = NO;
-
-  if (type == nil) {
-    return NO;
-  }
-
-  [pboard declareTypes: [NSArray arrayWithObject: type] owner: self];
-    
-  if ([type isEqualToString: NSStringPboardType]) {
-//    ret = [pboard setString: [[self string] substringWithRange: _layoutManager->_selected_range] 
-//			              forType: NSStringPboardType] || ret;
-	} else if ([type isEqualToString: NSRTFPboardType]) {
-//	  ret = [pboard setData: [self RTFFromRange: _layoutManager->_selected_range]
-//			forType: NSRTFPboardType];
-	} else if ([type isEqualToString: NSRTFDPboardType]) {
-//	  ret = [pboard setData: [self RTFDFromRange: _layoutManager->_selected_range]
-//			forType: NSRTFDPboardType] || ret;
-	} else if ([type isEqualToString: NSColorPboardType]) {
-	 /*
-    NSColor	*color;
-
-	  color = [_textStorage attribute: NSForegroundColorAttributeName
-				  atIndex: _layoutManager->_selected_range.location
-			   effectiveRange: 0];
-	  if (color != nil)
-	    {
-	      [color writeToPasteboard:  pboard];
-	      ret = YES;
-	    }
-    */
-	  } else if ([type isEqual: NSFileContentsPboardType]) {
-
-
-    } else if ([type isEqual: NSTIFFPboardType]) {
-    
-    
-    }
-
-  return ret;
 }
 
 @end

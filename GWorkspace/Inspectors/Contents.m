@@ -337,6 +337,52 @@ static NSString *nibName = @"ContentsPanel";
 	[inspBox setNeedsDisplay: YES];
 }
 
+- (void)showPasteboardData:(NSData *)data 
+                    ofType:(NSString *)type
+{
+	id viewer;
+	NSWindow *w;
+	BOOL stopped;
+  
+	[okButt setTarget: self];
+	[okButt setAction: @selector(doNothing:)];
+	[okButt setEnabled: NO];
+	[revertButt setTarget: self];
+	[revertButt setAction: @selector(doNothing:)];
+  [revertButt setEnabled: NO];
+	
+  [(NSBox *)vwrsBox setContentView: nil];
+  winName = NSLocalizedString(@"Pasteboard Inspector", @"");
+
+  viewer = [self viewerForData: data ofType: type];
+  
+	if (viewer) {   
+    if (currentViewer) {
+      stopped = [currentViewer stopTasks];  
+    }
+    
+    currentViewer = viewer;
+    [(NSBox *)vwrsBox setContentView: viewer];
+    
+    if ([viewer displayData: data ofType: type] == NO) {
+		  [(NSBox *)vwrsBox setContentView: nil];
+      [genericField setStringValue: NSLocalizedString(@"no data inspector", @"")];
+      [(NSBox *)vwrsBox setContentView: genericView];
+    }
+	} else {	   
+    if (currentViewer) {
+      stopped = [currentViewer stopTasks];
+      currentViewer = nil;
+    }   
+    [genericField setStringValue: NSLocalizedString(@"no data inspector", @"")];
+    [(NSBox *)vwrsBox setContentView: genericView];
+	}
+	
+  w = [inspBox window];	
+	[w setTitle: winName];
+	[inspBox setNeedsDisplay: YES];
+}
+
 - (void)deactivate
 {
   [inspBox removeFromSuperview];
@@ -386,6 +432,23 @@ static NSString *nibName = @"ContentsPanel";
 	}
 
 	return nil;
+}
+
+- (id)viewerForData:(NSData *)data ofType:(NSString *)type
+{
+  int i;
+  
+	for (i = 0; i < [viewers count]; i++) {
+		id vwr = [viewers objectAtIndex: i];		
+    
+    if ([vwr respondsToSelector: @selector(canDisplayData:ofType:)]) {
+      if([vwr canDisplayData: data ofType: type]) {
+			  return vwr;
+      }
+    } 				
+	}
+  
+  return nil;
 }
 
 - (id)inspView

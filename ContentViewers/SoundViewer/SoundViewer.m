@@ -292,6 +292,11 @@
 	[self findContentsAtPath: path];
 }
 
+- (BOOL)displayData:(NSData *)data ofType:(NSString *)type
+{
+  return NO;
+}
+
 - (BOOL)stopTasks
 {
 	if (sound) {
@@ -346,6 +351,11 @@
 //	}
 
 	return NO;
+}
+
+- (BOOL)canDisplayData:(NSData *)data ofType:(NSString *)type
+{
+  return NO;
 }
 
 - (int)index

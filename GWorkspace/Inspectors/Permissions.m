@@ -226,6 +226,11 @@ static NSString *nibName = @"PermissionsPanel";
 	[inspBox setNeedsDisplay: YES];
 }
 
+- (void)showPasteboardData:(NSData *)data 
+                    ofType:(NSString *)type
+{
+}
+
 - (id)inspView
 {
   return inspBox;

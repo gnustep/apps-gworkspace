@@ -146,6 +146,11 @@ static NSString *nibName = @"ToolsPanel";
 	[inspBox setNeedsDisplay: YES];	
 }
 
+- (void)showPasteboardData:(NSData *)data 
+                    ofType:(NSString *)type
+{
+}
+
 - (void)deactivate
 {
   [inspBox removeFromSuperview];

@@ -42,6 +42,7 @@
   IBOutlet id lowBox;
 
 	NSArray *currentPaths;
+  BOOL showingPb;
 	NSMutableArray *inspectors;
 	id currentInspector;
 }
@@ -49,6 +50,10 @@
 - (id)initForPaths:(NSArray *)paths;
 
 - (void)setPaths:(NSArray *)paths;
+
+- (void)showPasteboardData:(NSData *)data 
+                    ofType:(NSString *)type
+                  typeIcon:(NSImage *)icon;
 
 - (IBAction)activateInspector:(id)sender;
 

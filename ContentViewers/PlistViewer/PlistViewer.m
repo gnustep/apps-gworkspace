@@ -112,6 +112,11 @@
   [outlineView reloadData];
 }
 
+- (BOOL)displayData:(NSData *)data ofType:(NSString *)type
+{
+  return NO;
+}
+
 - (void)deactivate
 {
   [self removeFromSuperview];
@@ -143,6 +148,11 @@
     }
   }
 
+  return NO;
+}
+
+- (BOOL)canDisplayData:(NSData *)data ofType:(NSString *)type
+{
   return NO;
 }
 

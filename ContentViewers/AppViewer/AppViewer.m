@@ -217,6 +217,11 @@
   }
 }
 
+- (BOOL)displayData:(NSData *)data ofType:(NSString *)type
+{
+  return NO;
+}
+
 - (BOOL)stopTasks
 {
   return YES;
@@ -238,6 +243,11 @@
   }
 
 	return NO;
+}
+
+- (BOOL)canDisplayData:(NSData *)data ofType:(NSString *)type
+{
+  return NO;
 }
 
 - (int)index

@@ -92,6 +92,10 @@ typedef gridpoint *(*GridPointIMP)(id, SEL, NSPoint);
 
 - (void)addIconWithPaths:(NSArray *)iconpaths withGridIndex:(int)index;
 
+- (void)addPBIconForDataAtPath:(NSString *)dpath 
+                      dataType:(NSString *)dtype
+					       withGridIndex:(int)index; 
+
 - (void)removeIcon:(id)anIcon;
 
 - (void)setLabelRectOfIcon:(id)anIcon;
@@ -107,6 +111,8 @@ typedef gridpoint *(*GridPointIMP)(id, SEL, NSPoint);
 - (int)iconsType;
 
 - (void)updateIcons;
+
+- (id)selectedIcon;
 
 - (void)setCurrentSelection:(NSArray *)paths;
 
@@ -138,6 +144,8 @@ typedef gridpoint *(*GridPointIMP)(id, SEL, NSPoint);
 
 @interface TShelfIconsView(PBoardOperations)
 
+- (void)setCurrentPBIcon:(id)anIcon;
+
 - (void)doCut;
 
 - (void)doCopy;
@@ -145,9 +153,7 @@ typedef gridpoint *(*GridPointIMP)(id, SEL, NSPoint);
 - (void)doPaste;
 
 - (BOOL)readSelectionFromPasteboard:(NSPasteboard *)pboard;
-
-- (BOOL)writeSelectionToPasteboard:(NSPasteboard *)pboard
-			                        type:(NSString *)type;
+             
 @end
 
 @interface TShelfIconsView(DraggingDestination)

@@ -32,6 +32,8 @@
 
 - (void)activateForPaths:(NSArray *)paths;
 
+- (void)showPasteboardData:(NSData *)data 
+                    ofType:(NSString *)type;
 - (void)deactivate;
 
 - (NSString *)inspname;

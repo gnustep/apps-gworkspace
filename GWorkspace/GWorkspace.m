@@ -76,6 +76,10 @@ static GWorkspace *gworkspace = nil;
   #define CACHED_MAX 20
 #endif
 
+#ifndef TSHF_MAXF
+  #define TSHF_MAXF 999
+#endif
+
 //
 // GWProtocol
 //
@@ -464,6 +468,7 @@ return [ws openFile: fullPath withApplication: appName]
   RELEASE (operations);
   TEST_RELEASE (desktopWindow);
   TEST_RELEASE (tshelfWin);
+  TEST_RELEASE (tshelfPBDir);
   TEST_RELEASE (tshelfBackground);
 	[super dealloc];
 }
@@ -488,7 +493,7 @@ return [ws openFile: fullPath withApplication: appName]
 	defaults = [NSUserDefaults standardUserDefaults];
 	processName = [[NSProcessInfo processInfo] processName];    
 	[defaults setObject: processName forKey: @"GSWorkspaceApplication"];
-			
+      
 	result = [defaults stringForKey: @"defaulteditor"];
 	if (result == nil) {
 		defEditor = [[NSString alloc] initWithString: defaulteditor];
@@ -613,6 +618,7 @@ return [ws openFile: fullPath withApplication: appName]
     [self hideFiend: nil];
   }
 
+  tshelfPBFileNum = 0;
   if ([defaults boolForKey: @"tshelf"]) {
     [self showTShelf: nil];
   } else {
@@ -793,6 +799,26 @@ return [ws openFile: fullPath withApplication: appName]
   return nil;
 }
 
+- (NSString *)tshelfPBDir
+{
+  return tshelfPBDir;
+}
+
+- (NSString *)tshelfPBFilePath
+{
+  NSString *tshelfPBFileNName;
+
+	tshelfPBFileNum++;
+  
+	if (tshelfPBFileNum >= TSHF_MAXF) {
+		tshelfPBFileNum = 0;
+	}
+  
+  tshelfPBFileNName = [NSString stringWithFormat: @"%i", tshelfPBFileNum];
+  
+  return [tshelfPBDir stringByAppendingPathComponent: tshelfPBFileNName];
+}
+
 - (void)changeDefaultEditor:(NSString *)editor
 {
   ASSIGN (defEditor, editor);
@@ -823,6 +849,8 @@ return [ws openFile: fullPath withApplication: appName]
 	} else {
 		[defaults setBool: NO forKey: @"tshelf"];
 	}
+  [defaults setObject: [NSString stringWithFormat: @"%i", tshelfPBFileNum]
+               forKey: @"tshelfpbfnum"];
 
 	if ((inspController != nil) && ([[inspController myWin] isVisible])) {  
 		[inspController updateDefaults]; 
@@ -923,32 +951,81 @@ return [ws openFile: fullPath withApplication: appName]
 
 - (void)createRecycler
 {
-	NSDictionary *env;
 	NSString *basePath, *tpath; 
 	BOOL isdir;
-	
-	env = [[NSProcessInfo processInfo] environment];
-	basePath = [env objectForKey: @"GNUSTEP_USER_ROOT"];
-	if (basePath == nil) {
-		basePath = [NSHomeDirectory() stringByAppendingPathComponent: @"GNUstep"];
-		NSLog (@"Warning - GNUSTEP_USER_ROOT is not set - using %@", basePath);
-	}
 
+  basePath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
+  basePath = [basePath stringByAppendingPathComponent: @"GWorkspace"];
+
+  if (([fm fileExistsAtPath: basePath isDirectory: &isdir] && isdir) == NO) {
+    if ([fm createDirectoryAtPath: basePath attributes: nil] == NO) {
+      NSLog(@"Can't create the GWorkspace directory! Quitting now.");
+      [NSApp terminate: self];
+    }
+  }
+  
 	tpath = [basePath stringByAppendingPathComponent: @".GWTrash"];
 
 	if ([fm fileExistsAtPath: tpath isDirectory: &isdir] == NO) {
-		[fm createDirectoryAtPath: tpath attributes: nil];
-		
+    if ([fm createDirectoryAtPath: tpath attributes: nil] == NO) {
+      NSLog(@"Can't create the Recycler directory! Quitting now.");
+      [NSApp terminate: self];
+    }
 	} else {
 		if (isdir == NO) {
 			NSLog (@"Warning - %@ is not a directory - quitting now!", tpath);			
-			[[NSApplication sharedApplication] terminate: self];
+			[NSApp terminate: self];
 		}
-	}
+  }
   
   ASSIGN (trashPath, tpath);
 	recycler = [[Recycler alloc] initWithTrashPath: trashPath];
 	[recycler activate];
+}
+
+- (void)createTabbedShelf
+{
+	NSUserDefaults *defaults;  
+  id entry;
+  NSString *basePath;
+  BOOL isdir;
+
+	defaults = [NSUserDefaults standardUserDefaults];
+			
+  entry = [defaults objectForKey: @"tshelfpbfnum"];
+  if (entry) {
+    tshelfPBFileNum = [entry intValue];
+  } else {
+    tshelfPBFileNum = 0;
+  }      
+       
+  basePath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
+  basePath = [basePath stringByAppendingPathComponent: @"GWorkspace"];
+
+  if (([fm fileExistsAtPath: basePath isDirectory: &isdir] && isdir) == NO) {
+    if ([fm createDirectoryAtPath: basePath attributes: nil] == NO) {
+      NSLog(@"Can't create the GWorkspace directory! Quitting now.");
+      [NSApp terminate: self];
+    }
+  }
+
+	tshelfPBDir = [basePath stringByAppendingPathComponent: @"PBData"];
+
+	if ([fm fileExistsAtPath: tshelfPBDir isDirectory: &isdir] == NO) {
+    if ([fm createDirectoryAtPath: tshelfPBDir attributes: nil] == NO) {
+      NSLog(@"Can't create the TShelf directory! Quitting now.");
+      [NSApp terminate: self];
+    }
+	} else {
+		if (isdir == NO) {
+			NSLog (@"Warning - %@ is not a directory - quitting now!", tshelfPBDir);			
+			[NSApp terminate: self];
+		}
+  }
+  
+  RETAIN (tshelfPBDir);
+
+  tshelfWin = [[TShelfWin alloc] init];
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)anItem 
@@ -1415,6 +1492,17 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   }
 }
 
+- (void)resetSelectedPaths
+{
+  if (inspController != nil) {
+    [inspController setPaths: selectedPaths];
+  }    
+				
+  [[NSNotificationCenter defaultCenter]
+ 				 postNotificationName: GWCurrentSelectionChangedNotification
+	 								        object: nil];    
+}
+
 - (void)setSelectedPaths:(NSArray *)paths fromDesktopView:(DesktopView *)view
 {
   [rootViewer makeKeyAndOrderFront: nil];
@@ -1456,6 +1544,15 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 - (NSArray *)selectedPaths
 {
   return selectedPaths;
+}
+
+- (void)showPasteboardData:(NSData *)data 
+                    ofType:(NSString *)type
+                  typeIcon:(NSImage *)icon
+{
+  if (inspController != nil) {
+    [inspController showPasteboardData: data ofType: type typeIcon: icon];
+  }    
 }
 
 - (void)closeInspectors
@@ -2005,7 +2102,7 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 										action: @selector(addTShelfTab:) keyEquivalent: @""];		
                     						
   if (tshelfWin == nil) {
-    tshelfWin = [[TShelfWin alloc] init];
+    [self createTabbedShelf];
     [tshelfWin activate];
   } else if ([tshelfWin isVisible] == NO) {
 		[tshelfWin activate];
