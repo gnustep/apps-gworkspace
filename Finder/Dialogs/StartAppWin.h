@@ -1,11 +1,11 @@
-/* lsfd.h
+/* StartAppWin.h
  *  
  * Copyright (C) 2004 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
- * Date: September 2004
+ * Date: May 2004
  *
- * This file is part of the GNUstep Finder application
+ * This file is part of the GNUstep Desktop application
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,48 +22,27 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef FSWATCHER_H
-#define FSWATCHER_H
+#ifndef START_APP_WIN
+#define START_APP_WIN
 
 #include <Foundation/Foundation.h>
 
-@protocol	LSFdClientProtocol
-
-//- (oneway void)watchedPathDidChange:(NSData *)dirinfo;
-
-@end
-
-
-@protocol	LSFdProtocol
-
-- (void)registerFinder:(id <LSFdClientProtocol>)fndr;
-
-- (void)unregisterFinder:(id <LSFdClientProtocol>)fndr;
-
-@end
-
-
-@interface LSFd: NSObject 
+@interface StartAppWin: NSObject
 {
-  NSConnection *conn;
-  NSConnection *finderconn;
-  id <LSFdClientProtocol> finder;
-  
-//  NSMutableArray *wpaths;
-  
-  NSFileManager *fm;
-  NSNotificationCenter *nc; 
+  IBOutlet id win;
+  IBOutlet id startLabel;
+  IBOutlet id nameField;
+  IBOutlet id progInd;
 }
+                 
+- (void)showWindowWithTitle:(NSString *)title
+                    appName:(NSString *)appname
+               maxProgValue:(float)maxvalue;
 
-- (BOOL)connection:(NSConnection *)ancestor
-            shouldMakeNewConnection:(NSConnection *)newConn;
+- (void)updateProgressBy:(float)incr;
 
-- (void)connectionBecameInvalid:(NSNotification *)notification;
+- (NSWindow *)win;
 
-- (void)registerFinder:(id <LSFdClientProtocol>)fndr;
+@end 
 
-- (void)unregisterFinder:(id <LSFdClientProtocol>)fndr;
-      
-@end
-
-#endif // FSWATCHER_H
+#endif // START_APP_WIN

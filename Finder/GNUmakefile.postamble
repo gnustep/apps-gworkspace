@@ -2,6 +2,8 @@
 # Things to do before compiling
 before-all::
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/SearchResults
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/LiveSearch
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Dialogs
 
 # Things to do after compiling
 # after-all::
@@ -9,6 +11,8 @@ before-all::
 # Things to do before installing
 before-install::
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/SearchResults
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/LiveSearch
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Dialogs
   
 # Things to do after installing
 # after-install::

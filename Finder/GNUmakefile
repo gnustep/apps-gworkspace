@@ -6,7 +6,8 @@ VERSION = 0.7
 
 GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
 
-SUBPROJECTS = Modules 
+SUBPROJECTS = Modules \
+                LiveSearch/lsfd
 
 #
 # MAIN APP
@@ -33,6 +34,7 @@ Finder_OBJC_FILES = main.m \
                  SearchResults/ResultsTableView.m \
                  SearchResults/ResultsTextCell.m \
                  SearchResults/ResultsPathsView.m \
+                 Dialogs/StartAppWin.m \
                  Functions.m 
 
 ADDITIONAL_GUI_LIBS += -lFSNode

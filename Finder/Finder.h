@@ -32,6 +32,23 @@
 @class NSMatrix;
 @class SearchPlacesScroll;
 @class SearchPlacesMatrix;
+@class StartAppWin;
+
+@protocol	LSFdClientProtocol
+
+//- (oneway void)watchedPathDidChange:(NSData *)dirinfo;
+
+@end
+
+
+@protocol	LSFdProtocol
+
+- (void)registerFinder:(id <LSFdClientProtocol>)fndr;
+
+- (void)unregisterFinder:(id <LSFdClientProtocol>)fndr;
+
+@end
+
 
 @protocol workspaceAppProtocol
 
@@ -45,7 +62,7 @@
 @end
 
 
-@interface Finder : NSObject 
+@interface Finder : NSObject <LSFdClientProtocol>
 {
   IBOutlet id win;
   IBOutlet id searchLabel;
@@ -67,6 +84,10 @@
   
   NSMutableArray *searchResults;
   int searchResh;
+  
+  id lsfd;
+
+  StartAppWin *startAppWin;
   
   NSFileManager *fm;
   id ws;
@@ -131,6 +152,10 @@
 - (void)openFoundSelection:(NSArray *)selection;
 
 - (void)updateDefaults;
+
+- (void)connectLSFd;
+
+- (void)lsfdConnectionDidDie:(NSNotification *)notif;
 
 - (void)contactWorkspaceApp;
 

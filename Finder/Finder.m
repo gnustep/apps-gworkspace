@@ -29,6 +29,7 @@
 #include "FinderModulesProtocol.h"
 #include "SearchPlacesScroll.h"
 #include "SearchPlacesMatrix.h"
+#include "StartAppWin.h"
 #include "FSNBrowserCell.h"
 #include "SearchResults.h"
 #include "FSNode.h"
@@ -84,6 +85,10 @@ static Finder *finder = nil;
 
 - (void)dealloc
 {
+  if (lsfd && [[(NSDistantObject *)lsfd connectionForProxy] isValid]) {
+    [lsfd unregisterFinder: (id <LSFdClientProtocol>)self];
+    DESTROY (lsfd);
+  }
   [[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
   DESTROY (workspaceApplication);
   TEST_RELEASE (win);
@@ -94,6 +99,7 @@ static Finder *finder = nil;
   RELEASE (fviews);
   TEST_RELEASE (currentSelection);
   RELEASE (searchResults);
+  RELEASE (startAppWin);
     
 	[super dealloc];
 }
@@ -293,6 +299,11 @@ static Finder *finder = nil;
   } else {
     searchResh = 0;
   } 
+  
+  startAppWin = [[StartAppWin alloc] init];
+
+  lsfd = nil;
+  [self connectLSFd];
 }
 
 - (BOOL)application:(NSApplication *)application 
@@ -304,6 +315,8 @@ static Finder *finder = nil;
 - (BOOL)applicationShouldTerminate:(NSApplication *)app 
 {
   int i;
+
+#define TEST_CLOSE(o, w) if ((o) && ([w isVisible])) [w close]
     
   for (i = 0; i < [searchResults count]; i++) {
     SearchResults *results = [searchResults objectAtIndex: i];
@@ -326,6 +339,8 @@ static Finder *finder = nil;
       DESTROY (workspaceApplication);
     }
   }
+  
+  TEST_CLOSE (startAppWin, [startAppWin win]);
     		
 	return YES;
 }
@@ -1044,6 +1059,108 @@ static Finder *finder = nil;
 	return YES;
 }
 
+- (void)connectLSFd
+{
+  if (lsfd == nil) {
+    id remote = [NSConnection rootProxyForConnectionWithRegisteredName: @"lsfd" 
+                                                                  host: @""];
+
+    if (remote) {
+      NSConnection *c = [remote connectionForProxy];
+
+	    [[NSNotificationCenter defaultCenter] addObserver: self
+	                   selector: @selector(lsfdConnectionDidDie:)
+		                     name: NSConnectionDidDieNotification
+		                   object: c];
+      
+      lsfd = remote;
+	    [lsfd setProtocolForProxy: @protocol(LSFdProtocol)];
+      RETAIN (lsfd);
+                                   
+	    [lsfd registerFinder: (id <LSFdClientProtocol>)self];
+      
+	  } else {
+	    static BOOL recursion = NO;
+	    static NSString	*cmd = nil;
+
+	    if (recursion == NO) {
+        if (cmd == nil) {
+            cmd = RETAIN ([[NSSearchPathForDirectoriesInDomains(
+                      GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
+                            stringByAppendingPathComponent: @"lsfd"]);
+		    }
+      }
+	  
+      if (recursion == NO && cmd != nil) {
+        int i;
+        
+        [startAppWin showWindowWithTitle: @"Finder"
+                                 appName: @"lsfd"
+                            maxProgValue: 40.0];
+
+	      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
+        DESTROY (cmd);
+        
+        for (i = 1; i <= 40; i++) {
+          [startAppWin updateProgressBy: 1.0];
+	        [[NSRunLoop currentRunLoop] runUntilDate:
+		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+                           
+          remote = [NSConnection rootProxyForConnectionWithRegisteredName: @"lsfd" 
+                                                                     host: @""];                  
+          if (remote) {
+            [startAppWin updateProgressBy: 40.0 - i];
+            break;
+          }
+        }
+        
+        [[startAppWin win] close];
+        
+	      recursion = YES;
+	      [self connectLSFd];
+	      recursion = NO;
+        
+	    } else { 
+	      recursion = NO;
+        DESTROY (cmd);
+        
+        NSRunAlertPanel(nil,
+                NSLocalizedString(@"unable to contact lsfd!", @""),
+                NSLocalizedString(@"Ok", @""),
+                nil, 
+                nil);  
+      }
+	  }
+  }
+}
+
+- (void)lsfdConnectionDidDie:(NSNotification *)notif
+{
+  id connection = [notif object];
+
+  [[NSNotificationCenter defaultCenter] removeObserver: self
+	                    name: NSConnectionDidDieNotification
+	                  object: connection];
+
+  NSAssert(connection == [lsfd connectionForProxy],
+		                                  NSInternalInconsistencyException);
+  DESTROY (lsfd);
+
+  if (NSRunAlertPanel(nil,
+                    NSLocalizedString(@"The lsfd connection died.\nDo you want to restart it?", @""),
+                    NSLocalizedString(@"Yes", @""),
+                    NSLocalizedString(@"No", @""),
+                    nil)) {
+    [self connectLSFd];                
+  } else {
+    NSRunAlertPanel(nil,
+                    NSLocalizedString(@"Live Search Folders disabled!", @""),
+                    NSLocalizedString(@"Ok", @""),
+                    nil, 
+                    nil);  
+  }
+}
+
 - (void)contactWorkspaceApp
 {
   id app = nil;
@@ -1076,21 +1193,26 @@ static Finder *finder = nil;
 	  
       if (recursion == NO) {
         int i;
+
+        [startAppWin showWindowWithTitle: @"Finder"
+                                 appName: @"GWorkspace"
+                            maxProgValue: 80.0];
         
         [ws launchApplication: appName];
 
-        for (i = 1; i <= 40; i++) {
-          NSDate *limit = [[NSDate alloc] initWithTimeIntervalSinceNow: 0.1];
-          [[NSRunLoop currentRunLoop] runUntilDate: limit];
-          RELEASE(limit);
-        
+        for (i = 1; i <= 80; i++) {
+          [startAppWin updateProgressBy: 1.0];
+	        [[NSRunLoop currentRunLoop] runUntilDate:
+		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
           app = [NSConnection rootProxyForConnectionWithRegisteredName: appName 
                                                                    host: @""];                  
           if (app) {
             break;
           }
         }
-                
+        
+        [[startAppWin win] close];
+        
 	      recursion = YES;
 	      [self contactWorkspaceApp];
 	      recursion = NO;

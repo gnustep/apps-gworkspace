@@ -1582,7 +1582,7 @@ static GWorkspace *gworkspace = nil;
                             maxProgValue: 40.0];
 
 	      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
-        RELEASE (cmd);
+        DESTROY (cmd);
         
         for (i = 1; i <= 40; i++) {
           [startAppWin updateProgressBy: 1.0];
@@ -1604,6 +1604,7 @@ static GWorkspace *gworkspace = nil;
 	      recursion = NO;
         
 	    } else { 
+        DESTROY (cmd);
 	      recursion = NO;
         fswnotifications = NO;
         NSRunAlertPanel(nil,
