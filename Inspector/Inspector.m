@@ -382,11 +382,10 @@ static NSString *nibName = @"InspectorWin";
 - (void)addWatcherForPath:(NSString *)path
 {
   if (fswnotifications) {
-    [self connectFSWatcher];
-    
     if ((watchedPath == nil) || ([watchedPath isEqual: path] == NO)) {
-      ASSIGN (watchedPath, path);
+      [self connectFSWatcher];
       [fswatcher client: self addWatcherForPath: path];
+      ASSIGN (watchedPath, path);
     }
   }
 }
@@ -394,8 +393,11 @@ static NSString *nibName = @"InspectorWin";
 - (void)removeWatcherForPath:(NSString *)path
 {
   if (fswnotifications) {
-    [self connectFSWatcher];
-    [fswatcher client: self removeWatcherForPath: path];
+    if (watchedPath && [watchedPath isEqual: path]) {
+      [self connectFSWatcher];
+      [fswatcher client: self removeWatcherForPath: path];
+      DESTROY (watchedPath);
+    }
   }
 }
 

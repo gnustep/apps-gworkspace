@@ -56,16 +56,19 @@ if ([b image] == multipleImage) perms |= v; \
 
 static NSString *nibName = @"Attributes";
 
+static BOOL sizeStop = NO;
+
 @implementation Attributes
 
 - (void)dealloc
 {
+  [nc removeObserver: self];  
+  DESTROY (sizerConn);
+  DESTROY (sizer);
 	TEST_RELEASE (mainBox);
 	TEST_RELEASE (insppaths);
 	TEST_RELEASE (attributes);
 	TEST_RELEASE (currentPath);
-	TEST_RELEASE (timeDateView);
-	TEST_RELEASE (yearlabel);
 	TEST_RELEASE (onImage);
 	TEST_RELEASE (offImage);
 	TEST_RELEASE (multipleImage);  
@@ -90,16 +93,20 @@ static NSString *nibName = @"Attributes";
 		insppaths = nil;
 		attributes = nil;    
     currentPath = nil;
+    sizer = nil;
     
     fm = [NSFileManager defaultManager];	
+    nc = [NSNotificationCenter defaultCenter];
     
     timeDateView = [[TimeDateView alloc] init];
     [timeDateView setFrame: NSMakeRect(6, 13, 55, 57)];
     [changedDateBox addSubview: timeDateView];      
-
+    RELEASE (timeDateView);
+    
 		MAKE_LABEL (yearlabel, NSMakeRect(6, 1, 55, 12), nil, 'l', NO, changedDateBox);
 		[yearlabel setFont: [NSFont systemFontOfSize: 8]];
 		[yearlabel setAlignment: NSCenterTextAlignment];
+    RELEASE (yearlabel);
 
     ASSIGN (onImage, [NSImage imageNamed: @"switchOn.tiff"]);
     ASSIGN (offImage, [NSImage imageNamed: @"switchOff.tiff"]);
@@ -170,22 +177,30 @@ static NSString *nibName = @"Attributes";
 	int perms;
 	BOOL sameOwner, sameGroup;
 	int i;
-	
+
+  if (paths == nil) {
+    DESTROY (insppaths);
+    return;
+  }
+  	
 	attrs = [fm fileAttributesAtPath: [paths objectAtIndex: 0] traverseLink: NO];
-	if(attributes && [attrs isEqualToDictionary: attributes] 
+	if (attributes && [attrs isEqualToDictionary: attributes] 
                                   && [paths isEqualToArray: insppaths]) {
 		return;
 	}
 
-	ASSIGN (insppaths, paths);	
+	ASSIGN (insppaths, paths);
 	pathscount = [insppaths count];	
-	ASSIGN (currentPath, [insppaths objectAtIndex: 0]);		
+	ASSIGN (currentPath, [paths objectAtIndex: 0]);		
 	ASSIGN (attributes, attrs);	
 
 	[revertButt setEnabled: NO];
 	[okButt setEnabled: NO];
 	
 	if (pathscount == 1) {   // Single Selection
+    [iconView setImage: [[NSWorkspace sharedWorkspace] iconForFile: currentPath]];
+    [titleField setStringValue: [currentPath lastPathComponent]];
+  
 		usr = [attributes objectForKey: NSFileOwnerAccountName];
 		grp = [attributes objectForKey: NSFileGroupOwnerAccountName];
 		date = [attributes objectForKey: NSFileModificationDate];
@@ -202,7 +217,7 @@ static NSString *nibName = @"Attributes";
     [insideButt	setState: NSOffState];
 
 		ftype = [attributes objectForKey: NSFileType];
-		if([ftype isEqualToString: NSFileTypeDirectory] == NO) {	
+		if ([ftype isEqualToString: NSFileTypeDirectory] == NO) {	
       [insideButt	setEnabled: NO];
 			fsize = fileSizeDescription([[attributes objectForKey: NSFileSize] intValue]);
 		} else {
@@ -234,8 +249,23 @@ static NSString *nibName = @"Attributes";
 		[timeDateView setDate: cdate];
 		[yearlabel setStringValue: [NSString stringWithFormat: @"%d", [cdate yearOfCommonEra]]];
 
+    if ([ftype isEqualToString: NSFileTypeDirectory]) {
+      if (sizer == nil) {
+        [self startSizer];
+      } else {
+        sizeStop = YES;
+        [sizeField setStringValue: NSLocalizedString(@"calculating...", @"")]; 
+        [sizer computeSizeOfPaths: insppaths];
+      }
+    }
+
 	} else {	   // Multiple Selection
-	
+    NSString *items = NSLocalizedString(@"items", @"");
+    
+    items = [NSString stringWithFormat: @"%i %@", [paths count], items];
+		[titleField setStringValue: items];  
+    [iconView setImage: [NSImage imageNamed: @"MultipleSelection.tiff"]];
+  
 		ftype = [attributes objectForKey: NSFileType];
 		fsize = @"";
 		usr = [attributes objectForKey: NSFileOwnerAccountName];
@@ -291,48 +321,15 @@ static NSString *nibName = @"Attributes";
 		cdate = [date dateWithCalendarFormat: nil timeZone: nil];	
 		[timeDateView setDate: cdate];
 		[yearlabel setStringValue: [NSString stringWithFormat: @"%d", [cdate yearOfCommonEra]]];	
+
+    if (sizer == nil) {
+      [self startSizer];
+    } else {
+      sizeStop = YES;
+      [sizer computeSizeOfPaths: insppaths];
+    }
 	}
 	
-	[mainBox setNeedsDisplay: YES];
-}
-
-- (IBAction)computeSize:(id)sender
-{							
-	float dirsize;
-	int fsize, i;
-	
-	dirsize = 0;
-
- 	for(i = 0; i < [insppaths count]; i++) {
-		NSString *path, *filePath;
-		NSDictionary *fileAttrs;
-		BOOL isdir;
-		
-		path = [insppaths objectAtIndex: i];
-		[fm fileExistsAtPath: path isDirectory: &isdir];
-		 
-		if (isdir) {
-			NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: path];
-			
-			while((filePath = [enumerator nextObject])) {
-				filePath = [path stringByAppendingPathComponent: filePath];
-				fileAttrs = [fm fileAttributesAtPath: filePath traverseLink: NO];
-				if(fileAttrs != nil) {
-					fsize = [[fileAttrs objectForKey: NSFileSize] intValue];
-					dirsize += fsize;
-				}
-			}
-			
-		} else {
-			fileAttrs = [fm fileAttributesAtPath: path traverseLink: NO];
-			if (fileAttrs != nil) {
-				fsize = [[fileAttrs objectForKey: NSFileSize] intValue];
-				dirsize += fsize;
-			}
-		}
-	}	
-		
-	[sizeField setStringValue: fileSizeDescription(dirsize)]; 
 	[mainBox setNeedsDisplay: YES];
 }
 
@@ -386,7 +383,7 @@ static NSString *nibName = @"Attributes";
 					if ([ftype isEqualToString: NSFileTypeDirectory]) {		
 						[[NSDistributedNotificationCenter defaultCenter]
  									postNotificationName: @"GWDidSetFileAttributesNotification"
-	 					  							  object: (id)fpath];
+	 					  							    object: (id)fpath];
 					}
 				}
 			}
@@ -424,7 +421,7 @@ static NSString *nibName = @"Attributes";
 						if ([ftype isEqualToString: NSFileTypeDirectory]) {		
 							[[NSDistributedNotificationCenter defaultCenter]
  										postNotificationName: @"GWDidSetFileAttributesNotification"
-	 					  								  object: (id)fpath];
+	 					  								    object: (id)fpath];
 						}
 					}
 				}
@@ -444,7 +441,7 @@ static NSString *nibName = @"Attributes";
 
 	[[NSDistributedNotificationCenter defaultCenter]
  		postNotificationName: @"GWDidSetFileAttributesNotification"
-	 					  object: (id)[currentPath stringByDeletingLastPathComponent]];
+	 					      object: (id)[currentPath stringByDeletingLastPathComponent]];
 
 	[okButt setEnabled: NO];
 	[revertButt setEnabled: NO];
@@ -580,7 +577,165 @@ static NSString *nibName = @"Attributes";
 
 - (void)watchedPathDidChange:(NSData *)dirinfo
 {
+}
 
+- (void)startSizer
+{
+  NSPort *port[2];  
+  NSArray *portArray;
+
+  port[0] = (NSPort *)[NSPort port];
+  port[1] = (NSPort *)[NSPort port];
+  portArray = [NSArray arrayWithObjects: port[1], port[0], nil];
+
+  sizerConn = [[NSConnection alloc] initWithReceivePort: (NSPort *)port[0]
+                                               sendPort: (NSPort *)port[1]];
+  [sizerConn setRootObject: self];
+  [sizerConn setDelegate: self];
+  [sizerConn enableMultipleThreads];
+
+  [nc addObserver: self 
+				 selector: @selector(sizerConnDidDie:)
+	    			 name: NSConnectionDidDieNotification 
+           object: sizerConn];
+
+  NS_DURING
+  {
+    [NSThread detachNewThreadSelector: @selector(createSizerWithPorts:)
+                             toTarget: [Sizer class]
+                           withObject: portArray];
+  }
+  NS_HANDLER
+  {
+    NSLog(@"Error! A fatal error occured while detaching the thread.");
+  }
+  NS_ENDHANDLER
+}
+
+- (void)sizerConnDidDie:(NSNotification *)notification
+{
+	id diedconn = [notification object];
+
+  if (diedconn == sizerConn) {
+    [nc removeObserver: self
+	                name: NSConnectionDidDieNotification 
+                object: sizerConn];
+    DESTROY (sizer);
+    DESTROY (sizerConn);
+    NSLog(@"sizer connection died", @"");
+  }
+}
+
+- (void)setSizer:(id)anObject
+{
+  if (sizer == nil) {
+    [anObject setProtocolForProxy: @protocol(SizerProtocol)];
+    sizer = (id <SizerProtocol>)anObject;
+    RETAIN (sizer);
+    if (insppaths) {
+      sizeStop = YES;
+      [sizeField setStringValue: NSLocalizedString(@"calculating...", @"")];
+      [sizer computeSizeOfPaths: insppaths];
+    }
+  }
+}
+
+- (void)sizeReady:(NSString *)sizeStr
+{
+	[sizeField setStringValue: sizeStr]; 
+}
+
+@end
+
+
+@implementation Sizer
+
+- (void)dealloc
+{
+  [super dealloc];
+}
+
++ (void)createSizerWithPorts:(NSArray *)portArray
+{
+  NSAutoreleasePool *pool;
+  id attrs;
+  NSConnection *conn;
+  NSPort *port[2];
+  Sizer *sizer;
+	
+  pool = [[NSAutoreleasePool alloc] init];
+	  
+  port[0] = [portArray objectAtIndex: 0];
+  port[1] = [portArray objectAtIndex: 1];
+  conn = [NSConnection connectionWithReceivePort: port[0] sendPort: port[1]];
+  attrs = (id)[conn rootProxy];
+  sizer = [[Sizer alloc] initWithAttributesConnection: conn];
+  [attrs setSizer: sizer];
+  RELEASE (sizer);
+	
+  [[NSRunLoop currentRunLoop] run];
+  [pool release];
+}
+
+- (id)initWithAttributesConnection:(NSConnection *)conn
+{
+  self = [super init];
+  
+  if (self) {
+    id attrs = (id)[conn rootProxy];
+    [attrs setProtocolForProxy: @protocol(AttributesSizeProtocol)];
+    attributes = (id <AttributesSizeProtocol>)attrs;
+    fm = [NSFileManager defaultManager];	
+  }
+  
+  return self;
+}
+
+- (void)computeSizeOfPaths:(NSArray *)paths
+{
+	float dirsize;
+	int fsize, i;
+	
+	dirsize = 0;
+  sizeStop = NO;
+  
+ 	for (i = 0; i < [paths count]; i++) {
+		NSString *path, *filePath;
+		NSDictionary *fileAttrs;
+		BOOL isdir;
+		
+    if (sizeStop) {
+      return;
+    }
+    
+		path = [paths objectAtIndex: i];
+		[fm fileExistsAtPath: path isDirectory: &isdir];
+		 
+		if (isdir) {
+			NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: path];
+			
+			while((filePath = [enumerator nextObject])) {
+        if (sizeStop) {
+          return;
+        }
+				filePath = [path stringByAppendingPathComponent: filePath];
+				fileAttrs = [fm fileAttributesAtPath: filePath traverseLink: NO];
+				if(fileAttrs != nil) {
+					fsize = [[fileAttrs objectForKey: NSFileSize] intValue];
+					dirsize += fsize;
+				}
+			}
+			
+		} else {
+			fileAttrs = [fm fileAttributesAtPath: path traverseLink: NO];
+			if (fileAttrs != nil) {
+				fsize = [[fileAttrs objectForKey: NSFileSize] intValue];
+				dirsize += fsize;
+			}
+		}
+	}	
+	
+  [attributes sizeReady: fileSizeDescription(dirsize)]; 
 }
 
 @end

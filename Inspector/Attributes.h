@@ -30,6 +30,24 @@
 @class NSTextField;
 @class NSImage;
 @class TimeDateView;
+@class Sizer;
+
+@protocol SizerProtocol
+
+- (oneway void)computeSizeOfPaths:(NSArray *)paths;
+
+- (oneway void)stopComputeSize;
+
+@end
+
+@protocol AttributesSizeProtocol
+
+- (oneway void)setSizer:(id)anObject;
+
+- (oneway void)sizeReady:(NSString *)sizeStr;
+
+@end
+
 
 @interface Attributes : NSObject
 {
@@ -86,10 +104,19 @@
 	TimeDateView *timeDateView;
 	NSTextField *yearlabel;
   
-	NSFileManager *fm;
-  
+  NSConnection *sizerConn;
+  id sizer;
   id inspector;
+  
+	NSFileManager *fm;
+	NSNotificationCenter *nc;  
 }
+
+- (NSView *)inspView;
+
+- (NSString *)winname;
+
+- (void)activateForPaths:(NSArray *)paths;
 
 - (IBAction)permsButtonsAction:(id)sender;
 
@@ -102,6 +129,29 @@
 - (int)getPermissions:(int)oldperms;
 
 - (void)watchedPathDidChange:(NSData *)dirinfo;
+
+- (void)startSizer;
+
+- (void)sizerConnDidDie:(NSNotification *)notification;
+
+- (void)setSizer:(id)anObject;
+
+- (void)sizeReady:(NSString *)sizeStr;
+
+@end
+
+
+@interface Sizer : NSObject
+{
+  id attributes;
+  NSFileManager *fm;
+}
+
++ (void)createSizerWithPorts:(NSArray *)portArray;
+
+- (id)initWithAttributesConnection:(NSConnection *)conn;
+
+- (void)computeSizeOfPaths:(NSArray *)paths;
 
 @end
 
