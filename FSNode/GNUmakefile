@@ -15,7 +15,8 @@ FSNode_OBJC_FILES = \
          FSNTextCell.m \
          FSNBrowserCell.m \
          FSNIcon.m \
-         FSNIconContainer.m 
+         FSNIconContainer.m \
+         FSNIconGridContainer.m 
                 
 FSNode_HEADER_FILES = \
          FSNode.h \
@@ -24,7 +25,8 @@ FSNode_HEADER_FILES = \
          FSNTextCell.h \
          FSNBrowserCell.h \
          FSNIcon.h \
-         FSNIconContainer.h 
+         FSNIconContainer.h \
+         FSNIconGridContainer.h 
         
 FSNode_HAS_RESOURCE_BUNDLE = yes                                          
         

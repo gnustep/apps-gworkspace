@@ -26,7 +26,7 @@
 #define DESKTOP_VIEW_H
 
 #include <AppKit/NSView.h>
-#include "FSNodeRep.h"
+#include "FSNIconGridContainer.h"
 
 @class NSColor;
 @class NSImage;
@@ -42,7 +42,7 @@ typedef enum BackImageStyle {
   BackImageTileStyle = 2
 } BackImageStyle;
 
-@interface DesktopView : NSView <FSNodeRepContainer>
+@interface DesktopView : FSNIconGridContainer <FSNodeRepContainer>
 {
   FSNode *node;
   NSString *infoPath;

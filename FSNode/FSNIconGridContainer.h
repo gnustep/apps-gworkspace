@@ -1,4 +1,4 @@
-/* FSNIconContainer.h
+/* FSNIconGridContainer.h
  *  
  * Copyright (C) 2004 Free Software Foundation, Inc.
  *
@@ -22,18 +22,18 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef FSN_ICON_CONTAINER_H
-#define FSN_ICON_CONTAINER_H
+#ifndef FSN_ICON_GRID_CONTAINER_H
+#define FSN_ICON_GRID_CONTAINER_H
 
 #include <Foundation/Foundation.h>
 #include <AppKit/NSView.h>
-#include "FSNodeRep.h"
+#include "FSNIconContainer.h"
 
-@interface FSNIconContainer : NSView
+@interface FSNIconGridContainer : FSNIconContainer
 {
 
 }
 
 @end
 
-#endif // FSN_ICON_CONTAINER_H
+#endif // FSN_ICON_GRID_CONTAINER_H
