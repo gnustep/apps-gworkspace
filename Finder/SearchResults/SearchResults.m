@@ -621,53 +621,51 @@ static NSString *lsfname = @"LiveSearch.lsf";
 
 - (oneway void)remoteDraggingDestinationReply:(NSData *)reply
 {
-  if (SQLITE) {
-    NSDictionary *replydict = [NSUnarchiver unarchiveObjectWithData: reply];
-    NSString *destination = [replydict objectForKey: @"destination"];
-    BOOL dndok = [[replydict objectForKey: @"dndok"] boolValue];
+  NSDictionary *replydict = [NSUnarchiver unarchiveObjectWithData: reply];
+  NSString *destination = [replydict objectForKey: @"destination"];
+  BOOL dndok = [[replydict objectForKey: @"dndok"] boolValue];
 
-    if (dndok == NO) {
-      NSString *msg = [NSString stringWithFormat: @"a file named \"LiveSearch\" already exists.\nPlease rename it."];
-      NSRunAlertPanel(NULL, msg, NSLocalizedString(@"Ok", @""), NULL, NULL);  
-    } else {
-      NSString *lsfpath = [destination stringByAppendingPathComponent: lsfname];
-      NSMutableArray *foundPaths = [NSMutableArray array];
-      NSMutableDictionary *lsfdict = [NSMutableDictionary dictionary];
-      NSNotificationCenter *dnc = [NSDistributedNotificationCenter defaultCenter];
-      NSMutableDictionary *notifDict = [NSMutableDictionary dictionary];		
-      int i;
+  if (dndok == NO) {
+    NSString *msg = [NSString stringWithFormat: @"a file named \"LiveSearch\" already exists.\nPlease rename it."];
+    NSRunAlertPanel(NULL, msg, NSLocalizedString(@"Ok", @""), NULL, NULL);  
+  } else {
+    NSString *lsfpath = [destination stringByAppendingPathComponent: lsfname];
+    NSMutableArray *foundPaths = [NSMutableArray array];
+    NSMutableDictionary *lsfdict = [NSMutableDictionary dictionary];
+    NSNotificationCenter *dnc = [NSDistributedNotificationCenter defaultCenter];
+    NSMutableDictionary *notifDict = [NSMutableDictionary dictionary];		
+    int i;
 
-      for (i = 0; i < [foundObjects count]; i++) {
-        [foundPaths addObject: [[foundObjects objectAtIndex: i] path]];
-      }
-
-      [lsfdict setObject: searchPaths forKey: @"searchpaths"];	
-      [lsfdict setObject: searchCriteria forKey: @"criteria"];	
-      [lsfdict setObject: foundPaths forKey: @"foundpaths"];	
-      [lsfdict setObject: [[NSDate date] description] forKey: @"lastupdate"];	
-
-      [notifDict setObject: @"GWorkspaceCreateFileOperation" 
-                    forKey: @"operation"];	
-      [notifDict setObject: destination forKey: @"source"];	
-      [notifDict setObject: destination forKey: @"destination"];	
-      [notifDict setObject: [NSArray arrayWithObject: lsfname] 
-                    forKey: @"files"];	
-
-	    [dnc postNotificationName: @"GWFileSystemWillChangeNotification"
-	 								       object: nil 
-                       userInfo: notifDict];
-
-      if ([lsfdict writeToFile: lsfpath atomically: YES]) {
-        [finder liveSearchFolderCreatedAtPath: lsfpath];
-      } else {
-        NSString *msg = NSLocalizedString(@"can't create the Live Search folder", @"");
-        NSRunAlertPanel(NULL, msg, NSLocalizedString(@"Ok", @""), NULL, NULL);  
-      } 
-
-	    [dnc postNotificationName: @"GWFileSystemDidChangeNotification"
-	 						           object: nil 
-                       userInfo: notifDict];  
+    for (i = 0; i < [foundObjects count]; i++) {
+      [foundPaths addObject: [[foundObjects objectAtIndex: i] path]];
     }
+
+    [lsfdict setObject: searchPaths forKey: @"searchpaths"];	
+    [lsfdict setObject: searchCriteria forKey: @"criteria"];	
+    [lsfdict setObject: foundPaths forKey: @"foundpaths"];	
+    [lsfdict setObject: [[NSDate date] description] forKey: @"lastupdate"];	
+
+    [notifDict setObject: @"GWorkspaceCreateFileOperation" 
+                  forKey: @"operation"];	
+    [notifDict setObject: destination forKey: @"source"];	
+    [notifDict setObject: destination forKey: @"destination"];	
+    [notifDict setObject: [NSArray arrayWithObject: lsfname] 
+                  forKey: @"files"];	
+
+	  [dnc postNotificationName: @"GWFileSystemWillChangeNotification"
+	 								     object: nil 
+                     userInfo: notifDict];
+
+    if ([lsfdict writeToFile: lsfpath atomically: YES]) {
+      [finder addLiveSearchFolderWithPath: lsfpath contentsInfo: lsfdict];
+    } else {
+      NSString *msg = NSLocalizedString(@"can't create the Live Search folder", @"");
+      NSRunAlertPanel(NULL, msg, NSLocalizedString(@"Ok", @""), NULL, NULL);  
+    } 
+
+	  [dnc postNotificationName: @"GWFileSystemDidChangeNotification"
+	 						         object: nil 
+                     userInfo: notifDict];  
   }
 }
 

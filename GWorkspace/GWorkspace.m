@@ -2193,7 +2193,7 @@ static GWorkspace *gworkspace = nil;
 		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
                            
           db = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
-                                                                  host: @""];                  
+                                                                 host: @""];                  
           if (db) {
             [startAppWin updateProgressBy: 40.0 - i];
             break;

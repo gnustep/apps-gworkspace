@@ -40,6 +40,7 @@ Finder_OBJC_FILES = main.m \
                  SearchResults/ResultsTableView.m \
                  SearchResults/ResultsTextCell.m \
                  SearchResults/ResultsPathsView.m \
+                 LiveSearch/LSFolder.m \
                  Dialogs/StartAppWin.m \
                  Functions.m 
 

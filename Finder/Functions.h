@@ -87,6 +87,8 @@ int pathComponentsToPath(NSString *path);
 
 NSString *commonPrefixInArray(NSArray *a);
 
+NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
+
 NSString *fileSizeDescription(unsigned long long size);
 
 NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str, 

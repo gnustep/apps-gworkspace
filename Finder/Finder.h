@@ -32,22 +32,29 @@
 @class NSMatrix;
 @class SearchPlacesScroll;
 @class SearchPlacesMatrix;
+@class LSFolder;
 @class StartAppWin;
+@class FSNode;
 
-@protocol	LSFdClientProtocol
 
-//- (oneway void)watchedPathDidChange:(NSData *)dirinfo;
+@protocol	FSWClientProtocol
+
+- (void)watchedPathDidChange:(NSData *)dirinfo;
 
 @end
 
 
-@protocol	LSFdProtocol
+@protocol	FSWatcherProtocol
 
-- (oneway void)registerFinder:(id <LSFdClientProtocol>)fndr;
+- (oneway void)registerClient:(id <FSWClientProtocol>)client;
 
-- (oneway void)unregisterFinder:(id <LSFdClientProtocol>)fndr;
+- (oneway void)unregisterClient:(id <FSWClientProtocol>)client;
 
-- (oneway void)addLiveSearchFolderWithPath:(NSString *)path;
+- (oneway void)client:(id <FSWClientProtocol>)client
+                          addWatcherForPath:(NSString *)path;
+
+- (oneway void)client:(id <FSWClientProtocol>)client
+                          removeWatcherForPath:(NSString *)path;
 
 @end
 
@@ -64,7 +71,38 @@
 @end
 
 
-@interface Finder : NSObject <LSFdClientProtocol>
+@protocol	DDBdProtocol
+
+- (BOOL)dbactive;
+
+- (oneway void)insertPath:(NSString *)path;
+
+- (oneway void)removePath:(NSString *)path;
+
+- (NSString *)annotationsForPath:(NSString *)path;
+
+- (oneway void)setAnnotations:(NSString *)annotations
+                      forPath:(NSString *)path;
+
+- (NSString *)fileTypeForPath:(NSString *)path;
+
+- (oneway void)setFileType:(NSString *)type
+                   forPath:(NSString *)path;
+
+- (NSString *)modificationDateForPath:(NSString *)path;
+
+- (oneway void)setModificationDate:(NSString *)datedescr
+                           forPath:(NSString *)path;
+
+- (NSData *)iconDataForPath:(NSString *)path;
+
+- (oneway void)setIconData:(NSData *)data
+                   forPath:(NSString *)path;
+
+@end
+
+
+@interface Finder : NSObject <FSWClientProtocol>
 {
   IBOutlet id win;
   IBOutlet id searchLabel;
@@ -87,7 +125,12 @@
   NSMutableArray *searchResults;
   int searchResh;
   
-  id lsfd;
+  NSMutableArray *lsFolders;
+  id ddbd;
+  BOOL ddbdactive;
+
+  id fswatcher;
+  BOOL fswnotifications;
 
   StartAppWin *startAppWin;
   
@@ -153,17 +196,67 @@
 
 - (void)openFoundSelection:(NSArray *)selection;
 
-- (void)updateDefaults;
+- (LSFolder *)addLiveSearchFolderWithPath:(NSString *)path
+                             contentsInfo:(NSDictionary *)info;
 
-- (void)liveSearchFolderCreatedAtPath:(NSString *)path;
+- (void)removeLiveSearchFolder:(LSFolder *)folder;
 
-- (void)connectLSFd;
+- (LSFolder *)lsfolderWithNode:(FSNode *)node;
 
-- (void)lsfdConnectionDidDie:(NSNotification *)notif;
+- (LSFolder *)lsfolderWithPath:(NSString *)path;
+
+
+
+
+- (void)fileSystemWillChange:(NSNotification *)notif;
+
+- (void)fileSystemDidChange:(NSNotification *)notif;
+
+- (void)watchedPathDidChange:(NSData *)dirinfo;
+
+- (void)addWatcherForPath:(NSString *)path;
+
+- (void)removeWatcherForPath:(NSString *)path;
+
+- (void)connectFSWatcher;
+
+- (void)fswatcherConnectionDidDie:(NSNotification *)notif;
+
+- (void)connectDDBd;
+
+- (void)ddbdConnectionDidDie:(NSNotification *)notif;
+
+- (BOOL)ddbdactive;
+
+- (void)ddbdInsertPath:(NSString *)path;
+
+- (void)ddbdRemovePath:(NSString *)path;
+
+- (NSString *)ddbdGetAnnotationsForPath:(NSString *)path;
+
+- (void)ddbdSetAnnotations:(NSString *)annotations
+                   forPath:(NSString *)path;
+
+- (NSString *)ddbdGetFileTypeForPath:(NSString *)path;
+
+- (void)ddbdSetFileType:(NSString *)type
+                forPath:(NSString *)path;
+
+- (NSString *)ddbdGetModificationDateForPath:(NSString *)path;
+
+- (void)ddbdSetModificationDate:(NSString *)datedescr
+                        forPath:(NSString *)path;
+
+- (NSData *)ddbdGetIconDataForPath:(NSString *)path;
+
+- (void)ddbdSetIconData:(NSData *)data
+                forPath:(NSString *)path;
 
 - (void)contactWorkspaceApp;
 
 - (void)workspaceAppConnectionDidDie:(NSNotification *)notif;
+
+- (void)updateDefaults;
 
 
 //

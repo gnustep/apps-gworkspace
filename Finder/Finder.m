@@ -29,6 +29,7 @@
 #include "FinderModulesProtocol.h"
 #include "SearchPlacesScroll.h"
 #include "SearchPlacesMatrix.h"
+#include "LSFolder.h"
 #include "StartAppWin.h"
 #include "FSNBrowserCell.h"
 #include "SearchResults.h"
@@ -86,12 +87,9 @@ static Finder *finder = nil;
 
 - (void)dealloc
 {
-  if (lsfd && [[(NSDistantObject *)lsfd connectionForProxy] isValid]) {
-    [lsfd unregisterFinder: (id <LSFdClientProtocol>)self];
-    DESTROY (lsfd);
-  }
   [[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
   DESTROY (workspaceApplication);
+  DESTROY (ddbd);
   TEST_RELEASE (win);
   TEST_RELEASE (placesBox);
   TEST_RELEASE (addPlaceButt);
@@ -100,6 +98,7 @@ static Finder *finder = nil;
   RELEASE (fviews);
   TEST_RELEASE (currentSelection);
   RELEASE (searchResults);
+  RELEASE (lsFolders);
   RELEASE (startAppWin);
     
 	[super dealloc];
@@ -114,6 +113,7 @@ static Finder *finder = nil;
     modules = nil;
     currentSelection = nil;
     searchResults = [NSMutableArray new];
+    lsFolders = [NSMutableArray new];
     fm = [NSFileManager defaultManager];
     ws = [NSWorkspace sharedWorkspace];
     nc = [NSNotificationCenter defaultCenter];
@@ -303,16 +303,61 @@ static Finder *finder = nil;
   
   startAppWin = [[StartAppWin alloc] init];
 
-  lsfd = nil;
+  fswatcher = nil;
+  fswnotifications = YES;
+  [self connectFSWatcher];
+
+  ddbd = nil;
+  ddbdactive = NO;
+  [self connectDDBd];
   
-  if (SQLITE) {
-    [self connectLSFd];
+  defentry = [defaults objectForKey: @"lsfolders_paths"];
+  if (defentry) {
+    for (i = 0; i < [defentry count]; i++) {
+      NSString *lsfpath = [defentry objectAtIndex: i];
+    
+      if ([fm fileExistsAtPath: lsfpath]) {
+        NSDictionary *lsfdict = [NSDictionary dictionaryWithContentsOfFile: lsfpath];
+
+        if (lsfdict) {
+          [self addLiveSearchFolderWithPath: lsfpath contentsInfo: lsfdict];
+        
+          NSLog(@"added lsf with path %@", lsfpath);
+        }
+      }
+    }
   }
+  
+  [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
+                				selector: @selector(fileSystemWillChange:) 
+                					  name: @"GWFileSystemWillChangeNotification"
+                					object: nil];
+
+  [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
+                				selector: @selector(fileSystemDidChange:) 
+                					  name: @"GWFileSystemDidChangeNotification"
+                					object: nil];
 }
 
 - (BOOL)application:(NSApplication *)application 
            openFile:(NSString *)fileName
 {
+  LSFolder *folder = [self lsfolderWithPath: fileName];
+
+  if (folder == nil) {
+    NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: fileName];
+
+    if (dict) {
+      folder = [self addLiveSearchFolderWithPath: fileName contentsInfo: dict];
+
+      NSLog(@"(open file) added lsf with path %@", fileName);
+    }
+  }
+
+ // [folder sdlkfsldf
+
+  NSLog(@"(open file) found lsf with path %@", fileName);
+
   return YES;
 }
 
@@ -333,6 +378,18 @@ static Finder *finder = nil;
 
   [self updateDefaults];
 
+  if (fswatcher) {
+    NSConnection *fswconn = [(NSDistantObject *)fswatcher connectionForProxy];
+  
+    if ([fswconn isValid]) {
+      [[NSNotificationCenter defaultCenter] removeObserver: self
+	                        name: NSConnectionDidDieNotification
+	                      object: fswconn];
+      [fswatcher unregisterClient: (id <FSWClientProtocol>)self];  
+      DESTROY (fswatcher);
+    }
+  }
+
   if (workspaceApplication) {
     NSConnection *c = [(NSDistantObject *)workspaceApplication connectionForProxy];
   
@@ -345,6 +402,17 @@ static Finder *finder = nil;
   }
   
   TEST_CLOSE (startAppWin, [startAppWin win]);
+
+  if (ddbd) {
+    NSConnection *ddbdconn = [(NSDistantObject *)ddbd connectionForProxy];
+  
+    if (ddbdconn && [ddbdconn isValid]) {
+      [[NSNotificationCenter defaultCenter] removeObserver: self
+	                        name: NSConnectionDidDieNotification
+	                      object: ddbdconn];
+      DESTROY (ddbd);
+    }
+  }
     		
 	return YES;
 }
@@ -1003,93 +1071,252 @@ static Finder *finder = nil;
   }
 }
 
-- (void)liveSearchFolderCreatedAtPath:(NSString *)path
+- (LSFolder *)addLiveSearchFolderWithPath:(NSString *)path
+                             contentsInfo:(NSDictionary *)info
 {
-  if (lsfd) {
-    [lsfd addLiveSearchFolderWithPath: path];
+  LSFolder *folder = [self lsfolderWithPath: path];
+
+  if (folder == nil) {
+    FSNode *node = [FSNode nodeWithPath: path];
+  
+    folder = [[LSFolder alloc] initForNode: node];
+    [lsFolders addObject: folder];
+    RELEASE (folder);
   }
+  
+  return folder;
 }
 
-- (void)updateDefaults
+- (void)removeLiveSearchFolder:(LSFolder *)folder
 {
-  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-  NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-  NSArray *cells = [placesMatrix cells];
-  NSRect savedwrect = [win frame];
-  NSRect wrect = savedwrect;
+  [lsFolders removeObject: folder];
+}
+
+- (LSFolder *)lsfolderWithNode:(FSNode *)node
+{
+  int i;
+  
+  for (i = 0; i < [lsFolders count]; i++) {
+    LSFolder *folder = [lsFolders objectAtIndex: i];
+    
+    if ([[folder node] isEqual: node]) {
+      return folder;
+    }
+  }
+  
+  return nil;
+}
+
+- (LSFolder *)lsfolderWithPath:(NSString *)path
+{
+  int i;
+  
+  for (i = 0; i < [lsFolders count]; i++) {
+    LSFolder *folder = [lsFolders objectAtIndex: i];
+    
+    if ([[[folder node] path] isEqual: path]) {
+      return folder;
+    }
+  }
+  
+  return nil;
+}
+
+
+
+
+
+
+- (void)fileSystemWillChange:(NSNotification *)notif
+{
+  NSDictionary *info = [notif userInfo];
   int i;
 
-  [defaults setBool: ([placesBox superview] != nil)
-             forKey: @"search_places"];
+  for (i = 0; i < [lsFolders count]; i++) {
+    LSFolder *folder = [lsFolders objectAtIndex: i];
+    FSNode *node = [folder node];
+    
+    if ([node involvedByFileOperation: info]) {
+      [self removeWatcherForPath: [node path]];
+      [folder setWatcherSuspended: YES];
+      
+      if ([node willBeValidAfterFileOperation: info] == NO) {
+   //   [folder setLocked: YES];
+      }
+    }
+  }
 
-  if (cells && [cells count]) {
-    NSMutableArray *savedPlaces = [NSMutableArray array];
+  NSLog(@"fileSystemWillChange");
+}
+
+- (void)fileSystemDidChange:(NSNotification *)notif
+{
+  CREATE_AUTORELEASE_POOL(arp);
+  NSDictionary *info = [notif userInfo];
+  NSString *operation = [info objectForKey: @"operation"];
+  NSString *source = [info objectForKey: @"source"];
+  NSString *destination = [info objectForKey: @"destination"];
+  NSArray *files = [info objectForKey: @"files"];
+  NSArray *origfiles = [info objectForKey: @"origfiles"];
+  NSMutableArray *srcpaths = [NSMutableArray array];
+  NSMutableArray *dstpaths = [NSMutableArray array];
+  BOOL copy, move, remove; 
+  int i, j, count;
+  
+  if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
+    srcpaths = [NSArray arrayWithObject: source];
+    dstpaths = [NSArray arrayWithObject: destination];
+  } else {
+    if ([operation isEqual: @"NSWorkspaceDuplicateOperation"]) { 
+      for (i = 0; i < [files count]; i++) {
+        NSString *fname = [origfiles objectAtIndex: i];
+        [srcpaths addObject: [source stringByAppendingPathComponent: fname]];
+        fname = [files objectAtIndex: i];
+        [dstpaths addObject: [destination stringByAppendingPathComponent: fname]];
+      }
+    } else {  
+      for (i = 0; i < [files count]; i++) {
+        NSString *fname = [files objectAtIndex: i];
+        [srcpaths addObject: [source stringByAppendingPathComponent: fname]];
+        [dstpaths addObject: [destination stringByAppendingPathComponent: fname]];
+      }
+    }
+  }
+
+  copy = ([operation isEqual: @"NSWorkspaceCopyOperation"]
+                || [operation isEqual: @"NSWorkspaceDuplicateOperation"]); 
+
+  move = ([operation isEqual: @"NSWorkspaceMoveOperation"] 
+                || [operation isEqual: @"GWorkspaceRenameOperation"]); 
+
+  remove = ([operation isEqual: @"NSWorkspaceDestroyOperation"]
+				        || [operation isEqual: @"NSWorkspaceRecycleOperation"]);
+  
+  count = [lsFolders count];
+  
+  for (i = 0; i < count; i++) {
+    LSFolder *folder = [lsFolders objectAtIndex: i];
+    FSNode *node = [folder node];
+    FSNode *newnode = nil;
+    BOOL found = NO;
     
-    for (i = 0; i < [cells count]; i++) {
-      NSString *srchpath = [[cells objectAtIndex: i] path];
-    
-      if ([fm fileExistsAtPath: srchpath]) {
-        [savedPlaces addObject: srchpath];
+    for (j = 0; j < [srcpaths count]; j++) {
+      NSString *srcpath = [srcpaths objectAtIndex: j];
+      NSString *dstpath = [dstpaths objectAtIndex: j];
+      
+      if (move || copy) {
+        if ([[node path] isEqual: srcpath]) {
+          if ([fm fileExistsAtPath: dstpath]) {
+            newnode = [FSNode nodeWithPath: dstpath];
+            found = YES;
+          }
+          break;
+                  
+        } else if ([node isSubnodeOfPath: srcpath]) {
+          NSString *newpath = pathRemovingPrefix([node path], srcpath);
+
+          newpath = [dstpath stringByAppendingPathComponent: newpath];
+          
+          if ([fm fileExistsAtPath: newpath]) {
+            newnode = [FSNode nodeWithPath: newpath];
+            found = YES;
+          }
+          break;
+        }
+        
+      } else if (remove) {
+        if ([[node path] isEqual: srcpath] || [node isSubnodeOfPath: srcpath]) {
+          found = YES;
+          break;
+        }
       }
     }
     
-    [defaults setObject: savedPlaces forKey: @"saved_places"];
-  }
+    [folder setWatcherSuspended: NO];
+    
+    if (found) {
+      if (move) {
+      
+        NSLog(@"moved lsf with path %@ to path %@", [node path], [newnode path]);
+      
+        [folder setNode: newnode];
+        
+      } else if (copy) {
+        NSString *dictpath = [newnode path];
+        NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: dictpath];
 
-  for (i = 0; i < [fviews count]; i++) {
-    FindView *fview = [fviews objectAtIndex: i];
-    id module = [fview module]; 
-    [dict setObject: [NSNumber numberWithInt: i]
-             forKey: [module moduleName]];    
-  }
+        if (dict) {
+          [self addLiveSearchFolderWithPath: dictpath contentsInfo: dict];
+        
+        
+          NSLog(@"added lsf with path %@", [newnode path]);
+        
+        }
 
-  [defaults setObject: dict forKey: @"last_used_modules"];   
-  
-  [defaults setObject: [NSNumber numberWithInt: searchResh] 
-               forKey: @"search_res_h"];    
-   
-  [defaults synchronize];
-
-  if (savedwrect.size.height != WINH) {
-    if (savedwrect.size.height > WINH) {
-      savedwrect.origin.y += (savedwrect.size.height - WINH);
-    } else {
-      savedwrect.origin.y -= (WINH - savedwrect.size.height);
+      } else if (remove) {
+        NSLog(@"removed lsf with path %@", [node path]);
+      
+        [self removeLiveSearchFolder: folder];
+        count--;
+        i--;
+      }
     }
-    savedwrect.size.height = WINH;
-    [win setFrame: savedwrect display: NO];
   }
-
-  [win saveFrameUsingName: @"finder"];
-  [win setFrame: wrect display: NO];
+  
+  RELEASE (arp);
 }
 
-- (BOOL)windowShouldClose:(id)sender
+- (void)watchedPathDidChange:(NSData *)dirinfo
 {
-  [self updateDefaults];
-	return YES;
+  NSDictionary *info = [NSUnarchiver unarchiveObjectWithData: dirinfo];
+  NSString *event = [info objectForKey: @"event"];
+
+  if ([event isEqual: @"GWWatchedFileDeleted"]) {
+    LSFolder *folder = [self lsfolderWithPath: [info objectForKey: @"path"]];
+    
+    if (folder) {
+      NSLog(@"removed (watcher) lsf with path %@", [[folder node] path]);
+    
+      [self removeLiveSearchFolder: folder];
+    }
+  }
 }
 
-- (void)connectLSFd
+- (void)addWatcherForPath:(NSString *)path
 {
-/*
-  if (lsfd == nil) {
-    id remote = [NSConnection rootProxyForConnectionWithRegisteredName: @"lsfd" 
-                                                                  host: @""];
+  if (fswnotifications) {
+    [self connectFSWatcher];
+    [fswatcher client: self addWatcherForPath: path];
+  }
+}
 
-    if (remote) {
-      NSConnection *c = [remote connectionForProxy];
+- (void)removeWatcherForPath:(NSString *)path
+{
+  if (fswnotifications) {
+    [self connectFSWatcher];
+    [fswatcher client: self removeWatcherForPath: path];
+  }
+}
+
+- (void)connectFSWatcher
+{
+  if (fswatcher == nil) {
+    id fsw = [NSConnection rootProxyForConnectionWithRegisteredName: @"fswatcher" 
+                                                               host: @""];
+
+    if (fsw) {
+      NSConnection *c = [fsw connectionForProxy];
 
 	    [[NSNotificationCenter defaultCenter] addObserver: self
-	                   selector: @selector(lsfdConnectionDidDie:)
+	                   selector: @selector(fswatcherConnectionDidDie:)
 		                     name: NSConnectionDidDieNotification
 		                   object: c];
       
-      lsfd = remote;
-	    [lsfd setProtocolForProxy: @protocol(LSFdProtocol)];
-      RETAIN (lsfd);
+      fswatcher = fsw;
+	    [fswatcher setProtocolForProxy: @protocol(FSWatcherProtocol)];
+      RETAIN (fswatcher);
                                    
-	    [lsfd registerFinder: (id <LSFdClientProtocol>)self];
+	    [fswatcher registerClient: (id <FSWClientProtocol>)self];
       
 	  } else {
 	    static BOOL recursion = NO;
@@ -1099,7 +1326,7 @@ static Finder *finder = nil;
         if (cmd == nil) {
             cmd = RETAIN ([[NSSearchPathForDirectoriesInDomains(
                       GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
-                            stringByAppendingPathComponent: @"lsfd"]);
+                            stringByAppendingPathComponent: @"fswatcher"]);
 		    }
       }
 	  
@@ -1107,7 +1334,7 @@ static Finder *finder = nil;
         int i;
         
         [startAppWin showWindowWithTitle: @"Finder"
-                                 appName: @"lsfd"
+                                 appName: @"fswatcher"
                             maxProgValue: 40.0];
 
 	      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
@@ -1118,9 +1345,9 @@ static Finder *finder = nil;
 	        [[NSRunLoop currentRunLoop] runUntilDate:
 		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
                            
-          remote = [NSConnection rootProxyForConnectionWithRegisteredName: @"lsfd" 
-                                                                     host: @""];                  
-          if (remote) {
+          fsw = [NSConnection rootProxyForConnectionWithRegisteredName: @"fswatcher" 
+                                                                  host: @""];                  
+          if (fsw) {
             [startAppWin updateProgressBy: 40.0 - i];
             break;
           }
@@ -1129,25 +1356,24 @@ static Finder *finder = nil;
         [[startAppWin win] close];
         
 	      recursion = YES;
-	      [self connectLSFd];
+	      [self connectFSWatcher];
 	      recursion = NO;
         
 	    } else { 
-	      recursion = NO;
         DESTROY (cmd);
-        
+	      recursion = NO;
+        fswnotifications = NO;
         NSRunAlertPanel(nil,
-                NSLocalizedString(@"unable to contact lsfd!", @""),
+                NSLocalizedString(@"unable to contact fswatcher\nfswatcher notifications disabled!", @""),
                 NSLocalizedString(@"Ok", @""),
                 nil, 
                 nil);  
       }
 	  }
   }
-  */
 }
 
-- (void)lsfdConnectionDidDie:(NSNotification *)notif
+- (void)fswatcherConnectionDidDie:(NSNotification *)notif
 {
   id connection = [notif object];
 
@@ -1155,22 +1381,206 @@ static Finder *finder = nil;
 	                    name: NSConnectionDidDieNotification
 	                  object: connection];
 
-  NSAssert(connection == [lsfd connectionForProxy],
+  NSAssert(connection == [fswatcher connectionForProxy],
 		                                  NSInternalInconsistencyException);
-  DESTROY (lsfd);
+  RELEASE (fswatcher);
+  fswatcher = nil;
 
   if (NSRunAlertPanel(nil,
-                    NSLocalizedString(@"The lsfd connection died.\nDo you want to restart it?", @""),
+                    NSLocalizedString(@"The fswatcher connection died.\nDo you want to restart it?", @""),
                     NSLocalizedString(@"Yes", @""),
                     NSLocalizedString(@"No", @""),
                     nil)) {
-    [self connectLSFd];                
+    [self connectFSWatcher];                
   } else {
+    fswnotifications = NO;
     NSRunAlertPanel(nil,
-                    NSLocalizedString(@"Live Search Folders disabled!", @""),
+                    NSLocalizedString(@"fswatcher notifications disabled!", @""),
                     NSLocalizedString(@"Ok", @""),
                     nil, 
                     nil);  
+  }
+}
+
+- (void)connectDDBd
+{
+  if (ddbd == nil) {
+    id db = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
+                                                              host: @""];
+
+    if (db) {
+      NSConnection *c = [db connectionForProxy];
+
+	    [[NSNotificationCenter defaultCenter] addObserver: self
+	                   selector: @selector(ddbdConnectionDidDie:)
+		                     name: NSConnectionDidDieNotification
+		                   object: c];
+      
+      ddbd = db;
+	    [ddbd setProtocolForProxy: @protocol(DDBdProtocol)];
+      RETAIN (ddbd);
+      ddbdactive = [ddbd dbactive];
+                                         
+	  } else {
+	    static BOOL recursion = NO;
+	    static NSString	*cmd = nil;
+
+	    if (recursion == NO) {
+        if (cmd == nil) {
+            cmd = RETAIN ([[NSSearchPathForDirectoriesInDomains(
+                      GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
+                            stringByAppendingPathComponent: @"ddbd"]);
+		    }
+      }
+	  
+      if (recursion == NO && cmd != nil) {
+        int i;
+        
+        [startAppWin showWindowWithTitle: @"Finder"
+                                 appName: @"ddbd"
+                            maxProgValue: 40.0];
+
+	      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
+        DESTROY (cmd);
+        
+        for (i = 1; i <= 40; i++) {
+          [startAppWin updateProgressBy: 1.0];
+	        [[NSRunLoop currentRunLoop] runUntilDate:
+		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+                           
+          db = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
+                                                                 host: @""];                  
+          if (db) {
+            [startAppWin updateProgressBy: 40.0 - i];
+            break;
+          }
+        }
+        
+        [[startAppWin win] close];
+        
+	      recursion = YES;
+	      [self connectDDBd];
+	      recursion = NO;
+        
+	    } else { 
+        DESTROY (cmd);
+	      recursion = NO;
+        ddbdactive = NO;
+        NSRunAlertPanel(nil,
+                NSLocalizedString(@"unable to contact ddbd.", @""),
+                NSLocalizedString(@"Ok", @""),
+                nil, 
+                nil);  
+      }
+	  }
+  }
+}
+
+- (void)ddbdConnectionDidDie:(NSNotification *)notif
+{
+  id connection = [notif object];
+
+  [[NSNotificationCenter defaultCenter] removeObserver: self
+	                    name: NSConnectionDidDieNotification
+	                  object: connection];
+
+  NSAssert(connection == [ddbd connectionForProxy],
+		                                  NSInternalInconsistencyException);
+  RELEASE (ddbd);
+  ddbd = nil;
+  ddbdactive = NO;
+  
+  NSRunAlertPanel(nil,
+                  NSLocalizedString(@"ddbd connection died.", @""),
+                  NSLocalizedString(@"Ok", @""),
+                  nil,
+                  nil);                
+}
+
+- (BOOL)ddbdactive
+{
+  return ddbdactive;
+}
+
+- (void)ddbdInsertPath:(NSString *)path
+{
+  if (ddbdactive) {
+    [ddbd insertPath: path];
+  }
+}
+
+- (void)ddbdRemovePath:(NSString *)path
+{
+  if (ddbdactive) {
+    [ddbd removePath: path];
+  }
+}
+
+- (NSString *)ddbdGetAnnotationsForPath:(NSString *)path
+{
+  if (ddbdactive) {
+    return [ddbd annotationsForPath: path];
+  }
+  
+  return nil;
+}
+
+- (void)ddbdSetAnnotations:(NSString *)annotations
+                   forPath:(NSString *)path
+{
+  if (ddbdactive) {
+    [ddbd setAnnotations: annotations forPath: path];
+  }
+}
+
+- (NSString *)ddbdGetFileTypeForPath:(NSString *)path
+{
+  if (ddbdactive) {
+    return [ddbd fileTypeForPath: path];
+  }
+  
+  return nil;
+}
+
+- (void)ddbdSetFileType:(NSString *)type
+                forPath:(NSString *)path
+{
+  if (ddbdactive) {
+    [ddbd setFileType: type forPath: path];
+  }
+}
+
+- (NSString *)ddbdGetModificationDateForPath:(NSString *)path;
+{
+  if (ddbdactive) {
+    return [ddbd modificationDateForPath: path];
+  }
+  
+  return nil;
+}
+
+- (void)ddbdSetModificationDate:(NSString *)datedescr
+                        forPath:(NSString *)path
+{
+  if (ddbdactive) {
+    [ddbd setModificationDate: datedescr forPath: path];
+  }  
+}
+
+- (NSData *)ddbdGetIconDataForPath:(NSString *)path
+{
+  if (ddbdactive) {
+    return [ddbd iconDataForPath: path];
+  }
+  
+  return nil;
+}
+
+- (void)ddbdSetIconData:(NSData *)data
+                forPath:(NSString *)path
+{
+  if (ddbdactive) {
+    [ddbd setIconData: data forPath: path];
   }
 }
 
@@ -1255,6 +1665,78 @@ static Finder *finder = nil;
   DESTROY (workspaceApplication);
 }
 
+- (void)updateDefaults
+{
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+  NSMutableArray *lsfpaths = [NSMutableArray array];
+  NSArray *cells = [placesMatrix cells];
+  NSRect savedwrect = [win frame];
+  NSRect wrect = savedwrect;
+  int i;
+
+  [defaults setBool: ([placesBox superview] != nil)
+             forKey: @"search_places"];
+
+  if (cells && [cells count]) {
+    NSMutableArray *savedPlaces = [NSMutableArray array];
+    
+    for (i = 0; i < [cells count]; i++) {
+      NSString *srchpath = [[cells objectAtIndex: i] path];
+    
+      if ([fm fileExistsAtPath: srchpath]) {
+        [savedPlaces addObject: srchpath];
+      }
+    }
+    
+    [defaults setObject: savedPlaces forKey: @"saved_places"];
+  }
+
+  for (i = 0; i < [fviews count]; i++) {
+    FindView *fview = [fviews objectAtIndex: i];
+    id module = [fview module]; 
+    [dict setObject: [NSNumber numberWithInt: i]
+             forKey: [module moduleName]];    
+  }
+
+  [defaults setObject: dict forKey: @"last_used_modules"];   
+  
+  [defaults setObject: [NSNumber numberWithInt: searchResh] 
+               forKey: @"search_res_h"];    
+   
+  if (savedwrect.size.height != WINH) {
+    if (savedwrect.size.height > WINH) {
+      savedwrect.origin.y += (savedwrect.size.height - WINH);
+    } else {
+      savedwrect.origin.y -= (WINH - savedwrect.size.height);
+    }
+    savedwrect.size.height = WINH;
+    [win setFrame: savedwrect display: NO];
+  }
+
+  [win saveFrameUsingName: @"finder"];
+  [win setFrame: wrect display: NO];
+  
+  for (i = 0; i < [lsFolders count]; i++) {
+    LSFolder *folder = [lsFolders objectAtIndex: i];
+    FSNode *node = [folder node];
+    
+    if ([node isValid]) {
+      [lsfpaths addObject: [node path]];
+    }  
+  }
+  
+  [defaults setObject: lsfpaths forKey: @"lsfolders_paths"];
+  
+  [defaults synchronize];  
+}
+
+- (BOOL)windowShouldClose:(id)sender
+{
+  [self updateDefaults];
+	return YES;
+}
+
 
 //
 // Menu Operations
@@ -1327,14 +1809,6 @@ static Finder *finder = nil;
 
 - (void)concludeRemoteFilesDragOperation:(NSData *)opinfo
                              atLocalPath:(NSString *)localdest
-{
-}
-
-- (void)addWatcherForPath:(NSString *)path
-{
-}
-
-- (void)removeWatcherForPath:(NSString *)path
 {
 }
 

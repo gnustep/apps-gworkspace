@@ -305,7 +305,7 @@
 
           if ([fm fileExistsAtPath: newpath] && copy) {
             if ([ddbd setInfoOfPath: oldpath toPath: newpath] == NO) {
-               NSLog(@"updater: error at path: %@", newpath);
+              NSLog(@"updater: error at path: %@", newpath);
               [sqlite closedb];
               RELEASE (pool2);
               RELEASE (pool1);
