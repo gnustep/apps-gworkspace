@@ -35,7 +35,7 @@ typedef enum FSNInfoType {
   FSNInfoDateType = 3,
   FSNInfoSizeType = 4,
   FSNInfoOwnerType = 5,
-  FSNInfoOtherType = 6
+  FSNInfoExtendedType = 6
 } FSNInfoType;
 
 typedef enum FSNSelectionMask {   

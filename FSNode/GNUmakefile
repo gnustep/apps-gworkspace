@@ -36,8 +36,12 @@ FSNode_LANGUAGES = Resources/English
 
 #FSNode_LOCALIZED_RESOURCE_FILES = Localizable.strings  
 
+SUBPROJECTS = ExtendedInfo 
+
 -include GNUmakefile.preamble
 
 include $(GNUSTEP_MAKEFILES)/framework.make
+
+include $(GNUSTEP_MAKEFILES)/aggregate.make
 
 -include GNUmakefile.postamble

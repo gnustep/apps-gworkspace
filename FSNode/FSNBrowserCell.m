@@ -405,7 +405,7 @@ static NSDictionary *fontAttr = nil;
       break;
       
   /*    
-    case FSNInfoOtherType:      
+    case FSNInfoExtendedType:      
       {  
         NSString *str = [FSNodeRep 
         
