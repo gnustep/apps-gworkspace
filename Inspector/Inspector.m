@@ -437,8 +437,8 @@ static NSString *nibName = @"InspectorWin";
   [d setObject: @"Inspector" forKey: @"ApplicationName"];
   [d setObject: NSLocalizedString(@"-----------------------", @"")
       	forKey: @"ApplicationDescription"];
-  [d setObject: @"Inspector 0.3" forKey: @"ApplicationRelease"];
-  [d setObject: @"01 2004" forKey: @"FullVersionID"];
+  [d setObject: @"Inspector 0.7" forKey: @"ApplicationRelease"];
+  [d setObject: @"03 2004" forKey: @"FullVersionID"];
   [d setObject: [NSArray arrayWithObjects: @"Enrico Sersale <enrico@imago.ro>.", nil]
         forKey: @"Authors"];
   [d setObject: NSLocalizedString(@"See http://www.gnustep.it/enrico/gworkspace", @"") forKey: @"URL"];
