@@ -890,6 +890,7 @@ id instance = nil;
 {
   NSDictionary *infoDict = [NSUnarchiver unarchiveObjectWithData: pbdata];
   NSArray *srcPaths = [infoDict objectForKey: @"paths"];
+  BOOL bookmark = [[infoDict objectForKey: @"bookmark"] boolValue];
   NSString *connName = [infoDict objectForKey: @"dndconn"];
 	NSArray *locContents = [fm directoryContentsAtPath: localPath];
   BOOL samename = NO;
@@ -919,6 +920,7 @@ id instance = nil;
       
         [reply setObject: localPath forKey: @"destination"];
         [reply setObject: srcPaths forKey: @"paths"];
+        [reply setObject: [NSNumber numberWithBool: bookmark] forKey: @"bookmark"];  
         [reply setObject: [NSNumber numberWithBool: !samename] forKey: @"dndok"];
         rpdata = [NSArchiver archivedDataWithRootObject: reply];
       

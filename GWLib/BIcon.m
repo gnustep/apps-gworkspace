@@ -620,12 +620,6 @@ active. preventWindowOrdering is sent automatically by NSView's dragImage:... an
 
 @end
 
-@protocol PulaProtocol
-
-- (oneway void)remoteDraggingDestinationReply:(NSData *)reply;
-
-@end
-
 
 @implementation BIcon (DraggingDestination)
 
