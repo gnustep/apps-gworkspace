@@ -435,11 +435,11 @@ static GWNet *gwnet = nil;
   [d setObject: NSLocalizedString(@"-----------------------", @"")
       	forKey: @"ApplicationDescription"];
   [d setObject: @"GWNet 0.1" forKey: @"ApplicationRelease"];
-  [d setObject: @"12 2003" forKey: @"FullVersionID"];
+  [d setObject: @"01 2004" forKey: @"FullVersionID"];
   [d setObject: [NSArray arrayWithObjects: @"Enrico Sersale <enrico@imago.ro>.", nil]
         forKey: @"Authors"];
   [d setObject: NSLocalizedString(@"See http://www.gnustep.it/enrico/gwnet", @"") forKey: @"URL"];
-  [d setObject: @"Copyright (C) 2003 Free Software Foundation, Inc."
+  [d setObject: @"Copyright (C) 2004 Free Software Foundation, Inc."
         forKey: @"Copyright"];
   [d setObject: NSLocalizedString(@"Released under the GNU General Public License 2.0", @"")
         forKey: @"CopyrightDescription"];

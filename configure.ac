@@ -1,5 +1,5 @@
 AC_PREREQ(2.52)
-AC_INIT([GWorkspace], [0.6.2], [enrico@imago.ro])
+AC_INIT([GWorkspace], [0.6.3], [enrico@imago.ro])
 
 #--------------------------------------------------------------------
 # Use config.guess, config.sub and install-sh provided by gnustep-make
