@@ -737,23 +737,26 @@ if (rct.size.height < 0) rct.size.height = 0; \
 
 - (void)startOperation:(FileOpInfo *)op
 {
-  int optype = [op type];
-  NSString *opsrc = [op source];
-  NSString *opdst = [op destination];
-  NSArray *opfiles = [op files];
+  int optype;
   NSString *opbase;
+  NSArray *opfiles;
   NSMutableArray *oppaths;
   BOOL canstart;
+  NSString *lockedPath;
   NSData *data;
   int i, j, m;    
-   
+  
+  optype = [op type];
+  
   if (optype == RENAME) {
-    opfiles = [NSArray arrayWithObject: [opsrc lastPathComponent]];
-    opbase = [opsrc stringByDeletingLastPathComponent];
+    opbase = [[op source] stringByDeletingLastPathComponent];
+    opfiles = [NSArray arrayWithObject: [[op source] lastPathComponent]];
   } else if (optype == DOWNLOAD) {
-    opbase = opsrc;
+    opbase = [op source];
+    opfiles = [op files];
   } else {
-    opbase = opdst;
+    opbase = [op destination];
+    opfiles = [op files];
   }
 
   oppaths = [NSMutableArray array];
@@ -765,21 +768,24 @@ if (rct.size.height < 0) rct.size.height = 0; \
   canstart = YES;
      
   for (i = 0; i < [fileOperations count]; i++) {
-    FileOpInfo *info = [fileOperations objectAtIndex: i];
-    int inftype = [info type];
-    NSString *infsrc = [info source];
-    NSString *infdest = [info destination];
-    NSArray *chkfiles = [info files];
-    NSMutableArray *chkpaths;
+    FileOpInfo *info;
+    int inftype;
     NSString *chkbase;
+    NSArray *chkfiles;
+    NSMutableArray *chkpaths;
+    
+    info = [fileOperations objectAtIndex: i];
+    inftype = [info type];
     
     if (inftype == RENAME) {
-      chkfiles = [NSArray arrayWithObject: [infsrc lastPathComponent]];
-      chkbase = [infsrc stringByDeletingLastPathComponent];
+      chkbase = [[info source] stringByDeletingLastPathComponent];
+      chkfiles = [NSArray arrayWithObject: [[info source] lastPathComponent]];
     } else if (inftype == DOWNLOAD) {
-      chkbase = infsrc;
+      chkbase = [info source];
+      chkfiles = [info files];
     } else {
-      chkbase = infdest;
+      chkbase = [info destination];
+      chkfiles = [info files];
     }
     
     chkpaths = [NSMutableArray array];
@@ -788,6 +794,9 @@ if (rct.size.height < 0) rct.size.height = 0; \
       [chkpaths addObject: [chkbase stringByAppendingPathComponent: chkfile]];
     }
     
+    /*                                                              */
+    /* ogni path in chkfiles e discendenti di ogni path in chkfiles */
+    /*                                                              */
     if ((inftype == DOWNLOAD) || (inftype == UPLOAD)
             || (inftype == DELETE) || (inftype == DUPLICATE)
                                               || (inftype == RENAME)) {
@@ -795,12 +804,14 @@ if (rct.size.height < 0) rct.size.height = 0; \
         NSString *chkpath = [chkpaths objectAtIndex: j];
 
         if ([oppaths containsObject: chkpath]) {
+          lockedPath = chkpath;
           canstart = NO;
           break;
         }
 
         for (m = 0; m < [oppaths count]; m++) {
           if (subPathOfPath(chkpath, [oppaths objectAtIndex: m])) {
+            lockedPath = chkpath;
             canstart = NO;
             break;
           }
@@ -811,52 +822,66 @@ if (rct.size.height < 0) rct.size.height = 0; \
         }
       }
     }      
-            
+
+    /*                                 */
+    /* chkbase e precedenti di chkbase */
+    /*                                 */
     if ((inftype == DOWNLOAD) || (inftype == UPLOAD)
             || (inftype == DELETE) || (inftype == DUPLICATE)
                                         || (inftype == NEWFOLDER)) {
       if ((optype == RENAME) || (optype == DELETE)) {
         if ([oppaths containsObject: chkbase]) {
+          lockedPath = chkbase;
           canstart = NO;
           break;
         }
 
         for (m = 0; m < [oppaths count]; m++) {
           if (subPathOfPath([oppaths objectAtIndex: m], chkbase)) {
+            lockedPath = chkbase;
             canstart = NO;
             break;
           }
         }
       }
     }
-     
+
+    /*                                 */
+    /* chkbase e precedenti di chkbase */
+    /*                                 */
+    if ((inftype == DELETE) || (inftype == DUPLICATE) 
+                                            || (inftype == UPLOAD)) {
+      if ((optype == DOWNLOAD) || (optype == DUPLICATE)) {
+        if ([oppaths containsObject: chkbase]) {
+          lockedPath = chkbase;
+          canstart = NO;
+          break;
+        }
+
+        for (m = 0; m < [oppaths count]; m++) {
+          if (subPathOfPath([oppaths objectAtIndex: m], chkbase)) {
+            lockedPath = chkbase;
+            canstart = NO;
+            break;
+          }
+        }
+      }
+    }
+          
     if (canstart == NO) {
       break;
     }
   }   
    
   if (canstart == NO) {
-    NSString *error = NSLocalizedString(@"wait the other operation to terminate!", @"");
+    NSString *error = NSLocalizedString(@"is in use by an other operation!", @"");
+    NSString *msg = [NSString stringWithFormat: @"%@ %@", lockedPath, error];
     
-// AGGIUNGERE IL NOME DELLA DIRECTORY IMPLICATA !!!!!!!!!!!!!!    
-    
-    NSRunAlertPanel(NSLocalizedString(@"error", @""), error,
+    NSRunAlertPanel(NSLocalizedString(@"error", @""), msg,
 						                      NSLocalizedString(@"OK", @""), NULL, NULL);  
     return;
   }
    
-/*
-###  UPLOAD, dest
-###  DOWNLOAD, src
-###  DELETE, dest
-###  DUPLICATE, dest
- #   RENAME, src
-  #  NEWFOLDER dest
-*/    
-    
-
-    
-    
    
 /*    
   if ((optype == DUPLICATE) || (optype == DELETE) 

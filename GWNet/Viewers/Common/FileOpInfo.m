@@ -90,8 +90,8 @@ static NSString *nibName = @"FileOpIndicator";
           [win setFrame: wrect display: NO];
         } else if ([win setFrameUsingName: @"fopind"] == NO) {
           [win setFrame: NSMakeRect(300, 300, 280, 108) display: NO];
-          [self checkWinFrame];
         }
+        [self checkWinFrame];
         [win setDelegate: self];  
 	    }			
     } else {
