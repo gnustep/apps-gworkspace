@@ -384,10 +384,10 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   if (updater) {
     [nc removeObserver: self
 	                name: NSConnectionDidDieNotification 
-                object: conn];
+                object: updaterconn];
     [updater terminate];
     DESTROY (updater);
-    DESTROY (conn);
+    DESTROY (updaterconn);
     actionPending = NO;
     updaterbusy = NO;
     [progView stop];

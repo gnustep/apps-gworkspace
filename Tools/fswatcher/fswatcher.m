@@ -329,7 +329,7 @@
                 format: @"adding watcher for unregistered client"];
   }
 
- // NSLog(@"addWatcherForPath %@", path);
+  NSLog(@"addWatcherForPath %@", path);
   
   if (watcher) {
     [info addWatchedPath: path];
@@ -362,7 +362,7 @@
                 format: @"removing watcher for unregistered client"];
   }  
   
- // NSLog(@"removeWatcherForPath %@", path);
+  NSLog(@"removeWatcherForPath %@", path);
   
   if (watcher && ([watcher isOld] == NO)) {
     [info removeWatchedPath: path];
@@ -661,147 +661,75 @@ int main(int argc, char** argv)
 }
 
 /*
-static char	ebuf[2048];
-
-#ifdef HAVE_SYSLOG
-
-static int log_priority;
-
-static void fswatcher_log(int prio)
+static void init(int argc, char** argv, char **env)
 {
-  syslog (log_priority | prio, ebuf);
-   
-  if (prio == LOG_CRIT) {
-    syslog (LOG_CRIT, "exiting.");
-    exit(EXIT_FAILURE);
+  NSProcessInfo *pInfo = [NSProcessInfo processInfo];
+  NSMutableArray *args = [pInfo arguments];
+  BOOL shouldFork = YES;
+
+  if (([args count] > 1) && [[args objectAtIndex: 1] isEqual: @"--daemon"]) {
+    NSLog(@"beccato --daemon");
+    shouldFork = NO;
   }
-}
-#else
-
-#define	LOG_CRIT	2
-#define LOG_DEBUG	0
-#define LOG_ERR		1
-#define LOG_INFO	0
-#define LOG_WARNING	0
-
-void fswatcher_log(int prio)
-{
-  write (2, ebuf, strlen (ebuf));
-  write (2, "\n", 1);
-  if (prio == LOG_CRIT) {
-    fprintf (stderr, "exiting.\n");
-    fflush (stderr);
-    exit(EXIT_FAILURE);
-  }
-}
-#endif
-
-static void ihandler(int sig)
-{
-  static BOOL	beenHere = NO;
-
-  if (beenHere == YES) {
-    abort();
-  }
-  beenHere = YES;
-
-  if (sig == SIGTERM) {
-    exit(EXIT_FAILURE);
+      
+  if (shouldFork) {
+    NSFileHandle *nullHandle;
+    NSTask *task;
+    
+    NS_DURING
+	    {
+        task = [NSTask new];
+	      [task setLaunchPath: [[NSBundle mainBundle] executablePath]];
+	      [task setArguments: [NSArray arrayWithObject: @"--daemon"]];
+	      [task setEnvironment: [pInfo environment]];
+	      nullHandle = [NSFileHandle fileHandleWithNullDevice];
+	      [task setStandardInput: nullHandle];
+	      [task setStandardOutput: nullHandle];
+	      [task setStandardError: nullHandle];
+	      [task launch];
+	      DESTROY(task);
+      }
+    NS_HANDLER
+      {
+	      DESTROY(task);
+	    }
+    NS_ENDHANDLER
+    
+    NSLog(@"QUA 1");
+    
+    exit(0);
   }
 
-  fprintf(stderr, "gdnc killed by signal %d\n", sig);
-  exit(sig);
+    NSLog(@"QUA 2 (daemon)");
 }
 
-int main(int argc, char** argv, char** env)
+int main(int argc, char** argv, char **env)
 {
-  int c;
-  FSWatcher *fsw;
+  CREATE_AUTORELEASE_POOL (pool);
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	FSWatcher *fsw;
 
-#ifdef GS_PASS_ARGUMENTS
-  [NSProcessInfo initializeWithArguments:argv count:argc environment:env];
-#endif
+  init(argc, argv, env);
+
+ defaults = [NSUserDefaults standardUserDefaults];
+    [defaults registerDefaults: [NSDictionary dictionaryWithObjectsAndKeys:
+      @"YES", @"GSLogSyslog", nil]];
   
-#ifdef __MINGW__
-  {
-    char **a = malloc((argc+2) * sizeof(char*));
-    
-    memcpy(a, argv, argc * sizeof(char*));
-    a[argc] = "-f";
-    a[argc+1] = 0;
-    
-    if (_spawnv(_P_NOWAIT, argv[0], a) == -1) {
-	    fprintf(stderr, "fswatcher - spawn failed - bye.\n");
-	    exit(EXIT_FAILURE);
-	  }
-    
-    exit(EXIT_SUCCESS);
-  }    
-#else
-  switch (fork()) {
-    case -1:
-      fprintf(stderr, "fswatcher - fork failed - bye.\n");
-	    exit(EXIT_FAILURE);
+	fsw = [[FSWatcher alloc] init];
 
-	  case 0:
-      setsid();
-      break;
-
-	  default:
-      exit(EXIT_SUCCESS);
-	}
-    
-  for (c = 0; c < FD_SETSIZE; c++) {
-    (void)close(c);
-  }
-  
-  if (open("/dev/null", O_RDONLY) != 0) {
-    sprintf(ebuf, "failed to open stdin from /dev/null (%s)\n", strerror(errno));
-    fswatcher_log(LOG_CRIT);
-    exit(EXIT_FAILURE);
-  }
-  
-  if (open("/dev/null", O_WRONLY) != 1) {
-    sprintf(ebuf, "failed to open stdout from /dev/null (%s)\n", strerror(errno));
-    fswatcher_log(LOG_CRIT);
-    exit(EXIT_FAILURE);
-  }
-  
-  if (open("/dev/null", O_WRONLY) != 2) {
-    sprintf(ebuf, "failed to open stderr from /dev/null (%s)\n", strerror(errno));
-    fswatcher_log(LOG_CRIT);
-    exit(EXIT_FAILURE);
-  }
-#endif // !MINGW 
-
-  {
-    CREATE_AUTORELEASE_POOL(pool);
-    int sym;
-
-    for (sym = 0; sym < NSIG; sym++) {
-	    signal(sym, ihandler);
-    }
-    
-  #ifndef __MINGW__
-    signal(SIGPIPE, SIG_IGN);
-    signal(SIGTTOU, SIG_IGN);
-    signal(SIGTTIN, SIG_IGN);
-    signal(SIGHUP, SIG_IGN);
-  #endif
-
-    signal(SIGTERM, ihandler);
-
-    fsw = [FSWatcher new];
 
     [[NSFileHandle fileHandleWithStandardInput] closeFile];
     [[NSFileHandle fileHandleWithStandardOutput] closeFile];
-  #ifndef __MINGW__
-	  [[NSFileHandle fileHandleWithStandardError] closeFile];
-  #endif
+#ifndef __MINGW__
+//    if (debugging == NO)
+ //     {
+	[[NSFileHandle fileHandleWithStandardError] closeFile];
+ //     }
+#endif
 
-    RELEASE(pool);
-  }
 
+  RELEASE (pool);
+  
   if (fsw != nil) {
     CREATE_AUTORELEASE_POOL(pool);
     [[NSRunLoop currentRunLoop] run];

@@ -31,7 +31,7 @@
 #include "SearchPlacesCell.h"
 #include "GWFunctions.h"
 
-#define WINH (262.0)
+#define WINH (186.0)
 #define FMVIEWH (34.0)
 #define BORDER (4.0)
 #define HMARGIN (12.0)

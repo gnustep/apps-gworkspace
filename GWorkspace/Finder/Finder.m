@@ -1207,8 +1207,8 @@ static Finder *finder = nil;
 
 - (void)removeLiveSearchFolder:(LSFolder *)folder
 {
-  [folder closeWindow];
   [folder endUpdate];
+  [folder closeWindow];
   [lsFolders removeObject: folder];
 }
 

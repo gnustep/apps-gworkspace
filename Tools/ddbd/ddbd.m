@@ -1784,21 +1784,3 @@ int main(int argc, char** argv)
   exit(0);
 }
 
-
-
-
-/*
-  CREATE_AUTORELEASE_POOL(arp);
-  NSString *base = @"/home/enrico/Butt/GNUstep/CopyPix";  
-  NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: base];
-  NSString *path;    
-
-  while ((path = [enumerator nextObject])) {
-    if ([[enumerator fileAttributes] fileType] == NSFileTypeDirectory) {
-      addDirectory([base stringByAppendingPathComponent: path]);
-    }
-    addPath([base stringByAppendingPathComponent: path]);
-  } 
-
-  DESTROY (arp); 
-*/

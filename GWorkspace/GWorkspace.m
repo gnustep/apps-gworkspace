@@ -2117,7 +2117,7 @@ static GWorkspace *gworkspace = nil;
 	NS_HANDLER
 		{
 			app = nil;
-	}
+	  }
 	NS_ENDHANDLER
 
 	return app;
