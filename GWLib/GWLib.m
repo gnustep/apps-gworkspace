@@ -626,10 +626,12 @@ id instance = nil;
 		[defaults setObject: [NSString stringWithFormat: @"%i", defSortType] 
 							   forKey: @"defaultsorttype"];
 		[defaults synchronize];
-	    
+	  
+    [self clearCache];
+      
 		[[NSNotificationCenter defaultCenter]
 	 				 postNotificationName: GWSortTypeDidChangeNotification
-		 								     object: nil];  
+		 								     object: nil]; 
 	}
 }
 

@@ -1,3 +1,37 @@
+2003-10-01 Enrico Sersale  <enrico@imago.ro>
+
+  * Version 0.6
+
+  * GWLib/GWProtocol.h and GWorkspace/GWorkspace.m
+    -sortedDirectoryContentsAtPath:
+    -checkHiddenFiles:atPath:
+    -setCachedMax:
+    -addWatcherForPath:
+    -removeWatcherForPath:
+    -lockFiles:inDirectoryAtPath:
+    -unLockFiles:inDirectoryAtPath:
+    -isLockedPath:
+    -existsAndIsDirectoryFileAtPath:
+    -typeOfFileAt:  
+    -isPakageAtPath:
+    -sortTypeForDirectoryAtPath:
+    -setSortType:forDirectoryAtPath:
+    -setDefSortType:
+    -defSortType
+    -setHideSysFiles:
+    -hideSysFiles
+    -iconForFile:ofType:
+    -smallIconForFile:
+    -smallIconForFiles:
+    -smallHighlightIcon
+    -setUseThumbnails:
+    -imageExtensions
+    all these methods have been moved in GWLib
+    
+  * GWLib/GWLib [h m]
+    + (id)workspaceApp
+    new method.
+
 2003-09-26 Enrico Sersale  <enrico@imago.ro>
 
   * in many files: changed some occourrencies of the macro "new" with
