@@ -42,7 +42,6 @@
 #include "Dialogs/OpenWithController.h"
 #include "Dialogs/RunExternalController.h"
 #include "Dialogs/StartAppWin.h"
-#include "Inspectors/InspectorsController.h"
 #include "Apps/Apps.h"
 #include "Finder/FinderController.h"
 #include "Preferences/PrefController.h"
@@ -495,7 +494,6 @@ return [ws openFile: fullPath withApplication: appName]
   RELEASE (viewers);  
   TEST_RELEASE (viewersTemplates);
   TEST_RELEASE (viewersSearchPaths);
-  TEST_RELEASE (inspController);
   TEST_RELEASE (appsViewer);
   TEST_RELEASE (finder);
   TEST_RELEASE (fiend);
@@ -664,7 +662,6 @@ return [ws openFile: fullPath withApplication: appName]
   appsViewer = [[AppsViewer alloc] init];
 	history = [[History alloc] init];
   prefController = [[PrefController alloc] init];  
-  inspController = nil; 
   finder = nil;
   fiend = nil;
 
@@ -761,7 +758,6 @@ return [ws openFile: fullPath withApplication: appName]
 		TEST_CLOSE (vwr, vwr);
 	}
 	TEST_CLOSE (appsViewer, [appsViewer myWin]);
-	TEST_CLOSE (inspController, [inspController myWin]);
 	TEST_CLOSE (finder, [finder myWin]);
 	TEST_CLOSE (prefController, [prefController myWin]);
 	TEST_CLOSE (fiend, [fiend myWin]);
@@ -925,12 +921,6 @@ return [ws openFile: fullPath withApplication: appName]
 	}
   [defaults setObject: [NSString stringWithFormat: @"%i", tshelfPBFileNum]
                forKey: @"tshelfpbfnum"];
-
-	if ((inspController != nil) && ([[inspController myWin] isVisible])) {  
-		[inspController updateDefaults]; 
-	}
-
-//  [defaults setBool: !useInspector forKey: @"noinspector"];
 
 	if ([[appsViewer myWin] isVisible]) {  
 		[appsViewer updateDefaults]; 
@@ -1586,24 +1576,10 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 {
   if (paths && ([selectedPaths isEqualToArray: paths] == NO)) {
     ASSIGN (selectedPaths, paths);
-	  if (inspController != nil) {
-		  [inspController setPaths: selectedPaths];
-    }    
-				
-	  [[NSNotificationCenter defaultCenter]
- 				 postNotificationName: GWCurrentSelectionChangedNotification
-	 								        object: nil];   
-                          
                           
     if (inspector && useInspector) {
-//      if ([selectedPaths count] == 1) {
-//        [inspector showContentsAt: [selectedPaths objectAtIndex: 0]];
-//      }
-
       [inspector setPaths: selectedPaths];
     }
-    
-    
   }
 }
 
@@ -1613,8 +1589,8 @@ NSLocalizedString(@"OK", @""), nil, nil); \
     return;
   }
   
-  if (inspController != nil) {
-    [inspController setPaths: selectedPaths];
+  if (inspector && useInspector) {
+    [inspector setPaths: selectedPaths];
   }    
 				
   [[NSNotificationCenter defaultCenter]
@@ -1669,21 +1645,11 @@ NSLocalizedString(@"OK", @""), nil, nil); \
                     ofType:(NSString *)type
                   typeIcon:(NSImage *)icon
 {
-  if (inspController != nil) {
-    [inspController showPasteboardData: data ofType: type typeIcon: icon];
-  }    
-  
   if (inspector && useInspector) {
     if ([inspector canDisplayDataOfType: type]) {
       [inspector showData: data ofType: type];
     }
   }
-}
-
-- (void)closeInspectors
-{
-	[inspController release];
-	inspController = nil;
 }
 
 - (void)newObjectAtPath:(NSString *)basePath isDirectory:(BOOL)directory
@@ -2079,6 +2045,7 @@ NSLocalizedString(@"OK", @""), nil, nil); \
       inspector = insp;
 	    [inspector setProtocolForProxy: @protocol(InspectorProtocol)];
       RETAIN (inspector);
+      useInspector = YES;
       
 	  } else {
 	    static BOOL recursion = NO;
@@ -2298,34 +2265,42 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 
 - (void)showInspector:(id)sender
 {
-	if (inspController == nil) {
-		inspController = [[InspectorsController alloc] initForPaths: selectedPaths];
+	if (inspector == nil) {
+    [self connectInspector];
+  }
+	if (inspector && useInspector) {
+    [inspector showWindow];
   } 
-  [[inspController myWin] makeKeyAndOrderFront: nil]; 
 }
 
 - (void)showAttributesInspector:(id)sender
 {
-  [self showInspector: nil];
-  [inspController showAttributes];
+	if (inspector == nil) {
+    [self connectInspector];
+  }
+  if (inspector && useInspector) {  
+    [inspector showAttributes];
+  } 
 }
 
 - (void)showContentsInspector:(id)sender
 {
-  [self showInspector: nil];
-  [inspController showContents];
+	if (inspector == nil) {
+    [self connectInspector];
+  }
+  if (inspector && useInspector) {  
+    [inspector showContents];
+  } 
 }
 
 - (void)showToolsInspector:(id)sender
 {
-  [self showInspector: nil];
-  [inspController showTools];
-}
-
-- (void)showPermissionsInspector:(id)sender
-{
-  [self showInspector: nil];
-  [inspController showPermissions];
+	if (inspector == nil) {
+    [self connectInspector];
+  }
+  if (inspector && useInspector) {  
+    [inspector showTools];
+  } 
 }
 
 - (void)showApps:(id)sender

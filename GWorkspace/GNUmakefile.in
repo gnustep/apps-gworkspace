@@ -31,54 +31,19 @@ else
   ADDITIONAL_GUI_LIBS += -lGWorkspace
 endif
 
-ifneq ($(GS_PATH), none)
-  GWorkspace_RESOURCE_FILES = \
-    Resources/Icons/* \
-    Resources/English.lproj \
-    Resources/French.lproj \
-    Resources/German.lproj \
-    Resources/Italian.lproj \
-    Resources/Romanian.lproj \
-    Resources/Spanish.lproj \
-    Resources/Portuguese.lproj \
-    Resources/Dutch.lproj \
-    ../Viewers/BrowserViewer/BrowserViewer.viewer \
-    ../Viewers/IconsViewer/IconsViewer.viewer \
-    ../Viewers/SmallIconsViewer/SmallIconsViewer.viewer \
-    ../ContentViewers/AppViewer/AppViewer.inspector \
-    ../ContentViewers/FolderViewer/FolderViewer.inspector \
-    ../ContentViewers/ImageViewer/ImageViewer.inspector \
-    ../ContentViewers/SoundViewer/SoundViewer.inspector \
-    ../ContentViewers/RtfViewer/RtfViewer.inspector \
-    ../ContentViewers/InspectorViewer/InspectorViewer.inspector \
-    ../ContentViewers/StringsViewer/StringsViewer.inspector \
-    ../ContentViewers/PlistViewer/PlistViewer.inspector \
-    ../ContentViewers/PdfViewer/PdfViewer.inspector \
-    ../ContentViewers/PasteboardViewer/PasteboardViewer.inspector 
-else
-  GWorkspace_RESOURCE_FILES = \
-    Resources/Icons/* \
-    Resources/English.lproj \
-    Resources/French.lproj \
-    Resources/German.lproj \
-    Resources/Italian.lproj \
-    Resources/Romanian.lproj \
-    Resources/Spanish.lproj \
-    Resources/Portuguese.lproj \
-    Resources/Dutch.lproj \
-    ../Viewers/BrowserViewer/BrowserViewer.viewer \
-    ../Viewers/IconsViewer/IconsViewer.viewer \
-    ../Viewers/SmallIconsViewer/SmallIconsViewer.viewer \
-    ../ContentViewers/AppViewer/AppViewer.inspector \
-    ../ContentViewers/FolderViewer/FolderViewer.inspector \
-    ../ContentViewers/ImageViewer/ImageViewer.inspector \
-    ../ContentViewers/SoundViewer/SoundViewer.inspector \
-    ../ContentViewers/RtfViewer/RtfViewer.inspector \
-    ../ContentViewers/StringsViewer/StringsViewer.inspector \
-    ../ContentViewers/PlistViewer/PlistViewer.inspector \
-    ../ContentViewers/PasteboardViewer/PasteboardViewer.inspector \
-    ../ContentViewers/InspectorViewer/InspectorViewer.inspector 
-endif
+GWorkspace_RESOURCE_FILES = \
+  Resources/Icons/* \
+  Resources/English.lproj \
+  Resources/French.lproj \
+  Resources/German.lproj \
+  Resources/Italian.lproj \
+  Resources/Romanian.lproj \
+  Resources/Spanish.lproj \
+  Resources/Portuguese.lproj \
+  Resources/Dutch.lproj \
+  ../Viewers/BrowserViewer/BrowserViewer.viewer \
+  ../Viewers/IconsViewer/IconsViewer.viewer \
+  ../Viewers/SmallIconsViewer/SmallIconsViewer.viewer \
 
 GWorkspace_LANGUAGES = Resources/English \
 			                Resources/French \
@@ -102,11 +67,6 @@ ifeq ($(FOUNDATION_LIB), apple)
                                         FileOpsPref.nib \
                                         IconsPref.nib \
                                         HiddenFilesPref.nib \
-                                        InspectorsWin.nib \
-                                        AttributesPanel.nib \
-                                        ContentsPanel.nib \
-                                        ToolsPanel.nib \
-                                        PermissionsPanel.nib \
                                         FileOperationWin.nib \
                                         OpenWith.nib \
                                         RunExternal.nib \
@@ -123,11 +83,6 @@ else
                                         FileOpsPref.gorm \
                                         IconsPref.gorm \
                                         HiddenFilesPref.gorm \
-                                        InspectorsWin.gorm \
-                                        AttributesPanel.gorm \
-                                        ContentsPanel.gorm \
-                                        ToolsPanel.gorm \
-                                        PermissionsPanel.gorm \
                                         FileOperationWin.gorm \
                                         OpenWith.gorm \
                                         RunExternal.gorm \
@@ -151,12 +106,6 @@ ifneq ($(FOUNDATION_LIB), apple)
   TShelf/TShelfIconsView.m \
   TShelf/TShelfIcon.m \
   TShelf/TShelfPBIcon.m \
-  Inspectors/InspectorsController.m \
-  Inspectors/Attributes.m \
-  Inspectors/Contents.m \
-  Inspectors/Tools.m \
-  Inspectors/Permissions.m \
-  Inspectors/TimeDateView.m \
   Apps/Apps.m \
   Finder/FinderShelf.m \
   Finder/FinderShelfIcon.m \
@@ -199,12 +148,6 @@ else
   TShelf/TShelfIconsView.m \
   TShelf/TShelfIcon.m \
   TShelf/TShelfPBIcon.m \
-  Inspectors/InspectorsController.m \
-  Inspectors/Attributes.m \
-  Inspectors/Contents.m \
-  Inspectors/Tools.m \
-  Inspectors/Permissions.m \
-  Inspectors/TimeDateView.m \
   Apps/Apps.m \
   Finder/FinderShelf.m \
   Finder/FinderShelfIcon.m \

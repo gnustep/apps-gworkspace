@@ -116,7 +116,6 @@ void createMenu()
 		addItemToMenu(inspmenu, @"Attributes", @"", @"showAttributesInspector:", @"1");
 		addItemToMenu(inspmenu, @"Contents", @"", @"showContentsInspector:", @"2");
 		addItemToMenu(inspmenu, @"Tools", @"", @"showToolsInspector:", @"3");
-		addItemToMenu(inspmenu, @"Permissions", @"", @"showPermissionsInspector:", @"4");
 		menuItem = addItemToMenu(tools, @"History", @"", nil, @"");
 		hismenu = AUTORELEASE ([NSMenu new]);
 		[tools setSubmenu: hismenu forItem: menuItem];

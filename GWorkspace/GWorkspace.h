@@ -44,7 +44,6 @@
 @class NSFileManager;
 @class NSWorkspace;
 @class ViewersWindow;
-@class InspectorsController;
 @class PrefController;
 @class FinderController;
 @class AppsViewer;
@@ -85,7 +84,15 @@
 
 - (oneway void)addViewerWithBundleData:(NSData *)bundleData;
 
-- (oneway void)showContentsAt:(NSString *)path;
+- (oneway void)setPaths:(NSArray *)paths;
+
+- (oneway void)showWindow;
+
+- (oneway void)showAttributes;
+
+- (oneway void)showContents;
+
+- (oneway void)showTools;
 
 - (BOOL)canDisplayDataOfType:(NSString *)type;
 
@@ -103,7 +110,6 @@
   int oprefnum;
   BOOL showFileOpStatus;
   
-  InspectorsController *inspController;
 	NSArray *selectedPaths;
 
   id fswatcher;
@@ -256,8 +262,6 @@
                     ofType:(NSString *)type
                   typeIcon:(NSImage *)icon;
 
-- (void)closeInspectors;
-
 - (void)newObjectAtPath:(NSString *)basePath isDirectory:(BOOL)directory;
 
 - (void)duplicateFiles;
@@ -303,8 +307,6 @@
 - (void)showContentsInspector:(id)sender;
 
 - (void)showToolsInspector:(id)sender;
-
-- (void)showPermissionsInspector:(id)sender;
 
 - (void)showApps:(id)sender;
 
