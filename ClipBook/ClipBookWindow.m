@@ -46,6 +46,7 @@ static NSString *nibName = @"ClipBookWindow.gorm";
 	TEST_RELEASE (emptyBox);
 	TEST_RELEASE (invalidBox);
 	TEST_RELEASE (iconView);
+	TEST_RELEASE (dataTypes);  
   TEST_RELEASE (pbdir);
   TEST_RELEASE (pbDescrName);
   TEST_RELEASE (pbDescrPath);
@@ -158,6 +159,16 @@ static NSString *nibName = @"ClipBookWindow.gorm";
         pbDescr = [arr mutableCopy];
       }
             
+            
+      ASSIGN (dataTypes, ([NSArray arrayWithObjects: NSStringPboardType,
+                                                    NSRTFPboardType,
+                                                    NSRTFDPboardType,
+                                                    NSTIFFPboardType,
+                                                    NSFileContentsPboardType,
+                                                    NSColorPboardType,
+                                                    @"IBViewPboardType",
+                                                    nil]));
+            
       index = 0;
       isDragTarget = NO;
       [(NSBox *)viewersBox setContentView: emptyBox];
@@ -237,7 +248,7 @@ static NSString *nibName = @"ClipBookWindow.gorm";
   data = [self readSelectionFromPasteboard: [NSPasteboard generalPasteboard]
                                     ofType: &type];
      
-  if (data) {
+  if (data && [dataTypes containsObject: type]) {
     NSString *dpath = [clipbook pbFilePath];
       
     if ([data writeToFile: dpath atomically: YES]) {

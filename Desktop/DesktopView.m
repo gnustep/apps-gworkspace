@@ -1441,6 +1441,63 @@ NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str,
   }
 }
 
+- (BOOL)validatePasteOfFilenames:(NSArray *)names
+                       wasCutted:(BOOL)cutted
+{
+  NSMutableArray *sourcePaths = [names mutableCopy];
+  NSString *basePath;
+  NSString *nodePath = [node path];
+  NSString *prePath = [NSString stringWithString: nodePath];
+	int count = [names count];
+  int i;
+  
+  AUTORELEASE (sourcePaths);
+
+	if (count == 0) {
+		return NO;
+  } 
+
+  if ([node isWritable] == NO) {
+    return NO;
+  }
+    
+  basePath = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
+  if ([basePath isEqual: nodePath]) {
+    return NO;
+  }  
+    
+  if ([sourcePaths containsObject: nodePath]) {
+    return NO;
+  }
+
+  while (1) {
+    if ([sourcePaths containsObject: prePath]) {
+      return NO;
+    }
+    if ([prePath isEqual: path_separator()]) {
+      break;
+    }            
+    prePath = [prePath stringByDeletingLastPathComponent];
+  }
+
+  for (i = 0; i < count; i++) {
+    NSString *srcpath = [sourcePaths objectAtIndex: i];
+    FSNIcon *icon = [self repOfSubnodePath: srcpath];
+    
+    if (icon && [[icon node] isMountPoint]) {
+      [sourcePaths removeObject: srcpath];
+      count--;
+      i--;
+    }
+  }    
+  
+  if ([sourcePaths count] == 0) {
+    return NO;
+  }
+
+  return YES;
+}
+                       
 - (NSColor *)backgroundColor
 {
   return backColor;

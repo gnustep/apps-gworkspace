@@ -40,6 +40,18 @@
 
 @implementation TShelfPBIcon
 
++ (NSArray *)dataTypes
+{
+  return [NSArray arrayWithObjects: NSStringPboardType,
+                                    NSRTFPboardType,
+                                    NSRTFDPboardType,
+                                    NSTIFFPboardType,
+                                    NSFileContentsPboardType,
+                                    NSColorPboardType,
+                                    @"IBViewPboardType",
+                                    nil];
+}
+
 - (void)dealloc
 {
   RELEASE (dataPath);

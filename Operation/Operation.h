@@ -43,6 +43,8 @@ enum {
   NSMutableArray *fileOperations;
   int fopRef;
   
+  BOOL filenamesCutted;
+  
   OperationPrefs *preferences;
   
   NSFileManager *fm;  
@@ -50,6 +52,10 @@ enum {
 }
 
 + (Operation *)operation;
+
+- (void)setFilenamesCutted:(BOOL)value;
+
+- (BOOL)filenamesWasCutted;
 
 - (void)performFileOperation:(NSData *)opinfo;
 

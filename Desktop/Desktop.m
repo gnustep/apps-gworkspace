@@ -946,9 +946,14 @@ static Desktop *desktop = nil;
 	
 	if ([title isEqual: NSLocalizedString(@"Open", @"")]
         || [title isEqual: NSLocalizedString(@"Duplicate", @"")]
-        || [title isEqual: NSLocalizedString(@"Move to Recycler", @"")]) {
+        || [title isEqual: NSLocalizedString(@"Move to Recycler", @"")]
+        || [title isEqual: NSLocalizedString(@"Cut", @"")]
+        || [title isEqual: NSLocalizedString(@"Copy", @"")]) {
     return [[[win desktopView] selectedPaths] count] ? YES : NO;
     
+  } else if ([title isEqual: NSLocalizedString(@"Paste", @"")]) {
+    return YES;
+
   } else if ([title isEqual: NSLocalizedString(@"Empty Recycler", @"")]) {
     return [[FSNodeRep directoryContentsAtPath: trashPath] count] ? YES : NO;
 
@@ -1219,6 +1224,109 @@ static Desktop *desktop = nil;
   if (inspectorApp) {  
     [inspectorApp showTools];
   } 
+}
+
+- (void)cut:(id)sender
+{
+  NSArray *selection = [[win desktopView] selectedPaths];
+  
+  if ([selection count] != 0) {
+    NSPasteboard *pb = [NSPasteboard generalPasteboard];
+
+    [pb declareTypes: [NSArray arrayWithObject: NSFilenamesPboardType]
+               owner: nil];
+
+    if ([pb setPropertyList: selection forType: NSFilenamesPboardType]) {
+      [self connectOperation];
+
+      if (operationsApp) {
+        [(id <OperationProtocol>)operationsApp setFilenamesCutted: YES];
+      } else {
+        NSRunAlertPanel(nil, 
+            NSLocalizedString(@"File operations disabled!", @""), 
+                                NSLocalizedString(@"OK", @""), nil, nil);                                     
+      }
+    }    
+  }
+}
+
+- (void)copy:(id)sender
+{
+  NSArray *selection = [[win desktopView] selectedPaths];
+  
+  if ([selection count] != 0) {
+    NSPasteboard *pb = [NSPasteboard generalPasteboard];
+
+    [pb declareTypes: [NSArray arrayWithObject: NSFilenamesPboardType]
+               owner: nil];
+
+    if ([pb setPropertyList: selection forType: NSFilenamesPboardType]) {
+      [self connectOperation];
+
+      if (operationsApp) {
+        [(id <OperationProtocol>)operationsApp setFilenamesCutted: NO];
+      } else {
+        NSRunAlertPanel(nil, 
+            NSLocalizedString(@"File operations disabled!", @""), 
+                                NSLocalizedString(@"OK", @""), nil, nil);                                     
+      }
+    }
+  }
+}
+
+- (void)paste:(id)sender
+{
+  NSPasteboard *pb = [NSPasteboard generalPasteboard];
+
+  if ([[pb types] containsObject: NSFilenamesPboardType]) {
+    NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType];   
+
+    if (sourcePaths) {
+      [self connectOperation];
+
+      if (operationsApp) {
+        BOOL cutted = [(id <OperationProtocol>)operationsApp filenamesWasCutted];
+        
+        if ([[win desktopView] validatePasteOfFilenames: sourcePaths
+                                              wasCutted: cutted]) {
+          NSMutableDictionary *opDict = [NSMutableDictionary dictionary];
+          NSString *source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
+          NSString *destination = [desktopDir path];
+          NSMutableArray *files = [NSMutableArray array];
+          NSString *operation;
+          int i;
+        
+          for (i = 0; i < [sourcePaths count]; i++) {  
+            NSString *spath = [sourcePaths objectAtIndex: i];
+            [files addObject: [spath lastPathComponent]];
+          }  
+        
+          if (cutted) {
+            if ([source isEqual: [self trashPath]]) {
+              operation = @"GWorkspaceRecycleOutOperation";
+            } else {
+		          operation = NSWorkspaceMoveOperation;
+            }
+          } else {
+		        operation = NSWorkspaceCopyOperation;
+          }
+        
+	        [opDict setObject: operation forKey: @"operation"];
+	        [opDict setObject: source forKey: @"source"];
+	        [opDict setObject: destination forKey: @"destination"];
+	        [opDict setObject: files forKey: @"files"];
+
+	        [self performFileOperation: opDict];	
+        }
+        
+      } else {
+        NSRunAlertPanel(nil, 
+            NSLocalizedString(@"File operations disabled!", @""), 
+                                NSLocalizedString(@"OK", @""), nil, nil); 
+        return;                                    
+      }
+    }
+  }
 }
 
 - (void)selectAll:(id)sender

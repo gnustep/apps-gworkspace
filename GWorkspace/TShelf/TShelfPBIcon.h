@@ -47,6 +47,8 @@
   int dragdelay;
 }
 
++ (NSArray *)dataTypes;
+
 - (id)initForPBDataAtPath:(NSString *)dpath
                    ofType:(NSString *)type
 				        gridIndex:(int)index

@@ -414,6 +414,53 @@
   }
 }
 
+- (BOOL)validatePasteOfFilenames:(NSArray *)names
+                       wasCutted:(BOOL)cutted
+{
+  NSString *viewedPath = [self currentViewedPath];
+  NSString *prePath = [NSString stringWithString: viewedPath];
+	int count = [names count];
+  NSString *basePath;
+  int i;
+  
+	if (count == 0) {
+		return NO;
+  } 
+
+	if ([fm isWritableFileAtPath: viewedPath] == NO) {
+		return NO;
+	}
+    
+	for (i = 0; i < count; i++) {
+		if ([fm fileExistsAtPath: [names objectAtIndex: i]] == NO) {
+ 		  return NO;
+		}
+	}
+    
+  basePath = [[names objectAtIndex: 0] stringByDeletingLastPathComponent];
+  if ([basePath isEqual: viewedPath]) {
+    return NO;
+  }  
+
+	for (i = 0; i < count; i++) {
+		if ([viewedPath isEqual: [names objectAtIndex: i]]) {
+		  return NO;
+		}
+	}
+
+  while (1) {
+    if ([names containsObject: prePath]) {
+      return NO;
+    }
+    if ([prePath isEqual: fixPath(@"/", 0)]) {
+      break;
+    }            
+    prePath = [prePath stringByDeletingLastPathComponent];
+  }
+
+  return YES;
+}
+
 - (NSPoint)locationOfIconForPath:(NSString *)path
 {
 	if ([selectedPaths containsObject: path]) {

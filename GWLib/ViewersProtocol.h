@@ -58,6 +58,9 @@
 
 - (void)checkRootPathAfterHidingOfPaths:(NSArray *)hpaths;
 
+- (BOOL)validatePasteOfFilenames:(NSArray *)names
+                       wasCutted:(BOOL)cutted;
+
 - (NSPoint)locationOfIconForPath:(NSString *)path;
 
 - (void)setCurrentSelection:(NSArray *)paths;

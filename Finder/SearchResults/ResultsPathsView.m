@@ -341,6 +341,12 @@
 {
 }
 
+- (BOOL)validatePasteOfFilenames:(NSArray *)names
+                       wasCutted:(BOOL)cutted
+{
+  return NO;
+}
+
 - (NSColor *)backgroundColor
 {
   return [NSColor windowBackgroundColor];

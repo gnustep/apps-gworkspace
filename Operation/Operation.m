@@ -90,6 +90,16 @@ static Operation *operation = nil;
 	return YES;
 }
 
+- (void)setFilenamesCutted:(BOOL)value
+{
+  filenamesCutted = value;
+}
+
+- (BOOL)filenamesWasCutted
+{
+  return filenamesCutted;
+}
+
 - (void)performFileOperation:(NSData *)opinfo
 {
   NSDictionary *opdict = [NSUnarchiver unarchiveObjectWithData: opinfo];

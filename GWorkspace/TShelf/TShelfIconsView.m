@@ -972,7 +972,7 @@
   data = [self readSelectionFromPasteboard: [NSPasteboard generalPasteboard]
                                     ofType: &type];
      
-  if (data) {         
+  if (data && [[TShelfPBIcon dataTypes] containsObject: type]) {         
     NSString *dpath = [gw tshelfPBFilePath];
 		int index = -1; 
     int i;

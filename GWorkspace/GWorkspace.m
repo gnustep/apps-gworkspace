@@ -1087,30 +1087,50 @@ return [ws openFile: fullPath withApplication: appName]
 	if ([title isEqual: NSLocalizedString(@"Cut", @"")]
           || [title isEqual: NSLocalizedString(@"Copy", @"")]
           || [title isEqual: NSLocalizedString(@"Paste", @"")]) {
-    if ((tshelfWin == nil) || ([tshelfWin isVisible] == NO)) {
-      return NO;
-    } else {
-      TShelfView *tview = [tshelfWin shelfView];
-      TShelfViewItem *item = [[tshelfWin shelfView] selectedTabItem];
-  
-      if ([tview hiddenTabs]) {
-        return NO;
-      }
-  
-      if (item) {
-        TShelfIconsView *iview = (TShelfIconsView *)[item view];
-        
-        if ([iview iconsType] == DATA_TAB) {
-          if ([title isEqual: NSLocalizedString(@"Paste", @"")]) {
-            return YES;
-          } else {
-            return [iview hasSelectedIcon];
-          }
-        } else {
+    NSWindow *kwin = [NSApp keyWindow];
+
+    if (kwin) {
+      if ([kwin isKindOfClass: [TShelfWin class]]) {
+        if ((tshelfWin == nil) || ([tshelfWin isVisible] == NO)) {
           return NO;
+        } else {
+          TShelfView *tview = [tshelfWin shelfView];
+          TShelfViewItem *item = [[tshelfWin shelfView] selectedTabItem];
+
+          if ([tview hiddenTabs]) {
+            return NO;
+          }
+
+          if (item) {
+            TShelfIconsView *iview = (TShelfIconsView *)[item view];
+
+            if ([iview iconsType] == DATA_TAB) {
+              if ([title isEqual: NSLocalizedString(@"Paste", @"")]) {
+                return YES;
+              } else {
+                return [iview hasSelectedIcon];
+              }
+            } else {
+              return NO;
+            }
+          } else {
+            return NO;
+          }
         }
-      } else {
-        return NO;
+
+      } else if ([kwin isKindOfClass: [ViewersWindow class]]) {
+        id viewer = [(ViewersWindow *)kwin viewer];
+        NSArray *selection = [viewer selectedPaths];  
+        NSString *vpath = [(ViewersWindow *)kwin currentViewedPath]; 
+
+        if (selection && [selection count]) {
+          if ([selection isEqual: [NSArray arrayWithObject: vpath]]) {
+            return ([title isEqual: NSLocalizedString(@"Paste", @"")]);
+          } 
+
+        } else {
+          return ([title isEqual: NSLocalizedString(@"Paste", @"")]);
+        }
       }
     }
   }
@@ -2634,31 +2654,155 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 
 - (void)cut:(id)sender
 {
-  TShelfViewItem *item = [[tshelfWin shelfView] selectedTabItem];
+  NSWindow *kwin = [NSApp keyWindow];
+
+  if (kwin) {
+    if ([kwin isKindOfClass: [TShelfWin class]]) {
+      TShelfViewItem *item = [[tshelfWin shelfView] selectedTabItem];
+
+      if (item) {
+        TShelfIconsView *iview = (TShelfIconsView *)[item view];
+        [iview doCut];    
+      }
+      
+    } else if ([kwin isKindOfClass: [ViewersWindow class]]) {
+      id viewer = [(ViewersWindow *)kwin viewer];
+      NSArray *selection = [viewer selectedPaths];  
+      NSString *vpath = [(ViewersWindow *)kwin currentViewedPath]; 
   
-  if (item) {
-    TShelfIconsView *iview = (TShelfIconsView *)[item view];
-    [iview doCut];    
+      if (selection && [selection count]) {
+        if ([selection isEqual: [NSArray arrayWithObject: vpath]] == NO) {
+          NSPasteboard *pb = [NSPasteboard generalPasteboard];
+
+          [pb declareTypes: [NSArray arrayWithObject: NSFilenamesPboardType]
+                     owner: nil];
+
+          if ([pb setPropertyList: selection forType: NSFilenamesPboardType]) {
+            [self connectOperation];
+
+            if (operationsApp) {
+              [(id <OperationProtocol>)operationsApp setFilenamesCutted: YES];
+            } else {
+              NSRunAlertPanel(nil, 
+                  NSLocalizedString(@"File operations disabled!", @""), 
+                                      NSLocalizedString(@"OK", @""), nil, nil);                                     
+            }
+          }
+        }
+      } 
+    }
   }
 }
 
 - (void)copy:(id)sender
 {
-  TShelfViewItem *item = [[tshelfWin shelfView] selectedTabItem];
+  NSWindow *kwin = [NSApp keyWindow];
+
+  if (kwin) {
+    if ([kwin isKindOfClass: [TShelfWin class]]) {
+      TShelfViewItem *item = [[tshelfWin shelfView] selectedTabItem];
+
+      if (item) {
+        TShelfIconsView *iview = (TShelfIconsView *)[item view];
+        [iview doCopy];    
+      }
+      
+    } else if ([kwin isKindOfClass: [ViewersWindow class]]) {
+      id viewer = [(ViewersWindow *)kwin viewer];
+      NSArray *selection = [viewer selectedPaths];  
+      NSString *vpath = [(ViewersWindow *)kwin currentViewedPath]; 
   
-  if (item) {
-    TShelfIconsView *iview = (TShelfIconsView *)[item view];
-    [iview doCopy];    
+      if (selection && [selection count]) {
+        if ([selection isEqual: [NSArray arrayWithObject: vpath]] == NO) {
+          NSPasteboard *pb = [NSPasteboard generalPasteboard];
+
+          [pb declareTypes: [NSArray arrayWithObject: NSFilenamesPboardType]
+                     owner: nil];
+
+          if ([pb setPropertyList: selection forType: NSFilenamesPboardType]) {
+            [self connectOperation];
+
+            if (operationsApp) {
+              [(id <OperationProtocol>)operationsApp setFilenamesCutted: NO];
+            } else {
+              NSRunAlertPanel(nil, 
+                  NSLocalizedString(@"File operations disabled!", @""), 
+                                      NSLocalizedString(@"OK", @""), nil, nil);                                     
+            }
+          }
+        }
+      } 
+    }
   }
 }
 
 - (void)paste:(id)sender
 {
-  TShelfViewItem *item = [[tshelfWin shelfView] selectedTabItem];
-  
-  if (item) {
-    TShelfIconsView *iview = (TShelfIconsView *)[item view];
-    [iview doPaste];    
+  NSWindow *kwin = [NSApp keyWindow];
+
+  if (kwin) {
+    if ([kwin isKindOfClass: [TShelfWin class]]) {
+      TShelfViewItem *item = [[tshelfWin shelfView] selectedTabItem];
+
+      if (item) {
+        TShelfIconsView *iview = (TShelfIconsView *)[item view];
+        [iview doPaste];    
+      }
+      
+    } else if ([kwin isKindOfClass: [ViewersWindow class]]) {
+      NSPasteboard *pb = [NSPasteboard generalPasteboard];
+
+      if ([[pb types] containsObject: NSFilenamesPboardType]) {
+        NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType];   
+
+        if (sourcePaths) {
+          [self connectOperation];
+
+          if (operationsApp) {
+            id viewer = [(ViewersWindow *)kwin viewer];
+            BOOL cutted = [(id <OperationProtocol>)operationsApp filenamesWasCutted];
+
+            if ([viewer validatePasteOfFilenames: sourcePaths
+                                       wasCutted: cutted]) {
+              NSMutableDictionary *opDict = [NSMutableDictionary dictionary];
+              NSString *source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
+              NSString *destination = [(ViewersWindow *)kwin currentViewedPath];
+              NSMutableArray *files = [NSMutableArray array];
+              NSString *operation;
+              int i;
+              
+              for (i = 0; i < [sourcePaths count]; i++) {  
+                NSString *spath = [sourcePaths objectAtIndex: i];
+                [files addObject: [spath lastPathComponent]];
+              }  
+
+              if (cutted) {
+                if ([source isEqual: [self trashPath]]) {
+                  operation = GWorkspaceRecycleOutOperation;
+                } else {
+		              operation = NSWorkspaceMoveOperation;
+                }
+              } else {
+		            operation = NSWorkspaceCopyOperation;
+              }
+
+	            [opDict setObject: operation forKey: @"operation"];
+	            [opDict setObject: source forKey: @"source"];
+	            [opDict setObject: destination forKey: @"destination"];
+	            [opDict setObject: files forKey: @"files"];
+
+	            [self performFileOperationWithDictionary: opDict];	
+            }
+
+          } else {
+            NSRunAlertPanel(nil, 
+                NSLocalizedString(@"File operations disabled!", @""), 
+                                    NSLocalizedString(@"OK", @""), nil, nil); 
+            return;                                    
+          }
+        }
+      }
+    }
   }
 }
 

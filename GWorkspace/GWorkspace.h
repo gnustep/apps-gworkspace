@@ -121,6 +121,10 @@
 
 - (oneway void)performFileOperation:(NSData *)opinfo;
 
+- (oneway void)setFilenamesCutted:(BOOL)value;
+
+- (BOOL)filenamesWasCutted;
+
 @end
 
 

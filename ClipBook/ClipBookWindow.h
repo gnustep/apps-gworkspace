@@ -53,6 +53,8 @@
   IBOutlet id fwdButt;
   IBOutlet id bckwButt; 
   
+  NSArray *dataTypes;
+  
   PBViewer *viewer;
   NSBox *emptyBox;
   NSBox *invalidBox;

@@ -100,6 +100,10 @@ typedef enum DockPosition {
 
 - (oneway void)performFileOperation:(NSData *)opinfo;
 
+- (oneway void)setFilenamesCutted:(BOOL)value;
+
+- (BOOL)filenamesWasCutted;
+
 @end
 
 
@@ -233,6 +237,12 @@ typedef enum DockPosition {
 - (void)showContentsInspector:(id)sender;
 
 - (void)showToolsInspector:(id)sender;
+
+- (void)cut:(id)sender;
+
+- (void)copy:(id)sender;
+
+- (void)paste:(id)sender;
 
 - (void)selectAll:(id)sender;
 
