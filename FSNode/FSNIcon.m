@@ -53,6 +53,9 @@ static NSImage *branchImage;
 
 + (void)initialize
 {
+  NSBundle *bundle = [NSBundle bundleForClass: [self class]];
+  NSString *imagepath = [bundle pathForResource: @"ArrowRight" ofType: @"tiff"];
+
   if (desktopApp == nil) {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *appName = [defaults stringForKey: @"DesktopApplicationName"];
@@ -64,8 +67,8 @@ static NSImage *branchImage;
       desktopApp = [desktopAppClass performSelector: sel];
     }
   }
-  
-  ASSIGN (branchImage, [NSImage imageNamed: @"ArrowRight"]);
+    
+  branchImage = [[NSImage alloc] initWithContentsOfFile: imagepath];
 }
 
 + (NSImage *)branchImage

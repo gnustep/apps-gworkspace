@@ -15,7 +15,7 @@ ADDITIONAL_INCLUDE_DIRS += -I../ -IModules -ISearchResults -I../FSNode
 ADDITIONAL_LDFLAGS +=  
 
 # Additional library directories the linker should search
-ADDITIONAL_LIB_DIRS += -L../FSNode/$(GNUSTEP_OBJ_DIR) 
+ADDITIONAL_LIB_DIRS += -L../FSNode/FSNode.framework/Versions/Current/$(GNUSTEP_TARGET_LDIR)
 
 ADDITIONAL_TOOL_LIBS +=
 

@@ -18,10 +18,10 @@ endif
 #
 # subprojects
 #
-SUBPROJECTS = Utilities \
+SUBPROJECTS = FSNode \
+	      			  Utilities \
 	      			  Inspector \
 	      			  Operation \
-                FSNode \
                 Finder \
 	      			  Desktop \
 	      			  GWLib \

@@ -126,7 +126,9 @@ static FSNodeRep *shared = nil;
     
   if (self) {
   	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSBundle *bundle = [NSBundle bundleForClass: [self class]];
     id defentry;
+    NSString *imagepath;
     BOOL isdir;
     
     fm = [NSFileManager defaultManager];
@@ -151,14 +153,21 @@ static FSNodeRep *shared = nil;
       }
     }
     
-    ASSIGN (multipleSelIcon, [NSImage imageNamed: @"MultipleSelection"]);
-    ASSIGN (openFolderIcon, [NSImage imageNamed: @"FolderOpen"]);
-    ASSIGN (hardDiskIcon, [NSImage imageNamed: @"HardDisk"]);
-    ASSIGN (openHardDiskIcon, [NSImage imageNamed: @"HardDiskOpen"]);
-    ASSIGN (workspaceIcon, [NSImage imageNamed: @"Workspace"]);
-    ASSIGN (trashIcon, [NSImage imageNamed: @"Recycler"]);
-    ASSIGN (trashFullIcon, [NSImage imageNamed: @"RecyclerFull"]);
-    
+    imagepath = [bundle pathForResource: @"MultipleSelection" ofType: @"tiff"];
+    multipleSelIcon = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
+    imagepath = [bundle pathForResource: @"FolderOpen" ofType: @"tiff"];
+    openFolderIcon = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
+    imagepath = [bundle pathForResource: @"HardDisk" ofType: @"tiff"];
+    hardDiskIcon = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
+    imagepath = [bundle pathForResource: @"HardDiskOpen" ofType: @"tiff"];
+    openHardDiskIcon = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
+    imagepath = [bundle pathForResource: @"Workspace" ofType: @"tiff"];
+    workspaceIcon = [[NSImage alloc] initWithContentsOfFile: imagepath];
+    imagepath = [bundle pathForResource: @"Recycler" ofType: @"tiff"];
+    trashIcon = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
+    imagepath = [bundle pathForResource: @"RecyclerFull" ofType: @"tiff"];
+    trashFullIcon = [[NSImage alloc] initWithContentsOfFile: imagepath];
+
     thumbnailDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
     thumbnailDir = [thumbnailDir stringByAppendingPathComponent: @"Thumbnails"];
     RETAIN (thumbnailDir);
