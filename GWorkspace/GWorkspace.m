@@ -2363,8 +2363,7 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 	return nil;
 }
 	
-			 
-- (BOOL)readSelectionFromPasteboard:(NSPasteboard*)pboard
+- (BOOL)readSelectionFromPasteboard:(NSPasteboard *)pboard
 {
 	if ([[pboard types] indexOfObject: NSFilenamesPboardType] != NSNotFound) {
 		return YES;
@@ -2373,8 +2372,8 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 	return NO;
 }
 
-- (BOOL)writeSelectionToPasteboard:(NSPasteboard*)pboard
-                             types:(NSArray*)types
+- (BOOL)writeSelectionToPasteboard:(NSPasteboard *)pboard
+                             types:(NSArray *)types
 {
 	if ([types containsObject: NSFilenamesPboardType] == YES) {
 		NSArray *typesDeclared = [NSArray arrayWithObject: NSFilenamesPboardType];

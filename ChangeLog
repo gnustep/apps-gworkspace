@@ -1,3 +1,8 @@
+2003-07-29 Enrico Sersale  <enrico@imago.ro>
+
+  * GWorkspace/FileOperations/FileOperation.m
+    changed all the occourrencies of NSPort with NSMessagePort
+
 2003-07-18 Enrico Sersale  <enrico@imago.ro>
 
   * GWorkspace/Resources
