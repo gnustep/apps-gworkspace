@@ -31,11 +31,16 @@
 #define MAXSHELFHEIGHT  100
 
 #ifndef max
-#define max(a,b) ((a) > (b) ? (a):(b))
+  #define max(a,b) ((a) > (b) ? (a):(b))
 #endif
 
 #ifndef min
-#define min(a,b) ((a) < (b) ? (a):(b))
+  #define min(a,b) ((a) < (b) ? (a):(b))
+#endif
+
+#ifndef FILES_TAB
+  #define FILES_TAB 0
+  #define DATA_TAB 1
 #endif
 
 typedef struct {
@@ -59,7 +64,9 @@ typedef gridpoint *(*GridPointIMP)(id, SEL, NSPoint);
 
 @interface TShelfIconsView : NSView 
 {
+  BOOL isLastView;
 	NSMutableArray *icons; 
+  int iconsType;
 	NSMutableArray *watchedPaths;
   int cellsWidth;
 	gridpoint *gpoints;
@@ -76,9 +83,11 @@ typedef gridpoint *(*GridPointIMP)(id, SEL, NSPoint);
   GWorkspace *gw;
 }
 
-- (id)initWithIconsDicts:(NSArray *)iconsDicts;
+- (id)initWithIconsDescription:(NSArray *)idescr 
+                     iconsType:(int)itype
+                      lastView:(BOOL)last;
 
-- (NSArray *)iconsDicts;
+- (NSArray *)iconsDescription;
 
 - (void)addIconWithPaths:(NSArray *)iconpaths withGridIndex:(int)index;
 
@@ -91,6 +100,8 @@ typedef gridpoint *(*GridPointIMP)(id, SEL, NSPoint);
 - (void)sortIcons;
 
 - (NSArray *)icons;
+
+- (int)iconsType;
 
 - (void)updateIcons;
 

@@ -22,22 +22,29 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #ifndef TSHELF_VIEW_ITEM_H
 #define TSHELF_VIEW_ITEM_H
+
+#ifndef FILES_TAB
+  #define FILES_TAB 0
+  #define DATA_TAB 1
+#endif
 
 #include <Foundation/Foundation.h>
 
 @class NSString;
 @class NSView;
 @class NSColor;
+@class NSFont;
 @class NSImage;
 @class TShelfView;
 
 @interface TShelfViewItem : NSObject
 {
   id ident;
+  int tabtype;
   NSString *label;
+  NSFont *labfont;
   NSView *view;
   NSColor *color;
   NSTabState state;
@@ -45,6 +52,8 @@
   TShelfView *tview;
   NSRect rect; 
 }
+
+- (id)initWithTabType:(int)type;
 
 - (void)setLabel:(NSString *)labstr;
 - (NSString *)label;

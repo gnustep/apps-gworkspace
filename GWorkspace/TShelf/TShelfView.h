@@ -38,6 +38,7 @@
   NSMutableArray *items;
   TShelfViewItem *lastItem;
   NSFont *font;
+  NSFont *italicFont;
   TShelfViewItem *selected;
   int selectedItem;
   NSButton *hideButton;
@@ -75,6 +76,8 @@
 - (BOOL)hiddenTabs;
 
 - (NSFont *)font;
+
+- (NSFont *)italicFont;
 
 - (NSRect)contentRect;
 

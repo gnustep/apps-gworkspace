@@ -29,6 +29,11 @@
 #include <Foundation/Foundation.h>
 #include <AppKit/NSWindow.h>
 
+#ifndef FILES_TAB
+  #define FILES_TAB 0
+  #define DATA_TAB 1
+#endif
+
 @class TShelfView;
 
 @interface TShelfWin : NSWindow

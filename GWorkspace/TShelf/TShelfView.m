@@ -44,8 +44,19 @@
     buttw = 10;
     
     ASSIGN (items, [NSMutableArray array]);
-    ASSIGN (font, [NSFont boldSystemFontOfSize: 0]);
     
+    font = [NSFont fontWithName: @"Helvetica-Bold" size: 12];
+    if (font == nil) {
+      font = [NSFont boldSystemFontOfSize: 0];
+    }
+    RETAIN (font);
+
+    italicFont = [NSFont fontWithName: @"Helvetica-BoldOblique" size: 12];
+    if (italicFont == nil) {
+      italicFont = [NSFont boldSystemFontOfSize: 0];
+    }
+    RETAIN (italicFont);
+            
     hideButton = [[NSButton alloc] initWithFrame: NSMakeRect (0,0, buttw, rect.size.height)];
     [hideButton setImage: [NSImage imageNamed: @"Dimple.tiff"]];
     [hideButton setImagePosition: NSImageOnly];
@@ -65,6 +76,7 @@
 {
   RELEASE (items);
   RELEASE (font);
+  RELEASE (italicFont);
   RELEASE (hideButton);
   
   [super dealloc];
@@ -174,6 +186,11 @@
 - (NSFont *)font
 {
   return font;
+}
+
+- (NSFont *)italicFont
+{
+  return italicFont;
 }
 
 - (NSRect)contentRect

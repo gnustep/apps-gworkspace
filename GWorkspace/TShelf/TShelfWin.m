@@ -51,7 +51,6 @@
                           styleMask: NSBorderlessWindowMask 
                             backing: NSBackingStoreBuffered 
                               defer: NO];
-
   if (self) {
     NSUserDefaults *defaults;
     NSDictionary *tshelfDict;
@@ -67,7 +66,7 @@
     
     defaults = [NSUserDefaults standardUserDefaults];	
     
-    tshelfDict = [defaults objectForKey: @"tabbedshelf"];
+    tshelfDict = [defaults objectForKey: @"tabshelf"];
     if (tshelfDict == nil) {
       tshelfDict = [NSDictionary dictionary];
     }
@@ -78,11 +77,20 @@
       for (i = 0; i < [tabsArr count]; i++) {
         NSDictionary *dict = [tabsArr objectAtIndex: i];
         NSString *label = [[dict allKeys] objectAtIndex: 0];
-        NSArray *iconsDicts = [dict objectForKey: label];
+        NSDictionary *tabDict = [dict objectForKey: label];
+        NSArray *iconsArr = [tabDict objectForKey: @"icons"];
     
-        item = [[TShelfViewItem alloc] init];
+    
+          // TIRARE FUORI GLI ALTRI DATI DA "tabDict"
+    
+    
+    
+        item = [[TShelfViewItem alloc] initWithTabType: FILES_TAB];
         [item setLabel: label];
-        view = [[TShelfIconsView alloc] initWithIconsDicts: iconsDicts];
+        
+        view = [[TShelfIconsView alloc] initWithIconsDescription: iconsArr
+                                                       iconsType: FILES_TAB
+                              lastView: ([label isEqual: @"last"] ? YES : NO)];
         [view setFrame: NSMakeRect(0, 0, sizew, 80)];    
         [item setView: view];
         RELEASE (view);
@@ -97,9 +105,11 @@
       }
       
     } else {
-      item = [[TShelfViewItem alloc] init];
+      item = [[TShelfViewItem alloc] initWithTabType: FILES_TAB];
       [item setLabel: @"last"];
-      view = [[TShelfIconsView alloc] initWithIconsDicts: nil];
+      view = [[TShelfIconsView alloc] initWithIconsDescription: nil 
+                                                     iconsType: FILES_TAB
+                                                      lastView: YES];
       [view setFrame: NSMakeRect(0, 0, sizew, 80)];
       [item setView: view];
       RELEASE (view);
@@ -108,7 +118,7 @@
       [self saveDefaults];
     }
   }
-  
+    
   return self;
 }
 
@@ -131,8 +141,9 @@
 
 - (void)addTab
 {
-  FileOpsDialog *dialog;
+  SympleDialog *dialog;
   NSString *tabName;
+  int state;
   NSArray *items;
   TShelfViewItem *item;
   TShelfIconsView *view;
@@ -145,7 +156,9 @@
     return;
   }
 
-	dialog = [[FileOpsDialog alloc] initWithTitle: NSLocalizedString(@"Add Tab", @"") editText: @""];
+	dialog = [[SympleDialog alloc] initWithTitle: NSLocalizedString(@"Add Tab", @"") 
+                                      editText: @""
+                                   switchTitle: NSLocalizedString(@"pasteboard tab", @"")];
   AUTORELEASE (dialog);
 	[dialog center];
   [dialog makeKeyWindow];
@@ -184,12 +197,16 @@
     return;
   }
   
+  state = [dialog switchButtState];
+  
   item = [tView selectedTabItem];
   index = [tView indexOfItem: item];
   
-  item = [[TShelfViewItem alloc] init];
+  item = [[TShelfViewItem alloc] initWithTabType: FILES_TAB];
   [item setLabel: tabName];
-  view = [[TShelfIconsView alloc] initWithIconsDicts: nil];
+  view = [[TShelfIconsView alloc] initWithIconsDescription: nil 
+                                                 iconsType: FILES_TAB
+                                                  lastView: NO];
   [view setFrame: NSMakeRect(0, 0, [[NSScreen mainScreen] frame].size.width, 80)];
   [item setView: view];
   RELEASE (view);
@@ -246,7 +263,7 @@
 
 - (void)renameTab
 {
-  FileOpsDialog *dialog;
+  SympleDialog *dialog;
   NSString *oldName;
   NSString *tabName;
   NSArray *items;
@@ -272,8 +289,9 @@
     return;
   }
 
-	dialog = [[FileOpsDialog alloc] initWithTitle: NSLocalizedString(@"Rename Tab", @"") 
-                                       editText: oldName];
+	dialog = [[SympleDialog alloc] initWithTitle: NSLocalizedString(@"Rename Tab", @"") 
+                                      editText: oldName
+                                   switchTitle: nil];
   AUTORELEASE (dialog);
 	[dialog center];
   [dialog makeKeyWindow];
@@ -336,15 +354,20 @@
     TShelfViewItem *item = [items objectAtIndex: i];
     NSString *label = [item label];
     TShelfIconsView *iview = (TShelfIconsView *)[item view];
-    NSArray *iconsDicts = [iview iconsDicts];
-    NSDictionary *tdict = [NSDictionary dictionaryWithObject: iconsDicts 
-                                                      forKey: label];
-    [tabsArr addObject: tdict];
+    NSArray *iconsArr = [iview iconsDescription];
+    NSMutableDictionary *tdict = [NSMutableDictionary dictionary];
+    
+    [tdict setObject: iconsArr forKey: @"icons"];
+             
+                       // AGGIUNGERE GLI ALTRI DATI A "tdict"
+
+                                                      
+    [tabsArr addObject: [NSDictionary dictionaryWithObject: tdict forKey: label]];
   }
 
   [tshelfDict setObject: tabsArr forKey: @"tabs"];
 
-  [defaults setObject: tshelfDict forKey: @"tabbedshelf"];
+  [defaults setObject: tshelfDict forKey: @"tabshelf"];
   [defaults synchronize];
 }
 

@@ -33,22 +33,34 @@
 @class NSTextField;
 @class NSButton;
 
-@interface FileOpsDialogView : NSView
+@interface sympleDialogView : NSView
+{
+  BOOL useSwitch;
+}
+
+- (id)initWithFrame:(NSRect)frameRect useSwitch:(BOOL)swtch;
+
 @end
 
-@interface FileOpsDialog : NSWindow
+@interface SympleDialog : NSWindow
 {
-	FileOpsDialogView *dialogView;
+	sympleDialogView *dialogView;
 	NSTextField *titlefield, *editfield;	
+  NSButton *switchButt;
 	NSButton *cancelbutt, *okbutt;	
+  BOOL useSwitch;
 	int result;
 }
 
-- (id)initWithTitle:(NSString *)title editText:(NSString *)etext;
+- (id)initWithTitle:(NSString *)title 
+           editText:(NSString *)etext
+        switchTitle:(NSString *)swtitle;
 
 - (int)runModal;
 
 - (NSString *)getEditFieldText;
+
+- (int)switchButtState;
 
 - (void)buttonAction:(id)sender;
 

@@ -30,12 +30,13 @@
 
 @implementation TShelfViewItem
 
-- (id)init
+- (id)initWithTabType:(int)type
 {
   self = [super init];
 
   if (self) {
     state = NSBackgroundTab;
+    tabtype = type;
   }
   
   return self;
@@ -45,7 +46,8 @@
 {
   RELEASE (label);
   RELEASE (view);
-  RELEASE (color);
+  TEST_RELEASE (color);
+  RELEASE (labfont);
   
   [super dealloc];
 }
@@ -63,7 +65,7 @@
 - (NSSize)sizeOfLabel:(NSString *)str
 {
   NSDictionary *attr = [NSDictionary dictionaryWithObjectsAndKeys: 
-			                        [tview font], NSFontAttributeName, nil];
+			                        labfont, NSFontAttributeName, nil];
   return [str sizeWithAttributes: attr];
 }
 
@@ -110,6 +112,12 @@
 - (void)setTShelfView:(TShelfView *)tView
 {
   tview = tView;
+  
+  if (tabtype == FILES_TAB) {
+    ASSIGN (labfont, [tview font]);
+  } else {
+    ASSIGN (labfont, [tview italicFont]);
+  }
 }
 
 - (NSString *)truncatedLabelAtLenght:(float)lenght
@@ -117,13 +125,11 @@
 	NSString *cutname = nil;
   NSString *reststr = nil;
   NSString *dots;
-	NSFont *labfont;
   NSDictionary *attr;
 	float w, cw, dotslenght;
 	int i;
 
 	cw = 0;
-	labfont = [tview font];
   
   attr = [NSDictionary dictionaryWithObjectsAndKeys: 
 			                        labfont, NSFontAttributeName, nil];  
@@ -206,7 +212,7 @@
   }
 
   attr = [NSDictionary dictionaryWithObjectsAndKeys: 
-			                        [tview font], NSFontAttributeName,
+			                        labfont, NSFontAttributeName,
 			                [NSColor blackColor], NSForegroundColorAttributeName,
 			                nil];
   

@@ -77,7 +77,9 @@
   [super dealloc];
 }
 
-- (id)initWithIconsDicts:(NSArray *)iconsDicts
+- (id)initWithIconsDescription:(NSArray *)idescr 
+                     iconsType:(int)itype
+                      lastView:(BOOL)last
 {	
 	self = [super init];
   
@@ -99,9 +101,12 @@
 		
 		icons = [[NSMutableArray alloc] initWithCapacity: 1];
         
-    if (iconsDicts && [iconsDicts count]) {    
-      for (i = 0; i < [iconsDicts count]; i++) { 
-			  NSDictionary *iconDict = [iconsDicts objectAtIndex: i];
+    iconsType = itype;
+    isLastView = last;
+        
+    if (idescr && [idescr count]) {    
+      for (i = 0; i < [idescr count]; i++) { 
+			  NSDictionary *iconDict = [idescr objectAtIndex: i];
         NSArray *iconpaths = [iconDict objectForKey: @"paths"];
 			  int index = [[iconDict objectForKey: @"index"] intValue];
         BOOL canadd = YES;
@@ -119,39 +124,41 @@
         }
       }
 		}
-    
+        
 		gpoints = NULL;
 		pcount = 0;
 		isDragTarget = NO;
 		dragImage = nil;
 		
-  	[self registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, nil]];
+    if (isLastView == NO) {
+  	  [self registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, nil]];
+    
+		  [[NSNotificationCenter defaultCenter] 
+                 addObserver: self 
+                	  selector: @selector(fileSystemWillChange:) 
+                			  name: GWFileSystemWillChangeNotification
+                		  object: nil];
 
-		[[NSNotificationCenter defaultCenter] 
-               addObserver: self 
-                	selector: @selector(fileSystemWillChange:) 
-                			name: GWFileSystemWillChangeNotification
-                		object: nil];
+		  [[NSNotificationCenter defaultCenter] 
+                 addObserver: self 
+                	  selector: @selector(fileSystemDidChange:) 
+                			  name: GWFileSystemDidChangeNotification
+                		  object: nil];                     
 
-		[[NSNotificationCenter defaultCenter] 
-               addObserver: self 
-                	selector: @selector(fileSystemDidChange:) 
-                			name: GWFileSystemDidChangeNotification
-                		object: nil];                     
-  
-		[[NSNotificationCenter defaultCenter] 
-               addObserver: self 
-                  selector: @selector(watcherNotification:) 
-                		  name: GWFileWatcherFileDidChangeNotification
-                	  object: nil];
+		  [[NSNotificationCenter defaultCenter] 
+                 addObserver: self 
+                    selector: @selector(watcherNotification:) 
+                		    name: GWFileWatcherFileDidChangeNotification
+                	    object: nil];
+    }
 	}
   
   return self;	
 }
 
-- (NSArray *)iconsDicts
+- (NSArray *)iconsDescription
 { 
-  NSMutableArray *iconsdicts = [NSMutableArray arrayWithCapacity: 1]; 
+  NSMutableArray *arr = [NSMutableArray arrayWithCapacity: 1]; 
   int i;
 	  
 	for (i = 0; i < [icons count]; i++) {
@@ -163,10 +170,10 @@
 		index = [icon gridindex];
 		[dict setObject: [NSNumber numberWithInt: index] forKey: @"index"];
 
-    [iconsdicts addObject: dict];
+    [arr addObject: dict];
   }
   
-  return iconsdicts;
+  return arr;
 }
 
 - (void)addIconWithPaths:(NSArray *)iconpaths 
@@ -258,6 +265,11 @@
 - (NSArray *)icons
 {
   return icons;
+}
+
+- (int)iconsType
+{
+  return iconsType;
 }
 
 - (void)updateIcons

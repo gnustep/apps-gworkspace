@@ -204,7 +204,7 @@
 
 - (void)addLayer
 {
-  FileOpsDialog *dialog;
+  SympleDialog *dialog;
   NSString *layerName;
   NSMutableArray *leaves;
   int result;
@@ -213,7 +213,9 @@
     return;
   }
 
-	dialog = [[FileOpsDialog alloc] initWithTitle: NSLocalizedString(@"New Layer", @"") editText: @""];
+	dialog = [[SympleDialog alloc] initWithTitle: NSLocalizedString(@"New Layer", @"") 
+                                      editText: @""
+                                   switchTitle: nil];
   AUTORELEASE (dialog);
 	[dialog center];
   [dialog makeKeyWindow];
@@ -288,7 +290,7 @@
 
 - (void)renameCurrentLayer
 {
-  FileOpsDialog *dialog;
+  SympleDialog *dialog;
   NSString *layerName;
   NSMutableArray *leaves;
   int result;
@@ -297,7 +299,9 @@
     return;
   }
 
-	dialog = [[FileOpsDialog alloc] initWithTitle: NSLocalizedString(@"Rename Layer", @"") editText: currentName];
+	dialog = [[SympleDialog alloc] initWithTitle: NSLocalizedString(@"Rename Layer", @"") 
+                                      editText: currentName
+                                   switchTitle: nil];
   AUTORELEASE (dialog);
 	[dialog center];
   [dialog makeKeyWindow];

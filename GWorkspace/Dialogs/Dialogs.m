@@ -33,73 +33,106 @@
 #include "Dialogs.h"
 #include "GNUstep.h"
 
-@implementation FileOpsDialogView
+@implementation sympleDialogView
+
+- (id)initWithFrame:(NSRect)frameRect useSwitch:(BOOL)swtch
+{
+  self = [super initWithFrame: frameRect];
+
+  if (self) {
+    useSwitch = swtch;
+  }
+  
+  return self;
+}
 
 - (void)drawRect:(NSRect)rect
 {
-	STROKE_LINE (darkGrayColor, 0, 91, 240, 91);
-	STROKE_LINE (whiteColor, 0, 90, 240, 90);
+  if (useSwitch) {
+	  STROKE_LINE (darkGrayColor, 0, 121, 240, 121);
+	  STROKE_LINE (whiteColor, 0, 120, 240, 120);
+  } else {
+	  STROKE_LINE (darkGrayColor, 0, 91, 240, 91);
+	  STROKE_LINE (whiteColor, 0, 90, 240, 90);  
+  }
 	STROKE_LINE (darkGrayColor, 0, 45, 240, 45);
 	STROKE_LINE (whiteColor, 0, 44, 240, 44);
 }
 
 @end
 
-@implementation FileOpsDialog
+@implementation SympleDialog
 
 - (void)dealloc
 {
   RELEASE (titlefield);
 	RELEASE (editfield);
+	TEST_RELEASE (switchButt);
 	RELEASE (cancelbutt);
 	RELEASE (okbutt);	
   [super dealloc];
 }
 
-- (id)initWithTitle:(NSString *)title editText:(NSString *)etext;
+- (id)initWithTitle:(NSString *)title 
+           editText:(NSString *)etext
+        switchTitle:(NSString *)swtitle
 {
-	self = [super initWithContentRect: NSMakeRect(0, 0, 240, 120) 
+  NSRect r = swtitle ? NSMakeRect(0, 0, 240, 160) : NSMakeRect(0, 0, 240, 120);
+  
+	self = [super initWithContentRect: r
 					                styleMask: NSTitledWindowMask 
                             backing: NSBackingStoreRetained 
                               defer: NO];
-  	if(self) {
-      NSFont *font;
+  if(self) {
+    NSFont *font;
+    
+    useSwitch = swtitle ? YES : NO;
+    
+  	dialogView = [[sympleDialogView alloc] initWithFrame: [self frame] 
+                                               useSwitch: useSwitch];
+    AUTORELEASE (dialogView);
 
-  		dialogView = [[FileOpsDialogView alloc] initWithFrame: [self frame]];
-      AUTORELEASE (dialogView);
-		  
-      font = [NSFont systemFontOfSize: 18];
-		
-		  titlefield = [[NSTextField alloc] initWithFrame: NSMakeRect(10, 95, 200, 20)];
-		  [titlefield setBackgroundColor: [NSColor windowBackgroundColor]];
-		  [titlefield setBezeled: NO];
-		  [titlefield setEditable: NO];
-		  [titlefield setSelectable: NO];
-		  [titlefield setFont: font];
-		  [titlefield setStringValue: title];
-		  [dialogView addSubview: titlefield]; 
+    font = [NSFont systemFontOfSize: 18];
 
-		  editfield = [[NSTextField alloc] initWithFrame: NSMakeRect(30, 56, 180, 22)];
-		  [editfield setStringValue: etext];
-		  [dialogView addSubview: editfield];
+    r = useSwitch ? NSMakeRect(10, 125, 200, 20) : NSMakeRect(10, 95, 200, 20);
+		titlefield = [[NSTextField alloc] initWithFrame: r];
+		[titlefield setBackgroundColor: [NSColor windowBackgroundColor]];
+		[titlefield setBezeled: NO];
+		[titlefield setEditable: NO];
+		[titlefield setSelectable: NO];
+		[titlefield setFont: font];
+		[titlefield setStringValue: title];
+		[dialogView addSubview: titlefield]; 
 
-	  	cancelbutt = [[NSButton alloc] initWithFrame: NSMakeRect(100, 10, 60, 25)];
-	  	[cancelbutt setButtonType: NSMomentaryLight];
-	  	[cancelbutt setTitle: NSLocalizedString(@"Cancel", @"")];
-	  	[cancelbutt setTarget: self];
-	  	[cancelbutt setAction: @selector(buttonAction:)];		
-		  [dialogView addSubview: cancelbutt]; 
+    r = useSwitch ? NSMakeRect(30, 86, 180, 22) : NSMakeRect(30, 56, 180, 22);
+		editfield = [[NSTextField alloc] initWithFrame: r];
+		[editfield setStringValue: etext];
+		[dialogView addSubview: editfield];
 
-	  	okbutt = [[NSButton alloc] initWithFrame: NSMakeRect(170, 10, 60, 25)];
-	  	[okbutt setButtonType: NSMomentaryLight];
-	  	[okbutt setTitle: NSLocalizedString(@"OK", @"")];
-	  	[okbutt setTarget: self];
-	  	[okbutt setAction: @selector(buttonAction:)];		
-		  [dialogView addSubview: okbutt]; 
-      [self makeFirstResponder: okbutt];
+    if (useSwitch) {
+	    switchButt = [[NSButton alloc] initWithFrame: NSMakeRect(30, 62, 180, 16)];
+	    [switchButt setButtonType: NSSwitchButton];
+	    [switchButt setTitle: swtitle];
+		  [dialogView addSubview: switchButt]; 
+    }
 
-		  [self setContentView: dialogView];
-		  [self setTitle: @""];
+	  cancelbutt = [[NSButton alloc] initWithFrame: NSMakeRect(100, 10, 60, 25)];
+	  [cancelbutt setButtonType: NSMomentaryLight];
+	  [cancelbutt setTitle: NSLocalizedString(@"Cancel", @"")];
+	  [cancelbutt setTarget: self];
+	  [cancelbutt setAction: @selector(buttonAction:)];		
+		[dialogView addSubview: cancelbutt]; 
+
+	  okbutt = [[NSButton alloc] initWithFrame: NSMakeRect(170, 10, 60, 25)];
+	  [okbutt setButtonType: NSMomentaryLight];
+	  [okbutt setTitle: NSLocalizedString(@"OK", @"")];
+	  [okbutt setTarget: self];
+	  [okbutt setAction: @selector(buttonAction:)];		
+		[dialogView addSubview: okbutt]; 
+    [self makeFirstResponder: okbutt];
+
+		[self setContentView: dialogView];
+		[self setTitle: @""];
 	}
 
 	return self;
@@ -114,6 +147,14 @@
 - (NSString *)getEditFieldText
 {
 	return [editfield stringValue];
+}
+
+- (int)switchButtState
+{
+  if (useSwitch) {
+    return [switchButt state];
+  }
+  return 0;
 }
 
 - (void)buttonAction:(id)sender
