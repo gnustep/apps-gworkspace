@@ -95,6 +95,7 @@ static GWorkspace *gworkspace = nil;
   NSRect scr = [[NSScreen mainScreen] visibleFrame];
   NSRect wrect = NSZeroRect;
   FileOperation *op;
+  NSRect wr;
   int i;
 
 #define WMARGIN 50
@@ -107,7 +108,7 @@ static GWorkspace *gworkspace = nil;
 
   for (i = 0; i < [operations count]; i++) {
     op = [operations objectAtIndex: i];
-    NSRect wr = [op winRect];
+    wr = [op winRect];
     
     if (NSEqualRects(wr, NSZeroRect) == NO) {
       wrect = NSMakeRect(wr.origin.x + WSHIFT, 
