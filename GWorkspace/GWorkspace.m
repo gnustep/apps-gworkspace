@@ -657,6 +657,10 @@ return [ws openFile: fullPath withApplication: appName]
   useInspector = ![defaults boolForKey: @"noinspector"];
   if (useInspector) {
     [self connectInspector];
+    if (inspector) {
+      NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
+      [inspector setPathsData: data];
+    }
   }
 
   appsViewer = [[AppsViewer alloc] init];
@@ -2122,7 +2126,13 @@ NSLocalizedString(@"OK", @""), nil, nil); \
                     NSLocalizedString(@"Yes", @""),
                     NSLocalizedString(@"No", @""),
                     nil)) {
-    [self connectInspector];                
+    [self connectInspector]; 
+     
+    if (inspector) {
+      NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
+      [inspector setPathsData: data];
+    }
+                  
   } else {
     useInspector = NO;
   }
@@ -2281,6 +2291,10 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 {
 	if (inspector == nil) {
     [self connectInspector];
+    if (inspector) {
+      NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
+      [inspector setPathsData: data];
+    }    
   }
 	if (inspector && useInspector) {
     [inspector showWindow];
@@ -2291,6 +2305,10 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 {
 	if (inspector == nil) {
     [self connectInspector];
+    if (inspector) {
+      NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
+      [inspector setPathsData: data];
+    }
   }
   if (inspector && useInspector) {  
     [inspector showAttributes];
@@ -2301,6 +2319,10 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 {
 	if (inspector == nil) {
     [self connectInspector];
+    if (inspector) {
+      NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
+      [inspector setPathsData: data];
+    }
   }
   if (inspector && useInspector) {  
     [inspector showContents];
@@ -2311,6 +2333,10 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 {
 	if (inspector == nil) {
     [self connectInspector];
+    if (inspector) {
+      NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
+      [inspector setPathsData: data];
+    }
   }
   if (inspector && useInspector) {  
     [inspector showTools];
