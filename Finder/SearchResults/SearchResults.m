@@ -40,6 +40,9 @@
 
 static NSString *nibName = @"ResultsWindow";
 
+static NSString *lsfname = @"LiveSearch.lsf";
+
+
 @interface NSDictionary (ColumnsSort)
 
 - (int)compareColInfo:(NSDictionary *)dict;
@@ -72,6 +75,8 @@ static NSString *nibName = @"ResultsWindow";
   TEST_RELEASE (searchPaths);
   DESTROY (engineConn);
   DESTROY (engine);
+  RELEASE (dndConnName);
+	DESTROY (dndConn);
       
   [super dealloc];
 }
@@ -85,6 +90,7 @@ static NSString *nibName = @"ResultsWindow";
     id entry;
     NSRect r;
     int srh;
+    unsigned long cnref;
       
 		if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
       NSLog(@"failed to load %@!", nibName);
@@ -99,6 +105,11 @@ static NSString *nibName = @"ResultsWindow";
                                    refreshInterval: 0.05];
     [(NSBox *)progBox setContentView: progView]; 
     RELEASE (progView);
+    
+    r = [[(NSBox *)dragIconBox contentView] frame];
+    documentIcon = [[DocumentIcon alloc] initWithFrame: r searchResult: self];
+    [(NSBox *)dragIconBox setContentView: documentIcon]; 
+    RELEASE (documentIcon);
     
     [elementsLabel setStringValue: @""];
     
@@ -235,6 +246,21 @@ static NSString *nibName = @"ResultsWindow";
                         selector: @selector(fileSystemDidChange:) 
                 					  name: @"GWFileSystemDidChangeNotification"
                 					object: nil];    
+
+    cnref = (unsigned long)self;
+    ASSIGN (dndConnName, ([NSString stringWithFormat: @"search_res_dnd_%i", cnref]));
+    
+    dndConn = [[NSConnection alloc] initWithReceivePort: (NSPort *)[NSPort port] 
+																			         sendPort: nil];
+    [dndConn enableMultipleThreads];
+    [dndConn setRootObject: self];
+    [dndConn registerName: dndConnName];
+    [dndConn setDelegate: self];
+
+    [nc addObserver: self
+           selector: @selector(connectionDidDie:)
+               name: NSConnectionDidDieNotification
+             object: dndConn];    
   }
   
 	return self;
@@ -251,7 +277,7 @@ static NSString *nibName = @"ResultsWindow";
   ASSIGN (searchPaths, selection);
   ASSIGN (searchCriteria, criteria);
   engine = nil;
-  searchdone = NO;  
+  searching = YES;  
   
   port[0] = (NSPort *)[NSPort port];
   port[1] = (NSPort *)[NSPort port];
@@ -259,7 +285,7 @@ static NSString *nibName = @"ResultsWindow";
   ports = [NSArray arrayWithObjects: port[1], port[0], nil];
 
   engineConn = [[NSConnection alloc] initWithReceivePort: port[0]
-				                                      sendPort: port[1]];
+				                                        sendPort: port[1]];
   [engineConn setRootObject: self];
   [engineConn setDelegate: self];
 
@@ -286,40 +312,51 @@ static NSString *nibName = @"ResultsWindow";
   NS_ENDHANDLER
 }
 
-- (BOOL)connection:(NSConnection*)ancestor 
-								shouldMakeNewConnection:(NSConnection*)newConn
+- (BOOL)connection:(NSConnection *)ancestor 
+								shouldMakeNewConnection:(NSConnection *)newConn
 {
 	if (ancestor == engineConn) {
   	[newConn setDelegate: self];
+    
   	[nc addObserver: self 
 					 selector: @selector(connectionDidDie:)
 	    				 name: NSConnectionDidDieNotification 
              object: newConn];
-  	return YES;
 	}
 		
-  return NO;
+  return YES;
 }
 
 - (void)connectionDidDie:(NSNotification *)notification
 {
+	id diedconn = [notification object];
+
   [nc removeObserver: self
 	              name: NSConnectionDidDieNotification 
-              object: [notification object]];
+              object: diedconn];
 
-  if (searchdone == NO) {
+  if (diedconn == engineConn) {
+    if (searching) {
+      NSRunAlertPanel(nil, 
+                      NSLocalizedString(@"executor connection died!", @""), 
+                      NSLocalizedString(@"Continue", @""), 
+                      nil, 
+                      nil);
+      [self endOfSearch];
+    }
+    
+  } else if (diedconn == dndConn) {
     NSRunAlertPanel(nil, 
-                    NSLocalizedString(@"executor connection died!", @""), 
+                    NSLocalizedString(@"the connection for remote dnd has died", @""), 
                     NSLocalizedString(@"Continue", @""), 
                     nil, 
                     nil);
-    [self endOfSearch];
   }
 }
 
 - (void)threadWillExit:(NSNotification *)notification
 {
-  NSLog(@"search thread will exit");
+//  NSLog(@"search thread will exit");
 }
 
 - (void)registerEngine:(id)anObject
@@ -356,7 +393,8 @@ static NSString *nibName = @"ResultsWindow";
   [stopButt setEnabled: NO];
   [restartButt setEnabled: YES];
   [progView stop];
-
+  searching = NO;
+  
   if (engine) {
     [nc removeObserver: self
 	                name: NSConnectionDidDieNotification 
@@ -367,6 +405,11 @@ static NSString *nibName = @"ResultsWindow";
   }
 
   [self updateShownData];
+}
+
+- (BOOL)searching
+{
+  return searching;
 }
 
 - (IBAction)stopSearch:(id)sender
@@ -570,8 +613,158 @@ static NSString *nibName = @"ResultsWindow";
   return win;
 }
 
+- (NSString *)dndConnName
+{
+  return dndConnName;
+}
+
+- (oneway void)remoteDraggingDestinationReply:(NSData *)reply
+{
+  NSDictionary *replydict = [NSUnarchiver unarchiveObjectWithData: reply];
+  NSString *destination = [replydict objectForKey: @"destination"];
+  BOOL dndok = [[replydict objectForKey: @"dndok"] boolValue];
+
+  if (dndok == NO) {
+    NSString *msg = [NSString stringWithFormat: @"a file named \"LiveSearch\" already exists.\nPlease rename it."];
+    NSRunAlertPanel(NULL, msg, NSLocalizedString(@"Ok", @""), NULL, NULL);  
+  } else {
+    NSString *lsfpath = [destination stringByAppendingPathComponent: lsfname];
+    NSMutableDictionary *lsfdict = [NSMutableDictionary dictionary];
+    NSNotificationCenter *dnc = [NSDistributedNotificationCenter defaultCenter];
+    NSMutableDictionary *notifDict = [NSMutableDictionary dictionary];		
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    [notifDict setObject: @"GWorkspaceCreateFileOperation" 
+                  forKey: @"operation"];	
+    [notifDict setObject: destination forKey: @"source"];	
+    [notifDict setObject: destination forKey: @"destination"];	
+    [notifDict setObject: [NSArray arrayWithObject: lsfname] 
+                  forKey: @"files"];	
+
+	  [dnc postNotificationName: @"GWFileSystemWillChangeNotification"
+	 								     object: nil 
+                     userInfo: notifDict];
+  
+//    if ([lsfdict writeToFile: lsfpath atomically: YES] == NO) {
+//      NSString *msg = NSLocalizedString(@"can't create the Live Search folder", @"");
+//      NSRunAlertPanel(NULL, msg, NSLocalizedString(@"Ok", @""), NULL, NULL);  
+//    }
+	    
+	  [dnc postNotificationName: @"GWFileSystemDidChangeNotification"
+	 						         object: nil 
+                     userInfo: notifDict];  
+  }
+  
+
+
+/*
+  NSDictionary *replydict = [NSUnarchiver unarchiveObjectWithData: reply];
+  NSString *destination = [replydict objectForKey: @"destination"];
+  BOOL bookmark = [[replydict objectForKey: @"bookmark"] boolValue];
+  BOOL dndok = [[replydict objectForKey: @"dndok"] boolValue];
+
+  if (dndok == NO) {
+    NSString *msg = [NSString stringWithFormat: @"duplicate file name in '%@'", destination];
+    NSRunAlertPanel(NULL, msg, NSLocalizedString(@"Ok", @""), NULL, NULL);  
+  } else {
+    NSArray *srcPaths;
+    NSString *source;
+    NSMutableArray *files;
+    FileOpInfo *op;
+    int i;
+    
+    srcPaths = [replydict objectForKey: @"paths"];
+    source = [srcPaths objectAtIndex: 0];
+    source = [source stringByDeletingLastPathComponent];    
+    
+    files = [NSMutableArray array];
+    for (i = 0; i < [srcPaths count]; i++) {
+      [files addObject: [[srcPaths objectAtIndex: i] lastPathComponent]];
+    }
+  	
+    if (bookmark) {
+      NSString *bookmarkName;
+      NSString *bookmarkPath;
+      NSMutableDictionary *bmkDict;
+      NSString *path;
+      NSArray	*subStrings;
+      NSString *prgPath;
+      NSDictionary *contents;
+      unsigned count;      
+      
+      bookmarkName = [srcPaths objectAtIndex: 0];
+      bookmarkPath = [destination stringByAppendingPathComponent: bookmarkName];
+      bmkDict = [NSMutableDictionary dictionary];
+      
+      [bmkDict setObject: hostname forKey: @"hostname"];
+      [bmkDict setObject: @"ftp" forKey: @"scheme"];
+      [bmkDict setObject: selectedPaths forKey: @"selection"];
+    
+      if ([selectedPaths count] > 1) {
+        path = [[selectedPaths objectAtIndex: 0] stringByDeletingLastPathComponent];
+      } else {
+        path = [selectedPaths objectAtIndex: 0];
+      }
+
+      subStrings = [path componentsSeparatedByString: pathSeparator];
+	    count = [subStrings count];
+ 
+      prgPath = [NSString stringWithString: pathSeparator];
+      contents = [self contentsForPath: prgPath];
+      if (contents) {
+        [bmkDict setObject: contents forKey: prgPath];
+      }
+
+      for (i = 0; i < count; i++) {
+		    NSString *str = [subStrings objectAtIndex: i];
+
+		    if ([str isEqualToString: @""] == NO) {
+          prgPath = [prgPath stringByAppendingPathComponent: str];
+          contents = [self contentsForPath: prgPath];
+          
+          if (contents) {
+            [bmkDict setObject: contents forKey: prgPath];
+          }
+		    }
+	    }
+ 
+      if ([bmkDict writeToFile: bookmarkPath atomically: YES] == NO) {
+        NSString *msg = NSLocalizedString(@"can't save the bookmark", @"");
+        NSRunAlertPanel(NULL, msg, NSLocalizedString(@"Ok", @""), NULL, NULL);  
+      }
+
+    } else {    
+      op = [FileOpInfo fileOpInfoForViewer: self
+                                      type: DOWNLOAD
+                                       ref: [self fileOpRef]
+                                    source: source
+                               destination: destination
+                                     files: files
+                                 usewindow: YES
+                                   winrect: [gwnetapp rectForFileOpWindow]];
+
+      if ([self confirmOperation: op]) {
+        [self startOperation: op];
+      }
+    }
+  }   
+*/
+
+}
+
 - (BOOL)windowShouldClose:(id)sender
 {
+  if (dndConn) {
+    [dndConn registerName: nil];
+    DESTROY (dndConn);
+  } 
 	return YES;
 }
 
@@ -1023,3 +1216,114 @@ static NSString *nibName = @"ResultsWindow";
 }
 
 @end
+
+
+@implementation DocumentIcon
+
+- (void)dealloc
+{
+  RELEASE (icon);
+  [super dealloc];
+}
+
+- (id)initWithFrame:(NSRect)frameRect 
+       searchResult:(id)sres
+{
+  self = [super initWithFrame: frameRect];
+
+  if (self) {
+    ASSIGN (icon, [NSImage imageNamed: @"DragableDocument"]);
+    searchResult = sres;
+  }
+
+  return self;
+}
+
+- (void)mouseDown:(NSEvent *)theEvent
+{
+	NSEvent *nextEvent;
+  BOOL startdnd = NO;
+  int dragdelay = 0;
+  NSPoint p = [theEvent locationInWindow];
+  
+  p = [self convertPoint: p fromView: nil];
+  
+	if ([theEvent clickCount] == 1) {   
+    while (1) {
+	    nextEvent = [[self window] nextEventMatchingMask:
+    							              NSLeftMouseUpMask | NSLeftMouseDraggedMask];
+
+      if ([nextEvent type] == NSLeftMouseUp) {
+        [[self window] postEvent: nextEvent atStart: NO];
+        break;
+
+      } else if ([nextEvent type] == NSLeftMouseDragged) {
+	      if (dragdelay < 5) {
+          dragdelay++;
+        } else {        
+          startdnd = YES;        
+          break;
+        }
+      }
+    }
+
+    if (startdnd == YES) {  
+      [self startExternalDragOnEvent: nextEvent];    
+    } 
+  }              
+}
+
+- (void)drawRect:(NSRect)rect
+{
+  [super drawRect: rect];
+  [icon compositeToPoint: NSMakePoint(2, 2) 
+               operation: NSCompositeSourceOver];
+}
+
+- (void)startExternalDragOnEvent:(NSEvent *)event
+{
+  NSPoint dragPoint = [event locationInWindow];
+  NSPasteboard *pb = [NSPasteboard pasteboardWithName: NSDragPboard];	
+  NSArray *dndtypes = [NSArray arrayWithObject: @"GWRemoteFilenamesPboardType"];
+  NSMutableDictionary *pbDict = [NSMutableDictionary dictionary];
+  NSData *pbData = nil;
+  
+  [pb declareTypes: dndtypes owner: nil]; 
+    
+  [pbDict setObject: [NSArray arrayWithObject: lsfname] 
+             forKey: @"paths"];  
+  [pbDict setObject: [NSNumber numberWithBool: YES] forKey: @"bookmark"];  
+  [pbDict setObject: [searchResult dndConnName] 
+             forKey: @"dndconn"];
+  
+  pbData = [NSArchiver archivedDataWithRootObject: pbDict];
+  [pb setData: pbData forType: @"GWRemoteFilenamesPboardType"];
+
+  [self dragImage: icon
+               at: [self convertPoint: dragPoint fromView: nil] 
+           offset: NSZeroSize
+            event: event
+       pasteboard: pb
+           source: self
+        slideBack: YES];
+}
+
+- (unsigned int)draggingSourceOperationMaskForLocal:(BOOL)flag
+{
+  return NSDragOperationAll;
+}
+
+- (BOOL)ignoreModifierKeysWhileDragging
+{
+  return YES;
+}
+
+- (void)draggedImage:(NSImage *)anImage 
+						 endedAt:(NSPoint)aPoint 
+           deposited:(BOOL)flag
+{
+  [self setNeedsDisplay: YES];
+}
+
+@end 
+

@@ -2723,31 +2723,3 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 
 @end
 
-
-/*
-FROM GWNET
-- (void)declareAndSetShapeOnPasteboard:(NSPasteboard *)pb
-{
-  NSArray *dndtypes;
-  NSData *pbData;
-  NSMutableDictionary *pbDict;	
-  BOOL bookmark;
-    
-  dndtypes = [NSArray arrayWithObject: GWRemoteFilenamesPboardType];
-  [pb declareTypes: dndtypes owner: nil]; 
-
-  pbDict = [NSMutableDictionary dictionary];      
-  bookmark = (dndMask == NSDragOperationLink) ? YES : NO;
-  if (bookmark) {
-    NSString *bookmarkName = [remoteHostName stringByAppendingString: @".bmk"];
-    [pbDict setObject: [NSArray arrayWithObject: bookmarkName] forKey: @"paths"];  
-  } else {
-    [pbDict setObject: paths forKey: @"paths"];  
-  }
-  [pbDict setObject: [NSNumber numberWithBool: bookmark] forKey: @"bookmark"];  
-  [pbDict setObject: [[browser delegate] dndConnName] forKey: @"dndconn"];
-      
-  pbData = [NSArchiver archivedDataWithRootObject: pbDict];
-  [pb setData: pbData forType: GWRemoteFilenamesPboardType];
-}
-*/

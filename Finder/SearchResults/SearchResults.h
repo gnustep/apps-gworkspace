@@ -30,11 +30,13 @@
 
 @class Finder;
 @class NSWindow;
+@class NSView;
 @class ResultsTableView;
 @class NSTableColumn;
 @class ResultsPathsView;
 @class NSImage;
 @class ProgressView;
+@class DocumentIcon;
 
 @protocol SearchResultsProtocol
 
@@ -71,6 +73,7 @@
   IBOutlet id stopButt;
   IBOutlet id restartButt;
   IBOutlet id dragIconBox;
+  DocumentIcon *documentIcon;
   
   IBOutlet id splitView;
   
@@ -95,7 +98,10 @@
   NSDictionary *searchCriteria;
   NSConnection *engineConn;
   id <SearchEngineProtocol> engine;
-  BOOL searchdone;
+  BOOL searching;
+  
+  NSConnection *dndConn;
+  NSString *dndConnName;
   
   NSFileManager *fm;
   id ws;
@@ -114,6 +120,8 @@
 - (void)nextResult:(NSString *)path;
 
 - (void)endOfSearch;
+
+- (BOOL)searching;
 
 - (IBAction)stopSearch:(id)sender;
 
@@ -136,6 +144,10 @@
 - (void)saveColumnsSizes;
 
 - (NSWindow *)win;
+
+- (NSString *)dndConnName;
+
+- (oneway void)remoteDraggingDestinationReply:(NSData *)reply;
 
 // ResultsTableView delegate
 - (NSImage *)tableView:(NSTableView *)tableView 
@@ -187,5 +199,22 @@
 
 @end
 
+
+@interface DocumentIcon : NSView 
+{
+  NSImage *icon;
+  id searchResult;
+}
+
+- (id)initWithFrame:(NSRect)frameRect 
+       searchResult:(id)sres;
+
+- (void)startExternalDragOnEvent:(NSEvent *)event;
+
+- (unsigned int)draggingSourceOperationMaskForLocal:(BOOL)flag;
+
+- (BOOL)ignoreModifierKeysWhileDragging;
+
+@end
 
 #endif // SEARCH_RESULTS_H

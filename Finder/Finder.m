@@ -295,6 +295,12 @@ static Finder *finder = nil;
   } 
 }
 
+- (BOOL)application:(NSApplication *)application 
+           openFile:(NSString *)fileName
+{
+  return YES;
+}
+
 - (BOOL)applicationShouldTerminate:(NSApplication *)app 
 {
   int i;

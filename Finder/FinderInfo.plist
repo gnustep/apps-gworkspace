@@ -1,8 +1,14 @@
 {
     NSIcon = "Finder.tiff";
-    NSRole = "NSNone";
+    NSRole = "Viewer";
     ApplicationDescription = "Finder";
     ApplicationIcon = "Finder.tiff";
     ApplicationName = "Finder";
     ApplicationRelease = "0.7.0";
+    NSTypes = (
+      {
+        NSUnixExtensions = ( "lsf" );
+        NSIcon = "LiveSearchFolder.tiff";
+      }
+    );
 }
