@@ -654,14 +654,14 @@ static FSNodeRep *shared = nil;
   return 0.8125;
 }
 
-+ (float)labelMargin
++ (int)labelMargin
 {
-  return 4.0;
+  return 4;
 }
 
-+ (float)defaultIconBaseShift
++ (int)defaultIconBaseShift
 {
-  return 12.0;
+  return 12;
 }
 
 + (void)setDefaultSortOrder:(int)order

@@ -62,6 +62,14 @@
   titlelenght = [[self stringValue] sizeWithAttributes: fontAttr].width; 
 }
 
+- (void)setFont:(NSFont *)fontObj
+{
+  [super setFont: fontObj];
+  ASSIGN (fontAttr, [NSDictionary dictionaryWithObject: [self font] 
+                                                forKey: NSFontAttributeName]);
+  dtslenght = [dots sizeWithAttributes: fontAttr].width;     
+}
+
 - (void)setIcon:(NSImage *)icn
 { 
   ASSIGN (icon, icn);

@@ -137,9 +137,9 @@ typedef enum FSNInfoType {
 
 + (float)highlightHeightFactor;
 
-+ (float)labelMargin;
++ (int)labelMargin;
 
-+ (float)defaultIconBaseShift;
++ (int)defaultIconBaseShift;
 
 + (void)setDefaultSortOrder:(int)order;
 

@@ -120,8 +120,8 @@ static NSFont *labelFont = nil;
     [self setNodeInfoShowType: FSNInfoNameType];
     
     labelRect = NSZeroRect;
-    labelRect.size.width = [label uncuttedTitleLenght] + [FSNodeRep labelMargin];
-    labelRect.size.height = [[label font] defaultLineHeightForFont];
+    labelRect.size.width = ceil([label uncuttedTitleLenght] + [FSNodeRep labelMargin]);
+    labelRect.size.height = floor([[label font] defaultLineHeightForFont]);
 
     icnPosition = ipos;
     gridIndex = gindex;
@@ -223,9 +223,9 @@ static NSFont *labelFont = nil;
   NSSize sz = [icon size];
   
   if (icnPosition == NSImageAbove) {
-    float lblmargin = [FSNodeRep labelMargin];
+    int lblmargin = [FSNodeRep labelMargin];
     
-    labelRect.size.width = [label uncuttedTitleLenght] + lblmargin;
+    labelRect.size.width = ceil([label uncuttedTitleLenght] + lblmargin);
   
     if (labelRect.size.width >= frameRect.size.width) {
       labelRect.size.width = frameRect.size.width;
@@ -235,7 +235,7 @@ static NSFont *labelFont = nil;
     }
   
     labelRect.origin.y = 0;
-    labelRect.origin.y += (lblmargin / 2);
+    labelRect.origin.y += ceil(lblmargin / 2);
     
     if (selectable) {
       float hlx = (frameRect.size.width - hlightRect.size.width) / 2;
@@ -257,7 +257,7 @@ static NSFont *labelFont = nil;
       icnBounds.origin.y = hlightRect.origin.y + ((hlightRect.size.height - sz.height) / 2);
     
     } else {
-      float baseShift = [FSNodeRep defaultIconBaseShift];
+      int baseShift = [FSNodeRep defaultIconBaseShift];
       icnBounds.origin.x = (frameRect.size.width - sz.width) / 2;
       icnBounds.origin.y = labelRect.size.height + baseShift;
     }
@@ -397,35 +397,6 @@ static NSFont *labelFont = nil;
 
 - (void)drawRect:(NSRect)rect
 {	 
-
-/*
-  rect.origin.x = floor(rect.origin.x);
-  rect.origin.y = floor(rect.origin.y);
-  rect.size.width = ceil(rect.size.width) + 1;
-  rect.size.height = ceil(rect.size.height) + 1;
-
-  [[NSColor windowBackgroundColor] set];
-  NSRectFill(rect);
-*/
-
-/*
-NSRect
-NSIntegralRect(NSRect aRect)
-{
-  NSRect	rect;
-
-  if (NSIsEmptyRect(aRect))
-    return NSMakeRect(0, 0, 0, 0);
-
-  rect.origin.x = floor(NSMinX(aRect));
-  rect.origin.y = floor(NSMinY(aRect));
-  rect.size.width = ceil(NSMaxX(aRect)) - rect.origin.x;
-  rect.size.height = ceil(NSMaxY(aRect)) - rect.origin.y;
-  return rect;
-}
-*/
-
- 
   if (isSelected) {
     [[NSColor selectedControlColor] set];
 //    [highlightPath stroke];
@@ -508,8 +479,8 @@ NSIntegralRect(NSRect aRect)
 - (void)setFont:(NSFont *)fontObj
 {
   [label setFont: fontObj];
-  labelRect.size.width = [label uncuttedTitleLenght] + [FSNodeRep labelMargin];
-  labelRect.size.height = [[label font] defaultLineHeightForFont];
+  labelRect.size.width = ceil([label uncuttedTitleLenght] + [FSNodeRep labelMargin]);
+  labelRect.size.height = floor([[label font] defaultLineHeightForFont]);
   [self tile];
 }
 
