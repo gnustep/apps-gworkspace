@@ -61,7 +61,7 @@
 
 @protocol	FSWClientProtocol
 
-- (void)watchedDirectoryDidChange:(NSData *)dirinfo;
+- (void)watchedPathDidChange:(NSData *)dirinfo;
 
 @end
 
@@ -81,6 +81,20 @@
 @end
 
 
+@protocol	InspectorProtocol
+
+- (oneway void)addViewerWithBundleData:(NSData *)bundleData;
+
+- (oneway void)showContentsAt:(NSString *)path;
+
+- (BOOL)canDisplayDataOfType:(NSString *)type;
+
+- (oneway void)showData:(NSData *)data 
+                 ofType:(NSString *)type;
+
+@end
+
+
 @interface GWorkspace : NSObject <GWProtocol, FSWClientProtocol>
 {
 	NSString *defEditor, *defXterm, *defXtermArgs;
@@ -95,6 +109,9 @@
   id fswatcher;
   BOOL fswnotifications;
 	
+  id inspector;
+  BOOL useInspector;
+  
   AppsViewer *appsViewer;
   FinderController *finder;
   PrefController *prefController;
@@ -256,6 +273,10 @@
 - (void)connectFSWatcher;
 
 - (void)fswatcherConnectionDidDie:(NSNotification *)notif;
+
+- (void)connectInspector;
+
+- (void)inspectorConnectionDidDie:(NSNotification *)notif;
 
 - (id)connectApplication:(NSString *)appName;
 

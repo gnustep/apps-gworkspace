@@ -1,0 +1,5 @@
+{
+   Name = "Image Inspector";
+   Description = "This Inspector allow you view the content of an Image file";
+}
+

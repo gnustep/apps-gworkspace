@@ -1,0 +1,4 @@
+{
+   Name = "Application Inspector";
+   Description = "Displays info about an application bundle";
+}

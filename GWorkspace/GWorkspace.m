@@ -484,9 +484,9 @@ return [ws openFile: fullPath withApplication: appName]
     [fswatcher unregisterClient: (id <FSWClientProtocol>)self];
     DESTROY (fswatcher);
   }
-
   [[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
   [[NSNotificationCenter defaultCenter] removeObserver: self];
+  DESTROY (inspector);
 	RELEASE (defEditor);
 	RELEASE (defXterm);
 	RELEASE (defXtermArgs);
@@ -654,6 +654,12 @@ return [ws openFile: fullPath withApplication: appName]
   fswatcher = nil;
   fswnotifications = YES;
   [self connectFSWatcher];
+
+  inspector = nil;
+  useInspector = ![defaults boolForKey: @"noinspector"];
+  if (useInspector) {
+    [self connectInspector];
+  }
 
   appsViewer = [[AppsViewer alloc] init];
 	history = [[History alloc] init];
@@ -923,6 +929,8 @@ return [ws openFile: fullPath withApplication: appName]
 	if ((inspController != nil) && ([[inspController myWin] isVisible])) {  
 		[inspController updateDefaults]; 
 	}
+
+//  [defaults setBool: !useInspector forKey: @"noinspector"];
 
 	if ([[appsViewer myWin] isVisible]) {  
 		[appsViewer updateDefaults]; 
@@ -1584,7 +1592,16 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 				
 	  [[NSNotificationCenter defaultCenter]
  				 postNotificationName: GWCurrentSelectionChangedNotification
-	 								        object: nil];      
+	 								        object: nil];   
+                          
+                          
+    if (inspector && useInspector) {
+      if ([selectedPaths count] == 1) {
+        [inspector showContentsAt: [selectedPaths objectAtIndex: 0]];
+      }
+    }
+    
+    
   }
 }
 
@@ -1653,6 +1670,12 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   if (inspController != nil) {
     [inspController showPasteboardData: data ofType: type typeIcon: icon];
   }    
+  
+  if (inspector && useInspector) {
+    if ([inspector canDisplayDataOfType: type]) {
+      [inspector showData: data ofType: type];
+    }
+  }
 }
 
 - (void)closeInspectors
@@ -1936,14 +1959,9 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 
 	    if (recursion == NO) {
         if (cmd == nil) {
-          #ifdef GNUSTEP	
             cmd = RETAIN ([[NSSearchPathForDirectoriesInDomains(
                       GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
                             stringByAppendingPathComponent: @"fswatcher"]);
-          #else
-            cmd = @"/usr/local/bin/fswatcher";
-            RETAIN (cmd);
-          #endif
 		    }
       }
 	  
@@ -1958,9 +1976,16 @@ NSLocalizedString(@"OK", @""), nil, nil); \
         RELEASE (cmd);
         
         for (i = 1; i <= 40; i++) {
-          [startAppWin updateProgressBy: 1 * 1.0];
+          [startAppWin updateProgressBy: 1.0];
 	        [[NSRunLoop currentRunLoop] runUntilDate:
 		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+                           
+          fsw = [NSConnection rootProxyForConnectionWithRegisteredName: @"fswatcher" 
+                                                                  host: @""];                  
+          if (fsw) {
+            [startAppWin updateProgressBy: 40.0 - i];
+            break;
+          }
         }
         
         [[startAppWin win] close];
@@ -2011,7 +2036,7 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   }
 }
 
-- (void)watchedDirectoryDidChange:(NSData *)dirinfo
+- (void)watchedPathDidChange:(NSData *)dirinfo
 {
   NSMutableDictionary *info = [[NSUnarchiver unarchiveObjectWithData: dirinfo] mutableCopy];
   NSString *event = [info objectForKey: @"event"];
@@ -2033,6 +2058,91 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 	 								     object: info];  
                        
   RELEASE (info);
+}
+
+- (void)connectInspector
+{
+  if (inspector == nil) {
+    id insp = [NSConnection rootProxyForConnectionWithRegisteredName: @"Inspector" 
+                                                                host: @""];
+
+    if (insp) {
+      NSConnection *c = [insp connectionForProxy];
+
+	    [[NSNotificationCenter defaultCenter] addObserver: self
+	                   selector: @selector(inspectorConnectionDidDie:)
+		                     name: NSConnectionDidDieNotification
+		                   object: c];
+      
+      inspector = insp;
+	    [inspector setProtocolForProxy: @protocol(InspectorProtocol)];
+      RETAIN (inspector);
+      
+	  } else {
+	    static BOOL recursion = NO;
+	  
+      if (recursion == NO) {
+        int i;
+        
+        [startAppWin showWindowWithTitle: @"GWorkspace"
+                                 appName: @"Inspector"
+                            maxProgValue: 40.0];
+
+        [ws launchApplication: @"Inspector"];
+
+        for (i = 1; i <= 40; i++) {
+          [startAppWin updateProgressBy: 1.0];
+	        [[NSRunLoop currentRunLoop] runUntilDate:
+		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+          insp = [NSConnection rootProxyForConnectionWithRegisteredName: @"Inspector" 
+                                                                   host: @""];                  
+          if (insp) {
+            [startAppWin updateProgressBy: 40.0 - i];
+            break;
+          }
+        }
+        
+        [[startAppWin win] close];
+        
+	      recursion = YES;
+	      [self connectInspector];
+	      recursion = NO;
+        
+	    } else { 
+	      recursion = NO;
+        useInspector = NO;
+        NSRunAlertPanel(nil,
+                NSLocalizedString(@"unable to contact Inspector!", @""),
+                NSLocalizedString(@"Ok", @""),
+                nil, 
+                nil);  
+      }
+	  }
+  }
+}
+
+- (void)inspectorConnectionDidDie:(NSNotification *)notif
+{
+  id connection = [notif object];
+
+  [[NSNotificationCenter defaultCenter] removeObserver: self
+	                    name: NSConnectionDidDieNotification
+	                  object: connection];
+
+  NSAssert(connection == [inspector connectionForProxy],
+		                                  NSInternalInconsistencyException);
+  RELEASE (inspector);
+  inspector = nil;
+
+  if (NSRunAlertPanel(nil,
+                    NSLocalizedString(@"The Inspector connection died.\nDo you want to restart it?", @""),
+                    NSLocalizedString(@"Yes", @""),
+                    NSLocalizedString(@"No", @""),
+                    nil)) {
+    [self connectInspector];                
+  } else {
+    useInspector = NO;
+  }
 }
 
 - (id)connectApplication:(NSString *)appName

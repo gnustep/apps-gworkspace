@@ -1,0 +1,63 @@
+/* AppViewer.h
+ *  
+ * Copyright (C) 2004 Free Software Foundation, Inc.
+ *
+ * Author: Enrico Sersale <enrico@imago.ro>
+ * Date: January 2004
+ *
+ * This file is part of the GNUstep Inspector application
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ */
+
+#ifndef APPVIEWER_H
+#define APPVIEWER_H
+
+#include <Foundation/Foundation.h>
+#include <AppKit/NSView.h>
+#include "ContentViewersProtocol.h"
+  
+@class NSMatrix;
+@class NSScrollView;
+@class NSTextField;
+@class NSWorkspace;
+
+@protocol ContentInspectorProtocol
+
+- (void)contentsReadyAt:(NSString *)path;
+
+@end 
+
+@interface AppViewer : NSView <ContentViewersProtocol>
+{
+	NSString *bundlePath;
+  BOOL removable;
+  NSData *dataRep;
+  BOOL external;
+  NSString *currentPath;
+	BOOL valid;
+
+	NSMatrix *matrix;
+	NSScrollView *scroll;
+  NSTextField *errLabel;
+	NSTextField *explField;
+  
+  id <ContentInspectorProtocol>inspector;
+  NSWorkspace *ws;
+}
+
+@end
+
+#endif // APPVIEWER_H

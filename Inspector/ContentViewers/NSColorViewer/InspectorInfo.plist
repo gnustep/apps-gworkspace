@@ -1,0 +1,5 @@
+{
+   Name = "NSColor Inspector";
+   Description = "This Inspector allow you view NSColor pasteboard data";
+}
+

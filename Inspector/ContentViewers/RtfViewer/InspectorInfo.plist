@@ -1,0 +1,5 @@
+{
+   Name = "Rtf-Txt Inspector";
+   Description = "This Inspector allow you view the content of an Rtf ot txt file";
+}
+

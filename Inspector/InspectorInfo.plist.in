@@ -1,0 +1,14 @@
+{
+    NSIcon = "MagnifyGlas.tiff";
+    NSRole = "NSNone";
+    ApplicationDescription = "Inspector";
+    ApplicationIcon = "FileManager.tiff";
+    ApplicationName = "@PACKAGE_NAME@";
+    ApplicationRelease = "@PACKAGE_VERSION@";
+  NSTypes = (
+    {
+      NSUnixExtensions = ( "inspector" );
+      NSIcon = "MagnifyGlas.tiff";
+    }    
+  );
+}

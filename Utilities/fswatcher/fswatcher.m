@@ -342,9 +342,7 @@
     NSLog(@"addWatcherForPath: %@ (LISTENER)", path);
     
   } else {
-    BOOL isdir;
-  
-    if ([fm fileExistsAtPath: path isDirectory: &isdir] && isdir) {
+    if ([fm fileExistsAtPath: path]) {
       [info addWatchedPath: path];
   	  watcher = [[Watcher alloc] initWithWatchedPath: path fswatcher: self];      
   	  [watchers addObject: watcher];
@@ -434,14 +432,18 @@
   
   [dict setObject: path forKey: @"path"];
   
-  if (event == FSWatcherDirectoryDeleted) {
+  if (event == WatchedDirDeleted) {
     [dict setObject: @"GWWatchedDirectoryDeleted" forKey: @"event"];  
-  } else if (event == FSWatcherFilesDeleted) {
+  } else if (event == FilesDeletedInWatchedDir) {
     [dict setObject: @"GWFileDeletedInWatchedDirectory" forKey: @"event"];
     [dict setObject: [info objectForKey: @"files"] forKey: @"files"];
-  } else if (event == FSWatcherFilesCreated) {
+  } else if (event == FilesCreatedInWatchedDir) {
     [dict setObject: @"GWFileCreatedInWatchedDirectory" forKey: @"event"];
     [dict setObject: [info objectForKey: @"files"] forKey: @"files"];
+  } else if (event == WatchedFileDeleted) {
+    [dict setObject: @"GWWatchedFileDeleted" forKey: @"event"];  
+  } else if (event == WatchedFileModified) {
+    [dict setObject: @"GWWatchedFileModified" forKey: @"event"];  
   }
 
   data = [NSArchiver archivedDataWithRootObject: dict];
@@ -450,7 +452,7 @@
 		FSWClientInfo *info = [clientsInfo objectAtIndex: i];
     
 		if ([info isWathchingPath: path]) {
-			[[info client] watchedDirectoryDidChange: data];
+			[[info client] watchedPathDidChange: data];
 		}
 	}
 }
@@ -478,12 +480,21 @@
   
   if (self) { 
 		NSDictionary *attributes;
-				
+		NSString *type;
+    		
+    ASSIGN (watchedPath, path);    
 		fm = [NSFileManager defaultManager];	
     attributes = [fm fileAttributesAtPath: path traverseLink: YES];
-    ASSIGN (watchedPath, path);    
-		ASSIGN (pathContents, ([fm directoryContentsAtPath: watchedPath]));
+    type = [attributes fileType];
 		ASSIGN (date, [attributes fileModificationDate]);		
+    
+    if (type == NSFileTypeDirectory) {
+		  ASSIGN (pathContents, ([fm directoryContentsAtPath: watchedPath]));
+      isdir = YES;
+    } else {
+      isdir = NO;
+    }
+    
     listeners = 1;
 		isOld = NO;
     fswatcher = fsw;
@@ -512,8 +523,15 @@
   if (attributes == nil) {
     notifdict = [NSMutableDictionary dictionary];
     [notifdict setObject: watchedPath forKey: @"path"];
-    [notifdict setObject: [NSNumber numberWithInt: FSWatcherDirectoryDeleted] 
-                  forKey: @"event"];
+    
+    if (isdir) {
+      [notifdict setObject: [NSNumber numberWithInt: WatchedDirDeleted] 
+                    forKey: @"event"];
+    } else {
+      [notifdict setObject: [NSNumber numberWithInt: WatchedFileDeleted] 
+                    forKey: @"event"];
+    }
+    
     [fswatcher watcherNotification: notifdict];              
 		isOld = YES;
     return;
@@ -522,61 +540,74 @@
   moddate = [attributes fileModificationDate];
 
   if ([date isEqualToDate: moddate] == NO) {
-    NSArray *oldconts = [pathContents copy];
-    NSArray *newconts = [fm directoryContentsAtPath: watchedPath];	
-    NSMutableArray *diffFiles = [NSMutableArray array];
-    int i;
+    if (isdir) {
+      NSArray *oldconts = [pathContents copy];
+      NSArray *newconts = [fm directoryContentsAtPath: watchedPath];	
+      NSMutableArray *diffFiles = [NSMutableArray array];
+      int i;
 
-    ASSIGN (date, moddate);	
-    ASSIGN (pathContents, newconts);
+      ASSIGN (date, moddate);	
+      ASSIGN (pathContents, newconts);
 
-    notifdict = [NSMutableDictionary dictionary];
-    [notifdict setObject: watchedPath forKey: @"path"];
-
-		/* if there is an error in fileAttributesAtPath */
-		/* or watchedPath doesn't exist anymore         */
-		if (newconts == nil) {	
-      [notifdict setObject: [NSNumber numberWithInt: FSWatcherDirectoryDeleted] 
-                    forKey: @"event"];
-      [fswatcher watcherNotification: notifdict];
-      RELEASE (oldconts);
-			isOld = YES;
-    	return;
-		}
-		
-    for (i = 0; i < [oldconts count]; i++) {
-      NSString *fname = [oldconts objectAtIndex: i];
-      if ([newconts containsObject: fname] == NO) {
-        [diffFiles addObject: fname];
-      }
-    }
-
-    if ([diffFiles count] > 0) {
-      [notifdict setObject: [NSNumber numberWithInt: FSWatcherFilesDeleted] 
-                    forKey: @"event"];
-      [notifdict setObject: diffFiles forKey: @"files"];
-      [fswatcher watcherNotification: notifdict];
-    }
-
-    diffFiles = [NSMutableArray array];
-
-    for (i = 0; i < [newconts count]; i++) {
-      NSString *fname = [newconts objectAtIndex: i];
-      if ([oldconts containsObject: fname] == NO) {   
-        [diffFiles addObject: fname];
-      }
-    }
-		
-    if ([diffFiles count] > 0) {
+      notifdict = [NSMutableDictionary dictionary];
       [notifdict setObject: watchedPath forKey: @"path"];
-      [notifdict setObject: [NSNumber numberWithInt: FSWatcherFilesCreated] 
+
+		  /* if there is an error in fileAttributesAtPath */
+		  /* or watchedPath doesn't exist anymore         */
+		  if (newconts == nil) {	
+        [notifdict setObject: [NSNumber numberWithInt: WatchedDirDeleted] 
+                      forKey: @"event"];
+        [fswatcher watcherNotification: notifdict];
+        RELEASE (oldconts);
+			  isOld = YES;
+    	  return;
+		  }
+
+      for (i = 0; i < [oldconts count]; i++) {
+        NSString *fname = [oldconts objectAtIndex: i];
+        if ([newconts containsObject: fname] == NO) {
+          [diffFiles addObject: fname];
+        }
+      }
+
+      if ([diffFiles count] > 0) {
+        [notifdict setObject: [NSNumber numberWithInt: FilesDeletedInWatchedDir] 
+                      forKey: @"event"];
+        [notifdict setObject: diffFiles forKey: @"files"];
+        [fswatcher watcherNotification: notifdict];
+      }
+
+      diffFiles = [NSMutableArray array];
+
+      for (i = 0; i < [newconts count]; i++) {
+        NSString *fname = [newconts objectAtIndex: i];
+        if ([oldconts containsObject: fname] == NO) {   
+          [diffFiles addObject: fname];
+        }
+      }
+
+      if ([diffFiles count] > 0) {
+        [notifdict setObject: watchedPath forKey: @"path"];
+        [notifdict setObject: [NSNumber numberWithInt: FilesCreatedInWatchedDir] 
+                      forKey: @"event"];
+        [notifdict setObject: diffFiles forKey: @"files"];
+        [fswatcher watcherNotification: notifdict];
+      }
+
+      TEST_RELEASE (oldconts);	
+      	
+	  } else {  // isdir == NO
+      ASSIGN (date, moddate);	
+      
+      notifdict = [NSMutableDictionary dictionary];
+      
+      [notifdict setObject: watchedPath forKey: @"path"];
+      [notifdict setObject: [NSNumber numberWithInt: WatchedFileModified] 
                     forKey: @"event"];
-      [notifdict setObject: diffFiles forKey: @"files"];
+                    
       [fswatcher watcherNotification: notifdict];
     }
-    
-    TEST_RELEASE (oldconts);		
-	}   
+  } 
 }
 
 - (void)addListener

@@ -30,14 +30,16 @@
 @class Watcher;
 
 enum {
-  FSWatcherDirectoryDeleted,
-  FSWatcherFilesCreated,
-  FSWatcherFilesDeleted
+  WatchedDirDeleted,
+  FilesCreatedInWatchedDir,
+  FilesDeletedInWatchedDir,
+  WatchedFileDeleted,
+  WatchedFileModified
 };
 
 @protocol	FSWClientProtocol
 
-- (oneway void)watchedDirectoryDidChange:(NSData *)dirinfo;
+- (oneway void)watchedPathDidChange:(NSData *)dirinfo;
 
 @end
 
@@ -125,6 +127,7 @@ enum {
 @interface Watcher: NSObject
 {
   NSString *watchedPath;  
+  BOOL isdir;
   NSArray *pathContents;
   int listeners;
   NSDate *date;
