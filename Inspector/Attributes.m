@@ -168,7 +168,7 @@ static BOOL sizeStop = NO;
 - (void)activateForPaths:(NSArray *)paths
 {
 	NSString *fpath;
-	NSString *ftype, *fsize, *s;
+	NSString *ftype, *s;
 	NSString *usr, *grp, *tmpusr, *tmpgrp;
 	NSDate *date;
   NSDate *tmpdate = nil;
@@ -178,16 +178,14 @@ static BOOL sizeStop = NO;
 	BOOL sameOwner, sameGroup;
 	int i;
 
+  sizeStop = YES;
+
   if (paths == nil) {
     DESTROY (insppaths);
     return;
   }
   	
 	attrs = [fm fileAttributesAtPath: [paths objectAtIndex: 0] traverseLink: NO];
-	if (attributes && [attrs isEqualToDictionary: attributes] 
-                                  && [paths isEqualToArray: insppaths]) {
-		return;
-	}
 
 	ASSIGN (insppaths, paths);
 	pathscount = [insppaths count];	
@@ -196,7 +194,7 @@ static BOOL sizeStop = NO;
 
 	[revertButt setEnabled: NO];
 	[okButt setEnabled: NO];
-	
+  	
 	if (pathscount == 1) {   // Single Selection
     [iconView setImage: [[NSWorkspace sharedWorkspace] iconForFile: currentPath]];
     [titleField setStringValue: [currentPath lastPathComponent]];
@@ -217,12 +215,18 @@ static BOOL sizeStop = NO;
     [insideButt	setState: NSOffState];
 
 		ftype = [attributes objectForKey: NSFileType];
-		if ([ftype isEqualToString: NSFileTypeDirectory] == NO) {	
+		if ([ftype isEqual: NSFileTypeDirectory] == NO) {	
+      NSString *fsize = fileSizeDescription([[attributes objectForKey: NSFileSize] intValue]);
+		  [sizeField setStringValue: fsize]; 
       [insideButt	setEnabled: NO];
-			fsize = fileSizeDescription([[attributes objectForKey: NSFileSize] intValue]);
-		} else {
+    } else {
+      if (sizer == nil) {
+        [self startSizer];
+      } else {
+        [sizeField setStringValue: NSLocalizedString(@"calculating...", @"")]; 
+        [sizer computeSizeOfPaths: insppaths];
+      }
       [insideButt	setEnabled: YES];
-			fsize = @"";
 		}
 
 		s = [currentPath stringByDeletingLastPathComponent];
@@ -239,7 +243,6 @@ static BOOL sizeStop = NO;
 			[linkToField setTextColor: [NSColor darkGrayColor]];		
 		}
 			
-		[sizeField setStringValue: fsize]; 
 		[ownerField setStringValue: usr]; 
 		[groupField setStringValue: grp]; 
 
@@ -249,16 +252,6 @@ static BOOL sizeStop = NO;
 		[timeDateView setDate: cdate];
 		[yearlabel setStringValue: [NSString stringWithFormat: @"%d", [cdate yearOfCommonEra]]];
 
-    if ([ftype isEqualToString: NSFileTypeDirectory]) {
-      if (sizer == nil) {
-        [self startSizer];
-      } else {
-        sizeStop = YES;
-        [sizeField setStringValue: NSLocalizedString(@"calculating...", @"")]; 
-        [sizer computeSizeOfPaths: insppaths];
-      }
-    }
-
 	} else {	   // Multiple Selection
     NSString *items = NSLocalizedString(@"items", @"");
     
@@ -267,7 +260,14 @@ static BOOL sizeStop = NO;
     [iconView setImage: [NSImage imageNamed: @"MultipleSelection.tiff"]];
   
 		ftype = [attributes objectForKey: NSFileType];
-		fsize = @"";
+    
+    if (sizer == nil) {
+      [self startSizer];
+    } else {
+      [sizeField setStringValue: NSLocalizedString(@"calculating...", @"")]; 
+      [sizer computeSizeOfPaths: insppaths];
+    }
+
 		usr = [attributes objectForKey: NSFileOwnerAccountName];
 		grp = [attributes objectForKey: NSFileGroupOwnerAccountName];
 		date = [attributes objectForKey: NSFileModificationDate];
@@ -310,7 +310,6 @@ static BOOL sizeStop = NO;
 		[linkToLabel setTextColor: [NSColor darkGrayColor]];		
 		[linkToField setStringValue: @""];
 
-		[sizeField setStringValue: fsize]; 
 		[ownerField setStringValue: usr]; 
 		[groupField setStringValue: grp]; 
     
@@ -321,14 +320,6 @@ static BOOL sizeStop = NO;
 		cdate = [date dateWithCalendarFormat: nil timeZone: nil];	
 		[timeDateView setDate: cdate];
 		[yearlabel setStringValue: [NSString stringWithFormat: @"%d", [cdate yearOfCommonEra]]];	
-
-    if (sizer == nil) {
-      [self startSizer];
-    } else {
-      sizeStop = YES;
-      [sizeField setStringValue: NSLocalizedString(@"calculating...", @"")]; 
-      [sizer computeSizeOfPaths: insppaths];
-    }
 	}
 	
 	[mainBox setNeedsDisplay: YES];
@@ -360,7 +351,7 @@ static BOOL sizeStop = NO;
 {
 	NSMutableDictionary *attrs;
 	NSDirectoryEnumerator *enumerator;	
-	NSString *path, *fpath, *ftype;
+	NSString *path, *fpath;
 	int oldperms, newperms, i;
 	BOOL isdir;
 	BOOL recursive;
@@ -397,7 +388,6 @@ static BOOL sizeStop = NO;
 		}
 	
 	} else {
-	
 		for (i = 0; i < [insppaths count]; i++) {
 			path = [insppaths objectAtIndex: i];
 			[fm fileExistsAtPath: path isDirectory: &isdir];
@@ -719,8 +709,10 @@ static BOOL sizeStop = NO;
 			}
 		}
 	}	
-	
-  [attributes sizeReady: fileSizeDescription(dirsize)]; 
+
+  if (sizeStop == NO) {
+    [attributes sizeReady: fileSizeDescription(dirsize)]; 
+  }
 }
 
 @end

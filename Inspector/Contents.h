@@ -27,6 +27,8 @@
 
 #include <Foundation/Foundation.h>
 
+@class NSWorkspace;
+
 @interface Contents : NSObject
 {
   IBOutlet id win;
