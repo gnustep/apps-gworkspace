@@ -117,6 +117,29 @@
       RELEASE (view);
       [tView setLastTabItem: item];
       RELEASE (item);
+      
+      item = [[TShelfViewItem alloc] initWithTabType: FILES_TAB];
+      [item setLabel: @"Tab1"];
+      view = [[TShelfIconsView alloc] initWithIconsDescription: nil 
+                                                     iconsType: FILES_TAB
+                                                      lastView: NO];
+      [view setFrame: NSMakeRect(0, 0, sizew, 80)];
+      [item setView: view];
+      RELEASE (view);
+      [tView addTabItem: item];
+      RELEASE (item);
+
+      item = [[TShelfViewItem alloc] initWithTabType: DATA_TAB];
+      [item setLabel: @"Pasteboard"];
+      view = [[TShelfIconsView alloc] initWithIconsDescription: nil 
+                                                     iconsType: DATA_TAB
+                                                      lastView: NO];
+      [view setFrame: NSMakeRect(0, 0, sizew, 80)];
+      [item setView: view];
+      RELEASE (view);
+      [tView addTabItem: item];
+      RELEASE (item);
+      
       [self saveDefaults];
     }
   }

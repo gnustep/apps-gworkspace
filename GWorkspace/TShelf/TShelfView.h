@@ -43,7 +43,6 @@
   int selectedItem;
   NSButton *hideButton;
   BOOL hiddentabs;
-  float buttw;
 }
 
 - (void)addTabItem:(TShelfViewItem *)item;

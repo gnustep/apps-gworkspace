@@ -186,7 +186,6 @@
         NSDictionary *moduleCriteria = [criteria objectForKey: className];
         id module = [[principalClass alloc] initWithSearchCriteria: moduleCriteria
                                                         searchTool: self];
-
         [modules addObject: module];
         RELEASE (module);  
       }
