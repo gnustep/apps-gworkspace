@@ -47,10 +47,7 @@
 @class PrefController;
 @class AppsViewer;
 @class Fiend;
-@class Recycler;
 @class History;
-@class DesktopWindow;
-@class DesktopView;
 @class TShelfWin;
 @class OpenWithController;
 @class RunExternalController;
@@ -146,17 +143,12 @@
   BOOL contestualMenu;
 
   BOOL dontWarnOnQuit;
-
-  DesktopWindow *desktopWindow;
   
   TShelfWin *tshelfWin;
   NSImage *tshelfBackground;
   NSString *tshelfPBDir;
   int tshelfPBFileNum;
-  
-	Recycler *recycler;
-	NSString *trashPath;
-    
+      
   OpenWithController *openWithController;
   RunExternalController *runExtController;
   
@@ -185,10 +177,6 @@
 - (NSString *)defXtermArgs;
 
 - (History *)historyWindow;
-
-- (id)desktopView;	
-
-- (void)showHideDesktop:(BOOL)active;
 
 - (NSImage *)tshelfBackground;	
 
@@ -222,8 +210,6 @@
 
 - (void)setShelfCellsWidth:(int)w; 
 
-- (void)createRecycler;
-
 - (void)createTabbedShelf;
 
 - (void)makeViewersTemplates;
@@ -254,13 +240,6 @@
 - (void)setSelectedPaths:(NSArray *)paths;
 
 - (void)resetSelectedPaths;
-
-- (void)setSelectedPaths:(NSArray *)paths fromDesktopView:(DesktopView *)view;
-
-- (void)setSelectedPaths:(NSArray *)paths 
-         fromDesktopView:(DesktopView *)view
-            animateImage:(NSImage *)image 
-         startingAtPoint:(NSPoint)startp;
 
 - (NSArray *)selectedPaths;
 
@@ -359,8 +338,6 @@
 - (void)startXTerm:(id)sender;
 
 - (void)emptyRecycler:(id)sender;
-
-- (void)putAway:(id)sender;
 
 #ifndef GNUSTEP
 - (void)terminate:(id)sender;

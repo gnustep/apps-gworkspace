@@ -45,13 +45,10 @@
 #include "Preferences/PrefController.h"
 #include "Fiend/Fiend.h"
 #include "ViewersWindow.h"
-#include "Desktop/DesktopWindow.h"
-#include "Desktop/DesktopView.h"
 #include "TShelf/TShelfWin.h"
 #include "TShelf/TShelfView.h"
 #include "TShelf/TShelfViewItem.h"
 #include "TShelf/TShelfIconsView.h"
-#include "Recycler/Recycler.h"
 #include "History/History.h"
 #include "GNUstep.h"
 
@@ -389,7 +386,11 @@ return [ws openFile: fullPath withApplication: appName]
 
 - (NSString *)trashPath
 {
-	return trashPath;
+	NSString *tpath; 
+
+  tpath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
+  tpath = [tpath stringByAppendingPathComponent: @"Desktop"];
+  return [tpath stringByAppendingPathComponent: @".Trash"];
 }
 
 - (NSArray *)viewersSearchPaths
@@ -476,12 +477,9 @@ return [ws openFile: fullPath withApplication: appName]
   TEST_RELEASE (appsViewer);
   TEST_RELEASE (fiend);
 	TEST_RELEASE (history);
-	TEST_RELEASE (recycler);
-  TEST_RELEASE (trashPath);
   RELEASE (openWithController);
   RELEASE (runExtController);
   RELEASE (startAppWin);
-  TEST_RELEASE (desktopWindow);
   TEST_RELEASE (tshelfWin);
   TEST_RELEASE (tshelfPBDir);
   TEST_RELEASE (tshelfBackground);
@@ -633,7 +631,6 @@ return [ws openFile: fullPath withApplication: appName]
   fiend = nil;
 
   tshelfBackground = nil; 
-  [self showHideDesktop: [defaults boolForKey: @"desktop"]];  
   
   if ([defaults boolForKey: @"usefiend"]) {
     [self showFiend: nil];
@@ -647,8 +644,6 @@ return [ws openFile: fullPath withApplication: appName]
   } else {
     [self hideTShelf: nil];
   }
-
-	[self createRecycler];
   
   openWithController = [[OpenWithController alloc] init];
   runExtController = [[RunExternalController alloc] init];
@@ -739,10 +734,7 @@ return [ws openFile: fullPath withApplication: appName]
 	TEST_CLOSE (appsViewer, [appsViewer myWin]);
 	TEST_CLOSE (prefController, [prefController myWin]);
 	TEST_CLOSE (fiend, [fiend myWin]);
-	TEST_CLOSE (recycler, [recycler myWin]);
-	TEST_CLOSE (recycler, [recycler recyclerWin]);
 	TEST_CLOSE (history, [history myWin]); 
-	TEST_CLOSE (desktopWindow, desktopWindow);
 	TEST_CLOSE (tshelfWin, tshelfWin);
   TEST_CLOSE (startAppWin, [startAppWin win]);
 
@@ -834,32 +826,6 @@ return [ws openFile: fullPath withApplication: appName]
   return nil;
 }
 
-- (id)desktopView
-{
-  if (desktopWindow != nil) {
-    return [desktopWindow desktopView];
-  }
-  return nil;
-}
-
-- (void)showHideDesktop:(BOOL)active
-{
-	if (active) {
-  	if (desktopWindow == nil) {
-    	desktopWindow = [[DesktopWindow alloc] init];
-    	[desktopWindow activate];
-  	} else if ([desktopWindow isVisible] == NO) {
-			[desktopWindow activate];
-		}
-    [self makeTshelfBackground];
-	} else {
-		if ((desktopWindow != nil) && ([desktopWindow isVisible])) {
-      [[desktopWindow desktopView] saveDefaults]; 
-      [desktopWindow deactivate]; 
-		}
-	}
-}
-
 - (NSImage *)tshelfBackground
 {
   return tshelfBackground;
@@ -867,16 +833,16 @@ return [ws openFile: fullPath withApplication: appName]
 
 - (void)makeTshelfBackground
 {
-  if ((desktopWindow != nil) && ([desktopWindow isVisible])) {
-    ASSIGN (tshelfBackground, [[desktopWindow desktopView] shelfBackground]);
-  }
+//  if ((desktopWindow != nil) && ([desktopWindow isVisible])) {
+//    ASSIGN (tshelfBackground, [[desktopWindow desktopView] shelfBackground]);
+//  }
 }
 
 - (NSColor *)tshelfBackColor
 {
-  if ((desktopWindow != nil) && ([desktopWindow isVisible])) {
-    return [[desktopWindow desktopView] backColor];
-  }
+//  if ((desktopWindow != nil) && ([desktopWindow isVisible])) {
+//    return [[desktopWindow desktopView] backColor];
+//  }
   return nil;
 }
 
@@ -917,13 +883,6 @@ return [ws openFile: fullPath withApplication: appName]
   NSMutableArray *viewersPaths;
   int i;
  
-	if ((desktopWindow != nil) && ([desktopWindow isVisible])) {
-		[[desktopWindow desktopView] saveDefaults];  
-		[defaults setBool: YES forKey: @"desktop"];
-	} else {
-		[defaults setBool: NO forKey: @"desktop"];
-	}
-
 	if ((tshelfWin != nil) && ([tshelfWin isVisible])) {
 		[tshelfWin saveDefaults];  
 		[defaults setBool: YES forKey: @"tshelf"];
@@ -948,7 +907,6 @@ return [ws openFile: fullPath withApplication: appName]
     [defaults setBool: NO forKey: @"usefiend"];
 	}
   
-	[recycler updateDefaults];
 	[history updateDefaults];
   [rootViewer updateDefaults];
   
@@ -1026,40 +984,6 @@ return [ws openFile: fullPath withApplication: appName]
 	 								     object: nil];  
 }
 
-- (void)createRecycler
-{
-	NSString *basePath, *tpath; 
-	BOOL isdir;
-
-  basePath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
-  basePath = [basePath stringByAppendingPathComponent: @"GWorkspace"];
-
-  if (([fm fileExistsAtPath: basePath isDirectory: &isdir] && isdir) == NO) {
-    if ([fm createDirectoryAtPath: basePath attributes: nil] == NO) {
-      NSLog(@"Can't create the GWorkspace directory! Quitting now.");
-      [NSApp terminate: self];
-    }
-  }
-  
-	tpath = [basePath stringByAppendingPathComponent: @".GWTrash"];
-
-	if ([fm fileExistsAtPath: tpath isDirectory: &isdir] == NO) {
-    if ([fm createDirectoryAtPath: tpath attributes: nil] == NO) {
-      NSLog(@"Can't create the Recycler directory! Quitting now.");
-      [NSApp terminate: self];
-    }
-	} else {
-		if (isdir == NO) {
-			NSLog (@"Warning - %@ is not a directory - quitting now!", tpath);			
-			[NSApp terminate: self];
-		}
-  }
-  
-  ASSIGN (trashPath, tpath);
-	recycler = [[Recycler alloc] initWithTrashPath: trashPath];
-	[recycler activate];
-}
-
 - (void)createTabbedShelf
 {
 	NSUserDefaults *defaults;  
@@ -1110,17 +1034,10 @@ return [ws openFile: fullPath withApplication: appName]
 	NSString *title = [anItem title];
 	
 	if ([title isEqual: NSLocalizedString(@"Empty Recycler", @"")]) {
-		return [recycler isFull];
-	} else if ([title isEqual: NSLocalizedString(@"Put Away", @"")]) {
-		if ([recycler isFull] && [recycler isFull]) {
-			if ([recycler selectedPath] != nil) {
-				return YES;
-			}
-		}		
-		return NO;	
-	}
+		return YES;
+//		return [recycler isFull];
 
-	if ([title isEqual: NSLocalizedString(@"Open With...", @"")]) {
+	} else if ([title isEqual: NSLocalizedString(@"Open With...", @"")]) {
     BOOL found = NO;
     int i;
     
@@ -1360,11 +1277,7 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 	}
   
   [rootViewer checkRootPathAfterHidingOfPaths: paths];
-  
-  if (desktopWindow != nil) {
-    [[desktopWindow desktopView] checkIconsAfterHidingOfPaths: paths]; 
-	}
-  
+    
   if (tshelfWin != nil) {
     [tshelfWin checkIconsAfterHidingOfPaths: paths]; 
 	}
@@ -1604,45 +1517,6 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 	 								        object: nil];    
 }
 
-- (void)setSelectedPaths:(NSArray *)paths 
-         fromDesktopView:(DesktopView *)view
-{
-  [rootViewer makeKeyAndOrderFront: nil];
-  [self setSelectedPaths: paths];
-  [rootViewer setViewerSelection: paths];
-}
-
-- (void)setSelectedPaths:(NSArray *)paths 
-         fromDesktopView:(DesktopView *)view
-            animateImage:(NSImage *)image 
-         startingAtPoint:(NSPoint)startp
-{
-  #define SELRETURN \
-  [self setSelectedPaths: paths]; \
-  [rootViewer setViewerSelection: paths]; \
-  return
-
-  NSPoint endp = [rootViewer positionForSlidedImage];
-
-  [rootViewer makeKeyAndOrderFront: nil];
-
-  if (animateChdir == NO) {
-    SELRETURN;
-  }
-
-  if (startp.x <= 0 || startp.y <= 0) {
-    SELRETURN;
-  }
-
-  if (endp.x <= 0 || endp.y <= 0) {
-    SELRETURN;
-  }
-
-  [self slideImage: image from: startp to: endp];
-
-  SELRETURN;
-}  
-
 - (NSArray *)selectedPaths
 {
   return selectedPaths;
@@ -1820,9 +1694,6 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   for (i = 0; i < [viewers count]; i++) {
 		[[viewers objectAtIndex: i] thumbnailsDidChangeInPaths: nil];
 	}
-  if ((desktopWindow != nil) && ([desktopWindow isVisible])) {
-    [[desktopWindow desktopView] updateIcons]; 
-	}
   if ((tshelfWin != nil) && ([tshelfWin isVisible])) {
     [tshelfWin updateIcons]; 
 	}
@@ -1857,9 +1728,6 @@ NSLocalizedString(@"OK", @""), nil, nil); \
       for (i = 0; i < [viewers count]; i++) {
 		    [[viewers objectAtIndex: i] thumbnailsDidChangeInPaths: tmbdirs];
 	    }
-      if ((desktopWindow != nil) && ([desktopWindow isVisible])) {
-        [[desktopWindow desktopView] updateIcons]; 
-		  }
       if ((tshelfWin != nil) && ([tshelfWin isVisible])) {
         [tshelfWin updateIcons]; 
 		  }
@@ -1889,9 +1757,6 @@ NSLocalizedString(@"OK", @""), nil, nil); \
       for (i = 0; i < [viewers count]; i++) {
 		    [[viewers objectAtIndex: i] thumbnailsDidChangeInPaths: tmbdirs];
 	    }
-      if ((desktopWindow != nil) && ([desktopWindow isVisible])) {
-        [[desktopWindow desktopView] updateIcons]; 
-		  }
       if ((tshelfWin != nil) && ([tshelfWin isVisible])) {
         [tshelfWin updateIcons]; 
 		  }
@@ -2739,12 +2604,7 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 
 - (void)emptyRecycler:(id)sender
 {
-	[recycler emptyRecycler];
-}
-
-- (void)putAway:(id)sender
-{
-	[recycler putAway];
+	
 }
 
 #ifndef GNUSTEP

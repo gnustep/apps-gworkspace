@@ -1906,7 +1906,7 @@ int sortDragged(id icn1, id icn2, void *context)
     [userInfo setObject: newpath forKey: @"destination"];	
     [userInfo setObject: [NSArray arrayWithObject: @""] forKey: @"files"];	
     
-//    [desktop removeWatcherForPath: [node path]];
+    [desktop removeWatcherForPath: [node path]];
   
     [[NSDistributedNotificationCenter defaultCenter]
  				postNotificationName: @"GWFileSystemWillChangeNotification"
@@ -1920,7 +1920,7 @@ int sortDragged(id icn1, id icn2, void *context)
 	 								    object: nil 
                     userInfo: userInfo];
     
- //   [desktop addWatcherForPath: [node path]];
+    [desktop addWatcherForPath: [node path]];
   }
 }
 

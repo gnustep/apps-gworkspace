@@ -35,7 +35,6 @@
 #include "XTermPref.h"
 #include "DefSortOrderPref.h"
 #include "ShelfPref.h"
-#include "DeskTopPref.h"
 #include "IconsPref.h"
 #include "HiddenFilesPref.h"
 #include "GWorkspace.h"
@@ -88,7 +87,6 @@ RELEASE (currentPref)
   ADD_PREF_VIEW ([XTermPref class]);
   ADD_PREF_VIEW ([DefSortOrderPref class]);		
   ADD_PREF_VIEW ([ShelfPref class]);
-  ADD_PREF_VIEW ([DeskTopPref class]);
   ADD_PREF_VIEW ([IconsPref class]);
   ADD_PREF_VIEW ([HiddenFilesPref class]);
 

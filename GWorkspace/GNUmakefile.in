@@ -71,18 +71,11 @@ ifneq ($(FOUNDATION_LIB), apple)
   TShelf/TShelfIcon.m \
   TShelf/TShelfPBIcon.m \
   Apps/Apps.m \
-  Desktop/DesktopWindow.m \
-  Desktop/DesktopView.m \
-  Desktop/DesktopViewIcon.m \
-  Recycler/Recycler.m \
-  Recycler/RecyclerViews.m \
-  Recycler/RecyclerIcon.m \
   Preferences/PrefController.m \
   Preferences/DefEditorPref.m \
   Preferences/XTermPref.m \
   Preferences/DefSortOrderPref.m \
   Preferences/ShelfPref.m \
-  Preferences/DeskTopPref.m \
   Preferences/IconsPref.m \
   Preferences/HiddenFilesPref.m \
   History/History.m \
@@ -108,18 +101,11 @@ else
   TShelf/TShelfIcon.m \
   TShelf/TShelfPBIcon.m \
   Apps/Apps.m \
-  Desktop/DesktopWindow.m \
-  Desktop/DesktopView.m \
-  Desktop/DesktopViewIcon.m \
-  Recycler/Recycler.m \
-  Recycler/RecyclerViews.m \
-  Recycler/RecyclerIcon.m \
   Preferences/PrefController.m \
   Preferences/DefEditorPref.m \
   Preferences/XTermPref.m \
   Preferences/DefSortOrderPref.m \
   Preferences/ShelfPref.m \
-  Preferences/DeskTopPref.m \
   Preferences/IconsPref.m \
   Preferences/HiddenFilesPref.m \
   History/History.m \

@@ -86,7 +86,6 @@ void createMenu()
 	addItemToMenu(file, @"Duplicate", @"", @"duplicateFiles:", @"u");
 	addItemToMenu(file, @"Destroy", @"", @"deleteFiles:", @"d");
 	addItemToMenu(file, @"Empty Recycler", @"", @"emptyRecycler:", @"");
-	addItemToMenu(file, @"Put Away", @"", @"putAway:", @"");
 	addItemToMenu(file, @"Run...", @"", @"runCommand:", @"");  
 	addItemToMenu(file, @"Print...", @"", @"print:", @"p");
 
