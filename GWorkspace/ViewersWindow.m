@@ -828,7 +828,12 @@ if (rct.size.height < 0) rct.size.height = 0; \
 - (void)becomeMainWindow
 {
   [super becomeMainWindow];
+}
 
+- (void)becomeKeyWindow
+{
+  [super becomeKeyWindow];
+  
   if (viewer) {
     NSArray *selPaths = [viewer selectedPaths];
     
@@ -841,17 +846,12 @@ if (rct.size.height < 0) rct.size.height = 0; \
 	    [self tuneHistory];
 	    [historyWin setHistoryPaths: ViewerHistory];
 	    [self setCurrentHistoryPosition: currHistoryPos];
-      [self makeFirstResponder: [viewer viewerView]];  
       [self updateInfoString]; 
-    }
-  }
-}
 
-- (void)becomeKeyWindow
-{
-  [super becomeKeyWindow];
-  if (viewer && [viewer viewerView]) {
-    [self makeFirstResponder: [viewer viewerView]];  
+      if (viewer && [viewer viewerView]) {
+        [self makeFirstResponder: [viewer viewerView]];  
+      }
+    }
   }
 }
 

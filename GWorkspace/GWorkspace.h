@@ -84,7 +84,7 @@
 
 - (oneway void)addViewerWithBundleData:(NSData *)bundleData;
 
-- (oneway void)setPaths:(NSArray *)paths;
+- (oneway void)setPathsData:(NSData *)data;
 
 - (oneway void)showWindow;
 

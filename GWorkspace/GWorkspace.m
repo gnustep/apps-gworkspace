@@ -779,6 +779,17 @@ return [ws openFile: fullPath withApplication: appName]
       DESTROY (fswatcher);
     }
   }
+
+  if (inspector && useInspector) {
+    NSConnection *inspconn = [(NSDistantObject *)inspector connectionForProxy];
+  
+    if (inspconn && [inspconn isValid]) {
+      [[NSNotificationCenter defaultCenter] removeObserver: self
+	                        name: NSConnectionDidDieNotification
+	                      object: inspconn];
+      DESTROY (inspector);
+    }
+  }
   		
 	return YES;
 }
@@ -1576,9 +1587,10 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 {
   if (paths && ([selectedPaths isEqualToArray: paths] == NO)) {
     ASSIGN (selectedPaths, paths);
-                          
+
     if (inspector && useInspector) {
-      [inspector setPaths: selectedPaths];
+      NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
+      [inspector setPathsData: data];
     }
   }
 }
@@ -1590,7 +1602,8 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   }
   
   if (inspector && useInspector) {
-    [inspector setPaths: selectedPaths];
+    NSData *data = [NSArchiver archivedDataWithRootObject: selectedPaths];
+    [inspector setPathsData: data];
   }    
 				
   [[NSNotificationCenter defaultCenter]
@@ -1598,7 +1611,8 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 	 								        object: nil];    
 }
 
-- (void)setSelectedPaths:(NSArray *)paths fromDesktopView:(DesktopView *)view
+- (void)setSelectedPaths:(NSArray *)paths 
+         fromDesktopView:(DesktopView *)view
 {
   [rootViewer makeKeyAndOrderFront: nil];
   [self setSelectedPaths: paths];

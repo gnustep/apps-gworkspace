@@ -24,6 +24,7 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
+#include <math.h>
 #include "Attributes.h"
 #include "ContentViewersProtocol.h"
 #include "Inspector.h"
@@ -52,6 +53,27 @@ if ([b image] == multipleImage) perms |= v; \
 	#define S_IRUSR _S_IRUSR
 	#define S_IWUSR _S_IWUSR
 	#define S_IXUSR _S_IXUSR
+#endif
+
+#ifndef ICNMAX
+  #define ICNMAX 48
+  
+  #define CHECK_ICON_SIZE(i) \
+  { \
+  NSSize size = [i size]; \
+  if ((size.width > ICNMAX) || (size.height > ICNMAX)) { \
+  NSSize newsize; \
+  if (size.width >= size.height) { \
+  newsize.width = ICNMAX; \
+  newsize.height = floor(ICNMAX * size.height / size.width + 0.5); \
+  } else { \
+  newsize.height = ICNMAX; \
+  newsize.width  = floor(ICNMAX * size.width / size.height + 0.5); \
+  } \
+  [i setScalesWhenResized: YES]; \
+  [i setSize: newsize]; \
+  } \
+  }
 #endif
 
 static NSString *nibName = @"Attributes";
@@ -196,7 +218,10 @@ static BOOL sizeStop = NO;
 	[okButt setEnabled: NO];
   	
 	if (pathscount == 1) {   // Single Selection
-    [iconView setImage: [[NSWorkspace sharedWorkspace] iconForFile: currentPath]];
+    NSImage *icon = [[NSWorkspace sharedWorkspace] iconForFile: currentPath];
+
+    CHECK_ICON_SIZE (icon);
+    [iconView setImage: icon];
     [titleField setStringValue: [currentPath lastPathComponent]];
   
 		usr = [attributes objectForKey: NSFileOwnerAccountName];

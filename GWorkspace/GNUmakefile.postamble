@@ -7,7 +7,6 @@ before-all::
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Viewers
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Shelf
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/TShelf
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Inspectors
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Apps
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/FileOperations
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Finder
@@ -29,7 +28,6 @@ before-install::
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Viewers
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Shelf
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/TShelf
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Inspectors
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Apps
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/FileOperations
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Finder

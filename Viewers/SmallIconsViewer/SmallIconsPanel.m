@@ -1025,7 +1025,7 @@ if (s.height > maxr.size.height) s.height = maxr.size.height
 - (void)mouseDown:(NSEvent *)theEvent
 {
   [[self window] makeFirstResponder: self];
-  
+    
 	if([theEvent modifierFlags] != 2) {
 		isShiftClick = NO;
     selectInProgress = YES;

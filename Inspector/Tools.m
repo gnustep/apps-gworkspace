@@ -24,11 +24,33 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
+#include <math.h>
 #include "Tools.h"
 #include "ContentViewersProtocol.h"
 #include "Inspector.h"
 #include "Functions.h"
 #include "GNUstep.h"
+
+#ifndef ICNMAX
+  #define ICNMAX 48
+  
+  #define CHECK_ICON_SIZE(i) \
+  { \
+  NSSize size = [i size]; \
+  if ((size.width > ICNMAX) || (size.height > ICNMAX)) { \
+  NSSize newsize; \
+  if (size.width >= size.height) { \
+  newsize.width = ICNMAX; \
+  newsize.height = floor(ICNMAX * size.height / size.width + 0.5); \
+  } else { \
+  newsize.height = ICNMAX; \
+  newsize.width  = floor(ICNMAX * size.width / size.height + 0.5); \
+  } \
+  [i setScalesWhenResized: YES]; \
+  [i setSize: newsize]; \
+  } \
+  }
+#endif
 
 static NSString *nibName = @"Tools";
 
@@ -73,7 +95,7 @@ static NSString *nibName = @"Tools";
 
   	cell = [NSButtonCell new];
   	[cell setButtonType: NSPushOnPushOffButton];
-  	[cell setImagePosition: NSImageAbove]; 
+  	[cell setImagePosition: NSImageOnly]; 
 
   	matrix = [[NSMatrix alloc] initWithFrame: NSZeroRect
 			      	  					mode: NSRadioModeMatrix prototype: cell
@@ -132,6 +154,8 @@ static NSString *nibName = @"Tools";
     return;
   }
 
+	[okButt setEnabled: NO];		  
+
 	pathscount = [paths count];
 
 	if (pathscount == 1) { 
@@ -174,8 +198,6 @@ static NSString *nibName = @"Tools";
 			valid = NO;
 		}
 	}
-  
-	[okButt setEnabled: NO];		  
 }
 
 - (void)findApplicationsForPaths:(NSArray *)paths
@@ -246,7 +268,7 @@ static NSString *nibName = @"Tools";
 			}
 		}
 
-    commonApps = [NSMutableArray arrayWithCapacity: 1];
+    commonApps = [NSMutableArray array];
 
     for (i = 0; i < [extensions count]; i++) {
       NSString *ext = [extensions objectAtIndex: i];
@@ -298,12 +320,13 @@ static NSString *nibName = @"Tools";
 	[matrix renewRows: 1 columns: count];
 	[matrix sizeToCells];
 	
-	if (appsforext == YES) {
-		for(i = 0; i < count; i++) {
+	if (appsforext) {
+		for (i = 0; i < count; i++) {
 			NSString *appName = [commonApps objectAtIndex: i];
 			NSString *appPath = [ws fullPathForApplication: appName];
       NSImage *icon = [ws iconForFile: appPath];
       
+      CHECK_ICON_SIZE (icon);
 			cell = [matrix cellAtRow: 0 column: i];
 			[cell setImage: icon];
 			[cell setTitle: appName];
@@ -366,7 +389,7 @@ static NSString *nibName = @"Tools";
   cells = [matrix cells];
 	for(i = 0; i < [cells count]; i++) {
     app = [[cells objectAtIndex: i] title];
-		if([app isEqualToString: currentApp] == NO) {
+		if ([app isEqual: currentApp] == NO) {
       [newApps insertObject: app atIndex: [newApps count]];
 		}
   }
@@ -374,14 +397,13 @@ static NSString *nibName = @"Tools";
 	count = [newApps count];
 	[matrix renewRows: 1 columns: count];
   
-  for(i = 0; i < count; i++) {
+  for (i = 0; i < count; i++) {
 		app = [newApps objectAtIndex: i];
     app = [ws fullPathForApplication: app];
     icon = [ws iconForFile: app];
-    
+    CHECK_ICON_SIZE (icon);
 		cell = [matrix cellAtRow: 0 column: i];
 		[cell setTitle: app];
-		app = [ws fullPathForApplication: app];
 		[cell setImage: icon];
 	}
 

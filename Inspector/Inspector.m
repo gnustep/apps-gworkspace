@@ -183,15 +183,12 @@ static NSString *nibName = @"InspectorWin";
   }
 }
 
-- (void)setPaths:(NSArray *)paths
+- (void)setPathsData:(NSData *)data
 {
-  if (paths) {
+  if (data && currentInspector) {
+    NSArray *paths = [NSUnarchiver unarchiveObjectWithData: data];
     ASSIGN (currentPaths, paths);
-    if (currentInspector) {
-      [currentInspector activateForPaths: currentPaths];
-    }
-  } else {
-    DESTROY (currentPaths);
+    [currentInspector activateForPaths: currentPaths];
   }
 }
 

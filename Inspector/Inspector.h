@@ -80,7 +80,7 @@
 
 - (IBAction)activateInspector:(id)sender;
 
-- (void)setPaths:(NSArray *)paths;
+- (void)setPathsData:(NSData *)data;
 
 - (void)showWindow;
 

@@ -24,12 +24,34 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
+#include <math.h>
 #include "Contents.h"
 #include "ContentViewersProtocol.h"
 #include "Inspector.h"
 #include "Preferences/InspectorPref.h"
 #include "Functions.h"
 #include "GNUstep.h"
+
+#ifndef ICNMAX
+  #define ICNMAX 48
+  
+  #define CHECK_ICON_SIZE(i) \
+  { \
+  NSSize size = [i size]; \
+  if ((size.width > ICNMAX) || (size.height > ICNMAX)) { \
+  NSSize newsize; \
+  if (size.width >= size.height) { \
+  newsize.width = ICNMAX; \
+  newsize.height = floor(ICNMAX * size.height / size.width + 0.5); \
+  } else { \
+  newsize.height = ICNMAX; \
+  newsize.width  = floor(ICNMAX * size.width / size.height + 0.5); \
+  } \
+  [i setScalesWhenResized: YES]; \
+  [i setSize: newsize]; \
+  } \
+  }
+#endif
 
 static NSString *nibName = @"Contents";
 
@@ -555,6 +577,7 @@ static NSString *nibName = @"Contents";
       }
 		} else {
       NSString *appName, *type;
+      NSImage *icon;
             
       [ws getInfoForFile: path application: &appName type: &type];
       
@@ -571,7 +594,11 @@ static NSString *nibName = @"Contents";
       [(NSBox *)viewersBox setContentView: genericView];
       currentViewer = genericView;
 			winName = NSLocalizedString(@"Contents Inspector", @"");
-      [iconView setImage: [ws iconForFile: path]];
+      
+      icon = [ws iconForFile: path];
+      CHECK_ICON_SIZE (icon);
+      [iconView setImage: icon];
+      
       [titleField setStringValue: [path lastPathComponent]];
 		}
 		
@@ -596,6 +623,7 @@ static NSString *nibName = @"Contents";
   NSImage *icon = [ws iconForFile: path];
         
   if (icon) {
+    CHECK_ICON_SIZE (icon);
     [iconView setImage: icon];
   }
     
