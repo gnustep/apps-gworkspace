@@ -452,15 +452,28 @@ static NSString *nibName = @"FileOperationWin";
     
   notifNames = [NSMutableArray new];
   
-  if ([operation isEqual: @"NSWorkspaceDuplicateOperation"]) {       
+  if ([operation isEqual: @"NSWorkspaceDuplicateOperation"]) { 
+    NSString *copystr = NSLocalizedString(@"copy", @"");
+    NSString *ofstr = NSLocalizedString(@"_of_", @"");
+        
     for(i = 0; i < [files count]; i++) {
-      NSString *name = [NSString stringWithString: [files objectAtIndex: i]];     
+      NSString *name = [NSString stringWithString: [files objectAtIndex: i]]; 
+      NSString *ntmp;
+      int count = 1;
+          
 			while(1) {
-				name = [name stringByAppendingString: @"_copy"];
-				fulldestpath = [destination stringByAppendingPathComponent: name];        
-				if (![fm fileExistsAtPath: fulldestpath]) {          
-          [notifNames addObject: name];
+        if (count == 1) {
+          ntmp = [NSString stringWithFormat: @"%@%@%@", copystr, ofstr, name];
+        } else {
+          ntmp = [NSString stringWithFormat: @"%@%i%@%@", copystr, count, ofstr, name];
+        }
+        
+				fulldestpath = [destination stringByAppendingPathComponent: ntmp];        
+				if ([fm fileExistsAtPath: fulldestpath] == NO) {  
+          [notifNames addObject: ntmp];
 					break;
+        } else {
+          count++;
         }
 			}
     }
@@ -896,26 +909,39 @@ runUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.01]]
 
 - (void)doDuplicate
 {
+  NSString *copystr = NSLocalizedString(@"copy", @"");
+  NSString *ofstr = NSLocalizedString(@"_of_", @"");
 	NSString *fulldestpath;
 	NSString *newname;
+  NSString *ntmp;
 
   while (1) {
+    int count = 1;
+    
 	  GET_FILENAME;  
 
 	  newname = [NSString stringWithString: filename];
 
 	  while (1) {
-		  newname = [newname stringByAppendingString: @"_copy"];
-		  fulldestpath = [destination stringByAppendingPathComponent: newname];
+      if (count == 1) {
+        ntmp = [NSString stringWithFormat: @"%@%@%@", copystr, ofstr, newname];
+      } else {
+        ntmp = [NSString stringWithFormat: @"%@%i%@%@", copystr, count, ofstr, newname];
+      }
+      
+		  fulldestpath = [destination stringByAppendingPathComponent: ntmp];
 
-		  if (![fm fileExistsAtPath: fulldestpath]) {
+		  if ([fm fileExistsAtPath: fulldestpath] == NO) {
+        newname = ntmp;
 			  break;
+      } else {
+        count++;
       }
 	  }
 
 	  [fm copyPath: [destination stringByAppendingPathComponent: filename]
 				  toPath: fulldestpath 
-			  handler: self];
+			   handler: self];
 
     [procfiles addObject: newname];	 
 	  [files removeObject: filename];	   

@@ -287,27 +287,11 @@
       }
     }
 
-    if (startdnd == YES) {  
+    if (startdnd && [fm fileExistsAtPath: path]) {  
       [self startExternalDragOnEvent: nextEvent withMouseOffset: offset];    
     } 
 	}  
 }
-
-/*
-- (void)mouseDragged:(NSEvent *)theEvent
-{
-  if ([fm fileExistsAtPath: path] == NO) {
-    return;
-  }
-
-	if(dragdelay < 5) {
-    dragdelay++;
-    return;
-  }
-  
-  [self startExternalDragOnEvent: theEvent withMouseOffset: NSZeroSize];
-}
-*/
 
 - (NSMenu *)menuForEvent:(NSEvent *)theEvent
 {

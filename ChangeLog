@@ -1,3 +1,9 @@
+2003-10-23 Enrico Sersale  <enrico@imago.ro>
+
+  * GWorkspace/FileOperations/FileOperation.m
+    in -doDuplicate changed the suffix "_copy" appended to the file name
+    to a prepended string, that is, "copy_of_".
+
 2003-10-22 Enrico Sersale  <enrico@imago.ro>
 
   * All the DraggingSources now consider also the offset in

@@ -163,11 +163,12 @@
 - (void)clickOnLabel
 {
 	CHECK_LOCK;
-	[namelabel setBackgroundColor: [NSColor whiteColor]];
-	[namelabel setSelectable: YES];
-  [namelabel setEditable: YES];
+	
   if (isSelect == NO) {
     [self select];
+  } else {
+	  [namelabel setSelectable: YES];
+    [namelabel setEditable: YES];  
   }
 }
 
