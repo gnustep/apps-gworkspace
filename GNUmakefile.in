@@ -19,6 +19,7 @@ endif
 # subprojects
 #
 SUBPROJECTS = Utilities \
+	      			  Inspector \
 	      			  GWLib \
 	      			  Viewers \
 	      			  ContentViewers \
