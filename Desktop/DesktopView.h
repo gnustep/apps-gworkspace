@@ -25,17 +25,10 @@
 #ifndef DESKTOP_VIEW_H
 #define DESKTOP_VIEW_H
 
-#include <AppKit/NSView.h>
-#include "FSNodeRep.h"
+#include "FSNIconContainer.h"
 
-@class NSColor;
 @class NSImage;
-@class NSFont;
-@class NSMenu;
 @class Desktop;
-@class FSNode;
-@class FSNIcon;
-@class FSNIconNameEditor;
 
 typedef enum BackImageStyle {   
   BackImageCenterStyle = 0,
@@ -44,42 +37,18 @@ typedef enum BackImageStyle {
 } BackImageStyle;
 
 
-@interface DesktopView : NSView <FSNodeRepContainer>
+@interface DesktopView : FSNIconContainer
 {
-  FSNode *node;
-  NSString *infoPath;
-  NSMutableDictionary *nodeInfo;
-  NSMutableArray *icons;
-  FSNInfoType infoType;
-  
-  NSImage *verticalImage;
-  NSImage *horizontalImage;
-
-  FSNSelectionMask selectionMask;
-  NSArray *lastSelection;
-
-  FSNIconNameEditor *nameEditor;
-  FSNIcon *editIcon;
-
-  int iconSize;
-  int labelTextSize;
-  NSFont *labelFont;
-  int iconPosition;
-
   NSRect screenFrame;  
-  NSSize gridSize;
   NSRect *grid;
-  int rowcount;
-  int colcount;
   int gridcount;
+  int rowcount;
 
 	NSImage *dragIcon;
   NSPoint dragPoint;
   int insertIndex;
-	BOOL isDragTarget;
 	BOOL dragLocalIcon;
   
-  NSColor *backColor;
   NSImage *backImage;
   NSString *imagePath;
   NSPoint imagePoint;
@@ -88,10 +57,6 @@ typedef enum BackImageStyle {
     
   Desktop *desktop;
 }
-
-- (void)readNodeInfo;
-
-- (void)updateNodeInfo;
 
 - (void)newVolumeMountedAtPath:(NSString *)vpath;
 
@@ -103,19 +68,17 @@ typedef enum BackImageStyle {
 
 - (void)dockPositionDidChange;
 
-- (void)tile;
-
 - (int)firstFreeGridIndex;
 
 - (int)firstFreeGridIndexAfterIndex:(int)index;
 
 - (BOOL)isFreeGridIndex:(int)index;
 
+- (FSNIcon *)iconWithGridIndex:(int)index;
+
 - (int)indexOfGridRectContainingPoint:(NSPoint)p;
 
 - (NSRect)iconBoundsInGridAtIndex:(int)index;
-
-- (void)calculateGridSize;
 
 - (void)makeIconsGrid;
 
@@ -139,22 +102,6 @@ typedef enum BackImageStyle {
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender;
 
 - (void)concludeDragOperation:(id <NSDraggingInfo>)sender;
-
-@end
-
-
-@interface DesktopView (IconNameEditing)
-
-- (void)updateNameEditor;
-
-- (void)controlTextDidChange:(NSNotification *)aNotification;
-
-- (void)controlTextDidEndEditing:(NSNotification *)aNotification;
-
-- (BOOL)fileManager:(NSFileManager *)manager 
-              shouldProceedAfterError:(NSDictionary *)errorDict;
-
-- (void)fileManager:(NSFileManager *)manager willProcessPath:(NSString *)path;
 
 @end
 

@@ -68,7 +68,6 @@ if (rct.size.height < 0) rct.size.height = 0; \
 {
   TEST_RELEASE (node);
   TEST_RELEASE (infoPath);
-  TEST_RELEASE (nodeInfo);
   RELEASE (icons);
   RELEASE (labelFont);
   RELEASE (nameEditor);
@@ -161,22 +160,18 @@ if (rct.size.height < 0) rct.size.height = 0; \
   [icons addObjectsFromArray: sorted];
 }
 
-
-
-- (void)readNodeInfo
+- (NSDictionary *)readNodeInfo
 {
-/*
+  NSDictionary *nodeInfo;
+  
   ASSIGN (infoPath, [[node path] stringByAppendingPathComponent: @".dirinfo"]);
-  DESTROY (nodeInfo);
   
   if ([[NSFileManager defaultManager] fileExistsAtPath: infoPath]) {
-    NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: infoPath];
-    id entry;
+    nodeInfo = [NSDictionary dictionaryWithContentsOfFile: infoPath];
 
-    if (dict) {
-      nodeInfo = [dict mutableCopy];
-  
-      entry = [nodeInfo objectForKey: @"backcolor"];
+    if (nodeInfo) {
+      id entry = [nodeInfo objectForKey: @"backcolor"];
+      
       if (entry) {
         float red = [[entry objectForKey: @"red"] floatValue];
         float green = [[entry objectForKey: @"green"] floatValue];
@@ -187,68 +182,58 @@ if (rct.size.height < 0) rct.size.height = 0; \
                                                      green: green 
                                                       blue: blue 
                                                      alpha: alpha]);
-      } else {
-        ASSIGN (backColor, [NSColor windowBackgroundColor]);
       }
 
       entry = [nodeInfo objectForKey: @"iconsize"];
-      iconSize = entry ? [entry intValue] : DEF_ICN_SIZE;
+      iconSize = entry ? [entry intValue] : iconSize;
 
       entry = [nodeInfo objectForKey: @"labeltxtsize"];
-      labelTextSize = entry ? [entry intValue] : DEF_TEXT_SIZE;
-      ASSIGN (labelFont, [NSFont systemFontOfSize: labelTextSize]);
+      if (entry) {
+        labelTextSize = [entry intValue];
+        ASSIGN (labelFont, [NSFont systemFontOfSize: labelTextSize]);      
+      }
 
       entry = [nodeInfo objectForKey: @"iconposition"];
-      iconPosition = entry ? [entry intValue] : DEF_ICN_POS;
+      iconPosition = entry ? [entry intValue] : iconPosition;
 
       entry = [nodeInfo objectForKey: @"fsn_info_type"];
-      infoType = entry ? [entry intValue] : FSNInfoNameType;
-    
-    
-    
-    
-    
-    } else {
-      nodeInfo = [NSMutableDictionary new];
-      
-      
-      
-      
-      
-      
-      
-      
-      
+      infoType = entry ? [entry intValue] : infoType;
     }
-  } else {
-    nodeInfo = [NSMutableDictionary new];
   }
-  */
+    
+  return (nodeInfo != nil) ? nodeInfo : [NSDictionary dictionary];
 }
 
 - (void)updateNodeInfo
 {
-/*
   if ([node isWritable]) {
-    NSMutableDictionary *indexes = [NSMutableDictionary dictionary];
-    int i;
-    
-    for (i = 0; i < [icons count]; i++) {
-      FSNIcon *icon = [icons objectAtIndex: i];
-    
-      [indexes setObject: [NSNumber numberWithInt: [icon gridIndex]]
-                  forKey: [[icon node] name]];
-    }
-    
-    [nodeInfo setObject: indexes forKey: @"indexes"];
+    NSMutableDictionary *nodeInfo = [NSMutableDictionary dictionary];
+    NSMutableDictionary *colorDict = [NSMutableDictionary dictionary];
+    float red, green, blue, alpha;
+	
+    [backColor getRed: &red green: &green blue: &blue alpha: &alpha];
+    [colorDict setObject: [NSNumber numberWithFloat: red] forKey: @"red"];
+    [colorDict setObject: [NSNumber numberWithFloat: green] forKey: @"green"];
+    [colorDict setObject: [NSNumber numberWithFloat: blue] forKey: @"blue"];
+    [colorDict setObject: [NSNumber numberWithFloat: alpha] forKey: @"alpha"];
+
+    [nodeInfo setObject: colorDict forKey: @"backcolor"];
+
+    [nodeInfo setObject: [NSNumber numberWithInt: iconSize] 
+                 forKey: @"iconsize"];
+
+    [nodeInfo setObject: [NSNumber numberWithInt: labelTextSize] 
+                 forKey: @"labeltxtsize"];
+
+    [nodeInfo setObject: [NSNumber numberWithInt: iconPosition] 
+                 forKey: @"iconposition"];
+
+    [nodeInfo setObject: [NSNumber numberWithInt: infoType] 
+                 forKey: @"fsn_info_type"];
+
     [nodeInfo writeToFile: infoPath atomically: YES];
   }
-  */
 }
-
-
-
-
 
 - (void)calculateGridSize
 {
@@ -1027,7 +1012,7 @@ pp.x = NSMaxX([self bounds]) - 1
     int i;
     
     infoType = type;
-
+    
     for (i = 0; i < [icons count]; i++) {
       FSNIcon *icon = [icons objectAtIndex: i];
       
@@ -1631,6 +1616,7 @@ pp.x = NSMaxX([self bounds]) - 1
     FSNode *iconnode = [editIcon node];
     NSString *nodeDescr = nil;
     BOOL locked = [editIcon isLocked];
+    BOOL mpoint = [iconnode isMountPoint];
     NSRect icnr = [editIcon frame];
     NSRect labr = [editIcon labelRect];
     int ipos = [editIcon iconPosition];
@@ -1708,8 +1694,8 @@ pp.x = NSMaxX([self bounds]) - 1
       [nameEditor setTextColor: [NSColor disabledControlTextColor]];    
     }
 
-    [nameEditor setEditable: ((locked == NO) && (infoType == FSNInfoNameType))];
-    [nameEditor setSelectable: ((locked == NO) && (infoType == FSNInfoNameType))];	
+    [nameEditor setEditable: ((locked == NO) && (mpoint == NO) && (infoType == FSNInfoNameType))];
+    [nameEditor setSelectable: ((locked == NO) && (mpoint == NO) && (infoType == FSNInfoNameType))];	
     [self addSubview: nameEditor];
   }
 }

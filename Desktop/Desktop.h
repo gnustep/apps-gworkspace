@@ -249,7 +249,7 @@ typedef enum DockPosition {
 
 - (void)selectAll:(id)sender;
 
-- (void)setShowType:(id)sender;
+- (void)setShownType:(id)sender;
 
 - (void)checkNewRemovableMedia:(id)sender;
 

@@ -1320,7 +1320,7 @@ static Desktop *desktop = nil;
   [[win desktopView] selectAll];
 }
 
-- (void)setShowType:(id)sender
+- (void)setShownType:(id)sender
 {
   NSString *title = [sender title];
   FSNInfoType type = FSNInfoNameType;
@@ -1335,7 +1335,9 @@ static Desktop *desktop = nil;
     type = FSNInfoDateType;
   } else if ([title isEqual: NSLocalizedString(@"Owner", @"")]) {
     type = FSNInfoOwnerType;
-  }  
+  } else {
+    type = FSNInfoNameType;
+  } 
 
   [[win desktopView] setShowType: type];
 }

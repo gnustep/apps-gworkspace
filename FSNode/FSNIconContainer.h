@@ -39,7 +39,6 @@
 {
   FSNode *node;
   NSString *infoPath;
-  NSMutableDictionary *nodeInfo;
   NSMutableArray *icons;
   FSNInfoType infoType;
   
@@ -72,7 +71,7 @@
 
 - (void)sortIcons;
 
-- (void)readNodeInfo;
+- (NSDictionary *)readNodeInfo;
 
 - (void)updateNodeInfo;
 

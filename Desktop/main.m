@@ -96,11 +96,11 @@ void createMenu()
 	menuItem = addMenuItem(mainMenu, @"View", @"", nil, @"");
 	view = AUTORELEASE ([NSMenu new]);
 	[mainMenu setSubmenu: view forItem: menuItem];	
-	addMenuItem(view, @"Name", @"", @"setShowType:", @"");
-	addMenuItem(view, @"Kind", @"", @"setShowType:", @"");
-	addMenuItem(view, @"Size", @"", @"setShowType:", @"");
-	addMenuItem(view, @"Modification date", @"", @"setShowType:", @"");
-	addMenuItem(view, @"Owner", @"", @"setShowType:", @"");
+	addMenuItem(view, @"Name", @"", @"setShownType:", @"");
+	addMenuItem(view, @"Kind", @"", @"setShownType:", @"");
+	addMenuItem(view, @"Size", @"", @"setShownType:", @"");
+	addMenuItem(view, @"Modification date", @"", @"setShownType:", @"");
+	addMenuItem(view, @"Owner", @"", @"setShownType:", @"");
 				
 	// Tools
 	menuItem = addMenuItem(mainMenu, @"Tools", @"", nil, @"");
