@@ -158,28 +158,25 @@ static NSString *nibName = @"ContentsPanel";
   return self;
 }
 
-// From Preferences.app (BundleController.m) 
-// Authors Jeff Teunissen <deek@d2dc.net>
 - (NSMutableArray *)bundlesWithExtension:(NSString *)extension 
 																	inPath:(NSString *)path
 {
-  NSMutableArray *bundleList = [[NSMutableArray alloc] initWithCapacity: 10];
+  NSMutableArray *bundleList = [NSMutableArray array];
   NSEnumerator *enumerator;
   NSString *dir;
   BOOL isDir;
   
-  // ensure path exists, and is a directory
-  if (!(([fm fileExistsAtPath: path isDirectory: &isDir]) && isDir)) {
+  if ((([fm fileExistsAtPath: path isDirectory: &isDir]) && isDir) == NO) {
 		return nil;
   }
 	  
-  // scan for bundles matching the extension in the dir
   enumerator = [[fm directoryContentsAtPath: path] objectEnumerator];
   while ((dir = [enumerator nextObject])) {
     if ([[dir pathExtension] isEqualToString: extension]) {
 			[bundleList addObject: [path stringByAppendingPathComponent: dir]];
 		}
   }
+  
   return bundleList;
 }
 

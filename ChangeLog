@@ -1,3 +1,9 @@
+2004-02-07 Enrico Sersale  <enrico@imago.ro>
+  
+  * Utilities/thumbnailer/ImageThumbnailer/ImageThumbnailer.
+    bug fixed in -makeThumbnailForPath: (the width of the image is set
+    correctly)
+
 2004-02-03 Enrico Sersale  <enrico@imago.ro>
   
   * configure.ac

@@ -53,8 +53,7 @@
 
     exts = [NSArray arrayWithObjects: @"tiff", @"tif", @"TIFF", @"TIF", 
                                       @"png", @"PNG", @"jpeg", @"jpg", 
-                                      @"JPEG", @"JPG", @"gif", @"GIF", 
-                                      @"xpm", nil];
+                                      @"JPEG", @"JPG", nil];
     ASSIGN (imageExtensions, exts);
   }
 
@@ -170,8 +169,8 @@
 	[image recache];
 
   if ((size.width <= TMBMAX) && (size.height <= TMBMAX) 
-                      && (size.width >= (TMBMAX - RESZLIM)) 
-                          && (size.height >= (TMBMAX - RESZLIM))) {
+                          && (size.width >= (TMBMAX - RESZLIM)) 
+                                  && (size.height >= (TMBMAX - RESZLIM))) {
  	  if ([rep isKindOfClass: [NSBitmapImageRep class]]) {
       data = [(NSBitmapImageRep *)rep TIFFRepresentation];
       if (data) {
@@ -216,8 +215,8 @@
   newInfo = makeBilinearResizedMap(xfactor, yfactor, comInfo, map, newmap);  
     
   newBitmapImageRep = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: &newmap[0]
-	pixelsWide: newsize.width
-	pixelsHigh: newsize.height
+	pixelsWide: newInfo->width
+	pixelsHigh: newInfo->height
 	bitsPerSample: newInfo->bits
 	samplesPerPixel: [(NSBitmapImageRep *)rep samplesPerPixel]
 	hasAlpha: newInfo->alpha
