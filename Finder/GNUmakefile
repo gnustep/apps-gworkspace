@@ -31,6 +31,7 @@ Finder_OBJC_FILES = main.m \
                  SearchPlacesMatrix.m \
                  SearchResults/SearchResults.m \
                  SearchResults/ResultsTableView.m \
+                 SearchResults/ResultsTextCell.m \
                  SearchResults/ResultsPathsView.m \
                  Functions.m 
 

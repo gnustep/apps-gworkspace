@@ -360,19 +360,20 @@ if (rct.size.height < 0) rct.size.height = 0; \
   NSRect svr = [[self superview] frame];
   NSRect r = [self frame];
   NSRect maxr = [[NSScreen mainScreen] frame];
-	float px = X_MARGIN - gridSize.width;
+	float px = 0 - gridSize.width;
   float py = gridSize.height + Y_MARGIN;
   NSSize sz;
   int poscount = 0;
 	int count = [icons count];
 	NSRect *irects = NSZoneMalloc (NSDefaultMallocZone(), sizeof(NSRect) * count);
   NSCachedImageRep *rep = nil;
+  NSArray *selection;
   int i;
 
   colcount = 0;
   
 	for (i = 0; i < count; i++) {
-    px += gridSize.width;      
+    px += (gridSize.width + X_MARGIN);      
     
     if (px >= (svr.size.width - gridSize.width)) {
       px = X_MARGIN; 
@@ -442,12 +443,17 @@ if (rct.size.height < 0) rct.size.height = 0; \
   RELEASE (pool);
   
   [self updateNameEditor];
+  
+  selection = [self selectedReps];
+  if ([selection count]) {
+    [self scrollIconToVisible: [selection objectAtIndex: 0]];
+  } 
 }
 
 - (void)scrollIconToVisible:(FSNIcon *)icon
 {
   NSRect irect = [icon frame];  
-  float border = floor(irect.size.height * 0.5);
+  float border = floor(irect.size.height * 0.2);
         
   irect.origin.y -= border;
   irect.size.height += border * 2;
@@ -550,6 +556,11 @@ if (rct.size.height < 0) rct.size.height = 0; \
       break;
 		}
 	} 
+}
+
+- (void)mouseUp:(NSEvent *)theEvent
+{
+  [self setSelectionMask: NSSingleSelectionMask];        
 }
 
 - (void)mouseDown:(NSEvent *)theEvent
@@ -1410,6 +1421,11 @@ pp.x = NSMaxX([self bounds]) - 1
   [self selectionDidChange];
 }
 
+- (NSArray *)reps
+{
+  return icons;
+}
+
 - (NSArray *)selectedReps
 {
   NSMutableArray *selectedReps = [NSMutableArray array];
@@ -1589,6 +1605,7 @@ pp.x = NSMaxX([self bounds]) - 1
 	NSPasteboard *pb;
   NSDragOperation sourceDragMask;
 	NSArray *sourcePaths;
+  NSString *basePath;
   NSString *nodePath;
   NSString *prePath;
 	int count;
@@ -1620,6 +1637,11 @@ pp.x = NSMaxX([self bounds]) - 1
     
   nodePath = [node path];
 
+  basePath = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
+  if ([basePath isEqual: nodePath]) {
+    return NSDragOperationNone;
+  }
+  
   if ([sourcePaths containsObject: nodePath]) {
     return NSDragOperationNone;
   }

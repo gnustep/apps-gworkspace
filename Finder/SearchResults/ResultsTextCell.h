@@ -1,11 +1,11 @@
-/* GWSVIconsView.h
+/* ResultsTextCell.h
  *  
  * Copyright (C) 2004 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
- * Date: June 2004
+ * Date: March 2004
  *
- * This file is part of the GNUstep GWorkspace application
+ * This file is part of the GNUstep Finder application
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,23 +22,46 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef GW_SV_ICONS_VIEW_H
-#define GW_SV_ICONS_VIEW_H
+#ifndef RESULTS_TEXT_CELL_H
+#define RESULTS_TEXT_CELL_H
 
 #include <Foundation/Foundation.h>
-#include "FSNIconsView.h"
+#include <AppKit/NSTextFieldCell.h>
+#include "FSNodeRep.h"
 
-@class GWSpatialViewer;
-@class GWViewersManager;
+typedef NSString *(*cutIMP)(id, SEL, id, float);
 
-@interface GWSVIconsView : FSNIconsView
+@class NSImage;
+
+@interface ResultsTextCell : NSTextFieldCell 
 {
-  GWSpatialViewer *viewer;
-  GWViewersManager *manager;
+  NSDictionary *fontAttr;
+  NSString *dots;
+  float titlelenght;
+  float dtslenght;
+  BOOL dateCell;
+  NSString *uncuttedTitle; 
+	SEL cutTitleSel;
+	cutIMP cutTitle;
+  NSImage *icon;
 }
 
-- (id)initForViewer:(GWSpatialViewer *)vwr;
+- (void)setIcon:(NSImage *)icn;
+
+- (NSImage *)icon;
+
+- (float)uncuttedTitleLenght;
+
+- (void)setDateCell:(BOOL)value;
+
+- (BOOL)isDateCell;
+
+- (NSString *)cutTitle:(NSString *)title 
+            toFitWidth:(float)width;
+
+- (NSString *)cutDateTitle:(NSString *)title 
+                toFitWidth:(float)width;
 
 @end
 
-#endif // GW_SV_ICONS_VIEW_H
+#endif // RESULTS_TEXT_CELL_H

@@ -26,7 +26,9 @@
 #include "GWViewersManager.h"
 #include "GWSpatialViewer.h"
 #include "FSNodeRep.h"
+#include "FSNIcon.h"
 #include "FSNFunctions.h"
+#include "GWorkspace.h"
 
 static GWViewersManager *vwrsmanager = nil;
 
@@ -43,7 +45,7 @@ static GWViewersManager *vwrsmanager = nil;
 - (void)dealloc
 {
   RELEASE (viewers);
-  
+    
 	[super dealloc];
 }
 
@@ -53,17 +55,21 @@ static GWViewersManager *vwrsmanager = nil;
   
   if (self) {
     viewers = [NSMutableArray new];
+    gworkspace = [GWorkspace gworkspace];
     [FSNodeRep setLabelWFactor: 9.0];
+    [FSNodeRep setUseThumbnails: YES];
   }
   
   return self;
 }
 
-- (id)newViewerForPath:(NSString *)path 
-         viewsPackages:(BOOL)viewspkg
+- (id)newViewerForPath:(NSString *)path
+        closeOldViewer:(GWSpatialViewer *)oldvwr
 {
   GWSpatialViewer *viewer = [self viewerForPath: path];
-
+  NSArray *icons;
+  int i;
+  
   if (viewer == nil) {
     FSNode *node = [FSNode nodeWithRelativePath: path parent: nil];
   
@@ -71,9 +77,23 @@ static GWViewersManager *vwrsmanager = nil;
     [viewers addObject: viewer];
     RELEASE (viewer);
   } 
+
+  if (oldvwr) {  
+    [[oldvwr win] close]; 
+  }
   
   [viewer activate];
+      
+  icons = [viewer icons];  
     
+  for (i = 0; i < [icons count]; i++) {
+    FSNIcon *icon = [icons objectAtIndex: i];  
+    
+    if ([self viewerForPath: [[icon node] path]]) {
+      [icon setOpened: YES];
+    }
+  }
+     
   return viewer;
 }
 
@@ -91,6 +111,71 @@ static GWViewersManager *vwrsmanager = nil;
   }
   
   return nil;
+}
+
+- (void)viewerSelected:(GWSpatialViewer *)aviewer
+{
+  FSNode *node = [aviewer shownNode];
+  
+  [self unselectOtherViewers: aviewer];
+  
+  if ([[node path] isEqual: path_separator()] == NO) {
+    NSString *parentPath = [node parentPath];
+    GWSpatialViewer *parentViewer = [self viewerForPath: parentPath];
+  
+    if (parentViewer) {
+      [parentViewer setOpened: YES iconOfPath: [node path]];
+    }
+  }
+}
+
+- (void)unselectOtherViewers:(GWSpatialViewer *)aviewer
+{
+  int i;
+  
+  for (i = 0; i < [viewers count]; i++) {
+    GWSpatialViewer *viewer = [viewers objectAtIndex: i];
+
+    if (viewer != aviewer) {
+      [viewer unselectAllIcons];
+    }
+  }  
+}
+
+- (void)viewerWillClose:(GWSpatialViewer *)aviewer
+{
+  FSNode *node = [aviewer shownNode];
+  
+  if ([[node path] isEqual: path_separator()] == NO) {
+    NSString *parentPath = [node parentPath];
+    GWSpatialViewer *parentViewer = [self viewerForPath: parentPath];
+  
+    if (parentViewer) {
+      [parentViewer setOpened: NO iconOfPath: [node path]];
+    }
+  }
+    
+  [viewers removeObject: aviewer];
+}
+
+- (void)openSelectionInViewer:(GWSpatialViewer *)viewer
+                  closeSender:(BOOL)close
+{
+  NSArray *selnodes = [viewer selectedNodes];
+  int i;
+  
+  for (i = 0; i < [selnodes count]; i++) {
+    FSNode *node = [selnodes objectAtIndex: i];
+    NSString *path = [node path];
+        
+    if ([node isDirectory]) {
+      [self newViewerForPath: path closeOldViewer: (close ? viewer : nil)]; 
+    } else if ([node isPlain]) {
+      [gworkspace openFile: path];
+    } else if ([node isApplication]) {
+      [[NSWorkspace sharedWorkspace] launchApplication: path];
+    }
+  }
 }
 
 @end

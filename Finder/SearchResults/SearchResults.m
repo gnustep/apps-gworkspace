@@ -27,7 +27,7 @@
 #include <math.h>
 #include "SearchResults.h"
 #include "ResultsTableView.h"
-#include "FSNTextCell.h"
+#include "ResultsTextCell.h"
 #include "ResultsPathsView.h"
 #include "Finder.h"
 #include "FinderModulesProtocol.h"
@@ -127,7 +127,7 @@ static NSString *nibName = @"ResultsWindow";
     [resultsView sizeLastColumnToFit];
         
     nameColumn = [[NSTableColumn alloc] initWithIdentifier: @"name"];
-    [nameColumn setDataCell: AUTORELEASE ([[FSNTextCell alloc] init])];
+    [nameColumn setDataCell: AUTORELEASE ([[ResultsTextCell alloc] init])];
     [nameColumn setEditable: NO];
     [nameColumn setResizable: YES];
     [[nameColumn headerCell] setStringValue: NSLocalizedString(@"Name", @"")];
@@ -138,7 +138,7 @@ static NSString *nibName = @"ResultsWindow";
     RELEASE (nameColumn);
     
     parentColumn = [[NSTableColumn alloc] initWithIdentifier: @"parent"];
-    [parentColumn setDataCell: AUTORELEASE ([[FSNTextCell alloc] init])];
+    [parentColumn setDataCell: AUTORELEASE ([[ResultsTextCell alloc] init])];
     [parentColumn setEditable: NO];
     [parentColumn setResizable: YES];
     [[parentColumn headerCell] setStringValue: NSLocalizedString(@"Parent", @"")];
@@ -149,7 +149,7 @@ static NSString *nibName = @"ResultsWindow";
     RELEASE (parentColumn);
 
     dateColumn = [[NSTableColumn alloc] initWithIdentifier: @"date"];
-    [dateColumn setDataCell: AUTORELEASE ([[FSNTextCell alloc] init])];
+    [dateColumn setDataCell: AUTORELEASE ([[ResultsTextCell alloc] init])];
     [dateColumn setEditable: NO];
     [dateColumn setResizable: YES];
     [[dateColumn headerCell] setStringValue: NSLocalizedString(@"Date Modified", @"")];
@@ -160,7 +160,7 @@ static NSString *nibName = @"ResultsWindow";
     RELEASE (dateColumn);
 
     sizeColumn = [[NSTableColumn alloc] initWithIdentifier: @"size"];
-    [sizeColumn setDataCell: AUTORELEASE ([[FSNTextCell alloc] init])];
+    [sizeColumn setDataCell: AUTORELEASE ([[ResultsTextCell alloc] init])];
     [sizeColumn setEditable: NO];
     [sizeColumn setResizable: YES];
     [[sizeColumn headerCell] setStringValue: NSLocalizedString(@"Size", @"")];
@@ -171,7 +171,7 @@ static NSString *nibName = @"ResultsWindow";
     RELEASE (sizeColumn);
 
     kindColumn = [[NSTableColumn alloc] initWithIdentifier: @"kind"];
-    [kindColumn setDataCell: AUTORELEASE ([[FSNTextCell alloc] init])];
+    [kindColumn setDataCell: AUTORELEASE ([[ResultsTextCell alloc] init])];
     [kindColumn setEditable: NO];
     [kindColumn setResizable: YES];
     [[kindColumn headerCell] setStringValue: NSLocalizedString(@"Kind", @"")];
@@ -738,13 +738,13 @@ static NSString *nibName = @"ResultsWindow";
               row:(int)rowIndex
 {
   if (aTableColumn == nameColumn) {
-    FSNTextCell *cell = (FSNTextCell *)[nameColumn dataCell];
+    ResultsTextCell *cell = (ResultsTextCell *)[nameColumn dataCell];
     FSNode *node = [sortedObjects objectAtIndex: rowIndex];
 
     [cell setIcon: [FSNodeRep iconOfSize: 24 forNode: node]];
     
   } else if (aTableColumn == dateColumn) {
-    [(FSNTextCell *)[dateColumn dataCell] setDateCell: YES];
+    [(ResultsTextCell *)[dateColumn dataCell] setDateCell: YES];
   }
 }
 

@@ -28,14 +28,13 @@
 #include "GWSVIconsView.h"
 #include "GWSVPathsPopUp.h"
 #include "FSNodeRep.h"
+#include "FSNIcon.h"
 #include "FSNFunctions.h"
 
 #define DEFAULT_INCR 150
-#define MIN_W_HEIGHT 250
-
+#define MIN_W_HEIGHT 170
 
 static NSString *nibName = @"ViewerWindow";
-
 
 @implementation GWSpatialViewer
 
@@ -43,6 +42,7 @@ static NSString *nibName = @"ViewerWindow";
 {
   TEST_RELEASE (win);
   TEST_RELEASE (iconsView);
+  TEST_RELEASE (shownNode);
   
 	[super dealloc];
 }
@@ -59,12 +59,19 @@ static NSString *nibName = @"ViewerWindow";
     } else {
       NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	      
       id defEntry = [defaults objectForKey: @"browserColsWidth"];
+      NSString *labelstr;
+      NSDictionary *attributes;
+      NSNumber *freefs;
+      NSArray *icons;
+      NSRect r;
       
       if (defEntry) {
         resizeIncrement = [defEntry intValue];
       } else {
         resizeIncrement = DEFAULT_INCR;
       }
+
+      manager = [GWViewersManager viewersManager];
 
       [win setMinSize: NSMakeSize(resizeIncrement * 2, MIN_W_HEIGHT)];    
       [win setResizeIncrements: NSMakeSize(resizeIncrement, 1)];
@@ -74,6 +81,14 @@ static NSString *nibName = @"ViewerWindow";
 
       [win setDelegate: self];
 
+      r = [[(NSBox *)popUpBox contentView] frame];
+      pathsPopUp = [[GWSVPathsPopUp alloc] initWithFrame: r pullsDown: NO];
+      [pathsPopUp setTarget: self];
+      [pathsPopUp setAction: @selector(popUpAction:)];
+      [pathsPopUp setItemsToNode: node];
+      [(NSBox *)popUpBox setContentView: pathsPopUp];	
+      RELEASE (pathsPopUp);
+
       [scroll setBorderType: NSBezelBorder];
       [scroll setHasHorizontalScroller: YES];
       [scroll setHasVerticalScroller: YES]; 
@@ -81,9 +96,42 @@ static NSString *nibName = @"ViewerWindow";
       iconsView = [[GWSVIconsView alloc] initForViewer: self];
 	    [scroll setDocumentView: iconsView];	
       
+      ASSIGN (shownNode, node);
       [self activate];
       
       [iconsView showContentsOfNode: node];
+      
+      labelstr = [NSString stringWithFormat: @"%i ", [[iconsView reps] count]];
+      labelstr = [labelstr stringByAppendingString: NSLocalizedString(@"elements", @"")];
+      [elementsLabel setStringValue: labelstr];
+      
+      attributes = [[NSFileManager defaultManager] fileSystemAttributesAtPath: [node path]];
+	    freefs = [attributes objectForKey: NSFileSystemFreeSize];
+      
+	    if (freefs == nil) {  
+		    labelstr = NSLocalizedString(@"unknown volume size", @"");    
+	    } else {
+		    labelstr = [NSString stringWithFormat: @"%@ %@", 
+                       sizeDescription([freefs unsignedLongLongValue]),
+                                            NSLocalizedString(@"free", @"")];
+	    }
+      
+      
+      //
+      //
+      // DIVIDERE 'STA ROBA IN PIU' METODI
+      // -updateLabels -updateMenu ecc...
+      // O NO, GIA' CHE NON ESISTERA' -setNode ?
+      //
+      //
+      
+      
+      [spaceLabel setStringValue: labelstr];
+      
+      icons = [iconsView reps];
+      if ([icons count]) {
+        [iconsView scrollIconToVisible: [icons objectAtIndex: 0]];
+      }
     }
   }
   
@@ -93,29 +141,75 @@ static NSString *nibName = @"ViewerWindow";
 - (void)activate
 {
   [win makeKeyAndOrderFront: nil];
+  [manager viewerSelected: self];
 }
 
 - (void)popUpAction:(id)sender
 {
+  NSString *path = [[sender selectedItem] representedObject];
+  BOOL close = [sender closeViewer];
+  
+  if (close) {
+    [pathsPopUp setTarget: nil];
+  }
+  
+  [manager newViewerForPath: path closeOldViewer: (close ? self : nil)]; 
+}
 
+- (void)setOpened:(BOOL)opened 
+       iconOfPath:(NSString *)path
+{
+  FSNIcon *icon = [iconsView repOfSubnodePath: path];
+
+  if (icon) {
+    [icon setOpened: opened];
+    [icon select];
+  }
+}
+
+- (void)unselectAllIcons
+{
+  [iconsView unselectOtherReps: nil];
 }
 
 - (FSNode *)shownNode
 {
-  return [iconsView shownNode];
+  return shownNode;
+}
+
+- (NSArray *)selectedNodes
+{
+  return [iconsView selectedNodes];
+}
+
+- (NSArray *)icons
+{
+  return [iconsView reps];
+}
+
+- (NSWindow *)win
+{
+  return win;
 }
 
 - (void)updateDefaults
 {
-  FSNode *node = [iconsView shownNode];
-  NSString *wname = [NSString stringWithFormat: @"spviewer_at_%@", [node path]];
-
+  NSString *wname = [NSString stringWithFormat: @"spviewer_at_%@", [shownNode path]];
   [win saveFrameUsingName: wname];
 }
 
 - (void)windowDidBecomeKey:(NSNotification *)aNotification
 {
+  NSArray *selection = [iconsView selectedReps];
 
+  if (selection && [selection count]) {
+    [iconsView selectionDidChange];
+  } else {
+//    [manager unselectOtherViewers: self];      
+    [manager viewerSelected: self];              
+  }
+
+  // [self updateInfoString]; 
 }
 
 - (BOOL)windowShouldClose:(id)sender
@@ -126,12 +220,8 @@ static NSString *nibName = @"ViewerWindow";
 - (void)windowWillClose:(NSNotification *)aNotification
 {
   [self updateDefaults];
+  [manager viewerWillClose: self]; 
 }
-
-
-
-
-
 
 
 

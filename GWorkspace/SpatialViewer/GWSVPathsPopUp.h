@@ -22,18 +22,21 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #ifndef GWSP_PATHS_POPUP_H
 #define GWSP_PATHS_POPUP_H
 
 #include <AppKit/NSPopUpButton.h>
 
+@class FSNode;
+
 @interface GWSVPathsPopUp : NSPopUpButton 
 {
-	BOOL newViewer;	
+	BOOL closeViewer;	
 }
 
-- (BOOL)newViewer;
+- (void)setItemsToNode:(FSNode *)node;
+
+- (BOOL)closeViewer;
 
 @end
 

@@ -316,6 +316,11 @@
 {
 }
 
+- (NSArray *)reps
+{
+  return icons;
+}
+
 - (NSArray *)selectedReps
 {
   NSMutableArray *selectedReps = [NSMutableArray array];

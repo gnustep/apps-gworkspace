@@ -64,6 +64,8 @@
   BOOL isSelected;
   BOOL selectable;
   
+  BOOL isOpened;
+  
   BOOL nameEdited;
   BOOL isLeaf;
   BOOL isLocked;
@@ -97,6 +99,10 @@
 - (void)unselect;
 
 - (BOOL)isSelected;
+
+- (void)setOpened:(BOOL)value;
+
+- (BOOL)isOpened;
 
 - (NSRect)iconBounds;
 

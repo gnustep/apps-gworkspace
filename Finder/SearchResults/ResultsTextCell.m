@@ -1,11 +1,11 @@
-/* FSNTextCell.m
+/* ResultsTextCell.m
  *  
  * Copyright (C) 2004 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
  *
- * This file is part of the GNUstep FSNode framework
+ * This file is part of the GNUstep Finder application
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,16 +24,16 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-#include "FSNTextCell.h"
+#include "ResultsTextCell.h"
 
-@implementation FSNTextCell
+@implementation ResultsTextCell
 
 - (void)dealloc
 {
-  TEST_RELEASE (uncuttedTitle);
-  RELEASE (fontAttr);
-  RELEASE (dots);
-  TEST_RELEASE (icon);  
+//  TEST_RELEASE (uncuttedTitle);
+//  RELEASE (fontAttr);
+//  RELEASE (dots);
+//  TEST_RELEASE (icon);  
   [super dealloc];
 }
 

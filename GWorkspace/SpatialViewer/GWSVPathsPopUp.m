@@ -24,28 +24,65 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
+#include "FSNode.h"
 #include "GWSVPathsPopUp.h"
 
 @implementation GWSVPathsPopUp
 
-- (id)initWithFrame:(NSRect)frameRect pullsDown:(BOOL)flag
+- (void)setItemsToNode:(FSNode *)node
 {
-	self = [super initWithFrame: frameRect pullsDown: flag];
-	newViewer = NO;
-	return self;
+  NSMenu *menu = [self menu];
+  NSArray *components = [FSNode pathComponentsToNode: node];
+  NSString *progPath;
+  int i;
+  
+  [self removeAllItems];
+  
+  for (i = 0; i < [components count]; i++) {
+    NSString *path = [components objectAtIndex: i];
+    NSMenuItem *item = [NSMenuItem new];
+  
+    if (i == 0) {
+      progPath = path;
+    } else {
+      progPath = [progPath stringByAppendingPathComponent: path];
+    }
+  
+    [item setTitle: path];
+    [item setRepresentedObject: progPath]; 
+    [menu addItem: item];
+    RELEASE (item);  
+  }
+  
+  [self selectItemAtIndex: ([components count] - 1)];
+}
+
+- (BOOL)closeViewer
+{
+	return closeViewer;
 }
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-  unsigned int mask = [theEvent modifierFlags];
+  RETAIN (self);
 
-	newViewer = ((mask == NSControlKeyMask) || (mask == NSAlternateKeyMask));
-	[super mouseDown: theEvent];
-}
+	closeViewer = (([theEvent modifierFlags] == NSAlternateKeyMask)
+                          || ([theEvent modifierFlags] == NSControlKeyMask));
+                          
+  [super mouseDown: theEvent];
 
-- (BOOL)newViewer
-{
-	return newViewer;
+  if ([self superview]) {
+    [self selectItemAtIndex: ([self numberOfItems] - 1)];
+  } 
+  
+  RELEASE (self);
 }
 
 @end
+
+
+
+
+
+
+

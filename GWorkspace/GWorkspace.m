@@ -341,7 +341,7 @@ static GWorkspace *gworkspace = nil;
     RELEASE (viewer);
     
 //  } else {
-//    viewer = [vwrsManager newViewerForPath: path viewsPackages: viewapps];
+//    viewer = [vwrsManager newViewerForPath: path closeOldViewer: nil];
 //  }
   
   return viewer;

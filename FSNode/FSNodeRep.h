@@ -38,7 +38,7 @@ typedef enum FSNInfoType {
   FSNInfoExtendedType = 6
 } FSNInfoType;
 
-typedef enum FSNSelectionMask {   
+typedef enum FSNSelectionMask {
   NSSingleSelectionMask = 0,
   FSNMultipleSelectionMask = 1,
   FSNCreatingSelectionMask = 2
@@ -175,6 +175,8 @@ typedef enum FSNSelectionMask {
 - (void)selectRepsOfPaths:(NSArray *)paths;
 
 - (void)selectAll;
+
+- (NSArray *)reps;
 
 - (NSArray *)selectedReps;
 

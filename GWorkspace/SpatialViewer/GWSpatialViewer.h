@@ -42,10 +42,12 @@
   GWSVPathsPopUp *pathsPopUp;
   IBOutlet id scroll;
   
+  FSNode *shownNode;
   GWSVIconsView *iconsView;
   
   int resizeIncrement;
 
+  GWViewersManager *manager;
 }
 
 - (id)initForNode:(FSNode *)node;
@@ -54,7 +56,18 @@
 
 - (void)popUpAction:(id)sender;
 
+- (void)setOpened:(BOOL)opened 
+       iconOfPath:(NSString *)path;
+
+- (void)unselectAllIcons;
+
 - (FSNode *)shownNode;
+
+- (NSArray *)selectedNodes;
+
+- (NSArray *)icons;
+
+- (NSWindow *)win;
 
 - (void)updateDefaults;
 

@@ -27,19 +27,48 @@
 
 #include <Foundation/Foundation.h>
 
-// @class NSWindow;
+@class GWSpatialViewer;
+@class GWorkspace;
 
 @interface GWViewersManager : NSObject
 {
   NSMutableArray *viewers;
+  GWorkspace *gworkspace;
 }
 
 + (GWViewersManager *)viewersManager;
 
-- (id)newViewerForPath:(NSString *)path 
-         viewsPackages:(BOOL)viewspkg;
+- (id)newViewerForPath:(NSString *)path
+        closeOldViewer:(GWSpatialViewer *)oldvwr;
 
 - (id)viewerForPath:(NSString *)path;
+
+- (void)viewerSelected:(GWSpatialViewer *)aviewer;
+
+- (void)unselectOtherViewers:(GWSpatialViewer *)aviewer;
+
+- (void)viewerWillClose:(GWSpatialViewer *)aviewer;
+
+- (void)openSelectionInViewer:(GWSpatialViewer *)viewer
+                  closeSender:(BOOL)close;
+
+
+
+/*
+//
+// DesktopApplication protocol
+//
+- (void)selectionChanged:(NSArray *)newsel;
+
+- (void)openSelectionInNewViewer:(BOOL)newv;
+
+- (void)openSelectionWithApp:(id)sender;
+
+- (void)performFileOperation:(NSDictionary *)opinfo;
+
+- (void)concludeRemoteFilesDragOperation:(NSData *)opinfo
+                             atLocalPath:(NSString *)localdest;
+*/
 
 @end
 

@@ -372,6 +372,11 @@
 {
 }
 
+- (NSArray *)reps
+{
+  return [NSArray array];
+}
+
 - (NSArray *)selectedReps
 {
   return [NSArray array];

@@ -699,6 +699,11 @@
 	}
 }
 
+- (void)mouseUp:(NSEvent *)theEvent
+{
+  [self setSelectionMask: NSSingleSelectionMask];        
+}
+
 - (void)mouseDown:(NSEvent *)theEvent
 {
   NSWindow *win = [self window];
@@ -1240,6 +1245,7 @@
 	NSPasteboard *pb;
   NSDragOperation sourceDragMask;
 	NSArray *sourcePaths;
+  NSString *basePath;
   NSString *nodePath;
   NSString *prePath;
 	int count;
@@ -1289,6 +1295,11 @@
   }
     
   nodePath = [node path];
+
+  basePath = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
+  if ([basePath isEqual: nodePath]) {
+    return NSDragOperationNone;
+  }
 
   if ([sourcePaths containsObject: nodePath]) {
     return NSDragOperationNone;

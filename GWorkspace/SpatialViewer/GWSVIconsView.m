@@ -24,7 +24,9 @@
 
 #include <AppKit/AppKit.h>
 #include "GWSVIconsView.h"
+#include "FSNIcon.h"
 #include "GWSpatialViewer.h"
+#include "GWViewersManager.h"
 
 @implementation GWSVIconsView
 
@@ -39,15 +41,11 @@
   
   if (self) {
 		viewer = vwr;
+    manager = [GWViewersManager viewersManager];
   }
   
   return self;
 }
-
-
-
-
-
 
 - (void)selectionDidChange
 {
@@ -56,6 +54,8 @@
 		
     if ([selection count] == 0) {
       selection = [NSArray arrayWithObject: [node path]];
+    } else {
+      [manager unselectOtherViewers: viewer];
     }
 
     if ((lastSelection == nil) || ([selection isEqual: lastSelection] == NO)) {
@@ -67,6 +67,26 @@
 	}
 }
 
+- (void)openSelectionInNewViewer:(BOOL)newv
+{
+  [manager openSelectionInViewer: viewer closeSender: newv];
+}
+
+- (void)mouseDown:(NSEvent *)theEvent
+{
+  if ([theEvent modifierFlags] != NSShiftKeyMask) {
+    selectionMask = NSSingleSelectionMask;
+    selectionMask |= FSNCreatingSelectionMask;
+		[self unselectOtherReps: nil];
+    selectionMask = NSSingleSelectionMask;
+    
+    DESTROY (lastSelection);
+    [self selectionDidChange];
+    
+ //   [manager unselectOtherViewers: viewer];
+    [manager viewerSelected: viewer];
+	}
+}
 
 @end
 

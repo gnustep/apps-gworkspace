@@ -195,7 +195,7 @@ static NSImage *branchImage;
     container = nil;
 
     isSelected = NO; 
-    
+    isOpened = NO;
     nameEdited = NO;
     
     dragdelay = 0;
@@ -238,6 +238,20 @@ static NSImage *branchImage;
 - (BOOL)isSelected
 {
   return isSelected;
+}
+
+- (void)setOpened:(BOOL)value
+{
+  if (isOpened == value) {
+    return;
+  }
+  isOpened = value;
+  [self setNeedsDisplay: YES]; 
+}
+
+- (BOOL)isOpened
+{
+  return isOpened;
 }
 
 - (NSRect)iconBounds
@@ -393,12 +407,29 @@ static NSImage *branchImage;
 
 - (void)mouseUp:(NSEvent *)theEvent
 {
-	if ([node isLocked] == NO) {
-	  if ([theEvent clickCount] > 1) { 
-      BOOL newv = ([theEvent modifierFlags] & NSControlKeyMask);
+  NSPoint location = [theEvent locationInWindow];
+  BOOL onself = NO;
+
+  location = [self convertPoint: location fromView: nil];
+
+  if (icnPosition == NSImageOnly) {
+    onself = [self mouse: location inRect: icnBounds];
+  } else {
+    onself = ([self mouse: location inRect: icnBounds]
+                        || [self mouse: location inRect: labelRect]);
+  }
+
+  [container setSelectionMask: NSSingleSelectionMask];   
+
+  if (onself) {
+	  if (([node isLocked] == NO) && ([theEvent clickCount] > 1)) {
+      BOOL newv = (([theEvent modifierFlags] & NSControlKeyMask)
+                        || ([theEvent modifierFlags] & NSAlternateKeyMask));
 		  [container openSelectionInNewViewer: newv];
-	  }  
-  }  
+    }  
+  } else {
+    [container mouseUp: theEvent];
+  }
 }
 
 - (void)mouseDown:(NSEvent *)theEvent
@@ -447,6 +478,7 @@ static NSImage *branchImage;
     							                  NSLeftMouseUpMask | NSLeftMouseDraggedMask];
 
           if ([nextEvent type] == NSLeftMouseUp) {
+            [[self window] postEvent: nextEvent atStart: NO];
             break;
 
           } else if ([nextEvent type] == NSLeftMouseDragged) {
@@ -490,7 +522,6 @@ static NSImage *branchImage;
 {	 
   if (isSelected) {
     [[NSColor selectedControlColor] set];
-//    [highlightPath stroke];
     [highlightPath fill];
     
     if ((icnPosition != NSImageOnly) && (nameEdited == NO)) {
@@ -508,7 +539,11 @@ static NSImage *branchImage;
   }
 
 	if (isLocked == NO) {	
-    [icon compositeToPoint: icnPoint operation: NSCompositeSourceOver];
+    if (isOpened == NO) {	
+      [icon compositeToPoint: icnPoint operation: NSCompositeSourceOver];
+    } else {
+      [icon dissolveToPoint: icnPoint fraction: 0.5];
+    }
 	} else {						
     [icon dissolveToPoint: icnPoint fraction: 0.3];
 	}
