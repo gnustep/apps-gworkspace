@@ -62,6 +62,7 @@ static id <DesktopApplication> desktopApp = nil;
                    iconSize: ISIZE
                iconPosition: NSImageOnly
                   labelFont: [NSFont systemFontOfSize: 12]
+                  textColor: [NSColor controlTextColor]
                   gridIndex: 0
                   dndSource: NO
                   acceptDnd: YES];

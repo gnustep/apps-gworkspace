@@ -54,9 +54,6 @@
     desktopView = [DesktopView new];
     [self setContentView: desktopView];
     RELEASE (desktopView);
-    
-    
-    NSLog(@"windowNumber %i", [self windowNumber]);
 	}
   
 	return self;

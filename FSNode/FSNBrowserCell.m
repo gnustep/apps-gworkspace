@@ -367,6 +367,15 @@ static NSDictionary *fontAttr = nil;
   return [super font];
 }
 
+- (void)setLabelTextColor:(NSColor *)acolor
+{
+}
+
+- (NSColor *)labelTextColor
+{
+  return [NSColor controlTextColor];
+}
+
 - (void)setIconSize:(int)isize
 {
   icnsize = isize;

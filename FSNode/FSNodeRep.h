@@ -45,6 +45,7 @@ typedef enum FSNSelectionMask {
 } FSNSelectionMask;
 
 @class NSImage;
+@class NSColor;
 @class NSBezierPath;
 @class NSFont;
 
@@ -63,6 +64,10 @@ typedef enum FSNSelectionMask {
 - (void)setFont:(NSFont *)fontObj;
 
 - (NSFont *)labelFont;
+
+- (void)setLabelTextColor:(NSColor *)acolor;
+
+- (NSColor *)labelTextColor;
 
 - (void)setIconSize:(int)isize;
 
@@ -195,6 +200,12 @@ typedef enum FSNSelectionMask {
 - (void)setBackgroundColor:(NSColor *)acolor;
 
 - (NSColor *)backgroundColor;
+
+- (void)setTextColor:(NSColor *)acolor;
+
+- (NSColor *)textColor;
+
+- (NSColor *)disabledTextColor;
 
 @end
 

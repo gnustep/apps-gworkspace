@@ -77,7 +77,9 @@ if (rct.size.height < 0) rct.size.height = 0; \
   TEST_RELEASE (lastSelection);
   TEST_RELEASE (charBuffer);
   RELEASE (backColor);
-
+  RELEASE (textColor);
+  RELEASE (disabledTextColor);
+  
   [super dealloc];
 }
 
@@ -109,9 +111,26 @@ if (rct.size.height < 0) rct.size.height = 0; \
                                                     blue: blue 
                                                    alpha: alpha]);
     } else {
-      ASSIGN (backColor, [NSColor windowBackgroundColor]);
+      ASSIGN (backColor, [[NSColor windowBackgroundColor] colorUsingColorSpaceName: NSDeviceRGBColorSpace]);
     }
 
+    defentry = [defaults dictionaryForKey: @"textcolor"];
+    if (defentry) {
+      float red = [[defentry objectForKey: @"red"] floatValue];
+      float green = [[defentry objectForKey: @"green"] floatValue];
+      float blue = [[defentry objectForKey: @"blue"] floatValue];
+      float alpha = [[defentry objectForKey: @"alpha"] floatValue];
+    
+      ASSIGN (textColor, [NSColor colorWithCalibratedRed: red 
+                                                   green: green 
+                                                    blue: blue 
+                                                   alpha: alpha]);
+    } else {
+      ASSIGN (textColor, [[NSColor controlTextColor] colorUsingColorSpaceName: NSDeviceRGBColorSpace]);
+    }
+
+    ASSIGN (disabledTextColor, [textColor highlightWithLevel: NSDarkGray]);
+    
     defentry = [defaults objectForKey: @"iconsize"];
     iconSize = defentry ? [defentry intValue] : DEF_ICN_SIZE;
 
@@ -152,6 +171,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
 		[nameEditor setBezeled: NO];
 		[nameEditor setAlignment: NSCenterTextAlignment];
 	  [nameEditor setBackgroundColor: backColor];
+	  [nameEditor setTextColor: textColor];
     editIcon = nil;
     
     isDragTarget = NO;
@@ -207,6 +227,22 @@ if (rct.size.height < 0) rct.size.height = 0; \
                                                      alpha: alpha]);
       }
 
+      entry = [nodeInfo objectForKey: @"textcolor"];
+      
+      if (entry) {
+        float red = [[entry objectForKey: @"red"] floatValue];
+        float green = [[entry objectForKey: @"green"] floatValue];
+        float blue = [[entry objectForKey: @"blue"] floatValue];
+        float alpha = [[entry objectForKey: @"alpha"] floatValue];
+
+        ASSIGN (textColor, [NSColor colorWithCalibratedRed: red 
+                                                     green: green 
+                                                      blue: blue 
+                                                     alpha: alpha]);
+                                                     
+        ASSIGN (disabledTextColor, [textColor highlightWithLevel: NSDarkGray]);      
+      }
+
       entry = [nodeInfo objectForKey: @"iconsize"];
       iconSize = entry ? [entry intValue] : iconSize;
 
@@ -250,17 +286,26 @@ if (rct.size.height < 0) rct.size.height = 0; \
 {
   if ([node isWritable]) {
     NSMutableDictionary *nodeInfo = [NSMutableDictionary dictionary];
-    NSMutableDictionary *colorDict = [NSMutableDictionary dictionary];
+    NSMutableDictionary *backColorDict = [NSMutableDictionary dictionary];
+    NSMutableDictionary *txtColorDict = [NSMutableDictionary dictionary];
     float red, green, blue, alpha;
 	
     [backColor getRed: &red green: &green blue: &blue alpha: &alpha];
-    [colorDict setObject: [NSNumber numberWithFloat: red] forKey: @"red"];
-    [colorDict setObject: [NSNumber numberWithFloat: green] forKey: @"green"];
-    [colorDict setObject: [NSNumber numberWithFloat: blue] forKey: @"blue"];
-    [colorDict setObject: [NSNumber numberWithFloat: alpha] forKey: @"alpha"];
+    [backColorDict setObject: [NSNumber numberWithFloat: red] forKey: @"red"];
+    [backColorDict setObject: [NSNumber numberWithFloat: green] forKey: @"green"];
+    [backColorDict setObject: [NSNumber numberWithFloat: blue] forKey: @"blue"];
+    [backColorDict setObject: [NSNumber numberWithFloat: alpha] forKey: @"alpha"];
 
-    [nodeInfo setObject: colorDict forKey: @"backcolor"];
+    [nodeInfo setObject: backColorDict forKey: @"backcolor"];
 
+    [textColor getRed: &red green: &green blue: &blue alpha: &alpha];
+    [txtColorDict setObject: [NSNumber numberWithFloat: red] forKey: @"red"];
+    [txtColorDict setObject: [NSNumber numberWithFloat: green] forKey: @"green"];
+    [txtColorDict setObject: [NSNumber numberWithFloat: blue] forKey: @"blue"];
+    [txtColorDict setObject: [NSNumber numberWithFloat: alpha] forKey: @"alpha"];
+
+    [nodeInfo setObject: txtColorDict forKey: @"textcolor"];
+    
     [nodeInfo setObject: [NSNumber numberWithInt: iconSize] 
                  forKey: @"iconsize"];
 
@@ -933,6 +978,7 @@ pp.x = NSMaxX([self bounds]) - 1
                                         iconSize: iconSize
                                     iconPosition: iconPosition
                                        labelFont: labelFont
+                                       textColor: textColor
                                        gridIndex: -1
                                        dndSource: YES
                                        acceptDnd: YES];
@@ -1207,6 +1253,7 @@ pp.x = NSMaxX([self bounds]) - 1
                                       iconSize: iconSize
                                   iconPosition: iconPosition
                                      labelFont: labelFont
+                                     textColor: textColor
                                      gridIndex: -1
                                      dndSource: YES
                                      acceptDnd: YES];
@@ -1505,6 +1552,29 @@ pp.x = NSMaxX([self bounds]) - 1
   return backColor;
 }
 
+- (void)setTextColor:(NSColor *)acolor
+{
+  int i;
+  
+	for (i = 0; i < [icons count]; i++) {
+    [[icons objectAtIndex: i] setLabelTextColor: acolor];  
+  }
+  
+  [nameEditor setTextColor: acolor];
+  
+  ASSIGN (textColor, acolor);
+}
+
+- (NSColor *)textColor
+{
+  return textColor;
+}
+
+- (NSColor *)disabledTextColor
+{
+  return disabledTextColor;
+}
+
 @end
 
 
@@ -1768,9 +1838,9 @@ pp.x = NSMaxX([self bounds]) - 1
     [nameEditor setBackgroundColor: [NSColor selectedControlColor]];
     
     if (locked == NO) {
-      [nameEditor setTextColor: [NSColor controlTextColor]];    
+      [nameEditor setTextColor: textColor];    
     } else {
-      [nameEditor setTextColor: [NSColor disabledControlTextColor]];    
+      [nameEditor setTextColor: [self disabledTextColor]];    
     }
 
     [nameEditor setEditable: ((locked == NO) && (mpoint == NO) && (infoType == FSNInfoNameType))];

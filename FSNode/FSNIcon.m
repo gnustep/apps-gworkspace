@@ -83,6 +83,7 @@ static NSImage *branchImage;
          iconSize:(int)isize
      iconPosition:(unsigned int)ipos
         labelFont:(NSFont *)lfont
+        textColor:(NSColor *)tcolor
         gridIndex:(int)gindex
         dndSource:(BOOL)dndsrc
         acceptDnd:(BOOL)dndaccept
@@ -132,6 +133,7 @@ static NSImage *branchImage;
     
     label = [FSNTextCell new];
     [label setFont: lfont];
+    [label setTextColor: tcolor];
     
     if ((type == FSNInfoExtendedType) && (exttype != nil)) {
       if ([self setExtendedShowType: exttype] == NO) {
@@ -607,6 +609,16 @@ static NSImage *branchImage;
   return [label font];
 }
 
+- (void)setLabelTextColor:(NSColor *)acolor
+{
+  [label setTextColor: acolor];
+}
+
+- (NSColor *)labelTextColor
+{
+  return [label textColor];
+}
+
 - (void)setIconSize:(int)isize
 {
   iconSize = isize;
@@ -754,8 +766,8 @@ static NSImage *branchImage;
 		return;
 	}
 	isLocked = value;
-	[label setTextColor: (isLocked ? [NSColor disabledControlTextColor] 
-																							: [NSColor controlTextColor])];
+	[label setTextColor: (isLocked ? [container disabledTextColor] 
+                                            : [container textColor])];
 	[self setNeedsDisplay: YES];		
 }
 

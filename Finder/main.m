@@ -80,9 +80,9 @@ void createMenu()
 	menuItem = addItemToMenu(mainMenu, @"Edit", @"", nil, @"");
 	edit = AUTORELEASE ([NSMenu new]);
 	[mainMenu setSubmenu: edit forItem: menuItem];	
-	addItemToMenu(edit, @"Cut", @"", nil, @"x");
-	addItemToMenu(edit, @"Copy", @"", nil, @"c");
-	addItemToMenu(edit, @"Paste", @"", nil, @"v");  
+	addItemToMenu(edit, @"Cut", @"", @"cut:", @"x");
+	addItemToMenu(edit, @"Copy", @"", @"copy:", @"c");
+	addItemToMenu(edit, @"Paste", @"", @"paste:", @"v");  
 				
 	// Windows
 	menuItem = addItemToMenu(mainMenu, @"Windows", @"", nil, @"");

@@ -66,6 +66,8 @@
 	NSTimeInterval lastKeyPressed;
   
   NSColor *backColor;
+  NSColor *textColor;
+  NSColor *disabledTextColor;
 
   id <DesktopApplication> desktopApp;
 }

@@ -127,6 +127,7 @@
                                iconSize: ICN_SIZE
                            iconPosition: NSImageLeft
                               labelFont: [NSFont systemFontOfSize: 12]
+                              textColor: [NSColor controlTextColor]
                               gridIndex: 0
                               dndSource: NO
                               acceptDnd: NO];
@@ -221,10 +222,6 @@
 {
   return FSNInfoNameType;
 }
-
-
-
-
 
 - (void)setIconSize:(int)size
 {
@@ -412,6 +409,20 @@
 - (NSColor *)backgroundColor
 {
   return [NSColor windowBackgroundColor];
+}
+
+- (void)setTextColor:(NSColor *)acolor
+{
+}
+
+- (NSColor *)textColor
+{
+  return [NSColor controlTextColor];
+}
+
+- (NSColor *)disabledTextColor
+{
+  return [NSColor disabledControlTextColor];
 }
 
 @end

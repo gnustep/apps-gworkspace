@@ -478,5 +478,19 @@
   return [NSColor windowBackgroundColor];
 }
 
+- (void)setTextColor:(NSColor *)acolor
+{
+}
+
+- (NSColor *)textColor
+{
+  return [NSColor controlTextColor];
+}
+
+- (NSColor *)disabledTextColor
+{
+  return [NSColor disabledControlTextColor];
+}
+
 @end
 

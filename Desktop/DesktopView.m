@@ -75,6 +75,7 @@
   self = [super init];
     
   if (self) {
+    NSColor *color;
     NSSize size;
     NSCachedImageRep *rep;
 
@@ -107,7 +108,9 @@
     [verticalImage addRepresentation: rep];
     RELEASE (rep);
     
-    if ([backColor isEqual: [NSColor windowBackgroundColor]]) {
+    color = [NSColor windowBackgroundColor];
+    color = [color colorUsingColorSpaceName: NSDeviceRGBColorSpace];
+    if ([backColor isEqual: color]) {
       ASSIGN (backColor, DEF_COLOR);
     }
     
@@ -166,6 +169,22 @@
                                                      green: green 
                                                       blue: blue 
                                                      alpha: alpha]);
+      }
+
+      entry = [nodeInfo objectForKey: @"textcolor"];
+      
+      if (entry) {
+        float red = [[entry objectForKey: @"red"] floatValue];
+        float green = [[entry objectForKey: @"green"] floatValue];
+        float blue = [[entry objectForKey: @"blue"] floatValue];
+        float alpha = [[entry objectForKey: @"alpha"] floatValue];
+
+        ASSIGN (textColor, [NSColor colorWithCalibratedRed: red 
+                                                     green: green 
+                                                      blue: blue 
+                                                     alpha: alpha]);
+      
+        ASSIGN (disabledTextColor, [textColor highlightWithLevel: NSDarkGray]);      
       }
 
       entry = [nodeInfo objectForKey: @"imagestyle"];
@@ -229,17 +248,26 @@
   if ([node isWritable]) {
     NSMutableDictionary *nodeInfo = [NSMutableDictionary dictionary];
     NSMutableDictionary *indexes = [NSMutableDictionary dictionary];
-    NSMutableDictionary *colorDict = [NSMutableDictionary dictionary];
+    NSMutableDictionary *backColorDict = [NSMutableDictionary dictionary];
+    NSMutableDictionary *txtColorDict = [NSMutableDictionary dictionary];
     float red, green, blue, alpha;
     int i;
 	
     [backColor getRed: &red green: &green blue: &blue alpha: &alpha];
-    [colorDict setObject: [NSNumber numberWithFloat: red] forKey: @"red"];
-    [colorDict setObject: [NSNumber numberWithFloat: green] forKey: @"green"];
-    [colorDict setObject: [NSNumber numberWithFloat: blue] forKey: @"blue"];
-    [colorDict setObject: [NSNumber numberWithFloat: alpha] forKey: @"alpha"];
+    [backColorDict setObject: [NSNumber numberWithFloat: red] forKey: @"red"];
+    [backColorDict setObject: [NSNumber numberWithFloat: green] forKey: @"green"];
+    [backColorDict setObject: [NSNumber numberWithFloat: blue] forKey: @"blue"];
+    [backColorDict setObject: [NSNumber numberWithFloat: alpha] forKey: @"alpha"];
 
-    [nodeInfo setObject: colorDict forKey: @"backcolor"];
+    [nodeInfo setObject: backColorDict forKey: @"backcolor"];
+
+    [textColor getRed: &red green: &green blue: &blue alpha: &alpha];
+    [txtColorDict setObject: [NSNumber numberWithFloat: red] forKey: @"red"];
+    [txtColorDict setObject: [NSNumber numberWithFloat: green] forKey: @"green"];
+    [txtColorDict setObject: [NSNumber numberWithFloat: blue] forKey: @"blue"];
+    [txtColorDict setObject: [NSNumber numberWithFloat: alpha] forKey: @"alpha"];
+
+    [nodeInfo setObject: txtColorDict forKey: @"textcolor"];
 
     [nodeInfo setObject: [NSNumber numberWithBool: useBackImage] 
                  forKey: @"usebackimage"];
@@ -882,6 +910,7 @@
                                         iconSize: iconSize
                                     iconPosition: iconPosition
                                        labelFont: labelFont
+                                       textColor: textColor
                                        gridIndex: -1
                                        dndSource: YES
                                        acceptDnd: YES];

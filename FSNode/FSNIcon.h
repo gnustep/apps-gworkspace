@@ -85,6 +85,7 @@
          iconSize:(int)isize
      iconPosition:(unsigned int)ipos
         labelFont:(NSFont *)lfont
+        textColor:(NSColor *)tcolor
         gridIndex:(int)gindex
         dndSource:(BOOL)dndsrc
         acceptDnd:(BOOL)dndaccept;
