@@ -134,7 +134,10 @@ static NSImage *branchImage;
     [label setFont: lfont];
     
     if ((type == FSNInfoExtendedType) && (exttype != nil)) {
-      [self setExtendedShowType: exttype];  
+      if ([self setExtendedShowType: exttype] == NO) {
+        type = FSNInfoNameType;
+        [self setNodeInfoShowType: type];  
+      }
     } else {
       if (type == FSNInfoExtendedType) {
         type = FSNInfoNameType;
@@ -539,8 +542,14 @@ static NSImage *branchImage;
   } 
 
   if ((showType == FSNInfoExtendedType) && (extInfoType != nil)) {
-    [self setExtendedShowType: extInfoType];  
+    if ([self setExtendedShowType: extInfoType] == NO) {
+      showType = FSNInfoNameType;
+      [self setNodeInfoShowType: showType];  
+    }
   } else {
+    if (showType == FSNInfoExtendedType) {
+      showType = FSNInfoNameType;
+    }
     [self setNodeInfoShowType: showType];  
   }
   
@@ -644,6 +653,13 @@ static NSImage *branchImage;
 
 - (void)setNodeInfoShowType:(FSNInfoType)type
 {
+  if (showType == FSNInfoExtendedType) {
+    NSFontManager *fmanager = [NSFontManager sharedFontManager];
+    NSFont *font = [fmanager convertFont: [label font] 
+                          toNotHaveTrait: NSItalicFontMask];
+    [label setFont: font];
+  }
+  
   showType = type;
   DESTROY (extInfoType);
 
@@ -668,64 +684,13 @@ static NSImage *branchImage;
     case FSNInfoOwnerType:
       [label setStringValue: [node owner]];
       break;
-      
-      
-  /*    
-    case FSNInfoExtendedType:      
-      {  
-        NSString *str = [FSNodeRep 
-        
-        
-        + (NSArray *)availableExtendedInfoNames
-        
-        // RITORNARE SOLO I NOMI DA METTERE NEL MENU (TUTTI I NOMI)
-        // I NOMI VENGONO DALLA DESCRIZIONE DEI BUNDLE CHE SONO PRESENTI.
-        // MA LA COSA SI APPLICA SOLO AI NODES DOVE HA SENSO
-        // (IN QUESTO CASO LA LABEL E' IN CORSIVO)
-        // ALTRIMENTI NON FA NESSUN EFFETTO
-        // E L'ICONA CONTINUA AD USARE IL current showType
-        // NON POSSIAMO PENSARE CHE IN UNA DIRECTORY
-        // CI SIANO SOLO OGGETTI DI UN SOLO TIPO!!!!!
-
-        + (NSDictionary *)extendedInfoOfType:(NSString *)type
-                                     forNode:(FSNode *)anode
-
-        // NON SI DEVE RITORNARE TUTTA LA INFO
-        // MA SOLO DELLE SPECIE DI KEYS
-        // PERCHE' PUO' ESSERE TROPPA ROBA
-        // (RIGUARDO ALLA ROBA, NON FARE L'ERRORE DI PENSARE AI CONTENTS)
-        // MA, FORSE, CI PUO' ESSERE, AD ESEMPIO, UNA NSView PER
-        // VEDERLI. 
-        
-        // USARE NOMI DI selector ???? NSInvocation ????
-        // USARE NOMI DI selector ???? NSInvocation ????
-        // USARE NOMI DI selector ???? NSInvocation ????
-        // USARE NOMI DI selector ???? NSInvocation ????
-        
-        // USARE IL SUBMENU O NO ????????????????
-                
-        
-        @protocol ExtendedInfo
-
-          - (NSString *)menuName;
-
-          - (NSDictionary *)extendedInfoForNode:(FSNode *)anode;
-
-        @end
-
-
-      }
-      break;
-  */      
-      
-      
     default:
       [label setStringValue: [node name]];
       break;
   }
 }
 
-- (void)setExtendedShowType:(NSString *)type
+- (BOOL)setExtendedShowType:(NSString *)type
 {
   if (selection == nil) {
     NSDictionary *info = [FSNodeRep extendedInfoOfType: type forNode: node];
@@ -734,10 +699,22 @@ static NSImage *branchImage;
       NSString *labelstr = [info objectForKey: @"labelstr"];
     
       [label setStringValue: labelstr]; 
+    
+      if (showType != FSNInfoExtendedType) {
+        NSFontManager *fmanager = [NSFontManager sharedFontManager];
+        NSFont *font = [fmanager convertFont: [label font] 
+                                 toHaveTrait: NSItalicFontMask];
+        [label setFont: font];
+      }
+    
       showType = FSNInfoExtendedType;   
       ASSIGN (extInfoType, type);
+      
+      return YES;
     }
-  } 
+  }
+  
+  return NO; 
 }
 
 - (FSNInfoType)nodeInfoShowType

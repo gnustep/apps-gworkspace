@@ -25,6 +25,7 @@
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include "FSNFunctions.h"
+#include "FSNodeRep.h"
 #include "GNUstep.h"
 
 static NSString *fixpath(NSString *s, const char *c)
@@ -82,3 +83,25 @@ BOOL isSubpathOfPath(NSString *p1, NSString *p2)
 
   return NO;
 }
+
+int compareWithExtType(id *r1, id *r2, void *context)
+{
+  FSNInfoType t1 = [(id <FSNodeRep>)r1 nodeInfoShowType];
+  FSNInfoType t2 = [(id <FSNodeRep>)r2 nodeInfoShowType];
+
+  if (t1 == FSNInfoExtendedType) {
+    if (t2 != FSNInfoExtendedType) {
+      return NSOrderedDescending;
+    }
+  } else {
+    if (t2 == FSNInfoExtendedType) {
+      return NSOrderedAscending;
+    }
+  }
+
+  return NSOrderedSame;
+}
+
+
+
+

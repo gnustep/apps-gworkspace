@@ -40,11 +40,25 @@
 
 - (NSDictionary *)extendedInfoForNode:(FSNode *)anode
 {
-  NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+  if ([anode isApplication]) {
+    NSBundle *bundle = [NSBundle bundleWithPath: [anode path]];
+    NSDictionary *info = [bundle infoDictionary];
 
-  [dict setObject: @"TEST" forKey: @"labelstr"];
-  
-  return dict;
+    if (info) {
+      NSString *role = [info objectForKey: @"NSRole"];
+
+      if (role) {
+        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+
+        [dict setObject: NSLocalizedString(role, @"")
+                 forKey: @"labelstr"];
+      
+        return dict;
+      }
+    }
+  }
+
+  return nil;
 }
 
 @end

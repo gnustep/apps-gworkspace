@@ -166,7 +166,6 @@ static Desktop *desktop = nil;
   
   extendedInfo = [FSNodeRep availableExtendedInfoNames];
   menu = [[[NSApp mainMenu] itemWithTitle: NSLocalizedString(@"View", @"")] submenu];
-	menu = [[menu itemWithTitle: NSLocalizedString(@"Other", @"")] submenu];
   
   for (i = 0; i < [extendedInfo count]; i++) {
 	  [menu addItemWithTitle: [extendedInfo objectAtIndex: i] 

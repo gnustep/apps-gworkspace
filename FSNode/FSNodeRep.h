@@ -76,7 +76,7 @@ typedef enum FSNSelectionMask {
 
 - (void)setNodeInfoShowType:(FSNInfoType)type;
 
-- (void)setExtendedShowType:(NSString *)type;
+- (BOOL)setExtendedShowType:(NSString *)type;
 
 - (FSNInfoType)nodeInfoShowType;
 

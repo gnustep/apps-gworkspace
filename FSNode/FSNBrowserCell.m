@@ -303,8 +303,14 @@ static NSDictionary *fontAttr = nil;
   }
   
   if ((showType == FSNInfoExtendedType) && (extInfoType != nil)) {
-    [self setExtendedShowType: extInfoType];  
+    if ([self setExtendedShowType: extInfoType] == NO) {
+      showType = FSNInfoNameType;
+      [self setNodeInfoShowType: showType];  
+    }
   } else {
+    if (showType == FSNInfoExtendedType) {
+      showType = FSNInfoNameType;
+    }
     [self setNodeInfoShowType: showType];  
   }
   
@@ -388,6 +394,13 @@ static NSDictionary *fontAttr = nil;
 
 - (void)setNodeInfoShowType:(FSNInfoType)type
 {
+  if (showType == FSNInfoExtendedType) {
+    NSFontManager *fmanager = [NSFontManager sharedFontManager];
+    NSFont *font = [fmanager convertFont: [self font] 
+                          toNotHaveTrait: NSItalicFontMask];
+    [self setFont: font];
+  }
+
   showType = type;
   DESTROY (extInfoType);
   
@@ -418,19 +431,31 @@ static NSDictionary *fontAttr = nil;
   }
 }
 
-- (void)setExtendedShowType:(NSString *)type
+- (BOOL)setExtendedShowType:(NSString *)type
 {
   if (selection == nil) {
     NSDictionary *info = [FSNodeRep extendedInfoOfType: type forNode: node];
 
     if (info) {
       NSString *labelstr = [info objectForKey: @"labelstr"];
+
+      [self setStringValue: labelstr]; 
+
+      if (showType != FSNInfoExtendedType) {
+        NSFontManager *fmanager = [NSFontManager sharedFontManager];
+        NSFont *font = [fmanager convertFont: [self font] 
+                                 toHaveTrait: NSItalicFontMask];
+        [self setFont: font];
+      }
     
       showType = FSNInfoExtendedType;   
       ASSIGN (extInfoType, type);
-      [self setStringValue: labelstr]; 
+      
+      return YES;
     }
   } 
+  
+  return NO;
 }
 
 - (FSNInfoType)nodeInfoShowType

@@ -29,4 +29,6 @@ NSString *path_separator(void);
 
 BOOL isSubpathOfPath(NSString *p1, NSString *p2);
 
+int compareWithExtType(id *r1, id *r2, void *context);
+
 #endif // FSN_FUNCTIONS_H

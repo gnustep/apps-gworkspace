@@ -174,6 +174,13 @@ if (rct.size.height < 0) rct.size.height = 0; \
 {
   SEL compSel = [FSNodeRep compareSelectorForDirectory: [node path]];
   NSArray *sorted = [icons sortedArrayUsingSelector: compSel];
+
+  if (infoType == FSNInfoExtendedType) {
+    NSArray *extsorted = [sorted sortedArrayUsingFunction: (int (*)(id, id, void*))compareWithExtType
+                                                  context: (void *)NULL];
+    sorted = extsorted;
+  }
+  
   [icons removeAllObjects];
   [icons addObjectsFromArray: sorted];
 }
@@ -847,17 +854,9 @@ pp.x = NSMaxX([self bounds]) - 1
     pool = [NSAutoreleasePool new];
 
     while ((key = [app_enum nextObject])) {
-      NSDictionary *dict = [apps objectForKey: key];
-      NSString *role = [dict objectForKey: @"NSRole"];
-
       menuItem = [NSMenuItem new];    
-
-      if (role) {
-        [menuItem setTitle: [NSString stringWithFormat: @"%@ - %@", key, role]];
-      } else {
-        [menuItem setTitle: [NSString stringWithFormat: @"%@", key]];
-      }
-
+      key = [key stringByDeletingPathExtension];
+      [menuItem setTitle: key];
       [menuItem setTarget: desktopApp];      
       [menuItem setAction: @selector(openSelectionWithApp:)];      
       [menuItem setRepresentedObject: key];            
@@ -1703,7 +1702,7 @@ pp.x = NSMaxX([self bounds]) - 1
   
   if (editIcon) {
     FSNode *iconnode = [editIcon node];
-    NSString *nodeDescr = nil;
+    NSString *nodeDescr = [editIcon shownInfo];
     BOOL locked = [editIcon isLocked];
     BOOL mpoint = [iconnode isMountPoint];
     NSRect icnr = [editIcon frame];
@@ -1712,38 +1711,22 @@ pp.x = NSMaxX([self bounds]) - 1
     int margin = [FSNodeRep labelMargin];
     float bw = [self bounds].size.width - EDIT_MARGIN;
     float edwidth = 0.0; 
+    NSFontManager *fmanager = [NSFontManager sharedFontManager];
+    NSFont *edfont = [nameEditor font];
     
     [editIcon setNameEdited: YES];
- 
-    switch(infoType) {
-      case FSNInfoNameType:
-        nodeDescr = [iconnode name];
-        break;
-      case FSNInfoKindType:
-        nodeDescr = [iconnode typeDescription];
-        break;
-      case FSNInfoDateType:
-        nodeDescr = [iconnode modDateDescription];
-        break;
-      case FSNInfoSizeType:
-        nodeDescr = [iconnode sizeDescription];
-        break;
-      case FSNInfoOwnerType:
-        nodeDescr = [iconnode owner];
-        break;
-      case FSNInfoExtendedType:
-        {
-          NSDictionary *info = [FSNodeRep extendedInfoOfType: extInfoType 
-                                                     forNode: iconnode];
-          nodeDescr = [info objectForKey: @"labelstr"];
-          break;
-        }
-      default:
-        nodeDescr = [iconnode name];
-        break;
+  
+    if ([editIcon nodeInfoShowType] == FSNInfoExtendedType) {
+      edfont = [fmanager convertFont: edfont 
+                         toHaveTrait: NSItalicFontMask];
+    } else {
+      edfont = [fmanager convertFont: edfont 
+                      toNotHaveTrait: NSItalicFontMask];
     }
- 
-    edwidth = [labelFont widthOfString: nodeDescr];
+    
+    [nameEditor setFont: edfont];
+    
+    edwidth = [[nameEditor font] widthOfString: nodeDescr];
     edwidth += margin;
     
     if (ipos == NSImageAbove) {
@@ -1800,7 +1783,7 @@ pp.x = NSMaxX([self bounds]) - 1
 {
   NSRect icnr = [editIcon frame];
   int ipos = [editIcon iconPosition];
-  float edwidth = [labelFont widthOfString: [nameEditor stringValue]]; 
+  float edwidth = [[nameEditor font] widthOfString: [nameEditor stringValue]]; 
   int margin = [FSNodeRep labelMargin];
   float bw = [self bounds].size.width - EDIT_MARGIN;
   NSRect edrect = [nameEditor frame];
