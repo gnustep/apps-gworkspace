@@ -1,4 +1,9 @@
 #!/bin/sh
 
+APP=xsox
 
-xsox "$2" &
+if [ $# -eq 2 ] ; then
+  $APP "$2" &
+else
+  $APP &
+fi

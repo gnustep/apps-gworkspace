@@ -14,11 +14,16 @@
                 confMatrix = id; 
                 confirmBox = id; 
                 confirmItem = id; 
+                labelinfo1 = id; 
+                labelinfo2 = id; 
                 prefbox = id; 
                 statActivButt = id; 
                 statChooseButt = id; 
                 statusBox = id; 
                 statusItem = id; 
+                statusinfo1 = id; 
+                statusinfo2 = id; 
+                statuslabel = id; 
                 tabView = id; 
                 win = id; 
             }; 

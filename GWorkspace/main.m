@@ -25,8 +25,6 @@
 #include <AppKit/AppKit.h>
   #ifdef GNUSTEP 
 #include "GWFunctions.h"
-  #else
-#include <Renaissance/Renaissance.h>
   #endif
 #include "GWorkspace.h"
 #include "GNUstep.h"
@@ -44,7 +42,7 @@ int main(int argc, char **argv, char **env)
 #ifdef GNUSTEP
 	createMenu();
 #else
-  [NSBundle loadGSMarkupNamed: @"MainMenu-OSX"  owner: gw];
+  [NSBundle loadNibNamed: @"MainMenu-OSX"  owner: gw];
 #endif
 	
   [app setDelegate: gw];    
@@ -94,9 +92,9 @@ void createMenu()
 	menuItem = addItemToMenu(mainMenu, @"Edit", @"", nil, @"");
 	edit = AUTORELEASE ([NSMenu new]);
 	[mainMenu setSubmenu: edit forItem: menuItem];	
-	addItemToMenu(edit, @"Cut", @"", nil, @"x");
-	addItemToMenu(edit, @"Copy", @"", nil, @"c");
-	addItemToMenu(edit, @"Paste", @"", nil, @"v");
+	addItemToMenu(edit, @"Cut", @"", @"cut:", @"x");
+	addItemToMenu(edit, @"Copy", @"", @"copy:", @"c");
+	addItemToMenu(edit, @"Paste", @"", @"paste:", @"v");
 	addItemToMenu(edit, @"Select All", @"", @"selectAllInViewer:", @"a");
 
 	// View

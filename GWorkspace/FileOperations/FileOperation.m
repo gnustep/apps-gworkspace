@@ -140,11 +140,11 @@ static NSString *nibName = @"FileOperationWin";
         [self endOperation];
         return self; 
       } else {
-        NSPort *port[2];
+        NSMessagePort *port[2];
         NSArray *ports;
 
-        port[0] = (NSPort *)[NSPort port];
-        port[1] = (NSPort *)[NSPort port];
+        port[0] = (NSMessagePort *)[NSMessagePort port];
+        port[1] = (NSMessagePort *)[NSMessagePort port];
         ports = [NSArray arrayWithObjects: port[1], port[0], nil];
 
         execconn = [[NSConnection alloc] initWithReceivePort: port[0]
@@ -537,7 +537,7 @@ static NSString *nibName = @"FileOperationWin";
 + (void)setPorts:(NSArray *)thePorts
 {
   NSAutoreleasePool *pool;
-  NSPort *port[2];
+  NSMessagePort *port[2];
   NSConnection *conn;
   FileOpExecutor *executor;
                
@@ -546,8 +546,8 @@ static NSString *nibName = @"FileOperationWin";
   port[0] = [thePorts objectAtIndex: 0];             
   port[1] = [thePorts objectAtIndex: 1];             
                
-  conn = [NSConnection connectionWithReceivePort: (NSPort *)port[0]
-                                        sendPort: (NSPort *)port[1]];
+  conn = [NSConnection connectionWithReceivePort: (NSMessagePort *)port[0]
+                                        sendPort: (NSMessagePort *)port[1]];
   
   executor = [[self alloc] init];
   [executor setFileop: thePorts];
@@ -583,15 +583,15 @@ static NSString *nibName = @"FileOperationWin";
 
 - (void)setFileop:(NSArray *)thePorts
 {
-  NSPort *port[2];
+  NSMessagePort *port[2];
   NSConnection *conn;
   id anObject;
   
   port[0] = [thePorts objectAtIndex: 0];             
   port[1] = [thePorts objectAtIndex: 1];             
 
-  conn = [NSConnection connectionWithReceivePort: (NSPort *)port[0]
-                                        sendPort: (NSPort *)port[1]];
+  conn = [NSConnection connectionWithReceivePort: (NSMessagePort *)port[0]
+                                        sendPort: (NSMessagePort *)port[1]];
 
   anObject = (id)[conn rootProxy];
   [anObject setProtocolForProxy: @protocol(FileOpProtocol)];

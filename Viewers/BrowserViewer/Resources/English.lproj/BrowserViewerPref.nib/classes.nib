@@ -1,15 +1,18 @@
 {
     IBClasses = (
         {
-            ACTIONS = {setDefaultWidth = id; }; 
+            ACTIONS = {setDefaultWidth = id; setIcons = id; setShelf = id; }; 
             CLASS = BrowserViewerPref; 
             LANGUAGE = ObjC; 
             OUTLETS = {
+                aspectBox = id; 
+                cellIconButt = id; 
                 colExample = id; 
                 controlsbox = id; 
                 prefbox = id; 
                 resizerBox = id; 
                 setButt = id; 
+                shelfButt = id; 
                 win = id; 
             }; 
             SUPERCLASS = NSObject; 

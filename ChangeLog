@@ -1,3 +1,29 @@
+2003-07-29 Enrico Sersale  <enrico@imago.ro>
+
+  * GWorkspace/FileOperations/FileOperation.m
+    changed all the occourrencies of NSPort with NSMessagePort
+
+2003-07-18 Enrico Sersale  <enrico@imago.ro>
+
+  * GWorkspace/Resources
+    added some .nib files that was not created after the last try of 
+    building GWorkspace on OS X
+
+2003-07-17 Enrico Sersale  <enrico@imago.ro>
+
+  * GWorkspace/TShelf/TShelfView.m
+    in -drawRect: uses NSBezierPath instead of ps operators.
+
+2003-07-13 Enrico Sersale  <enrico@imago.ro>
+
+  * Utilities/findfile/findfile.m
+    fixed some bugs exposed by the recent changes in DO;
+
+2003-07-10 Enrico Sersale  <enrico@imago.ro>
+
+  * GWorkspace/TShelf
+    a new Tabbed Shelf added.
+
 2003-07-09 Enrico Sersale  <enrico@imago.ro>
 
   * GWorkspace/Watchers/Watcher.m

@@ -1,5 +1,9 @@
 #!/bin/sh
 
-#konqueror $*
+APP=konqueror
 
-konqueror "$2" &
+if [ $# -eq 2 ] ; then
+  $APP "$2" &
+else
+  $APP &
+fi

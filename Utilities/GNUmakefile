@@ -7,8 +7,7 @@ ifneq ($(FOUNDATION_LIB), apple)
        wopen 
 else
   SUBPROJECTS = \
-       findfile \
-       thumbnailer
+       findfile 
 endif
 
 -include GNUmakefile.preamble

@@ -162,7 +162,6 @@
 - (void)activate
 {
 	[self orderFrontLeaves];
-//	[GSCurrentContext() flush];
 }
 
 - (NSWindow *)myWin

@@ -1,3 +1,9 @@
 #!/bin/sh
 
-xfig "$2" &
+APP=xfig
+
+if [ $# -eq 2 ] ; then
+  $APP "$2" &
+else
+  $APP &
+fi

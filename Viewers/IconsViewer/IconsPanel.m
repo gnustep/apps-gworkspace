@@ -134,6 +134,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
 		lastKeyPressed = 0.;
     charBuffer = nil;
     selectInProgress = NO;
+    
     contestualMenu = [gworkspace usesContestualMenu];
     
   	[self registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, nil]];

@@ -2,10 +2,10 @@
  *  FinderController.m: Implementation of the FinderController Class 
  *  of the GNUstep GWorkspace application
  *
- *  Copyright (c) 2001 Enrico Sersale <enrico@imago.ro>
+ *  Copyright (c) 2003 Enrico Sersale <enrico@dtedu.net>
  *  
  *  Author: Enrico Sersale
- *  Date: August 2001
+ *  Date: August 2003
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -589,6 +589,7 @@ if (sz.height < 0) sz.height = 0
   if ([connection registerName: @"Finder"] == NO) {
     NSLog(@"Unable to register the connection");
   }
+  [connection setIndependentConversationQueueing: YES];
   [connection setRequestTimeout: LONG_DELAY];
   [connection setReplyTimeout: LONG_DELAY];
 	[connection setDelegate: self];
@@ -599,7 +600,7 @@ if (sz.height < 0) sz.height = 0
                             object: connection];    
 
   task = [NSTask launchedTaskWithLaunchPath: findfileName 
-                                  arguments: [NSArray array]];
+                                  arguments: nil];
   RETAIN (task);
 
   timer = [NSTimer scheduledTimerWithTimeInterval: 5.0 target: self 
@@ -608,12 +609,15 @@ if (sz.height < 0) sz.height = 0
   RETAIN (timer);   
 }
 
-- (void)registerFindFile:(id<FindFileProtocol>)anObject
+- (void)registerFindFile:(id)anObject
 {
-  ASSIGN (findfile, anObject);
+  [anObject setProtocolForProxy: @protocol(FindFileProtocol)];
+  findfile = (id <FindFileProtocol>)anObject;
 
+  RETAIN (findfile);
+    
   [findfile findAtPath: [currentSelection objectAtIndex: 0] 
-          withCriteria: criteria];
+          withCriteria: [criteria description]];
 }
 
 - (void)initNameControls
@@ -644,7 +648,7 @@ if (sz.height < 0) sz.height = 0
 
 - (NSDictionary *)initializeFindCriteria
 {
-  NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity: 1];
+  NSMutableDictionary *dict = [NSMutableDictionary dictionary];
   
 #define ZERO_VAL [NSNumber numberWithInt: 0]
 #define INIT_KEY(x) [dict setObject: ZERO_VAL forKey: x]

@@ -272,7 +272,6 @@ return [ws openFile: fullPath withApplication: appName]
 		viewer = [self newViewerAtPath: rootFullpath canViewApps: (type == NSApplicationFileType)];
 		[viewer setViewerSelection: paths];
 		[viewer makeKeyAndOrderFront: nil];
-		// [GSCurrentContext() flush];
 	} else {
 		[rootViewer setViewerSelection: paths];
 	}
@@ -1157,11 +1156,7 @@ return [ws openFile: fullPath withApplication: appName]
   	} else if ([desktopWindow isVisible] == NO) {
 			[desktopWindow activate];
 		}
-    
-    
- //   ASSIGN (tshelfBackground, [[desktopWindow desktopView] shelfBackground]);
-
-
+    [self makeTshelfBackground];
 	} else {
 		if ((desktopWindow != nil) && ([desktopWindow isVisible])) {
       [[desktopWindow desktopView] saveDefaults]; 
@@ -1173,6 +1168,13 @@ return [ws openFile: fullPath withApplication: appName]
 - (NSImage *)tshelfBackground
 {
   return tshelfBackground;
+}
+
+- (void)makeTshelfBackground
+{
+  if ((desktopWindow != nil) && ([desktopWindow isVisible])) {
+    ASSIGN (tshelfBackground, [[desktopWindow desktopView] shelfBackground]);
+  }
 }
 
 - (NSColor *)tshelfBackColor
@@ -2361,8 +2363,7 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 	return nil;
 }
 	
-			 
-- (BOOL)readSelectionFromPasteboard:(NSPasteboard*)pboard
+- (BOOL)readSelectionFromPasteboard:(NSPasteboard *)pboard
 {
 	if ([[pboard types] indexOfObject: NSFilenamesPboardType] != NSNotFound) {
 		return YES;
@@ -2371,8 +2372,8 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 	return NO;
 }
 
-- (BOOL)writeSelectionToPasteboard:(NSPasteboard*)pboard
-                             types:(NSArray*)types
+- (BOOL)writeSelectionToPasteboard:(NSPasteboard *)pboard
+                             types:(NSArray *)types
 {
 	if ([types containsObject: NSFilenamesPboardType] == YES) {
 		NSArray *typesDeclared = [NSArray arrayWithObject: NSFilenamesPboardType];

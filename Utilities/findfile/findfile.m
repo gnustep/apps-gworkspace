@@ -257,30 +257,28 @@ BOOL checkContents(NSString *str, NSString *path)
 - (id)init
 {  
 	self = [super init];
+  
   if(self) {
     NSConnection *connection;
     id anObject;
-        
-    connection = [NSConnection connectionWithRegisteredName: @"Finder" host: @""];
-    if (connection == nil) {
-      NSLog(@"FindFile - failed to get the connection - bye.");
-	    exit(1);               
-    }
-
-    anObject = [connection rootProxy];
-    
+            
+    anObject = [NSConnection rootProxyForConnectionWithRegisteredName: @"Finder" 
+                                                                 host: @""];
     if (anObject == nil) {
       NSLog(@"FindFile - failed to contact GWorkspace - bye.");
 	    exit(1);           
     } 
-
-    [anObject setProtocolForProxy: @protocol(FinderProtocol)];
-    finder = (id <FinderProtocol>)anObject;
     
+    connection = [anObject connectionForProxy];
+    [connection setIndependentConversationQueueing: YES];
+
     [[NSNotificationCenter defaultCenter] addObserver: self
                             selector: @selector(connectionDidDie:)
                                 name: NSConnectionDidDieNotification
                               object: connection];    
+
+    [anObject setProtocolForProxy: @protocol(FinderProtocol)];
+    finder = (id <FinderProtocol>)anObject;
 
     fm = [NSFileManager defaultManager];    
   }
@@ -294,10 +292,10 @@ BOOL checkContents(NSString *str, NSString *path)
 }
 
 - (oneway void)findAtPath:(NSString *)apath 
-             withCriteria:(NSDictionary *)crit
+             withCriteria:(NSString *)crit
 {
   findPath = [[NSString alloc] initWithString: apath];
-  criteria = [[NSMutableDictionary alloc] initWithDictionary: crit];
+  criteria = [[NSDictionary alloc] initWithDictionary: [crit propertyList]];
  
 #define GET_VALUE(k, x) \
 if ([[criteria objectForKey: k] intValue]) (findStruct.x) = 1;
@@ -435,9 +433,9 @@ int main(int argc, char** argv)
 	FindFile *findfile;
   
   CREATE_AUTORELEASE_POOL (pool);
-	findfile = [[FindFile alloc] init];
+	findfile = [FindFile new];
   
-  if (findfile != nil) {
+  if (findfile) {
     [findfile registerWithFinder];
     [[NSRunLoop currentRunLoop] run];
   }

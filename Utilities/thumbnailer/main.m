@@ -26,6 +26,7 @@
 #include <math.h>
 #include <unistd.h>
 #include <limits.h>
+#include "GNUstep.h"
 
 #define TMBMAX (48.0)
 #define RESZLIM 4

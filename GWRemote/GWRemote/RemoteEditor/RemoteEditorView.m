@@ -35,7 +35,10 @@ static NSString *nibName = @"FindWindow";
       [findWin setFrame: NSMakeRect(200, 200, 209, 99) display: NO];
     }
     [findWin setDelegate: self];  
-
+    
+    [self setString: @""];
+    [self setSelectedRange: NSMakeRange(0, 0)];
+    
     [self setRichText: NO];
     [self setImportsGraphics: NO];
     [self setUsesFontPanel: NO];
@@ -51,7 +54,7 @@ static NSString *nibName = @"FindWindow";
     size = NSMakeSize([self frame].size.width, 1e7);
     [[self textContainer] setContainerSize: size];
     [[self textContainer] setWidthTracksTextView: YES];
-    
+        
     font = [NSFont userFixedPitchFontOfSize: 12];
     fontDict = [[NSDictionary alloc] initWithObjects: 
                           [NSArray arrayWithObject: font] 

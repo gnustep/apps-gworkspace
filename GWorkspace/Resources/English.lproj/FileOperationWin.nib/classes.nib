@@ -1,0 +1,29 @@
+{
+    IBClasses = (
+        {
+            CLASS = FileOpExecutor; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {fileOp = id; }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {
+            ACTIONS = {checkExecutor = id; pause = id; stop = id; }; 
+            CLASS = FileOperation; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                executor = id; 
+                fromField = id; 
+                fromLabel = id; 
+                pauseButt = id; 
+                progInd = id; 
+                stopButt = id; 
+                toField = id; 
+                toLabel = id; 
+                win = id; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }, 
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }
+    ); 
+    IBVersion = 1; 
+}

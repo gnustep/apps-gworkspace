@@ -33,7 +33,7 @@
   #endif
 
 @class NSWiew;
-@class GenericContsView;
+@class NSTextField;
 @class GWorkspace;
 @class NSFileManager;
 @class NSWorkspace;
@@ -54,7 +54,7 @@
 	int pathscount;
   NSView *noContsView;
   NSView *genericView;
-	GenericContsView *genericContsView;
+  NSTextField *genericField;
   
 	NSMutableArray *viewers;
   id currentViewer;

@@ -13,7 +13,9 @@
             OUTLETS = {
                 addButt = id; 
                 cellPrototipe = id; 
+                hiddenlabel = id; 
                 iconView = id; 
+                labelinfo = id; 
                 leftScroll = id; 
                 loadButt = id; 
                 pathField = id; 
@@ -21,6 +23,7 @@
                 removeButt = id; 
                 rightScroll = id; 
                 setButt = id; 
+                shownlabel = id; 
                 win = id; 
             }; 
             SUPERCLASS = NSObject; 

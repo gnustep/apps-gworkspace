@@ -1,0 +1,20 @@
+{
+    IBClasses = (
+        {CLASS = FirstResponder; LANGUAGE = ObjC; SUPERCLASS = NSObject; }, 
+        {
+            ACTIONS = {cancelButtAction = id; okButtAction = id; }; 
+            CLASS = RunExternalController; 
+            LANGUAGE = ObjC; 
+            OUTLETS = {
+                cancelButt = id; 
+                fieldBox = id; 
+                okButt = id; 
+                secondLabel = id; 
+                titleLabel = id; 
+                win = id; 
+            }; 
+            SUPERCLASS = NSObject; 
+        }
+    ); 
+    IBVersion = 1; 
+}
