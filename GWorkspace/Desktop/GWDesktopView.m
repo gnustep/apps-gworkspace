@@ -484,22 +484,6 @@
                                                    alpha: alpha]);
     }
 
-    entry = [dskinfo objectForKey: @"textcolor"];
-
-    if (entry) {
-      float red = [[entry objectForKey: @"red"] floatValue];
-      float green = [[entry objectForKey: @"green"] floatValue];
-      float blue = [[entry objectForKey: @"blue"] floatValue];
-      float alpha = [[entry objectForKey: @"alpha"] floatValue];
-
-      ASSIGN (textColor, [NSColor colorWithCalibratedRed: red 
-                                                   green: green 
-                                                    blue: blue 
-                                                   alpha: alpha]);
-
-      ASSIGN (disabledTextColor, [textColor highlightWithLevel: NSDarkGray]);      
-    }
-
     entry = [dskinfo objectForKey: @"imagestyle"];
     backImageStyle = entry ? [entry intValue] : backImageStyle;
 
@@ -570,7 +554,6 @@
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
   NSMutableDictionary *indexes = [NSMutableDictionary dictionary];
   NSMutableDictionary *backColorDict = [NSMutableDictionary dictionary];
-  NSMutableDictionary *txtColorDict = [NSMutableDictionary dictionary];
   float red, green, blue, alpha;
   int i;
 
@@ -581,14 +564,6 @@
   [backColorDict setObject: [NSNumber numberWithFloat: alpha] forKey: @"alpha"];
 
   [desktopInfo setObject: backColorDict forKey: @"backcolor"];
-
-  [textColor getRed: &red green: &green blue: &blue alpha: &alpha];
-  [txtColorDict setObject: [NSNumber numberWithFloat: red] forKey: @"red"];
-  [txtColorDict setObject: [NSNumber numberWithFloat: green] forKey: @"green"];
-  [txtColorDict setObject: [NSNumber numberWithFloat: blue] forKey: @"blue"];
-  [txtColorDict setObject: [NSNumber numberWithFloat: alpha] forKey: @"alpha"];
-
-  [desktopInfo setObject: txtColorDict forKey: @"textcolor"];
 
   [desktopInfo setObject: [NSNumber numberWithBool: useBackImage] 
                   forKey: @"usebackimage"];

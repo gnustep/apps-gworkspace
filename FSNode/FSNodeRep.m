@@ -317,7 +317,8 @@ static FSNodeRep *shared = nil;
       if ([node isApplication]) {
         icon = [self darkerIcon: [self iconOfSize: size forNode: node]];
       } else {
-        icon = openFolderIcon;
+   //     icon = openFolderIcon;
+        icon = [self darkerIcon: [self iconOfSize: size forNode: node]];
       }
     }      
   } else {
@@ -327,7 +328,8 @@ static FSNodeRep *shared = nil;
     } else if ([node isApplication]) {    
       icon = [self darkerIcon: [self iconOfSize: size forNode: node]];
     } else {
-      icon = openFolderIcon;
+  //    icon = openFolderIcon;
+      icon = [self darkerIcon: [self iconOfSize: size forNode: node]];
     }
   }
 
