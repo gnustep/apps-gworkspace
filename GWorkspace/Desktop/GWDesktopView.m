@@ -26,9 +26,9 @@
 #include <AppKit/AppKit.h>
 #include <math.h>
 #include "FSNodeRep.h"
-#include "FSNIcon.h"
 #include "FSNFunctions.h"
 #include "GWDesktopView.h"
+#include "GWDesktopIcon.h"
 #include "GWDesktopManager.h"
 #include "Dock.h"
 
@@ -767,6 +767,8 @@
     
     DESTROY (lastSelection);
     [self selectionDidChange];
+    
+    [manager deselectInSpatialViewers];
 	}
 }
 
@@ -978,17 +980,17 @@
     
   for (i = 0; i < [subNodes count]; i++) {
     FSNode *subnode = [subNodes objectAtIndex: i];
-    FSNIcon *icon = [[FSNIcon alloc] initForNode: subnode
-                                    nodeInfoType: infoType
-                                    extendedType: extInfoType
-                                        iconSize: iconSize
-                                    iconPosition: iconPosition
-                                       labelFont: labelFont
-                                       textColor: textColor
-                                       gridIndex: -1
-                                       dndSource: YES
-                                       acceptDnd: YES
-                                       slideBack: YES];
+    GWDesktopIcon *icon = [[GWDesktopIcon alloc] initForNode: subnode
+                                          nodeInfoType: infoType
+                                          extendedType: extInfoType
+                                              iconSize: iconSize
+                                          iconPosition: iconPosition
+                                             labelFont: labelFont
+                                             textColor: textColor
+                                             gridIndex: -1
+                                             dndSource: YES
+                                             acceptDnd: YES
+                                             slideBack: YES];
                                        
     [unsorted addObject: icon];
     RELEASE (icon);
@@ -1276,6 +1278,32 @@
   FSNIcon *icon = [super addRepForSubnode: anode];
   [icon setGridIndex: [self firstFreeGridIndex]];
   return icon;
+}
+
+- (void)repSelected:(id)arep
+{
+  NSWindow *win = [self window];
+
+  if (win != [NSApp keyWindow]) {
+    [win makeKeyWindow];
+  }
+}
+
+- (void)selectionDidChange
+{
+	if (!(selectionMask & FSNCreatingSelectionMask)) {
+    NSArray *selection = [self selectedPaths];
+		
+    if ([selection count] == 0) {
+      selection = [NSArray arrayWithObject: [node path]];
+    } else {
+      [manager deselectInSpatialViewers];
+    }
+
+    ASSIGN (lastSelection, selection);
+    [desktopApp selectionChanged: selection];
+    [self updateNameEditor];
+	}
 }
 
 - (void)openSelectionInNewViewer:(BOOL)newv

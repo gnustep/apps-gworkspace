@@ -1,4 +1,4 @@
-/* XDockWindow.h
+/* DockWindow.m
  *  
  * Copyright (C) 2005 Free Software Foundation, Inc.
  *
@@ -22,17 +22,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef X_DOCK_WINDOW
-#define X_DOCK_WINDOW
+#include <Foundation/Foundation.h>
+#include <AppKit/AppKit.h>
+#include "DockWindow.h"
 
-#include <AppKit/NSWindow.h>
+@implementation DockWindow
 
-@interface XDockWindow : NSWindow
+- (void)activate
 {
+  [self orderFront: nil];
 }
 
-- (void)activate;
-
 @end
-
-#endif // X_DOCK_WINDOW

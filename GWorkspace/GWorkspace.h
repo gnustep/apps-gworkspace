@@ -199,11 +199,17 @@
 
 - (NSString *)defXtermArgs;
 
+- (GWViewersManager *)viewersManager;
+
+- (GWDesktopManager *)desktopManager;
+
 - (History *)historyWindow;
 
 - (NSImage *)tshelfBackground;	
 
 - (void)makeTshelfBackground;
+
+- (void)tshelfBackgroundDidChange;
 
 - (NSString *)tshelfPBDir;
 

@@ -26,6 +26,7 @@
 #include <AppKit/AppKit.h>
 #include <GNUstepGUI/GSDisplayServer.h>
 #include <X11/Xlib.h>
+#include <X11/Xatom.h>
 #include "XDesktopWindow.h"
 
 @implementation XDesktopWindow
@@ -51,29 +52,49 @@
 
 - (void)activate
 {
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
   GSDisplayServer *server = GSCurrentServer();
   Display *dpy = (Display *)[server serverDevice];
   void *winptr = [server windowDevice: [self windowNumber]];
   Window win = *(Window *)winptr;
-  Atom atom = 0;
   long data = 1;
-    
-  atom = XInternAtom(dpy, "KWM_WIN_STICKY", False);
-  
-  if (atom != 0) {
-    XChangeProperty(dpy, win, atom, atom, 32, 
-                        PropModeReplace, (unsigned char *)&data, 1);
-  }
-  
-  atom = XInternAtom(dpy, "WIN_STATE_STICKY", False);
 
-  if (atom != 0) {  
-    XChangeProperty(dpy, win, atom, atom, 32, 
-                        PropModeReplace, (unsigned char *)&data, 1);
-  }
+  if ([defaults boolForKey: @"NET_WM"]) {
+    long l = -1;
+    Atom atoms[3];
+
+    [self orderFront: nil];
+
+    atoms[0] = XInternAtom(dpy, "_NET_WM_DESKTOP", False);
+
+    XChangeProperty(dpy, win, atoms[0], XA_CARDINAL,
+                          32, PropModeReplace, (unsigned char*)&l, 1);
+
+    atoms[1] = XInternAtom(dpy, "_NET_WM_STATE", False);
+
+    XChangeProperty(dpy, win, atoms[1], atoms[1], 32, 
+                          PropModeReplace, (unsigned char *)&data, 1);
+
+    atoms[2] = XInternAtom(dpy, "_NET_WM_STATE_STICKY", False);
+
+    XChangeProperty(dpy, win, atoms[1], XA_ATOM, 32, 
+                          PropModeReplace, (unsigned char *)&atoms[2], 1);
+  } else {
+    Atom atom = 0;  
   
-	[self setLevel: NSDesktopWindowLevel];
-  [self orderFront: nil];
+    atom = XInternAtom(dpy, "KWM_WIN_STICKY", False);
+
+    XChangeProperty(dpy, win, atom, atom, 32, 
+                          PropModeReplace, (unsigned char *)&data, 1);
+
+    atom = XInternAtom(dpy, "WIN_STATE_STICKY", False);
+
+    XChangeProperty(dpy, win, atom, atom, 32, 
+                          PropModeReplace, (unsigned char *)&data, 1);
+
+//	  [self setLevel: NSDesktopWindowLevel];
+    [self orderFront: nil];
+  }
 }
 
 - (void)deactivate
@@ -187,7 +208,8 @@
 	[super print: sender];
 }
 
-- (void)orderWindow:(NSWindowOrderingMode)place relativeTo:(int)otherWin
+- (void)orderWindow:(NSWindowOrderingMode)place 
+         relativeTo:(int)otherWin
 {
   [super orderWindow: place relativeTo: otherWin];
   [self setLevel: NSDesktopWindowLevel];

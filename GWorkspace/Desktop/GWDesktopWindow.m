@@ -49,7 +49,6 @@
 
 - (void)activate
 {
-	[self setLevel: NSDesktopWindowLevel];
   [self orderFront: nil];
 }
 

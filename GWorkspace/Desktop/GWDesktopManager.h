@@ -95,6 +95,10 @@ typedef enum DockPosition {
 
 - (NSImage *)tabbedShelfBackground;
 
+- (void)deselectAllIcons;
+
+- (void)deselectInSpatialViewers;
+
 - (void)addWatcherForPath:(NSString *)path;
 
 - (void)removeWatcherForPath:(NSString *)path;

@@ -51,7 +51,9 @@ GWorkspace.m \
 Desktop/GWDesktopManager.m \
 Desktop/GWDesktopWindow.m \
 Desktop/GWDesktopView.m \
+Desktop/GWDesktopIcon.m \
 Desktop/Dock/Dock.m \
+Desktop/Dock/DockWindow.m \
 Desktop/Dock/DockIcon.m \
 FileViewer/GWViewersManager.m \
 FileViewer/GWViewer.m \

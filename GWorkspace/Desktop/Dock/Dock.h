@@ -36,7 +36,7 @@
 
 @interface Dock : NSView 
 {
-  NSWindow *win;
+  id win;
   BOOL usexbundle;
   DockPosition position;
 

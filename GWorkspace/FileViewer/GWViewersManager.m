@@ -30,6 +30,7 @@
 #include "History.h"
 #include "FSNFunctions.h"
 #include "GWorkspace.h"
+#include "GWDesktopManager.h"
 
 static GWViewersManager *vwrsmanager = nil;
 
@@ -395,7 +396,12 @@ static GWViewersManager *vwrsmanager = nil;
   NSString *path = [node path];
   NSArray *watchedNodes = [aviewer watchedNodes];
   id parentViewer = [self parentOfSpatialViewer: aviewer];
+  id desktopManager = [gworkspace desktopManager];  
   int i;
+
+  if ([desktopManager isActive]) {
+    [desktopManager deselectAllIcons];
+  }
   
   if (parentViewer && ([parentViewer invalidated] == NO)) {
     [parentViewer setOpened: NO repOfNode: node];
@@ -473,7 +479,7 @@ static GWViewersManager *vwrsmanager = nil;
  */
 - (void)selectedSpatialViewerChanged:(id)aviewer
 {
-  if ([aviewer isSpatial] && [[aviewer win] isKeyWindow]) {
+  if ((aviewer == nil) || ([aviewer isSpatial] && [[aviewer win] isKeyWindow])) {
     int i;
     
     orderingViewers = YES;
@@ -483,6 +489,14 @@ static GWViewersManager *vwrsmanager = nil;
 
       if ((viewer != aviewer) && [viewer isSpatial]) {
         [viewer unselectAllReps];
+      }
+    }
+    
+    if (aviewer != nil) {
+      id desktopManager = [gworkspace desktopManager];
+      
+      if ([desktopManager isActive]) {
+        [desktopManager deselectAllIcons];
       }
     }
     

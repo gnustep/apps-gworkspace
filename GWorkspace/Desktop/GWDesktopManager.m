@@ -30,6 +30,7 @@
 #include "FSNFunctions.h"
 #include "FileAnnotationsManager.h"
 #include "GWorkspace.h"
+#include "GWViewersManager.h"
 
 static GWDesktopManager *desktopManager = nil;
 
@@ -153,6 +154,7 @@ static GWDesktopManager *desktopManager = nil;
     
   if (hidedock == NO) {
     [dock activate];
+    [win orderBack: nil];
   }
 }
 
@@ -249,6 +251,10 @@ static GWDesktopManager *desktopManager = nil;
       [win activate];
       
       [dock setUsesXBundle: usexbundle];
+      
+      if (hidedock == NO) {
+        [win orderBack: nil];
+      }
     }
   }
 }
@@ -349,6 +355,17 @@ static GWDesktopManager *desktopManager = nil;
 - (NSImage *)tabbedShelfBackground
 {
   return [[win desktopView] tshelfBackground];
+}
+
+- (void)deselectAllIcons
+{
+  [[win desktopView] unselectOtherReps: nil];
+  [[win desktopView] stopRepNameEditing];
+}
+
+- (void)deselectInSpatialViewers
+{
+  [[gworkspace viewersManager] selectedSpatialViewerChanged: nil];
 }
 
 - (void)addWatcherForPath:(NSString *)path

@@ -26,6 +26,7 @@
 #include <AppKit/AppKit.h>
 #include <math.h>
 #include "Dock.h"
+#include "DockWindow.h"
 #include "DockIcon.h"
 #include "GWDesktopView.h"
 
@@ -66,7 +67,7 @@
 
     if (window == nil) {
       usexbundle = NO;
-	    window = [[NSWindow alloc] initWithContentRect: NSZeroRect
+	    window = [[DockWindow alloc] initWithContentRect: NSZeroRect
 					                          styleMask: NSBorderlessWindowMask  
                                       backing: NSBackingStoreBuffered 
                                         defer: NO];
@@ -75,9 +76,9 @@
     win = RETAIN (window);
     RELEASE (window);
 
-    [win setReleasedWhenClosed: NO]; 
+    [win setReleasedWhenClosed: NO];
     [win setExcludedFromWindowsMenu: YES];
-    [[win contentView] addSubview: self];	
+    [(NSWindow *)win setContentView: self];	
     
     manager = mngr;
     position = [manager dockPosition];
@@ -148,17 +149,15 @@
 
 - (void)activate
 {
-  [self tile];
-  [win makeKeyAndOrderFront: nil];
-	[win setLevel: NSNormalWindowLevel];  
-  [win makeMainWindow];
   [win setBackgroundColor: backColor];  
   [self setUseBackImage: [[manager desktopView] useBackImage]];
+  [self tile];
+  [win activate];
 }
 
 - (void)deactivate
 {
-  [win orderOut: self];
+  [win orderOut: nil];
 }
 
 - (void)setUsesXBundle:(BOOL)value
@@ -173,7 +172,7 @@
   } 
   
   if (window == nil) {
-	  window = [[NSWindow alloc] initWithContentRect: NSZeroRect
+	  window = [[DockWindow alloc] initWithContentRect: NSZeroRect
 					                        styleMask: NSBorderlessWindowMask  
                                     backing: NSBackingStoreBuffered 
                                       defer: NO];
@@ -188,9 +187,9 @@
   win = RETAIN (window);
   RELEASE (window);
   
-  [win setReleasedWhenClosed: NO]; 
-  [win setExcludedFromWindowsMenu: YES];
-  [[win contentView] addSubview: self];	
+  [win setReleasedWhenClosed: NO];
+  [win setExcludedFromWindowsMenu: YES];  
+  [(NSWindow *)win setContentView: self];	
 
   if (active) {
     [self activate];

@@ -555,8 +555,9 @@ static GWorkspace *gworkspace = nil;
     item = [menu itemWithTitle: NSLocalizedString(@"Show Desktop", @"")];
     [item setTitle: NSLocalizedString(@"Hide Desktop", @"")];
   }
-
+  
   tshelfBackground = nil; 
+  [self makeTshelfBackground];
   
   if ([defaults boolForKey: @"usefiend"]) {
     [self showFiend: nil];
@@ -734,6 +735,16 @@ static GWorkspace *gworkspace = nil;
 	return defXtermArgs;
 }
 
+- (GWViewersManager *)viewersManager
+{
+  return vwrsManager;
+}
+
+- (GWDesktopManager *)desktopManager
+{
+  return dtopManager;
+}
+
 - (History *)historyWindow
 {
 	return history;
@@ -763,15 +774,24 @@ static GWorkspace *gworkspace = nil;
 
 - (void)makeTshelfBackground
 {
+  DESTROY (tshelfBackground);
+  
   if ([dtopManager isActive]) {
     NSImage *image = [dtopManager tabbedShelfBackground];
-  
-    if (image) {
+    
+    if (image) {   
       ASSIGN (tshelfBackground, image);
-    }  
-  } else {
-    DESTROY (tshelfBackground);
+    }
   }
+}
+
+- (void)tshelfBackgroundDidChange
+{
+  [self makeTshelfBackground];
+  
+  if ((tshelfWin != nil) && ([tshelfWin isVisible])) {
+    [[tshelfWin shelfView] setNeedsDisplay: YES];
+  }  
 }
 
 - (NSString *)tshelfPBDir

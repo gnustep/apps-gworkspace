@@ -26,6 +26,7 @@
 #include <AppKit/AppKit.h>
 #include "DesktopPref.h"
 #include "GWDesktopManager.h"
+#include "GWorkspace.h"
 #include "GWDesktopView.h"
 #include "Dock.h"
 
@@ -59,6 +60,7 @@ static NSString *nibName = @"DesktopPref";
       RELEASE (win);
 
       manager = [GWDesktopManager desktopManager];
+      gworkspace = [GWorkspace gworkspace];
 
       // Color
       r = [[(NSBox *)currColorBox contentView] frame];
@@ -164,6 +166,7 @@ static NSString *nibName = @"DesktopPref";
 - (IBAction)setColor:(id)sender
 {
   [[manager desktopView] setCurrentColor: [colorView color]];
+  [gworkspace tshelfBackgroundDidChange];
 }
 
 
@@ -209,6 +212,7 @@ static NSString *nibName = @"DesktopPref";
     [[manager desktopView] setBackImageAtPath: imagePath];
     [imagePosMatrix selectCellAtRow: [[manager desktopView] backImageStyle] 
                              column: 0];
+    [gworkspace tshelfBackgroundDidChange];
   }
 }
 
@@ -218,14 +222,14 @@ static NSString *nibName = @"DesktopPref";
   int row, col;
   
   [imagePosMatrix getRow: &row column: &col ofCell: cell];
-  [[manager desktopView] setBackImageStyle: row];
-  
-  [imagePosMatrix selectCellAtRow: [[manager desktopView] backImageStyle] column: 0];
+  [[manager desktopView] setBackImageStyle: row];  
+  [gworkspace tshelfBackgroundDidChange];
 }
 
 - (IBAction)setUseImage:(id)sender
 {
   [[manager desktopView] setUseBackImage: ([sender state] == NSOnState) ? YES : NO];
+  [gworkspace tshelfBackgroundDidChange];
 }
 
 

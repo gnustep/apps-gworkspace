@@ -71,6 +71,7 @@
   IBOutlet id dockPosMatrix;    
 
   GWDesktopManager *manager;
+  id gworkspace;
 }
 
 // Color
