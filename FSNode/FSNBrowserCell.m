@@ -47,7 +47,6 @@ static NSDictionary *fontAttr = nil;
   TEST_RELEASE (extInfoType);
   TEST_RELEASE (icon); 
   TEST_RELEASE (openicon); 
-  TEST_RELEASE (highlightPath);
   RELEASE (dots);
   
   [super dealloc];
@@ -86,15 +85,17 @@ static NSDictionary *fontAttr = nil;
     node = nil;
     selection = nil;
     selectionTitle = nil;
+    showType = FSNInfoNameType;
     extInfoType = nil;
     icon = nil;
     icnsize = DEFAULT_ISIZE;
-    highlightPath = nil;
-    hlightRect = NSZeroRect;
     
     isLocked = NO;
     iconSelected = NO;
+    isOpened = NO;
     nameEdited = NO;
+    
+    [self setAllowsMixedState: NO];
   }
 
   return self;
@@ -103,20 +104,8 @@ static NSDictionary *fontAttr = nil;
 - (void)setIcon
 {
   if (node) {
-    NSImage *icn = [FSNodeRep openFolderIconOfSize: icnsize forNode: node];
-  
-    hlightRect = NSZeroRect;
-    hlightRect.size.width = ceil(icnsize / 3 * 4);
-    hlightRect.size.height = ceil(hlightRect.size.width * HLIGHT_H_FACT);
-    if ((icnsize - hlightRect.size.height) < 2) {
-      hlightRect.size.height = icnsize + 2;
-    }
-    ASSIGN (highlightPath, [FSNodeRep highlightPathOfSize: hlightRect.size]);
     ASSIGN (icon, [FSNodeRep iconOfSize: icnsize forNode: node]);
-    
-    if (icn) {
-      ASSIGN (openicon, icn);
-    }
+    DESTROY (openicon);
   }
 }
 
@@ -133,6 +122,15 @@ static NSDictionary *fontAttr = nil;
   if (iconSelected) {
     return NO;
   }
+  
+  if (openicon == nil) {
+    NSImage *opicn = [FSNodeRep openFolderIconOfSize: icnsize forNode: node];
+
+    if (opicn) {
+      ASSIGN (openicon, opicn);
+    }
+  }
+  
   iconSelected = YES;
   return YES;
 }
@@ -193,6 +191,7 @@ static NSDictionary *fontAttr = nil;
 - (void)drawInteriorWithFrame:(NSRect)cellFrame 
 		                   inView:(NSView *)controlView
 {
+  NSColor *backcolor = [(NSMatrix *)controlView cellBackgroundColor];
   float textlenght = cellFrame.size.width;
   BOOL showsFirstResponder = [self showsFirstResponder];
   NSString *cuttitle;  
@@ -214,36 +213,26 @@ static NSDictionary *fontAttr = nil;
     if (nameEdited == NO) {
       [super drawInteriorWithFrame: titleRect inView: controlView];
     } else {
-      [[NSColor controlBackgroundColor] set];
+      [backcolor set];
       NSRectFill(cellFrame);
     }
   } else {
     NSRect icon_rect;    
-    NSRect highlight_rect;    
 
     [controlView lockFocus];
 
+    if (([self isHighlighted] || [self state]) && (nameEdited == NO)) {
+	    [[self highlightColorInView: controlView] set];
+    } else {
+      [backcolor set];
+	  }
+	  NSRectFill(cellFrame);
+
     [self setShowsFirstResponder: NO];
     
-    highlight_rect = hlightRect;
-    if ([controlView isFlipped]) {
-	    highlight_rect.origin.y += highlight_rect.size.height;
-    }
-    
-    highlight_rect.origin = cellFrame.origin;
-    highlight_rect.origin.x += 1;
-    highlight_rect.origin.y += (cellFrame.size.height - highlight_rect.size.height) / 2.0;
-    if ([controlView isFlipped]) {
-	    highlight_rect.origin.y += highlight_rect.size.height;
-    }
-
     icon_rect.origin = cellFrame.origin;
     icon_rect.size = NSMakeSize(icnsize, icnsize);
-    if (highlight_rect.size.width > 0) {
-      icon_rect.origin.x += (highlight_rect.size.width - icon_rect.size.width) / 2.0;
-    } else {
-      icon_rect.origin.x += MARGIN;
-    }
+    icon_rect.origin.x += MARGIN;
     icon_rect.origin.y += ((cellFrame.size.height - icon_rect.size.height) / 2.0);
     if ([controlView isFlipped]) {
 	    icon_rect.origin.y += icon_rect.size.height;
@@ -251,13 +240,6 @@ static NSDictionary *fontAttr = nil;
     
     titleRect.origin.x += (icon_rect.size.width + (MARGIN * 2));	
     titleRect.size.width -= (icon_rect.size.width + (MARGIN * 2));	
-
-    if ([self isHighlighted] && (nameEdited == NO)) {
-	    [[self highlightColorInView: controlView] set];
-    } else {
-      [[NSColor controlBackgroundColor] set];
-	  }
-	  NSRectFill(cellFrame);
     
     if (nameEdited == NO) {        
       [super drawInteriorWithFrame: titleRect inView: controlView];
@@ -265,14 +247,19 @@ static NSDictionary *fontAttr = nil;
         
     if ([self isEnabled]) {
       if (iconSelected) {
-        [[self highlightColorInView: controlView] set];
-        [highlightPath fill];
-        [openicon compositeToPoint: icon_rect.origin 
-	                       operation: NSCompositeSourceOver];
-                         
+        if (isOpened == NO) {	
+          [openicon compositeToPoint: icon_rect.origin 
+	                         operation: NSCompositeSourceOver];
+        } else {
+          [openicon dissolveToPoint: icon_rect.origin fraction: 0.5];
+        }
       } else {
-        [icon compositeToPoint: icon_rect.origin 
-	                   operation: NSCompositeSourceOver];
+        if (isOpened == NO) {	
+          [icon compositeToPoint: icon_rect.origin 
+	                     operation: NSCompositeSourceOver];
+        } else {              
+          [icon dissolveToPoint: icon_rect.origin fraction: 0.5];
+        }
       }
     } else {
 			[icon dissolveToPoint: icon_rect.origin fraction: 0.3];
@@ -315,6 +302,19 @@ static NSDictionary *fontAttr = nil;
   }
   
   [self setLocked: [node isLocked]];
+}
+
+- (void)setNode:(FSNode *)anode
+   nodeInfoType:(FSNInfoType)type
+   extendedType:(NSString *)exttype
+{
+  showType = type;
+  
+  if (exttype) {
+    ASSIGN (extInfoType, exttype);
+  }
+
+  [self setNode: anode];
 }
 
 - (FSNode *)node
@@ -490,6 +490,25 @@ static NSDictionary *fontAttr = nil;
 - (BOOL)isLeaf
 {
   return [super isLeaf];
+}
+
+- (void)setOpened:(BOOL)value
+{
+/*
+  NSLog(@"setOpened %i", value);
+
+  if (isOpened == value) {
+    return;
+  }
+  isOpened = value;
+  
+  NSLog(@"setOpened %@ %i", [node name], value);
+*/
+}
+
+- (BOOL)isOpened
+{
+  return isOpened;
 }
 
 - (void)setLocked:(BOOL)value

@@ -145,8 +145,9 @@ static NSString *nibName = @"Tools";
 
 - (void)activateForPaths:(NSArray *)paths
 {
+  NSFileManager *fm = [NSFileManager defaultManager];
+  BOOL toolsok = YES;
 	int pathscount;
-  BOOL toolsok;
 	int i;
 
   if (paths == nil) {
@@ -168,18 +169,23 @@ static NSString *nibName = @"Tools";
 		[titleField setStringValue: items];  
     [iconView setImage: [NSImage imageNamed: @"MultipleSelection.tiff"]];
   }
-
-  toolsok = YES; 
+   
   for (i = 0; i < [paths count]; i++) {
 	  NSString *path = [paths objectAtIndex: i];
-		NSString *defApp = nil;
-		NSString *fType = nil;
 
-		[ws getInfoForFile: path application: &defApp type: &fType];		
-		if (([fType isEqual: NSPlainFileType] == NO)
-                       && ([fType isEqual: NSShellCommandFileType] == NO)) {
-			toolsok = NO;		
-			break;
+    if ([fm fileExistsAtPath: path]) {
+		  NSString *defApp = nil;
+		  NSString *fType = nil;
+    
+		  [ws getInfoForFile: path application: &defApp type: &fType];		
+		  if (([fType isEqual: NSPlainFileType] == NO)
+                         && ([fType isEqual: NSShellCommandFileType] == NO)) {
+			  toolsok = NO;		
+			  break;
+      }
+    } else {  
+      toolsok = NO;		
+      break;
     }
   }
     

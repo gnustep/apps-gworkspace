@@ -559,7 +559,7 @@ static NSString *nibName = @"Contents";
     }
   }   
     	      
-	if (path) {
+	if (path && [fm fileExistsAtPath: path]) {
 		id viewer = [self viewerForPath: path];
 
     if (currentPath && ([currentPath isEqual: path] == NO)) {

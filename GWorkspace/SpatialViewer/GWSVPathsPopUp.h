@@ -36,6 +36,8 @@
 
 - (void)setItemsToNode:(FSNode *)node;
 
+- (void)setItemsEnabled:(BOOL)enabled;
+
 - (BOOL)closeViewer;
 
 @end

@@ -811,12 +811,12 @@ double myrintf(double a)
 {
   int i;
     			
-  for (i = 0; i <= s; i++) {  
+  for (i = 0; i < s; i++) {  
     (*createEmpty)(self, createEmptySel);
   }
-	
+  
 	currentshift = s;  
-  (*lastColumn)(self, lastColumnSel, (lastColumnLoaded + s));
+  (*lastColumn)(self, lastColumnSel, (lastColumnLoaded + s));  
   [self scrollColumnsRightBy: s];
   [self tile];
 }

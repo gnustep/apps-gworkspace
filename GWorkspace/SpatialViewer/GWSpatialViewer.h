@@ -28,48 +28,99 @@
 #include <Foundation/Foundation.h>
 
 @class GWViewersManager;
-@class GWSVIconsView;
 @class GWSVPathsPopUp;
 @class FSNode;
+@class GWViewerWindow;
+@class GWorkspace;
+@class NSView;
+@class NSTextField;
+@class NSScroller;
+@class NSScrollView;
 
 @interface GWSpatialViewer : NSObject
 {
-  IBOutlet id win;
-  IBOutlet id topBox;
-  IBOutlet id elementsLabel;
-  IBOutlet id spaceLabel;
-  IBOutlet id popUpBox;
+  GWViewerWindow *vwrwin;
+  NSView *mainView;
+  NSView *topBox;
+  NSTextField *elementsLabel;
+  NSTextField *spaceLabel;
   GWSVPathsPopUp *pathsPopUp;
-  IBOutlet id scroll;
+  NSScrollView *scroll;
+  NSScroller *browserSroll;
+  id nodeView;
   
+  NSString *viewType;
+  BOOL rootviewer;
+  BOOL spatial;
+
+  int visibleCols;
+    
   FSNode *shownNode;
-  GWSVIconsView *iconsView;
-  
+  NSArray *lastSelection;  
+  NSMutableArray *watchedNodes;
+  BOOL watchersSuspended;
   int resizeIncrement;
 
   GWViewersManager *manager;
+  GWorkspace *gworkspace;
+    
+  BOOL invalidated;
 }
 
 - (id)initForNode:(FSNode *)node;
-
-- (void)activate;
-
-- (void)popUpAction:(id)sender;
-
-- (void)setOpened:(BOOL)opened 
-       iconOfPath:(NSString *)path;
-
-- (void)unselectAllIcons;
-
+- (void)createSubviews;
 - (FSNode *)shownNode;
-
-- (NSArray *)selectedNodes;
-
-- (NSArray *)icons;
+- (void)reloadNodeContents;
+- (void)unloadFromPath:(NSString *)path;
 
 - (NSWindow *)win;
+- (id)nodeView;
+- (NSString *)viewType;
+- (BOOL)isRootViewer;
+- (BOOL)isSpatial;
+
+- (void)activate;
+- (void)deactivate;
+- (void)invalidate;
+- (BOOL)invalidated;
+
+- (void)setOpened:(BOOL)opened 
+        repOfPath:(NSString *)path;
+- (void)unselectAllReps;
+- (void)selectionChanged:(NSArray *)newsel;
+- (void)setSelectableNodesRange:(NSRange)range;
+- (void)updeateInfoLabels;
+- (void)popUpAction:(id)sender;
+
+- (BOOL)involvedByFileOperation:(NSDictionary *)opinfo;
+- (void)nodeContentsWillChange:(NSDictionary *)info;
+- (void)nodeContentsDidChange:(NSDictionary *)info;
+
+- (void)setWatchersFromPath:(NSString *)path;
+- (void)unsetWatchersFromPath:(NSString *)path;
+- (void)watchedPathChanged:(NSDictionary *)info;
+- (NSArray *)watchedNodes;
 
 - (void)updateDefaults;
+
+@end
+
+
+//
+// GWViewerWindow Delegate Methods
+//
+@interface GWSpatialViewer (GWViewerWindowDelegateMethods)
+
+- (void)openSelectionInNewViewer:(BOOL)newv;
+- (void)openSelectionAsFolder;
+- (void)newFolder;
+- (void)newFile;
+- (void)duplicateFiles;
+- (void)deleteFiles;
+- (void)setViewerType:(id)sender;
+- (void)selectAllInViewer;
+- (void)showTerminal;
+- (BOOL)validateItem:(id)menuItem;
 
 @end
 

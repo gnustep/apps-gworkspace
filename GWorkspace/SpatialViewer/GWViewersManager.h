@@ -33,50 +33,36 @@
 @interface GWViewersManager : NSObject
 {
   NSMutableArray *viewers;
-  // GWSpatialViewer *
-  
   GWorkspace *gworkspace;
+  NSNotificationCenter *nc;    
 }
 
 + (GWViewersManager *)viewersManager;
 
 - (id)newViewerForPath:(NSString *)path
-        closeOldViewer:(GWSpatialViewer *)oldvwr;
-
+        closeOldViewer:(id)oldvwr;
+- (id)viewerWithBasePath:(NSString *)path;
 - (id)viewerForPath:(NSString *)path;
+- (id)parentOfViewer:(id)aviewer;
 
-- (void)viewerSelected:(GWSpatialViewer *)aviewer;
+- (void)viewerWillClose:(id)aviewer;
+- (void)closeInvalidViewers:(NSArray *)vwrs;
+- (void)closeViewerWithBasePath:(NSString *)path;
 
-- (void)unselectOtherViewers:(GWSpatialViewer *)aviewer;
+- (void)viewerSelected:(id)aviewer;
+- (void)unselectOtherViewers:(id)aviewer;
 
-- (void)selectionDidChangeInViewer:(GWSpatialViewer *)aviewer;
-
-- (void)viewerWillClose:(GWSpatialViewer *)aviewer;
-
-- (GWSpatialViewer *)parentOfViewer:(GWSpatialViewer *)aviewer;
-
+- (void)viewer:(id)aviewer didShowPath:(NSString *)apath;
+- (void)selectionDidChangeInViewer:(id)aviewer;
 - (void)selectionChanged:(NSArray *)selection;
-
-- (void)openSelectionInViewer:(GWSpatialViewer *)viewer
+- (void)openSelectionInViewer:(id)viewer
                   closeSender:(BOOL)close;
+- (void)openAsFolderSelectionInViewer:(id)viewer;
 
-
-
-/*
-//
-// DesktopApplication protocol
-//
-- (void)selectionChanged:(NSArray *)newsel;
-
-- (void)openSelectionInNewViewer:(BOOL)newv;
-
-- (void)openSelectionWithApp:(id)sender;
-
-- (void)performFileOperation:(NSDictionary *)opinfo;
-
-- (void)concludeRemoteFilesDragOperation:(NSData *)opinfo
-                             atLocalPath:(NSString *)localdest;
-*/
+- (void)sortTypeDidChange:(NSNotification *)notif;
+- (void)fileSystemWillChange:(NSNotification *)notif;
+- (void)fileSystemDidChange:(NSNotification *)notif;
+- (void)watcherNotification:(NSNotification *)notif;
 
 @end
 

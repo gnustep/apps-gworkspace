@@ -324,7 +324,7 @@ NSString *subtractPathComponentToPath(NSString *apath, NSString *firstpart)
 	NSString *secondpart;
 	int pos;
 		
-	if([apath isEqualToString: firstpart] == YES) {
+	if ([apath isEqualToString: firstpart]) {
 		return fixPath(@"/", 0);
   }
 	pos = [apath rangeOfString: firstpart].length +1;

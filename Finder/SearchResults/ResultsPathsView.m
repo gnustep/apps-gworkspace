@@ -185,18 +185,10 @@
   [self tile];
 }
 
+@end
 
-//
-// FSNodeRepContainer protocol
-//
-- (void)showContentsOfNode:(FSNode *)anode
-{
-}
 
-- (FSNode *)shownNode
-{
-  return nil;
-}
+@implementation ResultsPathsView (NodeRepContainer)
 
 - (void)nodeContentsWillChange:(NSDictionary *)info
 {
@@ -206,84 +198,7 @@
 {
 }
 
-- (void)watchedPathDidChange:(NSDictionary *)info
-{
-}
-
-- (void)setShowType:(FSNInfoType)type
-{
-}
-
-- (void)setExtendedShowType:(NSString *)type
-{
-}
-
-- (FSNInfoType)showType
-{
-  return FSNInfoNameType;
-}
-
-- (void)setIconSize:(int)size
-{
-}
-
-- (int)iconSize
-{
-  return ICN_SIZE;
-}
-
-- (void)setLabelTextSize:(int)size
-{
-}
-
-- (int)labelTextSize
-{
-  return 12;
-}
-
-- (void)setIconPosition:(int)pos
-{
-}
-
-- (int)iconPosition
-{
-  return NSImageLeft;
-}
-
-- (void)updateIcons
-{
-}
-
-- (id)repOfSubnode:(FSNode *)anode
-{
-  return nil;
-}
-
-- (id)repOfSubnodePath:(NSString *)apath
-{
-  return nil;
-}
-
-- (id)addRepForSubnode:(FSNode *)anode
-{
-  return nil;
-}
-
-- (id)addRepForSubnodePath:(NSString *)apath
-{
-  FSNode *subnode = [FSNode nodeWithRelativePath: apath parent: nil];
-  return [self addRepForSubnode: subnode];
-}
-
-- (void)removeRepOfSubnode:(FSNode *)anode
-{
-}
-
-- (void)removeRepOfSubnodePath:(NSString *)apath
-{
-}
-
-- (void)removeRep:(id)arep
+- (void)watchedPathChanged:(NSDictionary *)info
 {
 }
 
@@ -298,27 +213,6 @@
       [icon unselect];
     }
   }
-}
-
-- (void)selectReps:(NSArray *)reps
-{
-}
-
-- (void)selectRepsOfSubnodes:(NSArray *)nodes
-{
-}
-
-- (void)selectRepsOfPaths:(NSArray *)paths
-{
-}
-
-- (void)selectAll
-{
-}
-
-- (NSArray *)reps
-{
-  return icons;
 }
 
 - (NSArray *)selectedReps
@@ -373,10 +267,6 @@
 {
 }
 
-- (void)checkLockedReps
-{
-}
-
 - (void)setSelectionMask:(FSNSelectionMask)mask
 {
 }
@@ -407,17 +297,9 @@
   return NO;
 }
 
-- (void)setBackgroundColor:(NSColor *)acolor
-{
-}
-
 - (NSColor *)backgroundColor
 {
   return [NSColor windowBackgroundColor];
-}
-
-- (void)setTextColor:(NSColor *)acolor
-{
 }
 
 - (NSColor *)textColor
@@ -428,6 +310,11 @@
 - (NSColor *)disabledTextColor
 {
   return [NSColor disabledControlTextColor];
+}
+
+- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
+{
+  return NSDragOperationNone;
 }
 
 @end

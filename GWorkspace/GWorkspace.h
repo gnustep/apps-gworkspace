@@ -44,6 +44,7 @@
 @class NSFileManager;
 @class NSWorkspace;
 @class GWViewersManager;
+@class GWViewer;
 @class ViewersWindow;
 @class PrefController;
 @class Fiend;

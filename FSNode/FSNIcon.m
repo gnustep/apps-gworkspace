@@ -32,6 +32,7 @@
 #include "GNUstep.h"
 
 #define BRANCH_SIZE 7
+#define ARROW_MARGIN_X 11
 
 static id <DesktopApplication> desktopApp = nil;
 
@@ -47,6 +48,7 @@ static NSImage *branchImage;
   TEST_RELEASE (selectionTitle);
   TEST_RELEASE (extInfoType);
   RELEASE (icon);
+  TEST_RELEASE (openicon);
   RELEASE (highlightPath);
   RELEASE (label);
   [super dealloc];
@@ -79,7 +81,7 @@ static NSImage *branchImage;
 
 - (id)initForNode:(FSNode *)anode
      nodeInfoType:(FSNInfoType)type
-     extendedType: (NSString *)exttype
+     extendedType:(NSString *)exttype
          iconSize:(int)isize
      iconPosition:(unsigned int)ipos
         labelFont:(NSFont *)lfont
@@ -103,6 +105,8 @@ static NSImage *branchImage;
     selectionTitle = nil;
     
     ASSIGN (icon, [FSNodeRep iconOfSize: iconSize forNode: node]);
+    drawicon = icon;
+    openicon = nil;
     
     dndSource = dndsrc;
     acceptDnd = dndaccept;
@@ -231,27 +235,12 @@ static NSImage *branchImage;
     return;
   }
 	isSelected = NO;
-  [container selectionDidChange];	
   [self setNeedsDisplay: YES];
 }
 
 - (BOOL)isSelected
 {
   return isSelected;
-}
-
-- (void)setOpened:(BOOL)value
-{
-  if (isOpened == value) {
-    return;
-  }
-  isOpened = value;
-  [self setNeedsDisplay: YES]; 
-}
-
-- (BOOL)isOpened
-{
-  return isOpened;
 }
 
 - (NSRect)iconBounds
@@ -384,7 +373,7 @@ static NSImage *branchImage;
     icnPoint.y = floor((frameRect.size.height - sz.height) / 2);
   } 
     
-  brImgBounds.origin.x = frameRect.size.width - brImgBounds.size.width;
+  brImgBounds.origin.x = frameRect.size.width - ARROW_MARGIN_X;
   brImgBounds.origin.y = ceil(icnBounds.origin.y + (icnBounds.size.height / 2) - (BRANCH_SIZE / 2));
   brImgBounds = NSIntegralRect(brImgBounds);
   
@@ -459,6 +448,7 @@ static NSImage *branchImage;
          
 			  if (isSelected) {
 				  [self unselect];
+          [container selectionDidChange];
 				  return;
         } else {
 				  [self select];
@@ -540,12 +530,12 @@ static NSImage *branchImage;
 
 	if (isLocked == NO) {	
     if (isOpened == NO) {	
-      [icon compositeToPoint: icnPoint operation: NSCompositeSourceOver];
+      [drawicon compositeToPoint: icnPoint operation: NSCompositeSourceOver];
     } else {
-      [icon dissolveToPoint: icnPoint fraction: 0.5];
+      [drawicon dissolveToPoint: icnPoint fraction: 0.5];
     }
 	} else {						
-    [icon dissolveToPoint: icnPoint fraction: 0.3];
+    [drawicon dissolveToPoint: icnPoint fraction: 0.3];
 	}
   
   if (isLeaf == NO) {
@@ -564,8 +554,10 @@ static NSImage *branchImage;
   DESTROY (hostname);
   
   ASSIGN (node, anode);
-  ASSIGN (icon, [FSNodeRep iconOfSize: icnBounds.size.width forNode: node]);
-
+  ASSIGN (icon, [FSNodeRep iconOfSize: iconSize forNode: node]);
+  drawicon = icon;
+  DESTROY (openicon);
+  
   if ([[node path] isEqual: path_separator()] && ([node isMountPoint] == NO)) {
     NSHost *host = [NSHost currentHost];
     NSString *hname = [host name];
@@ -594,6 +586,19 @@ static NSImage *branchImage;
   [self tile];
 }
 
+- (void)setNode:(FSNode *)anode
+   nodeInfoType:(FSNInfoType)type
+   extendedType:(NSString *)exttype
+{
+  showType = type;
+  
+  if (exttype) {
+    ASSIGN (extInfoType, exttype);
+  }
+
+  [self setNode: anode];
+}
+
 - (FSNode *)node
 {
   return node;
@@ -607,7 +612,9 @@ static NSImage *branchImage;
   ASSIGN (selection, selnodes);
   ASSIGN (selectionTitle, ([NSString stringWithFormat: @"%i %@", 
                   [selection count], NSLocalizedString(@"elements", @"")]));
-  ASSIGN (icon, [FSNodeRep multipleSelectionIconOfSize: icnBounds.size.width]);
+  ASSIGN (icon, [FSNodeRep multipleSelectionIconOfSize: iconSize]);
+  drawicon = icon;
+  DESTROY (openicon);
   [label setStringValue: selectionTitle];
 
   [self setLocked: NO];
@@ -658,7 +665,13 @@ static NSImage *branchImage;
 {
   iconSize = isize;
   icnBounds = NSMakeRect(0, 0, iconSize, iconSize);
-  ASSIGN (icon, [FSNodeRep iconOfSize: iconSize forNode: node]);
+  if (selection == nil) {
+    ASSIGN (icon, [FSNodeRep iconOfSize: iconSize forNode: node]);
+  } else {
+    ASSIGN (icon, [FSNodeRep multipleSelectionIconOfSize: iconSize]);
+  }
+  drawicon = icon;
+  DESTROY (openicon);
   hlightRect.size.width = ceil(iconSize / 3 * 4);
   hlightRect.size.height = ceil(hlightRect.size.width * [FSNodeRep highlightHeightFactor]);
   if ((hlightRect.size.height - iconSize) < 4) {
@@ -793,6 +806,20 @@ static NSImage *branchImage;
 - (BOOL)isLeaf
 {
   return isLeaf;
+}
+
+- (void)setOpened:(BOOL)value
+{
+  if (isOpened == value) {
+    return;
+  }
+  isOpened = value;
+  [self setNeedsDisplay: YES]; 
+}
+
+- (BOOL)isOpened
+{
+  return isOpened;
 }
 
 - (void)setLocked:(BOOL)value
@@ -992,9 +1019,6 @@ static NSImage *branchImage;
     prePath = [prePath stringByDeletingLastPathComponent];
   }
 
-  ASSIGN (icon, [FSNodeRep openFolderIconOfSize: iconSize forNode: node]);
-  [self setNeedsDisplay: YES];   
-
   isDragTarget = YES;
 
 	sourceDragMask = [sender draggingSourceOperationMask];
@@ -1013,6 +1037,25 @@ static NSImage *branchImage;
 - (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
 {
   NSDragOperation sourceDragMask = [sender draggingSourceOperationMask];
+  NSPoint p = [self convertPoint: [sender draggingLocation] fromView: nil];
+
+  if ([self mouse: p inRect: icnBounds] == NO) {
+    if (drawicon == openicon) {
+      drawicon = icon;
+      [self setNeedsDisplay: YES];
+    }
+    return [container draggingUpdated: sender];
+    
+  } else {
+    if ((openicon == nil) && isDragTarget && (onSelf == NO)) {
+      ASSIGN (openicon, [FSNodeRep openFolderIconOfSize: iconSize forNode: node]);
+    }
+  
+    if ((drawicon == icon) && isDragTarget && (onSelf == NO)) {
+      drawicon = openicon;
+      [self setNeedsDisplay: YES];
+    }
+  }
 
   if (isDragTarget == NO) {
     return NSDragOperationNone;
@@ -1029,15 +1072,15 @@ static NSImage *branchImage;
 
 - (void)draggingExited:(id <NSDraggingInfo>)sender
 {
-  if (isDragTarget == YES) {
-    isDragTarget = NO;  
-    if (onSelf == NO) { 
-      ASSIGN (icon, [FSNodeRep iconOfSize: iconSize forNode: node]);
-      [container setNeedsDisplayInRect: [self frame]];   
-      [self setNeedsDisplay: YES];   
-    }
-		onSelf = NO;
+  isDragTarget = NO;  
+  
+  if (onSelf == NO) { 
+    drawicon = icon;
+    [container setNeedsDisplayInRect: [self frame]];   
+    [self setNeedsDisplay: YES];   
   }
+  
+	onSelf = NO;
 }
 
 - (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
@@ -1073,7 +1116,7 @@ static NSImage *branchImage;
     return;
   }	
 
-  ASSIGN (icon, [FSNodeRep iconOfSize: iconSize forNode: node]);
+  drawicon = icon;
   [self setNeedsDisplay: YES];
 
 	sourceDragMask = [sender draggingSourceOperationMask];

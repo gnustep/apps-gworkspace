@@ -24,9 +24,9 @@
 
 #include <AppKit/AppKit.h>
 #include "GWViewersManager.h"
+#include "Viewer/GWViewer.h"
 #include "GWSpatialViewer.h"
 #include "FSNodeRep.h"
-#include "FSNIcon.h"
 #include "FSNFunctions.h"
 #include "GWorkspace.h"
 
@@ -44,6 +44,8 @@ static GWViewersManager *vwrsmanager = nil;
 
 - (void)dealloc
 {
+  [[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
+  [nc removeObserver: self];
   RELEASE (viewers);
     
 	[super dealloc];
@@ -56,6 +58,28 @@ static GWViewersManager *vwrsmanager = nil;
   if (self) {
     viewers = [NSMutableArray new];
     gworkspace = [GWorkspace gworkspace];
+    nc = [NSNotificationCenter defaultCenter];
+
+    [nc addObserver: self 
+           selector: @selector(fileSystemWillChange:) 
+               name: @"GWFileSystemWillChangeNotification"
+             object: nil];
+
+    [nc addObserver: self 
+           selector: @selector(fileSystemDidChange:) 
+               name: @"GWFileSystemDidChangeNotification"
+             object: nil];
+
+    [nc addObserver: self 
+           selector: @selector(watcherNotification:) 
+               name: @"GWFileWatcherFileDidChangeNotification"
+             object: nil];    
+    
+    [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
+                				selector: @selector(sortTypeDidChange:) 
+                					  name: @"GWSortTypeDidChangeNotification"
+                					object: nil];
+    
     [FSNodeRep setLabelWFactor: 9.0];
     [FSNodeRep setUseThumbnails: YES];
   }
@@ -64,10 +88,10 @@ static GWViewersManager *vwrsmanager = nil;
 }
 
 - (id)newViewerForPath:(NSString *)path
-        closeOldViewer:(GWSpatialViewer *)oldvwr
+        closeOldViewer:(id)oldvwr
 {
-  GWSpatialViewer *viewer = [self viewerForPath: path];
-  NSArray *icons;
+  id viewer = [self viewerWithBasePath: path];
+  NSArray *reps;
   int i;
   
   if (viewer == nil) {
@@ -78,31 +102,31 @@ static GWViewersManager *vwrsmanager = nil;
     RELEASE (viewer);
   } 
 
-  if (oldvwr) {  
+  if (oldvwr) {
     [[oldvwr win] close]; 
   }
   
   [viewer activate];
       
-  icons = [viewer icons];  
+  reps = [[viewer nodeView] reps];  
     
-  for (i = 0; i < [icons count]; i++) {
-    FSNIcon *icon = [icons objectAtIndex: i];  
+  for (i = 0; i < [reps count]; i++) {
+    id rep = [reps objectAtIndex: i];  
     
-    if ([self viewerForPath: [[icon node] path]]) {
-      [icon setOpened: YES];
+    if ([self viewerForPath: [[rep node] path]]) {
+      [rep setOpened: YES];
     }
   }
      
   return viewer;
 }
 
-- (id)viewerForPath:(NSString *)path
+- (id)viewerWithBasePath:(NSString *)path
 {
   int i;
   
   for (i = 0; i < [viewers count]; i++) {
-    GWSpatialViewer *viewer = [viewers objectAtIndex: i];
+    id viewer = [viewers objectAtIndex: i];
     FSNode *node = [viewer shownNode];
     
     if ([[node path] isEqual: path]) {
@@ -113,51 +137,22 @@ static GWViewersManager *vwrsmanager = nil;
   return nil;
 }
 
-- (void)viewerSelected:(GWSpatialViewer *)aviewer
-{
-  GWSpatialViewer *parentViewer = [self parentOfViewer: aviewer];
-  
-  [self unselectOtherViewers: aviewer];
-  
-  if (parentViewer) {
-    [parentViewer setOpened: YES iconOfPath: [[aviewer shownNode] path]];
-  }
-}
-
-- (void)unselectOtherViewers:(GWSpatialViewer *)aviewer
+- (id)viewerForPath:(NSString *)path
 {
   int i;
   
   for (i = 0; i < [viewers count]; i++) {
-    GWSpatialViewer *viewer = [viewers objectAtIndex: i];
-
-    if (viewer != aviewer) {
-      [viewer unselectAllIcons];
-    }
-  }  
-}
-
-- (void)selectionDidChangeInViewer:(GWSpatialViewer *)aviewer
-{
-  GWSpatialViewer *parentViewer = [self parentOfViewer: aviewer];
-
-  if (parentViewer) {
-    [parentViewer unselectAllIcons]; 
-  }
-}
-
-- (void)viewerWillClose:(GWSpatialViewer *)aviewer
-{
-  GWSpatialViewer *parentViewer = [self parentOfViewer: aviewer];
-
-  if (parentViewer) {
-    [parentViewer setOpened: NO iconOfPath: [[aviewer shownNode] path]];
-  }
+    id viewer = [viewers objectAtIndex: i];
     
-  [viewers removeObject: aviewer];
+    if ([[viewer nodeView] isShowingPath: path]) {
+      return viewer;
+    }
+  }
+  
+  return nil;
 }
 
-- (GWSpatialViewer *)parentOfViewer:(GWSpatialViewer *)aviewer
+- (id)parentOfViewer:(id)aviewer
 {
   FSNode *node = [aviewer shownNode];
 
@@ -168,36 +163,281 @@ static GWViewersManager *vwrsmanager = nil;
   return nil;  
 }
 
+
+- (void)viewerWillClose:(id)aviewer
+{
+  FSNode *node = [aviewer shownNode];
+  NSString *path = [node path];
+  NSArray *watchedNodes = [aviewer watchedNodes];
+  id parentViewer = [self parentOfViewer: aviewer];
+  int i;
+  
+  if (parentViewer && ([parentViewer invalidated] == NO)) {
+    [parentViewer setOpened: NO repOfPath: path];
+  }
+  
+  if ([node isValid] == NO) {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];  
+    NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", path]; 
+    NSDictionary *vwrprefs = [defaults dictionaryForKey: prefsname];
+    
+    if (vwrprefs) {
+      [defaults removeObjectForKey: prefsname];
+    } 
+    
+    [NSWindow removeFrameUsingName: prefsname]; 
+  }
+  
+  for (i = 0; i < [watchedNodes count]; i++) {
+    [gworkspace removeWatcherForPath: [[watchedNodes objectAtIndex: i] path]];
+  }
+    
+  [viewers removeObject: aviewer];
+}
+
+- (void)closeInvalidViewers:(NSArray *)vwrs
+{
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  int i, j;
+
+  for (i = 0; i < [vwrs count]; i++) {
+    id viewer = [vwrs objectAtIndex: i];
+    NSString *vpath = [[viewer shownNode] path];
+    NSArray *watchedNodes = [viewer watchedNodes];
+    id parentViewer = [self parentOfViewer: viewer];
+    NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", vpath]; 
+    NSDictionary *vwrprefs = [defaults dictionaryForKey: prefsname];
+    
+    if (parentViewer && ([vwrs containsObject: parentViewer] == NO)) {
+      [parentViewer setOpened: NO repOfPath: vpath];
+    }
+
+    if (vwrprefs) {
+      [defaults removeObjectForKey: prefsname];
+    } 
+
+    [NSWindow removeFrameUsingName: prefsname]; 
+    
+    for (j = 0; j < [watchedNodes count]; j++) {
+      [gworkspace removeWatcherForPath: [[watchedNodes objectAtIndex: j] path]];
+    }
+  }
+      
+  for (i = 0; i < [vwrs count]; i++) {
+    id viewer = [vwrs objectAtIndex: i];
+    NSDate *limit = [NSDate dateWithTimeIntervalSinceNow: 0.1];
+    
+    [viewer deactivate];
+	  [[NSRunLoop currentRunLoop] runUntilDate: limit];
+    [viewers removeObject: viewer];
+  }
+}
+
+- (void)closeViewerWithBasePath:(NSString *)path
+{
+  id viewer = [self viewerWithBasePath: path];
+  
+  if (viewer) {
+    [[viewer win] close]; 
+  } 
+}
+
+- (void)viewerSelected:(id)aviewer
+{
+  id parentViewer = [self parentOfViewer: aviewer];
+  
+  [self unselectOtherViewers: aviewer];
+  
+  if (parentViewer) {
+    [parentViewer setOpened: YES repOfPath: [[aviewer shownNode] path]];
+  }
+}
+
+- (void)unselectOtherViewers:(id)aviewer
+{
+  int i;
+  
+  for (i = 0; i < [viewers count]; i++) {
+    id viewer = [viewers objectAtIndex: i];
+
+    if (viewer != aviewer) {
+      [viewer unselectAllReps];
+    }
+  }  
+}
+
+
+- (void)viewer:(id)aviewer didShowPath:(NSString *)apath
+{
+  int i;
+  
+  for (i = 0; i < [viewers count]; i++) {
+    id viewer = [viewers objectAtIndex: i];
+    
+    if ([[viewer nodeView] isShowingPath: apath] && (viewer != aviewer)) {
+      [viewer unloadFromPath: apath];
+      break;
+    }
+  }
+}
+
+- (void)selectionDidChangeInViewer:(id)aviewer
+{
+  [self unselectOtherViewers: aviewer];
+}
+
 - (void)selectionChanged:(NSArray *)selection
 {
   [gworkspace selectionChanged: selection];
 }
 
-- (void)openSelectionInViewer:(GWSpatialViewer *)viewer
+- (void)openSelectionInViewer:(id)viewer
                   closeSender:(BOOL)close
 {
-  NSArray *selnodes = [viewer selectedNodes];
+  NSArray *selreps = [[viewer nodeView] selectedReps];
   int i;
-  
-  for (i = 0; i < [selnodes count]; i++) {
-    FSNode *node = [selnodes objectAtIndex: i];
+    
+  for (i = 0; i < [selreps count]; i++) {
+    FSNode *node = [[selreps objectAtIndex: i] node];
     NSString *path = [node path];
         
     if ([node isDirectory]) {
-      [self newViewerForPath: path closeOldViewer: (close ? viewer : nil)]; 
-    } else if ([node isPlain]) {
+      if ([node isPackage]) {    
+        if ([node isApplication] == NO) {
+          [gworkspace openFile: path];
+        } else {
+          [[NSWorkspace sharedWorkspace] launchApplication: path];
+        }
+      } else {
+        [self newViewerForPath: path closeOldViewer: nil]; 
+      } 
+    } else if ([node isPlain]) {        
       [gworkspace openFile: path];
-    } else if ([node isApplication]) {
-      [[NSWorkspace sharedWorkspace] launchApplication: path];
     }
+  }
+
+  if (close) {
+    [[viewer win] close]; 
   }
 }
 
+- (void)openAsFolderSelectionInViewer:(id)viewer
+{
+  NSArray *selnodes = [[viewer nodeView] selectedNodes];
+  int i;
+    
+  for (i = 0; i < [selnodes count]; i++) {
+    FSNode *node = [selnodes objectAtIndex: i];
+        
+    if ([node isDirectory]) {
+      [self newViewerForPath: [node path] closeOldViewer: nil]; 
+    } else if ([node isPlain]) {        
+      [gworkspace openFile: [node path]];
+    }
+  }
+  
+  
+    {
+      FSNode *node = [FSNode nodeWithRelativePath: @"/home/enrico/Butt/GNUstep/CopyPix/CartaNuova/CooopyPix" 
+                                           parent: nil];
+      GWViewer *gwv = [[GWViewer alloc] initForNode: node];
+      [gwv activate];
+    }
+  
+}
+
+
+- (void)sortTypeDidChange:(NSNotification *)notif
+{
+  NSString *notifPath = [notif object];
+  int i;
+
+  for (i = 0; i < [viewers count]; i++) {
+    [[[viewers objectAtIndex: i] nodeView] sortTypeChangedAtPath: notifPath];
+  }  
+}
+
+- (void)fileSystemWillChange:(NSNotification *)notif
+{
+  NSDictionary *opinfo = (NSDictionary *)[notif object];  
+  NSMutableArray *viewersToClose = [NSMutableArray array];
+  int i;
+
+  for (i = 0; i < [viewers count]; i++) {
+    id viewer = [viewers objectAtIndex: i];
+    
+    if ([viewer involvedByFileOperation: opinfo]) {
+      if ([[viewer shownNode] willBeValidAfterFileOperation: opinfo] == NO) {
+        [viewer invalidate];
+        [viewersToClose addObject: viewer];
+        
+      } else { 
+        [viewer nodeContentsWillChange: opinfo];
+      }
+    }
+  }
+  
+  [self closeInvalidViewers: viewersToClose];
+}
+
+- (void)fileSystemDidChange:(NSNotification *)notif
+{
+  NSDictionary *opinfo = (NSDictionary *)[notif object];  
+  NSMutableArray *viewersToClose = [NSMutableArray array];
+  int i;
+    
+  for (i = 0; i < [viewers count]; i++) {
+    id viewer = [viewers objectAtIndex: i];
+    FSNode *vnode = [viewer shownNode];
+
+    if (([vnode isValid] == NO) && ([viewer invalidated] == NO)) {
+      [viewer invalidate];
+      [viewersToClose addObject: viewer];
+      
+    } else {
+      if ([viewer involvedByFileOperation: opinfo]) {
+        [viewer nodeContentsDidChange: opinfo];
+      }
+    }
+  }
+
+  [self closeInvalidViewers: viewersToClose]; 
+}
+
+- (void)watcherNotification:(NSNotification *)notif
+{
+  NSDictionary *info = (NSDictionary *)[notif object];
+  NSString *event = [info objectForKey: @"event"];
+  NSString *path = [info objectForKey: @"path"];
+  NSMutableArray *viewersToClose = [NSMutableArray array];
+  int i, j;
+
+  for (i = 0; i < [viewers count]; i++) {
+    id viewer = [viewers objectAtIndex: i];
+    FSNode *node = [viewer shownNode];
+    NSArray *watchedNodes = [viewer watchedNodes];
+    
+    if ([event isEqual: @"GWWatchedDirectoryDeleted"]) {  
+      if (([[node path] isEqual: path]) || [node isSubnodeOfPath: path]) { 
+        if ([viewer invalidated] == NO) {
+          [viewer invalidate];
+          [viewersToClose addObject: viewer];
+        }
+      }
+    }
+    
+    for (j = 0; j < [watchedNodes count]; j++) {
+      if ([[[watchedNodes objectAtIndex: j] path] isEqual: path]) {
+        [viewer watchedPathChanged: info];
+        break;
+      }
+    }
+  }
+
+  [self closeInvalidViewers: viewersToClose]; 
+}
+
 @end
-
-
-
-
 
 
 

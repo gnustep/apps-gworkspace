@@ -45,6 +45,8 @@
   NSString *extInfoType;
   
   NSImage *icon;
+  NSImage *openicon;
+  NSImage *drawicon;
   int iconSize;
   NSRect icnBounds;
   NSPoint icnPoint;
@@ -83,7 +85,7 @@
 
 - (id)initForNode:(FSNode *)anode
      nodeInfoType:(FSNInfoType)type
-     extendedType: (NSString *)exttype
+     extendedType:(NSString *)exttype
          iconSize:(int)isize
      iconPosition:(unsigned int)ipos
         labelFont:(NSFont *)lfont
@@ -99,10 +101,6 @@
 - (void)unselect;
 
 - (BOOL)isSelected;
-
-- (void)setOpened:(BOOL)value;
-
-- (BOOL)isOpened;
 
 - (NSRect)iconBounds;
 

@@ -3,6 +3,7 @@
 before-all::
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/GWorkspace
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/SpatialViewer
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Viewer
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/GWLib	
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Watchers
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Viewers
@@ -24,6 +25,7 @@ before-all::
 before-install::
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/GWorkspace
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/SpatialViewer
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Viewer
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/GWLib	
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Watchers
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Viewers

@@ -31,7 +31,7 @@
 
 @class Finder;
 
-@interface ResultsPathsView : NSView <FSNodeRepContainer>
+@interface ResultsPathsView : NSView
 {
 	NSMutableArray *icons; 
   NSString *pathSeparator;
@@ -43,6 +43,46 @@
 - (void)showComponentsOfSelection:(NSArray *)selection;
 
 - (void)tile;
+
+@end
+
+
+@interface ResultsPathsView (NodeRepContainer)
+
+- (void)nodeContentsWillChange:(NSDictionary *)info;
+
+- (void)nodeContentsDidChange:(NSDictionary *)info;
+
+- (void)watchedPathChanged:(NSDictionary *)info;
+
+- (void)unselectOtherReps:(id)arep;
+
+- (NSArray *)selectedReps;
+
+- (NSArray *)selectedNodes;
+
+- (NSArray *)selectedPaths;
+
+- (void)selectionDidChange;
+
+- (void)setSelectionMask:(FSNSelectionMask)mask;
+
+- (FSNSelectionMask)selectionMask;
+
+- (void)openSelectionInNewViewer:(BOOL)newv;
+
+- (void)restoreLastSelection;
+
+- (BOOL)validatePasteOfFilenames:(NSArray *)names
+                       wasCutted:(BOOL)cutted;
+
+- (NSColor *)backgroundColor;
+
+- (NSColor *)textColor;
+
+- (NSColor *)disabledTextColor;
+
+- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender;
 
 @end
 

@@ -57,6 +57,16 @@
   [self selectItemAtIndex: ([components count] - 1)];
 }
 
+- (void)setItemsEnabled:(BOOL)enabled
+{
+  NSArray *items = [[self menu] itemArray];
+  int i;
+  
+  for (i = 0; i < [items count]; i++) {
+    [[items objectAtIndex: i] setEnabled: enabled];
+  }
+}
+
 - (BOOL)closeViewer
 {
 	return closeViewer;

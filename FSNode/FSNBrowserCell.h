@@ -47,7 +47,6 @@ typedef NSString *(*cutIMP)(id, SEL, id, float);
   NSImage *openicon;
   int icnsize;
   
-  NSBezierPath *highlightPath;
   NSRect hlightRect;
   
   NSRect titleRect;
@@ -56,7 +55,8 @@ typedef NSString *(*cutIMP)(id, SEL, id, float);
   
   BOOL isLocked;
   BOOL iconSelected;
-  
+  BOOL isOpened;
+
   BOOL nameEdited;
   
 	SEL cutTitleSel;

@@ -36,6 +36,7 @@
   NSString *path;
   NSString *relativePath;
   NSString *name;
+  NSString *fileType;
   NSString *typeDescription;
   
   NSString *pathSeparator;  
@@ -83,7 +84,27 @@
 
 - (NSArray *)subNodes;
 
++ (NSArray *)nodeComponentsToNode:(FSNode *)anode;
+
 + (NSArray *)pathComponentsToNode:(FSNode *)anode;
+
++ (NSArray *)nodeComponentsFromNode:(FSNode *)firstNode 
+                             toNode:(FSNode *)secondNode;
+
++ (NSArray *)pathComponentsFromNode:(FSNode *)firstNode 
+                             toNode:(FSNode *)secondNode;
+
++ (unsigned int)indexOfNode:(FSNode *)anode 
+               inComponents:(NSArray *)nodes;
+
++ (unsigned int)indexOfNodeWithPath:(NSString *)apath 
+                       inComponents:(NSArray *)nodes;
+
++ (FSNode *)subnodeWithName:(NSString *)aname 
+                 inSubnodes:(NSArray *)subnodes;
+
++ (FSNode *)subnodeWithPath:(NSString *)apath 
+                 inSubnodes:(NSArray *)subnodes;
 
 - (FSNode *)parent;
 
@@ -102,6 +123,8 @@
 - (NSString *)relativePath;
 
 - (NSString *)name;
+
+- (NSString *)fileType;
 
 - (NSString *)typeDescription;
 
@@ -152,6 +175,10 @@
 - (BOOL)isLocked;
 
 - (BOOL)isValid;
+
+- (BOOL)willBeValidAfterFileOperation:(NSDictionary *)opinfo;
+
+- (BOOL)involvedByFileOperation:(NSDictionary *)opinfo;
 
 @end
 

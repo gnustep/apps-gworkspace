@@ -89,6 +89,32 @@ typedef enum BackImageStyle {
 @end
 
 
+@interface DesktopView (NodeRepContainer)
+
+- (void)showContentsOfNode:(FSNode *)anode;
+
+- (void)nodeContentsDidChange:(NSDictionary *)info;
+
+- (void)watchedPathChanged:(NSDictionary *)info;
+
+- (void)setIconSize:(int)size;
+
+- (void)setLabelTextSize:(int)size;
+
+- (void)setIconPosition:(int)pos;
+
+- (id)addRepForSubnode:(FSNode *)anode;
+
+- (BOOL)validatePasteOfFilenames:(NSArray *)names
+                       wasCutted:(BOOL)cutted;
+
+- (void)setBackgroundColor:(NSColor *)acolor;
+
+- (void)setTextColor:(NSColor *)acolor;
+
+@end
+
+
 @interface DesktopView (DraggingDestination)
 
 - (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender;

@@ -14,6 +14,10 @@ FSNode_OBJC_FILES = \
          FSNFunctions.m \
          FSNTextCell.m \
          FSNBrowserCell.m \
+         FSNBrowserScroll.m \
+         FSNBrowserMatrix.m \
+         FSNBrowserColumn.m \
+         FSNBrowser.m \
          FSNIcon.m \
          FSNIconsView.m 
                 
@@ -23,6 +27,10 @@ FSNode_HEADER_FILES = \
          FSNFunctions.h \
          FSNTextCell.h \
          FSNBrowserCell.h \
+         FSNBrowserScroll.h \
+         FSNBrowserMatrix.h \
+         FSNBrowserColumn.h \
+         FSNBrowser.h \
          FSNIcon.h \
          FSNIconsView.h 
         

@@ -115,8 +115,8 @@ static id <DesktopApplication> desktopApp = nil;
       NSArray *subNodes;
       int i, count;
 
-      ASSIGN (icon, [FSNodeRep trashIconOfSize: icnBounds.size.width]);
-      ASSIGN (trashFullIcon, [FSNodeRep trashFullIconOfSize: icnBounds.size.width]);
+      ASSIGN (icon, [FSNodeRep trashIconOfSize: ceil(icnBounds.size.width)]);
+      ASSIGN (trashFullIcon, [FSNodeRep trashFullIconOfSize: ceil(icnBounds.size.width)]);
       
       subNodes = [node subNodes];
       count = [subNodes count];
@@ -132,7 +132,8 @@ static id <DesktopApplication> desktopApp = nil;
       [self setTrashFull: !(count == 0)];
     
     } else {
-      ASSIGN (icon, [FSNodeRep iconOfSize: icnBounds.size.width forNode: node]);
+      ASSIGN (icon, [FSNodeRep iconOfSize: ceil(icnBounds.size.width) 
+                                  forNode: node]);
     }
   }
 }
@@ -322,10 +323,11 @@ static id <DesktopApplication> desktopApp = nil;
 {
   icnBounds = NSMakeRect(0, 0, isize, isize);
   if (isTrashIcon) {
-    ASSIGN (icon, [FSNodeRep trashIconOfSize: icnBounds.size.width]);
-    ASSIGN (trashFullIcon, [FSNodeRep trashFullIconOfSize: icnBounds.size.width]);
+    ASSIGN (icon, [FSNodeRep trashIconOfSize: ceil(icnBounds.size.width)]);
+    ASSIGN (trashFullIcon, [FSNodeRep trashFullIconOfSize: ceil(icnBounds.size.width)]);
   } else {
-    ASSIGN (icon, [FSNodeRep iconOfSize: icnBounds.size.width forNode: node]);
+    ASSIGN (icon, [FSNodeRep iconOfSize: ceil(icnBounds.size.width) 
+                                forNode: node]);
   }
   hlightRect.size.width = ceil(isize / 3 * 4);
   hlightRect.size.height = ceil(hlightRect.size.width * [FSNodeRep highlightHeightFactor]);

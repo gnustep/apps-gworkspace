@@ -216,7 +216,7 @@ static Recycler *recycler = nil;
 - (void)watchedPathDidChange:(NSData *)dirinfo
 {
   NSDictionary *info = [NSUnarchiver unarchiveObjectWithData: dirinfo];
-  [recview watchedPathDidChange: info];  
+  [recview watchedPathChanged: info];  
 }
 
 - (void)updateDefaults

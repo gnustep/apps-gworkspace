@@ -164,18 +164,10 @@
 	[tile compositeToPoint: NSZeroPoint operation: NSCompositeSourceOver]; 
 }
 
+@end
 
-//
-// FSNodeRepContainer protocol
-//
-- (void)showContentsOfNode:(FSNode *)anode
-{
-}
 
-- (FSNode *)shownNode
-{
-  return nil;
-}
+@implementation RecyclerView (NodeRepContainer)
 
 - (void)nodeContentsWillChange:(NSDictionary *)info
 {
@@ -232,7 +224,7 @@
   }
 }
 
-- (void)watchedPathDidChange:(NSDictionary *)info
+- (void)watchedPathChanged:(NSDictionary *)info
 {
   NSString *event = [info objectForKey: @"event"];
   NSString *path = [info objectForKey: @"path"];
@@ -275,116 +267,8 @@
   }
 }
 
-- (void)setShowType:(FSNInfoType)type
-{
-}
-
-- (void)setExtendedShowType:(NSString *)type
-{
-}
-
-- (FSNInfoType)showType
-{
-  return FSNInfoNameType;
-}
-
-- (void)setIconSize:(int)size
-{
-}
-
-- (int)iconSize
-{
-  return ICN_SIZE;
-}
-
-- (void)setLabelTextSize:(int)size
-{
-}
-
-- (int)labelTextSize
-{
-  return 12;
-}
-
-- (void)setIconPosition:(int)pos
-{
-}
-
-- (int)iconPosition
-{
-  return NSImageOnly;
-}
-
-- (void)updateIcons
-{
-}
-
-- (id)repOfSubnode:(FSNode *)anode
-{
-  return nil;
-}
-
-- (id)repOfSubnodePath:(NSString *)apath
-{
-  return nil;
-}
-
-- (id)addRepForSubnode:(FSNode *)anode
-{
-  return nil;
-}
-
-- (id)addRepForSubnodePath:(NSString *)apath
-{
-  FSNode *subnode = [FSNode nodeWithRelativePath: apath parent: nil];
-  return [self addRepForSubnode: subnode];
-}
-
-- (void)removeRepOfSubnode:(FSNode *)anode
-{
-}
-
-- (void)removeRepOfSubnodePath:(NSString *)apath
-{
-}
-
-- (void)removeRep:(id)arep
-{
-}
-
 - (void)unselectOtherReps:(id)arep
 {
-}
-
-- (void)selectReps:(NSArray *)reps
-{
-}
-
-- (void)selectRepsOfSubnodes:(NSArray *)nodes
-{
-}
-
-- (void)selectRepsOfPaths:(NSArray *)paths
-{
-}
-
-- (void)selectAll
-{
-}
-
-- (NSArray *)reps
-{
-  return [NSArray array];
-}
-
-- (NSArray *)selectedReps
-{
-  return [NSArray array];
-}
-
-- (NSArray *)selectedNodes
-{
-  return [NSArray array];
 }
 
 - (NSArray *)selectedPaths
@@ -393,10 +277,6 @@
 }
 
 - (void)selectionDidChange
-{
-}
-
-- (void)checkLockedReps
 {
 }
 
@@ -474,17 +354,9 @@
   return cutted;
 }
 
-- (void)setBackgroundColor:(NSColor *)acolor
-{
-}
-
 - (NSColor *)backgroundColor
 {
   return [NSColor windowBackgroundColor];
-}
-
-- (void)setTextColor:(NSColor *)acolor
-{
 }
 
 - (NSColor *)textColor
@@ -495,6 +367,11 @@
 - (NSColor *)disabledTextColor
 {
   return [NSColor disabledControlTextColor];
+}
+
+- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
+{
+  return NSDragOperationNone;
 }
 
 @end

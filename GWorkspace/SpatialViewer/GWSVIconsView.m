@@ -35,7 +35,7 @@
 	[super dealloc];
 }
 
-- (id)initForViewer:(GWSpatialViewer *)vwr
+- (id)initForViewer:(id)vwr
 {
   self = [super init];
   
@@ -60,6 +60,7 @@
 
     if ((lastSelection == nil) || ([selection isEqual: lastSelection] == NO)) {
       ASSIGN (lastSelection, selection);
+      [viewer selectionChanged: selection];
       [desktopApp selectionChanged: selection];
     }
     

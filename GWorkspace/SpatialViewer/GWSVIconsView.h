@@ -28,16 +28,15 @@
 #include <Foundation/Foundation.h>
 #include "FSNIconsView.h"
 
-@class GWSpatialViewer;
 @class GWViewersManager;
 
 @interface GWSVIconsView : FSNIconsView
 {
-  GWSpatialViewer *viewer;
-  GWViewersManager *manager;
+  id viewer;
+  id manager;
 }
 
-- (id)initForViewer:(GWSpatialViewer *)vwr;
+- (id)initForViewer:(id)vwr;
 
 @end
 

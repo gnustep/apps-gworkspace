@@ -28,7 +28,6 @@
 #include "FSNIconsView.h"
 #include "FSNIcon.h"
 #include "FSNFunctions.h"
-#include "GNUstep.h"
 
 #define DEF_ICN_SIZE 48
 #define DEF_TEXT_SIZE 12
@@ -631,7 +630,7 @@ pp.x = NSMaxX([self bounds]) - 1
     
     visibleRect = [self visibleRect];
     
-    if (NSPointInRect(pp, [self visibleRect]) == NO) {
+    if ([self mouse: pp inRect: [self visibleRect]] == NO) {
       scrollPointToVisible(pp);
       CONVERT_CHECK;
       visibleRect = [self visibleRect];
@@ -940,7 +939,10 @@ pp.x = NSMaxX([self bounds]) - 1
 - (void)viewDidMoveToSuperview
 {
   [super viewDidMoveToSuperview];
-  [[self window] setBackgroundColor: backColor];
+
+  if ([self superview]) {
+    [[self window] setBackgroundColor: backColor];
+  }
 }
 
 - (void)drawRect:(NSRect)rect
@@ -960,10 +962,11 @@ pp.x = NSMaxX([self bounds]) - 1
   return YES;
 }
 
+@end
 
-//
-// FSNodeRepContainer protocol
-//
+
+@implementation FSNIconsView (NodeRepContainer)
+
 - (void)showContentsOfNode:(FSNode *)anode
 {
   NSArray *subNodes = [anode subNodes];
@@ -976,14 +979,10 @@ pp.x = NSMaxX([self bounds]) - 1
     [[icons objectAtIndex: i] removeFromSuperview];
   }
   [icons removeAllObjects];
-  
-  if (node) {
-    [desktopApp removeWatcherForPath: [node path]];
-  }
-  
+  editIcon = nil;
+    
   ASSIGN (node, anode);
   [self readNodeInfo];
-  [desktopApp addWatcherForPath: [node path]];
     
   for (i = 0; i < [subNodes count]; i++) {
     FSNode *subnode = [subNodes objectAtIndex: i];
@@ -1009,9 +1008,96 @@ pp.x = NSMaxX([self bounds]) - 1
   [self tile];
 }
 
+- (void)reloadContents
+{
+  NSArray *selection = [self selectedNodes];
+  NSMutableArray *opennodes = [NSMutableArray array];
+  int i;
+            
+  RETAIN (selection);
+  
+  for (i = 0; i < [icons count]; i++) {
+    FSNIcon *icon = [icons objectAtIndex: i];
+
+    if ([icon isOpened]) {
+      [opennodes addObject: [icon node]];
+    }
+  }
+  
+  RETAIN (opennodes);
+
+  [self showContentsOfNode: node];
+
+  selectionMask = FSNMultipleSelectionMask;
+  selectionMask |= FSNCreatingSelectionMask;
+
+  for (i = 0; i < [selection count]; i++) {
+    FSNode *nd = [selection objectAtIndex: i]; 
+    
+    if ([nd isValid]) { 
+      FSNIcon *icon = [self repOfSubnode: nd];
+      
+      if (icon) {
+        [icon select];
+      }
+    }
+  }
+
+  selectionMask = NSSingleSelectionMask;
+
+  RELEASE (selection);
+
+  for (i = 0; i < [opennodes count]; i++) {
+    FSNode *nd = [opennodes objectAtIndex: i]; 
+    
+    if ([nd isValid]) { 
+      FSNIcon *icon = [self repOfSubnode: nd];
+      
+      if (icon) {
+        [icon setOpened: YES];
+      }
+    }
+  }
+  
+  RELEASE (opennodes);
+    
+  [self checkLockedReps];
+  [self tile];
+
+  selection = [self selectedReps];
+  
+  if ([selection count]) {
+    [self scrollIconToVisible: [selection objectAtIndex: 0]];
+  }
+
+  [self selectionDidChange];
+}
+
 - (FSNode *)shownNode
 {
   return node;
+}
+
+- (BOOL)isSingleNode
+{
+  return YES;
+}
+
+- (BOOL)isShowingNode:(FSNode *)anode
+{
+  return ([node isEqual: anode] ? YES : NO);
+}
+
+- (BOOL)isShowingPath:(NSString *)path
+{
+  return ([[node path] isEqual: path] ? YES : NO);
+}
+
+- (void)sortTypeChangedAtPath:(NSString *)path
+{
+  if ((path == nil) || [[node path] isEqual: path]) {
+    [self reloadContents];
+  }
 }
 
 - (void)nodeContentsWillChange:(NSDictionary *)info
@@ -1025,6 +1111,7 @@ pp.x = NSMaxX([self bounds]) - 1
   NSString *source = [info objectForKey: @"source"];
   NSString *destination = [info objectForKey: @"destination"];
   NSArray *files = [info objectForKey: @"files"];
+  NSString *ndpath = [node path];
   int i; 
 
   if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
@@ -1032,31 +1119,39 @@ pp.x = NSMaxX([self bounds]) - 1
     source = [source stringByDeletingLastPathComponent]; 
   }
 
-  if ([[node path] isEqual: source]
-        && ([operation isEqual: @"NSWorkspaceMoveOperation"]
-            || [operation isEqual: @"NSWorkspaceDestroyOperation"]
-            || [operation isEqual: @"GWorkspaceRenameOperation"]
-			      || [operation isEqual: @"NSWorkspaceRecycleOperation"]
-			      || [operation isEqual: @"GWorkspaceRecycleOutOperation"])) {
-    for (i = 0; i < [files count]; i++) {
-      NSString *fname = [files objectAtIndex: i];
-      FSNode *subnode = [FSNode nodeWithRelativePath: fname parent: node];
-      
-      [self removeRepOfSubnode: subnode];
-    }
+  if (([ndpath isEqual: source] == NO) && ([ndpath isEqual: destination] == NO)) {
+    [self reloadContents];
+    return;
   }
 
+  if ([ndpath isEqual: source]) {
+    if ([operation isEqual: @"NSWorkspaceMoveOperation"]
+              || [operation isEqual: @"NSWorkspaceDestroyOperation"]
+              || [operation isEqual: @"GWorkspaceRenameOperation"]
+			        || [operation isEqual: @"GWorkspaceRecycleOutOperation"]) {
+      for (i = 0; i < [files count]; i++) {
+        NSString *fname = [files objectAtIndex: i];
+        FSNode *subnode = [FSNode nodeWithRelativePath: fname parent: node];
+        [self removeRepOfSubnode: subnode];
+      }
+    } else if ([operation isEqual: @"NSWorkspaceRecycleOperation"]) {
+      [self reloadContents];
+      return;
+    }
+  }
+  
   if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
     files = [NSArray arrayWithObject: [destination lastPathComponent]];
     destination = [destination stringByDeletingLastPathComponent]; 
   }
 
-  if ([[node path] isEqual: destination]
+  if ([ndpath isEqual: destination]
           && ([operation isEqual: @"NSWorkspaceMoveOperation"]   
               || [operation isEqual: @"NSWorkspaceCopyOperation"]
               || [operation isEqual: @"NSWorkspaceLinkOperation"]
               || [operation isEqual: @"NSWorkspaceDuplicateOperation"]
               || [operation isEqual: @"GWorkspaceCreateDirOperation"]
+              || [operation isEqual: @"GWorkspaceCreateFileOperation"]
               || [operation isEqual: @"GWorkspaceRenameOperation"]
 				      || [operation isEqual: @"GWorkspaceRecycleOutOperation"])) { 
     for (i = 0; i < [files count]; i++) {
@@ -1070,14 +1165,17 @@ pp.x = NSMaxX([self bounds]) - 1
         [self addRepForSubnode: subnode];
       }
     }
+    
+    [self sortIcons];
   }
   
   [self checkLockedReps];
   [self tile];
+  [self setNeedsDisplay: YES];  
   [self selectionDidChange];
 }
 
-- (void)watchedPathDidChange:(NSDictionary *)info
+- (void)watchedPathChanged:(NSDictionary *)info
 {
   NSString *event = [info objectForKey: @"event"];
   NSArray *files = [info objectForKey: @"files"];
@@ -1106,6 +1204,7 @@ pp.x = NSMaxX([self bounds]) - 1
   }
   
   [self tile];
+  [self setNeedsDisplay: YES];  
   [self selectionDidChange];
 }
 
@@ -1312,6 +1411,20 @@ pp.x = NSMaxX([self bounds]) - 1
   [icons removeObject: arep];
 }
 
+- (void)unloadFromPath:(NSString *)path
+{
+  if ([[node path] isEqual: path]) {
+    int i;
+    
+    for (i = 0; i < [icons count]; i++) {
+      [[icons objectAtIndex: i] removeFromSuperview];
+    }
+    
+    [icons removeAllObjects];
+    editIcon = nil;
+  }
+}
+
 - (void)unselectOtherReps:(id)arep
 {
   int i;
@@ -1439,7 +1552,7 @@ pp.x = NSMaxX([self bounds]) - 1
     }
   }
 
-  return selectedReps;
+  return [NSArray arrayWithArray: selectedReps];
 }
 
 - (NSArray *)selectedNodes
@@ -1455,7 +1568,7 @@ pp.x = NSMaxX([self bounds]) - 1
     }
   }
 
-  return selectedNodes;
+  return [NSArray arrayWithArray: selectedNodes];
 }
 
 - (NSArray *)selectedPaths
@@ -1471,7 +1584,7 @@ pp.x = NSMaxX([self bounds]) - 1
     }
   }
 
-  return selectedPaths;
+  return [NSArray arrayWithArray: selectedPaths];
 }
 
 - (void)selectionDidChange
@@ -1521,6 +1634,11 @@ pp.x = NSMaxX([self bounds]) - 1
   if (lastSelection) {
     [self selectRepsOfPaths: lastSelection];
   }
+}
+
+- (BOOL)involvedByFileOperation:(NSDictionary *)opinfo
+{
+  return [node involvedByFileOperation: opinfo];
 }
 
 - (BOOL)validatePasteOfFilenames:(NSArray *)names
@@ -1677,7 +1795,55 @@ pp.x = NSMaxX([self bounds]) - 1
 - (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
 {
   NSDragOperation sourceDragMask = [sender draggingSourceOperationMask];
-	
+  NSRect vr = [self visibleRect];
+  NSRect scr = vr;
+  int xsc = 0.0;
+  int ysc = 0.0;
+  int sc = 0;
+  float margin = 4.0;
+  NSRect ir = NSInsetRect(vr, margin, margin);
+  NSPoint p = [sender draggingLocation];
+  int i;
+  
+  p = [self convertPoint: p fromView: nil];
+
+  if ([self mouse: p inRect: ir] == NO) {
+    if (p.x < (NSMinX(vr) + margin)) {
+      xsc = -gridSize.width;
+    } else if (p.x > (NSMaxX(vr) - margin)) {
+      xsc = gridSize.width;
+    }
+
+    if (p.y < (NSMinY(vr) + margin)) {
+      ysc = -gridSize.height;
+    } else if (p.y > (NSMaxY(vr) - margin)) {
+      ysc = gridSize.height;
+    }
+
+    sc = (abs(xsc) >= abs(ysc)) ? xsc : ysc;
+          
+    for (i = 0; i < abs(sc / margin); i++) {
+      NSDate *limit = [NSDate dateWithTimeIntervalSinceNow: 0.01];
+      int x = (abs(xsc) >= i) ? (xsc > 0 ? margin : -margin) : 0;
+      int y = (abs(ysc) >= i) ? (ysc > 0 ? margin : -margin) : 0;
+      
+      scr = NSOffsetRect(scr, x, y);
+      [self scrollRectToVisible: scr];
+
+      vr = [self visibleRect];
+      ir = NSInsetRect(vr, margin, margin);
+
+      p = [[self window] mouseLocationOutsideOfEventStream];
+      p = [self convertPoint: p fromView: nil];
+
+      if ([self mouse: p inRect: ir]) {
+        break;
+      }
+      
+      [[NSRunLoop currentRunLoop] runUntilDate: limit];
+    }
+  }
+  
 	if (isDragTarget == NO) {
 		return NSDragOperationNone;
 	}

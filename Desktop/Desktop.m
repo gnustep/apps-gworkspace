@@ -153,6 +153,7 @@ static Desktop *desktop = nil;
   [win activate];
   [[win desktopView] showMountedVolumes];
   [[win desktopView] showContentsOfNode: desktopDir];
+  [self addWatcherForPath: [desktopDir path]];
   
   [self createTrashPath];
   
@@ -215,6 +216,16 @@ static Desktop *desktop = nil;
 
 - (BOOL)applicationShouldTerminate:(NSApplication *)app 
 {
+  NSString *mtabpath = [[NSUserDefaults standardUserDefaults] stringForKey: @"GSMtabPath"];
+
+  if (mtabpath == nil) {
+    mtabpath = @"/etc/mtab";
+  }
+
+  [self removeWatcherForPath: mtabpath];
+
+  [self removeWatcherForPath: [desktopDir path]];
+
   [self updateDefaults];
 
   if (workspaceApplication) {
@@ -786,13 +797,13 @@ static Desktop *desktop = nil;
     }
     
   } else if ([event isEqual: @"GWWatchedFileModified"]) {
-    [[self desktopView] watchedPathDidChange: info];
+    [[self desktopView] watchedPathChanged: info];
     
   } else if ([path isEqual: [desktopDir path]]) {
-    [[self desktopView] watchedPathDidChange: info];
+    [[self desktopView] watchedPathChanged: info];
   }    
 
-  [dock watchedPathDidChange: info];  
+  [dock watchedPathChanged: info];  
 }
 
 - (void)applicationForExtensionsDidChange:(NSNotification *)notif

@@ -44,22 +44,22 @@ static FSNodeRep *shared = nil;
 
 - (NSArray *)directoryContentsAtPath:(NSString *)path;
 
-- (NSImage *)iconOfSize:(float)size 
+- (NSImage *)iconOfSize:(int)size 
                 forNode:(FSNode *)node;
 
-- (NSImage *)multipleSelectionIconOfSize:(float)size;
+- (NSImage *)multipleSelectionIconOfSize:(int)size;
 
-- (NSImage *)openFolderIconOfSize:(float)size 
+- (NSImage *)openFolderIconOfSize:(int)size 
                           forNode:(FSNode *)node;
 
-- (NSImage *)workspaceIconOfSize:(float)size;
+- (NSImage *)workspaceIconOfSize:(int)size;
 
-- (NSImage *)trashIconOfSize:(float)size;
+- (NSImage *)trashIconOfSize:(int)size;
 
-- (NSImage *)trashFullIconOfSize:(float)size;
+- (NSImage *)trashFullIconOfSize:(int)size;
 
 - (NSImage *)resizedIcon:(NSImage *)icon 
-                  ofSize:(float)size;
+                  ofSize:(int)size;
 
 - (NSBezierPath *)highlightPathOfSize:(NSSize)size;
 
@@ -252,7 +252,7 @@ static FSNodeRep *shared = nil;
   return fnames;
 }
 
-- (NSImage *)iconOfSize:(float)size 
+- (NSImage *)iconOfSize:(int)size 
                 forNode:(FSNode *)node
 {
   NSString *nodepath = [node path];
@@ -284,7 +284,7 @@ static FSNodeRep *shared = nil;
   return icon;
 }
 
-- (NSImage *)multipleSelectionIconOfSize:(float)size
+- (NSImage *)multipleSelectionIconOfSize:(int)size
 {
   NSSize icnsize = [multipleSelIcon size];
 
@@ -295,7 +295,7 @@ static FSNodeRep *shared = nil;
   return multipleSelIcon;
 }
 
-- (NSImage *)openFolderIconOfSize:(float)size 
+- (NSImage *)openFolderIconOfSize:(int)size 
                           forNode:(FSNode *)node
 {
   NSString *ipath = [[node path] stringByAppendingPathComponent: @".opendir.tiff"];
@@ -328,7 +328,7 @@ static FSNodeRep *shared = nil;
   return icon;
 }
 
-- (NSImage *)workspaceIconOfSize:(float)size
+- (NSImage *)workspaceIconOfSize:(int)size
 {
   NSSize icnsize = [workspaceIcon size];
 
@@ -339,7 +339,7 @@ static FSNodeRep *shared = nil;
   return workspaceIcon;
 }
 
-- (NSImage *)trashIconOfSize:(float)size
+- (NSImage *)trashIconOfSize:(int)size
 {
   NSSize icnsize = [trashIcon size];
 
@@ -350,7 +350,7 @@ static FSNodeRep *shared = nil;
   return trashIcon;
 }
 
-- (NSImage *)trashFullIconOfSize:(float)size
+- (NSImage *)trashFullIconOfSize:(int)size
 {
   NSSize icnsize = [trashFullIcon size];
 
@@ -362,7 +362,7 @@ static FSNodeRep *shared = nil;
 }
 
 - (NSImage *)resizedIcon:(NSImage *)icon 
-                  ofSize:(float)size
+                  ofSize:(int)size
 {
   NSImage *newIcon = [icon copy];
   NSSize icnsize = [icon size];
@@ -686,7 +686,6 @@ static FSNodeRep *shared = nil;
   }
   
   [defaults setBool: usesThumbnails forKey: @"use_thumbnails"];
-  [defaults synchronize];
 }
 
 - (void)prepareThumbnailsCache
@@ -900,34 +899,34 @@ static FSNodeRep *shared = nil;
   return [[self sharedInstance] directoryContentsAtPath: path];
 }
 
-+ (NSImage *)iconOfSize:(float)size 
++ (NSImage *)iconOfSize:(int)size 
                 forNode:(FSNode *)node
 {
   return [[self sharedInstance] iconOfSize: size forNode: node];
 }
 
-+ (NSImage *)multipleSelectionIconOfSize:(float)size
++ (NSImage *)multipleSelectionIconOfSize:(int)size
 {
   return [[self sharedInstance] multipleSelectionIconOfSize: size];
 }
 
-+ (NSImage *)openFolderIconOfSize:(float)size 
++ (NSImage *)openFolderIconOfSize:(int)size 
                           forNode:(FSNode *)node
 {
   return [[self sharedInstance] openFolderIconOfSize: size forNode: node];
 }
 
-+ (NSImage *)workspaceIconOfSize:(float)size
++ (NSImage *)workspaceIconOfSize:(int)size
 {
   return [[self sharedInstance] workspaceIconOfSize: size];
 }
 
-+ (NSImage *)trashIconOfSize:(float)size
++ (NSImage *)trashIconOfSize:(int)size
 {
   return [[self sharedInstance] trashIconOfSize: size];
 }
 
-+ (NSImage *)trashFullIconOfSize:(float)size
++ (NSImage *)trashFullIconOfSize:(int)size
 {
   return [[self sharedInstance] trashFullIconOfSize: size];
 }

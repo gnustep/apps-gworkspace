@@ -41,7 +41,7 @@
 
 @end
 
-@interface RecyclerView : NSView <FSNodeRepContainer>
+@interface RecyclerView : NSView
 {
   RecyclerWindow *win;
   RecyclerIcon *icon;
@@ -56,6 +56,42 @@
 - (RecyclerIcon *)trashIcon;
 
 - (void)updateDefaults;
+
+@end
+
+
+@interface RecyclerView (NodeRepContainer)
+
+- (void)nodeContentsWillChange:(NSDictionary *)info;
+
+- (void)nodeContentsDidChange:(NSDictionary *)info;
+
+- (void)watchedPathChanged:(NSDictionary *)info;
+
+- (void)unselectOtherReps:(id)arep;
+
+- (NSArray *)selectedPaths;
+
+- (void)selectionDidChange;
+
+- (void)setSelectionMask:(FSNSelectionMask)mask;
+
+- (FSNSelectionMask)selectionMask;
+
+- (void)openSelectionInNewViewer:(BOOL)newv;
+
+- (void)restoreLastSelection;
+
+- (BOOL)validatePasteOfFilenames:(NSArray *)names
+                       wasCutted:(BOOL)cutted;
+
+- (NSColor *)backgroundColor;
+
+- (NSColor *)textColor;
+
+- (NSColor *)disabledTextColor;
+
+- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender;
 
 @end
 

@@ -34,7 +34,7 @@
 @class NSImage;
 @class DockIcon;
 
-@interface Dock : NSView <FSNodeRepContainer>
+@interface Dock : NSView 
 {
   NSWindow *win;
   DockPosition position;
@@ -98,6 +98,42 @@
 - (void)updateDefaults;
 
 - (id)win;
+
+@end
+
+
+@interface Dock (NodeRepContainer)
+
+- (void)nodeContentsWillChange:(NSDictionary *)info;
+
+- (void)nodeContentsDidChange:(NSDictionary *)info;
+
+- (void)watchedPathChanged:(NSDictionary *)info;
+
+- (void)unselectOtherReps:(id)arep;
+
+- (NSArray *)selectedPaths;
+
+- (void)selectionDidChange;
+
+- (void)setSelectionMask:(FSNSelectionMask)mask;
+
+- (FSNSelectionMask)selectionMask;
+
+- (void)openSelectionInNewViewer:(BOOL)newv;
+
+- (void)restoreLastSelection;
+
+- (BOOL)validatePasteOfFilenames:(NSArray *)names
+                       wasCutted:(BOOL)cutted;
+
+- (void)setBackgroundColor:(NSColor *)acolor;
+
+- (NSColor *)backgroundColor;
+
+- (NSColor *)textColor;
+
+- (NSColor *)disabledTextColor;
 
 @end
 

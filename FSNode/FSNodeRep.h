@@ -53,6 +53,10 @@ typedef enum FSNSelectionMask {
 
 - (void)setNode:(FSNode *)anode;
 
+- (void)setNode:(FSNode *)anode
+   nodeInfoType:(FSNInfoType)type
+   extendedType:(NSString *)exttype;
+
 - (FSNode *)node;
 
 - (void)showSelection:(NSArray *)selnodes;
@@ -93,6 +97,10 @@ typedef enum FSNSelectionMask {
 
 - (BOOL)isLeaf;
 
+- (void)setOpened:(BOOL)value;
+
+- (BOOL)isOpened;
+
 - (void)setLocked:(BOOL)value;
 
 - (BOOL)isLocked;
@@ -124,13 +132,23 @@ typedef enum FSNSelectionMask {
 
 - (void)showContentsOfNode:(FSNode *)anode;
 
+- (void)reloadContents;
+
 - (FSNode *)shownNode;
+
+- (BOOL)isSingleNode;
+
+- (BOOL)isShowingNode:(FSNode *)anode;
+
+- (BOOL)isShowingPath:(NSString *)path;
+
+- (void)sortTypeChangedAtPath:(NSString *)path;
 
 - (void)nodeContentsWillChange:(NSDictionary *)info;
 
 - (void)nodeContentsDidChange:(NSDictionary *)info;
 
-- (void)watchedPathDidChange:(NSDictionary *)info;
+- (void)watchedPathChanged:(NSDictionary *)info;
 
 - (void)setShowType:(FSNInfoType)type;
 
@@ -166,6 +184,8 @@ typedef enum FSNSelectionMask {
 
 - (void)removeRep:(id)arep;
 
+- (void)unloadFromPath:(NSString *)path;
+
 - (void)unselectOtherReps:(id)arep;
 
 - (void)selectReps:(NSArray *)reps;
@@ -195,6 +215,8 @@ typedef enum FSNSelectionMask {
 - (void)openSelectionInNewViewer:(BOOL)newv;
 
 - (void)restoreLastSelection;
+
+- (BOOL)involvedByFileOperation:(NSDictionary *)opinfo;
 
 - (BOOL)validatePasteOfFilenames:(NSArray *)names
                        wasCutted:(BOOL)cutted;
@@ -266,19 +288,19 @@ typedef enum FSNSelectionMask {
 
 + (NSArray *)directoryContentsAtPath:(NSString *)path;
 
-+ (NSImage *)iconOfSize:(float)size 
++ (NSImage *)iconOfSize:(int)size 
                 forNode:(FSNode *)node;
 
-+ (NSImage *)multipleSelectionIconOfSize:(float)size;
++ (NSImage *)multipleSelectionIconOfSize:(int)size;
 
-+ (NSImage *)openFolderIconOfSize:(float)size 
++ (NSImage *)openFolderIconOfSize:(int)size 
                           forNode:(FSNode *)node;
 
-+ (NSImage *)workspaceIconOfSize:(float)size;
++ (NSImage *)workspaceIconOfSize:(int)size;
 
-+ (NSImage *)trashIconOfSize:(float)size;
++ (NSImage *)trashIconOfSize:(int)size;
 
-+ (NSImage *)trashFullIconOfSize:(float)size;
++ (NSImage *)trashFullIconOfSize:(int)size;
 
 + (NSBezierPath *)highlightPathOfSize:(NSSize)size;
 

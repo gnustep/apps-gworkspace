@@ -84,6 +84,14 @@ BOOL isSubpathOfPath(NSString *p1, NSString *p2)
   return NO;
 }
 
+NSString *subtractFirstPartFromPath(NSString *path, NSString *firstpart)
+{
+	if ([path isEqual: firstpart] == NO) {
+    return [path substringFromIndex: [path rangeOfString: firstpart].length +1];
+  }
+	return path_separator();
+}
+
 int compareWithExtType(id *r1, id *r2, void *context)
 {
   FSNInfoType t1 = [(id <FSNodeRep>)r1 nodeInfoShowType];

@@ -136,21 +136,37 @@
 	    "useStandardKerning:",
 	    "useStandardLigatures:",
 	    "yank:",
-	    "zoom:"
+	    "zoom:",
+	    "setViewerType:"
 	);
 	Super = NSObject;
     };
-    GWSpatialViewer = {
+    GWViewer = {
 	Actions = (
+	    "setViewerType:"
 	);
 	Outlets = (
 	    win,
-	    topBox,
-	    elementsLabel,
-	    spaceLabel,
-	    scroll,
-	    popUpBox
+	    split,
+	    lowBox,
+	    pathsScroll,
+	    pathsView,
+	    nviewScroll
 	);
 	Super = NSObject;
+    };
+    GWViewerIconsPath = {
+	Actions = (
+	);
+	Outlets = (
+	);
+	Super = NSView;
+    };
+    GWViewerShelf = {
+	Actions = (
+	);
+	Outlets = (
+	);
+	Super = NSView;
     };
 }

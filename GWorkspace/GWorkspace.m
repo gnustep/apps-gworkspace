@@ -28,6 +28,7 @@
 #include "GWLib.h"
 #include "GWFunctions.h"
 #include "GWNotifications.h"
+#include "FSNodeRep.h"
 #include "ViewersProtocol.h"
 #include "GWorkspace.h"
 #include "Dialogs/Dialogs.h"
@@ -37,6 +38,7 @@
 #include "Preferences/PrefController.h"
 #include "Fiend/Fiend.h"
 #include "ViewersWindow.h"
+#include "Viewer/GWViewer.h"
 #include "SpatialViewer/GWViewersManager.h"
 #include "TShelf/TShelfWin.h"
 #include "TShelf/TShelfView.h"
@@ -235,7 +237,7 @@ static GWorkspace *gworkspace = nil;
   NSString *defApp, *type;
   int i;
   
-  [self setSelectedPaths: paths];
+  [self setSelectedPaths: paths];      
       
   for (i = 0; i < [paths count]; i++) {
     apath = [paths objectAtIndex: i];
@@ -332,7 +334,7 @@ static GWorkspace *gworkspace = nil;
     }
   }
 
-//  if ((spatial == NO) || (starting && [path isEqual: fixPath(@"/", 0)])) {
+  if ((spatial == NO) || (starting && [path isEqual: fixPath(@"/", 0)])) {
     viewer = [[ViewersWindow alloc] initWithViewerTemplates: viewersTemplates
                                    forPath: path viewPakages: viewapps 
                                         isRootViewer: NO onStart: setSelection];
@@ -340,9 +342,9 @@ static GWorkspace *gworkspace = nil;
     [viewers addObject: viewer];
     RELEASE (viewer);
     
-//  } else {
-//    viewer = [vwrsManager newViewerForPath: path closeOldViewer: nil];
-//  }
+  } else {
+    viewer = [vwrsManager newViewerForPath: path closeOldViewer: nil];
+  }
   
   return viewer;
 }
@@ -1097,7 +1099,7 @@ static GWorkspace *gworkspace = nil;
         NSArray *selection = [viewer selectedPaths];  
         NSString *vpath = [(ViewersWindow *)kwin currentViewedPath]; 
 
-        if (selection && [selection count]) {
+        if (selection && [selection count] && vpath) {
           if ([selection isEqual: [NSArray arrayWithObject: vpath]]) {
             return ([title isEqual: NSLocalizedString(@"Paste", @"")]);
           } 
@@ -1370,9 +1372,11 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   NSString *source = [info objectForKey: @"source"];
   NSString *destination = [info objectForKey: @"destination"];
   NSArray *files = [info objectForKey: @"files"];
-	NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity: 1];		
+  NSMutableArray *paths = [NSMutableArray array];
+	NSMutableDictionary *dict = [NSMutableDictionary dictionary];		
   NSString *opPtr = nil;
-
+  int i;
+  
   if ([operation isEqual: NSWorkspaceMoveOperation]) {
     opPtr = NSWorkspaceMoveOperation;    
   } else if ([operation isEqual: NSWorkspaceCopyOperation]) {
@@ -1383,6 +1387,12 @@ NSLocalizedString(@"OK", @""), nil, nil); \
     opPtr = NSWorkspaceDuplicateOperation;    
   } else if ([operation isEqual: NSWorkspaceDestroyOperation]) {
     opPtr = NSWorkspaceDestroyOperation;    
+  } else if ([operation isEqual: GWorkspaceRenameOperation]) {
+    opPtr = GWorkspaceRenameOperation;  
+  } else if ([operation isEqual: GWorkspaceCreateFileOperation]) {
+    opPtr = GWorkspaceCreateFileOperation;  
+  } else if ([operation isEqual: GWorkspaceCreateDirOperation]) {
+    opPtr = GWorkspaceCreateDirOperation;  
   } else if ([operation isEqual: NSWorkspaceRecycleOperation]) {
     opPtr = NSWorkspaceRecycleOperation;    
   } else if ([operation isEqual: GWorkspaceRecycleOutOperation]) {
@@ -1395,8 +1405,14 @@ NSLocalizedString(@"OK", @""), nil, nil); \
      || opPtr == NSWorkspaceCopyOperation 
         || opPtr == NSWorkspaceLinkOperation
            || opPtr == NSWorkspaceDuplicateOperation
-						 || opPtr == NSWorkspaceRecycleOperation
-							 || opPtr == GWorkspaceRecycleOutOperation) { 
+						   || opPtr == NSWorkspaceRecycleOperation
+							   || opPtr == GWorkspaceRecycleOutOperation) { 
+    for (i = 0; i < [files count]; i++) {
+      NSString *fname = [files objectAtIndex: i];
+      NSString *fullpath = [destination stringByAppendingPathComponent: fname];
+      [paths addObject: fullpath];
+    }
+
     if ([viewersSearchPaths containsObject: destination] == NO) {
       [GWLib lockFiles: files inDirectoryAtPath: destination];
     }
@@ -1407,10 +1423,18 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 				|| opPtr == NSWorkspaceRecycleOperation
 				|| opPtr == GWorkspaceRecycleOutOperation
 				|| opPtr == GWorkspaceEmptyRecyclerOperation) {
+    for (i = 0; i < [files count]; i++) {
+      NSString *fname = [files objectAtIndex: i];
+      NSString *fullpath = [source stringByAppendingPathComponent: fname];
+      [paths addObject: fullpath];
+    }
+
     if ([viewersSearchPaths containsObject: source] == NO) {
       [GWLib lockFiles: files inDirectoryAtPath: source];
     }
   }
+
+  [FSNodeRep lockPaths: paths];
 
 	[dict setObject: opPtr forKey: @"operation"];	
   [dict setObject: source forKey: @"source"];	
@@ -1429,34 +1453,48 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   NSString *source = [info objectForKey: @"source"];
   NSString *destination = [info objectForKey: @"destination"];
   NSArray *files = [info objectForKey: @"files"];
+  NSMutableArray *paths = [NSMutableArray array];
   NSArray *origfiles = [info objectForKey: @"origfiles"];
-	NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithCapacity: 1];		
+	NSMutableDictionary *dict = [NSMutableDictionary dictionary];		
   NSString *opPtr = nil;
-
-  if ([operation isEqual: NSWorkspaceMoveOperation]) {
-    opPtr = NSWorkspaceMoveOperation;    
-  } else if ([operation isEqual: NSWorkspaceCopyOperation]) {
-    opPtr = NSWorkspaceCopyOperation;    
-  } else if ([operation isEqual: NSWorkspaceLinkOperation]) {
-    opPtr = NSWorkspaceLinkOperation;    
-  } else if ([operation isEqual: NSWorkspaceDuplicateOperation]) {
-    opPtr = NSWorkspaceDuplicateOperation;    
-  } else if ([operation isEqual: NSWorkspaceDestroyOperation]) {
-    opPtr = NSWorkspaceDestroyOperation;    
-  } else if ([operation isEqual: NSWorkspaceRecycleOperation]) {
-    opPtr = NSWorkspaceRecycleOperation;    
-  } else if ([operation isEqual: GWorkspaceRecycleOutOperation]) {
-    opPtr = GWorkspaceRecycleOutOperation;    
-  } else if ([operation isEqual: GWorkspaceEmptyRecyclerOperation]) {
-    opPtr = GWorkspaceEmptyRecyclerOperation;    
+  int i;
+  
+  if ([operation isEqual: NSWorkspaceMoveOperation]) { 
+    opPtr = NSWorkspaceMoveOperation;                                 
+  } else if ([operation isEqual: NSWorkspaceCopyOperation]) {         
+    opPtr = NSWorkspaceCopyOperation;                                 
+  } else if ([operation isEqual: NSWorkspaceLinkOperation]) {         
+    opPtr = NSWorkspaceLinkOperation;                                 
+  } else if ([operation isEqual: NSWorkspaceDuplicateOperation]) {    
+    opPtr = NSWorkspaceDuplicateOperation;                            
+  } else if ([operation isEqual: NSWorkspaceDestroyOperation]) {      
+    opPtr = NSWorkspaceDestroyOperation;                              
+  } else if ([operation isEqual: GWorkspaceRenameOperation]) {        
+    opPtr = GWorkspaceRenameOperation;                                
+  } else if ([operation isEqual: GWorkspaceCreateFileOperation]) {    
+    opPtr = GWorkspaceCreateFileOperation;                            
+  } else if ([operation isEqual: GWorkspaceCreateDirOperation]) {     
+    opPtr = GWorkspaceCreateDirOperation;                             
+  } else if ([operation isEqual: NSWorkspaceRecycleOperation]) {      
+    opPtr = NSWorkspaceRecycleOperation;                              
+  } else if ([operation isEqual: GWorkspaceRecycleOutOperation]) {    
+    opPtr = GWorkspaceRecycleOutOperation;                            
+  } else if ([operation isEqual: GWorkspaceEmptyRecyclerOperation]) { 
+    opPtr = GWorkspaceEmptyRecyclerOperation;                         
   }
 
   if (opPtr == NSWorkspaceMoveOperation 
      || opPtr == NSWorkspaceCopyOperation
         || opPtr == NSWorkspaceLinkOperation
            || opPtr == NSWorkspaceDuplicateOperation
-						 || opPtr == NSWorkspaceRecycleOperation
-							 || opPtr == GWorkspaceRecycleOutOperation) { 
+						     || opPtr == NSWorkspaceRecycleOperation
+							     || opPtr == GWorkspaceRecycleOutOperation) { 
+    for (i = 0; i < [origfiles count]; i++) {
+      NSString *fname = [origfiles objectAtIndex: i];
+      NSString *fullpath = [destination stringByAppendingPathComponent: fname];
+      [paths addObject: fullpath];
+    }
+
 		[GWLib unLockFiles: origfiles inDirectoryAtPath: destination];	
   }
 
@@ -1464,9 +1502,17 @@ NSLocalizedString(@"OK", @""), nil, nil); \
         || opPtr == NSWorkspaceDestroyOperation
 				|| opPtr == NSWorkspaceRecycleOperation
 				|| opPtr == GWorkspaceRecycleOutOperation
-				|| opPtr == GWorkspaceEmptyRecyclerOperation) {
+				|| opPtr == GWorkspaceEmptyRecyclerOperation) {        
+    for (i = 0; i < [origfiles count]; i++) {
+      NSString *fname = [origfiles objectAtIndex: i];
+      NSString *fullpath = [source stringByAppendingPathComponent: fname];
+      [paths addObject: fullpath];
+    }
+
     [GWLib unLockFiles: origfiles inDirectoryAtPath: source];
   }
+
+  [FSNodeRep unlockPaths: paths];
 
 	[dict setObject: opPtr forKey: @"operation"];	
   [dict setObject: source forKey: @"source"];	
@@ -2891,7 +2937,9 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 //
 - (void)selectionChanged:(NSArray *)newsel
 {
-  [self setSelectedPaths: newsel];
+  if (newsel && [newsel count]) {
+    [self setSelectedPaths: newsel];
+  }
 }
 
 - (void)openSelectionInNewViewer:(BOOL)newv

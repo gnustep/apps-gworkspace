@@ -878,10 +878,11 @@
 	}
 }
 
+@end
 
-//
-// FSNodeRepContainer protocol
-//
+
+@implementation DesktopView (NodeRepContainer)
+
 - (void)showContentsOfNode:(FSNode *)anode
 {
   NSArray *subNodes = [anode subNodes];
@@ -900,14 +901,9 @@
       i--;
     }
   }
-   
-  if (node) {
-    [desktopApp removeWatcherForPath: [node path]];
-  }
-  
+     
   ASSIGN (node, anode);
   nodeDict = [self readNodeInfo];
-  [desktopApp addWatcherForPath: [node path]];
     
   for (i = 0; i < [subNodes count]; i++) {
     FSNode *subnode = [subNodes objectAtIndex: i];
@@ -1065,7 +1061,7 @@
   [self selectionDidChange];
 }
 
-- (void)watchedPathDidChange:(NSDictionary *)info
+- (void)watchedPathChanged:(NSDictionary *)info
 {
   NSString *event = [info objectForKey: @"event"];
   NSArray *files = [info objectForKey: @"files"];
