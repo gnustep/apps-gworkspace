@@ -162,12 +162,10 @@ if (rct.size.height < 0) rct.size.height = 0; \
 
 - (NSDictionary *)readNodeInfo
 {
-  NSDictionary *nodeInfo;
-  
   ASSIGN (infoPath, [[node path] stringByAppendingPathComponent: @".dirinfo"]);
   
   if ([[NSFileManager defaultManager] fileExistsAtPath: infoPath]) {
-    nodeInfo = [NSDictionary dictionaryWithContentsOfFile: infoPath];
+    NSDictionary *nodeInfo = [NSDictionary dictionaryWithContentsOfFile: infoPath];
 
     if (nodeInfo) {
       id entry = [nodeInfo objectForKey: @"backcolor"];
@@ -198,10 +196,12 @@ if (rct.size.height < 0) rct.size.height = 0; \
 
       entry = [nodeInfo objectForKey: @"fsn_info_type"];
       infoType = entry ? [entry intValue] : infoType;
+    
+      return nodeInfo;
     }
   }
     
-  return (nodeInfo != nil) ? nodeInfo : [NSDictionary dictionary];
+  return nil;
 }
 
 - (void)updateNodeInfo

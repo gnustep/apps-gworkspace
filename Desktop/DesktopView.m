@@ -148,12 +148,10 @@
 
 - (NSDictionary *)readNodeInfo
 {
-  NSDictionary *nodeInfo;
-
   ASSIGN (infoPath, [[node path] stringByAppendingPathComponent: @".dirinfo"]);
   
   if ([[NSFileManager defaultManager] fileExistsAtPath: infoPath]) {
-    nodeInfo = [NSDictionary dictionaryWithContentsOfFile: infoPath];
+    NSDictionary *nodeInfo = [NSDictionary dictionaryWithContentsOfFile: infoPath];
 
     if (nodeInfo) {
       id entry = [nodeInfo objectForKey: @"backcolor"];
@@ -204,7 +202,7 @@
     }
   }
   
-  return (nodeInfo != nil) ? nodeInfo : [NSDictionary dictionary];
+  return nil;
 }
 
 - (void)updateNodeInfo
@@ -831,7 +829,6 @@
   NSMutableArray *unsorted = [NSMutableArray array];
   int count = [icons count];
   NSDictionary *nodeInfo;
-  NSDictionary *indexes;
   int i;
 
   for (i = 0; i < count; i++) {
@@ -851,7 +848,6 @@
   
   ASSIGN (node, anode);
   [desktopApp addWatcherForPath: [node path]];
-  nodeInfo = [self readNodeInfo];
     
   for (i = 0; i < [subNodes count]; i++) {
     FSNode *subnode = [subNodes objectAtIndex: i];
@@ -866,25 +862,29 @@
     RELEASE (icon);
   }
 
-  indexes = [nodeInfo objectForKey: @"indexes"];
+  nodeInfo = [self readNodeInfo];
+  
+  if (nodeInfo) {
+    NSDictionary *indexes = [nodeInfo objectForKey: @"indexes"];
 
-  if (indexes) {
-    for (i = 0; i < [unsorted count]; i++) {
-      FSNIcon *icon = [unsorted objectAtIndex: i];
-      NSString *name = [[icon node] name];
-      NSNumber *indnum = [indexes objectForKey: name];
+    if (indexes) {
+      for (i = 0; i < [unsorted count]; i++) {
+        FSNIcon *icon = [unsorted objectAtIndex: i];
+        NSString *name = [[icon node] name];
+        NSNumber *indnum = [indexes objectForKey: name];
 
-      if (indnum) {
-        int index = [indnum intValue];
-        
-        if (index >= gridcount) {
-          index = [self firstFreeGridIndex];
-        }
-        
-        if (index != -1) {
-          [icon setGridIndex: index];
-          [icons addObject: icon];
-          [self addSubview: icon];
+        if (indnum) {
+          int index = [indnum intValue];
+
+          if (index >= gridcount) {
+            index = [self firstFreeGridIndex];
+          }
+
+          if (index != -1) {
+            [icon setGridIndex: index];
+            [icons addObject: icon];
+            [self addSubview: icon];
+          }
         }
       }
     }
