@@ -46,6 +46,8 @@
   NSImage *icon;
   NSRect icnBounds;
   unsigned int icnPosition;
+
+  NSRect brImgBounds;
     
   NSBezierPath *highlightPath;
   NSRect hlightRect;
@@ -60,7 +62,7 @@
   BOOL selectable;
   
   BOOL nameEdited;
-  
+  BOOL isLeaf;
   BOOL isLocked;
   
   BOOL dndSource;
@@ -71,6 +73,8 @@
   
   NSView <FSNodeRepContainer> *container;
 }
+
++ (NSImage *)branchImage;
 
 - (id)initForNode:(FSNode *)anode
      nodeInfoType:(FSNInfoType)type

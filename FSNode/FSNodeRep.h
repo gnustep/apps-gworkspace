@@ -78,6 +78,10 @@ typedef enum FSNSelectionMask {
 
 - (void)setNameEdited:(BOOL)value;
 
+- (void)setLeaf:(BOOL)flag;
+
+- (BOOL)isLeaf;
+
 - (void)setLocked:(BOOL)value;
 
 - (BOOL)isLocked;

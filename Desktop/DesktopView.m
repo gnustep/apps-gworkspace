@@ -862,6 +862,7 @@
                                        gridIndex: -1
                                        dndSource: YES
                                        acceptDnd: YES];
+                                       
     [unsorted addObject: icon];
     RELEASE (icon);
   }
@@ -1049,6 +1050,54 @@
   [self tile];
   [self setNeedsDisplay: YES];
   [self selectionDidChange];
+}
+
+- (void)setIconSize:(int)size
+{
+  int i;
+  
+  iconSize = size;
+  [self makeIconsGrid];
+  
+  for (i = 0; i < [icons count]; i++) {
+    FSNIcon *icon = [icons objectAtIndex: i];
+    [icon setIconSize: iconSize];
+  }
+  
+  [self tile];
+}
+
+- (void)setLabelTextSize:(int)size
+{
+  int i;
+
+  labelTextSize = size;
+  ASSIGN (labelFont, [NSFont systemFontOfSize: labelTextSize]);  
+  [self makeIconsGrid];
+
+  for (i = 0; i < [icons count]; i++) {
+    FSNIcon *icon = [icons objectAtIndex: i];
+    [icon setFont: labelFont];
+  }
+
+  [nameEditor setFont: labelFont];
+
+  [self tile];
+}
+
+- (void)setIconPosition:(int)pos
+{
+  int i;
+  
+  iconPosition = pos;
+  [self makeIconsGrid];
+  
+  for (i = 0; i < [icons count]; i++) {
+    FSNIcon *icon = [icons objectAtIndex: i];
+    [icon setIconPosition: iconPosition];
+  }
+    
+  [self tile];
 }
 
 - (id)addRepForSubnode:(FSNode *)anode

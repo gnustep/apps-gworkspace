@@ -31,7 +31,11 @@
 #include "FSNFunctions.h"
 #include "GNUstep.h"
 
+#define BRANCH_SIZE 7
+
 static id <DesktopApplication> desktopApp = nil;
+
+static NSImage *branchImage;
 
 @implementation FSNIcon
 
@@ -60,6 +64,13 @@ static id <DesktopApplication> desktopApp = nil;
       desktopApp = [desktopAppClass performSelector: sel];
     }
   }
+  
+  ASSIGN (branchImage, [NSImage imageNamed: @"ArrowRight"]);
+}
+
++ (NSImage *)branchImage
+{
+  return branchImage;
 }
 
 - (id)initForNode:(FSNode *)anode
@@ -78,6 +89,8 @@ static id <DesktopApplication> desktopApp = nil;
     
     icnBounds = NSMakeRect(0, 0, isize, isize);
     
+    brImgBounds = NSMakeRect(0, 0, BRANCH_SIZE, BRANCH_SIZE);
+    
     ASSIGN (node, anode);
     selection = nil;
     selectionTitle = nil;
@@ -88,6 +101,7 @@ static id <DesktopApplication> desktopApp = nil;
     acceptDnd = dndaccept;
     
     selectable = YES;
+    isLeaf = YES;
     
     hlightRect = NSZeroRect;
     hlightRect.size.width = ceil(isize / 3 * 4);
@@ -253,6 +267,10 @@ static id <DesktopApplication> desktopApp = nil;
   } else if (icnPosition == NSImageLeft) {
     float icnspacew = selectable ? hlightRect.size.width : icnBounds.size.width;
   
+    if (isLeaf == NO) {
+      icnspacew += BRANCH_SIZE;
+    }
+    
     labelRect.size.width = ceil([label uncuttedTitleLenght] + lblmargin);
   
     if (labelRect.size.width >= (frameRect.size.width - icnspacew)) {
@@ -285,7 +303,7 @@ static id <DesktopApplication> desktopApp = nil;
       labelRect.origin.x = icnBounds.size.width;
       labelRect.origin.y = (icnBounds.size.height - labelRect.size.height) / 2;
     }
-    
+        
   } else if (icnPosition == NSImageOnly) {
     if (selectable) {
       float hlx = (frameRect.size.width - hlightRect.size.width) / 2;
@@ -307,6 +325,9 @@ static id <DesktopApplication> desktopApp = nil;
     icnBounds.origin.x = (frameRect.size.width - sz.width) / 2;
     icnBounds.origin.y = (frameRect.size.height - sz.height) / 2;
   } 
+
+  brImgBounds.origin.x = frameRect.size.width - brImgBounds.size.width;
+  brImgBounds.origin.y = ceil(icnBounds.origin.y + (icnBounds.size.height / 2) - (BRANCH_SIZE / 2));
   
   [self setNeedsDisplay: YES]; 
 }
@@ -446,6 +467,10 @@ static id <DesktopApplication> desktopApp = nil;
 	} else {						
     [icon dissolveToPoint: icnBounds.origin fraction: 0.3];
 	}
+  
+  if (isLeaf == NO) {
+    [[isa branchImage] compositeToPoint: brImgBounds.origin operation: NSCompositeSourceOver];
+  }
 }
 
 
@@ -586,6 +611,19 @@ static id <DesktopApplication> desktopApp = nil;
     case FSNInfoOwnerType:
       [label setStringValue: [node owner]];
       break;
+      
+      
+  /*    
+    case FSNInfoOtherType:      
+      {  
+        NSString *str = [FSNodeRep 
+        
+        
+      }
+      break;
+  */      
+      
+      
     default:
       [label setStringValue: [node name]];
       break;
@@ -608,6 +646,19 @@ static id <DesktopApplication> desktopApp = nil;
     nameEdited = value;
     [self setNeedsDisplay: YES];
   }
+}
+
+- (void)setLeaf:(BOOL)flag
+{
+  if (isLeaf != flag) {
+    isLeaf = flag;
+    [self tile]; 
+  }
+}
+
+- (BOOL)isLeaf
+{
+  return isLeaf;
 }
 
 - (void)setLocked:(BOOL)value

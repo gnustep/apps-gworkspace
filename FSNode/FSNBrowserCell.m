@@ -390,6 +390,16 @@ static NSDictionary *fontAttr = nil;
   nameEdited = value;
 }
 
+- (void)setLeaf:(BOOL)flag
+{
+  [super setLeaf: flag];
+}
+
+- (BOOL)isLeaf
+{
+  return [super isLeaf];
+}
+
 - (void)setLocked:(BOOL)value
 {
 	if (isLocked == value) {
