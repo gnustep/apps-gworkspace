@@ -80,8 +80,6 @@ id instance = nil;
 
 - (FSWatcher *)watcherForPath:(NSString *)path;
 
-- (NSTimer *)timerForPath:(NSString *)path;
-
 - (void)watcherNotification:(NSNotification *)notification;
 
 - (void)lockFiles:(NSArray *)files inDirectoryAtPath:(NSString *)path;
@@ -136,6 +134,9 @@ id instance = nil;
 
 - (id)workspaceApp;
 
+- (void)concludeRemoteFilesDragOperation:(NSData *)pbdata
+                             atLocalPath:(NSString *)localPath;
+
 @end
 
 @implementation GWLib (PrivateMethods)
@@ -155,7 +156,6 @@ id instance = nil;
 
   RELEASE (cachedContents);
 	RELEASE (watchers);
-	RELEASE (watchTimers);
   RELEASE (watchedPaths);
 	RELEASE (lockedPaths);
 	RELEASE (hiddenPaths);
@@ -182,7 +182,6 @@ id instance = nil;
     hideSysFiles = NO;
     
     watchers = [NSMutableArray new];	
-	  watchTimers = [NSMutableArray new];	
     watchedPaths = [NSMutableArray new];
     hiddenPaths = [NSArray new];
 	  lockedPaths = [NSMutableArray new];	
@@ -212,6 +211,10 @@ id instance = nil;
                           object: nil];
                           
     workspaceApp = [self workspaceApp];                        
+
+    [NSTimer scheduledTimerWithTimeInterval: 1.0 
+											target: self selector: @selector(watcherTimeOut:) 
+																								 userInfo: nil repeats: YES];
   }
   
   return self;
@@ -430,11 +433,6 @@ id instance = nil;
     BOOL isdir;
     
     if ([fm fileExistsAtPath: path isDirectory: &isdir] && isdir) {
-		  NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval: 1.0 
-												  target: self selector: @selector(watcherTimeOut:) 
-																								  userInfo: path repeats: YES];
-		  [watchTimers addObject: timer];
-																								
   	  watcher = [[FSWatcher alloc] initForWatchAtPath: path];      
   	  [watchers addObject: watcher];
   	  RELEASE (watcher);  
@@ -445,39 +443,36 @@ id instance = nil;
 - (void)removeWatcherForPath:(NSString *)path
 {
   FSWatcher *watcher = [self watcherForPath: path];
-	
-  if ((watcher != nil) && ([watcher isOld] == NO)) {
+  
+  if (watcher && ([watcher isOld] == NO)) {
   	[watcher removeListener];   
   }
 }
 
 - (void)watcherTimeOut:(id)sender
 {
-	NSString *watchedPath = (NSString *)[sender userInfo];
-	
-	if (watchedPath != nil) {
-		FSWatcher *watcher = [self watcherForPath: watchedPath];
-	
-		if (watcher != nil) {
-			if ([watcher isOld]) {
-				[self removeWatcher: watcher];
-			} else {
-				[watcher watchFile];
-			}
-		}
-	}
+  int count = [watchers count];
+  int i;
+  
+  for (i = 0; i < count; i++) {
+    FSWatcher *watcher = [watchers objectAtIndex: i];    
+
+    if ([watcher isOld]) {
+      [self removeWatcher: watcher];
+      count--;
+      i--;
+    } else {
+      [watcher watchFile];
+      
+//      [[NSRunLoop currentRunLoop] 
+//          runUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.001]];
+
+    }
+  }
 }
 
 - (void)removeWatcher:(FSWatcher *)awatcher
 {
-	NSString *watchedPath = [awatcher watchedPath];
-	NSTimer *timer = [self timerForPath: watchedPath];
-
-	if (timer && [timer isValid]) {
-		[timer invalidate];
-		[watchTimers removeObject: timer];
-	}
-	
 	[watchers removeObject: awatcher];
 }
 
@@ -493,21 +488,6 @@ id instance = nil;
   }
   
   return nil;
-}
-
-- (NSTimer *)timerForPath:(NSString *)path
-{
-	int i;
-
-  for (i = 0; i < [watchTimers count]; i++) {
-		NSTimer *t = [watchTimers objectAtIndex: i];    
-	
-		if (([t isValid]) && ([(NSString *)[t userInfo] isEqual: path])) {
-			return t;
-		}
-	}
-	
-	return nil;
 }
 
 - (void)watcherNotification:(NSNotification *)notification
@@ -905,6 +885,52 @@ id instance = nil;
   return workspaceApp;
 }
 
+- (void)concludeRemoteFilesDragOperation:(NSData *)pbdata
+                             atLocalPath:(NSString *)localPath
+{
+  NSDictionary *infoDict = [NSUnarchiver unarchiveObjectWithData: pbdata];
+  NSArray *srcPaths = [infoDict objectForKey: @"paths"];
+  NSString *connName = [infoDict objectForKey: @"dndconn"];
+	NSArray *locContents = [fm directoryContentsAtPath: localPath];
+  BOOL samename = NO;
+  int i;
+
+  if (locContents) {
+    NSConnection *conn;
+    id remote;
+  
+    for (i = 0; i < [srcPaths count]; i++) {
+      NSString *name = [[srcPaths objectAtIndex: i] lastPathComponent];
+
+      if ([locContents containsObject: name]) {
+        samename = YES;
+        break;
+      }
+    }
+    
+    conn = [NSConnection connectionWithRegisteredName: connName host: @""];
+  
+    if (conn) {
+      remote = [conn rootProxy];
+      
+      if (remote) {
+        NSMutableDictionary *reply = [NSMutableDictionary dictionary];
+        NSData *rpdata;
+      
+        [reply setObject: localPath forKey: @"destination"];
+        [reply setObject: srcPaths forKey: @"paths"];
+        [reply setObject: [NSNumber numberWithBool: !samename] forKey: @"dndok"];
+        rpdata = [NSArchiver archivedDataWithRootObject: reply];
+      
+        [remote setProtocolForProxy: @protocol(GWRemoteFilesDraggingInfo)];
+        remote = (id <GWRemoteFilesDraggingInfo>)remote;
+      
+        [remote remoteDraggingDestinationReply: rpdata];
+      }
+    }
+  }
+}
+
 @end
 
 
@@ -1038,6 +1064,13 @@ id instance = nil;
 + (id)workspaceApp
 {
   return [[self instance] workspaceApp];
+}
+
++ (void)concludeRemoteFilesDragOperation:(NSData *)pbdata
+                             atLocalPath:(NSString *)localPath
+{
+  [[self instance] concludeRemoteFilesDragOperation: pbdata 
+                                        atLocalPath: localPath];
 }
 
 @end

@@ -1,3 +1,12 @@
+2003-12-10 Enrico Sersale  <enrico@imago.ro>
+  
+  * added the "GWRemoteFilenamesPboardType" in all the classes 
+    that implements the DraggingDestination protocol
+
+  * GWLib/GWLib.h 
+    GWLib/GWLib.m
+    -concludeRemoteFilesDragOperation: new method.
+
 2003-11-06 Enrico Sersale  <enrico@imago.ro>
   
   * GWLib/FSWatcher.m

@@ -35,7 +35,6 @@
   BOOL hideSysFiles;
   
   NSMutableArray *watchers;
-	NSMutableArray *watchTimers;
   NSMutableArray *watchedPaths;  
 
 	NSMutableArray *lockedPaths;
@@ -103,6 +102,9 @@
 + (NSArray *)imageExtensions;
 
 + (id)workspaceApp;
+
++ (void)concludeRemoteFilesDragOperation:(NSData *)pbdata
+                             atLocalPath:(NSString *)localPath;
 
 @end
 

@@ -68,4 +68,12 @@ extern NSString *GWOpenFolderIconName;
 extern NSString *GWSmallOpenFolderIconName;
 extern NSString *GWCellHighlightIconName;
 
+/* The name of the pasteboard for GWNet */
+extern NSString *GWRemoteFilenamesPboardType;
+
+/* The protocol of the remote dnd source */
+@protocol GWRemoteFilesDraggingInfo
+- (oneway void)remoteDraggingDestinationReply:(NSData *)reply;
+@end 
+
 #endif

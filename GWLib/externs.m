@@ -74,3 +74,6 @@ NSString *GWIconAnimationChangedNotification = @"GWIconAnimationChangedNotificat
   NSString *GWCellHighlightIconName = @"CellHighlight_osx.tiff";  
 #endif
 
+/* The name of the pasteboard for GWNet */
+NSString *GWRemoteFilenamesPboardType = @"GWRemoteFilenamesPboardType";
+

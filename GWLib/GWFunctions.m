@@ -115,7 +115,7 @@ static inline int compare_Paths(id *p1, id *p2, void *context)
   int i1, i2;      
   NSDictionary *attributes; 
   NSDate *d1, *d2;
-  float fs1, fs2;
+  unsigned long long fs1, fs2;
   NSString *own1, *own2;
      
   stype = (int)context;

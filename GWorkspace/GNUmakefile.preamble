@@ -15,7 +15,6 @@ ifneq ($(FOUNDATION_LIB), apple)
   ADDITIONAL_INCLUDE_DIRS += -IGWLib -I../GWLib -I../../GWLib
 else
   ADDITIONAL_INCLUDE_DIRS += -framework GWorkspace
-  ADDITIONAL_INCLUDE_DIRS += -framework Renaissance
 endif
 
 # Additional LDFLAGS to pass to the linker

@@ -58,6 +58,8 @@
 {
   self = [super init];
   if (self) {
+    NSArray *pbTypes = [NSArray arrayWithObjects: NSFilenamesPboardType, 
+                                          GWRemoteFilenamesPboardType, nil];
     NSString *defApp = nil, *t = nil;
 		NSFont *font;
 
@@ -92,7 +94,7 @@
 	  [namelabel setTextColor: [NSColor blackColor]];
 		[self setLabelWidth]; 
     
-    [self registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, nil]];
+    [self registerForDraggedTypes: pbTypes];
 
     dragdelay = 0;
     isDragTarget = NO;
@@ -418,83 +420,94 @@
 	CHECK_LOCK_RET (NSDragOperationNone);
 
 	pb = [sender draggingPasteboard];
-  if([[pb types] indexOfObject: NSFilenamesPboardType] != NSNotFound) {
+  
+  if ([[pb types] containsObject: NSFilenamesPboardType]) {
     sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
-	  count = [sourcePaths count];
-
-    if ((count == 1) && ([path isEqualToString: [sourcePaths objectAtIndex: 0]])) {
-      onSelf = YES;
-      isDragTarget = YES;
-      return NSDragOperationAll;
-    }
-
-    if ((([type isEqualToString: NSDirectoryFileType] == NO)
-        && ([type isEqualToString: NSFilesystemFileType] == NO)) || isPakage) {
-      return NSDragOperationNone;
-    }
-    
-	  fromPath = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
-    
-	  if (count == 0) {
-		  return NSDragOperationNone;
-    } 
-  
-	  if ([fm isWritableFileAtPath: path] == NO) {
-		  return NSDragOperationNone;
-	  }
-  
-	  if ([path isEqualToString: fromPath]) {
-		  return NSDragOperationNone;
-    }  
-  
-	  for (i = 0; i < count; i++) {
-		  if ([path isEqualToString: [sourcePaths objectAtIndex: i]]) {
-		    return NSDragOperationNone;
-		  }
-	  }
        
-	  buff = [NSString stringWithString: path];
-	  while (1) {
-		  for (i = 0; i < count; i++) {
-			  if ([buff isEqualToString: [sourcePaths objectAtIndex: i]]) {
- 		      return NSDragOperationNone;
-			  }
-		  }
-      if ([buff isEqualToString: fixPath(@"/", 0)] == YES) {
-        break;
-      }            
-		  buff = [buff stringByDeletingLastPathComponent];
-	  }
-
-    isDragTarget = YES;
-		
-    iconPath =  [path stringByAppendingPathComponent: @".opendir.tiff"];
-
-    if ([fm isReadableFileAtPath: iconPath]) {
-      NSImage *img = [[NSImage alloc] initWithContentsOfFile: iconPath];
-	    
-      if (img) {
-        ASSIGN (icon, img);
-        RELEASE (img);
-      } else {
-        ASSIGN (icon, [NSImage imageNamed: GWOpenFolderIconName]);
-      }      
-    } else {
-	    ASSIGN (icon, [NSImage imageNamed: GWOpenFolderIconName]);    
-    }
-
-    [self setNeedsDisplay: YES];
-		
-		sourceDragMask = [sender draggingSourceOperationMask];
-	
-		if (sourceDragMask == NSDragOperationCopy) {
-			return NSDragOperationCopy;
-		} else if (sourceDragMask == NSDragOperationLink) {
-			return NSDragOperationLink;
-		} else {
-			return NSDragOperationAll;
-		}
+  } else if ([[pb types] containsObject: GWRemoteFilenamesPboardType]) {
+    NSData *pbData = [pb dataForType: GWRemoteFilenamesPboardType]; 
+    NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
+    
+    sourcePaths = [pbDict objectForKey: @"paths"];
+  } else {
+    return NSDragOperationNone;
   }
+
+	count = [sourcePaths count];
+
+  if ((count == 1) && ([path isEqualToString: [sourcePaths objectAtIndex: 0]])) {
+    onSelf = YES;
+    isDragTarget = YES;
+    return NSDragOperationAll;
+  }
+
+  if ((([type isEqualToString: NSDirectoryFileType] == NO)
+      && ([type isEqualToString: NSFilesystemFileType] == NO)) || isPakage) {
+    return NSDragOperationNone;
+  }
+
+	fromPath = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
+
+	if (count == 0) {
+		return NSDragOperationNone;
+  } 
+
+	if ([fm isWritableFileAtPath: path] == NO) {
+		return NSDragOperationNone;
+	}
+
+	if ([path isEqualToString: fromPath]) {
+		return NSDragOperationNone;
+  }  
+
+	for (i = 0; i < count; i++) {
+		if ([path isEqualToString: [sourcePaths objectAtIndex: i]]) {
+		  return NSDragOperationNone;
+		}
+	}
+
+	buff = [NSString stringWithString: path];
+	while (1) {
+		for (i = 0; i < count; i++) {
+			if ([buff isEqualToString: [sourcePaths objectAtIndex: i]]) {
+ 		    return NSDragOperationNone;
+			}
+		}
+    if ([buff isEqualToString: fixPath(@"/", 0)] == YES) {
+      break;
+    }            
+		buff = [buff stringByDeletingLastPathComponent];
+	}
+
+  isDragTarget = YES;
+
+  iconPath =  [path stringByAppendingPathComponent: @".opendir.tiff"];
+
+  if ([fm isReadableFileAtPath: iconPath]) {
+    NSImage *img = [[NSImage alloc] initWithContentsOfFile: iconPath];
+
+    if (img) {
+      ASSIGN (icon, img);
+      RELEASE (img);
+    } else {
+      ASSIGN (icon, [NSImage imageNamed: GWOpenFolderIconName]);
+    }      
+  } else {
+	  ASSIGN (icon, [NSImage imageNamed: GWOpenFolderIconName]);    
+  }
+
+  [self setNeedsDisplay: YES];
+
+	sourceDragMask = [sender draggingSourceOperationMask];
+
+	if (sourceDragMask == NSDragOperationCopy) {
+		return NSDragOperationCopy;
+	} else if (sourceDragMask == NSDragOperationLink) {
+		return NSDragOperationLink;
+	} else {
+		return NSDragOperationAll;
+	}
+  
       
   return NSDragOperationNone;
 }
@@ -574,6 +587,15 @@
 
 	sourceDragMask = [sender draggingSourceOperationMask];  
   pb = [sender draggingPasteboard];
+  
+  if ([[pb types] containsObject: GWRemoteFilenamesPboardType]) {  
+    NSData *pbData = [pb dataForType: GWRemoteFilenamesPboardType]; 
+    
+    [GWLib concludeRemoteFilesDragOperation: pbData
+                                atLocalPath: path];
+    return;
+  }  
+  
   sourcePaths = [pb propertyListForType: NSFilenamesPboardType];  
   source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
 

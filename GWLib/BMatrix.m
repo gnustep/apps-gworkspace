@@ -22,7 +22,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include "GWProtocol.h"
@@ -49,6 +48,9 @@
    numberOfColumns:(int)numColumns
          acceptDnd:(BOOL)dnd
 {
+  NSArray *pbTypes = [NSArray arrayWithObjects: NSFilenamesPboardType, 
+                                          GWRemoteFilenamesPboardType, nil];
+
   self = [super initWithFrame: frameRect mode: aMode prototype: aCell 
                         numberOfRows: numRows numberOfColumns: numColumns];
 
@@ -59,7 +61,7 @@
     acceptDnd = dnd;
     
     if (acceptDnd) {
-      [self registerForDraggedTypes: [NSArray arrayWithObject: NSFilenamesPboardType]];    
+      [self registerForDraggedTypes: pbTypes];    
     }
   }
   

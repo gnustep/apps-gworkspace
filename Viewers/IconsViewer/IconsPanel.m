@@ -99,6 +99,9 @@ if (rct.size.height < 0) rct.size.height = 0; \
   self = [super initWithFrame: NSZeroRect];
   
   if (self) {
+    NSArray *pbTypes = [NSArray arrayWithObjects: NSFilenamesPboardType, 
+                                          GWRemoteFilenamesPboardType, nil];
+  
     fm = [NSFileManager defaultManager];
 
     ASSIGN (currentPath, path);
@@ -130,7 +133,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
     
     contestualMenu = [[GWLib workspaceApp] usesContestualMenu];
     
-  	[self registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, nil]];
+  	[self registerForDraggedTypes: pbTypes];
 
     [[NSNotificationCenter defaultCenter] addObserver: self 
                 				  selector: @selector(cellsWidthChanged:) 
@@ -1538,56 +1541,65 @@ pp.x = NSMaxX([self bounds]) - 1
 	isDragTarget = NO;	
     
  	pb = [sender draggingPasteboard];
-  if ([[pb types] indexOfObject: NSFilenamesPboardType] != NSNotFound) {
-    sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
-    
-	  count = [sourcePaths count];
-	  fromPath = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
-  
-	  if (count == 0) {
-		  return NSDragOperationNone;
-    } 
-  
-	  if ([fm isWritableFileAtPath: currentPath] == NO) {
-		  return NSDragOperationNone;
-	  }
-  
-	  if ([currentPath isEqualToString: fromPath]) {
-		  return NSDragOperationNone;
-    }  
-  
-	  for (i = 0; i < count; i++) {
-		  if ([currentPath isEqualToString: [sourcePaths objectAtIndex: i]]) {
-		    return NSDragOperationNone;
-		  }
-	  }
-  
-	  buff = [NSString stringWithString: currentPath];
-	  while (1) {
-		  for (i = 0; i < count; i++) {
-			  if ([buff isEqualToString: [sourcePaths objectAtIndex: i]]) {
- 		      return NSDragOperationNone;
-			  }
-		  }
-      if ([buff isEqualToString: fixPath(@"/", 0)] == YES) {
-        break;
-      }            
-		  buff = [buff stringByDeletingLastPathComponent];
-	  }
-  
-    isDragTarget = YES;	
 
-		sourceDragMask = [sender draggingSourceOperationMask];
-	
-		if (sourceDragMask == NSDragOperationCopy) {
-			return NSDragOperationCopy;
-		} else if (sourceDragMask == NSDragOperationLink) {
-			return NSDragOperationLink;
-		} else {
-			return NSDragOperationAll;
-		}		
-    return NSDragOperationAll;
+  if ([[pb types] containsObject: NSFilenamesPboardType]) {
+    sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
+       
+  } else if ([[pb types] containsObject: GWRemoteFilenamesPboardType]) {
+    NSData *pbData = [pb dataForType: GWRemoteFilenamesPboardType]; 
+    NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
+    
+    sourcePaths = [pbDict objectForKey: @"paths"];
+  } else {
+    return NSDragOperationNone;
   }
+
+	count = [sourcePaths count];
+	fromPath = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
+
+	if (count == 0) {
+		return NSDragOperationNone;
+  } 
+
+	if ([fm isWritableFileAtPath: currentPath] == NO) {
+		return NSDragOperationNone;
+	}
+
+	if ([currentPath isEqualToString: fromPath]) {
+		return NSDragOperationNone;
+  }  
+
+	for (i = 0; i < count; i++) {
+		if ([currentPath isEqualToString: [sourcePaths objectAtIndex: i]]) {
+		  return NSDragOperationNone;
+		}
+	}
+
+	buff = [NSString stringWithString: currentPath];
+	while (1) {
+		for (i = 0; i < count; i++) {
+			if ([buff isEqualToString: [sourcePaths objectAtIndex: i]]) {
+ 		    return NSDragOperationNone;
+			}
+		}
+    if ([buff isEqualToString: fixPath(@"/", 0)] == YES) {
+      break;
+    }            
+		buff = [buff stringByDeletingLastPathComponent];
+	}
+
+  isDragTarget = YES;	
+
+	sourceDragMask = [sender draggingSourceOperationMask];
+
+	if (sourceDragMask == NSDragOperationCopy) {
+		return NSDragOperationCopy;
+	} else if (sourceDragMask == NSDragOperationLink) {
+		return NSDragOperationLink;
+	} else {
+		return NSDragOperationAll;
+	}		
+  return NSDragOperationAll;
   
 	isDragTarget = NO;	
   return NSDragOperationNone;
@@ -1644,6 +1656,15 @@ pp.x = NSMaxX([self bounds]) - 1
 	
 	sourceDragMask = [sender draggingSourceOperationMask];  	
   pb = [sender draggingPasteboard];
+  
+  if ([[pb types] containsObject: GWRemoteFilenamesPboardType]) {  
+    NSData *pbData = [pb dataForType: GWRemoteFilenamesPboardType]; 
+
+    [GWLib concludeRemoteFilesDragOperation: pbData
+                                atLocalPath: currentPath];
+    return;
+  }
+  
   sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
   source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
 

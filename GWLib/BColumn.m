@@ -83,6 +83,9 @@ if (sz.height < 0) sz.height = 0
   
   if (self) {
 	  NSRect rect = NSMakeRect(0, 0, 150, 100);
+    NSArray *pbTypes = [NSArray arrayWithObjects: NSFilenamesPboardType, 
+                                            GWRemoteFilenamesPboardType, nil];
+    
     styleMask = mask;
             
     fm = [NSFileManager defaultManager];
@@ -117,7 +120,7 @@ if (sz.height < 0) sz.height = 0
     if (styleMask & GWIconCellsMask) {
       cellsHeight = ICON_CELLS_HEIGHT;
       
-      [self registerForDraggedTypes: [NSArray arrayWithObject: NSFilenamesPboardType]];    
+      [self registerForDraggedTypes: pbTypes];    
     } else {
       cellsHeight = CELLS_HEIGHT;
     }
@@ -933,11 +936,18 @@ if (sz.height < 0) sz.height = 0
 	  
   pb = [sender draggingPasteboard];
 
-  if ([[pb types] indexOfObject: NSFilenamesPboardType] == NSNotFound) {
+  if ([[pb types] containsObject: NSFilenamesPboardType]) {
+    sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
+       
+  } else if ([[pb types] containsObject: GWRemoteFilenamesPboardType]) {
+    NSData *pbData = [pb dataForType: GWRemoteFilenamesPboardType]; 
+    NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
+    
+    sourcePaths = [pbDict objectForKey: @"paths"];
+  } else {
     return NSDragOperationNone;
   }
 
-  sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
   count = [sourcePaths count];
 
 	if (count == 0) {
@@ -1001,6 +1011,15 @@ if (sz.height < 0) sz.height = 0
 
   sourceDragMask = [sender draggingSourceOperationMask];  
   pb = [sender draggingPasteboard];
+
+  if ([[pb types] containsObject: GWRemoteFilenamesPboardType]) {  
+    NSData *pbData = [pb dataForType: GWRemoteFilenamesPboardType]; 
+    
+    targetPath = [path stringByAppendingPathComponent: [cell stringValue]];
+    [GWLib concludeRemoteFilesDragOperation: pbData
+                                atLocalPath: targetPath];
+    return;
+  }
 
   if ([[pb types] indexOfObject: NSFilenamesPboardType] == NSNotFound) {
     return;

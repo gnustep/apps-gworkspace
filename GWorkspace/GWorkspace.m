@@ -1649,7 +1649,7 @@ NSLocalizedString(@"OK", @""), nil, nil); \
 
   fullPath = [basePath stringByAppendingPathComponent: fileName];
   	
-  if ([fm fileExistsAtPath: fullPath] == YES) {    
+  if ([fm fileExistsAtPath: fullPath]) {    
     suff = 1;
     while (1) {    
       NSString *s = [fileName stringByAppendingFormat: @"%i", suff];

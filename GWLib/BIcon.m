@@ -65,6 +65,9 @@
   self = [super init];
   
   if (self) {
+    NSArray *pbTypes = [NSArray arrayWithObjects: NSFilenamesPboardType, 
+                                          GWRemoteFilenamesPboardType, nil];
+    
     fm = [NSFileManager defaultManager];
 
     ASSIGN (highlight, [NSImage imageNamed: GWCellHighlightIconName]);
@@ -100,7 +103,7 @@
 		onSelf = NO;
 		isRootIcon = NO;
 		
-    [self registerForDraggedTypes: [NSArray arrayWithObject: NSFilenamesPboardType]];    
+    [self registerForDraggedTypes: pbTypes];    
   }
   
   return self;
@@ -428,7 +431,8 @@
           dragdelay++;
         } else {     
           NSPoint p = [nextEvent locationInWindow];
-        
+          
+          p = [self convertPoint: p fromView: nil];
           offset = NSMakeSize(p.x - location.x, p.y - location.y); 
           startdnd = YES;        
           break;
@@ -616,6 +620,12 @@ active. preventWindowOrdering is sent automatically by NSView's dragImage:... an
 
 @end
 
+@protocol PulaProtocol
+
+- (oneway void)remoteDraggingDestinationReply:(NSData *)reply;
+
+@end
+
 
 @implementation BIcon (DraggingDestination)
 
@@ -640,11 +650,17 @@ active. preventWindowOrdering is sent automatically by NSView's dragImage:... an
 
 	pb = [sender draggingPasteboard];
 
-  if ([[pb types] indexOfObject: NSFilenamesPboardType] == NSNotFound) {
+  if ([[pb types] containsObject: NSFilenamesPboardType]) {
+    sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
+       
+  } else if ([[pb types] containsObject: GWRemoteFilenamesPboardType]) {
+    NSData *pbData = [pb dataForType: GWRemoteFilenamesPboardType]; 
+    NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
+    
+    sourcePaths = [pbDict objectForKey: @"paths"];
+  } else {
     return NSDragOperationNone;
   }
-
-  sourcePaths = [pb propertyListForType: NSFilenamesPboardType];    
   
 	count = [sourcePaths count];
 	fromPath = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
@@ -789,6 +805,14 @@ active. preventWindowOrdering is sent automatically by NSView's dragImage:... an
 
 	sourceDragMask = [sender draggingSourceOperationMask];
   pb = [sender draggingPasteboard];
+    
+  if ([[pb types] containsObject: GWRemoteFilenamesPboardType]) {  
+    NSData *pbData = [pb dataForType: GWRemoteFilenamesPboardType]; 
+
+    [GWLib concludeRemoteFilesDragOperation: pbData
+                                atLocalPath: fullpath];
+    return;
+  }
     
   sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
 
