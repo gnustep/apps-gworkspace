@@ -93,6 +93,7 @@ static NSDictionary *fontAttr = nil;
     
     isLocked = NO;
     iconSelected = NO;
+    nameEdited = NO;
   }
 
   return self;
@@ -167,14 +168,15 @@ static NSDictionary *fontAttr = nil;
 - (void)drawInteriorWithFrame:(NSRect)cellFrame 
 		                   inView:(NSView *)controlView
 {
-  NSRect title_rect = cellFrame;
-  float textlenght = title_rect.size.width;
+  float textlenght = cellFrame.size.width;
   BOOL showsFirstResponder = [self showsFirstResponder];
   NSString *title = [[self stringValue] copy];
   NSString *cuttitle;  
 
 #define MARGIN (2.0)
- 
+  
+  titleRect = cellFrame;
+  
   if (icon) {
     textlenght -= ([icon size].width + (MARGIN * 2));
   }
@@ -184,8 +186,12 @@ static NSDictionary *fontAttr = nil;
   [self setStringValue: cuttitle];        
 
   if (icon == nil) {
-    [super drawInteriorWithFrame: title_rect inView: controlView];
-    
+    if (nameEdited == NO) {
+      [super drawInteriorWithFrame: titleRect inView: controlView];
+    } else {
+      [[NSColor controlBackgroundColor] set];
+      NSRectFill(cellFrame);
+    }
   } else {
     NSRect icon_rect;    
     NSRect highlight_rect;    
@@ -218,17 +224,19 @@ static NSDictionary *fontAttr = nil;
 	    icon_rect.origin.y += icon_rect.size.height;
     }
     
-    title_rect.origin.x += (icon_rect.size.width + (MARGIN * 2));	
-    title_rect.size.width -= (icon_rect.size.width + (MARGIN * 2));	
+    titleRect.origin.x += (icon_rect.size.width + (MARGIN * 2));	
+    titleRect.size.width -= (icon_rect.size.width + (MARGIN * 2));	
 
-    if ([self isHighlighted]) {
+    if ([self isHighlighted] && (nameEdited == NO)) {
 	    [[self highlightColorInView: controlView] set];
     } else {
       [[NSColor controlBackgroundColor] set];
 	  }
 	  NSRectFill(cellFrame);
-            
-    [super drawInteriorWithFrame: title_rect inView: controlView];
+    
+    if (nameEdited == NO) {        
+      [super drawInteriorWithFrame: titleRect inView: controlView];
+    }
         
     if ([self isEnabled]) {
       if (iconSelected) {
@@ -319,6 +327,16 @@ static NSDictionary *fontAttr = nil;
 {
 }
 
+- (int)iconPosition
+{
+  return NSImageLeft;
+}
+
+- (NSRect)labelRect
+{
+  return titleRect;
+}
+
 - (void)setNodeInfoShowType:(FSNInfoType)type
 {
   showType = type;
@@ -348,6 +366,16 @@ static NSDictionary *fontAttr = nil;
       [self setStringValue: [node name]];
       break;
   }
+}
+
+- (FSNInfoType)nodeInfoShowType
+{
+  return showType;
+}
+
+- (void)setNameEdited:(BOOL)value
+{
+  nameEdited = value;
 }
 
 - (void)setLocked:(BOOL)value

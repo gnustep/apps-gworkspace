@@ -68,12 +68,16 @@ typedef NSString *(*cutIMP)(id, SEL, id, float);
   
   NSBezierPath *highlightPath;
   NSRect hlightRect;
-   
+  
+  NSRect titleRect;
+  
   FSNInfoType showType;
   
   BOOL isLocked;
   BOOL iconSelected;
-    
+  
+  BOOL nameEdited;
+  
 	SEL cutTitleSel;
 	cutIMP cutTitle;
 }

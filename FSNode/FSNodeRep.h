@@ -61,7 +61,15 @@ typedef enum FSNSelectionMask {
 
 - (void)setIconPosition:(unsigned int)ipos;
 
+- (int)iconPosition;
+
+- (NSRect)labelRect;
+
 - (void)setNodeInfoShowType:(FSNInfoType)type;
+
+- (FSNInfoType)nodeInfoShowType;
+
+- (void)setNameEdited:(BOOL)value;
 
 - (void)setLocked:(BOOL)value;
 

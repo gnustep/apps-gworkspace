@@ -167,6 +167,8 @@ static NSFont *labelFont = nil;
 
     isSelected = NO; 
     
+    nameEdited = NO;
+    
     dragdelay = 0;
     isDragTarget = NO;
     onSelf = NO;    
@@ -320,7 +322,7 @@ static NSFont *labelFont = nil;
     icnBounds.origin.x = (frameRect.size.width - sz.width) / 2;
     icnBounds.origin.y = (frameRect.size.height - sz.height) / 2;
   } 
-   
+  
   [self setNeedsDisplay: YES]; 
 }
 
@@ -442,13 +444,13 @@ static NSFont *labelFont = nil;
 //    [highlightPath stroke];
     [highlightPath fill];
     
-    if (icnPosition != NSImageOnly) {
+    if ((icnPosition != NSImageOnly) && (nameEdited == NO)) {
       NSFrameRect(labelRect);
       NSRectFill(labelRect);  
       [label drawWithFrame: labelRect inView: self];
     }
   } else {
-    if (icnPosition != NSImageOnly) {
+    if ((icnPosition != NSImageOnly) && (nameEdited == NO)) {
       [[container backgroundColor] set];
       NSFrameRect(labelRect);
       NSRectFill(labelRect);
@@ -556,6 +558,16 @@ static NSFont *labelFont = nil;
   [self tile];
 }
 
+- (int)iconPosition
+{
+  return icnPosition;
+}
+
+- (NSRect)labelRect
+{
+  return labelRect;
+}
+
 - (void)setNodeInfoShowType:(FSNInfoType)type
 {
   showType = type;
@@ -584,6 +596,19 @@ static NSFont *labelFont = nil;
     default:
       [label setStringValue: [node name]];
       break;
+  }
+}
+
+- (FSNInfoType)nodeInfoShowType
+{
+  return showType;
+}
+
+- (void)setNameEdited:(BOOL)value
+{
+  if (nameEdited != value) {
+    nameEdited = value;
+    [self setNeedsDisplay: YES];
   }
 }
 
@@ -914,4 +939,43 @@ static NSFont *labelFont = nil;
 
 @end
 
+
+@implementation FSNIconNameEditor
+
+- (void)dealloc
+{
+  TEST_RELEASE (node);
+  [super dealloc];
+}
+
+- (void)setNode:(FSNode *)anode 
+    stringValue:(NSString *)str
+          index:(int)idx
+{
+  DESTROY (node);
+  if (anode) {
+    ASSIGN (node, anode);
+  } 
+  [self setStringValue: str];
+  index = idx;
+}
+
+- (FSNode *)node
+{
+  return node;
+}
+
+- (int)index
+{
+  return index;
+}
+
+- (void)mouseDown:(NSEvent*)theEvent
+{
+	[self setAlignment: NSLeftTextAlignment];
+  [[self window] makeFirstResponder: self];
+  [super mouseDown: theEvent];
+}
+
+@end
 

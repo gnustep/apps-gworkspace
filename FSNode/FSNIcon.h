@@ -31,6 +31,7 @@
 
 @class NSImage;
 @class NSBezierPath;
+@class NSTextField;
 @class FSNode;
 @class FSNTextCell;
 
@@ -78,6 +79,8 @@
   
   BOOL isSelected;
   BOOL selectable;
+  
+  BOOL nameEdited;
   
   BOOL isLocked;
   
@@ -140,6 +143,23 @@
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender;
 
 - (void)concludeDragOperation:(id <NSDraggingInfo>)sender;
+
+@end
+
+
+@interface FSNIconNameEditor : NSTextField
+{
+  FSNode *node;
+  int index;
+}  
+
+- (void)setNode:(FSNode *)anode 
+    stringValue:(NSString *)str
+          index:(int)idx;
+
+- (FSNode *)node;
+
+- (int)index;
 
 @end
 
