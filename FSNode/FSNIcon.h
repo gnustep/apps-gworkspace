@@ -43,6 +43,10 @@
 - (void)concludeRemoteFilesDragOperation:(NSData *)opinfo
                              atLocalPath:(NSString *)localdest;
 
+- (void)addWatcherForPath:(NSString *)path;
+
+- (void)removeWatcherForPath:(NSString *)path;
+
 - (id)workspaceApplication;
 
 @end

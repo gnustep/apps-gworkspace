@@ -1177,6 +1177,14 @@ static Finder *finder = nil;
 {
 }
 
+- (void)addWatcherForPath:(NSString *)path
+{
+}
+
+- (void)removeWatcherForPath:(NSString *)path
+{
+}
+
 - (id)workspaceApplication
 {
   if (workspaceApplication == nil) {

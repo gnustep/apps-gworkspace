@@ -888,7 +888,7 @@ filename =  [fileinfo objectForKey: @"name"]
 	  GET_FILENAME;  
 	
 	  [fm removeFileAtPath: [destination stringByAppendingPathComponent: filename]
-				          handler: self];
+				         handler: self];
 
     [procfiles addObject: filename];	 
 	  [files removeObject: fileinfo];	
