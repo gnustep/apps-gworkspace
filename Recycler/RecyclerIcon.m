@@ -216,14 +216,34 @@ static id <DesktopApplication> desktopApp = nil;
         
   if ([[pb types] containsObject: NSFilenamesPboardType]) {
     NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
+ //   NSArray *vpaths = [ws mountedLocalVolumePaths];
     NSMutableArray *files = [NSMutableArray array];
+ //   NSMutableArray *umountPaths = [NSMutableArray array];
     NSMutableDictionary *opinfo = [NSMutableDictionary dictionary];
     int i;
 
     for (i = 0; i < [sourcePaths count]; i++) {
       NSString *srcpath = [sourcePaths objectAtIndex: i];
-      [files addObject: [srcpath lastPathComponent]];
+      FSNode *nd = [FSNode nodeWithRelativePath: srcpath parent: nil];
+      
+      
+      
+      if ([nd isMountPoint] == NO) {
+        [files addObject: [srcpath lastPathComponent]];
+      }
+      
+      
+      
+  //    if ([vpaths containsObject: srcpath]) {
+  //      [umountPaths addObject: srcpath];
+  //    } else {
+  //      [files addObject: [srcpath lastPathComponent]];
+  //    }
     }
+
+ //   for (i = 0; i < [umountPaths count]; i++) {
+ //     [ws unmountAndEjectDeviceAtPath: [umountPaths objectAtIndex: i]];
+ //   }
 
     if ([files count]) {
       [opinfo setObject: @"NSWorkspaceRecycleOperation" forKey: @"operation"];

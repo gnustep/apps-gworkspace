@@ -117,6 +117,13 @@
 @end
 
 
+@protocol	RecyclerAppProtocol
+
+- (oneway void)emptyTrash:(id)sender;
+
+@end
+
+
 @protocol	OperationProtocol
 
 - (oneway void)performFileOperation:(NSData *)opinfo;
@@ -141,6 +148,7 @@
   id operationsApp;
   id finderApp;
   id desktopApp;
+  id recyclerApp;
     
   AppsViewer *appsViewer;
   PrefController *prefController;
@@ -291,6 +299,10 @@
 
 - (void)desktopConnectionDidDie:(NSNotification *)notif;
 
+- (void)connectRecycler;
+
+- (void)recyclerConnectionDidDie:(NSNotification *)notif;
+
 - (void)connectOperation;
 
 - (void)operationConnectionDidDie:(NSNotification *)notif;
@@ -334,6 +346,8 @@
 - (void)showApps:(id)sender;
 
 - (void)showDesktop:(id)sender;
+
+- (void)showRecycler:(id)sender;
 
 - (void)showFinder:(id)sender;
 

@@ -415,34 +415,55 @@
 - (BOOL)validatePasteOfFilenames:(NSArray *)names
                        wasCutted:(BOOL)cutted
 {
-  NSString *basePath = [[names objectAtIndex: 0] stringByDeletingLastPathComponent];
+  NSMutableArray *sourcePaths = [names mutableCopy];
+  NSString *basePath;
   NSString *nodePath = [[icon node] path];
   NSString *prePath = [NSString stringWithString: nodePath];
+	int count = [names count];
+  int i;
   
-	if ([names count] == 0) {
+  AUTORELEASE (sourcePaths);
+
+	if (count == 0) {
 		return NO;
   } 
 
   if ([[icon node] isWritable] == NO) {
     return NO;
   }
-    
+
+  basePath = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
   if ([basePath isEqual: nodePath]) {
     return NO;
   }  
-    
-  if ([names containsObject: nodePath]) {
+
+  if ([sourcePaths containsObject: nodePath]) {
     return NO;
   }
 
   while (1) {
-    if ([names containsObject: prePath]) {
+    if ([sourcePaths containsObject: prePath]) {
       return NO;
     }
     if ([prePath isEqual: path_separator()]) {
       break;
     }            
     prePath = [prePath stringByDeletingLastPathComponent];
+  }
+
+  for (i = 0; i < count; i++) {
+    NSString *srcpath = [sourcePaths objectAtIndex: i];
+    FSNode *nd = [FSNode nodeWithRelativePath: srcpath parent: nil];
+       
+    if ([nd isMountPoint]) {
+      [sourcePaths removeObject: srcpath];
+      count--;
+      i--;
+    }
+  }    
+  
+  if ([sourcePaths count] == 0) {
+    return NO;
   }
 
   return cutted;

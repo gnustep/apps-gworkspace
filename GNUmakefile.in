@@ -24,6 +24,7 @@ SUBPROJECTS = FSNode \
 	      			  Operation \
                 Finder \
 	      			  Desktop \
+	      			  Recycler \
 	      			  GWLib \
 	      			  Viewers \
 	      			  GWorkspace 

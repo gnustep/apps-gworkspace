@@ -467,6 +467,7 @@ return [ws openFile: fullPath withApplication: appName]
   DESTROY (finderApp);
   DESTROY (operationsApp);
   DESTROY (desktopApp);
+  DESTROY (recyclerApp);
 	RELEASE (defEditor);
 	RELEASE (defXterm);
 	RELEASE (defXtermArgs);
@@ -685,6 +686,11 @@ return [ws openFile: fullPath withApplication: appName]
   if ([defaults boolForKey: @"uses_desktop"]) {  
     [self connectDesktop];
   }  
+
+  recyclerApp = nil;
+  if ([defaults boolForKey: @"uses_recycler"]) {  
+    [self connectRecycler];
+  }  
   
 	[defaults synchronize];
 
@@ -786,6 +792,17 @@ return [ws openFile: fullPath withApplication: appName]
 	                        name: NSConnectionDidDieNotification
 	                      object: dskconn];
       DESTROY (desktopApp);
+    }
+  }
+
+  if (recyclerApp) {
+    NSConnection *rcconn = [(NSDistantObject *)recyclerApp connectionForProxy];
+  
+    if (rcconn && [rcconn isValid]) {
+      [[NSNotificationCenter defaultCenter] removeObserver: self
+	                        name: NSConnectionDidDieNotification
+	                      object: rcconn];
+      DESTROY (recyclerApp);
     }
   }
 
@@ -954,6 +971,8 @@ return [ws openFile: fullPath withApplication: appName]
 
   [defaults setBool: (desktopApp != nil) forKey: @"uses_desktop"];
 
+  [defaults setBool: (recyclerApp != nil) forKey: @"uses_recycler"];
+
 	[defaults synchronize];
 }
 
@@ -1050,7 +1069,7 @@ return [ws openFile: fullPath withApplication: appName]
 	NSString *title = [anItem title];
 	
 	if ([title isEqual: NSLocalizedString(@"Empty Recycler", @"")]) {
-    return (desktopApp != nil);
+    return ((desktopApp != nil) || (recyclerApp != nil));
 
 	} else if ([title isEqual: NSLocalizedString(@"Check for disks", @"")]) {
     return (desktopApp != nil);
@@ -2210,6 +2229,88 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   }
 }
 
+- (void)connectRecycler
+{
+  if (recyclerApp == nil) {
+    id rcl = [NSConnection rootProxyForConnectionWithRegisteredName: @"Recycler" 
+                                                               host: @""];
+
+    if (rcl) {
+      NSConnection *c = [rcl connectionForProxy];
+
+	    [[NSNotificationCenter defaultCenter] addObserver: self
+	                   selector: @selector(recyclerConnectionDidDie:)
+		                     name: NSConnectionDidDieNotification
+		                   object: c];
+      
+      recyclerApp = rcl;
+	    [recyclerApp setProtocolForProxy: @protocol(RecyclerAppProtocol)];
+      RETAIN (recyclerApp);
+      
+	  } else {
+	    static BOOL recursion = NO;
+	  
+      if (recursion == NO) {
+        int i;
+        
+        [startAppWin showWindowWithTitle: @"GWorkspace"
+                                 appName: @"Recycler"
+                            maxProgValue: 80.0];
+
+        [ws launchApplication: @"Recycler"];
+
+        for (i = 1; i <= 80; i++) {
+          [startAppWin updateProgressBy: 1.0];
+	        [[NSRunLoop currentRunLoop] runUntilDate:
+		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+          rcl = [NSConnection rootProxyForConnectionWithRegisteredName: @"Recycler" 
+                                                                  host: @""];                  
+          if (rcl) {
+            [startAppWin updateProgressBy: 80.0 - i];
+            break;
+          }
+        }
+        
+        [[startAppWin win] close];
+        
+	      recursion = YES;
+	      [self connectRecycler];
+	      recursion = NO;
+        
+	    } else { 
+	      recursion = NO;
+        NSRunAlertPanel(nil,
+                NSLocalizedString(@"unable to contact Recycler!", @""),
+                NSLocalizedString(@"Ok", @""),
+                nil, 
+                nil);  
+      }
+	  }
+  }
+}
+
+- (void)recyclerConnectionDidDie:(NSNotification *)notif
+{
+  id connection = [notif object];
+
+  [[NSNotificationCenter defaultCenter] removeObserver: self
+	                    name: NSConnectionDidDieNotification
+	                  object: connection];
+
+  NSAssert(connection == [recyclerApp connectionForProxy],
+		                                  NSInternalInconsistencyException);
+  RELEASE (recyclerApp);
+  recyclerApp = nil;
+
+  if (NSRunAlertPanel(nil,
+                    NSLocalizedString(@"The Recycler connection died.\nDo you want to restart it?", @""),
+                    NSLocalizedString(@"Yes", @""),
+                    NSLocalizedString(@"No", @""),
+                    nil)) {
+    [self connectRecycler]; 
+  }
+}
+
 - (void)connectOperation
 {
   if (operationsApp == nil) {
@@ -2487,6 +2588,13 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 {
 	if (desktopApp == nil) {
     [self connectDesktop];
+  }   
+}
+
+- (void)showRecycler:(id)sender
+{
+	if (recyclerApp == nil) {
+    [self connectRecycler];
   }   
 }
 
@@ -2850,7 +2958,9 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 {
   if (desktopApp) {
     [desktopApp emptyTrash: nil];
-  }	
+  }	else if (recyclerApp) {
+    [recyclerApp emptyTrash: nil];
+  }
 }
 
 #ifndef GNUSTEP
