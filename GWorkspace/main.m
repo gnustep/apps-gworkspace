@@ -44,7 +44,7 @@ int main(int argc, char **argv, char **env)
 #ifdef GNUSTEP
 	createMenu();
 #else
-  [NSBundle loadNibNamed: @"MainMenu-OSX"  owner: gw];
+  [NSBundle loadNibNamed: @"MainMenu"  owner: gw];
 #endif
 	
   [app setDelegate: gw];    

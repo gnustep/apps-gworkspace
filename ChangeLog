@@ -2,7 +2,8 @@
 
   * GWorkspace/FileOperations/FileOperation.m
     -calculateNumFiles doesn't block anymore.
-    the stop button now works.
+    the stop button now works and the GWFileSystemDidChangeNotification is
+    sent only with the processed files.
 
   * Viewers/SmallIconsViewer/SmallIconsPanel.m
     in -selectIconWithPath: now the view scroll to show the icon.

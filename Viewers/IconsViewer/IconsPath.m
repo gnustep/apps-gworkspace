@@ -528,7 +528,6 @@
     [notifObj setObject: oldpath forKey: @"source"];	
     [notifObj setObject: newpath forKey: @"destination"];	
     [notifObj setObject: [NSArray arrayWithObject: @""] forKey: @"files"];	
-    [notifObj setObject: [NSArray arrayWithObject: @""] forKey: @"origfiles"];	
 
 	  [[NSNotificationCenter defaultCenter]
  				   postNotificationName: GWFileSystemWillChangeNotification

@@ -1470,7 +1470,6 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   [notifObj setObject: @"" forKey: @"source"];	
   [notifObj setObject: basePath forKey: @"destination"];	
   [notifObj setObject: [NSArray arrayWithObjects: fileName, nil] forKey: @"files"];	
-  [notifObj setObject: [NSArray arrayWithObjects: fileName, nil] forKey: @"origfiles"];	
 
 	[[NSNotificationCenter defaultCenter]
  				 postNotificationName: GWFileSystemWillChangeNotification
@@ -1554,7 +1553,6 @@ NSLocalizedString(@"OK", @""), nil, nil); \
   	[notifObj setObject: basePath forKey: @"source"];	
   	[notifObj setObject: basePath forKey: @"destination"];	
   	[notifObj setObject: [NSArray arrayWithObjects: path, nil] forKey: @"files"];	
-  	[notifObj setObject: [NSArray arrayWithObjects: path, nil] forKey: @"origfiles"];	
 
 		[[NSNotificationCenter defaultCenter]
  					 postNotificationName: GWFileSystemWillChangeNotification

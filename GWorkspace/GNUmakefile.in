@@ -27,7 +27,6 @@ GWorkspace_HAS_RESOURCE_BUNDLE = yes
 #
 ifeq ($(FOUNDATION_LIB), apple)
   ADDITIONAL_GUI_LIBS += -framework GWorkspace
-  ADDITIONAL_GUI_LIBS += -framework Renaissance
 else
   ADDITIONAL_GUI_LIBS += -lGWorkspace
 endif
@@ -89,7 +88,8 @@ GWorkspace_LANGUAGES = Resources/English \
                       Resources/Dutch
 
 ifeq ($(FOUNDATION_LIB), apple)
-  GWorkspace_LOCALIZED_RESOURCE_FILES = Localizable.strings \
+  GWorkspace_LOCALIZED_RESOURCE_FILES = MainMenu.nib \
+			                		              Localizable.strings \
 			                		              Finder.nib \
                                         PrefWindow.nib \
                                         DefEditorPref.nib \
@@ -129,10 +129,6 @@ else
                                         OpenWith.gorm \
                                         RunExternal.gorm                                         
 endif
-
-ifeq ($(FOUNDATION_LIB), apple)
-  GWorkspace_LOCALIZED_RESOURCE_FILES += MainMenu-OSX.gsmarkup
-endif            
 
 # The Objective-C source files to be compiled
 
