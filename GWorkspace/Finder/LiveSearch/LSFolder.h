@@ -165,6 +165,8 @@
 
 - (NSArray *)selectedObjects;
 
+- (void)selectObjects:(NSArray *)objects;
+
 - (void)doubleClickOnResultsView:(id)sender;
 
 - (IBAction)openEditor:(id)sender;
@@ -173,7 +175,10 @@
 
 - (NSDictionary *)searchCriteria;
 
-- (void)setSearchCriteria:(NSDictionary *)criteria;
+- (BOOL)recursive;
+
+- (void)setSearchCriteria:(NSDictionary *)criteria 
+                recursive:(BOOL)rec;
 
 - (void)fileSystemDidChange:(NSNotification *)notif;
 

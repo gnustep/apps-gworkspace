@@ -76,6 +76,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
   BOOL metadataModule;
   NSDictionary *searchCriteria;
   BOOL newcriteria;
+  BOOL norecursion;
   
   NSMutableArray *foundPaths;
   int fpathindex;
@@ -235,7 +236,9 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
 - (void)setFolderInfo:(NSData *)data
 {
   NSDictionary *lsfinfo = [NSUnarchiver unarchiveObjectWithData: data];
+  id recursion = [lsfinfo objectForKey: @"recursion"];
 
+  norecursion = ((recursion != nil) && ([recursion boolValue] == NO));
   searchPaths = [[lsfinfo objectForKey: @"searchpaths"] mutableCopy];
   ASSIGN (searchCriteria, [lsfinfo objectForKey: @"criteria"]);
   ASSIGN (lastUpdate, [NSDate dateWithString: [lsfinfo objectForKey: @"lastupdate"]]);
@@ -244,9 +247,11 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
 
 - (void)updateSearchCriteria:(NSData *)data
 {
-  ASSIGN (searchCriteria, [NSUnarchiver unarchiveObjectWithData: data]);
-  [self loadModules];
-  
+  NSDictionary *lsfinfo = [NSUnarchiver unarchiveObjectWithData: data];
+
+  ASSIGN (searchCriteria, [lsfinfo objectForKey: @"criteria"]);
+  norecursion = ([[lsfinfo objectForKey: @"recursion"] boolValue] == NO);  
+  [self loadModules]; 
   newcriteria = YES;
   
   if (autoupdate != 0) {
@@ -382,6 +387,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
     if (dircount > 0) {
       unsigned fcount = [foundPaths count];
       unsigned count = (fcount > dircount) ? fcount : dircount;
+      count = (count == 0) ? 1 : count;
       updateInterval = (autoupdate * 1.0) / count;
     }
 
@@ -407,7 +413,8 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
     unsigned fcount = [foundPaths count];
     unsigned count = (fcount > dircount) ? fcount : dircount;
     NSTimeInterval interval;
-
+    
+    count = (count == 0) ? 1 : count;
     updateInterval = (autoupdate * 1.0) / count;
     interval = (updateInterval == 0) ? 0.1 : updateInterval;
 
@@ -452,6 +459,8 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
 
   GWDebugLog(@"starting fast update");
 
+  [lsfolder clearFoundPaths];
+  
   [self getFoundPaths];
 
   GWDebugLog(@"got %i found paths. checking...", [foundPaths count]);
@@ -487,7 +496,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
   }  
 
   if (lsfdone == NO) {
-    [lsfolder updaterError: NSLocalizedString(@"cannot save the folder!", @"")];
+    [lsfolder updaterError: NSLocalizedString(@"No search location!", @"")];
   }
 
   newcriteria = NO;
@@ -513,19 +522,37 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
 - (void)checkFoundPaths
 {
   int count = [foundPaths count];
-  int i;
+  unsigned i, j;
     
   for (i = 0; i < count; i++) {
     NSString *path = [foundPaths objectAtIndex: i];
-    NSDictionary *attrs = [fm fileAttributesAtPath: path traverseLink: NO];   
     BOOL remove = NO;
     
-    if (attrs) {
-      remove = ([self checkPath: path attributes: attrs] == NO);
-    } else {
+    if (norecursion) {
       remove = YES;
+    
+      for (j = 0; j < [searchPaths count]; j++) {  
+        NSString *spath = [searchPaths objectAtIndex: j];
+      
+        if (subPathOfPath(spath, path)) {
+          if ([[path pathComponents] count] == ([[spath pathComponents] count] +1)) {
+            remove = NO;
+            break;
+          }
+        }
+      }
     }
-
+    
+    if (remove == NO) {
+      NSDictionary *attrs = [fm fileAttributesAtPath: path traverseLink: NO];   
+    
+      if (attrs) {
+        remove = ([self checkPath: path attributes: attrs] == NO);
+      } else {
+        remove = YES;
+      }
+    }
+    
     if (remove) {
       [lsfolder removeFoundPath: path];
       [foundPaths removeObjectAtIndex: i];
@@ -540,25 +567,29 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
 - (void)updateSearchPath:(NSString *)srcpath
 {
   CREATE_AUTORELEASE_POOL(arp);
-  NSArray *results;
+  NSArray *paths;
   
   GWDebugLog(@"getting directories from the db...");
   
-  results = [self ddbdGetDirectoryTreeFromPath: srcpath];
+  if (norecursion) {
+    paths = [NSArray array];
+  } else {
+    paths = [self ddbdGetDirectoryTreeFromPath: srcpath];
+  }
   
-  if (results && [foundPaths count]) {
+  if (paths) {
     NSMutableArray *toinsert = [NSMutableArray array];
-    unsigned count = [results count];
+    unsigned count = [paths count];
     unsigned i;
         
-    results = [results arrayByAddingObject: srcpath];
+    paths = [paths arrayByAddingObject: srcpath];
 
-    GWDebugLog(@"%i directories", [results count]);
+    GWDebugLog(@"%i directories", [paths count]);
     GWDebugLog(@"updating in %@", srcpath);    
     
     for (i = 0; i <= count; i++) {
       CREATE_AUTORELEASE_POOL(arp1);
-      NSString *dbpath = [results objectAtIndex: i];
+      NSString *dbpath = [paths objectAtIndex: i];
       NSDictionary *attributes = [fm fileAttributesAtPath: dbpath traverseLink: NO];
       NSDate *moddate = [attributes fileModificationDate];
       BOOL mustcheck;
@@ -600,7 +631,8 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
           }
 
           if (([attr fileType] == NSFileTypeDirectory) 
-                                && ([results containsObject: fpath] == NO)) { 
+                        && ([paths containsObject: fpath] == NO) 
+                                                && (norecursion == NO)) { 
             NSArray *founds = [self fullSearchInDirectory: fpath];
 
             if (founds && [founds count]) {
@@ -625,7 +657,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
       RELEASE (arp1);
     }
      
-    if ([toinsert count]) {
+    if ([toinsert count] && (norecursion == NO)) {
       [self ddbdInsertDirectoryTreesFromPaths: toinsert];
     }
 
@@ -633,11 +665,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
     NSArray *founds;
     int i;
     
-    if (results == nil) {
-      GWDebugLog(@"%@ not found in the db", srcpath);
-    } else {
-      GWDebugLog(@"no found paths");
-    }
+    GWDebugLog(@"%@ not found in the db", srcpath);
     GWDebugLog(@"performing full search in %@", srcpath);
   
     founds = [self fullSearchInDirectory: srcpath];
@@ -651,7 +679,9 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
       }
     }
     
-    [self ddbdInsertDirectoryTreesFromPaths: [NSArray arrayWithObject: srcpath]];
+    if (norecursion == NO) {
+      [self ddbdInsertDirectoryTreesFromPaths: [NSArray arrayWithObject: srcpath]];
+    }
   }
   
   GWDebugLog(@"searching done.");
@@ -665,6 +695,8 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
 
   [dict setObject: searchPaths forKey: @"searchpaths"];	
   [dict setObject: searchCriteria forKey: @"criteria"];	
+  [dict setObject: [NSNumber numberWithBool: !norecursion]
+           forKey: @"recursion"];	
   [dict setObject: [lastUpdate description] forKey: @"lastupdate"];	
   [dict setObject: [NSNumber numberWithLong: autoupdate] 
            forKey: @"autoupdate"];	
@@ -698,6 +730,10 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
     
     if ([self checkPath: fullPath attributes: attrs]) {    
       [founds addObject: fullPath];
+    }
+
+    if (([attrs fileType] == NSFileTypeDirectory) && norecursion) {
+      [enumerator skipDescendents];
     }
     
     RELEASE (arp1);
@@ -932,7 +968,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
 {
   NSString *spath;
   BOOL isdir;
-  NSArray *results;
+  NSArray *paths;
   BOOL reset = NO;
   
   [self checkNextFoundPath];
@@ -947,10 +983,14 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
     
     if ([fm fileExistsAtPath: spath isDirectory: &isdir]) {
       if (isdir) {
-        results = [self ddbdGetDirectoryTreeFromPath: spath];
+        if (norecursion) {
+          paths = [NSArray array];
+        } else {
+          paths = [self ddbdGetDirectoryTreeFromPath: spath];
+        }
     
-        if (results) {
-          directories = [results mutableCopy];
+        if (paths) {
+          directories = [paths mutableCopy];
           [directories addObject: spath];
         }
       } else {
@@ -990,11 +1030,15 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
       
       if ([fm fileExistsAtPath: spath isDirectory: &isdir]) {
         if (isdir) {
-          results = [self ddbdGetDirectoryTreeFromPath: spath];
+          if (norecursion) {
+            paths = [NSArray array];
+          } else {
+            paths = [self ddbdGetDirectoryTreeFromPath: spath];
+          }
 
-          if (results) {
+          if (paths) {
             RELEASE (directories);
-            directories = [results mutableCopy];
+            directories = [paths mutableCopy];
             [directories addObject: spath];
           }
         } else {
@@ -1068,7 +1112,8 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
           }
 
           if (([attr fileType] == NSFileTypeDirectory) 
-                                && ([directories containsObject: fpath] == NO)) { 
+                           && ([directories containsObject: fpath] == NO)
+                                                      && (norecursion == NO)) { 
             NSArray *founds = [self fullSearchInDirectory: fpath];
 
             if (founds && [founds count]) {
@@ -1096,7 +1141,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
     dirindex++;
     dircounter++;
     
-    if ([toinsert count]) {
+    if ([toinsert count] && (norecursion == NO)) {
       [self ddbdInsertDirectoryTreesFromPaths: toinsert];
     }
     
@@ -1112,23 +1157,42 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
 - (void)checkNextFoundPath
 {
   if ([foundPaths count]) {
-    NSString *path;
-    NSDictionary *attrs;
     BOOL remove = NO;
+    NSString *path;
   
     if (fpathindex >= [foundPaths count]) {
       fpathindex = 0;
     }
 
     path = [foundPaths objectAtIndex: fpathindex];
-    attrs = [fm fileAttributesAtPath: path traverseLink: NO];  
-
-    if (attrs) {
-      remove = ([self checkPath: path attributes: attrs] == NO);
-    } else {
+    
+    if (norecursion) {
+      unsigned i;
+      
       remove = YES;
+    
+      for (i = 0; i < [searchPaths count]; i++) {  
+        NSString *spath = [searchPaths objectAtIndex: i];
+      
+        if (subPathOfPath(spath, path)) {
+          if ([[path pathComponents] count] == ([[spath pathComponents] count] +1)) {
+            remove = NO;
+            break;
+          }
+        }
+      }
     }
-
+    
+    if (remove == NO) {
+      NSDictionary *attrs = [fm fileAttributesAtPath: path traverseLink: NO];   
+    
+      if (attrs) {
+        remove = ([self checkPath: path attributes: attrs] == NO);
+      } else {
+        remove = YES;
+      }
+    }
+    
     if (remove) {
       [lsfolder removeFoundPath: path];
       [foundPaths removeObject: path];

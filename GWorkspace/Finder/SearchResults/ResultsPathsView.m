@@ -67,6 +67,18 @@
   FSNIcon *icon;
   int i;
 
+  for (i = 0; i < [icons count]; i++) {
+    [[icons objectAtIndex: i] removeFromSuperview];
+  }
+  
+  [icons removeAllObjects];
+  
+  if ((selection == nil) || ([selection count] == 0)) {
+    [self tile];
+    RELEASE (arp);
+    return;
+  }
+  
   for (i = 0; i < [selection count]; i++) {
     FSNode *node = [selection objectAtIndex: i];
     [allComponents addObject: [FSNode pathComponentsToNode: node]];
@@ -105,13 +117,7 @@
   
     index++;
   }
-    
-  for (i = 0; i < [icons count]; i++) {
-    [[icons objectAtIndex: i] removeFromSuperview];
-  }
-  
-  [icons removeAllObjects];
-  
+      
   newSelection = [commonPath pathComponents];
   
   for (i = 0; i < [newSelection count]; i++) {   
@@ -140,44 +146,47 @@
 
 - (void)tile
 {
-  CREATE_AUTORELEASE_POOL(arp);
-  float sfw = [[self superview] frame].size.width;
-  float sfh = [[self superview] frame].size.height;
-	float px = MARGIN;
-	float py = ICN_H;
 	int count = [icons count];
-	NSRect *irects = NSZoneMalloc (NSDefaultMallocZone(), sizeof(NSRect) * count);
-  int i;
 
-	py += MARGIN;  
-  
-	for (i = 0; i < count; i++) {
-    FSNIcon *icon = [icons objectAtIndex: i];
-    NSRect irect = [icon frame];
-  
-    if (i != 0) {
-      px += ICN_INDT;
-      py += ICN_H; 
+  if (count) {
+    CREATE_AUTORELEASE_POOL(arp);
+    float sfw = [[self superview] frame].size.width;
+    float sfh = [[self superview] frame].size.height;
+	  float px = MARGIN;
+	  float py = ICN_H;
+	  NSRect *irects = NSZoneMalloc (NSDefaultMallocZone(), sizeof(NSRect) * count);
+    int i;
+
+	  py += MARGIN;  
+
+	  for (i = 0; i < count; i++) {
+      FSNIcon *icon = [icons objectAtIndex: i];
+      NSRect irect = [icon frame];
+
+      if (i != 0) {
+        px += ICN_INDT;
+        py += ICN_H; 
+      }
+
+      irects[i] = NSMakeRect(px, py, irect.size.width, ICN_H);
     }
-    
-    irects[i] = NSMakeRect(px, py, irect.size.width, ICN_H);
-  }
-  
-	py += (ICN_H / 2);  
-  py = (py < sfh) ? sfh : py;
-  
-  [self setFrame: NSMakeRect(0, 0, sfw, py)];
-  
-	for (i = 0; i < count; i++) {
-    FSNIcon *icon = [icons objectAtIndex: i];
-    
-		irects[i].origin.y = py - irects[i].origin.y;
-    [icon setFrame: irects[i]];
-		[icon resizeWithOldSuperviewSize: [self frame].size]; 
-  }  
 
-	NSZoneFree (NSDefaultMallocZone(), irects);
-  RELEASE (arp);
+	  py += (ICN_H / 2);  
+    py = (py < sfh) ? sfh : py;
+
+    [self setFrame: NSMakeRect(0, 0, sfw, py)];
+
+	  for (i = 0; i < count; i++) {
+      FSNIcon *icon = [icons objectAtIndex: i];
+
+		  irects[i].origin.y = py - irects[i].origin.y;
+      [icon setFrame: irects[i]];
+		  [icon resizeWithOldSuperviewSize: [self frame].size]; 
+    }  
+
+	  NSZoneFree (NSDefaultMallocZone(), irects);
+    RELEASE (arp);
+  }
 }
 
 - (void)resizeWithOldSuperviewSize:(NSSize)oldFrameSize

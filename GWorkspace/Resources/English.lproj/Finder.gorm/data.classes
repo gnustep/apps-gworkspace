@@ -16,7 +16,8 @@
 	    removePlaceButt,
 	    itemsLabel,
 	    modulesBox,
-	    findButt
+	    findButt,
+	    recursiveSwitch
 	);
 	Super = NSObject;
     };

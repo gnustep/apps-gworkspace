@@ -368,6 +368,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   [elementsLabel setStringValue: [NSString stringWithFormat: @"%i %@", 
                                         [foundObjects count], elementsStr]];
   [resultsView noteNumberOfRowsChanged];
+  [pathsView showComponentsOfSelection: [self selectedObjects]];
   RELEASE (pool);
 }
 
@@ -377,6 +378,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   [elementsLabel setStringValue: [NSString stringWithFormat: @"%i %@", 
                                         [foundObjects count], elementsStr]];
   [resultsView noteNumberOfRowsChanged];
+  [pathsView showComponentsOfSelection: nil];
 }
 
 - (void)endUpdate
@@ -787,6 +789,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   [foundObjects sortUsingSelector: sortingSel];
   [resultsView setHighlightedTableColumn: column];
   [resultsView reloadData];
+  [pathsView showComponentsOfSelection: [self selectedObjects]];
 }
 
 - (void)setCurrentOrder:(FSNInfoType)order
@@ -813,6 +816,26 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   return selected;  
 }
 
+- (void)selectObjects:(NSArray *)objects
+{
+  NSMutableIndexSet *set = [NSMutableIndexSet indexSet];
+  unsigned int i;
+
+  for (i = 0; i < [foundObjects count]; i++) {
+    FSNode *nd = [foundObjects objectAtIndex: i];
+  
+    if ([objects containsObject: nd]) {
+      [set addIndex: i];
+    }
+  }
+
+  if ([set count]) {
+    [resultsView deselectAll: self];
+    [resultsView selectRowIndexes: set byExtendingSelection: NO];
+    [resultsView setNeedsDisplay: YES];
+  }
+}
+
 - (void)doubleClickOnResultsView:(id)sender
 {
   [finder openFoundSelection: [self selectedObjects]];
@@ -836,13 +859,23 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   return [lsfinfo objectForKey: @"criteria"];
 }
 
-- (void)setSearchCriteria:(NSDictionary *)criteria
+- (BOOL)recursive
 {
-  if ([[lsfinfo objectForKey: @"criteria"] isEqual: criteria] == NO) {  
+  id recursion = [lsfinfo objectForKey: @"recursion"];
+  return ((recursion == nil) || [recursion boolValue]);
+}
+
+- (void)setSearchCriteria:(NSDictionary *)criteria
+                recursive:(BOOL)rec
+{
+  if (([[self searchCriteria] isEqual: criteria] == NO)
+                                        || ([self recursive] != rec)) {  
     [lsfinfo setObject: criteria forKey: @"criteria"];
+    [lsfinfo setObject: [NSNumber numberWithBool: rec]
+                forKey: @"recursion"];
 
     if (updater) {
-      NSData *info = [NSArchiver archivedDataWithRootObject: criteria];
+      NSData *info = [NSArchiver archivedDataWithRootObject: lsfinfo];
       [updater updateSearchCriteria: info];
     }
   }
@@ -1072,9 +1105,10 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification
 {
   NSArray *selected = [self selectedObjects];
+
+  [pathsView showComponentsOfSelection: selected];
   
   if ([selected count]) {
-    [pathsView showComponentsOfSelection: selected];
     [finder foundSelectionChanged: [FSNode pathsOfNodes: selected]];
   }
 }
@@ -1114,8 +1148,21 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   }
 
   if (newOrder != currentOrder) {
+    NSArray *selected = [self selectedObjects];
+  
     currentOrder = newOrder;
     [self updateShownData];
+    
+    if ([selected count]) {
+      id nd = [selected objectAtIndex: 0];
+      int index = [foundObjects indexOfObjectIdenticalTo: nd];
+      
+      [self selectObjects: selected];
+      
+      if (index != NSNotFound) {
+        [resultsView scrollRowToVisible: index];
+      }
+    }    
   }
 
   [tableView setHighlightedTableColumn: tableColumn];

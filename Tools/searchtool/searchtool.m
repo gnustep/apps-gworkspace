@@ -154,6 +154,8 @@
   CREATE_AUTORELEASE_POOL(arp);
   NSDictionary *srcdict = [NSUnarchiver unarchiveObjectWithData: srcinfo];
   NSArray *paths = [srcdict objectForKey: @"paths"];
+  id recursion = [srcdict objectForKey: @"recursion"];
+  BOOL norecursion = ((recursion != nil) && ([recursion boolValue] == NO));
   NSDictionary *criteria = [srcdict objectForKey: @"criteria"];
   NSArray *classNames = [criteria allKeys];
   NSMutableArray *modules = [NSMutableArray array];
@@ -210,7 +212,7 @@
         NSString *fullPath = [path stringByAppendingPathComponent: currentPath];
         NSDictionary *attrs = [enumerator fileAttributes];
         BOOL found = YES;
-        
+                
         for (j = 0; j < [modules count]; j++) {
           id module = [modules objectAtIndex: j];
   
@@ -234,6 +236,10 @@
           break;
         }
         
+        if (([attrs fileType] == NSFileTypeDirectory) && norecursion) {
+          [enumerator skipDescendents];
+        }
+
         RELEASE (arp2);
       }
       

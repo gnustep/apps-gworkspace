@@ -39,6 +39,7 @@
   NSMatrix *placesMatrix;  
   IBOutlet id modulesLabel;
   IBOutlet id modulesBox;
+  IBOutlet id recursiveSwitch;
   IBOutlet id cancelButt;
   IBOutlet id saveButt;
 

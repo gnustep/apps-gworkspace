@@ -2069,8 +2069,8 @@ static GWorkspace *gworkspace = nil;
   [d setObject: @"GWorkspace" forKey: @"ApplicationName"];
   [d setObject: NSLocalizedString(@"GNUstep Workspace Manager", @"")
       	forKey: @"ApplicationDescription"];
-  [d setObject: @"GWorkspace 0.6.5" forKey: @"ApplicationRelease"];
-  [d setObject: @"06 2004" forKey: @"FullVersionID"];
+  [d setObject: @"GWorkspace 0.7.0" forKey: @"ApplicationRelease"];
+  [d setObject: @"03 2005" forKey: @"FullVersionID"];
   [d setObject: [NSArray arrayWithObjects: 
       @"Enrico Sersale <enrico@imago.ro>.\n\
 InspectorViewer, PlistViewer, StringsViewer\n\
@@ -2080,7 +2080,7 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
       nil]
      forKey: @"Authors"];
   [d setObject: NSLocalizedString(@"See http://www.gnustep.it/enrico/gworkspace", @"") forKey: @"URL"];
-  [d setObject: @"Copyright (C) 2003, 2004 Free Software Foundation, Inc."
+  [d setObject: @"Copyright (C) 2003, 2004, 2005 Free Software Foundation, Inc."
      forKey: @"Copyright"];
   [d setObject: NSLocalizedString(@"Released under the GNU General Public License 2.0", @"")
      forKey: @"CopyrightDescription"];

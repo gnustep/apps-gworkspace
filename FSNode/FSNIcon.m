@@ -345,8 +345,6 @@ static NSImage *branchImage;
       labelRect.size.width = (frameRect.size.width - icnspacew);
     } 
     
-    labelRect = NSIntegralRect(labelRect);
-
     if (showType != FSNInfoNameType) {
       if (hasinfo) {
         infoRect.size.width = [infolabel uncuttedTitleLenght] + lblmargin;
@@ -841,6 +839,10 @@ static NSImage *branchImage;
   hlightRect.origin.x = 0;
   hlightRect.origin.y = 0;
   ASSIGN (highlightPath, [fsnodeRep highlightPathOfSize: hlightRect.size]); 
+
+  labelRect.size.width = [label uncuttedTitleLenght] + [fsnodeRep labelMargin];
+  labelRect.size.height = [[label font] defaultLineHeightForFont];
+
   [self tile];
 }
 

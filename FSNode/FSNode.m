@@ -202,6 +202,7 @@
                              toNode:(FSNode *)secondNode
 {
   if ([secondNode isSubnodeOfNode: firstNode]) {
+    CREATE_AUTORELEASE_POOL(arp);
     NSString *p1 = [firstNode path];
     NSString *p2 = [secondNode path];
     int index = ([p1 isEqual: path_separator()]) ? [p1 length] : ([p1 length] +1);
@@ -221,7 +222,10 @@
       [components insertObject: node atIndex: [components count]];
     }
     
-    return [NSArray arrayWithArray: components];
+    RETAIN (components);
+    RELEASE (arp);
+    
+    return [components makeImmutableCopyOnFail: NO];
     
   } else if ([secondNode isEqual: firstNode]) {
     return [NSArray arrayWithObject: firstNode];

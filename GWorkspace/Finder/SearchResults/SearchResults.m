@@ -234,6 +234,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
 
 - (void)activateForSelection:(NSArray *)selection
           withSearchCriteria:(NSDictionary *)criteria
+                   recursive:(BOOL)rec
 {
   NSString *cname;
   NSArray *paths;
@@ -243,7 +244,8 @@ static NSString *lsfname = @"LiveSearch.lsf";
   visibleRows = (int)([resultsScroll frame].size.height / CELLS_HEIGHT + 1);
   ASSIGN (searchPaths, selection);
   ASSIGN (searchCriteria, criteria);
-
+  recursive = rec;
+  
   cname = [NSString stringWithFormat: @"search_%i", [self memAddress]];
 
   if (conn == nil) {
@@ -348,7 +350,8 @@ static NSString *lsfname = @"LiveSearch.lsf";
 - (oneway void)registerSearchTool:(id)tool
 {
   NSDictionary *srcdict = [NSDictionary dictionaryWithObjectsAndKeys: 
-                    searchPaths, @"paths", searchCriteria, @"criteria", nil];
+                    searchPaths, @"paths", searchCriteria, @"criteria", 
+                     [NSNumber numberWithBool: recursive], @"recursion", nil];
   NSData *info = [NSArchiver archivedDataWithRootObject: srcdict];
 
   [stopButt setEnabled: YES];
@@ -413,7 +416,8 @@ static NSString *lsfname = @"LiveSearch.lsf";
     [foundObjects removeAllObjects];
     [resultsView reloadData];
     [self activateForSelection: searchPaths
-            withSearchCriteria: searchCriteria];
+            withSearchCriteria: searchCriteria
+                     recursive: recursive];
   }
 }
 
@@ -678,6 +682,8 @@ static NSString *lsfname = @"LiveSearch.lsf";
    
       [lsfdict setObject: searchPaths forKey: @"searchpaths"];	
       [lsfdict setObject: searchCriteria forKey: @"criteria"];	
+      [lsfdict setObject: [NSNumber numberWithBool: recursive]
+                  forKey: @"recursion"];	
       [lsfdict setObject: [[NSDate date] description] forKey: @"lastupdate"];	
    
       lsfdone = [lsfdict writeToFile: LSF_INFO(lsfpath) atomically: YES];
@@ -872,8 +878,9 @@ static NSString *lsfname = @"LiveSearch.lsf";
 {
   NSArray *selected = [self selectedObjects];
 
+  [pathsView showComponentsOfSelection: selected];
+  
   if ([selected count]) {
-    [pathsView showComponentsOfSelection: selected];
     [finder foundSelectionChanged: [FSNode pathsOfNodes: selected]];
   }
 }

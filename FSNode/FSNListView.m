@@ -536,7 +536,10 @@ static NSString *defaultColumns = @"{ \
       int index = [nodeReps indexOfObjectIdenticalTo: rep];
       
       [self selectReps: selected];
-      [listView scrollRowToVisible: index];
+      
+      if (index != NSNotFound) {
+        [listView scrollRowToVisible: index];
+      }
     }
   }
 
@@ -942,14 +945,18 @@ static NSString *defaultColumns = @"{ \
     for (i = 0; i < [files count]; i++) {  
       NSString *fname = [files objectAtIndex: i];
       FSNode *subnode = [FSNode nodeWithRelativePath: fname parent: node];
-      FSNListViewNodeRep *rep = [self repOfSubnode: subnode];
       
-      if (rep) {
-        [rep setNode: subnode];
-      } else {
-        [self addRepForSubnode: subnode];
-      }
+      if (subnode && [subnode isValid]) {
+        FSNListViewNodeRep *rep = [self repOfSubnode: subnode];
+      
+        if (rep) {
+          [rep setNode: subnode];
+        } else {
+          [self addRepForSubnode: subnode];
+        }
+      }  
     }
+    
     needsreload = YES;
   }
 
@@ -1232,7 +1239,7 @@ static NSString *defaultColumns = @"{ \
   RETAIN (selreps);
   RELEASE (pool);
 
-  return AUTORELEASE (selreps);
+  return [[selreps autorelease] makeImmutableCopyOnFail: NO];
 }
 
 - (NSArray *)selectedNodes
@@ -1254,7 +1261,7 @@ static NSString *defaultColumns = @"{ \
   RETAIN (selnodes);
   RELEASE (pool);
 
-  return AUTORELEASE (selnodes);
+  return [[selnodes autorelease] makeImmutableCopyOnFail: NO];
 }
 
 - (NSArray *)selectedPaths
@@ -1276,7 +1283,7 @@ static NSString *defaultColumns = @"{ \
   RETAIN (selpaths);
   RELEASE (pool);
 
-  return AUTORELEASE (selpaths);
+  return [[selpaths autorelease] makeImmutableCopyOnFail: NO];
 }
 
 - (void)selectionDidChange

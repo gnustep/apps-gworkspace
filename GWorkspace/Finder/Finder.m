@@ -178,6 +178,8 @@ static Finder *finder = nil;
       RELEASE (fmview);
     }
 
+    [recursiveSwitch setState: NSOnState];
+
     defentry = [defaults objectForKey: @"search_res_h"];
 
     if (defentry) {
@@ -225,6 +227,7 @@ static Finder *finder = nil;
     [addPlaceButt setTitle: NSLocalizedString(@"Add", @"")];
     [removePlaceButt setTitle: NSLocalizedString(@"Remove", @"")];
     [itemsLabel setStringValue: NSLocalizedString(@"Search for items whose:", @"")];
+    [recursiveSwitch setStringValue: NSLocalizedString(@"recursive", @"")];
     [findButt setTitle: NSLocalizedString(@"Search", @"")];
         
     usesSearchPlaces = [defaults boolForKey: @"uses_search_places"];
@@ -800,7 +803,8 @@ static Finder *finder = nil;
     RELEASE (results);
     
     [results activateForSelection: selection
-               withSearchCriteria: criteria];  
+               withSearchCriteria: criteria
+                        recursive: ([recursiveSwitch state] == NSOnState)];  
   } else {
     NSRunAlertPanel(nil, 
                     NSLocalizedString(@"No search criteria!", @""), 

@@ -85,6 +85,7 @@
   
   NSArray *searchPaths;
   NSDictionary *searchCriteria;
+  BOOL recursive;
   NSConnection *conn;
   NSConnection *toolConn;
   id <SearchToolProtocol> searchtool;
@@ -96,7 +97,8 @@
 }
 
 - (void)activateForSelection:(NSArray *)selection
-          withSearchCriteria:(NSDictionary *)criteria;
+          withSearchCriteria:(NSDictionary *)criteria
+                   recursive:(BOOL)rec;
 
 - (void)connectionDidDie:(NSNotification *)notification;
 

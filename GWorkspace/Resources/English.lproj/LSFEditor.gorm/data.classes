@@ -22,7 +22,8 @@
 	    saveButt,
 	    modulesLabel,
 	    placesScroll,
-	    searchLabel
+	    searchLabel,
+	    recursiveSwitch
 	);
 	Super = NSObject;
     };

@@ -45,6 +45,7 @@
   IBOutlet id removePlaceButt;
   IBOutlet id itemsLabel;
   IBOutlet id modulesBox;
+  IBOutlet id recursiveSwitch;
   IBOutlet id findButt;
 
   NSMutableArray *modules;

@@ -341,7 +341,8 @@ static id <DesktopApplication> desktopApp = nil;
   NSArray *subNodes = [shownNode subNodes];
 
   if ([subNodes count]) {
-    NSArray *selectedCells = [matrix selectedCells];
+    CREATE_AUTORELEASE_POOL(arp);
+    NSArray *selectedNodes = [self selectedNodes];
     SEL compSel = [fsnodeRep compareSelectorForDirectory: [shownNode path]];
     int i;
 
@@ -350,50 +351,55 @@ static id <DesktopApplication> desktopApp = nil;
     for (i = 0; i < [names count]; i++) {
       NSString *name = [names objectAtIndex: i];
       FSNode *node = [FSNode subnodeWithName: name inSubnodes: subNodes];
-		  FSNBrowserCell *cell = [self cellOfNode: node]; 
+      
+      if ([node isValid]) {   
+		    FSNBrowserCell *cell = [self cellOfNode: node]; 
          
-      if (cell == nil) {
-        [matrix addRow];
-        cell = [matrix cellAtRow: [[matrix cells] count] -1 column: 0];
+        if (cell == nil) {
+          [matrix addRow];
+          cell = [matrix cellAtRow: [[matrix cells] count] -1 column: 0];
 
-        [cell setLoaded: YES];
-		    [cell setEnabled: YES]; 
-        [cell setNode: node nodeInfoType: infoType extendedType: extInfoType];
+          [cell setLoaded: YES];
+		      [cell setEnabled: YES]; 
+          [cell setNode: node nodeInfoType: infoType extendedType: extInfoType];
 
-        if ([node isDirectory]) {
-          if ([node isPackage]) {
-            [cell setLeaf: YES]; 
+          if ([node isDirectory]) {
+            if ([node isPackage]) {
+              [cell setLeaf: YES]; 
+            } else {
+              [cell setLeaf: NO]; 
+            }
           } else {
-            [cell setLeaf: NO]; 
+		        [cell setLeaf: YES];
           }
+
+          if (cellsIcon) {
+            [cell setIcon];
+          }
+
+          [cell checkLocked];	
+
         } else {
-		      [cell setLeaf: YES];
+          [cell setEnabled: YES];
         }
-
-        if (cellsIcon) {
-          [cell setIcon];
-        }
-
-        [cell checkLocked];	
-
-      } else {
-        [cell setEnabled: YES];
       }
     }
 
     [matrix sortUsingSelector: compSel];
 	  [self adjustMatrix];
 
-	  if (selectedCells) {
-      [self selectCells: selectedCells sendAction: NO];
+	  if (selectedNodes) {
+      [self selectCellsOfNodes: selectedNodes sendAction: NO];
     } 
 
     [matrix setNeedsDisplay: YES]; 
+    RELEASE (arp);
   }
 }
 
 - (void)removeCellsWithNames:(NSArray *)names
 {
+  CREATE_AUTORELEASE_POOL(arp);
   NSArray *selcells = nil;
   NSMutableArray *selectedCells = nil;
   NSArray *vnodes = nil;
@@ -472,6 +478,7 @@ static id <DesktopApplication> desktopApp = nil;
   
   TEST_RELEASE (selectedCells); 
   TEST_RELEASE (visibleNodes);
+  RELEASE (arp);
 }
 
 - (NSArray *)selectedCells
@@ -501,7 +508,7 @@ static id <DesktopApplication> desktopApp = nil;
     }
 
 	  if ([cells count] > 0) {
-  	  return [NSArray arrayWithArray: cells];
+  	  return [cells makeImmutableCopyOnFail: NO];
 	  }
   }
 	
@@ -535,7 +542,7 @@ static id <DesktopApplication> desktopApp = nil;
     }
 
 	  if ([nodes count] > 0) {
-  	  return [NSArray arrayWithArray: nodes];
+  	  return [nodes makeImmutableCopyOnFail: NO];
 	  }
   }
 	
@@ -569,7 +576,7 @@ static id <DesktopApplication> desktopApp = nil;
     }
 
 	  if ([paths count] > 0) {
-  	  return [NSArray arrayWithArray: paths];
+  	  return [paths makeImmutableCopyOnFail: NO];
 	  }
   }
 	

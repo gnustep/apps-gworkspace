@@ -482,12 +482,12 @@ static Operation *operation = nil;
   [d setObject: @"Operation" forKey: @"ApplicationName"];
   [d setObject: NSLocalizedString(@"-----------------------", @"")
       	forKey: @"ApplicationDescription"];
-  [d setObject: @"Operation 0.7" forKey: @"ApplicationRelease"];
-  [d setObject: @"04 2004" forKey: @"FullVersionID"];
+  [d setObject: @"Operation 0.7.0" forKey: @"ApplicationRelease"];
+  [d setObject: @"03 2005" forKey: @"FullVersionID"];
   [d setObject: [NSArray arrayWithObjects: @"Enrico Sersale <enrico@imago.ro>.", nil]
         forKey: @"Authors"];
   [d setObject: NSLocalizedString(@"See http://www.gnustep.it/enrico/gworkspace", @"") forKey: @"URL"];
-  [d setObject: @"Copyright (C) 2004 Free Software Foundation, Inc."
+  [d setObject: @"Copyright (C) 2004, 2005 Free Software Foundation, Inc."
         forKey: @"Copyright"];
   [d setObject: NSLocalizedString(@"Released under the GNU General Public License 2.0", @"")
         forKey: @"CopyrightDescription"];

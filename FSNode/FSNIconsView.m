@@ -1219,13 +1219,16 @@ pp.y = NSMaxY(br) + 1; \
     for (i = 0; i < [files count]; i++) {  
       NSString *fname = [files objectAtIndex: i];
       FSNode *subnode = [FSNode nodeWithRelativePath: fname parent: node];
-      FSNIcon *icon = [self repOfSubnode: subnode];
       
-      if (icon) {
-        [icon setNode: subnode];
-      } else {
-        [self addRepForSubnode: subnode];
-      }
+      if (subnode && [subnode isValid]) {
+        FSNIcon *icon = [self repOfSubnode: subnode];
+
+        if (icon) {
+          [icon setNode: subnode];
+        } else {
+          [self addRepForSubnode: subnode];
+        }
+      }   
     }
   }
 
@@ -1592,7 +1595,7 @@ pp.y = NSMaxY(br) + 1; \
     }
   }
 
-  return [NSArray arrayWithArray: selectedReps];
+  return [selectedReps makeImmutableCopyOnFail: NO];
 }
 
 - (NSArray *)selectedNodes
@@ -1614,7 +1617,7 @@ pp.y = NSMaxY(br) + 1; \
     }
   }
 
-  return [NSArray arrayWithArray: selectedNodes];
+  return [selectedNodes makeImmutableCopyOnFail: NO];
 }
 
 - (NSArray *)selectedPaths
@@ -1638,7 +1641,7 @@ pp.y = NSMaxY(br) + 1; \
     }
   }
 
-  return [NSArray arrayWithArray: selectedPaths];
+  return [selectedPaths makeImmutableCopyOnFail: NO];
 }
 
 - (void)selectionDidChange

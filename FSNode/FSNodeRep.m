@@ -77,6 +77,8 @@ static FSNodeRep *shared = nil;
           
     labelWFactor = LABEL_W_FACT;
     
+    oldresize = [[NSUserDefaults standardUserDefaults] boolForKey: @"old_resize"];
+    
     imagepath = [bundle pathForResource: @"MultipleSelection" ofType: @"tiff"];
     multipleSelIcon = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
     imagepath = [bundle pathForResource: @"FolderOpen" ofType: @"tiff"];
@@ -120,78 +122,80 @@ static FSNodeRep *shared = nil;
 - (NSImage *)resizedIcon:(NSImage *)icon 
                   ofSize:(int)size
 {
-  CREATE_AUTORELEASE_POOL(arp);
-  NSSize icnsize = [icon size];
-	NSRect srcr = NSZeroRect;
-	NSRect dstr = NSZeroRect;  
-  float fact;
-  NSSize newsize;	
-  NSImage *newIcon;
-  NSBitmapImageRep *rep;
+  if (oldresize == NO) {
+    CREATE_AUTORELEASE_POOL(arp);
+    NSSize icnsize = [icon size];
+	  NSRect srcr = NSZeroRect;
+	  NSRect dstr = NSZeroRect;  
+    float fact;
+    NSSize newsize;	
+    NSImage *newIcon;
+    NSBitmapImageRep *rep;
 
-  if (icnsize.width >= icnsize.height) {
-    fact = icnsize.width / size;
-  } else {
-    fact = icnsize.height / size;
-  }
-  
-  newsize = NSMakeSize(icnsize.width / fact, icnsize.height / fact);
-	srcr.size = icnsize;
-	dstr.size = newsize;
-
-  newIcon = [[NSImage alloc] initWithSize: newsize];
-
-  NS_DURING
-    {
-		  [newIcon lockFocus];
-
-      [icon drawInRect: dstr 
-              fromRect: srcr 
-             operation: NSCompositeSourceOver 
-              fraction: 1.0];
-
-      rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect: dstr];
-      [newIcon addRepresentation: rep];
-      RELEASE (rep); 
-                        
-		  [newIcon unlockFocus];
+    if (icnsize.width >= icnsize.height) {
+      fact = icnsize.width / size;
+    } else {
+      fact = icnsize.height / size;
     }
-  NS_HANDLER
-    {
-      ASSIGN (newIcon, icon);
-    }
-  NS_ENDHANDLER
 
-  RELEASE (arp);
+    newsize = NSMakeSize(icnsize.width / fact, icnsize.height / fact);
+	  srcr.size = icnsize;
+	  dstr.size = newsize;
+
+    newIcon = [[NSImage alloc] initWithSize: newsize];
+
+    NS_DURING
+      {
+		    [newIcon lockFocus];
+
+        [icon drawInRect: dstr 
+                fromRect: srcr 
+               operation: NSCompositeSourceOver 
+                fraction: 1.0];
+
+        rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect: dstr];
+
+        if (rep) {
+          [newIcon addRepresentation: rep];
+          RELEASE (rep); 
+        }
+
+		    [newIcon unlockFocus];
+      }
+    NS_HANDLER
+      {
+        ASSIGN (newIcon, icon);
+      }
+    NS_ENDHANDLER
+
+    RELEASE (arp);
+
+    return [newIcon autorelease];  
   
-  return [newIcon autorelease];  
-}
-
-/*
-- (NSImage *)resizedIcon:(NSImage *)icon 
-                  ofSize:(int)size
-{
-  CREATE_AUTORELEASE_POOL(arp);
-  NSImage *newIcon = [icon copy];
-  NSSize icnsize = [icon size];
-  float fact;
-  NSSize newsize;
-
-  if (icnsize.width >= icnsize.height) {
-    fact = icnsize.width / size;
   } else {
-    fact = icnsize.height / size;
+    CREATE_AUTORELEASE_POOL(arp);
+    NSImage *newIcon = [icon copy];
+    NSSize icnsize = [icon size];
+    float fact;
+    NSSize newsize;
+
+    if (icnsize.width >= icnsize.height) {
+      fact = icnsize.width / size;
+    } else {
+      fact = icnsize.height / size;
+    }
+
+    newsize = NSMakeSize(icnsize.width / fact, icnsize.height / fact);
+
+	  [newIcon setScalesWhenResized: YES];
+	  [newIcon setSize: newsize];  
+    RELEASE (arp);
+
+    return [newIcon autorelease];  
   }
 
-  newsize = NSMakeSize(icnsize.width / fact, icnsize.height / fact);
-
-	[newIcon setScalesWhenResized: YES];
-	[newIcon setSize: newsize];  
-  RELEASE (arp);
-  
-  return [newIcon autorelease];  
+  return nil;
 }
-*/
 
 - (void)prepareThumbnailsCache
 {

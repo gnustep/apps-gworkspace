@@ -128,8 +128,11 @@ static NSString *nibName = @"LSFEditor";
     [placesMatrix setCellSize: NSMakeSize([placesScroll contentSize].width, CELLS_HEIGHT)];  
     [placesMatrix sizeToCells];
 
+    [recursiveSwitch setState: ([folder recursive] ? NSOnState : NSOffState)];
+
     [searchLabel setStringValue: NSLocalizedString(@"Searching in:", @"")];
     [modulesLabel setStringValue: NSLocalizedString(@"Modules:", @"")];
+    [recursiveSwitch setStringValue: NSLocalizedString(@"recursive", @"")];
 
     fmviews = [NSMutableArray new];
 
@@ -354,7 +357,8 @@ static NSString *nibName = @"LSFEditor";
     }
     
     if ([criteria count]) {
-      [folder setSearchCriteria: criteria];
+      [folder setSearchCriteria: criteria 
+                      recursive: ([recursiveSwitch state] == NSOnState)];
     }
   }
 }
