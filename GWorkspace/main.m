@@ -25,8 +25,6 @@
 #include <AppKit/AppKit.h>
   #ifdef GNUSTEP 
 #include "GWFunctions.h"
-  #else
-#include <Renaissance/Renaissance.h>
   #endif
 #include "GWorkspace.h"
 #include "GNUstep.h"
@@ -44,7 +42,7 @@ int main(int argc, char **argv, char **env)
 #ifdef GNUSTEP
 	createMenu();
 #else
-  [NSBundle loadGSMarkupNamed: @"MainMenu-OSX"  owner: gw];
+  [NSBundle loadNibNamed: @"MainMenu-OSX"  owner: gw];
 #endif
 	
   [app setDelegate: gw];    
