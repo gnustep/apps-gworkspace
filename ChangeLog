@@ -1,5 +1,10 @@
 2003-10-07 Enrico Sersale  <enrico@imago.ro>
 
+  * GWorkspace/Resources/Icons/
+    Added: Pboard.tiff, colorPboard.tiff, filecontsPboard.tiff, 
+    gormPboard.tiff, rtfPboard.tiff, rtfdPboard.tiff, stringPboard.tiff, 
+    tiffPboard.tiff.
+
   * GWorkspace/GWorkspace.m
     Added a "Do you really want to quit?" dialog 
     in -applicationShouldTerminate:.

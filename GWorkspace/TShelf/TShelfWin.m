@@ -79,17 +79,20 @@
         NSString *label = [[dict allKeys] objectAtIndex: 0];
         NSDictionary *tabDict = [dict objectForKey: label];
         NSArray *iconsArr = [tabDict objectForKey: @"icons"];
+        NSNumber *iconsType = [tabDict objectForKey: @"iconstype"];
+        int itype;
     
+        if (iconsType) {
+          itype = [iconsType intValue];
+        } else {
+          itype = FILES_TAB;
+        }
     
-          // TIRARE FUORI GLI ALTRI DATI DA "tabDict"
-    
-    
-    
-        item = [[TShelfViewItem alloc] initWithTabType: FILES_TAB];
+        item = [[TShelfViewItem alloc] initWithTabType: itype];
         [item setLabel: label];
         
         view = [[TShelfIconsView alloc] initWithIconsDescription: iconsArr
-                                                       iconsType: FILES_TAB
+                                                       iconsType: itype
                               lastView: ([label isEqual: @"last"] ? YES : NO)];
         [view setFrame: NSMakeRect(0, 0, sizew, 80)];    
         [item setView: view];
@@ -148,7 +151,7 @@
 {
   SympleDialog *dialog;
   NSString *tabName;
-  int state;
+  int itype;
   NSArray *items;
   TShelfViewItem *item;
   TShelfIconsView *view;
@@ -202,15 +205,15 @@
     return;
   }
   
-  state = [dialog switchButtState];
+  itype = ([dialog switchButtState] == NSOnState) ? DATA_TAB : FILES_TAB;
   
   item = [tView selectedTabItem];
   index = [tView indexOfItem: item];
   
-  item = [[TShelfViewItem alloc] initWithTabType: FILES_TAB];
+  item = [[TShelfViewItem alloc] initWithTabType: itype];
   [item setLabel: tabName];
   view = [[TShelfIconsView alloc] initWithIconsDescription: nil 
-                                                 iconsType: FILES_TAB
+                                                 iconsType: itype
                                                   lastView: NO];
   [view setFrame: NSMakeRect(0, 0, [[NSScreen mainScreen] frame].size.width, 80)];
   [item setView: view];
@@ -360,13 +363,12 @@
     NSString *label = [item label];
     TShelfIconsView *iview = (TShelfIconsView *)[item view];
     NSArray *iconsArr = [iview iconsDescription];
+    NSNumber *iconsType = [NSNumber numberWithInt: [iview iconsType]];
     NSMutableDictionary *tdict = [NSMutableDictionary dictionary];
     
     [tdict setObject: iconsArr forKey: @"icons"];
+    [tdict setObject: iconsType forKey: @"iconstype"];
              
-                       // AGGIUNGERE GLI ALTRI DATI A "tdict"
-
-                                                      
     [tabsArr addObject: [NSDictionary dictionaryWithObject: tdict forKey: label]];
   }
 

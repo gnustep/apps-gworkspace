@@ -51,6 +51,8 @@
 #include "Desktop/DesktopView.h"
 #include "TShelf/TShelfWin.h"
 #include "TShelf/TShelfView.h"
+#include "TShelf/TShelfViewItem.h"
+#include "TShelf/TShelfIconsView.h"
 #include "Recycler/Recycler.h"
 #include "History/History.h"
 #include "GNUstep.h"
@@ -995,6 +997,37 @@ return [ws openFile: fullPath withApplication: appName]
     }
     
     return !found;
+  }
+  
+	if ([title isEqual: NSLocalizedString(@"Cut", @"")]
+          || [title isEqual: NSLocalizedString(@"Copy", @"")]
+          || [title isEqual: NSLocalizedString(@"Paste", @"")]) {
+    if ((tshelfWin == nil) || ([tshelfWin isVisible] == NO)) {
+      return NO;
+    } else {
+      TShelfView *tview = [tshelfWin shelfView];
+      TShelfViewItem *item = [[tshelfWin shelfView] selectedTabItem];
+  
+      if ([tview hiddenTabs]) {
+        return NO;
+      }
+  
+      if (item) {
+        TShelfIconsView *iview = (TShelfIconsView *)[item view];
+        
+        if ([iview iconsType] == DATA_TAB) {
+          if ([title isEqual: NSLocalizedString(@"Paste", @"")]) {
+            return YES;
+          } else {
+            return [iview hasSelectedIcon];
+          }
+        } else {
+          return NO;
+        }
+      } else {
+        return NO;
+      }
+    }
   }
   
 	return YES;
@@ -2031,6 +2064,36 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 - (void)renameTShelfTab:(id)sender
 {
   [tshelfWin renameTab]; 
+}
+
+- (void)cut:(id)sender
+{
+  TShelfViewItem *item = [[tshelfWin shelfView] selectedTabItem];
+  
+  if (item) {
+    TShelfIconsView *iview = (TShelfIconsView *)[item view];
+    [iview doCut];    
+  }
+}
+
+- (void)copy:(id)sender
+{
+  TShelfViewItem *item = [[tshelfWin shelfView] selectedTabItem];
+  
+  if (item) {
+    TShelfIconsView *iview = (TShelfIconsView *)[item view];
+    [iview doCopy];    
+  }
+}
+
+- (void)paste:(id)sender
+{
+  TShelfViewItem *item = [[tshelfWin shelfView] selectedTabItem];
+  
+  if (item) {
+    TShelfIconsView *iview = (TShelfIconsView *)[item view];
+    [iview doPaste];    
+  }
 }
 
 - (void)openWith:(id)sender

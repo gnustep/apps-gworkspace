@@ -130,7 +130,7 @@
 		isDragTarget = NO;
 		dragImage = nil;
 		
-    if (isLastView == NO) {
+    if ((isLastView == NO) && (iconsType == FILES_TAB)) {
   	  [self registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, nil]];
     
 		  [[NSNotificationCenter defaultCenter] 
@@ -241,6 +241,20 @@
 	
 	labelRect = NSMakeRect(labxpos, [icon frame].origin.y - 14, labwidth, 14);
 	[label setFrame: labelRect];
+}
+
+- (BOOL)hasSelectedIcon
+{
+  int i;
+  
+  for (i = 0; i < [icons count]; i++) {
+    TShelfIcon *icon = [icons objectAtIndex: i];
+    if ([icon isSelect]) {  
+      return YES;
+    }
+  }  
+
+  return NO;
 }
 
 - (void)unselectOtherIcons:(id)anIcon
@@ -711,6 +725,115 @@
 - (BOOL)acceptsFirstMouse:(NSEvent *)theEvent
 {
 	return YES;
+}
+
+@end
+
+@implementation TShelfIconsView(PBoardOperations)
+
+- (void)doCut
+{
+  NSLog(@"cut");
+}
+
+- (void)doCopy
+{
+  NSLog(@"copy");
+}
+
+- (void)doPaste
+{
+  [self readSelectionFromPasteboard: [NSPasteboard generalPasteboard]];
+}
+
+- (BOOL)readSelectionFromPasteboard:(NSPasteboard *)pboard
+{
+  NSArray *types = [pboard types];
+  NSString *type;
+  
+  if ((types == nil) || ([types count] == 0)) {
+    return NO;
+  }
+  
+  type = [types objectAtIndex: 0];
+  
+  if ([type isEqual: NSStringPboardType]) {
+    NSString *str = [pboard stringForType: NSStringPboardType];
+  
+    NSLog(str);
+  
+  } else if ([type isEqual: NSRTFPboardType]) {
+    // NSData *d = [pboard dataForType: NSRTFPboardType];
+  
+
+  } else if ([type isEqual: NSRTFDPboardType]) {
+    // NSData *d = [pboard dataForType: NSRTFDPboardType];
+
+  
+  } else if ([type isEqual: NSTIFFPboardType]) {
+	  // NSData *d = [pboard dataForType: NSTIFFPboardType];
+
+  
+  } else if ([type isEqual: NSFileContentsPboardType]) {
+    // NSFileWrapper *wrapper = [pboard readFileWrapper];
+    // NSTextAttachment *attachment = [[NSTextAttachment alloc] initWithFileWrapper: wrapper];
+	  // NSAttributedString *as = [NSAttributedString attributedStringWithAttachment: attachment];
+
+    // RELEASE (attachment);
+    
+  } else if ([type isEqual: NSColorPboardType]) {
+    // NSColor *color = [NSColor colorFromPasteboard: pboard];
+
+  
+  } else {
+    NSBeep();
+  }
+  
+  return YES;
+}
+
+- (BOOL)writeSelectionToPasteboard:(NSPasteboard *)pboard
+			                        type:(NSString *)type
+{
+  BOOL ret = NO;
+
+  if (type == nil) {
+    return NO;
+  }
+
+  [pboard declareTypes: [NSArray arrayWithObject: type] owner: self];
+    
+  if ([type isEqualToString: NSStringPboardType]) {
+//    ret = [pboard setString: [[self string] substringWithRange: _layoutManager->_selected_range] 
+//			              forType: NSStringPboardType] || ret;
+	} else if ([type isEqualToString: NSRTFPboardType]) {
+//	  ret = [pboard setData: [self RTFFromRange: _layoutManager->_selected_range]
+//			forType: NSRTFPboardType];
+	} else if ([type isEqualToString: NSRTFDPboardType]) {
+//	  ret = [pboard setData: [self RTFDFromRange: _layoutManager->_selected_range]
+//			forType: NSRTFDPboardType] || ret;
+	} else if ([type isEqualToString: NSColorPboardType]) {
+	 /*
+    NSColor	*color;
+
+	  color = [_textStorage attribute: NSForegroundColorAttributeName
+				  atIndex: _layoutManager->_selected_range.location
+			   effectiveRange: 0];
+	  if (color != nil)
+	    {
+	      [color writeToPasteboard:  pboard];
+	      ret = YES;
+	    }
+    */
+	  } else if ([type isEqual: NSFileContentsPboardType]) {
+
+
+    } else if ([type isEqual: NSTIFFPboardType]) {
+    
+    
+    }
+
+  return ret;
 }
 
 @end
