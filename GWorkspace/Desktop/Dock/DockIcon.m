@@ -484,8 +484,12 @@ x += 6; \
     return YES;
     
   } else if (isTrashIcon) {
-    [self select];
-    return YES;
+	  NSString *fromPath = [[paths objectAtIndex: 0] stringByDeletingLastPathComponent];
+  
+    if ([fm isWritableFileAtPath: fromPath]) {
+      [self select];
+      return YES;
+    } 
   }
 
   return NO;

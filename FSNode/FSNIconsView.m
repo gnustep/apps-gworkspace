@@ -1924,6 +1924,7 @@ pp.y = NSMaxY(br) + 1; \
   }
 
   isDragTarget = YES;	
+  forceCopy = NO;
     
 	sourceDragMask = [sender draggingSourceOperationMask];
 
@@ -1932,7 +1933,12 @@ pp.y = NSMaxY(br) + 1; \
 	} else if (sourceDragMask == NSDragOperationLink) {
 		return NSDragOperationLink;
 	} else {
-		return NSDragOperationAll;
+    if ([[NSFileManager defaultManager] isWritableFileAtPath: basePath]) {
+      return NSDragOperationAll;			
+    } else {
+      forceCopy = YES;
+			return NSDragOperationCopy;			
+    }
 	}		
 
   isDragTarget = NO;	
@@ -2002,7 +2008,7 @@ pp.y = NSMaxY(br) + 1; \
 	} else if (sourceDragMask == NSDragOperationLink) {
 		return NSDragOperationLink;
 	} else {
-		return NSDragOperationAll;
+		return forceCopy ? NSDragOperationCopy : NSDragOperationAll;
 	}
 
 	return NSDragOperationNone;
@@ -2072,7 +2078,11 @@ pp.y = NSMaxY(br) + 1; \
 		} else if (sourceDragMask == NSDragOperationLink) {
 			operation = NSWorkspaceLinkOperation;
 		} else {
-			operation = NSWorkspaceMoveOperation;
+      if ([[NSFileManager defaultManager] isWritableFileAtPath: source]) {
+			  operation = NSWorkspaceMoveOperation;
+      } else {
+			  operation = NSWorkspaceCopyOperation;
+      }
 		}
   }
 

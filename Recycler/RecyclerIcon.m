@@ -218,43 +218,46 @@ static id <DesktopApplication> desktopApp = nil;
         
   if ([[pb types] containsObject: NSFilenamesPboardType]) {
     NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
- //   NSArray *vpaths = [ws mountedLocalVolumePaths];
-    NSMutableArray *files = [NSMutableArray array];
- //   NSMutableArray *umountPaths = [NSMutableArray array];
-    NSMutableDictionary *opinfo = [NSMutableDictionary dictionary];
-    int i;
+    NSString *source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
 
-    for (i = 0; i < [sourcePaths count]; i++) {
-      NSString *srcpath = [sourcePaths objectAtIndex: i];
-      FSNode *nd = [FSNode nodeWithPath: srcpath];
-      
-      
-      
-      if ([nd isMountPoint] == NO) {
-        [files addObject: [srcpath lastPathComponent]];
+    if ([[NSFileManager defaultManager] isWritableFileAtPath: source]) {
+   //   NSArray *vpaths = [ws mountedLocalVolumePaths];
+      NSMutableArray *files = [NSMutableArray array];
+   //   NSMutableArray *umountPaths = [NSMutableArray array];
+      NSMutableDictionary *opinfo = [NSMutableDictionary dictionary];
+      int i;
+
+      for (i = 0; i < [sourcePaths count]; i++) {
+        NSString *srcpath = [sourcePaths objectAtIndex: i];
+        FSNode *nd = [FSNode nodeWithPath: srcpath];
+
+
+
+        if ([nd isMountPoint] == NO) {
+          [files addObject: [srcpath lastPathComponent]];
+        }
+
+
+
+    //    if ([vpaths containsObject: srcpath]) {
+    //      [umountPaths addObject: srcpath];
+    //    } else {
+    //      [files addObject: [srcpath lastPathComponent]];
+    //    }
       }
-      
-      
-      
-  //    if ([vpaths containsObject: srcpath]) {
-  //      [umountPaths addObject: srcpath];
-  //    } else {
-  //      [files addObject: [srcpath lastPathComponent]];
-  //    }
-    }
 
- //   for (i = 0; i < [umountPaths count]; i++) {
- //     [ws unmountAndEjectDeviceAtPath: [umountPaths objectAtIndex: i]];
- //   }
+   //   for (i = 0; i < [umountPaths count]; i++) {
+   //     [ws unmountAndEjectDeviceAtPath: [umountPaths objectAtIndex: i]];
+   //   }
 
-    if ([files count]) {
-      [opinfo setObject: @"NSWorkspaceRecycleOperation" forKey: @"operation"];
-      [opinfo setObject: [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent]
-                 forKey: @"source"];
-      [opinfo setObject: [node path] forKey: @"destination"];
-      [opinfo setObject: files forKey: @"files"];
+      if ([files count]) {
+        [opinfo setObject: @"NSWorkspaceRecycleOperation" forKey: @"operation"];
+        [opinfo setObject: source forKey: @"source"];
+        [opinfo setObject: [node path] forKey: @"destination"];
+        [opinfo setObject: files forKey: @"files"];
 
-      [desktopApp performFileOperation: opinfo];
+        [desktopApp performFileOperation: opinfo];
+      }
     }
   }
 }

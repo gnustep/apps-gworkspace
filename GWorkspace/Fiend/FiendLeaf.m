@@ -28,6 +28,7 @@
 #include "FiendLeaf.h"
 #include "Fiend.h"
 #include "GWorkspace.h"
+#include "GWNotifications.h"
 #include "FSNodeRep.h"
 #include "FSNFunctions.h"
 #include "GNUstep.h"
@@ -407,6 +408,7 @@
 	    }
 
       isDragTarget = YES;
+      forceCopy = NO;
 			
       ASSIGN (icon, [NSImage imageNamed: @"FileIcon_Directory_Open.tiff"]);
       [self setNeedsDisplay: YES];
@@ -418,7 +420,12 @@
 			} else if (sourceDragMask == NSDragOperationLink) {
 				return NSDragOperationLink;
 			} else {
-				return NSDragOperationAll;
+        if ([fm isWritableFileAtPath: fromPath]) {
+          return NSDragOperationAll;			
+        } else {
+          forceCopy = YES;
+			    return NSDragOperationCopy;			
+        }
 			}
 
     } else {
@@ -462,7 +469,7 @@
 		} else if (sourceDragMask == NSDragOperationLink) {
 			return NSDragOperationLink;
 		} else {
-			return NSDragOperationAll;
+		  return forceCopy ? NSDragOperationCopy : NSDragOperationAll;
 		}
 	} else {
 		if ((sourceDragMask != NSDragOperationCopy) 
@@ -515,14 +522,18 @@
     source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
 
 		if ([source isEqual: [gw trashPath]]) {
-			operation = @"GWorkspaceRecycleOutOperation";
+			operation = GWorkspaceRecycleOutOperation;
 		} else {
 			if (sourceDragMask == NSDragOperationCopy) {
-				operation = @"NSWorkspaceCopyOperation";
+				operation = NSWorkspaceCopyOperation;
 			} else if (sourceDragMask == NSDragOperationLink) {
-				operation = @"NSWorkspaceLinkOperation";
+				operation = NSWorkspaceLinkOperation;
 			} else {
-				operation = @"NSWorkspaceMoveOperation";
+        if ([fm isWritableFileAtPath: source]) {
+			    operation = NSWorkspaceMoveOperation;
+        } else {
+			    operation = NSWorkspaceCopyOperation;
+        }
 			}
   	}
   

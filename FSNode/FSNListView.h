@@ -47,6 +47,7 @@
 
   unsigned int mouseFlags;    
 	BOOL isDragTarget;
+  BOOL forceCopy;
   FSNListViewNodeRep *dndTarget;
   unsigned int dragOperation;
   NSRect dndValidRect;
@@ -253,6 +254,7 @@
   BOOL wasOpened;
   BOOL nameEdited;
   BOOL isDragTarget;
+  BOOL forceCopy;
   
   FSNListViewDataSource *dataSource;
   FSNodeRep *fsnodeRep;  

@@ -60,6 +60,7 @@
   int colcount;
 
 	BOOL isDragTarget;
+  BOOL forceCopy;
   
   NSString *charBuffer;	
 	NSTimeInterval lastKeyPressed;

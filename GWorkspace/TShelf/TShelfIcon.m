@@ -565,6 +565,7 @@
 	}
 
   isDragTarget = YES;
+  forceCopy = NO;
 
   iconPath =  [[node path] stringByAppendingPathComponent: @".opendir.tiff"];
 
@@ -590,7 +591,12 @@
 	} else if (sourceDragMask == NSDragOperationLink) {
 		return NSDragOperationLink;
 	} else {
-		return NSDragOperationAll;
+    if ([[NSFileManager defaultManager] isWritableFileAtPath: fromPath]) {
+      return NSDragOperationAll;			
+    } else {
+      forceCopy = YES;
+			return NSDragOperationCopy;			
+    }
 	}
   
   return NSDragOperationNone;
@@ -615,7 +621,7 @@
 	} else if (sourceDragMask == NSDragOperationLink) {
 		return NSDragOperationLink;
 	} else {
-		return NSDragOperationAll;
+		return forceCopy ? NSDragOperationCopy : NSDragOperationAll;
 	}
 
 	return NSDragOperationNone;
@@ -696,7 +702,11 @@
 		} else if (sourceDragMask == NSDragOperationLink) {
 			operation = NSWorkspaceLinkOperation;
 		} else {
-			operation = NSWorkspaceMoveOperation;
+      if ([fm isWritableFileAtPath: source]) {
+			  operation = NSWorkspaceMoveOperation;
+      } else {
+			  operation = NSWorkspaceCopyOperation;
+      }
 		}
   }
   

@@ -62,6 +62,7 @@
   	
 	BOOL isGhost;
   BOOL isDragTarget;
+  BOOL forceCopy;  
   int posx, posy;
 	
   NSTimer *dissTimer;

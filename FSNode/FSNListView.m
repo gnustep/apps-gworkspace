@@ -1638,6 +1638,7 @@ static NSString *defaultColumns = @"{ \
     }
 
     isDragTarget = YES;	
+    forceCopy = NO;
 
 	  sourceDragMask = [sender draggingSourceOperationMask];
 
@@ -1646,7 +1647,12 @@ static NSString *defaultColumns = @"{ \
 	  } else if (sourceDragMask == NSDragOperationLink) {
 		  return NSDragOperationLink;
 	  } else {
-		  return NSDragOperationAll;
+      if ([[NSFileManager defaultManager] isWritableFileAtPath: basePath]) {
+        return NSDragOperationAll;			
+      } else {
+        forceCopy = YES;
+			  return NSDragOperationCopy;			
+      }
 	  }		
   }
 
@@ -1691,7 +1697,7 @@ static NSString *defaultColumns = @"{ \
 	  } else if (sourceDragMask == NSDragOperationLink) {
 		  return NSDragOperationLink;
 	  } else {
-		  return NSDragOperationAll;
+		  return forceCopy ? NSDragOperationCopy : NSDragOperationAll;
 	  }
   }
 
@@ -1776,7 +1782,11 @@ static NSString *defaultColumns = @"{ \
 		  } else if (sourceDragMask == NSDragOperationLink) {
 			  operation = NSWorkspaceLinkOperation;
 		  } else {
-			  operation = NSWorkspaceMoveOperation;
+        if ([[NSFileManager defaultManager] isWritableFileAtPath: source]) {
+			    operation = NSWorkspaceMoveOperation;
+        } else {
+			    operation = NSWorkspaceCopyOperation;
+        }
 		  }
     }
 
@@ -2197,6 +2207,7 @@ static NSString *defaultColumns = @"{ \
   }
 
   isDragTarget = YES;
+  forceCopy = NO;
 
 	sourceDragMask = [sender draggingSourceOperationMask];
 
@@ -2205,7 +2216,12 @@ static NSString *defaultColumns = @"{ \
 	} else if (sourceDragMask == NSDragOperationLink) {
 		return NSDragOperationLink;
 	} else {
-		return NSDragOperationAll;
+    if ([[NSFileManager defaultManager] isWritableFileAtPath: fromPath]) {
+      return NSDragOperationAll;			
+    } else {
+      forceCopy = YES;
+			return NSDragOperationCopy;			
+    }
 	}
     
   return NSDragOperationNone;
@@ -2252,7 +2268,11 @@ static NSString *defaultColumns = @"{ \
 		} else if (sourceDragMask == NSDragOperationLink) {
 			operation = NSWorkspaceLinkOperation;
 		} else {
-			operation = NSWorkspaceMoveOperation;
+      if ([[NSFileManager defaultManager] isWritableFileAtPath: source]) {
+			  operation = NSWorkspaceMoveOperation;
+      } else {
+			  operation = NSWorkspaceCopyOperation;
+      }
 		}
   }
   

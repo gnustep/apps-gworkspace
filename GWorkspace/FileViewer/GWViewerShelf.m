@@ -867,6 +867,7 @@
 	NSPasteboard *pb = [sender draggingPasteboard];
   NSDragOperation sourceDragMask = [sender draggingSourceOperationMask];
 
+  DESTROY (dragIcon);
   isDragTarget = NO;	
   dragLocalIcon = NO;    
 
@@ -921,6 +922,18 @@
 	}
   
   sourceDragMask = [sender draggingSourceOperationMask];
+  
+	if ((sourceDragMask == NSDragOperationCopy) 
+												|| (sourceDragMask == NSDragOperationLink)) {
+    if (dragIcon) {
+      DESTROY (dragIcon);
+      if (insertIndex != -1) {
+        [self setNeedsDisplayInRect: grid[insertIndex]];
+      }
+    }                   
+		return NSDragOperationNone;
+	}	
+  
   dpoint = [sender draggingLocation];
   dpoint = [self convertPoint: dpoint fromView: nil];
   index = [self indexOfGridRectContainingPoint: dpoint];

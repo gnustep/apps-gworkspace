@@ -1237,15 +1237,21 @@ static NSImage *branchImage;
   }
 
   isDragTarget = YES;
-
+  forceCopy = NO;
+  
 	sourceDragMask = [sender draggingSourceOperationMask];
 
 	if (sourceDragMask == NSDragOperationCopy) {
 		return NSDragOperationCopy;
 	} else if (sourceDragMask == NSDragOperationLink) {
 		return NSDragOperationLink;
-	} else {
-		return NSDragOperationAll;
+	} else {  
+    if ([[NSFileManager defaultManager] isWritableFileAtPath: fromPath]) {
+      return NSDragOperationAll;			
+    } else {
+      forceCopy = YES;
+			return NSDragOperationCopy;			
+    }
 	}
     
   return NSDragOperationNone;
@@ -1281,7 +1287,7 @@ static NSImage *branchImage;
 	} else if (sourceDragMask == NSDragOperationLink) {
 		return NSDragOperationLink;
 	} else {
-		return NSDragOperationAll;
+		return forceCopy ? NSDragOperationCopy : NSDragOperationAll;
 	}
 
 	return NSDragOperationNone;
@@ -1361,14 +1367,18 @@ static NSImage *branchImage;
   trashPath = [desktopApp trashPath];
 
   if ([source isEqual: trashPath]) {
-  		operation = @"GWorkspaceRecycleOutOperation";
+    operation = @"GWorkspaceRecycleOutOperation";
 	} else {	
 		if (sourceDragMask == NSDragOperationCopy) {
 			operation = NSWorkspaceCopyOperation;
 		} else if (sourceDragMask == NSDragOperationLink) {
 			operation = NSWorkspaceLinkOperation;
 		} else {
-			operation = NSWorkspaceMoveOperation;
+      if ([[NSFileManager defaultManager] isWritableFileAtPath: source]) {
+			  operation = NSWorkspaceMoveOperation;
+      } else {
+			  operation = NSWorkspaceCopyOperation;
+      }
 		}
   }
   

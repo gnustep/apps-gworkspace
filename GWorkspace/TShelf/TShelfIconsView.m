@@ -1028,6 +1028,8 @@
   BOOL found = YES;
   gridpoint *gpoint;
   
+  DESTROY (dragImage);
+  
   if (iconsType == FILES_TAB) {
 	  if ((sourceDragMask == NSDragOperationCopy) 
 												  || (sourceDragMask == NSDragOperationLink)) {
@@ -1089,6 +1091,10 @@
   if (iconsType == FILES_TAB) {
 	  if ((sourceDragMask == NSDragOperationCopy) 
 												  || (sourceDragMask == NSDragOperationLink)) {
+      if (dragImage) {
+        DESTROY (dragImage);
+        [self setNeedsDisplayInRect: dragRect]; 
+      }                   
 		  return NSDragOperationNone;
 	  }	
   }
@@ -1111,9 +1117,7 @@
 			[self setNeedsDisplayInRect: dragRect];
 
 		} else {
-			if (dragImage != nil) {
-				DESTROY (dragImage);
-			}
+      DESTROY (dragImage);
 			return NSDragOperationNone;
 		}
 	}

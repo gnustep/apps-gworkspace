@@ -52,6 +52,7 @@
   BOOL isLeaf;
 
 	BOOL isDragTarget;
+  BOOL forceCopy;
   
   FSNBrowser *browser;
   NSColor *backColor;

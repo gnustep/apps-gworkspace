@@ -1162,6 +1162,7 @@ static id <DesktopApplication> desktopApp = nil;
   }
 
   isDragTarget = YES;	
+  forceCopy = NO;
     
 	sourceDragMask = [sender draggingSourceOperationMask];
 
@@ -1170,7 +1171,12 @@ static id <DesktopApplication> desktopApp = nil;
 	} else if (sourceDragMask == NSDragOperationLink) {
 		return NSDragOperationLink;
 	} else {
-		return NSDragOperationAll;
+    if ([[NSFileManager defaultManager] isWritableFileAtPath: basePath]) {
+      return NSDragOperationAll;			
+    } else {
+      forceCopy = YES;
+			return NSDragOperationCopy;			
+    }
 	}		
 
   isDragTarget = NO;	
@@ -1190,7 +1196,7 @@ static id <DesktopApplication> desktopApp = nil;
 	} else if (sourceDragMask == NSDragOperationLink) {
 		return NSDragOperationLink;
 	} else {
-		return NSDragOperationAll;
+		return forceCopy ? NSDragOperationCopy : NSDragOperationAll;
 	}
 
 	return NSDragOperationNone;
@@ -1260,7 +1266,11 @@ static id <DesktopApplication> desktopApp = nil;
 		} else if (sourceDragMask == NSDragOperationLink) {
 			operation = NSWorkspaceLinkOperation;
 		} else {
-			operation = NSWorkspaceMoveOperation;
+      if ([[NSFileManager defaultManager] isWritableFileAtPath: source]) {
+			  operation = NSWorkspaceMoveOperation;
+      } else {
+			  operation = NSWorkspaceCopyOperation;
+      }
 		}
   }
 
@@ -1346,7 +1356,11 @@ static id <DesktopApplication> desktopApp = nil;
 	} else if (sourceDragMask == NSDragOperationLink) {
 		return NSDragOperationLink;
 	} else {
-		return NSDragOperationAll;
+    if ([[NSFileManager defaultManager] isWritableFileAtPath: fromPath]) {
+      return NSDragOperationAll;			
+    } else {
+			return NSDragOperationCopy;			
+    }
 	}
     
   return NSDragOperationNone;
@@ -1397,7 +1411,11 @@ static id <DesktopApplication> desktopApp = nil;
 		} else if (sourceDragMask == NSDragOperationLink) {
 			operation = NSWorkspaceLinkOperation;
 		} else {
-			operation = NSWorkspaceMoveOperation;
+      if ([[NSFileManager defaultManager] isWritableFileAtPath: source]) {
+			  operation = NSWorkspaceMoveOperation;
+      } else {
+			  operation = NSWorkspaceCopyOperation;
+      }
 		}
   }
   

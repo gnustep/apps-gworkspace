@@ -69,6 +69,7 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
   
   int dragdelay;
   BOOL isDragTarget;
+  BOOL forceCopy;
   BOOL onSelf;
 }
 

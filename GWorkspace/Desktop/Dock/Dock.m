@@ -699,7 +699,7 @@
         [icons insertObject: dndSourceIcon atIndex: index];
         RELEASE (dndSourceIcon);
         [self tile];  
-        return NSDragOperationAll;    
+        return NSDragOperationMove;    
       }
 
     } else {
@@ -708,7 +708,7 @@
       if ([[pb types] containsObject: @"DockIconPboardType"]) {
         if ([icon isTrashIcon] == NO) {
           targetIndex = index;        
-          return NSDragOperationAll;
+          return NSDragOperationMove;
         }
         
       } else if ([[pb types] containsObject: NSFilenamesPboardType]) {
@@ -727,11 +727,11 @@
           }
           
           targetIndex = index;
-          return NSDragOperationAll;
+          return NSDragOperationMove;
           
         } else {
           if ([icon acceptsDraggedPaths: sourcePaths]) {
-            return NSDragOperationAll;
+            return NSDragOperationMove;
           } else {
             [icon unselect];
           }
@@ -761,20 +761,20 @@
   if (targetIndex != -1) {
     if (NSEqualRects(targetRect, NSZeroRect)) {
       [self tile];
-      return NSDragOperationAll;
+      return NSDragOperationMove;
     }
   }
 
   if (targetIndex != -1) {
     if (NSPointInRect(location, NSInsetRect(targetRect, 0.0, 2.0))) {
-      return NSDragOperationAll;
+      return NSDragOperationMove;
     }
   }
   
   location = [self convertPoint: location fromView: nil];
   
   if (NSPointInRect(location, NSInsetRect(targetRect, 0.0, 2.0))) {
-    return NSDragOperationAll;
+    return NSDragOperationMove;
   }
   
   if (icon == nil) {
@@ -793,7 +793,7 @@
         [self tile];
       } 
       
-      return NSDragOperationAll;
+      return NSDragOperationMove;
     
     } else {
       NSPasteboard *pb = [sender draggingPasteboard];
@@ -802,7 +802,7 @@
         if ((targetIndex != index) && ([icon isTrashIcon] == NO)) {
           targetIndex = index;
           [self tile]; 
-          return NSDragOperationAll;
+          return NSDragOperationMove;
         }
 
       } else if (pb && [[pb types] containsObject: NSFilenamesPboardType]) {
@@ -813,7 +813,7 @@
         if (([node isApplication] == NO) 
                           || ([node isApplication] && [icon isTrashIcon])) {
           if ([icon acceptsDraggedPaths: sourcePaths]) {
-            return NSDragOperationAll;
+            return NSDragOperationMove;
           } else {
             [icon unselect];
           }
@@ -821,7 +821,7 @@
         } else if ((targetIndex != index) && ([icon isTrashIcon] == NO)) { 
           targetIndex = index;
           [self tile]; 
-          return NSDragOperationAll;
+          return NSDragOperationMove;
         } 
       }
     }   

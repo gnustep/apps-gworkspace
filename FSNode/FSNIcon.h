@@ -81,6 +81,7 @@
   BOOL slideBack;
   int dragdelay;
   BOOL isDragTarget;
+  BOOL forceCopy;
   BOOL onSelf;
   
   NSView <FSNodeRepContainer> *container;
