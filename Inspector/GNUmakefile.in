@@ -63,6 +63,7 @@ ifeq ($(FOUNDATION_LIB), apple)
                                         MainMenu.nib \
                                        InspectorWin.gorm \
                                         Contents.nib \ 
+                                        Attributes.nib \ 
                                         PreferencesWin.nib \
                                         StartAppWin.nib 
                                         
@@ -70,6 +71,7 @@ else
   Inspector_LOCALIZED_RESOURCE_FILES = Localizable.strings \
                                        InspectorWin.gorm \
                                        Contents.gorm \
+                                       Attributes.gorm \
                                      PreferencesWin.gorm \
                                      StartAppWin.gorm 
 endif
@@ -81,6 +83,8 @@ ifneq ($(FOUNDATION_LIB), apple)
                          Functions.m \
                          Inspector.m \
                          Contents.m \
+                         Attributes.m \
+                         TimeDateView.m \
                          Preferences/InspectorPref.m \
                          Dialogs/StartAppWin.m
 else
@@ -88,6 +92,8 @@ else
                          Functions.m \
                          Inspector.m \
                          Contents.m \
+                         Attributes.m \
+                         TimeDateView.m \                         
                          Preferences/InspectorPref.m \
                          Dialogs/StartAppWin.m
                          

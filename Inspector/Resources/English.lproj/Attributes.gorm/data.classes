@@ -1,14 +1,44 @@
 {
-    Contents = {
+    Attributes = {
 	Actions = (
+	    "permsButtonsAction:",
+	    "changePermissions:",
+	    "revertToOldPermissions:"
 	);
 	Outlets = (
 	    win,
+	    mainBox,
 	    topBox,
 	    iconView,
 	    titleField,
-	    viewersBox,
-	    mainBox
+	    linkToLabel,
+	    linkToField,
+	    sizeLabel,
+	    sizeField,
+	    ownerLabel,
+	    ownerField,
+	    groupLabel,
+	    groupField,
+	    changedDateBox,
+	    permsBox,
+	    readLabel,
+	    writeLabel,
+	    executeLabel,
+	    uLabel,
+	    gLabel,
+	    oLabel,
+	    ureadbutt,
+	    uwritebutt,
+	    uexebutt,
+	    greadbutt,
+	    gwritebutt,
+	    gexebutt,
+	    oreadbutt,
+	    owritebutt,
+	    oexebutt,
+	    insideButt,
+	    revertButt,
+	    okButt
 	);
 	Super = NSObject;
     };
@@ -154,7 +184,11 @@
 	    "zoom:",
 	    "closeMainWin:",
 	    "showInfo:",
-	    "okLoginAction:"
+	    "okLoginAction:",
+	    "computeSize:",
+	    "permsButtonsAction:",
+	    "changePermissions:",
+	    "revertToOldPermissions:"
 	);
 	Super = NSObject;
     };

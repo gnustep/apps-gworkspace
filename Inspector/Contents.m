@@ -68,6 +68,9 @@ static NSString *nibName = @"Contents";
       NSLog(@"failed to load %@!", nibName);
       [NSApp terminate: self];
     } 
+
+    RETAIN (mainBox);
+    RELEASE (win);
     
     inspector = insp;
     searchPaths = [NSMutableArray new];
@@ -77,10 +80,7 @@ static NSString *nibName = @"Contents";
     fm = [NSFileManager defaultManager];	
     ws = [NSWorkspace sharedWorkspace];
     nc = [NSNotificationCenter defaultCenter];
-    
-    RETAIN (mainBox);
-    RELEASE (win);
-    
+        
     r = [[(NSBox *)viewersBox contentView] frame];
 
     home = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];

@@ -27,6 +27,7 @@
 #include "Inspector.h"
 #include "ContentViewersProtocol.h"
 #include "Contents.h"
+#include "Attributes.h"
 #include "Preferences/InspectorPref.h"
 #include "Dialogs/StartAppWin.h"
 #include "Functions.h"
@@ -121,6 +122,12 @@ static NSString *nibName = @"InspectorWin";
                      atIndex: CONTENTS];
   DESTROY (currentInspector);
   contents = [inspectors objectAtIndex: CONTENTS];
+
+  currentInspector = [[Attributes alloc] initForInspector: self];
+  [inspectors insertObject: currentInspector atIndex: ATTRIBUTES]; 
+  [popUp insertItemWithTitle: NSLocalizedString(@"Attributes", @"") 
+                     atIndex: ATTRIBUTES];
+  DESTROY (currentInspector);
 
 
 
