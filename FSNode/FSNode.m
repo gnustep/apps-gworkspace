@@ -930,10 +930,22 @@
   } 
 
   if (i1 == i2) {	
-    return [self compareAccordingToName: aNode];
+    return [self compareAccordingToExtension: aNode];
   }   
 
   return ((i1 > i2) ? NSOrderedAscending : NSOrderedDescending);
+}
+
+- (NSComparisonResult)compareAccordingToExtension:(FSNode *)aNode
+{
+  NSString *e1 = [[self path] pathExtension];
+  NSString *e2 = [[aNode path] pathExtension];
+  
+  if ([e1 isEqual: e2]) {
+    return [self compareAccordingToName: aNode];
+  }
+  
+  return [e1 caseInsensitiveCompare: e2];
 }
 
 - (NSComparisonResult)compareAccordingToDate:(FSNode *)aNode

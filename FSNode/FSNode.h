@@ -210,6 +210,8 @@
 
 - (NSComparisonResult)compareAccordingToKind:(FSNode *)aNode;
 
+- (NSComparisonResult)compareAccordingToExtension:(FSNode *)aNode;
+
 - (NSComparisonResult)compareAccordingToDate:(FSNode *)aNode;
 
 - (NSComparisonResult)compareAccordingToSize:(FSNode *)aNode;
