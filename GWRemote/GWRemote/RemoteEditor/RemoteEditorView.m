@@ -179,12 +179,8 @@ static NSString *nibName = @"FindWindow";
   if ([title isEqual: NSLocalizedString(@"Save Remote File", @"")]) {
     return edited;
   }
-
-  if ([title isEqual: NSLocalizedString(@"Find...", @"")]) {
-    return YES;
-  }
   
-	return NO;
+	return YES;
 }
 
 @end
