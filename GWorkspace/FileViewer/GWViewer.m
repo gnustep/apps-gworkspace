@@ -642,61 +642,47 @@
 
 - (void)nodeContentsDidChange:(NSDictionary *)info
 {
-  NSString *operation = [info objectForKey: @"operation"];
-  NSString *source = [info objectForKey: @"source"];
-  NSString *destination = [info objectForKey: @"destination"];
-  NSArray *files = [info objectForKey: @"files"];
-
-  if ([nodeView isSingleNode] == NO) {  
-    [nodeView nodeContentsDidChange: info];
-  }
+  if ([nodeView isSingleNode]) {  
+    NSString *operation = [info objectForKey: @"operation"];
+    NSString *source = [info objectForKey: @"source"];
+    NSString *destination = [info objectForKey: @"destination"];
   
-  if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
-    files = [NSArray arrayWithObject: [destination lastPathComponent]];
-    destination = [destination stringByDeletingLastPathComponent]; 
-  }
-
-  if ([operation isEqual: @"NSWorkspaceRecycleOperation"]) {
-		files = [info objectForKey: @"origfiles"];
-  }	
-
-  if ([operation isEqual: @"NSWorkspaceMoveOperation"] 
-        || [operation isEqual: @"NSWorkspaceCopyOperation"]
-        || [operation isEqual: @"NSWorkspaceLinkOperation"]
-        || [operation isEqual: @"NSWorkspaceDuplicateOperation"]
-        || [operation isEqual: @"GWorkspaceCreateDirOperation"]
-        || [operation isEqual: @"GWorkspaceCreateFileOperation"]
-        || [operation isEqual: @"GWorkspaceRenameOperation"]
-			  || [operation isEqual: @"GWorkspaceRecycleOutOperation"]) { 
-    if ([nodeView isSingleNode]) {
-      FSNode *node = [FSNode nodeWithPath: destination];
-      [nodeView reloadFromNode: node];
+    if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
+      destination = [destination stringByDeletingLastPathComponent]; 
     }
-  }
 
-  if ([operation isEqual: @"NSWorkspaceMoveOperation"]
-        || [operation isEqual: @"NSWorkspaceDestroyOperation"]
-				|| [operation isEqual: @"NSWorkspaceRecycleOperation"]
-				|| [operation isEqual: @"GWorkspaceRecycleOutOperation"]
-				|| [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]) {
-    if ([nodeView isSingleNode]) {
-      FSNode *node = [FSNode nodeWithPath: source];
-      [nodeView reloadFromNode: node];
+    if ([operation isEqual: @"NSWorkspaceMoveOperation"] 
+          || [operation isEqual: @"NSWorkspaceCopyOperation"]
+          || [operation isEqual: @"NSWorkspaceLinkOperation"]
+          || [operation isEqual: @"NSWorkspaceDuplicateOperation"]
+          || [operation isEqual: @"GWorkspaceCreateDirOperation"]
+          || [operation isEqual: @"GWorkspaceCreateFileOperation"]
+          || [operation isEqual: @"NSWorkspaceRecycleOperation"]
+          || [operation isEqual: @"GWorkspaceRenameOperation"]
+			    || [operation isEqual: @"GWorkspaceRecycleOutOperation"]) { 
+      [nodeView reloadFromNode: [FSNode nodeWithPath: destination]];
     }
+
+    if ([operation isEqual: @"NSWorkspaceMoveOperation"]
+          || [operation isEqual: @"NSWorkspaceDestroyOperation"]
+				  || [operation isEqual: @"NSWorkspaceRecycleOperation"]
+				  || [operation isEqual: @"GWorkspaceRecycleOutOperation"]
+				  || [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]) {
+      [nodeView reloadFromNode: [FSNode nodeWithPath: source]];
+    }
+    
+  } else {
+    [nodeView nodeContentsDidChange: info];
   }
 }
 
 - (void)watchedPathChanged:(NSDictionary *)info
 {
   if (invalidated == NO) {
-    NSString *path = [info objectForKey: @"path"];
-  
-    if ([nodeView isSingleNode] == NO) {
-      [nodeView watchedPathChanged: info];
-
-    } else {
+    if ([nodeView isSingleNode]) {
+      NSString *path = [info objectForKey: @"path"];
       NSString *event = [info objectForKey: @"event"];
-
+  
       if ([event isEqual: @"GWWatchedDirectoryDeleted"]) {
         NSString *s = [path stringByDeletingLastPathComponent];
 
@@ -708,6 +694,9 @@
       } else if ([nodeView isShowingPath: path]) {
         [nodeView watchedPathChanged: info];
       }
+  
+    } else {
+      [nodeView watchedPathChanged: info];
     }
   }
 }
@@ -1181,12 +1170,14 @@
 
   [(id <FSNodeRepContainer>)nodeView setShowType: type]; 
   [self scrollToBeginning]; 
+  [nodeView updateNodeInfo];
 }
 
 - (void)setExtendedShownType:(id)sender
 {
   [(id <FSNodeRepContainer>)nodeView setExtendedShowType: [sender title]];  
   [self scrollToBeginning];
+  [nodeView updateNodeInfo];
 }
 
 - (void)setIconsSize:(id)sender
@@ -1194,6 +1185,7 @@
   if ([nodeView respondsToSelector: @selector(setIconSize:)]) {
     [(id <FSNodeRepContainer>)nodeView setIconSize: [[sender title] intValue]];
     [self scrollToBeginning];
+    [nodeView updateNodeInfo];
   }
 }
 
@@ -1209,6 +1201,7 @@
     }
     
     [self scrollToBeginning];
+    [nodeView updateNodeInfo];
   }
 }
 
@@ -1217,6 +1210,7 @@
   if ([nodeView respondsToSelector: @selector(setLabelTextSize:)]) {
     [nodeView setLabelTextSize: [[sender title] intValue]];
     [self scrollToBeginning];
+    [nodeView updateNodeInfo];
   }
 }
 

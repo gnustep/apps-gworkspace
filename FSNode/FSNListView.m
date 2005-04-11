@@ -843,10 +843,6 @@ static NSString *defaultColumns = @"{ \
     source = [source stringByDeletingLastPathComponent]; 
   }
 
-  if ([operation isEqual: @"NSWorkspaceRecycleOperation"]) {
-		files = [info objectForKey: @"origfiles"];
-  }	
-
   if (([ndpath isEqual: source] == NO) && ([ndpath isEqual: destination] == NO)) {    
     [self reloadContents];
     return;
@@ -855,18 +851,21 @@ static NSString *defaultColumns = @"{ \
   if ([ndpath isEqual: source]) {
     if ([operation isEqual: @"NSWorkspaceMoveOperation"]
               || [operation isEqual: @"NSWorkspaceDestroyOperation"]
+              || [operation isEqual: @"NSWorkspaceRecycleOperation"]
               || [operation isEqual: @"GWorkspaceRenameOperation"]
 			        || [operation isEqual: @"GWorkspaceRecycleOutOperation"]) {
+
+      if ([operation isEqual: @"NSWorkspaceRecycleOperation"]) {
+		    files = [info objectForKey: @"origfiles"];
+      }	
+
       for (i = 0; i < [files count]; i++) {
         NSString *fname = [files objectAtIndex: i];
         FSNode *subnode = [FSNode nodeWithRelativePath: fname parent: node];
         [self removeRepOfSubnode: subnode];
       }
       needsreload = YES;
-    } else if ([operation isEqual: @"NSWorkspaceRecycleOperation"]) {
-      [self reloadContents];
-      return;
-    }
+    } 
   }
 
   if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
@@ -881,8 +880,14 @@ static NSString *defaultColumns = @"{ \
               || [operation isEqual: @"NSWorkspaceDuplicateOperation"]
               || [operation isEqual: @"GWorkspaceCreateDirOperation"]
               || [operation isEqual: @"GWorkspaceCreateFileOperation"]
+              || [operation isEqual: @"NSWorkspaceRecycleOperation"]
               || [operation isEqual: @"GWorkspaceRenameOperation"]
 				      || [operation isEqual: @"GWorkspaceRecycleOutOperation"])) { 
+
+    if ([operation isEqual: @"NSWorkspaceRecycleOperation"]) {
+		  files = [info objectForKey: @"files"];
+    }	
+
     for (i = 0; i < [files count]; i++) {
       NSString *fname = [files objectAtIndex: i];
       FSNode *subnode = [FSNode nodeWithRelativePath: fname parent: node];

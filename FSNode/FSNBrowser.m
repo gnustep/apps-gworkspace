@@ -1503,6 +1503,7 @@
         || [operation isEqual: @"NSWorkspaceDuplicateOperation"]
         || [operation isEqual: @"GWorkspaceCreateDirOperation"]
         || [operation isEqual: @"GWorkspaceCreateFileOperation"]
+        || [operation isEqual: @"NSWorkspaceRecycleOperation"]
         || [operation isEqual: @"GWorkspaceRenameOperation"]
 			  || [operation isEqual: @"GWorkspaceRecycleOutOperation"]) { 
     FSNBrowserColumn *bc = [self columnWithPath: destination];        

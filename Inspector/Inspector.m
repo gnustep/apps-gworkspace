@@ -127,7 +127,10 @@ static NSString *nibName = @"InspectorWin";
   [win makeKeyAndOrderFront: nil];
 
   if (currentInspector == nil) {
-    [popUp selectItemAtIndex: 0];
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    id entry = [defaults objectForKey: @"last_inspector"];
+    
+    [popUp selectItemAtIndex: ((entry != nil) ? [entry intValue] : 0)];
     [self activateInspector: popUp];
   }
 }
@@ -231,6 +234,10 @@ static NSString *nibName = @"InspectorWin";
 
 - (void)updateDefaults
 {
+  NSNumber *index = [NSNumber numberWithInt: [popUp indexOfSelectedItem]];
+
+  [[NSUserDefaults standardUserDefaults] setObject: index 
+                                            forKey: @"last_inspector"];
   [[self attributes] updateDefaults];
   [win saveFrameUsingName: @"inspector"];
 }

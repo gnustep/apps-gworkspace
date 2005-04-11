@@ -877,12 +877,14 @@
 
   [(id <FSNodeRepContainer>)nodeView setShowType: type];  
   [self scrollToBeginning];
+  [nodeView updateNodeInfo];
 }
 
 - (void)setExtendedShownType:(id)sender
 {
   [(id <FSNodeRepContainer>)nodeView setExtendedShowType: [sender title]]; 
   [self scrollToBeginning]; 
+  [nodeView updateNodeInfo];
 }
 
 - (void)setIconsSize:(id)sender
@@ -890,6 +892,7 @@
   if ([nodeView respondsToSelector: @selector(setIconSize:)]) {
     [(id <FSNodeRepContainer>)nodeView setIconSize: [[sender title] intValue]];
     [self scrollToBeginning];
+    [nodeView updateNodeInfo];
   }
 }
 
@@ -905,6 +908,7 @@
     }
     
     [self scrollToBeginning];
+    [nodeView updateNodeInfo];
   }
 }
 
@@ -913,6 +917,7 @@
   if ([nodeView respondsToSelector: @selector(setLabelTextSize:)]) {
     [nodeView setLabelTextSize: [[sender title] intValue]];
     [self scrollToBeginning];
+    [nodeView updateNodeInfo];
   }
 }
 

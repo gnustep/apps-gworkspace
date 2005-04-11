@@ -581,7 +581,7 @@ static NSString *nibName = @"Contents";
     
     task = [NSTask new]; 
     [task setLaunchPath: shComm];
-    str = [NSString stringWithFormat: @"%@ -b %@", fileComm, path];
+    str = [NSString stringWithFormat: @"%@ -b \"%@\"", fileComm, path];
     [task setArguments: [NSArray arrayWithObjects: @"-c", str, nil]];
     ASSIGN (pipe, [NSPipe pipe]);
     [task setStandardOutput: pipe];

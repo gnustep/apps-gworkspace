@@ -179,7 +179,7 @@
       [self removeRep: icon];
     }
   }
-
+  
   icncount = [icons count];
 
   for (i = 0; i < [components count]; i++) {
@@ -219,7 +219,7 @@
   
   editIcon = nil;
   
-  [self tile];
+  [self tile];  
 }
 
 - (void)setSelectableIconsRange:(NSRange)range
@@ -293,7 +293,7 @@
   NSClipView *clip = [self superview];
   float vwidth = [clip visibleRect].size.width;
 	int count = [icons count];
-  int i;
+  int i;    
     
   if (ownScroller) {
     NSRect fr = [self frame];
@@ -312,7 +312,7 @@
       r.origin.x = posx;
       
       [[icons objectAtIndex: i] setFrame: r];
-
+      
       posx += gridSize.width;
     }
     
@@ -322,7 +322,7 @@
 
     if (count > visibleIcons) {    
       x += gridSize.width * count;
-      [clip scrollToPoint: NSMakePoint(x, y)];
+      [clip scrollToPoint: NSMakePoint(x, y)];      
     }
 
   } else {
@@ -357,7 +357,7 @@
   }
 
   [self updateNameEditor]; 
-    
+       
   [self setNeedsDisplay: YES];
 }
 
@@ -373,26 +373,28 @@
          scrollViewScrolled:(NSClipView *)clip
                     hitPart:(NSScrollerPart)hitpart
 {
-  int x = (int)[clip bounds].origin.x;
-  int y = (int)[clip bounds].origin.y;
-  int rem = x % (int)(myrintf(gridSize.width));
+  if (hitpart != NSScrollerNoPart) {
+    int x = (int)[clip bounds].origin.x;
+    int y = (int)[clip bounds].origin.y;
+    int rem = x % (int)(myrintf(gridSize.width));
 
-  [self stopRepNameEditing]; 
+    [self stopRepNameEditing]; 
 
-  if (rem != 0) {
-    if (rem <= gridSize.width / 2) {
-      x -= rem;
-    } else {
-      x += myrintf(gridSize.width) - rem;
+    if (rem != 0) {
+      if (rem <= gridSize.width / 2) {
+        x -= rem;
+      } else {
+        x += myrintf(gridSize.width) - rem;
+      }
+
+      [clip scrollToPoint: NSMakePoint(x, y)];      
+      [self setNeedsDisplay: YES];
     }
-    
-    [clip scrollToPoint: NSMakePoint(x, y)];      
-    [self setNeedsDisplay: YES];
-  }
-  
-  editIcon = [self lastIcon];
-  if (editIcon && NSContainsRect([editIcon visibleRect], [editIcon iconBounds])) {
-    [self updateNameEditor]; 
+
+    editIcon = [self lastIcon];
+    if (editIcon && NSContainsRect([editIcon visibleRect], [editIcon iconBounds])) {
+      [self updateNameEditor]; 
+    }
   }
 }
 

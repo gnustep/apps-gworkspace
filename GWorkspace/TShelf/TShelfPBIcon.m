@@ -195,7 +195,6 @@
           dragdelay++;
         } else {      
           NSPoint p = [nextEvent locationInWindow];
-        
           offset = NSMakeSize(p.x - location.x, p.y - location.y); 
           startdnd = YES;        
           break;
@@ -204,7 +203,7 @@
     }
 
     if (startdnd == YES) {  
-      [self startExternalDragOnEvent: nextEvent withMouseOffset: offset];    
+      [self startExternalDragOnEvent: theEvent withMouseOffset: offset];    
     }    
   }           
 }
