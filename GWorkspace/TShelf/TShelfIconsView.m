@@ -274,23 +274,31 @@
 
 - (void)removeIcon:(id)anIcon
 {
-  int index = [anIcon gridindex];	
+  if (anIcon) {
+    id label = [anIcon myLabel];
+    int index = [anIcon gridindex];	
 
-  if (iconsType == FILES_TAB) {
-	  NSString *watched = [[[anIcon paths] objectAtIndex: 0] stringByDeletingLastPathComponent];
+    if (iconsType == FILES_TAB) {
+	    NSString *watched = [[[anIcon paths] objectAtIndex: 0] stringByDeletingLastPathComponent];
 
-	  if ([watchedPaths containsObject: watched]) {
-		  [watchedPaths removeObject: watched];
-		  [self unsetWatcherForPath: watched];
-	  }
-  
-    [[anIcon myLabel] removeFromSuperview];
+	    if ([watchedPaths containsObject: watched]) {
+		    [watchedPaths removeObject: watched];
+		    [self unsetWatcherForPath: watched];
+	    }
+      
+      if ([[self subviews] containsObject: label]) {
+        [label removeFromSuperview];
+      }
+    }
+    
+    if ([[self subviews] containsObject: anIcon]) {
+      [anIcon removeFromSuperview];
+    }
+    
+    [icons removeObject: anIcon];
+    gpoints[index].used = 0;
+    [self resizeWithOldSuperviewSize: [self frame].size];  
   }
-  
-  [anIcon removeFromSuperview];
-  [icons removeObject: anIcon];
-  gpoints[index].used = 0;
-  [self resizeWithOldSuperviewSize: [self frame].size];  
 }
 
 - (void)removePBIconsWithData:(NSData *)data ofType:(NSString *)type
