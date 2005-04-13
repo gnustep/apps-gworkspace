@@ -725,33 +725,48 @@ static NSString *nibName = @"FileOperationWin";
 
 - (oneway void)calculateNumFiles
 {
-	BOOL isDir;
-  NSDirectoryEnumerator *enumerator;
-  NSString *dirEntry;
   int i, fnum = 0;
 
   for (i = 0; i < [files count]; i++) {
+    CREATE_AUTORELEASE_POOL (arp);
     NSDictionary *dict = [files objectAtIndex: i];
     NSString *name = [dict objectForKey: @"name"]; 
     NSString *path = [source stringByAppendingPathComponent: name];       
-
-	  isDir = NO;
+	  BOOL isDir = NO;
+    
 	  [fm fileExistsAtPath: path isDirectory: &isDir];
+    
 	  if (isDir) {
-      enumerator = [fm enumeratorAtPath: path];
-      while ((dirEntry = [enumerator nextObject])) {
-        if (stopped) {
+      NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: path];
+      
+      while (1) {
+        CREATE_AUTORELEASE_POOL (arp2);
+        NSString *dirEntry = [enumerator nextObject];
+      
+        if (dirEntry) {
+          if (stopped) {
+            break;
+          }
+			    fnum++;
+        
+        } else {
+          RELEASE (arp2);
           break;
         }
-			  fnum++;
+      
+        RELEASE (arp2);
       }
+            
 	  } else {
 		  fnum++;
 	  }
     
     if (stopped) {
+      RELEASE (arp);
       break;
     }
+    
+    RELEASE (arp);
   }
 
   if (stopped) {

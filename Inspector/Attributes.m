@@ -400,16 +400,30 @@ static BOOL sizeStop = NO;
 
 		if (recursive && isdir) {
 			enumerator = [fm enumeratorAtPath: currentPath];
-			while ((fpath = [enumerator nextObject])) {
-				fpath = [currentPath stringByAppendingPathComponent: fpath];
-				attrs = [[fm fileAttributesAtPath: fpath traverseLink: NO] mutableCopy];
-				if (attrs) {			
-					oldperms = [[attrs objectForKey: NSFilePosixPermissions] unsignedLongValue];	
-					newperms = [self getPermissions: oldperms];			
-					[attrs setObject: [NSNumber numberWithInt: newperms] forKey: NSFilePosixPermissions];
-					[fm changeFileAttributes: attrs atPath: fpath];
-				}
-			}
+      
+      while (1) {
+        CREATE_AUTORELEASE_POOL(arp);  
+      
+        fpath = [enumerator nextObject];
+      
+        if (fpath) {
+				  fpath = [currentPath stringByAppendingPathComponent: fpath];
+				  attrs = [[fm fileAttributesAtPath: fpath traverseLink: NO] mutableCopy];
+				  if (attrs) {			
+					  oldperms = [[attrs objectForKey: NSFilePosixPermissions] unsignedLongValue];	
+					  newperms = [self getPermissions: oldperms];			
+					  [attrs setObject: [NSNumber numberWithInt: newperms] forKey: NSFilePosixPermissions];
+					  [fm changeFileAttributes: attrs atPath: fpath];
+				  }
+        
+        } else {
+          RELEASE (arp);
+          break;
+        }
+        
+        RELEASE (arp);
+      }
+                  
 			ASSIGN (attributes, [fm fileAttributesAtPath: currentPath traverseLink: NO]);	
 			[self setPermissions: 0 isActive: YES];
 
@@ -431,17 +445,30 @@ static BOOL sizeStop = NO;
 			
 			if ((recursive == YES) && (isdir == YES)) {
 				enumerator = [fm enumeratorAtPath: path];
-				while ((fpath = [enumerator nextObject])) {
-					fpath = [path stringByAppendingPathComponent: fpath];
-					attrs = [[fm fileAttributesAtPath: fpath traverseLink: NO] mutableCopy];
-					if (attrs) {			
-						oldperms = [[attrs objectForKey: NSFilePosixPermissions] unsignedLongValue];	
-						newperms = [self getPermissions: oldperms];			
-						[attrs setObject: [NSNumber numberWithInt: newperms] forKey: NSFilePosixPermissions];
-						[fm changeFileAttributes: attrs atPath: fpath];
-					}
-				}
-				
+        
+        while (1) {
+          CREATE_AUTORELEASE_POOL(arp);  
+
+          fpath = [enumerator nextObject];
+
+          if (fpath) {
+					  fpath = [path stringByAppendingPathComponent: fpath];
+					  attrs = [[fm fileAttributesAtPath: fpath traverseLink: NO] mutableCopy];
+					  if (attrs) {			
+						  oldperms = [[attrs objectForKey: NSFilePosixPermissions] unsignedLongValue];	
+						  newperms = [self getPermissions: oldperms];			
+						  [attrs setObject: [NSNumber numberWithInt: newperms] forKey: NSFilePosixPermissions];
+						  [fm changeFileAttributes: attrs atPath: fpath];
+					  }
+
+          } else {
+            RELEASE (arp);
+            break;
+          }
+
+          RELEASE (arp);
+        }
+        
 			} else {
 				attrs = [[fm fileAttributesAtPath: path traverseLink: NO] mutableCopy];
 				oldperms = [[attrs objectForKey: NSFilePosixPermissions] unsignedLongValue];	
@@ -778,24 +805,33 @@ static BOOL sizeStop = NO;
 		if (isdir) {
 			NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: path];
 			
-			while((filePath = [enumerator nextObject])) {
+      while (1) {
         CREATE_AUTORELEASE_POOL (arp2);
         
-        if (sizeStop) {
-          RELEASE (arp2);
-          RELEASE (arp1);
-          return;
-        }
-				filePath = [path stringByAppendingPathComponent: filePath];
-				fileAttrs = [fm fileAttributesAtPath: filePath traverseLink: NO];
-				if (fileAttrs) {
-					fsize = [[fileAttrs objectForKey: NSFileSize] unsignedLongLongValue];
-					dirsize += fsize;
-				}
+        filePath = [enumerator nextObject];
+      
+        if (filePath) {
+          if (sizeStop) {
+            RELEASE (arp2);
+            RELEASE (arp1);
+            return;
+          }
         
+			    filePath = [path stringByAppendingPathComponent: filePath];
+			    fileAttrs = [fm fileAttributesAtPath: filePath traverseLink: NO];
+			    if (fileAttrs) {
+				    fsize = [[fileAttrs objectForKey: NSFileSize] unsignedLongLongValue];
+				    dirsize += fsize;
+			    }
+      
+        } else {
+          RELEASE (arp2);
+          break;   
+        } 
+      
         RELEASE (arp2);
-			}
-			
+      }
+      
 		} else {
 			fileAttrs = [fm fileAttributesAtPath: path traverseLink: NO];
 			if (fileAttrs) {

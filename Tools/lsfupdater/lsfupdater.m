@@ -720,22 +720,29 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
   NSMutableArray *founds = [NSMutableArray array];
   NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: dirpath];
   IMP nxtImp = [enumerator methodForSelector: @selector(nextObject)];    
-  NSString *path;
 
-  while ((path = (*nxtImp)(enumerator, @selector(nextObject))) != nil) { 
+  while (1) {
     CREATE_AUTORELEASE_POOL(arp1); 
-    NSString *fullPath = [dirpath stringByAppendingPathComponent: path];
-    NSDictionary *attrs = [enumerator fileAttributes];
-    
-    if ([self checkPath: fullPath attributes: attrs]) {    
-      [founds addObject: fullPath];
-    }
+    NSString *path = (*nxtImp)(enumerator, @selector(nextObject));
 
-    if (([attrs fileType] == NSFileTypeDirectory) && norecursion) {
-      [enumerator skipDescendents];
+    if (path) {
+      NSString *fullPath = [dirpath stringByAppendingPathComponent: path];
+      NSDictionary *attrs = [enumerator fileAttributes];
+
+      if ([self checkPath: fullPath attributes: attrs]) {    
+        [founds addObject: fullPath];
+      }
+
+      if (([attrs fileType] == NSFileTypeDirectory) && norecursion) {
+        [enumerator skipDescendents];
+      }
+
+    } else {
+      RELEASE (arp1);
+      break;
     }
     
-    RELEASE (arp1);
+    RELEASE (arp1); 
   }
   
   RETAIN (founds);

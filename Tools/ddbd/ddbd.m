@@ -562,17 +562,22 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
     if (type == NSFileTypeDirectory) {
       NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: base];
       IMP nxtImp = [enumerator methodForSelector: @selector(nextObject)];  
-      NSString *path;    
         
-      while ((path = (*nxtImp)(enumerator, @selector(nextObject))) != nil) {
-        CREATE_AUTORELEASE_POOL(arp1);
-
-        if ([[enumerator fileAttributes] fileType] == NSFileTypeDirectory) {
-          addDirectory([base stringByAppendingPathComponent: path]);
+      while (1) {  
+        CREATE_AUTORELEASE_POOL(arp1);  
+        NSString *path = (*nxtImp)(enumerator, @selector(nextObject));
+        
+        if (path) {
+          if ([[enumerator fileAttributes] fileType] == NSFileTypeDirectory) {
+            addDirectory([base stringByAppendingPathComponent: path]);
+          }
+        } else {
+          RELEASE (arp1);
+          break;
         }
         
-        DESTROY (arp1);
-      } 
+        DESTROY (arp1);  
+      }
       
       addDirectory(base);
     }
@@ -1095,9 +1100,17 @@ void readPaths()
   while (1) {
     CREATE_AUTORELEASE_POOL(pool);
 
-    data = [handle readDataOfLength: sizeof(dbpath)];
-        
-    if ([data length]) {
+    NS_DURING
+      {
+        data = [handle readDataOfLength: sizeof(dbpath)];
+      }
+    NS_HANDLER
+      {
+        data = nil;
+      }
+    NS_ENDHANDLER
+
+    if (data && [data length]) {
       NSMutableDictionary *dict = [NSMutableDictionary dictionary];
     
       memset(dbp.path, 0, sizeof(dbp.path));
@@ -1347,9 +1360,17 @@ void synchronizePaths()
   while (1) {
     CREATE_AUTORELEASE_POOL(arp);
 
-    data = [pathsAddHandle readDataOfLength: sizeof(dbpath)];
+    NS_DURING
+      {
+        data = [pathsAddHandle readDataOfLength: sizeof(dbpath)];
+      }
+    NS_HANDLER
+      {
+        data = nil;
+      }
+    NS_ENDHANDLER
 
-    if ([data length]) {
+    if (data && [data length]) {
       NSMutableDictionary *dict = [NSMutableDictionary dictionary];
       NSString *path;
       NSRange range;
@@ -1400,9 +1421,17 @@ void synchronizePaths()
   while (1) {
     CREATE_AUTORELEASE_POOL(arp);
 
-    data = [pathsRmvHandle readDataOfLength: sizeof(dbpath)];
+    NS_DURING
+      {
+        data = [pathsRmvHandle readDataOfLength: sizeof(dbpath)];
+      }
+    NS_HANDLER
+      {
+        data = nil;
+      }
+    NS_ENDHANDLER
 
-    if ([data length]) {
+    if (data && [data length]) {
       NSString *path;
       NSRange range;
       
@@ -1490,9 +1519,17 @@ NSString *annotationsForPath(NSString *path)
       
       [annsHandle seekToFileOffset: offset];
       
-      data = [annsHandle readDataOfLength: sizeof(annotation)];
+      NS_DURING
+        {
+          data = [annsHandle readDataOfLength: sizeof(annotation)];
+        }
+      NS_HANDLER
+        {
+          data = nil;
+        }
+      NS_ENDHANDLER
       
-      if ([data length] == sizeof(annotation)) {
+      if (data && ([data length] == sizeof(annotation))) {
         [data getBytes: &annot.ann range: NSMakeRange(0, sizeof(annot.ann) - 1)];
         [data getBytes: &annot.path 
                  range: NSMakeRange(sizeof(annot.ann), sizeof(annot.path) - 1)];
@@ -1631,9 +1668,17 @@ void checkAnnotations()
   annsize = sizeof(annotation);
 
   while (1) {
-    data = [annsHandle readDataOfLength: annsize];
+    NS_DURING
+      {
+        data = [annsHandle readDataOfLength: annsize];
+      }
+    NS_HANDLER
+      {
+        data = nil;
+      }
+    NS_ENDHANDLER
     
-    if ([data length] == annsize) {
+    if (data && ([data length] == annsize)) {
       NSMutableDictionary *dict;
       
       memset(annot.ann, 0, sizeof(annot.ann));
@@ -1690,9 +1735,17 @@ void checkAnnotations()
     [annsHandle truncateFileAtOffset: 0];
 
     while (1) {
-      data = [handle readDataOfLength: sizeof(annotation)];
+      NS_DURING
+        {
+          data = [handle readDataOfLength: sizeof(annotation)];
+        }
+      NS_HANDLER
+        {
+          data = nil;
+        }
+      NS_ENDHANDLER
 
-      if ([data length] == sizeof(annotation)) {
+      if (data && ([data length] == sizeof(annotation))) {
         [annsHandle writeData: data];
       } else {
         break;

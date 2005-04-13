@@ -204,42 +204,49 @@
     if (type == NSFileTypeDirectory) {
       CREATE_AUTORELEASE_POOL(arp1);
       NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: path];
-      NSString *currentPath;
       
-      while ((currentPath = [enumerator nextObject])) {
+      while (1) {
         CREATE_AUTORELEASE_POOL(arp2);
-        NSString *fullPath = [path stringByAppendingPathComponent: currentPath];
-        NSDictionary *attrs = [enumerator fileAttributes];
-        BOOL found = YES;
-                
-        for (j = 0; j < [modules count]; j++) {
-          id module = [modules objectAtIndex: j];
-  
-          found = [module checkPath: fullPath withAttributes: attrs];
-          
-          if (found == NO) {
-            break;
-          }
+        NSString *currentPath = [enumerator nextObject];
+      
+        if (currentPath) {
+          NSString *fullPath = [path stringByAppendingPathComponent: currentPath];
+          NSDictionary *attrs = [enumerator fileAttributes];
+          BOOL found = YES;
         
+          for (j = 0; j < [modules count]; j++) {
+            id module = [modules objectAtIndex: j];
+
+            found = [module checkPath: fullPath withAttributes: attrs];
+
+            if (found == NO) {
+              break;
+            }
+
+            if (stopped) {
+              break;
+            }
+          }
+
+          if (found) {
+            [finder nextResult: fullPath];
+          }
+
           if (stopped) {
+            RELEASE (arp2);
             break;
           }
-        }
-  
-        if (found) {
-          [finder nextResult: fullPath];
-        }
+
+          if (([attrs fileType] == NSFileTypeDirectory) && norecursion) {
+            [enumerator skipDescendents];
+          }
         
-        if (stopped) {
+        } else {
           RELEASE (arp2);
           break;
         }
         
-        if (([attrs fileType] == NSFileTypeDirectory) && norecursion) {
-          [enumerator skipDescendents];
-        }
-
-        RELEASE (arp2);
+        RELEASE (arp2);  
       }
       
       RELEASE (arp1);
