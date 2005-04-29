@@ -1338,7 +1338,7 @@ static GWorkspace *gworkspace = nil;
 		return;
 	}
 
-  files = [NSMutableArray arrayWithCapacity: 1];
+  files = [NSMutableArray array];
   for (i = 0; i < [selectedPaths count]; i++) {
     [files addObject: [[selectedPaths objectAtIndex: i] lastPathComponent]];
   }
@@ -1364,7 +1364,7 @@ static GWorkspace *gworkspace = nil;
 		return;
 	}
 
-  files = [NSMutableArray arrayWithCapacity: 1];
+  files = [NSMutableArray array];
   for (i = 0; i < [selectedPaths count]; i++) {
     [files addObject: [[selectedPaths objectAtIndex: i] lastPathComponent]];
   }
