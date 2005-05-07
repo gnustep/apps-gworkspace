@@ -1,0 +1,12 @@
+{
+  NSExecutable = "sodipodi";
+  NSIcon = "sodipodi.tiff";
+  NSRole = "Editor";
+	XAppWrapper = YES;
+  NSTypes = (
+    {
+      NSUnixExtensions = ( "svg" );
+      NSIcon = "sodipodi.tiff";
+    }
+  );
+}
