@@ -1085,8 +1085,6 @@ static id <DesktopApplication> desktopApp = nil;
 - (void)drawRect:(NSRect)rect
 {
   [super drawRect: rect];
-  [backColor set];
-  NSRectFill(rect);
   
   if (index != [browser firstVisibleColumn]) {
 	  [[NSColor blackColor] set];  

@@ -127,8 +127,8 @@
 		[namelabel setEditable: NO];
 		[namelabel setSelectable: NO];
 		[namelabel setAlignment: NSCenterTextAlignment];
-	  [namelabel setBackgroundColor: [NSColor windowBackgroundColor]];
-	  [namelabel setTextColor: [NSColor blackColor]];
+    [namelabel setDrawsBackground: NO];
+	  [namelabel setTextColor: [NSColor controlTextColor]];
 		[self setLabelWidth]; 
     
     [self registerForDraggedTypes: [NSArray arrayWithObjects: 

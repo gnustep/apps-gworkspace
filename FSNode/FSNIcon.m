@@ -643,8 +643,6 @@ static NSImage *branchImage;
     if (icnPosition != NSImageOnly) {
       if (nameEdited == NO) {
         [[container backgroundColor] set];
-        NSFrameRect(labelRect);
-        NSRectFill(labelRect);
         [label drawWithFrame: labelRect inView: self];
       }
       

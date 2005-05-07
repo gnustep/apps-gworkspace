@@ -278,11 +278,9 @@ static int infoheight = 0;
 
       if (([self isHighlighted] || [self state]) && (nameEdited == NO)) {
 	      [[self highlightColorInView: controlView] set];
-      } else {
-        [backcolor set];
-	    }
-	    NSRectFill(cellFrame);
-
+        NSRectFill(cellFrame);
+      } 
+	    
       if (infoCell) {
         titleRect.size.height -= infoheight;
 
