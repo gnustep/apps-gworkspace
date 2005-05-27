@@ -540,7 +540,7 @@
 {
   [nodeView nodeContentsWillChange: info];
 }
-
+ 
 - (void)nodeContentsDidChange:(NSDictionary *)info
 {
   [nodeView nodeContentsDidChange: info];
@@ -553,6 +553,7 @@
   
     if ([nodeView isShowingPath: path]) {
       [nodeView watchedPathChanged: info];
+      [self updeateInfoLabels];
     }
   }
 }
