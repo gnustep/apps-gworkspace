@@ -56,6 +56,30 @@
   return self;
 }
 
+- (id)copyWithZone:(NSZone *)zone
+{
+  FSNTextCell *c = [super copyWithZone: zone];
+
+  c->fontAttr = [fontAttr copyWithZone: zone];
+  c->dots = [dots copyWithZone: zone];
+
+  c->dtslenght = dtslenght;
+  c->dateCell = dateCell;
+  
+  if (uncuttedTitle) {
+    c->uncuttedTitle = [uncuttedTitle copyWithZone: zone];
+  } else {
+    c->uncuttedTitle = nil;
+  }
+  
+  c->cutTitleSel = cutTitleSel;
+  c->cutTitle = (cutIMP)[c methodForSelector: cutTitleSel];   
+
+  TEST_RETAIN (icon);
+
+  return c;
+}
+
 - (void)setStringValue:(NSString *)aString
 {
   [super setStringValue: aString];
@@ -224,6 +248,11 @@
   }
   
   [self setStringValue: uncuttedTitle];          
+}
+
+- (BOOL)startTrackingAt:(NSPoint)startPoint inView:(NSView *)controlView
+{
+  return NO;
 }
 
 @end
