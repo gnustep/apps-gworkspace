@@ -539,9 +539,18 @@ x += 6; \
     }
 
     if ([files count]) {
+	    NSString *fromPath = [[paths objectAtIndex: 0] stringByDeletingLastPathComponent];
+    
+	    if ([fm isWritableFileAtPath: fromPath] == NO) {
+		    NSString *err = NSLocalizedString(@"Error", @"");
+		    NSString *msg = NSLocalizedString(@"You have not write permission\nfor", @"");
+		    NSString *buttstr = NSLocalizedString(@"Continue", @"");
+        NSRunAlertPanel(err, [NSString stringWithFormat: @"%@ \"%@\"!\n", msg, fromPath], buttstr, nil, nil);   
+		    return;
+	    }
+    
       [opinfo setObject: @"NSWorkspaceRecycleOperation" forKey: @"operation"];
-      [opinfo setObject: [[paths objectAtIndex: 0] stringByDeletingLastPathComponent]
-                 forKey: @"source"];
+      [opinfo setObject: fromPath forKey: @"source"];
       [opinfo setObject: [node path] forKey: @"destination"];
       [opinfo setObject: files forKey: @"files"];
 
@@ -551,5 +560,4 @@ x += 6; \
 }
 
 @end
-
 

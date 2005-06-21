@@ -362,7 +362,6 @@
   return SPATIAL;
 }
 
-
 - (void)activate
 {
   [vwrwin makeKeyAndOrderFront: nil];

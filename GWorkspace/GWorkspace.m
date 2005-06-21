@@ -2062,9 +2062,7 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 
 - (void)showInspector:(id)sender
 {
-  if ([[inspector win] isVisible] == NO) {
-    [inspector activate];
-  }
+  [inspector activate];
   [inspector setCurrentSelection: selectedPaths];
 }
 

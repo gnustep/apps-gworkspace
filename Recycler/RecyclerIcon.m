@@ -231,13 +231,9 @@ static id <DesktopApplication> desktopApp = nil;
         NSString *srcpath = [sourcePaths objectAtIndex: i];
         FSNode *nd = [FSNode nodeWithPath: srcpath];
 
-
-
         if ([nd isMountPoint] == NO) {
           [files addObject: [srcpath lastPathComponent]];
         }
-
-
 
     //    if ([vpaths containsObject: srcpath]) {
     //      [umountPaths addObject: srcpath];
@@ -251,6 +247,14 @@ static id <DesktopApplication> desktopApp = nil;
    //   }
 
       if ([files count]) {
+	      if ([[NSFileManager defaultManager] isWritableFileAtPath: source] == NO) {
+		      NSString *err = NSLocalizedString(@"Error", @"");
+		      NSString *msg = NSLocalizedString(@"You have not write permission\nfor", @"");
+		      NSString *buttstr = NSLocalizedString(@"Continue", @"");
+          NSRunAlertPanel(err, [NSString stringWithFormat: @"%@ \"%@\"!\n", msg, source], buttstr, nil, nil);   
+		      return;
+	      }
+      
         [opinfo setObject: @"NSWorkspaceRecycleOperation" forKey: @"operation"];
         [opinfo setObject: source forKey: @"source"];
         [opinfo setObject: [node path] forKey: @"destination"];
