@@ -1436,14 +1436,14 @@ static NSString *defaultColumns = @"{ \
   if ([ednode isWritable] == NO) {
     NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
           [NSString stringWithFormat: @"%@\"%@\"!\n", 
-              NSLocalizedString(@"You have not write permission for ", @""), 
+              NSLocalizedString(@"You do not have write permission for ", @""), 
                     [ednode name]], NSLocalizedString(@"Continue", @""), nil, nil);   
     CLEAREDITING;
     
   } else if ([ednode isParentWritable] == NO) {
     NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
           [NSString stringWithFormat: @"%@\"%@\"!\n", 
-              NSLocalizedString(@"You have not write permission for ", @""), 
+              NSLocalizedString(@"You do not have write permission for ", @""), 
                   [ednode parentName]], NSLocalizedString(@"Continue", @""), nil, nil);   
     CLEAREDITING;
     

@@ -639,14 +639,14 @@ static GWSd *shared = nil;
   
   if ([fm isWritableFileAtPath: oldname] == NO) {
     message = [NSString stringWithFormat: 
-                    @"You have not write permission\nfor \"%@\"!", 
+                    @"You do not have write permission\nfor \"%@\"!", 
                                           [oldname lastPathComponent]];
     [gwsdClient showErrorAlertWithMessage: message];
     return;
     
   } else if ([fm isWritableFileAtPath: basepath] == NO) {	
     message = [NSString stringWithFormat: 
-                    @"You have not write permission\nfor \"%@\"!", 
+                    @"You do not have write permission\nfor \"%@\"!", 
                                           [basepath lastPathComponent]];
     [gwsdClient showErrorAlertWithMessage: message];
     return;
@@ -708,7 +708,7 @@ static GWSd *shared = nil;
 	
 	if ([fm isWritableFileAtPath: basePath] == NO) {
     NSString *message = [NSString stringWithFormat: 
-                @"You have not write permission for %@!", basePath];
+                @"You do not have write permission for %@!", basePath];
                 
     [gwsdClient showErrorAlertWithMessage: message];
 		return;
@@ -760,7 +760,7 @@ static GWSd *shared = nil;
 
 	if ([fm isWritableFileAtPath: basePath] == NO) {  
     NSString *message = [NSString stringWithFormat: 
-                @"You have not write permission for %@!", basePath];
+                @"You do not have write permission for %@!", basePath];
                 
     [gwsdClient showErrorAlertWithMessage: message];
 		return;
@@ -780,7 +780,7 @@ static GWSd *shared = nil;
 
 	if ([fm isWritableFileAtPath: basePath] == NO) {  
     NSString *message = [NSString stringWithFormat: 
-                @"You have not write permission for %@!", basePath];
+                @"You do not have write permission for %@!", basePath];
                 
     [gwsdClient showErrorAlertWithMessage: message];
 		return;

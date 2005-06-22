@@ -543,7 +543,7 @@ x += 6; \
     
 	    if ([fm isWritableFileAtPath: fromPath] == NO) {
 		    NSString *err = NSLocalizedString(@"Error", @"");
-		    NSString *msg = NSLocalizedString(@"You have not write permission\nfor", @"");
+		    NSString *msg = NSLocalizedString(@"You do not have write permission\nfor", @"");
 		    NSString *buttstr = NSLocalizedString(@"Continue", @"");
         NSRunAlertPanel(err, [NSString stringWithFormat: @"%@ \"%@\"!\n", msg, fromPath], buttstr, nil, nil);   
 		    return;

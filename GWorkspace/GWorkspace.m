@@ -1257,7 +1257,7 @@ static GWorkspace *gworkspace = nil;
 	
 	if ([fm isWritableFileAtPath: basePath] == NO) {
 		NSString *err = NSLocalizedString(@"Error", @"");
-		NSString *msg = NSLocalizedString(@"You have not write permission\nfor", @"");
+		NSString *msg = NSLocalizedString(@"You do not have write permission\nfor", @"");
 		NSString *buttstr = NSLocalizedString(@"Continue", @"");
     NSRunAlertPanel(err, [NSString stringWithFormat: @"%@ \"%@\"!\n", msg, basePath], buttstr, nil, nil);   
 		return;
@@ -1306,7 +1306,7 @@ static GWorkspace *gworkspace = nil;
 
 	if ([fm isWritableFileAtPath: basePath] == NO) {
 		NSString *err = NSLocalizedString(@"Error", @"");
-		NSString *msg = NSLocalizedString(@"You have not write permission\nfor", @"");
+		NSString *msg = NSLocalizedString(@"You do not have write permission\nfor", @"");
 		NSString *buttstr = NSLocalizedString(@"Continue", @"");
     NSRunAlertPanel(err, [NSString stringWithFormat: @"%@ \"%@\"!\n", msg, basePath], buttstr, nil, nil);   
 		return;
@@ -1332,7 +1332,7 @@ static GWorkspace *gworkspace = nil;
 
 	if ([fm isWritableFileAtPath: basePath] == NO) {
 		NSString *err = NSLocalizedString(@"Error", @"");
-		NSString *msg = NSLocalizedString(@"You have not write permission\nfor", @"");
+		NSString *msg = NSLocalizedString(@"You do not have write permission\nfor", @"");
 		NSString *buttstr = NSLocalizedString(@"Continue", @"");
     NSRunAlertPanel(err, [NSString stringWithFormat: @"%@ \"%@\"!\n", msg, basePath], buttstr, nil, nil);   
 		return;
@@ -1358,7 +1358,7 @@ static GWorkspace *gworkspace = nil;
 
 	if ([fm isWritableFileAtPath: basePath] == NO) {
 		NSString *err = NSLocalizedString(@"Error", @"");
-		NSString *msg = NSLocalizedString(@"You have not write permission\nfor", @"");
+		NSString *msg = NSLocalizedString(@"You do not have write permission\nfor", @"");
 		NSString *buttstr = NSLocalizedString(@"Continue", @"");
     NSRunAlertPanel(err, [NSString stringWithFormat: @"%@ \"%@\"!\n", msg, basePath], buttstr, nil, nil);   
 		return;

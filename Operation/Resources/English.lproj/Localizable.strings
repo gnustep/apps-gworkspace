@@ -67,7 +67,7 @@
 "See http://www.gnustep.it/enrico/gworkspace" = "See http://www.gnustep.it/enrico/gworkspace";
 "Released under the GNU General Public License 2.0" = "Released under the GNU General Public License 2.0";
 "Error" = "Error";
-"You have not write permission\nfor" = "You do not have permission to\nwrite to";
+"You have not write permission\nfor" = "You do not have write permission\nfor";
 "Continue" = "Continue";
 
 
@@ -105,7 +105,7 @@
 
 /* ColumnIcon.m */
 
-"You have not write permission\nfor " = "You do not have permission to\nwrite to ";
+"You have not write permission\nfor " = "You do not have write permission\nfor ";
 "The name " = "The name ";
 " is already in use!" = " is already in use!";
 "Cannot rename " = "Cannot rename ";
