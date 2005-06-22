@@ -2095,7 +2095,8 @@
   } else {
     NSString *newname = [nameEditor stringValue];
     NSString *newpath = [[ednode parentPath] stringByAppendingPathComponent: newname];
-    NSCharacterSet *notAllowSet = [NSCharacterSet characterSetWithCharactersInString: @"/\\*:?"];
+    NSString *extension = [newpath pathExtension];
+    NSCharacterSet *notAllowSet = [NSCharacterSet characterSetWithCharactersInString: @"/\\*:?\33"];
     NSRange range = [newname rangeOfCharacterFromSet: notAllowSet];
     NSArray *dirContents = [ednode subNodeNamesOfParent];
     NSMutableDictionary *opinfo = [NSMutableDictionary dictionary];
@@ -2106,6 +2107,22 @@
                           NSLocalizedString(@"Continue", @""), nil, nil);   
       CLEAREDITING;
     }	
+
+    if (([extension length] 
+            && ([ednode isDirectory] && ([ednode isPackage] == NO)))) {
+      NSString *msg = NSLocalizedString(@"Are you sure you want to add the extension ", @"");
+      
+      msg = [msg stringByAppendingFormat: @"\"%@\" ", extension];
+      msg = [msg stringByAppendingString: NSLocalizedString(@"to the end of the name?", @"")];
+      msg = [msg stringByAppendingString: NSLocalizedString(@"\nif you make this change, your folder may appear as a single file.", @"")];
+      
+      if (NSRunAlertPanel(@"", msg, 
+                          NSLocalizedString(@"Cancel", @""), 
+				                  NSLocalizedString(@"OK", @""), 
+                          nil) == NSAlertDefaultReturn) {
+        CLEAREDITING;
+      }
+    }
 
     if ([dirContents containsObject: newname]) {
       if ([newname isEqual: [ednode name]]) {

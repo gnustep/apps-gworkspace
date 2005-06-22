@@ -652,7 +652,7 @@ static GWSd *shared = nil;
     return;
     
   } else {  
-    NSCharacterSet *notAllowSet = [NSCharacterSet characterSetWithCharactersInString: @"/\\*$|~\'\"`^!?"];
+    NSCharacterSet *notAllowSet = [NSCharacterSet characterSetWithCharactersInString: @"/\\*$|~\'\"`^!?\33"];
     NSRange range = [[newname lastPathComponent] rangeOfCharacterFromSet: notAllowSet];
     NSArray *dirContents = [fm directoryContentsAtPath: basepath];
     
