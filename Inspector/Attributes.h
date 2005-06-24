@@ -118,6 +118,8 @@
 
 - (IBAction)permsButtonsAction:(id)sender;
 
+- (IBAction)insideButtonAction:(id)sender;
+
 - (IBAction)changePermissions:(id)sender;
 
 - (IBAction)revertToOldPermissions:(id)sender;

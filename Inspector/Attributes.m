@@ -383,6 +383,11 @@ static BOOL sizeStop = NO;
 	[okButt setEnabled: YES];
 }
 
+- (IBAction)insideButtonAction:(id)sender
+{
+  [okButt setEnabled: YES];
+}
+
 - (IBAction)changePermissions:(id)sender
 {
 	NSMutableDictionary *attrs;
@@ -396,30 +401,28 @@ static BOOL sizeStop = NO;
   recursive = ([insideButt isEnabled] && ([insideButt state] == NSOnState));
   
 	if (pathscount == 1) {
+		oldperms = [[attributes objectForKey: NSFilePosixPermissions] unsignedLongValue];
+		newperms = [self getPermissions: oldperms];		
+		attrs = [attributes mutableCopy];
+		[attrs setObject: [NSNumber numberWithInt: newperms] forKey: NSFilePosixPermissions];
+		[fm changeFileAttributes: attrs atPath: currentPath];	
+    RELEASE (attrs);
+
 		[fm fileExistsAtPath: currentPath isDirectory: &isdir];
 
-		if (recursive && isdir) {
+		if (isdir && recursive) {
 			enumerator = [fm enumeratorAtPath: currentPath];
       
-      while (1) {
+      while ((fpath = [enumerator nextObject])) {
         CREATE_AUTORELEASE_POOL(arp);  
       
-        fpath = [enumerator nextObject];
-      
-        if (fpath) {
-				  fpath = [currentPath stringByAppendingPathComponent: fpath];
-				  attrs = [[fm fileAttributesAtPath: fpath traverseLink: NO] mutableCopy];
-				  if (attrs) {			
-					  oldperms = [[attrs objectForKey: NSFilePosixPermissions] unsignedLongValue];	
-					  newperms = [self getPermissions: oldperms];			
-					  [attrs setObject: [NSNumber numberWithInt: newperms] forKey: NSFilePosixPermissions];
-					  [fm changeFileAttributes: attrs atPath: fpath];
-				  }
-        
-        } else {
-          RELEASE (arp);
-          break;
-        }
+				fpath = [currentPath stringByAppendingPathComponent: fpath];
+				attrs = [[fm fileAttributesAtPath: fpath traverseLink: NO] mutableCopy];
+				oldperms = [[attrs objectForKey: NSFilePosixPermissions] unsignedLongValue];	
+				newperms = [self getPermissions: oldperms];			
+				[attrs setObject: [NSNumber numberWithInt: newperms] forKey: NSFilePosixPermissions];
+				[fm changeFileAttributes: attrs atPath: fpath];
+        RELEASE (attrs);
         
         RELEASE (arp);
       }
@@ -428,11 +431,6 @@ static BOOL sizeStop = NO;
 			[self setPermissions: 0 isActive: YES];
 
 		} else {
-			oldperms = [[attributes objectForKey: NSFilePosixPermissions] unsignedLongValue];
-			newperms = [self getPermissions: oldperms];		
-			attrs = [attributes mutableCopy];
-			[attrs setObject: [NSNumber numberWithInt: newperms] forKey: NSFilePosixPermissions];
-			[fm changeFileAttributes: attrs atPath: currentPath];	
 			ASSIGN (attributes, [fm fileAttributesAtPath: currentPath traverseLink: NO]);	
 			newperms = [[attributes objectForKey: NSFilePosixPermissions] unsignedLongValue];				
 			[self setPermissions: newperms isActive: YES];
@@ -440,41 +438,32 @@ static BOOL sizeStop = NO;
 	
 	} else {
 		for (i = 0; i < [insppaths count]; i++) {
-			path = [insppaths objectAtIndex: i];
+			path = [insppaths objectAtIndex: i];			
+ 			attrs = [[fm fileAttributesAtPath: path traverseLink: NO] mutableCopy];
+			oldperms = [[attrs objectForKey: NSFilePosixPermissions] unsignedLongValue];	
+			newperms = [self getPermissions: oldperms];			
+			[attrs setObject: [NSNumber numberWithInt: newperms] forKey: NSFilePosixPermissions];
+			[fm changeFileAttributes: attrs atPath: path];	
+      RELEASE (attrs);			
+
 			[fm fileExistsAtPath: path isDirectory: &isdir];
-			
-			if ((recursive == YES) && (isdir == YES)) {
+     
+			if (isdir && recursive) {
 				enumerator = [fm enumeratorAtPath: path];
         
-        while (1) {
+        while ((fpath = [enumerator nextObject])) {
           CREATE_AUTORELEASE_POOL(arp);  
 
-          fpath = [enumerator nextObject];
-
-          if (fpath) {
-					  fpath = [path stringByAppendingPathComponent: fpath];
-					  attrs = [[fm fileAttributesAtPath: fpath traverseLink: NO] mutableCopy];
-					  if (attrs) {			
-						  oldperms = [[attrs objectForKey: NSFilePosixPermissions] unsignedLongValue];	
-						  newperms = [self getPermissions: oldperms];			
-						  [attrs setObject: [NSNumber numberWithInt: newperms] forKey: NSFilePosixPermissions];
-						  [fm changeFileAttributes: attrs atPath: fpath];
-					  }
-
-          } else {
-            RELEASE (arp);
-            break;
-          }
+					fpath = [path stringByAppendingPathComponent: fpath];
+					attrs = [[fm fileAttributesAtPath: fpath traverseLink: NO] mutableCopy];
+					oldperms = [[attrs objectForKey: NSFilePosixPermissions] unsignedLongValue];	
+					newperms = [self getPermissions: oldperms];			
+					[attrs setObject: [NSNumber numberWithInt: newperms] forKey: NSFilePosixPermissions];
+					[fm changeFileAttributes: attrs atPath: fpath];
+					RELEASE (attrs);
 
           RELEASE (arp);
         }
-        
-			} else {
-				attrs = [[fm fileAttributesAtPath: path traverseLink: NO] mutableCopy];
-				oldperms = [[attrs objectForKey: NSFilePosixPermissions] unsignedLongValue];	
-				newperms = [self getPermissions: oldperms];			
-				[attrs setObject: [NSNumber numberWithInt: newperms] forKey: NSFilePosixPermissions];
-				[fm changeFileAttributes: attrs atPath: path];				
 			}
 		}
 		

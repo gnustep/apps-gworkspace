@@ -5,7 +5,8 @@
 	    "permsButtonsAction:",
 	    "changePermissions:",
 	    "revertToOldPermissions:",
-	    "calculateSizes:"
+	    "calculateSizes:",
+	    "insideButtonAction:"
 	);
 	Outlets = (
 	    win,
@@ -48,15 +49,16 @@
     };
     FirstResponder = {
 	Actions = (
-	    "orderFrontFontPanel:",
-	    "closeMainWin:",
-	    "showInfo:",
-	    "okLoginAction:",
-	    "computeSize:",
-	    "permsButtonsAction:",
+	    "calculateSizes:",
 	    "changePermissions:",
+	    "closeMainWin:",
+	    "computeSize:",
+	    "insideButtonAction:",
+	    "okLoginAction:",
+	    "orderFrontFontPanel:",
+	    "permsButtonsAction:",
 	    "revertToOldPermissions:",
-	    "calculateSizes:"
+	    "showInfo:"
 	);
 	Super = NSObject;
     };
