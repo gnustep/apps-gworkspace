@@ -98,6 +98,8 @@
 
 @interface GWViewerIconsPath (NodeRepContainer)
 
+- (FSNode *)baseNode;
+
 - (id)repOfSubnode:(FSNode *)anode;
 - (id)repOfSubnodePath:(NSString *)apath;
 

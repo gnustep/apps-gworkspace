@@ -403,6 +403,11 @@
 
 @implementation GWViewerIconsPath (NodeRepContainer)
 
+- (FSNode *)baseNode
+{
+  return [viewer baseNode];  
+}
+
 - (id)repOfSubnode:(FSNode *)anode
 {
   int i;

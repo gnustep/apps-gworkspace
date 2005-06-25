@@ -1167,11 +1167,20 @@ static NSImage *branchImage;
   onSelf = NO;
 	
   if (selection || isLocked || ([node isDirectory] == NO) 
-            || ([node isPackage] && ([node isApplication] == NO))
             || (([node isWritable] == NO) && ([node isApplication] == NO))) {
     return NSDragOperationNone;
   }
   	
+  if ([node isPackage] && ([node isApplication] == NO)) {
+    if ([container respondsToSelector: @selector(baseNode)]) { 
+      if ([node isEqual: [container baseNode]] == NO) {
+        return NSDragOperationNone;
+      }
+    } else {
+      return NSDragOperationNone;
+    }
+  }
+    
 	pb = [sender draggingPasteboard];
   sourcePaths = nil;
   
@@ -1179,14 +1188,14 @@ static NSImage *branchImage;
     sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
        
   } else if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"]) {
-    if ([node isApplication] == NO) {
+    if ([node isPackage] == NO) {
       NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"]; 
       NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
 
       sourcePaths = [pbDict objectForKey: @"paths"];
     }
   } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {
-    if ([node isApplication] == NO) {
+    if ([node isPackage] == NO) {
       NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
       NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
     
@@ -1247,32 +1256,52 @@ static NSImage *branchImage;
   }
 
   if ([node isApplication]) {
-    for (i = 0; i < count; i++) {
-      CREATE_AUTORELEASE_POOL(arp);
-      FSNode *nd = [FSNode nodeWithPath: [sourcePaths objectAtIndex: i]];
-      
-      if (([nd isPlain] == NO) && ([nd isPackage] == NO)) {
+    if (([container respondsToSelector: @selector(baseNode)] == NO)
+                        || ([node isEqual: [container baseNode]] == NO)) { 
+      for (i = 0; i < count; i++) {
+        CREATE_AUTORELEASE_POOL(arp);
+        FSNode *nd = [FSNode nodeWithPath: [sourcePaths objectAtIndex: i]];
+
+        if (([nd isPlain] == NO) && ([nd isPackage] == NO)) {
+          RELEASE (arp);
+          return NSDragOperationNone;
+        }
         RELEASE (arp);
-        return NSDragOperationNone;
       }
-      RELEASE (arp);
+      
+    } else if ([node isEqual: [container baseNode]] == NO) {
+      return NSDragOperationNone;
     }
   }
 
   isDragTarget = YES;
   forceCopy = NO;
   
+  onApplication = ([node isApplication]
+                      && [container respondsToSelector: @selector(baseNode)]
+                                      && [node isEqual: [container baseNode]]);   
+  
 	sourceDragMask = [sender draggingSourceOperationMask];
 
 	if (sourceDragMask == NSDragOperationCopy) {
-		return ([node isApplication] ? NSDragOperationMove : NSDragOperationCopy);
+    if ([node isApplication]) {
+      return (onApplication ? NSDragOperationCopy : NSDragOperationMove);
+    } else {
+      return NSDragOperationCopy;
+    }
+    
 	} else if (sourceDragMask == NSDragOperationLink) {
-		return ([node isApplication] ? NSDragOperationMove : NSDragOperationLink);
+    if ([node isApplication]) {
+      return (onApplication ? NSDragOperationLink : NSDragOperationMove);
+    } else {
+      return NSDragOperationLink;
+    }
+  
 	} else {  
     if ([[NSFileManager defaultManager] isWritableFileAtPath: fromPath]
-                                                    || [node isApplication]) {
+                          || ([node isApplication] && (onApplication == NO))) {
       return NSDragOperationAll;			
-    } else if ([node isApplication] == NO) {
+    } else if (([node isApplication] == NO) || onApplication) {
       forceCopy = YES;
 			return NSDragOperationCopy;			
     }
@@ -1307,9 +1336,19 @@ static NSImage *branchImage;
   if (isDragTarget == NO) {
     return NSDragOperationNone;
   } else if (sourceDragMask == NSDragOperationCopy) {
-		return ([node isApplication] ? NSDragOperationMove : NSDragOperationCopy);
+    if ([node isApplication]) {
+      return (onApplication ? NSDragOperationCopy : NSDragOperationMove);
+    } else {
+      return NSDragOperationCopy;
+    }
+    
 	} else if (sourceDragMask == NSDragOperationLink) {
-		return ([node isApplication] ? NSDragOperationMove : NSDragOperationLink);
+    if ([node isApplication]) {
+      return (onApplication ? NSDragOperationLink : NSDragOperationMove);
+    } else {
+      return NSDragOperationLink;
+    }
+
 	} else {
 		return forceCopy ? NSDragOperationCopy : NSDragOperationAll;
 	}
@@ -1369,7 +1408,7 @@ static NSImage *branchImage;
 	sourceDragMask = [sender draggingSourceOperationMask];
   pb = [sender draggingPasteboard];
 
-  if ([node isApplication] == NO) {    
+  if ([node isPackage] == NO) {    
     if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"]) {  
       NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"]; 
 
@@ -1388,7 +1427,7 @@ static NSImage *branchImage;
     
   sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
 
-  if ([node isApplication] == NO) {
+  if (([node isApplication] == NO) || onApplication) {
     source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
     trashPath = [desktopApp trashPath];
 
