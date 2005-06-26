@@ -134,6 +134,11 @@
 
 - (void)checkBegin;
 
+- (void)print;
+
+- (void)printFromNode:(DBKBTreeNode *)node
+                depth:(int)depth;
+
 @end
 
 @protocol DBKBTreeDelegate

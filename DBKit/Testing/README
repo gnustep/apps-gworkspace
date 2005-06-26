@@ -1,0 +1,3 @@
+
+Before compiling the test you must edit "dbpath.h"
+to set the path where the database will be created.
