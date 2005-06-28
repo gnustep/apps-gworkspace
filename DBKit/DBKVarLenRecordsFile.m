@@ -23,6 +23,9 @@
  */
 
 #include "DBKVarLenRecordsFile.h"
+#include "DBKBTreeNode.h"
+
+#define FIRST_OFFSET 512
 
 @implementation	DBKVarLenRecordsFile
 
@@ -46,9 +49,15 @@
   self = [super init];
   
   if (self) {
+    NSMutableData *data = [NSMutableData dataWithCapacity: 1];
     NSFileManager *fm = [NSFileManager defaultManager];
     BOOL exists, isdir;  
-  
+
+    cacheDict = [NSMutableDictionary new];
+    offsets = [NSMutableArray new];
+    maxlen = len;
+    autoflush = YES;
+    
     exists = [fm fileExistsAtPath: path isDirectory: &isdir];
 
     if (exists == NO) {
@@ -87,23 +96,22 @@
         }
       }
 
-      handle = [NSFileHandle fileHandleForUpdatingAtPath: recordsPath];
-      RETAIN (handle);
-      [handle seekToEndOfFile];
-      eof = [handle offsetInFile];
-
       ulen = sizeof(unsigned);
       llen = sizeof(unsigned long);
+
+      handle = [NSFileHandle fileHandleForUpdatingAtPath: recordsPath];
+      RETAIN (handle);
+      
+      [data setLength: FIRST_OFFSET];
+      [handle writeData: data];
+      
+      [handle seekToEndOfFile];
+      eof = [handle offsetInFile];
 
       freeOffsetsTree = [[DBKBTree alloc] initWithPath: freePath 
                                                  order: 16 
                                               delegate: self];
     }
-
-    cacheDict = [NSMutableDictionary new];
-    offsets = [NSMutableArray new];
-    maxlen = len;
-    autoflush = YES;
   }
   
   return self;
@@ -163,34 +171,104 @@
   
   if (data == nil) {
     unsigned long ofst = [offset unsignedLongValue];
-    NSData *lndata;
     unsigned datalen;
   
     [handle seekToFileOffset: ofst];
-    lndata = [handle readDataOfLength: ulen];
-    [lndata getBytes: &datalen range: NSMakeRange(0, ulen)];
-
-    [handle seekToFileOffset: (ofst + ulen)];
+    data = [handle readDataOfLength: ulen];
+    [data getBytes: &datalen range: NSMakeRange(0, ulen)];
     data = [handle readDataOfLength: datalen];
   } 
 
   return data;
 }
 
+- (NSNumber *)writeData:(NSData *)data
+{
+  NSNumber *offset = [self offsetForNewData: data];
+
+  [self writeData: data atOffset: offset];
+    
+  return offset;
+}
+
 - (void)writeData:(NSData *)data
          atOffset:(NSNumber *)offset
 {
   int index = [self insertionIndexForOffset: offset];
-
-  [cacheDict setObject: data forKey: offset];
   
   if (index != -1) {
     [offsets insertObject: offset atIndex: index];
   }
 
-  if (([cacheDict count] >= maxlen) && autoflush) {
+  [cacheDict setObject: data forKey: offset];
+
+  if (([cacheDict count] > maxlen) && autoflush) {
     [self flush];
   }
+}
+
+- (void)deleteDataAtOffset:(NSNumber *)offset
+{
+  NSData *data = [cacheDict objectForKey: offset];
+  
+  if (data) {  
+    [cacheDict removeObjectForKey: offset];
+    [offsets removeObject: offset];
+
+  } else {
+    CREATE_AUTORELEASE_POOL(arp);
+    unsigned long ofst = [offset unsignedLongValue];
+    NSData *lndata;
+    unsigned datalen;
+    DBKBFreeNodeEntry *entry;    
+    
+    [handle seekToFileOffset: ofst];
+    lndata = [handle readDataOfLength: ulen];
+    [lndata getBytes: &datalen range: NSMakeRange(0, ulen)];
+            
+    entry = [DBKBFreeNodeEntry entryWithLength: datalen atOffset: ofst];
+  
+    [freeOffsetsTree begin];
+    [freeOffsetsTree insertKey: entry];  
+    [freeOffsetsTree end];  
+        
+    RELEASE (arp);
+  }
+}
+
+- (NSNumber *)offsetForNewData:(NSData *)data
+{
+  CREATE_AUTORELEASE_POOL(arp);
+  DBKBFreeNodeEntry *entry;
+  NSNumber *offset;
+
+  [freeOffsetsTree begin];
+  entry = [self freeOffsetForData: data];
+  
+  if (entry) {  
+    offset = RETAIN ([entry offsetNum]);  
+    [freeOffsetsTree deleteKey: entry];
+    
+  } else {
+    unsigned count = [offsets count];
+    unsigned long coffs = 0;
+  
+    if (count > 0) {
+      NSNumber *key = [offsets objectAtIndex: (count - 1)];
+      NSData *dictData = [cacheDict objectForKey: key];
+
+      coffs = [key unsignedLongValue] + ulen + [dictData length];
+    }
+    
+    offset = [NSNumber numberWithUnsignedLong: ((coffs > eof) ? coffs : eof)];
+    RETAIN (offset);
+  }
+  
+  [freeOffsetsTree end];  
+  
+  RELEASE (arp);
+    
+  return [offset autorelease];
 }
 
 - (int)insertionIndexForOffset:(NSNumber *)offset
@@ -234,54 +312,22 @@
   return ins;  
 }
 
-- (NSNumber *)offsetForNewData:(NSData *)data
+- (DBKBFreeNodeEntry *)freeOffsetForData:(NSData *)data
 {
-  CREATE_AUTORELEASE_POOL(arp);
   DBKBFreeNodeEntry *entry = [DBKBFreeNodeEntry entryWithLength: [data length] atOffset: 0];
-  NSNumber *offset;
-
-  [freeOffsetsTree begin];
-  entry = [freeOffsetsTree firstKeyGreaterThenKey: entry];
-  
-  if (entry) {  
-    offset = RETAIN ([entry offsetNum]);  
-    [freeOffsetsTree deleteKey: entry];
+  DBKBTreeNode *node;
+  BOOL exists;
+  int index;
     
+  node = [freeOffsetsTree nodeOfKey: entry getIndex: &index didExist: &exists];
+  
+  if (node && [[node keys] count]) {
+    entry = [node successorKeyInNode: &node forKeyAtIndex: index];
   } else {
-    unsigned count = [offsets count];
-    unsigned long coffs = 0;
-  
-    if (count > 0) {
-      NSNumber *key = [offsets objectAtIndex: (count - 1)];
-      NSData *dictData = [cacheDict objectForKey: key];
-
-      coffs = [key unsignedLongValue] + ulen + [dictData length];
-    }
-    
-    offset = [NSNumber numberWithUnsignedLong: ((coffs > eof) ? coffs : eof)];
-    RETAIN (offset);
+    DESTROY (entry);
   }
   
-  [freeOffsetsTree end];  
-  
-  RELEASE (arp);
-    
-  return [offset autorelease];
-}
-
-- (void)deleteData:(NSData *)data
-          atOffset:(NSNumber *)offset
-{
-  CREATE_AUTORELEASE_POOL(arp);
-  unsigned long ofst = [offset unsignedLongValue];
-  DBKBFreeNodeEntry *entry = [DBKBFreeNodeEntry entryWithLength: [data length] 
-                                                       atOffset: ofst];
-
-  [freeOffsetsTree begin];
-  [freeOffsetsTree insertKey: entry];  
-  [freeOffsetsTree end];  
-
-  RELEASE (arp);
+  return entry;
 }
 
 

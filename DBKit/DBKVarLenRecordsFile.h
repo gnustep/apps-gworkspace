@@ -28,6 +28,8 @@
 #include <Foundation/Foundation.h>
 #include "DBKBTree.h"
 
+@class DBKBFreeNodeEntry;
+
 @interface DBKVarLenRecordsFile: NSObject <DBKBTreeDelegate>
 {  
   NSMutableDictionary *cacheDict;
@@ -56,15 +58,19 @@
 
 - (NSData *)dataAtOffset:(NSNumber *)offset;
 
+- (NSNumber *)writeData:(NSData *)data;
+
 - (void)writeData:(NSData *)data
          atOffset:(NSNumber *)offset;
 
-- (int)insertionIndexForOffset:(NSNumber *)offset;
+- (void)deleteDataAtOffset:(NSNumber *)offset;
 
 - (NSNumber *)offsetForNewData:(NSData *)data;
 
-- (void)deleteData:(NSData *)data
-          atOffset:(NSNumber *)offset;
+- (int)insertionIndexForOffset:(NSNumber *)offset;
+
+- (DBKBFreeNodeEntry *)freeOffsetForData:(NSData *)data;
+
 @end
 
 

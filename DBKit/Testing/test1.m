@@ -1,4 +1,5 @@
 #include <DBKit/DBKBTree.h>
+#include "test.h"
 
 void test1(DBKBTree *tree)
 {
@@ -20,7 +21,7 @@ void test1(DBKBTree *tree)
   [tree insertKey: [NSNumber numberWithUnsignedLong: 752]];
 
   NSLog(@"Show tree structure");
-  [tree print];
+  printTree(tree);
 
   NSLog(@"search for item 122 in tree");
   node = [tree nodeOfKey: [NSNumber numberWithUnsignedLong: 122] 

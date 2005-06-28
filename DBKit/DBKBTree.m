@@ -429,41 +429,6 @@
   return [keys autorelease];
 }
 
-- (id)firstKeyGreaterThenKey:(id)akey
-{
-  CREATE_AUTORELEASE_POOL(pool);
-  DBKBTreeNode *node;
-  id key;
-  BOOL exists;
-  int index;
-    
-  [self checkBegin];
-  
-  key = akey;
-  node = [self nodeOfKey: key getIndex: &index didExist: &exists];
-
-  if (exists == NO) {
-    key = [node predecessorKeyInNode: &node forKeyAtIndex: index];
-    
-    if (key == nil) {
-      key = [node minKeyInSubnode: &node];
-    } else {
-      key = nil;
-    }
-  } else {
-    key = nil;
-  }
-  
-  if (key == nil) {
-    key = [node successorKeyInNode: &node forKeyAtIndex: index];
-  }
-  
-  TEST_RETAIN (key);
-  RELEASE (pool);
-  
-  return TEST_AUTORELEASE (key);
-}
-
 - (BOOL)replaceKey:(id)key
            withKey:(id)newkey
 {
@@ -779,45 +744,6 @@
   if (begin == NO) {
     [NSException raise: NSInternalInconsistencyException
 		            format: @"begin not called!"];     
-  }
-}
-
-- (void)print
-{
-  [self printFromNode: root depth: 0];
-}
-
-- (void)printFromNode:(DBKBTreeNode *)node
-                depth:(int)depth
-{
-  int kcount;
-  int index = -1;
-  int i, j;
-  
-  if ([node isLoaded] == NO) {
-    [node loadNodeData];
-  }
-  
-  kcount = [[node keys] count];
-  
-  if ([node parent] != nil) {
-    index = [[node parent] indexOfSubnode: node];
-  }
-  
-  if ([node isLeaf] == NO) {
-    [self printFromNode: [[node subnodes] objectAtIndex: kcount] depth: depth + 1];
-  }
-
-  for (i = kcount - 1; i >= 0; i--) {
-    for(j = 0; j < depth; j++) {
-			printf("\t");
-		}
-
-		printf("      %d (%d)\n", [[[node keys] objectAtIndex: i] intValue], index);
-   
-    if ([node isLeaf] == NO) {
-      [self printFromNode: [[node subnodes] objectAtIndex: i] depth: depth + 1];
-    }
   }
 }
 

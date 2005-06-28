@@ -93,8 +93,6 @@
 - (NSArray *)keysGreaterThenKey:(id)akey
                andLesserThenKey:(id)bkey;
 
-- (id)firstKeyGreaterThenKey:(id)akey;
-
 - (BOOL)replaceKey:(id)key
            withKey:(id)newkey;
                
@@ -133,11 +131,6 @@
 - (unsigned)order;
 
 - (void)checkBegin;
-
-- (void)print;
-
-- (void)printFromNode:(DBKBTreeNode *)node
-                depth:(int)depth;
 
 @end
 

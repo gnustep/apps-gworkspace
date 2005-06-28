@@ -1,4 +1,5 @@
 #include <DBKit/DBKBTree.h>
+#include "test.h"
 
 void test6(DBKBTree *tree)
 {
@@ -9991,7 +9992,7 @@ void test6(DBKBTree *tree)
   [tree deleteKey: [NSNumber numberWithUnsignedLong: 99999]];
 
   NSLog(@"Show tree structure");
-  [tree print];
+  printTree(tree);
 
   NSLog(@"test 6 passed\n\n");
 }
