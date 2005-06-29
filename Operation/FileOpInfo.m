@@ -146,30 +146,52 @@ static NSString *nibName = @"FileOperationWin";
   if (confirm) {    
 	  NSString *title;
 	  NSString *msg, *msg1, *msg2;
+    NSString *items;
 
+    if ([files count] > 1) {
+      items = [NSString stringWithFormat: @"%i %@", [files count], NSLocalizedString(@"items", @"")];
+    } else {
+      items = NSLocalizedString(@"one item", @"");
+    }
+    
 	  if ([type isEqual: @"NSWorkspaceMoveOperation"]) {
 		  title = NSLocalizedString(@"Move", @"");
-		  msg1 = NSLocalizedString(@"Move from: ", @"");
+      msg1 = [NSString stringWithFormat: @"%@ %@ %@: ", 
+                                            NSLocalizedString(@"Move", @""), 
+                                            items, 
+                                            NSLocalizedString(@"from", @"")];
 		  msg2 = NSLocalizedString(@"\nto: ", @"");
 		  msg = [NSString stringWithFormat: @"%@%@%@%@?", msg1, source, msg2, destination];
-	  } else if ([type isEqual: @"NSWorkspaceCopyOperation"]) {
+    } else if ([type isEqual: @"NSWorkspaceCopyOperation"]) {
 		  title = NSLocalizedString(@"Copy", @"");
-		  msg1 = NSLocalizedString(@"Copy from: ", @"");
+      msg1 = [NSString stringWithFormat: @"%@ %@ %@: ", 
+                                            NSLocalizedString(@"Copy", @""), 
+                                            items, 
+                                            NSLocalizedString(@"from", @"")];
 		  msg2 = NSLocalizedString(@"\nto: ", @"");
 		  msg = [NSString stringWithFormat: @"%@%@%@%@?", msg1, source, msg2, destination];
 	  } else if ([type isEqual: @"NSWorkspaceLinkOperation"]) {
 		  title = NSLocalizedString(@"Link", @"");
-		  msg1 = NSLocalizedString(@"Link ", @"");
+      msg1 = [NSString stringWithFormat: @"%@ %@ %@: ", 
+                                            NSLocalizedString(@"Link", @""), 
+                                            items, 
+                                            NSLocalizedString(@"from", @"")];
 		  msg2 = NSLocalizedString(@"\nto: ", @"");
 		  msg = [NSString stringWithFormat: @"%@%@%@%@?", msg1, source, msg2, destination];
 	  } else if ([type isEqual: @"NSWorkspaceRecycleOperation"]) {
 		  title = NSLocalizedString(@"Recycler", @"");
-		  msg1 = NSLocalizedString(@"Move from: ", @"");
+      msg1 = [NSString stringWithFormat: @"%@ %@ %@: ", 
+                                            NSLocalizedString(@"Move", @""), 
+                                            items, 
+                                            NSLocalizedString(@"from", @"")];
 		  msg2 = NSLocalizedString(@"\nto the Recycler", @"");
 		  msg = [NSString stringWithFormat: @"%@%@%@?", msg1, source, msg2];
 	  } else if ([type isEqual: @"GWorkspaceRecycleOutOperation"]) {
 		  title = NSLocalizedString(@"Recycler", @"");
-		  msg1 = NSLocalizedString(@"Move from the Recycler ", @"");
+      msg1 = [NSString stringWithFormat: @"%@ %@ %@ ", 
+                                            NSLocalizedString(@"Move", @""), 
+                                            items, 
+                                            NSLocalizedString(@"from the Recycler", @"")];
 		  msg2 = NSLocalizedString(@"\nto: ", @"");
 		  msg = [NSString stringWithFormat: @"%@%@%@?", msg1, msg2, destination];
 	  } else if ([type isEqual: @"GWorkspaceEmptyRecyclerOperation"]) {
