@@ -52,11 +52,6 @@
     NSMutableData *data = [NSMutableData dataWithCapacity: 1];
     NSFileManager *fm = [NSFileManager defaultManager];
     BOOL exists, isdir;  
-
-    cacheDict = [NSMutableDictionary new];
-    offsets = [NSMutableArray new];
-    maxlen = len;
-    autoflush = YES;
     
     exists = [fm fileExistsAtPath: path isDirectory: &isdir];
 
@@ -95,6 +90,11 @@
           return self;
         }
       }
+
+      cacheDict = [NSMutableDictionary new];
+      offsets = [NSMutableArray new];
+      maxlen = len;
+      autoflush = YES;
 
       ulen = sizeof(unsigned);
       llen = sizeof(unsigned long);
@@ -238,18 +238,9 @@
 
 - (NSNumber *)offsetForNewData:(NSData *)data
 {
-  CREATE_AUTORELEASE_POOL(arp);
-  DBKBFreeNodeEntry *entry;
-  NSNumber *offset;
-
-  [freeOffsetsTree begin];
-  entry = [self freeOffsetForData: data];
+  NSNumber *offset = [self freeOffsetForData: data];
   
-  if (entry) {  
-    offset = RETAIN ([entry offsetNum]);  
-    [freeOffsetsTree deleteKey: entry];
-    
-  } else {
+  if (offset == nil) {  
     unsigned count = [offsets count];
     unsigned long coffs = 0;
   
@@ -261,14 +252,9 @@
     }
     
     offset = [NSNumber numberWithUnsignedLong: ((coffs > eof) ? coffs : eof)];
-    RETAIN (offset);
   }
   
-  [freeOffsetsTree end];  
-  
-  RELEASE (arp);
-    
-  return [offset autorelease];
+  return offset;
 }
 
 - (int)insertionIndexForOffset:(NSNumber *)offset
@@ -312,22 +298,34 @@
   return ins;  
 }
 
-- (DBKBFreeNodeEntry *)freeOffsetForData:(NSData *)data
+- (NSNumber *)freeOffsetForData:(NSData *)data
 {
+  CREATE_AUTORELEASE_POOL(arp);
   DBKBFreeNodeEntry *entry = [DBKBFreeNodeEntry entryWithLength: [data length] atOffset: 0];
+  DBKBFreeNodeEntry *freeEntry = nil;
+  NSNumber *offset = nil;
   DBKBTreeNode *node;
   BOOL exists;
   int index;
+  
+  [freeOffsetsTree begin];
     
   node = [freeOffsetsTree nodeOfKey: entry getIndex: &index didExist: &exists];
   
   if (node && [[node keys] count]) {
-    entry = [node successorKeyInNode: &node forKeyAtIndex: index];
-  } else {
-    DESTROY (entry);
+    freeEntry = [node successorKeyInNode: &node forKeyAtIndex: index];
+  } 
+
+  if (freeEntry) {
+    offset = RETAIN ([freeEntry offsetNum]);
+    [freeOffsetsTree deleteKey: freeEntry];
   }
+
+  [freeOffsetsTree end];
   
-  return entry;
+  RELEASE (arp);
+  
+  return TEST_AUTORELEASE (offset);
 }
 
 

@@ -692,6 +692,14 @@
   }
 }
 
+- (void)windowWillMiniaturize:(NSNotification *)aNotification
+{
+  NSImage *image = [[FSNodeRep sharedInstance] iconOfSize: 48 forNode: baseNode];
+
+  [vwrwin setMiniwindowImage: image];
+  [vwrwin setMiniwindowTitle: [baseNode name]];
+}
+
 - (void)windowDidResize:(NSNotification *)aNotification
 {
   if (nodeView) {

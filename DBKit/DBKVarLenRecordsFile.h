@@ -69,7 +69,7 @@
 
 - (int)insertionIndexForOffset:(NSNumber *)offset;
 
-- (DBKBFreeNodeEntry *)freeOffsetForData:(NSData *)data;
+- (NSNumber *)freeOffsetForData:(NSData *)data;
 
 @end
 

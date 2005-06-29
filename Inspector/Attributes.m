@@ -789,8 +789,15 @@ static BOOL sizeStop = NO;
     }
     
 		path = [paths objectAtIndex: i];
-		[fm fileExistsAtPath: path isDirectory: &isdir];
 		 
+		fileAttrs = [fm fileAttributesAtPath: path traverseLink: NO];
+		if (fileAttrs) {
+			fsize = [[fileAttrs objectForKey: NSFileSize] unsignedLongLongValue];
+			dirsize += fsize;
+		}
+     
+		[fm fileExistsAtPath: path isDirectory: &isdir];
+          
 		if (isdir) {
 			NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: path];
 			
@@ -820,13 +827,6 @@ static BOOL sizeStop = NO;
       
         RELEASE (arp2);
       }
-      
-		} else {
-			fileAttrs = [fm fileAttributesAtPath: path traverseLink: NO];
-			if (fileAttrs) {
-				fsize = [[fileAttrs objectForKey: NSFileSize] unsignedLongLongValue];
-				dirsize += fsize;
-			}
 		}
     
     RELEASE (arp1);
