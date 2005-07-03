@@ -294,12 +294,32 @@
 - (void)showSelection:(NSArray *)selection
 {
   if (selection && [selection count]) {
+    FSNode *node = [selection objectAtIndex: 0];
     FSNBrowserColumn *bc;
     NSArray *selPaths;
     
     updateViewsLock++;
-
-    [self showSubnode: [selection objectAtIndex: 0]];
+    
+    if ([selection count] > 1) {
+      BOOL alldirs = YES;
+      int i;
+      
+      for (i = 0; i < [selection count]; i++) {
+        FSNode *nd = [selection objectAtIndex: i];  
+        
+        if ([nd isDirectory] == NO) {
+          node = nd;
+          alldirs = NO;
+          break;
+        }
+      }
+    
+      if (alldirs) {
+        node = [FSNode nodeWithPath: [node parentPath]];
+      }
+    }
+    
+    [self showSubnode: node];
 
     bc = [self lastLoadedColumn];
     [bc selectCellsOfNodes: selection sendAction: NO];
@@ -336,6 +356,25 @@
     NSArray *selPaths;
 
     updateViewsLock++;
+
+    if ([selpaths count] > 1) {
+      BOOL alldirs = YES;
+      int i;
+      
+      for (i = 0; i < [selpaths count]; i++) {
+        FSNode *nd = [FSNode nodeWithPath: [selpaths objectAtIndex: i]];
+        
+        if ([nd isDirectory] == NO) {
+          node = nd;
+          alldirs = NO;
+          break;
+        }
+      }
+    
+      if (alldirs) {
+        node = [FSNode nodeWithPath: [node parentPath]];
+      }
+    }
 
     [self showSubnode: node];
 

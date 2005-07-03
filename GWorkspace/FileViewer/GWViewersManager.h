@@ -37,6 +37,7 @@
 @interface GWViewersManager : NSObject
 {
   NSMutableArray *viewers;
+  NSMutableArray *rootViewersKeys;
   BOOL orderingViewers;
   GWorkspace *gworkspace;
   History *historyWindow;
@@ -75,6 +76,8 @@
        showingNode:(FSNode *)node; 
 
 - (id)rootViewer;
+
+- (NSNumber *)nextRootViewerKey;
 
 - (int)typeOfViewerForNode:(FSNode *)node;
 

@@ -85,7 +85,11 @@ static FSNodeRep *shared = nil;
     trashIcon = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
     imagepath = [bundle pathForResource: @"RecyclerFull" ofType: @"tiff"];
     trashFullIcon = [[NSImage alloc] initWithContentsOfFile: imagepath];
-
+    
+    iconsCache = [NSMutableDictionary new];
+    rootPath = path_separator();
+    RETAIN (rootPath);
+    
     thumbnailDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
     thumbnailDir = [thumbnailDir stringByAppendingPathComponent: @"Thumbnails"];
     RETAIN (thumbnailDir);
@@ -193,7 +197,9 @@ static FSNodeRep *shared = nil;
   TEST_RELEASE (extInfoModules);
 	TEST_RELEASE (lockedPaths);
   TEST_RELEASE (volumes);
+  TEST_RELEASE (rootPath);
   TEST_RELEASE (hiddenPaths);
+  TEST_RELEASE (iconsCache);
   TEST_RELEASE (tumbsCache);
   TEST_RELEASE (thumbnailDir);
   TEST_RELEASE (multipleSelIcon);
@@ -256,174 +262,6 @@ static FSNodeRep *shared = nil;
   }
   
   return fnames;
-}
-
-- (NSImage *)iconOfSize:(int)size 
-                forNode:(FSNode *)node
-{
-  NSString *nodepath = [node path];
-  NSImage *icon = nil;
-	NSSize icnsize;
-
-  if (usesThumbnails) {
-    icon = [self thumbnailForPath: nodepath];
-  }
-
-  if (icon == nil) {
-    if (([node isMountPoint] && [volumes containsObject: nodepath])
-                                  || [volumes containsObject: nodepath]) {
-      icon = hardDiskIcon;
-    } else {
-      icon = [ws iconForFile: nodepath];
-    }
-  }
-
-  if (icon == nil) {
-    icon = [NSImage imageNamed: @"Unknown"];
-  }
-  
-  icnsize = [icon size];
-
-  if ((icnsize.width > size) || (icnsize.height > size)) {
-    return [self resizedIcon: icon ofSize: size];
-  }  
-
-  return icon;
-}
-
-- (NSImage *)multipleSelectionIconOfSize:(int)size
-{
-  NSSize icnsize = [multipleSelIcon size];
-
-  if ((icnsize.width > size) || (icnsize.height > size)) {
-    return [self resizedIcon: multipleSelIcon ofSize: size];
-  }  
-  
-  return multipleSelIcon;
-}
-
-- (NSImage *)openFolderIconOfSize:(int)size 
-                          forNode:(FSNode *)node
-{
-  NSString *ipath = [[node path] stringByAppendingPathComponent: @".opendir.tiff"];
-  NSImage *icon = nil;
-
-  if ([fm isReadableFileAtPath: ipath]) {
-    NSImage *img = [[NSImage alloc] initWithContentsOfFile: ipath];
-
-    if (img) {
-      icon = AUTORELEASE (img);
-    } else {
-      if ([node isApplication]) {
-        icon = [self darkerIcon: [self iconOfSize: size forNode: node]];
-      } else {
-   //     icon = openFolderIcon;
-        icon = [self darkerIcon: [self iconOfSize: size forNode: node]];
-      }
-    }      
-  } else {
-    if (([node isMountPoint] && [volumes containsObject: [node path]])
-                                    || [volumes containsObject: [node path]]) {
-      icon = [self darkerIcon: hardDiskIcon];
-    } else if ([node isApplication]) {    
-      icon = [self darkerIcon: [self iconOfSize: size forNode: node]];
-    } else {
-  //    icon = openFolderIcon;
-      icon = [self darkerIcon: [self iconOfSize: size forNode: node]];
-    }
-  }
-
-  if (icon) {
-    NSSize icnsize = [icon size];
-
-    if ((icnsize.width > size) || (icnsize.height > size)) {
-      return [self resizedIcon: icon ofSize: size];
-    }  
-  }
-  
-  return icon;
-}
-
-- (NSImage *)workspaceIconOfSize:(int)size
-{
-  NSSize icnsize = [workspaceIcon size];
-
-  if ((icnsize.width > size) || (icnsize.height > size)) {
-    return [self resizedIcon: workspaceIcon ofSize: size];
-  }  
-  
-  return workspaceIcon;
-}
-
-- (NSImage *)trashIconOfSize:(int)size
-{
-  NSSize icnsize = [trashIcon size];
-
-  if ((icnsize.width > size) || (icnsize.height > size)) {
-    return [self resizedIcon: trashIcon ofSize: size];
-  }  
-  
-  return trashIcon;
-}
-
-- (NSImage *)trashFullIconOfSize:(int)size
-{
-  NSSize icnsize = [trashFullIcon size];
-
-  if ((icnsize.width > size) || (icnsize.height > size)) {
-    return [self resizedIcon: trashFullIcon ofSize: size];
-  }  
-  
-  return trashFullIcon;
-}
-
-- (NSBezierPath *)highlightPathOfSize:(NSSize)size
-{
-  NSSize intsize = NSMakeSize(ceil(size.width), ceil(size.height));
-  NSBezierPath *bpath = [NSBezierPath bezierPath];
-  float clenght = intsize.height / 4;
-  NSPoint p, cp1, cp2;
-  
-  p = NSMakePoint(clenght, 0);
-  [bpath moveToPoint: p];
-
-  p = NSMakePoint(0, clenght);
-  cp1 = NSMakePoint(0, 0);
-  cp2 = NSMakePoint(0, 0);
-  [bpath curveToPoint: p controlPoint1: cp1 controlPoint2: cp2];
-
-  p = NSMakePoint(0, intsize.height - clenght);
-  [bpath lineToPoint: p];
-
-  p = NSMakePoint(clenght, intsize.height);
-  cp1 = NSMakePoint(0, intsize.height);
-  cp2 = NSMakePoint(0, intsize.height);
-  [bpath curveToPoint: p controlPoint1: cp1 controlPoint2: cp2];
-
-  p = NSMakePoint(intsize.width - clenght, intsize.height);
-  [bpath lineToPoint: p];
-
-  p = NSMakePoint(intsize.width, intsize.height - clenght);
-  cp1 = NSMakePoint(intsize.width, intsize.height);
-  cp2 = NSMakePoint(intsize.width, intsize.height);
-  [bpath curveToPoint: p controlPoint1: cp1 controlPoint2: cp2];
-
-  p = NSMakePoint(intsize.width, clenght);
-  [bpath lineToPoint: p];
-
-  p = NSMakePoint(intsize.width - clenght, 0);
-  cp1 = NSMakePoint(intsize.width, 0);
-  cp2 = NSMakePoint(intsize.width, 0);
-  [bpath curveToPoint: p controlPoint1: cp1 controlPoint2: cp2];
-
-  [bpath closePath];
-  
-  return bpath;
-}
-
-- (float)highlightHeightFactor
-{
-  return 0.8125;
 }
 
 - (int)labelMargin

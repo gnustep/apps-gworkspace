@@ -337,7 +337,9 @@ typedef enum FSNSelectionMask {
 	NSMutableArray *lockedPaths;
   NSArray *hiddenPaths;
   NSMutableSet *volumes;
-  
+  NSString *rootPath;
+    
+  NSMutableDictionary *iconsCache;
   NSMutableDictionary *tumbsCache;
   NSString *thumbnailDir;
   BOOL usesThumbnails;  
@@ -362,24 +364,6 @@ typedef enum FSNSelectionMask {
 + (FSNodeRep *)sharedInstance;
 
 - (NSArray *)directoryContentsAtPath:(NSString *)path;
-
-- (NSImage *)iconOfSize:(int)size 
-                forNode:(FSNode *)node;
-
-- (NSImage *)multipleSelectionIconOfSize:(int)size;
-
-- (NSImage *)openFolderIconOfSize:(int)size 
-                          forNode:(FSNode *)node;
-
-- (NSImage *)workspaceIconOfSize:(int)size;
-
-- (NSImage *)trashIconOfSize:(int)size;
-
-- (NSImage *)trashFullIconOfSize:(int)size;
-
-- (NSBezierPath *)highlightPathOfSize:(NSSize)size;
-
-- (float)highlightHeightFactor;
 
 - (int)labelMargin;
 
@@ -448,6 +432,31 @@ typedef enum FSNSelectionMask {
 
 
 @interface FSNodeRep (Icons)
+
+- (NSImage *)iconOfSize:(int)size 
+                forNode:(FSNode *)node;
+
+- (NSImage *)cachedIconOfSize:(int)size 
+                       forKey:(NSString *)key;
+
+- (NSImage *)cachedIconOfSize:(int)size
+                       forKey:(NSString *)key
+                  addBaseIcon:(NSImage *)baseIcon;
+
+- (NSImage *)multipleSelectionIconOfSize:(int)size;
+
+- (NSImage *)openFolderIconOfSize:(int)size 
+                          forNode:(FSNode *)node;
+
+- (NSImage *)workspaceIconOfSize:(int)size;
+
+- (NSImage *)trashIconOfSize:(int)size;
+
+- (NSImage *)trashFullIconOfSize:(int)size;
+
+- (NSBezierPath *)highlightPathOfSize:(NSSize)size;
+
+- (float)highlightHeightFactor;
 
 - (NSImage *)resizedIcon:(NSImage *)icon 
                   ofSize:(int)size;

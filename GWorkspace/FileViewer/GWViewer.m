@@ -59,6 +59,7 @@
 
   RELEASE (baseNode);
   TEST_RELEASE (lastSelection);
+  TEST_RELEASE (rootViewerKey);
   RELEASE (watchedNodes);
   RELEASE (vwrwin);
   RELEASE (viewType);
@@ -74,12 +75,12 @@
   self = [super init];
   
   if (self) {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	      
-    NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", [node path]];
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
     NSDictionary *viewerPrefs = nil;
+    NSString *prefsname;
     id defEntry;
     NSRect r;
-    
+        
     ASSIGN (baseNode, [FSNode nodeWithPath: [node path]]);
     lastSelection = nil;
     history = [NSMutableArray new];
@@ -95,11 +96,28 @@
     } else {
       resizeIncrement = DEFAULT_INCR;
     }
-
+    
     rootviewer = ([[baseNode path] isEqual: path_separator()]
                 && ([[manager viewersForBaseNode: baseNode] count] == 0));
     
-    if ([baseNode isWritable] && (rootviewer == NO)) {
+    if ((rootviewer == NO) && [[baseNode path] isEqual: path_separator()]) {
+      rootViewerKey = [manager nextRootViewerKey];
+      
+      if (rootViewerKey == nil) {
+        ASSIGN (rootViewerKey, [NSNumber numberWithUnsignedLong: (unsigned long)self]);
+      } else {
+        RETAIN (rootViewerKey);
+      }
+      
+      prefsname = [NSString stringWithFormat: @"viewer_at_%@_%i", 
+                            [node path], [rootViewerKey unsignedLongValue]];
+
+    } else {
+      rootViewerKey = nil;
+      prefsname = [NSString stringWithFormat: @"viewer_at_%@", [node path]];
+    }
+    
+    if ([baseNode isWritable] && (rootviewer == NO) && (rootViewerKey == nil)) {
 		  NSString *dictPath = [[baseNode path] stringByAppendingPathComponent: @".gwdir"];
 
       if ([[NSFileManager defaultManager] fileExistsAtPath: dictPath]) {
@@ -174,7 +192,11 @@
     if (rootviewer) {
       [vwrwin setTitle: NSLocalizedString(@"File Viewer", @"")];
     } else {
-      [vwrwin setTitle: [NSString stringWithFormat: @"%@ - %@", [node name], [node parentPath]]];   
+      if (rootViewerKey == nil) {   
+        [vwrwin setTitle: [NSString stringWithFormat: @"%@ - %@", [node name], [node parentPath]]];   
+      } else {
+        [vwrwin setTitle: [NSString stringWithFormat: @"%@", [node name]]];   
+      }
     }
 
     [self createSubviews];
@@ -405,6 +427,11 @@
 - (BOOL)isRootViewer
 {
   return rootviewer;
+}
+
+- (NSNumber *)rootViewerKey
+{
+  return rootViewerKey;
 }
 
 - (BOOL)isSpatial
@@ -755,15 +782,24 @@
 - (void)updateDefaults
 {
   if ([baseNode isValid]) {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	      
-    NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", [baseNode path]];
-    NSString *dictPath = [[baseNode path] stringByAppendingPathComponent: @".gwdir"];
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
     NSMutableDictionary *updatedprefs = nil;
+    NSString *prefsname;
+    NSString *dictPath;
     id defEntry;
+
+    if (rootViewerKey != nil) {
+      prefsname = [NSString stringWithFormat: @"viewer_at_%@_%i", 
+                          [baseNode path], [rootViewerKey unsignedLongValue]];
+    } else {
+      prefsname = [NSString stringWithFormat: @"viewer_at_%@", [baseNode path]];
+    }
+
+    dictPath = [[baseNode path] stringByAppendingPathComponent: @".gwdir"];
     
     [nodeView updateNodeInfo];
     
-    if ([baseNode isWritable] && (rootviewer == NO)) {
+    if ([baseNode isWritable] && (rootviewer == NO) && (rootViewerKey == nil)) {
       if ([[NSFileManager defaultManager] fileExistsAtPath: dictPath]) {
         NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: dictPath];
 
@@ -809,7 +845,7 @@
     [updatedprefs setObject: [vwrwin stringWithSavedFrame] 
                      forKey: @"geometry"];
 
-    if ([baseNode isWritable] && (rootviewer == NO)) {
+    if ([baseNode isWritable] && (rootviewer == NO) && (rootViewerKey == nil)) {
       [updatedprefs writeToFile: dictPath atomically: YES];
     } else {
       [defaults setObject: updatedprefs forKey: prefsname];

@@ -52,6 +52,7 @@
   
   NSString *viewType;
   BOOL rootviewer;
+  NSNumber *rootViewerKey;
 
   int visibleCols;
   int resizeIncrement;
@@ -88,6 +89,7 @@
 - (id)shelf;
 - (NSString *)viewType;
 - (BOOL)isRootViewer;
+- (NSNumber *)rootViewerKey;
 - (BOOL)isSpatial;
 - (int)vtype;
 

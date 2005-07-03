@@ -49,6 +49,7 @@ static GWViewersManager *vwrsmanager = nil;
   [[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
   [nc removeObserver: self];
   RELEASE (viewers);
+  RELEASE (rootViewersKeys);
   RELEASE (spatialViewersHistory);
     
 	[super dealloc];
@@ -59,8 +60,17 @@ static GWViewersManager *vwrsmanager = nil;
   self = [super init];
   
   if (self) {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];  
+    id entry = [defaults objectForKey: @"root_viewers_keys"];
+    
     gworkspace = [GWorkspace gworkspace];
     viewers = [NSMutableArray new];
+    
+    rootViewersKeys = [NSMutableArray new];
+    if (entry) {
+      [rootViewersKeys addObjectsFromArray: entry];
+    }
+    
     spatialViewersHistory = [NSMutableArray new]; 
     spvHistoryPos = 0;  
     historyWindow = [gworkspace historyWindow]; 
@@ -109,10 +119,10 @@ static GWViewersManager *vwrsmanager = nil;
     
       if (node && [node isValid]) {
         [self newViewerOfType: type
-                forNode: node
-          showSelection: YES
-         closeOldViewer: NO
-               forceNew: NO];
+                      forNode: node
+                showSelection: YES
+               closeOldViewer: NO
+                     forceNew: YES];
       }
     }
 
@@ -159,7 +169,7 @@ static GWViewersManager *vwrsmanager = nil;
 
       viewer = [self newViewerOfType: type
                              forNode: node
-                       showSelection: NO
+                       showSelection: (type == BROWSING)
                       closeOldViewer: NO
                             forceNew: YES];
     }
@@ -348,6 +358,19 @@ static GWViewersManager *vwrsmanager = nil;
   return nil;
 }
 
+- (NSNumber *)nextRootViewerKey
+{
+  NSNumber *key = nil;
+    
+  if ([rootViewersKeys count]) {
+    key = [rootViewersKeys objectAtIndex: 0];
+    RETAIN (key);
+    [rootViewersKeys removeObjectAtIndex: 0];
+  }
+  
+  return TEST_AUTORELEASE (key);
+}
+
 - (int)typeOfViewerForNode:(FSNode *)node
 {
   NSFileManager *fm = [NSFileManager defaultManager];
@@ -395,6 +418,7 @@ static GWViewersManager *vwrsmanager = nil;
   FSNode *node = [aviewer baseNode];
   NSString *path = [node path];
   NSArray *watchedNodes = [aviewer watchedNodes];
+  NSNumber *key = [aviewer rootViewerKey];
   id parentViewer = [self parentOfSpatialViewer: aviewer];
   id desktopManager = [gworkspace desktopManager];  
   int i;
@@ -427,6 +451,10 @@ static GWViewersManager *vwrsmanager = nil;
     [self changeHistoryOwner: nil];
   }
       
+  if (key) {
+    [rootViewersKeys insertObject: key atIndex: 0];
+  }
+
   [viewers removeObject: aviewer];
 }
 
@@ -815,6 +843,8 @@ static GWViewersManager *vwrsmanager = nil;
   }
   
 	[defaults setObject: viewersInfo forKey: @"viewersinfo"];
+  
+  [defaults setObject: rootViewersKeys forKey: @"root_viewers_keys"];
 }
 
 @end
