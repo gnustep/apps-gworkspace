@@ -13,6 +13,7 @@ GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
 # subprojects
 #
 SUBPROJECTS = FSNode \
+	      			  DBKit \
 	      			  Tools \
 	      			  Inspector \
 	      			  Operation \

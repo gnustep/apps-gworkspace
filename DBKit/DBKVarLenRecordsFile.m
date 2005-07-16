@@ -252,13 +252,7 @@
     }
     
     offset = [NSNumber numberWithUnsignedLong: ((coffs > eof) ? coffs : eof)];
-    
-    NSLog(@"new offset at %@", [offset description]);
-  
-  } else {
-    
-    NSLog(@"found free offset at %@", [offset description]);  
-  } 
+  }
   
   return offset;
 }

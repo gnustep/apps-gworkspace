@@ -391,7 +391,7 @@
   int index;
   
   [self checkBegin];
-  
+    
   key = akey;
   node = [self nodeOfKey: key getIndex: &index didExist: &exists];
   
@@ -401,12 +401,14 @@
     if (key == nil) {
       key = [node minKeyInSubnode: &node];
       [keys addObject: key]; 
+    } else {
+      node = [self nodeOfKey: key getIndex: &index didExist: &exists];
     }
   }
 
   while (node != nil) { 
     CREATE_AUTORELEASE_POOL(arp);
-
+    
     key = [node successorKeyInNode: &node forKeyAtIndex: index];
     
     if (key == nil) {

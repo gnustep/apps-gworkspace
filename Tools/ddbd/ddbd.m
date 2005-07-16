@@ -23,98 +23,35 @@
  */
 
 #include <AppKit/AppKit.h>
+#include <DBKit/DBKBTreeNode.h>
+#include <DBKit/DBKVarLenRecordsFile.h>
 #include "ddbd.h"
+#include "DDBPathsManager.h"
+#include "DDBDirsManager.h"
 #include "config.h"
 
 #define GWDebugLog(format, args...) \
   do { if (GW_DEBUG_LOG) \
     NSLog(format , ## args); } while (0)
-
-#define SYNC_INTERVAL (3600.0)
-#define MIN_INTERVAL (60.0)
-#define MAX_INTERVAL (86400.0)
-
-#define PATHSIZE 512
-#define ANNSIZE 8192
-
-typedef struct {
-  char path[PATHSIZE];
-  unsigned long long annoffset;
-  double timestamp;
-} dbpath;
-
-typedef struct {
-  char ann[ANNSIZE];
-  char path[PATHSIZE];
-} annotation;
-
+    
 enum {   
-  DDBdPrepareDbUpdate,
   DDBdInsertTreeUpdate,
   DDBdRemoveTreeUpdate,
-  DDBdFileOperationUpdate,
-  DDBdSynchronize
+  DDBdFileOperationUpdate
 };
 
-static BOOL inited = NO;
-
-static NSString *dbdir = nil;
-
-static NSMutableSet *dirsSet = nil;
-static NSFileHandle *dirsAddHandle = nil; 
-static NSFileHandle *dirsRmvHandle = nil; 
+static DDBPathsManager *pathsManager = nil; 
+static NSRecursiveLock *pathslock = nil; 
+static DDBDirsManager *dirsManager = nil; 
 static NSRecursiveLock *dirslock = nil; 
 
-static NSMutableDictionary *pathsDict = nil;
-static NSFileHandle *pathsAddHandle = nil; 
-static NSFileHandle *pathsRmvHandle = nil; 
-static NSRecursiveLock *pathslock = nil; 
-
-static NSFileHandle *annsHandle = nil; 
-static NSRecursiveLock *annslock = nil; 
-
 static NSFileManager *fm = nil;
-static SEL existsSel = @selector(fileExistsAtPath:);
-typedef BOOL (*boolIMP)(id, SEL, id);
-boolIMP existsImp;  
 
-BOOL createDb(void);
-
-BOOL readDirectories(void);
-BOOL writeDirectories(void);
-void addDirectory(NSString *path);
-void removeDirectory(NSString *path);
-void checkDirectories(void);
-void synchronizeDirectories(void);
-
-void readPaths(void);
-BOOL writePaths(void);    
-NSMutableDictionary *addPath(NSString *path);
-void removePath(NSString *path);
-void pathUpdated(NSString *path);
-NSTimeInterval timestampOfPath(NSString *path);
-void checkPaths(void);
-void synchronizePaths(void);
-
-NSString *annotationsForPath(NSString *path);
-void setAnnotationsForPath(NSString *annotations, NSString *path);
-NSString *pathForAnnotationsOffset(unsigned long long offset);
-void checkAnnotations(void);
-
-void duplicatePathInfo(NSString *srcpath, NSString *dstpath);
-BOOL subpathOfPath(NSString *p1, NSString *p2);
-NSString *path_separator(void);
-NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
 
 @implementation	DDBd
 
 - (void)dealloc
 {
-  if (syncTimer && [syncTimer isValid]) {
-    [syncTimer invalidate];
-    DESTROY (syncTimer);
-  }
-
   [[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
 
   if (conn) {
@@ -123,6 +60,8 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
 		            object: conn];
     DESTROY (conn);
   }
+
+  RELEASE (dbdir);
             
   [super dealloc];
 }
@@ -132,31 +71,24 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
   self = [super init];
   
   if (self) {   
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	      
-    id interval = [defaults objectForKey: @"sync-interval"];
+    NSString *basepath;
+    BOOL isdir;
     
-    syncinterval = SYNC_INTERVAL;
+    fm = [NSFileManager defaultManager];
     
-    if (interval) {
-      float f = [interval floatValue];
-  
-      if ((f >= MIN_INTERVAL) && (f <= MAX_INTERVAL)) {
-        syncinterval = f;
-        GWDebugLog(@"synchronize interval set to %.2f", syncinterval);
-      } 
+    basepath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
+    ASSIGN (dbdir, [basepath stringByAppendingPathComponent: @"ddbd"]);
+
+    if (([fm fileExistsAtPath: dbdir isDirectory: &isdir] &isdir) == NO) {
+      if ([fm createDirectoryAtPath: dbdir attributes: nil] == NO) { 
+        NSLog(@"unable to create: %@", dbdir);
+        DESTROY (self);
+        return self;
+      }
     }
-   
-    fm = [NSFileManager defaultManager];	
-    existsImp = (boolIMP)[fm methodForSelector: existsSel];  
+
     nc = [NSNotificationCenter defaultCenter];
-    
-    dirslock = [NSRecursiveLock new];
-    pathslock = [NSRecursiveLock new];
-    annslock = [NSRecursiveLock new];
-   
-    dirsSet = [[NSMutableSet alloc] initWithCapacity: 1];
-    pathsDict = [NSMutableDictionary new];   
-           
+               
     conn = [NSConnection defaultConnection];
     [conn setRootObject: self];
     [conn setDelegate: self];
@@ -171,54 +103,31 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
            selector: @selector(connectionBecameInvalid:)
 	             name: NSConnectionDidDieNotification
 	           object: conn];
-    
+
     [nc addObserver: self
        selector: @selector(threadWillExit:)
            name: NSThreadWillExitNotification
          object: nil];    
-
+    
     [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
                 				  selector: @selector(fileSystemDidChange:) 
                 					    name: @"GWFileSystemDidChangeNotification"
                 					  object: nil];
 
-    syncTimer = [NSTimer scheduledTimerWithTimeInterval: syncinterval
-                                     target: self
-                                   selector: @selector(synchronize:)
-                                   userInfo: nil
-                                    repeats: YES];
-    RETAIN (syncTimer);
-    
-    NSLog(@"ddbd started");
+    pathsManager = [[DDBPathsManager alloc] initWithBasePath: dbdir];
+    pathslock = [NSRecursiveLock new];
+    dirsManager = [[DDBDirsManager alloc] initWithBasePath: dbdir];
+    dirslock = [NSRecursiveLock new];
+        
+    NSLog(@"ddbd started");    
   }
   
   return self;    
 }
 
-- (void)prepareDb
-{
-  NSMutableDictionary *updaterInfo = [NSMutableDictionary dictionary];
-    
-  [updaterInfo setObject: [NSNumber numberWithInt: DDBdPrepareDbUpdate] 
-                  forKey: @"type"];
-  [updaterInfo setObject: [NSDictionary dictionary] forKey: @"taskdict"];
-
-  NS_DURING
-    {
-      [NSThread detachNewThreadSelector: @selector(updaterForTask:)
-		                           toTarget: [DBUpdater class]
-		                         withObject: updaterInfo];
-    }
-  NS_HANDLER
-    {
-      NSLog(@"A fatal error occured while detaching the thread!");
-    }
-  NS_ENDHANDLER
-}
-
 - (BOOL)dbactive
 {
-  return inited;
+  return YES;
 }
 
 - (BOOL)insertPath:(NSString *)path
@@ -226,9 +135,14 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
   NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: NO];
 
   if (attributes) {
-    addPath(path);
+    [pathslock lock];
+    [pathsManager addPath: path];
+    [pathslock unlock];
+    
     if ([attributes fileType] == NSFileTypeDirectory) {
-      addDirectory(path);
+      [dirslock lock];
+      [dirsManager addDirectory: path];
+      [dirslock unlock];
     }
   }
 
@@ -237,8 +151,13 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
 
 - (BOOL)removePath:(NSString *)path
 {
-  removePath(path);
-  removeDirectory(path);
+  [pathslock lock];
+  [pathsManager removePath: path];
+  [pathslock unlock];
+  
+  [dirslock lock];
+  [dirsManager removeDirectory: path];
+  [dirslock unlock];
   
   return YES; 
 }
@@ -292,51 +211,66 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
 }
 
 - (NSData *)directoryTreeFromPath:(NSString *)apath
-{
+{  
   CREATE_AUTORELEASE_POOL(pool);
-  NSMutableArray *directories = [NSMutableArray array];  
-  NSEnumerator *enumerator;
-  NSString *path;
-        
+  NSArray *directories;  
+  NSData *data = nil;
+  
   [dirslock lock];
-  enumerator = [dirsSet objectEnumerator];
-    
-  while ((path = [enumerator nextObject])) {
-    if (subpathOfPath(apath, path) && (*existsImp)(fm, existsSel, path)) {
-      [directories addObject: path];
-    }
-  }   
-    
+  directories = [dirsManager dirsFromPath: apath];
   [dirslock unlock];
     
   if ([directories count]) { 
-    NSData *data = [NSArchiver archivedDataWithRootObject: directories]; 
-  
-    RETAIN (data);
-    RELEASE (pool);
-  
-    return AUTORELEASE (data);
-  }
+    data = [NSArchiver archivedDataWithRootObject: directories]; 
+  } 
 
+  TEST_RETAIN (data);
   RELEASE (pool);
   
-  return nil;
+  return TEST_AUTORELEASE (data);
 }
 
 - (NSString *)annotationsForPath:(NSString *)path
 {
-  return annotationsForPath(path);
+  NSString *annotations;
+  
+  [pathslock lock];
+  annotations = [pathsManager metadataOfType: @"MDAnnotations" forPath: path];
+  [pathslock unlock];
+  
+  return annotations;
 }
 
 - (oneway void)setAnnotations:(NSString *)annotations
                       forPath:(NSString *)path
 {
-  setAnnotationsForPath(annotations, path);
+  [pathslock lock];
+  [pathsManager setMetadata: annotations 
+                     ofType: @"MDAnnotations" 
+                    forPath: path];
+  [pathslock unlock];                    
 }
 
 - (NSTimeInterval)timestampOfPath:(NSString *)path
 {
-  return timestampOfPath(path);
+  NSTimeInterval interval;
+
+  [pathslock lock];
+  interval = [pathsManager timestampOfPath: path];
+  [pathslock unlock];
+  
+  return interval;
+}
+
+- (oneway void)synchronize
+{
+  [pathslock lock];
+  [pathsManager synchronize];
+  [pathslock unlock];
+  
+  [dirslock lock];
+  [dirsManager synchronize];
+  [dirslock unlock];
 }
 
 - (void)connectionBecameInvalid:(NSNotification *)notification
@@ -388,51 +322,6 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
   NS_ENDHANDLER
 }
 
-- (void)synchronize:(id)sender
-{
-  NSMutableDictionary *updaterInfo = [NSMutableDictionary dictionary];
-  id interval;
-    
-  [updaterInfo setObject: [NSNumber numberWithInt: DDBdSynchronize] 
-                  forKey: @"type"];
-  [updaterInfo setObject: [NSDictionary dictionary] forKey: @"taskdict"];
-
-  NS_DURING
-    {
-      [NSThread detachNewThreadSelector: @selector(updaterForTask:)
-		                           toTarget: [DBUpdater class]
-		                         withObject: updaterInfo];
-    }
-  NS_HANDLER
-    {
-      NSLog(@"A fatal error occured while detaching the thread!");
-    }
-  NS_ENDHANDLER
-  
-  interval = [[NSUserDefaults standardUserDefaults] objectForKey: @"sync-interval"];
-
-  if (interval) {
-    float f = [interval floatValue];
-
-    if ((f != syncinterval) && (f >= MIN_INTERVAL) && (f <= MAX_INTERVAL)) {
-      syncinterval = f;
-
-      if (syncTimer && [syncTimer isValid]) {
-        [syncTimer invalidate];
-        DESTROY (syncTimer);
-      }
-
-      syncTimer = [NSTimer scheduledTimerWithTimeInterval: syncinterval
-                                     target: self
-                                   selector: @selector(synchronize:)
-                                   userInfo: nil
-                                    repeats: YES];
-      RETAIN (syncTimer);
-      GWDebugLog(@"synchronize interval set to %.2f", syncinterval);
-    } 
-  }
-}
-
 - (void)threadWillExit:(NSNotification *)notification
 {
   NSLog(@"db update done");
@@ -473,10 +362,6 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
   NSLog(@"starting db update");
 
   switch(type) {
-    case DDBdPrepareDbUpdate:
-      [self prepareDb];
-      break;
-
     case DDBdInsertTreeUpdate:
       [self insertTrees];
       break;
@@ -487,10 +372,6 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
 
     case DDBdFileOperationUpdate:
       [self fileSystemDidChange];
-      break;
-
-    case DDBdSynchronize:
-      [self synchronize];
       break;
 
     default:
@@ -505,147 +386,32 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
   [NSThread exit];
 }
 
-- (void)prepareDb
-{
-  if (createDb() == NO) {
-    NSLog(@"unable to create the database files.");
-    exit(EXIT_FAILURE);
-  }
-
-  fprintf(stderr, "reading directories... "); 
-  if (readDirectories() == NO) {
-    NSLog(@"\nunable to read from the db.");
-    exit(EXIT_FAILURE);
-  }
-  fprintf(stderr, "done\n");
-  
-  fprintf(stderr, "checking directories... ");
-  checkDirectories();  
-  fprintf(stderr, "done\n");
-  
-  fprintf(stderr, "synchronizing directories... ");
-  synchronizeDirectories();
-  fprintf(stderr, "done\n");
-
-  fprintf(stderr, "reading paths... ");   
-  readPaths();
-  fprintf(stderr, "done\n");
-  
-  fprintf(stderr, "checking paths... ");   
-  checkPaths();  
-  fprintf(stderr, "done\n"); 
-  
-  fprintf(stderr, "synchronizing paths... ");
-  synchronizePaths(); 
-  fprintf(stderr, "done\n");
-
-  fprintf(stderr, "checking file annotations... ");   
-  checkAnnotations();
-  fprintf(stderr, "done\n");
-  
-  inited = YES;
-  
-  [self done];
-}
-
 - (void)insertTrees
 {
-  NSArray *basePaths = [updinfo objectForKey: @"paths"];
-  unsigned i;
-
-  for (i = 0; i < [basePaths count]; i++) {
-    CREATE_AUTORELEASE_POOL(arp);
-    NSString *base = [basePaths objectAtIndex: i];  
-    NSDictionary *attributes = [fm fileAttributesAtPath: base traverseLink: NO];
-    NSString *type = [attributes fileType];
-
-    if (type == NSFileTypeDirectory) {
-      NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: base];
-      IMP nxtImp = [enumerator methodForSelector: @selector(nextObject)];  
-        
-      while (1) {  
-        CREATE_AUTORELEASE_POOL(arp1);  
-        NSString *path = (*nxtImp)(enumerator, @selector(nextObject));
-        
-        if (path) {
-          if ([[enumerator fileAttributes] fileType] == NSFileTypeDirectory) {
-            addDirectory([base stringByAppendingPathComponent: path]);
-          }
-        } else {
-          RELEASE (arp1);
-          break;
-        }
-        
-        DESTROY (arp1);  
-      }
-      
-      addDirectory(base);
-    }
-    
-    DESTROY (arp); 
-  }
+  NSArray *paths = [updinfo objectForKey: @"paths"];
   
+  [dirslock lock];
+  [dirsManager insertDirsFromPaths: paths];
+  [dirslock unlock];
+
   [self done];
 }
 
 - (void)removeTrees
 {
-  NSArray *basePaths = [updinfo objectForKey: @"paths"];
-  unsigned i, j;
+  NSArray *paths = [updinfo objectForKey: @"paths"];
   
-  for (i = 0; i < [basePaths count]; i++) {  
-    CREATE_AUTORELEASE_POOL(arp);
-    NSString *base = [basePaths objectAtIndex: i];
-    NSMutableArray *toremove = [NSMutableArray array];
-    NSArray *keys;
-    NSEnumerator *enumerator;
-    NSString *path;
-    
-    [dirslock lock];
-    enumerator = [dirsSet objectEnumerator];
-    
-    while ((path = [enumerator nextObject])) {
-      if ([path isEqual: base] || subpathOfPath(base, path)) {
-        [toremove addObject: path];
-      }
-    }   
+  [dirslock lock];
+  [dirsManager removeDirsFromPaths: paths];
+  [dirslock unlock];
 
-    for (j = 0; j < [toremove count]; j++) {  
-      removeDirectory([toremove objectAtIndex: j]);
-    }
-    
-    [dirsRmvHandle synchronizeFile];
-    [dirslock unlock];
-     
-    [toremove removeAllObjects];
-
-    [pathslock lock]; 
-    keys = [pathsDict allKeys];
-    enumerator = [keys objectEnumerator];
-    
-    while ((path = [enumerator nextObject])) {
-      if ([path isEqual: base] || subpathOfPath(base, path)) {
-        [toremove addObject: path];
-      }
-    }   
-    
-    for (j = 0; j < [toremove count]; j++) {  
-      removePath([toremove objectAtIndex: j]);
-    }
-    
-    [pathsRmvHandle synchronizeFile];
-    [pathslock unlock];
-
-    DESTROY (arp);
-  }
-  
   [self done];
 }
 
 - (void)fileSystemDidChange
 {
   NSString *operation = [updinfo objectForKey: @"operation"];
-  
+
   if ([operation isEqual: @"NSWorkspaceMoveOperation"] 
                 || [operation isEqual: @"NSWorkspaceCopyOperation"]
                 || [operation isEqual: @"NSWorkspaceDuplicateOperation"]
@@ -657,10 +423,8 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
     NSArray *origfiles = [updinfo objectForKey: @"origfiles"];
     NSMutableArray *srcpaths = [NSMutableArray array];
     NSMutableArray *dstpaths = [NSMutableArray array];
-    NSArray *keys;
-    NSEnumerator *enumerator;
-    unsigned i;
-
+    int i;
+    
     if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
       srcpaths = [NSArray arrayWithObject: source];
       dstpaths = [NSArray arrayWithObject: destination];
@@ -680,1097 +444,21 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
         }
       }
     }
-
-    [pathslock lock]; 
-    keys = [pathsDict allKeys];
-    RETAIN (keys);
-    enumerator = [keys objectEnumerator];
-    [pathslock unlock]; 
-
-    for (i = 0; i < [srcpaths count]; i++) {
-      CREATE_AUTORELEASE_POOL(pool);
-      NSString *srcpath = [srcpaths objectAtIndex: i];
-      NSString *dstpath = [dstpaths objectAtIndex: i];
-      NSDictionary *attrs = [fm fileAttributesAtPath: dstpath traverseLink: NO];
-
-      if ([keys containsObject: srcpath]) {
-        duplicatePathInfo(srcpath, dstpath);
-      }
-
-      if ([attrs fileType] == NSFileTypeDirectory) {
-        NSString *path;
-
-        while ((path = [enumerator nextObject])) {
-          if (subpathOfPath(srcpath, path)) {
-            NSString *newpath = pathRemovingPrefix(path, srcpath);
-            
-            newpath = [dstpath stringByAppendingPathComponent: newpath];
-          
-            if ((*existsImp)(fm, existsSel, newpath)) {
-              duplicatePathInfo(path, newpath);  
-            }
-          }
-        }   
-      }
-
-      RELEASE (pool);
-    }
     
-    RELEASE (keys);
+    [pathslock lock];
+    [pathsManager duplicateDataOfPaths: srcpaths forPaths: dstpaths];
+    [pathslock unlock];
+    
     RELEASE (arp);
   }
   
-  [self done];
-}
-
-- (void)synchronize
-{
-  checkAnnotations();
-  
-  checkDirectories();
-  synchronizeDirectories();
-  
-  checkPaths();
-  synchronizePaths(); 
-
   [self done];
 }
 
 @end
 
 
-BOOL createDb()
-{
-  NSString *basepath;
-  NSString *dirs;  
-  NSString *paths;  
-  NSString *fpath;
-  BOOL isdir;
-  BOOL created;
-        
-  basepath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
-  ASSIGN (dbdir, [basepath stringByAppendingPathComponent: @"ddb"]);
-  created = YES;
-  
-  if (([fm fileExistsAtPath: dbdir isDirectory: &isdir] &isdir) == NO) {
-    if ([fm createDirectoryAtPath: dbdir attributes: nil] == NO) { 
-      return NO;
-    }
-  }
-  
-  dirs = [dbdir stringByAppendingPathComponent: @"dirs"];
-  [dirslock lock];
-
-  if ([fm fileExistsAtPath: dirs] == NO) {
-    if ([fm createFileAtPath: dirs contents: nil attributes: nil] == NO) { 
-      created = NO;
-    }    
-  }
-    
-  fpath = [dirs stringByAppendingPathExtension: @"add"];
-
-  if ([fm fileExistsAtPath: fpath] == NO) {
-    if ([fm createFileAtPath: fpath contents: nil attributes: nil] == NO) { 
-      created = NO;
-    }
-  }
-    
-  dirsAddHandle = [NSFileHandle fileHandleForUpdatingAtPath: fpath];
-  RETAIN (dirsAddHandle);
-    
-  fpath = [dirs stringByAppendingPathExtension: @"rmv"];
-
-  if ([fm fileExistsAtPath: fpath] == NO) {
-    if ([fm createFileAtPath: fpath contents: nil attributes: nil] == NO) { 
-      created = NO;
-    }
-  }
-    
-  dirsRmvHandle = [NSFileHandle fileHandleForUpdatingAtPath: fpath];
-  RETAIN (dirsRmvHandle);
-  [dirslock unlock];
-  
-  paths = [dbdir stringByAppendingPathComponent: @"paths"];
-  [pathslock lock];
-  
-  if ([fm fileExistsAtPath: paths] == NO) {
-    if ([fm createFileAtPath: paths contents: nil attributes: nil] == NO) { 
-      created = NO;
-    }
-  }
-
-  fpath = [paths stringByAppendingPathExtension: @"add"];
-
-  if ([fm fileExistsAtPath: fpath] == NO) {
-    if ([fm createFileAtPath: fpath contents: nil attributes: nil] == NO) {
-      created = NO;
-    }
-  }
-
-  pathsAddHandle = [NSFileHandle fileHandleForUpdatingAtPath: fpath];
-  RETAIN (pathsAddHandle);
-
-  fpath = [paths stringByAppendingPathExtension: @"rmv"];
-
-  if ([fm fileExistsAtPath: fpath] == NO) {
-    if ([fm createFileAtPath: fpath contents: nil attributes: nil] == NO) { 
-      created = NO;
-    }
-  }
-
-  pathsRmvHandle = [NSFileHandle fileHandleForUpdatingAtPath: fpath];
-  RETAIN (pathsRmvHandle);
-  [pathslock unlock];
-  
-  fpath = [dbdir stringByAppendingPathComponent: @"annotations"];
-  [annslock lock];
-  
-  if ([fm fileExistsAtPath: fpath] == NO) {
-    unsigned annsize = sizeof(annotation);
-    annotation dummy;
-    
-    memset(dummy.ann, 0, sizeof(dummy.ann));
-    memset(dummy.path, 0, sizeof(dummy.path));
-
-    if ([fm createFileAtPath: fpath 
-                    contents: [NSData dataWithBytes: &dummy length: annsize]
-                  attributes: nil] == NO) { 
-      created = NO;
-    }
-  }
-
-  annsHandle = [NSFileHandle fileHandleForUpdatingAtPath: fpath];
-  RETAIN (annsHandle);
-  [annslock unlock];
-
-  return created;
-}
-
-BOOL readDirectories()
-{
-  NSString *dirspath = [dbdir stringByAppendingPathComponent: @"dirs"];
-  char path[BUFSIZ];
-  FILE *fp;
-  char buf[BUFSIZ];
-  char *s;
-  
-  if ([dirspath getFileSystemRepresentation: path
-			                            maxLength: sizeof(path)-1] == NO) {
-    return NO;
-  }
-  
-  [dirslock lock];
-  
-  fp = fopen(path, "r");
-
-  if (fp == NULL) {
-    [dirslock unlock];
-    return NO;
-  }
-
-  while (fgets(buf, sizeof(buf), fp) != NULL) {
-    CREATE_AUTORELEASE_POOL(pool);
-
-    s = strchr(buf, '\n');
-    if (s) {
-      *s = '\0';
-    }
-    
-    [dirsSet addObject: [NSString stringWithUTF8String: buf]];
-  
-    RELEASE (pool);
-  }
-  
-  fclose(fp);
-  [dirslock unlock];
-    
-  return YES;
-}
-
-BOOL writeDirectories()
-{
-  NSString *dirspath = [dbdir stringByAppendingPathComponent: @"dirs"];
-  NSString *path = [dirspath stringByAppendingPathExtension: @"tmp"];
-  NSEnumerator *enumerator;
-  NSString *directory;
-  NSFileHandle *handle;
-  
-  [dirslock lock];
-     
-  if ([fm fileExistsAtPath: path] == NO) {
-    if ([fm createFileAtPath: path contents: nil attributes: nil] == NO) { 
-      [dirslock unlock];
-      return NO;
-    }
-  }
-    
-  handle = [NSFileHandle fileHandleForWritingAtPath: path];
-  
-  enumerator = [dirsSet objectEnumerator];
-  
-  while ((directory = [enumerator nextObject])) {
-    CREATE_AUTORELEASE_POOL(pool);
-    const char *buf = [directory UTF8String];
-    NSData *data = [NSData dataWithBytes: buf length: strlen(buf)];
-
-    [handle writeData: data];
-    data = [NSData dataWithBytes: "\n" length: 1];
-    [handle writeData: data];
-    
-    RELEASE (pool);
-  }
-
-  [handle synchronizeFile];
-  [handle closeFile];
-  
-  if ([fm removeFileAtPath: dirspath handler: nil]) {
-    if ([fm movePath: path toPath: dirspath handler: nil]) {
-      [dirslock unlock];
-      return YES;
-    }
-  }
-  
-  [dirslock unlock];
-  
-  return NO;
-}
-
-void addDirectory(NSString *path)
-{
-  [dirslock lock];
-
-  if ([dirsSet containsObject: path] == NO) {
-    const char *buf = [path UTF8String];
-    NSData *data = [NSData dataWithBytes: buf length: strlen(buf)];
-    
-    [dirsAddHandle seekToEndOfFile];
-    [dirsAddHandle writeData: data];
-    data = [NSData dataWithBytes: "\n" length: 1];
-    [dirsAddHandle writeData: data];
-//    [dirsAddHandle synchronizeFile];
-
-    [dirsSet addObject: path];
-  }
-
-  [dirslock unlock];
-}
-
-void removeDirectory(NSString *path)
-{
-  [dirslock lock];
-  
-  if ([dirsSet containsObject: path]) {
-    const char *buf = [path UTF8String];
-    NSData *data = [NSData dataWithBytes: buf length: strlen(buf)];
-
-    [dirsRmvHandle seekToEndOfFile];
-    [dirsRmvHandle writeData: data];
-    data = [NSData dataWithBytes: "\n" length: 1];
-    [dirsRmvHandle writeData: data];
-//    [dirsRmvHandle synchronizeFile];
-
-    [dirsSet removeObject: path];
-  }
-
-  [dirslock unlock];
-}
-
-void checkDirectories()
-{
-  NSArray *dirs;
-  unsigned i;
-  
-  [dirslock lock];
-  dirs = [dirsSet allObjects];
-  RETAIN (dirs);
-  [dirslock unlock];
-  
-  for (i = 0; i < [dirs count]; i++) {
-    NSString *dir = [dirs objectAtIndex: i];
-    
-    if ((*existsImp)(fm, existsSel, dir) == NO) {
-      removeDirectory(dir);
-    }
-  }
-  
-  RELEASE (dirs);  
-}
-
-void synchronizeDirectories()
-{
-  CREATE_AUTORELEASE_POOL(pool);
-  NSData *data;
-  const char *bytes;
-  unsigned length;
-  char *buf;
-  unsigned bufind;
-  NSString *path;
-  BOOL isdir;
-  unsigned i;
-  
-  [dirslock lock];
-  
-  buf = NSZoneMalloc(NSDefaultMallocZone(), sizeof(char) * BUFSIZ);
-
-  [dirsRmvHandle synchronizeFile];
-  [dirsRmvHandle seekToFileOffset: 0];
-  
-  data = [dirsRmvHandle readDataToEndOfFile];
-  
-  if ([data length]) {  
-    bytes = [data bytes];
-    length = strlen(bytes);
-
-    memset(buf, 0, sizeof(buf));
-    bufind = 0;
-
-    for (i = 0; i < length; i++) {
-      char c = bytes[i];
-
-      if (c != '\n') {
-        buf[bufind] = c;
-        bufind++;
-      } else {
-        buf[bufind] = '\0';        
-        path = [NSString stringWithUTF8String: buf];
-        if (([fm fileExistsAtPath: path isDirectory: &isdir] && isdir) == NO) {
-          [dirsSet removeObject: path];
-        }
-        memset(buf, 0, sizeof(buf));
-        bufind = 0;
-      }
-    }
-  }
-    
-  [dirsAddHandle synchronizeFile];
-  [dirsAddHandle seekToFileOffset: 0];
-
-  data = [dirsAddHandle readDataToEndOfFile];
-  
-  if ([data length]) {
-    bytes = [data bytes];
-    length = strlen(bytes);
-
-    memset(buf, 0, sizeof(buf));
-    bufind = 0;
-
-    for (i = 0; i < length; i++) {
-      char c = bytes[i];
-
-      if (c != '\n') {
-        buf[bufind] = c;
-        bufind++;
-      } else {
-        buf[bufind] = '\0';
-        path = [NSString stringWithUTF8String: buf];
-        if ([fm fileExistsAtPath: path isDirectory: &isdir] && isdir) {
-          [dirsSet addObject: path];
-        }
-        memset(buf, 0, sizeof(buf));
-        bufind = 0;
-      }
-    }
-  }  
-  
-  NSZoneFree(NSDefaultMallocZone(), buf);
-  
-  if (writeDirectories()) {
-    [dirsRmvHandle truncateFileAtOffset: 0];
-    [dirsRmvHandle synchronizeFile];  
-    [dirsAddHandle truncateFileAtOffset: 0];
-    [dirsAddHandle synchronizeFile];
-  }
-  
-  [dirslock unlock];
-    
-  RELEASE (pool);  
-}
-
-void readPaths()
-{
-  NSString *path = [dbdir stringByAppendingPathComponent: @"paths"];
-  NSFileHandle *handle;  
-  dbpath dbp;
-  NSData *data;
-  NSRange range;
-  
-  [pathslock lock];
-  handle = [NSFileHandle fileHandleForReadingAtPath: path];
-                    
-  while (1) {
-    CREATE_AUTORELEASE_POOL(pool);
-
-    NS_DURING
-      {
-        data = [handle readDataOfLength: sizeof(dbpath)];
-      }
-    NS_HANDLER
-      {
-        data = nil;
-      }
-    NS_ENDHANDLER
-
-    if (data && [data length]) {
-      NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-    
-      memset(dbp.path, 0, sizeof(dbp.path));
-      dbp.annoffset = 0;
-        
-      range = NSMakeRange(0, sizeof(dbp.path) - 1);
-      [data getBytes: &dbp.path range: range];
-      
-      range = NSMakeRange(sizeof(dbp.path), sizeof(dbp.annoffset) -1);
-      [data getBytes: &dbp.annoffset range: range];
-
-      [dict setObject: [NSNumber numberWithUnsignedLongLong: dbp.annoffset]
-               forKey: @"annoffset"];
-
-      range = NSMakeRange(sizeof(dbp.path) + sizeof(dbp.annoffset), sizeof(dbp.timestamp) -1);
-      [data getBytes: &dbp.timestamp range: range];
-               
-      [dict setObject: [NSNumber numberWithDouble: dbp.timestamp]
-               forKey: @"timestamp"];
-        
-      [pathsDict setObject: dict 
-                    forKey: [NSString stringWithUTF8String: dbp.path]];
-    } else {
-      break;
-    }
-    
-    RELEASE (pool);
-  }
-  
-  [handle closeFile]; 
-  [pathslock unlock];   
-}    
-
-BOOL writePaths()
-{
-  NSString *pathspath = [dbdir stringByAppendingPathComponent: @"paths"];
-  NSString *path = [pathspath stringByAppendingPathExtension: @"tmp"];
-  
-  [pathslock lock]; 
-  
-  if ([fm fileExistsAtPath: path] == NO) {
-    if ([fm createFileAtPath: path contents: nil attributes: nil] == NO) { 
-      [pathslock unlock]; 
-      return NO;
-    }
-  }
-
-  if ([pathsDict count]) {
-    NSArray *keys = [pathsDict allKeys];
-    NSFileHandle *handle = [NSFileHandle fileHandleForWritingAtPath: path];
-    dbpath dbp;
-    unsigned i;
-
-    for (i = 0; i < [keys count]; i++) {
-      CREATE_AUTORELEASE_POOL(pool);
-      NSString *key = [keys objectAtIndex: i];
-      const char *buf = [key UTF8String];
-      NSDictionary *dict = [pathsDict objectForKey: key];
-      NSNumber *annoffset = [dict objectForKey: @"annoffset"];
-      NSNumber *timestamp = [dict objectForKey: @"timestamp"];
-      NSData *data;
-      
-      memset(dbp.path, 0, sizeof(dbp.path));
-      memcpy(dbp.path, buf, strlen(buf));   
-
-      dbp.annoffset = [annoffset unsignedLongLongValue];
-      dbp.timestamp = [timestamp doubleValue];
-
-      data = [NSData dataWithBytes: &dbp length: sizeof(dbpath)];
-      [handle writeData: data];
-      RELEASE (pool);
-    }
-    
-    [handle synchronizeFile];
-    [handle closeFile];
-  }
-
-  if ([fm removeFileAtPath: pathspath handler: nil]) {
-    if ([fm movePath: path toPath: pathspath handler: nil]) {
-      [pathslock unlock]; 
-      return YES;
-    }
-  }
-  
-  [pathslock unlock]; 
-    
-  return NO;
-}
-    
-NSMutableDictionary *addPath(NSString *path)
-{
-  NSMutableDictionary *dict;
-  
-  [pathslock lock]; 
-  dict = [pathsDict objectForKey: path];
-  
-  if (dict) {
-    RETAIN (dict);
-  } else {
-    CREATE_AUTORELEASE_POOL(pool);
-    const char *buf = [path UTF8String];
-    dbpath dbp;
-    NSData *data;
-    
-    memset(dbp.path, 0, sizeof(dbp.path));
-    memcpy(dbp.path, buf, strlen(buf));
-    dbp.annoffset = 0;
-    dbp.timestamp = [[NSDate date] timeIntervalSinceReferenceDate];
-
-    data = [NSData dataWithBytes: &dbp length: sizeof(dbpath)];
-
-    [pathsAddHandle seekToEndOfFile];
-    [pathsAddHandle writeData: data];
-    [pathsAddHandle synchronizeFile];
-    
-    dict = [NSMutableDictionary dictionary];
-    
-    [dict setObject: [NSNumber numberWithUnsignedLongLong: 0]
-             forKey: @"annoffset"];
-    [dict setObject: [NSNumber numberWithDouble: dbp.timestamp]
-             forKey: @"timestamp"];
-        
-    [pathsDict setObject: dict forKey: path];
-  
-    RETAIN (dict);
-    RELEASE (pool);
-  } 
-  
-  [pathslock unlock]; 
-    
-  return AUTORELEASE (dict);
-}
-
-void removePath(NSString *path)
-{
-  NSDictionary *dict;
-  
-  [pathslock lock]; 
-  dict = [pathsDict objectForKey: path];
-  
-  if (dict) {
-    const char *buf = [path UTF8String]; 
-    NSNumber *num = [dict objectForKey: @"annoffset"];
-    dbpath dbp;
-    NSData *data;
-
-    memset(dbp.path, 0, sizeof(dbp.path));
-    memcpy(dbp.path, buf, strlen(buf));
-    dbp.annoffset = [num unsignedLongLongValue];
-    dbp.timestamp = [[NSDate date] timeIntervalSinceReferenceDate];
-  
-    data = [NSData dataWithBytes: &dbp length: sizeof(dbpath)];
-  
-    [pathsRmvHandle seekToEndOfFile];
-    [pathsRmvHandle writeData: data];
-    [pathsRmvHandle synchronizeFile];
-
-    [pathsDict removeObjectForKey: path];  
-  }
-  
-  [pathslock unlock]; 
-}
-
-void pathUpdated(NSString *path)
-{
-  const char *buf = [path UTF8String];
-  NSMutableDictionary *dict;
-  NSNumber *num;
-  unsigned long long offset;
-  dbpath dbp;  
-  NSData *data;
-
-  [pathslock lock];
-
-  dict = [pathsDict objectForKey: path];
-  num = [dict objectForKey: @"annoffset"];
-  offset = [num unsignedLongLongValue];
-
-  memset(dbp.path, 0, sizeof(dbp.path));
-  memcpy(dbp.path, buf, strlen(buf));
-  dbp.annoffset = offset;
-  dbp.timestamp = [[NSDate date] timeIntervalSinceReferenceDate];
-
-  [dict setObject: [NSNumber numberWithDouble: dbp.timestamp]
-           forKey: @"timestamp"];
-
-  data = [NSData dataWithBytes: &dbp length: sizeof(dbpath)];
-
-  [pathsAddHandle seekToEndOfFile];
-  [pathsAddHandle writeData: data];
-  [pathsAddHandle synchronizeFile];
-  [pathslock unlock];
-}
-
-NSTimeInterval timestampOfPath(NSString *path)
-{
-  NSDictionary *dict;
-  
-  [pathslock lock];
-  dict = [pathsDict objectForKey: path];
-  [pathslock unlock];
-
-  if (dict) {
-    return [[dict objectForKey: @"timestamp"] doubleValue];
-  }
-
-  return 0.0;
-}
-
-void checkPaths()
-{
-  NSArray *paths;
-  unsigned i;
-  
-  [pathslock lock];
-  paths = [pathsDict allKeys];
-  RETAIN (paths);
-  [pathslock unlock];
-  
-  for (i = 0; i < [paths count]; i++) {
-    NSString *path = [paths objectAtIndex: i];
-    
-    if ((*existsImp)(fm, existsSel, path) == NO) {
-      removePath(path);
-    }
-  }
-  
-  RELEASE (paths);  
-}
-
-void synchronizePaths()
-{
-  CREATE_AUTORELEASE_POOL(pool);
-  NSMutableDictionary *toadd = [NSMutableDictionary dictionary];
-  NSMutableArray *toremove = [NSMutableArray array];
-  NSDictionary *adddict;
-  NSArray *paths;
-  dbpath dbp;
-  NSData *data;
-  unsigned i;
-  
-  [pathslock lock];
-  
-  [pathsAddHandle synchronizeFile];
-  [pathsAddHandle seekToFileOffset: 0];
-
-  while (1) {
-    CREATE_AUTORELEASE_POOL(arp);
-
-    NS_DURING
-      {
-        data = [pathsAddHandle readDataOfLength: sizeof(dbpath)];
-      }
-    NS_HANDLER
-      {
-        data = nil;
-      }
-    NS_ENDHANDLER
-
-    if (data && [data length]) {
-      NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-      NSString *path;
-      NSRange range;
-      
-      memset(dbp.path, 0, sizeof(dbp.path));
-      dbp.annoffset = 0;
-      dbp.timestamp = 0.0;
-        
-      range = NSMakeRange(0, sizeof(dbp.path) - 1);    
-      [data getBytes: &dbp.path range: range];
-
-      range = NSMakeRange(sizeof(dbp.path), sizeof(dbp.annoffset) -1);
-      [data getBytes: &dbp.annoffset range: range];
-               
-      [dict setObject: [NSNumber numberWithUnsignedLongLong: dbp.annoffset]
-               forKey: @"annoffset"];
-        
-      range = NSMakeRange(sizeof(dbp.path) + sizeof(dbp.annoffset), sizeof(dbp.timestamp) -1);
-      [data getBytes: &dbp.timestamp range: range];
-               
-      [dict setObject: [NSNumber numberWithDouble: dbp.timestamp]
-               forKey: @"timestamp"];
-            
-      path = [NSString stringWithUTF8String: dbp.path];      
-            
-      adddict = [toadd objectForKey: path];
-      
-      if (adddict) {
-        double tstamp = [[adddict objectForKey: @"timestamp"] doubleValue];
-      
-        if (tstamp < dbp.timestamp) {
-          [toadd setObject: dict forKey: path];
-        }
-      } else {
-        [toadd setObject: dict forKey: path];
-      }
-    
-    } else {
-      break;
-    }
-    
-    RELEASE (arp);
-  }
-  
-  [pathsRmvHandle synchronizeFile];
-  [pathsRmvHandle seekToFileOffset: 0];
-
-  while (1) {
-    CREATE_AUTORELEASE_POOL(arp);
-
-    NS_DURING
-      {
-        data = [pathsRmvHandle readDataOfLength: sizeof(dbpath)];
-      }
-    NS_HANDLER
-      {
-        data = nil;
-      }
-    NS_ENDHANDLER
-
-    if (data && [data length]) {
-      NSString *path;
-      NSRange range;
-      
-      memset(dbp.path, 0, sizeof(dbp.path));
-      dbp.annoffset = 0;
-      dbp.timestamp = 0.0;
-        
-      range = NSMakeRange(0, sizeof(dbp.path) - 1);    
-      [data getBytes: &dbp.path range: range];
-
-      range = NSMakeRange(sizeof(dbp.path), sizeof(dbp.annoffset) -1);
-      [data getBytes: &dbp.annoffset range: range];
-               
-      range = NSMakeRange(sizeof(dbp.path) + sizeof(dbp.annoffset), sizeof(dbp.timestamp) -1);
-      [data getBytes: &dbp.timestamp range: range];
-      
-      path = [NSString stringWithUTF8String: dbp.path];
-      adddict = [toadd objectForKey: path];
-      
-      if (adddict) {
-        double tstamp = [[adddict objectForKey: @"timestamp"] doubleValue];
-      
-        if (tstamp < dbp.timestamp) {
-          [toadd removeObjectForKey: path];
-          
-          if ([toremove containsObject: path] == NO) {
-            [toremove addObject: path];
-          }
-        }
-      } else if ([toremove containsObject: path] == NO) {
-        [toremove addObject: path];
-      }
-
-    } else {
-      break;
-    }
-    
-    RELEASE (arp);
-  }
-
-  paths = [toadd allKeys];
-
-  for (i = 0; i < [paths count]; i++) {
-    NSString *path = [paths objectAtIndex: i];
-    NSMutableDictionary *dict = [toadd objectForKey: path];
-    
-    [pathsDict setObject: dict forKey: path];
-  }
-
-  for (i = 0; i < [toremove count]; i++) {
-    [pathsDict removeObjectForKey: [toremove objectAtIndex: i]];
-  }
-
-  if (writePaths()) {
-    [pathsAddHandle truncateFileAtOffset: 0];
-    [pathsAddHandle synchronizeFile];
-    [pathsRmvHandle truncateFileAtOffset: 0];
-    [pathsRmvHandle synchronizeFile];
-  }
-  
-  [pathslock unlock];
-    
-  RELEASE (pool);  
-}
-
-NSString *annotationsForPath(NSString *path)
-{
-  NSDictionary *dict;
-  
-  [annslock lock];
-  [pathslock lock];
-  dict = [pathsDict objectForKey: path];
-  [pathslock unlock];
-  
-  if (dict) {
-    NSNumber *num = [dict objectForKey: @"annoffset"];
-    unsigned long long offset = [num unsignedLongLongValue];
-
-    [annsHandle seekToEndOfFile];
-    
-    if ((offset != 0) 
-          && (offset <= ([annsHandle offsetInFile] - sizeof(annotation)))) {
-      annotation annot;
-      NSData *data;
-      
-      [annsHandle seekToFileOffset: offset];
-      
-      NS_DURING
-        {
-          data = [annsHandle readDataOfLength: sizeof(annotation)];
-        }
-      NS_HANDLER
-        {
-          data = nil;
-        }
-      NS_ENDHANDLER
-      
-      if (data && ([data length] == sizeof(annotation))) {
-        [data getBytes: &annot.ann range: NSMakeRange(0, sizeof(annot.ann) - 1)];
-        [data getBytes: &annot.path 
-                 range: NSMakeRange(sizeof(annot.ann), sizeof(annot.path) - 1)];
-      
-        [annslock unlock];
-        
-        return [NSString stringWithUTF8String: annot.ann];
-      }
-    }
-  }
-  
-  [annslock unlock];
-  
-  return nil;
-}
-
-void setAnnotationsForPath(NSString *annotations, NSString *path)
-{
-  NSMutableDictionary *dict;
-  annotation annot;
-  NSNumber *num;
-  unsigned long long offset;
-  const char *buf;
-  NSData *data;
-    
-  [annslock lock];
-  [pathslock lock];
-  dict = [pathsDict objectForKey: path];
-  [pathslock unlock];
-  
-  if (dict == nil) {
-    dict = addPath(path);
-  }
-  
-  num = [dict objectForKey: @"annoffset"];
-  offset = [num unsignedLongLongValue];
-
-  [annsHandle seekToEndOfFile];
-  
-  if ((offset == 0) 
-        || (offset > ([annsHandle offsetInFile] - sizeof(annotation)))) {
-    offset = [annsHandle offsetInFile];
-    num = [NSNumber numberWithUnsignedLongLong: offset];
-    [dict setObject: num forKey: @"annoffset"];
-    pathUpdated(path);
-  } else {
-    [annsHandle seekToFileOffset: offset];
-  }
-  
-  buf = [annotations UTF8String];
-  memset(annot.ann, 0, sizeof(annot.ann));
-  memcpy(&annot.ann, buf, strlen(buf));
-
-  buf = [path UTF8String];
-  memset(annot.path, 0, sizeof(annot.path));
-  memcpy(&annot.path, buf, strlen(buf));
-
-  data = [NSData dataWithBytes: &annot length: sizeof(annotation)];
-  [annsHandle writeData: data];
-  [annsHandle synchronizeFile];
-  
-  [annslock unlock];
-  
-  if ([path isEqual: path_separator()] == NO) {
-    NSString *parent = [path stringByDeletingLastPathComponent];
-  
-    [pathslock lock];
-    dict = [pathsDict objectForKey: parent];
-    [pathslock unlock];
-  
-    if (dict == nil) {
-      addPath(parent);
-    } else {
-      pathUpdated(parent);
-    }
-  }
-}
-
-NSString *pathForAnnotationsOffset(unsigned long long offset)
-{
-  NSArray *paths;
-  unsigned i;
-  
-  [pathslock lock]; 
-  paths = [pathsDict allKeys];  
-
-  for (i = 0; i < [paths count]; i++) {
-    NSString *path = [paths objectAtIndex: i];
-    NSDictionary *dict = [pathsDict objectForKey: path];
-      
-    if ([[dict objectForKey: @"annoffset"] unsignedLongLongValue] == offset) {
-      [pathslock unlock];
-      return path;
-    }
-  }
-  
-  [pathslock unlock];
-  
-  return nil;
-}
-
-void checkAnnotations()
-{
-  CREATE_AUTORELEASE_POOL(arp);
-  NSString *fpath = [dbdir stringByAppendingPathComponent: @"annotations.tmp"];
-  NSFileHandle *handle; 
-  NSMutableDictionary *written;
-  annotation annot;
-  unsigned annsize;
-  NSData *data;
-  NSString *path;
-  BOOL changed;
-  
-  if ([fm fileExistsAtPath: fpath]) {
-    if ([fm removeFileAtPath: fpath handler: nil] == NO) {
-      NSLog(@"unable to remove the annotations tmp file");
-      RELEASE (arp);
-      return;    
-    }
-  }
-
-  if ([fm createFileAtPath: fpath contents: nil attributes: nil] == NO) { 
-    NSLog(@"unable to create the annotations tmp file");
-    RELEASE (arp);
-    return;
-  }
-
-  handle = [NSFileHandle fileHandleForUpdatingAtPath: fpath];  
-  written = [NSMutableDictionary dictionary];
-   
-  [annslock lock];
-  changed = NO;
-  
-  [annsHandle synchronizeFile];
-  [annsHandle seekToFileOffset: 0];
-  annsize = sizeof(annotation);
-
-  while (1) {
-    NS_DURING
-      {
-        data = [annsHandle readDataOfLength: annsize];
-      }
-    NS_HANDLER
-      {
-        data = nil;
-      }
-    NS_ENDHANDLER
-    
-    if (data && ([data length] == annsize)) {
-      NSMutableDictionary *dict;
-      
-      memset(annot.ann, 0, sizeof(annot.ann));
-      memset(annot.path, 0, sizeof(annot.path));
-
-      [data getBytes: &annot.ann range: NSMakeRange(0, sizeof(annot.ann) - 1)];
-      [data getBytes: &annot.path 
-               range: NSMakeRange(sizeof(annot.ann), sizeof(annot.path) - 1)];
-    
-      path = [NSString stringWithUTF8String: annot.path];
-      dict = [pathsDict objectForKey: path];
-      
-      if (dict) {
-        NSDictionary *wrdict = [written objectForKey: path];
-        unsigned long long newoffset;
-        NSNumber *newoffnum;
-
-        if (wrdict) {
-          newoffnum = [wrdict objectForKey: @"annoffset"];
-          newoffset = [newoffnum unsignedLongLongValue];
-          [handle seekToFileOffset: newoffset];
-        } else {
-          [handle seekToEndOfFile];
-          newoffset = [handle offsetInFile];
-          newoffnum = [NSNumber numberWithUnsignedLongLong: newoffset];
-        } 
-
-        if ([[dict objectForKey: @"annoffset"] isEqual: newoffnum] == NO) {
-          [dict setObject: newoffnum forKey: @"annoffset"];
-          pathUpdated(path);
-          changed = YES;
-        }
-
-        [handle writeData: data]; 
-        [written setObject: dict forKey: path];
-        
-      } else {
-        if ([annsHandle offsetInFile] == annsize) {
-          [handle writeData: data]; 
-        } else {
-          changed = YES;
-        }
-      }
-      
-    } else {
-      break;
-    }
-  }
-    
-  [handle synchronizeFile];
-  [handle seekToFileOffset: 0];
-  
-  if (changed) {
-    [annsHandle truncateFileAtOffset: 0];
-
-    while (1) {
-      NS_DURING
-        {
-          data = [handle readDataOfLength: sizeof(annotation)];
-        }
-      NS_HANDLER
-        {
-          data = nil;
-        }
-      NS_ENDHANDLER
-
-      if (data && ([data length] == sizeof(annotation))) {
-        [annsHandle writeData: data];
-      } else {
-        break;
-      }
-    }
-    
-    [annsHandle synchronizeFile];
-  }
-
-  [handle closeFile];
-  [fm removeFileAtPath: fpath handler: nil];
-  [annslock unlock];
-  RELEASE (arp);
-}
-
-void duplicatePathInfo(NSString *srcpath, NSString *dstpath)
-{
-  NSString *annotations = annotationsForPath(srcpath);
-  
-  if (annotations) {
-    setAnnotationsForPath(annotations, dstpath);
-  }
-}
-
-BOOL subpathOfPath(NSString *p1, NSString *p2)
+BOOL subpath(NSString *p1, NSString *p2)
 {
   int l1 = [p1 length];
   int l2 = [p2 length];  
@@ -1821,12 +509,12 @@ static NSString *path_sep(void)
   return separator;
 }
 
-NSString *path_separator(void)
+NSString *pathsep(void)
 {
   return path_sep();
 }
 
-NSString *pathRemovingPrefix(NSString *path, NSString *prefix)
+NSString *removePrefix(NSString *path, NSString *prefix)
 {
   if ([path hasPrefix: prefix]) {
 	  return [path substringFromIndex: [path rangeOfString: prefix].length + 1];
@@ -1834,7 +522,6 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix)
 
   return path;  	
 }
-
 
 
 int main(int argc, char** argv)
@@ -1882,7 +569,6 @@ int main(int argc, char** argv)
 
     if (ddbd != nil) {
 	    CREATE_AUTORELEASE_POOL (pool);
-      [ddbd prepareDb];
       [[NSRunLoop currentRunLoop] run];
   	  RELEASE (pool);
     }

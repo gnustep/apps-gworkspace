@@ -48,24 +48,21 @@
 
 - (NSTimeInterval)timestampOfPath:(NSString *)path;
 
+- (oneway void)synchronize;
+
 @end
 
     
 @interface DDBd: NSObject <DDBdProtocol>
 {
-  NSTimer *syncTimer;
-  NSTimeInterval syncinterval;
+  NSString *dbdir;
   NSConnection *conn;
   NSNotificationCenter *nc; 
 }
-
-- (void)prepareDb;
                                                      
 - (void)connectionBecameInvalid:(NSNotification *)notification;
 
 - (void)fileSystemDidChange:(NSNotification *)notif;
-
-- (void)synchronize:(id)sender;
 
 - (void)threadWillExit:(NSNotification *)notification;
             
@@ -74,7 +71,6 @@
 
 @interface DBUpdater: NSObject
 {
-  id ddbd;
   NSDictionary *updinfo;
 }
 
@@ -84,16 +80,17 @@
 
 - (void)done;
 
-- (void)prepareDb;
-
 - (void)insertTrees;
 
 - (void)removeTrees;
 
 - (void)fileSystemDidChange;
 
-- (void)synchronize;
-
 @end
+
+
+BOOL subpath(NSString *p1, NSString *p2);
+NSString *pathsep(void);
+NSString *removePrefix(NSString *path, NSString *prefix);
 
 #endif // DDBD_H

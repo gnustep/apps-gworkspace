@@ -4,12 +4,18 @@ GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
 
 include $(GNUSTEP_MAKEFILES)/common.make
 
+SUBPROJECTS = MDModules 
+
 # The application to be compiled
 TOOL_NAME = ddbd
 
-ddbd_OBJC_FILES = ddbd.m
+ddbd_OBJC_FILES = ddbd.m \
+DDBPathsManager.m \
+DDBDirsManager.m \
+DDBMDStorage.m
 
-ADDITIONAL_TOOL_LIBS += -lgnustep-gui $(SYSTEM_LIBS)
+ddbd_TOOL_LIBS += -lDBKit
+ddbd_TOOL_LIBS += -lgnustep-gui $(SYSTEM_LIBS)
 
 -include GNUmakefile.preamble
 

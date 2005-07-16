@@ -1,5 +1,6 @@
+
 # Additional flags to pass to the preprocessor
-# ADDITIONAL_CPPFLAGS += 
+ADDITIONAL_CPPFLAGS += 
 
 # Additional flags to pass to the Objective-C compiler
 ADDITIONAL_OBJCFLAGS += -Wall
@@ -8,11 +9,17 @@ ADDITIONAL_OBJCFLAGS += -Wall
 ADDITIONAL_CFLAGS += -Wall
 
 # Additional include directories the compiler should search
-ADDITIONAL_INCLUDE_DIRS += -IMDModules
-ADDITIONAL_INCLUDE_DIRS += -I../DBKit
+ADDITIONAL_INCLUDE_DIRS += -I../
+ADDITIONAL_INCLUDE_DIRS += -I../../
 
 # Additional LDFLAGS to pass to the linker
-# ADDITIONAL_LDFLAGS += 
+ADDITIONAL_LDFLAGS += 
 
-ADDITIONAL_TOOL_LIBS += -L../DBKit/$(GNUSTEP_OBJ_DIR)
+ADDITIONAL_TOOL_LIBS +=
 
+#
+# Flags dealing with installing and uninstalling
+#
+
+# Additional directories to be created during installation
+ADDITIONAL_INSTALL_DIRS +=
