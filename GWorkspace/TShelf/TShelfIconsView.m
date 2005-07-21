@@ -286,7 +286,7 @@
 		    [self unsetWatcherForPath: watched];
 	    }
       
-      if ([[self subviews] containsObject: label]) {
+      if (label && [[self subviews] containsObject: label]) {
         [label removeFromSuperview];
       }
     }

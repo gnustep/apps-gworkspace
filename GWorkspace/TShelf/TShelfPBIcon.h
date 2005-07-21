@@ -77,6 +77,8 @@
 
 - (int)gridindex;
 
+- (NSTextField *)myLabel;
+
 @end
 
 @interface TShelfPBIcon (DraggingSource)

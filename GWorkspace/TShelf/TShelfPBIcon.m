@@ -167,6 +167,11 @@
   return gridindex;
 }
 
+- (NSTextField *)myLabel
+{
+  return nil;
+}
+
 - (BOOL)acceptsFirstMouse:(NSEvent *)theEvent 
 {
   return YES;
