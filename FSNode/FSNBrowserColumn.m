@@ -59,16 +59,22 @@ static id <DesktopApplication> desktopApp = nil;
 
 + (void)initialize
 {
-  if (desktopApp == nil) {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSString *appName = [defaults stringForKey: @"DesktopApplicationName"];
-    NSString *selName = [defaults stringForKey: @"DesktopApplicationSelName"];
+  static BOOL initialized = NO;
 
-    if (appName && selName) {
-		  Class desktopAppClass = [[NSBundle mainBundle] classNamed: appName];
-      SEL sel = NSSelectorFromString(selName);
-      desktopApp = [desktopAppClass performSelector: sel];
+  if (initialized == NO) {
+    if (desktopApp == nil) {
+      NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+      NSString *appName = [defaults stringForKey: @"DesktopApplicationName"];
+      NSString *selName = [defaults stringForKey: @"DesktopApplicationSelName"];
+
+      if (appName && selName) {
+		    Class desktopAppClass = [[NSBundle mainBundle] classNamed: appName];
+        SEL sel = NSSelectorFromString(selName);
+        desktopApp = [desktopAppClass performSelector: sel];
+      }
     }
+  
+    initialized = YES;
   }
 }
 

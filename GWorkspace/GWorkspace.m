@@ -631,6 +631,11 @@ static GWorkspace *gworkspace = nil;
                 					object: nil];
 
   [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
+                        selector: @selector(customDirectoryIconDidChange:) 
+                					  name: GWCustomDirectoryIconDidChangeNotification
+                					object: nil];
+
+  [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
                         selector: @selector(applicationForExtensionsDidChange:) 
                 					  name: @"GWAppForExtensionDidChangeNotification"
                 					object: nil];
@@ -1482,6 +1487,26 @@ static GWorkspace *gworkspace = nil;
 		  }
     }
   }
+}
+
+- (void)customDirectoryIconDidChange:(NSNotification *)notif
+{
+  NSDictionary *info = [notif userInfo];
+  NSString *path = [info objectForKey: @"path"];
+  NSArray *paths;	
+  
+  if ([path isEqual: path_separator()] == NO) {
+    path = [path stringByDeletingLastPathComponent];
+  }
+  
+  paths = [NSArray arrayWithObject: path];
+  
+  [vwrsManager thumbnailsDidChangeInPaths: paths];
+  [dtopManager thumbnailsDidChangeInPaths: paths];
+
+  if ([tshelfWin isVisible]) {
+    [tshelfWin updateIcons]; 
+	}
 }
 
 - (void)applicationForExtensionsDidChange:(NSNotification *)notif

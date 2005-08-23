@@ -27,6 +27,7 @@
 #include <math.h>
 #include "Tools.h"
 #include "Inspector.h"
+#include "IconView.h"
 #include "Functions.h"
 #include "FSNodeRep.h"
 
@@ -67,6 +68,7 @@ static NSString *nibName = @"Tools";
     RELEASE (win); 
 
     inspector = insp;
+    [iconView setInspector: inspector];
     ws = [NSWorkspace sharedWorkspace];
 
     [scrollView setBorderType: NSBezelBorder];

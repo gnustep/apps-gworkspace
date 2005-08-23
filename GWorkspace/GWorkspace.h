@@ -247,6 +247,8 @@
 
 - (void)thumbnailsDidChange:(NSNotification *)notif;
 
+- (void)customDirectoryIconDidChange:(NSNotification *)notif;
+
 - (void)applicationForExtensionsDidChange:(NSNotification *)notif;
 
 - (int)maxHistoryCache;

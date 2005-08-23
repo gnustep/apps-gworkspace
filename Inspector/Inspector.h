@@ -31,6 +31,7 @@
 @class Attributes;
 @class Contents;
 @class Tools;
+@class IconView;
 
 @interface Inspector : NSObject 
 {
@@ -87,6 +88,20 @@
 - (void)watcherNotification:(NSNotification *)notif;
 
 - (id)desktopApp;
+
+@end
+
+
+@interface Inspector (CustomDirectoryIcons)
+
+- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
+                     inIconView:(IconView *)iview;
+
+- (void)draggingExited: (id <NSDraggingInfo>)sender
+            inIconView:(IconView *)iview;
+
+- (void)concludeDragOperation:(id <NSDraggingInfo>)sender 
+                   inIconView:(IconView *)iview;
 
 @end
 

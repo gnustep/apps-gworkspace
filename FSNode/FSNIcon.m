@@ -60,22 +60,28 @@ static NSImage *branchImage;
 
 + (void)initialize
 {
-  NSBundle *bundle = [NSBundle bundleForClass: [FSNodeRep class]];
-  NSString *imagepath = [bundle pathForResource: @"ArrowRight" ofType: @"tiff"];
+  static BOOL initialized = NO;
 
-  if (desktopApp == nil) {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSString *appName = [defaults stringForKey: @"DesktopApplicationName"];
-    NSString *selName = [defaults stringForKey: @"DesktopApplicationSelName"];
+  if (initialized == NO) {
+    NSBundle *bundle = [NSBundle bundleForClass: [FSNodeRep class]];
+    NSString *imagepath = [bundle pathForResource: @"ArrowRight" ofType: @"tiff"];
 
-    if (appName && selName) {
-		  Class desktopAppClass = [[NSBundle mainBundle] classNamed: appName];
-      SEL sel = NSSelectorFromString(selName);
-      desktopApp = [desktopAppClass performSelector: sel];
+    if (desktopApp == nil) {
+      NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+      NSString *appName = [defaults stringForKey: @"DesktopApplicationName"];
+      NSString *selName = [defaults stringForKey: @"DesktopApplicationSelName"];
+
+      if (appName && selName) {
+		    Class desktopAppClass = [[NSBundle mainBundle] classNamed: appName];
+        SEL sel = NSSelectorFromString(selName);
+        desktopApp = [desktopAppClass performSelector: sel];
+      }
     }
+
+    branchImage = [[NSImage alloc] initWithContentsOfFile: imagepath];
+  
+    initialized = YES;
   }
-    
-  branchImage = [[NSImage alloc] initWithContentsOfFile: imagepath];
 }
 
 + (NSImage *)branchImage

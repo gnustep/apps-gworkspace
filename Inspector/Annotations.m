@@ -27,6 +27,7 @@
 #include <math.h>
 #include "Annotations.h"
 #include "Inspector.h"
+#include "IconView.h"
 #include "Functions.h"
 #include "FSNodeRep.h"
 #include "config.h"
@@ -64,6 +65,7 @@ static NSString *nibName = @"Annotations";
     RELEASE (win);
     
     inspector = insp;
+    [iconView setInspector: inspector];
     desktopApp = [inspector desktopApp];
     currentPath = nil;
 

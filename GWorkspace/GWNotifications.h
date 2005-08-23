@@ -42,6 +42,7 @@ extern NSString *GWIconsCellsWidthChangedNotification;
 
 /* Thumbnails Notifications */
 extern NSString *GWThumbnailsDidChangeNotification;
+extern NSString *GWCustomDirectoryIconDidChangeNotification;
 
 /* File Watcher Notifications */
 extern NSString *GWFileWatcherFileDidChangeNotification;

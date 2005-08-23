@@ -32,6 +32,7 @@ Inspector_OBJC_FILES = \
          Contents.m \
          Tools.m \
          Annotations.m \
+         IconView.m \
          TimeDateView.m \
          Functions.m
 

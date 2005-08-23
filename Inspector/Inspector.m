@@ -30,6 +30,7 @@
 #include "Attributes.h"
 #include "Tools.h"
 #include "Annotations.h"
+#include "IconView.h"
 #include "Functions.h"
 
 #define ATTRIBUTES   0
@@ -284,4 +285,121 @@ static NSString *nibName = @"InspectorWin";
 }
 
 @end
+
+
+@implementation Inspector (CustomDirectoryIcons)
+
+- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
+                     inIconView:(IconView *)iview
+{
+  FSNode *dstnode;
+
+  [iview setDndTarget: NO];
+
+  if ((currentPaths == nil) || ([currentPaths count] > 1)) {
+    return NSDragOperationNone;
+  } 
+
+  dstnode = [FSNode nodeWithPath: [currentPaths objectAtIndex: 0]];
+  
+  if ([dstnode isWritable] == NO) {
+    return NSDragOperationNone;
+  }
+  if (([dstnode isDirectory] == NO) || [dstnode isPackage]) {
+    return NSDragOperationNone;
+  }
+
+  if ([NSImage canInitWithPasteboard: [sender draggingPasteboard]]) {
+    [iview setDndTarget: YES];
+    return NSDragOperationAll;
+  }    
+  
+  return NSDragOperationNone;
+}
+
+- (void)draggingExited: (id <NSDraggingInfo>)sender
+            inIconView:(IconView *)iview
+{
+  [iview setDndTarget: NO];
+}
+
+#define TMBMAX (48.0)
+#define RESZLIM 4
+
+- (void)concludeDragOperation:(id <NSDraggingInfo>)sender 
+                   inIconView:(IconView *)iview
+{
+  CREATE_AUTORELEASE_POOL(arp);
+  NSPasteboard *pb = [sender draggingPasteboard];  
+  NSImage *image = [[NSImage alloc] initWithPasteboard: pb];
+  NSData *data = nil;
+
+  if (image && [image isValid]) {
+    NSSize size = [image size];
+    NSImageRep *rep = [image bestRepresentationForDevice: nil];
+
+    if ((size.width <= TMBMAX) && (size.height <= TMBMAX) 
+                            && (size.width >= (TMBMAX - RESZLIM)) 
+                                    && (size.height >= (TMBMAX - RESZLIM))) {
+ 	    if ([rep isKindOfClass: [NSBitmapImageRep class]]) {
+        data = [(NSBitmapImageRep *)rep TIFFRepresentation];
+      }
+    }
+  
+    if (data == nil) {
+      NSRect srcr = NSMakeRect(0, 0, size.width, size.height);
+	    NSRect dstr = NSZeroRect;  
+      NSImage *newimage = nil;
+      NSBitmapImageRep *newBitmapImageRep = nil;
+
+      if (size.width >= size.height) {
+        dstr.size.width = TMBMAX;
+        dstr.size.height = TMBMAX * size.height / size.width;
+      } else {
+        dstr.size.height = TMBMAX;
+        dstr.size.width = TMBMAX * size.width / size.height;
+      }  
+
+      newimage = [[NSImage alloc] initWithSize: dstr.size];
+      [newimage lockFocus];
+
+      [image drawInRect: dstr 
+               fromRect: srcr 
+              operation: NSCompositeSourceOver 
+               fraction: 1.0];
+
+      newBitmapImageRep = [[NSBitmapImageRep alloc] initWithFocusedViewRect: dstr];
+      [newimage unlockFocus];
+
+      data = [newBitmapImageRep TIFFRepresentation];
+      
+      RELEASE (newimage);  
+      RELEASE (newBitmapImageRep);
+    }
+
+    RELEASE (image);  
+  } 
+  
+  if (data) {  
+    NSString *basepath = [currentPaths objectAtIndex: 0];
+    NSString *imgpath = [basepath stringByAppendingPathComponent: @".dir.tiff"];
+    
+    if ([data writeToFile: imgpath atomically: YES]) {
+      NSDictionary *info = [NSDictionary dictionaryWithObject: basepath forKey: @"path"];
+      
+	    [[NSDistributedNotificationCenter defaultCenter] 
+            postNotificationName: @"GWCustomDirectoryIconDidChangeNotification"
+	 								        object: nil 
+                        userInfo: info];
+    }
+  }
+
+  [iview setDndTarget: NO];
+
+  RELEASE (arp);
+}
+
+@end
+
+
 

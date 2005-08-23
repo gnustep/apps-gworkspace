@@ -28,6 +28,7 @@
 #include "Contents.h"
 #include "ContentViewersProtocol.h"
 #include "Inspector.h"
+#include "IconView.h"
 #include "Functions.h"
 #include "FSNodeRep.h"
 #include "config.h"
@@ -73,6 +74,7 @@ static NSString *nibName = @"Contents";
     RELEASE (win);
     
     inspector = insp;
+    [iconView setInspector: inspector];
     viewers = [NSMutableArray new];
     currentPath = nil;
 
@@ -318,6 +320,11 @@ static NSString *nibName = @"Contents";
 	
 	[[inspector win] setTitle: winName];
 	[viewersBox setNeedsDisplay: YES];
+}
+
+- (BOOL)isShowingData
+{
+  return (currentPath == nil);
 }
 
 - (void)dataContentsReadyForType:(NSString *)typeDescr

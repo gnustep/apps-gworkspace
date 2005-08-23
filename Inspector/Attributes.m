@@ -27,6 +27,7 @@
 #include <math.h>
 #include "Attributes.h"
 #include "Inspector.h"
+#include "IconView.h"
 #include "TimeDateView.h"
 #include "Functions.h"
 #include "FSNodeRep.h"
@@ -100,6 +101,7 @@ static BOOL sizeStop = NO;
     RELEASE (win);
 
     inspector = insp;
+    [iconView setInspector: inspector];
 		insppaths = nil;
 		attributes = nil;    
     currentPath = nil;

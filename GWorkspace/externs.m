@@ -41,6 +41,7 @@ NSString *GWIconsCellsWidthChangedNotification = @"GWIconsCellsWidthChangedNotif
 
 /* Thumbnails Notifications */
 NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNotification";
+NSString *GWCustomDirectoryIconDidChangeNotification = @"GWCustomDirectoryIconDidChangeNotification";
 
 /* File Watcher Notifications */
 NSString *GWFileWatcherFileDidChangeNotification = @"GWFileWatcherFileDidChangeNotification";

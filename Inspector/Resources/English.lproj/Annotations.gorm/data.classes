@@ -27,4 +27,12 @@
 	);
 	Super = NSObject;
     };
+    IconView = {
+	Actions = (
+	);
+	Outlets = (
+	    inspector
+	);
+	Super = NSImageView;
+    };
 }

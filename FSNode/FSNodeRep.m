@@ -49,8 +49,13 @@ static FSNodeRep *shared = nil;
 
 + (void)initialize
 {
-  if ([self class] == [FSNodeRep class]) {
-    [FSNodeRep sharedInstance];     
+  static BOOL initialized = NO;
+
+  if (initialized == NO) {
+    if ([self class] == [FSNodeRep class]) {
+      [FSNodeRep sharedInstance];     
+    }
+    initialized = YES;
   }
 }
 

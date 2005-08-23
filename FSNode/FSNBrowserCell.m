@@ -59,26 +59,32 @@ static int infoheight = 0;
 
 + (void)initialize
 {
-  if (desktopApp == nil) {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSString *appName = [defaults stringForKey: @"DesktopApplicationName"];
-    NSString *selName = [defaults stringForKey: @"DesktopApplicationSelName"];
+  static BOOL initialized = NO;
 
-    if (appName && selName) {
-		  Class desktopAppClass = [[NSBundle mainBundle] classNamed: appName];
-      SEL sel = NSSelectorFromString(selName);
-      desktopApp = [desktopAppClass performSelector: sel];
+  if (initialized == NO) {
+    if (desktopApp == nil) {
+      NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+      NSString *appName = [defaults stringForKey: @"DesktopApplicationName"];
+      NSString *selName = [defaults stringForKey: @"DesktopApplicationSelName"];
+
+      if (appName && selName) {
+		    Class desktopAppClass = [[NSBundle mainBundle] classNamed: appName];
+        SEL sel = NSSelectorFromString(selName);
+        desktopApp = [desktopAppClass performSelector: sel];
+      }
+
+      fontAttr = [NSDictionary dictionaryWithObject: [NSFont systemFontOfSize: 12]
+                                             forKey: NSFontAttributeName];
+      RETAIN (fontAttr);
+      dtslenght = [dots sizeWithAttributes: fontAttr].width;     
+      infoFont = [NSFont systemFontOfSize: 10];
+      infoFont = [[NSFontManager sharedFontManager] convertFont: infoFont 
+                                                    toHaveTrait: NSItalicFontMask];
+      RETAIN (infoFont);
+      infoheight = floor([infoFont defaultLineHeightForFont]);
     }
-    
-    fontAttr = [NSDictionary dictionaryWithObject: [NSFont systemFontOfSize: 12]
-                                           forKey: NSFontAttributeName];
-    RETAIN (fontAttr);
-    dtslenght = [dots sizeWithAttributes: fontAttr].width;     
-    infoFont = [NSFont systemFontOfSize: 10];
-    infoFont = [[NSFontManager sharedFontManager] convertFont: infoFont 
-                                                  toHaveTrait: NSItalicFontMask];
-    RETAIN (infoFont);
-    infoheight = floor([infoFont defaultLineHeightForFont]);
+   
+    initialized = YES;
   }
 }
 
