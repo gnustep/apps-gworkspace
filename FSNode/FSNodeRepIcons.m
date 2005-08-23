@@ -237,6 +237,11 @@ static unsigned char darkerLUT[256] = {
   return [self cachedIconOfSize: size forKey: key];
 }
 
+- (void)removeCachedIconsForKey:(NSString *)key
+{
+  [iconsCache removeObjectForKey: key];
+}
+
 - (NSImage *)multipleSelectionIconOfSize:(int)size
 {
   NSSize icnsize = [multipleSelIcon size];

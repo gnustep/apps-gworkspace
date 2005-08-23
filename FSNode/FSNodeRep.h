@@ -443,6 +443,8 @@ typedef enum FSNSelectionMask {
                        forKey:(NSString *)key
                   addBaseIcon:(NSImage *)baseIcon;
 
+- (void)removeCachedIconsForKey:(NSString *)key;
+
 - (NSImage *)multipleSelectionIconOfSize:(int)size;
 
 - (NSImage *)openFolderIconOfSize:(int)size 

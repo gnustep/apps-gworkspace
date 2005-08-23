@@ -1492,14 +1492,17 @@ static GWorkspace *gworkspace = nil;
 - (void)customDirectoryIconDidChange:(NSNotification *)notif
 {
   NSDictionary *info = [notif userInfo];
-  NSString *path = [info objectForKey: @"path"];
+  NSString *dirpath = [info objectForKey: @"path"];
+  NSString *imgpath = [info objectForKey: @"icon_path"];  
   NSArray *paths;	
+
+  [fsnodeRep removeCachedIconsForKey: imgpath];
   
-  if ([path isEqual: path_separator()] == NO) {
-    path = [path stringByDeletingLastPathComponent];
+  if ([dirpath isEqual: path_separator()] == NO) {
+    dirpath = [dirpath stringByDeletingLastPathComponent];
   }
   
-  paths = [NSArray arrayWithObject: path];
+  paths = [NSArray arrayWithObject: dirpath];
   
   [vwrsManager thumbnailsDidChangeInPaths: paths];
   [dtopManager thumbnailsDidChangeInPaths: paths];

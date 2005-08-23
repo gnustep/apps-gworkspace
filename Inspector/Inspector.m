@@ -381,11 +381,14 @@ static NSString *nibName = @"InspectorWin";
   } 
   
   if (data) {  
-    NSString *basepath = [currentPaths objectAtIndex: 0];
-    NSString *imgpath = [basepath stringByAppendingPathComponent: @".dir.tiff"];
+    NSString *dirpath = [currentPaths objectAtIndex: 0];
+    NSString *imgpath = [dirpath stringByAppendingPathComponent: @".dir.tiff"];
     
     if ([data writeToFile: imgpath atomically: YES]) {
-      NSDictionary *info = [NSDictionary dictionaryWithObject: basepath forKey: @"path"];
+      NSMutableDictionary *info = [NSMutableDictionary dictionary];
+      
+      [info setObject: dirpath forKey: @"path"];
+      [info setObject: imgpath forKey: @"icon_path"];      
       
 	    [[NSDistributedNotificationCenter defaultCenter] 
             postNotificationName: @"GWCustomDirectoryIconDidChangeNotification"
