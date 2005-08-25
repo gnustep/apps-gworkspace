@@ -1070,7 +1070,18 @@ static id <DesktopApplication> desktopApp = nil;
 
 - (void)mouseUp:(NSEvent *)theEvent
 {
-  [browser clickInColumn: self];
+  if (matrix) {
+    NSPoint p = [theEvent locationInWindow];
+    int row, col;
+    
+    p = [matrix convertPoint: p fromView: nil];
+
+    if ([matrix getRow: &row column: &col forPoint: p] == NO) {
+      [browser clickInColumn: self];
+    }
+  } else {
+    [browser clickInColumn: self];
+  }
 }
 
 - (void)setFrame:(NSRect)frameRect
