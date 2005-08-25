@@ -142,6 +142,7 @@
 - (FSNBrowserColumn *)columnBeforeColumn:(FSNBrowserColumn *)col;
 - (FSNBrowserColumn *)columnAfterColumn:(FSNBrowserColumn *)col;
 
+- (void)clickInColumn:(FSNBrowserColumn *)col;
 - (void)clickInMatrixOfColumn:(FSNBrowserColumn *)col;
 - (void)doubleClickInMatrixOfColumn:(FSNBrowserColumn *)col;
 - (void)doubleClikTimeOut:(id)sender;

@@ -499,6 +499,13 @@
   [watchedNodes addObjectsFromArray: components];
 }
 
+- (void)multipleNodeViewDidSelectSubNode:(FSNode *)node
+{
+  if ([node isDirectory] && ([node isPackage] == NO)) {
+    [nodeView setLastShownNode: node];
+  }
+}
+
 - (void)setSelectableNodesRange:(NSRange)range
 {
   visibleCols = range.length;

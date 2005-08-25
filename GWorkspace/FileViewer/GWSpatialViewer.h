@@ -96,6 +96,7 @@
         repOfNode:(FSNode *)anode;
 - (void)unselectAllReps;
 - (void)selectionChanged:(NSArray *)newsel;
+- (void)multipleNodeViewDidSelectSubNode:(FSNode *)node;
 - (void)setSelectableNodesRange:(NSRange)range;
 - (void)updeateInfoLabels;
 - (void)popUpAction:(id)sender;

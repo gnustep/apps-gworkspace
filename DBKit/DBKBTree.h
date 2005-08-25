@@ -31,6 +31,8 @@
 @class DBKFreeNodesPage;
 @class DBKFixLenRecordsFile;
 
+extern NSRecursiveLock *dbkbtree_lock;
+
 @interface DBKBTree: NSObject 
 {
   NSMutableData *headData;

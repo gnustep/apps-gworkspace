@@ -1083,6 +1083,17 @@
   return nil;
 }
 
+- (void)clickInColumn:(FSNBrowserColumn *)col
+{
+  if (viewer) {
+    NSArray *selection = [col selectedNodes];
+
+    if (selection && [selection count]) {
+      [viewer multipleNodeViewDidSelectSubNode: [col shownNode]];
+    }
+  }
+}
+
 - (void)clickInMatrixOfColumn:(FSNBrowserColumn *)col
 {
   int index = [col index];

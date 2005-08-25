@@ -104,6 +104,7 @@
         repOfNode:(FSNode *)anode;
 - (void)unselectAllReps;
 - (void)selectionChanged:(NSArray *)newsel;
+- (void)multipleNodeViewDidSelectSubNode:(FSNode *)node;
 - (void)pathsViewDidSelectIcon:(id)icon;
 - (void)shelfDidSelectIcon:(id)icon;
 - (void)setSelectableNodesRange:(NSRange)range;

@@ -571,6 +571,10 @@
   [manager addNode: node toHistoryOfViewer: self];
 }
 
+- (void)multipleNodeViewDidSelectSubNode:(FSNode *)node
+{
+}
+
 - (void)pathsViewDidSelectIcon:(id)icon
 {
   FSNode *node = [icon node];

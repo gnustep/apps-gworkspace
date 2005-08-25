@@ -191,9 +191,13 @@
     [NSTask launchedTaskWithLaunchPath: cmd 
                              arguments: [NSArray arrayWithObject: cname]];
   } else {
+    NSSize imsize = [imview frame].size;
+    
+    imsize.width -= 4;
+    imsize.height -= 4;
     [self addSubview: progView]; 
     [progView start];
-    [resizer readImageAtPath: imagePath setSize: [imview frame].size];
+    [resizer readImageAtPath: imagePath setSize: imsize];
   }
 }
 
@@ -222,13 +226,17 @@
 - (void)setResizer:(id)anObject
 {
   if (resizer == nil) {
+    NSSize imsize = [imview frame].size;
+    
+    imsize.width -= 4;
+    imsize.height -= 4;
     [anObject setProtocolForProxy: @protocol(ImageResizerProtocol)];
     resizer = (id <ImageResizerProtocol>)anObject;
     RETAIN (resizer);
     waitingResizer = NO;
     [self addSubview: progView]; 
     [progView start];    
-    [resizer readImageAtPath: imagePath setSize: [imview frame].size];
+    [resizer readImageAtPath: imagePath setSize: imsize];
   }
 }
 

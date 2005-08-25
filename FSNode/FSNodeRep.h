@@ -314,6 +314,8 @@ typedef enum FSNSelectionMask {
 
 - (void)setSelectableNodesRange:(NSRange)range;
 
+- (void)multipleNodeViewDidSelectSubNode:(FSNode *)node;
+
 @end
 
 

@@ -31,7 +31,21 @@
 #define HEADLEN 512
 #define FREE_NPAGE_LEN 512
 
+NSRecursiveLock *dbkbtree_lock = nil;
+
 @implementation	DBKBTree
+
++ (void)initialize
+{
+  static BOOL initialized = NO;
+
+  if (initialized == NO) {
+    if ([self class] == [DBKBTree class]) {
+      dbkbtree_lock = [NSRecursiveLock new];
+    }
+    initialized = YES;
+  }
+}
 
 - (void)dealloc
 {

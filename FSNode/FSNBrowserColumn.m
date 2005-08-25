@@ -1068,6 +1068,11 @@ static id <DesktopApplication> desktopApp = nil;
   }
 }
 
+- (void)mouseUp:(NSEvent *)theEvent
+{
+  [browser clickInColumn: self];
+}
+
 - (void)setFrame:(NSRect)frameRect
 {
   NSRect r = NSMakeRect(1, 0, frameRect.size.width -1, frameRect.size.height);
