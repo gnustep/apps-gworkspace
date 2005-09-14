@@ -120,7 +120,7 @@
 		if (connection) {
       [nc removeObserver: self
 		                name: NSConnectionDidDieNotification
-		              object: conn];
+		              object: connection];
 		}
 	}
   

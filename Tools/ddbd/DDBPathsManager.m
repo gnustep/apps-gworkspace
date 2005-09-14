@@ -22,8 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <DBKit/DBKBTreeNode.h>
-#include <DBKit/DBKVarLenRecordsFile.h>
+#include "DBKBTreeNode.h"
+#include "DBKVarLenRecordsFile.h"
 #include "DDBPathsManager.h"
 #include "DDBMDStorage.h"
 #include "MDModulesProtocol.h"

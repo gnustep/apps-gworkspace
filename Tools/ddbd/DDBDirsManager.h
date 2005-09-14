@@ -26,7 +26,7 @@
 #define DDBD_DIRS_MANAGER_H
 
 #include <Foundation/Foundation.h>
-#include <DBKit/DBKBTree.h>
+#include "DBKBTree.h"
 
 @interface DDBDirsManager: NSObject <DBKBTreeDelegate>
 {

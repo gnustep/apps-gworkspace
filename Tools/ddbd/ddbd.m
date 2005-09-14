@@ -23,8 +23,8 @@
  */
 
 #include <AppKit/AppKit.h>
-#include <DBKit/DBKBTreeNode.h>
-#include <DBKit/DBKVarLenRecordsFile.h>
+#include "DBKBTreeNode.h"
+#include "DBKVarLenRecordsFile.h"
 #include "ddbd.h"
 #include "DDBPathsManager.h"
 #include "DDBDirsManager.h"

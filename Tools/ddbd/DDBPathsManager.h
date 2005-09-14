@@ -26,7 +26,7 @@
 #define DDBD_PATHS_MANAGER_H
 
 #include <Foundation/Foundation.h>
-#include <DBKit/DBKBTree.h>
+#include "DBKBTree.h"
 
 @class DDBPath;
 @class DDBMDStorage;
