@@ -2050,8 +2050,8 @@ static GWorkspace *gworkspace = nil;
   [d setObject: @"GWorkspace" forKey: @"ApplicationName"];
   [d setObject: NSLocalizedString(@"GNUstep Workspace Manager", @"")
       	forKey: @"ApplicationDescription"];
-  [d setObject: @"GWorkspace 0.7.1" forKey: @"ApplicationRelease"];
-  [d setObject: @"04 2005" forKey: @"FullVersionID"];
+  [d setObject: @"GWorkspace 0.7.2" forKey: @"ApplicationRelease"];
+  [d setObject: @"09 2005" forKey: @"FullVersionID"];
   [d setObject: [NSArray arrayWithObjects: 
       @"Enrico Sersale <enrico@imago.ro>.\n\
 InspectorViewer, PlistViewer, StringsViewer\n\
