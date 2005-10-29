@@ -28,7 +28,7 @@
 #include "LSFolder.h"
 #include "ResultsTableView.h"
 #include "FSNTextCell.h"
-#include "ResultsPathsView.h"
+#include "FSNPathComponentsViewer.h"
 #include "LSFEditor.h"
 #include "Finder.h"
 #include "FinderModulesProtocol.h"
@@ -368,7 +368,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   [elementsLabel setStringValue: [NSString stringWithFormat: @"%i %@", 
                                         [foundObjects count], elementsStr]];
   [resultsView noteNumberOfRowsChanged];
-  [pathsView showComponentsOfSelection: [self selectedObjects]];
+  [pathViewer showComponentsOfSelection: [self selectedObjects]];
   RELEASE (pool);
 }
 
@@ -378,7 +378,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   [elementsLabel setStringValue: [NSString stringWithFormat: @"%i %@", 
                                         [foundObjects count], elementsStr]];
   [resultsView noteNumberOfRowsChanged];
-  [pathsView showComponentsOfSelection: nil];
+  [pathViewer showComponentsOfSelection: nil];
 }
 
 - (void)endUpdate
@@ -453,7 +453,6 @@ BOOL isPathInResults(NSString *path, NSArray *results);
     NSArray *items;
     id entry;
     NSRect r;
-    int srh;
     int i;
     
     if (sizesDict) {
@@ -466,6 +465,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
     
     [win setTitle: [node name]];
     [win setReleasedWhenClosed: NO];
+    [win setAcceptsMouseMovedEvents: YES];
     [win setDelegate: self];
 
     progView = [[ProgrView alloc] initWithFrame: NSMakeRect(0, 0, 16, 16)
@@ -516,8 +516,6 @@ BOOL isPathInResults(NSString *path, NSArray *results);
     }
 
     [updateButt setTitle: NSLocalizedString(@"Update now", @"")];
-
-    [splitView setDelegate: self];
 
     [resultsScroll setBorderType: NSBezelBorder];
     [resultsScroll setHasHorizontalScroller: YES];
@@ -643,34 +641,10 @@ BOOL isPathInResults(NSString *path, NSArray *results);
       [self setCurrentOrder: FSNInfoNameType];
     }
     
-    r = [pathsScroll frame];
-    srh = 0;
-    
-    if (sizesDict) {
-      entry = [sizesDict objectForKey: @"paths_scr_h"];
-  
-      if (entry) {
-        srh = [entry intValue];
-      }
-    }
-    
-    if (srh == 0) {
-      srh = [finder searchResultsHeight];
-    }
-
-    if (srh != 0) {
-      r.size.height = srh;
-      [pathsScroll setFrame: r];
-    } 
-
-    [pathsScroll setBorderType: NSBezelBorder];
-    [pathsScroll setHasHorizontalScroller: NO];
-    [pathsScroll setHasVerticalScroller: YES]; 
-
-    r = [[pathsScroll contentView] frame];
-    pathsView = [[ResultsPathsView alloc] initWithFrame: r];
-    [pathsScroll setDocumentView: pathsView];
-    RELEASE (pathsView);
+    r = [[pathBox contentView] frame];
+    pathViewer = [[FSNPathComponentsViewer alloc] initWithFrame: r];
+    [(NSBox *)pathBox setContentView: pathViewer];
+    RELEASE (pathViewer);
 
     [[NSDistributedNotificationCenter defaultCenter] addObserver: self
                         selector: @selector(fileSystemDidChange:) 
@@ -727,9 +701,6 @@ BOOL isPathInResults(NSString *path, NSArray *results);
       [sizesDict setObject: [[editor win] stringWithSavedFrame] 
                     forKey: @"editor_win"];
     }
-
-    [sizesDict setObject: [NSNumber numberWithInt: ceil(NSHeight([pathsScroll frame]))] 
-                  forKey: @"paths_scr_h"];
 
     [sizesDict setObject: [NSNumber numberWithInt: currentOrder] 
                   forKey: @"sorting_order"];
@@ -789,7 +760,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   [foundObjects sortUsingSelector: sortingSel];
   [resultsView setHighlightedTableColumn: column];
   [resultsView reloadData];
-  [pathsView showComponentsOfSelection: [self selectedObjects]];
+  [pathViewer showComponentsOfSelection: [self selectedObjects]];
 }
 
 - (void)setCurrentOrder:(FSNInfoType)order
@@ -971,73 +942,6 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 
 
 //
-// NSSplitView delegate methods
-//
-#define MIN_PATHS_H 40
-#define MIN_RESULTS_H 80
-
-- (void)splitView:(NSSplitView *)sender 
-                  resizeSubviewsWithOldSize:(NSSize)oldSize
-{
-  NSRect spBounds = [splitView bounds];
-  float dvt = [splitView dividerThickness];
-  float ptsHeight = NSHeight([pathsScroll frame]);
-  float	resHeight;
-  NSRect newFrame;
-  
-  if ((ptsHeight + dvt) > (NSHeight(spBounds) - MIN_RESULTS_H)) {
-    ptsHeight = MIN_PATHS_H;
-  }
-  
-  resHeight = NSHeight(spBounds) - ptsHeight - dvt;
-  
-  newFrame = NSMakeRect(0, 0, NSWidth(spBounds), resHeight);
-  [resultsScroll setFrame: newFrame];
-
-  newFrame = NSMakeRect(0, resHeight + dvt, NSWidth(spBounds), ptsHeight);
-  [pathsScroll setFrame: newFrame];
-  
-  [resultsView sizeLastColumnToFit];
-  
-  [finder setSearchResultsHeight: ceil(NSHeight([pathsScroll frame]))];  
-}
-
-- (float)splitView:(NSSplitView *)sender 
-            constrainMaxCoordinate:(float)proposedMax 
-                       ofSubviewAt:(int)offset
-{
-  float spHeight = NSHeight([splitView bounds]);
-  float dvt = [splitView dividerThickness];
-
-  if (proposedMax > (spHeight - dvt - MIN_PATHS_H)) {
-    return (spHeight - dvt - MIN_PATHS_H);
-  }
-  
-  return proposedMax;
-}
-
-- (float)splitView:(NSSplitView *)sender 
-            constrainMinCoordinate:(float)proposedMin 
-                       ofSubviewAt:(int)offset
-{
-  if (proposedMin < MIN_RESULTS_H) {
-    return MIN_RESULTS_H;
-  }
-
-  return proposedMin;
-}
-
-- (void)splitViewDidResizeSubviews:(NSNotification *)aNotification
-{
-  visibleRows = (int)([resultsScroll frame].size.height / CELLS_HEIGHT + 1);
-  if ([foundObjects count] <= visibleRows) {
-    [resultsView noteNumberOfRowsChanged];
-  }
-  [finder setSearchResultsHeight: ceil(NSHeight([pathsScroll frame]))]; 
-}
-
-
-//
 // NSTableDataSource protocol
 //
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView
@@ -1106,7 +1010,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 {
   NSArray *selected = [self selectedObjects];
 
-  [pathsView showComponentsOfSelection: selected];
+  [pathViewer showComponentsOfSelection: selected];
   
   if ([selected count]) {
     [finder foundSelectionChanged: [FSNode pathsOfNodes: selected]];

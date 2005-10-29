@@ -876,8 +876,7 @@ static Finder *finder = nil;
       } else if ([node isPackage]) {
         [gworkspace openFile: [node path]];
       } else {
-        [gworkspace selectFile: [node path] 
-                inFileViewerRootedAtPath: [node parentPath]];
+        [gworkspace newViewerAtPath: [node path]];
       }        
     } else if ([node isPlain] || [node isExecutable]) {
       [gworkspace openFile: [node path]];    
@@ -885,7 +884,6 @@ static Finder *finder = nil;
       [ws launchApplication: [node path]];    
     }
   }
-
 }
 
 - (void)fileSystemWillChange:(NSNotification *)notif

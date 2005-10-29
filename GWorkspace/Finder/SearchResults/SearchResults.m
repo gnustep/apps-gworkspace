@@ -28,11 +28,11 @@
 #include "SearchResults.h"
 #include "ResultsTableView.h"
 #include "FSNTextCell.h"
-#include "ResultsPathsView.h"
 #include "Finder.h"
 #include "FinderModulesProtocol.h"
 #include "FSNode.h"
 #include "FSNodeRep.h"
+#include "FSNPathComponentsViewer.h"
 #include "GWFunctions.h"
 #include "Dialogs/Dialogs.h"
 
@@ -76,7 +76,6 @@ static NSString *lsfname = @"LiveSearch.lsf";
     NSUserDefaults *defaults;
     id entry;
     NSRect r;
-    int srh;
       
 		if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
       NSLog(@"failed to load %@!", nibName);
@@ -85,6 +84,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
     }
         
     [win setFrameUsingName: @"search_results"];
+    [win setAcceptsMouseMovedEvents: YES];
     [win setDelegate: self];
     
     progView = [[ProgressView alloc] initWithFrame: NSMakeRect(0, 0, 16, 16)
@@ -104,9 +104,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
     [stopButt setEnabled: NO];
     [restartButt setImage: [NSImage imageNamed: @"magnify_small"]];
     [restartButt setEnabled: NO];
-    
-    [splitView setDelegate: self];
-    
+        
     [resultsScroll setBorderType: NSBezelBorder];
     [resultsScroll setHasHorizontalScroller: YES];
     [resultsScroll setHasVerticalScroller: YES]; 
@@ -199,26 +197,13 @@ static NSString *lsfname = @"LiveSearch.lsf";
     } else {
       [self setCurrentOrder: FSNInfoNameType];
     }
+        
+    r = [[pathBox contentView] frame];
+    pathViewer = [[FSNPathComponentsViewer alloc] initWithFrame: r];
+    [(NSBox *)pathBox setContentView: pathViewer];
+    RELEASE (pathViewer);
 
-    finder = [Finder finder];
-        
-    r = [pathsScroll frame];
-    srh = [finder searchResultsHeight];
-    
-    if (srh != 0) {
-      r.size.height = srh;
-      [pathsScroll setFrame: r];
-    } 
-        
-    [pathsScroll setBorderType: NSBezelBorder];
-    [pathsScroll setHasHorizontalScroller: NO];
-    [pathsScroll setHasVerticalScroller: YES]; 
-
-    r = [[pathsScroll contentView] frame];
-    pathsView = [[ResultsPathsView alloc] initWithFrame: r];
-    [pathsScroll setDocumentView: pathsView];
-    RELEASE (pathsView);
-        
+    finder = [Finder finder];        
     fm = [NSFileManager defaultManager];
     ws = [NSWorkspace sharedWorkspace];
     nc = [NSNotificationCenter defaultCenter];
@@ -413,6 +398,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
 - (IBAction)restartSearch:(id)sender
 {
   if (searchtool == nil) {
+    [pathViewer showComponentsOfSelection: nil];
     [foundObjects removeAllObjects];
     [resultsView reloadData];
     [self activateForSelection: searchPaths
@@ -743,73 +729,6 @@ static NSString *lsfname = @"LiveSearch.lsf";
 
 
 //
-// NSSplitView delegate methods
-//
-#define MIN_PATHS_H 40
-#define MIN_RESULTS_H 80
-
-- (void)splitView:(NSSplitView *)sender 
-                  resizeSubviewsWithOldSize:(NSSize)oldSize
-{
-  NSRect spBounds = [splitView bounds];
-  float dvt = [splitView dividerThickness];
-  float ptsHeight = NSHeight([pathsScroll frame]);
-  float	resHeight;
-  NSRect newFrame;
-  
-  if ((ptsHeight + dvt) > (NSHeight(spBounds) - MIN_RESULTS_H)) {
-    ptsHeight = MIN_PATHS_H;
-  }
-  
-  resHeight = NSHeight(spBounds) - ptsHeight - dvt;
-  
-  newFrame = NSMakeRect(0, 0, NSWidth(spBounds), resHeight);
-  [resultsScroll setFrame: newFrame];
-
-  newFrame = NSMakeRect(0, resHeight + dvt, NSWidth(spBounds), ptsHeight);
-  [pathsScroll setFrame: newFrame];
-  
-  [resultsView sizeLastColumnToFit];
-  
-  [finder setSearchResultsHeight: ceil(NSHeight([pathsScroll frame]))];  
-}
-
-- (float)splitView:(NSSplitView *)sender 
-            constrainMaxCoordinate:(float)proposedMax 
-                       ofSubviewAt:(int)offset
-{
-  float spHeight = NSHeight([splitView bounds]);
-  float dvt = [splitView dividerThickness];
-
-  if (proposedMax > (spHeight - dvt - MIN_PATHS_H)) {
-    return (spHeight - dvt - MIN_PATHS_H);
-  }
-  
-  return proposedMax;
-}
-
-- (float)splitView:(NSSplitView *)sender 
-            constrainMinCoordinate:(float)proposedMin 
-                       ofSubviewAt:(int)offset
-{
-  if (proposedMin < MIN_RESULTS_H) {
-    return MIN_RESULTS_H;
-  }
-
-  return proposedMin;
-}
-
-- (void)splitViewDidResizeSubviews:(NSNotification *)aNotification
-{
-  visibleRows = (int)([resultsScroll frame].size.height / CELLS_HEIGHT + 1);
-  if ([foundObjects count] <= visibleRows) {
-    [resultsView noteNumberOfRowsChanged];
-  }
-  [finder setSearchResultsHeight: ceil(NSHeight([pathsScroll frame]))]; 
-}
-
-
-//
 // NSTableDataSource protocol
 //
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView
@@ -878,7 +797,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
 {
   NSArray *selected = [self selectedObjects];
 
-  [pathsView showComponentsOfSelection: selected];
+  [pathViewer showComponentsOfSelection: selected];
   
   if ([selected count]) {
     [finder foundSelectionChanged: [FSNode pathsOfNodes: selected]];

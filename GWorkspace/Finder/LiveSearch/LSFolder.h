@@ -32,7 +32,7 @@
 @class NSView;
 @class ResultsTableView;
 @class NSTableColumn;
-@class ResultsPathsView;
+@class FSNPathComponentsViewer;
 @class NSImage;
 @class ProgrView;
 
@@ -90,9 +90,7 @@
   IBOutlet id editButt;
   IBOutlet id autoupdatePopUp;
   IBOutlet id updateButt;
-  
-  IBOutlet id splitView;
-  
+    
   IBOutlet id resultsScroll;
   ResultsTableView *resultsView;
   NSTableColumn *nameColumn;
@@ -100,9 +98,9 @@
   NSTableColumn *dateColumn;
   NSTableColumn *sizeColumn;
   NSTableColumn *kindColumn;  
-  
-  IBOutlet id pathsScroll;
-  ResultsPathsView *pathsView;
+    
+  IBOutlet id pathBox;     
+  FSNPathComponentsViewer *pathViewer;
   int visibleRows;
 
   NSMutableArray *foundObjects;

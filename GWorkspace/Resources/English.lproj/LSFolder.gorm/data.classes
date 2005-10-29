@@ -24,10 +24,9 @@
 	    elementsLabel,
 	    autoupdatePopUp,
 	    updateButt,
-	    splitView,
 	    resultsScroll,
-	    pathsScroll,
-	    editButt
+	    editButt,
+	    pathBox
 	);
 	Super = NSObject;
     };

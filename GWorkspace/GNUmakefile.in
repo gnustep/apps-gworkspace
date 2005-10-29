@@ -78,7 +78,6 @@ Finder/SearchPlacesBox.m \
 Finder/SearchPlacesCell.m \
 Finder/SearchResults/SearchResults.m \
 Finder/SearchResults/ResultsTableView.m \
-Finder/SearchResults/ResultsPathsView.m \
 Finder/LiveSearch/LSFolder.m \
 Finder/LiveSearch/LSFEditor.m \
 TShelf/TShelfWin.m \

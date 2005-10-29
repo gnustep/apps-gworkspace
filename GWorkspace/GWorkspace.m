@@ -162,6 +162,11 @@ static GWorkspace *gworkspace = nil;
   return [ws openFile: fullPath withApplication: appName];
 }
 
+- (int)extendPowerOffBy:(int)requested
+{
+  return 0;
+}
+
 - (BOOL)selectFile:(NSString *)fullPath
 											inFileViewerRootedAtPath:(NSString *)rootFullpath
 {

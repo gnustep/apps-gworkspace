@@ -19,7 +19,8 @@ FSNode_OBJC_FILES = \
          FSNBrowser.m \
          FSNIcon.m \
          FSNIconsView.m \
-         FSNListView.m 
+         FSNListView.m \
+         FSNPathComponentsViewer.m
                 
 FSNode_HEADER_FILES = \
          FSNode.h \
@@ -33,7 +34,8 @@ FSNode_HEADER_FILES = \
          FSNBrowser.h \
          FSNIcon.h \
          FSNIconsView.h \
-         FSNListView.h
+         FSNListView.h \
+         FSNPathComponentsViewer.h
         
 FSNode_HAS_RESOURCE_BUNDLE = yes                                          
         

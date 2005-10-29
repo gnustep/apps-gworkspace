@@ -44,6 +44,8 @@
 
 - (BOOL)openFile:(NSString *)fullPath;
 
+- (int)extendPowerOffBy:(int)requested;
+
 - (BOOL)selectFile:(NSString *)fullPath
 							inFileViewerRootedAtPath:(NSString *)rootFullpath;
 

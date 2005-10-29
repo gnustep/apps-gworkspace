@@ -55,20 +55,20 @@
   NSNumber *groupId;
   
   struct nodeFlags {
-    unsigned readable;
-    unsigned writable;
-    unsigned executable;
-    unsigned deletable;
-    unsigned plain;
-    unsigned directory;
-    unsigned link;
-    unsigned socket;
-    unsigned charspecial;
-    unsigned blockspecial;
-    unsigned mountpoint;
-    unsigned application;
-    unsigned package;
-    unsigned unknown;
+    int readable;
+    int writable;
+    int executable;
+    int deletable;
+    int plain;
+    int directory;
+    int link;
+    int socket;
+    int charspecial;
+    int blockspecial;
+    int mountpoint;
+    int application;
+    int package;
+    int unknown;
   } flags;
   
   FSNodeRep *fsnodeRep;

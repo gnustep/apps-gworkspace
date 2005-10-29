@@ -21,9 +21,8 @@
 	    stopButt,
 	    restartButt,
 	    dragIconBox,
-	    splitView,
 	    resultsScroll,
-	    pathsScroll
+	    pathBox
 	);
 	Super = NSObject;
     };

@@ -33,7 +33,7 @@
 @class NSView;
 @class ResultsTableView;
 @class NSTableColumn;
-@class ResultsPathsView;
+@class FSNPathComponentsViewer;
 @class NSImage;
 @class ProgressView;
 @class DocumentIcon;
@@ -63,9 +63,7 @@
   IBOutlet id restartButt;
   IBOutlet id dragIconBox;
   DocumentIcon *documentIcon;
-  
-  IBOutlet id splitView;
-  
+    
   IBOutlet id resultsScroll;
   ResultsTableView *resultsView;
   NSTableColumn *nameColumn;
@@ -74,8 +72,9 @@
   NSTableColumn *sizeColumn;
   NSTableColumn *kindColumn;  
   
-  IBOutlet id pathsScroll;
-  ResultsPathsView *pathsView;
+  IBOutlet id pathBox;   
+  FSNPathComponentsViewer *pathViewer;
+  
   int visibleRows;
   
   NSMutableArray *foundObjects;
