@@ -202,29 +202,10 @@ static NSImage *branchImage;
 
 - (void)tile
 {
-  NSRect frameRect = [self frame];
-  float fwidth = frameRect.size.width;
   float minWidth = [FSNPathComponentView minWidthForIconSize: ICN_SIZE];
-  float xspace = 0.0;
   float orx = BORDER;
   unsigned i;
-    
-  for (i = 0; i < [components count]; i++) {
-    FSNPathComponentView *component = [components objectAtIndex: i];
-  
-    if ((component == openComponent) || (component == lastComponent)) {
-      xspace += [component fullWidth];
-    } else {
-      xspace += minWidth;
-    }
-  }
-  
-  if (xspace > (fwidth - BORDER)) {
-    fwidth = (xspace + BORDER);
-    frameRect.size.width = fwidth;
-    [self setFrame: NSIntegralRect(frameRect)];
-  }
-
+      
   for (i = 0; i < [components count]; i++) {
     FSNPathComponentView *component = [components objectAtIndex: i];
     float fullWidth = [component fullWidth];
