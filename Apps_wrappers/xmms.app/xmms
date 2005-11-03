@@ -6,32 +6,31 @@ else
    file="$1"
 fi
 
-if [ test -z "$file" ]; then 
+if [ -z "$file" ]; then 
    xmms &
    exit
 fi
 
 ACTION=`defaults read XMMS FileOpenAction`
 
-
 if [ "$ACTION" = "XMMS FileOpenAction 'EnqueueAndPlay'" ]; then
-
-   if [ ! "test -z '`which xmms-add-play`'" ]; then
+    
+    if ! which xmms-add-play; then
 	echo "Cannot find xmms-add-play - will enqueue instead."
 	xmms -e "$file" &
-   else if ! [ test -z "`echo '$file' |  grep '.pls' || '.m3u'`" ]; then
-           xmms-add-play "$file" &
-	   # xmms -e -p "$file" &
-	else
-	    # xmms-add-play does not support playlists
+    else 
+	if echo -n "$file" | egrep '.pls|.m3u'; then
+            # xmms-add-play does not support playlists, so enqueue instead.
 	    xmms -e "$file"  & 
-        fi
+	else
+	    xmms-add-play "$file" &
+	fi
         # xmms -p & # if xmms is currently not playing we need to make it play 
-   fi
-else if [ "$ACTION"  = "XMMS FileOpenAction 'Enqueue'" ]; then
-        xmms -e "$file" &
-     else
-	xmms "$file" & 
-     fi 
-fi
+    fi
+
+elif [ "$ACTION"  = "XMMS FileOpenAction 'Enqueue'" ]; then
+    xmms -e "$file" &
+else
+    xmms "$file" & 
+fi 
 

@@ -1,17 +1,35 @@
 #!/bin/sh
 
 if [ "$1" = "-GSFilePath" ] || [ "$1" = "-GSTempPath" ]; then
-   file=$2
+   file="$2"
 else
-   file=$1
+   file="$1"
+fi
+
+if [ -z "$file" ]; then 
+   xmms &
+   exit
 fi
 
 ACTION=`defaults read XMMS FileOpenAction`
 
+if [ "$ACTION" = "XMMS FileOpenAction 'EnqueueAndPlay'" ]; then
+    
+    if ! which xmms-add-play; then
+	echo "Cannot find xmms-add-play - will enqueue instead."
+	xmms -e "$file" &
+    else 
+	if echo -n "$file" | egrep '.pls|.m3u'; then
+            # xmms-add-play does not support playlists, so enqueue instead.
+	    xmms -e "$file"  & 
+	else
+	    xmms-add-play "$file" &
+	fi
+        # xmms -p & # if xmms is currently not playing we need to make it play 
+    fi
 
-if [ "$ACTION"  = "XMMS FileOpenAction 'Enqueue'" ]; then
-   xmms -e "$file" &
+elif [ "$ACTION" = "XMMS FileOpenAction 'Enqueue'" ]; then
+    xmms -e "$file" &
 else
-   xmms "$file" & 
-fi
-
+    xmms "$file" & 
+fi 
