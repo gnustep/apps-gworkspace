@@ -303,7 +303,8 @@ static Recycler *recycler = nil;
 	    [fswatcher setProtocolForProxy: @protocol(FSWatcherProtocol)];
       RETAIN (fswatcher);
                                    
-	    [fswatcher registerClient: (id <FSWClientProtocol>)self];
+	    [fswatcher registerClient: (id <FSWClientProtocol>)self
+                isGlobalWatcher: NO];
       
 	  } else {
 	    static BOOL recursion = NO;

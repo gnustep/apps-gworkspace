@@ -42,7 +42,8 @@
   if (self) {
 		client = nil;
 		conn = nil;
-    wpaths = [NSMutableArray new];
+    wpaths = [[NSCountedSet alloc] initWithCapacity: 1];
+    global = NO;
   }
   
   return self;
@@ -75,17 +76,7 @@
 
 - (void)removeWatchedPath:(NSString *)path
 {
-  int count = [wpaths count];
-  int i;
-  
-  for (i = count - 1; i >= 0; i--) {
-    NSString *wpath = [wpaths objectAtIndex: i];
-  
-    if ([wpath isEqual: path]) {
-      [wpaths removeObjectAtIndex: i];
-      break;
-    }
-  }
+  [wpaths removeObject: path];
 }
 
 - (BOOL)isWathchingPath:(NSString *)path
@@ -93,9 +84,19 @@
   return [wpaths containsObject: path];
 }
 
-- (NSArray *)watchedPaths
+- (NSSet *)watchedPaths
 {
   return wpaths;
+}
+
+- (void)setGlobal:(BOOL)value
+{
+  global = value;
+}
+
+- (BOOL)isGlobal
+{
+  return global;
 }
 
 @end
@@ -105,7 +106,18 @@
 
 - (void)dealloc
 {
-  int i;
+  NSEnumerator *enumerator = [clientsInfo objectEnumerator];
+  FSWClientInfo *info;
+  
+  while ((info = [enumerator nextObject])) {
+    NSConnection *connection = [info connection];
+
+		if (connection) {
+      [nc removeObserver: self
+		                name: NSConnectionDidDieNotification
+		              object: connection];
+		}
+  }
   
   if (conn) {
     [nc removeObserver: self
@@ -113,16 +125,6 @@
 		            object: conn];
     DESTROY (conn);
   }
-
-	for (i = 0; i < [clientsInfo count]; i++) {
-		NSConnection *connection = [[clientsInfo objectAtIndex: i] connection];
-    
-		if (connection) {
-      [nc removeObserver: self
-		                name: NSConnectionDidDieNotification
-		              object: connection];
-		}
-	}
   
   RELEASE (clientsInfo);
   RELEASE (watchers);
@@ -138,9 +140,9 @@
     fm = [NSFileManager defaultManager];	
     nc = [NSNotificationCenter defaultCenter];
     
-    clientsInfo = [NSMutableArray new];
+    clientsInfo = [[NSMutableSet alloc] initWithCapacity: 1];
     
-    watchers = [NSMutableArray new];
+    watchers = [[NSMutableSet alloc] initWithCapacity: 1];
 
     conn = [NSConnection defaultConnection];
     [conn setRootObject: self];
@@ -196,24 +198,30 @@
 		FSWClientInfo *info = [self clientInfoWithConnection: connection];
 	
 		if (info) {
-      NSArray *wpaths = [info watchedPaths];
-      int i;
-    
-      for (i = 0; i < [wpaths count]; i++) {
-        NSString *wpath = [wpaths objectAtIndex: i];
+      NSSet *wpaths = [info watchedPaths];
+      NSEnumerator *enumerator = [wpaths objectEnumerator];
+      NSString *wpath;
+      
+      while ((wpath = [enumerator nextObject])) {
         Watcher *watcher = [self watcherForPath: wpath];
       
         if (watcher) {
           [watcher removeListener];
-        }
-      }  
-    
+        }      
+      }
+          
 			[clientsInfo removeObject: info];
 		}
 	}
 }
 
-- (void)registerClient:(id <FSWClientProtocol>)client
+- (oneway void)setGlobalIncludePaths:(NSArray *)incpaths
+                        excludePaths:(NSArray *)excpaths
+{
+}
+
+- (oneway void)registerClient:(id <FSWClientProtocol>)client
+              isGlobalWatcher:(BOOL)global
 {
 	NSConnection *connection = [(NSDistantObject *)client connectionForProxy];
   FSWClientInfo *info = [self clientInfoWithConnection: connection];
@@ -231,15 +239,17 @@
   if ([(id)client isProxy] == YES) {
     [(id)client setProtocolForProxy: @protocol(FSWClientProtocol)];
     [info setClient: client];  
+    [info setGlobal: global];
   }
 }
 
-- (void)unregisterClient:(id <FSWClientProtocol>)client
+- (oneway void)unregisterClient:(id <FSWClientProtocol>)client
 {
 	NSConnection *connection = [(NSDistantObject *)client connectionForProxy];
   FSWClientInfo *info = [self clientInfoWithConnection: connection];
-  NSArray *wpaths;
-  int i;
+  NSSet *wpaths;
+  NSEnumerator *enumerator;
+  NSString *wpath;
 
 	if (info == nil) {
     [NSException raise: NSInternalInconsistencyException
@@ -252,17 +262,16 @@
   }
 
   wpaths = [info watchedPaths];
+  enumerator = [wpaths objectEnumerator];
   
-  for (i = 0; i < [wpaths count]; i++) {
-    NSString *wpath = [wpaths objectAtIndex: i];
+  while ((wpath = [enumerator nextObject])) {
     Watcher *watcher = [self watcherForPath: wpath];
-
+  
     if (watcher) {
-  //    NSLog(@"removing listener for: %@", wpath);
       [watcher removeListener];
-    }
-  }  
-
+    }  
+  }
+  
   [nc removeObserver: self
 	              name: NSConnectionDidDieNotification
 	            object: connection];
@@ -272,26 +281,24 @@
 
 - (FSWClientInfo *)clientInfoWithConnection:(NSConnection *)connection
 {
-	int i;
+  NSEnumerator *enumerator = [clientsInfo objectEnumerator];
+  FSWClientInfo *info;
 
-	for (i = 0; i < [clientsInfo count]; i++) {
-		FSWClientInfo *info = [clientsInfo objectAtIndex: i];
-    
+  while ((info = [enumerator nextObject])) {
 		if ([info connection] == connection) {
 			return info;
 		}
-	}
+  }
 
 	return nil;
 }
 
 - (FSWClientInfo *)clientInfoWithRemote:(id)remote
 {
-	int i;
+  NSEnumerator *enumerator = [clientsInfo objectEnumerator];
+  FSWClientInfo *info;
 
-	for (i = 0; i < [clientsInfo count]; i++) {
-		FSWClientInfo *info = [clientsInfo objectAtIndex: i];
-    
+  while ((info = [enumerator nextObject])) {
 		if ([info client] == remote) {
 			return info;
 		}
@@ -300,8 +307,8 @@
 	return nil;
 }
 
-- (void)client:(id <FSWClientProtocol>)client
-                          addWatcherForPath:(NSString *)path
+- (oneway void)client:(id <FSWClientProtocol>)client
+                              addWatcherForPath:(NSString *)path
 {
 	NSConnection *connection = [(NSDistantObject *)client connectionForProxy];
   FSWClientInfo *info = [self clientInfoWithConnection: connection];
@@ -333,8 +340,8 @@
   }
 }
 
-- (void)client:(id <FSWClientProtocol>)client
-                          removeWatcherForPath:(NSString *)path
+- (oneway void)client:(id <FSWClientProtocol>)client
+                                removeWatcherForPath:(NSString *)path
 {
 	NSConnection *connection = [(NSDistantObject *)client connectionForProxy];
   FSWClientInfo *info = [self clientInfoWithConnection: connection];
@@ -360,10 +367,10 @@
 
 - (Watcher *)watcherForPath:(NSString *)path
 {
-  int i;
-
-  for (i = 0; i < [watchers count]; i++) {
-    Watcher *watcher = [watchers objectAtIndex: i];    
+  NSEnumerator *enumerator = [watchers objectEnumerator];
+  Watcher *watcher;
+  
+  while ((watcher = [enumerator nextObject])) {
     if ([watcher isWathcingPath: path] && ([watcher isOld] == NO)) { 
       return watcher;
     }
@@ -394,39 +401,21 @@
   [watchers removeObject: watcher];
 }
 
-- (void)watcherNotification:(NSDictionary *)info
+- (void)notifyClients:(NSDictionary *)info
 {
-  int event = [[info objectForKey: @"event"] intValue];
+  CREATE_AUTORELEASE_POOL(pool);
   NSString *path = [info objectForKey: @"path"];
-  NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-  NSData *data;
-  int i;
-  
-  [dict setObject: path forKey: @"path"];
-  
-  if (event == WatchedDirDeleted) {
-    [dict setObject: @"GWWatchedDirectoryDeleted" forKey: @"event"];  
-  } else if (event == FilesDeletedInWatchedDir) {
-    [dict setObject: @"GWFileDeletedInWatchedDirectory" forKey: @"event"];
-    [dict setObject: [info objectForKey: @"files"] forKey: @"files"];
-  } else if (event == FilesCreatedInWatchedDir) {
-    [dict setObject: @"GWFileCreatedInWatchedDirectory" forKey: @"event"];
-    [dict setObject: [info objectForKey: @"files"] forKey: @"files"];
-  } else if (event == WatchedFileDeleted) {
-    [dict setObject: @"GWWatchedFileDeleted" forKey: @"event"];  
-  } else if (event == WatchedFileModified) {
-    [dict setObject: @"GWWatchedFileModified" forKey: @"event"];  
+  NSData *data = [NSArchiver archivedDataWithRootObject: info];
+  NSEnumerator *enumerator = [clientsInfo objectEnumerator];
+  FSWClientInfo *clinfo;
+
+  while ((clinfo = [enumerator nextObject])) {
+		if ([clinfo isWathchingPath: path]) {
+			[[clinfo client] watchedPathDidChange: data];
+		}
   }
 
-  data = [NSArchiver archivedDataWithRootObject: dict];
-  
-	for (i = 0; i < [clientsInfo count]; i++) {
-		FSWClientInfo *info = [clientsInfo objectAtIndex: i];
-    
-		if ([info isWathchingPath: path]) {
-			[[info client] watchedPathDidChange: data];
-		}
-	}
+  RELEASE (pool);  
 }
 
 @end
@@ -482,11 +471,13 @@
 
 - (void)watchFile
 {
+  CREATE_AUTORELEASE_POOL(pool);
   NSDictionary *attributes;
   NSDate *moddate;
   NSMutableDictionary *notifdict;
 
 	if (isOld) {
+    RELEASE (pool);  
 		return;
 	}
 	
@@ -495,17 +486,10 @@
   if (attributes == nil) {
     notifdict = [NSMutableDictionary dictionary];
     [notifdict setObject: watchedPath forKey: @"path"];
-    
-    if (isdir) {
-      [notifdict setObject: [NSNumber numberWithInt: WatchedDirDeleted] 
-                    forKey: @"event"];
-    } else {
-      [notifdict setObject: [NSNumber numberWithInt: WatchedFileDeleted] 
-                    forKey: @"event"];
-    }
-    
-    [fswatcher watcherNotification: notifdict];              
+    [notifdict setObject: @"GWWatchedPathDeleted" forKey: @"event"];
+    [fswatcher notifyClients: notifdict];              
 		isOld = YES;
+    RELEASE (pool);  
     return;
   }
   	
@@ -527,11 +511,11 @@
 		  /* if there is an error in fileAttributesAtPath */
 		  /* or watchedPath doesn't exist anymore         */
 		  if (newconts == nil) {	
-        [notifdict setObject: [NSNumber numberWithInt: WatchedDirDeleted] 
-                      forKey: @"event"];
-        [fswatcher watcherNotification: notifdict];
+        [notifdict setObject: @"GWWatchedPathDeleted" forKey: @"event"];
+        [fswatcher notifyClients: notifdict];
         RELEASE (oldconts);
 			  isOld = YES;
+        RELEASE (pool);  
     	  return;
 		  }
 
@@ -543,10 +527,9 @@
       }
 
       if ([diffFiles count] > 0) {
-        [notifdict setObject: [NSNumber numberWithInt: FilesDeletedInWatchedDir] 
-                      forKey: @"event"];
+        [notifdict setObject: @"GWFileDeletedInWatchedDirectory" forKey: @"event"];
         [notifdict setObject: diffFiles forKey: @"files"];
-        [fswatcher watcherNotification: notifdict];
+        [fswatcher notifyClients: notifdict];
       }
 
       diffFiles = [NSMutableArray array];
@@ -560,10 +543,9 @@
 
       if ([diffFiles count] > 0) {
         [notifdict setObject: watchedPath forKey: @"path"];
-        [notifdict setObject: [NSNumber numberWithInt: FilesCreatedInWatchedDir] 
-                      forKey: @"event"];
+        [notifdict setObject: @"GWFileCreatedInWatchedDirectory" forKey: @"event"];
         [notifdict setObject: diffFiles forKey: @"files"];
-        [fswatcher watcherNotification: notifdict];
+        [fswatcher notifyClients: notifdict];
       }
 
       TEST_RELEASE (oldconts);	
@@ -574,21 +556,24 @@
       notifdict = [NSMutableDictionary dictionary];
       
       [notifdict setObject: watchedPath forKey: @"path"];
-      [notifdict setObject: [NSNumber numberWithInt: WatchedFileModified] 
-                    forKey: @"event"];
+      [notifdict setObject: @"GWWatchedFileModified" forKey: @"event"];
                     
-      [fswatcher watcherNotification: notifdict];
+      [fswatcher notifyClients: notifdict];
     }
-  } 
+  }
+
+  RELEASE (pool);   
 }
 
 - (void)addListener
 {
+//  NSLog(@"adding listener for: %@", watchedPath);
   listeners++;
 }
 
 - (void)removeListener
 { 
+//  NSLog(@"removing listener for: %@", watchedPath);
   listeners--;
   if (listeners <= 0) { 
 		isOld = YES;

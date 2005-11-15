@@ -29,14 +29,6 @@
 
 @class Watcher;
 
-enum {
-  WatchedDirDeleted,
-  FilesCreatedInWatchedDir,
-  FilesDeletedInWatchedDir,
-  WatchedFileDeleted,
-  WatchedFileModified
-};
-
 @protocol	FSWClientProtocol
 
 - (oneway void)watchedPathDidChange:(NSData *)dirinfo;
@@ -46,7 +38,11 @@ enum {
 
 @protocol	FSWatcherProtocol
 
-- (oneway void)registerClient:(id <FSWClientProtocol>)client;
+- (oneway void)setGlobalIncludePaths:(NSArray *)incpaths
+                        excludePaths:(NSArray *)excpaths;
+
+- (oneway void)registerClient:(id <FSWClientProtocol>)client
+              isGlobalWatcher:(BOOL)global;
 
 - (oneway void)unregisterClient:(id <FSWClientProtocol>)client;
 
@@ -63,7 +59,8 @@ enum {
 {
   NSConnection *conn;
   id <FSWClientProtocol> client;
-  NSMutableArray *wpaths;
+  NSCountedSet *wpaths;
+  BOOL global;
 }
 
 - (void)setConnection:(NSConnection *)connection;
@@ -80,7 +77,11 @@ enum {
 
 - (BOOL)isWathchingPath:(NSString *)path;
 
-- (NSArray *)watchedPaths;
+- (NSSet *)watchedPaths;
+
+- (void)setGlobal:(BOOL)value;
+
+- (BOOL)isGlobal;
 
 @end
 
@@ -88,8 +89,8 @@ enum {
 @interface FSWatcher: NSObject 
 {
   NSConnection *conn;
-  NSMutableArray *clientsInfo;
-  NSMutableArray *watchers;
+  NSMutableSet *clientsInfo;
+  NSMutableSet *watchers;
   NSFileManager *fm;
   NSNotificationCenter *nc; 
 }
@@ -99,19 +100,20 @@ enum {
 
 - (void)connectionBecameInvalid:(NSNotification *)notification;
 
-- (void)registerClient:(id <FSWClientProtocol>)client;
+- (oneway void)registerClient:(id <FSWClientProtocol>)client
+              isGlobalWatcher:(BOOL)global;
 
-- (void)unregisterClient:(id <FSWClientProtocol>)client;
+- (oneway void)unregisterClient:(id <FSWClientProtocol>)client;
 
 - (FSWClientInfo *)clientInfoWithConnection:(NSConnection *)connection;
 
 - (FSWClientInfo *)clientInfoWithRemote:(id)remote;
 
-- (void)client:(id <FSWClientProtocol>)client
-                          addWatcherForPath:(NSString *)path;
+- (oneway void)client:(id <FSWClientProtocol>)client
+                                addWatcherForPath:(NSString *)path;
 
-- (void)client:(id <FSWClientProtocol>)client
-                          removeWatcherForPath:(NSString *)path;
+- (oneway void)client:(id <FSWClientProtocol>)client
+                                removeWatcherForPath:(NSString *)path;
 
 - (Watcher *)watcherForPath:(NSString *)path;
 
@@ -119,7 +121,7 @@ enum {
 
 - (void)removeWatcher:(Watcher *)awatcher;
 
-- (void)watcherNotification:(NSDictionary *)info;
+- (void)notifyClients:(NSDictionary *)info;
       
 @end
 

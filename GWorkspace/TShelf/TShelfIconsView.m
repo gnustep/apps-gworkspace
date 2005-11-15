@@ -640,7 +640,7 @@
 		  NSString *ipath;
 		  int count = [icons count];
 
-		  if ([event isEqual: @"GWWatchedDirectoryDeleted"]) {		
+		  if ([event isEqual: @"GWWatchedPathDeleted"]) {		
 			  for (i = 0; i < count; i++) {
 				  icon = [icons objectAtIndex: i];
 				  ipaths = [icon paths];

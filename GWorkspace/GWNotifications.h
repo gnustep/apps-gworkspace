@@ -46,7 +46,7 @@ extern NSString *GWCustomDirectoryIconDidChangeNotification;
 
 /* File Watcher Notifications */
 extern NSString *GWFileWatcherFileDidChangeNotification;
-extern NSString *GWWatchedDirectoryDeleted;
+extern NSString *GWWatchedPathDeleted;
 extern NSString *GWFileDeletedInWatchedDirectory;
 extern NSString *GWFileCreatedInWatchedDirectory;
 

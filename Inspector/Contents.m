@@ -340,14 +340,16 @@ static NSString *nibName = @"Contents";
   NSString *event = [info objectForKey: @"event"];
 
   if (currentPath && [currentPath isEqual: path]) {
-    if ([event isEqual: @"GWWatchedFileDeleted"]) {
+    if ([event isEqual: @"GWWatchedPathDeleted"]) {
       [self showContentsAt: nil];
 
     } else if ([event isEqual: @"GWWatchedFileModified"]) {
       if (currentViewer 
               && [currentViewer conformsToProtocol: @protocol(ContentViewersProtocol)]) {
         if ([currentPath isEqual: [currentViewer currentPath]]) {
+          [inspector removeWatcherForPath: currentPath];
           [currentViewer displayLastPath: YES];
+          [inspector addWatcherForPath: currentPath];
         }
       }
     }

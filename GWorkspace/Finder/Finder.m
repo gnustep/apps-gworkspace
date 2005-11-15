@@ -1039,7 +1039,7 @@ static Finder *finder = nil;
   NSDictionary *info = [notif object];
   NSString *event = [info objectForKey: @"event"];
 
-  if ([event isEqual: @"GWWatchedFileDeleted"]) {
+  if ([event isEqual: @"GWWatchedPathDeleted"]) {
     LSFolder *folder = [self lsfolderWithPath: [info objectForKey: @"path"]];
     
     if (folder) {

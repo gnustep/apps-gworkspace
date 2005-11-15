@@ -342,11 +342,15 @@ static GWorkspace *gworkspace = nil;
 
 - (NSString *)trashPath
 {
-	NSString *tpath; 
-
-  tpath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
-  tpath = [tpath stringByAppendingPathComponent: @"Desktop"];
-  return [tpath stringByAppendingPathComponent: @".Trash"];
+	static NSString *tpath = nil; 
+  
+  if (tpath == nil) {
+    tpath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
+    tpath = [tpath stringByAppendingPathComponent: @"Desktop"];
+    ASSIGN (tpath, ([tpath stringByAppendingPathComponent: @".Trash"]));
+  }
+  
+  return tpath;
 }
 
 - (BOOL)animateChdir
@@ -1559,7 +1563,8 @@ static GWorkspace *gworkspace = nil;
 	    [fswatcher setProtocolForProxy: @protocol(FSWatcherProtocol)];
       RETAIN (fswatcher);
                                    
-	    [fswatcher registerClient: (id <FSWClientProtocol>)self];
+	    [fswatcher registerClient: (id <FSWClientProtocol>)self 
+                isGlobalWatcher: NO];
       
 	  } else {
 	    static BOOL recursion = NO;
@@ -1648,19 +1653,6 @@ static GWorkspace *gworkspace = nil;
 - (void)watchedPathDidChange:(NSData *)dirinfo
 {
   NSMutableDictionary *info = [[NSUnarchiver unarchiveObjectWithData: dirinfo] mutableCopy];
-  NSString *event = [info objectForKey: @"event"];
-
-  if ([event isEqual: @"GWWatchedDirectoryDeleted"]) {
-    [info setObject: GWWatchedDirectoryDeleted forKey: @"event"];
-  }
-
-  if ([event isEqual: @"GWFileDeletedInWatchedDirectory"]) {
-    [info setObject: GWFileDeletedInWatchedDirectory forKey: @"event"];
-  }
-
-  if ([event isEqual: @"GWFileCreatedInWatchedDirectory"]) {
-    [info setObject: GWFileCreatedInWatchedDirectory forKey: @"event"];
-  }
 
 	[[NSNotificationCenter defaultCenter]
  				 postNotificationName: GWFileWatcherFileDidChangeNotification

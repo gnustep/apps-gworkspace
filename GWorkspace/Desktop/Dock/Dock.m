@@ -565,7 +565,7 @@
   NSString *event = [info objectForKey: @"event"];
   NSString *path = [info objectForKey: @"path"];
     
-  if ([event isEqual: @"GWWatchedDirectoryDeleted"]) {
+  if ([event isEqual: @"GWWatchedPathDeleted"]) {
     int count = [icons count];
     int i;
 

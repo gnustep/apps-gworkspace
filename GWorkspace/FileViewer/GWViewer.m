@@ -714,7 +714,7 @@
       NSString *path = [info objectForKey: @"path"];
       NSString *event = [info objectForKey: @"event"];
   
-      if ([event isEqual: @"GWWatchedDirectoryDeleted"]) {
+      if ([event isEqual: @"GWWatchedPathDeleted"]) {
         NSString *s = [path stringByDeletingLastPathComponent];
 
         if ([self isShowingPath: s]) {

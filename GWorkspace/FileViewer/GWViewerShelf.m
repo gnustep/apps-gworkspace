@@ -733,7 +733,7 @@
     BOOL updated = NO;
     FSNIcon *icon;
 
-		if ([event isEqual: @"GWWatchedDirectoryDeleted"]) {		
+		if ([event isEqual: @"GWWatchedPathDeleted"]) {		
 			for (i = 0; i < count; i++) {
         icon = [icons objectAtIndex: i];
         

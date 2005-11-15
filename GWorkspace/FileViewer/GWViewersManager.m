@@ -715,7 +715,7 @@ static GWViewersManager *vwrsmanager = nil;
     FSNode *node = [viewer baseNode];
     NSArray *watchedNodes = [viewer watchedNodes];
     
-    if ([event isEqual: @"GWWatchedDirectoryDeleted"]) {  
+    if ([event isEqual: @"GWWatchedPathDeleted"]) {  
       if (([[node path] isEqual: path]) || [node isSubnodeOfPath: path]) { 
         if ([viewer invalidated] == NO) {
           [viewer invalidate];

@@ -45,7 +45,7 @@ NSString *GWCustomDirectoryIconDidChangeNotification = @"GWCustomDirectoryIconDi
 
 /* File Watcher Notifications */
 NSString *GWFileWatcherFileDidChangeNotification = @"GWFileWatcherFileDidChangeNotification";
-NSString *GWWatchedDirectoryDeleted = @"GWWatchedDirectoryDeleted";
+NSString *GWWatchedPathDeleted = @"GWWatchedPathDeleted";
 NSString *GWFileDeletedInWatchedDirectory = @"GWFileDeletedInWatchedDirectory";
 NSString *GWFileCreatedInWatchedDirectory = @"GWFileCreatedInWatchedDirectory";
 

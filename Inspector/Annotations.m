@@ -157,7 +157,7 @@ static NSString *nibName = @"Annotations";
   NSString *path = [info objectForKey: @"path"];
 
   if (currentPath && [currentPath isEqual: path]) {
-    if ([[info objectForKey: @"event"] isEqual: @"GWWatchedFileDeleted"]) {
+    if ([[info objectForKey: @"event"] isEqual: @"GWWatchedPathDeleted"]) {
       [iconView setImage: nil];
       [titleField setStringValue: @""];
       
