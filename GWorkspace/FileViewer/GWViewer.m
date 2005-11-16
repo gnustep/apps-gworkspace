@@ -974,26 +974,42 @@
 - (void)openSelectionInNewViewer:(BOOL)newv
 {
   NSArray *selection = [nodeView selectedNodes]; 
-  
-  if (selection) {
+    
+  if (selection && [selection count]) {
     NSMutableArray *dirs = [NSMutableArray array];
     int i;
 
     for (i = 0; i < [selection count]; i++) {
       FSNode *node = [selection objectAtIndex: i];
-      
-      if ([node isDirectory] && ([node isPackage] == NO)) {
-        [dirs addObject: node];
+
+      if ([node isDirectory]) {
+        if ([node isPackage]) {    
+          if ([node isApplication] == NO) {
+            [gworkspace openFile: [node path]];
+          } else {
+            [[NSWorkspace sharedWorkspace] launchApplication: [node path]];
+          }
+        } else {
+          [dirs addObject: node];
+        }
+      } else {
+        [gworkspace openFile: [node path]];
       }
     }
     
-    if ([nodeView isSingleNode] && ([dirs count] == 1) && ([selection count] == 1)) {
-      [nodeView showContentsOfNode: [dirs objectAtIndex: 0]];
-      [self scrollToBeginning];
-      
-    } else if ([dirs count] == 0) {
-      [manager openSelectionInViewer: self closeSender: NO];
+    if (([dirs count] == 1) && ([selection count] == 1)) {
+      if (newv == NO) {
+        if ([nodeView isSingleNode]) {
+          [nodeView showContentsOfNode: [dirs objectAtIndex: 0]];
+          [self scrollToBeginning];
+        }
+      } else {
+        [manager openAsFolderSelectionInViewer: self];
+      }
     }
+    
+  } else if (newv) {
+    [manager openAsFolderSelectionInViewer: self];
   }
 }
 

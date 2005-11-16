@@ -532,7 +532,7 @@
 }
 
 - (void)openSelectionInNewViewer:(BOOL)newv
-{
+{  
   [viewer openSelectionInNewViewer: newv];
 }
 

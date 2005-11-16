@@ -582,14 +582,13 @@ static GWViewersManager *vwrsmanager = nil;
     
   for (i = 0; i < [selreps count]; i++) {
     FSNode *node = [[selreps objectAtIndex: i] node];
-    NSString *path = [node path];
         
     if ([node isDirectory]) {
       if ([node isPackage]) {    
         if ([node isApplication] == NO) {
-          [gworkspace openFile: path];
+          [gworkspace openFile: [node path]];
         } else {
-          [[NSWorkspace sharedWorkspace] launchApplication: path];
+          [[NSWorkspace sharedWorkspace] launchApplication: [node path]];
         }
       } else {
         [self newViewerOfType: [viewer vtype] 
@@ -599,7 +598,7 @@ static GWViewersManager *vwrsmanager = nil;
                      forceNew: NO];
       } 
     } else if ([node isPlain]) {        
-      [gworkspace openFile: path];
+      [gworkspace openFile: [node path]];
     }
   }
 
@@ -611,8 +610,14 @@ static GWViewersManager *vwrsmanager = nil;
 - (void)openAsFolderSelectionInViewer:(id)viewer
 {
   NSArray *selnodes = [[viewer nodeView] selectedNodes];
+  BOOL force = NO;
   int i;
-    
+  
+  if ((selnodes == nil) || ([selnodes count] == 0)) {
+    selnodes = [NSArray arrayWithObject: [[viewer nodeView] shownNode]];
+    force = YES;
+  }
+  
   for (i = 0; i < [selnodes count]; i++) {
     FSNode *node = [selnodes objectAtIndex: i];
         
@@ -621,7 +626,7 @@ static GWViewersManager *vwrsmanager = nil;
                     forNode: node
               showSelection: NO
              closeOldViewer: nil
-                   forceNew: NO];
+                   forceNew: force];
     } else if ([node isPlain]) {        
       [gworkspace openFile: [node path]];
     }
