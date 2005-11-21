@@ -50,8 +50,7 @@ static NSString *nibName = @"VolumesPref";
 		if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
       NSLog(@"failed to load %@!", nibName);
     } else {
-	    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];      
-      NSString *mtabpath;
+      unsigned int systype = [[NSProcessInfo processInfo] operatingSystem];
       NSArray *removables;
       NSSize cs, ms;
       id cell;
@@ -59,19 +58,18 @@ static NSString *nibName = @"VolumesPref";
       
       RETAIN (prefbox);
       RELEASE (win);
-
-      mtabpath = [defaults stringForKey: @"GSMtabPath"];
       
-      if (mtabpath == nil) {
-        mtabpath = @"/etc/mtab";
-        NSRunAlertPanel(nil, 
-               NSLocalizedString(@"The mtab path is not set. Using default value.", @""), 
-               NSLocalizedString(@"OK", @""), 
-               nil, 
-               nil);                                     
+      if (systype == NSGNULinuxOperatingSystem) {
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        NSString *mtabpath = [defaults stringForKey: @"GSMtabPath"];
+      
+        if (mtabpath) {
+          [mtabField setStringValue: mtabpath];
+        }
+      } else {
+        [mtabField setEditable: NO];
+        [mtabField setSelectable: NO];
       }
-
-      [mtabField setStringValue: mtabpath];
       
       [mediaScroll setBorderType: NSBezelBorder];
       [mediaScroll setHasHorizontalScroller: NO];
@@ -94,17 +92,8 @@ static NSString *nibName = @"VolumesPref";
 	    [mediaScroll setDocumentView: mediaMatrix];	
       RELEASE (mediaMatrix);
       
-      removables = [defaults arrayForKey: @"GSRemovableMediaPaths"];
+      removables = [[NSWorkspace sharedWorkspace] removableMediaPaths];
       
-      if ((removables == nil) || ([removables count] == 0)) {
-        removables = [NSArray arrayWithObjects: @"/mnt/floppy", @"/mnt/cdrom", nil];
-        NSRunAlertPanel(nil, 
-               NSLocalizedString(@"The mount points for removable media are not defined. Using default values.", @""), 
-               NSLocalizedString(@"OK", @""), 
-               nil, 
-               nil);                                     
-      }
-
       for (i = 0; i < [removables count]; i++) {
         NSString *mpoint = [removables objectAtIndex: i];
         int count = [[mediaMatrix cells] count];

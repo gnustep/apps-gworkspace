@@ -442,7 +442,6 @@ static GWorkspace *gworkspace = nil;
 	id entry;
   BOOL boolentry;
   NSArray *extendedInfo;
-  NSArray *removables;
   NSMenu *menu;
   int i;
   
@@ -467,11 +466,7 @@ static GWorkspace *gworkspace = nil;
 	processName = [[NSProcessInfo processInfo] processName];    
 	[defaults setObject: processName forKey: @"GSWorkspaceApplication"];
 
-  removables = [defaults arrayForKey: @"GSRemovableMediaPaths"];
-  if ((removables == nil) || ([removables count] == 0)) {
-    removables = [NSArray arrayWithObjects: @"/mnt/floppy", @"/mnt/cdrom", nil];
-  }
-  [fsnodeRep setVolumes: removables];
+  [fsnodeRep setVolumes: [ws removableMediaPaths]];
         
 	entry = [defaults stringForKey: @"defaulteditor"];
 	if (entry == nil) {

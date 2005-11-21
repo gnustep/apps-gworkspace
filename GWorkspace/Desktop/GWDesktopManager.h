@@ -52,6 +52,7 @@ typedef enum DockPosition {
   NSRect tshelfActivateFrame;
   
   GWorkspace *gworkspace;
+  FSNodeRep *fsnodeRep;
   id ws;
   NSFileManager *fm;
   NSNotificationCenter *nc;      
@@ -175,26 +176,6 @@ typedef enum DockPosition {
 + (void)mountRemovableMedia;
 
 - (void)mountRemovableMedia;
-
-@end
-
-
-@interface NSWorkspace (mounting)
-
-- (BOOL)getFileSystemInfoForPath:(NSString *)fullPath
-		                 isRemovable:(BOOL *)removableFlag
-		                  isWritable:(BOOL *)writableFlag
-		               isUnmountable:(BOOL *)unmountableFlag
-		                 description:(NSString **)description
-			                      type:(NSString **)fileSystemType;
-                            
-- (NSArray *)mountedLocalVolumePaths;
-
-- (NSArray *)mountedRemovableMedia;
-
-- (NSArray *)mountNewRemovableMedia;
-
-- (BOOL)unmountAndEjectDeviceAtPath:(NSString *)path;
 
 @end
 

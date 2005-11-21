@@ -72,6 +72,7 @@ static GWDesktopManager *desktopManager = nil;
     nc = [NSNotificationCenter defaultCenter];
     ws = [NSWorkspace sharedWorkspace];
     gworkspace = [GWorkspace gworkspace];
+    fsnodeRep = [FSNodeRep sharedInstance];
     
     [self checkDesktopDirs];
 
@@ -148,7 +149,11 @@ static GWDesktopManager *desktopManager = nil;
 }
 
 - (void)activateDesktop
-{  
+{
+  NSSet *volumes = [fsnodeRep volumes];
+  NSEnumerator *enumerator = [volumes objectEnumerator];
+  NSString *vpath;
+  
   [win activate];
   [[win desktopView] showMountedVolumes];
   [[win desktopView] showContentsOfNode: dskNode];
@@ -158,12 +163,24 @@ static GWDesktopManager *desktopManager = nil;
     [[win desktopView] addSubview: dock];
     [dock tile];
   }
+  
+  while ((vpath = [enumerator nextObject])) {
+    [self addWatcherForPath: vpath];
+  }
 }
 
 - (void)deactivateDesktop
 {
+  NSSet *volumes = [fsnodeRep volumes];
+  NSEnumerator *enumerator = [volumes objectEnumerator];
+  NSString *vpath;
+
   [win deactivate];
   [self removeWatcherForPath: [dskNode path]];
+
+  while ((vpath = [enumerator nextObject])) {
+    [self removeWatcherForPath: vpath];
+  }
 }
 
 - (BOOL)isActive
@@ -466,22 +483,27 @@ static GWDesktopManager *desktopManager = nil;
   NSString *path = [info objectForKey: @"path"];
   NSString *event = [info objectForKey: @"event"];
   
-  if ([event isEqual: @"GWWatchedPathDeleted"]) {
-    if ([path isEqual: [dskNode path]]) {
-      NSRunAlertPanel(nil, 
-                      NSLocalizedString(@"The Desktop directory has been deleted! Quiting now!", @""), 
-                      NSLocalizedString(@"OK", @""), 
-                      nil, 
-                      nil);                                     
-      [NSApp terminate: self];
-    }
-    
-  } else if ([event isEqual: @"GWWatchedFileModified"]) {
-    [[self desktopView] watchedPathChanged: info];
-    
-  } else if ([path isEqual: [dskNode path]]) {
-    [[self desktopView] watchedPathChanged: info];
-  }    
+  if ([[fsnodeRep volumes] containsObject: path]) {  
+    [[self desktopView] showMountedVolumes];
+  
+  } else {
+    if ([event isEqual: @"GWWatchedPathDeleted"]) {
+      if ([path isEqual: [dskNode path]]) {
+        NSRunAlertPanel(nil, 
+                        NSLocalizedString(@"The Desktop directory has been deleted! Quiting now!", @""), 
+                        NSLocalizedString(@"OK", @""), 
+                        nil, 
+                        nil);                                     
+        [NSApp terminate: self];
+      }
+
+    } else if ([event isEqual: @"GWWatchedFileModified"]) {
+      [[self desktopView] watchedPathChanged: info];
+
+    } else if ([path isEqual: [dskNode path]]) {
+      [[self desktopView] watchedPathChanged: info];
+    }    
+  }
 
   [dock watchedPathChanged: info];  
 }
@@ -507,7 +529,7 @@ static GWDesktopManager *desktopManager = nil;
     NSDictionary *dict = [notif userInfo];  
     NSString *volpath = [dict objectForKey: @"NSDevicePath"];
 
-    [[FSNodeRep sharedInstance] lockPaths: [NSArray arrayWithObject: volpath]];
+    [fsnodeRep lockPaths: [NSArray arrayWithObject: volpath]];
     [[self desktopView] workspaceWillUnmountVolumeAtPath: volpath];
   }
 }
@@ -518,7 +540,7 @@ static GWDesktopManager *desktopManager = nil;
     NSDictionary *dict = [notif userInfo];  
     NSString *volpath = [dict objectForKey: @"NSDevicePath"];
 
-    [[FSNodeRep sharedInstance] unlockPaths: [NSArray arrayWithObject: volpath]];
+    [fsnodeRep unlockPaths: [NSArray arrayWithObject: volpath]];
     [[self desktopView] workspaceDidUnmountVolumeAtPath: volpath];
   }
 }
@@ -726,220 +748,5 @@ static GWDesktopManager *desktopManager = nil;
 
 @end
 
-
-@implementation NSWorkspace (mounting)
-
-- (BOOL)getFileSystemInfoForPath:(NSString *)fullPath
-		                 isRemovable:(BOOL *)removableFlag
-		                  isWritable:(BOOL *)writableFlag
-		               isUnmountable:(BOOL *)unmountableFlag
-		                 description:(NSString **)description
-			                      type:(NSString **)fileSystemType
-{
-  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-  NSString *mtabpath = [defaults stringForKey: @"GSMtabPath"];
-  NSArray *removables = [defaults arrayForKey: @"GSRemovableMediaPaths"];
-  NSString *mtab;
-  NSArray *mounts;
-  int i;
-   
-  if (mtabpath == nil) {
-    mtabpath = @"/etc/mtab";
-  }
-
-  if (removables == nil) {
-    removables = [NSArray arrayWithObjects: @"/mnt/floppy", @"/mnt/cdrom", nil];
-  }
-  
-  mtab = [NSString stringWithContentsOfFile: mtabpath];
-  mounts = [mtab componentsSeparatedByString: @"\n"];
-
-  for (i = 0; i < [mounts count]; i++) {
-    NSString *mount = [mounts objectAtIndex: i];
-    
-    if ([mount length]) {
-      NSArray	*parts = [mount componentsSeparatedByString: @" "];
-      
-      if ([parts count] == 6) {
-     //   NSString *device = [parts objectAtIndex: 0];
-        NSString *mountPoint = [parts objectAtIndex: 1];
-        NSString *fsType = [parts objectAtIndex: 2];
-        NSString *fsOptions = [parts objectAtIndex: 3];
-    //    NSString *fsDump = [parts objectAtIndex: 4];      
-    //    NSString *fsPass = [parts objectAtIndex: 5];      
-
-        if ([mountPoint isEqual: fullPath]) {
-          NSScanner *scanner = [NSScanner scannerWithString: fsOptions];
-          
-          *removableFlag = [removables containsObject: mountPoint];
-          *writableFlag = [scanner scanString: @"rw" intoString: NULL];
-          *unmountableFlag = YES;
-          *description = fsType;
-          *fileSystemType = fsType;
-          
-          return YES;
-        }
-      }
-    }
-  }
-
-  return NO;
-}
-
-- (NSArray *)mountedLocalVolumePaths
-{
-  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-  NSString *mtabpath = [defaults stringForKey: @"GSMtabPath"];
-  NSArray *reserved = [defaults arrayForKey: @"GSReservedMountPoints"];
-  NSString *mtab;
-  NSArray *mounts;
-  NSMutableArray *names;
-  int i;
-   
-  if (mtabpath == nil) {
-    mtabpath = @"/etc/mtab";
-  }
-
-  if (reserved == nil) {
-    reserved = [NSArray arrayWithObjects: @"proc", @"devpts", @"shm", 
-                                    @"usbdevfs", @"devpts", 
-                                    @"sysfs", @"tmpfs", nil];
-  }
-
-  mtab = [NSString stringWithContentsOfFile: mtabpath];
-  mounts = [mtab componentsSeparatedByString: @"\n"];
-  names = [NSMutableArray array];
-
-  for (i = 0; i < [mounts count]; i++) {
-    NSString *mount = [mounts objectAtIndex: i];
-    
-    if ([mount length]) {
-      NSArray	*parts = [mount componentsSeparatedByString: @" "];
-        
-      if ([parts count] >= 2) {
-        NSString *type = [parts objectAtIndex: 2];
-        
-        if ([reserved containsObject: type] == NO) {
-	        [names addObject: [parts objectAtIndex: 1]];
-	      }
-      }
-    } 
-  }
-
-  return names;
-}
-
-- (NSArray *)mountedRemovableMedia
-{
-  NSArray	*volumes = [self mountedLocalVolumePaths];
-  NSMutableArray *names = [NSMutableArray array];
-  unsigned	i;
-
-  for (i = 0; i < [volumes count]; i++) {
-    BOOL removableFlag;
-    BOOL writableFlag;
-    BOOL unmountableFlag;
-    NSString *description;
-    NSString *fileSystemType;
-    NSString *name = [volumes objectAtIndex: i];
-
-    if ([self getFileSystemInfoForPath: name
-		              isRemovable: &removableFlag
-		              isWritable: &writableFlag
-		              isUnmountable: &unmountableFlag
-		              description: &description
-		              type: &fileSystemType] && removableFlag) {
-	    [names addObject: name];
-	  }
-  }
-
-  return names;
-}
-
-- (NSArray *)mountNewRemovableMedia
-{
-  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-  NSArray *removables = [defaults arrayForKey: @"GSRemovableMediaPaths"];
-  NSArray *mountedMedia = [self mountedRemovableMedia]; 
-  NSMutableArray *willMountMedia = [NSMutableArray array];
-  NSMutableArray *newlyMountedMedia = [NSMutableArray array];
-  int i;
-
-  if (removables == nil) {
-    removables = [NSArray arrayWithObjects: @"/mnt/floppy", @"/mnt/cdrom", nil];
-  }
-
-  for (i = 0; i < [removables count]; i++) {
-    NSString *removable = [removables objectAtIndex: i];
-    
-    if ([mountedMedia containsObject: removable] == NO) {
-      [willMountMedia addObject: removable];
-    }
-  }  
-  
-  for (i = 0; i < [willMountMedia count]; i++) {
-    NSString *media = [willMountMedia objectAtIndex: i];
-    NSTask *task = [NSTask launchedTaskWithLaunchPath: @"mount"
-                                arguments: [NSArray arrayWithObject: media]];
-      
-    if (task) {
-      [task waitUntilExit];
-      
-      if ([task terminationStatus] == 0) {
-        NSDictionary *userinfo = [NSDictionary dictionaryWithObject: media 
-                                                      forKey: @"NSDevicePath"];
-
-        [[self notificationCenter] postNotificationName: NSWorkspaceDidMountNotification
-                                  object: self
-                                userInfo: userinfo];
-
-        [newlyMountedMedia addObject: media];
-      }
-    }
-  }
-
-  return newlyMountedMedia;
-}
-
-- (BOOL)unmountAndEjectDeviceAtPath:(NSString *)path
-{
-  NSArray	*volumes = [self mountedLocalVolumePaths];
-
-  if ([volumes containsObject: path]) {
-    NSDictionary *userinfo;
-    NSTask *task;
-
-    userinfo = [NSDictionary dictionaryWithObject: path forKey: @"NSDevicePath"];
-
-    [[self notificationCenter] postNotificationName: NSWorkspaceWillUnmountNotification
-				                object: self
-				              userInfo: userinfo];
-
-    task = [NSTask launchedTaskWithLaunchPath: @"umount"
-				                            arguments: [NSArray arrayWithObject: path]];
-
-    if (task) {
-      [task waitUntilExit];
-      if ([task terminationStatus] != 0) {
-	      return NO;
-	    } 
-    } else {
-      return NO;
-    }
-
-    [[self notificationCenter] postNotificationName: NSWorkspaceDidUnmountNotification
-				                object: self
-				              userInfo: userinfo];
-
-    task = [NSTask launchedTaskWithLaunchPath: @"eject"
-				                            arguments: [NSArray arrayWithObject: path]];
-
-    return YES;
-  }
-  
-  return NO;
-}
-
-@end
 
 

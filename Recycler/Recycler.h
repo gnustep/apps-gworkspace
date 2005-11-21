@@ -53,8 +53,20 @@
 
 @protocol	FSWatcherProtocol
 
-- (oneway void)setGlobalIncludePaths:(NSArray *)incpaths
-                        excludePaths:(NSArray *)excpaths;
+- (oneway void)setGlobalIncludePaths:(NSArray *)ipaths
+                        excludePaths:(NSArray *)epaths;
+
+- (oneway void)addGlobalIncludePath:(NSString *)path;
+
+- (oneway void)removeGlobalIncludePath:(NSString *)path;
+
+- (NSArray *)globalIncludePaths;
+
+- (oneway void)addGlobalExcludePath:(NSString *)path;
+
+- (oneway void)removeGlobalExcludePath:(NSString *)path;
+
+- (NSArray *)globalExcludePaths;
 
 - (oneway void)registerClient:(id <FSWClientProtocol>)client
               isGlobalWatcher:(BOOL)global;

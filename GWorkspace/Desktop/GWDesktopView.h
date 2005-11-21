@@ -55,6 +55,7 @@ typedef enum BackImageStyle {
   BackImageStyle backImageStyle;
   BOOL useBackImage;
 
+  NSMutableArray *mountedVolumes;
   NSMutableDictionary *desktopInfo;
       
   GWDesktopManager *manager;

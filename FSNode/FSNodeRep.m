@@ -532,6 +532,11 @@ static FSNodeRep *shared = nil;
   [volumes removeObject: path];
 }
 
+- (NSSet *)volumes
+{
+  return volumes;
+}
+
 - (void)setUseThumbnails:(BOOL)value
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];  
@@ -620,6 +625,303 @@ static FSNodeRep *shared = nil;
 
 @end
 
+
+@implementation NSWorkspace (mounting)
+
+- (NSString *)mtabContents
+{
+  unsigned int systype = [[NSProcessInfo processInfo] operatingSystem];
+  NSString *mtab = nil;
+
+  if (systype == NSGNULinuxOperatingSystem) {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString *mtabpath = [defaults stringForKey: @"GSMtabPath"];
+
+    if (mtabpath == nil) {
+      mtabpath = @"/etc/mtab";
+    }
+
+    if ([[NSFileManager defaultManager] fileExistsAtPath: mtabpath]) {
+      mtab = [NSString stringWithContentsOfFile: mtabpath];
+    }
+    
+  } else if (systype == NSBSDOperatingSystem) {
+    NSTask *task = [NSTask new]; 
+    NSPipe *pipe = [NSPipe pipe];
+    NSFileHandle *handle = [pipe fileHandleForReading];
+    
+    [task setLaunchPath: @"mount"];
+    [task setArguments: [NSArray arrayWithObject: @"-p"]];
+    [task setStandardOutput: pipe];    
+    
+    [task launch];
+    [task waitUntilExit];
+    
+    if ([task terminationStatus] == 0) {
+      NSData *data = [handle readDataToEndOfFile];
+      unsigned len = [data length];
+      
+      if (len) {
+        char mtabuf[1024];
+        const char *bytes = [data bytes];
+        int i;
+      
+        for (i = 0; i < len; i++) {
+          if (bytes[i] == '\t') {
+            mtabuf[i] = ' ';
+          } else {
+            mtabuf[i] = bytes[i]; 
+          } 
+        }
+      
+        mtabuf[i+1] = '\0';
+      
+        mtab = [NSString stringWithUTF8String: mtabuf];
+      }
+    }
+    
+    RELEASE (task);     
+  }
+
+  return mtab;
+}
+
+- (NSArray *)removableMediaPaths
+{
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  NSArray *removables = [defaults arrayForKey: @"GSRemovableMediaPaths"];
+
+  if (removables == nil) {
+    unsigned int systype = [[NSProcessInfo processInfo] operatingSystem];
+  
+    switch(systype) {
+      case NSGNULinuxOperatingSystem:
+        removables = [NSArray arrayWithObjects: @"/mnt/floppy", @"/mnt/cdrom", nil];
+        break;
+
+      case NSBSDOperatingSystem:
+        removables = [NSArray arrayWithObjects: @"/cdrom", nil];
+        break;
+    
+      default:
+        break;
+    }
+  }
+
+  return removables;
+}
+
+- (NSArray *)reservedMountPoints
+{
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  NSArray *reserved = [defaults arrayForKey: @"GSReservedMountPoints"];
+
+  if (reserved == nil) {
+    unsigned int systype = [[NSProcessInfo processInfo] operatingSystem];
+  
+    switch(systype) {
+      case NSGNULinuxOperatingSystem:
+        reserved = [NSArray arrayWithObjects: @"proc", @"devpts", @"shm", 
+                                                    @"usbdevfs", @"devpts", 
+                                                    @"sysfs", @"tmpfs", nil];
+        break;
+
+      case NSBSDOperatingSystem:
+        reserved = [NSArray arrayWithObjects: @"devfs", nil];
+        break;
+    
+      default:
+        break;
+    }
+  }
+
+  return reserved;
+}
+
+- (BOOL)getFileSystemInfoForPath:(NSString *)fullPath
+		                 isRemovable:(BOOL *)removableFlag
+		                  isWritable:(BOOL *)writableFlag
+		               isUnmountable:(BOOL *)unmountableFlag
+		                 description:(NSString **)description
+			                      type:(NSString **)fileSystemType
+{
+  NSString *mtab = [self mtabContents];
+       
+  if (mtab) {
+    NSArray *mounts = [mtab componentsSeparatedByString: @"\n"];
+    NSArray *removables = [self removableMediaPaths];
+    int i;
+
+    for (i = 0; i < [mounts count]; i++) {
+      NSString *mount = [mounts objectAtIndex: i];
+
+      if ([mount length]) {
+        NSArray	*parts = [mount componentsSeparatedByString: @" "];
+
+        if ([parts count] == 6) {
+          NSString *mountPoint = [parts objectAtIndex: 1];
+          NSString *fsType = [parts objectAtIndex: 2];
+          NSString *fsOptions = [parts objectAtIndex: 3];
+
+          if ([mountPoint isEqual: fullPath]) {
+            NSScanner *scanner = [NSScanner scannerWithString: fsOptions];
+
+            *removableFlag = [removables containsObject: mountPoint];
+            *writableFlag = [scanner scanString: @"rw" intoString: NULL];
+            *unmountableFlag = YES;
+            *description = fsType;
+            *fileSystemType = fsType;
+
+            return YES;
+          }
+        }
+      }
+    }
+  }
+  
+  return NO;
+}
+
+- (NSArray *)mountedLocalVolumePaths
+{
+  NSString *mtab = [self mtabContents];
+  NSMutableArray *names = [NSMutableArray array];
+   
+  if (mtab) {
+    NSArray *mounts = [mtab componentsSeparatedByString: @"\n"];
+    NSArray *reserved = [self reservedMountPoints];
+    int i;
+
+    for (i = 0; i < [mounts count]; i++) {
+      NSString *mount = [mounts objectAtIndex: i];
+
+      if ([mount length]) {
+        NSArray	*parts = [mount componentsSeparatedByString: @" "];
+
+        if ([parts count] >= 2) {
+          NSString *type = [parts objectAtIndex: 2];
+
+          if ([reserved containsObject: type] == NO) {
+	          [names addObject: [parts objectAtIndex: 1]];
+	        }
+        }
+      } 
+    }
+  }
+  
+  return names;
+}
+
+- (NSArray *)mountedRemovableMedia
+{
+  NSArray	*volumes = [self mountedLocalVolumePaths];
+  NSMutableArray *names = [NSMutableArray array];
+  unsigned	i;
+
+  for (i = 0; i < [volumes count]; i++) {
+    BOOL removableFlag;
+    BOOL writableFlag;
+    BOOL unmountableFlag;
+    NSString *description;
+    NSString *fileSystemType;
+    NSString *name = [volumes objectAtIndex: i];
+
+    if ([self getFileSystemInfoForPath: name
+		              isRemovable: &removableFlag
+		              isWritable: &writableFlag
+		              isUnmountable: &unmountableFlag
+		              description: &description
+		              type: &fileSystemType] && removableFlag) {
+	    [names addObject: name];
+	  }
+  }
+
+  return names;
+}
+
+- (NSArray *)mountNewRemovableMedia
+{
+  NSArray *removables = [self removableMediaPaths];
+  NSArray *mountedMedia = [self mountedRemovableMedia]; 
+  NSMutableArray *willMountMedia = [NSMutableArray array];
+  NSMutableArray *newlyMountedMedia = [NSMutableArray array];
+  int i;
+
+  for (i = 0; i < [removables count]; i++) {
+    NSString *removable = [removables objectAtIndex: i];
+    
+    if ([mountedMedia containsObject: removable] == NO) {
+      [willMountMedia addObject: removable];
+    }
+  }  
+  
+  for (i = 0; i < [willMountMedia count]; i++) {
+    NSString *media = [willMountMedia objectAtIndex: i];
+    NSTask *task = [NSTask launchedTaskWithLaunchPath: @"mount"
+                                arguments: [NSArray arrayWithObject: media]];
+      
+    if (task) {
+      [task waitUntilExit];
+      
+      if ([task terminationStatus] == 0) {
+        NSDictionary *userinfo = [NSDictionary dictionaryWithObject: media 
+                                                      forKey: @"NSDevicePath"];
+
+        [[self notificationCenter] postNotificationName: NSWorkspaceDidMountNotification
+                                  object: self
+                                userInfo: userinfo];
+
+        [newlyMountedMedia addObject: media];
+      }
+    }
+  }
+
+  return newlyMountedMedia;
+}
+
+- (BOOL)unmountAndEjectDeviceAtPath:(NSString *)path
+{
+  unsigned int systype = [[NSProcessInfo processInfo] operatingSystem];
+  NSArray	*volumes = [self mountedLocalVolumePaths];
+
+  if ([volumes containsObject: path]) {
+    NSDictionary *userinfo;
+    NSTask *task;
+
+    userinfo = [NSDictionary dictionaryWithObject: path forKey: @"NSDevicePath"];
+
+    [[self notificationCenter] postNotificationName: NSWorkspaceWillUnmountNotification
+				                object: self
+				              userInfo: userinfo];
+
+    task = [NSTask launchedTaskWithLaunchPath: @"umount"
+				                            arguments: [NSArray arrayWithObject: path]];
+
+    if (task) {
+      [task waitUntilExit];
+      if ([task terminationStatus] != 0) {
+	      return NO;
+	    } 
+    } else {
+      return NO;
+    }
+
+    [[self notificationCenter] postNotificationName: NSWorkspaceDidUnmountNotification
+				                object: self
+				              userInfo: userinfo];
+
+    if (systype == NSGNULinuxOperatingSystem) {
+      task = [NSTask launchedTaskWithLaunchPath: @"eject"
+				                              arguments: [NSArray arrayWithObject: path]];
+    }
+    
+    return YES;
+  }
+  
+  return NO;
+}
+
+@end
 
 
 

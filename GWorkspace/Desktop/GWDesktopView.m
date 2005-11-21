@@ -59,6 +59,7 @@
 	if (grid != NULL) {
 		NSZoneFree (NSDefaultMallocZone(), grid);
 	}
+  RELEASE (mountedVolumes);
   RELEASE (desktopInfo);
   TEST_RELEASE (backImage);
   TEST_RELEASE (imagePath);
@@ -109,6 +110,7 @@
     ASSIGN (backColor, DEF_COLOR);
 
     backImageStyle = BackImageCenterStyle;
+    mountedVolumes = [NSMutableArray new];
     [self getDesktopInfo];
     [self makeIconsGrid];
     dragIcon = nil;
@@ -144,42 +146,38 @@
 
 - (void)showMountedVolumes
 {
-  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-  NSString *mtabpath = [defaults stringForKey: @"GSMtabPath"];
   NSArray *rvpaths = [[NSWorkspace sharedWorkspace] mountedRemovableMedia];
-  int count = [icons count];
-  int i;
 
-  if (mtabpath == nil) {
-    mtabpath = @"/etc/mtab";
-  }
-
-  [desktopApp removeWatcherForPath: mtabpath];
-
-  for (i = 0; i < count; i++) {
-    FSNIcon *icon = [icons objectAtIndex: i];
+  if ([mountedVolumes isEqual: rvpaths] == NO) {
+    int count = [icons count];
+    int i;
   
-    if ([[icon node] isMountPoint]) {
-      [self removeRep: icon];
-      count--;
-      i--;
+    [mountedVolumes removeAllObjects];
+    [mountedVolumes addObjectsFromArray: rvpaths];
+
+    for (i = 0; i < count; i++) {
+      FSNIcon *icon = [icons objectAtIndex: i];
+
+      if ([[icon node] isMountPoint]) {
+        [self removeRep: icon];
+        count--;
+        i--;
+      }
     }
-  }
 
-  for (i = 0; i < [rvpaths count]; i++) {
-    NSString *vpath = [rvpaths objectAtIndex: i];
-    
-    if ([vpath isEqual: path_separator()] == NO) {
-      FSNode *vnode = [FSNode nodeWithPath: vpath];
-  
-      [vnode setMountPoint: YES];
-      [self addRepForSubnode: vnode];
+    for (i = 0; i < [mountedVolumes count]; i++) {
+      NSString *vpath = [mountedVolumes objectAtIndex: i];
+
+      if ([vpath isEqual: path_separator()] == NO) {
+        FSNode *vnode = [FSNode nodeWithPath: vpath];
+
+        [vnode setMountPoint: YES];
+        [self addRepForSubnode: vnode];
+      }
     }
+
+    [self tile];  
   }
-  
-  [self tile];  
-  
-  [desktopApp addWatcherForPath: mtabpath];
 }
 
 - (void)dockPositionDidChange
@@ -1140,21 +1138,6 @@
         [self addRepForSubnodePath: fpath];
         needupdate = YES;
       }
-    }
-    
-  } else if ([event isEqual: @"GWWatchedFileModified"]) {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSString *mtabpath = [defaults stringForKey: @"GSMtabPath"];
-
-    if (mtabpath == nil) {
-      mtabpath = @"/etc/mtab";
-    }
-  
-    fpath = [info objectForKey: @"path"];
-  
-    if ([fpath isEqual: mtabpath]) {
-      [self showMountedVolumes];
-      needupdate = YES;
     }
   }
   

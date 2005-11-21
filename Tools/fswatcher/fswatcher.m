@@ -215,9 +215,35 @@
 	}
 }
 
-- (oneway void)setGlobalIncludePaths:(NSArray *)incpaths
-                        excludePaths:(NSArray *)excpaths
+- (oneway void)setGlobalIncludePaths:(NSArray *)ipaths
+                        excludePaths:(NSArray *)epaths
 {
+}
+
+- (oneway void)addGlobalIncludePath:(NSString *)path
+{
+}
+
+- (oneway void)removeGlobalIncludePath:(NSString *)path
+{
+}
+
+- (NSArray *)globalIncludePaths
+{
+  return nil;
+}
+
+- (oneway void)addGlobalExcludePath:(NSString *)path
+{
+}
+
+- (oneway void)removeGlobalExcludePath:(NSString *)path
+{
+}
+
+- (NSArray *)globalExcludePaths
+{
+  return nil;
 }
 
 - (oneway void)registerClient:(id <FSWClientProtocol>)client
@@ -500,6 +526,7 @@
       NSArray *oldconts = [pathContents copy];
       NSArray *newconts = [fm directoryContentsAtPath: watchedPath];	
       NSMutableArray *diffFiles = [NSMutableArray array];
+      BOOL contentsChanged = NO;
       int i;
 
       ASSIGN (date, moddate);	
@@ -527,12 +554,13 @@
       }
 
       if ([diffFiles count] > 0) {
+        contentsChanged = YES;
         [notifdict setObject: @"GWFileDeletedInWatchedDirectory" forKey: @"event"];
         [notifdict setObject: diffFiles forKey: @"files"];
         [fswatcher notifyClients: notifdict];
       }
 
-      diffFiles = [NSMutableArray array];
+      [diffFiles removeAllObjects];
 
       for (i = 0; i < [newconts count]; i++) {
         NSString *fname = [newconts objectAtIndex: i];
@@ -542,6 +570,7 @@
       }
 
       if ([diffFiles count] > 0) {
+        contentsChanged = YES;
         [notifdict setObject: watchedPath forKey: @"path"];
         [notifdict setObject: @"GWFileCreatedInWatchedDirectory" forKey: @"event"];
         [notifdict setObject: diffFiles forKey: @"files"];
@@ -549,6 +578,11 @@
       }
 
       TEST_RELEASE (oldconts);	
+
+      if (contentsChanged == NO) {
+        [notifdict setObject: @"GWWatchedFileModified" forKey: @"event"];
+        [fswatcher notifyClients: notifdict];
+      }
       	
 	  } else {  // isdir == NO
       ASSIGN (date, moddate);	

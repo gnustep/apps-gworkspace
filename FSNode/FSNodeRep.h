@@ -421,6 +421,8 @@ typedef enum FSNSelectionMask {
 
 - (void)removeVolumeAt:(NSString *)path;
 
+- (NSSet *)volumes;
+
 - (void)setUseThumbnails:(BOOL)value;
 
 - (BOOL)usesThumbnails;
@@ -474,6 +476,32 @@ typedef enum FSNSelectionMask {
 - (void)prepareThumbnailsCache;
 
 - (NSImage *)thumbnailForPath:(NSString *)apath;
+
+@end
+
+
+@interface NSWorkspace (mounting)
+
+- (NSString *)mtabContents;
+
+- (NSArray *)removableMediaPaths;
+
+- (NSArray *)reservedMountPoints;
+
+- (BOOL)getFileSystemInfoForPath:(NSString *)fullPath
+		                 isRemovable:(BOOL *)removableFlag
+		                  isWritable:(BOOL *)writableFlag
+		               isUnmountable:(BOOL *)unmountableFlag
+		                 description:(NSString **)description
+			                      type:(NSString **)fileSystemType;
+                            
+- (NSArray *)mountedLocalVolumePaths;
+
+- (NSArray *)mountedRemovableMedia;
+
+- (NSArray *)mountNewRemovableMedia;
+
+- (BOOL)unmountAndEjectDeviceAtPath:(NSString *)path;
 
 @end
 
