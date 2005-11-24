@@ -628,6 +628,8 @@ static FSNodeRep *shared = nil;
 
 @implementation NSWorkspace (mounting)
 
+static char mtabuf[1024] = "";
+
 - (NSString *)mtabContents
 {
   unsigned int systype = [[NSProcessInfo processInfo] operatingSystem];
@@ -662,10 +664,11 @@ static FSNodeRep *shared = nil;
       unsigned len = [data length];
       
       if (len) {
-        char mtabuf[1024];
         const char *bytes = [data bytes];
         int i;
-      
+          
+        bzero(mtabuf, 1024);
+        
         for (i = 0; i < len; i++) {
           if (bytes[i] == '\t') {
             mtabuf[i] = ' ';
@@ -673,9 +676,7 @@ static FSNodeRep *shared = nil;
             mtabuf[i] = bytes[i]; 
           } 
         }
-      
-        mtabuf[i+1] = '\0';
-      
+            
         mtab = [NSString stringWithUTF8String: mtabuf];
       }
     }

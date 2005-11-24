@@ -90,7 +90,7 @@ static Operation *operation = nil;
 	return YES;
 }
 
-- (void)setFilenamesCutted:(BOOL)value
+- (oneway void)setFilenamesCutted:(BOOL)value
 {
   filenamesCutted = value;
 }
@@ -100,7 +100,7 @@ static Operation *operation = nil;
   return filenamesCutted;
 }
 
-- (void)performOperation:(NSData *)opinfo
+- (oneway void)performOperation:(NSData *)opinfo
 {
   NSDictionary *opdict = [NSUnarchiver unarchiveObjectWithData: opinfo];
 	NSString *operation = [opdict objectForKey: @"operation"];

@@ -130,7 +130,7 @@ static NSFileManager *fm = nil;
   return YES;
 }
 
-- (BOOL)insertPath:(NSString *)path
+- (oneway void)insertPath:(NSString *)path
 {
   NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: NO];
 
@@ -145,11 +145,9 @@ static NSFileManager *fm = nil;
       [dirslock unlock];
     }
   }
-
-  return YES; 
 }
 
-- (BOOL)removePath:(NSString *)path
+- (oneway void)removePath:(NSString *)path
 {
   [pathslock lock];
   [pathsManager removePath: path];
@@ -158,8 +156,6 @@ static NSFileManager *fm = nil;
   [dirslock lock];
   [dirsManager removeDirectory: path];
   [dirslock unlock];
-  
-  return YES; 
 }
 
 - (void)insertDirectoryTreesFromPaths:(NSData *)info

@@ -113,8 +113,9 @@ static NSString *nibName = @"DefEditorPref";
 
 - (IBAction)chooseEditor:(id)sender
 {
+  NSString *path = [NSSearchPathForDirectoriesInDomains(NSApplicationDirectory, NSSystemDomainMask, YES) lastObject];
 	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
-	NSArray *fileTypes = [NSArray arrayWithObjects: @"app", @"debug", nil];
+	NSArray *fileTypes = [NSArray arrayWithObjects: @"app", @"debug", @"profile", nil];
 	FSNode *node;
 	int result;
 
@@ -123,17 +124,20 @@ static NSString *nibName = @"DefEditorPref";
   [openPanel setCanChooseFiles: YES];
   [openPanel setCanChooseDirectories: NO];
 
-  result = [openPanel runModalForDirectory: NSHomeDirectory() file: nil types: fileTypes];
+  result = [openPanel runModalForDirectory: path file: nil types: fileTypes];
 	if(result != NSOKButton) {
 		return;
   }
   
 	node = [FSNode nodeWithPath: [openPanel filename]];
   
-  if ([node isApplication] == NO) {
+  if (([node isValid] == NO) || ([node isApplication] == NO)) {
     NSRunAlertPanel(nil, 
-        [NSString stringWithFormat: @"%@ is not a valid application!", [node name]], 
-                            @"Continue", nil, nil);  
+        [NSString stringWithFormat: @"%@ %@", 
+                [node name], NSLocalizedString(@"is not a valid application!", @"")], 
+                            @"Continue", 
+                            nil, 
+                            nil);  
     return;
   }	
       
@@ -151,21 +155,30 @@ static NSString *nibName = @"DefEditorPref";
   }
   
   path = [ws fullPathForApplication: editor];
-        
-  ASSIGN (ednode, [FSNode nodeWithPath: path]);
-  image = [fsnodeRep iconOfSize: ICON_SIZE forNode: ednode];
-  [imView setImage: image];
   
-  [nameLabel setStringValue: [ednode name]];
-  [self tile];
-   
-	[defaults setObject: [ednode name] forKey: @"defaulteditor"];
-	[defaults synchronize];
+  if (path) {      
+    ASSIGN (ednode, [FSNode nodeWithPath: path]);
+    image = [fsnodeRep iconOfSize: ICON_SIZE forNode: ednode];
+    [imView setImage: image];
 
-	[[NSDistributedNotificationCenter defaultCenter]
- 				postNotificationName: @"GWDefaultEditorChangedNotification"
-	 								    object: [ednode name] 
-                    userInfo: nil];
+    [nameLabel setStringValue: [ednode name]];
+    [self tile];
+
+	  [defaults setObject: [ednode name] forKey: @"defaulteditor"];
+	  [defaults synchronize];
+
+	  [[NSDistributedNotificationCenter defaultCenter]
+ 				  postNotificationName: @"GWDefaultEditorChangedNotification"
+	 								      object: [ednode name] 
+                      userInfo: nil];
+  } else {
+    NSRunAlertPanel(nil, 
+        [NSString stringWithFormat: @"%@ %@", 
+                editor, NSLocalizedString(@"seems not a valid application!", @"")], 
+                            @"Continue", 
+                            nil, 
+                            nil);    
+  }
 }
 
 - (void)tile

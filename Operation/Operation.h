@@ -53,11 +53,11 @@ enum {
 
 + (Operation *)operation;
 
-- (void)setFilenamesCutted:(BOOL)value;
+- (oneway void)setFilenamesCutted:(BOOL)value;
 
 - (BOOL)filenamesWasCutted;
 
-- (void)performOperation:(NSData *)opinfo;
+- (oneway void)performOperation:(NSData *)opinfo;
 
 - (BOOL)isLockedAction:(int)action
                 onPath:(NSString *)path ;

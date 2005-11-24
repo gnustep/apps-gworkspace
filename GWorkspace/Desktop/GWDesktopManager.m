@@ -486,23 +486,18 @@ static GWDesktopManager *desktopManager = nil;
   if ([[fsnodeRep volumes] containsObject: path]) {  
     [[self desktopView] showMountedVolumes];
   
-  } else {
+  } else if ([path isEqual: [dskNode path]]) {
     if ([event isEqual: @"GWWatchedPathDeleted"]) {
-      if ([path isEqual: [dskNode path]]) {
-        NSRunAlertPanel(nil, 
-                        NSLocalizedString(@"The Desktop directory has been deleted! Quiting now!", @""), 
-                        NSLocalizedString(@"OK", @""), 
-                        nil, 
-                        nil);                                     
-        [NSApp terminate: self];
-      }
+      NSRunAlertPanel(nil, 
+                      NSLocalizedString(@"The Desktop directory has been deleted! Quiting now!", @""), 
+                      NSLocalizedString(@"OK", @""), 
+                      nil, 
+                      nil);                                     
+      [NSApp terminate: self];
 
-    } else if ([event isEqual: @"GWWatchedFileModified"]) {
+    } else {
       [[self desktopView] watchedPathChanged: info];
-
-    } else if ([path isEqual: [dskNode path]]) {
-      [[self desktopView] watchedPathChanged: info];
-    }    
+    }
   }
 
   [dock watchedPathChanged: info];  

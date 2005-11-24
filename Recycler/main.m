@@ -73,7 +73,7 @@ void createMenu()
 	menuItem = addMenuItem(mainMenu, @"File", @"", nil, @"");
 	file = AUTORELEASE ([NSMenu new]);
 	[mainMenu setSubmenu: file forItem: menuItem];		
-	addMenuItem(file, @"Empty Recycler", @"", @"emptyTrash:", @"");
+	addMenuItem(file, @"Empty Recycler", @"", @"emptyTrashFromMenu:", @"");
 
 	// Edit
 	menuItem = addMenuItem(mainMenu, @"Edit", @"", nil, @"");

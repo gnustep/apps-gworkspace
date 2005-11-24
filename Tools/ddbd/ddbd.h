@@ -31,9 +31,9 @@
 
 - (BOOL)dbactive;
 
-- (BOOL)insertPath:(NSString *)path;
+- (oneway void)insertPath:(NSString *)path;
 
-- (BOOL)removePath:(NSString *)path;
+- (oneway void)removePath:(NSString *)path;
 
 - (void)insertDirectoryTreesFromPaths:(NSData *)info;
 

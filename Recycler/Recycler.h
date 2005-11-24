@@ -113,6 +113,8 @@
 
 + (Recycler *)recycler;
 
+- (oneway void)emptyTrash;
+
 - (void)setDocked:(BOOL)value;
 
 - (BOOL)isDocked;
@@ -139,7 +141,7 @@
 //
 // Menu Operations
 //
-- (void)emptyTrash:(id)sender;
+- (void)emptyTrashFromMenu:(id)sender;
 
 - (void)paste:(id)sender;
 

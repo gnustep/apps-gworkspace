@@ -165,6 +165,11 @@ static Recycler *recycler = nil;
 	return YES;
 }
 
+- (oneway void)emptyTrash
+{
+  [self emptyTrashFromMenu: nil];
+}
+
 - (void)setDocked:(BOOL)value
 {
   docked = value;
@@ -563,7 +568,7 @@ static Recycler *recycler = nil;
 //
 // Menu Operations
 //
-- (void)emptyTrash:(id)sender
+- (void)emptyTrashFromMenu:(id)sender
 {
   FSNode *node = [FSNode nodeWithPath: trashPath];
   NSArray *subNodes = [node subNodes];
