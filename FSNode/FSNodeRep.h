@@ -342,6 +342,8 @@ typedef enum FSNSelectionMask {
   NSArray *hiddenPaths;
   NSMutableSet *volumes;
   NSString *rootPath;
+
+  unsigned systype;
     
   NSMutableDictionary *iconsCache;
   NSMutableDictionary *tumbsCache;
@@ -359,7 +361,7 @@ typedef enum FSNSelectionMask {
   NSImage *trashFullIcon;
   
   float labelWFactor;
-  
+    
   NSNotificationCenter *nc;
   NSFileManager *fm;
   id ws;    
@@ -422,6 +424,8 @@ typedef enum FSNSelectionMask {
 - (void)removeVolumeAt:(NSString *)path;
 
 - (NSSet *)volumes;
+
+- (unsigned)systemType;
 
 - (void)setUseThumbnails:(BOOL)value;
 

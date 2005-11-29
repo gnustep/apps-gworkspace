@@ -115,6 +115,8 @@ static FSNodeRep *shared = nil;
     volumes = [[NSMutableSet alloc] initWithCapacity: 1];
     
     [self loadExtendedInfoModules];
+    
+    systype = [[NSProcessInfo processInfo] operatingSystem];
   }
     
   return self;
@@ -535,6 +537,11 @@ static FSNodeRep *shared = nil;
 - (NSSet *)volumes
 {
   return volumes;
+}
+
+- (unsigned)systemType
+{
+  return systype;
 }
 
 - (void)setUseThumbnails:(BOOL)value

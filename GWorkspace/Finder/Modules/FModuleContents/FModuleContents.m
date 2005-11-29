@@ -39,8 +39,8 @@ static NSString *nibName = @"FModuleContents";
   int index;
   BOOL used;
 
-  NSString *contentsStr;
-  const char *contentsPtr;
+  NSString *searchStr;
+  const char *searchPtr;
   NSFileManager *fm;
 }
 
@@ -51,7 +51,7 @@ static NSString *nibName = @"FModuleContents";
 - (void)dealloc
 {
   TEST_RELEASE (controlsBox);
-  TEST_RELEASE (contentsStr);
+  TEST_RELEASE (searchStr);
   [super dealloc];
 }
 
@@ -72,7 +72,7 @@ static NSString *nibName = @"FModuleContents";
     used = NO;
     index = 0;
     
-    contentsStr = nil;
+    searchStr = nil;
     
     [textField setStringValue: @""];
 
@@ -89,8 +89,8 @@ static NSString *nibName = @"FModuleContents";
 	self = [super init];
 
   if (self) {
-    ASSIGN (contentsStr, [criteria objectForKey: @"what"]);
-    contentsPtr = [contentsStr UTF8String];
+    ASSIGN (searchStr, [criteria objectForKey: @"what"]);
+    searchPtr = [searchStr UTF8String];
     fm = [NSFileManager defaultManager];
   }
   
@@ -156,10 +156,21 @@ static NSString *nibName = @"FModuleContents";
             && ([attributes fileType] == NSFileTypeRegular)) {
     CREATE_AUTORELEASE_POOL(pool);
     NSData *contents = [NSData dataWithContentsOfFile: path];
-
-    if (contents && [contents length]) {
+    unsigned length = ((contents != nil) ? [contents length] : 0);
+    
+    if (length) {
       const char *bytesStr = (const char *)[contents bytes];
-      contains = (strstr(bytesStr, contentsPtr) != NULL);
+      unsigned testlen = ((length < 256) ? length : 256);
+      int i;
+      
+      for (i = 0; i < testlen; i++) {
+        if (bytesStr[i] == 0x00) {
+          RELEASE (pool);
+          return NO; 
+        } 
+      }
+    
+      contains = (strstr(bytesStr, searchPtr) != NULL);
     }
     
     RELEASE (pool);

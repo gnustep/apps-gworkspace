@@ -8,17 +8,18 @@ fi
 #--------------------------------------------------------------------
 # Use config.guess, config.sub and install-sh provided by gnustep-make
 #--------------------------------------------------------------------
-AC_CHECK_HEADERS(dir.h unistd.h)
-AC_CHECK_FUNCS(getpwnam getpwuid geteuid getlogin)
-
 AC_CONFIG_AUX_DIR([$GNUSTEP_MAKEFILES])
 
-AC_CONFIG_HEADER([GWorkspace/config.h])
-AC_CONFIG_HEADER([Tools/ddbd/config.h])
-AC_CONFIG_HEADER([Tools/searchtool/config.h])
-AC_CONFIG_HEADER([Tools/lsfupdater/config.h])
+#--------------------------------------------------------------------
+# Support for determining mountpoints
+#--------------------------------------------------------------------
+AC_CHECK_FUNCS(getmntinfo)
 
-AC_CONFIG_SUBDIRS(FSNode Inspector)
+AC_CHECK_HEADERS(mntent.h)
+AC_CHECK_HEADERS(sys/mntent.h)
+AC_CHECK_MEMBER(struct mntent.mnt_dir,[AC_DEFINE(MNT_MEMB,mnt_dir,mntent structure member name)],,[#include <mntent.h>])
+AC_CHECK_MEMBER(struct mntent.mnt_mountp,[AC_DEFINE(MNT_MEMB,mnt_mountp,mntent structure member name)],,[#include <sys/mntent.h>])
+AC_FUNC_GETMNTENT
 
 #--------------------------------------------------------------------
 # Debug logging
@@ -35,9 +36,8 @@ fi
 
 AC_DEFINE_UNQUOTED([GW_DEBUG_LOG], [$GW_DEBUG_LOG], [debug logging])
 
-AC_CONFIG_FILES([GNUmakefile \
-									Tools/ddbd/GNUmakefile \
-									GWorkspace/GNUmakefile \
-									GWorkspace/GWorkspaceInfo.plist \
-									gworkspace.make])
+AC_CONFIG_HEADER([config.h])
+
+AC_CONFIG_FILES([GNUmakefile])
+
 AC_OUTPUT

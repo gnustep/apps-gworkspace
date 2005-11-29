@@ -1,0 +1,11 @@
+
+#undef HAVE_GETMNTENT
+
+#undef HAVE_SYS_MNTENT_H
+
+#undef MNT_MEMB
+
+#undef HAVE_GETMNTINFO
+
+/* gworkspace debug log */
+#undef GW_DEBUG_LOG

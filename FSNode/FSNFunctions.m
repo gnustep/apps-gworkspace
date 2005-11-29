@@ -123,20 +123,20 @@ NSString *sizeDescription(unsigned long long size)
 	NSString *sizeStr;
 	char *sign = "";
     
-	if(size == 1) {
+	if (size == 1) {
 		sizeStr = @"1 byte";
-	} else if(size < 0) {
+	} else if (size < 0) {
 		sign = "-";
 		size = -size;
 	}
-	if(size == 0) {
+	if (size == 0) {
 		sizeStr = @"0 bytes";
-	} else if(size < (10 * ONE_KB)) {
+	} else if (size < (10 * ONE_KB)) {
 		sizeStr = [NSString stringWithFormat:@"%s %d bytes", sign, size];
-	} else if(size < (100 * ONE_KB)) {
+	} else if (size < (100 * ONE_KB)) {
  		sizeStr = [NSString stringWithFormat:@"%s %3.2fKB", sign,
                           					((double)size / (double)(ONE_KB))];
-	} else if(size < (100 * ONE_MB)) {
+	} else if (size < (100 * ONE_MB)) {
 		sizeStr = [NSString stringWithFormat:@"%s %3.2fMB", sign,
                           					((double)size / (double)(ONE_MB))];
 	} else {

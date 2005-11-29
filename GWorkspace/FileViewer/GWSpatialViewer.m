@@ -530,9 +530,25 @@
 	if (freefs == nil) {  
 		labelstr = NSLocalizedString(@"unknown volume size", @"");    
 	} else {
+    unsigned long long freeSize = [freefs unsignedLongLongValue];
+    unsigned systemType = [[FSNodeRep sharedInstance] systemType];
+    
+    switch (systemType) {
+      case NSBSDOperatingSystem:
+        freeSize = (freeSize >> 8);
+        break;
+
+      case NSMACHOperatingSystem:
+        freeSize = (freeSize >> 8);
+        break;
+        
+      default:
+        break;
+    }
+    
 		labelstr = [NSString stringWithFormat: @"%@ %@", 
-                   sizeDescription([freefs unsignedLongLongValue]),
-                                        NSLocalizedString(@"free", @"")];
+                                      sizeDescription(freeSize),
+                                            NSLocalizedString(@"free", @"")];
 	}
 
   [spaceLabel setStringValue: labelstr];
