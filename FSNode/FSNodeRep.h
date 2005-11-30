@@ -486,11 +486,11 @@ typedef enum FSNSelectionMask {
 
 @interface NSWorkspace (mounting)
 
-- (NSString *)mtabContents;
+- (NSArray *)mountedVolumes;
 
 - (NSArray *)removableMediaPaths;
 
-- (NSArray *)reservedMountPoints;
+- (NSArray *)reservedMountNames;
 
 - (BOOL)getFileSystemInfoForPath:(NSString *)fullPath
 		                 isRemovable:(BOOL *)removableFlag
@@ -498,6 +498,14 @@ typedef enum FSNSelectionMask {
 		               isUnmountable:(BOOL *)unmountableFlag
 		                 description:(NSString **)description
 			                      type:(NSString **)fileSystemType;
+
+- (BOOL)getFileSystemInfoForPath:(NSString *)fullPath
+		                 isRemovable:(BOOL *)removableFlag
+		                  isWritable:(BOOL *)writableFlag
+		               isUnmountable:(BOOL *)unmountableFlag
+		                 description:(NSString **)description
+			                      type:(NSString **)fileSystemType
+                usingVolumesInfo:(NSArray *)info;
                             
 - (NSArray *)mountedLocalVolumePaths;
 

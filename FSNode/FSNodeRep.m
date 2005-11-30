@@ -28,6 +28,25 @@
 #include "FSNodeRep.h"
 #include "FSNFunctions.h"
 #include "ExtendedInfo.h"
+#include "config.h"
+
+#ifndef __APPLE__
+  #if	defined(HAVE_GETMNTENT) && defined (MNT_DIR)
+    #if	defined(HAVE_MNTENT_H)
+      #include <mntent.h>
+    #elif defined(HAVE_SYS_MNTENT_H)
+      #include <sys/mntent.h>
+    #else
+      #undef HAVE_GETMNTENT
+    #endif
+  #endif
+#else
+  #ifdef HAVE_GETMNTINFO
+    #include <sys/param.h>
+    #include <sys/ucred.h>
+    #include <sys/mount.h>
+  #endif  
+#endif
 
 #define LABEL_W_FACT (8.0)
 
@@ -635,63 +654,134 @@ static FSNodeRep *shared = nil;
 
 @implementation NSWorkspace (mounting)
 
-static char mtabuf[1024] = "";
+#if !defined(HAVE_GETMNTENT)
+  #ifndef __APPLE__
+    static char mtabuf[1024] = "";
+  #endif
+#endif
 
-- (NSString *)mtabContents
+- (NSArray *)mountedVolumes
 {
-  unsigned int systype = [[NSProcessInfo processInfo] operatingSystem];
-  NSString *mtab = nil;
-
-  if (systype == NSGNULinuxOperatingSystem) {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSString *mtabpath = [defaults stringForKey: @"GSMtabPath"];
-
-    if (mtabpath == nil) {
-      mtabpath = @"/etc/mtab";
-    }
-
-    if ([[NSFileManager defaultManager] fileExistsAtPath: mtabpath]) {
-      mtab = [NSString stringWithContentsOfFile: mtabpath];
-    }
+  NSMutableArray *volumes = [NSMutableArray array];
+  
+#ifndef __APPLE__
+  #if defined(HAVE_GETMNTENT) && defined(MNT_DIR)
+    FILE *fp = fopen("/etc/mtab", "r");
+    struct mntent	*mnt;
     
-  } else if (systype == NSBSDOperatingSystem) {
-    NSTask *task = [NSTask new]; 
-    NSPipe *pipe = [NSPipe pipe];
-    NSFileHandle *handle = [pipe fileHandleForReading];
-    
-    [task setLaunchPath: @"mount"];
-    [task setArguments: [NSArray arrayWithObject: @"-p"]];
-    [task setStandardOutput: pipe];    
-    
-    [task launch];
-    [task waitUntilExit];
-    
-    if ([task terminationStatus] == 0) {
-      NSData *data = [handle readDataToEndOfFile];
-      unsigned len = [data length];
+    while ((mnt = getmntent(fp)) != 0) { 
+      NSMutableDictionary *dict = [NSMutableDictionary dictionary];
       
-      if (len) {
-        const char *bytes = [data bytes];
-        int i;
-          
-        bzero(mtabuf, 1024);
+      [dict setObject: [NSString stringWithUTF8String: mnt->MNT_FSNAME]
+               forKey: @"name"]; 
+      [dict setObject: [NSString stringWithUTF8String: mnt->MNT_DIR]
+               forKey: @"dir"];  
+      [dict setObject: [NSString stringWithUTF8String: mnt->MNT_FSTYPE]
+               forKey: @"type"];  
+                                   
+      [volumes addObject: dict];
+    }
+
+    fclose(fp);
         
-        for (i = 0; i < len; i++) {
-          if (bytes[i] == '\t') {
-            mtabuf[i] = ' ';
-          } else {
-            mtabuf[i] = bytes[i]; 
-          } 
+  #else   // NO GETMNTENT
+    unsigned int systype = [[NSProcessInfo processInfo] operatingSystem];
+    NSString *mtab = nil;
+  
+    if (systype == NSGNULinuxOperatingSystem) {
+      NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+      NSString *mtabpath = [defaults stringForKey: @"GSMtabPath"];
+      
+      if (mtabpath == nil) {
+        mtabpath = @"/etc/mtab";
+      }
+
+      if ([[NSFileManager defaultManager] fileExistsAtPath: mtabpath]) {
+        mtab = [NSString stringWithContentsOfFile: mtabpath];
+      }
+
+    } else if (systype == NSBSDOperatingSystem) {
+      NSTask *task = [NSTask new]; 
+      NSPipe *pipe = [NSPipe pipe];
+      NSFileHandle *handle = [pipe fileHandleForReading];
+
+      [task setLaunchPath: @"mount"];
+      [task setArguments: [NSArray arrayWithObject: @"-p"]];
+      [task setStandardOutput: pipe];    
+
+      [task launch];
+      [task waitUntilExit];
+
+      if ([task terminationStatus] == 0) {
+        NSData *data = [handle readDataToEndOfFile];
+        unsigned len = [data length];
+
+        if (len) {
+          const char *bytes = [data bytes];
+          int i;
+
+          bzero(mtabuf, 1024);
+
+          for (i = 0; i < len; i++) {
+            if (bytes[i] == '\t') {
+              mtabuf[i] = ' ';
+            } else {
+              mtabuf[i] = bytes[i]; 
+            } 
+          }
+
+          mtab = [NSString stringWithUTF8String: mtabuf];
         }
-            
-        mtab = [NSString stringWithUTF8String: mtabuf];
+      }
+
+      RELEASE (task);     
+    }
+    
+    if (mtab) {
+      NSArray *lines = [mtab componentsSeparatedByString: @"\n"];
+      int i;
+      
+      for (i = 0; i < [lines count]; i++) {
+        NSString *line = [lines objectAtIndex: i];
+        
+        if ([line length]) {
+          NSArray	*parts = [line componentsSeparatedByString: @" "];
+
+          if ([parts count] == 6) {  
+            NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+
+            [dict setObject: [parts objectAtIndex: 0] forKey: @"name"]; 
+            [dict setObject: [parts objectAtIndex: 1] forKey: @"dir"]; 
+            [dict setObject: [parts objectAtIndex: 2] forKey: @"type"]; 
+                        
+            [volumes addObject: dict];
+          }
+        }
       }
     }
     
-    RELEASE (task);     
-  }
+  #endif
+#else   // __APPLE__
+  struct statfs *buf;
+  int i, count;
+  
+  count = getmntinfo(&buf, 0);
+  
+	for (i = 0; i < count; i++) {
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];  
+  
+    [dict setObject: [NSString stringWithUTF8String: buf[i].f_mntfromname]
+             forKey: @"name"]; 
+    [dict setObject: [NSString stringWithUTF8String: buf[i].f_mntonname]
+             forKey: @"dir"]; 
+    [dict setObject: [NSString stringWithUTF8String: buf[i].f_fstypename]
+             forKey: @"type"]; 
 
-  return mtab;
+    [volumes addObject: dict];
+  }
+#endif
+    
+  return volumes;
 }
 
 - (NSArray *)removableMediaPaths
@@ -719,10 +809,10 @@ static char mtabuf[1024] = "";
   return removables;
 }
 
-- (NSArray *)reservedMountPoints
+- (NSArray *)reservedMountNames
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-  NSArray *reserved = [defaults arrayForKey: @"GSReservedMountPoints"];
+  NSArray *reserved = [defaults arrayForKey: @"GSReservedMountNames"];
 
   if (reserved == nil) {
     unsigned int systype = [[NSProcessInfo processInfo] operatingSystem];
@@ -736,6 +826,11 @@ static char mtabuf[1024] = "";
 
       case NSBSDOperatingSystem:
         reserved = [NSArray arrayWithObjects: @"devfs", nil];
+        break;
+
+      case NSMACHOperatingSystem:
+        reserved = [NSArray arrayWithObjects: @"devfs", @"fdesc", 
+                                                    @"<volfs>", nil];
         break;
     
       default:
@@ -753,37 +848,40 @@ static char mtabuf[1024] = "";
 		                 description:(NSString **)description
 			                      type:(NSString **)fileSystemType
 {
-  NSString *mtab = [self mtabContents];
-       
-  if (mtab) {
-    NSArray *mounts = [mtab componentsSeparatedByString: @"\n"];
-    NSArray *removables = [self removableMediaPaths];
-    int i;
+  return [self getFileSystemInfoForPath: fullPath
+		                 isRemovable: removableFlag
+		                  isWritable: writableFlag
+		               isUnmountable: unmountableFlag
+		                 description: description
+			                      type: fileSystemType
+                usingVolumesInfo: nil];
+}
 
-    for (i = 0; i < [mounts count]; i++) {
-      NSString *mount = [mounts objectAtIndex: i];
+- (BOOL)getFileSystemInfoForPath:(NSString *)fullPath
+		                 isRemovable:(BOOL *)removableFlag
+		                  isWritable:(BOOL *)writableFlag
+		               isUnmountable:(BOOL *)unmountableFlag
+		                 description:(NSString **)description
+			                      type:(NSString **)fileSystemType
+                usingVolumesInfo:(NSArray *)info
+{
+  NSArray *mounted = ((info == nil) ? [self mountedVolumes] : info);
+  NSArray *removables = [self removableMediaPaths];
+  int i;
 
-      if ([mount length]) {
-        NSArray	*parts = [mount componentsSeparatedByString: @" "];
+  for (i = 0; i < [mounted count]; i++) {
+    NSDictionary *dict = [mounted objectAtIndex: i];
+    NSString *mountPoint = [dict objectForKey: @"dir"];
+    NSString *fsType = [dict objectForKey: @"type"];
+  
+    if ([mountPoint isEqual: fullPath]) {  
+      *removableFlag = [removables containsObject: mountPoint];
+      *writableFlag = [[NSFileManager defaultManager] isWritableFileAtPath: fullPath];
+      *unmountableFlag = YES;
+      *description = fsType;
+      *fileSystemType = fsType;
 
-        if ([parts count] == 6) {
-          NSString *mountPoint = [parts objectAtIndex: 1];
-          NSString *fsType = [parts objectAtIndex: 2];
-          NSString *fsOptions = [parts objectAtIndex: 3];
-
-          if ([mountPoint isEqual: fullPath]) {
-            NSScanner *scanner = [NSScanner scannerWithString: fsOptions];
-
-            *removableFlag = [removables containsObject: mountPoint];
-            *writableFlag = [scanner scanString: @"rw" intoString: NULL];
-            *unmountableFlag = YES;
-            *description = fsType;
-            *fileSystemType = fsType;
-
-            return YES;
-          }
-        }
-      }
+      return YES;
     }
   }
   
@@ -792,54 +890,53 @@ static char mtabuf[1024] = "";
 
 - (NSArray *)mountedLocalVolumePaths
 {
-  NSString *mtab = [self mtabContents];
-  NSMutableArray *names = [NSMutableArray array];
-   
-  if (mtab) {
-    NSArray *mounts = [mtab componentsSeparatedByString: @"\n"];
-    NSArray *reserved = [self reservedMountPoints];
-    int i;
+  NSMutableArray *mpoints = [NSMutableArray array];
+  NSArray *mounted = [self mountedVolumes];
+  NSArray *reserved = [self reservedMountNames];
+  unsigned i;
 
-    for (i = 0; i < [mounts count]; i++) {
-      NSString *mount = [mounts objectAtIndex: i];
+  for (i = 0; i < [mounted count]; i++) {
+    NSDictionary *dict = [mounted objectAtIndex: i];
 
-      if ([mount length]) {
-        NSArray	*parts = [mount componentsSeparatedByString: @" "];
-
-        if ([parts count] >= 2) {
-          NSString *type = [parts objectAtIndex: 2];
-
-          if ([reserved containsObject: type] == NO) {
-	          [names addObject: [parts objectAtIndex: 1]];
-	        }
-        }
-      } 
+    if ([reserved containsObject: [dict objectForKey: @"name"]] == NO) {
+      [mpoints addObject: [dict objectForKey: @"dir"]];
     }
   }
   
-  return names;
+  return mpoints;
 }
 
 - (NSArray *)mountedRemovableMedia
 {
-  NSArray	*volumes = [self mountedLocalVolumePaths];
-  NSMutableArray *names = [NSMutableArray array];
-  unsigned	i;
+  NSMutableArray *mpoints = [NSMutableArray array];
+  NSArray *mounted = [self mountedVolumes];
+  NSArray *reserved = [self reservedMountNames];
+  NSMutableArray *names = [NSMutableArray array];  
+  unsigned i;
 
-  for (i = 0; i < [volumes count]; i++) {
+  for (i = 0; i < [mounted count]; i++) {
+    NSDictionary *dict = [mounted objectAtIndex: i];
+
+    if ([reserved containsObject: [dict objectForKey: @"name"]] == NO) {
+      [mpoints addObject: [dict objectForKey: @"dir"]];
+    }
+  }
+
+  for (i = 0; i < [mpoints count]; i++) {
     BOOL removableFlag;
     BOOL writableFlag;
     BOOL unmountableFlag;
     NSString *description;
     NSString *fileSystemType;
-    NSString *name = [volumes objectAtIndex: i];
+    NSString *name = [mpoints objectAtIndex: i];
 
     if ([self getFileSystemInfoForPath: name
 		              isRemovable: &removableFlag
 		              isWritable: &writableFlag
 		              isUnmountable: &unmountableFlag
 		              description: &description
-		              type: &fileSystemType] && removableFlag) {
+		              type: &fileSystemType
+      usingVolumesInfo: mounted] && removableFlag) {
 	    [names addObject: name];
 	  }
   }

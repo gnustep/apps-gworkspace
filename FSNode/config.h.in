@@ -1,9 +1,13 @@
 
 #undef HAVE_GETMNTENT
 
+#undef HAVE_MNTENT_H
+
 #undef HAVE_SYS_MNTENT_H
 
-#undef MNT_MEMB
+#undef MNT_DIR
+#undef MNT_FSNAME
+#undef MNT_FSTYPE
 
 #undef HAVE_GETMNTINFO
 
