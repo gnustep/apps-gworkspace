@@ -202,11 +202,17 @@
     [self createSubviews];
     
     defEntry = [viewerPrefs objectForKey: @"shelfdicts"];
-    
-    if (defEntry) {
+
+    if (defEntry && [defEntry count]) {
       [shelf setContents: defEntry];
+    } else if (rootviewer || rootViewerKey) {
+      NSDictionary *sfdict = [NSDictionary dictionaryWithObjectsAndKeys:
+                        [NSNumber numberWithInt: 0], @"index", 
+                        [NSArray arrayWithObject: NSHomeDirectory()], @"paths", 
+                        nil];
+      [shelf setContents: [NSArray arrayWithObject: sfdict]];
     }
-        
+    
     if ([viewType isEqual: @"Icon"]) {
       nodeView = [[GWViewerIconsView alloc] initForViewer: self];
       
