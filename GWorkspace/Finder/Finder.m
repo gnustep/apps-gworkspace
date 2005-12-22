@@ -178,6 +178,10 @@ static Finder *finder = nil;
       RELEASE (fmview);
     }
 
+    for (i = 0; i < [fmviews count]; i++) {
+      [[fmviews objectAtIndex: i] updateMenuForModules: modules];
+    }
+
     [recursiveSwitch setState: NSOnState];
 
     defentry = [defaults objectForKey: @"search_res_h"];
