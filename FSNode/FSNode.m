@@ -537,6 +537,8 @@
   } else {
     flags.unknown = 1;
   } 
+
+  ASSIGN (typeDescription, NSLocalizedString(@"symbolic link", @""));
 }
 
 - (NSString *)typeDescription
