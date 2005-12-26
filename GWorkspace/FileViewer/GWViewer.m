@@ -1242,7 +1242,7 @@
 
   if ([title isEqual: NSLocalizedString(@"Name", @"")]) {
     type = FSNInfoNameType;
-  } else if ([title isEqual: NSLocalizedString(@"Kind", @"")]) {
+  } else if ([title isEqual: NSLocalizedString(@"Type", @"")]) {
     type = FSNInfoKindType;
   } else if ([title isEqual: NSLocalizedString(@"Size", @"")]) {
     type = FSNInfoSizeType;

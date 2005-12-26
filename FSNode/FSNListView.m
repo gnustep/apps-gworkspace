@@ -174,7 +174,7 @@ static NSString *defaultColumns = @"{ \
       [[column headerCell] setStringValue: NSLocalizedString(@"Name", @"")];
       break;
     case FSNInfoKindType:
-      [[column headerCell] setStringValue: NSLocalizedString(@"Kind", @"")];
+      [[column headerCell] setStringValue: NSLocalizedString(@"Type", @"")];
       break;
     case FSNInfoDateType:
       [[column headerCell] setStringValue: NSLocalizedString(@"Date Modified", @"")];

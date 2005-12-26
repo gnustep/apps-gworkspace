@@ -166,7 +166,7 @@
   = "La méthode de tri s'applique aux\ncontenus des dossiers sélectionnés,\nPAS aux dossiers parents";
 "Sort by" = "Trier par";
 "Name" = "Nom";
-"Kind" = "Type";
+"Type" = "Type";
 "Date" = "Date";
 "Size" = "Taille";
 "Owner" = "Propriétaire";
@@ -351,7 +351,7 @@
 "Sorting Order" = "Ordre de tri";
 "Sort by" = "Trier par";
 "Name" = "Nom";
-"Kind" = "Type";
+"Type" = "Type";
 "Date" = "Date";
 "Size" = "Taille";
 "Owner" = "Propriétaire";

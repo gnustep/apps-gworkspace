@@ -149,7 +149,7 @@
   = "L'odinamento si applica al\ncontenuto della cartella selezionata,\nNON alla directory che la contiene";
 "Sort by" = "Ordinamento";
 "Name" = "Nome";
-"Kind" = "Tipo";
+"Type" = "Tipo";
 "Date" = "Data";
 "Size" = "Dimensioni";
 "Owner" = "Propr.";

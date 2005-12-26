@@ -153,7 +153,7 @@
 "Sort method applies to the\ncontents of the selected folder,\nNOT to its parent folder"  = "Sorteren slaat op de \ninhoud van de Map,\nNIET op de bovenliggende Map";
 "Sort by" = "Sorteer op";
 "Name" = "Naam";
-"Kind" = "Type";
+"Type" = "Type";
 "Date" = "Datum";
 "Size" = "Grootte";
 "Owner" = "Eigenaar";

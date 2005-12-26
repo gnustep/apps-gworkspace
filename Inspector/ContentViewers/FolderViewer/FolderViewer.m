@@ -79,7 +79,7 @@
     [cell setTitle: NSLocalizedString(@"Name", @"")];
     [cell setTag: byname];
     cell = [matrix cellAtRow: bykind column: 0];
-    [cell setTitle: NSLocalizedString(@"Kind", @"")];
+    [cell setTitle: NSLocalizedString(@"Type", @"")];
     [cell setTag: bykind];
     cell = [matrix cellAtRow: bydate column: 0];
     [cell setTitle: NSLocalizedString(@"Date", @"")];

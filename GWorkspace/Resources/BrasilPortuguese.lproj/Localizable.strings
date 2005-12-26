@@ -152,7 +152,7 @@
   = "O método de ordenação se\naplica ao conteúdo da\npasta selecionada, e não\nà sua pasta mãe";
 "Sort by" = "Ordenar por";
 "Name" = "Nome";
-"Kind" = "Tipo";
+"Type" = "Tipo";
 "Date" = "Data";
 "Size" = "Tamanho";
 "Owner" = "Proprietário";

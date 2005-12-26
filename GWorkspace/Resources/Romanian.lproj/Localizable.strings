@@ -148,7 +148,7 @@
   = "Ordonarea se aplicã\nconþinutului dosarului selectat,\nNU directorului care îl conþine";
 "Sort by" = "Ordonare";
 "Name" = "Nume";
-"Kind" = "Tip";
+"Type" = "Tip";
 "Date" = "Data";
 "Size" = "Dimensiuni";
 "Owner" = "Propr.";

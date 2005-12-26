@@ -153,7 +153,7 @@
   = "El método de ordenación se\naplica al contenido de la\ncarpeta seleccionada, NO\na la carpeta superior";
 "Sort by" = "Ordenar por";
 "Name" = "Nombre";
-"Kind" = "Clase";
+"Type" = "Clase";
 "Date" = "Fecha";
 "Size" = "Tamaño";
 "Owner" = "Propietario";

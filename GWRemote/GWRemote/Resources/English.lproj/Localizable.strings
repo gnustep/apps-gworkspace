@@ -152,7 +152,7 @@
   = "Sort method applies to the\ncontents of the selected folder,\nNOT to its parent folder";
 "Sort by" = "Sort by";
 "Name" = "Name";
-"Kind" = "Kind";
+"Type" = "Type";
 "Date" = "Date";
 "Size" = "Size";
 "Owner" = "Owner";

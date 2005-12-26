@@ -107,7 +107,7 @@ void createMenu()
 	  subenu = AUTORELEASE ([NSMenu new]);
 	  [menu setSubmenu: subenu forItem: menuItem];	
 	  addItemToMenu(subenu, @"Name only", @"", @"setShownType:", @"");
-	  addItemToMenu(subenu, @"Kind", @"", @"setShownType:", @"");
+	  addItemToMenu(subenu, @"Type", @"", @"setShownType:", @"");
 	  addItemToMenu(subenu, @"Size", @"", @"setShownType:", @"");
 	  addItemToMenu(subenu, @"Modification date", @"", @"setShownType:", @"");
 	  addItemToMenu(subenu, @"Owner", @"", @"setShownType:", @"");

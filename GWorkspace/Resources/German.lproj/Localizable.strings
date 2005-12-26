@@ -178,7 +178,7 @@ which ends in "kann <the file> nicht umbenennen"
   = "Sortier-Methode trifft auf die\nInhalte des ausgewählten Ordners zu,\nNICHT auf dessen übergerordneten Ordner";
 "Sort by" = "Sortieren nach:";
 "Name" = "Name";
-"Kind" = "Typ";
+"Type" = "Typ";
 "Date" = "Datum";
 "Size" = "Größe";
 "Owner" = "Besitzer";

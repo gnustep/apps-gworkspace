@@ -152,7 +152,7 @@
   = "A sorbarendezés a\nkijelölt könyvtárak tartalmát érinti,\nNEM pedig magukat a könyvtárakat";
 "Sort by" = "Rendezés a következõk alapján";
 "Name" = "Név";
-"Kind" = "Típus";
+"Type" = "TÃ­pus";
 "Date" = "Dátum";
 "Size" = "Méret";
 "Owner" = "Tulajdonos";

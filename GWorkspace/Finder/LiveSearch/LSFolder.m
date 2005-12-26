@@ -582,7 +582,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
     [kindColumn setDataCell: AUTORELEASE ([[FSNTextCell alloc] init])];
     [kindColumn setEditable: NO];
     [kindColumn setResizable: YES];
-    [[kindColumn headerCell] setStringValue: NSLocalizedString(@"Kind", @"")];
+    [[kindColumn headerCell] setStringValue: NSLocalizedString(@"Type", @"")];
     [[kindColumn headerCell] setAlignment: NSLeftTextAlignment];
     [kindColumn setMinWidth: 80];
     [kindColumn setWidth: 80];
