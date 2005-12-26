@@ -1,0 +1,4 @@
+
+#undef HAVE_DAZUKO
+
+#undef GW_DEBUG_LOG
