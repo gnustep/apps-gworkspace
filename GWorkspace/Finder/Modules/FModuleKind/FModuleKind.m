@@ -89,8 +89,8 @@ static NSString *nibName = @"FModuleKind";
 
     [typePopUp removeAllItems];
     [typePopUp insertItemWithTitle: NSLocalizedString(@"plain file", @"") atIndex: 0];
-    [typePopUp insertItemWithTitle: NSLocalizedString(@"directory", @"") atIndex: 1];
-    [typePopUp insertItemWithTitle: NSLocalizedString(@"shell executable", @"") atIndex: 2];
+    [typePopUp insertItemWithTitle: NSLocalizedString(@"folder", @"") atIndex: 1];
+    [typePopUp insertItemWithTitle: NSLocalizedString(@"tool", @"") atIndex: 2];
     [typePopUp insertItemWithTitle: NSLocalizedString(@"symbolic link", @"") atIndex: 3];
     [typePopUp insertItemWithTitle: NSLocalizedString(@"application", @"") atIndex: 4];
     [typePopUp selectItemAtIndex: 0]; 
@@ -140,7 +140,7 @@ static NSString *nibName = @"FModuleKind";
 
 - (NSString *)moduleName
 {
-  return NSLocalizedString(@"kind", @"");
+  return NSLocalizedString(@"type", @"");
 }
 
 - (BOOL)used

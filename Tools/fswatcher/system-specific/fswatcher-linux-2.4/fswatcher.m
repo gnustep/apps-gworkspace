@@ -779,6 +779,7 @@
       case MKDIR:
         if (pathModified(path)) {
           [notifdict setObject: @"GWWatchedFileModified" forKey: @"event"];
+          GWDebugLog(@"MODIFIED %@", path);
         } else {
           notify = NO;
           globnotify = NO;
@@ -789,6 +790,7 @@
       case RMDIR:
       case RENAME:
         [notifdict setObject: @"GWWatchedPathDeleted" forKey: @"event"];
+        GWDebugLog(@"DELETE %@", path); 
         glob = NO;
         break;
 
@@ -805,8 +807,6 @@
       [self notifyGlobalWatchingClients: notifdict];
     }  
   }
-
-  NSLog(@"basePath %@", basePath);
 
   notify = [watchedPaths containsObject: basePath];
 
@@ -830,6 +830,7 @@
         [notifdict setObject: @"GWFileDeletedInWatchedDirectory" forKey: @"event"];
         [notifdict setObject: [NSArray arrayWithObject: [path lastPathComponent]] 
                       forKey: @"files"];
+        GWDebugLog(@"DELETE %@", path);
         break;
 
       case RENAME:
@@ -853,6 +854,7 @@
                       && isInTreeFirstPartOfPath(destBasePath, includePathsTree)
                   && ((isInTreeFirstPartOfPath(destBasePath, excludePathsTree) == NO)
                                 || fullPathInTree(destBasePath, includePathsTree)));
+        GWDebugLog(@"RENAME %@ to %@", path, destPath);
         break;
 
       default:

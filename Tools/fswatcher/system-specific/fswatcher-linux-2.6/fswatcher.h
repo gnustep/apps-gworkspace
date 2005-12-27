@@ -98,11 +98,6 @@
 @end
 
 
-
-
-
-
-
 typedef struct {  
   int has_syscall;
   int has_cwd;
