@@ -87,7 +87,7 @@ static NSString *nibName = @"FModuleName";
                        atIndex: CONTAINS];
     [popUp insertItemWithTitle: NSLocalizedString(@"is", @"") 
                        atIndex: IS];
-    [popUp insertItemWithTitle: NSLocalizedString(@"doesn't contain", @"") 
+    [popUp insertItemWithTitle: NSLocalizedString(@"contains not", @"") 
                        atIndex: NOT_CONTAINS];
     [popUp insertItemWithTitle: NSLocalizedString(@"starts with", @"") 
                        atIndex: STARTS];

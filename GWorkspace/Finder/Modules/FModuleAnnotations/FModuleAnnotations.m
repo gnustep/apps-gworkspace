@@ -84,13 +84,13 @@ static NSString *nibName = @"FModuleAnnotations";
 
     /* Internationalization */    
     [popUp removeAllItems];
-    [popUp insertItemWithTitle: NSLocalizedString(@"with one of the words", @"") 
+    [popUp insertItemWithTitle: NSLocalizedString(@"contains one of", @"") 
                        atIndex: ONE_WORD];
-    [popUp insertItemWithTitle: NSLocalizedString(@"with all the words", @"") 
+    [popUp insertItemWithTitle: NSLocalizedString(@"contains all of", @"") 
                        atIndex: ALL_WORDS];
-    [popUp insertItemWithTitle: NSLocalizedString(@"with the exact phrase", @"") 
+    [popUp insertItemWithTitle: NSLocalizedString(@"with exactly", @"") 
                        atIndex: EXACT_PHRASE];
-    [popUp insertItemWithTitle: NSLocalizedString(@"without the words", @"") 
+    [popUp insertItemWithTitle: NSLocalizedString(@"without one of", @"") 
                        atIndex: WITHOUT_WORDS];
                        
     [popUp selectItemAtIndex: ONE_WORD]; 
