@@ -338,7 +338,7 @@
     highlightSize.height = iconSize + 4;
   }
 
-  labelSize.height = myrintf([labelFont defaultLineHeightForFont]);
+  labelSize.height = myrintf([fsnodeRep heighOfFont: labelFont]);
   labelSize.width = gridSize.width;
   gridSize.height = highlightSize.height + labelSize.height;
 }
@@ -463,7 +463,7 @@
   hlightRect.size.width = ceil(iconSize / 3 * 4);
   hlightRect.size.height = ceil(hlightRect.size.width * [fsnodeRep highlightHeightFactor]);
   hlightRect.origin.x = ceil((gridSize.width - hlightRect.size.width) / 2);   
-  hlightRect.origin.y = floor([labelFont defaultLineHeightForFont]);
+  hlightRect.origin.y = floor([fsnodeRep heighOfFont: labelFont]);
   
   icnBounds.origin.x += hlightRect.origin.x + ((hlightRect.size.width - iconSize) / 2);
   icnBounds.origin.y += hlightRect.origin.y + ((hlightRect.size.height - iconSize) / 2);

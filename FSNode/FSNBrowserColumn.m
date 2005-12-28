@@ -90,7 +90,7 @@ static id <DesktopApplication> desktopApp = nil;
   
   if (self) {
 	  NSRect rect = NSMakeRect(0, 0, 150, 100);
-    int lineh = floor([[acell font] defaultLineHeightForFont]);
+    int lineh;
                 
     browser = abrowser;
     index = ind;
@@ -112,6 +112,7 @@ static id <DesktopApplication> desktopApp = nil;
     [self setFrame: rect];
     
     fsnodeRep = [FSNodeRep sharedInstance];
+    lineh = floor([fsnodeRep heighOfFont: [acell font]]);
     
     scroll = [[FSNBrowserScroll alloc] initWithFrame: rect 
                                     inColumn: self acceptDnd: cellsIcon];
@@ -137,7 +138,7 @@ static id <DesktopApplication> desktopApp = nil;
 - (void)setShowType:(FSNInfoType)type
 {
   if (infoType != type) {
-    int lineh = floor([[cellPrototype font] defaultLineHeightForFont]);
+    int lineh = floor([fsnodeRep heighOfFont: [cellPrototype font]]);
     
     infoType = type;
     DESTROY (extInfoType);
@@ -168,7 +169,7 @@ static id <DesktopApplication> desktopApp = nil;
 - (void)setExtendedShowType:(NSString *)type
 {
   if ((extInfoType == nil) || ([extInfoType isEqual: type] == NO)) {
-    int lineh = floor([[cellPrototype font] defaultLineHeightForFont]);  
+    int lineh = floor([fsnodeRep heighOfFont: [cellPrototype font]]);  
   
     infoType = FSNInfoExtendedType;
     ASSIGN (extInfoType, type);

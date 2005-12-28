@@ -71,7 +71,9 @@
     NSString *selName = [defaults stringForKey: @"DesktopApplicationSelName"];
     id defentry;
 		int i;
-
+    
+    fsnodeRep = [FSNodeRep sharedInstance];
+    
     if (appName && selName) {
 		  Class desktopAppClass = [[NSBundle mainBundle] classNamed: appName];
       SEL sel = NSSelectorFromString(selName);
@@ -88,7 +90,7 @@
       defentry = [defaults objectForKey: @"extended_info_type"];
 
       if (defentry) {
-        NSArray *availableTypes = [[FSNodeRep sharedInstance] availableExtendedInfoNames];
+        NSArray *availableTypes = [fsnodeRep availableExtendedInfoNames];
       
         if ([availableTypes containsObject: defentry]) {
           ASSIGN (extInfoType, defentry);
@@ -1410,7 +1412,7 @@
       entry = [nodeDict objectForKey: @"ext_info_type"];
 
       if (entry) {
-        NSArray *availableTypes = [[FSNodeRep sharedInstance] availableExtendedInfoNames];
+        NSArray *availableTypes = [fsnodeRep availableExtendedInfoNames];
 
         if ([availableTypes containsObject: entry]) {
           ASSIGN (extInfoType, entry);
@@ -2077,7 +2079,7 @@
     if (canedit) {   
       NSMatrix *matrix = [col cmatrix];
       NSFont *edfont = [nameEditor font];
-      float fnheight = [edfont defaultLineHeightForFont];
+      float fnheight = [fsnodeRep heighOfFont: edfont];
       NSRect r = [cell labelRect];
       
       r = [matrix convertRect: r toView: self];

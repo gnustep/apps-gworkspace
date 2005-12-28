@@ -184,7 +184,7 @@ if (rct.size.height < 0) rct.size.height = 0; \
     highlightSize.height = iconSize + 4;
   }
 
-  labelSize.height = floor([labelFont defaultLineHeightForFont]);
+  labelSize.height = floor([fsnodeRep heighOfFont: labelFont]);
   labelSize.width = [fsnodeRep labelWFactor] * labelTextSize;
 
   gridSize.height = highlightSize.height;

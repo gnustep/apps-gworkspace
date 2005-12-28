@@ -81,7 +81,7 @@ static int infoheight = 0;
       infoFont = [[NSFontManager sharedFontManager] convertFont: infoFont 
                                                     toHaveTrait: NSItalicFontMask];
       RETAIN (infoFont);
-      infoheight = floor([infoFont defaultLineHeightForFont]);
+      infoheight = floor([[FSNodeRep sharedInstance] heighOfFont: infoFont]);
     }
    
     initialized = YES;

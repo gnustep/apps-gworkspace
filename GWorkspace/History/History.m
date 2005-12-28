@@ -27,6 +27,7 @@
 #include "History.h"
 #include "GWViewersManager.h"
 #include "GWFunctions.h"
+#include "FSNodeRep.h"
 #include "GNUstep.h"
 
 @implementation History
@@ -75,7 +76,8 @@
     [matrix setDoubleAction: @selector(matrixAction:)];
     [matrix setIntercellSpacing: NSZeroSize];
     ms.width = [[scrollView contentView] frame].size.width;
-    ms.height = [[NSFont systemFontOfSize: 12] defaultLineHeightForFont];
+    ms.height = [[FSNodeRep sharedInstance] heighOfFont: [NSFont systemFontOfSize: 12]];
+    
     [matrix setCellSize: ms];
     [matrix setAutoscroll: YES];
 	  [matrix setAllowsEmptySelection: YES];

@@ -823,6 +823,7 @@
         [notifdict setObject: @"GWFileCreatedInWatchedDirectory" forKey: @"event"];
         [notifdict setObject: [NSArray arrayWithObject: [path lastPathComponent]] 
                       forKey: @"files"];
+        GWDebugLog(@"CREATE %@", path);
         break;
 
       case UNLINK:

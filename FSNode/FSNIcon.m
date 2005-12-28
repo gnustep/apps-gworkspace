@@ -172,7 +172,7 @@ static NSImage *branchImage;
     
     labelRect = NSZeroRect;
     labelRect.size.width = [label uncuttedTitleLenght] + [fsnodeRep labelMargin];
-    labelRect.size.height = [[label font] defaultLineHeightForFont];
+    labelRect.size.height = [fsnodeRep heighOfFont: [label font]];
     labelRect = NSIntegralRect(labelRect);
 
     infoRect = NSZeroRect;
@@ -181,7 +181,7 @@ static NSImage *branchImage;
     } else {
       infoRect.size.width = labelRect.size.width;
     }
-    infoRect.size.height = [[infolabel font] defaultLineHeightForFont];
+    infoRect.size.height = [fsnodeRep heighOfFont: [infolabel font]];
     infoRect = NSIntegralRect(infoRect);
 
     icnPosition = ipos;
@@ -796,7 +796,7 @@ static NSImage *branchImage;
   [infolabel setFont: infoFont];
 
   labelRect.size.width = myrintf([label uncuttedTitleLenght] + lblmargin);
-  labelRect.size.height = myrintf([[label font] defaultLineHeightForFont]);
+  labelRect.size.height = myrintf([fsnodeRep heighOfFont: [label font]]);
   labelRect = NSIntegralRect(labelRect);
 
   infoRect = NSZeroRect;
@@ -805,7 +805,7 @@ static NSImage *branchImage;
   } else {
     infoRect.size.width = labelRect.size.width;
   }
-  infoRect.size.height = [infoFont defaultLineHeightForFont];
+  infoRect.size.height = [fsnodeRep heighOfFont: infoFont];
   infoRect = NSIntegralRect(infoRect);
 
   [self tile];
@@ -848,7 +848,7 @@ static NSImage *branchImage;
   ASSIGN (highlightPath, [fsnodeRep highlightPathOfSize: hlightRect.size]); 
 
   labelRect.size.width = [label uncuttedTitleLenght] + [fsnodeRep labelMargin];
-  labelRect.size.height = [[label font] defaultLineHeightForFont];
+  labelRect.size.height = [fsnodeRep heighOfFont: [label font]];
 
   [self tile];
 }

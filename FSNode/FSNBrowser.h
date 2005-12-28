@@ -75,6 +75,7 @@
   id viewer;  
   id manager;
   id <DesktopApplication> desktopApp;
+  FSNodeRep *fsnodeRep; 
 }
 
 - (id)initWithBaseNode:(FSNode *)bsnode

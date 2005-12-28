@@ -49,6 +49,7 @@
 #endif
 
 #define LABEL_W_FACT (8.0)
+#define FONT_H_FACT (1.5)
 
 static FSNodeRep *shared = nil;
 
@@ -303,6 +304,12 @@ static FSNodeRep *shared = nil;
 - (void)setLabelWFactor:(float)f
 {
   labelWFactor = f;
+}
+
+- (float)heighOfFont:(NSFont *)font
+{
+//  return [font defaultLineHeightForFont];
+  return ([font pointSize] * FONT_H_FACT);
 }
 
 - (int)defaultIconBaseShift

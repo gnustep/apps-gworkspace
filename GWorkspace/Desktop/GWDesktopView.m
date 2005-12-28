@@ -339,9 +339,9 @@
   if (iconPosition == NSImageAbove) {  
     hlightRect.origin.x = ceil((gridSize.width - hlightRect.size.width) / 2);   
     if (infoType != FSNInfoNameType) {
-      hlightRect.origin.y = floor([labelFont defaultLineHeightForFont] * 2 - 2);
-    } else {
-      hlightRect.origin.y = floor([labelFont defaultLineHeightForFont]);
+      hlightRect.origin.y = floor([fsnodeRep heighOfFont: labelFont] * 2 - 2);
+    } else { 
+      hlightRect.origin.y = floor([fsnodeRep heighOfFont: labelFont]);
     }
   } else {
     hlightRect.origin.x = 0;
