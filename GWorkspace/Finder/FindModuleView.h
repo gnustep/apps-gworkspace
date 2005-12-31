@@ -32,9 +32,9 @@
 @interface FindModuleView : NSObject 
 {
   IBOutlet id win;
-  IBOutlet id mainBox;
+  IBOutlet NSBox *mainBox;
   IBOutlet id popUp;
-  IBOutlet id moduleBox;
+  IBOutlet NSBox *moduleBox;
   IBOutlet id removeButt;
   IBOutlet id addButt;
 

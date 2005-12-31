@@ -103,7 +103,7 @@ static NSString *nibName = @"FileOperationWin";
       }
 
       RETAIN (progInd);
-      r = [[(NSBox *)progBox contentView] frame];
+      r = [[progBox contentView] frame];
       progView = [[ProgressView alloc] initWithFrame: r refreshInterval: 0.05];
 
       [fromLabel setStringValue: NSLocalizedString(@"From:", @"")];
@@ -364,7 +364,7 @@ static NSString *nibName = @"FileOperationWin";
       [toField setStringValue: @""];    
     }
     
-    [(NSBox *)progBox setContentView: progView];
+    [progBox setContentView: progView];
     [progView start];
   }
   
@@ -375,7 +375,7 @@ static NSString *nibName = @"FileOperationWin";
 - (void)setNumFiles:(int)n
 {
   [progView stop];  
-  [(NSBox *)progBox setContentView: progInd];
+  [progBox setContentView: progInd];
   [progInd setMinValue: 0.0];
   [progInd setMaxValue: n];
   [progInd setDoubleValue: 0.0];
@@ -390,7 +390,7 @@ static NSString *nibName = @"FileOperationWin";
 - (void)endOperation
 {
   if (showwin) {
-    if ([(NSBox *)progBox contentView] == progView) {
+    if ([progBox contentView] == progView) {
       [progView stop];  
     }
     [win saveFrameUsingName: @"fopinfo"];

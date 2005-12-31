@@ -59,6 +59,7 @@
             
 
 - (id)newViewerOfType:(unsigned)vtype
+             showType:(NSString *)stype
               forNode:(FSNode *)node
         showSelection:(BOOL)showsel
        closeOldViewer:(id)oldvwr

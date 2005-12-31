@@ -37,7 +37,7 @@
                        files:(NSArray *)files 
                          tag:(int *)tag;
 
-- (void)performFileOperationWithDictionary:(id)opdict;
+- (void)performFileOperationWithDictionary:(NSDictionary *)opdict;
 
 - (BOOL)application:(NSApplication *)theApplication 
            openFile:(NSString *)filename;

@@ -470,7 +470,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 
     progView = [[ProgrView alloc] initWithFrame: NSMakeRect(0, 0, 16, 16)
                                 refreshInterval: 0.1];
-    [(NSBox *)progBox setContentView: progView]; 
+    [progBox setContentView: progView]; 
     RELEASE (progView);
 
     [elementsLabel setStringValue: @""];
@@ -643,7 +643,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
     
     r = [[pathBox contentView] frame];
     pathViewer = [[FSNPathComponentsViewer alloc] initWithFrame: r];
-    [(NSBox *)pathBox setContentView: pathViewer];
+    [pathBox setContentView: pathViewer];
     RELEASE (pathViewer);
 
     [[NSDistributedNotificationCenter defaultCenter] addObserver: self

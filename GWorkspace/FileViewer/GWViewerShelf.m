@@ -72,10 +72,10 @@
     
     defentry = [defaults dictionaryForKey: @"backcolor"];
     if (defentry) {
-      float red = [[defentry objectForKey: @"red"] floatValue];
-      float green = [[defentry objectForKey: @"green"] floatValue];
-      float blue = [[defentry objectForKey: @"blue"] floatValue];
-      float alpha = [[defentry objectForKey: @"alpha"] floatValue];
+      float red = [[(NSDictionary *)defentry objectForKey: @"red"] floatValue];
+      float green = [[(NSDictionary *)defentry objectForKey: @"green"] floatValue];
+      float blue = [[(NSDictionary *)defentry objectForKey: @"blue"] floatValue];
+      float alpha = [[(NSDictionary *)defentry objectForKey: @"alpha"] floatValue];
     
       ASSIGN (backColor, [NSColor colorWithCalibratedRed: red 
                                                    green: green 
@@ -87,10 +87,10 @@
 
     defentry = [defaults dictionaryForKey: @"textcolor"];
     if (defentry) {
-      float red = [[defentry objectForKey: @"red"] floatValue];
-      float green = [[defentry objectForKey: @"green"] floatValue];
-      float blue = [[defentry objectForKey: @"blue"] floatValue];
-      float alpha = [[defentry objectForKey: @"alpha"] floatValue];
+      float red = [[(NSDictionary *)defentry objectForKey: @"red"] floatValue];
+      float green = [[(NSDictionary *)defentry objectForKey: @"green"] floatValue];
+      float blue = [[(NSDictionary *)defentry objectForKey: @"blue"] floatValue];
+      float alpha = [[(NSDictionary *)defentry objectForKey: @"alpha"] floatValue];
     
       ASSIGN (textColor, [NSColor colorWithCalibratedRed: red 
                                                    green: green 

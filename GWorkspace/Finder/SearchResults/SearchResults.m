@@ -89,12 +89,12 @@ static NSString *lsfname = @"LiveSearch.lsf";
     
     progView = [[ProgressView alloc] initWithFrame: NSMakeRect(0, 0, 16, 16)
                                    refreshInterval: 0.1];
-    [(NSBox *)progBox setContentView: progView]; 
+    [progBox setContentView: progView]; 
     RELEASE (progView);
     
-    r = [[(NSBox *)dragIconBox contentView] frame];
+    r = [[dragIconBox contentView] frame];
     documentIcon = [[DocumentIcon alloc] initWithFrame: r searchResult: self];
-    [(NSBox *)dragIconBox setContentView: documentIcon]; 
+    [dragIconBox setContentView: documentIcon]; 
     RELEASE (documentIcon);
     
     [elementsLabel setStringValue: @""];
@@ -200,7 +200,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
         
     r = [[pathBox contentView] frame];
     pathViewer = [[FSNPathComponentsViewer alloc] initWithFrame: r];
-    [(NSBox *)pathBox setContentView: pathViewer];
+    [pathBox setContentView: pathViewer];
     RELEASE (pathViewer);
 
     finder = [Finder finder];        

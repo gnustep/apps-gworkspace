@@ -154,14 +154,14 @@
 					continue;
 				}
 				
-        typesarr = [entry objectForKey: @"NSUnixExtensions"];
+        typesarr = [(NSDictionary *)entry objectForKey: @"NSUnixExtensions"];
 
         if ([typesarr isKindOfClass: [NSArray class]] == NO) {
 					continue;
 				}
 				
         j = [typesarr count];
-        iname = [entry objectForKey: @"NSIcon"];
+        iname = [(NSDictionary *)entry objectForKey: @"NSIcon"];
 
         while (j-- > 0) {
           NSString *ext = [[typesarr objectAtIndex: j] lowercaseString];

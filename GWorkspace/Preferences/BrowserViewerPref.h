@@ -47,11 +47,11 @@
 @interface BrowserViewerPref : NSObject <PrefProtocol>
 {
   IBOutlet id win;
-  IBOutlet id prefbox;
+  IBOutlet NSBox *prefbox;
 
-  IBOutlet id controlsbox;
+  IBOutlet NSBox *controlsbox;
   IBOutlet id colExample;
-  IBOutlet id resizerBox;
+  IBOutlet NSBox *resizerBox;
 
   IBOutlet id setButt;
 

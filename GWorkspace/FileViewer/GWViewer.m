@@ -70,6 +70,7 @@
 
 - (id)initForNode:(FSNode *)node
          inWindow:(GWViewerWindow *)win
+         showType:(NSString *)stype
     showSelection:(BOOL)showsel
 {
   self = [super init];
@@ -142,7 +143,7 @@
     viewType = [viewerPrefs objectForKey: @"viewtype"];
     
     if (viewType == nil) {
-      viewType = @"Browser";
+      viewType = ((stype != nil) ? stype : @"Browser");
     }
     if (([viewType isEqual: @"Icon"] == NO)
               && ([viewType isEqual: @"List"] == NO)

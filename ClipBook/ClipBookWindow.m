@@ -133,7 +133,7 @@ static NSString *nibName = @"ClipBookWindow.gorm";
       RELEASE (label);
      
       iconView = [[PBIconView alloc] initWithFrame: [[iconBox contentView] frame]];
-      [(NSBox *)iconBox setContentView: iconView];
+      [iconBox setContentView: iconView];
       
       fm = [NSFileManager defaultManager];
       
@@ -169,7 +169,7 @@ static NSString *nibName = @"ClipBookWindow.gorm";
             
       index = 0;
       isDragTarget = NO;
-      [(NSBox *)viewersBox setContentView: emptyBox];
+      [viewersBox setContentView: emptyBox];
       [self showPbData];
     }
   }
@@ -268,7 +268,7 @@ static NSString *nibName = @"ClipBookWindow.gorm";
   [self checkStoredData];
 
   if ([pbDescr count] == 0) {
-    [(NSBox *)viewersBox setContentView: emptyBox];
+    [viewersBox setContentView: emptyBox];
     [self showPbInfo: nil];
   } else {
     NSDictionary *dict = [pbDescr objectAtIndex: index];
@@ -280,10 +280,10 @@ static NSString *nibName = @"ClipBookWindow.gorm";
       id bpviewer = [viewer viewerForData: data ofType: type];
       
       if (bpviewer) {
-        [(NSBox *)viewersBox setContentView: bpviewer];
+        [viewersBox setContentView: bpviewer];
         [self showPbInfo: dict];
       } else {
-        [(NSBox *)viewersBox setContentView: invalidBox];
+        [viewersBox setContentView: invalidBox];
         [self showPbInfo: nil];
       } 
     }

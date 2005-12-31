@@ -37,7 +37,7 @@
 {
   IBOutlet id win;
   IBOutlet id popUp;
-  IBOutlet id inspBox;
+  IBOutlet NSBox *inspBox;
 
   NSMutableArray *inspectors;
 	id currentInspector;

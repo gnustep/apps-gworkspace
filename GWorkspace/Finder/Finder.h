@@ -44,7 +44,7 @@
   IBOutlet id addPlaceButt;
   IBOutlet id removePlaceButt;
   IBOutlet id itemsLabel;
-  IBOutlet id modulesBox;
+  IBOutlet NSBox *modulesBox;
   IBOutlet id recursiveSwitch;
   IBOutlet id findButt;
 

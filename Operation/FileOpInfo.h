@@ -109,7 +109,7 @@
   IBOutlet id fromField;
   IBOutlet id toLabel;
   IBOutlet id toField;
-  IBOutlet id progBox;
+  IBOutlet NSBox *progBox;
   IBOutlet id progInd;
   ProgressView *progView;
   IBOutlet id pauseButt;

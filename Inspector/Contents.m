@@ -85,7 +85,7 @@ static NSString *nibName = @"Contents";
     imagepath = [bundle pathForResource: @"Pboard" ofType: @"tiff"];
     pboardImage = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
         
-    r = [[(NSBox *)viewersBox contentView] frame];
+    r = [[viewersBox contentView] frame];
 
     bundlesDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSSystemDomainMask, YES) lastObject];
     bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
@@ -151,7 +151,7 @@ static NSString *nibName = @"Contents";
 		[titleField setStringValue: items];  
     [iconView setImage: icon];
     
-    [(NSBox *)viewersBox setContentView: noContsView];
+    [viewersBox setContentView: noContsView];
     currentViewer = noContsView;
     
     if (currentPath) {
@@ -223,7 +223,7 @@ static NSString *nibName = @"Contents";
 		if (viewer) {
       currentViewer = viewer;
       winName = [viewer winname];
-      [(NSBox *)viewersBox setContentView: viewer];
+      [viewersBox setContentView: viewer];
     
       if ([path isEqual: [viewer currentPath]]) {
         [viewer displayLastPath: NO];
@@ -238,12 +238,12 @@ static NSString *nibName = @"Contents";
       [titleField setStringValue: [node name]];
 
       if ([textViewer tryToDisplayPath: path]) {
-        [(NSBox *)viewersBox setContentView: textViewer];
+        [viewersBox setContentView: textViewer];
         currentViewer = textViewer;
 			  winName = NSLocalizedString(@"Text Inspector", @"");
       
       } else {
-        [(NSBox *)viewersBox setContentView: genericView];
+        [viewersBox setContentView: genericView];
         currentViewer = genericView;
         [genericView showInfoOfPath: path];
 			  winName = NSLocalizedString(@"Contents Inspector", @"");
@@ -253,7 +253,7 @@ static NSString *nibName = @"Contents";
 	} else {  
     [iconView setImage: nil];
     [titleField setStringValue: @""];
-    [(NSBox *)viewersBox setContentView: noContsView];
+    [viewersBox setContentView: noContsView];
     currentViewer = noContsView;
 		winName = NSLocalizedString(@"Contents Inspector", @"");
     
@@ -307,13 +307,13 @@ static NSString *nibName = @"Contents";
 	if (viewer) {   
     currentViewer = viewer;
     winName = [viewer winname];
-    [(NSBox *)viewersBox setContentView: viewer];
+    [viewersBox setContentView: viewer];
     [viewer displayData: data ofType: type];
 
 	} else {	   
     [iconView setImage: pboardImage];
     [titleField setStringValue: @""];  
-    [(NSBox *)viewersBox setContentView: noContsView];
+    [viewersBox setContentView: noContsView];
     currentViewer = noContsView;
 	  winName = NSLocalizedString(@"Data Inspector", @"");
   }

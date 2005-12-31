@@ -31,6 +31,7 @@
 @class Finder;
 @class NSWindow;
 @class NSView;
+@class NSScrollView;
 @class ResultsTableView;
 @class NSTableColumn;
 @class FSNPathComponentsViewer;
@@ -54,17 +55,17 @@
 {
   IBOutlet id win;
   
-  IBOutlet id topBox;
-  IBOutlet id progBox; 
+  IBOutlet NSBox *topBox;
+  IBOutlet NSBox *progBox; 
   ProgressView *progView;
   IBOutlet id elementsLabel;
   NSString *elementsStr;
   IBOutlet id stopButt;
   IBOutlet id restartButt;
-  IBOutlet id dragIconBox;
+  IBOutlet NSBox *dragIconBox;
   DocumentIcon *documentIcon;
     
-  IBOutlet id resultsScroll;
+  IBOutlet NSScrollView *resultsScroll;
   ResultsTableView *resultsView;
   NSTableColumn *nameColumn;
   NSTableColumn *parentColumn;
@@ -72,7 +73,7 @@
   NSTableColumn *sizeColumn;
   NSTableColumn *kindColumn;  
   
-  IBOutlet id pathBox;   
+  IBOutlet NSBox *pathBox;   
   FSNPathComponentsViewer *pathViewer;
   
   int visibleRows;

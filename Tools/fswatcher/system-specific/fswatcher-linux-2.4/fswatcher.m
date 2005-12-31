@@ -649,7 +649,7 @@
   return nil;
 }
 
-- (void)watcherTimeOut:(id)sender
+- (void)watcherTimeOut:(NSTimer *)sender
 {
   Watcher *watcher = (Watcher *)[sender userInfo];
 

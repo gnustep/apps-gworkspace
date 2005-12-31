@@ -645,37 +645,37 @@ static int infoheight = 0;
   return 0;
 }
 
-- (int)compareAccordingToName:(FSNBrowserCell *)aCell
+- (int)compareAccordingToName:(id)aCell
 {
   return [node compareAccordingToName: [aCell node]];
 }
 
-- (int)compareAccordingToKind:(FSNBrowserCell *)aCell
+- (int)compareAccordingToKind:(id)aCell
 {
   return [node compareAccordingToKind: [aCell node]];
 }
 
-- (int)compareAccordingToDate:(FSNBrowserCell *)aCell
+- (int)compareAccordingToDate:(id)aCell
 {
   return [node compareAccordingToDate: [aCell node]];
 }
 
-- (int)compareAccordingToSize:(FSNBrowserCell *)aCell
+- (int)compareAccordingToSize:(id)aCell
 {
   return [node compareAccordingToSize: [aCell node]];
 }
 
-- (int)compareAccordingToOwner:(FSNBrowserCell *)aCell
+- (int)compareAccordingToOwner:(id)aCell
 {
   return [node compareAccordingToOwner: [aCell node]];
 }
 
-- (int)compareAccordingToGroup:(FSNBrowserCell *)aCell
+- (int)compareAccordingToGroup:(id)aCell
 {
   return [node compareAccordingToGroup: [aCell node]];
 }
 
-- (int)compareAccordingToIndex:(FSNBrowserCell *)aCell
+- (int)compareAccordingToIndex:(id)aCell
 {
   return NSOrderedSame;
 }

@@ -38,7 +38,7 @@
   IBOutlet id win;
   IBOutlet id firstLabel;
   IBOutlet id secondLabel;
-  IBOutlet id fieldBox;
+  IBOutlet NSBox *fieldBox;
   IBOutlet id cancelButt;
   IBOutlet id okButt;
 

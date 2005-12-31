@@ -90,7 +90,7 @@ static NSString *nibName = @"FindModuleView";
 - (void)setModule:(id)mdl
 {
   module = mdl;
-  [(NSBox *)moduleBox setContentView: [module controls]];
+  [moduleBox setContentView: [module controls]];
   [popUp selectItemWithTitle: [mdl moduleName]];  
 }
 
@@ -137,7 +137,7 @@ static NSString *nibName = @"FindModuleView";
   }
 }
 
-- (BOOL)validateMenuItem:(NSMenuItem *)anItem 
+- (BOOL)validateMenuItem:(id <NSMenuItem>)anItem 
 {
   if (module == nil) {
     return NO;

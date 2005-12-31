@@ -32,7 +32,7 @@ static NSString *nibName = @"FModuleCrDate";
 @interface FModuleCrDate : NSObject <FinderModulesProtocol>
 {  
   IBOutlet id win;
-  IBOutlet id controlsBox;
+  IBOutlet NSBox *controlsBox;
   IBOutlet id isPopUp;
   IBOutlet id whenPopUp;
   IBOutlet id dateField;

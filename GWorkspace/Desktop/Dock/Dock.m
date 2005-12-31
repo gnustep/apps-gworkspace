@@ -52,7 +52,7 @@
   if (self) {
 	  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
     NSArray *launched;
-    id appsdict;
+    NSDictionary *appsdict;
     NSArray *pbTypes;
     int i;
 

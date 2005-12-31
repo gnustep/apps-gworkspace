@@ -1061,37 +1061,37 @@ static NSImage *branchImage;
   return gridIndex;
 }
 
-- (int)compareAccordingToName:(FSNIcon *)aIcon
+- (int)compareAccordingToName:(id)aIcon
 {
   return [node compareAccordingToName: [aIcon node]];
 }
 
-- (int)compareAccordingToKind:(FSNIcon *)aIcon
+- (int)compareAccordingToKind:(id)aIcon
 {
   return [node compareAccordingToKind: [aIcon node]];
 }
 
-- (int)compareAccordingToDate:(FSNIcon *)aIcon
+- (int)compareAccordingToDate:(id)aIcon
 {
   return [node compareAccordingToDate: [aIcon node]];
 }
 
-- (int)compareAccordingToSize:(FSNIcon *)aIcon
+- (int)compareAccordingToSize:(id)aIcon
 {
   return [node compareAccordingToSize: [aIcon node]];
 }
 
-- (int)compareAccordingToOwner:(FSNIcon *)aIcon
+- (int)compareAccordingToOwner:(id)aIcon
 {
   return [node compareAccordingToOwner: [aIcon node]];
 }
 
-- (int)compareAccordingToGroup:(FSNIcon *)aIcon
+- (int)compareAccordingToGroup:(id)aIcon
 {
   return [node compareAccordingToGroup: [aIcon node]];
 }
 
-- (int)compareAccordingToIndex:(FSNIcon *)aIcon
+- (int)compareAccordingToIndex:(id)aIcon
 {
   return (gridIndex <= [aIcon gridIndex]) ? NSOrderedAscending : NSOrderedDescending;
 }

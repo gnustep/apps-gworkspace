@@ -102,7 +102,7 @@ static NSString *nibName = @"BrowserViewerPref";
 
       resizer = [[Resizer alloc] initForController: self];
       [resizer setFrame: NSMakeRect(0, 0, RESIZER_W, RESIZER_W)];
-	    [(NSBox *)resizerBox setContentView: resizer]; 
+	    [resizerBox setContentView: resizer]; 
             
       /* Internationalization */
       [controlsbox setTitle: NSLocalizedString(@"Columns Width", @"")];  

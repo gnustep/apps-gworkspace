@@ -41,10 +41,10 @@
   IBOutlet id totalSizeField;
   IBOutlet id showHideButt;
 
-  IBOutlet id viewersBox;
+  IBOutlet NSBox *viewersBox;
   NSRect viewerRect;
      
-  IBOutlet id iconBox;
+  IBOutlet NSBox *iconBox;
   PBIconView *iconView;
   IBOutlet id pbIndexField;
   IBOutlet id pbSizeField;

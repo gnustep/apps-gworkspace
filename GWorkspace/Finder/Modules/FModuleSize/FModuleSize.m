@@ -79,7 +79,7 @@ static NSString *nibName = @"FModuleSize";
 
     /* Internationalization */    
     [popUp removeAllItems];
-    [popUp insertItemWithTitle: NSLocalizedString(@"greather then", @"") atIndex: 0];
+    [popUp insertItemWithTitle: NSLocalizedString(@"greater then", @"") atIndex: 0];
     [popUp insertItemWithTitle: NSLocalizedString(@"less then", @"") atIndex: 1];
     [popUp selectItemAtIndex: 0]; 
   }

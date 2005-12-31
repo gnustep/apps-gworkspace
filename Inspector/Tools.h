@@ -44,7 +44,7 @@
 	BOOL valid;
 
   IBOutlet id explLabel1;
-  IBOutlet id scrollView;
+  IBOutlet NSScrollView *scrollView;
   NSMatrix *matrix; 
 
   IBOutlet id defAppLabel;

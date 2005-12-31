@@ -111,7 +111,7 @@ static GWorkspace *gworkspace = nil;
   return YES;
 }
 
-- (void)performFileOperationWithDictionary:(id)opdict
+- (void)performFileOperationWithDictionary:(NSDictionary *)opdict
 {
 	NSString *operation = [opdict objectForKey: @"operation"];
 	NSString *source = [opdict objectForKey: @"source"];
@@ -250,6 +250,7 @@ static GWorkspace *gworkspace = nil;
   
   if (newviewer) {
     viewer = [vwrsManager newViewerOfType: SPATIAL
+                                 showType: nil
                                   forNode: parentnode
                             showSelection: NO
                            closeOldViewer: NO
@@ -764,6 +765,7 @@ static GWorkspace *gworkspace = nil;
   unsigned type = [vwrsManager typeOfViewerForNode: node];
 
   [vwrsManager newViewerOfType: type 
+                      showType: nil
                        forNode: node 
                  showSelection: NO
                 closeOldViewer: nil
@@ -1002,7 +1004,7 @@ static GWorkspace *gworkspace = nil;
   return tshelfWin;
 }
 
-- (BOOL)validateMenuItem:(NSMenuItem *)anItem 
+- (BOOL)validateMenuItem:(id <NSMenuItem>)anItem
 {	
 	NSString *title = [anItem title];
 	
@@ -2485,7 +2487,7 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 
 - (void)openSelectionWithApp:(id)sender
 {
-  NSString *appName = (NSString *)[sender representedObject];
+  NSString *appName = (NSString *)[(NSMenuItem *)sender representedObject];
     
   if (selectedPaths && [selectedPaths count]) {
     int i;

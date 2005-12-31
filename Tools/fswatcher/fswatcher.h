@@ -144,7 +144,7 @@
 
 - (Watcher *)watcherForPath:(NSString *)path;
 
-- (void)watcherTimeOut:(id)sender;
+- (void)watcherTimeOut:(NSTimer *)sender;
 
 - (void)removeWatcher:(Watcher *)awatcher;
 

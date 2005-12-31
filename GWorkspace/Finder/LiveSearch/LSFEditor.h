@@ -35,10 +35,10 @@
 {
   IBOutlet id win;
   IBOutlet id searchLabel;
-  IBOutlet id placesScroll;
+  IBOutlet NSScrollView *placesScroll;
   NSMatrix *placesMatrix;  
   IBOutlet id modulesLabel;
-  IBOutlet id modulesBox;
+  IBOutlet NSBox *modulesBox;
   IBOutlet id recursiveSwitch;
   IBOutlet id cancelButt;
   IBOutlet id saveButt;

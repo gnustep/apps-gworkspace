@@ -64,10 +64,10 @@ static NSString *nibName = @"DesktopPref";
       gworkspace = [GWorkspace gworkspace];
 
       // Color
-      r = [[(NSBox *)currColorBox contentView] frame];
+      r = [[currColorBox contentView] frame];
       colorView = [[ColorView alloc] initWithFrame: r];
       [colorView setColor: [[manager desktopView] currentColor]]; 
-      [(NSBox *)currColorBox setContentView: colorView];
+      [currColorBox setContentView: colorView];
       RELEASE (colorView);
 
       [NSColorPanel setPickerMask: NSColorPanelWheelModeMask 

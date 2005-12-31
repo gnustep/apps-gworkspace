@@ -33,11 +33,11 @@
 @interface Annotations: NSObject
 {
   IBOutlet id win;
-  IBOutlet id mainBox;
-  IBOutlet id topBox;
+  IBOutlet NSBox *mainBox;
+  IBOutlet NSBox *topBox;
   IBOutlet id iconView;
   IBOutlet id titleField;
-  IBOutlet id toolsBox;
+  IBOutlet NSBox *toolsBox;
   IBOutlet id textView;
   IBOutlet id okButt;
 

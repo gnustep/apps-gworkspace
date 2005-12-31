@@ -68,6 +68,7 @@
 
 - (id)initForNode:(FSNode *)node
          inWindow:(GWViewerWindow *)win
+         showType:(NSString *)stype
     showSelection:(BOOL)showsel;
 - (void)createSubviews;
 - (FSNode *)baseNode;

@@ -44,13 +44,13 @@
 @interface DesktopPref : NSObject <PrefProtocol>
 {
   IBOutlet id win;
-  IBOutlet id prefbox;
+  IBOutlet NSBox *prefbox;
   
   IBOutlet id tabView;
   
   // Color
   NSColorPanel *panel;
-  IBOutlet id currColorBox;
+  IBOutlet NSBox *currColorBox;
   ColorView *colorView;
   IBOutlet id chooseColorButt;
   IBOutlet id setColorButt;
@@ -58,7 +58,7 @@
   // Background image
   NSString *imagePath;
   NSString *imagesDir;  
-  IBOutlet id imageView;
+  IBOutlet NSImageView *imageView;
   IBOutlet id imagePosMatrix;
   IBOutlet id chooseImageButt;
   IBOutlet id setImageButt;

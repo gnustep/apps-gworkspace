@@ -164,7 +164,7 @@ static NSString *nibName = @"InspectorWin";
 	if (currentInspector != insp) {
     currentInspector = insp;
 	  [win setTitle: [insp winname]];
-	  [(NSBox *)inspBox setContentView: [insp inspView]];	 
+	  [inspBox setContentView: [insp inspView]];	 
 	}
   
   if (currentPaths) {

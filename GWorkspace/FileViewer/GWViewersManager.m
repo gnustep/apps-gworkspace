@@ -119,6 +119,7 @@ static GWViewersManager *vwrsmanager = nil;
     
       if (node && [node isValid]) {
         [self newViewerOfType: type
+                     showType: nil
                       forNode: node
                 showSelection: YES
                closeOldViewer: NO
@@ -152,6 +153,7 @@ static GWViewersManager *vwrsmanager = nil;
     }
   
     viewer = [self newViewerOfType: type
+                          showType: nil
                            forNode: node
                      showSelection: YES
                     closeOldViewer: NO
@@ -168,6 +170,7 @@ static GWViewersManager *vwrsmanager = nil;
       }
 
       viewer = [self newViewerOfType: type
+                            showType: nil
                              forNode: node
                        showSelection: (type == BROWSING)
                       closeOldViewer: NO
@@ -202,6 +205,7 @@ static GWViewersManager *vwrsmanager = nil;
             && [[viewer nodeView] isSingleNode]
                               && (baseIsParent == NO)) { 
       viewer = [self newViewerOfType: BROWSING
+                            showType: nil
                              forNode: base
                        showSelection: NO
                       closeOldViewer: NO
@@ -213,6 +217,7 @@ static GWViewersManager *vwrsmanager = nil;
     int newtype = ((type == SPATIAL) && baseIsParent) ? SPATIAL : BROWSING;
 
     viewer = [self newViewerOfType: newtype
+                          showType: nil
                            forNode: base
                      showSelection: NO
                     closeOldViewer: NO
@@ -225,6 +230,7 @@ static GWViewersManager *vwrsmanager = nil;
 }
 
 - (id)newViewerOfType:(unsigned)vtype
+             showType:(NSString *)stype
               forNode:(FSNode *)node
         showSelection:(BOOL)showsel
        closeOldViewer:(id)oldvwr
@@ -241,6 +247,7 @@ static GWViewersManager *vwrsmanager = nil;
     
     viewer = [[c alloc] initForNode: node 
                            inWindow: win 
+                           showType: stype
                       showSelection: showsel]; 
                         
     [viewers addObject: viewer];
@@ -284,6 +291,7 @@ static GWViewersManager *vwrsmanager = nil;
     
     viewer = [[c alloc] initForNode: node 
                            inWindow: win 
+                           showType: nil
                       showSelection: YES];   
     [viewers addObject: viewer];
     RELEASE (viewer);
@@ -592,6 +600,7 @@ static GWViewersManager *vwrsmanager = nil;
         }
       } else {
         [self newViewerOfType: [viewer vtype] 
+                     showType: nil
                       forNode: node 
                 showSelection: NO
                closeOldViewer: nil
@@ -623,6 +632,7 @@ static GWViewersManager *vwrsmanager = nil;
         
     if ([node isDirectory]) {
       [self newViewerOfType: [viewer vtype] 
+                   showType: [viewer viewType]
                     forNode: node
               showSelection: NO
              closeOldViewer: nil
@@ -1062,6 +1072,7 @@ if (*pos >= i) *pos -= n; \
     }
   } else {
     [self newViewerOfType: SPATIAL
+                 showType: nil
                   forNode: node
             showSelection: YES
            closeOldViewer: nil

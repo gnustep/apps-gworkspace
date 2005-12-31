@@ -189,7 +189,7 @@ static NSString *nibName = @"LSFEditor";
       [fmview setAddEnabled: NO];    
     }
 
-    [[(NSBox *)modulesBox contentView] addSubview: [fmview mainBox]];
+    [[modulesBox contentView] addSubview: [fmview mainBox]];
     [fmviews insertObject: fmview atIndex: [fmviews count]];
     RELEASE (fmview);
   }
@@ -268,7 +268,7 @@ static NSString *nibName = @"LSFEditor";
     [module setInUse: YES];
     [fmview setModule: module];
 
-    [[(NSBox *)modulesBox contentView] addSubview: [fmview mainBox]];
+    [[modulesBox contentView] addSubview: [fmview mainBox]];
     [fmviews insertObject: fmview atIndex: index + 1];
     RELEASE (fmview);
     

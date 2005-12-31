@@ -82,8 +82,8 @@
   IBOutlet id win;
   BOOL forceclose;
 
-  IBOutlet id topBox;
-  IBOutlet id progBox; 
+  IBOutlet NSBox *topBox;
+  IBOutlet NSBox *progBox; 
   ProgrView *progView;
   IBOutlet id elementsLabel;
   NSString *elementsStr;
@@ -91,7 +91,7 @@
   IBOutlet id autoupdatePopUp;
   IBOutlet id updateButt;
     
-  IBOutlet id resultsScroll;
+  IBOutlet NSScrollView *resultsScroll;
   ResultsTableView *resultsView;
   NSTableColumn *nameColumn;
   NSTableColumn *parentColumn;
@@ -99,7 +99,7 @@
   NSTableColumn *sizeColumn;
   NSTableColumn *kindColumn;  
     
-  IBOutlet id pathBox;     
+  IBOutlet NSBox *pathBox;     
   FSNPathComponentsViewer *pathViewer;
   int visibleRows;
 

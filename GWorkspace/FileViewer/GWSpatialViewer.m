@@ -59,6 +59,7 @@
 
 - (id)initForNode:(FSNode *)node
          inWindow:(GWViewerWindow *)win
+         showType:(NSString *)stype
     showSelection:(BOOL)showsel
 {
   self = [super init];
@@ -567,6 +568,7 @@
     }
   
     [manager newViewerOfType: SPATIAL
+                    showType: nil
                      forNode: node 
                showSelection: NO
               closeOldViewer: (close ? self : nil)

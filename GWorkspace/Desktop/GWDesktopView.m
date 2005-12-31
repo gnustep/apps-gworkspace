@@ -464,17 +464,17 @@
 - (void)getDesktopInfo
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
-  id dskinfo = [defaults objectForKey: @"desktopinfo"];
+  NSDictionary *dskinfo = [defaults objectForKey: @"desktopinfo"];
 
   if (dskinfo) {
     id entry = [dskinfo objectForKey: @"backcolor"];
     FSNInfoType itype;
 
     if (entry) {
-      float red = [[entry objectForKey: @"red"] floatValue];
-      float green = [[entry objectForKey: @"green"] floatValue];
-      float blue = [[entry objectForKey: @"blue"] floatValue];
-      float alpha = [[entry objectForKey: @"alpha"] floatValue];
+      float red = [[(NSDictionary *)entry objectForKey: @"red"] floatValue];
+      float green = [[(NSDictionary *)entry objectForKey: @"green"] floatValue];
+      float blue = [[(NSDictionary *)entry objectForKey: @"blue"] floatValue];
+      float alpha = [[(NSDictionary *)entry objectForKey: @"alpha"] floatValue];
 
       ASSIGN (backColor, [NSColor colorWithCalibratedRed: red 
                                                    green: green 
