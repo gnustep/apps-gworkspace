@@ -26,7 +26,6 @@
 #include <AppKit/AppKit.h>
 #include <math.h>
 #include "GWFunctions.h"
-#include "GWNotifications.h"
 #include "FSNodeRep.h"
 #include "FSNFunctions.h"
 #include "GWorkspace.h"
@@ -355,21 +354,6 @@ static GWorkspace *gworkspace = nil;
   return tpath;
 }
 
-- (BOOL)animateChdir
-{
-  return animateChdir;
-}
-
-- (BOOL)animateSlideBack
-{
-  return animateSlideBack;
-}
-
-- (BOOL)usesContestualMenu
-{
-  return contestualMenu;
-}
-
 - (void)addWatcherForPath:(NSString *)path
 {
   if (fswnotifications) {
@@ -492,14 +476,7 @@ static GWorkspace *gworkspace = nil;
   
   teminalService = [defaults boolForKey: @"terminal_services"];
   [self setUseTerminalService: teminalService];
-  
-	entry = [defaults objectForKey: @"shelfcellswidth"];
-	if (entry == nil) {
-    shelfCellsWidth = 90;
-	} else {
-    shelfCellsWidth = [entry intValue];
-  }
-		
+  		
 	entry = [defaults objectForKey: @"default_sortorder"];	
 	if (entry == nil) { 
 		[defaults setObject: @"0" forKey: @"default_sortorder"];
@@ -508,19 +485,7 @@ static GWorkspace *gworkspace = nil;
     [fsnodeRep setDefaultSortOrder: [entry intValue]];
 	}
 
-  entry = [defaults objectForKey: @"GSFileBrowserHideDotFiles"];
-  if (entry) {
-    boolentry = [entry boolValue];
-  } else {  
-    NSDictionary *domain = [defaults persistentDomainForName: NSGlobalDomain];
-    
-    entry = [domain objectForKey: @"GSFileBrowserHideDotFiles"];
-    if (entry) {
-      boolentry = [entry boolValue];
-    } else {  
-      boolentry = NO;
-    }
-  }
+  boolentry = [defaults boolForKey: @"GSFileBrowserHideDotFiles"];
   [fsnodeRep setHideSysFiles: boolentry];
 
 	entry = [defaults objectForKey: @"hiddendirs"];
@@ -534,12 +499,7 @@ static GWorkspace *gworkspace = nil;
 	} else {
     maxHistoryCache = HISTORT_CACHE_MAX;
   }
-
-  animateChdir = ![defaults boolForKey: @"nochdiranim"];
-  animateSlideBack = ![defaults boolForKey: @"noslidebackanim"];
   
-  contestualMenu = [defaults boolForKey: @"UsesContestualMenu"];
-
   dontWarnOnQuit = [defaults boolForKey: @"NoWarnOnQuit"];
 
   boolentry = [defaults boolForKey: @"use_thumbnails"];
@@ -613,12 +573,12 @@ static GWorkspace *gworkspace = nil;
 
   [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
                 				selector: @selector(fileSystemWillChange:) 
-                					  name: GWFileSystemWillChangeNotification
+                					  name: @"GWFileSystemWillChangeNotification"
                 					object: nil];
 
   [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
                 				selector: @selector(fileSystemDidChange:) 
-                					  name: GWFileSystemDidChangeNotification
+                					  name: @"GWFileSystemDidChangeNotification"
                 					object: nil];
 
   [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
@@ -626,19 +586,14 @@ static GWorkspace *gworkspace = nil;
                 					  name: @"GWDefaultEditorChangedNotification"
                 					object: nil];
 
-	[[NSNotificationCenter defaultCenter] addObserver: self 
-                        selector: @selector(iconAnimationChanged:) 
-                					  name: GWIconAnimationChangedNotification
-                					object: nil];
-  
   [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
                         selector: @selector(thumbnailsDidChange:) 
-                					  name: GWThumbnailsDidChangeNotification
+                					  name: @"GWThumbnailsDidChangeNotification"
                 					object: nil];
 
   [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
                         selector: @selector(customDirectoryIconDidChange:) 
-                					  name: GWCustomDirectoryIconDidChangeNotification
+                					  name: @"GWCustomDirectoryIconDidChangeNotification"
                 					object: nil];
 
   [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
@@ -879,12 +834,6 @@ static GWorkspace *gworkspace = nil;
 
   [defaults setBool: teminalService forKey: @"terminal_services"];
 	
-  [defaults setObject: [NSString stringWithFormat: @"%i", shelfCellsWidth]
-               forKey: @"shelfcellswidth"];
-
-  [defaults setBool: !animateChdir forKey: @"nochdiranim"];
-  [defaults setBool: !animateSlideBack forKey: @"noslidebackanim"];
-
   [defaults setBool: [fsnodeRep usesThumbnails]  
              forKey: @"use_thumbnails"];
 
@@ -934,26 +883,6 @@ static GWorkspace *gworkspace = nil;
 - (void)setDefaultSortType:(int)type
 {
   [fsnodeRep setDefaultSortOrder: type];
-}
-
-- (int)shelfCellsWidth
-{
-  return shelfCellsWidth;
-}
-
-- (int)defaultShelfCellsWidth
-{
-  [self setShelfCellsWidth: 90];
-  return 90;
-}
-
-- (void)setShelfCellsWidth:(int)w
-{
-  shelfCellsWidth = w;
-    
-	[[NSNotificationCenter defaultCenter]
- 				 postNotificationName: GWShelfCellsWidthChangedNotification
-	 								     object: nil];  
 }
 
 - (void)createTabbedShelf
@@ -1104,107 +1033,21 @@ static GWorkspace *gworkspace = nil;
     
   [tshelfWin checkIconsAfterHidingOfPaths: paths]; 
 }
-
-- (void)iconAnimationChanged:(NSNotification *)notif
-{
-  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];     
-  
-  animateChdir = ![defaults boolForKey: @"nochdiranim"];
-  animateSlideBack = ![defaults boolForKey: @"noslidebackanim"];
-}
            
 - (void)fileSystemWillChange:(NSNotification *)notif
 {
-  NSDictionary *info = [notif userInfo];
-  NSString *operation = [info objectForKey: @"operation"];
-  NSString *source = [info objectForKey: @"source"];
-  NSString *destination = [info objectForKey: @"destination"];
-  NSArray *files = [info objectForKey: @"files"];
-	NSMutableDictionary *dict = [NSMutableDictionary dictionary];		
-  NSString *opPtr = nil;
-  
-  if ([operation isEqual: NSWorkspaceMoveOperation]) {
-    opPtr = NSWorkspaceMoveOperation;    
-  } else if ([operation isEqual: NSWorkspaceCopyOperation]) {
-    opPtr = NSWorkspaceCopyOperation;    
-  } else if ([operation isEqual: NSWorkspaceLinkOperation]) {
-    opPtr = NSWorkspaceLinkOperation;    
-  } else if ([operation isEqual: NSWorkspaceDuplicateOperation]) {
-    opPtr = NSWorkspaceDuplicateOperation;    
-  } else if ([operation isEqual: NSWorkspaceDestroyOperation]) {
-    opPtr = NSWorkspaceDestroyOperation;    
-  } else if ([operation isEqual: GWorkspaceRenameOperation]) {
-    opPtr = GWorkspaceRenameOperation;  
-  } else if ([operation isEqual: GWorkspaceCreateFileOperation]) {
-    opPtr = GWorkspaceCreateFileOperation;  
-  } else if ([operation isEqual: GWorkspaceCreateDirOperation]) {
-    opPtr = GWorkspaceCreateDirOperation;  
-  } else if ([operation isEqual: NSWorkspaceRecycleOperation]) {
-    opPtr = NSWorkspaceRecycleOperation;    
-  } else if ([operation isEqual: GWorkspaceRecycleOutOperation]) {
-    opPtr = GWorkspaceRecycleOutOperation;    
-  } else if ([operation isEqual: GWorkspaceEmptyRecyclerOperation]) {
-    opPtr = GWorkspaceEmptyRecyclerOperation;    
-  }
-
-	[dict setObject: opPtr forKey: @"operation"];	
-  [dict setObject: source forKey: @"source"];	
-  [dict setObject: destination forKey: @"destination"];	
-  [dict setObject: files forKey: @"files"];	
-
   [[NSNotificationCenter defaultCenter]
- 				postNotificationName: GWFileSystemWillChangeNotification
-	 								    object: [dict makeImmutableCopyOnFail: NO]];
+ 				postNotificationName: @"GWFileSystemWillChangeNotification"
+	 								    object: [notif userInfo]];
 }
 
 - (void)fileSystemDidChange:(NSNotification *)notif
 {
-  NSDictionary *info = [notif userInfo];
-  NSString *operation = [info objectForKey: @"operation"];
-  NSString *source = [info objectForKey: @"source"];
-  NSString *destination = [info objectForKey: @"destination"];
-  NSArray *files = [info objectForKey: @"files"];
-  NSArray *origfiles = [info objectForKey: @"origfiles"];
-	NSMutableDictionary *dict = [NSMutableDictionary dictionary];		
-  NSString *opPtr = nil;
-  
-  if ([operation isEqual: NSWorkspaceMoveOperation]) { 
-    opPtr = NSWorkspaceMoveOperation;                                 
-  } else if ([operation isEqual: NSWorkspaceCopyOperation]) {         
-    opPtr = NSWorkspaceCopyOperation;                                 
-  } else if ([operation isEqual: NSWorkspaceLinkOperation]) {         
-    opPtr = NSWorkspaceLinkOperation;                                 
-  } else if ([operation isEqual: NSWorkspaceDuplicateOperation]) {    
-    opPtr = NSWorkspaceDuplicateOperation;                            
-  } else if ([operation isEqual: NSWorkspaceDestroyOperation]) {      
-    opPtr = NSWorkspaceDestroyOperation;                              
-  } else if ([operation isEqual: GWorkspaceRenameOperation]) {        
-    opPtr = GWorkspaceRenameOperation;                                
-  } else if ([operation isEqual: GWorkspaceCreateFileOperation]) {    
-    opPtr = GWorkspaceCreateFileOperation;                            
-  } else if ([operation isEqual: GWorkspaceCreateDirOperation]) {     
-    opPtr = GWorkspaceCreateDirOperation;                             
-  } else if ([operation isEqual: NSWorkspaceRecycleOperation]) {      
-    opPtr = NSWorkspaceRecycleOperation;                              
-  } else if ([operation isEqual: GWorkspaceRecycleOutOperation]) {    
-    opPtr = GWorkspaceRecycleOutOperation;                            
-  } else if ([operation isEqual: GWorkspaceEmptyRecyclerOperation]) { 
-    opPtr = GWorkspaceEmptyRecyclerOperation;                         
-  }
-
-	[dict setObject: opPtr forKey: @"operation"];	
-  [dict setObject: source forKey: @"source"];	
-  [dict setObject: destination forKey: @"destination"];	
-  [dict setObject: files forKey: @"files"];	
-  if (origfiles) {
-    [dict setObject: origfiles forKey: @"origfiles"];	
-  }
-
  // [waitCursor set];
   
 	[[NSNotificationCenter defaultCenter]
- 				postNotificationName: GWFileSystemDidChangeNotification
-	 								    object: [dict makeImmutableCopyOnFail: NO]];
+ 				postNotificationName: @"GWFileSystemDidChangeNotification"
+	 								    object: [notif userInfo]];
                       
  // [[NSCursor arrowCursor] set];
 }
@@ -1221,7 +1064,7 @@ static GWorkspace *gworkspace = nil;
     [finder setCurrentSelection: paths];
     
 	  [[NSNotificationCenter defaultCenter]
- 				 postNotificationName: GWCurrentSelectionChangedNotification
+ 				 postNotificationName: @"GWCurrentSelectionChangedNotification"
 	 								     object: nil];      
   }
 }
@@ -1237,7 +1080,7 @@ static GWorkspace *gworkspace = nil;
   }
 				
   [[NSNotificationCenter defaultCenter]
- 				 postNotificationName: GWCurrentSelectionChangedNotification
+ 				 postNotificationName: @"GWCurrentSelectionChangedNotification"
 	 								        object: nil];    
 }
 
@@ -1280,10 +1123,10 @@ static GWorkspace *gworkspace = nil;
 
   if (directory) {
     fileName = @"NewFolder";
-    operation = GWorkspaceCreateDirOperation;
+    operation = @"GWorkspaceCreateDirOperation";
   } else {
     fileName = @"NewFile";
-    operation = GWorkspaceCreateFileOperation;
+    operation = @"GWorkspaceCreateFileOperation";
   }
 
   fullPath = [basePath stringByAppendingPathComponent: fileName];
@@ -1406,11 +1249,11 @@ static GWorkspace *gworkspace = nil;
   	[notifObj setObject: [NSArray arrayWithObjects: path, nil] forKey: @"files"];	
 
 		[[NSNotificationCenter defaultCenter]
- 					 postNotificationName: GWFileSystemWillChangeNotification
+ 					 postNotificationName: @"GWFileSystemWillChangeNotification"
 	 									object: notifObj];
 
 		[[NSNotificationCenter defaultCenter]
- 				  postNotificationName: GWFileSystemDidChangeNotification
+ 				  postNotificationName: @"GWFileSystemDidChangeNotification"
 	 									object: notifObj];
 		return NO;
 	}
@@ -1656,7 +1499,7 @@ static GWorkspace *gworkspace = nil;
   NSMutableDictionary *info = [[NSUnarchiver unarchiveObjectWithData: dirinfo] mutableCopy];
 
 	[[NSNotificationCenter defaultCenter]
- 				 postNotificationName: GWFileWatcherFileDidChangeNotification
+ 				 postNotificationName: @"GWFileWatcherFileDidChangeNotification"
 	 								     object: info];  
                        
   RELEASE (info);
@@ -1816,17 +1659,6 @@ static GWorkspace *gworkspace = nil;
                 nil);  
       }
 	  }
-  
-  } else {
-  
- //   NSImage *image = [operationsApp applicationIconImage];
-  
-//    if (image) {
-//      NSLog(@"C'E");
-//    } else {
-//      NSLog(@"NON C'E");
-//    }
-  
   }
 }
 
@@ -2428,7 +2260,7 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 
               if (cutted) {
                 if ([source isEqual: [self trashPath]]) {
-                  operation = GWorkspaceRecycleOutOperation;
+                  operation = @"GWorkspaceRecycleOutOperation";
                 } else {
 		              operation = NSWorkspaceMoveOperation;
                 }

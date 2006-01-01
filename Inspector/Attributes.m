@@ -38,20 +38,6 @@
 #define SINGLE 0
 #define MULTIPLE 1
 
-#define SET_BUTTON_STATE(b, v) { \
-if ((perms & v) == v) [b setState: NSOnState]; \
-else [b setState: NSOffState]; \
-}
-
-#define GET_BUTTON_STATE(b, v) { \
-if ([b state] == NSOnState) { \
-perms |= v; \
-} else { \
-if ((oldperms & v) == v) { \
-if ([b tag] == MULTIPLE) perms |= v; \
-} } \
-}
-
 #ifdef __WIN32__
 	#define S_IRUSR _S_IRUSR
 	#define S_IWUSR _S_IWUSR
@@ -582,6 +568,11 @@ static BOOL sizeStop = NO;
 	#endif
 	}
 
+#define SET_BUTTON_STATE(b, v) { \
+if ((perms & v) == v) [b setState: NSOnState]; \
+else [b setState: NSOffState]; \
+}
+
 	SET_BUTTON_STATE (ureadbutt, S_IRUSR);				
 	SET_BUTTON_STATE (uwritebutt, S_IWUSR);
 	SET_BUTTON_STATE (uexebutt, S_IXUSR);
@@ -599,6 +590,15 @@ static BOOL sizeStop = NO;
 - (unsigned long)getPermissions:(unsigned long)oldperms
 {
 	unsigned long perms = 0;
+
+#define GET_BUTTON_STATE(b, v) { \
+if ([b state] == NSOnState) { \
+perms |= v; \
+} else { \
+if ((oldperms & v) == v) { \
+if ([b tag] == MULTIPLE) perms |= v; \
+} } \
+}
 
 	GET_BUTTON_STATE (ureadbutt, S_IRUSR);
 	GET_BUTTON_STATE (uwritebutt, S_IWUSR);

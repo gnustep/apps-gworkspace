@@ -66,12 +66,6 @@
 
 - (NSString *)trashPath;
 
-- (BOOL)animateChdir;
-
-- (BOOL)animateSlideBack;
-
-- (BOOL)usesContestualMenu;
-
 - (void)addWatcherForPath:(NSString *)path;
 
 - (void)removeWatcherForPath:(NSString *)path;

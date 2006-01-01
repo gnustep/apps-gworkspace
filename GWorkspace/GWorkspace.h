@@ -120,6 +120,12 @@
 @end
 
 
+/* The protocol of the remote dnd source */
+@protocol GWRemoteFilesDraggingInfo
+- (oneway void)remoteDraggingDestinationReply:(NSData *)reply;
+@end 
+
+
 @interface GWorkspace : NSObject <GWProtocol, FSWClientProtocol>
 {	
   FSNodeRep *fsnodeRep;
@@ -146,11 +152,6 @@
   Inspector *inspector;
   Finder *finder;
   
-  BOOL animateChdir;
-  BOOL animateSlideBack;
-
-  BOOL contestualMenu;
-
   BOOL dontWarnOnQuit;
   BOOL terminating;
   
@@ -163,8 +164,6 @@
   
   StartAppWin *startAppWin;
     	      
-  int shelfCellsWidth;
-
 	NSString *defEditor;
   NSString *defXterm;
   NSString *defXtermArgs;
@@ -221,19 +220,11 @@
 
 - (void)setDefaultSortType:(int)type;
 
-- (int)shelfCellsWidth; 
-
-- (int)defaultShelfCellsWidth; 
-
-- (void)setShelfCellsWidth:(int)w; 
-
 - (void)createTabbedShelf;
 
 - (TShelfWin *)tabbedShelf;
 
 - (void)checkViewersAfterHidingOfPaths:(NSArray *)paths;
-
-- (void)iconAnimationChanged:(NSNotification *)notif;
 
 - (void)fileSystemWillChange:(NSNotification *)notif;
 

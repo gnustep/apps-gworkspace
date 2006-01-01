@@ -28,7 +28,6 @@
 #include "FiendLeaf.h"
 #include "Fiend.h"
 #include "GWorkspace.h"
-#include "GWNotifications.h"
 #include "FSNodeRep.h"
 #include "FSNFunctions.h"
 #include "GNUstep.h"
@@ -524,7 +523,7 @@
     source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
 
 		if ([source isEqual: [gw trashPath]]) {
-			operation = GWorkspaceRecycleOutOperation;
+			operation = @"GWorkspaceRecycleOutOperation";
 		} else {
 			if (sourceDragMask == NSDragOperationCopy) {
 				operation = NSWorkspaceCopyOperation;
