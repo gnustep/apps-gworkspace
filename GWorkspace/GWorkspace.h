@@ -131,6 +131,7 @@
 	
   id operationsApp;
   id recyclerApp;
+  BOOL recyclerCanQuit;
   
   id ddbd;
   

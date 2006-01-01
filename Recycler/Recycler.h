@@ -105,6 +105,8 @@
   BOOL fswnotifications;
   id operationsApp;  
   id workspaceApplication;
+  
+  BOOL terminating;
 
   NSFileManager *fm;
   id ws;

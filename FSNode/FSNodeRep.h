@@ -307,6 +307,8 @@ typedef enum FSNSelectionMask {
 
 - (id)workspaceApplication;
 
+- (oneway void)terminateApplication;
+
 - (BOOL)terminating;
 
 @end

@@ -143,10 +143,14 @@ static Recycler *recycler = nil;
                 				selector: @selector(fileSystemDidChange:) 
                 					  name: @"GWFileSystemDidChangeNotification"
                 					object: nil];
+  
+  terminating = NO;
 }
 
 - (BOOL)applicationShouldTerminate:(NSApplication *)app 
 {
+  terminating = YES;
+  
   [self removeWatcherForPath: trashPath];
 
   if (fswatcher) {
@@ -562,6 +566,16 @@ static Recycler *recycler = nil;
     [self contactWorkspaceApp];
   }
   return workspaceApplication;
+}
+
+- (oneway void)terminateApplication
+{
+  [NSApp terminate: self];
+}
+
+- (BOOL)terminating
+{
+  return terminating;
 }
 
 

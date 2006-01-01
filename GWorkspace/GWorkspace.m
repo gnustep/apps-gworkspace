@@ -553,6 +553,8 @@ static GWorkspace *gworkspace = nil;
   [self connectFSWatcher];
   
   operationsApp = nil;
+  
+  recyclerApp = nil;
 
   dtopManager = [GWDesktopManager desktopManager];
 
@@ -563,7 +565,10 @@ static GWorkspace *gworkspace = nil;
     menu = [[[NSApp mainMenu] itemWithTitle: NSLocalizedString(@"Tools", @"")] submenu];
     item = [menu itemWithTitle: NSLocalizedString(@"Show Desktop", @"")];
     [item setTitle: NSLocalizedString(@"Hide Desktop", @"")];
-  }
+
+  } else if ([defaults boolForKey: @"uses_recycler"]) { 
+    [self connectRecycler];
+  }  
 
   tshelfPBFileNum = 0;
   [self createTabbedShelf];
@@ -597,11 +602,6 @@ static GWorkspace *gworkspace = nil;
     [self showInspector: nil]; 
   }
     
-  recyclerApp = nil;
-  if ([defaults boolForKey: @"uses_recycler"]) {  
-    [self connectRecycler];
-  }  
-
   ddbd = nil;
   [self connectDDBd];
   
@@ -1007,8 +1007,11 @@ static GWorkspace *gworkspace = nil;
 - (BOOL)validateMenuItem:(id <NSMenuItem>)anItem
 {	
 	NSString *title = [anItem title];
-	
-	if ([title isEqual: NSLocalizedString(@"Empty Recycler", @"")]) {
+
+	if ([title isEqual: NSLocalizedString(@"Show Recycler", @"")]) {
+    return ([dtopManager isActive] == NO);
+
+  } else if ([title isEqual: NSLocalizedString(@"Empty Recycler", @"")]) {
     if ([dtopManager isActive] || (recyclerApp != nil)) {
       return ([[fm directoryContentsAtPath: [self trashPath]] count] != 0);
     }
@@ -1666,6 +1669,9 @@ static GWorkspace *gworkspace = nil;
                                                                host: @""];
 
     if (rcl) {
+      NSMenu *menu = [[[NSApp mainMenu] itemWithTitle: NSLocalizedString(@"Tools", @"")] submenu];
+      id item = [menu itemWithTitle: NSLocalizedString(@"Show Recycler", @"")];
+
       NSConnection *c = [rcl connectionForProxy];
 
 	    [[NSNotificationCenter defaultCenter] addObserver: self
@@ -1676,6 +1682,10 @@ static GWorkspace *gworkspace = nil;
       recyclerApp = rcl;
 	    [recyclerApp setProtocolForProxy: @protocol(RecyclerAppProtocol)];
       RETAIN (recyclerApp);
+      
+      if (item != nil) {
+        [item setTitle: NSLocalizedString(@"Hide Recycler", @"")];
+      }
       
 	  } else {
 	    static BOOL recursion = NO;
@@ -1722,6 +1732,8 @@ static GWorkspace *gworkspace = nil;
 - (void)recyclerConnectionDidDie:(NSNotification *)notif
 {
   id connection = [notif object];
+  NSMenu *menu = [[[NSApp mainMenu] itemWithTitle: NSLocalizedString(@"Tools", @"")] submenu];
+  id item = [menu itemWithTitle: NSLocalizedString(@"Hide Recycler", @"")];
 
   [[NSNotificationCenter defaultCenter] removeObserver: self
 	                    name: NSConnectionDidDieNotification
@@ -1732,12 +1744,18 @@ static GWorkspace *gworkspace = nil;
   RELEASE (recyclerApp);
   recyclerApp = nil;
 
-  if (NSRunAlertPanel(nil,
-                    NSLocalizedString(@"The Recycler connection died.\nDo you want to restart it?", @""),
-                    NSLocalizedString(@"Yes", @""),
-                    NSLocalizedString(@"No", @""),
-                    nil)) {
-    [self connectRecycler]; 
+  if (item != nil) {
+    [item setTitle: NSLocalizedString(@"Show Recycler", @"")];
+  }
+    
+  if (recyclerCanQuit == NO) {  
+    if (NSRunAlertPanel(nil,
+                      NSLocalizedString(@"The Recycler connection died.\nDo you want to restart it?", @""),
+                      NSLocalizedString(@"Yes", @""),
+                      NSLocalizedString(@"No", @""),
+                      nil)) {
+      [self connectRecycler]; 
+    }    
   }
 }
 
@@ -2131,9 +2149,20 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 
 - (void)showRecycler:(id)sender
 {
+  NSMenu *menu = [[[NSApp mainMenu] itemWithTitle: NSLocalizedString(@"Tools", @"")] submenu];
+  id item;
+
 	if (recyclerApp == nil) {
+    recyclerCanQuit = NO; 
     [self connectRecycler];
-  }   
+    item = [menu itemWithTitle: NSLocalizedString(@"Show Recycler", @"")];
+    [item setTitle: NSLocalizedString(@"Hide Recycler", @"")];
+  } else {
+    recyclerCanQuit = YES;
+    [recyclerApp terminateApplication];
+    item = [menu itemWithTitle: NSLocalizedString(@"Hide Recycler", @"")];
+    [item setTitle: NSLocalizedString(@"Show Recycler", @"")];
+  }
 }
 
 - (void)showFinder:(id)sender
@@ -2566,6 +2595,11 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 - (id)workspaceApplication
 {
   return [GWorkspace gworkspace];
+}
+
+- (oneway void)terminateApplication
+{
+  [NSApp terminate: self];
 }
 
 - (BOOL)terminating
