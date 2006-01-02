@@ -508,6 +508,16 @@ static GWDesktopManager *desktopManager = nil;
   [[self desktopView] updateIcons];
 }
 
+- (void)hideDotsFileDidChange:(BOOL)hide
+{
+  [[self desktopView] reloadFromNode: dskNode];
+}
+
+- (void)hiddenFilesDidChange:(NSArray *)paths
+{
+  [[self desktopView] reloadFromNode: dskNode];
+}
+
 - (void)newVolumeMounted:(NSNotification *)notif
 {
   if (win && [win isVisible]) {

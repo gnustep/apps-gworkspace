@@ -592,6 +592,11 @@ static GWorkspace *gworkspace = nil;
                 					object: nil];
 
   [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
+                        selector: @selector(hideDotsFileDidChange:) 
+                					  name: @"GSHideDotFilesDidChangeNotification"
+                					object: nil];
+
+  [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
                         selector: @selector(customDirectoryIconDidChange:) 
                 					  name: @"GWCustomDirectoryIconDidChangeNotification"
                 					object: nil];
@@ -1017,22 +1022,6 @@ static GWorkspace *gworkspace = nil;
   
 	return YES;
 }
-
-- (void)checkViewersAfterHidingOfPaths:(NSArray *)paths
-{
-//  int i = [viewers count] - 1;
-  
-//	while (i >= 0) {
-//		id viewer = [viewers objectAtIndex: i];
-    
-//    [viewer checkRootPathAfterHidingOfPaths: paths];
-//    i--;
-//	}
-  
-//  [rootViewer checkRootPathAfterHidingOfPaths: paths];
-    
-  [tshelfWin checkIconsAfterHidingOfPaths: paths]; 
-}
            
 - (void)fileSystemWillChange:(NSNotification *)notif
 {
@@ -1339,6 +1328,33 @@ static GWorkspace *gworkspace = nil;
         [tshelfWin updateIcons]; 
 		  }
     }
+  }
+}
+
+- (void)hideDotsFileDidChange:(NSNotification *)notif
+{
+  NSDictionary *info = [notif userInfo];
+  BOOL hide = [[info objectForKey: @"hide"] boolValue];
+  
+  [fsnodeRep setHideSysFiles: hide];
+  [vwrsManager hideDotsFileDidChange: hide];
+  [dtopManager hideDotsFileDidChange: hide];
+
+  [tshelfWin checkIconsAfterDotsFilesChange];
+  
+  if (fiend != nil) {
+    [fiend checkIconsAfterDotsFilesChange];
+  }
+}
+
+- (void)hiddenFilesDidChange:(NSArray *)paths
+{
+  [vwrsManager hiddenFilesDidChange: paths];
+  [dtopManager hiddenFilesDidChange: paths];
+  [tshelfWin checkIconsAfterHidingOfPaths: paths]; 
+
+  if (fiend != nil) {
+    [fiend checkIconsAfterHidingOfPaths: paths];
   }
 }
 

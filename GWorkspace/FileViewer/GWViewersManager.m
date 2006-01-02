@@ -789,6 +789,57 @@ static GWViewersManager *vwrsmanager = nil;
   }
 }
 
+- (void)hideDotsFileDidChange:(BOOL)hide
+{
+  NSMutableArray *viewersToClose = [NSMutableArray array];
+  int i;  
+
+  for (i = 0; i < [viewers count]; i++) {
+    id viewer = [viewers objectAtIndex: i];
+        
+    if ([viewer invalidated] == NO) {
+      if (hide) {
+        if ([[[viewer baseNode] path] rangeOfString: @"."].location != NSNotFound) {
+          [viewer invalidate];
+          [viewersToClose addObject: viewer];
+        }
+      }
+      
+      if ([viewersToClose containsObject: viewer] == NO) {
+        [viewer hideDotsFileChanged: hide];
+      }
+    }
+  }
+
+  [self closeInvalidViewers: viewersToClose]; 
+}
+
+- (void)hiddenFilesDidChange:(NSArray *)paths
+{
+  NSMutableArray *viewersToClose = [NSMutableArray array];
+  int i, j;  
+
+  for (i = 0; i < [viewers count]; i++) {
+    id viewer = [viewers objectAtIndex: i];
+    NSString *vwrpath = [[viewer baseNode] path];
+
+    for (j = 0; j < [paths count]; j++) {
+      NSString *path = [paths objectAtIndex: j];
+      
+      if (isSubpathOfPath(path, vwrpath) || [path isEqual: vwrpath]) {
+        [viewer invalidate];
+        [viewersToClose addObject: viewer];
+      }
+    }
+    
+    if ([viewersToClose containsObject: viewer] == NO) {
+      [viewer hiddenFilesChanged: paths];
+    }
+  }
+
+  [self closeInvalidViewers: viewersToClose]; 
+}
+
 
 - (BOOL)hasViewerWithWindow:(id)awindow
 {

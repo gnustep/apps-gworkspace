@@ -64,6 +64,8 @@
 
 - (void)updateIcons;
 
+- (void)checkIconsAfterDotsFilesChange;
+
 - (void)checkIconsAfterHidingOfPaths:(NSArray *)hpaths;
 
 - (void)saveDefaults;

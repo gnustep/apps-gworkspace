@@ -49,7 +49,7 @@
   int colcount;
   int rowcount;
   
-  NSMutableArray *watchedPaths;
+  NSCountedSet *watchedPaths;
   
   NSImage *dragIcon;
   NSPoint dragPoint;
@@ -113,6 +113,10 @@
 - (void)unsetWatchers;
 
 - (NSArray *)watchedPaths;
+
+- (void)checkIconsAfterDotsFilesChange;
+
+- (void)checkIconsAfterHidingOfPaths:(NSArray *)hpaths;
 
 @end
 

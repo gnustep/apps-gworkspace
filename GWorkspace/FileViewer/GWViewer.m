@@ -395,6 +395,7 @@
 - (void)reloadFromNode:(FSNode *)anode
 {
   [nodeView reloadFromNode: anode];
+  [self updeateInfoLabels];
 }
 
 - (void)unloadFromNode:(FSNode *)anode
@@ -773,6 +774,18 @@
 - (NSArray *)watchedNodes
 {
   return watchedNodes;
+}
+
+- (void)hideDotsFileChanged:(BOOL)hide
+{
+  [self reloadFromNode: baseNode];
+  [shelf checkIconsAfterDotsFilesChange];
+}
+
+- (void)hiddenFilesChanged:(NSArray *)paths
+{
+  [self reloadFromNode: baseNode];
+  [shelf checkIconsAfterHidingOfPaths: paths];
 }
 
 - (void)columnsWidthChanged:(NSNotification *)notification

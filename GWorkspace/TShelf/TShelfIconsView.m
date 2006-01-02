@@ -112,7 +112,7 @@
 		
     cellsWidth = CELLS_WIDTH;
     		
-		watchedPaths = [[NSMutableArray alloc] initWithCapacity: 1];
+		watchedPaths = [[NSCountedSet alloc] initWithCapacity: 1];
 		
 		icons = [[NSMutableArray alloc] initWithCapacity: 1];
         
@@ -245,9 +245,9 @@
 	[self resizeWithOldSuperviewSize: [self frame].size];  
 
 	if ([watchedPaths containsObject: watched] == NO) {
-		[watchedPaths addObject: watched];
 		[self setWatcherForPath: watched];
 	}
+  [watchedPaths addObject: watched];
 }
 
 - (TShelfPBIcon *)addPBIconForDataAtPath:(NSString *)dpath 
@@ -283,7 +283,10 @@
 
 	    if ([watchedPaths containsObject: watched]) {
 		    [watchedPaths removeObject: watched];
-		    [self unsetWatcherForPath: watched];
+        
+        if ([watchedPaths containsObject: watched] == NO) {
+		      [self unsetWatcherForPath: watched];
+        }
 	    }
       
       if (label && [[self subviews] containsObject: label]) {
@@ -424,6 +427,31 @@
   [gw openSelectedPaths: paths newViewer: YES];
 }
 
+- (void)checkIconsAfterDotsFilesChange
+{
+  if (iconsType == FILES_TAB) {
+    int count = [icons count]; 
+    int i;
+
+	  for (i = 0; i < count; i++) {
+		  TShelfIcon *icon = [icons objectAtIndex: i];
+      NSArray *iconpaths = [icon paths];
+      int j;
+
+	    for (j = 0; j < [iconpaths count]; j++) {
+        NSString *op = [iconpaths objectAtIndex: j];
+
+        if ([op rangeOfString: @"."].location != NSNotFound) {
+          [self removeIcon: icon];
+          count--;
+          i--;
+          break;
+        }
+      }
+	  }
+  }
+}
+
 - (void)checkIconsAfterHidingOfPaths:(NSArray *)hpaths
 {
   if (iconsType == FILES_TAB) {
@@ -466,6 +494,7 @@
 
 - (void)fileSystemWillChange:(NSNotification *)notification
 {
+  CREATE_AUTORELEASE_POOL(arp);
   NSDictionary *dict = [notification object];
   NSString *operation = [dict objectForKey: @"operation"];
 	NSString *source = [dict objectForKey: @"source"];	  
@@ -505,40 +534,18 @@
       }
 	  }
   }
+
+  RELEASE (arp);
 }
 
 - (void)fileSystemDidChange:(NSNotification *)notification
 {
-  NSDictionary *dict;
-  NSString *operation, *source, *destination;
-  NSArray *files;
-  NSMutableArray *paths;
-  TShelfIcon *icon;
-  NSArray *iconpaths;
-  int count;
-	int i, j, m;
+  CREATE_AUTORELEASE_POOL(arp);
+  NSDictionary *dict = [notification object];
+  NSString *operation = [dict objectForKey: @"operation"];
+  NSString *source = [dict objectForKey: @"source"];
+  NSArray *files = [dict objectForKey: @"files"];
   
-  dict = [notification object];
-  operation = [dict objectForKey: @"operation"];
-  source = [dict objectForKey: @"source"];
-  destination = [dict objectForKey: @"destination"];
-  files = [dict objectForKey: @"files"];
-
-/*		                    
-  if ([operation isEqual: @"GWorkspaceRenameOperation"]) {      
-    for (i = 0; i < [icons count]; i++) {
-      icon = [icons objectAtIndex: i];      
-      if ([icon isSinglePath] == YES) {      
-        if ([[[icon paths] objectAtIndex: 0] isEqual: source]) {     
-          [icon setPaths: [NSArray arrayWithObject: destination]];
-          [icon setNeedsDisplay: YES];
-					[self resizeWithOldSuperviewSize: [self frame].size];  
-          break;
-        }
-      }          
-    }        
-  }  
-*/
   if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
 		files = [NSArray arrayWithObject: [source lastPathComponent]];
     source = [source stringByDeletingLastPathComponent];
@@ -550,8 +557,12 @@
 				|| [operation isEqual: NSWorkspaceRecycleOperation]
 				|| [operation isEqual: @"GWorkspaceRecycleOutOperation"]
 				|| [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]) {
+    NSMutableArray *paths = [NSMutableArray arrayWithCapacity: 1];
+    TShelfIcon *icon;
+    NSArray *iconpaths;
+    int count;
+	  int i, j, m;
 
-    paths = [NSMutableArray arrayWithCapacity: 1];
     for (i = 0; i < [files count]; i++) {
       NSString *s = [source stringByAppendingPathComponent: [files objectAtIndex: i]];
       [paths addObject: s];
@@ -588,14 +599,19 @@
       }
 	  }
   }
+  
+  RELEASE (arp);
 }
 
 - (void)watcherNotification:(NSNotification *)notification
 {
+  CREATE_AUTORELEASE_POOL(arp);
 	NSDictionary *notifdict = (NSDictionary *)[notification object];
   NSString *path = [notifdict objectForKey: @"path"];
 	NSString *event = [notifdict objectForKey: @"event"];
-	BOOL contained = NO;
+	NSEnumerator *enumerator;
+  NSString *wpath;
+  BOOL contained = NO;
 	int i;
   
   if (iconsType == DATA_TAB) {
@@ -623,16 +639,18 @@
     }
   } else {
 	  if ([event isEqual: @"GWFileCreatedInWatchedDirectory"]) {
+      RELEASE (arp);
 		  return;
 	  }
-
-	  for (i = 0; i < [watchedPaths count]; i++) {
-		  NSString *wpath = [watchedPaths objectAtIndex: i];
+    
+    enumerator = [watchedPaths objectEnumerator]; 
+    
+    while ((wpath = [enumerator nextObject])) {
 		  if (([wpath isEqual: path]) || (isSubpathOfPath(path, wpath))) {
 			  contained = YES;
 			  break;
 		  }
-	  }
+    }
 
     if (contained) {
 		  id icon;
@@ -652,6 +670,8 @@
 					  i--;
 				  }
 			  }
+        
+        RELEASE (arp);
 			  return;
 		  }		
 
@@ -681,7 +701,6 @@
 					  }
 
 				  } else {
-
 					  for (j = 0; j < [files count]; j++) {
 						  NSString *fname = [files objectAtIndex: j];
 						  NSString *fullPath = [path stringByAppendingPathComponent: fname];
@@ -728,14 +747,17 @@
 		  }
 	  }
   }
+
+  RELEASE (arp);
 }
 
 - (void)setWatchers
 {
-	int i;
-	
-  for (i = 0; i < [watchedPaths count]; i++) {
-    [self setWatcherForPath: [watchedPaths objectAtIndex: i]];  
+  NSEnumerator *enumerator = [watchedPaths objectEnumerator]; 
+  NSString *wpath;
+
+	while ((wpath = [enumerator nextObject])) {
+    [self setWatcherForPath: wpath]; 
   }
 }
 
@@ -746,10 +768,11 @@
 
 - (void)unsetWatchers
 {
-	int i;
-	
-  for (i = 0; i < [watchedPaths count]; i++) {
-    [self unsetWatcherForPath: [watchedPaths objectAtIndex: i]];  
+  NSEnumerator *enumerator = [watchedPaths objectEnumerator]; 
+  NSString *wpath;
+
+	while ((wpath = [enumerator nextObject])) {
+    [self unsetWatcherForPath: wpath]; 
   }
 }
 

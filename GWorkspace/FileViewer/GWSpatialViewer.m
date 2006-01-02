@@ -338,6 +338,7 @@
 {
   if ([nodeView isShowingNode: anode]) {
     [nodeView reloadFromNode: anode];
+    [self updeateInfoLabels];
   }
 }
 
@@ -612,6 +613,16 @@
 - (NSArray *)watchedNodes
 {
   return watchedNodes;
+}
+
+- (void)hideDotsFileChanged:(BOOL)hide
+{
+  [self reloadFromNode: baseNode];
+}
+
+- (void)hiddenFilesChanged:(NSArray *)paths
+{
+  [self reloadFromNode: baseNode];
 }
 
 - (void)columnsWidthChanged:(NSNotification *)notification

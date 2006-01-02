@@ -118,6 +118,9 @@
 - (void)watchedPathChanged:(NSDictionary *)info;
 - (NSArray *)watchedNodes;
 
+- (void)hideDotsFileChanged:(BOOL)hide;
+- (void)hiddenFilesChanged:(NSArray *)paths;
+
 - (NSMutableArray *)history;
 - (int)historyPosition;
 - (void)setHistoryPosition:(int)pos;

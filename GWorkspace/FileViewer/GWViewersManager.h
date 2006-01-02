@@ -115,6 +115,10 @@
 
 - (void)thumbnailsDidChangeInPaths:(NSArray *)paths;
 
+- (void)hideDotsFileDidChange:(BOOL)hide;
+
+- (void)hiddenFilesDidChange:(NSArray *)paths;
+
 
 - (BOOL)hasViewerWithWindow:(id)awindow;
 

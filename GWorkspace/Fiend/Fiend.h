@@ -47,7 +47,10 @@
   NSMutableDictionary *layers;
   NSString *currentName;
   
-  NSMutableArray *leavesPlaces, *freePositions;
+  NSMutableArray *leavesPlaces;
+  NSMutableArray *freePositions;
+
+	NSCountedSet *watchedPaths;
   
 	NSTextFieldCell *namelabel;	
   NSButton *ffButt, *rewButt;
@@ -89,6 +92,16 @@
 - (void)hide;
 
 - (void)verifyDraggingExited:(id)sender;
+
+- (void)removeInvalidLeaf:(FiendLeaf *)leaf;
+
+- (void)checkIconsAfterDotsFilesChange;
+
+- (void)checkIconsAfterHidingOfPaths:(NSArray *)paths;
+
+- (void)fileSystemDidChange:(NSNotification *)notification;
+
+- (void)watcherNotification:(NSNotification *)notification;
 
 - (void)updateDefaults;
 

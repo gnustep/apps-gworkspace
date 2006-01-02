@@ -75,6 +75,7 @@
 - (void)dealloc
 {
   TEST_RELEASE (node);
+  TEST_RELEASE (layerName);
   RELEASE (tile);
   TEST_RELEASE (hightile);	
   TEST_RELEASE (icon);
@@ -87,6 +88,7 @@
    relativeToPoint:(NSPoint)p
            forPath:(NSString *)apath
            inFiend:(Fiend *)afiend 
+         layerName:(NSString *)lname 
         ghostImage:(NSImage *)ghostimage
 {
   NSWindow *win;
@@ -100,10 +102,12 @@
   [win setContentView: self];		
   [self setPosX: px posY: py relativeToPoint: p];
   
-  if (apath != nil) {
+  if (apath && lname) {
     fm = [NSFileManager defaultManager];
     ws = [NSWorkspace sharedWorkspace];
 		gw = [GWorkspace gworkspace];
+
+    ASSIGN (layerName, lname);
 
     ASSIGN (node, [FSNode nodeWithPath: apath]);
     
@@ -200,6 +204,11 @@
 	return icon;
 }
 
+- (NSString *)layerName
+{
+  return layerName;
+}
+
 - (void)startDissolve
 {
 	dissolving = YES;
@@ -231,53 +240,58 @@
 
 - (void)mouseDown:(NSEvent*)theEvent
 {  
-  NSEvent *nextEvent;
-  NSPoint location, lastLocation, origin;
-  NSWindow *win;
-
 	[fiend orderFrontLeaves];
 	
-	if ([theEvent clickCount] > 1) {   
-    if ([node isApplication]) {
-      [ws launchApplication: [node path]];
-      [self startDissolve];
-    
-    } else if ([node isPlain] || [node isDirectory] || [node isMountPoint]) { 
-      NSArray *paths = [NSArray arrayWithObjects: [node path], nil];    
-      [gw openSelectedPaths: paths newViewer: YES];   
-    }    
-    return;
-  }  
-    
-  win = [self window]; 
-	[win orderFront: self];
-	
-  nextEvent = [win nextEventMatchingMask: NSLeftMouseUpMask | NSLeftMouseDraggedMask];
-  if ([nextEvent type] == NSLeftMouseUp) {
-		[win orderBack: self];
-    return;
-  }
-     
-  lastLocation = [theEvent locationInWindow];  
+  if ([node isValid]) {
+    NSEvent *nextEvent;
+    NSPoint location, lastLocation, origin;
+    NSWindow *win;
+  
+	  if ([theEvent clickCount] > 1) {   
+      if ([node isApplication]) {
+        [ws launchApplication: [node path]];
+        [self startDissolve];
 
-  while (1) {
-	  nextEvent = [win nextEventMatchingMask: NSLeftMouseUpMask | NSLeftMouseDraggedMask];
+      } else if ([node isPlain] || [node isDirectory] || [node isMountPoint]) { 
+        NSArray *paths = [NSArray arrayWithObjects: [node path], nil];    
+        [gw openSelectedPaths: paths newViewer: YES];   
+      }    
+      return;
+    }  
 
+    win = [self window]; 
+	  [win orderFront: self];
+
+    nextEvent = [win nextEventMatchingMask: NSLeftMouseUpMask | NSLeftMouseDraggedMask];
     if ([nextEvent type] == NSLeftMouseUp) {
-      break;
+		  [win orderBack: self];
+      return;
     }
 
- 		location = [win mouseLocationOutsideOfEventStream];
-    origin = [win frame].origin;
-		origin.x += (location.x - lastLocation.x);
-		origin.y += (location.y - lastLocation.y);
-    [win setFrameOrigin: origin];
-    
-    [fiend draggedFiendLeaf: self atPoint: origin mouseUp: NO];  
-  } 
-	
-	[win orderBack: self];
-  [fiend draggedFiendLeaf: self atPoint: [win frame].origin mouseUp: YES];  
+    lastLocation = [theEvent locationInWindow];  
+
+    while (1) {
+	    nextEvent = [win nextEventMatchingMask: NSLeftMouseUpMask | NSLeftMouseDraggedMask];
+
+      if ([nextEvent type] == NSLeftMouseUp) {
+        break;
+      }
+
+ 		  location = [win mouseLocationOutsideOfEventStream];
+      origin = [win frame].origin;
+		  origin.x += (location.x - lastLocation.x);
+		  origin.y += (location.y - lastLocation.y);
+      [win setFrameOrigin: origin];
+
+      [fiend draggedFiendLeaf: self atPoint: origin mouseUp: NO];  
+    } 
+
+	  [win orderBack: self];
+    [fiend draggedFiendLeaf: self atPoint: [win frame].origin mouseUp: YES];
+  
+  } else {  
+    [fiend removeInvalidLeaf: self];
+  }
 }                                                        
 
 - (void)drawRect:(NSRect)rect

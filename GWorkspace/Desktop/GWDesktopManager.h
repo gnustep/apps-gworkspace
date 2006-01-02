@@ -131,6 +131,10 @@ typedef enum DockPosition {
 
 - (void)thumbnailsDidChangeInPaths:(NSArray *)paths;
 
+- (void)hideDotsFileDidChange:(BOOL)hide;
+
+- (void)hiddenFilesDidChange:(NSArray *)paths;
+
 - (void)newVolumeMounted:(NSNotification *)notif;
 
 - (void)mountedVolumeWillUnmount:(NSNotification *)notif;

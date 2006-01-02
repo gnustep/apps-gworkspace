@@ -428,6 +428,8 @@ if (sz.height < 0) sz.height = 0
                         nil, nil);
     return;
   } else {
+    NSString *base = [currentNode path];
+    NSMutableArray *paths = [NSMutableArray array];
     NSArray *cells = [leftMatrix cells];
     
     if (cells) {	
@@ -438,14 +440,17 @@ if (sz.height < 0) sz.height = 0
      
       names = [NSMutableArray arrayWithCapacity: 1];    
       for (i = 0; i < [cells count]; i++) {
-        id cell = [cells objectAtIndex: i];      
-        [names addObject: [cell stringValue]];
+        id cell = [cells objectAtIndex: i]; 
+        NSString *name = [cell stringValue];
+        
+        [names addObject: name];
+        [paths addObject: [base stringByAppendingPathComponent: name]];
       }
       
       hconts = [names componentsJoinedByString: @"\n"];      
       h = [[currentNode path] stringByAppendingPathComponent: @".hidden"];
       [hconts writeToFile: h atomically: YES];
-      
+      [gw hiddenFilesDidChange: paths];
       [setButt setEnabled: NO];
     }
   }
@@ -537,7 +542,7 @@ if (sz.height < 0) sz.height = 0
 - (IBAction)activateDirChanges:(id)sender
 {
   [[FSNodeRep sharedInstance] setHiddenPaths: hiddenPaths];
-  [gw checkViewersAfterHidingOfPaths: hiddenPaths];
+  [gw hiddenFilesDidChange: hiddenPaths];
   [setDirButt setEnabled: NO];
 }
 

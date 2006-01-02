@@ -26,6 +26,7 @@
 #include <AppKit/AppKit.h>
 #include <AppKit/AppKit.h>
 #include "FSNode.h"
+#include "FSNFunctions.h"
 #include "GWFunctions.h"
 #include "Fiend.h"
 #include "FiendLeaf.h"
@@ -37,6 +38,16 @@
 
 - (void)dealloc
 {
+  NSEnumerator *enumerator = [watchedPaths objectEnumerator];  
+  NSString *wpath;
+            
+  while ((wpath = [enumerator nextObject])) {
+    [gw removeWatcherForPath: wpath];
+  }
+	RELEASE (watchedPaths);
+  
+  [[NSNotificationCenter defaultCenter] removeObserver: self];	
+
   RELEASE (layers);
   RELEASE (namelabel);
   RELEASE (ffButt);
@@ -78,6 +89,7 @@
     defaults = [NSUserDefaults standardUserDefaults];	
 
     layers = [[NSMutableDictionary alloc] initWithCapacity: 1];
+		watchedPaths = [[NSCountedSet alloc] initWithCapacity: 1];
     
     myPrefs = [defaults dictionaryForKey: @"fiendlayers"];
     if (myPrefs != nil) {
@@ -91,19 +103,31 @@
         
         for (j = 0; j < [paths count]; j++) {
           NSString *path = [paths objectAtIndex: j];
+	        NSString *watched = [path stringByDeletingLastPathComponent];	
           
-          if ([[NSFileManager defaultManager] fileExistsAtPath: path] == YES) { 
+          if ([[NSFileManager defaultManager] fileExistsAtPath: path]) { 
             NSDictionary *dict = [pathsAndRects objectForKey: path];
             int posx = [[dict objectForKey: @"posx"] intValue];
             int posy = [[dict objectForKey: @"posy"] intValue];            
 
-            leaf = [[FiendLeaf alloc] initWithPosX: posx posY: posy
-                                relativeToPoint: r.origin forPath: path 
-                                             inFiend: self  ghostImage: nil];
+            leaf = [[FiendLeaf alloc] initWithPosX: posx 
+                                              posY: posy
+                                   relativeToPoint: r.origin 
+                                           forPath: path 
+                                           inFiend: self  
+                                         layerName: layername
+                                        ghostImage: nil];
             [leaves addObject: leaf];
             RELEASE (leaf);
+            
+	          if ([watchedPaths containsObject: watched] == NO) {
+              [gw addWatcherForPath: watched];
+	          }
+            
+            [watchedPaths addObject: watched];
           }                 
-        }        
+        }
+                
         [layers setObject: leaves forKey: layername];        
       }    
       currentName = [defaults stringForKey: @"fiendcurrentlayer"];
@@ -153,7 +177,19 @@
     leaveshidden = NO;
     isDragTarget = NO;
 		
-		[myWin setContentView: self];		
+		[myWin setContentView: self];	
+
+		[[NSNotificationCenter defaultCenter] 
+               addObserver: self 
+                	selector: @selector(fileSystemDidChange:) 
+                			name: @"GWFileSystemDidChangeNotification"
+                		object: nil];                     
+    
+		[[NSNotificationCenter defaultCenter] 
+               addObserver: self 
+                  selector: @selector(watcherNotification:) 
+                		  name: @"GWFileWatcherFileDidChangeNotification"
+                	  object: nil];
   }
   
   return self;
@@ -263,7 +299,17 @@
   leaves = [layers objectForKey: currentName];  
   for (i = 0; i < [leaves count]; i++) {
     id leaf = [leaves objectAtIndex: i];    
-    [[leaf window] close];
+    NSString *watched = [[[leaf node] path] stringByDeletingLastPathComponent];    
+
+	  if ([watchedPaths containsObject: watched]) {
+		  [watchedPaths removeObject: watched];
+      
+      if ([watchedPaths containsObject: watched] == NO) {
+        [gw removeWatcherForPath: watched];
+      }
+	  }
+    
+    [[leaf window] close];    
   }
 
   [layers removeObjectForKey: currentName];     
@@ -505,8 +551,12 @@
       if ([lfpos containsPoint: location]) {
         if (hlightleaf == nil) {        
           hlightleaf = [[FiendLeaf alloc] initWithPosX: [lfpos posx] 
-                  posY: [lfpos posy] relativeToPoint: r.origin forPath: nil 
-                                       inFiend: self ghostImage: [leaf icon]];
+                                                  posY: [lfpos posy] 
+                                       relativeToPoint: r.origin 
+                                               forPath: nil 
+                                               inFiend: self 
+                                             layerName: nil
+                                            ghostImage: [leaf icon]];
           [[hlightleaf window] display];                           
           [[hlightleaf window] orderBack: self];                                 
         } else {        
@@ -544,6 +594,16 @@
     }
       
     if (newpos == NO) {    
+      NSString *watched = [[[leaf node] path] stringByDeletingLastPathComponent];    
+
+	    if ([watchedPaths containsObject: watched]) {
+		    [watchedPaths removeObject: watched];
+        
+        if ([watchedPaths containsObject: watched] == NO) {
+          [gw removeWatcherForPath: watched];
+        }
+	    }
+    
       [[leaf window] close];
       [leaves removeObject: leaf];
     }
@@ -690,6 +750,235 @@
   }
 }
 
+- (void)removeInvalidLeaf:(FiendLeaf *)leaf
+{
+  NSString *layerName = [leaf layerName];
+  NSMutableArray *leaves = [layers objectForKey: layerName];
+  NSString *watched = [[[leaf node] path] stringByDeletingLastPathComponent];    
+
+  if ([watchedPaths containsObject: watched]) {
+    [watchedPaths removeObject: watched];
+    
+    if ([watchedPaths containsObject: watched] == NO) {
+      [gw removeWatcherForPath: watched];
+    }
+  }
+  
+  [[leaf window] close];
+  [leaves removeObject: leaf]; 
+}
+
+- (void)checkIconsAfterDotsFilesChange
+{
+  NSArray *names = [layers allKeys];
+  int i;
+
+  for (i = 0; i < [names count]; i++) {
+    NSString *lname = [names objectAtIndex: i];
+    NSMutableArray *leaves = [layers objectForKey: lname];
+    int count = [leaves count];
+    BOOL modified = NO;  
+    int j;
+
+    for (j = 0; j < count; j++) {
+      id leaf = [leaves objectAtIndex: j];
+      NSString *leafpath = [[leaf node] path];
+      
+      if ([leafpath rangeOfString: @"."].location != NSNotFound) {
+        [self removeInvalidLeaf: leaf];
+        modified = YES;   
+        count--;
+        j--;
+      }
+    }
+    
+    if (modified && ([lname isEqual: currentName])) {
+      [self orderFrontLeaves];
+      [self findFreePositions];
+    }
+  }
+}
+
+- (void)checkIconsAfterHidingOfPaths:(NSArray *)paths
+{
+  NSArray *names = [layers allKeys];
+  int i;
+
+  for (i = 0; i < [names count]; i++) {
+    NSString *lname = [names objectAtIndex: i];
+    NSMutableArray *leaves = [layers objectForKey: lname];
+    int count = [leaves count];
+    BOOL modified = NO;  
+    int j, m;
+
+    for (j = 0; j < count; j++) {
+      id leaf = [leaves objectAtIndex: j];
+      NSString *leafpath = [[leaf node] path];
+      
+      for (m = 0; m < [paths count]; m++) {
+        NSString *path = [paths objectAtIndex: m]; 
+      
+        if (isSubpathOfPath(path, leafpath) || [path isEqual: leafpath]) {
+          [self removeInvalidLeaf: leaf];          
+          modified = YES;   
+          count--;
+          j--;
+          break;
+        }
+      }
+    }
+    
+    if (modified && ([lname isEqual: currentName])) {
+      [self orderFrontLeaves];
+      [self findFreePositions];
+    }
+  }
+}
+
+- (void)fileSystemDidChange:(NSNotification *)notification
+{
+  CREATE_AUTORELEASE_POOL(arp);
+  NSDictionary *dict = [notification object];
+  NSString *operation = [dict objectForKey: @"operation"];
+  NSString *source = [dict objectForKey: @"source"];
+  NSArray *files = [dict objectForKey: @"files"];
+  
+  if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
+		files = [NSArray arrayWithObject: [source lastPathComponent]];
+    source = [source stringByDeletingLastPathComponent];
+  }	
+
+  if ([operation isEqual: NSWorkspaceMoveOperation] 
+        || [operation isEqual: NSWorkspaceDestroyOperation]
+				|| [operation isEqual: @"GWorkspaceRenameOperation"]
+				|| [operation isEqual: NSWorkspaceRecycleOperation]
+				|| [operation isEqual: @"GWorkspaceRecycleOutOperation"]
+				|| [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]) {
+    NSMutableArray *paths = [NSMutableArray arrayWithCapacity: 1];
+    NSArray *names = [layers allKeys];    
+    int i;
+    
+    for (i = 0; i < [files count]; i++) {
+      NSString *s = [source stringByAppendingPathComponent: [files objectAtIndex: i]];
+      [paths addObject: s];
+    }
+
+    for (i = 0; i < [names count]; i++) {
+      NSString *lname = [names objectAtIndex: i];
+      NSMutableArray *leaves = [layers objectForKey: lname];
+      int count = [leaves count];
+      BOOL modified = NO;  
+      int j, m;
+
+      for (j = 0; j < count; j++) {
+        id leaf = [leaves objectAtIndex: j];
+        NSString *leafpath = [[leaf node] path];
+
+        for (m = 0; m < [paths count]; m++) {
+          NSString *path = [paths objectAtIndex: m]; 
+
+          if (isSubpathOfPath(path, leafpath) || [path isEqual: leafpath]) {
+            [self removeInvalidLeaf: leaf];          
+            modified = YES;   
+            count--;
+            j--;
+            break;
+          }
+        }
+      }
+      
+      if (modified && ([lname isEqual: currentName])) {
+        [self orderFrontLeaves];
+        [self findFreePositions];
+      }
+    }
+  }
+  
+  RELEASE (arp);
+}
+
+- (void)watcherNotification:(NSNotification *)notification
+{
+  CREATE_AUTORELEASE_POOL(arp);
+	NSDictionary *notifdict = (NSDictionary *)[notification object];
+  NSString *path = [notifdict objectForKey: @"path"];
+	NSString *event = [notifdict objectForKey: @"event"];
+  NSEnumerator *enumerator;
+  NSString *wpath;
+	BOOL contained = NO;
+	
+	if ([event isEqual: @"GWFileCreatedInWatchedDirectory"]) {
+    RELEASE (arp);
+		return;
+	}
+  
+  enumerator = [watchedPaths objectEnumerator];  
+            
+  while ((wpath = [enumerator nextObject])) {
+		if (([wpath isEqual: path]) || (isSubpathOfPath(path, wpath))) {
+			contained = YES;
+			break;
+		}
+  }
+
+  if (contained) {
+    NSArray *names = [layers allKeys];
+    int i;
+
+    for (i = 0; i < [names count]; i++) {
+      NSString *lname = [names objectAtIndex: i];
+      NSMutableArray *leaves = [layers objectForKey: lname];
+      int count = [leaves count];
+      BOOL modified = NO;  
+      int j;
+      
+      if ([event isEqual: @"GWWatchedPathDeleted"]) {
+        for (j = 0; j < count; j++) {
+          id leaf = [leaves objectAtIndex: j];
+          NSString *leafpath = [[leaf node] path];
+
+				  if (isSubpathOfPath(path, leafpath)) {
+					  [self removeInvalidLeaf: leaf];
+            modified = YES; 
+					  count--;
+					  j--;
+				  }
+        }
+
+      } else if ([event isEqual: @"GWFileDeletedInWatchedDirectory"]) {
+			  NSArray *files = [notifdict objectForKey: @"files"];
+      
+        for (j = 0; j < count; j++) {
+          id leaf = [leaves objectAtIndex: j];
+          NSString *leafpath = [[leaf node] path];
+          int m;
+          
+          for (m = 0; m < [files count]; m++) {
+            NSString *fname = [files objectAtIndex: m];
+            NSString *fullPath = [path stringByAppendingPathComponent: fname];
+
+            if ((isSubpathOfPath(fullPath, leafpath))
+															      || ([fullPath isEqual: leafpath])) {
+					    [self removeInvalidLeaf: leaf];
+              modified = YES; 
+					    count--;
+					    j--;
+              break;
+            }
+          }
+        }
+      }
+      
+      if (modified && ([lname isEqual: currentName])) {
+        [self orderFrontLeaves];
+        [self findFreePositions];
+      }
+    }
+  }
+  
+  RELEASE (arp);
+}
+
 - (void)updateDefaults
 {
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];		
@@ -792,6 +1081,7 @@
   NSPasteboard *pb;
 	NSArray *sourcePaths;
   NSString *path;
+  NSString *watched;
   NSMutableArray *leaves;
   id leaf;
   NSRect r;
@@ -812,6 +1102,7 @@
   leaves = [layers objectForKey: currentName];  
 
   path = [sourcePaths objectAtIndex: 0];
+  watched = [path stringByDeletingLastPathComponent];
   
   for (i = 0; i < [leaves count]; i++) {
     leaf = [leaves objectAtIndex: i];    
@@ -838,11 +1129,21 @@
   }
   posy--;
                   
-  leaf = [[FiendLeaf alloc] initWithPosX: posx posY: posy
-                            relativeToPoint: r.origin forPath: path 
-                                          inFiend: self  ghostImage: nil];                          
+  leaf = [[FiendLeaf alloc] initWithPosX: posx 
+                                    posY: posy
+                         relativeToPoint: r.origin 
+                                 forPath: path 
+                                 inFiend: self 
+                               layerName: currentName 
+                              ghostImage: nil];                          
   [leaves addObject: leaf];
   RELEASE (leaf);
+  
+	if ([watchedPaths containsObject: watched] == NO) {
+    [gw addWatcherForPath: watched];
+	}
+  
+  [watchedPaths addObject: watched];
   
   leaf = [leaves objectAtIndex: [leaves count] -1];
   [[leaf window] display]; 

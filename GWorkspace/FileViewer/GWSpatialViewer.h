@@ -109,6 +109,9 @@
 - (void)watchedPathChanged:(NSDictionary *)info;
 - (NSArray *)watchedNodes;
 
+- (void)hideDotsFileChanged:(BOOL)hide;
+- (void)hiddenFilesChanged:(NSArray *)paths;
+
 - (void)columnsWidthChanged:(NSNotification *)notification;
 
 - (void)updateDefaults;

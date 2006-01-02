@@ -57,6 +57,7 @@
 @interface FiendLeaf : NSView
 {
   FSNode *node;
+  NSString *layerName;
   NSImage *tile, *hightile, *icon;
 	NSTextFieldCell *namelabel;
   	
@@ -81,6 +82,7 @@
    relativeToPoint:(NSPoint)p
            forPath:(NSString *)apath
            inFiend:(Fiend *)afiend 
+         layerName:(NSString *)lname 
         ghostImage:(NSImage *)ghostimage;
 
 - (void)setPosX:(int)px posY:(int)py relativeToPoint:(NSPoint)p;
@@ -94,6 +96,8 @@
 - (FSNode *)node;
 
 - (NSImage *)icon;
+
+- (NSString *)layerName;
 
 - (void)startDissolve;
 

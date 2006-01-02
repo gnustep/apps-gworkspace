@@ -145,7 +145,7 @@
     
   	[self registerForDraggedTypes: [NSArray arrayWithObject: NSFilenamesPboardType]];
 
-		watchedPaths = [NSMutableArray new];
+		watchedPaths = [[NSCountedSet alloc] initWithCapacity: 1];
   }
   
   return self;
@@ -239,9 +239,9 @@
   	NSString *watched = [node parentPath];	
 
 	  if ([watchedPaths containsObject: watched] == NO) {
-		  [watchedPaths addObject: watched];
 		  [self setWatcherForPath: watched];
 	  }
+    [watchedPaths addObject: watched];
   }
   
   return icon;
@@ -507,16 +507,115 @@
 
 - (void)unsetWatchers
 {
-	int i;
-	
-  for (i = 0; i < [watchedPaths count]; i++) {
-    [self unsetWatcherForPath: [watchedPaths objectAtIndex: i]];  
+  NSEnumerator *enumerator = [watchedPaths objectEnumerator]; 
+  NSString *wpath;
+
+	while ((wpath = [enumerator nextObject])) {
+    [self unsetWatcherForPath: wpath]; 
   }
 }
 
 - (NSArray *)watchedPaths
 {
-  return watchedPaths;
+  return [watchedPaths allObjects];
+}
+
+- (void)checkIconsAfterDotsFilesChange
+{
+  int count = [icons count]; 
+  BOOL updated = NO;
+  int i;
+
+	for (i = 0; i < count; i++) {
+    FSNIcon *icon = [icons objectAtIndex: i]; 
+    int j;
+  
+    if ([icon isShowingSelection] == NO) {
+      if ([[[icon node] path] rangeOfString: @"."].location != NSNotFound) {
+        [self removeRep: icon];
+        updated = YES;
+        count--;
+        i--;
+      }
+      
+    } else {
+      NSArray *iconpaths = [icon pathsSelection];
+  
+      for (j = 0; j < [iconpaths count]; j++) {
+        NSString *iconpath = [iconpaths objectAtIndex: j];
+
+        if ([iconpath rangeOfString: @"."].location != NSNotFound) {
+          [self removeRep: icon];
+          updated = YES;
+          count--;
+          i--;
+          break;
+        }
+      }
+    }
+	}
+  
+  if (updated) {
+    [self tile];
+    [self setNeedsDisplay: YES];
+  }
+}
+
+- (void)checkIconsAfterHidingOfPaths:(NSArray *)hpaths
+{
+  int count = [icons count]; 
+  BOOL updated = NO;
+  int i;
+
+	for (i = 0; i < count; i++) {
+    FSNIcon *icon = [icons objectAtIndex: i]; 
+    int j, m;
+  
+    if ([icon isShowingSelection] == NO) {
+      NSString *iconpath = [[icon node] path];
+
+	    for (m = 0; m < [hpaths count]; m++) {
+        NSString *hpath = [hpaths objectAtIndex: m]; 
+      
+        if (isSubpathOfPath(hpath, iconpath) || [hpath isEqual: iconpath]) {
+          [self removeRep: icon];
+          updated = YES;
+          count--;
+          i--;
+          break;
+        }
+      }
+    } else {
+      NSArray *iconpaths = [icon pathsSelection];
+      BOOL removed = NO;
+  
+      for (j = 0; j < [iconpaths count]; j++) {
+        NSString *iconpath = [iconpaths objectAtIndex: j];
+
+	      for (m = 0; m < [hpaths count]; m++) {
+          NSString *hpath = [hpaths objectAtIndex: m]; 
+        
+          if (isSubpathOfPath(hpath, iconpath) || [hpath isEqual: iconpath]) {
+            [self removeRep: icon];
+            updated = YES;
+            count--;
+            i--;
+            removed = YES;
+            break;
+          }
+        }
+
+        if (removed) {
+          break;
+        } 
+      }
+    }
+	}
+  
+  if (updated) {
+    [self tile];
+    [self setNeedsDisplay: YES];
+  }
 }
 
 - (void)resizeWithOldSuperviewSize:(NSSize)oldFrameSize
@@ -550,8 +649,11 @@
 
 	if ([watchedPaths containsObject: watched]) {
     [watchedPaths removeObject: watched];
-    [self unsetWatcherForPath: watched];
-	}
+    
+    if ([watchedPaths containsObject: watched] == NO) {
+      [self unsetWatcherForPath: watched];
+	  }
+  }
 
   if ([[self subviews] containsObject: arep]) {
     [arep removeFromSuperviewWithoutNeedingDisplay];
@@ -713,25 +815,28 @@
 {
   NSString *path = [info objectForKey: @"path"];
 	NSString *event = [info objectForKey: @"event"];
-	BOOL contained = NO;
-	int i;
+	NSEnumerator *enumerator;
+  NSString *wpath;
+  BOOL contained = NO;
 
 	if ([event isEqual: @"GWFileCreatedInWatchedDirectory"]) {
 		return;
 	}
-
-	for (i = 0; i < [watchedPaths count]; i++) {
-		NSString *wpath = [watchedPaths objectAtIndex: i];
+  
+  enumerator = [watchedPaths objectEnumerator];
+  
+	while ((wpath = [enumerator nextObject])) {
 		if (([wpath isEqual: path]) || (isSubpathOfPath(path, wpath))) {
 			contained = YES;
 			break;
 		}
-	}
+  }
 
   if (contained) {
 		int count = [icons count];
     BOOL updated = NO;
     FSNIcon *icon;
+	  int i;
 
 		if ([event isEqual: @"GWWatchedPathDeleted"]) {		
 			for (i = 0; i < count; i++) {

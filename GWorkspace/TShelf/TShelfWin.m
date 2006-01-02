@@ -431,6 +431,19 @@
   }  
 }
 
+- (void)checkIconsAfterDotsFilesChange
+{
+  NSArray *items = [tView items];
+  int i;
+  
+  for (i = 0; i < [items count]; i++) {
+    TShelfViewItem *item = [items objectAtIndex: i];
+    TShelfIconsView *iview = (TShelfIconsView *)[item view];
+
+    [iview checkIconsAfterDotsFilesChange];
+  }  
+}
+
 - (void)checkIconsAfterHidingOfPaths:(NSArray *)hpaths
 {
   NSArray *items = [tView items];

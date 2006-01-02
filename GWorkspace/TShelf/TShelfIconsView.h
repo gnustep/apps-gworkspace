@@ -67,7 +67,7 @@ typedef gridpoint *(*GridPointIMP)(id, SEL, NSPoint);
   BOOL isLastView;
 	NSMutableArray *icons; 
   int iconsType;
-	NSMutableArray *watchedPaths;
+	NSCountedSet *watchedPaths;
   int cellsWidth;
 	gridpoint *gpoints;
 	int pcount;
@@ -118,6 +118,8 @@ typedef gridpoint *(*GridPointIMP)(id, SEL, NSPoint);
 - (void)setCurrentSelection:(NSArray *)paths;
 
 - (void)openCurrentSelection:(NSArray *)paths;
+
+- (void)checkIconsAfterDotsFilesChange;
 
 - (void)checkIconsAfterHidingOfPaths:(NSArray *)hpaths;
 

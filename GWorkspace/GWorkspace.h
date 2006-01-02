@@ -224,8 +224,6 @@
 
 - (TShelfWin *)tabbedShelf;
 
-- (void)checkViewersAfterHidingOfPaths:(NSArray *)paths;
-
 - (void)fileSystemWillChange:(NSNotification *)notif;
 
 - (void)fileSystemDidChange:(NSNotification *)notif;
@@ -254,6 +252,10 @@
 - (void)setUsesThumbnails:(BOOL)value;
 
 - (void)thumbnailsDidChange:(NSNotification *)notif;
+
+- (void)hideDotsFileDidChange:(NSNotification *)notif;
+
+- (void)hiddenFilesDidChange:(NSArray *)paths;
 
 - (void)customDirectoryIconDidChange:(NSNotification *)notif;
 
