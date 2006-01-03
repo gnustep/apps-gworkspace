@@ -95,6 +95,7 @@ Preferences/HiddenFilesPref.m \
 Preferences/HistoryPref.m \
 Preferences/BrowserViewerPref.m \
 Preferences/VolumesPref.m \
+Preferences/OperationPrefs.m \
 Preferences/DesktopPref.m \
 History/History.m \
 Dialogs/Dialogs.m \
