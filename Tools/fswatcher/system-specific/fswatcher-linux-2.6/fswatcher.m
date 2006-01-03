@@ -1369,6 +1369,25 @@ auditctl -a exit,always -S mkdir
 auditctl -a exit,always -S rmdir
 auditctl -a exit,always -S unlink
 auditctl -a exit,always -S rename
+
+
+
+
+auditctl -a exit,always -S open -w /root
+auditctl -a exit,always -S creat -w /root
+auditctl -a exit,always -S mkdir -w /root
+auditctl -a exit,always -S rmdir -w /root
+auditctl -a exit,always -S unlink -w /root
+auditctl -a exit,always -S rename -w /root
+
+
+auditctl -a watch,always -S open 
+auditctl -a watch,always -S creat 
+auditctl -a watch,always -S mkdir 
+auditctl -a watch,always -S rmdir 
+auditctl -a watch,always -S unlink
+auditctl -a watch,always -S rename
+
 */
 
   return ((call == __NR_open) || (call == __NR_creat)

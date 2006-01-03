@@ -28,6 +28,7 @@ GWorkspace_HAS_RESOURCE_BUNDLE = yes
 #
 ADDITIONAL_GUI_LIBS += -lFSNode
 ADDITIONAL_GUI_LIBS += -lInspector
+ADDITIONAL_GUI_LIBS += -lOperation
 
 GWorkspace_RESOURCE_FILES = \
   Resources/Icons/* \

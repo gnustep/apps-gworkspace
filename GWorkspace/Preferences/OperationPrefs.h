@@ -26,10 +26,9 @@
 #define OPERATION_PREFS_H
 
 #include <Foundation/Foundation.h>
+#include "PrefProtocol.h"
 
-@class NSWindow;
-
-@interface OperationPrefs : NSObject 
+@interface OperationPrefs : NSObject <PrefProtocol>
 {
   IBOutlet id win;
   IBOutlet id prefbox;
@@ -50,12 +49,6 @@
 
   BOOL showstatus;
 }
-
-- (void)activate;
-
-- (NSWindow *)win;
-
-- (void)updateDefaults;
 
 - (IBAction)setUnsetStatWin:(id)sender;
 

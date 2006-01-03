@@ -5,7 +5,7 @@
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
  *
- * This file is part of the GNUstep Operation application
+ * This file is part of the GNUstep GWorkspace application
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@
 
 #include <Foundation/Foundation.h>
 
-@class OperationPrefs;
 @class FileOpInfo;
 
 enum {
@@ -44,23 +43,19 @@ enum {
   int fopRef;
   
   BOOL filenamesCutted;
-  
-  OperationPrefs *preferences;
-  
+    
   NSFileManager *fm;  
   NSNotificationCenter *nc; 
 }
 
-+ (Operation *)operation;
-
-- (oneway void)setFilenamesCutted:(BOOL)value;
+- (void)setFilenamesCutted:(BOOL)value;
 
 - (BOOL)filenamesWasCutted;
 
-- (oneway void)performOperation:(NSData *)opinfo;
+- (void)performOperation:(NSData *)opinfo;
 
 - (BOOL)isLockedAction:(int)action
-                onPath:(NSString *)path ;
+                onPath:(NSString *)path;
 
 - (BOOL)isLockedByOperation:(FileOpInfo *)opinfo
                      action:(int)action
@@ -83,19 +78,7 @@ enum {
 - (BOOL)descendentOfPath:(NSString *)path 
                  inPaths:(NSArray *)paths;
 
-- (void)updateDefaults;
-
-
-//
-// Menu Operations 
-//
-- (void)showPreferences:(id)sender;
-
-- (void)showInfo:(id)sender;
-
-#ifndef GNUSTEP
-- (void)terminate:(id)sender;
-#endif
+- (BOOL)operationsPending;
 
 @end
 

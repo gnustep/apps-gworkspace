@@ -38,6 +38,7 @@
 @class GWDesktopManager;
 @class Finder;
 @class Inspector;
+@class Operation;
 @class GWViewer;
 @class PrefController;
 @class Fiend;
@@ -93,17 +94,6 @@
 @end
 
 
-@protocol	OperationProtocol
-
-- (oneway void)performOperation:(NSData *)opinfo;
-
-- (oneway void)setFilenamesCutted:(BOOL)value;
-
-- (BOOL)filenamesWasCutted;
-
-@end
-
-
 @protocol	DDBdProtocol
 
 - (BOOL)dbactive;
@@ -135,7 +125,6 @@
   id fswatcher;
   BOOL fswnotifications;
 	
-  id operationsApp;
   id recyclerApp;
   BOOL recyclerCanQuit;
   
@@ -151,6 +140,7 @@
   GWDesktopManager *dtopManager;  
   Inspector *inspector;
   Finder *finder;
+  Operation *fileOpsManager;
   
   BOOL dontWarnOnQuit;
   BOOL terminating;
@@ -272,10 +262,6 @@
 - (void)connectRecycler;
 
 - (void)recyclerConnectionDidDie:(NSNotification *)notif;
-
-- (void)connectOperation;
-
-- (void)operationConnectionDidDie:(NSNotification *)notif;
 
 - (void)connectDDBd;
 

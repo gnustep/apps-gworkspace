@@ -5,7 +5,7 @@
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
  *
- * This file is part of the GNUstep Operation application
+ * This file is part of the GNUstep GWorkspace application
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,72 +25,34 @@
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include "Operation.h"
-#include "Preferences/OperationPrefs.h"
 #include "FileOpInfo.h"
 #include "Functions.h"
 #include "GNUstep.h"
 
-static Operation *operation = nil;
-
 @implementation Operation
-
-+ (Operation *)operation
-{
-	if (operation == nil) {
-		operation = [[Operation alloc] init];
-	}	
-  return operation;
-}
-
-+ (void)initialize
-{
-	static BOOL initialized = NO;
-	
-	if (initialized == YES) {
-		return;
-  }
-	
-	initialized = YES;
-}
 
 - (void)dealloc
 {
   RELEASE (fileOperations);
-  RELEASE (preferences);
     
 	[super dealloc];
 }
 
-- (void)applicationDidFinishLaunching:(NSNotification *)aNotification
+- (id)init
 {
-  fileOperations = [NSMutableArray new];
-  fopRef = 0;
-  preferences = [OperationPrefs new];
-  fm = [NSFileManager defaultManager];
-  nc = [NSNotificationCenter defaultCenter];
-}
-
-- (BOOL)applicationShouldTerminate:(NSApplication *)app 
-{
-#define TEST_CLOSE(o, w) if ((o) && ([w isVisible])) [w close]
+  self = [super init];
   
-  if ([fileOperations count]) {
-    NSRunAlertPanel(nil, 
-                    NSLocalizedString(@"Wait the operations to terminate!", @""),
-					          NSLocalizedString(@"OK", @""), 
-                    nil, 
-                    nil);  
-    return NO;
+  if (self) {  
+    fileOperations = [NSMutableArray new];
+    fopRef = 0;
+    fm = [NSFileManager defaultManager];
+    nc = [NSNotificationCenter defaultCenter];
   }
-
-  [self updateDefaults];
-
-  TEST_CLOSE (preferences, [preferences win]);
-    		
-	return YES;
+  
+  return self;
 }
 
-- (oneway void)setFilenamesCutted:(BOOL)value
+- (void)setFilenamesCutted:(BOOL)value
 {
   filenamesCutted = value;
 }
@@ -100,7 +62,7 @@ static Operation *operation = nil;
   return filenamesCutted;
 }
 
-- (oneway void)performOperation:(NSData *)opinfo
+- (void)performOperation:(NSData *)opinfo
 {
   NSDictionary *opdict = [NSUnarchiver unarchiveObjectWithData: opinfo];
 	NSString *operation = [opdict objectForKey: @"operation"];
@@ -493,50 +455,9 @@ static Operation *operation = nil;
   return NO;
 }
 
-- (void)updateDefaults
+- (BOOL)operationsPending
 {
-  if ([[preferences win] isVisible]) {
-    [preferences updateDefaults];
-  }
+  return ([fileOperations count] > 0);
 }
-
-
-//
-// Menu Operations
-//
-- (void)showPreferences:(id)sender
-{
-  [preferences activate];
-}
-
-- (void)showInfo:(id)sender
-{
-  NSMutableDictionary *d = AUTORELEASE ([NSMutableDictionary new]);
-  [d setObject: @"Operation" forKey: @"ApplicationName"];
-  [d setObject: NSLocalizedString(@"-----------------------", @"")
-      	forKey: @"ApplicationDescription"];
-  [d setObject: @"Operation 0.7.1" forKey: @"ApplicationRelease"];
-  [d setObject: @"04 2005" forKey: @"FullVersionID"];
-  [d setObject: [NSArray arrayWithObjects: @"Enrico Sersale <enrico@imago.ro>.", nil]
-        forKey: @"Authors"];
-  [d setObject: NSLocalizedString(@"See http://www.gnustep.it/enrico/gworkspace", @"") forKey: @"URL"];
-  [d setObject: @"Copyright (C) 2004, 2005 Free Software Foundation, Inc."
-        forKey: @"Copyright"];
-  [d setObject: NSLocalizedString(@"Released under the GNU General Public License 2.0", @"")
-        forKey: @"CopyrightDescription"];
-  
-#ifdef GNUSTEP	
-  [NSApp orderFrontStandardInfoPanelWithOptions: d];
-#else
-	[NSApp orderFrontStandardAboutPanel: d];
-#endif
-}
-
-#ifndef GNUSTEP
-- (void)terminate:(id)sender
-{
-  [NSApp terminate: self];
-}
-#endif
 
 @end

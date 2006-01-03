@@ -50,5 +50,3 @@ include $(GNUSTEP_MAKEFILES)/aggregate.make
 -include GNUmakefile.postamble
 
 
-# ADDITIONAL_LDFLAGS = -lPDFKit
-# ViewPDF_GUI_LIBS = -lPDFKit

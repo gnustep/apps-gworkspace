@@ -204,9 +204,7 @@ static NSString *nibName = @"FileOperationWin";
 		  title = NSLocalizedString(@"Duplicate", @"");
 		  msg = NSLocalizedString(@"Duplicate the selected objects?", @"");
 	  }
-    
-    [NSApp activateIgnoringOtherApps: YES];
-    
+        
     if (NSRunAlertPanel(title, msg, 
                         NSLocalizedString(@"OK", @""), 
 				                NSLocalizedString(@"Cancel", @""), 
@@ -261,9 +259,7 @@ static NSString *nibName = @"FileOperationWin";
 
 - (int)requestUserConfirmationWithMessage:(NSString *)message 
                                     title:(NSString *)title
-{
-  [NSApp activateIgnoringOtherApps: YES];
-  
+{  
   return NSRunAlertPanel(NSLocalizedString(title, @""),
 												 NSLocalizedString(message, @""),
 											   NSLocalizedString(@"OK", @""), 
@@ -272,9 +268,7 @@ static NSString *nibName = @"FileOperationWin";
 }
 
 - (int)showErrorAlertWithMessage:(NSString *)message
-{
-  [NSApp activateIgnoringOtherApps: YES];
-  
+{  
   return NSRunAlertPanel(nil, 
                          NSLocalizedString(message, @""), 
 												 NSLocalizedString(@"Continue", @""), 
@@ -493,9 +487,7 @@ static NSString *nibName = @"FileOperationWin";
 			msg = @"Some items have the same name;\ndo you want to replace them?";
 			title = @"Recycle";
 		}
-    
-    [NSApp activateIgnoringOtherApps: YES];
-    
+        
     result = NSRunAlertPanel(NSLocalizedString(title, @""),
 														 NSLocalizedString(msg, @""),
 														 NSLocalizedString(@"OK", @""), 

@@ -40,7 +40,7 @@ static NSString *nibName = @"OperationPrefs";
 
 - (void)dealloc
 {
-  TEST_RELEASE (win);
+  TEST_RELEASE (prefbox);
   [super dealloc];
 }
 
@@ -60,8 +60,8 @@ static NSString *nibName = @"OperationPrefs";
       return self;
     }
 
-    [win setFrameUsingName: @"operationprefs"];
-    [win setDelegate: self];
+    RETAIN (prefbox);
+    RELEASE (win); 
   
     statusItem = [tabView tabViewItemAtIndex: 0];
     [statusItem setLabel: NSLocalizedString(@"Status Window", @"")];
@@ -118,14 +118,14 @@ static NSString *nibName = @"OperationPrefs";
   return self;
 }
 
-- (void)activate
+- (NSView *)prefView
 {
-  [win makeKeyAndOrderFront: nil];
+  return prefbox;
 }
 
-- (NSWindow *)win
+- (NSString *)prefName
 {
-  return win;
+  return NSLocalizedString(@"File Operations", @"");
 }
 
 - (void)setUnsetStatWin:(id)sender
@@ -157,17 +157,6 @@ forKey: confirmString]
   CHECK_CONFIRM (DESTROYOP, @"NSWorkspaceDestroyOperation");
 
   [defaults synchronize];
-}
-
-- (void)updateDefaults
-{
-  [win saveFrameUsingName: @"operationprefs"];
-}
-
-- (BOOL)windowShouldClose:(id)sender
-{
-  [win saveFrameUsingName: @"operationprefs"];
-	return YES;
 }
 
 @end
