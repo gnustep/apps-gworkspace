@@ -5,7 +5,7 @@
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
  *
- * This file is part of the GNUstep Operation application
+ * This file is part of the GNUstep GWorkspace application
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -104,7 +104,7 @@ static NSString *nibName = @"FileOperationWin";
 
       RETAIN (progInd);
       r = [[progBox contentView] frame];
-      progView = [[ProgressView alloc] initWithFrame: r refreshInterval: 0.05];
+      progView = [[OpProgressView alloc] initWithFrame: r refreshInterval: 0.05];
 
       [fromLabel setStringValue: NSLocalizedString(@"From:", @"")];
       [toLabel setStringValue: NSLocalizedString(@"To:", @"")];
@@ -304,42 +304,42 @@ static NSString *nibName = @"FileOperationWin";
     if ([type isEqual: @"NSWorkspaceMoveOperation"]) {
       [win setTitle: NSLocalizedString(@"Move", @"")];
       [fromLabel setStringValue: NSLocalizedString(@"From:", @"")];
-      [fromField setStringValue: relativePathFittingInContainer(fromField, source)];
+      [fromField setStringValue: relativePathFittingInField(fromField, source)];
       [toLabel setStringValue: NSLocalizedString(@"To:", @"")];
-      [toField setStringValue: relativePathFittingInContainer(fromField, destination)];
+      [toField setStringValue: relativePathFittingInField(fromField, destination)];
     
     } else if ([type isEqual: @"NSWorkspaceCopyOperation"]) {
       [win setTitle: NSLocalizedString(@"Copy", @"")];
       [fromLabel setStringValue: NSLocalizedString(@"From:", @"")];
-      [fromField setStringValue: relativePathFittingInContainer(fromField, source)];
+      [fromField setStringValue: relativePathFittingInField(fromField, source)];
       [toLabel setStringValue: NSLocalizedString(@"To:", @"")];
-      [toField setStringValue: relativePathFittingInContainer(fromField, destination)];
+      [toField setStringValue: relativePathFittingInField(fromField, destination)];
     
     } else if ([type isEqual: @"NSWorkspaceLinkOperation"]) {
       [win setTitle: NSLocalizedString(@"Link", @"")];
       [fromLabel setStringValue: NSLocalizedString(@"From:", @"")];
-      [fromField setStringValue: relativePathFittingInContainer(fromField, source)];
+      [fromField setStringValue: relativePathFittingInField(fromField, source)];
       [toLabel setStringValue: NSLocalizedString(@"To:", @"")];
-      [toField setStringValue: relativePathFittingInContainer(fromField, destination)];
+      [toField setStringValue: relativePathFittingInField(fromField, destination)];
     
     } else if ([type isEqual: @"NSWorkspaceDuplicateOperation"]) {
       [win setTitle: NSLocalizedString(@"Duplicate", @"")];
       [fromLabel setStringValue: NSLocalizedString(@"In:", @"")];
-      [fromField setStringValue: relativePathFittingInContainer(fromField, destination)];
+      [fromField setStringValue: relativePathFittingInField(fromField, destination)];
       [toLabel setStringValue: @""];
       [toField setStringValue: @""];
     
     } else if ([type isEqual: @"NSWorkspaceDestroyOperation"]) {
       [win setTitle: NSLocalizedString(@"Destroy", @"")];
       [fromLabel setStringValue: NSLocalizedString(@"In:", @"")];
-      [fromField setStringValue: relativePathFittingInContainer(fromField, destination)];
+      [fromField setStringValue: relativePathFittingInField(fromField, destination)];
       [toLabel setStringValue: @""];
       [toField setStringValue: @""];
     
     } else if ([type isEqual: @"NSWorkspaceRecycleOperation"]) {
       [win setTitle: NSLocalizedString(@"Move", @"")];
       [fromLabel setStringValue: NSLocalizedString(@"From:", @"")];
-      [fromField setStringValue: relativePathFittingInContainer(fromField, source)];
+      [fromField setStringValue: relativePathFittingInField(fromField, source)];
       [toLabel setStringValue: NSLocalizedString(@"To:", @"")];
       [toField setStringValue: NSLocalizedString(@"the Recycler", @"")];
         
@@ -348,7 +348,7 @@ static NSString *nibName = @"FileOperationWin";
       [fromLabel setStringValue: NSLocalizedString(@"From:", @"")];
       [fromField setStringValue: NSLocalizedString(@"the Recycler", @"")];
       [toLabel setStringValue: NSLocalizedString(@"To:", @"")];
-      [toField setStringValue: relativePathFittingInContainer(fromField, destination)];
+      [toField setStringValue: relativePathFittingInField(fromField, destination)];
                             
     } else if ([type isEqual: @"GWorkspaceEmptyRecyclerOperation"]) {
       [win setTitle: NSLocalizedString(@"Destroy", @"")];
@@ -1203,7 +1203,7 @@ filename =  [fileinfo objectForKey: @"name"]
 
 @end
 
-@implementation ProgressView
+@implementation OpProgressView
 
 #define PROG_IND_MAX (-28)
 

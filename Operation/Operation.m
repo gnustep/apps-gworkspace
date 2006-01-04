@@ -433,7 +433,7 @@
   int i;
 
   for (i = 0; i < [paths count]; i++) {  
-    if (subPathOfPath([paths objectAtIndex: i], path)) {
+    if (isSubpath([paths objectAtIndex: i], path)) {
       return YES;
     }
   }
@@ -447,7 +447,7 @@
   int i;
 
   for (i = 0; i < [paths count]; i++) {  
-    if (subPathOfPath(path, [paths objectAtIndex: i])) {
+    if (isSubpath(path, [paths objectAtIndex: i])) {
       return YES;
     }
   }

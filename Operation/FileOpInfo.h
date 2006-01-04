@@ -5,7 +5,7 @@
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
  *
- * This file is part of the GNUstep Operation application
+ * This file is part of the GNUstep GWorkspace application
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 #include <Foundation/Foundation.h>
 
 @class FileOpExecutor;
-@class ProgressView;
+@class OpProgressView;
 
 
 @protocol FileOpInfoProtocol
@@ -111,7 +111,7 @@
   IBOutlet id toField;
   IBOutlet NSBox *progBox;
   IBOutlet id progInd;
-  ProgressView *progView;
+  OpProgressView *progView;
   IBOutlet id pauseButt;
   IBOutlet id stopButt;  
 }
@@ -255,7 +255,7 @@
 @end 
 
 
-@interface ProgressView : NSView 
+@interface OpProgressView : NSView 
 {
   NSImage *image;
   float orx;
