@@ -26,11 +26,10 @@
 #ifndef OPEN_WITH_CONTROLLER_H
 #define OPEN_WITH_CONTROLLER_H
 
-#include <Foundation/NSObject.h>
+#include <Foundation/Foundation.h>
 
 @class CompletionField;
-@class NSFileManager;
-@class NSArray;
+@class NSBox;
 @class GWorkspace;
 
 @interface OpenWithController : NSObject 

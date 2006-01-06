@@ -329,7 +329,7 @@
 
 	title = NSLocalizedString(@"Remove Tab", @"");
 	msg = NSLocalizedString(@"Are you sure that you want to remove the selected tab?", @"");
-	buttstr = NSLocalizedString(@"Continue", @"");
+	buttstr = NSLocalizedString(@"Cancel", @"");
   result = NSRunAlertPanel(title, msg, 
                   NSLocalizedString(@"OK", @""), buttstr, NULL);
   if(result != NSAlertDefaultReturn) {

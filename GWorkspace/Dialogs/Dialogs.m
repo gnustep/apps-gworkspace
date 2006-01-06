@@ -65,11 +65,6 @@
 
 - (void)dealloc
 {
-  RELEASE (titlefield);
-	RELEASE (editfield);
-	TEST_RELEASE (switchButt);
-	RELEASE (cancelbutt);
-	RELEASE (okbutt);	
   [super dealloc];
 }
 
@@ -103,17 +98,20 @@
 		[titlefield setFont: font];
 		[titlefield setStringValue: title];
 		[dialogView addSubview: titlefield]; 
+    RELEASE (titlefield);
 
     r = useSwitch ? NSMakeRect(30, 86, 180, 22) : NSMakeRect(30, 56, 180, 22);
 		editfield = [[NSTextField alloc] initWithFrame: r];
 		[editfield setStringValue: etext];
 		[dialogView addSubview: editfield];
+	  RELEASE (editfield);
 
     if (useSwitch) {
 	    switchButt = [[NSButton alloc] initWithFrame: NSMakeRect(30, 62, 180, 16)];
 	    [switchButt setButtonType: NSSwitchButton];
 	    [switchButt setTitle: swtitle];
 		  [dialogView addSubview: switchButt]; 
+	    RELEASE (switchButt);
     }
 
 	  cancelbutt = [[NSButton alloc] initWithFrame: NSMakeRect(100, 10, 60, 25)];
@@ -122,6 +120,7 @@
 	  [cancelbutt setTarget: self];
 	  [cancelbutt setAction: @selector(buttonAction:)];		
 		[dialogView addSubview: cancelbutt]; 
+	  RELEASE (cancelbutt);
 
 	  okbutt = [[NSButton alloc] initWithFrame: NSMakeRect(170, 10, 60, 25)];
 	  [okbutt setButtonType: NSMomentaryLight];
@@ -129,10 +128,12 @@
 	  [okbutt setTarget: self];
 	  [okbutt setAction: @selector(buttonAction:)];		
 		[dialogView addSubview: okbutt]; 
-    [self makeFirstResponder: okbutt];
+    RELEASE (okbutt);	
 
 		[self setContentView: dialogView];
 		[self setTitle: @""];
+
+    [self setInitialFirstResponder: editfield];
 	}
 
 	return self;

@@ -58,9 +58,10 @@ static NSString *nibName = @"RunExternal";
 		  cfield = [[CompletionField alloc] init];
       [cfield setFrame: [[fieldBox contentView] frame]];
       [cfield setNextKeyView: okButt]; 
-      [fieldBox addSubview: cfield];      
-      [fieldBox sizeToFit];
+      [fieldBox setContentView: cfield];      
       RELEASE (cfield);
+
+      [win setInitialFirstResponder: cfield];
       
       fm = [NSFileManager defaultManager];
     }
