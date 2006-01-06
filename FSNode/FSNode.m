@@ -829,6 +829,11 @@
   return [fm fileExistsAtPath: path];
 }
 
+- (BOOL)isReserved
+{
+  return [fsnodeRep isReservedName: name];
+}
+
 - (BOOL)willBeValidAfterFileOperation:(NSDictionary *)opinfo
 {
   NSString *operation = [opinfo objectForKey: @"operation"];

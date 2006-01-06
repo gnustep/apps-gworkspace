@@ -1277,6 +1277,32 @@
   }
 }
 
+- (void)selectAll
+{
+	int i;
+
+  selectionMask = NSSingleSelectionMask;
+  selectionMask |= FSNCreatingSelectionMask;
+  
+	[self unselectOtherReps: nil];
+  
+  selectionMask = FSNMultipleSelectionMask;
+  selectionMask |= FSNCreatingSelectionMask;
+  
+	for (i = 0; i < [icons count]; i++) {
+    FSNIcon *icon = [icons objectAtIndex: i];
+    FSNode *inode = [icon node];
+    
+    if (([inode isReserved] == NO) && ([inode isMountPoint] == NO)) {
+      [icon select];
+    }
+	}
+  
+  selectionMask = NSSingleSelectionMask;
+
+  [self selectionDidChange];
+}
+
 - (void)selectionDidChange
 {
 	if (!(selectionMask & FSNCreatingSelectionMask)) {

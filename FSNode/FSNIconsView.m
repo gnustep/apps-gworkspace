@@ -1562,7 +1562,12 @@ pp.y = NSMaxY(br) + 1; \
   selectionMask |= FSNCreatingSelectionMask;
   
 	for (i = 0; i < [icons count]; i++) {
-    [[icons objectAtIndex: i] select];
+    FSNIcon *icon = [icons objectAtIndex: i];
+    FSNode *inode = [icon node];
+    
+    if ([inode isReserved] == NO) {
+      [icon select];
+    }
 	}
   
   selectionMask = NSSingleSelectionMask;

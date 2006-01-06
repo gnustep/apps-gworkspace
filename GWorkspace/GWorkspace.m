@@ -446,6 +446,13 @@ static GWorkspace *gworkspace = nil;
 
   [fsnodeRep setVolumes: [ws removableMediaPaths]];
         
+	entry = [defaults objectForKey: @"reserved_names"];
+	if (entry) {
+    [fsnodeRep setReservedNames: entry];
+	} else {
+    [fsnodeRep setReservedNames: [NSArray arrayWithObjects: @".gwdir", @".gwsort", nil]];
+  }
+        
 	entry = [defaults stringForKey: @"defaulteditor"];
 	if (entry == nil) {
 		defEditor = [[NSString alloc] initWithString: defaulteditor];
@@ -938,13 +945,27 @@ static GWorkspace *gworkspace = nil;
 
   } else if ([title isEqual: NSLocalizedString(@"Empty Recycler", @"")]) {
     if ([dtopManager isActive] || (recyclerApp != nil)) {
-      return ([[fm directoryContentsAtPath: [self trashPath]] count] != 0);
+      CREATE_AUTORELEASE_POOL(arp);
+      FSNode *node = [FSNode nodeWithPath: [self trashPath]];
+      NSArray *subNodes = [node subNodes];
+      int count = [subNodes count];
+      int i;  
+          
+      for (i = 0; i < [subNodes count]; i++) {
+        if ([[subNodes objectAtIndex: i] isReserved]) {
+          count --;
+        }
+      }  
+    
+      RELEASE (arp);
+      return (count != 0);
     }
     
 	} else if ([title isEqual: NSLocalizedString(@"Check for disks", @"")]) {
     return [dtopManager isActive];
   
   } else if ([title isEqual: NSLocalizedString(@"Open With...", @"")]) {
+    CREATE_AUTORELEASE_POOL(arp);
     BOOL found = NO;
     int i;
     
@@ -970,6 +991,7 @@ static GWorkspace *gworkspace = nil;
       }
     }
     
+    RELEASE (arp);
     return !found;
     
   } else if ([title isEqual: NSLocalizedString(@"Select Special Tab", @"")]
@@ -2210,14 +2232,26 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 
 - (void)emptyRecycler:(id)sender
 {
+  CREATE_AUTORELEASE_POOL(arp);
   NSString *trashPath = [self trashPath];
   FSNode *node = [FSNode nodeWithPath: trashPath];
-  NSArray *subNodes = [node subNodes];
+  NSMutableArray *subNodes = [[node subNodes] mutableCopy];
+  int count = [subNodes count];
+  int i;  
+  
+  for (i = 0; i < count; i++) {
+    FSNode *nd = [subNodes objectAtIndex: i];
+  
+    if ([nd isReserved]) {
+      [subNodes removeObjectAtIndex: i];
+      i--;
+      count --;
+    }
+  }  
   
   if ([subNodes count]) {
     NSMutableArray *files = [NSMutableArray array];
     NSMutableDictionary *opinfo = [NSMutableDictionary dictionary];
-    int i;  
 
     for (i = 0; i < [subNodes count]; i++) {
       [files addObject: [(FSNode *)[subNodes objectAtIndex: i] name]];
@@ -2230,6 +2264,9 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
 
     [self performFileOperation: opinfo];
   }
+  
+  RELEASE (subNodes);
+  RELEASE (arp);
 }
 
 

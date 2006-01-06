@@ -133,6 +133,7 @@ static FSNodeRep *shared = nil;
     lockedPaths = [NSMutableArray new];	
     hiddenPaths = [NSArray new];
     volumes = [[NSMutableSet alloc] initWithCapacity: 1];
+    reservedNames = [[NSMutableSet alloc] initWithCapacity: 1];
     
     [self loadExtendedInfoModules];
     
@@ -224,6 +225,7 @@ static FSNodeRep *shared = nil;
   TEST_RELEASE (extInfoModules);
 	TEST_RELEASE (lockedPaths);
   TEST_RELEASE (volumes);
+  TEST_RELEASE (reservedNames);
   TEST_RELEASE (rootPath);
   TEST_RELEASE (hiddenPaths);
   TEST_RELEASE (iconsCache);
@@ -563,6 +565,22 @@ static FSNodeRep *shared = nil;
 - (NSSet *)volumes
 {
   return volumes;
+}
+
+- (void)setReservedNames:(NSArray *)names
+{
+  [reservedNames removeAllObjects];
+  [reservedNames addObjectsFromArray: names];
+}
+
+- (NSSet *)reservedNames
+{
+  return reservedNames;
+}
+
+- (BOOL)isReservedName:(NSString *)name
+{
+  return [reservedNames containsObject: name];
 }
 
 - (unsigned)systemType

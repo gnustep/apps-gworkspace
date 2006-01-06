@@ -584,13 +584,25 @@ static Recycler *recycler = nil;
 //
 - (void)emptyTrashFromMenu:(id)sender
 {
+  CREATE_AUTORELEASE_POOL(arp);
   FSNode *node = [FSNode nodeWithPath: trashPath];
-  NSArray *subNodes = [node subNodes];
+  NSMutableArray *subNodes = [[node subNodes] mutableCopy];
+  int count = [subNodes count];
+  int i;  
+
+  for (i = 0; i < count; i++) {
+    FSNode *nd = [subNodes objectAtIndex: i];
+  
+    if ([nd isReserved]) {
+      [subNodes removeObjectAtIndex: i];
+      i--;
+      count --;
+    }
+  }  
   
   if ([subNodes count]) {
     NSMutableArray *files = [NSMutableArray array];
     NSMutableDictionary *opinfo = [NSMutableDictionary dictionary];
-    int i;  
 
     for (i = 0; i < [subNodes count]; i++) {
       [files addObject: [(FSNode *)[subNodes objectAtIndex: i] name]];
@@ -603,6 +615,9 @@ static Recycler *recycler = nil;
 
     [self performFileOperation: opinfo];
   }
+
+  RELEASE (subNodes);
+  RELEASE (arp);
 }
 
 - (void)paste:(id)sender

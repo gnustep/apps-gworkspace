@@ -1203,8 +1203,22 @@ static NSString *defaultColumns = @"{ \
 
 - (void)selectAll
 {
-  [listView selectAll: self];
-  [listView setNeedsDisplay: YES];
+  NSMutableIndexSet *set = [NSMutableIndexSet indexSet];
+  unsigned int i;
+
+  for (i = 0; i < [nodeReps count]; i++) {
+    FSNListViewNodeRep *rep = [nodeReps objectAtIndex: i];
+  
+    if ([[rep node] isReserved] == NO) {
+      [set addIndex: i];
+    }
+  }
+
+  if ([set count]) {
+    [listView deselectAll: self];
+    [listView selectRowIndexes: set byExtendingSelection: NO];
+    [listView setNeedsDisplay: YES];
+  }
 }
 
 - (void)scrollSelectionToVisible

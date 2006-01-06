@@ -794,8 +794,21 @@ static id <DesktopApplication> desktopApp = nil;
 - (void)selectAll
 {
   if (matrix && [[matrix cells] count]) {
-    [matrix selectAll: nil];
-	  [matrix sendAction];
+    NSArray *cells = [matrix cells];
+    int i;
+
+    [matrix deselectAllCells];
+
+	  for (i = 0; i < [cells count]; i++) {
+	    FSNBrowserCell *cell = [cells objectAtIndex: i];
+      
+      if ([[cell node] isReserved] == NO) {
+        [matrix selectCell: cell];
+      } 
+	  }
+
+    [matrix sendAction];
+
   } else {
     FSNBrowserColumn *col = [browser columnBeforeColumn: self];
   

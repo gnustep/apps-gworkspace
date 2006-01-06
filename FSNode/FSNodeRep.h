@@ -342,6 +342,7 @@ typedef enum FSNSelectionMask {
 
 	NSMutableArray *lockedPaths;
   NSArray *hiddenPaths;
+  NSMutableSet *reservedNames;
   NSMutableSet *volumes;
   NSString *rootPath;
 
@@ -428,6 +429,12 @@ typedef enum FSNSelectionMask {
 - (void)removeVolumeAt:(NSString *)path;
 
 - (NSSet *)volumes;
+
+- (void)setReservedNames:(NSArray *)names;
+
+- (NSSet *)reservedNames;
+
+- (BOOL)isReservedName:(NSString *)name;
 
 - (unsigned)systemType;
 

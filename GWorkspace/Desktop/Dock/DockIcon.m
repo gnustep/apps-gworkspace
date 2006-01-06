@@ -108,9 +108,7 @@
       count = [subNodes count];
       
       for (i = 0; i < [subNodes count]; i++) {
-        FSNode *subNode = [subNodes objectAtIndex: i];
-        
-        if ([[subNode name] hasPrefix: @"."]) {
+        if ([[subNodes objectAtIndex: i] isReserved]) {
           count --;
         }
       }

@@ -362,7 +362,7 @@ static NSString *nibName = @"FileOperationWin";
     [progView start];
   }
   
-  [win makeKeyAndOrderFront: nil];
+  [win orderFront: nil];
   showwin = YES;
 }
 
