@@ -28,6 +28,7 @@
 #include "RunExternalController.h"
 #include "CompletionField.h"
 #include "GWorkspace.h"
+#include "FSNode.h"
 #include "GNUstep.h"
 
 static NSString *nibName = @"RunExternal";
@@ -55,12 +56,14 @@ static NSString *nibName = @"RunExternal";
       
       ASSIGN (pathsArr, [paths componentsSeparatedByString: @":"]);
   
-		  cfield = [[CompletionField alloc] init];
+		  cfield = [[CompletionField alloc] initForController: self];
       [cfield setFrame: [[fieldBox contentView] frame]];
       [cfield setNextKeyView: okButt]; 
       [fieldBox setContentView: cfield];      
       RELEASE (cfield);
-
+      
+      [win setDelegate: self];
+      [win setFrameUsingName: @"run_external"];
       [win setInitialFirstResponder: cfield];
       
       fm = [NSFileManager defaultManager];
@@ -71,18 +74,26 @@ static NSString *nibName = @"RunExternal";
 }
 
 - (NSString *)checkCommand:(NSString *)comm
-{
-  int i;
-
-  for (i = 0; i < [pathsArr count]; i++) {
-    NSString *basePath = [pathsArr objectAtIndex: i];
-    NSArray *contents = [fm directoryContentsAtPath: basePath];
-
-    if (contents && [contents containsObject: comm]) {
-      NSString *fullPath = [basePath stringByAppendingPathComponent: comm];
+{  
+  if ([comm isAbsolutePath]) {
+    FSNode *node = [FSNode nodeWithPath: comm];
+  
+    if (node && [node isPlain] && [node isExecutable]) {
+      return comm;
+    }
+  } else {
+    int i;
     
-      if ([fm isExecutableFileAtPath: fullPath]) {
-        return fullPath;
+    for (i = 0; i < [pathsArr count]; i++) {
+      NSString *basePath = [pathsArr objectAtIndex: i];
+      NSArray *contents = [fm directoryContentsAtPath: basePath];
+
+      if (contents && [contents containsObject: comm]) {
+        NSString *fullPath = [basePath stringByAppendingPathComponent: comm];
+
+        if ([fm isExecutableFileAtPath: fullPath]) {
+          return fullPath;
+        }
       }
     }
   }
@@ -92,45 +103,50 @@ static NSString *nibName = @"RunExternal";
 
 - (void)activate
 {
-  [NSApp runModalForWindow: win];
-  
-  if (result == NSAlertDefaultReturn) {
-    NSString *str = [cfield string];
-    int i;
-    
-    if ([str length]) {
-      NSArray *components = [str componentsSeparatedByString: @" "];
-      NSMutableArray *args = [NSMutableArray array];
-      NSString *command = [components objectAtIndex: 0];
-          
-      for (i = 1; i < [components count]; i++) {
-        [args addObject: [components objectAtIndex: i]];
-      }
-      
-      command = [self checkCommand: command];
-      
-      if (command) {
-        [NSTask launchedTaskWithLaunchPath: command arguments: args];
-      } else {
-        NSRunAlertPanel(NULL, NSLocalizedString(@"No executable found!", @""),
-                                    NSLocalizedString(@"OK", @""), NULL, NULL);   
-      }
-    }
-  }
+  [win makeKeyAndOrderFront: nil];
+  [win makeFirstResponder: cfield];
 }
 
 - (IBAction)cancelButtAction:(id)sender
 {
-  result = NSAlertAlternateReturn;
-  [NSApp stopModal];
   [win close];
 }
 
 - (IBAction)okButtAction:(id)sender
 {
-  result = NSAlertDefaultReturn;
-  [NSApp stopModal];
-  [win close];
+  NSString *str = [cfield string];
+  int i;
+
+  if ([str length]) {
+    NSArray *components = [str componentsSeparatedByString: @" "];
+    NSMutableArray *args = [NSMutableArray array];
+    NSString *command = [components objectAtIndex: 0];
+
+    for (i = 1; i < [components count]; i++) {
+      [args addObject: [components objectAtIndex: i]];
+    }
+
+    command = [self checkCommand: command];
+
+    if (command) {
+      [NSTask launchedTaskWithLaunchPath: command arguments: args];
+    } else {
+      NSRunAlertPanel(NULL, NSLocalizedString(@"No executable found!", @""),
+                                  NSLocalizedString(@"OK", @""), NULL, NULL);   
+    }
+    
+    [cfield setString: @""];
+  }
+}
+
+- (void)completionFieldDidEndLine:(id)afield
+{
+  [win makeFirstResponder: okButt];
+}
+
+- (void)windowWillClose:(NSNotification *)aNotification
+{
+  [win saveFrameUsingName: @"run_external"];
 }
 
 @end

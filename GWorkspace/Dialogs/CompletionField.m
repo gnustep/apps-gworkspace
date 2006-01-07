@@ -36,7 +36,7 @@
   [super dealloc];
 }
 
-- (id)init
+- (id)initForController:(id)cntrl
 {
   self = [super init];
   
@@ -46,7 +46,7 @@
     [self setUsesFontPanel: NO];
     [self setUsesRuler: NO];
     [self setEditable: YES];
-    
+    controller = cntrl;
     fm = [NSFileManager defaultManager];
   }
   
@@ -73,17 +73,20 @@ if ([path hasSuffix: pathSeparator] == NO) \
 [path appendString: pathSeparator]
  
   if (([eventstr isEqual: @"\r"] == NO)
-                              && ([eventstr isEqual: @"\t"] == NO)) {  
+                              && ([eventstr isEqual: @"\t"] == NO)) { 
+                               
     [super keyDown: theEvent];
   }
   
   if ([eventstr isEqual: @"\t"] && [str length]) {
+    CREATE_AUTORELEASE_POOL(arp);
     NSString *pathSeparator = path_separator();
     NSArray *components = [str componentsSeparatedByString: pathSeparator];
     NSMutableString *path = [NSMutableString string];
     int i, j, m, n;
     
     if ([[components objectAtIndex: 0] isEqual: str]) {
+      RELEASE (arp);
       return;
     }
         
@@ -222,6 +225,10 @@ if ([path hasSuffix: pathSeparator] == NO) \
     }
   
     [self setString: path];
+    RELEASE (arp);
+  
+  } else if ([eventstr isEqual: @"\r"] && [str length]) {
+    [controller completionFieldDidEndLine: self];
   }
 }
 

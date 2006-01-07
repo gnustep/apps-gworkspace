@@ -31,7 +31,17 @@
 @interface CompletionField : NSTextView 
 {
   id fm;
+  id controller;
 }
+
+- (id)initForController:(id)cntrl;
+
+@end
+
+
+@interface NSObject (CompletionField)
+
+- (void)completionFieldDidEndLine:(id)afield;
 
 @end
 

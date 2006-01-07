@@ -57,6 +57,8 @@
 
 - (IBAction)okButtAction:(id)sender;
 
+- (void)completionFieldDidEndLine:(id)afield;
+
 @end
 
 #endif // OPEN_WITH_CONTROLLER_H

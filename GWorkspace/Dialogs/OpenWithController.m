@@ -27,6 +27,7 @@
 #include "OpenWithController.h"
 #include "CompletionField.h"
 #include "GWorkspace.h"
+#include "FSNode.h"
 #include "GNUstep.h"
 
 static NSString *nibName = @"OpenWith";
@@ -54,7 +55,7 @@ static NSString *nibName = @"OpenWith";
       
       ASSIGN (pathsArr, [paths componentsSeparatedByString: @":"]);
 
-		  cfield = [[CompletionField alloc] init];
+		  cfield = [[CompletionField alloc] initForController: self];
       [cfield setFrame: [[fieldBox contentView] frame]];
       [cfield setNextKeyView: okButt]; 
       [fieldBox setContentView: cfield];   
@@ -72,36 +73,29 @@ static NSString *nibName = @"OpenWith";
 
 - (NSString *)checkCommand:(NSString *)comm
 {
-  int i;
-
   if ([comm isAbsolutePath]) {
-    BOOL isdir;
-    
-    if ([fm fileExistsAtPath: comm isDirectory: &isdir]) {
-      if (isdir) {
-        return nil;
-      }
-      if ([fm isExecutableFileAtPath: comm]) {
-        return comm;
-      } else {
-        return nil;
-      }
-    }
-  }
+    FSNode *node = [FSNode nodeWithPath: comm];
   
-  for (i = 0; i < [pathsArr count]; i++) {
-    NSString *basePath = [pathsArr objectAtIndex: i];
-    NSArray *contents = [fm directoryContentsAtPath: basePath];
+    if (node && [node isPlain] && [node isExecutable]) {
+      return comm;
+    }
+  } else {
+    int i;
+  
+    for (i = 0; i < [pathsArr count]; i++) {
+      NSString *basePath = [pathsArr objectAtIndex: i];
+      NSArray *contents = [fm directoryContentsAtPath: basePath];
 
-    if (contents && [contents containsObject: comm]) {
-      NSString *fullPath = [basePath stringByAppendingPathComponent: comm];
-    
-      if ([fm isExecutableFileAtPath: fullPath]) {
-        return fullPath;
+      if (contents && [contents containsObject: comm]) {
+        NSString *fullPath = [basePath stringByAppendingPathComponent: comm];
+
+        if ([fm isExecutableFileAtPath: fullPath]) {
+          return fullPath;
+        }
       }
     }
   }
-    
+     
   return nil;
 }
 
@@ -169,6 +163,11 @@ static NSString *nibName = @"OpenWith";
   result = NSAlertDefaultReturn;
   [NSApp stopModal];
   [win close];
+}
+
+- (void)completionFieldDidEndLine:(id)afield
+{
+  [win makeFirstResponder: okButt];
 }
 
 @end

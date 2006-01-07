@@ -33,7 +33,7 @@
 @class NSTextField;
 @class NSButton;
 
-@interface sympleDialogView : NSView
+@interface SympleDialogView : NSView
 {
   BOOL useSwitch;
 }
@@ -44,7 +44,7 @@
 
 @interface SympleDialog : NSWindow
 {
-	sympleDialogView *dialogView;
+	SympleDialogView *dialogView;
 	NSTextField *titlefield, *editfield;	
   NSButton *switchButt;
 	NSButton *cancelbutt, *okbutt;	

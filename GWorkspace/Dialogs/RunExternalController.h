@@ -57,6 +57,8 @@
 
 - (IBAction)okButtAction:(id)sender;
 
+- (void)completionFieldDidEndLine:(id)afield;
+
 @end
 
 #endif // RUN_EXTERNAL_CONTROLLER_H

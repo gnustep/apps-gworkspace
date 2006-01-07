@@ -22,18 +22,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-  #ifdef GNUSTEP 
 #include "GWFunctions.h"
-  #else
-#include <GWorkspace/GWFunctions.h>
-  #endif
 #include "Dialogs.h"
 #include "GNUstep.h"
 
-@implementation sympleDialogView
+@implementation SympleDialogView
 
 - (id)initWithFrame:(NSRect)frameRect useSwitch:(BOOL)swtch
 {
@@ -83,7 +78,7 @@
     
     useSwitch = swtitle ? YES : NO;
     
-  	dialogView = [[sympleDialogView alloc] initWithFrame: [self frame] 
+  	dialogView = [[SympleDialogView alloc] initWithFrame: [self frame] 
                                                useSwitch: useSwitch];
     AUTORELEASE (dialogView);
 
@@ -166,8 +161,8 @@
     result = NSAlertAlternateReturn;
   }
 
-  [self orderOut: self];
   [[NSApplication sharedApplication] stopModal];
+  [self orderOut: nil];
 }
 
 @end
