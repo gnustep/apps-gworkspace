@@ -70,301 +70,6 @@ static GWorkspace *gworkspace = nil;
   #define TSHF_MAXF 999
 #endif
 
-//
-// GWProtocol
-//
-+ (GWorkspace *)gworkspace
-{
-	if (gworkspace == nil) {
-		gworkspace = [[GWorkspace alloc] init];
-	}	
-  return gworkspace;
-}
-
-- (BOOL)performFileOperation:(NSString *)operation 
-                      source:(NSString *)source 
-                 destination:(NSString *)destination 
-                       files:(NSArray *)files 
-                         tag:(int *)tag
-{
-  NSMutableDictionary *opdict = [NSMutableDictionary dictionary];
-  NSData *data;
-
-  [opdict setObject: operation forKey: @"operation"];
-  [opdict setObject: source forKey: @"source"];
-  [opdict setObject: destination forKey: @"destination"];
-  [opdict setObject: files forKey: @"files"];
-
-  data = [NSArchiver archivedDataWithRootObject: opdict];
-
-  [fileOpsManager performOperation: data];
-  
-  return YES;
-}
-
-- (void)performFileOperationWithDictionary:(NSDictionary *)opdict
-{
-	NSString *operation = [opdict objectForKey: @"operation"];
-	NSString *source = [opdict objectForKey: @"source"];
-	NSString *destination = [opdict objectForKey: @"destination"];
-	NSArray *files = [opdict objectForKey: @"files"];
-	int tag;
-	
-	[self performFileOperation: operation source: source 
-											destination: destination files: files tag: &tag];
-}
-
-- (BOOL)application:(NSApplication *)theApplication 
-           openFile:(NSString *)filename
-{
-  BOOL isDir;
-  
-  if ([filename isAbsolutePath] 
-                    && [fm fileExistsAtPath: filename isDirectory: &isDir]) {
-    if (isDir) {
-      if ([[filename pathExtension] isEqual: @"lsf"]) {
-        return [finder openLiveSearchFolderAtPath: filename];
-      } else {
-        [self newViewerAtPath: filename];
-        return YES;
-      }
-    } else {
-      [self selectFile: filename 
-        inFileViewerRootedAtPath: [filename stringByDeletingLastPathComponent]];
-      [self openFile: filename];
-      return YES;
-    }
-  } 
-
-  return NO;
-}
-
-- (BOOL)openFile:(NSString *)fullPath
-{
-	NSString *appName;
-  NSString *type;
-  
-  [ws getInfoForFile: fullPath application: &appName type: &type];
-  
-	if (appName == nil) {
-		appName = defEditor;
-	}		
-  
-  return [ws openFile: fullPath withApplication: appName];
-}
-
-- (int)extendPowerOffBy:(int)requested
-{
-  return 0;
-}
-
-- (BOOL)selectFile:(NSString *)fullPath
-											inFileViewerRootedAtPath:(NSString *)rootFullpath
-{
-  FSNode *node = [FSNode nodeWithPath: fullPath];
-  
-  if (node && [node isValid]) {
-    FSNode *base;
-  
-    if ((rootFullpath == nil) || ([rootFullpath length] == 0)) {
-      base = [FSNode nodeWithPath: path_separator()];
-    } else {
-      base = [FSNode nodeWithPath: rootFullpath];
-    }
-  
-    if (base && [base isValid]) {
-      if (([base isDirectory] == NO) || [base isPackage]) {
-        return NO;
-      }
-    
-      [vwrsManager selectRepOfNode: node inViewerWithBaseNode: base];
-      return YES;
-    }
-  }
-   
-  return NO;
-}
-
-- (void)showRootViewer
-{
-  id viewer = [vwrsManager rootViewer];
-  
-  if (viewer == nil) {
-    [vwrsManager showRootViewer];
-  } else {
-    [viewer activate];
-  }
-}
-
-- (void)rootViewerSelectFiles:(NSArray *)paths
-{
-  NSString *path = [[paths objectAtIndex: 0] stringByDeletingLastPathComponent];
-  FSNode *parentnode = [FSNode nodeWithPath: path];
-  NSArray *selection = [NSArray arrayWithArray: paths];
-  id viewer = [vwrsManager rootViewer];
-  id nodeView = nil;
-  BOOL newviewer = NO;
-
-  if ([paths count] == 1) {
-    FSNode *node = [FSNode nodeWithPath: [paths objectAtIndex: 0]];
-  
-    if ([node isDirectory] && ([node isPackage] == NO)) {
-      parentnode = [FSNode nodeWithPath: [node path]];
-      selection = [NSArray arrayWithObject: [node path]];
-    }
-  }
-    
-  if (viewer == nil) {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSString *path = path_separator();
-    NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", path];
-    NSDictionary *viewerPrefs = [defaults objectForKey: prefsname];
-    int type = BROWSING;
-    
-    if (viewerPrefs) {
-      id entry = [viewerPrefs objectForKey: @"spatial"];
-   
-      if (entry) {
-        type = ([entry boolValue] ? SPATIAL : BROWSING);
-      }
-    }
-  
-    if (type == BROWSING) {
-      viewer = [vwrsManager showRootViewer];
-    } else {
-      newviewer = YES;
-    }
-    
-  } else if ([viewer vtype] == SPATIAL) {
-    newviewer = YES;
-  } 
-  
-  if (newviewer) {
-    viewer = [vwrsManager newViewerOfType: SPATIAL
-                                 showType: nil
-                                  forNode: parentnode
-                            showSelection: NO
-                           closeOldViewer: NO
-                                 forceNew: NO];
-  }
-  
-  nodeView = [viewer nodeView];
-  
-  if ([viewer vtype] == BROWSING) {
-    [nodeView showContentsOfNode: parentnode];
-  }
-  
-  [nodeView selectRepsOfPaths: selection];
-  
-  if ([nodeView respondsToSelector: @selector(scrollSelectionToVisible)]) {
-    [nodeView scrollSelectionToVisible];
-  }
-}
-
-- (void)slideImage:(NSImage *)image 
-							from:(NSPoint)fromPoint 
-								to:(NSPoint)toPoint
-{
-	[[NSWorkspace sharedWorkspace] slideImage: image from: fromPoint to: toPoint];
-}
-
-- (void)openSelectedPaths:(NSArray *)paths newViewer:(BOOL)newv
-{
-  NSString *apath;
-  NSString *defApp, *type;
-  int i;
-  
-  [self setSelectedPaths: paths];      
-      
-  for (i = 0; i < [paths count]; i++) {
-    apath = [paths objectAtIndex: i];
-    
-    [ws getInfoForFile: apath application: &defApp type: &type];     
-    
-    if ((type == NSDirectoryFileType) || (type == NSFilesystemFileType)) {
-      if (newv) {    
-        [self newViewerAtPath: apath];    
-      }
-    } else if ((type == NSPlainFileType) 
-                        || ([type isEqual: NSShellCommandFileType])) {
-      [self openFile: apath];
-      
-    } else if (type == NSApplicationFileType) {
-      [ws launchApplication: apath];
-    }
-  }
-}
-
-- (void)openSelectedPathsWith
-{
-  BOOL found = NO;
-  int i;
-
-  for (i = 0; i < [selectedPaths count]; i++) {
-    NSString *spath = [selectedPaths objectAtIndex: i];
-    NSDictionary *attributes = [fm fileAttributesAtPath: spath traverseLink: YES];
-
-    if ([attributes objectForKey: NSFileType] != NSFileTypeDirectory) {
-      NSString *defApp, *fileType;
-
- 	    [ws getInfoForFile: spath application: &defApp type: &fileType];
-
-      if ((fileType != NSPlainFileType) && (fileType != NSShellCommandFileType)) {
-        found = YES;
-      }
-
-    }	else {
-      found = YES;
-    }
-
-    if (found) {
-      break;
-    }
-  }
-  
-  if (found == NO) {
-    [openWithController activate];
-  }
-}
-
-- (NSArray *)getSelectedPaths
-{
-  return selectedPaths;
-}
-
-- (NSString *)trashPath
-{
-	static NSString *tpath = nil; 
-  
-  if (tpath == nil) {
-    tpath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
-    tpath = [tpath stringByAppendingPathComponent: @"Desktop"];
-    tpath = [tpath stringByAppendingPathComponent: @".Trash"];
-    RETAIN (tpath);
-  }
-  
-  return tpath;
-}
-
-- (void)addWatcherForPath:(NSString *)path
-{
-  if (fswnotifications) {
-    [self connectFSWatcher];
-    [fswatcher client: self addWatcherForPath: path];
-  }
-}
-
-- (void)removeWatcherForPath:(NSString *)path
-{
-  if (fswnotifications) {
-    [self connectFSWatcher];
-    [fswatcher client: self removeWatcherForPath: path];
-  }
-}
-//
-// end of GWProtocol
-//
-
 + (void)initialize
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -373,6 +78,14 @@ static GWorkspace *gworkspace = nil;
   [defaults setObject: @"gworkspace" 
                forKey: @"DesktopApplicationSelName"];
   [defaults synchronize];
+}
+
++ (GWorkspace *)gworkspace
+{
+	if (gworkspace == nil) {
+		gworkspace = [[GWorkspace alloc] init];
+	}	
+  return gworkspace;
 }
 
 + (void)registerForServices
@@ -715,6 +428,109 @@ static GWorkspace *gworkspace = nil;
 - (id)rootViewer
 {
   return nil;
+}
+
+- (void)showRootViewer
+{
+  id viewer = [vwrsManager rootViewer];
+  
+  if (viewer == nil) {
+    [vwrsManager showRootViewer];
+  } else {
+    [viewer activate];
+  }
+}
+
+- (BOOL)selectFile:(NSString *)fullPath
+											inFileViewerRootedAtPath:(NSString *)rootFullpath
+{
+  FSNode *node = [FSNode nodeWithPath: fullPath];
+  
+  if (node && [node isValid]) {
+    FSNode *base;
+  
+    if ((rootFullpath == nil) || ([rootFullpath length] == 0)) {
+      base = [FSNode nodeWithPath: path_separator()];
+    } else {
+      base = [FSNode nodeWithPath: rootFullpath];
+    }
+  
+    if (base && [base isValid]) {
+      if (([base isDirectory] == NO) || [base isPackage]) {
+        return NO;
+      }
+    
+      [vwrsManager selectRepOfNode: node inViewerWithBaseNode: base];
+      return YES;
+    }
+  }
+   
+  return NO;
+}
+
+- (void)rootViewerSelectFiles:(NSArray *)paths
+{
+  NSString *path = [[paths objectAtIndex: 0] stringByDeletingLastPathComponent];
+  FSNode *parentnode = [FSNode nodeWithPath: path];
+  NSArray *selection = [NSArray arrayWithArray: paths];
+  id viewer = [vwrsManager rootViewer];
+  id nodeView = nil;
+  BOOL newviewer = NO;
+
+  if ([paths count] == 1) {
+    FSNode *node = [FSNode nodeWithPath: [paths objectAtIndex: 0]];
+  
+    if ([node isDirectory] && ([node isPackage] == NO)) {
+      parentnode = [FSNode nodeWithPath: [node path]];
+      selection = [NSArray arrayWithObject: [node path]];
+    }
+  }
+    
+  if (viewer == nil) {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString *path = path_separator();
+    NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", path];
+    NSDictionary *viewerPrefs = [defaults objectForKey: prefsname];
+    int type = BROWSING;
+    
+    if (viewerPrefs) {
+      id entry = [viewerPrefs objectForKey: @"spatial"];
+   
+      if (entry) {
+        type = ([entry boolValue] ? SPATIAL : BROWSING);
+      }
+    }
+  
+    if (type == BROWSING) {
+      viewer = [vwrsManager showRootViewer];
+    } else {
+      newviewer = YES;
+    }
+    
+  } else if ([viewer vtype] == SPATIAL) {
+    newviewer = YES;
+  } 
+  
+  if (newviewer) {
+    viewer = [vwrsManager newViewerOfType: SPATIAL
+                                 showType: nil
+                                  forNode: parentnode
+                            showSelection: NO
+                           closeOldViewer: NO
+                                 forceNew: NO];
+  }
+  
+  nodeView = [viewer nodeView];
+  
+  if ([viewer vtype] == BROWSING) {
+    [nodeView showContentsOfNode: parentnode];
+  }
+  
+  [nodeView selectRepsOfPaths: selection];
+  
+  if ([nodeView respondsToSelector: @selector(scrollSelectionToVisible)]) {
+    [nodeView scrollSelectionToVisible];
+  }
 }
 
 - (void)newViewerAtPath:(NSString *)path
@@ -1087,6 +903,109 @@ static GWorkspace *gworkspace = nil;
 }
 
 - (NSArray *)selectedPaths
+{
+  return selectedPaths;
+}
+
+- (void)openSelectedPaths:(NSArray *)paths newViewer:(BOOL)newv
+{
+  NSString *apath;
+  NSString *defApp, *type;
+  int i;
+  
+  [self setSelectedPaths: paths];      
+      
+  for (i = 0; i < [paths count]; i++) {
+    apath = [paths objectAtIndex: i];
+    
+    [ws getInfoForFile: apath application: &defApp type: &type];     
+    
+    if ((type == NSDirectoryFileType) || (type == NSFilesystemFileType)) {
+      if (newv) {    
+        [self newViewerAtPath: apath];    
+      }
+    } else if ((type == NSPlainFileType) 
+                        || ([type isEqual: NSShellCommandFileType])) {
+      [self openFile: apath];
+      
+    } else if (type == NSApplicationFileType) {
+      [ws launchApplication: apath];
+    }
+  }
+}
+
+- (void)openSelectedPathsWith
+{
+  BOOL found = NO;
+  int i;
+
+  for (i = 0; i < [selectedPaths count]; i++) {
+    NSString *spath = [selectedPaths objectAtIndex: i];
+    NSDictionary *attributes = [fm fileAttributesAtPath: spath traverseLink: YES];
+
+    if ([attributes objectForKey: NSFileType] != NSFileTypeDirectory) {
+      NSString *defApp, *fileType;
+
+ 	    [ws getInfoForFile: spath application: &defApp type: &fileType];
+
+      if ((fileType != NSPlainFileType) && (fileType != NSShellCommandFileType)) {
+        found = YES;
+      }
+
+    }	else {
+      found = YES;
+    }
+
+    if (found) {
+      break;
+    }
+  }
+  
+  if (found == NO) {
+    [openWithController activate];
+  }
+}
+
+- (BOOL)openFile:(NSString *)fullPath
+{
+	NSString *appName;
+  NSString *type;
+  
+  [ws getInfoForFile: fullPath application: &appName type: &type];
+  
+	if (appName == nil) {
+		appName = defEditor;
+	}		
+  
+  return [ws openFile: fullPath withApplication: appName];
+}
+
+- (BOOL)application:(NSApplication *)theApplication 
+           openFile:(NSString *)filename
+{
+  BOOL isDir;
+  
+  if ([filename isAbsolutePath] 
+                    && [fm fileExistsAtPath: filename isDirectory: &isDir]) {
+    if (isDir) {
+      if ([[filename pathExtension] isEqual: @"lsf"]) {
+        return [finder openLiveSearchFolderAtPath: filename];
+      } else {
+        [self newViewerAtPath: filename];
+        return YES;
+      }
+    } else {
+      [self selectFile: filename 
+        inFileViewerRootedAtPath: [filename stringByDeletingLastPathComponent]];
+      [self openFile: filename];
+      return YES;
+    }
+  } 
+
+  return NO;
+}
+
+- (NSArray *)getSelectedPaths
 {
   return selectedPaths;
 }
@@ -1793,6 +1712,51 @@ static GWorkspace *gworkspace = nil;
 	return app;
 }
 
+- (BOOL)performFileOperation:(NSString *)operation 
+                      source:(NSString *)source 
+                 destination:(NSString *)destination 
+                       files:(NSArray *)files 
+                         tag:(int *)tag
+{
+  NSMutableDictionary *opdict = [NSMutableDictionary dictionary];
+  NSData *data;
+
+  [opdict setObject: operation forKey: @"operation"];
+  [opdict setObject: source forKey: @"source"];
+  [opdict setObject: destination forKey: @"destination"];
+  [opdict setObject: files forKey: @"files"];
+
+  data = [NSArchiver archivedDataWithRootObject: opdict];
+
+  [fileOpsManager performOperation: data];
+  
+  return YES;
+}
+
+- (void)performFileOperationWithDictionary:(NSDictionary *)opdict
+{
+	NSString *operation = [opdict objectForKey: @"operation"];
+	NSString *source = [opdict objectForKey: @"source"];
+	NSString *destination = [opdict objectForKey: @"destination"];
+	NSArray *files = [opdict objectForKey: @"files"];
+	int tag;
+	
+	[self performFileOperation: operation source: source 
+											destination: destination files: files tag: &tag];
+}
+
+- (void)slideImage:(NSImage *)image 
+							from:(NSPoint)fromPoint 
+								to:(NSPoint)toPoint
+{
+	[[NSWorkspace sharedWorkspace] slideImage: image from: fromPoint to: toPoint];
+}
+
+- (int)extendPowerOffBy:(int)requested
+{
+  return 0;
+}
+
 
 //
 // NSServicesRequests protocol
@@ -2359,11 +2323,35 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
   }
 }
 
-// - (void)addWatcherForPath:(NSString *)path // already in GWProtocol
+- (void)addWatcherForPath:(NSString *)path
+{
+  if (fswnotifications) {
+    [self connectFSWatcher];
+    [fswatcher client: (id <FSWClientProtocol>)self addWatcherForPath: path];
+  }
+}
 
-// - (void)removeWatcherForPath:(NSString *)path // already in GWProtocol
+- (void)removeWatcherForPath:(NSString *)path
+{
+  if (fswnotifications) {
+    [self connectFSWatcher];
+    [fswatcher client: (id <FSWClientProtocol>)self removeWatcherForPath: path];
+  }
+}
 
-// - (NSString *)trashPath // already in GWProtocol
+- (NSString *)trashPath
+{
+	static NSString *tpath = nil; 
+  
+  if (tpath == nil) {
+    tpath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
+    tpath = [tpath stringByAppendingPathComponent: @"Desktop"];
+    tpath = [tpath stringByAppendingPathComponent: @".Trash"];
+    RETAIN (tpath);
+  }
+  
+  return tpath;
+}
 
 - (id)workspaceApplication
 {

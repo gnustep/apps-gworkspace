@@ -1069,7 +1069,22 @@
   }
   
   if (iconsType == FILES_TAB) {  
-    if ([[pb types] indexOfObject: NSFilenamesPboardType] == NSNotFound) {
+    if ([[pb types] indexOfObject: NSFilenamesPboardType] != NSNotFound) {
+      NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
+      
+      if ([sourcePaths count]) {
+        NSString *basePath = [sourcePaths objectAtIndex: 0];
+      
+        basePath = [basePath stringByDeletingLastPathComponent];
+        
+        if ([basePath isEqual: [gw trashPath]]) {
+          found = NO;
+        }
+      
+      } else {
+        found = NO;
+      }
+    } else {
       found = NO;
     }
   } else {

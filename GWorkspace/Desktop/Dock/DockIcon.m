@@ -73,6 +73,7 @@
     ASSIGN (appName, [[node name] stringByDeletingPathExtension]);
     isDocked = NO;
     isLaunched = NO;
+ //   manager = [GWDesktopManager desktopManager];
     nc = [NSNotificationCenter defaultCenter];
     fm = [NSFileManager defaultManager];
     ws = [NSWorkspace sharedWorkspace];
@@ -335,8 +336,7 @@
     
     } else if (isTrashIcon) {
       NSString *path = [node path];
-      [[GWDesktopManager desktopManager] selectFile: path 
-                           inFileViewerRootedAtPath: path];
+      [[GWDesktopManager desktopManager] selectFile: path inFileViewerRootedAtPath: path];
     }
   }  
 }
@@ -490,8 +490,10 @@ x += 6; \
     
   } else if (isTrashIcon) {
 	  NSString *fromPath = [[paths objectAtIndex: 0] stringByDeletingLastPathComponent];
-  
-    if ([fm isWritableFileAtPath: fromPath]) {
+    NSString *trashpath = [[GWDesktopManager desktopManager] trashPath];
+    
+    if ([fm isWritableFileAtPath: fromPath] 
+                          && ([fromPath isEqual: trashpath] == NO)) {
       [self select];
       return YES;
     } 

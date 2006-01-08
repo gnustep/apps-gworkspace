@@ -27,7 +27,6 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/NSApplication.h>
-#include "GWProtocol.h"
 
 #define NOEDIT 0
 #define NOXTERM 1
@@ -116,7 +115,7 @@
 @end 
 
 
-@interface GWorkspace : NSObject <GWProtocol, FSWClientProtocol>
+@interface GWorkspace : NSObject <FSWClientProtocol>
 {	
   FSNodeRep *fsnodeRep;
   
@@ -165,11 +164,9 @@
   NSWorkspace *ws;
 }
 
++ (GWorkspace *)gworkspace;
+
 + (void)registerForServices;
-
-- (void)applicationDidFinishLaunching:(NSNotification *)aNotification;
-
-- (BOOL)applicationShouldTerminate:(NSApplication *)app;
 
 - (NSString *)defEditor;
 
@@ -192,6 +189,13 @@
 - (NSString *)tshelfPBFilePath;
 
 - (id)rootViewer;
+
+- (void)showRootViewer;
+
+- (BOOL)selectFile:(NSString *)fullPath
+							inFileViewerRootedAtPath:(NSString *)rootFullpath;
+
+- (void)rootViewerSelectFiles:(NSArray *)paths;
 
 - (void)newViewerAtPath:(NSString *)path;
 
@@ -223,6 +227,18 @@
 - (void)resetSelectedPaths;
 
 - (NSArray *)selectedPaths;
+
+- (void)openSelectedPaths:(NSArray *)paths 
+                newViewer:(BOOL)newv;
+
+- (void)openSelectedPathsWith;
+
+- (BOOL)openFile:(NSString *)fullPath;
+
+- (BOOL)application:(NSApplication *)theApplication 
+           openFile:(NSString *)filename;
+
+- (NSArray *)getSelectedPaths;
 
 - (void)showPasteboardData:(NSData *)data 
                     ofType:(NSString *)type
@@ -279,6 +295,20 @@
                    forPath:(NSString *)path;
 
 - (id)connectApplication:(NSString *)appName;
+
+- (BOOL)performFileOperation:(NSString *)operation 
+                      source:(NSString *)source 
+                 destination:(NSString *)destination 
+                       files:(NSArray *)files 
+                         tag:(int *)tag;
+
+- (void)performFileOperationWithDictionary:(NSDictionary *)opdict;
+
+- (void)slideImage:(NSImage *)image 
+							from:(NSPoint)fromPoint 
+								to:(NSPoint)toPoint;
+
+- (int)extendPowerOffBy:(int)requested;
 
 
 //
@@ -371,11 +401,11 @@
 - (void)concludeRemoteFilesDragOperation:(NSData *)opinfo
                              atLocalPath:(NSString *)localPath;
 
-// - (void)addWatcherForPath:(NSString *)path; // already in GWProtocol
+- (void)addWatcherForPath:(NSString *)path;
 
-// - (void)removeWatcherForPath:(NSString *)path; // already in GWProtocol
+- (void)removeWatcherForPath:(NSString *)path;
 
-// - (NSString *)trashPath; // already in GWProtocol
+- (NSString *)trashPath;
 
 - (id)workspaceApplication;
 

@@ -1176,7 +1176,13 @@ static NSImage *branchImage;
             || (([node isWritable] == NO) && ([node isApplication] == NO))) {
     return NSDragOperationNone;
   }
-  	
+  
+  if ([node isDirectory]) {
+    if ([node isSubnodeOfPath: [desktopApp trashPath]]) { 
+      return NSDragOperationNone;
+    }
+  }	
+  
   if ([node isPackage] && ([node isApplication] == NO)) {
     if ([container respondsToSelector: @selector(baseNode)]) { 
       if ([node isEqual: [container baseNode]] == NO) {
@@ -1186,7 +1192,7 @@ static NSImage *branchImage;
       return NSDragOperationNone;
     }
   }
-    
+  
 	pb = [sender draggingPasteboard];
   sourcePaths = nil;
   

@@ -985,6 +985,7 @@
     NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
     int count = [sourcePaths count];
     FSNode *baseNode = [viewer baseNode];
+    NSString *basePath;
     int i;
         
 	  if (count == 0) {
@@ -998,7 +999,12 @@
         return NSDragOperationNone;
       } 
     }  
-  
+    
+    basePath = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
+    if ([basePath isEqual: [gworkspace trashPath]]) {
+      return NSDragOperationNone;
+    }
+    
     if (count == 1) {
       dragLocalIcon = ([self iconForPath: [sourcePaths objectAtIndex: 0]] != nil);
     } else {

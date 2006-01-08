@@ -1461,6 +1461,12 @@ static NSString *defaultColumns = @"{ \
               NSLocalizedString(@"You do not have write permission for ", @""), 
                   [ednode parentName]], NSLocalizedString(@"Continue", @""), nil, nil);   
     CLEAREDITING;
+
+  } else if ([ednode isSubnodeOfPath: [desktopApp trashPath]]) {
+    NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
+            NSLocalizedString(@"You can't rename an object that is in the Recycler", @""), 
+            NSLocalizedString(@"Continue", @""), nil, nil);   
+    CLEAREDITING;
     
   } else {
     NSString *newname = [nameEditor stringValue];
@@ -2164,6 +2170,14 @@ static NSString *defaultColumns = @"{ \
                     || [node isPackage] || ([node isWritable] == NO)) {
     return NSDragOperationNone;
   }
+
+  if ([node isDirectory]) {
+    id <DesktopApplication> desktopApp = [dataSource desktopApp];
+
+    if ([node isSubnodeOfPath: [desktopApp trashPath]]) { 
+      return NSDragOperationNone;
+    }
+  }	
   	
 	pb = [sender draggingPasteboard];
 

@@ -1081,7 +1081,7 @@
   NSPasteboard *pb;
 	NSArray *sourcePaths;
   NSString *path;
-  NSString *watched;
+  NSString *basepath;
   NSMutableArray *leaves;
   id leaf;
   NSRect r;
@@ -1102,8 +1102,13 @@
   leaves = [layers objectForKey: currentName];  
 
   path = [sourcePaths objectAtIndex: 0];
-  watched = [path stringByDeletingLastPathComponent];
-  
+  basepath = [path stringByDeletingLastPathComponent];
+
+  if ([basepath isEqual: [gw trashPath]]) {
+    isDragTarget = NO;
+    return;
+  }
+    
   for (i = 0; i < [leaves count]; i++) {
     leaf = [leaves objectAtIndex: i];    
     if ([[[leaf node] path] isEqual: path] == YES) {
@@ -1139,11 +1144,11 @@
   [leaves addObject: leaf];
   RELEASE (leaf);
   
-	if ([watchedPaths containsObject: watched] == NO) {
-    [gw addWatcherForPath: watched];
+	if ([watchedPaths containsObject: basepath] == NO) {
+    [gw addWatcherForPath: basepath];
 	}
   
-  [watchedPaths addObject: watched];
+  [watchedPaths addObject: basepath];
   
   leaf = [leaves objectAtIndex: [leaves count] -1];
   [[leaf window] display]; 

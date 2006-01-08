@@ -1009,85 +1009,128 @@
 
 - (void)openSelectionInNewViewer:(BOOL)newv
 {
-  NSArray *selection = [nodeView selectedNodes]; 
-    
-  if (selection && [selection count]) {
-    NSMutableArray *dirs = [NSMutableArray array];
-    int i;
+  if ([[baseNode path] isEqual: [gworkspace trashPath]] == NO) {
+    NSArray *selection = [nodeView selectedNodes]; 
 
-    for (i = 0; i < [selection count]; i++) {
-      FSNode *node = [selection objectAtIndex: i];
+    if (selection && [selection count]) {
+      NSMutableArray *dirs = [NSMutableArray array];
+      int i;
 
-      if ([node isDirectory]) {
-        if ([node isPackage]) {    
-          if ([node isApplication] == NO) {
-            [gworkspace openFile: [node path]];
+      for (i = 0; i < [selection count]; i++) {
+        FSNode *node = [selection objectAtIndex: i];
+
+        if ([node isDirectory]) {
+          if ([node isPackage]) {    
+            if ([node isApplication] == NO) {
+              [gworkspace openFile: [node path]];
+            } else {
+              [[NSWorkspace sharedWorkspace] launchApplication: [node path]];
+            }
           } else {
-            [[NSWorkspace sharedWorkspace] launchApplication: [node path]];
+            [dirs addObject: node];
           }
         } else {
-          [dirs addObject: node];
+          [gworkspace openFile: [node path]];
         }
-      } else {
-        [gworkspace openFile: [node path]];
       }
-    }
-    
-    if (([dirs count] == 1) && ([selection count] == 1)) {
-      if (newv == NO) {
-        if ([nodeView isSingleNode]) {
-          [nodeView showContentsOfNode: [dirs objectAtIndex: 0]];
-          [self scrollToBeginning];
+
+      if (([dirs count] == 1) && ([selection count] == 1)) {
+        if (newv == NO) {
+          if ([nodeView isSingleNode]) {
+            [nodeView showContentsOfNode: [dirs objectAtIndex: 0]];
+            [self scrollToBeginning];
+          }
+        } else {
+          [manager openAsFolderSelectionInViewer: self];
         }
-      } else {
-        [manager openAsFolderSelectionInViewer: self];
       }
+
+    } else if (newv) {
+      [manager openAsFolderSelectionInViewer: self];
     }
-    
-  } else if (newv) {
-    [manager openAsFolderSelectionInViewer: self];
+  
+  } else {
+    NSRunAlertPanel(nil, 
+                  NSLocalizedString(@"You can't open a document that is in the Recycler!", @""),
+					        NSLocalizedString(@"OK", @""), 
+                  nil, 
+                  nil);  
   }
 }
 
 - (void)openSelectionAsFolder
 {
-  [manager openAsFolderSelectionInViewer: self];
+  if ([[baseNode path] isEqual: [gworkspace trashPath]] == NO) {
+    [manager openAsFolderSelectionInViewer: self];
+  } else {
+    NSRunAlertPanel(nil, 
+                  NSLocalizedString(@"You can't do this in the Recycler!", @""),
+					        NSLocalizedString(@"OK", @""), 
+                  nil, 
+                  nil);  
+  }
 }
 
 - (void)newFolder
 {
-  [gworkspace newObjectAtPath: [[nodeView shownNode] path] 
-                  isDirectory: YES];
+  if ([[baseNode path] isEqual: [gworkspace trashPath]] == NO) {
+    [gworkspace newObjectAtPath: [[nodeView shownNode] path] 
+                    isDirectory: YES];
+  } else {
+    NSRunAlertPanel(nil, 
+                  NSLocalizedString(@"You can't create a new folder in the Recycler!", @""),
+					        NSLocalizedString(@"OK", @""), 
+                  nil, 
+                  nil);  
+  }
 }
 
 - (void)newFile
 {
-  [gworkspace newObjectAtPath: [[nodeView shownNode] path] 
-                  isDirectory: NO];
+  if ([[baseNode path] isEqual: [gworkspace trashPath]] == NO) {
+    [gworkspace newObjectAtPath: [[nodeView shownNode] path] 
+                    isDirectory: NO];
+  } else {
+    NSRunAlertPanel(nil, 
+                  NSLocalizedString(@"You can't create a new file in the Recycler!", @""),
+					        NSLocalizedString(@"OK", @""), 
+                  nil, 
+                  nil);  
+  }
 }
 
 - (void)duplicateFiles
 {
-  NSArray *selection = [nodeView selectedNodes];
+  if ([[baseNode path] isEqual: [gworkspace trashPath]] == NO) {
+    NSArray *selection = [nodeView selectedNodes];
 
-  if (selection && [selection count]) {
-    if ([nodeView isSingleNode]) {
-      [gworkspace duplicateFiles];
-    } else if ([selection isEqual: [NSArray arrayWithObject: baseNode]] == NO) {
-      [gworkspace duplicateFiles];
+    if (selection && [selection count]) {
+      if ([nodeView isSingleNode]) {
+        [gworkspace duplicateFiles];
+      } else if ([selection isEqual: [NSArray arrayWithObject: baseNode]] == NO) {
+        [gworkspace duplicateFiles];
+      }
     }
+  } else {
+    NSRunAlertPanel(nil, 
+                  NSLocalizedString(@"You can't duplicate files in the Recycler!", @""),
+					        NSLocalizedString(@"OK", @""), 
+                  nil, 
+                  nil);  
   }
 }
 
 - (void)recycleFiles
 {
-  NSArray *selection = [nodeView selectedNodes];
+  if ([[baseNode path] isEqual: [gworkspace trashPath]] == NO) {
+    NSArray *selection = [nodeView selectedNodes];
 
-  if (selection && [selection count]) {
-    if ([nodeView isSingleNode]) {
-      [gworkspace moveToTrash];
-    } else if ([selection isEqual: [NSArray arrayWithObject: baseNode]] == NO) {
-      [gworkspace moveToTrash];
+    if (selection && [selection count]) {
+      if ([nodeView isSingleNode]) {
+        [gworkspace moveToTrash];
+      } else if ([selection isEqual: [NSArray arrayWithObject: baseNode]] == NO) {
+        [gworkspace moveToTrash];
+      }
     }
   }
 }
@@ -1387,14 +1430,21 @@
 
     if (selection && [selection count]) {
       if ([nodeView isSingleNode]) {
-        return YES;
+        if ([itemTitle isEqual: NSLocalizedString(@"Move to Recycler", @"")]) {
+          return ([[baseNode path] isEqual: [gworkspace trashPath]] == NO);
+        } else {
+          return YES;
+        }
       } else if ([selection isEqual: [NSArray arrayWithObject: baseNode]] == NO) {
-        return YES;
+        if ([itemTitle isEqual: NSLocalizedString(@"Move to Recycler", @"")]) {
+          return ([[baseNode path] isEqual: [gworkspace trashPath]] == NO);
+        } else {
+          return YES;
+        }
       }
     }
     
     return NO;
-    
   }
 
   return YES;

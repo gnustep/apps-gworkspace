@@ -1149,6 +1149,12 @@ static id <DesktopApplication> desktopApp = nil;
   if ((shownNode == nil) || ([shownNode isValid] == NO)) {
     return NSDragOperationNone;
   }
+
+  if ([shownNode isDirectory]) {
+    if ([shownNode isSubnodeOfPath: [desktopApp trashPath]]) { 
+      return NSDragOperationNone;
+    }
+  }	
   
  	pb = [sender draggingPasteboard];
 
@@ -1348,6 +1354,12 @@ static id <DesktopApplication> desktopApp = nil;
     return NSDragOperationNone;
   }
 
+  if ([node isDirectory]) {
+    if ([node isSubnodeOfPath: [desktopApp trashPath]]) { 
+      return NSDragOperationNone;
+    }
+  }	
+ 
   sourcePaths = nil;
 
   if ([[pb types] containsObject: NSFilenamesPboardType]) {
