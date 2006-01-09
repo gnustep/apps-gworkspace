@@ -30,6 +30,8 @@
 #include "GNUstep.h"
 
 #define PROGR_STEPS (100.0)
+static BOOL stopped = NO;
+static BOOL paused = NO;
 
 static NSString *nibName = @"FileOperationWin";
 
@@ -245,16 +247,6 @@ static NSString *nibName = @"FileOperationWin";
       [self endOperation];
     }
   NS_ENDHANDLER
-
-  [nc addObserver: self
-         selector: @selector(threadWillExit:)
-             name: NSThreadWillExitNotification
-           object: nil];    
-}
-
-- (void)threadWillExit:(NSNotification *)notification
-{
-  NSLog(@"operation thread will exit");
 }
 
 - (int)requestUserConfirmationWithMessage:(NSString *)message 
@@ -278,24 +270,21 @@ static NSString *nibName = @"FileOperationWin";
 
 - (IBAction)pause:(id)sender
 {
-  if (executor) {  
-	  if ([executor isPaused] == NO) {
-		  [pauseButt setTitle: NSLocalizedString(@"Continue", @"")];
-		  [stopButt setEnabled: NO];	
-      [executor Pause];
-	  } else {
-		  [pauseButt setTitle: NSLocalizedString(@"Pause", @"")];
-		  [stopButt setEnabled: YES];	
-		  [executor performOperation];
-	  }
-  }
+	if (paused == NO) {
+		[pauseButt setTitle: NSLocalizedString(@"Continue", @"")];
+		[stopButt setEnabled: NO];	
+    paused = YES;
+	} else {
+		[pauseButt setTitle: NSLocalizedString(@"Pause", @"")];
+		[stopButt setEnabled: YES];	
+    paused = NO;
+		[executor performOperation];
+	}
 }
 
 - (IBAction)stop:(id)sender
 {
-  if (executor) {
-	  [executor Stop];
-  }
+  stopped = YES;   
 }
 
 - (void)showProgressWin
@@ -506,7 +495,10 @@ static NSString *nibName = @"FileOperationWin";
     [self showProgressWin];
   }
 
-  [self sendWillChangeNotification];  
+  [self sendWillChangeNotification]; 
+  
+  stopped = NO;
+  paused = NO;   
   [executor calculateNumFiles];
 }
 
@@ -630,8 +622,6 @@ static NSString *nibName = @"FileOperationWin";
   
   if (self) {
     fm = [NSFileManager defaultManager];
-		stopped = NO;
-		paused = NO;  
 		samename = NO;
     onlyolder = NO;
   }
@@ -802,8 +792,6 @@ static NSString *nibName = @"FileOperationWin";
 - (oneway void)performOperation
 {
 	canupdate = YES; 
-  stopped = NO;
-  paused = NO;
           
 	if ([operation isEqual: @"NSWorkspaceMoveOperation"]
 						|| [operation isEqual: @"GWorkspaceRecycleOutOperation"]) {
@@ -1109,21 +1097,6 @@ filename =  [fileinfo objectForKey: @"name"]
   return YES;
 }
 
-- (void)Pause
-{
-  paused = YES;
-}
-
-- (void)Stop
-{
-  stopped = YES;
-}
-
-- (BOOL)isPaused
-{
-  return paused;
-}
-
 - (void)done
 {
   [fileOp sendDidChangeNotification];
@@ -1199,6 +1172,10 @@ filename =  [fileinfo objectForKey: @"name"]
       [fileOp setProgIndicatorValue: fcount];
     }
   }
+  
+  if (stopped) {
+    [self done];
+  }                                             
 }
 
 @end
@@ -1219,7 +1196,10 @@ filename =  [fileinfo objectForKey: @"name"]
   self = [super initWithFrame: frameRect];
 
   if (self) {
-    ASSIGN (image, [NSImage imageNamed: @"progind.tiff"]);
+    NSBundle *bundle = [NSBundle bundleForClass: [Operation class]];
+    NSString *path = [bundle pathForResource: @"progind" ofType: @"tiff"];
+ 
+    image = [[NSImage alloc] initWithContentsOfFile: path];     
     rfsh = refresh;
     orx = PROG_IND_MAX;
   }

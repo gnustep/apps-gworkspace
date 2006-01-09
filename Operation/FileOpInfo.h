@@ -138,8 +138,6 @@
 
 - (void)startOperation;
 
-- (void)threadWillExit:(NSNotification *)notification;
-
 - (int)requestUserConfirmationWithMessage:(NSString *)message 
                                     title:(NSString *)title;
 
@@ -196,8 +194,6 @@
   int fcount;
   float progstep;
   int stepcount;
-	BOOL stopped;
-	BOOL paused;
 	BOOL canupdate;
   BOOL samename;
   BOOL onlyolder;
@@ -221,12 +217,6 @@
 - (void)performOperation;
 
 - (NSData *)processedFiles;
-
-- (void)Pause;
-
-- (void)Stop;
-
-- (BOOL)isPaused;
 
 - (void)done;
 
