@@ -603,6 +603,8 @@ static GWDesktopManager *desktopManager = nil;
     FSNode *node = [[selreps objectAtIndex: i] node];
     NSString *path = [node path];
         
+    NS_DURING
+      {
     if ([node isDirectory]) {
       if ([node isPackage]) {    
         if ([node isApplication] == NO) {
@@ -616,6 +618,17 @@ static GWDesktopManager *desktopManager = nil;
     } else if ([node isPlain]) {        
       [gworkspace openFile: path];
     }
+      }
+    NS_HANDLER
+      {
+        NSRunAlertPanel(NSLocalizedString(@"error", @""), 
+            [NSString stringWithFormat: @"%@ %@!", 
+                      NSLocalizedString(@"Can't open ", @""), [node name]],
+                                          NSLocalizedString(@"OK", @""), 
+                                          nil, 
+                                          nil);                                     
+      }
+    NS_ENDHANDLER
   }
 }
 

@@ -514,7 +514,20 @@ x += 6; \
       FSNode *nod = [FSNode nodeWithPath: path];
 
       if ([nod isPlain] || ([nod isPackage] && ([nod isApplication] == NO))) {
-        [ws openFile: [paths objectAtIndex: i] withApplication: appName];
+        NS_DURING
+          {
+        [ws openFile: path withApplication: appName];
+          }
+        NS_HANDLER
+          {
+        NSRunAlertPanel(NSLocalizedString(@"error", @""), 
+            [NSString stringWithFormat: @"%@ %@!", 
+                NSLocalizedString(@"Can't open ", @""), [path lastPathComponent]],
+                                          NSLocalizedString(@"OK", @""), 
+                                          nil, 
+                                          nil);                                     
+          }
+        NS_ENDHANDLER  
       }
     }
 

@@ -590,7 +590,9 @@ static GWViewersManager *vwrsmanager = nil;
     
   for (i = 0; i < [selreps count]; i++) {
     FSNode *node = [[selreps objectAtIndex: i] node];
-        
+                
+    NS_DURING
+      {
     if ([node isDirectory]) {
       if ([node isPackage]) {    
         if ([node isApplication] == NO) {
@@ -609,6 +611,17 @@ static GWViewersManager *vwrsmanager = nil;
     } else if ([node isPlain]) {        
       [gworkspace openFile: [node path]];
     }
+      }
+    NS_HANDLER
+      {
+        NSRunAlertPanel(NSLocalizedString(@"error", @""), 
+            [NSString stringWithFormat: @"%@ %@!", 
+                      NSLocalizedString(@"Can't open ", @""), [node name]],
+                                          NSLocalizedString(@"OK", @""), 
+                                          nil, 
+                                          nil);                                     
+      }
+    NS_ENDHANDLER
   }
 
   if (close) {

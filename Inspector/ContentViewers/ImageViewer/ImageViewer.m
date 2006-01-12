@@ -422,7 +422,20 @@
   [ws getInfoForFile: editPath application: &appName type: &type];
 
 	if (appName) {
-		[ws openFile: editPath withApplication: appName];
+    NS_DURING
+      {
+    [ws openFile: editPath withApplication: appName];
+      }
+    NS_HANDLER
+      {
+    NSRunAlertPanel(NSLocalizedString(@"error", @""), 
+        [NSString stringWithFormat: @"%@ %@!", 
+          NSLocalizedString(@"Can't open ", @""), [editPath lastPathComponent]],
+                                      NSLocalizedString(@"OK", @""), 
+                                      nil, 
+                                      nil);                                     
+      }
+    NS_ENDHANDLER  
 	}
 }
 

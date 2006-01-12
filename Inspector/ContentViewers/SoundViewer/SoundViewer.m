@@ -166,7 +166,20 @@
   [ws getInfoForFile: soundPath application: &appName type: &type];
 
 	if (appName != nil) {
-		[ws openFile: soundPath withApplication: appName];
+    NS_DURING
+      {
+    [ws openFile: soundPath withApplication: appName];
+      }
+    NS_HANDLER
+      {
+    NSRunAlertPanel(NSLocalizedString(@"error", @""), 
+        [NSString stringWithFormat: @"%@ %@!", 
+          NSLocalizedString(@"Can't open ", @""), [soundPath lastPathComponent]],
+                                      NSLocalizedString(@"OK", @""), 
+                                      nil, 
+                                      nil);                                     
+      }
+    NS_ENDHANDLER  
 	}
 }
 

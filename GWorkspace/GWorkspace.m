@@ -918,6 +918,8 @@ static GWorkspace *gworkspace = nil;
   for (i = 0; i < [paths count]; i++) {
     apath = [paths objectAtIndex: i];
     
+    NS_DURING
+      {
     [ws getInfoForFile: apath application: &defApp type: &type];     
     
     if ((type == NSDirectoryFileType) || (type == NSFilesystemFileType)) {
@@ -931,6 +933,17 @@ static GWorkspace *gworkspace = nil;
     } else if (type == NSApplicationFileType) {
       [ws launchApplication: apath];
     }
+      }
+    NS_HANDLER
+      {
+        NSRunAlertPanel(NSLocalizedString(@"error", @""), 
+            [NSString stringWithFormat: @"%@ %@!", 
+             NSLocalizedString(@"Can't open ", @""), [apath lastPathComponent]],
+                                          NSLocalizedString(@"OK", @""), 
+                                          nil, 
+                                          nil);                                     
+      }
+    NS_ENDHANDLER
   }
 }
 
@@ -970,6 +983,7 @@ static GWorkspace *gworkspace = nil;
 {
 	NSString *appName;
   NSString *type;
+  BOOL success;
   
   [ws getInfoForFile: fullPath application: &appName type: &type];
   
@@ -977,7 +991,23 @@ static GWorkspace *gworkspace = nil;
 		appName = defEditor;
 	}		
   
-  return [ws openFile: fullPath withApplication: appName];
+  NS_DURING
+    {
+  success = [ws openFile: fullPath withApplication: appName];
+    }
+  NS_HANDLER
+    {
+  NSRunAlertPanel(NSLocalizedString(@"error", @""), 
+      [NSString stringWithFormat: @"%@ %@!", 
+          NSLocalizedString(@"Can't open ", @""), [fullPath lastPathComponent]],
+                                    NSLocalizedString(@"OK", @""), 
+                                    nil, 
+                                    nil);                                     
+  success = NO;
+    }
+  NS_ENDHANDLER  
+  
+  return success;  
 }
 
 - (BOOL)application:(NSApplication *)theApplication 
@@ -2259,7 +2289,22 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
     int i;
     
     for (i = 0; i < [selectedPaths count]; i++) {
-      [ws openFile: [selectedPaths objectAtIndex: i] withApplication: appName];
+      NSString *path = [selectedPaths objectAtIndex: i];
+    
+      NS_DURING
+        {
+      [ws openFile: path withApplication: appName];
+        }
+      NS_HANDLER
+        {
+      NSRunAlertPanel(NSLocalizedString(@"error", @""), 
+          [NSString stringWithFormat: @"%@ %@!", 
+              NSLocalizedString(@"Can't open ", @""), [path lastPathComponent]],
+                                        NSLocalizedString(@"OK", @""), 
+                                        nil, 
+                                        nil);                                     
+        }
+      NS_ENDHANDLER  
     }
   }
 }

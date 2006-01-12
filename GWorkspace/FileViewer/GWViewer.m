@@ -1019,6 +1019,8 @@
       for (i = 0; i < [selection count]; i++) {
         FSNode *node = [selection objectAtIndex: i];
 
+        NS_DURING
+          {
         if ([node isDirectory]) {
           if ([node isPackage]) {    
             if ([node isApplication] == NO) {
@@ -1031,7 +1033,18 @@
           }
         } else {
           [gworkspace openFile: [node path]];
-        }
+        }      
+          }
+        NS_HANDLER
+          {
+            NSRunAlertPanel(NSLocalizedString(@"error", @""), 
+                [NSString stringWithFormat: @"%@ %@!", 
+                          NSLocalizedString(@"Can't open ", @""), [node name]],
+                                              NSLocalizedString(@"OK", @""), 
+                                              nil, 
+                                              nil);                                     
+          }
+        NS_ENDHANDLER
       }
 
       if (([dirs count] == 1) && ([selection count] == 1)) {

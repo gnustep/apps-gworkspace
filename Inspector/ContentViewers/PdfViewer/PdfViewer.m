@@ -383,7 +383,20 @@ const double PDFResolution = 72.0;
   [ws getInfoForFile: pdfPath application: &appName type: &type];
 
 	if (appName) {
-		[ws openFile: pdfPath withApplication: appName];
+    NS_DURING
+      {
+    [ws openFile: pdfPath withApplication: appName];
+      }
+    NS_HANDLER
+      {
+    NSRunAlertPanel(NSLocalizedString(@"error", @""), 
+        [NSString stringWithFormat: @"%@ %@!", 
+          NSLocalizedString(@"Can't open ", @""), [pdfPath lastPathComponent]],
+                                      NSLocalizedString(@"OK", @""), 
+                                      nil, 
+                                      nil);                                     
+      }
+    NS_ENDHANDLER  
 	}
 }
 

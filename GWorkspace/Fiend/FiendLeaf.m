@@ -249,8 +249,21 @@
   
 	  if ([theEvent clickCount] > 1) {   
       if ([node isApplication]) {
+        NS_DURING
+          {
         [ws launchApplication: [node path]];
         [self startDissolve];
+          }
+        NS_HANDLER
+          {
+        NSRunAlertPanel(NSLocalizedString(@"error", @""), 
+            [NSString stringWithFormat: @"%@ %@!", 
+                  NSLocalizedString(@"Can't open ", @""), [node name]],
+                                          NSLocalizedString(@"OK", @""), 
+                                          nil, 
+                                          nil);                                     
+          }
+        NS_ENDHANDLER  
 
       } else if ([node isPlain] || [node isDirectory] || [node isMountPoint]) { 
         NSArray *paths = [NSArray arrayWithObjects: [node path], nil];    
@@ -565,7 +578,20 @@
       FSNode *draggednode = [FSNode nodeWithPath: [sourcePaths objectAtIndex: i]];
       
       if ([draggednode isPlain]) {
+        NS_DURING
+          {
         [ws openFile: [draggednode path] withApplication: [node path]];
+          }
+        NS_HANDLER
+          {
+        NSRunAlertPanel(NSLocalizedString(@"error", @""), 
+            [NSString stringWithFormat: @"%@ %@!", 
+                  NSLocalizedString(@"Can't open ", @""), [draggednode name]],
+                                          NSLocalizedString(@"OK", @""), 
+                                          nil, 
+                                          nil);                                     
+          }
+        NS_ENDHANDLER  
       }
     }
   }

@@ -411,7 +411,21 @@ static NSString *nibName = @"Tools";
   
   for (i = 0; i < [insppaths count]; i++) {
     NSString *fpath = [insppaths objectAtIndex: i];
-	  [ws openFile: fpath withApplication: [[sender selectedCell] title]];
+        
+    NS_DURING
+      {
+    [ws openFile: fpath withApplication: [[sender selectedCell] title]];
+      }
+    NS_HANDLER
+      {
+    NSRunAlertPanel(NSLocalizedString(@"error", @""), 
+        [NSString stringWithFormat: @"%@ %@!", 
+          NSLocalizedString(@"Can't open ", @""), [fpath lastPathComponent]],
+                                      NSLocalizedString(@"OK", @""), 
+                                      nil, 
+                                      nil);                                     
+      }
+    NS_ENDHANDLER  
   }
 }
 

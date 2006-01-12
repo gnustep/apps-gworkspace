@@ -745,10 +745,30 @@
 
   } else {  
     for (i = 0; i < [sourcePaths count]; i++) {    
-      [[NSWorkspace sharedWorkspace] openFile: [sourcePaths objectAtIndex: i] 
+      NSString *path = [sourcePaths objectAtIndex: i];
+    
+      NS_DURING
+        {
+      [[NSWorkspace sharedWorkspace] openFile: path 
                               withApplication: [node name]];
+        }
+      NS_HANDLER
+        {
+      NSRunAlertPanel(NSLocalizedString(@"error", @""), 
+          [NSString stringWithFormat: @"%@ %@!", 
+                    NSLocalizedString(@"Can't open ", @""), [node name]],
+                                        NSLocalizedString(@"OK", @""), 
+                                        nil, 
+                                        nil);                                     
+        }
+      NS_ENDHANDLER  
     }
   }
 }
 
 @end
+
+
+
+
+
