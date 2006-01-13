@@ -254,7 +254,7 @@ static NSString *nibName = @"FileOperationWin";
 {  
   return NSRunAlertPanel(NSLocalizedString(title, @""),
 												 NSLocalizedString(message, @""),
-											   NSLocalizedString(@"OK", @""), 
+											   NSLocalizedString(@"Ok", @""), 
 												 NSLocalizedString(@"Cancel", @""), 
                          nil);       
 }
@@ -263,7 +263,7 @@ static NSString *nibName = @"FileOperationWin";
 {  
   return NSRunAlertPanel(nil, 
                          NSLocalizedString(message, @""), 
-												 NSLocalizedString(@"Continue", @""), 
+												 NSLocalizedString(@"Ok", @""), 
                          nil, 
                          nil);
 }
@@ -826,22 +826,24 @@ if (([files count] == 0) || stopped || paused) break
 
 #define GET_FILENAME \
 fileinfo = [files objectAtIndex: 0]; \
-filename =  [fileinfo objectForKey: @"name"]
+RETAIN (fileinfo); \
+filename = [fileinfo objectForKey: @"name"]; 
 
 - (void)doMove
 {
   while (1) {
+	  CHECK_DONE;	
 	  GET_FILENAME;    
 
     if ((samename == NO) || (samename && [self removeExisting: fileinfo])) {
-	    [fm movePath: [source stringByAppendingPathComponent: filename]
-				    toPath: [destination stringByAppendingPathComponent: filename]
-	 		     handler: self];
-      [procfiles addObject: filename];	
+	    if ([fm movePath: [source stringByAppendingPathComponent: filename]
+				        toPath: [destination stringByAppendingPathComponent: filename]
+	 		         handler: self]) {          
+        [procfiles addObject: filename];	
+      }
     }
-	  [files removeObject: fileinfo];	
-    
-	  CHECK_DONE;	
+ 	  [files removeObject: fileinfo];	
+    RELEASE (fileinfo);
   }
   
   if (([files count] == 0) || stopped) {
@@ -852,17 +854,18 @@ filename =  [fileinfo objectForKey: @"name"]
 - (void)doCopy
 {
   while (1) {
+	  CHECK_DONE;	
 	  GET_FILENAME;   
 
     if ((samename == NO) || (samename && [self removeExisting: fileinfo])) {
-	    [fm copyPath: [source stringByAppendingPathComponent: filename]
-				    toPath: [destination stringByAppendingPathComponent: filename]
-	 		    handler: self];
-      [procfiles addObject: filename];	     
+	    if ([fm copyPath: [source stringByAppendingPathComponent: filename]
+				        toPath: [destination stringByAppendingPathComponent: filename]
+	 		         handler: self]) {
+        [procfiles addObject: filename];	
+      }
     }
-	  [files removeObject: fileinfo];	 
-    
-	  CHECK_DONE;	
+	  [files removeObject: fileinfo];	
+    RELEASE (fileinfo); 
   }
 
   if (([files count] == 0) || stopped) {
@@ -873,18 +876,19 @@ filename =  [fileinfo objectForKey: @"name"]
 - (void)doLink
 {
   while (1) {
+	  CHECK_DONE;	
 	  GET_FILENAME;    
     
     if ((samename == NO) || (samename && [self removeExisting: fileinfo])) {
       NSString *dst = [destination stringByAppendingPathComponent: filename];
       NSString *src = [source stringByAppendingPathComponent: filename];
   
-      [fm createSymbolicLinkAtPath: dst pathContent: src];
-      [procfiles addObject: filename];	      
+      if ([fm createSymbolicLinkAtPath: dst pathContent: src]) {
+        [procfiles addObject: filename];	      
+      }
     }
-	  [files removeObject: fileinfo];	    
-    
-	  CHECK_DONE;	
+	  [files removeObject: fileinfo];	   
+    RELEASE (fileinfo);     
   }
 
   if (([files count] == 0) || stopped) {
@@ -895,15 +899,15 @@ filename =  [fileinfo objectForKey: @"name"]
 - (void)doRemove
 {
   while (1) {
-	  GET_FILENAME;  
-	
-	  [fm removeFileAtPath: [destination stringByAppendingPathComponent: filename]
-				         handler: self];
-
-    [procfiles addObject: filename];	 
-	  [files removeObject: fileinfo];	
-    
 	  CHECK_DONE;	
+	  GET_FILENAME;  
+	  
+	  if ([fm removeFileAtPath: [destination stringByAppendingPathComponent: filename]
+				             handler: self]) {
+      [procfiles addObject: filename];
+    }
+	  [files removeObject: fileinfo];	 
+    RELEASE (fileinfo);   
   }
 
   if (([files count] == 0) || stopped) {
@@ -922,7 +926,8 @@ filename =  [fileinfo objectForKey: @"name"]
 
   while (1) {
     int count = 1;
-    
+
+	  CHECK_DONE;    
 	  GET_FILENAME;  
 
 	  newname = [NSString stringWithString: filename];
@@ -952,14 +957,13 @@ filename =  [fileinfo objectForKey: @"name"]
       }
 	  }
 
-	  [fm copyPath: [destination stringByAppendingPathComponent: filename]
-				  toPath: destpath 
-			   handler: self];
-
-    [procfiles addObject: newname];	 
-	  [files removeObject: fileinfo];	   
-    
-	  CHECK_DONE;
+	  if ([fm copyPath: [destination stringByAppendingPathComponent: filename]
+				      toPath: destpath 
+			       handler: self]) {
+      [procfiles addObject: newname];	
+    }
+	  [files removeObject: fileinfo];
+    RELEASE (fileinfo);	       
   }
   
   if (([files count] == 0) || stopped) {
@@ -971,10 +975,11 @@ filename =  [fileinfo objectForKey: @"name"]
 {
 	GET_FILENAME;    
 
-	[fm movePath: source toPath: destination handler: self];
-         
-  [procfiles addObject: filename];	
-	[files removeObject: fileinfo];	
+	if ([fm movePath: source toPath: destination handler: self]) {         
+    [procfiles addObject: filename];
+  }
+	[files removeObject: fileinfo];
+  RELEASE (fileinfo);	
 
   [self done];
 }
@@ -983,11 +988,12 @@ filename =  [fileinfo objectForKey: @"name"]
 {
 	GET_FILENAME;  
 
-	[fm createDirectoryAtPath: [destination stringByAppendingPathComponent: filename]
-				         attributes: nil];
-
-  [procfiles addObject: filename];	 
+	if ([fm createDirectoryAtPath: [destination stringByAppendingPathComponent: filename]
+				             attributes: nil]) {
+    [procfiles addObject: filename];
+  }
 	[files removeObject: fileinfo];	
+  RELEASE (fileinfo);
 
   [self done];
 }
@@ -996,13 +1002,14 @@ filename =  [fileinfo objectForKey: @"name"]
 {
 	GET_FILENAME;  
 
-	[fm createFileAtPath: [destination stringByAppendingPathComponent: filename]
-				      contents: nil
-            attributes: nil];
-
-  [procfiles addObject: filename];	 
+	if ([fm createFileAtPath: [destination stringByAppendingPathComponent: filename]
+				          contents: nil
+                attributes: nil]) {
+    [procfiles addObject: filename];
+  }
 	[files removeObject: fileinfo];	
-
+  RELEASE (fileinfo);
+  
   [self done];
 }
 
@@ -1013,7 +1020,8 @@ filename =  [fileinfo objectForKey: @"name"]
 	NSString *newname;
   NSString *ntmp;
 
-  while (1) {    
+  while (1) {
+	  CHECK_DONE;      
 	  GET_FILENAME;  
 
     newname = [NSString stringWithString: filename];
@@ -1050,14 +1058,13 @@ filename =  [fileinfo objectForKey: @"name"]
 	    }
     }
 
-	  [fm movePath: [source stringByAppendingPathComponent: filename]
-				  toPath: destpath 
-			   handler: self];
-    
-    [procfiles addObject: newname];	 
-	  [files removeObject: fileinfo];	   
-    
-	  CHECK_DONE;
+	  if ([fm movePath: [source stringByAppendingPathComponent: filename]
+				      toPath: destpath 
+			       handler: self]) {
+      [procfiles addObject: newname];	
+    }
+	  [files removeObject: fileinfo];	 
+    RELEASE (fileinfo);  
   }
   
   if (([files count] == 0) || stopped) {
@@ -1097,6 +1104,21 @@ filename =  [fileinfo objectForKey: @"name"]
   return YES;
 }
 
+- (NSDictionary *)infoForFilename:(NSString *)name
+{
+  int i;
+
+  for (i = 0; i < [files count]; i++) {
+    NSDictionary *info = [files objectAtIndex: i];
+
+    if ([[info objectForKey: @"name"] isEqual: name]) {
+      return info;
+    }
+  }
+  
+  return nil;
+}
+
 - (void)done
 {
   [fileOp sendDidChangeNotification];
@@ -1111,54 +1133,67 @@ filename =  [fileinfo objectForKey: @"name"]
 - (BOOL)fileManager:(NSFileManager *)manager 
               shouldProceedAfterError:(NSDictionary *)errorDict
 {  
-  NSString *path, *msg;
-  BOOL iserror = NO;
+  NSString *path;
+  NSString *error;
+  NSString *msg;
   int result;
-  
-  path = [errorDict objectForKey: @"Path"];
+
+  error = [errorDict objectForKey: @"Error"];
+
+  if ([error hasPrefix: @"Unable to change NSFileOwnerAccountID to to"]
+        || [error hasPrefix: @"Unable to change NSFileOwnerAccountName to"]
+        || [error hasPrefix: @"Unable to change NSFileGroupOwnerAccountID to"]
+        || [error hasPrefix: @"Unable to change NSFileGroupOwnerAccountName to"]
+        || [error hasPrefix: @"Unable to change NSFilePosixPermissions to"]
+        || [error hasPrefix: @"Unable to change NSFileModificationDate to"]) {
+    return YES;
+  }
+
+  path = [NSString stringWithString: [errorDict objectForKey: @"Path"]];
   
   msg = [NSString stringWithFormat: @"%@ %@\n%@ %@\n",
 							NSLocalizedString(@"File operation error:", @""),
-							[errorDict objectForKey: @"Error"],
+							error,
 							NSLocalizedString(@"with file:", @""),
 							path];
 
   result = [fileOp requestUserConfirmationWithMessage: msg title: @"Error"];
     
   if (result != NSAlertDefaultReturn) {
-    [fileOp sendDidChangeNotification];
-    [fileOp endOperation];
+    [self done];
     
 	} else {  
-    NSString *fname = [path lastPathComponent];
     BOOL found = NO;
     
-    while (1) {     
-      if ([path isEqualToString: source] == YES) {
+    while (1) { 
+      NSDictionary *info = [self infoForFilename: [path lastPathComponent]];
+          
+      if ([path isEqual: source]) {
         break;      
       }    
      
-      if ([files containsObject: fname] == YES) {
-        [files removeObject: fname];
+      if (info) {
+        [files removeObject: info];
         found = YES;
         break;
       }
          
       path = [path stringByDeletingLastPathComponent];
-      fname = [path lastPathComponent];
     }   
     
-    if (found) {
-      [self performOperation]; 
+    if ([files count]) {
+      if (found) {
+        [self performOperation]; 
+      } else {
+        result = [fileOp showErrorAlertWithMessage: @"File Operation Error!"];
+        [self done];
+      }
     } else {
-      result = [fileOp showErrorAlertWithMessage: @"File Operation Error!"];
-      [fileOp sendDidChangeNotification];
-      [fileOp endOperation];
-      return NO;
+      [self done];
     }
   }
   
-	return !iserror;
+	return YES;
 }
 
 - (void)fileManager:(NSFileManager *)manager willProcessPath:(NSString *)path

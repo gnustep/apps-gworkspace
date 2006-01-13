@@ -138,11 +138,6 @@ static GWDesktopManager *desktopManager = nil;
                 				  selector: @selector(mountedVolumeDidUnmount:) 
                 					    name: NSWorkspaceDidUnmountNotification
                 					  object: nil];
-
-    [nc addObserver: self
-           selector: @selector(mountThreadWillExit:)
-               name: NSThreadWillExitNotification
-             object: nil];
   }
   
   return self;
@@ -548,11 +543,6 @@ static GWDesktopManager *desktopManager = nil;
     [fsnodeRep unlockPaths: [NSArray arrayWithObject: volpath]];
     [[self desktopView] workspaceDidUnmountVolumeAtPath: volpath];
   }
-}
-
-- (void)mountThreadWillExit:(NSNotification *)notif
-{
-  NSLog(@"mount thread will exit");
 }
 
 - (void)updateDefaults

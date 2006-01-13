@@ -242,6 +242,8 @@
 
 - (BOOL)removeExisting:(NSDictionary *)info;
 
+- (NSDictionary *)infoForFilename:(NSString *)name;
+
 @end 
 
 

@@ -141,8 +141,6 @@ typedef enum DockPosition {
 
 - (void)mountedVolumeDidUnmount:(NSNotification *)notif;
 
-- (void)mountThreadWillExit:(NSNotification *)notif;
-
 - (void)updateDefaults;
 
 @end
