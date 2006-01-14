@@ -247,6 +247,38 @@
 @end 
 
 
+@protocol FMProtocol
+
+- (BOOL)_copyPath:(NSString *)source
+	         toPath:(NSString *)destination
+	        handler:(id)handler;
+
+- (BOOL)_copyFile:(NSString *)source
+	         toFile:(NSString *)destination
+	        handler:(id)handler;
+
+- (void)_sendToHandler:(id)handler
+       willProcessPath:(NSString *)path;
+
+- (BOOL)_proceedAccordingToHandler:(id)handler
+                          forError:(NSString *)error
+                            inPath:(NSString *)path;
+
+- (BOOL)_proceedAccordingToHandler:(id)handler
+                          forError:(NSString *)error
+                            inPath:(NSString *)path
+                          fromPath:(NSString *)fromPath
+                            toPath:(NSString *)toPath;
+
+@end
+
+
+@interface NSFileManager (FileOp)
+
+
+@end
+
+
 @interface OpProgressView : NSView 
 {
   NSImage *image;

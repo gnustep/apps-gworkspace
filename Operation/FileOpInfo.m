@@ -1215,6 +1215,184 @@ filename = [fileinfo objectForKey: @"name"];
 
 @end
 
+
+@implementation NSFileManager (FileOp)
+
+- (BOOL)copyPath:(NSString *)source
+	        toPath:(NSString *)destination
+	       handler:(id)handler
+{
+  NSDictionary *attrs;
+  NSString *fileType;
+
+  if ([self fileExistsAtPath: destination] == YES) {
+    return NO;
+  }
+  attrs = [self fileAttributesAtPath: source traverseLink: NO];
+  if (attrs == nil) {
+    return NO;
+  }
+  fileType = [attrs fileType];
+  if ([fileType isEqualToString: NSFileTypeDirectory] == YES) {
+    /* If destination directory is a descendant of source directory copying
+	  isn't possible. */
+    if ([[destination stringByAppendingString: @"/"]
+	                  hasPrefix: [source stringByAppendingString: @"/"]]) {
+	    return NO;
+	  }
+
+    [(id <FMProtocol>)self _sendToHandler: handler willProcessPath: destination];
+
+    if ([self fileExistsAtPath: destination]) {
+      return NO;
+    }
+
+    if ([self createDirectoryAtPath: destination attributes: attrs] == NO) {
+      BOOL isdir;
+      
+      if (([self fileExistsAtPath: destination isDirectory: &isdir] && isdir) == NO) {
+        return [(id <FMProtocol>)self _proceedAccordingToHandler: handler
+					                          forError: _lastError
+					                            inPath: destination
+					                          fromPath: source
+					                            toPath: destination];
+	    }
+    }
+
+    if ([(id <FMProtocol>)self _copyPath: source 
+                                  toPath: destination 
+                                 handler: handler] == NO) {
+	    return NO;
+	  }
+  
+  } else if ([fileType isEqualToString: NSFileTypeSymbolicLink] == YES) {
+    NSString	*path;
+    BOOL	result;
+
+    [(id <FMProtocol>)self _sendToHandler: handler willProcessPath: source];
+
+    path = [self pathContentOfSymbolicLinkAtPath: source];
+    result = [self createSymbolicLinkAtPath: destination pathContent: path];
+    if (result == NO) {
+      result = [(id <FMProtocol>)self _proceedAccordingToHandler: handler
+					                            forError: @"cannot link to file"
+					                              inPath: source
+					                            fromPath: source
+					                              toPath: destination];
+	    if (result == NO) {
+	      return NO;
+	    }
+	  }
+    
+  } else {
+    [(id <FMProtocol>)self _sendToHandler: handler willProcessPath: source];
+
+    if ([(id <FMProtocol>)self _copyFile: source 
+                                  toFile: destination 
+                                 handler: handler] == NO) {
+	    return NO;
+	  }
+  }
+  
+  [self changeFileAttributes: attrs atPath: destination];
+  
+  return YES;
+}
+
+- (BOOL)_copyPath:(NSString *)source
+	         toPath:(NSString *)destination
+	        handler:(id)handler
+{
+  NSDirectoryEnumerator	*enumerator;
+  NSString *dirEntry;
+  CREATE_AUTORELEASE_POOL(pool);
+  
+  enumerator = [self enumeratorAtPath: source];
+  while ((dirEntry = [enumerator nextObject])) {
+    NSString *sourceFile;
+    NSString *fileType;
+    NSString *destinationFile;
+    NSDictionary *attributes;
+
+    attributes = [enumerator fileAttributes];
+    fileType = [attributes fileType];
+    sourceFile = [source stringByAppendingPathComponent: dirEntry];
+    destinationFile = [destination stringByAppendingPathComponent: dirEntry];
+
+    [(id <FMProtocol>)self _sendToHandler: handler willProcessPath: sourceFile];
+
+    if ([fileType isEqual: NSFileTypeDirectory]) {
+      if ([self fileExistsAtPath: destinationFile]) {
+        return NO;
+      }
+    
+	    if (![self createDirectoryAtPath: destinationFile 
+                            attributes: attributes]) {
+        BOOL isdir; 
+           
+        if ([self fileExistsAtPath: destinationFile isDirectory: &isdir] && isdir) {
+	        [enumerator skipDescendents];
+	        if (![(id <FMProtocol>)self _copyPath: sourceFile
+                                         toPath: destinationFile
+                                        handler: handler]) {
+		        return NO;
+          }
+        } else if (![(id <FMProtocol>)self _proceedAccordingToHandler: handler
+					                                 forError: _lastError
+					                                   inPath: destinationFile
+					                                 fromPath: sourceFile
+					                                   toPath: destinationFile]) {
+          return NO;
+        }
+        
+      } else {
+	      [enumerator skipDescendents];
+	      if (![(id <FMProtocol>)self _copyPath: sourceFile
+                                       toPath: destinationFile
+                                      handler: handler]) {
+		      return NO;
+        }
+      }
+      
+	  } else if ([fileType isEqual: NSFileTypeRegular]) {
+	    if (![(id <FMProtocol>)self _copyFile: sourceFile
+			                               toFile: destinationFile
+		                                handler: handler]) {
+	      return NO;
+      }
+      
+	  } else if ([fileType isEqual: NSFileTypeSymbolicLink]) {
+	    NSString *path = [self pathContentOfSymbolicLinkAtPath: sourceFile];
+      
+	    if (![self createSymbolicLinkAtPath: destinationFile pathContent: path]) {
+        if (![(id <FMProtocol>)self _proceedAccordingToHandler: handler
+		                                forError: @"cannot create symbolic link"
+		                                  inPath: sourceFile
+		                                fromPath: sourceFile
+		                                  toPath: destinationFile]) {
+          return NO;
+        }
+	    }
+      
+	  } else {
+	    NSString *s = [NSString stringWithFormat: @"cannot copy file type '%@'", fileType];
+	  
+      ASSIGN(_lastError, s);
+	    NSLog(@"%@: %@", sourceFile, s);
+	    continue;
+	  }
+    
+    [self changeFileAttributes: attributes atPath: destinationFile];
+  }
+  
+  RELEASE(pool);
+
+  return YES;
+}
+
+@end
+
+
 @implementation OpProgressView
 
 #define PROG_IND_MAX (-28)
