@@ -4,17 +4,7 @@ Installing GWorkspace
 GWorkspace requires GNUstep to be installed. Make sure that you have an
 up to date version on your system installed! 
 
-Some classes needs the FSNode framework so you need to install this first:
-    
-    cd FSNode
-    make install
+  ./configure
+  make install
 
-now you can build the other things:
 
-		cd ../
-    ./configure
-		make install
-
-		If you want to do make; make install, make sure that you
-		first make; make install GWLib, and *then* the rest of the
-		sources!

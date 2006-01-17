@@ -104,6 +104,7 @@ static NSString *nibName = @"RunExternal";
 - (void)activate
 {
   [win makeKeyAndOrderFront: nil];
+  [cfield setString: @""];
   [win makeFirstResponder: cfield];
 }
 
@@ -130,12 +131,11 @@ static NSString *nibName = @"RunExternal";
 
     if (command) {
       [NSTask launchedTaskWithLaunchPath: command arguments: args];
+      [win close];
     } else {
       NSRunAlertPanel(NULL, NSLocalizedString(@"No executable found!", @""),
                                   NSLocalizedString(@"OK", @""), NULL, NULL);   
     }
-    
-    [cfield setString: @""];
   }
 }
 

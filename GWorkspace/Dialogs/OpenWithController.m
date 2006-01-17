@@ -129,7 +129,7 @@ static NSString *nibName = @"OpenWith";
           
           [ws getInfoForFile: spath application: &defApp type: &fileType];
           
-          if(([fileType isEqual: NSPlainFileType] == NO)
+          if (([fileType isEqual: NSPlainFileType] == NO)
                     && ([fileType isEqual: NSShellCommandFileType] == NO)) {
             NSRunAlertPanel(NULL, NSLocalizedString(@"Can't edit a directory!", @""),
                                     NSLocalizedString(@"OK", @""), NULL, NULL);
