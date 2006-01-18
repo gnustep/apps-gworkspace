@@ -795,20 +795,64 @@ static id <DesktopApplication> desktopApp = nil;
 {
   if (matrix && [[matrix cells] count]) {
     NSArray *cells = [matrix cells];
+    unsigned count = [cells count];
+    FSNBrowserCell *cell;
+    int selstart = 0;
+    int selend = 0;
     int i;
-
+        
     [matrix deselectAllCells];
 
-	  for (i = 0; i < [cells count]; i++) {
-	    FSNBrowserCell *cell = [cells objectAtIndex: i];
+    while (selstart < count) {
+      cell = [cells objectAtIndex: selstart];
       
       if ([[cell node] isReserved] == NO) {
-        [matrix selectCell: cell];
+        break;
       } 
-	  }
+      
+      selstart++;
+    } 
+    
+    i = selstart;
 
-    [matrix sendAction];
+    while (i < count) {
+      cell = [cells objectAtIndex: i];
+      
+      if ([[cell node] isReserved] == NO) {
+        selend = i;
 
+      } else {
+        [matrix setSelectionFrom: selstart 
+                              to: selend
+                          anchor: selstart 
+                       highlight: YES];
+        
+        selstart = i + 1;
+        
+        while (selstart < count) {        
+          cell = [cells objectAtIndex: selstart];
+
+          if ([[cell node] isReserved] == NO) {
+            break;
+          }
+           
+          selstart++;
+          i++;
+        }
+      }
+      
+      i++;
+    }
+    
+    if (selstart < count) {
+      [matrix setSelectionFrom: selstart 
+                            to: selend 
+                        anchor: selstart 
+                     highlight: YES];
+                     
+      [matrix sendAction];
+    }
+        
   } else {
     FSNBrowserColumn *col = [browser columnBeforeColumn: self];
   

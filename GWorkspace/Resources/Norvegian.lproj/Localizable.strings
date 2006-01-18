@@ -1,0 +1,387 @@
+/* ----------------------- menu strings --------------------------- *\
+/* main.m */
+
+"Info" = "Info";
+	"Info Panel..." = "Infopanel...";
+	"Preferences..." = "Instillinger...";
+	"Help..." = "Hjelp...";
+
+"File" = "Fil";
+	"Open" = "Åpne";
+	"Open as Folder" = "Åpne som mappe";
+	"Edit File" = "Rediger fil";
+	"New Folder" = "Ny mappe";
+	"New File" = "Ny fil";
+	"Duplicate" = "Fordoble";	
+	"Destroy" = "Ødelegg"
+	"Empty Recycler" = "Tøm papirkurven";
+/*	"Put Away" = "Gjenopprett";
+	"Print..." = "Skriv ut...";
+	"Open With..." = "Åpne med...";
+	"Run..." = "Kjør...";
+*/
+
+"Edit" = "Rediger";
+	"Cut" = "Klipp ut";
+	"Copy" = "Kopier";
+	"Paste" = "Lim inn";
+/*	"Delete" = "Slett" 		*/
+	"Select All" = "Merk alt";
+		
+"View" = "Vis";
+	"Browser" = "Browser";
+	"Icon" = "Ikoner";
+/*	"Small Icon" = "Små ikoner";	*/
+		
+"Tools" = "Verktøy";
+	"Viewer" = "Visning";
+	"Inspectors" = "Inspektører...";
+		"Show Inspectors" = "Vis inspektørene";
+		"Attributes" = "Egenskaper";
+		"Contents" = "Innhold";
+		"Tools" = "Verktøy";	
+		"Permissions" = "Rettigheter";	
+/*	"History" = "Historie";
+		"Show History" = "Vis historie";
+		"Go backward" = "Tilbake";
+		"Go forward" = "Fram";
+*/
+	"Finder" = "Finn";
+	"Processes..." = "Prosesser...";
+	"Applications..." = "Applikasjoner...";
+/*	"File Operations..." = "Filoperasjoner...";	*/
+	"Fiend" = "Fiend";
+		"Show Fiend" = "Vis fiend";
+		"Hide Fiend" = "Skjul fiend";
+		"Add Layer..." = "Nytt skrivebord...";
+		"Remove Current Layer" = "Slett aktuelt skrivebord";
+		"Rename Current Layer" = "Gi skrivebordet nytt navn";
+		"Layers" = "Skriveborder";
+/*	"Tabbed Shelf" = "Tabbed Shelf";
+		"Show Tabbed Shelf" = "Vis Tabbed Shelf";
+		"Hide Tabbed Shelf" = "Skjul Tabbed Shelf";
+		"Remove Current Tab" = "Slett aktuelt faneblad";
+		"Rename Current Tab" = "Gi fanebladet nytt navn";
+		"Add Tab..." = "Nytt faneblad...";
+*/
+	"DeskTop Shelf" = "Desktop Shelf";
+	"XTerm" = "XTerm";
+	
+"Windows" = "Vindu";
+	"Arrange in Front" = "Ordne til forgrunnen";
+	"Miniaturize Window" = "Minimer vinduet";
+	"Close Window" = "Lukk vinduet";
+	
+"Services" = "Tjenester";
+
+"Hide" = "Skjul";
+
+"Quit" = "Avslutt";
+	
+	
+	
+/* ----------------------- File Operations strings --------------------------- *\
+
+/* GWorkspace.m */
+
+/*"Author" = "Forfatter";*/
+"GNUstep Workspace Manager" = "GNUstep Workspace Manager";
+"See http://www.gnustep.it/enrico/gworkspace" = "Se http://www.gnustep.it/enrico/gworkspace";
+"Released under the GNU General Public License 2.0" = "Publisert under GNU General Public License 2.0";
+"Error" = "Feil";
+"You have not write permission\nfor" = "Du har ingen skrive-rettigheter\ntil";
+"Continue" = "Fortsette";
+
+
+/* FileOperation.m */
+
+"OK" = "OK";
+"Cancel" = "Avbryt";
+"Move" = "Flytt";
+"Move from: " = "Flytt fra: ";
+"\nto: " = "\ntil: ";
+"Copy" = "Kopier";
+"Copy from: " = "Kopier fra: ";
+"Link" = "Lenke";
+"Link " = "Lenke ";
+"Delete" = "Slett";
+"Delete the selected objects?" = "Slette de utvalgte objektene?";
+"Duplicate" = "Fordoble";
+"Duplicate the selected objects?" = "Fordoble de utvalgte objektene?";
+"From:" = "Fra:";
+"To:" = "Til:";
+"In:" = "I:";
+"Stop" = "Stopp";
+"Pause" = "Pause";
+"Moving" = "Flytter";
+"Copying" = "Kopierer";
+"Linking" = "Lenker";
+"Duplicating" = "Fordobler";
+"Destroying" = "Ødelegger";
+"File Operation Completed" = "Filoperation komplett utført";
+"Backgrounder connection died!" = "Bakgrunn-forbindelse drept.";
+"Some items have the same name;\ndo you want to sobstitute them?" = "Noe gjenstand har det samme navnet;\nskal de erstattes?";
+"Error" = "Feil";
+"File Operation Error!" = "Feil ved filoperation.";
+
+
+/* ColumnIcon.m */
+
+"You have not write permission\nfor " = "Du har ingen skrive-rettigheter\ntil ";
+"The name " = "Navnet ";
+" is already in use!" = " brukes alerede!";
+"Cannot rename " = "Kan ikke gi nytt navn til ";
+"Invalid char in name" = "Ugyldig tegn i navnet";
+
+
+/* ----------------------- Inspectors strings --------------------------- *\
+
+/* InspectorsWin.m */
+
+"Attributes" = "Egenskaper";
+"Contents" = "Innholder";
+"Tools" = "Verktøy";
+"Access Control" = "Tilgangkontroll";
+
+
+/* AttributesPanel.m */
+
+"Attributes" = "Egenskaper";
+"Attributes Inspector" = "Egenskap-inspektør";
+"Path:" = "Adresse:";
+"Link To:" = "Lenke til:";
+"Size:" = "Størrelse:";
+"Owner:" = "Eier:";
+"Group:" = "Gruppe:";
+"Changed" = "Endret";
+"Revert" = "Tilbakestill";
+"OK" = "OK";
+
+
+/* ContentsPanel.m */
+
+"Contents" = "Innhold";
+"Contents Inspector" = "Innhold-inspektør";
+"No Contents Inspector" = "Ingen innhold-inspektør";
+"No Contents Inspector\nFor Multiple Selection" = "Ingen innhold-inspektør\ntil mangfoldig utvalg.";
+"error" = "Feil";
+"No Contents Inspectors found!" = "Ingen innhold-inspektør funnet.";
+
+
+/* FolderViewer.m */
+
+"Sort method applies to the\ncontents of the selected folder,\nNOT to its parent folder"r
+  = "Sorter-metoden brukes\ni den utvalgte mappen,\nIKKE i den overordnet mappen.";
+"Sort by" = "Sorter etter:";
+"Name" = "Navn";
+"Kind" = "Type";
+"Date" = "Dato";
+"Size" = "Størrelse";
+"Owner" = "Eier";
+"Folder Inspector" = "Mappe-inspektør";	
+
+
+/* ImageViewer.m */
+
+"Image Inspector" = "Bilde-inspektør";
+
+
+/* AppViewer.m */
+
+"Open these kinds of documents:" = "Åpne disse filtypene:";
+"Invalid Contents" = "Ugyldig innhold";
+"App Inspector" = "Applikasjon-inspektør";
+
+
+/* PermissionsPanel.m */
+
+"UNIX Permissions" = "UNIX-filrettigheter";
+"Access Control" = "Tilgangkontroll";
+/* "Also apply to files inside selection" = "Anvende også til utvalgte filer" */
+"Also apply to files inside selection" = "Anvende også til utvalgte filer";
+
+
+/* ToolsPanel.m */
+
+"Tools" = "Verktøy";
+"Tools Inspector" = "Verktøy-inspektør";
+"No Tools Inspector" = "Ingen verktøy-inspektør";
+"Set Default" = "Sett standard";
+
+
+/* AppsView.m */
+	
+"Double-click to open selected document(s)" = "Klikk dobblet til å åpne dokumenter";	
+"Default:" = "Standard:";
+"Path:" = "Adresse:";		
+"Click 'Set Default' to set default application\nfor all documents with this extension" 
+  = "Klikk på 'Sett standard' til å sette standardapplikasjonen\ntil alle dokumenter med denne ending";
+
+
+/* PermsBox.m */
+
+"Permissions" = "Rettigheter";
+"Read" = "Lese";
+"Write" = "Skrive";
+"Execute" = "Kjøre";
+"Owner" = "Eier";
+"Group" = "Gruppe";
+"Other" = "Andre";
+
+
+/* ----------------------- Processes strings --------------------------- *\
+
+/* Processes.m */
+
+"Processes" = "Prosesser";
+"No Background Process" = "Ingen bakgrunnprosess";
+"Kill" = "Avbryt";
+"Path: " = "Adresse: ";
+"Status: " = "Status: ";
+
+
+/* ProcsView.m */
+
+"Applications" = "Applikasjoner";
+"Background" = "Bakgrunn";
+
+
+/* ----------------------- Finder strings --------------------------- *\
+
+/* Finder.m */
+
+"Finder" = "Finn filer";
+"Find items with names that match" = "Søk etter samsvarendene navner";
+"Find items with contents that match" = "Søk etter samsvarende innhold";
+"No selection!" = "Ingen utvalg.";
+"No arguments!" = "Inge argumenter.";
+
+
+/* ----------------------- Fiend strings --------------------------- *\
+
+/* Fiend.m */
+
+"New Layer" = "Nytt skrivebord";
+"A layer with this name is already present!" = "Et skrivebord med dette navnet eksisterer alerede.";
+"You can't remove the last layer!" = "Du kan ikke fjerne det siste skrivebordet.";
+"Remove layer" = "Fjerne skrivebordet?";
+"Are you sure that you want to remove this layer?" = "Er du sikker at skrivebordet skal fjernes?";
+"Rename Layer" = "Gi skrivebordet nytt navn";
+"You can't dock multiple paths!" = "Du kan ikke dokke mangfoldige adresser"
+"This object is already present in this layer!" = "Dette objektet eksisterer allerede i dette skrivebordet.";
+	
+			
+/* ----------------------- Preferences strings --------------------------- *\
+
+/* PreferencesWin.m */
+
+"GWorkspace Preferences" = "GWorkspace instillinger";
+
+
+/* BackWinPreferences.m */       
+
+"Desktop Shelf" = "Desktop Shelf";	
+"Desktop Color" = "Skrivebordfarge";
+"red" = "rød";
+"green" = "grønn";
+"blue" = "blå";
+"Set Color" = "Sett fargen";
+"Push the \"Set Image\" button\nto set your DeskTop image.\nThe image must have the same\nsize of your screen." = 
+  "Klikk på knappen\"Sett bilde\"\ntil å sette skrivebordets bakgrunnbildet.\nBildet må ha den samme\nstørrelsen like skjermen.";
+"Set Image" = "Sett bilde"
+"Unset Image" = "Usett bilde";
+/*"Activate desktop" = "Aktiver skrivebord";*/
+	
+/* DefaultXTerm.m */             
+	
+"Set" = "Sett";	
+/*"xterm" = "xterm";
+"arguments" = "Argumenter";
+*/
+	
+/* BrowserViewsPreferences.m */  
+
+"Column Width" = "Kolonnbredde";
+"Use Default Settings" = "Bruk standardinstilling";	
+"Browser" = "Browser";
+	
+	
+/* FileWatchingPreferences.m */  
+	
+"File System Watching" = "Fil-overvåkning";
+"timeout" = "Tidbegrensning";
+"frequency" = "Frekvens";
+"Values will apply to the \nnew watchers from now, \nto the existing ones, after the first timeout" = 
+   "Verder brukes straks til\n nye overvåkninger, \ntil eksisterende etter den først tidbegrensning";
+	
+	
+/* ShelfPreferences.m */
+	
+"Shelf" = "Shelf";
+/*"Default" = "Standard";*/
+	
+	
+/* DefaultEditor.m */            
+
+"Default Editor" = "Standard-editor";
+"No Default Editor" = "Ingen standard-editor";
+"Choose..." = "Velg...";
+/*"Choose" = "Velg";*/
+
+/* IconViewsPreferences.m */
+
+"Title Width" = "Tittelbredde";
+"Icon View" = "Ikonvisning";
+
+/* Sorting order */
+"Sorting Order" = "Sorterrekkefølge";
+"Sort by" = "Sorter etter";
+"This sort method will apply to all the folders\nthat have no sorting order specified" = "Denne sortermetoden gjelder til\nalle mapper uten egen definert rekkefulge.";
+
+/* File Operations */
+/*
+"File Operations" = "Filoperasjoner";
+"Status Window" = "Statusvindu";
+"Confirmation" = "Bekreftelse";
+"Show status window" = "Vis statusvindu";
+"Check this option to show a status window\nduring the file operations" = "Sett denne opsjonen til å vise et statusvindu\nmens filoperasjoner.";
+*/
+
+/* Icons */
+/*
+"Icons" = "Ikoner";
+"Thumbnails" = "Forhandsvisning";
+"use thumbnails" = "Bruk forhandsvisning";
+"Animate icons" = "Animer ikoner";
+"when changing a path" = "ved veksling av adressen";
+"when opening a file" = "ved åpning av en fil";
+"sliding back after file operation" = "skli bak etter filoperasjonen";
+"Activate changes" = "Aktivier endringene";
+*/
+/* Hidden Files */
+/*
+"Hidden Files" = "Skjulte filer";
+"Hidden files" = "Skjulte filer";
+"Shown files" = "Synlige filer";
+"Load" = "Last";
+"Select and move the files to hide or to show" = "Velg og skift filene til skjulle eller vise";
+*/
+/* Browser */
+/*"Aspect" = "Aspekt";
+"Icons in Browser Cells" = "Vis ikoner i browser-celler";
+"Uses Shelf" = "Bruk Shelf";
+"Columns Width" = "Kolonnbredde";
+*/
+
+/* Recycler strings */
+"Recycle: " = "Søppel: ";
+"Recycler: " = "Papirkurv: ";
+"Recycler" = "Papirkurv";
+"the Recycler" = "Papirkurven";
+"\nto the Recycler" = "\ni papirkurven";
+"Move from the Recycler " = "Flytt fra papirkurven ";
+"In" = "I";
+"Empty Recycler" = "Tøm papirkurven";
+"Empty the Recycler?" = "Tøm papirkurven?";
+"Put Away" = "Gjenopprett";
+

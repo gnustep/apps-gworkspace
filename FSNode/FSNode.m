@@ -650,7 +650,7 @@
 	if (fsize == 0) {
 		sizeStr = @"0 bytes";
 	} else if (fsize < (10 * ONE_KB)) {
-		sizeStr = [NSString stringWithFormat: @"%s%d bytes", sign, fsize];
+		sizeStr = [NSString stringWithFormat: @"%s%d bytes", sign, (long)fsize];
 	} else if(fsize < (100 * ONE_KB)) {
  		sizeStr = [NSString stringWithFormat: @"%s%3.2f KB", sign,
                           					  ((double)fsize / (double)(ONE_KB))];
