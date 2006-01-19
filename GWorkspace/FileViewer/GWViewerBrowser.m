@@ -26,6 +26,7 @@
 #include "GWViewerBrowser.h"
 #include "FSNBrowserColumn.h"
 #include "FSNBrowserMatrix.h"
+#include "FSNBrowserCell.h"
 #include "GWSpatialViewer.h"
 #include "GWViewersManager.h"
 
@@ -70,6 +71,91 @@
       [self synchronizeViewer];
     } 
   }
+}
+
+- (NSMenu *)menuForEvent:(NSEvent *)theEvent
+{
+  if (([theEvent type] == NSRightMouseDown) && ([viewer vtype] == SPATIAL)) {  
+    FSNBrowserColumn *bc = [self lastLoadedColumn];
+    NSPoint location = [theEvent locationInWindow];
+
+    location = [self convertPoint: location fromView: nil];
+    
+    if (bc && [self mouse: location inRect: [bc frame]]) {
+      NSArray *selnodes = [bc selectedNodes];
+      NSAutoreleasePool *pool;
+      NSMenu *menu;
+      NSMenuItem *menuItem;
+      NSString *firstext; 
+      NSDictionary *apps;
+      NSEnumerator *app_enum;
+      id key; 
+      int i;
+  
+      if (selnodes && [selnodes count]) {
+        FSNBrowserMatrix *matrix = [bc cmatrix];
+        FSNBrowserCell *cell;
+        int row, col;
+        
+        location = [matrix convertPoint: location fromView: self];
+        
+        if ([matrix getRow: &row column: &col forPoint: location] == NO) {
+          return [super menuForEvent: theEvent];
+        }
+        
+        cell = [matrix cellAtRow: row column: col];
+        
+        if ([selnodes containsObject: [cell node]] == NO) {
+          return [super menuForEvent: theEvent];
+        }
+        
+        firstext = [[[selnodes objectAtIndex: 0] path] pathExtension];
+
+        for (i = 0; i < [selnodes count]; i++) {
+          FSNode *snode = [selnodes objectAtIndex: i];
+          NSString *selpath = [snode path];
+          NSString *ext = [selpath pathExtension];   
+
+          if ([ext isEqual: firstext] == NO) {
+            return [super menuForEvent: theEvent];  
+          }
+
+          if ([snode isDirectory] == NO) {
+            if ([snode isPlain] == NO) {
+              return [super menuForEvent: theEvent];
+            }
+          } else {
+            if (([snode isPackage] == NO) || [snode isApplication]) {
+              return [super menuForEvent: theEvent];
+            } 
+          }
+        }
+
+        menu = [[NSMenu alloc] initWithTitle: NSLocalizedString(@"Open with", @"")];
+        apps = [[NSWorkspace sharedWorkspace] infoForExtension: firstext];
+        app_enum = [[apps allKeys] objectEnumerator];
+
+        pool = [NSAutoreleasePool new];
+
+        while ((key = [app_enum nextObject])) {
+          menuItem = [NSMenuItem new];    
+          key = [key stringByDeletingPathExtension];
+          [menuItem setTitle: key];
+          [menuItem setTarget: desktopApp];      
+          [menuItem setAction: @selector(openSelectionWithApp:)];      
+          [menuItem setRepresentedObject: key];            
+          [menu addItem: menuItem];
+          RELEASE (menuItem);
+        }
+
+        RELEASE (pool);
+
+        return [menu autorelease];
+      }    
+    }  
+  }
+  
+  return [super menuForEvent: theEvent]; 
 }
 
 @end

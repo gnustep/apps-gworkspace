@@ -366,6 +366,78 @@
   [self tile];
 }
 
+- (NSMenu *)menuForEvent:(NSEvent *)theEvent
+{
+  NSPoint location = [theEvent locationInWindow];
+  NSPoint selfloc = [self convertPoint: location fromView: nil];
+
+  if (editIcon && [self mouse: selfloc inRect: [editIcon frame]]) {
+    NSArray *selnodes;
+    NSMenu *menu;
+    NSMenuItem *menuItem;
+    NSString *firstext; 
+    NSDictionary *apps;
+    NSEnumerator *app_enum;
+    id key; 
+    int i;
+
+    if ([theEvent modifierFlags] == NSControlKeyMask) {
+      return [super menuForEvent: theEvent];
+    } 
+
+    selnodes = [self selectedNodes];
+
+    if ([selnodes count]) {
+      NSAutoreleasePool *pool;
+
+      firstext = [[[selnodes objectAtIndex: 0] path] pathExtension];
+
+      for (i = 0; i < [selnodes count]; i++) {
+        FSNode *snode = [selnodes objectAtIndex: i];
+        NSString *selpath = [snode path];
+        NSString *ext = [selpath pathExtension];   
+
+        if ([ext isEqual: firstext] == NO) {
+          return [super menuForEvent: theEvent];  
+        }
+
+        if ([snode isDirectory] == NO) {
+          if ([snode isPlain] == NO) {
+            return [super menuForEvent: theEvent];
+          }
+        } else {
+          if (([snode isPackage] == NO) || [snode isApplication]) {
+            return [super menuForEvent: theEvent];
+          } 
+        }
+      }
+
+      menu = [[NSMenu alloc] initWithTitle: NSLocalizedString(@"Open with", @"")];
+      apps = [[NSWorkspace sharedWorkspace] infoForExtension: firstext];
+      app_enum = [[apps allKeys] objectEnumerator];
+
+      pool = [NSAutoreleasePool new];
+
+      while ((key = [app_enum nextObject])) {
+        menuItem = [NSMenuItem new];    
+        key = [key stringByDeletingPathExtension];
+        [menuItem setTitle: key];
+        [menuItem setTarget: [GWorkspace gworkspace]];      
+        [menuItem setAction: @selector(openSelectionWithApp:)];      
+        [menuItem setRepresentedObject: key];            
+        [menu addItem: menuItem];
+        RELEASE (menuItem);
+      }
+
+      RELEASE (pool);
+
+      return [menu autorelease];
+    }
+  }
+     
+  return [super menuForEvent: theEvent]; 
+}
+
 //
 // scrollview delegate
 //
@@ -493,6 +565,28 @@
   }
 }
 
+- (NSArray *)selectedNodes
+{
+  NSMutableArray *selectedNodes = [NSMutableArray array];
+  int i;
+  
+  for (i = 0; i < [icons count]; i++) {
+    FSNIcon *icon = [icons objectAtIndex: i];
+
+    if ([icon isSelected]) {
+      NSArray *selection = [icon selection];
+      
+      if (selection) {
+        [selectedNodes addObjectsFromArray: selection];
+      } else {
+        [selectedNodes addObject: [icon node]];
+      }
+    }
+  }
+
+  return [selectedNodes makeImmutableCopyOnFail: NO];
+}
+
 - (NSArray *)selectedPaths
 {
   NSMutableArray *selectedPaths = [NSMutableArray array];
@@ -514,7 +608,7 @@
     }
   }
 
-  return [NSArray arrayWithArray: selectedPaths];
+  return [selectedPaths makeImmutableCopyOnFail: NO];
 }
 
 - (void)checkLockedReps

@@ -110,6 +110,7 @@
 
 - (void)repSelected:(id)arep;
 - (void)unselectOtherReps:(id)arep;
+- (NSArray *)selectedNodes;
 - (NSArray *)selectedPaths;  
 
 - (void)checkLockedReps;
