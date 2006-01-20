@@ -12,13 +12,15 @@ DBKBTree.m \
 DBKBTreeNode.m \
 DBKFreeNodesPage.m \
 DBKFixLenRecordsFile.m \
-DBKVarLenRecordsFile.m
+DBKVarLenRecordsFile.m \
+DBKPathsTree.m
 
 libDBKit_HEADER_FILES = \
 DBKBTree.h \
 DBKBTreeNode.h \
 DBKFixLenRecordsFile.h \
-DBKVarLenRecordsFile.h
+DBKVarLenRecordsFile.h \
+DBKPathsTree.h
 
 libDBKit_HEADER_FILES_DIR = .
 libDBKit_HEADER_FILES_INSTALL_DIR=DBKit
