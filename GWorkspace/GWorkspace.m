@@ -779,7 +779,7 @@ static GWorkspace *gworkspace = nil;
     
 	} else if ([title isEqual: NSLocalizedString(@"Check for disks", @"")]) {
     return [dtopManager isActive];
-  
+    
   } else if ([title isEqual: NSLocalizedString(@"Open With...", @"")]) {
     CREATE_AUTORELEASE_POOL(arp);
     BOOL found = NO;
@@ -794,7 +794,7 @@ static GWorkspace *gworkspace = nil;
         
  	      [ws getInfoForFile: spath application: &defApp type: &fileType];
        
-        if((fileType != NSPlainFileType) && (fileType != NSShellCommandFileType)) {
+        if ((fileType != NSPlainFileType) && (fileType != NSShellCommandFileType)) {
           found = YES;
         }
         

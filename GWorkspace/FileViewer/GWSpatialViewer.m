@@ -1130,7 +1130,27 @@
     }
     
     return NO;
-  } 
+    
+  } else if ([itemTitle isEqual: NSLocalizedString(@"Open as Folder", @"")]) {
+    NSArray *selection = [nodeView selectedNodes];
+    
+    if (selection && ([selection count] == 1)) {  
+      return [[selection objectAtIndex: 0] isPackage];
+    }
+    
+    return NO;
+    
+  } else if ([itemTitle isEqual: NSLocalizedString(@"New Folder", @"")]
+       || [itemTitle isEqual: NSLocalizedString(@"New File", @"")]) {
+    if ([[baseNode path] isEqual: [gworkspace trashPath]] == NO) {
+      return [[nodeView shownNode] isWritable];
+    }
+    
+    return NO;
+
+  } else if ([itemTitle isEqual: NSLocalizedString(@"Open", @"")]) {
+    return ([[baseNode path] isEqual: [gworkspace trashPath]] == NO);
+  }
 
   return YES;
 }

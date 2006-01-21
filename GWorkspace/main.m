@@ -69,18 +69,15 @@ void createMenu()
 	menu = AUTORELEASE ([NSMenu new]);
 	[mainMenu setSubmenu: menu forItem: menuItem];		
 	addItemToMenu(menu, @"Open", @"", @"openSelection:", @"o");
-	addItemToMenu(menu, @"Open as Folder", @"", @"openSelectionAsFolder:", @"O");
 	addItemToMenu(menu, @"Open With...", @"", @"openWith:", @"");
+	addItemToMenu(menu, @"Open as Folder", @"", @"openSelectionAsFolder:", @"O");
 	addItemToMenu(menu, @"New Folder", @"", @"newFolder:", @"n");
 	addItemToMenu(menu, @"New File", @"", @"newFile:", @"N");
 	addItemToMenu(menu, @"Duplicate", @"", @"duplicateFiles:", @"u");
+	addItemToMenu(menu, @"Destroy", @"", @"deleteFiles:", @"r");  
 	addItemToMenu(menu, @"Move to Recycler", @"", @"recycleFiles:", @"d");
 	addItemToMenu(menu, @"Empty Recycler", @"", @"emptyRecycler:", @"");
-	addItemToMenu(menu, @"Destroy", @"", @"deleteFiles:", @"r");
-	addItemToMenu(menu, @"Check for disks", @"", @"checkRemovableMedia:", @"E");
-	addItemToMenu(menu, @"Run...", @"", @"runCommand:", @"");  
-	addItemToMenu(menu, @"Print...", @"", @"print:", @"p");
-
+  
 	// Edit
 	menuItem = addItemToMenu(mainMenu, @"Edit", @"", nil, @"");
 	menu = AUTORELEASE ([NSMenu new]);
@@ -139,16 +136,13 @@ void createMenu()
 	  addItemToMenu(subenu, @"14", @"", @"setLabelSize:", @"");
 	  addItemToMenu(subenu, @"15", @"", @"setLabelSize:", @"");
 	  addItemToMenu(subenu, @"16", @"", @"setLabelSize:", @"");
-      
-//	  addItemToMenu(menu, @"Label Color...", @"", @"chooseLabelColor:", @"");
-	  
-//    addItemToMenu(menu, @"Background Color...", @"", @"chooseBackColor:", @"");
-      
+
+	addItemToMenu(menu, @"Viewer", @"", @"showViewer:", @"V");	
+            
 	// Tools
 	menuItem = addItemToMenu(mainMenu, @"Tools", @"", nil, @"");
 	menu = AUTORELEASE ([NSMenu new]);
 	[mainMenu setSubmenu: menu forItem: menuItem];	
-	addItemToMenu(menu, @"Viewer", @"", @"showViewer:", @"V");	
 		
     menuItem = addItemToMenu(menu, @"Inspectors", @"", nil, @"");
 		subenu = AUTORELEASE ([NSMenu new]);
@@ -158,22 +152,13 @@ void createMenu()
 		addItemToMenu(subenu, @"Contents", @"", @"showContentsInspector:", @"2");
 		addItemToMenu(subenu, @"Tools", @"", @"showToolsInspector:", @"3");
 		addItemToMenu(subenu, @"Annotations", @"", @"showAnnotationsInspector:", @"4");
-		
-    menuItem = addItemToMenu(menu, @"History", @"", nil, @"");
-		subenu = AUTORELEASE ([NSMenu new]);
-		[menu setSubmenu: subenu forItem: menuItem];
-		addItemToMenu(subenu, @"Show History", @"", @"showHistory:", @"H");
-		addItemToMenu(subenu, @"Go backward", @"", @"goBackwardInHistory:", @"");
-		addItemToMenu(subenu, @"Go forward", @"", @"goForwardInHistory:", @"");
-	
-  addItemToMenu(menu, @"Show Desktop", @"", @"showDesktop:", @"");
-	addItemToMenu(menu, @"Show Recycler", @"", @"showRecycler:", @"");
+
 	addItemToMenu(menu, @"Finder", @"", @"showFinder:", @"f");
-		
+
     menuItem = addItemToMenu(menu, @"Fiend", @"", nil, @"");
 		subenu = AUTORELEASE ([NSMenu new]);
 		[menu setSubmenu: subenu forItem: menuItem];
-		
+
     menuItem = addItemToMenu(menu, @"Tabbed Shelf", @"", nil, @"");
 		subenu = AUTORELEASE ([NSMenu new]);
 		[menu setSubmenu: subenu forItem: menuItem];    
@@ -184,6 +169,22 @@ void createMenu()
 		addItemToMenu(subenu, @"Add Tab...", @"", @"addTShelfTab:", @"");
 
 	addItemToMenu(menu, @"Terminal", @"", @"showTerminal:", @"t");
+	addItemToMenu(menu, @"Run...", @"", @"runCommand:", @"");  
+
+    menuItem = addItemToMenu(menu, @"History", @"", nil, @"");
+		subenu = AUTORELEASE ([NSMenu new]);
+		[menu setSubmenu: subenu forItem: menuItem];
+		addItemToMenu(subenu, @"Show History", @"", @"showHistory:", @"H");
+		addItemToMenu(subenu, @"Go backward", @"", @"goBackwardInHistory:", @"");
+		addItemToMenu(subenu, @"Go forward", @"", @"goForwardInHistory:", @"");
+	
+  addItemToMenu(menu, @"Show Desktop", @"", @"showDesktop:", @"");
+	addItemToMenu(menu, @"Show Recycler", @"", @"showRecycler:", @"");
+
+	addItemToMenu(menu, @"Check for disks", @"", @"checkRemovableMedia:", @"E");
+
+	// Print
+	addItemToMenu(mainMenu, @"Print...", @"", @"print:", @"p");
 	
 	// Windows
 	menuItem = addItemToMenu(mainMenu, @"Windows", @"", nil, @"");
