@@ -139,6 +139,7 @@
 
 - (void)openSelectionInNewViewer:(BOOL)newv;
 - (void)openSelectionAsFolder;
+- (void)openSelectionWith;
 - (void)newFolder;
 - (void)newFile;
 - (void)duplicateFiles;

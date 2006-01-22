@@ -809,6 +809,19 @@
   }
 }
 
+- (void)openSelectionWith
+{
+  if ([[baseNode path] isEqual: [gworkspace trashPath]] == NO) {
+    [manager openWithSelectionInViewer: self];
+  } else {
+    NSRunAlertPanel(nil, 
+                  NSLocalizedString(@"You can't do this in the Recycler!", @""),
+					        NSLocalizedString(@"OK", @""), 
+                  nil, 
+                  nil);  
+  }
+}
+
 - (void)newFolder
 {
   if ([[baseNode path] isEqual: [gworkspace trashPath]] == NO) {
@@ -1109,7 +1122,8 @@
     return [nodeView respondsToSelector: @selector(setBackgroundColor:)];
   
   } else if ([itemTitle isEqual: NSLocalizedString(@"Duplicate", @"")]
-       || [itemTitle isEqual: NSLocalizedString(@"Move to Recycler", @"")]) {
+       || [itemTitle isEqual: NSLocalizedString(@"Move to Recycler", @"")]
+       || [itemTitle isEqual: NSLocalizedString(@"Destroy", @"")]) {
     NSArray *selection = [nodeView selectedNodes];
 
     if (selection && [selection count]) {
@@ -1130,6 +1144,12 @@
     }
     
     return NO;
+
+  } else if ([itemTitle isEqual: NSLocalizedString(@"Open", @"")]) {
+    NSArray *selection = [nodeView selectedNodes];
+
+    return (selection && [selection count] 
+            && ([selection isEqual: [NSArray arrayWithObject: baseNode]] == NO));
     
   } else if ([itemTitle isEqual: NSLocalizedString(@"Open as Folder", @"")]) {
     NSArray *selection = [nodeView selectedNodes];
@@ -1139,6 +1159,28 @@
     }
     
     return NO;
+
+  } else if ([itemTitle isEqual: NSLocalizedString(@"Open With...", @"")]) {
+    NSArray *selection = [nodeView selectedNodes];
+    BOOL canopen = YES;
+    int i;
+        
+    if (selection && [selection count]
+          && ([selection isEqual: [NSArray arrayWithObject: baseNode]] == NO)) {
+      for (i = 0; i < [selection count]; i++) {
+        FSNode *node = [selection objectAtIndex: i];
+    
+        if (([node isPlain] == NO) 
+              && (([node isPackage] == NO) || [node isApplication])) {
+          canopen = NO;
+          break;
+        }
+      }
+    } else {
+      canopen = NO;
+    }
+    
+    return canopen;
     
   } else if ([itemTitle isEqual: NSLocalizedString(@"New Folder", @"")]
        || [itemTitle isEqual: NSLocalizedString(@"New File", @"")]) {

@@ -574,10 +574,48 @@ static GWDesktopManager *desktopManager = nil;
     GWDesktopView *desktopView = [win desktopView];
 
     if ([itemTitle isEqual: NSLocalizedString(@"Duplicate", @"")]
-        || [itemTitle isEqual: NSLocalizedString(@"Move to Recycler", @"")]) {
+        || [itemTitle isEqual: NSLocalizedString(@"Move to Recycler", @"")]
+        || [itemTitle isEqual: NSLocalizedString(@"Destroy", @"")]) {
       return ([[desktopView selectedNodes] count] > 0);
-    }
 
+    } else if ([itemTitle isEqual: NSLocalizedString(@"Open", @"")]) {
+      NSArray *selection = [desktopView selectedNodes];
+     
+      return (selection && [selection count] 
+            && ([selection isEqual: [NSArray arrayWithObject: dskNode]] == NO));
+    
+    } else if ([itemTitle isEqual: NSLocalizedString(@"Open With...", @"")]) {
+      NSArray *selection = [desktopView selectedNodes];
+      BOOL canopen = YES;
+      int i;
+
+      if (selection && [selection count]
+            && ([selection isEqual: [NSArray arrayWithObject: dskNode]] == NO)) {
+        for (i = 0; i < [selection count]; i++) {
+          FSNode *node = [selection objectAtIndex: i];
+
+          if (([node isPlain] == NO) 
+                && (([node isPackage] == NO) || [node isApplication])) {
+            canopen = NO;
+            break;
+          }
+        }
+      } else {
+        canopen = NO;
+      }
+
+      return canopen;
+      
+    } else if ([itemTitle isEqual: NSLocalizedString(@"Open as Folder", @"")]) {
+      NSArray *selection = [desktopView selectedNodes];
+    
+      if (selection && ([selection count] == 1)) {  
+        return [[selection objectAtIndex: 0] isPackage];
+      }
+    
+      return NO;
+    }
+         
     return YES;
   }
   
@@ -636,6 +674,11 @@ static GWDesktopManager *desktopManager = nil;
       [gworkspace openFile: [node path]];
     }
   }
+}
+
+- (void)openSelectionWith
+{
+  [gworkspace openSelectedPathsWith];
 }
 
 - (void)newFolder

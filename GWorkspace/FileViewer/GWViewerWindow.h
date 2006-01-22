@@ -37,6 +37,7 @@
 
 - (void)openSelection:(id)sender;
 - (void)openSelectionAsFolder:(id)sender;
+- (void)openWith:(id)sender;
 - (void)newFolder:(id)sender;
 - (void)newFile:(id)sender;
 - (void)duplicateFiles:(id)sender;
@@ -64,6 +65,7 @@
 - (BOOL)validateItem:(id)menuItem;
 - (void)openSelectionInNewViewer:(BOOL)newv;
 - (void)openSelectionAsFolder;
+- (void)openSelectionWith;
 - (void)newFolder;
 - (void)newFile;
 - (void)duplicateFiles;

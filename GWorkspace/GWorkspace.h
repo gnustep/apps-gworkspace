@@ -375,8 +375,6 @@
 
 - (void)renameTShelfTab:(id)sender;
 
-- (void)openWith:(id)sender;
-
 - (void)runCommand:(id)sender;
 
 - (void)checkRemovableMedia:(id)sender;

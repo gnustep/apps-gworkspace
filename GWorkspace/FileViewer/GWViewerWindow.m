@@ -66,6 +66,11 @@
   [delegate openSelectionAsFolder];
 }
 
+- (void)openWith:(id)sender
+{
+  [delegate openSelectionWith];
+}
+
 - (void)newFolder:(id)sender
 {
   [delegate newFolder];

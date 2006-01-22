@@ -656,6 +656,10 @@ static GWViewersManager *vwrsmanager = nil;
   }
 }
 
+- (void)openWithSelectionInViewer:(id)viewer
+{
+  [gworkspace openSelectedPathsWith];
+}
 
 - (void)sortTypeDidChange:(NSNotification *)notif
 {

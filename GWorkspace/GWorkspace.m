@@ -779,37 +779,7 @@ static GWorkspace *gworkspace = nil;
     
 	} else if ([title isEqual: NSLocalizedString(@"Check for disks", @"")]) {
     return [dtopManager isActive];
-    
-  } else if ([title isEqual: NSLocalizedString(@"Open With...", @"")]) {
-    CREATE_AUTORELEASE_POOL(arp);
-    BOOL found = NO;
-    int i;
-    
-    for (i = 0; i < [selectedPaths count]; i++) {
-      NSString *spath = [selectedPaths objectAtIndex: i];
-      NSDictionary *attributes = [fm fileAttributesAtPath: spath traverseLink: YES];
-      
-      if ([attributes objectForKey: NSFileType] != NSFileTypeDirectory) {
-        NSString *defApp, *fileType;
         
- 	      [ws getInfoForFile: spath application: &defApp type: &fileType];
-       
-        if ((fileType != NSPlainFileType) && (fileType != NSShellCommandFileType)) {
-          found = YES;
-        }
-        
-      }	else {
-        found = YES;
-      }
-      
-      if (found) {
-        break;
-      }
-    }
-    
-    RELEASE (arp);
-    return !found;
-    
   } else if ([title isEqual: NSLocalizedString(@"Select Special Tab", @"")]
               || [title isEqual: NSLocalizedString(@"Remove Current Tab", @"")]
               || [title isEqual: NSLocalizedString(@"Rename Current Tab", @"")]
@@ -949,32 +919,20 @@ static GWorkspace *gworkspace = nil;
 
 - (void)openSelectedPathsWith
 {
-  BOOL found = NO;
+  BOOL canopen = YES;
   int i;
 
   for (i = 0; i < [selectedPaths count]; i++) {
-    NSString *spath = [selectedPaths objectAtIndex: i];
-    NSDictionary *attributes = [fm fileAttributesAtPath: spath traverseLink: YES];
+    FSNode *node = [FSNode nodeWithPath: [selectedPaths objectAtIndex: i]];
 
-    if ([attributes objectForKey: NSFileType] != NSFileTypeDirectory) {
-      NSString *defApp, *fileType;
-
- 	    [ws getInfoForFile: spath application: &defApp type: &fileType];
-
-      if ((fileType != NSPlainFileType) && (fileType != NSShellCommandFileType)) {
-        found = YES;
-      }
-
-    }	else {
-      found = YES;
-    }
-
-    if (found) {
+    if (([node isPlain] == NO) 
+          && (([node isPackage] == NO) || [node isApplication])) {
+      canopen = NO;
       break;
     }
   }
   
-  if (found == NO) {
+  if (canopen) {
     [openWithController activate];
   }
 }
@@ -2205,11 +2163,6 @@ by Alexey I. Froloff <raorn@altlinux.ru>.",
       }
     }    
   }
-}
-
-- (void)openWith:(id)sender
-{
-  [self openSelectedPathsWith];
 }
 
 - (void)runCommand:(id)sender

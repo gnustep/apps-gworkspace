@@ -104,6 +104,8 @@
                   
 - (void)openAsFolderSelectionInViewer:(id)viewer;
 
+- (void)openWithSelectionInViewer:(id)viewer;
+
 
 - (void)sortTypeDidChange:(NSNotification *)notif;
 
