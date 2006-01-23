@@ -305,6 +305,16 @@ static GWorkspace *gworkspace = nil;
                 					object: nil];
 
   [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
+                        selector: @selector(removableMediaPathsDidChange:) 
+                					  name: @"GSRemovableMediaPathsDidChangeNotification"
+                					object: nil];
+
+  [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
+                        selector: @selector(reservedMountNamesDidChange:) 
+                					  name: @"GSReservedMountNamesDidChangeNotification"
+                					object: nil];
+
+  [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
                         selector: @selector(hideDotsFileDidChange:) 
                 					  name: @"GSHideDotFilesDidChangeNotification"
                 					object: nil];
@@ -1249,6 +1259,17 @@ static GWorkspace *gworkspace = nil;
 		  }
     }
   }
+}
+
+- (void)removableMediaPathsDidChange:(NSNotification *)notif
+{
+  [fsnodeRep setVolumes: [ws removableMediaPaths]];
+  [dtopManager removableMediaPathsDidChange];
+}
+
+- (void)reservedMountNamesDidChange:(NSNotification *)notif
+{
+
 }
 
 - (void)hideDotsFileDidChange:(NSNotification *)notif

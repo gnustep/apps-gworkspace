@@ -259,6 +259,10 @@
 
 - (void)thumbnailsDidChange:(NSNotification *)notif;
 
+- (void)removableMediaPathsDidChange:(NSNotification *)notif;
+
+- (void)reservedMountNamesDidChange:(NSNotification *)notif;
+
 - (void)hideDotsFileDidChange:(NSNotification *)notif;
 
 - (void)hiddenFilesDidChange:(NSArray *)paths;

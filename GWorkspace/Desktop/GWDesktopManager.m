@@ -503,6 +503,11 @@ static GWDesktopManager *desktopManager = nil;
   [[self desktopView] updateIcons];
 }
 
+- (void)removableMediaPathsDidChange
+{
+  [[self desktopView] showMountedVolumes];
+}
+
 - (void)hideDotsFileDidChange:(BOOL)hide
 {
   [[self desktopView] reloadFromNode: dskNode];

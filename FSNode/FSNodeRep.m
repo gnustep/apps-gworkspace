@@ -811,8 +811,14 @@ static FSNodeRep *shared = nil;
 
 - (NSArray *)removableMediaPaths
 {
-  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-  NSArray *removables = [defaults arrayForKey: @"GSRemovableMediaPaths"];
+  NSUserDefaults *defaults;
+  NSMutableDictionary *domain;
+  NSArray *removables;
+  
+  defaults = [NSUserDefaults standardUserDefaults];
+  [defaults synchronize];
+  domain = [[defaults persistentDomainForName: NSGlobalDomain] mutableCopy];
+  removables = [domain objectForKey: @"GSRemovableMediaPaths"];
 
   if (removables == nil) {
     unsigned int systype = [[NSProcessInfo processInfo] operatingSystem];
@@ -836,9 +842,15 @@ static FSNodeRep *shared = nil;
 
 - (NSArray *)reservedMountNames
 {
-  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-  NSArray *reserved = [defaults arrayForKey: @"GSReservedMountNames"];
+  NSUserDefaults *defaults;
+  NSMutableDictionary *domain;
+  NSArray *reserved;
 
+  defaults = [NSUserDefaults standardUserDefaults];
+  [defaults synchronize];
+  domain = [[defaults persistentDomainForName: NSGlobalDomain] mutableCopy];
+  reserved = [domain objectForKey: @"GSReservedMountNames"];
+  
   if (reserved == nil) {
     unsigned int systype = [[NSProcessInfo processInfo] operatingSystem];
   
@@ -935,15 +947,22 @@ static FSNodeRep *shared = nil;
 {
   NSMutableArray *mpoints = [NSMutableArray array];
   NSArray *mounted = [self mountedVolumes];
+  NSArray *removables = [self removableMediaPaths];
   NSArray *reserved = [self reservedMountNames];
   NSMutableArray *names = [NSMutableArray array];  
   unsigned i;
 
+      NSLog(@"****** removables %@", [removables description]);
+
+
   for (i = 0; i < [mounted count]; i++) {
     NSDictionary *dict = [mounted objectAtIndex: i];
+    NSString *name = [dict objectForKey: @"name"];
+    NSString *dir = [dict objectForKey: @"dir"];
 
-    if ([reserved containsObject: [dict objectForKey: @"name"]] == NO) {
-      [mpoints addObject: [dict objectForKey: @"dir"]];
+    if (([reserved containsObject: name] == NO) 
+                        && [removables containsObject: dir]) {
+      [mpoints addObject: dir];
     }
   }
 

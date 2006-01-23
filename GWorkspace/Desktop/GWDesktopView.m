@@ -151,7 +151,7 @@
   if ([mountedVolumes isEqual: rvpaths] == NO) {
     int count = [icons count];
     int i;
-  
+        
     [mountedVolumes removeAllObjects];
     [mountedVolumes addObjectsFromArray: rvpaths];
 

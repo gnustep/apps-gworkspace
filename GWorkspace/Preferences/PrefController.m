@@ -33,7 +33,6 @@
 #include "HistoryPref.h"
 #include "BrowserViewerPref.h"
 #include "DesktopPref.h"
-#include "VolumesPref.h"
 #include "OperationPrefs.h"
 #include "GWorkspace.h"
 #include "GNUstep.h"
@@ -89,7 +88,6 @@ RELEASE (currentPref)
   ADD_PREF_VIEW ([HiddenFilesPref class]);
   ADD_PREF_VIEW ([DesktopPref class]);
   ADD_PREF_VIEW ([OperationPrefs class]);
-  ADD_PREF_VIEW ([VolumesPref class]);
   ADD_PREF_VIEW ([HistoryPref class]);
 
   currentPref = nil;
