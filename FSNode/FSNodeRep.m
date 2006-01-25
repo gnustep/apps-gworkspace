@@ -952,9 +952,6 @@ static FSNodeRep *shared = nil;
   NSMutableArray *names = [NSMutableArray array];  
   unsigned i;
 
-      NSLog(@"****** removables %@", [removables description]);
-
-
   for (i = 0; i < [mounted count]; i++) {
     NSDictionary *dict = [mounted objectAtIndex: i];
     NSString *name = [dict objectForKey: @"name"];

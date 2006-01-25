@@ -300,12 +300,6 @@
 
 - (id)connectApplication:(NSString *)appName;
 
-- (BOOL)performFileOperation:(NSString *)operation 
-                      source:(NSString *)source 
-                 destination:(NSString *)destination 
-                       files:(NSArray *)files 
-                         tag:(int *)tag;
-
 - (void)performFileOperationWithDictionary:(NSDictionary *)opdict;
 
 - (void)slideImage:(NSImage *)image 
@@ -412,6 +406,17 @@
 - (id)workspaceApplication;
 
 - (BOOL)terminating;
+
+@end
+
+
+@interface GWorkspace (NSWorkspaceApplication)
+
+- (BOOL)performFileOperation:(NSString *)operation 
+                      source:(NSString *)source 
+                 destination:(NSString *)destination 
+                       files:(NSArray *)files 
+                         tag:(int *)tag;
 
 @end
 

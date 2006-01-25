@@ -62,9 +62,8 @@
   return filenamesCutted;
 }
 
-- (void)performOperation:(NSData *)opinfo
+- (void)performOperation:(NSDictionary *)opdict
 {
-  NSDictionary *opdict = [NSUnarchiver unarchiveObjectWithData: opinfo];
 	NSString *operation = [opdict objectForKey: @"operation"];
 	NSString *source = [opdict objectForKey: @"source"];
 	NSString *destination = [opdict objectForKey: @"destination"];

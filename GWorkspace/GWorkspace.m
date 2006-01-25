@@ -1721,27 +1721,6 @@ static GWorkspace *gworkspace = nil;
 	return app;
 }
 
-- (BOOL)performFileOperation:(NSString *)operation 
-                      source:(NSString *)source 
-                 destination:(NSString *)destination 
-                       files:(NSArray *)files 
-                         tag:(int *)tag
-{
-  NSMutableDictionary *opdict = [NSMutableDictionary dictionary];
-  NSData *data;
-
-  [opdict setObject: operation forKey: @"operation"];
-  [opdict setObject: source forKey: @"source"];
-  [opdict setObject: destination forKey: @"destination"];
-  [opdict setObject: files forKey: @"files"];
-
-  data = [NSArchiver archivedDataWithRootObject: opdict];
-
-  [fileOpsManager performOperation: data];
-  
-  return YES;
-}
-
 - (void)performFileOperationWithDictionary:(NSDictionary *)opdict
 {
 	NSString *operation = [opdict objectForKey: @"operation"];
@@ -1816,30 +1795,22 @@ static GWorkspace *gworkspace = nil;
 - (void)showInfo:(id)sender
 {
   NSMutableDictionary *d = AUTORELEASE ([NSMutableDictionary new]);
+  
   [d setObject: @"GWorkspace" forKey: @"ApplicationName"];
   [d setObject: NSLocalizedString(@"GNUstep Workspace Manager", @"")
       	forKey: @"ApplicationDescription"];
-  [d setObject: @"GWorkspace 0.7.2" forKey: @"ApplicationRelease"];
-  [d setObject: @"09 2005" forKey: @"FullVersionID"];
+  [d setObject: @"GWorkspace 0.8.0" forKey: @"ApplicationRelease"];
+  [d setObject: @"02 2006" forKey: @"FullVersionID"];
   [d setObject: [NSArray arrayWithObjects: 
-      @"Enrico Sersale <enrico@imago.ro>.\n\
-InspectorViewer, PlistViewer, StringsViewer\n\
-by Fabien Vallon <fabien.vallon@fr.alcove.com>.\n\
-Makefiles and configuration scripts\n\
-by Alexey I. Froloff <raorn@altlinux.ru>.",
-      nil]
-     forKey: @"Authors"];
+                    @"Enrico Sersale <enrico@dtedu.net>", nil]
+        forKey: @"Authors"];
   [d setObject: NSLocalizedString(@"See http://www.gnustep.it/enrico/gworkspace", @"") forKey: @"URL"];
-  [d setObject: @"Copyright (C) 2003, 2004, 2005 Free Software Foundation, Inc."
-     forKey: @"Copyright"];
+  [d setObject: @"Copyright (C) 2003, 2004, 2005, 2006 Free Software Foundation, Inc."
+        forKey: @"Copyright"];
   [d setObject: NSLocalizedString(@"Released under the GNU General Public License 2.0", @"")
-     forKey: @"CopyrightDescription"];
+        forKey: @"CopyrightDescription"];
   
-#ifdef GNUSTEP	
   [NSApp orderFrontStandardInfoPanelWithOptions: d];
-#else
-	[NSApp orderFrontStandardAboutPanel: d];
-#endif
 }
 
 - (void)showPreferences:(id)sender

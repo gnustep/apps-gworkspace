@@ -306,7 +306,7 @@
   NSString *appname = [[notif userInfo] objectForKey: @"NSApplicationName"];
   DockIcon *icon = [self iconForApplicationName: appname];
 
-  if ((icon == nil) && ([appname isEqual: @"Desktop"] == NO)) {
+  if ((icon == nil) && ([appname isEqual: @"GWorkspace"] == NO)) {
     icon = [self addIconForApplicationWithName: appname atIndex: -1];
     [self tile];
   } 
