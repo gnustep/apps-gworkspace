@@ -178,6 +178,8 @@
     }
   
     [self setNeedsDisplay: YES];
+
+    [(Dock *)container applicationTerminated: appName];
     
     if ((isDocked == NO) && ([self isSpecialIcon] == NO)) {
       [(Dock *)container removeIcon: self];

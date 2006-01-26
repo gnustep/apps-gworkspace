@@ -91,6 +91,8 @@
 
 - (void)applicationLaunched:(NSNotification *)notif;
 
+- (void)applicationTerminated:(NSString *)appName;
+
 - (void)setPosition:(DockPosition)pos;
 
 - (void)setBackColor:(NSColor *)color;

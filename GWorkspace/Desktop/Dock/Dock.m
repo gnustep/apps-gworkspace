@@ -420,6 +420,37 @@
   }
 }
 
+- (void)applicationTerminated:(NSString *)appName
+{
+  if ([appName isEqual: @"GWorkspace"] == NO) {
+    int i;
+
+    for (i = 0; i < [launchedApplications count]; i++) {
+      NSDictionary *dict = [launchedApplications objectAtIndex: i];
+      
+      if ([[dict objectForKey: @"NSApplicationName"] isEqual: appName]) {
+        [launchedApplications removeObjectAtIndex: i];
+      
+        [gnustep_global_lock lock]; 
+
+        NS_DURING
+	        {
+        [launchedApplications writeToFile: launchedPath atomically: YES];
+	        }
+        NS_HANDLER
+	        {
+	      NSLog(@"unable to write app list to %@!", launchedPath); 
+	        }
+        NS_ENDHANDLER
+
+        [gnustep_global_lock unlock]; 
+      
+        break;
+      }
+    }
+  }
+}
+
 - (void)setPosition:(DockPosition)pos
 {
   position = pos;
