@@ -54,7 +54,7 @@ GWorkspace_LANGUAGES = Resources/English \
 GWorkspace_OBJC_FILES = main.m \
 GWFunctions.m \
 GWorkspace.m \
-NSWorkspaceApplication.m \
+WorkspaceApplication.m \
 Desktop/GWDesktopManager.m \
 Desktop/GWDesktopWindow.m \
 Desktop/GWDesktopView.m \

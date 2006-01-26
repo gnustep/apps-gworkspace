@@ -410,7 +410,7 @@
 @end
 
 
-@interface GWorkspace (NSWorkspaceApplication)
+@interface GWorkspace (WorkspaceApplication)
 
 - (BOOL)performFileOperation:(NSString *)operation 
                       source:(NSString *)source 

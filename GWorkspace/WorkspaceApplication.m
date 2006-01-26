@@ -1,4 +1,4 @@
-/* NSWorkspaceApplication.m
+/* WorkspaceApplication.m
  *  
  * Copyright (C) 2006 Free Software Foundation, Inc.
  *
@@ -35,7 +35,7 @@
 #include "Operation.h"
 #include "GNUstep.h"
 
-@implementation GWorkspace (NSWorkspaceApplication)
+@implementation GWorkspace (WorkspaceApplication)
 
 - (BOOL)performFileOperation:(NSString *)operation 
                       source:(NSString *)source 
