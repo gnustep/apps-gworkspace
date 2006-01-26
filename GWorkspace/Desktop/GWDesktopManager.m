@@ -325,6 +325,7 @@ static GWDesktopManager *desktopManager = nil;
     
   } else if ([dock superview] == nil) {
     [[win desktopView] addSubview: dock];
+    [dock tile];
     [[win desktopView] setNeedsDisplayInRect: dockReservedFrame];
   }
 }
@@ -548,6 +549,11 @@ static GWDesktopManager *desktopManager = nil;
     [fsnodeRep unlockPaths: [NSArray arrayWithObject: volpath]];
     [[self desktopView] workspaceDidUnmountVolumeAtPath: volpath];
   }
+}
+
+- (NSArray *)launchedApplications
+{
+  return [dock launchedApplications];
 }
 
 - (void)updateDefaults

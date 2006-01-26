@@ -28,6 +28,7 @@
 #include "DockIcon.h"
 #include "Dock.h"
 #include "GWDesktopManager.h"
+#include "StartAppWin.h"
 
 @implementation DockIcon
 
@@ -73,7 +74,6 @@
     ASSIGN (appName, [[node name] stringByDeletingPathExtension]);
     isDocked = NO;
     isLaunched = NO;
- //   manager = [GWDesktopManager desktopManager];
     nc = [NSNotificationCenter defaultCenter];
     fm = [NSFileManager defaultManager];
     ws = [NSWorkspace sharedWorkspace];
@@ -139,7 +139,7 @@
   return (isWsIcon || isTrashIcon);
 }
 
-- (void)setIsDocked:(BOOL)value
+- (void)setDocked:(BOOL)value
 {
   isDocked = value;
 }
@@ -149,17 +149,20 @@
   return isDocked;
 }
 
-- (void)setIsLaunched:(BOOL)value
+- (void)setLaunched:(BOOL)value
+       showProgress:(BOOL)prog
 {
   isLaunched = value;
 
   if (isLaunched) {
     if (application == nil) {
-      [self connectApplication];
+      [self connectApplication: prog];
     }
     
     if (application) {
       [self setNeedsDisplay: YES];
+    } else {
+      isLaunched = NO;
     }
         
   } else {
@@ -182,7 +185,7 @@
   }
 }
 
-- (void)connectApplication
+- (void)connectApplication:(BOOL)showProgress
 {
   if (application == nil) {
     id app = [NSConnection rootProxyForConnectionWithRegisteredName: appName
@@ -201,11 +204,25 @@
       
 	  } else {
 	    static BOOL recursion = NO;
+	    static StartAppWin *startAppWin = nil;
 	  
       if (recursion == NO) {
         int i;
         
-        for (i = 1; i <= 80; i++) {
+        if (showProgress && (startAppWin == nil)) {
+          startAppWin = [(Dock *)container startAppWin];
+
+          [startAppWin showWindowWithTitle: @"GWorkspace"
+                                   appName: appName
+                                 operation: NSLocalizedString(@"contacting:", @"")         
+                              maxProgValue: 20.0];
+        }
+        
+        for (i = 1; i <= 20; i++) {
+          if (showProgress) {
+            [startAppWin updateProgressBy: 1.0];
+          }
+          
 	        [[NSRunLoop currentRunLoop] runUntilDate:
 		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
                            
@@ -216,8 +233,12 @@
           }
         }
         
+        if (showProgress) {
+          [[startAppWin win] close];
+        }
+        
 	      recursion = YES;
-	      [self connectApplication];
+	      [self connectApplication: showProgress];
 	      recursion = NO;
         
 	    } else { 
@@ -241,7 +262,7 @@
   RELEASE (application);
   application = nil;
   
-  [self setIsLaunched: NO];
+  [self setLaunched: NO showProgress: NO];
 }
 
 - (BOOL)isLaunched

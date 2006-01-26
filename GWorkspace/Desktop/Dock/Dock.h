@@ -33,6 +33,7 @@
 @class NSColor;
 @class NSImage;
 @class DockIcon;
+@class StartAppWin;
 
 @interface Dock : NSView 
 {
@@ -41,6 +42,11 @@
   NSMutableArray *icons;
   int iconSize;
 
+  NSString *launchedPath;
+  NSMutableArray *launchedApplications;
+
+  StartAppWin *startAppWin;
+  
   NSColor *backColor;
   NSImage *backImage;
   BOOL useBackImage;
@@ -51,7 +57,8 @@
   int targetIndex;
   NSRect targetRect;
   
-  GWDesktopManager *manager;  
+  GWDesktopManager *manager; 
+  NSFileManager *fm; 
   id ws;
   NSNotificationCenter *wsnc; 
 }
@@ -93,6 +100,10 @@
 - (void)setUseBackImage:(BOOL)value;
 
 - (void)tile;
+
+- (NSArray *)launchedApplications;
+
+- (StartAppWin *)startAppWin;
 
 - (void)updateDefaults;
 

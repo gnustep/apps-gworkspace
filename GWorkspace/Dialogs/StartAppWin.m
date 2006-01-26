@@ -67,10 +67,12 @@ static NSString *nibName = @"StartAppWin";
 
 - (void)showWindowWithTitle:(NSString *)title
                     appName:(NSString *)appname
+                  operation:(NSString *)operation
                maxProgValue:(float)maxvalue
 {
   if (win) {
     [win setTitle: title];
+    [startLabel setStringValue: operation];
     [nameField setStringValue: appname];
 
     [progInd setMinValue: 0.0];

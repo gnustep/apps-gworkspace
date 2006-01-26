@@ -29,10 +29,10 @@
 #include "FSNodeRep.h"
 #include "FSNFunctions.h"
 #include "GWorkspace.h"
-#include "Dialogs/Dialogs.h"
-#include "Dialogs/OpenWithController.h"
-#include "Dialogs/RunExternalController.h"
-#include "Dialogs/StartAppWin.h"
+#include "Dialogs.h"
+#include "OpenWithController.h"
+#include "RunExternalController.h"
+#include "StartAppWin.h"
 #include "Preferences/PrefController.h"
 #include "Fiend/Fiend.h"
 #include "GWDesktopManager.h"
@@ -449,33 +449,6 @@ static GWorkspace *gworkspace = nil;
   } else {
     [viewer activate];
   }
-}
-
-- (BOOL)selectFile:(NSString *)fullPath
-											inFileViewerRootedAtPath:(NSString *)rootFullpath
-{
-  FSNode *node = [FSNode nodeWithPath: fullPath];
-  
-  if (node && [node isValid]) {
-    FSNode *base;
-  
-    if ((rootFullpath == nil) || ([rootFullpath length] == 0)) {
-      base = [FSNode nodeWithPath: path_separator()];
-    } else {
-      base = [FSNode nodeWithPath: rootFullpath];
-    }
-  
-    if (base && [base isValid]) {
-      if (([base isDirectory] == NO) || [base isPackage]) {
-        return NO;
-      }
-    
-      [vwrsManager selectRepOfNode: node inViewerWithBaseNode: base];
-      return YES;
-    }
-  }
-   
-  return NO;
 }
 
 - (void)rootViewerSelectFiles:(NSArray *)paths
@@ -1384,6 +1357,7 @@ static GWorkspace *gworkspace = nil;
         
         [startAppWin showWindowWithTitle: @"GWorkspace"
                                  appName: @"fswatcher"
+                               operation: NSLocalizedString(@"starting:", @"")
                             maxProgValue: 40.0];
 
 	      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
@@ -1495,6 +1469,7 @@ static GWorkspace *gworkspace = nil;
         
         [startAppWin showWindowWithTitle: @"GWorkspace"
                                  appName: @"Recycler"
+                               operation: NSLocalizedString(@"starting:", @"")
                             maxProgValue: 80.0];
 
         [ws launchApplication: @"Recycler"];
@@ -1594,6 +1569,7 @@ static GWorkspace *gworkspace = nil;
         
         [startAppWin showWindowWithTitle: @"GWorkspace"
                                  appName: @"ddbd"
+                               operation: NSLocalizedString(@"starting:", @"")
                             maxProgValue: 40.0];
 
 	      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
@@ -1738,11 +1714,6 @@ static GWorkspace *gworkspace = nil;
 								to:(NSPoint)toPoint
 {
 	[[NSWorkspace sharedWorkspace] slideImage: image from: fromPoint to: toPoint];
-}
-
-- (int)extendPowerOffBy:(int)requested
-{
-  return 0;
 }
 
 

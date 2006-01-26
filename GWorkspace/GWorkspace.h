@@ -192,9 +192,6 @@
 
 - (void)showRootViewer;
 
-- (BOOL)selectFile:(NSString *)fullPath
-							inFileViewerRootedAtPath:(NSString *)rootFullpath;
-
 - (void)rootViewerSelectFiles:(NSArray *)paths;
 
 - (void)newViewerAtPath:(NSString *)path;
@@ -306,8 +303,6 @@
 							from:(NSPoint)fromPoint 
 								to:(NSPoint)toPoint;
 
-- (int)extendPowerOffBy:(int)requested;
-
 
 //
 // NSServicesRequests protocol
@@ -417,6 +412,13 @@
                  destination:(NSString *)destination 
                        files:(NSArray *)files 
                          tag:(int *)tag;
+
+- (BOOL)selectFile:(NSString *)fullPath
+							inFileViewerRootedAtPath:(NSString *)rootFullpath;
+
+- (int)extendPowerOffBy:(int)requested;
+
+- (NSArray *)launchedApplications;
 
 @end
 

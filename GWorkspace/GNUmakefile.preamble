@@ -20,6 +20,7 @@ ADDITIONAL_INCLUDE_DIRS += -IFinder/Modules
 ADDITIONAL_INCLUDE_DIRS += -IFileViewer -I../FileViewer 
 ADDITIONAL_INCLUDE_DIRS += -IFileAnnotations -I../FileAnnotations 
 ADDITIONAL_INCLUDE_DIRS += -IHistory -I../History 
+ADDITIONAL_INCLUDE_DIRS += -IDialogs -I../Dialogs -I../../Dialogs 
 ADDITIONAL_INCLUDE_DIRS += -I../FSNode -I../../FSNode -I../../../FSNode
 ADDITIONAL_INCLUDE_DIRS += -I../Inspector -I../../Inspector
 ADDITIONAL_INCLUDE_DIRS += -I../Operation -I../../Operation

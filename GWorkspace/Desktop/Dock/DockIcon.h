@@ -73,13 +73,14 @@
 
 - (BOOL)isSpecialIcon;
 
-- (void)setIsDocked:(BOOL)value;
+- (void)setDocked:(BOOL)value;
 
 - (BOOL)isDocked;
 
-- (void)setIsLaunched:(BOOL)value;
+- (void)setLaunched:(BOOL)value 
+       showProgress:(BOOL)prog;
 
-- (void)connectApplication;
+- (void)connectApplication:(BOOL)showProgress;
 
 - (void)applicationConnectionDidDie:(NSNotification *)notif;
 
