@@ -122,8 +122,24 @@ static GWorkspace *gworkspace = nil;
   DESTROY (fileOpsManager);
   RELEASE (finder);
   RELEASE (waitCursor);
-  
+
+  RELEASE (launchedApps);
+    
 	[super dealloc];
+}
+
+- (id)init
+{
+  self = [super init];
+  
+  if (self) {
+    fm = [NSFileManager defaultManager];
+	  ws = [NSWorkspace sharedWorkspace];
+    wsnc = [ws notificationCenter]; 
+    launchedApps = [NSMutableDictionary new];     
+  }
+  
+  return self;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
@@ -137,12 +153,9 @@ static GWorkspace *gworkspace = nil;
   int i;
   
 	[isa registerForServices];
+
+  fsnodeRep = [FSNodeRep sharedInstance];  
     
-  fm = [NSFileManager defaultManager];
-	ws = [NSWorkspace sharedWorkspace];
-
-  fsnodeRep = [FSNodeRep sharedInstance];
-
   extendedInfo = [fsnodeRep availableExtendedInfoNames];
   menu = [[[NSApp mainMenu] itemWithTitle: NSLocalizedString(@"View", @"")] submenu];
   menu = [[menu itemWithTitle: NSLocalizedString(@"Show", @"")] submenu];
@@ -1662,39 +1675,6 @@ static GWorkspace *gworkspace = nil;
   if (ddbd && [ddbd dbactive]) {
     [ddbd setAnnotations: annotations forPath: path];
   }
-}
-
-- (id)connectApplication:(NSString *)appName
-{
-	NSString *host;
-	NSString *port;
-	id app = nil;
-
-	host = [[NSUserDefaults standardUserDefaults] stringForKey: @"NSHost"];
-	if (host == nil) {
-		host = @"";
-	} else {
-		NSHost *h = [NSHost hostWithName: host];
-		
-		if ([h isEqual: [NSHost currentHost]] == YES) {
-	  	host = @"";
-		}
-	}
-  
-	port = [appName stringByDeletingPathExtension];
-
-	NS_DURING
-		{
-			app = [NSConnection rootProxyForConnectionWithRegisteredName: port  
-                                                              host: host];
-		}
-	NS_HANDLER
-		{
-			app = nil;
-	  }
-	NS_ENDHANDLER
-
-	return app;
 }
 
 - (void)performFileOperationWithDictionary:(NSDictionary *)opdict

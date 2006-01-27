@@ -161,7 +161,13 @@
   NSCursor *waitCursor;
           
   NSFileManager *fm;
-  NSWorkspace *ws;
+
+  //
+  // WorkspaceApplication
+  //
+  NSWorkspace *ws;  
+  NSNotificationCenter *wsnc; 
+  NSMutableDictionary	*launchedApps;
 }
 
 + (GWorkspace *)gworkspace;
@@ -295,8 +301,6 @@
 - (void)ddbdSetAnnotations:(NSString *)annotations
                    forPath:(NSString *)path;
 
-- (id)connectApplication:(NSString *)appName;
-
 - (void)performFileOperationWithDictionary:(NSDictionary *)opdict;
 
 - (void)slideImage:(NSImage *)image 
@@ -419,6 +423,21 @@
 - (int)extendPowerOffBy:(int)requested;
 
 - (NSArray *)launchedApplications;
+
+- (BOOL)_launchApplication:(NSString *)appName
+		             arguments:(NSArray *)args;
+
+- (id)_connectApplication:(NSString *)appName;
+
+- (BOOL)openFile:(NSString *)fullPath
+          withApplication:(NSString *)appName
+            andDeactivate:(BOOL)flag;
+
+- (BOOL)launchApplication:(NSString *)appName
+		             showIcon:(BOOL)showIcon
+	             autolaunch:(BOOL)autolaunch;
+
+- (BOOL)openTempFile:(NSString *)fullPath;
 
 @end
 

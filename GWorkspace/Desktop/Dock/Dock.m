@@ -73,9 +73,7 @@
     iconSize = MAX_ICN_SIZE;
 
     startAppWin = [StartAppWin new];
-                        
-    [self setBackColor: [[manager desktopView] currentColor]];
-        
+                                
     dndSourceIcon = nil;
     isDragTarget = NO;  
     dragdelay = 0;
@@ -198,6 +196,8 @@
         [gnustep_global_lock unlock]; 
       }
     }
+    
+    [self setBackColor: [[manager desktopView] currentColor]];
   }
   
   return self;  
