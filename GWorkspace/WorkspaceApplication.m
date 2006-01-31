@@ -110,6 +110,8 @@
   NSString *appPath, *appName;
   GWLaunchedApp *app;
   id application;
+  
+  NSLog(@"QUA 1 %@", [fullPath lastPathComponent]);
     
   if (appname == nil) {
     NSString *ext = [fullPath pathExtension];
@@ -129,15 +131,21 @@
   if (app == nil) {
     NSArray *args = [NSArray arrayWithObjects: @"-GSFilePath", fullPath, nil];
     
+    NSLog(@"QUA 2 %@", [fullPath lastPathComponent]);
+    
     return [self _launchApplication: appName arguments: args locally: NO];
   
   } else {
     application = [app application];
-
+    
+    NSLog(@"QUA 3 %@", [fullPath lastPathComponent]);
+    
     if (application == nil) {
       NSArray *args = [NSArray arrayWithObjects: @"-GSFilePath", fullPath, nil];
       
       [self applicationTerminated: app];
+      
+      NSLog(@"QUA 4 %@", [fullPath lastPathComponent]);
        
       return [self _launchApplication: appName arguments: args locally: NO];
 
@@ -351,7 +359,7 @@
   NSDictionary *info = [notif userInfo];
   NSString *name = [info objectForKey: @"NSApplicationName"];
   NSString *path = [info objectForKey: @"NSApplicationPath"];
-  NSNumber *ident = [info objectForKey: @"NSApplicationPprocessIdentifier"];
+  NSNumber *ident = [info objectForKey: @"NSApplicationProcessIdentifier"];
   GWLaunchedApp *app = [self launchedAppWithPath: path andName: name];
 
   if (app) {
@@ -547,12 +555,12 @@
   if (oldrunning && [oldrunning count]) {
     NSMutableArray *toremove = [NSMutableArray array];
     unsigned i;
-
+    
     for (i = 0; i < [oldrunning count]; i++) {
       NSDictionary *dict = [oldrunning objectAtIndex: i];
       NSString *name = [dict objectForKey: @"NSApplicationName"];
       NSString *path = [dict objectForKey: @"NSApplicationPath"];
-      NSNumber *ident = [dict objectForKey: @"NSApplicationPprocessIdentifier"];
+      NSNumber *ident = [dict objectForKey: @"NSApplicationProcessIdentifier"];
     
       if (name && path && ident) {
         GWLaunchedApp *app = [GWLaunchedApp appWithApplicationPath: path
@@ -650,9 +658,11 @@
   return self;
 }
 
+/*
 - (unsigned)hash
 {
-  return [super hash];
+  return 0;
+//  return [super hash];
 }
 
 - (BOOL)isEqual:(id)other
@@ -675,6 +685,7 @@
   
   return NO;
 }
+*/
 
 - (NSDictionary *)appInfo
 {
@@ -687,7 +698,7 @@
     [dict setObject: path forKey: @"NSApplicationPath"];
   }
   if (identifier != nil) {
-    [dict setObject: identifier forKey: @"NSApplicationPprocessIdentifier"];
+    [dict setObject: identifier forKey: @"NSApplicationProcessIdentifier"];
   }
 
   return dict;
@@ -784,6 +795,9 @@
       int i;
 
 	    if ((task == nil || [task isRunning] == NO) && (showProgress == NO)) {
+   //     if ((task != nil) && (showProgress == NO)) {
+   //       [gw applicationTerminated: self];
+   //     }
         return;
 	    }
 
