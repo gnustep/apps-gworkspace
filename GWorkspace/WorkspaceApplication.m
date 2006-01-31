@@ -31,8 +31,10 @@
 #include "FSNFunctions.h"
 #include "GWorkspace.h"
 #include "GWDesktopManager.h"
+#include "Dock.h"
 #include "GWViewersManager.h"
 #include "Operation.h"
+#include "StartAppWin.h"
 #include "GNUstep.h"
 
 @implementation GWorkspace (WorkspaceApplication)
@@ -91,16 +93,197 @@
 
 - (NSArray *)launchedApplications
 {
-  return [dtopManager launchedApplications];
+  NSMutableArray *launched = [NSMutableArray array];
+  unsigned i;
+  
+  for (i = 0; i < [launchedApps count]; i++) {
+    [launched addObject: [[launchedApps objectAtIndex: i] appInfo]];
+  }
+
+  return launched;
 }
 
-- (BOOL)_launchApplication:(NSString *)appName
-		             arguments:(NSArray *)args
+- (BOOL)openFile:(NSString *)fullPath
+          withApplication:(NSString *)appname
+            andDeactivate:(BOOL)flag
 {
+  NSString *appPath, *appName;
+  GWLaunchedApp *app;
+  id application;
+    
+  if (appname == nil) {
+    NSString *ext = [fullPath pathExtension];
+    
+    appname = [ws getBestAppInRole: nil forExtension: ext];
+    
+    if (appName == nil) {
+      NSWarnLog(@"No known applications for file extension '%@'", ext);
+      return NO;
+    }
+  }
+
+  [self applicationName: &appName andPath: &appPath forName: appname];
+  
+  app = [self launchedAppWithPath: appPath andName: appName];
+  
+  if (app == nil) {
+    NSArray *args = [NSArray arrayWithObjects: @"-GSFilePath", fullPath, nil];
+    
+    return [self _launchApplication: appName arguments: args locally: NO];
+  
+  } else {
+    application = [app application];
+
+    if (application == nil) {
+      NSArray *args = [NSArray arrayWithObjects: @"-GSFilePath", fullPath, nil];
+      
+      [self applicationTerminated: app];
+       
+      return [self _launchApplication: appName arguments: args locally: NO];
+
+    } else {
+      NS_DURING
+	      {
+	    if (flag == NO) {
+	      [application application: NSApp openFileWithoutUI: fullPath];
+      } else {
+	      [application application: NSApp openFile: fullPath];
+	    }
+	      }
+      NS_HANDLER
+	      {
+      [self applicationTerminated: app]; 
+	    NSWarnLog(@"Failed to contact '%@' to open file", appName);
+	    return NO;
+	      }
+      NS_ENDHANDLER
+    }
+  }
+  
+  if (flag) {
+    [NSApp deactivate];
+  }
+
+  return YES;
+}
+
+- (BOOL)launchApplication:(NSString *)appname
+		             showIcon:(BOOL)showIcon
+	             autolaunch:(BOOL)autolaunch
+{
+  NSString *appPath, *appName;
+  GWLaunchedApp *app;
+  id application;
+  NSArray	*args = nil;
+
+  [self applicationName: &appName andPath: &appPath forName: appname];
+ 
+  app = [self launchedAppWithPath: appPath andName: appName];
+ 
+  if (app == nil) {
+    if (autolaunch) {
+	    args = [NSArray arrayWithObjects: @"-autolaunch", @"YES", nil];
+	  }
+    
+    return [self _launchApplication: appName arguments: args locally: NO];
+  
+  } else {
+    application = [app application];
+ 
+    if (application == nil) {
+      [self applicationTerminated: app];
+
+      if (autolaunch) {
+	      args = [NSArray arrayWithObjects: @"-autolaunch", @"YES", nil];
+	    }
+             
+      return [self _launchApplication: appName arguments: args locally: NO];
+    
+    } else {
+      [application activateIgnoringOtherApps: YES];
+    }
+  }
+
+  return YES;
+}
+
+- (BOOL)openTempFile:(NSString *)fullPath
+{
+  NSString *ext = [fullPath pathExtension];
+  NSString *name = [ws getBestAppInRole: nil forExtension: ext];
+  NSString *appPath, *appName;
+  GWLaunchedApp *app;
+  id application;
+  
+  if (name == nil) {
+    NSWarnLog(@"No known applications for file extension '%@'", ext);
+    return NO;
+  }
+  
+  [self applicationName: &appName andPath: &appPath forName: name];  
+    
+  app = [self launchedAppWithPath: appPath andName: appName];
+    
+  if (app == nil) {
+    NSArray *args = [NSArray arrayWithObjects: @"-GSTempPath", fullPath, nil];
+    
+    return [self _launchApplication: appName arguments: args locally: NO];
+  
+  } else {
+    application = [app application];
+    
+    if (application == nil) {
+      NSArray *args = [NSArray arrayWithObjects: @"-GSTempPath", fullPath, nil];
+    
+      [self applicationTerminated: app];
+      
+      return [self _launchApplication: appName arguments: args locally: NO];
+      
+    } else {
+      NS_DURING
+	      {
+	    [application application: NSApp openTempFile: fullPath];
+	      }
+      NS_HANDLER
+	      {
+      [self applicationTerminated: app];
+	    NSWarnLog(@"Failed to contact '%@' to open temp file", appName);
+	    return NO;
+	      }
+      NS_ENDHANDLER
+    }
+  }    
+
+  [NSApp deactivate];
+
+  return YES;
+}
+
+@end
+
+
+@implementation GWorkspace (Applications)
+
+- (void)applicationName:(NSString **)appName
+                andPath:(NSString **)appPath
+                forName:(NSString *)name
+{
+  *appName = [[name lastPathComponent] stringByDeletingPathExtension];
+  *appPath = [ws fullPathForApplication: *appName];
+}
+                
+- (BOOL)_launchApplication:(NSString *)appname
+		             arguments:(NSArray *)args
+                   locally:(BOOL)locally
+{
+  NSString *appPath, *appName;
   NSTask *task;
+  GWLaunchedApp *app;
   NSString *path;
   NSDictionary *userinfo;
   NSString *host;
+
+  [self applicationName: &appName andPath: &appPath forName: appname];
 
   path = [ws locateApplicationBinary: appName];
   
@@ -132,8 +315,6 @@
     }
 	}
   
-  // App being launched, send
-  // NSWorkspaceWillLaunchApplicationNotification
   userinfo = [NSDictionary dictionaryWithObjectsAndKeys:
 	              [[appName lastPathComponent] stringByDeletingPathExtension], 
 			           @"NSApplicationName",
@@ -150,208 +331,540 @@
   if (task == nil) {
 	  return NO;
 	}
+  
+  app = [GWLaunchedApp appWithApplicationPath: appPath
+                              applicationName: appName
+                                 launchedTask: task];
 
-  // The NSWorkspaceDidLaunchApplicationNotification will be
-  // sent by the started application itself.
-  [launchedApps setObject: task forKey: appName];
+  [launchedApps addObject: app];
   
   return YES;    
 }
 
-- (id)_connectApplication:(NSString *)appName
-{
-  NSString *host;
-  NSString *port;
-  NSDate *when = nil;
-  id app = nil;
-
-  while (app == nil) {
-    host = [[NSUserDefaults standardUserDefaults] stringForKey: @"NSHost"];
-    
-    if (host == nil) {
-	    host = @"";
-	  } else {
-	    NSHost *h;
-
-	    h = [NSHost hostWithName: host];
-	    
-      if ([h isEqual: [NSHost currentHost]] == YES) {
-	      host = @"";
-	    }
-	  }
-    
-    port = [[appName lastPathComponent] stringByDeletingPathExtension];
-      /*
-       *	Try to contact a running application.
-       */
-    NS_DURING
-	    {
-	  app = [NSConnection rootProxyForConnectionWithRegisteredName: port host: host];
-	    }
-    NS_HANDLER
-	    {
-	    /* Fatal error in DO	*/
-	  app = nil;
-	    }
-    NS_ENDHANDLER
-
-    if (app == nil) {
-	    NSTask *task = [launchedApps objectForKey: appName];
-	    NSDate *limit;
-
-	    if (task == nil || [task isRunning] == NO) {
-	      if (task != nil) { // Not running
-		      [launchedApps removeObjectForKey: appName];
-		    }
-	      
-        break;  // Need to launch the app
-	    }
-
-	    if (when == nil) {
-	      when = [[NSDate alloc] init];
-      } else if ([when timeIntervalSinceNow] < -5.0) {
-	      int result;
-
-	      DESTROY (when);
-        
-        result = NSRunAlertPanel(appName,
-                      [NSString stringWithFormat: @"%@ %@", 
-                            [appName lastPathComponent],
-                            NSLocalizedString(@"seems to have hung", @"")], 
-		                  NSLocalizedString(@"Continue", @""), 
-                      NSLocalizedString(@"Terminate", @""), 
-                      NSLocalizedString(@"Wait", @""));
-
-	      if (result == NSAlertDefaultReturn) {
-		      break;		// Finished without app
-		    } else if (result == NSAlertOtherReturn) {
-		      // Continue to wait for app startup.
-		    } else {
-		      [task terminate];
-		      [launchedApps removeObjectForKey: appName];
-		      break;		// Terminate hung app
-		    }
-	    }
-
-	    // Give it another 0.5 of a second to start up.
-	    limit = [[NSDate alloc] initWithTimeIntervalSinceNow: 0.5];
-	    [[NSRunLoop currentRunLoop] runUntilDate: limit];
-	    RELEASE(limit);
-	  }
-  }
-  
-  TEST_RELEASE (when);
-  
-  return app;
+- (void)applicationWillLaunch:(NSNotification *)notif
+{  
+  [[dtopManager dock] applicationWillLaunch: [notif userInfo]];
 }
 
-- (BOOL)openFile:(NSString *)fullPath
-          withApplication:(NSString *)appName
-            andDeactivate:(BOOL)flag
+- (void)applicationDidLaunch:(NSNotification *)notif
 {
-  id app;
+  NSDictionary *info = [notif userInfo];
+  NSString *name = [info objectForKey: @"NSApplicationName"];
+  NSString *path = [info objectForKey: @"NSApplicationPath"];
+  NSNumber *ident = [info objectForKey: @"NSApplicationPprocessIdentifier"];
+  GWLaunchedApp *app = [self launchedAppWithPath: path andName: name];
 
-  if (appName == nil) {
-    NSString *ext = [fullPath pathExtension];
+  if (app) {
+    [app setIdentifier: ident];
     
-    appName = [ws getBestAppInRole: nil forExtension: ext];
+  } else { // if launched by an other process
+    app = [GWLaunchedApp appWithApplicationPath: path
+                                applicationName: name
+                              processIdentifier: ident
+                                   checkRunning: NO];
+  
+    if ([app application] != nil) {
+      [launchedApps addObject: app];
+    }  
+  }
+
+  if ([app application] != nil) {
+    [[dtopManager dock] applicationDidLaunch: info];
+  }
+}
+
+
+
+
+
+
+
+
+- (void)applicationTerminated:(GWLaunchedApp *)app
+{
+  [[dtopManager dock] applicationTerminated: [app appInfo]];
+  [launchedApps removeObject: app];
+}
+
+- (GWLaunchedApp *)launchedAppWithPath:(NSString *)path
+                               andName:(NSString *)name
+{
+  unsigned i;
+
+  for (i = 0; i < [launchedApps count]; i++) {
+    GWLaunchedApp *app = [launchedApps objectAtIndex: i];
     
-    if (appName == nil) {
-      NSWarnLog(@"No known applications for file extension '%@'", ext);
-      return NO;
+    if (([[app path] isEqual: path]) && ([[app name] isEqual: name])) {
+      return app;
     }
   }
+  
+  return nil;
+}
 
-  app = [self _connectApplication: appName];
+- (NSArray *)storedAppInfo
+{
+  NSDictionary *runningInfo = nil;
+  NSDictionary *apps = nil;
   
-  if (app == nil) {
-    NSArray *args = [NSArray arrayWithObjects: @"-GSFilePath", fullPath, nil];
+  if ([storedAppinfoLock tryLock] == NO) {
+    unsigned sleeps = 0;
+
+    if ([[storedAppinfoLock lockDate] timeIntervalSinceNow] < -20.0) {
+	    NS_DURING
+	      {
+	    [storedAppinfoLock breakLock];
+	      }
+	    NS_HANDLER
+	      {
+      NSLog(@"Unable to break lock %@ ... %@", storedAppinfoLock, localException);
+	      }
+	    NS_ENDHANDLER
+    }
     
-    return [self _launchApplication: appName arguments: args];
+    for (sleeps = 0; sleeps < 10; sleeps++) {
+	    if ([storedAppinfoLock tryLock] == YES) {
+	      break;
+	    }
+	    
+      sleeps++;
+	    [NSThread sleepUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+	  }
+    
+    if (sleeps >= 10) {
+      NSLog(@"Unable to obtain lock %@", storedAppinfoLock);
+      return nil;
+	  }
+  }
+
+  if ([fm isReadableFileAtPath: storedAppinfoPath]) {
+    runningInfo = [NSDictionary dictionaryWithContentsOfFile: storedAppinfoPath];
+  }
+        
+  [storedAppinfoLock unlock];
   
+  if (runningInfo == nil) {
+    return nil;
+  }
+  
+  apps = [runningInfo objectForKey: @"GSLaunched"];
+  
+  return ((apps != nil) ? [apps allValues] : nil);
+}
+
+- (void)updateStoredAppInfoWithLaunchedApps:(NSArray *)apps
+{
+  CREATE_AUTORELEASE_POOL(arp);
+  NSMutableDictionary *runningInfo = nil;
+  NSDictionary *oldapps = nil;
+  NSMutableDictionary *newapps = nil;
+  BOOL modified = NO;
+  unsigned i;
+    
+  if ([storedAppinfoLock tryLock] == NO) {
+    unsigned sleeps = 0;
+
+    if ([[storedAppinfoLock lockDate] timeIntervalSinceNow] < -20.0) {
+	    NS_DURING
+	      {
+	    [storedAppinfoLock breakLock];
+	      }
+	    NS_HANDLER
+	      {
+      NSLog(@"Unable to break lock %@ ... %@", storedAppinfoLock, localException);
+	      }
+	    NS_ENDHANDLER
+    }
+    
+    for (sleeps = 0; sleeps < 10; sleeps++) {
+	    if ([storedAppinfoLock tryLock] == YES) {
+	      break;
+	    }
+	    
+      sleeps++;
+	    [NSThread sleepUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+	  }
+    
+    if (sleeps >= 10) {
+      NSLog(@"Unable to obtain lock %@", storedAppinfoLock);
+      return;
+	  }
+  }
+
+  if ([fm isReadableFileAtPath: storedAppinfoPath]) {
+    runningInfo = [NSMutableDictionary dictionaryWithContentsOfFile: storedAppinfoPath];
+  }
+
+  if (runningInfo == nil) {
+    runningInfo = [NSMutableDictionary dictionary];
+    modified = YES;
+  }
+
+  oldapps = [runningInfo objectForKey: @"GSLaunched"];
+  
+  if (oldapps == nil) {
+    newapps = [NSMutableDictionary new];
+    modified = YES;
   } else {
-    NS_DURING
-	    {
-	  if (flag == NO) {
-	    [app application: NSApp openFileWithoutUI: fullPath];
+    newapps = [oldapps mutableCopy];
+  }
+  
+  for (i = 0; i < [apps count]; i++) {
+    GWLaunchedApp *app = [apps objectAtIndex: i];
+    NSString *appname = [app name];
+    NSDictionary *oldInfo = [newapps objectForKey: appname];
+
+    if ([app isRunning] == NO) {
+      if (oldInfo != nil) {
+        [newapps removeObjectForKey: appname];
+	      modified = YES;
+	    }
+
     } else {
-	    [app application: NSApp openFile: fullPath];
-	  }
-	    }
-    NS_HANDLER
-	    {
-	  NSWarnLog(@"Failed to contact '%@' to open file", appName);
-	  return NO;
-	    }
-    NS_ENDHANDLER
+      NSDictionary *info = [app appInfo];
+
+      if ([info isEqual: oldInfo] == NO) {
+        [newapps setObject: info forKey: appname];
+	      modified = YES;
+      }
+    }
+  }
+  
+  if (modified) {
+    [runningInfo setObject: newapps forKey: @"GSLaunched"];
+    [runningInfo writeToFile: storedAppinfoPath atomically: YES];
   }
 
-  if (flag) {
-    [NSApp deactivate];
-  }
-
-  return YES;
+  RELEASE (newapps);  
+  [storedAppinfoLock unlock];
+  RELEASE (arp);
 }
 
-- (BOOL)launchApplication:(NSString *)appName
-		             showIcon:(BOOL)showIcon
-	             autolaunch:(BOOL)autolaunch
+- (void)checkLastRunningApps
 {
-  id app = [self _connectApplication: appName];
-  
-  if (app == nil) {
-    NSArray	*args = nil;
+  NSArray *oldrunning = [self storedAppInfo];
 
-    if (autolaunch) {
-	    args = [NSArray arrayWithObjects: @"-autolaunch", @"YES", nil];
-	  }
+  if (oldrunning && [oldrunning count]) {
+    NSMutableArray *toremove = [NSMutableArray array];
+    unsigned i;
+
+    for (i = 0; i < [oldrunning count]; i++) {
+      NSDictionary *dict = [oldrunning objectAtIndex: i];
+      NSString *name = [dict objectForKey: @"NSApplicationName"];
+      NSString *path = [dict objectForKey: @"NSApplicationPath"];
+      NSNumber *ident = [dict objectForKey: @"NSApplicationPprocessIdentifier"];
     
-    return [self _launchApplication: appName arguments: args];
-
-  } else {
-    [app activateIgnoringOtherApps: YES];
-  }
-
-  return YES;
-}
-
-- (BOOL)openTempFile:(NSString *)fullPath
-{
-  NSString *ext = [fullPath pathExtension];
-  NSString *appName = [ws getBestAppInRole: nil forExtension: ext];
-  id app;
-  
-  if (appName == nil) {
-    NSWarnLog(@"No known applications for file extension '%@'", ext);
-    return NO;
-  }
+      if (name && path && ident) {
+        GWLaunchedApp *app = [GWLaunchedApp appWithApplicationPath: path
+                                                   applicationName: name
+                                                 processIdentifier: ident
+                                                      checkRunning: YES];
+        
+        if ([app isRunning]) {
+          [launchedApps addObject: app];
+          [[dtopManager dock] applicationDidLaunch: [app appInfo]];
+        } else {
+          [toremove addObject: app];
+        }
+      }
+    }
     
-  app = [self _connectApplication: appName];
-  
-  if (app == nil) {
-    NSArray *args = [NSArray arrayWithObjects: @"-GSTempPath", fullPath, nil];
-    
-    return [self _launchApplication: appName arguments: args];
-  
-  } else {
-    NS_DURING
-	    {
-	  [app application: NSApp openTempFile: fullPath];
-	    }
-    NS_HANDLER
-	    {
-	  NSWarnLog(@"Failed to contact '%@' to open temp file", appName);
-	  return NO;
-	    }
-    NS_ENDHANDLER
+    if ([toremove count]) {
+      [self updateStoredAppInfoWithLaunchedApps: toremove];
+    }
   }
-
-  [NSApp deactivate];
-
-  return YES;
 }
 
 @end
 
+
+@implementation GWLaunchedApp
+
++ (id)appWithApplicationPath:(NSString *)apath
+             applicationName:(NSString *)aname
+                launchedTask:(NSTask *)atask
+{
+  GWLaunchedApp *app = [GWLaunchedApp new];
+  
+  [app setPath: apath];
+  [app setName: aname];
+  [app setTask: atask];
+
+  return AUTORELEASE (app);  
+}
+
++ (id)appWithApplicationPath:(NSString *)apath
+             applicationName:(NSString *)aname
+           processIdentifier:(NSNumber *)ident
+                checkRunning:(BOOL)check
+{
+  GWLaunchedApp *app = [GWLaunchedApp new];
+  
+  [app setPath: apath];
+  [app setName: aname];
+  [app setIdentifier: ident];
+  
+  if (check) {
+    [app connectApplication: YES];
+  }
+  
+  return AUTORELEASE (app);  
+}
+
+- (void)dealloc
+{
+  if (application) {
+    NSConnection *conn = [(NSDistantObject *)application connectionForProxy];
+  
+    if (conn && [conn isValid]) {
+      [nc removeObserver: self
+	                  name: NSConnectionDidDieNotification
+	                object: conn];
+      DESTROY (application);
+    }
+  }
+  
+  TEST_RELEASE (name);
+  TEST_RELEASE (path);
+  TEST_RELEASE (identifier);
+  TEST_RELEASE (task);
+  
+  [super dealloc];
+}
+
+- (id)init
+{
+  self = [super init];
+  
+  if (self) {
+    task = nil;
+    name = nil;
+    path = nil; 
+    identifier = nil;
+    application = nil;
+    
+    gw = [GWorkspace gworkspace];
+    nc = [NSNotificationCenter defaultCenter];      
+  }
+  
+  return self;
+}
+
+- (unsigned)hash
+{
+  return [super hash];
+}
+
+- (BOOL)isEqual:(id)other
+{
+  if (other == self) {
+    return YES;
+  }
+  
+  if ([other isKindOfClass: [GWLaunchedApp class]]) {
+    if (identifier != nil) {
+      NSNumber *ident = [(GWLaunchedApp *)other identifier];
+      return (ident && [ident isEqual: identifier]);
+    }
+
+    if (name != nil) {
+      NSString *aname = [(GWLaunchedApp *)other name];
+      return (aname && [aname isEqual: name]);
+    }
+  }
+  
+  return NO;
+}
+
+- (NSDictionary *)appInfo
+{
+  NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+  
+  if (name != nil) {
+    [dict setObject: name forKey: @"NSApplicationName"];
+  }
+  if (path != nil) {
+    [dict setObject: path forKey: @"NSApplicationPath"];
+  }
+  if (identifier != nil) {
+    [dict setObject: identifier forKey: @"NSApplicationPprocessIdentifier"];
+  }
+
+  return dict;
+}
+
+- (void)setTask:(NSTask *)atask
+{
+  ASSIGN (task, atask);
+}
+
+- (NSTask *)task
+{
+  return task;
+}
+
+- (void)setPath:(NSString *)apath
+{
+  ASSIGN (path, apath);
+}
+
+- (NSString *)path
+{
+  return path;
+}
+
+- (void)setName:(NSString *)aname
+{
+  ASSIGN (name, aname);
+}
+
+- (NSString *)name
+{
+  return name;
+}
+
+- (void)setIdentifier:(NSNumber *)ident
+{
+  ASSIGN (identifier, ident);
+}
+
+- (NSNumber *)identifier
+{
+  return identifier;
+}
+
+- (id)application
+{
+  [self connectApplication: NO];
+  return application;
+}
+
+- (BOOL)gwlaunched
+{
+  return (task != nil);
+}
+
+- (BOOL)isRunning
+{
+  return (application != nil);
+}
+
+- (void)connectApplication:(BOOL)showProgress
+{
+  if (application == nil) {
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSString *host = [defaults stringForKey: @"NSHost"];
+
+    if (host == nil) {
+	    host = @"";
+	  } else {
+	    NSHost *h = [NSHost hostWithName: host];
+
+      if ([h isEqual: [NSHost currentHost]]) {
+	      host = @"";
+	    }
+	  }
+  
+    id app = [NSConnection rootProxyForConnectionWithRegisteredName: name
+                                                               host: host];
+
+    if (app) {
+      NSConnection *conn = [app connectionForProxy];
+
+	    [nc addObserver: self
+	           selector: @selector(connectionDidDie:)
+		             name: NSConnectionDidDieNotification
+		           object: conn];
+      
+      application = app;
+      RETAIN (application);
+      
+	  } else {
+      StartAppWin *startAppWin;
+      int i;
+
+	    if ((task == nil || [task isRunning] == NO) && (showProgress == NO)) {
+        return;
+	    }
+
+      if (showProgress) {
+        startAppWin = [gw startAppWin];
+        [startAppWin showWindowWithTitle: @"GWorkspace"
+                                 appName: name
+                               operation: NSLocalizedString(@"contacting:", @"")         
+                            maxProgValue: 20.0];
+      }
+
+      for (i = 1; i <= 20; i++) {
+        if (showProgress) {
+          [startAppWin updateProgressBy: 1.0];
+        }
+
+	      [[NSRunLoop currentRunLoop] runUntilDate:
+		                     [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+
+        app = [NSConnection rootProxyForConnectionWithRegisteredName: name
+                                                                host: host];                  
+        if (app) {
+          NSConnection *conn = [app connectionForProxy];
+
+	        [nc addObserver: self
+	               selector: @selector(connectionDidDie:)
+		                 name: NSConnectionDidDieNotification
+		               object: conn];
+
+          application = app;
+          RETAIN (application);
+          break;
+        }
+      }
+
+      if (showProgress) {
+        [[startAppWin win] close];
+      }
+      
+      if ((application == nil) && (showProgress == NO)) {
+        NSRunAlertPanel(NSLocalizedString(@"error", @""),
+                      [NSString stringWithFormat: @"%@ %@", 
+                          name, NSLocalizedString(@"seems to have hung", @"")], 
+		                                      NSLocalizedString(@"OK", @""), 
+                                          nil, 
+                                          nil);
+      }
+	  }
+  }
+}
+
+- (void)connectionDidDie:(NSNotification *)notif
+{
+  id conn = [notif object];
+
+  [nc removeObserver: self
+	              name: NSConnectionDidDieNotification
+	            object: conn];
+
+  NSAssert(conn == [application connectionForProxy],
+		                                  NSInternalInconsistencyException);
+  RELEASE (application);
+  application = nil;
+  
+  if (task && [task isRunning]) {
+    [task terminate];
+  }
+  
+  [gw applicationTerminated: self];
+}
+
+@end
+
+
+@implementation NSWorkspace (WorkspaceApplication)
+
+- (id)_workspaceApplication
+{
+  return [GWorkspace gworkspace];
+}
+
+@end
 
 

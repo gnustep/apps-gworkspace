@@ -36,6 +36,7 @@
 #include "Preferences/PrefController.h"
 #include "Fiend/Fiend.h"
 #include "GWDesktopManager.h"
+#include "Dock.h"
 #include "GWViewersManager.h"
 #include "GWViewer.h"
 #include "GWSpatialViewer.h"
@@ -122,8 +123,9 @@ static GWorkspace *gworkspace = nil;
   DESTROY (fileOpsManager);
   RELEASE (finder);
   RELEASE (waitCursor);
-
   RELEASE (launchedApps);
+  RELEASE (storedAppinfoPath);
+  RELEASE (storedAppinfoLock);
     
 	[super dealloc];
 }
@@ -136,7 +138,7 @@ static GWorkspace *gworkspace = nil;
     fm = [NSFileManager defaultManager];
 	  ws = [NSWorkspace sharedWorkspace];
     wsnc = [ws notificationCenter]; 
-    launchedApps = [NSMutableDictionary new];     
+    launchedApps = [NSMutableArray new];      
   }
   
   return self;
@@ -150,6 +152,7 @@ static GWorkspace *gworkspace = nil;
   BOOL boolentry;
   NSArray *extendedInfo;
   NSMenu *menu;
+  NSString *lockpath;
   int i;
   
 	[isa registerForServices];
@@ -297,6 +300,11 @@ static GWorkspace *gworkspace = nil;
   waitCursor = [[NSCursor alloc] initWithImage: [NSImage imageNamed: @"watch.tiff"]];
   [waitCursor setHotSpot: NSMakePoint(8, 8)];
 
+  storedAppinfoPath = [NSTemporaryDirectory() stringByAppendingPathComponent: @"GSLaunchedApplications"];
+  RETAIN (storedAppinfoPath); 
+  lockpath = [storedAppinfoPath stringByAppendingPathExtension: @"lock"];   
+  storedAppinfoLock = [[NSDistributedLock alloc] initWithPath: lockpath];
+
   [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
                 				selector: @selector(fileSystemWillChange:) 
                 					  name: @"GWFileSystemWillChangeNotification"
@@ -341,6 +349,18 @@ static GWorkspace *gworkspace = nil;
                         selector: @selector(applicationForExtensionsDidChange:) 
                 					  name: @"GWAppForExtensionDidChangeNotification"
                 					object: nil];
+
+  [wsnc addObserver: self
+	         selector: @selector(applicationWillLaunch:)
+		           name: NSWorkspaceWillLaunchApplicationNotification
+		         object: nil];
+
+  [wsnc addObserver: self
+	         selector: @selector(applicationDidLaunch:)
+		           name: NSWorkspaceDidLaunchApplicationNotification
+		         object: nil];    
+
+  [self checkLastRunningApps];
 }
 
 - (BOOL)applicationShouldTerminate:(NSApplication *)app 
@@ -746,6 +766,11 @@ static GWorkspace *gworkspace = nil;
 - (TShelfWin *)tabbedShelf
 {
   return tshelfWin;
+}
+
+- (StartAppWin *)startAppWin
+{
+  return startAppWin;
 }
 
 - (BOOL)validateMenuItem:(id <NSMenuItem>)anItem

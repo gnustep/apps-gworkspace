@@ -28,7 +28,6 @@
 #include "Dock.h"
 #include "DockIcon.h"
 #include "GWDesktopView.h"
-#include "StartAppWin.h"
 
 #define MAX_ICN_SIZE 48
 #define MIN_ICN_SIZE 16
@@ -38,11 +37,7 @@
 
 - (void)dealloc
 {
-  [wsnc removeObserver: self];
   RELEASE (icons);
-  RELEASE (launchedPath);
-  RELEASE (launchedApplications);
-  RELEASE (startAppWin);
   RELEASE (backColor);
   TEST_RELEASE (backImage);
   
@@ -55,8 +50,6 @@
   
   if (self) {
 	  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
-    NSArray *launched = nil;
-    NSString *service;
     NSDictionary *appsdict;
     NSArray *pbTypes;
     int i;
@@ -64,15 +57,11 @@
     manager = mngr;
     position = [manager dockPosition];
     
-    fm = [NSFileManager defaultManager];
-    
+    fm = [NSFileManager defaultManager];    
     ws = [NSWorkspace sharedWorkspace];
-    wsnc = [ws notificationCenter];   
 
     icons = [NSMutableArray new];
     iconSize = MAX_ICN_SIZE;
-
-    startAppWin = [StartAppWin new];
                                 
     dndSourceIcon = nil;
     isDragTarget = NO;  
@@ -84,17 +73,9 @@
                                          @"DockIconPboardType", 
                                          nil];
     [self registerForDraggedTypes: pbTypes];    
-    
-    [wsnc addObserver: self
-	           selector: @selector(applicationWillLaunch:)
-		             name: NSWorkspaceWillLaunchApplicationNotification
-		           object: nil];
-    
-    [wsnc addObserver: self
-	           selector: @selector(applicationLaunched:)
-		             name: NSWorkspaceDidLaunchApplicationNotification
-		           object: nil];    
 
+    [self setBackColor: [[manager desktopView] currentColor]];
+    
     [self createWorkspaceIcon];
 
     appsdict = [defaults objectForKey: @"applications"];
@@ -113,91 +94,7 @@
       }
     }
 
-	  service = [NSSearchPathForDirectoriesInDomains(NSUserDirectory, 
-							                                  NSUserDomainMask, 
-                                                YES) 
-                                                objectAtIndex: 0];
-    service = [service stringByAppendingPathComponent: @"Library/Services"];
-
-    ASSIGN (launchedPath, [service stringByAppendingPathComponent: @".GNUstepRunningAppList"]);
-    launchedApplications = [NSMutableArray new];
-    
-    if ([fm isReadableFileAtPath: launchedPath]) {
-      [gnustep_global_lock lock];   
-
-      NS_DURING
-	      {
-      launched = [NSArray arrayWithContentsOfFile: launchedPath];
-	      }
-      NS_HANDLER
-	      {
-	    DESTROY (launched);
-	    NSLog(@"corrupted running app list at %@!", launchedPath); 
-	      }
-      NS_ENDHANDLER
-
-      [gnustep_global_lock unlock];
-    }
-    
-    if (launched) {
-      [launchedApplications addObjectsFromArray: launched];
-      
-      for (i = 0; i < [launchedApplications count]; i++) {
-        NSDictionary *dict = [launchedApplications objectAtIndex: i];
-        NSString *appname = [dict objectForKey: @"NSApplicationName"];
-        DockIcon *icon = [self iconForApplicationName: appname];
-      
-        if (icon == nil) {
-          icon = [self addIconForApplicationWithName: appname atIndex: -1];
-        }
-      }
-    }
-
     [self createTrashIcon];
-
-    if (launched) {
-      unsigned count = [launchedApplications count];
-      BOOL modified = NO;
-          
-      for (i = 0; i < count; i++) {
-        NSDictionary *dict = [launchedApplications objectAtIndex: i];
-        NSString *appname = [dict objectForKey: @"NSApplicationName"];
-        DockIcon *icon = [self iconForApplicationName: appname];
-
-        if (icon && ([appname isEqual: @"GWorkspace"] == NO)) {
-          [icon setLaunched: YES showProgress: YES];
-          
-          if ([icon isLaunched] == NO) {
-            if ([icon isDocked] == NO) {
-              [self removeIcon: icon];
-            }
-          
-            [launchedApplications removeObjectAtIndex: i];
-            i--;
-            count--;
-            modified = YES;
-          }
-        }
-      }
-      
-      if (modified) {
-        [gnustep_global_lock lock]; 
-        
-        NS_DURING
-	        {
-        [launchedApplications writeToFile: launchedPath atomically: YES];
-	        }
-        NS_HANDLER
-	        {
-	      NSLog(@"unable to write app list to %@!", launchedPath); 
-	        }
-        NS_ENDHANDLER
-        
-        [gnustep_global_lock unlock]; 
-      }
-    }
-    
-    [self setBackColor: [[manager desktopView] currentColor]];
   }
   
   return self;  
@@ -219,8 +116,10 @@
   node = [FSNode nodeWithPath: path];
   
   icon = [[DockIcon alloc] initForNode: node iconSize: iconSize];
+  [icon setHighlightColor: backColor];
+  [icon setUseHlightImage: useBackImage];
   [icon setWsIcon: YES];   
-  [icon setDocked: YES];                        
+  [icon setDocked: YES];   
   [icons insertObject: icon atIndex: 0];
   [self addSubview: icon];
   RELEASE (icon);
@@ -231,7 +130,9 @@
   NSString *path = [manager trashPath];
   FSNode *node = [FSNode nodeWithPath: path];
   DockIcon *icon = [[DockIcon alloc] initForNode: node iconSize: iconSize];
-  
+
+  [icon setHighlightColor: backColor];
+  [icon setUseHlightImage: useBackImage];  
   [icon setTrashIcon: YES];  
   [icon setDocked: YES];                         
   [icons insertObject: icon atIndex: [icons count]];
@@ -282,8 +183,7 @@
   DockIcon *icon = [self addIconForApplicationWithName: appname atIndex: index];
 
   [icon setDocked: [[dict objectForKey: @"docked"] boolValue]];
-  [icon setLaunched: [[dict objectForKey: @"launched"] boolValue] 
-       showProgress: NO];
+  [icon setLaunched: [[dict objectForKey: @"launched"] boolValue]];
 }
 
 - (void)removeIcon:(DockIcon *)icon
@@ -294,7 +194,7 @@
     [icon removeFromSuperview];
   }
   if ([icon isLaunched]) {
-    [icon setLaunched: NO showProgress: NO];
+    [icon setLaunched: NO];
   }
   [icons removeObject: icon];
   [self tile];
@@ -367,85 +267,50 @@
   dndSourceIcon = icon;
 }
 
-- (void)applicationWillLaunch:(NSNotification *)notif
+- (void)applicationWillLaunch:(NSDictionary *)info
 {
-  NSString *appname = [[notif userInfo] objectForKey: @"NSApplicationName"];
-  DockIcon *icon = [self iconForApplicationName: appname];
+  NSString *appname = [info objectForKey: @"NSApplicationName"];
   
-  if (icon == nil) {
-    icon = [self addIconForApplicationWithName: appname atIndex: -1];
-  } 
+  if ([appname isEqual: @"GWorkspace"] == NO) {
+    DockIcon *icon = [self iconForApplicationName: appname];
   
-  if (icon) {
+    if (icon == nil) {
+      icon = [self addIconForApplicationWithName: appname atIndex: -1];
+    } 
+  
     [self tile];
     [icon animateLaunch];
   }
 }
 
-- (void)applicationLaunched:(NSNotification *)notif
+- (void)applicationDidLaunch:(NSDictionary *)info
 {
-  NSString *appname = [[notif userInfo] objectForKey: @"NSApplicationName"];
-  DockIcon *icon = [self iconForApplicationName: appname];
+  NSString *appname = [info objectForKey: @"NSApplicationName"];
 
-  if ((icon == nil) && ([appname isEqual: @"GWorkspace"] == NO)) {
-    icon = [self addIconForApplicationWithName: appname atIndex: -1];
-    [self tile];
-  } 
+  if ([appname isEqual: @"GWorkspace"] == NO) {
+    DockIcon *icon = [self iconForApplicationName: appname];
+
+    if (icon == nil) {
+      icon = [self addIconForApplicationWithName: appname atIndex: -1];
+      [self tile];
+    } 
   
-  if (icon) {
-    [icon setLaunched: YES showProgress: NO];
-    
-    if ([icon isLaunched] && ([appname isEqual: @"GWorkspace"] == NO)) {
-      NSDictionary *dict = [NSDictionary dictionaryWithObject: appname
-                                                       forKey: @"NSApplicationName"];
-      
-      if ([launchedApplications containsObject: dict] == NO) {
-        [launchedApplications addObject: dict];
-      
-        [gnustep_global_lock lock]; 
-
-        NS_DURING
-	        {
-        [launchedApplications writeToFile: launchedPath atomically: YES];
-	        }
-        NS_HANDLER
-	        {
-	      NSLog(@"unable to write app list to %@!", launchedPath); 
-	        }
-        NS_ENDHANDLER
-
-        [gnustep_global_lock unlock]; 
-      }
-    }
+    [icon setLaunched: YES];
   }
 }
 
-- (void)applicationTerminated:(NSString *)appName
+- (void)applicationTerminated:(NSDictionary *)info
 {
-  if ([appName isEqual: @"GWorkspace"] == NO) {
-    int i;
+  NSString *appname = [info objectForKey: @"NSApplicationName"];
 
-    for (i = 0; i < [launchedApplications count]; i++) {
-      NSDictionary *dict = [launchedApplications objectAtIndex: i];
-      
-      if ([[dict objectForKey: @"NSApplicationName"] isEqual: appName]) {
-        [launchedApplications removeObjectAtIndex: i];
-      
-        [gnustep_global_lock lock]; 
+  if ([appname isEqual: @"GWorkspace"] == NO) {
+    DockIcon *icon = [self iconForApplicationName: appname];
 
-        NS_DURING
-	        {
-        [launchedApplications writeToFile: launchedPath atomically: YES];
-	        }
-        NS_HANDLER
-	        {
-	      NSLog(@"unable to write app list to %@!", launchedPath); 
-	        }
-        NS_ENDHANDLER
-
-        [gnustep_global_lock unlock]; 
-      
-        break;
+    if (icon) {
+      if (([icon isDocked] == NO) && ([icon isSpecialIcon] == NO)) {
+        [self removeIcon: icon];
+      } else {
+        [icon setLaunched: NO];
       }
     }
   }
@@ -580,16 +445,6 @@
   if (view) {
     [view setNeedsDisplayInRect: [self frame]];
   }
-}
-
-- (NSArray *)launchedApplications
-{
-  return launchedApplications;
-}
-
-- (StartAppWin *)startAppWin
-{
-  return startAppWin;
 }
 
 - (void)updateDefaults

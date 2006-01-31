@@ -33,7 +33,6 @@
 @class NSColor;
 @class NSImage;
 @class DockIcon;
-@class StartAppWin;
 
 @interface Dock : NSView 
 {
@@ -42,11 +41,6 @@
   NSMutableArray *icons;
   int iconSize;
 
-  NSString *launchedPath;
-  NSMutableArray *launchedApplications;
-
-  StartAppWin *startAppWin;
-  
   NSColor *backColor;
   NSImage *backImage;
   BOOL useBackImage;
@@ -60,7 +54,6 @@
   GWDesktopManager *manager; 
   NSFileManager *fm; 
   id ws;
-  NSNotificationCenter *wsnc; 
 }
 
 - (id)initForManager:(id)mngr;
@@ -87,11 +80,11 @@
 
 - (void)setDndSourceIcon:(DockIcon *)icon;
 
-- (void)applicationWillLaunch:(NSNotification *)notif;
+- (void)applicationWillLaunch:(NSDictionary *)info;
 
-- (void)applicationLaunched:(NSNotification *)notif;
+- (void)applicationDidLaunch:(NSDictionary *)info;
 
-- (void)applicationTerminated:(NSString *)appName;
+- (void)applicationTerminated:(NSDictionary *)info;
 
 - (void)setPosition:(DockPosition)pos;
 
@@ -102,10 +95,6 @@
 - (void)setUseBackImage:(BOOL)value;
 
 - (void)tile;
-
-- (NSArray *)launchedApplications;
-
-- (StartAppWin *)startAppWin;
 
 - (void)updateDefaults;
 

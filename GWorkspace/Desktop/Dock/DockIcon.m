@@ -28,23 +28,11 @@
 #include "DockIcon.h"
 #include "Dock.h"
 #include "GWDesktopManager.h"
-#include "StartAppWin.h"
 
 @implementation DockIcon
 
 - (void)dealloc
 {
-  if (application) {
-    NSConnection *conn = [(NSDistantObject *)application connectionForProxy];
-  
-    if (conn && [conn isValid]) {
-      [nc removeObserver: self
-	                  name: NSConnectionDidDieNotification
-	                object: conn];
-      DESTROY (application);
-    }
-  }
-  
   RELEASE (appName);
   TEST_RELEASE (highlightColor);
   TEST_RELEASE (darkerColor);
@@ -72,6 +60,8 @@
 
   if (self) {
     ASSIGN (appName, [[node name] stringByDeletingPathExtension]);
+
+
     isDocked = NO;
     isLaunched = NO;
     nc = [NSNotificationCenter defaultCenter];
@@ -150,121 +140,9 @@
 }
 
 - (void)setLaunched:(BOOL)value
-       showProgress:(BOOL)prog
 {
   isLaunched = value;
-
-  if (isLaunched) {
-    if (application == nil) {
-      [self connectApplication: prog];
-    }
-    
-    if (application) {
-      [self setNeedsDisplay: YES];
-    } else {
-      isLaunched = NO;
-    }
-        
-  } else {
-    if (application) {
-      NSConnection *conn = [(NSDistantObject *)application connectionForProxy];
-
-      if (conn && [conn isValid]) {
-        [nc removeObserver: self
-	                    name: NSConnectionDidDieNotification
-	                  object: conn];
-        DESTROY (application);
-      }
-    }
-  
-    [self setNeedsDisplay: YES];
-
-    [(Dock *)container applicationTerminated: appName];
-    
-    if ((isDocked == NO) && ([self isSpecialIcon] == NO)) {
-      [(Dock *)container removeIcon: self];
-    }
-  }
-}
-
-- (void)connectApplication:(BOOL)showProgress
-{
-  if (application == nil) {
-    id app = [NSConnection rootProxyForConnectionWithRegisteredName: appName
-                                                               host: @""];
-
-    if (app) {
-      NSConnection *conn = [app connectionForProxy];
-
-	    [nc addObserver: self
-	           selector: @selector(applicationConnectionDidDie:)
-		             name: NSConnectionDidDieNotification
-		           object: conn];
-      
-      application = app;
-      RETAIN (application);
-      
-	  } else {
-	    static BOOL recursion = NO;
-	    static StartAppWin *startAppWin = nil;
-	  
-      if (recursion == NO) {
-        int i;
-        
-        if (showProgress && (startAppWin == nil)) {
-          startAppWin = [(Dock *)container startAppWin];
-
-          [startAppWin showWindowWithTitle: @"GWorkspace"
-                                   appName: appName
-                                 operation: NSLocalizedString(@"contacting:", @"")         
-                              maxProgValue: 20.0];
-        }
-        
-        for (i = 1; i <= 20; i++) {
-          if (showProgress) {
-            [startAppWin updateProgressBy: 1.0];
-          }
-          
-	        [[NSRunLoop currentRunLoop] runUntilDate:
-		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
-                           
-          app = [NSConnection rootProxyForConnectionWithRegisteredName: appName
-                                                                  host: @""];                  
-          if (app) {
-            break;
-          }
-        }
-        
-        if (showProgress) {
-          [[startAppWin win] close];
-        }
-        
-	      recursion = YES;
-	      [self connectApplication: showProgress];
-	      recursion = NO;
-        
-	    } else { 
-	      recursion = NO;
-        NSLog(@"unable to contact %@!", appName);  
-      }
-	  }
-  }
-}
-
-- (void)applicationConnectionDidDie:(NSNotification *)notif
-{
-  id conn = [notif object];
-
-  [nc removeObserver: self
-	              name: NSConnectionDidDieNotification
-	            object: conn];
-
-  NSAssert(conn == [application connectionForProxy],
-		                                  NSInternalInconsistencyException);
-  RELEASE (application);
-  application = nil;
-  
-  [self setLaunched: NO showProgress: NO];
+  [self setNeedsDisplay: YES];
 }
 
 - (BOOL)isLaunched

@@ -34,7 +34,6 @@
 @interface DockIcon : FSNIcon
 {
   NSString *appName;
-  id application;
 
   BOOL isWsIcon;
   BOOL isTrashIcon;
@@ -77,12 +76,7 @@
 
 - (BOOL)isDocked;
 
-- (void)setLaunched:(BOOL)value 
-       showProgress:(BOOL)prog;
-
-- (void)connectApplication:(BOOL)showProgress;
-
-- (void)applicationConnectionDidDie:(NSNotification *)notif;
+- (void)setLaunched:(BOOL)value;
 
 - (BOOL)isLaunched;
 

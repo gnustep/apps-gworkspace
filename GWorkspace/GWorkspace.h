@@ -27,6 +27,7 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/NSApplication.h>
+#include <AppKit/NSWorkspace.h>
 
 #define NOEDIT 0
 #define NOXTERM 1
@@ -46,6 +47,7 @@
 @class OpenWithController;
 @class RunExternalController;
 @class StartAppWin;
+@class GWLaunchedApp;
 @class NSCursor;
 
 @protocol	FSWClientProtocol
@@ -167,7 +169,11 @@
   //
   NSWorkspace *ws;  
   NSNotificationCenter *wsnc; 
-  NSMutableDictionary	*launchedApps;
+  
+  NSMutableArray *launchedApps;
+  
+  NSString *storedAppinfoPath;
+  NSDistributedLock *storedAppinfoLock;
 }
 
 + (GWorkspace *)gworkspace;
@@ -220,6 +226,8 @@
 - (void)createTabbedShelf;
 
 - (TShelfWin *)tabbedShelf;
+
+- (StartAppWin *)startAppWin;
 
 - (void)fileSystemWillChange:(NSNotification *)notif;
 
@@ -424,20 +432,100 @@
 
 - (NSArray *)launchedApplications;
 
-- (BOOL)_launchApplication:(NSString *)appName
-		             arguments:(NSArray *)args;
-
-- (id)_connectApplication:(NSString *)appName;
-
 - (BOOL)openFile:(NSString *)fullPath
-          withApplication:(NSString *)appName
+          withApplication:(NSString *)appname
             andDeactivate:(BOOL)flag;
 
-- (BOOL)launchApplication:(NSString *)appName
+- (BOOL)launchApplication:(NSString *)appname
 		             showIcon:(BOOL)showIcon
 	             autolaunch:(BOOL)autolaunch;
 
 - (BOOL)openTempFile:(NSString *)fullPath;
+
+@end
+
+
+@interface GWorkspace (Applications)
+
+- (void)applicationName:(NSString **)appName
+                andPath:(NSString **)appPath
+                forName:(NSString *)name;
+
+- (BOOL)_launchApplication:(NSString *)appname
+		             arguments:(NSArray *)args
+                   locally:(BOOL)locally;
+
+- (void)applicationWillLaunch:(NSNotification *)notif;
+
+- (void)applicationDidLaunch:(NSNotification *)notif;
+
+- (void)applicationTerminated:(GWLaunchedApp *)app;
+
+- (GWLaunchedApp *)launchedAppWithPath:(NSString *)path
+                               andName:(NSString *)name;
+
+- (NSArray *)storedAppInfo;
+
+- (void)updateStoredAppInfoWithLaunchedApps:(NSArray *)apps;
+
+- (void)checkLastRunningApps;
+
+@end
+
+
+@interface GWLaunchedApp : NSObject
+{
+  NSTask *task;
+  NSString *name;
+  NSString *path;
+  NSNumber *identifier;
+  id application;
+  
+  GWorkspace *gw;   
+  NSNotificationCenter *nc;
+}
+
++ (id)appWithApplicationPath:(NSString *)apath
+             applicationName:(NSString *)aname
+                launchedTask:(NSTask *)atask;
+
++ (id)appWithApplicationPath:(NSString *)apath
+             applicationName:(NSString *)aname
+           processIdentifier:(NSNumber *)ident
+                checkRunning:(BOOL)check;
+            
+- (NSDictionary *)appInfo;
+
+- (void)setTask:(NSTask *)atask;
+
+- (NSTask *)task;
+
+- (void)setPath:(NSString *)apath;
+
+- (NSString *)path;
+
+- (void)setName:(NSString *)aname;
+
+- (NSString *)name;
+
+- (void)setIdentifier:(NSNumber *)ident;
+
+- (NSNumber *)identifier;
+
+- (id)application;
+
+- (BOOL)gwlaunched;
+
+- (BOOL)isRunning;
+
+- (void)connectApplication:(BOOL)showProgress;
+
+- (void)connectionDidDie:(NSNotification *)notif;
+
+@end
+
+
+@interface NSWorkspace (WorkspaceApplication)
 
 @end
 

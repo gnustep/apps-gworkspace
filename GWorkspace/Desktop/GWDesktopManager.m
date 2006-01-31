@@ -551,11 +551,6 @@ static GWDesktopManager *desktopManager = nil;
   }
 }
 
-- (NSArray *)launchedApplications
-{
-  return [dock launchedApplications];
-}
-
 - (void)updateDefaults
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
