@@ -110,9 +110,7 @@
   NSString *appPath, *appName;
   GWLaunchedApp *app;
   id application;
-  
-  NSLog(@"QUA 1 %@", [fullPath lastPathComponent]);
-    
+      
   if (appname == nil) {
     NSString *ext = [fullPath pathExtension];
     
@@ -131,22 +129,25 @@
   if (app == nil) {
     NSArray *args = [NSArray arrayWithObjects: @"-GSFilePath", fullPath, nil];
     
-    NSLog(@"QUA 2 %@", [fullPath lastPathComponent]);
-    
     return [self _launchApplication: appName arguments: args locally: NO];
   
-  } else {
-    application = [app application];
+  } else {  
+    NSDate *delay = [NSDate dateWithTimeIntervalSinceNow: 0.1];
+
+    /*
+    * If we are opening many files together and our app is a wrapper,
+    * we must wait a little for the precedent task to terminate.
+    * Else we'd end waiting two seconds in -connectApplication.
+    */
+    [[NSRunLoop currentRunLoop] runUntilDate: delay];
     
-    NSLog(@"QUA 3 %@", [fullPath lastPathComponent]);
+    application = [app application];
     
     if (application == nil) {
       NSArray *args = [NSArray arrayWithObjects: @"-GSFilePath", fullPath, nil];
       
       [self applicationTerminated: app];
       
-      NSLog(@"QUA 4 %@", [fullPath lastPathComponent]);
-       
       return [self _launchApplication: appName arguments: args locally: NO];
 
     } else {
@@ -632,12 +633,31 @@
     }
   }
   
-  TEST_RELEASE (name);
-  TEST_RELEASE (path);
+  RELEASE (name);
+  RELEASE (path);
   TEST_RELEASE (identifier);
   TEST_RELEASE (task);
   
   [super dealloc];
+}
+
+- (unsigned)hash
+{
+  return ([name hash] | [path hash]);
+}
+
+- (BOOL)isEqual:(id)other
+{
+  if (other == self) {
+    return YES;
+  }
+  
+  if ([other isKindOfClass: [GWLaunchedApp class]]) {
+    return ([[(GWLaunchedApp *)other name] isEqual: name]
+                && [[(GWLaunchedApp *)other path] isEqual: path]);
+  }
+  
+  return NO;
 }
 
 - (id)init
@@ -657,35 +677,6 @@
   
   return self;
 }
-
-/*
-- (unsigned)hash
-{
-  return 0;
-//  return [super hash];
-}
-
-- (BOOL)isEqual:(id)other
-{
-  if (other == self) {
-    return YES;
-  }
-  
-  if ([other isKindOfClass: [GWLaunchedApp class]]) {
-    if (identifier != nil) {
-      NSNumber *ident = [(GWLaunchedApp *)other identifier];
-      return (ident && [ident isEqual: identifier]);
-    }
-
-    if (name != nil) {
-      NSString *aname = [(GWLaunchedApp *)other name];
-      return (aname && [aname isEqual: name]);
-    }
-  }
-  
-  return NO;
-}
-*/
 
 - (NSDictionary *)appInfo
 {
@@ -795,9 +786,7 @@
       int i;
 
 	    if ((task == nil || [task isRunning] == NO) && (showProgress == NO)) {
-   //     if ((task != nil) && (showProgress == NO)) {
-   //       [gw applicationTerminated: self];
-   //     }
+        DESTROY (task);
         return;
 	    }
 
@@ -837,13 +826,20 @@
         [[startAppWin win] close];
       }
       
-      if ((application == nil) && (showProgress == NO)) {
-        NSRunAlertPanel(NSLocalizedString(@"error", @""),
+      if (application == nil) {          
+        if (task && [task isRunning]) {
+          [task terminate];
+        }
+        DESTROY (task);
+          
+        if (showProgress == NO) {
+          NSRunAlertPanel(NSLocalizedString(@"error", @""),
                       [NSString stringWithFormat: @"%@ %@", 
                           name, NSLocalizedString(@"seems to have hung", @"")], 
 		                                      NSLocalizedString(@"OK", @""), 
                                           nil, 
                                           nil);
+        }
       }
 	  }
   }
