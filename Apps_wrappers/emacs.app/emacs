@@ -32,8 +32,8 @@ fi
 ps -Ac | fgrep -q gnuserv
 if [ $? -eq 0 ] ; then
   if [ -z "$file" ] ; then file='*UNTITLED*' ; fi
-	$GNUCLIENT $file &
+	$GNUCLIENT "$file" &
 else
-  $EMACS $file &
+  $EMACS "$file" &
 fi
 

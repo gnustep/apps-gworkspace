@@ -133,10 +133,10 @@
   
   } else {  
     NSDate *delay = [NSDate dateWithTimeIntervalSinceNow: 0.1];
-
+    
     /*
     * If we are opening many files together and our app is a wrapper,
-    * we must wait a little for the precedent task to terminate.
+    * we must wait a little for the last launched task to terminate.
     * Else we'd end waiting two seconds in -connectApplication.
     */
     [[NSRunLoop currentRunLoop] runUntilDate: delay];
@@ -641,6 +641,24 @@
   [super dealloc];
 }
 
+- (id)init
+{
+  self = [super init];
+  
+  if (self) {
+    task = nil;
+    name = nil;
+    path = nil; 
+    identifier = nil;
+    application = nil;
+    
+    gw = [GWorkspace gworkspace];
+    nc = [NSNotificationCenter defaultCenter];      
+  }
+  
+  return self;
+}
+
 - (unsigned)hash
 {
   return ([name hash] | [path hash]);
@@ -658,24 +676,6 @@
   }
   
   return NO;
-}
-
-- (id)init
-{
-  self = [super init];
-  
-  if (self) {
-    task = nil;
-    name = nil;
-    path = nil; 
-    identifier = nil;
-    application = nil;
-    
-    gw = [GWorkspace gworkspace];
-    nc = [NSNotificationCenter defaultCenter];      
-  }
-  
-  return self;
 }
 
 - (NSDictionary *)appInfo

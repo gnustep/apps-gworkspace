@@ -26,5 +26,5 @@ else
   usage
 fi
 # -- run vi
-xterm -e vi $file &
+xterm -e vi "$file" &
 # -- you may want to echo 2>/dev/console if permissioned for it
