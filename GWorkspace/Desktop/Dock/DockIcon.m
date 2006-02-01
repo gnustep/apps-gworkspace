@@ -60,8 +60,6 @@
 
   if (self) {
     ASSIGN (appName, [[node name] stringByDeletingPathExtension]);
-
-
     isDocked = NO;
     isLaunched = NO;
     nc = [NSNotificationCenter defaultCenter];

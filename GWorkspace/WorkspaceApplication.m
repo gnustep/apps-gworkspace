@@ -103,6 +103,11 @@
   return launched;
 }
 
+- (NSDictionary *)activeApplication
+{
+  return ((activeApplication != nil) ? [activeApplication appInfo] : nil);
+}
+
 - (BOOL)openFile:(NSString *)fullPath
           withApplication:(NSString *)appname
             andDeactivate:(BOOL)flag
@@ -129,7 +134,7 @@
   if (app == nil) {
     NSArray *args = [NSArray arrayWithObjects: @"-GSFilePath", fullPath, nil];
     
-    return [self _launchApplication: appName arguments: args locally: NO];
+    return [self launchApplication: appName arguments: args];
   
   } else {  
     NSDate *delay = [NSDate dateWithTimeIntervalSinceNow: 0.1];
@@ -148,7 +153,7 @@
       
       [self applicationTerminated: app];
       
-      return [self _launchApplication: appName arguments: args locally: NO];
+      return [self launchApplication: appName arguments: args];
 
     } else {
       NS_DURING
@@ -194,7 +199,7 @@
 	    args = [NSArray arrayWithObjects: @"-autolaunch", @"YES", nil];
 	  }
     
-    return [self _launchApplication: appName arguments: args locally: NO];
+    return [self launchApplication: appName arguments: args];
   
   } else {
     application = [app application];
@@ -206,7 +211,7 @@
 	      args = [NSArray arrayWithObjects: @"-autolaunch", @"YES", nil];
 	    }
              
-      return [self _launchApplication: appName arguments: args locally: NO];
+      return [self launchApplication: appName arguments: args];
     
     } else {
       [application activateIgnoringOtherApps: YES];
@@ -236,7 +241,7 @@
   if (app == nil) {
     NSArray *args = [NSArray arrayWithObjects: @"-GSTempPath", fullPath, nil];
     
-    return [self _launchApplication: appName arguments: args locally: NO];
+    return [self launchApplication: appName arguments: args];
   
   } else {
     application = [app application];
@@ -246,7 +251,7 @@
     
       [self applicationTerminated: app];
       
-      return [self _launchApplication: appName arguments: args locally: NO];
+      return [self launchApplication: appName arguments: args];
       
     } else {
       NS_DURING
@@ -281,9 +286,8 @@
   *appPath = [ws fullPathForApplication: *appName];
 }
                 
-- (BOOL)_launchApplication:(NSString *)appname
-		             arguments:(NSArray *)args
-                   locally:(BOOL)locally
+- (BOOL)launchApplication:(NSString *)appname
+		            arguments:(NSArray *)args
 {
   NSString *appPath, *appName;
   NSTask *task;
@@ -378,11 +382,103 @@
   }
 
   if ([app application] != nil) {
-    [[dtopManager dock] applicationDidLaunch: info];
+    [[dtopManager dock] applicationDidLaunch: app];
+  }
+}
+
+- (void)appDidBecomeActive:(NSNotification *)notif
+{
+  NSDictionary *info = [notif userInfo];
+  NSString *name = [info objectForKey: @"NSApplicationName"];
+  NSString *path = [info objectForKey: @"NSApplicationPath"];
+  GWLaunchedApp *app = [self launchedAppWithPath: path andName: name];
+
+  if (app && [app application]) {
+    unsigned i;
+    
+    for (i = 0; i < [launchedApps count]; i++) {
+      GWLaunchedApp *a = [launchedApps objectAtIndex: i];
+      [a setActive: (a == app)];
+    }
+    
+    activeApplication = app;
+  
+    NSLog(@"appDidBecomeActive");
+    NSLog(@"name %@", [activeApplication name]);
+    NSLog(@"path %@", [activeApplication path]);
+    NSLog(@"ident %@", [[activeApplication identifier] description]);
+    NSLog(@"\n\n");  
+  
+  } else {
+    activeApplication = nil;
+    NSLog(@"\"%@\"unknown running application.", name);
+  }
+}
+
+- (void)appDidResignActive:(NSNotification *)notif
+{
+  NSDictionary *info = [notif userInfo];
+  NSString *name = [info objectForKey: @"NSApplicationName"];
+  NSString *path = [info objectForKey: @"NSApplicationPath"];
+  GWLaunchedApp *app = [self launchedAppWithPath: path andName: name];
+  
+  if (app) {
+    [app setActive: NO];
+    
+    if (app == activeApplication) {
+      NSLog(@"appDidResignActive");  
+      NSLog(@"name %@", [activeApplication name]);
+      NSLog(@"path %@", [activeApplication path]);
+      NSLog(@"ident %@", [[activeApplication identifier] description]);
+      NSLog(@"\n\n");
+    
+      activeApplication = nil;
+    }
+    
+  } else {
+    NSLog(@"\"%@\"unknown running application.", name);
   }
 }
 
 
+
+
+
+/*
+in NSApplication
+
+- (void)hideOtherApplications:(id)sender
+{
+  // FIXME Currently does nothing
+}
+
+// Cause all apps including this one to unhide themselves.
+// <em>Unimplemented under GNUstep.</em>
+
+- (void)unhideAllApplications:(id)sender
+{
+  // FIXME Currently does nothing
+}
+
+// Request this application to "hide" (unmap all windows from the screen
+// except the icon window).  Posts 
+// <code>NSApplicationWillHideNotification</code> and
+// <code>NSApplicationDidHideNotification</code>.  On OS X this activates
+// the next app that is running, however on GNUstep this is up to the window
+// manager.</p><p>See Also: -unhide: -isHidden</p>
+- (void) hide: (id)sender
+
+// Returns whether app is currently in hidden state.</p>
+// <p>See Also: -hide: -unhide:</p>
+- (BOOL) isHidden
+
+// Unhides and activates this application.</p>
+   <p>See Also: -unhideWithoutActivation -hide: -isHidden</p>
+- (void) unhide: (id)sender
+
+// Unhides this app (displays its windows) but does not activate it.
+- (void) unhideWithoutActivation
+*/
 
 
 
@@ -391,7 +487,10 @@
 
 - (void)applicationTerminated:(GWLaunchedApp *)app
 {
-  [[dtopManager dock] applicationTerminated: [app appInfo]];
+  if (app == activeApplication) {
+    activeApplication = nil;
+  }
+  [[dtopManager dock] applicationTerminated: app];
   [launchedApps removeObject: app];
 }
 
@@ -571,7 +670,7 @@
         
         if ([app isRunning]) {
           [launchedApps addObject: app];
-          [[dtopManager dock] applicationDidLaunch: [app appInfo]];
+          [[dtopManager dock] applicationDidLaunch: app];
         } else {
           [toremove addObject: app];
         }
@@ -739,6 +838,16 @@
 {
   [self connectApplication: NO];
   return application;
+}
+
+- (void)setActive:(BOOL)value
+{
+  active = value;
+}
+
+- (BOOL)isActive
+{
+  return active;
 }
 
 - (BOOL)gwlaunched

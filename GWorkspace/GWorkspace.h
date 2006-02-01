@@ -171,6 +171,7 @@
   NSNotificationCenter *wsnc; 
   
   NSMutableArray *launchedApps;
+  GWLaunchedApp *activeApplication;
   
   NSString *storedAppinfoPath;
   NSDistributedLock *storedAppinfoLock;
@@ -432,6 +433,8 @@
 
 - (NSArray *)launchedApplications;
 
+- (NSDictionary *)activeApplication;
+
 - (BOOL)openFile:(NSString *)fullPath
           withApplication:(NSString *)appname
             andDeactivate:(BOOL)flag;
@@ -451,13 +454,16 @@
                 andPath:(NSString **)appPath
                 forName:(NSString *)name;
 
-- (BOOL)_launchApplication:(NSString *)appname
-		             arguments:(NSArray *)args
-                   locally:(BOOL)locally;
+- (BOOL)launchApplication:(NSString *)appname
+		            arguments:(NSArray *)args;
 
 - (void)applicationWillLaunch:(NSNotification *)notif;
 
 - (void)applicationDidLaunch:(NSNotification *)notif;
+
+- (void)appDidBecomeActive:(NSNotification *)notif;
+
+- (void)appDidResignActive:(NSNotification *)notif;
 
 - (void)applicationTerminated:(GWLaunchedApp *)app;
 
@@ -480,6 +486,7 @@
   NSString *path;
   NSNumber *identifier;
   id application;
+  BOOL active;
   
   GWorkspace *gw;   
   NSNotificationCenter *nc;
@@ -513,6 +520,10 @@
 - (NSNumber *)identifier;
 
 - (id)application;
+
+- (void)setActive:(BOOL)value;
+
+- (BOOL)isActive;
 
 - (BOOL)gwlaunched;
 

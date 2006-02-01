@@ -28,6 +28,7 @@
 #include "Dock.h"
 #include "DockIcon.h"
 #include "GWDesktopView.h"
+#include "GWorkspace.h"
 
 #define MAX_ICN_SIZE 48
 #define MIN_ICN_SIZE 16
@@ -283,9 +284,9 @@
   }
 }
 
-- (void)applicationDidLaunch:(NSDictionary *)info
+- (void)applicationDidLaunch:(GWLaunchedApp *)app
 {
-  NSString *appname = [info objectForKey: @"NSApplicationName"];
+  NSString *appname = [app name];
 
   if ([appname isEqual: @"GWorkspace"] == NO) {
     DockIcon *icon = [self iconForApplicationName: appname];
@@ -299,9 +300,9 @@
   }
 }
 
-- (void)applicationTerminated:(NSDictionary *)info
+- (void)applicationTerminated:(GWLaunchedApp *)app
 {
-  NSString *appname = [info objectForKey: @"NSApplicationName"];
+  NSString *appname = [app name];
 
   if ([appname isEqual: @"GWorkspace"] == NO) {
     DockIcon *icon = [self iconForApplicationName: appname];

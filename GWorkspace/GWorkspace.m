@@ -130,18 +130,9 @@ static GWorkspace *gworkspace = nil;
 	[super dealloc];
 }
 
-- (id)init
+- (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
-  self = [super init];
-  
-  if (self) {
-    fm = [NSFileManager defaultManager];
-	  ws = [NSWorkspace sharedWorkspace];
-    wsnc = [ws notificationCenter]; 
-    launchedApps = [NSMutableArray new];      
-  }
-  
-  return self;
+ 
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
@@ -154,9 +145,12 @@ static GWorkspace *gworkspace = nil;
   NSMenu *menu;
   NSString *lockpath;
   int i;
-  
+    
 	[isa registerForServices];
 
+  fm = [NSFileManager defaultManager];
+	ws = [NSWorkspace sharedWorkspace];
+  wsnc = [ws notificationCenter]; 
   fsnodeRep = [FSNodeRep sharedInstance];  
     
   extendedInfo = [fsnodeRep availableExtendedInfoNames];
@@ -244,7 +238,7 @@ static GWorkspace *gworkspace = nil;
   recyclerApp = nil;
 
   dtopManager = [GWDesktopManager desktopManager];
-
+    
   if ([defaults boolForKey: @"uses_desktop"]) { 
     id item;
    
@@ -305,6 +299,9 @@ static GWorkspace *gworkspace = nil;
   lockpath = [storedAppinfoPath stringByAppendingPathExtension: @"lock"];   
   storedAppinfoLock = [[NSDistributedLock alloc] initWithPath: lockpath];
 
+  launchedApps = [NSMutableArray new];   
+  activeApplication = nil;   
+
   [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
                 				selector: @selector(fileSystemWillChange:) 
                 					  name: @"GWFileSystemWillChangeNotification"
@@ -358,6 +355,16 @@ static GWorkspace *gworkspace = nil;
   [wsnc addObserver: self
 	         selector: @selector(applicationDidLaunch:)
 		           name: NSWorkspaceDidLaunchApplicationNotification
+		         object: nil];    
+
+  [wsnc addObserver: self
+	         selector: @selector(appDidBecomeActive:)
+		           name: NSApplicationDidBecomeActiveNotification
+		         object: nil];
+
+  [wsnc addObserver: self
+	         selector: @selector(appDidResignActive:)
+		           name: NSApplicationDidResignActiveNotification
 		         object: nil];    
 
   [self checkLastRunningApps];

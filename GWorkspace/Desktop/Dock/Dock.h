@@ -33,6 +33,7 @@
 @class NSColor;
 @class NSImage;
 @class DockIcon;
+@class GWLaunchedApp;
 
 @interface Dock : NSView 
 {
@@ -82,9 +83,9 @@
 
 - (void)applicationWillLaunch:(NSDictionary *)info;
 
-- (void)applicationDidLaunch:(NSDictionary *)info;
+- (void)applicationDidLaunch:(GWLaunchedApp *)app;
 
-- (void)applicationTerminated:(NSDictionary *)info;
+- (void)applicationTerminated:(GWLaunchedApp *)app;
 
 - (void)setPosition:(DockPosition)pos;
 
