@@ -28,6 +28,7 @@
 #include "DockIcon.h"
 #include "Dock.h"
 #include "GWDesktopManager.h"
+#include "GWorkspace.h"
 
 @implementation DockIcon
 
@@ -44,6 +45,7 @@
 }
 
 - (id)initForNode:(FSNode *)anode
+          appName:(NSString *)aname
          iconSize:(int)isize
 {
   self = [super initForNode: anode
@@ -59,16 +61,29 @@
                   slideBack: NO];
 
   if (self) {
-    ASSIGN (appName, [[node name] stringByDeletingPathExtension]);
-    isDocked = NO;
-    isLaunched = NO;
+    if (aname != nil) {
+      ASSIGN (appName, aname);
+    } else {
+      ASSIGN (appName, [[node name] stringByDeletingPathExtension]);
+    }
+
+    dragIcon = [icon copy];
+    
+    docked = NO;
+    launched = NO;
+    apphidden = NO;
+    
     nc = [NSNotificationCenter defaultCenter];
     fm = [NSFileManager defaultManager];
     ws = [NSWorkspace sharedWorkspace];
-    dragIcon = [icon copy];
   }
 
   return self;
+}
+
+- (NSString *)appName
+{
+  return appName;
 }
 
 - (void)setWsIcon:(BOOL)value
@@ -129,23 +144,35 @@
 
 - (void)setDocked:(BOOL)value
 {
-  isDocked = value;
+  docked = value;
 }
 
 - (BOOL)isDocked
 {
-  return isDocked;
+  return docked;
 }
 
 - (void)setLaunched:(BOOL)value
 {
-  isLaunched = value;
+  launched = value;
   [self setNeedsDisplay: YES];
 }
 
 - (BOOL)isLaunched
 {
-  return isLaunched;
+  return launched;
+}
+
+- (void)setAppHidden:(BOOL)value
+{
+  apphidden = value;
+  [self setNeedsDisplay: YES];
+  [container setNeedsDisplayInRect: [self frame]];
+}
+
+- (BOOL)isAppHidden
+{
+  return apphidden;
 }
 
 - (void)animateLaunch
@@ -227,9 +254,12 @@
 - (void)mouseUp:(NSEvent *)theEvent
 {
   if ([theEvent clickCount] > 1) {  
-    if ((isLaunched == NO) && ([self isSpecialIcon] == NO)) {
-      [ws launchApplication: appName];
-      
+    if ([self isSpecialIcon] == NO) {
+      if (launched == NO) {
+        [ws launchApplication: appName];
+      } else if (apphidden) {
+        [[GWorkspace gworkspace] unhideAppWithPath: [node path] andName: appName];
+      }
     } else if (isWsIcon) {
       [[GWDesktopManager desktopManager] showRootViewer];
     
@@ -283,11 +313,14 @@
   NSPasteboard *pb = [NSPasteboard pasteboardWithName: NSDragPboard];	
   NSMutableDictionary *dict = [NSMutableDictionary dictionary];
 
-  [dict setObject: [node name] forKey: @"name"];
-  [dict setObject: [NSNumber numberWithBool: isDocked] 
+  [dict setObject: appName forKey: @"name"];
+  [dict setObject: [node path] forKey: @"path"];
+  [dict setObject: [NSNumber numberWithBool: docked] 
            forKey: @"docked"];
-  [dict setObject: [NSNumber numberWithBool: isLaunched] 
+  [dict setObject: [NSNumber numberWithBool: launched] 
            forKey: @"launched"];
+  [dict setObject: [NSNumber numberWithBool: apphidden] 
+           forKey: @"hidden"];
   
   [pb declareTypes: [NSArray arrayWithObject: @"DockIconPboardType"] 
              owner: nil];
@@ -326,6 +359,15 @@
 
 - (void)drawRect:(NSRect)rect
 {   
+#define DRAWDOT(c1, c2, p) \
+{ \
+[c1 set]; \
+NSRectFill(NSMakeRect(p.x, p.y, 3, 2)); \
+[c2 set]; \
+NSRectFill(NSMakeRect(p.x + 1, p.y, 2, 1)); \
+NSRectFill(NSMakeRect(p.x + 2, p.y + 1, 1, 1)); \
+}
+
 #define DRAWDOTS(c1, c2, p) \
 { \
 int i, x = p.x, y = p.y; \
@@ -338,7 +380,7 @@ NSRectFill(NSMakeRect(x + 2, y + 1, 1, 1)); \
 x += 6; \
 } \
 }
- 	 
+ 	
   if (isSelected || launching) {
     [highlightColor set];
     NSRectFill(rect);
@@ -364,8 +406,12 @@ x += 6; \
       }
     }
     
-    if ((isWsIcon == NO) && (isTrashIcon == NO) && (isLaunched == NO)) {
-      DRAWDOTS (darkerColor, [NSColor whiteColor], NSMakePoint(4, 2));
+    if ((isWsIcon == NO) && (isTrashIcon == NO)) { 
+      if (apphidden) {
+        DRAWDOT (darkerColor, [NSColor whiteColor], NSMakePoint(4, 2));
+      } else if (launched == NO) {
+        DRAWDOTS (darkerColor, [NSColor whiteColor], NSMakePoint(4, 2));
+      }
     }
   }
 }

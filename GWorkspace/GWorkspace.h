@@ -457,13 +457,20 @@
 - (BOOL)launchApplication:(NSString *)appname
 		            arguments:(NSArray *)args;
 
-- (void)applicationWillLaunch:(NSNotification *)notif;
+- (void)appWillLaunch:(NSNotification *)notif;
 
-- (void)applicationDidLaunch:(NSNotification *)notif;
+- (void)appDidLaunch:(NSNotification *)notif;
 
 - (void)appDidBecomeActive:(NSNotification *)notif;
 
 - (void)appDidResignActive:(NSNotification *)notif;
+
+- (void)appDidHide:(NSNotification *)notif;
+
+- (void)appDidUnhide:(NSNotification *)notif;
+
+- (void)unhideAppWithPath:(NSString *)path
+                  andName:(NSString *)name;
 
 - (void)applicationTerminated:(GWLaunchedApp *)app;
 
@@ -487,6 +494,7 @@
   NSNumber *identifier;
   id application;
   BOOL active;
+  BOOL hidden;
   
   GWorkspace *gw;   
   NSNotificationCenter *nc;
@@ -524,6 +532,12 @@
 - (void)setActive:(BOOL)value;
 
 - (BOOL)isActive;
+
+- (void)setHidden:(BOOL)value;
+
+- (BOOL)isHidden;
+
+- (void)unhideApplication;
 
 - (BOOL)gwlaunched;
 

@@ -710,7 +710,7 @@
   if (flags.plain == -1) {
     [self setTypeFlags];
   }
-  return flags.plain;
+  return (flags.plain ? YES : NO);  
 }
 
 - (BOOL)isDirectory 
@@ -718,7 +718,7 @@
   if (flags.directory == -1) {
     [self setTypeFlags];
   }
-  return flags.directory;
+  return (flags.directory ? YES : NO);
 }
 
 - (BOOL)isLink 
@@ -726,7 +726,7 @@
   if (flags.link == -1) {
     [self setTypeFlags];
   }
-  return flags.link;
+  return (flags.link ? YES : NO);
 }
 
 - (BOOL)isSocket
@@ -734,7 +734,7 @@
   if (flags.socket == -1) {
     [self setTypeFlags];
   }
-  return flags.socket;
+  return (flags.socket ? YES : NO);
 }
 
 - (BOOL)isCharspecial
@@ -742,7 +742,7 @@
   if (flags.charspecial == -1) {
     [self setTypeFlags];
   }
-  return flags.charspecial;
+  return (flags.charspecial ? YES : NO);
 }
 
 - (BOOL)isBlockspecial
@@ -750,7 +750,7 @@
   if (flags.blockspecial == -1) {
     [self setTypeFlags];
   }
-  return flags.blockspecial;
+  return (flags.blockspecial ? YES : NO);
 }
 
 - (BOOL)isMountPoint
@@ -758,7 +758,7 @@
   if (flags.mountpoint == -1) {
     [self setTypeFlags];
   }
-  return flags.mountpoint;
+  return (flags.mountpoint ? YES : NO);
 }
 
 - (void)setMountPoint:(BOOL)value
@@ -771,7 +771,7 @@
   if (flags.application == -1) {
     [self setTypeFlags];
   }
-  return flags.application;
+  return (flags.application ? YES : NO);
 }
 
 - (BOOL)isPackage
@@ -779,7 +779,7 @@
   if (flags.package == -1) {
     [self setTypeFlags];
   }
-  return flags.package;
+  return (flags.package ? YES : NO);
 }
 
 - (BOOL)isReadable 
@@ -787,7 +787,7 @@
   if (flags.readable == -1) {
     flags.readable = [fm isReadableFileAtPath: path];
   }
-  return flags.readable;
+  return (flags.readable ? YES : NO);
 }
 
 - (BOOL)isWritable 
@@ -795,7 +795,7 @@
   if (flags.writable == -1) {
     flags.writable = [fm isWritableFileAtPath: path];
   }
-  return flags.writable;
+  return (flags.writable ? YES : NO);
 }
 
 - (BOOL)isParentWritable
@@ -808,7 +808,7 @@
   if (flags.executable == -1) {
     flags.executable = [fm isExecutableFileAtPath: path];
   }
-  return flags.executable;
+  return (flags.executable ? YES : NO);
 }
 
 - (BOOL)isDeletable
@@ -816,7 +816,7 @@
   if (flags.deletable == -1) {
     flags.deletable = [fm isDeletableFileAtPath: path];
   }
-  return flags.deletable;
+  return (flags.deletable ? YES : NO);
 }
 
 - (BOOL)isLocked

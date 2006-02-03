@@ -63,8 +63,9 @@
 
 - (void)createTrashIcon;
 
-- (DockIcon *)addIconForApplicationWithName:(NSString *)name
-                                    atIndex:(int)index;
+- (DockIcon *)addIconForApplicationAtPath:(NSString *)path
+                                 withName:(NSString *)name
+                                  atIndex:(int)index;
 
 - (void)addDraggedIcon:(NSData *)icondata
                atIndex:(int)index;
@@ -86,6 +87,10 @@
 - (void)applicationDidLaunch:(GWLaunchedApp *)app;
 
 - (void)applicationTerminated:(GWLaunchedApp *)app;
+
+- (void)appDidHide:(GWLaunchedApp *)app;
+
+- (void)appDidUnhide:(GWLaunchedApp *)app;
 
 - (void)setPosition:(DockPosition)pos;
 

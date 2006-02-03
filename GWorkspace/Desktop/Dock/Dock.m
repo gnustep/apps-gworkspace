@@ -88,10 +88,15 @@
     
       for (i = 0; i < [indexes count]; i++) {
         NSNumber *index = [indexes objectAtIndex: i];
-        NSString *appname = [appsdict objectForKey: index];
-        DockIcon *icon = [self addIconForApplicationWithName: appname 
+        NSString *name = [[appsdict objectForKey: index] stringByDeletingPathExtension];
+        NSString *path = [ws fullPathForApplication: name];
+        
+        if (path) {
+          DockIcon *icon = [self addIconForApplicationAtPath: path
+                                                    withName: name 
                                                      atIndex: [index intValue]];
-        [icon setDocked: YES];
+          [icon setDocked: YES];
+        }
       }
     }
 
@@ -116,7 +121,9 @@
   path = [ws fullPathForApplication: wsname];
   node = [FSNode nodeWithPath: path];
   
-  icon = [[DockIcon alloc] initForNode: node iconSize: iconSize];
+  icon = [[DockIcon alloc] initForNode: node 
+                               appName: wsname
+                              iconSize: iconSize];
   [icon setHighlightColor: backColor];
   [icon setUseHlightImage: useBackImage];
   [icon setWsIcon: YES];   
@@ -130,7 +137,9 @@
 {
   NSString *path = [manager trashPath];
   FSNode *node = [FSNode nodeWithPath: path];
-  DockIcon *icon = [[DockIcon alloc] initForNode: node iconSize: iconSize];
+  DockIcon *icon = [[DockIcon alloc] initForNode: node 
+                                         appName: nil
+                                        iconSize: iconSize];
 
   [icon setHighlightColor: backColor];
   [icon setUseHlightImage: useBackImage];  
@@ -143,17 +152,18 @@
   [manager addWatcherForPath: path];
 }
 
-- (DockIcon *)addIconForApplicationWithName:(NSString *)name
-                                    atIndex:(int)index
+- (DockIcon *)addIconForApplicationAtPath:(NSString *)path
+                                 withName:(NSString *)name
+                                  atIndex:(int)index
 {
-  NSString *path = [ws fullPathForApplication: name];
-
-  if (path) {
+  if ([fm fileExistsAtPath: path]) {
     FSNode *node = [FSNode nodeWithPath: path];
     
     if ([node isApplication]) {
-      DockIcon *icon = [[DockIcon alloc] initForNode: node iconSize: iconSize];
       int icnindex;
+      DockIcon *icon = [[DockIcon alloc] initForNode: node 
+                                             appName: name
+                                            iconSize: iconSize];
 
       if (index == -1) {
         icnindex = ([icons count]) ? ([icons count] - 1) : 0;
@@ -180,11 +190,15 @@
                atIndex:(int)index
 {
   NSDictionary *dict = [NSUnarchiver unarchiveObjectWithData: icondata];
-  NSString *appname = [dict objectForKey: @"name"];
-  DockIcon *icon = [self addIconForApplicationWithName: appname atIndex: index];
+  NSString *name = [dict objectForKey: @"name"];
+  NSString *path = [dict objectForKey: @"path"];
+  DockIcon *icon = [self addIconForApplicationAtPath: path 
+                                            withName: name 
+                                             atIndex: index];
 
   [icon setDocked: [[dict objectForKey: @"docked"] boolValue]];
   [icon setLaunched: [[dict objectForKey: @"launched"] boolValue]];
+  [icon setHidden: [[dict objectForKey: @"hidden"] boolValue]];
 }
 
 - (void)removeIcon:(DockIcon *)icon
@@ -270,13 +284,16 @@
 
 - (void)applicationWillLaunch:(NSDictionary *)info
 {
-  NSString *appname = [info objectForKey: @"NSApplicationName"];
+  NSString *path = [info objectForKey: @"NSApplicationPath"];
+  NSString *name = [info objectForKey: @"NSApplicationName"];
   
-  if ([appname isEqual: @"GWorkspace"] == NO) {
-    DockIcon *icon = [self iconForApplicationName: appname];
+  if ([name isEqual: @"GWorkspace"] == NO) {
+    DockIcon *icon = [self iconForApplicationName: name];
   
     if (icon == nil) {
-      icon = [self addIconForApplicationWithName: appname atIndex: -1];
+      icon = [self addIconForApplicationAtPath: path
+                                      withName: name
+                                       atIndex: -1];
     } 
   
     [self tile];
@@ -286,13 +303,16 @@
 
 - (void)applicationDidLaunch:(GWLaunchedApp *)app
 {
-  NSString *appname = [app name];
+  NSString *path = [app path];
+  NSString *name = [app name];
 
-  if ([appname isEqual: @"GWorkspace"] == NO) {
-    DockIcon *icon = [self iconForApplicationName: appname];
+  if ([name isEqual: @"GWorkspace"] == NO) {
+    DockIcon *icon = [self iconForApplicationName: name];
 
     if (icon == nil) {
-      icon = [self addIconForApplicationWithName: appname atIndex: -1];
+      icon = [self addIconForApplicationAtPath: path
+                                      withName: name
+                                       atIndex: -1];
       [self tile];
     } 
   
@@ -302,17 +322,44 @@
 
 - (void)applicationTerminated:(GWLaunchedApp *)app
 {
-  NSString *appname = [app name];
+  NSString *name = [app name];
 
-  if ([appname isEqual: @"GWorkspace"] == NO) {
-    DockIcon *icon = [self iconForApplicationName: appname];
+  if ([name isEqual: @"GWorkspace"] == NO) {
+    DockIcon *icon = [self iconForApplicationName: name];
 
     if (icon) {
       if (([icon isDocked] == NO) && ([icon isSpecialIcon] == NO)) {
         [self removeIcon: icon];
       } else {
+        [icon setAppHidden: NO];
         [icon setLaunched: NO];
       }
+    }
+  }
+}
+
+- (void)appDidHide:(GWLaunchedApp *)app
+{
+  NSString *name = [app name];
+
+  if ([name isEqual: @"GWorkspace"] == NO) {
+    DockIcon *icon = [self iconForApplicationName: name];
+
+    if (icon) {
+      [icon setAppHidden: YES];
+    }
+  }
+}
+
+- (void)appDidUnhide:(GWLaunchedApp *)app
+{
+  NSString *name = [app name];
+
+  if ([name isEqual: @"GWorkspace"] == NO) {
+    DockIcon *icon = [self iconForApplicationName: name];
+
+    if (icon) {
+      [icon setAppHidden: NO];
     }
   }
 }
@@ -458,7 +505,7 @@
     DockIcon *icon = [icons objectAtIndex: i];    
 
     if (([icon isSpecialIcon] == NO) && [icon isDocked]) {
-      [dict setObject: [[icon node] name] forKey: [NSNumber numberWithInt: i]];
+      [dict setObject: [icon appName] forKey: [NSNumber numberWithInt: i]];
       [manager removeWatcherForPath: [[icon node] path]];
     }
   }
@@ -880,7 +927,8 @@
       if ([sourcePaths count] == 1) {
         NSString *path = [sourcePaths objectAtIndex: 0];
         FSNode *node = [FSNode nodeWithPath: path];
-
+        NSString *appName = [[node name] stringByDeletingPathExtension];
+        
         if ([node isApplication]) {
           if ((icon == nil) || (icon && ([icon isTrashIcon] == NO))) {
             BOOL duplicate = NO;
@@ -889,7 +937,8 @@
             for (i = 0; i < [icons count]; i++) {
               DockIcon *icon = [icons objectAtIndex: i];
 
-              if ([[icon node] isEqualToNode: node]) {
+              if ([[icon node] isEqual: node] 
+                          && [[icon appName] isEqual: appName]) {
                 RETAIN (icon);
                 [icons removeObject: icon];
                 [icons insertObject: icon atIndex: targetIndex];
@@ -900,8 +949,9 @@
             }
 
             if (duplicate == NO) {
-              DockIcon *icon = [self addIconForApplicationWithName: [node name] 
-                                                           atIndex: targetIndex];
+              DockIcon *icon = [self addIconForApplicationAtPath: path
+                                                        withName: appName 
+                                                         atIndex: targetIndex];
               [icon setDocked: YES];
             }
 

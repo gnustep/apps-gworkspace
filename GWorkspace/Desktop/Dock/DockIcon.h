@@ -30,6 +30,7 @@
 
 @class NSColor;
 @class NSImage;
+@class GWLaunchedApp;
 
 @interface DockIcon : FSNIcon
 {
@@ -39,9 +40,10 @@
   BOOL isTrashIcon;
   NSImage *trashFullIcon;
   BOOL trashFull;
-  BOOL isDocked;
-  BOOL isLaunched;
+  BOOL docked;
+  BOOL launched;
 	BOOL launching;
+  BOOL apphidden;  
   float dissFract;	
     
   NSColor *darkerColor;
@@ -58,7 +60,10 @@
 }
 
 - (id)initForNode:(FSNode *)anode
+          appName:(NSString *)aname
          iconSize:(int)isize;
+
+- (NSString *)appName;
         
 - (void)setWsIcon:(BOOL)value;
 
@@ -79,6 +84,10 @@
 - (void)setLaunched:(BOOL)value;
 
 - (BOOL)isLaunched;
+
+- (void)setAppHidden:(BOOL)value;
+
+- (BOOL)isAppHidden;
 
 - (void)animateLaunch;
 

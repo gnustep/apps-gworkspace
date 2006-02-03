@@ -100,7 +100,7 @@
     [launched addObject: [[launchedApps objectAtIndex: i] appInfo]];
   }
 
-  return launched;
+  return [launched makeImmutableCopyOnFail: NO];
 }
 
 - (NSDictionary *)activeApplication
@@ -348,18 +348,21 @@
   app = [GWLaunchedApp appWithApplicationPath: appPath
                               applicationName: appName
                                  launchedTask: task];
-
-  [launchedApps addObject: app];
   
-  return YES;    
+  if (app != nil) {
+    [launchedApps addObject: app];
+    return YES;
+  }
+  
+  return NO;    
 }
 
-- (void)applicationWillLaunch:(NSNotification *)notif
+- (void)appWillLaunch:(NSNotification *)notif
 {  
   [[dtopManager dock] applicationWillLaunch: [notif userInfo]];
 }
 
-- (void)applicationDidLaunch:(NSNotification *)notif
+- (void)appDidLaunch:(NSNotification *)notif
 {
   NSDictionary *info = [notif userInfo];
   NSString *name = [info objectForKey: @"NSApplicationName"];
@@ -376,12 +379,12 @@
                               processIdentifier: ident
                                    checkRunning: NO];
   
-    if ([app application] != nil) {
+    if ((app != nil) && ([app application] != nil)) {
       [launchedApps addObject: app];
     }  
   }
 
-  if ([app application] != nil) {
+  if ((app != nil) && ([app application] != nil)) {
     [[dtopManager dock] applicationDidLaunch: app];
   }
 }
@@ -440,50 +443,45 @@
   }
 }
 
-
-
-
-
-/*
-in NSApplication
-
-- (void)hideOtherApplications:(id)sender
+- (void)appDidHide:(NSNotification *)notif
 {
-  // FIXME Currently does nothing
+  NSDictionary *info = [notif userInfo];
+  NSString *name = [info objectForKey: @"NSApplicationName"];
+  NSString *path = [info objectForKey: @"NSApplicationPath"];
+  GWLaunchedApp *app = [self launchedAppWithPath: path andName: name];
+  
+  if (app) {
+    [app setHidden: YES];
+    [[dtopManager dock] appDidHide: app];
+  } else {
+    NSLog(@"\"%@\"unknown running application.", name);
+  }
 }
 
-// Cause all apps including this one to unhide themselves.
-// <em>Unimplemented under GNUstep.</em>
-
-- (void)unhideAllApplications:(id)sender
+- (void)appDidUnhide:(NSNotification *)notif
 {
-  // FIXME Currently does nothing
+  NSDictionary *info = [notif userInfo];
+  NSString *name = [info objectForKey: @"NSApplicationName"];
+  NSString *path = [info objectForKey: @"NSApplicationPath"];
+  GWLaunchedApp *app = [self launchedAppWithPath: path andName: name];
+  
+  if (app) {
+    [app setHidden: NO];
+    [[dtopManager dock] appDidUnhide: app];
+  } else {
+    NSLog(@"\"%@\"unknown running application.", name);
+  }
 }
 
-// Request this application to "hide" (unmap all windows from the screen
-// except the icon window).  Posts 
-// <code>NSApplicationWillHideNotification</code> and
-// <code>NSApplicationDidHideNotification</code>.  On OS X this activates
-// the next app that is running, however on GNUstep this is up to the window
-// manager.</p><p>See Also: -unhide: -isHidden</p>
-- (void) hide: (id)sender
+- (void)unhideAppWithPath:(NSString *)path
+                  andName:(NSString *)name
+{
+  GWLaunchedApp *app = [self launchedAppWithPath: path andName: name];
 
-// Returns whether app is currently in hidden state.</p>
-// <p>See Also: -hide: -unhide:</p>
-- (BOOL) isHidden
-
-// Unhides and activates this application.</p>
-   <p>See Also: -unhideWithoutActivation -hide: -isHidden</p>
-- (void) unhide: (id)sender
-
-// Unhides this app (displays its windows) but does not activate it.
-- (void) unhideWithoutActivation
-*/
-
-
-
-
-
+  if (app && [app isHidden]) {
+    [app unhideApplication];
+  }
+}
 
 - (void)applicationTerminated:(GWLaunchedApp *)app
 {
@@ -497,16 +495,18 @@ in NSApplication
 - (GWLaunchedApp *)launchedAppWithPath:(NSString *)path
                                andName:(NSString *)name
 {
-  unsigned i;
+  if ((path != nil) && (name != nil)) {
+    unsigned i;
 
-  for (i = 0; i < [launchedApps count]; i++) {
-    GWLaunchedApp *app = [launchedApps objectAtIndex: i];
-    
-    if (([[app path] isEqual: path]) && ([[app name] isEqual: name])) {
-      return app;
+    for (i = 0; i < [launchedApps count]; i++) {
+      GWLaunchedApp *app = [launchedApps objectAtIndex: i];
+
+      if (([[app path] isEqual: path]) && ([[app name] isEqual: name])) {
+        return app;
+      }
     }
   }
-  
+    
   return nil;
 }
 
@@ -668,10 +668,10 @@ in NSApplication
                                                  processIdentifier: ident
                                                       checkRunning: YES];
         
-        if ([app isRunning]) {
+        if ((app != nil) && [app isRunning]) {
           [launchedApps addObject: app];
           [[dtopManager dock] applicationDidLaunch: app];
-        } else {
+        } else if (app != nil) {
           [toremove addObject: app];
         }
       }
@@ -697,8 +697,12 @@ in NSApplication
   [app setPath: apath];
   [app setName: aname];
   [app setTask: atask];
-
-  return AUTORELEASE (app);  
+  
+  if (([app name] == nil) || ([app path] == nil)) {
+    DESTROY (app);
+  }
+  
+  return TEST_AUTORELEASE (app);  
 }
 
 + (id)appWithApplicationPath:(NSString *)apath
@@ -712,11 +716,13 @@ in NSApplication
   [app setName: aname];
   [app setIdentifier: ident];
   
-  if (check) {
+  if (([app name] == nil) || ([app path] == nil) || ([app identifier] == nil)) {
+    DESTROY (app);
+  } else if (check) {
     [app connectApplication: YES];
   }
   
-  return AUTORELEASE (app);  
+  return TEST_AUTORELEASE (app);  
 }
 
 - (void)dealloc
@@ -791,7 +797,7 @@ in NSApplication
     [dict setObject: identifier forKey: @"NSApplicationProcessIdentifier"];
   }
 
-  return dict;
+  return [dict makeImmutableCopyOnFail: NO];
 }
 
 - (void)setTask:(NSTask *)atask
@@ -849,6 +855,31 @@ in NSApplication
 {
   return active;
 }
+
+- (void)setHidden:(BOOL)value
+{
+  hidden = value;
+}
+
+- (BOOL)isHidden
+{
+  return hidden;
+}
+
+- (void)unhideApplication
+{
+  NS_DURING
+    {
+  [application unhideWithoutActivation];
+    }
+  NS_HANDLER
+    {
+  NSLog(@"Unable to unhide %@", name);
+  NSLog(@"GWorkspace caught exception %@: %@", 
+	        [localException name], [localException reason]);
+    }
+  NS_ENDHANDLER
+}    
 
 - (BOOL)gwlaunched
 {
@@ -964,6 +995,19 @@ in NSApplication
 
   NSAssert(conn == [application connectionForProxy],
 		                                  NSInternalInconsistencyException);
+
+/*
+	NS_DURING
+	  {
+    RELEASE (application);
+	  }
+	NS_HANDLER
+	  {
+    NSLog(@"%@ crashed!", name);
+	  }
+	NS_ENDHANDLER
+*/
+
   RELEASE (application);
   application = nil;
   

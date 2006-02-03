@@ -132,11 +132,6 @@ static GWorkspace *gworkspace = nil;
 
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
- 
-}
-
-- (void)applicationDidFinishLaunching:(NSNotification *)aNotification
-{
 	NSString *processName;
 	NSUserDefaults *defaults;
 	id entry;
@@ -231,6 +226,7 @@ static GWorkspace *gworkspace = nil;
 	selectedPaths = [[NSArray alloc] initWithObjects: NSHomeDirectory(), nil];
 
   startAppWin = [[StartAppWin alloc] init];
+  
   fswatcher = nil;
   fswnotifications = YES;
   [self connectFSWatcher];
@@ -301,7 +297,10 @@ static GWorkspace *gworkspace = nil;
 
   launchedApps = [NSMutableArray new];   
   activeApplication = nil;   
+}
 
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification
+{
   [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
                 				selector: @selector(fileSystemWillChange:) 
                 					  name: @"GWFileSystemWillChangeNotification"
@@ -348,12 +347,12 @@ static GWorkspace *gworkspace = nil;
                 					object: nil];
 
   [wsnc addObserver: self
-	         selector: @selector(applicationWillLaunch:)
+	         selector: @selector(appWillLaunch:)
 		           name: NSWorkspaceWillLaunchApplicationNotification
 		         object: nil];
 
   [wsnc addObserver: self
-	         selector: @selector(applicationDidLaunch:)
+	         selector: @selector(appDidLaunch:)
 		           name: NSWorkspaceDidLaunchApplicationNotification
 		         object: nil];    
 
@@ -365,6 +364,16 @@ static GWorkspace *gworkspace = nil;
   [wsnc addObserver: self
 	         selector: @selector(appDidResignActive:)
 		           name: NSApplicationDidResignActiveNotification
+		         object: nil];    
+
+  [wsnc addObserver: self
+	         selector: @selector(appDidHide:)
+		           name: NSApplicationDidHideNotification
+		         object: nil];
+
+  [wsnc addObserver: self
+	         selector: @selector(appDidUnhide:)
+		           name: NSApplicationDidUnhideNotification
 		         object: nil];    
 
   [self checkLastRunningApps];
