@@ -669,8 +669,16 @@
                                                       checkRunning: YES];
         
         if ((app != nil) && [app isRunning]) {
+          BOOL hidden = [app isApplicationHidden];
+          
           [launchedApps addObject: app];
+          [app setHidden: hidden];
           [[dtopManager dock] applicationDidLaunch: app];
+          
+          if (hidden) {
+            [[dtopManager dock] appDidHide: app];
+          }
+          
         } else if (app != nil) {
           [toremove addObject: app];
         }
@@ -880,6 +888,26 @@
     }
   NS_ENDHANDLER
 }    
+
+- (BOOL)isApplicationHidden
+{
+  BOOL apphidden = NO;
+  
+  if (application != nil) {
+    NS_DURING
+      {
+    apphidden = [application isHidden];
+      }
+    NS_HANDLER
+      {
+    NSLog(@"GWorkspace caught exception %@: %@", 
+	          [localException name], [localException reason]);
+      }
+    NS_ENDHANDLER
+  }
+  
+  return apphidden;
+}
 
 - (BOOL)gwlaunched
 {

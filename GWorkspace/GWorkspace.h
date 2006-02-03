@@ -539,6 +539,8 @@
 
 - (void)unhideApplication;
 
+- (BOOL)isApplicationHidden;
+
 - (BOOL)gwlaunched;
 
 - (BOOL)isRunning;
