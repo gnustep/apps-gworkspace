@@ -48,6 +48,7 @@ typedef enum DockPosition {
   DockPosition dockPosition;
   
   NSRect dockReservedFrame;
+  NSRect macmenuReservedFrame;
   NSRect tshelfReservedFrame;
   NSRect tshelfActivateFrame;
   
@@ -89,6 +90,8 @@ typedef enum DockPosition {
 - (BOOL)dockActive;
 
 - (void)setReservedFrames;
+
+- (NSRect)macmenuReservedFrame;
 
 - (NSRect)dockReservedFrame;
 

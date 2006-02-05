@@ -358,6 +358,7 @@
 {
   NSRect dckr = [manager dockReservedFrame];
   NSRect tshfr = [manager tshelfReservedFrame];
+  NSRect mmfr = [manager macmenuReservedFrame];
   NSRect gridrect = screenFrame;
   int ymargin;
   NSPoint gpnt;
@@ -372,6 +373,9 @@
   gridrect.origin.y += tshfr.size.height;
   gridrect.size.height -= tshfr.size.height;
   gridrect.size.width -= dckr.size.width;
+  
+  gridrect.size.height -= mmfr.size.height;
+  
   if ([manager dockPosition] == DockPositionLeft) {
     gridrect.origin.x += dckr.size.width;
   }

@@ -406,12 +406,6 @@
     
     activeApplication = app;
   
-    NSLog(@"appDidBecomeActive");
-    NSLog(@"name %@", [activeApplication name]);
-    NSLog(@"path %@", [activeApplication path]);
-    NSLog(@"ident %@", [[activeApplication identifier] description]);
-    NSLog(@"\n\n");  
-  
   } else {
     activeApplication = nil;
     NSLog(@"\"%@\"unknown running application.", name);
@@ -429,12 +423,6 @@
     [app setActive: NO];
     
     if (app == activeApplication) {
-      NSLog(@"appDidResignActive");  
-      NSLog(@"name %@", [activeApplication name]);
-      NSLog(@"path %@", [activeApplication path]);
-      NSLog(@"ident %@", [[activeApplication identifier] description]);
-      NSLog(@"\n\n");
-    
       activeApplication = nil;
     }
     
@@ -750,7 +738,7 @@
   RELEASE (path);
   TEST_RELEASE (identifier);
   TEST_RELEASE (task);
-  
+    
   [super dealloc];
 }
 
@@ -901,7 +889,7 @@
     NS_HANDLER
       {
     NSLog(@"GWorkspace caught exception %@: %@", 
-	          [localException name], [localException reason]);
+	                      [localException name], [localException reason]);
       }
     NS_ENDHANDLER
   }
@@ -1016,28 +1004,12 @@
 - (void)connectionDidDie:(NSNotification *)notif
 {
   id conn = [notif object];
-
+  
   [nc removeObserver: self
 	              name: NSConnectionDidDieNotification
 	            object: conn];
 
-  NSAssert(conn == [application connectionForProxy],
-		                                  NSInternalInconsistencyException);
-
-/*
-	NS_DURING
-	  {
-    RELEASE (application);
-	  }
-	NS_HANDLER
-	  {
-    NSLog(@"%@ crashed!", name);
-	  }
-	NS_ENDHANDLER
-*/
-
-  RELEASE (application);
-  application = nil;
+  DESTROY (application);
   
   if (task && [task isRunning]) {
     [task terminate];

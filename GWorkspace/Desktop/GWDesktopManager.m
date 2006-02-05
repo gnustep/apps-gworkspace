@@ -338,6 +338,17 @@ static GWDesktopManager *desktopManager = nil;
 - (void)setReservedFrames
 {
   NSRect screenFrame = [[NSScreen mainScreen] frame];
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
+  NSString *menuStyle = [defaults objectForKey: @"NSMenuInterfaceStyle"];
+  
+  macmenuReservedFrame = NSZeroRect;
+
+  if (menuStyle && [menuStyle isEqual: @"NSMacintoshInterfaceStyle"]) {
+    macmenuReservedFrame.size.width = screenFrame.size.width;
+    macmenuReservedFrame.size.height = 25;
+    macmenuReservedFrame.origin.x = 0;
+    macmenuReservedFrame.origin.y = screenFrame.size.height - 25;    
+  }
 
   dockReservedFrame.size.height = screenFrame.size.height;
   dockReservedFrame.size.width = 64 + RESV_MARGIN;
@@ -350,6 +361,11 @@ static GWDesktopManager *desktopManager = nil;
   
   tshelfReservedFrame = NSMakeRect(0, 0, screenFrame.size.width, 106 + RESV_MARGIN);
   tshelfActivateFrame = NSMakeRect(0, 0, screenFrame.size.width, 20);
+}
+
+- (NSRect)macmenuReservedFrame
+{
+  return macmenuReservedFrame;
 }
 
 - (NSRect)dockReservedFrame
