@@ -357,6 +357,11 @@ static GWorkspace *gworkspace = nil;
 		         object: nil];    
 
   [wsnc addObserver: self
+	         selector: @selector(appDidTerminate:)
+		           name: NSWorkspaceDidTerminateApplicationNotification
+		         object: nil];    
+
+  [wsnc addObserver: self
 	         selector: @selector(appDidBecomeActive:)
 		           name: NSApplicationDidBecomeActiveNotification
 		         object: nil];

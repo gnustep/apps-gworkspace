@@ -33,7 +33,6 @@
 @class NSColor;
 @class NSImage;
 @class DockIcon;
-@class GWLaunchedApp;
 
 @interface Dock : NSView 
 {
@@ -82,15 +81,17 @@
 
 - (void)setDndSourceIcon:(DockIcon *)icon;
 
-- (void)applicationWillLaunch:(NSDictionary *)info;
+- (void)appWillLaunch:(NSString *)appPath
+              appName:(NSString *)appName;
 
-- (void)applicationDidLaunch:(GWLaunchedApp *)app;
+- (void)appDidLaunch:(NSString *)appPath
+             appName:(NSString *)appName;
 
-- (void)applicationTerminated:(GWLaunchedApp *)app;
+- (void)applicationTerminated:(NSString *)appName;
 
-- (void)appDidHide:(GWLaunchedApp *)app;
+- (void)appDidHide:(NSString *)appName;
 
-- (void)appDidUnhide:(GWLaunchedApp *)app;
+- (void)appDidUnhide:(NSString *)appName;
 
 - (void)setPosition:(DockPosition)pos;
 

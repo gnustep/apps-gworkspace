@@ -461,6 +461,8 @@
 
 - (void)appDidLaunch:(NSNotification *)notif;
 
+- (void)appDidTerminate:(NSNotification *)notif;
+
 - (void)appDidBecomeActive:(NSNotification *)notif;
 
 - (void)appDidResignActive:(NSNotification *)notif;
@@ -492,6 +494,7 @@
   NSString *name;
   NSString *path;
   NSNumber *identifier;
+  NSConnection *conn;
   id application;
   BOOL active;
   BOOL hidden;

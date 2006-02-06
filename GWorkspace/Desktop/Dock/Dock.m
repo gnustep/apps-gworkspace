@@ -28,7 +28,6 @@
 #include "Dock.h"
 #include "DockIcon.h"
 #include "GWDesktopView.h"
-#include "GWorkspace.h"
 
 #define MAX_ICN_SIZE 48
 #define MIN_ICN_SIZE 16
@@ -221,9 +220,8 @@
   
   for (i = 0; i < [icons count]; i++) {
     DockIcon *icon = [icons objectAtIndex: i];
-    NSString *nodename = [[icon node] name];
     
-    if ([[nodename stringByDeletingPathExtension] isEqual: name]) {
+    if ([[icon appName] isEqual: name]) {
       return icon;
     }
   }
@@ -282,17 +280,15 @@
   dndSourceIcon = icon;
 }
 
-- (void)applicationWillLaunch:(NSDictionary *)info
+- (void)appWillLaunch:(NSString *)appPath
+              appName:(NSString *)appName
 {
-  NSString *path = [info objectForKey: @"NSApplicationPath"];
-  NSString *name = [info objectForKey: @"NSApplicationName"];
-  
-  if ([name isEqual: @"GWorkspace"] == NO) {
-    DockIcon *icon = [self iconForApplicationName: name];
+  if ([appName isEqual: @"GWorkspace"] == NO) {
+    DockIcon *icon = [self iconForApplicationName: appName];
   
     if (icon == nil) {
-      icon = [self addIconForApplicationAtPath: path
-                                      withName: name
+      icon = [self addIconForApplicationAtPath: appPath
+                                      withName: appName
                                        atIndex: -1];
     } 
   
@@ -301,17 +297,15 @@
   }
 }
 
-- (void)applicationDidLaunch:(GWLaunchedApp *)app
+- (void)appDidLaunch:(NSString *)appPath
+             appName:(NSString *)appName
 {
-  NSString *path = [app path];
-  NSString *name = [app name];
-
-  if ([name isEqual: @"GWorkspace"] == NO) {
-    DockIcon *icon = [self iconForApplicationName: name];
+  if ([appName isEqual: @"GWorkspace"] == NO) {
+    DockIcon *icon = [self iconForApplicationName: appName];
 
     if (icon == nil) {
-      icon = [self addIconForApplicationAtPath: path
-                                      withName: name
+      icon = [self addIconForApplicationAtPath: appPath
+                                      withName: appName
                                        atIndex: -1];
       [self tile];
     } 
@@ -320,12 +314,10 @@
   }
 }
 
-- (void)applicationTerminated:(GWLaunchedApp *)app
+- (void)applicationTerminated:(NSString *)appName
 {
-  NSString *name = [app name];
-
-  if ([name isEqual: @"GWorkspace"] == NO) {
-    DockIcon *icon = [self iconForApplicationName: name];
+  if ([appName isEqual: @"GWorkspace"] == NO) {
+    DockIcon *icon = [self iconForApplicationName: appName];
 
     if (icon) {
       if (([icon isDocked] == NO) && ([icon isSpecialIcon] == NO)) {
@@ -338,12 +330,10 @@
   }
 }
 
-- (void)appDidHide:(GWLaunchedApp *)app
+- (void)appDidHide:(NSString *)appName
 {
-  NSString *name = [app name];
-
-  if ([name isEqual: @"GWorkspace"] == NO) {
-    DockIcon *icon = [self iconForApplicationName: name];
+  if ([appName isEqual: @"GWorkspace"] == NO) {
+    DockIcon *icon = [self iconForApplicationName: appName];
 
     if (icon) {
       [icon setAppHidden: YES];
@@ -351,12 +341,10 @@
   }
 }
 
-- (void)appDidUnhide:(GWLaunchedApp *)app
+- (void)appDidUnhide:(NSString *)appName
 {
-  NSString *name = [app name];
-
-  if ([name isEqual: @"GWorkspace"] == NO) {
-    DockIcon *icon = [self iconForApplicationName: name];
+  if ([appName isEqual: @"GWorkspace"] == NO) {
+    DockIcon *icon = [self iconForApplicationName: appName];
 
     if (icon) {
       [icon setAppHidden: NO];

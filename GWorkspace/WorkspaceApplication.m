@@ -331,7 +331,7 @@
   userinfo = [NSDictionary dictionaryWithObjectsAndKeys:
 	              [[appName lastPathComponent] stringByDeletingPathExtension], 
 			           @"NSApplicationName",
-	               appName, 
+	               appPath, 
                  @"NSApplicationPath",
 	               nil];
                  
@@ -359,7 +359,15 @@
 
 - (void)appWillLaunch:(NSNotification *)notif
 {  
-  [[dtopManager dock] applicationWillLaunch: [notif userInfo]];
+  NSString *appPath, *appName;
+  
+  [self applicationName: &appName 
+                andPath: &appPath 
+                forName: [[notif userInfo] objectForKey: @"NSApplicationName"]];
+
+  GWDebugLog(@"appWillLaunch: \"%@\" path: %@", appName, appPath);
+          
+  [[dtopManager dock] appWillLaunch: appPath appName: appName];
 }
 
 - (void)appDidLaunch:(NSNotification *)notif
@@ -373,20 +381,31 @@
   if (app) {
     [app setIdentifier: ident];
     
-  } else { // if launched by an other process
+  } else { 
+    /*
+    * if launched by an other process
+    */
     app = [GWLaunchedApp appWithApplicationPath: path
                                 applicationName: name
                               processIdentifier: ident
                                    checkRunning: NO];
-  
-    if ((app != nil) && ([app application] != nil)) {
+    
+    if (app && [app application]) {
       [launchedApps addObject: app];
     }  
   }
 
-  if ((app != nil) && ([app application] != nil)) {
-    [[dtopManager dock] applicationDidLaunch: app];
+  if (app && [app application]) {
+    [[dtopManager dock] appDidLaunch: path appName: name];
   }
+}
+
+- (void)appDidTerminate:(NSNotification *)notif
+{
+  /*
+  * we do nothing here because we will know that the app has terminated 
+  * from the connection.
+  */
 }
 
 - (void)appDidBecomeActive:(NSNotification *)notif
@@ -408,7 +427,7 @@
   
   } else {
     activeApplication = nil;
-    NSLog(@"\"%@\"unknown running application.", name);
+    GWDebugLog(@"appDidBecomeActive: \"%@\" unknown running application.", name);
   }
 }
 
@@ -427,7 +446,7 @@
     }
     
   } else {
-    NSLog(@"\"%@\"unknown running application.", name);
+    GWDebugLog(@"appDidResignActive: \"%@\" unknown running application.", name);
   }
 }
 
@@ -438,11 +457,13 @@
   NSString *path = [info objectForKey: @"NSApplicationPath"];
   GWLaunchedApp *app = [self launchedAppWithPath: path andName: name];
   
+  GWDebugLog(@"appDidHide: %@", name);
+   
   if (app) {
     [app setHidden: YES];
-    [[dtopManager dock] appDidHide: app];
+    [[dtopManager dock] appDidHide: name];
   } else {
-    NSLog(@"\"%@\"unknown running application.", name);
+    GWDebugLog(@"appDidHide: \"%@\" unknown running application.", name);
   }
 }
 
@@ -455,9 +476,9 @@
   
   if (app) {
     [app setHidden: NO];
-    [[dtopManager dock] appDidUnhide: app];
+    [[dtopManager dock] appDidUnhide: name];
   } else {
-    NSLog(@"\"%@\"unknown running application.", name);
+    GWDebugLog(@"appDidUnhide: \"%@\" unknown running application.", name);
   }
 }
 
@@ -473,10 +494,12 @@
 
 - (void)applicationTerminated:(GWLaunchedApp *)app
 {
+  GWDebugLog(@"%@ applicationTerminated", [app name]);
+
   if (app == activeApplication) {
     activeApplication = nil;
   }
-  [[dtopManager dock] applicationTerminated: app];
+  [[dtopManager dock] applicationTerminated: [app name]];
   [launchedApps removeObject: app];
 }
 
@@ -661,10 +684,10 @@
           
           [launchedApps addObject: app];
           [app setHidden: hidden];
-          [[dtopManager dock] applicationDidLaunch: app];
+          [[dtopManager dock] appDidLaunch: path appName: name];
           
           if (hidden) {
-            [[dtopManager dock] appDidHide: app];
+            [[dtopManager dock] appDidHide: name];
           }
           
         } else if (app != nil) {
@@ -723,15 +746,11 @@
 
 - (void)dealloc
 {
-  if (application) {
-    NSConnection *conn = [(NSDistantObject *)application connectionForProxy];
-  
-    if (conn && [conn isValid]) {
-      [nc removeObserver: self
-	                  name: NSConnectionDidDieNotification
-	                object: conn];
-      DESTROY (application);
-    }
+  if (conn && [conn isValid]) {
+    [nc removeObserver: self
+	                name: NSConnectionDidDieNotification
+	              object: conn];
+    RELEASE (application);  
   }
   
   RELEASE (name);
@@ -751,6 +770,7 @@
     name = nil;
     path = nil; 
     identifier = nil;
+    conn = nil;
     application = nil;
     
     gw = [GWorkspace gworkspace];
@@ -783,12 +803,9 @@
 {
   NSMutableDictionary *dict = [NSMutableDictionary dictionary];
   
-  if (name != nil) {
-    [dict setObject: name forKey: @"NSApplicationName"];
-  }
-  if (path != nil) {
-    [dict setObject: path forKey: @"NSApplicationPath"];
-  }
+  [dict setObject: name forKey: @"NSApplicationName"];
+  [dict setObject: path forKey: @"NSApplicationPath"];
+  
   if (identifier != nil) {
     [dict setObject: identifier forKey: @"NSApplicationProcessIdentifier"];
   }
@@ -927,15 +944,16 @@
                                                                host: host];
 
     if (app) {
-      NSConnection *conn = [app connectionForProxy];
+      NSConnection *c = [app connectionForProxy];
 
 	    [nc addObserver: self
 	           selector: @selector(connectionDidDie:)
 		             name: NSConnectionDidDieNotification
-		           object: conn];
+		           object: c];
       
       application = app;
       RETAIN (application);
+      ASSIGN (conn, c);
       
 	  } else {
       StartAppWin *startAppWin;
@@ -965,15 +983,16 @@
         app = [NSConnection rootProxyForConnectionWithRegisteredName: name
                                                                 host: host];                  
         if (app) {
-          NSConnection *conn = [app connectionForProxy];
+          NSConnection *c = [app connectionForProxy];
 
 	        [nc addObserver: self
 	               selector: @selector(connectionDidDie:)
 		                 name: NSConnectionDidDieNotification
-		               object: conn];
+		               object: c];
 
           application = app;
           RETAIN (application);
+          ASSIGN (conn, c);
           break;
         }
       }
@@ -1003,19 +1022,18 @@
 
 - (void)connectionDidDie:(NSNotification *)notif
 {
-  id conn = [notif object];
-  
-  [nc removeObserver: self
-	              name: NSConnectionDidDieNotification
-	            object: conn];
+  if (conn == (NSConnection *)[notif object]) {
+    [nc removeObserver: self
+	                name: NSConnectionDidDieNotification
+	              object: conn];
 
-  DESTROY (application);
-  
-  if (task && [task isRunning]) {
-    [task terminate];
+    RELEASE (application);
+    DESTROY (conn);
+    
+    GWDebugLog(@"%@ application connection did die", name);
+
+    [gw applicationTerminated: self];
   }
-  
-  [gw applicationTerminated: self];
 }
 
 @end

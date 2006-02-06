@@ -30,7 +30,6 @@
 
 @class NSColor;
 @class NSImage;
-@class GWLaunchedApp;
 
 @interface DockIcon : FSNIcon
 {

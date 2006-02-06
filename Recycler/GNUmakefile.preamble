@@ -15,6 +15,7 @@ ADDITIONAL_INCLUDE_DIRS += -I../ -I../../ -I../FSNode -IPreferences -IDialogs
 ADDITIONAL_LDFLAGS +=  
 
 ADDITIONAL_LIB_DIRS += -L../FSNode/FSNode.framework/Versions/Current/$(GNUSTEP_TARGET_LDIR)
+ADDITIONAL_LIB_DIRS += -L../FSNode/FSNode.framework
 
 ADDITIONAL_TOOL_LIBS +=
 
