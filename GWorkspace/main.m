@@ -207,6 +207,9 @@ void createMenu()
 	// Quit
 	addItemToMenu(mainMenu, @"Quit", @"", @"terminate:", @"Q");
 
+	// Logout
+	addItemToMenu(mainMenu, @"Logout", @"", @"logout:", @"");
+
 	[mainMenu update];
 
 	[[NSApplication sharedApplication] setServicesMenu: services];

@@ -28,6 +28,7 @@
 #include "Dock.h"
 #include "DockIcon.h"
 #include "GWDesktopView.h"
+#include "GWorkspace.h"
 
 #define MAX_ICN_SIZE 48
 #define MIN_ICN_SIZE 16
@@ -57,6 +58,7 @@
     manager = mngr;
     position = [manager dockPosition];
     
+    gw = [GWorkspace gworkspace];
     fm = [NSFileManager defaultManager];    
     ws = [NSWorkspace sharedWorkspace];
 
@@ -114,7 +116,7 @@
   DockIcon *icon;
   
   if (wsname == nil) {
-    wsname = @"GWorkspace";
+    wsname = [gw gworkspaceProcessName];
   }
 
   path = [ws fullPathForApplication: wsname];
@@ -283,7 +285,7 @@
 - (void)appWillLaunch:(NSString *)appPath
               appName:(NSString *)appName
 {
-  if ([appName isEqual: @"GWorkspace"] == NO) {
+  if ([appName isEqual: [gw gworkspaceProcessName]] == NO) {
     DockIcon *icon = [self iconForApplicationName: appName];
   
     if (icon == nil) {
@@ -300,7 +302,7 @@
 - (void)appDidLaunch:(NSString *)appPath
              appName:(NSString *)appName
 {
-  if ([appName isEqual: @"GWorkspace"] == NO) {
+  if ([appName isEqual: [gw gworkspaceProcessName]] == NO) {
     DockIcon *icon = [self iconForApplicationName: appName];
 
     if (icon == nil) {
@@ -314,9 +316,9 @@
   }
 }
 
-- (void)applicationTerminated:(NSString *)appName
+- (void)appTerminated:(NSString *)appName
 {
-  if ([appName isEqual: @"GWorkspace"] == NO) {
+  if ([appName isEqual: [gw gworkspaceProcessName]] == NO) {
     DockIcon *icon = [self iconForApplicationName: appName];
 
     if (icon) {
@@ -332,7 +334,7 @@
 
 - (void)appDidHide:(NSString *)appName
 {
-  if ([appName isEqual: @"GWorkspace"] == NO) {
+  if ([appName isEqual: [gw gworkspaceProcessName]] == NO) {
     DockIcon *icon = [self iconForApplicationName: appName];
 
     if (icon) {
@@ -343,7 +345,7 @@
 
 - (void)appDidUnhide:(NSString *)appName
 {
-  if ([appName isEqual: @"GWorkspace"] == NO) {
+  if ([appName isEqual: [gw gworkspaceProcessName]] == NO) {
     DockIcon *icon = [self iconForApplicationName: appName];
 
     if (icon) {

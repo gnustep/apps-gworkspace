@@ -33,6 +33,7 @@
 @class NSColor;
 @class NSImage;
 @class DockIcon;
+@class GWorkspace;
 
 @interface Dock : NSView 
 {
@@ -52,6 +53,7 @@
   NSRect targetRect;
   
   GWDesktopManager *manager; 
+  GWorkspace *gw;
   NSFileManager *fm; 
   id ws;
 }
@@ -87,7 +89,7 @@
 - (void)appDidLaunch:(NSString *)appPath
              appName:(NSString *)appName;
 
-- (void)applicationTerminated:(NSString *)appName;
+- (void)appTerminated:(NSString *)appName;
 
 - (void)appDidHide:(NSString *)appName;
 

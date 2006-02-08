@@ -45,18 +45,29 @@
                        files:(NSArray *)files 
                          tag:(int *)tag
 {
-  NSMutableDictionary *opdict = [NSMutableDictionary dictionary];
+  if (loggingout == NO) {
+    NSMutableDictionary *opdict = [NSMutableDictionary dictionary];
 
-  [opdict setObject: operation forKey: @"operation"];
-  [opdict setObject: source forKey: @"source"];
-  [opdict setObject: destination forKey: @"destination"];
-  [opdict setObject: files forKey: @"files"];
+    [opdict setObject: operation forKey: @"operation"];
+    [opdict setObject: source forKey: @"source"];
+    [opdict setObject: destination forKey: @"destination"];
+    [opdict setObject: files forKey: @"files"];
 
-  [fileOpsManager performOperation: opdict];
+    [fileOpsManager performOperation: opdict];
+
+    *tag = 0;
+
+    return YES;
   
-  *tag = 0;
+  } else {
+    NSRunAlertPanel(nil, 
+                  NSLocalizedString(@"GWorkspace is logging out!", @""),
+					        NSLocalizedString(@"Ok", @""), 
+                  nil, 
+                  nil);  
+  }
   
-  return YES;
+  return NO;
 }
 
 - (BOOL)selectFile:(NSString *)fullPath
@@ -88,7 +99,23 @@
 
 - (int)extendPowerOffBy:(int)requested
 {
-  return 0;
+  int req = (int)(requested / 1000);
+  int ret;
+  
+  if (req > 0) {
+    ret = (req < maxLogoutDelay) ? req : maxLogoutDelay;
+  } else {
+    ret = 0;
+  }
+  
+  logoutDelay += ret;
+
+  if (logoutTimer && [logoutTimer isValid]) {
+    NSTimeInterval fireInterval = ([[logoutTimer fireDate] timeIntervalSinceNow] + ret);
+    [logoutTimer setFireDate: [NSDate dateWithTimeIntervalSinceNow: fireInterval]];
+  }
+  
+  return (ret * 1000);
 }
 
 - (NSArray *)launchedApplications
@@ -115,6 +142,15 @@
   NSString *appPath, *appName;
   GWLaunchedApp *app;
   id application;
+
+  if (loggingout) {
+    NSRunAlertPanel(nil, 
+                  NSLocalizedString(@"GWorkspace is logging out!", @""),
+					        NSLocalizedString(@"Ok", @""), 
+                  nil, 
+                  nil);  
+    return NO;
+  }
       
   if (appname == nil) {
     NSString *ext = [fullPath pathExtension];
@@ -190,6 +226,15 @@
   id application;
   NSArray	*args = nil;
 
+  if (loggingout) {
+    NSRunAlertPanel(nil, 
+                  NSLocalizedString(@"GWorkspace is logging out!", @""),
+					        NSLocalizedString(@"Ok", @""), 
+                  nil, 
+                  nil);  
+    return NO;
+  }
+
   [self applicationName: &appName andPath: &appPath forName: appname];
  
   app = [self launchedAppWithPath: appPath andName: appName];
@@ -228,6 +273,15 @@
   NSString *appPath, *appName;
   GWLaunchedApp *app;
   id application;
+
+  if (loggingout) {
+    NSRunAlertPanel(nil, 
+                  NSLocalizedString(@"GWorkspace is logging out!", @""),
+					        NSLocalizedString(@"Ok", @""), 
+                  nil, 
+                  nil);  
+    return NO;
+  }
   
   if (name == nil) {
     NSWarnLog(@"No known applications for file extension '%@'", ext);
@@ -278,6 +332,66 @@
 
 @implementation GWorkspace (Applications)
 
+- (void)initializeWorkspace
+{
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+
+  autoLogoutDelay = [defaults integerForKey: @"GSAutoLogoutDelay"];
+  
+  if (autoLogoutDelay == 0) {
+    autoLogoutDelay = 120;
+  }
+
+  maxLogoutDelay = [defaults integerForKey: @"GSMaxLogoutDelay"];
+  
+  if (autoLogoutDelay == 0) {
+    maxLogoutDelay = 30;
+  }  
+
+  wsnc = [ws notificationCenter];
+  
+  [wsnc addObserver: self
+	         selector: @selector(appWillLaunch:)
+		           name: NSWorkspaceWillLaunchApplicationNotification
+		         object: nil];
+
+  [wsnc addObserver: self
+	         selector: @selector(appDidLaunch:)
+		           name: NSWorkspaceDidLaunchApplicationNotification
+		         object: nil];    
+
+  [wsnc addObserver: self
+	         selector: @selector(appDidTerminate:)
+		           name: NSWorkspaceDidTerminateApplicationNotification
+		         object: nil];    
+
+  [wsnc addObserver: self
+	         selector: @selector(appDidBecomeActive:)
+		           name: NSApplicationDidBecomeActiveNotification
+		         object: nil];
+
+  [wsnc addObserver: self
+	         selector: @selector(appDidResignActive:)
+		           name: NSApplicationDidResignActiveNotification
+		         object: nil];    
+
+  [wsnc addObserver: self
+	         selector: @selector(appDidHide:)
+		           name: NSApplicationDidHideNotification
+		         object: nil];
+
+  [wsnc addObserver: self
+	         selector: @selector(appDidUnhide:)
+		           name: NSApplicationDidUnhideNotification
+		         object: nil];    
+    
+  [self checkLastRunningApps];
+
+  logoutTimer = nil;
+  logoutDelay = 0;
+  loggingout = NO;
+}
+
 - (void)applicationName:(NSString **)appName
                 andPath:(NSString **)appPath
                 forName:(NSString *)name
@@ -304,8 +418,10 @@
 	  return NO;
 	}
 
-  // Try to ensure that apps we launch display in this workspace
-  // ie they have the same -NSHost specification.
+  /*
+  * Try to ensure that apps we launch display in this workspace
+  * ie they have the same -NSHost specification.
+  */
   host = [[NSUserDefaults standardUserDefaults] stringForKey: @"NSHost"];
       
   if (host != nil) {
@@ -328,12 +444,11 @@
     }
 	}
   
-  userinfo = [NSDictionary dictionaryWithObjectsAndKeys:
-	              [[appName lastPathComponent] stringByDeletingPathExtension], 
-			           @"NSApplicationName",
-	               appPath, 
-                 @"NSApplicationPath",
-	               nil];
+  userinfo = [NSDictionary dictionaryWithObjectsAndKeys: appName, 
+			                                                   @"NSApplicationName",
+	                                                       appPath, 
+                                                         @"NSApplicationPath",
+	                                                       nil];
                  
   [wsnc postNotificationName: NSWorkspaceWillLaunchApplicationNotification
 	                    object: ws
@@ -349,7 +464,7 @@
                               applicationName: appName
                                  launchedTask: task];
   
-  if (app != nil) {
+  if (app) {
     [launchedApps addObject: app];
     return YES;
   }
@@ -358,16 +473,13 @@
 }
 
 - (void)appWillLaunch:(NSNotification *)notif
-{  
-  NSString *appPath, *appName;
-  
-  [self applicationName: &appName 
-                andPath: &appPath 
-                forName: [[notif userInfo] objectForKey: @"NSApplicationName"]];
-
-  GWDebugLog(@"appWillLaunch: \"%@\" path: %@", appName, appPath);
-          
-  [[dtopManager dock] appWillLaunch: appPath appName: appName];
+{
+  NSDictionary *info = [notif userInfo];
+  NSString *path = [info objectForKey: @"NSApplicationPath"];
+  NSString *name = [info objectForKey: @"NSApplicationName"];
+           
+  [[dtopManager dock] appWillLaunch: path appName: name];
+  GWDebugLog(@"appWillLaunch: \"%@\" %@", name, path);
 }
 
 - (void)appDidLaunch:(NSNotification *)notif
@@ -397,6 +509,7 @@
 
   if (app && [app application]) {
     [[dtopManager dock] appDidLaunch: path appName: name];
+    GWDebugLog(@"appDidLaunch: \"%@\" %@", name, path);
   }
 }
 
@@ -415,7 +528,7 @@
   NSString *path = [info objectForKey: @"NSApplicationPath"];
   GWLaunchedApp *app = [self launchedAppWithPath: path andName: name];
 
-  if (app && [app application]) {
+  if (app) {
     unsigned i;
     
     for (i = 0; i < [launchedApps count]; i++) {
@@ -424,7 +537,8 @@
     }
     
     activeApplication = app;
-  
+    GWDebugLog(@"appDidBecomeActive: \"%@\"", name);
+
   } else {
     activeApplication = nil;
     GWDebugLog(@"appDidBecomeActive: \"%@\" unknown running application.", name);
@@ -473,10 +587,11 @@
   NSString *name = [info objectForKey: @"NSApplicationName"];
   NSString *path = [info objectForKey: @"NSApplicationPath"];
   GWLaunchedApp *app = [self launchedAppWithPath: path andName: name];
-  
+    
   if (app) {
     [app setHidden: NO];
     [[dtopManager dock] appDidUnhide: name];
+    GWDebugLog(@"appDidUnhide: \"%@\"", name);
   } else {
     GWDebugLog(@"appDidUnhide: \"%@\" unknown running application.", name);
   }
@@ -494,13 +609,22 @@
 
 - (void)applicationTerminated:(GWLaunchedApp *)app
 {
-  GWDebugLog(@"%@ applicationTerminated", [app name]);
-
   if (app == activeApplication) {
     activeApplication = nil;
   }
-  [[dtopManager dock] applicationTerminated: [app name]];
+  
+  [[dtopManager dock] appTerminated: [app name]];
+  GWDebugLog(@"%@ applicationTerminated", [app name]);  
   [launchedApps removeObject: app];
+  
+  
+  if (loggingout && ([launchedApps count] == 1)) {
+    GWLaunchedApp *app = [launchedApps objectAtIndex: 0];
+
+    if ([[app name] isEqual: gwProcessName]) {
+      [NSApp terminate: self];
+    }
+  }
 }
 
 - (GWLaunchedApp *)launchedAppWithPath:(NSString *)path
@@ -702,6 +826,144 @@
   }
 }
 
+- (void)startLogout
+{
+  NSString *msg = [NSString stringWithFormat: @"%@\n%@%i %@",
+        NSLocalizedString(@"Are you sure you want to quit\nall applications and log out now?", @""),
+        NSLocalizedString(@"If you do nothing, the system will log out\nautomatically in", @""),
+        autoLogoutDelay,
+        NSLocalizedString(@"seconds.", @"")];
+  
+  loggingout = YES;
+  logoutDelay = 30;
+  
+  if (logoutTimer && [logoutTimer isValid]) {
+    [logoutTimer invalidate];
+  }
+
+  ASSIGN (logoutTimer, [NSTimer scheduledTimerWithTimeInterval: autoLogoutDelay
+											                          target: self 
+                                              selector: @selector(doLogout:) 
+															                userInfo: nil 
+                                               repeats: NO]);
+                                        
+  if (NSRunAlertPanel(NSLocalizedString(@"Logout", @""),
+                      msg,
+                      NSLocalizedString(@"Log out", @""),
+                      NSLocalizedString(@"Cancel", @""),
+                      nil)) {
+    [logoutTimer invalidate]; 
+    [self doLogout: nil];
+  } else {
+    [logoutTimer invalidate]; 
+    DESTROY (logoutTimer);
+    loggingout = NO;
+  }
+}
+
+- (void)doLogout:(id)sender
+{
+  NSMutableArray *launched = [NSMutableArray array];
+  GWLaunchedApp *gwapp = [self launchedAppWithPath: gwBundlePath andName: gwProcessName];
+  unsigned i;
+
+  [launched addObjectsFromArray: launchedApps];
+  [launched removeObject: gwapp];
+  
+  for (i = 0; i < [launched count]; i++) {
+    GWLaunchedApp *app = [launched objectAtIndex: i];
+    
+    NS_DURING
+      {
+    [app terminateApplication];      
+      }
+    NS_HANDLER
+      {
+    GWDebugLog(@"GWorkspace caught exception %@: %@", 
+	                      [localException name], [localException reason]);
+      }
+    NS_ENDHANDLER
+  }
+
+  [launched removeAllObjects];
+  [launched addObjectsFromArray: launchedApps];
+  [launched removeObject: gwapp];
+    
+  if ([launched count]) {
+    ASSIGN (logoutTimer, [NSTimer scheduledTimerWithTimeInterval: logoutDelay
+											                      target: self 
+                                          selector: @selector(terminateTasks:) 
+															            userInfo: nil 
+                                           repeats: NO]);
+  } else {
+    [NSApp terminate: self];
+  }
+}
+
+- (void)terminateTasks:(id)sender
+{
+  BOOL canterminate = YES;
+
+  if ([launchedApps count] > 1) {
+    NSMutableArray *launched = [NSMutableArray array];
+    GWLaunchedApp *gwapp = [self launchedAppWithPath: gwBundlePath andName: gwProcessName];
+    NSMutableString *appNames = [NSMutableString string];
+    NSString *msg = nil;
+    unsigned count;
+    unsigned i;
+
+    [launched addObjectsFromArray: launchedApps];
+    [launched removeObject: gwapp];
+    
+    count = [launched count];
+    
+    for (i = 0; i < count; i++) {
+      GWLaunchedApp *app = [launched objectAtIndex: i];
+      
+      [appNames appendString: [app name]];
+
+      if (i < (count - 1)) {
+        [appNames appendString: @", "];
+      }
+    }
+    
+    msg = [NSString stringWithFormat: @"%@\n%@\n%@",
+                          NSLocalizedString(@"The following applications:", @""),
+                          appNames, 
+                          NSLocalizedString(@"refuse to terminate.", @"")];    
+
+    if (NSRunAlertPanel(NSLocalizedString(@"Logout", @""),
+                            msg,
+                            NSLocalizedString(@"Kill applications", @""),
+                            NSLocalizedString(@"Cancel logout", @""),
+                            nil)) {
+      for (i = 0; i < [launched count]; i++) {
+        GWLaunchedApp *app = [launched objectAtIndex: i];
+                
+        NS_DURING
+          {
+        [app terminateTask];      
+          }
+        NS_HANDLER
+          {
+        GWDebugLog(@"GWorkspace caught exception %@: %@", 
+	                          [localException name], [localException reason]);
+          }
+        NS_ENDHANDLER
+      }    
+      
+    } else {
+      canterminate = NO;
+    }
+  }
+  
+  if (canterminate) {  
+    [NSApp terminate: self];
+  } else {
+    loggingout = NO;
+  }
+}
+
 @end
 
 
@@ -750,7 +1012,8 @@
     [nc removeObserver: self
 	                name: NSConnectionDidDieNotification
 	              object: conn];
-    RELEASE (application);  
+    DESTROY (application);  
+    RELEASE (conn);  
   }
   
   RELEASE (name);
@@ -772,6 +1035,8 @@
     identifier = nil;
     conn = nil;
     application = nil;
+    active = NO;
+    hidden = NO;
     
     gw = [GWorkspace gworkspace];
     nc = [NSNotificationCenter defaultCenter];      
@@ -924,6 +1189,23 @@
   return (application != nil);
 }
 
+- (void)terminateApplication 
+{  
+  if (application) {
+    [application terminate: nil];
+  } else { 
+    /* if the app is a wrapper */
+    [gw applicationTerminated: self];
+  }
+}
+
+- (void)terminateTask 
+{
+  if (task && [task isRunning]) {
+    [task terminate];
+  }
+}
+
 - (void)connectApplication:(BOOL)showProgress
 {
   if (application == nil) {
@@ -1027,7 +1309,7 @@
 	                name: NSConnectionDidDieNotification
 	              object: conn];
 
-    RELEASE (application);
+    DESTROY (application);
     DESTROY (conn);
     
     GWDebugLog(@"%@ application connection did die", name);

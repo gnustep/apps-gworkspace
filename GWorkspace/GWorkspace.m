@@ -103,9 +103,16 @@ static GWorkspace *gworkspace = nil;
     DESTROY (fswatcher);
   }
   [[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
+  [wsnc removeObserver: self];
   [[NSNotificationCenter defaultCenter] removeObserver: self];
+  if (logoutTimer && [logoutTimer isValid]) {
+    [logoutTimer invalidate];
+    DESTROY (logoutTimer);
+  }
   DESTROY (recyclerApp);
   DESTROY (ddbd);
+	RELEASE (gwProcessName);
+	RELEASE (gwBundlePath);
 	RELEASE (defEditor);
 	RELEASE (defXterm);
 	RELEASE (defXtermArgs);
@@ -132,7 +139,6 @@ static GWorkspace *gworkspace = nil;
 
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
-	NSString *processName;
 	NSUserDefaults *defaults;
 	id entry;
   BOOL boolentry;
@@ -142,10 +148,12 @@ static GWorkspace *gworkspace = nil;
   int i;
     
 	[isa registerForServices];
-
+  
+  ASSIGN (gwProcessName, [[NSProcessInfo processInfo] processName]);
+  ASSIGN (gwBundlePath, [[NSBundle mainBundle] bundlePath]);
+  
   fm = [NSFileManager defaultManager];
 	ws = [NSWorkspace sharedWorkspace];
-  wsnc = [ws notificationCenter]; 
   fsnodeRep = [FSNodeRep sharedInstance];  
     
   extendedInfo = [fsnodeRep availableExtendedInfoNames];
@@ -159,8 +167,7 @@ static GWorkspace *gworkspace = nil;
   }
 	    
 	defaults = [NSUserDefaults standardUserDefaults];
-	processName = [[NSProcessInfo processInfo] processName];    
-	[defaults setObject: processName forKey: @"GSWorkspaceApplication"];
+	[defaults setObject: gwProcessName forKey: @"GSWorkspaceApplication"];
 
   [fsnodeRep setVolumes: [ws removableMediaPaths]];
         
@@ -345,59 +352,24 @@ static GWorkspace *gworkspace = nil;
                         selector: @selector(applicationForExtensionsDidChange:) 
                 					  name: @"GWAppForExtensionDidChangeNotification"
                 					object: nil];
-
-  [wsnc addObserver: self
-	         selector: @selector(appWillLaunch:)
-		           name: NSWorkspaceWillLaunchApplicationNotification
-		         object: nil];
-
-  [wsnc addObserver: self
-	         selector: @selector(appDidLaunch:)
-		           name: NSWorkspaceDidLaunchApplicationNotification
-		         object: nil];    
-
-  [wsnc addObserver: self
-	         selector: @selector(appDidTerminate:)
-		           name: NSWorkspaceDidTerminateApplicationNotification
-		         object: nil];    
-
-  [wsnc addObserver: self
-	         selector: @selector(appDidBecomeActive:)
-		           name: NSApplicationDidBecomeActiveNotification
-		         object: nil];
-
-  [wsnc addObserver: self
-	         selector: @selector(appDidResignActive:)
-		           name: NSApplicationDidResignActiveNotification
-		         object: nil];    
-
-  [wsnc addObserver: self
-	         selector: @selector(appDidHide:)
-		           name: NSApplicationDidHideNotification
-		         object: nil];
-
-  [wsnc addObserver: self
-	         selector: @selector(appDidUnhide:)
-		           name: NSApplicationDidUnhideNotification
-		         object: nil];    
-
-  [self checkLastRunningApps];
+  
+  [self initializeWorkspace]; 
 }
 
 - (BOOL)applicationShouldTerminate:(NSApplication *)app 
 {
 #define TEST_CLOSE(o, w) if ((o) && ([w isVisible])) [w close]
-
+  
   if ([fileOpsManager operationsPending]) {
     NSRunAlertPanel(nil, 
                   NSLocalizedString(@"Wait the operations to terminate!", @""),
-					        NSLocalizedString(@"OK", @""), 
+					        NSLocalizedString(@"Ok", @""), 
                   nil, 
                   nil);  
     return NO;  
   }
     
-  if (dontWarnOnQuit == NO) {
+  if ((dontWarnOnQuit == NO) && (loggingout == NO)) {
     if (NSRunAlertPanel(NSLocalizedString(@"Quit!", @""),
                       NSLocalizedString(@"Do you really want to quit?", @""),
                       NSLocalizedString(@"No", @""),
@@ -406,6 +378,13 @@ static GWorkspace *gworkspace = nil;
       return NO;
     }
   }
+
+  if (logoutTimer && [logoutTimer isValid]) {
+    [logoutTimer invalidate];
+    DESTROY (logoutTimer);
+  }
+  
+  [wsnc removeObserver: self];
   
   fswnotifications = NO;
   terminating = YES;
@@ -641,6 +620,11 @@ static GWorkspace *gworkspace = nil;
   teminalService = value;
 }
 
+- (NSString *)gworkspaceProcessName
+{
+  return gwProcessName;
+}
+
 - (void)updateDefaults
 {
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -827,6 +811,9 @@ static GWorkspace *gworkspace = nil;
               || [title isEqual: NSLocalizedString(@"Rename Current Tab", @"")]
               || [title isEqual: NSLocalizedString(@"Add Tab...", @"")]) {
     return [tshelfWin isVisible];
+  
+  } else if ([title isEqual: NSLocalizedString(@"Logout", @"")]) {
+    return !loggingout;
   }
   
 	if ([title isEqual: NSLocalizedString(@"Cut", @"")]
@@ -1787,6 +1774,11 @@ static GWorkspace *gworkspace = nil;
 - (void)closeMainWin:(id)sender
 {
   [[[NSApplication sharedApplication] keyWindow] performClose: sender];
+}
+
+- (void)logout:(id)sender
+{
+  [self startLogout];
 }
 
 - (void)showInfo:(id)sender

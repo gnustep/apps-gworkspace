@@ -154,7 +154,9 @@
   RunExternalController *runExtController;
   
   StartAppWin *startAppWin;
-    	      
+  
+  NSString *gwProcessName;  	      
+  NSString *gwBundlePath;  	      
 	NSString *defEditor;
   NSString *defXterm;
   NSString *defXtermArgs;
@@ -175,6 +177,12 @@
   
   NSString *storedAppinfoPath;
   NSDistributedLock *storedAppinfoLock;
+  
+  NSTimer *logoutTimer;
+  BOOL loggingout;
+  int autoLogoutDelay;
+  int maxLogoutDelay;  
+  int logoutDelay;
 }
 
 + (GWorkspace *)gworkspace;
@@ -215,7 +223,9 @@
                  arguments:(NSString *)args;
              
 - (void)setUseTerminalService:(BOOL)value;             
-                             
+
+- (NSString *)gworkspaceProcessName;
+
 - (void)updateDefaults;
 					 
 - (void)startXTermOnDirectory:(NSString *)dirPath;
@@ -335,6 +345,8 @@
 //
 - (void)closeMainWin:(id)sender;
 
+- (void)logout:(id)sender;
+
 - (void)showInfo:(id)sender;
 
 - (void)showPreferences:(id)sender;
@@ -450,6 +462,8 @@
 
 @interface GWorkspace (Applications)
 
+- (void)initializeWorkspace;
+
 - (void)applicationName:(NSString **)appName
                 andPath:(NSString **)appPath
                 forName:(NSString *)name;
@@ -484,6 +498,12 @@
 - (void)updateStoredAppInfoWithLaunchedApps:(NSArray *)apps;
 
 - (void)checkLastRunningApps;
+
+- (void)startLogout;
+
+- (void)doLogout:(id)sender;
+
+- (void)terminateTasks:(id)sender;
 
 @end
 
@@ -548,6 +568,10 @@
 
 - (BOOL)isRunning;
 
+- (void)terminateApplication;
+
+- (void)terminateTask;
+
 - (void)connectApplication:(BOOL)showProgress;
 
 - (void)connectionDidDie:(NSNotification *)notif;
@@ -556,6 +580,8 @@
 
 
 @interface NSWorkspace (WorkspaceApplication)
+
+- (id)_workspaceApplication;
 
 @end
 
