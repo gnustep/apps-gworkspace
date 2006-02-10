@@ -564,6 +564,16 @@
   }
 }
 
+- (void)activateAppWithPath:(NSString *)path
+                    andName:(NSString *)name
+{
+  GWLaunchedApp *app = [self launchedAppWithPath: path andName: name];
+
+  if (app && ([app isActive] == NO)) {
+    [app activateApplication];
+  }
+}
+
 - (void)appDidHide:(NSNotification *)notif
 {
   NSDictionary *info = [notif userInfo];
@@ -1110,6 +1120,21 @@
 {
   return active;
 }
+
+- (void)activateApplication
+{
+  NS_DURING
+    {
+  [application activateIgnoringOtherApps: YES];
+    }
+  NS_HANDLER
+    {
+  NSLog(@"Unable to activate %@", name);
+  NSLog(@"GWorkspace caught exception %@: %@", 
+	        [localException name], [localException reason]);
+    }
+  NS_ENDHANDLER
+}    
 
 - (void)setHidden:(BOOL)value
 {

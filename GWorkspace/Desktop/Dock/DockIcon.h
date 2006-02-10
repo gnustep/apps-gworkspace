@@ -43,6 +43,7 @@
   BOOL launched;
 	BOOL launching;
   BOOL apphidden;  
+  BOOL appactive;  
   float dissFract;	
     
   NSColor *darkerColor;

@@ -481,6 +481,9 @@
 
 - (void)appDidResignActive:(NSNotification *)notif;
 
+- (void)activateAppWithPath:(NSString *)path
+                    andName:(NSString *)name;
+
 - (void)appDidHide:(NSNotification *)notif;
 
 - (void)appDidUnhide:(NSNotification *)notif;
@@ -555,6 +558,8 @@
 - (void)setActive:(BOOL)value;
 
 - (BOOL)isActive;
+
+- (void)activateApplication;
 
 - (void)setHidden:(BOOL)value;
 

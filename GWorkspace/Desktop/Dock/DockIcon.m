@@ -259,6 +259,8 @@
         [ws launchApplication: appName];
       } else if (apphidden) {
         [[GWorkspace gworkspace] unhideAppWithPath: [node path] andName: appName];
+      } else {
+        [[GWorkspace gworkspace] activateAppWithPath: [node path] andName: appName];
       }
     } else if (isWsIcon) {
       [[GWDesktopManager desktopManager] showRootViewer];
