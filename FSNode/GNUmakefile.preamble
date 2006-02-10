@@ -9,7 +9,7 @@ ADDITIONAL_OBJCFLAGS += -Wall
 ADDITIONAL_CFLAGS += -Wall 
 
 # Additional include directories the compiler should search
-ADDITIONAL_INCLUDE_DIRS += -IExtendedInfo -I../
+ADDITIONAL_INCLUDE_DIRS += -IExtendedInfo -I..
 
 #
 # Flags dealing with installing and uninstalling

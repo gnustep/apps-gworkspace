@@ -8,10 +8,10 @@ ADDITIONAL_OBJCFLAGS += -Wall
 # Additional flags to pass to the C compiler
 ADDITIONAL_CFLAGS += -Wall
 
-ADDITIONAL_INCLUDE_DIRS += -I../ -I../../
+ADDITIONAL_INCLUDE_DIRS += -I.. -I../..
 
 ADDITIONAL_LIB_DIRS += -L../../FSNode.framework/Versions/Current/$(GNUSTEP_TARGET_LDIR)
-ADDITIONAL_LIB_DIRS += -L../../FSNode.framework/
+ADDITIONAL_LIB_DIRS += -L../../FSNode.framework
 
 # Additional LDFLAGS to pass to the linker
 ADDITIONAL_LDFLAGS += 
