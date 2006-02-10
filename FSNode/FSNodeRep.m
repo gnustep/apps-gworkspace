@@ -745,7 +745,7 @@ static FSNodeRep *shared = nil;
           const char *bytes = [data bytes];
           int i;
 
-          bzero(mtabuf, 1024);
+          memset(mtabuf, '\0', 1024);
 
           for (i = 0; i < len; i++) {
             if (bytes[i] == '\t') {
