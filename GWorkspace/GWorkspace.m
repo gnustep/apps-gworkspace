@@ -242,7 +242,7 @@ static GWorkspace *gworkspace = nil;
 
   dtopManager = [GWDesktopManager desktopManager];
     
-  if ([defaults boolForKey: @"uses_desktop"]) { 
+  if ([defaults boolForKey: @"no_desktop"] == NO) { 
     id item;
    
     [dtopManager activateDesktop];
@@ -662,7 +662,7 @@ static GWorkspace *gworkspace = nil;
   [vwrsManager updateDefaults];
 
   [dtopManager updateDefaults];
-  [defaults setBool: [dtopManager isActive] forKey: @"uses_desktop"];
+  [defaults setBool: ![dtopManager isActive] forKey: @"no_desktop"];
 
 	[finder updateDefaults];
       

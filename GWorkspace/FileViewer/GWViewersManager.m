@@ -1030,16 +1030,16 @@ if (*pos >= i) *pos -= n; \
 		}
 	}
   
-	if ([history count] > 4) {
+  count = [history count];
+  
+	if (count > 4) {
 		FSNode *na[2], *nb[2];
-	
-		count = [history count];
 		
 		for (i = 0; i < count; i++) {
-			if (i < ([history count] - 3)) {
+			if (i < (count - 3)) {
 				na[0] = [history objectAtIndex: i];
 				na[1] = [history objectAtIndex: i + 1];
-				nb[0] = [history objectAtIndex: i + 2];
+				nb[0] = [history objectAtIndex: i + 2]; 
 				nb[1] = [history objectAtIndex: i + 3];
 		
 				if (([na[0] isEqual: nb[0]]) && ([na[1] isEqual: nb[1]])) {

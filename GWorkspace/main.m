@@ -174,7 +174,7 @@ void createMenu()
     menuItem = addItemToMenu(menu, @"History", @"", nil, @"");
 		subenu = AUTORELEASE ([NSMenu new]);
 		[menu setSubmenu: subenu forItem: menuItem];
-		addItemToMenu(subenu, @"Show History", @"", @"showHistory:", @"H");
+		addItemToMenu(subenu, @"Show History", @"", @"showHistory:", @"");
 		addItemToMenu(subenu, @"Go backward", @"", @"goBackwardInHistory:", @"");
 		addItemToMenu(subenu, @"Go forward", @"", @"goForwardInHistory:", @"");
 	

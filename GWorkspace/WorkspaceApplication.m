@@ -615,8 +615,7 @@
   
   [[dtopManager dock] appTerminated: [app name]];
   GWDebugLog(@"%@ applicationTerminated", [app name]);  
-  [launchedApps removeObject: app];
-  
+  [launchedApps removeObject: app];  
   
   if (loggingout && ([launchedApps count] == 1)) {
     GWLaunchedApp *app = [launchedApps objectAtIndex: 0];
@@ -871,18 +870,7 @@
   [launched removeObject: gwapp];
   
   for (i = 0; i < [launched count]; i++) {
-    GWLaunchedApp *app = [launched objectAtIndex: i];
-    
-    NS_DURING
-      {
-    [app terminateApplication];      
-      }
-    NS_HANDLER
-      {
-    GWDebugLog(@"GWorkspace caught exception %@: %@", 
-	                      [localException name], [localException reason]);
-      }
-    NS_ENDHANDLER
+    [[launched objectAtIndex: i] terminateApplication];      
   }
 
   [launched removeAllObjects];
@@ -938,18 +926,7 @@
                             NSLocalizedString(@"Cancel logout", @""),
                             nil)) {
       for (i = 0; i < [launched count]; i++) {
-        GWLaunchedApp *app = [launched objectAtIndex: i];
-                
-        NS_DURING
-          {
-        [app terminateTask];      
-          }
-        NS_HANDLER
-          {
-        GWDebugLog(@"GWorkspace caught exception %@: %@", 
-	                          [localException name], [localException reason]);
-          }
-        NS_ENDHANDLER
+        [[launched objectAtIndex: i] terminateTask];      
       }    
       
     } else {
@@ -1192,7 +1169,16 @@
 - (void)terminateApplication 
 {  
   if (application) {
-    [application terminate: nil];
+    NS_DURING
+      {
+    [application terminate: nil];      
+      }
+    NS_HANDLER
+      {
+    GWDebugLog(@"GWorkspace caught exception %@: %@", 
+	                      [localException name], [localException reason]);
+      }
+    NS_ENDHANDLER
   } else { 
     /* if the app is a wrapper */
     [gw applicationTerminated: self];
@@ -1202,7 +1188,16 @@
 - (void)terminateTask 
 {
   if (task && [task isRunning]) {
-    [task terminate];
+    NS_DURING
+      {
+    [task terminate];      
+      }
+    NS_HANDLER
+      {
+    GWDebugLog(@"GWorkspace caught exception %@: %@", 
+	                      [localException name], [localException reason]);
+      }
+    NS_ENDHANDLER
   }
 }
 
@@ -1211,7 +1206,8 @@
   if (application == nil) {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *host = [defaults stringForKey: @"NSHost"];
-
+    id app = nil;
+    
     if (host == nil) {
 	    host = @"";
 	  } else {
@@ -1222,8 +1218,8 @@
 	    }
 	  }
   
-    id app = [NSConnection rootProxyForConnectionWithRegisteredName: name
-                                                               host: host];
+    app = [NSConnection rootProxyForConnectionWithRegisteredName: name
+                                                            host: host];
 
     if (app) {
       NSConnection *c = [app connectionForProxy];
@@ -1254,7 +1250,7 @@
                             maxProgValue: 20.0];
       }
 
-      for (i = 1; i <= 20; i++) {
+      for (i = 0; i < 20; i++) {
         if (showProgress) {
           [startAppWin updateProgressBy: 1.0];
         }
@@ -1329,5 +1325,4 @@
 }
 
 @end
-
 
