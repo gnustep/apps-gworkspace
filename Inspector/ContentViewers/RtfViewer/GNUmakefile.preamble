@@ -8,7 +8,7 @@ ADDITIONAL_OBJCFLAGS += -Wall
 # Additional flags to pass to the C compiler
 ADDITIONAL_CFLAGS += -Wall
 
-ADDITIONAL_INCLUDE_DIRS += -I../../
+ADDITIONAL_INCLUDE_DIRS += -I../..
 
 # Additional LDFLAGS to pass to the linker
 ADDITIONAL_LDFLAGS += 

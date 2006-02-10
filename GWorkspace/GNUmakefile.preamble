@@ -32,9 +32,9 @@ ADDITIONAL_LDFLAGS +=
 ADDITIONAL_LIB_DIRS += -L../FSNode/FSNode.framework/Versions/Current/$(GNUSTEP_TARGET_LDIR)
 ADDITIONAL_LIB_DIRS += -L../Inspector/Inspector.framework/Versions/Current/$(GNUSTEP_TARGET_LDIR)
 ADDITIONAL_LIB_DIRS += -L../Operation/Operation.framework/Versions/Current/$(GNUSTEP_TARGET_LDIR)
-ADDITIONAL_LIB_DIRS += -L../FSNode/FSNode.framework/
-ADDITIONAL_LIB_DIRS += -L../Inspector/Inspector.framework/
-ADDITIONAL_LIB_DIRS += -L../Operation/Operation.framework/
+ADDITIONAL_LIB_DIRS += -L../FSNode/FSNode.framework
+ADDITIONAL_LIB_DIRS += -L../Inspector/Inspector.framework
+ADDITIONAL_LIB_DIRS += -L../Operation/Operation.framework
 
 ADDITIONAL_TOOL_LIBS +=
 
