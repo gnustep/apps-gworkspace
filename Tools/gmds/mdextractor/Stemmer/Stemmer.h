@@ -1,4 +1,4 @@
-/* sqlite.h
+/* gmsd.h
  *  
  * Copyright (C) 2006 Free Software Foundation, Inc.
  *
@@ -19,41 +19,43 @@
  * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#ifndef SQLITE_CLIENT_H
-#define SQLITE_CLIENT_H
+#ifndef STEMMER_H
+#define STEMMER_H
 
 #include <Foundation/Foundation.h>
-#include <sqlite3.h>
+#include "libstemmer.h"
 
-sqlite3 *opendbAtPath(NSString *dbpath);
+@interface Stemmer: NSObject 
+{
+  struct sb_stemmer *stemmer;
+  NSString *language;
+  NSArray *stopWords;  
+}
 
-void closedb(sqlite3 *db);
+- (NSString *)stemWord:(NSString *)word;
 
-BOOL createTables(sqlite3 *db, NSString *schema);
+- (BOOL)setLanguage:(NSString *)lang;
 
-NSArray *performQuery(sqlite3 *db, NSString *query);
+- (NSString *)language;
 
-BOOL performWriteQuery(sqlite3 *db, NSString *query);
+- (NSArray *)stopWords;
+      
+@end
 
-char **resultsForQuery(sqlite3 *db, NSString *query, int *rows, int *cols);
+#endif // STEMMER_H
 
-NSString *getStringEntry(sqlite3 *db, NSString *query);
 
-int getIntEntry(sqlite3 *db, NSString *query);
 
-float getFloatEntry(sqlite3 *db, NSString *query);
 
-NSData *getBlobEntry(sqlite3 *db, NSString *query);
 
-NSString *blobFromData(NSData *data);
 
-void decodeBlobUnit(unsigned char *unit, const char *src);
 
-NSData *dataFromBlob(const char *blob);
 
-NSString *stringForQuery(NSString *str);
 
-#endif // SQLITE_CLIENT_H
+
+
+
+

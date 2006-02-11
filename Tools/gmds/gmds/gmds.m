@@ -1,9 +1,9 @@
 /* gmsd.m
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2006 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
- * Date: October 2005
+ * Author: Enrico Sersale <enrico@dtedu.net>
+ * Date: February 2006
  *
  * This file is part of the GNUstep GWorkspace application
  *

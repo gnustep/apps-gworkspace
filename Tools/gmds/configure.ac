@@ -8,7 +8,7 @@ fi
 AC_CONFIG_AUX_DIR([$GNUSTEP_MAKEFILES])
 
 
-AC_CONFIG_SUBDIRS(gmds)
+AC_CONFIG_SUBDIRS(gmds mdextractor)
 
 #--------------------------------------------------------------------
 # Debug logging

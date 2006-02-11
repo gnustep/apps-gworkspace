@@ -1,12 +1,9 @@
-
-GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
-
 include $(GNUSTEP_MAKEFILES)/common.make
 
 SUBPROJECTS = \
-gmds \
-mdextractor
-        
+  TextExtractor \
+  JpegExtractor 
+  
 -include GNUmakefile.preamble
 
 -include GNUmakefile.local
