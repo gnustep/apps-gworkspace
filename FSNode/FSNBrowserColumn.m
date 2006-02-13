@@ -849,9 +849,9 @@ static id <DesktopApplication> desktopApp = nil;
                             to: selend 
                         anchor: selstart 
                      highlight: YES];
-                     
-      [matrix sendAction];
     }
+
+    [matrix sendAction];
         
   } else {
     FSNBrowserColumn *col = [browser columnBeforeColumn: self];

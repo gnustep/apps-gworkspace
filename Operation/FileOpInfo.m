@@ -46,6 +46,7 @@ static NSString *nibName = @"FileOperationWin";
   TEST_RELEASE (source);
   TEST_RELEASE (destination);
   TEST_RELEASE (files);
+  TEST_RELEASE (dupfiles);
   TEST_RELEASE (notifNames);
   TEST_RELEASE (win);
   TEST_RELEASE (progInd);
@@ -123,7 +124,50 @@ static NSString *nibName = @"FileOperationWin";
     ASSIGN (type, tp);
     ASSIGN (source, src);
     ASSIGN (destination, dst);
-		files = [fls mutableCopy];	
+    ASSIGN (files, fls);
+    
+    dupfiles = [NSMutableArray new];
+    
+    if ([type isEqual: @"NSWorkspaceDuplicateOperation"]) {    
+      NSString *copystr = NSLocalizedString(@"_copy", @"");
+      unsigned i;
+      
+      for (i = 0; i < [files count]; i++) {
+        NSDictionary *fdict = [files objectAtIndex: i];
+        NSString *fname = [fdict objectForKey: @"name"]; 
+        NSString *newname = [NSString stringWithString: fname];
+        NSString *ext = [newname pathExtension]; 
+        NSString *base = [newname stringByDeletingPathExtension];        
+        NSString *ntmp;
+	      NSString *destpath;        
+        int count = 1;
+	      
+	      while (1) {
+          if (count == 1) {
+            ntmp = [NSString stringWithFormat: @"%@%@", base, copystr];
+            if ([ext length]) {
+              ntmp = [ntmp stringByAppendingPathExtension: ext];
+            }
+          } else {
+            ntmp = [NSString stringWithFormat: @"%@%@%i", base, copystr, count];
+            if ([ext length]) {
+              ntmp = [ntmp stringByAppendingPathExtension: ext];
+            }
+          }
+
+		      destpath = [destination stringByAppendingPathComponent: ntmp];
+
+		      if ([fm fileExistsAtPath: destpath] == NO) {
+            newname = ntmp;
+			      break;
+          } else {
+            count++;
+          }
+	      }
+        
+        [dupfiles addObject: newname];
+      }
+    }
     
     operationDict = [NSMutableDictionary new];
     [operationDict setObject: type forKey: @"operation"]; 
@@ -410,6 +454,9 @@ static NSString *nibName = @"FileOperationWin";
   [dict setObject: destination forKey: @"destination"];	
   [dict setObject: notifNames forKey: @"files"];	
 
+  [nc postNotificationName: @"GWFileSystemWillChangeNotification"
+	 								  object: dict];
+
 	[dnc postNotificationName: @"GWFileSystemWillChangeNotification"
 	 								   object: nil 
                    userInfo: dict];
@@ -435,6 +482,9 @@ static NSString *nibName = @"FileOperationWin";
   }
   
   opdone = YES;			
+
+  [nc postNotificationName: @"GWFileSystemDidChangeNotification"
+	 								  object: notifObj];
 
 	[dnc postNotificationName: @"GWFileSystemDidChangeNotification"
 	 						       object: nil 
@@ -552,6 +602,11 @@ static NSString *nibName = @"FileOperationWin";
 - (NSArray *)files
 {
   return files;
+}
+
+- (NSArray *)dupfiles
+{
+  return dupfiles;
 }
 
 - (int)ref

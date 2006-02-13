@@ -280,32 +280,42 @@
 
 - (void)startExternalDragOnEvent:(NSEvent *)event
 {
-  NSPoint dragPoint = [event locationInWindow];
-  NSPasteboard *pb = [NSPasteboard pasteboardWithName: NSDragPboard];	
   NSArray *selectedCells = [self selectedCells];
-  int iconSize = [[self prototype] iconSize];
-  NSImage *dragIcon;
-  
-  [self declareAndSetShapeOnPasteboard: pb];
-		
-  if ([selectedCells count] > 1) {
-    dragIcon = [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: iconSize];
-  } else {
-    FSNode *node = [[selectedCells objectAtIndex: 0] node];
-    dragIcon = [[FSNodeRep sharedInstance] iconOfSize: iconSize forNode: node];
-  }   
+  unsigned count = [selectedCells count];
 
-  dragPoint = [self convertPoint: dragPoint fromView: nil];
-  dragPoint.x -= (iconSize / 2);
-  dragPoint.y += (iconSize / 2);
+  if (count) {
+    NSPoint dragPoint = [event locationInWindow];
+    NSPasteboard *pb = [NSPasteboard pasteboardWithName: NSDragPboard];	
+    int iconSize = [[self prototype] iconSize];
+    NSImage *dragIcon;
 
-  [self dragImage: dragIcon
-               at: dragPoint 
-           offset: NSZeroSize
-            event: event
-       pasteboard: pb
-           source: self
-        slideBack: YES];
+    [self declareAndSetShapeOnPasteboard: pb];
+
+    if (count > 1) {
+      dragIcon = [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: iconSize];
+    } else {
+      FSNBrowserCell *cell = [selectedCells objectAtIndex: 0];
+      FSNode *node = [cell node];
+
+      if (node && [node isValid]) {
+        dragIcon = [[FSNodeRep sharedInstance] iconOfSize: iconSize forNode: node];
+      } else {
+        return;
+      }
+    } 
+
+    dragPoint = [self convertPoint: dragPoint fromView: nil];
+    dragPoint.x -= (iconSize / 2);
+    dragPoint.y += (iconSize / 2);
+
+    [self dragImage: dragIcon
+                 at: dragPoint 
+             offset: NSZeroSize
+              event: event
+         pasteboard: pb
+             source: self
+          slideBack: YES];
+  }
 }
 
 - (void)draggedImage:(NSImage *)anImage 
@@ -317,20 +327,26 @@
 - (void)declareAndSetShapeOnPasteboard:(NSPasteboard *)pb
 {
   NSArray *selectedCells = [self selectedCells];
-  NSMutableArray *selection = [NSMutableArray arrayWithCapacity: 1];
+  NSMutableArray *selection = [NSMutableArray array];
   NSArray *dndtypes;
   int i; 
 
   for (i = 0; i < [selectedCells count]; i++) {
-    FSNode *node = [[selectedCells objectAtIndex: i] node];
-    [selection addObject: [node path]];
+    FSNBrowserCell *cell = [selectedCells objectAtIndex: i];
+    FSNode *node = [cell node];
+  
+    if (node && [node isValid]) {
+      [selection addObject: [node path]];
+    }
   }
-  	
-  dndtypes = [NSArray arrayWithObject: NSFilenamesPboardType];
-  [pb declareTypes: dndtypes owner: nil];
+  
+  if ([selection count]) { 	
+    dndtypes = [NSArray arrayWithObject: NSFilenamesPboardType];
+    [pb declareTypes: dndtypes owner: nil];
 
-  if ([pb setPropertyList: selection forType: NSFilenamesPboardType] == NO) {
-    return;
+    if ([pb setPropertyList: selection forType: NSFilenamesPboardType] == NO) {
+      return;
+    }
   }
 }
 

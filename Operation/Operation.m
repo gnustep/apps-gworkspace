@@ -96,6 +96,7 @@
   if ([operation isEqual: @"NSWorkspaceMoveOperation"]
          || [operation isEqual: @"NSWorkspaceCopyOperation"]
          || [operation isEqual: @"NSWorkspaceLinkOperation"]
+         || [operation isEqual: @"NSWorkspaceDuplicateOperation"]
          || [operation isEqual: @"NSWorkspaceRecycleOperation"]
          || [operation isEqual: @"GWorkspaceRecycleOutOperation"]) {
     opbase = source;
@@ -204,44 +205,32 @@
   NSMutableArray *opdstpaths = [NSMutableArray array];
   int i;
 
-  for (i = 0; i < [opfiles count]; i++) {
-    NSDictionary *fdict = [opfiles objectAtIndex: i];
-    NSString *opfile = [fdict objectForKey: @"name"];
-  
-    [opsrcpaths addObject: [opsrc stringByAppendingPathComponent: opfile]];
-    
-    if ([optype isEqual: @"NSWorkspaceDuplicateOperation"] == NO) {
+  if ([optype isEqual: @"NSWorkspaceDuplicateOperation"] == NO) {
+    for (i = 0; i < [opfiles count]; i++) {
+      NSDictionary *fdict = [opfiles objectAtIndex: i];
+      NSString *opfile = [fdict objectForKey: @"name"];
+
+      [opsrcpaths addObject: [opsrc stringByAppendingPathComponent: opfile]];
       [opdstpaths addObject: [opdst stringByAppendingPathComponent: opfile]];
-    
-    } else {
-      NSString *copystr = NSLocalizedString(@"_copy", @"");
-      NSString *ext = [opfile pathExtension]; 
-      NSString *base = [opfile stringByDeletingPathExtension];       
-      NSString *ntmp;
-      NSString *destpath;
-      int count = 1;
-    
-			while(1) {
-        if (count == 1) {
-          ntmp = [NSString stringWithFormat: @"%@%@", base, copystr];
-          ntmp = [ntmp stringByAppendingPathExtension: ext];
-        } else {
-          ntmp = [NSString stringWithFormat: @"%@%@%i", base, copystr, count];
-          ntmp = [ntmp stringByAppendingPathExtension: ext];
-        }
-        
-				destpath = [opdst stringByAppendingPathComponent: ntmp];  
-              
-				if ([fm fileExistsAtPath: destpath] == NO) {
-          [opdstpaths addObject: destpath];
-					break;
-        } else {
-          count++;
-        }
-			}
+    }
+  
+  } else {
+    NSArray *dupfiles = [opinfo dupfiles];
+  
+    for (i = 0; i < [opfiles count]; i++) {
+      NSDictionary *fdict = [opfiles objectAtIndex: i];
+      NSString *opfile = [fdict objectForKey: @"name"];
+
+      [opsrcpaths addObject: [opsrc stringByAppendingPathComponent: opfile]];
+    }
+
+    for (i = 0; i < [dupfiles count]; i++) {
+      NSString *dupfile = [dupfiles objectAtIndex: i];
+
+      [opdstpaths addObject: [opdst stringByAppendingPathComponent: dupfile]];
     }
   }
-
+    
   if (action == CREATE) {    
     path = [path stringByDeletingLastPathComponent];
   }

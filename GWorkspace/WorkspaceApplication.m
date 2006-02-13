@@ -509,7 +509,7 @@
 
   if (app && [app application]) {
     [[dtopManager dock] appDidLaunch: path appName: name];
-    GWDebugLog(@"appDidLaunch: \"%@\" %@", name, path);
+    GWDebugLog(@"\"%@\" appDidLaunch (%@)", name, path);
   }
 }
 
@@ -537,7 +537,7 @@
     }
     
     activeApplication = app;
-    GWDebugLog(@"appDidBecomeActive: \"%@\"", name);
+    GWDebugLog(@"\"%@\" appDidBecomeActive", name);
 
   } else {
     activeApplication = nil;
@@ -601,7 +601,7 @@
   if (app) {
     [app setHidden: NO];
     [[dtopManager dock] appDidUnhide: name];
-    GWDebugLog(@"appDidUnhide: \"%@\"", name);
+    GWDebugLog(@"\"%@\" appDidUnhide", name);
   } else {
     GWDebugLog(@"appDidUnhide: \"%@\" unknown running application.", name);
   }
@@ -624,7 +624,7 @@
   }
   
   [[dtopManager dock] appTerminated: [app name]];
-  GWDebugLog(@"%@ applicationTerminated", [app name]);  
+  GWDebugLog(@"\"%@\" applicationTerminated", [app name]);  
   [launchedApps removeObject: app];  
   
   if (loggingout && ([launchedApps count] == 1)) {
@@ -1333,7 +1333,7 @@
     DESTROY (application);
     DESTROY (conn);
     
-    GWDebugLog(@"%@ application connection did die", name);
+    GWDebugLog(@"\"%@\" application connection did die", name);
 
     [gw applicationTerminated: self];
   }

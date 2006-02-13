@@ -88,6 +88,7 @@
   NSString *source;
   NSString *destination;
   NSArray *files;
+  NSMutableArray *dupfiles;
   int ref;
   
   NSMutableDictionary *operationDict;
@@ -170,6 +171,8 @@
 - (NSString *)destination;
 
 - (NSArray *)files;
+
+- (NSArray *)dupfiles;
 
 - (int)ref;
 

@@ -853,20 +853,16 @@ static GWorkspace *gworkspace = nil;
            
 - (void)fileSystemWillChange:(NSNotification *)notif
 {
-  [[NSNotificationCenter defaultCenter]
- 				postNotificationName: @"GWFileSystemWillChangeNotification"
-	 								    object: [notif userInfo]];
+//  [[NSNotificationCenter defaultCenter]
+// 				postNotificationName: @"GWFileSystemWillChangeNotification"
+//	 								    object: [notif userInfo]];
 }
 
 - (void)fileSystemDidChange:(NSNotification *)notif
 {
- // [waitCursor set];
-  
-	[[NSNotificationCenter defaultCenter]
- 				postNotificationName: @"GWFileSystemDidChangeNotification"
-	 								    object: [notif userInfo]];
-                      
- // [[NSCursor arrowCursor] set];
+//	[[NSNotificationCenter defaultCenter]
+// 				postNotificationName: @"GWFileSystemDidChangeNotification"
+//	 								    object: [notif userInfo]];
 }
 
 - (void)setSelectedPaths:(NSArray *)paths
@@ -1473,13 +1469,13 @@ static GWorkspace *gworkspace = nil;
 
 - (void)watchedPathDidChange:(NSData *)dirinfo
 {
-  NSMutableDictionary *info = [[NSUnarchiver unarchiveObjectWithData: dirinfo] mutableCopy];
+  CREATE_AUTORELEASE_POOL(arp);
+  NSDictionary *info = [NSUnarchiver unarchiveObjectWithData: dirinfo];
 
 	[[NSNotificationCenter defaultCenter]
  				 postNotificationName: @"GWFileWatcherFileDidChangeNotification"
 	 								     object: info];  
-                       
-  RELEASE (info);
+  RELEASE (arp);                       
 }
 
 - (void)connectRecycler
