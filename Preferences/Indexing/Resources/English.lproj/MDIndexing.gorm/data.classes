@@ -1,0 +1,42 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    FirstResponder = {
+	Actions = (
+	    "applyButtAction:",
+	    "closeMainWindow:",
+	    "enableSwitchAction:",
+	    "excludedButtAction:",
+	    "indexedButtAction:",
+	    "revertButtAction:",
+	    "nextButtAction:",
+	    "prevButtAction:",
+	    "runInfoPanel:",
+	    "showAllButtAction:"
+	);
+	Super = NSObject;
+    };
+    MDIndexing = {
+	Actions = (
+	    "excludedButtAction:",
+	    "indexedButtAction:",
+	    "applyButtAction:",
+	    "enableSwitchAction:",
+	    "revertButtAction:"
+	);
+	Outlets = (
+	    excludedTitle,
+	    excludedScroll,
+	    excludedAdd,
+	    excludedRemove,
+	    indexedTitle,
+	    indexedScroll,
+	    indexedAdd,
+	    indexedRemove,
+	    _window,
+	    enableSwitch,
+	    applyButton,
+	    revertButton
+	);
+	Super = NSObject;
+    };
+}
