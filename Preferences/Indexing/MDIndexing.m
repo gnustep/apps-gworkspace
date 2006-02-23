@@ -356,8 +356,10 @@ return; \
   
   [self readDefaults];  
   
-  [indexedMatrix removeColumn: 0];
-
+  if ([indexedMatrix numberOfColumns] > 0) { 
+    [indexedMatrix removeColumn: 0];
+  }
+  
   for (i = 0; i < [indexedPaths count]; i++) {
     NSString *name = [indexedPaths objectAtIndex: i];
     int count = [[indexedMatrix cells] count];
@@ -372,9 +374,11 @@ return; \
   [indexedMatrix sizeToCells]; 
 
   [indexedRemove setEnabled: ([[indexedMatrix cells] count] > 0)];
-
-  [excludedMatrix removeColumn: 0];
-
+  
+  if ([excludedMatrix numberOfColumns] > 0) {
+    [excludedMatrix removeColumn: 0];
+  }
+  
   for (i = 0; i < [excludedPaths count]; i++) {
     NSString *path = [excludedPaths objectAtIndex: i];
     int count = [[excludedMatrix cells] count];
