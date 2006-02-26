@@ -84,23 +84,23 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
   self = [super init];
   
   if (self) {    
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    id path = [defaults objectForKey: @"dbpath"];
+    NSString *basepath;
+    BOOL isdir;
+
+    fm = [NSFileManager defaultManager];
   
-    if (path) {
-      ASSIGN (dbpath, path);
-    } else {
-	    NSLog(@"no database path - quiting.");
-	    DESTROY (self);
-	    return self;
+    basepath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
+    basepath = [basepath stringByAppendingPathComponent: @"gmds"];
+
+    if (([fm fileExistsAtPath: basepath isDirectory: &isdir] &isdir) == NO) {
+      if ([fm createDirectoryAtPath: basepath attributes: nil] == NO) { 
+        NSLog(@"unable to create: %@", basepath);
+        DESTROY (self);
+        return self;
+      }
     }
-   
-    clientInfo = [NSMutableDictionary new];
-    extractorsInfo = [NSMutableArray new];
-    
-    fm = [NSFileManager defaultManager];	
-    nc = [NSNotificationCenter defaultCenter];
-    
+
+    ASSIGN (dbpath, [basepath stringByAppendingPathComponent: @"contents.db"]);    
     db = NULL;
 
     if ([self opendb] == NO) {
@@ -117,11 +117,16 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
 	    DESTROY (self);
 	    return self;
 	  }
+    
+    nc = [NSNotificationCenter defaultCenter];
       
     [nc addObserver: self
            selector: @selector(connectionDidDie:)
 	             name: NSConnectionDidDieNotification
 	           object: conn];
+             
+    clientInfo = [NSMutableDictionary new];
+    extractorsInfo = [NSMutableArray new];
   }
   
   return self;    

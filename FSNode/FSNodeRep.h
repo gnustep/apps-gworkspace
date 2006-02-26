@@ -280,6 +280,15 @@ typedef enum FSNSelectionMask {
 
 - (void)performFileOperation:(NSDictionary *)opinfo;
 
+- (BOOL)filenamesWasCutted;
+
+- (void)setFilenamesCutted:(BOOL)value;
+
+- (void)performFileOperation:(NSString *)operation
+		                  source:(NSString *)source
+		             destination:(NSString *)destination
+		                   files:(NSArray *)files;
+
 - (void)lsfolderDragOperation:(NSData *)opinfo
               concludedAtPath:(NSString *)path;
 

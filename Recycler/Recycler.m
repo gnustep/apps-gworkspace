@@ -63,7 +63,6 @@ static Recycler *recycler = nil;
   }
   [[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
   DESTROY (workspaceApplication);
-  DESTROY (operationsApp);
   RELEASE (trashPath);
   RELEASE (recview);
   RELEASE (preferences);
@@ -72,18 +71,23 @@ static Recycler *recycler = nil;
 	[super dealloc];
 }
 
-- (id)init
+- (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
-  self = [super init];
-  
-  if (self) {
-    fm = [NSFileManager defaultManager];
-    ws = [NSWorkspace sharedWorkspace];
-    nc = [NSNotificationCenter defaultCenter];
-    workspaceApplication = nil;
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	id entry;
+
+  fm = [NSFileManager defaultManager];
+  ws = [NSWorkspace sharedWorkspace];
+  nc = [NSNotificationCenter defaultCenter];
+  fsnodeRep = [FSNodeRep sharedInstance];
+  workspaceApplication = nil;
+
+	entry = [defaults objectForKey: @"reserved_names"];
+	if (entry) {
+    [fsnodeRep setReservedNames: entry];
+	} else {
+    [fsnodeRep setReservedNames: [NSArray arrayWithObjects: @".gwdir", @".gwsort", nil]];
   }
-  
-  return self;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
@@ -398,85 +402,6 @@ static Recycler *recycler = nil;
   }
 }
 
-- (void)connectOperation
-{
-  if (operationsApp == nil) {
-    id opr = [NSConnection rootProxyForConnectionWithRegisteredName: @"Operation" 
-                                                               host: @""];
-
-    if (opr) {
-      NSConnection *c = [opr connectionForProxy];
-
-	    [nc addObserver: self
-	           selector: @selector(operationConnectionDidDie:)
-		             name: NSConnectionDidDieNotification
-		           object: c];
-      
-      operationsApp = opr;
-	    [operationsApp setProtocolForProxy: @protocol(OperationProtocol)];
-      RETAIN (operationsApp);
-      
-	  } else {
-	    static BOOL recursion = NO;
-	  
-      if (recursion == NO) {
-        int i;
-        
-        [startAppWin showWindowWithTitle: @"Recycler"
-                                 appName: @"Operation"
-                            maxProgValue: 80.0];
-
-        [ws launchApplication: @"Operation"];
-
-        for (i = 1; i <= 80; i++) {
-          [startAppWin updateProgressBy: 1.0];
-	        [[NSRunLoop currentRunLoop] runUntilDate:
-		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
-          opr = [NSConnection rootProxyForConnectionWithRegisteredName: @"Operation" 
-                                                                  host: @""];                  
-          if (opr) {
-            [startAppWin updateProgressBy: 80.0 - i];
-            break;
-          }
-        }
-        
-        [[startAppWin win] close];
-        
-	      recursion = YES;
-	      [self connectOperation];
-	      recursion = NO;
-        
-	    } else { 
-	      recursion = NO;
-        NSRunAlertPanel(nil,
-                NSLocalizedString(@"unable to contact Operation!", @""),
-                NSLocalizedString(@"Ok", @""),
-                nil, 
-                nil);  
-      }
-	  }
-  }
-}
-
-- (void)operationConnectionDidDie:(NSNotification *)notif
-{
-  id connection = [notif object];
-
-  [nc removeObserver: self
-	              name: NSConnectionDidDieNotification
-	            object: connection];
-
-  NSAssert(connection == [operationsApp connectionForProxy],
-		                                  NSInternalInconsistencyException);
-  RELEASE (operationsApp);
-  operationsApp = nil;
-
-  NSRunAlertPanel(nil, 
-       NSLocalizedString(@"The Operation connection died. File operations disabled!", @""), 
-                              NSLocalizedString(@"OK", @""), nil, nil);                                     
-}
-
-
 //
 // NSServicesRequests protocol
 //
@@ -520,16 +445,20 @@ static Recycler *recycler = nil;
 {
 }
 
-- (void)performFileOperation:(NSDictionary *)opinfo
+- (void)performFileOperation:(NSString *)operation
+		                  source:(NSString *)source
+		             destination:(NSString *)destination
+		                   files:(NSArray *)files
 {
-  [self connectOperation];
+  int tag;
 
-  if (operationsApp) {  
-    NSData *data = [NSArchiver archivedDataWithRootObject: opinfo];
-    [(id <OperationProtocol>)operationsApp performOperation: data];
-  } else {
+  if ([ws performFileOperation: operation 
+                        source: source
+		               destination: destination
+		                     files: files
+			                     tag: &tag] == NO) {
     NSRunAlertPanel(nil, 
-        NSLocalizedString(@"File operations disabled!", @""), 
+        NSLocalizedString(@"Unable to contact GWorkspace", @""), 
                             NSLocalizedString(@"OK", @""), nil, nil);                                     
   }
 }
@@ -602,18 +531,15 @@ static Recycler *recycler = nil;
   
   if ([subNodes count]) {
     NSMutableArray *files = [NSMutableArray array];
-    NSMutableDictionary *opinfo = [NSMutableDictionary dictionary];
 
     for (i = 0; i < [subNodes count]; i++) {
       [files addObject: [(FSNode *)[subNodes objectAtIndex: i] name]];
     }
-
-    [opinfo setObject: @"GWorkspaceEmptyRecyclerOperation" forKey: @"operation"];
-    [opinfo setObject: trashPath forKey: @"source"];
-    [opinfo setObject: trashPath forKey: @"destination"];
-    [opinfo setObject: files forKey: @"files"];
-
-    [self performFileOperation: opinfo];
+    
+    [self performFileOperation: @"GWorkspaceEmptyRecyclerOperation"
+		                    source: trashPath
+		               destination: trashPath
+		                     files: files];
   }
 
   RELEASE (subNodes);
@@ -627,14 +553,12 @@ static Recycler *recycler = nil;
   if ([[pb types] containsObject: NSFilenamesPboardType]) {
     NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType];   
 
-    if (sourcePaths) {
-      [self connectOperation];
+      [self contactWorkspaceApp];
 
-      if (operationsApp) {
-        BOOL cutted = [(id <OperationProtocol>)operationsApp filenamesWasCutted];
+      if (workspaceApplication) {
+        BOOL cutted = [(id <OperationProtocol>)workspaceApplication filenamesWasCutted];
         
         if ([recview validatePasteOfFilenames: sourcePaths wasCutted: cutted]) {
-          NSMutableDictionary *opDict = [NSMutableDictionary dictionary];
           NSString *source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
           NSString *destination = trashPath;
           NSMutableArray *files = [NSMutableArray array];
@@ -655,13 +579,11 @@ static Recycler *recycler = nil;
           } else {
 		        operation = NSWorkspaceCopyOperation;
           }
-        
-	        [opDict setObject: operation forKey: @"operation"];
-	        [opDict setObject: source forKey: @"source"];
-	        [opDict setObject: destination forKey: @"destination"];
-	        [opDict setObject: files forKey: @"files"];
 
-	        [self performFileOperation: opDict];	
+          [self performFileOperation: operation
+		                          source: source
+		                     destination: destination
+		                           files: files];
         }
         
       } else {
@@ -670,7 +592,7 @@ static Recycler *recycler = nil;
                                 NSLocalizedString(@"OK", @""), nil, nil); 
         return;                                    
       }
-    }
+
   }
 }
 

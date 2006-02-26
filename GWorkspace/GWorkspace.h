@@ -411,6 +411,10 @@
 
 - (void)performFileOperation:(NSDictionary *)opinfo;
 
+- (BOOL)filenamesWasCutted;
+
+- (void)setFilenamesCutted:(BOOL)value;
+
 - (void)lsfolderDragOperation:(NSData *)opinfo
               concludedAtPath:(NSString *)path;
                           

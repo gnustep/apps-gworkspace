@@ -2244,6 +2244,16 @@ static GWorkspace *gworkspace = nil;
   [self performFileOperationWithDictionary: opinfo];
 }
 
+- (BOOL)filenamesWasCutted
+{
+  return [fileOpsManager filenamesWasCutted];
+}
+
+- (void)setFilenamesCutted:(BOOL)value
+{
+  [fileOpsManager setFilenamesCutted: value];
+}
+
 - (void)lsfolderDragOperation:(NSData *)opinfo
               concludedAtPath:(NSString *)path
 {

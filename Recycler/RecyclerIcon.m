@@ -85,6 +85,8 @@ static id <DesktopApplication> desktopApp = nil;
     trashFull = (count != 0);
       
     [self registerForDraggedTypes: [NSArray arrayWithObject: NSFilenamesPboardType]];    
+  
+    ws = [NSWorkspace sharedWorkspace];
   }
 
   return self;
@@ -222,7 +224,6 @@ static id <DesktopApplication> desktopApp = nil;
    //   NSArray *vpaths = [ws mountedLocalVolumePaths];
       NSMutableArray *files = [NSMutableArray array];
    //   NSMutableArray *umountPaths = [NSMutableArray array];
-      NSMutableDictionary *opinfo = [NSMutableDictionary dictionary];
       int i;
 
       for (i = 0; i < [sourcePaths count]; i++) {
@@ -252,13 +253,11 @@ static id <DesktopApplication> desktopApp = nil;
           NSRunAlertPanel(err, [NSString stringWithFormat: @"%@ \"%@\"!\n", msg, source], buttstr, nil, nil);   
 		      return;
 	      }
-      
-        [opinfo setObject: @"NSWorkspaceRecycleOperation" forKey: @"operation"];
-        [opinfo setObject: source forKey: @"source"];
-        [opinfo setObject: [node path] forKey: @"destination"];
-        [opinfo setObject: files forKey: @"files"];
 
-        [desktopApp performFileOperation: opinfo];
+        [desktopApp performFileOperation: @"NSWorkspaceRecycleOperation"
+		                              source: source
+		                         destination: [node path]
+		                               files: files];
       }
     }
   }

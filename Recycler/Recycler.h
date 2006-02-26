@@ -27,6 +27,7 @@
 
 #include <Foundation/Foundation.h>
 
+@class FSNodeRep;
 @class FSNode;
 @class RecyclerView;
 @class RecyclerPrefs;
@@ -95,6 +96,7 @@
 
 @interface Recycler : NSObject <FSWClientProtocol>
 {
+  FSNodeRep *fsnodeRep;
   NSString *trashPath;
   RecyclerView *recview;
   BOOL docked;
@@ -135,10 +137,6 @@
 
 - (void)fswatcherConnectionDidDie:(NSNotification *)notif;
 
-- (void)connectOperation;
-
-- (void)operationConnectionDidDie:(NSNotification *)notif;
-
 
 //
 // Menu Operations
@@ -161,7 +159,10 @@
 
 - (void)openSelectionWithApp:(id)sender;
 
-- (void)performFileOperation:(NSDictionary *)opinfo;
+- (void)performFileOperation:(NSString *)operation
+		                  source:(NSString *)source
+		             destination:(NSString *)destination
+		                   files:(NSArray *)files;
 
 - (void)concludeRemoteFilesDragOperation:(NSData *)opinfo
                              atLocalPath:(NSString *)localdest;

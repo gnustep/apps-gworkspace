@@ -179,10 +179,20 @@
   if ([operation isEqual: NSWorkspaceMoveOperation]
       || [operation isEqual: NSWorkspaceCopyOperation]
 			|| [operation isEqual: NSWorkspaceRecycleOperation]) { 
-    NSString *trashPath = [[icon node] path];
+    FSNode *node = [icon node];
+    NSString *trashPath = [node path];
     
     if ([destination isEqual: trashPath]) {
-      [icon setTrashFull: YES];
+      NSArray *subNodes = [node subNodes];
+      int count = [subNodes count];
+    
+      for (i = 0; i < [subNodes count]; i++) {
+        if ([[subNodes objectAtIndex: i] isReserved]) {
+          count --;
+        }
+      }      
+      
+      [icon setTrashFull: (count > 0)];    
     }
   }
 

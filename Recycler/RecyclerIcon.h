@@ -30,11 +30,13 @@
 
 @class NSColor;
 @class NSImage;
+@class NSWorkspace;
 
 @interface RecyclerIcon : FSNIcon
 {
   NSImage *trashFullIcon;
   BOOL trashFull;
+  NSWorkspace *ws;
 }
 
 - (id)initWithRecyclerNode:(FSNode *)anode;
