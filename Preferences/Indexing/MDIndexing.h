@@ -33,6 +33,7 @@
 #endif
 
 @class NSMatrix;
+@class StartAppWin;
 
 @interface MDIndexing : NSPreferencePane 
 {
@@ -58,6 +59,10 @@
       
   BOOL loaded;
   NSPreferencePaneUnselectReply unselectReply;
+
+  StartAppWin *startAppWin;  
+  NSString *extractorsInfoPath;
+  NSDistributedLock *extractorsInfoLock;
   
   NSFileManager *fm;
   NSNotificationCenter *dnc;
@@ -78,6 +83,14 @@
 - (IBAction)applyButtAction:(id)sender;
 
 - (void)adjustMatrix:(NSMatrix *)matrix;
+
+- (void)setupDbPaths;
+
+- (NSDictionary *)extractorsInfo;
+
+
+
+
 
 - (NSString *)chooseNewPath;
 

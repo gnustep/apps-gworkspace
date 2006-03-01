@@ -62,19 +62,8 @@
 @end
 
 
-@protocol	GMDSProtocol
-
-- (oneway void)registerExtractor:(id)extractor;
-
-- (oneway void)extractorDidEndTask:(id)extractor;
-
-@end
-
-
 @interface GMDSExtractor: NSObject 
 {
-  NSString *extractPath;
-  BOOL recursive;
   NSString *dbpath;
   sqlite3 *db;
 
@@ -83,24 +72,22 @@
 	id stemmer;
   NSSet *stopWords;
   
-  id gmds;
+  NSConnection *conn;
+
+  NSString *extractorInfoPath;
+  NSDistributedLock *extractorInfoLock;
+
   NSFileManager *fm;
   id ws;
   NSNotificationCenter *nc; 
 }
 
-- (id)initForPath:(NSString *)apath
-        recursive:(BOOL)rec
-           dbPath:(NSString *)dbp
-     gmdsConnName:(NSString *)cname;
-
-- (void)terminate;
-
-- (NSString *)extractPath;
+- (BOOL)connection:(NSConnection *)ancestor
+            shouldMakeNewConnection:(NSConnection *)newConn;
 
 - (void)connectionDidDie:(NSNotification *)notification;
 
-- (void)startExtracting;
+- (oneway void)startExtracting;
 
 - (void)setMetadata:(NSDictionary *)mddict
             forPath:(NSString *)path
@@ -117,6 +104,14 @@
 - (void)setStemmingLanguage:(NSString *)language;
 
 - (void)loadStemmer;
+
+- (BOOL)opendb;
+
+- (NSDictionary *)extractorInfo;
+
+- (void)writeExtractorInfo;
+
+- (void)terminate;
 
 @end
 

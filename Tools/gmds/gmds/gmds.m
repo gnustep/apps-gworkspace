@@ -62,7 +62,6 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
   }
 
   RELEASE (clientInfo);
-  RELEASE (extractorsInfo);
   
   [nc removeObserver: self
 		            name: NSConnectionDidDieNotification
@@ -84,23 +83,33 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
   self = [super init];
   
   if (self) {    
-    NSString *basepath;
+    NSString *dbdir;
     BOOL isdir;
 
     fm = [NSFileManager defaultManager];
   
-    basepath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
-    basepath = [basepath stringByAppendingPathComponent: @"gmds"];
+    dbdir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
+    dbdir = [dbdir stringByAppendingPathComponent: @"gmds"];
 
-    if (([fm fileExistsAtPath: basepath isDirectory: &isdir] &isdir) == NO) {
-      if ([fm createDirectoryAtPath: basepath attributes: nil] == NO) { 
-        NSLog(@"unable to create: %@", basepath);
+    if (([fm fileExistsAtPath: dbdir isDirectory: &isdir] &isdir) == NO) {
+      if ([fm createDirectoryAtPath: dbdir attributes: nil] == NO) { 
+        NSLog(@"unable to create: %@", dbdir);
         DESTROY (self);
         return self;
       }
     }
 
-    ASSIGN (dbpath, [basepath stringByAppendingPathComponent: @"contents.db"]);    
+    dbdir = [dbdir stringByAppendingPathComponent: @".db"];
+
+    if (([fm fileExistsAtPath: dbdir isDirectory: &isdir] &isdir) == NO) {
+      if ([fm createDirectoryAtPath: dbdir attributes: nil] == NO) { 
+        NSLog(@"unable to create: %@", dbdir);
+        DESTROY (self);
+        return self;
+      }
+    }
+
+    ASSIGN (dbpath, [dbdir stringByAppendingPathComponent: @"contents.db"]);    
     db = NULL;
 
     if ([self opendb] == NO) {
@@ -126,7 +135,6 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
 	           object: conn];
              
     clientInfo = [NSMutableDictionary new];
-    extractorsInfo = [NSMutableArray new];
   }
   
   return self;    
@@ -135,9 +143,7 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
 - (BOOL)connection:(NSConnection *)parentConnection
             shouldMakeNewConnection:(NSConnection *)newConnnection
 {
-  NSConnection *clientConn = [clientInfo objectForKey: @"connection"];
-  
-  if (clientConn == nil) {
+  if ([clientInfo objectForKey: @"connection"] == nil) {
     CREATE_AUTORELEASE_POOL(pool); 
     NSProcessInfo *info = [NSProcessInfo processInfo];
     NSMutableArray *args = [[info arguments] mutableCopy];
@@ -188,32 +194,9 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
     GWDebugLog(@"new client connection");
 
     return YES;
+  } 
   
-  } else if ([clientConn isEqual: newConnnection] == NO) {
-    NSMutableDictionary *info = [self infoOfExtractorWithConnection: newConnnection];
-  
-    if (info == nil) {
-      info = [NSMutableDictionary dictionary];
-      [info setObject: newConnnection forKey: @"connection"];
-      [extractorsInfo addObject: info];
-
-      [newConnnection setDelegate: self];
-
-      [nc addObserver: self
-             selector: @selector(connectionDidDie:)
-	               name: NSConnectionDidDieNotification
-	             object: newConnnection];
-      
-      GWDebugLog(@"new extractor connection");
-      
-      return YES;
-      
-    } else {
-      NSLog(@"extractor connection already exists!");
-    }
-  } else {
-    NSLog(@"client connection already exists!");
-  }
+  NSLog(@"client connection already exists!");
   
   return NO;
 }
@@ -229,32 +212,12 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
   if (connection == conn) {
     NSLog(@"argh - gmds server root connection has been destroyed.");
     exit(EXIT_FAILURE);
-    
-  } else {
-    id clientConn = [clientInfo objectForKey: @"connection"]; 
-       
-    if (clientConn && (clientConn == connection)) {
-      [clientInfo removeObjectForKey: @"client"];
-      [clientInfo removeObjectForKey: @"connection"];
-      GWDebugLog(@"client connection did die");
-
-	  } else {
-      NSDictionary *info = [self infoOfExtractorWithConnection: connection];
-    
-      if (info) {
-        [extractorsInfo removeObject: info];
-        GWDebugLog(@"extractor connection did die");
-      }
-    }
   }
   
-  if (([clientInfo objectForKey: @"client"] == nil) 
-                        && ([extractorsInfo count] == 0)) {
-    [self terminate]; 
-  }
+  [self terminate]; 
 }
 
-- (void)registerClient:(id)remote
+- (oneway void)registerClient:(id)remote
 {
 	NSConnection *connection = [(NSDistantObject *)remote connectionForProxy];
   NSConnection *clientConn = [clientInfo objectForKey: @"connection"];  
@@ -271,12 +234,12 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
 
   [(id)remote setProtocolForProxy: @protocol(GMDSClientProtocol)];    
   [clientInfo setObject: remote forKey: @"client"];
+  
   GWDebugLog(@"new client registered");
 }
 
-- (void)unregisterClient:(id)remote
+- (oneway void)unregisterClient:(id)remote
 {
-	NSConnection *connection = [(NSDistantObject *)remote connectionForProxy];
   NSConnection *clientConn = [clientInfo objectForKey: @"connection"];  
   id client = [clientInfo objectForKey: @"client"];  
     
@@ -289,19 +252,10 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
     [NSException raise: NSInternalInconsistencyException
                 format: @"unregistration with unregistered client"];
   }
-  
-  [nc removeObserver: self
-	              name: NSConnectionDidDieNotification
-	            object: connection];
-
-  [clientInfo removeObjectForKey: @"client"];
-  [clientInfo removeObjectForKey: @"connection"];
-  
+    
   GWDebugLog(@"client unregistered");
 
-  if ([extractorsInfo count] == 0) {
-    [self terminate]; 
-  }
+  [self terminate]; 
 }
 
 - (BOOL)performSubquery:(NSString *)query
@@ -371,7 +325,7 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
   }
 }
 
-- (void)performQuery:(NSData *)queryInfo
+- (oneway void)performQuery:(NSData *)queryInfo
 {
   CREATE_AUTORELEASE_POOL(pool); 
   NSDictionary *dict = [NSUnarchiver unarchiveObjectWithData: queryInfo];  
@@ -548,151 +502,6 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
   NSLog(@"exiting");
   
   exit(EXIT_SUCCESS);
-}
-
-@end
-
-
-@implementation	GMDS (extractors)
-
-- (void)extractMetadataAtPath:(NSString *)path 
-{
-  NSDictionary *info = [self infoOfExtractorForPath: path];
-
-  if (info == nil) {
-    [self startExtractorForPath: path recursive: NO];
-  }
-}
-
-- (void)extractMetadataFromPath:(NSString *)path 
-{
-  NSDictionary *info = [self infoOfExtractorForPath: path];
-
-  if (info == nil) {
-    [self startExtractorForPath: path recursive: YES];
-  }
-}
-
-- (void)startExtractorForPath:(NSString *)path
-                    recursive:(BOOL)rec
-{
-  NSArray *paths = NSSearchPathForDirectoriesInDomains(GSToolsDirectory, NSSystemDomainMask, YES);
-  NSString *cmd = [[paths objectAtIndex: 0] stringByAppendingPathComponent: @"mdextractor"];
-  NSMutableArray *args = [NSMutableArray array];
-  NSTask *task;
-      
-  GWDebugLog(@"starting new extractor task");
-  
-  [args addObject: path];
-  [args addObject: [NSString stringWithFormat: @"%i", rec]];
-  [args addObject: dbpath];
-  [args addObject: connectionName];
-  
-  NS_DURING
-	  {
-      task = [NSTask new];  
-      [task setLaunchPath: cmd];        
-      [task setArguments: args];      
-      [task launch];
-	    DESTROY (task);
-	  }
-  NS_HANDLER
-	  {
-	    NSLog(@"unable to launch the extractor task.");
-	    DESTROY (task);
-	  }
-  NS_ENDHANDLER
-}
-
-- (void)registerExtractor:(id)extractor
-{
-	NSConnection *connection = [(NSDistantObject *)extractor connectionForProxy];
-  NSMutableDictionary *info = [self infoOfExtractorWithConnection: connection];
-
-	if (info == nil) {
-    [NSException raise: NSInternalInconsistencyException
-		            format: @"registration with unknown connection"];
-  }
-
-  if ([info objectForKey: @"extractor"] != nil) { 
-    [NSException raise: NSInternalInconsistencyException
-		            format: @"registration with registered extractor"];
-  }
-
-  if ([(id)extractor isProxy]) {
-    NSString *path;
-  
-    [(id)extractor setProtocolForProxy: @protocol(GMDSExtractorProtocol)];
-    [info setObject: extractor forKey: @"extractor"];  
-    path = [NSString stringWithString: [extractor extractPath]];
-    [info setObject: path forKey: @"path"];  
-                
-    GWDebugLog(@"new extractor registered for path %@", [info objectForKey: @"path"]);
-    
-    [extractor startExtracting];
-  }
-}
-
-- (void)extractorDidEndTask:(id)extractor
-{
-	NSConnection *connection = [(NSDistantObject *)extractor connectionForProxy];
-  NSDictionary *info = [self infoOfExtractorWithConnection: connection];
-  
-	if (info == nil) {
-    [NSException raise: NSInternalInconsistencyException
-		            format: @"unregistration with unknown connection"];
-  }
-
-  if ([info objectForKey: @"extractor"] == nil) { 
-    [NSException raise: NSInternalInconsistencyException
-                format: @"unregistration with unregistered extractor"];
-  }
-
-  [nc removeObserver: self
-	              name: NSConnectionDidDieNotification
-	            object: connection];
-
-  GWDebugLog(@"extractor for path %@ did end indexing", [info objectForKey: @"path"]);
-  
-  [extractorsInfo removeObject: info];  
-  [extractor terminate];
-  
-  if (([clientInfo objectForKey: @"client"] == nil) 
-                        && ([extractorsInfo count] == 0)) {
-    [self terminate]; 
-  }
-}
-
-- (NSMutableDictionary *)infoOfExtractorForPath:(NSString *)path
-{
-  unsigned i;
-  
-  for (i = 0; i < [extractorsInfo count]; i++) {
-    NSMutableDictionary *info = [extractorsInfo objectAtIndex: i];
-    NSString *extractPath = [info objectForKey: @"path"];
-    
-    if (extractPath && [extractPath isEqual: path]) {
-      return info;
-    }
-  }
-  
-  return nil;
-}
-
-- (NSMutableDictionary *)infoOfExtractorWithConnection:(id)connection
-{
-  unsigned i;
-  
-  for (i = 0; i < [extractorsInfo count]; i++) {
-    NSMutableDictionary *info = [extractorsInfo objectAtIndex: i];
-    NSConnection *extractorConn = [info objectForKey: @"connection"];
-    
-    if (extractorConn && (extractorConn == connection)) {
-      return info;
-    }
-  }
-  
-  return nil;
 }
 
 @end

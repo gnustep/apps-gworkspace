@@ -37,38 +37,18 @@
 @end
 
 
-@protocol	GMDSExtractorProtocol
-
-- (oneway void)terminate;
-
-- (oneway void)startExtracting;
-
-- (NSString *)extractPath;
-
-@end
-
-
 @protocol	GMDSProtocol
 
 - (oneway void)registerClient:(id)remote;
 
 - (oneway void)unregisterClient:(id)remote;
 
-- (oneway void)extractMetadataAtPath:(NSString *)path;
-
-- (oneway void)extractMetadataFromPath:(NSString *)path;
-
 - (oneway void)performQuery:(NSData *)queryInfo;
-
-// extractors
-- (oneway void)registerExtractor:(id)extractor;
-
-- (oneway void)extractorDidEndTask:(id)extractor;
 
 @end
 
 
-@interface GMDS: NSObject 
+@interface GMDS: NSObject <GMDSProtocol>
 {
   NSString *dbpath;
   sqlite3 *db;
@@ -77,8 +57,6 @@
   NSString *connectionName;
   NSMutableDictionary *clientInfo;
 
-  NSMutableArray *extractorsInfo;
-  
   NSFileManager *fm;
   NSNotificationCenter *nc; 
 }
@@ -88,44 +66,18 @@
 
 - (void)connectionDidDie:(NSNotification *)notification;
       
-- (void)registerClient:(id)remote;
-
-- (void)unregisterClient:(id)remote;
-
 - (BOOL)performSubquery:(NSString *)query;
 
 - (BOOL)performPreQueries:(NSArray *)queries;
 
 - (void)performPostQueries:(NSArray *)queries;
           
-- (void)performQuery:(NSData *)queryInfo;
-
 - (BOOL)sendResults:(NSArray *)lines
            forQueryWithNumber:(NSNumber *)qnum;
            
 - (BOOL)opendb;
 
 - (void)terminate;
-
-@end
-
-
-@interface GMDS (extractors)
-
-- (void)extractMetadataAtPath:(NSString *)path;
-
-- (void)extractMetadataFromPath:(NSString *)path;
-
-- (void)startExtractorForPath:(NSString *)path
-                    recursive:(BOOL)rec;
-
-- (void)registerExtractor:(id)extractor;
-
-- (void)extractorDidEndTask:(id)extractor;
-
-- (NSMutableDictionary *)infoOfExtractorForPath:(NSString *)path;
-
-- (NSMutableDictionary *)infoOfExtractorWithConnection:(id)connection;
 
 @end
 

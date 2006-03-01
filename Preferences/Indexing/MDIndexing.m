@@ -24,6 +24,7 @@
 
 #include <AppKit/AppKit.h>
 #include "MDIndexing.h"
+#include "StartAppWin.h"
 
 BOOL subPathOfPath(NSString *p1, NSString *p2);
 
@@ -34,9 +35,12 @@ BOOL isDotFile(NSString *path);
 
 - (void)dealloc
 {
-  RELEASE (indexedPaths);
-  RELEASE (excludedPaths);
-  
+  TEST_RELEASE (indexedPaths);
+  TEST_RELEASE (excludedPaths);
+  TEST_RELEASE (startAppWin);  
+  TEST_RELEASE (extractorsInfoPath);
+  TEST_RELEASE (extractorsInfoLock);
+    
 	[super dealloc];
 }
 
@@ -130,6 +134,11 @@ BOOL isDotFile(NSString *path);
   
     [revertButton setEnabled: NO];
     [applyButton setEnabled: NO];
+        
+    startAppWin = [[StartAppWin alloc] init];
+    
+    extractorsInfoPath = nil;
+    [self setupDbPaths];
   }
 }
 
@@ -434,6 +443,98 @@ return; \
   }
 }
 
+- (void)setupDbPaths
+{
+  NSString *dbdir;
+  NSString *lockpath;
+  BOOL isdir;
+  
+  dbdir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
+  dbdir = [dbdir stringByAppendingPathComponent: @"gmds"];
+
+  if (([fm fileExistsAtPath: dbdir isDirectory: &isdir] &isdir) == NO) {
+    if ([fm createDirectoryAtPath: dbdir attributes: nil] == NO) { 
+      NSRunAlertPanel(nil, 
+                      NSLocalizedString(@"unable to create the db directory.", @""), 
+                      NSLocalizedString(@"Ok", @""), 
+                      nil, 
+                      nil); 
+      return;
+    }
+  }
+
+  dbdir = [dbdir stringByAppendingPathComponent: @".db"];
+
+  if (([fm fileExistsAtPath: dbdir isDirectory: &isdir] &isdir) == NO) {
+    if ([fm createDirectoryAtPath: dbdir attributes: nil] == NO) { 
+      NSRunAlertPanel(nil, 
+                      NSLocalizedString(@"unable to create the db directory.", @""), 
+                      NSLocalizedString(@"Ok", @""), 
+                      nil, 
+                      nil); 
+      return;
+    }
+  }
+
+  ASSIGN (extractorsInfoPath, [dbdir stringByAppendingPathComponent: @"extractors.plist"]);
+
+  lockpath = [dbdir stringByAppendingPathComponent: @"extractors.lock"];
+  extractorsInfoLock = [[NSDistributedLock alloc] initWithPath: lockpath];
+}
+
+- (NSDictionary *)extractorsInfo
+{
+  if (extractorsInfoPath && [fm isReadableFileAtPath: extractorsInfoPath]) {
+    NSDictionary *info;
+
+    if ([extractorsInfoLock tryLock] == NO) {
+      unsigned sleeps = 0;
+
+      if ([[extractorsInfoLock lockDate] timeIntervalSinceNow] < -20.0) {
+	      NS_DURING
+	        {
+	      [extractorsInfoLock breakLock];
+	        }
+	      NS_HANDLER
+	        {
+        NSLog(@"Unable to break lock %@ ... %@", extractorsInfoLock, localException);
+	        }
+	      NS_ENDHANDLER
+      }
+
+      for (sleeps = 0; sleeps < 10; sleeps++) {
+	      if ([extractorsInfoLock tryLock]) {
+	        break;
+	      }
+
+        sleeps++;
+	      [NSThread sleepUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+	    }
+
+      if (sleeps >= 10) {
+        NSLog(@"Unable to obtain lock %@", extractorsInfoLock);
+        return nil;
+	    }
+    }
+
+    info = [NSDictionary dictionaryWithContentsOfFile: extractorsInfoPath];
+    [extractorsInfoLock unlock];
+
+    return info;
+  }
+  
+  return nil;
+}
+
+
+
+
+
+
+
+
+
+
 - (NSString *)chooseNewPath
 {
 	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
@@ -573,3 +674,83 @@ BOOL isDotFile(NSString *path)
   
   return NO;  
 }
+
+
+/*
+- (void)connectFSWatcher
+{
+  if (fswatcher == nil) {
+    id fsw = [NSConnection rootProxyForConnectionWithRegisteredName: @"fswatcher" 
+                                                               host: @""];
+
+    if (fsw) {
+      NSConnection *c = [fsw connectionForProxy];
+
+	    [[NSNotificationCenter defaultCenter] addObserver: self
+	                   selector: @selector(fswatcherConnectionDidDie:)
+		                     name: NSConnectionDidDieNotification
+		                   object: c];
+      
+      fswatcher = fsw;
+	    [fswatcher setProtocolForProxy: @protocol(FSWatcherProtocol)];
+      RETAIN (fswatcher);
+                                   
+	    [fswatcher registerClient: (id <FSWClientProtocol>)self 
+                isGlobalWatcher: NO];
+      
+	  } else {
+	    static BOOL recursion = NO;
+	    static NSString	*cmd = nil;
+
+	    if (recursion == NO) {
+        if (cmd == nil) {
+          cmd = RETAIN ([[NSSearchPathForDirectoriesInDomains(
+                      GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
+                            stringByAppendingPathComponent: @"fswatcher"]);
+		    }
+      }
+	  
+      if (recursion == NO && cmd != nil) {
+        int i;
+        
+        [startAppWin showWindowWithTitle: @"GWorkspace"
+                                 appName: @"fswatcher"
+                               operation: NSLocalizedString(@"starting:", @"")
+                            maxProgValue: 40.0];
+
+	      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
+        DESTROY (cmd);
+        
+        for (i = 1; i <= 40; i++) {
+          [startAppWin updateProgressBy: 1.0];
+	        [[NSRunLoop currentRunLoop] runUntilDate:
+		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+                           
+          fsw = [NSConnection rootProxyForConnectionWithRegisteredName: @"fswatcher" 
+                                                                  host: @""];                  
+          if (fsw) {
+            [startAppWin updateProgressBy: 40.0 - i];
+            break;
+          }
+        }
+        
+        [[startAppWin win] close];
+        
+	      recursion = YES;
+	      [self connectFSWatcher];
+	      recursion = NO;
+        
+	    } else { 
+        DESTROY (cmd);
+	      recursion = NO;
+        fswnotifications = NO;
+        NSRunAlertPanel(nil,
+                NSLocalizedString(@"unable to contact fswatcher\nfswatcher notifications disabled!", @""),
+                NSLocalizedString(@"Ok", @""),
+                nil, 
+                nil);  
+      }
+	  }
+  }
+}
+*/

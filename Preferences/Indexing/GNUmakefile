@@ -10,7 +10,8 @@ MDIndexing_HAS_RESOURCE_BUNDLE = yes
 OBJCFLAGS += -Wall
 
 MDIndexing_OBJC_FILES = \
-MDIndexing.m 
+MDIndexing.m \
+StartAppWin.m
 
 MDIndexing_PRINCIPAL_CLASS = MDIndexing
 
