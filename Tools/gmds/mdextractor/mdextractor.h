@@ -26,6 +26,7 @@
 #define MDEXTRACTOR_H
 
 #include <Foundation/Foundation.h>
+#include "DBKPathsTree.h"
 #include "sqlite.h"
 
 @protocol	ExtractorsProtocol
@@ -64,6 +65,11 @@
 
 @interface GMDSExtractor: NSObject 
 {
+  NSMutableArray *indexedPaths;
+  pcomp *excludePathsTree;  
+  NSMutableDictionary *pathsStatus;
+  BOOL indexingEnabled;
+  BOOL indexing;
   NSString *dbpath;
   sqlite3 *db;
 
@@ -74,20 +80,37 @@
   
   NSConnection *conn;
 
-  NSString *extractorInfoPath;
-  NSDistributedLock *extractorInfoLock;
+  NSString *indexedStatusPath;
+  NSDistributedLock *indexedStatusLock;
 
   NSFileManager *fm;
   id ws;
   NSNotificationCenter *nc; 
+  NSNotificationCenter *dnc;  
 }
 
-- (BOOL)connection:(NSConnection *)ancestor
-            shouldMakeNewConnection:(NSConnection *)newConn;
+- (void)indexedDirectoriesChanged:(NSNotification *)notification;
 
-- (void)connectionDidDie:(NSNotification *)notification;
+- (void)synchronizePathsStatus:(BOOL)onstart;
 
-- (oneway void)startExtracting;
+- (NSDictionary *)readPathsStatus;
+
+- (void)writePathsStatus;
+
+
+
+
+
+
+
+
+
+
+
+
+- (void)startExtracting;
+
+- (void)stopExtracting;
 
 - (void)setMetadata:(NSDictionary *)mddict
             forPath:(NSString *)path
@@ -95,6 +118,10 @@
 
 - (void)setFileSystemMetadataForPath:(NSString *)path
                       withAttributes:(NSDictionary *)attributes;
+
+
+
+
 
 - (id)extractorForPath:(NSString *)path
         withAttributes:(NSDictionary *)attributes;
@@ -107,9 +134,10 @@
 
 - (BOOL)opendb;
 
-- (NSDictionary *)extractorInfo;
+- (BOOL)connection:(NSConnection *)ancestor
+            shouldMakeNewConnection:(NSConnection *)newConn;
 
-- (void)writeExtractorInfo;
+- (void)connectionDidDie:(NSNotification *)notification;
 
 - (void)terminate;
 

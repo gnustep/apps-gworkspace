@@ -38,8 +38,8 @@ BOOL isDotFile(NSString *path);
   TEST_RELEASE (indexedPaths);
   TEST_RELEASE (excludedPaths);
   TEST_RELEASE (startAppWin);  
-  TEST_RELEASE (extractorsInfoPath);
-  TEST_RELEASE (extractorsInfoLock);
+  TEST_RELEASE (indexedStatusPath);
+  TEST_RELEASE (indexedStatusLock);
     
 	[super dealloc];
 }
@@ -52,6 +52,7 @@ BOOL isDotFile(NSString *path);
     int i;
     
     fm = [NSFileManager defaultManager];
+    nc = [NSNotificationCenter defaultCenter];
     dnc = [NSDistributedNotificationCenter defaultCenter];
     
     indexedPaths = [NSMutableArray new];
@@ -137,8 +138,29 @@ BOOL isDotFile(NSString *path);
         
     startAppWin = [[StartAppWin alloc] init];
     
-    extractorsInfoPath = nil;
+    indexedStatusPath = nil;
     [self setupDbPaths];
+    
+    mdextractor = nil;
+    [self connectMDExtractor];
+  }
+}
+
+- (NSPreferencePaneUnselectReply)shouldUnselect
+{
+  return unselectReply;
+}
+
+- (void)didSelect
+{
+  if (mdextractor == nil) {
+    if (NSRunAlertPanel(nil,
+                      NSLocalizedString(@"The mdextractor connection died.\nDo you want to restart it?", @""),
+                      NSLocalizedString(@"Yes", @""),
+                      NSLocalizedString(@"No", @""),
+                      nil)) {
+      [self connectMDExtractor];                
+    }
   }
 }
 
@@ -476,34 +498,34 @@ return; \
     }
   }
 
-  ASSIGN (extractorsInfoPath, [dbdir stringByAppendingPathComponent: @"extractors.plist"]);
+  ASSIGN (indexedStatusPath, [dbdir stringByAppendingPathComponent: @"status.plist"]);
 
   lockpath = [dbdir stringByAppendingPathComponent: @"extractors.lock"];
-  extractorsInfoLock = [[NSDistributedLock alloc] initWithPath: lockpath];
+  indexedStatusLock = [[NSDistributedLock alloc] initWithPath: lockpath];
 }
 
-- (NSDictionary *)extractorsInfo
+- (NSDictionary *)readIndexedPathsStatus
 {
-  if (extractorsInfoPath && [fm isReadableFileAtPath: extractorsInfoPath]) {
+  if (indexedStatusPath && [fm isReadableFileAtPath: indexedStatusPath]) {
     NSDictionary *info;
 
-    if ([extractorsInfoLock tryLock] == NO) {
+    if ([indexedStatusLock tryLock] == NO) {
       unsigned sleeps = 0;
 
-      if ([[extractorsInfoLock lockDate] timeIntervalSinceNow] < -20.0) {
+      if ([[indexedStatusLock lockDate] timeIntervalSinceNow] < -20.0) {
 	      NS_DURING
 	        {
-	      [extractorsInfoLock breakLock];
+	      [indexedStatusLock breakLock];
 	        }
 	      NS_HANDLER
 	        {
-        NSLog(@"Unable to break lock %@ ... %@", extractorsInfoLock, localException);
+        NSLog(@"Unable to break lock %@ ... %@", indexedStatusLock, localException);
 	        }
 	      NS_ENDHANDLER
       }
 
       for (sleeps = 0; sleeps < 10; sleeps++) {
-	      if ([extractorsInfoLock tryLock]) {
+	      if ([indexedStatusLock tryLock]) {
 	        break;
 	      }
 
@@ -512,19 +534,123 @@ return; \
 	    }
 
       if (sleeps >= 10) {
-        NSLog(@"Unable to obtain lock %@", extractorsInfoLock);
+        NSLog(@"Unable to obtain lock %@", indexedStatusLock);
         return nil;
 	    }
     }
 
-    info = [NSDictionary dictionaryWithContentsOfFile: extractorsInfoPath];
-    [extractorsInfoLock unlock];
+    info = [NSDictionary dictionaryWithContentsOfFile: indexedStatusPath];
+    [indexedStatusLock unlock];
 
     return info;
   }
   
   return nil;
 }
+
+- (void)connectMDExtractor
+{
+  if (mdextractor == nil) {
+    id fsw = [NSConnection rootProxyForConnectionWithRegisteredName: @"mdextractor" 
+                                                               host: @""];
+
+    if (fsw) {
+      NSConnection *c = [fsw connectionForProxy];
+
+	    [nc addObserver: self
+	           selector: @selector(mdextractorConnectionDidDie:)
+		             name: NSConnectionDidDieNotification
+		           object: c];
+      
+      mdextractor = fsw;
+	    [mdextractor setProtocolForProxy: @protocol(MDExtractorProtocol)];
+      RETAIN (mdextractor);
+      
+	  } else {
+	    static BOOL recursion = NO;
+	    static NSString	*cmd = nil;
+
+	    if (recursion == NO) {
+        if (cmd == nil) {
+          cmd = RETAIN ([[NSSearchPathForDirectoriesInDomains(
+                      GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
+                            stringByAppendingPathComponent: @"mdextractor"]);
+		    }
+      }
+	  
+      if (recursion == NO && cmd != nil) {
+        int i;
+        
+        [startAppWin showWindowWithTitle: @"MDIndexing"
+                                 appName: @"mdextractor"
+                               operation: NSLocalizedString(@"starting:", @"")
+                            maxProgValue: 40.0];
+
+	      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
+        DESTROY (cmd);
+        
+        for (i = 1; i <= 40; i++) {
+          [startAppWin updateProgressBy: 1.0];
+	        [[NSRunLoop currentRunLoop] runUntilDate:
+		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+                           
+          fsw = [NSConnection rootProxyForConnectionWithRegisteredName: @"mdextractor" 
+                                                                  host: @""];                  
+          if (fsw) {
+            [startAppWin updateProgressBy: 40.0 - i];
+            break;
+          }
+        }
+        
+        [[startAppWin win] close];
+        
+	      recursion = YES;
+	      [self connectMDExtractor];
+	      recursion = NO;
+        
+	    } else { 
+        DESTROY (cmd);
+	      recursion = NO;
+
+        NSRunAlertPanel(nil,
+                NSLocalizedString(@"unable to contact mdextractor!", @""),
+                NSLocalizedString(@"Ok", @""),
+                nil, 
+                nil);  
+      }
+	  }
+  }
+}
+
+- (void)mdextractorConnectionDidDie:(NSNotification *)notif
+{
+  id connection = [notif object];
+
+  [nc removeObserver: self
+	              name: NSConnectionDidDieNotification
+	            object: connection];
+
+  NSAssert(connection == [mdextractor connectionForProxy],
+		                                  NSInternalInconsistencyException);
+  RELEASE (mdextractor);
+  mdextractor = nil;
+
+  if ([self isSelected]) {
+    if (NSRunAlertPanel(nil,
+                      NSLocalizedString(@"The mdextractor connection died.\nDo you want to restart it?", @""),
+                      NSLocalizedString(@"Yes", @""),
+                      NSLocalizedString(@"No", @""),
+                      nil)) {
+      [self connectMDExtractor];                
+    }
+  }
+}
+
+
+
+
+
+
 
 
 
@@ -632,11 +758,6 @@ return; \
   RELEASE (arp);
 }
 
-- (NSPreferencePaneUnselectReply)shouldUnselect
-{
-  return unselectReply;
-}
-
 @end
 
 
@@ -675,82 +796,3 @@ BOOL isDotFile(NSString *path)
   return NO;  
 }
 
-
-/*
-- (void)connectFSWatcher
-{
-  if (fswatcher == nil) {
-    id fsw = [NSConnection rootProxyForConnectionWithRegisteredName: @"fswatcher" 
-                                                               host: @""];
-
-    if (fsw) {
-      NSConnection *c = [fsw connectionForProxy];
-
-	    [[NSNotificationCenter defaultCenter] addObserver: self
-	                   selector: @selector(fswatcherConnectionDidDie:)
-		                     name: NSConnectionDidDieNotification
-		                   object: c];
-      
-      fswatcher = fsw;
-	    [fswatcher setProtocolForProxy: @protocol(FSWatcherProtocol)];
-      RETAIN (fswatcher);
-                                   
-	    [fswatcher registerClient: (id <FSWClientProtocol>)self 
-                isGlobalWatcher: NO];
-      
-	  } else {
-	    static BOOL recursion = NO;
-	    static NSString	*cmd = nil;
-
-	    if (recursion == NO) {
-        if (cmd == nil) {
-          cmd = RETAIN ([[NSSearchPathForDirectoriesInDomains(
-                      GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
-                            stringByAppendingPathComponent: @"fswatcher"]);
-		    }
-      }
-	  
-      if (recursion == NO && cmd != nil) {
-        int i;
-        
-        [startAppWin showWindowWithTitle: @"GWorkspace"
-                                 appName: @"fswatcher"
-                               operation: NSLocalizedString(@"starting:", @"")
-                            maxProgValue: 40.0];
-
-	      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
-        DESTROY (cmd);
-        
-        for (i = 1; i <= 40; i++) {
-          [startAppWin updateProgressBy: 1.0];
-	        [[NSRunLoop currentRunLoop] runUntilDate:
-		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
-                           
-          fsw = [NSConnection rootProxyForConnectionWithRegisteredName: @"fswatcher" 
-                                                                  host: @""];                  
-          if (fsw) {
-            [startAppWin updateProgressBy: 40.0 - i];
-            break;
-          }
-        }
-        
-        [[startAppWin win] close];
-        
-	      recursion = YES;
-	      [self connectFSWatcher];
-	      recursion = NO;
-        
-	    } else { 
-        DESTROY (cmd);
-	      recursion = NO;
-        fswnotifications = NO;
-        NSRunAlertPanel(nil,
-                NSLocalizedString(@"unable to contact fswatcher\nfswatcher notifications disabled!", @""),
-                NSLocalizedString(@"Ok", @""),
-                nil, 
-                nil);  
-      }
-	  }
-  }
-}
-*/

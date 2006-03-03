@@ -12,6 +12,7 @@ mdextractor_OBJC_FILES = mdextractor.m \
                   sqlite.m 
 
 mdextractor_TOOL_LIBS += -lgnustep-gui
+mdextractor_TOOL_LIBS += -lDBKit
 mdextractor_TOOL_LIBS += -lsqlite3
 
 -include GNUmakefile.preamble

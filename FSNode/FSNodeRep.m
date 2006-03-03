@@ -691,23 +691,29 @@ static FSNodeRep *shared = nil;
   
 #ifndef __APPLE__
   #if defined(HAVE_GETMNTENT) && defined(MNT_DIR)
-    FILE *fp = fopen("/etc/mtab", "r");
-    struct mntent	*mnt;
-    
-    while ((mnt = getmntent(fp)) != 0) { 
-      NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-      
-      [dict setObject: [NSString stringWithUTF8String: mnt->MNT_FSNAME]
-               forKey: @"name"]; 
-      [dict setObject: [NSString stringWithUTF8String: mnt->MNT_DIR]
-               forKey: @"dir"];  
-      [dict setObject: [NSString stringWithUTF8String: mnt->MNT_FSTYPE]
-               forKey: @"type"];  
-                                   
-      [volumes addObject: dict];
-    }
+    if ([[NSFileManager defaultManager] fileExistsAtPath: @"/etc/mtab"]) {
+      FILE *fp = fopen("/etc/mtab", "r");
+      struct mntent	*mnt;
 
-    fclose(fp);
+      while ((mnt = getmntent(fp)) != 0) { 
+        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+
+        [dict setObject: [NSString stringWithUTF8String: mnt->MNT_FSNAME]
+                 forKey: @"name"]; 
+        [dict setObject: [NSString stringWithUTF8String: mnt->MNT_DIR]
+                 forKey: @"dir"];  
+        [dict setObject: [NSString stringWithUTF8String: mnt->MNT_FSTYPE]
+                 forKey: @"type"];  
+
+        [volumes addObject: dict];
+      }
+
+      fclose(fp);
+    
+    } else {
+      /* FIXME add something for Hurd */
+      
+    }       
         
   #else   // NO GETMNTENT
     unsigned int systype = [[NSProcessInfo processInfo] operatingSystem];

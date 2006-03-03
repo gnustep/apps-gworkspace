@@ -63,14 +63,18 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
 
 - (void)dealloc
 {
+  [dnc removeObserver: self];
   [nc removeObserver: self];
-
-  RELEASE (dbpath);
-  TEST_RELEASE (extractorInfoPath);
-  TEST_RELEASE (extractorInfoLock);
-  RELEASE (extractors);  
-  RELEASE (textExtractor);
-  RELEASE (stemmer);  
+  
+  TEST_RELEASE (indexedPaths);
+  freeTree(excludePathsTree);
+  TEST_RELEASE (pathsStatus);
+  TEST_RELEASE (dbpath);
+  TEST_RELEASE (indexedStatusPath);
+  TEST_RELEASE (indexedStatusLock);
+  TEST_RELEASE (extractors);  
+  TEST_RELEASE (textExtractor);
+  TEST_RELEASE (stemmer);  
   TEST_RELEASE (stopWords);
   
   [super dealloc];
@@ -81,6 +85,8 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
   self = [super init];
   
   if (self) {
+    NSUserDefaults *defaults;
+    id entry;
     NSString *dbdir;
     NSString *lockpath;
     BOOL isdir;    
@@ -109,9 +115,9 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
     }
 
     ASSIGN (dbpath, [dbdir stringByAppendingPathComponent: @"contents.db"]);    
-    ASSIGN (extractorInfoPath, [dbdir stringByAppendingPathComponent: @"extractors.plist"]);
+    ASSIGN (indexedStatusPath, [dbdir stringByAppendingPathComponent: @"status.plist"]);
     lockpath = [dbdir stringByAppendingPathComponent: @"extractors.lock"];
-    extractorInfoLock = [[NSDistributedLock alloc] initWithPath: lockpath];
+    indexedStatusLock = [[NSDistributedLock alloc] initWithPath: lockpath];
     
     db = NULL;
 
@@ -137,47 +143,252 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
 	             name: NSConnectionDidDieNotification
 	           object: conn];
 
-    ws = [NSWorkspace sharedWorkspace];   
-
     textExtractor = nil;        
     [self loadExtractors];
     
     [self loadStemmer];
     [self setStemmingLanguage: nil];
+        
+    dnc = [NSDistributedNotificationCenter defaultCenter];
+    
+    [dnc addObserver: self
+            selector: @selector(indexedDirectoriesChanged:)
+	              name: @"GSMetadataIndexedDirectoriesChanged"
+	            object: nil];
+    
+    ws = [NSWorkspace sharedWorkspace]; 
+    
+    indexedPaths = [NSMutableArray new];
+    excludePathsTree = newTreeWithIdentifier(@"excluded");
+    pathsStatus = [NSMutableDictionary new];
+    
+    defaults = [NSUserDefaults standardUserDefaults];
+    [defaults synchronize];
+    
+    entry = [defaults arrayForKey: @"GSMetadataIndexedPaths"];
+    if (entry) {
+      [indexedPaths addObjectsFromArray: entry];
+    }
+    
+    entry = [defaults arrayForKey: @"GSMetadataExcludedPaths"];
+    if (entry) {
+      unsigned i;
+      
+      for (i = 0; i < [entry count]; i++) {
+        insertComponentsOfPath([entry objectAtIndex: i], excludePathsTree);
+      }
+    }
+  
+    indexingEnabled = [defaults boolForKey: @"GSMetadataIndexingEnabled"];    
+    
+    indexing = NO;
+    
+    [self synchronizePathsStatus: YES];
   }
   
   return self;
 }
 
-- (BOOL)connection:(NSConnection *)ancestor
-            shouldMakeNewConnection:(NSConnection *)newConn;
+- (void)indexedDirectoriesChanged:(NSNotification *)notification
 {
-  [nc addObserver: self
-         selector: @selector(connectionDidDie:)
-	           name: NSConnectionDidDieNotification
-	         object: newConn];
-           
-  [newConn setDelegate: self];
+  NSDictionary *info = [notification userInfo];
+  NSArray *indexed = [info objectForKey: @"GSMetadataIndexedPaths"];
+  NSArray *excluded = [info objectForKey: @"GSMetadataExcludedPaths"];
+  unsigned i;
+
+  [indexedPaths removeAllObjects];
+  [indexedPaths addObjectsFromArray: indexed];
+  // Controllare anche se ne e' stata tolta qualcuna e
+  // toglierla dal database?
+  // Fermare l'indexing se la path current e' stata tolta?
   
-  return YES;
+  emptyTreeWithBase(excludePathsTree);
+  
+  for (i = 0; i < [excluded count]; i++) {
+    insertComponentsOfPath([excluded objectAtIndex: i], excludePathsTree);
+  }
+
+  indexingEnabled = [[info objectForKey: @"GSMetadataIndexingEnabled"] boolValue];
+    
+  [self synchronizePathsStatus: NO];
 }
 
-- (void)connectionDidDie:(NSNotification *)notification
+- (void)synchronizePathsStatus:(BOOL)onstart
 {
-  id connection = [notification object];
+  CREATE_AUTORELEASE_POOL(arp);
+  
+  if (onstart) {
+    NSDictionary *savedStatus = [self readPathsStatus];
+    unsigned i; 
+    
+    for (i = 0; i < [indexedPaths count]; i++) {
+      NSString *indexed = [indexedPaths objectAtIndex: i];
+      NSDictionary *savedDict = [savedStatus objectForKey: indexed];
+      NSMutableDictionary *dict;
+  
+      if (savedDict != nil) {
+        dict = [savedDict mutableCopy];
+      } else {
+        dict = [NSMutableDictionary new];
+        
+        [dict setObject: [NSNumber numberWithBool: NO] forKey: @"indexed"];
+        [dict setObject: [NSNumber numberWithInt: 0] forKey: @"files"];
+      }
+      
+      [pathsStatus setObject: dict forKey: indexed];
+      
+      RELEASE (dict);
+    }
+  
+  } else {
+    NSArray *paths = [[pathsStatus allKeys] copy];
+    unsigned i;
+        
+    for (i = 0; i < [paths count]; i++) {
+      NSString *path = [paths objectAtIndex: i];  
+      
+      if ([indexedPaths containsObject: path] == NO) {
+        [pathsStatus removeObjectForKey: path];
+      }
+    }
+    
+    RELEASE (paths);
+    
+    for (i = 0; i < [indexedPaths count]; i++) {
+      NSString *indexed = [indexedPaths objectAtIndex: i];
+      NSMutableDictionary *dict = [pathsStatus objectForKey: indexed];
+    
+      if (dict == nil) {
+        dict = [NSMutableDictionary dictionary];
+    
+        [dict setObject: [NSNumber numberWithBool: NO] forKey: @"indexed"];
+        [dict setObject: [NSNumber numberWithInt: 0] forKey: @"files"];
+        
+        [pathsStatus setObject: dict forKey: indexed];
+      }
+    }
+  
+    [self writePathsStatus];
+  }
+   
+  RELEASE (arp);  
+}
 
-  [nc removeObserver: self
-	              name: NSConnectionDidDieNotification
-	            object: connection];
+- (NSDictionary *)readPathsStatus
+{
+  if (indexedStatusPath && [fm isReadableFileAtPath: indexedStatusPath]) {
+    NSDictionary *info;
 
-  if (connection == conn) {
-    NSLog(@"mdextractor connection has been destroyed. Exiting.");
-    exit(EXIT_FAILURE);
+    if ([indexedStatusLock tryLock] == NO) {
+      unsigned sleeps = 0;
+
+      if ([[indexedStatusLock lockDate] timeIntervalSinceNow] < -20.0) {
+	      NS_DURING
+	        {
+	      [indexedStatusLock breakLock];
+	        }
+	      NS_HANDLER
+	        {
+        NSLog(@"Unable to break lock %@ ... %@", indexedStatusLock, localException);
+	        }
+	      NS_ENDHANDLER
+      }
+
+      for (sleeps = 0; sleeps < 10; sleeps++) {
+	      if ([indexedStatusLock tryLock]) {
+	        break;
+	      }
+
+        sleeps++;
+	      [NSThread sleepUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+	    }
+
+      if (sleeps >= 10) {
+        NSLog(@"Unable to obtain lock %@", indexedStatusLock);
+        return [NSDictionary dictionary];
+	    }
+    }
+
+    info = [NSDictionary dictionaryWithContentsOfFile: indexedStatusPath];
+    [indexedStatusLock unlock];
+
+    return info;
+  }
+  
+  return [NSDictionary dictionary];
+}
+
+- (void)writePathsStatus
+{
+  if (indexedStatusPath) {
+    if ([indexedStatusLock tryLock] == NO) {
+      unsigned sleeps = 0;
+
+      if ([[indexedStatusLock lockDate] timeIntervalSinceNow] < -20.0) {
+	      NS_DURING
+	        {
+	      [indexedStatusLock breakLock];
+	        }
+	      NS_HANDLER
+	        {
+        NSLog(@"Unable to break lock %@ ... %@", indexedStatusLock, localException);
+	        }
+	      NS_ENDHANDLER
+      }
+
+      for (sleeps = 0; sleeps < 10; sleeps++) {
+	      if ([indexedStatusLock tryLock]) {
+	        break;
+	      }
+
+        sleeps++;
+	      [NSThread sleepUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+	    }
+
+      if (sleeps >= 10) {
+        NSLog(@"Unable to obtain lock %@", indexedStatusLock);
+        return;
+	    }
+    }
+
+    [pathsStatus writeToFile: indexedStatusPath atomically: YES];
+    [indexedStatusLock unlock];
   }
 }
 
-- (oneway void)startExtracting
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+- (void)startExtracting
 {
+  
+  NSLog(@"startExtracting");
+  
+}
+
+- (void)stopExtracting
+{
+
+  NSLog(@"stopExtracting");
 
 }
 
@@ -197,6 +408,48 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
 - (id)extractorForPath:(NSString *)path
         withAttributes:(NSDictionary *)attributes
 {
+  NSString *ext = [[path pathExtension] lowercaseString];
+  NSString *app, *type;
+  NSData *data = nil;
+  int i;
+  
+  [ws getInfoForFile: path application: &app type: &type]; 
+  
+  if ([attributes fileType] == NSFileTypeRegular) {
+    NSFileHandle *handle = [NSFileHandle fileHandleForReadingAtPath: path];
+
+    if (handle) {
+      NS_DURING
+        {
+          data = [handle readDataOfLength: DLENGTH];
+        }
+      NS_HANDLER
+        {
+          data = nil;
+        }
+      NS_ENDHANDLER
+
+      [handle closeFile];
+    }
+  }
+  
+  for (i = 0; i < [extractors count]; i++) {
+    id extractor = [extractors objectAtIndex: i];
+
+    if ([extractor canExtractFromFileType: type
+                            withExtension: ext 
+                               attributes: attributes
+                                 testData: data]) {
+      return extractor;
+    }
+  }
+  
+  if ([textExtractor canExtractFromFileType: type 
+                              withExtension: ext
+                                 attributes: attributes
+                                   testData: data]) {
+    return textExtractor;
+  }
   
   return nil;
 }
@@ -312,98 +565,40 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
   return YES;
 }
 
-- (NSDictionary *)extractorInfo
+- (BOOL)connection:(NSConnection *)ancestor
+            shouldMakeNewConnection:(NSConnection *)newConn;
 {
-  if (extractorInfoPath && [fm isReadableFileAtPath: extractorInfoPath]) {
-    NSDictionary *info;
-
-    if ([extractorInfoLock tryLock] == NO) {
-      unsigned sleeps = 0;
-
-      if ([[extractorInfoLock lockDate] timeIntervalSinceNow] < -20.0) {
-	      NS_DURING
-	        {
-	      [extractorInfoLock breakLock];
-	        }
-	      NS_HANDLER
-	        {
-        NSLog(@"Unable to break lock %@ ... %@", extractorInfoLock, localException);
-	        }
-	      NS_ENDHANDLER
-      }
-
-      for (sleeps = 0; sleeps < 10; sleeps++) {
-	      if ([extractorInfoLock tryLock]) {
-	        break;
-	      }
-
-        sleeps++;
-	      [NSThread sleepUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.1]];
-	    }
-
-      if (sleeps >= 10) {
-        NSLog(@"Unable to obtain lock %@", extractorInfoLock);
-        return nil;
-	    }
-    }
-
-    info = [NSDictionary dictionaryWithContentsOfFile: extractorInfoPath];
-    [extractorInfoLock unlock];
-
-    return info;
-  }
+  [nc addObserver: self
+         selector: @selector(connectionDidDie:)
+	           name: NSConnectionDidDieNotification
+	         object: newConn];
+           
+  [newConn setDelegate: self];
   
-  return nil;
+  GWDebugLog(@"new connection");
+  
+  return YES;
 }
 
-- (void)writeExtractorInfo
+- (void)connectionDidDie:(NSNotification *)notification
 {
-  if (extractorInfoPath) {
-    NSMutableDictionary *info = [NSMutableDictionary dictionary];
+  id connection = [notification object];
 
+  [nc removeObserver: self
+	              name: NSConnectionDidDieNotification
+	            object: connection];
 
-
-
-
-
-
-    if ([extractorInfoLock tryLock] == NO) {
-      unsigned sleeps = 0;
-
-      if ([[extractorInfoLock lockDate] timeIntervalSinceNow] < -20.0) {
-	      NS_DURING
-	        {
-	      [extractorInfoLock breakLock];
-	        }
-	      NS_HANDLER
-	        {
-        NSLog(@"Unable to break lock %@ ... %@", extractorInfoLock, localException);
-	        }
-	      NS_ENDHANDLER
-      }
-
-      for (sleeps = 0; sleeps < 10; sleeps++) {
-	      if ([extractorInfoLock tryLock]) {
-	        break;
-	      }
-
-        sleeps++;
-	      [NSThread sleepUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.1]];
-	    }
-
-      if (sleeps >= 10) {
-        NSLog(@"Unable to obtain lock %@", extractorInfoLock);
-        return;
-	    }
-    }
-
-    [info writeToFile: extractorInfoPath atomically: YES];
-    [extractorInfoLock unlock];
+  if (connection == conn) {
+    NSLog(@"mdextractor connection has been destroyed. Exiting.");
+    exit(EXIT_FAILURE);
+  } else {
+    GWDebugLog(@"connection closed");
   }
 }
 
 - (void)terminate
 {
+  [dnc removeObserver: self];
   [nc removeObserver: self];
   
   if (db != NULL) {

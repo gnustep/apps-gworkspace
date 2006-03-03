@@ -35,6 +35,12 @@
 @class NSMatrix;
 @class StartAppWin;
 
+@protocol	MDExtractorProtocol
+
+
+@end
+
+
 @interface MDIndexing : NSPreferencePane 
 {
   IBOutlet id indexedTitle;
@@ -60,11 +66,13 @@
   BOOL loaded;
   NSPreferencePaneUnselectReply unselectReply;
 
+  id mdextractor;
   StartAppWin *startAppWin;  
-  NSString *extractorsInfoPath;
-  NSDistributedLock *extractorsInfoLock;
+  NSString *indexedStatusPath;
+  NSDistributedLock *indexedStatusLock;
   
   NSFileManager *fm;
+  NSNotificationCenter *nc;
   NSNotificationCenter *dnc;
 }
 
@@ -86,7 +94,13 @@
 
 - (void)setupDbPaths;
 
-- (NSDictionary *)extractorsInfo;
+- (NSDictionary *)readIndexedPathsStatus;
+
+- (void)connectMDExtractor;
+
+- (void)mdextractorConnectionDidDie:(NSNotification *)notif;
+
+
 
 
 

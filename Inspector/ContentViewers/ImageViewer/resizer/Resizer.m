@@ -113,7 +113,7 @@
   exit(0);
 }
 
-/*
+
 - (void)readImageAtPath:(NSString *)path
                 setSize:(NSSize)imsize
 {
@@ -205,8 +205,11 @@
   
   RELEASE (arp);
 }
-*/
 
+
+
+
+/*
 - (void)readImageAtPath:(NSString *)path
                 setSize:(NSSize)imsize
 {
@@ -325,6 +328,7 @@
   [viewer imageReady: [NSArchiver archivedDataWithRootObject: info]];
   RELEASE (arp);
 }
+*/
 
 - (void)terminate
 {
