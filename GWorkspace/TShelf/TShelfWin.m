@@ -173,17 +173,34 @@
   }
 
   if (autohidden) {
+    CREATE_AUTORELEASE_POOL(arp);
     int h = -SHELF_HEIGHT;
-    int i;
+    int p = (int)(SHELF_HEIGHT / 10);
+    NSDate *future = [NSDate distantFuture];
+    NSEvent *event;
     
-    [self setFrameOrigin: NSMakePoint(0, h)];
-
-    for (i = 0; i < 50; i++) {
-      h += (int)(SHELF_HEIGHT / 50);
+    [self disableFlushWindow];
+    [NSEvent startPeriodicEventsAfterDelay: 0.01 withPeriod: 0.01];
+    
+    while (1) {
+      event = [NSApp nextEventMatchingMask: NSPeriodicMask
+                                 untilDate: future
+                                    inMode: NSEventTrackingRunLoopMode
+                                   dequeue: YES];
+      h += p;
       [self setFrameOrigin: NSMakePoint(0, h)];
+    
+      if (h >= 0) {
+        break;
+      }
     }
     
+    [NSEvent stopPeriodicEvents];
     [self setFrameOrigin: NSMakePoint(0, 0)];
+    [self enableFlushWindow];
+    [self flushWindowIfNeeded];
+    
+    RELEASE (arp);
   }
   
   autohidden = NO;
@@ -196,17 +213,34 @@
   }
 
   if (autohidden == NO) {
+    CREATE_AUTORELEASE_POOL(arp);
     int h = 0;
-    int i;
+    int p = (int)(SHELF_HEIGHT / 10);
+    NSDate *future = [NSDate distantFuture];
+    NSEvent *event;
+    
+    [self disableFlushWindow];
+    [NSEvent startPeriodicEventsAfterDelay: 0.01 withPeriod: 0.01];
 
-    [self setFrameOrigin: NSMakePoint(0, 0)];
-    
-    for (i = 0; i < 50; i++) {
-      h -= (int)(SHELF_HEIGHT / 50);
+    while (1) {
+      event = [NSApp nextEventMatchingMask: NSPeriodicMask
+                                 untilDate: future
+                                    inMode: NSEventTrackingRunLoopMode
+                                   dequeue: YES];
+      h -= p;
       [self setFrameOrigin: NSMakePoint(0, h)];
-    }
     
+      if (h <= -SHELF_HEIGHT) {
+        break;
+      }
+    }
+
+    [NSEvent stopPeriodicEvents];    
     [self setFrameOrigin: NSMakePoint(0, -SHELF_HEIGHT)];
+    [self enableFlushWindow];
+    [self flushWindowIfNeeded];
+    
+    RELEASE (arp);
   }
   
   autohidden = YES;
