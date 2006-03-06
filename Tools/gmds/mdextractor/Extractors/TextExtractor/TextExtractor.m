@@ -108,14 +108,15 @@
   return NO;
 }
 
-- (void)extractMetadataAtPath:(NSString *)path
+- (BOOL)extractMetadataAtPath:(NSString *)path
                withAttributes:(NSDictionary *)attributes
                  usingStemmer:(id)stemmer
                     stopWords:(NSSet *)stopwords
 {
   CREATE_AUTORELEASE_POOL(arp);
   NSString *contents = [NSString stringWithContentsOfFile: path];
-
+  BOOL success = YES;
+  
   if (contents && [contents length]) {
     NSScanner *scanner = [NSScanner scannerWithString: contents];
     SEL scanSel = @selector(scanUpToCharactersFromSet:intoString:);
@@ -159,14 +160,16 @@
 
     [mddict setObject: wordsDict forKey: @"words"];
     
-    [extractor setMetadata: mddict
-                   forPath: path
-            withAttributes: attributes];
+    success = [extractor setMetadata: mddict
+                             forPath: path
+                      withAttributes: attributes];
     
     RELEASE (wordset);   
   }
 
   RELEASE (arp);
+  
+  return success;
 }
 
 @end

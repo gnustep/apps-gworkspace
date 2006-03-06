@@ -36,15 +36,6 @@
   do { if (GW_DEBUG_LOG) \
     NSLog(format , ## args); } while (0)
 
-#define PERFORM_OR_EXIT(d, q) \
-do { \
-  if (performWriteQuery(d, q) == NO) { \
-    NSLog(@"error at: %@", q); \
-    exit(EXIT_FAILURE); \
-  } \
-} while (0)
-
-
 static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv)
 {
   const unsigned char *path = sqlite3_value_text(argv[0]);
@@ -58,24 +49,48 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
   sqlite3_result_int(context, exists);
 }
 
+BOOL isDotFile(NSString *path)
+{
+  int len = ([path length] - 1);
+  unichar c;
+  int i;
+  
+  for (i = len; i >= 0; i--) {
+    c = [path characterAtIndex: i];
+    
+    if (c == '.') {
+      if ((i > 0) && ([path characterAtIndex: (i - 1)] == '/')) {
+        return YES;
+      }
+    }
+  }
+  
+  return NO;  
+}
+
 
 @implementation	GMDSExtractor
 
 - (void)dealloc
 {
+  if (statusTimer && [statusTimer isValid]) {
+    [statusTimer invalidate];
+  }
+  DESTROY (statusTimer);
+  
   [dnc removeObserver: self];
   [nc removeObserver: self];
   
-  TEST_RELEASE (indexedPaths);
+  DESTROY (indexedPaths);
   freeTree(excludePathsTree);
-  TEST_RELEASE (pathsStatus);
-  TEST_RELEASE (dbpath);
-  TEST_RELEASE (indexedStatusPath);
-  TEST_RELEASE (indexedStatusLock);
-  TEST_RELEASE (extractors);  
-  TEST_RELEASE (textExtractor);
-  TEST_RELEASE (stemmer);  
-  TEST_RELEASE (stopWords);
+  DESTROY (pathsStatus);
+  DESTROY (dbpath);
+  DESTROY (indexedStatusPath);
+  DESTROY (indexedStatusLock);
+  DESTROY (extractors);  
+  DESTROY (textExtractor);
+  DESTROY (stemmer);  
+  DESTROY (stopWords);
   
   [super dealloc];
 }
@@ -181,9 +196,12 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
   
     indexingEnabled = [defaults boolForKey: @"GSMetadataIndexingEnabled"];    
     
-    indexing = NO;
+    extracting = NO;
+    statusTimer = nil;
     
-    [self synchronizePathsStatus: YES];
+    if ([self synchronizePathsStatus: YES] && indexingEnabled) {
+      [self startExtracting];
+    }
   }
   
   return self;
@@ -194,10 +212,12 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
   NSDictionary *info = [notification userInfo];
   NSArray *indexed = [info objectForKey: @"GSMetadataIndexedPaths"];
   NSArray *excluded = [info objectForKey: @"GSMetadataExcludedPaths"];
+  BOOL shouldExtract;
   unsigned i;
 
   [indexedPaths removeAllObjects];
   [indexedPaths addObjectsFromArray: indexed];
+
   // Controllare anche se ne e' stata tolta qualcuna e
   // toglierla dal database?
   // Fermare l'indexing se la path current e' stata tolta?
@@ -209,40 +229,48 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
   }
 
   indexingEnabled = [[info objectForKey: @"GSMetadataIndexingEnabled"] boolValue];
-    
-  [self synchronizePathsStatus: NO];
+  
+  shouldExtract = [self synchronizePathsStatus: NO];
+  
+  if (indexingEnabled) {
+    if (shouldExtract && (extracting == NO)) {
+      [self startExtracting];
+    }
+  
+  } else if (extracting) {
+    [self stopExtracting];
+  }
 }
 
-- (void)synchronizePathsStatus:(BOOL)onstart
+- (BOOL)synchronizePathsStatus:(BOOL)onstart
 {
   CREATE_AUTORELEASE_POOL(arp);
-  
+  BOOL shouldExtract = NO;
+  unsigned i;
+    
   if (onstart) {
     NSDictionary *savedStatus = [self readPathsStatus];
-    unsigned i; 
     
     for (i = 0; i < [indexedPaths count]; i++) {
-      NSString *indexed = [indexedPaths objectAtIndex: i];
-      NSDictionary *savedDict = [savedStatus objectForKey: indexed];
+      NSString *path = [indexedPaths objectAtIndex: i];
+      NSDictionary *savedDict = [savedStatus objectForKey: path];
       NSMutableDictionary *dict;
-  
+        
       if (savedDict != nil) {
         dict = [savedDict mutableCopy];
       } else {
         dict = [NSMutableDictionary new];
-        
         [dict setObject: [NSNumber numberWithBool: NO] forKey: @"indexed"];
-        [dict setObject: [NSNumber numberWithInt: 0] forKey: @"files"];
+        [dict setObject: [NSNumber numberWithUnsignedLong: 0L] forKey: @"files"];
       }
       
-      [pathsStatus setObject: dict forKey: indexed];
+      [pathsStatus setObject: dict forKey: path];
       
       RELEASE (dict);
     }
   
   } else {
     NSArray *paths = [[pathsStatus allKeys] copy];
-    unsigned i;
         
     for (i = 0; i < [paths count]; i++) {
       NSString *path = [paths objectAtIndex: i];  
@@ -255,23 +283,38 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
     RELEASE (paths);
     
     for (i = 0; i < [indexedPaths count]; i++) {
-      NSString *indexed = [indexedPaths objectAtIndex: i];
-      NSMutableDictionary *dict = [pathsStatus objectForKey: indexed];
-    
+      NSString *path = [indexedPaths objectAtIndex: i];
+      NSMutableDictionary *dict = [pathsStatus objectForKey: path];
+      
       if (dict == nil) {
         dict = [NSMutableDictionary dictionary];
     
         [dict setObject: [NSNumber numberWithBool: NO] forKey: @"indexed"];
-        [dict setObject: [NSNumber numberWithInt: 0] forKey: @"files"];
+        [dict setObject: [NSNumber numberWithUnsignedLong: 0L] forKey: @"files"];
         
-        [pathsStatus setObject: dict forKey: indexed];
+        [pathsStatus setObject: dict forKey: path];
       }
     }
   
-    [self writePathsStatus];
+    [self writePathsStatus: nil];
   }
-   
+  
+  {  
+    NSArray *pathsInfo = [pathsStatus allValues]; 
+  
+    for (i = 0; i < [pathsInfo count]; i++) {
+      NSDictionary *dict = [pathsInfo objectAtIndex: i];
+    
+      if ([[dict objectForKey: @"indexed"] boolValue] == NO) {
+        shouldExtract = YES;
+        break; 
+      }
+    }
+  }
+     
   RELEASE (arp);  
+  
+  return shouldExtract;
 }
 
 - (NSDictionary *)readPathsStatus
@@ -318,7 +361,7 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
   return [NSDictionary dictionary];
 }
 
-- (void)writePathsStatus
+- (void)writePathsStatus:(id)sender
 {
   if (indexedStatusPath) {
     if ([indexedStatusLock tryLock] == NO) {
@@ -353,56 +396,351 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
 
     [pathsStatus writeToFile: indexedStatusPath atomically: YES];
     [indexedStatusLock unlock];
+    
+    GWDebugLog(@"paths status updated"); 
   }
 }
 
+- (void)updateStatusOfPath:(NSString *)path
+                 startTime:(NSDate *)stime
+                   endTime:(NSDate *)etime
+                filesCount:(unsigned long)count
+               indexedDone:(BOOL)indexed
+{
+  NSMutableDictionary *dict = [pathsStatus objectForKey: path];
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  if (dict) {
+    if (stime) {
+      [dict setObject: stime forKey: @"start_time"];  
+    } 
+    if (etime) {
+      [dict setObject: etime forKey: @"end_time"];  
+    }     
+    [dict setObject: [NSNumber numberWithUnsignedLong: count] forKey: @"files"];    
+    [dict setObject: [NSNumber numberWithBool: indexed] forKey: @"indexed"];
+  }
+}
 
 - (void)startExtracting
 {
+  unsigned index = 0;
+  NSString *path;
+  NSDictionary *dict;
+    
+  GWDebugLog(@"start extracting");
+  extracting = YES;
+
+  if (statusTimer && [statusTimer isValid]) {
+    [statusTimer invalidate];
+  }
+  DESTROY (statusTimer);
   
-  NSLog(@"startExtracting");
+  statusTimer = [NSTimer scheduledTimerWithTimeInterval: 5.0 
+						                         target: self 
+                                   selector: @selector(writePathsStatus:) 
+																   userInfo: nil 
+                                    repeats: YES];
+  RETAIN (statusTimer);
+    
+  while (1) {  
+    if (index < ([indexedPaths count] -1)) {
+      path = [indexedPaths objectAtIndex: index];
+      RETAIN (path);
+      dict = [pathsStatus objectForKey: path];
+      
+      if ([[dict objectForKey: @"indexed"] boolValue] == NO) {
+        if ([self extractFromPath: path] == NO) {
+          NSLog(@"An error occurred while processing %@", path);
+          RELEASE (path);
+          break;
+        }
+      }
+      
+      RELEASE (path);
+      
+    } else {
+      break;
+    }
+      
+    if (extracting == NO) {
+      break;
+    }
+    
+    index++;
+  }
   
+  if (statusTimer && [statusTimer isValid]) {
+    [statusTimer invalidate];
+  }
+  DESTROY (statusTimer);
+  
+  [self writePathsStatus: nil];
+  extracting = NO;
+
+  GWDebugLog(@"extracting done!");
 }
 
 - (void)stopExtracting
 {
-
-  NSLog(@"stopExtracting");
-
+  extracting = NO;  
 }
 
-- (void)setMetadata:(NSDictionary *)mddict
+#define PERFORM_QUERY(d, q) \
+do { \
+  if (performWriteQuery(d, q) == NO) { \
+    NSLog(@"error at: %@", q); \
+    RELEASE (path); \
+    return NO; \
+  } \
+} while (0)
+
+#define UPDATE_COUNT 100
+
+- (BOOL)extractFromPath:(NSString *)path
+{
+  NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: NO];
+  
+  if (attributes) {
+    NSDirectoryEnumerator *enumerator;
+    id extractor = nil;
+    unsigned long fcount = 0;  
+  
+    [self updateStatusOfPath: path
+                   startTime: [NSDate date]
+                     endTime: nil
+                  filesCount: fcount
+                 indexedDone: NO];
+
+    if ([self insertOrUpdatePath: path withAttributes: attributes] == NO) {
+      return NO;
+    }
+
+    extractor = [self extractorForPath: path withAttributes: attributes];
+
+    if (extractor) {
+      if ([extractor extractMetadataAtPath: path
+                            withAttributes: attributes
+                              usingStemmer: stemmer
+                                 stopWords: stopWords] == NO) {
+        return NO;
+      }
+    }
+    
+    fcount++;
+
+    enumerator = [fm enumeratorAtPath: path];
+
+    while (1) {
+      CREATE_AUTORELEASE_POOL(arp); 
+      NSString *entry = [enumerator nextObject];
+      NSDate *date = [NSDate dateWithTimeIntervalSinceNow: 0.001];
+      BOOL skip = NO;
+
+      [[NSRunLoop currentRunLoop] runUntilDate: date];
+
+      if (entry) {
+        NSString *subpath = [path stringByAppendingPathComponent: entry];
+
+        skip = (isDotFile(subpath) 
+                    || inTreeFirstPartOfPath(subpath, excludePathsTree));
+
+        attributes = [fm fileAttributesAtPath: subpath traverseLink: NO];
+
+        if (attributes) {
+          if (skip == NO) {
+            if ([self insertOrUpdatePath: subpath withAttributes: attributes] == NO) {
+              RELEASE (arp);
+              return NO;
+            }
+
+            extractor = [self extractorForPath: subpath withAttributes: attributes];
+
+            if (extractor) {
+              if ([extractor extractMetadataAtPath: subpath
+                                    withAttributes: attributes
+                                      usingStemmer: stemmer
+                                         stopWords: stopWords] == NO) {
+                RELEASE (arp);
+                return NO;
+              }
+            }
+            
+            fcount++;
+            
+            if ((fcount % UPDATE_COUNT) == 0) {
+              [self updateStatusOfPath: path
+                             startTime: nil
+                               endTime: nil
+                            filesCount: fcount
+                           indexedDone: NO];
+              GWDebugLog(@"updating %i", fcount);             
+            }
+          }
+
+          if (([attributes fileType] == NSFileTypeDirectory) && skip) {
+            GWDebugLog(@"skipping %@", subpath); 
+            [enumerator skipDescendents];
+          }
+        }
+
+      } else {
+        RELEASE (arp);
+        break;
+      }
+
+      if (extracting == NO) {
+        GWDebugLog(@"stopped"); 
+        RELEASE (arp);
+        break;
+      }
+
+      RELEASE (arp); 
+    }
+    
+    [self updateStatusOfPath: path
+                   startTime: nil
+                     endTime: [NSDate date]
+                  filesCount: fcount
+                 indexedDone: extracting];
+        
+    [self writePathsStatus: nil];
+    
+    GWDebugLog(@"done %@", path); 
+  }
+  
+  return YES;
+}
+
+- (BOOL)insertOrUpdatePath:(NSString *)path
+            withAttributes:(NSDictionary *)attributes
+{
+  NSTimeInterval interval = [[attributes fileModificationDate] timeIntervalSinceReferenceDate];
+  NSString *query;
+  int path_id;
+    
+  PERFORM_QUERY (db, @"BEGIN");
+
+  query = [NSString stringWithFormat: 
+                    @"SELECT id FROM paths WHERE path = '%@'",
+                                              stringForQuery(path)];
+  path_id = getIntEntry(db, query);
+    
+  if (path_id == -1) { 
+    query = [NSString stringWithFormat:
+        @"INSERT INTO paths (path, words_count, moddate) VALUES('%@', 0, %f)", 
+                                                 stringForQuery(path), interval];
+    PERFORM_QUERY (db, query);
+  
+    path_id = sqlite3_last_insert_rowid(db);
+  
+  } else {
+    query = [NSString stringWithFormat:
+        @"UPDATE paths SET words_count = 0, moddate = %f WHERE id = %i",
+                                                          interval, path_id];
+    PERFORM_QUERY (db, query);
+  }
+
+  query = [NSString stringWithFormat:
+                      @"DELETE FROM attributes WHERE path_id = %i", path_id];
+  PERFORM_QUERY (db, query);
+  
+  PERFORM_QUERY (db, @"COMMIT");
+
+  return YES;
+}
+
+- (BOOL)setMetadata:(NSDictionary *)mddict
             forPath:(NSString *)path
      withAttributes:(NSDictionary *)attributes
 {
+  NSDictionary *wordsdict;
+  NSDictionary *attrsdict;
+  NSString *query;
+  int path_id;
+  
+//  NSLog(path);
+  
+  PERFORM_QUERY (db, @"BEGIN");
+  
+  query = [NSString stringWithFormat: 
+             @"SELECT id FROM paths WHERE path = '%@'", stringForQuery(path)];
+  path_id = getIntEntry(db, query);
 
-}
+  query = [NSString stringWithFormat:
+                      @"DELETE FROM postings WHERE path_id = %i", path_id];
+  PERFORM_QUERY (db, query);
+  
+  wordsdict = [mddict objectForKey: @"words"];
 
-- (void)setFileSystemMetadataForPath:(NSString *)path
-                      withAttributes:(NSDictionary *)attributes
-{
+  if (wordsdict) {
+    NSCountedSet *wordset = [wordsdict objectForKey: @"wset"];
+    NSEnumerator *enumerator = [wordset objectEnumerator];  
+    unsigned wcount = [[wordsdict objectForKey: @"wcount"] unsignedLongValue];
+    NSString *word;
 
+    query = [NSString stringWithFormat:
+                  @"UPDATE paths SET words_count = %i WHERE id = %i", 
+                                                              wcount, path_id];
+    PERFORM_QUERY (db, query);
+
+    while ((word = [enumerator nextObject])) {
+      unsigned count = [wordset countForObject: word];
+      int word_id;
+
+      query = [NSString stringWithFormat: 
+                      @"SELECT id FROM words WHERE word = '%@'",
+                                                  stringForQuery(word)];
+      word_id = getIntEntry(db, query);
+
+      if (word_id == -1) {
+        query = [NSString stringWithFormat:
+             @"INSERT INTO words (word) VALUES('%@')", stringForQuery(word)];
+        PERFORM_QUERY (db, query);
+
+        word_id = sqlite3_last_insert_rowid(db);
+      }
+            
+      query = [NSString stringWithFormat:
+          @"INSERT INTO postings (word_id, path_id, score) VALUES(%i, %i, %f)", 
+                    word_id, path_id, (1.0 * count / wcount)];
+      PERFORM_QUERY (db, query);
+    }
+  }
+
+  attrsdict = [mddict objectForKey: @"attributes"];
+
+  if (attrsdict) {
+    NSArray *keys = [attrsdict allKeys];
+    unsigned i;
+
+    for (i = 0; i < [keys count]; i++) {
+      NSString *key = [keys objectAtIndex: i];
+      id mdvalue = [attrsdict objectForKey: key];
+      NSString *attributeStr;
+
+      if ([mdvalue isKindOfClass: [NSString class]]) {
+        attributeStr = [NSString stringWithFormat: @"'%@'", mdvalue];
+
+      } else if ([mdvalue isKindOfClass: [NSArray class]]) {
+        attributeStr = [NSString stringWithFormat: @"'%@'", [mdvalue description]];      
+      
+      } else if ([mdvalue isKindOfClass: [NSNumber class]]) {
+        attributeStr = [NSString stringWithFormat: @"%@", [mdvalue description]];      
+      
+      } else if ([mdvalue isKindOfClass: [NSData class]]) {
+        attributeStr = [NSString stringWithFormat: @"%@", blobFromData(mdvalue)];      
+      }
+     
+      query = [NSString stringWithFormat:
+        @"INSERT INTO attributes (path_id, key, attribute) VALUES(%i, '%@', %@)", 
+                                                  path_id, key, attributeStr];
+      PERFORM_QUERY (db, query);
+    }
+  }
+
+  PERFORM_QUERY (db, @"COMMIT");
+
+  return YES;
 }
 
 - (id)extractorForPath:(NSString *)path
@@ -598,6 +936,10 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
 
 - (void)terminate
 {
+  if (statusTimer && [statusTimer isValid]) {
+    [statusTimer invalidate];
+  }
+
   [dnc removeObserver: self];
   [nc removeObserver: self];
   

@@ -41,7 +41,7 @@
 
 @protocol	GMDSExtractorProtocol
 
-- (void)setMetadata:(NSDictionary *)mddict
+- (BOOL)setMetadata:(NSDictionary *)mddict
             forPath:(NSString *)path
      withAttributes:(NSDictionary *)attributes;
 
@@ -60,7 +60,7 @@
                     attributes:(NSDictionary *)attributes
                       testData:(NSData *)testdata;
 
-- (void)extractMetadataAtPath:(NSString *)path
+- (BOOL)extractMetadataAtPath:(NSString *)path
                withAttributes:(NSDictionary *)attributes
                  usingStemmer:(id)stemmer
                     stopWords:(NSSet *)stopwords;

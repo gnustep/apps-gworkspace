@@ -64,7 +64,7 @@
   return (testdata && [testdata length] && [extensions containsObject: ext]);
 }
 
-- (void)extractMetadataAtPath:(NSString *)path
+- (BOOL)extractMetadataAtPath:(NSString *)path
                withAttributes:(NSDictionary *)attributes
                  usingStemmer:(id)stemmer
                     stopWords:(NSSet *)stopwords
@@ -72,7 +72,8 @@
   CREATE_AUTORELEASE_POOL(arp);
   NSMutableDictionary *mddict = [NSMutableDictionary dictionary];
   NSMutableDictionary *imageInfo = [NSMutableDictionary dictionary];
-
+  BOOL success = YES;
+  
   ResetJpgfile();
 
   if (ReadJpegFile([path UTF8String], imageInfo)) {
@@ -80,12 +81,14 @@
     [mddict setObject: imageInfo forKey: @"attributes"];
     DiscardData();
 
-    [extractor setMetadata: mddict
-                   forPath: path
-            withAttributes: attributes];
+    success = [extractor setMetadata: mddict
+                             forPath: path
+                      withAttributes: attributes];
   }
   
   RELEASE (arp);
+  
+  return success;
 }
 
 @end

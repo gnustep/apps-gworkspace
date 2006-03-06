@@ -42,7 +42,7 @@
                     attributes:(NSDictionary *)attributes
                       testData:(NSData *)testdata;
 
-- (void)extractMetadataAtPath:(NSString *)path
+- (BOOL)extractMetadataAtPath:(NSString *)path
                withAttributes:(NSDictionary *)attributes
                  usingStemmer:(id)stemmer
                     stopWords:(NSSet *)stopwords;
@@ -69,7 +69,7 @@
   pcomp *excludePathsTree;  
   NSMutableDictionary *pathsStatus;
   BOOL indexingEnabled;
-  BOOL indexing;
+  BOOL extracting;
   NSString *dbpath;
   sqlite3 *db;
 
@@ -82,7 +82,8 @@
 
   NSString *indexedStatusPath;
   NSDistributedLock *indexedStatusLock;
-
+  NSTimer *statusTimer;
+  
   NSFileManager *fm;
   id ws;
   NSNotificationCenter *nc; 
@@ -91,37 +92,30 @@
 
 - (void)indexedDirectoriesChanged:(NSNotification *)notification;
 
-- (void)synchronizePathsStatus:(BOOL)onstart;
+- (BOOL)synchronizePathsStatus:(BOOL)onstart;
 
 - (NSDictionary *)readPathsStatus;
 
-- (void)writePathsStatus;
+- (void)writePathsStatus:(id)sender;
 
-
-
-
-
-
-
-
-
-
-
+- (void)updateStatusOfPath:(NSString *)path
+                 startTime:(NSDate *)stime
+                   endTime:(NSDate *)etime
+                filesCount:(unsigned long)count
+               indexedDone:(BOOL)indexed;
 
 - (void)startExtracting;
 
 - (void)stopExtracting;
 
-- (void)setMetadata:(NSDictionary *)mddict
+- (BOOL)extractFromPath:(NSString *)path;
+
+- (BOOL)insertOrUpdatePath:(NSString *)path
+            withAttributes:(NSDictionary *)attributes;
+
+- (BOOL)setMetadata:(NSDictionary *)mddict
             forPath:(NSString *)path
      withAttributes:(NSDictionary *)attributes;
-
-- (void)setFileSystemMetadataForPath:(NSString *)path
-                      withAttributes:(NSDictionary *)attributes;
-
-
-
-
 
 - (id)extractorForPath:(NSString *)path
         withAttributes:(NSDictionary *)attributes;
