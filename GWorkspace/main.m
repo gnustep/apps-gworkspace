@@ -181,9 +181,6 @@ void createMenu()
 	addItemToMenu(menu, @"Show Recycler", @"", @"showRecycler:", @"");
 
 	addItemToMenu(menu, @"Check for disks", @"", @"checkRemovableMedia:", @"E");
-
-	// Print
-	addItemToMenu(mainMenu, @"Print...", @"", @"print:", @"p");
 	
 	// Windows
 	menuItem = addItemToMenu(mainMenu, @"Windows", @"", nil, @"");
@@ -201,7 +198,10 @@ void createMenu()
 	// Hide
 	addItemToMenu(mainMenu, @"Hide", @"", @"hide:", @"h");
 	addItemToMenu(mainMenu, @"Hide Others", @"", @"hideOtherApplications:", @"H");
-	addItemToMenu(mainMenu, @"Show All", @"", @"unhideAllApplications:", @"h");
+	addItemToMenu(mainMenu, @"Show All", @"", @"unhideAllApplications:", @"");
+
+	// Print
+	addItemToMenu(mainMenu, @"Print...", @"", @"print:", @"p");
 	
 	// Quit
 	addItemToMenu(mainMenu, @"Quit", @"", @"terminate:", @"Q");

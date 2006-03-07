@@ -45,6 +45,9 @@ static NSImage *branchImage;
 
 - (void)dealloc
 {
+  if (trectTag != -1) {
+    [self removeTrackingRect: trectTag];
+  }
   RELEASE (node);
 	TEST_RELEASE (hostname);
   TEST_RELEASE (selection);
@@ -225,7 +228,8 @@ static NSImage *branchImage;
     } else {
       r.size = icnBounds.size;
     }
-
+    
+    trectTag = -1;
     [self setFrame: NSIntegralRect(r)];
     
     if (acceptDnd) {
@@ -454,7 +458,18 @@ static NSImage *branchImage;
   brImgBounds.origin.x = frameRect.size.width - ARROW_ORIGIN_X;
   brImgBounds.origin.y = myrintf(icnBounds.origin.y + (icnBounds.size.height / 2) - (BRANCH_SIZE / 2));
   brImgBounds = NSIntegralRect(brImgBounds);
+
+  if ([self window]) {
+    if (trectTag != -1) {
+      [self removeTrackingRect: trectTag];
+    }
   
+    trectTag = [self addTrackingRect: icnBounds 
+                               owner: self 
+                            userData: nil
+                        assumeInside: NO]; 
+  }
+    
   [self setNeedsDisplay: YES]; 
 }
 
@@ -601,6 +616,11 @@ static NSImage *branchImage;
         if ([container respondsToSelector: @selector(stopRepNameEditing)]) {
           [container stopRepNameEditing];
         }
+        
+        if ([container respondsToSelector: @selector(setFocusedRep:)]) {
+          [container setFocusedRep: nil];
+        }
+        
         [self startExternalDragOnEvent: theEvent withMouseOffset: offset];
       }
       
@@ -609,6 +629,20 @@ static NSImage *branchImage;
     
   } else {
     [container mouseDown: theEvent];
+  }
+}
+
+- (void)mouseEntered:(NSEvent *)theEvent
+{
+  if ([container respondsToSelector: @selector(setFocusedRep:)]) {
+    [container setFocusedRep: self];
+  }
+}
+
+- (void)mouseExited:(NSEvent *)theEvent
+{
+  if ([container respondsToSelector: @selector(setFocusedRep:)]) {
+    [container setFocusedRep: nil];
   }
 }
 

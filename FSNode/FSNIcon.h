@@ -57,6 +57,8 @@
   NSBezierPath *highlightPath;
   NSRect hlightRect;
   
+  NSTrackingRectTag trectTag;
+  
   FSNTextCell *label;
   NSRect labelRect;
   FSNTextCell *infolabel;

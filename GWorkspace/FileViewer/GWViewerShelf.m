@@ -38,6 +38,7 @@
 
 #define DEF_GRID_WIDTH 90
 #define Y_MARGIN (4)
+#define EDIT_MARGIN (4)
 
 
 @implementation GWViewerShelf
@@ -52,6 +53,7 @@
 		NSZoneFree (NSDefaultMallocZone(), grid);
 	}
   TEST_RELEASE (dragIcon);
+  RELEASE (focusedIconLabel);  
   RELEASE (backColor);
   RELEASE (textColor);
   RELEASE (disabledTextColor);
@@ -139,6 +141,7 @@
     gworkspace = [GWorkspace gworkspace];
 
     dragIcon = nil;
+    focusedIcon = nil;
 
     [self calculateGridSize];    
     [self makeIconsGrid];
@@ -146,6 +149,16 @@
   	[self registerForDraggedTypes: [NSArray arrayWithObject: NSFilenamesPboardType]];
 
 		watchedPaths = [[NSCountedSet alloc] initWithCapacity: 1];
+
+    focusedIconLabel = [NSTextField new];
+		[focusedIconLabel setFont: [NSFont systemFontOfSize: 12]];
+		[focusedIconLabel setBezeled: NO];
+		[focusedIconLabel setAlignment: NSCenterTextAlignment];
+    [focusedIconLabel setEditable: NO];
+    [focusedIconLabel setSelectable: NO];
+    [focusedIconLabel setDrawsBackground: NO];
+	  [focusedIconLabel setTextColor: [NSColor controlTextColor]];
+    [focusedIconLabel setFrame: NSMakeRect(0, 0, 0, 14)];    
   }
   
   return self;
@@ -490,9 +503,61 @@
         [icon setFrame: grid[index]];
       }
     } else {
+      if (focusedIcon == icon) {
+        focusedIcon = nil;
+      }
+
       [icon removeFromSuperview];
     }
   }
+  
+  [self updateFocusedIconLabel];
+}
+
+- (void)updateFocusedIconLabel
+{
+  if ([[self subviews] containsObject: focusedIconLabel]) {
+    NSRect rect = [focusedIconLabel frame];
+
+    [focusedIconLabel removeFromSuperview];
+    [self setNeedsDisplayInRect: rect];
+  }
+
+  if (focusedIcon) {
+    NSRect icnr = [focusedIcon frame];
+    float centerx = icnr.origin.x + (icnr.size.width / 2);
+    NSRect edrect = [self convertRect: [focusedIcon labelRect] fromView: focusedIcon];
+    int margin = [fsnodeRep labelMargin];
+    float bw = [self bounds].size.width - EDIT_MARGIN;
+    NSString *nodeDescr = [focusedIcon shownInfo]; 
+    float edwidth = [[focusedIconLabel font] widthOfString: nodeDescr];
+    
+    edwidth += margin;
+
+    if ((centerx + (edwidth / 2)) >= bw) {
+      centerx -= (centerx + (edwidth / 2) - bw);
+    } else if ((centerx - (edwidth / 2)) < margin) {
+      centerx += fabs(centerx - (edwidth / 2)) + margin;
+    }    
+    
+    edrect.origin.x = centerx - (edwidth / 2);
+    edrect.size.width = edwidth;
+    edrect = NSIntegralRect(edrect);
+
+    [focusedIconLabel setFrame: edrect];
+    [focusedIconLabel setStringValue: nodeDescr];
+
+    if ([focusedIcon isLocked] == NO) {
+      [focusedIconLabel setTextColor: [NSColor controlTextColor]];    
+    } else {
+      [focusedIconLabel setTextColor: [NSColor disabledControlTextColor]];    
+    }
+
+    [focusedIcon setNameEdited: YES];
+    
+    [self addSubview: focusedIconLabel];  
+    [self setNeedsDisplayInRect: edrect];
+  }  
 }
 
 - (void)setWatcherForPath:(NSString *)path
@@ -657,6 +722,11 @@
 
   if ([[self subviews] containsObject: arep]) {
     [arep removeFromSuperviewWithoutNeedingDisplay];
+  }
+  
+  if (focusedIcon == arep) {
+    focusedIcon = nil;
+    [self updateFocusedIconLabel];
   }
   
   [icons removeObject: arep];
@@ -945,6 +1015,18 @@
 - (void)restoreLastSelection
 {
   [self unselectOtherReps: nil];
+}
+
+- (void)setFocusedRep:(id)arep
+{
+  if (arep == nil) {
+    if (focusedIcon) {
+      [focusedIcon setNameEdited: NO];
+    }
+  } 
+
+  focusedIcon = arep;  
+  [self updateFocusedIconLabel];
 }
 
 - (NSColor *)backgroundColor

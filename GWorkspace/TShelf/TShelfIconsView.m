@@ -24,6 +24,7 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
+#include <math.h>
 #include "FSNodeRep.h"
 #include "FSNFunctions.h"
 #include "TShelfIconsView.h"
@@ -32,7 +33,8 @@
 #include "GWorkspace.h"
 #include "GNUstep.h"
 
-#define CELLS_WIDTH 80
+#define CELLS_WIDTH (80)
+#define EDIT_MARGIN (4)
 
 @interface TShelfIcon (TShelfIconsViewSorting)
 
@@ -88,6 +90,7 @@
 	RELEASE (icons);  
 	RELEASE (watchedPaths);
 	TEST_RELEASE (dragImage);
+  RELEASE (focusedIconLabel);
   [super dealloc];
 }
 
@@ -113,7 +116,19 @@
     cellsWidth = CELLS_WIDTH;
     		
 		watchedPaths = [[NSCountedSet alloc] initWithCapacity: 1];
-		
+		    
+    focusedIconLabel = [NSTextField new];
+		[focusedIconLabel setFont: [NSFont systemFontOfSize: 12]];
+		[focusedIconLabel setBezeled: NO];
+		[focusedIconLabel setAlignment: NSCenterTextAlignment];
+    [focusedIconLabel setEditable: NO];
+    [focusedIconLabel setSelectable: NO];
+    [focusedIconLabel setDrawsBackground: NO];
+	  [focusedIconLabel setTextColor: [NSColor controlTextColor]];
+    [focusedIconLabel setFrame: NSMakeRect(0, 0, 0, 14)];
+    
+    focusedIcon = nil;
+    
 		icons = [[NSMutableArray alloc] initWithCapacity: 1];
         
     iconsType = itype;
@@ -294,6 +309,11 @@
       }
     }
     
+    if (focusedIcon == anIcon) {
+      focusedIcon = nil;
+      [self updateFocusedIconLabel];
+    }
+    
     if ([[self subviews] containsObject: anIcon]) {
       [anIcon removeFromSuperview];
     }
@@ -338,7 +358,7 @@
 	iconwidth = [icon frame].size.width;
 	labwidth = [label frame].size.width;
 
-	if(iconwidth > labwidth) {
+	if (iconwidth > labwidth) {
 		labxpos = [icon frame].origin.x + ((iconwidth - labwidth) / 2);
 	} else {
 		labxpos = [icon frame].origin.x - ((labwidth - iconwidth) / 2);
@@ -371,6 +391,59 @@
     if (icon != anIcon) {  
       [icon unselect];
     }
+  }  
+}
+
+- (void)setFocusedIcon:(id)anIcon
+{
+  if (anIcon == nil) {
+    if (focusedIcon) {
+      [self addSubview: [focusedIcon myLabel]];
+      [self setLabelRectOfIcon: focusedIcon];
+    }
+  } 
+
+  focusedIcon = anIcon;  
+  [self updateFocusedIconLabel];
+}
+
+- (void)updateFocusedIconLabel
+{
+  if ([[self subviews] containsObject: focusedIconLabel]) {
+    NSRect rect = [focusedIconLabel frame];
+
+    [focusedIconLabel removeFromSuperview];
+    [self setNeedsDisplayInRect: rect];
+  }
+  
+  if (focusedIcon) {
+    NSRect iconrect = [focusedIcon frame];
+    float centerx = iconrect.origin.x + (iconrect.size.width / 2);  
+    NSTextField *label = [focusedIcon myLabel];
+    NSRect labelrect = [label frame];
+    NSString *name = [focusedIcon shownName];  
+    float fwidth = [[label font] widthOfString: name];
+    float boundswidth = [self bounds].size.width - EDIT_MARGIN;
+    int margin = 8;
+      
+    fwidth += margin;  
+
+    if ((centerx + (fwidth / 2)) >= boundswidth) {
+      centerx -= (centerx + (fwidth / 2) - boundswidth);
+    } else if ((centerx - (fwidth / 2)) < margin) {
+      centerx += fabs(centerx - (fwidth / 2)) + margin;
+    }    
+
+    labelrect.origin.x = centerx - (fwidth / 2);
+    labelrect.size.width = fwidth;
+    labelrect = NSIntegralRect(labelrect);
+
+    [label removeFromSuperview];
+
+    [focusedIconLabel setFrame: labelrect];
+    [focusedIconLabel setStringValue: name];
+    [self addSubview: focusedIconLabel];  
+    [self setNeedsDisplayInRect: labelrect];
   }  
 }
 

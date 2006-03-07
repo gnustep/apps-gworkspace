@@ -56,6 +56,7 @@ typedef gridpoint *(*GridPointIMP)(id, SEL, NSPoint);
 @class NSMutableArray;
 @class NSNotification;
 @class NSImage;
+@class NSTextField;
 @class NSMenu;
 @class TShelfIcon;
 @class TShelfPBIcon;
@@ -71,11 +72,16 @@ typedef gridpoint *(*GridPointIMP)(id, SEL, NSPoint);
   int cellsWidth;
 	gridpoint *gpoints;
 	int pcount;
+  
+  id focusedIcon;
+  NSTextField *focusedIconLabel;
+  
 	BOOL isDragTarget;
 	NSImage *dragImage;
 	NSPoint dragPoint;
 	NSRect dragRect;	
 	SEL makePosSel;
+  
 	IMP makePos;
 	SEL gridPointSel;
 	GridPointIMP gridPoint;
@@ -104,6 +110,10 @@ typedef gridpoint *(*GridPointIMP)(id, SEL, NSPoint);
 - (BOOL)hasSelectedIcon;
 
 - (void)unselectOtherIcons:(id)anIcon;
+
+- (void)setFocusedIcon:(id)anIcon;
+
+- (void)updateFocusedIconLabel;
 
 - (void)sortIcons;
 

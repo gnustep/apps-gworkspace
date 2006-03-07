@@ -41,6 +41,9 @@
 
 - (void)dealloc
 {
+  if (trectTag != -1) {
+    [self removeTrackingRect: trectTag];
+  }
   RELEASE (paths);
   RELEASE (name);
 	TEST_RELEASE (hostname);
@@ -142,6 +145,7 @@
     dragdelay = 0;
     isDragTarget = NO;
     onSelf = NO;
+    trectTag = -1;
   }
   
   return self;
@@ -301,6 +305,11 @@
   return namelabel;
 }
 
+- (NSString *)shownName
+{
+  return (isRootIcon ? hostname : name);
+}
+
 - (NSArray *)paths
 {
   return paths;
@@ -390,9 +399,35 @@
     }
 
     if (startdnd) {  
+      [tview setFocusedIcon: nil];
       [self startExternalDragOnEvent: theEvent withMouseOffset: offset];    
     }    
   }           
+}
+
+- (void)mouseEntered:(NSEvent *)theEvent
+{
+  [tview setFocusedIcon: self];
+}
+
+- (void)mouseExited:(NSEvent *)theEvent
+{
+  [tview setFocusedIcon: nil];
+}
+ 
+- (void)setFrame:(NSRect)rect
+{	
+  NSSize s = [icon size];
+  NSPoint ip = NSMakePoint((rect.size.width - s.width) / 2, (rect.size.height - s.height) / 2);	
+  NSRect ir = NSMakeRect(ip.x, ip.y, s.width, s.height);
+  
+  [super setFrame: rect];	
+	
+  if (trectTag != -1) {
+    [self removeTrackingRect: trectTag];
+  }
+  
+  trectTag = [self addTrackingRect: ir owner: self userData: nil assumeInside: NO]; 
 }
 
 - (NSMenu *)menuForEvent:(NSEvent *)theEvent

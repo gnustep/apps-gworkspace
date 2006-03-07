@@ -61,7 +61,8 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 	NSPoint position;
 	int gridindex;
   int labelWidth;
-
+  NSTrackingRectTag trectTag;
+  
   TShelfIconsView *tview;
   
   FSNodeRep *fsnodeRep;
@@ -106,6 +107,8 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 - (int)gridindex;
 
 - (NSTextField *)myLabel;
+
+- (NSString *)shownName;
 
 - (NSArray *)paths;
 

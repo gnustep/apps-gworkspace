@@ -29,6 +29,7 @@
 #include <AppKit/NSView.h>
 #include "FSNodeRep.h"
 
+@class NSTextField;
 @class GWorkspace;
 
 @interface GWViewerShelf : NSView
@@ -48,6 +49,9 @@
   int gridcount;
   int colcount;
   int rowcount;
+  
+  id focusedIcon;
+  NSTextField *focusedIconLabel;  
   
   NSCountedSet *watchedPaths;
   
@@ -106,6 +110,8 @@
 
 - (void)tile;
 
+- (void)updateFocusedIconLabel;
+
 - (void)setWatcherForPath:(NSString *)path;
 
 - (void)unsetWatcherForPath:(NSString *)path;
@@ -137,6 +143,8 @@
 - (void)checkLockedReps;
 - (FSNSelectionMask)selectionMask;
 - (void)restoreLastSelection;
+
+- (void)setFocusedRep:(id)arep;
 
 - (NSColor *)backgroundColor;
 - (NSColor *)textColor;
