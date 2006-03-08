@@ -123,7 +123,7 @@
 		[focusedIconLabel setAlignment: NSCenterTextAlignment];
     [focusedIconLabel setEditable: NO];
     [focusedIconLabel setSelectable: NO];
-    [focusedIconLabel setDrawsBackground: NO];
+    [focusedIconLabel setBackgroundColor: [NSColor windowBackgroundColor]];
 	  [focusedIconLabel setTextColor: [NSColor controlTextColor]];
     [focusedIconLabel setFrame: NSMakeRect(0, 0, 0, 14)];
     
