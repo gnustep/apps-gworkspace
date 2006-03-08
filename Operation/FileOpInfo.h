@@ -275,12 +275,12 @@
 
 @end
 
-
+/*
 @interface NSFileManager (FileOp)
 
 
 @end
-
+*/
 
 @interface OpProgressView : NSView 
 {

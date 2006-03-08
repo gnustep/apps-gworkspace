@@ -1270,7 +1270,7 @@ filename = [fileinfo objectForKey: @"name"];
 
 @end
 
-
+/*
 @implementation NSFileManager (FileOp)
 
 - (BOOL)copyPath:(NSString *)source
@@ -1289,8 +1289,8 @@ filename = [fileinfo objectForKey: @"name"];
   }
   fileType = [attrs fileType];
   if ([fileType isEqualToString: NSFileTypeDirectory] == YES) {
-    /* If destination directory is a descendant of source directory copying
-	  isn't possible. */
+    // If destination directory is a descendant of source directory copying
+	  // isn't possible. 
     if ([[destination stringByAppendingString: @"/"]
 	                  hasPrefix: [source stringByAppendingString: @"/"]]) {
 	    return NO;
@@ -1446,7 +1446,7 @@ filename = [fileinfo objectForKey: @"name"];
 }
 
 @end
-
+*/
 
 @implementation OpProgressView
 
