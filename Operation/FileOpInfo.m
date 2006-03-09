@@ -891,12 +891,26 @@ filename = [fileinfo objectForKey: @"name"];
 	  GET_FILENAME;    
 
     if ((samename == NO) || (samename && [self removeExisting: fileinfo])) {
-	    if ([fm movePath: [source stringByAppendingPathComponent: filename]
-				        toPath: [destination stringByAppendingPathComponent: filename]
-	 		         handler: self]) {          
+      NSString *src = [source stringByAppendingPathComponent: filename];
+      NSString *dst = [destination stringByAppendingPathComponent: filename];
+      
+	    if ([fm movePath: src toPath: dst handler: self]) {    
         [procfiles addObject: filename];	
+      
+      } else {
+        /* check for broken symlink */
+        NSDictionary *attributes = [fm fileAttributesAtPath: src traverseLink: NO];
+        
+        if (attributes && ([attributes fileType] == NSFileTypeSymbolicLink)
+                                        && ([fm fileExistsAtPath: src] == NO)) {
+          if ([fm copyPath: src toPath: dst handler: self]
+                          && [fm removeFileAtPath: src handler: self]) {
+        	  [procfiles addObject: filename];
+          }
+        }
       }
     }
+    
  	  [files removeObject: fileinfo];	
     RELEASE (fileinfo);
   }
@@ -1029,10 +1043,23 @@ filename = [fileinfo objectForKey: @"name"];
 - (void)doRename
 {
 	GET_FILENAME;    
-
+  
 	if ([fm movePath: source toPath: destination handler: self]) {         
     [procfiles addObject: filename];
+  
+  } else {
+    /* check for broken symlink */
+    NSDictionary *attributes = [fm fileAttributesAtPath: source traverseLink: NO];
+  
+    if (attributes && ([attributes fileType] == NSFileTypeSymbolicLink)
+                                    && ([fm fileExistsAtPath: source] == NO)) {
+      if ([fm copyPath: source toPath: destination handler: self]
+                      && [fm removeFileAtPath: source handler: self]) {
+        [procfiles addObject: filename];
+      }
+    }
   }
+  
 	[files removeObject: fileinfo];
   RELEASE (fileinfo);	
 
@@ -1071,6 +1098,7 @@ filename = [fileinfo objectForKey: @"name"];
 - (void)doTrash
 {
   NSString *copystr = NSLocalizedString(@"_copy", @"");
+  NSString *srcpath;
 	NSString *destpath;
 	NSString *newname;
   NSString *ntmp;
@@ -1080,6 +1108,7 @@ filename = [fileinfo objectForKey: @"name"];
 	  GET_FILENAME;  
 
     newname = [NSString stringWithString: filename];
+    srcpath = [source stringByAppendingPathComponent: filename];
     destpath = [destination stringByAppendingPathComponent: newname];
     
     if ([fm fileExistsAtPath: destpath]) {
@@ -1113,11 +1142,22 @@ filename = [fileinfo objectForKey: @"name"];
 	    }
     }
 
-	  if ([fm movePath: [source stringByAppendingPathComponent: filename]
-				      toPath: destpath 
-			       handler: self]) {
+	  if ([fm movePath: srcpath toPath: destpath handler: self]) {
       [procfiles addObject: newname];	
+      
+    } else {
+      /* check for broken symlink */
+      NSDictionary *attributes = [fm fileAttributesAtPath: srcpath traverseLink: NO];
+    
+      if (attributes && ([attributes fileType] == NSFileTypeSymbolicLink)
+                                  && ([fm fileExistsAtPath: srcpath] == NO)) {
+        if ([fm copyPath: srcpath toPath: destpath handler: self]
+                          && [fm removeFileAtPath: srcpath handler: self]) {
+          [procfiles addObject: newname];
+        }
+      }
     }
+    
 	  [files removeObject: fileinfo];	 
     RELEASE (fileinfo);  
   }

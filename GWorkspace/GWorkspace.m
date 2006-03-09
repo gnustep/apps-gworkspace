@@ -904,41 +904,45 @@ static GWorkspace *gworkspace = nil;
 
 - (void)openSelectedPaths:(NSArray *)paths newViewer:(BOOL)newv
 {
-  NSString *apath;
-  NSString *defApp, *type;
   int i;
   
   [self setSelectedPaths: paths];      
       
   for (i = 0; i < [paths count]; i++) {
-    apath = [paths objectAtIndex: i];
+    NSString *apath = [paths objectAtIndex: i];
     
-    NS_DURING
-      {
-    [ws getInfoForFile: apath application: &defApp type: &type];     
-    
-    if ((type == NSDirectoryFileType) || (type == NSFilesystemFileType)) {
-      if (newv) {    
-        [self newViewerAtPath: apath];    
+    if ([fm fileExistsAtPath: apath]) {
+      NSString *defApp = nil, *type = nil;
+
+      NS_DURING
+        {
+      [ws getInfoForFile: apath application: &defApp type: &type];     
+
+      if (type != nil) {
+        if ((type == NSDirectoryFileType) || (type == NSFilesystemFileType)) {
+          if (newv) {    
+            [self newViewerAtPath: apath];    
+          }
+        } else if ((type == NSPlainFileType) 
+                            || ([type isEqual: NSShellCommandFileType])) {
+          [self openFile: apath];
+
+        } else if (type == NSApplicationFileType) {
+          [ws launchApplication: apath];
+        }
       }
-    } else if ((type == NSPlainFileType) 
-                        || ([type isEqual: NSShellCommandFileType])) {
-      [self openFile: apath];
-      
-    } else if (type == NSApplicationFileType) {
-      [ws launchApplication: apath];
+        }
+      NS_HANDLER
+        {
+          NSRunAlertPanel(NSLocalizedString(@"error", @""), 
+              [NSString stringWithFormat: @"%@ %@!", 
+               NSLocalizedString(@"Can't open ", @""), [apath lastPathComponent]],
+                                            NSLocalizedString(@"OK", @""), 
+                                            nil, 
+                                            nil);                                     
+        }
+      NS_ENDHANDLER
     }
-      }
-    NS_HANDLER
-      {
-        NSRunAlertPanel(NSLocalizedString(@"error", @""), 
-            [NSString stringWithFormat: @"%@ %@!", 
-             NSLocalizedString(@"Can't open ", @""), [apath lastPathComponent]],
-                                          NSLocalizedString(@"OK", @""), 
-                                          nil, 
-                                          nil);                                     
-      }
-    NS_ENDHANDLER
   }
 }
 
@@ -964,8 +968,8 @@ static GWorkspace *gworkspace = nil;
 
 - (BOOL)openFile:(NSString *)fullPath
 {
-	NSString *appName;
-  NSString *type;
+	NSString *appName = nil;
+  NSString *type = nil;
   BOOL success;
   
   [ws getInfoForFile: fullPath application: &appName type: &type];

@@ -651,34 +651,43 @@ static GWDesktopManager *desktopManager = nil;
     
   for (i = 0; i < [selreps count]; i++) {
     FSNode *node = [[selreps objectAtIndex: i] node];
-    NSString *path = [node path];
         
-    NS_DURING
-      {
-    if ([node isDirectory]) {
-      if ([node isPackage]) {    
-        if ([node isApplication] == NO) {
-          [gworkspace openFile: path];
+    if ([node hasValidPath]) {           
+      NS_DURING
+        {
+      if ([node isDirectory]) {
+        if ([node isPackage]) {    
+          if ([node isApplication] == NO) {
+            [gworkspace openFile: [node path]];
+          } else {
+            [ws launchApplication: [node path]];
+          }
         } else {
-          [ws launchApplication: path];
+          [gworkspace newViewerAtPath: [node path]];
+        } 
+      } else if ([node isPlain]) {        
+        [gworkspace openFile: [node path]];
+      }
         }
-      } else {
-        [gworkspace newViewerAtPath: [node path]];
-      } 
-    } else if ([node isPlain]) {        
-      [gworkspace openFile: path];
+      NS_HANDLER
+        {
+          NSRunAlertPanel(NSLocalizedString(@"error", @""), 
+              [NSString stringWithFormat: @"%@ %@!", 
+                        NSLocalizedString(@"Can't open ", @""), [node name]],
+                                            NSLocalizedString(@"OK", @""), 
+                                            nil, 
+                                            nil);                                     
+        }
+      NS_ENDHANDLER
+      
+    } else {
+      NSRunAlertPanel(NSLocalizedString(@"error", @""), 
+          [NSString stringWithFormat: @"%@ %@!", 
+                    NSLocalizedString(@"Can't open ", @""), [node name]],
+                                        NSLocalizedString(@"OK", @""), 
+                                        nil, 
+                                        nil);                                     
     }
-      }
-    NS_HANDLER
-      {
-        NSRunAlertPanel(NSLocalizedString(@"error", @""), 
-            [NSString stringWithFormat: @"%@ %@!", 
-                      NSLocalizedString(@"Can't open ", @""), [node name]],
-                                          NSLocalizedString(@"OK", @""), 
-                                          nil, 
-                                          nil);                                     
-      }
-    NS_ENDHANDLER
   }
 }
 

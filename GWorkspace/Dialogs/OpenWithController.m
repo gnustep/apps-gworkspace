@@ -125,12 +125,13 @@ static NSString *nibName = @"OpenWith";
         
         for (i = 0; i < [selpaths count]; i++) {
           NSString *spath = [selpaths objectAtIndex: i];
-          NSString *defApp, *fileType;
+          NSString *defApp = nil, *fileType = nil;
           
           [ws getInfoForFile: spath application: &defApp type: &fileType];
           
-          if (([fileType isEqual: NSPlainFileType] == NO)
-                    && ([fileType isEqual: NSShellCommandFileType] == NO)) {
+          if ((fileType == nil) 
+              || (([fileType isEqual: NSPlainFileType] == NO)
+                    && ([fileType isEqual: NSShellCommandFileType] == NO))) {
             NSRunAlertPanel(NULL, NSLocalizedString(@"Can't edit a directory!", @""),
                                     NSLocalizedString(@"OK", @""), NULL, NULL);
             RELEASE (selpaths);

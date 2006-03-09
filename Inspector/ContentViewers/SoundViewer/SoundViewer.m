@@ -161,7 +161,7 @@
 
 - (void)editFile:(id)sender
 {
-	NSString *appName, *type;
+	NSString *appName = nil, *type = nil;
 
   [ws getInfoForFile: soundPath application: &appName type: &type];
 

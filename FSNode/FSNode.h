@@ -207,6 +207,8 @@
 
 - (BOOL)isValid;
 
+- (BOOL)hasValidPath;
+
 - (BOOL)isReserved;
 
 - (BOOL)willBeValidAfterFileOperation:(NSDictionary *)opinfo;

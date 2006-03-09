@@ -2125,83 +2125,102 @@
 - (void)controlTextDidEndEditing:(NSNotification *)aNotification
 {
   FSNode *ednode = [nameEditor node];
+  BOOL writable = [ednode isWritable];
 
 #define CLEAREDITING \
   [self stopCellEditing]; \
   return 
     
-  if ([ednode isWritable] == NO) {
-    NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
-          [NSString stringWithFormat: @"%@\"%@\"!\n", 
-              NSLocalizedString(@"You do not have write permission for ", @""), 
-                    [ednode name]], NSLocalizedString(@"Continue", @""), nil, nil);   
-    CLEAREDITING;
-    
-  } else if ([ednode isParentWritable] == NO) {
-    NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
-          [NSString stringWithFormat: @"%@\"%@\"!\n", 
-              NSLocalizedString(@"You do not have write permission for ", @""), 
-                  [ednode parentName]], NSLocalizedString(@"Continue", @""), nil, nil);   
-    CLEAREDITING;
-
-  } else if ([ednode isSubnodeOfPath: [desktopApp trashPath]]) {
-    NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
-            NSLocalizedString(@"You can't rename an object that is in the Recycler", @""), 
-            NSLocalizedString(@"Continue", @""), nil, nil);   
-    CLEAREDITING;
-    
-  } else {
-    NSString *newname = [nameEditor stringValue];
-    NSString *newpath = [[ednode parentPath] stringByAppendingPathComponent: newname];
-    NSString *extension = [newpath pathExtension];
-    NSCharacterSet *notAllowSet = [NSCharacterSet characterSetWithCharactersInString: @"/\\*:?\33"];
-    NSRange range = [newname rangeOfCharacterFromSet: notAllowSet];
-    NSArray *dirContents = [ednode subNodeNamesOfParent];
-    NSMutableDictionary *opinfo = [NSMutableDictionary dictionary];
-    
-    if (range.length > 0) {
-      NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
-                NSLocalizedString(@"Invalid char in name", @""), 
-                          NSLocalizedString(@"Continue", @""), nil, nil);   
-      CLEAREDITING;
-    }	
-
-    if (([extension length] 
-            && ([ednode isDirectory] && ([ednode isPackage] == NO)))) {
-      NSString *msg = NSLocalizedString(@"Are you sure you want to add the extension ", @"");
+  if (writable == NO) {
+    /* check for broken symlink */     
+    if ([ednode isLink] && ([ednode hasValidPath] == NO)) { 
+      BOOL iamRoot;
       
-      msg = [msg stringByAppendingFormat: @"\"%@\" ", extension];
-      msg = [msg stringByAppendingString: NSLocalizedString(@"to the end of the name?", @"")];
-      msg = [msg stringByAppendingString: NSLocalizedString(@"\nif you make this change, your folder may appear as a single file.", @"")];
+      #ifdef __WIN32__
+		    iamRoot = YES;
+	    #else
+		    iamRoot = (geteuid() == 0);
+	    #endif
       
-      if (NSRunAlertPanel(@"", msg, 
-                          NSLocalizedString(@"Cancel", @""), 
-				                  NSLocalizedString(@"OK", @""), 
-                          nil) == NSAlertDefaultReturn) {
-        CLEAREDITING;
-      }
+      writable = (iamRoot || [[ednode owner] isEqual: NSUserName()]);          
     }
+    
+    if (writable == NO) {
+      NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
+            [NSString stringWithFormat: @"%@\"%@\"!\n", 
+                NSLocalizedString(@"You do not have write permission for ", @""), 
+                      [ednode name]], NSLocalizedString(@"Continue", @""), nil, nil);   
+      CLEAREDITING;
+    }
+  } 
+  
+  if (writable) {  
+    if ([ednode isParentWritable] == NO) {
+      NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
+            [NSString stringWithFormat: @"%@\"%@\"!\n", 
+                NSLocalizedString(@"You do not have write permission for ", @""), 
+                    [ednode parentName]], NSLocalizedString(@"Continue", @""), nil, nil);   
+      CLEAREDITING;
 
-    if ([dirContents containsObject: newname]) {
-      if ([newname isEqual: [ednode name]]) {
-        CLEAREDITING;
-      } else {
+    } else if ([ednode isSubnodeOfPath: [desktopApp trashPath]]) {
+      NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
+              NSLocalizedString(@"You can't rename an object that is in the Recycler", @""), 
+              NSLocalizedString(@"Continue", @""), nil, nil);   
+      CLEAREDITING;
+
+    } else {
+      NSString *newname = [nameEditor stringValue];
+      NSString *newpath = [[ednode parentPath] stringByAppendingPathComponent: newname];
+      NSString *extension = [newpath pathExtension];
+      NSCharacterSet *notAllowSet = [NSCharacterSet characterSetWithCharactersInString: @"/\\*:?\33"];
+      NSRange range = [newname rangeOfCharacterFromSet: notAllowSet];
+      NSArray *dirContents = [ednode subNodeNamesOfParent];
+      NSMutableDictionary *opinfo = [NSMutableDictionary dictionary];
+
+      if (range.length > 0) {
         NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
-          [NSString stringWithFormat: @"%@\"%@\" %@ ", 
-              NSLocalizedString(@"The name ", @""), 
-              newname, NSLocalizedString(@" is already in use!", @"")], 
+                  NSLocalizedString(@"Invalid char in name", @""), 
                             NSLocalizedString(@"Continue", @""), nil, nil);   
         CLEAREDITING;
+      }	
+
+      if (([extension length] 
+              && ([ednode isDirectory] && ([ednode isPackage] == NO)))) {
+        NSString *msg = NSLocalizedString(@"Are you sure you want to add the extension ", @"");
+
+        msg = [msg stringByAppendingFormat: @"\"%@\" ", extension];
+        msg = [msg stringByAppendingString: NSLocalizedString(@"to the end of the name?", @"")];
+        msg = [msg stringByAppendingString: NSLocalizedString(@"\nif you make this change, your folder may appear as a single file.", @"")];
+
+        if (NSRunAlertPanel(@"", msg, 
+                            NSLocalizedString(@"Cancel", @""), 
+				                    NSLocalizedString(@"OK", @""), 
+                            nil) == NSAlertDefaultReturn) {
+          CLEAREDITING;
+        }
       }
+
+      if ([dirContents containsObject: newname]) {
+        if ([newname isEqual: [ednode name]]) {
+          CLEAREDITING;
+        } else {
+          NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
+            [NSString stringWithFormat: @"%@\"%@\" %@ ", 
+                NSLocalizedString(@"The name ", @""), 
+                newname, NSLocalizedString(@" is already in use!", @"")], 
+                              NSLocalizedString(@"Continue", @""), nil, nil);   
+          CLEAREDITING;
+        }
+      }
+
+	    [opinfo setObject: @"GWorkspaceRenameOperation" forKey: @"operation"];	
+      [opinfo setObject: [ednode path] forKey: @"source"];	
+      [opinfo setObject: newpath forKey: @"destination"];	
+      [opinfo setObject: [NSArray arrayWithObject: @""] forKey: @"files"];	
+
+      [self stopCellEditing];
+      [desktopApp performFileOperation: opinfo];
     }
-    
-	  [opinfo setObject: @"GWorkspaceRenameOperation" forKey: @"operation"];	
-    [opinfo setObject: [ednode path] forKey: @"source"];	
-    [opinfo setObject: newpath forKey: @"destination"];	
-    [opinfo setObject: [NSArray arrayWithObject: @""] forKey: @"files"];	
-    
-    [self stopCellEditing];
-    [desktopApp performFileOperation: opinfo];
   }
 }
 

@@ -191,7 +191,7 @@ static NSString *nibName = @"FModuleKind";
     }
   } else if (fileType == NSFileTypeDirectory) {
     CREATE_AUTORELEASE_POOL(arp);
-	  NSString *defApp, *type;
+	  NSString *defApp = nil, *type = nil;
 		
 	  [ws getInfoForFile: path application: &defApp type: &type];  
     

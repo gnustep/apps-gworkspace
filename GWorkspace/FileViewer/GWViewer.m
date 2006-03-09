@@ -1031,7 +1031,7 @@
           } else {
             [dirs addObject: node];
           }
-        } else {
+        } else if ([node isPlain]) {
           [gworkspace openFile: [node path]];
         }      
           }

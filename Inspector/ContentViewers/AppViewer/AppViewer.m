@@ -252,17 +252,13 @@
 
 - (BOOL)canDisplayPath:(NSString *)path
 {
-	NSString *defApp, *fileType;
+	NSString *defApp = nil, *fileType = nil;
 		
 	[ws getInfoForFile: path 
          application: &defApp 
                 type: &fileType];
 	
-	if ([fileType isEqual: NSApplicationFileType]) {
-		return YES;
-  }
-
-	return NO;
+  return (fileType && [fileType isEqual: NSApplicationFileType]);
 }
 
 - (BOOL)canDisplayDataOfType:(NSString *)type

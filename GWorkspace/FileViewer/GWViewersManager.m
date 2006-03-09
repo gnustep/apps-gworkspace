@@ -590,38 +590,48 @@ static GWViewersManager *vwrsmanager = nil;
     
   for (i = 0; i < [selreps count]; i++) {
     FSNode *node = [[selreps objectAtIndex: i] node];
-                
-    NS_DURING
-      {
-    if ([node isDirectory]) {
-      if ([node isPackage]) {    
-        if ([node isApplication] == NO) {
-          [gworkspace openFile: [node path]];
+    
+    if ([node hasValidPath]) {            
+      NS_DURING
+        {
+      if ([node isDirectory]) {
+        if ([node isPackage]) {    
+          if ([node isApplication] == NO) {
+            [gworkspace openFile: [node path]];
+          } else {
+            [[NSWorkspace sharedWorkspace] launchApplication: [node path]];
+          }
         } else {
-          [[NSWorkspace sharedWorkspace] launchApplication: [node path]];
+          [self newViewerOfType: [viewer vtype] 
+                       showType: nil
+                        forNode: node 
+                  showSelection: NO
+                 closeOldViewer: nil
+                       forceNew: NO];
+        } 
+      } else if ([node isPlain]) {        
+        [gworkspace openFile: [node path]];
+      }
         }
-      } else {
-        [self newViewerOfType: [viewer vtype] 
-                     showType: nil
-                      forNode: node 
-                showSelection: NO
-               closeOldViewer: nil
-                     forceNew: NO];
-      } 
-    } else if ([node isPlain]) {        
-      [gworkspace openFile: [node path]];
+      NS_HANDLER
+        {
+          NSRunAlertPanel(NSLocalizedString(@"error", @""), 
+              [NSString stringWithFormat: @"%@ %@!", 
+                        NSLocalizedString(@"Can't open ", @""), [node name]],
+                                            NSLocalizedString(@"OK", @""), 
+                                            nil, 
+                                            nil);                                     
+        }
+      NS_ENDHANDLER
+    
+    } else {
+      NSRunAlertPanel(NSLocalizedString(@"error", @""), 
+          [NSString stringWithFormat: @"%@ %@!", 
+                    NSLocalizedString(@"Can't open ", @""), [node name]],
+                                        NSLocalizedString(@"OK", @""), 
+                                        nil, 
+                                        nil);                                     
     }
-      }
-    NS_HANDLER
-      {
-        NSRunAlertPanel(NSLocalizedString(@"error", @""), 
-            [NSString stringWithFormat: @"%@ %@!", 
-                      NSLocalizedString(@"Can't open ", @""), [node name]],
-                                          NSLocalizedString(@"OK", @""), 
-                                          nil, 
-                                          nil);                                     
-      }
-    NS_ENDHANDLER
   }
 
   if (close) {

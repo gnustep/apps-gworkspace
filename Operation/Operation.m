@@ -380,13 +380,21 @@
             forOperation:(NSString *)operation
 {
   NSString *chpath = path;
+  BOOL valid;
   
   if (operation && ([operation isEqual: @"GWorkspaceCreateDirOperation"]
                   || [operation isEqual: @"GWorkspaceCreateFileOperation"])) {    
     chpath = [path stringByDeletingLastPathComponent];
   }
-
-	if ([fm fileExistsAtPath: chpath] == NO) {
+  
+  valid = [fm fileExistsAtPath: chpath];
+  
+  if (valid == NO) {
+    /* case of broken symlink */
+    valid = ([fm fileAttributesAtPath: chpath traverseLink: NO] != nil);
+  }
+  
+  if (valid == NO) {
 		NSString *err = NSLocalizedString(@"Error", @"");
 		NSString *msg = NSLocalizedString(@": no such file or directory!", @"");
 		NSString *buttstr = NSLocalizedString(@"Continue", @"");

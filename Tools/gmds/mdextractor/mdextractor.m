@@ -747,7 +747,7 @@ do { \
         withAttributes:(NSDictionary *)attributes
 {
   NSString *ext = [[path pathExtension] lowercaseString];
-  NSString *app, *type;
+  NSString *app = nil, *type = nil;
   NSData *data = nil;
   int i;
   

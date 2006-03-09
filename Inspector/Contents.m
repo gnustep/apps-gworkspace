@@ -441,11 +441,11 @@ static NSString *nibName = @"Contents";
   [editButt setEnabled: NO];	
 
   if (attributes && ([attributes fileType] != NSFileTypeDirectory)) {
-	  NSString *app, *type;
+	  NSString *app = nil, *type = nil;
     
     [ws getInfoForFile: path application: &app type: &type];
     
-    if ((type == NSPlainFileType) || (type == NSShellCommandFileType)) {
+    if (type && ((type == NSPlainFileType) || (type == NSShellCommandFileType))) {
       NSData *data = [self textContentsAtPath: path withAttributes: attributes];
 
       if (data) {

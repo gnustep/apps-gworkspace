@@ -463,7 +463,7 @@
       flags.plain = 1;
 
     } else if (fileType == NSFileTypeDirectory) {
-	    NSString *defApp, *type;
+	    NSString *defApp = nil, *type = nil;
 
 	    [ws getInfoForFile: path application: &defApp type: &type]; 
 
@@ -508,7 +508,7 @@
     flags.plain = 1;
 
   } else if (ftype == NSFileTypeDirectory) {
-	  NSString *defApp, *type;
+	  NSString *defApp = nil, *type = nil;
 
 	  [ws getInfoForFile: path application: &defApp type: &type]; 
 
@@ -825,6 +825,17 @@
 }
 
 - (BOOL)isValid
+{
+  BOOL valid = [fm fileExistsAtPath: path];
+
+  if ((valid == NO) && flags.link) {
+    valid = ([fm fileAttributesAtPath: path traverseLink: NO] != nil);
+  }
+
+  return valid;
+}
+
+- (BOOL)hasValidPath
 {
   return [fm fileExistsAtPath: path];
 }
