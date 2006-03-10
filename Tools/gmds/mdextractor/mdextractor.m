@@ -770,7 +770,7 @@ do { \
       [handle closeFile];
     }
   }
-  
+
   for (i = 0; i < [extractors count]; i++) {
     id extractor = [extractors objectAtIndex: i];
 

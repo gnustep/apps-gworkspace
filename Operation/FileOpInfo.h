@@ -201,7 +201,6 @@
   BOOL samename;
   BOOL onlyolder;
   NSFileManager *fm;
-  NSConnection *fopConn;
   id <FileOpInfoProtocol> fileOp;
 }
 
@@ -275,12 +274,6 @@
 
 @end
 
-/*
-@interface NSFileManager (FileOp)
-
-
-@end
-*/
 
 @interface OpProgressView : NSView 
 {
