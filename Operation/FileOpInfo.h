@@ -222,8 +222,6 @@
 
 - (void)done;
 
-- (void)exitThread;
-
 - (void)doMove;
 
 - (void)doCopy;

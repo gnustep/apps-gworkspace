@@ -1075,16 +1075,10 @@
   CREATE_AUTORELEASE_POOL(arp);
   FSWDeviceReader *reader = [[FSWDeviceReader alloc] initWithPorts: ports];
 
-  if (reader) {
-    [reader readDeviceData];
-    [[NSRunLoop currentRunLoop] run];
-    RELEASE (reader);
-  } else {
-    NSLog(@"unable to detach the device reader thread.");
-  }
-  
+  [reader readDeviceData];
+
+  RELEASE (reader);  
   RELEASE (arp);
-  [NSThread exit];
 }
 
 - (void)dealloc

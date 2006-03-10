@@ -340,9 +340,8 @@ static NSFileManager *fm = nil;
   DBUpdater *updater = [[self alloc] init];
   
   [updater setUpdaterTask: info];
+
   RELEASE (updater);
-                              
-  [[NSRunLoop currentRunLoop] run];
   RELEASE (arp);
 }
 
@@ -371,15 +370,8 @@ static NSFileManager *fm = nil;
       break;
 
     default:
-      [self done];
       break;
   }
-}
-
-- (void)done
-{
-  RELEASE (self);
-  [NSThread exit];
 }
 
 - (void)insertTrees
@@ -389,8 +381,6 @@ static NSFileManager *fm = nil;
   [dirslock lock];
   [dirsManager insertDirsFromPaths: paths];
   [dirslock unlock];
-
-  [self done];
 }
 
 - (void)removeTrees
@@ -400,8 +390,6 @@ static NSFileManager *fm = nil;
   [dirslock lock];
   [dirsManager removeDirsFromPaths: paths];
   [dirslock unlock];
-
-  [self done];
 }
 
 - (void)fileSystemDidChange
@@ -447,8 +435,6 @@ static NSFileManager *fm = nil;
     
     RELEASE (arp);
   }
-  
-  [self done];
 }
 
 @end

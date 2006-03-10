@@ -78,8 +78,6 @@
 
 - (void)setUpdaterTask:(NSDictionary *)info;
 
-- (void)done;
-
 - (void)insertTrees;
 
 - (void)removeTrees;

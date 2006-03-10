@@ -1068,16 +1068,10 @@ static BOOL plainAndModifiedPath(char *path);
   CREATE_AUTORELEASE_POOL(arp);
   FSWRecordsReader *reader = [[FSWRecordsReader alloc] initWithPorts: ports];
 
-  if (reader) {
-    [reader readLoop];
-    [[NSRunLoop currentRunLoop] run];
-    RELEASE (reader);
-  } else {
-    NSLog(@"unable to detach the records reader thread.");
-  }
-  
+  [reader readLoop];
+
+  RELEASE (reader);  
   RELEASE (arp);
-  [NSThread exit];
 }
 
 - (void)dealloc
@@ -1120,7 +1114,7 @@ static BOOL plainAndModifiedPath(char *path);
 }
 
 - (void)readLoop
-{
+{  
   while (1) {
     stream = fopen([logPath UTF8String], "r");
 

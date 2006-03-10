@@ -183,8 +183,6 @@ typedef enum DockPosition {
 
 + (void)mountRemovableMedia;
 
-- (void)mountRemovableMedia;
-
 @end
 
 #endif // GW_DESKTOP_MANAGER

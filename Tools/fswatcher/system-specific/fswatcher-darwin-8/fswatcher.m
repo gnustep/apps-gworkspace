@@ -27,6 +27,7 @@
 #include <sys/ioctl.h>
 #include <sys/sysctl.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 #include "fswatcher.h"
 #include "fsevents.h"
 #include "GNUstep.h"
@@ -982,16 +983,10 @@ char large_buf[0x2000];
   CREATE_AUTORELEASE_POOL(arp);
   FSWDeviceReader *reader = [[FSWDeviceReader alloc] initWithPorts: ports];
 
-  if (reader) {
-    [reader readDeviceData];
-    [[NSRunLoop currentRunLoop] run];
-    RELEASE (reader);
-  } else {
-    NSLog(@"unable to detach the device reader thread.");
-  }
+  [reader readDeviceData];
   
+  RELEASE (reader);
   RELEASE (arp);
-  [NSThread exit];
 }
 
 - (void)dealloc

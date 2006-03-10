@@ -429,9 +429,6 @@ static NSString *nibName = @"FileOperationWin";
     [nc removeObserver: self
 	                name: NSConnectionDidDieNotification 
                 object: execconn];
-                
-//    [executor exitThread];
-
     DESTROY (executor);
     DESTROY (execconn);
   }
@@ -1221,11 +1218,6 @@ filename = [fileinfo objectForKey: @"name"];
 {
   [fileOp sendDidChangeNotification];
   [fileOp endOperation];  
-}
-
-- (oneway void)exitThread
-{
-  [NSThread exit];
 }
 
 - (BOOL)fileManager:(NSFileManager *)manager 

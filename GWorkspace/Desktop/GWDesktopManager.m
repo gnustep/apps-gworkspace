@@ -813,19 +813,9 @@ static GWDesktopManager *desktopManager = nil;
 
 + (void)mountRemovableMedia
 {
-  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	GWMounter *mounter = [GWMounter new];  
-  
-  [mounter mountRemovableMedia];
-  
-  [[NSRunLoop currentRunLoop] run];
-  [pool release];
-}
-
-- (void)mountRemovableMedia
-{
+  CREATE_AUTORELEASE_POOL(pool);
   [[NSWorkspace sharedWorkspace] mountNewRemovableMedia];
-  [NSThread exit];
+  RELEASE (pool);  
 }
 
 @end
