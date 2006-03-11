@@ -142,6 +142,8 @@
 		            name: NSConnectionDidDieNotification
 		          object: devReadConn];
   DESTROY (devReadConn);
+
+  [dnc removeObserver: self];
   
   RELEASE (clientsInfo);
   RELEASE (watchers);
@@ -160,6 +162,7 @@
      
     fm = [NSFileManager defaultManager];	
     nc = [NSNotificationCenter defaultCenter];
+    dnc = [NSDistributedNotificationCenter defaultCenter];
     
     conn = [NSConnection defaultConnection];
     [conn setRootObject: self];
@@ -180,6 +183,8 @@
     watchers = [[NSMutableSet alloc] initWithCapacity: 1];
     watchedPaths = [[NSCountedSet alloc] initWithCapacity: 1];
 
+    includePathsTree = newCompWithName(@"incl_paths");
+    excludePathsTree = newCompWithName(@"excl_paths");
     [self setDefaultGlobalPaths];
     
     port[0] = (NSPort *)[NSPort port];
@@ -210,6 +215,11 @@
         return self;
       }
     NS_ENDHANDLER
+    
+    [dnc addObserver: self
+            selector: @selector(globalPathsChanged:)
+	              name: @"GSMetadataIndexedDirectoriesChanged"
+	            object: nil];
   }
   
   return self;    
@@ -274,186 +284,72 @@
 - (void)setDefaultGlobalPaths
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-  NSArray *paths;
+  id paths;
   unsigned i;
   
-  paths = [defaults objectForKey: @"incl_paths"];
-  
-  if (paths == nil) {
-    NSString *home;
+  [defaults synchronize];
 
-    if (geteuid() == 0) {
-      home = @"/private/var/root";
-    } else {
-      home = NSHomeDirectory();
+  paths = [defaults arrayForKey: @"GSMetadataIndexedPaths"];
+  
+  if (paths) {
+    for (i = 0; i < [paths count]; i++) {
+      insertComponentsOfPath([paths objectAtIndex: i], includePathsTree);
+    }
+  
+  } else {
+    insertComponentsOfPath(NSHomeDirectory(), includePathsTree);
+
+    paths = NSSearchPathForDirectoriesInDomains(NSAllApplicationsDirectory, 
+                                                        NSAllDomainsMask, YES);
+    for (i = 0; i < [paths count]; i++) {
+      insertComponentsOfPath([paths objectAtIndex: i], includePathsTree);
     }
     
-    paths = [NSArray arrayWithObjects: home, @"/Applications", @"/Developer", @"/Users", nil];
+    paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, 
+                                                      NSAllDomainsMask, YES);
+    for (i = 0; i < [paths count]; i++) {
+      NSString *dir = [paths objectAtIndex: i];
+      NSString *path = [dir stringByAppendingPathComponent: @"Headers"];
 
-    [defaults setObject: paths forKey: @"incl_paths"];
-    [defaults synchronize];
+      if ([fm fileExistsAtPath: path]) {
+        insertComponentsOfPath(path, includePathsTree);
+      }
+      
+      path = [dir stringByAppendingPathComponent: @"Documentation"];
+      
+      if ([fm fileExistsAtPath: path]) {
+        insertComponentsOfPath(path, includePathsTree);
+      }
+    }  
   }
 
-  includePathsTree = newCompWithName(@"incl_paths");
+  paths = [defaults arrayForKey: @"GSMetadataExcludedPaths"];
 
-  for (i = 0; i < [paths count]; i++) {
-    insertComponentsOfPath([paths objectAtIndex: i], includePathsTree);
+  if (paths) {
+    for (i = 0; i < [paths count]; i++) {
+      insertComponentsOfPath([paths objectAtIndex: i], excludePathsTree);
+    }
   }
-  
-  paths = [defaults objectForKey: @"excl_paths"];
-  
-  if (paths == nil) {
-    paths = [NSArray arrayWithObjects: @"/dev", @"/tmp", @"/Volumes", 
-                    @"/automount", @"/cores", @"/Volumes", @"/Volumes", nil];
-  
-    [defaults setObject: paths forKey: @"excl_paths"];
-    [defaults synchronize];  
-  }  
-  
-  excludePathsTree = newCompWithName(@"excl_paths");
-  
-  for (i = 0; i < [paths count]; i++) {
-    insertComponentsOfPath([paths objectAtIndex: i], excludePathsTree);
-  }  
 }
 
-- (oneway void)setGlobalIncludePaths:(NSArray *)ipaths
-                        excludePaths:(NSArray *)epaths
+- (void)globalPathsChanged:(NSNotification *)notification
 {
-  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-  int i;
-  
+  NSDictionary *info = [notification userInfo];
+  NSArray *indexed = [info objectForKey: @"GSMetadataIndexedPaths"];
+  NSArray *excluded = [info objectForKey: @"GSMetadataExcludedPaths"];
+  unsigned i;
+
   emptyTreeWithBase(includePathsTree);
   
-  for (i = 0; i < [ipaths count]; i++) {
-    insertComponentsOfPath([ipaths objectAtIndex: i], includePathsTree);
+  for (i = 0; i < [indexed count]; i++) {
+    insertComponentsOfPath([indexed objectAtIndex: i], includePathsTree);
   }
 
-  [defaults setObject: ipaths forKey: @"incl_paths"];
-    
   emptyTreeWithBase(excludePathsTree);
   
-  for (i = 0; i < [epaths count]; i++) {
-    insertComponentsOfPath([epaths objectAtIndex: i], excludePathsTree);
+  for (i = 0; i < [excluded count]; i++) {
+    insertComponentsOfPath([excluded objectAtIndex: i], excludePathsTree);
   }
-
-  [defaults setObject: epaths forKey: @"excl_paths"];
-  
-  [defaults synchronize];
-}
-
-- (oneway void)addGlobalIncludePath:(NSString *)path
-{
-  if (fullPathInTree(path, includePathsTree) == NO) {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSArray *paths = [defaults objectForKey: @"incl_paths"];
-    NSMutableArray *newpaths = [NSMutableArray array];
-
-    insertComponentsOfPath(path, includePathsTree);
-    
-    if (paths) {
-      [newpaths addObjectsFromArray: paths];
-    }
-    
-    [newpaths addObject: paths];
-
-    [defaults setObject: newpaths forKey: @"incl_paths"];
-    [defaults synchronize];
-  }
-}
-
-- (oneway void)removeGlobalIncludePath:(NSString *)path
-{
-  if (fullPathInTree(path, includePathsTree)) {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSArray *paths = [defaults objectForKey: @"incl_paths"];
-
-    removeComponentsOfPath(path, includePathsTree);
-  
-    if (paths) {
-      NSMutableArray *newpaths = [NSMutableArray array];
-      unsigned i;
-    
-      for (i = 0; i < [paths count]; i++) {
-        NSString *pt = [paths objectAtIndex: i];
-        
-        if ([pt isEqual: path] == NO) {
-          [newpaths addObject: pt];
-        }
-      }
-    
-      [defaults setObject: newpaths forKey: @"incl_paths"];
-      [defaults synchronize];
-    }
-  }
-}
-
-- (NSArray *)globalIncludePaths
-{
-  NSArray *paths = [[NSUserDefaults standardUserDefaults] objectForKey: @"incl_paths"];
-  
-  if (paths) {
-    return [NSArray arrayWithArray: paths];
-  }
-
-  return nil;
-}
-
-- (oneway void)addGlobalExcludePath:(NSString *)path
-{
-  if (fullPathInTree(path, excludePathsTree) == NO) {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSArray *paths = [defaults objectForKey: @"excl_paths"];
-    NSMutableArray *newpaths = [NSMutableArray array];
-
-    insertComponentsOfPath(path, excludePathsTree);
-    
-    if (paths) {
-      [newpaths addObjectsFromArray: paths];
-    }
-    
-    [newpaths addObject: paths];
-
-    [defaults setObject: newpaths forKey: @"excl_paths"];
-    [defaults synchronize];
-  }
-}
-
-- (oneway void)removeGlobalExcludePath:(NSString *)path
-{
-  if (fullPathInTree(path, excludePathsTree)) {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSArray *paths = [defaults objectForKey: @"excl_paths"];
-
-    removeComponentsOfPath(path, excludePathsTree);
-  
-    if (paths) {
-      NSMutableArray *newpaths = [NSMutableArray array];
-      unsigned i;
-    
-      for (i = 0; i < [paths count]; i++) {
-        NSString *pt = [paths objectAtIndex: i];
-        
-        if ([pt isEqual: path] == NO) {
-          [newpaths addObject: pt];
-        }
-      }
-    
-      [defaults setObject: newpaths forKey: @"excl_paths"];
-      [defaults synchronize];
-    }
-  }
-}
-
-- (NSArray *)globalExcludePaths
-{
-  NSArray *paths = [[NSUserDefaults standardUserDefaults] objectForKey: @"excl_paths"];
-  
-  if (paths) {
-    return [NSArray arrayWithArray: paths];
-  }
-
-  return nil;
 }
 
 - (oneway void)registerClient:(id <FSWClientProtocol>)client

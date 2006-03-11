@@ -197,7 +197,7 @@
 
   for (i = 0; i < [paths count]; i++) {
     NSString *path = [paths objectAtIndex: i];
-    NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: NO];
+    NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: YES];
     NSString *type = [attributes fileType];
     int j;
     

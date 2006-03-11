@@ -52,7 +52,7 @@
     [opdict setObject: source forKey: @"source"];
     [opdict setObject: destination forKey: @"destination"];
     [opdict setObject: files forKey: @"files"];
-    
+
     [fileOpsManager performOperation: opdict];
 
     *tag = 0;

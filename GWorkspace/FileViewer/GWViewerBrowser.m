@@ -93,7 +93,7 @@
       int i;
   
       if (selnodes && [selnodes count]) {
-        FSNBrowserMatrix *matrix = [bc cmatrix];
+        FSNBrowserMatrix *matrix = (FSNBrowserMatrix *)[bc cmatrix];
         FSNBrowserCell *cell;
         int row, col;
         

@@ -41,17 +41,6 @@
 
 @protocol	FSWatcherProtocol
 
-- (oneway void)setGlobalIncludePaths:(NSArray *)ipaths
-                        excludePaths:(NSArray *)epaths;
-
-- (oneway void)addGlobalIncludePath:(NSString *)path;
-
-- (oneway void)removeGlobalIncludePath:(NSString *)path;
-
-- (oneway void)addGlobalExcludePath:(NSString *)path;
-
-- (oneway void)removeGlobalExcludePath:(NSString *)path;
-
 - (oneway void)registerClient:(id <FSWClientProtocol>)client
               isGlobalWatcher:(BOOL)global;
 
@@ -113,6 +102,7 @@
   
   NSFileManager *fm;
   NSNotificationCenter *nc; 
+  NSNotificationCenter *dnc;
 }
 
 - (BOOL)connection:(NSConnection *)ancestor
@@ -122,20 +112,7 @@
 
 - (void)setDefaultGlobalPaths;
 
-- (oneway void)setGlobalIncludePaths:(NSArray *)ipaths
-                        excludePaths:(NSArray *)epaths;
-
-- (oneway void)addGlobalIncludePath:(NSString *)path;
-
-- (oneway void)removeGlobalIncludePath:(NSString *)path;
-
-- (NSArray *)globalIncludePaths;
-
-- (oneway void)addGlobalExcludePath:(NSString *)path;
-
-- (oneway void)removeGlobalExcludePath:(NSString *)path;
-
-- (NSArray *)globalExcludePaths;
+- (void)globalPathsChanged:(NSNotification *)notification;
 
 - (oneway void)registerClient:(id <FSWClientProtocol>)client
               isGlobalWatcher:(BOOL)global;
