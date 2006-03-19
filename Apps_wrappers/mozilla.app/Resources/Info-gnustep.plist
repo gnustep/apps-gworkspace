@@ -1,0 +1,16 @@
+{
+  NSExecutable = "mozilla";
+  NSRole = "Viewer";
+  NSIcon = "mozilla.png";
+	XAppWrapper = YES;
+  NSTypes = (
+    {
+      NSUnixExtensions = ( "html" );
+      NSIcon = "FileIcon_.html.tiff";
+    },
+    {
+      NSUnixExtensions = ( "htm" );
+      NSIcon = "FileIcon_.html.tiff";
+    }
+  );
+}
