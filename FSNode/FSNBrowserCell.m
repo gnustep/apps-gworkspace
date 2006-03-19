@@ -51,7 +51,7 @@ static int infoheight = 0;
   TEST_RELEASE (extInfoType);
   TEST_RELEASE (infoCell); 
   TEST_RELEASE (icon); 
-  TEST_RELEASE (openicon); 
+  TEST_RELEASE (selectedicon); 
   RELEASE (dots);
   
   [super dealloc];
@@ -102,7 +102,7 @@ static int infoheight = 0;
     showType = FSNInfoNameType;
     extInfoType = nil;
     icon = nil;
-    openicon = nil;
+    selectedicon = nil;
     icnsize = DEFAULT_ISIZE;
     
     isLocked = NO;
@@ -123,7 +123,7 @@ static int infoheight = 0;
   if (node) {
     ASSIGN (icon, [fsnodeRep iconOfSize: icnsize forNode: node]);
     icnh = [icon size].height;
-    DESTROY (openicon);
+    DESTROY (selectedicon);
   }
 }
 
@@ -141,12 +141,12 @@ static int infoheight = 0;
     return NO;
   }
   
-  if (openicon == nil) {
+  if (selectedicon == nil) {
     NSImage *opicn = [fsnodeRep openFolderIconOfSize: icnsize forNode: node];
 
     if (opicn) {
-      ASSIGN (openicon, opicn);
-      icnh = [openicon size].height;
+      ASSIGN (selectedicon, opicn);
+      icnh = [selectedicon size].height;
     }
   }
   
@@ -336,10 +336,10 @@ static int infoheight = 0;
       if ([self isEnabled]) {
         if (iconSelected) {
           if (isOpened == NO) {	
-            [openicon compositeToPoint: icon_rect.origin 
+            [selectedicon compositeToPoint: icon_rect.origin 
 	                           operation: NSCompositeSourceOver];
           } else {
-            [openicon dissolveToPoint: icon_rect.origin fraction: 0.5];
+            [selectedicon dissolveToPoint: icon_rect.origin fraction: 0.5];
           }
         } else {
           if (isOpened == NO) {	

@@ -115,11 +115,11 @@ pcomp *newTreeWithIdentifier(id identifier)
     pcomp *comp = NSZoneCalloc(NSDefaultMallocZone(), 1, sizeof(pcomp));
 
     comp->name = [identifier retain];
-    comp->subcomps = NSZoneCalloc(NSDefaultMallocZone(), GROW_FACTOR, sizeof(pcomp *)); 
-    comp->capacity = GROW_FACTOR;
+    comp->subcomps = NSZoneCalloc(NSDefaultMallocZone(), 1, sizeof(pcomp *)); 
+    comp->capacity = 0;
     comp->sub_count = 0;  
     comp->parent = NULL;
-    comp->ins_count = 0;  
+    comp->ins_count = 1;  
 
     if (pathCompsSel == NULL) {
       pathCompsSel = @selector(pathComponents);
@@ -164,6 +164,7 @@ pcomp *compInsertingName(NSString *name, pcomp *parent)
       if (result == NSOrderedSame) {
         parent->subcomps[pos]->ins_count++;
         return parent->subcomps[pos];
+          
       } else if (result == NSOrderedAscending) { 
         first = pos + 1;
       } else {
@@ -172,30 +173,32 @@ pcomp *compInsertingName(NSString *name, pcomp *parent)
     }
   }
 
-  for (i = parent->sub_count; i > ins; i--) {
-    parent->subcomps[i] = parent->subcomps[i - 1];
-  }
-
-  parent->sub_count++;
-
-  if (parent->sub_count >= parent->capacity) {
+  if ((parent->sub_count + 1) > parent->capacity) {
     size_t size;
     pcomp **ptr;
     
     parent->capacity += GROW_FACTOR;
-    size = (parent->capacity + 1) * sizeof(pcomp *);
+    size = parent->capacity * sizeof(pcomp *);
     
     ptr = NSZoneRealloc(NSDefaultMallocZone(), parent->subcomps, size);
     
     if (ptr == 0) {
 	    [NSException raise: NSMallocException format: @"Unable to grow tree"];
-	  }
+	  } 
     
     parent->subcomps = ptr;
   }
+
+  for (i = parent->sub_count; i > ins; i--) {
+    parent->subcomps[i] = parent->subcomps[i - 1];
+  }
+
+  parent->sub_count++;
     
   parent->subcomps[ins] = NSZoneCalloc(NSDefaultMallocZone(), 1, sizeof(pcomp));
   parent->subcomps[ins]->name = [[NSString alloc] initWithString: name];
+  parent->subcomps[ins]->subcomps = NSZoneCalloc(NSDefaultMallocZone(), 1, sizeof(pcomp *)); 
+  parent->subcomps[ins]->capacity = 0;
   parent->subcomps[ins]->sub_count = 0;  
   parent->subcomps[ins]->parent = parent;
   parent->subcomps[ins]->ins_count = 1;  
@@ -412,29 +415,6 @@ BOOL containsElementsOfPath(NSString *path, pcomp *base)
   
   return YES;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

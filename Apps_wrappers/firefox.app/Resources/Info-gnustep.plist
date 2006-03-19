@@ -1,0 +1,16 @@
+{
+  NSExecutable = "firefox";
+  NSRole = "Viewer";
+  NSIcon = "firefox.png";
+	XAppWrapper = YES;
+  NSTypes = (
+    {
+      NSUnixExtensions = ( "html" );
+      NSIcon = "FileIcon_.html.tiff";
+    },
+    {
+      NSUnixExtensions = ( "htm" );
+      NSIcon = "FileIcon_.html.tiff";
+    }
+  );
+}

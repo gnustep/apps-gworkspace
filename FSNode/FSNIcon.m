@@ -54,7 +54,7 @@ static NSImage *branchImage;
   TEST_RELEASE (selectionTitle);
   TEST_RELEASE (extInfoType);
   RELEASE (icon);
-  TEST_RELEASE (openicon);
+  TEST_RELEASE (selectedicon);
   RELEASE (highlightPath);
   RELEASE (label);
   RELEASE (infolabel);
@@ -124,7 +124,7 @@ static NSImage *branchImage;
     
     ASSIGN (icon, [fsnodeRep iconOfSize: iconSize forNode: node]);
     drawicon = icon;
-    openicon = nil;
+    selectedicon = nil;
     
     dndSource = dndsrc;
     acceptDnd = dndaccept;
@@ -720,7 +720,7 @@ static NSImage *branchImage;
   ASSIGN (node, anode);
   ASSIGN (icon, [fsnodeRep iconOfSize: iconSize forNode: node]);
   drawicon = icon;
-  DESTROY (openicon);
+  DESTROY (selectedicon);
   
   if ([[node path] isEqual: path_separator()] && ([node isMountPoint] == NO)) {
     NSHost *host = [NSHost currentHost];
@@ -772,7 +772,7 @@ static NSImage *branchImage;
                   [selection count], NSLocalizedString(@"elements", @"")]));
   ASSIGN (icon, [fsnodeRep multipleSelectionIconOfSize: iconSize]);
   drawicon = icon;
-  DESTROY (openicon);
+  DESTROY (selectedicon);
   
   [label setStringValue: selectionTitle];
   [infolabel setStringValue: @""];
@@ -871,7 +871,7 @@ static NSImage *branchImage;
     ASSIGN (icon, [fsnodeRep multipleSelectionIconOfSize: iconSize]);
   }
   drawicon = icon;
-  DESTROY (openicon);
+  DESTROY (selectedicon);
   hlightRect.size.width = myrintf(iconSize / 3 * 4);
   hlightRect.size.height = myrintf(hlightRect.size.width * [fsnodeRep highlightHeightFactor]);
   if ((hlightRect.size.height - iconSize) < 4) {
@@ -1362,19 +1362,19 @@ static NSImage *branchImage;
   NSPoint p = [self convertPoint: [sender draggingLocation] fromView: nil];
 
   if ([self mouse: p inRect: icnBounds] == NO) {
-    if (drawicon == openicon) {
+    if (drawicon == selectedicon) {
       drawicon = icon;
       [self setNeedsDisplay: YES];
     }
     return [container draggingUpdated: sender];
     
   } else {
-    if ((openicon == nil) && isDragTarget && (onSelf == NO)) {
-      ASSIGN (openicon, [fsnodeRep openFolderIconOfSize: iconSize forNode: node]);
+    if ((selectedicon == nil) && isDragTarget && (onSelf == NO)) {
+      ASSIGN (selectedicon, [fsnodeRep openFolderIconOfSize: iconSize forNode: node]);
     }
   
-    if (openicon && (drawicon == icon) && isDragTarget && (onSelf == NO)) {
-      drawicon = openicon;
+    if (selectedicon && (drawicon == icon) && isDragTarget && (onSelf == NO)) {
+      drawicon = selectedicon;
       [self setNeedsDisplay: YES];
     }
   }

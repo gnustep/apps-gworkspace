@@ -94,17 +94,11 @@
 
 - (void)setupDbPaths;
 
-- (NSDictionary *)readIndexedPathsStatus;
+- (NSArray *)readIndexedPathsStatus;
 
 - (void)connectMDExtractor;
 
 - (void)mdextractorConnectionDidDie:(NSNotification *)notif;
-
-
-
-
-
-
 
 - (NSString *)chooseNewPath;
 

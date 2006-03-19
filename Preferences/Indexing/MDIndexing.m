@@ -321,7 +321,7 @@ return; \
         NSString *idxpath = [indexedPaths objectAtIndex: i];
         
         if ([path isEqual: idxpath] || subPathOfPath(path, idxpath)) {
-          EXCL_ERR_RETURN (@"This path would exclude a path defined indexable!");
+          EXCL_ERR_RETURN (@"This path would exclude a path defined as indexable!");
         }
       }
     
@@ -504,11 +504,11 @@ return; \
   indexedStatusLock = [[NSDistributedLock alloc] initWithPath: lockpath];
 }
 
-- (NSDictionary *)readIndexedPathsStatus
+- (NSArray *)readIndexedPathsStatus
 {
-  if (indexedStatusPath && [fm isReadableFileAtPath: indexedStatusPath]) {
-    NSDictionary *info;
+  NSArray *status = nil;
 
+  if (indexedStatusPath && [fm isReadableFileAtPath: indexedStatusPath]) {
     if ([indexedStatusLock tryLock] == NO) {
       unsigned sleeps = 0;
 
@@ -539,18 +539,17 @@ return; \
 	    }
     }
 
-    info = [NSDictionary dictionaryWithContentsOfFile: indexedStatusPath];
+    status = [NSArray arrayWithContentsOfFile: indexedStatusPath];
     [indexedStatusLock unlock];
-
-    return info;
   }
   
-  return nil;
+  return ((status != nil) ? status : [NSArray array]);
 }
 
 - (void)connectMDExtractor
 {
   if (mdextractor == nil) {
+    int timeout = 80;
     id fsw = [NSConnection rootProxyForConnectionWithRegisteredName: @"mdextractor" 
                                                                host: @""];
 
@@ -584,12 +583,12 @@ return; \
         [startAppWin showWindowWithTitle: @"MDIndexing"
                                  appName: @"mdextractor"
                                operation: NSLocalizedString(@"starting:", @"")
-                            maxProgValue: 40.0];
+                            maxProgValue: timeout];
 
 	      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
         DESTROY (cmd);
         
-        for (i = 1; i <= 40; i++) {
+        for (i = 1; i <= timeout; i++) {
           [startAppWin updateProgressBy: 1.0];
 	        [[NSRunLoop currentRunLoop] runUntilDate:
 		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
@@ -597,7 +596,7 @@ return; \
           fsw = [NSConnection rootProxyForConnectionWithRegisteredName: @"mdextractor" 
                                                                   host: @""];                  
           if (fsw) {
-            [startAppWin updateProgressBy: 40.0 - i];
+            [startAppWin updateProgressBy: timeout - i];
             break;
           }
         }
@@ -646,21 +645,6 @@ return; \
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 - (NSString *)chooseNewPath
 {
 	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
@@ -683,7 +667,7 @@ return; \
   
   [defaults synchronize];
 
-  entry = [defaults arrayForKey: @"GSMetadataIndexedPaths"];
+  entry = [defaults arrayForKey: @"GSMetadataIndexablePaths"];
   if (entry) {
     [indexedPaths addObjectsFromArray: entry];
   
@@ -735,7 +719,7 @@ return; \
   [defaults synchronize];
   domain = [[defaults persistentDomainForName: NSGlobalDomain] mutableCopy];
 
-  [domain setObject: indexedPaths forKey: @"GSMetadataIndexedPaths"];
+  [domain setObject: indexedPaths forKey: @"GSMetadataIndexablePaths"];
   [domain setObject: excludedPaths forKey: @"GSMetadataExcludedPaths"];  
   [domain setObject: [NSNumber numberWithBool: indexingEnabled] 
              forKey: @"GSMetadataIndexingEnabled"];  
@@ -746,7 +730,7 @@ return; \
 
   info = [NSMutableDictionary dictionary];
 
-  [info setObject: indexedPaths forKey: @"GSMetadataIndexedPaths"];
+  [info setObject: indexedPaths forKey: @"GSMetadataIndexablePaths"];
   [info setObject: excludedPaths forKey: @"GSMetadataExcludedPaths"];  
   [info setObject: [NSNumber numberWithBool: indexingEnabled] 
            forKey: @"GSMetadataIndexingEnabled"];  

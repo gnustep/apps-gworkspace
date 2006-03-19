@@ -29,6 +29,8 @@
 #include "DBKPathsTree.h"
 #include "sqlite.h"
 
+@class GMDSIndexablePath;
+
 @protocol	ExtractorsProtocol
 
 - (id)initForExtractor:(id)extr;
@@ -65,9 +67,9 @@
 
 @interface GMDSExtractor: NSObject 
 {
-  NSMutableArray *indexedPaths;
-  pcomp *excludePathsTree;  
-  NSMutableDictionary *pathsStatus;
+  NSMutableArray *indexablePaths;
+  NSMutableArray *excludedPaths;  
+  pcomp *excludedPathsTree;  
   BOOL indexingEnabled;
   BOOL extracting;
   NSString *dbpath;
@@ -94,21 +96,30 @@
 
 - (BOOL)synchronizePathsStatus:(BOOL)onstart;
 
-- (NSDictionary *)readPathsStatus;
+- (NSArray *)readPathsStatus;
 
 - (void)writePathsStatus:(id)sender;
 
-- (void)updateStatusOfPath:(NSString *)path
+- (NSDictionary *)infoOfPath:(NSString *)path 
+               inSavedStatus:(NSArray *)status;
+
+- (void)updateStatusOfPath:(GMDSIndexablePath *)indpath
                  startTime:(NSDate *)stime
                    endTime:(NSDate *)etime
                 filesCount:(unsigned long)count
                indexedDone:(BOOL)indexed;
 
+- (GMDSIndexablePath *)indexablePathWithPath:(NSString *)path;
+
+- (GMDSIndexablePath *)ancestorOfAddedPath:(NSString *)path;
+
+- (GMDSIndexablePath *)ancestorForAddingPath:(NSString *)path;
+
 - (void)startExtracting;
 
 - (void)stopExtracting;
 
-- (BOOL)extractFromPath:(NSString *)path;
+- (BOOL)extractFromPath:(GMDSIndexablePath *)indpath;
 
 - (BOOL)insertOrUpdatePath:(NSString *)path
             withAttributes:(NSDictionary *)attributes;
@@ -133,8 +144,69 @@
 
 - (void)connectionDidDie:(NSNotification *)notification;
 
-- (void)terminate;
+@end
+
+
+@interface GMDSIndexablePath: NSObject 
+{
+  NSString *path;
+  unsigned long filescount;
+  BOOL indexed;
+  NSDate *startTime;
+  NSDate *endTime;
+  NSMutableArray *subpaths;
+  GMDSIndexablePath *ancestor;
+}
+
+- (id)initWithPath:(NSString *)apath
+          ancestor:(GMDSIndexablePath *)prepath;
+
+- (NSString *)path;
+
+- (NSArray *)subpaths;
+
+- (GMDSIndexablePath *)subpathWithPath:(NSString *)apath;
+
+- (BOOL)acceptsSubpath:(NSString *)subpath;
+
+- (GMDSIndexablePath *)addSubpath:(NSString *)apath;
+
+- (void)removeSubpath:(NSString *)apath;
+
+- (BOOL)isSubpath;
+
+- (GMDSIndexablePath *)ancestor;
+
+- (unsigned long)filescount;
+
+- (void)setFilesCount:(unsigned long)count;
+
+- (NSDate *)startTime;
+
+- (void)setStartTime:(NSDate *)date;
+
+- (NSDate *)endTime;
+
+- (void)setEndTime:(NSDate *)date;
+
+- (BOOL)indexed;
+
+- (void)setIndexed:(BOOL)value;
+
+- (void)checkIndexingDone;
+
+- (NSDictionary *)info;
 
 @end
 
 #endif // MDEXTRACTOR_H
+
+
+
+
+
+
+
+
+
+

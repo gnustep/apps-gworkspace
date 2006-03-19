@@ -1,0 +1,9 @@
+#!/bin/sh
+
+APP=firefox
+
+if [ $# -eq 2 ] ; then
+  $APP "$2" &
+else
+  $APP &
+fi

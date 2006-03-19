@@ -24,6 +24,8 @@
 
 #include <AppKit/AppKit.h>
 #include <math.h>
+#include <sys/types.h>
+#include <unistd.h>
 #include "FSNIcon.h"
 #include "FSNFunctions.h"
 #include "GWViewerIconsPath.h"

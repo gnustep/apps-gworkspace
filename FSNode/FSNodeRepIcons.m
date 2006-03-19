@@ -202,6 +202,12 @@ static unsigned char darkerLUT[256] = {
   return icon;
 }
 
+- (NSImage *)selectedIconOfSize:(int)size 
+                        forNode:(FSNode *)node
+{
+  return [self darkerIcon: [self iconOfSize: size forNode: node]];
+}
+
 - (NSImage *)cachedIconOfSize:(int)size 
                        forKey:(NSString *)key
 {

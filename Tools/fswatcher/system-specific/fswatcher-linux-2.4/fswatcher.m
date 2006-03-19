@@ -294,7 +294,7 @@
   
   [defaults synchronize];
 
-  paths = [defaults arrayForKey: @"GSMetadataIndexedPaths"];
+  paths = [defaults arrayForKey: @"GSMetadataIndexablePaths"];
   
   if (paths) {
     for (i = 0; i < [paths count]; i++) {
@@ -340,14 +340,14 @@
 - (void)globalPathsChanged:(NSNotification *)notification
 {
   NSDictionary *info = [notification userInfo];
-  NSArray *indexed = [info objectForKey: @"GSMetadataIndexedPaths"];
+  NSArray *indexable = [info objectForKey: @"GSMetadataIndexablePaths"];
   NSArray *excluded = [info objectForKey: @"GSMetadataExcludedPaths"];
   unsigned i;
 
   emptyTreeWithBase(includePathsTree);
   
-  for (i = 0; i < [indexed count]; i++) {
-    insertComponentsOfPath([indexed objectAtIndex: i], includePathsTree);
+  for (i = 0; i < [indexable count]; i++) {
+    insertComponentsOfPath([indexable objectAtIndex: i], includePathsTree);
   }
 
   emptyTreeWithBase(excludePathsTree);

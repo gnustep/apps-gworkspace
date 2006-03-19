@@ -468,6 +468,9 @@ typedef enum FSNSelectionMask {
 - (NSImage *)iconOfSize:(int)size 
                 forNode:(FSNode *)node;
 
+- (NSImage *)selectedIconOfSize:(int)size 
+                        forNode:(FSNode *)node;
+
 - (NSImage *)cachedIconOfSize:(int)size 
                        forKey:(NSString *)key;
 

@@ -68,6 +68,22 @@ BOOL isDotFile(NSString *path)
   return NO;  
 }
 
+BOOL subPathOfPath(NSString *p1, NSString *p2)
+{
+  int l1 = [p1 length];
+  int l2 = [p2 length];  
+
+  if ((l1 > l2) || ([p1 isEqual: p2])) {
+    return NO;
+  } else if ([[p2 substringToIndex: l1] isEqual: p1]) {
+    if ([[p2 pathComponents] containsObject: [p1 lastPathComponent]]) {
+      return YES;
+    }
+  }
+
+  return NO;
+}
+
 
 @implementation	GMDSExtractor
 
@@ -81,9 +97,9 @@ BOOL isDotFile(NSString *path)
   [dnc removeObserver: self];
   [nc removeObserver: self];
   
-  DESTROY (indexedPaths);
-  freeTree(excludePathsTree);
-  DESTROY (pathsStatus);
+  DESTROY (indexablePaths);
+  DESTROY (excludedPaths);
+  freeTree(excludedPathsTree);
   DESTROY (dbpath);
   DESTROY (indexedStatusPath);
   DESTROY (indexedStatusLock);
@@ -105,6 +121,7 @@ BOOL isDotFile(NSString *path)
     NSString *dbdir;
     NSString *lockpath;
     BOOL isdir;    
+    unsigned i;
     
     fm = [NSFileManager defaultManager]; 
 
@@ -173,27 +190,34 @@ BOOL isDotFile(NSString *path)
     
     ws = [NSWorkspace sharedWorkspace]; 
     
-    indexedPaths = [NSMutableArray new];
-    excludePathsTree = newTreeWithIdentifier(@"excluded");
-    pathsStatus = [NSMutableDictionary new];
-    
     defaults = [NSUserDefaults standardUserDefaults];
     [defaults synchronize];
     
-    entry = [defaults arrayForKey: @"GSMetadataIndexedPaths"];
+    indexablePaths = [NSMutableArray new];
+    excludedPaths = [NSMutableArray new];
+    excludedPathsTree = newTreeWithIdentifier(@"excluded");
+
+    entry = [defaults arrayForKey: @"GSMetadataIndexablePaths"];
+
     if (entry) {
-      [indexedPaths addObjectsFromArray: entry];
-    }
-    
-    entry = [defaults arrayForKey: @"GSMetadataExcludedPaths"];
-    if (entry) {
-      unsigned i;
-      
-      for (i = 0; i < [entry count]; i++) {
-        insertComponentsOfPath([entry objectAtIndex: i], excludePathsTree);
+      for (i = 0; i < [entry count]; i++) {  
+        NSString *path = [entry objectAtIndex: i];
+        GMDSIndexablePath *indpath = [[GMDSIndexablePath alloc] initWithPath: path 
+                                                                    ancestor: nil];
+        [indexablePaths addObject: indpath];
+        RELEASE (indpath);
       }
     }
-  
+
+    entry = [defaults arrayForKey: @"GSMetadataExcludedPaths"];
+    if (entry) {
+      [excludedPaths addObjectsFromArray: entry];
+
+      for (i = 0; i < [entry count]; i++) {
+        insertComponentsOfPath([entry objectAtIndex: i], excludedPathsTree);
+      }
+    }
+
     indexingEnabled = [defaults boolForKey: @"GSMetadataIndexingEnabled"];    
     
     extracting = NO;
@@ -209,29 +233,87 @@ BOOL isDotFile(NSString *path)
 
 - (void)indexedDirectoriesChanged:(NSNotification *)notification
 {
+  CREATE_AUTORELEASE_POOL(arp);
   NSDictionary *info = [notification userInfo];
-  NSArray *indexed = [info objectForKey: @"GSMetadataIndexedPaths"];
+  NSArray *indexable = [info objectForKey: @"GSMetadataIndexablePaths"];
   NSArray *excluded = [info objectForKey: @"GSMetadataExcludedPaths"];
   BOOL shouldExtract;
+  unsigned count;
   unsigned i;
 
-  [indexedPaths removeAllObjects];
-  [indexedPaths addObjectsFromArray: indexed];
+  for (i = 0; i < [indexable count]; i++) {
+    NSString *path = [indexable objectAtIndex: i];
+    GMDSIndexablePath *indpath = [self indexablePathWithPath: path];   
+    
+    if (indpath == nil) {
+      indpath = [[GMDSIndexablePath alloc] initWithPath: path ancestor: nil];
+      [indexablePaths addObject: indpath];
+      RELEASE (indpath);
+    }
+  }
+  
+  count = [indexablePaths count];
+  
+  for (i = 0; i < count; i++) {
+    GMDSIndexablePath *indpath = [indexablePaths objectAtIndex: i];
 
-  // Controllare anche se ne e' stata tolta qualcuna e
-  // toglierla dal database?
-  // Fermare l'indexing se la path current e' stata tolta?
-  
-  emptyTreeWithBase(excludePathsTree);
-  
+    if ([indexable containsObject: [indpath path]] == NO) {
+      [indexablePaths removeObject: indpath];
+      count--;
+      i--;
+      
+      /* FIXME 
+      - remove the path from the db?
+      - stop indexing if the current indexed path == indpath?
+      */
+    }
+  }  
+
+  emptyTreeWithBase(excludedPathsTree);
+
   for (i = 0; i < [excluded count]; i++) {
-    insertComponentsOfPath([excluded objectAtIndex: i], excludePathsTree);
+    NSString *path = [excluded objectAtIndex: i];
+    
+    insertComponentsOfPath(path, excludedPathsTree);
+    
+    if ([excludedPaths containsObject: path] == NO) {
+      GMDSIndexablePath *ancestor = [self ancestorOfAddedPath: path];
+    
+      if (ancestor) {
+        [ancestor removeSubpath: path];
+                  
+        /* FIXME 
+        - remove the path from the db?
+        - stop indexing if the current indexed path == path?
+        */
+      }
+      
+      [excludedPaths addObject: path];
+    }
+  }
+
+  count = [excludedPaths count];
+
+  for (i = 0; i < [excludedPaths count]; i++) {
+    NSString *path = [excludedPaths objectAtIndex: i];
+    
+    if ([excluded containsObject: path] == NO) {
+      GMDSIndexablePath *indpath = [self ancestorForAddingPath: path];
+    
+      if (indpath) {
+        [indpath addSubpath: path];
+      }
+      
+      [excludedPaths removeObject: path];
+      count--;
+      i--;
+    }
   }
 
   indexingEnabled = [[info objectForKey: @"GSMetadataIndexingEnabled"] boolValue];
   
   shouldExtract = [self synchronizePathsStatus: NO];
-  
+    
   if (indexingEnabled) {
     if (shouldExtract && (extracting == NO)) {
       [self startExtracting];
@@ -240,88 +322,102 @@ BOOL isDotFile(NSString *path)
   } else if (extracting) {
     [self stopExtracting];
   }
+    
+  RELEASE (arp);    
 }
 
 - (BOOL)synchronizePathsStatus:(BOOL)onstart
 {
-  CREATE_AUTORELEASE_POOL(arp);
   BOOL shouldExtract = NO;
   unsigned i;
     
   if (onstart) {
-    NSDictionary *savedStatus = [self readPathsStatus];
+    NSArray *savedPaths = [self readPathsStatus];
     
-    for (i = 0; i < [indexedPaths count]; i++) {
-      NSString *path = [indexedPaths objectAtIndex: i];
-      NSDictionary *savedDict = [savedStatus objectForKey: path];
-      NSMutableDictionary *dict;
+    for (i = 0; i < [indexablePaths count]; i++) {
+      GMDSIndexablePath *indPath = [indexablePaths objectAtIndex: i];
+      NSDictionary *savedInfo = [self infoOfPath: [indPath path] inSavedStatus: savedPaths];
+      id entry;
+      
+      if (savedInfo) {
+        entry = [savedInfo objectForKey: @"subpaths"];
         
-      if (savedDict != nil) {
-        dict = [savedDict mutableCopy];
+        if (entry) {
+          unsigned j;
+          
+          for (j = 0; j < [entry count]; j++) {
+            NSDictionary *subSaved = [entry objectAtIndex: j];
+            id subentry = [subSaved objectForKey: @"path"];
+            GMDSIndexablePath *subpath = [indPath addSubpath: subentry];
+            
+            subentry = [subSaved objectForKey: @"indexed"];
+            [subpath setIndexed: [subentry boolValue]];
+            
+            if ([subpath indexed] == NO) {
+              shouldExtract = YES;
+            }
+          }
+        }
+        
+        entry = [savedInfo objectForKey: @"count"];
+        
+        if (entry) {
+          [indPath setFilesCount: [entry unsignedLongValue]];
+        }
+        
+        entry = [savedInfo objectForKey: @"indexed"];
+        
+        if (entry) {
+          [indPath setIndexed: [entry boolValue]];
+        
+          if ([indPath indexed] == NO) {
+            shouldExtract = YES;
+          }
+        }
+        
       } else {
-        dict = [NSMutableDictionary new];
-        [dict setObject: [NSNumber numberWithBool: NO] forKey: @"indexed"];
-        [dict setObject: [NSNumber numberWithUnsignedLong: 0L] forKey: @"files"];
+        shouldExtract = YES;
       }
-      
-      [pathsStatus setObject: dict forKey: path];
-      
-      RELEASE (dict);
-    }
+    }    
   
   } else {
-    NSArray *paths = [[pathsStatus allKeys] copy];
-        
-    for (i = 0; i < [paths count]; i++) {
-      NSString *path = [paths objectAtIndex: i];  
-      
-      if ([indexedPaths containsObject: path] == NO) {
-        [pathsStatus removeObjectForKey: path];
-      }
-    }
-    
-    RELEASE (paths);
-    
-    for (i = 0; i < [indexedPaths count]; i++) {
-      NSString *path = [indexedPaths objectAtIndex: i];
-      NSMutableDictionary *dict = [pathsStatus objectForKey: path];
-      
-      if (dict == nil) {
-        dict = [NSMutableDictionary dictionary];
-    
-        [dict setObject: [NSNumber numberWithBool: NO] forKey: @"indexed"];
-        [dict setObject: [NSNumber numberWithUnsignedLong: 0L] forKey: @"files"];
-        
-        [pathsStatus setObject: dict forKey: path];
-      }
-    }
+    for (i = 0; i < [indexablePaths count]; i++) {      
+      GMDSIndexablePath *indPath = [indexablePaths objectAtIndex: i];
   
+      if ([indPath indexed] == NO) {
+        shouldExtract = YES;
+      }
+      
+      if (shouldExtract == NO) {
+        NSArray *subpaths = [indPath subpaths];
+        unsigned j;
+      
+        for (j = 0; j < [subpaths count]; j++) {
+          GMDSIndexablePath *subpath = [subpaths objectAtIndex: j];
+          
+          if ([subpath indexed] == NO) {
+            shouldExtract = YES;
+            break;
+          }
+        }
+      }
+      
+      if (shouldExtract == YES) {
+        break;
+      }
+    }
+    
     [self writePathsStatus: nil];
   }
-  
-  {  
-    NSArray *pathsInfo = [pathsStatus allValues]; 
-  
-    for (i = 0; i < [pathsInfo count]; i++) {
-      NSDictionary *dict = [pathsInfo objectAtIndex: i];
-    
-      if ([[dict objectForKey: @"indexed"] boolValue] == NO) {
-        shouldExtract = YES;
-        break; 
-      }
-    }
-  }
-     
-  RELEASE (arp);  
-  
+       
   return shouldExtract;
 }
 
-- (NSDictionary *)readPathsStatus
+- (NSArray *)readPathsStatus
 {
-  if (indexedStatusPath && [fm isReadableFileAtPath: indexedStatusPath]) {
-    NSDictionary *info;
+  NSArray *status = nil;
 
+  if (indexedStatusPath && [fm isReadableFileAtPath: indexedStatusPath]) {
     if ([indexedStatusLock tryLock] == NO) {
       unsigned sleeps = 0;
 
@@ -352,18 +448,20 @@ BOOL isDotFile(NSString *path)
 	    }
     }
 
-    info = [NSDictionary dictionaryWithContentsOfFile: indexedStatusPath];
+    status = [NSArray arrayWithContentsOfFile: indexedStatusPath];
     [indexedStatusLock unlock];
-
-    return info;
   }
   
-  return [NSDictionary dictionary];
+  return ((status != nil) ? status : [NSArray array]);
 }
 
 - (void)writePathsStatus:(id)sender
 {
   if (indexedStatusPath) {
+    CREATE_AUTORELEASE_POOL(arp);
+    NSMutableArray *status = [NSMutableArray array];
+    unsigned i;
+    
     if ([indexedStatusLock tryLock] == NO) {
       unsigned sleeps = 0;
 
@@ -390,42 +488,124 @@ BOOL isDotFile(NSString *path)
 
       if (sleeps >= 10) {
         NSLog(@"Unable to obtain lock %@", indexedStatusLock);
+        RELEASE (arp);
         return;
 	    }
     }
 
-    [pathsStatus writeToFile: indexedStatusPath atomically: YES];
+    for (i = 0; i < [indexablePaths count]; i++) {
+      [status addObject: [[indexablePaths objectAtIndex: i] info]];
+    }
+
+    [status writeToFile: indexedStatusPath atomically: YES];
     [indexedStatusLock unlock];
     
     GWDebugLog(@"paths status updated"); 
+    
+    RELEASE (arp);
   }
 }
 
-- (void)updateStatusOfPath:(NSString *)path
+- (NSDictionary *)infoOfPath:(NSString *)path 
+               inSavedStatus:(NSArray *)status
+{
+  unsigned i;
+
+  for (i = 0; i < [status count]; i++) {
+    NSDictionary *info = [status objectAtIndex: i];
+  
+    if ([[info objectForKey: @"path"] isEqual: path]) {
+      return info;
+    }
+  }
+
+  return nil;
+}
+
+- (void)updateStatusOfPath:(GMDSIndexablePath *)indpath
                  startTime:(NSDate *)stime
                    endTime:(NSDate *)etime
                 filesCount:(unsigned long)count
                indexedDone:(BOOL)indexed
 {
-  NSMutableDictionary *dict = [pathsStatus objectForKey: path];
-
-  if (dict) {
+  if ([indexablePaths containsObject: indpath]) {
     if (stime) {
-      [dict setObject: stime forKey: @"start_time"];  
+      [indpath setStartTime: stime];  
     } 
     if (etime) {
-      [dict setObject: etime forKey: @"end_time"];  
+      [indpath setEndTime: etime];  
     }     
-    [dict setObject: [NSNumber numberWithUnsignedLong: count] forKey: @"files"];    
-    [dict setObject: [NSNumber numberWithBool: indexed] forKey: @"indexed"];
+    [indpath setFilesCount: count];
+    [indpath setIndexed: indexed];
+
+  } else {
+    GMDSIndexablePath *ancestor = [indpath ancestor];
+  
+    if (ancestor) {
+      if (stime) {
+        [indpath setStartTime: stime];  
+      } 
+      if (etime) {
+        [indpath setEndTime: etime];  
+      }     
+      [indpath setFilesCount: count];
+      [indpath setIndexed: indexed];
+      
+      if (indexed) {
+        [ancestor checkIndexingDone];
+      }
+    }
   }
+}
+
+- (GMDSIndexablePath *)indexablePathWithPath:(NSString *)path
+{
+  unsigned i;
+
+  for (i = 0; i < [indexablePaths count]; i++) {
+    GMDSIndexablePath *indpath = [indexablePaths objectAtIndex: i];
+
+    if ([[indpath path] isEqual: path]) {
+      return indpath;
+    }
+  }
+  
+  return nil;
+}
+
+- (GMDSIndexablePath *)ancestorForAddingPath:(NSString *)path 
+{
+  unsigned i;
+
+  for (i = 0; i < [indexablePaths count]; i++) {
+    GMDSIndexablePath *indpath = [indexablePaths objectAtIndex: i];
+  
+    if ([indpath acceptsSubpath: path]) {
+      return indpath;
+    }
+  }
+  
+  return nil;
+}
+
+- (GMDSIndexablePath *)ancestorOfAddedPath:(NSString *)path
+{
+  unsigned i;
+
+  for (i = 0; i < [indexablePaths count]; i++) {
+    GMDSIndexablePath *indpath = [indexablePaths objectAtIndex: i];
+
+    if ([indpath subpathWithPath: path] != nil) {
+      return indpath;
+    }
+  }
+  
+  return nil;
 }
 
 - (void)startExtracting
 {
   unsigned index = 0;
-  NSString *path;
-  NSDictionary *dict;
     
   GWDebugLog(@"start extracting");
   extracting = YES;
@@ -443,20 +623,42 @@ BOOL isDotFile(NSString *path)
   RETAIN (statusTimer);
     
   while (1) {  
-    if (index < ([indexedPaths count] -1)) {
-      path = [indexedPaths objectAtIndex: index];
-      RETAIN (path);
-      dict = [pathsStatus objectForKey: path];
+    if (index < [indexablePaths count]) {
+      GMDSIndexablePath *indpath = [indexablePaths objectAtIndex: index]; 
+      NSArray *subpaths = [indpath subpaths];
+      BOOL indexed = [indpath indexed];
       
-      if ([[dict objectForKey: @"indexed"] boolValue] == NO) {
-        if ([self extractFromPath: path] == NO) {
-          NSLog(@"An error occurred while processing %@", path);
-          RELEASE (path);
+      RETAIN (indpath);
+      
+      if (indexed == NO) {
+        if ([self extractFromPath: indpath] == NO) {
+          NSLog(@"An error occurred while processing %@", [indpath path]);
+          RELEASE (indpath);
           break;
         }
       }
       
-      RELEASE (path);
+      if (subpaths) {
+        unsigned i;
+      
+        for (i = 0; i < [subpaths count]; i++) {
+          GMDSIndexablePath *subpath = [subpaths objectAtIndex: i];
+          
+          RETAIN (subpath);
+          
+          if ([subpath indexed] == NO) {
+            if ([self extractFromPath: subpath] == NO) {
+              NSLog(@"An error occurred while processing %@", [subpath path]);
+              RELEASE (subpath);
+              break;
+            }
+          }
+          
+          TEST_RELEASE (subpath);
+        }      
+      }
+      
+      TEST_RELEASE (indpath);
       
     } else {
       break;
@@ -496,8 +698,9 @@ do { \
 
 #define UPDATE_COUNT 100
 
-- (BOOL)extractFromPath:(NSString *)path
+- (BOOL)extractFromPath:(GMDSIndexablePath *)indpath
 {
+  NSString *path = [NSString stringWithString: [indpath path]];
   NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: NO];
   
   if (attributes) {
@@ -505,7 +708,7 @@ do { \
     id extractor = nil;
     unsigned long fcount = 0;  
   
-    [self updateStatusOfPath: path
+    [self updateStatusOfPath: indpath
                    startTime: [NSDate date]
                      endTime: nil
                   filesCount: fcount
@@ -542,7 +745,7 @@ do { \
         NSString *subpath = [path stringByAppendingPathComponent: entry];
 
         skip = (isDotFile(subpath) 
-                    || inTreeFirstPartOfPath(subpath, excludePathsTree));
+                    || inTreeFirstPartOfPath(subpath, excludedPathsTree));
 
         attributes = [fm fileAttributesAtPath: subpath traverseLink: NO];
 
@@ -568,11 +771,12 @@ do { \
             fcount++;
             
             if ((fcount % UPDATE_COUNT) == 0) {
-              [self updateStatusOfPath: path
+              [self updateStatusOfPath: indpath
                              startTime: nil
                                endTime: nil
                             filesCount: fcount
                            indexedDone: NO];
+                           
               GWDebugLog(@"updating %i", fcount);             
             }
           }
@@ -597,7 +801,7 @@ do { \
       RELEASE (arp); 
     }
     
-    [self updateStatusOfPath: path
+    [self updateStatusOfPath: indpath
                    startTime: nil
                      endTime: [NSDate date]
                   filesCount: fcount
@@ -934,22 +1138,196 @@ do { \
   }
 }
 
-- (void)terminate
+@end
+
+
+@implementation	GMDSIndexablePath
+
+- (void)dealloc
 {
-  if (statusTimer && [statusTimer isValid]) {
-    [statusTimer invalidate];
+  RELEASE (path);
+  TEST_RELEASE (startTime);
+  TEST_RELEASE (endTime);
+  RELEASE (subpaths);
+  TEST_RELEASE (ancestor);
+  
+  [super dealloc];
+}
+
+- (id)initWithPath:(NSString *)apath
+          ancestor:(GMDSIndexablePath *)prepath
+{
+  self = [super init];
+  
+  if (self) {
+    ASSIGN (path, apath);
+    subpaths = [NSMutableArray new];
+    ancestor = nil;
+    if (prepath) {
+      ASSIGN (ancestor, prepath);
+    }
+    startTime = nil;
+    endTime = nil;
+    filescount = 0L;
+    indexed = NO;
+  }
+  
+  return self;
+}
+
+- (NSString *)path
+{
+  return path;
+}
+
+- (NSArray *)subpaths
+{
+  return subpaths;
+}
+
+- (GMDSIndexablePath *)subpathWithPath:(NSString *)apath
+{
+  unsigned i;
+  
+  for (i = 0; i < [subpaths count]; i++) {  
+    GMDSIndexablePath *subpath = [subpaths objectAtIndex: i];
+    
+    if ([[subpath path] isEqual: apath]) {
+      return subpath;
+    }
+  }
+  
+  return nil;
+}
+
+- (BOOL)acceptsSubpath:(NSString *)subpath
+{
+  if (subPathOfPath(path, subpath)) {
+    return ([self subpathWithPath: subpath] == nil);
+  }
+  
+  return NO;
+}
+
+- (GMDSIndexablePath *)addSubpath:(NSString *)apath
+{
+  if ([self acceptsSubpath: apath]) {
+    GMDSIndexablePath *subpath = [[GMDSIndexablePath alloc] initWithPath: apath ancestor: self];
+
+    [subpaths addObject: subpath];
+    RELEASE (subpath);
+    
+    return subpath;
+  }
+  
+  return nil;
+}
+
+- (void)removeSubpath:(NSString *)apath
+{
+  GMDSIndexablePath *subpath = [self subpathWithPath: apath];
+  
+  if (subpath) {
+    [subpaths removeObject: subpath];
+  }
+}
+
+- (BOOL)isSubpath
+{
+  return (ancestor != nil);
+}
+
+- (GMDSIndexablePath *)ancestor
+{
+  return ancestor;
+}
+
+- (unsigned long)filescount
+{
+  return filescount;
+}
+
+- (void)setFilesCount:(unsigned long)count
+{
+  filescount = count;
+}
+
+- (NSDate *)startTime
+{
+  return startTime;
+}
+
+- (void)setStartTime:(NSDate *)date
+{
+  ASSIGN (startTime, date);
+}
+
+- (NSDate *)endTime
+{
+  return endTime;
+}
+
+- (void)setEndTime:(NSDate *)date
+{
+  ASSIGN (endTime, date);
+}
+
+- (BOOL)indexed
+{
+  return indexed;
+}
+
+- (void)setIndexed:(BOOL)value
+{
+  indexed = value;
+}
+
+- (void)checkIndexingDone
+{
+  unsigned count = [subpaths count];
+  unsigned i;
+
+  for (i = 0; i < count; i++) {  
+    GMDSIndexablePath *subpath = [subpaths objectAtIndex: i];
+
+    [self setFilesCount: (filescount + [subpath filescount])];
+
+    if ([subpath indexed]) {
+      [self setEndTime: [subpath endTime]];
+      [subpaths removeObject: subpath];
+      count--;
+      i--;
+    }
+  }
+}
+
+- (NSDictionary *)info
+{
+  NSMutableDictionary *info = [NSMutableDictionary dictionary];
+  NSMutableArray *subinfo = [NSMutableArray array];
+  unsigned i;
+  
+  [info setObject: path forKey: @"path"];
+  
+  if (startTime) {
+    [info setObject: startTime forKey: @"start_time"];
   }
 
-  [dnc removeObserver: self];
-  [nc removeObserver: self];
-  
-  if (db != NULL) {
-    sqlite3_close(db);
+  if (endTime) {
+    [info setObject: endTime forKey: @"end_time"];
   }
   
-  NSLog(@"exiting");
+  [info setObject: [NSNumber numberWithBool: indexed] forKey: @"indexed"];
   
-  exit(EXIT_SUCCESS);
+  [info setObject: [NSNumber numberWithUnsignedLong: filescount] forKey: @"count"];
+  
+  for (i = 0; i < [subpaths count]; i++) {
+    [subinfo addObject: [[subpaths objectAtIndex: i] info]];
+  }
+  [info setObject: [subinfo makeImmutableCopyOnFail: NO]
+           forKey: @"subpaths"];
+
+  return [info makeImmutableCopyOnFail: NO];
 }
 
 @end

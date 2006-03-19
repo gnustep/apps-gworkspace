@@ -45,7 +45,7 @@
   NSString *extInfoType;
   
   NSImage *icon;
-  NSImage *openicon;
+  NSImage *selectedicon;
   NSImage *drawicon;
   int iconSize;
   NSRect icnBounds;

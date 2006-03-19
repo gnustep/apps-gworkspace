@@ -90,3 +90,6 @@ BOOL inTreeFirstPartOfPath(NSString *path, pcomp *base);
 BOOL containsElementsOfPath(NSString *path, pcomp *base);
 
 #endif // DBK_PATHS_TREE_H
+
+
+
