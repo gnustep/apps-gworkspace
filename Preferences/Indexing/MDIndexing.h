@@ -33,6 +33,8 @@
 #endif
 
 @class NSMatrix;
+@class NSScrollView;
+@class NSTextView;
 @class StartAppWin;
 
 @protocol	MDExtractorProtocol
@@ -60,6 +62,7 @@
   BOOL indexingEnabled;
   
   IBOutlet id enableSwitch;
+  IBOutlet id statusButton;
   IBOutlet id revertButton;
   IBOutlet id applyButton;
       
@@ -67,9 +70,15 @@
   NSPreferencePaneUnselectReply unselectReply;
 
   id mdextractor;
+  
   StartAppWin *startAppWin;  
   NSString *indexedStatusPath;
   NSDistributedLock *indexedStatusLock;
+  
+  IBOutlet id statusWindow;
+  IBOutlet NSScrollView *statusScroll;
+  NSTextView *statusView;
+  NSTimer *statusTimer;
   
   NSFileManager *fm;
   NSNotificationCenter *nc;
@@ -90,17 +99,19 @@
 
 - (IBAction)applyButtAction:(id)sender;
 
+- (NSString *)chooseNewPath;
+
 - (void)adjustMatrix:(NSMatrix *)matrix;
 
 - (void)setupDbPaths;
-
-- (NSArray *)readIndexedPathsStatus;
 
 - (void)connectMDExtractor;
 
 - (void)mdextractorConnectionDidDie:(NSNotification *)notif;
 
-- (NSString *)chooseNewPath;
+- (IBAction)statusButtAction:(id)sender;
+
+- (void)readIndexedPathsStatus:(id)sender;
 
 - (void)readDefaults;
 

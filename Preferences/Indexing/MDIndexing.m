@@ -35,11 +35,17 @@ BOOL isDotFile(NSString *path);
 
 - (void)dealloc
 {
+  if (statusTimer && [statusTimer isValid]) {
+    [statusTimer invalidate];
+  }
+  DESTROY (statusTimer);
+
   TEST_RELEASE (indexedPaths);
   TEST_RELEASE (excludedPaths);
   TEST_RELEASE (startAppWin);  
   TEST_RELEASE (indexedStatusPath);
   TEST_RELEASE (indexedStatusLock);
+  TEST_RELEASE (statusWindow);
     
 	[super dealloc];
 }
@@ -138,6 +144,24 @@ BOOL isDotFile(NSString *path);
         
     startAppWin = [[StartAppWin alloc] init];
     
+    [statusWindow setTitle: NSLocalizedString(@"Status", @"")];
+    [statusWindow setFrameUsingName: @"mdindexing_status_win"];
+    [statusWindow setDelegate: self];
+
+    [statusScroll setBorderType: NSBezelBorder];
+    [statusScroll setHasHorizontalScroller: NO];
+    [statusScroll setHasVerticalScroller: YES]; 
+    statusView = [[NSTextView alloc] initWithFrame: [[statusScroll contentView] frame]];
+    [statusView setEditable: NO];
+    [statusView setSelectable: NO];
+    [statusView setVerticallyResizable: YES];
+    [statusView setHorizontallyResizable: NO];
+    [statusView setFont: [NSFont userFixedPitchFontOfSize: 0]];
+    [statusScroll setDocumentView: statusView];
+    RELEASE (statusView);
+    
+    statusTimer = nil;
+    
     indexedStatusPath = nil;
     [self setupDbPaths];
     
@@ -161,6 +185,13 @@ BOOL isDotFile(NSString *path);
                       nil)) {
       [self connectMDExtractor];                
     }
+  }
+}
+
+- (void)willUnselect
+{
+  if ([statusWindow isVisible]) {
+    [statusWindow close];
   }
 }
 
@@ -438,6 +469,21 @@ return; \
   [applyButton setEnabled: NO];
 }
 
+- (NSString *)chooseNewPath
+{
+	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+	int result;
+
+	[openPanel setTitle: NSLocalizedString(@"Choose directory", @"")];	
+  [openPanel setAllowsMultipleSelection: NO];
+  [openPanel setCanChooseFiles: NO];
+  [openPanel setCanChooseDirectories: YES];
+
+  result = [openPanel runModalForDirectory: nil file: nil types: nil];
+
+  return ((result == NSOKButton) ? [openPanel filename] : nil);  
+}
+
 - (void)adjustMatrix:(NSMatrix *)matrix
 {
   NSArray *cells = [matrix cells];
@@ -502,48 +548,6 @@ return; \
 
   lockpath = [dbdir stringByAppendingPathComponent: @"extractors.lock"];
   indexedStatusLock = [[NSDistributedLock alloc] initWithPath: lockpath];
-}
-
-- (NSArray *)readIndexedPathsStatus
-{
-  NSArray *status = nil;
-
-  if (indexedStatusPath && [fm isReadableFileAtPath: indexedStatusPath]) {
-    if ([indexedStatusLock tryLock] == NO) {
-      unsigned sleeps = 0;
-
-      if ([[indexedStatusLock lockDate] timeIntervalSinceNow] < -20.0) {
-	      NS_DURING
-	        {
-	      [indexedStatusLock breakLock];
-	        }
-	      NS_HANDLER
-	        {
-        NSLog(@"Unable to break lock %@ ... %@", indexedStatusLock, localException);
-	        }
-	      NS_ENDHANDLER
-      }
-
-      for (sleeps = 0; sleeps < 10; sleeps++) {
-	      if ([indexedStatusLock tryLock]) {
-	        break;
-	      }
-
-        sleeps++;
-	      [NSThread sleepUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.1]];
-	    }
-
-      if (sleeps >= 10) {
-        NSLog(@"Unable to obtain lock %@", indexedStatusLock);
-        return nil;
-	    }
-    }
-
-    status = [NSArray arrayWithContentsOfFile: indexedStatusPath];
-    [indexedStatusLock unlock];
-  }
-  
-  return ((status != nil) ? status : [NSArray array]);
 }
 
 - (void)connectMDExtractor
@@ -645,19 +649,141 @@ return; \
   }
 }
 
-- (NSString *)chooseNewPath
+- (IBAction)statusButtAction:(id)sender
 {
-	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
-	int result;
+  if ([statusWindow isVisible] == NO) {
+    [statusWindow makeKeyAndOrderFront: nil];
+    
+    [self readIndexedPathsStatus: nil];
+    
+    if (statusTimer && [statusTimer isValid]) {
+      [statusTimer invalidate];
+    }
+    DESTROY (statusTimer);
 
-	[openPanel setTitle: NSLocalizedString(@"Choose directory", @"")];	
-  [openPanel setAllowsMultipleSelection: NO];
-  [openPanel setCanChooseFiles: NO];
-  [openPanel setCanChooseDirectories: YES];
+    statusTimer = [NSTimer scheduledTimerWithTimeInterval: 5.0 
+						                           target: self 
+                                     selector: @selector(readIndexedPathsStatus:) 
+																     userInfo: nil 
+                                      repeats: YES];
+    RETAIN (statusTimer);
+  }
+}
 
-  result = [openPanel runModalForDirectory: nil file: nil types: nil];
+- (void)readIndexedPathsStatus:(id)sender
+{
+  CREATE_AUTORELEASE_POOL(arp);
 
-  return ((result == NSOKButton) ? [openPanel filename] : nil);  
+  if (indexedStatusPath && [fm isReadableFileAtPath: indexedStatusPath]) {
+    NSArray *status = nil;
+    
+    if ([indexedStatusLock tryLock] == NO) {
+      unsigned sleeps = 0;
+
+      if ([[indexedStatusLock lockDate] timeIntervalSinceNow] < -20.0) {
+	      NS_DURING
+	        {
+	      [indexedStatusLock breakLock];
+	        }
+	      NS_HANDLER
+	        {
+        NSLog(@"Unable to break lock %@ ... %@", indexedStatusLock, localException);
+	        }
+	      NS_ENDHANDLER
+      }
+
+      for (sleeps = 0; sleeps < 10; sleeps++) {
+	      if ([indexedStatusLock tryLock]) {
+	        break;
+	      }
+
+        sleeps++;
+	      [NSThread sleepUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+	    }
+
+      if (sleeps >= 10) {
+        NSLog(@"Unable to obtain lock %@", indexedStatusLock);
+        RELEASE (arp);
+        return;
+	    }
+    }
+
+    status = [NSArray arrayWithContentsOfFile: indexedStatusPath];
+    [indexedStatusLock unlock];
+  
+    if (status) {
+      NSMutableString *str = [NSMutableString string];
+      unsigned i;
+    
+      for (i = 0; i < [status count]; i++) {
+        NSDictionary *info = [status objectAtIndex: i];
+        NSString *path = [info objectForKey: @"path"];
+        BOOL indexed = [[info objectForKey: @"indexed"] boolValue];
+        NSNumber *fcount = [info objectForKey: @"count"];
+        NSDate *startTime = [info objectForKey: @"start_time"];
+        NSDate *endTime = [info objectForKey: @"end_time"];
+        NSArray *subPaths = [info objectForKey: @"subpaths"];
+                
+        [str appendFormat: @"%@\n", path];
+        [str appendFormat: @"  indexed: %@\n", (indexed ? @"YES" : @"NO")];
+        
+        if (startTime) {
+          [str appendFormat: @"  start:   %@\n", [startTime description]];
+        }
+        if (endTime) {
+          [str appendFormat: @"  end:     %@\n", [endTime description]];
+        }
+        if (fcount) {
+          [str appendFormat: @"  files:    %i\n", [fcount unsignedLongValue]];
+        }
+
+        if (subPaths && [subPaths count]) {
+          unsigned j;
+          
+          [str appendString: @"  subpaths:\n"];
+          
+          for (j = 0; j < [subPaths count]; j++) {
+            info = [subPaths objectAtIndex: j];
+            path = [info objectForKey: @"path"];
+            indexed = [[info objectForKey: @"indexed"] boolValue];
+            fcount = [info objectForKey: @"count"];
+            startTime = [info objectForKey: @"start_time"];
+            endTime = [info objectForKey: @"end_time"];
+            
+            [str appendFormat: @"    %@\n", path];
+            [str appendFormat: @"      indexed: %@\n", (indexed ? @"YES" : @"NO")];
+            
+            if (startTime) {
+              [str appendFormat: @"      start:   %@\n", [startTime description]];
+            }
+            if (endTime) {
+              [str appendFormat: @"      end:     %@\n", [endTime description]];
+            }
+            if (fcount) {
+              [str appendFormat: @"      files:    %i\n", [fcount unsignedLongValue]];
+            }          
+          }
+        }
+        
+        [str appendString: @"\n"];
+      }
+  
+      [statusView setString: str];
+      [statusView sizeToFit];
+    }
+  }
+  
+  RELEASE (arp);
+}
+
+- (void)windowWillClose:(NSNotification *)aNotification
+{
+  if (statusTimer && [statusTimer isValid]) {
+    [statusTimer invalidate];
+  }
+  DESTROY (statusTimer);
+
+  [statusWindow saveFrameUsingName: @"mdindexing_status_win"];
 }
 
 - (void)readDefaults 
