@@ -6,8 +6,7 @@ include $(GNUSTEP_MAKEFILES)/common.make
 
 TOOL_NAME = fswatcher
 
-fswatcher_OBJC_FILES = fswatcher.m \
-pathutils.m
+fswatcher_OBJC_FILES = fswatcher.m 
 
 fswatcher_TOOL_LIBS += -lDBKit
 
