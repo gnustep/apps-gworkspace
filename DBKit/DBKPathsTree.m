@@ -106,6 +106,11 @@ static intIMP pathCompareImp = NULL;
   return containsElementsOfPath(path, tree);
 }
 
+- (NSArray *)paths
+{
+  return pathsOfTreeWithBase(tree);
+}
+
 @end
 
 
@@ -116,10 +121,11 @@ pcomp *newTreeWithIdentifier(id identifier)
 
     comp->name = [identifier retain];
     comp->subcomps = NSZoneCalloc(NSDefaultMallocZone(), 1, sizeof(pcomp *)); 
-    comp->capacity = 0;
     comp->sub_count = 0;  
+    comp->capacity = 0;
     comp->parent = NULL;
     comp->ins_count = 1;  
+    comp->last_path_comp = 0;  
 
     if (pathCompsSel == NULL) {
       pathCompsSel = @selector(pathComponents);
@@ -198,10 +204,11 @@ pcomp *compInsertingName(NSString *name, pcomp *parent)
   parent->subcomps[ins] = NSZoneCalloc(NSDefaultMallocZone(), 1, sizeof(pcomp));
   parent->subcomps[ins]->name = [[NSString alloc] initWithString: name];
   parent->subcomps[ins]->subcomps = NSZoneCalloc(NSDefaultMallocZone(), 1, sizeof(pcomp *)); 
-  parent->subcomps[ins]->capacity = 0;
   parent->subcomps[ins]->sub_count = 0;  
+  parent->subcomps[ins]->capacity = 0;
   parent->subcomps[ins]->parent = parent;
   parent->subcomps[ins]->ins_count = 1;  
+  parent->subcomps[ins]->last_path_comp = 0;  
   
   return parent->subcomps[ins];
 }
@@ -262,30 +269,37 @@ void insertComponentsOfPath(NSString *path, pcomp *base)
   for (i = 0; i < [components count]; i++) {
     comp = compInsertingName([components objectAtIndex: i], comp);
   }
+  
+  comp->last_path_comp = 1;
 }
 
 void removeComponentsOfPath(NSString *path, pcomp *base)
 {
   NSArray *components = (*pathCompsImp)(path, pathCompsSel);
+  unsigned compcount = [components count];  
   pcomp *comp = base;
   pcomp *comps[MAX_PATH_DEEP];
   unsigned count = 0;  
   int i;
 
-  for (i = 0; i < [components count]; i++) {
+  for (i = 0; i < compcount; i++) {
     comp = subcompWithName([components objectAtIndex: i], comp);
     
     if (comp) {
       comp->ins_count--;
+      if (i == (compcount -1)) {
+        comp->last_path_comp = 0;
+      }
       comps[count] = comp;
       count++;
+      
     } else {
       break;
     }
   }
   
   for (i = count - 1; i >= 0; i--) {  
-    if ((comps[i]->ins_count <= 0) && (comps[i]->sub_count == 0)) {
+    if ((comps[i]->sub_count == 0) && (comps[i]->ins_count <= 0)) {
       removeSubcomp(comps[i], comps[i]->parent);
     }
   }
@@ -360,7 +374,7 @@ BOOL fullPathInTree(NSString *path, pcomp *base)
 
     if (comp == NULL) {
       break;
-    } else if ((i == (count -1)) && (comp->sub_count == 0)) {
+    } else if ((i == (count -1)) && (comp->last_path_comp == 1)) {
       return YES;
     }
   }
@@ -396,7 +410,6 @@ BOOL inTreeFirstPartOfPath(NSString *path, pcomp *base)
 
 /*
   This verifies if the tree contains all the elements of the path,
-  even if it has not been inserted as a whole.
 */
 BOOL containsElementsOfPath(NSString *path, pcomp *base)
 {
@@ -415,6 +428,59 @@ BOOL containsElementsOfPath(NSString *path, pcomp *base)
   
   return YES;
 }
+
+NSArray *pathsOfTreeWithBase(pcomp *base)
+{
+  NSMutableArray *paths = [NSMutableArray array];
+  
+  if ((base->parent == NULL) && (base->sub_count == 1)) {
+    base = base->subcomps[0];
+  }
+  
+  appendComponentToArray(base, nil, paths);
+  
+  return (([paths count] > 0) ? [paths makeImmutableCopyOnFail: NO] : nil);
+}
+
+void appendComponentToArray(pcomp *comp, NSString *path, NSMutableArray *paths)
+{
+  if (path == nil) {
+    path = [NSString stringWithString: comp->name];
+  } else {
+    path = [path stringByAppendingPathComponent: comp->name];
+  }
+  
+  if (comp->last_path_comp) {
+    [paths addObject: path];
+  }
+    
+  if (comp->sub_count) {
+    unsigned i;
+    
+    for (i = 0; i < comp->sub_count; i++) {
+      appendComponentToArray(comp->subcomps[i], path, paths);
+    }
+  } 
+}
+
+unsigned deepOfComponent(pcomp *comp)
+{
+  if (comp->parent != NULL) {
+    return (1 + deepOfComponent(comp->parent));
+  }
+  
+  return 0;
+}
+
+
+
+
+
+
+
+
+
+
 
 
 

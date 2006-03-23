@@ -33,10 +33,11 @@ typedef struct _pcomp
 {
   id name;
   struct _pcomp **subcomps;
-  unsigned capacity;
   unsigned sub_count;
+  unsigned capacity;
   struct _pcomp *parent;
   int ins_count;
+  unsigned last_path_comp;
 } pcomp;
 
 
@@ -61,6 +62,8 @@ typedef struct _pcomp
 - (BOOL)inTreeFirstPartOfPath:(NSString *)path;
 
 - (BOOL)containsElementsOfPath:(NSString *)path;
+
+- (NSArray *)paths;
 
 @end
 
@@ -88,6 +91,12 @@ BOOL fullPathInTree(NSString *path, pcomp *base);
 BOOL inTreeFirstPartOfPath(NSString *path, pcomp *base);
 
 BOOL containsElementsOfPath(NSString *path, pcomp *base);
+
+NSArray *pathsOfTreeWithBase(pcomp *base);
+
+void appendComponentToArray(pcomp *comp, NSString *path, NSMutableArray *paths);
+
+unsigned deepOfComponent(pcomp *comp);
 
 #endif // DBK_PATHS_TREE_H
 

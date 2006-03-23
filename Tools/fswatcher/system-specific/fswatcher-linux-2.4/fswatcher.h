@@ -26,7 +26,7 @@
 #define FSWATCHER_H
 
 #include <Foundation/Foundation.h>
-#include "pathutils.h"
+#include "DBKPathsTree.h"
 
 @class Watcher;
 

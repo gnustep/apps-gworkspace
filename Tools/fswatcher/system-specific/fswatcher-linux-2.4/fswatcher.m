@@ -42,6 +42,25 @@
 #define MAX_PATH_LEN 512
 #define MAX_LINE_LEN (MAX_PATH_LEN * 2)
 
+BOOL isDotFile(NSString *path)
+{
+  int len = ([path length] - 1);
+  unichar c;
+  int i;
+  
+  for (i = len; i >= 0; i--) {
+    c = [path characterAtIndex: i];
+    
+    if (c == '.') {
+      if ((i > 0) && ([path characterAtIndex: (i - 1)] == '/')) {
+        return YES;
+      }
+    }
+  }
+  
+  return NO;  
+}
+
 @implementation	FSWClientInfo
 
 - (void)dealloc
@@ -188,8 +207,8 @@
     watchers = [[NSMutableSet alloc] initWithCapacity: 1];
     watchedPaths = [[NSCountedSet alloc] initWithCapacity: 1];
 
-    includePathsTree = newCompWithName(@"incl_paths");
-    excludePathsTree = newCompWithName(@"excl_paths");
+    includePathsTree = newTreeWithIdentifier(@"incl_paths");
+    excludePathsTree = newTreeWithIdentifier(@"excl_paths");
     [self setDefaultGlobalPaths];
 
     port[0] = (NSPort *)[NSPort port];
@@ -635,8 +654,8 @@
     
   notify = [watchedPaths containsObject: path];
   globnotify = ((isDotFile(path) == NO) 
-                      && isInTreeFirstPartOfPath(path, includePathsTree)
-                  && ((isInTreeFirstPartOfPath(path, excludePathsTree) == NO)
+                      && inTreeFirstPartOfPath(path, includePathsTree)
+                  && ((inTreeFirstPartOfPath(path, excludePathsTree) == NO)
                                   || fullPathInTree(path, includePathsTree)));
     
   if (notify || globnotify) {
@@ -724,8 +743,8 @@
 
         notify = ([watchedPaths containsObject: destBasePath]);
         globnotify = ((isDotFile(destBasePath) == NO) 
-                      && isInTreeFirstPartOfPath(destBasePath, includePathsTree)
-                  && ((isInTreeFirstPartOfPath(destBasePath, excludePathsTree) == NO)
+                      && inTreeFirstPartOfPath(destBasePath, includePathsTree)
+                  && ((inTreeFirstPartOfPath(destBasePath, excludePathsTree) == NO)
                                 || fullPathInTree(destBasePath, includePathsTree)));
         GWDebugLog(@"RENAME %@ to %@", path, destPath);
         break;

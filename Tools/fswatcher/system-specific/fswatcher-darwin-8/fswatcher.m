@@ -37,6 +37,25 @@
   do { if (GW_DEBUG_LOG) \
     NSLog(format , ## args); } while (0)
 
+BOOL isDotFile(NSString *path)
+{
+  int len = ([path length] - 1);
+  unichar c;
+  int i;
+  
+  for (i = len; i >= 0; i--) {
+    c = [path characterAtIndex: i];
+    
+    if (c == '.') {
+      if ((i > 0) && ([path characterAtIndex: (i - 1)] == '/')) {
+        return YES;
+      }
+    }
+  }
+  
+  return NO;  
+}
+
 @implementation	FSWClientInfo
 
 - (void)dealloc
@@ -183,8 +202,8 @@
     watchers = [[NSMutableSet alloc] initWithCapacity: 1];
     watchedPaths = [[NSCountedSet alloc] initWithCapacity: 1];
 
-    includePathsTree = newCompWithName(@"incl_paths");
-    excludePathsTree = newCompWithName(@"excl_paths");
+    includePathsTree = newTreeWithIdentifier(@"incl_paths");
+    excludePathsTree = newTreeWithIdentifier(@"excl_paths");
     [self setDefaultGlobalPaths];
     
     port[0] = (NSPort *)[NSPort port];
@@ -575,8 +594,8 @@
   NSString *basePath = [fullPath stringByDeletingLastPathComponent];
   BOOL notify = [watchedPaths containsObject: fullPath];
   BOOL globnotify = ((isDotFile(fullPath) == NO) 
-                      && isInTreeFirstPartOfPath(fullPath, includePathsTree)
-                && ((isInTreeFirstPartOfPath(fullPath, excludePathsTree) == NO)
+                      && inTreeFirstPartOfPath(fullPath, includePathsTree)
+                && ((inTreeFirstPartOfPath(fullPath, excludePathsTree) == NO)
                                 || fullPathInTree(fullPath, includePathsTree)));
   
   if (notify || globnotify) {

@@ -1333,6 +1333,66 @@ do { \
 @end
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+int main(int argc, char** argv)
+{
+  CREATE_AUTORELEASE_POOL(pool);
+  pcomp *tree = newTreeWithIdentifier(@"cazz");
+  NSFileManager *mgr = [NSFileManager defaultManager];
+//  NSString *basepath = @"/opt/Surse/gnustep/SVN/devmodules/usr-apps/gworkspace";
+  NSString *basepath = @"/usr/local/share/xine";
+  NSDirectoryEnumerator *enumerator = [mgr enumeratorAtPath: basepath];
+  NSMutableArray *testarr = [NSMutableArray array];
+  NSMutableArray *diffarr = [NSMutableArray array];
+  NSArray *paths;
+  unsigned i;
+    
+  while (1) {
+    NSString *entry = [enumerator nextObject];
+    
+    if (entry) {
+      NSString *fullPath = [basepath stringByAppendingPathComponent: entry];
+      
+      insertComponentsOfPath(fullPath, tree);
+      
+      [testarr addObject: fullPath];
+      
+    } else {
+      break;
+    }
+  }
+    
+  paths = pathsOfTreeWithBase(tree);
+    
+  NSLog(@"paths COUNT %i", [paths count]);
+  NSLog(@"testarr COUNT %i", [testarr count]);
+  
+  for (i = 0; i < [testarr count]; i++) {
+    NSString *path = [testarr objectAtIndex: i];
+  
+    if ([paths containsObject: path] == NO) {
+      [diffarr addObject: path];
+    }
+  }
+  
+  [diffarr writeToFile: @"/root/Desktop/aa" atomically: YES];
+      
+  RELEASE (pool);
+  exit(EXIT_SUCCESS);
+}
+
+/*
 int main(int argc, char** argv)
 {
   CREATE_AUTORELEASE_POOL(pool);
@@ -1386,5 +1446,5 @@ int main(int argc, char** argv)
   exit(EXIT_SUCCESS);
 }
 
-
+*/
 

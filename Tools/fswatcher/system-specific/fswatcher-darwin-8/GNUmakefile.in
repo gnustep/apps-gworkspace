@@ -9,6 +9,8 @@ TOOL_NAME = fswatcher
 fswatcher_OBJC_FILES = fswatcher.m \
 pathutils.m
 
+fswatcher_TOOL_LIBS += -lDBKit
+
 -include GNUmakefile.preamble
 
 -include GNUmakefile.local
