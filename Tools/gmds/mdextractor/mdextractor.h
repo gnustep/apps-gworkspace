@@ -31,6 +31,31 @@
 
 @class GMDSIndexablePath;
 
+@protocol	FSWClientProtocol
+
+- (oneway void)watchedPathDidChange:(NSData *)dirinfo;
+
+- (oneway void)globalWatchedPathDidChange:(NSDictionary *)info;
+
+@end
+
+
+@protocol	FSWatcherProtocol
+
+- (oneway void)registerClient:(id <FSWClientProtocol>)client
+              isGlobalWatcher:(BOOL)global;
+
+- (oneway void)unregisterClient:(id <FSWClientProtocol>)client;
+
+- (oneway void)client:(id <FSWClientProtocol>)client
+                          addWatcherForPath:(NSString *)path;
+
+- (oneway void)client:(id <FSWClientProtocol>)client
+                          removeWatcherForPath:(NSString *)path;
+
+@end
+
+
 @protocol	ExtractorsProtocol
 
 - (id)initForExtractor:(id)extr;
@@ -68,10 +93,10 @@
 @interface GMDSExtractor: NSObject 
 {
   NSMutableArray *indexablePaths;
-  NSMutableArray *excludedPaths;  
   pcomp *excludedPathsTree;  
   BOOL indexingEnabled;
   BOOL extracting;
+  BOOL subpathsChanged;  
   NSString *dbpath;
   sqlite3 *db;
 
@@ -86,6 +111,8 @@
   NSDistributedLock *indexedStatusLock;
   NSTimer *statusTimer;
   
+  id fswatcher;
+
   NSFileManager *fm;
   id ws;
   NSNotificationCenter *nc; 
@@ -147,6 +174,17 @@
 @end
 
 
+@interface GMDSExtractor (fswatcher)
+
+- (void)connectFSWatcher;
+
+- (void)fswatcherConnectionDidDie:(NSNotification *)notif;
+
+- (oneway void)globalWatchedPathDidChange:(NSDictionary *)info;
+
+@end
+
+
 @interface GMDSIndexablePath: NSObject 
 {
   NSString *path;
@@ -198,6 +236,11 @@
 - (NSDictionary *)info;
 
 @end
+
+
+BOOL isDotFile(NSString *path);
+
+BOOL subPathOfPath(NSString *p1, NSString *p2);
 
 #endif // MDEXTRACTOR_H
 

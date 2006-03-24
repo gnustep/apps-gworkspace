@@ -682,7 +682,7 @@ int main(int argc, char** argv)
 	    }
     NS_HANDLER
 	    {
-	      fprintf (stderr, "unable to launch the fswatcher task. exiting.\n");
+	      fprintf (stderr, "unable to launch the thumbnailer task. exiting.\n");
 	      DESTROY (task);
 	    }
     NS_ENDHANDLER

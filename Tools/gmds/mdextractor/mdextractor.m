@@ -49,46 +49,16 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
   sqlite3_result_int(context, exists);
 }
 
-BOOL isDotFile(NSString *path)
-{
-  int len = ([path length] - 1);
-  unichar c;
-  int i;
-  
-  for (i = len; i >= 0; i--) {
-    c = [path characterAtIndex: i];
-    
-    if (c == '.') {
-      if ((i > 0) && ([path characterAtIndex: (i - 1)] == '/')) {
-        return YES;
-      }
-    }
-  }
-  
-  return NO;  
-}
-
-BOOL subPathOfPath(NSString *p1, NSString *p2)
-{
-  int l1 = [p1 length];
-  int l2 = [p2 length];  
-
-  if ((l1 > l2) || ([p1 isEqual: p2])) {
-    return NO;
-  } else if ([[p2 substringToIndex: l1] isEqual: p1]) {
-    if ([[p2 pathComponents] containsObject: [p1 lastPathComponent]]) {
-      return YES;
-    }
-  }
-
-  return NO;
-}
-
 
 @implementation	GMDSExtractor
 
 - (void)dealloc
 {
+  if (fswatcher && [[(NSDistantObject *)fswatcher connectionForProxy] isValid]) {
+    [fswatcher unregisterClient: (id <FSWClientProtocol>)self];
+    DESTROY (fswatcher);
+  }
+
   if (statusTimer && [statusTimer isValid]) {
     [statusTimer invalidate];
   }
@@ -98,7 +68,6 @@ BOOL subPathOfPath(NSString *p1, NSString *p2)
   [nc removeObserver: self];
   
   DESTROY (indexablePaths);
-  DESTROY (excludedPaths);
   freeTree(excludedPathsTree);
   DESTROY (dbpath);
   DESTROY (indexedStatusPath);
@@ -194,7 +163,6 @@ BOOL subPathOfPath(NSString *p1, NSString *p2)
     [defaults synchronize];
     
     indexablePaths = [NSMutableArray new];
-    excludedPaths = [NSMutableArray new];
     excludedPathsTree = newTreeWithIdentifier(@"excluded");
 
     entry = [defaults arrayForKey: @"GSMetadataIndexablePaths"];
@@ -211,8 +179,6 @@ BOOL subPathOfPath(NSString *p1, NSString *p2)
 
     entry = [defaults arrayForKey: @"GSMetadataExcludedPaths"];
     if (entry) {
-      [excludedPaths addObjectsFromArray: entry];
-
       for (i = 0; i < [entry count]; i++) {
         insertComponentsOfPath([entry objectAtIndex: i], excludedPathsTree);
       }
@@ -221,7 +187,11 @@ BOOL subPathOfPath(NSString *p1, NSString *p2)
     indexingEnabled = [defaults boolForKey: @"GSMetadataIndexingEnabled"];    
     
     extracting = NO;
+    subpathsChanged = NO;
     statusTimer = nil;
+
+    fswatcher = nil;
+    [self connectFSWatcher];
     
     if ([self synchronizePathsStatus: YES] && indexingEnabled) {
       [self startExtracting];
@@ -237,6 +207,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2)
   NSDictionary *info = [notification userInfo];
   NSArray *indexable = [info objectForKey: @"GSMetadataIndexablePaths"];
   NSArray *excluded = [info objectForKey: @"GSMetadataExcludedPaths"];
+  NSArray *excludedPaths = pathsOfTreeWithBase(excludedPathsTree);
   BOOL shouldExtract;
   unsigned count;
   unsigned i;
@@ -287,12 +258,8 @@ BOOL subPathOfPath(NSString *p1, NSString *p2)
         - stop indexing if the current indexed path == path?
         */
       }
-      
-      [excludedPaths addObject: path];
     }
   }
-
-  count = [excludedPaths count];
 
   for (i = 0; i < [excludedPaths count]; i++) {
     NSString *path = [excludedPaths objectAtIndex: i];
@@ -302,11 +269,8 @@ BOOL subPathOfPath(NSString *p1, NSString *p2)
     
       if (indpath) {
         [indpath addSubpath: path];
+        subpathsChanged = YES;
       }
-      
-      [excludedPaths removeObject: path];
-      count--;
-      i--;
     }
   }
 
@@ -316,6 +280,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2)
     
   if (indexingEnabled) {
     if (shouldExtract && (extracting == NO)) {
+      subpathsChanged = NO;
       [self startExtracting];
     }
   
@@ -678,8 +643,13 @@ BOOL subPathOfPath(NSString *p1, NSString *p2)
   
   [self writePathsStatus: nil];
   extracting = NO;
-
+  
   GWDebugLog(@"extracting done!");
+  
+  if (subpathsChanged) {
+    subpathsChanged = NO;
+    [self startExtracting];
+  }
 }
 
 - (void)stopExtracting
@@ -1333,66 +1303,6 @@ do { \
 @end
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-int main(int argc, char** argv)
-{
-  CREATE_AUTORELEASE_POOL(pool);
-  pcomp *tree = newTreeWithIdentifier(@"cazz");
-  NSFileManager *mgr = [NSFileManager defaultManager];
-//  NSString *basepath = @"/opt/Surse/gnustep/SVN/devmodules/usr-apps/gworkspace";
-  NSString *basepath = @"/usr/local/share/xine";
-  NSDirectoryEnumerator *enumerator = [mgr enumeratorAtPath: basepath];
-  NSMutableArray *testarr = [NSMutableArray array];
-  NSMutableArray *diffarr = [NSMutableArray array];
-  NSArray *paths;
-  unsigned i;
-    
-  while (1) {
-    NSString *entry = [enumerator nextObject];
-    
-    if (entry) {
-      NSString *fullPath = [basepath stringByAppendingPathComponent: entry];
-      
-      insertComponentsOfPath(fullPath, tree);
-      
-      [testarr addObject: fullPath];
-      
-    } else {
-      break;
-    }
-  }
-    
-  paths = pathsOfTreeWithBase(tree);
-    
-  NSLog(@"paths COUNT %i", [paths count]);
-  NSLog(@"testarr COUNT %i", [testarr count]);
-  
-  for (i = 0; i < [testarr count]; i++) {
-    NSString *path = [testarr objectAtIndex: i];
-  
-    if ([paths containsObject: path] == NO) {
-      [diffarr addObject: path];
-    }
-  }
-  
-  [diffarr writeToFile: @"/root/Desktop/aa" atomically: YES];
-      
-  RELEASE (pool);
-  exit(EXIT_SUCCESS);
-}
-
-/*
 int main(int argc, char** argv)
 {
   CREATE_AUTORELEASE_POOL(pool);
@@ -1446,5 +1356,39 @@ int main(int argc, char** argv)
   exit(EXIT_SUCCESS);
 }
 
-*/
+
+BOOL isDotFile(NSString *path)
+{
+  int len = ([path length] - 1);
+  unichar c;
+  int i;
+  
+  for (i = len; i >= 0; i--) {
+    c = [path characterAtIndex: i];
+    
+    if (c == '.') {
+      if ((i > 0) && ([path characterAtIndex: (i - 1)] == '/')) {
+        return YES;
+      }
+    }
+  }
+  
+  return NO;  
+}
+
+BOOL subPathOfPath(NSString *p1, NSString *p2)
+{
+  int l1 = [p1 length];
+  int l2 = [p2 length];  
+
+  if ((l1 > l2) || ([p1 isEqual: p2])) {
+    return NO;
+  } else if ([[p2 substringToIndex: l1] isEqual: p1]) {
+    if ([[p2 pathComponents] containsObject: [p1 lastPathComponent]]) {
+      return YES;
+    }
+  }
+
+  return NO;
+}
 

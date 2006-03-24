@@ -438,6 +438,7 @@ static NSString *nibName = @"FileOperationWin";
 
 - (void)sendWillChangeNotification
 {
+  CREATE_AUTORELEASE_POOL(arp);
 	NSMutableDictionary *dict = [NSMutableDictionary dictionary];	
   int i;
     
@@ -460,10 +461,12 @@ static NSString *nibName = @"FileOperationWin";
 	[dnc postNotificationName: @"GWFileSystemWillChangeNotification"
 	 								   object: nil 
                    userInfo: dict];
+  RELEASE (arp);
 }
 
 - (void)sendDidChangeNotification
 {
+  CREATE_AUTORELEASE_POOL(arp);
   NSMutableDictionary *notifObj = [NSMutableDictionary dictionary];		
 
 	[notifObj setObject: type forKey: @"operation"];	
@@ -489,6 +492,7 @@ static NSString *nibName = @"FileOperationWin";
 	[dnc postNotificationName: @"GWFileSystemDidChangeNotification"
 	 						       object: nil 
                    userInfo: notifObj];  
+  RELEASE (arp);
 }
 
 - (void)registerExecutor:(id)anObject
@@ -654,8 +658,6 @@ static NSString *nibName = @"FileOperationWin";
   [executor setFileop: thePorts];
   [(id)[conn rootProxy] registerExecutor: executor];
   RELEASE (executor);
-  
-//  [[NSRunLoop currentRunLoop] run];
   
   RELEASE (pool);
 }

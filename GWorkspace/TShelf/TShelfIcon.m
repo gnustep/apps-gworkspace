@@ -776,7 +776,7 @@
 	  [opDict setObject: [node path] forKey: @"destination"];
 	  [opDict setObject: files forKey: @"files"];
 
-    [gw performFileOperationWithDictionary: opDict];
+    [gw performFileOperation: opDict];
 
   } else {  
     for (i = 0; i < [sourcePaths count]; i++) {    

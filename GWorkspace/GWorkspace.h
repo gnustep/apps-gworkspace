@@ -52,7 +52,9 @@
 
 @protocol	FSWClientProtocol
 
-- (void)watchedPathDidChange:(NSData *)dirinfo;
+- (oneway void)watchedPathDidChange:(NSData *)dirinfo;
+
+- (oneway void)globalWatchedPathDidChange:(NSDictionary *)dirinfo;
 
 @end
 
@@ -304,8 +306,6 @@
 
 - (void)ddbdSetAnnotations:(NSString *)annotations
                    forPath:(NSString *)path;
-
-- (void)performFileOperationWithDictionary:(NSDictionary *)opdict;
 
 - (void)slideImage:(NSImage *)image 
 							from:(NSPoint)fromPoint 

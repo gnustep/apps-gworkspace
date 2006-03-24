@@ -1,9 +1,18 @@
 #!/bin/sh
 
-APP=mozilla
-
-if [ $# -eq 2 ] ; then
-  $APP "$2" &
+if [ "$1" = "-GSFilePath" ] || [ "$1" = "-GSTempPath" ]; then
+   URL="$2"
 else
-  $APP &
+   URL="$1"
 fi
+
+mozilla -remote "openurl($URL,new-window)"
+
+if [ $? -eq 0 ]; then
+    echo contacted mozilla process
+else
+    echo starting mozilla
+    mozilla $URL &
+fi
+
+

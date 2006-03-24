@@ -9,6 +9,7 @@ Extractors
 TOOL_NAME = mdextractor
 
 mdextractor_OBJC_FILES = mdextractor.m \
+                  updater.m \
                   sqlite.m 
 
 mdextractor_TOOL_LIBS += -lgnustep-gui

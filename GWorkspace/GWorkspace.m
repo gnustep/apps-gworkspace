@@ -1471,7 +1471,7 @@ static GWorkspace *gworkspace = nil;
   }
 }
 
-- (void)watchedPathDidChange:(NSData *)dirinfo
+- (oneway void)watchedPathDidChange:(NSData *)dirinfo
 {
   CREATE_AUTORELEASE_POOL(arp);
   NSDictionary *info = [NSUnarchiver unarchiveObjectWithData: dirinfo];
@@ -1480,6 +1480,10 @@ static GWorkspace *gworkspace = nil;
  				 postNotificationName: @"GWFileWatcherFileDidChangeNotification"
 	 								     object: info];  
   RELEASE (arp);                       
+}
+
+- (oneway void)globalWatchedPathDidChange:(NSDictionary *)dirinfo
+{
 }
 
 - (void)connectRecycler
@@ -1708,18 +1712,6 @@ static GWorkspace *gworkspace = nil;
   if (ddbd && [ddbd dbactive]) {
     [ddbd setAnnotations: annotations forPath: path];
   }
-}
-
-- (void)performFileOperationWithDictionary:(NSDictionary *)opdict
-{
-	NSString *operation = [opdict objectForKey: @"operation"];
-	NSString *source = [opdict objectForKey: @"source"];
-	NSString *destination = [opdict objectForKey: @"destination"];
-	NSArray *files = [opdict objectForKey: @"files"];
-	int tag;
-	
-	[self performFileOperation: operation source: source 
-											destination: destination files: files tag: &tag];
 }
 
 - (void)slideImage:(NSImage *)image 
@@ -2138,7 +2130,7 @@ static GWorkspace *gworkspace = nil;
 	          [opDict setObject: destination forKey: @"destination"];
 	          [opDict setObject: files forKey: @"files"];
 
-	          [self performFileOperationWithDictionary: opDict];	
+	          [self performFileOperation: opDict];	
           }
         }
       }
@@ -2245,7 +2237,14 @@ static GWorkspace *gworkspace = nil;
 
 - (void)performFileOperation:(NSDictionary *)opinfo
 {
-  [self performFileOperationWithDictionary: opinfo];
+	NSString *operation = [opinfo objectForKey: @"operation"];
+	NSString *source = [opinfo objectForKey: @"source"];
+	NSString *destination = [opinfo objectForKey: @"destination"];
+	NSArray *files = [opinfo objectForKey: @"files"];
+	int tag;
+	
+	[self performFileOperation: operation source: source 
+											destination: destination files: files tag: &tag];
 }
 
 - (BOOL)filenamesWasCutted
