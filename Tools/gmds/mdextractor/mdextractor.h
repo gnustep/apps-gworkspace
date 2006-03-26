@@ -110,13 +110,20 @@
   NSString *indexedStatusPath;
   NSDistributedLock *indexedStatusLock;
   NSTimer *statusTimer;
-  
-  id fswatcher;
 
   NSFileManager *fm;
   id ws;
   NSNotificationCenter *nc; 
   NSNotificationCenter *dnc;  
+
+  //
+  // fswatcher_update  
+  //
+  id fswatcher;
+  NSMutableArray *fswupdatePaths;
+  NSMutableDictionary *fswupdateSkipBuff;
+  NSTimer *fswupdateTimer;
+  
 }
 
 - (void)indexedDirectoriesChanged:(NSNotification *)notification;
@@ -151,6 +158,8 @@
 - (BOOL)insertOrUpdatePath:(NSString *)path
             withAttributes:(NSDictionary *)attributes;
 
+- (BOOL)removePath:(NSString *)path;
+
 - (BOOL)setMetadata:(NSDictionary *)mddict
             forPath:(NSString *)path
      withAttributes:(NSDictionary *)attributes;
@@ -174,13 +183,20 @@
 @end
 
 
-@interface GMDSExtractor (fswatcher)
+@interface GMDSExtractor (fswatcher_update)
+
+- (void)setupFswatcherUpdater;
+
+- (oneway void)globalWatchedPathDidChange:(NSDictionary *)info;
+
+- (void)processPendingChanges:(id)sender;
+
+- (BOOL)updatePath:(NSString *)path
+        attributes:(NSDictionary *)attributes;
 
 - (void)connectFSWatcher;
 
 - (void)fswatcherConnectionDidDie:(NSNotification *)notif;
-
-- (oneway void)globalWatchedPathDidChange:(NSDictionary *)info;
 
 @end
 

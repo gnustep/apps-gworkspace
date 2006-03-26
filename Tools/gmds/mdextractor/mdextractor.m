@@ -54,28 +54,39 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
 
 - (void)dealloc
 {
+  if (statusTimer && [statusTimer isValid]) {
+    [statusTimer invalidate];
+  }
+  TEST_RELEASE (statusTimer);
+  
+  [dnc removeObserver: self];
+  [nc removeObserver: self];
+  
+  RELEASE (indexablePaths);
+  freeTree(excludedPathsTree);
+  RELEASE (dbpath);
+  RELEASE (indexedStatusPath);
+  RELEASE (indexedStatusLock);
+  RELEASE (extractors);  
+  RELEASE (textExtractor);
+  RELEASE (stemmer);  
+  RELEASE (stopWords);
+  
+  //  
+  // fswatcher_update  
+  //
   if (fswatcher && [[(NSDistantObject *)fswatcher connectionForProxy] isValid]) {
     [fswatcher unregisterClient: (id <FSWClientProtocol>)self];
     DESTROY (fswatcher);
   }
 
-  if (statusTimer && [statusTimer isValid]) {
-    [statusTimer invalidate];
+  if (fswupdateTimer && [fswupdateTimer isValid]) {
+    [fswupdateTimer invalidate];
   }
-  DESTROY (statusTimer);
-  
-  [dnc removeObserver: self];
-  [nc removeObserver: self];
-  
-  DESTROY (indexablePaths);
-  freeTree(excludedPathsTree);
-  DESTROY (dbpath);
-  DESTROY (indexedStatusPath);
-  DESTROY (indexedStatusLock);
-  DESTROY (extractors);  
-  DESTROY (textExtractor);
-  DESTROY (stemmer);  
-  DESTROY (stopWords);
+  TEST_RELEASE (fswupdateTimer);
+
+  RELEASE (fswupdatePaths);
+  RELEASE (fswupdateSkipBuff);
   
   [super dealloc];
 }
@@ -189,9 +200,8 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
     extracting = NO;
     subpathsChanged = NO;
     statusTimer = nil;
-
-    fswatcher = nil;
-    [self connectFSWatcher];
+    
+    [self setupFswatcherUpdater];
     
     if ([self synchronizePathsStatus: YES] && indexingEnabled) {
       [self startExtracting];
@@ -817,6 +827,37 @@ do { \
   query = [NSString stringWithFormat:
                       @"DELETE FROM attributes WHERE path_id = %i", path_id];
   PERFORM_QUERY (db, query);
+  
+  PERFORM_QUERY (db, @"COMMIT");
+
+  return YES;
+}
+
+- (BOOL)removePath:(NSString *)path
+{
+  NSString *query;
+  int path_id;
+
+  PERFORM_QUERY (db, @"BEGIN");
+
+  query = [NSString stringWithFormat: 
+                    @"SELECT id FROM paths WHERE path = '%@'",
+                                              stringForQuery(path)];
+  path_id = getIntEntry(db, query);
+
+  if (path_id != -1) { 
+    query = [NSString stringWithFormat:
+                      @"DELETE FROM postings WHERE path_id = %i", path_id];
+    PERFORM_QUERY (db, query);
+
+    query = [NSString stringWithFormat:
+                      @"DELETE FROM attributes WHERE path_id = %i", path_id];
+    PERFORM_QUERY (db, query);
+
+    query = [NSString stringWithFormat:
+                      @"DELETE FROM paths WHERE id = %i", path_id];
+    PERFORM_QUERY (db, query);
+  }
   
   PERFORM_QUERY (db, @"COMMIT");
 

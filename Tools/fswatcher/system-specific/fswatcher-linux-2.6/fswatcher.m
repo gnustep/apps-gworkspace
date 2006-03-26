@@ -694,6 +694,7 @@ BOOL isDotFile(NSString *path)
 
         notify = ([watchedPaths containsObject: destBasePath]);
         globnotify = ((isDotFile(destBasePath) == NO) 
+                      && (isDotFile(path) == NO)
                       && inTreeFirstPartOfPath(destBasePath, includePathsTree)
                   && ((inTreeFirstPartOfPath(destBasePath, excludePathsTree) == NO)
                                 || fullPathInTree(destBasePath, includePathsTree)));
@@ -714,20 +715,21 @@ BOOL isDotFile(NSString *path)
     }      
   }
 
+  
+  if (isDotFile(path) == NO) {
+    printf("sec %ld\n", rec->sec); 
+    printf("milli %ld\n", rec->milli); 
+    printf("serial %ld\n", rec->serial); 
+    printf("syscall %ld\n", rec->syscall); 
 
-  printf("sec %ld\n", rec->sec); 
-  printf("milli %ld\n", rec->milli); 
-  printf("serial %ld\n", rec->serial); 
-  printf("syscall %ld\n", rec->syscall); 
+    printf("basepath %s\n", rec->basepath);
+    printf("fullpath %s\n", rec->fullpath);
+    if (rec->syscall == __NR_rename) {
+      printf("destpath %s\n", rec->destpath);
+    }
 
-  printf("basepath %s\n", rec->basepath);
-  printf("fullpath %s\n", rec->fullpath);
-  if (rec->syscall == __NR_rename) {
-    printf("destpath %s\n", rec->destpath);
+    printf("\n"); 
   }
-
-  printf("\n"); 
-
 
 
   RELEASE (pool);
@@ -1330,12 +1332,13 @@ static BOOL plainAndModifiedPath(char *path)
 
   if ((lstat(path, &ptstat) == 0) && S_ISREG(ptstat.st_mode)) {
     time_t now = time(&now);
-    return (difftime(now, ptstat.st_mtime) < 5.0);
+    
+    return ((difftime(now, ptstat.st_ctime) < 5.0)
+                      || difftime(now, ptstat.st_mtime) < 5.0);
   } 
   
   return NO;
 }
-
 
 int main(int argc, char** argv)
 {
