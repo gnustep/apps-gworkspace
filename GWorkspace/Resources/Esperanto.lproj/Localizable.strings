@@ -1,4 +1,4 @@
-/* Attempt of a GWorkspace translation to esperanto
+/* Attempt of a GWorkspace translation to Esperanto
 ** ingolf jandt, jan 2006
 */
 
@@ -18,7 +18,7 @@
 	"New Folder" = "Nova dosierujo";
 	"New File" = "Nova dosiero";
 	"Duplicate" = "Duobligu";
-	"Destroy" = "Detruu"
+	"Destroy" = "Detruu";
 	"Move to Recycler" = "Ĵetu en rubujon";
 	"Empty Recycler" = "Malplenigu rubujon";
 
@@ -38,7 +38,8 @@
 		"Spatial" = "Space";
 		"Show" = "Montru";
 			"Name only" = "Nur nomon";
-			"Kind" = "Tipon";
+			"Type" = "Tipon";
+			/*"Kind" = "Tipon";*/
 			"Size" = "Grandecon";
 			"Modification date" = "Ŝanĝan daton";
 			"Owner" = "Posedanton";
@@ -83,7 +84,7 @@
 	"Hide Desktop" = "Kaŝu tablon";
 	"Show Recycler" = "Montru rubujon";
 	"Hide Recycler" = "Kaŝu rubujon";
-	"Check for Disks" = "Ekzamenu je disketoj";
+	"Check for disks" = "Ekzamenu je disketoj";
 
 /* depre... */
 	"Processes..." = "Procezoj...";
@@ -103,10 +104,15 @@
 
 "Print..." = "Printu...";
 
+"Show All" = "Montru ĉiujn";
+
 "Hide" = "Kaŝu";
 
+"Hide Others" = "Kaŝu aliajn";
+
 "Quit" = "Finu";
-	
+
+"Logout" = "Adiaŭu";	
 	
 	
 /* ----------------------- File Operations strings --------------------------- *\
@@ -118,7 +124,7 @@
 "Released under the GNU General Public License 2.0" = "Publicita laŭ la GNU General Public License 2.0";
 
 "Quit!" = "Finu!";
-"Do you really want to quit?" = "Ĉu vi vere volas fini?"
+"Do you really want to quit?" = "Ĉu vi vere volas fini?";
 "No" = "Ne";
 "Yes" = "Jes";
 
@@ -136,7 +142,7 @@
 "The Recycler connection died.\nDo you want to restart it?" = "La konekto al rubujon mortis.\nĈu vi volas relanĉi tiun?";
 
 "unable to contact Operation!" = "Ne povas konatiĝi Operation.";
-"The Operation connection died. File operations disabled!" = "La konekto al Operation mortis.\nDosiera operacioj malŝaltas."
+"The Operation connection died. File operations disabled!" = "La konekto al Operation mortis.\nDosiera operacioj malŝaltas.";
 
 "unable to contact ddbd." = "Ne povas konatiĝi ddbd.";
 "ddbd connection died." = "La konekto al ddbd mortis.";
@@ -167,7 +173,7 @@
 "items" = "anoj";
 
 /* Operation/Operation.m */
-"Wait the operations to terminate!" = "Bonvolu atendi ĝis la operacioj finiĝis."
+"Wait the operations to terminate!" = "Bonvolu atendi ĝis la operacioj finiĝis.";
 ": no such file or directory!" = ": neniu tiel dosiero aŭ dosierujo.";
 
 /* GWRemote/gwsd/FileOp.m */
@@ -332,7 +338,7 @@
 "Remove layer" = "Forigu tabulon";
 "Are you sure that you want to remove this layer?" = "Ĉu vi estas certa ke vi volas forigi tiun tabulon?";
 "Rename Layer" = "Alinomu tabulon";
-"You can't dock multiple paths!" = "Vi ne povas doki pluroblajn dosierindikojn"
+"You can't dock multiple paths!" = "Vi ne povas doki pluroblajn dosierindikojn";
 "This object is already present in this layer!" = "Ĉi tiu objekto jam ekzistas sur tiu tabulo.";
 			
 /* ----------------------- Preferences strings --------------------------- *\
@@ -352,7 +358,7 @@
 "Set Color" = "Difinu farbon";
 "Push the \"Set Image\" button\nto set your DeskTop image.\nThe image must have the same\nsize of your screen." = 
   "Klak la butonon «Difinu bildon»\nper difini la fonan bildon de la tabulo.\nLa bildo devas havi la saman\ngrandecon kiel via elkrano.";
-"Set Image" = "Difinu bildon"
+"Set Image" = "Difinu bildon";
 "Unset Image" = "Maldifinu bildon";
 
 	

@@ -158,8 +158,6 @@
 - (BOOL)insertOrUpdatePath:(NSString *)path
             withAttributes:(NSDictionary *)attributes;
 
-- (BOOL)removePath:(NSString *)path;
-
 - (BOOL)setMetadata:(NSDictionary *)mddict
             forPath:(NSString *)path
      withAttributes:(NSDictionary *)attributes;
@@ -183,6 +181,20 @@
 @end
 
 
+@interface GMDSExtractor (updater)
+
+- (BOOL)addPath:(NSString *)path;
+
+- (BOOL)updatePath:(NSString *)path;
+
+- (BOOL)updateRenamedPath:(NSString *)path 
+                  oldPath:(NSString *)oldpath;
+
+- (BOOL)removePath:(NSString *)path;
+
+@end
+
+
 @interface GMDSExtractor (fswatcher_update)
 
 - (void)setupFswatcherUpdater;
@@ -190,9 +202,6 @@
 - (oneway void)globalWatchedPathDidChange:(NSDictionary *)info;
 
 - (void)processPendingChanges:(id)sender;
-
-- (BOOL)updatePath:(NSString *)path
-        attributes:(NSDictionary *)attributes;
 
 - (void)connectFSWatcher;
 
@@ -257,6 +266,8 @@
 BOOL isDotFile(NSString *path);
 
 BOOL subPathOfPath(NSString *p1, NSString *p2);
+
+NSString *path_separator(void);
 
 #endif // MDEXTRACTOR_H
 

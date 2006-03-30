@@ -61,6 +61,25 @@ BOOL isDotFile(NSString *path)
   return NO;  
 }
 
+BOOL pathModified(NSString *path)
+{
+  static NSFileManager *fm = nil;
+  NSDictionary *attributes;
+  
+  if (fm == nil) {
+    fm = [NSFileManager defaultManager];
+  }
+  
+  attributes = [fm fileAttributesAtPath: path traverseLink: NO];
+
+  if (attributes) {
+    return (abs([[attributes fileModificationDate] timeIntervalSinceNow]) < 5);
+  }
+  
+  return NO;
+}
+
+
 @implementation	FSWClientInfo
 
 - (void)dealloc
@@ -607,7 +626,7 @@ BOOL isDotFile(NSString *path)
   NSString *destBasePath = nil;
   NSRange range = NSMakeRange(0, 1);
   BOOL notify;
-  BOOL globnotify;
+  BOOL rename_notify;
 
   while (*p != '\0') {
     buf[i] = *p;
@@ -649,40 +668,32 @@ BOOL isDotFile(NSString *path)
   }
   
   path = [path stringByStandardizingPath];
-  
   basePath = [path stringByDeletingLastPathComponent];
     
   notify = [watchedPaths containsObject: path];
-  globnotify = ((isDotFile(path) == NO) 
-                      && inTreeFirstPartOfPath(path, includePathsTree)
-                  && ((inTreeFirstPartOfPath(path, excludePathsTree) == NO)
-                                  || fullPathInTree(path, includePathsTree)));
-    
-  if (notify || globnotify) {
-    NSMutableDictionary *notifdict = [NSMutableDictionary dictionary];
-    BOOL glob = globnotify;
 
-    [notifdict setObject: path forKey: @"path"];
+  if (notify) {
+    NSMutableDictionary *info = [NSMutableDictionary dictionary];
+    
+    [info setObject: path forKey: @"path"];
 
     switch (operation) { 
       case OPENW:
       case CREATE:
       case MKDIR:
         if (pathModified(path)) {
-          [notifdict setObject: @"GWWatchedFileModified" forKey: @"event"];
+          [info setObject: @"GWWatchedFileModified" forKey: @"event"];
           GWDebugLog(@"MODIFIED %@", path);
         } else {
           notify = NO;
-          globnotify = NO;
         }
         break;
 
       case UNLINK:
       case RMDIR:
       case RENAME:
-        [notifdict setObject: @"GWWatchedPathDeleted" forKey: @"event"];
+        [info setObject: @"GWWatchedPathDeleted" forKey: @"event"];
         GWDebugLog(@"DELETE %@", path); 
-        glob = NO;
         break;
 
       default:
@@ -691,61 +702,52 @@ BOOL isDotFile(NSString *path)
     }
 
     if (notify) {
-      [self notifyClients: notifdict];
+      [self notifyClients: info];
     }
-
-    if (glob) {
-      [self notifyGlobalWatchingClients: notifdict];
-    }  
   }
 
   notify = [watchedPaths containsObject: basePath];
 
-  if (notify || globnotify) {
-    NSMutableDictionary *notifdict = [NSMutableDictionary dictionary];
-    BOOL notify = YES;
-
-    [notifdict setObject: basePath forKey: @"path"];
+  if (notify) {
+    NSMutableDictionary *info = [NSMutableDictionary dictionary];
+    
+    [info setObject: basePath forKey: @"path"];
 
     switch (operation) {   
       case OPENW:
       case CREATE:
       case MKDIR:
-        [notifdict setObject: @"GWFileCreatedInWatchedDirectory" forKey: @"event"];
-        [notifdict setObject: [NSArray arrayWithObject: [path lastPathComponent]] 
-                      forKey: @"files"];
+        [info setObject: @"GWFileCreatedInWatchedDirectory" forKey: @"event"];
+        [info setObject: [NSArray arrayWithObject: [path lastPathComponent]] 
+                 forKey: @"files"];
         GWDebugLog(@"CREATE %@", path);
         break;
 
       case UNLINK:
       case RMDIR:
-        [notifdict setObject: @"GWFileDeletedInWatchedDirectory" forKey: @"event"];
-        [notifdict setObject: [NSArray arrayWithObject: [path lastPathComponent]] 
-                      forKey: @"files"];
+        [info setObject: @"GWFileDeletedInWatchedDirectory" forKey: @"event"];
+        [info setObject: [NSArray arrayWithObject: [path lastPathComponent]] 
+                 forKey: @"files"];
         GWDebugLog(@"DELETE %@", path);
         break;
 
       case RENAME:
-        [notifdict setObject: @"GWFileDeletedInWatchedDirectory" forKey: @"event"];
-        [notifdict setObject: [NSArray arrayWithObject: [path lastPathComponent]] 
-                      forKey: @"files"];
-        [self notifyClients: notifdict];
-        if (globnotify) {
-          [self notifyGlobalWatchingClients: notifdict];
-        }  
-
-        notifdict = [NSMutableDictionary dictionary];
-
-        [notifdict setObject: destBasePath forKey: @"path"];
-        [notifdict setObject: @"GWFileCreatedInWatchedDirectory" forKey: @"event"];
-        [notifdict setObject: [NSArray arrayWithObject: [destPath lastPathComponent]]
-                      forKey: @"files"];
+        [info setObject: @"GWFileDeletedInWatchedDirectory" forKey: @"event"];
+        [info setObject: [NSArray arrayWithObject: [path lastPathComponent]] 
+                 forKey: @"files"];
+        [self notifyClients: info];
 
         notify = ([watchedPaths containsObject: destBasePath]);
-        globnotify = ((isDotFile(destBasePath) == NO) 
-                      && inTreeFirstPartOfPath(destBasePath, includePathsTree)
-                  && ((inTreeFirstPartOfPath(destBasePath, excludePathsTree) == NO)
-                                || fullPathInTree(destBasePath, includePathsTree)));
+        
+        if (notify) {
+          info = [NSMutableDictionary dictionary];
+
+          [info setObject: destBasePath forKey: @"path"];
+          [info setObject: @"GWFileCreatedInWatchedDirectory" forKey: @"event"];
+          [info setObject: [NSArray arrayWithObject: [destPath lastPathComponent]]
+                   forKey: @"files"];
+        }
+        
         GWDebugLog(@"RENAME %@ to %@", path, destPath);
         break;
 
@@ -755,13 +757,76 @@ BOOL isDotFile(NSString *path)
     }
 
     if (notify) {
-      [self notifyClients: notifdict];
+      [self notifyClients: info];
     }
+  }
 
-    if (globnotify) {
-      [self notifyGlobalWatchingClients: notifdict];
+  //
+  // global watching
+  //
+  notify = ((isDotFile(path) == NO) 
+                      && inTreeFirstPartOfPath(path, includePathsTree)
+                  && (inTreeFirstPartOfPath(path, excludePathsTree) == NO));
+
+  rename_notify = ((operation == RENAME)
+                  && (isDotFile(destPath) == NO) 
+                        && inTreeFirstPartOfPath(destPath, includePathsTree)
+                    && (inTreeFirstPartOfPath(destPath, excludePathsTree) == NO));
+    
+  if (notify) {
+    NSMutableDictionary *info = [NSMutableDictionary dictionary];
+    
+    [info setObject: path forKey: @"path"];
+
+    switch (operation) { 
+      case OPENW:
+      case CREATE:
+      case MKDIR:
+        if (pathModified(path)) {
+          [info setObject: @"GWWatchedFileModified" forKey: @"event"];
+          GWDebugLog(@"MODIFIED %@", path);
+        } else {
+          notify = NO;
+        }
+        break;
+
+      case UNLINK:
+      case RMDIR:
+        [info setObject: @"GWWatchedPathDeleted" forKey: @"event"];
+        GWDebugLog(@"DELETE %@", path); 
+        break;
+              
+      case RENAME:
+        if (rename_notify == NO) {
+          [info setObject: @"GWWatchedPathDeleted" forKey: @"event"];
+          GWDebugLog(@"DELETE %@", path);        
+        } else {
+          notify = NO;
+        }
+        break;
+
+      default:
+        notify = NO;
+        break;        
+    }
+    
+    if (notify) {
+      [self notifyGlobalWatchingClients: info];
     }  
-  }       
+  }
+
+  if (rename_notify) {  
+    NSMutableDictionary *info = [NSMutableDictionary dictionary];
+    
+    [info setObject: destPath forKey: @"path"];
+    if (notify) {
+      [info setObject: path forKey: @"oldpath"];
+    } 
+    [info setObject: @"GWWatchedPathRenamed" forKey: @"event"];
+    GWDebugLog(@"RENAME %@ to %@", path, destPath);
+    
+    [self notifyGlobalWatchingClients: info];
+  }
 
   RELEASE (pool);
 }

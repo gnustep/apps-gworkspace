@@ -592,107 +592,139 @@ BOOL isDotFile(NSString *path)
   CREATE_AUTORELEASE_POOL(pool);
   NSString *fullPath = [NSString stringWithUTF8String: path];
   NSString *basePath = [fullPath stringByDeletingLastPathComponent];
-  BOOL notify = [watchedPaths containsObject: fullPath];
-  BOOL globnotify = ((isDotFile(fullPath) == NO) 
-                      && inTreeFirstPartOfPath(fullPath, includePathsTree)
-                && ((inTreeFirstPartOfPath(fullPath, excludePathsTree) == NO)
-                                || fullPathInTree(fullPath, includePathsTree)));
-  
-  if (notify || globnotify) {
-    NSMutableDictionary *notifdict = [NSMutableDictionary dictionary];
-    BOOL glob = globnotify;
-    
-    [notifdict setObject: fullPath forKey: @"path"];
-  
+  BOOL notify;
+
+  notify = [watchedPaths containsObject: fullPath];
+
+  if (notify) {
+    NSMutableDictionary *info = [NSMutableDictionary dictionary];
+
+    [info setObject: fullPath forKey: @"path"];
+
     switch (type) { 
       case FSE_CONTENT_MODIFIED:
-        [notifdict setObject: @"GWWatchedFileModified" forKey: @"event"];
+        [info setObject: @"GWWatchedFileModified" forKey: @"event"];
         GWDebugLog(@"MODIFIED %@", fullPath);
         break;
-  
-      case FSE_DELETE:
-        [notifdict setObject: @"GWWatchedPathDeleted" forKey: @"event"];
-        glob = NO;
+
+      case FSE_DELETE:      
+        [info setObject: @"GWWatchedPathDeleted" forKey: @"event"];
         GWDebugLog(@"DELETE %@", fullPath);
         break;
-  
+
       case FSE_RENAME:
         if ([fm fileExistsAtPath: fullPath] == NO) {
-          [notifdict setObject: @"GWWatchedPathDeleted" forKey: @"event"];
+          [info setObject: @"GWWatchedPathDeleted" forKey: @"event"];
           GWDebugLog(@"RENAME %@", fullPath);
         } else {
           notify = NO; 
         }
-        glob = NO;
         break;
   
       default:
         notify = NO;
-        glob = NO;
         break;
     }
     
     if (notify) {
-      [self notifyClients: notifdict];
-    }  
-    
-    if (glob) {
-      [self notifyGlobalWatchingClients: notifdict];
+      [self notifyClients: info];
     }  
   }
 
   notify = [watchedPaths containsObject: basePath];
-  
-  if (notify || globnotify) {
-    NSMutableDictionary *notifdict = [NSMutableDictionary dictionary];
-    
-    [notifdict setObject: basePath forKey: @"path"];
+
+  if (notify) {
+    NSMutableDictionary *info = [NSMutableDictionary dictionary];
+
+    [info setObject: basePath forKey: @"path"];
       
     switch (type) { 
       case FSE_CREATE_FILE:
       case FSE_CREATE_DIR:
-        [notifdict setObject: @"GWFileCreatedInWatchedDirectory" forKey: @"event"];
-        [notifdict setObject: [NSArray arrayWithObject: [fullPath lastPathComponent]] 
-                      forKey: @"files"];
+        [info setObject: @"GWFileCreatedInWatchedDirectory" forKey: @"event"];
+        [info setObject: [NSArray arrayWithObject: [fullPath lastPathComponent]] 
+                 forKey: @"files"];
         GWDebugLog(@"CREATE %@", fullPath);
         break;
         
       case FSE_DELETE:
-        [notifdict setObject: @"GWFileDeletedInWatchedDirectory" forKey: @"event"];
-        [notifdict setObject: [NSArray arrayWithObject: [fullPath lastPathComponent]] 
-                      forKey: @"files"];
+        [info setObject: @"GWFileDeletedInWatchedDirectory" forKey: @"event"];
+        [info setObject: [NSArray arrayWithObject: [fullPath lastPathComponent]] 
+                 forKey: @"files"];
         GWDebugLog(@"DELETE %@", fullPath);
         break;
 
       case FSE_RENAME:
         if ([fm fileExistsAtPath: fullPath]) {
-          [notifdict setObject: @"GWFileCreatedInWatchedDirectory" forKey: @"event"];
-          [notifdict setObject: [NSArray arrayWithObject: [fullPath lastPathComponent]] 
-                        forKey: @"files"];
+          [info setObject: @"GWFileCreatedInWatchedDirectory" forKey: @"event"];
+          [info setObject: [NSArray arrayWithObject: [fullPath lastPathComponent]] 
+                   forKey: @"files"];
           GWDebugLog(@"RENAME %@", fullPath);
         } else {
-          [notifdict setObject: @"GWFileDeletedInWatchedDirectory" forKey: @"event"];
-          [notifdict setObject: [NSArray arrayWithObject: [fullPath lastPathComponent]] 
-                        forKey: @"files"];
+          [info setObject: @"GWFileDeletedInWatchedDirectory" forKey: @"event"];
+          [info setObject: [NSArray arrayWithObject: [fullPath lastPathComponent]] 
+                   forKey: @"files"];
           GWDebugLog(@"RENAME %@", fullPath);
         }
         break;
 
       default:
         notify = NO;
-        globnotify = NO;
         break;
     }
 
     if (notify) {
-      [self notifyClients: notifdict];
+      [self notifyClients: info];
     }    
+  }
 
-    if (globnotify) {
-      [self notifyGlobalWatchingClients: notifdict];
+  //
+  // global watching
+  //
+  notify = ((isDotFile(fullPath) == NO) 
+                      && inTreeFirstPartOfPath(fullPath, includePathsTree)
+                && (inTreeFirstPartOfPath(fullPath, excludePathsTree) == NO));
+
+  if (notify) {
+    NSMutableDictionary *info = [NSMutableDictionary dictionary];
+
+    [info setObject: fullPath forKey: @"path"];
+
+    switch (type) { 
+      case FSE_CREATE_FILE:
+      case FSE_CREATE_DIR:
+      case FSE_CONTENT_MODIFIED:
+        [info setObject: @"GWWatchedFileModified" forKey: @"event"];
+        GWDebugLog(@"MODIFIED %@", fullPath);
+        break;
+
+      case FSE_DELETE:
+        [info setObject: @"GWWatchedPathDeleted" forKey: @"event"];
+        GWDebugLog(@"DELETE %@", fullPath);
+        break;
+
+      case FSE_RENAME:
+        {
+          if ([fm fileExistsAtPath: fullPath]) {
+            [info setObject: @"GWWatchedFileModified" forKey: @"event"];
+            GWDebugLog(@"RENAME %@", fullPath);
+          } else {
+            [info setObject: @"GWWatchedPathDeleted" forKey: @"event"];
+            GWDebugLog(@"RENAME %@", fullPath);
+          }
+          break;
+        }
+        
+      default:
+        notify = NO;
+        break;        
+    }
+    
+    if (notify) {
+      [self notifyGlobalWatchingClients: info];
     }  
   }
-    
+
   RELEASE (pool);
 }
 

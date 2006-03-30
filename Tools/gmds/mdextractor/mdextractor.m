@@ -778,7 +778,7 @@ do { \
         break;
       }
 
-      RELEASE (arp); 
+      TEST_RELEASE (arp); 
     }
     
     [self updateStatusOfPath: indpath
@@ -827,37 +827,6 @@ do { \
   query = [NSString stringWithFormat:
                       @"DELETE FROM attributes WHERE path_id = %i", path_id];
   PERFORM_QUERY (db, query);
-  
-  PERFORM_QUERY (db, @"COMMIT");
-
-  return YES;
-}
-
-- (BOOL)removePath:(NSString *)path
-{
-  NSString *query;
-  int path_id;
-
-  PERFORM_QUERY (db, @"BEGIN");
-
-  query = [NSString stringWithFormat: 
-                    @"SELECT id FROM paths WHERE path = '%@'",
-                                              stringForQuery(path)];
-  path_id = getIntEntry(db, query);
-
-  if (path_id != -1) { 
-    query = [NSString stringWithFormat:
-                      @"DELETE FROM postings WHERE path_id = %i", path_id];
-    PERFORM_QUERY (db, query);
-
-    query = [NSString stringWithFormat:
-                      @"DELETE FROM attributes WHERE path_id = %i", path_id];
-    PERFORM_QUERY (db, query);
-
-    query = [NSString stringWithFormat:
-                      @"DELETE FROM paths WHERE id = %i", path_id];
-    PERFORM_QUERY (db, query);
-  }
   
   PERFORM_QUERY (db, @"COMMIT");
 
@@ -1433,3 +1402,37 @@ BOOL subPathOfPath(NSString *p1, NSString *p2)
   return NO;
 }
 
+static NSString *fixpath(NSString *s, const char *c)
+{
+  static NSFileManager *mgr = nil;
+  const char *ptr = c;
+  unsigned len;
+
+  if (mgr == nil) {
+    mgr = [NSFileManager defaultManager];
+    RETAIN (mgr);
+  }
+  
+  if (ptr == 0) {
+    if (s == nil) {
+	    return nil;
+	  }
+    ptr = [s cString];
+  }
+  
+  len = strlen(ptr);
+
+  return [mgr stringWithFileSystemRepresentation: ptr length: len]; 
+}
+
+NSString *path_separator(void)
+{
+  static NSString *separator = nil;
+
+  if (separator == nil) {
+    separator = fixpath(@"/", 0);
+    RETAIN (separator);
+  }
+
+  return separator;
+}
