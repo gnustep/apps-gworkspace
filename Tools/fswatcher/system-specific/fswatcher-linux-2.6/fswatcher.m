@@ -717,31 +717,28 @@ BOOL isDotFile(NSString *path)
       case __NR_creat:
       case __NR_mkdir:
         [info setObject: @"GWWatchedFileModified" forKey: @"event"];
-        GWDebugLog(@"MODIFIED %@", path);        
+        GWDebugLog(@"MODIFIED %@", path); 
+        [self notifyGlobalWatchingClients: info];       
         break;
 
       case __NR_unlink:
       case __NR_rmdir:
         [info setObject: @"GWWatchedPathDeleted" forKey: @"event"];
-        GWDebugLog(@"DELETE %@", path);        
-      
+        GWDebugLog(@"DELETE %@", path); 
+        [self notifyGlobalWatchingClients: info];       
+        break;
+        
       case __NR_rename:
         if (rename_notify == NO) {
           [info setObject: @"GWWatchedPathDeleted" forKey: @"event"];
-          GWDebugLog(@"DELETE %@", path);        
-        } else {
-          notify = NO;
+          GWDebugLog(@"DELETE %@", path);   
+          [self notifyGlobalWatchingClients: info];     
         }
         break;
 
       default:
-        notify = NO;
         break;        
     }
-
-    if (notify) {
-      [self notifyGlobalWatchingClients: info];
-    }  
   }
 
   if (rename_notify) {  
@@ -756,8 +753,7 @@ BOOL isDotFile(NSString *path)
     
     [self notifyGlobalWatchingClients: info];
   }
-  
-  
+    
   
   if (isDotFile(path) == NO) {
     printf("sec %ld\n", rec->sec); 

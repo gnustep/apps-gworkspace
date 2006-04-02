@@ -122,11 +122,9 @@ do { \
         TEST_RELEASE (arp);
       }
     }
-    
-    return YES;
   }
   
-  return NO;
+  return YES;
 }
 
 - (BOOL)updatePath:(NSString *)path
@@ -150,98 +148,81 @@ do { \
         return NO;
       }
     }
-
-    return YES;
   }
   
-  return NO;
+  return YES;
 }
 
 - (BOOL)updateRenamedPath:(NSString *)path 
                   oldPath:(NSString *)oldpath
 {
+  NSString *qpath = stringForQuery(path);
+  NSString *qoldpath = stringForQuery(oldpath);
+  NSString *query;
+    
+  PERFORM_QUERY (db, @"BEGIN");
 
+  query = [NSString stringWithFormat: @"CREATE TABLE paths_tmp "
+                                      @"(id INTEGER PRIMARY KEY, "
+                                      @"path TEXT, "
+                                      @"base TEXT DEFAULT '%@', "
+                                      @"oldbase TEXT DEFAULT '%@')", 
+                                      qpath, qoldpath];
+  PERFORM_QUERY (db, query);
 
+  query = @"CREATE TRIGGER paths_tmp_trigger AFTER INSERT ON paths_tmp "
+          @"BEGIN "
+          @"UPDATE paths "
+          @"SET path = pathMoved(new.oldbase, new.base, new.path) "
+          @"WHERE id = new.id; "
+          @"END";
+  PERFORM_QUERY (db, query);
+  
+  query = [NSString stringWithFormat: @"INSERT INTO paths_tmp (id, path) "
+                                      @"SELECT paths.id, paths.path "
+                                      @"FROM paths "
+                                      @"WHERE path = '%@'", qoldpath];
+  PERFORM_QUERY (db, query);
 
+  query = [NSString stringWithFormat: @"INSERT INTO paths_tmp (id, path) "
+                                      @"SELECT paths.id, paths.path "
+                                      @"FROM paths "
+                                      @"WHERE path > '%@%@' "
+                                      @"AND path < '%@0'", 
+                                      qoldpath, path_separator(), qoldpath];
+  PERFORM_QUERY (db, query);
 
+  PERFORM_QUERY (db, @"DROP TRIGGER paths_tmp_trigger");
+  PERFORM_QUERY (db, @"DROP TABLE paths_tmp");
 
-
-
-
-
-
+  PERFORM_QUERY (db, @"COMMIT");
 
   return YES;
+
+// SELECT * FROM paths WHERE path > '/root/Desktop/AA/' AND path < '/root/Desktop/AA0';
+// SELECT * FROM paths WHERE path > '/root/Desktop/BB/' AND path < '/root/Desktop/BB0';
 }
-
-/*
-    [query appendFormat: @"FROM files WHERE path > '%@", stringForQuery(path)];
-
-    if ([path isEqual: path_separator()] == NO) {
-      [query appendString: path_separator()];
-    }
-    [query appendString: @"' "];
-    
-    if ([path isEqual: path_separator()] == NO) {
-      [query appendFormat: @"AND path < '%@0' ", stringForQuery(path)];
-    } else {
-      [query appendString: @"AND path < '0' "];
-    }
-
-
-select path_id from postings 
-where path_id = (SELECT id FROM paths WHERE path = '/root/AA');
-
-
-
-CREATE TABLE id_tmp (id INTEGER PRIMARY KEY);
-
-INSERT INTO id_tmp (id) SELECT id FROM paths WHERE path = '/root/Mailboxes/GNUstep';
-
-
-SELECT path FROM paths 
-  WHERE path > '/root/Mailboxes/'
-  AND path < '/root/Mailboxes0';
-  
-SELECT path FROM paths 
-  WHERE path > '/root/Desktop/AA/'
-  AND path < '/root/Desktop/AA0';
-  
-
-DELETE FROM postings WHERE path_id IN (SELECT id FROM id_tmp);
-
-DROP TABLE id_tmp;
-*/
-
 
 - (BOOL)removePath:(NSString *)path
 {
-  NSMutableString *query;
+  NSString *qpath = stringForQuery(path);
+  NSString *query;
 
   PERFORM_QUERY (db, @"BEGIN");
 
   PERFORM_QUERY (db, @"CREATE TABLE id_tmp (id INTEGER PRIMARY KEY)");
   
-  query = [NSMutableString stringWithCapacity: 128];
-  [query appendString: @"INSERT INTO id_tmp (id) SELECT id FROM paths "];
-  [query appendFormat: @"WHERE path = '%@'", stringForQuery(path)];
+  query = [NSString stringWithFormat: @"INSERT INTO id_tmp (id) "
+                                      @"SELECT id FROM paths "
+                                      @"WHERE path = '%@'", 
+                                      qpath];
   PERFORM_QUERY (db, query);
   
-  query = [NSMutableString stringWithCapacity: 128];
-  [query appendString: @"INSERT INTO id_tmp (id) SELECT id FROM paths "];
-  [query appendFormat: @"WHERE path > '%@", stringForQuery(path)];
-
-  if ([path isEqual: path_separator()] == NO) {
-    [query appendString: path_separator()];
-  }
-  [query appendString: @"' "];
-
-  if ([path isEqual: path_separator()] == NO) {
-    [query appendFormat: @"AND path < '%@0' ", stringForQuery(path)];
-  } else {
-    [query appendString: @"AND path < '0' "];
-  }
-  
+  query = [NSString stringWithFormat: @"INSERT INTO id_tmp (id) "
+                                      @"SELECT id FROM paths "
+                                      @"WHERE path > '%@%@' "
+                                      @"AND path < '%@0'",
+                                      qpath, path_separator(), qpath];
   PERFORM_QUERY (db, query);
 
   PERFORM_QUERY (db, @"DELETE FROM postings WHERE path_id IN (SELECT id FROM id_tmp)");
@@ -279,44 +260,50 @@ DROP TABLE id_tmp;
 - (oneway void)globalWatchedPathDidChange:(NSDictionary *)info
 {
   CREATE_AUTORELEASE_POOL(arp);
+  NSMutableDictionary *dict = [NSMutableDictionary dictionary];  
   NSString *path = [info objectForKey: @"path"];
   NSString *event = [info objectForKey: @"event"];
-  NSMutableDictionary *dict = [NSMutableDictionary dictionary];  
+  NSNumber *exists;
+    
+  if ([event isEqual: @"GWWatchedPathDeleted"]) {
+    exists = [NSNumber numberWithBool: NO];
+    
+  } else if ([event isEqual: @"GWWatchedFileModified"]) {
+    exists = [NSNumber numberWithBool: YES];
   
-  [dict setObject: path forKey: @"path"];
-  [dict setObject: event forKey: @"event"];
-  
-  if ([event isEqual: @"GWWatchedPathRenamed"]) {
+  } else if ([event isEqual: @"GWWatchedPathRenamed"]) {
     NSString *oldpath = [info objectForKey: @"oldpath"];
  
     if (oldpath != nil) {
       [dict setObject: oldpath forKey: @"oldpath"];
     } 
+    
+    exists = [NSNumber numberWithBool: YES];
   } 
+
+  [dict setObject: path forKey: @"path"];
+  [dict setObject: event forKey: @"event"];
+  [dict setObject: exists forKey: @"exists"];
 
   if ([fswupdatePaths containsObject: dict] == NO) {
     NSDictionary *skipInfo = [fswupdateSkipBuff objectForKey: path];
     BOOL caninsert = YES;
     
     if (skipInfo != nil) {
-      NSString *lastevent = [skipInfo objectForKey: @"event"];
-    
-      if ([lastevent isEqual: event]) {
+      NSNumber *didexists = [skipInfo objectForKey: @"exists"];
+      
+      if ([exists isEqual: didexists]) {
         caninsert = NO;
       } else {
-        skipInfo = [NSDictionary dictionaryWithObjectsAndKeys: event, 
-                                                               @"event", 
-                                                               [NSDate date], 
-                                                               @"stamp", 
-                                                               nil];     
+        skipInfo = [NSDictionary dictionaryWithObjectsAndKeys: event, @"event", 
+                                                  exists, @"exists",
+                                                  [NSDate date], @"stamp", nil];     
         [fswupdateSkipBuff setObject: skipInfo forKey: path];
       }
     } else {
-      skipInfo = [NSDictionary dictionaryWithObjectsAndKeys: event, 
-                                                             @"event", 
-                                                             [NSDate date], 
-                                                             @"stamp", 
-                                                             nil];     
+      skipInfo = [NSDictionary dictionaryWithObjectsAndKeys: event, @"event",
+                                                 exists, @"exists",
+                                                 [NSDate date], @"stamp", nil];     
       [fswupdateSkipBuff setObject: skipInfo forKey: path];
     }
   

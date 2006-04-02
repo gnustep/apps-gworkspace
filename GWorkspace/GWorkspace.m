@@ -907,7 +907,7 @@ static GWorkspace *gworkspace = nil;
   int i;
   
   [self setSelectedPaths: paths];      
-      
+  
   for (i = 0; i < [paths count]; i++) {
     NSString *apath = [paths objectAtIndex: i];
     

@@ -153,7 +153,7 @@
   }
       
   if (appname == nil) {
-    NSString *ext = [fullPath pathExtension];
+    NSString *ext = [[fullPath pathExtension] lowercaseString];
     
     appname = [ws getBestAppInRole: nil forExtension: ext];
     
@@ -170,7 +170,7 @@
   if (app == nil) {
     NSArray *args = [NSArray arrayWithObjects: @"-GSFilePath", fullPath, nil];
     
-    return [self launchApplication: appName arguments: args];
+    return [self launchApplication: appname arguments: args];
   
   } else {  
     NSDate *delay = [NSDate dateWithTimeIntervalSinceNow: 0.1];
@@ -189,7 +189,7 @@
       
       [self applicationTerminated: app];
       
-      return [self launchApplication: appName arguments: args];
+      return [self launchApplication: appname arguments: args];
 
     } else {
       NS_DURING
@@ -244,7 +244,7 @@
 	    args = [NSArray arrayWithObjects: @"-autolaunch", @"YES", nil];
 	  }
     
-    return [self launchApplication: appName arguments: args];
+    return [self launchApplication: appname arguments: args];
   
   } else {
     application = [app application];
@@ -256,7 +256,7 @@
 	      args = [NSArray arrayWithObjects: @"-autolaunch", @"YES", nil];
 	    }
              
-      return [self launchApplication: appName arguments: args];
+      return [self launchApplication: appname arguments: args];
     
     } else {
       [application activateIgnoringOtherApps: YES];
@@ -268,7 +268,7 @@
 
 - (BOOL)openTempFile:(NSString *)fullPath
 {
-  NSString *ext = [fullPath pathExtension];
+  NSString *ext = [[fullPath pathExtension] lowercaseString];
   NSString *name = [ws getBestAppInRole: nil forExtension: ext];
   NSString *appPath, *appName;
   GWLaunchedApp *app;
@@ -295,7 +295,7 @@
   if (app == nil) {
     NSArray *args = [NSArray arrayWithObjects: @"-GSTempPath", fullPath, nil];
     
-    return [self launchApplication: appName arguments: args];
+    return [self launchApplication: name arguments: args];
   
   } else {
     application = [app application];
@@ -305,7 +305,7 @@
     
       [self applicationTerminated: app];
       
-      return [self launchApplication: appName arguments: args];
+      return [self launchApplication: name arguments: args];
       
     } else {
       NS_DURING
@@ -410,9 +410,7 @@
   NSDictionary *userinfo;
   NSString *host;
 
-  [self applicationName: &appName andPath: &appPath forName: appname];
-
-  path = [ws locateApplicationBinary: appName];
+  path = [ws locateApplicationBinary: appname];
   
   if (path == nil) {
 	  return NO;
@@ -443,6 +441,13 @@
 		  }
     }
 	}
+
+  [self applicationName: &appName andPath: &appPath forName: appname];
+  
+  if (appPath == nil) {
+    [ws findApplications];
+    [self applicationName: &appName andPath: &appPath forName: appname];
+  }
   
   userinfo = [NSDictionary dictionaryWithObjectsAndKeys: appName, 
 			                                                   @"NSApplicationName",

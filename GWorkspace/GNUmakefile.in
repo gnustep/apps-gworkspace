@@ -33,22 +33,31 @@ ADDITIONAL_GUI_LIBS += -lOperation
 GWorkspace_RESOURCE_FILES = \
   Resources/Icons/* \
   Resources/English.lproj \
+  Resources/BrasilPortuguese.lproj \
+  Resources/Dutch.lproj \
+  Resources/Esperanto.lproj \
   Resources/French.lproj \
   Resources/German.lproj \
+  Resources/Hungarian.lproj \
   Resources/Italian.lproj \
-  Resources/Romanian.lproj \
-  Resources/Spanish.lproj \
+  Resources/Norvegian.lproj \
   Resources/Portuguese.lproj \
-  Resources/Dutch.lproj 
+  Resources/Romanian.lproj \
+  Resources/Spanish.lproj
 
-GWorkspace_LANGUAGES = Resources/English \
-			                Resources/French \
-			                Resources/German \
-			                Resources/Italian \
-			                Resources/Romanian \
-			                Resources/Spanish \
-			                Resources/Portuguese \
-                      Resources/Dutch
+GWorkspace_LANGUAGES = \
+  Resources/English \
+  Resources/BrasilPortuguese \
+  Resources/Dutch \
+  Resources/Esperanto \
+  Resources/French \
+  Resources/German \
+  Resources/Hungarian \
+  Resources/Italian \
+  Resources/Norvegian \
+  Resources/Portuguese \
+  Resources/Romanian \
+  Resources/Spanish
 
 # The Objective-C source files to be compiled
 GWorkspace_OBJC_FILES = main.m \

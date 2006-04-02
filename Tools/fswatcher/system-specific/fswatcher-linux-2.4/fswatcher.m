@@ -785,6 +785,7 @@ BOOL pathModified(NSString *path)
         if (pathModified(path)) {
           [info setObject: @"GWWatchedFileModified" forKey: @"event"];
           GWDebugLog(@"MODIFIED %@", path);
+          [self notifyGlobalWatchingClients: info];
         } else {
           notify = NO;
         }
@@ -794,25 +795,20 @@ BOOL pathModified(NSString *path)
       case RMDIR:
         [info setObject: @"GWWatchedPathDeleted" forKey: @"event"];
         GWDebugLog(@"DELETE %@", path); 
+        [self notifyGlobalWatchingClients: info];
         break;
               
       case RENAME:
         if (rename_notify == NO) {
           [info setObject: @"GWWatchedPathDeleted" forKey: @"event"];
-          GWDebugLog(@"DELETE %@", path);        
-        } else {
-          notify = NO;
-        }
+          GWDebugLog(@"DELETE %@", path);
+          [self notifyGlobalWatchingClients: info];        
+        } 
         break;
 
       default:
-        notify = NO;
         break;        
     }
-    
-    if (notify) {
-      [self notifyGlobalWatchingClients: info];
-    }  
   }
 
   if (rename_notify) {  

@@ -49,6 +49,30 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
   sqlite3_result_int(context, exists);
 }
 
+static void path_moved(sqlite3_context *context, int argc, sqlite3_value **argv)
+{
+  const unsigned char *oldbase = sqlite3_value_text(argv[0]);
+  int oldblen = strlen((const char *)oldbase);
+  const unsigned char *newbase = sqlite3_value_text(argv[1]);
+  int newblen = strlen((const char *)newbase);
+  const unsigned char *oldpath = sqlite3_value_text(argv[2]);
+  int oldplen = strlen((const char *)oldpath);
+  char newpath[PATH_MAX] = "";
+  int i = newblen;
+  int j;
+  
+  strncpy(newpath, (const char *)newbase, newblen);  
+  
+  for (j = oldblen; j < oldplen; j++) {
+    newpath[i] = oldpath[j];
+    i++;
+  }
+  
+  newpath[i] = '\0';
+  
+  sqlite3_result_text(context, newpath, strlen(newpath), SQLITE_TRANSIENT);
+}
+
 
 @implementation	GMDSExtractor
 
@@ -810,22 +834,24 @@ do { \
   path_id = getIntEntry(db, query);
     
   if (path_id == -1) { 
-    query = [NSString stringWithFormat:
-        @"INSERT INTO paths (path, words_count, moddate) VALUES('%@', 0, %f)", 
-                                                 stringForQuery(path), interval];
+    query = [NSString stringWithFormat: @"INSERT INTO paths (path, words_count, moddate) "
+                                        @"VALUES('%@', 0, %f)", 
+                                        stringForQuery(path), interval];
     PERFORM_QUERY (db, query);
   
     path_id = sqlite3_last_insert_rowid(db);
   
   } else {
-    query = [NSString stringWithFormat:
-        @"UPDATE paths SET words_count = 0, moddate = %f WHERE id = %i",
-                                                          interval, path_id];
+    query = [NSString stringWithFormat: @"UPDATE paths "
+                                        @"SET words_count = 0, moddate = %f "
+                                        @"WHERE id = %i",
+                                        interval, path_id];
     PERFORM_QUERY (db, query);
   }
 
-  query = [NSString stringWithFormat:
-                      @"DELETE FROM attributes WHERE path_id = %i", path_id];
+  query = [NSString stringWithFormat: @"DELETE FROM attributes "
+                                      @"WHERE path_id = %i", 
+                                      path_id];
   PERFORM_QUERY (db, query);
   
   PERFORM_QUERY (db, @"COMMIT");
@@ -846,12 +872,14 @@ do { \
   
   PERFORM_QUERY (db, @"BEGIN");
   
-  query = [NSString stringWithFormat: 
-             @"SELECT id FROM paths WHERE path = '%@'", stringForQuery(path)];
+  query = [NSString stringWithFormat: @"SELECT id FROM paths "
+                                      @"WHERE path = '%@'", 
+                                      stringForQuery(path)];
   path_id = getIntEntry(db, query);
 
-  query = [NSString stringWithFormat:
-                      @"DELETE FROM postings WHERE path_id = %i", path_id];
+  query = [NSString stringWithFormat: @"DELETE FROM postings "
+                                      @"WHERE path_id = %i", 
+                                      path_id];
   PERFORM_QUERY (db, query);
   
   wordsdict = [mddict objectForKey: @"words"];
@@ -862,31 +890,33 @@ do { \
     unsigned wcount = [[wordsdict objectForKey: @"wcount"] unsignedLongValue];
     NSString *word;
 
-    query = [NSString stringWithFormat:
-                  @"UPDATE paths SET words_count = %i WHERE id = %i", 
-                                                              wcount, path_id];
+    query = [NSString stringWithFormat: @"UPDATE paths "
+                                        @"SET words_count = %i "
+                                        @"WHERE id = %i", 
+                                        wcount, path_id];
     PERFORM_QUERY (db, query);
 
     while ((word = [enumerator nextObject])) {
       unsigned count = [wordset countForObject: word];
       int word_id;
 
-      query = [NSString stringWithFormat: 
-                      @"SELECT id FROM words WHERE word = '%@'",
-                                                  stringForQuery(word)];
+      query = [NSString stringWithFormat: @"SELECT id FROM words "
+                                          @"WHERE word = '%@'",
+                                          stringForQuery(word)];
       word_id = getIntEntry(db, query);
 
       if (word_id == -1) {
-        query = [NSString stringWithFormat:
-             @"INSERT INTO words (word) VALUES('%@')", stringForQuery(word)];
+        query = [NSString stringWithFormat: @"INSERT INTO words (word) "
+                                            @"VALUES('%@')", 
+                                            stringForQuery(word)];
         PERFORM_QUERY (db, query);
 
         word_id = sqlite3_last_insert_rowid(db);
       }
             
-      query = [NSString stringWithFormat:
-          @"INSERT INTO postings (word_id, path_id, score) VALUES(%i, %i, %f)", 
-                    word_id, path_id, (1.0 * count / wcount)];
+      query = [NSString stringWithFormat: @"INSERT INTO postings (word_id, path_id, score) "
+                                          @"VALUES(%i, %i, %f)", 
+                                          word_id, path_id, (1.0 * count / wcount)];
       PERFORM_QUERY (db, query);
     }
   }
@@ -915,9 +945,9 @@ do { \
         attributeStr = [NSString stringWithFormat: @"%@", blobFromData(mdvalue)];      
       }
      
-      query = [NSString stringWithFormat:
-        @"INSERT INTO attributes (path_id, key, attribute) VALUES(%i, '%@', %@)", 
-                                                  path_id, key, attributeStr];
+      query = [NSString stringWithFormat: @"INSERT INTO attributes (path_id, key, attribute) "
+                                          @"VALUES(%i, '%@', %@)", 
+                                          path_id, key, attributeStr];
       PERFORM_QUERY (db, query);
     }
   }
@@ -1077,6 +1107,9 @@ do { \
     
     sqlite3_create_function(db, "pathExists", 1, 
                                 SQLITE_UTF8, 0, path_Exists, 0, 0);
+
+    sqlite3_create_function(db, "pathMoved", 3, 
+                                SQLITE_UTF8, 0, path_moved, 0, 0);
 
     performWriteQuery(db, @"PRAGMA cache_size = 20000");
     performWriteQuery(db, @"PRAGMA count_changes = 0");
