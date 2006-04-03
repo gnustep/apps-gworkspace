@@ -1,3 +1,4 @@
+
 static NSString *dbschema = @"\
 \
 CREATE TABLE paths \
@@ -27,3 +28,5 @@ attribute TEXT); \
 CREATE INDEX attributes_key_index ON attributes(key, attribute, path_id); \
 CREATE INDEX attributes_path_index ON attributes(path_id); \
 ";
+
+

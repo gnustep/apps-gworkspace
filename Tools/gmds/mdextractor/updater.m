@@ -201,6 +201,7 @@ do { \
 
 // SELECT * FROM paths WHERE path > '/root/Desktop/AA/' AND path < '/root/Desktop/AA0';
 // SELECT * FROM paths WHERE path > '/root/Desktop/BB/' AND path < '/root/Desktop/BB0';
+// kMDItemFinderComment
 }
 
 - (BOOL)removePath:(NSString *)path

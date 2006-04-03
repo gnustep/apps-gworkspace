@@ -1,0 +1,8 @@
+{
+    NSIcon = "Magnify.tiff";
+    NSRole = "NSNone";
+    ApplicationDescription = "GMDSClient";
+    ApplicationIcon = "Magnify.tiff";
+    ApplicationName = "GMDSClient";
+    ApplicationRelease = "0.1";
+}
