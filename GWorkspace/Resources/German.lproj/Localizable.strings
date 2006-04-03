@@ -1,57 +1,70 @@
+ï»¿/*GWorkspace German strings, updated by Ingolf Jandt 2006 *\
+
 /* ----------------------- menu strings --------------------------- *\
 /* main.m */
 
 "Info" = "Info";
 	"Info Panel..." = "Info Panel...";
-	"Preferences..." = "Grundeinstellungen...";
+	"Preferences..." = "Einstellungen...";
 	"Help..." = "Hilfe...";
 
 "File" = "Datei";
-	"Open" = "Öffnen";
-	"Open as Folder" = "Als Ordner öffnen";
-	"Edit File" = "Datei bearbeiten";
+	"Open" = "Ã–ffnen";
+	"Open as Folder" = "Als Ordner Ã¶ffnen";
 	"New Folder" = "Neuer Ordner";
 	"New File" = "Neue Datei";
 	"Duplicate" = "Duplizieren";	
 	"Destroy" = "Vernichten";
-	"Empty Recycler" = "Recycler entleeren";
+	"Move to Recycler" = "In den Papierkorb";
+	"Empty Recycler" = "Papierkorb leeren";
 	"Put Away" = "Wiederherstellen";
 	"Print..." = "Drucken...";
-	"Open With..." = "Öffnen mit...";
-	"Run..." = "Ausführen...";
+	"Open With..." = "Ã–ffnen mit...";
+	"Run..." = "AusfÃ¼hren...";
 
 "Edit" = "Bearbeiten";
 	"Cut" = "Ausschneiden";
 	"Copy" = "Kopieren";
-	"Paste" = "Einfügen";
-/*	"Delete" = "Löschen" 		*/
-	"Select All" = "Alles auswählen";
+	"Paste" = "EinfÃ¼gen";
+/*	"Delete" = "LÃ¶schen" 		*/
+	"Select All" = "Alles auswÃ¤hlen";
 		
-"View" = "Übersicht";
+"View" = "Ansicht";
 	"Browser" = "Browser";
 	"Icon" = "Symbole";
-	"Small Icon" = "Kleine Symbole";
+	"List" = "Liste";
+	"Viewer behaviour" = "Betrachterverhalten";
+		"Browsing" = "Browsing";
+		"Spacial" = "Spacial";
+	"Show" = "Zeige";
+		"Name only" = "Nur Namen";
+		"Modification date" = "Ã„nderungsdatum";
+		"Role" = "Funktion";
+	"Icon Size" = "SymbolgrÃ¶ÃŸe";
+	"Icon Position" = "Symbolposition";
+		"Up" = "Oben";
+		"Left" = "Links";
+	"Label Size" = "SchriftgrÃ¶ÃŸe";
+	"Viewer" = "Betrachter";
 		
 "Tools" = "Werkzeuge";
-	"Viewer" = "Dateiübersicht";
-	"Inspectors" = "Inspektoren...";
+	"Inspectors" = "Inspektoren";
 		"Show Inspectors" = "Inspektoren anzeigen";
 		"Attributes" = "Attribute";
 		"Contents" = "Inhalt";
 		"Tools" = "Werkzeuge";	
-		"Permissions" = "Dateirechte";	
+		"Annotations" = "Notizen";
 	"History" = "Verlauf";
 		"Show History" = "Verlauf anzeigen";
-		"Go backward" = "Zurück";
-		"Go forward" = "Vorwärts";
+		"Go backward" = "ZurÃ¼ck";
+		"Go forward" = "VorwÃ¤rts";
 	"Finder" = "Dateisuche";
-	/*"Processes..." = "Prozesse..."; */
 	"Applications..." = "Anwendungen...";
 	"File Operations..." = "Dateioperationen...";
 	"Fiend" = "Fiend";
 		"Show Fiend" = "Fiend anzeigen";
 		"Hide Fiend" = "Fiend ausblenden";
-		"Add Layer..." = "Schicht hinzufügen...";
+		"Add Layer..." = "Schicht hinzufÃ¼gen...";
 		"Remove Current Layer" = "Aktuelle Schicht entfernen";
 		"Rename Current Layer" = "Aktuelle Schicht umbenennen";
 		"Layers" = "Schichten";
@@ -60,20 +73,30 @@
 		"Hide Tabbed Shelf" = "Tabbed Shelf ausblenden";
 		"Remove Current Tab" = "Aktuellen Tab entfernen";
 		"Rename Current Tab" = "Aktuellen Tab umbenennen";
-		"Add Tab..." = "Tab hinzufügen...";
-	"DeskTop Shelf" = "Desktop Shelf";	
-	"XTerm" = "XTerm";
+		"Add Tab..." = "Tab hinzufÃ¼gen...";
+	"Terminal" = "Terminal";
+	"Show Desktop" = "ArbeitsflÃ¤che anzeigen";
+	"Hide Desktop" = "ArbeitsflÃ¤che ausblenden";
+	"Show Recycler" = "Papierkorb anzeigen";
+	"Hide Recycler" = "Papierkorb ausblenden";
+	"Check for disks" = "Nach Medien prÃ¼fen";
 	
 "Windows" = "Fenster";
 	"Arrange in Front" = "Im Vordergrund anordnen";
 	"Miniaturize Window" = "Fenster miniaturisieren";
-	"Close Window" = "Fenster schließen";
+	"Close Window" = "Fenster schlieÃŸen";
 	
 "Services" = "Dienste";
 
 "Hide" = "Ausblenden";
 
-"Quit" = "Verlassen";
+"Hide Others" = "Andere ausblenden";
+
+"Show All" = "Alle anzeigen";
+
+"Quit" = "Beenden";
+
+"Logout" = "Ausloggen";
 	
 	
 	
@@ -84,11 +107,22 @@
 "Author" = "Autor";
 "GNUstep Workspace Manager" = "GNUstep Workspace Manager";
 "See http://www.gnustep.it/enrico/gworkspace" = "Siehe http://www.gnustep.it/enrico/gworkspace";
-"Released under the GNU General Public License 2.0" = "Veröffentlicht unter der GNU General Public License 2.0";
+"Released under the GNU General Public License 2.0" = "VerÃ¶ffentlicht unter der GNU General Public License 2.0";
 "Error" = "Fehler";
-"You have not write permission\nfor" = "Sie haben keine Schreibrechte\nfür";
+"You have not write permission\nfor" = "Sie haben keine Schreibrechte\nfÃ¼r";
 "Continue" = "Fortfahren";
 
+"File Viewer" = "Dateibetrachter";
+
+"Quit!" = "Beenden";
+"Do you really want to quit?" = "Wollen Sie GWorkspace wirklich beenden?";
+"Yes" = "Ja";
+"No" = "Nein";
+
+"Log out" = "Ausloggen";
+"Are you sure you want to quit\nall applications and log out now?" = "Sind sie sicher, dass Sie alle\nAnwendungen beenden und ausloggen wollen?";
+"If you do nothing, the system will log out\nautomatically in" = "Falls Sie nichts tun, wird das System\nautomatisch nach ";
+"seconds." = "Sekunden ausloggen.";
 
 /* FileOperation.m */
 
@@ -101,10 +135,10 @@
 "Copy from: " = "Kopieren von: ";
 "Link" = "Link";
 "Link " = "Link ";
-"Delete" = "Löschen";
-"Delete the selected objects?" = "Die ausgewählten Objekte löschen?";
+"Delete" = "LÃ¶schen";
+"Delete the selected objects?" = "Die ausgewÃ¤hlten Objekte lÃ¶schen?";
 "Duplicate" = "Duplizieren";
-"Duplicate the selected objects?" = "Die ausgewählten Objekte duplizieren?";
+"Duplicate the selected objects?" = "Die ausgewÃ¤hlten Objekte duplizieren?";
 "From:" = "Von:";
 "To:" = "Nach:";
 "In:" = "In:";
@@ -115,16 +149,16 @@
 "Linking" = "Linke";
 "Duplicating" = "Dupliziere";
 "Destroying" = "Vernichte";
-"File Operation Completed" = "Dateioperation vollständig";
+"File Operation Completed" = "Dateioperation vollstÃ¤ndig";
 "Backgrounder connection died!" = "Backgrounder-Verbindung gestorben!";
-"Some items have the same name;\ndo you want to sobstitute them?" = "Einige Gegenstände haben den selben Namen;\nwollen Sie diese ersetzen?";
+"Some items have the same name;\ndo you want to sobstitute them?" = "Einige GegenstÃ¤nde haben den selben Namen;\nwollen Sie diese ersetzen?";
 "Error" = "Fehler";
 "File Operation Error!" = "Fehler bei Dateioperation!";
 
 
 /* ColumnIcon.m */
 
-"You have not write permission\nfor " = "Sie haben keine Schreibrechte\nfür ";
+"You have not write permission\nfor " = "Sie haben keine Schreibrechte\nfÃ¼r ";
 "The name " = "Der Name ";
 " is already in use!" = " wird bereits verwendet!";
 
@@ -137,7 +171,7 @@
 which ends in "kann <the file> nicht umbenennen"
 */
 
-"Invalid char in name" = "Ungültiges Zeichen im Namen";
+"Invalid char in name" = "UngÃ¼ltiges Zeichen im Namen";
 
 
 /* ----------------------- Inspectors strings --------------------------- *\
@@ -156,11 +190,13 @@ which ends in "kann <the file> nicht umbenennen"
 "Attributes Inspector" = "Attribut-Inspektor";
 "Path:" = "Pfad:";
 "Link To:" = "Link zu:";
-"Size:" = "Größe:";
+"Size:" = "GrÃ¶ÃŸe:";
+"Calculate" = "Berechnen";
 "Owner:" = "Besitzer:";
 "Group:" = "Gruppe:";
-"Changed" = "Geändert";
-"Revert" = "Zurücksetzen";
+"Changed" = "GeÃ¤ndert";
+"also apply to files inside selection" = "auch auf Dateien innerhalb der Auswahl anwenden";
+"Revert" = "ZurÃ¼cksetzen";
 "OK" = "OK";
 
 
@@ -169,18 +205,18 @@ which ends in "kann <the file> nicht umbenennen"
 "Contents" = "Inhalt";
 "Contents Inspector" = "Inhalts-Inspektor";
 "No Contents Inspector" = "Kein Inhalts-Inspektor";
-"No Contents Inspector\nFor Multiple Selection" = "Kein Inhalts-Inspektor\nfür mehrfache Auswahl";
+"No Contents Inspector\nFor Multiple Selection" = "Kein Inhalts-Inspektor\nfÃ¼r mehrfache Auswahl";
 
 
 /* FolderViewer.m */
 
 "Sort method applies to the\ncontents of the selected folder,\nNOT to its parent folder"
-  = "Sortier-Methode trifft auf die\nInhalte des ausgewählten Ordners zu,\nNICHT auf dessen übergerordneten Ordner";
+  = "Sortier-Methode trifft auf die\nInhalte des ausgewÃ¤hlten Ordners zu,\nNICHT auf dessen Ã¼bergerordneten Ordner";
 "Sort by" = "Sortieren nach:";
 "Name" = "Name";
 "Type" = "Typ";
 "Date" = "Datum";
-"Size" = "Größe";
+"Size" = "GrÃ¶ÃŸe";
 "Owner" = "Besitzer";
 "Folder Inspector" = "Verzeichnis-Inspektor";	
 
@@ -192,8 +228,8 @@ which ends in "kann <the file> nicht umbenennen"
 
 /* AppViewer.m */
 
-"Open these kinds of documents:" = "Öffne diese Dokumenttypen:";
-"Invalid Contents" = "Ungültiger Inhalt";
+"Open these kinds of documents:" = "Ã–ffne diese Dokumenttypen:";
+"Invalid Contents" = "UngÃ¼ltiger Inhalt";
 "App Inspector" = "Applikations-Inspektor";
 
 
@@ -215,11 +251,11 @@ which ends in "kann <the file> nicht umbenennen"
 
 /* AppsView.m */
 	
-"Double-click to open selected document(s)" = "Doppelt klicken, um Dokument(e) zu öffnen";	
+"Double-click to open selected document(s)" = "Doppelt klicken, um Dokument(e) zu Ã¶ffnen";	
 "Default:" = "Standard:";
 "Path:" = "Pfad:";		
 "Click 'Set Default' to set default application\nfor all documents with this extension" 
-  = "Klick 'Standard setzen', um die Anwendung. \nfür alle Dokumente dieser Endung zu setzen";
+  = "Klick 'Standard setzen', um die Anwendung. \nfÃ¼r alle Dokumente dieser Endung zu setzen";
 
 
 /* PermsBox.m */
@@ -227,10 +263,10 @@ which ends in "kann <the file> nicht umbenennen"
 "Permissions" = "Zugriffsrechte";
 "Read" = "Lesen";
 "Write" = "Schreiben";
-"Execute" = "Ausführen";
+"Execute" = "AusfÃ¼hren";
 "Owner" = "Besitzer";
 "Group" = "Gruppe";
-"Other" = "Andere";
+"Others" = "Andere";
 
 
 /* ----------------------- Processes strings --------------------------- *\
@@ -267,11 +303,11 @@ which ends in "kann <the file> nicht umbenennen"
 
 "New Layer" = "Neue Schicht";
 "A layer with this name is already present!" = "Eine Schicht mit diesem Namen existiert bereits!";
-"You can't remove the last layer!" = "Sie können die letzte Schicht nicht entfernen!";
+"You can't remove the last layer!" = "Sie kÃ¶nnen die letzte Schicht nicht entfernen!";
 "Remove layer" = "Schicht entfernen";
 "Are you sure that you want to remove this layer?" = "Sie sind sicher, dass Sie diese Schicht entfernen wollen?";
 "Rename Layer" = "Schicht umbenennen";
-"You can't dock multiple paths!" = "Sie können keine mehrfachen Pfade andocken!";
+"You can't dock multiple paths!" = "Sie kÃ¶nnen keine mehrfachen Pfade andocken!";
 "This object is already present in this layer!" = "Dieses Objekt existiert bereits in dieser Schicht!";
 	
 			
@@ -287,19 +323,20 @@ which ends in "kann <the file> nicht umbenennen"
 "Desktop Shelf" = "Desktop Shelf";	
 "Desktop Color" = "Desktop-Farbe";
 "red" = "rot";
-"green" = "grün";
+"green" = "grÃ¼n";
 "blue" = "blau";
 "Set Color" = "Farbe setzen";
 "Push the \"Set Image\" button\nto set your DeskTop image.\nThe image must have the same\nsize of your screen." = 
-  "Klicken Sie den \"Bild setzen\"-Button,\num Ihr Desktop-Bild zu setzen.\nDas Bild muss die gleiche\nGröße wie Ihr Bildschirm haben.";
+  "Klicken Sie den \"Bild setzen\"-Button,\num Ihr Desktop-Bild zu setzen.\nDas Bild muss die gleiche\nGrÃ¶ÃŸe wie Ihr Bildschirm haben.";
 "Set Image" = "Bild setzen";
 "Unset Image" = "Bild aufheben";
 "Activate desktop" = "Desktop aktivieren";
 	
 /* DefaultXTerm.m */             
-	
+
+"Use Terminal service" = "Terminal-Service verwenden";
 "Set" = "Setzen";	
-"xterm" = "xterm";
+"xterm" = "Programm";
 "arguments" = "Argumente";
 
 	
@@ -312,11 +349,11 @@ which ends in "kann <the file> nicht umbenennen"
 	
 /* FileWatchingPreferences.m */  
 	
-"File System Watching" = "Datei-Überwachung";
+"File System Watching" = "Datei-Ãœberwachung";
 "timeout" = "Auszeit";
 "frequency" = "Frequenz";
 "Values will apply to the \nnew watchers from now, \nto the existing ones, after the first timeout" = 
-   "Werte wirken von jetzt an auf neue\n Überwachungen, auf die existier-\nenden nach der ersten Auszeit";
+   "Werte wirken von jetzt an auf neue\n Ãœberwachungen, auf die existier-\nenden nach der ersten Auszeit";
 	
 	
 /* ShelfPreferences.m */
@@ -329,8 +366,8 @@ which ends in "kann <the file> nicht umbenennen"
 
 "Default Editor" = "Standard-Editor";
 "No Default Editor" = "Kein Standard-Editor";
-"Choose..." = "Auswählen...";
-"Choose" = "Auswählen";
+"Choose..." = "AuswÃ¤hlen...";
+"Choose" = "AuswÃ¤hlen";
 
 /* IconViewsPreferences.m */
 
@@ -340,14 +377,14 @@ which ends in "kann <the file> nicht umbenennen"
 /* Sorting order */
 "Sorting Order" = "Sortierreihenfolge";
 "Sort by" = "Sortieren nach";
-"This sort method will apply to all the folders\nthat have no sorting order specified" = "Diese Sortiermethode gilt für alle Ordner, für die\nkeine Reihenfolge festgelegt ist";
+"The sort method will apply to all the folders\nthat have no sorting order specified" = "Diese Sortiermethode gilt fÃ¼r alle Ordner, fÃ¼r die\nkeine Reihenfolge festgelegt ist";
 
 /* File Operations */
 "File Operations" = "Dateioperationen";
 "Status Window" = "Statusfenster";
-"Confirmation" = "Bestätigung";
+"Confirmation" = "BestÃ¤tigung";
 "Show status window" = "Statusfenster zeigen";
-"Check this option to show a status window\nduring the file operations" = "Setze diese Option, um ein Statusfenster\nwährend Dateioperationen zu zeigen";
+"Check this option to show a status window\nduring the file operations" = "Setze diese Option, um ein Statusfenster\nwÃ¤hrend Dateioperationen zu zeigen";
 
 /* Icons */
 
@@ -356,16 +393,38 @@ which ends in "kann <the file> nicht umbenennen"
 "use thumbnails" = "Thumbnails verwenden";
 "Animate icons" = "Symbole animieren";
 "when changing a path" = "beim Pfadwechsel";
-"when opening a file" = "beim Dateiöffnen";
-"sliding back after file operation" = "Nach Dateioperation zurückrutschen";
-"Activate changes" = "Änderungen aktivieren";
+"when opening a file" = "beim DateiÃ¶ffnen";
+"sliding back after file operation" = "Nach Dateioperation zurÃ¼ckrutschen";
+"Activate changes" = "Ã„nderungen aktivieren";
 
 /* Hidden Files */
+"Files" = "Dateien";
+"Folders" = "Ordner";
 "Hidden Files" = "Versteckte Dateien";
 "Hidden files" = "Versteckte Dateien";
 "Shown files" = "Sichtbare Dateien";
 "Load" = "Laden";
-"Select and move the files to hide or to show" = "Dateien zum zeigen oder verstecken auswählen und verschieben";
+"Select and move the files to hide or to show" = "Dateien zum Zeigen oder Verstecken auswÃ¤hlen und verschieben";
+"Hidden directories" = "Versteckte Ordner";
+"add" = "hinzufÃ¼gen";
+"remove" = "entfernen";
+
+
+/* Desktop */
+"Back Color" = "Hintergrundfarbe";
+	"Current color" = "Aktuelle Farbe";
+"Back Image" = "Hintergrundbild";
+	"center" = "zentriert";
+	"fit" = "skaliert";
+	"tile" = "gekachelt";
+	"Use image" = "Bild verwenden";
+"General" = "Allgemein";
+	"Omnipresent" = "OmniprÃ¤sent";
+	"Show Dock" = "Dock anzeigen";
+	"Dock position" = "Dockposition";
+	"Left" = "Links";
+	"Right" = "Rechts";
+	"Autohide Tabbed Shelf" = "Tabbed Schelf einfahren";
 
 /* Browser */
 "Aspect" = "Aspekt";
@@ -373,3 +432,5 @@ which ends in "kann <the file> nicht umbenennen"
 "Uses Shelf" = "Shelf verwenden";
 "Columns Width" = "Spaltenbreite";
 
+/* History */
+"Number of saved paths" = "Anzahl der gespeicherten Pfade";

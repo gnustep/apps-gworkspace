@@ -1,4 +1,4 @@
-/* Attempt of a GWorkspace translation to Esperanto
+﻿/* Attempt of a GWorkspace translation to Esperanto
 ** ingolf jandt, jan 2006
 */
 
@@ -38,7 +38,7 @@
 		"Spatial" = "Space";
 		"Show" = "Montru";
 			"Name only" = "Nur nomon";
-			"Type" = "Tipon";
+			"Type" = "Tipo";
 			/*"Kind" = "Tipon";*/
 			"Size" = "Grandecon";
 			"Modification date" = "Ŝanĝan daton";
@@ -128,6 +128,10 @@
 "No" = "Ne";
 "Yes" = "Jes";
 
+"Are you sure you want to quit\nall applications and log out now?" = "Ĉu vi estas certa ke vi volas\nfiniĝi ĉiujn aplikojn kaj adiaŭi?";
+"If you do nothing, the system will log out\nautomatically in" = "Se vi faros nenion sistemo\naŭtomate finos post ";
+"seconds." = "sekundoj.";
+
 "Error" = "Eraro";
 "You have not write permission\nfor" = "Vi ne havas skribpermeson\nje";
 "Continue" = "Daŭrigu";
@@ -149,7 +153,7 @@
 
 /* Inspector/Attributes.m */
 
-"Link To:" = "Ligo al:";
+"Link to:" = "Ligo al:";
 "Size:" = "Grandeco:";
 "Calculate" = "Kalkulu";
 "Owner:" = "Posedanto:";
@@ -161,8 +165,8 @@
 "Execute" = "Ruli";
 "Owner" = "Posedanto";
 "Group" = "Grupo";
-"Other" = "Alioj";
-"Also apply to files inside selection" = "Apliku ankaŭ je elektitaj dosieroj";
+"Others" = "Alioj";
+"also apply to files inside selection" = "Apliku ankaŭ en elektitaj dosieroj";
 "Revert" = "Remetu";
 "OK" = "Konfirmu";
 
@@ -297,7 +301,7 @@
 "Execute" = "Ruli";
 "Owner" = "Posedanto";
 "Group" = "Grupo";
-"Other" = "Alioj";
+"Others" = "Alioj";
 
 
 /* ----------------------- Processes strings --------------------------- *\
