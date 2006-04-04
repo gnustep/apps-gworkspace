@@ -420,9 +420,9 @@ x += 6; \
 
 - (BOOL)acceptsDraggedPaths:(NSArray *)paths
 {
-  if ([self isSpecialIcon] == NO) {
-    int i;
+  unsigned i;
 
+  if ([self isSpecialIcon] == NO) {
     for (i = 0; i < [paths count]; i++) {
       NSString *path = [paths objectAtIndex: i];
       FSNode *nod = [FSNode nodeWithPath: path];
@@ -436,14 +436,30 @@ x += 6; \
     return YES;
     
   } else if (isTrashIcon) {
-	  NSString *fromPath = [[paths objectAtIndex: 0] stringByDeletingLastPathComponent];
-    NSString *trashpath = [[GWDesktopManager desktopManager] trashPath];
+    NSString *fromPath = [[paths objectAtIndex: 0] stringByDeletingLastPathComponent];
+    BOOL accept = YES;
     
-    if ([fm isWritableFileAtPath: fromPath] 
-                          && ([fromPath isEqual: trashpath] == NO)) {
+    if ([fromPath isEqual: [[GWDesktopManager desktopManager] trashPath]] == NO) {
+      NSArray *vpaths = [ws mountedLocalVolumePaths];
+    
+      for (i = 0; i < [paths count]; i++) {
+        NSString *path = [paths objectAtIndex: i];
+
+        if (([vpaths containsObject: path] == NO)
+                          && ([fm isWritableFileAtPath: path] == NO)) {
+          accept = NO;
+          break;
+        }
+      }
+    } else {
+      accept = NO;
+    }
+      
+    if (accept) {
       [self select];
-      return YES;
-    } 
+    }
+  
+    return accept;
   }
 
   return NO;

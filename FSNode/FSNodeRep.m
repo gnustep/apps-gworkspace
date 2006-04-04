@@ -679,7 +679,7 @@ static FSNodeRep *shared = nil;
 
 @implementation NSWorkspace (mounting)
 
-#if !defined(HAVE_GETMNTENT)
+#if !defined(HAVE_GETMNTENT) || !defined(MNT_DIR)
   #ifndef __APPLE__
     static char mtabuf[1024] = "";
   #endif

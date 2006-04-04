@@ -1145,29 +1145,42 @@ static GWorkspace *gworkspace = nil;
 
 - (void)moveToTrash
 {
-  NSString *basePath;
-  NSMutableArray *files;
+  NSArray *vpaths = [ws mountedLocalVolumePaths];
+  NSMutableArray *umountPaths = [NSMutableArray array];
+  NSMutableArray *files = [NSMutableArray array];
   int tag, i;
 
-  basePath = [NSString stringWithString: [selectedPaths objectAtIndex: 0]];
-  basePath = [basePath stringByDeletingLastPathComponent];
-
-	if ([fm isWritableFileAtPath: basePath] == NO) {
-		NSString *err = NSLocalizedString(@"Error", @"");
-		NSString *msg = NSLocalizedString(@"You do not have write permission\nfor", @"");
-		NSString *buttstr = NSLocalizedString(@"Continue", @"");
-    NSRunAlertPanel(err, [NSString stringWithFormat: @"%@ \"%@\"!\n", msg, basePath], buttstr, nil, nil);   
-		return;
-	}
-
-  files = [NSMutableArray array];
   for (i = 0; i < [selectedPaths count]; i++) {
-    [files addObject: [[selectedPaths objectAtIndex: i] lastPathComponent]];
+    NSString *path = [selectedPaths objectAtIndex: i];
+
+    if ([vpaths containsObject: path]) {
+      [umountPaths addObject: path];
+    } else {
+      [files addObject: [path lastPathComponent]];
+    }
   }
 
-  [self performFileOperation: @"NSWorkspaceRecycleOperation"
-                  source: basePath destination: [self trashPath] 
-                                            files: files tag: &tag];
+  for (i = 0; i < [umountPaths count]; i++) {
+    [ws unmountAndEjectDeviceAtPath: [umountPaths objectAtIndex: i]];
+  }
+
+  if ([files count]) {
+    NSString *basePath = [NSString stringWithString: [selectedPaths objectAtIndex: 0]];
+
+    basePath = [basePath stringByDeletingLastPathComponent];
+
+	  if ([fm isWritableFileAtPath: basePath] == NO) {
+		  NSString *err = NSLocalizedString(@"Error", @"");
+		  NSString *msg = NSLocalizedString(@"You do not have write permission\nfor", @"");
+		  NSString *buttstr = NSLocalizedString(@"Continue", @"");
+      NSRunAlertPanel(err, [NSString stringWithFormat: @"%@ \"%@\"!\n", msg, basePath], buttstr, nil, nil);   
+		  return;
+	  }
+
+    [self performFileOperation: @"NSWorkspaceRecycleOperation"
+                    source: basePath destination: [self trashPath] 
+                                              files: files tag: &tag];
+  }
 }
 
 - (BOOL)verifyFileAtPath:(NSString *)path
