@@ -1,11 +1,11 @@
-/* Sé que la traducción es muy mejorable */
-/* He revisado y actualizado la traducción. Quique */
+ï»¿/* SÃ© que la traducciÃ³n es muy mejorable */
+/* He revisado y actualizado la traducciÃ³n. Quique */
 
 /* ----------------------- menu strings --------------------------- *\
 /* main.m */
 
-"Info" = "Información";
-	"Info Panel..." = "Panel de información...";
+"Info" = "InformaciÃ³n";
+	"Info Panel..." = "Panel de informaciÃ³n...";
 	"Preferences..." = "Preferencias...";
 	"Help..." = "Ayuda...";
 
@@ -40,13 +40,13 @@
 	"Finder" = "Buscador";
 	"Processes..." = "Procesos...";
 	"Fiend" = "Fiend";
-		"Show Fiend" = "Mostrar Fiend"; /* R// Arreglar esto  Q// En francés e italiano no lo traducen */
+		"Show Fiend" = "Mostrar Fiend"; /* R// Arreglar esto  Q// En francÃ©s e italiano no lo traducen */
 		"Hide Fiend" = "Ocultar Fiend";
-		"Add Layer..." = "Añadir capa...";
+		"Add Layer..." = "AÃ±adir capa...";
 		"Remove Current Layer" = "Quitar la capa actual";
 		"Rename Current Layer" = "Renombrar la capa actual";
 		"Layers" = "Capas";
-	"DeskTop Shelf" = "DeskTop Shelf"; /* Q// En francés lo traducen como Etagère, es decir, estante */	
+	"DeskTop Shelf" = "DeskTop Shelf"; /* Q// En francÃ©s lo traducen como EtagÃ¨re, es decir, estante */	
 	"XTerm" = "XTerm";
 	
 "Windows" = "Ventanas";
@@ -68,9 +68,9 @@
 
 "GNUstep Workspace Manager" = "Gestor de escritorio de GNUstep";
 "See http://www.gnustep.it/enrico/gworkspace" = "Vea http://www.gnustep.it/enrico/gworkspace";
-"Released under the GNU General Public License 2.0" = "Publicado bajo la Licencia Pública General GNU 2.0";
+"Released under the GNU General Public License 2.0" = "Publicado bajo la Licencia PÃºblica General GNU 2.0";
 "Error" = "Error";
-"You have not write permission\nfor" = "No tiene permisos de escritura\npara"; /* R// ?  ¿Cuál es el problema? */
+"You have not write permission\nfor" = "No tiene permisos de escritura\npara"; /* R// ?  Â¿CuÃ¡l es el problema? */
 "Continue" = "Continuar";
 
 
@@ -86,9 +86,9 @@
 "Link" = "Enlazar";
 "Link " = "Enlazar ";
 "Delete" = "Borrar";
-"Delete the selected objects?" = "¿Borrar los objetos seleccionados?";
+"Delete the selected objects?" = "Â¿Borrar los objetos seleccionados?";
 "Duplicate" = "Duplicar";
-"Duplicate the selected objects?" = "¿Duplicar los objetos seleccionados?";
+"Duplicate the selected objects?" = "Â¿Duplicar los objetos seleccionados?";
 "From:" = "De:";
 "To:" = "A:";
 "In:" = "En:";
@@ -99,20 +99,20 @@
 "Linking" = "Enlazando";
 "Duplicating" = "Duplicando";
 "Destroying" = "Destruyendo";
-"File Operation Completed" = "Operación de fichero completada";
-"Backgrounder connection died!" = "La conexión con Backgrounder se ha roto"; /* R// Jarl  Q// Consultada la traducción italiana */
-"Some items have the same name;\ndo you want to substitute them?" = "Algunos elementos tienen el mismo nombre;\n¿Quiere sustituirlos?";
+"File Operation Completed" = "OperaciÃ³n de fichero completada";
+"Backgrounder connection died!" = "La conexiÃ³n con Backgrounder se ha roto"; /* R// Jarl  Q// Consultada la traducciÃ³n italiana */
+"Some items have the same name;\ndo you want to substitute them?" = "Algunos elementos tienen el mismo nombre;\nÂ¿Quiere sustituirlos?";
 "Error" = "Error";
-"File Operation Error!" = "¡Error en la operación de ficheros!";
+"File Operation Error!" = "Â¡Error en la operaciÃ³n de ficheros!";
 
 
 /* ColumnIcon.m */
 
 "You have not write permission\nfor " = "No tiene permisos de escritura\npara ";
-"The name " = "¡El nombre ";
-" is already in use!" = " ya está en uso!";
+"The name " = "Â¡El nombre ";
+" is already in use!" = " ya estÃ¡ en uso!";
 "Cannot rename " = "No puedo renombrar ";
-"Invalid char in name" = "Carácter no válido en el nombre";
+"Invalid char in name" = "CarÃ¡cter no vÃ¡lido en el nombre";
 
 
 /* ----------------------- Inspectors strings --------------------------- *\
@@ -131,7 +131,7 @@
 "Attributes Inspector" = "Inspector de atributos";
 "Path:" = "Ruta:";
 "Link To:" = "Enlazar a:";
-"Size:" = "Tamaño:";
+"Size:" = "TamaÃ±o:";
 "Owner:" = "Propietario:";
 "Group:" = "Grupo:";
 "Changed" = "Cambiado";
@@ -144,31 +144,31 @@
 "Contents" = "Contenidos";
 "Contents Inspector" = "Inspector de contenidos";
 "No Contents Inspector" = "Sin inspector de contenidos";
-"No Contents Inspector\nFor Multiple Selection" = "No hay Inspector de\ncontenidos para\nselección múltiple";
+"No Contents Inspector\nFor Multiple Selection" = "No hay Inspector de\ncontenidos para\nselecciÃ³n mÃºltiple";
 
 
 /* FolderViewer.m */
 
 "Sort method applies to the\ncontents of the selected folder,\nNOT to its parent folder"
-  = "El método de ordenación se\naplica al contenido de la\ncarpeta seleccionada, NO\na la carpeta superior";
+  = "El mÃ©todo de ordenaciÃ³n se\naplica al contenido de la\ncarpeta seleccionada, NO\na la carpeta superior";
 "Sort by" = "Ordenar por";
 "Name" = "Nombre";
 "Type" = "Clase";
 "Date" = "Fecha";
-"Size" = "Tamaño";
+"Size" = "TamaÃ±o";
 "Owner" = "Propietario";
 "Folder Inspector" = "Inspector de Carpetas";	
 
 
 /* ImageViewer.m */
 
-"Image Inspector" = "Inspector de imágenes";
+"Image Inspector" = "Inspector de imÃ¡genes";
 
 
 /* AppViewer.m */
 
 "Open these kinds of documents:" = "Abrir este tipo de documentos:";
-"Invalid Contents" = "Contenido no válido";
+"Invalid Contents" = "Contenido no vÃ¡lido";
 "App Inspector" = "Inspector de aplicaciones";
 
 
@@ -176,7 +176,7 @@
 
 "UNIX Permissions" = "Permisos UNIX";
 "Access Control" = "Control de acceso";
-"Also apply to files inside selection" = "Aplicar también a los ficheros de la selección";
+"Also apply to files inside selection" = "Aplicar tambiÃ©n a los ficheros de la selecciÃ³n";
 
 
 /* ToolsPanel.m */
@@ -184,7 +184,7 @@
 "Tools" = "Herramientas";
 "Tools Inspector" = "Inspector de herramientas";
 "No Tools Inspector" = "Sin Inspector de herramientas";
-"Set Default" = "Definir por defecto"; /* Me gusta más que Poner por omisión */
+"Set Default" = "Definir por defecto"; /* Me gusta mÃ¡s que Poner por omisiÃ³n */
 
 
 /* AppsView.m */
@@ -194,7 +194,7 @@
 "Default:" = "Por defecto:";
 "Path:" = "Ruta:";		
 "Click 'Set Default' to set default application\nfor all documents with this extension" 
-  ="Pulse 'Por defecto' para elegir la\naplicación predeterminada a usar para todos\nlos documentos con esta extensión";
+  ="Pulse 'Por defecto' para elegir la\naplicaciÃ³n predeterminada a usar para todos\nlos documentos con esta extensiÃ³n";
 
 
 /* PermsBox.m */
@@ -202,7 +202,7 @@
 "Permissions" = "Permisos";
 "Read" = "Lectura";
 "Write" = "Escritura";
-"Execute" = "Ejecución";
+"Execute" = "EjecuciÃ³n";
 "Owner" = "Propietario";
 "Group" = "Grupo";
 "Other" = "Otros";
@@ -232,23 +232,23 @@
 "Finder" = "Buscar";
 "Find items with names that match" = "Buscar elementos cuyo nombre case";
 "Find items with contents that match" = "Buscar elementos cuyo contenido case";
-"No selection!" = "¡Ninguna selección!";
-"No arguments!" = "¡Ningún argumento!";
+"No selection!" = "Â¡Ninguna selecciÃ³n!";
+"No arguments!" = "Â¡NingÃºn argumento!";
 
 
 /* ----------------------- Fiend strings --------------------------- *\
 
 /* Fiend.m */
-/* R// A ver cómo lo traducimos */
+/* R// A ver cÃ³mo lo traducimos */
 
 "New Layer" = "Nueva capa";
-"A layer with this name is already present!" = "¡Ya hay una capa con ese nombre!";
-"You can't remove the last layer!" = "¡No puede borrar la última capa!";
+"A layer with this name is already present!" = "Â¡Ya hay una capa con ese nombre!";
+"You can't remove the last layer!" = "Â¡No puede borrar la Ãºltima capa!";
 "Remove layer" = "Quitar capa";
-"Are you sure that you want to remove this layer?" = "¿Está seguro de querer quitar esta capa?";
+"Are you sure that you want to remove this layer?" = "Â¿EstÃ¡ seguro de querer quitar esta capa?";
 "Rename Layer" = "Renombrar capa";
-"You can't dock multiple paths!" = "¡No puede aparcar rutas múltiples!";
-"This object is already present in this layer!" = "¡Este objeto ya está en esta capa!";
+"You can't dock multiple paths!" = "Â¡No puede aparcar rutas mÃºltiples!";
+"This object is already present in this layer!" = "Â¡Este objeto ya estÃ¡ en esta capa!";
 	
 			
 /* ----------------------- Preference strings --------------------------- *\
@@ -267,7 +267,7 @@
 "green" = "verde";
 "blue" = "azul";
 "Set Color" = "Poner color";
-"Push the \"Set Image\" button\nto set your DeskTop image.\nThe image must have the same\nsize of your screen." = "Pulse el botón \"Poner imagen\" para poner su\nimagen de escritorio. La imagen debe tener el\nmismo tamño que la pantalla.";
+"Push the \"Set Image\" button\nto set your DeskTop image.\nThe image must have the same\nsize of your screen." = "Pulse el botÃ³n \"Poner imagen\" para poner su\nimagen de escritorio. La imagen debe tener el\nmismo tamÃ±o que la pantalla.";
 
 "Set Image" = "Poner imagen";
 "Unset Image" = "Quitar imagen";
@@ -292,7 +292,7 @@
 "timeout" = "timeout";
 "frequency" = "frecuencia";
 "Values will apply to the \nnew watchers from now, \nto the existing ones, after the first timeout" = 
-"Los valores se aplicarán a\nlos nuevos vigilantes desde ahora,\ny a los ya existentes a partir del primer timeout";
+"Los valores se aplicarÃ¡n a\nlos nuevos vigilantes desde ahora,\ny a los ya existentes a partir del primer timeout";
 	
 	
 /* ShelfPreferences.m */
@@ -309,7 +309,7 @@
 
 /* IconViewsPreferences.m */
 
-"Title Width" = "Anchura del título";
+"Title Width" = "Anchura del tÃ­tulo";
 "Icon View" = "Ver por iconos";
 
 /* Recycler strings */
@@ -321,5 +321,5 @@
 "Move from the Recycler " = "Mover de la papelera ";
 "In" = "En";
 "Empty Recycler" = "Vaciar papelera";
-"Empty the Recycler?" = "¿Vaciar la papelera?";
+"Empty the Recycler?" = "Â¿Vaciar la papelera?";
 "Put Away" = "Tirar";

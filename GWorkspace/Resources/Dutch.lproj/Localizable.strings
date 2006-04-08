@@ -1,4 +1,4 @@
-/* ----------------------- menu strings --------------------------- */
+﻿/* ----------------------- menu strings --------------------------- */
 /* Vertaling door David Bekaert david.bekaert@pandora.be
  *
  */
@@ -96,7 +96,7 @@
 "Stop" = "Stop";
 "Pause" = "Pause";
 "Moving" = "Bezig met Verplaatsen";
-"Copying" = "Bezig met Kopi�ren";
+"Copying" = "Bezig met Kopiëren";
 "Linking" = "Bezig met Linken";
 "Duplicating" = "Bezig met Dupliceren";
 "Destroying" = "Bezig met Verwijderen";

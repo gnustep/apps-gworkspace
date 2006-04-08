@@ -1,39 +1,39 @@
-/* ----------------------- menu strings --------------------------- */
-/* Traduction réalisée par Stéphane PERON <speron@telys.com> 
+ï»¿/* ----------------------- menu strings --------------------------- */
+/* Traduction rÃ©alisÃ©e par StÃ©phane PERON <speron@telys.com> 
  * et Xavier BARRIER <xavier.barrier@proxyware.fr> 
  */
 /* main.m */
 
 
 "Info" = "Informations";
-	"Info Panel..." = "À propos...";
-	"Preferences..." = "Préférences...";
+	"Info Panel..." = "Ã€ propos...";
+	"Preferences..." = "PrÃ©fÃ©rences...";
 	"Help..." = "Aide...";
 
 "File" = "Fichier";
 	"Open" = "Ouvrir";
 	"Open as Folder" = "Ouvrir le dossier";
 	"Open With..." = "Ouvrir avec ...";
-	"Edit File" = "Éditer le fichier";
+	"Edit File" = "Ã‰diter le fichier";
 	"New Folder" = "Nouveau dossier";
 	"New File" = "Nouveau fichier";
 	"Duplicate" = "Dupliquer";	
 	"Destroy" = "Supprimer";
 	"Empty Recycler" = "Vider la corbeille";
 	"Put Away" = "Jeter";
-	"Run..." = "Démarrer ...";
+	"Run..." = "DÃ©marrer ...";
 	"Print..." = "Imprimer ...";
 
 "Edit" = "Edition";
 	"Cut" = "Couper";
 	"Copy" = "Copier";
 	"Paste" = "Coller";
-	"Select All" = "Tout sélectionner";
+	"Select All" = "Tout sÃ©lectionner";
 		
 "View" = "Affichage";
 	"Browser" = "Liste";
-	"Icon" = "Icône";
-	"Small Icon" = "Mini-icône";
+	"Icon" = "IcÃ´ne";
+	"Small Icon" = "Mini-icÃ´ne";
 		
 "Tools" = "Outils";
 	"Viewer" = "Visualisateur";
@@ -45,11 +45,11 @@
 		"Permissions" = "Droits";
 	"History" = "Historique";
 	"Show History" = "Voir l'historique";	
-	"Go backward" = "Revenir en arrière";	
+	"Go backward" = "Revenir en arriÃ¨re";	
 	"Go forward" = "Avancer";	
 	"Finder" = "Chercher un fichier";
 	"Applications..." = "Applications ...";
-	"File Operations..." = "Opérations sur fichier";
+	"File Operations..." = "OpÃ©rations sur fichier";
 
 	"Processes..." = "Processus...";
 	"Fiend" = "Fiend";
@@ -59,14 +59,14 @@
 		"Remove Current Layer" = "Supprimer l'espace de travail courant";
 		"Rename Current Layer" = "Renommer l'espace de travail courant";
 		"Layers" = "Espaces de travail";
-	"DeskTop Shelf" = "Etagère du bureau";	
+	"DeskTop Shelf" = "EtagÃ¨re du bureau";	
 	"XTerm" = "XTerm";
 	
-"Windows" = "Fenêtre";
+"Windows" = "FenÃªtre";
 	"Arrange in Front" = "Mettre au premier plan";
-	"Miniaturize Window" = "Réduire la fenêtre";
-	"Close Window" = "Fermer la fenêtre";
-	"Window" = "Fenêtre";	
+	"Miniaturize Window" = "RÃ©duire la fenÃªtre";
+	"Close Window" = "Fermer la fenÃªtre";
+	"Window" = "FenÃªtre";	
 
 "Services" = "Services";
 
@@ -81,9 +81,9 @@
 
 "GNUstep Workspace Manager" = "Gestionnaire de bureau de GNUstep";
 "See http://www.gnustep.it/enrico/gworkspace" = "http://www.gnustep.it/enrico/gworkspace";
-"Released under the GNU General Public License 2.0" = "Mise à disposition sous licence : GNU General Public License 2.0";
+"Released under the GNU General Public License 2.0" = "Mise Ã  disposition sous licence : GNU General Public License 2.0";
 "Error" = "Erreur";
-"You have not write permission\nfor" = "Vous n'avez pas les droits d'écrire\npour";
+"You have not write permission\nfor" = "Vous n'avez pas les droits d'Ã©crire\npour";
 "Continue" = "Continuer";
 
 
@@ -91,41 +91,41 @@
 
 "OK" = "Ok";
 "Cancel" = "Annuler";
-"Move" = "Déplacer";
-"Move from: " = "Déplacer depuis : ";
+"Move" = "DÃ©placer";
+"Move from: " = "DÃ©placer depuis : ";
 "\nto: " = "\nvers : ";
 "Copy" = "Copier";
 "Copy from: " = "Copie depuis : ";
 "Link" = "Lier";
 "Link " = "Lier ";
 "Delete" = "Supprimer";
-"Delete the selected objects?" = "Supprimer les objets sélectionnés ?";
+"Delete the selected objects?" = "Supprimer les objets sÃ©lectionnÃ©s ?";
 "Duplicate" = "Dupliquer";
-"Duplicate the selected objects?" = "Dupliquer les objets sélectionnés ?";
+"Duplicate the selected objects?" = "Dupliquer les objets sÃ©lectionnÃ©s ?";
 "From:" = "De :";
-"To:" = "À:";
+"To:" = "Ã€:";
 "In:" = "Dans :";
 "Stop" = "Stop";
 "Pause" = "Pause";
-"Moving" = "Déplacement en cours";
+"Moving" = "DÃ©placement en cours";
 "Copying" = "Copie en cours";
 "Linking" = "Liaison en cours";
 "Duplicating" = "Duplication en cours";
 "Destroying" = "Suppression en cours";
-"File Operation Completed" = "Opération sur fichier terminée";
+"File Operation Completed" = "OpÃ©ration sur fichier terminÃ©e";
 "Backgrounder connection died!" = "Interruption de la connexion !";
-"Some items have the same name;\ndo you want to sobstitute them?" = "Des éléments ont le même nom ;\nvoulez-vous en remplacer le nom ?";
+"Some items have the same name;\ndo you want to sobstitute them?" = "Des Ã©lÃ©ments ont le mÃªme nom ;\nvoulez-vous en remplacer le nom ?";
 "Error" = "Erreur";
 "File Operation Error!" = "Erreur de manipulation de fichier !";
 
 
 /* ColumnIcon.m */
 
-"You have not write permission\nfor " = "Vous n'avez pas les droits d'écriture\n ";
+"You have not write permission\nfor " = "Vous n'avez pas les droits d'Ã©criture\n ";
 "The name " = "Le nom ";
-" is already in use!" = " est déja utilisé!";
+" is already in use!" = " est dÃ©ja utilisÃ©!";
 "Cannot rename " = "Impossible de renommer ";
-"Invalid char in name" = "Le nom contient un caractère invalide";
+"Invalid char in name" = "Le nom contient un caractÃ¨re invalide";
 
 
 /* ----------------------- Inspectors strings --------------------------- *\
@@ -135,7 +135,7 @@
 "Attributes" = "Attributs";
 "Contents" = "Contenus";
 "Tools" = "Outils";
-"Access Control" = "Contrôle des accès";
+"Access Control" = "ContrÃ´le des accÃ¨s";
 
 
 /* AttributesPanel.m */
@@ -143,11 +143,11 @@
 "Attributes" = "Attributs";
 "Attributes Inspector" = "Inspecteur d'attributs";
 "Path:" = "Nom complet :";
-"Link To:" = "Lié à :";
+"Link To:" = "LiÃ© Ã  :";
 "Size:" = "Taille :";
-"Owner:" = "Propriétaire :";
+"Owner:" = "PropriÃ©taire :";
 "Group:" = "Groupe :";
-"Changed" = "Modifié";
+"Changed" = "ModifiÃ©";
 "Revert" = "Revenir";
 "OK" = "Ok";
 
@@ -157,19 +157,19 @@
 "Contents" = "Contenus";
 "Contents Inspector" = "Inspecteur de contenus";
 "No Contents Inspector" = "Pas d'inspecteur de contenus";
-"No Contents Inspector\nFor Multiple Selection" = "Pas d'inspecteur de contenus\npour des sélections multiples";
+"No Contents Inspector\nFor Multiple Selection" = "Pas d'inspecteur de contenus\npour des sÃ©lections multiples";
 
 
 /* FolderViewer.m */
 
 "Sort method applies to the\ncontents of the selected folder,\nNOT to its parent folder"
-  = "La méthode de tri s'applique aux\ncontenus des dossiers sélectionnés,\nPAS aux dossiers parents";
+  = "La mÃ©thode de tri s'applique aux\ncontenus des dossiers sÃ©lectionnÃ©s,\nPAS aux dossiers parents";
 "Sort by" = "Trier par";
 "Name" = "Nom";
 "Type" = "Type";
 "Date" = "Date";
 "Size" = "Taille";
-"Owner" = "Propriétaire";
+"Owner" = "PropriÃ©taire";
 "Folder Inspector" = "Inspecteur de dossiers";	
 /* Ajouts 25052003 */
 "%@ available on hard disk"= "%@ disponibles sur le disque dur";
@@ -193,8 +193,8 @@
 /* PermissionsPanel.m */
 
 "UNIX Permissions" = "Droits UNIX";
-"Access Control" = "Contrôle des accès";
-"Also apply to files inside selection" = "S'applique aussi aux fichiers sélectionnés";
+"Access Control" = "ContrÃ´le des accÃ¨s";
+"Also apply to files inside selection" = "S'applique aussi aux fichiers sÃ©lectionnÃ©s";
 
 
 /* ToolsPanel.m */
@@ -202,16 +202,16 @@
 "Tools" = "Outils";
 "Tools Inspector" = "Inspecteur d'outils";
 "No Tools Inspector" = "Pas d'inspecteur d'outils";
-"Set Default" = "Définir par défaut";
+"Set Default" = "DÃ©finir par dÃ©faut";
 
 
 /* AppsView.m */
 	
-"Double-click to open selected document(s)" = "Double-cliquez pour ouvrir le ou les document(s) sélectionné(s)";	
-"Default:" = "Défaut :";
+"Double-click to open selected document(s)" = "Double-cliquez pour ouvrir le ou les document(s) sÃ©lectionnÃ©(s)";	
+"Default:" = "DÃ©faut :";
 "Path:" = "Nom complet :";		
 "Click 'Set Default' to set default application\nfor all documents with this extension" 
-  = "Cliquez sur 'Définir par défaut' pour définir l'application \nqui sera associée à tous les documents ayant cette extension";
+  = "Cliquez sur 'DÃ©finir par dÃ©faut' pour dÃ©finir l'application \nqui sera associÃ©e Ã  tous les documents ayant cette extension";
 
 
 /* PermsBox.m */
@@ -220,7 +220,7 @@
 "Read" = "Lire";
 "Write" = "Ecrire";
 "Execute" = "Executer";
-"Owner" = "Propriétaire";
+"Owner" = "PropriÃ©taire";
 "Group" = "Groupe";
 "Other" = "Autre";
 
@@ -230,7 +230,7 @@
 /* Processes.m */
 
 "Processes" = "Processus";
-"No Background Process" = "Pas de tâche de fond";
+"No Background Process" = "Pas de tÃ¢che de fond";
 "Kill" = "Tuer";
 "Path: " = "Nom complet : ";
 "Status: " = "Etat : ";
@@ -239,7 +239,7 @@
 /* ProcsView.m */
 
 "Applications" = "Applications";
-"Background" = "Fond d'écran";
+"Background" = "Fond d'Ã©cran";
 
 
 /* ----------------------- Finder strings --------------------------- *\
@@ -247,105 +247,105 @@
 /* Finder.m */
 
 "Finder" = "Rechercher";
-"Find items with names that match" = "Rechercher les éléments nommés";
-"Find items with contents that match" = "Rechercher les éléments contenant le texte";
-"No selection!" = "Pas de sélection!";
+"Find items with names that match" = "Rechercher les Ã©lÃ©ments nommÃ©s";
+"Find items with contents that match" = "Rechercher les Ã©lÃ©ments contenant le texte";
+"No selection!" = "Pas de sÃ©lection!";
 "No arguments!" = "Pas d'argument!";
-"Search for items whose:"="Recherche de fichiers à partir des critères ci-dessous :";
+"Search for items whose:"="Recherche de fichiers Ã  partir des critÃ¨res ci-dessous :";
 "file name" = "Nom";
 "kind" = "Type";
 "size (KB)" = "Taille (KB)";
-"owner" = "Propriétaire";
-"date created" = "Date création";
+"owner" = "PropriÃ©taire";
+"date created" = "Date crÃ©ation";
 "date modified" = "Date modif.";
 "contents" = "Contenu";
 "includes" = "contient";
 "contains" = "contenant";
 "doesn't contain" = "ne contenant pas";
 "is" = "est";
-"is not" = "est différent";
+"is not" = "est diffÃ©rent";
 "starts with" = "commence par";
 "ends with" = "finit par";
-"no value" = "n'est pas un critère";
+"no value" = "n'est pas un critÃ¨re";
 "plain file" = "fichier commun";
-"directory" = "répertoire";
-"shell executable" ="exécutable de shell";
+"directory" = "rÃ©pertoire";
+"shell executable" ="exÃ©cutable de shell";
 "symbolic link" = "lien symbolique";
 "application" = "application";
-"is less than" = "est inférieure à";
-"is greater than"= "est supérieure à";
+"is less than" = "est infÃ©rieure Ã ";
+"is greater than"= "est supÃ©rieure Ã ";
 
 /* ----------------------- Fiend strings --------------------------- *\
 
 /* Fiend.m */
 
 "New Layer" = "Nouvel espace de travail";
-"A layer with this name is already present!" = "Un espace de travail possède déja ce nom !";
+"A layer with this name is already present!" = "Un espace de travail possÃ¨de dÃ©ja ce nom !";
 "You can't remove the last layer!" = "Vous ne pouvez supprimer le dernier espace de travail !";
 "Remove layer" = "Supprimer cet espace de travail";
-"Are you sure that you want to remove this layer?" = "Êtes-vous sûr de vouloir supprimer cet espace de travail ?";
+"Are you sure that you want to remove this layer?" = "ÃŠtes-vous sÃ»r de vouloir supprimer cet espace de travail ?";
 "Rename Layer" = "Renommer cet espace de travail";
-"You can't dock multiple paths!" = "Vous ne pouvez pas stocker plusieurs chemins d'accès !";
-"This object is already present in this layer!" = "Cet objet est déja présent dans cet espace de travail !";
+"You can't dock multiple paths!" = "Vous ne pouvez pas stocker plusieurs chemins d'accÃ¨s !";
+"This object is already present in this layer!" = "Cet objet est dÃ©ja prÃ©sent dans cet espace de travail !";
 	
 			
 /* ----------------------- Preferences strings --------------------------- *\
 
 /* PreferencesWin.m */
 
-"GWorkspace Preferences" = "Préférences de GWorkspace";
+"GWorkspace Preferences" = "PrÃ©fÃ©rences de GWorkspace";
 
 
 /* BackWinPreferences.m */       
 
-"DeskTop Shelf" = "Etagère du bureau";	
+"DeskTop Shelf" = "EtagÃ¨re du bureau";	
 "DeskTop Color" = "Couleur du bureau";
 "red" = "rouge";
 "green" = "vert";
 "blue" = "bleu";
 "Set Color" = "Appliquer la couleur";
 "Push the \"Set Image\" button\nto set your DeskTop image.\nThe image must have the same\nsize of your screen." = 
-  "Cliquez sur le bouton\"Appliquer l'image\"\npour installer l'image sur votre bureau.\nCette image doit avoir la même\ntaille que l'écran.";
+  "Cliquez sur le bouton\"Appliquer l'image\"\npour installer l'image sur votre bureau.\nCette image doit avoir la mÃªme\ntaille que l'Ã©cran.";
 "Set Image" = "Appliquer l'image";
 "Unset Image" = "Retirer l'image";
 "Push the 'Set Image' button" = "Cliquez sur le bouton 'Appliquer l'image'";
 "to set you Destop image" = "pour appliquer l'image au fonds de votre bureau." ;
-"The image must have the same" = "L'image doit avoir la même taille";
-"size as your screen." = "que votre écran.";
+"The image must have the same" = "L'image doit avoir la mÃªme taille";
+"size as your screen." = "que votre Ã©cran.";
 	
 /* DefaultXTerm.m */             
 	
-"Set" = "Définir";	
+"Set" = "DÃ©finir";	
 
 	
 /* BrowserViewsPreferences.m */  
 
 "Columns Width" = "Largeur des colonnes";
-"Use Default Settings" = "Param. par défaut";	
+"Use Default Settings" = "Param. par dÃ©faut";	
 "Browser" = "Liste";
 "Browser View" = "Affichage liste";
 	
 	
 /* FileWatchingPreferences.m */  
 	
-"File System Watching" = "Consultation du système de fichier";
-"timeout" = "délai d'attente dépassé";
-"frequency" = "fréquence";
+"File System Watching" = "Consultation du systÃ¨me de fichier";
+"timeout" = "dÃ©lai d'attente dÃ©passÃ©";
+"frequency" = "frÃ©quence";
 "Values will apply to the \nnew watchers from now, \nto the existing ones, after the first timeout" = 
-   "A partir de maintenant, les paramètres seront \nappliquées aux nouveaux arrivants";
+   "A partir de maintenant, les paramÃ¨tres seront \nappliquÃ©es aux nouveaux arrivants";
 
 	
 /* ShelfPreferences.m */
 	
-"Shelf" = "Etagère";
+"Shelf" = "EtagÃ¨re";
 	
 	
 /* DefaultEditor.m */            
 
-"Default Editor" = "Editeur par défaut";
-"No Default Editor" = "Pas d'éditeur par défaut";
-"Choose..." = "Sélectionner...";
-"Choose" = "Sélectionner...";
+"Default Editor" = "Editeur par dÃ©faut";
+"No Default Editor" = "Pas d'Ã©diteur par dÃ©faut";
+"Choose..." = "SÃ©lectionner...";
+"Choose" = "SÃ©lectionner...";
 "Editor" = "Editeur de texte";
 "XTerminal" = "Console X";
 "Sorting Order" = "Ordre de tri";
@@ -354,44 +354,44 @@
 "Type" = "Type";
 "Date" = "Date";
 "Size" = "Taille";
-"Owner" = "Propriétaire";
+"Owner" = "PropriÃ©taire";
 "Set" = "Appliquer";
-"Icons Animation" = "Animation d'icônes";
-"Hidden Files" = "Fichiers cachés";
-"File Operations" = "Opérations sur fichier";
+"Icons Animation" = "Animation d'icÃ´nes";
+"Hidden Files" = "Fichiers cachÃ©s";
+"File Operations" = "OpÃ©rations sur fichier";
 "DeskTop" = "Bureau";
 "failed to load %@!" = "Impossible de charger %@ !";
 "Xterm" = "Terminal xterm";
 "Arguments" = "Arguments";
 "Desktop Color" = "Couleur du bureau";
-"Deactivate" = "Désactiver";
+"Deactivate" = "DÃ©sactiver";
 "Activate" = "Activer";
 "Activate changes" = "Appliquer";
 "Default" = "Standard";
-"Status Window" = "Fenêtre de progression";
+"Status Window" = "FenÃªtre de progression";
 "Confirmation" = "Confirmation";
 "Show status window" ="Afficher la progression";
 "Load" = "Charg.";
 
-"Uncheck the buttons to allow automatic confirmation" = "Décochez les buttons pour une confirmation systématique";
-"of file operations" = "des opérations sur fichier" ;
+"Uncheck the buttons to allow automatic confirmation" = "DÃ©cochez les buttons pour une confirmation systÃ©matique";
+"of file operations" = "des opÃ©rations sur fichier" ;
 
-"The method will apply to all the folders" = "Cette méthode s'appliquera à tous les dossiers";
-"that have no order specified" = "qui n'ont pas d'ordre de tri spécifié" ;
-"Check this option to show a status window" = "Cochez cette option pour voir une fenêtre de progression";
-"during the file operations"  = "lors des opérations sur fichier";
+"The method will apply to all the folders" = "Cette mÃ©thode s'appliquera Ã  tous les dossiers";
+"that have no order specified" = "qui n'ont pas d'ordre de tri spÃ©cifiÃ©" ;
+"Check this option to show a status window" = "Cochez cette option pour voir une fenÃªtre de progression";
+"during the file operations"  = "lors des opÃ©rations sur fichier";
 
-"when changing a path" = "en changeant de répertoire";
+"when changing a path" = "en changeant de rÃ©pertoire";
 "when opening a file" = "en ouvrant un fichier";
-"sliding back after file operation" = "en revenant en arrière" ;
-"Animate icons" = "Animation des icônes";
+"sliding back after file operation" = "en revenant en arriÃ¨re" ;
+"Animate icons" = "Animation des icÃ´nes";
 "Shown files" = "Fichiers visibles";
-"Hidden files" = "Fichiers cachés";
-"Select and move the files to hide or to show" = "Selectionnez et déplacez les fichiers à cacher ou afficher";
+"Hidden files" = "Fichiers cachÃ©s";
+"Select and move the files to hide or to show" = "Selectionnez et dÃ©placez les fichiers Ã  cacher ou afficher";
 
 /* IconViewsPreferences.m */
 "Title Width" = "Largeur du titre";
-"Icon View" = "Affichage icône";
+"Icon View" = "Affichage icÃ´ne";
 
 /* Recycler strings */
 
@@ -400,7 +400,7 @@
 "Recycler" = "Corbeille";
 "the Recycler" = "la Corbeille";
 "\nto the Recycler" = "\nvers la Corbeille";
-"Move from the Recycler " = "Déplacer depuis la Corbeille ";
+"Move from the Recycler " = "DÃ©placer depuis la Corbeille ";
 "In" = "Dedans";
 "Empty Recycler" = "Vider la Corbeille";
 "Empty the Recycler?" = "Vider la Corbeille ?";

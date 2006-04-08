@@ -1,11 +1,11 @@
-/* TraduÁ„o feita por Tiago Ribeiro <tiagor@mac.com> */
+Ôªø/* Tradu√ß√£o feita por Tiago Ribeiro <tiagor@mac.com> */
 
 /* ----------------------- menu strings --------------------------- *\
 /* main.m */
 
 "Info" = "Info";
-	"Info Panel..." = "Painel de InformaÁıes...";
-	"Preferences..." = "PreferÍncias...";
+	"Info Panel..." = "Painel de Informa√ß√µes...";
+	"Preferences..." = "Prefer√™ncias...";
 	"Help..." = "Ajuda...";
 
 "File" = "Arquivo";
@@ -33,9 +33,9 @@
 	"Inspectors" = "Inspetores";
 		"Show Inspectors" = "Mostrar Inspetores";
 		"Attributes" = "Atributos";
-		"Contents" = "Conte˙do";
+		"Contents" = "Conte√∫do";
 		"Tools" = "Ferramentas";	
-		"Permissions" = "Permissıes";	
+		"Permissions" = "Permiss√µes";	
 	"Finder" = "Buscador";
 	"Processes..." = "Processos...";
 	"Fiend" = "Fiend";
@@ -49,11 +49,11 @@
 	"XTerm" = "XTerm";
 	
 "Windows" = "Janelas";
-	"Arrange in Front" = "Organizar ‡ Frente";
+	"Arrange in Front" = "Organizar √† Frente";
 	"Miniaturize Window" = "Miniaturizar Janela";
 	"Close Window" = "Fechar Janela";
 	
-"Services" = "ServiÁos";
+"Services" = "Servi√ßos";
 
 "Hide" = "Ocultar";
 
@@ -67,9 +67,9 @@
 
 "GNUstep Workspace Manager" = "Gerenciador de DeskTop GNUstep";
 "See http://www.gnustep.it/enrico/gworkspace" = "Acesse http://www.gnustep.it/enrico/gworkspace";
-"Released under the GNU General Public License 2.0" = "Distribuido segundo a LicenÁa P˙blica Geral GNU 2.0";
+"Released under the GNU General Public License 2.0" = "Distribuido segundo a Licen√ßa P√∫blica Geral GNU 2.0";
 "Error" = "Erro";
-"You have not write permission\nfor" = "N„o h· permissıes de escrita\npara"; /* R// ? */
+"You have not write permission\nfor" = "N√£o h√° permiss√µes de escrita\npara"; /* R// ? */
 "Continue" = "Continuar";
 
 
@@ -98,20 +98,20 @@
 "Linking" = "Vinculando";
 "Duplicating" = "Duplicando";
 "Destroying" = "Apagando";
-"File Operation Completed" = "OperaÁ„o de Arquivos Completada";
-"Backgrounder connection died!" = "ConexÁ„o de segundo plano interrompida"; /* R// Jarl */
-"Some items have the same name;\ndo you want to substitute them?" = "Alguns Ìtems tÍm o mesmo\nnome; Deseja substituÌ-los?";
+"File Operation Completed" = "Opera√ß√£o de Arquivos Completada";
+"Backgrounder connection died!" = "Conex√ß√£o de segundo plano interrompida"; /* R// Jarl */
+"Some items have the same name;\ndo you want to substitute them?" = "Alguns √≠tems t√™m o mesmo\nnome; Deseja substitu√≠-los?";
 "Error" = "Erro";
-"File Operation Error!" = "Erro na OperaÁ„o de Arquivos!";
+"File Operation Error!" = "Erro na Opera√ß√£o de Arquivos!";
 
 
 /* ColumnIcon.m */
 
-"You have not write permission\nfor " = "N„o h· permissıes de escrita\npara";
+"You have not write permission\nfor " = "N√£o h√° permiss√µes de escrita\npara";
 "The name " = "O nome ";
-" is already in use!" = " j· est· sendo usado!";
-"Cannot rename " = "N„o È possÌvel renomear ";
-"Invalid char in name" = "Caractere inv·lido no nome";
+" is already in use!" = " j√° est√° sendo usado!";
+"Cannot rename " = "N√£o √© poss√≠vel renomear ";
+"Invalid char in name" = "Caractere inv√°lido no nome";
 
 
 /* ----------------------- Inspectors strings --------------------------- *\
@@ -119,7 +119,7 @@
 /* InspectorsWin.m */
 
 "Attributes" = "Atributos";
-"Contents" = "Conte˙do";
+"Contents" = "Conte√∫do";
 "Tools" = "Ferramentas";
 "Access Control" = "Controle de Acesso";
 
@@ -131,7 +131,7 @@
 "Path:" = "Caminho:";
 "Link To:" = "Vincular a:";
 "Size:" = "Tamanho:";
-"Owner:" = "Propriet·rio:";
+"Owner:" = "Propriet√°rio:";
 "Group:" = "Grupo:";
 "Changed" = "Mudado";
 "Revert" = "Reverter";
@@ -140,22 +140,22 @@
 
 /* ContentsPanel.m */
 
-"Contents" = "Conte˙do";
-"Contents Inspector" = "Inspetor de Conte˙do";
-"No Contents Inspector" = "N„o h· Inspetor de Conte˙do";
-"No Contents Inspector\nFor Multiple Selection" = "N„o h· Inspetor de\nConte˙do para\nm˙ltiplas seleÁıes";
+"Contents" = "Conte√∫do";
+"Contents Inspector" = "Inspetor de Conte√∫do";
+"No Contents Inspector" = "N√£o h√° Inspetor de Conte√∫do";
+"No Contents Inspector\nFor Multiple Selection" = "N√£o h√° Inspetor de\nConte√∫do para\nm√∫ltiplas sele√ß√µes";
 
 
 /* FolderViewer.m */
 
 "Sort method applies to the\ncontents of the selected folder,\nNOT to its parent folder"
-  = "O mÈtodo de ordenaÁ„o se\naplica ao conte˙do da\npasta selecionada, e n„o\n‡ sua pasta m„e";
+  = "O m√©todo de ordena√ß√£o se\naplica ao conte√∫do da\npasta selecionada, e n√£o\n√† sua pasta m√£e";
 "Sort by" = "Ordenar por";
 "Name" = "Nome";
 "Type" = "Tipo";
 "Date" = "Data";
 "Size" = "Tamanho";
-"Owner" = "Propriet·rio";
+"Owner" = "Propriet√°rio";
 "Folder Inspector" = "Inspetor de Pastas";	
 
 
@@ -167,42 +167,42 @@
 /* AppViewer.m */
 
 "Open these kinds of documents:" = "Abrir estes tipos de documentos:";
-"Invalid Contents" = "Conte˙do Inv·lido";
-"App Inspector" = "Inspetor de AplicaÁıes";
+"Invalid Contents" = "Conte√∫do Inv√°lido";
+"App Inspector" = "Inspetor de Aplica√ß√µes";
 
 
 /* PermissionsPanel.m */
 
-"UNIX Permissions" = "Permissıes UNIX";
+"UNIX Permissions" = "Permiss√µes UNIX";
 "Access Control" = "Controle de Acesso";
-"Also apply to files inside selection" = "Aplicar tambÈm aos arquivos da seleÁ„o";
+"Also apply to files inside selection" = "Aplicar tamb√©m aos arquivos da sele√ß√£o";
 
 
 /* ToolsPanel.m */
 
 "Tools" = "Ferramentas";
 "Tools Inspector" = "Inspetor de Ferramentas";
-"No Tools Inspector" = "N„o h· Inspetor de Ferramentas";
-"Set Default" = "Configurar como Padr„o";
+"No Tools Inspector" = "N√£o h√° Inspetor de Ferramentas";
+"Set Default" = "Configurar como Padr√£o";
 
 
 /* AppsView.m */
 	
 "Double-click to open selected document(s)" =
 "Duplo-clique para abrir documentos selecionados";
-"Default:" = "Padr„o:";
+"Default:" = "Padr√£o:";
 "Path:" = "Caminho:";		
 "Click 'Set Default' to set default application\nfor all documents with this extension" 
-  ="Clique em 'Configurar como Padr„o' para configurar a\naplicaÁ„o a ser usada para todos\nos documentos com esta extens„o";
+  ="Clique em 'Configurar como Padr√£o' para configurar a\naplica√ß√£o a ser usada para todos\nos documentos com esta extens√£o";
 
 
 /* PermsBox.m */
 
-"Permissions" = "Permissıes";
+"Permissions" = "Permiss√µes";
 "Read" = "Leitura";
 "Write" = "Escrita";
-"Execute" = "ExecuÁ„o";
-"Owner" = "Propriet·rio";
+"Execute" = "Execu√ß√£o";
+"Owner" = "Propriet√°rio";
 "Group" = "Grupo";
 "Other" = "Outros";
 
@@ -212,7 +212,7 @@
 /* Processes.m */
 
 "Processes" = "Processos";
-"No Background Process" = "N„o h· Processos en Segundo Plano";
+"No Background Process" = "N√£o h√° Processos en Segundo Plano";
 "Kill" = "Matar";
 "Path: " = "Caminho: ";
 "Status: " = "Estado: ";
@@ -220,7 +220,7 @@
 
 /* ProcsView.m */
 
-"Applications" = "AplicaÁıes";
+"Applications" = "Aplica√ß√µes";
 "Background" = "Segundo Plano"; /* R// revisar */
 
 
@@ -229,10 +229,10 @@
 /* Finder.m */
 
 "Finder" = "Buscador";
-"Find items with names that match" = "Buscar Ìtens com nomes que combinem";
-"Find items with contents that match" = "Buscar Ìtems com conte˙do que combine";
-"No selection!" = "N„o h· nenhuma seleÁ„o!";
-"No arguments!" = "N„o h· argumentos!";
+"Find items with names that match" = "Buscar √≠tens com nomes que combinem";
+"Find items with contents that match" = "Buscar √≠tems com conte√∫do que combine";
+"No selection!" = "N√£o h√° nenhuma sele√ß√£o!";
+"No arguments!" = "N√£o h√° argumentos!";
 
 
 /* ----------------------- Fiend strings --------------------------- *\
@@ -240,20 +240,20 @@
 /* Fiend.m */
 
 "New Layer" = "Nova Camada";
-"A layer with this name is already present!" = "J· h· uma camada com este nome!";
-"You can't remove the last layer!" = "N„o È possÌvel remover a ˙ltima camada!";
+"A layer with this name is already present!" = "J√° h√° uma camada com este nome!";
+"You can't remove the last layer!" = "N√£o √© poss√≠vel remover a √∫ltima camada!";
 "Remove layer" = "Remover camada";
-"Are you sure that you want to remove this layer?" = "VocÍ tem certeza de que deseja remover esta camada?";
+"Are you sure that you want to remove this layer?" = "Voc√™ tem certeza de que deseja remover esta camada?";
 "Rename Layer" = "Renomear camada";
-"You can't dock multiple paths!" = "N„o È possÌvel agrupar m˙ltiplos caminhos!";
-"This object is already present in this layer!" = "Este objeto j· est· nesta camada!";
+"You can't dock multiple paths!" = "N√£o √© poss√≠vel agrupar m√∫ltiplos caminhos!";
+"This object is already present in this layer!" = "Este objeto j√° est√° nesta camada!";
 	
 			
 /* ----------------------- Preference strings --------------------------- *\
 
 /* PreferencesWin.m */
 
-"GWorkspace Preferences" = "PreferÍncias do GWorkspace";
+"GWorkspace Preferences" = "Prefer√™ncias do GWorkspace";
 
 
 /* BackWinPreferences.m */       
@@ -264,7 +264,7 @@
 "green" = "verde";
 "blue" = "azul";
 "Set Color" = "Configurar cor";
-"Push the \"Set Image\" button\nto set your DeskTop image.\nThe image must have the same\nsize of your screen." = "Pressione o bot„o \"Configurar Imagem\" para configurar sua\nimagem de fundo. A imagem deve ter o\nmesmo tamanho que a tela.";
+"Push the \"Set Image\" button\nto set your DeskTop image.\nThe image must have the same\nsize of your screen." = "Pressione o bot√£o \"Configurar Imagem\" para configurar sua\nimagem de fundo. A imagem deve ter o\nmesmo tamanho que a tela.";
 
 "Set Image" = "Configurar Imagem";
 "Unset Image" = "Remover Imagem";
@@ -278,7 +278,7 @@
 /* BrowserViewsPreferences.m */  
 
 "Column Width" = "Largura das Colunas";
-"Use Default Settings" = "Usar Ajustes-Padr„o";	
+"Use Default Settings" = "Usar Ajustes-Padr√£o";	
 "Browser" = "Navegador";
 	
 	
@@ -287,9 +287,9 @@
 /* timeout */
 "File System Watching" = "Vigilancia do Sistema de Arquivos";
 "timeout" = "timeout";
-"frequency" = "frequÍncia";
+"frequency" = "frequ√™ncia";
 "Values will apply to the \nnew watchers from now, \nto the existing ones, after the first timeout" = 
-"Os valores se aplicar„o aos\n novos vigilantes a partir de agora,\ne aos j· existentes, a partir do primeiro timeout";
+"Os valores se aplicar√£o aos\n novos vigilantes a partir de agora,\ne aos j√° existentes, a partir do primeiro timeout";
 	
 	
 /* ShelfPreferences.m */
@@ -299,15 +299,15 @@
 	
 /* DefaultEditor.m */            
 
-"Default Editor" = "Editor Padr„o";
-"No Default Editor" = "N„o h· Editor Padr„o";
+"Default Editor" = "Editor Padr√£o";
+"No Default Editor" = "N√£o h√° Editor Padr√£o";
 "Choose..." = "Escolher...";
 
 
 /* IconViewsPreferences.m */
 
-"Title Width" = "Largura do TÌtulo";
-"Icon View" = "VisualizaÁ„o por Icones";
+"Title Width" = "Largura do T√≠tulo";
+"Icon View" = "Visualiza√ß√£o por Icones";
 
 
 

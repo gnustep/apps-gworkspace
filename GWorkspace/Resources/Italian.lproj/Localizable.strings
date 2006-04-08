@@ -1,4 +1,4 @@
-/* ----------------------- menu strings --------------------------- *\
+Ôªø/* ----------------------- menu strings --------------------------- *\
 /* main.m */
 
 "Info" = "Info";
@@ -106,7 +106,7 @@
 
 "You have not write permission\nfor " = "Non hai permesso di scrittura\nper ";
 "The name " = "Il nome ";
-" is already in use!" = " e gi‡ in uso!";
+" is already in use!" = " e gi√† in uso!";
 "Cannot rename " = "Non posso rinominare ";
 "Invalid char in name" = "Carattere non valido nel nome";
 
@@ -236,13 +236,13 @@
 /* Fiend.m */
 
 "New Layer" = "Nuovo Layer";
-"A layer with this name is already present!" = "E' gi‡ presente un layer con lo stesso nome!";
+"A layer with this name is already present!" = "E' gi√† presente un layer con lo stesso nome!";
 "You can't remove the last layer!" = "Non si puo eliminare l'ultimo layer!";
 "Remove layer" = "Remove layer";
 "Are you sure that you want to remove this layer?" = "Sei sicuro di voler rimuovere questo layer?";
 "Rename Layer" = "Rename Layer";
 "You can't dock multiple paths!" = "Non puoi aggiungere path multiple!";
-"This object is already present in this layer!" = "Questo oggetto e gi‡ presente in questo layer!";
+"This object is already present in this layer!" = "Questo oggetto e gi√† presente in questo layer!";
 
 
 /* ----------------------- Preferences strings --------------------------- *\
@@ -317,5 +317,5 @@
 "Empty the Recycler?" = "Vuoto il reciclatore?";
 "Put Away" = "Rimetti a posto";
 
-/* Ï (i') ‡ (a') */
+/* √¨ (i') √† (a') */
 

@@ -1,4 +1,4 @@
-/* ----------------------- menu strings --------------------------- *\
+﻿/* ----------------------- menu strings --------------------------- *\
 /* main.m */
 
 "Info" = "Info";
@@ -7,18 +7,18 @@
 	"Help..." = "Hjelp...";
 
 "File" = "Fil";
-	"Open" = "Åpne";
-	"Open as Folder" = "Åpne som mappe";
+	"Open" = "Ãpne";
+	"Open as Folder" = "Ãpne som mappe";
 	"Edit File" = "Rediger fil";
 	"New Folder" = "Ny mappe";
 	"New File" = "Ny fil";
 	"Duplicate" = "Fordoble";	
-	"Destroy" = "Ødelegg"
-	"Empty Recycler" = "Tøm papirkurven";
+	"Destroy" = "Ãdelegg"
+	"Empty Recycler" = "TÃ¸m papirkurven";
 /*	"Put Away" = "Gjenopprett";
 	"Print..." = "Skriv ut...";
-	"Open With..." = "Åpne med...";
-	"Run..." = "Kjør...";
+	"Open With..." = "Ãpne med...";
+	"Run..." = "KjÃ¸r...";
 */
 
 "Edit" = "Rediger";
@@ -31,15 +31,15 @@
 "View" = "Vis";
 	"Browser" = "Browser";
 	"Icon" = "Ikoner";
-/*	"Small Icon" = "Små ikoner";	*/
+/*	"Small Icon" = "SmÃ¥ ikoner";	*/
 		
-"Tools" = "Verktøy";
+"Tools" = "VerktÃ¸y";
 	"Viewer" = "Visning";
-	"Inspectors" = "Inspektører...";
-		"Show Inspectors" = "Vis inspektørene";
+	"Inspectors" = "InspektÃ¸rer...";
+		"Show Inspectors" = "Vis inspektÃ¸rene";
 		"Attributes" = "Egenskaper";
 		"Contents" = "Innhold";
-		"Tools" = "Verktøy";	
+		"Tools" = "VerktÃ¸y";	
 		"Permissions" = "Rettigheter";	
 /*	"History" = "Historie";
 		"Show History" = "Vis historie";
@@ -117,8 +117,8 @@
 "Copying" = "Kopierer";
 "Linking" = "Lenker";
 "Duplicating" = "Fordobler";
-"Destroying" = "Ødelegger";
-"File Operation Completed" = "Filoperasjon komplett utført";
+"Destroying" = "Ãdelegger";
+"File Operation Completed" = "Filoperasjon komplett utfÃ¸rt";
 "Backgrounder connection died!" = "Bakgrunn-forbindelse drept.";
 "Some items have the same name;\ndo you want to sobstitute them?" = "Noe gjenstand har det samme navnet;\nskal de erstattes?";
 "Error" = "Feil";
@@ -140,17 +140,17 @@
 
 "Attributes" = "Egenskaper";
 "Contents" = "Innholder";
-"Tools" = "Verktøy";
+"Tools" = "VerktÃ¸y";
 "Access Control" = "Tilgangkontroll";
 
 
 /* AttributesPanel.m */
 
 "Attributes" = "Egenskaper";
-"Attributes Inspector" = "Egenskap-inspektør";
+"Attributes Inspector" = "Egenskap-inspektÃ¸r";
 "Path:" = "Adresse:";
 "Link To:" = "Lenke til:";
-"Size:" = "Størrelse:";
+"Size:" = "StÃ¸rrelse:";
 "Owner:" = "Eier:";
 "Group:" = "Gruppe:";
 "Changed" = "Endret";
@@ -161,11 +161,11 @@
 /* ContentsPanel.m */
 
 "Contents" = "Innhold";
-"Contents Inspector" = "Innhold-inspektør";
-"No Contents Inspector" = "Ingen innhold-inspektør";
-"No Contents Inspector\nFor Multiple Selection" = "Ingen innhold-inspektør\ntil mangfoldig utvalg.";
+"Contents Inspector" = "Innhold-inspektÃ¸r";
+"No Contents Inspector" = "Ingen innhold-inspektÃ¸r";
+"No Contents Inspector\nFor Multiple Selection" = "Ingen innhold-inspektÃ¸r\ntil mangfoldig utvalg.";
 "error" = "Feil";
-"No Contents Inspectors found!" = "Ingen innhold-inspektør funnet.";
+"No Contents Inspectors found!" = "Ingen innhold-inspektÃ¸r funnet.";
 
 
 /* FolderViewer.m */
@@ -176,46 +176,46 @@
 "Name" = "Navn";
 "Kind" = "Type";
 "Date" = "Dato";
-"Size" = "Størrelse";
+"Size" = "StÃ¸rrelse";
 "Owner" = "Eier";
-"Folder Inspector" = "Mappe-inspektør";	
+"Folder Inspector" = "Mappe-inspektÃ¸r";	
 
 
 /* ImageViewer.m */
 
-"Image Inspector" = "Bilde-inspektør";
+"Image Inspector" = "Bilde-inspektÃ¸r";
 
 
 /* AppViewer.m */
 
-"Open these kinds of documents:" = "Åpne disse filtypene:";
+"Open these kinds of documents:" = "Ãpne disse filtypene:";
 "Invalid Contents" = "Ugyldig innhold";
-"App Inspector" = "Applikasjon-inspektør";
+"App Inspector" = "Applikasjon-inspektÃ¸r";
 
 
 /* PermissionsPanel.m */
 
 "UNIX Permissions" = "UNIX-filrettigheter";
 "Access Control" = "Tilgangkontroll";
-/* "Also apply to files inside selection" = "Anvende også til utvalgte filer" */
-"Also apply to files inside selection" = "Anvende også til utvalgte filer";
+/* "Also apply to files inside selection" = "Anvende ogsÃ¥ til utvalgte filer" */
+"Also apply to files inside selection" = "Anvende ogsÃ¥ til utvalgte filer";
 
 
 /* ToolsPanel.m */
 
-"Tools" = "Verktøy";
-"Tools Inspector" = "Verktøy-inspektør";
-"No Tools Inspector" = "Ingen verktøy-inspektør";
+"Tools" = "VerktÃ¸y";
+"Tools Inspector" = "VerktÃ¸y-inspektÃ¸r";
+"No Tools Inspector" = "Ingen verktÃ¸y-inspektÃ¸r";
 "Set Default" = "Sett standard";
 
 
 /* AppsView.m */
 	
-"Double-click to open selected document(s)" = "Klikk dobbelt til å åpne dokumenter";	
+"Double-click to open selected document(s)" = "Klikk dobbelt til Ã¥ Ã¥pne dokumenter";	
 "Default:" = "Standard:";
 "Path:" = "Adresse:";		
 "Click 'Set Default' to set default application\nfor all documents with this extension" 
-  = "Klikk på ‹Sett standard› til å sette standardapplikasjonen\ntil alle dokumenter med denne ending";
+  = "Klikk pÃ¥ â¹Sett standardâº til Ã¥ sette standardapplikasjonen\ntil alle dokumenter med denne ending";
 
 
 /* PermsBox.m */
@@ -223,7 +223,7 @@
 "Permissions" = "Rettigheter";
 "Read" = "Lese";
 "Write" = "Skrive";
-"Execute" = "Kjøre";
+"Execute" = "KjÃ¸re";
 "Owner" = "Eier";
 "Group" = "Gruppe";
 "Other" = "Andre";
@@ -251,8 +251,8 @@
 /* Finder.m */
 
 "Finder" = "Finn filer";
-"Find items with names that match" = "Søk etter samsvarendene navner";
-"Find items with contents that match" = "Søk etter samsvarende innhold";
+"Find items with names that match" = "SÃ¸k etter samsvarendene navner";
+"Find items with contents that match" = "SÃ¸k etter samsvarende innhold";
 "No selection!" = "Ingen utvalg.";
 "No arguments!" = "Inge argumenter.";
 
@@ -282,12 +282,12 @@
 
 "Desktop Shelf" = "Desktop Shelf";	
 "Desktop Color" = "Skrivebordfarge";
-"red" = "rød";
-"green" = "grønn";
-"blue" = "blå";
+"red" = "rÃ¸d";
+"green" = "grÃ¸nn";
+"blue" = "blÃ¥";
 "Set Color" = "Sett fargen";
 "Push the \"Set Image\" button\nto set your DeskTop image.\nThe image must have the same\nsize of your screen." = 
-  "Klikk på knappen «Sett bilde»\ntil å sette skrivebordets bakgrunnbildet.\nBildet må ha den samme\nstørrelsen like skjermen.";
+  "Klikk pÃ¥ knappen Â«Sett bildeÂ»\ntil Ã¥ sette skrivebordets bakgrunnbildet.\nBildet mÃ¥ ha den samme\nstÃ¸rrelsen like skjermen.";
 "Set Image" = "Sett bilde"
 "Unset Image" = "Usett bilde";
 /*"Activate desktop" = "Aktiver skrivebord";*/
@@ -308,11 +308,11 @@
 	
 /* FileWatchingPreferences.m */  
 	
-"File System Watching" = "Fil-overvåkning";
+"File System Watching" = "Fil-overvÃ¥kning";
 "timeout" = "Tidbegrensning";
 "frequency" = "Frekvens";
 "Values will apply to the \nnew watchers from now, \nto the existing ones, after the first timeout" = 
-   "Verder brukes straks til\n nye overvåkninger, \ntil eksisterende etter den først tidbegrensning";
+   "Verder brukes straks til\n nye overvÃ¥kninger, \ntil eksisterende etter den fÃ¸rst tidbegrensning";
 	
 	
 /* ShelfPreferences.m */
@@ -334,9 +334,9 @@
 "Icon View" = "Ikonvisning";
 
 /* Sorting order */
-"Sorting Order" = "Sorterrekkefølge";
+"Sorting Order" = "SorterrekkefÃ¸lge";
 "Sort by" = "Sorter etter";
-"This sort method will apply to all the folders\nthat have no sorting order specified" = "Denne sortermetoden gjelder til\nalle mapper uten egen definert rekkefølge.";
+"This sort method will apply to all the folders\nthat have no sorting order specified" = "Denne sortermetoden gjelder til\nalle mapper uten egen definert rekkefÃ¸lge.";
 
 /* File Operations */
 /*
@@ -344,7 +344,7 @@
 "Status Window" = "Statusvindu";
 "Confirmation" = "Bekreftelse";
 "Show status window" = "Vis statusvindu";
-"Check this option to show a status window\nduring the file operations" = "Sett denne opsjonen til å vise et statusvindu\nmens filoperasjoner.";
+"Check this option to show a status window\nduring the file operations" = "Sett denne opsjonen til Ã¥ vise et statusvindu\nmens filoperasjoner.";
 */
 
 /* Icons */
@@ -354,7 +354,7 @@
 "use thumbnails" = "Bruk forhandsvisning";
 "Animate icons" = "Animer ikoner";
 "when changing a path" = "ved veksling av adressen";
-"when opening a file" = "ved åpning av en fil";
+"when opening a file" = "ved Ã¥pning av en fil";
 "sliding back after file operation" = "skli bak etter filoperasjonen";
 "Activate changes" = "Aktiver endringene";
 */
@@ -374,14 +374,14 @@
 */
 
 /* Recycler strings */
-"Recycle: " = "Søppel: ";
+"Recycle: " = "SÃ¸ppel: ";
 "Recycler: " = "Papirkurv: ";
 "Recycler" = "Papirkurv";
 "the Recycler" = "Papirkurven";
 "\nto the Recycler" = "\ni papirkurven";
 "Move from the Recycler " = "Flytt fra papirkurven ";
 "In" = "I";
-"Empty Recycler" = "Tøm papirkurven";
-"Empty the Recycler?" = "Tøm papirkurven?";
+"Empty Recycler" = "TÃ¸m papirkurven";
+"Empty the Recycler?" = "TÃ¸m papirkurven?";
 "Put Away" = "Gjenopprett";
 

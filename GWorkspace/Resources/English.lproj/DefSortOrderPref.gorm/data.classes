@@ -9,7 +9,10 @@
 	    win,
 	    prefbox,
 	    matrix,
-	    setButt
+	    setButt,
+	    sortinfo2,
+	    selectbox,
+	    sortinfo1
 	);
 	Super = NSObject;
     };

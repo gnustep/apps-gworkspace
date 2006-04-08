@@ -162,15 +162,28 @@ if (sz.height < 0) sz.height = 0
       [setDirButt setEnabled: NO];
                                                             
       /* Internationalization */
-      [setButt setTitle: NSLocalizedString(@"Activate changes", @"")];
-      [loadButt setTitle: NSLocalizedString(@"Load", @"")];
-      [hiddenlabel setStringValue: NSLocalizedString(@"Hidden files", @"")];
-      [shownlabel setStringValue: NSLocalizedString(@"Shown files", @"")];
-      [labelinfo setStringValue: NSLocalizedString(@"Select and move the files to hide or to show", @"")];
-      [hiddenDirslabel setStringValue: NSLocalizedString(@"Hidden directories", @"")];
-      [addDirButt setTitle: NSLocalizedString(@"add", @"")];
-      [removeDirButt setTitle: NSLocalizedString(@"remove", @"")];
-      [setDirButt setTitle: NSLocalizedString(@"Activate changes", @"")];
+      {
+        int tabindex;
+        NSTabViewItem *item;
+        
+        tabindex = [tabView indexOfTabViewItemWithIdentifier: @"Files"];
+        item = [tabView tabViewItemAtIndex: tabindex];
+        [item setLabel: NSLocalizedString(@"Files", @"")];
+
+        tabindex = [tabView indexOfTabViewItemWithIdentifier: @"Folders"];
+        item = [tabView tabViewItemAtIndex: tabindex];
+        [item setLabel: NSLocalizedString(@"Folders", @"")];
+
+        [setButt setTitle: NSLocalizedString(@"Activate changes", @"")];
+        [loadButt setTitle: NSLocalizedString(@"Load", @"")];
+        [hiddenlabel setStringValue: NSLocalizedString(@"Hidden files", @"")];
+        [shownlabel setStringValue: NSLocalizedString(@"Shown files", @"")];
+        [labelinfo setStringValue: NSLocalizedString(@"Select and move the files to hide or to show", @"")];
+        [hiddenDirslabel setStringValue: NSLocalizedString(@"Hidden directories", @"")];
+        [addDirButt setTitle: NSLocalizedString(@"add", @"")];
+        [removeDirButt setTitle: NSLocalizedString(@"remove", @"")];
+        [setDirButt setTitle: NSLocalizedString(@"Activate changes", @"")];
+      }
     }
   }
   
