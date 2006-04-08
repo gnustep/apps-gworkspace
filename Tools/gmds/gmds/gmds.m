@@ -32,10 +32,10 @@
   do { if (GW_DEBUG_LOG) \
     NSLog(format , ## args); } while (0)
 
-#define MAX_RETRY 100
+#define MAX_RETRY 1000
 #define MAX_RES 100
 
-static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv)
+static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv)
 {
   const unsigned char *path = sqlite3_value_text(argv[0]);
   int exists = 0;
@@ -472,7 +472,7 @@ static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv
     }    
     
     sqlite3_create_function(db, "pathExists", 1, 
-                                SQLITE_UTF8, 0, path_Exists, 0, 0);
+                                SQLITE_UTF8, 0, path_exists, 0, 0);
 
     performWriteQuery(db, @"PRAGMA cache_size = 20000");
     performWriteQuery(db, @"PRAGMA count_changes = 0");

@@ -123,7 +123,8 @@
   NSMutableArray *fswupdatePaths;
   NSMutableDictionary *fswupdateSkipBuff;
   NSTimer *fswupdateTimer;
-  
+  NSMutableDictionary *lastRemovedUserMdata;
+  NSTimer *userMdataTimer;
 }
 
 - (void)indexedDirectoriesChanged:(NSNotification *)notification;
@@ -183,6 +184,8 @@
 
 @interface GMDSExtractor (updater)
 
+- (void)setupUpdaters;
+
 - (BOOL)addPath:(NSString *)path;
 
 - (BOOL)updatePath:(NSString *)path;
@@ -191,6 +194,8 @@
                   oldPath:(NSString *)oldpath;
 
 - (BOOL)removePath:(NSString *)path;
+
+- (void)checkLastRemovedUserMdata:(id)sender;
 
 @end
 

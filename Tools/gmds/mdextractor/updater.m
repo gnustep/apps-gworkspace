@@ -43,9 +43,15 @@ do { \
 } while (0)
 
 #define SKIP_EXPIRE (1.0)
+#define USER_MDATA_EXPIRE (10.0)
 
 
 @implementation GMDSExtractor (updater)
+
+- (void)setupUpdaters
+{
+  [self setupFswatcherUpdater];
+}
 
 - (BOOL)addPath:(NSString *)path
 {
@@ -201,14 +207,15 @@ do { \
 
 // SELECT * FROM paths WHERE path > '/root/Desktop/AA/' AND path < '/root/Desktop/AA0';
 // SELECT * FROM paths WHERE path > '/root/Desktop/BB/' AND path < '/root/Desktop/BB0';
-// kMDItemFinderComment
 }
 
 - (BOOL)removePath:(NSString *)path
 {
   NSString *qpath = stringForQuery(path);
   NSString *query;
-
+  NSArray *userattrs;
+  unsigned i;
+    
   PERFORM_QUERY (db, @"BEGIN");
 
   PERFORM_QUERY (db, @"CREATE TABLE id_tmp (id INTEGER PRIMARY KEY)");
@@ -226,8 +233,36 @@ do { \
                                       qpath, path_separator(), qpath];
   PERFORM_QUERY (db, query);
 
-  PERFORM_QUERY (db, @"DELETE FROM postings WHERE path_id IN (SELECT id FROM id_tmp)");
+  query = @"SELECT paths.path, attributes.key, attributes.attribute " 
+          @"FROM paths, attributes "
+          @"WHERE paths.id IN (SELECT id FROM id_tmp) "
+          @"AND attributes.path_id = paths.id "                                    
+          @"AND isUserMdataKey(attributes.key)";                                     
+
+  userattrs = performQuery(db, query);
+    
+  for (i = 0; i < [userattrs count]; i++) {
+    NSDictionary *dict = [userattrs objectAtIndex: i];
+    NSData *data = [dict objectForKey: @"path"];
+    NSString *path = [NSString stringWithUTF8String: [data bytes]];
+    NSMutableDictionary *mdatadict = [lastRemovedUserMdata objectForKey: path];
+    NSMutableArray *attrs;
+    
+    if (mdatadict == nil) {
+      mdatadict = [NSMutableDictionary dictionary];
+      attrs = [NSMutableArray array];
+      [mdatadict setObject: attrs forKey: @"attributes"];
+      [mdatadict setObject: [NSDate date] forKey: @"stamp"];
+      [lastRemovedUserMdata setObject: mdatadict forKey: path];
+    } else {
+      attrs = [mdatadict objectForKey: @"attributes"];
+    }
+    
+    [attrs addObject: dict];
+  }
+
   PERFORM_QUERY (db, @"DELETE FROM attributes WHERE path_id IN (SELECT id FROM id_tmp)");
+  PERFORM_QUERY (db, @"DELETE FROM postings WHERE path_id IN (SELECT id FROM id_tmp)");
   PERFORM_QUERY (db, @"DELETE FROM paths WHERE id IN (SELECT id FROM id_tmp)");
 
   PERFORM_QUERY (db, @"DROP TABLE id_tmp");
@@ -235,6 +270,30 @@ do { \
   PERFORM_QUERY (db, @"COMMIT");
 
   return YES;
+}
+
+- (void)checkLastRemovedUserMdata:(id)sender
+{
+  CREATE_AUTORELEASE_POOL(arp);  
+  NSArray *paths = [lastRemovedUserMdata allKeys];
+  NSDate *now = [NSDate date];
+  unsigned i;
+
+  RETAIN (paths);
+  
+  for (i = 0; i < [paths count]; i++) {
+    NSString *path = [paths objectAtIndex: i];
+    NSDictionary *dict = [lastRemovedUserMdata objectForKey: path];
+    NSDate *stamp = [dict objectForKey: @"stamp"];
+  
+    if ([now timeIntervalSinceDate: stamp] > USER_MDATA_EXPIRE) {
+      [lastRemovedUserMdata removeObjectForKey: path];
+      GWDebugLog(@"expired user-mdata %@", path);
+    }
+  }
+  
+  RELEASE (paths);
+  RELEASE (arp);
 }
 
 @end
@@ -253,6 +312,15 @@ do { \
 																   userInfo: nil 
                                     repeats: YES];
   RETAIN (fswupdateTimer);     
+     
+  lastRemovedUserMdata = [NSMutableDictionary new];
+     
+  userMdataTimer = [NSTimer scheduledTimerWithTimeInterval: USER_MDATA_EXPIRE
+						                         target: self 
+                                   selector: @selector(checkLastRemovedUserMdata:) 
+																   userInfo: nil 
+                                    repeats: YES];
+  RETAIN (userMdataTimer);     
      
   fswatcher = nil;
   [self connectFSWatcher];

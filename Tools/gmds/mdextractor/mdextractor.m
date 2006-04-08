@@ -36,7 +36,7 @@
   do { if (GW_DEBUG_LOG) \
     NSLog(format , ## args); } while (0)
 
-static void path_Exists(sqlite3_context *context, int argc, sqlite3_value **argv)
+static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv)
 {
   const unsigned char *path = sqlite3_value_text(argv[0]);
   int exists = 0;
@@ -71,6 +71,26 @@ static void path_moved(sqlite3_context *context, int argc, sqlite3_value **argv)
   newpath[i] = '\0';
   
   sqlite3_result_text(context, newpath, strlen(newpath), SQLITE_TRANSIENT);
+}
+
+static void user_mdata_key(sqlite3_context *context, int argc, sqlite3_value **argv)
+{
+#define KEYS 1
+  const unsigned char *key = sqlite3_value_text(argv[0]);
+  const static char *user_keys[KEYS] = { 
+    "kMDItemFinderComment"
+  };
+  int contains = 0;
+  unsigned i;
+
+  for (i = 0; i < KEYS; i++) {
+    if (strcmp((char *)key, user_keys[i]) == 0) {
+      contains = 1;
+      break;
+    }
+  }
+     
+  sqlite3_result_int(context, contains);
 }
 
 
@@ -111,6 +131,13 @@ static void path_moved(sqlite3_context *context, int argc, sqlite3_value **argv)
 
   RELEASE (fswupdatePaths);
   RELEASE (fswupdateSkipBuff);
+
+  if (userMdataTimer && [userMdataTimer isValid]) {
+    [userMdataTimer invalidate];
+  }
+  TEST_RELEASE (userMdataTimer);
+
+  RELEASE (lastRemovedUserMdata);
   
   [super dealloc];
 }
@@ -184,7 +211,7 @@ static void path_moved(sqlite3_context *context, int argc, sqlite3_value **argv)
     
     [self loadStemmer];
     [self setStemmingLanguage: nil];
-        
+                
     dnc = [NSDistributedNotificationCenter defaultCenter];
     
     [dnc addObserver: self
@@ -225,7 +252,7 @@ static void path_moved(sqlite3_context *context, int argc, sqlite3_value **argv)
     subpathsChanged = NO;
     statusTimer = nil;
     
-    [self setupFswatcherUpdater];
+    [self setupUpdaters];
     
     if ([self synchronizePathsStatus: YES] && indexingEnabled) {
       [self startExtracting];
@@ -823,36 +850,87 @@ do { \
             withAttributes:(NSDictionary *)attributes
 {
   NSTimeInterval interval = [[attributes fileModificationDate] timeIntervalSinceReferenceDate];
+  NSMutableArray *mdattributes = [NSMutableArray array];
   NSString *query;
   int path_id;
+  BOOL didexist;
+  unsigned i;
+
+#define KEY_AND_ATTRIBUTE(k, a) \
+do { \
+  NSMutableDictionary *dict = [NSMutableDictionary dictionary]; \
+  [dict setObject: [NSData dataWithBytes: [k UTF8String] length: [k length] + 1] \
+           forKey: @"key"]; \
+  [dict setObject: [NSData dataWithBytes: [a UTF8String] length: [a length] + 1] \
+           forKey: @"attribute"]; \
+\
+  [mdattributes addObject: dict]; \
+} while (0)
     
   PERFORM_QUERY (db, @"BEGIN");
 
-  query = [NSString stringWithFormat: 
-                    @"SELECT id FROM paths WHERE path = '%@'",
-                                              stringForQuery(path)];
+  query = [NSString stringWithFormat: @"SELECT id FROM paths "
+                                      @"WHERE path = '%@'",
+                                       stringForQuery(path)];
   path_id = getIntEntry(db, query);
-    
-  if (path_id == -1) { 
+  didexist = (path_id != -1);
+     
+  if (didexist == NO) {  
+    NSDictionary *userMdata;
+
     query = [NSString stringWithFormat: @"INSERT INTO paths (path, words_count, moddate) "
                                         @"VALUES('%@', 0, %f)", 
                                         stringForQuery(path), interval];
     PERFORM_QUERY (db, query);
   
     path_id = sqlite3_last_insert_rowid(db);
-  
+
+    userMdata = [lastRemovedUserMdata objectForKey: path];
+    
+    if (userMdata != nil) {
+      [mdattributes addObjectsFromArray: [userMdata objectForKey: @"attributes"]];
+    }
+        
   } else {
     query = [NSString stringWithFormat: @"UPDATE paths "
                                         @"SET words_count = 0, moddate = %f "
                                         @"WHERE id = %i",
                                         interval, path_id];
     PERFORM_QUERY (db, query);
+
+    query = [NSString stringWithFormat: @"SELECT key, attribute FROM attributes "
+                                        @"WHERE attributes.path_id = %i "
+                                        @"AND isUserMdataKey(key)",
+                                        path_id];
+    [mdattributes addObjectsFromArray: performQuery(db, query)];
+
+    query = [NSString stringWithFormat: @"DELETE FROM attributes "
+                                        @"WHERE path_id = %i", 
+                                        path_id];
+    PERFORM_QUERY (db, query);
+
+    query = [NSString stringWithFormat: @"DELETE FROM postings "
+                                        @"WHERE path_id = %i", 
+                                        path_id];
+    PERFORM_QUERY (db, query);
   }
 
-  query = [NSString stringWithFormat: @"DELETE FROM attributes "
-                                      @"WHERE path_id = %i", 
-                                      path_id];
-  PERFORM_QUERY (db, query);
+  KEY_AND_ATTRIBUTE (@"kMDItemFSName", stringForQuery([path lastPathComponent]));  
+  
+  for (i = 0; i < [mdattributes count]; i++) {
+    NSDictionary *dict = [mdattributes objectAtIndex: i];      
+    const char *key = [[dict objectForKey: @"key"] bytes];  
+    const char *attribute = [[dict objectForKey: @"attribute"] bytes];  
+
+    
+    NSLog(@"didexist = %i - SETTING %s FOR %s", didexist, attribute, key);
+
+
+    query = [NSString stringWithFormat: @"INSERT INTO attributes (path_id, key, attribute) "
+                                        @"VALUES(%i, '%s', '%s')", 
+                                        path_id, key, attribute];
+    PERFORM_QUERY (db, query);
+  }
   
   PERFORM_QUERY (db, @"COMMIT");
 
@@ -876,11 +954,6 @@ do { \
                                       @"WHERE path = '%@'", 
                                       stringForQuery(path)];
   path_id = getIntEntry(db, query);
-
-  query = [NSString stringWithFormat: @"DELETE FROM postings "
-                                      @"WHERE path_id = %i", 
-                                      path_id];
-  PERFORM_QUERY (db, query);
   
   wordsdict = [mddict objectForKey: @"words"];
 
@@ -1106,10 +1179,13 @@ do { \
     }    
     
     sqlite3_create_function(db, "pathExists", 1, 
-                                SQLITE_UTF8, 0, path_Exists, 0, 0);
+                                SQLITE_UTF8, 0, path_exists, 0, 0);
 
     sqlite3_create_function(db, "pathMoved", 3, 
                                 SQLITE_UTF8, 0, path_moved, 0, 0);
+
+    sqlite3_create_function(db, "isUserMdataKey", 1, 
+                                SQLITE_UTF8, 0, user_mdata_key, 0, 0);
 
     performWriteQuery(db, @"PRAGMA cache_size = 20000");
     performWriteQuery(db, @"PRAGMA count_changes = 0");
