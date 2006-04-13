@@ -25,8 +25,8 @@ CREATE TABLE attributes \
 key TEXT, \
 attribute TEXT); \
 \
-CREATE INDEX attributes_key_index ON attributes(key, attribute, path_id); \
 CREATE INDEX attributes_path_index ON attributes(path_id); \
+CREATE INDEX attributes_key_index ON attributes(key); \
+CREATE INDEX attributes_attr_index ON attributes(attribute); \
 ";
-
 

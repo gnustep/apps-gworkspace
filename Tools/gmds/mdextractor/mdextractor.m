@@ -718,12 +718,11 @@ static void user_mdata_key(sqlite3_context *context, int argc, sqlite3_value **a
   extracting = NO;  
 }
 
-#define PERFORM_QUERY(d, q) \
+#define PERFORM_QUERY(d, q, r) \
 do { \
   if (performWriteQuery(d, q) == NO) { \
     NSLog(@"error at: %@", q); \
-    RELEASE (path); \
-    return NO; \
+    return r; \
   } \
 } while (0)
 
@@ -738,14 +737,20 @@ do { \
     NSDirectoryEnumerator *enumerator;
     id extractor = nil;
     unsigned long fcount = 0;  
-  
+    int path_id;
+    
     [self updateStatusOfPath: indpath
                    startTime: [NSDate date]
                      endTime: nil
                   filesCount: fcount
                  indexedDone: NO];
-
-    if ([self insertOrUpdatePath: path withAttributes: attributes] == NO) {
+    
+    performWriteQuery(db, @"BEGIN");
+    
+    path_id = [self insertOrUpdatePath: path withAttributes: attributes];
+    
+    if (path_id == -1) {
+      performWriteQuery(db, @"COMMIT");
       return NO;
     }
 
@@ -753,12 +758,18 @@ do { \
 
     if (extractor) {
       if ([extractor extractMetadataAtPath: path
-                            withAttributes: attributes
+                                    withID: path_id
+                                attributes: attributes
                               usingStemmer: stemmer
                                  stopWords: stopWords] == NO) {
+        performWriteQuery(db, @"COMMIT");
         return NO;
       }
     }
+    
+    performWriteQuery(db, @"COMMIT");
+    
+    //  NSLog(path);
     
     fcount++;
 
@@ -782,7 +793,12 @@ do { \
 
         if (attributes) {
           if (skip == NO) {
-            if ([self insertOrUpdatePath: subpath withAttributes: attributes] == NO) {
+            performWriteQuery(db, @"BEGIN");
+            
+            path_id = [self insertOrUpdatePath: subpath withAttributes: attributes];
+          
+            if (path_id == -1) {
+              performWriteQuery(db, @"COMMIT");
               RELEASE (arp);
               return NO;
             }
@@ -791,13 +807,17 @@ do { \
 
             if (extractor) {
               if ([extractor extractMetadataAtPath: subpath
-                                    withAttributes: attributes
+                                            withID: path_id
+                                        attributes: attributes
                                       usingStemmer: stemmer
                                          stopWords: stopWords] == NO) {
+                performWriteQuery(db, @"COMMIT");
                 RELEASE (arp);
                 return NO;
               }
             }
+            
+            performWriteQuery(db, @"COMMIT");
             
             fcount++;
             
@@ -817,6 +837,8 @@ do { \
             [enumerator skipDescendents];
           }
         }
+
+    //  NSLog(subpath);
 
       } else {
         RELEASE (arp);
@@ -846,8 +868,8 @@ do { \
   return YES;
 }
 
-- (BOOL)insertOrUpdatePath:(NSString *)path
-            withAttributes:(NSDictionary *)attributes
+- (int)insertOrUpdatePath:(NSString *)path
+           withAttributes:(NSDictionary *)attributes
 {
   NSTimeInterval interval = [[attributes fileModificationDate] timeIntervalSinceReferenceDate];
   NSMutableArray *mdattributes = [NSMutableArray array];
@@ -867,8 +889,6 @@ do { \
   [mdattributes addObject: dict]; \
 } while (0)
     
-  PERFORM_QUERY (db, @"BEGIN");
-
   query = [NSString stringWithFormat: @"SELECT id FROM paths "
                                       @"WHERE path = '%@'",
                                        stringForQuery(path)];
@@ -881,7 +901,7 @@ do { \
     query = [NSString stringWithFormat: @"INSERT INTO paths (path, words_count, moddate) "
                                         @"VALUES('%@', 0, %f)", 
                                         stringForQuery(path), interval];
-    PERFORM_QUERY (db, query);
+    PERFORM_QUERY (db, query, -1);
   
     path_id = sqlite3_last_insert_rowid(db);
 
@@ -896,7 +916,7 @@ do { \
                                         @"SET words_count = 0, moddate = %f "
                                         @"WHERE id = %i",
                                         interval, path_id];
-    PERFORM_QUERY (db, query);
+    PERFORM_QUERY (db, query, -1);
 
     query = [NSString stringWithFormat: @"SELECT key, attribute FROM attributes "
                                         @"WHERE attributes.path_id = %i "
@@ -907,54 +927,76 @@ do { \
     query = [NSString stringWithFormat: @"DELETE FROM attributes "
                                         @"WHERE path_id = %i", 
                                         path_id];
-    PERFORM_QUERY (db, query);
+    PERFORM_QUERY (db, query, -1);
 
     query = [NSString stringWithFormat: @"DELETE FROM postings "
                                         @"WHERE path_id = %i", 
                                         path_id];
-    PERFORM_QUERY (db, query);
+    PERFORM_QUERY (db, query, -1);
   }
 
   KEY_AND_ATTRIBUTE (@"kMDItemFSName", stringForQuery([path lastPathComponent]));  
+  KEY_AND_ATTRIBUTE (@"NSFileType", [attributes fileType]);  
   
   for (i = 0; i < [mdattributes count]; i++) {
     NSDictionary *dict = [mdattributes objectAtIndex: i];      
     const char *key = [[dict objectForKey: @"key"] bytes];  
     const char *attribute = [[dict objectForKey: @"attribute"] bytes];  
 
-    
-    NSLog(@"didexist = %i - SETTING %s FOR %s", didexist, attribute, key);
-
+    GWDebugLog(@"didexist = %i - SETTING %s FOR %s", didexist, attribute, key);
 
     query = [NSString stringWithFormat: @"INSERT INTO attributes (path_id, key, attribute) "
                                         @"VALUES(%i, '%s', '%s')", 
                                         path_id, key, attribute];
-    PERFORM_QUERY (db, query);
+    PERFORM_QUERY (db, query, -1);
   }
   
-  PERFORM_QUERY (db, @"COMMIT");
-
-  return YES;
+  return path_id;
 }
+
+
+/*
+SELECT count(*) FROM attributes 
+WHERE key = 'NSFileType' 
+AND attribute = 'NSFileTypeDirectory'
+
+SELECT path FROM paths
+WHERE id IN 
+(SELECT path_id FROM attributes 
+WHERE key = 'NSFileType' 
+AND attribute = 'NSFileTypeDirectory');
+
+SELECT * FROM paths 
+WHERE path > '/root/Desktop/AA/' 
+AND path < '/root/Desktop/AA0';
+
+
+
+SELECT path FROM paths 
+WHERE path > '/root/Desktop/AA/' 
+AND path < '/root/Desktop/AA0'
+AND path NOT GLOB '/root/Desktop/AA/*/*';
+
+
+
+
+SELECT path FROM paths
+WHERE path > '/root/' 
+AND path < '/root0'
+AND id IN 
+(SELECT path_id FROM attributes 
+WHERE key = 'NSFileType' 
+AND attribute = 'NSFileTypeDirectory');
+*/
 
 - (BOOL)setMetadata:(NSDictionary *)mddict
             forPath:(NSString *)path
-     withAttributes:(NSDictionary *)attributes
+             withID:(int)path_id
 {
   NSDictionary *wordsdict;
   NSDictionary *attrsdict;
   NSString *query;
-  int path_id;
-  
-//  NSLog(path);
-  
-  PERFORM_QUERY (db, @"BEGIN");
-  
-  query = [NSString stringWithFormat: @"SELECT id FROM paths "
-                                      @"WHERE path = '%@'", 
-                                      stringForQuery(path)];
-  path_id = getIntEntry(db, query);
-  
+        
   wordsdict = [mddict objectForKey: @"words"];
 
   if (wordsdict) {
@@ -967,7 +1009,7 @@ do { \
                                         @"SET words_count = %i "
                                         @"WHERE id = %i", 
                                         wcount, path_id];
-    PERFORM_QUERY (db, query);
+    PERFORM_QUERY (db, query, 0);
 
     while ((word = [enumerator nextObject])) {
       unsigned count = [wordset countForObject: word];
@@ -982,7 +1024,7 @@ do { \
         query = [NSString stringWithFormat: @"INSERT INTO words (word) "
                                             @"VALUES('%@')", 
                                             stringForQuery(word)];
-        PERFORM_QUERY (db, query);
+        PERFORM_QUERY (db, query, 0);
 
         word_id = sqlite3_last_insert_rowid(db);
       }
@@ -990,7 +1032,7 @@ do { \
       query = [NSString stringWithFormat: @"INSERT INTO postings (word_id, path_id, score) "
                                           @"VALUES(%i, %i, %f)", 
                                           word_id, path_id, (1.0 * count / wcount)];
-      PERFORM_QUERY (db, query);
+      PERFORM_QUERY (db, query, 0);
     }
   }
 
@@ -1021,11 +1063,9 @@ do { \
       query = [NSString stringWithFormat: @"INSERT INTO attributes (path_id, key, attribute) "
                                           @"VALUES(%i, '%@', %@)", 
                                           path_id, key, attributeStr];
-      PERFORM_QUERY (db, query);
+      PERFORM_QUERY (db, query, 0);
     }
   }
-
-  PERFORM_QUERY (db, @"COMMIT");
 
   return YES;
 }

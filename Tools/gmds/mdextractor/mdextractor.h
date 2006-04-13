@@ -70,7 +70,8 @@
                       testData:(NSData *)testdata;
 
 - (BOOL)extractMetadataAtPath:(NSString *)path
-               withAttributes:(NSDictionary *)attributes
+                       withID:(int)path_id
+                   attributes:(NSDictionary *)attributes
                  usingStemmer:(id)stemmer
                     stopWords:(NSSet *)stopwords;
 
@@ -156,12 +157,12 @@
 
 - (BOOL)extractFromPath:(GMDSIndexablePath *)indpath;
 
-- (BOOL)insertOrUpdatePath:(NSString *)path
-            withAttributes:(NSDictionary *)attributes;
+- (int)insertOrUpdatePath:(NSString *)path
+           withAttributes:(NSDictionary *)attributes;
 
 - (BOOL)setMetadata:(NSDictionary *)mddict
             forPath:(NSString *)path
-     withAttributes:(NSDictionary *)attributes;
+             withID:(int)path_id;
 
 - (id)extractorForPath:(NSString *)path
         withAttributes:(NSDictionary *)attributes;

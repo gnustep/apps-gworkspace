@@ -71,6 +71,7 @@
     id defEntry;
 
     ASSIGN (baseNode, [FSNode nodeWithPath: [node path]]);
+    fsnodeRep = [FSNodeRep sharedInstance];
     lastSelection = nil;
     watchedNodes = [NSMutableArray new];
     manager = [GWViewersManager viewersManager];
@@ -104,7 +105,8 @@
       prefsname = [NSString stringWithFormat: @"viewer_at_%@", [node path]];
     }
 
-    if ([baseNode isWritable] && (rootviewer == NO) && (rootViewerKey == nil)) {
+    if ([baseNode isWritable] && (rootviewer == NO) && (rootViewerKey == nil) 
+                 && ([[fsnodeRep volumes] containsObject: [node path]] == NO)) {
 		  NSString *dictPath = [[baseNode path] stringByAppendingPathComponent: @".gwdir"];
 
       if ([[NSFileManager defaultManager] fileExistsAtPath: dictPath]) {
@@ -533,7 +535,7 @@
 		labelstr = NSLocalizedString(@"unknown volume size", @"");    
 	} else {
     unsigned long long freeSize = [freefs unsignedLongLongValue];
-    unsigned systemType = [[FSNodeRep sharedInstance] systemType];
+    unsigned systemType = [fsnodeRep systemType];
     
     switch (systemType) {
       case NSBSDOperatingSystem:
@@ -665,7 +667,10 @@
     
     [nodeView updateNodeInfo];
     
-    if ([baseNode isWritable] && (rootviewer == NO) && (rootViewerKey == nil)) {
+    [baseNode checkWritable];
+    
+    if ([baseNode isWritable] && (rootviewer == NO) && (rootViewerKey == nil)
+            && ([[fsnodeRep volumes] containsObject: [baseNode path]] == NO)) {
       if ([[NSFileManager defaultManager] fileExistsAtPath: dictPath]) {
         NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: dictPath];
 
@@ -702,7 +707,8 @@
     [updatedprefs setObject: [vwrwin stringWithSavedFrame] 
                      forKey: @"geometry"];
 
-    if ([baseNode isWritable] && (rootviewer == NO) && (rootViewerKey == nil)) {
+    if ([baseNode isWritable] && (rootviewer == NO) && (rootViewerKey == nil)
+            && ([[fsnodeRep volumes] containsObject: [baseNode path]] == NO)) {
       [updatedprefs writeToFile: dictPath atomically: YES];
     } else {
       [defaults setObject: updatedprefs forKey: prefsname];
@@ -766,7 +772,7 @@
 
 - (void)windowWillMiniaturize:(NSNotification *)aNotification
 {
-  NSImage *image = [[FSNodeRep sharedInstance] iconOfSize: 48 forNode: baseNode];
+  NSImage *image = [fsnodeRep iconOfSize: 48 forNode: baseNode];
 
   [vwrwin setMiniwindowImage: image];
   [vwrwin setMiniwindowTitle: [baseNode name]];

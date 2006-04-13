@@ -65,7 +65,8 @@
 }
 
 - (BOOL)extractMetadataAtPath:(NSString *)path
-               withAttributes:(NSDictionary *)attributes
+                       withID:(int)path_id
+                   attributes:(NSDictionary *)attributes
                  usingStemmer:(id)stemmer
                     stopWords:(NSSet *)stopwords
 {
@@ -81,9 +82,7 @@
     [mddict setObject: imageInfo forKey: @"attributes"];
     DiscardData();
 
-    success = [extractor setMetadata: mddict
-                             forPath: path
-                      withAttributes: attributes];
+    success = [extractor setMetadata: mddict forPath: path withID: path_id];
   }
   
   RELEASE (arp);

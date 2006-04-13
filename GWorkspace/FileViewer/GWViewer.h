@@ -29,6 +29,7 @@
 
 @class GWViewersManager;
 @class FSNode;
+@class FSNodeRep;
 @class GWViewerWindow;
 @class GWViewerSplit;
 @class GWViewerShelf;
@@ -60,6 +61,8 @@
   FSNode *baseNode;
   NSArray *lastSelection;  
   NSMutableArray *watchedNodes;
+
+  FSNodeRep *fsnodeRep;
 
   NSMutableArray *history;
   int historyPosition;

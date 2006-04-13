@@ -391,7 +391,7 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
 
       case TAG_DATETIME_ORIGINAL:
         // If we get a DATETIME_ORIGINAL, we use that one.
-        strncpy(buff, (char *)ValuePtr, strlen(ValuePtr) + 1);
+        strncpy(buff, (char *)ValuePtr, strlen((char *)ValuePtr) + 1);
         
         [imageInfo setObject: [NSString stringWithCString: buff]
                       forKey: @"kMDItemExposureTimeString"];
@@ -399,7 +399,7 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
       case TAG_DATETIME_DIGITIZED:
       case TAG_DATETIME:
         if ([imageInfo objectForKey: @"kMDItemExposureTimeString"] == nil) {
-          strncpy(buff, (char *)ValuePtr, strlen(ValuePtr) + 1);
+          strncpy(buff, (char *)ValuePtr, strlen((char *)ValuePtr) + 1);
           [imageInfo setObject: [NSString stringWithCString: buff]
                         forKey: @"kMDItemExposureTimeString"];      
         }

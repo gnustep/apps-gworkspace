@@ -197,6 +197,8 @@
 
 - (BOOL)isWritable;
 
+- (void)checkWritable;
+
 - (BOOL)isParentWritable;
 
 - (BOOL)isExecutable;

@@ -30,6 +30,7 @@
 @class GWViewersManager;
 @class GWViewerPathsPopUp;
 @class FSNode;
+@class FSNodeRep;
 @class GWViewerWindow;
 @class GWorkspace;
 @class NSView;
@@ -57,7 +58,9 @@
   FSNode *baseNode;
   NSArray *lastSelection;  
   NSMutableArray *watchedNodes;
-
+  
+  FSNodeRep *fsnodeRep;
+  
   BOOL invalidated;
 
   GWViewersManager *manager;

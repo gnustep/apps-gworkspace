@@ -894,7 +894,8 @@ pp.y = NSMaxY(br) + 1; \
   NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", [node path]];
   NSDictionary *nodeDict = nil;
 
-  if ([node isWritable]) {
+  if ([node isWritable]
+          && ([[fsnodeRep volumes] containsObject: [node path]] == NO)) {
     NSString *infoPath = [[node path] stringByAppendingPathComponent: @".gwdir"];
   
     if ([[NSFileManager defaultManager] fileExistsAtPath: infoPath]) {
@@ -959,7 +960,8 @@ pp.y = NSMaxY(br) + 1; \
     NSString *infoPath = [[node path] stringByAppendingPathComponent: @".gwdir"];
     NSMutableDictionary *updatedInfo = nil;
 
-    if ([node isWritable]) {
+    if ([node isWritable]
+          && ([[fsnodeRep volumes] containsObject: [node path]] == NO)) {
       if ([[NSFileManager defaultManager] fileExistsAtPath: infoPath]) {
         NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: infoPath];
 
@@ -996,7 +998,8 @@ pp.y = NSMaxY(br) + 1; \
       [updatedInfo setObject: extInfoType forKey: @"ext_info_type"];
     }
     
-    if ([node isWritable]) {
+    if ([node isWritable] 
+            && ([[fsnodeRep volumes] containsObject: [node path]] == NO)) {
       [updatedInfo writeToFile: infoPath atomically: YES];
     } else {
       [defaults setObject: updatedInfo forKey: prefsname];

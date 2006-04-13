@@ -798,6 +798,11 @@
   return (flags.writable ? YES : NO);
 }
 
+- (void)checkWritable
+{
+  flags.writable = [fm isWritableFileAtPath: path];
+}
+
 - (BOOL)isParentWritable
 {
   return [fm isWritableFileAtPath: [self parentPath]];

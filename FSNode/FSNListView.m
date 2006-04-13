@@ -632,7 +632,8 @@ static NSString *defaultColumns = @"{ \
   NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", [infoNode path]];
   NSDictionary *nodeDict = nil;
 
-  if ([infoNode isWritable]) {
+  if ([infoNode isWritable]
+          && ([[fsnodeRep volumes] containsObject: [node path]] == NO)) {
     NSString *infoPath = [[infoNode path] stringByAppendingPathComponent: @".gwdir"];
   
     if ([[NSFileManager defaultManager] fileExistsAtPath: infoPath]) {
@@ -680,7 +681,8 @@ static NSString *defaultColumns = @"{ \
     NSString *infoPath = [[infoNode path] stringByAppendingPathComponent: @".gwdir"];
     NSMutableDictionary *updatedInfo = nil;
 
-    if ([infoNode isWritable]) {
+    if ([infoNode isWritable]
+            && ([[fsnodeRep volumes] containsObject: [node path]] == NO)) {
       if ([[NSFileManager defaultManager] fileExistsAtPath: infoPath]) {
         NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: infoPath];
 
@@ -710,8 +712,14 @@ static NSString *defaultColumns = @"{ \
     if (extInfoType) {
       [updatedInfo setObject: extInfoType forKey: @"ext_info_type"];
     }
+
+    if ([node isWritable] 
+            && ([[fsnodeRep volumes] containsObject: [node path]] == NO)) {
+      [updatedInfo writeToFile: infoPath atomically: YES];
+    } else {
+      [defaults setObject: updatedInfo forKey: prefsname];
+    }
     
-    [updatedInfo writeToFile: infoPath atomically: YES];
     RELEASE (updatedInfo);
   }
 }

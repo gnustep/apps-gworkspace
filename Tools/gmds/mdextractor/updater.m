@@ -33,12 +33,11 @@
   do { if (GW_DEBUG_LOG) \
     NSLog(format , ## args); } while (0)
 
-#define PERFORM_QUERY(d, q) \
+#define PERFORM_QUERY(d, q, r) \
 do { \
   if (performWriteQuery(d, q) == NO) { \
     NSLog(@"error at: %@", q); \
-    RELEASE (path); \
-    return NO; \
+    return r; \
   } \
 } while (0)
 
@@ -59,8 +58,14 @@ do { \
       
   if (attributes) {
     id extractor = nil;
-
-    if ([self insertOrUpdatePath: path withAttributes: attributes] == NO) {
+    int path_id;
+    
+    performWriteQuery(db, @"BEGIN");
+    
+    path_id = [self insertOrUpdatePath: path withAttributes: attributes];
+    
+    if (path_id == -1) {
+      performWriteQuery(db, @"COMMIT");
       return NO;
     }
 
@@ -68,13 +73,17 @@ do { \
 
     if (extractor) {
       if ([extractor extractMetadataAtPath: path
-                            withAttributes: attributes
+                                    withID: path_id
+                                attributes: attributes
                               usingStemmer: stemmer
                                  stopWords: stopWords] == NO) {
+        performWriteQuery(db, @"COMMIT");
         return NO;
       }
     }
-
+    
+    performWriteQuery(db, @"COMMIT");
+    
     if ([attributes fileType] == NSFileTypeDirectory) {
       NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: path];
       
@@ -96,8 +105,13 @@ do { \
         
           if (attributes) {
             if (skip == NO) {
-              if ([self insertOrUpdatePath: subpath withAttributes: attributes] == NO) {
+              performWriteQuery(db, @"BEGIN");
+              
+              path_id = [self insertOrUpdatePath: subpath withAttributes: attributes];
+    
+              if (path_id == -1) {
                 RELEASE (arp);
+                performWriteQuery(db, @"COMMIT");
                 return NO;
               }
 
@@ -105,13 +119,17 @@ do { \
                   
               if (extractor) {
                 if ([extractor extractMetadataAtPath: subpath
-                                      withAttributes: attributes
+                                              withID: path_id
+                                          attributes: attributes
                                         usingStemmer: stemmer
                                            stopWords: stopWords] == NO) {
+                  performWriteQuery(db, @"COMMIT");
                   RELEASE (arp);
                   return NO;
                 }
               }
+              
+              performWriteQuery(db, @"COMMIT");
             }
           
             if (([attributes fileType] == NSFileTypeDirectory) && skip) {
@@ -139,8 +157,14 @@ do { \
       
   if (attributes) {
     id extractor;
-
-    if ([self insertOrUpdatePath: path withAttributes: attributes] == NO) {
+    int path_id;
+    
+    performWriteQuery(db, @"BEGIN");
+    
+    path_id = [self insertOrUpdatePath: path withAttributes: attributes];
+    
+    if (path_id == -1) {
+      performWriteQuery(db, @"COMMIT");
       return NO;
     }
 
@@ -148,12 +172,16 @@ do { \
 
     if (extractor) {
       if ([extractor extractMetadataAtPath: path
-                            withAttributes: attributes
+                                    withID: path_id
+                                attributes: attributes
                               usingStemmer: stemmer
                                  stopWords: stopWords] == NO) {
+        performWriteQuery(db, @"COMMIT");
         return NO;
       }
     }
+    
+    performWriteQuery(db, @"COMMIT");
   }
   
   return YES;
@@ -166,7 +194,7 @@ do { \
   NSString *qoldpath = stringForQuery(oldpath);
   NSString *query;
     
-  PERFORM_QUERY (db, @"BEGIN");
+  PERFORM_QUERY (db, @"BEGIN", 0);
 
   query = [NSString stringWithFormat: @"CREATE TABLE paths_tmp "
                                       @"(id INTEGER PRIMARY KEY, "
@@ -174,7 +202,7 @@ do { \
                                       @"base TEXT DEFAULT '%@', "
                                       @"oldbase TEXT DEFAULT '%@')", 
                                       qpath, qoldpath];
-  PERFORM_QUERY (db, query);
+  PERFORM_QUERY (db, query, 0);
 
   query = @"CREATE TRIGGER paths_tmp_trigger AFTER INSERT ON paths_tmp "
           @"BEGIN "
@@ -182,13 +210,13 @@ do { \
           @"SET path = pathMoved(new.oldbase, new.base, new.path) "
           @"WHERE id = new.id; "
           @"END";
-  PERFORM_QUERY (db, query);
+  PERFORM_QUERY (db, query, 0);
   
   query = [NSString stringWithFormat: @"INSERT INTO paths_tmp (id, path) "
                                       @"SELECT paths.id, paths.path "
                                       @"FROM paths "
                                       @"WHERE path = '%@'", qoldpath];
-  PERFORM_QUERY (db, query);
+  PERFORM_QUERY (db, query, 0);
 
   query = [NSString stringWithFormat: @"INSERT INTO paths_tmp (id, path) "
                                       @"SELECT paths.id, paths.path "
@@ -196,17 +224,14 @@ do { \
                                       @"WHERE path > '%@%@' "
                                       @"AND path < '%@0'", 
                                       qoldpath, path_separator(), qoldpath];
-  PERFORM_QUERY (db, query);
+  PERFORM_QUERY (db, query, 0);
 
-  PERFORM_QUERY (db, @"DROP TRIGGER paths_tmp_trigger");
-  PERFORM_QUERY (db, @"DROP TABLE paths_tmp");
+  PERFORM_QUERY (db, @"DROP TRIGGER paths_tmp_trigger", 0);
+  PERFORM_QUERY (db, @"DROP TABLE paths_tmp", 0);
 
-  PERFORM_QUERY (db, @"COMMIT");
+  PERFORM_QUERY (db, @"COMMIT", 0);
 
   return YES;
-
-// SELECT * FROM paths WHERE path > '/root/Desktop/AA/' AND path < '/root/Desktop/AA0';
-// SELECT * FROM paths WHERE path > '/root/Desktop/BB/' AND path < '/root/Desktop/BB0';
 }
 
 - (BOOL)removePath:(NSString *)path
@@ -216,22 +241,22 @@ do { \
   NSArray *userattrs;
   unsigned i;
     
-  PERFORM_QUERY (db, @"BEGIN");
+  PERFORM_QUERY (db, @"BEGIN", 0);
 
-  PERFORM_QUERY (db, @"CREATE TABLE id_tmp (id INTEGER PRIMARY KEY)");
+  PERFORM_QUERY (db, @"CREATE TABLE id_tmp (id INTEGER PRIMARY KEY)", 0);
   
   query = [NSString stringWithFormat: @"INSERT INTO id_tmp (id) "
                                       @"SELECT id FROM paths "
                                       @"WHERE path = '%@'", 
                                       qpath];
-  PERFORM_QUERY (db, query);
+  PERFORM_QUERY (db, query, 0);
   
   query = [NSString stringWithFormat: @"INSERT INTO id_tmp (id) "
                                       @"SELECT id FROM paths "
                                       @"WHERE path > '%@%@' "
                                       @"AND path < '%@0'",
                                       qpath, path_separator(), qpath];
-  PERFORM_QUERY (db, query);
+  PERFORM_QUERY (db, query, 0);
 
   query = @"SELECT paths.path, attributes.key, attributes.attribute " 
           @"FROM paths, attributes "
@@ -261,13 +286,13 @@ do { \
     [attrs addObject: dict];
   }
 
-  PERFORM_QUERY (db, @"DELETE FROM attributes WHERE path_id IN (SELECT id FROM id_tmp)");
-  PERFORM_QUERY (db, @"DELETE FROM postings WHERE path_id IN (SELECT id FROM id_tmp)");
-  PERFORM_QUERY (db, @"DELETE FROM paths WHERE id IN (SELECT id FROM id_tmp)");
+  PERFORM_QUERY (db, @"DELETE FROM attributes WHERE path_id IN (SELECT id FROM id_tmp)", 0);
+  PERFORM_QUERY (db, @"DELETE FROM postings WHERE path_id IN (SELECT id FROM id_tmp)", 0);
+  PERFORM_QUERY (db, @"DELETE FROM paths WHERE id IN (SELECT id FROM id_tmp)", 0);
 
-  PERFORM_QUERY (db, @"DROP TABLE id_tmp");
+  PERFORM_QUERY (db, @"DROP TABLE id_tmp", 0);
 
-  PERFORM_QUERY (db, @"COMMIT");
+  PERFORM_QUERY (db, @"COMMIT", 0);
 
   return YES;
 }
