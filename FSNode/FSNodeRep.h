@@ -142,7 +142,7 @@ typedef enum FSNSelectionMask {
 
 - (NSDictionary *)readNodeInfo;
 
-- (void)updateNodeInfo;
+- (NSMutableDictionary *)updateNodeInfo:(BOOL)ondisk;
 
 - (void)reloadContents;
 

@@ -1429,16 +1429,18 @@
   return nodeDict;
 }
 
-- (void)updateNodeInfo
+- (NSMutableDictionary *)updateNodeInfo:(BOOL)ondisk
 {
+  CREATE_AUTORELEASE_POOL(arp);
+  NSMutableDictionary *updatedInfo = nil;
+
   if ([baseNode isValid]) {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	      
     NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", [baseNode path]];
     NSString *infoPath = [[baseNode path] stringByAppendingPathComponent: @".gwdir"];
-    NSMutableDictionary *updatedInfo = nil;
-
-    if ([baseNode isWritable]
-          && ([[fsnodeRep volumes] containsObject: [baseNode path]] == NO)) {
+    BOOL writable = ([baseNode isWritable] && ([[fsnodeRep volumes] containsObject: [baseNode path]] == NO));
+    
+    if (writable) {
       if ([[NSFileManager defaultManager] fileExistsAtPath: infoPath]) {
         NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: infoPath];
 
@@ -1465,16 +1467,19 @@
     if (infoType == FSNInfoExtendedType) {
       [updatedInfo setObject: extInfoType forKey: @"ext_info_type"];
     }
-    
-    if ([baseNode isWritable]
-            && ([[fsnodeRep volumes] containsObject: [baseNode path]] == NO)) {
-      [updatedInfo writeToFile: infoPath atomically: YES];
-    } else {
-      [defaults setObject: updatedInfo forKey: prefsname];
-    }
 
-    RELEASE (updatedInfo);
+    if (ondisk) {    
+      if (writable) {
+        [updatedInfo writeToFile: infoPath atomically: YES];
+      } else {
+        [defaults setObject: updatedInfo forKey: prefsname];
+      }
+    }
   }
+      
+  RELEASE (arp);
+  
+  return (TEST_AUTORELEASE (updatedInfo));
 }
 
 - (void)reloadContents

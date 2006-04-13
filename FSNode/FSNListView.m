@@ -671,18 +671,19 @@ static NSString *defaultColumns = @"{ \
   return nodeDict;
 }
 
-- (void)updateNodeInfo
+- (NSMutableDictionary *)updateNodeInfo:(BOOL)ondisk
 {
+  CREATE_AUTORELEASE_POOL(arp);
   FSNode *infoNode = [self infoNode];
+  NSMutableDictionary *updatedInfo = nil;
 
   if ([infoNode isValid]) {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	      
     NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", [infoNode path]];
     NSString *infoPath = [[infoNode path] stringByAppendingPathComponent: @".gwdir"];
-    NSMutableDictionary *updatedInfo = nil;
-
-    if ([infoNode isWritable]
-            && ([[fsnodeRep volumes] containsObject: [node path]] == NO)) {
+    BOOL writable = ([infoNode isWritable] && ([[fsnodeRep volumes] containsObject: [node path]] == NO));
+    
+    if (writable) {
       if ([[NSFileManager defaultManager] fileExistsAtPath: infoPath]) {
         NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: infoPath];
 
@@ -712,16 +713,19 @@ static NSString *defaultColumns = @"{ \
     if (extInfoType) {
       [updatedInfo setObject: extInfoType forKey: @"ext_info_type"];
     }
-
-    if ([node isWritable] 
-            && ([[fsnodeRep volumes] containsObject: [node path]] == NO)) {
-      [updatedInfo writeToFile: infoPath atomically: YES];
-    } else {
-      [defaults setObject: updatedInfo forKey: prefsname];
-    }
     
-    RELEASE (updatedInfo);
+    if (ondisk) {
+      if (writable) {
+        [updatedInfo writeToFile: infoPath atomically: YES];
+      } else {
+        [defaults setObject: updatedInfo forKey: prefsname];
+      }
+    }
   }
+  
+  RELEASE (arp);
+  
+  return (TEST_AUTORELEASE (updatedInfo));
 }
 
 - (void)reloadContents
@@ -2613,9 +2617,9 @@ static NSString *defaultColumns = @"{ \
   return [dsource readNodeInfo];
 }
 
-- (void)updateNodeInfo
+- (NSMutableDictionary *)updateNodeInfo:(BOOL)ondisk
 {
-  [dsource updateNodeInfo];
+  return [dsource updateNodeInfo: ondisk];
 }
 
 - (void)reloadContents

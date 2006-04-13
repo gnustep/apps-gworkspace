@@ -99,7 +99,7 @@
 
 - (void)showContentsOfNode:(FSNode *)anode;
 - (NSDictionary *)readNodeInfo;
-- (void)updateNodeInfo;
+- (NSMutableDictionary *)updateNodeInfo:(BOOL)ondisk;
 - (void)reloadContents;
 - (void)reloadFromNode:(FSNode *)anode;
 - (FSNode *)baseNode;

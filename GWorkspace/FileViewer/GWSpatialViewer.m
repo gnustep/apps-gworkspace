@@ -650,45 +650,11 @@
 - (void)updateDefaults
 {
   if ([baseNode isValid]) {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
-    NSMutableDictionary *updatedprefs = nil;
-    NSString *prefsname;
-    NSString *dictPath;
+    NSMutableDictionary *updatedprefs = [nodeView updateNodeInfo: NO];
     id defEntry;
     
-    if (rootViewerKey != nil) {
-      prefsname = [NSString stringWithFormat: @"viewer_at_%@_%i", 
-                          [baseNode path], [rootViewerKey unsignedLongValue]];
-    } else {
-      prefsname = [NSString stringWithFormat: @"viewer_at_%@", [baseNode path]];
-    }    
-
-    dictPath = [[baseNode path] stringByAppendingPathComponent: @".gwdir"];
-    
-    [nodeView updateNodeInfo];
-    
-    [baseNode checkWritable];
-    
-    if ([baseNode isWritable] && (rootviewer == NO) && (rootViewerKey == nil)
-            && ([[fsnodeRep volumes] containsObject: [baseNode path]] == NO)) {
-      if ([[NSFileManager defaultManager] fileExistsAtPath: dictPath]) {
-        NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: dictPath];
-
-        if (dict) {
-          updatedprefs = [dict mutableCopy];
-        }   
-      }
-  
-    } else { 
-      NSDictionary *prefs = [defaults dictionaryForKey: prefsname];
-  
-      if (prefs) {
-        updatedprefs = [prefs mutableCopy];
-      }
-    }
-
     if (updatedprefs == nil) {
-      updatedprefs = [NSMutableDictionary new];
+      updatedprefs = [NSMutableDictionary dictionary];
     }
 
     [updatedprefs setObject: [NSNumber numberWithBool: YES]
@@ -707,14 +673,26 @@
     [updatedprefs setObject: [vwrwin stringWithSavedFrame] 
                      forKey: @"geometry"];
 
+    [baseNode checkWritable];
+
     if ([baseNode isWritable] && (rootviewer == NO) && (rootViewerKey == nil)
             && ([[fsnodeRep volumes] containsObject: [baseNode path]] == NO)) {
+      NSString *dictPath = [[baseNode path] stringByAppendingPathComponent: @".gwdir"];
+            
       [updatedprefs writeToFile: dictPath atomically: YES];
     } else {
+      NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
+      NSString *prefsname;
+    
+      if (rootViewerKey != nil) {
+        prefsname = [NSString stringWithFormat: @"viewer_at_%@_%i", 
+                            [baseNode path], [rootViewerKey unsignedLongValue]];
+      } else {
+        prefsname = [NSString stringWithFormat: @"viewer_at_%@", [baseNode path]];
+      }    
+    
       [defaults setObject: updatedprefs forKey: prefsname];
     }
-  
-    RELEASE (updatedprefs);
   }
 }
 
@@ -933,7 +911,7 @@
     NSArray *selection = [nodeView selectedPaths];
     int i;
     
-    [nodeView updateNodeInfo];
+    [nodeView updateNodeInfo: YES];
     if ([nodeView isSingleNode] && ([selection count] == 0)) {
       selection = [NSArray arrayWithObject: [[nodeView shownNode] path]];
     }    
@@ -1018,14 +996,14 @@
 
   [(id <FSNodeRepContainer>)nodeView setShowType: type];  
   [self scrollToBeginning];
-  [nodeView updateNodeInfo];
+  [nodeView updateNodeInfo: YES];
 }
 
 - (void)setExtendedShownType:(id)sender
 {
   [(id <FSNodeRepContainer>)nodeView setExtendedShowType: [sender title]]; 
   [self scrollToBeginning]; 
-  [nodeView updateNodeInfo];
+  [nodeView updateNodeInfo: YES];
 }
 
 - (void)setIconsSize:(id)sender
@@ -1033,7 +1011,7 @@
   if ([nodeView respondsToSelector: @selector(setIconSize:)]) {
     [(id <FSNodeRepContainer>)nodeView setIconSize: [[sender title] intValue]];
     [self scrollToBeginning];
-    [nodeView updateNodeInfo];
+    [nodeView updateNodeInfo: YES];
   }
 }
 
@@ -1049,7 +1027,7 @@
     }
     
     [self scrollToBeginning];
-    [nodeView updateNodeInfo];
+    [nodeView updateNodeInfo: YES];
   }
 }
 
@@ -1058,7 +1036,7 @@
   if ([nodeView respondsToSelector: @selector(setLabelTextSize:)]) {
     [nodeView setLabelTextSize: [[sender title] intValue]];
     [self scrollToBeginning];
-    [nodeView updateNodeInfo];
+    [nodeView updateNodeInfo: YES];
   }
 }
 
