@@ -126,6 +126,13 @@
   NSTimer *fswupdateTimer;
   NSMutableDictionary *lastRemovedUserMdata;
   NSTimer *userMdataTimer;
+
+  //
+  // scheduled_update  
+  //
+  NSMutableArray *directories;
+  int dirpos;
+  NSTimer *schedupdateTimer;
 }
 
 - (void)indexedDirectoriesChanged:(NSNotification *)notification;
@@ -183,6 +190,23 @@
 @end
 
 
+@interface GMDSExtractor (queries)
+
+- (NSArray *)performQuery:(NSString *)query;
+
+- (BOOL)performWriteQuery:(NSString *)query;
+
+- (int)getIntEntry:(NSString *)query;
+
+- (float)getFloatEntry:(NSString *)query;
+
+- (NSString *)getStringEntry:(NSString *)query;
+
+- (NSData *)getBlobEntry:(NSString *)query;
+
+@end
+
+
 @interface GMDSExtractor (updater)
 
 - (void)setupUpdaters;
@@ -198,6 +222,8 @@
 
 - (void)checkLastRemovedUserMdata:(id)sender;
 
+- (NSArray *)filteredDirectoryContentsAtPath:(NSString *)path;
+
 @end
 
 
@@ -212,6 +238,15 @@
 - (void)connectFSWatcher;
 
 - (void)fswatcherConnectionDidDie:(NSNotification *)notif;
+
+@end
+
+
+@interface GMDSExtractor (scheduled_update)
+
+- (void)setupScheduledUpdater;
+
+- (void)checkNextDir:(id)sender;
 
 @end
 

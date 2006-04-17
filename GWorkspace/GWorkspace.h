@@ -112,7 +112,8 @@
 
   id fswatcher;
   BOOL fswnotifications;
-	
+	NSCountedSet *watchedPaths;
+  
   id recyclerApp;
   BOOL recyclerCanQuit;
   

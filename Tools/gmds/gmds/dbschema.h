@@ -5,7 +5,9 @@ CREATE TABLE paths \
 (id INTEGER PRIMARY KEY AUTOINCREMENT, \
 path TEXT UNIQUE ON CONFLICT IGNORE, \
 words_count INTEGER, \
-moddate REAL); \
+moddate REAL, \
+is_directory INTEGER, \
+user_path INTEGER); \
 \
 CREATE TABLE words \
 (id INTEGER PRIMARY KEY AUTOINCREMENT, \
@@ -29,4 +31,5 @@ CREATE INDEX attributes_path_index ON attributes(path_id); \
 CREATE INDEX attributes_key_index ON attributes(key); \
 CREATE INDEX attributes_attr_index ON attributes(attribute); \
 ";
+
 

@@ -117,6 +117,7 @@ static GWorkspace *gworkspace = nil;
 	RELEASE (defXterm);
 	RELEASE (defXtermArgs);
   RELEASE (selectedPaths);
+  RELEASE (watchedPaths);
   TEST_RELEASE (fiend);
 	TEST_RELEASE (history);
   RELEASE (openWithController);
@@ -234,6 +235,7 @@ static GWorkspace *gworkspace = nil;
 
   startAppWin = [[StartAppWin alloc] init];
   
+  watchedPaths = [[NSCountedSet alloc] initWithCapacity: 1];
   fswatcher = nil;
   fswnotifications = YES;
   [self connectFSWatcher];
@@ -1473,7 +1475,22 @@ static GWorkspace *gworkspace = nil;
                     NSLocalizedString(@"Yes", @""),
                     NSLocalizedString(@"No", @""),
                     nil)) {
-    [self connectFSWatcher];                
+    [self connectFSWatcher]; 
+    
+    if (fswatcher != nil) {
+      NSEnumerator *enumerator = [watchedPaths objectEnumerator];
+      NSString *path;
+      
+      while ((path = [enumerator nextObject])) {
+        unsigned count = [watchedPaths countForObject: path];
+        unsigned i;
+      
+        for (i = 0; i < count; i++) {
+          [fswatcher client: (id <FSWClientProtocol>)self addWatcherForPath: path];
+        }
+      }
+    }
+                   
   } else {
     fswnotifications = NO;
     NSRunAlertPanel(nil,
@@ -2326,6 +2343,8 @@ static GWorkspace *gworkspace = nil;
 
 - (void)addWatcherForPath:(NSString *)path
 {
+  [watchedPaths addObject: path];
+
   if (fswnotifications) {
     [self connectFSWatcher];
     [fswatcher client: (id <FSWClientProtocol>)self addWatcherForPath: path];
@@ -2334,6 +2353,8 @@ static GWorkspace *gworkspace = nil;
 
 - (void)removeWatcherForPath:(NSString *)path
 {
+  [watchedPaths removeObject: path];
+
   if (fswnotifications) {
     [self connectFSWatcher];
     [fswatcher client: (id <FSWClientProtocol>)self removeWatcherForPath: path];

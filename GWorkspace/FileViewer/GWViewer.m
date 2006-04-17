@@ -517,7 +517,6 @@
 {
   FSNode *node;
   NSArray *components;
-  int i, j, count;
 
   [manager selectionChanged: newsel];
 
@@ -549,35 +548,36 @@
     }
   }
 
-  count = [components count];
+  if ([components isEqual: watchedNodes] == NO) {
+    unsigned count = [components count];
+    unsigned pos = 0;
+    unsigned i;
+  
+    for (i = 0; i < [watchedNodes count]; i++) { 
+      FSNode *nd = [watchedNodes objectAtIndex: i];
+      
+      if (i < count) {
+        FSNode *ndcomp = [components objectAtIndex: i];
 
-  for (i = 0; i < [watchedNodes count]; i++) {
-    FSNode *n1 = [watchedNodes objectAtIndex: i];
-    FSNode *n2 = nil;
+        if ([nd isEqual: ndcomp] == NO) {
+          [gworkspace removeWatcherForPath: [nd path]];
+        } else {
+          pos = i + 1;
+        }
 
-    if (count > i) {
-      n2 = [components objectAtIndex: i];  
-    } else {
-      i = count;
-      break;
+      } else {
+        [gworkspace removeWatcherForPath: [nd path]];
+      }
     }
 
-    if ([n1 isEqual: n2] == NO) {
-      break;
-    }    
-  }
+    for (i = pos; i < count; i++) {   
+      [gworkspace addWatcherForPath: [[components objectAtIndex: i] path]];
+    }
 
-  for (j = i; j < [watchedNodes count]; j++) {  
-    [gworkspace removeWatcherForPath: [[watchedNodes objectAtIndex: j] path]];
-  }
-
-  for (j = i; j < [components count]; j++) { 
-    [gworkspace addWatcherForPath: [[components objectAtIndex: j] path]];
-  }
+    [watchedNodes removeAllObjects];
+    [watchedNodes addObjectsFromArray: components];
+  }  
   
-  [watchedNodes removeAllObjects];
-  [watchedNodes addObjectsFromArray: components];
-
   [manager addNode: node toHistoryOfViewer: self];
 }
 

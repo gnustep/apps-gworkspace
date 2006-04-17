@@ -31,6 +31,7 @@
 #include "config.h"
 
 #define DLENGTH 256
+#define MAX_RETRY 1000
 
 #define GWDebugLog(format, args...) \
   do { if (GW_DEBUG_LOG) \
@@ -139,6 +140,16 @@ static void user_mdata_key(sqlite3_context *context, int argc, sqlite3_value **a
 
   RELEASE (lastRemovedUserMdata);
   
+  //  
+  // scheduled_update  
+  //
+  if (schedupdateTimer && [schedupdateTimer isValid]) {
+    [schedupdateTimer invalidate];
+  }
+  TEST_RELEASE (schedupdateTimer);
+  
+  RELEASE (directories);
+  
   [super dealloc];
 }
 
@@ -177,10 +188,21 @@ static void user_mdata_key(sqlite3_context *context, int argc, sqlite3_value **a
       }
     }
 
-    ASSIGN (dbpath, [dbdir stringByAppendingPathComponent: @"contents.db"]);    
     ASSIGN (indexedStatusPath, [dbdir stringByAppendingPathComponent: @"status.plist"]);
     lockpath = [dbdir stringByAppendingPathComponent: @"extractors.lock"];
     indexedStatusLock = [[NSDistributedLock alloc] initWithPath: lockpath];
+    
+    dbdir = [dbdir stringByAppendingPathComponent: @"v1"];
+
+    if (([fm fileExistsAtPath: dbdir isDirectory: &isdir] &isdir) == NO) {
+      if ([fm createDirectoryAtPath: dbdir attributes: nil] == NO) { 
+        NSLog(@"unable to create: %@", dbdir);
+        DESTROY (self);
+        return self;
+      }
+    }
+
+    ASSIGN (dbpath, [dbdir stringByAppendingPathComponent: @"contents.db"]);    
     
     db = NULL;
 
@@ -718,9 +740,9 @@ static void user_mdata_key(sqlite3_context *context, int argc, sqlite3_value **a
   extracting = NO;  
 }
 
-#define PERFORM_QUERY(d, q, r) \
+#define PERFORM_WRITE_QUERY(q, r) \
 do { \
-  if (performWriteQuery(d, q) == NO) { \
+  if ([self performWriteQuery: q] == NO) { \
     NSLog(@"error at: %@", q); \
     return r; \
   } \
@@ -745,12 +767,12 @@ do { \
                   filesCount: fcount
                  indexedDone: NO];
     
-    performWriteQuery(db, @"BEGIN");
+    [self performWriteQuery: @"BEGIN"];
     
     path_id = [self insertOrUpdatePath: path withAttributes: attributes];
     
     if (path_id == -1) {
-      performWriteQuery(db, @"COMMIT");
+      [self performWriteQuery: @"COMMIT"];
       return NO;
     }
 
@@ -762,12 +784,12 @@ do { \
                                 attributes: attributes
                               usingStemmer: stemmer
                                  stopWords: stopWords] == NO) {
-        performWriteQuery(db, @"COMMIT");
+        [self performWriteQuery: @"COMMIT"];
         return NO;
       }
     }
     
-    performWriteQuery(db, @"COMMIT");
+    [self performWriteQuery: @"COMMIT"];
     
     //  NSLog(path);
     
@@ -793,12 +815,12 @@ do { \
 
         if (attributes) {
           if (skip == NO) {
-            performWriteQuery(db, @"BEGIN");
+            [self performWriteQuery: @"BEGIN"];
             
             path_id = [self insertOrUpdatePath: subpath withAttributes: attributes];
           
             if (path_id == -1) {
-              performWriteQuery(db, @"COMMIT");
+              [self performWriteQuery: @"COMMIT"];
               RELEASE (arp);
               return NO;
             }
@@ -811,13 +833,13 @@ do { \
                                         attributes: attributes
                                       usingStemmer: stemmer
                                          stopWords: stopWords] == NO) {
-                performWriteQuery(db, @"COMMIT");
+                [self performWriteQuery: @"COMMIT"];
                 RELEASE (arp);
                 return NO;
               }
             }
             
-            performWriteQuery(db, @"COMMIT");
+            [self performWriteQuery: @"COMMIT"];
             
             fcount++;
             
@@ -881,10 +903,8 @@ do { \
 #define KEY_AND_ATTRIBUTE(k, a) \
 do { \
   NSMutableDictionary *dict = [NSMutableDictionary dictionary]; \
-  [dict setObject: [NSData dataWithBytes: [k UTF8String] length: [k length] + 1] \
-           forKey: @"key"]; \
-  [dict setObject: [NSData dataWithBytes: [a UTF8String] length: [a length] + 1] \
-           forKey: @"attribute"]; \
+  [dict setObject: k forKey: @"key"]; \
+  [dict setObject: a forKey: @"attribute"]; \
 \
   [mdattributes addObject: dict]; \
 } while (0)
@@ -892,16 +912,18 @@ do { \
   query = [NSString stringWithFormat: @"SELECT id FROM paths "
                                       @"WHERE path = '%@'",
                                        stringForQuery(path)];
-  path_id = getIntEntry(db, query);
+  path_id = [self getIntEntry: query];
   didexist = (path_id != -1);
      
-  if (didexist == NO) {  
+  if (didexist == NO) {
+    BOOL isdir = ([attributes fileType] == NSFileTypeDirectory);  
     NSDictionary *userMdata;
 
-    query = [NSString stringWithFormat: @"INSERT INTO paths (path, words_count, moddate) "
-                                        @"VALUES('%@', 0, %f)", 
-                                        stringForQuery(path), interval];
-    PERFORM_QUERY (db, query, -1);
+    query = [NSString stringWithFormat: @"INSERT INTO paths "
+                      @"(path, words_count, moddate, is_directory, user_path) "
+                      @"VALUES('%@', 0, %f, %i, 0)", 
+                      stringForQuery(path), interval, isdir];
+    PERFORM_WRITE_QUERY (query, -1);
   
     path_id = sqlite3_last_insert_rowid(db);
 
@@ -916,23 +938,23 @@ do { \
                                         @"SET words_count = 0, moddate = %f "
                                         @"WHERE id = %i",
                                         interval, path_id];
-    PERFORM_QUERY (db, query, -1);
+    PERFORM_WRITE_QUERY (query, -1);
 
     query = [NSString stringWithFormat: @"SELECT key, attribute FROM attributes "
                                         @"WHERE attributes.path_id = %i "
                                         @"AND isUserMdataKey(key)",
                                         path_id];
-    [mdattributes addObjectsFromArray: performQuery(db, query)];
+    [mdattributes addObjectsFromArray: [self performQuery: query]];
 
     query = [NSString stringWithFormat: @"DELETE FROM attributes "
                                         @"WHERE path_id = %i", 
                                         path_id];
-    PERFORM_QUERY (db, query, -1);
+    PERFORM_WRITE_QUERY (query, -1);
 
     query = [NSString stringWithFormat: @"DELETE FROM postings "
                                         @"WHERE path_id = %i", 
                                         path_id];
-    PERFORM_QUERY (db, query, -1);
+    PERFORM_WRITE_QUERY (query, -1);
   }
 
   KEY_AND_ATTRIBUTE (@"kMDItemFSName", stringForQuery([path lastPathComponent]));  
@@ -940,54 +962,19 @@ do { \
   
   for (i = 0; i < [mdattributes count]; i++) {
     NSDictionary *dict = [mdattributes objectAtIndex: i];      
-    const char *key = [[dict objectForKey: @"key"] bytes];  
-    const char *attribute = [[dict objectForKey: @"attribute"] bytes];  
+    NSString *key = [dict objectForKey: @"key"];  
+    NSString *attribute = [dict objectForKey: @"attribute"];  
 
-    GWDebugLog(@"didexist = %i - SETTING %s FOR %s", didexist, attribute, key);
+    GWDebugLog(@"didexist = %i - SETTING %@ FOR %@", didexist, attribute, key);
 
     query = [NSString stringWithFormat: @"INSERT INTO attributes (path_id, key, attribute) "
-                                        @"VALUES(%i, '%s', '%s')", 
+                                        @"VALUES(%i, '%@', '%@')", 
                                         path_id, key, attribute];
-    PERFORM_QUERY (db, query, -1);
+    PERFORM_WRITE_QUERY (query, -1);
   }
   
   return path_id;
 }
-
-
-/*
-SELECT count(*) FROM attributes 
-WHERE key = 'NSFileType' 
-AND attribute = 'NSFileTypeDirectory'
-
-SELECT path FROM paths
-WHERE id IN 
-(SELECT path_id FROM attributes 
-WHERE key = 'NSFileType' 
-AND attribute = 'NSFileTypeDirectory');
-
-SELECT * FROM paths 
-WHERE path > '/root/Desktop/AA/' 
-AND path < '/root/Desktop/AA0';
-
-
-
-SELECT path FROM paths 
-WHERE path > '/root/Desktop/AA/' 
-AND path < '/root/Desktop/AA0'
-AND path NOT GLOB '/root/Desktop/AA/*/*';
-
-
-
-
-SELECT path FROM paths
-WHERE path > '/root/' 
-AND path < '/root0'
-AND id IN 
-(SELECT path_id FROM attributes 
-WHERE key = 'NSFileType' 
-AND attribute = 'NSFileTypeDirectory');
-*/
 
 - (BOOL)setMetadata:(NSDictionary *)mddict
             forPath:(NSString *)path
@@ -1009,7 +996,7 @@ AND attribute = 'NSFileTypeDirectory');
                                         @"SET words_count = %i "
                                         @"WHERE id = %i", 
                                         wcount, path_id];
-    PERFORM_QUERY (db, query, 0);
+    PERFORM_WRITE_QUERY (query, NO);
 
     while ((word = [enumerator nextObject])) {
       unsigned count = [wordset countForObject: word];
@@ -1018,13 +1005,13 @@ AND attribute = 'NSFileTypeDirectory');
       query = [NSString stringWithFormat: @"SELECT id FROM words "
                                           @"WHERE word = '%@'",
                                           stringForQuery(word)];
-      word_id = getIntEntry(db, query);
+      word_id = [self getIntEntry: query];
 
       if (word_id == -1) {
         query = [NSString stringWithFormat: @"INSERT INTO words (word) "
                                             @"VALUES('%@')", 
                                             stringForQuery(word)];
-        PERFORM_QUERY (db, query, 0);
+        PERFORM_WRITE_QUERY (query, NO);
 
         word_id = sqlite3_last_insert_rowid(db);
       }
@@ -1032,7 +1019,7 @@ AND attribute = 'NSFileTypeDirectory');
       query = [NSString stringWithFormat: @"INSERT INTO postings (word_id, path_id, score) "
                                           @"VALUES(%i, %i, %f)", 
                                           word_id, path_id, (1.0 * count / wcount)];
-      PERFORM_QUERY (db, query, 0);
+      PERFORM_WRITE_QUERY (query, NO);
     }
   }
 
@@ -1045,25 +1032,35 @@ AND attribute = 'NSFileTypeDirectory');
     for (i = 0; i < [keys count]; i++) {
       NSString *key = [keys objectAtIndex: i];
       id mdvalue = [attrsdict objectForKey: key];
-      NSString *attributeStr;
 
       if ([mdvalue isKindOfClass: [NSString class]]) {
-        attributeStr = [NSString stringWithFormat: @"'%@'", mdvalue];
+        query = [NSString stringWithFormat: @"INSERT INTO attributes "
+                                          @"(path_id, key, attribute) "
+                                          @"VALUES(%i, '%@', '%@')", 
+                                          path_id, key, mdvalue];
 
       } else if ([mdvalue isKindOfClass: [NSArray class]]) {
-        attributeStr = [NSString stringWithFormat: @"'%@'", [mdvalue description]];      
-      
+        query = [NSString stringWithFormat: @"INSERT INTO attributes "
+                                          @"(path_id, key, attribute) "
+                                          @"VALUES(%i, '%@', '%@')", 
+                                          path_id, key, [mdvalue description]];
+
       } else if ([mdvalue isKindOfClass: [NSNumber class]]) {
-        attributeStr = [NSString stringWithFormat: @"%@", [mdvalue description]];      
-      
-      } else if ([mdvalue isKindOfClass: [NSData class]]) {
-        attributeStr = [NSString stringWithFormat: @"%@", blobFromData(mdvalue)];      
+        query = [NSString stringWithFormat: @"INSERT INTO attributes "
+                                          @"(path_id, key, attribute) "
+                                          @"VALUES(%i, '%@', %@)", 
+                                          path_id, key, [mdvalue description]];
+
+      } else if ([mdvalue isKindOfClass: [NSData class]]) {      
+        query = [NSString stringWithFormat: @"INSERT INTO attributes "
+                                          @"(path_id, key, attribute) "
+                                          @"VALUES(%i, '%@', %s)", 
+                                          path_id, key, [mdvalue bytes]];
+      } else {
+        return NO;
       }
      
-      query = [NSString stringWithFormat: @"INSERT INTO attributes (path_id, key, attribute) "
-                                          @"VALUES(%i, '%@', %@)", 
-                                          path_id, key, attributeStr];
-      PERFORM_QUERY (db, query, 0);
+      PERFORM_WRITE_QUERY (query, NO);
     }
   }
 
@@ -1201,23 +1198,25 @@ AND attribute = 'NSFileTypeDirectory');
 {
   if (db == NULL) {
     BOOL newdb = ([fm fileExistsAtPath: dbpath] == NO);
-  
+    char *err;
+        
     db = opendbAtPath(dbpath);
-
+        
     if (db != NULL) {
       if (newdb) {
-        if (performQuery(db, dbschema) == nil) {
+        if (sqlite3_exec(db, [dbschema UTF8String], NULL, 0, &err) != SQLITE_OK) {
           NSLog(@"unable to create the database at %@", dbpath);
+          sqlite3_free(err); 
           return NO;    
         } else {
-          GWDebugLog(@"database created");
+          GWDebugLog(@"contents database created");
         }
       }    
     } else {
       NSLog(@"unable to open the database at %@", dbpath);
       return NO;
     }    
-    
+        
     sqlite3_create_function(db, "pathExists", 1, 
                                 SQLITE_UTF8, 0, path_exists, 0, 0);
 
@@ -1227,10 +1226,10 @@ AND attribute = 'NSFileTypeDirectory');
     sqlite3_create_function(db, "isUserMdataKey", 1, 
                                 SQLITE_UTF8, 0, user_mdata_key, 0, 0);
 
-    performWriteQuery(db, @"PRAGMA cache_size = 20000");
-    performWriteQuery(db, @"PRAGMA count_changes = 0");
-    performWriteQuery(db, @"PRAGMA synchronous = OFF");
-    performWriteQuery(db, @"PRAGMA temp_store = MEMORY");
+    [self performWriteQuery: @"PRAGMA cache_size = 20000"];
+    [self performWriteQuery: @"PRAGMA count_changes = 0"];
+    [self performWriteQuery: @"PRAGMA synchronous = OFF"];
+    [self performWriteQuery: @"PRAGMA temp_store = MEMORY"];
   }
 
   return YES;
@@ -1265,6 +1264,183 @@ AND attribute = 'NSFileTypeDirectory');
   } else {
     GWDebugLog(@"connection closed");
   }
+}
+
+@end
+
+
+@implementation GMDSExtractor (queries)
+
+- (NSArray *)performQuery:(NSString *)query
+{
+  const char *qbuff = [query UTF8String];
+  NSMutableArray *lines = [NSMutableArray array];
+  struct sqlite3_stmt *stmt;
+  int retry = 0;
+  int err;
+  int i;
+    
+  if (sqlite3_prepare(db, qbuff, strlen(qbuff), &stmt, NULL) == SQLITE_OK) {
+    while (1) {
+      err = sqlite3_step(stmt);
+
+      if (err == SQLITE_ROW) {
+        NSMutableDictionary *line = [NSMutableDictionary dictionary];
+        int count = sqlite3_data_count(stmt);
+
+        // we use "<= count" because sqlite sends also 
+        // the id of the entry with type = 0 
+        for (i = 0; i <= count; i++) { 
+          const char *name = sqlite3_column_name(stmt, i); 
+          
+          if (name != NULL) {
+            int type = sqlite3_column_type(stmt, i);
+
+            if (type == SQLITE_INTEGER) {
+              [line setObject: [NSNumber numberWithInt: sqlite3_column_int(stmt, i)]
+                       forKey: [NSString stringWithUTF8String: name]];    
+            
+            } else if (type == SQLITE_FLOAT) {
+              [line setObject: [NSNumber numberWithDouble: sqlite3_column_double(stmt, i)]
+                       forKey: [NSString stringWithUTF8String: name]];    
+            
+            } else if (type == SQLITE_TEXT) {
+              [line setObject: [NSString stringWithUTF8String: (const char *)sqlite3_column_text(stmt, i)]
+                       forKey: [NSString stringWithUTF8String: name]];    
+
+            } else if (type == SQLITE_BLOB) {
+              const char *bytes = sqlite3_column_blob(stmt, i);
+              int length = sqlite3_column_bytes(stmt, i); 
+              
+              [line setObject: [NSData dataWithBytes: bytes length: length]
+                       forKey: [NSString stringWithUTF8String: name]];    
+            }
+          }
+        }
+
+        [lines addObject: line];
+
+      } else {
+        if (err == SQLITE_DONE) {
+          break;
+
+        } else if (err == SQLITE_BUSY) {
+          CREATE_AUTORELEASE_POOL(arp); 
+          NSDate *when = [NSDate dateWithTimeIntervalSinceNow: 0.1];
+
+          [NSThread sleepUntilDate: when];
+          GWDebugLog(@"retry %i", retry);
+          RELEASE (arp);
+
+          if (retry++ > MAX_RETRY) {
+            NSLog(@"%s", sqlite3_errmsg(db));
+		        break;
+          }
+
+        } else {
+          NSLog(@"%i %s", err, sqlite3_errmsg(db));
+          break;
+        }
+      }
+    }
+  
+    sqlite3_finalize(stmt);
+    
+  } else {
+    NSLog(@"%s", sqlite3_errmsg(db));
+  }
+  
+  return lines;
+}
+
+- (BOOL)performWriteQuery:(NSString *)query
+{
+  const char *qbuff = [query UTF8String];
+  struct sqlite3_stmt *stmt;
+  int retry = 0;
+  int err;
+  
+  err = sqlite3_prepare(db, qbuff, strlen(qbuff), &stmt, NULL);
+  
+  if (err != SQLITE_OK) {
+    NSLog(@"%s", sqlite3_errmsg(db));
+    return NO;
+  }
+  
+  while (1) {
+    err = sqlite3_step(stmt);
+
+    if (err == SQLITE_DONE) {
+      break;
+      
+    } else if (err == SQLITE_BUSY) {
+      CREATE_AUTORELEASE_POOL(arp); 
+      NSDate *when = [NSDate dateWithTimeIntervalSinceNow: 0.1];
+
+      [NSThread sleepUntilDate: when];
+      NSLog(@"retry %i", retry);
+      RELEASE (arp);
+
+      if (retry++ > MAX_RETRY) {
+        NSLog(@"%s", sqlite3_errmsg(db));
+        sqlite3_finalize(stmt);
+		    return NO;
+      }
+
+    } else {
+      NSLog(@"%s", sqlite3_errmsg(db));
+      sqlite3_finalize(stmt);
+      return NO;
+    }
+  }
+
+  sqlite3_finalize(stmt);
+  
+  return YES;
+}
+
+- (int)getIntEntry:(NSString *)query
+{
+  NSArray *result = [self performQuery: query];
+
+  if ([result count]) {
+    return [[[[result objectAtIndex: 0] allValues] objectAtIndex: 0] intValue];
+  }
+
+  return -1;
+}
+
+- (float)getFloatEntry:(NSString *)query
+{
+  NSArray *result = [self performQuery: query];
+
+  if ([result count]) {
+    return [[[[result objectAtIndex: 0] allValues] objectAtIndex: 0] floatValue];
+  }
+
+  return -1.0;
+}
+
+- (NSString *)getStringEntry:(NSString *)query
+{
+  NSArray *result = [self performQuery: query];
+
+  if ([result count]) {
+    return [[[result objectAtIndex: 0] allValues] objectAtIndex: 0];
+  }
+
+  return nil;
+}
+
+- (NSData *)getBlobEntry:(NSString *)query
+{
+  NSArray *result = [self performQuery: query];
+
+  if ([result count]) {
+    return [[[result objectAtIndex: 0] allValues] objectAtIndex: 0];
+  }
+
+  return nil;
 }
 
 @end

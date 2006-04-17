@@ -33,9 +33,9 @@
   do { if (GW_DEBUG_LOG) \
     NSLog(format , ## args); } while (0)
 
-#define PERFORM_QUERY(d, q, r) \
+#define PERFORM_WRITE_QUERY(q, r) \
 do { \
-  if (performWriteQuery(d, q) == NO) { \
+  if ([self performWriteQuery: q] == NO) { \
     NSLog(@"error at: %@", q); \
     return r; \
   } \
@@ -43,6 +43,7 @@ do { \
 
 #define SKIP_EXPIRE (1.0)
 #define USER_MDATA_EXPIRE (10.0)
+#define SCHED_TIME (1.0)
 
 
 @implementation GMDSExtractor (updater)
@@ -50,6 +51,7 @@ do { \
 - (void)setupUpdaters
 {
   [self setupFswatcherUpdater];
+  [self setupScheduledUpdater];
 }
 
 - (BOOL)addPath:(NSString *)path
@@ -60,12 +62,12 @@ do { \
     id extractor = nil;
     int path_id;
     
-    performWriteQuery(db, @"BEGIN");
+    [self performWriteQuery: @"BEGIN"];
     
     path_id = [self insertOrUpdatePath: path withAttributes: attributes];
     
     if (path_id == -1) {
-      performWriteQuery(db, @"COMMIT");
+      [self performWriteQuery: @"COMMIT"];
       return NO;
     }
 
@@ -77,15 +79,22 @@ do { \
                                 attributes: attributes
                               usingStemmer: stemmer
                                  stopWords: stopWords] == NO) {
-        performWriteQuery(db, @"COMMIT");
+        [self performWriteQuery: @"COMMIT"];
         return NO;
       }
     }
     
-    performWriteQuery(db, @"COMMIT");
+    [self performWriteQuery: @"COMMIT"];
     
     if ([attributes fileType] == NSFileTypeDirectory) {
       NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: path];
+      
+      if ([directories containsObject: path] == NO) {
+        
+        NSLog(@"schedule-add %@", path);
+        
+        [directories addObject: path];
+      }
       
       while (1) {
         CREATE_AUTORELEASE_POOL(arp); 
@@ -105,13 +114,13 @@ do { \
         
           if (attributes) {
             if (skip == NO) {
-              performWriteQuery(db, @"BEGIN");
+              [self performWriteQuery: @"BEGIN"];
               
               path_id = [self insertOrUpdatePath: subpath withAttributes: attributes];
     
               if (path_id == -1) {
                 RELEASE (arp);
-                performWriteQuery(db, @"COMMIT");
+                [self performWriteQuery: @"COMMIT"];
                 return NO;
               }
 
@@ -123,18 +132,27 @@ do { \
                                           attributes: attributes
                                         usingStemmer: stemmer
                                            stopWords: stopWords] == NO) {
-                  performWriteQuery(db, @"COMMIT");
+                  [self performWriteQuery: @"COMMIT"];
                   RELEASE (arp);
                   return NO;
                 }
               }
               
-              performWriteQuery(db, @"COMMIT");
+              [self performWriteQuery: @"COMMIT"];
             }
           
-            if (([attributes fileType] == NSFileTypeDirectory) && skip) {
-              GWDebugLog(@"skipping %@", subpath); 
-              [enumerator skipDescendents];
+            if ([attributes fileType] == NSFileTypeDirectory) {
+              if (skip) {
+                GWDebugLog(@"skipping %@", subpath); 
+                [enumerator skipDescendents];
+              } else {
+                if ([directories containsObject: subpath] == NO) {
+                
+                  NSLog(@"schedule-add %@", subpath);
+                  
+                  [directories addObject: subpath];
+                }
+              }
             }
           }
           
@@ -159,12 +177,12 @@ do { \
     id extractor;
     int path_id;
     
-    performWriteQuery(db, @"BEGIN");
+    [self performWriteQuery: @"BEGIN"];
     
     path_id = [self insertOrUpdatePath: path withAttributes: attributes];
     
     if (path_id == -1) {
-      performWriteQuery(db, @"COMMIT");
+      [self performWriteQuery: @"COMMIT"];
       return NO;
     }
 
@@ -176,12 +194,12 @@ do { \
                                 attributes: attributes
                               usingStemmer: stemmer
                                  stopWords: stopWords] == NO) {
-        performWriteQuery(db, @"COMMIT");
+        [self performWriteQuery: @"COMMIT"];
         return NO;
       }
     }
     
-    performWriteQuery(db, @"COMMIT");
+    [self performWriteQuery: @"COMMIT"];
   }
   
   return YES;
@@ -194,7 +212,7 @@ do { \
   NSString *qoldpath = stringForQuery(oldpath);
   NSString *query;
     
-  PERFORM_QUERY (db, @"BEGIN", 0);
+  PERFORM_WRITE_QUERY (@"BEGIN", NO);
 
   query = [NSString stringWithFormat: @"CREATE TABLE paths_tmp "
                                       @"(id INTEGER PRIMARY KEY, "
@@ -202,7 +220,7 @@ do { \
                                       @"base TEXT DEFAULT '%@', "
                                       @"oldbase TEXT DEFAULT '%@')", 
                                       qpath, qoldpath];
-  PERFORM_QUERY (db, query, 0);
+  PERFORM_WRITE_QUERY (query, NO);
 
   query = @"CREATE TRIGGER paths_tmp_trigger AFTER INSERT ON paths_tmp "
           @"BEGIN "
@@ -210,13 +228,13 @@ do { \
           @"SET path = pathMoved(new.oldbase, new.base, new.path) "
           @"WHERE id = new.id; "
           @"END";
-  PERFORM_QUERY (db, query, 0);
+  PERFORM_WRITE_QUERY (query, NO);
   
   query = [NSString stringWithFormat: @"INSERT INTO paths_tmp (id, path) "
                                       @"SELECT paths.id, paths.path "
                                       @"FROM paths "
                                       @"WHERE path = '%@'", qoldpath];
-  PERFORM_QUERY (db, query, 0);
+  PERFORM_WRITE_QUERY (query, NO);
 
   query = [NSString stringWithFormat: @"INSERT INTO paths_tmp (id, path) "
                                       @"SELECT paths.id, paths.path "
@@ -224,12 +242,12 @@ do { \
                                       @"WHERE path > '%@%@' "
                                       @"AND path < '%@0'", 
                                       qoldpath, path_separator(), qoldpath];
-  PERFORM_QUERY (db, query, 0);
+  PERFORM_WRITE_QUERY (query, NO);
 
-  PERFORM_QUERY (db, @"DROP TRIGGER paths_tmp_trigger", 0);
-  PERFORM_QUERY (db, @"DROP TABLE paths_tmp", 0);
+  PERFORM_WRITE_QUERY (@"DROP TRIGGER paths_tmp_trigger", NO);
+  PERFORM_WRITE_QUERY (@"DROP TABLE paths_tmp", NO);
 
-  PERFORM_QUERY (db, @"COMMIT", 0);
+  PERFORM_WRITE_QUERY (@"COMMIT", NO);
 
   return YES;
 }
@@ -241,22 +259,22 @@ do { \
   NSArray *userattrs;
   unsigned i;
     
-  PERFORM_QUERY (db, @"BEGIN", 0);
+  PERFORM_WRITE_QUERY (@"BEGIN", NO);
 
-  PERFORM_QUERY (db, @"CREATE TABLE id_tmp (id INTEGER PRIMARY KEY)", 0);
+  PERFORM_WRITE_QUERY (@"CREATE TABLE id_tmp (id INTEGER PRIMARY KEY)", NO);
   
   query = [NSString stringWithFormat: @"INSERT INTO id_tmp (id) "
                                       @"SELECT id FROM paths "
                                       @"WHERE path = '%@'", 
                                       qpath];
-  PERFORM_QUERY (db, query, 0);
+  PERFORM_WRITE_QUERY (query, NO);
   
   query = [NSString stringWithFormat: @"INSERT INTO id_tmp (id) "
                                       @"SELECT id FROM paths "
                                       @"WHERE path > '%@%@' "
                                       @"AND path < '%@0'",
                                       qpath, path_separator(), qpath];
-  PERFORM_QUERY (db, query, 0);
+  PERFORM_WRITE_QUERY (query, NO);
 
   query = @"SELECT paths.path, attributes.key, attributes.attribute " 
           @"FROM paths, attributes "
@@ -264,12 +282,11 @@ do { \
           @"AND attributes.path_id = paths.id "                                    
           @"AND isUserMdataKey(attributes.key)";                                     
 
-  userattrs = performQuery(db, query);
+  userattrs = [self performQuery: query];
     
   for (i = 0; i < [userattrs count]; i++) {
     NSDictionary *dict = [userattrs objectAtIndex: i];
-    NSData *data = [dict objectForKey: @"path"];
-    NSString *path = [NSString stringWithUTF8String: [data bytes]];
+    NSString *path = [dict objectForKey: @"path"];
     NSMutableDictionary *mdatadict = [lastRemovedUserMdata objectForKey: path];
     NSMutableArray *attrs;
     
@@ -286,13 +303,13 @@ do { \
     [attrs addObject: dict];
   }
 
-  PERFORM_QUERY (db, @"DELETE FROM attributes WHERE path_id IN (SELECT id FROM id_tmp)", 0);
-  PERFORM_QUERY (db, @"DELETE FROM postings WHERE path_id IN (SELECT id FROM id_tmp)", 0);
-  PERFORM_QUERY (db, @"DELETE FROM paths WHERE id IN (SELECT id FROM id_tmp)", 0);
+  PERFORM_WRITE_QUERY (@"DELETE FROM attributes WHERE path_id IN (SELECT id FROM id_tmp)", NO);
+  PERFORM_WRITE_QUERY (@"DELETE FROM postings WHERE path_id IN (SELECT id FROM id_tmp)", NO);
+  PERFORM_WRITE_QUERY (@"DELETE FROM paths WHERE id IN (SELECT id FROM id_tmp)", NO);
 
-  PERFORM_QUERY (db, @"DROP TABLE id_tmp", 0);
+  PERFORM_WRITE_QUERY (@"DROP TABLE id_tmp", NO);
 
-  PERFORM_QUERY (db, @"COMMIT", 0);
+  PERFORM_WRITE_QUERY (@"COMMIT", NO);
 
   return YES;
 }
@@ -319,6 +336,24 @@ do { \
   
   RELEASE (paths);
   RELEASE (arp);
+}
+
+- (NSArray *)filteredDirectoryContentsAtPath:(NSString *)path
+{
+  NSMutableArray *contents = [NSMutableArray array];
+  NSEnumerator *enumerator = [[fm directoryContentsAtPath: path] objectEnumerator];
+  NSString *fname;
+
+  while ((fname = [enumerator nextObject])) {
+    NSString *subpath = [path stringByAppendingPathComponent: fname];
+
+    if ((isDotFile(subpath) == NO)
+            && (inTreeFirstPartOfPath(subpath, excludedPathsTree) == NO)) {
+      [contents addObject: subpath];
+    }
+  }
+
+  return [contents makeImmutableCopyOnFail: NO];
 }
 
 @end
@@ -566,7 +601,148 @@ do { \
 @end
 
 
+@implementation GMDSExtractor (scheduled_update)
 
+- (void)setupScheduledUpdater
+{
+  CREATE_AUTORELEASE_POOL(arp);
+  NSString *query = @"SELECT path FROM paths WHERE is_directory = 1 AND user_path = 0";
+  NSArray *lines = [self performQuery: query];
+  unsigned i;
+    
+  directories = [NSMutableArray new];
+                                       
+  for (i = 0; i < [lines count]; i++) {
+    [directories addObject: [[lines objectAtIndex: i] objectForKey: @"path"]];
+  }
+  
+  dirpos = 0;
+
+  schedupdateTimer = [NSTimer scheduledTimerWithTimeInterval: SCHED_TIME
+						                                 target: self 
+                                           selector: @selector(checkNextDir:) 
+																           userInfo: nil 
+                                            repeats: YES];
+  RETAIN (schedupdateTimer);     
+  
+  RELEASE (arp);
+}
+
+- (void)checkNextDir:(id)sender
+{
+  CREATE_AUTORELEASE_POOL(arp);
+  unsigned count = [directories count];
+
+  if (dirpos < count) {
+    NSString *dir = [directories objectAtIndex: dirpos];
+    NSDictionary *attributes = [fm fileAttributesAtPath: dir traverseLink: NO];
+    BOOL dirok = (attributes && ([attributes fileType] == NSFileTypeDirectory));
+    unsigned i;
+    
+    if (dirok) {
+      NSArray *contents = [self filteredDirectoryContentsAtPath: dir];
+      NSMutableDictionary *dbcontents = [NSMutableDictionary dictionary];
+      NSArray *dbpaths = nil;
+      NSString *qdir = stringForQuery(dir);
+      NSString *query;
+      NSArray *results;
+      unsigned i;
+      
+      query = [NSString stringWithFormat: @"SELECT path, moddate FROM paths "
+                                          @"WHERE path > '%@%@' "
+                                          @"AND path < '%@0' "
+                                          @"AND path NOT GLOB '%@%@*%@*'", 
+                                          qdir, path_separator(), qdir, 
+                                          qdir, path_separator(), path_separator()];
+      results = [self performQuery: query];
+
+      for (i = 0; i < [results count]; i++) {
+        NSDictionary *dict = [results objectAtIndex: i];
+        
+        [dbcontents setObject: [dict objectForKey: @"moddate"]
+                       forKey: [dict objectForKey: @"path"]];
+      }
+          
+      for (i = 0; i < [contents count]; i++) {
+        NSString *path = [contents objectAtIndex: i];
+        NSNumber *dbdate = [dbcontents objectForKey: path];
+        
+        if (dbdate == nil) {
+          NSLog(@"schedule-add %@", path);
+        
+          [self addPath: path];
+        
+        } else {
+          NSDictionary *attrs = [fm fileAttributesAtPath: path traverseLink: NO];
+          NSTimeInterval date = [[attrs fileModificationDate] timeIntervalSinceReferenceDate];
+   
+          if ((date - [dbdate floatValue]) > 10) {
+          
+            NSLog(@"schedule-update %@ ---- %f - %f", path, date, [dbdate floatValue]);
+          
+            [self updatePath: path];
+            
+          }
+        }
+      }    
+    
+      dbpaths = [dbcontents allKeys];
+    
+      for (i = 0; i < [dbpaths count]; i++) {    
+        NSString *path = [dbpaths objectAtIndex: i];
+    
+        if ([contents containsObject: path] == NO) {
+          NSLog(@"schedule-remove %@", path);
+    
+          [self removePath: path];
+        }
+      }
+        
+    } else {  
+      [self removePath: dir];
+      
+      RETAIN (dir);
+      
+      NSLog(@"schedule-remove %@", dir);
+      
+      [directories removeObjectAtIndex: dirpos];
+      count--;
+      dirpos--;
+        
+      for (i = 0; i < count; i++) {
+        if (subPathOfPath(dir, [directories objectAtIndex: i])) {
+          NSLog(@"schedule-remove %@", [directories objectAtIndex: i]);
+        
+          [directories removeObjectAtIndex: i];
+
+          count--;
+          if (dirpos >= i) {
+            dirpos--;
+          }
+          i--;
+        }
+      }
+      
+      if (attributes) {
+        [self addPath: dir];
+        
+        NSLog(@"schedule-remove->add %@", dir);
+      }
+      
+      RELEASE (dir);
+    }
+
+    dirpos++;
+  
+    if ((dirpos >= count) || (dirpos < 0)) {
+      dirpos = 0;
+    }
+  }
+  
+  RELEASE (arp);
+}
+
+@end
 
 
 

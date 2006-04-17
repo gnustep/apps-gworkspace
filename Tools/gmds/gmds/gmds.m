@@ -109,6 +109,16 @@ static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv
       }
     }
 
+    dbdir = [dbdir stringByAppendingPathComponent: @"v1"];
+
+    if (([fm fileExistsAtPath: dbdir isDirectory: &isdir] &isdir) == NO) {
+      if ([fm createDirectoryAtPath: dbdir attributes: nil] == NO) { 
+        NSLog(@"unable to create: %@", dbdir);
+        DESTROY (self);
+        return self;
+      }
+    }
+
     ASSIGN (dbpath, [dbdir stringByAppendingPathComponent: @"contents.db"]);    
     db = NULL;
 
@@ -353,19 +363,25 @@ static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv
         NSMutableArray *line = [NSMutableArray array];
         int count = sqlite3_data_count(stmt);
 
-        /* we use "<= count" because sqlite sends also 
-         * the id of the entry with type = 0        */
+        // we use "<= count" because sqlite sends also 
+        // the id of the entry with type = 0 
         for (i = 0; i <= count; i++) { 
           int type = sqlite3_column_type(stmt, i);
-
+                    
           if (type == SQLITE_INTEGER) {
             [line addObject: [NSNumber numberWithInt: sqlite3_column_int(stmt, i)]];
+          
           } else if (type == SQLITE_FLOAT) {
             [line addObject: [NSNumber numberWithDouble: sqlite3_column_double(stmt, i)]];
+          
           } else if (type == SQLITE_TEXT) {
             [line addObject: [NSString stringWithUTF8String: (const char *)sqlite3_column_text(stmt, i)]];
+          
           } else if (type == SQLITE_BLOB) {
-            [line addObject: dataFromBlob(sqlite3_column_blob(stmt, i))];
+            const char *bytes = sqlite3_column_blob(stmt, i);
+            int length = sqlite3_column_bytes(stmt, i); 
+
+            [line addObject: [NSData dataWithBytes: bytes length: length]];
           }
         }
 
@@ -454,16 +470,18 @@ static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv
 {
   if (db == NULL) {
     BOOL newdb = ([fm fileExistsAtPath: dbpath] == NO);
-  
+    char *err;
+        
     db = opendbAtPath(dbpath);
-
+        
     if (db != NULL) {
       if (newdb) {
-        if (performQuery(db, dbschema) == nil) {
+        if (sqlite3_exec(db, [dbschema UTF8String], NULL, 0, &err) != SQLITE_OK) {
           NSLog(@"unable to create the database at %@", dbpath);
+          sqlite3_free(err); 
           return NO;    
         } else {
-          GWDebugLog(@"database created");
+          GWDebugLog(@"contents database created");
         }
       }    
     } else {
