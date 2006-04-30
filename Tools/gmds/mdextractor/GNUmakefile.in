@@ -6,6 +6,9 @@ include $(GNUSTEP_MAKEFILES)/common.make
 SUBPROJECTS = Stemmer \
 Extractors
 
+ADDITIONAL_INCLUDE_DIRS += @ADDITIONAL_INCLUDE_DIRS@
+ADDITIONAL_LIB_DIRS += @ADDITIONAL_LIB_DIRS@
+
 TOOL_NAME = mdextractor
 
 mdextractor_OBJC_FILES = mdextractor.m \
@@ -14,7 +17,6 @@ mdextractor_OBJC_FILES = mdextractor.m \
 
 mdextractor_TOOL_LIBS += -lgnustep-gui
 mdextractor_TOOL_LIBS += -lDBKit
-mdextractor_TOOL_LIBS += -lsqlite3
 
 -include GNUmakefile.preamble
 

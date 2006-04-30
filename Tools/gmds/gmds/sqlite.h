@@ -22,8 +22,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef SQLITE_CLIENT_H
-#define SQLITE_CLIENT_H
+#ifndef SQLITE_H
+#define SQLITE_H
 
 #include <Foundation/Foundation.h>
 #include <sqlite3.h>
@@ -56,4 +56,4 @@ NSData *dataFromBlob(const char *blob);
 
 NSString *stringForQuery(NSString *str);
 
-#endif // SQLITE_CLIENT_H
+#endif // SQLITE_H

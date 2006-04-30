@@ -7,6 +7,26 @@ fi
 
 AC_CONFIG_AUX_DIR([$GNUSTEP_MAKEFILES])
 
+#--------------------------------------------------------------------
+# Find sqlite
+#--------------------------------------------------------------------
+AC_ARG_WITH(sqlite_library, 
+           [  --with-sqlite-library=DIR sqlite library files are in DIR], ,
+           with_sqlite_library=)
+AC_ARG_WITH(sqlite_include,  
+ [  --with-sqlite-include=DIR sqlite include files are in DIR], ,
+        with_sqlite_include=)
+
+if test -n "$with_sqlite_library"; then
+  with_sqlite_library="-L$with_sqlite_library"
+fi
+if test -n "$with_sqlite_include"; then
+  with_sqlite_include="-I$with_sqlite_include"
+fi
+
+CPPFLAGS="$with_sqlite_include ${CPPFLAGS}"
+LDFLAGS="$with_sqlite_library -lsqlite3 ${LDFLAGS}"
+
 AC_CHECK_HEADER(sqlite3.h, have_sqlite=yes, have_sqlite=no)
 if test "$have_sqlite" = yes; then
   AC_CHECK_LIB(sqlite3, sqlite3_get_table)  
@@ -16,12 +36,6 @@ if test "$have_sqlite" = yes; then
 fi
 
 if test "$have_sqlite" = yes; then
-  AC_LANG_SAVE
-  AC_LANG_C
-  ac_save_CFLAGS="$CFLAGS"
-  ac_save_LIBS="$LIBS"
-  LIBS="$LIBS -lsqlite3"
-
   AC_TRY_RUN([
     #include <stdio.h>
     #include <stdlib.h>
@@ -37,22 +51,24 @@ int main ()
 }
   ],, have_sqlite=no,[echo "wrong sqlite3 version"])
 
-  CFLAGS="$ac_save_CFLAGS"
-  LIBS="$ac_save_LIBS"
-  AC_LANG_RESTORE
-
-  if test "$have_sqlite" = no; then
-    AC_MSG_ERROR(wrong sqlite3 version. sqlite3 >= 3.2.8 required.)
+  if test "$have_sqlite" = yes; then
+    ADDITIONAL_LIB_DIRS="$ADDITIONAL_LIB_DIRS $with_sqlite_library -lsqlite3"
+    ADDITIONAL_INCLUDE_DIRS="$ADDITIONAL_INCLUDE_DIRS $with_sqlite_include"
   fi
-
-else 
-  AC_MSG_WARN(Cannot find sqlite3 header and/or library)
-  echo "* The gmds tool reqiures the sqlite3 library"
-  AC_MSG_ERROR(gmds will not compile without sqlite3)
 fi
 
+if test "$have_sqlite" = no; then
+  AC_MSG_WARN(Cannot find libsqlite header and/or library)
+  echo "* The gmds tool reqiures the sqlite3 library"
+  echo "* Use --with-sqlite-library and --with-sqlite-include"
+  echo "* to specify the tiff library directory if it is not"
+  echo "* in the usual place(s)"
+  AC_MSG_ERROR(gmds will not compile without sqlite)
+fi
 
-# AC_CONFIG_SUBDIRS(Inspector)
+AC_SUBST(ADDITIONAL_LIB_DIRS)
+AC_SUBST(ADDITIONAL_INCLUDE_DIRS)
+
 
 #--------------------------------------------------------------------
 # Debug logging
@@ -71,7 +87,6 @@ AC_DEFINE_UNQUOTED([GW_DEBUG_LOG], [$GW_DEBUG_LOG], [debug logging])
 
 
 AC_CONFIG_HEADER([config.h])
-
 AC_CONFIG_FILES([GNUmakefile])
 
 AC_OUTPUT

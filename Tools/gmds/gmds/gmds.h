@@ -50,6 +50,7 @@
 
 @interface GMDS: NSObject <GMDSProtocol>
 {
+  NSString *dbdir;
   NSString *dbpath;
   sqlite3 *db;
 

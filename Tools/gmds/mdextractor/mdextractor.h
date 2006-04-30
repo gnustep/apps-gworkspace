@@ -100,7 +100,8 @@
   BOOL subpathsChanged;  
   NSString *dbpath;
   sqlite3 *db;
-
+  NSMutableDictionary *preparedStatements;
+  
 	NSMutableArray *extractors;
   id textExtractor;
 	id stemmer;
@@ -123,9 +124,9 @@
   id fswatcher;
   NSMutableArray *fswupdatePaths;
   NSMutableDictionary *fswupdateSkipBuff;
+  NSMutableArray *lostPaths;
   NSTimer *fswupdateTimer;
-  NSMutableDictionary *lastRemovedUserMdata;
-  NSTimer *userMdataTimer;
+  NSTimer *lostPathsTimer;
 
   //
   // scheduled_update  
@@ -192,11 +193,28 @@
 
 @interface GMDSExtractor (queries)
 
-- (NSArray *)performQuery:(NSString *)query;
+- (id)statementForQuery:(NSString *)query
+         withIdentifier:(id)identifier
+               bindings:(int)firstTipe, ...;
 
-- (BOOL)performWriteQuery:(NSString *)query;
+- (SQLitePreparedStatement *)statementWithIdentifier:(id)identifier;
+
+- (SQLitePreparedStatement *)statementForQuery:(NSString *)query;
+
+- (void)addPreparedStatement:(SQLitePreparedStatement *)statement
+               forIdentifier:(id)identifier;
+
+- (NSArray *)resultsOfQuery:(NSString *)query;
+
+- (NSArray *)resultsOfQueryWithStatement:(SQLitePreparedStatement *)statement;
+
+- (BOOL)executeQuery:(NSString *)query;
+
+- (BOOL)executeQueryWithStatement:(SQLitePreparedStatement *)statement;
 
 - (int)getIntEntry:(NSString *)query;
+
+- (int)getIntEntryWithStatement:(SQLitePreparedStatement *)statement;
 
 - (float)getFloatEntry:(NSString *)query;
 
@@ -220,7 +238,7 @@
 
 - (BOOL)removePath:(NSString *)path;
 
-- (void)checkLastRemovedUserMdata:(id)sender;
+- (void)checkLostPaths:(id)sender;
 
 - (NSArray *)filteredDirectoryContentsAtPath:(NSString *)path;
 

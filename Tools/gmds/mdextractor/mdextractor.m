@@ -32,10 +32,46 @@
 
 #define DLENGTH 256
 #define MAX_RETRY 1000
+#define UPDATE_COUNT 100
 
 #define GWDebugLog(format, args...) \
   do { if (GW_DEBUG_LOG) \
     NSLog(format , ## args); } while (0)
+
+#define EXECUTE_QUERY(q, r) \
+do { \
+  if ([self executeQuery: q] == NO) { \
+    NSLog(@"error at: %@", q); \
+    return r; \
+  } \
+} while (0)
+
+#define EXECUTE_OR_ROLLBACK(q, r) \
+do { \
+  if ([self executeQuery: q] == NO) { \
+    [self executeQuery: @"ROLLBACK"]; \
+    NSLog(@"error at: %@", q); \
+    return r; \
+  } \
+} while (0)
+
+#define STATEMENT_EXECUTE_QUERY(s, r) \
+do { \
+  if ([self executeQueryWithStatement: s] == NO) { \
+    NSLog(@"error at: %@", [s query]); \
+    return r; \
+  } \
+} while (0)
+
+#define STATEMENT_EXECUTE_OR_ROLLBACK(s, r) \
+do { \
+  if ([self executeQueryWithStatement: s] == NO) { \
+    [self executeQuery: @"ROLLBACK"]; \
+    NSLog(@"error at: %@", [s query]); \
+    return r; \
+  } \
+} while (0)
+
 
 static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv)
 {
@@ -74,6 +110,14 @@ static void path_moved(sqlite3_context *context, int argc, sqlite3_value **argv)
   sqlite3_result_text(context, newpath, strlen(newpath), SQLITE_TRANSIENT);
 }
 
+static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
+{
+  NSTimeInterval interval = [[NSDate date] timeIntervalSinceReferenceDate];
+
+  sqlite3_result_double(context, interval);
+}
+
+/*
 static void user_mdata_key(sqlite3_context *context, int argc, sqlite3_value **argv)
 {
 #define KEYS 1
@@ -93,7 +137,7 @@ static void user_mdata_key(sqlite3_context *context, int argc, sqlite3_value **a
      
   sqlite3_result_int(context, contains);
 }
-
+*/
 
 @implementation	GMDSExtractor
 
@@ -110,6 +154,7 @@ static void user_mdata_key(sqlite3_context *context, int argc, sqlite3_value **a
   RELEASE (indexablePaths);
   freeTree(excludedPathsTree);
   RELEASE (dbpath);
+  RELEASE (preparedStatements);
   RELEASE (indexedStatusPath);
   RELEASE (indexedStatusLock);
   RELEASE (extractors);  
@@ -132,13 +177,12 @@ static void user_mdata_key(sqlite3_context *context, int argc, sqlite3_value **a
 
   RELEASE (fswupdatePaths);
   RELEASE (fswupdateSkipBuff);
-
-  if (userMdataTimer && [userMdataTimer isValid]) {
-    [userMdataTimer invalidate];
+  RELEASE (lostPaths);
+  
+  if (lostPathsTimer && [lostPathsTimer isValid]) {
+    [lostPathsTimer invalidate];
   }
-  TEST_RELEASE (userMdataTimer);
-
-  RELEASE (lastRemovedUserMdata);
+  TEST_RELEASE (lostPathsTimer);
   
   //  
   // scheduled_update  
@@ -274,6 +318,7 @@ static void user_mdata_key(sqlite3_context *context, int argc, sqlite3_value **a
     subpathsChanged = NO;
     statusTimer = nil;
     
+    preparedStatements = [NSMutableDictionary new];
     [self setupUpdaters];
     
     if ([self synchronizePathsStatus: YES] && indexingEnabled) {
@@ -740,16 +785,6 @@ static void user_mdata_key(sqlite3_context *context, int argc, sqlite3_value **a
   extracting = NO;  
 }
 
-#define PERFORM_WRITE_QUERY(q, r) \
-do { \
-  if ([self performWriteQuery: q] == NO) { \
-    NSLog(@"error at: %@", q); \
-    return r; \
-  } \
-} while (0)
-
-#define UPDATE_COUNT 100
-
 - (BOOL)extractFromPath:(GMDSIndexablePath *)indpath
 {
   NSString *path = [NSString stringWithString: [indpath path]];
@@ -767,12 +802,12 @@ do { \
                   filesCount: fcount
                  indexedDone: NO];
     
-    [self performWriteQuery: @"BEGIN"];
+    EXECUTE_QUERY (@"BEGIN", NO);
     
     path_id = [self insertOrUpdatePath: path withAttributes: attributes];
     
     if (path_id == -1) {
-      [self performWriteQuery: @"COMMIT"];
+      [self executeQuery: @"ROLLBACK"];
       return NO;
     }
 
@@ -784,12 +819,12 @@ do { \
                                 attributes: attributes
                               usingStemmer: stemmer
                                  stopWords: stopWords] == NO) {
-        [self performWriteQuery: @"COMMIT"];
+        [self executeQuery: @"ROLLBACK"];
         return NO;
       }
     }
     
-    [self performWriteQuery: @"COMMIT"];
+    [self executeQuery: @"COMMIT"];
     
     //  NSLog(path);
     
@@ -815,12 +850,12 @@ do { \
 
         if (attributes) {
           if (skip == NO) {
-            [self performWriteQuery: @"BEGIN"];
+            [self executeQuery: @"BEGIN"];
             
             path_id = [self insertOrUpdatePath: subpath withAttributes: attributes];
           
             if (path_id == -1) {
-              [self performWriteQuery: @"COMMIT"];
+              [self executeQuery: @"ROLLBACK"];
               RELEASE (arp);
               return NO;
             }
@@ -833,13 +868,13 @@ do { \
                                         attributes: attributes
                                       usingStemmer: stemmer
                                          stopWords: stopWords] == NO) {
-                [self performWriteQuery: @"COMMIT"];
+                [self executeQuery: @"ROLLBACK"];
                 RELEASE (arp);
                 return NO;
               }
             }
             
-            [self performWriteQuery: @"COMMIT"];
+            [self executeQuery: @"COMMIT"];
             
             fcount++;
             
@@ -895,6 +930,8 @@ do { \
 {
   NSTimeInterval interval = [[attributes fileModificationDate] timeIntervalSinceReferenceDate];
   NSMutableArray *mdattributes = [NSMutableArray array];
+  NSString *qpath = stringForQuery(path);
+  SQLitePreparedStatement *statement;
   NSString *query;
   int path_id;
   BOOL didexist;
@@ -909,52 +946,64 @@ do { \
   [mdattributes addObject: dict]; \
 } while (0)
     
-  query = [NSString stringWithFormat: @"SELECT id FROM paths "
-                                      @"WHERE path = '%@'",
-                                       stringForQuery(path)];
-  path_id = [self getIntEntry: query];
+  query = @"SELECT id FROM paths WHERE path = :path";
+    
+  statement = [self statementForQuery: query 
+                       withIdentifier: @"insert_or_update_1"
+                             bindings: SQLITE_TEXT, @":path", qpath, 0];
+                             
+  path_id = [self getIntEntryWithStatement: statement];    
+  
   didexist = (path_id != -1);
      
   if (didexist == NO) {
     BOOL isdir = ([attributes fileType] == NSFileTypeDirectory);  
-    NSDictionary *userMdata;
 
-    query = [NSString stringWithFormat: @"INSERT INTO paths "
-                      @"(path, words_count, moddate, is_directory, user_path) "
-                      @"VALUES('%@', 0, %f, %i, 0)", 
-                      stringForQuery(path), interval, isdir];
-    PERFORM_WRITE_QUERY (query, -1);
-  
+    if (isdir && ([directories containsObject: path] == NO)) {
+      [directories addObject: path];
+    }
+
+    query = @"INSERT INTO paths "
+            @"(path, words_count, moddate, is_directory) "
+            @"VALUES(:path, 0, :moddate, :isdir)";
+
+    statement = [self statementForQuery: query 
+                         withIdentifier: @"insert_or_update_2"
+                               bindings: SQLITE_TEXT, @":path", qpath, 
+                                         SQLITE_FLOAT, @":moddate", interval, 
+                                         SQLITE_INTEGER, @":isdir", isdir, 0];
+
+    STATEMENT_EXECUTE_QUERY (statement, -1);
+
     path_id = sqlite3_last_insert_rowid(db);
 
-    userMdata = [lastRemovedUserMdata objectForKey: path];
-    
-    if (userMdata != nil) {
-      [mdattributes addObjectsFromArray: [userMdata objectForKey: @"attributes"]];
-    }
-        
   } else {
-    query = [NSString stringWithFormat: @"UPDATE paths "
-                                        @"SET words_count = 0, moddate = %f "
-                                        @"WHERE id = %i",
-                                        interval, path_id];
-    PERFORM_WRITE_QUERY (query, -1);
+    query = @"UPDATE paths "
+            @"SET words_count = 0, moddate = :moddate "
+            @"WHERE id = :pathid";
+  
+    statement = [self statementForQuery: query 
+                         withIdentifier: @"insert_or_update_3"
+                               bindings: SQLITE_FLOAT, @":moddate", interval, 
+                                         SQLITE_INTEGER, @":pathid", path_id, 0];
+  
+    STATEMENT_EXECUTE_QUERY (statement, -1);
+  
+    query = @"DELETE FROM attributes WHERE path_id = :pathid";
 
-    query = [NSString stringWithFormat: @"SELECT key, attribute FROM attributes "
-                                        @"WHERE attributes.path_id = %i "
-                                        @"AND isUserMdataKey(key)",
-                                        path_id];
-    [mdattributes addObjectsFromArray: [self performQuery: query]];
+    statement = [self statementForQuery: query 
+                         withIdentifier: @"insert_or_update_4"
+                               bindings: SQLITE_INTEGER, @":pathid", path_id, 0];
 
-    query = [NSString stringWithFormat: @"DELETE FROM attributes "
-                                        @"WHERE path_id = %i", 
-                                        path_id];
-    PERFORM_WRITE_QUERY (query, -1);
+    STATEMENT_EXECUTE_QUERY (statement, -1);
 
-    query = [NSString stringWithFormat: @"DELETE FROM postings "
-                                        @"WHERE path_id = %i", 
-                                        path_id];
-    PERFORM_WRITE_QUERY (query, -1);
+    query = @"DELETE FROM postings WHERE path_id = :pathid";
+
+    statement = [self statementForQuery: query 
+                         withIdentifier: @"insert_or_update_5"
+                               bindings: SQLITE_INTEGER, @":pathid", path_id, 0];
+
+    STATEMENT_EXECUTE_QUERY (statement, -1);
   }
 
   KEY_AND_ATTRIBUTE (@"kMDItemFSName", stringForQuery([path lastPathComponent]));  
@@ -965,12 +1014,16 @@ do { \
     NSString *key = [dict objectForKey: @"key"];  
     NSString *attribute = [dict objectForKey: @"attribute"];  
 
-    GWDebugLog(@"didexist = %i - SETTING %@ FOR %@", didexist, attribute, key);
+    query = @"INSERT INTO attributes (path_id, key, attribute) "
+            @"VALUES(:pathid, :key, :attribute)"; 
 
-    query = [NSString stringWithFormat: @"INSERT INTO attributes (path_id, key, attribute) "
-                                        @"VALUES(%i, '%@', '%@')", 
-                                        path_id, key, attribute];
-    PERFORM_WRITE_QUERY (query, -1);
+    statement = [self statementForQuery: query 
+                         withIdentifier: @"insert_or_update_6"
+                               bindings: SQLITE_INTEGER, @":pathid", path_id, 
+                                         SQLITE_TEXT, @":key", key, 
+                                      SQLITE_TEXT, @":attribute", attribute, 0];
+
+    STATEMENT_EXECUTE_QUERY (statement, -1);
   }
   
   return path_id;
@@ -982,6 +1035,7 @@ do { \
 {
   NSDictionary *wordsdict;
   NSDictionary *attrsdict;
+  SQLitePreparedStatement *statement;
   NSString *query;
         
   wordsdict = [mddict objectForKey: @"words"];
@@ -992,34 +1046,53 @@ do { \
     unsigned wcount = [[wordsdict objectForKey: @"wcount"] unsignedLongValue];
     NSString *word;
 
-    query = [NSString stringWithFormat: @"UPDATE paths "
-                                        @"SET words_count = %i "
-                                        @"WHERE id = %i", 
-                                        wcount, path_id];
-    PERFORM_WRITE_QUERY (query, NO);
+    query = @"UPDATE paths "
+            @"SET words_count = :wcount "
+            @"WHERE id = :pathid";
+
+    statement = [self statementForQuery: query 
+                         withIdentifier: @"set_metadata_1"
+                               bindings: SQLITE_INTEGER, @":wcount", wcount, 
+                                         SQLITE_INTEGER, @":pathid", path_id, 0];
+
+    STATEMENT_EXECUTE_QUERY (statement, NO);
 
     while ((word = [enumerator nextObject])) {
+      NSString *qword = stringForQuery(word);
       unsigned count = [wordset countForObject: word];
+      float score = (1.0 * count / wcount);
       int word_id;
+      
+      query = @"SELECT id FROM words WHERE word = :word";
 
-      query = [NSString stringWithFormat: @"SELECT id FROM words "
-                                          @"WHERE word = '%@'",
-                                          stringForQuery(word)];
-      word_id = [self getIntEntry: query];
-
+      statement = [self statementForQuery: query 
+                           withIdentifier: @"set_metadata_2"
+                                 bindings: SQLITE_TEXT, @":word", qword, 0];
+      
+      word_id = [self getIntEntryWithStatement: statement];
+      
       if (word_id == -1) {
-        query = [NSString stringWithFormat: @"INSERT INTO words (word) "
-                                            @"VALUES('%@')", 
-                                            stringForQuery(word)];
-        PERFORM_WRITE_QUERY (query, NO);
+        query = @"INSERT INTO words (word) VALUES(:word)";
 
+        statement = [self statementForQuery: query 
+                             withIdentifier: @"set_metadata_3"
+                                   bindings: SQLITE_TEXT, @":word", qword, 0];
+      
+        STATEMENT_EXECUTE_QUERY (statement, NO);
+      
         word_id = sqlite3_last_insert_rowid(db);
       }
-            
-      query = [NSString stringWithFormat: @"INSERT INTO postings (word_id, path_id, score) "
-                                          @"VALUES(%i, %i, %f)", 
-                                          word_id, path_id, (1.0 * count / wcount)];
-      PERFORM_WRITE_QUERY (query, NO);
+      
+      query = @"INSERT INTO postings (word_id, path_id, score) "
+              @"VALUES(:wordid, :pathid, :score)";
+              
+      statement = [self statementForQuery: query 
+                           withIdentifier: @"set_metadata_4"
+                                 bindings: SQLITE_INTEGER, @":wordid", word_id,
+                                           SQLITE_INTEGER, @":pathid", path_id, 
+                                           SQLITE_FLOAT, @":score", score, 0];
+              
+      STATEMENT_EXECUTE_QUERY (statement, NO);
     }
   }
 
@@ -1033,34 +1106,42 @@ do { \
       NSString *key = [keys objectAtIndex: i];
       id mdvalue = [attrsdict objectForKey: key];
 
-      if ([mdvalue isKindOfClass: [NSString class]]) {
-        query = [NSString stringWithFormat: @"INSERT INTO attributes "
-                                          @"(path_id, key, attribute) "
-                                          @"VALUES(%i, '%@', '%@')", 
-                                          path_id, key, mdvalue];
+      query = @"INSERT INTO attributes "
+              @"(path_id, key, attribute) "
+              @"VALUES(:pathid, :key, :mdvalue)";
 
-      } else if ([mdvalue isKindOfClass: [NSArray class]]) {
-        query = [NSString stringWithFormat: @"INSERT INTO attributes "
-                                          @"(path_id, key, attribute) "
-                                          @"VALUES(%i, '%@', '%@')", 
-                                          path_id, key, [mdvalue description]];
+      if ([mdvalue isKindOfClass: [NSString class]]) {      
+        statement = [self statementForQuery: query 
+                             withIdentifier: @"set_metadata_5"
+                                   bindings: SQLITE_INTEGER, @":pathid", path_id, 
+                                             SQLITE_TEXT, @":key", key,        
+                                             SQLITE_TEXT, @":mdvalue", mdvalue, 0];
 
+      } else if ([mdvalue isKindOfClass: [NSArray class]]) {     
+        statement = [self statementForQuery: query 
+                             withIdentifier: @"set_metadata_5"
+                                   bindings: SQLITE_INTEGER, @":pathid", path_id, 
+                                             SQLITE_TEXT, @":key", key,        
+                                             SQLITE_TEXT, @":mdvalue", [mdvalue description], 0];
+ 
       } else if ([mdvalue isKindOfClass: [NSNumber class]]) {
-        query = [NSString stringWithFormat: @"INSERT INTO attributes "
-                                          @"(path_id, key, attribute) "
-                                          @"VALUES(%i, '%@', %@)", 
-                                          path_id, key, [mdvalue description]];
+        statement = [self statementForQuery: query 
+                             withIdentifier: @"set_metadata_5"
+                                   bindings: SQLITE_INTEGER, @":pathid", path_id, 
+                                             SQLITE_TEXT, @":key", key,        
+                                             SQLITE_TEXT, @":mdvalue", [mdvalue description], 0];
 
       } else if ([mdvalue isKindOfClass: [NSData class]]) {      
-        query = [NSString stringWithFormat: @"INSERT INTO attributes "
-                                          @"(path_id, key, attribute) "
-                                          @"VALUES(%i, '%@', %s)", 
-                                          path_id, key, [mdvalue bytes]];
+        statement = [self statementForQuery: query 
+                             withIdentifier: @"set_metadata_5"
+                                   bindings: SQLITE_INTEGER, @":pathid", path_id, 
+                                             SQLITE_TEXT, @":key", key,        
+                                             SQLITE_BLOB, @":mdvalue", mdvalue, 0];
       } else {
         return NO;
       }
-     
-      PERFORM_WRITE_QUERY (query, NO);
+      
+      STATEMENT_EXECUTE_QUERY (statement, NO);
     }
   }
 
@@ -1204,7 +1285,7 @@ do { \
         
     if (db != NULL) {
       if (newdb) {
-        if (sqlite3_exec(db, [dbschema UTF8String], NULL, 0, &err) != SQLITE_OK) {
+        if (sqlite3_exec(db, [db_schema UTF8String], NULL, 0, &err) != SQLITE_OK) {
           NSLog(@"unable to create the database at %@", dbpath);
           sqlite3_free(err); 
           return NO;    
@@ -1216,20 +1297,29 @@ do { \
       NSLog(@"unable to open the database at %@", dbpath);
       return NO;
     }    
-        
+
+    if (sqlite3_exec(db, "ATTACH DATABASE ':memory:' AS queries", NULL, 0, &err) != SQLITE_OK) {
+      NSLog(@"unable to open the memory db: %s", err);
+      sqlite3_free(err); 
+      return NO;
+    }
+    
     sqlite3_create_function(db, "pathExists", 1, 
                                 SQLITE_UTF8, 0, path_exists, 0, 0);
 
     sqlite3_create_function(db, "pathMoved", 3, 
                                 SQLITE_UTF8, 0, path_moved, 0, 0);
 
-    sqlite3_create_function(db, "isUserMdataKey", 1, 
-                                SQLITE_UTF8, 0, user_mdata_key, 0, 0);
+//    sqlite3_create_function(db, "isUserMdataKey", 1, 
+//                                SQLITE_UTF8, 0, user_mdata_key, 0, 0);
 
-    [self performWriteQuery: @"PRAGMA cache_size = 20000"];
-    [self performWriteQuery: @"PRAGMA count_changes = 0"];
-    [self performWriteQuery: @"PRAGMA synchronous = OFF"];
-    [self performWriteQuery: @"PRAGMA temp_store = MEMORY"];
+    sqlite3_create_function(db, "timeStamp", 0, 
+                                SQLITE_UTF8, 0, time_stamp, 0, 0);
+
+    [self executeQuery: @"PRAGMA cache_size = 20000"];
+    [self executeQuery: @"PRAGMA count_changes = 0"];
+    [self executeQuery: @"PRAGMA synchronous = OFF"];
+    [self executeQuery: @"PRAGMA temp_store = MEMORY"];
   }
 
   return YES;
@@ -1271,7 +1361,109 @@ do { \
 
 @implementation GMDSExtractor (queries)
 
-- (NSArray *)performQuery:(NSString *)query
+- (id)statementForQuery:(NSString *)query
+         withIdentifier:(id)identifier
+               bindings:(int)firstTipe, ...
+{
+  SQLitePreparedStatement *statement = [self statementWithIdentifier: identifier];
+
+  if (statement == nil) {
+    statement = [SQLitePreparedStatement statementForQuery: query dbHandle: db];
+    
+    if (statement == nil) {
+      return nil;
+    }
+    
+    [preparedStatements setObject: statement forKey: identifier];
+  }
+  
+  if ([statement expired] && ([statement prepare] == NO)) {
+    [preparedStatements removeObjectForKey: identifier];
+    return nil;
+  }
+  
+  if (firstTipe != 0) {  
+    int type = firstTipe;
+    id name;
+    va_list	ap;
+    
+    va_start(ap, firstTipe);   
+  
+    while (type != 0) {    
+      name = va_arg(ap, id); 
+      
+      if (type == SQLITE_INTEGER) {
+        if ([statement bindIntValue: va_arg(ap, int) forName: name] == NO) {
+          va_end(ap);  
+          [preparedStatements removeObjectForKey: identifier];
+          return nil;
+        }
+      
+      } else if (type == SQLITE_FLOAT) {
+        if ([statement bindDoubleValue: va_arg(ap, double) forName: name] == NO) {
+          va_end(ap);  
+          [preparedStatements removeObjectForKey: identifier];
+          return nil;
+        }
+      
+      } else if (type == SQLITE_TEXT) {
+        if ([statement bindTextValue: va_arg(ap, id) forName: name] == NO) {
+          va_end(ap);  
+          [preparedStatements removeObjectForKey: identifier];
+          return nil;
+        }
+
+      } else if (type == SQLITE_BLOB) {
+        if ([statement bindBlobValue: va_arg(ap, id) forName: name] == NO) {
+          va_end(ap);  
+          [preparedStatements removeObjectForKey: identifier];
+          return nil;
+        }
+      
+      } else {
+        va_end(ap);  
+        [preparedStatements removeObjectForKey: identifier];
+        return nil;
+      }
+      
+      type = va_arg(ap, int); 
+    }
+    
+    va_end(ap); 
+  }
+  
+  return statement;
+}
+
+- (SQLitePreparedStatement *)statementWithIdentifier:(id)identifier
+{
+  return [preparedStatements objectForKey: identifier];
+}
+
+- (SQLitePreparedStatement *)statementForQuery:(NSString *)query
+{
+  NSArray *keys = [preparedStatements allKeys];
+  unsigned i;
+  
+  for (i = 0; i < [keys count]; i++) {
+    id key = [keys objectAtIndex: i];
+    SQLitePreparedStatement *statement = [preparedStatements objectForKey: key];
+  
+    if ([[statement query] isEqual: query]) {
+      return statement;
+    }
+  }
+  
+  return nil;
+}
+
+- (void)addPreparedStatement:(SQLitePreparedStatement *)statement
+               forIdentifier:(id)identifier
+{
+  [preparedStatements setObject: statement forKey: identifier];
+}
+
+- (NSArray *)resultsOfQuery:(NSString *)query
 {
   const char *qbuff = [query UTF8String];
   NSMutableArray *lines = [NSMutableArray array];
@@ -1353,7 +1545,86 @@ do { \
   return lines;
 }
 
-- (BOOL)performWriteQuery:(NSString *)query
+- (NSArray *)resultsOfQueryWithStatement:(SQLitePreparedStatement *)statement
+{
+  NSMutableArray *lines = [NSMutableArray array];
+  
+  if (statement) {
+    sqlite3_stmt *handle = [statement handle];
+    int retry = 0;
+    int err;
+    int i;
+
+    while (1) {
+      err = sqlite3_step(handle);
+
+      if (err == SQLITE_ROW) {
+        NSMutableDictionary *line = [NSMutableDictionary dictionary];
+        int count = sqlite3_data_count(handle);
+
+        // we use "<= count" because sqlite sends also 
+        // the id of the entry with type = 0 
+        for (i = 0; i <= count; i++) { 
+          const char *name = sqlite3_column_name(handle, i); 
+
+          if (name != NULL) {
+            int type = sqlite3_column_type(handle, i);
+
+            if (type == SQLITE_INTEGER) {
+              [line setObject: [NSNumber numberWithInt: sqlite3_column_int(handle, i)]
+                       forKey: [NSString stringWithUTF8String: name]];    
+
+            } else if (type == SQLITE_FLOAT) {
+              [line setObject: [NSNumber numberWithDouble: sqlite3_column_double(handle, i)]
+                       forKey: [NSString stringWithUTF8String: name]];    
+
+            } else if (type == SQLITE_TEXT) {
+              [line setObject: [NSString stringWithUTF8String: (const char *)sqlite3_column_text(handle, i)]
+                       forKey: [NSString stringWithUTF8String: name]];    
+
+            } else if (type == SQLITE_BLOB) {
+              const char *bytes = sqlite3_column_blob(handle, i);
+              int length = sqlite3_column_bytes(handle, i); 
+
+              [line setObject: [NSData dataWithBytes: bytes length: length]
+                       forKey: [NSString stringWithUTF8String: name]];    
+            }
+          }
+        }
+
+        [lines addObject: line];
+
+      } else {
+        if (err == SQLITE_DONE) {
+          break;
+
+        } else if (err == SQLITE_BUSY) {
+          CREATE_AUTORELEASE_POOL(arp); 
+          NSDate *when = [NSDate dateWithTimeIntervalSinceNow: 0.1];
+
+          [NSThread sleepUntilDate: when];
+          GWDebugLog(@"retry %i", retry);
+          RELEASE (arp);
+
+          if (retry++ > MAX_RETRY) {
+            NSLog(@"%s", sqlite3_errmsg(db));
+		        break;
+          }
+
+        } else {
+          NSLog(@"%i %s", err, sqlite3_errmsg(db));
+          break;
+        }
+      }
+    }
+
+    [statement reset];
+  }
+      
+  return lines;
+}
+
+- (BOOL)executeQuery:(NSString *)query
 {
   const char *qbuff = [query UTF8String];
   struct sqlite3_stmt *stmt;
@@ -1399,9 +1670,62 @@ do { \
   return YES;
 }
 
+- (BOOL)executeQueryWithStatement:(SQLitePreparedStatement *)statement
+{
+  if (statement) {
+    sqlite3_stmt *handle = [statement handle];
+    int retry = 0;
+    int err;
+
+    while (1) {
+      err = sqlite3_step(handle);
+
+      if (err == SQLITE_DONE) {
+        break;
+
+      } else if (err == SQLITE_BUSY) {
+        CREATE_AUTORELEASE_POOL(arp); 
+        NSDate *when = [NSDate dateWithTimeIntervalSinceNow: 0.1];
+
+        [NSThread sleepUntilDate: when];
+        NSLog(@"retry %i", retry);
+        RELEASE (arp);
+
+        if (retry++ > MAX_RETRY) {
+          NSLog(@"%s", sqlite3_errmsg(db));
+          [statement reset];
+		      return NO;
+        }
+
+      } else {
+        NSLog(@"%s", sqlite3_errmsg(db));
+        [statement reset];
+        return NO;
+      }
+    }
+
+    [statement reset];
+
+    return YES;
+  }
+  
+  return NO;
+}
+
 - (int)getIntEntry:(NSString *)query
 {
-  NSArray *result = [self performQuery: query];
+  NSArray *result = [self resultsOfQuery: query];
+
+  if ([result count]) {
+    return [[[[result objectAtIndex: 0] allValues] objectAtIndex: 0] intValue];
+  }
+
+  return -1;
+}
+
+- (int)getIntEntryWithStatement:(SQLitePreparedStatement *)statement
+{
+  NSArray *result = [self resultsOfQueryWithStatement: statement];
 
   if ([result count]) {
     return [[[[result objectAtIndex: 0] allValues] objectAtIndex: 0] intValue];
@@ -1412,7 +1736,7 @@ do { \
 
 - (float)getFloatEntry:(NSString *)query
 {
-  NSArray *result = [self performQuery: query];
+  NSArray *result = [self resultsOfQuery: query];
 
   if ([result count]) {
     return [[[[result objectAtIndex: 0] allValues] objectAtIndex: 0] floatValue];
@@ -1423,7 +1747,7 @@ do { \
 
 - (NSString *)getStringEntry:(NSString *)query
 {
-  NSArray *result = [self performQuery: query];
+  NSArray *result = [self resultsOfQuery: query];
 
   if ([result count]) {
     return [[[result objectAtIndex: 0] allValues] objectAtIndex: 0];
@@ -1434,7 +1758,7 @@ do { \
 
 - (NSData *)getBlobEntry:(NSString *)query
 {
-  NSArray *result = [self performQuery: query];
+  NSArray *result = [self resultsOfQuery: query];
 
   if ([result count]) {
     return [[[result objectAtIndex: 0] allValues] objectAtIndex: 0];

@@ -27,6 +27,11 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "sqlite.h"
+#include "config.h"
+
+#define GWDebugLog(format, args...) \
+  do { if (GW_DEBUG_LOG) \
+    NSLog(format , ## args); } while (0)
 
 #define MAX_RETRY 1000
 
@@ -468,4 +473,149 @@ NSString *stringForQuery(NSString *str)
   
 	return querystr;
 }
+
+
+@implementation SQLitePreparedStatement
+
+- (void)dealloc
+{
+  if (handle != NULL) {
+    sqlite3_finalize(handle);
+  }
+  RELEASE (query);
+  [super dealloc];
+}
+
++ (id)statementForQuery:(NSString *)querystr
+               dbHandle:(sqlite3 *)dbptr
+{
+  SQLitePreparedStatement *statement = [[self alloc] initForQuery: querystr 
+                                                         dbHandle: dbptr];
+  if (statement) {
+    return [statement autorelease];
+  }
+
+  return nil;
+}
+                    
+- (id)initForQuery:(NSString *)querystr
+          dbHandle:(sqlite3 *)dbptr
+{
+  self = [super init];
+
+  if (self) {
+    ASSIGN (query, stringForQuery(querystr));
+    db = dbptr;
+    handle = NULL;
+    
+    if (sqlite3_prepare(db, [query UTF8String], -1, &handle, NULL) != SQLITE_OK) {
+      NSLog(@"%s", sqlite3_errmsg(db));
+      DESTROY (self);
+    }
+  }
+  
+  return self;
+}
+
+- (BOOL)bindIntValue:(int)value 
+             forName:(NSString *)name
+{
+  int index = sqlite3_bind_parameter_index(handle, [name UTF8String]);
+
+  if (index != 0) {
+    return (sqlite3_bind_int(handle, index, value) == SQLITE_OK);
+  }
+  
+  return NO;
+}
+
+- (BOOL)bindDoubleValue:(double)value 
+                forName:(NSString *)name
+{
+  int index = sqlite3_bind_parameter_index(handle, [name UTF8String]);
+
+  if (index != 0) {
+    return (sqlite3_bind_double(handle, index, value) == SQLITE_OK);
+  }
+  
+  return NO;
+}
+
+- (BOOL)bindTextValue:(NSString *)value 
+              forName:(NSString *)name
+{
+  int index = sqlite3_bind_parameter_index(handle, [name UTF8String]);
+
+  if (index != 0) {
+    return (sqlite3_bind_text(handle, index, [value UTF8String], -1, SQLITE_TRANSIENT) == SQLITE_OK);
+  }
+
+  return NO;
+}
+
+- (BOOL)bindBlobValue:(NSData *)value 
+              forName:(NSString *)name
+{
+  int index = sqlite3_bind_parameter_index(handle, [name UTF8String]);
+
+  if (index != 0) {
+    const char *bytes = [value bytes];
+    return (sqlite3_bind_blob(handle, index, bytes, strlen(bytes), SQLITE_TRANSIENT) == SQLITE_OK);
+  }
+
+  return NO;
+}
+
+- (BOOL)expired
+{
+  return (sqlite3_expired(handle) != 0);
+}
+
+- (BOOL)prepare
+{
+  if (sqlite3_prepare(db, [query UTF8String], -1, &handle, NULL) != SQLITE_OK) {
+    NSLog(@"%s", sqlite3_errmsg(db));
+    return NO;
+  }
+
+  return YES;
+}
+
+- (BOOL)reset
+{
+  return (sqlite3_reset(handle) == SQLITE_OK);
+}
+
+- (BOOL)finalize
+{
+  int err = sqlite3_finalize(handle);
+
+  if (err == SQLITE_OK) {
+    handle = NULL;
+    return YES;
+  }
+  
+  return NO;
+}
+
+- (NSString *)query
+{
+  return query;
+}
+
+- (sqlite3_stmt *)handle
+{
+  return handle;
+}
+
+@end
+
+
+
+
+
+
+
+
+
 

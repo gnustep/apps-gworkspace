@@ -33,16 +33,44 @@
   do { if (GW_DEBUG_LOG) \
     NSLog(format , ## args); } while (0)
 
-#define PERFORM_WRITE_QUERY(q, r) \
+#define EXECUTE_QUERY(q, r) \
 do { \
-  if ([self performWriteQuery: q] == NO) { \
+  if ([self executeQuery: q] == NO) { \
     NSLog(@"error at: %@", q); \
     return r; \
   } \
 } while (0)
 
+#define EXECUTE_OR_ROLLBACK(q, r) \
+do { \
+  if ([self executeQuery: q] == NO) { \
+    [self executeQuery: @"ROLLBACK"]; \
+    NSLog(@"error at: %@", q); \
+    return r; \
+  } \
+} while (0)
+
+#define STATEMENT_EXECUTE_QUERY(s, r) \
+do { \
+  if ([self executeQueryWithStatement: s] == NO) { \
+    NSLog(@"error at: %@", [s query]); \
+    return r; \
+  } \
+} while (0)
+
+#define STATEMENT_EXECUTE_OR_ROLLBACK(s, r) \
+do { \
+  if ([self executeQueryWithStatement: s] == NO) { \
+    [self executeQuery: @"ROLLBACK"]; \
+    NSLog(@"error at: %@", [s query]); \
+    return r; \
+  } \
+} while (0)
+
+
 #define SKIP_EXPIRE (1.0)
-#define USER_MDATA_EXPIRE (10.0)
+#define LOST_PATHS_EXPIRE (60.0)
+#define LOST_PATHS_CHECK (30.0)
 #define SCHED_TIME (1.0)
 
 
@@ -62,12 +90,12 @@ do { \
     id extractor = nil;
     int path_id;
     
-    [self performWriteQuery: @"BEGIN"];
+    EXECUTE_QUERY (@"BEGIN", NO);
     
     path_id = [self insertOrUpdatePath: path withAttributes: attributes];
     
     if (path_id == -1) {
-      [self performWriteQuery: @"COMMIT"];
+      [self executeQuery: @"ROLLBACK"];
       return NO;
     }
 
@@ -79,22 +107,15 @@ do { \
                                 attributes: attributes
                               usingStemmer: stemmer
                                  stopWords: stopWords] == NO) {
-        [self performWriteQuery: @"COMMIT"];
+        [self executeQuery: @"ROLLBACK"];
         return NO;
       }
     }
     
-    [self performWriteQuery: @"COMMIT"];
+    [self executeQuery: @"COMMIT"];
     
     if ([attributes fileType] == NSFileTypeDirectory) {
       NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: path];
-      
-      if ([directories containsObject: path] == NO) {
-        
-        NSLog(@"schedule-add %@", path);
-        
-        [directories addObject: path];
-      }
       
       while (1) {
         CREATE_AUTORELEASE_POOL(arp); 
@@ -114,13 +135,13 @@ do { \
         
           if (attributes) {
             if (skip == NO) {
-              [self performWriteQuery: @"BEGIN"];
+              [self executeQuery: @"BEGIN"];
               
               path_id = [self insertOrUpdatePath: subpath withAttributes: attributes];
     
               if (path_id == -1) {
                 RELEASE (arp);
-                [self performWriteQuery: @"COMMIT"];
+                [self executeQuery: @"ROLLBACK"];
                 return NO;
               }
 
@@ -132,26 +153,19 @@ do { \
                                           attributes: attributes
                                         usingStemmer: stemmer
                                            stopWords: stopWords] == NO) {
-                  [self performWriteQuery: @"COMMIT"];
+                  [self executeQuery: @"ROLLBACK"];
                   RELEASE (arp);
                   return NO;
                 }
               }
               
-              [self performWriteQuery: @"COMMIT"];
+              [self executeQuery: @"COMMIT"];
             }
           
             if ([attributes fileType] == NSFileTypeDirectory) {
               if (skip) {
                 GWDebugLog(@"skipping %@", subpath); 
                 [enumerator skipDescendents];
-              } else {
-                if ([directories containsObject: subpath] == NO) {
-                
-                  NSLog(@"schedule-add %@", subpath);
-                  
-                  [directories addObject: subpath];
-                }
               }
             }
           }
@@ -177,12 +191,12 @@ do { \
     id extractor;
     int path_id;
     
-    [self performWriteQuery: @"BEGIN"];
+    EXECUTE_QUERY (@"BEGIN", NO);
     
     path_id = [self insertOrUpdatePath: path withAttributes: attributes];
     
     if (path_id == -1) {
-      [self performWriteQuery: @"COMMIT"];
+      [self executeQuery: @"ROLLBACK"];
       return NO;
     }
 
@@ -194,12 +208,12 @@ do { \
                                 attributes: attributes
                               usingStemmer: stemmer
                                  stopWords: stopWords] == NO) {
-        [self performWriteQuery: @"COMMIT"];
+        [self executeQuery: @"ROLLBACK"];
         return NO;
       }
     }
     
-    [self performWriteQuery: @"COMMIT"];
+    [self executeQuery: @"COMMIT"];
   }
   
   return YES;
@@ -210,132 +224,157 @@ do { \
 {
   NSString *qpath = stringForQuery(path);
   NSString *qoldpath = stringForQuery(oldpath);
+  SQLitePreparedStatement *statement;
   NSString *query;
-    
-  PERFORM_WRITE_QUERY (@"BEGIN", NO);
+        
+  EXECUTE_QUERY (@"BEGIN", NO);
 
-  query = [NSString stringWithFormat: @"CREATE TABLE paths_tmp "
-                                      @"(id INTEGER PRIMARY KEY, "
-                                      @"path TEXT, "
-                                      @"base TEXT DEFAULT '%@', "
-                                      @"oldbase TEXT DEFAULT '%@')", 
-                                      qpath, qoldpath];
-  PERFORM_WRITE_QUERY (query, NO);
+  statement = [self statementForQuery: @"DELETE FROM renamed_paths" 
+                       withIdentifier: @"update_renamed_1"
+                             bindings: 0];
 
-  query = @"CREATE TRIGGER paths_tmp_trigger AFTER INSERT ON paths_tmp "
-          @"BEGIN "
-          @"UPDATE paths "
-          @"SET path = pathMoved(new.oldbase, new.base, new.path) "
-          @"WHERE id = new.id; "
-          @"END";
-  PERFORM_WRITE_QUERY (query, NO);
+  STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
+
+  statement = [self statementForQuery: @"DELETE FROM renamed_paths_base" 
+                       withIdentifier: @"update_renamed_2"
+                             bindings: 0];
+
+  STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
+
+  query = @"INSERT INTO renamed_paths_base "
+          @"(base, oldbase) "
+          @"VALUES(:path, :oldpath)";
+
+  statement = [self statementForQuery: query 
+                       withIdentifier: @"update_renamed_3"
+                             bindings: SQLITE_TEXT, @":path", qpath, 
+                                       SQLITE_TEXT, @":oldpath", qoldpath, 0];
+
+  STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
+
+  query = @"INSERT INTO renamed_paths "
+          @"(id, path, base, oldbase) "
+          @"SELECT paths.id, paths.path, "
+          @"renamed_paths_base.base, renamed_paths_base.oldbase "
+          @"FROM paths, renamed_paths_base "
+          @"WHERE paths.path = :oldpath";
+
+  statement = [self statementForQuery: query 
+                       withIdentifier: @"update_renamed_4"
+                             bindings: SQLITE_TEXT, @":oldpath", qoldpath, 0];
+
+  STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
+
+  query = @"INSERT INTO renamed_paths "
+          @"(id, path, base, oldbase) "
+          @"SELECT paths.id, paths.path, "
+          @"renamed_paths_base.base, renamed_paths_base.oldbase "
+          @"FROM paths, renamed_paths_base "
+          @"WHERE paths.path > :minpath "
+          @"AND paths.path < :maxpath";
+          
+  statement = [self statementForQuery: query 
+                       withIdentifier: @"update_renamed_5"
+                             bindings: SQLITE_TEXT, 
+                                       @":minpath", 
+               [NSString stringWithFormat: @"%@%@", qoldpath, path_separator()],
+                                       SQLITE_TEXT,
+                                       @":maxpath", 
+                          [NSString stringWithFormat: @"%@0", qoldpath], 0];
+
+  STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
+
+  EXECUTE_QUERY (@"COMMIT", NO);
   
-  query = [NSString stringWithFormat: @"INSERT INTO paths_tmp (id, path) "
-                                      @"SELECT paths.id, paths.path "
-                                      @"FROM paths "
-                                      @"WHERE path = '%@'", qoldpath];
-  PERFORM_WRITE_QUERY (query, NO);
-
-  query = [NSString stringWithFormat: @"INSERT INTO paths_tmp (id, path) "
-                                      @"SELECT paths.id, paths.path "
-                                      @"FROM paths "
-                                      @"WHERE path > '%@%@' "
-                                      @"AND path < '%@0'", 
-                                      qoldpath, path_separator(), qoldpath];
-  PERFORM_WRITE_QUERY (query, NO);
-
-  PERFORM_WRITE_QUERY (@"DROP TRIGGER paths_tmp_trigger", NO);
-  PERFORM_WRITE_QUERY (@"DROP TABLE paths_tmp", NO);
-
-  PERFORM_WRITE_QUERY (@"COMMIT", NO);
-
   return YES;
 }
 
 - (BOOL)removePath:(NSString *)path
 {
   NSString *qpath = stringForQuery(path);
+  SQLitePreparedStatement *statement;
   NSString *query;
-  NSArray *userattrs;
-  unsigned i;
+      
+  EXECUTE_QUERY (@"BEGIN", NO);
+
+  statement = [self statementForQuery: @"DELETE FROM removed_id" 
+                       withIdentifier: @"remove_path_1"
+                             bindings: 0];
+                             
+  STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
+
+  query = @"INSERT INTO removed_id (id) "
+          @"SELECT id FROM paths "
+          @"WHERE path = :path";
+          
+  statement = [self statementForQuery: query 
+                       withIdentifier: @"remove_path_2"
+                             bindings: SQLITE_TEXT, @":path", qpath, 0];
+
+  STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
     
-  PERFORM_WRITE_QUERY (@"BEGIN", NO);
+  query = @"INSERT INTO removed_id (id) "
+          @"SELECT id FROM paths "
+          @"WHERE path > :minpath "
+          @"AND path < :maxpath";
+          
+  statement = [self statementForQuery: query 
+                       withIdentifier: @"remove_path_3"
+                             bindings: SQLITE_TEXT, 
+                                       @":minpath", 
+                [NSString stringWithFormat: @"%@%@", qpath, path_separator()],
+                                       SQLITE_TEXT, 
+                                       @":maxpath",
+                  [NSString stringWithFormat: @"%@0", qpath], 0];
+      
+  STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
 
-  PERFORM_WRITE_QUERY (@"CREATE TABLE id_tmp (id INTEGER PRIMARY KEY)", NO);
-  
-  query = [NSString stringWithFormat: @"INSERT INTO id_tmp (id) "
-                                      @"SELECT id FROM paths "
-                                      @"WHERE path = '%@'", 
-                                      qpath];
-  PERFORM_WRITE_QUERY (query, NO);
-  
-  query = [NSString stringWithFormat: @"INSERT INTO id_tmp (id) "
-                                      @"SELECT id FROM paths "
-                                      @"WHERE path > '%@%@' "
-                                      @"AND path < '%@0'",
-                                      qpath, path_separator(), qpath];
-  PERFORM_WRITE_QUERY (query, NO);
+  query = @"DELETE FROM attributes WHERE path_id IN (SELECT id FROM removed_id)";
 
-  query = @"SELECT paths.path, attributes.key, attributes.attribute " 
-          @"FROM paths, attributes "
-          @"WHERE paths.id IN (SELECT id FROM id_tmp) "
-          @"AND attributes.path_id = paths.id "                                    
-          @"AND isUserMdataKey(attributes.key)";                                     
+  statement = [self statementForQuery: query 
+                       withIdentifier: @"remove_path_4"
+                             bindings: 0];
 
-  userattrs = [self performQuery: query];
-    
-  for (i = 0; i < [userattrs count]; i++) {
-    NSDictionary *dict = [userattrs objectAtIndex: i];
-    NSString *path = [dict objectForKey: @"path"];
-    NSMutableDictionary *mdatadict = [lastRemovedUserMdata objectForKey: path];
-    NSMutableArray *attrs;
-    
-    if (mdatadict == nil) {
-      mdatadict = [NSMutableDictionary dictionary];
-      attrs = [NSMutableArray array];
-      [mdatadict setObject: attrs forKey: @"attributes"];
-      [mdatadict setObject: [NSDate date] forKey: @"stamp"];
-      [lastRemovedUserMdata setObject: mdatadict forKey: path];
-    } else {
-      attrs = [mdatadict objectForKey: @"attributes"];
-    }
-    
-    [attrs addObject: dict];
-  }
+  STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
 
-  PERFORM_WRITE_QUERY (@"DELETE FROM attributes WHERE path_id IN (SELECT id FROM id_tmp)", NO);
-  PERFORM_WRITE_QUERY (@"DELETE FROM postings WHERE path_id IN (SELECT id FROM id_tmp)", NO);
-  PERFORM_WRITE_QUERY (@"DELETE FROM paths WHERE id IN (SELECT id FROM id_tmp)", NO);
+  query = @"DELETE FROM postings WHERE path_id IN (SELECT id FROM removed_id)";
 
-  PERFORM_WRITE_QUERY (@"DROP TABLE id_tmp", NO);
+  statement = [self statementForQuery: query 
+                       withIdentifier: @"remove_path_5"
+                             bindings: 0];
 
-  PERFORM_WRITE_QUERY (@"COMMIT", NO);
+  STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
+
+  query = @"DELETE FROM paths WHERE id IN (SELECT id FROM removed_id)";
+
+  statement = [self statementForQuery: query 
+                       withIdentifier: @"remove_path_6"
+                             bindings: 0];
+
+  STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
+
+  EXECUTE_QUERY (@"COMMIT", NO);
 
   return YES;
 }
 
-- (void)checkLastRemovedUserMdata:(id)sender
+- (void)checkLostPaths:(id)sender
 {
-  CREATE_AUTORELEASE_POOL(arp);  
-  NSArray *paths = [lastRemovedUserMdata allKeys];
   NSDate *now = [NSDate date];
+  unsigned count = [lostPaths count];
   unsigned i;
-
-  RETAIN (paths);
   
-  for (i = 0; i < [paths count]; i++) {
-    NSString *path = [paths objectAtIndex: i];
-    NSDictionary *dict = [lastRemovedUserMdata objectForKey: path];
-    NSDate *stamp = [dict objectForKey: @"stamp"];
-  
-    if ([now timeIntervalSinceDate: stamp] > USER_MDATA_EXPIRE) {
-      [lastRemovedUserMdata removeObjectForKey: path];
-      GWDebugLog(@"expired user-mdata %@", path);
+  for (i = 0; i < count; i++) {
+    NSDictionary *d = [lostPaths objectAtIndex: i];
+    NSDate *stamp = [d objectForKey: @"stamp"];
+    
+    if ([stamp timeIntervalSinceDate: now] > LOST_PATHS_EXPIRE) {
+      GWDebugLog(@"removing expired lost path: %@ ", [d objectForKey: @"path"]);
+      [lostPaths removeObjectAtIndex: i];
+      count--;
+      i--;
     }
-  }
-  
-  RELEASE (paths);
-  RELEASE (arp);
+  }  
 }
 
 - (NSArray *)filteredDirectoryContentsAtPath:(NSString *)path
@@ -365,6 +404,7 @@ do { \
 {
   fswupdatePaths = [NSMutableArray new];
   fswupdateSkipBuff = [NSMutableDictionary new];
+  lostPaths = [NSMutableArray new];
      
   fswupdateTimer = [NSTimer scheduledTimerWithTimeInterval: 1.0 
 						                         target: self 
@@ -372,15 +412,13 @@ do { \
 																   userInfo: nil 
                                     repeats: YES];
   RETAIN (fswupdateTimer);     
-     
-  lastRemovedUserMdata = [NSMutableDictionary new];
-     
-  userMdataTimer = [NSTimer scheduledTimerWithTimeInterval: USER_MDATA_EXPIRE
+          
+  lostPathsTimer = [NSTimer scheduledTimerWithTimeInterval: LOST_PATHS_CHECK
 						                         target: self 
-                                   selector: @selector(checkLastRemovedUserMdata:) 
+                                   selector: @selector(checkLostPaths:) 
 																   userInfo: nil 
                                     repeats: YES];
-  RETAIN (userMdataTimer);     
+  RETAIN (lostPathsTimer);     
      
   fswatcher = nil;
   [self connectFSWatcher];
@@ -403,9 +441,9 @@ do { \
   } else if ([event isEqual: @"GWWatchedPathRenamed"]) {
     NSString *oldpath = [info objectForKey: @"oldpath"];
  
-    if (oldpath != nil) {
-      [dict setObject: oldpath forKey: @"oldpath"];
-    } 
+    if (oldpath != nil) {    
+      [dict setObject: oldpath forKey: @"oldpath"];   
+    }
     
     exists = [NSNumber numberWithBool: YES];
   } 
@@ -420,13 +458,16 @@ do { \
     
     if (skipInfo != nil) {
       NSNumber *didexists = [skipInfo objectForKey: @"exists"];
-      
-      if ([exists isEqual: didexists]) {
+      NSDate *stamp = [skipInfo objectForKey: @"stamp"];
+      NSDate *now = [NSDate date];
+            
+      if ([exists isEqual: didexists]
+             && ([now timeIntervalSinceDate: stamp] < SKIP_EXPIRE)) {
         caninsert = NO;
       } else {
         skipInfo = [NSDictionary dictionaryWithObjectsAndKeys: event, @"event", 
                                                   exists, @"exists",
-                                                  [NSDate date], @"stamp", nil];     
+                                                  now, @"stamp", nil];     
         [fswupdateSkipBuff setObject: skipInfo forKey: path];
       }
     } else {
@@ -438,7 +479,7 @@ do { \
   
     if (caninsert) {
       [fswupdatePaths insertObject: dict atIndex: 0];
-      GWDebugLog(@"inserting: %@ - %@", path, event);
+      GWDebugLog(@"queueing: %@ - %@", path, event);
     }
   }
      
@@ -458,33 +499,83 @@ do { \
     [[NSRunLoop currentRunLoop] runUntilDate: date]; 
     
     if ([event isEqual: @"GWWatchedFileModified"]) {
-      GWDebugLog(@"db update: %@", path);
-      
-      if ([self updatePath: path] == NO) {      
-        NSLog(@"An error occurred while processing %@", path);
+      if ([fm fileExistsAtPath: path]) {
+        GWDebugLog(@"db update: %@", path);
+
+        if ([self updatePath: path] == NO) {      
+          NSLog(@"An error occurred while processing %@", path);
+        }        
+      } else {
+        NSMutableDictionary *d = [NSMutableDictionary dictionary];
+        
+        [d setObject: path forKey: @"path"];
+        [d setObject: [NSDate date] forKey: @"stamp"];
+        
+        GWDebugLog(@"add lost path: %@", path);
+        [lostPaths addObject: d];
       }
-      
+       
     } else if ([event isEqual: @"GWWatchedPathDeleted"]) {
-      GWDebugLog(@"db remove: %@", path);
-      
-      [self removePath: path];
+      if ([fm fileExistsAtPath: path] == NO) {
+        GWDebugLog(@"db remove: %@", path);
+        [self removePath: path];
+      }
 
     } else if ([event isEqual: @"GWWatchedPathRenamed"]) {
-      NSString *oldpath = [dict objectForKey: @"oldpath"];
- 
-      if (oldpath != nil) {
-        GWDebugLog(@"db rename: %@ -> %@", oldpath, path);
+      if ([fm fileExistsAtPath: path]) {
+        NSString *oldpath = [dict objectForKey: @"oldpath"];
+      
+        if (oldpath != nil) {
+          unsigned count = [lostPaths count];
+          unsigned i;
+
+          for (i = 0; i < count; i++) {
+            NSMutableDictionary *d = [lostPaths objectAtIndex: i];
+            NSString *lost = [d objectForKey: @"path"];
+
+            if (subPathOfPath(oldpath, lost)) {
+              unsigned pos = [lost rangeOfString: oldpath].length +1;
+              NSString *part = [lost substringFromIndex: pos];
+              NSString *newpath = [path stringByAppendingPathComponent: part];          
+
+              GWDebugLog(@"found lost path: %@", lost);          
+
+              [self removePath: lost];
+              
+              if ([fm fileExistsAtPath: newpath]) {
+                [self updatePath: newpath]; 
+                [lostPaths removeObjectAtIndex: i];
+                count--;
+                i--;
+              } else {
+                [d setObject: newpath forKey: @"path"];
+                [d setObject: [NSDate date] forKey: @"stamp"];
+                GWDebugLog(@"changed lost path: %@ to: %@", lost, newpath);    
+              }
+            }
+          }
         
-        if ([self updateRenamedPath: path oldPath: oldpath] == NO) { 
-          NSLog(@"An error occurred while processing %@", path);
+          GWDebugLog(@"db rename: %@ -> %@", oldpath, path);
+
+          if ([self updateRenamedPath: path oldPath: oldpath] == NO) { 
+            NSLog(@"An error occurred while processing %@", path);
+          }
+
+        } else {
+          GWDebugLog(@"db update renamed: %@", path);
+
+          if ([self addPath: path] == NO) {      
+            NSLog(@"An error occurred while processing %@", path);
+          }
         }
         
       } else {
-        GWDebugLog(@"db update renamed: %@", path);
+        NSMutableDictionary *d = [NSMutableDictionary dictionary];
         
-        if ([self addPath: path] == NO) {      
-          NSLog(@"An error occurred while processing %@", path);
-        }
+        [d setObject: path forKey: @"path"];
+        [d setObject: [NSDate date] forKey: @"stamp"];
+        [lostPaths addObject: d];
+        GWDebugLog(@"add lost path: %@", path);
       }
     }
        
@@ -505,7 +596,7 @@ do { \
       
       if ([now timeIntervalSinceDate: stamp] > SKIP_EXPIRE) {
         [fswupdateSkipBuff removeObjectForKey: path];
-        GWDebugLog(@"expired skip-info %@", path);
+   //     GWDebugLog(@"expired skip-info %@", path);
       }
     }
     
@@ -606,8 +697,8 @@ do { \
 - (void)setupScheduledUpdater
 {
   CREATE_AUTORELEASE_POOL(arp);
-  NSString *query = @"SELECT path FROM paths WHERE is_directory = 1 AND user_path = 0";
-  NSArray *lines = [self performQuery: query];
+  NSString *query = @"SELECT path FROM paths WHERE is_directory = 1";
+  NSArray *lines = [self resultsOfQuery: query];
   unsigned i;
     
   directories = [NSMutableArray new];
@@ -644,17 +735,30 @@ do { \
       NSMutableDictionary *dbcontents = [NSMutableDictionary dictionary];
       NSArray *dbpaths = nil;
       NSString *qdir = stringForQuery(dir);
+      NSString *sep = path_separator();
       NSString *query;
+      SQLitePreparedStatement *statement;
       NSArray *results;
       unsigned i;
       
-      query = [NSString stringWithFormat: @"SELECT path, moddate FROM paths "
-                                          @"WHERE path > '%@%@' "
-                                          @"AND path < '%@0' "
-                                          @"AND path NOT GLOB '%@%@*%@*'", 
-                                          qdir, path_separator(), qdir, 
-                                          qdir, path_separator(), path_separator()];
-      results = [self performQuery: query];
+      query = @"SELECT path, moddate FROM paths "
+              @"WHERE path > :minpath "
+              @"AND path < :maxpath "
+              @"AND path NOT GLOB :limit";
+               
+      statement = [self statementForQuery: query 
+                           withIdentifier: @"check_next_dir"
+                                 bindings: SQLITE_TEXT,
+                                           @":minpath",
+                      [NSString stringWithFormat: @"%@%@", qdir, sep],                   
+                                           SQLITE_TEXT,
+                                           @":maxpath",                             
+                      [NSString stringWithFormat: @"%@0", qdir],
+                                           SQLITE_TEXT,
+                                           @":limit",                             
+                [NSString stringWithFormat: @"%@%@*%@*", qdir, sep, sep], 0];
+      
+      results = [self resultsOfQueryWithStatement: statement];
 
       for (i = 0; i < [results count]; i++) {
         NSDictionary *dict = [results objectAtIndex: i];
@@ -668,8 +772,7 @@ do { \
         NSNumber *dbdate = [dbcontents objectForKey: path];
         
         if (dbdate == nil) {
-          NSLog(@"schedule-add %@", path);
-        
+          GWDebugLog(@"schedule-add %@", path);
           [self addPath: path];
         
         } else {
@@ -677,11 +780,8 @@ do { \
           NSTimeInterval date = [[attrs fileModificationDate] timeIntervalSinceReferenceDate];
    
           if ((date - [dbdate floatValue]) > 10) {
-          
-            NSLog(@"schedule-update %@ ---- %f - %f", path, date, [dbdate floatValue]);
-          
+            GWDebugLog(@"schedule-update %@ ---- %f - %f", path, date, [dbdate floatValue]);
             [self updatePath: path];
-            
           }
         }
       }    
@@ -692,8 +792,7 @@ do { \
         NSString *path = [dbpaths objectAtIndex: i];
     
         if ([contents containsObject: path] == NO) {
-          NSLog(@"schedule-remove %@", path);
-    
+          GWDebugLog(@"schedule-remove %@", path);
           [self removePath: path];
         }
       }
@@ -702,19 +801,15 @@ do { \
       [self removePath: dir];
       
       RETAIN (dir);
-      
-      NSLog(@"schedule-remove %@", dir);
-      
+      GWDebugLog(@"schedule-remove %@", dir);
       [directories removeObjectAtIndex: dirpos];
       count--;
       dirpos--;
         
       for (i = 0; i < count; i++) {
         if (subPathOfPath(dir, [directories objectAtIndex: i])) {
-          NSLog(@"schedule-remove %@", [directories objectAtIndex: i]);
-        
+          GWDebugLog(@"schedule-remove %@", [directories objectAtIndex: i]);
           [directories removeObjectAtIndex: i];
-
           count--;
           if (dirpos >= i) {
             dirpos--;
@@ -725,8 +820,7 @@ do { \
       
       if (attributes) {
         [self addPath: dir];
-        
-        NSLog(@"schedule-remove->add %@", dir);
+        GWDebugLog(@"schedule-remove->add %@", dir);
       }
       
       RELEASE (dir);

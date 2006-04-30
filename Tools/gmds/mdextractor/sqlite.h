@@ -22,8 +22,8 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef SQLITE_CLIENT_H
-#define SQLITE_CLIENT_H
+#ifndef SQLITE_H
+#define SQLITE_H
 
 #include <Foundation/Foundation.h>
 #include <sqlite3.h>
@@ -56,4 +56,46 @@ NSData *dataFromBlob(const char *blob);
 
 NSString *stringForQuery(NSString *str);
 
-#endif // SQLITE_CLIENT_H
+
+@interface SQLitePreparedStatement: NSObject 
+{
+  NSString *query;
+  sqlite3_stmt *handle;
+  sqlite3 *db;
+}
+
++ (id)statementForQuery:(NSString *)querystr
+               dbHandle:(sqlite3 *)dbptr;
+                     
+- (id)initForQuery:(NSString *)querystr
+          dbHandle:(sqlite3 *)dbptr;
+          
+- (BOOL)bindIntValue:(int)value 
+             forName:(NSString *)name;
+
+- (BOOL)bindDoubleValue:(double)value 
+                forName:(NSString *)name;
+
+- (BOOL)bindTextValue:(NSString *)value 
+              forName:(NSString *)name;
+
+- (BOOL)bindBlobValue:(NSData *)value 
+              forName:(NSString *)name;
+
+- (BOOL)expired;
+
+- (BOOL)prepare;
+
+- (BOOL)reset;
+
+- (BOOL)finalize;
+
+- (NSString *)query;
+
+- (sqlite3_stmt *)handle;
+
+@end
+
+#endif // SQLITE_H
+
+

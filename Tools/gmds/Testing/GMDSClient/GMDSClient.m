@@ -405,33 +405,23 @@ static NSString *nibName = @"GMDSClient";
 @implementation GMDSClient (queries)
 
 #define TABLE(x) \
-@"CREATE TEMP TABLE tab%i \
+@"CREATE TABLE queries.tab%i \
 (path_id INTEGER UNIQUE ON CONFLICT IGNORE, \
-path TEXT, \
+path TEXT UNIQUE ON CONFLICT IGNORE, \
 score REAL); ", x
 
-#define INDEX(x) \
-@"CREATE INDEX tab%i_index ON tab%i(path_id); ", x, x
-
 #define TRIGGER(x) \
-@"CREATE TRIGGER tab%i_trigger BEFORE INSERT ON tab%i \
-WHEN \
-  (SELECT \
-    path_id \
-  FROM \
-    tab%i \
-  WHERE \
-    path_id = new.path_id) NOT NULL \
+@"CREATE TRIGGER queries.tab%i_trigger BEFORE INSERT ON queries.tab%i \
 BEGIN \
   UPDATE tab%i \
   SET \
     score = (score + new.score) \
   WHERE \
     path_id = new.path_id; \
-END; ", x, x, x, x
+END; ", x, x, x
 
 #define INSERT(x, w) \
-@"INSERT INTO tab%i (path_id, path, score) \
+@"INSERT INTO queries.tab%i (path_id, path, score) \
 SELECT \
   paths.id, \
   paths.path, \
@@ -439,31 +429,11 @@ SELECT \
 FROM \
   words, paths, postings \
 WHERE \
+  words.word GLOB '%@' \
+AND \
   postings.word_id = words.id \
 AND \
-  postings.path_id = paths.id \
-AND \
-  words.word GLOB '%@'; ", x, w
-
-/*
-CAMBIATA MA NON PROVATA !!!!!!!!
-ERA COSI':
-
-#define INSERT(x, w) \
-@"INSERT INTO tab%i (path_id, path, score) \
-SELECT \
-  paths.id, \
-  paths.path, \
-  postings.score \
-FROM \
-  words, paths, postings \
-WHERE \
-  postings.word_id = words.id \
-AND \
-  postings.path_id = paths.id \
-AND \
-  words.word GLOB '%@'; ", i, w
-*/
+  postings.path_id = paths.id; ", x, w
 
 
 - (void)prepareQuery
@@ -504,7 +474,9 @@ AND \
     NSMutableString *query = [NSMutableString string];
     NSMutableArray *postqueries = [NSMutableArray array];
     int i;
-
+    
+    [prequeries addObject: @"BEGIN"];
+    
     for (i = 0; i < count; i++) {
       NSString *part;
 
@@ -513,8 +485,6 @@ AND \
       
       part = [NSString stringWithFormat: TABLE(i)];
       [prequeries addObject: part];
-   //   part = [NSString stringWithFormat: INDEX(i)];
-   //   [prequeries addObject: part];
       part = [NSString stringWithFormat: TRIGGER(i)];
       [prequeries addObject: part];
       part = [NSString stringWithFormat: INSERT(i, word)];
@@ -564,6 +534,7 @@ AND \
       [postqueries addObject: part];
     }
     
+    [postqueries addObject: @"COMMIT"];
     
     [queryInfo setObject: prequeries forKey: @"pre_queries"];
     [queryInfo setObject: query forKey: @"query"];

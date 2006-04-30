@@ -74,6 +74,7 @@ static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv
   }
   
   RELEASE (dbpath);
+  RELEASE (dbdir);
   
   [super dealloc];
 }
@@ -83,7 +84,6 @@ static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv
   self = [super init];
   
   if (self) {    
-    NSString *dbdir;
     BOOL isdir;
 
     fm = [NSFileManager defaultManager];
@@ -118,7 +118,8 @@ static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv
         return self;
       }
     }
-
+    
+    RETAIN (dbdir);
     ASSIGN (dbpath, [dbdir stringByAppendingPathComponent: @"contents.db"]);    
     db = NULL;
 
@@ -476,7 +477,7 @@ static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv
         
     if (db != NULL) {
       if (newdb) {
-        if (sqlite3_exec(db, [dbschema UTF8String], NULL, 0, &err) != SQLITE_OK) {
+        if (sqlite3_exec(db, [db_schema UTF8String], NULL, 0, &err) != SQLITE_OK) {
           NSLog(@"unable to create the database at %@", dbpath);
           sqlite3_free(err); 
           return NO;    
@@ -488,6 +489,8 @@ static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv
       NSLog(@"unable to open the database at %@", dbpath);
       return NO;
     }    
+
+    performWriteQuery(db, @"ATTACH DATABASE ':memory:' AS queries");
     
     sqlite3_create_function(db, "pathExists", 1, 
                                 SQLITE_UTF8, 0, path_exists, 0, 0);
