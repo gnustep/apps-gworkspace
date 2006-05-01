@@ -258,17 +258,6 @@ static NSFileManager *fm = nil;
   return interval;
 }
 
-- (oneway void)synchronize
-{
-  [pathslock lock];
-  [pathsManager synchronize];
-  [pathslock unlock];
-  
-  [dirslock lock];
-  [dirsManager synchronize];
-  [dirslock unlock];
-}
-
 - (void)connectionBecameInvalid:(NSNotification *)notification
 {
   id connection = [notification object];

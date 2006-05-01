@@ -98,6 +98,7 @@
   BOOL indexingEnabled;
   BOOL extracting;
   BOOL subpathsChanged;  
+  NSString *dbdir;
   NSString *dbpath;
   sqlite3 *db;
   NSMutableDictionary *preparedStatements;

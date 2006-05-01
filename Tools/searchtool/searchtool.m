@@ -44,7 +44,6 @@
 
 @protocol	DDBd
 
-- (BOOL)dbactive;
 - (NSString *)annotationsForPath:(NSString *)path;
 
 @end
@@ -405,7 +404,7 @@
 - (NSString *)ddbdGetAnnotationsForPath:(NSString *)path
 {
   [self connectDDBd];
-  if (ddbd && [ddbd dbactive]) {
+  if (ddbd != nil) {
     return [ddbd annotationsForPath: path];
   }
   return nil;

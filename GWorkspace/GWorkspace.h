@@ -84,8 +84,6 @@
 
 @protocol	DDBdProtocol
 
-- (BOOL)dbactive;
-
 - (oneway void)insertPath:(NSString *)path;
 
 - (oneway void)removePath:(NSString *)path;

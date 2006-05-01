@@ -48,8 +48,6 @@
 
 - (NSTimeInterval)timestampOfPath:(NSString *)path;
 
-- (oneway void)synchronize;
-
 @end
 
     

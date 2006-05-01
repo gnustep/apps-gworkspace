@@ -50,7 +50,6 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
 
 @protocol	DDBd
 
-- (BOOL)dbactive;
 - (oneway void)insertPath:(NSString *)path;
 - (oneway void)insertDirectoryTreesFromPaths:(NSData *)info;
 - (oneway void)removeTreesFromPaths:(NSData *)info;
@@ -903,7 +902,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
 - (void)ddbdInsertTrees
 {
   [self connectDDBd];
-  if (ddbd && [ddbd dbactive]) {
+  if (ddbd != nil) {
     NSData *info = [NSArchiver archivedDataWithRootObject: searchPaths];
     
     [NSTimer scheduledTimerWithTimeInterval: 10
@@ -919,7 +918,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
 - (void)ddbdInsertDirectoryTreesFromPaths:(NSArray *)paths
 {
   [self connectDDBd];
-  if (ddbd && [ddbd dbactive]) {
+  if (ddbd != nil) {
     NSData *info = [NSArchiver archivedDataWithRootObject: paths];
     [ddbd insertDirectoryTreesFromPaths: info];
   }
@@ -928,7 +927,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
 - (NSArray *)ddbdGetDirectoryTreeFromPath:(NSString *)path
 {
   [self connectDDBd];
-  if (ddbd && [ddbd dbactive]) {
+  if (ddbd != nil) {
     NSData *data = [ddbd directoryTreeFromPath: path];  
 
     if (data) {
@@ -942,7 +941,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
 - (void)ddbdRemoveTreesFromPaths:(NSArray *)paths
 {
   [self connectDDBd];
-  if (ddbd && [ddbd dbactive]) {
+  if (ddbd != nil) {
     [ddbd removeTreesFromPaths: [NSArchiver archivedDataWithRootObject: paths]];
   }
 }
@@ -950,7 +949,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
 - (NSString *)ddbdGetAnnotationsForPath:(NSString *)path
 {
   [self connectDDBd];
-  if (ddbd && [ddbd dbactive]) {
+  if (ddbd != nil) {
     return [ddbd annotationsForPath: path];
   }
   return nil;
@@ -959,7 +958,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
 - (NSTimeInterval)ddbdGetTimestampOfPath:(NSString *)path
 {
   [self connectDDBd];
-  if (ddbd && [ddbd dbactive]) {
+  if (ddbd != nil) {
     return [ddbd timestampOfPath: path];
   }
   return 0.0;

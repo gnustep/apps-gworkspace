@@ -1710,26 +1710,26 @@ static GWorkspace *gworkspace = nil;
 
 - (BOOL)ddbdactive
 {
-  return ((terminating == NO) && (ddbd && [ddbd dbactive]));
+  return ((terminating == NO) && (ddbd != nil));
 }
 
 - (void)ddbdInsertPath:(NSString *)path
 {
-  if (ddbd && [ddbd dbactive]) {
+  if (ddbd != nil) {
     [ddbd insertPath: path];
   }
 }
 
 - (void)ddbdRemovePath:(NSString *)path
 {
-  if (ddbd && [ddbd dbactive]) {
+  if (ddbd != nil) {
     [ddbd removePath: path];
   }
 }
 
 - (NSString *)ddbdGetAnnotationsForPath:(NSString *)path
 {
-  if (ddbd && [ddbd dbactive]) {
+  if (ddbd != nil) {
     return [ddbd annotationsForPath: path];
   }
   
@@ -1739,7 +1739,7 @@ static GWorkspace *gworkspace = nil;
 - (void)ddbdSetAnnotations:(NSString *)annotations
                    forPath:(NSString *)path
 {
-  if (ddbd && [ddbd dbactive]) {
+  if (ddbd != nil) {
     [ddbd setAnnotations: annotations forPath: path];
   }
 }

@@ -154,6 +154,7 @@ static void user_mdata_key(sqlite3_context *context, int argc, sqlite3_value **a
   RELEASE (indexablePaths);
   freeTree(excludedPathsTree);
   RELEASE (dbpath);
+  RELEASE (dbdir);
   RELEASE (preparedStatements);
   RELEASE (indexedStatusPath);
   RELEASE (indexedStatusLock);
@@ -204,7 +205,6 @@ static void user_mdata_key(sqlite3_context *context, int argc, sqlite3_value **a
   if (self) {
     NSUserDefaults *defaults;
     id entry;
-    NSString *dbdir;
     NSString *lockpath;
     BOOL isdir;    
     unsigned i;
@@ -246,6 +246,7 @@ static void user_mdata_key(sqlite3_context *context, int argc, sqlite3_value **a
       }
     }
 
+    RETAIN (dbdir);
     ASSIGN (dbpath, [dbdir stringByAppendingPathComponent: @"contents.db"]);    
     
     db = NULL;
@@ -952,7 +953,7 @@ do { \
                        withIdentifier: @"insert_or_update_1"
                              bindings: SQLITE_TEXT, @":path", qpath, 0];
                              
-  path_id = [self getIntEntryWithStatement: statement];    
+  path_id = [self getIntEntryWithStatement: statement];
   
   didexist = (path_id != -1);
      

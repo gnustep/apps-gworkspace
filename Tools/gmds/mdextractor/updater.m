@@ -257,30 +257,14 @@ do { \
           @"SELECT paths.id, paths.path, "
           @"renamed_paths_base.base, renamed_paths_base.oldbase "
           @"FROM paths, renamed_paths_base "
-          @"WHERE paths.path = :oldpath";
-
-  statement = [self statementForQuery: query 
-                       withIdentifier: @"update_renamed_4"
-                             bindings: SQLITE_TEXT, @":oldpath", qoldpath, 0];
-
-  STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
-
-  query = @"INSERT INTO renamed_paths "
-          @"(id, path, base, oldbase) "
-          @"SELECT paths.id, paths.path, "
-          @"renamed_paths_base.base, renamed_paths_base.oldbase "
-          @"FROM paths, renamed_paths_base "
-          @"WHERE paths.path > :minpath "
-          @"AND paths.path < :maxpath";
+          @"WHERE paths.path = :oldpath "
+          @"OR paths.path GLOB :minpath ";
           
   statement = [self statementForQuery: query 
-                       withIdentifier: @"update_renamed_5"
-                             bindings: SQLITE_TEXT, 
-                                       @":minpath", 
-               [NSString stringWithFormat: @"%@%@", qoldpath, path_separator()],
-                                       SQLITE_TEXT,
-                                       @":maxpath", 
-                          [NSString stringWithFormat: @"%@0", qoldpath], 0];
+                       withIdentifier: @"update_renamed_4"
+                             bindings: SQLITE_TEXT, @":oldpath", qoldpath,
+                                       SQLITE_TEXT, @":minpath", 
+        [NSString stringWithFormat: @"%@%@*", qoldpath, path_separator()], 0];
 
   STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
 
@@ -302,37 +286,24 @@ do { \
                              bindings: 0];
                              
   STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
-
-  query = @"INSERT INTO removed_id (id) "
-          @"SELECT id FROM paths "
-          @"WHERE path = :path";
-          
-  statement = [self statementForQuery: query 
-                       withIdentifier: @"remove_path_2"
-                             bindings: SQLITE_TEXT, @":path", qpath, 0];
-
-  STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
     
   query = @"INSERT INTO removed_id (id) "
           @"SELECT id FROM paths "
-          @"WHERE path > :minpath "
-          @"AND path < :maxpath";
+          @"WHERE path = :path "
+          @"OR path GLOB :minpath";
           
   statement = [self statementForQuery: query 
-                       withIdentifier: @"remove_path_3"
-                             bindings: SQLITE_TEXT, 
-                                       @":minpath", 
-                [NSString stringWithFormat: @"%@%@", qpath, path_separator()],
-                                       SQLITE_TEXT, 
-                                       @":maxpath",
-                  [NSString stringWithFormat: @"%@0", qpath], 0];
+                       withIdentifier: @"remove_path_2"
+                             bindings: SQLITE_TEXT, @":path", qpath,
+                                       SQLITE_TEXT, @":minpath", 
+          [NSString stringWithFormat: @"%@%@*", qpath, path_separator()], 0];
       
   STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
 
   query = @"DELETE FROM attributes WHERE path_id IN (SELECT id FROM removed_id)";
 
   statement = [self statementForQuery: query 
-                       withIdentifier: @"remove_path_4"
+                       withIdentifier: @"remove_path_3"
                              bindings: 0];
 
   STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
@@ -340,7 +311,7 @@ do { \
   query = @"DELETE FROM postings WHERE path_id IN (SELECT id FROM removed_id)";
 
   statement = [self statementForQuery: query 
-                       withIdentifier: @"remove_path_5"
+                       withIdentifier: @"remove_path_4"
                              bindings: 0];
 
   STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
@@ -348,7 +319,7 @@ do { \
   query = @"DELETE FROM paths WHERE id IN (SELECT id FROM removed_id)";
 
   statement = [self statementForQuery: query 
-                       withIdentifier: @"remove_path_6"
+                       withIdentifier: @"remove_path_5"
                              bindings: 0];
 
   STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
