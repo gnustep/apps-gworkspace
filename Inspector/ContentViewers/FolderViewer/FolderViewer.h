@@ -57,8 +57,6 @@
 
 - (int)sortTypeForPath:(NSString *)path;
 
-- (void)newSortType:(id)sender;
-
 - (void)setNewSortType:(id)sender;
 
 @end

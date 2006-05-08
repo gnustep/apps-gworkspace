@@ -26,20 +26,19 @@
 #define DDBD_H
 
 #include <Foundation/Foundation.h>
+#include "sqlite.h"
 
 @protocol	DDBdProtocol
-
-- (BOOL)dbactive;
 
 - (oneway void)insertPath:(NSString *)path;
 
 - (oneway void)removePath:(NSString *)path;
 
-- (void)insertDirectoryTreesFromPaths:(NSData *)info;
+- (oneway void)insertDirectoryTreesFromPaths:(NSData *)info;
 
-- (void)removeTreesFromPaths:(NSData *)info;
+- (oneway void)removeTreesFromPaths:(NSData *)info;
 
-- (NSData *)directoryTreeFromPath:(NSString *)apath;
+- (NSData *)directoryTreeFromPath:(NSString *)path;
 
 - (NSString *)annotationsForPath:(NSString *)path;
 
@@ -48,45 +47,123 @@
 
 - (NSTimeInterval)timestampOfPath:(NSString *)path;
 
+- (void)registerUpdater:(id)anObject;
+
+@end
+
+
+@protocol	DBUpdaterProtocol
+
+- (BOOL)openDbAtPath:(NSString *)dbpath;
+
+- (oneway void)insertTrees:(NSData *)info;
+
+- (oneway void)removeTrees:(NSData *)info;
+
+- (oneway void)fileSystemDidChange:(NSData *)info;
+
+- (oneway void)scheduledUpdate;
+
 @end
 
     
-@interface DDBd: NSObject <DDBdProtocol>
+@interface DDBd: NSObject 
 {
   NSString *dbdir;
+  NSString *dbpath;
+  sqlite3 *db;
+  SQLiteQueryManager *qmanager;
+  
+  NSConnection *updaterconn;
+  id <DBUpdaterProtocol> updater;
+  
   NSConnection *conn;
   NSNotificationCenter *nc; 
+  NSFileManager *fm;
 }
-                                                     
-- (void)connectionBecameInvalid:(NSNotification *)notification;
 
+- (void)registerUpdater:(id)anObject;
+
+- (oneway void)insertPath:(NSString *)path;
+      
+- (oneway void)removePath:(NSString *)path;
+
+- (oneway void)insertDirectoryTreesFromPaths:(NSData *)info;
+
+- (oneway void)removeTreesFromPaths:(NSData *)info;
+
+- (NSData *)directoryTreeFromPath:(NSString *)apath;
+
+- (NSData *)attributeForKey:(NSString *)key
+                     atPath:(NSString *)path;
+
+- (BOOL)setAttribute:(NSData *)attribute
+              forKey:(NSString *)key
+              atPath:(NSString *)path;
+
+- (NSTimeInterval)timestampOfPath:(NSString *)path;
+
+- (NSString *)annotationsForPath:(NSString *)path;
+
+- (oneway void)setAnnotations:(NSString *)annotations
+                      forPath:(NSString *)path;
+                                                     
 - (void)fileSystemDidChange:(NSNotification *)notif;
 
-- (void)threadWillExit:(NSNotification *)notification;
+- (void)performScheduledUpdate:(id)sender;
+
+- (BOOL)opendb;
+
+- (void)connectionBecameInvalid:(NSNotification *)notification;
+
+- (BOOL)connection:(NSConnection *)ancestor
+            shouldMakeNewConnection:(NSConnection *)newConn;
             
 @end
 
 
 @interface DBUpdater: NSObject
 {
-  NSDictionary *updinfo;
+  sqlite3 *db;
+  SQLiteQueryManager *qmanager;
+  NSFileManager *fm;
 }
 
-+ (void)updaterForTask:(NSDictionary *)info;
++ (void)newUpdater:(NSArray *)ports;
 
-- (void)setUpdaterTask:(NSDictionary *)info;
+- (BOOL)openDbAtPath:(NSString *)dbpath;
 
-- (void)insertTrees;
+- (oneway void)insertTrees:(NSData *)info;
 
-- (void)removeTrees;
+- (oneway void)removeTrees:(NSData *)info;
 
-- (void)fileSystemDidChange;
+- (oneway void)fileSystemDidChange:(NSData *)info;
+
+- (oneway void)scheduledUpdate;
 
 @end
 
 
+int insertPathIfNeeded(NSString *path, sqlite3 *db, SQLiteQueryManager *qmanager);
+
+BOOL removePath(NSString *path, SQLiteQueryManager *qmanager);
+
+BOOL renamePath(NSString *path, NSString *oldpath, SQLiteQueryManager *qmanager);
+
+BOOL copyPath(NSString *srcpath, NSString *dstpath, SQLiteQueryManager *qmanager);
+
+
 BOOL subpath(NSString *p1, NSString *p2);
+
 NSString *pathsep(void);
+
 NSString *removePrefix(NSString *path, NSString *prefix);
+
+
+static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv);
+
+static void path_moved(sqlite3_context *context, int argc, sqlite3_value **argv);
+
+static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv);
 
 #endif // DDBD_H

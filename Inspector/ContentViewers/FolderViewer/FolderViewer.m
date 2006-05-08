@@ -93,7 +93,7 @@
 
 	  [matrix sizeToCells];
 	  [matrix setTarget: self];
-	  [matrix setAction: @selector(newSortType:)];
+	  [matrix setAction: @selector(setNewSortType:)];
 
 		label = [[NSTextField alloc] initWithFrame: NSMakeRect(8, 55, 240, 60)];	
 		[label setFont: [NSFont systemFontOfSize: 12]];
@@ -112,8 +112,6 @@
     [okButt setImage: [NSImage imageNamed: @"common_ret.tiff"]];
     [okButt setImagePosition: NSImageRight];
 	  [okButt setTitle: NSLocalizedString(@"Ok", @"")];
-	  [okButt setTarget: self];
-	  [okButt setAction: @selector(setNewSortType:)];	
     [okButt setEnabled: NO];		
 		[self addSubview: okButt]; 
     RELEASE (okButt);
@@ -210,17 +208,10 @@
 	return byname;
 }
 
-- (void)newSortType:(id)sender
-{
-	sortType = [[sender selectedCell] tag];
-  
-  [self setNewSortType: nil];
-  
-//	[okButt setEnabled: YES];
-}
-
 - (void)setNewSortType:(id)sender
 {
+	sortType = [[sender selectedCell] tag];
+
   if ([fm isWritableFileAtPath: currentPath]) {
     NSString *sortstr = [NSString stringWithFormat: @"%i", sortType];
     NSDictionary *dict = [NSDictionary dictionaryWithObject: sortstr 
@@ -233,9 +224,7 @@
           postNotificationName: @"GWSortTypeDidChangeNotification"
                         object: currentPath
                       userInfo: dict];
-  }
-	
-//  [okButt setEnabled: NO];	
+  }	
 }
 
 @end

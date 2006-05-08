@@ -23,29 +23,65 @@
  */
 
 #include <AppKit/AppKit.h>
-#include "DBKBTreeNode.h"
-#include "DBKVarLenRecordsFile.h"
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "ddbd.h"
-#include "DDBPathsManager.h"
-#include "DDBDirsManager.h"
+#include "dbschema.h"
 #include "config.h"
 
 #define GWDebugLog(format, args...) \
   do { if (GW_DEBUG_LOG) \
     NSLog(format , ## args); } while (0)
+
+#define EXECUTE_QUERY(q, r) \
+do { \
+  if ([qmanager executeQuery: q] == NO) { \
+    NSLog(@"error at: %@", q); \
+    return r; \
+  } \
+} while (0)
+
+#define EXECUTE_OR_ROLLBACK(q, r) \
+do { \
+  if ([qmanager executeQuery: q] == NO) { \
+    [qmanager executeQuery: @"ROLLBACK"]; \
+    NSLog(@"error at: %@", q); \
+    return r; \
+  } \
+} while (0)
+
+#define STATEMENT_EXECUTE_QUERY(s, r) \
+do { \
+  if ([qmanager executeQueryWithStatement: s] == NO) { \
+    NSLog(@"error at: %@", [s query]); \
+    return r; \
+  } \
+} while (0)
+
+#define STATEMENT_EXECUTE_OR_ROLLBACK(s, r) \
+do { \
+  if ([qmanager executeQueryWithStatement: s] == NO) { \
+    [qmanager executeQuery: @"ROLLBACK"]; \
+    NSLog(@"error at: %@", [s query]); \
+    return r; \
+  } \
+} while (0)
+
+#define SCHEDULE_UPDATE 3600
+
+/*
+60
+3600
+86400
+*/        
+
     
 enum {   
   DDBdInsertTreeUpdate,
   DDBdRemoveTreeUpdate,
-  DDBdFileOperationUpdate
+  DDBdFileOperationUpdate,
+  DDBdScheduledUpdate
 };
-
-static DDBPathsManager *pathsManager = nil; 
-static NSRecursiveLock *pathslock = nil; 
-static DDBDirsManager *dirsManager = nil; 
-static NSRecursiveLock *dirslock = nil; 
-
-static NSFileManager *fm = nil;
 
 
 @implementation	DDBd
@@ -61,8 +97,17 @@ static NSFileManager *fm = nil;
     DESTROY (conn);
   }
 
+  if (db != NULL) {
+    closedb(db);
+  }
+  
   RELEASE (dbdir);
-            
+  RELEASE (dbpath);
+  RELEASE (qmanager);
+
+  DESTROY (updater);
+  DESTROY (updaterconn);
+              
   [super dealloc];
 }
 
@@ -71,13 +116,15 @@ static NSFileManager *fm = nil;
   self = [super init];
   
   if (self) {   
-    NSString *basepath;
-    BOOL isdir;
+    NSPort *port[2];
+    NSArray *ports;
+    BOOL isdir;    
     
-    fm = [NSFileManager defaultManager];
-    
-    basepath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
-    ASSIGN (dbdir, [basepath stringByAppendingPathComponent: @"ddbd"]);
+    fm = [NSFileManager defaultManager]; 
+    nc = [NSNotificationCenter defaultCenter];
+
+    dbdir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
+    dbdir = [dbdir stringByAppendingPathComponent: @"gmds"];
 
     if (([fm fileExistsAtPath: dbdir isDirectory: &isdir] &isdir) == NO) {
       if ([fm createDirectoryAtPath: dbdir attributes: nil] == NO) { 
@@ -87,8 +134,36 @@ static NSFileManager *fm = nil;
       }
     }
 
-    nc = [NSNotificationCenter defaultCenter];
-               
+    dbdir = [dbdir stringByAppendingPathComponent: @".db"];
+
+    if (([fm fileExistsAtPath: dbdir isDirectory: &isdir] &isdir) == NO) {
+      if ([fm createDirectoryAtPath: dbdir attributes: nil] == NO) { 
+        NSLog(@"unable to create: %@", dbdir);
+        DESTROY (self);
+        return self;
+      }
+    }
+    
+    dbdir = [dbdir stringByAppendingPathComponent: @"v1"];
+
+    if (([fm fileExistsAtPath: dbdir isDirectory: &isdir] &isdir) == NO) {
+      if ([fm createDirectoryAtPath: dbdir attributes: nil] == NO) { 
+        NSLog(@"unable to create: %@", dbdir);
+        DESTROY (self);
+        return self;
+      }
+    }
+
+    RETAIN (dbdir);
+    ASSIGN (dbpath, [dbdir stringByAppendingPathComponent: @"user.db"]);    
+    
+    db = NULL;
+
+    if ([self opendb] == NO) {
+      DESTROY (self);
+      return self;    
+    }
+
     conn = [NSConnection defaultConnection];
     [conn setRootObject: self];
     [conn setDelegate: self];
@@ -103,159 +178,333 @@ static NSFileManager *fm = nil;
            selector: @selector(connectionBecameInvalid:)
 	             name: NSConnectionDidDieNotification
 	           object: conn];
-
-    [nc addObserver: self
-       selector: @selector(threadWillExit:)
-           name: NSThreadWillExitNotification
-         object: nil];    
     
     [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
                 				  selector: @selector(fileSystemDidChange:) 
                 					    name: @"GWFileSystemDidChangeNotification"
                 					  object: nil];
 
-    pathsManager = [[DDBPathsManager alloc] initWithBasePath: dbdir];
-    pathslock = [NSRecursiveLock new];
-    dirsManager = [[DDBDirsManager alloc] initWithBasePath: dbdir];
-    dirslock = [NSRecursiveLock new];
-        
-    NSLog(@"ddbd started");    
+    port[0] = (NSPort *)[NSPort port];
+    port[1] = (NSPort *)[NSPort port];
+
+    ports = [NSArray arrayWithObjects: port[1], port[0], nil];
+
+    updaterconn = [[NSConnection alloc] initWithReceivePort: port[0]
+				                                           sendPort: port[1]];
+    [updaterconn setRootObject: self];
+    [updaterconn setDelegate: self];
+    RETAIN (updaterconn);
+
+    [nc addObserver: self
+           selector: @selector(connectionBecameInvalid:)
+               name: NSConnectionDidDieNotification
+             object: updaterconn];    
+    
+    updater = nil;
+    
+    NS_DURING
+      {
+        [NSThread detachNewThreadSelector: @selector(newUpdater:)
+		                             toTarget: [DBUpdater class]
+		                           withObject: ports];
+      }
+    NS_HANDLER
+      {
+        NSLog(@"A fatal error occured while detaching the updater thread! Exiting.");
+        closedb(db);
+        exit(EXIT_FAILURE);        
+      }
+    NS_ENDHANDLER
+
+    NSLog(@"ddbd started");  
   }
   
   return self;    
 }
 
-- (BOOL)dbactive
+- (void)registerUpdater:(id)anObject
 {
-  return YES;
+  [anObject setProtocolForProxy: @protocol(DBUpdaterProtocol)];
+  updater = (id <DBUpdaterProtocol>)[anObject retain];
+  
+  if ([updater openDbAtPath: dbpath] == NO) {
+    NSLog(@"The updater thread is unable to open the db! Exiting.");
+    closedb(db);
+    exit(EXIT_FAILURE);        
+  }
+  
+  [NSTimer scheduledTimerWithTimeInterval: SCHEDULE_UPDATE
+                                   target: self
+                                 selector: @selector(performScheduledUpdate:)
+                                 userInfo: nil
+                                  repeats: YES];
+  
+  NSLog(@"updater thread started");
 }
 
 - (oneway void)insertPath:(NSString *)path
 {
-  NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: NO];
-
-  if (attributes) {
-    [pathslock lock];
-    [pathsManager addPath: path];
-    [pathslock unlock];
-    
-    if ([attributes fileType] == NSFileTypeDirectory) {
-      [dirslock lock];
-      [dirsManager addDirectory: path];
-      [dirslock unlock];
-    }
-  }
+  if ([qmanager executeQuery: @"BEGIN"] == NO) {      
+    NSLog(@"error at insertPath: %@", path);  
+    return;   
+  }     
+  if (insertPathIfNeeded(path, db, qmanager) != -1) {      
+    [qmanager executeQuery: @"COMMIT"];    
+  }   
 }
 
 - (oneway void)removePath:(NSString *)path
 {
-  [pathslock lock];
-  [pathsManager removePath: path];
-  [pathslock unlock];
-  
-  [dirslock lock];
-  [dirsManager removeDirectory: path];
-  [dirslock unlock];
+  if ([qmanager executeQuery: @"BEGIN"] == NO) {      
+    NSLog(@"error at removePath: %@", path); 
+    return;   
+  }     
+  if (removePath(path, qmanager)) {      
+    [qmanager executeQuery: @"COMMIT"];    
+  }   
 }
 
-- (void)insertDirectoryTreesFromPaths:(NSData *)info
+- (oneway void)insertDirectoryTreesFromPaths:(NSData *)info
 {
-  NSArray *paths = [NSUnarchiver unarchiveObjectWithData: info];
-  NSMutableDictionary *updaterInfo = [NSMutableDictionary dictionary];
-  NSDictionary *dict = [NSDictionary dictionaryWithObject: paths 
-                                                   forKey: @"paths"];
-    
-  [updaterInfo setObject: [NSNumber numberWithInt: DDBdInsertTreeUpdate] 
-                  forKey: @"type"];
-  [updaterInfo setObject: dict forKey: @"taskdict"];
-
-  NS_DURING
-    {
-      [NSThread detachNewThreadSelector: @selector(updaterForTask:)
-		                           toTarget: [DBUpdater class]
-		                         withObject: updaterInfo];
-    }
-  NS_HANDLER
-    {
-      NSLog(@"A fatal error occured while detaching the thread!");
-    }
-  NS_ENDHANDLER
+  GWDebugLog(@"starting db update");
+  [updater insertTrees: info];
 }
 
-- (void)removeTreesFromPaths:(NSData *)info
+- (oneway void)removeTreesFromPaths:(NSData *)info
 {
-  NSArray *paths = [NSUnarchiver unarchiveObjectWithData: info];
-  NSMutableDictionary *updaterInfo = [NSMutableDictionary dictionary];
-  NSDictionary *dict = [NSDictionary dictionaryWithObject: paths 
-                                                   forKey: @"paths"];
-
-  [updaterInfo setObject: [NSNumber numberWithInt: DDBdRemoveTreeUpdate] 
-                  forKey: @"type"];
-  [updaterInfo setObject: dict forKey: @"taskdict"];
-
-  NS_DURING
-    {
-      [NSThread detachNewThreadSelector: @selector(updaterForTask:)
-		                           toTarget: [DBUpdater class]
-		                         withObject: updaterInfo];
-    }
-  NS_HANDLER
-    {
-      NSLog(@"A fatal error occured while detaching the thread!");
-    }
-  NS_ENDHANDLER
+  GWDebugLog(@"starting db update");
+  [updater removeTrees: info];
 }
 
-- (NSData *)directoryTreeFromPath:(NSString *)apath
+- (NSData *)directoryTreeFromPath:(NSString *)path
 {  
-  CREATE_AUTORELEASE_POOL(pool);
-  NSArray *directories;  
+  CREATE_AUTORELEASE_POOL (arp);
+  NSString *qpath;
+  NSString *query;
+  SQLitePreparedStatement *statement;  
+  NSArray *results;
   NSData *data = nil;
+
+  if ([qmanager executeQuery: @"BEGIN"] == NO) {      
+    NSLog(@"error at: %@", path); 
+    RELEASE (arp);   
+    return nil;
+  }   
+
+  query = @"SELECT path FROM user_paths WHERE path GLOB :path "
+          @"AND is_directory = 1 "
+          @"AND pathExists(path)";
+
+  if ([path isEqual: pathsep()] == NO) {
+    qpath = [stringForQuery(path) stringByAppendingFormat: @"%@*", pathsep()];
+  } else {
+    qpath = [stringForQuery(path) stringByAppendingString: @"*"];
+  }
   
-  [dirslock lock];
-  directories = [dirsManager dirsFromPath: apath];
-  [dirslock unlock];
+  statement = [qmanager statementForQuery: query 
+                           withIdentifier: @"directory_tree_1"
+                                 bindings: SQLITE_TEXT, @":path", qpath, 0];
     
-  if ([directories count]) { 
-    data = [NSArchiver archivedDataWithRootObject: directories]; 
-  } 
+  results = [qmanager resultsOfQueryWithStatement: statement];
+
+  if (results && [results count]) {
+    NSMutableArray *dirs = [NSMutableArray array];
+    unsigned i;
+
+    for (i = 0; i < [results count]; i++) {
+      [dirs addObject: [[results objectAtIndex: i] objectForKey: @"path"]];
+    }
+    
+    data = [NSArchiver archivedDataWithRootObject: dirs];
+  }
+
+  if ([qmanager executeQuery: @"COMMIT"] == NO) {      
+    NSLog(@"error at: %@", path); 
+  }   
 
   TEST_RETAIN (data);
-  RELEASE (pool);
+  RELEASE (arp);
   
   return TEST_AUTORELEASE (data);
 }
 
+- (NSData *)attributeForKey:(NSString *)key
+                     atPath:(NSString *)path
+{
+  if ([fm fileExistsAtPath: path]) {
+    NSString *qpath = stringForQuery(path);
+    NSString *query;
+    SQLitePreparedStatement *statement;  
+
+    query = @"SELECT attribute FROM user_attributes "
+            @"WHERE path_id = (SELECT id FROM user_paths WHERE path = :path) "
+            @"AND key = :key";
+
+    statement = [qmanager statementForQuery: query 
+                             withIdentifier: @"attribute_for_key_1"
+                                   bindings: SQLITE_TEXT, @":path", qpath,
+                                             SQLITE_TEXT, @":key", key, 0];
+
+    return [qmanager getBlobEntryWithStatement: statement];
+  }
+  
+  return nil;
+}
+
+- (BOOL)setAttribute:(NSData *)attribute
+              forKey:(NSString *)key
+              atPath:(NSString *)path
+{
+  if ([fm fileExistsAtPath: path]) {
+    int path_id;
+    
+    EXECUTE_QUERY (@"BEGIN", NO);
+    
+    path_id = insertPathIfNeeded(path, db, qmanager);
+        
+    if (path_id != -1) {
+      NSTimeInterval mdstamp = [[NSDate date] timeIntervalSinceReferenceDate];
+      NSString *query;
+      SQLitePreparedStatement *statement;  
+
+      query = @"INSERT INTO user_attributes (path_id, key, attribute) "
+              @"VALUES (:path_id, :key, :attribute)";
+
+      statement = [qmanager statementForQuery: query 
+                               withIdentifier: @"set_attribute_1"
+                                     bindings: SQLITE_INTEGER, @":path_id", path_id,
+                                               SQLITE_TEXT, @":key", key, 
+                                               SQLITE_BLOB, 
+                                               @":attribute", 
+                                               attribute, 0];
+      
+      STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
+      
+      query = @"UPDATE user_paths "
+              @"SET md_moddate = :mdstamp "
+              @"WHERE id = :path_id";
+      
+      statement = [qmanager statementForQuery: query 
+                               withIdentifier: @"set_attribute_2"
+                                     bindings: SQLITE_FLOAT, @":mdstamp", mdstamp,
+                                               SQLITE_INTEGER, @":path_id", path_id, 0];
+      
+      STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
+      
+      [qmanager executeQuery: @"COMMIT"]; 
+    
+      return YES;
+    }
+    
+    [qmanager executeQuery: @"COMMIT"]; 
+  }
+  
+  return NO;
+}
+
+- (NSTimeInterval)timestampOfPath:(NSString *)path
+{
+  if ([fm fileExistsAtPath: path]) {
+    NSString *qpath = stringForQuery(path);
+    NSString *query;
+    SQLitePreparedStatement *statement;  
+    
+    query = @"SELECT md_moddate FROM user_paths "
+            @"WHERE path = :path";
+
+    statement = [qmanager statementForQuery: query 
+                             withIdentifier: @"timestamp_of_path_1"
+                                   bindings: SQLITE_TEXT, @":path", qpath, 0];
+    
+    return [qmanager getFloatEntryWithStatement: statement];
+  }
+    
+  return 0.0;
+}
+
 - (NSString *)annotationsForPath:(NSString *)path
 {
-  NSString *annotations;
+  NSData *data = [self attributeForKey: @"kMDItemFinderComment" atPath: path];
   
-  [pathslock lock];
-  annotations = [pathsManager metadataOfType: @"MDAnnotations" forPath: path];
-  [pathslock unlock];
-  
-  return annotations;
+  if (data) {
+    return [NSString stringWithUTF8String: [data bytes]];
+  }
+
+  return nil;
 }
 
 - (oneway void)setAnnotations:(NSString *)annotations
                       forPath:(NSString *)path
 {
-  [pathslock lock];
-  [pathsManager setMetadata: annotations 
-                     ofType: @"MDAnnotations" 
-                    forPath: path];
-  [pathslock unlock];                    
+  const char *bytes = [annotations UTF8String];
+  
+  [self setAttribute: [NSData dataWithBytes: bytes length: strlen(bytes) + 1] 
+              forKey: @"kMDItemFinderComment" 
+              atPath: path];
 }
 
-- (NSTimeInterval)timestampOfPath:(NSString *)path
+- (void)fileSystemDidChange:(NSNotification *)notif
 {
-  NSTimeInterval interval;
-
-  [pathslock lock];
-  interval = [pathsManager timestampOfPath: path];
-  [pathslock unlock];
+  NSData *info = [NSArchiver archivedDataWithRootObject: [notif userInfo]];
   
-  return interval;
+  GWDebugLog(@"starting db update");
+  [updater fileSystemDidChange: info];
+}
+
+- (void)performScheduledUpdate:(id)sender
+{
+  GWDebugLog(@"starting db update");
+  [updater scheduledUpdate];
+}
+
+- (BOOL)opendb
+{
+  if (db == NULL) {
+    BOOL newdb = ([fm fileExistsAtPath: dbpath] == NO);
+    char *err;
+        
+    db = opendbAtPath(dbpath);
+        
+    if (db != NULL) {
+      qmanager = [[SQLiteQueryManager alloc] initForDb: db];
+    
+      if (newdb) {
+        if (sqlite3_exec(db, [db_schema UTF8String], NULL, 0, &err) != SQLITE_OK) {
+          NSLog(@"unable to create the database at %@", dbpath);
+          sqlite3_free(err); 
+          return NO;    
+        } else {
+          GWDebugLog(@"user database created");
+        }
+      }    
+    } else {
+      NSLog(@"unable to open the database at %@", dbpath);
+      return NO;
+    }    
+    
+    sqlite3_create_function(db, "pathExists", 1, 
+                                SQLITE_UTF8, 0, path_exists, 0, 0);
+
+    sqlite3_create_function(db, "pathMoved", 3, 
+                                SQLITE_UTF8, 0, path_moved, 0, 0);
+
+    sqlite3_create_function(db, "timeStamp", 0, 
+                                SQLITE_UTF8, 0, time_stamp, 0, 0);
+
+    [qmanager executeQuery: @"PRAGMA cache_size = 20000"];
+    [qmanager executeQuery: @"PRAGMA count_changes = 0"];
+    [qmanager executeQuery: @"PRAGMA synchronous = OFF"];
+    [qmanager executeQuery: @"PRAGMA temp_store = MEMORY"];
+
+    if (sqlite3_exec(db, [db_schema_tmp UTF8String], NULL, 0, &err) != SQLITE_OK) {
+      NSLog(@"unable to create temp tables");
+      sqlite3_free(err); 
+      closedb(db);
+      return NO;    
+    }
+  }
+
+  return YES;
 }
 
 - (void)connectionBecameInvalid:(NSNotification *)notification
@@ -268,12 +517,19 @@ static NSFileManager *fm = nil;
 
   if (connection == conn) {
     NSLog(@"argh - ddbd root connection has been destroyed.");
-    exit(EXIT_FAILURE);
-  } 
+  } else if (connection == updaterconn) {
+    NSLog(@"The updater connection died. Exiting now.");
+  }
+  
+  if (db != NULL) {
+    closedb(db);
+  }
+  
+  exit(EXIT_FAILURE);
 }
 
 - (BOOL)connection:(NSConnection *)ancestor
-            shouldMakeNewConnection:(NSConnection *)newConn;
+            shouldMakeNewConnection:(NSConnection *)newConn
 {
   [nc addObserver: self
          selector: @selector(connectionBecameInvalid:)
@@ -285,33 +541,6 @@ static NSFileManager *fm = nil;
   return YES;
 }
 
-- (void)fileSystemDidChange:(NSNotification *)notif
-{
-  NSDictionary *info = [notif userInfo];
-  NSMutableDictionary *updaterInfo = [NSMutableDictionary dictionary];
-    
-  [updaterInfo setObject: [NSNumber numberWithInt: DDBdFileOperationUpdate] 
-                  forKey: @"type"];
-  [updaterInfo setObject: info forKey: @"taskdict"];
-
-  NS_DURING
-    {
-      [NSThread detachNewThreadSelector: @selector(updaterForTask:)
-		                           toTarget: [DBUpdater class]
-		                         withObject: updaterInfo];
-    }
-  NS_HANDLER
-    {
-      NSLog(@"A fatal error occured while detaching the thread!");
-    }
-  NS_ENDHANDLER
-}
-
-- (void)threadWillExit:(NSNotification *)notification
-{
-  NSLog(@"db update done");
-}
-
 @end
 
 
@@ -319,114 +548,511 @@ static NSFileManager *fm = nil;
 
 - (void)dealloc
 {
-  RELEASE (updinfo);
+  TEST_RELEASE (qmanager);
+  
+  if (db != NULL) {
+    closedb(db);
+  }
+  
 	[super dealloc];
 }
 
-+ (void)updaterForTask:(NSDictionary *)info
++ (void)newUpdater:(NSArray *)ports
 {
-  CREATE_AUTORELEASE_POOL(arp);
-  DBUpdater *updater = [[self alloc] init];
-  
-  [updater setUpdaterTask: info];
+  CREATE_AUTORELEASE_POOL(pool);
+  NSPort *port[2];
+  NSConnection *conn;
+  DBUpdater *updater;
+                              
+  port[0] = [ports objectAtIndex: 0];             
+  port[1] = [ports objectAtIndex: 1];             
 
+  conn = [NSConnection connectionWithReceivePort: (NSPort *)port[0]
+                                        sendPort: (NSPort *)port[1]];
+  
+  updater = [[self alloc] init];
+  
+  [(id)[conn rootProxy] registerUpdater: updater];
   RELEASE (updater);
-  RELEASE (arp);
+  
+  [[NSRunLoop currentRunLoop] run];
+  
+  RELEASE (pool);
 }
 
-- (void)setUpdaterTask:(NSDictionary *)info
+- (id)init
 {
-  NSDictionary *dict = [info objectForKey: @"taskdict"];
-  int type = [[info objectForKey: @"type"] intValue];
+  self = [super init];
   
-  ASSIGN (updinfo, dict);
-  
-  RETAIN (self);
-    
-  NSLog(@"starting db update");
-
-  switch(type) {
-    case DDBdInsertTreeUpdate:
-      [self insertTrees];
-      break;
-
-    case DDBdRemoveTreeUpdate:
-      [self removeTrees];
-      break;
-
-    case DDBdFileOperationUpdate:
-      [self fileSystemDidChange];
-      break;
-
-    default:
-      break;
+  if (self) {
+    fm = [NSFileManager defaultManager];    
   }
-}
-
-- (void)insertTrees
-{
-  NSArray *paths = [updinfo objectForKey: @"paths"];
   
-  [dirslock lock];
-  [dirsManager insertDirsFromPaths: paths];
-  [dirslock unlock];
+  return self;
 }
 
-- (void)removeTrees
+- (BOOL)openDbAtPath:(NSString *)dbpath
 {
-  NSArray *paths = [updinfo objectForKey: @"paths"];
+  db = opendbAtPath(dbpath);  
   
-  [dirslock lock];
-  [dirsManager removeDirsFromPaths: paths];
-  [dirslock unlock];
+  if (db != NULL) {
+    char *err;
+
+    sqlite3_create_function(db, "pathExists", 1, 
+                                SQLITE_UTF8, 0, path_exists, 0, 0);
+
+    sqlite3_create_function(db, "pathMoved", 3, 
+                                SQLITE_UTF8, 0, path_moved, 0, 0);
+
+    sqlite3_create_function(db, "timeStamp", 0, 
+                                SQLITE_UTF8, 0, time_stamp, 0, 0);
+
+    [qmanager executeQuery: @"PRAGMA cache_size = 20000"];
+    [qmanager executeQuery: @"PRAGMA count_changes = 0"];
+    [qmanager executeQuery: @"PRAGMA synchronous = OFF"];
+    [qmanager executeQuery: @"PRAGMA temp_store = MEMORY"];
+
+    qmanager = [[SQLiteQueryManager alloc] initForDb: db];
+
+    if (sqlite3_exec(db, [db_schema_tmp UTF8String], NULL, 0, &err) != SQLITE_OK) {
+      NSLog(@"unable to create temp tables");
+      sqlite3_free(err); 
+      closedb(db);
+      return NO;    
+    }    
+  } else {
+    NSLog(@"unable to open db at %@", dbpath);
+    return NO;
+  }
+
+  return YES;
 }
 
-- (void)fileSystemDidChange
+- (oneway void)insertTrees:(NSData *)info
 {
-  NSString *operation = [updinfo objectForKey: @"operation"];
+  CREATE_AUTORELEASE_POOL (arp);
+  NSArray *paths = [NSUnarchiver unarchiveObjectWithData: info];
+  unsigned i;
 
-  if ([operation isEqual: @"NSWorkspaceMoveOperation"] 
-                || [operation isEqual: @"NSWorkspaceCopyOperation"]
-                || [operation isEqual: @"NSWorkspaceDuplicateOperation"]
-                || [operation isEqual: @"GWorkspaceRenameOperation"]) {
-    CREATE_AUTORELEASE_POOL(arp);
-    NSString *source = [updinfo objectForKey: @"source"];
-    NSString *destination = [updinfo objectForKey: @"destination"];
-    NSArray *files = [updinfo objectForKey: @"files"];
-    NSArray *origfiles = [updinfo objectForKey: @"origfiles"];
-    NSMutableArray *srcpaths = [NSMutableArray array];
-    NSMutableArray *dstpaths = [NSMutableArray array];
-    int i;
-    
-    if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
-      srcpaths = [NSArray arrayWithObject: source];
-      dstpaths = [NSArray arrayWithObject: destination];
-    } else {
-      if ([operation isEqual: @"NSWorkspaceDuplicateOperation"]) { 
-        for (i = 0; i < [files count]; i++) {
-          NSString *fname = [origfiles objectAtIndex: i];
-          [srcpaths addObject: [source stringByAppendingPathComponent: fname]];
-          fname = [files objectAtIndex: i];
-          [dstpaths addObject: [destination stringByAppendingPathComponent: fname]];
+  if ([qmanager executeQuery: @"BEGIN"] == NO) {      
+    NSLog(@"error at removeTrees");
+    GWDebugLog(@"db update failed"); 
+    return;   
+  }     
+
+  for (i = 0; i < [paths count]; i++) {
+    NSString *path = [paths objectAtIndex: i];  
+    NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: NO];
+    NSString *type = [attributes fileType];
+
+    if (type == NSFileTypeDirectory) {
+      NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: path];
+      NSString *part;    
+
+      while ((part = [enumerator nextObject]) != nil) {
+        CREATE_AUTORELEASE_POOL (arp1);
+        NSString *subpath = [path stringByAppendingPathComponent: part];        
+
+        if ([[enumerator fileAttributes] fileType] == NSFileTypeDirectory) {
+          if (insertPathIfNeeded(subpath, db, qmanager) == -1) {      
+            [qmanager executeQuery: @"COMMIT"]; 
+            NSLog(@"insertTrees: error at %@", subpath);
+            GWDebugLog(@"db update failed");
+            RELEASE (arp1);
+            RELEASE (arp);
+            return;   
+          }   
         }
-      } else {  
-        for (i = 0; i < [files count]; i++) {
-          NSString *fname = [files objectAtIndex: i];
-          [srcpaths addObject: [source stringByAppendingPathComponent: fname]];
-          [dstpaths addObject: [destination stringByAppendingPathComponent: fname]];
-        }
+        
+        RELEASE (arp1);
+      }
+      
+      if (insertPathIfNeeded(path, db, qmanager) == -1) {      
+        NSLog(@"insertTrees: error at %@", path);
+        break;   
+      }   
+    }
+  }
+  
+  [qmanager executeQuery: @"COMMIT"]; 
+      
+  RELEASE (arp);
+  
+  GWDebugLog(@"db update done");
+}
+
+- (oneway void)removeTrees:(NSData *)info
+{
+  NSArray *paths = [NSUnarchiver unarchiveObjectWithData: info];
+  unsigned i;
+
+  if ([qmanager executeQuery: @"BEGIN"] == NO) {      
+    NSLog(@"error at removeTrees"); 
+    GWDebugLog(@"db update failed");
+    return;   
+  }     
+
+  for (i = 0; i < [paths count]; i++) {
+    if (removePath([paths objectAtIndex: i], qmanager) == NO) {
+      NSLog(@"error at removeTrees"); 
+      GWDebugLog(@"db update failed");
+      return;   
+    }
+  }
+
+  [qmanager executeQuery: @"COMMIT"]; 
+  
+  GWDebugLog(@"db update done");   
+}
+
+- (oneway void)fileSystemDidChange:(NSData *)info
+{
+  CREATE_AUTORELEASE_POOL (arp);
+  NSDictionary *opdict = [NSUnarchiver unarchiveObjectWithData: info];
+  NSString *operation = [opdict objectForKey: @"operation"];
+  NSString *source = [opdict objectForKey: @"source"];
+  NSString *destination = [opdict objectForKey: @"destination"];
+  NSArray *files = [opdict objectForKey: @"files"];
+  NSArray *origfiles = [opdict objectForKey: @"origfiles"];
+  NSMutableArray *srcpaths = [NSMutableArray array];
+  NSMutableArray *dstpaths = [NSMutableArray array];
+  BOOL move, copy, remove; 
+  int i;
+
+  if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
+    srcpaths = [NSArray arrayWithObject: source];
+    dstpaths = [NSArray arrayWithObject: destination];
+  } else {
+    if ([operation isEqual: @"NSWorkspaceDuplicateOperation"]
+            || [operation isEqual: @"NSWorkspaceRecycleOperation"]) { 
+      for (i = 0; i < [files count]; i++) {
+        NSString *fname = [origfiles objectAtIndex: i];
+        
+        [srcpaths addObject: [source stringByAppendingPathComponent: fname]];
+        fname = [files objectAtIndex: i];
+        [dstpaths addObject: [destination stringByAppendingPathComponent: fname]];
+      }
+    } else {  
+      for (i = 0; i < [files count]; i++) {
+        NSString *fname = [files objectAtIndex: i];
+        
+        [srcpaths addObject: [source stringByAppendingPathComponent: fname]];
+        [dstpaths addObject: [destination stringByAppendingPathComponent: fname]];
+      }
+    }
+  }
+
+  remove = ([operation isEqual: @"NSWorkspaceDestroyOperation"]
+				        || [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]);
+
+  move = ([operation isEqual: @"NSWorkspaceMoveOperation"] 
+            || [operation isEqual: @"GWorkspaceRenameOperation"]
+            || [operation isEqual: @"NSWorkspaceRecycleOperation"]
+            || [operation isEqual: @"GWorkspaceRecycleOutOperation"]);
+
+  copy = ([operation isEqual: @"NSWorkspaceCopyOperation"]
+             || [operation isEqual: @"NSWorkspaceDuplicateOperation"]); 
+      
+
+  if ([qmanager executeQuery: @"BEGIN"] == NO) {      
+    NSLog(@"error at fileSystemDidChange"); 
+    GWDebugLog(@"db update failed");
+    RELEASE (arp);
+    return;   
+  }     
+
+  if (remove) {    
+    for (i = 0; i < [srcpaths count]; i++) {
+      NSString *path = [srcpaths objectAtIndex: i];
+      
+      if (removePath(path, qmanager) == NO) { 
+        NSLog(@"fileSystemDidChange: error removing %@", path);
+        GWDebugLog(@"db update failed"); 
+        RELEASE (arp);
+        return;   
       }
     }
     
-    [pathslock lock];
-    [pathsManager duplicateDataOfPaths: srcpaths forPaths: dstpaths];
-    [pathslock unlock];
+  } else if (move) {
+    for (i = 0; i < [srcpaths count]; i++) {
+      NSString *srcpath = [srcpaths objectAtIndex: i];
+      NSString *dstpath = [dstpaths objectAtIndex: i];
+            
+      if (renamePath(dstpath, srcpath, qmanager) == NO) { 
+        NSLog(@"fileSystemDidChange: error renaming %@", srcpath); 
+        GWDebugLog(@"db update failed");
+        RELEASE (arp);
+        return;   
+      }
+    }
     
-    RELEASE (arp);
+  } else if (copy) {
+    for (i = 0; i < [srcpaths count]; i++) {
+      NSString *srcpath = [srcpaths objectAtIndex: i];
+      NSString *dstpath = [dstpaths objectAtIndex: i];
+      
+      if (removePath(dstpath, qmanager) == NO) {
+        NSLog(@"fileSystemDidChange: error copying %@", srcpath); 
+        RELEASE (arp);
+        return;   
+      }
+      
+      if (copyPath(srcpath, dstpath, qmanager) == NO) {
+        NSLog(@"fileSystemDidChange: error copying %@", srcpath);
+        GWDebugLog(@"db update failed"); 
+        RELEASE (arp);
+        return;   
+      } 
+    }    
   }
+
+  [qmanager executeQuery: @"COMMIT"];    
+
+  RELEASE (arp);
+
+  GWDebugLog(@"db update done");
+}
+
+- (oneway void)scheduledUpdate
+{
+  CREATE_AUTORELEASE_POOL (arp);
+  NSString *query;
+  SQLitePreparedStatement *statement;  
+  NSArray *results;
+
+  if ([qmanager executeQuery: @"BEGIN"] == NO) {      
+    NSLog(@"scheduledUpdate error"); 
+    RELEASE (arp);   
+    return;
+  }   
+  
+  query = @"SELECT path FROM user_paths WHERE (pathExists(path) = 0)";
+
+  statement = [qmanager statementForQuery: query 
+                           withIdentifier: @"scheduled_update_1"
+                                 bindings: 0];
+                                 
+  results = [qmanager resultsOfQueryWithStatement: statement];
+
+  if (results && [results count]) {
+    unsigned i;
+
+    for (i = 0; i < [results count]; i++) {
+      NSString *path = [[results objectAtIndex: i] objectForKey: @"path"];
+      
+      if (removePath(path, qmanager) == NO) {
+        NSLog(@"scheduledUpdate error"); 
+        GWDebugLog(@"db update failed");
+        RELEASE (arp);
+        return;   
+      }    
+    }
+  }
+
+  if ([qmanager executeQuery: @"COMMIT"] == NO) {      
+    NSLog(@"scheduledUpdate error"); 
+  }   
+
+  RELEASE (arp);
+
+  GWDebugLog(@"db update done");
 }
 
 @end
+
+
+int insertPathIfNeeded(NSString *path, sqlite3 *db, SQLiteQueryManager *qmanager)
+{
+  NSFileManager *fm = [NSFileManager defaultManager];
+  NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: NO];
+  int path_id = -1;
+  
+  if (attributes) {
+    NSString *qpath = stringForQuery(path);
+    SQLitePreparedStatement *statement;
+    NSString *query;
+    
+    query = @"SELECT id FROM user_paths WHERE path = :path";
+    
+    statement = [qmanager statementForQuery: query 
+                             withIdentifier: @"insert_if_needed_1"
+                                   bindings: SQLITE_TEXT, @":path", qpath, 0];
+                             
+    path_id = [qmanager getIntEntryWithStatement: statement];
+  
+    if (path_id == -1) {
+      NSTimeInterval interval = [[attributes fileModificationDate] timeIntervalSinceReferenceDate];
+      NSTimeInterval mdinterval = [[NSDate date] timeIntervalSinceReferenceDate];
+      BOOL isdir = ([attributes fileType] == NSFileTypeDirectory);  
+
+      query = @"INSERT INTO user_paths "
+              @"(path, moddate, md_moddate, is_directory) "
+              @"VALUES(:path, :moddate, :mdmoddate, :isdir)";
+
+      statement = [qmanager statementForQuery: query 
+                               withIdentifier: @"insert_if_needed_2"
+                                     bindings: SQLITE_TEXT, @":path", qpath, 
+                                               SQLITE_FLOAT, @":moddate", interval, 
+                                               SQLITE_FLOAT, @":mdmoddate", mdinterval, 
+                                               SQLITE_INTEGER, @":isdir", isdir, 0];
+
+      STATEMENT_EXECUTE_OR_ROLLBACK (statement, -1);
+
+      path_id = sqlite3_last_insert_rowid(db);
+    }
+  }
+
+  return path_id;
+}
+
+BOOL removePath(NSString *path, SQLiteQueryManager *qmanager)
+{
+  NSString *qpath = stringForQuery(path);
+  SQLitePreparedStatement *statement;
+  NSString *query;
+        
+  statement = [qmanager statementForQuery: @"DELETE FROM user_paths_removed_id" 
+                           withIdentifier: @"remove_path_1"
+                                 bindings: 0];
+  
+  STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
+    
+  query = @"INSERT INTO user_paths_removed_id (id) "
+          @"SELECT id FROM user_paths "
+          @"WHERE path = :path "
+          @"OR path GLOB :minpath";
+          
+  statement = [qmanager statementForQuery: query 
+                           withIdentifier: @"remove_path_2"
+                                 bindings: SQLITE_TEXT, @":path", qpath,
+                                       SQLITE_TEXT, @":minpath", 
+                [NSString stringWithFormat: @"%@%@*", qpath, pathsep()], 0];
+      
+  STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
+      
+  query = @"DELETE FROM user_attributes "
+          @"WHERE path_id IN (SELECT id FROM user_paths_removed_id)";
+
+  statement = [qmanager statementForQuery: query 
+                           withIdentifier: @"remove_path_3"
+                                 bindings: 0];
+
+  STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
+
+  query = @"DELETE FROM user_paths WHERE id IN (SELECT id FROM user_paths_removed_id)";
+
+  statement = [qmanager statementForQuery: query 
+                           withIdentifier: @"remove_path_4"
+                                 bindings: 0];
+
+  STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
+
+  return YES;
+}
+
+BOOL renamePath(NSString *path, NSString *oldpath, SQLiteQueryManager *qmanager)
+{
+  NSString *qpath = stringForQuery(path);
+  NSString *qoldpath = stringForQuery(oldpath);
+  SQLitePreparedStatement *statement;
+  NSString *query;
+
+  GWDebugLog(@"srcpath = %@", qoldpath);
+  GWDebugLog(@"dstpath = %@", qpath);
+          
+  statement = [qmanager statementForQuery: @"DELETE FROM user_renamed_paths" 
+                           withIdentifier: @"rename_path_1"
+                                 bindings: 0];
+
+  STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
+
+  statement = [qmanager statementForQuery: @"DELETE FROM user_renamed_paths_base" 
+                           withIdentifier: @"rename_path_2"
+                                 bindings: 0];
+
+  STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
+
+  query = @"INSERT INTO user_renamed_paths_base "
+          @"(base, oldbase) "
+          @"VALUES(:path, :oldpath)";
+
+  statement = [qmanager statementForQuery: query 
+                           withIdentifier: @"rename_path_3"
+                                 bindings: SQLITE_TEXT, @":path", qpath, 
+                                       SQLITE_TEXT, @":oldpath", qoldpath, 0];
+
+  STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
+
+  query = @"INSERT INTO user_renamed_paths "
+          @"(id, path, base, oldbase) "
+          @"SELECT user_paths.id, user_paths.path, "
+          @"user_renamed_paths_base.base, user_renamed_paths_base.oldbase "
+          @"FROM user_paths, user_renamed_paths_base "
+          @"WHERE user_paths.path = :oldpath "
+          @"OR user_paths.path GLOB :minpath ";
+          
+  statement = [qmanager statementForQuery: query 
+                           withIdentifier: @"rename_path_4"
+                                 bindings: SQLITE_TEXT, @":oldpath", qoldpath,
+                                            SQLITE_TEXT, @":minpath", 
+            [NSString stringWithFormat: @"%@%@*", qoldpath, pathsep()], 0];
+
+  STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
+  
+  return YES;
+}
+
+BOOL copyPath(NSString *srcpath, NSString *dstpath, SQLiteQueryManager *qmanager)
+{
+  NSString *qsrcpath = stringForQuery(srcpath);
+  NSString *qdstpath = stringForQuery(dstpath);
+  SQLitePreparedStatement *statement;
+  NSString *query;
+  
+  GWDebugLog(@"srcpath = %@", qsrcpath);
+  GWDebugLog(@"dstpath = %@", qdstpath);
+        
+  statement = [qmanager statementForQuery: @"DELETE FROM user_copied_paths" 
+                           withIdentifier: @"copy_path_1"
+                                 bindings: 0];
+
+  STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
+
+  statement = [qmanager statementForQuery: @"DELETE FROM user_copied_paths_base" 
+                           withIdentifier: @"copy_path_2"
+                                 bindings: 0];
+
+  STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
+
+  query = @"INSERT INTO user_copied_paths_base "
+          @"(srcbase, dstbase) "
+          @"VALUES(:srcbase, :dstbase)";
+
+  statement = [qmanager statementForQuery: query 
+                           withIdentifier: @"copy_path_4"
+                                 bindings: SQLITE_TEXT, @":srcbase", qsrcpath, 
+                                    SQLITE_TEXT, @":dstbase", qdstpath, 0];
+
+  STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
+
+  query = @"INSERT INTO user_copied_paths "
+          @"(src_id, srcpath, is_directory, srcbase, dstbase) "
+          @"SELECT user_paths.id, user_paths.path, user_paths.is_directory, "
+          @"user_copied_paths_base.srcbase, user_copied_paths_base.dstbase "
+          @"FROM user_paths, user_copied_paths_base "
+          @"WHERE user_paths.path = :srcbase " 
+          @"OR user_paths.path GLOB :minpath";
+
+  statement = [qmanager statementForQuery: query 
+                           withIdentifier: @"copy_path_5"
+                                 bindings: SQLITE_TEXT, @":srcbase", qsrcpath,
+                                            SQLITE_TEXT, @":minpath", 
+            [NSString stringWithFormat: @"%@%@*", qsrcpath, pathsep()], 0];
+
+  STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
+  
+  return YES;
+}
 
 
 BOOL subpath(NSString *p1, NSString *p2)
@@ -494,6 +1120,49 @@ NSString *removePrefix(NSString *path, NSString *prefix)
   return path;  	
 }
 
+static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv)
+{
+  const unsigned char *path = sqlite3_value_text(argv[0]);
+  int exists = 0;
+  
+  if (path) {
+    struct stat statbuf;  
+    exists = (stat((const char *)path, &statbuf) == 0);
+  }
+     
+  sqlite3_result_int(context, exists);
+}
+
+static void path_moved(sqlite3_context *context, int argc, sqlite3_value **argv)
+{
+  const unsigned char *oldbase = sqlite3_value_text(argv[0]);
+  int oldblen = strlen((const char *)oldbase);
+  const unsigned char *newbase = sqlite3_value_text(argv[1]);
+  int newblen = strlen((const char *)newbase);
+  const unsigned char *oldpath = sqlite3_value_text(argv[2]);
+  int oldplen = strlen((const char *)oldpath);
+  char newpath[PATH_MAX] = "";
+  int i = newblen;
+  int j;
+  
+  strncpy(newpath, (const char *)newbase, newblen);  
+  
+  for (j = oldblen; j < oldplen; j++) {
+    newpath[i] = oldpath[j];
+    i++;
+  }
+  
+  newpath[i] = '\0';
+    
+  sqlite3_result_text(context, newpath, strlen(newpath), SQLITE_TRANSIENT);
+}
+
+static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
+{
+  NSTimeInterval interval = [[NSDate date] timeIntervalSinceReferenceDate];
+
+  sqlite3_result_double(context, interval);
+}
 
 int main(int argc, char** argv)
 {

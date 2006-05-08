@@ -167,11 +167,7 @@ static NSString *nibName = @"Annotations";
       }
       
       [inspector removeWatcherForPath: currentPath];
-      
-      if ([desktopApp ddbdactive]) {
-        [desktopApp ddbdRemovePath: currentPath];
-      }
-      
+            
       DESTROY (currentPath);
     }
   }
