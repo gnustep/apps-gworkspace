@@ -58,10 +58,10 @@ int main ()
 fi
 
 if test "$have_sqlite" = no; then
-  AC_MSG_WARN(Cannot find libsqlite header and/or library)
-  echo "* The gmds tool reqiures the sqlite3 library"
+  AC_MSG_WARN(Cannot find libsqlite3 header and/or library)
+  echo "* gmds requires the sqlite3 library"
   echo "* Use --with-sqlite-library and --with-sqlite-include"
-  echo "* to specify the tiff library directory if it is not"
+  echo "* to specify the sqlite library directory if it is not"
   echo "* in the usual place(s)"
   AC_MSG_ERROR(gmds will not compile without sqlite)
 fi

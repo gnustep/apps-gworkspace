@@ -1,0 +1,24 @@
+
+include $(GNUSTEP_MAKEFILES)/common.make
+GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
+
+ADDITIONAL_INCLUDE_DIRS += @ADDITIONAL_INCLUDE_DIRS@
+ADDITIONAL_LIB_DIRS += @ADDITIONAL_LIB_DIRS@
+
+PACKAGE_NAME = SQLite
+LIBRARY_VAR  = SQLITE
+LIBRARY_NAME = libSQLite
+
+libSQLite_OBJC_FILES = SQLite.m  
+
+libSQLite_HEADER_FILES = SQLite.h 
+
+libSQLite_HEADER_FILES_DIR = .
+libSQLite_HEADER_FILES_INSTALL_DIR=/SQLite
+                        
+include $(GNUSTEP_MAKEFILES)/library.make
+
+-include GNUmakefile.preamble
+-include GNUmakefile.local
+-include GNUmakefile.postamble
+

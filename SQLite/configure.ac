@@ -5,20 +5,7 @@ if test -z "$GNUSTEP_SYSTEM_ROOT"; then
   AC_MSG_ERROR([You must run the GNUstep initialization script first!])
 fi
 
-#--------------------------------------------------------------------
-# Use config.guess, config.sub and install-sh provided by gnustep-make
-#--------------------------------------------------------------------
-AC_CHECK_HEADERS(dir.h unistd.h)
-AC_CHECK_FUNCS(getpwnam getpwuid geteuid getlogin)
-
 AC_CONFIG_AUX_DIR([$GNUSTEP_MAKEFILES])
-
-AC_CONFIG_HEADER([GWorkspace/config.h])
-AC_CONFIG_HEADER([Tools/ddbd/config.h])
-AC_CONFIG_HEADER([Tools/searchtool/config.h])
-AC_CONFIG_HEADER([Tools/lsfupdater/config.h])
-
-AC_CONFIG_SUBDIRS(FSNode Inspector Tools/ddbd)
 
 #--------------------------------------------------------------------
 # Find sqlite
@@ -64,16 +51,24 @@ int main ()
 }
   ],, have_sqlite=no,[echo "wrong sqlite3 version"])
 
+  if test "$have_sqlite" = yes; then
+    ADDITIONAL_LIB_DIRS="$ADDITIONAL_LIB_DIRS $with_sqlite_library -lsqlite3"
+    ADDITIONAL_INCLUDE_DIRS="$ADDITIONAL_INCLUDE_DIRS $with_sqlite_include"
+  fi
 fi
 
 if test "$have_sqlite" = no; then
   AC_MSG_WARN(Cannot find libsqlite3 header and/or library)
-  echo "* GWorkspace requires the sqlite3 library"
+  echo "* The SQLite library requires the sqlite3 library"
   echo "* Use --with-sqlite-library and --with-sqlite-include"
-  echo "* to specify the sqlite library directory if it is not"
+  echo "* to specify the sqlite3 library directory if it is not"
   echo "* in the usual place(s)"
-  AC_MSG_ERROR(GWorkspace will not compile without sqlite)
+  AC_MSG_ERROR(SQLite will not compile without sqlite)
 fi
+
+AC_SUBST(ADDITIONAL_LIB_DIRS)
+AC_SUBST(ADDITIONAL_INCLUDE_DIRS)
+
 
 #--------------------------------------------------------------------
 # Debug logging
@@ -90,9 +85,12 @@ fi
 
 AC_DEFINE_UNQUOTED([GW_DEBUG_LOG], [$GW_DEBUG_LOG], [debug logging])
 
-AC_CONFIG_FILES([GNUmakefile \
-									Tools/ddbd/GNUmakefile \
-									GWorkspace/GNUmakefile \
-									GWorkspace/GWorkspaceInfo.plist \
-									gworkspace.make])
+
+AC_CONFIG_HEADER([config.h])
+AC_CONFIG_FILES([GNUmakefile])
+
 AC_OUTPUT
+
+
+
+

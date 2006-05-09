@@ -3055,11 +3055,11 @@ fi
 fi
 
 if test "$have_sqlite" = no; then
-  { echo "$as_me:$LINENO: WARNING: Cannot find libsqlite header and/or library" >&5
-echo "$as_me: WARNING: Cannot find libsqlite header and/or library" >&2;}
-  echo "* The gmds tool reqiures the sqlite3 library"
+  { echo "$as_me:$LINENO: WARNING: Cannot find libsqlite3 header and/or library" >&5
+echo "$as_me: WARNING: Cannot find libsqlite3 header and/or library" >&2;}
+  echo "* gmds requires the sqlite3 library"
   echo "* Use --with-sqlite-library and --with-sqlite-include"
-  echo "* to specify the tiff library directory if it is not"
+  echo "* to specify the sqlite library directory if it is not"
   echo "* in the usual place(s)"
   { { echo "$as_me:$LINENO: error: gmds will not compile without sqlite" >&5
 echo "$as_me: error: gmds will not compile without sqlite" >&2;}
