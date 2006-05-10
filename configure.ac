@@ -18,7 +18,7 @@ AC_CONFIG_HEADER([Tools/ddbd/config.h])
 AC_CONFIG_HEADER([Tools/searchtool/config.h])
 AC_CONFIG_HEADER([Tools/lsfupdater/config.h])
 
-AC_CONFIG_SUBDIRS(FSNode Inspector Tools/ddbd)
+AC_CONFIG_SUBDIRS(FSNode Inspector SQLite Tools/gmds)
 
 #--------------------------------------------------------------------
 # Find sqlite

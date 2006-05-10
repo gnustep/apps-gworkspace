@@ -1,8 +1,0 @@
-{
-    NSIcon = "GWRemote.tiff";
-    NSRole = "Viewer";
-    ApplicationDescription = "GWRemote";
-    ApplicationIcon = "GWRemote.tiff";
-    ApplicationName = "GWRemote";
-    ApplicationRelease = "0.1";
-}

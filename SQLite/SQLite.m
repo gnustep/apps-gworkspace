@@ -90,7 +90,7 @@
 - (BOOL)opendbAtPath:(NSString *)path
                isNew:(BOOL *)isnew
 {
-  *isnew = [fm fileExistsAtPath: path];
+  *isnew = ([fm fileExistsAtPath: path] == NO);
 
   if (db == NULL) {
     NSArray *components = [path pathComponents];
@@ -132,6 +132,11 @@
     sqlite3_close(db);
     db = NULL;
   }
+}
+
+- (sqlite3 *)db
+{
+  return db;
 }
 
 - (BOOL)executeSimpleQuery:(NSString *)query
@@ -335,6 +340,11 @@
 {
   return (sqlite3_create_function(db, [fname UTF8String], nargs, 
                               SQLITE_UTF8, 0, funct, 0, 0) == SQLITE_OK);
+}
+
+- (int)lastInsertRowId
+{
+  return sqlite3_last_insert_rowid(db);
 }
 
 @end

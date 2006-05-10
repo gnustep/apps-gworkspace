@@ -1,0 +1,22 @@
+PACKAGE_NEEDS_CONFIGURE = YES
+
+GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
+
+include $(GNUSTEP_MAKEFILES)/common.make
+
+TOOL_NAME = ddbd
+
+# The Objective-C source files to be compiled
+
+ddbd_OBJC_FILES = ddbd.m 
+
+ddbd_TOOL_LIBS += -lSQLite -lgnustep-gui $(SYSTEM_LIBS)
+
+-include GNUmakefile.preamble
+
+-include GNUmakefile.local
+
+include $(GNUSTEP_MAKEFILES)/tool.make
+
+-include GNUmakefile.postamble
+

@@ -48,6 +48,8 @@
 
 - (void)closeDb;
 
+- (sqlite3 *)db;
+
 - (BOOL)executeSimpleQuery:(NSString *)query;
 
 - (BOOL)executeQuery:(NSString *)query;
@@ -65,6 +67,8 @@
 - (BOOL)createFunctionWithName:(NSString *)fname
                 argumentsCount:(int)nargs
                   userFunction:(void *)funct;
+
+- (int)lastInsertRowId;
 
 @end
 
