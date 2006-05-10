@@ -10,8 +10,6 @@ AC_CONFIG_AUX_DIR([$GNUSTEP_MAKEFILES])
 AC_CONFIG_HEADER([ddbd/config.h])
 AC_CONFIG_HEADER([mdextractor/config.h])
 
-#AC_CONFIG_FILES([GNUmakefile])
-
 AC_CONFIG_SUBDIRS(gmds)
 
 #--------------------------------------------------------------------
