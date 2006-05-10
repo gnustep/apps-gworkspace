@@ -4,7 +4,7 @@ SUBPROJECTS = \
         fswatcher \
         searchtool \
         lsfupdater \
-        ddbd \
+        gmds \
         thumbnailer \
         wopen 
 
