@@ -1,10 +1,9 @@
 
+include $(GNUSTEP_MAKEFILES)/common.make
 GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
 
-include $(GNUSTEP_MAKEFILES)/common.make
-
-#SUBPROJECTS = \
- #       mdextractor 
+ADDITIONAL_INCLUDE_DIRS += @ADDITIONAL_INCLUDE_DIRS@
+ADDITIONAL_LIB_DIRS += @ADDITIONAL_LIB_DIRS@
         
 TOOL_NAME = gmds
 
@@ -12,7 +11,6 @@ gmds_OBJC_FILES = gmds.m \
                   sqlite.m 
 
 gmds_TOOL_LIBS += -lgnustep-gui
-gmds_TOOL_LIBS += -lsqlite3
 
 -include GNUmakefile.preamble
 
