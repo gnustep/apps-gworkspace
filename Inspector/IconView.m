@@ -45,12 +45,12 @@
 
 @implementation IconView (NSDraggingDestination)
 
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
   return [inspector draggingEntered: sender inIconView: self];
 }
 
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender
 {
   return dndTarget;
 }

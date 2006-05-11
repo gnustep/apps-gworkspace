@@ -1571,8 +1571,8 @@ static NSString *defaultColumns = @"{ \
   return NSPointInRect(loc, dndValidRect);
 }
 
-- (unsigned int)checkReturnValueForRep:(FSNListViewNodeRep *)arep
-                      withDraggingInfo:(id <NSDraggingInfo>)sender
+- (NSDragOperation)checkReturnValueForRep:(FSNListViewNodeRep *)arep
+                         withDraggingInfo:(id <NSDraggingInfo>)sender
 {
   if (dndTarget != arep) {
     dndTarget = arep;
@@ -1588,7 +1588,7 @@ static NSString *defaultColumns = @"{ \
   return dragOperation;
 }
 
-- (unsigned int)listViewDraggingEntered:(id <NSDraggingInfo>)sender
+- (NSDragOperation)listViewDraggingEntered:(id <NSDraggingInfo>)sender
 {
   NSPoint location;
   int row;
@@ -1705,7 +1705,7 @@ static NSString *defaultColumns = @"{ \
   return dragOperation;
 }
 
-- (unsigned int)listViewDraggingUpdated:(id <NSDraggingInfo>)sender
+- (NSDragOperation)listViewDraggingUpdated:(id <NSDraggingInfo>)sender
 {
   NSPoint location;
   int row;
@@ -2185,7 +2185,7 @@ static NSString *defaultColumns = @"{ \
 
 @implementation FSNListViewNodeRep (DraggingDestination)
 
-- (unsigned int)repDraggingEntered:(id <NSDraggingInfo>)sender
+- (NSDragOperation)repDraggingEntered:(id <NSDraggingInfo>)sender
 {
 	NSPasteboard *pb;
   NSDragOperation sourceDragMask;
@@ -2818,12 +2818,12 @@ static NSString *defaultColumns = @"{ \
 
 @implementation FSNListView (DraggingDestination)
 
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
   return [dsource listViewDraggingEntered: sender];
 }
 
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender
 {
   return [dsource listViewDraggingUpdated: sender];
 }

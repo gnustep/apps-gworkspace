@@ -1178,7 +1178,7 @@ static id <DesktopApplication> desktopApp = nil;
 
 @implementation FSNBrowserColumn (DraggingDestination)
 
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
 	NSPasteboard *pb;
   NSDragOperation sourceDragMask;
@@ -1275,7 +1275,7 @@ static id <DesktopApplication> desktopApp = nil;
   return NSDragOperationNone;
 }
 
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender
 {
   NSDragOperation sourceDragMask = [sender draggingSourceOperationMask];
   
@@ -1380,8 +1380,8 @@ static id <DesktopApplication> desktopApp = nil;
   [desktopApp performFileOperation: opDict];
 }
 
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
-                   inMatrixCell:(id)cell
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
+                      inMatrixCell:(id)cell
 {
 	NSPasteboard *pb = [sender draggingPasteboard];
   NSDragOperation sourceDragMask = [sender draggingSourceOperationMask];

@@ -450,10 +450,10 @@ do { \
                   argumentsCount: 0
                     userFunction: time_stamp];
   
-  [sqlite executeQuery: @"PRAGMA cache_size = 20000"];
-  [sqlite executeQuery: @"PRAGMA count_changes = 0"];
-  [sqlite executeQuery: @"PRAGMA synchronous = OFF"];
-  [sqlite executeQuery: @"PRAGMA temp_store = MEMORY"];
+  [sqlite executeSimpleQuery: @"PRAGMA cache_size = 20000"];
+  [sqlite executeSimpleQuery: @"PRAGMA count_changes = 0"];
+  [sqlite executeSimpleQuery: @"PRAGMA synchronous = OFF"];
+  [sqlite executeSimpleQuery: @"PRAGMA temp_store = MEMORY"];
   
   if ([sqlite executeSimpleQuery: user_db_schema_tmp] == NO) {
     NSLog(@"unable to create temp tables");

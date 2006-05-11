@@ -131,9 +131,9 @@
 
 @interface FSNIcon (DraggingDestination)
 
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender;
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender;
 
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender;
+- (NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender;
 
 - (void)draggingExited:(id <NSDraggingInfo>)sender;
 

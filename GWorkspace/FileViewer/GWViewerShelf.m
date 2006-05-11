@@ -1049,7 +1049,7 @@
 
 @implementation GWViewerShelf (DraggingDestination)
 
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
 	NSPasteboard *pb = [sender draggingPasteboard];
   NSDragOperation sourceDragMask = [sender draggingSourceOperationMask];
@@ -1104,7 +1104,7 @@
   return NSDragOperationNone;
 }
 
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender
 {
   NSDragOperation sourceDragMask;
   NSPoint dpoint;

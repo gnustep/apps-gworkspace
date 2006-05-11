@@ -47,12 +47,12 @@
   finder = anobject;
 }
 
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
   return [finder draggingEnteredInSearchPlaces: sender];
 }
 
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender
 {
   return [finder draggingUpdatedInSearchPlaces: sender];
 }

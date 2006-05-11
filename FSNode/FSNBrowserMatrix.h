@@ -80,12 +80,12 @@
 
 @interface FSNBrowserMatrix (DraggingDestination)
 
-- (unsigned int)checkReturnValueForCell:(FSNBrowserCell *)acell
-                       withDraggingInfo:(id <NSDraggingInfo>)sender;
+- (NSDragOperation)checkReturnValueForCell:(FSNBrowserCell *)acell
+                          withDraggingInfo:(id <NSDraggingInfo>)sender;
 
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender;
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender;
 
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender;
+- (NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender;
 
 - (void)draggingExited:(id <NSDraggingInfo>)sender;
 

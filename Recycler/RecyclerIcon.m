@@ -167,7 +167,7 @@ static id <DesktopApplication> desktopApp = nil;
 
 @implementation RecyclerIcon (DraggingDestination)
 
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
   NSPasteboard *pb = [sender draggingPasteboard];
               
@@ -180,7 +180,7 @@ static id <DesktopApplication> desktopApp = nil;
   return NSDragOperationNone;
 }
 
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender
 {
   NSPasteboard *pb = [sender draggingPasteboard];
 

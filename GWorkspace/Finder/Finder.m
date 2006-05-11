@@ -537,7 +537,7 @@ static Finder *finder = nil;
   [removePlaceButt setEnabled: NO];
 }
 
-- (unsigned int)draggingEnteredInSearchPlaces:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingEnteredInSearchPlaces:(id <NSDraggingInfo>)sender
 {
   if (usesSearchPlaces) {
 	  NSPasteboard *pb = [sender draggingPasteboard];
@@ -571,7 +571,7 @@ static Finder *finder = nil;
   return NSDragOperationNone;
 }
 
-- (unsigned int)draggingUpdatedInSearchPlaces:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingUpdatedInSearchPlaces:(id <NSDraggingInfo>)sender
 {
 	if (splacesDndTarget && usesSearchPlaces) {
 		return [sender draggingSourceOperationMask];

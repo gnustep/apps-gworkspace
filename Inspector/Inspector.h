@@ -94,8 +94,8 @@
 
 @interface Inspector (CustomDirectoryIcons)
 
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
-                     inIconView:(IconView *)iview;
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
+                        inIconView:(IconView *)iview;
 
 - (void)draggingExited: (id <NSDraggingInfo>)sender
             inIconView:(IconView *)iview;

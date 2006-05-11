@@ -122,7 +122,7 @@
 - (NSColor *)textColor;
 - (NSColor *)disabledTextColor;
 
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender;
+- (NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender;
 
 @end
 

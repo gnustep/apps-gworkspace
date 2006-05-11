@@ -486,7 +486,7 @@ static NSString *nibName = @"ClipBookWindow.gorm";
 
 @implementation ClipBookWindow (DraggingDestination)
 
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
   NSPasteboard *pb = [sender draggingPasteboard];
   NSArray *types = [pb types];
@@ -507,7 +507,7 @@ static NSString *nibName = @"ClipBookWindow.gorm";
   return NSDragOperationNone;
 }
 
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender
 {
 	if (isDragTarget) {
 		return NSDragOperationCopy;

@@ -169,9 +169,9 @@
 
 @interface FSNBrowserColumn (DraggingDestination)
 
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender;
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender;
 
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender;
+- (NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender;
 
 - (void)draggingExited:(id <NSDraggingInfo>)sender;
 
@@ -181,8 +181,8 @@
 
 - (void)concludeDragOperation:(id <NSDraggingInfo>)sender;
 
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
-                   inMatrixCell:(id)cell;
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
+                      inMatrixCell:(id)cell;
 
 - (void)concludeDragOperation:(id <NSDraggingInfo>)sender
                  inMatrixCell:(id)cell;

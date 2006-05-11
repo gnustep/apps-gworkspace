@@ -139,9 +139,9 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 
 @interface TShelfIcon (DraggingDestination)
 
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender;
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender;
 
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender;
+- (NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender;
 
 - (void)draggingExited:(id <NSDraggingInfo>)sender;
 

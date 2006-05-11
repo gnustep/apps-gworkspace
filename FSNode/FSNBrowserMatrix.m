@@ -360,8 +360,8 @@
 
 @implementation FSNBrowserMatrix (DraggingDestination)
 
-- (unsigned int)checkReturnValueForCell:(FSNBrowserCell *)acell
-                       withDraggingInfo:(id <NSDraggingInfo>)sender
+- (NSDragOperation)checkReturnValueForCell:(FSNBrowserCell *)acell
+                          withDraggingInfo:(id <NSDraggingInfo>)sender
 {
   if (dndTarget != acell) {
     dndTarget = acell;
@@ -377,7 +377,7 @@
   return dragOperation;
 }
 
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
   NSPoint location;
   int row, col;
@@ -408,7 +408,7 @@
   return NSDragOperationNone;
 }
 
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender
 {
   NSPoint location;
   int row, col;

@@ -1024,7 +1024,7 @@
 
 @implementation Fiend (DraggingDestination)
 
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
 	NSPasteboard *pb = [sender draggingPasteboard];
 	
@@ -1043,7 +1043,7 @@
   return NSDragOperationNone;
 }
 
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender
 {
   NSDragOperation sourceDragMask;
 	

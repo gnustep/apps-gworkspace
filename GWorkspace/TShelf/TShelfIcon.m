@@ -524,7 +524,7 @@
 
 @implementation TShelfIcon (DraggingDestination)
 
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
 	NSPasteboard *pb;
   NSDragOperation sourceDragMask;
@@ -652,7 +652,7 @@
   return NSDragOperationNone;
 }
 
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender
 {
   NSDragOperation sourceDragMask;
 

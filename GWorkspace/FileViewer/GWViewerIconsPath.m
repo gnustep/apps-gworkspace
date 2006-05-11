@@ -653,7 +653,7 @@
   return [NSColor disabledControlTextColor];
 }
 
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender
 {
   return NSDragOperationNone;
 }

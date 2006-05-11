@@ -215,12 +215,12 @@
 
 - (BOOL)checkDraggingLocation:(NSPoint)loc;
 
-- (unsigned int)checkReturnValueForRep:(FSNListViewNodeRep *)arep
-                      withDraggingInfo:(id <NSDraggingInfo>)sender;
+- (NSDragOperation)checkReturnValueForRep:(FSNListViewNodeRep *)arep
+                         withDraggingInfo:(id <NSDraggingInfo>)sender;
 
-- (unsigned int)listViewDraggingEntered:(id <NSDraggingInfo>)sender;
+- (NSDragOperation)listViewDraggingEntered:(id <NSDraggingInfo>)sender;
 
-- (unsigned int)listViewDraggingUpdated:(id <NSDraggingInfo>)sender;
+- (NSDragOperation)listViewDraggingUpdated:(id <NSDraggingInfo>)sender;
 
 - (void)listViewDraggingExited:(id <NSDraggingInfo>)sender;
 
@@ -274,7 +274,7 @@
 
 @interface FSNListViewNodeRep (DraggingDestination)
 
-- (unsigned int)repDraggingEntered:(id <NSDraggingInfo>)sender;
+- (NSDragOperation)repDraggingEntered:(id <NSDraggingInfo>)sender;
 
 - (void)repConcludeDragOperation:(id <NSDraggingInfo>)sender;
 
@@ -373,9 +373,9 @@
 
 @interface FSNListView (DraggingDestination)
 
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender;
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender;
 
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender;
+- (NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender;
 
 - (void)draggingExited:(id <NSDraggingInfo>)sender;
 

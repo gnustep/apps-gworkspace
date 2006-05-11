@@ -289,8 +289,8 @@ static NSString *nibName = @"InspectorWin";
 
 @implementation Inspector (CustomDirectoryIcons)
 
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
-                     inIconView:(IconView *)iview
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
+                        inIconView:(IconView *)iview
 {
   FSNode *dstnode;
 
@@ -317,7 +317,7 @@ static NSString *nibName = @"InspectorWin";
   return NSDragOperationNone;
 }
 
-- (void)draggingExited: (id <NSDraggingInfo>)sender
+- (void)draggingExited:(id <NSDraggingInfo>)sender
             inIconView:(IconView *)iview
 {
   [iview setDndTarget: NO];

@@ -69,7 +69,7 @@
 
 @implementation GWViewerScrollView (DraggingDestination)
 
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
   if (nodeView && [nodeView needsDndProxy]) {
     return [nodeView draggingEntered: sender];
@@ -77,7 +77,7 @@
   return NSDragOperationNone;
 }
 
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender
 {
   if (nodeView && [nodeView needsDndProxy]) {
     return [nodeView draggingUpdated: sender];

@@ -1193,7 +1193,7 @@ static NSImage *branchImage;
 
 @implementation FSNIcon (DraggingDestination)
 
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
 	NSPasteboard *pb;
   NSDragOperation sourceDragMask;
@@ -1356,7 +1356,7 @@ static NSImage *branchImage;
   return NSDragOperationNone;
 }
 
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender
 {
   NSDragOperation sourceDragMask = [sender draggingSourceOperationMask];
   NSPoint p = [self convertPoint: [sender draggingLocation] fromView: nil];

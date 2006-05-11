@@ -92,9 +92,9 @@
                            
 - (IBAction)chooseSearchPlacesType:(id)sender;
 
-- (unsigned int)draggingEnteredInSearchPlaces:(id <NSDraggingInfo>)sender;
+- (NSDragOperation)draggingEnteredInSearchPlaces:(id <NSDraggingInfo>)sender;
 
-- (unsigned int)draggingUpdatedInSearchPlaces:(id <NSDraggingInfo>)sender;
+- (NSDragOperation)draggingUpdatedInSearchPlaces:(id <NSDraggingInfo>)sender;
 
 - (void)concludeDragOperationInSearchPlaces:(id <NSDraggingInfo>)sender;
 

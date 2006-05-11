@@ -41,12 +41,12 @@
   [[self contentView] addSubview: [icon superview]];		
 }
 
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
   return [icon draggingEntered: sender];
 }
 
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender
 {
 	return [icon draggingUpdated: sender];
 }
@@ -344,7 +344,7 @@
   return [NSColor disabledControlTextColor];
 }
 
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender
 {
   return NSDragOperationNone;
 }

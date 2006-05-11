@@ -708,7 +708,7 @@
 
 @implementation Dock (DraggingDestination)
 
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
   NSPoint location = [sender draggingLocation];
   DockIcon *icon;
@@ -776,7 +776,7 @@
   return NSDragOperationNone;
 }
 
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender
 {
   NSPoint location;
   DockIcon *icon;

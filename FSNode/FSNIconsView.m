@@ -1804,7 +1804,7 @@ pp.y = NSMaxY(br) + 1; \
 
 @implementation FSNIconsView (DraggingDestination)
 
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
 	NSPasteboard *pb;
   NSDragOperation sourceDragMask;
@@ -1891,7 +1891,7 @@ pp.y = NSMaxY(br) + 1; \
   return NSDragOperationNone;
 }
 
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender
 {
   NSDragOperation sourceDragMask = [sender draggingSourceOperationMask];
   NSRect vr = [self visibleRect];

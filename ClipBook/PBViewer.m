@@ -440,12 +440,12 @@ static NSRect vrect = { { 0, 0 }, { 260, 300 } };
 
 @implementation GormObjectsView
 
-- (unsigned int)draggingEntered:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
   return [[[self window] delegate] draggingEntered: sender];
 }
 
-- (unsigned int)draggingUpdated:(id <NSDraggingInfo>)sender
+- (NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender
 {
   return [[[self window] delegate] draggingUpdated: sender];
 }
