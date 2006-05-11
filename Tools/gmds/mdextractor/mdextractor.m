@@ -1045,7 +1045,7 @@ do { \
       
       word_id = [sqlite getIntEntryWithStatement: statement];
       
-      if (word_id == -1) {
+      if (word_id == INT_MAX) {
         query = @"INSERT INTO words (word) VALUES(:word)";
 
         statement = [sqlite statementForQuery: query 
