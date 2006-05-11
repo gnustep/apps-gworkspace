@@ -1288,6 +1288,12 @@ do { \
   [sqlite executeQuery: @"PRAGMA synchronous = OFF"];
   [sqlite executeQuery: @"PRAGMA temp_store = MEMORY"];
 
+  if ([sqlite executeSimpleQuery: db_schema_tmp] == NO) {
+    NSLog(@"unable to create temp tables");
+    [sqlite closeDb];
+    return NO;    
+  }
+
   /* only to avoid a compiler warning */
   if (0) {
     NSLog(user_db_schema);

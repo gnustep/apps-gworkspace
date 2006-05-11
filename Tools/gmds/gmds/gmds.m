@@ -501,6 +501,7 @@ static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv
 
   /* only to avoid a compiler warning */
   if (0) {
+    NSLog(db_schema_tmp);
     NSLog(user_db_schema);
     NSLog(user_db_schema_tmp);
   }

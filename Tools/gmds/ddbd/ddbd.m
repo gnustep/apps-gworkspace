@@ -464,6 +464,7 @@ do { \
   /* only to avoid a compiler warning */
   if (0) {
     NSLog(db_schema);
+    NSLog(db_schema_tmp);
   }
 
   return YES;
