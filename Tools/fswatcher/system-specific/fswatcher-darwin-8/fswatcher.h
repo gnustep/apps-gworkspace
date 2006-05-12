@@ -98,6 +98,7 @@
   NSCountedSet *watchedPaths;
   pcomp *includePathsTree;
   pcomp *excludePathsTree;
+  NSMutableSet *excludedSuffixes;
   NSConnection *devReadConn;
   
   NSFileManager *fm;

@@ -114,6 +114,7 @@ typedef struct {
   NSCountedSet *watchedPaths;
   pcomp *includePathsTree;
   pcomp *excludePathsTree;  
+  NSMutableSet *excludedSuffixes;
   NSConnection *recReadConn;
      
   NSFileManager *fm;

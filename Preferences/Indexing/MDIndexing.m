@@ -42,6 +42,7 @@ BOOL isDotFile(NSString *path);
 
   TEST_RELEASE (indexedPaths);
   TEST_RELEASE (excludedPaths);
+  TEST_RELEASE (excludedSuffixes);
   TEST_RELEASE (startAppWin);  
   TEST_RELEASE (indexedStatusPath);
   TEST_RELEASE (indexedStatusLock);
@@ -63,6 +64,7 @@ BOOL isDotFile(NSString *path);
     
     indexedPaths = [NSMutableArray new];
     excludedPaths = [NSMutableArray new];
+    excludedSuffixes = [NSMutableArray new];
 
     [self readDefaults];
 
@@ -135,6 +137,41 @@ BOOL isDotFile(NSString *path);
     [excludedMatrix setAction: @selector(excludedMatrixAction:)]; 
 
     [excludedRemove setEnabled: ([[excludedMatrix cells] count] > 0)];
+
+    [suffixScroll setBorderType: NSBezelBorder];
+    [suffixScroll setHasHorizontalScroller: YES];
+    [suffixScroll setHasVerticalScroller: YES]; 
+
+    suffixMatrix = [[NSMatrix alloc] initWithFrame: NSMakeRect(0, 0, 100, 100)
+				            	              mode: NSRadioModeMatrix 
+                               prototype: [[NSBrowserCell new] autorelease]
+			       							  numberOfRows: 0 
+                         numberOfColumns: 0];
+    [suffixMatrix setIntercellSpacing: NSZeroSize];
+    [suffixMatrix setCellSize: NSMakeSize([suffixScroll contentSize].width, fonth)];
+    [suffixMatrix setAutoscroll: YES];
+	  [suffixMatrix setAllowsEmptySelection: YES];
+	  [suffixScroll setDocumentView: suffixMatrix];	
+    RELEASE (suffixMatrix);
+
+    for (i = 0; i < [excludedSuffixes count]; i++) {
+      NSString *path = [excludedSuffixes objectAtIndex: i];
+      int count = [[suffixMatrix cells] count];
+
+      [suffixMatrix insertRow: count];
+      cell = [suffixMatrix cellAtRow: count column: 0];   
+      [cell setStringValue: path];
+      [cell setLeaf: YES];  
+    }
+
+    [self adjustMatrix: suffixMatrix];    
+    [suffixMatrix sizeToCells]; 
+    [suffixMatrix setTarget: self]; 
+    [suffixMatrix setAction: @selector(suffixMatrixAction:)]; 
+
+    [suffixField setStringValue: @""];
+    
+    [suffixRemove setEnabled: ([[suffixMatrix cells] count] > 0)];
 
     unselectReply = NSUnselectNow;
     loaded = YES;
@@ -398,6 +435,90 @@ return; \
   [applyButton setEnabled: (unselectReply != NSUnselectNow)];    
 }
 
+- (void)suffixMatrixAction:(id)sender
+{
+  [suffixRemove setEnabled: ([[suffixMatrix cells] count] > 0)];  
+}
+
+- (IBAction)suffixButtAction:(id)sender
+{
+  NSPreferencePaneUnselectReply oldReply = unselectReply;
+  NSArray *cells = [suffixMatrix cells];
+  int count = [cells count];
+  id cell;
+
+#define SUFF_ERR_RETURN(x) \
+do { \
+NSRunAlertPanel(nil, \
+NSLocalizedString(x, @""), \
+NSLocalizedString(@"Ok", @""), \
+nil, \
+nil); \
+unselectReply = oldReply; \
+[suffixField setStringValue: @""]; \
+return; \
+} while (0)
+
+  if (sender == suffixAdd) {
+    NSString *suff = [suffixField stringValue];
+
+    unselectReply = NSUnselectCancel; 
+
+    if ([suff length]) {
+      NSCharacterSet *set = [NSCharacterSet characterSetWithCharactersInString: @". "];
+
+      if ([suff rangeOfCharacterFromSet: set].location != NSNotFound) {
+        SUFF_ERR_RETURN (@"Invalid character in suffix!");
+      }
+      
+      if ([excludedSuffixes containsObject: suff]) {
+        SUFF_ERR_RETURN (@"The suffix is already present!");
+      }
+      
+      [excludedSuffixes addObject: suff];
+      
+      [suffixMatrix insertRow: count];
+      cell = [suffixMatrix cellAtRow: count column: 0];   
+      [cell setStringValue: suff];
+      [cell setLeaf: YES];  
+      [self adjustMatrix: suffixMatrix];
+      [suffixMatrix sizeToCells]; 
+      [suffixMatrix selectCellAtRow: count column: 0]; 
+      
+      [suffixMatrix sendAction];  
+                
+    } else {        
+      unselectReply = oldReply;
+    }
+
+  } else if (sender == suffixRemove) {
+    cell = [suffixMatrix selectedCell];  
+    
+    if (cell) {  
+      int row, col;
+      
+      [excludedSuffixes removeObject: [cell stringValue]];
+
+      [suffixMatrix getRow: &row column: &col ofCell: cell];
+      [suffixMatrix removeRow: row];
+      [self adjustMatrix: suffixMatrix];
+      [suffixMatrix sizeToCells]; 
+      
+      [suffixMatrix sendAction];
+      
+      unselectReply = NSUnselectCancel; 
+    
+    } else {
+      unselectReply = oldReply;
+    }
+  }
+
+  [suffixField setStringValue: @""];
+  
+  [revertButton setEnabled: (unselectReply != NSUnselectNow)];   
+  [applyButton setEnabled: (unselectReply != NSUnselectNow)];  
+}
+
 - (IBAction)enableSwitchAction:(id)sender
 {
   BOOL oldEnabled = indexingEnabled;
@@ -413,8 +534,13 @@ return; \
   id cell;
   unsigned i;
 
-  [indexedPaths removeAllObjects];
-  [excludedPaths removeAllObjects];
+  DESTROY (indexedPaths);
+  DESTROY (excludedPaths);
+  DESTROY (excludedSuffixes);
+
+  indexedPaths = [NSMutableArray new];
+  excludedPaths = [NSMutableArray new];
+  excludedSuffixes = [NSMutableArray new];
   
   [self readDefaults];  
   
@@ -440,7 +566,7 @@ return; \
   if ([excludedMatrix numberOfColumns] > 0) {
     [excludedMatrix removeColumn: 0];
   }
-  
+
   for (i = 0; i < [excludedPaths count]; i++) {
     NSString *path = [excludedPaths objectAtIndex: i];
     int count = [[excludedMatrix cells] count];
@@ -456,6 +582,25 @@ return; \
 
   [excludedRemove setEnabled: ([[excludedMatrix cells] count] > 0)];
 
+  if ([suffixMatrix numberOfColumns] > 0) {
+    [suffixMatrix removeColumn: 0];
+  }
+
+  for (i = 0; i < [excludedSuffixes count]; i++) {
+    NSString *suff = [excludedSuffixes objectAtIndex: i];
+    int count = [[suffixMatrix cells] count];
+
+    [suffixMatrix insertRow: count];
+    cell = [suffixMatrix cellAtRow: count column: 0];   
+    [cell setStringValue: suff];
+    [cell setLeaf: YES];  
+  }
+
+  [self adjustMatrix: suffixMatrix];    
+  [suffixMatrix sizeToCells]; 
+
+  [suffixRemove setEnabled: ([[suffixMatrix cells] count] > 0)];
+  
   unselectReply = NSUnselectNow;
   [revertButton setEnabled: NO];   
   [applyButton setEnabled: NO];
@@ -796,7 +941,7 @@ return; \
   entry = [defaults arrayForKey: @"GSMetadataIndexablePaths"];
   if (entry) {
     [indexedPaths addObjectsFromArray: entry];
-  
+    
   } else {
     NSArray *dirs;
     unsigned i;
@@ -830,6 +975,18 @@ return; \
     [excludedPaths addObjectsFromArray: entry];
   }
   
+  entry = [defaults arrayForKey: @"GSMetadataExcludedSuffixes"];
+  if (entry == nil) {
+    entry = [NSArray arrayWithObjects: @"a", @"d", @"dylib", @"er1", 
+                                       @"err", @"extinfo", @"frag", @"la", 
+                                       @"log", @"o", @"out", @"part", 
+                                       @"sed", @"so", @"status", @"temp",
+                                       @"tmp",  
+                                       nil];
+  } 
+  
+  [excludedSuffixes addObjectsFromArray: entry];
+  
   indexingEnabled = [defaults boolForKey: @"GSMetadataIndexingEnabled"];
   [enableSwitch setState: (indexingEnabled ? NSOnState : NSOffState)];
 }
@@ -847,6 +1004,7 @@ return; \
 
   [domain setObject: indexedPaths forKey: @"GSMetadataIndexablePaths"];
   [domain setObject: excludedPaths forKey: @"GSMetadataExcludedPaths"];  
+  [domain setObject: excludedSuffixes forKey: @"GSMetadataExcludedSuffixes"];  
   [domain setObject: [NSNumber numberWithBool: indexingEnabled] 
              forKey: @"GSMetadataIndexingEnabled"];  
 
@@ -858,6 +1016,7 @@ return; \
 
   [info setObject: indexedPaths forKey: @"GSMetadataIndexablePaths"];
   [info setObject: excludedPaths forKey: @"GSMetadataExcludedPaths"];  
+  [info setObject: excludedSuffixes forKey: @"GSMetadataExcludedSuffixes"];  
   [info setObject: [NSNumber numberWithBool: indexingEnabled] 
            forKey: @"GSMetadataIndexingEnabled"];  
 

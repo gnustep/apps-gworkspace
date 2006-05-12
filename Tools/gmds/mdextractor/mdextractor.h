@@ -95,6 +95,7 @@
 {
   NSMutableArray *indexablePaths;
   pcomp *excludedPathsTree;  
+  NSMutableSet *excludedSuffixes;  
   BOOL indexingEnabled;
   BOOL extracting;
   BOOL subpathsChanged;  

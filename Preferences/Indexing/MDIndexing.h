@@ -39,7 +39,6 @@
 
 @protocol	MDExtractorProtocol
 
-
 @end
 
 
@@ -58,6 +57,14 @@
   IBOutlet id excludedAdd;
   IBOutlet id excludedRemove;  
   NSMutableArray *excludedPaths;
+
+  IBOutlet id suffixTitle;
+  IBOutlet id suffixScroll;
+  NSMatrix *suffixMatrix;
+  IBOutlet id suffixField;
+  IBOutlet id suffixAdd;
+  IBOutlet id suffixRemove;  
+  NSMutableArray *excludedSuffixes;
   
   BOOL indexingEnabled;
   
@@ -92,6 +99,10 @@
 - (void)excludedMatrixAction:(id)sender;
 
 - (IBAction)excludedButtAction:(id)sender;
+
+- (void)suffixMatrixAction:(id)sender;
+
+- (IBAction)suffixButtAction:(id)sender;
 
 - (IBAction)enableSwitchAction:(id)sender;
 

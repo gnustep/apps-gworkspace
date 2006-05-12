@@ -155,6 +155,7 @@ static void user_mdata_key(sqlite3_context *context, int argc, sqlite3_value **a
   
   RELEASE (indexablePaths);
   freeTree(excludedPathsTree);
+  RELEASE (excludedSuffixes);
   RELEASE (dbpath);
   RELEASE (sqlite);
   RELEASE (indexedStatusPath);
@@ -267,7 +268,8 @@ static void user_mdata_key(sqlite3_context *context, int argc, sqlite3_value **a
     
     indexablePaths = [NSMutableArray new];
     excludedPathsTree = newTreeWithIdentifier(@"excluded");
-
+    excludedSuffixes = [[NSMutableSet alloc] initWithCapacity: 1];
+    
     entry = [defaults arrayForKey: @"GSMetadataIndexablePaths"];
 
     if (entry) {
@@ -286,6 +288,18 @@ static void user_mdata_key(sqlite3_context *context, int argc, sqlite3_value **a
         insertComponentsOfPath([entry objectAtIndex: i], excludedPathsTree);
       }
     }
+
+    entry = [defaults arrayForKey: @"GSMetadataExcludedSuffixes"];
+    if (entry == nil) {
+      entry = [NSArray arrayWithObjects: @"a", @"d", @"dylib", @"er1", 
+                                         @"err", @"extinfo", @"frag", @"la", 
+                                         @"log", @"o", @"out", @"part", 
+                                         @"sed", @"so", @"status", @"temp",
+                                         @"tmp",  
+                                         nil];
+    } 
+
+    [excludedSuffixes addObjectsFromArray: entry];
 
     indexingEnabled = [defaults boolForKey: @"GSMetadataIndexingEnabled"];    
     
@@ -309,6 +323,7 @@ static void user_mdata_key(sqlite3_context *context, int argc, sqlite3_value **a
   NSDictionary *info = [notification userInfo];
   NSArray *indexable = [info objectForKey: @"GSMetadataIndexablePaths"];
   NSArray *excluded = [info objectForKey: @"GSMetadataExcludedPaths"];
+  NSArray *suffixes = [info objectForKey: @"GSMetadataExcludedSuffixes"];
   NSArray *excludedPaths = pathsOfTreeWithBase(excludedPathsTree);
   BOOL shouldExtract;
   unsigned count;
@@ -375,6 +390,9 @@ static void user_mdata_key(sqlite3_context *context, int argc, sqlite3_value **a
       }
     }
   }
+
+  [excludedSuffixes removeAllObjects];
+  [excludedSuffixes addObjectsFromArray: suffixes];
 
   indexingEnabled = [[info objectForKey: @"GSMetadataIndexingEnabled"] boolValue];
   
@@ -816,8 +834,10 @@ static void user_mdata_key(sqlite3_context *context, int argc, sqlite3_value **a
 
       if (entry) {
         NSString *subpath = [path stringByAppendingPathComponent: entry];
+        NSString *ext = [[subpath pathExtension] lowercaseString];
 
-        skip = (isDotFile(subpath) 
+        skip = ([excludedSuffixes containsObject: ext]
+                    || isDotFile(subpath) 
                     || inTreeFirstPartOfPath(subpath, excludedPathsTree));
 
         attributes = [fm fileAttributesAtPath: subpath traverseLink: NO];

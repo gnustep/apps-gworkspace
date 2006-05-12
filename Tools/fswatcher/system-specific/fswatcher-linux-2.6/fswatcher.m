@@ -168,6 +168,9 @@ BOOL isDotFile(NSString *path)
   RELEASE (clientsInfo);
   RELEASE (watchers);
   RELEASE (watchedPaths);
+  freeTree(includePathsTree);
+  freeTree(excludePathsTree);
+  RELEASE (excludedSuffixes);
 
   [super dealloc];
 }
@@ -205,6 +208,8 @@ BOOL isDotFile(NSString *path)
     
     includePathsTree = newTreeWithIdentifier(@"incl_paths");
     excludePathsTree = newTreeWithIdentifier(@"excl_paths");
+    excludedSuffixes = [[NSMutableSet alloc] initWithCapacity: 1];
+    
     [self setDefaultGlobalPaths];
     
     port[0] = (NSPort *)[NSPort port];
@@ -304,31 +309,31 @@ BOOL isDotFile(NSString *path)
 - (void)setDefaultGlobalPaths
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-  id paths;
+  id entry;
   unsigned i;
   
   [defaults synchronize];
 
-  paths = [defaults arrayForKey: @"GSMetadataIndexablePaths"];
+  entry = [defaults arrayForKey: @"GSMetadataIndexablePaths"];
   
-  if (paths) {
-    for (i = 0; i < [paths count]; i++) {
-      insertComponentsOfPath([paths objectAtIndex: i], includePathsTree);
+  if (entry) {
+    for (i = 0; i < [entry count]; i++) {
+      insertComponentsOfPath([entry objectAtIndex: i], includePathsTree);
     }
   
   } else {
     insertComponentsOfPath(NSHomeDirectory(), includePathsTree);
 
-    paths = NSSearchPathForDirectoriesInDomains(NSAllApplicationsDirectory, 
+    entry = NSSearchPathForDirectoriesInDomains(NSAllApplicationsDirectory, 
                                                         NSAllDomainsMask, YES);
-    for (i = 0; i < [paths count]; i++) {
-      insertComponentsOfPath([paths objectAtIndex: i], includePathsTree);
+    for (i = 0; i < [entry count]; i++) {
+      insertComponentsOfPath([entry objectAtIndex: i], includePathsTree);
     }
     
-    paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, 
+    entry = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, 
                                                       NSAllDomainsMask, YES);
-    for (i = 0; i < [paths count]; i++) {
-      NSString *dir = [paths objectAtIndex: i];
+    for (i = 0; i < [entry count]; i++) {
+      NSString *dir = [entry objectAtIndex: i];
       NSString *path = [dir stringByAppendingPathComponent: @"Headers"];
 
       if ([fm fileExistsAtPath: path]) {
@@ -343,13 +348,26 @@ BOOL isDotFile(NSString *path)
     }  
   }
 
-  paths = [defaults arrayForKey: @"GSMetadataExcludedPaths"];
+  entry = [defaults arrayForKey: @"GSMetadataExcludedPaths"];
 
-  if (paths) {
-    for (i = 0; i < [paths count]; i++) {
-      insertComponentsOfPath([paths objectAtIndex: i], excludePathsTree);
+  if (entry) {
+    for (i = 0; i < [entry count]; i++) {
+      insertComponentsOfPath([entry objectAtIndex: i], excludePathsTree);
     }
   }
+  
+  entry = [defaults arrayForKey: @"GSMetadataExcludedSuffixes"];
+  
+  if (entry == nil) {
+    entry = [NSArray arrayWithObjects: @"a", @"d", @"dylib", @"er1", 
+                                       @"err", @"extinfo", @"frag", @"la", 
+                                       @"log", @"o", @"out", @"part", 
+                                       @"sed", @"so", @"status", @"temp",
+                                       @"tmp",  
+                                       nil];
+  } 
+  
+  [excludedSuffixes addObjectsFromArray: entry];
 }
 
 - (void)globalPathsChanged:(NSNotification *)notification
@@ -357,6 +375,8 @@ BOOL isDotFile(NSString *path)
   NSDictionary *info = [notification userInfo];
   NSArray *indexable = [info objectForKey: @"GSMetadataIndexablePaths"];
   NSArray *excluded = [info objectForKey: @"GSMetadataExcludedPaths"];
+  NSArray *suffixes = [info objectForKey: @"GSMetadataExcludedSuffixes"];
+  
   unsigned i;
 
   emptyTreeWithBase(includePathsTree);
@@ -370,6 +390,9 @@ BOOL isDotFile(NSString *path)
   for (i = 0; i < [excluded count]; i++) {
     insertComponentsOfPath([excluded objectAtIndex: i], excludePathsTree);
   }
+  
+  [excludedSuffixes removeAllObjects];
+  [excludedSuffixes addObjectsFromArray: suffixes];
 }
 
 - (oneway void)registerClient:(id <FSWClientProtocol>)client
@@ -595,6 +618,7 @@ BOOL isDotFile(NSString *path)
   NSString *basePath = nil;    
   NSString *destPath = nil;
   NSString *destBasePath = nil;
+  NSString *ext = nil;
   BOOL notify;
   BOOL rename_notify;
 
@@ -698,14 +722,22 @@ BOOL isDotFile(NSString *path)
   //
   // global watching
   //
-  notify = ((isDotFile(path) == NO) 
-                      && inTreeFirstPartOfPath(path, includePathsTree)
-                  && (inTreeFirstPartOfPath(path, excludePathsTree) == NO));
+  ext = [[path pathExtension] lowercaseString];
+
+  notify = (([excludedSuffixes containsObject: ext] == NO)
+                    && (isDotFile(path) == NO) 
+                    && inTreeFirstPartOfPath(path, includePathsTree)
+                    && (inTreeFirstPartOfPath(path, excludePathsTree) == NO));
+  
+  if (rec->syscall == __NR_rename) {
+    ext = [[destPath pathExtension] lowercaseString];
+  }
     
   rename_notify = ((rec->syscall == __NR_rename)
+                  && ([excludedSuffixes containsObject: ext] == NO)
                   && (isDotFile(destPath) == NO) 
-                        && inTreeFirstPartOfPath(destPath, includePathsTree)
-                    && (inTreeFirstPartOfPath(destPath, excludePathsTree) == NO));
+                  && inTreeFirstPartOfPath(destPath, includePathsTree)
+                  && (inTreeFirstPartOfPath(destPath, excludePathsTree) == NO));
 
   if (notify) {
     NSMutableDictionary *info = [NSMutableDictionary dictionary];

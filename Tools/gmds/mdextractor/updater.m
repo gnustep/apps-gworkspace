@@ -129,8 +129,10 @@ do { \
 
         if (entry) {
           NSString *subpath = [path stringByAppendingPathComponent: entry];
-
-          skip = (isDotFile(subpath) 
+          NSString *ext = [[subpath pathExtension] lowercaseString];
+          
+          skip = ([excludedSuffixes containsObject: ext]
+                    || isDotFile(subpath) 
                     || inTreeFirstPartOfPath(subpath, excludedPathsTree));
         
           attributes = [fm fileAttributesAtPath: subpath traverseLink: NO];

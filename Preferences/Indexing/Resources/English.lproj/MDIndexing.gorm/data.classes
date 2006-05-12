@@ -7,12 +7,13 @@
 	    "enableSwitchAction:",
 	    "excludedButtAction:",
 	    "indexedButtAction:",
-	    "statusButtAction:",
+	    "suffixButtAction:",
 	    "nextButtAction:",
 	    "prevButtAction:",
 	    "revertButtAction:",
 	    "runInfoPanel:",
-	    "showAllButtAction:"
+	    "showAllButtAction:",
+	    "statusButtAction:"
 	);
 	Super = NSObject;
     };
@@ -23,7 +24,8 @@
 	    "applyButtAction:",
 	    "enableSwitchAction:",
 	    "revertButtAction:",
-	    "statusButtAction:"
+	    "statusButtAction:",
+	    "suffixButtAction:"
 	);
 	Outlets = (
 	    excludedTitle,
@@ -40,7 +42,12 @@
 	    revertButton,
 	    statusButton,
 	    statusWindow,
-	    statusScroll
+	    statusScroll,
+	    suffixRemove,
+	    suffixAdd,
+	    suffixScroll,
+	    suffixTitle,
+	    suffixField
 	);
 	Super = NSObject;
     };
