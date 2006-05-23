@@ -102,7 +102,7 @@
   NSString *dbpath;
   SQLite *sqlite;
   
-	NSMutableArray *extractors;
+	NSMutableDictionary *extractors;
   id textExtractor;
 	id stemmer;
   NSSet *stopWords;
@@ -200,7 +200,8 @@
 - (BOOL)updatePath:(NSString *)path;
 
 - (BOOL)updateRenamedPath:(NSString *)path 
-                  oldPath:(NSString *)oldpath;
+                  oldPath:(NSString *)oldpath
+              isDirectory:(BOOL)isdir;
 
 - (BOOL)removePath:(NSString *)path;
 

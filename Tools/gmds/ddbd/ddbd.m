@@ -733,12 +733,15 @@ do { \
     for (i = 0; i < [srcpaths count]; i++) {
       NSString *srcpath = [srcpaths objectAtIndex: i];
       NSString *dstpath = [dstpaths objectAtIndex: i];
-            
-      if (renamePath(dstpath, srcpath, sqlite) == NO) { 
-        NSLog(@"fileSystemDidChange: error renaming %@", srcpath); 
-        GWDebugLog(@"db update failed");
-        RELEASE (arp);
-        return;   
+      BOOL isdir;
+
+      if ([fm fileExistsAtPath: dstpath isDirectory: &isdir]) {
+        if (renamePath(dstpath, srcpath, isdir, sqlite) == NO) { 
+          NSLog(@"fileSystemDidChange: error renaming %@", srcpath); 
+          GWDebugLog(@"db update failed");
+          RELEASE (arp);
+          return;   
+        }
       }
     }
     
@@ -746,19 +749,22 @@ do { \
     for (i = 0; i < [srcpaths count]; i++) {
       NSString *srcpath = [srcpaths objectAtIndex: i];
       NSString *dstpath = [dstpaths objectAtIndex: i];
+      BOOL isdir;
       
-      if (removePath(dstpath, sqlite) == NO) {
-        NSLog(@"fileSystemDidChange: error copying %@", srcpath); 
-        RELEASE (arp);
-        return;   
+      if ([fm fileExistsAtPath: dstpath isDirectory: &isdir]) {
+        if (removePath(dstpath, sqlite) == NO) {
+          NSLog(@"fileSystemDidChange: error copying %@", srcpath); 
+          RELEASE (arp);
+          return;   
+        }
+
+        if (copyPath(srcpath, dstpath, isdir, sqlite) == NO) {
+          NSLog(@"fileSystemDidChange: error copying %@", srcpath);
+          GWDebugLog(@"db update failed"); 
+          RELEASE (arp);
+          return;   
+        } 
       }
-      
-      if (copyPath(srcpath, dstpath, sqlite) == NO) {
-        NSLog(@"fileSystemDidChange: error copying %@", srcpath);
-        GWDebugLog(@"db update failed"); 
-        RELEASE (arp);
-        return;   
-      } 
     }    
   }
 
@@ -906,15 +912,12 @@ BOOL removePath(NSString *path, SQLite *sqlite)
   return YES;
 }
 
-BOOL renamePath(NSString *path, NSString *oldpath, SQLite *sqlite)
+BOOL renamePath(NSString *path, NSString *oldpath, BOOL isdir, SQLite *sqlite)
 {
   NSString *qpath = stringForQuery(path);
   NSString *qoldpath = stringForQuery(oldpath);
   SQLitePreparedStatement *statement;
   NSString *query;
-
-  GWDebugLog(@"srcpath = %@", qoldpath);
-  GWDebugLog(@"dstpath = %@", qpath);
           
   statement = [sqlite statementForQuery: @"DELETE FROM user_renamed_paths" 
                          withIdentifier: @"rename_path_1"
@@ -939,35 +942,45 @@ BOOL renamePath(NSString *path, NSString *oldpath, SQLite *sqlite)
 
   STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
 
-  query = @"INSERT INTO user_renamed_paths "
-          @"(id, path, base, oldbase) "
-          @"SELECT user_paths.id, user_paths.path, "
-          @"user_renamed_paths_base.base, user_renamed_paths_base.oldbase "
-          @"FROM user_paths, user_renamed_paths_base "
-          @"WHERE user_paths.path = :oldpath "
-          @"OR user_paths.path GLOB :minpath ";
-          
-  statement = [sqlite statementForQuery: query 
-                         withIdentifier: @"rename_path_4"
-                               bindings: SQLITE_TEXT, @":oldpath", qoldpath,
-                                          SQLITE_TEXT, @":minpath", 
-            [NSString stringWithFormat: @"%@%@*", qoldpath, pathsep()], 0];
+  if (isdir) {
+    query = @"INSERT INTO user_renamed_paths "
+            @"(id, path, base, oldbase) "
+            @"SELECT user_paths.id, user_paths.path, "
+            @"user_renamed_paths_base.base, user_renamed_paths_base.oldbase "
+            @"FROM user_paths, user_renamed_paths_base "
+            @"WHERE user_paths.path = :oldpath "
+            @"OR user_paths.path GLOB :minpath";
 
+    statement = [sqlite statementForQuery: query 
+                           withIdentifier: @"rename_path_4"
+                                 bindings: SQLITE_TEXT, @":oldpath", qoldpath,
+                                            SQLITE_TEXT, @":minpath", 
+              [NSString stringWithFormat: @"%@%@*", qoldpath, pathsep()], 0];
+  } else {
+    query = @"INSERT INTO user_renamed_paths "
+            @"(id, path, base, oldbase) "
+            @"SELECT user_paths.id, user_paths.path, "
+            @"user_renamed_paths_base.base, user_renamed_paths_base.oldbase "
+            @"FROM user_paths, user_renamed_paths_base "
+            @"WHERE user_paths.path = :oldpath";
+
+    statement = [sqlite statementForQuery: query 
+                           withIdentifier: @"rename_path_5"
+                                 bindings: SQLITE_TEXT, @":oldpath", qoldpath, 0];
+  }
+  
   STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
   
   return YES;
 }
 
-BOOL copyPath(NSString *srcpath, NSString *dstpath, SQLite *sqlite)
+BOOL copyPath(NSString *srcpath, NSString *dstpath, BOOL isdir, SQLite *sqlite)
 {
   NSString *qsrcpath = stringForQuery(srcpath);
   NSString *qdstpath = stringForQuery(dstpath);
   SQLitePreparedStatement *statement;
   NSString *query;
-  
-  GWDebugLog(@"srcpath = %@", qsrcpath);
-  GWDebugLog(@"dstpath = %@", qdstpath);
-        
+          
   statement = [sqlite statementForQuery: @"DELETE FROM user_copied_paths" 
                          withIdentifier: @"copy_path_1"
                                bindings: 0];
@@ -991,19 +1004,32 @@ BOOL copyPath(NSString *srcpath, NSString *dstpath, SQLite *sqlite)
 
   STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
 
-  query = @"INSERT INTO user_copied_paths "
-          @"(src_id, srcpath, is_directory, srcbase, dstbase) "
-          @"SELECT user_paths.id, user_paths.path, user_paths.is_directory, "
-          @"user_copied_paths_base.srcbase, user_copied_paths_base.dstbase "
-          @"FROM user_paths, user_copied_paths_base "
-          @"WHERE user_paths.path = :srcbase " 
-          @"OR user_paths.path GLOB :minpath";
+  if (isdir) {
+    query = @"INSERT INTO user_copied_paths "
+            @"(src_id, srcpath, is_directory, srcbase, dstbase) "
+            @"SELECT user_paths.id, user_paths.path, user_paths.is_directory, "
+            @"user_copied_paths_base.srcbase, user_copied_paths_base.dstbase "
+            @"FROM user_paths, user_copied_paths_base "
+            @"WHERE user_paths.path = :srcbase " 
+            @"OR user_paths.path GLOB :minpath";
 
-  statement = [sqlite statementForQuery: query 
-                         withIdentifier: @"copy_path_5"
-                               bindings: SQLITE_TEXT, @":srcbase", qsrcpath,
-                                          SQLITE_TEXT, @":minpath", 
-            [NSString stringWithFormat: @"%@%@*", qsrcpath, pathsep()], 0];
+    statement = [sqlite statementForQuery: query 
+                           withIdentifier: @"copy_path_5"
+                                 bindings: SQLITE_TEXT, @":srcbase", qsrcpath,
+                                            SQLITE_TEXT, @":minpath", 
+              [NSString stringWithFormat: @"%@%@*", qsrcpath, pathsep()], 0];
+  } else {
+    query = @"INSERT INTO user_copied_paths "
+            @"(src_id, srcpath, is_directory, srcbase, dstbase) "
+            @"SELECT user_paths.id, user_paths.path, user_paths.is_directory, "
+            @"user_copied_paths_base.srcbase, user_copied_paths_base.dstbase "
+            @"FROM user_paths, user_copied_paths_base "
+            @"WHERE user_paths.path = :srcbase";
+
+    statement = [sqlite statementForQuery: query 
+                           withIdentifier: @"copy_path_6"
+                                 bindings: SQLITE_TEXT, @":srcbase", qsrcpath, 0];
+  }
 
   STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
   

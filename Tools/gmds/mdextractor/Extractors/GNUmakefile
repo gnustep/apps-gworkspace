@@ -2,6 +2,7 @@ include $(GNUSTEP_MAKEFILES)/common.make
 
 SUBPROJECTS = \
   TextExtractor \
+  HtmlExtractor \
   JpegExtractor 
   
 -include GNUmakefile.preamble

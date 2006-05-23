@@ -225,6 +225,7 @@ do { \
 
 - (BOOL)updateRenamedPath:(NSString *)path 
                   oldPath:(NSString *)oldpath
+              isDirectory:(BOOL)isdir
 {
   NSString *qpath = stringForQuery(path);
   NSString *qoldpath = stringForQuery(oldpath);
@@ -255,21 +256,34 @@ do { \
                                          SQLITE_TEXT, @":oldpath", qoldpath, 0];
 
   STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
+  
+  if (isdir) {
+    query = @"INSERT INTO renamed_paths "
+            @"(id, path, base, oldbase) "
+            @"SELECT paths.id, paths.path, "
+            @"renamed_paths_base.base, renamed_paths_base.oldbase "
+            @"FROM paths, renamed_paths_base "
+            @"WHERE paths.path = :oldpath "
+            @"OR paths.path GLOB :minpath ";
 
-  query = @"INSERT INTO renamed_paths "
-          @"(id, path, base, oldbase) "
-          @"SELECT paths.id, paths.path, "
-          @"renamed_paths_base.base, renamed_paths_base.oldbase "
-          @"FROM paths, renamed_paths_base "
-          @"WHERE paths.path = :oldpath "
-          @"OR paths.path GLOB :minpath ";
-          
-  statement = [sqlite statementForQuery: query 
-                         withIdentifier: @"update_renamed_4"
-                               bindings: SQLITE_TEXT, @":oldpath", qoldpath,
-                                         SQLITE_TEXT, @":minpath", 
-        [NSString stringWithFormat: @"%@%@*", qoldpath, path_separator()], 0];
+    statement = [sqlite statementForQuery: query 
+                           withIdentifier: @"update_renamed_4"
+                                 bindings: SQLITE_TEXT, @":oldpath", qoldpath,
+                                           SQLITE_TEXT, @":minpath", 
+          [NSString stringWithFormat: @"%@%@*", qoldpath, path_separator()], 0];
+  } else {
+    query = @"INSERT INTO renamed_paths "
+            @"(id, path, base, oldbase) "
+            @"SELECT paths.id, paths.path, "
+            @"renamed_paths_base.base, renamed_paths_base.oldbase "
+            @"FROM paths, renamed_paths_base "
+            @"WHERE paths.path = :oldpath";
 
+    statement = [sqlite statementForQuery: query 
+                           withIdentifier: @"update_renamed_5"
+                                 bindings: SQLITE_TEXT, @":oldpath", qoldpath, 0];
+  }
+  
   STATEMENT_EXECUTE_OR_ROLLBACK (statement, NO);
 
   EXECUTE_QUERY (@"COMMIT", NO);
@@ -360,8 +374,10 @@ do { \
 
   while ((fname = [enumerator nextObject])) {
     NSString *subpath = [path stringByAppendingPathComponent: fname];
-
-    if ((isDotFile(subpath) == NO)
+    NSString *ext = [[subpath pathExtension] lowercaseString];
+    
+    if (([excludedSuffixes containsObject: ext] == NO)
+            && (isDotFile(subpath) == NO)
             && (inTreeFirstPartOfPath(subpath, excludedPathsTree) == NO)) {
       [contents addObject: subpath];
     }
@@ -497,7 +513,9 @@ do { \
       }
 
     } else if ([event isEqual: @"GWWatchedPathRenamed"]) {
-      if ([fm fileExistsAtPath: path]) {
+      BOOL isdir;
+      
+      if ([fm fileExistsAtPath: path isDirectory: &isdir]) {
         NSString *oldpath = [dict objectForKey: @"oldpath"];
       
         if (oldpath != nil) {
@@ -532,7 +550,9 @@ do { \
         
           GWDebugLog(@"db rename: %@ -> %@", oldpath, path);
 
-          if ([self updateRenamedPath: path oldPath: oldpath] == NO) { 
+          if ([self updateRenamedPath: path 
+                              oldPath: oldpath 
+                          isDirectory: isdir] == NO) { 
             NSLog(@"An error occurred while processing %@", path);
           }
 

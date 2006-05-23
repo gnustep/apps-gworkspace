@@ -1148,7 +1148,7 @@ do { \
   NSString *ext = [[path pathExtension] lowercaseString];
   NSString *app = nil, *type = nil;
   NSData *data = nil;
-  int i;
+  id extractor = nil;  
   
   [ws getInfoForFile: path application: &app type: &type]; 
   
@@ -1170,13 +1170,13 @@ do { \
     }
   }
 
-  for (i = 0; i < [extractors count]; i++) {
-    id extractor = [extractors objectAtIndex: i];
-
+  extractor = [extractors objectForKey: ext];
+  
+  if (extractor) {
     if ([extractor canExtractFromFileType: type
                             withExtension: ext 
                                attributes: attributes
-                                 testData: data]) {
+                                 testData: data]) {      
       return extractor;
     }
   }
@@ -1212,7 +1212,7 @@ do { \
 		}
   }
 
-  extractors = [NSMutableArray new];
+  extractors = [NSMutableDictionary new];
   
   for (i = 0; i < [bundlesPaths count]; i++) {
     NSString *bpath = [bundlesPaths objectAtIndex: i];
@@ -1223,11 +1223,19 @@ do { \
   
 			if ([principalClass conformsToProtocol: @protocol(ExtractorsProtocol)]) {	
         id extractor = [[principalClass alloc] initForExtractor: self];
+        NSArray *extensions = [extractor pathExtensions];
         
-        if ([[extractor pathExtensions] containsObject: @"txt"]) {
+        if ([extensions containsObject: @"txt"]) {
           ASSIGN (textExtractor, extractor);
+          
         } else {
-          [extractors addObject: extractor];
+          unsigned j;
+          
+          for (j = 0; j < [extensions count]; j++) {
+            [extractors setObject: extractor 
+                           forKey: [[extensions objectAtIndex: j] lowercaseString]];
+          }
+        
           RELEASE ((id)extractor);
         }
       }

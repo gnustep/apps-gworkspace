@@ -94,6 +94,10 @@ static NSString *nibName = @"Annotations";
     FSNode *node = [FSNode nodeWithPath: [paths objectAtIndex: 0]];
     NSImage *icon = [[FSNodeRep sharedInstance] iconOfSize: ICNSIZE forNode: node];
 
+    if (currentPath) {
+      [inspector removeWatcherForPath: currentPath];
+    }  
+
     ASSIGN (currentPath, [node path]);
     [inspector addWatcherForPath: currentPath];
   

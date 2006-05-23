@@ -145,9 +145,9 @@ int insertPathIfNeeded(NSString *path, SQLite *sqlite);
 
 BOOL removePath(NSString *path, SQLite *sqlite);
 
-BOOL renamePath(NSString *path, NSString *oldpath, SQLite *sqlite);
+BOOL renamePath(NSString *path, NSString *oldpath, BOOL isdir, SQLite *sqlite);
 
-BOOL copyPath(NSString *srcpath, NSString *dstpath, SQLite *sqlite);
+BOOL copyPath(NSString *srcpath, NSString *dstpath, BOOL isdir, SQLite *sqlite);
 
 
 BOOL subpath(NSString *p1, NSString *p2);
