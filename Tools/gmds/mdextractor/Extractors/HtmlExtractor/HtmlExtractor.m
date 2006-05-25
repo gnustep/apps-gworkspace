@@ -142,7 +142,6 @@ int escapeChar(char *buf, NSMutableString *str);
       [scanner setCharactersToBeSkipped: skipSet];
 
       while ([scanner isAtEnd] == NO) {        
-        CREATE_AUTORELEASE_POOL(arp1);    
         (*scanImp)(scanner, scanSel, skipSet, &word);
 
         if (word) {
@@ -162,8 +161,6 @@ int escapeChar(char *buf, NSMutableString *str);
 
           wcount++;
         }
-
-        RELEASE (arp1);
       }
 
       [wordsDict setObject: wordset forKey: @"wset"];
