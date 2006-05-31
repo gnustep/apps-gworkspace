@@ -129,7 +129,7 @@ static NSString *nibName = @"InspectorWin";
 
   if (currentInspector == nil) {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    id entry = [defaults objectForKey: @"last_inspector"];
+    id entry = [defaults objectForKey: @"last_active_inspector"];
     
     [popUp selectItemAtIndex: ((entry != nil) ? [entry intValue] : 0)];
     [self activateInspector: popUp];
@@ -238,7 +238,7 @@ static NSString *nibName = @"InspectorWin";
   NSNumber *index = [NSNumber numberWithInt: [popUp indexOfSelectedItem]];
 
   [[NSUserDefaults standardUserDefaults] setObject: index 
-                                            forKey: @"last_inspector"];
+                                            forKey: @"last_active_inspector"];
   [[self attributes] updateDefaults];
   [win saveFrameUsingName: @"inspector"];
 }
