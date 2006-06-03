@@ -573,7 +573,7 @@
       int last = (i > 0) ? i - 1 : 0;
       int shift = 0;
       int leftscr = 0;
-
+    
       if (last >= visibleColumns) {
         if (last < firstVisibleColumn) {
           shift = visibleColumns - 1;
@@ -596,10 +596,7 @@
       break;
     }
 	}
-  
-  updateViewsLock--;
-  [self tile];
-  
+
   col = [self lastLoadedColumn];
 
   if (col) {
@@ -613,13 +610,29 @@
     [[self window] makeFirstResponder: [col cmatrix]];
 
     if (selection) {
+      if (selColumn && (index == lastColumnLoaded)) {
+        if ([selection count] == 1) {
+          FSNode *node = [FSNode nodeWithPath: [selection objectAtIndex: 0]];
+        
+          if (([node isDirectory] == NO) || [node isPackage]) {
+            [self addFillingColumn];
+          }
+        
+        } else {
+          [self addFillingColumn];
+        }
+      }
+    
       [self notifySelectionChange: selection];	
-
+    
     } else {
       FSNode *node = [col shownNode];
       [self notifySelectionChange: [NSArray arrayWithObject: [node path]]];
     }
   }
+
+  updateViewsLock--;
+  [self tile];
 }
 
 - (void)reloadFromColumnWithNode:(FSNode *)anode
@@ -649,6 +662,8 @@
 
 - (void)tile
 {
+  updateViewsLock = (updateViewsLock < 0) ? 0 : updateViewsLock;
+
   if (updateViewsLock == 0) {
     NSWindow *window = [self window];
     NSRect r = [self frame];

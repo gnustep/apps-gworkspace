@@ -400,8 +400,11 @@ static GWDesktopManager *desktopManager = nil;
 
 - (void)deselectAllIcons
 {
-  [[win desktopView] unselectOtherReps: nil];
-  [[win desktopView] stopRepNameEditing];
+  GWDesktopView *view = [win desktopView];
+  
+  [view unselectOtherReps: nil];
+  [view selectionDidChange];
+  [view stopRepNameEditing];
 }
 
 - (void)deselectInSpatialViewers

@@ -5,7 +5,7 @@
 	XAppWrapper = YES;
   NSTypes = (
     {
-      NSUnixExtensions = ( "txt" );
+      NSUnixExtensions = ( "txt", "text" );
       NSIcon = "FileIcon_txt.tiff";
     },
     {
@@ -13,7 +13,7 @@
       NSIcon = "FileIcon_.c.tiff";
     },
     {
-      NSUnixExtensions = ( "m" );
+      NSUnixExtensions = ( "m", "mm" );
       NSIcon = "FileIcon_.m.tiff";
     },
     {
