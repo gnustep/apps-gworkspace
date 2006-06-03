@@ -20,6 +20,11 @@ AC_CONFIG_HEADER([Tools/lsfupdater/config.h])
 AC_CONFIG_SUBDIRS(FSNode Inspector SQLite Tools/gmds)
 
 #--------------------------------------------------------------------
+# Determine the host, build, and target systems
+#--------------------------------------------------------------------
+AC_CANONICAL_TARGET([])
+
+#--------------------------------------------------------------------
 # Find sqlite
 #--------------------------------------------------------------------
 AC_ARG_WITH(sqlite_library, 
@@ -38,6 +43,14 @@ fi
 
 CPPFLAGS="$with_sqlite_include ${CPPFLAGS}"
 LDFLAGS="$with_sqlite_library -lsqlite3 ${LDFLAGS}"
+
+case "$target_os" in
+  freebsd* | openbsd* )	
+	        CPPFLAGS="$CPPFLAGS -I/usr/local/include"
+		LDFLAGS="$LDFLAGS -L/usr/local/lib";;
+  netbsd*)	CPPFLAGS="$CPPFLAGS -I/usr/pkg/include"
+		LDFLAGS="$LDFLAGS -Wl,-R/usr/pkg/lib -L/usr/pkg/lib";;
+esac
 
 AC_CHECK_HEADER(sqlite3.h, have_sqlite=yes, have_sqlite=no)
 if test "$have_sqlite" = yes; then
