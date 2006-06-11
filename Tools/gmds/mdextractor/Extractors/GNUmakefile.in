@@ -1,9 +1,19 @@
 include $(GNUSTEP_MAKEFILES)/common.make
 
+PDFKIT=@have_pdfkit@
+
+ifneq ($(PDFKIT),no)
+SUBPROJECTS = \
+  TextExtractor \
+  HtmlExtractor \
+  PdfExtractor \
+  JpegExtractor 
+else
 SUBPROJECTS = \
   TextExtractor \
   HtmlExtractor \
   JpegExtractor 
+endif
   
 -include GNUmakefile.preamble
 

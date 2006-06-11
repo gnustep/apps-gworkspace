@@ -131,7 +131,6 @@
     [scanner setCharactersToBeSkipped: skipSet];
         
     while ([scanner isAtEnd] == NO) {        
-      CREATE_AUTORELEASE_POOL(arp1);    
       (*scanImp)(scanner, scanSel, skipSet, &word);
       
       if (word) {
@@ -151,8 +150,6 @@
         
         wcount++;
       }
-  
-      RELEASE (arp1);
     }
     
     [wordsDict setObject: wordset forKey: @"wset"];

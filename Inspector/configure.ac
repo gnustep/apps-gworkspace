@@ -15,6 +15,8 @@ AC_CONFIG_AUX_DIR([$GNUSTEP_MAKEFILES])
 AC_CONFIG_HEADER([config.h])
 AC_CONFIG_HEADER([ContentViewers/ImageViewer/resizer/config.h])
 
+AC_CANONICAL_TARGET([])
+
 #--------------------------------------------------------------------
 # Debug logging
 #--------------------------------------------------------------------
@@ -55,9 +57,16 @@ AC_DEFINE_UNQUOTED([FILEPATH], ["$FILE_PATH"], [Path to file])
 #--------------------------------------------------------------------
 # We need PDFKit
 #--------------------------------------------------------------------
-AC_CHECK_PDFKIT(have_pdfkit=yes, have_pdfkit=no)
+case "$target_os" in
+  darwin*)
+    AC_CHECK_PDFKIT_DARWIN(have_pdfkit=yes, have_pdfkit=no)
+    ;;
+  *)	
+    AC_CHECK_PDFKIT(have_pdfkit=yes, have_pdfkit=no)
+    ;;
+esac
 
-if test "$have_pdfkit" = no; then
+if test "$have_pdfkit" = "no"; then
   AC_MSG_NOTICE([The PDFKit framework can't be found.])
   AC_MSG_NOTICE([The pdf viewer will not be built.])  
 fi

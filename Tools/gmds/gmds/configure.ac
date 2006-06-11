@@ -7,6 +7,8 @@ fi
 
 AC_CONFIG_AUX_DIR([$GNUSTEP_MAKEFILES])
 
+AC_CANONICAL_TARGET([])
+
 #--------------------------------------------------------------------
 # Find sqlite
 #--------------------------------------------------------------------
@@ -69,6 +71,24 @@ fi
 AC_SUBST(ADDITIONAL_LIB_DIRS)
 AC_SUBST(ADDITIONAL_INCLUDE_DIRS)
 
+#--------------------------------------------------------------------
+# We need PDFKit
+#--------------------------------------------------------------------
+case "$target_os" in
+  darwin*)
+    AC_CHECK_PDFKIT_DARWIN(have_pdfkit=yes, have_pdfkit=no)
+    ;;
+  *)	
+    AC_CHECK_PDFKIT(have_pdfkit=yes, have_pdfkit=no)
+    ;;
+esac
+
+if test "$have_pdfkit" = "no"; then
+  AC_MSG_NOTICE([The PDFKit framework can't be found.])
+  AC_MSG_NOTICE([The pdf extractor will not be built.])  
+fi
+
+AC_SUBST(have_pdfkit)
 
 #--------------------------------------------------------------------
 # Debug logging
@@ -85,10 +105,9 @@ fi
 
 AC_DEFINE_UNQUOTED([GW_DEBUG_LOG], [$GW_DEBUG_LOG], [debug logging])
 
-
 AC_CONFIG_HEADER([config.h])
 
-AC_CONFIG_FILES([GNUmakefile])
+AC_CONFIG_FILES([GNUmakefile ../mdextractor/Extractors/GNUmakefile])
 
 AC_OUTPUT
 

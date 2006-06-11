@@ -12,6 +12,7 @@ AC_CONFIG_HEADER([mdextractor/config.h])
 
 AC_CONFIG_SUBDIRS(gmds)
 
+AC_CANONICAL_TARGET([])
 #--------------------------------------------------------------------
 # Debug logging
 #--------------------------------------------------------------------
