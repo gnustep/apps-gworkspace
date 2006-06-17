@@ -378,82 +378,65 @@ static unsigned char darkerLUT[256] = {
 - (NSImage *)resizedIcon:(NSImage *)icon 
                   ofSize:(int)size
 {
-  if (oldresize == NO) {
-    CREATE_AUTORELEASE_POOL(arp);
+  CREATE_AUTORELEASE_POOL(arp);
+  NSData *tiffdata = [icon TIFFRepresentation];
+  NSBitmapImageRep *rep = [NSBitmapImageRep imageRepWithData: tiffdata];
+  int spp = [rep samplesPerPixel];
+  int bitsPerPixel = [rep bitsPerPixel];
+  int bpp = bitsPerPixel / 8;
+  NSImage *newIcon;
+
+	if (((spp == 3) && (bitsPerPixel == 24)) 
+                          || ((spp == 4) && (bitsPerPixel == 32))) {
     NSSize icnsize = [icon size];
-	  NSRect srcr = NSZeroRect;
-	  NSRect dstr = NSZeroRect;  
-    float fact;
-    NSSize newsize;	
-    NSImage *newIcon;
-    NSBitmapImageRep *rep;
-
-    if (icnsize.width >= icnsize.height) {
-      fact = icnsize.width / size;
-    } else {
-      fact = icnsize.height / size;
-    }
-
-    newsize.width = floor(icnsize.width / fact + 0.5);
-    newsize.height = floor(icnsize.height / fact + 0.5);
-	  srcr.size = icnsize;
-	  dstr.size = newsize;
+    float fact = (icnsize.width >= icnsize.height) ? icnsize.width / size : icnsize.height / size;
+    NSSize newsize = NSMakeSize(floor(icnsize.width / fact + 0.5), floor(icnsize.height / fact + 0.5));	
+    float xratio = icnsize.width / newsize.width;
+    float yratio = icnsize.height / newsize.height;
+    BOOL isColor = [rep hasAlpha] ? (spp > 2) : (spp > 1);
+    NSString *colorSpaceName = isColor ? NSCalibratedRGBColorSpace : NSCalibratedWhiteColorSpace;      
+    NSBitmapImageRep *newrep;
+    unsigned char *srcData;
+    unsigned char *dstData;    
+    unsigned x, y, i;
 
     newIcon = [[NSImage alloc] initWithSize: newsize];
 
-    NS_DURING
-      {
-		    [newIcon lockFocus];
+    newrep = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: NULL
+                                pixelsWide: (int)newsize.width
+                                pixelsHigh: (int)newsize.height
+                                bitsPerSample: 8
+                                samplesPerPixel: (isColor ? 4 : 2)
+                                hasAlpha: YES
+                                isPlanar: NO
+                                colorSpaceName: colorSpaceName
+                                bytesPerRow: 0
+                                bitsPerPixel: 0];
 
-        [icon drawInRect: dstr 
-                fromRect: srcr 
-               operation: NSCompositeSourceOver 
-                fraction: 1.0];
+    [newIcon addRepresentation: newrep];
+    RELEASE (newrep); 
 
-        rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect: dstr];
+    srcData = [rep bitmapData];
+    dstData = [newrep bitmapData];
 
-        if (rep) {
-          [newIcon addRepresentation: rep];
-          RELEASE (rep); 
+    for (y = 0; y < (int)newsize.height; y++) {
+      for (x = 0; x < (int)newsize.width; x++) {
+        for (i = 0; i < bpp; i++) {
+          int dstidx = (int)(bpp * (y * newsize.width + x) + i);
+          int srcidx = (int)(bpp * (floor(y * yratio) * icnsize.width + floor(x * xratio)) + i);
+
+          dstData[dstidx] = srcData[srcidx];
         }
-
-		    [newIcon unlockFocus];
       }
-    NS_HANDLER
-      {
-        newIcon = [icon copy];
-	      [newIcon setScalesWhenResized: YES];
-	      [newIcon setSize: newsize];  
-      }
-    NS_ENDHANDLER
-
-    RELEASE (arp);
-
-    return [newIcon autorelease];  
-  
-  } else {
-    CREATE_AUTORELEASE_POOL(arp);
-    NSImage *newIcon = [icon copy];
-    NSSize icnsize = [icon size];
-    float fact;
-    NSSize newsize;
-
-    if (icnsize.width >= icnsize.height) {
-      fact = icnsize.width / size;
-    } else {
-      fact = icnsize.height / size;
     }
 
-    newsize.width = floor(icnsize.width / fact + 0.5);
-    newsize.height = floor(icnsize.height / fact + 0.5);
-	  [newIcon setScalesWhenResized: YES];
-	  [newIcon setSize: newsize];  
-    RELEASE (arp);
-
-    return [newIcon autorelease];  
+  } else {
+    newIcon = [icon copy];  
   }
 
-  return nil;
+  RELEASE (arp);
+
+  return AUTORELEASE (newIcon);  
 }
 
 - (NSImage *)lighterIcon:(NSImage *)icon

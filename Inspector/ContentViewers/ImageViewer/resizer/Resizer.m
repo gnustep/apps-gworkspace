@@ -123,14 +123,17 @@
   if (srcImage && [srcImage isValid]) {
     NSData *srcData = [srcImage TIFFRepresentation];
     NSBitmapImageRep *srcRep = [NSBitmapImageRep imageRepWithData: srcData];
+    int spp = [srcRep samplesPerPixel];
+    int bitsPerPixel = [srcRep bitsPerPixel];
     NSSize srcsize = NSMakeSize([srcRep pixelsWide], [srcRep pixelsHigh]);
 
     [info setObject: [NSNumber numberWithFloat: srcsize.width] forKey: @"width"];
     [info setObject: [NSNumber numberWithFloat: srcsize.height] forKey: @"height"];
 
-    if ((imsize.width < srcsize.width) || (imsize.height < srcsize.height)) {
-      int spp = [srcRep samplesPerPixel];
-      int bpp = [srcRep bitsPerPixel] / 8;
+    if (((imsize.width < srcsize.width) || (imsize.height < srcsize.height))
+                            && (((spp == 3) && (bitsPerPixel == 24)) 
+                                    || ((spp == 4) && (bitsPerPixel == 32)))) {            
+      int bpp = bitsPerPixel / 8;
       BOOL isColor = [srcRep hasAlpha] ? (spp > 2) : (spp > 1);
       NSString *colorSpaceName = isColor ? NSCalibratedRGBColorSpace : NSCalibratedWhiteColorSpace;
       NSSize dstsize;
@@ -140,7 +143,7 @@
       unsigned char *srcData;
       unsigned char *destData;
       unsigned x, y, i;
-      
+
       if ((imsize.width / srcsize.width) <= (imsize.height / srcsize.height)) {
         dstsize.width = floor(imsize.width + 0.5);
         dstsize.height = floor(dstsize.width * srcsize.height / srcsize.width + 0.5);
@@ -149,8 +152,8 @@
         dstsize.width = floor(dstsize.height * srcsize.width / srcsize.height + 0.5);    
       }
 
-      xratio = srcsize.width / dstsize.width * 1.0;
-      yratio = srcsize.height / dstsize.height * 1.0;
+      xratio = srcsize.width / dstsize.width;
+      yratio = srcsize.height / dstsize.height;
 
       dstRep = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: NULL
                               pixelsWide: (int)dstsize.width
@@ -162,7 +165,7 @@
                               colorSpaceName: colorSpaceName
                               bytesPerRow: 0
                               bitsPerPixel: 0];
-    
+
       srcData = [srcRep bitmapData];
       destData = [dstRep bitmapData];
 
@@ -171,7 +174,7 @@
           for (i = 0; i < bpp; i++) {
             int dstidx = (int)(bpp * (y * dstsize.width + x) + i);
             int srcidx = (int)(bpp * (floor(y * yratio) * srcsize.width + floor(x * xratio)) + i);
-          
+
             destData[dstidx] = srcData[srcidx];
           }
         }
@@ -179,20 +182,20 @@
 
       NS_DURING
 		    {
-          tiffData = [dstRep TIFFRepresentation];
+          tiffData = [dstRep TIFFRepresentation];   
 		    }
 	    NS_HANDLER
 		    {
 			    tiffData = nil;
 	      }
 	    NS_ENDHANDLER
-      
+
       if (tiffData) {
         [info setObject: tiffData forKey: @"imgdata"];
       } 
-      
-      RELEASE (dstRep);
 
+      RELEASE (dstRep);
+      
     } else {
       [info setObject: srcData forKey: @"imgdata"];
     }
