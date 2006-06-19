@@ -61,6 +61,8 @@ if test "$have_sqlite" = yes; then
 fi
 
 if test "$have_sqlite" = yes; then
+  sqlite_version_ok=yes
+  
   AC_TRY_RUN([
     #include <stdio.h>
     #include <stdlib.h>
@@ -74,7 +76,7 @@ int main ()
   printf("sqlite3 version number %d\n", vnum);
   return !(vnum >= 3002008);
 }
-  ],, have_sqlite=no,[echo "wrong sqlite3 version"])
+  ],, sqlite_version_ok=no,[echo "wrong sqlite3 version"])
 
 fi
 
@@ -85,6 +87,12 @@ if test "$have_sqlite" = no; then
   echo "* to specify the sqlite library directory if it is not"
   echo "* in the usual place(s)"
   AC_MSG_ERROR(GWorkspace will not compile without sqlite)
+else
+  if test "$sqlite_version_ok" = no; then
+    AC_MSG_WARN(Wrong libsqlite3 version)
+    echo "* GWorkspace requires libsqlite3 >= 3002008 *"
+    AC_MSG_ERROR(GWorkspace will not compile without sqlite)
+  fi
 fi
 
 #--------------------------------------------------------------------

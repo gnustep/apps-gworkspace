@@ -3373,6 +3373,8 @@ fi
 fi
 
 if test "$have_sqlite" = yes; then
+  sqlite_version_ok=yes
+
   if test "$cross_compiling" = yes; then
   echo "wrong sqlite3 version"
 else
@@ -3415,7 +3417,7 @@ echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
 ( exit $ac_status )
-have_sqlite=no
+sqlite_version_ok=no
 fi
 rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
 fi
@@ -3432,6 +3434,15 @@ echo "$as_me: WARNING: Cannot find libsqlite3 header and/or library" >&2;}
   { { echo "$as_me:$LINENO: error: GWorkspace will not compile without sqlite" >&5
 echo "$as_me: error: GWorkspace will not compile without sqlite" >&2;}
    { (exit 1); exit 1; }; }
+else
+  if test "$sqlite_version_ok" = no; then
+    { echo "$as_me:$LINENO: WARNING: Wrong libsqlite3 version" >&5
+echo "$as_me: WARNING: Wrong libsqlite3 version" >&2;}
+    echo "* GWorkspace requires libsqlite3 >= 3002008 *"
+    { { echo "$as_me:$LINENO: error: GWorkspace will not compile without sqlite" >&5
+echo "$as_me: error: GWorkspace will not compile without sqlite" >&2;}
+   { (exit 1); exit 1; }; }
+  fi
 fi
 
 #--------------------------------------------------------------------

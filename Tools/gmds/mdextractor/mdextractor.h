@@ -207,7 +207,8 @@
 
 - (void)checkLostPaths:(id)sender;
 
-- (NSArray *)filteredDirectoryContentsAtPath:(NSString *)path;
+- (NSArray *)filteredDirectoryContentsAtPath:(NSString *)path
+                               escapeEntries:(BOOL)escape;
 
 @end
 

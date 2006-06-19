@@ -367,6 +367,7 @@ do { \
 }
 
 - (NSArray *)filteredDirectoryContentsAtPath:(NSString *)path
+                               escapeEntries:(BOOL)escape
 {
   NSMutableArray *contents = [NSMutableArray array];
   NSEnumerator *enumerator = [[fm directoryContentsAtPath: path] objectEnumerator];
@@ -379,7 +380,7 @@ do { \
     if (([excludedSuffixes containsObject: ext] == NO)
             && (isDotFile(subpath) == NO)
             && (inTreeFirstPartOfPath(subpath, excludedPathsTree) == NO)) {
-      [contents addObject: subpath];
+      [contents addObject: (escape ? stringForQuery(subpath) : subpath)];
     }
   }
 
@@ -726,7 +727,7 @@ do { \
     unsigned i;
     
     if (dirok) {
-      NSArray *contents = [self filteredDirectoryContentsAtPath: dir];
+      NSArray *contents = [self filteredDirectoryContentsAtPath: dir escapeEntries: YES];
       NSMutableDictionary *dbcontents = [NSMutableDictionary dictionary];
       NSArray *dbpaths = nil;
       NSString *qdir = stringForQuery(dir);

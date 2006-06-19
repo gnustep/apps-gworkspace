@@ -38,6 +38,8 @@ if test "$have_sqlite" = yes; then
 fi
 
 if test "$have_sqlite" = yes; then
+  sqlite_version_ok=yes
+
   AC_TRY_RUN([
     #include <stdio.h>
     #include <stdlib.h>
@@ -51,7 +53,7 @@ int main ()
   printf("sqlite3 version number %d\n", vnum);
   return !(vnum >= 3002008);
 }
-  ],, have_sqlite=no,[echo "wrong sqlite3 version"])
+  ],, sqlite_version_ok=no,[echo "wrong sqlite3 version"])
 
   if test "$have_sqlite" = yes; then
     ADDITIONAL_LIB_DIRS="$ADDITIONAL_LIB_DIRS $with_sqlite_library -lsqlite3"
@@ -66,6 +68,12 @@ if test "$have_sqlite" = no; then
   echo "* to specify the sqlite3 library directory if it is not"
   echo "* in the usual place(s)"
   AC_MSG_ERROR(The gmds tool will not compile without sqlite)
+else
+  if test "$sqlite_version_ok" = no; then
+    AC_MSG_WARN(Wrong libsqlite3 version)
+    echo "* The gmds tool requires libsqlite3 >= 3002008 *"
+    AC_MSG_ERROR(The gmds tool will not compile without sqlite)
+  fi
 fi
 
 AC_SUBST(ADDITIONAL_LIB_DIRS)
@@ -91,6 +99,17 @@ fi
 AC_SUBST(have_pdfkit)
 
 #--------------------------------------------------------------------
+# We need unzip
+#--------------------------------------------------------------------
+AC_ARG_WITH([unzip], [  --with-unzip=PROG  Use PROG as unzip], [UNZ_PATH=$withval], [UNZ_PATH=none])
+
+if test "x$UNZ_PATH" = "xnone"; then
+	AC_PATH_PROGS([UNZ_PATH], [unzip unzip], [none])
+fi
+
+AC_DEFINE_UNQUOTED([UNZIP_PATH], ["$UNZ_PATH"], [Path to unzip])
+
+#--------------------------------------------------------------------
 # Debug logging
 #--------------------------------------------------------------------
 AC_ARG_ENABLE(debug_log,
@@ -105,7 +124,7 @@ fi
 
 AC_DEFINE_UNQUOTED([GW_DEBUG_LOG], [$GW_DEBUG_LOG], [debug logging])
 
-AC_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADER([config.h  ../mdextractor/Extractors/extractors.h])
 
 AC_CONFIG_FILES([GNUmakefile ../mdextractor/Extractors/GNUmakefile])
 

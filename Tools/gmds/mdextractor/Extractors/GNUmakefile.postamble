@@ -29,7 +29,7 @@
 
 # Things to do after distcleaning
 after-distclean::
-	rm -f GNUmakefile
+	rm -f GNUmakefile extractors.h
   
 # Things to do before checking
 # before-check::
