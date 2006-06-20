@@ -22,7 +22,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <libaudit.h>
 #include <sys/select.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -37,6 +36,8 @@
 #define GWDebugLog(format, args...) \
   do { if (GW_DEBUG_LOG) \
     NSLog(format , ## args); } while (0)
+
+#define MAX_AUDIT_MESSAGE_LENGTH    8460 /* PATH_MAX*2+11+256+1 */
 
 BOOL isDotFile(NSString *path)
 {

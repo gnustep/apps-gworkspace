@@ -7,7 +7,6 @@ TOOL_NAME = fswatcher
 
 fswatcher_OBJC_FILES = fswatcher.m 
 
-fswatcher_TOOL_LIBS += -laudit
 fswatcher_TOOL_LIBS += -lDBKit
 
 -include GNUmakefile.preamble

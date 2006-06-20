@@ -130,8 +130,14 @@ static NSString *nibName = @"InspectorWin";
   if (currentInspector == nil) {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     id entry = [defaults objectForKey: @"last_active_inspector"];
+    int index = 0;
     
-    [popUp selectItemAtIndex: ((entry != nil) ? [entry intValue] : 0)];
+    if (entry) {
+      index = [entry intValue];
+      index = ((index < 0) ? 0 : index);
+    }
+    
+    [popUp selectItemAtIndex: index];
     [self activateInspector: popUp];
   }
 }
