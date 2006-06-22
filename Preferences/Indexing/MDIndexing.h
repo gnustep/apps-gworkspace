@@ -69,7 +69,8 @@
   BOOL indexingEnabled;
   
   IBOutlet id enableSwitch;
-  IBOutlet id statusButton;
+  IBOutlet id statusButton;  
+  IBOutlet id errorButton;  
   IBOutlet id revertButton;
   IBOutlet id applyButton;
       
@@ -86,6 +87,12 @@
   IBOutlet NSScrollView *statusScroll;
   NSTextView *statusView;
   NSTimer *statusTimer;
+
+  NSString *errorLogPath;
+
+  IBOutlet id errorWindow;
+  IBOutlet NSScrollView *errorScroll;
+  NSTextView *errorView;
   
   NSFileManager *fm;
   NSNotificationCenter *nc;
@@ -121,6 +128,8 @@
 - (void)mdextractorConnectionDidDie:(NSNotification *)notif;
 
 - (IBAction)statusButtAction:(id)sender;
+
+- (IBAction)errorButtAction:(id)sender;
 
 - (void)readIndexedPathsStatus:(id)sender;
 

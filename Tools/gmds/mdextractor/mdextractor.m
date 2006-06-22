@@ -119,27 +119,6 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
   sqlite3_result_double(context, interval);
 }
 
-/*
-static void user_mdata_key(sqlite3_context *context, int argc, sqlite3_value **argv)
-{
-#define KEYS 1
-  const unsigned char *key = sqlite3_value_text(argv[0]);
-  const static char *user_keys[KEYS] = { 
-    "kMDItemFinderComment"
-  };
-  int contains = 0;
-  unsigned i;
-
-  for (i = 0; i < KEYS; i++) {
-    if (strcmp((char *)key, user_keys[i]) == 0) {
-      contains = 1;
-      break;
-    }
-  }
-     
-  sqlite3_result_int(context, contains);
-}
-*/
 
 @implementation	GMDSExtractor
 
@@ -160,6 +139,7 @@ static void user_mdata_key(sqlite3_context *context, int argc, sqlite3_value **a
   RELEASE (sqlite);
   RELEASE (indexedStatusPath);
   RELEASE (indexedStatusLock);
+  TEST_RELEASE (errHandle);
   RELEASE (extractors);  
   RELEASE (textExtractor);
   RELEASE (stemmer);  
@@ -209,6 +189,7 @@ static void user_mdata_key(sqlite3_context *context, int argc, sqlite3_value **a
     id entry;
     NSString *dbdir;
     NSString *lockpath;
+    NSString *errpath;
     unsigned i;
     
     fm = [NSFileManager defaultManager]; 
@@ -220,7 +201,9 @@ static void user_mdata_key(sqlite3_context *context, int argc, sqlite3_value **a
     ASSIGN (indexedStatusPath, [dbdir stringByAppendingPathComponent: @"status.plist"]);
     lockpath = [dbdir stringByAppendingPathComponent: @"extractors.lock"];
     indexedStatusLock = [[NSDistributedLock alloc] initWithPath: lockpath];
-    
+
+    errpath = [dbdir stringByAppendingPathComponent: @"error.log"];
+        
     dbdir = [dbdir stringByAppendingPathComponent: @"v1"];
     ASSIGN (dbpath, [dbdir stringByAppendingPathComponent: @"contents.db"]);    
     
@@ -230,6 +213,12 @@ static void user_mdata_key(sqlite3_context *context, int argc, sqlite3_value **a
       DESTROY (self);
       return self;    
     }
+
+    if ([fm fileExistsAtPath: errpath] == NO) {
+      [fm createFileAtPath: errpath contents: nil attributes: nil];
+    }
+    errHandle = [NSFileHandle fileHandleForWritingAtPath: errpath];
+    RETAIN (errHandle);
 
     conn = [NSConnection defaultConnection];
     [conn setRootObject: self];
@@ -818,7 +807,7 @@ static void user_mdata_key(sqlite3_context *context, int argc, sqlite3_value **a
     
     [sqlite executeQuery: @"COMMIT"];
     
-    //  NSLog(path);
+    GWDebugLog(path);
     
     fcount++;
 
@@ -843,34 +832,36 @@ static void user_mdata_key(sqlite3_context *context, int argc, sqlite3_value **a
         attributes = [fm fileAttributesAtPath: subpath traverseLink: NO];
 
         if (attributes) {
+          BOOL failed = NO;
+        
           if (skip == NO) {
             [sqlite executeQuery: @"BEGIN"];
             
             path_id = [self insertOrUpdatePath: subpath withAttributes: attributes];
-          
-            if (path_id == -1) {
-              [sqlite executeQuery: @"ROLLBACK"];
-              RELEASE (arp);
-              return NO;
-            }
+                    
+            if (path_id != -1) {
+              extractor = [self extractorForPath: subpath 
+                                  withAttributes: attributes];
 
-            extractor = [self extractorForPath: subpath withAttributes: attributes];
-
-            if (extractor) {
-              if ([extractor extractMetadataAtPath: subpath
-                                            withID: path_id
-                                        attributes: attributes
-                                      usingStemmer: stemmer
-                                         stopWords: stopWords] == NO) {
-                [sqlite executeQuery: @"ROLLBACK"];
-                RELEASE (arp);
-                return NO;
+              if (extractor) {
+                if ([extractor extractMetadataAtPath: subpath
+                                              withID: path_id
+                                          attributes: attributes
+                                        usingStemmer: stemmer
+                                           stopWords: stopWords] == NO) {
+                  failed = YES;                         
+                }
               }
+          
+            } else {
+              failed = YES;
             }
+                        
+            [sqlite executeQuery: (failed ? @"ROLLBACK" : @"COMMIT")];
             
-            [sqlite executeQuery: @"COMMIT"];
-            
-            fcount++;
+            if ((failed == NO) && (skip == NO)) {
+              fcount++;
+            }
             
             if ((fcount % UPDATE_COUNT) == 0) {
               [self updateStatusOfPath: indpath
@@ -882,14 +873,23 @@ static void user_mdata_key(sqlite3_context *context, int argc, sqlite3_value **a
               GWDebugLog(@"updating %i", fcount);             
             }
           }
+          
+          if (skip) {
+            GWDebugLog(@"skipping %@", subpath);
+            
+            if ([attributes fileType] == NSFileTypeDirectory) {
+              [enumerator skipDescendents];
+            }
 
-          if (([attributes fileType] == NSFileTypeDirectory) && skip) {
-            GWDebugLog(@"skipping %@", subpath); 
-            [enumerator skipDescendents];
+          } else {
+            if (failed) {
+              [self logError: subpath];
+              GWDebugLog(@"error extracting at: %@", subpath);
+            } else {
+              GWDebugLog(subpath);
+            }
           }
         }
-
-    //  NSLog(subpath);
 
       } else {
         RELEASE (arp);
@@ -1308,9 +1308,6 @@ do { \
                   argumentsCount: 0
                     userFunction: time_stamp];
 
-//    sqlite3_create_function(db, "isUserMdataKey", 1, 
-//                                SQLITE_UTF8, 0, user_mdata_key, 0, 0);
-
   [sqlite executeQuery: @"PRAGMA cache_size = 20000"];
   [sqlite executeQuery: @"PRAGMA count_changes = 0"];
   [sqlite executeQuery: @"PRAGMA synchronous = OFF"];
@@ -1329,6 +1326,19 @@ do { \
   }
 
   return YES;
+}
+
+- (void)logError:(NSString *)err
+{
+  NSString *errbuf = [NSString stringWithFormat: @"%@\n", err];
+  NSData *data = [errbuf dataUsingEncoding: [NSString defaultCStringEncoding]];
+
+  if (data == nil) {
+    data = [errbuf dataUsingEncoding: NSUnicodeStringEncoding];
+  }
+
+  [errHandle seekToEndOfFile];
+  [errHandle writeData: data];
 }
 
 - (BOOL)connection:(NSConnection *)ancestor

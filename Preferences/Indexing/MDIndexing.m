@@ -47,7 +47,9 @@ BOOL isDotFile(NSString *path);
   TEST_RELEASE (indexedStatusPath);
   TEST_RELEASE (indexedStatusLock);
   TEST_RELEASE (statusWindow);
-    
+  TEST_RELEASE (errorLogPath);
+  TEST_RELEASE (errorWindow);
+  
 	[super dealloc];
 }
 
@@ -196,10 +198,26 @@ BOOL isDotFile(NSString *path);
     [statusView setFont: [NSFont userFixedPitchFontOfSize: 0]];
     [statusScroll setDocumentView: statusView];
     RELEASE (statusView);
-    
-    statusTimer = nil;
+
+    [errorWindow setTitle: NSLocalizedString(@"Error log", @"")];
+    [errorWindow setFrameUsingName: @"mdindexing_error_win"];
+    [errorWindow setDelegate: self];
+    [errorScroll setBorderType: NSBezelBorder];
+    [errorScroll setHasHorizontalScroller: NO];
+    [errorScroll setHasVerticalScroller: YES]; 
+
+    errorView = [[NSTextView alloc] initWithFrame: [[errorScroll contentView] frame]];
+    [errorView setEditable: NO];
+    [errorView setSelectable: NO];
+    [errorView setVerticallyResizable: YES];
+    [errorView setHorizontallyResizable: YES];
+    [errorView setFont: [NSFont userFixedPitchFontOfSize: 0]];
+    [errorScroll setDocumentView: errorView];
+    RELEASE (errorView);
     
     indexedStatusPath = nil;
+    errorLogPath = nil;
+    statusTimer = nil;    
     [self setupDbPaths];
     
     mdextractor = nil;
@@ -229,6 +247,9 @@ BOOL isDotFile(NSString *path);
 {
   if ([statusWindow isVisible]) {
     [statusWindow close];
+  }
+  if ([errorWindow isVisible]) {
+    [errorWindow close];
   }
 }
 
@@ -691,6 +712,8 @@ return; \
 
   ASSIGN (indexedStatusPath, [dbdir stringByAppendingPathComponent: @"status.plist"]);
 
+  ASSIGN (errorLogPath, [dbdir stringByAppendingPathComponent: @"error.log"]);
+
   lockpath = [dbdir stringByAppendingPathComponent: @"extractors.lock"];
   indexedStatusLock = [[NSDistributedLock alloc] initWithPath: lockpath];
 }
@@ -815,6 +838,30 @@ return; \
   }
 }
 
+- (IBAction)errorButtAction:(id)sender
+{
+  NSString *errstr = @"";
+
+  if ([fm fileExistsAtPath: errorLogPath]) {
+	  NS_DURING
+	    {
+	      errstr = [NSString stringWithContentsOfFile: errorLogPath];
+	    }
+	  NS_HANDLER
+	    {
+        errstr = @"";
+	    }
+	  NS_ENDHANDLER
+  }
+  
+  [errorView setString: errstr];
+//  [errorView sizeToFit];
+
+  if ([errorWindow isVisible] == NO) {
+    [errorWindow makeKeyAndOrderFront: nil];
+  }
+}
+
 - (void)readIndexedPathsStatus:(id)sender
 {
   CREATE_AUTORELEASE_POOL(arp);
@@ -923,12 +970,19 @@ return; \
 
 - (void)windowWillClose:(NSNotification *)aNotification
 {
-  if (statusTimer && [statusTimer isValid]) {
-    [statusTimer invalidate];
-  }
-  DESTROY (statusTimer);
+  id win = [aNotification object];
+  
+  if (win == statusWindow) {
+    if (statusTimer && [statusTimer isValid]) {
+      [statusTimer invalidate];
+    }
+    DESTROY (statusTimer);
 
-  [statusWindow saveFrameUsingName: @"mdindexing_status_win"];
+    [statusWindow saveFrameUsingName: @"mdindexing_status_win"];
+  
+  } else if (win == errorWindow) {
+    [errorWindow saveFrameUsingName: @"mdindexing_error_win"];
+  }
 }
 
 - (void)readDefaults 

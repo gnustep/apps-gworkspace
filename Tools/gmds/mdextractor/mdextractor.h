@@ -112,7 +112,8 @@
   NSString *indexedStatusPath;
   NSDistributedLock *indexedStatusLock;
   NSTimer *statusTimer;
-
+  NSFileHandle *errHandle;
+  
   NSFileManager *fm;
   id ws;
   NSNotificationCenter *nc; 
@@ -182,6 +183,8 @@
 - (void)loadStemmer;
 
 - (BOOL)opendb;
+
+- (void)logError:(NSString *)err;
 
 - (BOOL)connection:(NSConnection *)ancestor
             shouldMakeNewConnection:(NSConnection *)newConn;
