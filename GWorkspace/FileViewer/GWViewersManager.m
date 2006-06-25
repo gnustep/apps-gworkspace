@@ -65,6 +65,7 @@ static GWViewersManager *vwrsmanager = nil;
     
     gworkspace = [GWorkspace gworkspace];
     viewers = [NSMutableArray new];
+    orderingViewers = NO;
     
     rootViewersKeys = [NSMutableArray new];
     if (entry) {
@@ -574,7 +575,6 @@ static GWViewersManager *vwrsmanager = nil;
   }  
 }
 
-
 - (void)selectionChanged:(NSArray *)selection
 {
   if (orderingViewers == NO) {
@@ -914,6 +914,10 @@ static GWViewersManager *vwrsmanager = nil;
   return wins;
 }
 
+- (BOOL)orderingViewers
+{
+  return orderingViewers;
+}
 
 - (void)updateDefaults
 {

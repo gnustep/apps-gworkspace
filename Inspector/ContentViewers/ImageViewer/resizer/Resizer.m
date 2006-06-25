@@ -131,10 +131,13 @@
     [info setObject: [NSNumber numberWithFloat: srcsize.height] forKey: @"height"];
 
     if (((imsize.width < srcsize.width) || (imsize.height < srcsize.height))
-                            && (((spp == 3) && (bitsPerPixel == 24)) 
-                                    || ((spp == 4) && (bitsPerPixel == 32)))) {            
+                                && (((spp == 3) && (bitsPerPixel == 24)) 
+                                    || ((spp == 4) && (bitsPerPixel == 32))
+                                    || ((spp == 1) && (bitsPerPixel == 8))
+                                    || ((spp == 2) && (bitsPerPixel == 16)))) {            
       int bpp = bitsPerPixel / 8;
-      BOOL isColor = [srcRep hasAlpha] ? (spp > 2) : (spp > 1);
+      BOOL hasAlpha = [srcRep hasAlpha];
+      BOOL isColor = hasAlpha ? (spp > 2) : (spp > 1);
       NSString *colorSpaceName = isColor ? NSCalibratedRGBColorSpace : NSCalibratedWhiteColorSpace;
       NSSize dstsize;
       float xratio, yratio;
@@ -142,7 +145,7 @@
       NSData *tiffData;
       unsigned char *srcData;
       unsigned char *destData;
-      unsigned x, y, i;
+      unsigned x, y;
 
       if ((imsize.width / srcsize.width) <= (imsize.height / srcsize.height)) {
         dstsize.width = floor(imsize.width + 0.5);
@@ -154,7 +157,7 @@
 
       xratio = srcsize.width / dstsize.width;
       yratio = srcsize.height / dstsize.height;
-
+    
       dstRep = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: NULL
                               pixelsWide: (int)dstsize.width
                               pixelsHigh: (int)dstsize.height
@@ -171,11 +174,13 @@
 
       for (y = 0; y < (int)dstsize.height; y++) {
         for (x = 0; x < (int)dstsize.width; x++) {
-          for (i = 0; i < bpp; i++) {
-            int dstidx = (int)(bpp * (y * dstsize.width + x) + i);
-            int srcidx = (int)(bpp * (floor(y * yratio) * srcsize.width + floor(x * xratio)) + i);
+          int pos = (int)(bpp * (floor(y * yratio) * srcsize.width + floor(x * xratio)));
 
-            destData[dstidx] = srcData[srcidx];
+          *destData++ = srcData[pos];
+
+          if (isColor) {
+            *destData++ = srcData[pos + 1];
+            *destData++ = srcData[pos + 2];
           }
         }
       }

@@ -574,7 +574,7 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
     [status writeToFile: indexedStatusPath atomically: YES];
     [indexedStatusLock unlock];
     
-    GWDebugLog(@"paths status updated"); 
+ //   GWDebugLog(@"paths status updated"); 
     
     RELEASE (arp);
   }
@@ -833,8 +833,13 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
 
         if (attributes) {
           BOOL failed = NO;
+          BOOL hasextractor = NO;
         
           if (skip == NO) {
+            #if 0 
+              [self logError: [NSString stringWithFormat: @"EXTRACT %@", subpath]];   // TOGLIERE !!!!
+            #endif
+            
             [sqlite executeQuery: @"BEGIN"];
             
             path_id = [self insertOrUpdatePath: subpath withAttributes: attributes];
@@ -844,6 +849,8 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
                                   withAttributes: attributes];
 
               if (extractor) {
+                hasextractor = YES;
+                
                 if ([extractor extractMetadataAtPath: subpath
                                               withID: path_id
                                           attributes: attributes
@@ -883,10 +890,12 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
 
           } else {
             if (failed) {
-              [self logError: subpath];
+              [self logError: [NSString stringWithFormat: @"EXTRACT %@", subpath]];
               GWDebugLog(@"error extracting at: %@", subpath);
+            } else if (hasextractor == NO) {
+              GWDebugLog(@"no extractor for: %@", subpath);
             } else {
-              GWDebugLog(subpath);
+              GWDebugLog(@"extracted: %@", subpath);
             }
           }
         }

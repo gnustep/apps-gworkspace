@@ -90,31 +90,53 @@ do { \
       
   if (attributes) {
     id extractor = nil;
+    BOOL failed = NO;
+    BOOL hasextractor = NO;
     int path_id;
+
+    #if 0 
+      [self logError: [NSString stringWithFormat: @"UPDATE %@", path]];   
+    #endif
     
     EXECUTE_QUERY (@"BEGIN", NO);
     
     path_id = [self insertOrUpdatePath: path withAttributes: attributes];
     
-    if (path_id == -1) {
-      [sqlite executeQuery: @"ROLLBACK"];
-      return NO;
-    }
-
-    extractor = [self extractorForPath: path withAttributes: attributes];
-
-    if (extractor) {
-      if ([extractor extractMetadataAtPath: path
-                                    withID: path_id
-                                attributes: attributes
-                              usingStemmer: stemmer
-                                 stopWords: stopWords] == NO) {
-        [sqlite executeQuery: @"ROLLBACK"];
-        return NO;
+    if (path_id != -1) {
+      extractor = [self extractorForPath: path withAttributes: attributes];    
+    
+      if (extractor) {
+        hasextractor = YES;
+      
+        if ([extractor extractMetadataAtPath: path
+                                      withID: path_id
+                                  attributes: attributes
+                                usingStemmer: stemmer
+                                   stopWords: stopWords] == NO) {
+          failed = YES;                         
+        }
       }
+    
+    } else {
+      failed = YES;
     }
     
-    [sqlite executeQuery: @"COMMIT"];
+    if (failed == NO) {
+      [sqlite executeQuery: @"COMMIT"];
+      
+      if (hasextractor) {
+        GWDebugLog(@"updated: %@", path);
+      } else {
+        GWDebugLog(@"no extractor for: %@", path);
+      }
+      
+    } else {
+      [sqlite executeQuery: @"ROLLBACK"];
+      [self logError: [NSString stringWithFormat: @"UPDATE %@", path]];
+      GWDebugLog(@"error updating at: %@", path);
+      
+      return NO;
+    }
     
     if ([attributes fileType] == NSFileTypeDirectory) {
       NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: path];
@@ -138,40 +160,55 @@ do { \
           attributes = [fm fileAttributesAtPath: subpath traverseLink: NO];
         
           if (attributes) {
+            failed = NO;
+            hasextractor = NO;
+            
             if (skip == NO) {
+              #if 0 
+                [self logError: [NSString stringWithFormat: @"UPDATE %@", subpath]]; 
+              #endif
+              
               [sqlite executeQuery: @"BEGIN"];
               
               path_id = [self insertOrUpdatePath: subpath withAttributes: attributes];
     
-              if (path_id == -1) {
-                RELEASE (arp);
-                [sqlite executeQuery: @"ROLLBACK"];
-                return NO;
-              }
-
-              extractor = [self extractorForPath: subpath withAttributes: attributes];
-                  
-              if (extractor) {
-                if ([extractor extractMetadataAtPath: subpath
-                                              withID: path_id
-                                          attributes: attributes
-                                        usingStemmer: stemmer
-                                           stopWords: stopWords] == NO) {
-                  [sqlite executeQuery: @"ROLLBACK"];
-                  RELEASE (arp);
-                  return NO;
+              if (path_id != -1) {
+                extractor = [self extractorForPath: subpath withAttributes: attributes];
+    
+                if (extractor) {
+                  if ([extractor extractMetadataAtPath: subpath
+                                                withID: path_id
+                                            attributes: attributes
+                                          usingStemmer: stemmer
+                                             stopWords: stopWords] == NO) {
+                    failed = YES;                         
+                  }
                 }
+    
+              } else {
+                failed = YES;
               }
-              
-              [sqlite executeQuery: @"COMMIT"];
+    
+              [sqlite executeQuery: (failed ? @"ROLLBACK" : @"COMMIT")];
             }
-          
-            if ([attributes fileType] == NSFileTypeDirectory) {
-              if (skip) {
-                GWDebugLog(@"skipping %@", subpath); 
+            
+            if (skip) { 
+              GWDebugLog(@"skipping (update) %@", subpath);
+
+              if ([attributes fileType] == NSFileTypeDirectory) {
                 [enumerator skipDescendents];
               }
-            }
+            
+            } else {
+              if (failed) {
+                [self logError: [NSString stringWithFormat: @"UPDATE %@", subpath]];
+                GWDebugLog(@"error updating: %@", subpath);
+              } else if (hasextractor == NO) {
+                GWDebugLog(@"no extractor for: %@", subpath);
+              } else {
+                GWDebugLog(@"updated: %@", subpath);
+              }
+            }            
           }
           
         } else {
@@ -559,10 +596,7 @@ do { \
 
         } else {
           GWDebugLog(@"db update renamed: %@", path);
-
-          if ([self addPath: path] == NO) {      
-            NSLog(@"An error occurred while processing %@", path);
-          }
+          [self addPath: path];      
         }
         
       } else {
@@ -717,10 +751,14 @@ do { \
 
 - (void)checkNextDir:(id)sender
 {
-  CREATE_AUTORELEASE_POOL(arp);
   unsigned count = [directories count];
 
+  if (extracting) {
+    return;
+  }
+    
   if (dirpos < count) {
+    CREATE_AUTORELEASE_POOL(arp);
     NSString *dir = [directories objectAtIndex: dirpos];
     NSDictionary *attributes = [fm fileAttributesAtPath: dir traverseLink: NO];
     BOOL dirok = (attributes && ([attributes fileType] == NSFileTypeDirectory));
@@ -827,9 +865,9 @@ do { \
     if ((dirpos >= count) || (dirpos < 0)) {
       dirpos = 0;
     }
+    
+    RELEASE (arp);
   }
-  
-  RELEASE (arp);
 }
 
 @end

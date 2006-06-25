@@ -128,6 +128,7 @@
 
 - (NSArray *)viewerWindows;
 
+- (BOOL)orderingViewers;
 
 - (void)updateDefaults;
 

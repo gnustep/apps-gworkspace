@@ -387,18 +387,21 @@ static unsigned char darkerLUT[256] = {
   NSImage *newIcon;
 
 	if (((spp == 3) && (bitsPerPixel == 24)) 
-                          || ((spp == 4) && (bitsPerPixel == 32))) {
+        || ((spp == 4) && (bitsPerPixel == 32))
+        || ((spp == 1) && (bitsPerPixel == 8))
+        || ((spp == 2) && (bitsPerPixel == 16))) {
     NSSize icnsize = [icon size];
-    float fact = (icnsize.width >= icnsize.height) ? icnsize.width / size : icnsize.height / size;
+    float fact = (icnsize.width >= icnsize.height) ? (icnsize.width / size) : (icnsize.height / size);
     NSSize newsize = NSMakeSize(floor(icnsize.width / fact + 0.5), floor(icnsize.height / fact + 0.5));	
     float xratio = icnsize.width / newsize.width;
     float yratio = icnsize.height / newsize.height;
-    BOOL isColor = [rep hasAlpha] ? (spp > 2) : (spp > 1);
+    BOOL hasAlpha = [rep hasAlpha];
+    BOOL isColor = hasAlpha ? (spp > 2) : (spp > 1);
     NSString *colorSpaceName = isColor ? NSCalibratedRGBColorSpace : NSCalibratedWhiteColorSpace;      
     NSBitmapImageRep *newrep;
     unsigned char *srcData;
     unsigned char *dstData;    
-    unsigned x, y, i;
+    unsigned x, y;
 
     newIcon = [[NSImage alloc] initWithSize: newsize];
 
@@ -421,11 +424,23 @@ static unsigned char darkerLUT[256] = {
 
     for (y = 0; y < (int)newsize.height; y++) {
       for (x = 0; x < (int)newsize.width; x++) {
-        for (i = 0; i < bpp; i++) {
-          int dstidx = (int)(bpp * (y * newsize.width + x) + i);
-          int srcidx = (int)(bpp * (floor(y * yratio) * icnsize.width + floor(x * xratio)) + i);
+        int pos = (int)(bpp * (floor(y * yratio) * icnsize.width + floor(x * xratio)));
 
-          dstData[dstidx] = srcData[srcidx];
+        *dstData++ = srcData[pos];
+        
+        if (isColor) {
+          *dstData++ = srcData[pos + 1];
+          *dstData++ = srcData[pos + 2];
+        }
+        
+        if (hasAlpha) {
+          if (isColor) {
+            *dstData++ = srcData[pos + 3];
+          } else {
+            *dstData++ = srcData[pos + 1];
+          }
+        } else {
+          *dstData++ = 255;
         }
       }
     }

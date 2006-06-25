@@ -2225,7 +2225,7 @@ static GWorkspace *gworkspace = nil;
 //
 - (void)selectionChanged:(NSArray *)newsel
 {
-  if (newsel && [newsel count]) {
+  if (newsel && [newsel count] && ([vwrsManager orderingViewers] == NO)) {
     [self setSelectedPaths: newsel];
   }
 }
