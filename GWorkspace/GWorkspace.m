@@ -138,6 +138,176 @@ static GWorkspace *gworkspace = nil;
 	[super dealloc];
 }
 
+- (void)createMenu
+{
+  NSMenu *mainMenu = [NSMenu new];
+  NSMenu *menu;
+  NSMenu *subenu;
+	NSMenu *windows, *services;  
+	NSMenuItem *menuItem;
+    	
+	// Info 	
+	menuItem = addItemToMenu(mainMenu, @"Info", @"", nil, @"");
+	menu = AUTORELEASE ([NSMenu new]);
+	[mainMenu setSubmenu: menu forItem: menuItem];	
+	addItemToMenu(menu, @"Info Panel...", @"", @"showInfo:", @"");
+	addItemToMenu(menu, @"Preferences...", @"", @"showPreferences:", @"");
+	addItemToMenu(menu, @"Help...", @"", nil, @"?");
+	 
+	// File
+	menuItem = addItemToMenu(mainMenu, @"File", @"", nil, @"");
+	menu = AUTORELEASE ([NSMenu new]);
+	[mainMenu setSubmenu: menu forItem: menuItem];		
+	addItemToMenu(menu, @"Open", @"", @"openSelection:", @"o");
+	addItemToMenu(menu, @"Open With...", @"", @"openWith:", @"");
+	addItemToMenu(menu, @"Open as Folder", @"", @"openSelectionAsFolder:", @"O");
+	addItemToMenu(menu, @"New Folder", @"", @"newFolder:", @"n");
+	addItemToMenu(menu, @"New File", @"", @"newFile:", @"N");
+	addItemToMenu(menu, @"Duplicate", @"", @"duplicateFiles:", @"u");
+	addItemToMenu(menu, @"Destroy", @"", @"deleteFiles:", @"r");  
+	addItemToMenu(menu, @"Move to Recycler", @"", @"recycleFiles:", @"d");
+	addItemToMenu(menu, @"Empty Recycler", @"", @"emptyRecycler:", @"");
+  
+	// Edit
+	menuItem = addItemToMenu(mainMenu, @"Edit", @"", nil, @"");
+	menu = AUTORELEASE ([NSMenu new]);
+	[mainMenu setSubmenu: menu forItem: menuItem];	
+	addItemToMenu(menu, @"Cut", @"", @"cut:", @"x");
+	addItemToMenu(menu, @"Copy", @"", @"copy:", @"c");
+	addItemToMenu(menu, @"Paste", @"", @"paste:", @"v");
+	addItemToMenu(menu, @"Select All", @"", @"selectAllInViewer:", @"a");
+
+	// View
+	menuItem = addItemToMenu(mainMenu, @"View", @"", nil, @"");
+	menu = AUTORELEASE ([NSMenu new]);
+	[mainMenu setSubmenu: menu forItem: menuItem];	
+	addItemToMenu(menu, @"Browser", @"", @"setViewerType:", @"b");
+	addItemToMenu(menu, @"Icon", @"", @"setViewerType:", @"i");
+	addItemToMenu(menu, @"List", @"", @"setViewerType:", @"l");
+	  menuItem = addItemToMenu(menu, @"Viewer behaviour", @"", nil, @"");
+	  subenu = AUTORELEASE ([NSMenu new]);
+	  [menu setSubmenu: subenu forItem: menuItem];	
+	  addItemToMenu(subenu, @"Browsing", @"", @"setViewerBehaviour:", @"B");
+	  addItemToMenu(subenu, @"Spatial", @"", @"setViewerBehaviour:", @"S");
+	
+    menuItem = addItemToMenu(menu, @"Show", @"", nil, @"");
+	  subenu = AUTORELEASE ([NSMenu new]);
+	  [menu setSubmenu: subenu forItem: menuItem];	
+	  addItemToMenu(subenu, @"Name only", @"", @"setShownType:", @"");
+	  addItemToMenu(subenu, @"Type", @"", @"setShownType:", @"");
+	  addItemToMenu(subenu, @"Size", @"", @"setShownType:", @"");
+	  addItemToMenu(subenu, @"Modification date", @"", @"setShownType:", @"");
+	  addItemToMenu(subenu, @"Owner", @"", @"setShownType:", @"");
+      
+    menuItem = addItemToMenu(menu, @"Icon Size", @"", nil, @"");
+	  subenu = AUTORELEASE ([NSMenu new]);
+	  [menu setSubmenu: subenu forItem: menuItem];	
+	  addItemToMenu(subenu, @"24", @"", @"setIconsSize:", @"");
+	  addItemToMenu(subenu, @"28", @"", @"setIconsSize:", @"");
+	  addItemToMenu(subenu, @"32", @"", @"setIconsSize:", @"");
+	  addItemToMenu(subenu, @"36", @"", @"setIconsSize:", @"");
+	  addItemToMenu(subenu, @"40", @"", @"setIconsSize:", @"");
+	  addItemToMenu(subenu, @"44", @"", @"setIconsSize:", @"");
+	  addItemToMenu(subenu, @"48", @"", @"setIconsSize:", @"");
+      
+    menuItem = addItemToMenu(menu, @"Icon Position", @"", nil, @"");
+	  subenu = AUTORELEASE ([NSMenu new]);
+	  [menu setSubmenu: subenu forItem: menuItem];	
+	  addItemToMenu(subenu, @"Up", @"", @"setIconsPosition:", @"");
+	  addItemToMenu(subenu, @"Left", @"", @"setIconsPosition:", @"");
+      
+    menuItem = addItemToMenu(menu, @"Label Size", @"", nil, @"");
+	  subenu = AUTORELEASE ([NSMenu new]);
+	  [menu setSubmenu: subenu forItem: menuItem];	
+	  addItemToMenu(subenu, @"10", @"", @"setLabelSize:", @"");
+	  addItemToMenu(subenu, @"11", @"", @"setLabelSize:", @"");
+	  addItemToMenu(subenu, @"12", @"", @"setLabelSize:", @"");
+	  addItemToMenu(subenu, @"13", @"", @"setLabelSize:", @"");
+	  addItemToMenu(subenu, @"14", @"", @"setLabelSize:", @"");
+	  addItemToMenu(subenu, @"15", @"", @"setLabelSize:", @"");
+	  addItemToMenu(subenu, @"16", @"", @"setLabelSize:", @"");
+
+	addItemToMenu(menu, @"Viewer", @"", @"showViewer:", @"V");	
+            
+	// Tools
+	menuItem = addItemToMenu(mainMenu, @"Tools", @"", nil, @"");
+	menu = AUTORELEASE ([NSMenu new]);
+	[mainMenu setSubmenu: menu forItem: menuItem];	
+		
+    menuItem = addItemToMenu(menu, @"Inspectors", @"", nil, @"");
+		subenu = AUTORELEASE ([NSMenu new]);
+		[menu setSubmenu: subenu forItem: menuItem];	
+		addItemToMenu(subenu, @"Show Inspectors", @"", nil, @"");
+		addItemToMenu(subenu, @"Attributes", @"", @"showAttributesInspector:", @"1");
+		addItemToMenu(subenu, @"Contents", @"", @"showContentsInspector:", @"2");
+		addItemToMenu(subenu, @"Tools", @"", @"showToolsInspector:", @"3");
+		addItemToMenu(subenu, @"Annotations", @"", @"showAnnotationsInspector:", @"4");
+
+	addItemToMenu(menu, @"Finder", @"", @"showFinder:", @"f");
+
+    menuItem = addItemToMenu(menu, @"Fiend", @"", nil, @"");
+		subenu = AUTORELEASE ([NSMenu new]);
+		[menu setSubmenu: subenu forItem: menuItem];
+
+    menuItem = addItemToMenu(menu, @"Tabbed Shelf", @"", nil, @"");
+		subenu = AUTORELEASE ([NSMenu new]);
+		[menu setSubmenu: subenu forItem: menuItem];    
+		addItemToMenu(subenu, @"Show Tabbed Shelf", @"", @"showTShelf:", @"s");
+		addItemToMenu(subenu, @"Remove Current Tab", @"", @"removeTShelfTab:", @"");
+		addItemToMenu(subenu, @"Rename Current Tab", @"", @"renameTShelfTab:", @"");
+		addItemToMenu(subenu, @"Add Tab...", @"", @"addTShelfTab:", @"");
+
+	addItemToMenu(menu, @"Terminal", @"", @"showTerminal:", @"t");
+	addItemToMenu(menu, @"Run...", @"", @"runCommand:", @"");  
+
+    menuItem = addItemToMenu(menu, @"History", @"", nil, @"");
+		subenu = AUTORELEASE ([NSMenu new]);
+		[menu setSubmenu: subenu forItem: menuItem];
+		addItemToMenu(subenu, @"Show History", @"", @"showHistory:", @"");
+		addItemToMenu(subenu, @"Go backward", @"", @"goBackwardInHistory:", @"");
+		addItemToMenu(subenu, @"Go forward", @"", @"goForwardInHistory:", @"");
+	
+  addItemToMenu(menu, @"Show Desktop", @"", @"showDesktop:", @"");
+	addItemToMenu(menu, @"Show Recycler", @"", @"showRecycler:", @"");
+
+	addItemToMenu(menu, @"Check for disks", @"", @"checkRemovableMedia:", @"E");
+	
+	// Windows
+	menuItem = addItemToMenu(mainMenu, @"Windows", @"", nil, @"");
+	windows = AUTORELEASE ([NSMenu new]);
+	[mainMenu setSubmenu: windows forItem: menuItem];		
+	addItemToMenu(windows, @"Arrange in Front", @"", nil, @"");
+	addItemToMenu(windows, @"Miniaturize Window", @"", nil, @"");
+	addItemToMenu(windows, @"Close Window", @"", @"closeMainWin:", @"w");
+
+	// Services 
+	menuItem = addItemToMenu(mainMenu, @"Services", @"", nil, @"");
+	services = AUTORELEASE ([NSMenu new]);
+	[mainMenu setSubmenu: services forItem: menuItem];		
+
+	// Hide
+	addItemToMenu(mainMenu, @"Hide", @"", @"hide:", @"h");
+	addItemToMenu(mainMenu, @"Hide Others", @"", @"hideOtherApplications:", @"H");
+	addItemToMenu(mainMenu, @"Show All", @"", @"unhideAllApplications:", @"");
+
+	// Print
+	addItemToMenu(mainMenu, @"Print...", @"", @"print:", @"p");
+	
+	// Quit
+	addItemToMenu(mainMenu, @"Quit", @"", @"terminate:", @"Q");
+
+	// Logout
+	addItemToMenu(mainMenu, @"Logout", @"", @"logout:", @"");
+
+	[mainMenu update];
+
+	[NSApp setServicesMenu: services];
+	[NSApp setWindowsMenu: windows];
+	[NSApp setMainMenu: mainMenu];		
+  
+  RELEASE (mainMenu);
+}
+
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
 	NSUserDefaults *defaults;
@@ -147,6 +317,8 @@ static GWorkspace *gworkspace = nil;
   NSMenu *menu;
   NSString *lockpath;
   int i;
+  
+  [self createMenu];
     
 	[isa registerForServices];
   
@@ -1795,7 +1967,7 @@ static GWorkspace *gworkspace = nil;
 //
 - (void)closeMainWin:(id)sender
 {
-  [[[NSApplication sharedApplication] keyWindow] performClose: sender];
+  [[NSApp keyWindow] performClose: sender];
 }
 
 - (void)logout:(id)sender

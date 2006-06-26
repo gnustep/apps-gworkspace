@@ -175,6 +175,8 @@
 
 + (void)registerForServices;
 
+- (void)createMenu;
+
 - (NSString *)defEditor;
 
 - (NSString *)defXterm;
