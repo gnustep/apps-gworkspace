@@ -204,17 +204,7 @@ static GWDesktopManager *desktopManager = nil;
                   atomically: YES];
   }
 
-  path = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
-  path = [path stringByAppendingPathComponent: @"Desktop"];
-
-  if (([fm fileExistsAtPath: path isDirectory: &isdir] && isdir) == NO) {
-    if ([fm createDirectoryAtPath: path attributes: nil] == NO) {
-      NSLog(@"Can't create the Recycler directory! Quitting now.");
-      [NSApp terminate: self];
-    }
-  }
-
-	path = [path stringByAppendingPathComponent: @".Trash"];
+  path = [NSHomeDirectory() stringByAppendingPathComponent: @".Trash"]; 
 
 	if ([fm fileExistsAtPath: path isDirectory: &isdir] == NO) {
     if ([fm createDirectoryAtPath: path attributes: nil] == NO) {

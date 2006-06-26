@@ -92,33 +92,17 @@ static Recycler *recycler = nil;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-	NSString *basePath;
   NSString *tpath; 
 	BOOL isdir;
-  
-  basePath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
-  basePath = [basePath stringByAppendingPathComponent: @"Desktop"];
 
-  if (([fm fileExistsAtPath: basePath isDirectory: &isdir] && isdir) == NO) {
-    if ([fm createDirectoryAtPath: basePath attributes: nil] == NO) {
-      NSLog(@"Can't create the Recycler directory! Quitting now.");
-      [NSApp terminate: self];
-    }
-  }
-  
-	tpath = [basePath stringByAppendingPathComponent: @".Trash"];
+  tpath = [NSHomeDirectory() stringByAppendingPathComponent: @".Trash"]; 
 
 	if ([fm fileExistsAtPath: tpath isDirectory: &isdir] == NO) {
     if ([fm createDirectoryAtPath: tpath attributes: nil] == NO) {
-      NSLog(@"Can't create the Recycler directory! Quiting now.");
+      NSLog(@"Can't create the Recycler directory! Quitting now.");
       [NSApp terminate: self];
     }
-	} else {
-		if (isdir == NO) {
-			NSLog (@"Warning - %@ is not a directory - quiting now!", tpath);			
-			[NSApp terminate: self];
-		}
-  }
+	}
   
   ASSIGN (trashPath, tpath);
 

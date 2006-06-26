@@ -2538,9 +2538,7 @@ static GWorkspace *gworkspace = nil;
 	static NSString *tpath = nil; 
   
   if (tpath == nil) {
-    tpath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
-    tpath = [tpath stringByAppendingPathComponent: @"Desktop"];
-    tpath = [tpath stringByAppendingPathComponent: @".Trash"];
+    tpath = [NSHomeDirectory() stringByAppendingPathComponent: @".Trash"]; 
     RETAIN (tpath);
   }
   
