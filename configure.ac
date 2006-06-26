@@ -74,7 +74,7 @@ int main ()
   unsigned vnum = sqlite3_libversion_number();
   
   printf("sqlite3 version number %d\n", vnum);
-  return !(vnum >= 3002008);
+  return !(vnum >= 3002006);
 }
   ],, sqlite_version_ok=no,[echo "wrong sqlite3 version"])
 
@@ -90,7 +90,7 @@ if test "$have_sqlite" = no; then
 else
   if test "$sqlite_version_ok" = no; then
     AC_MSG_WARN(Wrong libsqlite3 version)
-    echo "* GWorkspace requires libsqlite3 >= 3002008 *"
+    echo "* GWorkspace requires libsqlite3 >= 3002006 *"
     AC_MSG_ERROR(GWorkspace will not compile without sqlite)
   fi
 fi

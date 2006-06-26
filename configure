@@ -3395,7 +3395,7 @@ int main ()
   unsigned vnum = sqlite3_libversion_number();
 
   printf("sqlite3 version number %d\n", vnum);
-  return !(vnum >= 3002008);
+  return !(vnum >= 3002006);
 }
 
 _ACEOF
@@ -3438,7 +3438,7 @@ else
   if test "$sqlite_version_ok" = no; then
     { echo "$as_me:$LINENO: WARNING: Wrong libsqlite3 version" >&5
 echo "$as_me: WARNING: Wrong libsqlite3 version" >&2;}
-    echo "* GWorkspace requires libsqlite3 >= 3002008 *"
+    echo "* GWorkspace requires libsqlite3 >= 3002006 *"
     { { echo "$as_me:$LINENO: error: GWorkspace will not compile without sqlite" >&5
 echo "$as_me: error: GWorkspace will not compile without sqlite" >&2;}
    { (exit 1); exit 1; }; }

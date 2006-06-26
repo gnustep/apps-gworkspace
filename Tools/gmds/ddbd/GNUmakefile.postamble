@@ -29,7 +29,7 @@
 
 # Things to do after distcleaning
 after-distclean::
-	rm -rf autom4te*.cache
+	rm -rf GNUmakefile
 	rm -f config.status config.log config.cache config.h  
 
 # Things to do before checking

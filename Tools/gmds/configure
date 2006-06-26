@@ -3112,7 +3112,7 @@ int main ()
   unsigned vnum = sqlite3_libversion_number();
 
   printf("sqlite3 version number %d\n", vnum);
-  return !(vnum >= 3002008);
+  return !(vnum >= 3002006);
 }
 
 _ACEOF
@@ -3159,7 +3159,7 @@ else
   if test "$sqlite_version_ok" = no; then
     { echo "$as_me:$LINENO: WARNING: Wrong libsqlite3 version" >&5
 echo "$as_me: WARNING: Wrong libsqlite3 version" >&2;}
-    echo "* The gmds tools require libsqlite3 >= 3002008 *"
+    echo "* The gmds tools require libsqlite3 >= 3002006 *"
     { { echo "$as_me:$LINENO: error: The gmds tools will not compile without sqlite" >&5
 echo "$as_me: error: The gmds tools will not compile without sqlite" >&2;}
    { (exit 1); exit 1; }; }
@@ -3654,7 +3654,7 @@ _ACEOF
           ac_config_headers="$ac_config_headers mdextractor/Extractors/extractors.h"
 
 
-                              ac_config_files="$ac_config_files gmds/GNUmakefile mdextractor/GNUmakefile mdextractor/Extractors/GNUmakefile"
+                                        ac_config_files="$ac_config_files gmds/GNUmakefile mdextractor/GNUmakefile mdextractor/Extractors/GNUmakefile ddbd/GNUmakefile"
 
 
 cat >confcache <<\_ACEOF
@@ -4184,6 +4184,7 @@ do
   "gmds/GNUmakefile" ) CONFIG_FILES="$CONFIG_FILES gmds/GNUmakefile" ;;
   "mdextractor/GNUmakefile" ) CONFIG_FILES="$CONFIG_FILES mdextractor/GNUmakefile" ;;
   "mdextractor/Extractors/GNUmakefile" ) CONFIG_FILES="$CONFIG_FILES mdextractor/Extractors/GNUmakefile" ;;
+  "ddbd/GNUmakefile" ) CONFIG_FILES="$CONFIG_FILES ddbd/GNUmakefile" ;;
   "ddbd/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS ddbd/config.h" ;;
   "gmds/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS gmds/config.h" ;;
   "mdextractor/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS mdextractor/config.h" ;;

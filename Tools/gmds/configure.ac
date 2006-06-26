@@ -51,7 +51,7 @@ int main ()
   unsigned vnum = sqlite3_libversion_number();
   
   printf("sqlite3 version number %d\n", vnum);
-  return !(vnum >= 3002008);
+  return !(vnum >= 3002006);
 }
   ],, sqlite_version_ok=no,[echo "wrong sqlite3 version"])
 
@@ -71,7 +71,7 @@ if test "$have_sqlite" = no; then
 else
   if test "$sqlite_version_ok" = no; then
     AC_MSG_WARN(Wrong libsqlite3 version)
-    echo "* The gmds tools require libsqlite3 >= 3002008 *"
+    echo "* The gmds tools require libsqlite3 >= 3002006 *"
     AC_MSG_ERROR(The gmds tools will not compile without sqlite)
   fi
 fi
@@ -129,7 +129,7 @@ AC_CONFIG_HEADER([gmds/config.h])
 AC_CONFIG_HEADER([mdextractor/config.h])
 AC_CONFIG_HEADER([mdextractor/Extractors/extractors.h])
 
-AC_CONFIG_FILES([gmds/GNUmakefile mdextractor/GNUmakefile mdextractor/Extractors/GNUmakefile])
+AC_CONFIG_FILES([gmds/GNUmakefile mdextractor/GNUmakefile mdextractor/Extractors/GNUmakefile ddbd/GNUmakefile])
 
 AC_OUTPUT
 

@@ -49,6 +49,8 @@ if test "$have_sqlite" = yes; then
 fi
 
 if test "$have_sqlite" = yes; then
+  sqlite_version_ok=yes
+
   AC_TRY_RUN([
     #include <stdio.h>
     #include <stdlib.h>
@@ -60,9 +62,9 @@ int main ()
   unsigned vnum = sqlite3_libversion_number();
   
   printf("sqlite3 version number %d\n", vnum);
-  return !(vnum >= 3002008);
+  return !(vnum >= 3002006);
 }
-  ],, have_sqlite=no,[echo "wrong sqlite3 version"])
+  ],, sqlite_version_ok=no,[echo "wrong sqlite3 version"])
 
   if test "$have_sqlite" = yes; then
     ADDITIONAL_LIB_DIRS="$ADDITIONAL_LIB_DIRS $with_sqlite_library -lsqlite3"
@@ -77,6 +79,12 @@ if test "$have_sqlite" = no; then
   echo "* to specify the sqlite3 library directory if it is not"
   echo "* in the usual place(s)"
   AC_MSG_ERROR(SQLite will not compile without sqlite)
+else
+  if test "$sqlite_version_ok" = no; then
+    AC_MSG_WARN(Wrong libsqlite3 version)
+    echo "* The SQLite library requires libsqlite3 >= 3002006 *"
+    AC_MSG_ERROR(The SQLite library will not compile without sqlite)
+  fi
 fi
 
 AC_SUBST(ADDITIONAL_LIB_DIRS)
