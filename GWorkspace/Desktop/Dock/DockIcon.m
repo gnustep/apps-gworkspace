@@ -511,7 +511,16 @@ x += 6; \
     }
 
     for (i = 0; i < [umountPaths count]; i++) {
-      [ws unmountAndEjectDeviceAtPath: [umountPaths objectAtIndex: i]];
+      NSString *umpath = [umountPaths objectAtIndex: i];
+      
+      if ([fm isWritableFileAtPath: umpath]) {
+        [ws unmountAndEjectDeviceAtPath: umpath];
+      } else {
+		    NSString *err = NSLocalizedString(@"Error", @"");
+		    NSString *msg = NSLocalizedString(@"You must be root to umount\n", @"");
+		    NSString *buttstr = NSLocalizedString(@"Continue", @"");
+        NSRunAlertPanel(err, [NSString stringWithFormat: @"%@ \"%@\"!\n", msg, umpath], buttstr, nil, nil);         
+      }
     }
 
     if ([files count]) {

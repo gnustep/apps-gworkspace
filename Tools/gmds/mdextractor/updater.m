@@ -176,6 +176,8 @@ do { \
                 extractor = [self extractorForPath: subpath withAttributes: attributes];
     
                 if (extractor) {
+                  hasextractor = YES;
+
                   if ([extractor extractMetadataAtPath: subpath
                                                 withID: path_id
                                             attributes: attributes
