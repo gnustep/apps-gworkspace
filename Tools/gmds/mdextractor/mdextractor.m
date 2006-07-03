@@ -1232,20 +1232,23 @@ do { \
   
 			if ([principalClass conformsToProtocol: @protocol(ExtractorsProtocol)]) {	
         id extractor = [[principalClass alloc] initForExtractor: self];
-        NSArray *extensions = [extractor pathExtensions];
         
-        if ([extensions containsObject: @"txt"]) {
-          ASSIGN (textExtractor, extractor);
-          
-        } else {
-          unsigned j;
-          
-          for (j = 0; j < [extensions count]; j++) {
-            [extractors setObject: extractor 
-                           forKey: [[extensions objectAtIndex: j] lowercaseString]];
+        if (extractor) {
+          NSArray *extensions = [extractor pathExtensions];
+
+          if ([extensions containsObject: @"txt"]) {
+            ASSIGN (textExtractor, extractor);
+
+          } else {
+            unsigned j;
+
+            for (j = 0; j < [extensions count]; j++) {
+              [extractors setObject: extractor 
+                             forKey: [[extensions objectAtIndex: j] lowercaseString]];
+            }
+
+            RELEASE ((id)extractor);
           }
-        
-          RELEASE ((id)extractor);
         }
       }
     }
