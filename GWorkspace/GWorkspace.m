@@ -152,7 +152,7 @@ static GWorkspace *gworkspace = nil;
 	[mainMenu setSubmenu: menu forItem: menuItem];	
 	addItemToMenu(menu, @"Info Panel...", @"", @"showInfo:", @"");
 	addItemToMenu(menu, @"Preferences...", @"", @"showPreferences:", @"");
-	addItemToMenu(menu, @"Help...", @"", nil, @"?");
+	addItemToMenu(menu, @"Help...", @"", @"showHelp:", @"?");
 	 
 	// File
 	menuItem = addItemToMenu(mainMenu, @"File", @"", nil, @"");

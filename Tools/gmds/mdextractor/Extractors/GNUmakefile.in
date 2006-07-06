@@ -8,12 +8,14 @@ SUBPROJECTS = \
   HtmlExtractor \
   PdfExtractor \
   OpenOfficeExtractor \
+  AbiwordExtractor \
   JpegExtractor 
 else
 SUBPROJECTS = \
   TextExtractor \
   HtmlExtractor \
   OpenOfficeExtractor \
+  AbiwordExtractor \
   JpegExtractor 
 endif
   
