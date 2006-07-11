@@ -422,6 +422,53 @@ static unsigned char darkerLUT[256] = {
     srcData = [rep bitmapData];
     dstData = [newrep bitmapData];
 
+/*
+    for (y = 0; y < (int)(newsize.height); y++) {
+      int px[2], py[2]; 
+
+      py[0] = floor(y * yratio);
+      py[1] = ceil((y + 1) * yratio);
+
+      for (x = 0; x < (int)(newsize.width); x++) {
+        unsigned pix[4] = { 0, 0, 0, 0 };
+        int count = 0;
+        int i, j;
+
+        px[0] = floor(x * xratio);
+        px[1] = ceil((x + 1) * xratio);
+
+        for (i = px[0]; i < px[1]; i++) {
+          for (j = py[0]; j < py[1]; j++) {
+            int pos = (int)(bpp * (j * icnsize.width + i));
+
+            pix[0] += srcData[pos];
+
+            if (isColor) {
+              pix[1] += srcData[pos + 1];
+              pix[2] += srcData[pos + 2];
+              pix[3] += (hasAlpha ? srcData[pos + 3] : 255);
+            } else {
+              pix[1] += (hasAlpha ? srcData[pos + 1] : 255);
+            }
+            
+            count++;
+          }
+        }
+
+        *dstData++ = (unsigned char)(pix[0] / count);
+
+        if (isColor) {
+          *dstData++ = (unsigned char)(pix[1] / count);
+          *dstData++ = (unsigned char)(pix[2] / count);
+          *dstData++ = (unsigned char)(pix[3] / count);
+        } else {
+          *dstData++ = (unsigned char)(pix[1] / count);
+        }
+      }
+    }
+  */
+
+
     for (y = 0; y < (int)newsize.height; y++) {
       for (x = 0; x < (int)newsize.width; x++) {
         int pos = (int)(bpp * (floor(y * yratio) * icnsize.width + floor(x * xratio)));
@@ -443,7 +490,7 @@ static unsigned char darkerLUT[256] = {
           *dstData++ = 255;
         }
       }
-    }
+    }    
 
   } else {
     newIcon = [icon copy];  

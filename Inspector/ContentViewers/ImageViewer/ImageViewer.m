@@ -129,7 +129,7 @@
     RELEASE (editButt);
 
     ASSIGN (extsarr, ([NSArray arrayWithObjects: @"tiff", @"tif", @"png", 
-                                      @"jpeg", @"jpg", @"gif", @"xpm", nil]));
+                                            @"jpeg", @"jpg", @"gif", nil]));
 
     inspector = insp;
     fm = [NSFileManager defaultManager];

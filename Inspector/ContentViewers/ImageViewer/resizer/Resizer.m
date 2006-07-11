@@ -112,7 +112,6 @@
   exit(0);
 }
 
-
 - (void)readImageAtPath:(NSString *)path
                 setSize:(NSSize)imsize
 {
@@ -146,7 +145,7 @@
       unsigned char *srcData;
       unsigned char *destData;
       unsigned x, y;
-
+      
       if ((imsize.width / srcsize.width) <= (imsize.height / srcsize.height)) {
         dstsize.width = floor(imsize.width + 0.5);
         dstsize.height = floor(dstsize.width * srcsize.height / srcsize.width + 0.5);
@@ -172,6 +171,45 @@
       srcData = [srcRep bitmapData];
       destData = [dstRep bitmapData];
 
+      for (y = 0; y < (int)(dstsize.height); y++) {
+        int px[2], py[2]; 
+        
+        py[0] = floor(y * yratio);
+        py[1] = ceil((y + 1) * yratio);
+                
+        for (x = 0; x < (int)(dstsize.width); x++) {
+          unsigned pix[4] = { 0, 0, 0, 0 };
+          int count = 0;
+          int i, j;
+
+          px[0] = floor(x * xratio);
+          px[1] = ceil((x + 1) * xratio);
+          
+          for (i = px[0]; i < px[1]; i++) {
+            for (j = py[0]; j < py[1]; j++) {
+              int pos = (int)(bpp * (j * srcsize.width + i));
+
+              pix[0] += srcData[pos];
+              
+              if (isColor) {
+                pix[1] += srcData[pos + 1];
+                pix[2] += srcData[pos + 2];
+              }
+
+              count++;
+            }
+          }
+
+          *destData++ = (unsigned char)(pix[0] / count);
+
+          if (isColor) {
+            *destData++ = (unsigned char)(pix[1] / count);
+            *destData++ = (unsigned char)(pix[2] / count);
+          }
+        }
+      }
+  
+  /*
       for (y = 0; y < (int)dstsize.height; y++) {
         for (x = 0; x < (int)dstsize.width; x++) {
           int pos = (int)(bpp * (floor(y * yratio) * srcsize.width + floor(x * xratio)));
@@ -184,7 +222,8 @@
           }
         }
       }
-
+  */    
+  
       NS_DURING
 		    {
           tiffData = [dstRep TIFFRepresentation];   
@@ -239,3 +278,4 @@ int main(int argc, char** argv)
   RELEASE (pool);  
   exit(0);
 }
+
