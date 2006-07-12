@@ -9,6 +9,7 @@ SUBPROJECTS = \
   PdfExtractor \
   OpenOfficeExtractor \
   AbiwordExtractor \
+  XmlExtractor \
   JpegExtractor 
 else
 SUBPROJECTS = \
@@ -16,6 +17,7 @@ SUBPROJECTS = \
   HtmlExtractor \
   OpenOfficeExtractor \
   AbiwordExtractor \
+  XmlExtractor \
   JpegExtractor 
 endif
   
