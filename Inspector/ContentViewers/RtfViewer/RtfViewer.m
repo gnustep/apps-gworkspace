@@ -125,7 +125,7 @@
 - (void)displayPath:(NSString *)path
 {
   CREATE_AUTORELEASE_POOL (pool);
-  NSString *ext = [path pathExtension];
+  NSString *ext = [[path pathExtension] lowercaseString];
   NSData *data = nil;
   NSString *s = nil;
   NSAttributedString *attrstr = nil;
@@ -135,8 +135,7 @@
     [inspector contentsReadyAt: path];
   }
   
-  if (([[ext lowercaseString] isEqual: @"rtf"] == NO)
-                  && ([[ext lowercaseString] isEqual: @"rtfd"] == NO)) {
+  if (([ext isEqual: @"rtf"] == NO) && ([ext isEqual: @"rtfd"] == NO)) {
     NSDictionary *dict = [[NSFileManager defaultManager] 
                               fileAttributesAtPath: path traverseLink: YES];
     int nbytes = [[dict objectForKey: NSFileSize] intValue];
@@ -164,23 +163,10 @@
 
     font = [NSFont systemFontOfSize: 8.0];
 
-  } else if ([[ext lowercaseString] isEqual: @"rtf"]) {
-    data = [NSData dataWithContentsOfFile: path];
-
-    if (data) {    
-      attrstr = [[NSAttributedString alloc] initWithRTF: data
-						                         documentAttributes: NULL];
-      AUTORELEASE (attrstr);
-    }
-
-  } else if ([[ext lowercaseString] isEqual: @"rtfd"]) {
-    data = [NSData dataWithContentsOfFile: path];
-
-    if (data) {
-      attrstr = [[NSAttributedString alloc] initWithRTFD: data
-						                          documentAttributes: NULL];
-      AUTORELEASE (attrstr);
-    }
+  } else if ([ext isEqual: @"rtf"] || [ext isEqual: @"rtfd"]) {
+    attrstr = [[NSAttributedString alloc] initWithPath: path
+                                    documentAttributes: NULL];
+    TEST_AUTORELEASE (attrstr);
   }
   
   if (attrstr) {
@@ -247,8 +233,10 @@
 
   attributes = [[NSFileManager defaultManager] fileAttributesAtPath: path
                                                        traverseLink: YES];
+	extension = [[path pathExtension] lowercaseString];
+
   if ([attributes objectForKey: NSFileType] == NSFileTypeDirectory) {
-    return NO;
+    return [extension isEqual: @"rtfd"];
   }		
 
 	[ws getInfoForFile: path application: &defApp type: &fileType];
@@ -258,9 +246,7 @@
     return NO;
   }
 
-	extension = [path pathExtension];
-
-  if ([extsarr containsObject: [extension lowercaseString]]) {
+  if ([extsarr containsObject: extension]) {
     return YES;
   }
   

@@ -102,6 +102,7 @@
                                   
     ASSIGN (typeIcons, ([NSArray arrayWithObjects:
                               [NSImage imageNamed: @"stringPboard"],
+                              [NSImage imageNamed: @"rtfPboard"],
                               [NSImage imageNamed: @"rtfPboard"], nil]));
   }
 	
@@ -151,11 +152,15 @@
       [errLabel removeFromSuperview];
       [self addSubview: scrollView]; 
     }
-  
+    
     [[textView textStorage] setAttributedString: attrstr];
-		[[textView textStorage] addAttribute: NSFontAttributeName 
-                                   value: [NSFont systemFontOfSize: 8.0] 
-                                   range: NSMakeRange(0, [attrstr length])];
+
+    if ([type isEqual: NSStringPboardType]) {
+		  [[textView textStorage] addAttribute: NSFontAttributeName 
+                                     value: [NSFont systemFontOfSize: 8.0] 
+                                     range: NSMakeRange(0, [attrstr length])];
+    }
+    
     RELEASE (attrstr);                                
   } else {
     if (valid == YES) {
