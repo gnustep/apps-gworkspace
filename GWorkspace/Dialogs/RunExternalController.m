@@ -108,6 +108,11 @@ static NSString *nibName = @"RunExternal";
   [win makeFirstResponder: cfield];
 }
 
+- (NSWindow *)win
+{
+  return win;
+}
+
 - (IBAction)cancelButtAction:(id)sender
 {
   [win close];

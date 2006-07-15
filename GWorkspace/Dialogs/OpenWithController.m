@@ -152,6 +152,11 @@ static NSString *nibName = @"OpenWith";
   RELEASE (selpaths);
 }
 
+- (NSWindow *)win
+{
+  return win;
+}
+
 - (IBAction)cancelButtAction:(id)sender
 {
   result = NSAlertAlternateReturn;

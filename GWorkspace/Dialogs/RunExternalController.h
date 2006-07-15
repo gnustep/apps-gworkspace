@@ -26,11 +26,11 @@
 #ifndef RUN_EXTERNAL_CONTROLLER_H
 #define RUN_EXTERNAL_CONTROLLER_H
 
-#include <Foundation/NSObject.h>
+#include <Foundation/Foundation.h>
 
 @class CompletionField;
-@class NSFileManager;
-@class NSArray;
+@class NSBox;
+@class NSWindow;
 
 @interface RunExternalController : NSObject 
 {
@@ -52,6 +52,8 @@
 - (NSString *)checkCommand:(NSString *)comm;
 
 - (void)activate;
+
+- (NSWindow *)win;
 
 - (IBAction)cancelButtAction:(id)sender;
 

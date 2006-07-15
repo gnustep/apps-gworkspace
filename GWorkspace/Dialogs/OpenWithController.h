@@ -30,6 +30,7 @@
 
 @class CompletionField;
 @class NSBox;
+@class NSWindow;
 @class GWorkspace;
 
 @interface OpenWithController : NSObject 
@@ -52,6 +53,8 @@
 - (NSString *)checkCommand:(NSString *)comm;
 
 - (void)activate;
+
+- (NSWindow *)win;
 
 - (IBAction)cancelButtAction:(id)sender;
 

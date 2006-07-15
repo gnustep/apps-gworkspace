@@ -440,12 +440,13 @@ static GWorkspace *gworkspace = nil;
   prefController = [PrefController new];  
   
 	history = [[History alloc] init];
-  fiend = nil;
   
   openWithController = [[OpenWithController alloc] init];
   runExtController = [[RunExternalController alloc] init];
   	    
   finder = [Finder finder];
+  
+  fiend = [[Fiend alloc] init];
   
   if ([defaults boolForKey: @"usefiend"]) {
     [self showFiend: nil];
@@ -468,7 +469,9 @@ static GWorkspace *gworkspace = nil;
   
 	[defaults synchronize];
   terminating = NO;
-
+  
+  [self setContextHelp];
+  
   waitCursor = [[NSCursor alloc] initWithImage: [NSImage imageNamed: @"watch.tiff"]];
   [waitCursor setHotSpot: NSMakePoint(8, 8)];
 
@@ -860,6 +863,50 @@ static GWorkspace *gworkspace = nil;
   [defaults setBool: (recyclerApp != nil) forKey: @"uses_recycler"];
 
 	[defaults synchronize];
+}
+
+- (void)setContextHelp
+{
+  NSHelpManager *manager = [NSHelpManager sharedHelpManager];
+  NSString *help;
+
+  help = @"TabbedShelf.rtfd";
+  [manager setContextHelp: (NSAttributedString *)help 
+               withObject: [tshelfWin shelfView]];
+
+  help = @"History.rtfd";
+  [manager setContextHelp: (NSAttributedString *)help 
+               withObject: [[history myWin] contentView]];
+
+  help = @"Fiend.rtfd";
+  [manager setContextHelp: (NSAttributedString *)help 
+               withObject: [[fiend myWin] contentView]];
+
+  help = @"RunExternal.rtfd";
+  [manager setContextHelp: (NSAttributedString *)help 
+               withObject: [[runExtController win] contentView]];
+
+
+/*
+  TabbedShelf         ---> OK
+  History             ---> OK
+  Fiend               ---> OK
+  runExtController    ---> OK
+  
+  
+  Preferences ---> deve farselo da solo (PIU' UNO GENERICO!!!!!)
+  Inspector   ---> deve farselo da solo (PIU' UNO GENERICO!!!!!)
+  
+  Finder      ---> uno generico piu' uno per i results 
+                    (per i results se lo deve fare da solo)
+  
+  LSFolders (aperte)   ??????
+  
+     
+ vwrsManager = [GWViewersManager viewersManager];
+ [vwrsManager showViewers];
+
+*/
 }
 
 - (void)startXTermOnDirectory:(NSString *)dirPath
@@ -2112,9 +2159,6 @@ static GWorkspace *gworkspace = nil;
 	[menu addItemWithTitle: NSLocalizedString(@"Add Layer...", @"") 
 										action: @selector(addFiendLayer:) keyEquivalent: @""];								
 
-  if (fiend == nil) {    
-    fiend = [[Fiend alloc] init];
-  }
   [fiend activate];
 }
 

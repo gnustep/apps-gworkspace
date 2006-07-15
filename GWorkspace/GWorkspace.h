@@ -215,6 +215,8 @@
 - (NSString *)gworkspaceProcessName;
 
 - (void)updateDefaults;
+
+- (void)setContextHelp;
 					 
 - (void)startXTermOnDirectory:(NSString *)dirPath;
 
