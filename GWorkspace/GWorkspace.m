@@ -153,6 +153,7 @@ static GWorkspace *gworkspace = nil;
 	addItemToMenu(menu, @"Info Panel...", @"", @"showInfo:", @"");
 	addItemToMenu(menu, @"Preferences...", @"", @"showPreferences:", @"");
 	addItemToMenu(menu, @"Help...", @"", @"showHelp:", @"?");
+	addItemToMenu(menu, @"Activate context help", @"", @"activateContextHelp:", @";");
 	 
 	// File
 	menuItem = addItemToMenu(mainMenu, @"File", @"", nil, @"");
@@ -985,7 +986,10 @@ static GWorkspace *gworkspace = nil;
               || [title isEqual: NSLocalizedString(@"Rename Current Tab", @"")]
               || [title isEqual: NSLocalizedString(@"Add Tab...", @"")]) {
     return [tshelfWin isVisible];
-  
+
+  } else if ([title isEqual: NSLocalizedString(@"Activate context help", @"")]) {
+    return ([NSHelpManager isContextHelpModeActive] == NO);
+
   } else if ([title isEqual: NSLocalizedString(@"Logout", @"")]) {
     return !loggingout;
   }
@@ -1999,6 +2003,13 @@ static GWorkspace *gworkspace = nil;
 - (void)showPreferences:(id)sender
 {
   [prefController activate]; 
+}
+
+- (void)activateContextHelp:(id)sender
+{
+  if ([NSHelpManager isContextHelpModeActive] == NO) {
+    [NSHelpManager setContextHelpModeActive: YES];
+  }
 }
 
 - (void)showViewer:(id)sender

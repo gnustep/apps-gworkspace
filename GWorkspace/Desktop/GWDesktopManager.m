@@ -138,6 +138,8 @@ static GWDesktopManager *desktopManager = nil;
                 				  selector: @selector(mountedVolumeDidUnmount:) 
                 					    name: NSWorkspaceDidUnmountNotification
                 					  object: nil];
+
+    [self setContextHelp];
   }
   
   return self;
@@ -572,6 +574,23 @@ static GWDesktopManager *desktopManager = nil;
   
   [dock updateDefaults];
   [[win desktopView] updateDefaults];
+}
+
+- (void)setContextHelp
+{
+  NSHelpManager *manager = [NSHelpManager sharedHelpManager];
+  NSString *help;
+
+  help = @"Desktop.rtfd";
+  [manager setContextHelp: (NSAttributedString *)help 
+               withObject: [self desktopView]];
+
+  help = @"Dock.rtfd";
+  [manager setContextHelp: (NSAttributedString *)help withObject: dock];
+  
+  help = @"Recycler.rtfd";
+  [manager setContextHelp: (NSAttributedString *)help 
+               withObject: [dock trashIcon]];
 }
 
 @end

@@ -148,6 +148,8 @@ typedef enum DockPosition {
 
 - (void)updateDefaults;
 
+- (void)setContextHelp;
+
 @end
 
 
