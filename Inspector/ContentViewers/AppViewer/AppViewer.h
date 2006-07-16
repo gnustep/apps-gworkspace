@@ -54,6 +54,8 @@
   NSWorkspace *ws;
 }
 
+- (void)setContextHelp;
+
 @end
 
 #endif // APPVIEWER_H

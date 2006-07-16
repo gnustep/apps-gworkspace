@@ -90,6 +90,8 @@
 
 - (void)editFile:(id)sender;
 
+- (void)setContextHelp;
+
 @end
 
 

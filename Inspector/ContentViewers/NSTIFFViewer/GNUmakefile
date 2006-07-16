@@ -19,7 +19,8 @@ NSTIFFViewer_PRINCIPAL_CLASS = NSTIFFViewer
 
 #NSTIFFViewer_LOCALIZED_RESOURCE_FILES = Localizable.strings
 
-NSTIFFViewer_RESOURCE_FILES = InspectorInfo.plist
+NSTIFFViewer_RESOURCE_FILES = InspectorInfo.plist \
+Help.rtfd
 
 -include GNUmakefile.preamble
 

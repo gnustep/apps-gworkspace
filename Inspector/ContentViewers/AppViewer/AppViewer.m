@@ -113,6 +113,8 @@
     ws = [NSWorkspace sharedWorkspace];
 				
 		valid = YES;
+    
+    [self setContextHelp];
   }
 	
 	return self;
@@ -274,6 +276,18 @@
 - (NSString *)description
 {
 	return NSLocalizedString(@"Displays info about an application bundle", @"");	
+}
+
+- (void)setContextHelp
+{
+  NSBundle *bundle = [NSBundle bundleForClass: [self class]];
+  NSString *hpath = [bundle pathForResource: @"Help" ofType: @"rtfd"];
+  NSAttributedString *help = [[NSAttributedString alloc] initWithPath: hpath
+                                                   documentAttributes: NULL];
+                                    
+  [[NSHelpManager sharedHelpManager] setContextHelp: help withObject: self];
+                                    
+  RELEASE (help);
 }
 
 @end

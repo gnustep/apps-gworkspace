@@ -56,6 +56,8 @@
   id <ContentInspectorProtocol>inspector;
 }
 
+- (void)setContextHelp;
+
 @end
 
 

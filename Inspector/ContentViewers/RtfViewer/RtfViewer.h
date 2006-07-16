@@ -58,6 +58,8 @@
 
 - (void)editFile:(id)sender;
 
+- (void)setContextHelp;
+
 @end
 
 #endif // RTFVIEWER_H

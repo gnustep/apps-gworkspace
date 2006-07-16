@@ -63,6 +63,8 @@
 
 - (void)editFile:(id)sender;
 
+- (void)setContextHelp;
+
 @end
 
 #endif // SOUNDVIEWER_H

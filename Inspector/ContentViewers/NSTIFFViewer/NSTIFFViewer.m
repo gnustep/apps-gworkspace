@@ -97,6 +97,8 @@
     
     ASSIGN (typeDescriprion, NSLocalizedString(@"Image data", @""));
     ASSIGN (icon, [NSImage imageNamed: @"tiffPboard"]);
+  
+    [self setContextHelp];
   }
 	
 	return self;
@@ -187,6 +189,18 @@
 - (NSString *)description
 {
 	return NSLocalizedString(@"This Inspector allow you view NSTIFF pasteboard data", @"");	
+}
+
+- (void)setContextHelp
+{
+  NSBundle *bundle = [NSBundle bundleForClass: [self class]];
+  NSString *hpath = [bundle pathForResource: @"Help" ofType: @"rtfd"];
+  NSAttributedString *help = [[NSAttributedString alloc] initWithPath: hpath
+                                                   documentAttributes: NULL];
+                                    
+  [[NSHelpManager sharedHelpManager] setContextHelp: help withObject: self];
+                                    
+  RELEASE (help);
 }
 
 @end

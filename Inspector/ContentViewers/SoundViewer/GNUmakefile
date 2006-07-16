@@ -15,7 +15,8 @@ SoundViewer_PRINCIPAL_CLASS = SoundViewer
 #SoundViewer_LANGUAGES = English
 
 SoundViewer_RESOURCE_FILES = Images/* \
-                             InspectorInfo.plist
+                             InspectorInfo.plist \
+                             Help.rtfd
 
 #SoundViewer_LOCALIZED_RESOURCE_FILES = Localizable.strings
 

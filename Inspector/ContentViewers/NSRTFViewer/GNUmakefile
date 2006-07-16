@@ -19,7 +19,8 @@ NSRTFViewer_PRINCIPAL_CLASS = NSRTFViewer
 
 #NSRTFViewer_LOCALIZED_RESOURCE_FILES = Localizable.strings
 
-NSRTFViewer_RESOURCE_FILES = InspectorInfo.plist
+NSRTFViewer_RESOURCE_FILES = InspectorInfo.plist \
+Help.rtfd
 
 -include GNUmakefile.preamble
 

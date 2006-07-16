@@ -23,7 +23,8 @@ ImageViewer_PRINCIPAL_CLASS = ImageViewer
 
 #ImageViewer_LOCALIZED_RESOURCE_FILES = Localizable.strings
 
-ImageViewer_RESOURCE_FILES = InspectorInfo.plist
+ImageViewer_RESOURCE_FILES = InspectorInfo.plist \
+Help.rtfd
 
 -include GNUmakefile.preamble
 

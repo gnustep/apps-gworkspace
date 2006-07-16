@@ -81,6 +81,8 @@
   id <ContentInspectorProtocol>inspector;
 }
 
+- (void)setContextHelp;
+
 @end
 
 #endif // IBVIEWVIEWER_H

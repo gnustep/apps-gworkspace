@@ -16,7 +16,8 @@ FolderViewer_PRINCIPAL_CLASS = FolderViewer
 
 #FolderViewer_LOCALIZED_RESOURCE_FILES = Localizable.strings
 
-FolderViewer_RESOURCE_FILES = InspectorInfo.plist
+FolderViewer_RESOURCE_FILES = InspectorInfo.plist \
+Help.rtfd
 
 -include GNUmakefile.preamble
 

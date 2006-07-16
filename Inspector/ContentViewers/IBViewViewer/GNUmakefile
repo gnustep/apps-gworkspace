@@ -19,7 +19,8 @@ IBViewViewer_PRINCIPAL_CLASS = IBViewViewer
 
 #IBViewViewer_LOCALIZED_RESOURCE_FILES = Localizable.strings
 
-IBViewViewer_RESOURCE_FILES = InspectorInfo.plist
+IBViewViewer_RESOURCE_FILES = InspectorInfo.plist \
+Help.rtfd
 
 -include GNUmakefile.preamble
 

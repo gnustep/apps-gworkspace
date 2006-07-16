@@ -19,7 +19,8 @@ AppViewer_PRINCIPAL_CLASS = AppViewer
 
 #AppViewer_LOCALIZED_RESOURCE_FILES = Localizable.strings
 
-AppViewer_RESOURCE_FILES = InspectorInfo.plist
+AppViewer_RESOURCE_FILES = InspectorInfo.plist \
+Help.rtfd
 
 -include GNUmakefile.preamble
 

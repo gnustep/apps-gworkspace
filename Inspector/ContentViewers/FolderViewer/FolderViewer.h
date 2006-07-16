@@ -59,6 +59,8 @@
 
 - (void)setNewSortType:(id)sender;
 
+- (void)setContextHelp;
+
 @end
 
 #endif // FOLDERVIEWER_H

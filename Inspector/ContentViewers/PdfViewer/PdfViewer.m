@@ -149,6 +149,8 @@ const double PDFResolution = 72.0;
 		valid = YES;
 		
     pdfPath = nil;
+    
+    [self setContextHelp];
 	}
 	
 	return self;
@@ -398,6 +400,18 @@ const double PDFResolution = 72.0;
       }
     NS_ENDHANDLER  
 	}
+}
+
+- (void)setContextHelp
+{
+  NSBundle *bundle = [NSBundle bundleForClass: [self class]];
+  NSString *hpath = [bundle pathForResource: @"Help" ofType: @"rtfd"];
+  NSAttributedString *help = [[NSAttributedString alloc] initWithPath: hpath
+                                                   documentAttributes: NULL];
+                                    
+  [[NSHelpManager sharedHelpManager] setContextHelp: help withObject: self];
+                                    
+  RELEASE (help);
 }
 
 @end

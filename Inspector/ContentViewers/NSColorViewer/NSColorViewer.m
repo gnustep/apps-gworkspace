@@ -119,6 +119,8 @@
     
     ASSIGN (typeDescriprion, NSLocalizedString(@"NSColor data", @""));
     ASSIGN (icon, [NSImage imageNamed: @"colorPboard"]);
+    
+    [self setContextHelp];
   }
 	
 	return self;
@@ -201,6 +203,18 @@
 - (NSString *)description
 {
 	return NSLocalizedString(@"This Inspector allow you view NSColor pasteboard data", @"");	
+}
+
+- (void)setContextHelp
+{
+  NSBundle *bundle = [NSBundle bundleForClass: [self class]];
+  NSString *hpath = [bundle pathForResource: @"Help" ofType: @"rtfd"];
+  NSAttributedString *help = [[NSAttributedString alloc] initWithPath: hpath
+                                                   documentAttributes: NULL];
+                                    
+  [[NSHelpManager sharedHelpManager] setContextHelp: help withObject: self];
+                                    
+  RELEASE (help);
 }
 
 @end

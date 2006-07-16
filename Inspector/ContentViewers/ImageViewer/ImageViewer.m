@@ -143,6 +143,8 @@
     imagePath = nil;
     nextPath = nil;
     editPath = nil;
+    
+    [self setContextHelp];
   }
 	
 	return self;
@@ -437,6 +439,18 @@
       }
     NS_ENDHANDLER  
 	}
+}
+
+- (void)setContextHelp
+{
+  NSBundle *bundle = [NSBundle bundleForClass: [self class]];
+  NSString *hpath = [bundle pathForResource: @"Help" ofType: @"rtfd"];
+  NSAttributedString *help = [[NSAttributedString alloc] initWithPath: hpath
+                                                   documentAttributes: NULL];
+                                    
+  [[NSHelpManager sharedHelpManager] setContextHelp: help withObject: self];
+                                    
+  RELEASE (help);
 }
 
 @end

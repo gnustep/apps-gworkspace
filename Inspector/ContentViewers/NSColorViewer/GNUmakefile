@@ -19,7 +19,8 @@ NSColorViewer_PRINCIPAL_CLASS = NSColorViewer
 
 #NSColorViewer_LOCALIZED_RESOURCE_FILES = Localizable.strings
 
-NSColorViewer_RESOURCE_FILES = InspectorInfo.plist
+NSColorViewer_RESOURCE_FILES = InspectorInfo.plist \
+Help.rtfd
 
 -include GNUmakefile.preamble
 

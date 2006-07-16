@@ -55,6 +55,8 @@
   id <ContentInspectorProtocol>inspector;
 }
 
+- (void)setContextHelp;
+
 @end
 
 #endif // NSRTFVIEWER_H

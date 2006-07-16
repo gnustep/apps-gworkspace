@@ -79,6 +79,8 @@
 
 - (void)editFile:(id)sender;
 
+- (void)setContextHelp;
+
 @end
 
 #endif // PDFVIEWER_H

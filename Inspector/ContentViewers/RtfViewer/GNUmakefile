@@ -19,7 +19,8 @@ RtfViewer_PRINCIPAL_CLASS = RtfViewer
 
 #RtfViewer_LOCALIZED_RESOURCE_FILES = Localizable.strings
 
-RtfViewer_RESOURCE_FILES = InspectorInfo.plist
+RtfViewer_RESOURCE_FILES = InspectorInfo.plist \
+Help.rtfd
 
 -include GNUmakefile.preamble
 

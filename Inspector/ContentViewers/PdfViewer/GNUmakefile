@@ -15,7 +15,8 @@ PdfViewer_PRINCIPAL_CLASS = PdfViewer
 
 #PdfViewer_LANGUAGES = English 
 PdfViewer_RESOURCE_FILES = Images/* \
-                           InspectorInfo.plist 
+                           InspectorInfo.plist \
+                           Help.rtfd
 
 #PdfViewer_LOCALIZED_RESOURCE_FILES = Localizable.strings
 

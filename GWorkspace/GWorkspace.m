@@ -886,16 +886,29 @@ static GWorkspace *gworkspace = nil;
   [manager setContextHelp: (NSAttributedString *)help 
                withObject: [[runExtController win] contentView]];
 
+  help = @"Preferences.rtfd";
+  [manager setContextHelp: (NSAttributedString *)help 
+               withObject: [[prefController myWin] contentView]];
+
+  help = @"Inspector.rtfd";
+  [manager setContextHelp: (NSAttributedString *)help 
+               withObject: [[inspector win] contentView]];
+
+
+
+
+
+
 
 /*
   TabbedShelf         ---> OK
   History             ---> OK
   Fiend               ---> OK
   runExtController    ---> OK
+    
+  Preferences         ---> OK (aggiungere i subhelps)
+  Inspector           ---> OK (aggiungere i subhelps ma non per contents)
   
-  
-  Preferences ---> deve farselo da solo (PIU' UNO GENERICO!!!!!)
-  Inspector   ---> deve farselo da solo (PIU' UNO GENERICO!!!!!)
   
   Finder      ---> uno generico piu' uno per i results 
                     (per i results se lo deve fare da solo)
