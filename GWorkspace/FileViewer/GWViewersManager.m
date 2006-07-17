@@ -51,6 +51,8 @@ static GWViewersManager *vwrsmanager = nil;
   RELEASE (viewers);
   RELEASE (rootViewersKeys);
   RELEASE (spatialViewersHistory);
+  RELEASE (bviewerHelp);
+  RELEASE (sviewerHelp);
     
 	[super dealloc];
 }
@@ -64,6 +66,10 @@ static GWViewersManager *vwrsmanager = nil;
     id entry = [defaults objectForKey: @"root_viewers_keys"];
     
     gworkspace = [GWorkspace gworkspace];
+    helpManager = [NSHelpManager sharedHelpManager];    
+    ASSIGN (bviewerHelp, [gworkspace contextHelpFromName: @"BViewer.rtfd"]);
+    ASSIGN (sviewerHelp, [gworkspace contextHelpFromName: @"SViewer.rtfd"]);
+    
     viewers = [NSMutableArray new];
     orderingViewers = NO;
     
@@ -97,7 +103,7 @@ static GWViewersManager *vwrsmanager = nil;
                 					  name: @"GWSortTypeDidChangeNotification"
                 					object: nil];
     
-    [[FSNodeRep sharedInstance] setLabelWFactor: 9.0];
+    [[FSNodeRep sharedInstance] setLabelWFactor: 9.0];    
   }
   
   return self;
@@ -257,6 +263,7 @@ static GWViewersManager *vwrsmanager = nil;
   } 
 
   if (oldvwr) {
+    [helpManager removeContextHelpForObject: [[oldvwr win] contentView]];
     [[oldvwr win] close]; 
   }
   
@@ -272,6 +279,13 @@ static GWViewersManager *vwrsmanager = nil;
         [rep setOpened: YES];
       }
     }
+   
+    [helpManager setContextHelp: sviewerHelp 
+                     withObject: [[viewer win] contentView]];
+    
+  } else {
+    [helpManager setContextHelp: bviewerHelp
+                     withObject: [[viewer win] contentView]];
   }
        
   return viewer;
@@ -301,6 +315,9 @@ static GWViewersManager *vwrsmanager = nil;
     
     [viewer activate];
     [viewer windowDidBecomeKey: nil];
+
+    [helpManager setContextHelp: (vtype == SPATIAL) ? sviewerHelp : bviewerHelp
+                     withObject: [[viewer win] contentView]];
   }
 }
 
@@ -464,6 +481,7 @@ static GWViewersManager *vwrsmanager = nil;
     [rootViewersKeys insertObject: key atIndex: 0];
   }
 
+  [helpManager removeContextHelpForObject: [[aviewer win] contentView]];
   [viewers removeObject: aviewer];
 }
 
@@ -505,6 +523,7 @@ static GWViewersManager *vwrsmanager = nil;
 
     [viewer deactivate];
 	  [[NSRunLoop currentRunLoop] runUntilDate: limit];
+    [helpManager removeContextHelpForObject: [[viewer win] contentView]];
     [viewers removeObject: viewer];
   }
 }

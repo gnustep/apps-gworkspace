@@ -217,6 +217,8 @@
 - (void)updateDefaults;
 
 - (void)setContextHelp;
+
+- (NSAttributedString *)contextHelpFromName:(NSString *)fileName;
 					 
 - (void)startXTermOnDirectory:(NSString *)dirPath;
 

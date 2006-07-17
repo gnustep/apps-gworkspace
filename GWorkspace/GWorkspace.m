@@ -895,12 +895,12 @@ static GWorkspace *gworkspace = nil;
                withObject: [[inspector win] contentView]];
 
 
-
-
-
-
-
+  
+  
+  
+      
 /*
+  GWViewersManager    ---> OK
   TabbedShelf         ---> OK
   History             ---> OK
   Fiend               ---> OK
@@ -914,12 +914,34 @@ static GWorkspace *gworkspace = nil;
                     (per i results se lo deve fare da solo)
   
   LSFolders (aperte)   ??????
-  
      
- vwrsManager = [GWViewersManager viewersManager];
- [vwrsManager showViewers];
-
 */
+}
+
+- (NSAttributedString *)contextHelpFromName:(NSString *)fileName
+{
+  NSString *bpath = [[NSBundle mainBundle] bundlePath];
+  NSString *resPath = [bpath stringByAppendingPathComponent: @"Resources"];
+  NSArray *languages = [NSUserDefaults userLanguages];
+  unsigned i;
+     
+  for (i = 0; i < [languages count]; i++) {
+    NSString *language = [languages objectAtIndex: i];
+    NSString *langDir = [NSString stringWithFormat: @"%@.lproj", language];  
+    NSString *helpPath = [langDir stringByAppendingPathComponent: @"Help"];
+  
+    helpPath = [resPath stringByAppendingPathComponent: helpPath];
+    helpPath = [helpPath stringByAppendingPathComponent: fileName];
+  
+  
+    if ([fm fileExistsAtPath: helpPath]) {
+      NSAttributedString *help = [[NSAttributedString alloc] initWithPath: helpPath
+                                                       documentAttributes: NULL];
+      return TEST_AUTORELEASE (help);
+    }
+  }
+  
+  return nil;
 }
 
 - (void)startXTermOnDirectory:(NSString *)dirPath
@@ -2046,10 +2068,12 @@ static GWorkspace *gworkspace = nil;
   [d setObject: @"GWorkspace" forKey: @"ApplicationName"];
   [d setObject: NSLocalizedString(@"GNUstep Workspace Manager", @"")
       	forKey: @"ApplicationDescription"];
-  [d setObject: @"GWorkspace 0.8.2" forKey: @"ApplicationRelease"];
-  [d setObject: @"03 2006" forKey: @"FullVersionID"];
+  [d setObject: @"GWorkspace 0.8.3" forKey: @"ApplicationRelease"];
+  [d setObject: @"07 2006" forKey: @"FullVersionID"];
   [d setObject: [NSArray arrayWithObjects: 
-                    @"Enrico Sersale <enrico@dtedu.net>", nil]
+                    @"Enrico Sersale <enrico@fibernet.ro>",
+        @"Documentation and Help contents by Dennis Leeuw <dleeuw@made-it.com>", 
+                    nil]
         forKey: @"Authors"];
   [d setObject: NSLocalizedString(@"See http://www.gnustep.it/enrico/gworkspace", @"") forKey: @"URL"];
   [d setObject: @"Copyright (C) 2003, 2004, 2005, 2006 Free Software Foundation, Inc."

@@ -44,7 +44,10 @@
   NSMutableArray *spatialViewersHistory;
   int spvHistoryPos;  
   BOOL settingHistoryPath;
-  NSNotificationCenter *nc;      
+  NSHelpManager *helpManager;
+  NSAttributedString *bviewerHelp;
+  NSAttributedString *sviewerHelp;
+  NSNotificationCenter *nc;  
 }
 
 + (GWViewersManager *)viewersManager;
