@@ -872,27 +872,27 @@ static GWorkspace *gworkspace = nil;
 
   help = @"TabbedShelf.rtfd";
   [manager setContextHelp: (NSAttributedString *)help 
-               withObject: [tshelfWin shelfView]];
+                forObject: [tshelfWin shelfView]];
 
   help = @"History.rtfd";
   [manager setContextHelp: (NSAttributedString *)help 
-               withObject: [[history myWin] contentView]];
+                forObject: [[history myWin] contentView]];
 
   help = @"Fiend.rtfd";
   [manager setContextHelp: (NSAttributedString *)help 
-               withObject: [[fiend myWin] contentView]];
+                forObject: [[fiend myWin] contentView]];
 
   help = @"RunExternal.rtfd";
   [manager setContextHelp: (NSAttributedString *)help 
-               withObject: [[runExtController win] contentView]];
+                forObject: [[runExtController win] contentView]];
 
   help = @"Preferences.rtfd";
   [manager setContextHelp: (NSAttributedString *)help 
-               withObject: [[prefController myWin] contentView]];
+                forObject: [[prefController myWin] contentView]];
 
   help = @"Inspector.rtfd";
   [manager setContextHelp: (NSAttributedString *)help 
-               withObject: [[inspector win] contentView]];
+                forObject: [[inspector win] contentView]];
 
 
   

@@ -281,11 +281,11 @@ static GWViewersManager *vwrsmanager = nil;
     }
    
     [helpManager setContextHelp: sviewerHelp 
-                     withObject: [[viewer win] contentView]];
+                      forObject: [[viewer win] contentView]];
     
   } else {
     [helpManager setContextHelp: bviewerHelp
-                     withObject: [[viewer win] contentView]];
+                      forObject: [[viewer win] contentView]];
   }
        
   return viewer;
@@ -317,7 +317,7 @@ static GWViewersManager *vwrsmanager = nil;
     [viewer windowDidBecomeKey: nil];
 
     [helpManager setContextHelp: (vtype == SPATIAL) ? sviewerHelp : bviewerHelp
-                     withObject: [[viewer win] contentView]];
+                      forObject: [[viewer win] contentView]];
   }
 }
 

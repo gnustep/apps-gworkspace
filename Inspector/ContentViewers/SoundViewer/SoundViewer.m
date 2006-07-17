@@ -312,6 +312,7 @@
 
 - (void)setContextHelp
 {
+  NSFileManager *fm = [NSFileManager defaultManager];
   NSString *bpath = [[NSBundle bundleForClass: [self class]] bundlePath];
   NSString *resPath = [bpath stringByAppendingPathComponent: @"Resources"];
   NSArray *languages = [NSUserDefaults userLanguages];
