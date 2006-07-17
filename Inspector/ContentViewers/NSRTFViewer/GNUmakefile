@@ -15,12 +15,8 @@ NSRTFViewer_OBJC_FILES = NSRTFViewer.m
 
 NSRTFViewer_PRINCIPAL_CLASS = NSRTFViewer
 
-#NSRTFViewer_LANGUAGES = English
-
-#NSRTFViewer_LOCALIZED_RESOURCE_FILES = Localizable.strings
-
-NSRTFViewer_RESOURCE_FILES = InspectorInfo.plist \
-Help.rtfd
+NSRTFViewer_RESOURCE_FILES = Resources/English.lproj \
+InspectorInfo.plist 
 
 -include GNUmakefile.preamble
 

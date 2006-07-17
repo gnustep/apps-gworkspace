@@ -15,12 +15,8 @@ RtfViewer_OBJC_FILES = RtfViewer.m
 
 RtfViewer_PRINCIPAL_CLASS = RtfViewer
 
-#RtfViewer_LANGUAGES = English Italian Romanian
-
-#RtfViewer_LOCALIZED_RESOURCE_FILES = Localizable.strings
-
-RtfViewer_RESOURCE_FILES = InspectorInfo.plist \
-Help.rtfd
+RtfViewer_RESOURCE_FILES = Resources/English.lproj \
+InspectorInfo.plist 
 
 -include GNUmakefile.preamble
 

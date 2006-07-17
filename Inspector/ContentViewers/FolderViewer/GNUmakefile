@@ -12,12 +12,8 @@ FolderViewer_OBJC_FILES = FolderViewer.m
 
 FolderViewer_PRINCIPAL_CLASS = FolderViewer
 
-#FolderViewer_LANGUAGES = English
-
-#FolderViewer_LOCALIZED_RESOURCE_FILES = Localizable.strings
-
-FolderViewer_RESOURCE_FILES = InspectorInfo.plist \
-Help.rtfd
+FolderViewer_RESOURCE_FILES = Resources/English.lproj \
+InspectorInfo.plist 
 
 -include GNUmakefile.preamble
 

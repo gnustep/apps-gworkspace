@@ -1,0 +1,13 @@
+{
+    fsn_info_type = <*I0>;
+    geometry = "115 618 450 350 0 0  1600 1176 ";
+    lastselection = (
+	"/opt/Surse/gnustep/SVN/devmodules/usr-apps/gworkspace/Inspector/ContentViewers/IBViewViewer/Resources/English.lproj/Help.rtfd"
+    );
+    shelfdicts = (
+    );
+    shelfheight = <*R77>;
+    singlenode = <*BN>;
+    spatial = <*BN>;
+    viewtype = Browser;
+}

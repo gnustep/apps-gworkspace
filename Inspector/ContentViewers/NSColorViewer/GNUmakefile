@@ -15,12 +15,8 @@ NSColorViewer_OBJC_FILES = NSColorViewer.m
 
 NSColorViewer_PRINCIPAL_CLASS = NSColorViewer
 
-#NSColorViewer_LANGUAGES = English
-
-#NSColorViewer_LOCALIZED_RESOURCE_FILES = Localizable.strings
-
-NSColorViewer_RESOURCE_FILES = InspectorInfo.plist \
-Help.rtfd
+NSColorViewer_RESOURCE_FILES = Resources/English.lproj \
+InspectorInfo.plist 
 
 -include GNUmakefile.preamble
 

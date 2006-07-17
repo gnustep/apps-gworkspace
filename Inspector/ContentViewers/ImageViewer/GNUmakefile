@@ -19,12 +19,8 @@ ImageViewer_OBJC_FILES = ImageViewer.m
 
 ImageViewer_PRINCIPAL_CLASS = ImageViewer
 
-#ImageViewer_LANGUAGES = English
-
-#ImageViewer_LOCALIZED_RESOURCE_FILES = Localizable.strings
-
-ImageViewer_RESOURCE_FILES = InspectorInfo.plist \
-Help.rtfd
+ImageViewer_RESOURCE_FILES = Resources/English.lproj \
+InspectorInfo.plist 
 
 -include GNUmakefile.preamble
 

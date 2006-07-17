@@ -15,12 +15,8 @@ IBViewViewer_OBJC_FILES = IBViewViewer.m
 
 IBViewViewer_PRINCIPAL_CLASS = IBViewViewer
 
-#IBViewViewer_LANGUAGES = English
-
-#IBViewViewer_LOCALIZED_RESOURCE_FILES = Localizable.strings
-
-IBViewViewer_RESOURCE_FILES = InspectorInfo.plist \
-Help.rtfd
+IBViewViewer_RESOURCE_FILES = Resources/English.lproj \
+InspectorInfo.plist 
 
 -include GNUmakefile.preamble
 

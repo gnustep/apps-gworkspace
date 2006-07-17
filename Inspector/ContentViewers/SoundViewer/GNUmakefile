@@ -12,13 +12,9 @@ SoundViewer_OBJC_FILES = SoundViewer.m
 
 SoundViewer_PRINCIPAL_CLASS = SoundViewer
 
-#SoundViewer_LANGUAGES = English
-
 SoundViewer_RESOURCE_FILES = Images/* \
                              InspectorInfo.plist \
-                             Help.rtfd
-
-#SoundViewer_LOCALIZED_RESOURCE_FILES = Localizable.strings
+                             Resources/English.lproj \
 
 -include GNUmakefile.preamble
 

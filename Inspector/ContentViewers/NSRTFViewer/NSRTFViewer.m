@@ -206,14 +206,27 @@
 
 - (void)setContextHelp
 {
-  NSBundle *bundle = [NSBundle bundleForClass: [self class]];
-  NSString *hpath = [bundle pathForResource: @"Help" ofType: @"rtfd"];
-  NSAttributedString *help = [[NSAttributedString alloc] initWithPath: hpath
-                                                   documentAttributes: NULL];
-                                    
-  [[NSHelpManager sharedHelpManager] setContextHelp: help withObject: self];
-                                    
-  RELEASE (help);
+  NSString *bpath = [[NSBundle bundleForClass: [self class]] bundlePath];
+  NSString *resPath = [bpath stringByAppendingPathComponent: @"Resources"];
+  NSArray *languages = [NSUserDefaults userLanguages];
+  unsigned i;
+     
+  for (i = 0; i < [languages count]; i++) {
+    NSString *language = [languages objectAtIndex: i];
+    NSString *langDir = [NSString stringWithFormat: @"%@.lproj", language];  
+    NSString *helpPath = [langDir stringByAppendingPathComponent: @"Help.rtfd"];
+  
+    helpPath = [resPath stringByAppendingPathComponent: helpPath];
+  
+    if ([fm fileExistsAtPath: helpPath]) {
+      NSAttributedString *help = [[NSAttributedString alloc] initWithPath: helpPath
+                                                       documentAttributes: NULL];
+      if (help) {
+        [[NSHelpManager sharedHelpManager] setContextHelp: help forObject: self];
+        RELEASE (help);
+      }
+    }
+  }
 }
 
 @end

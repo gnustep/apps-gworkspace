@@ -15,12 +15,8 @@ AppViewer_OBJC_FILES = AppViewer.m
 
 AppViewer_PRINCIPAL_CLASS = AppViewer
 
-#AppViewer_LANGUAGES = English
-
-#AppViewer_LOCALIZED_RESOURCE_FILES = Localizable.strings
-
-AppViewer_RESOURCE_FILES = InspectorInfo.plist \
-Help.rtfd
+AppViewer_RESOURCE_FILES = Resources/English.lproj \
+InspectorInfo.plist 
 
 -include GNUmakefile.preamble
 

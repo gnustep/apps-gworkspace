@@ -15,12 +15,8 @@ NSTIFFViewer_OBJC_FILES = NSTIFFViewer.m
 
 NSTIFFViewer_PRINCIPAL_CLASS = NSTIFFViewer
 
-#NSTIFFViewer_LANGUAGES = English
-
-#NSTIFFViewer_LOCALIZED_RESOURCE_FILES = Localizable.strings
-
-NSTIFFViewer_RESOURCE_FILES = InspectorInfo.plist \
-Help.rtfd
+NSTIFFViewer_RESOURCE_FILES = Resources/English.lproj \
+InspectorInfo.plist 
 
 -include GNUmakefile.preamble
 
