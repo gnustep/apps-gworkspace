@@ -2072,7 +2072,8 @@ static GWorkspace *gworkspace = nil;
   [d setObject: @"07 2006" forKey: @"FullVersionID"];
   [d setObject: [NSArray arrayWithObjects: 
                     @"Enrico Sersale <enrico@fibernet.ro>",
-        @"Documentation and Help contents by Dennis Leeuw <dleeuw@made-it.com>", 
+                    @"Documentation and Help contents by: \n"
+                    @"Dennis Leeuw <dleeuw@made-it.com>", 
                     nil]
         forKey: @"Authors"];
   [d setObject: NSLocalizedString(@"See http://www.gnustep.it/enrico/gworkspace", @"") forKey: @"URL"];
