@@ -71,22 +71,7 @@
 
 - (BOOL)extractMetadataAtPath:(NSString *)path
                        withID:(int)path_id
-                   attributes:(NSDictionary *)attributes
-                 usingStemmer:(id)stemmer
-                    stopWords:(NSSet *)stopwords;
-
-@end
-
-
-@protocol	StemmerProtocol
-
-- (BOOL)setLanguage:(NSString *)lang;
-
-- (NSString *)language;
-
-- (NSArray *)stopWords;
-
-- (NSString *)stemWord:(NSString *)word;
+                   attributes:(NSDictionary *)attributes;
 
 @end
 
@@ -104,8 +89,6 @@
   
 	NSMutableDictionary *extractors;
   id textExtractor;
-	id stemmer;
-  NSSet *stopWords;
   
   NSConnection *conn;
 
@@ -177,10 +160,6 @@
         withAttributes:(NSDictionary *)attributes;
 
 - (void)loadExtractors;
-
-- (void)setStemmingLanguage:(NSString *)language;
-
-- (void)loadStemmer;
 
 - (BOOL)opendb;
 

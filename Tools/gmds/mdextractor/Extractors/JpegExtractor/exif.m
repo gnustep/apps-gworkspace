@@ -318,7 +318,7 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
               break;
           }
     
-          [imageInfo setObject: spacestr forKey: @"kMDItemColorSpace"];
+          [imageInfo setObject: spacestr forKey: @"GSMDItemColorSpace"];
           
           break;
         }
@@ -326,7 +326,7 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
       case TAG_EXIF_VERSION:
         {
           [imageInfo setObject: removeUnprintables(ValuePtr, ByteCount)
-                        forKey: @"kMDItemEXIFVersion"];
+                        forKey: @"GSMDItemEXIFVersion"];
           
           break;
         }
@@ -336,7 +336,7 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
           int xres = (int)ConvertAnyFormat(ValuePtr, Format);
       
           [imageInfo setObject: [NSNumber numberWithInt: xres] 
-                        forKey: @"kMDItemResolutionWidthDPI"];
+                        forKey: @"GSMDItemResolutionWidthDPI"];
           break;
         }
 
@@ -345,14 +345,14 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
           int yres = (int)ConvertAnyFormat(ValuePtr, Format);
       
           [imageInfo setObject: [NSNumber numberWithInt: yres] 
-                        forKey: @"kMDItemResolutionHeightDPI"];
+                        forKey: @"GSMDItemResolutionHeightDPI"];
           break;
         }
         
       case TAG_DOCUMENT_NAME:
         {
           [imageInfo setObject: removeUnprintables(ValuePtr, ByteCount)
-                        forKey: @"kMDItemTitle"];
+                        forKey: @"GSMDItemTitle"];
           break;
         }
       
@@ -361,14 +361,14 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
           NSString *author = removeUnprintables(ValuePtr, ByteCount);
           
           [imageInfo setObject: [NSArray arrayWithObject: author] 
-                        forKey: @"kMDItemAuthors"];
+                        forKey: @"GSMDItemAuthors"];
           break;
         }
       
       case TAG_COPYRIGHT:
         {
           [imageInfo setObject: removeUnprintables(ValuePtr, ByteCount)
-                        forKey: @"kMDItemCopyright"];
+                        forKey: @"GSMDItemCopyright"];
           break;
         }
         
@@ -379,14 +379,14 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
         strncpy(buff, (char *)ValuePtr, ByteCount < 31 ? ByteCount : 31);
         
         [imageInfo setObject: [NSString stringWithCString: buff]
-                      forKey: @"kMDItemAcquisitionMake"];
+                      forKey: @"GSMDItemAcquisitionMake"];
         break;
 
       case TAG_MODEL:
         strncpy(buff, (char *)ValuePtr, ByteCount < 39 ? ByteCount : 39);
       
         [imageInfo setObject: [NSString stringWithCString: buff]
-                      forKey: @"kMDItemAcquisitionModel"];
+                      forKey: @"GSMDItemAcquisitionModel"];
         break;
 
       case TAG_DATETIME_ORIGINAL:
@@ -394,21 +394,21 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
         strncpy(buff, (char *)ValuePtr, strlen((char *)ValuePtr) + 1);
         
         [imageInfo setObject: [NSString stringWithCString: buff]
-                      forKey: @"kMDItemExposureTimeString"];
+                      forKey: @"GSMDItemExposureTimeString"];
 
       case TAG_DATETIME_DIGITIZED:
       case TAG_DATETIME:
-        if ([imageInfo objectForKey: @"kMDItemExposureTimeString"] == nil) {
+        if ([imageInfo objectForKey: @"GSMDItemExposureTimeString"] == nil) {
           strncpy(buff, (char *)ValuePtr, strlen((char *)ValuePtr) + 1);
           [imageInfo setObject: [NSString stringWithCString: buff]
-                        forKey: @"kMDItemExposureTimeString"];      
+                        forKey: @"GSMDItemExposureTimeString"];      
         }
        
         break;
 
       case TAG_USERCOMMENT:
         {
-          NSString *comments = [imageInfo objectForKey: @"kMDItemComment"];
+          NSString *comments = [imageInfo objectForKey: @"GSMDItemComment"];
         
           if (comments == nil) {
             comments = [NSString string];
@@ -444,7 +444,7 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
             comments = [comments stringByAppendingString: [NSString stringWithCString: buff]];
           }
           
-          [imageInfo setObject: comments forKey: @"kMDItemComment"];      
+          [imageInfo setObject: comments forKey: @"GSMDItemComment"];      
           
           break;
         }
@@ -457,10 +457,10 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
           // (overwrite previously computd value if there is one)
 
           [imageInfo setObject: [NSNumber numberWithFloat: aperture]
-                        forKey: @"kMDItemFNumber"];
+                        forKey: @"GSMDItemFNumber"];
 
           [imageInfo setObject: [NSNumber numberWithFloat: aperture]
-                        forKey: @"kMDItemMaxAperture"];
+                        forKey: @"GSMDItemMaxAperture"];
 
           break;
         }
@@ -470,7 +470,7 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
           float aperture = (float)exp(ConvertAnyFormat(ValuePtr, Format) * log(2) * 0.5);
 
           [imageInfo setObject: [NSNumber numberWithFloat: aperture]
-                        forKey: @"kMDItemAperture"];
+                        forKey: @"GSMDItemAperture"];
 
           break;
         }
@@ -482,7 +482,7 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
           float flen = (float)ConvertAnyFormat(ValuePtr, Format);
           
           [imageInfo setObject: [NSNumber numberWithFloat: flen]
-                        forKey: @"kMDItemFocalLength"];
+                        forKey: @"GSMDItemFocalLength"];
 
           break;
         }
@@ -507,7 +507,7 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
           float exptime = (float)ConvertAnyFormat(ValuePtr, Format);
                     
           [imageInfo setObject: [NSNumber numberWithFloat: exptime]
-                        forKey: @"kMDItemExposureTimeSeconds"];
+                        forKey: @"GSMDItemExposureTimeSeconds"];
           
           break;
         }
@@ -515,11 +515,11 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
       case TAG_SHUTTERSPEED:
         // More complicated way of expressing exposure time, so only use
         // this value if we don't already have it from somewhere else.      
-        if ([imageInfo objectForKey: @"kMDItemExposureTimeSeconds"] == nil) {
+        if ([imageInfo objectForKey: @"GSMDItemExposureTimeSeconds"] == nil) {
           float exptime = (float)(1/exp(ConvertAnyFormat(ValuePtr, Format)*log(2)));
 
           [imageInfo setObject: [NSNumber numberWithFloat: exptime]
-                        forKey: @"kMDItemExposureTimeSeconds"];        
+                        forKey: @"GSMDItemExposureTimeSeconds"];        
         }
         
         break;
@@ -533,16 +533,16 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
                       || (flash == 0x59) || (flash == 0x5d) || (flash == 0x5f));
 
           [imageInfo setObject: [NSNumber numberWithUnsignedInt: flashused]
-                        forKey: @"kMDItemFlashOnOff"];        
+                        forKey: @"GSMDItemFlashOnOff"];        
 
           [imageInfo setObject: [NSNumber numberWithUnsignedInt: redeye]
-                        forKey: @"kMDItemRedEyeOnOff"];        
+                        forKey: @"GSMDItemRedEyeOnOff"];        
 
           break;
         }
         
       case TAG_ORIENTATION:
-        if ([imageInfo objectForKey: @"kMDItemOrientation"] == nil) {
+        if ([imageInfo objectForKey: @"GSMDItemOrientation"] == nil) {
           int orientation = (int)ConvertAnyFormat(ValuePtr, Format);
 
           if (orientation < 1 || orientation > 8) {
@@ -551,7 +551,7 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
           }
 
           [imageInfo setObject: [NSNumber numberWithInt: orientation] 
-                        forKey: @"kMDItemOrientation"];        
+                        forKey: @"GSMDItemOrientation"];        
         }
         break;
         
@@ -579,7 +579,7 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
           int balance = (int)ConvertAnyFormat(ValuePtr, Format);
       
           [imageInfo setObject: [NSNumber numberWithInt: balance]
-                        forKey: @"kMDItemWhiteBalance"];              
+                        forKey: @"GSMDItemWhiteBalance"];              
           break;
         }
         
@@ -612,7 +612,7 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
               break;
           }
 
-          [imageInfo setObject: modestr forKey: @"kMDItemMeteringMode"];        
+          [imageInfo setObject: modestr forKey: @"GSMDItemMeteringMode"];        
         
           break;
         }
@@ -652,17 +652,17 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
               break;
           }
         
-          [imageInfo setObject: expstr forKey: @"kMDItemExposureProgram"];        
+          [imageInfo setObject: expstr forKey: @"GSMDItemExposureProgram"];        
 
           break;
         }
         
       case TAG_EXPOSURE_INDEX:
-        if ([imageInfo objectForKey: @"kMDItemISOSpeed"] == nil) {  
+        if ([imageInfo objectForKey: @"GSMDItemISOSpeed"] == nil) {  
           int iso = (int)ConvertAnyFormat(ValuePtr, Format);
       
           [imageInfo setObject: [NSNumber numberWithInt: iso]
-                        forKey: @"kMDItemISOSpeed"];        
+                        forKey: @"GSMDItemISOSpeed"];        
         }
 
         break;
@@ -672,7 +672,7 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
           int mode = (int)ConvertAnyFormat(ValuePtr, Format);
 
           [imageInfo setObject: [NSNumber numberWithInt: mode]
-                        forKey: @"kMDItemExposureMode"];        
+                        forKey: @"GSMDItemExposureMode"];        
           break;
         }
         
@@ -686,7 +686,7 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
           }
 
           [imageInfo setObject: [NSNumber numberWithInt: isoeq]
-                        forKey: @"kMDItemISOSpeed"];        
+                        forKey: @"GSMDItemISOSpeed"];        
           break;
         }
         

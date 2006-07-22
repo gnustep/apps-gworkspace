@@ -59,7 +59,7 @@ static void process_COM (const uchar *Data, int length,
   Comment[nch] = '\0'; // Null terminate
 
   [imageInfo setObject: [NSString stringWithCString: Comment]
-                forKey: @"kMDItemComment"];
+                forKey: @"GSMDItemComment"];
 }
 
  
@@ -75,10 +75,10 @@ static void process_SOFn (const uchar *Data, int marker,
   
   
   [imageInfo setObject: [NSNumber numberWithInt: Get16m(Data+3)]
-                forKey: @"kMDItemPixelHeight"];
+                forKey: @"GSMDItemPixelHeight"];
                 
   [imageInfo setObject: [NSNumber numberWithInt: Get16m(Data+5)]
-                forKey: @"kMDItemPixelWidth"];
+                forKey: @"GSMDItemPixelWidth"];
     
 //  [imageInfo setObject: [NSNumber numberWithUnsignedInt: isColor]
 //                forKey: @"iscolor"];
@@ -87,7 +87,7 @@ static void process_SOFn (const uchar *Data, int marker,
 //                forKey: @"process"];
 
   [imageInfo setObject: [NSNumber numberWithInt: data_precision]
-                forKey: @"kMDItemBitsPerSample"];
+                forKey: @"GSMDItemBitsPerSample"];
 
 //  [imageInfo setObject: [NSNumber numberWithInt: num_components]
 //                forKey: @"colorcomponents"];

@@ -35,24 +35,7 @@
 
 - (oneway void)unregisterClient:(id)remote;
 
-- (oneway void)extractMetadataAtPath:(NSString *)path;
-
-- (oneway void)extractMetadataFromPath:(NSString *)path;
-
 - (oneway void)performQuery:(NSData *)queryInfo;
-
-@end
-
-
-@protocol	StemmerProtocol
-
-- (BOOL)setLanguage:(NSString *)lang;
-
-- (NSString *)language;
-
-- (NSArray *)stopWords;
-
-- (NSString *)stemWord:(NSString *)word;
 
 @end
 
@@ -80,8 +63,6 @@
   BOOL pendingQuery;
   BOOL queryStopped;
   
-  id stemmer;
-  NSSet *stopWords;
   NSMutableCharacterSet *skipSet;
   NSMutableArray *foundObjects;
   

@@ -482,9 +482,13 @@
   NSDictionary *info = [notif userInfo];
   NSString *path = [info objectForKey: @"NSApplicationPath"];
   NSString *name = [info objectForKey: @"NSApplicationName"];
-           
-  [[dtopManager dock] appWillLaunch: path appName: name];
-  GWDebugLog(@"appWillLaunch: \"%@\" %@", name, path);
+  
+  if (path && name) {
+    [[dtopManager dock] appWillLaunch: path appName: name];
+    GWDebugLog(@"appWillLaunch: \"%@\" %@", name, path);
+  } else {
+    GWDebugLog(@"appWillLaunch: unknown application!");
+  }
 }
 
 - (void)appDidLaunch:(NSNotification *)notif

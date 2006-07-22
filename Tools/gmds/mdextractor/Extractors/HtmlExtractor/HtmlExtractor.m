@@ -115,8 +115,6 @@ int escapeChar(char *buf, NSMutableString *str);
 - (BOOL)extractMetadataAtPath:(NSString *)path
                        withID:(int)path_id
                    attributes:(NSDictionary *)attributes
-                 usingStemmer:(id)stemmer
-                    stopWords:(NSSet *)stopwords
 {
   CREATE_AUTORELEASE_POOL(arp);
   NSString *contents = [NSString stringWithContentsOfFile: path];
@@ -148,15 +146,7 @@ int escapeChar(char *buf, NSMutableString *str);
           unsigned wl = [word length];
 
           if ((wl > 3) && (wl < WORD_MAX)) { 
-            word = [word lowercaseString];
-
-            if ([stopwords containsObject: word] == NO) {
-              word = [stemmer stemWord: word];
-
-              if ([word length] > 2) {
-                [wordset addObject: word];
-              }
-            }
+            [wordset addObject: word];
           }
 
           wcount++;
@@ -286,7 +276,7 @@ do { \
 
       if (isTitle) {
         [metadict setObject: [mdbuff makeImmutableCopyOnFail: NO]
-                     forKey: @"kMDItemTitle"];
+                     forKey: @"GSMDItemTitle"];
         i += 8;
       } else {
         /* TODO - extract metadata from <meta> */

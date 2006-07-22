@@ -142,8 +142,6 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
   TEST_RELEASE (errHandle);
   RELEASE (extractors);  
   RELEASE (textExtractor);
-  RELEASE (stemmer);  
-  RELEASE (stopWords);
   
   //  
   // fswatcher_update  
@@ -204,7 +202,7 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
 
     errpath = [dbdir stringByAppendingPathComponent: @"error.log"];
         
-    dbdir = [dbdir stringByAppendingPathComponent: @"v1"];
+    dbdir = [dbdir stringByAppendingPathComponent: @"v2"];
     ASSIGN (dbpath, [dbdir stringByAppendingPathComponent: @"contents.db"]);    
     
     sqlite = [SQLite new];
@@ -239,10 +237,7 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
 
     textExtractor = nil;        
     [self loadExtractors];
-    
-    [self loadStemmer];
-    [self setStemmingLanguage: nil];
-                
+                    
     dnc = [NSDistributedNotificationCenter defaultCenter];
     
     [dnc addObserver: self
@@ -797,9 +792,7 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
     if (extractor) {
       if ([extractor extractMetadataAtPath: path
                                     withID: path_id
-                                attributes: attributes
-                              usingStemmer: stemmer
-                                 stopWords: stopWords] == NO) {
+                                attributes: attributes] == NO) {
         [sqlite executeQuery: @"ROLLBACK"];
         return NO;
       }
@@ -853,9 +846,7 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
                 
                 if ([extractor extractMetadataAtPath: subpath
                                               withID: path_id
-                                          attributes: attributes
-                                        usingStemmer: stemmer
-                                           stopWords: stopWords] == NO) {
+                                          attributes: attributes] == NO) {
                   failed = YES;                         
                 }
               }
@@ -932,8 +923,10 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
            withAttributes:(NSDictionary *)attributes
 {
   NSTimeInterval interval = [[attributes fileModificationDate] timeIntervalSinceReferenceDate];
-  NSMutableArray *mdattributes = [NSMutableArray array];
+  NSMutableArray *mdattributes = [NSMutableArray array];  
   NSString *qpath = stringForQuery(path);
+  NSString *qname = stringForQuery([path lastPathComponent]);
+  NSString *qext = stringForQuery([[path pathExtension] lowercaseString]);  
   SQLitePreparedStatement *statement;
   NSString *query;
   int path_id;
@@ -1009,8 +1002,9 @@ do { \
     STATEMENT_EXECUTE_QUERY (statement, -1);
   }
 
-  KEY_AND_ATTRIBUTE (@"kMDItemFSName", stringForQuery([path lastPathComponent]));  
-  KEY_AND_ATTRIBUTE (@"NSFileType", [attributes fileType]);  
+  KEY_AND_ATTRIBUTE (@"GSMDItemFSName", qname);  
+  KEY_AND_ATTRIBUTE (@"GSMDItemFSExtension", qext);  
+  KEY_AND_ATTRIBUTE (@"GSMDItemFSType", [attributes fileType]);  
   
   for (i = 0; i < [mdattributes count]; i++) {
     NSDictionary *dict = [mdattributes objectAtIndex: i];      
@@ -1252,41 +1246,6 @@ do { \
         }
       }
     }
-  }
-}
-
-- (void)setStemmingLanguage:(NSString *)language
-{
-  NSString *lang = (language == nil) ? @"English" : language;
-
-  if ([stemmer setLanguage: lang] == NO) {
-    [stemmer setLanguage: @"English"];
-  }
-  
-  ASSIGN (stopWords, [NSSet setWithArray: [stemmer stopWords]]);
-}
-
-- (void)loadStemmer
-{
-  NSString *bundlePath;
-
-  bundlePath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSSystemDomainMask, YES) lastObject];
-  bundlePath = [bundlePath stringByAppendingPathComponent: @"Bundles"];
-  bundlePath = [bundlePath stringByAppendingPathComponent: @"Stemmer.bundle"];
-
-  if ([fm fileExistsAtPath: bundlePath]) {
-    NSBundle *bundle = [NSBundle bundleWithPath: bundlePath];
-
-    if (bundle) {
-      stemmer = [[bundle principalClass] new];
-    } 
-  }
-  
-  if (stemmer == nil) {
-    [NSException raise: NSInternalInconsistencyException
-		            format: @"unable to load stemmer"]; 
-    [sqlite closeDb];  
-    exit(EXIT_FAILURE);
   }
 }
 

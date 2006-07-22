@@ -62,9 +62,7 @@
 
 - (BOOL)extractMetadataAtPath:(NSString *)path
                        withID:(int)path_id
-                   attributes:(NSDictionary *)attributes
-                 usingStemmer:(id)stemmer
-                    stopWords:(NSSet *)stopwords;
+                   attributes:(NSDictionary *)attributes;
 
 @end
 

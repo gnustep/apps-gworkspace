@@ -109,7 +109,7 @@ static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv
       }
     }
 
-    dbdir = [dbdir stringByAppendingPathComponent: @"v1"];
+    dbdir = [dbdir stringByAppendingPathComponent: @"v2"];
 
     if (([fm fileExistsAtPath: dbdir isDirectory: &isdir] &isdir) == NO) {
       if ([fm createDirectoryAtPath: dbdir attributes: nil] == NO) { 

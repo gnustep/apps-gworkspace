@@ -116,8 +116,6 @@ static char *style = "<xsl:stylesheet "
 - (BOOL)extractMetadataAtPath:(NSString *)path
                        withID:(int)path_id
                    attributes:(NSDictionary *)attributes
-                 usingStemmer:(id)stemmer
-                    stopWords:(NSSet *)stopwords
 {
   CREATE_AUTORELEASE_POOL(arp);
   NSMutableDictionary *mddict = [NSMutableDictionary dictionary];  
@@ -174,15 +172,7 @@ static char *style = "<xsl:stylesheet "
           unsigned wl = [word length];
 
           if ((wl > 3) && (wl < WORD_MAX)) { 
-            word = [word lowercaseString];
-
-            if ([stopwords containsObject: word] == NO) {
-              word = [stemmer stemWord: word];
-
-              if ([word length] > 2) {
-                [wordset addObject: word];
-              }
-            }
+            [wordset addObject: word];
           }
 
           wcount++;
@@ -217,7 +207,7 @@ static char *style = "<xsl:stylesheet "
     
       entry = [dict objectForKey: @"title"];    
       if (entry) {
-        [attrsdict setObject: entry forKey: @"kMDItemTitle"];
+        [attrsdict setObject: entry forKey: @"GSMDItemTitle"];
       }
     
       entry = [dict objectForKey: @"keyword"];    
@@ -225,18 +215,18 @@ static char *style = "<xsl:stylesheet "
         NSArray *words = [entry componentsSeparatedByString: @", "];
       
         [attrsdict setObject: [words description]
-                      forKey: @"kMDItemKeywords"];
+                      forKey: @"GSMDItemKeywords"];
       }
   
       entry = [dict objectForKey: @"creator"];    
       if (entry) {
-        [attrsdict setObject: entry forKey: @"kMDItemCreator"];
+        [attrsdict setObject: entry forKey: @"GSMDItemCreator"];
       }
         
       entry = [dict objectForKey: @"generator"];    
       if (entry) {
         [attrsdict setObject: [[NSArray arrayWithObject: entry] description] 
-                      forKey: @"kMDItemEncodingApplications"];
+                      forKey: @"GSMDItemEncodingApplications"];
       }      
       
       [mddict setObject: attrsdict forKey: @"attributes"]; 

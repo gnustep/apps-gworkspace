@@ -101,8 +101,6 @@ static char *style = "<xsl:stylesheet "
 - (BOOL)extractMetadataAtPath:(NSString *)path
                        withID:(int)path_id
                    attributes:(NSDictionary *)attributes
-                 usingStemmer:(id)stemmer
-                    stopWords:(NSSet *)stopwords
 {
   CREATE_AUTORELEASE_POOL(arp);
   NSMutableDictionary *mddict = [NSMutableDictionary dictionary];  
@@ -149,15 +147,7 @@ static char *style = "<xsl:stylesheet "
           unsigned wl = [word length];
 
           if ((wl > 3) && (wl < WORD_MAX)) { 
-            word = [word lowercaseString];
-
-            if ([stopwords containsObject: word] == NO) {
-              word = [stemmer stemWord: word];
-
-              if ([word length] > 2) {
-                [wordset addObject: word];
-              }
-            }
+            [wordset addObject: word];
           }
 
           wcount++;
@@ -197,28 +187,28 @@ static char *style = "<xsl:stylesheet "
         
         if ([attrname isEqual: @"abiword.generator"]) {
           [attributes setObject: [[NSArray arrayWithObject: ndcont] description] 
-                         forKey: @"kMDItemEncodingApplications"];
+                         forKey: @"GSMDItemEncodingApplications"];
         
         } else if ([attrname isEqual: @"dc.description"]) {
-          [attributes setObject: ndcont forKey: @"kMDItemDescription"];
+          [attributes setObject: ndcont forKey: @"GSMDItemDescription"];
 
         } else if ([attrname isEqual: @"abiword.keywords"]) {
           NSArray *words = [ndcont componentsSeparatedByString: @" "];
       
           [attributes setObject: [words description]
-                          forKey: @"kMDItemKeywords"];
+                          forKey: @"GSMDItemKeywords"];
 
         } else if ([attrname isEqual: @"dc.contributor"]) {
           NSArray *contrs = [ndcont componentsSeparatedByString: @" "];
       
           [attributes setObject: [contrs description]
-                         forKey: @"kMDItemContributors"];
+                         forKey: @"GSMDItemContributors"];
 
         } else if ([attrname isEqual: @"dc.subject"]) {
 
 
         } else if ([attrname isEqual: @"dc.creator"]) {
-          [attributes setObject: ndcont forKey: @"kMDItemCreator"];
+          [attributes setObject: ndcont forKey: @"GSMDItemCreator"];
 
         } else if ([attrname isEqual: @"dc.type"]) {
 
@@ -227,17 +217,17 @@ static char *style = "<xsl:stylesheet "
           NSArray *langs = [ndcont componentsSeparatedByString: @" "];
       
           [attributes setObject: [langs description]
-                         forKey: @"kMDItemLanguages"];
+                         forKey: @"GSMDItemLanguages"];
 
         } else if ([attrname isEqual: @"dc.format"]) {
-          [attributes setObject: ndcont forKey: @"kMDItemContentType"];
+          [attributes setObject: ndcont forKey: @"GSMDItemContentType"];
 
         } else if ([attrname isEqual: @"dc.title"]) {
-          [attributes setObject: ndcont forKey: @"kMDItemTitle"];
+          [attributes setObject: ndcont forKey: @"GSMDItemTitle"];
 
         } else if ([attrname isEqual: @"dc.publisher"]) {
           [attributes setObject: [[NSArray arrayWithObject: ndcont] description] 
-                         forKey: @"kMDItemPublishers"];
+                         forKey: @"GSMDItemPublishers"];
         }        
 
         node = [node nextElement];

@@ -102,8 +102,6 @@
 - (BOOL)extractMetadataAtPath:(NSString *)path
                        withID:(int)path_id
                    attributes:(NSDictionary *)attributes
-                 usingStemmer:(id)stemmer
-                    stopWords:(NSSet *)stopwords
 {
   CREATE_AUTORELEASE_POOL(arp);
   NSMutableDictionary *mddict = [NSMutableDictionary dictionary];  
@@ -132,15 +130,7 @@
           unsigned wl = [word length];
 
           if ((wl > 3) && (wl < WORD_MAX)) { 
-            word = [word lowercaseString];
-
-            if ([stopwords containsObject: word] == NO) {
-              word = [stemmer stemWord: word];
-
-              if ([word length] > 2) {
-                [wordset addObject: word];
-              }
-            }
+            [wordset addObject: word];
           }
 
           wcount++;
@@ -161,12 +151,12 @@
     
       entry = [info objectForKey: @"Title"];    
       if (entry) {
-        [attrsdict setObject: entry forKey: @"kMDItemTitle"];
+        [attrsdict setObject: entry forKey: @"GSMDItemTitle"];
       }
 
   //    entry = [info objectForKey: @"Subject"];    
   //    if (entry) {
-  //      [attrsdict setObject: entry forKey: @"kMDItemTitle"];
+  //      [attrsdict setObject: entry forKey: @"GSMDItemTitle"];
   //    }
     
       entry = [info objectForKey: @"Keywords"];    
@@ -174,24 +164,24 @@
         NSArray *words = [entry componentsSeparatedByString: @", "];
       
         [attrsdict setObject: [words description]
-                      forKey: @"kMDItemKeywords"];
+                      forKey: @"GSMDItemKeywords"];
       }
     
       entry = [info objectForKey: @"Author"];    
       if (entry) {
         [attrsdict setObject: [[NSArray arrayWithObject: entry] description] 
-                      forKey: @"kMDItemAuthors"];
+                      forKey: @"GSMDItemAuthors"];
       }
     
       entry = [info objectForKey: @"Creator"];    
       if (entry) {
-        [attrsdict setObject: entry forKey: @"kMDItemCreator"];
+        [attrsdict setObject: entry forKey: @"GSMDItemCreator"];
       }
 
       entry = [info objectForKey: @"Producer"];    
       if (entry) {
         [attrsdict setObject: [[NSArray arrayWithObject: entry] description] 
-                      forKey: @"kMDItemEncodingApplications"];
+                      forKey: @"GSMDItemEncodingApplications"];
       }
     
       [mddict setObject: attrsdict forKey: @"attributes"];

@@ -914,7 +914,6 @@ static GWorkspace *gworkspace = nil;
                     (per i results se lo deve fare da solo)
   
   LSFolders (aperte)   ??????
-     
 */
 }
 

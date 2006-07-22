@@ -67,8 +67,6 @@
 - (BOOL)extractMetadataAtPath:(NSString *)path
                        withID:(int)path_id
                    attributes:(NSDictionary *)attributes
-                 usingStemmer:(id)stemmer
-                    stopWords:(NSSet *)stopwords
 {
   CREATE_AUTORELEASE_POOL(arp);
   NSMutableDictionary *mddict = [NSMutableDictionary dictionary];
@@ -78,7 +76,7 @@
   ResetJpgfile();
 
   if (ReadJpegFile([path UTF8String], imageInfo)) {
-    [imageInfo setObject: @"public.jpeg" forKey: @"kMDItemContentType"];
+    [imageInfo setObject: @"public.jpeg" forKey: @"GSMDItemContentType"];
     [mddict setObject: imageInfo forKey: @"attributes"];
     DiscardData();
 

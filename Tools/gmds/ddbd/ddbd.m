@@ -113,7 +113,7 @@ do { \
     dbpath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
     dbpath = [dbpath stringByAppendingPathComponent: @"gmds"];
     dbpath = [dbpath stringByAppendingPathComponent: @".db"];
-    dbpath = [dbpath stringByAppendingPathComponent: @"v1"];
+    dbpath = [dbpath stringByAppendingPathComponent: @"v2"];
     dbpath = [dbpath stringByAppendingPathComponent: @"user.db"];    
     RETAIN (dbpath);
     
@@ -387,7 +387,7 @@ do { \
 
 - (NSString *)annotationsForPath:(NSString *)path
 {
-  NSData *data = [self attributeForKey: @"kMDItemFinderComment" atPath: path];
+  NSData *data = [self attributeForKey: @"GSMDItemFinderComment" atPath: path];
   
   if (data) {
     return [NSString stringWithUTF8String: [data bytes]];
@@ -402,7 +402,7 @@ do { \
   const char *bytes = [annotations UTF8String];
   
   [self setAttribute: [NSData dataWithBytes: bytes length: strlen(bytes) + 1] 
-              forKey: @"kMDItemFinderComment" 
+              forKey: @"GSMDItemFinderComment" 
               atPath: path];
 }
 

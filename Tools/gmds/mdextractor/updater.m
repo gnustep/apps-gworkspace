@@ -110,9 +110,7 @@ do { \
       
         if ([extractor extractMetadataAtPath: path
                                       withID: path_id
-                                  attributes: attributes
-                                usingStemmer: stemmer
-                                   stopWords: stopWords] == NO) {
+                                  attributes: attributes] == NO) {
           failed = YES;                         
         }
       }
@@ -180,9 +178,7 @@ do { \
 
                   if ([extractor extractMetadataAtPath: subpath
                                                 withID: path_id
-                                            attributes: attributes
-                                          usingStemmer: stemmer
-                                             stopWords: stopWords] == NO) {
+                                            attributes: attributes] == NO) {
                     failed = YES;                         
                   }
                 }
@@ -248,9 +244,7 @@ do { \
     if (extractor) {
       if ([extractor extractMetadataAtPath: path
                                     withID: path_id
-                                attributes: attributes
-                              usingStemmer: stemmer
-                                 stopWords: stopWords] == NO) {
+                                attributes: attributes] == NO) {
         [sqlite executeQuery: @"ROLLBACK"];
         return NO;
       }

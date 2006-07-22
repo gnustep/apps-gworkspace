@@ -50,8 +50,6 @@ static NSString *nibName = @"GMDSClient";
   RELEASE (progView);
   TEST_RELEASE (wordsBuff);
   RELEASE (currentQuery);
-  TEST_RELEASE (stemmer);
-  TEST_RELEASE (stopWords);
   TEST_RELEASE (skipSet);
   RELEASE (foundObjects);
   TEST_RELEASE (win);
@@ -73,7 +71,6 @@ static NSString *nibName = @"GMDSClient";
 
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
-  NSString *bundlePath;
   NSCharacterSet *set;
   NSRect r;
   
@@ -153,27 +150,7 @@ static NSString *nibName = @"GMDSClient";
   [resultsView setDoubleAction: @selector(doubleClickOnResultsView:)];
   
   foundObjects = [NSMutableArray new];
-  
-  bundlePath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSSystemDomainMask, YES) lastObject];
-  bundlePath = [bundlePath stringByAppendingPathComponent: @"Bundles"];
-  bundlePath = [bundlePath stringByAppendingPathComponent: @"Stemmer.bundle"];
-
-  if ([fm fileExistsAtPath: bundlePath]) {
-    NSBundle *bundle = [NSBundle bundleWithPath: bundlePath];
-
-    if (bundle) {
-      stemmer = [[bundle principalClass] new];
-    } 
-  }
-  
-  if (stemmer == nil) {
-    NSRunAlertPanel(nil, @"unable to load stemmer.", @"OK", nil, nil);  
-    [NSApp terminate: self];
-  }
-  
-  [stemmer setLanguage: @"English"];  
-  ASSIGN (stopWords, [NSSet setWithArray: [stemmer stopWords]]);
-  
+    
   skipSet = [NSMutableCharacterSet new];
 
   set = [NSCharacterSet controlCharacterSet];
@@ -452,16 +429,8 @@ AND \
     if (word) {
       unsigned wl = [word length];
 
-      if ((wl > 3) && (wl < WORD_MAX)) { 
-        word = [word lowercaseString];
-
-        if ([stopWords containsObject: word] == NO) {
-          word = [stemmer stemWord: word];
-
-          if ([word length] > 2) {
-            [words addObject: word];
-          }
-        }
+      if ((wl > 2) && (wl < WORD_MAX)) { 
+        [words addObject: word];
       }
     }
   }
