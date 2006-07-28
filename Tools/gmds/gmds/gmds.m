@@ -32,8 +32,16 @@
   do { if (GW_DEBUG_LOG) \
     NSLog(format , ## args); } while (0)
 
+#define GWPrintfDebugLog(format, args...) \
+  do { \
+    if (GW_DEBUG_LOG) \
+    fprintf(stderr, format , ## args); \
+    fflush(stderr); \
+  } while (0)
+
 #define MAX_RETRY 1000
 #define MAX_RES 100
+#define TOUCH_INTERVAL (60.0)
 
 static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv)
 {
@@ -75,6 +83,7 @@ static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv
   
   RELEASE (dbpath);
   RELEASE (dbdir);
+  RELEASE (touchQueries);
   
   [super dealloc];
 }
@@ -146,6 +155,19 @@ static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv
 	           object: conn];
              
     clientInfo = [NSMutableDictionary new];
+    
+    touchQueries = [NSMutableArray new];
+    touchind = 0;
+    [touchQueries addObject: @"select count(is_directory) from paths;"];
+    [touchQueries addObject: @"select count(word) from words;"];
+    [touchQueries addObject: @"select count(score) from postings;"];
+    [touchQueries addObject: @"select count(attribute) from attributes;"];
+    
+    [NSTimer scheduledTimerWithTimeInterval: TOUCH_INTERVAL 
+						                         target: self 
+                                   selector: @selector(touchTables:) 
+																   userInfo: nil 
+                                    repeats: YES];
   }
   
   return self;    
@@ -229,44 +251,23 @@ static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv
 }
 
 - (oneway void)registerClient:(id)remote
-{
-	NSConnection *connection = [(NSDistantObject *)remote connectionForProxy];
-  NSConnection *clientConn = [clientInfo objectForKey: @"connection"];  
-  
-	if ((clientConn == nil) || (clientConn != connection)) {
-    [NSException raise: NSInternalInconsistencyException
-		            format: @"registration with unknown connection"];
+{  
+  if ([clientInfo objectForKey: @"client"] == nil) { 
+    [(id)remote setProtocolForProxy: @protocol(GMDSClientProtocol)];    
+    [clientInfo setObject: remote forKey: @"client"];
+    GWDebugLog(@"new client registered");
   }
-
-  if ([clientInfo objectForKey: @"client"] != nil) { 
-    [NSException raise: NSInternalInconsistencyException
-		            format: @"registration with registered client"];
-  }
-
-  [(id)remote setProtocolForProxy: @protocol(GMDSClientProtocol)];    
-  [clientInfo setObject: remote forKey: @"client"];
-  
-  GWDebugLog(@"new client registered");
 }
 
 - (oneway void)unregisterClient:(id)remote
 {
-  NSConnection *clientConn = [clientInfo objectForKey: @"connection"];  
   id client = [clientInfo objectForKey: @"client"];  
-    
-	if (clientConn == nil) {
-    [NSException raise: NSInternalInconsistencyException
-		            format: @"unregistration with unknown connection"];
-  }
 
-  if ((client == nil) || (client != remote)) { 
-    [NSException raise: NSInternalInconsistencyException
-                format: @"unregistration with unregistered client"];
+  if (client && (client == remote)) {
+    [clientInfo removeObjectForKey: @"client"]; 
+    GWDebugLog(@"client unregistered");
+    [self terminate]; 
   }
-    
-  GWDebugLog(@"client unregistered");
-
-  [self terminate]; 
 }
 
 - (BOOL)performSubquery:(NSString *)query
@@ -316,24 +317,35 @@ static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv
 {
   int i;
   
+  if ([self performSubquery: @"BEGIN"] == NO) {
+    return NO;
+  }
+  
   for (i = 0; i < [queries count]; i++) {
     if ([self performSubquery: [queries objectAtIndex: i]] == NO) {
+      [self performSubquery: @"COMMIT"];
       return NO;
     }
   }
+  
+  [self performSubquery: @"COMMIT"];
    
   return YES;
 }
 
 - (void)performPostQueries:(NSArray *)queries
 {
-  if (queries) {
-    int i;
+  int i;
 
-    for (i = 0; i < [queries count]; i++) {
-      [self performSubquery: [queries objectAtIndex: i]];
-    }
+  if ([self performSubquery: @"BEGIN"] == NO) {
+    return;
   }
+
+  for (i = 0; i < [queries count]; i++) {
+    [self performSubquery: [queries objectAtIndex: i]];
+  }
+
+  [self performSubquery: @"COMMIT"];
 }
 
 - (oneway void)performQuery:(NSData *)queryInfo
@@ -389,7 +401,6 @@ static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv
         [reslines addObject: line];
 
         if ([reslines count] == MAX_RES) {
-
           GWDebugLog(@"SENDING");
 
           if ([self sendResults: reslines forQueryWithNumber: queryNumber]) {
@@ -403,7 +414,6 @@ static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv
 
       } else {
         if (err == SQLITE_DONE) {
-
           GWDebugLog(@"SENDING (last)");
 
           if ([reslines count]) {
@@ -444,7 +454,9 @@ static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv
     NSLog(@"%s", sqlite3_errmsg(db));
   }
   
-  [self performPostQueries: postqueries];
+  if (postqueries) {
+    [self performPostQueries: postqueries];
+  }
   
   [[clientInfo objectForKey: @"client"] endOfQuery];
   
@@ -507,6 +519,42 @@ static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv
   }
 
   return YES;
+}
+
+- (void)touchTables:(id)sender
+{
+  if ([self isBaseServer]) {
+    CREATE_AUTORELEASE_POOL(pool);   
+    const char *query = [[touchQueries objectAtIndex: touchind] UTF8String];
+    NSDate *date = [NSDate date];
+    char *err;
+
+    GWPrintfDebugLog("executing: \"%s\" ... ", query);
+
+    if (sqlite3_exec(db, query, NULL, 0, &err) != SQLITE_OK) {
+      NSLog(@"error at %s", query);
+
+      if (err != NULL) {
+        NSLog(@"%s", err);
+        sqlite3_free(err); 
+      }
+    } else {
+      GWPrintfDebugLog("done. (%.2f sec.)\n", [[NSDate date] timeIntervalSinceDate: date]);
+    }
+
+    touchind++;
+
+    if (touchind == [touchQueries count]) {
+      touchind = 0;
+    }
+
+    RELEASE (pool);
+  }
+}
+
+- (BOOL)isBaseServer
+{
+  return ([clientInfo objectForKey: @"client"] == nil);
 }
 
 - (void)terminate

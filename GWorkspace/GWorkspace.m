@@ -893,28 +893,6 @@ static GWorkspace *gworkspace = nil;
   help = @"Inspector.rtfd";
   [manager setContextHelp: (NSAttributedString *)help 
                 forObject: [[inspector win] contentView]];
-
-
-  
-  
-  
-      
-/*
-  GWViewersManager    ---> OK
-  TabbedShelf         ---> OK
-  History             ---> OK
-  Fiend               ---> OK
-  runExtController    ---> OK
-    
-  Preferences         ---> OK (aggiungere i subhelps)
-  Inspector           ---> OK (aggiungere i subhelps ma non per contents)
-  
-  
-  Finder      ---> uno generico piu' uno per i results 
-                    (per i results se lo deve fare da solo)
-  
-  LSFolders (aperte)   ??????
-*/
 }
 
 - (NSAttributedString *)contextHelpFromName:(NSString *)fileName
@@ -931,7 +909,6 @@ static GWorkspace *gworkspace = nil;
   
     helpPath = [resPath stringByAppendingPathComponent: helpPath];
     helpPath = [helpPath stringByAppendingPathComponent: fileName];
-  
   
     if ([fm fileExistsAtPath: helpPath]) {
       NSAttributedString *help = [[NSAttributedString alloc] initWithPath: helpPath

@@ -29,6 +29,15 @@
 
 @class ProgrView;
 
+@protocol	GMDSClientProtocol
+
+- (BOOL)queryResults:(NSData *)results;
+
+- (oneway void)endOfQuery;
+
+@end
+
+
 @protocol	GMDSProtocol
 
 - (oneway void)registerClient:(id)remote;
@@ -87,7 +96,7 @@
 @end
 
 
-@interface GMDSClient (queries)
+@interface GMDSClient (queries) <GMDSClientProtocol>
 
 - (void)prepareQuery;
 

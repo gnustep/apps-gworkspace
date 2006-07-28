@@ -444,7 +444,7 @@ AND \
     NSMutableArray *postqueries = [NSMutableArray array];
     int i;
     
-    [prequeries addObject: @"BEGIN"];
+ //   [prequeries addObject: @"BEGIN"];
     
     for (i = 0; i < count; i++) {
       NSString *part;
@@ -503,7 +503,7 @@ AND \
       [postqueries addObject: part];
     }
     
-    [postqueries addObject: @"COMMIT"];
+ //   [postqueries addObject: @"COMMIT"];
     
     [queryInfo setObject: prequeries forKey: @"pre_queries"];
     [queryInfo setObject: query forKey: @"query"];
@@ -685,3 +685,7 @@ AND \
 }
 
 @end
+
+
+
+

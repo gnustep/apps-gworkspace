@@ -53,6 +53,8 @@
   NSString *dbdir;
   NSString *dbpath;
   sqlite3 *db;
+  NSMutableArray *touchQueries;
+  int touchind;
 
   NSConnection *conn;
   NSString *connectionName;
@@ -77,6 +79,10 @@
            forQueryWithNumber:(NSNumber *)qnum;
            
 - (BOOL)opendb;
+
+- (void)touchTables:(id)sender;
+
+- (BOOL)isBaseServer;
 
 - (void)terminate;
 
