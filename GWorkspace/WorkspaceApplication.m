@@ -448,6 +448,11 @@
     [ws findApplications];
     [self applicationName: &appName andPath: &appPath forName: appname];
   }
+
+  if (appPath == nil && [appname isAbsolutePath] == YES)
+    {
+      appPath = appname;
+    }
   
   userinfo = [NSDictionary dictionaryWithObjectsAndKeys: appName, 
 			                                                   @"NSApplicationName",
