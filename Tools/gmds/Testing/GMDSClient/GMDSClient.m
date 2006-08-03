@@ -30,6 +30,9 @@
 
 #define CELLS_HEIGHT (28.0)
 #define WORD_MAX 40
+#define WORD_MIN 3
+
+NSString *pathsep(void);
 
 static GMDSClient *gmdsclient = nil;
 static NSString *nibName = @"GMDSClient";
@@ -48,7 +51,7 @@ static NSString *nibName = @"GMDSClient";
 {
   DESTROY (gmds);
   RELEASE (progView);
-  TEST_RELEASE (wordsBuff);
+  TEST_RELEASE (queryWords);
   RELEASE (currentQuery);
   TEST_RELEASE (skipSet);
   RELEASE (foundObjects);
@@ -176,8 +179,6 @@ static NSString *nibName = @"GMDSClient";
   
   currentQuery = [NSMutableDictionary new];
   queryNumber = 0L;
-  [currentQuery setObject: [self nextQueryNumber] 
-                   forKey: @"query_number"];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
@@ -378,173 +379,73 @@ static NSString *nibName = @"GMDSClient";
 
 @end
 
+// GSMDItemTextContent
 
 @implementation GMDSClient (queries)
-
-#define TABLE(x) \
-@"CREATE TEMP TABLE tab%i \
-(path_id INTEGER UNIQUE ON CONFLICT IGNORE, \
-path TEXT UNIQUE ON CONFLICT IGNORE, \
-score REAL); ", x
-
-#define TRIGGER(x) \
-@"CREATE TEMP TRIGGER tab%i_trigger BEFORE INSERT ON tab%i \
-BEGIN \
-  UPDATE tab%i \
-  SET \
-    score = (score + new.score) \
-  WHERE \
-    path_id = new.path_id; \
-END; ", x, x, x
-
-#define INSERT(x, w) \
-@"INSERT INTO tab%i (path_id, path, score) \
-SELECT \
-  paths.id, \
-  paths.path, \
-  postings.score \
-FROM \
-  words, paths, postings \
-WHERE \
-  words.word GLOB '%@' \
-AND \
-  postings.word_id = words.id \
-AND \
-  postings.path_id = paths.id; ", x, w
-
 
 - (void)prepareQuery
 {
   CREATE_AUTORELEASE_POOL(arp);
-  NSScanner *scanner = [NSScanner scannerWithString: wordsBuff];
-  NSMutableArray *words = [NSMutableArray array];
-  unsigned count;
-  NSString *word;
-  
-  [scanner setCharactersToBeSkipped: skipSet];
+  NSMutableArray *prequeries = [NSMutableArray array];
+  NSMutableArray *postqueries = [NSMutableArray array];
+  unsigned count = [queryWords count];
+  NSString *query;
+  int i;
+    
+  for (i = 0; i < count; i++) {
+    NSString *word = [queryWords objectAtIndex: i];
 
-  while ([scanner isAtEnd] == NO) {
-    [scanner scanUpToCharactersFromSet: skipSet intoString: &word];
+    [prequeries addObject: [self tcCreateTempTable: i]];
+    [prequeries addObject: [self tcTriggerForTable: i]];
 
-    if (word) {
-      unsigned wl = [word length];
+    [prequeries addObject: [self tcInsertIntoTempTable: i
+                                        resultsForWord: word
+                                         caseSensitive: YES
+                                         rightWildcard: YES
+                                          leftWildcard: NO
+                                            searchPath: nil]];
 
-      if ((wl > 2) && (wl < WORD_MAX)) { 
-        [words addObject: word];
-      }
-    }
-  }
-  
-  count = [words count];
-  
-  if (count) {
-    NSMutableDictionary *queryInfo = [NSMutableDictionary dictionary];
-    NSMutableArray *prequeries = [NSMutableArray array];
-    NSMutableString *query = [NSMutableString string];
-    NSMutableArray *postqueries = [NSMutableArray array];
-    int i;
-    
- //   [prequeries addObject: @"BEGIN"];
-    
-    for (i = 0; i < count; i++) {
-      NSString *part;
-
-      word = [words objectAtIndex: i];
-      word = [NSString stringWithFormat: @"%@*", word];
-      
-      part = [NSString stringWithFormat: TABLE(i)];
-      [prequeries addObject: part];
-      part = [NSString stringWithFormat: TRIGGER(i)];
-      [prequeries addObject: part];
-      part = [NSString stringWithFormat: INSERT(i, word)];
-      [prequeries addObject: part];
-    }
-
-    [query appendString: @"SELECT tab0.path, "];
-    
-    for (i = 0; i < count; i++) {
-      [query appendFormat: @"tab%i.score ", i];    
-    
-      if (i == (count -1)) { 
-        [query appendString: @"AS total_score "]; 
-      } else { 
-        [query appendString: @"+ "]; 
-      } 
-    }
-    
-    [query appendString: @"FROM "];
-
-    for (i = 0; i < count; i++) {
-      [query appendFormat: @"tab%i", i];    
-
-      if (i == (count -1)) { 
-        [query appendString: @" "]; 
-      } else { 
-        [query appendString: @", "]; 
-      } 
-    }
-    
-    if (count > 1) {
-      [query appendString: @"WHERE "];
-
-      for (i = 1; i < count; i++) {
-        if (i != 1) {
-          [query appendString: @"AND "];
-        } 
-     
-        [query appendFormat: @"tab0.path_id = tab%i.path_id ", i];
-      }
-    }
-    
-    [query appendString: @"ORDER BY total_score DESC; "];
-        
-    for (i = 0; i < count; i++) {
-      NSString *part = [NSString stringWithFormat: @"DROP TABLE tab%i; ", i];
-      [postqueries addObject: part];
-    }
-    
- //   [postqueries addObject: @"COMMIT"];
-    
-    [queryInfo setObject: prequeries forKey: @"pre_queries"];
-    [queryInfo setObject: query forKey: @"query"];
-    [queryInfo setObject: postqueries forKey: @"post_queries"];
-    [queryInfo setObject: [currentQuery objectForKey: @"query_number"] 
-                  forKey: @"query_number"];
-    
-    if ([currentQuery isEqual: queryInfo] == NO) {      
-      ASSIGN (currentQuery, queryInfo);
-      [currentQuery setObject: [self nextQueryNumber] forKey: @"query_number"];
-      
-                NSLog([currentQuery description]);
-      
-      [foundObjects removeAllObjects];
-      [resultsView noteNumberOfRowsChanged];
-      [resultsView setNeedsDisplayInRect: [resultsView visibleRect]];
-      [foundField setStringValue: @"0"];
-      
-      if (waitResults == NO) {
-        waitResults = YES;
-        queryStopped = NO;
-        [progView start];
-        
-        [gmds performQuery: [NSArchiver archivedDataWithRootObject: currentQuery]];
-        
-      } else {
-        pendingQuery = YES;
-      }
-    }
+    [postqueries addObject: [self tcDropTempTable: i]];      
   }
 
+  query = [self tcGetResults: count];
+
+  [currentQuery removeAllObjects];
+  [currentQuery setObject: prequeries forKey: @"pre_queries"];
+  [currentQuery setObject: query forKey: @"query"];
+  [currentQuery setObject: postqueries forKey: @"post_queries"];
+  [currentQuery setObject: [self nextQueryNumber] forKey: @"query_number"];
+
+  [foundObjects removeAllObjects];
+  [resultsView noteNumberOfRowsChanged];
+  [resultsView setNeedsDisplayInRect: [resultsView visibleRect]];
+  [foundField setStringValue: @"0"];
+
+            NSLog([currentQuery description]);
+
+  if (waitResults == NO) {
+    waitResults = YES;
+    queryStopped = NO;
+    [progView start];
+
+    [gmds performQuery: [NSArchiver archivedDataWithRootObject: currentQuery]];
+
+  } else {
+    pendingQuery = YES;
+  }
+  
   RELEASE (arp);
 }
 
 - (BOOL)queryResults:(NSData *)results
 {
+  CREATE_AUTORELEASE_POOL(arp);
   NSDictionary *dict = [NSUnarchiver unarchiveObjectWithData: results];
   NSNumber *qnum = [dict objectForKey: @"query_number"];
   NSArray *lines = [dict objectForKey: @"lines"];
+  BOOL resok = NO;
   int i;
-
+  
   if ((queryStopped == NO) 
             && [[currentQuery objectForKey: @"query_number"] isEqual: qnum]) {
     for (i = 0; i < [lines count]; i++) {
@@ -558,11 +459,12 @@ AND \
     [resultsView noteNumberOfRowsChanged];
     [resultsView setNeedsDisplayInRect: [resultsView visibleRect]];
     [foundField setStringValue: [NSString stringWithFormat: @"%i", [foundObjects count]]];
-            
-    return YES;
+    resok = YES;
   } 
+  
+  RELEASE (arp);
     
-  return NO;
+  return resok;
 }
 
 - (void)endOfQuery
@@ -584,7 +486,6 @@ AND \
     
   } else {
     waitResults = NO;
-    [self prepareQuery];
   }
 }
 
@@ -595,17 +496,184 @@ AND \
 
 - (NSNumber *)nextQueryNumber
 {
-  queryNumber++;
-                   
-  NSLog(@"set number to %i", queryNumber);
-  
-  return [NSNumber numberWithUnsignedLong: queryNumber];  
+  NSLog(@"set number to %i", queryNumber + 1);
+  return [NSNumber numberWithUnsignedLong: queryNumber++];  
 }
 
 - (void)controlTextDidChange:(NSNotification *)aNotification
 {
-  ASSIGN (wordsBuff, [searchField stringValue]);
-  [self prepareQuery];
+  NSString *str = [searchField stringValue];
+  BOOL newquery = NO;
+    
+  if ([str length]) {
+    CREATE_AUTORELEASE_POOL(arp);
+    NSScanner *scanner = [NSScanner scannerWithString: str];
+    NSMutableArray *words = [NSMutableArray array];
+    
+    while ([scanner isAtEnd] == NO) {
+      NSString *word;
+
+      [scanner scanUpToCharactersFromSet: skipSet intoString: &word];
+
+      if (word) {
+        unsigned wl = [word length];
+
+        if ((wl >= WORD_MIN) && (wl < WORD_MAX)) { 
+          [words addObject: word];
+        }
+      }
+    }
+
+    if ([words count] && ([words isEqual: queryWords] == NO)) {
+      ASSIGN (queryWords, words);
+      newquery = YES;
+    }      
+    
+    RELEASE (arp);
+    
+  } else {
+    queryStopped = YES;
+  }
+
+  if (newquery) {
+    [self prepareQuery];
+  }
+}
+
+@end
+
+
+@implementation GMDSClient (text_contents_queries)
+
+- (NSString *)tcCreateTempTable:(int)table
+{
+  return [NSString stringWithFormat: @"CREATE TEMP TABLE tab%i "
+                                     @"(id INTEGER UNIQUE ON CONFLICT IGNORE, "
+                                     @"path TEXT UNIQUE ON CONFLICT IGNORE, "
+                                     @"score REAL); ", table];
+}
+
+- (NSString *)tcTriggerForTable:(int)table
+{
+  return [NSString stringWithFormat: @"CREATE TEMP TRIGGER tab%i_trigger "
+                                     @"BEFORE INSERT ON tab%i "
+                                     @"BEGIN "
+                                     @"UPDATE tab%i "
+                                     @"SET score = (score + new.score) "
+                                     @"WHERE id = new.id; "
+                                     @"END;", table, table, table];
+}
+
+- (NSString *)tcDropTempTable:(int)table
+{
+  return [NSString stringWithFormat: @"DROP TABLE tab%i", table];
+}
+
+- (NSString *)tcInsertIntoTempTable:(int)table
+                     resultsForWord:(NSString *)word
+                      caseSensitive:(BOOL)csens
+                      rightWildcard:(BOOL)rwild
+                       leftWildcard:(BOOL)lwild
+                         searchPath:(NSString *)path
+{
+  NSMutableString *query = [NSMutableString string];
+  NSString *operator = (csens ? @"GLOB" : @"LIKE");
+  NSString *wildcard = (csens ? @"*" : @"%%");
+  NSString *srctab, *dsttab;
+  
+  if (table == 0) {
+    srctab = @"paths";
+  } else {
+    srctab = [NSString stringWithFormat: @"tab%i", table - 1];
+  }
+  
+  dsttab = [NSString stringWithFormat: @"tab%i", table];  
+
+  [query appendFormat: @"INSERT INTO %@ (id, path, score) "
+                       @"SELECT %@.id, %@.path, postings.score "
+                       @"FROM words, %@, postings ",
+                       dsttab, srctab, srctab, srctab];
+
+  [query appendFormat: @"WHERE words.word %@ '", operator];
+
+  if (lwild) {
+    [query appendString: wildcard];
+  } 
+  
+  [query appendString: word];
+  
+  if (rwild) {
+    [query appendString: wildcard];
+  } 
+  
+  [query appendString: @"' "];
+    
+  [query appendFormat: @"AND postings.word_id = words.id "
+                       @"AND %@.id = postings.path_id ", srctab];
+  
+  if ((path != nil) && (table == 0)) {
+    NSString *sep = pathsep();
+    NSString *minpath;
+  
+    if ([path isEqual: sep]) {
+      minpath = [NSString stringWithFormat: @"%@*", path];
+    } else {
+      minpath = [NSString stringWithFormat: @"%@%@*", path, sep];
+    }
+    
+    [query appendFormat: @"AND (%@.path = '%@' OR %@.path GLOB '%@')",
+                         srctab, path, srctab, minpath];    
+  }
+  
+  [query appendString: @";"];
+  
+  return query;
+}
+
+- (NSString *)tcGetResults:(int)wcount
+{
+  NSMutableString *query = [NSMutableString string];
+  int i;
+
+  [query appendString: @"SELECT tab0.path, "];
+    
+  for (i = 0; i < wcount; i++) {
+    [query appendFormat: @"tab%i.score ", i];    
+
+    if (i == (wcount -1)) { 
+      [query appendString: @"AS total_score "]; 
+    } else { 
+      [query appendString: @"+ "]; 
+    } 
+  }
+
+  [query appendString: @"FROM "];
+
+  for (i = 0; i < wcount; i++) {
+    [query appendFormat: @"tab%i", i];    
+
+    if (i == (wcount -1)) { 
+      [query appendString: @" "]; 
+    } else { 
+      [query appendString: @", "]; 
+    } 
+  }
+
+  if (wcount > 1) {
+    [query appendString: @"WHERE "];
+
+    for (i = 1; i < wcount; i++) {
+      if (i != 1) {
+        [query appendString: @"AND "];
+      } 
+
+      [query appendFormat: @"tab0.id = tab%i.id ", i];
+    }
+  }
+
+  [query appendString: @"ORDER BY total_score DESC; "];
+
+  return query;
 }
 
 @end
@@ -685,6 +753,48 @@ AND \
 }
 
 @end
+
+
+static NSString *fixpath(NSString *s, const char *c)
+{
+  static NSFileManager *mgr = nil;
+  const char *ptr = c;
+  unsigned len;
+
+  if (mgr == nil) {
+    mgr = [NSFileManager defaultManager];
+    RETAIN (mgr);
+  }
+  
+  if (ptr == 0) {
+    if (s == nil) {
+	    return nil;
+	  }
+    ptr = [s cString];
+  }
+  
+  len = strlen(ptr);
+
+  return [mgr stringWithFileSystemRepresentation: ptr length: len]; 
+}
+
+NSString *pathsep(void)
+{
+  static NSString *separator = nil;
+
+  if (separator == nil) {
+    separator = fixpath(@"/", 0);
+    RETAIN (separator);
+  }
+
+  return separator;
+}
+
+
+
+
+
+
 
 
 

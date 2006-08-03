@@ -65,7 +65,7 @@
   NSTableColumn *dateColumn;
   NSTableColumn *kindColumn;  
   
-  NSString *wordsBuff;
+  NSArray *queryWords;
   NSMutableDictionary *currentQuery;
   unsigned long queryNumber;
   BOOL waitResults;
@@ -107,6 +107,26 @@
 - (IBAction)stopQuery:(id)sender;
 
 - (NSNumber *)nextQueryNumber;
+
+@end
+
+
+@interface GMDSClient (text_contents_queries)
+
+- (NSString *)tcCreateTempTable:(int)table;
+
+- (NSString *)tcTriggerForTable:(int)table;
+
+- (NSString *)tcDropTempTable:(int)table;
+                                                                  
+- (NSString *)tcInsertIntoTempTable:(int)table
+                     resultsForWord:(NSString *)word
+                      caseSensitive:(BOOL)csens
+                      rightWildcard:(BOOL)rwild
+                       leftWildcard:(BOOL)lwild
+                         searchPath:(NSString *)path;
+
+- (NSString *)tcGetResults:(int)wcount;
 
 @end
 

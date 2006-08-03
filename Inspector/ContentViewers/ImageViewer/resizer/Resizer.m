@@ -112,6 +112,8 @@
   exit(0);
 }
 
+#define MIX_LIM 16
+
 - (void)readImageAtPath:(NSString *)path
                 setSize:(NSSize)imsize
 {
@@ -176,14 +178,26 @@
         
         py[0] = floor(y * yratio);
         py[1] = ceil((y + 1) * yratio);
-                
+        py[1] = ((py[1] >= srcsize.height) ? (int)(srcsize.height - 1) : py[1]);
+                        
         for (x = 0; x < (int)(dstsize.width); x++) {
+          int expos = (int)(bpp * (floor(y * yratio) * srcsize.width + floor(x * xratio)));        
+          unsigned expix[4] = { 0, 0, 0, 0 };
           unsigned pix[4] = { 0, 0, 0, 0 };
           int count = 0;
+          unsigned char c;
           int i, j;
+
+          expix[0] = srcData[expos];
+
+          if (isColor) {
+            expix[1] = srcData[expos + 1];
+            expix[2] = srcData[expos + 2];
+          }
 
           px[0] = floor(x * xratio);
           px[1] = ceil((x + 1) * xratio);
+          px[1] = ((px[1] >= srcsize.width) ? (int)(srcsize.width - 1) : px[1]);
           
           for (i = px[0]; i < px[1]; i++) {
             for (j = py[0]; j < py[1]; j++) {
@@ -200,11 +214,30 @@
             }
           }
 
-          *destData++ = (unsigned char)(pix[0] / count);
-
+          c = (unsigned char)(pix[0] / count);
+          
+          if (abs(c - expix[0]) < MIX_LIM) {
+            *destData++ = (unsigned char)(expix[0]);
+          } else {
+            *destData++ = c;
+          }
+          
           if (isColor) {
-            *destData++ = (unsigned char)(pix[1] / count);
-            *destData++ = (unsigned char)(pix[2] / count);
+            c = (unsigned char)(pix[1] / count);
+
+            if (abs(c - expix[1]) < MIX_LIM) {
+              *destData++ = (unsigned char)(expix[1]);
+            } else {
+              *destData++ = c;
+            }
+
+            c = (unsigned char)(pix[2] / count);
+
+            if (abs(c - expix[2]) < MIX_LIM) {
+              *destData++ = (unsigned char)(expix[2]);
+            } else {
+              *destData++ = c;            
+            }
           }
         }
       }
