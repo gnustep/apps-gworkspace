@@ -178,7 +178,7 @@
         
         py[0] = floor(y * yratio);
         py[1] = ceil((y + 1) * yratio);
-        py[1] = ((py[1] >= srcsize.height) ? (int)(srcsize.height - 1) : py[1]);
+        py[1] = ((py[1] > srcsize.height) ? (int)(srcsize.height) : py[1]);
                         
         for (x = 0; x < (int)(dstsize.width); x++) {
           int expos = (int)(bpp * (floor(y * yratio) * srcsize.width + floor(x * xratio)));        
@@ -197,7 +197,7 @@
 
           px[0] = floor(x * xratio);
           px[1] = ceil((x + 1) * xratio);
-          px[1] = ((px[1] >= srcsize.width) ? (int)(srcsize.width - 1) : px[1]);
+          px[1] = ((px[1] > srcsize.width) ? (int)(srcsize.width) : px[1]);
           
           for (i = px[0]; i < px[1]; i++) {
             for (j = py[0]; j < py[1]; j++) {
