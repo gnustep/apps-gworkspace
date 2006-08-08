@@ -375,6 +375,8 @@ static unsigned char darkerLUT[256] = {
   return 0.8125;
 }
 
+#define MIX_LIM 16
+
 - (NSImage *)resizedIcon:(NSImage *)icon 
                   ofSize:(int)size
 {
@@ -422,20 +424,34 @@ static unsigned char darkerLUT[256] = {
     srcData = [rep bitmapData];
     dstData = [newrep bitmapData];
 
-/*
     for (y = 0; y < (int)(newsize.height); y++) {
       int px[2], py[2]; 
 
       py[0] = floor(y * yratio);
       py[1] = ceil((y + 1) * yratio);
+      py[1] = ((py[1] > icnsize.height) ? (int)(icnsize.height) : py[1]);
 
       for (x = 0; x < (int)(newsize.width); x++) {
+        int expos = (int)(bpp * (floor(y * yratio) * icnsize.width + floor(x * xratio)));        
+        unsigned expix[4] = { 0, 0, 0, 0 };      
         unsigned pix[4] = { 0, 0, 0, 0 };
         int count = 0;
+        unsigned char c;
         int i, j;
+
+        expix[0] = srcData[expos];
+        
+        if (isColor) {
+          expix[1] = srcData[expos + 1];
+          expix[2] = srcData[expos + 2];
+          expix[3] = (hasAlpha ? srcData[expos + 3] : 255);
+        } else {
+          expix[1] = (hasAlpha ? srcData[expos + 1] : 255);
+        }
 
         px[0] = floor(x * xratio);
         px[1] = ceil((x + 1) * xratio);
+        px[1] = ((px[1] > icnsize.width) ? (int)(icnsize.width) : px[1]);
 
         for (i = px[0]; i < px[1]; i++) {
           for (j = py[0]; j < py[1]; j++) {
@@ -455,42 +471,25 @@ static unsigned char darkerLUT[256] = {
           }
         }
 
-        *dstData++ = (unsigned char)(pix[0] / count);
-
+        c = (unsigned char)(pix[0] / count);
+        *dstData++ = ((abs(c - expix[0]) < MIX_LIM) ? (unsigned char)expix[0] : c);
+        
         if (isColor) {
-          *dstData++ = (unsigned char)(pix[1] / count);
-          *dstData++ = (unsigned char)(pix[2] / count);
-          *dstData++ = (unsigned char)(pix[3] / count);
+          c = (unsigned char)(pix[1] / count);
+          *dstData++ = ((abs(c - expix[1]) < MIX_LIM) ? (unsigned char)expix[1] : c);
+
+          c = (unsigned char)(pix[2] / count);
+          *dstData++ = ((abs(c - expix[2]) < MIX_LIM) ? (unsigned char)expix[2] : c);
+
+          c = (unsigned char)(pix[3] / count);
+          *dstData++ = ((abs(c - expix[3]) < MIX_LIM) ? (unsigned char)expix[3] : c);
+        
         } else {
-          *dstData++ = (unsigned char)(pix[1] / count);
+          c = (unsigned char)(pix[1] / count);
+          *dstData++ = ((abs(c - expix[1]) < MIX_LIM) ? (unsigned char)expix[1] : c);
         }
       }
     }
-  */
-
-
-    for (y = 0; y < (int)newsize.height; y++) {
-      for (x = 0; x < (int)newsize.width; x++) {
-        int pos = (int)(bpp * (floor(y * yratio) * icnsize.width + floor(x * xratio)));
-
-        *dstData++ = srcData[pos];
-        
-        if (isColor) {
-          *dstData++ = srcData[pos + 1];
-          *dstData++ = srcData[pos + 2];
-        }
-        
-        if (hasAlpha) {
-          if (isColor) {
-            *dstData++ = srcData[pos + 3];
-          } else {
-            *dstData++ = srcData[pos + 1];
-          }
-        } else {
-          *dstData++ = 255;
-        }
-      }
-    }    
 
   } else {
     newIcon = [icon copy];  
@@ -664,3 +663,32 @@ static unsigned char darkerLUT[256] = {
 }
 
 @end
+
+
+/*
+    // original nearest neighbour algorithm
+    
+    for (y = 0; y < (int)newsize.height; y++) {
+      for (x = 0; x < (int)newsize.width; x++) {
+        int pos = (int)(bpp * (floor(y * yratio) * icnsize.width + floor(x * xratio)));
+
+        *dstData++ = srcData[pos];
+        
+        if (isColor) {
+          *dstData++ = srcData[pos + 1];
+          *dstData++ = srcData[pos + 2];
+        }
+        
+        if (hasAlpha) {
+          if (isColor) {
+            *dstData++ = srcData[pos + 3];
+          } else {
+            *dstData++ = srcData[pos + 1];
+          }
+        } else {
+          *dstData++ = 255;
+        }
+      }
+    }    
+    
+*/    

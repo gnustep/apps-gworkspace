@@ -590,9 +590,12 @@ static NSString *nibName = @"GMDSClient";
   dsttab = [NSString stringWithFormat: @"tab%i", table];  
 
   [query appendFormat: @"INSERT INTO %@ (id, path, score) "
-                       @"SELECT %@.id, %@.path, postings.score "
+                       @"SELECT "
+                       @"%@.id, "
+                       @"%@.path, "
+                       @"(postings.score * foundWeight(words.word, '%@')) "
                        @"FROM words, %@, postings ",
-                       dsttab, srctab, srctab, srctab];
+                       dsttab, srctab, srctab, word, srctab];
 
   [query appendFormat: @"WHERE words.word %@ '", operator];
 
@@ -611,15 +614,8 @@ static NSString *nibName = @"GMDSClient";
   [query appendFormat: @"AND postings.word_id = words.id "
                        @"AND %@.id = postings.path_id ", srctab];
   
-  if ((path != nil) && (table == 0)) {
-    NSString *sep = pathsep();
-    NSString *minpath;
-  
-    if ([path isEqual: sep]) {
-      minpath = [NSString stringWithFormat: @"%@*", path];
-    } else {
-      minpath = [NSString stringWithFormat: @"%@%@*", path, sep];
-    }
+  if ((path != nil) && (table == 0) && ([path isEqual: pathsep()] == NO)) {
+    NSString *minpath = [NSString stringWithFormat: @"%@%@*", path, pathsep()];
     
     [query appendFormat: @"AND (%@.path = '%@' OR %@.path GLOB '%@')",
                          srctab, path, srctab, minpath];    
@@ -629,6 +625,21 @@ static NSString *nibName = @"GMDSClient";
   
   return query;
 }
+
+/*
+SELECT 
+  paths.id, 
+  paths.path,
+  (postings.score + length(words.word) + length('asdasdasd'))
+FROM 
+  words, paths, postings 
+WHERE 
+  words.word GLOB 'NSString*'
+AND 
+  postings.word_id = words.id
+AND 
+  paths.id = postings.path_id;
+*/
 
 - (NSString *)tcGetResults:(int)wcount
 {

@@ -29,6 +29,7 @@
 
 #define TMBMAX (48.0)
 #define RESZLIM 4
+#define MIX_LIM 16
 
 @implementation ImageThumbnailer
 
@@ -43,7 +44,6 @@
   return (ext && [[NSImage imageFileTypes] containsObject: ext]);
 }
 
-/*
 - (NSData *)makeThumbnailForPath:(NSString *)path
 {
   CREATE_AUTORELEASE_POOL(arp);
@@ -99,29 +99,73 @@
         srcData = [rep bitmapData];
         dstData = [newrep bitmapData];
 
-        for (y = 0; y < (int)newsize.height; y++) {
-          for (x = 0; x < (int)newsize.width; x++) {
-            int pos = (int)(bpp * (floor(y * yratio) * imsize.width + floor(x * xratio)));
+        for (y = 0; y < (int)(newsize.height); y++) {
+          int px[2], py[2]; 
 
-            *dstData++ = srcData[pos];
+          py[0] = floor(y * yratio);
+          py[1] = ceil((y + 1) * yratio);
+          py[1] = ((py[1] > imsize.height) ? (int)(imsize.height) : py[1]);
+
+          for (x = 0; x < (int)(newsize.width); x++) {
+            int expos = (int)(bpp * (floor(y * yratio) * imsize.width + floor(x * xratio)));        
+            unsigned expix[4] = { 0, 0, 0, 0 };      
+            unsigned pix[4] = { 0, 0, 0, 0 };
+            int count = 0;
+            unsigned char c;
+            int i, j;
+
+            expix[0] = srcData[expos];
 
             if (isColor) {
-              *dstData++ = srcData[pos + 1];
-              *dstData++ = srcData[pos + 2];
+              expix[1] = srcData[expos + 1];
+              expix[2] = srcData[expos + 2];
+              expix[3] = (hasAlpha ? srcData[expos + 3] : 255);
+            } else {
+              expix[1] = (hasAlpha ? srcData[expos + 1] : 255);
             }
 
-            if (hasAlpha) {
-              if (isColor) {
-                *dstData++ = srcData[pos + 3];
-              } else {
-                *dstData++ = srcData[pos + 1];
+            px[0] = floor(x * xratio);
+            px[1] = ceil((x + 1) * xratio);
+            px[1] = ((px[1] > imsize.width) ? (int)(imsize.width) : px[1]);
+
+            for (i = px[0]; i < px[1]; i++) {
+              for (j = py[0]; j < py[1]; j++) {
+                int pos = (int)(bpp * (j * imsize.width + i));
+
+                pix[0] += srcData[pos];
+
+                if (isColor) {
+                  pix[1] += srcData[pos + 1];
+                  pix[2] += srcData[pos + 2];
+                  pix[3] += (hasAlpha ? srcData[pos + 3] : 255);
+                } else {
+                  pix[1] += (hasAlpha ? srcData[pos + 1] : 255);
+                }
+
+                count++;
               }
+            }
+
+            c = (unsigned char)(pix[0] / count);
+            *dstData++ = ((abs(c - expix[0]) < MIX_LIM) ? (unsigned char)expix[0] : c);
+
+            if (isColor) {
+              c = (unsigned char)(pix[1] / count);
+              *dstData++ = ((abs(c - expix[1]) < MIX_LIM) ? (unsigned char)expix[1] : c);
+
+              c = (unsigned char)(pix[2] / count);
+              *dstData++ = ((abs(c - expix[2]) < MIX_LIM) ? (unsigned char)expix[2] : c);
+
+              c = (unsigned char)(pix[3] / count);
+              *dstData++ = ((abs(c - expix[3]) < MIX_LIM) ? (unsigned char)expix[3] : c);
+
             } else {
-              *dstData++ = 255;
+              c = (unsigned char)(pix[1] / count);
+              *dstData++ = ((abs(c - expix[1]) < MIX_LIM) ? (unsigned char)expix[1] : c);
             }
           }
         }
-  
+
         data = [newrep TIFFRepresentation];
         RETAIN (data);
 
@@ -139,8 +183,8 @@
     
   return nil;
 }
-*/
 
+/*
 - (NSData *)makeThumbnailForPath:(NSString *)path
 {
   CREATE_AUTORELEASE_POOL(arp);
@@ -204,6 +248,7 @@
     
   return nil;
 }
+*/
 
 - (NSString *)fileNameExtension
 {

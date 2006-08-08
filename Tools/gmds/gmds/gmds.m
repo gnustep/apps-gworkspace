@@ -56,6 +56,15 @@ static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv
   sqlite3_result_int(context, exists);
 }
 
+static void found_weight(sqlite3_context *context, int argc, sqlite3_value **argv)
+{
+  int foundlen = strlen((const char *)sqlite3_value_text(argv[0]));
+  int searchedlen = strlen((const char *)sqlite3_value_text(argv[1]));
+  float w = (1.0 * searchedlen / foundlen);
+
+  sqlite3_result_double(context, w);
+}
+
 
 @implementation	GMDS
 
@@ -422,8 +431,6 @@ static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv
             } else {
               GWDebugLog(@"INVALID!");
             }
-          } else {
-            GWDebugLog(@"0 RESULTS");
           }
 
           break;
@@ -504,6 +511,8 @@ static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv
     
     sqlite3_create_function(db, "pathExists", 1, 
                                 SQLITE_UTF8, 0, path_exists, 0, 0);
+    sqlite3_create_function(db, "foundWeight", 2, 
+                                SQLITE_UTF8, 0, found_weight, 0, 0);
 
     performWriteQuery(db, @"PRAGMA cache_size = 20000");
     performWriteQuery(db, @"PRAGMA count_changes = 0");

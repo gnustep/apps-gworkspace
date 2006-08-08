@@ -215,47 +215,17 @@
           }
 
           c = (unsigned char)(pix[0] / count);
-          
-          if (abs(c - expix[0]) < MIX_LIM) {
-            *destData++ = (unsigned char)(expix[0]);
-          } else {
-            *destData++ = c;
-          }
+          *destData++ = ((abs(c - expix[0]) < MIX_LIM) ? (unsigned char)expix[0] : c);
           
           if (isColor) {
             c = (unsigned char)(pix[1] / count);
-
-            if (abs(c - expix[1]) < MIX_LIM) {
-              *destData++ = (unsigned char)(expix[1]);
-            } else {
-              *destData++ = c;
-            }
+            *destData++ = ((abs(c - expix[1]) < MIX_LIM) ? (unsigned char)expix[1] : c);
 
             c = (unsigned char)(pix[2] / count);
-
-            if (abs(c - expix[2]) < MIX_LIM) {
-              *destData++ = (unsigned char)(expix[2]);
-            } else {
-              *destData++ = c;            
-            }
+            *destData++ = ((abs(c - expix[2]) < MIX_LIM) ? (unsigned char)expix[2] : c);
           }
         }
       }
-  
-  /*
-      for (y = 0; y < (int)dstsize.height; y++) {
-        for (x = 0; x < (int)dstsize.width; x++) {
-          int pos = (int)(bpp * (floor(y * yratio) * srcsize.width + floor(x * xratio)));
-
-          *destData++ = srcData[pos];
-
-          if (isColor) {
-            *destData++ = srcData[pos + 1];
-            *destData++ = srcData[pos + 2];
-          }
-        }
-      }
-  */    
   
       NS_DURING
 		    {
@@ -312,3 +282,21 @@ int main(int argc, char** argv)
   exit(0);
 }
 
+
+  /* 
+      // original nearest neighbour algorithm
+    
+      for (y = 0; y < (int)dstsize.height; y++) {
+        for (x = 0; x < (int)dstsize.width; x++) {
+          int pos = (int)(bpp * (floor(y * yratio) * srcsize.width + floor(x * xratio)));
+
+          *destData++ = srcData[pos];
+
+          if (isColor) {
+            *destData++ = srcData[pos + 1];
+            *destData++ = srcData[pos + 2];
+          }
+        }
+      }
+  */    
+  
