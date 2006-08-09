@@ -550,6 +550,7 @@ static NSString *nibName = @"GMDSClient";
   return [NSString stringWithFormat: @"CREATE TEMP TABLE tab%i "
                                      @"(id INTEGER UNIQUE ON CONFLICT IGNORE, "
                                      @"path TEXT UNIQUE ON CONFLICT IGNORE, "
+                                     @"words_count INTEGER, "
                                      @"score REAL); ", table];
 }
 
@@ -589,13 +590,14 @@ static NSString *nibName = @"GMDSClient";
   
   dsttab = [NSString stringWithFormat: @"tab%i", table];  
 
-  [query appendFormat: @"INSERT INTO %@ (id, path, score) "
-                       @"SELECT "
-                       @"%@.id, "
-                       @"%@.path, "
-                       @"(postings.score * foundWeight(words.word, '%@')) "
-                       @"FROM words, %@, postings ",
-                       dsttab, srctab, srctab, word, srctab];
+  [query appendFormat: @"INSERT INTO %@ (id, path, words_count, score) "
+          @"SELECT "
+          @"%@.id, "
+          @"%@.path, "
+          @"%@.words_count, "
+          @"wordScore('%@', words.word, postings.word_count, %@.words_count) "    
+          @"FROM words, %@, postings ",
+          dsttab, srctab, srctab, srctab, word, srctab, srctab];
 
   [query appendFormat: @"WHERE words.word %@ '", operator];
 
@@ -625,21 +627,6 @@ static NSString *nibName = @"GMDSClient";
   
   return query;
 }
-
-/*
-SELECT 
-  paths.id, 
-  paths.path,
-  (postings.score + length(words.word) + length('asdasdasd'))
-FROM 
-  words, paths, postings 
-WHERE 
-  words.word GLOB 'NSString*'
-AND 
-  postings.word_id = words.id
-AND 
-  paths.id = postings.path_id;
-*/
 
 - (NSString *)tcGetResults:(int)wcount
 {

@@ -14,10 +14,10 @@ word TEXT UNIQUE ON CONFLICT IGNORE); \
 CREATE TABLE postings \
 (word_id INTEGER REFERENCES words(id), \
 path_id INTEGER REFERENCES paths(id), \
-score REAL); \
+word_count INTEGER); \
 \
 CREATE INDEX postings_wid_index ON postings(word_id); \
-CREATE INDEX postings_pid_index ON postings(path_id, word_id); \
+CREATE INDEX postings_pid_index ON postings(path_id); \
 \
 \
 CREATE TABLE attributes \

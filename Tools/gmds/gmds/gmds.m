@@ -56,13 +56,19 @@ static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv
   sqlite3_result_int(context, exists);
 }
 
-static void found_weight(sqlite3_context *context, int argc, sqlite3_value **argv)
+static void word_score(sqlite3_context *context, int argc, sqlite3_value **argv)
 {
-  int foundlen = strlen((const char *)sqlite3_value_text(argv[0]));
-  int searchedlen = strlen((const char *)sqlite3_value_text(argv[1]));
-  float w = (1.0 * searchedlen / foundlen);
+  int searchlen = strlen((const char *)sqlite3_value_text(argv[0]));
+  int foundlen = strlen((const char *)sqlite3_value_text(argv[1]));
+  int posting_wcount = sqlite3_value_int(argv[2]);
+  int path_wcount = sqlite3_value_int(argv[3]);
+  float score = (1.0 * posting_wcount / path_wcount);
 
-  sqlite3_result_double(context, w);
+  if (searchlen != foundlen) {
+    score *= (1.0 * searchlen / foundlen);    
+  } 
+
+  sqlite3_result_double(context, score);
 }
 
 
@@ -127,7 +133,7 @@ static void found_weight(sqlite3_context *context, int argc, sqlite3_value **arg
       }
     }
 
-    dbdir = [dbdir stringByAppendingPathComponent: @"v2"];
+    dbdir = [dbdir stringByAppendingPathComponent: @"v3"];
 
     if (([fm fileExistsAtPath: dbdir isDirectory: &isdir] &isdir) == NO) {
       if ([fm createDirectoryAtPath: dbdir attributes: nil] == NO) { 
@@ -169,7 +175,7 @@ static void found_weight(sqlite3_context *context, int argc, sqlite3_value **arg
     touchind = 0;
     [touchQueries addObject: @"select count(is_directory) from paths;"];
     [touchQueries addObject: @"select count(word) from words;"];
-    [touchQueries addObject: @"select count(score) from postings;"];
+    [touchQueries addObject: @"select count(word_count) from postings;"];
     [touchQueries addObject: @"select count(attribute) from attributes;"];
     
     [NSTimer scheduledTimerWithTimeInterval: TOUCH_INTERVAL 
@@ -511,8 +517,8 @@ static void found_weight(sqlite3_context *context, int argc, sqlite3_value **arg
     
     sqlite3_create_function(db, "pathExists", 1, 
                                 SQLITE_UTF8, 0, path_exists, 0, 0);
-    sqlite3_create_function(db, "foundWeight", 2, 
-                                SQLITE_UTF8, 0, found_weight, 0, 0);
+    sqlite3_create_function(db, "wordScore", 4, 
+                                SQLITE_UTF8, 0, word_score, 0, 0);
 
     performWriteQuery(db, @"PRAGMA cache_size = 20000");
     performWriteQuery(db, @"PRAGMA count_changes = 0");

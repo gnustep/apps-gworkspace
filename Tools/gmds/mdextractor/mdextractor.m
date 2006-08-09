@@ -202,7 +202,7 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
 
     errpath = [dbdir stringByAppendingPathComponent: @"error.log"];
         
-    dbdir = [dbdir stringByAppendingPathComponent: @"v2"];
+    dbdir = [dbdir stringByAppendingPathComponent: @"v3"];
     ASSIGN (dbpath, [dbdir stringByAppendingPathComponent: @"contents.db"]);    
     
     sqlite = [SQLite new];
@@ -1056,8 +1056,7 @@ do { \
 
     while ((word = [enumerator nextObject])) {
       NSString *qword = stringForQuery(word);
-      unsigned count = [wordset countForObject: word];
-      float score = (1.0 * count / wcount);
+      unsigned word_count = [wordset countForObject: word];
       int word_id;
       
       query = @"SELECT id FROM words WHERE word = :word";
@@ -1080,14 +1079,14 @@ do { \
         word_id = [sqlite lastInsertRowId];
       }
       
-      query = @"INSERT INTO postings (word_id, path_id, score) "
-              @"VALUES(:wordid, :pathid, :score)";
+      query = @"INSERT INTO postings (word_id, path_id, word_count) "
+              @"VALUES(:wordid, :pathid, :wordcount)";
               
       statement = [sqlite statementForQuery: query 
                              withIdentifier: @"set_metadata_4"
                                    bindings: SQLITE_INTEGER, @":wordid", word_id,
                                              SQLITE_INTEGER, @":pathid", path_id, 
-                                             SQLITE_FLOAT, @":score", score, 0];
+                                             SQLITE_INTEGER, @":wordcount", word_count, 0];
               
       STATEMENT_EXECUTE_QUERY (statement, NO);
     }

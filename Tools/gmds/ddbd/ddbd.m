@@ -113,7 +113,7 @@ do { \
     dbpath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
     dbpath = [dbpath stringByAppendingPathComponent: @"gmds"];
     dbpath = [dbpath stringByAppendingPathComponent: @".db"];
-    dbpath = [dbpath stringByAppendingPathComponent: @"v2"];
+    dbpath = [dbpath stringByAppendingPathComponent: @"v3"];
     dbpath = [dbpath stringByAppendingPathComponent: @"user.db"];    
     RETAIN (dbpath);
     
