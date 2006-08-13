@@ -2,23 +2,15 @@ PACKAGE_NEEDS_CONFIGURE = YES
 
 include $(GNUSTEP_MAKEFILES)/common.make
 
-include gworkspace.make
-
-PACKAGE_NAME = @PACKAGE_NAME@
-VERSION = @PACKAGE_VERSION@
-
 GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
 
 #
 # subprojects
 #
-SUBPROJECTS = FSNode \
-	      			  DBKit \
-	      			  Tools \
-	      			  Inspector \
-	      			  Operation \
-	      			  Recycler \
-	      			  GWorkspace 
+SUBPROJECTS = SQLite \
+              gmds \
+	      			Preferences \
+	      			Testing/GMDSClient
 						 
 -include GNUmakefile.preamble
 

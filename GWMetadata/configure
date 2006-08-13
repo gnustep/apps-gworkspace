@@ -308,8 +308,8 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subdirs_all="$ac_subdirs_all FSNode Inspector"
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP subdirs LIBOBJS LTLIBOBJS'
+ac_subdirs_all="$ac_subdirs_all SQLite gmds"
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP EGREP subdirs build build_cpu build_vendor build_os host host_cpu host_vendor host_os target target_cpu target_vendor target_os LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -830,6 +830,11 @@ Fine tuning of the installation directories:
 _ACEOF
 
   cat <<\_ACEOF
+
+System types:
+  --build=BUILD     configure for building on BUILD [guessed]
+  --host=HOST       cross-compile to build programs to run on HOST [BUILD]
+  --target=TARGET   configure for building compilers for TARGET [HOST]
 _ACEOF
 fi
 
@@ -841,6 +846,12 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-debug-log  		Enable debug logging
+
+Optional Packages:
+  --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
+  --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-sqlite-library=DIR sqlite library files are in DIR
+  --with-sqlite-include=DIR sqlite include files are in DIR
 
 Some influential environment variables:
   CC          C compiler command
@@ -3001,19 +3012,431 @@ ac_config_sub="$SHELL $ac_aux_dir/config.sub"
 ac_configure="$SHELL $ac_aux_dir/configure" # This should be Cygnus configure.
 
 
-          ac_config_headers="$ac_config_headers GWorkspace/config.h"
-
-          ac_config_headers="$ac_config_headers Tools/ddbd/config.h"
-
-          ac_config_headers="$ac_config_headers Tools/searchtool/config.h"
-
-          ac_config_headers="$ac_config_headers Tools/lsfupdater/config.h"
 
 
+subdirs="$subdirs SQLite gmds"
 
 
-subdirs="$subdirs FSNode Inspector"
+#--------------------------------------------------------------------
+# Determine the host, build, and target systems
+#--------------------------------------------------------------------
+# Make sure we can run config.sub.
+$ac_config_sub sun4 >/dev/null 2>&1 ||
+  { { echo "$as_me:$LINENO: error: cannot run $ac_config_sub" >&5
+echo "$as_me: error: cannot run $ac_config_sub" >&2;}
+   { (exit 1); exit 1; }; }
 
+echo "$as_me:$LINENO: checking build system type" >&5
+echo $ECHO_N "checking build system type... $ECHO_C" >&6
+if test "${ac_cv_build+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_cv_build_alias=$build_alias
+test -z "$ac_cv_build_alias" &&
+  ac_cv_build_alias=`$ac_config_guess`
+test -z "$ac_cv_build_alias" &&
+  { { echo "$as_me:$LINENO: error: cannot guess build type; you must specify one" >&5
+echo "$as_me: error: cannot guess build type; you must specify one" >&2;}
+   { (exit 1); exit 1; }; }
+ac_cv_build=`$ac_config_sub $ac_cv_build_alias` ||
+  { { echo "$as_me:$LINENO: error: $ac_config_sub $ac_cv_build_alias failed" >&5
+echo "$as_me: error: $ac_config_sub $ac_cv_build_alias failed" >&2;}
+   { (exit 1); exit 1; }; }
+
+fi
+echo "$as_me:$LINENO: result: $ac_cv_build" >&5
+echo "${ECHO_T}$ac_cv_build" >&6
+build=$ac_cv_build
+build_cpu=`echo $ac_cv_build | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\1/'`
+build_vendor=`echo $ac_cv_build | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\2/'`
+build_os=`echo $ac_cv_build | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
+
+
+echo "$as_me:$LINENO: checking host system type" >&5
+echo $ECHO_N "checking host system type... $ECHO_C" >&6
+if test "${ac_cv_host+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_cv_host_alias=$host_alias
+test -z "$ac_cv_host_alias" &&
+  ac_cv_host_alias=$ac_cv_build_alias
+ac_cv_host=`$ac_config_sub $ac_cv_host_alias` ||
+  { { echo "$as_me:$LINENO: error: $ac_config_sub $ac_cv_host_alias failed" >&5
+echo "$as_me: error: $ac_config_sub $ac_cv_host_alias failed" >&2;}
+   { (exit 1); exit 1; }; }
+
+fi
+echo "$as_me:$LINENO: result: $ac_cv_host" >&5
+echo "${ECHO_T}$ac_cv_host" >&6
+host=$ac_cv_host
+host_cpu=`echo $ac_cv_host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\1/'`
+host_vendor=`echo $ac_cv_host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\2/'`
+host_os=`echo $ac_cv_host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
+
+
+echo "$as_me:$LINENO: checking target system type" >&5
+echo $ECHO_N "checking target system type... $ECHO_C" >&6
+if test "${ac_cv_target+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_cv_target_alias=$target_alias
+test "x$ac_cv_target_alias" = "x" &&
+  ac_cv_target_alias=$ac_cv_host_alias
+ac_cv_target=`$ac_config_sub $ac_cv_target_alias` ||
+  { { echo "$as_me:$LINENO: error: $ac_config_sub $ac_cv_target_alias failed" >&5
+echo "$as_me: error: $ac_config_sub $ac_cv_target_alias failed" >&2;}
+   { (exit 1); exit 1; }; }
+
+fi
+echo "$as_me:$LINENO: result: $ac_cv_target" >&5
+echo "${ECHO_T}$ac_cv_target" >&6
+target=$ac_cv_target
+target_cpu=`echo $ac_cv_target | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\1/'`
+target_vendor=`echo $ac_cv_target | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\2/'`
+target_os=`echo $ac_cv_target | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
+
+
+# The aliases save the names the user supplied, while $host etc.
+# will get canonicalized.
+test -n "$target_alias" &&
+  test "$program_prefix$program_suffix$program_transform_name" = \
+    NONENONEs,x,x, &&
+  program_prefix=${target_alias}-
+
+#--------------------------------------------------------------------
+# Find sqlite
+#--------------------------------------------------------------------
+
+# Check whether --with-sqlite_library or --without-sqlite_library was given.
+if test "${with_sqlite_library+set}" = set; then
+  withval="$with_sqlite_library"
+
+else
+  with_sqlite_library=
+fi;
+
+# Check whether --with-sqlite_include or --without-sqlite_include was given.
+if test "${with_sqlite_include+set}" = set; then
+  withval="$with_sqlite_include"
+
+else
+  with_sqlite_include=
+fi;
+
+if test -n "$with_sqlite_library"; then
+  with_sqlite_library="-L$with_sqlite_library"
+fi
+if test -n "$with_sqlite_include"; then
+  with_sqlite_include="-I$with_sqlite_include"
+fi
+
+CPPFLAGS="$with_sqlite_include ${CPPFLAGS}"
+LDFLAGS="$with_sqlite_library -lsqlite3 ${LDFLAGS}"
+
+case "$target_os" in
+  freebsd* | openbsd* )
+	        CPPFLAGS="$CPPFLAGS -I/usr/local/include"
+		LDFLAGS="$LDFLAGS -L/usr/local/lib";;
+  netbsd*)	CPPFLAGS="$CPPFLAGS -I/usr/pkg/include"
+		LDFLAGS="$LDFLAGS -Wl,-R/usr/pkg/lib -L/usr/pkg/lib";;
+esac
+
+if test "${ac_cv_header_sqlite3_h+set}" = set; then
+  echo "$as_me:$LINENO: checking for sqlite3.h" >&5
+echo $ECHO_N "checking for sqlite3.h... $ECHO_C" >&6
+if test "${ac_cv_header_sqlite3_h+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+fi
+echo "$as_me:$LINENO: result: $ac_cv_header_sqlite3_h" >&5
+echo "${ECHO_T}$ac_cv_header_sqlite3_h" >&6
+else
+  # Is the header compilable?
+echo "$as_me:$LINENO: checking sqlite3.h usability" >&5
+echo $ECHO_N "checking sqlite3.h usability... $ECHO_C" >&6
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+$ac_includes_default
+#include <sqlite3.h>
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_header_compiler=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_header_compiler=no
+fi
+rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+echo "$as_me:$LINENO: result: $ac_header_compiler" >&5
+echo "${ECHO_T}$ac_header_compiler" >&6
+
+# Is the header present?
+echo "$as_me:$LINENO: checking sqlite3.h presence" >&5
+echo $ECHO_N "checking sqlite3.h presence... $ECHO_C" >&6
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <sqlite3.h>
+_ACEOF
+if { (eval echo "$as_me:$LINENO: \"$ac_cpp conftest.$ac_ext\"") >&5
+  (eval $ac_cpp conftest.$ac_ext) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } >/dev/null; then
+  if test -s conftest.err; then
+    ac_cpp_err=$ac_c_preproc_warn_flag
+    ac_cpp_err=$ac_cpp_err$ac_c_werror_flag
+  else
+    ac_cpp_err=
+  fi
+else
+  ac_cpp_err=yes
+fi
+if test -z "$ac_cpp_err"; then
+  ac_header_preproc=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+  ac_header_preproc=no
+fi
+rm -f conftest.err conftest.$ac_ext
+echo "$as_me:$LINENO: result: $ac_header_preproc" >&5
+echo "${ECHO_T}$ac_header_preproc" >&6
+
+# So?  What about this header?
+case $ac_header_compiler:$ac_header_preproc:$ac_c_preproc_warn_flag in
+  yes:no: )
+    { echo "$as_me:$LINENO: WARNING: sqlite3.h: accepted by the compiler, rejected by the preprocessor!" >&5
+echo "$as_me: WARNING: sqlite3.h: accepted by the compiler, rejected by the preprocessor!" >&2;}
+    { echo "$as_me:$LINENO: WARNING: sqlite3.h: proceeding with the compiler's result" >&5
+echo "$as_me: WARNING: sqlite3.h: proceeding with the compiler's result" >&2;}
+    ac_header_preproc=yes
+    ;;
+  no:yes:* )
+    { echo "$as_me:$LINENO: WARNING: sqlite3.h: present but cannot be compiled" >&5
+echo "$as_me: WARNING: sqlite3.h: present but cannot be compiled" >&2;}
+    { echo "$as_me:$LINENO: WARNING: sqlite3.h:     check for missing prerequisite headers?" >&5
+echo "$as_me: WARNING: sqlite3.h:     check for missing prerequisite headers?" >&2;}
+    { echo "$as_me:$LINENO: WARNING: sqlite3.h: see the Autoconf documentation" >&5
+echo "$as_me: WARNING: sqlite3.h: see the Autoconf documentation" >&2;}
+    { echo "$as_me:$LINENO: WARNING: sqlite3.h:     section \"Present But Cannot Be Compiled\"" >&5
+echo "$as_me: WARNING: sqlite3.h:     section \"Present But Cannot Be Compiled\"" >&2;}
+    { echo "$as_me:$LINENO: WARNING: sqlite3.h: proceeding with the preprocessor's result" >&5
+echo "$as_me: WARNING: sqlite3.h: proceeding with the preprocessor's result" >&2;}
+    { echo "$as_me:$LINENO: WARNING: sqlite3.h: in the future, the compiler will take precedence" >&5
+echo "$as_me: WARNING: sqlite3.h: in the future, the compiler will take precedence" >&2;}
+    (
+      cat <<\_ASBOX
+## ------------------------------------------ ##
+## Report this to the AC_PACKAGE_NAME lists.  ##
+## ------------------------------------------ ##
+_ASBOX
+    ) |
+      sed "s/^/$as_me: WARNING:     /" >&2
+    ;;
+esac
+echo "$as_me:$LINENO: checking for sqlite3.h" >&5
+echo $ECHO_N "checking for sqlite3.h... $ECHO_C" >&6
+if test "${ac_cv_header_sqlite3_h+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_cv_header_sqlite3_h=$ac_header_preproc
+fi
+echo "$as_me:$LINENO: result: $ac_cv_header_sqlite3_h" >&5
+echo "${ECHO_T}$ac_cv_header_sqlite3_h" >&6
+
+fi
+if test $ac_cv_header_sqlite3_h = yes; then
+  have_sqlite=yes
+else
+  have_sqlite=no
+fi
+
+
+if test "$have_sqlite" = yes; then
+
+echo "$as_me:$LINENO: checking for sqlite3_get_table in -lsqlite3" >&5
+echo $ECHO_N "checking for sqlite3_get_table in -lsqlite3... $ECHO_C" >&6
+if test "${ac_cv_lib_sqlite3_sqlite3_get_table+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lsqlite3  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char sqlite3_get_table ();
+int
+main ()
+{
+sqlite3_get_table ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_sqlite3_sqlite3_get_table=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_sqlite3_sqlite3_get_table=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_sqlite3_sqlite3_get_table" >&5
+echo "${ECHO_T}$ac_cv_lib_sqlite3_sqlite3_get_table" >&6
+if test $ac_cv_lib_sqlite3_sqlite3_get_table = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBSQLITE3 1
+_ACEOF
+
+  LIBS="-lsqlite3 $LIBS"
+
+fi
+
+  if test "$ac_cv_lib_sqlite3_sqlite3_get_table" = no; then
+     have_sqlite=no
+  fi
+fi
+
+if test "$have_sqlite" = yes; then
+  sqlite_version_ok=yes
+
+  if test "$cross_compiling" = yes; then
+  echo "wrong sqlite3 version"
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <string.h>
+    #include <sqlite3.h>
+
+int main ()
+{
+  unsigned vnum = sqlite3_libversion_number();
+
+  printf("sqlite3 version number %d\n", vnum);
+  return !(vnum >= 3002006);
+}
+
+_ACEOF
+rm -f conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && { ac_try='./conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  :
+else
+  echo "$as_me: program exited with status $ac_status" >&5
+echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+( exit $ac_status )
+sqlite_version_ok=no
+fi
+rm -f core *.core gmon.out bb.out conftest$ac_exeext conftest.$ac_objext conftest.$ac_ext
+fi
+
+fi
+
+if test "$have_sqlite" = no; then
+  { echo "$as_me:$LINENO: WARNING: Cannot find libsqlite3 header and/or library" >&5
+echo "$as_me: WARNING: Cannot find libsqlite3 header and/or library" >&2;}
+  echo "* GWMetadata requires the sqlite3 library"
+  echo "* Use --with-sqlite-library and --with-sqlite-include"
+  echo "* to specify the sqlite library directory if it is not"
+  echo "* in the usual place(s)"
+  { { echo "$as_me:$LINENO: error: GWMetadata will not compile without sqlite" >&5
+echo "$as_me: error: GWMetadata will not compile without sqlite" >&2;}
+   { (exit 1); exit 1; }; }
+else
+  if test "$sqlite_version_ok" = no; then
+    { echo "$as_me:$LINENO: WARNING: Wrong libsqlite3 version" >&5
+echo "$as_me: WARNING: Wrong libsqlite3 version" >&2;}
+    echo "* GWMetadata requires libsqlite3 >= 3002006 *"
+    { { echo "$as_me:$LINENO: error: GWMetadata will not compile without sqlite" >&5
+echo "$as_me: error: GWMetadata will not compile without sqlite" >&2;}
+   { (exit 1); exit 1; }; }
+  fi
+fi
 
 #--------------------------------------------------------------------
 # Debug logging
@@ -3038,7 +3461,8 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
-                                                  ac_config_files="$ac_config_files GNUmakefile Tools/ddbd/GNUmakefile GWorkspace/GNUmakefile GWorkspace/GWorkspaceInfo.plist gworkspace.make"
+          ac_config_files="$ac_config_files GNUmakefile"
+
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -3114,7 +3538,38 @@ s/^[^=]*=[	 ]*$//;
 }'
 fi
 
-DEFS=-DHAVE_CONFIG_H
+# Transform confdefs.h into DEFS.
+# Protect against shell expansion while executing Makefile rules.
+# Protect against Makefile macro expansion.
+#
+# If the first sed substitution is executed (which looks for macros that
+# take arguments), then we branch to the quote section.  Otherwise,
+# look for a macro that doesn't take arguments.
+cat >confdef2opt.sed <<\_ACEOF
+t clear
+: clear
+s,^[	 ]*#[	 ]*define[	 ][	 ]*\([^	 (][^	 (]*([^)]*)\)[	 ]*\(.*\),-D\1=\2,g
+t quote
+s,^[	 ]*#[	 ]*define[	 ][	 ]*\([^	 ][^	 ]*\)[	 ]*\(.*\),-D\1=\2,g
+t quote
+d
+: quote
+s,[	 `~#$^&*(){}\\|;'"<>?],\\&,g
+s,\[,\\&,g
+s,\],\\&,g
+s,\$,$$,g
+p
+_ACEOF
+# We use echo to avoid assuming a particular line-breaking character.
+# The extra dot is to prevent the shell from consuming trailing
+# line-breaks from the sub-command output.  A line-break within
+# single-quotes doesn't work because, if this script is created in a
+# platform that uses two characters for line-breaks (e.g., DOS), tr
+# would break.
+ac_LF_and_DOT=`echo; echo .`
+DEFS=`sed -n -f confdef2opt.sed confdefs.h | tr "$ac_LF_and_DOT" ' .'`
+rm -f confdef2opt.sed
+
 
 ac_libobjs=
 ac_ltlibobjs=
@@ -3448,14 +3903,9 @@ Usage: $0 [OPTIONS] [FILE]...
       --recheck    update $as_me by reconfiguring in the same conditions
   --file=FILE[:TEMPLATE]
 		   instantiate the configuration file FILE
-  --header=FILE[:TEMPLATE]
-		   instantiate the configuration header FILE
 
 Configuration files:
 $config_files
-
-Configuration headers:
-$config_headers
 
 Report bugs to <bug-autoconf@gnu.org>."
 _ACEOF
@@ -3565,14 +4015,6 @@ do
   case "$ac_config_target" in
   # Handling of arguments.
   "GNUmakefile" ) CONFIG_FILES="$CONFIG_FILES GNUmakefile" ;;
-  "Tools/ddbd/GNUmakefile" ) CONFIG_FILES="$CONFIG_FILES Tools/ddbd/GNUmakefile" ;;
-  "GWorkspace/GNUmakefile" ) CONFIG_FILES="$CONFIG_FILES GWorkspace/GNUmakefile" ;;
-  "GWorkspace/GWorkspaceInfo.plist" ) CONFIG_FILES="$CONFIG_FILES GWorkspace/GWorkspaceInfo.plist" ;;
-  "gworkspace.make" ) CONFIG_FILES="$CONFIG_FILES gworkspace.make" ;;
-  "GWorkspace/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS GWorkspace/config.h" ;;
-  "Tools/ddbd/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS Tools/ddbd/config.h" ;;
-  "Tools/searchtool/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS Tools/searchtool/config.h" ;;
-  "Tools/lsfupdater/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS Tools/lsfupdater/config.h" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
    { (exit 1); exit 1; }; };;
@@ -3585,7 +4027,6 @@ done
 # bizarre bug on SunOS 4.1.3.
 if $ac_need_defaults; then
   test "${CONFIG_FILES+set}" = set || CONFIG_FILES=$config_files
-  test "${CONFIG_HEADERS+set}" = set || CONFIG_HEADERS=$config_headers
 fi
 
 # Have a temporary directory for convenience.  Make it in the build tree
@@ -3667,6 +4108,18 @@ s,@OBJEXT@,$OBJEXT,;t t
 s,@CPP@,$CPP,;t t
 s,@EGREP@,$EGREP,;t t
 s,@subdirs@,$subdirs,;t t
+s,@build@,$build,;t t
+s,@build_cpu@,$build_cpu,;t t
+s,@build_vendor@,$build_vendor,;t t
+s,@build_os@,$build_os,;t t
+s,@host@,$host,;t t
+s,@host_cpu@,$host_cpu,;t t
+s,@host_vendor@,$host_vendor,;t t
+s,@host_os@,$host_os,;t t
+s,@target@,$target,;t t
+s,@target_cpu@,$target_cpu,;t t
+s,@target_vendor@,$target_vendor,;t t
+s,@target_os@,$target_os,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
 CEOF
@@ -3900,229 +4353,6 @@ s,@abs_top_builddir@,$ac_abs_top_builddir,;t t
     rm -f $tmp/out
   fi
 
-done
-_ACEOF
-cat >>$CONFIG_STATUS <<\_ACEOF
-
-#
-# CONFIG_HEADER section.
-#
-
-# These sed commands are passed to sed as "A NAME B NAME C VALUE D", where
-# NAME is the cpp macro being defined and VALUE is the value it is being given.
-#
-# ac_d sets the value in "#define NAME VALUE" lines.
-ac_dA='s,^\([	 ]*\)#\([	 ]*define[	 ][	 ]*\)'
-ac_dB='[	 ].*$,\1#\2'
-ac_dC=' '
-ac_dD=',;t'
-# ac_u turns "#undef NAME" without trailing blanks into "#define NAME VALUE".
-ac_uA='s,^\([	 ]*\)#\([	 ]*\)undef\([	 ][	 ]*\)'
-ac_uB='$,\1#\2define\3'
-ac_uC=' '
-ac_uD=',;t'
-
-for ac_file in : $CONFIG_HEADERS; do test "x$ac_file" = x: && continue
-  # Support "outfile[:infile[:infile...]]", defaulting infile="outfile.in".
-  case $ac_file in
-  - | *:- | *:-:* ) # input from stdin
-	cat >$tmp/stdin
-	ac_file_in=`echo "$ac_file" | sed 's,[^:]*:,,'`
-	ac_file=`echo "$ac_file" | sed 's,:.*,,'` ;;
-  *:* ) ac_file_in=`echo "$ac_file" | sed 's,[^:]*:,,'`
-	ac_file=`echo "$ac_file" | sed 's,:.*,,'` ;;
-  * )   ac_file_in=$ac_file.in ;;
-  esac
-
-  test x"$ac_file" != x- && { echo "$as_me:$LINENO: creating $ac_file" >&5
-echo "$as_me: creating $ac_file" >&6;}
-
-  # First look for the input files in the build tree, otherwise in the
-  # src tree.
-  ac_file_inputs=`IFS=:
-    for f in $ac_file_in; do
-      case $f in
-      -) echo $tmp/stdin ;;
-      [\\/$]*)
-	 # Absolute (can't be DOS-style, as IFS=:)
-	 test -f "$f" || { { echo "$as_me:$LINENO: error: cannot find input file: $f" >&5
-echo "$as_me: error: cannot find input file: $f" >&2;}
-   { (exit 1); exit 1; }; }
-	 # Do quote $f, to prevent DOS paths from being IFS'd.
-	 echo "$f";;
-      *) # Relative
-	 if test -f "$f"; then
-	   # Build tree
-	   echo "$f"
-	 elif test -f "$srcdir/$f"; then
-	   # Source tree
-	   echo "$srcdir/$f"
-	 else
-	   # /dev/null tree
-	   { { echo "$as_me:$LINENO: error: cannot find input file: $f" >&5
-echo "$as_me: error: cannot find input file: $f" >&2;}
-   { (exit 1); exit 1; }; }
-	 fi;;
-      esac
-    done` || { (exit 1); exit 1; }
-  # Remove the trailing spaces.
-  sed 's/[	 ]*$//' $ac_file_inputs >$tmp/in
-
-_ACEOF
-
-# Transform confdefs.h into two sed scripts, `conftest.defines' and
-# `conftest.undefs', that substitutes the proper values into
-# config.h.in to produce config.h.  The first handles `#define'
-# templates, and the second `#undef' templates.
-# And first: Protect against being on the right side of a sed subst in
-# config.status.  Protect against being in an unquoted here document
-# in config.status.
-rm -f conftest.defines conftest.undefs
-# Using a here document instead of a string reduces the quoting nightmare.
-# Putting comments in sed scripts is not portable.
-#
-# `end' is used to avoid that the second main sed command (meant for
-# 0-ary CPP macros) applies to n-ary macro definitions.
-# See the Autoconf documentation for `clear'.
-cat >confdef2sed.sed <<\_ACEOF
-s/[\\&,]/\\&/g
-s,[\\$`],\\&,g
-t clear
-: clear
-s,^[	 ]*#[	 ]*define[	 ][	 ]*\([^	 (][^	 (]*\)\(([^)]*)\)[	 ]*\(.*\)$,${ac_dA}\1${ac_dB}\1\2${ac_dC}\3${ac_dD},gp
-t end
-s,^[	 ]*#[	 ]*define[	 ][	 ]*\([^	 ][^	 ]*\)[	 ]*\(.*\)$,${ac_dA}\1${ac_dB}\1${ac_dC}\2${ac_dD},gp
-: end
-_ACEOF
-# If some macros were called several times there might be several times
-# the same #defines, which is useless.  Nevertheless, we may not want to
-# sort them, since we want the *last* AC-DEFINE to be honored.
-uniq confdefs.h | sed -n -f confdef2sed.sed >conftest.defines
-sed 's/ac_d/ac_u/g' conftest.defines >conftest.undefs
-rm -f confdef2sed.sed
-
-# This sed command replaces #undef with comments.  This is necessary, for
-# example, in the case of _POSIX_SOURCE, which is predefined and required
-# on some systems where configure will not decide to define it.
-cat >>conftest.undefs <<\_ACEOF
-s,^[	 ]*#[	 ]*undef[	 ][	 ]*[a-zA-Z_][a-zA-Z_0-9]*,/* & */,
-_ACEOF
-
-# Break up conftest.defines because some shells have a limit on the size
-# of here documents, and old seds have small limits too (100 cmds).
-echo '  # Handle all the #define templates only if necessary.' >>$CONFIG_STATUS
-echo '  if grep "^[	 ]*#[	 ]*define" $tmp/in >/dev/null; then' >>$CONFIG_STATUS
-echo '  # If there are no defines, we may have an empty if/fi' >>$CONFIG_STATUS
-echo '  :' >>$CONFIG_STATUS
-rm -f conftest.tail
-while grep . conftest.defines >/dev/null
-do
-  # Write a limited-size here document to $tmp/defines.sed.
-  echo '  cat >$tmp/defines.sed <<CEOF' >>$CONFIG_STATUS
-  # Speed up: don't consider the non `#define' lines.
-  echo '/^[	 ]*#[	 ]*define/!b' >>$CONFIG_STATUS
-  # Work around the forget-to-reset-the-flag bug.
-  echo 't clr' >>$CONFIG_STATUS
-  echo ': clr' >>$CONFIG_STATUS
-  sed ${ac_max_here_lines}q conftest.defines >>$CONFIG_STATUS
-  echo 'CEOF
-  sed -f $tmp/defines.sed $tmp/in >$tmp/out
-  rm -f $tmp/in
-  mv $tmp/out $tmp/in
-' >>$CONFIG_STATUS
-  sed 1,${ac_max_here_lines}d conftest.defines >conftest.tail
-  rm -f conftest.defines
-  mv conftest.tail conftest.defines
-done
-rm -f conftest.defines
-echo '  fi # grep' >>$CONFIG_STATUS
-echo >>$CONFIG_STATUS
-
-# Break up conftest.undefs because some shells have a limit on the size
-# of here documents, and old seds have small limits too (100 cmds).
-echo '  # Handle all the #undef templates' >>$CONFIG_STATUS
-rm -f conftest.tail
-while grep . conftest.undefs >/dev/null
-do
-  # Write a limited-size here document to $tmp/undefs.sed.
-  echo '  cat >$tmp/undefs.sed <<CEOF' >>$CONFIG_STATUS
-  # Speed up: don't consider the non `#undef'
-  echo '/^[	 ]*#[	 ]*undef/!b' >>$CONFIG_STATUS
-  # Work around the forget-to-reset-the-flag bug.
-  echo 't clr' >>$CONFIG_STATUS
-  echo ': clr' >>$CONFIG_STATUS
-  sed ${ac_max_here_lines}q conftest.undefs >>$CONFIG_STATUS
-  echo 'CEOF
-  sed -f $tmp/undefs.sed $tmp/in >$tmp/out
-  rm -f $tmp/in
-  mv $tmp/out $tmp/in
-' >>$CONFIG_STATUS
-  sed 1,${ac_max_here_lines}d conftest.undefs >conftest.tail
-  rm -f conftest.undefs
-  mv conftest.tail conftest.undefs
-done
-rm -f conftest.undefs
-
-cat >>$CONFIG_STATUS <<\_ACEOF
-  # Let's still pretend it is `configure' which instantiates (i.e., don't
-  # use $as_me), people would be surprised to read:
-  #    /* config.h.  Generated by config.status.  */
-  if test x"$ac_file" = x-; then
-    echo "/* Generated by configure.  */" >$tmp/config.h
-  else
-    echo "/* $ac_file.  Generated by configure.  */" >$tmp/config.h
-  fi
-  cat $tmp/in >>$tmp/config.h
-  rm -f $tmp/in
-  if test x"$ac_file" != x-; then
-    if diff $ac_file $tmp/config.h >/dev/null 2>&1; then
-      { echo "$as_me:$LINENO: $ac_file is unchanged" >&5
-echo "$as_me: $ac_file is unchanged" >&6;}
-    else
-      ac_dir=`(dirname "$ac_file") 2>/dev/null ||
-$as_expr X"$ac_file" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
-	 X"$ac_file" : 'X\(//\)[^/]' \| \
-	 X"$ac_file" : 'X\(//\)$' \| \
-	 X"$ac_file" : 'X\(/\)' \| \
-	 .     : '\(.\)' 2>/dev/null ||
-echo X"$ac_file" |
-    sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{ s//\1/; q; }
-  	  /^X\(\/\/\)[^/].*/{ s//\1/; q; }
-  	  /^X\(\/\/\)$/{ s//\1/; q; }
-  	  /^X\(\/\).*/{ s//\1/; q; }
-  	  s/.*/./; q'`
-      { if $as_mkdir_p; then
-    mkdir -p "$ac_dir"
-  else
-    as_dir="$ac_dir"
-    as_dirs=
-    while test ! -d "$as_dir"; do
-      as_dirs="$as_dir $as_dirs"
-      as_dir=`(dirname "$as_dir") 2>/dev/null ||
-$as_expr X"$as_dir" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
-	 X"$as_dir" : 'X\(//\)[^/]' \| \
-	 X"$as_dir" : 'X\(//\)$' \| \
-	 X"$as_dir" : 'X\(/\)' \| \
-	 .     : '\(.\)' 2>/dev/null ||
-echo X"$as_dir" |
-    sed '/^X\(.*[^/]\)\/\/*[^/][^/]*\/*$/{ s//\1/; q; }
-  	  /^X\(\/\/\)[^/].*/{ s//\1/; q; }
-  	  /^X\(\/\/\)$/{ s//\1/; q; }
-  	  /^X\(\/\).*/{ s//\1/; q; }
-  	  s/.*/./; q'`
-    done
-    test ! -n "$as_dirs" || mkdir $as_dirs
-  fi || { { echo "$as_me:$LINENO: error: cannot create directory \"$ac_dir\"" >&5
-echo "$as_me: error: cannot create directory \"$ac_dir\"" >&2;}
-   { (exit 1); exit 1; }; }; }
-
-      rm -f $ac_file
-      mv $tmp/config.h $ac_file
-    fi
-  else
-    cat $tmp/config.h
-    rm -f $tmp/config.h
-  fi
 done
 _ACEOF
 

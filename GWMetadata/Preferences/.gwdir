@@ -1,0 +1,10 @@
+{
+    fsn_info_type = <*I0>;
+    geometry = "738 288 450 300 0 0  1600 1176 ";
+    lastselection = (
+	"/home/enrico/Butt/GNUstep/CopyPix/AA/Preferences/Resources/English.lproj"
+    );
+    singlenode = <*BN>;
+    spatial = <*BY>;
+    viewtype = Browser;
+}
