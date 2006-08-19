@@ -40,9 +40,7 @@
   NSDictionary *attributes;
   NSString *fileType;
   NSString *typeDescription;
-  
-  NSString *pathSeparator;  
-  
+    
   unsigned long long filesize;
   NSDate *crDate;
   NSString *crDateDescription;

@@ -31,34 +31,6 @@
 #define ONE_MB (ONE_KB * ONE_KB)
 #define ONE_GB (ONE_KB * ONE_MB)
 
-static NSString *fix_path(NSString *s, const char *c)
-{
-  static NSFileManager *mgr = nil;
-  const char *ptr = c;
-  unsigned len;
-
-  if (mgr == nil) {
-    mgr = [NSFileManager defaultManager];
-    RETAIN (mgr);
-  }
-  
-  if (ptr == 0) {
-    if (s == nil) {
-	    return nil;
-	  }
-    ptr = [s cString];
-  }
-  
-  len = strlen(ptr);
-
-  return [mgr stringWithFileSystemRepresentation: ptr length: len]; 
-}
-
-NSString *fixPath(NSString *s, const char *c)
-{
-  return fix_path(s, c);
-}
-
 NSString *fileSizeDescription(unsigned long size)
 {
 	NSString *sizeStr;

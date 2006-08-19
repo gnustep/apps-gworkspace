@@ -79,8 +79,6 @@ toPoint: NSMakePoint(x2, y2)]; \
 }
 #endif
 
-NSString *fixPath(NSString *s, const char *c);
-
 NSString *fileSizeDescription(unsigned long size);
 
 NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str, 

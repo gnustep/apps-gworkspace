@@ -456,44 +456,21 @@ BOOL subpath(NSString *p1, NSString *p2)
   return NO;
 }
 
-static NSString *fixpath(NSString *s, const char *c)
-{
-  static NSFileManager *mgr = nil;
-  const char *ptr = c;
-  unsigned len;
-
-  if (mgr == nil) {
-    mgr = [NSFileManager defaultManager];
-    RETAIN (mgr);
-  }
-  
-  if (ptr == 0) {
-    if (s == nil) {
-	    return nil;
-	  }
-    ptr = [s cString];
-  }
-  
-  len = strlen(ptr);
-
-  return [mgr stringWithFileSystemRepresentation: ptr length: len]; 
-}
-
-static NSString *path_sep(void)
+NSString *pathsep(void)
 {
   static NSString *separator = nil;
 
   if (separator == nil) {
-    separator = fixpath(@"/", 0);
+    #if defined(__MINGW32__)
+      separator = @"\\";	
+    #else
+      separator = @"/";	
+    #endif
+
     RETAIN (separator);
   }
 
   return separator;
-}
-
-NSString *pathsep(void)
-{
-  return path_sep();
 }
 
 NSString *removePrefix(NSString *path, NSString *prefix)

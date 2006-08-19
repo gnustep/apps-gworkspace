@@ -89,33 +89,15 @@ toPoint: NSMakePoint(x2, y2)]; \
 #define ICNMAX 48
 #endif
 
-NSString *fixPath(NSString *s, const char *c);
+NSString *systemRoot(void);
 
 NSString *cutFileLabelText(NSString *filename, id label, int lenght);
 
-NSString *subtractPathComponentToPath(NSString *apath, NSString *firstpart);
-
 BOOL subPathOfPath(NSString *p1, NSString *p2);
-
-NSString *pathFittingInContainer(id container, NSString *fullPath, int margins);
-
-NSString *relativePathFittingInContainer(id container, NSString *fullPath);
-
-int pathComponentsToPath(NSString *path);
 
 NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
 
 NSString *commonPrefixInArray(NSArray *a);
-
-int comparePaths(id *p1, id *p2, void *context);
-
-int compareCells(id *c1, id *c2, void *context);
-
-int compareCellsRemote(id *c1, id *c2, void *context);
-
-int compareDimmedCells(id *c1, id *c2, void *context);
-
-int compIcons(id *c1, id *c2, void *context);
 
 NSString *fileSizeDescription(unsigned long long size);
 

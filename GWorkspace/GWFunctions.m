@@ -66,202 +66,23 @@ static NSDictionary *fontAttr = nil;
 
 @end 
 
-static inline NSString *cut_Text(NSString *filename, id label, int lenght)
+NSString *systemRoot()
 {
-	NSString *cutname = nil;
-  NSString *reststr = nil;
-  NSString *dots;
-	NSFont *labfont;
-  NSDictionary *attr;
-	float w, cw, dotslenght;
-	int i;
+  static NSString *root = nil;
 
-	cw = 0;
-	labfont = [label font];
-  
-  attr = [NSDictionary dictionaryWithObjectsAndKeys: 
-			                        labfont, NSFontAttributeName, nil];  
-  
-  dots = @"...";  
-	dotslenght = [dots sizeWithAttributes: attr].width;  
-  w = [filename sizeWithAttributes: attr].width;
-  
-	if (w > lenght) {
-		i = 0;
-		while (cw <= (lenght - dotslenght)) {
-			if (i == [filename length]) {
-				break;
-      }
-			cutname = [filename substringToIndex: i];
-			reststr = [filename substringFromIndex: i];
-      cw = [cutname sizeWithAttributes: attr].width;
-			i++;
-		}	
-		if ([cutname isEqual: filename] == NO) {      
-			if ([reststr length] <= 3) { 
-				return filename;
-			} else {
-				cutname = [cutname stringByAppendingString: dots];
-      }
-		} else {
-			return filename;
-		}	
-	} else {
-		return filename;
-	}
-  
-	return cutname;
-}
+  if (root == nil) {
+    #if defined(__MINGW32__)
+    /* FIXME !!!!!! */
+      root = @"\\";	
+    #else
+      root = @"/";	
+    #endif
 
-static inline int compare_Paths(id *p1, id *p2, void *context)
-{
-  int stype;
-  int i1, i2;      
-  NSDictionary *attributes; 
-  NSDate *d1, *d2;
-  unsigned long long fs1, fs2;
-  NSString *own1, *own2;
-     
-  stype = (int)context;
-
-  switch(stype) {
-    case byname:
-			{
-				NSString *n1 = [(NSString *)p1 lastPathComponent];
-				NSString *n2 = [(NSString *)p2 lastPathComponent];
-
-      	if ([n2 hasPrefix: @"."] || [n1 hasPrefix: @"."]) {
-        	if ([n2 hasPrefix: @"."] && [n1 hasPrefix: @"."]) {
-          	return [n1 caseInsensitiveCompare: n2];
-        	} else {
-          	return [n2 caseInsensitiveCompare: n1];
-        	}
-      	}
-      	return [n1 caseInsensitiveCompare: n2];
-      	break;
-  		}
-			
-    case bykind:      
- 			SORT_INDEX (i1, p1);
-			SORT_INDEX (i2, p2);
-			    
-      if (i1 == i2) {			
-        return [(NSString *)p1 compare: (NSString *)p2]; 
-      }   
-			   
-      return (i1 < i2 ? 1 : -1);
-      break;
-  
-    case bydate:
-			ATTRIBUTES_AT_PATH(attributes, p1, NO);
-      d1 = [attributes fileModificationDate];
-			ATTRIBUTES_AT_PATH(attributes, p2, NO);
-      d2 = [attributes fileModificationDate];
-    
-      return [d1 compare: d2]; 
-      break;
-
-    case bysize:
-			ATTRIBUTES_AT_PATH(attributes, p1, NO);
-      fs1 = [attributes fileSize];
-			ATTRIBUTES_AT_PATH(attributes, p2, NO);
-      fs2 = [attributes fileSize];
-    
-      return (fs1 < fs2 ? 1 : -1);    
-      break;
-
-    case byowner:
-			ATTRIBUTES_AT_PATH(attributes, p1, NO);
-      own1 = [attributes fileOwnerAccountName];
-			ATTRIBUTES_AT_PATH(attributes, p2, NO);
-      own2 = [attributes fileOwnerAccountName];
-    
-      return [own1 compare: own2];     
-      break;
- 
-    default:
-      break;
+    RETAIN (root);
   }
 
-  return 1;
+  return root;
 }
-
-static inline int compare_Cells(id *c1, id *c2, void *context)
-{
-  NSDictionary *dict = (NSDictionary *)context;
-  NSString *basepath = fixPath([dict objectForKey: @"path"], 0);
-  NSString *s1 = [basepath stringByAppendingPathComponent: [(NSCell *)c1 stringValue]];
-  NSString *s2 = [basepath stringByAppendingPathComponent: [(NSCell *)c2 stringValue]];
-  int stype = [[dict objectForKey: @"type"] intValue]; 
-  
-	return comparePaths((id *)s1, (id *)s2, (void *)stype);
-}
-
-static inline int compare_Cells_Remote(id *c1, id *c2, void *context)
-{
-  NSString *n1 = [(NSCell *)c1 stringValue];
-  NSString *n2 = [(NSCell *)c2 stringValue];
-
-  if ([n2 hasPrefix: @"."] || [n1 hasPrefix: @"."]) {
-    if ([n2 hasPrefix: @"."] && [n1 hasPrefix: @"."]) {
-      return [n1 caseInsensitiveCompare: n2];
-    } else {
-      return [n2 caseInsensitiveCompare: n1];
-    }
-  }
-  return [n1 caseInsensitiveCompare: n2];
-}
-
-static inline int comp_Icons(id *c1, id *c2, void *context)
-{
-	NSDictionary *sdict = (NSDictionary *)context;
-	NSString *basepath = fixPath([sdict objectForKey: @"path"], 0);
-	int stype = [[sdict objectForKey: @"type"] intValue];
-
-  NSString *s1 = [basepath stringByAppendingPathComponent: [(id<IconsProtocol>)c1 myName]];
-  NSString *s2 = [basepath stringByAppendingPathComponent: [(id<IconsProtocol>)c2 myName]];
-  
-  return comparePaths((id *)s1, (id *)s2, (void *)stype);
-}
-
-static NSString *fxpath(NSString *s, const char *c)
-{
-  static NSFileManager *mgr = nil;
-  const char *ptr = c;
-  unsigned len;
-
-  if (mgr == nil) {
-    mgr = [NSFileManager defaultManager];
-    RETAIN (mgr);
-  }
-  
-  if (ptr == 0) {
-    if (s == nil) {
-	    return nil;
-	  }
-    ptr = [s cString];
-  }
-  
-  len = strlen(ptr);
-
-  return [mgr stringWithFileSystemRepresentation: ptr length: len]; 
-}
-
-NSString *fixPath(NSString *s, const char *c)
-{
-  return fxpath(s, c);
-}
-
-/*
-NSString *cutFileLabelText(NSString *filename, id label, int lenght)
-{
-	if (lenght > 0) {
-		return cut_Text(filename, label, lenght);
-	}
-  
-	return filename;
-}
-*/
 
 NSString *cutFileLabelText(NSString *filename, id label, int lenght)
 {
@@ -319,20 +140,6 @@ NSString *cutFileLabelText(NSString *filename, id label, int lenght)
 	return filename;
 }
 
-NSString *subtractPathComponentToPath(NSString *apath, NSString *firstpart)
-{
-	NSString *secondpart;
-	int pos;
-		
-	if ([apath isEqual: firstpart]) {
-		return fixPath(@"/", 0);
-  }
-	pos = [apath rangeOfString: firstpart].length +1;
-	secondpart = [apath substringFromIndex: pos];
-
-	return secondpart;
-}
-
 BOOL subPathOfPath(NSString *p1, NSString *p2)
 {
   int l1 = [p1 length];
@@ -347,88 +154,6 @@ BOOL subPathOfPath(NSString *p1, NSString *p2)
   }
 
   return NO;
-}
-
-NSString *pathFittingInContainer(id container, NSString *fullPath, int margins)
-{
-	NSArray *pathcomps;
-	float cntwidth;
-	NSFont *font;	
-	NSString *path;
-  NSString *relpath = nil;		
-	int i;
-						
-	cntwidth = [container frame].size.width - margins;
-	font = [container font];
-
-	if([font widthOfString: fullPath] < cntwidth) {
-		return fullPath;
-	}
-  
-	cntwidth = cntwidth - [font widthOfString: fixPath(@"../", 0)];
-		
-	pathcomps = [fullPath pathComponents];
-	i = [pathcomps count] - 1;
-	path = [NSString stringWithString: [pathcomps objectAtIndex: i]];
-	
-	while(i > 0) {
-		i--;		
-		if([font widthOfString: path] < cntwidth) {
-			relpath = [NSString stringWithString: path];
-		} else {
-			break;
-    }						
-		path = [NSString stringWithFormat: @"%@%@%@", [pathcomps objectAtIndex: i], fixPath(@"/", 0), path];
-	}
-	
-	relpath = [NSString stringWithFormat: @"%@%@", fixPath(@"../", 0), relpath];
-	
-	return relpath;
-}
-
-NSString *relativePathFittingInContainer(id container, NSString *fullPath)
-{
-	NSArray *pathcomps;
-	float cntwidth;
-	NSFont *font;	
-	NSString *path;
-  NSString *relpath = nil;		
-	int i;
-						
-	cntwidth = [container frame].size.width;
-	font = [container font];
-
-	if([font widthOfString: fullPath] < cntwidth) {
-		return fullPath;
-	}
-  	
-	cntwidth = cntwidth - [font widthOfString: fixPath(@"../", 0)];
-		
-	pathcomps = [fullPath pathComponents];
-	i = [pathcomps count] - 1;
-	path = [NSString stringWithString: [pathcomps objectAtIndex: i]];
-	
-	while(i > 0) {
-		i--;		
-		if([font widthOfString: path] < cntwidth) {
-			relpath = [NSString stringWithString: path];
-		} else {
-			break;
-    }						
-		path = [NSString stringWithFormat: @"%@%@%@", [pathcomps objectAtIndex: i], fixPath(@"/", 0), path];
-	}
-	
-	relpath = [NSString stringWithFormat: @"%@%@", fixPath(@"../", 0), relpath];
-	
-	return relpath;
-}
-
-int pathComponentsToPath(NSString *path)
-{
-  if ([path isEqual: fixPath(@"/", 0)]) {
-    return 0;
-  }
-  return [[path pathComponents] count] - 1;
 }
 
 NSString *pathRemovingPrefix(NSString *path, NSString *prefix)
@@ -497,35 +222,6 @@ NSString *commonPrefixInArray(NSArray *a)
   } 
   
   return ([s length] ? s : nil);
-}
-
-int comparePaths(id *p1, id *p2, void *context)
-{
-	NSString *s1 = fixPath((NSString *)p1, 0);
-	NSString *s2 = fixPath((NSString *)p2, 0);	
-  return compare_Paths((id *)s1, (id *)s2, context);
-}
-
-int compareCells(id *c1, id *c2, void *context)
-{
-  return compare_Cells(c1, c2, context);
-}
-
-int compareCellsRemote(id *c1, id *c2, void *context)
-{
-  return compare_Cells_Remote(c1, c2, context);
-}
-
-int compareDimmedCells(id *c1, id *c2, void *context)
-{
-  NSString *s1 = [(NSCell *)c1 stringValue];
-  NSString *s2 = [(NSCell *)c2 stringValue];
-  return [s1 compare: s2]; 
-}
-
-int compIcons(id *c1, id *c2, void *context)
-{
-  return comp_Icons(c1, c2, context);
 }
 
 NSString *fileSizeDescription(unsigned long long size)

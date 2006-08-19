@@ -610,7 +610,7 @@ static Finder *finder = nil;
 	[openPanel setCanChooseFiles: YES];
 	[openPanel setCanChooseDirectories: YES];
 
-	result = [openPanel runModalForDirectory: fixPath(@"/", 0) 
+	result = [openPanel runModalForDirectory: systemRoot() 
                                       file: nil 
 							                       types: nil];
 	if (result != NSOKButton) {
