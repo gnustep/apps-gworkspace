@@ -2,8 +2,6 @@ PACKAGE_NEEDS_CONFIGURE = YES
 
 include $(GNUSTEP_MAKEFILES)/common.make
 
-include gworkspace.make
-
 PACKAGE_NAME = @PACKAGE_NAME@
 VERSION = @PACKAGE_VERSION@
 

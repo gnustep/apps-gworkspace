@@ -3038,7 +3038,7 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
-                                                  ac_config_files="$ac_config_files GNUmakefile Tools/ddbd/GNUmakefile GWorkspace/GNUmakefile GWorkspace/GWorkspaceInfo.plist gworkspace.make"
+                                        ac_config_files="$ac_config_files GNUmakefile Tools/ddbd/GNUmakefile GWorkspace/GNUmakefile GWorkspace/GWorkspaceInfo.plist"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -3568,7 +3568,6 @@ do
   "Tools/ddbd/GNUmakefile" ) CONFIG_FILES="$CONFIG_FILES Tools/ddbd/GNUmakefile" ;;
   "GWorkspace/GNUmakefile" ) CONFIG_FILES="$CONFIG_FILES GWorkspace/GNUmakefile" ;;
   "GWorkspace/GWorkspaceInfo.plist" ) CONFIG_FILES="$CONFIG_FILES GWorkspace/GWorkspaceInfo.plist" ;;
-  "gworkspace.make" ) CONFIG_FILES="$CONFIG_FILES gworkspace.make" ;;
   "GWorkspace/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS GWorkspace/config.h" ;;
   "Tools/ddbd/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS Tools/ddbd/config.h" ;;
   "Tools/searchtool/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS Tools/searchtool/config.h" ;;

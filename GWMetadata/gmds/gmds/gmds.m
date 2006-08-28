@@ -47,6 +47,32 @@
 #define MAX_RES 100
 #define TOUCH_INTERVAL (60.0)
 
+enum {
+  STRING,
+  ARRAY,
+  NUMBER,
+  DATE,
+  DATA
+};
+
+enum {
+  NUM_INT,
+  NUM_FLOAT,
+  NUM_BOOL
+};
+
+typedef enum _GMDSOperatorType
+{
+  GMDSLessThanOperatorType = 0,
+  GMDSLessThanOrEqualToOperatorType,
+  GMDSGreaterThanOperatorType,
+  GMDSGreaterThanOrEqualToOperatorType,
+  GMDSEqualToOperatorType,
+  GMDSNotEqualToOperatorType,
+  GMDSInRangeOperatorType
+} GMDSOperatorType;
+
+
 static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv)
 {
   const unsigned char *path = sqlite3_value_text(argv[0]);
@@ -72,6 +98,41 @@ static void word_score(sqlite3_context *context, int argc, sqlite3_value **argv)
     /* TODO a better correction algorithm for score */
     score *= (1.0 * searchlen / foundlen);    
   } 
+
+  sqlite3_result_double(context, score);
+}
+
+static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **argv)
+{
+  const unsigned char *search_val = sqlite3_value_text(argv[0]);
+  const unsigned char *found_val = sqlite3_value_text(argv[1]);
+  int attribute_type = sqlite3_value_int(argv[2]);
+  int operator_type = sqlite3_value_int(argv[3]);
+  float score = 1.0;
+
+  if ((attribute_type == STRING) 
+              || (attribute_type == ARRAY) 
+                          || (attribute_type == DATA)) {
+    if (operator_type == GMDSEqualToOperatorType) {                          
+      int searchlen = strlen((const char *)search_val);
+      int foundlen = strlen((const char *)found_val);
+    
+      score *= (searchlen / foundlen); 
+    }
+  }
+
+
+
+  /*
+    const char *searchValue IL VALORE CERCATO
+    
+    attributes.attribute IL VALORE TROVATO
+    
+    int attributeType [STRING, ARRAY, NUMBER, DATE, DATA]
+    
+    GMDSOperatorType operatorType
+  */
+  
 
   sqlite3_result_double(context, score);
 }
@@ -524,6 +585,8 @@ static void word_score(sqlite3_context *context, int argc, sqlite3_value **argv)
                                 SQLITE_UTF8, 0, path_exists, 0, 0);
     sqlite3_create_function(db, "wordScore", 4, 
                                 SQLITE_UTF8, 0, word_score, 0, 0);
+    sqlite3_create_function(db, "attributeScore", 4, 
+                                SQLITE_UTF8, 0, attribute_score, 0, 0);
 
     performWriteQuery(db, @"PRAGMA cache_size = 20000");
     performWriteQuery(db, @"PRAGMA count_changes = 0");

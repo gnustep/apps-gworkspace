@@ -30,7 +30,7 @@
 # Things to do after distcleaning
 after-distclean::
 	rm -rf autom4te*.cache
-	rm -f config.status config.log config.cache TAGS GNUmakefile gworkspace.make GWorkspace/GWorkspaceInfo.plist
+	rm -f config.status config.log config.cache TAGS GNUmakefile GWorkspace/GWorkspaceInfo.plist
   
 # Things to do before checking
 # before-check::
