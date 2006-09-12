@@ -112,7 +112,7 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
 
   if ((attribute_type == STRING) 
               || (attribute_type == ARRAY) 
-                          || (attribute_type == DATA)) {
+                              || (attribute_type == DATA)) {
     if (operator_type == GMDSEqualToOperatorType) {                          
       int searchlen = strlen((const char *)search_val);
       int foundlen = strlen((const char *)found_val);

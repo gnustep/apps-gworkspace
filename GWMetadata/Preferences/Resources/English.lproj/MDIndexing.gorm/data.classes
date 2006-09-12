@@ -1,1 +1,59 @@
-{"## Comment" = "Do NOT change this file, Gorm maintains it"; FirstResponder = {Actions = ("applyButtAction:", "closeMainWindow:", "enableSwitchAction:", "excludedButtAction:", "indexedButtAction:", "errorButtAction:", "nextButtAction:", "prevButtAction:", "revertButtAction:", "runInfoPanel:", "showAllButtAction:", "statusButtAction:", "suffixButtAction:"); Super = NSObject; }; MDIndexing = {Actions = ("excludedButtAction:", "indexedButtAction:", "applyButtAction:", "enableSwitchAction:", "revertButtAction:", "statusButtAction:", "suffixButtAction:", "errorButtAction:"); Outlets = (excludedTitle, excludedScroll, excludedAdd, excludedRemove, indexedTitle, indexedScroll, indexedAdd, indexedRemove, _window, enableSwitch, applyButton, revertButton, statusButton, statusWindow, statusScroll, suffixRemove, suffixAdd, suffixScroll, suffixTitle, suffixField, errorButton, errorWindow, errorScroll); Super = NSObject; }; }
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    FirstResponder = {
+	Actions = (
+	    "applyButtAction:",
+	    "closeMainWindow:",
+	    "enableSwitchAction:",
+	    "excludedButtAction:",
+	    "indexedButtAction:",
+	    "errorButtAction:",
+	    "nextButtAction:",
+	    "prevButtAction:",
+	    "revertButtAction:",
+	    "runInfoPanel:",
+	    "showAllButtAction:",
+	    "statusButtAction:",
+	    "suffixButtAction:"
+	);
+	Super = NSObject;
+    };
+    MDIndexing = {
+	Actions = (
+	    "excludedButtAction:",
+	    "indexedButtAction:",
+	    "applyButtAction:",
+	    "enableSwitchAction:",
+	    "revertButtAction:",
+	    "statusButtAction:",
+	    "suffixButtAction:",
+	    "errorButtAction:"
+	);
+	Outlets = (
+	    excludedTitle,
+	    excludedScroll,
+	    excludedAdd,
+	    excludedRemove,
+	    indexedTitle,
+	    indexedScroll,
+	    indexedAdd,
+	    indexedRemove,
+	    _window,
+	    enableSwitch,
+	    applyButton,
+	    revertButton,
+	    statusButton,
+	    statusWindow,
+	    statusScroll,
+	    suffixRemove,
+	    suffixAdd,
+	    suffixScroll,
+	    suffixTitle,
+	    suffixField,
+	    errorButton,
+	    errorWindow,
+	    errorScroll
+	);
+	Super = NSObject;
+    };
+}
