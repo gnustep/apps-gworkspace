@@ -61,16 +61,16 @@ enum {
   NUM_BOOL
 };
 
-typedef enum _GMDSOperatorType
+typedef enum _GMDOperatorType
 {
-  GMDSLessThanOperatorType = 0,
-  GMDSLessThanOrEqualToOperatorType,
-  GMDSGreaterThanOperatorType,
-  GMDSGreaterThanOrEqualToOperatorType,
-  GMDSEqualToOperatorType,
-  GMDSNotEqualToOperatorType,
-  GMDSInRangeOperatorType
-} GMDSOperatorType;
+  GMDLessThanOperatorType = 0,
+  GMDLessThanOrEqualToOperatorType,
+  GMDGreaterThanOperatorType,
+  GMDGreaterThanOrEqualToOperatorType,
+  GMDEqualToOperatorType,
+  GMDNotEqualToOperatorType,
+  GMDInRangeOperatorType
+} GMDOperatorType;
 
 
 static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv)
@@ -107,13 +107,13 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
   const unsigned char *search_val = sqlite3_value_text(argv[0]);
   const unsigned char *found_val = sqlite3_value_text(argv[1]);
   int attribute_type = sqlite3_value_int(argv[2]);
-  int operator_type = sqlite3_value_int(argv[3]);
+  GMDOperatorType operator_type = sqlite3_value_int(argv[3]);
   float score = 1.0;
 
   if ((attribute_type == STRING) 
               || (attribute_type == ARRAY) 
                               || (attribute_type == DATA)) {
-    if (operator_type == GMDSEqualToOperatorType) {                          
+    if (operator_type == GMDEqualToOperatorType) {                          
       int searchlen = strlen((const char *)search_val);
       int foundlen = strlen((const char *)found_val);
     
@@ -130,7 +130,7 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
     
     int attributeType [STRING, ARRAY, NUMBER, DATE, DATA]
     
-    GMDSOperatorType operatorType
+    GMDOperatorType operatorType
   */
   
 

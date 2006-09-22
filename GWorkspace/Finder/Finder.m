@@ -40,16 +40,10 @@
 #define BORDER (4.0)
 #define HMARGIN (12.0)
 
-#define ITMSLABY (3.0)
-#define PLACESBOXY (24.0)
-#define PLACESBOXH (116.0)
-#define PLACEBUTTY (33.0)
-
 #define SELECTION 0
 #define PLACES 1
 
 #define CELLS_HEIGHT (28.0)
-#define ICON_SIZE NSMakeSize(24.0, 24.0)
 
 #define CHECKSIZE(sz) \
 if (sz.width < 0) sz.width = 0; \
@@ -1083,6 +1077,25 @@ static Finder *finder = nil;
     }
   }
 }
+
+
+/*
+#define FIX_PARTS_HEIGHT (229.0)
+
+// 38 SU
+// 119 PATHS
+// 27 SEARCITEMSLADKADLJ
+// 34 BOX
+// 45 SOTTO
+
+
+#define WINH (262.0)
+#define FMVIEWH (34.0)
+#define BORDER (4.0)
+#define HMARGIN (12.0)
+#define FIX_PARTS_HEIGHT (229.0)
+
+*/
 
 - (void)adjustMatrix
 {

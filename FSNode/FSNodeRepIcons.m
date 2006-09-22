@@ -631,27 +631,29 @@ static unsigned char darkerLUT[256] = {
   DESTROY (tumbsCache);
   tumbsCache = [NSMutableDictionary new];
   
-  tdict = [NSDictionary dictionaryWithContentsOfFile: dictPath];
-    
-  if (tdict) {
-    NSArray *keys = [tdict allKeys];
-    int i;
+  if ([fm fileExistsAtPath: dictPath]) {
+    tdict = [NSDictionary dictionaryWithContentsOfFile: dictPath];
 
-    for (i = 0; i < [keys count]; i++) {
-      NSString *key = [keys objectAtIndex: i];
-      NSString *tumbname = [tdict objectForKey: key];
-      NSString *tumbpath = [thumbnailDir stringByAppendingPathComponent: tumbname]; 
+    if (tdict) {
+      NSArray *keys = [tdict allKeys];
+      int i;
 
-      if ([fm fileExistsAtPath: tumbpath]) {
-        NSImage *tumb = [[NSImage alloc] initWithContentsOfFile: tumbpath];
-        
-        if (tumb) {
-          [tumbsCache setObject: tumb forKey: key];
-          RELEASE (tumb);
+      for (i = 0; i < [keys count]; i++) {
+        NSString *key = [keys objectAtIndex: i];
+        NSString *tumbname = [tdict objectForKey: key];
+        NSString *tumbpath = [thumbnailDir stringByAppendingPathComponent: tumbname]; 
+
+        if ([fm fileExistsAtPath: tumbpath]) {
+          NSImage *tumb = [[NSImage alloc] initWithContentsOfFile: tumbpath];
+
+          if (tumb) {
+            [tumbsCache setObject: tumb forKey: key];
+            RELEASE (tumb);
+          }
         }
       }
-    }
-  } 
+    }   
+  }
 }
 
 - (NSImage *)thumbnailForPath:(NSString *)apath

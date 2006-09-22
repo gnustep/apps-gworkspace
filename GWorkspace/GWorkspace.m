@@ -1504,21 +1504,24 @@ static GWorkspace *gworkspace = nil;
     if ([created count]) {
       NSString *dictName = @"thumbnails.plist";
       NSString *dictPath = [thumbnailDir stringByAppendingPathComponent: dictName];
-      NSDictionary *tdict = [NSDictionary dictionaryWithContentsOfFile: dictPath];
+      
+      if ([fm fileExistsAtPath: dictPath]) {
+        NSDictionary *tdict = [NSDictionary dictionaryWithContentsOfFile: dictPath];
 
-      for (i = 0; i < [created count]; i++) {
-        NSString *key = [created objectAtIndex: i];
-        NSString *dir = [key stringByDeletingLastPathComponent];
-        NSString *tumbname = [tdict objectForKey: key];
-        NSString *tumbpath = [thumbnailDir stringByAppendingPathComponent: tumbname]; 
+        for (i = 0; i < [created count]; i++) {
+          NSString *key = [created objectAtIndex: i];
+          NSString *dir = [key stringByDeletingLastPathComponent];
+          NSString *tumbname = [tdict objectForKey: key];
+          NSString *tumbpath = [thumbnailDir stringByAppendingPathComponent: tumbname]; 
 
-        if ([fm fileExistsAtPath: tumbpath]) {        
-          if ([tmbdirs containsObject: dir] == NO) {
-            [tmbdirs addObject: dir];
+          if ([fm fileExistsAtPath: tumbpath]) {        
+            if ([tmbdirs containsObject: dir] == NO) {
+              [tmbdirs addObject: dir];
+            }
           }
         }
       }
-
+      
       [vwrsManager thumbnailsDidChangeInPaths: tmbdirs];
       [dtopManager thumbnailsDidChangeInPaths: tmbdirs];
       
