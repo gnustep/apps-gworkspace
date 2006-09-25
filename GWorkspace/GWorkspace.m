@@ -1016,7 +1016,7 @@ static GWorkspace *gworkspace = nil;
 	NSString *title = [anItem title];
 
 	if ([title isEqual: NSLocalizedString(@"Show Recycler", @"")]) {
-    return ([dtopManager isActive] == NO);
+    return (([dtopManager isActive] == NO) || ([dtopManager dockActive] == NO));
 
   } else if ([title isEqual: NSLocalizedString(@"Empty Recycler", @"")]) {
     if ([dtopManager isActive] || (recyclerApp != nil)) {
