@@ -7,6 +7,7 @@
 	"Info Panel..." = "Info Panel...";
 	"Preferences..." = "Einstellungen...";
 	"Help..." = "Hilfe...";
+	"Activate context help" = "Kontexthilfe aktivieren";
 
 "File" = "Datei";
 	"Open" = "Öffnen";
@@ -377,14 +378,18 @@ which ends in "kann <the file> nicht umbenennen"
 /* Sorting order */
 "Sorting Order" = "Sortierreihenfolge";
 "Sort by" = "Sortieren nach";
-"The sort method will apply to all the folders\nthat have no sorting order specified" = "Diese Sortiermethode gilt für alle Ordner, für die\nkeine Reihenfolge festgelegt ist";
+"The method will apply to all the folders" = "Diese Methode gilt für alle Ordner, für die";
+"that have no order specified" = "keine Reihenfolge festgelegt ist";
 
-/* File Operations */
+/* File Operations*/
 "File Operations" = "Dateioperationen";
 "Status Window" = "Statusfenster";
 "Confirmation" = "Bestätigung";
 "Show status window" = "Statusfenster zeigen";
-"Check this option to show a status window\nduring the file operations" = "Setze diese Option, um ein Statusfenster\nwährend Dateioperationen zu zeigen";
+"Check this option to show a status window" = "Setze diese Option, um ein Statusfenster";
+"during the file operations" = "während Dateioperationen zu zeigen";
+"Uncheck the buttons to allow automatic confirmation" = "Deaktivieren Sie Optionen, um automatische";
+"of file operations" = "Bestätigung von Dateioperationen zu erlauben";
 
 /* Icons */
 

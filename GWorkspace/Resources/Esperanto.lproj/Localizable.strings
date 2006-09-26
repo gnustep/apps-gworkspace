@@ -1,4 +1,4 @@
-ï»¿/* Attempt of a GWorkspace translation to Esperanto
+﻿/* Attempt of a GWorkspace translation to Esperanto
  ** ingolf jandt, jan 2006
  */
 
@@ -7,8 +7,9 @@
 
 "Info" = "Info";
 	"Info Panel..." = "Informpanelo...";
-	"Preferences..." = "AgordaÄoj...";
+	"Preferences..." = "Agordaĝoj...";
 	"Help..." = "Helpo...";
+	"Activate context help" = "Aktivigu kunteksthelpon";
 
 "File" = "Dosiero";
 	"Open" = "Malfermu";
@@ -19,15 +20,15 @@
 	"New File" = "Nova dosiero";
 	"Duplicate" = "Duobligu";
 	"Destroy" = "Detruu";
-	"Move to Recycler" = "Ä´etu en rubujon";
+	"Move to Recycler" = "Ĵetu en rubujon";
 	"Empty Recycler" = "Malplenigu rubujon";
 
 "Edit" = "Redaktu";
 	"Cut" = "Eltondu";
 	"Copy" = "Kopiu";
 	"Paste" = "Enmetu";
-/*	"Delete" = "ForviÅu" 		*/
-	"Select All" = "Elektu Äion";
+/*	"Delete" = "Forviŝu" 		*/
+	"Select All" = "Elektu ĉion";
 		
 "View" = "Rigardo";
 	"Browser" = "Krozilo";
@@ -36,14 +37,14 @@
 	"Viewer behaviour" = "Montrila agmaniero";
 		"Browsing" = "Krozante";
 		"Spatial" = "Space";
-		"Show" = "Montru";
-			"Name only" = "Nur nomon";
-			"Type" = "Tipo";
-			/*"Kind" = "Tipon";*/
-			"Size" = "Grandecon";
-			"Modification date" = "ÅanÄan daton";
-			"Owner" = "Posedanton";
-			"Role" = "Rolon";
+	"Show" = "Montru";
+		"Name only" = "Nur nomon";
+		"Type" = "Tipo";
+		/*"Kind" = "Tipon";*/
+		"Size" = "Grandecon";
+		"Modification date" = "Ŝanĝan daton";
+		"Owner" = "Posedanton";
+		"Role" = "Rolon";
 	"Icon Size" = "Piktograma grandeco";
 	"Icon Position" = "Piktograma posicio";
 		"Up" = "Supre";
@@ -63,14 +64,14 @@
 	"Finder" = "Trovilo";
 	"Fiend" = "Fantomo";
 		"Show Fiend" = "Montru fantomon";
-		"Hide Fiend" = "KaÅu fantomon";
+		"Hide Fiend" = "Kaŝu fantomon";
 		"Add Layer..." = "Nova tabulo...";
 		"Remove Current Layer" = "Forigu aktualan tabulon";
 		"Rename Current Layer" = "Alinomu aktualan tabulon";
 		"Layers" = "Tabuloj";
         "Tabbed Shelf" = "Taba breto";
                 "Show Tabbed Shelf" = "Montru taban breton";
-                "Hide Tabbed Shelf" = "KaÅu taban breton";
+                "Hide Tabbed Shelf" = "Kaŝu taban breton";
                 "Remove Current Tab" = "Forigu aktualan tabon";
                 "Rename Current Tab" = "Alinomu aktualan tabon";
                 "Add Tab..." = "Nova tabo...";
@@ -79,11 +80,11 @@
 	"History" = "Historio";
                 "Show History" = "Montru historion";
                 "Go backward" = "Reen";
-                "Go forward" = "AntaÅ­en";
+                "Go forward" = "Antaŭen";
 	"Show Desktop" = "Montru tablon";
-	"Hide Desktop" = "KaÅu tablon";
+	"Hide Desktop" = "Kaŝu tablon";
 	"Show Recycler" = "Montru rubujon";
-	"Hide Recycler" = "KaÅu rubujon";
+	"Hide Recycler" = "Kaŝu rubujon";
 	"Check for disks" = "Ekzamenu je disketoj";
 
 /* depre... */
@@ -94,9 +95,9 @@
 /* ...cated */
 	
 "Windows" = "Fenestroj";
-	"Arrange in Front" = "AranÄu antaÅ­en";
+	"Arrange in Front" = "Aranĝu antaŭen";
 	"File Viewer" = "Dosiermontrilo";
-	"Miniaturize Window" = "MiniaturiÄu fenestron";
+	"Miniaturize Window" = "Miniaturiĝu fenestron";
 	"Close Window" = "Fermu fenestron";
 	"Window" = "Fenestro";
 	
@@ -104,15 +105,15 @@
 
 "Print..." = "Printu...";
 
-"Show All" = "Montru Äiujn";
+"Show All" = "Montru ĉiujn";
 
-"Hide" = "KaÅu";
+"Hide" = "Kaŝu";
 
-"Hide Others" = "KaÅu aliajn";
+"Hide Others" = "Kaŝu aliajn";
 
 "Quit" = "Finu";
 
-"Logout" = "AdiaÅ­u";	
+"Logout" = "Adiaŭu";	
 	
 	
 /* ----------------------- File Operations strings --------------------------- *\
@@ -120,36 +121,36 @@
 /* GWorkspace.m */
 
 "GNUstep Workspace Manager" = "GNUstep Workspace Manager";
-"Author: Enrico Sersale <enrico@dtedu.net>" = " AÅ­toro: Enrico SERSALE <enrico@dtedu.net>";
+"Author: Enrico Sersale <enrico@dtedu.net>" = " Aŭtoro: Enrico SERSALE <enrico@dtedu.net>";
 "See http://www.gnustep.it/enrico/gworkspace" = "Vide http://www.gnustep.it/enrico/gworkspace";
-"Released under the GNU General Public License 2.0" = "Publicita laÅ­ la GNU General Public License 2.0";
+"Released under the GNU General Public License 2.0" = "Publicita laŭ la GNU General Public License 2.0";
 
 "Quit!" = "Finu!";
-"Do you really want to quit?" = "Äu vi vere volas fini?";
+"Do you really want to quit?" = "Ĉu vi vere volas fini?";
 "No" = "Ne";
 "Yes" = "Jes";
 
-"Are you sure you want to quit\nall applications and log out now?" = "Äu vi certas ke vi volas\nfinigi Äiujn aplikojn kaj adiaÅ­i?";
-"If you do nothing, the system will log out\nautomatically in" = "Se vi faros nenion sistemo\naÅ­tomate finos post ";
+"Are you sure you want to quit\nall applications and log out now?" = "Ĉu vi certas ke vi volas\nfinigi ĉiujn aplikojn kaj adiaŭi?";
+"If you do nothing, the system will log out\nautomatically in" = "Se vi faros nenion sistemo\naŭtomate finos post ";
 "seconds." = "sekundoj.";
 
 "Error" = "Eraro";
 "You have not write permission\nfor" = "Vi ne havas skribpermeson\nje";
-"Continue" = "DaÅ­rigu";
+"Continue" = "Daŭrigu";
 
-": no such file or directory!" = ": neniu tiel dosiero aÅ­ dosierujo.";
+": no such file or directory!" = ": neniu tiel dosiero aŭ dosierujo.";
 
-"unable to contact fswatcher\nfswatcher notifications disabled!" = "Ne povas konatiÄi fswatcher\nfswacher-notifikoj malÅaltiÄas.";
-"The fswatcher connection died.\nDo you want to restart it?" = "La konekto al fswatcher mortis.\nÄu vi volas relanÄi tiun?";
-"fswatcher notifications disabled!" = "fswatcher-notifikoj malÅaltigis.";
+"unable to contact fswatcher\nfswatcher notifications disabled!" = "Ne povas konatiĝi fswatcher\nfswacher-notifikoj malŝaltiĝas.";
+"The fswatcher connection died.\nDo you want to restart it?" = "La konekto al fswatcher mortis.\nĈu vi volas relanĉi tiun?";
+"fswatcher notifications disabled!" = "fswatcher-notifikoj malŝaltigis.";
 
-"unable to contact Recycler!" = "Ne povas konatiÄi rubujon.";
-"The Recycler connection died.\nDo you want to restart it?" = "La konekto al rubujon mortis.\nÄu vi volas relanÄi tiun?";
+"unable to contact Recycler!" = "Ne povas konatiĝi rubujon.";
+"The Recycler connection died.\nDo you want to restart it?" = "La konekto al rubujon mortis.\nĈu vi volas relanĉi tiun?";
 
-"unable to contact Operation!" = "Ne povas konatiÄi Operation.";
-"The Operation connection died. File operations disabled!" = "La konekto al Operation mortis.\nDosiera operacioj malÅaltas.";
+"unable to contact Operation!" = "Ne povas konatiĝi Operation.";
+"The Operation connection died. File operations disabled!" = "La konekto al Operation mortis.\nDosiera operacioj malŝaltas.";
 
-"unable to contact ddbd." = "Ne povas konatiÄi ddbd.";
+"unable to contact ddbd." = "Ne povas konatiĝi ddbd.";
 "ddbd connection died." = "La konekto al ddbd mortis.";
 
 /* Inspector/Attributes.m */
@@ -159,7 +160,7 @@
 "Calculate" = "Kalkulu";
 "Owner:" = "Posedanto:";
 "Group:" = "Grupo:";
-"Changed" = "ÅanÄita:";
+"Changed" = "Ŝanĝita:";
 "Permissions" = "Permesoj";
 "Read" = "Legi";
 "Write" = "Skribi";
@@ -167,7 +168,7 @@
 "Owner" = "Posedanto";
 "Group" = "Grupo";
 "Others" = "Alioj";
-"also apply to files inside selection" = "Apliku ankaÅ­ en elektitaj dosieroj";
+"also apply to files inside selection" = "Apliku ankaŭ en elektitaj dosieroj";
 "Revert" = "Remetu";
 "OK" = "Konfirmu";
 
@@ -178,8 +179,8 @@
 "items" = "anoj";
 
 /* Operation/Operation.m */
-"Wait the operations to terminate!" = "Bonvolu atendi Äis la operacioj finiÄis.";
-": no such file or directory!" = ": neniu tiel dosiero aÅ­ dosierujo.";
+"Wait the operations to terminate!" = "Bonvolu atendi ĝis la operacioj finiĝis.";
+": no such file or directory!" = ": neniu tiel dosiero aŭ dosierujo.";
 
 /* GWRemote/gwsd/FileOp.m */
 "File operation error:" = "Eraro dum dosiera operacio:";
@@ -190,30 +191,30 @@
 
 "OK" = "Konfirmu";
 "Cancel" = "Rezignu";
-"Move" = "Åovu";
-"Move from: " = "Åovu el: ";
+"Move" = "Ŝovu";
+"Move from: " = "Ŝovu el: ";
 "\nto: " = "\nal: ";
 "Copy" = "Kopiu";
 "Copy from: " = "Kopiu el: ";
-"Link" = "LigiÄu";
-"Link " = "LigiÄu ";
-"Delete" = "ForviÅu";
-"Delete the selected objects?" = "Äu forviÅu la elektitajn objektojn?";
+"Link" = "Ligiĝu";
+"Link " = "Ligiĝu ";
+"Delete" = "Forviŝu";
+"Delete the selected objects?" = "Ĉu forviŝu la elektitajn objektojn?";
 "Duplicate" = "Duplikatu";
-"Duplicate the selected objects?" = "Äu duplikatu la elektitajn objektojn?";
+"Duplicate the selected objects?" = "Ĉu duplikatu la elektitajn objektojn?";
 "From:" = "El:";
 "To:" = "Al:";
 "In:" = "En:";
 "Stop" = "Haltu";
-"Pause" = "PaÅ­su";
-"Moving" = "Åovante";
+"Pause" = "Paŭsu";
+"Moving" = "Ŝovante";
 "Copying" = "Kopiante";
-"Linking" = "LigiÄante";
+"Linking" = "Ligiĝante";
 "Duplicating" = "Duplikante";
 "Destroying" = "Detruante";
-"File Operation Completed" = "Dosiera operacio plenumiÄis.";
+"File Operation Completed" = "Dosiera operacio plenumiĝis.";
 "Backgrounder connection died!" = "Fona konekto mortis.";
-"Some items have the same name;\ndo you want to sobstitute them?" = "Kelkaj anoj havas la saman nomon;\nÄu vi volas substitui ilin?";
+"Some items have the same name;\ndo you want to sobstitute them?" = "Kelkaj anoj havas la saman nomon;\nĉu vi volas substitui ilin?";
 "Error" = "Eraro";
 "File Operation Error!" = "Eraro apud dosiera operacio.";
 
@@ -222,7 +223,7 @@
 
 "You have not write permission\nfor " = "Vi ne havas skribpermeson\nje ";
 "The name " = "La nomo ";
-" is already in use!" = " jam usiÄas.";
+" is already in use!" = " jam usiĝas.";
 "Cannot rename " = "Ne povas alinomi ";
 "Invalid char in name" = "Malvalida signo en nomo";
 
@@ -243,13 +244,13 @@
 "No Contents Inspector" = "Neniu enhava inspektanto";
 "No Contents Inspector\nFor Multiple Selection" = "Neniu enhava inspektanto\nper plurobla selekto.";
 "error" = "eraro";
-"No Contents Inspectors found!" = "Neniu enhava inspektanto troviÄis.";
+"No Contents Inspectors found!" = "Neniu enhava inspektanto troviĝis.";
 
 /* FolderViewer.m */
 
 "Sort method applies to the\ncontents of the selected folder,\nNOT to its parent folder"
-  = "La ordiga metodo usiÄos\nen la selekta dosierujo,\nNE en Äia supera dosierujo.";
-"Sort by" = "Ordigu laÅ­:";
+  = "La ordiga metodo usiĝos\nen la selekta dosierujo,\nNE en ĝia supera dosierujo.";
+"Sort by" = "Ordigu laŭ:";
 "Name" = "Nomo";
 "Kind" = "Tipo";
 "Date" = "Dato";
@@ -261,12 +262,12 @@
 /* ImageViewer.m */
 
 "Image Inspector" = "Bilda inspektanto";
-"Width:" = "LarÄo:";
+"Width:" = "Larĝo:";
 "Height:" = "Alto:";
 
 /* AppViewer.m */
 
-"Open these kinds of documents:" = "Malfermu Äi tiujn dosiertipojn:";
+"Open these kinds of documents:" = "Malfermu ĉi tiujn dosiertipojn:";
 "Invalid Contents" = "Malvalida enhavo";
 "Application Inspector" = "Aplika inspektanto";
 
@@ -274,7 +275,7 @@
 
 "UNIX Permissions" = "UNIX-permesoj";
 "Access Control" = "Alira kontrolo";
-"also apply to files inside selection" = "Apliku ankaÅ­ en elektitaj dosieroj";
+"also apply to files inside selection" = "Apliku ankaŭ en elektitaj dosieroj";
 
 
 /* ToolsPanel.m */
@@ -282,16 +283,16 @@
 "Tools" = "Iloj";
 "Tools Inspector" = "Ila inspektanto";
 "No Tools Inspector" = "Neniu ila inspektanto";
-"Set Default" = "Igu aprioraÄµon";
+"Set Default" = "Igu aprioraĵon";
 
 
 /* AppsView.m */
 
 "Double-click to open selected document(s)" = "Klaku duoble per malfermi la elektitajn dosierojn";
-"Default:" = "AprioraÄµo:";
+"Default:" = "Aprioraĵo:";
 "Path:" = "Dosierindiko:";	
 "Click 'Set Default' to set default application\nfor all documents with this extension" 
-  = "Klak â¹Igu aprioraÄµonâº per difini aprioran aplikon\nje Äiuj dosieroj kun Äi tiu finaÄµo";
+  = "Klak ‹Igu aprioraĵon› per difini aprioran aplikon\nje ĉiuj dosieroj kun ĉi tiu finaĵo";
 
 
 /* PermsBox.m */
@@ -322,7 +323,7 @@
 
 /* ProcsView.m */
 
-"Applications" = "AplikaÄµoj";
+"Applications" = "Aplikaĵoj";
 "Background" = "Fono";
 
 
@@ -331,8 +332,8 @@
 /* Finder.m */
 
 "Finder" = "Trovilo";
-"Find items with names that match" = "SerÄu anoj kun egalaj nomo";
-"Find items with contents that match" = "SerÄu anoj kun egalaj enhavoj";
+"Find items with names that match" = "Serĉu anoj kun egalaj nomo";
+"Find items with contents that match" = "Serĉu anoj kun egalaj enhavoj";
 "No selection!" = "Neniu selekto.";
 "No arguments!" = "Neniuj operandoj.";
 
@@ -342,13 +343,13 @@
 /* Fiend.m */
 
 "New Layer" = "Nova tabulo";
-"A layer with this name is already present!" = "Tabulo kun Äi tiu nomo jam ekzistas.";
+"A layer with this name is already present!" = "Tabulo kun ĉi tiu nomo jam ekzistas.";
 "You can't remove the last layer!" = "Vi ne povas forigi la lastan tabulon.";
 "Remove layer" = "Forigu tabulon";
-"Are you sure that you want to remove this layer?" = "Äu vi estas certa ke vi volas forigi tiun tabulon?";
+"Are you sure that you want to remove this layer?" = "Ĉu vi estas certa ke vi volas forigi tiun tabulon?";
 "Rename Layer" = "Alinomu tabulon";
 "You can't dock multiple paths!" = "Vi ne povas doki pluroblajn dosierindikojn";
-"This object is already present in this layer!" = "Äi tiu objekto jam ekzistas sur tiu tabulo.";
+"This object is already present in this layer!" = "Ĉi tiu objekto jam ekzistas sur tiu tabulo.";
 			
 /* ----------------------- Preferences strings --------------------------- *\
 
@@ -361,12 +362,12 @@
 
 "Desktop Shelf" = "Tabula faco";	
 "Desktop Color" = "Fona farbo";
-"red" = "ruÄa";
+"red" = "ruĝa";
 "green" = "verda";
 "blue" = "blua";
 "Set Color" = "Difinu farbon";
 "Push the \"Set Image\" button\nto set your DeskTop image.\nThe image must have the same\nsize of your screen." = 
-  "Klak la butonon Â«Difinu bildonÂ»\nper difini la fonan bildon de la tabulo.\nLa bildo devas havi la saman\ngrandecon kiel via elkrano.";
+  "Klak la butonon «Difinu bildon»\nper difini la fonan bildon de la tabulo.\nLa bildo devas havi la saman\ngrandecon kiel via elkrano.";
 "Set Image" = "Difinu bildon";
 "Unset Image" = "Maldifinu bildon";
 
@@ -381,8 +382,8 @@
 	
 /* BrowserViewsPreferences.m */  
 
-"Columns Width" = "KolonlarÄo";
-"Use Default Settings" = "Uzu la aprioraÄojn";	
+"Columns Width" = "Kolonlarĝo";
+"Use Default Settings" = "Uzu la aprioraĝojn";	
 "Browser" = "Krozilo";
 	
 	
@@ -392,7 +393,7 @@
 "timeout" = "Templimigo";
 "frequency" = "Frekvenco";
 "Values will apply to the \nnew watchers from now, \nto the existing ones, after the first timeout" = 
-   "Valoroj aplikigos je\nnovaj observadaÄµoj ekde nun,\nje nunaj post la unua templimigo.";
+   "Valoroj aplikigos je\nnovaj observadaĵoj ekde nun,\nje nunaj post la unua templimigo.";
 	
 	
 /* ShelfPreferences.m */
@@ -410,35 +411,35 @@
 /* IconViewsPreferences.m */
 
 "Icons" = "Piktogramoj";
-"Thumbnails" = "AntaÅ­rigardoj";
-"use thumbnails" = "montru antaÅ­rigardojn";
-"Title Width" = "TitollarÄo";
+"Thumbnails" = "Antaŭrigardoj";
+"use thumbnails" = "montru antaŭrigardojn";
+"Title Width" = "Titollarĝo";
 "Icon View" = "Piktograma rigardo";
 
 /* Hidden Files */
 
-"Hidden Files" = "KaÅitaj dosieroj";
+"Hidden Files" = "Kaŝitaj dosieroj";
 "Files" = "Dosieroj";
 "Folders" = "Dosierujoj";
-"Hidden files" = "KaÅitaj dosieroj";
+"Hidden files" = "Kaŝitaj dosieroj";
 "Shown files" = "Montrataj dosieroj";
-"Load" = "ÅarÄu";
+"Load" = "Ŝarĝu";
 "Select and move the files to hide or to show" 
-	= "Elektu kaj movu dosierojn pro kaÅi aÅ­ montri";
-"Hidden directories" = "KaÅitaj dosierujoj";
+	= "Elektu kaj movu dosierojn pro kaŝi aŭ montri";
+"Hidden directories" = "Kaŝitaj dosierujoj";
 "add" = "aldonu";
 "remove" = "forigu";
-"Activate changes" = "Aktivigu ÅanÄojn";
+"Activate changes" = "Aktivigu ŝanĝojn";
 
 /* Desktop */
 
 "Desktop" = "Tablo";
 "General" = "Generaloj";
-"Omnipresent" = "Äie ekzistanta";
+"Omnipresent" = "Ĉie ekzistanta";
 "Show Dock" = "Montru dokon";
 "Dock position:" = "Doka posicio:";
 "Right" = "Dektstre";
-"Autohide Tabbed Shelf" = "AÅ­tomate kaÅu taban breton";
+"Autohide Tabbed Shelf" = "Aŭtomate kaŝu taban breton";
 "Back Image" = "Funda bildo";
 "center" = "centrigu";
 "fit" = "adaptigu";
@@ -449,22 +450,22 @@
 
 /* Sorting order */
 "Sorting Order" = "Ordo";
-"Sort by " = "Ordigu laÅ­";
-"The sort method will apply to all the folders"
-	= "La ordiga metodo aplikiÄos je Äiuj dosierujoj";
-"that have no sorting order specified" 
+"Sort by " = "Ordigu laŭ";
+"The method will apply to all the folders"
+	= "La ordiga metodo aplikiĝos je ĉiuj dosierujoj";
+"that have no order specified" 
 	= "kiuj ne havas propran ordon enigitan.";
 
 /* File Operations */
 
 "File Operations" = "Dosieroperacioj";
 "Status Window" = "Statusfenestro";
-"Confirmation" = "KonfirmaÄµo";
+"Confirmation" = "Konfirmaĵo";
 "Uncheck the buttons to allow automatic confirmation" 
-	= "MalÅaltu opciojn por konfirmi";
-"of file operations" = "dosieroperaciojn aÅ­tomate";
+	= "Malŝaltu opciojn por konfirmi";
+"of file operations" = "dosieroperaciojn aŭtomate";
 "Show status window" = "Montru statusfenestron";
-"Check this option to show a status window" = "Åaltu opcion por montri";
+"Check this option to show a status window" = "Ŝaltu opcion por montri";
 "during the file operations" = "statusfenestron dum dosieroperacioj";
 
 /* History */
@@ -472,7 +473,7 @@
 
 
 /* Recycler strings */
-"Recycle: " = "AlrubujiÄu: ";
+"Recycle: " = "Alrubujiĝu: ";
 "Recycler: " = "Rubujo: ";
 "Recycler" = "Rubujo";
 "the Recycler" = "la rubujo";
@@ -480,6 +481,6 @@
 "Move from the Recycler " = "Movigu el rubujo ";
 "In" = "Al";
 "Empty Recycler" = "Malplenigu rubujon";
-"Empty the Recycler?" = "Äu malplenigu la rubujon?";
-"Put Away" = "RestaÅ­rigu";
+"Empty the Recycler?" = "Ĉu malplenigu la rubujon?";
+"Put Away" = "Restaŭrigu";
 
