@@ -1,0 +1,400 @@
+{
+  GSMDItemAttributeChangeDate = {
+    type = <*I3>;
+  };
+  GSMDItemAudiences = {
+    type = <*I1>;
+    elements_type = <*I0>;
+  };
+  GSMDItemAuthors = {
+    type = <*I1>;
+    elements_type = <*I0>;
+  };
+  GSMDItemCity = {
+    type = <*I0>;
+  };
+  GSMDItemComment = {
+    type = <*I0>;
+  };
+  GSMDItemContactKeywords = {
+    type = <*I1>;
+    elements_type = <*I0>;
+  };
+  GSMDItemContentCreationDate = {
+    type = <*I3>;
+  };
+  GSMDItemContentModificationDate = {
+    type = <*I3>;
+  };
+  GSMDItemContent = {
+    type = <*I0>;
+  };
+  GSMDItemContentTypeTree = {
+    type = <*I1>;
+    elements_type = <*I0>;
+  };
+  GSMDItemContributors = {
+    type = <*I1>;
+    elements_type = <*I0>;
+  };
+  GSMDItemCopyright = {
+    type = <*I0>;
+  };
+  GSMDItemCountry = {
+    type = <*I0>;
+  };
+  GSMDItemCoverage = {
+    type = <*I0>;
+  };
+  GSMDItemCreator = {
+    type = <*I0>;
+  };
+  GSMDItemDescription = {
+    type = <*I0>;
+  };
+  GSMDItemDisplayName = {
+    type = <*I0>;
+  };
+  GSMDItemDueDate = {
+    type = <*I3>;
+  };
+  GSMDItemDurationSeconds = {
+    type = <*I2>;
+    number_type = <*I1>;  
+  };
+  GSMDItemEmailAddresses = {
+    type = <*I1>;
+    elements_type = <*I0>;
+  };
+  GSMDItemEncodingApplications = {
+    type = <*I1>;
+    elements_type = <*I0>;
+  };
+  GSMDItemFinderComment = {
+    type = <*I0>;
+  };
+  GSMDItemFonts = {
+    type = <*I1>;
+    elements_type = <*I0>;
+  };
+  GSMDItemHeadline = {
+    type = <*I0>;
+  };
+  GSMDItemIdentifier = {
+    type = <*I0>;
+  };
+  GSMDItemInstantMessageAddresses = {
+    type = <*I1>;
+    elements_type = <*I0>;
+  };
+  GSMDItemInstructions = {
+    type = <*I0>;
+  };
+  GSMDItemKeywords = {
+    type = <*I1>;
+    elements_type = <*I0>;
+  };
+  GSMDItemKind = {
+    type = <*I0>;
+  };
+  GSMDItemLanguages = {
+    type = <*I1>;
+    elements_type = <*I0>;
+  };
+  GSMDItemLastUsedDate = {
+    type = <*I3>;
+  };
+  GSMDItemNumberOfPages = {
+    type = <*I2>;
+    number_type = <*I0>;
+  };
+  GSMDItemOrganizations = {
+    type = <*I1>;
+    elements_type = <*I0>;
+  };
+  GSMDItemPageHeight = {
+    type = <*I2>;
+    number_type = <*I0>;
+  };
+  GSMDItemPageWidth = {
+    type = <*I2>;
+    number_type = <*I0>;
+  };
+  GSMDItemPhoneNumbers = {
+    type = <*I1>;
+    elements_type = <*I0>;
+  };
+  GSMDItemProjects = {
+    type = <*I1>;
+    elements_type = <*I0>;
+  };
+  GSMDItemPublishers = {
+    type = <*I1>;
+    elements_type = <*I0>;
+  };
+  GSMDItemRecipients = {
+    type = <*I1>;
+    elements_type = <*I0>;
+  };
+  GSMDItemRights = {
+    type = <*I0>;
+  };
+  GSMDItemSecurityMethod = {
+    type = <*I0>;
+  };
+  GSMDItemStarRating = {
+    type = <*I2>;
+    number_type = <*I0>;
+  };
+  GSMDItemStateOrProvince = {
+    type = <*I0>;
+  };
+  GSMDItemTextContent = {
+    type = <*I0>;
+  };
+  GSMDItemTitle = {
+    type = <*I0>;
+  };
+  GSMDItemVersion = {
+    type = <*I0>;
+  };
+  GSMDItemWhereFroms = {
+    type = <*I1>;
+    elements_type = <*I0>;
+  };
+  GSMDItemAcquisitionMake = {
+    type = <*I0>;
+  };
+  GSMDItemAcquisitionModel = {
+    type = <*I0>;
+  };
+  GSMDItemAlbum = {
+    type = <*I0>;
+  };
+  GSMDItemAperture = {
+    type = <*I2>;
+    number_type = <*I0>;
+  };
+  GSMDItemBitsPerSample = {
+    type = <*I2>;
+    number_type = <*I0>;
+  };
+  GSMDItemColorSpace = {
+    type = <*I0>;
+  };
+  GSMDItemEXIFVersion = {
+    type = <*I0>;
+  };
+  GSMDItemExposureMode = {
+    type = <*I2>;
+    number_type = <*I0>;
+  };
+  GSMDItemExposureProgram = {
+    type = <*I0>;
+  };
+  GSMDItemExposureTimeSeconds = {
+    type = <*I2>;
+    number_type = <*I1>;
+  };
+  GSMDItemExposureTimeString = {
+    type = <*I0>;
+  };
+  GSMDItemFNumber = {
+    type = <*I2>;
+    number_type = <*I1>;
+  };
+  GSMDItemFlashOnOff = {
+    type = <*I2>;
+    number_type = <*I2>;
+  };
+  GSMDItemFocalLength = {
+    type = <*I2>;
+    number_type = <*I1>;
+  };
+  GSMDItemHasAlphaChannel = {
+    type = <*I2>;
+    number_type = <*I2>;
+  };
+  GSMDItemISOSpeed = {
+    type = <*I2>;
+    number_type = <*I0>;
+  };
+  GSMDItemLayerNames = {
+    type = <*I1>;
+    elements_type = <*I0>;
+  };
+  GSMDItemMaxAperture = {
+    type = <*I2>;
+    number_type = <*I1>;
+  };
+  GSMDItemMeteringMode = {
+    type = <*I0>;
+  };
+  GSMDItemOrientation = {
+    type = <*I2>;
+    number_type = <*I0>;
+  };
+  GSMDItemPixelHeight = {
+    type = <*I2>;
+    number_type = <*I0>;
+  };
+  GSMDItemPixelWidth = {
+    type = <*I2>;
+    number_type = <*I0>;
+  };
+  GSMDItemProfileName = {
+    type = <*I0>;
+  };
+  GSMDItemRedEyeOnOff = {
+    type = <*I2>;
+    number_type = <*I2>;
+  };
+  GSMDItemResolutionHeightDPI = {
+    type = <*I2>;
+    number_type = <*I0>;
+  };
+  GSMDItemResolutionWidthDPI = {
+    type = <*I2>;
+    number_type = <*I0>;
+  };
+  GSMDItemWhiteBalance = {
+    type = <*I2>;
+    number_type = <*I0>;
+  };
+  GSMDItemAudioBitRate = {
+    type = <*I2>;
+    number_type = <*I0>;
+  };
+  GSMDItemCodecs = {
+    type = <*I1>;
+    elements_type = <*I0>;
+  };
+  GSMDItemDelivery = {
+    type = <*I0>;
+  };
+  GSMDItemMediaTypes = {
+    type = <*I1>;
+    elements_type = <*I0>;
+  };  
+  GSMDItemStreamable = {
+    type = <*I2>;
+    number_type = <*I2>;
+  };
+  GSMDItemTotalBitRate = {
+    type = <*I2>;
+    number_type = <*I0>;
+  };
+  GSMDItemVideoBitRate = {
+    type = <*I2>;
+    number_type = <*I0>;
+  };
+  GSMDItemAppleLoopDescriptors = {
+    type = <*I1>;
+    elements_type = <*I0>;
+  };
+  GSMDItemAppleLoopsKeyFilter = {
+    type = <*I0>;
+  };
+  GSMDItemAppleLoopsLoopMode = {
+    type = <*I0>;
+  };
+  GSMDItemAppleLoopsRootKey = {
+    type = <*I0>;
+  };
+  GSMDItemAudioChannelCount = {
+    type = <*I2>;
+    number_type = <*I0>;
+  };
+  GSMDItemAudioEncodingApplication = {
+    type = <*I0>;
+  };
+  GSMDItemAudioSampleRate = {
+    type = <*I2>;
+    number_type = <*I1>;
+  };
+  GSMDItemAudioTrackNumber = {
+    type = <*I2>;
+    number_type = <*I0>;
+  };
+  GSMDItemComposer = {
+    type = <*I0>;
+  };
+  GSMDItemIsGeneralMIDISequence = {
+    type = <*I2>;
+    number_type = <*I2>;
+  };
+  GSMDItemKeySignature = {
+    type = <*I0>;
+  };
+  GSMDItemLyricist = {
+    type = <*I0>;
+  };
+  GSMDItemMusicalGenre = {
+    type = <*I0>;
+  };
+  GSMDItemMusicalInstrumentCategory = {
+    type = <*I0>;
+  };
+  GSMDItemMusicalInstrumentName = {
+    type = <*I0>;
+  };
+  GSMDItemRecordingDate = {
+    type = <*I3>;
+  };
+  GSMDItemRecordingYear = {
+    type = <*I2>;
+    number_type = <*I0>;
+  };
+  GSMDItemTempo = {
+    type = <*I2>;
+    number_type = <*I0>;
+  };
+  GSMDItemTimeSignature = {
+    type = <*I0>;
+  };
+  GSMDItemFSContentChangeDate = {
+    type = <*I3>;
+  };
+  GSMDItemFSCreationDate = {
+    type = <*I3>;
+  };
+  GSMDItemFSInvisible = {
+    type = <*I2>;
+    number_type = <*I2>;
+  };
+  GSMDItemFSIsExtensionHidden = {
+    type = <*I2>;
+    number_type = <*I2>;
+  };
+  GSMDItemFSLabel = {
+    type = <*I2>;
+    number_type = <*I0>;
+  };
+  GSMDItemFSName = {
+    type = <*I0>;
+  };
+  GSMDItemFSNodeCount = {
+    type = <*I2>;
+  };
+  GSMDItemFSOwnerGroupID = {
+    type = <*I2>;
+  };
+  GSMDItemFSOwnerUserID = {
+    type = <*I2>;
+  };
+  GSMDItemFSSize = {
+    type = <*I2>;
+  };
+  GSMDItemPath = {
+    type = <*I0>;
+  };
+  GSMDItemFSName = {
+    type = <*I0>;
+  };
+  GSMDItemFSExtension = {
+    type = <*I0>;
+  };
+  GSMDItemFSType = {
+    type = <*I0>;
+  };
+}

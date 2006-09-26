@@ -7,7 +7,7 @@ GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
 #
 # subprojects
 #
-SUBPROJECTS = SQLite \
+SUBPROJECTS = MDKit \
               gmds \
 	      			Preferences \
 	      			Testing/GMDSClient

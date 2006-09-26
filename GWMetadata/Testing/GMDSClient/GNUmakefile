@@ -21,9 +21,9 @@ GMDSClient_LANGUAGES = Resources/English
 # The Objective-C source files to be compiled
 
 GMDSClient_OBJC_FILES = main.m \
-                 GMDSClient.m \
+                 GMDSClient.m 
 
-ADDITIONAL_GUI_LIBS += -lFSNode
+ADDITIONAL_GUI_LIBS += -lFSNode -lMDKit
 						 
 -include GNUmakefile.preamble
 

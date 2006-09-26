@@ -128,7 +128,7 @@ AC_CONFIG_HEADER([gmds/config.h])
 AC_CONFIG_HEADER([mdextractor/config.h])
 AC_CONFIG_HEADER([mdextractor/Extractors/extractors.h])
 
-AC_CONFIG_FILES([gmds/GNUmakefile mdextractor/GNUmakefile mdextractor/Extractors/GNUmakefile])
+AC_CONFIG_FILES([gmds/GNUmakefile mdextractor/GNUmakefile mdextractor/Extractors/GNUmakefile mdfind/GNUmakefile])
 
 AC_OUTPUT
 

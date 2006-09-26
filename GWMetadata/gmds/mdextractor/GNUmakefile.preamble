@@ -8,9 +8,9 @@ ADDITIONAL_OBJCFLAGS += -Wall
 ADDITIONAL_CFLAGS += -Wall
 
 # Additional include directories the compiler should search
-ADDITIONAL_INCLUDE_DIRS += -I../ -I../../SQLite -I../../../DBKit
+ADDITIONAL_INCLUDE_DIRS += -I../ -I../../MDKit -I../../../DBKit
 
-ADDITIONAL_LIB_DIRS += -L../../SQLite/$(GNUSTEP_OBJ_DIR)   
+ADDITIONAL_LIB_DIRS += -L../../MDKit/$(GNUSTEP_OBJ_DIR)   
 ADDITIONAL_LIB_DIRS += -L../../DBKit/$(GNUSTEP_OBJ_DIR)   
 
 # Additional LDFLAGS to pass to the linker

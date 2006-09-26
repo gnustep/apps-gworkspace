@@ -3652,7 +3652,7 @@ _ACEOF
           ac_config_headers="$ac_config_headers mdextractor/Extractors/extractors.h"
 
 
-                              ac_config_files="$ac_config_files gmds/GNUmakefile mdextractor/GNUmakefile mdextractor/Extractors/GNUmakefile"
+                                        ac_config_files="$ac_config_files gmds/GNUmakefile mdextractor/GNUmakefile mdextractor/Extractors/GNUmakefile mdfind/GNUmakefile"
 
 
 cat >confcache <<\_ACEOF
@@ -4182,6 +4182,7 @@ do
   "gmds/GNUmakefile" ) CONFIG_FILES="$CONFIG_FILES gmds/GNUmakefile" ;;
   "mdextractor/GNUmakefile" ) CONFIG_FILES="$CONFIG_FILES mdextractor/GNUmakefile" ;;
   "mdextractor/Extractors/GNUmakefile" ) CONFIG_FILES="$CONFIG_FILES mdextractor/Extractors/GNUmakefile" ;;
+  "mdfind/GNUmakefile" ) CONFIG_FILES="$CONFIG_FILES mdfind/GNUmakefile" ;;
   "gmds/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS gmds/config.h" ;;
   "mdextractor/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS mdextractor/config.h" ;;
   "mdextractor/Extractors/extractors.h" ) CONFIG_HEADERS="$CONFIG_HEADERS mdextractor/Extractors/extractors.h" ;;

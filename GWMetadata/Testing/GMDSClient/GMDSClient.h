@@ -111,26 +111,6 @@
 @end
 
 
-@interface GMDSClient (text_contents_queries)
-
-- (NSString *)tcCreateTempTable:(int)table;
-
-- (NSString *)tcTriggerForTable:(int)table;
-
-- (NSString *)tcDropTempTable:(int)table;
-                                                                  
-- (NSString *)tcInsertIntoTempTable:(int)table
-                     resultsForWord:(NSString *)word
-                      caseSensitive:(BOOL)csens
-                      rightWildcard:(BOOL)rwild
-                       leftWildcard:(BOOL)lwild
-                         searchPath:(NSString *)path;
-
-- (NSString *)tcGetResults:(int)wcount;
-
-@end
-
-
 @interface ProgrView : NSView 
 {
   NSMutableArray *images;

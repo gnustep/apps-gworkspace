@@ -24,6 +24,7 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
+#include <MDKit/MDKit.h>
 #include <FSNode/FSNodeRep.h>
 #include <FSNode/FSNTextCell.h>
 #include "GMDSClient.h"
@@ -31,8 +32,6 @@
 #define CELLS_HEIGHT (28.0)
 #define WORD_MAX 40
 #define WORD_MIN 3
-
-NSString *pathsep(void);
 
 static GMDSClient *gmdsclient = nil;
 static NSString *nibName = @"GMDSClient";
@@ -162,8 +161,8 @@ static NSString *nibName = @"GMDSClient";
   set = [NSCharacterSet illegalCharacterSet];
   [skipSet formUnionWithCharacterSet: set];
 
-  set = [NSCharacterSet punctuationCharacterSet];
-  [skipSet formUnionWithCharacterSet: set];
+//  set = [NSCharacterSet punctuationCharacterSet];
+//  [skipSet formUnionWithCharacterSet: set];
 
   set = [NSCharacterSet symbolCharacterSet];
   [skipSet formUnionWithCharacterSet: set];
@@ -171,10 +170,11 @@ static NSString *nibName = @"GMDSClient";
   set = [NSCharacterSet whitespaceAndNewlineCharacterSet];
   [skipSet formUnionWithCharacterSet: set];
 
-  set = [NSCharacterSet decimalDigitCharacterSet];
-  [skipSet formUnionWithCharacterSet: set];
+//  set = [NSCharacterSet decimalDigitCharacterSet];
+//  [skipSet formUnionWithCharacterSet: set];
 
-  set = [NSCharacterSet characterSetWithCharactersInString: @"+-=<>&@$*%#\"\'^`|~_/\\"];
+  set = [NSCharacterSet characterSetWithCharactersInString: 
+                                      @"~`@#$%^_-+\\{}:;\"\',/?"];
   [skipSet formUnionWithCharacterSet: set];  
   
   currentQuery = [NSMutableDictionary new];
@@ -185,6 +185,113 @@ static NSString *nibName = @"GMDSClient";
 {
   [win makeKeyAndOrderFront: nil];
   [self connectGMDs];
+  
+  
+  
+  
+  
+  
+  
+  
+/*  
+
+  {
+    MDKQuery *query = [MDKQuery query];
+    MDKQuery *q;
+    
+    // (
+        
+    [query appendSubqueryWithCompoundOperator: GMDCompoundOperatorNone
+                                    attribute: @"GSMDItemExposureTimeSeconds"
+                                  searchValue: @"0.9"
+                                 operatorType: GMDLessThanOperatorType    
+                                caseSensitive: NO];
+    // (a 
+         
+    q = [query appendSubqueryWithCompoundOperator: GMDOrCompoundOperator];
+
+    // (a OR (
+    
+    q = [q appendSubqueryWithCompoundOperator: GMDCompoundOperatorNone];
+
+    // (a OR ((
+    
+    [q appendSubqueryWithCompoundOperator: GMDCompoundOperatorNone
+                                attribute: @"GSMDItemExposureTimeSeconds"
+                              searchValue: @"0.9"
+                             operatorType: GMDLessThanOperatorType    
+                            caseSensitive: NO];
+
+    // (a OR ((b
+    
+    [q appendSubqueryWithCompoundOperator: GMDAndCompoundOperator
+                                attribute: @"GSMDItemExposureTimeSeconds"
+                              searchValue: @"0.01"
+                             operatorType: GMDGreaterThanOperatorType    
+                            caseSensitive: NO];    
+
+    // (a OR ((b AND c
+    
+    [q closeSubqueries];
+
+    // (a OR ((b AND c)
+    
+    q = [q parentQuery];
+    
+    q = [q appendSubqueryWithCompoundOperator: GMDAndCompoundOperator];
+    
+    // (a OR ((b AND c) AND (
+    
+    [q appendSubqueryWithCompoundOperator: GMDCompoundOperatorNone
+                                attribute: @"GSMDItemFSExtension"
+                              searchValue: @"jpeg"
+                             operatorType: GMDEqualToOperatorType    
+                            caseSensitive: NO];
+    
+    // (a OR ((b AND c) AND (d
+    
+    [q appendSubqueryWithCompoundOperator: GMDOrCompoundOperator
+                                attribute: @"GSMDItemTextContent"
+                              searchValue: @"tiff"
+                             operatorType: GMDEqualToOperatorType    
+                            caseSensitive: NO];
+    
+    // (a OR ((b AND c) AND (d OR e
+    
+    [q closeSubqueries];
+    
+    // (a OR ((b AND c) AND (d OR e)
+    
+    q = [q parentQuery];
+    [q closeSubqueries];
+
+    // (a OR ((b AND c) AND (d OR e))
+    
+    [query closeSubqueries];
+    
+    // (a OR ((b AND c) AND (d OR e)))
+    
+    [query buildQuery];
+    
+    
+    NSLog([query description]);
+    NSLog([[query sqldescription] description]);
+
+//    NSString *str = @"GSMDItemExposureTimeSeconds < 0.9 "
+//                    @"|| ( ( GSMDItemExposureTimeSeconds < 0.4 "
+//                    @"&& GSMDItemExposureTimeSeconds > 0.01 ) "
+//                    @"&& ( GSMDItemFSExtension == \"jpeg\"wc "
+//                    @"|| GSMDItemTextContent == tiff ) )";
+    
+//    query = [MDKQuery queryFromString: str];
+    
+ //   NSLog([query description]);
+ //   NSLog([[query sqldescription] description]);
+
+  }
+
+*/   
+  
 }
 
 - (BOOL)applicationShouldTerminate:(NSApplication *)app 
@@ -351,7 +458,7 @@ static NSString *nibName = @"GMDSClient";
 //
 // NSTableView delegate methods
 //
-- (void)tableViewSelectionDidChange:(NSNotification *)aNotification
+- (void)tableViewSelectionange:(NSNotification *)aNotification
 {
 }
 
@@ -385,42 +492,50 @@ static NSString *nibName = @"GMDSClient";
 - (void)prepareQuery
 {
   CREATE_AUTORELEASE_POOL(arp);
-  NSMutableArray *prequeries = [NSMutableArray array];
-  NSMutableArray *postqueries = [NSMutableArray array];
   unsigned count = [queryWords count];
-  NSString *query;
+  MDKQuery *query = [MDKQuery query];
+  NSArray *prequeries;
+  NSArray *postqueries;
+  NSString *querystr;
   int i;
+
+  [query appendSubqueryWithCompoundOperator: GMDCompoundOperatorNone
+                                  attribute: @"GSMDItemTextContent"
+                                searchValue: [queryWords objectAtIndex: 0]
+                               operatorType: GMDEqualToOperatorType    
+                              caseSensitive: YES];
     
-  for (i = 0; i < count; i++) {
-    NSString *word = [queryWords objectAtIndex: i];
-
-    [prequeries addObject: [self tcCreateTempTable: i]];
-    [prequeries addObject: [self tcTriggerForTable: i]];
-
-    [prequeries addObject: [self tcInsertIntoTempTable: i
-                                        resultsForWord: word
-                                         caseSensitive: YES
-                                         rightWildcard: YES
-                                          leftWildcard: NO
-                                            searchPath: nil]];
-
-    [postqueries addObject: [self tcDropTempTable: i]];      
+  for (i = 1; i < count; i++) {
+    [query appendSubqueryWithCompoundOperator: GMDAndCompoundOperator
+                                    attribute: @"GSMDItemTextContent"
+                                  searchValue: [queryWords objectAtIndex: i]
+                                 operatorType: GMDEqualToOperatorType    
+                                caseSensitive: YES];
   }
-
-  query = [self tcGetResults: count];
+  
+  [query closeSubqueries];
+  
+  if ([query buildQuery]) {    
+    NSDictionary *dict = [query sqldescription];
+       
+    prequeries = [dict objectForKey: @"pre"];
+    postqueries = [dict objectForKey: @"post"];
+    querystr = [dict objectForKey: @"join"];
+  }
 
   [currentQuery removeAllObjects];
   [currentQuery setObject: prequeries forKey: @"pre_queries"];
-  [currentQuery setObject: query forKey: @"query"];
+  [currentQuery setObject: querystr forKey: @"query"];
   [currentQuery setObject: postqueries forKey: @"post_queries"];
   [currentQuery setObject: [self nextQueryNumber] forKey: @"query_number"];
-
+    
   [foundObjects removeAllObjects];
   [resultsView noteNumberOfRowsChanged];
   [resultsView setNeedsDisplayInRect: [resultsView visibleRect]];
   [foundField setStringValue: @"0"];
 
-            NSLog([currentQuery description]);
+         //   NSLog([currentQuery description]);
+            NSLog([query description]);
 
   if (waitResults == NO) {
     waitResults = YES;
@@ -508,12 +623,12 @@ static NSString *nibName = @"GMDSClient";
     CREATE_AUTORELEASE_POOL(arp);
     NSScanner *scanner = [NSScanner scannerWithString: str];
     NSMutableArray *words = [NSMutableArray array];
-    
+        
     while ([scanner isAtEnd] == NO) {
       NSString *word;
-
+            
       [scanner scanUpToCharactersFromSet: skipSet intoString: &word];
-
+            
       if (word) {
         unsigned wl = [word length];
 
@@ -537,142 +652,6 @@ static NSString *nibName = @"GMDSClient";
   if (newquery) {
     [self prepareQuery];
   }
-}
-
-@end
-
-
-// GSMDItemTextContent
-
-@implementation GMDSClient (text_contents_queries)
-
-- (NSString *)tcCreateTempTable:(int)table
-{
-  return [NSString stringWithFormat: @"CREATE TEMP TABLE tab%i "
-                                     @"(id INTEGER UNIQUE ON CONFLICT IGNORE, "
-                                     @"path TEXT UNIQUE ON CONFLICT IGNORE, "
-                                     @"words_count INTEGER, "
-                                     @"score REAL); ", table];
-}
-
-- (NSString *)tcTriggerForTable:(int)table
-{
-  return [NSString stringWithFormat: @"CREATE TEMP TRIGGER tab%i_trigger "
-                                     @"BEFORE INSERT ON tab%i "
-                                     @"BEGIN "
-                                     @"UPDATE tab%i "
-                                     @"SET score = (score + new.score) "
-                                     @"WHERE id = new.id; "
-                                     @"END;", table, table, table];
-}
-
-- (NSString *)tcDropTempTable:(int)table
-{
-  return [NSString stringWithFormat: @"DROP TABLE tab%i", table];
-}
-
-- (NSString *)tcInsertIntoTempTable:(int)table
-                     resultsForWord:(NSString *)word
-                      caseSensitive:(BOOL)csens
-                      rightWildcard:(BOOL)rwild
-                       leftWildcard:(BOOL)lwild
-                         searchPath:(NSString *)path
-{
-  NSMutableString *query = [NSMutableString string];
-  NSString *operator = (csens ? @"GLOB" : @"LIKE");
-  NSString *wildcard = (csens ? @"*" : @"%%");
-  NSString *srctab, *dsttab;
-  
-  if (table == 0) {
-    srctab = @"paths";
-  } else {
-    srctab = [NSString stringWithFormat: @"tab%i", table - 1];
-  }
-  
-  dsttab = [NSString stringWithFormat: @"tab%i", table];  
-
-  [query appendFormat: @"INSERT INTO %@ (id, path, words_count, score) "
-          @"SELECT "
-          @"%@.id, "
-          @"%@.path, "
-          @"%@.words_count, "
-          @"wordScore('%@', words.word, postings.word_count, %@.words_count) "    
-          @"FROM words, %@, postings ",
-          dsttab, srctab, srctab, srctab, word, srctab, srctab];
-
-  [query appendFormat: @"WHERE words.word %@ '", operator];
-
-  if (lwild) {
-    [query appendString: wildcard];
-  } 
-  
-  [query appendString: word];
-  
-  if (rwild) {
-    [query appendString: wildcard];
-  } 
-  
-  [query appendString: @"' "];
-    
-  [query appendFormat: @"AND postings.word_id = words.id "
-                       @"AND %@.id = postings.path_id ", srctab];
-  
-  if ((path != nil) && (table == 0) && ([path isEqual: pathsep()] == NO)) {
-    NSString *minpath = [NSString stringWithFormat: @"%@%@*", path, pathsep()];
-    
-    [query appendFormat: @"AND (%@.path = '%@' OR %@.path GLOB '%@')",
-                         srctab, path, srctab, minpath];    
-  }
-  
-  [query appendString: @";"];
-  
-  return query;
-}
-
-- (NSString *)tcGetResults:(int)wcount
-{
-  NSMutableString *query = [NSMutableString string];
-  int i;
-
-  [query appendString: @"SELECT tab0.path, "];
-    
-  for (i = 0; i < wcount; i++) {
-    [query appendFormat: @"tab%i.score ", i];    
-
-    if (i == (wcount -1)) { 
-      [query appendString: @"AS total_score "]; 
-    } else { 
-      [query appendString: @"+ "]; 
-    } 
-  }
-
-  [query appendString: @"FROM "];
-
-  for (i = 0; i < wcount; i++) {
-    [query appendFormat: @"tab%i", i];    
-
-    if (i == (wcount -1)) { 
-      [query appendString: @" "]; 
-    } else { 
-      [query appendString: @", "]; 
-    } 
-  }
-
-  if (wcount > 1) {
-    [query appendString: @"WHERE "];
-
-    for (i = 1; i < wcount; i++) {
-      if (i != 1) {
-        [query appendString: @"AND "];
-      } 
-
-      [query appendFormat: @"tab0.id = tab%i.id ", i];
-    }
-  }
-
-  [query appendString: @"ORDER BY total_score DESC; "];
-
-  return query;
 }
 
 @end
@@ -752,27 +731,6 @@ static NSString *nibName = @"GMDSClient";
 }
 
 @end
-
-
-NSString *pathsep(void)
-{
-  static NSString *separator = nil;
-
-  if (separator == nil) {
-    #if defined(__MINGW32__)
-      separator = @"\\";	
-    #else
-      separator = @"/";	
-    #endif
-
-    RETAIN (separator);
-  }
-
-  return separator;
-}
-
-
-
 
 
 

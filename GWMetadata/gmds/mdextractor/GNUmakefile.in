@@ -14,7 +14,7 @@ mdextractor_OBJC_FILES = mdextractor.m \
                   updater.m 
 
 mdextractor_TOOL_LIBS += -lgnustep-gui
-mdextractor_TOOL_LIBS += -lSQLite
+mdextractor_TOOL_LIBS += -lMDKit
 mdextractor_TOOL_LIBS += -lDBKit
 
 -include GNUmakefile.preamble

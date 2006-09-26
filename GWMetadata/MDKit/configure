@@ -3158,20 +3158,20 @@ fi
 if test "$have_sqlite" = no; then
   { echo "$as_me:$LINENO: WARNING: Cannot find libsqlite3 header and/or library" >&5
 echo "$as_me: WARNING: Cannot find libsqlite3 header and/or library" >&2;}
-  echo "* The SQLite library requires the sqlite3 library"
+  echo "* The MDKit library requires the sqlite3 library"
   echo "* Use --with-sqlite-library and --with-sqlite-include"
   echo "* to specify the sqlite3 library directory if it is not"
   echo "* in the usual place(s)"
-  { { echo "$as_me:$LINENO: error: SQLite will not compile without sqlite" >&5
-echo "$as_me: error: SQLite will not compile without sqlite" >&2;}
+  { { echo "$as_me:$LINENO: error: MDKit will not compile without sqlite" >&5
+echo "$as_me: error: MDKit will not compile without sqlite" >&2;}
    { (exit 1); exit 1; }; }
 else
   if test "$sqlite_version_ok" = no; then
     { echo "$as_me:$LINENO: WARNING: Wrong libsqlite3 version" >&5
 echo "$as_me: WARNING: Wrong libsqlite3 version" >&2;}
-    echo "* The SQLite library requires libsqlite3 >= 3002006 *"
-    { { echo "$as_me:$LINENO: error: The SQLite library will not compile without sqlite" >&5
-echo "$as_me: error: The SQLite library will not compile without sqlite" >&2;}
+    echo "* The MDKit framework requires libsqlite3 >= 3002006 *"
+    { { echo "$as_me:$LINENO: error: The MDKit framework will not compile without sqlite" >&5
+echo "$as_me: error: The MDKit framework will not compile without sqlite" >&2;}
    { (exit 1); exit 1; }; }
   fi
 fi

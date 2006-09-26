@@ -74,16 +74,16 @@ fi
 
 if test "$have_sqlite" = no; then
   AC_MSG_WARN(Cannot find libsqlite3 header and/or library)
-  echo "* The SQLite library requires the sqlite3 library"
+  echo "* The MDKit library requires the sqlite3 library"
   echo "* Use --with-sqlite-library and --with-sqlite-include"
   echo "* to specify the sqlite3 library directory if it is not"
   echo "* in the usual place(s)"
-  AC_MSG_ERROR(SQLite will not compile without sqlite)
+  AC_MSG_ERROR(MDKit will not compile without sqlite)
 else
   if test "$sqlite_version_ok" = no; then
     AC_MSG_WARN(Wrong libsqlite3 version)
-    echo "* The SQLite library requires libsqlite3 >= 3002006 *"
-    AC_MSG_ERROR(The SQLite library will not compile without sqlite)
+    echo "* The MDKit framework requires libsqlite3 >= 3002006 *"
+    AC_MSG_ERROR(The MDKit framework will not compile without sqlite)
   fi
 fi
 
