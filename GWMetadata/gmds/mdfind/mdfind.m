@@ -334,7 +334,7 @@ int main(int argc, char **argv, char **env)
     }
 
 
- //   GSPrintf(stdout, @"%@\n", [[query sqldescription] description]);
+    GSPrintf(stdout, @"%@\n", [[query sqldescription] description]);
  //   GSPrintf(stdout, @"%@\n", [query description]);
 
 

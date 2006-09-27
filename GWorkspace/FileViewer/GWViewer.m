@@ -63,6 +63,7 @@
   RELEASE (watchedNodes);
   RELEASE (vwrwin);
   RELEASE (viewType);
+  RELEASE (viewerPrefs);
   RELEASE (history);
   
   [super dealloc];
@@ -77,7 +78,6 @@
   
   if (self) {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
-    NSDictionary *viewerPrefs = nil;
     NSString *prefsname;
     id defEntry;
     NSRect r;
@@ -287,9 +287,7 @@
     [self tileViews];
 
     [self scrollToBeginning];
-    
-    RELEASE (viewerPrefs);
-    
+        
     [nc addObserver: self 
            selector: @selector(columnsWidthChanged:) 
                name: @"GWBrowserColumnWidthChangedNotification"
@@ -876,6 +874,8 @@
     
       [defaults setObject: updatedprefs forKey: prefsname];
     }
+    
+    ASSIGN (viewerPrefs, [updatedprefs makeImmutableCopyOnFail: NO]);
   }
 }
 

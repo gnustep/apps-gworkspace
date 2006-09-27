@@ -715,6 +715,7 @@
 - (void)scrollViaScroller:(NSScroller *)sender
 {
   NSScrollerPart hit = [sender hitPart];
+  BOOL needsDisplay = NO;
   
   updateViewsLock++;
   skipUpdateScroller = YES;
@@ -734,6 +735,7 @@
 		case NSScrollerIncrementLine:
 		case NSScrollerIncrementPage:
       [self scrollColumnsRightBy: 1];
+      needsDisplay = YES;
 			break;
       
 		// The knob or knob slot
@@ -749,6 +751,8 @@
           [self setLastColumn: (lastColumnLoaded - currentshift)];			
 		      currentshift = 0;
         }
+        
+        needsDisplay = YES;
 			}
       break;
       
@@ -760,6 +764,7 @@
   
   updateViewsLock--;
   [self tile];
+  [self setNeedsDisplay: needsDisplay];
 } 
 
 - (void)updateScroller

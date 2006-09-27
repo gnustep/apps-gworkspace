@@ -48,6 +48,7 @@
   GWViewerScrollView *scroll;
   id nodeView;
   
+  NSDictionary *viewerPrefs;
   NSString *viewType;
   BOOL rootviewer;
   NSNumber *rootViewerKey;

@@ -53,6 +53,7 @@
   RELEASE (watchedNodes);
   RELEASE (vwrwin);
   RELEASE (viewType);
+  RELEASE (viewerPrefs);
   
 	[super dealloc];
 }
@@ -66,7 +67,6 @@
   
   if (self) {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
-    NSDictionary *viewerPrefs = nil;
     NSString *prefsname;
     id defEntry;
 
@@ -225,9 +225,7 @@
     [self updeateInfoLabels];
 
     [self scrollToBeginning];
-    
-    RELEASE (viewerPrefs);
-    
+        
     [nc addObserver: self 
            selector: @selector(columnsWidthChanged:) 
                name: @"GWBrowserColumnWidthChangedNotification"
@@ -666,6 +664,16 @@
 
     [updatedprefs setObject: viewType forKey: @"viewtype"];
 
+    defEntry = [viewerPrefs objectForKey: @"shelfheight"];
+    if (defEntry) {
+      [updatedprefs setObject: defEntry forKey: @"shelfheight"];
+    }
+
+    defEntry = [viewerPrefs objectForKey: @"shelfdicts"];
+    if (defEntry) {
+      [updatedprefs setObject: defEntry forKey: @"shelfdicts"];
+    }
+
     defEntry = [nodeView selectedPaths];
     if (defEntry) {
       [updatedprefs setObject: defEntry forKey: @"lastselection"];
@@ -694,6 +702,8 @@
     
       [defaults setObject: updatedprefs forKey: prefsname];
     }
+    
+    ASSIGN (viewerPrefs, [updatedprefs makeImmutableCopyOnFail: NO]);
   }
 }
 
