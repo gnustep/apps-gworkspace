@@ -75,7 +75,8 @@ typedef enum _GMDCompoundOperator
 
 + (id)query;
 
-+ (MDKQuery *)queryFromString:(NSString *)qstr;
++ (MDKQuery *)queryFromString:(NSString *)qstr
+                inDirectories:(NSArray *)searchdirs;
 
 - (id)initForAttribute:(NSString *)attr
            searchValue:(NSString *)value
@@ -85,6 +86,7 @@ typedef enum _GMDCompoundOperator
 - (void)setTextOperatorForCaseSensitive:(BOOL)csens;
 
 - (void)setSearchPaths:(NSArray *)srcpaths;
+- (NSArray *)searchPaths;
 
 - (void)setSrcTable:(NSString *)srctab;
 - (NSString *)srcTable;

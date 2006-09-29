@@ -44,7 +44,8 @@ enum {
 };
 
 static sqlite3 *db = NULL;
-
+static BOOL repscore = NO;
+static BOOL onlycount = NO;
 
 static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv)
 {
@@ -176,6 +177,7 @@ BOOL queryResults(NSString *qstr)
 {
   const char *qbuff = [qstr UTF8String];
   struct sqlite3_stmt *stmt;
+  int linescount = 0;
   int retry = 0;
   BOOL resok = YES;
   int err;
@@ -186,30 +188,29 @@ BOOL queryResults(NSString *qstr)
       err = sqlite3_step(stmt);
       
       if (err == SQLITE_ROW) {
-        int count = sqlite3_data_count(stmt);
+        if (onlycount == NO) {
+          int count = sqlite3_data_count(stmt);
 
-        // we use "<= count" because sqlite sends also 
-        // the id of the entry with type = 0 
-        for (i = 0; i <= count; i++) { 
-          int type = sqlite3_column_type(stmt, i);
-                    
-          if (type == SQLITE_INTEGER) {
-   //         GSPrintf(stdout, @"%i", sqlite3_column_int(stmt, i));
+          /* we use "<= count" because sqlite sends 
+             also the id of the entry with type = 0 */
+          for (i = 0; i <= count; i++) { 
+            int type = sqlite3_column_type(stmt, i);
 
-          } else if (type == SQLITE_FLOAT) {
-   //         GSPrintf(stdout, @"%f", sqlite3_column_double(stmt, i));
-            
-          } else if (type == SQLITE_TEXT) {
-            GSPrintf(stdout, @"%s", sqlite3_column_text(stmt, i));
-          
-          } else if (type == SQLITE_BLOB) {
-    //        GSPrintf(stdout, @"%s", sqlite3_column_blob(stmt, i));
+            /* mdfind reports only the path and (optionally) the score */          
+            if (type == SQLITE_TEXT) {
+              GSPrintf(stdout, @"%s", sqlite3_column_text(stmt, i));          
+
+            } else if (repscore && type == SQLITE_FLOAT) {
+              NSNumber *score = [NSNumber numberWithDouble: sqlite3_column_double(stmt, i)];
+              GSPrintf(stdout, @" %@", [score description]);          
+            }
           }
-        
-          GSPrintf(stdout, @" ");
-        }
 
-        GSPrintf(stdout, @"\n");
+          GSPrintf(stdout, @"\n");
+        
+        } else {
+          linescount++;
+        }
 
       } else {
         if (err == SQLITE_DONE) {
@@ -239,6 +240,10 @@ BOOL queryResults(NSString *qstr)
      
     sqlite3_finalize(stmt);
     
+    if (onlycount) {
+      GSPrintf(stdout, @"%i\n", linescount);
+    }
+    
   } else {
     GSPrintf(stderr, @"mdfind: %s\n", sqlite3_errmsg(db));
     resok = NO;
@@ -247,13 +252,67 @@ BOOL queryResults(NSString *qstr)
   return resok;
 }
 
+void printAttributesList()
+{
+  NSArray *attributes = [MDKQuery attributesNames];
+  unsigned i;
+  
+  for (i = 0; i < [attributes count]; i++) {
+    GSPrintf(stderr, @"%@\n", [attributes objectAtIndex: i]);
+  }
+}
+
+void printHelp()
+{
+  GSPrintf(stderr,
+      @"\n"
+      @"The 'mdfind' tool finds files matching a given query\n"
+      @"\n"
+      @"usage: mdfind [arguments] query\n"
+      @"\n"
+      @"Arguments:\n"
+      @"  -onlyin 'directory'    limits the the search to 'directory'.\n"
+      @"  -s                     reports also the score for each found path.\n"
+      @"  -c                     reports only the count of the found paths.\n"
+      @"  -a                     prints the attributes list and exit.\n"
+      @"  -h                     shows this help and exit.\n"
+      @"\n"
+      @"The query have the format: attribute  operator  value\n"
+      @"where 'attribute' is one of the attributes used by the mdextractor\n"
+      @"tool when indexing (type 'mdfind -a' for the attribute list),\n"
+      @"and 'operator' is one of the following:\n"
+      @"  ==   equal\n"
+      @"  !=   not equal\n"
+      @"  <    less than (only for numeric values and dates)\n"
+      @"  <=   less than or equal (only for numeric values and dates)\n"
+      @"  >    greater than (only for numeric values and dates)\n"
+      @"  >=   greater than or equal (only for numeric values and dates)\n"
+      @"\n"
+      @"Value comparision modifiers for string values:\n"
+      @"Appending the 'c' character to the search value (ex. \"value\"c),\n"
+      @"makes the query case insensitive.\n"      
+      @"You can use the '*' wildcard to match substrings anywhere in the\n"
+      @"search value.\n"
+      @"\n"
+      @"Combining queries:\n"
+      @"Queries can be combined using '&&' for AND and '||' for OR and\n"
+      @"parenthesis to define nesting criteria.\n"
+      @"\n"
+  );
+}
+
 
 int main(int argc, char **argv, char **env)
 {
   NSAutoreleasePool	*pool;
   NSProcessInfo *proc;
   NSArray *args;
-
+  NSString *arg; 
+  NSString *searchdir = nil;
+  unsigned count;
+  unsigned pos;
+  unsigned i;
+  
 #ifdef GS_PASS_ARGUMENTS
   [NSProcessInfo initializeWithArguments: argv count: argc environment: env];
 #endif
@@ -268,9 +327,63 @@ int main(int argc, char **argv, char **env)
   }
 
   args = [proc arguments];
+  count = [args count];
+  
+  if (count <= 1) {
+    GSPrintf(stderr, @"mdfind: too few arguments supplied!\n");
+    RELEASE (pool);
+    return 1;
+  }
+  
+  pos = 1;
+  
+  for (i = 1; i < count; i++) {
+    arg = [args objectAtIndex: i];
+  
+    if ([arg isEqual: @"-h"]) {
+      printHelp();
+      RELEASE (pool);
+      return 0;
+    
+    } else if ([arg isEqual: @"-a"]) {
+      printAttributesList();
+      RELEASE (pool);
+      return 0;            
+    
+    } else if ([arg isEqual: @"-s"]) {
+      repscore = YES; 
+      pos++;
 
-  if ([args count] > 1) {
-    NSArray *queryargs = [args subarrayWithRange: NSMakeRange(1, [args count] - 1)];
+    } else if ([arg isEqual: @"-c"]) {
+      onlycount = YES; 
+      pos++;
+      
+    } else if ([arg isEqual: @"-onlyin"]) {
+      BOOL pathok = YES;
+      
+      if (i++ < count) {
+        arg = [args objectAtIndex: i];
+        
+        if ([[NSFileManager defaultManager] fileExistsAtPath: arg]) {
+          ASSIGN (searchdir, arg);
+          pos += 2;
+        } else {
+          pathok = NO;
+        }
+      } else {
+        pathok = NO;
+      }
+      
+      if (pathok == NO) {
+        GSPrintf(stderr, @"mdfind: no search path or invalid path supplied!\n");
+        RELEASE (pool);
+        return 0;            
+      }
+    }   
+  }
+  
+  if (pos < count) {
+    NSArray *queryargs = [args subarrayWithRange: NSMakeRange(pos, count - pos)];
     NSMutableString *qstr = [[queryargs componentsJoinedByString: @" "] mutableCopy];
     NSString *dbpath;
 
@@ -312,12 +425,18 @@ int main(int argc, char **argv, char **env)
     
 	  NS_DURING
 	    {
-    MDKQuery *query = [MDKQuery queryFromString: qstr];
-    NSDictionary *dict = [query sqldescription];
-    NSArray *prequeries = [dict objectForKey: @"pre"];
-    NSArray *postqueries = [dict objectForKey: @"post"];
-    NSString *joinstr = [dict objectForKey: @"join"];    
+    NSArray *dirs = (searchdir ? [NSArray arrayWithObject: searchdir] : nil);  
+    MDKQuery *query = [MDKQuery queryFromString: qstr inDirectories: dirs];
+    NSDictionary *dict;
+    NSArray *prequeries;
+    NSArray *postqueries;
+    NSString *joinstr;    
 
+    dict = [query sqldescription];
+    prequeries = [dict objectForKey: @"pre"];
+    postqueries = [dict objectForKey: @"post"];
+    joinstr = [dict objectForKey: @"join"];    
+    
     if (prequeries && (performPreQueries(prequeries) == NO)) {
       GSPrintf(stderr, @"mdfind: error in: %@", [prequeries description]);
       closedb(db);
@@ -332,12 +451,6 @@ int main(int argc, char **argv, char **env)
     if (postqueries) {
       performPostQueries(postqueries);
     }
-
-
-    GSPrintf(stdout, @"%@\n", [[query sqldescription] description]);
- //   GSPrintf(stdout, @"%@\n", [query description]);
-
-
       }
 	  NS_HANDLER
 	    {
@@ -355,29 +468,8 @@ int main(int argc, char **argv, char **env)
 	  
     return 0;
   }
-
-/*
-  GSPrintf(stderr,
-@"The 'gspath' utility prints out various items of path/directory\n"
-@"information (one item at a time).\n"
-@"The program always takes a single argument ... selecting the information\n"
-@"to be printed.\n\n"
-@"The arguments and their meanings are -\n\n"
-@"defaults\n"
-@"  The GNUstep defaults directory of the current user\n\n"
-@"libpath\n"
-@"  A path specification which may be used to add all the standard GNUstep\n"
-@"  directories where dynamic libraries are normally stored.\n\n"
-@"  you might do 'LD_LIBRARY_PATH=$LD_LIBRARY_PATH:`gspath libpath`' to make\n"
-@"  use of this.\n\n"
-@"path\n"
-@"  A path specification which may be used to add all the standard GNUstep\n"
-@"  directories where command-line programs are normally stored.\n"
-@"  you might do 'PATH=$PATH:`gspath path`' to make use of this.\n\n"
-@"user\n"
-@"  The GNUstep home directory of the current user\n\n"
-);
-*/
+  
+  printHelp();
 
   RELEASE (pool);
 

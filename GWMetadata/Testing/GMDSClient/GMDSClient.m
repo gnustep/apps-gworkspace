@@ -283,7 +283,7 @@ static NSString *nibName = @"GMDSClient";
 //                    @"&& ( GSMDItemFSExtension == \"jpeg\"wc "
 //                    @"|| GSMDItemTextContent == tiff ) )";
     
-//    query = [MDKQuery queryFromString: str];
+//    query = [MDKQuery queryFromString: str inDirectories: nil];
     
  //   NSLog([query description]);
  //   NSLog([[query sqldescription] description]);

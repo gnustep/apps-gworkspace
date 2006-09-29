@@ -132,10 +132,13 @@ enum {
 }
 
 + (MDKQuery *)queryFromString:(NSString *)qstr
+                inDirectories:(NSArray *)searchdirs
 {
   MDKQuery *query = [self query];  
   NSMutableString *mqstr = [[qstr mutableCopy] autorelease];
   MDKQueryScanner *scanner;
+
+  [query setSearchPaths: searchdirs];
   
   [mqstr replaceOccurrencesOfString: @"(" 
                          withString: @" ( " 
@@ -215,6 +218,11 @@ enum {
   } else {
     DESTROY (searchPaths);
   }
+}
+
+- (NSArray *)searchPaths
+{
+  return searchPaths;
 }
 
 - (void)setSrcTable:(NSString *)srctab
