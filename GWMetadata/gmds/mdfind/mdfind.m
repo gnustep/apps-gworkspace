@@ -25,7 +25,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include "sqlite.h"
-#include <MDKit/MDKit.h>
+#include "MDKQuery.h"
+#include "SQLite.h"
 
 #define MAX_RETRY 1000
 

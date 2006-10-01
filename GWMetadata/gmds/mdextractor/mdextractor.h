@@ -26,7 +26,8 @@
 #define MDEXTRACTOR_H
 
 #include <Foundation/Foundation.h>
-#include "MDKit.h"
+#include "MDKQuery.h"
+#include "SQLite.h"
 #include "DBKPathsTree.h"
 
 @class GMDSIndexablePath;

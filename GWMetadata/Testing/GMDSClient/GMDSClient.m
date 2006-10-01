@@ -24,7 +24,7 @@
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
-#include <MDKit/MDKit.h>
+#include "MDKQuery.h"
 #include <FSNode/FSNodeRep.h>
 #include <FSNode/FSNTextCell.h>
 #include "GMDSClient.h"
