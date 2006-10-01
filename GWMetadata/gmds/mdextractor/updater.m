@@ -81,6 +81,7 @@ do { \
 - (void)setupUpdaters
 {
   [self setupFswatcherUpdater];
+  [self setupDDBdUpdater];
   [self setupScheduledUpdater];
 }
 
@@ -713,6 +714,115 @@ do { \
   NSLog(@"The fswatcher connection died!");
 
   [self connectFSWatcher];                
+}
+
+@end
+
+
+@implementation GMDSExtractor (ddbd_update)
+
+- (void)setupDDBdUpdater
+{
+  ddbd = nil;
+  [self connectDDBd];
+
+  [dnc addObserver: self
+          selector: @selector(userAttributeModified:)
+	            name: @"GSMetadataUserAttributeModifiedNotification"
+	          object: nil];
+}
+
+- (void)connectDDBd
+{
+  if (ddbd == nil) {
+    id dd = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
+                                                              host: @""];
+
+    if (dd) {
+      NSConnection *c = [dd connectionForProxy];
+
+	    [nc addObserver: self
+	           selector: @selector(ddbdConnectionDidDie:)
+		             name: NSConnectionDidDieNotification
+		           object: c];
+      
+      ddbd = dd;
+	    [ddbd setProtocolForProxy: @protocol(DDBdProtocol)];
+      RETAIN (ddbd);
+                                         
+      NSLog(@"ddbd connected!");
+      
+	  } else {
+	    static BOOL recursion = NO;
+	    static NSString	*cmd = nil;
+
+	    if (recursion == NO) {
+        if (cmd == nil) {
+          cmd = RETAIN ([[NSSearchPathForDirectoriesInDomains(
+                      GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
+                            stringByAppendingPathComponent: @"ddbd"]);
+		    }
+      }
+	  
+      if (recursion == NO && cmd != nil) {
+        int i;
+        
+	      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
+        DESTROY (cmd);
+        
+        for (i = 1; i <= 40; i++) {
+	        [[NSRunLoop currentRunLoop] runUntilDate:
+		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+                           
+          dd = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
+                                                                 host: @""];                  
+          if (dd) {
+            break;
+          }
+        }
+        
+	      recursion = YES;
+	      [self connectDDBd];
+	      recursion = NO;
+        
+	    } else { 
+        DESTROY (cmd);
+	      recursion = NO;
+        NSLog(@"unable to contact ddbd!");  
+      }
+	  }
+  }
+}
+
+- (void)ddbdConnectionDidDie:(NSNotification *)notif
+{
+  id connection = [notif object];
+
+  [nc removeObserver: self
+	              name: NSConnectionDidDieNotification
+	            object: connection];
+
+  NSAssert(connection == [fswatcher connectionForProxy],
+		                                  NSInternalInconsistencyException);
+  RELEASE (ddbd);
+  ddbd = nil;
+
+  NSLog(@"The ddbd connection died!");
+
+  [self connectDDBd];                
+}
+
+- (void)userAttributeModified:(NSNotification *)notif
+{
+  NSString *path = [notif object];
+  NSString *ext = [[path pathExtension] lowercaseString];
+
+  if (([excludedSuffixes containsObject: ext] == NO)
+            && (isDotFile(path) == NO)
+            && inTreeFirstPartOfPath(path, includePathsTree)
+            && (inTreeFirstPartOfPath(path, excludedPathsTree) == NO)) {
+    [self updatePath: path];
+  }
 }
 
 @end

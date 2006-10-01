@@ -226,14 +226,34 @@ static NSFileManager *fm = nil;
   return TEST_AUTORELEASE (data);
 }
 
-- (NSString *)annotationsForPath:(NSString *)path
+- (NSArray *)userMetadataForPath:(NSString *)apath
 {
-  NSString *annotations;
+  CREATE_AUTORELEASE_POOL(arp);
+  NSArray *usrdata = nil;
   
   [pathslock lock];
-  annotations = [pathsManager metadataOfType: @"MDAnnotations" forPath: path];
+  usrdata = [pathsManager metadataForPath: apath];
   [pathslock unlock];
+
+  TEST_RETAIN (usrdata);
+  RELEASE (arp);
+
+  return usrdata;
+}
+
+- (NSString *)annotationsForPath:(NSString *)path
+{
+  CREATE_AUTORELEASE_POOL(arp);
+  NSString *annotations = nil;
   
+  [pathslock lock];
+  annotations = [pathsManager metadataOfType: @"GSMDItemFinderComment" 
+                                     forPath: path];
+  [pathslock unlock];
+
+  TEST_RETAIN (annotations);
+  RELEASE (arp);
+
   return annotations;
 }
 
@@ -242,7 +262,7 @@ static NSFileManager *fm = nil;
 {
   [pathslock lock];
   [pathsManager setMetadata: annotations 
-                     ofType: @"MDAnnotations" 
+                     ofType: @"GSMDItemFinderComment" 
                     forPath: path];
   [pathslock unlock];                    
 }

@@ -255,13 +255,17 @@
     }
   }
 
+	[[NSDistributedNotificationCenter defaultCenter] 
+        postNotificationName: @"GSMetadataUserAttributeModifiedNotification"
+	 								    object: apath 
+                    userInfo: nil];
+
   RELEASE (arp);
 }
 
 - (id)metadataOfType:(NSString *)mdtype
              forPath:(NSString *)apath
 {
-  CREATE_AUTORELEASE_POOL(arp);
   DDBPath *ddbpath = [self ddbpathForPath: apath];
   id mddata = nil;
   
@@ -273,10 +277,30 @@
     mddata = [module dataWithBasePath: path];
   }
   
-  TEST_RETAIN (mddata);
-  RELEASE (arp);
+  return mddata;
+}
 
-  return TEST_AUTORELEASE (mddata);
+- (NSArray *)metadataForPath:(NSString *)apath
+{
+  NSMutableArray *alldata = [NSMutableArray array];
+  NSArray *types = [mdmodules allKeys];
+  int i;
+
+  for (i = 0; i < [types count]; i++) {
+    NSString *type = [types objectAtIndex: i];
+    id data = [self metadataOfType: type forPath: apath];
+
+    if (data) {
+      NSDictionary *dict;
+      
+      dict = [NSDictionary dictionaryWithObjectsAndKeys: type, @"key", 
+                                                         data, @"attribute",
+                                                         nil]; 
+      [alldata addObject: dict];
+    }
+  }
+  
+  return alldata;
 }
 
 - (NSTimeInterval)timestampOfPath:(NSString *)path

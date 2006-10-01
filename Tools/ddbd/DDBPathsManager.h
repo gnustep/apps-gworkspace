@@ -65,6 +65,8 @@
 - (id)metadataOfType:(NSString *)mdtype
              forPath:(NSString *)apath;
 
+- (NSArray *)metadataForPath:(NSString *)apath;
+
 - (NSTimeInterval)timestampOfPath:(NSString *)path;
 
 - (void)metadataDidChangeForPath:(DDBPath *)ddbpath;

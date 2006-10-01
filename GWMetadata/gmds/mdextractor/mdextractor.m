@@ -133,6 +133,7 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
   [nc removeObserver: self];
   
   RELEASE (indexablePaths);
+  freeTree(includePathsTree);
   freeTree(excludedPathsTree);
   RELEASE (excludedSuffixes);
   RELEASE (dbpath);
@@ -164,7 +165,12 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
     [lostPathsTimer invalidate];
   }
   TEST_RELEASE (lostPathsTimer);
-  
+
+  //
+  // ddbd_update
+  //
+  DESTROY (ddbd);
+    
   //  
   // scheduled_update  
   //
@@ -251,6 +257,8 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
     [defaults synchronize];
     
     indexablePaths = [NSMutableArray new];
+    
+    includePathsTree = newTreeWithIdentifier(@"included");
     excludedPathsTree = newTreeWithIdentifier(@"excluded");
     excludedSuffixes = [[NSMutableSet alloc] initWithCapacity: 1];
     
@@ -263,6 +271,8 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
                                                                     ancestor: nil];
         [indexablePaths addObject: indpath];
         RELEASE (indpath);
+        
+        insertComponentsOfPath(path, includePathsTree);
       }
     }
 
@@ -313,6 +323,8 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
   unsigned count;
   unsigned i;
 
+  emptyTreeWithBase(includePathsTree);
+
   for (i = 0; i < [indexable count]; i++) {
     NSString *path = [indexable objectAtIndex: i];
     GMDSIndexablePath *indpath = [self indexablePathWithPath: path];   
@@ -322,6 +334,8 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
       [indexablePaths addObject: indpath];
       RELEASE (indpath);
     }
+    
+    insertComponentsOfPath(path, includePathsTree);
   }
   
   count = [indexablePaths count];
@@ -935,10 +949,8 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
 
 #define KEY_AND_ATTRIBUTE(k, a) \
 do { \
-  NSMutableDictionary *dict = [NSMutableDictionary dictionary]; \
-  [dict setObject: k forKey: @"key"]; \
-  [dict setObject: a forKey: @"attribute"]; \
-\
+  NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys: \
+                                        k, @"key", a, @"attribute", nil]; \
   [mdattributes addObject: dict]; \
 } while (0)
     
@@ -1005,6 +1017,14 @@ do { \
   KEY_AND_ATTRIBUTE (@"GSMDItemFSName", qname);  
   KEY_AND_ATTRIBUTE (@"GSMDItemFSExtension", qext);  
   KEY_AND_ATTRIBUTE (@"GSMDItemFSType", [attributes fileType]);  
+  
+  if (ddbd) {
+    NSArray *usermdata = [ddbd userMetadataForPath: path];
+    
+    if (usermdata) {
+      [mdattributes addObjectsFromArray: usermdata];
+    }
+  }
   
   for (i = 0; i < [mdattributes count]; i++) {
     NSDictionary *dict = [mdattributes objectAtIndex: i];      

@@ -56,6 +56,13 @@
 @end
 
 
+@protocol	DDBdProtocol
+
+- (NSArray *)userMetadataForPath:(NSString *)apath;
+
+@end
+
+
 @protocol	ExtractorsProtocol
 
 - (id)initForExtractor:(id)extr;
@@ -79,6 +86,7 @@
 @interface GMDSExtractor: NSObject 
 {
   NSMutableArray *indexablePaths;
+  pcomp *includePathsTree;  
   pcomp *excludedPathsTree;  
   NSMutableSet *excludedSuffixes;  
   BOOL indexingEnabled;
@@ -112,6 +120,11 @@
   NSTimer *fswupdateTimer;
   NSTimer *lostPathsTimer;
 
+  //
+  // ddbd_update
+  //
+  id ddbd;
+  
   //
   // scheduled_update  
   //
@@ -206,6 +219,19 @@
 - (void)connectFSWatcher;
 
 - (void)fswatcherConnectionDidDie:(NSNotification *)notif;
+
+@end
+
+
+@interface GMDSExtractor (ddbd_update)
+
+- (void)setupDDBdUpdater;
+
+- (void)connectDDBd;
+
+- (void)ddbdConnectionDidDie:(NSNotification *)notif;
+
+- (void)userAttributeModified:(NSNotification *)notif;
 
 @end
 

@@ -41,6 +41,8 @@
 
 - (NSData *)directoryTreeFromPath:(NSString *)apath;
 
+- (NSArray *)userMetadataForPath:(NSString *)apath;
+
 - (NSString *)annotationsForPath:(NSString *)path;
 
 - (oneway void)setAnnotations:(NSString *)annotations
