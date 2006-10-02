@@ -85,11 +85,6 @@ int escapeChar(char *buf, NSMutableString *str);
   return extensions;
 }
 
-- (NSString *)fileType
-{
-  return NSPlainFileType;
-}
-
 - (BOOL)canExtractFromFileType:(NSString *)type
                  withExtension:(NSString *)ext
                     attributes:(NSDictionary *)attributes

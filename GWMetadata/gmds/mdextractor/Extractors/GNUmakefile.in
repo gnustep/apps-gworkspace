@@ -6,6 +6,7 @@ ifneq ($(PDFKIT),no)
 SUBPROJECTS = \
   TextExtractor \
   HtmlExtractor \
+  RtfExtractor \
   PdfExtractor \
   OpenOfficeExtractor \
   AbiwordExtractor \
@@ -15,6 +16,7 @@ else
 SUBPROJECTS = \
   TextExtractor \
   HtmlExtractor \
+  RtfExtractor \
   OpenOfficeExtractor \
   AbiwordExtractor \
   XmlExtractor \

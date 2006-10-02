@@ -1,9 +1,9 @@
-/* XmlExtractor.m
+/* RtfExtractor.m
  *  
  * Copyright (C) 2006 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@dtedu.net>
- * Date: July 2006
+ * Date: October 2006
  *
  * This file is part of the GNUstep GWorkspace application
  *
@@ -23,25 +23,17 @@
  */
 
 #include <AppKit/AppKit.h>
-#include "XmlExtractor.h"
+#include "RtfExtractor.h"
 
 #define MAXFSIZE 600000
 #define WORD_MAX 40
 
-static char *style = "<xsl:stylesheet "
-                      "xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\" "
-                      "version=\"1.0\"> "
-                      "<xsl:output method=\"text\"/> "
-                      "</xsl:stylesheet>";
-
-
-@implementation XmlExtractor
+@implementation RtfExtractor
 
 - (void)dealloc
 {
   RELEASE (extensions);
   RELEASE (skipSet);
-  RELEASE (stylesheet);
 
 	[super dealloc];
 }
@@ -51,15 +43,7 @@ static char *style = "<xsl:stylesheet "
   self = [super init];
   
   if (self) {    
-    NSData *data = [NSData dataWithBytes: style length: strlen(style)];
-    GSXMLParser *parser = [GSXMLParser parserWithData: data];
-
-    [parser parse];
-    ASSIGN (stylesheet, [parser document]);
-    
-    fm = [NSFileManager defaultManager];
-    
-    ASSIGN (extensions, ([NSArray arrayWithObjects: @"xml", nil]));
+    ASSIGN (extensions, ([NSArray arrayWithObjects: @"rtf", @"rtfd", nil]));
 
     skipSet = [NSMutableCharacterSet new];    
     [skipSet formUnionWithCharacterSet: [NSCharacterSet controlCharacterSet]];
@@ -88,6 +72,8 @@ static char *style = "<xsl:stylesheet "
 {
   if (testdata && ([attributes fileSize] < MAXFSIZE)) {
     return ([extensions containsObject: ext]);  
+  } else if ([attributes fileType] == NSFileTypeDirectory) {
+    return ([ext isEqual: @"rtfd"]); 
   }
   
   return NO;
@@ -99,56 +85,82 @@ static char *style = "<xsl:stylesheet "
 {
   CREATE_AUTORELEASE_POOL(arp);
   NSMutableDictionary *mddict = [NSMutableDictionary dictionary];  
-  GSXMLParser *parser = [GSXMLParser parserWithContentsOfFile: path];
-  GSXMLDocument *doc = nil;
+  NSString *ext = [[path pathExtension] lowercaseString]; 
+  NSAttributedString *attrstr = nil;
+  NSDictionary *attrsdict = nil;
   NSString *contents = nil;
   BOOL success = NO;
   
-  if (parser && [parser parse]) { 
-    doc = [[parser document] xsltTransform: stylesheet];
-    
-    contents = [doc description];
+  NS_DURING
+    {
+  if ([ext isEqualToString: @"rtf"]) {
+    NSData *data = [NSData dataWithContentsOfFile: path];
 
-    if (contents && [contents length]) {
-      NSScanner *scanner = [NSScanner scannerWithString: contents];
-      SEL scanSel = @selector(scanUpToCharactersFromSet:intoString:);
-      IMP scanImp = [scanner methodForSelector: scanSel];
-      NSMutableDictionary *wordsDict = [NSMutableDictionary dictionary];
-      NSCountedSet *wordset = [[NSCountedSet alloc] initWithCapacity: 1];
-      unsigned long wcount = 0;
-      NSString *word;
+    attrstr = [[NSAttributedString alloc] initWithRTF: data
+						                       documentAttributes: &attrsdict];
 
-      if ([scanner scanString: @"<?xml" intoString: NULL]) {
-        if ([scanner scanUpToString: @"?>" intoString: NULL]) {
-          [scanner scanString: @"?>" intoString: NULL];
-        }
-      }
+  } else if ([ext isEqualToString: @"rtfd"]) {
+    if ([attributes fileType] == NSFileTypeRegular) {
+      NSData *data = [NSData dataWithContentsOfFile: path];
 
-      [scanner setCharactersToBeSkipped: skipSet];
+      attrstr = [[NSAttributedString alloc] initWithRTF: data
+						                         documentAttributes: &attrsdict];
 
-      while ([scanner isAtEnd] == NO) {        
-        (*scanImp)(scanner, scanSel, skipSet, &word);
+    } else if ([attributes fileType] == NSFileTypeDirectory) {
+      NSFileWrapper *wrapper = [[NSFileWrapper alloc] initWithPath: path];
 
-        if (word) {
-          unsigned wl = [word length];
-
-          if ((wl > 3) && (wl < WORD_MAX)) { 
-            [wordset addObject: word];
-          }
-
-          wcount++;
-        }
-      }
-
-      [wordsDict setObject: wordset forKey: @"wset"];
-      RELEASE (wordset);
-      [wordsDict setObject: [NSNumber numberWithUnsignedLong: wcount] 
-                    forKey: @"wcount"];
-
-      [mddict setObject: wordsDict forKey: @"words"];
+      attrstr = [[NSAttributedString alloc]initWithRTFDFileWrapper: wrapper
+                                                documentAttributes: &attrsdict];
+      RELEASE (wrapper);
     }
   }
-            
+    }
+  NS_HANDLER
+    {
+  RELEASE (arp);
+  return NO;
+    }
+  NS_ENDHANDLER
+ 
+  if (attrstr == nil) {
+    RELEASE (arp);
+    return NO;
+  } 
+ 
+  contents = [attrstr string]; 
+
+  if (contents && [contents length]) {
+    NSScanner *scanner = [NSScanner scannerWithString: contents];
+    SEL scanSel = @selector(scanUpToCharactersFromSet:intoString:);
+    IMP scanImp = [scanner methodForSelector: scanSel];
+    NSMutableDictionary *wordsDict = [NSMutableDictionary dictionary];
+    NSCountedSet *wordset = [[[NSCountedSet alloc] initWithCapacity: 1] autorelease];
+    unsigned long wcount = 0;
+    NSString *word;
+
+    [scanner setCharactersToBeSkipped: skipSet];
+
+    while ([scanner isAtEnd] == NO) {        
+      (*scanImp)(scanner, scanSel, skipSet, &word);
+
+      if (word) {
+        unsigned wl = [word length];
+
+        if ((wl > 3) && (wl < WORD_MAX)) { 
+          [wordset addObject: word];
+        }
+
+        wcount++;
+      }
+    }
+
+    [wordsDict setObject: wordset forKey: @"wset"];
+    [wordsDict setObject: [NSNumber numberWithUnsignedLong: wcount] 
+                  forKey: @"wcount"];
+
+    [mddict setObject: wordsDict forKey: @"words"];
+  }
+              
   success = [extractor setMetadata: mddict forPath: path withID: path_id];  
   
   RELEASE (arp);
@@ -157,5 +169,3 @@ static char *style = "<xsl:stylesheet "
 }
 
 @end
-
-

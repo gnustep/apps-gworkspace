@@ -1603,6 +1603,7 @@ int main(int argc, char** argv)
 
     if (extractor != nil) {
 	    CREATE_AUTORELEASE_POOL (pool);
+      [NSApplication sharedApplication];
       [[NSRunLoop currentRunLoop] run];
   	  RELEASE (pool);
     }

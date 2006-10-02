@@ -1,9 +1,9 @@
-/* XmlExtractor.h
+/* RtfExtractor.h
  *  
  * Copyright (C) 2006 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@dtedu.net>
- * Date: July 2006
+ * Date: October 2006
  *
  * This file is part of the GNUstep GWorkspace application
  *
@@ -22,11 +22,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef XML_EXTRACTOR_H
-#define XML_EXTRACTOR_H
+#ifndef RTF_EXTRACTOR_H
+#define RTF_EXTRACTOR_H
 
 #include <Foundation/Foundation.h>
-#include <GNUstepBase/GSXML.h>
 
 @protocol	GMDSExtractorProtocol
 
@@ -55,16 +54,13 @@
 @end
 
 
-@interface XmlExtractor: NSObject <ExtractorsProtocol>
+@interface RtfExtractor: NSObject <ExtractorsProtocol>
 {
   NSArray *extensions;
-  GSXMLDocument *stylesheet;  
   NSMutableCharacterSet *skipSet;  
   id extractor;
-  
-  NSFileManager *fm;
 }
 
 @end
 
-#endif // XML_EXTRACTOR_H
+#endif // RTF_EXTRACTOR_H

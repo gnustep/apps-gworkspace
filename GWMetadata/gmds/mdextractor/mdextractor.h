@@ -68,8 +68,6 @@
 
 - (id)initForExtractor:(id)extr;
 
-- (NSString *)fileType;
-
 - (NSArray *)pathExtensions;
 
 - (BOOL)canExtractFromFileType:(NSString *)type

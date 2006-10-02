@@ -51,11 +51,6 @@
   return extensions;
 }
 
-- (NSString *)fileType
-{
-  return NSPlainFileType;
-}
-
 - (BOOL)canExtractFromFileType:(NSString *)type
                  withExtension:(NSString *)ext
                     attributes:(NSDictionary *)attributes

@@ -28,19 +28,6 @@
 #include <Foundation/Foundation.h>
 #include <GNUstepBase/GSXML.h>
 
-@protocol	StemmerProtocol
-
-- (BOOL)setLanguage:(NSString *)lang;
-
-- (NSString *)language;
-
-- (NSArray *)stopWords;
-
-- (NSString *)stemWord:(NSString *)word;
-
-@end
-
-
 @protocol	GMDSExtractorProtocol
 
 - (BOOL)setMetadata:(NSDictionary *)mddict
@@ -53,8 +40,6 @@
 @protocol	ExtractorsProtocol
 
 - (id)initForExtractor:(id)extr;
-
-- (NSString *)fileType;
 
 - (NSArray *)pathExtensions;
 
