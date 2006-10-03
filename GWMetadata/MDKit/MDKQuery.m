@@ -126,6 +126,17 @@ enum {
   return attrInfo;
 }
 
++ (NSString *)attributeDescription:(NSString *)attribute
+{
+  NSDictionary *dict = [attrInfo objectForKey: attribute];
+  
+  if (dict) {
+    return [dict objectForKey: @"description"];
+  }
+  
+  return nil;
+}
+
 + (id)query
 {
   return AUTORELEASE ([MDKQuery new]);

@@ -71,7 +71,7 @@
   ResetJpgfile();
 
   if (ReadJpegFile([path UTF8String], imageInfo)) {
-    [imageInfo setObject: @"public.jpeg" forKey: @"GSMDItemContentType"];
+ //   [imageInfo setObject: @"public.jpeg" forKey: @"GSMDItemContentType"];
     [mddict setObject: imageInfo forKey: @"attributes"];
     DiscardData();
 

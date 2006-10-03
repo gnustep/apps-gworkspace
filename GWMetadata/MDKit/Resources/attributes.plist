@@ -1,400 +1,387 @@
 {
   GSMDItemAttributeChangeDate = {
     type = <*I3>;
+    description = "Date and last change metadata change. (NSDate)";
   };
   GSMDItemAudiences = {
     type = <*I1>;
     elements_type = <*I0>;
+    description = "Audience for which the document is intended. (NSArray of NSString elements)";
   };
   GSMDItemAuthors = {
     type = <*I1>;
     elements_type = <*I0>;
+    description = "Authors of the document or application. (NSArray of NSString elements)";
   };
   GSMDItemCity = {
     type = <*I0>;
+    description = "City of origin. (NSString)";
   };
   GSMDItemComment = {
     type = <*I0>;
+    description = "Comment related to the document. (NSString)";
   };
   GSMDItemContactKeywords = {
     type = <*I1>;
     elements_type = <*I0>;
+    description = "Contacts associated with the document. (NSArray of NSString elements)";
   };
   GSMDItemContentCreationDate = {
     type = <*I3>;
+    description = "Content creation Date (NSDate)";
   };
   GSMDItemContentModificationDate = {
     type = <*I3>;
-  };
-  GSMDItemContent = {
-    type = <*I0>;
-  };
-  GSMDItemContentTypeTree = {
-    type = <*I1>;
-    elements_type = <*I0>;
+    description = "Content modification Date (NSDate)";
   };
   GSMDItemContributors = {
     type = <*I1>;
     elements_type = <*I0>;
+    description = "Contributors to the contents of the document. (NSArray of NSString elements)";
   };
   GSMDItemCopyright = {
     type = <*I0>;
+    description = "Owner of the copyright of the document.";
   };
   GSMDItemCountry = {
     type = <*I0>;
-  };
-  GSMDItemCoverage = {
-    type = <*I0>;
+    description = "Full name of the country where the item has been created. (NSString)";
   };
   GSMDItemCreator = {
     type = <*I0>;
+    description = "Application used to create the document. (NSString)";
   };
   GSMDItemDescription = {
     type = <*I0>;
-  };
-  GSMDItemDisplayName = {
-    type = <*I0>;
-  };
-  GSMDItemDueDate = {
-    type = <*I3>;
+    description = "Description of the document. (NSString)";
   };
   GSMDItemDurationSeconds = {
     type = <*I2>;
     number_type = <*I1>;  
+    description = "Float value representing the duration in seconds of the content. (NSNumber)";
   };
   GSMDItemEmailAddresses = {
     type = <*I1>;
     elements_type = <*I0>;
+    description = "Email addresses related to the document. (NSArray of NSString elements)";
   };
   GSMDItemEncodingApplications = {
     type = <*I1>;
     elements_type = <*I0>;
+    description = "Name of the application used to convert the document to its actual form. (NSString)";
   };
   GSMDItemFinderComment = {
     type = <*I0>;
+    description = "File Annotations of the document. (NSString)";
   };
   GSMDItemFonts = {
     type = <*I1>;
     elements_type = <*I0>;
-  };
-  GSMDItemHeadline = {
-    type = <*I0>;
-  };
-  GSMDItemIdentifier = {
-    type = <*I0>;
-  };
-  GSMDItemInstantMessageAddresses = {
-    type = <*I1>;
-    elements_type = <*I0>;
-  };
-  GSMDItemInstructions = {
-    type = <*I0>;
+    description = "Fonts used in the document. (NSArray of NSString elements)";
   };
   GSMDItemKeywords = {
     type = <*I1>;
     elements_type = <*I0>;
-  };
-  GSMDItemKind = {
-    type = <*I0>;
+    description = "Keywords associated with the document. (NSArray of NSString elements)";
   };
   GSMDItemLanguages = {
     type = <*I1>;
     elements_type = <*I0>;
-  };
-  GSMDItemLastUsedDate = {
-    type = <*I3>;
+    description = "Languages used by the item. (NSArray of NSString elements)";
   };
   GSMDItemNumberOfPages = {
     type = <*I2>;
     number_type = <*I0>;
-  };
-  GSMDItemOrganizations = {
-    type = <*I1>;
-    elements_type = <*I0>;
+    description = "Number of pages in the document. (NSNumber)";
   };
   GSMDItemPageHeight = {
     type = <*I2>;
     number_type = <*I0>;
+    description = "Height in points of the document page. (NSNumber)";
   };
   GSMDItemPageWidth = {
     type = <*I2>;
     number_type = <*I0>;
+    description = "Width in points of the document page. (NSNumber)";
   };
   GSMDItemPhoneNumbers = {
     type = <*I1>;
     elements_type = <*I0>;
-  };
-  GSMDItemProjects = {
-    type = <*I1>;
-    elements_type = <*I0>;
+    description = "Phone numbers related to this document. (NSArray of NSString elements)";
   };
   GSMDItemPublishers = {
     type = <*I1>;
     elements_type = <*I0>;
-  };
-  GSMDItemRecipients = {
-    type = <*I1>;
-    elements_type = <*I0>;
-  };
-  GSMDItemRights = {
-    type = <*I0>;
-  };
-  GSMDItemSecurityMethod = {
-    type = <*I0>;
-  };
-  GSMDItemStarRating = {
-    type = <*I2>;
-    number_type = <*I0>;
-  };
-  GSMDItemStateOrProvince = {
-    type = <*I0>;
+    description = "Publishers of the document. (NSArray of NSString elements)";
   };
   GSMDItemTextContent = {
     type = <*I0>;
+    description = "Text content of the document. (This value can't be directly read but the attribute name can be used in queries)";
   };
   GSMDItemTitle = {
     type = <*I0>;
+    description = "Title of the document. (NSString)";
   };
   GSMDItemVersion = {
     type = <*I0>;
-  };
-  GSMDItemWhereFroms = {
-    type = <*I1>;
-    elements_type = <*I0>;
+    description = "Version number of the document. (NSString)";
   };
   GSMDItemAcquisitionMake = {
     type = <*I0>;
+    description = "Manufacturer of the device used to acquire the document. (NSString)";
   };
   GSMDItemAcquisitionModel = {
     type = <*I0>;
+    description = "Model of the device used to acquire the document. (NSString)";
   };
   GSMDItemAlbum = {
     type = <*I0>;
+    description = "Name of the collection containing this document. (NSString)";
   };
   GSMDItemAperture = {
     type = <*I2>;
     number_type = <*I0>;
+    description = "APEX value representing the aperture used to aquire the document contents. (NSNumber)";
   };
   GSMDItemBitsPerSample = {
     type = <*I2>;
     number_type = <*I0>;
+    description = "Bits per sample. (NSNumber)";
   };
   GSMDItemColorSpace = {
     type = <*I0>;
+    description = "Color space model. (NSString)";
   };
   GSMDItemEXIFVersion = {
     type = <*I0>;
+    description = "EXIF version. (NSString)";
   };
   GSMDItemExposureMode = {
     type = <*I2>;
     number_type = <*I0>;
+    description = "Exposure mode used to acquire the document contents. (NSNumber)";
   };
   GSMDItemExposureProgram = {
     type = <*I0>;
+    description = "Name of the exposure program used to acquire the contents. (NSString)";
   };
   GSMDItemExposureTimeSeconds = {
     type = <*I2>;
     number_type = <*I1>;
+    description = "Float value representing the time in seconds used to capture the document contents.(NSNumber)";
   };
   GSMDItemExposureTimeString = {
     type = <*I0>;
+    description = "Description of the date-time when the camera has created the document contents. (NSString)";
   };
   GSMDItemFNumber = {
     type = <*I2>;
     number_type = <*I1>;
+    description = "F-number of the lens used acquiring the document contents. (NSNumber)";
   };
   GSMDItemFlashOnOff = {
     type = <*I2>;
     number_type = <*I2>;
+    description = "Bool value representing if a flash was used aquiring the contents. (NSNumber)";
   };
   GSMDItemFocalLength = {
     type = <*I2>;
     number_type = <*I1>;
+    description = "Focal length in millimeters of the lens used acquiring the document contents. (NSNumber)";
   };
   GSMDItemHasAlphaChannel = {
     type = <*I2>;
     number_type = <*I2>;
+    description = "Bool value representing if the image has an alpha channel. (NSNumber)";
   };
   GSMDItemISOSpeed = {
     type = <*I2>;
     number_type = <*I0>;
-  };
-  GSMDItemLayerNames = {
-    type = <*I1>;
-    elements_type = <*I0>;
+    description = "ISO speed used to acquire the document contents. (NSNumber)";
   };
   GSMDItemMaxAperture = {
     type = <*I2>;
     number_type = <*I1>;
+    description = "Smallest F number of the lens. (NSNumber)";
   };
   GSMDItemMeteringMode = {
     type = <*I0>;
+    description = "Metering mode used to acquire the document contents. (NSString)";
   };
   GSMDItemOrientation = {
     type = <*I2>;
     number_type = <*I0>;
+    description = "Orientation of the document. (NSNumber)";
   };
   GSMDItemPixelHeight = {
     type = <*I2>;
     number_type = <*I0>;
+    description = "Height, in pixels, of the contents. (NSNumber)";
   };
   GSMDItemPixelWidth = {
     type = <*I2>;
     number_type = <*I0>;
-  };
-  GSMDItemProfileName = {
-    type = <*I0>;
+    description = "Width, in pixels, of the contents. (NSNumber)";
   };
   GSMDItemRedEyeOnOff = {
     type = <*I2>;
     number_type = <*I2>;
+    description = "Whether red-eye reduction was used to acquire the document contents. (NSNumber)";
   };
   GSMDItemResolutionHeightDPI = {
     type = <*I2>;
     number_type = <*I0>;
+    description = "Resolution height of the document. (NSNumber)";
   };
   GSMDItemResolutionWidthDPI = {
     type = <*I2>;
     number_type = <*I0>;
+    description = "Resolution width of the document. (NSNumber)";
   };
   GSMDItemWhiteBalance = {
     type = <*I2>;
     number_type = <*I0>;
+    description = "White balance settings used when the contents was acquired. (NSNumber)";
   };
   GSMDItemAudioBitRate = {
     type = <*I2>;
     number_type = <*I0>;
+    description = "Bit rate of the audio. (NSNumber)";
   };
   GSMDItemCodecs = {
     type = <*I1>;
     elements_type = <*I0>;
+    description = "Codec used to encode or decode the document. (NSArray of NSString elements)";
   };
   GSMDItemDelivery = {
     type = <*I0>;
+    description = "Streaming media deliver type (NSString)";
   };
   GSMDItemMediaTypes = {
     type = <*I1>;
     elements_type = <*I0>;
+    description = "Media types of the document. (NSArray of NSString elements)";
   };  
   GSMDItemStreamable = {
     type = <*I2>;
     number_type = <*I2>;
+    description = "Whether the document contents are streamable. (NSNumber)";
   };
   GSMDItemTotalBitRate = {
     type = <*I2>;
     number_type = <*I0>;
+    description = "Total bit rate (audio and video) of the document. (NSNumber)";
   };
   GSMDItemVideoBitRate = {
     type = <*I2>;
     number_type = <*I0>;
-  };
-  GSMDItemAppleLoopDescriptors = {
-    type = <*I1>;
-    elements_type = <*I0>;
-  };
-  GSMDItemAppleLoopsKeyFilter = {
-    type = <*I0>;
-  };
-  GSMDItemAppleLoopsLoopMode = {
-    type = <*I0>;
-  };
-  GSMDItemAppleLoopsRootKey = {
-    type = <*I0>;
+    description = "Videobit rate of the document. (NSNumber)";
   };
   GSMDItemAudioChannelCount = {
     type = <*I2>;
     number_type = <*I0>;
+    description = "Number of audio channels in the document. (NSNumber)";
   };
   GSMDItemAudioEncodingApplication = {
     type = <*I0>;
+    description = "Application used to encode the audio document. (NSString)";
   };
   GSMDItemAudioSampleRate = {
     type = <*I2>;
     number_type = <*I1>;
+    description = "Float value in hz representing the sample rate of the document. (NSNumber)";
   };
   GSMDItemAudioTrackNumber = {
     type = <*I2>;
     number_type = <*I0>;
+    description = "Number of the document if it is part of an album. (NSNumber)";
   };
   GSMDItemComposer = {
     type = <*I0>;
+    description = "Composer of the music in the document. (NSString)";
   };
   GSMDItemIsGeneralMIDISequence = {
     type = <*I2>;
     number_type = <*I2>;
+    description = "Whether the document is set up for use with a General Midi device. (NSNumber)";
   };
   GSMDItemKeySignature = {
     type = <*I0>;
+    description = "Musical key of the music in the document. (NSString)";
   };
   GSMDItemLyricist = {
     type = <*I0>;
+    description = "Lyricist of the music in the document. (NSString)";
   };
   GSMDItemMusicalGenre = {
     type = <*I0>;
-  };
-  GSMDItemMusicalInstrumentCategory = {
-    type = <*I0>;
-  };
-  GSMDItemMusicalInstrumentName = {
-    type = <*I0>;
+    description = "Musical genre of the music in the document. (NSString)";
   };
   GSMDItemRecordingDate = {
     type = <*I3>;
+    description = "Recording date of the music in the document. (NSDate)";
   };
   GSMDItemRecordingYear = {
     type = <*I2>;
     number_type = <*I0>;
+    description = "Recording year of the music in the document.(NSNumber)";
   };
   GSMDItemTempo = {
     type = <*I2>;
     number_type = <*I0>;
+    description = "Tempo of the music in the document. (NSNumber)";
   };
   GSMDItemTimeSignature = {
     type = <*I0>;
+    description = "Time signature of the music in the document. (NSString)";
   };
   GSMDItemFSContentChangeDate = {
     type = <*I3>;
+    description = "Date of the last change of the document content. (NSDate)";
   };
   GSMDItemFSCreationDate = {
     type = <*I3>;
+    description = "Creation date of the document. (NSDate)";
   };
   GSMDItemFSInvisible = {
     type = <*I2>;
     number_type = <*I2>;
-  };
-  GSMDItemFSIsExtensionHidden = {
-    type = <*I2>;
-    number_type = <*I2>;
-  };
-  GSMDItemFSLabel = {
-    type = <*I2>;
-    number_type = <*I0>;
-  };
-  GSMDItemFSName = {
-    type = <*I0>;
+    description = "Whether the document is invisible. (NSNumber)";
   };
   GSMDItemFSNodeCount = {
     type = <*I2>;
+    number_type = <*I0>;
+    description = "Number of files in a directory (NSNumber)";
   };
   GSMDItemFSOwnerGroupID = {
     type = <*I2>;
+    number_type = <*I0>;
+    description = "Owner group ID of the file. (NSNumber)";
   };
   GSMDItemFSOwnerUserID = {
     type = <*I2>;
+    number_type = <*I0>;
+    description = "Owner user ID of the file. (NSNumber)";
   };
   GSMDItemFSSize = {
     type = <*I2>;
+    number_type = <*I0>;
+    description = "Size in bytes of the file. (NSNumber)";
   };
   GSMDItemPath = {
     type = <*I0>;
+    description = "Full path of the document. (NSString)";
   };
   GSMDItemFSName = {
     type = <*I0>;
+    description = "Name of the document. (NSString)";
   };
   GSMDItemFSExtension = {
     type = <*I0>;
+    description = "Path extension of the document. (NSString)";
   };
   GSMDItemFSType = {
     type = <*I0>;
+    description = "File type of the document. (NSString)";
   };
 }

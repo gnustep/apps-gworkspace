@@ -263,6 +263,17 @@ void printAttributesList()
   }
 }
 
+void printAttributeDescription(NSString *attribute)
+{
+  NSString *description = [MDKQuery attributeDescription: attribute];
+
+  if (description) {
+    GSPrintf(stderr, @"%@\n", description);
+  } else {
+    GSPrintf(stderr, @"%@: invalid attribute name!\n", attribute);
+  }
+}
+
 void printHelp()
 {
   GSPrintf(stderr,
@@ -275,7 +286,8 @@ void printHelp()
       @"  -onlyin 'directory'    limits the the search to 'directory'.\n"
       @"  -s                     reports also the score for each found path.\n"
       @"  -c                     reports only the count of the found paths.\n"
-      @"  -a                     prints the attributes list and exit.\n"
+      @"  -a [attribute]         if 'attribute' is supplied, prints the attribute\n"
+      @"                         description, else prints the attributes list.\n"
       @"  -h                     shows this help and exit.\n"
       @"\n"
       @"The query have the format: attribute  operator  value\n"
@@ -347,7 +359,12 @@ int main(int argc, char **argv, char **env)
       return 0;
     
     } else if ([arg isEqual: @"-a"]) {
-      printAttributesList();
+      if ((i + 1) < count) {
+        printAttributeDescription([args objectAtIndex: (i + 1)]);
+      } else {
+        printAttributesList();
+      }
+      
       RELEASE (pool);
       return 0;            
     

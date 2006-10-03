@@ -73,6 +73,8 @@ typedef enum _GMDCompoundOperator
 
 + (NSDictionary *)attributesInfo;
 
++ (NSString *)attributeDescription:(NSString *)attribute;
+
 + (id)query;
 
 + (MDKQuery *)queryFromString:(NSString *)qstr

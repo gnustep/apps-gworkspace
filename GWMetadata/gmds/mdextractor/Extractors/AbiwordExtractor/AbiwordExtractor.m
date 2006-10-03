@@ -215,7 +215,7 @@ static char *style = "<xsl:stylesheet "
                          forKey: @"GSMDItemLanguages"];
 
         } else if ([attrname isEqual: @"dc.format"]) {
-          [attributes setObject: ndcont forKey: @"GSMDItemContentType"];
+       //   [attributes setObject: ndcont forKey: @"GSMDItemContentType"];
 
         } else if ([attrname isEqual: @"dc.title"]) {
           [attributes setObject: ndcont forKey: @"GSMDItemTitle"];
