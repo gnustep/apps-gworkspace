@@ -66,7 +66,7 @@
     } else {
       ASSIGN (appName, [[node name] stringByDeletingPathExtension]);
     }
-
+        
     dragIcon = [icon copy];
     
     docked = NO;
@@ -76,6 +76,8 @@
     nc = [NSNotificationCenter defaultCenter];
     fm = [NSFileManager defaultManager];
     ws = [NSWorkspace sharedWorkspace];
+
+    [self setToolTip: appName];  
   }
 
   return self;
@@ -89,6 +91,9 @@
 - (void)setWsIcon:(BOOL)value
 {
   isWsIcon = value;
+  if (isWsIcon) {
+    [self removeAllToolTips];
+  }
 }
 
 - (BOOL)isWsIcon
@@ -124,6 +129,10 @@
                                   forNode: node]);
     }
   }
+  
+  if (isTrashIcon) {
+    [self removeAllToolTips];
+  }  
 }
 
 - (void)setTrashFull:(BOOL)value
