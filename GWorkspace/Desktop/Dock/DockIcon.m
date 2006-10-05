@@ -318,6 +318,60 @@
 	} 
 }
 
+- (NSMenu *)menuForEvent:(NSEvent *)theEvent
+{
+  if ([self isSpecialIcon] == NO) {
+    NSString *appPath = [ws fullPathForApplication: appName];
+    
+    if (appPath) {
+      CREATE_AUTORELEASE_POOL(arp);
+      NSMenu *menu = [[NSMenu alloc] initWithTitle: appName];
+      NSMenuItem *item;
+      GWLaunchedApp *app;
+      
+      item = [NSMenuItem new];  
+      [item setTitle: NSLocalizedString(@"Show In File Viewer", @"")];
+      [item setTarget: (Dock *)container];  
+      [item setAction: @selector(iconMenuAction:)]; 
+      [item setRepresentedObject: appPath];            
+      [menu addItem: item];
+      RELEASE (item);
+
+      app = [[GWorkspace gworkspace] launchedAppWithPath: appPath
+                                                 andName: appName];      
+      if (app && [app isRunning]) {
+        item = [NSMenuItem new];  
+        [item setTarget: (Dock *)container];  
+        [item setAction: @selector(iconMenuAction:)]; 
+        [item setRepresentedObject: app];            
+      
+        if ([app isHidden]) {
+          [item setTitle: NSLocalizedString(@"Unhide", @"")];
+        } else {
+          [item setTitle: NSLocalizedString(@"Hide", @"")];
+        }
+        
+        [menu addItem: item];
+        RELEASE (item);      
+
+        item = [NSMenuItem new];  
+        [item setTitle: NSLocalizedString(@"Quit", @"")];
+        [item setTarget: (Dock *)container];  
+        [item setAction: @selector(iconMenuAction:)]; 
+        [item setRepresentedObject: app];            
+        [menu addItem: item];
+        RELEASE (item);
+      } 
+      
+      RELEASE (arp);
+
+      return AUTORELEASE (menu);
+    }
+  }
+  
+  return [super menuForEvent: theEvent];
+}
+
 - (void)startExternalDragOnEvent:(NSEvent *)event
                  withMouseOffset:(NSSize)offset
 {

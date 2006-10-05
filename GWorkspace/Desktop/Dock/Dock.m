@@ -354,6 +354,34 @@
   }
 }
 
+- (void)iconMenuAction:(id)sender
+{
+  NSString *title = [(NSMenuItem *)sender title];
+  
+  if ([title isEqual: NSLocalizedString(@"Show In File Viewer", @"")]) {
+    NSString *path = [(NSMenuItem *)sender representedObject];
+    NSString *basePath = [path stringByDeletingLastPathComponent];
+  
+    [gw selectFile: path inFileViewerRootedAtPath: basePath];
+  
+  } else {
+    GWLaunchedApp *app = (GWLaunchedApp *)[(NSMenuItem *)sender representedObject];
+  
+    if ([app isRunning] == NO) {
+      /* terminated while the icon menu is open */
+      return;
+    }
+  
+    if ([title isEqual: NSLocalizedString(@"Hide", @"")]) {
+      [app hideApplication];
+    } else if ([title isEqual: NSLocalizedString(@"Unhide", @"")]) {
+      [app unhideApplication];
+    } else if ([title isEqual: NSLocalizedString(@"Quit", @"")]) {
+      [app terminateApplication];
+    }  
+  }
+}
+
 - (void)setPosition:(DockPosition)pos
 {
   position = pos;

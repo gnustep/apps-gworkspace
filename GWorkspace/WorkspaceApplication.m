@@ -1160,6 +1160,21 @@
   return hidden;
 }
 
+- (void)hideApplication
+{
+  NS_DURING
+    {
+  [application hide: nil];
+    }
+  NS_HANDLER
+    {
+  NSLog(@"Unable to hide %@", name);
+  NSLog(@"GWorkspace caught exception %@: %@", 
+	        [localException name], [localException reason]);
+    }
+  NS_ENDHANDLER
+}    
+
 - (void)unhideApplication
 {
   NS_DURING
@@ -1210,7 +1225,8 @@
   if (application) {
     NS_DURING
       {
-    [application terminate: nil];      
+    [nc removeObserver: self];
+    [application terminate: nil];
       }
     NS_HANDLER
       {

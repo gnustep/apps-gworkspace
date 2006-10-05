@@ -559,6 +559,8 @@
 
 - (BOOL)isHidden;
 
+- (void)hideApplication;
+
 - (void)unhideApplication;
 
 - (BOOL)isApplicationHidden;

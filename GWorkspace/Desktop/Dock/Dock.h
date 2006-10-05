@@ -95,6 +95,8 @@
 
 - (void)appDidUnhide:(NSString *)appName;
 
+- (void)iconMenuAction:(id)sender;
+
 - (void)setPosition:(DockPosition)pos;
 
 - (void)setBackColor:(NSColor *)color;
