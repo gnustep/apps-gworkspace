@@ -384,4 +384,33 @@
     type = <*I0>;
     description = "File type of the document. (NSString)";
   };
+  GSMDItemUnixExtensions = {
+    type = <*I1>;
+    elements_type = <*I0>;
+    description = "File extensions an application can open. (NSArray of NSString elements)";
+  };
+  GSMDItemCopyrightDescription = {
+    type = <*I0>;
+    description = "Description of the copyright (License type, etc.). (NSString)";
+  };
+  GSMDItemRole = {
+    type = <*I0>;
+    description = "Role of the application (Editor, Viewer, etc.). (NSString)";
+  };
+  GSMDItemBuildVersion = {
+    type = <*I0>;
+    description = "Build version of the application. (NSString)";
+  };
+  GSMDItemApplicationName = {
+    type = <*I0>;
+    description = "Name of the application. (NSString)";
+  };  
+  GSMDItemApplicationDescription = {
+    type = <*I0>;
+    description = "Description of the application. (NSString)";
+  };
+  GSMDItemApplicationRelease = {
+    type = <*I0>;
+    description = "Full name of the application release. (NSString)";
+  };
 }

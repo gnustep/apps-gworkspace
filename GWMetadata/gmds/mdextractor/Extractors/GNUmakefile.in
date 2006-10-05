@@ -11,7 +11,8 @@ SUBPROJECTS = \
   OpenOfficeExtractor \
   AbiwordExtractor \
   XmlExtractor \
-  JpegExtractor 
+  JpegExtractor \
+  AppExtractor   
 else
 SUBPROJECTS = \
   TextExtractor \
@@ -20,7 +21,8 @@ SUBPROJECTS = \
   OpenOfficeExtractor \
   AbiwordExtractor \
   XmlExtractor \
-  JpegExtractor 
+  JpegExtractor \
+  AppExtractor   
 endif
   
 -include GNUmakefile.preamble

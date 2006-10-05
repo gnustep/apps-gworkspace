@@ -137,6 +137,7 @@
   info = [bundle infoDictionary]; 
 	
   if (info) {
+    NSFileManager *fm = [NSFileManager defaultManager];
     id typesAndIcons = [info objectForKey: @"NSTypes"];
     
     if (typesAndIcons && [typesAndIcons isKindOfClass: [NSArray class]]) {
@@ -200,11 +201,16 @@
         NSString *ext = [extensions objectAtIndex: i];
 			  NSString *icnname = [iconsdict objectForKey: ext];
 			  NSString *iconPath = [bundle pathForImageResource: icnname];
-        NSImage *image = [[NSImage alloc] initWithContentsOfFile: iconPath]; 
-			  cell = [matrix cellAtRow: 0 column: i];
-			  [cell setTitle: ext];
-			  [cell setImage: image];     
-        RELEASE (image);
+
+        cell = [matrix cellAtRow: 0 column: i];
+        [cell setTitle: ext];
+        
+        if (iconPath && [fm fileExistsAtPath: iconPath]) {
+          NSImage *image = [[NSImage alloc] initWithContentsOfFile: iconPath]; 
+        
+			    [cell setImage: image];     
+          RELEASE (image);
+        }
 		  }
 		  [matrix sizeToCells];
       
