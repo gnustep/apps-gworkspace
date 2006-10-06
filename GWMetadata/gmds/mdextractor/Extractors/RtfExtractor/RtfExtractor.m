@@ -87,30 +87,29 @@
   NSMutableDictionary *mddict = [NSMutableDictionary dictionary];  
   NSString *ext = [[path pathExtension] lowercaseString]; 
   NSAttributedString *attrstr = nil;
-  NSDictionary *attrsdict = nil;
   NSString *contents = nil;
   BOOL success = NO;
   
   NS_DURING
     {
-  if ([ext isEqualToString: @"rtf"]) {
+  if ([ext isEqual: @"rtf"]) {
     NSData *data = [NSData dataWithContentsOfFile: path];
 
     attrstr = [[NSAttributedString alloc] initWithRTF: data
-						                       documentAttributes: &attrsdict];
+						                       documentAttributes: NULL];
 
-  } else if ([ext isEqualToString: @"rtfd"]) {
+  } else if ([ext isEqual: @"rtfd"]) {
     if ([attributes fileType] == NSFileTypeRegular) {
       NSData *data = [NSData dataWithContentsOfFile: path];
 
       attrstr = [[NSAttributedString alloc] initWithRTF: data
-						                         documentAttributes: &attrsdict];
+						                         documentAttributes: NULL];
 
     } else if ([attributes fileType] == NSFileTypeDirectory) {
       NSFileWrapper *wrapper = [[NSFileWrapper alloc] initWithPath: path];
 
-      attrstr = [[NSAttributedString alloc]initWithRTFDFileWrapper: wrapper
-                                                documentAttributes: &attrsdict];
+      attrstr = [[NSAttributedString alloc] initWithRTFDFileWrapper: wrapper
+                                                 documentAttributes: NULL];
       RELEASE (wrapper);
     }
   }

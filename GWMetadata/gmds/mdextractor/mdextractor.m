@@ -1598,12 +1598,14 @@ int main(int argc, char** argv)
 
   {
     CREATE_AUTORELEASE_POOL (pool);
-	  GMDSExtractor *extractor = [[GMDSExtractor alloc] init];
+	  GMDSExtractor *extractor;
+    
+    [NSApplication sharedApplication];
+    extractor = [GMDSExtractor new];
     RELEASE (pool);
 
     if (extractor != nil) {
 	    CREATE_AUTORELEASE_POOL (pool);
-      [NSApplication sharedApplication];
       [[NSRunLoop currentRunLoop] run];
   	  RELEASE (pool);
     }
