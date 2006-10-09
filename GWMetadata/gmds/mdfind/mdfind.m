@@ -199,8 +199,10 @@ BOOL queryResults(NSString *qstr)
 
             /* mdfind reports only the path and (optionally) the score */          
             if (type == SQLITE_TEXT) {
-              GSPrintf(stdout, @"%s", sqlite3_column_text(stmt, i));          
-
+              /* only if i == 0 to not print the attribute name */  
+              if (i == 0) {
+                GSPrintf(stdout, @"%s", sqlite3_column_text(stmt, i));          
+              }
             } else if (repscore && type == SQLITE_FLOAT) {
               NSNumber *score = [NSNumber numberWithDouble: sqlite3_column_double(stmt, i)];
               GSPrintf(stdout, @" %@", [score description]);          

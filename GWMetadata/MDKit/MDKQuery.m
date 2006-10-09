@@ -632,10 +632,12 @@ enum {
 {
   if ([self isRoot]) {
     NSString *jtable = [self joinTable];
-    NSString *joinquery = [NSString stringWithFormat: @"SELECT %@.path, %@.score "
+    NSString *joinquery = [NSString stringWithFormat: @"SELECT %@.path, "
+                                          @"%@.score, "
+                                          @"%@.attribute "
                                           @"FROM %@ "
                                           @"ORDER BY %@.score DESC; ",
-                                          jtable, jtable, jtable, jtable];
+                                          jtable, jtable, jtable, jtable, jtable];
   
     [sqldescription setObject: joinquery forKey: @"join"];
   
@@ -862,7 +864,8 @@ enum {
                                @"BEFORE INSERT ON %@ "
                                @"BEGIN "
                                @"UPDATE %@ "
-                               @"SET score = (score + new.score) "
+                               @"SET score = (score + new.score), "
+                               @"attribute = (attribute || ' ' || new.attribute) "
                                @"WHERE id = new.id; "
                                @"END;", destTable, destTable, destTable];
 
@@ -950,19 +953,20 @@ enum {
         || ((leftSibling == nil) && [self hasParentWithCompound: GMDAndCompoundOperator])) {
     NSMutableString *joinquery = [NSMutableString string];
 
-    [joinquery appendFormat: @"INSERT INTO %@ (id, path, words_count, score) "
+    [joinquery appendFormat: @"INSERT INTO %@ (id, path, words_count, score, attribute) "
                              @"SELECT "
                              @"%@.id, "
                              @"%@.path, "
                              @"%@.words_count, "
-                             @"%@.score "
+                             @"%@.score, "
+                             @"%@.attribute "
                              @"FROM "
                              @"%@, %@ "
                              @"WHERE "
                              @"%@.id = %@.id; ",
                              destTable, srcTable, srcTable, 
-                             srcTable, srcTable, srcTable, 
-                             destTable, srcTable, destTable];
+                             srcTable, srcTable, srcTable,
+                             srcTable, destTable, srcTable, destTable];
     
     [root appendSQLToPreStatements: joinquery checkExisting: NO];
   }
@@ -1142,7 +1146,8 @@ enum {
                                  @"BEFORE INSERT ON %@ "
                                  @"BEGIN "
                                  @"UPDATE %@ "
-                                 @"SET score = (score + new.score) "
+                                 @"SET score = (score + new.score), "
+                                 @"attribute = (attribute || ' ' || new.attribute) "
                                  @"WHERE id = new.id; "
                                  @"END;", destTable, destTable, destTable];
 
@@ -1221,19 +1226,20 @@ enum {
         || ((leftSibling == nil) && [self hasParentWithCompound: GMDAndCompoundOperator])) {
     NSMutableString *joinquery = [NSMutableString string];
 
-    [joinquery appendFormat: @"INSERT INTO %@ (id, path, words_count, score) "
+    [joinquery appendFormat: @"INSERT INTO %@ (id, path, words_count, score, attribute) "
                              @"SELECT "
                              @"%@.id, "
                              @"%@.path, "
                              @"%@.words_count, "
-                             @"%@.score "
+                             @"%@.score, "
+                             @"%@.attribute "
                              @"FROM "
                              @"%@, %@ "
                              @"WHERE "
                              @"%@.id = %@.id; ",
                              destTable, srcTable, srcTable, 
                              srcTable, srcTable, srcTable, 
-                             destTable, srcTable, destTable];
+                             srcTable, destTable, srcTable, destTable];
 
     [root appendSQLToPreStatements: joinquery checkExisting: NO];
   }
