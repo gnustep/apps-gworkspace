@@ -86,6 +86,33 @@ static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv
   sqlite3_result_int(context, exists);
 }
 
+static void contains_substr(sqlite3_context *context, int argc, sqlite3_value **argv)
+{
+  const char *buff = (const char *)sqlite3_value_text(argv[0]);
+  const char *substr = (const char *)sqlite3_value_text(argv[1]);
+  int contains = (strstr(buff, substr) != NULL);
+  
+  sqlite3_result_int(context, contains);
+}
+
+static void append_string(sqlite3_context *context, int argc, sqlite3_value **argv)
+{
+  const char *buff = (const char *)sqlite3_value_text(argv[0]);
+  const char *str = (const char *)sqlite3_value_text(argv[1]);
+
+  if (strstr(buff, str) == NULL) {
+    char newbuff[2048] = "";
+  
+    sprintf(newbuff, "%s %s", buff, str);
+    newbuff[strlen(newbuff)] = '\0';
+    sqlite3_result_text(context, newbuff, strlen(newbuff), SQLITE_TRANSIENT);
+    
+    return;
+  } 
+  
+  sqlite3_result_text(context, buff, strlen(buff), SQLITE_TRANSIENT);  
+}
+
 static void word_score(sqlite3_context *context, int argc, sqlite3_value **argv)
 {
   int searchlen = strlen((const char *)sqlite3_value_text(argv[0]));
@@ -95,7 +122,6 @@ static void word_score(sqlite3_context *context, int argc, sqlite3_value **argv)
   float score = (1.0 * posting_wcount / path_wcount);
 
   if (searchlen != foundlen) {
-    /* TODO a better correction algorithm for score */
     score *= (1.0 * searchlen / foundlen);    
   } 
 
@@ -108,7 +134,7 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
   const unsigned char *found_val = sqlite3_value_text(argv[1]);
   int attribute_type = sqlite3_value_int(argv[2]);
   GMDOperatorType operator_type = sqlite3_value_int(argv[3]);
-  float score = 1.0;
+  float score = 0.0;
 
   if ((attribute_type == STRING) 
               || (attribute_type == ARRAY) 
@@ -117,22 +143,9 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
       int searchlen = strlen((const char *)search_val);
       int foundlen = strlen((const char *)found_val);
     
-      score *= (searchlen / foundlen); 
+      score = (1.0 * searchlen / foundlen); 
     }
   }
-
-
-
-  /*
-    const char *searchValue IL VALORE CERCATO
-    
-    attributes.attribute IL VALORE TROVATO
-    
-    int attributeType [STRING, ARRAY, NUMBER, DATE, DATA]
-    
-    GMDOperatorType operatorType
-  */
-  
 
   sqlite3_result_double(context, score);
 }
@@ -583,6 +596,10 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
     
     sqlite3_create_function(db, "pathExists", 1, 
                                 SQLITE_UTF8, 0, path_exists, 0, 0);
+    sqlite3_create_function(db, "containsSubstr", 2, 
+                                SQLITE_UTF8, 0, contains_substr, 0, 0);                                
+    sqlite3_create_function(db, "appendString", 2, 
+                                SQLITE_UTF8, 0, append_string, 0, 0);
     sqlite3_create_function(db, "wordScore", 4, 
                                 SQLITE_UTF8, 0, word_score, 0, 0);
     sqlite3_create_function(db, "attributeScore", 4, 

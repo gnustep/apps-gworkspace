@@ -861,13 +861,16 @@ enum {
   [root appendSQLToPreStatements: sqlstr checkExisting: YES];
 
   sqlstr = [NSString stringWithFormat: @"CREATE TEMP TRIGGER %@_trigger "
-                               @"BEFORE INSERT ON %@ "
-                               @"BEGIN "
-                               @"UPDATE %@ "
-                               @"SET score = (score + new.score), "
-                               @"attribute = (attribute || ' ' || new.attribute) "
-                               @"WHERE id = new.id; "
-                               @"END;", destTable, destTable, destTable];
+               @"BEFORE INSERT ON %@ "
+               @"BEGIN "
+               @"UPDATE %@ "
+               @"SET score = (score + new.score), "
+               @"attribute = "
+               @"(CASE WHEN (containsSubstr(new.attribute, attribute) == 0) "
+               @"THEN (new.attribute || ' ' || attribute) "
+               @"ELSE (new.attribute) END) "
+               @"WHERE id = new.id; "
+               @"END;", destTable, destTable, destTable];
 
   [root appendSQLToPreStatements: sqlstr checkExisting: YES];
 
@@ -877,15 +880,15 @@ enum {
       @"SELECT "
       @"%@.id, "
       @"%@.path, "
-      @"0, "
-      @"attributeScore('%@', attributes.attribute, %i, %i), "
-      @"'%@' "
+      @"%@.words_count, "
+      @"0.0, "
+      @"'%@' || ',' || attributeScore('%@', attributes.attribute, %i, %i) "
       @"FROM %@, attributes "
       @"WHERE attributes.key = '%@' ", 
-      destTable, srcTable, srcTable, 
-      searchValue, attributeType, operatorType,
-      attribute, srcTable, attribute];
-        
+      destTable, srcTable, srcTable, srcTable, 
+      attribute, searchValue, attributeType, operatorType, 
+      srcTable, attribute];
+
   [sqlstr appendFormat: @"AND attributes.attribute %@ ", operator];
       
   if ((attributeType == STRING) || (attributeType == DATA)) {
@@ -1143,13 +1146,16 @@ enum {
   [root appendSQLToPreStatements: sqlstr checkExisting: YES];
   
   sqlstr = [NSString stringWithFormat: @"CREATE TEMP TRIGGER %@_trigger "
-                                 @"BEFORE INSERT ON %@ "
-                                 @"BEGIN "
-                                 @"UPDATE %@ "
-                                 @"SET score = (score + new.score), "
-                                 @"attribute = (attribute || ' ' || new.attribute) "
-                                 @"WHERE id = new.id; "
-                                 @"END;", destTable, destTable, destTable];
+               @"BEFORE INSERT ON %@ "
+               @"BEGIN "
+               @"UPDATE %@ "
+               @"SET score = (score + new.score), "
+               @"attribute = "
+               @"(CASE WHEN (containsSubstr(new.attribute, attribute) == 0) "
+               @"THEN (new.attribute || ' ' || attribute) "
+               @"ELSE (new.attribute) END) "
+               @"WHERE id = new.id; "
+               @"END;", destTable, destTable, destTable];
 
   [root appendSQLToPreStatements: sqlstr checkExisting: YES];
 
@@ -1162,9 +1168,10 @@ enum {
         @"%@.path, "
         @"%@.words_count, "
         @"wordScore('%@', words.word, postings.word_count, %@.words_count), "
-        @"'%@' "    
+        @"'%@' || ',' || 0.0 "    
         @"FROM words, %@, postings ",
-        destTable, srcTable, srcTable, srcTable, searchValue, srcTable, attribute, srcTable];
+        destTable, srcTable, srcTable, srcTable, 
+        searchValue, srcTable, attribute, srcTable];
 
     [sqlstr appendFormat: @"WHERE words.word %@ '", operator];
     [sqlstr appendString: searchValue];
@@ -1180,9 +1187,10 @@ enum {
         @"%@.path, "
         @"%@.words_count, "
         @"(1.0 / %@.words_count), "
-        @"'%@' "
+        @"'%@' || ',' || 0.0 "
         @"FROM %@ ",
-        destTable, srcTable, srcTable, srcTable, srcTable, attribute, srcTable];
+        destTable, srcTable, srcTable, srcTable, 
+        srcTable, attribute, srcTable];
 
     [sqlstr appendString: @"WHERE "
                          @"(SELECT words.word "
