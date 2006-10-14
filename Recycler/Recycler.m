@@ -208,8 +208,6 @@ static Recycler *recycler = nil;
 
 - (void)contactWorkspaceApp
 {
-  id app = nil;
-
   if (workspaceApplication == nil) {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSString *appName = [defaults stringForKey: @"GSWorkspaceApplication"];
@@ -217,55 +215,41 @@ static Recycler *recycler = nil;
     if (appName == nil) {
       appName = @"GWorkspace";
     }
+  
+    workspaceApplication = [NSConnection rootProxyForConnectionWithRegisteredName: appName
+                                                                             host: @""];
+    if (workspaceApplication == nil) {
+      int i;
+  
+      [ws launchApplication: appName];  
+  
+      for (i = 0; i < 80; i++) {
+	      [[NSRunLoop currentRunLoop] runUntilDate:
+		                     [NSDate dateWithTimeIntervalSinceNow: 0.1]];
 
-    app = [NSConnection rootProxyForConnectionWithRegisteredName: appName
-                                                            host: @""];
-
-    if (app) {
-      NSConnection *c = [app connectionForProxy];
-
+        workspaceApplication = [NSConnection rootProxyForConnectionWithRegisteredName: appName 
+                                                                                 host: @""];                  
+        if (workspaceApplication) {
+          break;
+        }
+      }
+    }  
+    
+    if (workspaceApplication) {
+      [workspaceApplication setProtocolForProxy: @protocol(workspaceAppProtocol)];
+      RETAIN (workspaceApplication);
+    
 	    [nc addObserver: self
 	           selector: @selector(workspaceAppConnectionDidDie:)
 		             name: NSConnectionDidDieNotification
-		           object: c];
-
-      workspaceApplication = app;
-      [workspaceApplication setProtocolForProxy: @protocol(workspaceAppProtocol)];
-      RETAIN (workspaceApplication);
-      
-	  } else {
-	    static BOOL recursion = NO;
-	  
-      if (recursion == NO) {
-        int i;
-        
-        [ws launchApplication: appName];
-
-        for (i = 1; i <= 80; i++) {
-          NSDate *limit = [[NSDate alloc] initWithTimeIntervalSinceNow: 0.1];
-          [[NSRunLoop currentRunLoop] runUntilDate: limit];
-          RELEASE(limit);
-        
-          app = [NSConnection rootProxyForConnectionWithRegisteredName: appName 
-                                                                   host: @""];                  
-          if (app) {
-            break;
-          }
-        }
-                
-	      recursion = YES;
-	      [self contactWorkspaceApp];
-	      recursion = NO;
-        
-	    } else { 
-	      recursion = NO;
-        NSRunAlertPanel(nil,
-                NSLocalizedString(@"unable to contact the workspace application!", @""),
-                NSLocalizedString(@"Ok", @""),
-                nil, 
-                nil);  
-      }
-	  }
+		           object: [workspaceApplication connectionForProxy]];
+    } else {
+      NSRunAlertPanel(nil,
+              NSLocalizedString(@"unable to contact the workspace application!", @""),
+              NSLocalizedString(@"Ok", @""),
+              nil, 
+              nil);  
+    }
   }
 }
 
@@ -285,75 +269,58 @@ static Recycler *recycler = nil;
 - (void)connectFSWatcher
 {
   if (fswatcher == nil) {
-    id fsw = [NSConnection rootProxyForConnectionWithRegisteredName: @"fswatcher" 
-                                                               host: @""];
+    fswatcher = [NSConnection rootProxyForConnectionWithRegisteredName: @"fswatcher" 
+                                                                  host: @""];
 
-    if (fsw) {
-      NSConnection *c = [fsw connectionForProxy];
+    if (fswatcher == nil) {
+	    NSString *cmd;
+      int i;
+    
+      cmd = [[NSSearchPathForDirectoriesInDomains(
+                GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
+                                      stringByAppendingPathComponent: @"fswatcher"];    
+                
+      [startAppWin showWindowWithTitle: @"Recycler"
+                               appName: @"fswatcher"
+                          maxProgValue: 40.0];
+    
+      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
+   
+      for (i = 1; i <= 40; i++) {
+        [startAppWin updateProgressBy: 1.0];
+	      [[NSRunLoop currentRunLoop] runUntilDate:
+		                     [NSDate dateWithTimeIntervalSinceNow: 0.1]];
 
-	    [nc addObserver: self
-	           selector: @selector(fswatcherConnectionDidDie:)
-		             name: NSConnectionDidDieNotification
-		           object: c];
-      
-      fswatcher = fsw;
-	    [fswatcher setProtocolForProxy: @protocol(FSWatcherProtocol)];
-      RETAIN (fswatcher);
-                                   
-	    [fswatcher registerClient: (id <FSWClientProtocol>)self
-                isGlobalWatcher: NO];
-      
-	  } else {
-	    static BOOL recursion = NO;
-	    static NSString	*cmd = nil;
-
-	    if (recursion == NO) {
-        if (cmd == nil) {
-            cmd = RETAIN ([[NSSearchPathForDirectoriesInDomains(
-                      GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
-                            stringByAppendingPathComponent: @"fswatcher"]);
-		    }
-      }
-	  
-      if (recursion == NO && cmd != nil) {
-        int i;
-        
-        [startAppWin showWindowWithTitle: @"Recycler"
-                                 appName: @"fswatcher"
-                            maxProgValue: 40.0];
-
-	      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
-        RELEASE (cmd);
-        
-        for (i = 1; i <= 40; i++) {
-          [startAppWin updateProgressBy: 1.0];
-	        [[NSRunLoop currentRunLoop] runUntilDate:
-		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
-                           
-          fsw = [NSConnection rootProxyForConnectionWithRegisteredName: @"fswatcher" 
-                                                                  host: @""];                  
-          if (fsw) {
-            [startAppWin updateProgressBy: 40.0 - i];
-            break;
-          }
+        fswatcher = [NSConnection rootProxyForConnectionWithRegisteredName: @"fswatcher" 
+                                                                      host: @""];                  
+        if (fswatcher) {
+          [startAppWin updateProgressBy: 40.0 - i];
+          break;
         }
-        
-        [[startAppWin win] close];
-        
-	      recursion = YES;
-	      [self connectFSWatcher];
-	      recursion = NO;
-        
-	    } else { 
-	      recursion = NO;
-        fswnotifications = NO;
-        NSRunAlertPanel(nil,
-                NSLocalizedString(@"unable to contact fswatcher\nfswatcher notifications disabled!", @""),
-                NSLocalizedString(@"Ok", @""),
-                nil, 
-                nil);  
       }
-	  }
+
+      [[startAppWin win] close];
+    }
+    
+    if (fswatcher) {
+      RETAIN (fswatcher);
+      [fswatcher setProtocolForProxy: @protocol(FSWatcherProtocol)];
+    
+	    [[NSNotificationCenter defaultCenter] addObserver: self
+	                   selector: @selector(fswatcherConnectionDidDie:)
+		                     name: NSConnectionDidDieNotification
+		                   object: [fswatcher connectionForProxy]];
+                       
+	    [fswatcher registerClient: (id <FSWClientProtocol>)self 
+                isGlobalWatcher: NO];
+    } else {
+      fswnotifications = NO;
+      NSRunAlertPanel(nil,
+              NSLocalizedString(@"unable to contact fswatcher\nfswatcher notifications disabled!", @""),
+              NSLocalizedString(@"Ok", @""),
+              nil, 
+              nil);  
+    }
   }
 }
 

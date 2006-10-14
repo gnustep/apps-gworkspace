@@ -1620,77 +1620,59 @@ static GWorkspace *gworkspace = nil;
 - (void)connectFSWatcher
 {
   if (fswatcher == nil) {
-    id fsw = [NSConnection rootProxyForConnectionWithRegisteredName: @"fswatcher" 
-                                                               host: @""];
+    fswatcher = [NSConnection rootProxyForConnectionWithRegisteredName: @"fswatcher" 
+                                                                  host: @""];
 
-    if (fsw) {
-      NSConnection *c = [fsw connectionForProxy];
+    if (fswatcher == nil) {
+	    NSString *cmd;
+      int i;
+    
+      cmd = [[NSSearchPathForDirectoriesInDomains(
+                GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
+                                      stringByAppendingPathComponent: @"fswatcher"];    
+                
+      [startAppWin showWindowWithTitle: @"GWorkspace"
+                               appName: @"fswatcher"
+                             operation: NSLocalizedString(@"starting:", @"")
+                          maxProgValue: 40.0];
+    
+      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
+   
+      for (i = 1; i <= 40; i++) {
+        [startAppWin updateProgressBy: 1.0];
+	      [[NSRunLoop currentRunLoop] runUntilDate:
+		                     [NSDate dateWithTimeIntervalSinceNow: 0.1]];
 
+        fswatcher = [NSConnection rootProxyForConnectionWithRegisteredName: @"fswatcher" 
+                                                                      host: @""];                  
+        if (fswatcher) {
+          [startAppWin updateProgressBy: 40.0 - i];
+          break;
+        }
+      }
+
+      [[startAppWin win] close];
+    }
+    
+    if (fswatcher) {
+      RETAIN (fswatcher);
+      [fswatcher setProtocolForProxy: @protocol(FSWatcherProtocol)];
+    
 	    [[NSNotificationCenter defaultCenter] addObserver: self
 	                   selector: @selector(fswatcherConnectionDidDie:)
 		                     name: NSConnectionDidDieNotification
-		                   object: c];
-      
-      fswatcher = fsw;
-	    [fswatcher setProtocolForProxy: @protocol(FSWatcherProtocol)];
-      RETAIN (fswatcher);
-                                   
+		                   object: [fswatcher connectionForProxy]];
+                       
 	    [fswatcher registerClient: (id <FSWClientProtocol>)self 
                 isGlobalWatcher: NO];
-      
-	  } else {
-	    static BOOL recursion = NO;
-	    static NSString	*cmd = nil;
-
-	    if (recursion == NO) {
-        if (cmd == nil) {
-          cmd = RETAIN ([[NSSearchPathForDirectoriesInDomains(
-                      GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
-                            stringByAppendingPathComponent: @"fswatcher"]);
-		    }
-      }
-	  
-      if (recursion == NO && cmd != nil) {
-        int i;
-        
-        [startAppWin showWindowWithTitle: @"GWorkspace"
-                                 appName: @"fswatcher"
-                               operation: NSLocalizedString(@"starting:", @"")
-                            maxProgValue: 40.0];
-
-	      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
-        DESTROY (cmd);
-        
-        for (i = 1; i <= 40; i++) {
-          [startAppWin updateProgressBy: 1.0];
-	        [[NSRunLoop currentRunLoop] runUntilDate:
-		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
-                           
-          fsw = [NSConnection rootProxyForConnectionWithRegisteredName: @"fswatcher" 
-                                                                  host: @""];                  
-          if (fsw) {
-            [startAppWin updateProgressBy: 40.0 - i];
-            break;
-          }
-        }
-        
-        [[startAppWin win] close];
-        
-	      recursion = YES;
-	      [self connectFSWatcher];
-	      recursion = NO;
-        
-	    } else { 
-        DESTROY (cmd);
-	      recursion = NO;
-        fswnotifications = NO;
-        NSRunAlertPanel(nil,
-                NSLocalizedString(@"unable to contact fswatcher\nfswatcher notifications disabled!", @""),
-                NSLocalizedString(@"Ok", @""),
-                nil, 
-                nil);  
-      }
-	  }
+    } else {
+      fswnotifications = NO;
+      NSRunAlertPanel(nil,
+              NSLocalizedString(@"unable to contact fswatcher\nfswatcher notifications disabled!", @""),
+              NSLocalizedString(@"Ok", @""),
+              nil, 
+              nil);  
+    }
   }
 }
 
@@ -1756,68 +1738,56 @@ static GWorkspace *gworkspace = nil;
 - (void)connectRecycler
 {
   if (recyclerApp == nil) {
-    id rcl = [NSConnection rootProxyForConnectionWithRegisteredName: @"Recycler" 
-                                                               host: @""];
+    recyclerApp = [NSConnection rootProxyForConnectionWithRegisteredName: @"Recycler" 
+                                                                    host: @""];
 
-    if (rcl) {
+    if (recyclerApp == nil) {
+      int i;
+    
+      [startAppWin showWindowWithTitle: @"GWorkspace"
+                               appName: @"Recycler"
+                             operation: NSLocalizedString(@"starting:", @"")
+                          maxProgValue: 80.0];
+
+      [ws launchApplication: @"Recycler"];
+   
+      for (i = 1; i <= 80; i++) {
+        [startAppWin updateProgressBy: 1.0];
+	      [[NSRunLoop currentRunLoop] runUntilDate:
+		                     [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+        recyclerApp = [NSConnection rootProxyForConnectionWithRegisteredName: @"Recycler" 
+                                                                        host: @""];                  
+        if (recyclerApp) {
+          [startAppWin updateProgressBy: 80.0 - i];
+          break;
+        }
+      }
+
+      [[startAppWin win] close];
+    }
+    
+    if (recyclerApp) {
       NSMenu *menu = [[[NSApp mainMenu] itemWithTitle: NSLocalizedString(@"Tools", @"")] submenu];
       id item = [menu itemWithTitle: NSLocalizedString(@"Show Recycler", @"")];
 
-      NSConnection *c = [rcl connectionForProxy];
-
-	    [[NSNotificationCenter defaultCenter] addObserver: self
-	                   selector: @selector(recyclerConnectionDidDie:)
-		                     name: NSConnectionDidDieNotification
-		                   object: c];
-      
-      recyclerApp = rcl;
-	    [recyclerApp setProtocolForProxy: @protocol(RecyclerAppProtocol)];
-      RETAIN (recyclerApp);
-      
       if (item != nil) {
         [item setTitle: NSLocalizedString(@"Hide Recycler", @"")];
       }
-      
-	  } else {
-	    static BOOL recursion = NO;
-	  
-      if (recursion == NO) {
-        int i;
-        
-        [startAppWin showWindowWithTitle: @"GWorkspace"
-                                 appName: @"Recycler"
-                               operation: NSLocalizedString(@"starting:", @"")
-                            maxProgValue: 80.0];
-
-        [ws launchApplication: @"Recycler"];
-
-        for (i = 1; i <= 80; i++) {
-          [startAppWin updateProgressBy: 1.0];
-	        [[NSRunLoop currentRunLoop] runUntilDate:
-		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
-          rcl = [NSConnection rootProxyForConnectionWithRegisteredName: @"Recycler" 
-                                                                  host: @""];                  
-          if (rcl) {
-            [startAppWin updateProgressBy: 80.0 - i];
-            break;
-          }
-        }
-        
-        [[startAppWin win] close];
-        
-	      recursion = YES;
-	      [self connectRecycler];
-	      recursion = NO;
-        
-	    } else { 
-	      recursion = NO;
-        NSRunAlertPanel(nil,
-                NSLocalizedString(@"unable to contact Recycler!", @""),
-                NSLocalizedString(@"Ok", @""),
-                nil, 
-                nil);  
-      }
-	  }
+    
+      RETAIN (recyclerApp);
+      [ddbd setProtocolForProxy: @protocol(RecyclerAppProtocol)];
+    
+	    [[NSNotificationCenter defaultCenter] addObserver: self
+	                   selector: @selector(recyclerConnectionDidDie:)
+		                     name: NSConnectionDidDieNotification
+		                   object: [recyclerApp connectionForProxy]];
+    } else {
+      NSRunAlertPanel(nil,
+              NSLocalizedString(@"unable to contact Recycler!", @""),
+              NSLocalizedString(@"Ok", @""),
+              nil, 
+              nil);  
+    }
   }
 }
 
@@ -1854,77 +1824,58 @@ static GWorkspace *gworkspace = nil;
 - (void)connectDDBd
 {
   if (ddbd == nil) {
-    id db = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
-                                                              host: @""];
+    ddbd = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
+                                                             host: @""];
 
-    if (db) {
-      NSConnection *c = [db connectionForProxy];
+    if (ddbd == nil) {
+	    NSString *cmd;
+      int i;
+    
+      cmd = [[NSSearchPathForDirectoriesInDomains(
+                GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
+                                      stringByAppendingPathComponent: @"ddbd"];    
+                
+      [startAppWin showWindowWithTitle: @"GWorkspace"
+                               appName: @"ddbd"
+                             operation: NSLocalizedString(@"starting:", @"")
+                          maxProgValue: 40.0];
+    
+      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
+   
+      for (i = 1; i <= 40; i++) {
+        [startAppWin updateProgressBy: 1.0];
+	      [[NSRunLoop currentRunLoop] runUntilDate:
+		                     [NSDate dateWithTimeIntervalSinceNow: 0.1]];
 
+        ddbd = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
+                                                                 host: @""];                  
+        if (ddbd) {
+          [startAppWin updateProgressBy: 40.0 - i];
+          break;
+        }
+      }
+
+      [[startAppWin win] close];
+    }
+    
+    if (ddbd) {
+      RETAIN (ddbd);
+      [ddbd setProtocolForProxy: @protocol(DDBdProtocol)];
+    
 	    [[NSNotificationCenter defaultCenter] addObserver: self
 	                   selector: @selector(ddbdConnectionDidDie:)
 		                     name: NSConnectionDidDieNotification
-		                   object: c];
-      
-      ddbd = db;
-	    [ddbd setProtocolForProxy: @protocol(DDBdProtocol)];
-      RETAIN (ddbd);
-                                         
-	  } else {
-	    static BOOL recursion = NO;
-	    static NSString	*cmd = nil;
-
-	    if (recursion == NO) {
-        if (cmd == nil) {
-            cmd = RETAIN ([[NSSearchPathForDirectoriesInDomains(
-                      GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
-                            stringByAppendingPathComponent: @"ddbd"]);
-		    }
-      }
-	  
-      if (recursion == NO && cmd != nil) {
-        int i;
-        
-        [startAppWin showWindowWithTitle: @"GWorkspace"
-                                 appName: @"ddbd"
-                               operation: NSLocalizedString(@"starting:", @"")
-                            maxProgValue: 40.0];
-
-	      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
-        DESTROY (cmd);
-        
-        for (i = 1; i <= 40; i++) {
-          [startAppWin updateProgressBy: 1.0];
-	        [[NSRunLoop currentRunLoop] runUntilDate:
-		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
-                           
-          db = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
-                                                                 host: @""];                  
-          if (db) {
-            [startAppWin updateProgressBy: 40.0 - i];
-            break;
-          }
-        }
-        
-        [[startAppWin win] close];
-        
-	      recursion = YES;
-	      [self connectDDBd];
-	      recursion = NO;
-        
-	    } else { 
-        DESTROY (cmd);
-	      recursion = NO;
-        ddbd = nil;
-        NSRunAlertPanel(nil,
-                NSLocalizedString(@"unable to contact ddbd.", @""),
-                NSLocalizedString(@"Ok", @""),
-                nil, 
-                nil);  
-      }
-	  }
+		                   object: [ddbd connectionForProxy]];
+    } else {
+      NSRunAlertPanel(nil,
+              NSLocalizedString(@"unable to contact ddbd.", @""),
+              NSLocalizedString(@"Ok", @""),
+              nil, 
+              nil);  
+    }
   }
-}
-
+}  
+  
 - (void)ddbdConnectionDidDie:(NSNotification *)notif
 {
   id connection = [notif object];

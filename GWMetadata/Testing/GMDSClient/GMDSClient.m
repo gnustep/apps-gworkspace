@@ -311,66 +311,52 @@ static NSString *nibName = @"GMDSClient";
 - (void)connectGMDs
 {
   if (gmds == nil) {
-    id gm = [NSConnection rootProxyForConnectionWithRegisteredName: @"gmds" 
-                                                              host: @""];
+    gmds = [NSConnection rootProxyForConnectionWithRegisteredName: @"gmds" 
+                                                             host: @""];
 
-    if (gm) {
-      NSConnection *c = [gm connectionForProxy];
+    if (gmds == nil) {
+	    NSString *cmd;
+      int i;
+    
+      cmd = [[NSSearchPathForDirectoriesInDomains(
+                GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
+                                      stringByAppendingPathComponent: @"gmds"];    
+                    
+      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
+   
+      for (i = 1; i <= 40; i++) {
+	      [[NSRunLoop currentRunLoop] runUntilDate:
+		                     [NSDate dateWithTimeIntervalSinceNow: 0.1]];
 
-	    [nc addObserver: self
-	           selector: @selector(connectionDidDie:)
-		             name: NSConnectionDidDieNotification
-		           object: c];
-      
-      gmds = gm;
-	    [gmds setProtocolForProxy: @protocol(GMDSProtocol)];
+        gmds = [NSConnection rootProxyForConnectionWithRegisteredName: @"gmds" 
+                                                                 host: @""];                  
+        if (gmds) {
+          break;
+        }
+      }
+    }
+    
+    if (gmds) {
       RETAIN (gmds);
-      
-      NSLog(@"gmds connected!");     
+      [gmds setProtocolForProxy: @protocol(GMDSProtocol)];
+    
+	    [[NSNotificationCenter defaultCenter] addObserver: self
+	                   selector: @selector(connectionDidDie:)
+		                     name: NSConnectionDidDieNotification
+		                   object: [gmds connectionForProxy]];
 
       [gmds registerClient: self];                              
-                                         
-	  } else {
-	    static BOOL recursion = NO;
-	    static NSString	*cmd = nil;
-
-	    if (recursion == NO) {
-        if (cmd == nil) {
-            cmd = RETAIN ([[NSSearchPathForDirectoriesInDomains(
-                      GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
-                            stringByAppendingPathComponent: @"gmds"]);
-		    }
-      }
-	  
-      if (recursion == NO && cmd != nil) {
-        int i;
-        
-	      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
-        DESTROY (cmd);
-        
-        for (i = 1; i <= 40; i++) {
-	        [[NSRunLoop currentRunLoop] runUntilDate:
-		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
-                           
-          gm = [NSConnection rootProxyForConnectionWithRegisteredName: @"gmds" 
-                                                                 host: @""];                  
-          if (gm) {
-            break;
-          }
-        }
-        
-	      recursion = YES;
-	      [self connectGMDs];
-	      recursion = NO;
-        
-	    } else { 
-        DESTROY (cmd);
-	      recursion = NO;
-        gmds = nil;
-        NSRunAlertPanel(nil, @"unable to contact gmds.", @"OK", nil, nil);  
-      }
-	  }
-  }
+      NSLog(@"gmds connected!");     
+                       
+    } else {
+      gmds = nil;
+      NSRunAlertPanel(nil,
+              NSLocalizedString(@"unable to contact gmds.", @""),
+              NSLocalizedString(@"Ok", @""),
+              nil, 
+              nil);  
+    }
+  }  
 }
 
 - (void)connectionDidDie:(NSNotification *)notif

@@ -327,63 +327,44 @@
 - (void)connectDDBd
 {
   if (ddbd == nil) {
-    id db = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
-                                                              host: @""];
+    ddbd = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
+                                                             host: @""];
 
-    if (db) {
-      NSConnection *c = [db connectionForProxy];
-
-	    [nc addObserver: self
-	           selector: @selector(ddbdConnectionDidDie:)
-		             name: NSConnectionDidDieNotification
-		           object: c];
-      
-      ddbd = db;
-	    [ddbd setProtocolForProxy: @protocol(DDBd)];
-      RETAIN (ddbd);
-      
-      GWDebugLog(@"ddbd connected!");     
-                                         
-	  } else {
-	    static BOOL recursion = NO;
-	    static NSString	*cmd = nil;
-
-	    if (recursion == NO) {
-        if (cmd == nil) {
-            cmd = RETAIN ([[NSSearchPathForDirectoriesInDomains(
-                      GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
-                            stringByAppendingPathComponent: @"ddbd"]);
-		    }
-      }
-	  
-      if (recursion == NO && cmd != nil) {
-        int i;
-        
-	      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
-        DESTROY (cmd);
-        
-        for (i = 1; i <= 40; i++) {
-	        [[NSRunLoop currentRunLoop] runUntilDate:
+    if (ddbd == nil) {
+	    NSString *cmd;
+      int i;
+    
+      cmd = [[NSSearchPathForDirectoriesInDomains(
+                GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
+                                      stringByAppendingPathComponent: @"ddbd"];    
+                
+      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
+   
+      for (i = 0; i < 40; i++) {
+        [[NSRunLoop currentRunLoop] runUntilDate:
 		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
-                           
-          db = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
+
+        ddbd = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
                                                                  host: @""];                  
-          if (db) {
-            break;
-          }
+        if (ddbd) {
+          break;
         }
-        
-	      recursion = YES;
-	      [self connectDDBd];
-	      recursion = NO;
-        
-	    } else { 
-        DESTROY (cmd);
-	      recursion = NO;
-        ddbd = nil;
-        NSLog(@"unable to contact ddbd.");
       }
-	  }
+    }
+    
+    if (ddbd) {
+      RETAIN (ddbd);
+      [ddbd setProtocolForProxy: @protocol(DDBd)];
+    
+	    [[NSNotificationCenter defaultCenter] addObserver: self
+	                   selector: @selector(ddbdConnectionDidDie:)
+		                     name: NSConnectionDidDieNotification
+		                   object: [ddbd connectionForProxy]];
+                       
+      GWDebugLog(@"ddbd connected!");     
+    } else {
+      NSLog(@"unable to contact ddbd.");
+    }
   }
 }
 

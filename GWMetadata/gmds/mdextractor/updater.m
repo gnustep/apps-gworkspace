@@ -636,65 +636,47 @@ do { \
 - (void)connectFSWatcher
 {
   if (fswatcher == nil) {
-    id fsw = [NSConnection rootProxyForConnectionWithRegisteredName: @"fswatcher" 
-                                                               host: @""];
+    fswatcher = [NSConnection rootProxyForConnectionWithRegisteredName: @"fswatcher" 
+                                                                  host: @""];
 
-    if (fsw) {
-      NSConnection *c = [fsw connectionForProxy];
+    if (fswatcher == nil) {
+	    NSString *cmd;
+      int i;
+    
+      cmd = [[NSSearchPathForDirectoriesInDomains(
+                GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
+                                      stringByAppendingPathComponent: @"fswatcher"];    
+                
+     [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
+   
+      for (i = 0; i < 40; i++) {
+	      [[NSRunLoop currentRunLoop] runUntilDate:
+		                     [NSDate dateWithTimeIntervalSinceNow: 0.1]];
 
-	    [nc addObserver: self
-	           selector: @selector(fswatcherConnectionDidDie:)
-		             name: NSConnectionDidDieNotification
-		           object: c];
-      
-      fswatcher = fsw;
-	    [fswatcher setProtocolForProxy: @protocol(FSWatcherProtocol)];
+        fswatcher = [NSConnection rootProxyForConnectionWithRegisteredName: @"fswatcher" 
+                                                                      host: @""];                  
+        if (fswatcher) {
+          break;
+        }
+      }
+    }
+    
+    if (fswatcher) {
       RETAIN (fswatcher);
-                                   
+      [fswatcher setProtocolForProxy: @protocol(FSWatcherProtocol)];
+    
+	    [[NSNotificationCenter defaultCenter] addObserver: self
+	                   selector: @selector(fswatcherConnectionDidDie:)
+		                     name: NSConnectionDidDieNotification
+		                   object: [fswatcher connectionForProxy]];
+                       
 	    [fswatcher registerClient: (id <FSWClientProtocol>)self 
                 isGlobalWatcher: YES];
-      
-      NSLog(@"fswatcher connected!");
-      
-	  } else {
-	    static BOOL recursion = NO;
-	    static NSString	*cmd = nil;
 
-	    if (recursion == NO) {
-        if (cmd == nil) {
-          cmd = RETAIN ([[NSSearchPathForDirectoriesInDomains(
-                      GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
-                            stringByAppendingPathComponent: @"fswatcher"]);
-		    }
-      }
-	  
-      if (recursion == NO && cmd != nil) {
-        int i;
-        
-	      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
-        DESTROY (cmd);
-        
-        for (i = 1; i <= 40; i++) {
-	        [[NSRunLoop currentRunLoop] runUntilDate:
-		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
-                           
-          fsw = [NSConnection rootProxyForConnectionWithRegisteredName: @"fswatcher" 
-                                                                  host: @""];                  
-          if (fsw) {
-            break;
-          }
-        }
-        
-	      recursion = YES;
-	      [self connectFSWatcher];
-	      recursion = NO;
-        
-	    } else { 
-        DESTROY (cmd);
-	      recursion = NO;
-        NSLog(@"unable to contact fswatcher!");  
-      }
-	  }
+      NSLog(@"fswatcher connected!");                
+    } else {
+      NSLog(@"unable to contact fswatcher!");  
+    }
   }
 }
 
@@ -735,62 +717,44 @@ do { \
 - (void)connectDDBd
 {
   if (ddbd == nil) {
-    id dd = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
-                                                              host: @""];
+    ddbd = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
+                                                             host: @""];
 
-    if (dd) {
-      NSConnection *c = [dd connectionForProxy];
+    if (ddbd == nil) {
+	    NSString *cmd;
+      int i;
+    
+      cmd = [[NSSearchPathForDirectoriesInDomains(
+                GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
+                                      stringByAppendingPathComponent: @"ddbd"];    
+                
+     [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
+   
+      for (i = 0; i < 40; i++) {
+	      [[NSRunLoop currentRunLoop] runUntilDate:
+		                     [NSDate dateWithTimeIntervalSinceNow: 0.1]];
 
-	    [nc addObserver: self
-	           selector: @selector(ddbdConnectionDidDie:)
-		             name: NSConnectionDidDieNotification
-		           object: c];
-      
-      ddbd = dd;
-	    [ddbd setProtocolForProxy: @protocol(DDBdProtocol)];
-      RETAIN (ddbd);
-                                         
-      NSLog(@"ddbd connected!");
-      
-	  } else {
-	    static BOOL recursion = NO;
-	    static NSString	*cmd = nil;
-
-	    if (recursion == NO) {
-        if (cmd == nil) {
-          cmd = RETAIN ([[NSSearchPathForDirectoriesInDomains(
-                      GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
-                            stringByAppendingPathComponent: @"ddbd"]);
-		    }
-      }
-	  
-      if (recursion == NO && cmd != nil) {
-        int i;
-        
-	      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
-        DESTROY (cmd);
-        
-        for (i = 1; i <= 40; i++) {
-	        [[NSRunLoop currentRunLoop] runUntilDate:
-		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
-                           
-          dd = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
+        ddbd = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
                                                                  host: @""];                  
-          if (dd) {
-            break;
-          }
+        if (ddbd) {
+          break;
         }
-        
-	      recursion = YES;
-	      [self connectDDBd];
-	      recursion = NO;
-        
-	    } else { 
-        DESTROY (cmd);
-	      recursion = NO;
-        NSLog(@"unable to contact ddbd!");  
       }
-	  }
+    }
+    
+    if (ddbd) {
+      RETAIN (ddbd);
+      [ddbd setProtocolForProxy: @protocol(DDBdProtocol)];
+    
+	    [[NSNotificationCenter defaultCenter] addObserver: self
+	                   selector: @selector(ddbdConnectionDidDie:)
+		                     name: NSConnectionDidDieNotification
+		                   object: [ddbd connectionForProxy]];
+    
+      NSLog(@"ddbd connected!");    
+    } else {
+      NSLog(@"unable to contact ddbd!");  
+    }
   }
 }
 

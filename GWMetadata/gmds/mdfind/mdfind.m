@@ -230,11 +230,16 @@ BOOL queryResults(NSString *qstr)
             /* mdfind reports only the path and (optionally) the score */          
             if (type == SQLITE_TEXT) {
               /* only if i == 0 to not print also the attribute name */  
-              if (i == 0) {
+           //   if (i == 0) {
                 GSPrintf(stdout, @" %s", sqlite3_column_text(stmt, i));          
-              }
+           //   }
+           
+            //
+            // TOGLIERE ANCHE IL printf() IN contains_substr()
+            //
+           
             } else if (repscore && type == SQLITE_FLOAT) {
-              GSPrintf(stdout, @"%f", sqlite3_column_double(stmt, i));          
+              GSPrintf(stdout, @" %f", sqlite3_column_double(stmt, i));          
             }
           }
 

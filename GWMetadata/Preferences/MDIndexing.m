@@ -721,75 +721,55 @@ return; \
 - (void)connectMDExtractor
 {
   if (mdextractor == nil) {
-    int timeout = 80;
-    id fsw = [NSConnection rootProxyForConnectionWithRegisteredName: @"mdextractor" 
-                                                               host: @""];
+    mdextractor = [NSConnection rootProxyForConnectionWithRegisteredName: @"mdextractor" 
+                                                                    host: @""];
 
-    if (fsw) {
-      NSConnection *c = [fsw connectionForProxy];
+    if (mdextractor == nil) {
+	    NSString *cmd;
+      int i;
+    
+      cmd = [[NSSearchPathForDirectoriesInDomains(
+                GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
+                                      stringByAppendingPathComponent: @"mdextractor"];    
+                
+      [startAppWin showWindowWithTitle: @"MDIndexing"
+                               appName: @"mdextractor"
+                             operation: NSLocalizedString(@"starting:", @"")
+                          maxProgValue: 80.0];
+    
+      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
+   
+      for (i = 1; i <= 80; i++) {
+        [startAppWin updateProgressBy: 1.0];
+	      [[NSRunLoop currentRunLoop] runUntilDate:
+		                     [NSDate dateWithTimeIntervalSinceNow: 0.1]];
 
-	    [nc addObserver: self
-	           selector: @selector(mdextractorConnectionDidDie:)
-		             name: NSConnectionDidDieNotification
-		           object: c];
-      
-      mdextractor = fsw;
-	    [mdextractor setProtocolForProxy: @protocol(MDExtractorProtocol)];
-      RETAIN (mdextractor);
-      
-	  } else {
-	    static BOOL recursion = NO;
-	    static NSString	*cmd = nil;
-
-	    if (recursion == NO) {
-        if (cmd == nil) {
-          cmd = RETAIN ([[NSSearchPathForDirectoriesInDomains(
-                      GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
-                            stringByAppendingPathComponent: @"mdextractor"]);
-		    }
-      }
-	  
-      if (recursion == NO && cmd != nil) {
-        int i;
-        
-        [startAppWin showWindowWithTitle: @"MDIndexing"
-                                 appName: @"mdextractor"
-                               operation: NSLocalizedString(@"starting:", @"")
-                            maxProgValue: timeout];
-
-	      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
-        DESTROY (cmd);
-        
-        for (i = 1; i <= timeout; i++) {
-          [startAppWin updateProgressBy: 1.0];
-	        [[NSRunLoop currentRunLoop] runUntilDate:
-		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
-                           
-          fsw = [NSConnection rootProxyForConnectionWithRegisteredName: @"mdextractor" 
-                                                                  host: @""];                  
-          if (fsw) {
-            [startAppWin updateProgressBy: timeout - i];
-            break;
-          }
+        mdextractor = [NSConnection rootProxyForConnectionWithRegisteredName: @"mdextractor" 
+                                                                        host: @""];                  
+        if (mdextractor) {
+          [startAppWin updateProgressBy: 80.0 - i];
+          break;
         }
-        
-        [[startAppWin win] close];
-        
-	      recursion = YES;
-	      [self connectMDExtractor];
-	      recursion = NO;
-        
-	    } else { 
-        DESTROY (cmd);
-	      recursion = NO;
-
-        NSRunAlertPanel(nil,
-                NSLocalizedString(@"unable to contact mdextractor!", @""),
-                NSLocalizedString(@"Ok", @""),
-                nil, 
-                nil);  
       }
-	  }
+
+      [[startAppWin win] close];
+    }
+    
+    if (mdextractor) {
+      [mdextractor setProtocolForProxy: @protocol(MDExtractorProtocol)];
+      RETAIN (mdextractor);
+    
+	    [[NSNotificationCenter defaultCenter] addObserver: self
+	                   selector: @selector(mdextractorConnectionDidDie:)
+		                     name: NSConnectionDidDieNotification
+		                   object: [mdextractor connectionForProxy]];
+    } else {
+      NSRunAlertPanel(nil,
+              NSLocalizedString(@"unable to contact mdextractor!", @""),
+              NSLocalizedString(@"Ok", @""),
+              nil, 
+              nil);  
+    }
   }
 }
 
