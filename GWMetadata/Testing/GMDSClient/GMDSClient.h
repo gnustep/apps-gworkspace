@@ -33,7 +33,7 @@
 
 - (BOOL)queryResults:(NSData *)results;
 
-- (oneway void)endOfQuery;
+- (oneway void)endOfQueryWithNumber:(NSData *)qnum;
 
 @end
 
@@ -102,7 +102,7 @@
 
 - (BOOL)queryResults:(NSData *)results;
 
-- (void)endOfQuery;
+- (oneway void)endOfQueryWithNumber:(NSData *)qnum;
 
 - (IBAction)stopQuery:(id)sender;
 

@@ -68,7 +68,7 @@ static void contains_substr(sqlite3_context *context, int argc, sqlite3_value **
   const char *substr = (const char *)sqlite3_value_text(argv[1]);
   int contains = (strstr(buff, substr) != NULL);
   
-  printf("buff = %s - substr = %s contains = %d\n", buff, substr, contains);
+//  printf("buff = %s - substr = %s contains = %d\n", buff, substr, contains);
   
   sqlite3_result_int(context, contains);
 }
@@ -230,14 +230,9 @@ BOOL queryResults(NSString *qstr)
             /* mdfind reports only the path and (optionally) the score */          
             if (type == SQLITE_TEXT) {
               /* only if i == 0 to not print also the attribute name */  
-           //   if (i == 0) {
+              if (i == 0) {
                 GSPrintf(stdout, @" %s", sqlite3_column_text(stmt, i));          
-           //   }
-           
-            //
-            // TOGLIERE ANCHE IL printf() IN contains_substr()
-            //
-           
+              }                      
             } else if (repscore && type == SQLITE_FLOAT) {
               GSPrintf(stdout, @" %f", sqlite3_column_double(stmt, i));          
             }

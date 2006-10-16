@@ -32,7 +32,7 @@
 
 - (BOOL)queryResults:(NSData *)results;
 
-- (oneway void)endOfQuery;
+- (oneway void)endOfQueryWithNumber:(NSData *)qnum;
 
 @end
 
@@ -77,6 +77,8 @@
           
 - (BOOL)sendResults:(NSArray *)lines
            forQueryWithNumber:(NSNumber *)qnum;
+
+- (void)endOfQueryWithNumber:(NSNumber *)qnum;
            
 - (BOOL)opendb;
 

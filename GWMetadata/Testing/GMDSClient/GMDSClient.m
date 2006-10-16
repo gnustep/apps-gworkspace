@@ -324,7 +324,7 @@ static NSString *nibName = @"GMDSClient";
                     
       [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
    
-      for (i = 1; i <= 40; i++) {
+      for (i = 0; i < 40; i++) {
 	      [[NSRunLoop currentRunLoop] runUntilDate:
 		                     [NSDate dateWithTimeIntervalSinceNow: 0.1]];
 
@@ -567,7 +567,7 @@ static NSString *nibName = @"GMDSClient";
   return resok;
 }
 
-- (void)endOfQuery
+- (oneway void)endOfQueryWithNumber:(NSData *)qnum
 {
   [progView stop];
   [foundField setStringValue: [NSString stringWithFormat: @"%i", [foundObjects count]]];

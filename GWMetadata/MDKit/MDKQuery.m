@@ -23,11 +23,11 @@
  */
 
 #include "MDKQuery.h"
+#include "MDKQueryManager.h"
 #include "SQLite.h"
 
 static NSArray *attrNames = nil;
 static NSDictionary *attrInfo = nil;
-static unsigned long tabnum = 0;
 
 static NSString *path_sep(void);
 
@@ -172,6 +172,8 @@ enum {
   self = [super init];
   
   if (self) {   
+    qmanager = [MDKQueryManager queryManager];
+
     attribute = nil;
     searchValue = nil;
    
@@ -181,7 +183,7 @@ enum {
     searchPaths = nil;     
     
     ASSIGN (srcTable, @"paths");
-    ASSIGN (destTable, ([NSString stringWithFormat: @"tab_%i", tabnum++]));
+    ASSIGN (destTable, ([NSString stringWithFormat: @"tab_%i", [qmanager nextTableNumber]]));
     joinTable = nil;
             
     subqueries = [NSMutableArray new];    

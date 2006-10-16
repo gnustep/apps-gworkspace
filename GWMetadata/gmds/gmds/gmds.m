@@ -550,7 +550,7 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
     [self performPostQueries: postqueries];
   }
   
-  [[clientInfo objectForKey: @"client"] endOfQuery];
+  [self endOfQueryWithNumber: queryNumber];
   
   RELEASE (pool);
 }
@@ -569,6 +569,12 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
   RELEASE (arp);
   
   return accepted;
+}
+
+- (void)endOfQueryWithNumber:(NSNumber *)qnum
+{
+  NSData *ndata = [NSArchiver archivedDataWithRootObject: qnum];
+  [[clientInfo objectForKey: @"client"] endOfQueryWithNumber: ndata];
 }
 
 - (BOOL)opendb

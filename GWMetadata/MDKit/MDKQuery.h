@@ -67,6 +67,8 @@ typedef enum _GMDCompoundOperator
   GMDCompoundOperator compoundOperator;
   
   NSMutableDictionary *sqldescription;
+  
+  id qmanager;
 }
 
 + (NSArray *)attributesNames;

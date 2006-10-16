@@ -18,12 +18,14 @@ MDKit_RESOURCE_FILES = \
 		    
 MDKit_OBJC_FILES = \
 SQLite.m \
-MDKQuery.m 
+MDKQuery.m \
+MDKQueryManager.m
 
 MDKit_HEADER_FILES = \
 MDKit.h \
 SQLite.h \
-MDKQuery.h 
+MDKQuery.h \
+MDKQueryManager.h 
     				 
 -include GNUmakefile.preamble
 
