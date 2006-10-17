@@ -446,11 +446,11 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
 {
   CREATE_AUTORELEASE_POOL(pool); 
   NSDictionary *dict = [NSUnarchiver unarchiveObjectWithData: queryInfo];  
-  NSArray *prequeries = [dict objectForKey: @"pre_queries"];
+  NSArray *prequeries = [dict objectForKey: @"pre"];
   BOOL prepared = YES;
-  NSString *query = [dict objectForKey: @"query"];
-  NSArray *postqueries = [dict objectForKey: @"post_queries"];  
-  NSNumber *queryNumber = [dict objectForKey: @"query_number"];  
+  NSString *query = [dict objectForKey: @"join"];
+  NSArray *postqueries = [dict objectForKey: @"post"];  
+  NSNumber *queryNumber = [dict objectForKey: @"qnumber"];  
   const char *qbuff = [query UTF8String];
   NSMutableArray *reslines = [NSMutableArray array];
   struct sqlite3_stmt *stmt;
@@ -563,7 +563,7 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
   NSMutableDictionary *results = [NSMutableDictionary dictionary];
   BOOL accepted;
   
-  [results setObject: qnum forKey: @"query_number"];  
+  [results setObject: qnum forKey: @"qnumber"];  
   [results setObject: lines forKey: @"lines"];
   accepted = [client queryResults: [NSArchiver archivedDataWithRootObject: results]];    
   RELEASE (arp);

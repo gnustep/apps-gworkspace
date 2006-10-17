@@ -821,19 +821,22 @@ do { \
 
 - (void)checkNextDir:(id)sender
 {
-  unsigned count = [directories count];
-
-  if (extracting) {
-    return;
-  }
-    
-  if (dirpos < count) {
+  if (extracting == NO) {
     CREATE_AUTORELEASE_POOL(arp);
-    NSString *dir = [directories objectAtIndex: dirpos];
-    NSDictionary *attributes = [fm fileAttributesAtPath: dir traverseLink: NO];
-    BOOL dirok = (attributes && ([attributes fileType] == NSFileTypeDirectory));
+    unsigned count = [directories count];
+    NSString *dir;
+    NSDictionary *attributes;
+    BOOL dirok;
     unsigned i;
-    
+  
+    if ((dirpos >= count) || (dirpos < 0)) {
+      dirpos = 0;
+    }
+  
+    dir = [directories objectAtIndex: dirpos];
+    attributes = [fm fileAttributesAtPath: dir traverseLink: NO];
+    dirok = (attributes && ([attributes fileType] == NSFileTypeDirectory));
+  
     if (dirok) {
       NSArray *contents = [self filteredDirectoryContentsAtPath: dir escapeEntries: YES];
       NSMutableDictionary *dbcontents = [NSMutableDictionary dictionary];

@@ -188,6 +188,7 @@ enum {
             
     subqueries = [NSMutableArray new];    
     subclosed = NO;
+    built = NO;
     parentQuery = nil;     
     compoundOperator = GMDCompoundOperatorNone;
 
@@ -195,6 +196,7 @@ enum {
     [sqldescription setObject: [NSMutableArray array] forKey: @"pre"];
     [sqldescription setObject: [NSString string] forKey: @"join"];
     [sqldescription setObject: [NSMutableArray array] forKey: @"post"];
+    [sqldescription setObject: [NSNumber numberWithInt: 0] forKey: @"qnumber"];
   }
   
   return self;
@@ -538,6 +540,11 @@ enum {
   }
 }
 
+- (BOOL)isClosed
+{
+  return subclosed;
+}
+
 - (NSArray *)subqueries
 {
   return subqueries;
@@ -546,9 +553,10 @@ enum {
 - (BOOL)buildQuery
 {
   if (subclosed) {
-    BOOL built = YES;
     unsigned i;
-
+    
+    built = YES;
+    
     for (i = 0; i < [subqueries count]; i++) {
       built = [[subqueries objectAtIndex: i] buildQuery];    
       if (built == NO) {
@@ -564,6 +572,11 @@ enum {
   }
   
   return NO;
+}
+
+- (BOOL)isBuilt
+{
+  return built;
 }
 
 - (void)appendSQLToPreStatements:(NSString *)sqlstr
@@ -651,6 +664,16 @@ enum {
   }
   
   return nil;
+}
+
+- (void)setQueryNumber:(NSNumber *)qnum
+{
+  [sqldescription setObject: qnum forKey: @"qnumber"];  
+}
+
+- (NSNumber *)queryNumber
+{
+  return [sqldescription objectForKey: @"qnumber"];  
 }
 
 @end
@@ -980,8 +1003,10 @@ enum {
                     checkExisting: YES];
   
   [parentQuery setJoinTable: destTable];
-
-  return YES;
+  
+  built = YES;
+  
+  return built;
 }
 
 - (NSString *)description
@@ -1259,7 +1284,9 @@ enum {
   
   [parentQuery setJoinTable: destTable];
   
-  return YES;
+  built = YES;
+  
+  return built;
 }
 
 - (NSString *)description

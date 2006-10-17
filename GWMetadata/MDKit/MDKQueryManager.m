@@ -78,7 +78,9 @@ static MDKQueryManager *queryManager = nil;
     RELEASE (self);
     return RETAIN (queryManager);
   }
-
+  
+  queries = [NSMutableDictionary dictionary];
+  
   tableNumber = 0L;
   queryNumber = 0L;
   gmds = nil;
@@ -87,16 +89,56 @@ static MDKQueryManager *queryManager = nil;
   return self;
 }
 
-- (void)startQuery:(MDKQuery *)query
+- (BOOL)startQuery:(MDKQuery *)query
 {
-
+  if ([query isRoot] == NO) {
+    [NSException raise: NSInvalidArgumentException
+	              format: @"\"%@\" is not the root query.", [query description]];
+  }
+  
+  if ([[queries allValues] containsObject: query]) { 
+    [NSException raise: NSInvalidArgumentException
+	              format: @"\"%@\" is already started.", [query description]];
+  }
+  
   [self connectGMDs];
   
-  if (gmds == nil) {
-    [NSException raise: NSInternalInconsistencyException
-	              format: @"The query manager is unable to contact the gmds daemon."];
-  }
+  if (gmds) {
+    NSNumber *qnum = [self nextQueryNumber];
+    NSDictionary *dict;
+    
+    NS_DURING
+	    {
+        if ([query isClosed] == NO) {
+          [query closeSubqueries];
+        }
+        if ([query isBuilt] == NO) {
+          [query buildQuery];
+        }
+	    }
+    NS_HANDLER
+	    {
+        NSLog(@"unable to build \"%@\"", [query description]); 
+        return NO;
+	    }
+    NS_ENDHANDLER
 
+    [query setQueryNumber: qnum];
+    [queries setObject: query forKey: qnum];
+
+  // waitResults ???????
+  // queryStopped ???????
+
+    dict = [query sqldescription];
+    [gmds performQuery: [NSArchiver archivedDataWithRootObject: dict]];
+
+
+  } else {
+    [NSException raise: NSInternalInconsistencyException
+	              format: @"The query manager is unable to contact the gmds daemon."];  
+  }
+  
+  return YES;
 }
 
 - (BOOL)queryResults:(NSData *)results

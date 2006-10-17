@@ -63,6 +63,7 @@ typedef enum _GMDCompoundOperator
 
   NSMutableArray *subqueries;
   BOOL subclosed;
+  BOOL built;
   MDKQuery *parentQuery;
   GMDCompoundOperator compoundOperator;
   
@@ -131,9 +132,13 @@ typedef enum _GMDCompoundOperator
 
 - (void)closeSubqueries;
 
+- (BOOL)isClosed;
+
 - (NSArray *)subqueries;
 
 - (BOOL)buildQuery;
+
+- (BOOL)isBuilt;
 
 - (void)appendSQLToPreStatements:(NSString *)sqlstr
                    checkExisting:(BOOL)check;
@@ -142,6 +147,9 @@ typedef enum _GMDCompoundOperator
                     checkExisting:(BOOL)check;
 
 - (NSDictionary *)sqldescription;
+
+- (void)setQueryNumber:(NSNumber *)qnum;
+- (NSNumber *)queryNumber;
 
 @end
 

@@ -177,7 +177,7 @@ static NSString *nibName = @"GMDSClient";
                                       @"~`@#$%^_-+\\{}:;\"\',/?"];
   [skipSet formUnionWithCharacterSet: set];  
   
-  currentQuery = [NSMutableDictionary new];
+  currentQuery = [NSDictionary new];
   queryNumber = 0L;
 }
 
@@ -480,9 +480,6 @@ static NSString *nibName = @"GMDSClient";
   CREATE_AUTORELEASE_POOL(arp);
   unsigned count = [queryWords count];
   MDKQuery *query = [MDKQuery query];
-  NSArray *prequeries;
-  NSArray *postqueries;
-  NSString *querystr;
   int i;
 
   [query appendSubqueryWithCompoundOperator: GMDCompoundOperatorNone
@@ -501,26 +498,20 @@ static NSString *nibName = @"GMDSClient";
   
   [query closeSubqueries];
   
-  if ([query buildQuery]) {    
-    NSDictionary *dict = [query sqldescription];
-       
-    prequeries = [dict objectForKey: @"pre"];
-    postqueries = [dict objectForKey: @"post"];
-    querystr = [dict objectForKey: @"join"];
-  }
-
-  [currentQuery removeAllObjects];
-  [currentQuery setObject: prequeries forKey: @"pre_queries"];
-  [currentQuery setObject: querystr forKey: @"query"];
-  [currentQuery setObject: postqueries forKey: @"post_queries"];
-  [currentQuery setObject: [self nextQueryNumber] forKey: @"query_number"];
+  if ([query buildQuery] == NO) {
+    NSLog(@"unable to build \"%@\"", [query description]); 
+    [NSApp terminate: self];
+  } 
+     
+  [query setQueryNumber: [self nextQueryNumber]];    
+     
+  ASSIGN (currentQuery, [query sqldescription]);
     
   [foundObjects removeAllObjects];
   [resultsView noteNumberOfRowsChanged];
   [resultsView setNeedsDisplayInRect: [resultsView visibleRect]];
   [foundField setStringValue: @"0"];
 
-         //   NSLog([currentQuery description]);
             NSLog([query description]);
 
   if (waitResults == NO) {
@@ -541,13 +532,13 @@ static NSString *nibName = @"GMDSClient";
 {
   CREATE_AUTORELEASE_POOL(arp);
   NSDictionary *dict = [NSUnarchiver unarchiveObjectWithData: results];
-  NSNumber *qnum = [dict objectForKey: @"query_number"];
+  NSNumber *qnum = [dict objectForKey: @"qnumber"];
   NSArray *lines = [dict objectForKey: @"lines"];
   BOOL resok = NO;
   int i;
   
   if ((queryStopped == NO) 
-            && [[currentQuery objectForKey: @"query_number"] isEqual: qnum]) {
+            && [[currentQuery objectForKey: @"qnumber"] isEqual: qnum]) {
     for (i = 0; i < [lines count]; i++) {
       NSArray *line = [lines objectAtIndex: i];
       NSString *path = [line objectAtIndex: 0];

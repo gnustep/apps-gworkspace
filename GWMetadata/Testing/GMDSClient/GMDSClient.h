@@ -66,7 +66,7 @@
   NSTableColumn *kindColumn;  
   
   NSArray *queryWords;
-  NSMutableDictionary *currentQuery;
+  NSDictionary *currentQuery;
   unsigned long queryNumber;
   BOOL waitResults;
   BOOL pendingQuery;

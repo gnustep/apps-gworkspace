@@ -30,6 +30,7 @@
 
 @interface MDKQueryManager : NSObject
 {  
+  NSMutableDictionary *queries;
   unsigned long tableNumber;
   unsigned long queryNumber;
   id gmds;
@@ -39,7 +40,7 @@
 
 + (MDKQueryManager *)queryManager;
 
-- (void)startQuery:(MDKQuery *)query;
+- (BOOL)startQuery:(MDKQuery *)query;
 
 - (BOOL)queryResults:(NSData *)results;
 

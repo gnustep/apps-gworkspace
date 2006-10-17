@@ -1,5 +1,7 @@
 
-GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
+# Install into the system root by default
+GNUSTEP_INSTALLATION_DOMAIN=SYSTEM
+RPM_DISABLE_RELOCATABLE=YES
 
 include $(GNUSTEP_MAKEFILES)/common.make
 include Version

@@ -1,6 +1,8 @@
-include $(GNUSTEP_MAKEFILES)/common.make
+# Install into the system root by default
+GNUSTEP_INSTALLATION_DOMAIN=SYSTEM
+RPM_DISABLE_RELOCATABLE=YES
 
-GNUSTEP_INSTALLATION_DIR = $(GNUSTEP_SYSTEM_ROOT)
+include $(GNUSTEP_MAKEFILES)/common.make
 
 BUNDLE_NAME = OpenOfficeExtractor
 BUNDLE_EXTENSION = .extr
