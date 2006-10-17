@@ -742,7 +742,10 @@ static GWorkspace *gworkspace = nil;
 
 - (NSImage *)tshelfBackground
 {
-  return ([dtopManager isActive]) ? [dtopManager tabbedShelfBackground] : nil;
+  if ([dtopManager isActive]) {
+    return [dtopManager tabbedShelfBackground];
+  }
+  return nil;
 }
 
 - (void)tshelfBackgroundDidChange

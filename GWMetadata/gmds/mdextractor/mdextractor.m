@@ -535,7 +535,11 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
     [indexedStatusLock unlock];
   }
   
-  return ((status != nil) ? status : [NSArray array]);
+  if (status != nil) {
+    return status;
+  }
+  
+  return [NSArray array];
 }
 
 - (void)writePathsStatus:(id)sender

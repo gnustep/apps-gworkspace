@@ -292,7 +292,11 @@
 		}
   }
   
-  return [icns count] ? icns : nil;
+  if ([icns count]) {
+    return icns;
+  }
+  
+  return nil;
 }
 
 - (NSArray *)iconsWithGridOriginY:(float)y
@@ -308,8 +312,12 @@
       [icns addObject: icon];
 		}
   }
+
+  if ([icns count]) {
+    return icns;
+  }
   
-  return [icns count] ? icns : nil;
+  return nil;
 }
 
 - (int)indexOfGridRectContainingPoint:(NSPoint)p

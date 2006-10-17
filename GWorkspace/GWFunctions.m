@@ -221,7 +221,11 @@ NSString *commonPrefixInArray(NSArray *a)
     index++;
   } 
   
-  return ([s length] ? s : nil);
+  if ([s length]) {
+    return s;
+  }
+  
+  return nil;
 }
 
 NSString *fileSizeDescription(unsigned long long size)

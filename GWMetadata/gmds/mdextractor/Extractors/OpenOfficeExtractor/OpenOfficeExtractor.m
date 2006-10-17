@@ -286,7 +286,11 @@ static char *style = "<xsl:stylesheet "
     RELEASE (task);
   } 
   
-  return ((paths && [paths count]) ? paths : nil);
+  if (paths && [paths count]) {
+    return paths;
+  }
+  
+  return nil;
 }
 
 - (NSDictionary *)getAttributes:(NSMutableDictionary *)attributes

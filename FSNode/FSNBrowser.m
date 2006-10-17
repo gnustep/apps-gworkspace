@@ -935,7 +935,12 @@
 - (NSString *)pathToLastColumn
 {
   FSNode *node = [self nodeOfLastColumn];
-  return node ? [node path] : nil;
+
+  if (node) {
+    return [node path];
+  }
+  
+  return nil;
 }
 
 - (NSArray *)selectionInColumnBeforeColumn:(FSNBrowserColumn *)col

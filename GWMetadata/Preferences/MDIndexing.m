@@ -646,8 +646,12 @@ return; \
   [openPanel setCanChooseDirectories: YES];
 
   result = [openPanel runModalForDirectory: nil file: nil types: nil];
-
-  return ((result == NSOKButton) ? [openPanel filename] : nil);  
+  
+  if (result == NSOKButton) {
+    return [openPanel filename];
+  }
+  
+  return nil;
 }
 
 - (void)adjustMatrix:(NSMatrix *)matrix

@@ -152,8 +152,14 @@ static NSImage *branchImage;
   selcount = [newSelection count]; 
   
   for (i = 0; i < selcount; i++) {   
+    FSNode *pn = nil;
+    
+    if (i != 0) {
+      pn = node;
+    }
+    
     node = [FSNode nodeWithRelativePath: [newSelection objectAtIndex: i] 
-                                 parent: ((i == 0) ? nil : node)];
+                                 parent: pn];
                                  
     component = [[FSNPathComponentView alloc] initForNode: node
                                                  iconSize: ICN_SIZE];
@@ -176,7 +182,11 @@ static NSImage *branchImage;
 - (void)mouseMovedOnComponent:(FSNPathComponentView *)component
 {
   if (openComponent != component) {
-    openComponent = (component != lastComponent) ? component : nil;
+    if (component != lastComponent) {
+      openComponent = component;
+    } else {
+      openComponent = nil;
+    }
     [self tile];
   }
 }

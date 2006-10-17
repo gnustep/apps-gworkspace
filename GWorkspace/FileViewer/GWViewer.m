@@ -145,7 +145,11 @@
     viewType = [viewerPrefs objectForKey: @"viewtype"];
     
     if (viewType == nil) {
-      viewType = ((stype != nil) ? stype : @"Browser");
+      if (stype != nil) {
+        viewType = stype;
+      } else {
+        viewType = @"Browser";
+      }
     }
     if (([viewType isEqual: @"Icon"] == NO)
               && ([viewType isEqual: @"List"] == NO)

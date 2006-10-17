@@ -564,16 +564,18 @@
   if ([path isEqual: [baseNode path]] == NO) {
     FSNode *node = [FSNode nodeWithPath: path];
     BOOL close = [sender closeViewer];
-  
+    id vwr = nil;
+    
     if (close) {
       [pathsPopUp setTarget: nil];
+      vwr = self;
     }
   
     [manager newViewerOfType: SPATIAL
                     showType: nil
                      forNode: node 
                showSelection: NO
-              closeOldViewer: (close ? self : nil)
+              closeOldViewer: vwr
                     forceNew: NO];
   } else {
     [nodeView showContentsOfNode: baseNode]; 

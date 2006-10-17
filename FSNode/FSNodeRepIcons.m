@@ -181,7 +181,12 @@ static unsigned char darkerLUT[256] = {
     if (icon == nil) {
       NSString *ext = [[nodepath pathExtension] lowercaseString];
       
-      key = ((ext && ([ext isEqual: @""] == NO)) ? ext : @"unknown");
+      if (ext && ([ext isEqual: @""] == NO)) {
+        key = ext;
+      } else {
+        key = @"unknown";
+      }
+      
       icon = [self cachedIconOfSize: size forKey: key];
 
       if (icon == nil) {

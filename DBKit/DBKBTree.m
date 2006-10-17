@@ -390,8 +390,12 @@ NSRecursiveLock *dbkbtree_lock = nil;
 
   [self checkBegin];
   node = [self nodeOfKey: key getIndex: &index didExist: &exists];
-
-  return (exists ? node : nil);
+  
+  if (exists) {
+    return node;
+  }
+  
+  return nil;
 }
 
 - (NSArray *)keysGreaterThenKey:(id)akey

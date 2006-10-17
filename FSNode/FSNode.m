@@ -182,8 +182,12 @@
   CREATE_AUTORELEASE_POOL(arp);
   NSMutableArray *nodes = [NSMutableArray array];
   NSArray *fnames = [fsnodeRep directoryContentsAtPath: [self parentPath]];
-  FSNode *pnd = (parent != nil) ? [parent parent] : nil;
+  FSNode *pnd = nil;
   int i;
+  
+  if (parent != nil) {
+    pnd = [parent parent];
+  }
   
   for (i = 0; i < [fnames count]; i++) {
     NSString *fname = [fnames objectAtIndex: i];
@@ -438,7 +442,7 @@
   if (attributes && (fileType == nil)) {
     ASSIGN (fileType, [attributes fileType]);
   }
-  return (fileType ? fileType : [NSString string]);
+  return (fileType ? fileType : (NSString *)[NSString string]);
 }
 
 - (void)setTypeFlags
@@ -577,7 +581,7 @@
   if (attributes && (crDate == nil)) {
     ASSIGN (crDate, [attributes fileCreationDate]);
   }
-  return (crDate ? crDate : [NSDate date]);
+  return (crDate ? crDate : (NSDate *)[NSDate date]);
 }
 
 - (NSString *)crDateDescription
@@ -603,7 +607,7 @@
   if (attributes && (modDate == nil)) {
     ASSIGN (modDate, [attributes fileModificationDate]);
   }
-  return (modDate ? modDate : [NSDate date]);
+  return (modDate ? modDate : (NSDate *)[NSDate date]);
 }
 
 - (NSString *)modDateDescription
@@ -670,7 +674,7 @@
   if (attributes && (owner == nil)) {
     ASSIGN (owner, [attributes fileOwnerAccountName]);
   }
-  return (owner ? owner : [NSString string]);
+  return (owner ? owner : (NSString *)[NSString string]);
 }
 
 - (NSNumber *)ownerId
@@ -686,7 +690,7 @@
   if (attributes && (group == nil)) {
     ASSIGN (group, [attributes fileGroupOwnerAccountName]);
   }
-  return (group ? group : [NSString string]);
+  return (group ? group : (NSString *)[NSString string]);
 }
 
 - (NSNumber *)groupId

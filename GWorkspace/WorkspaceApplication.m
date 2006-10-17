@@ -132,7 +132,10 @@
 
 - (NSDictionary *)activeApplication
 {
-  return ((activeApplication != nil) ? [activeApplication appInfo] : nil);
+  if (activeApplication != nil) {
+    return [activeApplication appInfo];
+  }
+  return nil;
 }
 
 - (BOOL)openFile:(NSString *)fullPath
@@ -715,7 +718,11 @@
   
   apps = [runningInfo objectForKey: @"GSLaunched"];
   
-  return ((apps != nil) ? [apps allValues] : nil);
+  if (apps != nil) {
+    return [apps allValues];
+  }
+  
+  return nil;
 }
 
 - (void)updateStoredAppInfoWithLaunchedApps:(NSArray *)apps
