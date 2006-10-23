@@ -68,8 +68,12 @@ typedef enum _GMDCompoundOperator
   GMDCompoundOperator compoundOperator;
   
   NSMutableDictionary *sqldescription;
+  NSArray *attributesList;
   
   id qmanager;
+  id delegate;
+  BOOL started;
+  BOOL stopped;
 }
 
 + (NSArray *)attributesNames;
@@ -146,11 +150,52 @@ typedef enum _GMDCompoundOperator
 - (void)appendSQLToPostStatements:(NSString *)sqlstr
                     checkExisting:(BOOL)check;
 
+- (void)appendToAttributesList:(NSCountedSet *)attributes;
+
+@end
+
+
+@interface MDKQuery (gathering)
+
+- (void)setDelegate:(id)adelegate;
+
 - (NSDictionary *)sqldescription;
 
 - (void)setQueryNumber:(NSNumber *)qnum;
 - (NSNumber *)queryNumber;
+- (NSComparisonResult)compareByQueryNumber:(MDKQuery *)other;
+
+- (void)startQuery;
+- (void)setStarted;
+- (BOOL)isStarted;
+
+- (void)stopQuery;
+- (BOOL)isStopped;
+
+- (void)endQuery;
+
+- (void)appendResults:(NSArray *)lines;
+
+- (NSArray *)attributesList;
+
+@end
+
+
+@interface NSObject (MDKQueryDelegate)
+
+- (void)appendResults:(NSArray *)lines;
+
+- (void)endQuery;
 
 @end
 
 #endif // MDK_QUERY_H
+
+
+
+
+
+
+
+
+

@@ -24,11 +24,14 @@
 
 #include "MDKQueryManager.h"
 
+static MDKQueryManager *queryManager = nil;
+
+
 @protocol	GMDSClientProtocol
 
 - (BOOL)queryResults:(NSData *)results;
 
-- (oneway void)endOfQueryWithNumber:(NSData *)qnum;
+- (oneway void)endOfQueryWithNumber:(NSNumber *)qnum;
 
 @end
 
@@ -39,53 +42,41 @@
 
 - (oneway void)unregisterClient:(id)remote;
 
-- (oneway void)performQuery:(NSData *)queryInfo;
+- (oneway void)performQuery:(NSDictionary *)queryInfo;
 
 @end
 
 
 @implementation MDKQueryManager
 
-static MDKQueryManager *queryManager = nil;
-
-+ (id)allocWithZone:(NSZone *)zone
-{
-  [NSException raise: NSInvalidArgumentException
-	            format: @"You may not allocate a query manager directly"];
-  return nil;
-}
-
 + (MDKQueryManager *)queryManager
 {
   if (queryManager == nil) {
-    queryManager = (MDKQueryManager *)NSAllocateObject(self, 0, NSDefaultMallocZone());
-	  [queryManager init];
+    queryManager = [MDKQueryManager new];
   }
-    
   return queryManager;
 }
 
 - (void)dealloc
 {  
-  [NSException raise: NSInvalidArgumentException
-	            format: @"Attempt to call dealloc for shared query manager"];
-  GSNOSUPERDEALLOC;
+  RELEASE (queries);
+  
+  [super dealloc];
 }
 
 - (id)init
 {
-  if (self != queryManager) {
-    RELEASE (self);
-    return RETAIN (queryManager);
+  self = [super init];
+  
+  if (self) {
+    queries = [NSMutableArray new];
+  
+    tableNumber = 0L;
+    queryNumber = 0L;
+    gmds = nil;
+    nc = [NSNotificationCenter defaultCenter];
   }
   
-  queries = [NSMutableDictionary dictionary];
-  
-  tableNumber = 0L;
-  queryNumber = 0L;
-  gmds = nil;
-  nc = [NSNotificationCenter defaultCenter];
-
   return self;
 }
 
@@ -96,7 +87,7 @@ static MDKQueryManager *queryManager = nil;
 	              format: @"\"%@\" is not the root query.", [query description]];
   }
   
-  if ([[queries allValues] containsObject: query]) { 
+  if ([queries containsObject: query]) { 
     [NSException raise: NSInvalidArgumentException
 	              format: @"\"%@\" is already started.", [query description]];
   }
@@ -105,7 +96,18 @@ static MDKQueryManager *queryManager = nil;
   
   if (gmds) {
     NSNumber *qnum = [self nextQueryNumber];
-    NSDictionary *dict;
+    unsigned count = [queries count];
+    unsigned i;
+
+    for (i = 0; i < count; i++) {
+      MDKQuery *q = [queries objectAtIndex: i];
+      
+      if (([q isStarted] == NO) && [q isStopped]) {
+        [queries removeObjectAtIndex: i];
+        i--;
+        count--;
+      }
+    }
     
     NS_DURING
 	    {
@@ -118,21 +120,19 @@ static MDKQueryManager *queryManager = nil;
 	    }
     NS_HANDLER
 	    {
-        NSLog(@"unable to build \"%@\"", [query description]); 
+        NSLog(@"%@", localException); 
         return NO;
 	    }
     NS_ENDHANDLER
-
+        
     [query setQueryNumber: qnum];
-    [queries setObject: query forKey: qnum];
-
-  // waitResults ???????
-  // queryStopped ???????
-
-    dict = [query sqldescription];
-    [gmds performQuery: [NSArchiver archivedDataWithRootObject: dict]];
-
-
+    [queries insertObject: query atIndex: 0];
+    
+    if ([queries count] == 1) {
+      [query setStarted];
+      [gmds performQuery: [query sqldescription]];
+    }
+      
   } else {
     [NSException raise: NSInternalInconsistencyException
 	              format: @"The query manager is unable to contact the gmds daemon."];  
@@ -143,14 +143,67 @@ static MDKQueryManager *queryManager = nil;
 
 - (BOOL)queryResults:(NSData *)results
 {
+  CREATE_AUTORELEASE_POOL(arp);
+  NSDictionary *dict = [NSUnarchiver unarchiveObjectWithData: results];
+  NSNumber *qnum = [dict objectForKey: @"qnumber"];
+  MDKQuery *query = [self queryWithNumber: qnum];
+  BOOL resok = NO;
+  
+  if (query && ([query isStopped] == NO)) {
+    [query appendResults: [dict objectForKey: @"lines"]];
+    resok = YES;
+  }
 
+  RELEASE (arp);
 
-  return NO;
+  return resok;
 }
 
-- (oneway void)endOfQueryWithNumber:(NSData *)qnum
+- (oneway void)endOfQueryWithNumber:(NSNumber *)qnum
 {
+  MDKQuery *query = [self queryWithNumber: qnum];
+    
+  if (query) {
+    [query endQuery];
+    [queries removeObject: query];
+  }
 
+  query = [self nextQuery];
+
+  if (query && ([query isStarted] == NO)) {
+    if ([query isStopped] == NO) {
+      [query setStarted];
+      [gmds performQuery: [query sqldescription]];
+    } else {
+      [queries removeObject: query];
+    }
+  }
+}
+
+- (MDKQuery *)queryWithNumber:(NSNumber *)qnum
+{
+  unsigned i;
+
+  for (i = 0; i < [queries count]; i++) {
+    MDKQuery *query = [queries objectAtIndex: i];
+    
+    if ([[query queryNumber] isEqual: qnum]) {
+      return query;
+    }
+  }
+
+  return nil;
+}
+
+- (MDKQuery *)nextQuery
+{
+  unsigned count = [queries count];
+  
+  if (count) {
+    return [queries objectAtIndex: count -1];
+  }
+
+  return nil;
 }
 
 - (unsigned long)nextTableNumber

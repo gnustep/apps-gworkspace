@@ -95,6 +95,7 @@ enum {
   RELEASE (destTable); 
   TEST_RELEASE (joinTable);
   RELEASE (sqldescription);
+  TEST_RELEASE (attributesList);
   
 	[super dealloc];
 }
@@ -171,9 +172,7 @@ enum {
 {
   self = [super init];
   
-  if (self) {   
-    qmanager = [MDKQueryManager queryManager];
-
+  if (self) {       
     attribute = nil;
     searchValue = nil;
    
@@ -183,6 +182,7 @@ enum {
     searchPaths = nil;     
     
     ASSIGN (srcTable, @"paths");
+    qmanager = [MDKQueryManager queryManager];
     ASSIGN (destTable, ([NSString stringWithFormat: @"tab_%i", [qmanager nextTableNumber]]));
     joinTable = nil;
             
@@ -197,6 +197,12 @@ enum {
     [sqldescription setObject: [NSString string] forKey: @"join"];
     [sqldescription setObject: [NSMutableArray array] forKey: @"post"];
     [sqldescription setObject: [NSNumber numberWithInt: 0] forKey: @"qnumber"];
+    
+    attributesList = nil;
+    
+    started = NO;
+    stopped = NO;
+    delegate = nil;
   }
   
   return self;
@@ -347,17 +353,6 @@ enum {
     }
   }
 }
-
-/*
-- (void)closeSubqueries
-{
-  if (parentQuery) {
-    [parentQuery setDestTable: destTable];
-  }
-}
-*/
-
-
 
 - (MDKQuery *)parentQuery
 {
@@ -564,6 +559,14 @@ enum {
       }
     }
 
+    if ([self isRoot]) {
+      NSCountedSet *set = [[NSCountedSet alloc] initWithCapacity: 1];
+    
+      [self appendToAttributesList: set];
+      ASSIGN (attributesList, [set allObjects]);
+      RELEASE (set);
+    }
+
     return built;
   
   } else {
@@ -611,6 +614,21 @@ enum {
   }
 }
 
+- (void)appendToAttributesList:(NSCountedSet *)attributes
+{
+  if (attributes) {
+    unsigned i;
+  
+    if (attribute) {
+      [attributes addObject: attribute];
+    }
+    
+    for (i = 0; i < [subqueries count]; i++) {
+      [[subqueries objectAtIndex: i] appendToAttributesList: attributes];
+    }
+  }
+}
+
 - (NSString *)description
 {
   NSMutableString *descr = [NSMutableString string];
@@ -641,39 +659,6 @@ enum {
   [descr appendString: @" )"];
   
   return descr;
-}
-
-- (NSDictionary *)sqldescription
-{
-  if ([self isRoot]) {
-    NSString *jtable = [self joinTable];
-    NSString *joinquery = [NSString stringWithFormat: @"SELECT %@.path, "
-                                          @"%@.score, "
-                                          @"%@.attribute "
-                                          @"FROM %@ "
-                                          @"ORDER BY %@.score DESC; ",
-                                          jtable, jtable, jtable, jtable, jtable];
-  
-    [sqldescription setObject: joinquery forKey: @"join"];
-  
-    return sqldescription;
-  
-  } else {
-    [NSException raise: NSInternalInconsistencyException
-		            format: @"%@ is not the root query.", [self description]];     
-  }
-  
-  return nil;
-}
-
-- (void)setQueryNumber:(NSNumber *)qnum
-{
-  [sqldescription setObject: qnum forKey: @"qnumber"];  
-}
-
-- (NSNumber *)queryNumber
-{
-  return [sqldescription objectForKey: @"qnumber"];  
 }
 
 @end
@@ -1315,6 +1300,146 @@ enum {
   }  
   
   return descr;
+}
+
+@end
+
+
+@implementation MDKQuery (gathering)
+
+- (void)setDelegate:(id)adelegate
+{
+  if ([self isRoot]) {
+    delegate = adelegate;
+  } else {
+    [NSException raise: NSInternalInconsistencyException
+		            format: @"only the root query can have a delegate."];     
+  }
+}
+
+- (NSDictionary *)sqldescription
+{
+  if ([self isRoot]) {
+    NSString *jtable = [self joinTable];
+    NSString *joinquery = [NSString stringWithFormat: @"SELECT %@.path, "
+                                          @"%@.score, "
+                                          @"%@.attribute "
+                                          @"FROM %@ "
+                                          @"ORDER BY %@.score DESC; ",
+                                          jtable, jtable, jtable, jtable, jtable];
+  
+    [sqldescription setObject: joinquery forKey: @"join"];
+  
+    return [sqldescription makeImmutableCopyOnFail: NO];
+  
+  } else {
+    [NSException raise: NSInternalInconsistencyException
+		            format: @"%@ is not the root query.", [self description]];     
+  }
+  
+  return nil;
+}
+
+- (void)setQueryNumber:(NSNumber *)qnum
+{
+  [sqldescription setObject: qnum forKey: @"qnumber"];  
+}
+
+- (NSNumber *)queryNumber
+{
+  return [sqldescription objectForKey: @"qnumber"];  
+}
+
+- (NSComparisonResult)compareByQueryNumber:(MDKQuery *)other
+{
+  return [[self queryNumber] compare: [other queryNumber]];
+}
+
+- (void)startQuery
+{
+  if (started == NO) {
+    stopped = NO;
+    [qmanager startQuery: self];
+  }
+}
+
+- (void)setStarted
+{
+  started = YES;
+}
+
+- (BOOL)isStarted
+{
+  return started;
+}
+
+- (void)stopQuery
+{
+  stopped = YES;
+}
+
+- (BOOL)isStopped
+{
+  return stopped;
+}
+
+- (void)endQuery
+{
+  started = NO;
+  stopped = NO;
+
+  if (delegate) {
+    [delegate endQuery];
+  }  
+}
+
+- (void)appendResults:(NSArray *)lines
+{
+  if (delegate) {
+    [delegate appendResults: lines];
+  }
+  
+  // attributesList
+  
+/*  
+    NSString *joinquery = [NSString stringWithFormat: @"SELECT %@.path, "
+                                          @"%@.score, "
+                                          @"%@.attribute "
+  
+  
+    [sqlstr appendFormat: @"INSERT INTO %@ (id, path, words_count, score, attribute) "
+      @"SELECT "
+      @"%@.id, "
+      @"%@.path, "
+      @"%@.words_count, "
+      @"0.0, "
+      @"'%@' || ',' || attributeScore('%@', attributes.attribute, %i, %i) "
+      @"FROM %@, attributes "
+      @"WHERE attributes.key = '%@' ", 
+      destTable, srcTable, srcTable, srcTable, 
+      attribute, searchValue, attributeType, operatorType, 
+      srcTable, attribute];  
+
+
+    [sqlstr appendFormat: @"INSERT INTO %@ (id, path, words_count, score, attribute) "
+        @"SELECT "
+        @"%@.id, "
+        @"%@.path, "
+        @"%@.words_count, "
+        @"wordScore('%@', words.word, postings.word_count, %@.words_count), "
+        @"'%@' || ',' || 0.0 "    
+        @"FROM words, %@, postings ",
+        destTable, srcTable, srcTable, srcTable, 
+        searchValue, srcTable, attribute, srcTable];
+
+
+  if ([attribute isEqual: @"GSMDItemTextContent"]) {  
+*/  
+}
+
+- (NSArray *)attributesList
+{
+  return attributesList;
 }
 
 @end

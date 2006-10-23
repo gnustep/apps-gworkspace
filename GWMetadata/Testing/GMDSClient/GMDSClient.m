@@ -48,10 +48,9 @@ static NSString *nibName = @"GMDSClient";
 
 - (void)dealloc
 {
-  DESTROY (gmds);
   RELEASE (progView);
   TEST_RELEASE (queryWords);
-  RELEASE (currentQuery);
+  TEST_RELEASE (currentQuery);
   TEST_RELEASE (skipSet);
   RELEASE (foundObjects);
   TEST_RELEASE (win);
@@ -65,7 +64,6 @@ static NSString *nibName = @"GMDSClient";
 
   if (self) {
     fm = [NSFileManager defaultManager];
-    nc = [NSNotificationCenter defaultCenter];
   }
 
   return self;
@@ -177,202 +175,148 @@ static NSString *nibName = @"GMDSClient";
                                       @"~`@#$%^_-+\\{}:;\"\',/?"];
   [skipSet formUnionWithCharacterSet: set];  
   
-  currentQuery = [NSDictionary new];
-  queryNumber = 0L;
+  currentQuery = nil;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
   [win makeKeyAndOrderFront: nil];
-  [self connectGMDs];
-  
-  
-  
-  
-  
-  
-  
-  
-/*  
-
-  {
-    MDKQuery *query = [MDKQuery query];
-    MDKQuery *q;
-    
-    // (
-        
-    [query appendSubqueryWithCompoundOperator: GMDCompoundOperatorNone
-                                    attribute: @"GSMDItemExposureTimeSeconds"
-                                  searchValue: @"0.9"
-                                 operatorType: GMDLessThanOperatorType    
-                                caseSensitive: NO];
-    // (a 
-         
-    q = [query appendSubqueryWithCompoundOperator: GMDOrCompoundOperator];
-
-    // (a OR (
-    
-    q = [q appendSubqueryWithCompoundOperator: GMDCompoundOperatorNone];
-
-    // (a OR ((
-    
-    [q appendSubqueryWithCompoundOperator: GMDCompoundOperatorNone
-                                attribute: @"GSMDItemExposureTimeSeconds"
-                              searchValue: @"0.9"
-                             operatorType: GMDLessThanOperatorType    
-                            caseSensitive: NO];
-
-    // (a OR ((b
-    
-    [q appendSubqueryWithCompoundOperator: GMDAndCompoundOperator
-                                attribute: @"GSMDItemExposureTimeSeconds"
-                              searchValue: @"0.01"
-                             operatorType: GMDGreaterThanOperatorType    
-                            caseSensitive: NO];    
-
-    // (a OR ((b AND c
-    
-    [q closeSubqueries];
-
-    // (a OR ((b AND c)
-    
-    q = [q parentQuery];
-    
-    q = [q appendSubqueryWithCompoundOperator: GMDAndCompoundOperator];
-    
-    // (a OR ((b AND c) AND (
-    
-    [q appendSubqueryWithCompoundOperator: GMDCompoundOperatorNone
-                                attribute: @"GSMDItemFSExtension"
-                              searchValue: @"jpeg"
-                             operatorType: GMDEqualToOperatorType    
-                            caseSensitive: NO];
-    
-    // (a OR ((b AND c) AND (d
-    
-    [q appendSubqueryWithCompoundOperator: GMDOrCompoundOperator
-                                attribute: @"GSMDItemTextContent"
-                              searchValue: @"tiff"
-                             operatorType: GMDEqualToOperatorType    
-                            caseSensitive: NO];
-    
-    // (a OR ((b AND c) AND (d OR e
-    
-    [q closeSubqueries];
-    
-    // (a OR ((b AND c) AND (d OR e)
-    
-    q = [q parentQuery];
-    [q closeSubqueries];
-
-    // (a OR ((b AND c) AND (d OR e))
-    
-    [query closeSubqueries];
-    
-    // (a OR ((b AND c) AND (d OR e)))
-    
-    [query buildQuery];
-    
-    
-    NSLog([query description]);
-    NSLog([[query sqldescription] description]);
-
-//    NSString *str = @"GSMDItemExposureTimeSeconds < 0.9 "
-//                    @"|| ( ( GSMDItemExposureTimeSeconds < 0.4 "
-//                    @"&& GSMDItemExposureTimeSeconds > 0.01 ) "
-//                    @"&& ( GSMDItemFSExtension == \"jpeg\"wc "
-//                    @"|| GSMDItemTextContent == tiff ) )";
-    
-//    query = [MDKQuery queryFromString: str inDirectories: nil];
-    
- //   NSLog([query description]);
- //   NSLog([[query sqldescription] description]);
-
-  }
-
-*/   
-  
 }
 
 - (BOOL)applicationShouldTerminate:(NSApplication *)app 
 {
   [self updateDefaults];
   
-  if (gmds) {
-    [nc removeObserver: self
-	                name: NSConnectionDidDieNotification
-	              object: nil];
-    [gmds unregisterClient: self];
-  }
-  
 	return YES;
 }
 
-- (void)connectGMDs
+- (void)prepareQuery
 {
-  if (gmds == nil) {
-    gmds = [NSConnection rootProxyForConnectionWithRegisteredName: @"gmds" 
-                                                             host: @""];
-
-    if (gmds == nil) {
-	    NSString *cmd;
-      int i;
+  CREATE_AUTORELEASE_POOL(arp);
+  unsigned count = [queryWords count];
+  int i;
+  
+  if ([foundObjects count]) {
+    [foundObjects removeAllObjects];
+    [resultsView noteNumberOfRowsChanged];
+    [resultsView setNeedsDisplayInRect: [resultsView visibleRect]];
+    [foundField setStringValue: @"0"];
+  }
+  
+  [progView stop];
+  
+  if (currentQuery) {
+    [currentQuery stopQuery];
+  }
+  
+  ASSIGN (currentQuery, [MDKQuery query]);
+  [currentQuery setDelegate: self];
+  
+  [currentQuery appendSubqueryWithCompoundOperator: GMDCompoundOperatorNone
+                                         attribute: @"GSMDItemTextContent"
+                                       searchValue: [queryWords objectAtIndex: 0]
+                                      operatorType: GMDEqualToOperatorType    
+                                     caseSensitive: YES];
     
-      cmd = [[NSSearchPathForDirectoriesInDomains(
-                GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
-                                      stringByAppendingPathComponent: @"gmds"];    
-                    
-      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
-   
-      for (i = 0; i < 40; i++) {
-	      [[NSRunLoop currentRunLoop] runUntilDate:
-		                     [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+  for (i = 1; i < count; i++) {
+    [currentQuery appendSubqueryWithCompoundOperator: GMDAndCompoundOperator
+                                    attribute: @"GSMDItemTextContent"
+                                  searchValue: [queryWords objectAtIndex: i]
+                                 operatorType: GMDEqualToOperatorType    
+                                caseSensitive: YES];
+  }
+  
+  [currentQuery closeSubqueries];
+  
+  if ([currentQuery buildQuery] == NO) {
+    NSLog(@"unable to build \"%@\"", [currentQuery description]); 
+    [NSApp terminate: self];
+  } 
+     
+       //     NSLog([currentQuery description]);
+  
+  [currentQuery startQuery];
+    
+  RELEASE (arp);
+}
 
-        gmds = [NSConnection rootProxyForConnectionWithRegisteredName: @"gmds" 
-                                                                 host: @""];                  
-        if (gmds) {
-          break;
+- (void)appendResults:(NSArray *)lines
+{
+  unsigned i;
+  
+  for (i = 0; i < [lines count]; i++) {
+    NSArray *line = [lines objectAtIndex: i];
+    NSString *path = [line objectAtIndex: 0];
+    FSNode *node = [FSNode nodeWithPath: path];
+
+    [foundObjects addObject: node];
+  }
+
+  [resultsView noteNumberOfRowsChanged];
+  [resultsView setNeedsDisplayInRect: [resultsView visibleRect]];
+  [foundField setStringValue: [NSString stringWithFormat: @"%i", [foundObjects count]]];
+}
+
+- (void)endQuery
+{
+  [progView stop];
+  [foundField setStringValue: [NSString stringWithFormat: @"%i", [foundObjects count]]];  
+}
+
+- (IBAction)stopQuery:(id)sender
+{
+  if (currentQuery) {
+    [currentQuery stopQuery];
+    
+    if ([foundObjects count]) {
+      [foundObjects removeAllObjects];
+      [resultsView noteNumberOfRowsChanged];
+      [resultsView setNeedsDisplayInRect: [resultsView visibleRect]];
+      [foundField setStringValue: @"0"];
+    }
+    
+    [progView stop];
+  }
+}
+
+- (void)controlTextDidChange:(NSNotification *)aNotification
+{
+  NSString *str = [searchField stringValue];
+  BOOL newquery = NO;
+    
+  if ([str length]) {
+    CREATE_AUTORELEASE_POOL(arp);
+    NSScanner *scanner = [NSScanner scannerWithString: str];
+    NSMutableArray *words = [NSMutableArray array];
+        
+    while ([scanner isAtEnd] == NO) {
+      NSString *word;
+            
+      [scanner scanUpToCharactersFromSet: skipSet intoString: &word];
+            
+      if (word) {
+        unsigned wl = [word length];
+
+        if ((wl >= WORD_MIN) && (wl < WORD_MAX)) { 
+          [words addObject: word];
         }
       }
     }
+
+    if ([words count] && ([words isEqual: queryWords] == NO)) {
+      ASSIGN (queryWords, words);
+      newquery = YES;
+    }      
     
-    if (gmds) {
-      RETAIN (gmds);
-      [gmds setProtocolForProxy: @protocol(GMDSProtocol)];
+    RELEASE (arp);
     
-	    [[NSNotificationCenter defaultCenter] addObserver: self
-	                   selector: @selector(connectionDidDie:)
-		                     name: NSConnectionDidDieNotification
-		                   object: [gmds connectionForProxy]];
+  } else {
+    [self stopQuery: nil];
+  }
 
-      [gmds registerClient: self];                              
-      NSLog(@"gmds connected!");     
-                       
-    } else {
-      gmds = nil;
-      NSRunAlertPanel(nil,
-              NSLocalizedString(@"unable to contact gmds.", @""),
-              NSLocalizedString(@"Ok", @""),
-              nil, 
-              nil);  
-    }
-  }  
-}
-
-- (void)connectionDidDie:(NSNotification *)notif
-{
-  id connection = [notif object];
-
-  [nc removeObserver: self
-	                    name: NSConnectionDidDieNotification
-	                  object: connection];
-
-  NSAssert(connection == [gmds connectionForProxy],
-		                                  NSInternalInconsistencyException);
-  RELEASE (gmds);
-  gmds = nil;
-
-  NSRunAlertPanel(nil, @"gmds connection died!", @"OK", nil, nil);  
+  if (newquery) {
+    [self prepareQuery];
+  }
 }
 
 - (void)doubleClickOnResultsView:(id)sender
@@ -468,167 +412,6 @@ static NSString *nibName = @"GMDSClient";
             mouseDownInHeaderOfTableColumn:(NSTableColumn *)tableColumn
 {
   [tableView setHighlightedTableColumn: tableColumn];
-}
-
-@end
-
-
-@implementation GMDSClient (queries)
-
-- (void)prepareQuery
-{
-  CREATE_AUTORELEASE_POOL(arp);
-  unsigned count = [queryWords count];
-  MDKQuery *query = [MDKQuery query];
-  int i;
-
-  [query appendSubqueryWithCompoundOperator: GMDCompoundOperatorNone
-                                  attribute: @"GSMDItemTextContent"
-                                searchValue: [queryWords objectAtIndex: 0]
-                               operatorType: GMDEqualToOperatorType    
-                              caseSensitive: YES];
-    
-  for (i = 1; i < count; i++) {
-    [query appendSubqueryWithCompoundOperator: GMDAndCompoundOperator
-                                    attribute: @"GSMDItemTextContent"
-                                  searchValue: [queryWords objectAtIndex: i]
-                                 operatorType: GMDEqualToOperatorType    
-                                caseSensitive: YES];
-  }
-  
-  [query closeSubqueries];
-  
-  if ([query buildQuery] == NO) {
-    NSLog(@"unable to build \"%@\"", [query description]); 
-    [NSApp terminate: self];
-  } 
-     
-  [query setQueryNumber: [self nextQueryNumber]];    
-     
-  ASSIGN (currentQuery, [query sqldescription]);
-    
-  [foundObjects removeAllObjects];
-  [resultsView noteNumberOfRowsChanged];
-  [resultsView setNeedsDisplayInRect: [resultsView visibleRect]];
-  [foundField setStringValue: @"0"];
-
-            NSLog([query description]);
-
-  if (waitResults == NO) {
-    waitResults = YES;
-    queryStopped = NO;
-    [progView start];
-
-    [gmds performQuery: [NSArchiver archivedDataWithRootObject: currentQuery]];
-
-  } else {
-    pendingQuery = YES;
-  }
-  
-  RELEASE (arp);
-}
-
-- (BOOL)queryResults:(NSData *)results
-{
-  CREATE_AUTORELEASE_POOL(arp);
-  NSDictionary *dict = [NSUnarchiver unarchiveObjectWithData: results];
-  NSNumber *qnum = [dict objectForKey: @"qnumber"];
-  NSArray *lines = [dict objectForKey: @"lines"];
-  BOOL resok = NO;
-  int i;
-  
-  if ((queryStopped == NO) 
-            && [[currentQuery objectForKey: @"qnumber"] isEqual: qnum]) {
-    for (i = 0; i < [lines count]; i++) {
-      NSArray *line = [lines objectAtIndex: i];
-      NSString *path = [line objectAtIndex: 0];
-      FSNode *node = [FSNode nodeWithPath: path];
-
-      [foundObjects addObject: node];
-    }
-
-    [resultsView noteNumberOfRowsChanged];
-    [resultsView setNeedsDisplayInRect: [resultsView visibleRect]];
-    [foundField setStringValue: [NSString stringWithFormat: @"%i", [foundObjects count]]];
-    resok = YES;
-  } 
-  
-  RELEASE (arp);
-    
-  return resok;
-}
-
-- (oneway void)endOfQueryWithNumber:(NSData *)qnum
-{
-  [progView stop];
-  [foundField setStringValue: [NSString stringWithFormat: @"%i", [foundObjects count]]];
-  
-  queryStopped = NO;
-  
-  if (pendingQuery) {
-    pendingQuery = NO;
-    waitResults = YES;
-    [foundObjects removeAllObjects];
-    [resultsView noteNumberOfRowsChanged];
-    [resultsView setNeedsDisplayInRect: [resultsView visibleRect]];
-    [foundField setStringValue: @"0"];
-    
-    [gmds performQuery: [NSArchiver archivedDataWithRootObject: currentQuery]];
-    
-  } else {
-    waitResults = NO;
-  }
-}
-
-- (IBAction)stopQuery:(id)sender
-{
-  queryStopped = YES;
-}
-
-- (NSNumber *)nextQueryNumber
-{
-  NSLog(@"set number to %i", queryNumber + 1);
-  return [NSNumber numberWithUnsignedLong: queryNumber++];  
-}
-
-- (void)controlTextDidChange:(NSNotification *)aNotification
-{
-  NSString *str = [searchField stringValue];
-  BOOL newquery = NO;
-    
-  if ([str length]) {
-    CREATE_AUTORELEASE_POOL(arp);
-    NSScanner *scanner = [NSScanner scannerWithString: str];
-    NSMutableArray *words = [NSMutableArray array];
-        
-    while ([scanner isAtEnd] == NO) {
-      NSString *word;
-            
-      [scanner scanUpToCharactersFromSet: skipSet intoString: &word];
-            
-      if (word) {
-        unsigned wl = [word length];
-
-        if ((wl >= WORD_MIN) && (wl < WORD_MAX)) { 
-          [words addObject: word];
-        }
-      }
-    }
-
-    if ([words count] && ([words isEqual: queryWords] == NO)) {
-      ASSIGN (queryWords, words);
-      newquery = YES;
-    }      
-    
-    RELEASE (arp);
-    
-  } else {
-    queryStopped = YES;
-  }
-
-  if (newquery) {
-    [self prepareQuery];
-  }
 }
 
 @end

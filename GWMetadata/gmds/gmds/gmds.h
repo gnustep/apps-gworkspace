@@ -32,7 +32,7 @@
 
 - (BOOL)queryResults:(NSData *)results;
 
-- (oneway void)endOfQueryWithNumber:(NSData *)qnum;
+- (oneway void)endOfQueryWithNumber:(NSNumber *)qnum;
 
 @end
 
@@ -43,7 +43,7 @@
 
 - (oneway void)unregisterClient:(id)remote;
 
-- (oneway void)performQuery:(NSData *)queryInfo;
+- (oneway void)performQuery:(NSDictionary *)queryInfo;
 
 @end
 

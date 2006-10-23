@@ -22,269 +22,158 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <string.h>
-#include "sqlite.h"
+#include <Foundation/Foundation.h>
 #include "MDKQuery.h"
-#include "SQLite.h"
 
-#define MAX_RETRY 1000
-
-enum {
-  STRING,
-  ARRAY,
-  NUMBER,
-  DATE,
-  DATA
-};
-
-enum {
-  NUM_INT,
-  NUM_FLOAT,
-  NUM_BOOL
-};
-
-static sqlite3 *db = NULL;
-static BOOL repscore = NO;
-static BOOL onlycount = NO;
-
-static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv)
-{
-  const unsigned char *path = sqlite3_value_text(argv[0]);
-  int exists = 0;
-  
-  if (path) {
-    struct stat statbuf;  
-    exists = (stat((const char *)path, &statbuf) == 0);
-  }
-     
-  sqlite3_result_int(context, exists);
+@interface MDFind : NSObject
+{ 
+  MDKQuery *query;
+  unsigned rescount;
+  NSString *searchdir;
+  BOOL repscore;
+  BOOL onlycount;
 }
 
-static void contains_substr(sqlite3_context *context, int argc, sqlite3_value **argv)
-{
-  const char *buff = (const char *)sqlite3_value_text(argv[0]);
-  const char *substr = (const char *)sqlite3_value_text(argv[1]);
-  int contains = (strstr(buff, substr) != NULL);
-  
-//  printf("buff = %s - substr = %s contains = %d\n", buff, substr, contains);
-  
-  sqlite3_result_int(context, contains);
-}
+- (id)initWithArguments:(NSArray *)args;
 
-static void append_unique_string(sqlite3_context *context, int argc, sqlite3_value **argv)
-{
-  const char *buff = (const char *)sqlite3_value_text(argv[0]);
-  const char *str = (const char *)sqlite3_value_text(argv[1]);
+- (void)appendResults:(NSArray *)lines;
 
-  if (strstr(buff, str) == NULL) {
-    char newbuff[2048] = "";
-  
-    sprintf(newbuff, "%s %s", buff, str);
-    newbuff[strlen(newbuff)] = '\0';
-    sqlite3_result_text(context, newbuff, strlen(newbuff), SQLITE_TRANSIENT);
+- (void)endQuery;
+
+- (void)printAttributesList;
+
+- (void)printAttributeDescription:(NSString *)attribute;
+
+- (void)printHelp;
+
+@end
+
+
+@implementation MDFind
+
+- (id)initWithArguments:(NSArray *)args
+{
+  self = [super init];
+
+  if (self) {
+    unsigned count = [args count];
+    unsigned pos = 1;
+    BOOL runquery = YES;
+    unsigned i;
     
-    return;
-  } 
-  
-  sqlite3_result_text(context, buff, strlen(buff), SQLITE_TRANSIENT);  
-}
-
-static void word_score(sqlite3_context *context, int argc, sqlite3_value **argv)
-{
-  int searchlen = strlen((const char *)sqlite3_value_text(argv[0]));
-  int foundlen = strlen((const char *)sqlite3_value_text(argv[1]));
-  int posting_wcount = sqlite3_value_int(argv[2]);
-  int path_wcount = sqlite3_value_int(argv[3]);
-  float score = (1.0 * posting_wcount / path_wcount);
-
-  if (searchlen != foundlen) {
-    score *= (1.0 * searchlen / foundlen);    
-  } 
-
-  sqlite3_result_double(context, score);
-}
-
-static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **argv)
-{
-  const unsigned char *search_val = sqlite3_value_text(argv[0]);
-  const unsigned char *found_val = sqlite3_value_text(argv[1]);
-  int attribute_type = sqlite3_value_int(argv[2]);
-  GMDOperatorType operator_type = sqlite3_value_int(argv[3]);
-  float score = 0.0;
-
-  if ((attribute_type == STRING) 
-              || (attribute_type == ARRAY) 
-                              || (attribute_type == DATA)) {
-    if (operator_type == GMDEqualToOperatorType) {                          
-      int searchlen = strlen((const char *)search_val);
-      int foundlen = strlen((const char *)found_val);
-    
-      score = (1.0 * searchlen / foundlen); 
+    if (count <= 1) {
+      GSPrintf(stderr, @"mdfind: too few arguments supplied!\n");
+      [self printHelp];
+      return self;
     }
-  }
 
-  sqlite3_result_double(context, score);
-}
-
-
-BOOL performSubquery(NSString *query)
-{
-  const char *qbuff = [query UTF8String];
-  struct sqlite3_stmt *stmt;
-  int err;
-
-  if ((err = sqlite3_prepare(db, qbuff, strlen(qbuff), &stmt, NULL)) == SQLITE_OK) {  
-    int retry = 0;
+    searchdir = nil;
+    repscore = NO;
+    onlycount = NO;
+    rescount = 0;
     
-    while (1) {
-      err = sqlite3_step(stmt);
+    for (i = 1; i < count; i++) {
+      NSString *arg = [args objectAtIndex: i];
+  
+      if ([arg isEqual: @"-h"]) {
+        [self printHelp];
+        runquery = NO;
 
-      if (err == SQLITE_DONE) {
-        break;
+      } else if ([arg isEqual: @"-a"]) {
+        if ((i + 1) < count) {
+          [self printAttributeDescription: [args objectAtIndex: (i + 1)]];
+        } else {
+          [self printAttributesList];
+        }
+        runquery = NO;
 
-      } else if (err == SQLITE_BUSY) {
-        CREATE_AUTORELEASE_POOL(arp); 
-        NSDate *when = [NSDate dateWithTimeIntervalSinceNow: 0.1];
+      } else if ([arg isEqual: @"-s"]) {
+        repscore = YES; 
+        pos++;
 
-        [NSThread sleepUntilDate: when];
-        GSPrintf(stderr, @"mdfind: retry %i\n", retry);
-        RELEASE (arp);
+      } else if ([arg isEqual: @"-c"]) {
+        onlycount = YES; 
+        pos++;
 
-        if (retry++ > MAX_RETRY) {
-          GSPrintf(stderr, @"mdfind: %s\n", sqlite3_errmsg(db));
-		      break;
+      } else if ([arg isEqual: @"-onlyin"]) {
+        BOOL pathok = YES;
+
+        if (i++ < count) {
+          arg = [args objectAtIndex: i];
+
+          if ([[NSFileManager defaultManager] fileExistsAtPath: arg]) {
+            ASSIGN (searchdir, arg);
+            pos += 2;
+          } else {
+            pathok = NO;
+          }
+        } else {
+          pathok = NO;
         }
 
-      } else {
-        GSPrintf(stderr, @"mdfind: %s\n", sqlite3_errmsg(db));
-        break;
-      }
+        if (pathok == NO) {
+          GSPrintf(stderr, @"mdfind: no search path or invalid path supplied!\n");
+          runquery = NO;
+        }
+      }   
     }
-    
-    sqlite3_finalize(stmt);
-  }
   
-  return (err == SQLITE_DONE);
-}
+    if ((pos < count) && runquery) {
+      NSArray *queryargs = [args subarrayWithRange: NSMakeRange(pos, count - pos)];
+      NSString *qstr = [queryargs componentsJoinedByString: @" "];
 
-BOOL performPreQueries(NSArray *queries)
-{
-  int i;
-  
-  if (performSubquery(@"BEGIN") == NO) {
-    return NO;
-  }
-  
-  for (i = 0; i < [queries count]; i++) {
-    if (performSubquery([queries objectAtIndex: i]) == NO) {
-      performSubquery(@"COMMIT");
-      return NO;
-    }
-  }
-  
-  performSubquery(@"COMMIT");
-   
-  return YES;
-}
-
-void performPostQueries(NSArray *queries)
-{
-  int i;
-
-  if (performSubquery(@"BEGIN") == NO) {
-    return;
-  }
-
-  for (i = 0; i < [queries count]; i++) {
-    performSubquery([queries objectAtIndex: i]);
-  }
-
-  performSubquery(@"COMMIT");
-}
-
-BOOL queryResults(NSString *qstr)
-{
-  const char *qbuff = [qstr UTF8String];
-  struct sqlite3_stmt *stmt;
-  int linescount = 0;
-  int retry = 0;
-  BOOL resok = YES;
-  int err;
-  int i;
-
-  if (sqlite3_prepare(db, qbuff, strlen(qbuff), &stmt, NULL) == SQLITE_OK) {
-    while (1) {
-      err = sqlite3_step(stmt);
+	    NS_DURING
+	      {
+      NSArray *dirs = (searchdir ? [NSArray arrayWithObject: searchdir] : nil);  
       
-      if (err == SQLITE_ROW) {
-        if (onlycount == NO) {
-          int count = sqlite3_data_count(stmt);
-
-          /* we use "<= count" because sqlite sends 
-             also the id of the entry with type = 0 */
-          for (i = 0; i <= count; i++) { 
-            int type = sqlite3_column_type(stmt, i);
-
-            /* mdfind reports only the path and (optionally) the score */          
-            if (type == SQLITE_TEXT) {
-              /* only if i == 0 to not print also the attribute name */  
-              if (i == 0) {
-                GSPrintf(stdout, @" %s", sqlite3_column_text(stmt, i));          
-              }                      
-            } else if (repscore && type == SQLITE_FLOAT) {
-              GSPrintf(stdout, @" %f", sqlite3_column_double(stmt, i));          
-            }
-          }
-
-          GSPrintf(stdout, @"\n");
-        
-        } else {
-          linescount++;
+      ASSIGN (query, [MDKQuery queryFromString: qstr inDirectories: dirs]);
+      [query setDelegate: self];
+      [query startQuery];
         }
-
-      } else {
-        if (err == SQLITE_DONE) {
-          break;
-        
-        } else if (err == SQLITE_BUSY) {
-          CREATE_AUTORELEASE_POOL(arp); 
-          NSDate *when = [NSDate dateWithTimeIntervalSinceNow: 0.1];
-
-          [NSThread sleepUntilDate: when];
-          GSPrintf(stderr, @"mdfind: retry %i\n", retry);
-          RELEASE (arp);
-
-          if (retry++ > MAX_RETRY) {
-            GSPrintf(stderr, @"mdfind: %s\n", sqlite3_errmsg(db));
-            resok = NO;
-		        break;
-          }
-
-        } else {
-          GSPrintf(stderr, @"mdfind: %i %s\n", err, sqlite3_errmsg(db));
-          resok = NO;
-          break;
-        }
-      }
-    }
-     
-    sqlite3_finalize(stmt);
-    
-    if (onlycount) {
-      GSPrintf(stdout, @"%i\n", linescount);
-    }
-    
-  } else {
-    GSPrintf(stderr, @"mdfind: %s\n", sqlite3_errmsg(db));
-    resok = NO;
+	    NS_HANDLER
+	      {
+      GSPrintf(stderr, @"mdfind: %@\n", localException);
+      exit(EXIT_FAILURE);
+	      }
+	    NS_ENDHANDLER
+    }  
   }
-
-  return resok;
+  
+  return self;
 }
 
-void printAttributesList()
+- (void)appendResults:(NSArray *)lines
+{
+  if (onlycount == NO) {
+    unsigned i;
+
+    for (i = 0; i < [lines count]; i++) {
+      NSArray *line = [lines objectAtIndex: i];
+      NSString *path = [line objectAtIndex: 0];
+
+      GSPrintf(stdout, @"%@", path);
+      
+      if (repscore) {
+        GSPrintf(stdout, @" %@", [[line objectAtIndex: 1] description]);
+      }
+      
+      GSPrintf(stdout, @"\n");
+    }
+
+  } else {
+    rescount += [lines count];
+  }
+}
+
+- (void)endQuery
+{
+  if (onlycount) {
+    GSPrintf(stdout, @"%i\n", rescount);
+  }
+  exit(EXIT_SUCCESS);
+}
+
+- (void)printAttributesList
 {
   NSArray *attributes = [MDKQuery attributesNames];
   unsigned i;
@@ -294,7 +183,7 @@ void printAttributesList()
   }
 }
 
-void printAttributeDescription(NSString *attribute)
+- (void)printAttributeDescription:(NSString *)attribute
 {
   NSString *description = [MDKQuery attributeDescription: attribute];
 
@@ -305,7 +194,7 @@ void printAttributeDescription(NSString *attribute)
   }
 }
 
-void printHelp()
+- (void)printHelp
 {
   GSPrintf(stderr,
       @"\n"
@@ -345,17 +234,14 @@ void printHelp()
   );
 }
 
+@end
+
 
 int main(int argc, char **argv, char **env)
 {
   NSAutoreleasePool	*pool;
   NSProcessInfo *proc;
-  NSArray *args;
-  NSString *arg; 
-  NSString *searchdir = nil;
-  unsigned count;
-  unsigned pos;
-  unsigned i;
+  MDFind *mdfind;
   
 #ifdef GS_PASS_ARGUMENTS
   [NSProcessInfo initializeWithArguments: argv count: argc environment: env];
@@ -367,164 +253,20 @@ int main(int argc, char **argv, char **env)
   if (proc == nil) {
     GSPrintf(stderr, @"mdfind: unable to get process information!\n");
     RELEASE (pool);
-    return 1;
+    exit(EXIT_FAILURE);
   }
 
-  args = [proc arguments];
-  count = [args count];
+  mdfind = [[MDFind alloc] initWithArguments: [proc arguments]];
   
-  if (count <= 1) {
-    GSPrintf(stderr, @"mdfind: too few arguments supplied!\n");
-    RELEASE (pool);
-    return 1;
-  }
-  
-  pos = 1;
-  
-  for (i = 1; i < count; i++) {
-    arg = [args objectAtIndex: i];
-  
-    if ([arg isEqual: @"-h"]) {
-      printHelp();
-      RELEASE (pool);
-      return 0;
-    
-    } else if ([arg isEqual: @"-a"]) {
-      if ((i + 1) < count) {
-        printAttributeDescription([args objectAtIndex: (i + 1)]);
-      } else {
-        printAttributesList();
-      }
-      
-      RELEASE (pool);
-      return 0;            
-    
-    } else if ([arg isEqual: @"-s"]) {
-      repscore = YES; 
-      pos++;
-
-    } else if ([arg isEqual: @"-c"]) {
-      onlycount = YES; 
-      pos++;
-      
-    } else if ([arg isEqual: @"-onlyin"]) {
-      BOOL pathok = YES;
-      
-      if (i++ < count) {
-        arg = [args objectAtIndex: i];
-        
-        if ([[NSFileManager defaultManager] fileExistsAtPath: arg]) {
-          ASSIGN (searchdir, arg);
-          pos += 2;
-        } else {
-          pathok = NO;
-        }
-      } else {
-        pathok = NO;
-      }
-      
-      if (pathok == NO) {
-        GSPrintf(stderr, @"mdfind: no search path or invalid path supplied!\n");
-        RELEASE (pool);
-        return 0;            
-      }
-    }   
-  }
-  
-  if (pos < count) {
-    NSArray *queryargs = [args subarrayWithRange: NSMakeRange(pos, count - pos)];
-    NSMutableString *qstr = [[queryargs componentsJoinedByString: @" "] mutableCopy];
-    NSString *dbpath;
-
-    dbpath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
-    dbpath = [dbpath stringByAppendingPathComponent: @"gmds"];    
-    dbpath = [dbpath stringByAppendingPathComponent: @".db"];
-    dbpath = [dbpath stringByAppendingPathComponent: @"v3"];
-    dbpath = [dbpath stringByAppendingPathComponent: @"contents.db"];    
-    
-    db = opendbAtPath(dbpath);
-    
-    if (db == NULL) {
-      GSPrintf(stderr, @"mdfind: unable to open the db!\n");
-      RELEASE (pool);
-      return 1;
-    }
-    
-    sqlite3_create_function(db, "pathExists", 1, 
-                                SQLITE_UTF8, 0, path_exists, 0, 0);
-    sqlite3_create_function(db, "containsSubstr", 2, 
-                                SQLITE_UTF8, 0, contains_substr, 0, 0);
-    sqlite3_create_function(db, "appendUniqueString", 2, 
-                                SQLITE_UTF8, 0, append_unique_string, 0, 0);
-    sqlite3_create_function(db, "wordScore", 4, 
-                                SQLITE_UTF8, 0, word_score, 0, 0);
-    sqlite3_create_function(db, "attributeScore", 4, 
-                                SQLITE_UTF8, 0, attribute_score, 0, 0);
-
-    performWriteQuery(db, @"PRAGMA cache_size = 20000");
-    performWriteQuery(db, @"PRAGMA count_changes = 0");
-    performWriteQuery(db, @"PRAGMA synchronous = OFF");
-    performWriteQuery(db, @"PRAGMA temp_store = MEMORY");
-
-    [qstr replaceOccurrencesOfString: @"(" 
-                          withString: @" ( " 
-                             options: NSLiteralSearch
-                               range: NSMakeRange(0, [qstr length])];
-
-    [qstr replaceOccurrencesOfString: @")" 
-                          withString: @" ) " 
-                             options: NSLiteralSearch
-                               range: NSMakeRange(0, [qstr length])];
-    
-	  NS_DURING
-	    {
-    NSArray *dirs = (searchdir ? [NSArray arrayWithObject: searchdir] : nil);  
-    MDKQuery *query = [MDKQuery queryFromString: qstr inDirectories: dirs];
-    NSDictionary *dict;
-    NSArray *prequeries;
-    NSArray *postqueries;
-    NSString *joinstr;    
-
-    dict = [query sqldescription];
-    prequeries = [dict objectForKey: @"pre"];
-    postqueries = [dict objectForKey: @"post"];
-    joinstr = [dict objectForKey: @"join"];    
-    
-    if (prequeries && (performPreQueries(prequeries) == NO)) {
-      GSPrintf(stderr, @"mdfind: error in: %@", [prequeries description]);
-      closedb(db);
-      RELEASE (pool);
-      return 1;    
-    }
-      
-    if (queryResults(joinstr) == NO) {
-      GSPrintf(stderr, @"mdfind: error in: %@", joinstr);
-    }
-    
-    if (postqueries) {
-      performPostQueries(postqueries);
-    }
-      }
-	  NS_HANDLER
-	    {
-    GSPrintf(stderr, @"mdfind: %@\n", localException);
-    closedb(db);
-    RELEASE (pool);
-    return 1;
-	    }
-	  NS_ENDHANDLER
-    
-    closedb(db);
-
-    RELEASE (qstr);
-    RELEASE (pool);
-	  
-    return 0;
-  }
-  
-  printHelp();
-
   RELEASE (pool);
 
-  return 1;
+  if (mdfind != nil) {
+	  CREATE_AUTORELEASE_POOL (pool);
+    [[NSRunLoop currentRunLoop] run];
+  	RELEASE (pool);
+  }
+  
+  exit(EXIT_SUCCESS);
 }
+
+

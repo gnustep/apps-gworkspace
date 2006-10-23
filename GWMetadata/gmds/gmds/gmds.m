@@ -442,15 +442,14 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
   [self performSubquery: @"COMMIT"];
 }
 
-- (oneway void)performQuery:(NSData *)queryInfo
+- (oneway void)performQuery:(NSDictionary *)queryInfo
 {
   CREATE_AUTORELEASE_POOL(pool); 
-  NSDictionary *dict = [NSUnarchiver unarchiveObjectWithData: queryInfo];  
-  NSArray *prequeries = [dict objectForKey: @"pre"];
+  NSArray *prequeries = [queryInfo objectForKey: @"pre"];
   BOOL prepared = YES;
-  NSString *query = [dict objectForKey: @"join"];
-  NSArray *postqueries = [dict objectForKey: @"post"];  
-  NSNumber *queryNumber = [dict objectForKey: @"qnumber"];  
+  NSString *query = [queryInfo objectForKey: @"join"];
+  NSArray *postqueries = [queryInfo objectForKey: @"post"];  
+  NSNumber *queryNumber = [queryInfo objectForKey: @"qnumber"];  
   const char *qbuff = [query UTF8String];
   NSMutableArray *reslines = [NSMutableArray array];
   struct sqlite3_stmt *stmt;
@@ -573,8 +572,7 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
 
 - (void)endOfQueryWithNumber:(NSNumber *)qnum
 {
-  NSData *ndata = [NSArchiver archivedDataWithRootObject: qnum];
-  [[clientInfo objectForKey: @"client"] endOfQueryWithNumber: ndata];
+  [[clientInfo objectForKey: @"client"] endOfQueryWithNumber: qnum];
 }
 
 - (BOOL)opendb

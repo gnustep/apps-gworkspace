@@ -27,27 +27,8 @@
 
 #include <Foundation/Foundation.h>
 
+@class MDKQuery;
 @class ProgrView;
-
-@protocol	GMDSClientProtocol
-
-- (BOOL)queryResults:(NSData *)results;
-
-- (oneway void)endOfQueryWithNumber:(NSData *)qnum;
-
-@end
-
-
-@protocol	GMDSProtocol
-
-- (oneway void)registerClient:(id)remote;
-
-- (oneway void)unregisterClient:(id)remote;
-
-- (oneway void)performQuery:(NSData *)queryInfo;
-
-@end
-
 
 @interface GMDSClient: NSObject 
 {
@@ -66,47 +47,29 @@
   NSTableColumn *kindColumn;  
   
   NSArray *queryWords;
-  NSDictionary *currentQuery;
-  unsigned long queryNumber;
-  BOOL waitResults;
-  BOOL pendingQuery;
-  BOOL queryStopped;
+  MDKQuery *currentQuery;
   
   NSMutableCharacterSet *skipSet;
   NSMutableArray *foundObjects;
   
   NSFileManager *fm;  
-  NSNotificationCenter *nc; 
-  
-  id gmds;
 }
 
 + (GMDSClient *)gmdsclient;
 
-- (void)connectGMDs;
+- (void)prepareQuery;
 
-- (void)connectionDidDie:(NSNotification *)notif;
+- (void)appendResults:(NSArray *)lines;
+
+- (void)endQuery;
+
+- (IBAction)stopQuery:(id)sender;
 
 - (void)doubleClickOnResultsView:(id)sender;
 
 - (void)updateDefaults;
 
 - (void)showInfo:(id)sender;
-
-@end
-
-
-@interface GMDSClient (queries) <GMDSClientProtocol>
-
-- (void)prepareQuery;
-
-- (BOOL)queryResults:(NSData *)results;
-
-- (oneway void)endOfQueryWithNumber:(NSData *)qnum;
-
-- (IBAction)stopQuery:(id)sender;
-
-- (NSNumber *)nextQueryNumber;
 
 @end
 

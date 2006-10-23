@@ -2,11 +2,6 @@
 GNUSTEP_INSTALLATION_DOMAIN=SYSTEM
 RPM_DISABLE_RELOCATABLE=YES
 
-PACKAGE_NEEDS_CONFIGURE = YES
-
-ADDITIONAL_INCLUDE_DIRS += @SQLITE_INCLUDE_DIRS@
-ADDITIONAL_LIB_DIRS += @SQLITE_LIB_DIRS@
-
 include $(GNUSTEP_MAKEFILES)/common.make
 
 ifeq ($(findstring darwin, $(GNUSTEP_TARGET_OS)), darwin)
@@ -16,8 +11,7 @@ else
 endif
 
 $(TOOL_NAME)_OBJC_FILES = \
-mdfind.m \
-sqlite.m
+mdfind.m 
 
 $(TOOL_NAME)_TOOL_LIBS += -lMDKit
     				 
