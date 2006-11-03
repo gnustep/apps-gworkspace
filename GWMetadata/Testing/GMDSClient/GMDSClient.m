@@ -211,6 +211,7 @@ static NSString *nibName = @"GMDSClient";
   
   ASSIGN (currentQuery, [MDKQuery query]);
   [currentQuery setDelegate: self];
+  [currentQuery setReportRawResults: YES];
   
   [currentQuery appendSubqueryWithCompoundOperator: GMDCompoundOperatorNone
                                          attribute: @"GSMDItemTextContent"
@@ -240,7 +241,12 @@ static NSString *nibName = @"GMDSClient";
   RELEASE (arp);
 }
 
-- (void)appendResults:(NSArray *)lines
+- (void)queryStarted:(MDKQuery *)query
+{
+
+}
+
+- (void)appendRawResults:(NSArray *)lines
 {
   unsigned i;
   
@@ -257,7 +263,12 @@ static NSString *nibName = @"GMDSClient";
   [foundField setStringValue: [NSString stringWithFormat: @"%i", [foundObjects count]]];
 }
 
-- (void)endQuery
+- (void)queryDidUpdateResults:(MDKQuery *)query
+{
+
+}
+
+- (void)endOfQuery:(MDKQuery *)query
 {
   [progView stop];
   [foundField setStringValue: [NSString stringWithFormat: @"%i", [foundObjects count]]];  

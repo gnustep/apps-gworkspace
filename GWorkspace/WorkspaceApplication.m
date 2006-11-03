@@ -586,7 +586,8 @@
 {
   GWLaunchedApp *app = [self launchedAppWithPath: path andName: name];
 
-  if (app && ([app isActive] == NO)) {
+//  if (app && ([app isActive] == NO)) {
+  if (app) {
     [app activateApplication];
   }
 }

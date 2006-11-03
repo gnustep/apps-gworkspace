@@ -59,9 +59,13 @@
 
 - (void)prepareQuery;
 
-- (void)appendResults:(NSArray *)lines;
+- (void)queryStarted:(MDKQuery *)query;
 
-- (void)endQuery;
+- (void)appendRawResults:(NSArray *)lines;
+
+- (void)queryDidUpdateResults:(MDKQuery *)query;
+
+- (void)endOfQuery:(MDKQuery *)query;
 
 - (IBAction)stopQuery:(id)sender;
 

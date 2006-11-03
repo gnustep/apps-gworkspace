@@ -126,6 +126,43 @@
   return NO;
 }
 
+- (BOOL)attachDbAtPath:(NSString *)path
+              withName:(NSString *)name
+                 isNew:(BOOL *)isnew
+{
+  *isnew = ([fm fileExistsAtPath: path] == NO);
+
+  if (db != NULL) {
+    NSArray *components = [path pathComponents];
+    unsigned count = [components count];
+    NSString *dbname = [components objectAtIndex: count - 1];
+    NSString *dbpath = [NSString string];
+    NSString *query;
+    unsigned i;
+
+    for (i = 0; i < (count - 1); i++) {
+      NSString *dir = [components objectAtIndex: i];
+      BOOL isdir;    
+      
+      dbpath = [dbpath stringByAppendingPathComponent: dir];
+      
+      if (([fm fileExistsAtPath: dbpath isDirectory: &isdir] &isdir) == NO) {
+        if ([fm createDirectoryAtPath: dbpath attributes: nil] == NO) { 
+          NSLog(@"unable to create: %@", dbpath);
+          return NO;
+        }
+      }
+    }
+
+    dbpath = [dbpath stringByAppendingPathComponent: dbname];
+    query = [NSString stringWithFormat: @"ATTACH DATABASE '%@' AS %@", dbpath, name]; 
+    
+    return [self executeSimpleQuery: query];
+  }
+  
+  return NO;
+}
+
 - (void)closeDb
 {
   if (db != NULL) {

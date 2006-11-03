@@ -46,6 +46,10 @@
 - (BOOL)opendbAtPath:(NSString *)path
                isNew:(BOOL *)isnew;
 
+- (BOOL)attachDbAtPath:(NSString *)path
+              withName:(NSString *)name
+                 isNew:(BOOL *)isnew;
+
 - (void)closeDb;
 
 - (sqlite3 *)db;

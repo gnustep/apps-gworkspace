@@ -1,3 +1,7 @@
+
+static NSString *db_version = @"v4";
+
+
 static NSString *db_schema = @"\
 \
 CREATE TABLE paths \
@@ -28,8 +32,37 @@ attribute TEXT); \
 CREATE INDEX attributes_path_index ON attributes(path_id); \
 CREATE INDEX attributes_key_attr_index ON attributes(key, attribute); \
 CREATE INDEX attributes_attr_index ON attributes(attribute); \
+\
+\
+CREATE TABLE updated_paths \
+(id INTEGER UNIQUE ON CONFLICT REPLACE, \
+path TEXT UNIQUE ON CONFLICT REPLACE, \
+words_count INTEGER, \
+moddate REAL, \
+is_directory INTEGER, \
+timestamp REAL); \
+\
+CREATE INDEX updated_paths_index ON updated_paths(timestamp); \
+\
+CREATE TABLE removed_paths \
+(path TEXT UNIQUE ON CONFLICT REPLACE); \
+\
+\
+CREATE TRIGGER updated_paths_trigger AFTER UPDATE ON paths \
+WHEN (checkUpdating() != 0) \
+  BEGIN \
+    INSERT INTO updated_paths (id, path, words_count, moddate, is_directory, timestamp) \
+    VALUES (new.id, new.path, new.words_count, new.moddate, new.is_directory, timeStamp()); \
+  END; \
+\
+CREATE TRIGGER deleted_paths_trigger AFTER DELETE ON paths \
+WHEN (checkUpdating() != 0) \
+  BEGIN \
+    DELETE FROM updated_paths WHERE id = old.id; \
+    INSERT INTO removed_paths (path) \
+    VALUES (old.path); \
+  END; \
 ";
-
 
 static NSString *db_schema_tmp = @"\
 CREATE TEMP TABLE removed_id \
@@ -48,6 +81,7 @@ oldbase TEXT); \
 \
 CREATE TEMP TRIGGER renamed_paths_trigger AFTER INSERT ON renamed_paths \
 BEGIN \
+  INSERT INTO removed_paths (path) VALUES (new.path); \
   UPDATE paths \
   SET path = pathMoved(new.oldbase, new.base, new.path) \
   WHERE id = new.id; \
@@ -55,6 +89,9 @@ END; \
 ";
 
 
+
+
+/* for ddbd when/if it will be sqlite-based */
 static NSString *user_db_schema = @"\
 \
 CREATE TABLE user_paths \
@@ -81,7 +118,6 @@ BEGIN \
   AND key = new.key; \
 END; \
 ";
-
 
 static NSString *user_db_schema_tmp = @"\
 CREATE TEMP TABLE user_paths_removed_id \

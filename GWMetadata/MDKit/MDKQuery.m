@@ -96,6 +96,8 @@ enum {
   TEST_RELEASE (joinTable);
   RELEASE (sqldescription);
   TEST_RELEASE (attributesList);
+  TEST_RELEASE (results);
+  TEST_RELEASE (groupedResults);
   
 	[super dealloc];
 }
@@ -202,6 +204,7 @@ enum {
     
     started = NO;
     stopped = NO;
+    reportRawResults = NO;
     delegate = nil;
   }
   
@@ -559,12 +562,20 @@ enum {
       }
     }
 
-    if ([self isRoot]) {
+    if (built && [self isRoot]) {
       NSCountedSet *set = [[NSCountedSet alloc] initWithCapacity: 1];
     
       [self appendToAttributesList: set];
       ASSIGN (attributesList, [set allObjects]);
       RELEASE (set);
+      
+      ASSIGN (results, [NSMutableArray array]);
+      ASSIGN (groupedResults, [NSMutableDictionary dictionary]);
+      
+      for (i = 0; i < [attributesList count]; i++) {
+        [groupedResults setObject: [NSMutableArray array]
+                           forKey: [attributesList objectAtIndex: i]];
+      }
     }
 
     return built;
@@ -1366,6 +1377,10 @@ enum {
 - (void)setStarted
 {
   started = YES;
+  
+  if (delegate && [delegate respondsToSelector: @selector(queryStarted:)]) {
+    [delegate queryStarted: self];
+  }    
 }
 
 - (BOOL)isStarted
@@ -1383,63 +1398,122 @@ enum {
   return stopped;
 }
 
+- (void)setReportRawResults:(BOOL)value
+{
+  reportRawResults = value;
+}
+
 - (void)endQuery
 {
   started = NO;
   stopped = NO;
 
-  if (delegate) {
-    [delegate endQuery];
+  if (delegate && [delegate respondsToSelector: @selector(endOfQuery:)]) {
+    [delegate endOfQuery: self];
   }  
 }
 
 - (void)appendResults:(NSArray *)lines
 {
-  if (delegate) {
-    [delegate appendResults: lines];
+  if (reportRawResults) {
+    if (delegate && [delegate respondsToSelector: @selector(appendRawResults:)]) {
+      [delegate appendRawResults: lines];
+    }
+  } else {
+    CREATE_AUTORELEASE_POOL(arp);
+    unsigned i;  
+  
+    for (i = 0; i < [lines count]; i++) {
+      NSArray *line = [lines objectAtIndex: i];
+      NSString *path = [line objectAtIndex: 0];
+      NSNumber *score = [line objectAtIndex: 1];
+      NSString *attribstr = [line objectAtIndex: 2];
+      NSScanner *scanner = [NSScanner scannerWithString: attribstr];
+      NSDictionary *pathdict;
+      
+      while ([scanner isAtEnd] == NO) {
+        NSString *attrname;
+        float attrscore;
+        NSMutableArray *attresults;
+        
+        [scanner scanUpToString: @"," intoString: &attrname];
+        [scanner scanString: @"," intoString: NULL];
+        [scanner scanFloat: &attrscore];
+            
+        attresults = [groupedResults objectForKey: attrname];
+        
+        if ([attrname isEqual: @"GSMDItemTextContent"]) { 
+          pathdict = [NSDictionary dictionaryWithObjectsAndKeys: path, @"path", 
+                                                                 score, @"score",
+                                                                 nil];
+          /* already sorted */
+          [attresults addObject: pathdict];
+        } else {
+          unsigned count = [attresults count];    
+          int ins = 0;
+          
+          score = [NSNumber numberWithFloat: attrscore];
+          pathdict = [NSDictionary dictionaryWithObjectsAndKeys: path, @"path", 
+                                                                 score, @"score",
+                                                                 nil];
+          if (count) {
+            int first = 0;
+            int last = count;
+            int pos = 0; 
+            NSDictionary *d;
+            NSComparisonResult result;
+
+            while (1) {
+              if (first == last) {
+                ins = first;
+                break;
+              }
+
+              pos = (first + last) / 2;
+              d = [attresults objectAtIndex: pos];
+
+              result = [[d objectForKey: @"score"] compare: score];
+
+              if (result == NSOrderedSame) {
+                result = [[d objectForKey: @"path"] compare: path];
+              }
+
+              if ((result == NSOrderedAscending) || (result == NSOrderedSame)) {
+                first = pos + 1;
+              } else {
+                last = pos;	
+              }
+            } 
+          }
+
+          [attresults insertObject: pathdict atIndex: ins];
+        }
+      }
+      
+      [results addObject: path];
+    }
+  
+    if (delegate && [delegate respondsToSelector: @selector(queryDidUpdateResults:)]) {
+      [delegate queryDidUpdateResults: self];
+    }
+    
+    RELEASE (arp);
   }
-  
-  // attributesList
-  
-/*  
-    NSString *joinquery = [NSString stringWithFormat: @"SELECT %@.path, "
-                                          @"%@.score, "
-                                          @"%@.attribute "
-  
-  
-    [sqlstr appendFormat: @"INSERT INTO %@ (id, path, words_count, score, attribute) "
-      @"SELECT "
-      @"%@.id, "
-      @"%@.path, "
-      @"%@.words_count, "
-      @"0.0, "
-      @"'%@' || ',' || attributeScore('%@', attributes.attribute, %i, %i) "
-      @"FROM %@, attributes "
-      @"WHERE attributes.key = '%@' ", 
-      destTable, srcTable, srcTable, srcTable, 
-      attribute, searchValue, attributeType, operatorType, 
-      srcTable, attribute];  
-
-
-    [sqlstr appendFormat: @"INSERT INTO %@ (id, path, words_count, score, attribute) "
-        @"SELECT "
-        @"%@.id, "
-        @"%@.path, "
-        @"%@.words_count, "
-        @"wordScore('%@', words.word, postings.word_count, %@.words_count), "
-        @"'%@' || ',' || 0.0 "    
-        @"FROM words, %@, postings ",
-        destTable, srcTable, srcTable, srcTable, 
-        searchValue, srcTable, attribute, srcTable];
-
-
-  if ([attribute isEqual: @"GSMDItemTextContent"]) {  
-*/  
 }
 
 - (NSArray *)attributesList
 {
   return attributesList;
+}
+
+- (NSArray *)results
+{
+  return results;
+}
+
+- (NSDictionary *)groupedResults
+{
+  return groupedResults;
 }
 
 @end

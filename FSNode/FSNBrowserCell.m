@@ -600,16 +600,11 @@ static int infoheight = 0;
 
 - (void)setOpened:(BOOL)value
 {
-/*
-  NSLog(@"setOpened %i", value);
-
+  /* This was commented. (To know if something goes wrong) */
   if (isOpened == value) {
     return;
   }
   isOpened = value;
-  
-  NSLog(@"setOpened %@ %i", [node name], value);
-*/
 }
 
 - (BOOL)isOpened

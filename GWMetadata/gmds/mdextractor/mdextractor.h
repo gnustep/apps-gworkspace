@@ -91,6 +91,7 @@
   BOOL indexingEnabled;
   BOOL extracting;
   BOOL subpathsChanged;  
+  NSString *dbdir;
   NSString *dbpath;
   SQLite *sqlite;
   
@@ -130,6 +131,12 @@
   NSMutableArray *directories;
   int dirpos;
   NSTimer *schedupdateTimer;
+  
+  //
+  // update_notifications
+  //
+  NSTimer *notificationsTimer;
+  NSDate *notifDate;
 }
 
 - (void)indexedDirectoriesChanged:(NSNotification *)notification;
@@ -244,6 +251,15 @@
 @end
 
 
+@interface GMDSExtractor (update_notifications)
+
+- (void)setupUpdateNotifications;
+
+- (void)notifyUpdates:(id)sender;
+
+@end
+
+
 @interface GMDSIndexablePath: NSObject 
 {
   NSString *path;
@@ -296,6 +312,8 @@
 
 @end
 
+
+void setUpdating(BOOL value);
 
 BOOL isDotFile(NSString *path);
 

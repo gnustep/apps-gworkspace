@@ -48,15 +48,6 @@ do { \
   } \
 } while (0)
 
-#define EXECUTE_OR_ROLLBACK(q, r) \
-do { \
-  if ([sqlite executeQuery: q] == NO) { \
-    [sqlite executeQuery: @"ROLLBACK"]; \
-    NSLog(@"error at: %@", q); \
-    return r; \
-  } \
-} while (0)
-
 #define STATEMENT_EXECUTE_QUERY(s, r) \
 do { \
   if ([sqlite executeQueryWithStatement: s] == NO) { \
@@ -65,15 +56,13 @@ do { \
   } \
 } while (0)
 
-#define STATEMENT_EXECUTE_OR_ROLLBACK(s, r) \
-do { \
-  if ([sqlite executeQueryWithStatement: s] == NO) { \
-    [sqlite executeQuery: @"ROLLBACK"]; \
-    NSLog(@"error at: %@", [s query]); \
-    return r; \
-  } \
-} while (0)
 
+static BOOL updating = NO;
+
+static void check_updating(sqlite3_context *context, int argc, sqlite3_value **argv)
+{
+  sqlite3_result_int(context, (int)updating);
+}
 
 static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv)
 {
@@ -177,10 +166,18 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
   if (schedupdateTimer && [schedupdateTimer isValid]) {
     [schedupdateTimer invalidate];
   }
-  TEST_RELEASE (schedupdateTimer);
-  
+  TEST_RELEASE (schedupdateTimer);  
   RELEASE (directories);
   
+  //
+  // update_notifications
+  //
+  if (notificationsTimer && [notificationsTimer isValid]) {
+    [notificationsTimer invalidate];
+  }
+  TEST_RELEASE (notificationsTimer);
+  RELEASE (notifDate);
+    
   [super dealloc];
 }
 
@@ -191,7 +188,6 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
   if (self) {
     NSUserDefaults *defaults;
     id entry;
-    NSString *dbdir;
     NSString *lockpath;
     NSString *errpath;
     unsigned i;
@@ -208,7 +204,8 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
 
     errpath = [dbdir stringByAppendingPathComponent: @"error.log"];
         
-    dbdir = [dbdir stringByAppendingPathComponent: @"v3"];
+    dbdir = [dbdir stringByAppendingPathComponent: db_version];
+    RETAIN (dbdir);
     ASSIGN (dbpath, [dbdir stringByAppendingPathComponent: @"contents.db"]);    
     
     sqlite = [SQLite new];
@@ -1070,7 +1067,7 @@ do { \
     query = @"UPDATE paths "
             @"SET words_count = :wcount "
             @"WHERE id = :pathid";
-
+  
     statement = [sqlite statementForQuery: query 
                            withIdentifier: @"set_metadata_1"
                                  bindings: SQLITE_INTEGER, @":wcount", wcount, 
@@ -1276,7 +1273,7 @@ do { \
 {
   BOOL newdb;
 
-  if ([sqlite opendbAtPath: dbpath isNew: &newdb]) {
+  if ([sqlite opendbAtPath: dbpath isNew: &newdb]) {    
     if (newdb) {
       if ([sqlite executeSimpleQuery: db_schema] == NO) {
         NSLog(@"unable to create the database at %@", dbpath);
@@ -1289,6 +1286,10 @@ do { \
     NSLog(@"unable to open the database at %@", dbpath);
     return NO;
   }    
+
+  [sqlite createFunctionWithName: @"checkUpdating"
+                  argumentsCount: 0
+                    userFunction: check_updating];
 
   [sqlite createFunctionWithName: @"pathExists"
                   argumentsCount: 1
@@ -1618,6 +1619,11 @@ int main(int argc, char** argv)
   exit(EXIT_SUCCESS);
 }
 
+
+void setUpdating(BOOL value)
+{
+  updating = value;
+}
 
 BOOL isDotFile(NSString *path)
 {

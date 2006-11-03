@@ -153,6 +153,19 @@
     }
          
     [mddict setObject: attrsdict forKey: @"attributes"];
+    
+    {
+      /* mdextractor needs this empty "words" dictionary to let 
+         a trigger to fire when updating a path. (see dbschema.h) */
+      NSMutableDictionary *wordsDict = [NSMutableDictionary dictionary];
+      NSCountedSet *wordset = [[[NSCountedSet alloc] initWithCapacity: 1] autorelease];
+
+      [wordsDict setObject: wordset forKey: @"wset"];
+      [wordsDict setObject: [NSNumber numberWithUnsignedLong: 0L] 
+                    forKey: @"wcount"];
+    
+      [mddict setObject: wordsDict forKey: @"words"];
+    }
   }  
               
   success = [extractor setMetadata: mddict forPath: path withID: path_id];  

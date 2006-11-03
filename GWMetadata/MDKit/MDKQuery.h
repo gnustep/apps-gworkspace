@@ -69,11 +69,14 @@ typedef enum _GMDCompoundOperator
   
   NSMutableDictionary *sqldescription;
   NSArray *attributesList;
+  NSMutableArray *results;
+  NSMutableDictionary *groupedResults;
   
   id qmanager;
   id delegate;
   BOOL started;
   BOOL stopped;
+  BOOL reportRawResults;
 }
 
 + (NSArray *)attributesNames;
@@ -172,20 +175,30 @@ typedef enum _GMDCompoundOperator
 - (void)stopQuery;
 - (BOOL)isStopped;
 
+- (void)setReportRawResults:(BOOL)value;
+
 - (void)endQuery;
 
 - (void)appendResults:(NSArray *)lines;
 
 - (NSArray *)attributesList;
 
+- (NSArray *)results;
+
+- (NSDictionary *)groupedResults;
+
 @end
 
 
 @interface NSObject (MDKQueryDelegate)
 
-- (void)appendResults:(NSArray *)lines;
+- (void)appendRawResults:(NSArray *)lines;
 
-- (void)endQuery;
+- (void)queryStarted:(MDKQuery *)query;
+
+- (void)queryDidUpdateResults:(MDKQuery *)query;
+
+- (void)endOfQuery:(MDKQuery *)query;
 
 @end
 

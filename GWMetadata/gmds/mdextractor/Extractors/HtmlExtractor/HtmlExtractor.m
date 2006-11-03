@@ -112,6 +112,7 @@ int escapeChar(char *buf, NSMutableString *str);
                    attributes:(NSDictionary *)attributes
 {
   CREATE_AUTORELEASE_POOL(arp);
+  NSMutableDictionary *mddict = [NSMutableDictionary dictionary];
   NSString *contents = [NSString stringWithContentsOfFile: path];
   BOOL success = NO;
   
@@ -126,7 +127,6 @@ int escapeChar(char *buf, NSMutableString *str);
       NSScanner *scanner = [NSScanner scannerWithString: stripped];
       SEL scanSel = @selector(scanUpToCharactersFromSet:intoString:);
       IMP scanImp = [scanner methodForSelector: scanSel];
-      NSMutableDictionary *mddict = [NSMutableDictionary dictionary];
       NSMutableDictionary *wordsDict = [NSMutableDictionary dictionary];
       NSCountedSet *wordset = [[NSCountedSet alloc] initWithCapacity: 1];
       unsigned long wcount = 0;
@@ -155,11 +155,11 @@ int escapeChar(char *buf, NSMutableString *str);
       [mddict setObject: wordsDict forKey: @"words"];
       [mddict setObject: attrsdict forKey: @"attributes"];
 
-      success = [extractor setMetadata: mddict forPath: path withID: path_id];
-
       RELEASE (wordset); 
     }    
   }
+
+  success = [extractor setMetadata: mddict forPath: path withID: path_id];
   
   RELEASE (arp);
   

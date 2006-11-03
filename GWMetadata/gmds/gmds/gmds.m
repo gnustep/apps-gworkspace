@@ -86,6 +86,37 @@ static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv
   sqlite3_result_int(context, exists);
 }
 
+static void path_moved(sqlite3_context *context, int argc, sqlite3_value **argv)
+{
+  const unsigned char *oldbase = sqlite3_value_text(argv[0]);
+  int oldblen = strlen((const char *)oldbase);
+  const unsigned char *newbase = sqlite3_value_text(argv[1]);
+  int newblen = strlen((const char *)newbase);
+  const unsigned char *oldpath = sqlite3_value_text(argv[2]);
+  int oldplen = strlen((const char *)oldpath);
+  char newpath[PATH_MAX] = "";
+  int i = newblen;
+  int j;
+  
+  strncpy(newpath, (const char *)newbase, newblen);  
+  
+  for (j = oldblen; j < oldplen; j++) {
+    newpath[i] = oldpath[j];
+    i++;
+  }
+  
+  newpath[i] = '\0';
+  
+  sqlite3_result_text(context, newpath, strlen(newpath), SQLITE_TRANSIENT);
+}
+
+static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
+{
+  NSTimeInterval interval = [[NSDate date] timeIntervalSinceReferenceDate];
+
+  sqlite3_result_double(context, interval);
+}
+
 static void contains_substr(sqlite3_context *context, int argc, sqlite3_value **argv)
 {
   const char *buff = (const char *)sqlite3_value_text(argv[0]);
@@ -212,7 +243,7 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
       }
     }
 
-    dbdir = [dbdir stringByAppendingPathComponent: @"v3"];
+    dbdir = [dbdir stringByAppendingPathComponent: db_version];
 
     if (([fm fileExistsAtPath: dbdir isDirectory: &isdir] &isdir) == NO) {
       if ([fm createDirectoryAtPath: dbdir attributes: nil] == NO) { 
@@ -592,14 +623,18 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
         } else {
           GWDebugLog(@"contents database created");
         }
-      }    
+      }
     } else {
       NSLog(@"unable to open the database at %@", dbpath);
       return NO;
     }    
     
     sqlite3_create_function(db, "pathExists", 1, 
-                                SQLITE_UTF8, 0, path_exists, 0, 0);
+                                SQLITE_UTF8, 0, path_exists, 0, 0);                                
+    sqlite3_create_function(db, "pathMoved", 3, 
+                                SQLITE_UTF8, 0, path_moved, 0, 0);
+    sqlite3_create_function(db, "timeStamp", 0, 
+                                SQLITE_UTF8, 0, time_stamp, 0, 0);
     sqlite3_create_function(db, "containsSubstr", 2, 
                                 SQLITE_UTF8, 0, contains_substr, 0, 0);                                
     sqlite3_create_function(db, "appendString", 2, 

@@ -36,9 +36,11 @@
 
 - (id)initWithArguments:(NSArray *)args;
 
-- (void)appendResults:(NSArray *)lines;
+- (void)queryStarted:(MDKQuery *)query;
 
-- (void)endQuery;
+- (void)appendRawResults:(NSArray *)lines;
+
+- (void)endOfQuery:(MDKQuery *)query;
 
 - (void)printAttributesList;
 
@@ -128,6 +130,7 @@
       
       ASSIGN (query, [MDKQuery queryFromString: qstr inDirectories: dirs]);
       [query setDelegate: self];
+      [query setReportRawResults: YES];
       [query startQuery];
         }
 	    NS_HANDLER
@@ -142,7 +145,12 @@
   return self;
 }
 
-- (void)appendResults:(NSArray *)lines
+- (void)queryStarted:(MDKQuery *)query
+{
+
+}
+
+- (void)appendRawResults:(NSArray *)lines
 {
   if (onlycount == NO) {
     unsigned i;
@@ -165,7 +173,7 @@
   }
 }
 
-- (void)endQuery
+- (void)endOfQuery:(MDKQuery *)query
 {
   if (onlycount) {
     GSPrintf(stdout, @"%i\n", rescount);
