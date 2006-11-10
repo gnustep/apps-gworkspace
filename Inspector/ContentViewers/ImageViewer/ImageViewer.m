@@ -57,7 +57,7 @@
   self = [super initWithFrame: frameRect];
   
   if(self) {
-    NSRect r = [self frame];
+    NSRect r = [self bounds];
     
     r.origin.y += 60;
     r.size.height -= 60;
@@ -95,7 +95,7 @@
 
     r.origin.x = 2;
     r.origin.y = 170;
-    r.size.width = [self frame].size.width - 4;
+    r.size.width = [self bounds].size.width - 4;
     r.size.height = 25;
     errLabel = [[NSTextField alloc] initWithFrame: r];	
     [errLabel setFont: [NSFont systemFontOfSize: 18]];
@@ -193,7 +193,7 @@
     [NSTask launchedTaskWithLaunchPath: cmd 
                              arguments: [NSArray arrayWithObject: cname]];
   } else {
-    NSSize imsize = [imview frame].size;
+    NSSize imsize = [imview bounds].size;
     
     imsize.width -= 4;
     imsize.height -= 4;
@@ -228,7 +228,7 @@
 - (void)setResizer:(id)anObject
 {
   if (resizer == nil) {
-    NSSize imsize = [imview frame].size;
+    NSSize imsize = [imview bounds].size;
     
     imsize.width -= 4;
     imsize.height -= 4;

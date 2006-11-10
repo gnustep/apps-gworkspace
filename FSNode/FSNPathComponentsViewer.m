@@ -349,7 +349,7 @@ static NSImage *branchImage;
  
   labelRect.size.width = [self uncuttedLabelLenght];
       
-  if (labelRect.size.width <= ([self frame].size.width - minwidth)) {
+  if (labelRect.size.width <= ([self bounds].size.width - minwidth)) {
     labelRect.origin.x = iconRect.size.width + ELEM_MARGIN;
     labelRect.size.height = [fsnodeRep heighOfFont: [label font]];
     labelRect.origin.y = (iconRect.size.height - labelRect.size.height) / 2;  

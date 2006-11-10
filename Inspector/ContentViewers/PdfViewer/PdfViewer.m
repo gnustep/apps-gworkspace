@@ -54,7 +54,7 @@ const double PDFResolution = 72.0;
   self = [super initWithFrame: frameRect];
   
   if(self) {
-    NSRect r = [self frame];
+    NSRect r = [self bounds];
     NSRect vr;
 		id cell;
 
@@ -96,7 +96,7 @@ const double PDFResolution = 72.0;
 				            				mode: NSRadioModeMatrix prototype: cell
 			       												numberOfRows: 0 numberOfColumns: 0];
     [matrix setIntercellSpacing: NSZeroSize];
-    [matrix setCellSize: NSMakeSize(26, [[scroll contentView] frame].size.height)];
+    [matrix setCellSize: NSMakeSize(26, [[scroll contentView] bounds].size.height)];
 		[matrix setAllowsEmptySelection: YES];
 		[matrix setTarget: self];
 		[matrix setAction: @selector(goToPage:)];
@@ -207,7 +207,7 @@ const double PDFResolution = 72.0;
 				            				mode: NSRadioModeMatrix prototype: cell
 			       												numberOfRows: 0 numberOfColumns: 0];
   	[matrix setIntercellSpacing: NSZeroSize];
-  	[matrix setCellSize: NSMakeSize(26, [[scroll contentView] frame].size.height)];
+  	[matrix setCellSize: NSMakeSize(26, [[scroll contentView] bounds].size.height)];
 		[matrix setAllowsEmptySelection: YES];
 		[matrix setTarget: self];
 		[matrix setAction: @selector(goToPage:)];
@@ -275,7 +275,7 @@ const double PDFResolution = 72.0;
 {
   NSImage *image = nil;
   int index = [matrix selectedColumn] + 1;
-  NSSize imsize = [imageView frame].size;
+  NSSize imsize = [imageView bounds].size;
   NSSize unscaledSize = NSMakeSize([pdfDoc pageWidth: index], 
                                               [pdfDoc pageHeight: index]);  
 

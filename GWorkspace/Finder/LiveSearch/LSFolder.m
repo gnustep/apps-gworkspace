@@ -202,7 +202,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
       needupdate = YES;
     }
     [win makeKeyAndOrderFront: nil];
-    visibleRows = (int)([resultsScroll frame].size.height / CELLS_HEIGHT + 1);
+    visibleRows = (int)([resultsScroll bounds].size.height / CELLS_HEIGHT + 1);
   } else {  
     needupdate = YES;
   }
@@ -521,7 +521,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
     [resultsScroll setHasHorizontalScroller: YES];
     [resultsScroll setHasVerticalScroller: YES]; 
     
-    r = [[resultsScroll contentView] frame];
+    r = [[resultsScroll contentView] bounds];
 
     resultsView = [[ResultsTableView alloc] initWithFrame: r];
     [resultsView setDrawsGrid: NO];
@@ -641,7 +641,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
       [self setCurrentOrder: FSNInfoNameType];
     }
     
-    r = [[pathBox contentView] frame];
+    r = [[pathBox contentView] bounds];
     pathViewer = [[FSNPathComponentsViewer alloc] initWithFrame: r];
     [pathBox setContentView: pathViewer];
     RELEASE (pathViewer);

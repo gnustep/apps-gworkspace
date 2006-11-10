@@ -69,7 +69,7 @@ static NSString *nibName = @"Annotations";
     desktopApp = [inspector desktopApp];
     currentPath = nil;
 
-    noContsView = [[NSView alloc] initWithFrame: [[toolsBox contentView] frame]];
+    noContsView = [[NSView alloc] initWithFrame: [[toolsBox contentView] bounds]];
     MAKE_LOCALIZED_LABEL (label, NSMakeRect(2, 125, 254, 65), @"No Annotations Inspector", @"", 'c', YES, noContsView);		  
     [label setFont: [NSFont systemFontOfSize: 18]];
     [label setTextColor: [NSColor grayColor]];				

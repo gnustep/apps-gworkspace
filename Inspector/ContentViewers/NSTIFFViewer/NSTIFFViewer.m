@@ -43,7 +43,7 @@
   self = [super initWithFrame: frameRect];
   
   if(self) {
-    NSRect r = [self frame];
+    NSRect r = [self bounds];
     
     r.origin.y += 30;
     r.size.height -= 30;
@@ -80,7 +80,7 @@
 
     r.origin.x = 2;
     r.origin.y = 170;
-    r.size.width = [self frame].size.width - 4;
+    r.size.width = [self bounds].size.width - 4;
     r.size.height = 25;
     errLabel = [[NSTextField alloc] initWithFrame: r];	
     [errLabel setFont: [NSFont systemFontOfSize: 18]];
@@ -125,7 +125,7 @@
     NSSize is = [image size];
     float width = is.width;
     float height = is.height;
-    NSSize rs = [imview frame].size;
+    NSSize rs = [imview bounds].size;
     NSString *str;
 
     if (valid == NO) {

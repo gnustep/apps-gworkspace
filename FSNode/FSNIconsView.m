@@ -2141,7 +2141,6 @@ pp.y = NSMaxY(br) + 1; \
     [nameEditor setNode: nil stringValue: @"" index: -1];
     [nameEditor removeFromSuperview];
     [self setNeedsDisplayInRect: edrect];
-    [[NSCursor arrowCursor] set];
   }
 
   for (i = 0; i < [icons count]; i++) {

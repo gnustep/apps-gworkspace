@@ -859,8 +859,8 @@
   float wdt, hgt, x, y;
 	int i;
   
-  wdt = [self frame].size.width;
-  hgt = [self frame].size.height;
+  wdt = [self bounds].size.width;
+  hgt = [self bounds].size.height;
 	
 	pcount = (int)((wdt - 16) / cellsWidth);
 		
@@ -890,8 +890,9 @@
 
 - (gridpoint *)gridPointNearestToPoint:(NSPoint)p
 {
-	float maxx = [self frame].size.width;
-	float maxy = [self frame].size.height;
+  NSRect r = [self bounds];
+	float maxx = r.size.width;
+	float maxy = r.size.height;
 	float px = p.x;
 	float py = p.y;	
 	float minx = maxx;

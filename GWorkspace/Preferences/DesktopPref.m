@@ -64,7 +64,7 @@ static NSString *nibName = @"DesktopPref";
       gworkspace = [GWorkspace gworkspace];
 
       // Color
-      r = [[currColorBox contentView] frame];
+      r = [[currColorBox contentView] bounds];
       colorView = [[ColorView alloc] initWithFrame: r];
       [colorView setColor: [[manager desktopView] currentColor]]; 
       [currColorBox setContentView: colorView];

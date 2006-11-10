@@ -358,7 +358,7 @@
 
 - (void)makeIconsGrid
 {
-  NSRect gridrect = [self frame];
+  NSRect gridrect = [self bounds];
   NSPoint gpnt;
   int i;
 

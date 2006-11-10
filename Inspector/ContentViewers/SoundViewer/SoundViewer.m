@@ -109,7 +109,7 @@
     RELEASE (editButt);
     
   	errLabel = [[NSTextField alloc] init];	
-		[errLabel setFrame: NSMakeRect(5, 162, [self frame].size.width - 10, 25)];
+		[errLabel setFrame: NSMakeRect(5, 162, [self bounds].size.width - 10, 25)];
   	[errLabel setAlignment: NSCenterTextAlignment];
 		[errLabel setFont: [NSFont systemFontOfSize: 18]];
   	[errLabel setBackgroundColor: [NSColor windowBackgroundColor]];

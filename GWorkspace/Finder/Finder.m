@@ -112,7 +112,7 @@ static Finder *finder = nil;
 
     [placesBox setFinder: self];
 
-    rect = [[(NSBox *)placesBox contentView] frame];
+    rect = [[(NSBox *)placesBox contentView] bounds];
     placesScroll = [[NSScrollView alloc] initWithFrame: rect];
     [placesScroll setBorderType: NSBezelBorder];
     [placesScroll setHasHorizontalScroller: NO];
@@ -1050,7 +1050,7 @@ static Finder *finder = nil;
 - (void)tile
 {
   NSRect wrect = [win frame];
-  NSRect mbrect = [modulesBox frame];
+  NSRect mbrect = [modulesBox bounds];
   int count = [fmviews count];
   float hspace = (count * FMVIEWH) + HMARGIN + BORDER;
   int i;
@@ -1063,7 +1063,7 @@ static Finder *finder = nil;
     [win setFrame: wrect display: NO];
   }
 
-  mbrect = [modulesBox frame];
+  mbrect = [modulesBox bounds];
   
   for (i = 0; i < count; i++) {  
     FindModuleView *fmview = [fmviews objectAtIndex: i];

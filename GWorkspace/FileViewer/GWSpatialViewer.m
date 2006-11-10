@@ -174,7 +174,7 @@
       nodeView = [[GWViewerIconsView alloc] initForViewer: self];
 
     } else if ([viewType isEqual: @"List"]) { 
-      NSRect r = [[scroll contentView] frame];
+      NSRect r = [[scroll contentView] bounds];
       
       nodeView = [[GWViewerListView alloc] initWithFrame: r forViewer: self];
 
@@ -237,7 +237,7 @@
 
 - (void)createSubviews
 {
-  NSRect r = [[vwrwin contentView] frame];
+  NSRect r = [[vwrwin contentView] bounds];
   float w = r.size.width;
 	float h = r.size.height; 
   int boxh = 32;  
@@ -949,7 +949,7 @@
       ASSIGN (viewType, @"Icon");
       
     } else if ([title isEqual: NSLocalizedString(@"List", @"")]) {
-      NSRect r = [[scroll contentView] frame];
+      NSRect r = [[scroll contentView] bounds];
 
       nodeView = [[GWViewerListView alloc] initWithFrame: r forViewer: self];
       [scroll setHasVerticalScroller: YES];

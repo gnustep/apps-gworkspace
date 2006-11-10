@@ -28,7 +28,7 @@
 #include <Foundation/Foundation.h>
 #include <sqlite3.h>
 
-sqlite3 *opendbAtPath(NSString *dbpath);
+sqlite3 *opendbAtPath(NSString *path);
 
 void closedb(sqlite3 *db);
 

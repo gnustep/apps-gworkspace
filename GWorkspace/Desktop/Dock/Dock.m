@@ -411,12 +411,12 @@
   DESTROY (backImage);
 
   if (image) {
-    NSSize size = [self frame].size;
+    NSRect r = [self bounds];
     
-    backImage = [[NSImage alloc] initWithSize: size];
+    backImage = [[NSImage alloc] initWithSize: r.size];
     [backImage lockFocus]; 
     [image compositeToPoint: NSZeroPoint 
-                   fromRect: [self frame]
+                   fromRect: r
                   operation: NSCompositeCopy];
     [backImage unlockFocus];
     [self setNeedsDisplay: YES];

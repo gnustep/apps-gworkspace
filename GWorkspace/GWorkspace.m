@@ -130,7 +130,6 @@ static GWorkspace *gworkspace = nil;
   DESTROY (inspector);
   DESTROY (fileOpsManager);
   RELEASE (finder);
-  RELEASE (waitCursor);
   RELEASE (launchedApps);
   RELEASE (storedAppinfoPath);
   RELEASE (storedAppinfoLock);
@@ -472,9 +471,6 @@ static GWorkspace *gworkspace = nil;
   
   [self setContextHelp];
   
-  waitCursor = [[NSCursor alloc] initWithImage: [NSImage imageNamed: @"watch.tiff"]];
-  [waitCursor setHotSpot: NSMakePoint(8, 8)];
-
   storedAppinfoPath = [NSTemporaryDirectory() stringByAppendingPathComponent: @"GSLaunchedApplications"];
   RETAIN (storedAppinfoPath); 
   lockpath = [storedAppinfoPath stringByAppendingPathExtension: @"lock"];   

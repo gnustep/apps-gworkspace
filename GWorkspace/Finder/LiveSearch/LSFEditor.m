@@ -366,7 +366,7 @@ static NSString *nibName = @"LSFEditor";
 - (void)tile
 {
   NSRect wrect = [win frame];
-  NSRect mbrect = [modulesBox frame];
+  NSRect mbrect = [modulesBox bounds];
   int count = [fmviews count];
   float hspace = (count * FMVIEWH) + HMARGIN + BORDER;
   int i;
@@ -379,7 +379,7 @@ static NSString *nibName = @"LSFEditor";
     [win setFrame: wrect display: NO];
   }
 
-  mbrect = [modulesBox frame];
+  mbrect = [modulesBox bounds];
   
   for (i = 0; i < count; i++) {  
     FindModuleView *fmview = [fmviews objectAtIndex: i];

@@ -61,7 +61,7 @@ static NSString *nibName = @"DefEditorPref";
       NSString *editor = [defaults stringForKey: @"defaulteditor"];
       
       RETAIN (prefbox);
-      iconBoxWidth = [iconbox frame].size.width;
+      iconBoxWidth = [iconbox bounds].size.width;
       labelHeight = [nameLabel frame].size.height;
       labelOrigin = [nameLabel frame].origin;      
       RELEASE (win);

@@ -226,7 +226,7 @@
       [pathsScroll setDelegate: pathsView];
       
     } else if ([viewType isEqual: @"List"]) { 
-      NSRect r = [[nviewScroll contentView] frame];
+      NSRect r = [[nviewScroll contentView] bounds];
       
       nodeView = [[GWViewerListView alloc] initWithFrame: r forViewer: self];
        
@@ -303,7 +303,7 @@
 
 - (void)createSubviews
 {
-  NSRect r = [[vwrwin contentView] frame];
+  NSRect r = [[vwrwin contentView] bounds];
   float w = r.size.width;
 	float h = r.size.height;   
   float d = 0.0;
@@ -332,7 +332,7 @@
   [split addSubview: lowBox];
   RELEASE (lowBox);
 
-  r = [lowBox frame];
+  r = [lowBox bounds];
   w = r.size.width;
   h = r.size.height; 
   
@@ -349,7 +349,7 @@
 
   visibleCols = myrintf(r.size.width / [vwrwin resizeIncrements].width);  
   
-  r = [[pathsScroll contentView] frame];
+  r = [[pathsScroll contentView] bounds];
   pathsView = [[GWViewerIconsPath alloc] initWithFrame: r 
                    visibleIcons: visibleCols forViewer: self
                    ownsScroller: ([viewType isEqual: @"Browser"] == NO)];
@@ -469,7 +469,7 @@
 
 - (void)tileViews
 {
-  NSRect r = [split frame];
+  NSRect r = [split bounds];
   float w = r.size.width;
 	float h = r.size.height;   
   float d = [split dividerThickness];
@@ -964,7 +964,7 @@
     [pathsView stopRepNameEditing];  
 
     if ([nodeView isSingleNode]) {
-      NSRect r = [[vwrwin contentView] frame];
+      NSRect r = [[vwrwin contentView] bounds];
       int cols = myrintf(r.size.width / [vwrwin resizeIncrements].width);  
 
       if (cols != visibleCols) {
@@ -1234,7 +1234,7 @@
       ASSIGN (viewType, @"Icon");
       
     } else if ([title isEqual: NSLocalizedString(@"List", @"")]) {
-      NSRect r = [[nviewScroll contentView] frame];
+      NSRect r = [[nviewScroll contentView] bounds];
 
       NSScroller *scroller = RETAIN ([pathsScroll horizontalScroller]);
 

@@ -63,7 +63,7 @@
     [scrollView setHasHorizontalScroller: YES];
     [scrollView setHasVerticalScroller: YES]; 
   	[scrollView setAutoresizingMask: (NSViewWidthSizable | NSViewHeightSizable)];
-		[scrollView setFrame: [[win contentView] frame]];
+		[scrollView setFrame: [[win contentView] bounds]];
     [win setContentView: scrollView];
     RELEASE (scrollView);
     
@@ -75,7 +75,7 @@
     [matrix setTarget: self];
     [matrix setDoubleAction: @selector(matrixAction:)];
     [matrix setIntercellSpacing: NSZeroSize];
-    ms.width = [[scrollView contentView] frame].size.width;
+    ms.width = [[scrollView contentView] bounds].size.width;
     ms.height = [[FSNodeRep sharedInstance] heighOfFont: [NSFont systemFontOfSize: 12]];
     
     [matrix setCellSize: ms];
@@ -166,7 +166,7 @@
 	NSFont *font = [NSFont systemFontOfSize: 12];
 	NSArray *cells = [matrix cells];
 	float mh = [matrix cellSize].height;
-	float maxw = [[scrollView contentView] frame].size.width;
+	float maxw = [[scrollView contentView] bounds].size.width;
 	int i;
 	
 	for (i = 0; i < [cells count]; i++) {

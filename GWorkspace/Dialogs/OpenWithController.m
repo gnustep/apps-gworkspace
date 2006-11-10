@@ -56,7 +56,7 @@ static NSString *nibName = @"OpenWith";
       ASSIGN (pathsArr, [paths componentsSeparatedByString: @":"]);
 
 		  cfield = [[CompletionField alloc] initForController: self];
-      [cfield setFrame: [[fieldBox contentView] frame]];
+      [cfield setFrame: [[fieldBox contentView] bounds]];
       [cfield setNextKeyView: okButt]; 
       [fieldBox setContentView: cfield];   
       RELEASE (cfield);

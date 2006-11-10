@@ -272,7 +272,7 @@ static NSImage *branchImage;
 
 - (void)tile
 {
-  NSRect frameRect = [self frame];
+  NSRect frameRect = [self bounds];
   NSSize sz = [icon size];
   int lblmargin = [fsnodeRep labelMargin];
   BOOL hasinfo = ([[infolabel stringValue] length] > 0);

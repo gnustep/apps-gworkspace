@@ -136,7 +136,7 @@ static NSString *nibName = @"BrowserViewerPref";
   NSDate *farAway = [NSDate distantFuture];
   int orx = (int)[controlsbox convertPoint: [theEvent locationInWindow] fromView: nil].x;
   unsigned int eventMask = NSLeftMouseUpMask | NSLeftMouseDraggedMask;
-  int newWidth = (int)[colExample frame].size.width;
+  int newWidth = (int)[colExample bounds].size.width;
   NSEvent	*e;
   
   [controlsbox lockFocus];
@@ -172,7 +172,7 @@ static NSString *nibName = @"BrowserViewerPref";
   }
   
   [controlsbox unlockFocus];
-  [self setNewWidth: (int)[colExample frame].size.width];
+  [self setNewWidth: (int)[colExample bounds].size.width];
   [setButt setEnabled: YES];
 }
 

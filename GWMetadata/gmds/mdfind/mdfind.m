@@ -128,7 +128,7 @@
 	      {
       NSArray *dirs = (searchdir ? [NSArray arrayWithObject: searchdir] : nil);  
       
-      ASSIGN (query, [MDKQuery queryFromString: qstr inDirectories: dirs]);
+      ASSIGN (query, [MDKQuery queryFromString: qstr inDirectories: dirs]);            
       [query setDelegate: self];
       [query setReportRawResults: YES];
       [query startQuery];
@@ -178,6 +178,7 @@
   if (onlycount) {
     GSPrintf(stdout, @"%i\n", rescount);
   }
+    
   exit(EXIT_SUCCESS);
 }
 

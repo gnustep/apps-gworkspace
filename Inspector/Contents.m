@@ -85,7 +85,7 @@ static NSString *nibName = @"Contents";
     imagepath = [bundle pathForResource: @"Pboard" ofType: @"tiff"];
     pboardImage = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
         
-    r = [[viewersBox contentView] frame];
+    r = [[viewersBox contentView] bounds];
 
     bundlesDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSSystemDomainMask, YES) lastObject];
     bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
@@ -378,7 +378,7 @@ static NSString *nibName = @"Contents";
   self = [super initWithFrame: frameRect];
   
   if (self) {
-    NSRect r = [self frame];
+    NSRect r = [self bounds];
         
     r.origin.y += 45;
     r.size.height -= 45;
@@ -392,7 +392,7 @@ static NSString *nibName = @"Contents";
     [self addSubview: scrollView]; 
     RELEASE (scrollView);
     
-    r = [[scrollView contentView] frame];
+    r = [[scrollView contentView] bounds];
     textView = [[NSTextView alloc] initWithFrame: r];
     [textView setBackgroundColor: [NSColor whiteColor]];
     [textView setRichText: YES];
@@ -559,7 +559,7 @@ static NSString *nibName = @"Contents";
     
     r = NSMakeRect(0, 60, frameRect.size.width, 140);
     textview = [[NSTextView alloc] initWithFrame: r];
-    [[textview textContainer] setContainerSize: [textview frame].size];
+    [[textview textContainer] setContainerSize: [textview bounds].size];
 		[textview setDrawsBackground: NO];
     [textview setRichText: NO];
     [textview setSelectable: NO];

@@ -61,7 +61,7 @@
     
 		[self setReleasedWhenClosed: NO];
         
-    tView = [[TShelfView alloc] initWithFrame: [[self contentView] frame]];
+    tView = [[TShelfView alloc] initWithFrame: [[self contentView] bounds]];
     [self setContentView: tView];		
     
     defaults = [NSUserDefaults standardUserDefaults];	

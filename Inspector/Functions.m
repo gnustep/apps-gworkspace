@@ -115,7 +115,7 @@ NSString *relativePathFit(id container, NSString *fullPath)
   NSString *relpath = nil;		
 	int i;
 						
-	cntwidth = [container frame].size.width;
+	cntwidth = [container bounds].size.width;
 	font = [container font];
 
 	if([font widthOfString: fullPath] < cntwidth) {

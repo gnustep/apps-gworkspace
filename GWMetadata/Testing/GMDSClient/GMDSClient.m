@@ -95,7 +95,7 @@ static NSString *nibName = @"GMDSClient";
   [pathsScroll setHasHorizontalScroller: YES];
   [pathsScroll setHasVerticalScroller: YES]; 
   
-  r = [[pathsScroll contentView] frame];
+  r = [[pathsScroll contentView] bounds];
   
   resultsView = [[NSTableView alloc] initWithFrame: r];
   [resultsView setDrawsGrid: NO];

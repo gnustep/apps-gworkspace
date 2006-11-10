@@ -48,7 +48,7 @@
   self = [super initWithFrame: frameRect];
   
   if(self) {
-    NSRect r = [self frame];
+    NSRect r = [self bounds];
 
     r.origin.y += 10;
     r.size.height -= 10;
@@ -62,7 +62,7 @@
     [[scrollView contentView] setAutoresizesSubviews:YES];
     [self addSubview: scrollView]; 
 
-    r = [[scrollView contentView] frame];
+    r = [[scrollView contentView] bounds];
     textView = [[NSTextView alloc] initWithFrame: r];
     [textView setBackgroundColor: [NSColor whiteColor]];
     [textView setRichText: YES];

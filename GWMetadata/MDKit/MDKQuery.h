@@ -67,15 +67,17 @@ typedef enum _GMDCompoundOperator
   MDKQuery *parentQuery;
   GMDCompoundOperator compoundOperator;
   
-  NSMutableDictionary *sqldescription;
+  NSMutableDictionary *sqlDescription;
+  NSMutableDictionary *sqlUpdatesDescription;
   NSArray *attributesList;
-  NSMutableArray *results;
+  NSDictionary *results;
   NSMutableDictionary *groupedResults;
   
   id qmanager;
   id delegate;
   BOOL started;
   BOOL stopped;
+  BOOL updating;
   BOOL reportRawResults;
 }
 
@@ -90,9 +92,14 @@ typedef enum _GMDCompoundOperator
 + (MDKQuery *)queryFromString:(NSString *)qstr
                 inDirectories:(NSArray *)searchdirs;
 
++ (MDKQuery *)queryWithContentsOfFile:(NSString *)path;
+
 - (id)initForAttribute:(NSString *)attr
            searchValue:(NSString *)value
           operatorType:(GMDOperatorType)optype;
+
+- (BOOL)writeToFile:(NSString *)path 
+         atomically:(BOOL)flag;
 
 - (void)setCaseSensitive:(BOOL)csens;
 - (void)setTextOperatorForCaseSensitive:(BOOL)csens;
@@ -162,11 +169,12 @@ typedef enum _GMDCompoundOperator
 
 - (void)setDelegate:(id)adelegate;
 
-- (NSDictionary *)sqldescription;
+- (NSDictionary *)sqlDescription;
+
+- (NSDictionary *)sqlUpdatesDescription;
 
 - (void)setQueryNumber:(NSNumber *)qnum;
 - (NSNumber *)queryNumber;
-- (NSComparisonResult)compareByQueryNumber:(MDKQuery *)other;
 
 - (void)startQuery;
 - (void)setStarted;
@@ -175,15 +183,26 @@ typedef enum _GMDCompoundOperator
 - (void)stopQuery;
 - (BOOL)isStopped;
 
+- (void)enableUpdates;
+- (void)disableUpdates;
+- (BOOL)updating;
+
 - (void)setReportRawResults:(BOOL)value;
 
 - (void)endQuery;
 
 - (void)appendResults:(NSArray *)lines;
 
+- (void)insertPath:(NSString *)path
+          andScore:(NSNumber *)score
+      inDictionary:(NSDictionary *)dict
+       needSorting:(BOOL)sort;
+
+- (void)removePaths:(NSArray *)paths;
+
 - (NSArray *)attributesList;
 
-- (NSArray *)results;
+- (NSDictionary *)results;
 
 - (NSDictionary *)groupedResults;
 

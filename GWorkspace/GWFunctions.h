@@ -79,7 +79,7 @@ toPoint: NSMakePoint(x2, y2)]; \
 #ifndef ICONCENTER
 #define ICONCENTER(v, i, p) \
 { \
-  NSSize ss = [v frame].size; \
+  NSSize ss = [v bounds].size; \
   NSSize is = [i size]; \
   p = NSMakePoint((ss.width - is.width) / 2, (ss.height - is.height) / 2); \
 }

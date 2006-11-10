@@ -84,7 +84,7 @@ static NSString *nibName = @"Tools";
 		       							    			numberOfRows: 0 numberOfColumns: 0];
     RELEASE (cell);
 		[matrix setIntercellSpacing: NSZeroSize];
-    [matrix setCellSize: NSMakeSize(64, [[scrollView contentView] frame].size.height)];
+    [matrix setCellSize: NSMakeSize(64, [[scrollView contentView] bounds].size.height)];
 		[matrix setAllowsEmptySelection: YES];
   	[matrix setTarget: self];		
   	[matrix setAction: @selector(setCurrentApplication:)];		
@@ -92,7 +92,7 @@ static NSString *nibName = @"Tools";
 		[scrollView setDocumentView: matrix];	
     RELEASE (matrix);
 
-    r = [toolsBox frame];
+    r = [toolsBox bounds];
     r.origin.y = 165;
     r.size.height = 25;
   	errLabel = [[NSTextField alloc] initWithFrame: r];	

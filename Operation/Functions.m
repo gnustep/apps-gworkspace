@@ -75,10 +75,10 @@ NSString *relativePathFittingInField(id field, NSString *fullPath)
   NSString *relpath = nil;		
 	int i;
 						
-	cntwidth = [field frame].size.width;
+	cntwidth = [field bounds].size.width;
 	font = [field font];
 
-	if([font widthOfString: fullPath] < cntwidth) {
+	if ([font widthOfString: fullPath] < cntwidth) {
 		return fullPath;
 	}
   	
@@ -88,9 +88,9 @@ NSString *relativePathFittingInField(id field, NSString *fullPath)
 	i = [pathcomps count] - 1;
 	path = [NSString stringWithString: [pathcomps objectAtIndex: i]];
 	
-	while(i > 0) {
+	while (i > 0) {
 		i--;		
-		if([font widthOfString: path] < cntwidth) {
+		if ([font widthOfString: path] < cntwidth) {
 			relpath = [NSString stringWithString: path];
 		} else {
 			break;

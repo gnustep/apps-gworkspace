@@ -285,7 +285,7 @@ static id <DesktopApplication> desktopApp = nil;
   int i;
 
 	matrix = [[FSNBrowserMatrix alloc] initInColumn: self 
-                                        withFrame: [self frame]
+                                        withFrame: [self bounds]
 		                                         mode: NSListModeMatrix 
                                         prototype: cellPrototype
 		      					                 numberOfRows: 0 

@@ -46,7 +46,7 @@
     float x, y, w, h;
 		id cell;
     
-    r = [self frame];
+    r = [self bounds];
     
     x = 5;
     y = r.origin.y + 182;
@@ -85,7 +85,7 @@
 			       												numberOfRows: 0 numberOfColumns: 0];
     RELEASE (cell);
     [matrix setIntercellSpacing: NSZeroSize];
-    h = [[scroll contentView] frame].size.height;
+    h = [[scroll contentView] bounds].size.height;
     [matrix setCellSize: NSMakeSize(64, h)];
 		[matrix setAllowsEmptySelection: YES];
 		[scroll setDocumentView: matrix];	

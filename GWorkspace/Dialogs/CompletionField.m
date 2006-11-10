@@ -58,7 +58,7 @@
   NSSize size;
 
   [super setFrame: frameRect];
-  size = NSMakeSize(1e7, [self frame].size.height);
+  size = NSMakeSize(1e7, [self bounds].size.height);
   [[self textContainer] setContainerSize: size];
   [[self textContainer] setWidthTracksTextView: YES];
 }

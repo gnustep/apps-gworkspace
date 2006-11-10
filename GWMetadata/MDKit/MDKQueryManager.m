@@ -130,7 +130,7 @@ static MDKQueryManager *queryManager = nil;
     
     if ([queries count] == 1) {
       [query setStarted];
-      [gmds performQuery: [query sqldescription]];
+      [gmds performQuery: [query sqlDescription]];
     }
       
   } else {
@@ -173,7 +173,7 @@ static MDKQueryManager *queryManager = nil;
   if (query && ([query isStarted] == NO)) {
     if ([query isStopped] == NO) {
       [query setStarted];
-      [gmds performQuery: [query sqldescription]];
+      [gmds performQuery: [query sqlDescription]];
     } else {
       [queries removeObject: query];
     }

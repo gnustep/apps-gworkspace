@@ -104,7 +104,7 @@ static NSString *nibName = @"FileOperationWin";
       }
 
       RETAIN (progInd);
-      r = [[progBox contentView] frame];
+      r = [[progBox contentView] bounds];
       progView = [[OpProgressView alloc] initWithFrame: r refreshInterval: 0.05];
 
       [fromLabel setStringValue: NSLocalizedString(@"From:", @"")];
@@ -267,7 +267,6 @@ static NSString *nibName = @"FileOperationWin";
 				                                      sendPort: port[1]];
   [execconn setRootObject: self];
   [execconn setDelegate: self];
-  RETAIN (execconn);
   
   [nc addObserver: self
          selector: @selector(connectionDidDie:)

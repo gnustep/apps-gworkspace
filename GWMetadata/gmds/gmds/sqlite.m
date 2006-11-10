@@ -32,10 +32,33 @@
 
 static char basetable[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-sqlite3 *opendbAtPath(NSString *dbpath)
+sqlite3 *opendbAtPath(NSString *path)
 {
+  NSFileManager *fm = [NSFileManager defaultManager];
+  NSArray *components = [path pathComponents];
+  unsigned count = [components count];
+  NSString *dbname = [components objectAtIndex: count - 1];
+  NSString *dbpath = [NSString string];
   sqlite3 *db = NULL;
-  int dberr = sqlite3_open([dbpath fileSystemRepresentation], &db);
+  int dberr;
+  unsigned i;
+
+  for (i = 0; i < (count - 1); i++) {
+    NSString *dir = [components objectAtIndex: i];
+    BOOL isdir;    
+
+    dbpath = [dbpath stringByAppendingPathComponent: dir];
+
+    if (([fm fileExistsAtPath: dbpath isDirectory: &isdir] &isdir) == NO) {
+      if ([fm createDirectoryAtPath: dbpath attributes: nil] == NO) { 
+        NSLog(@"unable to create: %@", dbpath);
+        return NULL;
+      }
+    }
+  }
+
+  dbpath = [dbpath stringByAppendingPathComponent: dbname];
+  dberr = sqlite3_open([dbpath fileSystemRepresentation], &db);
     
   if (dberr != SQLITE_OK) {
     NSLog(@"%s", sqlite3_errmsg(db));

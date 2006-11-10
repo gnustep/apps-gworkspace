@@ -92,7 +92,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
     [progBox setContentView: progView]; 
     RELEASE (progView);
     
-    r = [[dragIconBox contentView] frame];
+    r = [[dragIconBox contentView] bounds];
     documentIcon = [[DocumentIcon alloc] initWithFrame: r searchResult: self];
     [dragIconBox setContentView: documentIcon]; 
     RELEASE (documentIcon);
@@ -109,7 +109,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
     [resultsScroll setHasHorizontalScroller: YES];
     [resultsScroll setHasVerticalScroller: YES]; 
     
-    r = [[resultsScroll contentView] frame];
+    r = [[resultsScroll contentView] bounds];
 
     resultsView = [[ResultsTableView alloc] initWithFrame: r];
     [resultsView setDrawsGrid: NO];
@@ -198,7 +198,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
       [self setCurrentOrder: FSNInfoNameType];
     }
         
-    r = [[pathBox contentView] frame];
+    r = [[pathBox contentView] bounds];
     pathViewer = [[FSNPathComponentsViewer alloc] initWithFrame: r];
     [pathBox setContentView: pathViewer];
     RELEASE (pathViewer);
@@ -226,7 +226,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
   NSString *cmd;
 
   [win makeKeyAndOrderFront: nil];
-  visibleRows = (int)([resultsScroll frame].size.height / CELLS_HEIGHT + 1);
+  visibleRows = (int)([resultsScroll bounds].size.height / CELLS_HEIGHT + 1);
   ASSIGN (searchPaths, selection);
   ASSIGN (searchCriteria, criteria);
   recursive = rec;

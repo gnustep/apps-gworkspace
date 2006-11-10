@@ -30,6 +30,7 @@ static NSArray *attrNames = nil;
 static NSDictionary *attrInfo = nil;
 
 static NSString *path_sep(void);
+BOOL subPathOfPath(NSString *p1, NSString *p2);
 
 enum {
   STRING,
@@ -94,7 +95,8 @@ enum {
   RELEASE (srcTable);
   RELEASE (destTable); 
   TEST_RELEASE (joinTable);
-  RELEASE (sqldescription);
+  RELEASE (sqlDescription);
+  RELEASE (sqlUpdatesDescription);
   TEST_RELEASE (attributesList);
   TEST_RELEASE (results);
   TEST_RELEASE (groupedResults);
@@ -170,6 +172,58 @@ enum {
   return query;
 }
 
++ (MDKQuery *)queryWithContentsOfFile:(NSString *)path
+{
+  NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: path];
+  
+  if (dict) {
+    id descr = [dict objectForKey: @"description"];
+    id paths = [dict objectForKey: @"searchpaths"];
+    id results = [dict objectForKey: @"results"];
+    id grpresults = [dict objectForKey: @"grouped-results"];
+    
+    if (descr && [descr isKindOfClass: [NSString class]]
+         && results && [results isKindOfClass: [NSDictionary class]]
+         && grpresults && [grpresults isKindOfClass: [NSDictionary class]]) {
+      MDKQuery *query = [self queryFromString: descr inDirectories: paths];
+      
+      if (query) {
+        NSDictionary *resdict = [query results];
+        NSMutableArray *paths = [resdict objectForKey: @"paths"];
+        NSMutableArray *scores = [resdict objectForKey: @"scores"];
+        NSArray *attrlist = [query attributesList];        
+        NSArray *savedpaths = [results objectForKey: @"paths"];
+        NSArray *savedscores = [results objectForKey: @"scores"];
+        unsigned i;
+        
+        [paths addObjectsFromArray: savedpaths];
+        [scores addObjectsFromArray: savedscores];
+        
+        for (i = 0; i < [attrlist count]; i++) {
+          NSString *attrname = [attrlist objectAtIndex: i];
+          NSDictionary *savedict = [grpresults objectForKey: attrname];
+          
+          if (savedict) {
+            resdict = [[query groupedResults] objectForKey: attrname];
+            paths = [resdict objectForKey: @"paths"];
+            scores = [resdict objectForKey: @"scores"];
+            
+            savedpaths = [savedict objectForKey: @"paths"];
+            savedscores = [savedict objectForKey: @"scores"];
+          
+            [paths addObjectsFromArray: savedpaths];
+            [scores addObjectsFromArray: savedscores];        
+          }           
+        }        
+      }
+      
+      return query;
+    }
+  }
+  
+  return nil;
+}
+
 - (id)init
 {
   self = [super init];
@@ -194,16 +248,23 @@ enum {
     parentQuery = nil;     
     compoundOperator = GMDCompoundOperatorNone;
 
-    sqldescription = [NSMutableDictionary new]; 
-    [sqldescription setObject: [NSMutableArray array] forKey: @"pre"];
-    [sqldescription setObject: [NSString string] forKey: @"join"];
-    [sqldescription setObject: [NSMutableArray array] forKey: @"post"];
-    [sqldescription setObject: [NSNumber numberWithInt: 0] forKey: @"qnumber"];
+    sqlDescription = [NSMutableDictionary new]; 
+    [sqlDescription setObject: [NSMutableArray array] forKey: @"pre"];
+    [sqlDescription setObject: [NSString string] forKey: @"join"];
+    [sqlDescription setObject: [NSMutableArray array] forKey: @"post"];
+    [sqlDescription setObject: [NSNumber numberWithInt: 0] forKey: @"qnumber"];
+
+    sqlUpdatesDescription = [NSMutableDictionary new]; 
+    [sqlUpdatesDescription setObject: [NSMutableArray array] forKey: @"pre"];
+    [sqlUpdatesDescription setObject: [NSString string] forKey: @"join"];
+    [sqlUpdatesDescription setObject: [NSMutableArray array] forKey: @"post"];
+    [sqlUpdatesDescription setObject: [NSNumber numberWithInt: 0] forKey: @"qnumber"];
     
     attributesList = nil;
     
     started = NO;
     stopped = NO;
+    updating = NO;
     reportRawResults = NO;
     delegate = nil;
   }
@@ -217,6 +278,38 @@ enum {
 {
   [self subclassResponsibility: _cmd];
   return nil;
+}
+
+- (BOOL)writeToFile:(NSString *)path 
+         atomically:(BOOL)flag
+{
+  if ([self isRoot] == NO) {
+    [NSException raise: NSInternalInconsistencyException
+		            format: @"%@ is not the root query.", [self description]];       
+  
+  } else if ([self isBuilt] == NO) {
+    [NSException raise: NSInternalInconsistencyException
+		            format: @"%@ is not built.", [self description]];       
+  
+  } else {
+    CREATE_AUTORELEASE_POOL(arp);
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    BOOL written;
+    
+    [dict setObject: [self description] forKey: @"description"];
+    if (searchPaths && [searchPaths count]) {
+      [dict setObject: searchPaths forKey: @"searchpaths"];
+    }
+    [dict setObject: results forKey: @"results"];
+    [dict setObject: groupedResults forKey: @"grouped-results"];
+    written = [dict writeToFile: path atomically: flag];
+
+    RELEASE (arp);
+      
+    return written;
+  }
+  
+  return NO;
 }
 
 - (void)setCaseSensitive:(BOOL)csens
@@ -569,11 +662,18 @@ enum {
       ASSIGN (attributesList, [set allObjects]);
       RELEASE (set);
       
-      ASSIGN (results, [NSMutableArray array]);
+      ASSIGN (results, ([NSDictionary dictionaryWithObjectsAndKeys: 
+                                      [NSMutableArray array], @"paths",
+                                      [NSMutableArray array], @"scores", nil]));
+      
       ASSIGN (groupedResults, [NSMutableDictionary dictionary]);
       
       for (i = 0; i < [attributesList count]; i++) {
-        [groupedResults setObject: [NSMutableArray array]
+        NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys: 
+                                      [NSMutableArray array], @"paths",
+                                      [NSMutableArray array], @"scores", nil];
+                                      
+        [groupedResults setObject: dict
                            forKey: [attributesList objectAtIndex: i]];
       }
     }
@@ -597,12 +697,28 @@ enum {
                    checkExisting:(BOOL)check
 {
   if ([self isRoot]) {
-    NSMutableArray *sqlpre = [sqldescription objectForKey: @"pre"];  
+    CREATE_AUTORELEASE_POOL(arp);
+    NSMutableString *sqlUpdatesStr = [sqlstr mutableCopy];
+    NSMutableArray *sqlpre = [sqlDescription objectForKey: @"pre"];  
 
     if ((check == NO) || ([sqlpre containsObject: sqlstr] == NO)) {
       [sqlpre addObject: sqlstr];
     }
 
+    [sqlUpdatesStr replaceOccurrencesOfString: @"paths" 
+                        withString: @"updated_paths" 
+                           options: NSLiteralSearch
+                             range: NSMakeRange(0, [sqlUpdatesStr length])];
+    
+    sqlpre = [sqlUpdatesDescription objectForKey: @"pre"];
+
+    if ((check == NO) || ([sqlpre containsObject: sqlUpdatesStr] == NO)) {
+      [sqlpre addObject: sqlUpdatesStr];
+    }
+
+    RELEASE (sqlUpdatesStr);
+    RELEASE (arp);
+    
   } else {
     [NSException raise: NSInternalInconsistencyException
 		            format: @"%@ is not the root query.", [self description]];     
@@ -613,11 +729,27 @@ enum {
                     checkExisting:(BOOL)check
 {
   if ([self isRoot]) {
-    NSMutableArray *sqlpost = [sqldescription objectForKey: @"post"];  
+    CREATE_AUTORELEASE_POOL(arp);
+    NSMutableString *sqlUpdatesStr = [sqlstr mutableCopy];    
+    NSMutableArray *sqlpost = [sqlDescription objectForKey: @"post"];  
 
     if ((check == NO) || ([sqlpost containsObject: sqlstr] == NO)) {
       [sqlpost addObject: sqlstr];
     }
+
+    [sqlUpdatesStr replaceOccurrencesOfString: @"paths" 
+                        withString: @"updated_paths" 
+                           options: NSLiteralSearch
+                             range: NSMakeRange(0, [sqlUpdatesStr length])];
+
+    sqlpost = [sqlUpdatesDescription objectForKey: @"post"];
+
+    if ((check == NO) || ([sqlpost containsObject: sqlUpdatesStr] == NO)) {
+      [sqlpost addObject: sqlUpdatesStr];
+    }
+
+    RELEASE (sqlUpdatesStr);
+    RELEASE (arp);
 
   } else {
     [NSException raise: NSInternalInconsistencyException
@@ -645,8 +777,10 @@ enum {
   NSMutableString *descr = [NSMutableString string];
   unsigned i;
   
-  [descr appendString: @"("];
-
+  if ([self isRoot] == NO) {
+    [descr appendString: @"("];
+  }
+  
   for (i = 0; i < [subqueries count]; i++) {
     MDKQuery *query = [subqueries objectAtIndex: i];
     GMDCompoundOperator op = [query compoundOperator];
@@ -666,8 +800,10 @@ enum {
   
     [descr appendString: [[subqueries objectAtIndex: i] description]];
   }
-
-  [descr appendString: @" )"];
+  
+  if ([self isRoot] == NO) {
+    [descr appendString: @" )"];
+  }
   
   return descr;
 }
@@ -1328,7 +1464,7 @@ enum {
   }
 }
 
-- (NSDictionary *)sqldescription
+- (NSDictionary *)sqlDescription
 {
   if ([self isRoot]) {
     NSString *jtable = [self joinTable];
@@ -1336,12 +1472,15 @@ enum {
                                           @"%@.score, "
                                           @"%@.attribute "
                                           @"FROM %@ "
-                                          @"ORDER BY %@.score DESC; ",
-                                          jtable, jtable, jtable, jtable, jtable];
+                                          @"ORDER BY "
+                                          @"%@.score DESC, "
+                                          @"%@.path ASC;",
+                                          jtable, jtable, jtable, 
+                                          jtable, jtable, jtable];
   
-    [sqldescription setObject: joinquery forKey: @"join"];
+    [sqlDescription setObject: joinquery forKey: @"join"];
   
-    return [sqldescription makeImmutableCopyOnFail: NO];
+    return [sqlDescription makeImmutableCopyOnFail: NO];
   
   } else {
     [NSException raise: NSInternalInconsistencyException
@@ -1351,24 +1490,36 @@ enum {
   return nil;
 }
 
+- (NSDictionary *)sqlUpdatesDescription
+{
+  if ([self isRoot]) {
+    [sqlUpdatesDescription setObject: [sqlDescription objectForKey: @"join"]
+                              forKey: @"join"];
+
+    return [sqlUpdatesDescription makeImmutableCopyOnFail: NO];
+
+  } else {
+    [NSException raise: NSInternalInconsistencyException
+		            format: @"%@ is not the root query.", [self description]];       
+  }
+  
+  return nil;
+}
+
 - (void)setQueryNumber:(NSNumber *)qnum
 {
-  [sqldescription setObject: qnum forKey: @"qnumber"];  
+  [sqlDescription setObject: qnum forKey: @"qnumber"];  
+  [sqlUpdatesDescription setObject: qnum forKey: @"qnumber"];  
 }
 
 - (NSNumber *)queryNumber
 {
-  return [sqldescription objectForKey: @"qnumber"];  
-}
-
-- (NSComparisonResult)compareByQueryNumber:(MDKQuery *)other
-{
-  return [[self queryNumber] compare: [other queryNumber]];
+  return [sqlDescription objectForKey: @"qnumber"];  
 }
 
 - (void)startQuery
 {
-  if (started == NO) {
+  if ((started == NO) && (updating == NO)) {
     stopped = NO;
     [qmanager startQuery: self];
   }
@@ -1391,11 +1542,35 @@ enum {
 - (void)stopQuery
 {
   stopped = YES;
+  
+  if (updating) {
+  
+  }
 }
 
 - (BOOL)isStopped
 {
   return stopped;
+}
+
+- (void)enableUpdates
+{
+  if (updating == NO) {
+  
+  
+  }
+}
+
+- (void)disableUpdates
+{
+  if (updating) {
+  
+  }
+}
+
+- (BOOL)updating
+{
+  return updating;
 }
 
 - (void)setReportRawResults:(BOOL)value
@@ -1429,68 +1604,28 @@ enum {
       NSNumber *score = [line objectAtIndex: 1];
       NSString *attribstr = [line objectAtIndex: 2];
       NSScanner *scanner = [NSScanner scannerWithString: attribstr];
-      NSDictionary *pathdict;
       
       while ([scanner isAtEnd] == NO) {
         NSString *attrname;
         float attrscore;
-        NSMutableArray *attresults;
+        BOOL sort;
         
         [scanner scanUpToString: @"," intoString: &attrname];
         [scanner scanString: @"," intoString: NULL];
         [scanner scanFloat: &attrscore];
-            
-        attresults = [groupedResults objectForKey: attrname];
         
-        if ([attrname isEqual: @"GSMDItemTextContent"]) { 
-          pathdict = [NSDictionary dictionaryWithObjectsAndKeys: path, @"path", 
-                                                                 score, @"score",
-                                                                 nil];
-          /* already sorted */
-          [attresults addObject: pathdict];
-        } else {
-          unsigned count = [attresults count];    
-          int ins = 0;
-          
-          score = [NSNumber numberWithFloat: attrscore];
-          pathdict = [NSDictionary dictionaryWithObjectsAndKeys: path, @"path", 
-                                                                 score, @"score",
-                                                                 nil];
-          if (count) {
-            int first = 0;
-            int last = count;
-            int pos = 0; 
-            NSDictionary *d;
-            NSComparisonResult result;
-
-            while (1) {
-              if (first == last) {
-                ins = first;
-                break;
-              }
-
-              pos = (first + last) / 2;
-              d = [attresults objectAtIndex: pos];
-
-              result = [[d objectForKey: @"score"] compare: score];
-
-              if (result == NSOrderedSame) {
-                result = [[d objectForKey: @"path"] compare: path];
-              }
-
-              if ((result == NSOrderedAscending) || (result == NSOrderedSame)) {
-                first = pos + 1;
-              } else {
-                last = pos;	
-              }
-            } 
-          }
-
-          [attresults insertObject: pathdict atIndex: ins];
-        }
+        sort = ([attrname isEqual: @"GSMDItemTextContent"] == NO) && (updating == NO);
+        
+        [self insertPath: path 
+                andScore: [NSNumber numberWithFloat: attrscore] 
+            inDictionary: [groupedResults objectForKey: attrname] 
+             needSorting: sort];
       }
-      
-      [results addObject: path];
+            
+      [self insertPath: path 
+              andScore: score 
+          inDictionary: results
+           needSorting: (updating == NO)];
     }
   
     if (delegate && [delegate respondsToSelector: @selector(queryDidUpdateResults:)]) {
@@ -1501,12 +1636,103 @@ enum {
   }
 }
 
+- (void)insertPath:(NSString *)path
+          andScore:(NSNumber *)score
+      inDictionary:(NSDictionary *)dict
+       needSorting:(BOOL)sort
+{
+  NSMutableArray *paths = [dict objectForKey: @"paths"];
+  NSMutableArray *scores = [dict objectForKey: @"scores"];
+  
+  if (updating) {
+    unsigned index = [paths indexOfObject: path];
+  
+    if (index != NSNotFound) {
+      [paths removeObjectAtIndex: index];
+      [scores removeObjectAtIndex: index];
+    }
+  }
+  
+  if (sort) {
+    unsigned count = [paths count];    
+    int ins = 0;
+
+    if (count) {
+      int first = 0;
+      int last = count;
+      int pos = 0; 
+      NSComparisonResult result;
+
+      while (1) {
+        if (first == last) {
+          ins = first;
+          break;
+        }
+
+        pos = (first + last) / 2;
+
+        result = [[scores objectAtIndex: pos] compare: score];
+
+        if (result == NSOrderedSame) {
+          result = [[paths objectAtIndex: pos] compare: path];
+        }
+
+        if ((result == NSOrderedAscending) || (result == NSOrderedSame)) {
+          first = pos + 1;
+        } else {
+          last = pos;	
+        }
+      } 
+    }
+
+    [paths insertObject: path atIndex: ins];
+    [scores insertObject: score atIndex: ins];
+  
+  } else {
+    [paths addObject: path];
+    [scores addObject: score];
+  }
+}
+
+- (void)removePaths:(NSArray *)paths
+{
+  NSMutableArray *respaths = [results objectForKey: @"paths"];
+  NSMutableArray *resscores = [results objectForKey: @"scores"];
+  unsigned i;
+  
+  for (i = 0; i < [paths count]; i++) {
+    NSString *path = [paths objectAtIndex: i];
+    unsigned index = [respaths indexOfObject: path];
+
+    if (index != NSNotFound) {
+      unsigned j;
+
+      [respaths removeObjectAtIndex: index];
+      [resscores removeObjectAtIndex: index];      
+      
+      for (j = 0; j < [attributesList count]; j++) {
+        NSString *attrname = [attributesList objectAtIndex: j];
+        NSDictionary *attrdict = [groupedResults objectForKey: attrname];
+        NSMutableArray *attrpaths = [attrdict objectForKey: @"paths"];
+        NSMutableArray *attrscores = [attrdict objectForKey: @"scores"];
+        
+        index = [attrpaths indexOfObject: path];
+        
+        if (index != NSNotFound) {
+          [attrpaths removeObjectAtIndex: index];
+          [attrscores removeObjectAtIndex: index];      
+        }
+      }
+    }
+  }
+}
+
 - (NSArray *)attributesList
 {
   return attributesList;
 }
 
-- (NSArray *)results
+- (NSDictionary *)results
 {
   return results;
 }
@@ -1649,6 +1875,7 @@ enum {
   
   valueInfo = [self scanSearchValueForAttributeType: attrtype];
   searchValue = [valueInfo objectForKey: @"value"];
+  
   caseSens = [[valueInfo objectForKey: @"case_sens"] boolValue];
 
   if ([attribute isEqual: @"GSMDItemTextContent"]) {  
@@ -1699,19 +1926,17 @@ enum {
 
   if (scanQuote) {
     NSString *modifiers;
-
+    
     if (([self scanUpToString: @"\"" intoString: &value] && value) == NO) {
 	    [NSException raise: NSInvalidArgumentException 
 		              format: @"Missing \" in query"];
-    } else {
-      [self scanString: @"\"" intoString: NULL];
-    }
-  
+    } 
+        
     if ([self scanUpToCharactersFromSet: set intoString: &modifiers] && modifiers) {
       if ([modifiers rangeOfString: @"c"].location != NSNotFound) {
         caseSens = NO;
       }
-    }
+    } 
   
   } else {
     if (([self scanUpToCharactersFromSet: set intoString: &value] && value) == NO) {
@@ -1769,3 +1994,18 @@ static NSString *path_sep(void)
   return separator;
 }
 
+BOOL subPathOfPath(NSString *p1, NSString *p2)
+{
+  int l1 = [p1 length];
+  int l2 = [p2 length];  
+
+  if ((l1 > l2) || ([p1 isEqual: p2])) {
+    return NO;
+  } else if ([[p2 substringToIndex: l1] isEqual: p1]) {
+    if ([[p2 pathComponents] containsObject: [p1 lastPathComponent]]) {
+      return YES;
+    }
+  }
+
+  return NO;
+}

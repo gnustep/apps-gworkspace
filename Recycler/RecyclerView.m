@@ -106,7 +106,7 @@
     node = [FSNode nodeWithPath: path];
     
     icon = [[RecyclerIcon alloc] initWithRecyclerNode: node];
-    [icon setFrame: [self frame]];
+    [icon setFrame: [self bounds]];
     [self addSubview: icon];
     RELEASE (icon);
 

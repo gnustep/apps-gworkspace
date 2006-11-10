@@ -666,7 +666,7 @@
 
   if (updateViewsLock == 0) {
     NSWindow *window = [self window];
-    NSRect r = [self frame];
+    NSRect r = [self bounds];
     float frameWidth = r.size.width - visibleColumns;
     int count = [columns count];
     NSRect colrect;
@@ -2142,7 +2142,6 @@
     [nameEditor setNode: nil stringValue: @"" index: -1];
     [nameEditor removeFromSuperview];
     [self setNeedsDisplayInRect: [nameEditor frame]];
-    [[NSCursor arrowCursor] set];
   }
 }
 

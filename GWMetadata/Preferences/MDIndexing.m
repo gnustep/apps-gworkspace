@@ -190,7 +190,7 @@ BOOL isDotFile(NSString *path);
     [statusScroll setBorderType: NSBezelBorder];
     [statusScroll setHasHorizontalScroller: NO];
     [statusScroll setHasVerticalScroller: YES]; 
-    statusView = [[NSTextView alloc] initWithFrame: [[statusScroll contentView] frame]];
+    statusView = [[NSTextView alloc] initWithFrame: [[statusScroll contentView] bounds]];
     [statusView setEditable: NO];
     [statusView setSelectable: NO];
     [statusView setVerticallyResizable: YES];
@@ -206,7 +206,7 @@ BOOL isDotFile(NSString *path);
     [errorScroll setHasHorizontalScroller: NO];
     [errorScroll setHasVerticalScroller: YES]; 
 
-    errorView = [[NSTextView alloc] initWithFrame: [[errorScroll contentView] frame]];
+    errorView = [[NSTextView alloc] initWithFrame: [[errorScroll contentView] bounds]];
     [errorView setEditable: NO];
     [errorView setSelectable: NO];
     [errorView setVerticallyResizable: YES];

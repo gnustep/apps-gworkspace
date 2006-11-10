@@ -1405,7 +1405,6 @@ static NSString *defaultColumns = @"{ \
     [nameEditor setNode: nil stringValue: @"" index: -1];
     [nameEditor removeFromSuperview];
     [listView setNeedsDisplayInRect: [nameEditor frame]];
-    [[NSCursor arrowCursor] set];
   }
 }
 
@@ -2438,7 +2437,7 @@ static NSString *defaultColumns = @"{ \
 - (void)checkSize
 {
   id sview = [self superview];
-  if (sview && ([self frame].size.width < [sview frame].size.width)) {
+  if (sview && ([self bounds].size.width < [sview bounds].size.width)) {
     [self sizeLastColumnToFit];  
   }
 }

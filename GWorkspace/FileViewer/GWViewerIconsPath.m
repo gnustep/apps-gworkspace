@@ -159,7 +159,7 @@
 - (void)setOwnsScroller:(BOOL)ownscr
 {
   ownScroller = ownscr;
-  [self setFrame: [[self superview] frame]];
+  [self setFrame: [[self superview] bounds]];
   [self tile];
 }
 
@@ -229,7 +229,7 @@
   int cols = range.length;
 
   if (cols != visibleIcons) {
-    [self setFrame: [[self superview] frame]];
+    [self setFrame: [[self superview] bounds]];
     visibleIcons = cols;  
   }
 
@@ -728,7 +728,6 @@
     [nameEditor setNode: nil stringValue: @"" index: -1];
     [nameEditor removeFromSuperview];
     [self setNeedsDisplayInRect: edrect];
-    [[NSCursor arrowCursor] set];
   }
 
   for (i = 0; i < [icons count]; i++) {

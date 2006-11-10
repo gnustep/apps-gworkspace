@@ -1,8 +1,0 @@
-{
-    NSIcon = "ClipBook.tiff";
-    NSRole = "Viewer";
-    ApplicationDescription = "ClipBook";
-    ApplicationIcon = "ClipBook.tiff";
-    ApplicationName = "ClipBook";
-    ApplicationRelease = "0.6";
-}
