@@ -46,10 +46,11 @@
   NSTableColumn *dateColumn;
   NSTableColumn *kindColumn;  
   
+  NSMutableCharacterSet *skipSet;  
   NSArray *queryWords;
   MDKQuery *currentQuery;
+  BOOL validResults;
   
-  NSMutableCharacterSet *skipSet;
   NSMutableArray *foundObjects;
   
   NSFileManager *fm;  
@@ -59,13 +60,13 @@
 
 - (void)prepareQuery;
 
-- (void)queryStarted:(MDKQuery *)query;
+- (void)queryDidStartGathering:(MDKQuery *)query;
 
 - (void)appendRawResults:(NSArray *)lines;
 
 - (void)queryDidUpdateResults:(MDKQuery *)query;
 
-- (void)endOfQuery:(MDKQuery *)query;
+- (void)queryDidEndGathering:(MDKQuery *)query;
 
 - (IBAction)stopQuery:(id)sender;
 

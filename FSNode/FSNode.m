@@ -982,6 +982,11 @@
 
 @implementation FSNode (Comparing)
 
+- (NSComparisonResult)compareAccordingToPath:(FSNode *)aNode
+{
+  return [path compare: [aNode path]];
+}
+
 - (NSComparisonResult)compareAccordingToName:(FSNode *)aNode
 {
   NSString *n1 = [self name];

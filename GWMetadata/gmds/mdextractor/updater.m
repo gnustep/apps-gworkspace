@@ -1012,7 +1012,7 @@ do { \
     info = [NSDictionary dictionaryWithObject: [removed makeImmutableCopyOnFail: NO]
                                        forKey: @"removed"];
 
-    [dnc postNotificationName: @"GWMetadataPathsUpdatedNotification"
+    [dnc postNotificationName: @"GWMetadataDidUpdateNotification"
                        object: nil 
                      userInfo: info];
 

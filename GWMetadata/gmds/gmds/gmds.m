@@ -540,12 +540,10 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
         if (err == SQLITE_DONE) {
           GWDebugLog(@"SENDING (last)");
 
-          if ([reslines count]) {
-            if ([self sendResults: reslines forQueryWithNumber: queryNumber]) {
-              GWDebugLog(@"SENT");
-            } else {
-              GWDebugLog(@"INVALID!");
-            }
+          if ([self sendResults: reslines forQueryWithNumber: queryNumber]) {
+            GWDebugLog(@"SENT");
+          } else {
+            GWDebugLog(@"INVALID!");
           }
 
           break;
@@ -590,11 +588,11 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
 {
   CREATE_AUTORELEASE_POOL(arp); 
   id client = [clientInfo objectForKey: @"client"];
-  NSMutableDictionary *results = [NSMutableDictionary dictionary];
+  NSDictionary *results;
   BOOL accepted;
   
-  [results setObject: qnum forKey: @"qnumber"];  
-  [results setObject: lines forKey: @"lines"];
+  results = [NSDictionary dictionaryWithObjectsAndKeys: qnum, @"qnumber",
+                                                        lines, @"lines", nil];  
   accepted = [client queryResults: [NSArchiver archivedDataWithRootObject: results]];    
   RELEASE (arp);
   

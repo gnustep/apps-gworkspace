@@ -220,6 +220,8 @@
 
 @interface FSNode (Comparing)
 
+- (NSComparisonResult)compareAccordingToPath:(FSNode *)aNode;
+
 - (NSComparisonResult)compareAccordingToName:(FSNode *)aNode;
 
 - (NSComparisonResult)compareAccordingToParent:(FSNode *)aNode;

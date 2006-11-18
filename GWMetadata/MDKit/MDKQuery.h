@@ -27,6 +27,8 @@
 
 #include <Foundation/Foundation.h>
 
+@class FSNode;
+
 typedef enum _GMDOperatorType
 {
   GMDLessThanOperatorType,
@@ -62,23 +64,21 @@ typedef enum _GMDCompoundOperator
   NSString *joinTable;  
 
   NSMutableArray *subqueries;
-  BOOL subclosed;
-  BOOL built;
   MDKQuery *parentQuery;
   GMDCompoundOperator compoundOperator;
   
+  NSNumber *queryNumber;
   NSMutableDictionary *sqlDescription;
   NSMutableDictionary *sqlUpdatesDescription;
   NSArray *attributesList;
   NSDictionary *results;
   NSMutableDictionary *groupedResults;
+    
+  BOOL reportRawResults;
+  unsigned int status;    
   
   id qmanager;
   id delegate;
-  BOOL started;
-  BOOL stopped;
-  BOOL updating;
-  BOOL reportRawResults;
 }
 
 + (NSArray *)attributesNames;
@@ -170,41 +170,49 @@ typedef enum _GMDCompoundOperator
 - (void)setDelegate:(id)adelegate;
 
 - (NSDictionary *)sqlDescription;
-
 - (NSDictionary *)sqlUpdatesDescription;
-
-- (void)setQueryNumber:(NSNumber *)qnum;
 - (NSNumber *)queryNumber;
 
-- (void)startQuery;
+- (void)startGathering;
 - (void)setStarted;
-- (BOOL)isStarted;
+- (BOOL)waitingStart;
+- (BOOL)isGathering;
 
 - (void)stopQuery;
 - (BOOL)isStopped;
 
-- (void)enableUpdates;
-- (void)disableUpdates;
-- (BOOL)updating;
+- (void)setUpdatesEnabled:(BOOL)enabled;
+- (BOOL)updatesEnabled;
+- (BOOL)isUpdating;
 
-- (void)setReportRawResults:(BOOL)value;
-
-- (void)endQuery;
+- (void)gatheringDone;
 
 - (void)appendResults:(NSArray *)lines;
 
-- (void)insertPath:(NSString *)path
+- (void)insertNode:(FSNode *)node
           andScore:(NSNumber *)score
       inDictionary:(NSDictionary *)dict
        needSorting:(BOOL)sort;
 
 - (void)removePaths:(NSArray *)paths;
 
+- (void)removeNode:(FSNode *)node;
+
 - (NSArray *)attributesList;
 
 - (NSDictionary *)results;
 
+- (NSArray *)resultNodes;
+
+- (unsigned)resultsCount;
+
 - (NSDictionary *)groupedResults;
+
+- (NSArray *)resultNodesForAttribute:(NSString *)attr;
+
+- (unsigned)resultsCountForAttribute:(NSString *)attr;
+
+- (void)setReportRawResults:(BOOL)value;
 
 @end
 
@@ -213,11 +221,11 @@ typedef enum _GMDCompoundOperator
 
 - (void)appendRawResults:(NSArray *)lines;
 
-- (void)queryStarted:(MDKQuery *)query;
+- (void)queryDidStartGathering:(MDKQuery *)query;
 
 - (void)queryDidUpdateResults:(MDKQuery *)query;
 
-- (void)endOfQuery:(MDKQuery *)query;
+- (void)queryDidEndGathering:(MDKQuery *)query;
 
 @end
 

@@ -31,11 +31,13 @@
 @interface MDKQueryManager : NSObject
 {  
   NSMutableArray *queries;
+  NSMutableArray *liveQueries;
   unsigned long tableNumber;
   unsigned long queryNumber;
   id gmds;
 
   NSNotificationCenter *nc; 
+  NSNotificationCenter *dnc;
 }
 
 + (MDKQueryManager *)queryManager;
@@ -50,13 +52,22 @@
 
 - (MDKQuery *)nextQuery;
 
-- (unsigned long)nextTableNumber;
+- (unsigned long)tableNumber;
 
-- (NSNumber *)nextQueryNumber;
+- (NSNumber *)queryNumber;
 
 - (void)connectGMDs;
 
 - (void)gmdsConnectionDidDie:(NSNotification *)notif;
+
+@end
+
+
+@interface MDKQueryManager (updates)
+
+- (void)startUpdateForQuery:(MDKQuery *)query;
+
+- (void)metadataDidUpdate:(NSNotification *)notif;
 
 @end
 

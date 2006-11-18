@@ -59,7 +59,10 @@ static MDKQueryManager *queryManager = nil;
 
 - (void)dealloc
 {  
+  [dnc removeObserver: self];
+  [nc removeObserver: self];
   RELEASE (queries);
+  RELEASE (liveQueries);
   
   [super dealloc];
 }
@@ -70,11 +73,18 @@ static MDKQueryManager *queryManager = nil;
   
   if (self) {
     queries = [NSMutableArray new];
+    liveQueries = [NSMutableArray new];
   
     tableNumber = 0L;
     queryNumber = 0L;
     gmds = nil;
     nc = [NSNotificationCenter defaultCenter];
+    dnc = [NSDistributedNotificationCenter defaultCenter];
+
+    [dnc addObserver: self
+            selector: @selector(metadataDidUpdate:)
+	              name: @"GWMetadataDidUpdateNotification"
+	            object: nil];
   }
   
   return self;
@@ -95,14 +105,13 @@ static MDKQueryManager *queryManager = nil;
   [self connectGMDs];
   
   if (gmds) {
-    NSNumber *qnum = [self nextQueryNumber];
     unsigned count = [queries count];
     unsigned i;
 
     for (i = 0; i < count; i++) {
       MDKQuery *q = [queries objectAtIndex: i];
       
-      if (([q isStarted] == NO) && [q isStopped]) {
+      if (([q isGathering] == NO) && [q isStopped]) {
         [queries removeObjectAtIndex: i];
         i--;
         count--;
@@ -125,7 +134,6 @@ static MDKQueryManager *queryManager = nil;
 	    }
     NS_ENDHANDLER
         
-    [query setQueryNumber: qnum];
     [queries insertObject: query atIndex: 0];
     
     if ([queries count] == 1) {
@@ -164,16 +172,29 @@ static MDKQueryManager *queryManager = nil;
   MDKQuery *query = [self queryWithNumber: qnum];
     
   if (query) {
-    [query endQuery];
+    if ([query isUpdating]) {
+      NSLog(@"REMOVING UPDATING QUERY %i", [queries count]);
+    } else {
+      NSLog(@"REMOVING SIMPLE QUERY %i", [queries count]);
+    }
+  
+    [query gatheringDone];
     [queries removeObject: query];
   }
 
   query = [self nextQuery];
 
-  if (query && ([query isStarted] == NO)) {
+  if (query && ([query isGathering] == NO)) {
     if ([query isStopped] == NO) {
-      [query setStarted];
-      [gmds performQuery: [query sqlDescription]];
+      if ([query isUpdating] == NO) {    
+        [query setStarted];
+        [gmds performQuery: [query sqlDescription]];
+      } else {
+        
+        NSLog(@"PERFORMING UPDATE (2) %i", [queries count]);
+        
+        [gmds performQuery: [query sqlUpdatesDescription]];
+      }
     } else {
       [queries removeObject: query];
     }
@@ -197,21 +218,15 @@ static MDKQueryManager *queryManager = nil;
 
 - (MDKQuery *)nextQuery
 {
-  unsigned count = [queries count];
-  
-  if (count) {
-    return [queries objectAtIndex: count -1];
-  }
-
-  return nil;
+  return [queries lastObject];
 }
 
-- (unsigned long)nextTableNumber
+- (unsigned long)tableNumber
 {
   return tableNumber++;
 }
 
-- (NSNumber *)nextQueryNumber
+- (NSNumber *)queryNumber
 {
   return [NSNumber numberWithUnsignedLong: queryNumber++];  
 }
@@ -275,3 +290,60 @@ static MDKQueryManager *queryManager = nil;
 }
 
 @end
+
+
+@implementation MDKQueryManager (updates)
+
+- (void)startUpdateForQuery:(MDKQuery *)query
+{
+  if ([liveQueries containsObject: query] == NO) {
+    [liveQueries insertObject: query atIndex: 0];
+  }
+}
+
+- (void)metadataDidUpdate:(NSNotification *)notif
+{
+  CREATE_AUTORELEASE_POOL(arp);
+  NSArray *removed = [[notif userInfo] objectForKey: @"removed"];
+  unsigned count = [liveQueries count];
+  unsigned i;
+
+  for (i = 0; i < count; i++) {
+    MDKQuery *query = [liveQueries objectAtIndex: i];
+    
+    if ([query updatesEnabled]) {
+      [query removePaths: removed];
+    
+      if ([queries containsObject: query] == NO) {
+        [queries addObject: query];
+    
+        NSLog(@"INSERTING UPDATING QUERY %i", [queries count]);
+      }
+      
+    } else {
+      [liveQueries removeObjectAtIndex: i];
+      count--;
+      i--;
+    }
+  }
+  
+  if (count && (count == [queries count])) {  
+    
+    NSLog(@"PERFORMING UPDATE (1) %i", [queries count]);
+        
+    [gmds performQuery: [[queries lastObject] sqlUpdatesDescription]];
+  }
+
+  RELEASE (arp);
+}
+
+@end
+
+
+
+
+
+
+
+
+

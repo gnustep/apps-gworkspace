@@ -10,12 +10,14 @@ ADDITIONAL_CFLAGS += -Wall
 
 # Additional include directories the compiler should search
 ADDITIONAL_INCLUDE_DIRS += 
+ADDITIONAL_INCLUDE_DIRS += -I../../FSNode 
 
 # Additional LDFLAGS to pass to the linker
 ADDITIONAL_LDFLAGS +=  
 
 # Additional library directories the linker should search
 ADDITIONAL_LIB_DIRS += 
+ADDITIONAL_LIB_DIRS += -L../../FSNode/FSNode.framework/Versions/Current/$(GNUSTEP_TARGET_LDIR)
                       
 #
 # Flags dealing with installing and uninstalling

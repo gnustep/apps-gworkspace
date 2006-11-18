@@ -15,6 +15,10 @@ include Version
 MDKit_PRINCIPAL_CLASS = MDKQuery
 MDKit_HAS_RESOURCE_BUNDLE = yes
 
+MDKit_GUI_LIBS += -lFSNode
+LIBRARIES_DEPEND_UPON += -lFSNode
+LIBRARIES_DEPEND_UPON += -lgnustep-gui $(SYSTEM_LIBS)
+
 MDKit_RESOURCE_FILES = \
     Resources/attributes.plist 
 		    

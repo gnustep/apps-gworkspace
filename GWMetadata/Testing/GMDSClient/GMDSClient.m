@@ -50,9 +50,8 @@ static NSString *nibName = @"GMDSClient";
 {
   RELEASE (progView);
   TEST_RELEASE (queryWords);
-  TEST_RELEASE (currentQuery);
+  RELEASE (currentQuery);
   TEST_RELEASE (skipSet);
-  RELEASE (foundObjects);
   TEST_RELEASE (win);
   
 	[super dealloc];
@@ -148,9 +147,7 @@ static NSString *nibName = @"GMDSClient";
   [resultsView setDelegate: self];
   [resultsView setTarget: self];
   [resultsView setDoubleAction: @selector(doubleClickOnResultsView:)];
-  
-  foundObjects = [NSMutableArray new];
-    
+      
   skipSet = [NSMutableCharacterSet new];
 
   set = [NSCharacterSet controlCharacterSet];
@@ -175,11 +172,69 @@ static NSString *nibName = @"GMDSClient";
                                       @"~`@#$%^_-+\\{}:;\"\',/?"];
   [skipSet formUnionWithCharacterSet: set];  
   
-  currentQuery = nil;
+  ASSIGN (currentQuery, [MDKQuery query]);
+  validResults = NO;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+/*
+  MDKQuery *query;
+
+  query = [MDKQuery query];
+  [query appendSubqueryWithCompoundOperator: GMDCompoundOperatorNone
+                                         attribute: @"GSMDItemTextContent"
+                                       searchValue: @"NSString"
+                                      operatorType: GMDEqualToOperatorType    
+                                     caseSensitive: YES];
+  [query appendSubqueryWithCompoundOperator: GMDAndCompoundOperator
+                                    attribute: @"GSMDItemTextContent"
+                                  searchValue: @"Enrico"
+                                 operatorType: GMDEqualToOperatorType    
+                                caseSensitive: YES];
+  [query appendSubqueryWithCompoundOperator: GMDAndCompoundOperator
+                                    attribute: @"GSMDItemTextContent"
+                                  searchValue: @"FSNode"
+                                 operatorType: GMDEqualToOperatorType    
+                                caseSensitive: YES];
+  [query setUpdatesEnabled: YES];
+  [query setDelegate: self];
+  [query setReportRawResults: NO];
+  [query startGathering];
+
+  query = [MDKQuery query];
+  [query appendSubqueryWithCompoundOperator: GMDCompoundOperatorNone
+                                  attribute: @"GSMDItemFSExtension"
+                                searchValue: @"jpg"
+                               operatorType: GMDEqualToOperatorType   
+                              caseSensitive: YES];
+  [query appendSubqueryWithCompoundOperator: GMDAndCompoundOperator
+                                  attribute: @"GSMDItemFSName"
+                                searchValue: @"06*"
+                               operatorType: GMDEqualToOperatorType    
+                              caseSensitive: YES];
+  [query setUpdatesEnabled: YES];
+  [query setDelegate: self];
+  [query setReportRawResults: NO];
+  [query startGathering];
+
+  query = [MDKQuery query];
+  [query appendSubqueryWithCompoundOperator: GMDCompoundOperatorNone
+                                  attribute: @"GSMDItemFSExtension"
+                                searchValue: @"m"
+                               operatorType: GMDEqualToOperatorType   
+                              caseSensitive: YES];
+  [query appendSubqueryWithCompoundOperator: GMDAndCompoundOperator
+                                  attribute: @"GSMDItemTextContent"
+                                searchValue: @"NSImage"
+                               operatorType: GMDEqualToOperatorType    
+                              caseSensitive: YES];
+  [query setUpdatesEnabled: YES];
+  [query setDelegate: self];
+  [query setReportRawResults: NO];
+  [query startGathering];
+*/
+
   [win makeKeyAndOrderFront: nil];
 }
 
@@ -195,23 +250,19 @@ static NSString *nibName = @"GMDSClient";
   CREATE_AUTORELEASE_POOL(arp);
   unsigned count = [queryWords count];
   int i;
+
+  [currentQuery setUpdatesEnabled: NO];
+  [currentQuery stopQuery];
   
-  if ([foundObjects count]) {
-    [foundObjects removeAllObjects];
-    [resultsView noteNumberOfRowsChanged];
-    [resultsView setNeedsDisplayInRect: [resultsView visibleRect]];
-    [foundField setStringValue: @"0"];
-  }
-  
-  [progView stop];
-  
-  if (currentQuery) {
-    [currentQuery stopQuery];
-  }
+  [progView stop];  
+  [foundField setStringValue: @"0"];
+  validResults = NO; 
+  [resultsView noteNumberOfRowsChanged];
+  [resultsView setNeedsDisplayInRect: [resultsView visibleRect]];
   
   ASSIGN (currentQuery, [MDKQuery query]);
+  [currentQuery setUpdatesEnabled: YES];
   [currentQuery setDelegate: self];
-  [currentQuery setReportRawResults: YES];
   
   [currentQuery appendSubqueryWithCompoundOperator: GMDCompoundOperatorNone
                                          attribute: @"GSMDItemTextContent"
@@ -233,61 +284,47 @@ static NSString *nibName = @"GMDSClient";
     NSLog(@"unable to build \"%@\"", [currentQuery description]); 
     [NSApp terminate: self];
   } 
-     
-       //     NSLog([currentQuery description]);
   
-  [currentQuery startQuery];
+  validResults = YES;  
+  [currentQuery startGathering];
     
   RELEASE (arp);
 }
 
-- (void)queryStarted:(MDKQuery *)query
+- (void)queryDidStartGathering:(MDKQuery *)query
 {
-
+  [progView start];   
 }
 
 - (void)appendRawResults:(NSArray *)lines
 {
-  unsigned i;
-  
-  for (i = 0; i < [lines count]; i++) {
-    NSArray *line = [lines objectAtIndex: i];
-    NSString *path = [line objectAtIndex: 0];
-    FSNode *node = [FSNode nodeWithPath: path];
-
-    [foundObjects addObject: node];
-  }
-
-  [resultsView noteNumberOfRowsChanged];
-  [resultsView setNeedsDisplayInRect: [resultsView visibleRect]];
-  [foundField setStringValue: [NSString stringWithFormat: @"%i", [foundObjects count]]];
 }
 
 - (void)queryDidUpdateResults:(MDKQuery *)query
 {
-
+  [resultsView noteNumberOfRowsChanged];
+  [resultsView setNeedsDisplayInRect: [resultsView visibleRect]];
+  [foundField setStringValue: [NSString stringWithFormat: @"%i", [currentQuery resultsCount]]];  
 }
 
-- (void)endOfQuery:(MDKQuery *)query
+- (void)queryDidEndGathering:(MDKQuery *)query
 {
-  [progView stop];
-  [foundField setStringValue: [NSString stringWithFormat: @"%i", [foundObjects count]]];  
+  if (query == currentQuery) {
+  //  [query stopQuery];
+    [progView stop];
+    [foundField setStringValue: [NSString stringWithFormat: @"%i", [currentQuery resultsCount]]];  
+  } 
 }
 
 - (IBAction)stopQuery:(id)sender
 {
-  if (currentQuery) {
-    [currentQuery stopQuery];
-    
-    if ([foundObjects count]) {
-      [foundObjects removeAllObjects];
-      [resultsView noteNumberOfRowsChanged];
-      [resultsView setNeedsDisplayInRect: [resultsView visibleRect]];
-      [foundField setStringValue: @"0"];
-    }
-    
-    [progView stop];
-  }
+  [currentQuery setUpdatesEnabled: NO];
+  [currentQuery stopQuery];
+  validResults = NO;
+  [progView stop];  
+  [resultsView noteNumberOfRowsChanged];
+  [resultsView setNeedsDisplayInRect: [resultsView visibleRect]];
+  [foundField setStringValue: @"0"];
 }
 
 - (void)controlTextDidChange:(NSNotification *)aNotification
@@ -336,13 +373,21 @@ static NSString *nibName = @"GMDSClient";
   NSNumber *row;
   
   while ((row = [enumerator nextObject])) {
-	  FSNode *node = [foundObjects objectAtIndex: [row intValue]];
+    unsigned rowind = [row intValue];
     
-    if ([node isValid]) {
-      [[NSWorkspace sharedWorkspace] openFile: [node path]];
+    if (rowind < [currentQuery resultsCount]) {
+      FSNode *node = [[currentQuery resultNodes] objectAtIndex: rowind];
+    
+      if ([node isValid]) {
+        [[NSWorkspace sharedWorkspace] openFile: [node path]];
+      } else {
+        [currentQuery removeNode: node];
+        [resultsView noteNumberOfRowsChanged];
+      }
+    
     } else {
-      [foundObjects removeObject: node];
       [resultsView noteNumberOfRowsChanged];
+      break;
     }
   }
 }
@@ -369,14 +414,17 @@ static NSString *nibName = @"GMDSClient";
 //
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView
 {
-  return [foundObjects count];
+  if (validResults) {
+    return [currentQuery resultsCount];
+  }
+  return 0;
 }
 
 - (id)tableView:(NSTableView *)aTableView
           objectValueForTableColumn:(NSTableColumn *)aTableColumn
                                 row:(int)rowIndex
 {
-  FSNode *nd = [foundObjects objectAtIndex: rowIndex];
+  FSNode *nd = [[currentQuery resultNodes] objectAtIndex: rowIndex];
     
   if (aTableColumn == nameColumn) {
     return [nd name];
@@ -410,7 +458,7 @@ static NSString *nibName = @"GMDSClient";
 {
   if (aTableColumn == nameColumn) {
     FSNTextCell *cell = (FSNTextCell *)[nameColumn dataCell];
-    FSNode *nd = [foundObjects objectAtIndex: rowIndex];
+    FSNode *nd = [[currentQuery resultNodes] objectAtIndex: rowIndex];
 
     [cell setIcon: [[FSNodeRep sharedInstance] iconOfSize: 24 forNode: nd]];
     
