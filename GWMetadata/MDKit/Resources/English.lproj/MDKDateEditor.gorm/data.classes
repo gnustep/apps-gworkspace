@@ -1,0 +1,35 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    FirstResponder = {
+	Actions = (
+	    "buttonsAction:",
+	    "stepperAction:",
+	    "operatorPopupAction:",
+	    "orderFrontFontPanel:",
+	    "popUpAction:",
+	    "startFind:",
+	    "valuesPopupAction:"
+	);
+	Super = NSObject;
+    };
+    MDKDateEditor = {
+	Actions = (
+	    "valuesPopupAction:",
+	    "operatorPopupAction:",
+	    "stepperAction:"
+	);
+	Outlets = (
+	    editorBox,
+	    win,
+	    operatorPopup,
+	    valueField,
+	    valuesPopup,
+	    firstValueBox,
+	    secondValueBox,
+	    valueBox,
+	    dateField,
+	    dateStepper
+	);
+	Super = NSObject;
+    };
+}

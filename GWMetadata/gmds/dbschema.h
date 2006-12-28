@@ -20,7 +20,7 @@ CREATE TABLE postings \
 path_id INTEGER REFERENCES paths(id), \
 word_count INTEGER); \
 \
-CREATE INDEX postiqqngs_wid_index ON postings(word_id); \
+CREATE INDEX postings_wid_index ON postings(word_id); \
 CREATE INDEX postings_pid_index ON postings(path_id); \
 \
 \

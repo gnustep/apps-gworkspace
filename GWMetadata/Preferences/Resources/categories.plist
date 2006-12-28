@@ -1,0 +1,58 @@
+{
+  applications = {
+    category_name = "applications";
+    menu_name = "Applications";
+    icon = "applications";
+    active = <*I1>;
+    index = <*I0>;
+  };
+  documents = {
+    category_name = "documents";
+    menu_name = "Documents";
+    icon = "documents";
+    active = <*I1>;
+    index = <*I1>;
+  };
+  folders = {
+    category_name = "folders";
+    menu_name = "Folders";
+    icon = "folders";
+    active = <*I1>;
+    index = <*I2>;
+  };
+  images = {
+    category_name = "images";
+    menu_name = "Images";
+    icon = "images";
+    active = <*I1>;
+    index = <*I3>;
+  };
+  pdfdocs = {
+    category_name = "pdfdocs";
+    menu_name = "PDF Documents";
+    icon = "pdfdocs";
+    active = <*I1>;
+    index = <*I4>;
+  };
+  movies = {
+    category_name = "movies";
+    menu_name = "Movies";
+    icon = "movies";
+    active = <*I1>;
+    index = <*I5>;
+  };
+  music = {
+    category_name = "music";
+    menu_name = "Music";
+    icon = "music";
+    active = <*I1>;
+    index = <*I6>;
+  };
+  plainfiles = {
+    category_name = "plainfiles";
+    menu_name = "Plain Files";
+    icon = "plainfiles";
+    active = <*I1>;
+    index = <*I7>;
+  };    
+}

@@ -26,7 +26,28 @@
 #include <AppKit/AppKit.h>
 #include "FSNTextCell.h"
 
+static SEL cutNameSel = NULL;
+static cutIMP cutName = NULL;
+
+static SEL cutDateSel = NULL;
+static cutIMP cutDate = NULL;
+
+
 @implementation FSNTextCell
+
++ (void)initialize
+{
+  static BOOL initialized = NO;
+
+  if (initialized == NO) {
+    cutNameSel = @selector(cutTitle:toFitWidth:);
+    cutName = (cutIMP)[self instanceMethodForSelector: cutNameSel];    
+    cutDateSel = @selector(cutTitle:toFitWidth:);
+    cutDate = (cutIMP)[self instanceMethodForSelector: cutDateSel];    
+
+    initialized = YES;
+  }
+}
 
 - (void)dealloc
 {
@@ -49,8 +70,8 @@
     titlelenght = 0.0;
     icon = nil;
     dateCell = NO;
-    cutTitleSel = @selector(cutTitle:toFitWidth:);
-    cutTitle = (cutIMP)[self methodForSelector: cutTitleSel];    
+    cutTitleSel = cutNameSel;
+    cutTitle = cutName;    
   }
 
   return self;
@@ -72,8 +93,8 @@
     c->uncuttedTitle = nil;
   }
   
-  c->cutTitleSel = cutTitleSel;
-  c->cutTitle = (cutIMP)[c methodForSelector: cutTitleSel];   
+  c->cutTitleSel = cutNameSel;
+  c->cutTitle = cutName;   
 
   TEST_RETAIN (icon);
 
@@ -115,11 +136,11 @@
   dateCell = value;
 
   if (dateCell) {
-    cutTitleSel = @selector(cutDateTitle:toFitWidth:);
-    cutTitle = (cutIMP)[self methodForSelector: cutTitleSel];    
+    cutTitleSel = cutDateSel;
+    cutTitle = cutDate; 
   } else {
-    cutTitleSel = @selector(cutTitle:toFitWidth:);
-    cutTitle = (cutIMP)[self methodForSelector: cutTitleSel];    
+    cutTitleSel = cutNameSel;
+    cutTitle = cutName;  
   }
 }
 

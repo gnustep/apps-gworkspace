@@ -782,6 +782,8 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
   NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: NO];
   
   if (attributes) {
+    NSString *app = nil;
+    NSString *type = nil;
     NSDirectoryEnumerator *enumerator;
     id extractor = nil;
     unsigned long fcount = 0;  
@@ -795,14 +797,20 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
     
     EXECUTE_QUERY (@"BEGIN", NO);
     
-    path_id = [self insertOrUpdatePath: path withAttributes: attributes];
+    [ws getInfoForFile: path application: &app type: &type];  
+    
+    path_id = [self insertOrUpdatePath: path 
+                                ofType: type
+                        withAttributes: attributes];
     
     if (path_id == -1) {
       [sqlite executeQuery: @"ROLLBACK"];
       return NO;
     }
 
-    extractor = [self extractorForPath: path withAttributes: attributes];
+    extractor = [self extractorForPath: path 
+                                ofType: type
+                        withAttributes: attributes];
 
     if (extractor) {
       if ([extractor extractMetadataAtPath: path
@@ -844,16 +852,24 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
           BOOL hasextractor = NO;
         
           if (skip == NO) {
+            NSString *app = nil;
+            NSString *type = nil;        
+                    
             #if 0 
               [self logError: [NSString stringWithFormat: @"EXTRACT %@", subpath]];   // TOGLIERE !!!!
             #endif
             
             [sqlite executeQuery: @"BEGIN"];
             
-            path_id = [self insertOrUpdatePath: subpath withAttributes: attributes];
+            [ws getInfoForFile: subpath application: &app type: &type];
+            
+            path_id = [self insertOrUpdatePath: subpath 
+                                        ofType: type
+                                withAttributes: attributes];
                     
             if (path_id != -1) {
               extractor = [self extractorForPath: subpath 
+                                          ofType: type
                                   withAttributes: attributes];
 
               if (extractor) {
@@ -935,6 +951,7 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
 }
 
 - (int)insertOrUpdatePath:(NSString *)path
+                   ofType:(NSString *)type
            withAttributes:(NSDictionary *)attributes
 {
   NSTimeInterval interval = [[attributes fileModificationDate] timeIntervalSinceReferenceDate];
@@ -950,9 +967,11 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
 
 #define KEY_AND_ATTRIBUTE(k, a) \
 do { \
-  NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys: \
+  if (a) { \
+    NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys: \
                                         k, @"key", a, @"attribute", nil]; \
-  [mdattributes addObject: dict]; \
+    [mdattributes addObject: dict]; \
+  } \
 } while (0)
     
   query = @"SELECT id FROM paths WHERE path = :path";
@@ -1017,7 +1036,7 @@ do { \
 
   KEY_AND_ATTRIBUTE (@"GSMDItemFSName", qname);  
   KEY_AND_ATTRIBUTE (@"GSMDItemFSExtension", qext);  
-  KEY_AND_ATTRIBUTE (@"GSMDItemFSType", [attributes fileType]);  
+  KEY_AND_ATTRIBUTE (@"GSMDItemFSType", type);  
   
   if (ddbd) {
     NSArray *usermdata = [ddbd userMetadataForPath: path];
@@ -1166,14 +1185,12 @@ do { \
 }
 
 - (id)extractorForPath:(NSString *)path
+                ofType:(NSString *)type
         withAttributes:(NSDictionary *)attributes
 {
   NSString *ext = [[path pathExtension] lowercaseString];
-  NSString *app = nil, *type = nil;
   NSData *data = nil;
   id extractor = nil;  
-  
-  [ws getInfoForFile: path application: &app type: &type]; 
   
   if ([attributes fileType] == NSFileTypeRegular) {
     NSFileHandle *handle = [NSFileHandle fileHandleForReadingAtPath: path];
@@ -1210,7 +1227,7 @@ do { \
                                    testData: data]) {
     return textExtractor;
   }
-  
+
   return nil;
 }
 

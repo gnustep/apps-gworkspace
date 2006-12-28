@@ -29,23 +29,45 @@
 
 @class FSNode;
 
-typedef enum _GMDOperatorType
-{
-  GMDLessThanOperatorType,
-  GMDLessThanOrEqualToOperatorType,
-  GMDGreaterThanOperatorType,
-  GMDGreaterThanOrEqualToOperatorType,
-  GMDEqualToOperatorType,
-  GMDNotEqualToOperatorType,
-  GMDInRangeOperatorType
-} GMDOperatorType;
+enum {
+  STRING,
+  ARRAY,
+  NUMBER,
+  DATE,
+  DATA
+};
 
-typedef enum _GMDCompoundOperator
+enum {
+  NUM_INT,
+  NUM_FLOAT,
+  NUM_BOOL
+};
+
+typedef enum _MDKAttributeMask
 {
-  GMDCompoundOperatorNone,  
+  MDKAttributeSearchable = 1,
+  MDKAttributeFSType = 2,
+  MDKAttributeBaseSet = 4,
+  MDKAttributeUserSet = 8
+} MDKAttributeMask;
+
+typedef enum _MDKOperatorType
+{
+  MDKLessThanOperatorType,
+  MDKLessThanOrEqualToOperatorType,
+  MDKGreaterThanOperatorType,
+  MDKGreaterThanOrEqualToOperatorType,
+  MDKEqualToOperatorType,
+  MDKNotEqualToOperatorType,
+  MDKInRangeOperatorType
+} MDKOperatorType;
+
+typedef enum _MDKCompoundOperator
+{
+  MDKCompoundOperatorNone,  
   GMDAndCompoundOperator,  
   GMDOrCompoundOperator
-} GMDCompoundOperator;
+} MDKCompoundOperator;
 
 
 @interface MDKQuery : NSObject
@@ -55,7 +77,7 @@ typedef enum _GMDCompoundOperator
   NSString *searchValue;
   BOOL caseSensitive;
   
-  GMDOperatorType operatorType;
+  MDKOperatorType operatorType;
   NSString *operator;
     
   NSArray *searchPaths;
@@ -65,13 +87,13 @@ typedef enum _GMDCompoundOperator
 
   NSMutableArray *subqueries;
   MDKQuery *parentQuery;
-  GMDCompoundOperator compoundOperator;
+  MDKCompoundOperator compoundOperator;
   
   NSNumber *queryNumber;
   NSMutableDictionary *sqlDescription;
   NSMutableDictionary *sqlUpdatesDescription;
-  NSArray *attributesList;
   NSDictionary *results;
+  NSArray *categoryNames;  
   NSMutableDictionary *groupedResults;
     
   BOOL reportRawResults;
@@ -85,7 +107,19 @@ typedef enum _GMDCompoundOperator
 
 + (NSDictionary *)attributesInfo;
 
-+ (NSString *)attributeDescription:(NSString *)attribute;
++ (void)updateUserAttributes:(NSArray *)userattrs;
+
++ (NSString *)attributeDescription:(NSString *)attrname;
+
++ (NSDictionary *)attributeWithName:(NSString *)name;
+
++ (NSDictionary *)attributesWithMask:(MDKAttributeMask)mask;
+
++ (NSArray *)categoryNames;
+
++ (NSDictionary *)categoryInfo;
+
++ (void)updateCategoryInfo:(NSDictionary *)info;
 
 + (id)query;
 
@@ -96,7 +130,7 @@ typedef enum _GMDCompoundOperator
 
 - (id)initForAttribute:(NSString *)attr
            searchValue:(NSString *)value
-          operatorType:(GMDOperatorType)optype;
+          operatorType:(MDKOperatorType)optype;
 
 - (BOOL)writeToFile:(NSString *)path 
          atomically:(BOOL)flag;
@@ -117,29 +151,29 @@ typedef enum _GMDCompoundOperator
 - (void)setJoinTable:(NSString *)jtab;
 - (NSString *)joinTable;
 
-- (void)setCompoundOperator:(GMDCompoundOperator)op;
-- (GMDCompoundOperator)compoundOperator;
+- (void)setCompoundOperator:(MDKCompoundOperator)op;
+- (MDKCompoundOperator)compoundOperator;
 
 - (void)setParentQuery:(MDKQuery *)query;
 - (MDKQuery *)parentQuery;
 
 - (MDKQuery *)leftSibling;
 
-- (BOOL)hasParentWithCompound:(GMDCompoundOperator)op;
+- (BOOL)hasParentWithCompound:(MDKCompoundOperator)op;
 
 - (MDKQuery *)rootQuery;
 
 - (BOOL)isRoot;
 
-- (MDKQuery *)appendSubqueryWithCompoundOperator:(GMDCompoundOperator)op;
+- (MDKQuery *)appendSubqueryWithCompoundOperator:(MDKCompoundOperator)op;
 
 - (void)appendSubquery:(id)query
-      compoundOperator:(GMDCompoundOperator)op;
+      compoundOperator:(MDKCompoundOperator)op;
 
-- (void)appendSubqueryWithCompoundOperator:(GMDCompoundOperator)op
+- (void)appendSubqueryWithCompoundOperator:(MDKCompoundOperator)op
                                  attribute:(NSString *)attr
                                searchValue:(NSString *)value
-                              operatorType:(GMDOperatorType)optype        
+                              operatorType:(MDKOperatorType)optype        
                              caseSensitive:(BOOL)csens;
 
 - (void)appendSubqueriesFromString:(NSString *)qstr;
@@ -160,8 +194,6 @@ typedef enum _GMDCompoundOperator
 - (void)appendSQLToPostStatements:(NSString *)sqlstr
                     checkExisting:(BOOL)check;
 
-- (void)appendToAttributesList:(NSCountedSet *)attributes;
-
 @end
 
 
@@ -177,6 +209,7 @@ typedef enum _GMDCompoundOperator
 - (void)setStarted;
 - (BOOL)waitingStart;
 - (BOOL)isGathering;
+- (void)gatheringDone;
 
 - (void)stopQuery;
 - (BOOL)isStopped;
@@ -184,8 +217,8 @@ typedef enum _GMDCompoundOperator
 - (void)setUpdatesEnabled:(BOOL)enabled;
 - (BOOL)updatesEnabled;
 - (BOOL)isUpdating;
-
-- (void)gatheringDone;
+- (void)updatingStarted;
+- (void)updatingDone;
 
 - (void)appendResults:(NSArray *)lines;
 
@@ -198,8 +231,6 @@ typedef enum _GMDCompoundOperator
 
 - (void)removeNode:(FSNode *)node;
 
-- (NSArray *)attributesList;
-
 - (NSDictionary *)results;
 
 - (NSArray *)resultNodes;
@@ -208,9 +239,9 @@ typedef enum _GMDCompoundOperator
 
 - (NSDictionary *)groupedResults;
 
-- (NSArray *)resultNodesForAttribute:(NSString *)attr;
+- (NSArray *)resultNodesForCategory:(NSString *)catname;
 
-- (unsigned)resultsCountForAttribute:(NSString *)attr;
+- (int)resultsCountForCategory:(NSString *)catname;
 
 - (void)setReportRawResults:(BOOL)value;
 
@@ -223,9 +254,21 @@ typedef enum _GMDCompoundOperator
 
 - (void)queryDidStartGathering:(MDKQuery *)query;
 
-- (void)queryDidUpdateResults:(MDKQuery *)query;
+- (void)queryDidUpdateResults:(MDKQuery *)query
+                forCategories:(NSArray *)catnames;
 
 - (void)queryDidEndGathering:(MDKQuery *)query;
+
+- (void)queryDidStartUpdating:(MDKQuery *)query;
+
+- (void)queryDidEndUpdating:(MDKQuery *)query;
+
+@end
+
+
+@interface NSDictionary (CategorySort)
+
+- (NSComparisonResult)compareAccordingToIndex:(NSDictionary *)dict;
 
 @end
 

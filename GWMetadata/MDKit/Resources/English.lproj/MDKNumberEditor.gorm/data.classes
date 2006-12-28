@@ -1,0 +1,31 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    FirstResponder = {
+	Actions = (
+	    "buttonsAction:",
+	    "valuesPopupAction:",
+	    "operatorPopupAction:",
+	    "orderFrontFontPanel:",
+	    "popUpAction:",
+	    "startFind:"
+	);
+	Super = NSObject;
+    };
+    MDKNumberEditor = {
+	Actions = (
+	    "valuesPopupAction:",
+	    "operatorPopupAction:"
+	);
+	Outlets = (
+	    editorBox,
+	    win,
+	    operatorPopup,
+	    valueField,
+	    valuesPopup,
+	    firstValueBox,
+	    secondValueBox,
+	    valueBox
+	);
+	Super = NSObject;
+    };
+}

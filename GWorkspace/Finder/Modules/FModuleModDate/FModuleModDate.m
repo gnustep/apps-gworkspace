@@ -237,27 +237,29 @@ static NSString *nibName = @"FModuleModDate";
 - (IBAction)stepperAction:(id)sender
 {
   NSString *str = [dateField stringValue];  
-  double sv = [sender doubleValue];
-  int month, day, year;
 
   if ([str length]) {
     NSCalendarDate *cdate = [NSCalendarDate dateWithString: str
                                             calendarFormat: @"%m %d %Y"];
+    if (cdate) {   
+      double sv = [sender doubleValue];
+      int month, day, year;
     
-    if (sv > stepperValue) {
-      cdate = [cdate addTimeInterval: DAY_TI];
-    } else {
-      cdate = [cdate addTimeInterval: -DAY_TI];
+      if (sv > stepperValue) {
+        cdate = [cdate addTimeInterval: DAY_TI];
+      } else if (sv < stepperValue) {
+        cdate = [cdate addTimeInterval: -DAY_TI];
+      }
+    
+      month = [cdate monthOfYear];
+      day = [cdate dayOfMonth];
+      year = [cdate yearOfCommonEra];    
+
+      str = [NSString stringWithFormat: @"%i %i %i", month, day, year];
+      [dateField setStringValue: str];
+
+      stepperValue = sv;
     }
-    
-    month = [cdate monthOfYear];
-    day = [cdate dayOfMonth];
-    year = [cdate yearOfCommonEra];    
-    
-    str = [NSString stringWithFormat: @"%i %i %i", month, day, year];
-    [dateField setStringValue: str];
-    
-    stepperValue = sv;
   } 
 }
 

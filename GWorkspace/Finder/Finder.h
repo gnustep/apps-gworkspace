@@ -71,9 +71,6 @@
 - (void)activate;
 
 - (void)loadModules;
-
-- (NSArray *)bundlesWithExtension:(NSString *)extension 
-													 inPath:(NSString *)path;
                            
 - (NSArray *)modules;
 

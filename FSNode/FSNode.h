@@ -40,6 +40,7 @@
   NSDictionary *attributes;
   NSString *fileType;
   NSString *typeDescription;
+  NSString *application;
     
   unsigned long long filesize;
   NSDate *crDate;
@@ -142,6 +143,8 @@
 - (NSString *)name;
 
 - (NSString *)fileType;
+
+- (NSString *)application;
 
 - (void)setTypeFlags;
 

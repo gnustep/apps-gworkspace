@@ -40,6 +40,9 @@ static NSDictionary *fontAttr = nil;
 static NSFont *infoFont = nil;
 static int infoheight = 0;
 
+static SEL cutTitleSel = NULL;
+static cutIMP cutTitle = NULL;
+
 
 @implementation FSNBrowserCell
 
@@ -62,6 +65,9 @@ static int infoheight = 0;
   static BOOL initialized = NO;
 
   if (initialized == NO) {
+    cutTitleSel = @selector(cutTitle:toFitWidth:);
+    cutTitle = (cutIMP)[self instanceMethodForSelector: cutTitleSel];   
+  
     if (desktopApp == nil) {
       NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
       NSString *appName = [defaults stringForKey: @"DesktopApplicationName"];
@@ -92,10 +98,7 @@ static int infoheight = 0;
 {
   self = [super init];
   
-  if (self) {
-    cutTitleSel = @selector(cutTitle:toFitWidth:);
-    cutTitle = (cutIMP)[self methodForSelector: cutTitleSel]; 
-       
+  if (self) {       
     node = nil;
     selection = nil;
     selectionTitle = nil;

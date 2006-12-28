@@ -13,6 +13,8 @@ OBJCFLAGS += -Wall
 
 MDIndexing_OBJC_FILES = \
 MDIndexing.m \
+CategoriesEditor.m \
+CategoryView.m \
 StartAppWin.m
 
 MDIndexing_PRINCIPAL_CLASS = MDIndexing
@@ -20,6 +22,8 @@ MDIndexing_PRINCIPAL_CLASS = MDIndexing
 MDIndexing_RESOURCE_FILES = \
 Info.plist \
 MDIndexing.tiff \
+Resources/categories.plist \
+Resources/Images/* \
 Resources/English.lproj 
 
 ifeq ($(findstring darwin, $(GNUSTEP_TARGET_OS)), darwin)
@@ -32,3 +36,6 @@ include $(GNUSTEP_MAKEFILES)/bundle.make
 
 -include GNUmakefile.preamble
 -include GNUmakefile.postamble
+
+
+

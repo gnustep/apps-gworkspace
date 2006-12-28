@@ -116,12 +116,11 @@
     
     fileType = nil;    
     typeDescription = nil;
+    
+    application = nil;
                                       
     attributes = [fm fileAttributesAtPath: path traverseLink: NO];
-                                              
-    if (attributes) {
-      RETAIN (attributes);
-    }
+    TEST_RETAIN (attributes);
   }
     
   return self;
@@ -445,6 +444,14 @@
   return (fileType ? fileType : (NSString *)[NSString string]);
 }
 
+- (NSString *)application
+{
+  if ([self isApplication] == NO) {
+    return application;
+  }
+  return nil;
+}
+
 - (void)setTypeFlags
 {  
   flags.plain = 0;
@@ -470,7 +477,11 @@
 	    NSString *defApp = nil, *type = nil;
 
 	    [ws getInfoForFile: path application: &defApp type: &type]; 
-
+      
+      if (defApp) {
+        ASSIGN (application, defApp);
+      }
+      
       flags.directory = 1;
 
 	    if (type == NSApplicationFileType) {
@@ -515,7 +526,11 @@
 	  NSString *defApp = nil, *type = nil;
 
 	  [ws getInfoForFile: path application: &defApp type: &type]; 
-
+      
+    if (defApp) {
+      ASSIGN (application, defApp);
+    }
+    
     flags.directory = 1;
 
 	  if (type == NSApplicationFileType) {
@@ -835,12 +850,16 @@
 
 - (BOOL)isValid
 {
-  BOOL valid = [fm fileExistsAtPath: path];
+  BOOL valid = (attributes != nil);
 
-  if ((valid == NO) && flags.link) {
-    valid = ([fm fileAttributesAtPath: path traverseLink: NO] != nil);
+  if (valid) {
+    valid = [fm fileExistsAtPath: path];
+
+    if ((valid == NO) && flags.link) {
+      valid = ([fm fileAttributesAtPath: path traverseLink: NO] != nil);
+    }
   }
-
+  
   return valid;
 }
 

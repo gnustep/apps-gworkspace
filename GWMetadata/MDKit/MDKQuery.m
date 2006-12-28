@@ -33,19 +33,35 @@ static NSDictionary *attrInfo = nil;
 static NSString *path_sep(void);
 BOOL subPathOfPath(NSString *p1, NSString *p2);
 
-enum {
-  STRING,
-  ARRAY,
-  NUMBER,
-  DATE,
-  DATA
-};
+static NSArray *basesetAttributes(void)
+{
+  static NSArray *attributes = nil;
 
-enum {
-  NUM_INT,
-  NUM_FLOAT,
-  NUM_BOOL
-};
+  if (attributes == nil) {
+    attributes = [[NSArray alloc] initWithObjects: 
+	        @"GSMDItemFSName",
+	        @"GSMDItemFSExtension",    
+	        @"GSMDItemFSType",
+
+	        @"GSMDItemFSSize",              // FSAttribute
+	        @"GSMDItemFSModificationDate",  // FSAttribute
+	        @"GSMDItemFSOwnerUser",         // FSAttribute
+	        @"GSMDItemFSOwnerGroup",        // FSAttribute
+
+	        @"GSMDItemFinderComment",
+
+	        @"GSMDItemApplicationName",
+	        @"GSMDItemRole",
+          @"GSMDItemUnixExtensions",
+
+	        @"GSMDItemTitle",
+	        @"GSMDItemAuthors",
+	        @"GSMDItemCopyrightDescription",
+          nil];
+  }
+
+  return attributes;
+}
 
 enum {
   SUBCLOSED = 1,
@@ -58,6 +74,10 @@ enum {
 };
 
 
+#define CHECKDELEGATE(s) \
+  ((delegate != nil) \
+    && [delegate respondsToSelector: @selector(s)])
+    
 @interface MDKAttributeQuery : MDKQuery
 {
 }
@@ -109,7 +129,7 @@ enum {
   RELEASE (queryNumber);
   RELEASE (sqlDescription);
   RELEASE (sqlUpdatesDescription);
-  TEST_RELEASE (attributesList);
+  TEST_RELEASE (categoryNames);
   TEST_RELEASE (results);
   TEST_RELEASE (groupedResults);
   
@@ -123,12 +143,55 @@ enum {
   if (initialized == NO) {
     NSBundle *bundle = [NSBundle bundleForClass: [self class]];
     NSString *dictpath = [bundle pathForResource: @"attributes" ofType: @"plist"];
-
-    attrInfo = [NSDictionary dictionaryWithContentsOfFile: dictpath];
-    RETAIN (attrInfo);
-    attrNames = [attrInfo allKeys];
-    RETAIN (attrNames);
-  
+    NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: dictpath];
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];  
+    NSDictionary *domain = [defaults persistentDomainForName: @"MDKQuery"];
+    
+    if (dict == nil) {
+      [NSException raise: NSInternalInconsistencyException
+		              format: @"\"%@\" doesn't contain a dictionary!", dictpath];     
+    }
+    
+    ASSIGN (attrInfo, [dict objectForKey: @"attributes"]);
+    ASSIGN (attrNames, [attrInfo allKeys]);
+               
+    if (domain == nil) {
+      domain = [NSDictionary dictionaryWithObjectsAndKeys: 
+                      basesetAttributes(), @"user-attributes",
+                     [dict objectForKey: @"categories"], @"categories", nil];
+      [defaults setPersistentDomain: domain forName: @"MDKQuery"];
+      [defaults synchronize];
+    } else {
+      NSArray *entry = nil;
+      BOOL modified = NO;
+      NSMutableDictionary *mdom = nil;
+      
+      entry = [domain objectForKey: @"user-attributes"];
+      
+      if ((entry == nil) || ([entry count] == 0)) {
+        mdom = [domain mutableCopy];    
+        [mdom setObject: basesetAttributes() forKey: @"user-attributes"];
+        modified = YES;
+      }
+      
+      entry = [domain objectForKey: @"categories"];
+      
+      if ((entry == nil) || ([entry count] == 0)) {      
+        if (mdom == nil) {
+          mdom = [domain mutableCopy];
+        }
+        [mdom setObject: [dict objectForKey: @"categories"] 
+                 forKey: @"categories"];
+        modified = YES;
+      }
+            
+      if (modified) {
+        [defaults setPersistentDomain: mdom forName: @"MDKQuery"];
+        [defaults synchronize];
+        RELEASE (mdom);
+      }
+    }
+    
     initialized = YES;
   }
 }
@@ -143,15 +206,99 @@ enum {
   return attrInfo;
 }
 
-+ (NSString *)attributeDescription:(NSString *)attribute
++ (void)updateUserAttributes:(NSArray *)userattrs
 {
-  NSDictionary *dict = [attrInfo objectForKey: attribute];
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];  
+  NSMutableDictionary *domain;
+  
+  [defaults synchronize];
+  domain = [[defaults persistentDomainForName: @"MDKQuery"] mutableCopy];
+  [domain setObject: userattrs forKey: @"user-attributes"];
+  [defaults setPersistentDomain: domain forName: @"MDKQuery"];
+  [defaults synchronize];
+  
+  RELEASE (domain);
+}
+
++ (NSString *)attributeDescription:(NSString *)attrname
+{
+  NSDictionary *dict = [attrInfo objectForKey: attrname];
   
   if (dict) {
     return [dict objectForKey: @"description"];
   }
   
   return nil;
+}
+
++ (NSDictionary *)attributeWithName:(NSString *)attrname
+{
+  return [attrInfo objectForKey: attrname];
+}
+
++ (NSDictionary *)attributesWithMask:(MDKAttributeMask)mask
+{
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];  
+  NSDictionary *domain = [defaults persistentDomainForName: @"MDKQuery"];
+  NSArray *userSet = [domain objectForKey: @"user-attributes"];
+  NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
+  unsigned i;
+
+  for (i = 0; i < [attrNames count]; i++) {
+    NSString *attrname = [attrNames objectAtIndex: i];
+    NSDictionary *attrdict = [attrInfo objectForKey: attrname];
+    BOOL insert = YES;
+
+#define CHECK_MASK(m, condition) \
+  if (insert && (mask & m)) insert = condition
+
+    CHECK_MASK(MDKAttributeSearchable, [[attrdict objectForKey: @"searchable"] boolValue]);
+    CHECK_MASK(MDKAttributeFSType, [[attrdict objectForKey: @"fsattribute"] boolValue]);
+    CHECK_MASK(MDKAttributeUserSet, [userSet containsObject: attrname]);
+    CHECK_MASK(MDKAttributeBaseSet, [basesetAttributes() containsObject: attrname]);
+  
+    if (insert && ([attributes objectForKey: attrname] == nil)) {
+      [attributes setObject: attrdict forKey: attrname];
+    }
+  }
+  
+  return attributes;
+}
+
++ (NSArray *)categoryNames
+{
+  NSDictionary *dict = [self categoryInfo];  
+  
+  if (dict) {
+    return [dict keysSortedByValueUsingSelector: @selector(compareAccordingToIndex:)];
+  }
+  
+  return nil;
+}
+
++ (NSDictionary *)categoryInfo
+{
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];  
+  NSDictionary *domain;
+  
+  [defaults synchronize];
+  domain = [defaults persistentDomainForName: @"MDKQuery"];
+  
+  return [domain objectForKey: @"categories"];
+}
+
++ (void)updateCategoryInfo:(NSDictionary *)info
+{
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];  
+  NSMutableDictionary *domain;
+  
+  [defaults synchronize];
+  domain = [[defaults persistentDomainForName: @"MDKQuery"] mutableCopy];
+  [domain setObject: info forKey: @"categories"];
+  [defaults setPersistentDomain: domain forName: @"MDKQuery"];
+  [defaults synchronize];
+  
+  RELEASE (domain);
 }
 
 + (id)query
@@ -209,7 +356,7 @@ enum {
     searchValue = nil;
    
     caseSensitive = NO;
-    operatorType = GMDEqualToOperatorType;
+    operatorType = MDKEqualToOperatorType;
     operator = nil;
     searchPaths = nil;     
     
@@ -221,7 +368,7 @@ enum {
             
     subqueries = [NSMutableArray new];    
     parentQuery = nil;     
-    compoundOperator = GMDCompoundOperatorNone;
+    compoundOperator = MDKCompoundOperatorNone;
 
     sqlDescription = [NSMutableDictionary new]; 
     [sqlDescription setObject: [NSMutableArray array] forKey: @"pre"];
@@ -235,7 +382,7 @@ enum {
     [sqlUpdatesDescription setObject: [NSMutableArray array] forKey: @"post"];
     [sqlUpdatesDescription setObject: queryNumber forKey: @"qnumber"];
     
-    attributesList = nil;
+    categoryNames = nil;
         
     reportRawResults = NO;
     status = 0;    
@@ -245,27 +392,9 @@ enum {
   return self;
 }
 
-/*
-- (unsigned)hash
-{
-  return [queryNumber hash];
-}
-
-- (BOOL)isEqual:(id)other
-{
-  if (other == self) {
-    return YES;
-  }
-  if ([other isKindOfClass: [MDKQuery class]]) {
-    return [queryNumber isEqual: [other queryNumber]];
-  }
-  return NO;
-}
-*/
-
 - (id)initForAttribute:(NSString *)attr
            searchValue:(NSString *)value
-          operatorType:(GMDOperatorType)optype           
+          operatorType:(MDKOperatorType)optype           
 {
   [self subclassResponsibility: _cmd];
   return nil;
@@ -390,12 +519,12 @@ enum {
   return joinTable;
 }
 
-- (void)setCompoundOperator:(GMDCompoundOperator)op
+- (void)setCompoundOperator:(MDKCompoundOperator)op
 {
   compoundOperator = op;
 }
 
-- (GMDCompoundOperator)compoundOperator
+- (MDKCompoundOperator)compoundOperator
 {
   return compoundOperator;
 }
@@ -463,7 +592,7 @@ enum {
   return sibling;
 }
 
-- (BOOL)hasParentWithCompound:(GMDCompoundOperator)op
+- (BOOL)hasParentWithCompound:(MDKCompoundOperator)op
 {
   Class c = [MDKQuery class];
   MDKQuery *query = self;
@@ -472,11 +601,11 @@ enum {
     query = [query parentQuery];
   
     if (query && [query isMemberOfClass: c]) {
-      GMDCompoundOperator qop = [query compoundOperator];
+      MDKCompoundOperator qop = [query compoundOperator];
       
       if (qop == op) {
         break;
-      } else if (qop != GMDCompoundOperatorNone) {
+      } else if (qop != MDKCompoundOperatorNone) {
         query = nil;
       }
     } else {
@@ -509,7 +638,7 @@ enum {
   return (parentQuery == nil);
 }
 
-- (MDKQuery *)appendSubqueryWithCompoundOperator:(GMDCompoundOperator)op
+- (MDKQuery *)appendSubqueryWithCompoundOperator:(MDKCompoundOperator)op
 {
   if ([self isClosed] == NO) {
     MDKQuery *query = [MDKQuery query];
@@ -529,7 +658,7 @@ enum {
 }
 
 - (void)appendSubquery:(id)query
-      compoundOperator:(GMDCompoundOperator)op
+      compoundOperator:(MDKCompoundOperator)op
 {
   if ([self isClosed] == NO) {
     if ([subqueries containsObject: query] == NO) {
@@ -544,10 +673,10 @@ enum {
   }
 }
 
-- (void)appendSubqueryWithCompoundOperator:(GMDCompoundOperator)op
+- (void)appendSubqueryWithCompoundOperator:(MDKCompoundOperator)op
                                  attribute:(NSString *)attr
                                searchValue:(NSString *)value
-                              operatorType:(GMDOperatorType)optype        
+                              operatorType:(MDKOperatorType)optype        
                              caseSensitive:(BOOL)csens
 {
   if ([self isClosed] == NO) {
@@ -645,25 +774,20 @@ enum {
     }
 
     if ([self isBuilt] && [self isRoot]) {
-      NSCountedSet *set = [[NSCountedSet alloc] initWithCapacity: 1];
-    
-      [self appendToAttributesList: set];
-      ASSIGN (attributesList, [set allObjects]);
-      RELEASE (set);
-      
       ASSIGN (results, ([NSDictionary dictionaryWithObjectsAndKeys: 
                                       [NSMutableArray array], @"nodes",
                                       [NSMutableArray array], @"scores", nil]));
       
       ASSIGN (groupedResults, [NSMutableDictionary dictionary]);
+      ASSIGN (categoryNames, [MDKQuery categoryNames]);
       
-      for (i = 0; i < [attributesList count]; i++) {
+      for (i = 0; i < [categoryNames count]; i++) {
         NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys: 
                                       [NSMutableArray array], @"nodes",
                                       [NSMutableArray array], @"scores", nil];
                                       
         [groupedResults setObject: dict
-                           forKey: [attributesList objectAtIndex: i]];
+                           forKey: [categoryNames objectAtIndex: i]];
       }
     }
 
@@ -746,21 +870,6 @@ enum {
   }
 }
 
-- (void)appendToAttributesList:(NSCountedSet *)attributes
-{
-  if (attributes) {
-    unsigned i;
-  
-    if (attribute) {
-      [attributes addObject: attribute];
-    }
-    
-    for (i = 0; i < [subqueries count]; i++) {
-      [[subqueries objectAtIndex: i] appendToAttributesList: attributes];
-    }
-  }
-}
-
 - (NSString *)description
 {
   NSMutableString *descr = [NSMutableString string];
@@ -772,7 +881,7 @@ enum {
   
   for (i = 0; i < [subqueries count]; i++) {
     MDKQuery *query = [subqueries objectAtIndex: i];
-    GMDCompoundOperator op = [query compoundOperator];
+    MDKCompoundOperator op = [query compoundOperator];
     
     switch (op) {
       case GMDAndCompoundOperator:
@@ -781,7 +890,7 @@ enum {
       case GMDOrCompoundOperator:
         [descr appendString: @" || "];
         break;
-      case GMDCompoundOperatorNone:
+      case MDKCompoundOperatorNone:
       default:
         [descr appendString: @" "];
         break;
@@ -809,7 +918,7 @@ enum {
 
 - (id)initForAttribute:(NSString *)attr
            searchValue:(NSString *)value
-          operatorType:(GMDOperatorType)optype
+          operatorType:(MDKOperatorType)optype
 {
   self = [super init];
   
@@ -859,8 +968,8 @@ enum {
   int attrtype = [[attrinfo objectForKey: @"type"] intValue];
 
   if ((attrtype == STRING) || (attrtype == DATA)) {
-    if ((operatorType != GMDEqualToOperatorType) 
-              && (operatorType != GMDNotEqualToOperatorType)) {
+    if ((operatorType != MDKEqualToOperatorType) 
+              && (operatorType != MDKNotEqualToOperatorType)) {
       return NO;
     }
   
@@ -868,8 +977,8 @@ enum {
     int elemtype = [[attrinfo objectForKey: @"elements_type"] intValue];
   
     if ((elemtype == STRING) || (elemtype == DATA)) {
-      if ((operatorType != GMDEqualToOperatorType) 
-              && (operatorType != GMDNotEqualToOperatorType)) {
+      if ((operatorType != MDKEqualToOperatorType) 
+              && (operatorType != MDKNotEqualToOperatorType)) {
         return NO;
       }
     } else {
@@ -880,14 +989,14 @@ enum {
     int numtype = [[attrinfo objectForKey: @"number_type"] intValue];
 
     if (numtype == NUM_BOOL) {
-      if ((operatorType != GMDEqualToOperatorType) 
-              && (operatorType != GMDNotEqualToOperatorType)) {
+      if ((operatorType != MDKEqualToOperatorType) 
+              && (operatorType != MDKNotEqualToOperatorType)) {
         return NO;
       }
     }
 
   } else if (attrtype == DATE) {
-    if ([NSDate dateWithString: searchValue] == nil) {
+    if ([searchValue floatValue] == 0.0) {
       return NO;
     }
   
@@ -901,31 +1010,33 @@ enum {
 - (void)setOperatorFromType
 {
   switch (operatorType) {
-    case GMDLessThanOperatorType:
+    case MDKLessThanOperatorType:
       ASSIGN (operator, @"<");
       break;
 
-    case GMDLessThanOrEqualToOperatorType:
+    case MDKLessThanOrEqualToOperatorType:
       ASSIGN (operator, @"<=");
       break;
 
-    case GMDGreaterThanOperatorType:
+    case MDKGreaterThanOperatorType:
       ASSIGN (operator, @">");
       break;
 
-    case GMDGreaterThanOrEqualToOperatorType:
+    case MDKGreaterThanOrEqualToOperatorType:
       ASSIGN (operator, @">=");
       break;
 
-    case GMDNotEqualToOperatorType:
+    case MDKNotEqualToOperatorType:
       ASSIGN (operator, @"!=");
       break;
 
-    case GMDInRangeOperatorType:
+    case MDKInRangeOperatorType:
       /* FIXME */
       break;
-
+    
+    case MDKEqualToOperatorType:   
     default:
+      ASSIGN (operator, @"==");
       break;
   }
 }
@@ -945,7 +1056,7 @@ enum {
   NSString *wc = (csens ? @"%" : @"*");
   NSString *wildcard = (csens ? @"*" : @"%");
 
-  if (operatorType == GMDEqualToOperatorType) {
+  if (operatorType == MDKEqualToOperatorType) {
     ASSIGN (operator, (csens ? @"GLOB" : @"LIKE"));
   } else {
     ASSIGN (operator, (csens ? @"NOT GLOB" : @"NOT LIKE"));
@@ -967,7 +1078,7 @@ enum {
   caseSensitive = csens;
 }
 
-- (MDKQuery *)appendSubqueryWithCompoundOperator:(GMDCompoundOperator)op
+- (MDKQuery *)appendSubqueryWithCompoundOperator:(MDKCompoundOperator)op
 {
   [NSException raise: NSInternalInconsistencyException
 		          format: @"Cannot append to a MDKAttributeQuery instance."];     
@@ -975,16 +1086,16 @@ enum {
 }
 
 - (void)appendSubquery:(id)query
-      compoundOperator:(GMDCompoundOperator)op
+      compoundOperator:(MDKCompoundOperator)op
 {
   [NSException raise: NSInternalInconsistencyException
 		          format: @"Cannot append to a MDKAttributeQuery instance."];     
 }
 
-- (void)appendSubqueryWithCompoundOperator:(GMDCompoundOperator)op
+- (void)appendSubqueryWithCompoundOperator:(MDKCompoundOperator)op
                                  attribute:(NSString *)attr
                                searchValue:(NSString *)value
-                              operatorType:(GMDOperatorType)optype        
+                              operatorType:(MDKOperatorType)optype        
                              caseSensitive:(BOOL)csens
 {
   [NSException raise: NSInternalInconsistencyException
@@ -1001,8 +1112,7 @@ enum {
                                    @"(id INTEGER UNIQUE ON CONFLICT IGNORE, "
                                    @"path TEXT UNIQUE ON CONFLICT IGNORE, "
                                    @"words_count INTEGER, "
-                                   @"score REAL, "
-                                   @"attribute TEXT); ", destTable];
+                                   @"score REAL); ", destTable];
   
   [root appendSQLToPreStatements: sqlstr checkExisting: YES];
 
@@ -1010,11 +1120,7 @@ enum {
                @"BEFORE INSERT ON %@ "
                @"BEGIN "
                @"UPDATE %@ "
-               @"SET score = (score + new.score), "
-               @"attribute = "
-               @"(CASE WHEN (containsSubstr(new.attribute, attribute) == 0) "
-               @"THEN (new.attribute || ' ' || attribute) "
-               @"ELSE (new.attribute) END) "
+               @"SET score = (score + new.score) "
                @"WHERE id = new.id; "
                @"END;", destTable, destTable, destTable];
 
@@ -1022,13 +1128,12 @@ enum {
 
   sqlstr = [NSMutableString string];
           
-  [sqlstr appendFormat: @"INSERT INTO %@ (id, path, words_count, score, attribute) "
+  [sqlstr appendFormat: @"INSERT INTO %@ (id, path, words_count, score) "
       @"SELECT "
       @"%@.id, "
       @"%@.path, "
       @"%@.words_count, "
-      @"0.0, "
-      @"'%@' || ',' || attributeScore('%@', attributes.attribute, %i, %i) "
+      @"attributeScore('%@', '%@', attributes.attribute, %i, %i) "
       @"FROM %@, attributes "
       @"WHERE attributes.key = '%@' ", 
       destTable, srcTable, srcTable, srcTable, 
@@ -1062,10 +1167,7 @@ enum {
     }
   
   } else if (attributeType == DATE) {
-    NSDate *date = [NSDate dateWithString: searchValue];
-    NSTimeInterval interval = [date timeIntervalSinceReferenceDate];
-
-    [sqlstr appendFormat: @"(cast (%f as REAL)) ", interval];
+    [sqlstr appendFormat: @"(cast (%@ as REAL)) ", searchValue];
   
   } else {
     return NO;
@@ -1102,20 +1204,19 @@ enum {
         || ((leftSibling == nil) && [self hasParentWithCompound: GMDAndCompoundOperator])) {
     NSMutableString *joinquery = [NSMutableString string];
 
-    [joinquery appendFormat: @"INSERT INTO %@ (id, path, words_count, score, attribute) "
+    [joinquery appendFormat: @"INSERT INTO %@ (id, path, words_count, score) "
                              @"SELECT "
                              @"%@.id, "
                              @"%@.path, "
                              @"%@.words_count, "
-                             @"%@.score, "
-                             @"%@.attribute "
+                             @"%@.score "
                              @"FROM "
                              @"%@, %@ "
                              @"WHERE "
                              @"%@.id = %@.id; ",
                              destTable, srcTable, srcTable, 
-                             srcTable, srcTable, srcTable,
-                             srcTable, destTable, srcTable, destTable];
+                             srcTable, srcTable, srcTable, 
+                             destTable, srcTable, destTable];
     
     [root appendSQLToPreStatements: joinquery checkExisting: NO];
   }
@@ -1141,25 +1242,25 @@ enum {
   [descr appendString: attribute];
 
   switch (operatorType) {
-    case GMDLessThanOperatorType:
+    case MDKLessThanOperatorType:
       [descr appendString: @" < "];
       break;
-    case GMDLessThanOrEqualToOperatorType:
+    case MDKLessThanOrEqualToOperatorType:
       [descr appendString: @" <= "];
       break;
-    case GMDGreaterThanOperatorType:
+    case MDKGreaterThanOperatorType:
       [descr appendString: @" > "];
       break;
-    case GMDGreaterThanOrEqualToOperatorType:
+    case MDKGreaterThanOrEqualToOperatorType:
       [descr appendString: @" >= "];
       break;
-    case GMDEqualToOperatorType:
+    case MDKEqualToOperatorType:
       [descr appendString: @" == "];
       break;
-    case GMDNotEqualToOperatorType:
+    case MDKNotEqualToOperatorType:
       [descr appendString: @" != "];
       break;
-    case GMDInRangeOperatorType:
+    case MDKInRangeOperatorType:
       /* TODO */
       break;
     default:
@@ -1202,13 +1303,13 @@ enum {
 
 - (id)initForAttribute:(NSString *)attr
            searchValue:(NSString *)value
-          operatorType:(GMDOperatorType)optype
+          operatorType:(MDKOperatorType)optype
 {
   self = [super init];
   
   if (self) {
-    if ((optype != GMDEqualToOperatorType) 
-                        && (optype != GMDNotEqualToOperatorType)) {
+    if ((optype != MDKEqualToOperatorType) 
+                        && (optype != MDKNotEqualToOperatorType)) {
       DESTROY (self);
       return self;
     }
@@ -1254,7 +1355,7 @@ enum {
   caseSensitive = csens;
 }
 
-- (MDKQuery *)appendSubqueryWithCompoundOperator:(GMDCompoundOperator)op
+- (MDKQuery *)appendSubqueryWithCompoundOperator:(MDKCompoundOperator)op
 {
   [NSException raise: NSInternalInconsistencyException
 		          format: @"Cannot append to a MDKTextContentQuery instance."];     
@@ -1262,16 +1363,16 @@ enum {
 }
 
 - (void)appendSubquery:(id)query
-      compoundOperator:(GMDCompoundOperator)op
+      compoundOperator:(MDKCompoundOperator)op
 {
   [NSException raise: NSInternalInconsistencyException
 		          format: @"Cannot append to a MDKTextContentQuery instance."];     
 }
 
-- (void)appendSubqueryWithCompoundOperator:(GMDCompoundOperator)op
+- (void)appendSubqueryWithCompoundOperator:(MDKCompoundOperator)op
                                  attribute:(NSString *)attr
                                searchValue:(NSString *)value
-                              operatorType:(GMDOperatorType)optype        
+                              operatorType:(MDKOperatorType)optype        
                              caseSensitive:(BOOL)csens
 {
   [NSException raise: NSInternalInconsistencyException
@@ -1288,8 +1389,7 @@ enum {
                                    @"(id INTEGER UNIQUE ON CONFLICT IGNORE, "
                                    @"path TEXT UNIQUE ON CONFLICT IGNORE, "
                                    @"words_count INTEGER, "
-                                   @"score REAL, "
-                                   @"attribute TEXT); ", destTable];
+                                   @"score REAL); ", destTable];
   
   [root appendSQLToPreStatements: sqlstr checkExisting: YES];
   
@@ -1297,11 +1397,7 @@ enum {
                @"BEFORE INSERT ON %@ "
                @"BEGIN "
                @"UPDATE %@ "
-               @"SET score = (score + new.score), "
-               @"attribute = "
-               @"(CASE WHEN (containsSubstr(new.attribute, attribute) == 0) "
-               @"THEN (new.attribute || ' ' || attribute) "
-               @"ELSE (new.attribute) END) "
+               @"SET score = (score + new.score) "
                @"WHERE id = new.id; "
                @"END;", destTable, destTable, destTable];
 
@@ -1309,17 +1405,16 @@ enum {
 
   sqlstr = [NSMutableString string];
 
-  if (operatorType == GMDEqualToOperatorType) {
-    [sqlstr appendFormat: @"INSERT INTO %@ (id, path, words_count, score, attribute) "
+  if (operatorType == MDKEqualToOperatorType) {
+    [sqlstr appendFormat: @"INSERT INTO %@ (id, path, words_count, score) "
         @"SELECT "
         @"%@.id, "
         @"%@.path, "
         @"%@.words_count, "
-        @"wordScore('%@', words.word, postings.word_count, %@.words_count), "
-        @"'%@' || ',' || 0.0 "    
-        @"FROM words, %@, postings ",
+        @"wordScore('%@', words.word, postings.word_count, %@.words_count) "
+        @"FROM words, %@, postings ",        
         destTable, srcTable, srcTable, srcTable, 
-        searchValue, srcTable, attribute, srcTable];
+        searchValue, srcTable, srcTable];
 
     [sqlstr appendFormat: @"WHERE words.word %@ '", operator];
     [sqlstr appendString: searchValue];
@@ -1328,17 +1423,16 @@ enum {
     [sqlstr appendFormat: @"AND postings.word_id = words.id "
                          @"AND %@.id = postings.path_id ", srcTable];
 
-  } else {  /* GMDNotEqualToOperatorType */
-    [sqlstr appendFormat: @"INSERT INTO %@ (id, path, words_count, score, attribute) "
+  } else {  /* MDKNotEqualToOperatorType */
+    [sqlstr appendFormat: @"INSERT INTO %@ (id, path, words_count, score) "
         @"SELECT "
         @"%@.id AS tid, "
         @"%@.path, "
         @"%@.words_count, "
-        @"(1.0 / %@.words_count), "
-        @"'%@' || ',' || 0.0 "
+        @"(1.0 / %@.words_count) "        
         @"FROM %@ ",
         destTable, srcTable, srcTable, srcTable, 
-        srcTable, attribute, srcTable];
+        srcTable, srcTable];
 
     [sqlstr appendString: @"WHERE "
                          @"(SELECT words.word "
@@ -1382,20 +1476,19 @@ enum {
         || ((leftSibling == nil) && [self hasParentWithCompound: GMDAndCompoundOperator])) {
     NSMutableString *joinquery = [NSMutableString string];
 
-    [joinquery appendFormat: @"INSERT INTO %@ (id, path, words_count, score, attribute) "
+    [joinquery appendFormat: @"INSERT INTO %@ (id, path, words_count, score) "
                              @"SELECT "
                              @"%@.id, "
                              @"%@.path, "
                              @"%@.words_count, "
-                             @"%@.score, "
-                             @"%@.attribute "
+                             @"%@.score "
                              @"FROM "
                              @"%@, %@ "
                              @"WHERE "
                              @"%@.id = %@.id; ",
                              destTable, srcTable, srcTable, 
                              srcTable, srcTable, srcTable, 
-                             srcTable, destTable, srcTable, destTable];
+                             destTable, srcTable, destTable];
 
     [root appendSQLToPreStatements: joinquery checkExisting: NO];
   }
@@ -1417,7 +1510,7 @@ enum {
   
   [descr appendString: attribute];
   
-  if (operatorType == GMDEqualToOperatorType) {
+  if (operatorType == MDKEqualToOperatorType) {
     [descr appendString: @" == "];
   } else {
     [descr appendString: @" != "];
@@ -1458,14 +1551,13 @@ enum {
   if ([self isRoot]) {
     NSString *jtable = [self joinTable];
     NSString *joinquery = [NSString stringWithFormat: @"SELECT %@.path, "
-                                          @"%@.score, "
-                                          @"%@.attribute "
+                                          @"%@.score "
                                           @"FROM %@ "
                                           @"ORDER BY "
                                           @"%@.score DESC, "
                                           @"%@.path ASC;",
                                           jtable, jtable, jtable, 
-                                          jtable, jtable, jtable];
+                                          jtable, jtable];
   
     [sqlDescription setObject: joinquery forKey: @"join"];
     
@@ -1514,7 +1606,7 @@ enum {
   status &= ~WAITSTART;
   status |= GATHERING;
   
-  if (delegate && [delegate respondsToSelector: @selector(queryDidStartGathering:)]) {
+  if (CHECKDELEGATE (queryDidStartGathering:)) {  
     [delegate queryDidStartGathering: self];
   }    
 }
@@ -1527,6 +1619,24 @@ enum {
 - (BOOL)isGathering
 {
   return ((status & GATHERING) == GATHERING);
+}
+
+- (void)gatheringDone
+{
+  if ([self isStopped]) {
+    status &= ~(GATHERING | UPDATING);
+  } else {
+    status &= ~GATHERING;
+  }
+  
+  if (CHECKDELEGATE (queryDidEndGathering:)) {    
+    [delegate queryDidEndGathering: self];
+  }  
+  
+  if ([self updatesEnabled] && ([self isUpdating] == NO) && ([self isStopped] == NO)) {
+    status |= UPDATING;
+    [qmanager startUpdateForQuery: self];
+  }  
 }
 
 - (void)stopQuery
@@ -1559,66 +1669,56 @@ enum {
   return ((status & UPDATING) == UPDATING);
 }
 
-- (void)gatheringDone
+- (void)updatingStarted
 {
-  if ([self isStopped]) {
-    status &= ~(GATHERING | UPDATING);
-  } else {
-    status &= ~GATHERING;
-  }
-  
-  if (delegate && [delegate respondsToSelector: @selector(queryDidEndGathering:)]) {
-    [delegate queryDidEndGathering: self];
+  if (CHECKDELEGATE (queryDidStartUpdating:)) {
+    [delegate queryDidStartUpdating: self];
   }  
-  
-  if ([self updatesEnabled] && ([self isUpdating] == NO) && ([self isStopped] == NO)) {
-    status |= UPDATING;
-    [qmanager startUpdateForQuery: self];
+}
+
+- (void)updatingDone
+{
+  if (CHECKDELEGATE (queryDidEndUpdating:)) {    
+    [delegate queryDidEndUpdating: self];
   }  
 }
 
 - (void)appendResults:(NSArray *)lines
 {
   if (reportRawResults) {
-    if (delegate && [delegate respondsToSelector: @selector(appendRawResults:)]) {
+    if (CHECKDELEGATE (appendRawResults:)) {
       [delegate appendRawResults: lines];
     }
   } else {
     CREATE_AUTORELEASE_POOL(arp);
+    NSMutableArray *catnames = [NSMutableArray array];
+    BOOL sort = [self isUpdating];
     unsigned i;  
   
     for (i = 0; i < [lines count]; i++) {
       NSArray *line = [lines objectAtIndex: i];
       FSNode *node = [FSNode nodeWithPath: [line objectAtIndex: 0]];
       NSNumber *score = [line objectAtIndex: 1];
-      NSString *attribstr = [line objectAtIndex: 2];
-      NSScanner *scanner = [NSScanner scannerWithString: attribstr];
       
-      while ([scanner isAtEnd] == NO) {
-        NSString *attrname;
-        float attrscore;
-        BOOL sort;
-        
-        [scanner scanUpToString: @"," intoString: &attrname];
-        [scanner scanString: @"," intoString: NULL];
-        [scanner scanFloat: &attrscore];
-        
-        sort = (([attrname isEqual: @"GSMDItemTextContent"] == NO) || [self isUpdating]);
+      if (node && [node isValid]) {
+        NSString *category = [qmanager categoryNameForNode: node];
         
         [self insertNode: node 
-                andScore: [NSNumber numberWithFloat: attrscore] 
-            inDictionary: [groupedResults objectForKey: attrname] 
+                andScore: score 
+            inDictionary: [groupedResults objectForKey: category] 
              needSorting: sort];
+      
+        [catnames addObject: category];
       }
-            
+
       [self insertNode: node 
               andScore: score 
           inDictionary: results
-           needSorting: [self isUpdating]];
+           needSorting: sort];
     }
   
-    if (delegate && [delegate respondsToSelector: @selector(queryDidUpdateResults:)]) {
-      [delegate queryDidUpdateResults: self];
+    if (CHECKDELEGATE (queryDidUpdateResults:forCategories:)) {      
+      [delegate queryDidUpdateResults: self forCategories: catnames];
     }
     
     RELEASE (arp);
@@ -1685,8 +1785,11 @@ enum {
 
 - (void)removePaths:(NSArray *)paths
 {
+  CREATE_AUTORELEASE_POOL(arp);
   NSMutableArray *resnodes = [results objectForKey: @"nodes"];
   NSMutableArray *resscores = [results objectForKey: @"scores"];
+  NSMutableArray *catnames = [NSMutableArray array];
+  BOOL removed = NO;
   unsigned i;
   
   for (i = 0; i < [paths count]; i++) {
@@ -1694,59 +1797,106 @@ enum {
     unsigned index = [resnodes indexOfObject: node];
 
     if (index != NSNotFound) {
-      unsigned j;
-
+      NSString *catname;
+      NSDictionary *catdict;
+      NSMutableArray *catnodes;
+      NSMutableArray *catscores;
+      
       [resnodes removeObjectAtIndex: index];
       [resscores removeObjectAtIndex: index];      
       
-      for (j = 0; j < [attributesList count]; j++) {
-        NSString *attrname = [attributesList objectAtIndex: j];
-        NSDictionary *attrdict = [groupedResults objectForKey: attrname];
-        NSMutableArray *attrnodes = [attrdict objectForKey: @"nodes"];
-        NSMutableArray *attrscores = [attrdict objectForKey: @"scores"];
-        
-        index = [attrnodes indexOfObject: node];
-        
-        if (index != NSNotFound) {
-          [attrnodes removeObjectAtIndex: index];
-          [attrscores removeObjectAtIndex: index];      
-        }
+      if ([node isValid]) {
+        catname = [qmanager categoryNameForNode: node];
+        catdict = [groupedResults objectForKey: catname];        
+        catnodes = [catdict objectForKey: @"nodes"];
+        catscores = [catdict objectForKey: @"scores"];
+      
+        index = [catnodes indexOfObject: node];
+      
+      } else {
+        unsigned j;
+      
+        for (j = 0; j < [categoryNames count]; j++) {
+          catname = [categoryNames objectAtIndex: j];
+          catdict = [groupedResults objectForKey: catname];
+          catnodes = [catdict objectForKey: @"nodes"];
+          catscores = [catdict objectForKey: @"scores"];
+
+          index = [catnodes indexOfObject: node];
+
+          if (index != NSNotFound) {
+            break;
+          }
+        }              
       }
+      
+      if (index != NSNotFound) {
+        [catnodes removeObjectAtIndex: index];
+        [catscores removeObjectAtIndex: index]; 
+        [catnames addObject: catname];     
+      }
+      
+      removed = YES;      
     }
   }
+  
+  if (removed && CHECKDELEGATE (queryDidUpdateResults:forCategories:)) {        
+    [delegate queryDidUpdateResults: self forCategories: catnames];
+  }
+  
+  RELEASE (arp);
 }
 
 - (void)removeNode:(FSNode *)node
 {
   NSMutableArray *resnodes = [results objectForKey: @"nodes"];
+  NSMutableArray *resscores = [results objectForKey: @"scores"];  
   unsigned index = [resnodes indexOfObject: node];
   
   if (index != NSNotFound) {  
-    NSMutableArray *resscores = [results objectForKey: @"scores"];
-    unsigned i;
-  
+    NSString *catname;
+    NSDictionary *catdict;
+    NSMutableArray *catnodes;
+    NSMutableArray *catscores;
+      
     [resnodes removeObjectAtIndex: index];
     [resscores removeObjectAtIndex: index];      
     
-    for (i = 0; i < [attributesList count]; i++) {
-      NSString *attrname = [attributesList objectAtIndex: i];
-      NSDictionary *attrdict = [groupedResults objectForKey: attrname];
-      NSMutableArray *attrnodes = [attrdict objectForKey: @"nodes"];
-      NSMutableArray *attrscores = [attrdict objectForKey: @"scores"];
+    if ([node isValid]) {
+      catname = [qmanager categoryNameForNode: node];
+      catdict = [groupedResults objectForKey: catname];        
+      catnodes = [catdict objectForKey: @"nodes"];
+      catscores = [catdict objectForKey: @"scores"];
 
-      index = [attrnodes indexOfObject: node];
+      index = [catnodes indexOfObject: node];
+    
+    } else {
+      unsigned i;
+    
+      for (i = 0; i < [categoryNames count]; i++) {
+        catname = [categoryNames objectAtIndex: i];
+        catdict = [groupedResults objectForKey: catname];
+        catnodes = [catdict objectForKey: @"nodes"];
+        catscores = [catdict objectForKey: @"scores"];
 
-      if (index != NSNotFound) {
-        [attrnodes removeObjectAtIndex: index];
-        [attrscores removeObjectAtIndex: index];      
-      }
-    }  
+        index = [catnodes indexOfObject: node];
+
+        if (index != NSNotFound) {
+          break;
+        }
+      }              
+    }
+    
+    if (index != NSNotFound) {
+      [catnodes removeObjectAtIndex: index];
+      [catscores removeObjectAtIndex: index];      
+    
+      if (CHECKDELEGATE (queryDidUpdateResults:forCategories:)) {        
+        [delegate queryDidUpdateResults: self 
+                          forCategories: [NSArray arrayWithObject: catname]];
+      }      
+    }        
   }
-}
-
-- (NSArray *)attributesList
-{
-  return attributesList;
 }
 
 - (NSDictionary *)results
@@ -1769,21 +1919,21 @@ enum {
   return groupedResults;
 }
 
-- (NSArray *)resultNodesForAttribute:(NSString *)attr
+- (NSArray *)resultNodesForCategory:(NSString *)catname
 {
-  NSDictionary *attrdict = [groupedResults objectForKey: attr];
+  NSDictionary *catdict = [groupedResults objectForKey: catname];
 
-  if (attrdict) {
-    return [attrdict objectForKey: @"nodes"];
+  if (catdict) {
+    return [catdict objectForKey: @"nodes"];
   }
   
   return nil;
 }
 
-- (unsigned)resultsCountForAttribute:(NSString *)attr
+- (int)resultsCountForCategory:(NSString *)catname
 {
-  NSDictionary *attrdict = [groupedResults objectForKey: attr];
-  return (attrdict ? [attrdict count] : 0);
+  NSArray *catdnodes = [self resultNodesForCategory: catname];
+  return (catdnodes ? [catdnodes count] : 0);
 }
 
 - (void)setReportRawResults:(BOOL)value
@@ -1818,7 +1968,7 @@ enum {
 
 - (void)parse
 {
-  GMDCompoundOperator op = GMDCompoundOperatorNone;
+  MDKCompoundOperator op = MDKCompoundOperatorNone;
   static unsigned int parsed = 0;
 
 #define PARSEXCEPT(x, e) \
@@ -1834,7 +1984,7 @@ enum {
     op = GMDOrCompoundOperator;
   }
   
-  if (op != GMDCompoundOperatorNone) {
+  if (op != MDKCompoundOperatorNone) {
     PARSEXCEPT ((parsed & COMPOUND), @"double compound operator");
     PARSEXCEPT ((parsed & SUBOPEN), @"compound operator without arguments");
     parsed &= ~(SUBOPEN | SUBCLOSE | COMPARISION);
@@ -1880,7 +2030,7 @@ enum {
   int attrtype;
   NSDictionary *valueInfo;
   NSString *searchValue;
-  GMDOperatorType optype;
+  MDKOperatorType optype;
   BOOL caseSens;
   Class queryClass;
   id query = nil;
@@ -1896,24 +2046,24 @@ enum {
   attrtype = [[attrinfo objectForKey: @"type"] intValue];
 
   if ([self scanString: @"<" intoString: NULL]) {
-    optype = GMDLessThanOperatorType;
+    optype = MDKLessThanOperatorType;
     CHK_ATTR_TYPE (@"<");
   } else if ([self scanString: @"<=" intoString: NULL]) {
-    optype = GMDLessThanOrEqualToOperatorType;
+    optype = MDKLessThanOrEqualToOperatorType;
     CHK_ATTR_TYPE (@"<=");
   } else if ([self scanString: @">" intoString: NULL]) {
-    optype = GMDGreaterThanOperatorType;
+    optype = MDKGreaterThanOperatorType;
     CHK_ATTR_TYPE (@">");
   } else if ([self scanString: @">=" intoString: NULL]) {
-    optype = GMDGreaterThanOrEqualToOperatorType;
+    optype = MDKGreaterThanOrEqualToOperatorType;
     CHK_ATTR_TYPE (@">=");
   } else if ([self scanString: @"==" intoString: NULL]) {
-    optype = GMDEqualToOperatorType;
+    optype = MDKEqualToOperatorType;
   } else if ([self scanString: @"!=" intoString: NULL]) {
-    optype = GMDNotEqualToOperatorType;
+    optype = MDKNotEqualToOperatorType;
   } else if ([self scanString: @"---------------------" intoString: NULL]) {
     /* TODO TODO TODO TODO TODO TODO TODO */
-    optype = GMDInRangeOperatorType;
+    optype = MDKInRangeOperatorType;
     CHK_ATTR_TYPE (@"---------------------");
   } else {
     NSString *str = [[self string] substringFromIndex: [self scanLocation]];
@@ -2021,6 +2171,18 @@ enum {
   [self setScanLocation: loc];
 
   return NO;
+}
+
+@end
+
+
+@implementation NSDictionary (CategorySort)
+
+- (NSComparisonResult)compareAccordingToIndex:(NSDictionary *)dict
+{
+  NSNumber *p1 = [self objectForKey: @"index"];
+  NSNumber *p2 = [dict objectForKey: @"index"];
+  return [p1 compare: p2];
 }
 
 @end

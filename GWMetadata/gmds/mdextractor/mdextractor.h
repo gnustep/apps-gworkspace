@@ -169,6 +169,7 @@
 - (BOOL)extractFromPath:(GMDSIndexablePath *)indpath;
 
 - (int)insertOrUpdatePath:(NSString *)path
+                   ofType:(NSString *)type
            withAttributes:(NSDictionary *)attributes;
 
 - (BOOL)setMetadata:(NSDictionary *)mddict
@@ -176,6 +177,7 @@
              withID:(int)path_id;
 
 - (id)extractorForPath:(NSString *)path
+                ofType:(NSString *)type
         withAttributes:(NSDictionary *)attributes;
 
 - (void)loadExtractors;

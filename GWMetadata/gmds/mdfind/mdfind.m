@@ -173,7 +173,7 @@
   }
 }
 
-- (BOOL)queryDidEndGathering:(MDKQuery *)query
+- (void)queryDidEndGathering:(MDKQuery *)query
 {
   if (onlycount) {
     GSPrintf(stdout, @"%i\n", rescount);

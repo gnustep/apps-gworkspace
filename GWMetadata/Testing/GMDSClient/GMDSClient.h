@@ -50,9 +50,7 @@
   NSArray *queryWords;
   MDKQuery *currentQuery;
   BOOL validResults;
-  
-  NSMutableArray *foundObjects;
-  
+    
   NSFileManager *fm;  
 }
 
@@ -64,9 +62,14 @@
 
 - (void)appendRawResults:(NSArray *)lines;
 
-- (void)queryDidUpdateResults:(MDKQuery *)query;
+- (void)queryDidUpdateResults:(MDKQuery *)query
+                forCategories:(NSArray *)catnames;
 
 - (void)queryDidEndGathering:(MDKQuery *)query;
+
+- (void)queryDidStartUpdating:(MDKQuery *)query;
+
+- (void)queryDidEndUpdating:(MDKQuery *)query;
 
 - (IBAction)stopQuery:(id)sender;
 
@@ -88,8 +91,7 @@
   BOOL animating;
 }
 
-- (id)initWithFrame:(NSRect)frameRect 
-    refreshInterval:(float)refresh;
+- (id)initWithFrame:(NSRect)frameRect;
 
 - (void)start;
 

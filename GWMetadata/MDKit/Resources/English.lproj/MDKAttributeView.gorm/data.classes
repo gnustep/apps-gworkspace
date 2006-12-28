@@ -1,0 +1,28 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    FirstResponder = {
+	Actions = (
+	    "buttonsAction:",
+	    "orderFrontFontPanel:",
+	    "popUpAction:",
+	    "setModule:",
+	    "startFind:"
+	);
+	Super = NSObject;
+    };
+    MDKAttributeView = {
+	Actions = (
+	    "popUpAction:",
+	    "buttonsAction:"
+	);
+	Outlets = (
+	    win,
+	    mainBox,
+	    popUp,
+	    editorBox,
+	    removeButt,
+	    addButt
+	);
+	Super = NSObject;
+    };
+}

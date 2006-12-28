@@ -22,7 +22,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
+#include <AppKit/AppKit.h>
 #include "MDKQueryManager.h"
+#include "FSNode.h"
 
 static MDKQueryManager *queryManager = nil;
 
@@ -172,12 +174,15 @@ static MDKQueryManager *queryManager = nil;
   MDKQuery *query = [self queryWithNumber: qnum];
     
   if (query) {
-    if ([query isUpdating]) {
+    if ([query isUpdating]) {    
       NSLog(@"REMOVING UPDATING QUERY %i", [queries count]);
-    } else {
+    } else {    
       NSLog(@"REMOVING SIMPLE QUERY %i", [queries count]);
     }
-  
+
+    if ([query isUpdating]) {
+      [query updatingDone];
+    }  
     [query gatheringDone];
     [queries removeObject: query];
   }
@@ -190,6 +195,7 @@ static MDKQueryManager *queryManager = nil;
         [query setStarted];
         [gmds performQuery: [query sqlDescription]];
       } else {
+        [query updatingStarted];
         
         NSLog(@"PERFORMING UPDATE (2) %i", [queries count]);
         
@@ -328,10 +334,12 @@ static MDKQueryManager *queryManager = nil;
   }
   
   if (count && (count == [queries count])) {  
+    MDKQuery *query = [queries lastObject];
     
     NSLog(@"PERFORMING UPDATE (1) %i", [queries count]);
-        
-    [gmds performQuery: [[queries lastObject] sqlUpdatesDescription]];
+    
+    [query updatingStarted];
+    [gmds performQuery: [query sqlUpdatesDescription]];
   }
 
   RELEASE (arp);
@@ -340,10 +348,85 @@ static MDKQueryManager *queryManager = nil;
 @end
 
 
+@implementation MDKQueryManager (results_filtering)
 
+static NSArray *imageExtensions(void)
+{
+  static NSMutableArray *extensions = nil;
 
+  if (extensions == nil) {
+    extensions = [NSMutableArray new]; 
+    
+    [extensions addObjectsFromArray: [NSImage imageFileTypes]];
+    [extensions addObject: @"xpm"];
+    [extensions addObject: @"xbm"];
+    
+    [extensions makeImmutableCopyOnFail: NO];
+  }
 
+  return extensions;
+}
 
+static NSArray *movieExtensions(void)
+{
+  static NSArray *extensions = nil;
 
+  if (extensions == nil) {
+    extensions = [[NSArray alloc] initWithObjects: @"avi", @"mpg", @"mpeg",
+                          @"mov", @"divx", @"m1v", @"m2p", @"m2v", @"moov", 
+                          @"mp4", @"mpv", @"ogm", @"qt", @"rm", @"swf", 
+                          @"vob", @"wmv", nil];
+  }
 
+  return extensions;
+}
 
+static NSArray *musicExtensions(void)
+{
+  static NSArray *extensions = nil;
+
+  if (extensions == nil) {
+    extensions = [[NSArray alloc] initWithObjects: @"aac", @"ac3", @"aif",
+                          @"aiff", @"mpa", @"mp1", @"mp2", @"mp3", @"ogg", 
+                          @"omf", @"ram", @"wav", @"wma", nil];
+  }
+
+  return extensions;
+}
+
+- (NSString *)categoryNameForNode:(FSNode *)node
+{
+  NSString *category = nil;
+    
+  if ([node isApplication]) {
+    category = @"applications";
+  } else if ([node isDirectory] && ([node isPackage] == NO)) {
+    category = @"folders";
+  } else {
+    NSString *ext = [[[node path] pathExtension] lowercaseString];
+    
+    if (ext && [ext length]) {
+      if ([ext isEqual: @"pdf"]) {
+        category = @"pdfdocs";
+      } else if ([imageExtensions() containsObject: ext]) {
+        category = @"images";      
+      } else if ([movieExtensions() containsObject: ext]) {
+        category = @"movies";      
+      } else if ([musicExtensions() containsObject: ext]) {
+        category = @"music";      
+      }
+    }
+  }
+  
+  if (category == nil) {
+    if ([node application]) {
+      category = @"documents";  
+    } else {
+      category = @"plainfiles";
+    }
+  }
+  
+  return category;
+}
+
+@end

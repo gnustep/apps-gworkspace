@@ -95,6 +95,8 @@ do { \
   NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: NO];
       
   if (attributes) {
+    NSString *app = nil;
+    NSString *type = nil;
     id extractor = nil;
     BOOL failed = NO;
     BOOL hasextractor = NO;
@@ -103,10 +105,16 @@ do { \
     EXECUTE_QUERY (@"BEGIN", NO); 
     setUpdating(YES);
      
-    path_id = [self insertOrUpdatePath: path withAttributes: attributes];
+    [ws getInfoForFile: path application: &app type: &type];  
+    
+    path_id = [self insertOrUpdatePath: path 
+                                ofType: type
+                        withAttributes: attributes];
     
     if (path_id != -1) {
-      extractor = [self extractorForPath: path withAttributes: attributes];    
+      extractor = [self extractorForPath: path 
+                                  ofType: type
+                          withAttributes: attributes];    
     
       if (extractor) {
         hasextractor = YES;
@@ -162,18 +170,27 @@ do { \
         
           attributes = [fm fileAttributesAtPath: subpath traverseLink: NO];
         
-          if (attributes) {
+          if (attributes) {          
             failed = NO;
             hasextractor = NO;
             
             if (skip == NO) {
+              NSString *app = nil;
+              NSString *type = nil;
+              
               [sqlite executeQuery: @"BEGIN"];
               setUpdating(YES);
               
-              path_id = [self insertOrUpdatePath: subpath withAttributes: attributes];
+              [ws getInfoForFile: subpath application: &app type: &type];
+              
+              path_id = [self insertOrUpdatePath: subpath 
+                                          ofType: type
+                                  withAttributes: attributes];
     
               if (path_id != -1) {
-                extractor = [self extractorForPath: subpath withAttributes: attributes];
+                extractor = [self extractorForPath: subpath 
+                                            ofType: type
+                                    withAttributes: attributes];
     
                 if (extractor) {
                   hasextractor = YES;
@@ -230,13 +247,19 @@ do { \
   NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: NO];
       
   if (attributes) {
+    NSString *app = nil;
+    NSString *type = nil;  
     id extractor;
     int path_id;
     
     EXECUTE_QUERY (@"BEGIN", NO);
     setUpdating(YES);
     
-    path_id = [self insertOrUpdatePath: path withAttributes: attributes];
+    [ws getInfoForFile: path application: &app type: &type];  
+    
+    path_id = [self insertOrUpdatePath: path 
+                                ofType: type
+                        withAttributes: attributes];
     
     if (path_id == -1) {
       setUpdating(NO);
@@ -244,7 +267,9 @@ do { \
       return NO;
     }
 
-    extractor = [self extractorForPath: path withAttributes: attributes];
+    extractor = [self extractorForPath: path 
+                                ofType: type
+                        withAttributes: attributes];
 
     if (extractor) {
       if ([extractor extractMetadataAtPath: path

@@ -35,6 +35,7 @@
 @class NSMatrix;
 @class NSScrollView;
 @class NSTextView;
+@class NSButton;
 @class StartAppWin;
 
 @protocol	MDExtractorProtocol
@@ -44,6 +45,11 @@
 
 @interface MDIndexing : NSPreferencePane 
 {
+  IBOutlet id tabView;
+
+  //
+  // Paths & Status
+  //
   IBOutlet id indexedTitle;
   IBOutlet id indexedScroll;
   NSMatrix *indexedMatrix;  
@@ -75,7 +81,7 @@
   IBOutlet id applyButton;
       
   BOOL loaded;
-  NSPreferencePaneUnselectReply unselectReply;
+  NSPreferencePaneUnselectReply pathsUnselReply;
 
   id mdextractor;
   
@@ -94,6 +100,18 @@
   IBOutlet NSScrollView *errorScroll;
   NSTextView *errorView;
   
+  //
+  // Search Results
+  //
+  IBOutlet id searchResTitle;
+  IBOutlet id searchResSubtitle;
+  IBOutlet id searchResScroll;
+  IBOutlet id searchResEditor;
+  IBOutlet id searchResRevert;
+  IBOutlet id searchResApply;
+  
+  NSPreferencePaneUnselectReply searchResultsReply;
+
   NSFileManager *fm;
   NSNotificationCenter *nc;
   NSNotificationCenter *dnc;
@@ -136,6 +154,15 @@
 - (void)readDefaults;
 
 - (void)applyChanges;
+
+//
+// Search Results
+//
+- (IBAction)searchResButtAction:(id)sender;
+
+- (void)searchResultDidStartEditing;
+
+- (void)searchResultDidEndEditing;
 
 @end
 

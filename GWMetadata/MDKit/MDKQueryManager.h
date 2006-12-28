@@ -28,6 +28,8 @@
 #include <Foundation/Foundation.h>
 #include "MDKQuery.h"
 
+@class FSNode;
+
 @interface MDKQueryManager : NSObject
 {  
   NSMutableArray *queries;
@@ -68,6 +70,13 @@
 - (void)startUpdateForQuery:(MDKQuery *)query;
 
 - (void)metadataDidUpdate:(NSNotification *)notif;
+
+@end
+
+
+@interface MDKQueryManager (results_filtering)
+
+- (NSString *)categoryNameForNode:(FSNode *)node;
 
 @end
 

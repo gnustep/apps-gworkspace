@@ -1,0 +1,47 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    FirstResponder = {
+	Actions = (
+	    "animate:",
+	    "placesPopUpdAction:",
+	    "saveButtAction:",
+	    "attributesButtAction:",
+	    "startSearchButtAction:",
+	    "stopSearchButtAction:"
+	);
+	Super = NSObject;
+    };
+    MDKWindow = {
+	Actions = (
+	    "placesPopUpdAction:",
+	    "startSearchButtAction:",
+	    "stopSearchButtAction:",
+	    "attributesButtAction:",
+	    "saveButtAction:"
+	);
+	Outlets = (
+	    win,
+	    controlsBox,
+	    placesPopUp,
+	    progView,
+	    searchField,
+	    startSearchButt,
+	    stopSearchButt,
+	    attributesButt,
+	    saveButt,
+	    attrBox,
+	    elementsLabel,
+	    resultsScroll,
+	    pathBox
+	);
+	Super = NSObject;
+    };
+    ProgrView = {
+	Actions = (
+	    "animate:"
+	);
+	Outlets = (
+	);
+	Super = NSView;
+    };
+}

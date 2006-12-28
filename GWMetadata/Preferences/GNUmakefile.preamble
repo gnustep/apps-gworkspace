@@ -9,14 +9,13 @@ ADDITIONAL_OBJCFLAGS += -Wall
 ADDITIONAL_CFLAGS += -Wall 
 
 # Additional include directories the compiler should search
-#ADDITIONAL_INCLUDE_DIRS +=
+#ADDITIONAL_INCLUDE_DIRS += 
 
 # Additional LDFLAGS to pass to the linker
 #ADDITIONAL_LDFLAGS +=  
 
 # Additional library directories the linker should search   
 #ADDITIONAL_LIB_DIRS += 
-
 #
 # Flags dealing with installing and uninstalling
 #

@@ -49,7 +49,7 @@ static NSString *nibName = @"GMDSClient";
 - (void)dealloc
 {
   RELEASE (progView);
-  TEST_RELEASE (queryWords);
+  RELEASE (queryWords);
   RELEASE (currentQuery);
   TEST_RELEASE (skipSet);
   TEST_RELEASE (win);
@@ -81,8 +81,7 @@ static NSString *nibName = @"GMDSClient";
   [win setDelegate: self];
   [win setFrameUsingName: @"gmdsclient"];
 
-  progView = [[ProgrView alloc] initWithFrame: NSMakeRect(0, 0, 16, 16)
-                              refreshInterval: 0.1];
+  progView = [[ProgrView alloc] initWithFrame: NSMakeRect(0, 0, 16, 16)];
   [(NSBox *)progBox setContentView: progView]; 
   RELEASE (progView);
   
@@ -105,8 +104,8 @@ static NSString *nibName = @"GMDSClient";
   [resultsView setAllowsMultipleSelection: NO];
   [resultsView setRowHeight: CELLS_HEIGHT];
   [resultsView setIntercellSpacing: NSZeroSize];
-  [resultsView sizeLastColumnToFit];
-  
+  [resultsView setAutoresizesAllColumnsToFit: YES];
+    
   nameColumn = [[NSTableColumn alloc] initWithIdentifier: @"name"];
   [nameColumn setDataCell: AUTORELEASE ([[FSNTextCell alloc] init])];
   [nameColumn setEditable: NO];
@@ -132,7 +131,7 @@ static NSString *nibName = @"GMDSClient";
   kindColumn = [[NSTableColumn alloc] initWithIdentifier: @"kind"];
   [kindColumn setDataCell: AUTORELEASE ([[FSNTextCell alloc] init])];
   [kindColumn setEditable: NO];
-  [kindColumn setResizable: YES];
+  [kindColumn setResizable: NO];
   [[kindColumn headerCell] setStringValue: NSLocalizedString(@"Kind", @"")];
   [[kindColumn headerCell] setAlignment: NSLeftTextAlignment];
   [kindColumn setMinWidth: 60];
@@ -156,23 +155,18 @@ static NSString *nibName = @"GMDSClient";
   set = [NSCharacterSet illegalCharacterSet];
   [skipSet formUnionWithCharacterSet: set];
 
-//  set = [NSCharacterSet punctuationCharacterSet];
-//  [skipSet formUnionWithCharacterSet: set];
-
   set = [NSCharacterSet symbolCharacterSet];
   [skipSet formUnionWithCharacterSet: set];
 
   set = [NSCharacterSet whitespaceAndNewlineCharacterSet];
   [skipSet formUnionWithCharacterSet: set];
 
-//  set = [NSCharacterSet decimalDigitCharacterSet];
-//  [skipSet formUnionWithCharacterSet: set];
-
   set = [NSCharacterSet characterSetWithCharactersInString: 
                                       @"~`@#$%^_-+\\{}:;\"\',/?"];
   [skipSet formUnionWithCharacterSet: set];  
   
   ASSIGN (currentQuery, [MDKQuery query]);
+  ASSIGN (queryWords, [NSArray array]);
   validResults = NO;
 }
 
@@ -182,20 +176,20 @@ static NSString *nibName = @"GMDSClient";
   MDKQuery *query;
 
   query = [MDKQuery query];
-  [query appendSubqueryWithCompoundOperator: GMDCompoundOperatorNone
+  [query appendSubqueryWithCompoundOperator: MDKCompoundOperatorNone
                                          attribute: @"GSMDItemTextContent"
                                        searchValue: @"NSString"
-                                      operatorType: GMDEqualToOperatorType    
+                                      operatorType: MDKEqualToOperatorType    
                                      caseSensitive: YES];
   [query appendSubqueryWithCompoundOperator: GMDAndCompoundOperator
                                     attribute: @"GSMDItemTextContent"
                                   searchValue: @"Enrico"
-                                 operatorType: GMDEqualToOperatorType    
+                                 operatorType: MDKEqualToOperatorType    
                                 caseSensitive: YES];
   [query appendSubqueryWithCompoundOperator: GMDAndCompoundOperator
                                     attribute: @"GSMDItemTextContent"
                                   searchValue: @"FSNode"
-                                 operatorType: GMDEqualToOperatorType    
+                                 operatorType: MDKEqualToOperatorType    
                                 caseSensitive: YES];
   [query setUpdatesEnabled: YES];
   [query setDelegate: self];
@@ -203,15 +197,15 @@ static NSString *nibName = @"GMDSClient";
   [query startGathering];
 
   query = [MDKQuery query];
-  [query appendSubqueryWithCompoundOperator: GMDCompoundOperatorNone
+  [query appendSubqueryWithCompoundOperator: MDKCompoundOperatorNone
                                   attribute: @"GSMDItemFSExtension"
                                 searchValue: @"jpg"
-                               operatorType: GMDEqualToOperatorType   
+                               operatorType: MDKEqualToOperatorType   
                               caseSensitive: YES];
   [query appendSubqueryWithCompoundOperator: GMDAndCompoundOperator
                                   attribute: @"GSMDItemFSName"
                                 searchValue: @"06*"
-                               operatorType: GMDEqualToOperatorType    
+                               operatorType: MDKEqualToOperatorType    
                               caseSensitive: YES];
   [query setUpdatesEnabled: YES];
   [query setDelegate: self];
@@ -219,22 +213,29 @@ static NSString *nibName = @"GMDSClient";
   [query startGathering];
 
   query = [MDKQuery query];
-  [query appendSubqueryWithCompoundOperator: GMDCompoundOperatorNone
+  [query appendSubqueryWithCompoundOperator: MDKCompoundOperatorNone
                                   attribute: @"GSMDItemFSExtension"
                                 searchValue: @"m"
-                               operatorType: GMDEqualToOperatorType   
+                               operatorType: MDKEqualToOperatorType   
                               caseSensitive: YES];
   [query appendSubqueryWithCompoundOperator: GMDAndCompoundOperator
                                   attribute: @"GSMDItemTextContent"
                                 searchValue: @"NSImage"
-                               operatorType: GMDEqualToOperatorType    
+                               operatorType: MDKEqualToOperatorType    
                               caseSensitive: YES];
   [query setUpdatesEnabled: YES];
   [query setDelegate: self];
   [query setReportRawResults: NO];
   [query startGathering];
 */
-
+    
+  {
+    unsigned mask = MDKAttributeSearchable | MDKAttributeFSType;    
+ //   unsigned mask = MDKAttributeAll & ~MDKAttributeFSType;
+    
+    NSLog([[[MDKQuery attributesWithMask: mask] allKeys] description]);
+  }
+  
   [win makeKeyAndOrderFront: nil];
 }
 
@@ -264,17 +265,17 @@ static NSString *nibName = @"GMDSClient";
   [currentQuery setUpdatesEnabled: YES];
   [currentQuery setDelegate: self];
   
-  [currentQuery appendSubqueryWithCompoundOperator: GMDCompoundOperatorNone
+  [currentQuery appendSubqueryWithCompoundOperator: MDKCompoundOperatorNone
                                          attribute: @"GSMDItemTextContent"
                                        searchValue: [queryWords objectAtIndex: 0]
-                                      operatorType: GMDEqualToOperatorType    
+                                      operatorType: MDKEqualToOperatorType    
                                      caseSensitive: YES];
     
   for (i = 1; i < count; i++) {
     [currentQuery appendSubqueryWithCompoundOperator: GMDAndCompoundOperator
                                     attribute: @"GSMDItemTextContent"
                                   searchValue: [queryWords objectAtIndex: i]
-                                 operatorType: GMDEqualToOperatorType    
+                                 operatorType: MDKEqualToOperatorType    
                                 caseSensitive: YES];
   }
   
@@ -301,6 +302,7 @@ static NSString *nibName = @"GMDSClient";
 }
 
 - (void)queryDidUpdateResults:(MDKQuery *)query
+                forCategories:(NSArray *)catnames
 {
   [resultsView noteNumberOfRowsChanged];
   [resultsView setNeedsDisplayInRect: [resultsView visibleRect]];
@@ -314,6 +316,21 @@ static NSString *nibName = @"GMDSClient";
     [progView stop];
     [foundField setStringValue: [NSString stringWithFormat: @"%i", [currentQuery resultsCount]]];  
   } 
+}
+
+- (void)queryDidStartUpdating:(MDKQuery *)query
+{
+  if (query == currentQuery) {
+    [progView start];
+  }
+}
+
+- (void)queryDidEndUpdating:(MDKQuery *)query
+{
+  if (query == currentQuery) {
+    [progView stop];
+    [foundField setStringValue: [NSString stringWithFormat: @"%i", [currentQuery resultsCount]]];  
+  }
 }
 
 - (IBAction)stopQuery:(id)sender
@@ -487,7 +504,6 @@ static NSString *nibName = @"GMDSClient";
 }
 
 - (id)initWithFrame:(NSRect)frameRect 
-    refreshInterval:(float)refresh
 {
   self = [super initWithFrame: frameRect];
 
@@ -501,7 +517,7 @@ static NSString *nibName = @"GMDSClient";
       [images addObject: [NSImage imageNamed: imname]];    
     }
   
-    rfsh = refresh;
+    rfsh = 0.1;
     animating = NO;
   }
 

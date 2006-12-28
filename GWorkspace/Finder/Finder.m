@@ -250,7 +250,8 @@ static Finder *finder = nil;
 - (void)loadModules
 {
   NSString *bundlesDir;
-  BOOL isdir;
+  NSEnumerator *enumerator;
+  NSString *path;
   NSMutableArray *bundlesPaths;
   NSMutableArray *unsortedModules;
   NSDictionary *lastUsedModules;
@@ -261,27 +262,19 @@ static Finder *finder = nil;
   bundlesDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSSystemDomainMask, YES) lastObject];
   bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
   bundlesPaths = [NSMutableArray array];
-  [bundlesPaths addObjectsFromArray: [self bundlesWithExtension: @"finder" 
-                                                         inPath: bundlesDir]];
 
-  bundlesDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
-  bundlesDir = [bundlesDir stringByAppendingPathComponent: @"GWorkspace"];
+  enumerator = [[fm directoryContentsAtPath: bundlesDir] objectEnumerator];
 
-  if (([fm fileExistsAtPath: bundlesDir isDirectory: &isdir] && isdir) == NO) {
-    if ([fm createDirectoryAtPath: bundlesDir attributes: nil] == NO) {
-      NSRunAlertPanel(NSLocalizedString(@"error", @""), 
-             NSLocalizedString(@"Can't create the GWorkspace directory! Quiting now.", @""), 
-                                    NSLocalizedString(@"OK", @""), nil, nil);                                     
-      [NSApp terminate: self];
-    }
+  while ((path = [enumerator nextObject])) {
+    if ([[path pathExtension] isEqual: @"finder"]) {
+			[bundlesPaths addObject: [bundlesDir stringByAppendingPathComponent: path]];
+		}
   }
-
-  [bundlesPaths addObjectsFromArray: [self bundlesWithExtension: @"finder" 
-                                                         inPath: bundlesDir]];
 
   unsortedModules = [NSMutableArray array];
 
   for (i = 0; i < [bundlesPaths count]; i++) {
+    CREATE_AUTORELEASE_POOL(arp);
     NSString *bpath = [bundlesPaths objectAtIndex: i];
     NSBundle *bundle = [NSBundle bundleWithPath: bpath];
      
@@ -289,28 +282,14 @@ static Finder *finder = nil;
 			Class principalClass = [bundle principalClass];
 
 			if ([principalClass conformsToProtocol: @protocol(FinderModulesProtocol)]) {	
-	      CREATE_AUTORELEASE_POOL (pool);
         id module = [[principalClass alloc] initInterface];
-	  		NSString *name = [module moduleName];
-        BOOL exists = NO;	
-        int j;
-        			
-				for (j = 0; j < [unsortedModules count]; j++) {
-					if ([name isEqual: [[unsortedModules objectAtIndex: j] moduleName]]) {
-            NSLog(@"duplicate module \"%@\" at %@", name, bpath);
-						exists = YES;
-						break;
-					}
-				}
-
-				if (exists == NO) {
-          [unsortedModules addObject: module];
-        }
-
+        
+        [unsortedModules addObject: module];
 	  		RELEASE ((id)module);			
-        RELEASE (pool);		
 			}
     }
+    
+    RELEASE (arp);
   }
 
   if ([unsortedModules count] == 0) {  
@@ -355,28 +334,6 @@ static Finder *finder = nil;
   }
 
   modules = [[unsortedModules sortedArrayUsingSelector: @selector(compareModule:)] mutableCopy];
-}
-
-- (NSArray *)bundlesWithExtension:(NSString *)extension 
-													 inPath:(NSString *)path
-{
-  NSMutableArray *bundleList = [NSMutableArray array];
-  NSEnumerator *enumerator;
-  NSString *dir;
-  BOOL isDir;
-  
-  if ((([fm fileExistsAtPath: path isDirectory: &isDir]) && isDir) == NO) {
-		return nil;
-  }
-	  
-  enumerator = [[fm directoryContentsAtPath: path] objectEnumerator];
-  while ((dir = [enumerator nextObject])) {
-    if ([[dir pathExtension] isEqualToString: extension]) {
-			[bundleList addObject: [path stringByAppendingPathComponent: dir]];
-		}
-  }
-  
-  return bundleList;
 }
 
 - (NSArray *)modules
@@ -1077,25 +1034,6 @@ static Finder *finder = nil;
     }
   }
 }
-
-
-/*
-#define FIX_PARTS_HEIGHT (229.0)
-
-// 38 SU
-// 119 PATHS
-// 27 SEARCITEMSLADKADLJ
-// 34 BOX
-// 45 SOTTO
-
-
-#define WINH (262.0)
-#define FMVIEWH (34.0)
-#define BORDER (4.0)
-#define HMARGIN (12.0)
-#define FIX_PARTS_HEIGHT (229.0)
-
-*/
 
 - (void)adjustMatrix
 {

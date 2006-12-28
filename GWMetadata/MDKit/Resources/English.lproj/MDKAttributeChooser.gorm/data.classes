@@ -1,0 +1,29 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    FirstResponder = {
+	Actions = (
+	    "buttonsAction:"
+	);
+	Super = NSObject;
+    };
+    MDKAttributeChooser = {
+	Actions = (
+	    "buttonsAction:"
+	);
+	Outlets = (
+	    win,
+	    menuNamesScroll,
+	    nameLabel,
+	    nameField,
+	    typeLabel,
+	    typeField,
+	    typeDescrLabel,
+	    typeDescrField,
+	    descriptionLabel,
+	    descriptionView,
+	    cancelButt,
+	    okButt
+	);
+	Super = NSObject;
+    };
+}

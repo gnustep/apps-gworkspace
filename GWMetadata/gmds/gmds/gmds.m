@@ -61,16 +61,16 @@ enum {
   NUM_BOOL
 };
 
-typedef enum _GMDOperatorType
+typedef enum _MDKOperatorType
 {
-  GMDLessThanOperatorType = 0,
-  GMDLessThanOrEqualToOperatorType,
-  GMDGreaterThanOperatorType,
-  GMDGreaterThanOrEqualToOperatorType,
-  GMDEqualToOperatorType,
-  GMDNotEqualToOperatorType,
-  GMDInRangeOperatorType
-} GMDOperatorType;
+  MDKLessThanOperatorType,
+  MDKLessThanOrEqualToOperatorType,
+  MDKGreaterThanOperatorType,
+  MDKGreaterThanOrEqualToOperatorType,
+  MDKEqualToOperatorType,
+  MDKNotEqualToOperatorType,
+  MDKInRangeOperatorType
+} MDKOperatorType;
 
 
 static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv)
@@ -161,24 +161,7 @@ static void word_score(sqlite3_context *context, int argc, sqlite3_value **argv)
 
 static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **argv)
 {
-  const unsigned char *search_val = sqlite3_value_text(argv[0]);
-  const unsigned char *found_val = sqlite3_value_text(argv[1]);
-  int attribute_type = sqlite3_value_int(argv[2]);
-  GMDOperatorType operator_type = sqlite3_value_int(argv[3]);
-  float score = 0.0;
-
-  if ((attribute_type == STRING) 
-              || (attribute_type == ARRAY) 
-                              || (attribute_type == DATA)) {
-    if (operator_type == GMDEqualToOperatorType) {                          
-      int searchlen = strlen((const char *)search_val);
-      int foundlen = strlen((const char *)found_val);
-    
-      score = (1.0 * searchlen / foundlen); 
-    }
-  }
-
-  sqlite3_result_double(context, score);
+  sqlite3_result_double(context, 0.0);
 }
 
 
@@ -639,7 +622,7 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
                                 SQLITE_UTF8, 0, append_string, 0, 0);
     sqlite3_create_function(db, "wordScore", 4, 
                                 SQLITE_UTF8, 0, word_score, 0, 0);
-    sqlite3_create_function(db, "attributeScore", 4, 
+    sqlite3_create_function(db, "attributeScore", 5, 
                                 SQLITE_UTF8, 0, attribute_score, 0, 0);
 
     performWriteQuery(db, @"PRAGMA cache_size = 20000");

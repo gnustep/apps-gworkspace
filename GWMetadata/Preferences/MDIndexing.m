@@ -24,6 +24,7 @@
 
 #include <AppKit/AppKit.h>
 #include "MDIndexing.h"
+#include "CategoriesEditor.h"
 #include "StartAppWin.h"
 
 BOOL subPathOfPath(NSString *p1, NSString *p2);
@@ -58,6 +59,8 @@ BOOL isDotFile(NSString *path);
   if (loaded == NO) {
     id cell;
     float fonth;
+    int index;
+    NSString *str;
     int i;
     
     fm = [NSFileManager defaultManager];
@@ -69,6 +72,12 @@ BOOL isDotFile(NSString *path);
     excludedSuffixes = [NSMutableArray new];
 
     [self readDefaults];
+
+    index = [tabView indexOfTabViewItemWithIdentifier: @"paths"];
+    [[tabView tabViewItemAtIndex: index] setLabel: NSLocalizedString(@"Paths", @"")];
+
+    index = [tabView indexOfTabViewItemWithIdentifier: @"results"];
+    [[tabView tabViewItemAtIndex: index] setLabel: NSLocalizedString(@"Search Results", @"")];
 
     [indexedScroll setBorderType: NSBezelBorder];
     [indexedScroll setHasHorizontalScroller: YES];
@@ -175,7 +184,8 @@ BOOL isDotFile(NSString *path);
     
     [suffixRemove setEnabled: ([[suffixMatrix cells] count] > 0)];
 
-    unselectReply = NSUnselectNow;
+    pathsUnselReply = NSUnselectNow;
+    searchResultsReply = NSUnselectNow;
     loaded = YES;
   
     [revertButton setEnabled: NO];
@@ -214,6 +224,19 @@ BOOL isDotFile(NSString *path);
     [errorView setFont: [NSFont userFixedPitchFontOfSize: 0]];
     [errorScroll setDocumentView: errorView];
     RELEASE (errorView);
+        
+    //
+    // Search Results
+    //
+    str = @"Drag categories to change the order in which results appear.";
+    [searchResTitle setStringValue: NSLocalizedString(str, @"")];
+
+    str = @"Only selected categories will appear in search results.";
+    [searchResSubtitle setStringValue: NSLocalizedString(str, @"")];
+    
+    [searchResEditor setMdindexing: self];
+    
+    [searchResApply setTitle: NSLocalizedString(@"Apply", @"")];
     
     indexedStatusPath = nil;
     errorLogPath = nil;
@@ -227,7 +250,12 @@ BOOL isDotFile(NSString *path);
 
 - (NSPreferencePaneUnselectReply)shouldUnselect
 {
-  return unselectReply;
+  if ((pathsUnselReply == NSUnselectNow) 
+                && (searchResultsReply == NSUnselectNow)) {
+    return NSUnselectNow;  
+  }
+    
+  return NSUnselectCancel;
 }
 
 - (void)didSelect
@@ -260,7 +288,7 @@ BOOL isDotFile(NSString *path);
 
 - (IBAction)indexedButtAction:(id)sender
 {
-  NSPreferencePaneUnselectReply oldReply = unselectReply;
+  NSPreferencePaneUnselectReply oldReply = pathsUnselReply;
   NSArray *cells = [indexedMatrix cells];
   int count = [cells count];
   id cell;
@@ -273,14 +301,14 @@ NSLocalizedString(x, @""), \
 NSLocalizedString(@"Ok", @""), \
 nil, \
 nil); \
-unselectReply = oldReply; \
+pathsUnselReply = oldReply; \
 return; \
 } while (0)
 
   if (sender == indexedAdd) {
     NSString *path;
     
-    unselectReply = NSUnselectCancel; 
+    pathsUnselReply = NSUnselectCancel; 
     path = [self chooseNewPath];
     
     if (path) {
@@ -319,7 +347,7 @@ return; \
       [indexedMatrix sendAction];  
           
     } else {
-      unselectReply = oldReply;
+      pathsUnselReply = oldReply;
     }
 
   } else if (sender == indexedRemove) {
@@ -337,15 +365,15 @@ return; \
       
       [indexedMatrix sendAction];
       
-      unselectReply = NSUnselectCancel; 
+      pathsUnselReply = NSUnselectCancel; 
     
     } else {
-      unselectReply = oldReply;
+      pathsUnselReply = oldReply;
     }
   }
   
-  [revertButton setEnabled: (unselectReply != NSUnselectNow)];   
-  [applyButton setEnabled: (unselectReply != NSUnselectNow)];  
+  [revertButton setEnabled: (pathsUnselReply != NSUnselectNow)];   
+  [applyButton setEnabled: (pathsUnselReply != NSUnselectNow)];  
 }
 
 - (void)excludedMatrixAction:(id)sender
@@ -355,7 +383,7 @@ return; \
 
 - (IBAction)excludedButtAction:(id)sender
 {
-  NSPreferencePaneUnselectReply oldReply = unselectReply;
+  NSPreferencePaneUnselectReply oldReply = pathsUnselReply;
   NSArray *cells = [excludedMatrix cells];
   int count = [cells count];
   id cell;
@@ -368,14 +396,14 @@ NSLocalizedString(x, @""), \
 NSLocalizedString(@"Ok", @""), \
 nil, \
 nil); \
-unselectReply = oldReply; \
+pathsUnselReply = oldReply; \
 return; \
 } while (0)
 
   if (sender == excludedAdd) {
     NSString *path;
     
-    unselectReply = NSUnselectCancel; 
+    pathsUnselReply = NSUnselectCancel; 
     path = [self chooseNewPath];
     
     if (path) {
@@ -427,7 +455,7 @@ return; \
       [excludedMatrix sendAction];  
           
     } else {
-      unselectReply = oldReply;
+      pathsUnselReply = oldReply;
     }
 
   } else if (sender == excludedRemove) {
@@ -445,15 +473,15 @@ return; \
       
       [excludedMatrix sendAction];
       
-      unselectReply = NSUnselectCancel; 
+      pathsUnselReply = NSUnselectCancel; 
     
     } else {
-      unselectReply = oldReply;
+      pathsUnselReply = oldReply;
     }
   }
   
-  [revertButton setEnabled: (unselectReply != NSUnselectNow)];   
-  [applyButton setEnabled: (unselectReply != NSUnselectNow)];    
+  [revertButton setEnabled: (pathsUnselReply != NSUnselectNow)];   
+  [applyButton setEnabled: (pathsUnselReply != NSUnselectNow)];    
 }
 
 - (void)suffixMatrixAction:(id)sender
@@ -463,7 +491,7 @@ return; \
 
 - (IBAction)suffixButtAction:(id)sender
 {
-  NSPreferencePaneUnselectReply oldReply = unselectReply;
+  NSPreferencePaneUnselectReply oldReply = pathsUnselReply;
   NSArray *cells = [suffixMatrix cells];
   int count = [cells count];
   id cell;
@@ -475,7 +503,7 @@ NSLocalizedString(x, @""), \
 NSLocalizedString(@"Ok", @""), \
 nil, \
 nil); \
-unselectReply = oldReply; \
+pathsUnselReply = oldReply; \
 [suffixField setStringValue: @""]; \
 return; \
 } while (0)
@@ -483,7 +511,7 @@ return; \
   if (sender == suffixAdd) {
     NSString *suff = [suffixField stringValue];
 
-    unselectReply = NSUnselectCancel; 
+    pathsUnselReply = NSUnselectCancel; 
 
     if ([suff length]) {
       NSCharacterSet *set = [NSCharacterSet characterSetWithCharactersInString: @". "];
@@ -509,7 +537,7 @@ return; \
       [suffixMatrix sendAction];  
                 
     } else {        
-      unselectReply = oldReply;
+      pathsUnselReply = oldReply;
     }
 
   } else if (sender == suffixRemove) {
@@ -527,17 +555,17 @@ return; \
       
       [suffixMatrix sendAction];
       
-      unselectReply = NSUnselectCancel; 
+      pathsUnselReply = NSUnselectCancel; 
     
     } else {
-      unselectReply = oldReply;
+      pathsUnselReply = oldReply;
     }
   }
 
   [suffixField setStringValue: @""];
   
-  [revertButton setEnabled: (unselectReply != NSUnselectNow)];   
-  [applyButton setEnabled: (unselectReply != NSUnselectNow)];  
+  [revertButton setEnabled: (pathsUnselReply != NSUnselectNow)];   
+  [applyButton setEnabled: (pathsUnselReply != NSUnselectNow)];  
 }
 
 - (IBAction)enableSwitchAction:(id)sender
@@ -622,7 +650,7 @@ return; \
 
   [suffixRemove setEnabled: ([[suffixMatrix cells] count] > 0)];
   
-  unselectReply = NSUnselectNow;
+  pathsUnselReply = NSUnselectNow;
   [revertButton setEnabled: NO];   
   [applyButton setEnabled: NO];
 }
@@ -630,7 +658,7 @@ return; \
 - (IBAction)applyButtAction:(id)sender
 {
   [self applyChanges];  
-  unselectReply = NSUnselectNow; 
+  pathsUnselReply = NSUnselectNow; 
   [revertButton setEnabled: NO];   
   [applyButton setEnabled: NO];
 }
@@ -1063,6 +1091,32 @@ return; \
                    userInfo: info];
 
   RELEASE (arp);
+}
+
+//
+// Search Results
+//
+- (IBAction)searchResButtAction:(id)sender
+{
+  if (sender == searchResApply) {
+    [searchResEditor applyChanges];
+  } else {
+    [searchResEditor revertChanges];
+  } 
+}
+
+- (void)searchResultDidStartEditing
+{
+  [searchResRevert setEnabled: YES];
+  [searchResApply setEnabled: YES];
+  searchResultsReply = NSUnselectCancel;
+}
+
+- (void)searchResultDidEndEditing
+{
+  [searchResRevert setEnabled: NO];
+  [searchResApply setEnabled: NO];
+  searchResultsReply = NSUnselectNow;
 }
 
 @end

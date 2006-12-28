@@ -1,13 +1,21 @@
 {
     "## Comment" = "Do NOT change this file, Gorm maintains it";
+    CategoriesEditor = {
+	Actions = (
+	);
+	Outlets = (
+	);
+	Super = NSView;
+    };
     FirstResponder = {
 	Actions = (
 	    "applyButtAction:",
 	    "closeMainWindow:",
 	    "enableSwitchAction:",
+	    "errorButtAction:",
 	    "excludedButtAction:",
 	    "indexedButtAction:",
-	    "errorButtAction:",
+	    "searchResButtAction:",
 	    "nextButtAction:",
 	    "prevButtAction:",
 	    "revertButtAction:",
@@ -27,7 +35,8 @@
 	    "revertButtAction:",
 	    "statusButtAction:",
 	    "suffixButtAction:",
-	    "errorButtAction:"
+	    "errorButtAction:",
+	    "searchResButtAction:"
 	);
 	Outlets = (
 	    excludedTitle,
@@ -52,7 +61,14 @@
 	    suffixField,
 	    errorButton,
 	    errorWindow,
-	    errorScroll
+	    errorScroll,
+	    tabView,
+	    searchResApply,
+	    searchResScroll,
+	    searchResSubtitle,
+	    searchResTitle,
+	    searchResEditor,
+	    searchResRevert
 	);
 	Super = NSObject;
     };

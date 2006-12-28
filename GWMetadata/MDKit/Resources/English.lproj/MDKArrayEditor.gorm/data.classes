@@ -1,0 +1,34 @@
+{
+    "## Comment" = "Do NOT change this file, Gorm maintains it";
+    FirstResponder = {
+	Actions = (
+	    "buttonsAction:",
+	    "caseSensButtAction:",
+	    "operatorPopupAction:",
+	    "orderFrontFontPanel:",
+	    "popUpAction:",
+	    "startFind:",
+	    "valuesPopupAction:"
+	);
+	Super = NSObject;
+    };
+    MDKArrayEditor = {
+	Actions = (
+	    "valuesPopupAction:",
+	    "operatorPopupAction:",
+	    "caseSensButtAction:"
+	);
+	Outlets = (
+	    editorBox,
+	    win,
+	    operatorPopup,
+	    valueField,
+	    valuesPopup,
+	    firstValueBox,
+	    secondValueBox,
+	    valueBox,
+	    caseSensButt
+	);
+	Super = NSObject;
+    };
+}

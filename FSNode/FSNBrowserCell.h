@@ -58,10 +58,7 @@ typedef NSString *(*cutIMP)(id, SEL, id, float);
   BOOL isOpened;
 
   BOOL nameEdited;
-  
-	SEL cutTitleSel;
-	cutIMP cutTitle;
-  
+    
   FSNodeRep *fsnodeRep;  
 }
 

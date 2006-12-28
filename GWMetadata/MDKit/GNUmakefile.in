@@ -15,28 +15,48 @@ include Version
 MDKit_PRINCIPAL_CLASS = MDKQuery
 MDKit_HAS_RESOURCE_BUNDLE = yes
 
-MDKit_GUI_LIBS += -lFSNode
+#MDKit_GUI_LIBS += -lFSNode
 LIBRARIES_DEPEND_UPON += -lFSNode
+LIBRARIES_DEPEND_UPON += -lDBKit
 LIBRARIES_DEPEND_UPON += -lgnustep-gui $(SYSTEM_LIBS)
 
 MDKit_RESOURCE_FILES = \
-    Resources/attributes.plist 
+    Resources/attributes.plist \
+    Resources/Images/* \
+    Resources/English.lproj
+
+MDKit_LANGUAGES = Resources/English 
 		    
 MDKit_OBJC_FILES = \
 SQLite.m \
 MDKQuery.m \
-MDKQueryManager.m
+MDKQueryManager.m \
+MDKWindow.m \
+MDKResultsCategory.m \
+MDKTableView.m \
+MDKResultCell.m \
+MDKAttributeChooser.m \
+MDKAttribute.m \
+MDKAttributeView.m \
+MDKAttributeEditor.m
 
 MDKit_HEADER_FILES = \
 MDKit.h \
 SQLite.h \
 MDKQuery.h \
-MDKQueryManager.h 
+MDKQueryManager.h \
+MDKWindow.h \
+MDKAttributeChooser.h \
+MDKAttribute.h \
+MDKAttributeView.h \
+MDKAttributeEditor.h
     				 
 -include GNUmakefile.preamble
 
 -include GNUmakefile.local
 
 include $(GNUSTEP_MAKEFILES)/framework.make
+
+include $(GNUSTEP_MAKEFILES)/aggregate.make
 
 -include GNUmakefile.postamble

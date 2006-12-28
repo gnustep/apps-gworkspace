@@ -1,416 +1,1244 @@
 {
-  GSMDItemAttributeChangeDate = {
-    type = <*I3>;
-    description = "Date and last change metadata change. (NSDate)";
-  };
-  GSMDItemAudiences = {
-    type = <*I1>;
-    elements_type = <*I0>;
-    description = "Audience for which the document is intended. (NSArray of NSString elements)";
-  };
-  GSMDItemAuthors = {
-    type = <*I1>;
-    elements_type = <*I0>;
-    description = "Authors of the document or application. (NSArray of NSString elements)";
-  };
-  GSMDItemCity = {
-    type = <*I0>;
-    description = "City of origin. (NSString)";
-  };
-  GSMDItemComment = {
-    type = <*I0>;
-    description = "Comment related to the document. (NSString)";
-  };
-  GSMDItemContactKeywords = {
-    type = <*I1>;
-    elements_type = <*I0>;
-    description = "Contacts associated with the document. (NSArray of NSString elements)";
-  };
-  GSMDItemContentCreationDate = {
-    type = <*I3>;
-    description = "Content creation Date (NSDate)";
-  };
-  GSMDItemContentModificationDate = {
-    type = <*I3>;
-    description = "Content modification Date (NSDate)";
-  };
-  GSMDItemContributors = {
-    type = <*I1>;
-    elements_type = <*I0>;
-    description = "Contributors to the contents of the document. (NSArray of NSString elements)";
-  };
-  GSMDItemCopyright = {
-    type = <*I0>;
-    description = "Owner of the copyright of the document.";
-  };
-  GSMDItemCountry = {
-    type = <*I0>;
-    description = "Full name of the country where the item has been created. (NSString)";
-  };
-  GSMDItemCreator = {
-    type = <*I0>;
-    description = "Application used to create the document. (NSString)";
-  };
-  GSMDItemDescription = {
-    type = <*I0>;
-    description = "Description of the document. (NSString)";
-  };
-  GSMDItemDurationSeconds = {
-    type = <*I2>;
-    number_type = <*I1>;  
-    description = "Float value representing the duration in seconds of the content. (NSNumber)";
-  };
-  GSMDItemEmailAddresses = {
-    type = <*I1>;
-    elements_type = <*I0>;
-    description = "Email addresses related to the document. (NSArray of NSString elements)";
-  };
-  GSMDItemEncodingApplications = {
-    type = <*I1>;
-    elements_type = <*I0>;
-    description = "Name of the application used to convert the document to its actual form. (NSString)";
-  };
-  GSMDItemFinderComment = {
-    type = <*I0>;
-    description = "File Annotations of the document. (NSString)";
-  };
-  GSMDItemFonts = {
-    type = <*I1>;
-    elements_type = <*I0>;
-    description = "Fonts used in the document. (NSArray of NSString elements)";
-  };
-  GSMDItemKeywords = {
-    type = <*I1>;
-    elements_type = <*I0>;
-    description = "Keywords associated with the document. (NSArray of NSString elements)";
-  };
-  GSMDItemLanguages = {
-    type = <*I1>;
-    elements_type = <*I0>;
-    description = "Languages used by the item. (NSArray of NSString elements)";
-  };
-  GSMDItemNumberOfPages = {
-    type = <*I2>;
-    number_type = <*I0>;
-    description = "Number of pages in the document. (NSNumber)";
-  };
-  GSMDItemPageHeight = {
-    type = <*I2>;
-    number_type = <*I0>;
-    description = "Height in points of the document page. (NSNumber)";
-  };
-  GSMDItemPageWidth = {
-    type = <*I2>;
-    number_type = <*I0>;
-    description = "Width in points of the document page. (NSNumber)";
-  };
-  GSMDItemPhoneNumbers = {
-    type = <*I1>;
-    elements_type = <*I0>;
-    description = "Phone numbers related to this document. (NSArray of NSString elements)";
-  };
-  GSMDItemPublishers = {
-    type = <*I1>;
-    elements_type = <*I0>;
-    description = "Publishers of the document. (NSArray of NSString elements)";
-  };
-  GSMDItemTextContent = {
-    type = <*I0>;
-    description = "Text content of the document. (This value can't be directly read but the attribute name can be used in queries)";
-  };
-  GSMDItemTitle = {
-    type = <*I0>;
-    description = "Title of the document. (NSString)";
-  };
-  GSMDItemVersion = {
-    type = <*I0>;
-    description = "Version number of the document. (NSString)";
-  };
-  GSMDItemAcquisitionMake = {
-    type = <*I0>;
-    description = "Manufacturer of the device used to acquire the document. (NSString)";
-  };
-  GSMDItemAcquisitionModel = {
-    type = <*I0>;
-    description = "Model of the device used to acquire the document. (NSString)";
-  };
-  GSMDItemAlbum = {
-    type = <*I0>;
-    description = "Name of the collection containing this document. (NSString)";
-  };
-  GSMDItemAperture = {
-    type = <*I2>;
-    number_type = <*I0>;
-    description = "APEX value representing the aperture used to aquire the document contents. (NSNumber)";
-  };
-  GSMDItemBitsPerSample = {
-    type = <*I2>;
-    number_type = <*I0>;
-    description = "Bits per sample. (NSNumber)";
-  };
-  GSMDItemColorSpace = {
-    type = <*I0>;
-    description = "Color space model. (NSString)";
-  };
-  GSMDItemEXIFVersion = {
-    type = <*I0>;
-    description = "EXIF version. (NSString)";
-  };
-  GSMDItemExposureMode = {
-    type = <*I2>;
-    number_type = <*I0>;
-    description = "Exposure mode used to acquire the document contents. (NSNumber)";
-  };
-  GSMDItemExposureProgram = {
-    type = <*I0>;
-    description = "Name of the exposure program used to acquire the contents. (NSString)";
-  };
-  GSMDItemExposureTimeSeconds = {
-    type = <*I2>;
-    number_type = <*I1>;
-    description = "Float value representing the time in seconds used to capture the document contents.(NSNumber)";
-  };
-  GSMDItemExposureTimeString = {
-    type = <*I0>;
-    description = "Description of the date-time when the camera has created the document contents. (NSString)";
-  };
-  GSMDItemFNumber = {
-    type = <*I2>;
-    number_type = <*I1>;
-    description = "F-number of the lens used acquiring the document contents. (NSNumber)";
-  };
-  GSMDItemFlashOnOff = {
-    type = <*I2>;
-    number_type = <*I2>;
-    description = "Bool value representing if a flash was used aquiring the contents. (NSNumber)";
-  };
-  GSMDItemFocalLength = {
-    type = <*I2>;
-    number_type = <*I1>;
-    description = "Focal length in millimeters of the lens used acquiring the document contents. (NSNumber)";
-  };
-  GSMDItemHasAlphaChannel = {
-    type = <*I2>;
-    number_type = <*I2>;
-    description = "Bool value representing if the image has an alpha channel. (NSNumber)";
-  };
-  GSMDItemISOSpeed = {
-    type = <*I2>;
-    number_type = <*I0>;
-    description = "ISO speed used to acquire the document contents. (NSNumber)";
-  };
-  GSMDItemMaxAperture = {
-    type = <*I2>;
-    number_type = <*I1>;
-    description = "Smallest F number of the lens. (NSNumber)";
-  };
-  GSMDItemMeteringMode = {
-    type = <*I0>;
-    description = "Metering mode used to acquire the document contents. (NSString)";
-  };
-  GSMDItemOrientation = {
-    type = <*I2>;
-    number_type = <*I0>;
-    description = "Orientation of the document. (NSNumber)";
-  };
-  GSMDItemPixelHeight = {
-    type = <*I2>;
-    number_type = <*I0>;
-    description = "Height, in pixels, of the contents. (NSNumber)";
-  };
-  GSMDItemPixelWidth = {
-    type = <*I2>;
-    number_type = <*I0>;
-    description = "Width, in pixels, of the contents. (NSNumber)";
-  };
-  GSMDItemRedEyeOnOff = {
-    type = <*I2>;
-    number_type = <*I2>;
-    description = "Whether red-eye reduction was used to acquire the document contents. (NSNumber)";
-  };
-  GSMDItemResolutionHeightDPI = {
-    type = <*I2>;
-    number_type = <*I0>;
-    description = "Resolution height of the document. (NSNumber)";
-  };
-  GSMDItemResolutionWidthDPI = {
-    type = <*I2>;
-    number_type = <*I0>;
-    description = "Resolution width of the document. (NSNumber)";
-  };
-  GSMDItemWhiteBalance = {
-    type = <*I2>;
-    number_type = <*I0>;
-    description = "White balance settings used when the contents was acquired. (NSNumber)";
-  };
-  GSMDItemAudioBitRate = {
-    type = <*I2>;
-    number_type = <*I0>;
-    description = "Bit rate of the audio. (NSNumber)";
-  };
-  GSMDItemCodecs = {
-    type = <*I1>;
-    elements_type = <*I0>;
-    description = "Codec used to encode or decode the document. (NSArray of NSString elements)";
-  };
-  GSMDItemDelivery = {
-    type = <*I0>;
-    description = "Streaming media deliver type (NSString)";
-  };
-  GSMDItemMediaTypes = {
-    type = <*I1>;
-    elements_type = <*I0>;
-    description = "Media types of the document. (NSArray of NSString elements)";
-  };  
-  GSMDItemStreamable = {
-    type = <*I2>;
-    number_type = <*I2>;
-    description = "Whether the document contents are streamable. (NSNumber)";
-  };
-  GSMDItemTotalBitRate = {
-    type = <*I2>;
-    number_type = <*I0>;
-    description = "Total bit rate (audio and video) of the document. (NSNumber)";
-  };
-  GSMDItemVideoBitRate = {
-    type = <*I2>;
-    number_type = <*I0>;
-    description = "Videobit rate of the document. (NSNumber)";
-  };
-  GSMDItemAudioChannelCount = {
-    type = <*I2>;
-    number_type = <*I0>;
-    description = "Number of audio channels in the document. (NSNumber)";
-  };
-  GSMDItemAudioEncodingApplication = {
-    type = <*I0>;
-    description = "Application used to encode the audio document. (NSString)";
-  };
-  GSMDItemAudioSampleRate = {
-    type = <*I2>;
-    number_type = <*I1>;
-    description = "Float value in hz representing the sample rate of the document. (NSNumber)";
-  };
-  GSMDItemAudioTrackNumber = {
-    type = <*I2>;
-    number_type = <*I0>;
-    description = "Number of the document if it is part of an album. (NSNumber)";
-  };
-  GSMDItemComposer = {
-    type = <*I0>;
-    description = "Composer of the music in the document. (NSString)";
-  };
-  GSMDItemIsGeneralMIDISequence = {
-    type = <*I2>;
-    number_type = <*I2>;
-    description = "Whether the document is set up for use with a General Midi device. (NSNumber)";
-  };
-  GSMDItemKeySignature = {
-    type = <*I0>;
-    description = "Musical key of the music in the document. (NSString)";
-  };
-  GSMDItemLyricist = {
-    type = <*I0>;
-    description = "Lyricist of the music in the document. (NSString)";
-  };
-  GSMDItemMusicalGenre = {
-    type = <*I0>;
-    description = "Musical genre of the music in the document. (NSString)";
-  };
-  GSMDItemRecordingDate = {
-    type = <*I3>;
-    description = "Recording date of the music in the document. (NSDate)";
-  };
-  GSMDItemRecordingYear = {
-    type = <*I2>;
-    number_type = <*I0>;
-    description = "Recording year of the music in the document.(NSNumber)";
-  };
-  GSMDItemTempo = {
-    type = <*I2>;
-    number_type = <*I0>;
-    description = "Tempo of the music in the document. (NSNumber)";
-  };
-  GSMDItemTimeSignature = {
-    type = <*I0>;
-    description = "Time signature of the music in the document. (NSString)";
-  };
-  GSMDItemFSContentChangeDate = {
-    type = <*I3>;
-    description = "Date of the last change of the document content. (NSDate)";
-  };
-  GSMDItemFSCreationDate = {
-    type = <*I3>;
-    description = "Creation date of the document. (NSDate)";
-  };
-  GSMDItemFSInvisible = {
-    type = <*I2>;
-    number_type = <*I2>;
-    description = "Whether the document is invisible. (NSNumber)";
-  };
-  GSMDItemFSNodeCount = {
-    type = <*I2>;
-    number_type = <*I0>;
-    description = "Number of files in a directory (NSNumber)";
-  };
-  GSMDItemFSOwnerGroupID = {
-    type = <*I2>;
-    number_type = <*I0>;
-    description = "Owner group ID of the file. (NSNumber)";
-  };
-  GSMDItemFSOwnerUserID = {
-    type = <*I2>;
-    number_type = <*I0>;
-    description = "Owner user ID of the file. (NSNumber)";
-  };
-  GSMDItemFSSize = {
-    type = <*I2>;
-    number_type = <*I0>;
-    description = "Size in bytes of the file. (NSNumber)";
-  };
-  GSMDItemPath = {
-    type = <*I0>;
-    description = "Full path of the document. (NSString)";
-  };
-  GSMDItemFSName = {
-    type = <*I0>;
-    description = "Name of the document. (NSString)";
-  };
-  GSMDItemFSExtension = {
-    type = <*I0>;
-    description = "Path extension of the document. (NSString)";
-  };
-  GSMDItemFSType = {
-    type = <*I0>;
-    description = "File type of the document. (NSString)";
-  };
-  GSMDItemUnixExtensions = {
-    type = <*I1>;
-    elements_type = <*I0>;
-    description = "File extensions an application can open. (NSArray of NSString elements)";
-  };
-  GSMDItemCopyrightDescription = {
-    type = <*I0>;
-    description = "Description of the copyright (License type, etc.). (NSString)";
-  };
-  GSMDItemRole = {
-    type = <*I0>;
-    description = "Role of the application (Editor, Viewer, etc.). (NSString)";
-  };
-  GSMDItemBuildVersion = {
-    type = <*I0>;
-    description = "Build version of the application. (NSString)";
-  };
-  GSMDItemApplicationName = {
-    type = <*I0>;
-    description = "Name of the application. (NSString)";
-  };  
-  GSMDItemApplicationDescription = {
-    type = <*I0>;
-    description = "Description of the application. (NSString)";
-  };
-  GSMDItemApplicationRelease = {
-    type = <*I0>;
-    description = "Full name of the application release. (NSString)";
+  categories = {
+    applications = {
+      category_name = "applications";
+      menu_name = "Applications";
+      icon = "applications";
+      active = <*I1>;
+      index = <*I0>;
+    };
+    documents = {
+      category_name = "documents";
+      menu_name = "Documents";
+      icon = "documents";
+      active = <*I1>;
+      index = <*I1>;
+    };
+    folders = {
+      category_name = "folders";
+      menu_name = "Folders";
+      icon = "folders";
+      active = <*I1>;
+      index = <*I2>;
+    };
+    images = {
+      category_name = "images";
+      menu_name = "Images";
+      icon = "images";
+      active = <*I1>;
+      index = <*I3>;
+    };
+    pdfdocs = {
+      category_name = "pdfdocs";
+      menu_name = "PDF Documents";
+      icon = "pdfdocs";
+      active = <*I1>;
+      index = <*I4>;
+    };
+    movies = {
+      category_name = "movies";
+      menu_name = "Movies";
+      icon = "movies";
+      active = <*I1>;
+      index = <*I5>;
+    };
+    music = {
+      category_name = "music";
+      menu_name = "Music";
+      icon = "music";
+      active = <*I1>;
+      index = <*I6>;
+    };
+    plainfiles = {
+      category_name = "plainfiles";
+      menu_name = "Plain Files";
+      icon = "plainfiles";
+      active = <*I1>;
+      index = <*I7>;
+    };    
+  };
+  attributes = {
+    GSMDItemAudiences = {
+      type = <*I1>;
+      elements_type = <*I0>;
+      type_description = "NSArray of NSString objects";
+      description = "Audience for which the document is intended";
+      attribute_name = "GSMDItemAudiences";
+      menu_name = "Audience";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I4>, <*I5> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemAuthors = {
+      type = <*I1>;
+      elements_type = <*I0>;
+      type_description = "NSArray of NSString objects";
+      description = "Authors of the document or application";
+      attribute_name = "GSMDItemAuthors";
+      menu_name = "Authors";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I4>, <*I5> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemCity = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "City of origin";
+      attribute_name = "GSMDItemCity";
+      menu_name = "City";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemComment = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Comment related to the document";
+      attribute_name = "GSMDItemComment";
+      menu_name = "Comment";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemContactKeywords = {
+      type = <*I1>;
+      elements_type = <*I0>;
+      type_description = "NSArray of NSString objects";
+      description = "Contacts associated with the document";
+      attribute_name = "GSMDItemContactKeywords";
+      menu_name = "Contacts";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I4>, <*I5> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemContributors = {
+      type = <*I1>;
+      elements_type = <*I0>;
+      type_description = "NSArray of NSString objects";
+      description = "Contributors to the contents of the document";
+      attribute_name = "GSMDItemContributors";
+      menu_name = "Contributors";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I4>, <*I5> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemCopyright = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Owner of the copyright of the document";
+      attribute_name = "GSMDItemCopyright";
+      menu_name = "Copyright owner";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemCountry = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Full name of the country where the item has been created";
+      attribute_name = "GSMDItemCountry";
+      menu_name = "Country";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemCreator = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Application used to create the document";
+      attribute_name = "GSMDItemCreator";
+      menu_name = "Creator";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemDescription = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Description of the document";
+      attribute_name = "GSMDItemDescription";
+      menu_name = "Description";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemDurationSeconds = {
+      type = <*I2>;
+      number_type = <*I1>;
+      type_description = "NSNumber (float)";
+      description = "Float value representing the duration in seconds of the content";
+      attribute_name = "GSMDItemDurationSeconds";
+      menu_name = "Duration";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I8>, <*I9>, <*I10> );
+        value_edit = <*I2>;    
+      };
+    };
+    GSMDItemEmailAddresses = {
+      type = <*I1>;
+      elements_type = <*I0>;
+      type_description = "NSArray of NSString objects";
+      description = "Email addresses related to the document";
+      attribute_name = "GSMDItemEmailAddresses";
+      menu_name = "Email addresses";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I4>, <*I5> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemEncodingApplications = {
+      type = <*I1>;
+      elements_type = <*I0>;
+      type_description = "NSString";
+      description = "Name of the application used to convert the document to its actual form";
+      attribute_name = "GSMDItemEncodingApplications";
+      menu_name = "Encoding application";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemFinderComment = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "File Annotations of the document";
+      attribute_name = "GSMDItemFinderComment";
+      menu_name = "File Annotations";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I4>, <*I5> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemFonts = {
+      type = <*I1>;
+      elements_type = <*I0>;
+      type_description = "NSArray of NSString objects";
+      description = "Fonts used in the document";
+      attribute_name = "GSMDItemFonts";
+      menu_name = "Fonts";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I4>, <*I5> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemKeywords = {
+      type = <*I1>;
+      elements_type = <*I0>;
+      type_description = "NSArray of NSString objects";
+      description = "Keywords associated with the document";
+      attribute_name = "GSMDItemKeywords";
+      menu_name = "Keywords";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I4>, <*I5> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemLanguages = {
+      type = <*I1>;
+      elements_type = <*I0>;
+      type_description = "NSArray of NSString objects";
+      description = "Languages used by the item";
+      attribute_name = "GSMDItemLanguages";
+      menu_name = "Languages";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I4>, <*I5> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemNumberOfPages = {
+      type = <*I2>;
+      number_type = <*I0>;
+      type_description = "NSNumber (int)";
+      description = "Number of pages in the document";
+      attribute_name = "GSMDItemNumberOfPages";
+      menu_name = "Number of pages";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I8>, <*I9>, <*I10> );
+        value_edit = <*I2>;    
+      };
+    };
+    GSMDItemPageHeight = {
+      type = <*I2>;
+      number_type = <*I0>;
+      type_description = "NSNumber (int)";
+      description = "Height in points of the document page";
+      attribute_name = "GSMDItemPageHeight";
+      menu_name = "Page height";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I8>, <*I9>, <*I10> );
+        value_edit = <*I2>;    
+      };
+    };
+    GSMDItemPageWidth = {
+      type = <*I2>;
+      number_type = <*I0>;
+      type_description = "NSNumber (int)";
+      description = "Width in points of the document page";
+      attribute_name = "GSMDItemPageWidth";
+      menu_name = "Page width";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I8>, <*I9>, <*I10> );
+        value_edit = <*I2>;    
+      };
+    };
+    GSMDItemPhoneNumbers = {
+      type = <*I1>;
+      elements_type = <*I0>;
+      type_description = "NSArray of NSString objects";
+      description = "Phone numbers related to this document";
+      attribute_name = "GSMDItemPhoneNumbers";
+      menu_name = "Phone numbers";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I4>, <*I5> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemPublishers = {
+      type = <*I1>;
+      elements_type = <*I0>;
+      type_description = "NSArray of NSString objects";
+      description = "Publishers of the document";
+      attribute_name = "GSMDItemPublishers";
+      menu_name = "Publishers";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I4>, <*I5> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemTextContent = {
+      type = <*I0>;
+      type_description = " ";
+      description = "Text content of the document. (This value can't be directly read but the attribute name can be used in queries)";
+      attribute_name = "GSMDItemTextContent";
+      menu_name = "Text content";
+      searchable = <*I0>;
+      fsattribute = <*I0>;
+      editor = {
+      };
+    };
+    GSMDItemTitle = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Title of the document";
+      attribute_name = "GSMDItemTitle";
+      menu_name = "Title";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemVersion = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Version number of the document";
+      attribute_name = "GSMDItemVersion";
+      menu_name = "Version number";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemAcquisitionMake = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Manufacturer of the device used to acquire the document";
+      attribute_name = "GSMDItemAcquisitionMake";
+      menu_name = "Acquisition manufacturer";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemAcquisitionModel = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Model of the device used to acquire the document";
+      attribute_name = "GSMDItemAcquisitionModel";
+      menu_name = "Acquisition model";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemAlbum = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Name of the collection containing this document";
+      attribute_name = "GSMDItemAlbum";
+      menu_name = "Album name";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemAperture = {
+      type = <*I2>;
+      number_type = <*I0>;
+      type_description = "NSNumber (int)";
+      description = "APEX value representing the aperture used to aquire the document contents";
+      attribute_name = "GSMDItemAperture";
+      menu_name = "APEX aperture";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I8>, <*I9>, <*I10> );
+        value_edit = <*I2>;    
+      };
+    };
+    GSMDItemBitsPerSample = {
+      type = <*I2>;
+      number_type = <*I0>;
+      type_description = "NSNumber (int)";
+      description = "Bits per sample";
+      attribute_name = "GSMDItemBitsPerSample";
+      menu_name = "Bits per sample";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I8>, <*I9>, <*I10> );
+        value_edit = <*I2>;    
+      };
+    };
+    GSMDItemColorSpace = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Color space model";
+      attribute_name = "GSMDItemColorSpace";
+      menu_name = "Color space";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemEXIFVersion = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "EXIF version";
+      attribute_name = "GSMDItemEXIFVersion";
+      menu_name = "EXIF version";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemExposureMode = {
+      type = <*I2>;
+      number_type = <*I0>;
+      type_description = "NSNumber (int)";
+      description = "Exposure mode used to acquire the document contents";
+      attribute_name = "GSMDItemExposureMode";
+      menu_name = "Exposure mode";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I8>, <*I9>, <*I10> );
+        value_edit = <*I2>;    
+      };
+    };
+    GSMDItemExposureProgram = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Name of the exposure program used to acquire the contents";
+      attribute_name = "GSMDItemExposureProgram";
+      menu_name = "Exposure program";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemExposureTimeSeconds = {
+      type = <*I2>;
+      number_type = <*I1>;
+      type_description = "NSNumber (float)";
+      description = "Float value representing the time in seconds used to capture the document contents";
+      attribute_name = "GSMDItemExposureTimeSeconds";
+      menu_name = "Exposure time";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I8>, <*I9>, <*I10> );
+        value_edit = <*I2>;    
+      };
+    };
+    GSMDItemExposureTimeString = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Description of the date-time when the camera has created the document contents";
+      attribute_name = "GSMDItemExposureTimeString";
+      menu_name = "Exposure date";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemFNumber = {
+      type = <*I2>;
+      number_type = <*I1>;
+      type_description = "NSNumber (float)";
+      description = "F-number of the lens used acquiring the document contents";
+      attribute_name = "GSMDItemFNumber";
+      menu_name = "F-number";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I8>, <*I9>, <*I10> );
+        value_edit = <*I2>;    
+      };
+    };
+    GSMDItemFlashOnOff = {
+      type = <*I2>;
+      number_type = <*I2>;
+      type_description = "NSNumber (BOOL)";
+      description = "Bool value representing if a flash was used aquiring the contents";
+      attribute_name = "GSMDItemFlashOnOff";
+      menu_name = "Flash on";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I0>, <*I1> );
+        value_edit = <*I0>;    
+        search_value = "1";
+      };
+    };
+    GSMDItemFocalLength = {
+      type = <*I2>;
+      number_type = <*I1>;
+      type_description = "NSNumber (float)";
+      description = "Focal length in millimeters of the lens used acquiring the document contents";
+      attribute_name = "GSMDItemFocalLength";
+      menu_name = "Focal length";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I8>, <*I9>, <*I10> );
+        value_edit = <*I2>;    
+      };
+    };
+    GSMDItemHasAlphaChannel = {
+      type = <*I2>;
+      number_type = <*I2>;
+      type_description = "NSNumber (BOOL)";
+      description = "Bool value representing if the image has an alpha channel";
+      attribute_name = "GSMDItemHasAlphaChannel";
+      menu_name = "Has alpha";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I0>, <*I1> );
+        value_edit = <*I0>;
+        search_value = "1";    
+      };
+    };
+    GSMDItemISOSpeed = {
+      type = <*I2>;
+      number_type = <*I0>;
+      type_description = "NSNumber (int)";
+      description = "ISO speed used to acquire the document contents";
+      attribute_name = "GSMDItemISOSpeed";
+      menu_name = "ISO speed";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I8>, <*I9>, <*I10> );
+        value_edit = <*I2>;    
+      };
+    };
+    GSMDItemMaxAperture = {
+      type = <*I2>;
+      number_type = <*I1>;
+      type_description = "NSNumber (float)";
+      description = "Smallest F number of the lens";
+      attribute_name = "GSMDItemMaxAperture";
+      menu_name = "Max aperture";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I8>, <*I9>, <*I10> );
+        value_edit = <*I2>;    
+      };
+    };
+    GSMDItemMeteringMode = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Metering mode used to acquire the document contents";
+      attribute_name = "GSMDItemMeteringMode";
+      menu_name = "Metering mode";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemOrientation = {
+      type = <*I2>;
+      number_type = <*I0>;
+      type_description = "NSNumber (int)";
+      description = "Orientation of the document";
+      attribute_name = "GSMDItemOrientation";
+      menu_name = "Orientation";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3> );
+        value_edit = <*I1>;   
+        value_menu = ( orizzontal, vertical );  
+        value_set = ( <*I0>, <*I1> );
+      };
+    };
+    GSMDItemPixelHeight = {
+      type = <*I2>;
+      number_type = <*I0>;
+      type_description = "NSNumber (int)";
+      description = "Height, in pixels, of the contents";
+      attribute_name = "GSMDItemPixelHeight";
+      menu_name = "Pixel height";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I8>, <*I9>, <*I10> );
+        value_edit = <*I2>;    
+      };
+    };
+    GSMDItemPixelWidth = {
+      type = <*I2>;
+      number_type = <*I0>;
+      type_description = "NSNumber (int)";
+      description = "Width, in pixels, of the contents";
+      attribute_name = "GSMDItemPixelWidth";
+      menu_name = "Pixel width";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I8>, <*I9>, <*I10> );
+        value_edit = <*I2>;    
+      };
+    };
+    GSMDItemRedEyeOnOff = {
+      type = <*I2>;
+      number_type = <*I2>;
+      type_description = "NSNumber (BOOL)";
+      description = "Whether red-eye reduction was used to acquire the document contents";
+      attribute_name = "GSMDItemRedEyeOnOff";
+      menu_name = "Red-eye";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I0>, <*I1> );
+        value_edit = <*I0>;
+        search_value = "1";    
+      };
+    };
+    GSMDItemResolutionHeightDPI = {
+      type = <*I2>;
+      number_type = <*I0>;
+      type_description = "NSNumber (int)";
+      description = "Resolution height of the document";
+      attribute_name = "GSMDItemResolutionHeightDPI";
+      menu_name = "Resolution height";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I8>, <*I9>, <*I10> );
+        value_edit = <*I2>;    
+      };
+    };
+    GSMDItemResolutionWidthDPI = {
+      type = <*I2>;
+      number_type = <*I0>;
+      type_description = "NSNumber (int)";
+      description = "Resolution width of the document";
+      attribute_name = "GSMDItemResolutionWidthDPI";
+      menu_name = "Resolution width";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I8>, <*I9>, <*I10> );
+        value_edit = <*I2>;    
+      };
+    };
+    GSMDItemWhiteBalance = {
+      type = <*I2>;
+      number_type = <*I0>;
+      type_description = "NSNumber (int)";
+      description = "White balance settings used when the contents was acquired";
+      attribute_name = "GSMDItemWhiteBalance";
+      menu_name = "White balance";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I8>, <*I9>, <*I10> );
+        value_edit = <*I2>;    
+      };
+    };
+    GSMDItemAudioBitRate = {
+      type = <*I2>;
+      number_type = <*I0>;
+      type_description = "NSNumber (int)";
+      description = "Bit rate of the audio";
+      attribute_name = "GSMDItemAudioBitRate";
+      menu_name = "Audio bit rate";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I8>, <*I9>, <*I10> );
+        value_edit = <*I2>;    
+      };
+    };
+    GSMDItemCodecs = {
+      type = <*I1>;
+      elements_type = <*I0>;
+      type_description = "NSArray of NSString objects";
+      description = "Codec used to encode or decode the document";
+      attribute_name = "GSMDItemCodecs";
+      menu_name = "Codecs";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I4>, <*I5> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemDelivery = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Streaming media deliver type";
+      attribute_name = "GSMDItemDelivery";
+      menu_name = "Streaming type";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemMediaTypes = {
+      type = <*I1>;
+      elements_type = <*I0>;
+      type_description = "NSArray of NSString objects";
+      description = "Media types of the document";
+      attribute_name = "GSMDItemMediaTypes";
+      menu_name = "Media types";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I4>, <*I5> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemStreamable = {
+      type = <*I2>;
+      number_type = <*I2>;
+      type_description = "NSNumber (BOOL)";
+      description = "Whether the document contents are streamable";
+      attribute_name = "GSMDItemStreamable";
+      menu_name = "Streamable";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I0>, <*I1> );
+        value_edit = <*I0>;
+        search_value = "1";    
+      };
+    };
+    GSMDItemTotalBitRate = {
+      type = <*I2>;
+      number_type = <*I0>;
+      type_description = "NSNumber (int)";
+      description = "Total bit rate (audio and video) of the document";
+      attribute_name = "GSMDItemTotalBitRate";
+      menu_name = "Total bit rate";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I8>, <*I9>, <*I10> );
+        value_edit = <*I2>;    
+      };
+    };
+    GSMDItemVideoBitRate = {
+      type = <*I2>;
+      number_type = <*I0>;
+      type_description = "NSNumber (int)";
+      description = "Videobit rate of the document";
+      attribute_name = "GSMDItemVideoBitRate";
+      menu_name = "Video bit rate";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I8>, <*I9>, <*I10> );
+        value_edit = <*I2>;    
+      };
+    };
+    GSMDItemAudioChannelCount = {
+      type = <*I2>;
+      number_type = <*I0>;
+      type_description = "NSNumber (int)";
+      description = "Number of audio channels in the document";
+      attribute_name = "GSMDItemAudioChannelCount";
+      menu_name = "Audio channel count";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I8>, <*I9>, <*I10> );
+        value_edit = <*I2>;    
+      };
+    };
+    GSMDItemAudioSampleRate = {
+      type = <*I2>;
+      number_type = <*I1>;
+      type_description = "NSNumber (float)";
+      description = "Float value in hz representing the sample rate of the document";
+      attribute_name = "GSMDItemAudioSampleRate";
+      menu_name = "Audio sample rate";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I8>, <*I9>, <*I10> );
+        value_edit = <*I2>;    
+      };
+    };
+    GSMDItemAudioTrackNumber = {
+      type = <*I2>;
+      number_type = <*I0>;
+      type_description = "NSNumber (int)";
+      description = "Number of the document if it is part of an album";
+      attribute_name = "GSMDItemAudioTrackNumber";
+      menu_name = "Track number";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I8>, <*I9>, <*I10> );
+        value_edit = <*I2>;    
+      };
+    };
+    GSMDItemComposer = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Composer of the music in the document";
+      attribute_name = "GSMDItemComposer";
+      menu_name = "Composer";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemIsGeneralMIDISequence = {
+      type = <*I2>;
+      number_type = <*I2>;
+      type_description = "NSNumber (BOOL)";
+      description = "Whether the document is set up for use with a General Midi device";
+      attribute_name = "GSMDItemIsGeneralMIDISequence";
+      menu_name = "General MIDI";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I0>, <*I1> );
+        value_edit = <*I0>;  
+        search_value = "1";  
+      };
+    };
+    GSMDItemKeySignature = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Musical key of the music in the document";
+      attribute_name = "GSMDItemKeySignature";
+      menu_name = "Musical key";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemLyricist = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Lyricist of the music in the document";
+      attribute_name = "GSMDItemLyricist";
+      menu_name = "Lyricist";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemMusicalGenre = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Musical genre of the music in the document";
+      attribute_name = "GSMDItemMusicalGenre";
+      menu_name = "Musical genre";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemRecordingDate = {
+      type = <*I3>;
+      type_description = "NSDate";
+      description = "Recording date of the music in the document";
+      attribute_name = "GSMDItemRecordingDate";
+      menu_name = "Recording date";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        value_edit = <*I3>;
+        operator = ( <*I11>, <*I12>, <*I13>, <*I14>, <*I15> );
+      };
+    };
+    GSMDItemRecordingYear = {
+      type = <*I2>;
+      number_type = <*I0>;
+      type_description = "NSNumber (int)";
+      description = "Recording year of the music in the document";
+      attribute_name = "GSMDItemRecordingYear";
+      menu_name = "Recording year";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I8>, <*I9>, <*I10> );
+        value_edit = <*I2>;    
+      };
+    };
+    GSMDItemTempo = {
+      type = <*I2>;
+      number_type = <*I0>;
+      type_description = "NSNumber (int)";
+      description = "Tempo of the music in the document";
+      attribute_name = "GSMDItemTempo";
+      menu_name = "Tempo";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I8>, <*I9>, <*I10> );
+        value_edit = <*I2>;    
+      };
+    };
+    GSMDItemTimeSignature = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Time signature of the music in the document";
+      attribute_name = "GSMDItemTimeSignature";
+      menu_name = "Time signature";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemUnixExtensions = {
+      type = <*I1>;
+      elements_type = <*I0>;
+      type_description = "NSArray of NSString objects";
+      description = "File extensions an application can open";
+      attribute_name = "GSMDItemUnixExtensions";
+      menu_name = "Application file extensions";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I4>, <*I5> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemCopyrightDescription = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Description of the copyright (License type, etc.)";
+      attribute_name = "GSMDItemCopyrightDescription";
+      menu_name = "Copyright";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemRole = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Role of the application (Editor, Viewer, etc.)";
+      attribute_name = "GSMDItemRole";
+      menu_name = "Application role";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3> );
+        value_edit = <*I1>;
+        value_menu = ( Editor, Viewer, None );  
+        value_set = ( Editor, Viewer, NSNone );      
+      };
+    };
+    GSMDItemBuildVersion = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Build version of the application";
+      attribute_name = "GSMDItemBuildVersion";
+      menu_name = "Build version";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemApplicationName = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Name of the application";
+      attribute_name = "GSMDItemApplicationName";
+      menu_name = "Application name";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemApplicationDescription = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Description of the application";
+      attribute_name = "GSMDItemApplicationDescription";
+      menu_name = "Application description";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemApplicationRelease = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Full name of the application release";
+      attribute_name = "GSMDItemApplicationRelease";
+      menu_name = "Application release";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemFSName = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Name of the document";
+      attribute_name = "GSMDItemFSName";
+      menu_name = "File name";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemFSExtension = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Path extension of the document";
+      attribute_name = "GSMDItemFSExtension";
+      menu_name = "File name extension";
+      searchable = <*I1>;
+      fsattribute = <*I0>;
+      editor = {
+        operator = ( <*I2>, <*I3>, <*I4>, <*I5>, <*I6>, <*I7> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemFSType = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "File type of the document";
+      attribute_name = "GSMDItemFSType";
+      menu_name = "File type";
+      searchable = <*I1>;
+      fsattribute = <*I0>;      
+      editor = {
+        operator = ( <*I2>, <*I3> );
+        value_edit = <*I1>;
+        value_menu = ( "plain file", folder, application, "mount point", "shell command" );  
+        value_set = ( NSPlainFileType, NSDirectoryFileType, NSApplicationFileType, NSFilesystemFileType, NSShellCommandFileType );
+      };
+    }; 
+    GSMDItemFSModificationDate = {
+      type = <*I3>;
+      type_description = "NSDate";
+      description = "Date of the last change of the document content";
+      attribute_name = "GSMDItemFSModificationDate";
+      menu_name = "Modification date";
+      searchable = <*I1>;
+      fsattribute = <*I1>;
+      fsfilter = "MDKFSFilterModDate";
+      editor = {
+        value_edit = <*I3>;
+        operator = ( <*I11>, <*I12>, <*I13>, <*I14>, <*I15> );
+      };
+    };
+    GSMDItemFSCreationDate = {
+      type = <*I3>;
+      type_description = "NSDate";
+      description = "Creation date of the document";
+      attribute_name = "GSMDItemFSCreationDate";
+      menu_name = "Creation date";
+      searchable = <*I1>;
+      fsattribute = <*I1>;
+      fsfilter = "MDKFSFilterCrDate";
+      editor = {
+        value_edit = <*I3>;
+        operator = ( <*I11>, <*I12>, <*I13>, <*I14>, <*I15> );
+      };
+    };
+    GSMDItemFSOwnerGroup = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Owner group of the file";
+      attribute_name = "GSMDItemFSOwnerGroup";
+      menu_name = "Owner group";
+      searchable = <*I1>;
+      fsattribute = <*I1>;
+      fsfilter = "MDKFSFilterGroup";
+      editor = {
+        operator = ( <*I2>, <*I3> );
+        value_edit = <*I2>;
+      };
+    };
+    GSMDItemFSOwnerGroupID = {
+      type = <*I2>;
+      number_type = <*I0>;
+      type_description = "NSNumber (int)";
+      description = "Owner group ID of the file";
+      attribute_name = "GSMDItemFSOwnerGroupID";
+      menu_name = "Owner group ID";
+      searchable = <*I1>;
+      fsattribute = <*I1>;
+      fsfilter = "MDKFSFilterGroupId";
+      editor = {
+        operator = ( <*I2>, <*I3> );
+        value_edit = <*I2>;   
+      };
+    };
+    GSMDItemFSOwnerUser = {
+      type = <*I0>;
+      type_description = "NSString";
+      description = "Owner user of the file";
+      attribute_name = "GSMDItemFSOwnerUser";
+      menu_name = "Owner";
+      searchable = <*I1>;
+      fsattribute = <*I1>;
+      fsfilter = "MDKFSFilterOwner";
+      editor = {
+        operator = ( <*I2>, <*I3> );
+        value_edit = <*I2>;
+      };
+    };    
+    GSMDItemFSOwnerUserID = {
+      type = <*I2>;
+      number_type = <*I0>;
+      type_description = "NSNumber (int)";
+      description = "Owner user ID of the file";
+      attribute_name = "GSMDItemFSOwnerUserID";
+      menu_name = "Owner ID";
+      searchable = <*I1>;
+      fsattribute = <*I1>;
+      fsfilter = "MDKFSFilterOwnerId";
+      editor = {
+        operator = ( <*I2>, <*I3> );
+        value_edit = <*I2>;   
+      };
+    };    
+    GSMDItemFSSize = {
+      type = <*I2>;
+      number_type = <*I0>;
+      type_description = "NSNumber (int)";
+      description = "Size in bytes of the file";
+      attribute_name = "GSMDItemFSSize";
+      menu_name = "Size";
+      searchable = <*I1>;
+      fsattribute = <*I1>;
+      fsfilter = "MDKFSFilterSize";
+      editor = {
+        operator = ( <*I8>, <*I9>, <*I10> );
+        value_edit = <*I2>;    
+      };
+    };
   };
 }
