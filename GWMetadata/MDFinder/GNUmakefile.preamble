@@ -8,9 +8,9 @@ ADDITIONAL_OBJCFLAGS += -Wall
 ADDITIONAL_CFLAGS += -Wall
 
 # Additional include directories the compiler should search
-ADDITIONAL_INCLUDE_DIRS += -I../../MDKit
+ADDITIONAL_INCLUDE_DIRS += -I../MDKit
 
-ADDITIONAL_LIB_DIRS += -L../../MDKit/MDKit.framework/Versions/Current/$(GNUSTEP_TARGET_LDIR) 
+ADDITIONAL_LIB_DIRS += -L../MDKit/MDKit.framework/Versions/Current/$(GNUSTEP_TARGET_LDIR) 
 
 # Additional LDFLAGS to pass to the linker
 # ADDITIONAL_LDFLAGS += 

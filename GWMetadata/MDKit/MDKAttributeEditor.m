@@ -1155,6 +1155,112 @@ static NSString *calformat = @"%m %d %Y";
 @end
 
 
+@implementation MDKTextContentEditor
+
+- (void)dealloc
+{
+  RELEASE (textContentWords);
+  RELEASE (skipSet);
+  
+  [super dealloc];
+}
+
+- (id)initWithSearchField:(NSTextField *)field
+{
+  self = [super init];
+  
+  if (self) {
+    NSCharacterSet *set;
+
+    searchField = field;
+    [searchField setDelegate: self];
+    
+    ASSIGN (textContentWords, [NSArray array]);
+    
+    skipSet = [NSMutableCharacterSet new];
+
+    set = [NSCharacterSet controlCharacterSet];
+    [skipSet formUnionWithCharacterSet: set];
+
+    set = [NSCharacterSet illegalCharacterSet];
+    [skipSet formUnionWithCharacterSet: set];
+
+    set = [NSCharacterSet symbolCharacterSet];
+    [skipSet formUnionWithCharacterSet: set];
+
+    set = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+    [skipSet formUnionWithCharacterSet: set];
+
+    set = [NSCharacterSet characterSetWithCharactersInString: 
+                                        @"~`@#$%^_-+\\{}:;\"\',/?"];
+    [skipSet formUnionWithCharacterSet: set];  
+  }
+  
+  return self;
+}
+
+#define WORD_MAX 40
+#define WORD_MIN 3
+
+- (void)controlTextDidChange:(NSNotification *)notif
+{
+  NSString *str = [searchField stringValue];
+  BOOL newquery = NO;
+    
+  if ([str length]) {
+    CREATE_AUTORELEASE_POOL(arp);
+    NSScanner *scanner = [NSScanner scannerWithString: str];
+    NSMutableArray *words = [NSMutableArray array];
+        
+    while ([scanner isAtEnd] == NO) {
+      NSString *word;
+            
+      if ([scanner scanUpToCharactersFromSet: skipSet intoString: &word]) {            
+        if (word) {
+          unsigned wl = [word length];
+
+          if ((wl >= WORD_MIN) && (wl < WORD_MAX)) { 
+            [words addObject: word];
+          }
+        }
+      } else {
+        break;
+      }
+    }
+
+    if ([words count] && ([words isEqual: textContentWords] == NO)) {
+      ASSIGN (textContentWords, words);
+      newquery = YES;
+    }      
+    
+    RELEASE (arp);
+    
+  } else {
+    ASSIGN (textContentWords, [NSArray array]);
+    newquery = YES;
+  }
+
+  if (newquery) {
+    [[NSNotificationCenter defaultCenter]
+ 				    postNotificationName: @"MDKAttributeEditorStateDidChange"
+	 								        object: self];
+  }
+}
+
+- (void)setTextContentWords:(NSArray *)words
+{
+  ASSIGN (textContentWords, words);  
+  [searchField setStringValue: [words componentsJoinedByString: @" "]];  
+}
+
+- (NSArray *)textContentWords
+{
+  return textContentWords;
+}
+
+@end
+
+
 
 
 

@@ -38,7 +38,6 @@
   NSMutableArray *components;
   FSNPathComponentView *lastComponent;
   FSNPathComponentView *openComponent;
-  id <DesktopApplication> desktopApp;
 }
 
 - (void)showComponentsOfSelection:(NSArray *)selection;

@@ -92,9 +92,9 @@ typedef enum _MDKCompoundOperator
   NSNumber *queryNumber;
   NSMutableDictionary *sqlDescription;
   NSMutableDictionary *sqlUpdatesDescription;
-  NSDictionary *results;
   NSArray *categoryNames;  
   NSMutableDictionary *groupedResults;
+  NSArray *fsfilters;
     
   BOOL reportRawResults;
   unsigned int status;    
@@ -188,6 +188,10 @@ typedef enum _MDKCompoundOperator
 
 - (BOOL)isBuilt;
 
+- (void)setFSFilters:(NSArray *)filters;
+
+- (NSArray *)fsfilters;
+
 - (void)appendSQLToPreStatements:(NSString *)sqlstr
                    checkExisting:(BOOL)check;
 
@@ -230,12 +234,6 @@ typedef enum _MDKCompoundOperator
 - (void)removePaths:(NSArray *)paths;
 
 - (void)removeNode:(FSNode *)node;
-
-- (NSDictionary *)results;
-
-- (NSArray *)resultNodes;
-
-- (unsigned)resultsCount;
 
 - (NSDictionary *)groupedResults;
 

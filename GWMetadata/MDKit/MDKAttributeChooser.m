@@ -61,7 +61,7 @@ static NSString *nibName = @"MDKAttributeChooser";
     mdkwindow = awindow;
     mdkattributes = [NSMutableArray new];
     attrdict = [MDKQuery attributesWithMask: MDKAttributeSearchable];
-    names = [attrdict allKeys]; 
+    names = [[attrdict allKeys] sortedArrayUsingSelector: @selector(compare:)];
     
     cell = [NSBrowserCell new];
     fonth = [[cell font] defaultLineHeightForFont];
@@ -150,7 +150,6 @@ static NSString *nibName = @"MDKAttributeChooser";
     MDKAttribute *attr = [self attributeWithMenuName: [cell stringValue]];
     int type = [attr type];
     NSString *typestr;
-    BOOL enableok;
     
     [nameField setStringValue: [attr name]];
     
@@ -179,14 +178,7 @@ static NSString *nibName = @"MDKAttributeChooser";
     [typeDescrField setStringValue: [attr typeDescription]];        
     [descriptionView setString: [attr description]];
     
-    enableok = ([winattrs containsObject: attr] == NO);
-    
-    if (enableok && [attr isFsattribute] && 
-                      ([mdkwindow indexOfAttributeView: attrView] == 0)) {
-      enableok = [[mdkwindow attributeWithName: @"GSMDItemTextContent"] inUse];
-    }
-  
-    [okButt setEnabled: enableok];
+    [okButt setEnabled: ([winattrs containsObject: attr] == NO)];
   }
 }
 

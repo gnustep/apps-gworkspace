@@ -3,9 +3,10 @@
     FirstResponder = {
 	Actions = (
 	    "animate:",
+	    "attributesButtAction:",
+	    "caseSensButtAction:",
 	    "placesPopUpdAction:",
 	    "saveButtAction:",
-	    "attributesButtAction:",
 	    "startSearchButtAction:",
 	    "stopSearchButtAction:"
 	);
@@ -17,7 +18,8 @@
 	    "startSearchButtAction:",
 	    "stopSearchButtAction:",
 	    "attributesButtAction:",
-	    "saveButtAction:"
+	    "saveButtAction:",
+	    "caseSensButtAction:"
 	);
 	Outlets = (
 	    win,
@@ -32,7 +34,8 @@
 	    attrBox,
 	    elementsLabel,
 	    resultsScroll,
-	    pathBox
+	    pathBox,
+	    caseSensButt
 	);
 	Super = NSObject;
     };

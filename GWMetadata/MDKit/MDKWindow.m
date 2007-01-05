@@ -28,16 +28,22 @@
 #include "MDKAttribute.h"
 #include "MDKAttributeView.h"
 #include "MDKAttributeEditor.h"
+#include "MDKFSFilter.h"
 #include "MDKAttributeChooser.h"
 #include "MDKQuery.h"
 #include "MDKResultsCategory.h"
 #include "DBKPathsTree.h"
 #include "FSNodeRep.h"
+#include "FSNPathComponentsViewer.h"
 #include "MDKResultCell.h"
+
+#define CHECKDELEGATE(s) \
+  (delegate && [delegate respondsToSelector: @selector(s)])
 
 #define WORD_MAX 40
 #define WORD_MIN 3
 #define CELLS_HEIGHT (28.0)
+#define ICNSIZE 24
 
 BOOL isDotFile(NSString *path);
 NSString *pathSeparator(void);
@@ -67,6 +73,8 @@ static NSString *nibName = @"MDKWindow";
 
 - (void)dealloc
 {
+  [dnc removeObserver: self];
+  
   RELEASE (win);
   RELEASE (attributes);
   RELEASE (attrViews);
@@ -75,99 +83,193 @@ static NSString *nibName = @"MDKWindow";
   freeTree(includePathsTree);
   freeTree(excludedPathsTree);
   RELEASE (excludedSuffixes);
-  RELEASE (textContentWords);
   RELEASE (queryEditors);
+  RELEASE (searchPaths);
+  RELEASE (textContentEditor);
   RELEASE (currentQuery);
-  RELEASE (skipSet);
   RELEASE (categoryNames);
   RELEASE (resultCategories);
   
 	[super dealloc];
 }
 
-- (id)init
+- (id)initWithDelegate:(id)adelegate
+            windowRect:(NSRect)wrect
+             savedInfo:(NSDictionary *)info
 {
   self = [super init];
 
   if (self) {
-    NSArray *usedAttributes;
-    unsigned i;
-    
     if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
       NSLog(@"failed to load %@!", nibName);
       DESTROY (self);
       return self;
     }  
     
-    loadingAttributes = YES;
+    delegate = adelegate;
+    
+    if (info) {
+      NSString *str = [info objectForKey: @"window_frame"];
+      
+      if (str) {
+        [win setFrame: NSRectFromString([info objectForKey: @"window_frame"]) 
+              display: NO];
+      } else {
+        [win setFrameUsingName: @"mdkwindow"];
+      }      
+    } else {
+      if (NSEqualRects(wrect, NSZeroRect) == NO) {
+        [win setFrame: wrect display: NO];
+      } else {
+        [win setFrameUsingName: @"mdkwindow"];
+      }
+    }
     
     fm = [NSFileManager defaultManager];
     nc = [NSNotificationCenter defaultCenter];
     dnc = [NSDistributedNotificationCenter defaultCenter];
     fsnodeRep = [FSNodeRep sharedInstance];
-    
-    [self setupQueries];
-    [self setupResults];
-    [self setupInterface];
 
-    attrViews = [NSMutableArray new];  
-    [self loadAttributes];
-    usedAttributes = [self usedAttributes];
-
-    for (i = 0; i < [usedAttributes count]; i++) {
-      MDKAttribute *attr = [usedAttributes objectAtIndex: i];
-      MDKAttributeView *attrview = [[MDKAttributeView alloc] initInWindow: self];
-
-      [attrview setAttribute: attr];
-
-      if ([usedAttributes count] == [attributes count]) {
-        [attrview setAddEnabled: NO];    
-      }
-
-      [[attrBox contentView] addSubview: [attrview mainBox]];
-      [attrViews addObject: attrview];
-      RELEASE (attrview);
-    }
-
-    for (i = 0; i < [attrViews count]; i++) {
-      [[attrViews objectAtIndex: i] updateMenuForAttributes: attributes];
-    }
-    
-    chooser = nil;
-        
+    loadingAttributes = YES; 
+    [self prepareInterface];       
+    [self prepareQueries: info];
+    [self prepareResults];
+    [self loadAttributes: info];
+    loadingAttributes = NO;
+            
     includePathsTree = newTreeWithIdentifier(@"included");
     excludedPathsTree = newTreeWithIdentifier(@"excluded");
     excludedSuffixes = [[NSMutableSet alloc] initWithCapacity: 1];
     
     [self setSearcheablePaths];
-  
+      
     [dnc addObserver: self
             selector: @selector(searcheablePathsDidChange:)
 	              name: @"GSMetadataIndexedDirectoriesChanged"
 	            object: nil];
-  
-    loadingAttributes = NO;
+    
+    chooser = nil;
+    closing = NO;
+    
+    if (info) {
+      NSNumber *num = [info objectForKey: @"attributes_visible"];
+      
+      if (num) {
+        [attributesButt setState: [num intValue]];
+        [self attributesButtAction: attributesButt];
+      }
+    }
+    
+    [self startSearchButtAction: startSearchButt];
   }
   
   return self;
 }
 
-- (void)setupInterface
+- (void)loadAttributes:(NSDictionary *)info
 {
+  unsigned mask = MDKAttributeSearchable | MDKAttributeUserSet;
+  NSDictionary *attrdict = [MDKQuery attributesWithMask: mask];
+  NSArray *attrnames = [attrdict allKeys];
+  MDKAttribute *attribute;
+  MDKAttributeView *attrview;
+  BOOL addenabled;
+  int i;
+  
+  attributes = [NSMutableArray new];
+  attrViews = [NSMutableArray new];
+  
+  attrnames = [attrnames sortedArrayUsingSelector: @selector(compare:)];
+  
+  for (i = 0; i < [attrnames count]; i++) {
+    NSDictionary *attrinfo = [attrdict objectForKey: [attrnames objectAtIndex: i]];
+    
+    attribute = [[MDKAttribute alloc] initWithAttributeInfo: attrinfo];
+    [attributes addObject: attribute];
+    RELEASE (attribute);
+  }
+
+  if (info) {
+    NSArray *editorsInfo = [info objectForKey: @"editors"];
+    NSArray *words = [info objectForKey: @"text_content_words"];
+    
+    for (i = 0; i < [editorsInfo count]; i++) {
+      NSDictionary *edinfo = [editorsInfo objectAtIndex: i];
+      NSString *attrname = [edinfo objectForKey: @"attrname"];
+      MDKAttributeEditor *editor;
+      
+      attribute = [self attributeWithName: attrname];        
+      [attribute setInUse: YES];
+      
+      attrview = [[MDKAttributeView alloc] initInWindow: self];
+      [attrview setAttribute: attribute];
+      [[attrBox contentView] addSubview: [attrview mainBox]];
+      [attrViews addObject: attrview];
+      RELEASE (attrview);     
+      
+      editor = [attribute editor];
+      [editor restoreSavedState: edinfo];           
+      [queryEditors addObject: editor];      
+    }
+    
+    if (words && [words count]) {
+      [textContentEditor setTextContentWords: words];
+    }
+            
+  } else {
+    attribute = [self attributeWithName: @"GSMDItemFSName"];  
+    [attribute setInUse: YES];
+    
+    attrview = [[MDKAttributeView alloc] initInWindow: self];
+    [attrview setAttribute: attribute];
+    
+    [[attrBox contentView] addSubview: [attrview mainBox]];
+    [attrViews addObject: attrview];
+    RELEASE (attrview);    
+  }
+  
+  if ([[self usedAttributes] count] == [attributes count]) {
+    for (i = 0; i < [attrViews count]; i++) {
+      [[attrViews objectAtIndex: i] setAddEnabled: NO];     
+    }      
+  }
+  
+  addenabled = ([[self usedAttributes] count] < [attributes count]);
+  
+  for (i = 0; i < [attrViews count]; i++) {
+    attrview = [attrViews objectAtIndex: i];
+    [attrview setAddEnabled: addenabled];     
+    [attrview updateMenuForAttributes: attributes];
+  }
+}
+
+- (void)prepareInterface
+{
+  NSBundle *bundle = [NSBundle bundleForClass: [self class]];
+  NSString *impath;
+  NSImage *image;
   NSString *ttstr;
   NSRect r;
   
   onImage = [NSImage imageNamed: @"common_2DCheckMark"];
   RETAIN (onImage);
 
-  while ([[placesPopUp itemArray] count] > 1) {
-    [placesPopUp removeItemAtIndex: 1];
-  }      
-  [self insertSavedSearchPlaces];
-  [placesPopUp addItemWithTitle: NSLocalizedString(@"Add...", @"")];
   ttstr = NSLocalizedString(@"Restrict the search to choosen places.", @"");
   [placesPopUp setTitle: NSLocalizedString(@"Search in...", @"")];
   [placesPopUp setToolTip: ttstr]; 
+  
+  impath = [bundle pathForResource: @"switchOff" ofType: @"tiff"];
+  image = [[NSImage alloc] initWithContentsOfFile: impath];
+  [caseSensButt setImage: image];    
+  RELEASE (image);
+
+  impath = [bundle pathForResource: @"switchOn" ofType: @"tiff"];
+  image = [[NSImage alloc] initWithContentsOfFile: impath];
+  [caseSensButt setAlternateImage: image];    
+  RELEASE (image);
+
+  [caseSensButt setState: NSOnState];    
+  [caseSensButt setToolTip: NSLocalizedString(@"Case sensitive switch", @"")];     
   
   ttstr = NSLocalizedString(@"Saves the query as a Live Search Folder.", @"");
   [saveButt setTitle: NSLocalizedString(@"Save", @"")];
@@ -228,33 +330,12 @@ static NSString *nibName = @"MDKWindow";
   [resultsView setTarget: self];
   [resultsView setDoubleAction: @selector(doubleClickOnResultsView:)];
   
+  r = [[pathBox contentView] bounds];
+  pathViewer = [[FSNPathComponentsViewer alloc] initWithFrame: r];
+  [pathBox setContentView: pathViewer];
+  RELEASE (pathViewer);
+
   [self setContextHelp];
-}
-
-- (void)insertSavedSearchPlaces
-{
-  [placesPopUp addItemWithTitle: NSLocalizedString(@"Computer", @"")];
-  [[placesPopUp lastItem] setRepresentedObject: pathSeparator()];
-
-  [placesPopUp addItemWithTitle: NSLocalizedString(@"Home", @"")];
-  [[placesPopUp lastItem] setRepresentedObject: NSHomeDirectory()];
-
-
-  /* This will be useful only for the saved live queries */
-  /* For the moment we insert only the default places */
-}
-
-- (NSArray *)searchPlaces
-{
-  NSMutableArray *places = [NSMutableArray array];
-  NSArray *items = [placesPopUp itemArray];
-  unsigned i;
-
-  for (i = 3; i < [items count] -1; i++) {
-    [places addObject: [[items objectAtIndex: i] representedObject]];
-  }
-  
-  return places;
 }
 
 - (void)setSearcheablePaths
@@ -335,91 +416,6 @@ static NSString *nibName = @"MDKWindow";
   [[placesPopUp menu] update];
 }
 
-- (void)loadAttributes
-{
-  unsigned mask = MDKAttributeSearchable | MDKAttributeUserSet;
-  NSDictionary *attrdict = [MDKQuery attributesWithMask: mask];
-  NSArray *names = [attrdict allKeys];
-  NSMutableArray *unsortedAttributes;
-  NSDictionary *lastUsedAttributes;
-  NSArray *usedNames;  
-  unsigned index;
-  unsigned i;
-
-  unsortedAttributes = [NSMutableArray array];
-  
-  for (i = 0; i < [names count]; i++) {
-    NSDictionary *info = [attrdict objectForKey: [names objectAtIndex: i]];
-    MDKAttribute *attribute = [[MDKAttribute alloc] initWithAttributeInfo: info];
-    
-    [unsortedAttributes addObject: attribute];
-    RELEASE (attribute);
-  }
-  
-  lastUsedAttributes = [self lastUsedAttributes];  
-  
-  if (lastUsedAttributes && [lastUsedAttributes count]) {
-    usedNames = [lastUsedAttributes allKeys]; // C'ERA SOLO QUESTA LINEA !!
-  
-    for (i = 0; i < [usedNames count]; i++) {
-      NSString *usedName = [usedNames objectAtIndex: i];
-      
-      if ([self attributeWithName: usedName inArray: unsortedAttributes] == nil) {
-        NSDictionary *info = [MDKQuery attributeWithName: usedName];
-        MDKAttribute *attribute = [[MDKAttribute alloc] initWithAttributeInfo: info];
-      
-        [unsortedAttributes addObject: attribute];
-        RELEASE (attribute);
-      }
-    }
-  
-  } else {
-    lastUsedAttributes = [NSDictionary dictionaryWithObject: [NSNumber numberWithInt: 0]
-                                                     forKey: @"GSMDItemFSName"];
-    usedNames = [NSArray arrayWithObject: @"GSMDItemFSName"];
-  }
-  
-  index = [usedNames count];
-  
-  for (i = 0; i < [unsortedAttributes count]; i++) {
-    MDKAttribute *attribute = [unsortedAttributes objectAtIndex: i];  
-    NSString *name = [attribute name];
-    NSNumber *num = [lastUsedAttributes objectForKey: name];
-  
-    if (num) {
-      [attribute setIndex: [num intValue]];    
-      [attribute setInUse: [usedNames containsObject: name]];
-    } else {
-      [attribute setIndex: index];
-      [attribute setInUse: NO];
-      index++;
-    }  
-  }
-  
-  [unsortedAttributes sortUsingSelector: @selector(compareByIndex:)];
-  attributes = [unsortedAttributes mutableCopy];
-}
-
-- (NSDictionary *)lastUsedAttributes
-{
-  /* this will be useful only for the saved live queries */
-
-  return nil;
-}
-
-- (NSDictionary *)orderedAttributeNames
-{
-  NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-  unsigned i;
-
-  for (i = 0; i < [attrViews count]; i++) {
-    [dict setObject: [NSNumber numberWithInt: i]
-             forKey: [[[attrViews objectAtIndex: i] attribute] name]];    
-  }
-  
-  return dict;
-}
-
 - (NSArray *)attributes
 {
   return attributes;
@@ -456,39 +452,12 @@ static NSString *nibName = @"MDKWindow";
   return nil;
 }
 
-- (BOOL)isUsedAttributeWithName:(NSString *)name
-{
-  MDKAttribute *attribute = [self attributeWithName: name];
-  
-  if (attribute) {
-    return [attribute inUse];
-  }
-
-  return NO;
-}
-
 - (MDKAttribute *)attributeWithName:(NSString *)name
 {
   int i;
   
   for (i = 0; i < [attributes count]; i++) {
     MDKAttribute *attribute = [attributes objectAtIndex: i];
-    
-    if ([[attribute name] isEqual: name]) {
-      return attribute;
-    }
-  }
- 
-  return nil;
-}
-
-- (MDKAttribute *)attributeWithName:(NSString *)name
-                            inArray:(NSArray *)attrarray
-{
-  int i;
-  
-  for (i = 0; i < [attrarray count]; i++) {
-    MDKAttribute *attribute = [attrarray objectAtIndex: i];
     
     if ([[attribute name] isEqual: name]) {
       return attribute;
@@ -606,15 +575,56 @@ static NSString *nibName = @"MDKWindow";
   }
 }
 
-- (unsigned)indexOfAttributeView:(MDKAttributeView *)view
+- (NSDictionary *)statusInfo
 {
-  return [attrViews indexOfObjectIdenticalTo: view];
+  NSMutableDictionary *info = [NSMutableDictionary dictionary];
+  NSMutableArray *editorsInfo = [NSMutableArray array];
+  NSArray *items = [placesPopUp itemArray];
+  NSMutableArray *paths = [NSMutableArray array];
+  int index;
+  int i;
+  
+  for (i = 0; i < [attrViews count]; i++) {
+    MDKAttributeView *attrview = [attrViews objectAtIndex: i];
+    MDKAttribute *attr = [attrview attribute];
+    MDKAttributeEditor *editor = [attr editor];
+        
+    if ([editor hasValidValues]) { 
+      [editorsInfo addObject: [editor editorInfo]];
+    }  
+  }
+  
+  [info setObject: editorsInfo forKey: @"editors"];
+  
+  [info setObject: [textContentEditor textContentWords]
+           forKey: @"text_content_words"];
+    
+  [info setObject: NSStringFromRect([win frame])
+           forKey: @"window_frame"];
+    
+  [info setObject: [NSNumber numberWithInt: [attributesButt state]]
+           forKey: @"attributes_visible"];
+  
+  /* We must start at 2 because [items objectAtIndex: 0] is the title */
+  /* of the popup, [items objectAtIndex: 1] is "Computer"             */
+  /* and [items objectAtIndex: 2] is "Home".                          */
+  /* The upper limit is [items count] -1 because the last item        */
+  /* is the "Add..." item                                             */
+  for (i = 3; i < [items count] -1; i++) {
+    [paths addObject: [[items objectAtIndex: i] representedObject]];
+  }  
+  
+  [info setObject: paths forKey: @"search_places"];
+  
+  index = [placesPopUp indexOfSelectedItem];
+  
+  if ((index > 0) && (index < [items count] -1)) {
+    [info setObject: [NSNumber numberWithInt: index]
+             forKey: @"selected_search_place"];
+  }
+  
+  return info;
 }
-
-
-
-
-
 
 - (void)activate
 {
@@ -680,10 +690,9 @@ static NSString *nibName = @"MDKWindow";
     
     [win setFrame: wrect display: NO];
     
-    /* setting the window frame will cause 
-      a NSWindowDidResizeNotification 
-      so we must return to avoid recursion */
-
+    /* setting the window frame will cause   */
+    /* a NSWindowDidResizeNotification       */
+    /* so we must return to avoid recursion  */
     return;
   }
   
@@ -692,29 +701,42 @@ static NSString *nibName = @"MDKWindow";
   [view setNeedsDisplay: YES];  
 }
 
+- (NSWindow *)window
+{
+  return win;
+}
+
 - (IBAction)placesPopUpdAction:(id)sender
 {
   NSArray *items = [sender itemArray];
-  int count = [items count];
+  int count = [items count];    
   int index = [sender indexOfSelectedItem];
   int i;
   
+  [searchPaths removeAllObjects];
+  
   if ((index != 0) && (index != count-1)) {
-    NSString *title = [sender titleOfSelectedItem];
-    
-    for (i = 1; i < [items count] -1; i++) {
-      NSMenuItem *item = [items objectAtIndex: i];
+    NSMenuItem *item = [sender selectedItem];    
+    NSString *path = [item representedObject];
+        
+    for (i = 1; i < count -1; i++) {
+      item = [items objectAtIndex: i];
     
       if (i == index) {
         [item setImage: onImage];
-        title = [item title];
       } else {
         [item setImage: nil];
       }
     }
     
-    // DO SOMETHING WITH "title"
-    
+    if ([path isEqual: pathSeparator()] == NO) {
+      [searchPaths addObject: path];      
+    }    
+
+    if (loadingAttributes == NO) {
+      [self startSearchButtAction: startSearchButt];
+    }
+        
   } else if (index == count-1) {
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];
 	  int result;
@@ -766,14 +788,21 @@ static NSString *nibName = @"MDKWindow";
       }      
     }
   }
-  
-  
-  
 }
 
 - (IBAction)startSearchButtAction:(id)sender
+{  
+  [self stopSearchButtAction: nil];
+      
+  if ([[textContentEditor textContentWords] count] || [queryEditors count]) {
+    [self newQuery];
+  }    
+}
+
+- (IBAction)caseSensButtAction:(id)sender
 {
-  NSLog(@"startSearchButtAction");
+  [nc postNotificationName: @"MDKAttributeEditorStateDidChange"
+	 								  object: caseSensButt];
 }
 
 - (IBAction)attributesButtAction:(id)sender
@@ -789,6 +818,11 @@ static NSString *nibName = @"MDKWindow";
 
 - (IBAction)saveButtAction:(id)sender
 {
+  NSDictionary *dict = [self statusInfo];
+
+  NSLog([dict description]);
+  
+  [dict writeToFile: @"/root/Desktop/aa.plist" atomically: YES];
   
 //  NSLog(@"saveButtAction");
 }
@@ -867,39 +901,40 @@ static NSString *nibName = @"MDKWindow";
   }
 }
 
+- (BOOL)windowShouldClose:(id)sender
+{
+  if ([currentQuery isGathering] || [currentQuery waitingStart]) {
+    closing = YES;
+    [self stopCurrentQuery];        
+    return NO;
+  }
+
+	return YES;
+}
+
+- (void)windowWillClose:(NSNotification *)aNotification
+{
+  if (currentQuery) {
+    [self stopCurrentQuery];  
+    [win saveFrameUsingName: @"mdkwindow"];
+    [delegate mdkwindowWillClose: self];
+  }
+}
+
 @end
 
 
 @implementation MDKWindow (queries)
 
-- (void)setupQueries
+- (void)prepareQueries:(NSDictionary *)info
 {
-  NSCharacterSet *set;
-
   ASSIGN (currentQuery, [MDKQuery query]);
-  ASSIGN (textContentWords, [NSArray array]);
   queryEditors = [NSMutableArray new];
+  textContentEditor = [[MDKTextContentEditor alloc] initWithSearchField: searchField];
+
   rowsCount = 0;
   globalCount = 0;
   
-  skipSet = [NSMutableCharacterSet new];
-
-  set = [NSCharacterSet controlCharacterSet];
-  [skipSet formUnionWithCharacterSet: set];
-
-  set = [NSCharacterSet illegalCharacterSet];
-  [skipSet formUnionWithCharacterSet: set];
-
-  set = [NSCharacterSet symbolCharacterSet];
-  [skipSet formUnionWithCharacterSet: set];
-
-  set = [NSCharacterSet whitespaceAndNewlineCharacterSet];
-  [skipSet formUnionWithCharacterSet: set];
-
-  set = [NSCharacterSet characterSetWithCharactersInString: 
-                                      @"~`@#$%^_-+\\{}:;\"\',/?"];
-  [skipSet formUnionWithCharacterSet: set];  
-
   [nc addObserver: self
          selector: @selector(editorStateDidChange:)
 	           name: @"MDKAttributeEditorStateDidChange"
@@ -909,9 +944,55 @@ static NSString *nibName = @"MDKWindow";
           selector: @selector(queryCategoriesDidChange:)
 	            name: @"MDKQueryCategoriesDidChange"
 	          object: nil];
+
+  searchPaths = [NSMutableArray new];
+
+  while ([[placesPopUp itemArray] count] > 1) {
+    [placesPopUp removeItemAtIndex: 1];
+  }   
+     
+  [placesPopUp addItemWithTitle: NSLocalizedString(@"Computer", @"")];
+  [[placesPopUp lastItem] setRepresentedObject: pathSeparator()];
+
+  [placesPopUp addItemWithTitle: NSLocalizedString(@"Home", @"")];
+  [[placesPopUp lastItem] setRepresentedObject: NSHomeDirectory()];
+
+  if (info) {
+    NSArray *places = [info objectForKey: @"search_places"];
+    int index = [[info objectForKey: @"selected_search_place"] intValue];
+    BOOL canselect = YES;
+    int i;
+    
+    for (i = 0; i < [places count]; i++) {
+      NSString *place = [places objectAtIndex: i];
+      
+      if ([fm fileExistsAtPath: place]
+              && inTreeFirstPartOfPath(place, includePathsTree)
+              && (inTreeFirstPartOfPath(place, excludedPathsTree) == NO)) {      
+        NSString *name = [place lastPathComponent];
+    
+        [placesPopUp addItemWithTitle: name];
+        [[placesPopUp lastItem] setRepresentedObject: place];
+      
+      } else {
+        canselect = NO;
+      }
+    }
+    
+    if (canselect) {
+      [placesPopUp selectItemAtIndex: index];
+    }
+    
+  } else {
+    [placesPopUp selectItemAtIndex: 1];
+  }
+
+  [placesPopUp addItemWithTitle: NSLocalizedString(@"Add...", @"")];
+  
+  [self placesPopUpdAction: placesPopUp];
 }
 
-- (void)setupResults
+- (void)prepareResults
 {
   NSDictionary *categoryInfo = [MDKQuery categoryInfo];
   int i;
@@ -944,103 +1025,74 @@ static NSString *nibName = @"MDKWindow";
   catlist = [resultCategories objectForKey: [categoryNames objectAtIndex: 0]];
 }
 
-- (void)controlTextDidChange:(NSNotification *)notif
+- (void)editorStateDidChange:(NSNotification *)notif
 {
-  NSString *str = [searchField stringValue];
-  BOOL newquery = NO;
-    
-  if ([str length]) {
-    CREATE_AUTORELEASE_POOL(arp);
-    NSScanner *scanner = [NSScanner scannerWithString: str];
-    NSMutableArray *words = [NSMutableArray array];
-        
-    while ([scanner isAtEnd] == NO) {
-      NSString *word;
-            
-      if ([scanner scanUpToCharactersFromSet: skipSet intoString: &word]) {            
-        if (word) {
-          unsigned wl = [word length];
+  if (loadingAttributes == NO) {
+    id sender = [notif object];  
+    NSArray *words = [textContentEditor textContentWords];
+    BOOL newquery = NO;
+  
+    if (sender == caseSensButt) {
+      if ([words count]) {
+        newquery = YES;
+      }    
 
-          if ((wl >= WORD_MIN) && (wl < WORD_MAX)) { 
-            [words addObject: word];
+    } else if (sender == textContentEditor) {      
+      if ([words count] || [queryEditors count]) {
+        newquery = YES;
+      }    
+    
+    } else {
+      MDKAttribute *attribute = [sender attribute];      
+
+      if ([attribute inUse]) {  
+        if ([sender hasValidValues]) {    
+          if ([queryEditors containsObject: sender] == NO) {
+            [queryEditors addObject: sender];
+          }
+          newquery = YES;
+
+        } else {       
+          if ([queryEditors containsObject: sender]) {
+            [queryEditors removeObject: sender];
+            newquery = YES;
           }
         }
-      } else {
-        break;
-      }
-    }
 
-    if ([words count] && ([words isEqual: textContentWords] == NO)) {
-      ASSIGN (textContentWords, words);
-      newquery = YES;
-    }      
+      } else {
+        if ([queryEditors containsObject: sender]) {
+          [queryEditors removeObject: sender];
+          newquery = YES;
+        }    
+      }
+      
+      newquery = (([queryEditors count] && newquery) || [words count]);
+    }
     
-    RELEASE (arp);
-    
-  } else {
-    ASSIGN (textContentWords, [NSArray array]);
-    
-    if ([queryEditors count]) {
-      newquery = YES;
+    if (newquery) {
+      [self newQuery];
     } else {
       [self stopSearchButtAction: nil];
     }
-  }
-
-  if (newquery) {
-    [self newQuery];
-  }
-}
-
-- (void)editorStateDidChange:(NSNotification *)notif
-{
-  MDKAttributeEditor *editor = [notif object];  
-  MDKAttribute *attribute = [editor attribute];
-  BOOL newquery = NO;
-  
-  if (loadingAttributes) {
-    return;
-  }
-  
-  if ([attribute inUse]) {  
-    if ([editor hasValidValues]) {    
-      if ([queryEditors containsObject: editor] == NO) {
-        [queryEditors addObject: editor];
-      }
-      newquery = YES;
-      
-    } else {       
-      if ([queryEditors containsObject: editor]) {
-        [queryEditors removeObject: editor];
-        newquery = YES;
-      }
-    }
-  
-  } else {
-    if ([queryEditors containsObject: editor]) {
-      [queryEditors removeObject: editor];
-      newquery = YES;
-    }    
-  }
-  
-  if ([queryEditors count] && newquery) {
-    [self newQuery];
-  } else {
-    [self stopSearchButtAction: nil];
   }
 }
 
 - (void)newQuery
 {
   CREATE_AUTORELEASE_POOL(arp);
+  NSArray *words;
   MDKCompoundOperator operator;
-  int i;
+  BOOL casesens;
+  NSMutableArray *fsfilters;
+  BOOL onlyfilters;
+  int i, j;
 
   [currentQuery setUpdatesEnabled: NO];
   [currentQuery stopQuery];
 
   [progView stop];  
   [self updateElementsLabel: 0];
+  [pathViewer showComponentsOfSelection: nil];
   rowsCount = 0; 
   globalCount = 0;
   [self updateCategoryControls: NO removeSubviews: YES];
@@ -1050,56 +1102,89 @@ static NSString *nibName = @"MDKWindow";
   ASSIGN (currentQuery, [MDKQuery query]);
   [currentQuery setUpdatesEnabled: YES];
   [currentQuery setDelegate: self];
-    
+  
+  casesens = ([caseSensButt state] == NSOnState);
   operator = MDKCompoundOperatorNone;
   
-  for (i = 0; i < [textContentWords count]; i++) {
+  onlyfilters = YES;  
+  words = [textContentEditor textContentWords];
+  
+  for (i = 0; i < [words count]; i++) {
     [currentQuery appendSubqueryWithCompoundOperator: operator
                                            attribute: @"GSMDItemTextContent"
-                                         searchValue: [textContentWords objectAtIndex: i]
+                                         searchValue: [words objectAtIndex: i]
                                         operatorType: MDKEqualToOperatorType    
-                                       caseSensitive: YES];    
+                                       caseSensitive: casesens];    
     operator = GMDAndCompoundOperator;
+    onlyfilters = NO;
   }
   
+  fsfilters = [NSMutableArray array];
+  
   for (i = 0; i < [queryEditors count]; i++) {
-    MDKAttributeEditor *editor = [queryEditors objectAtIndex: i];  
+    MDKAttributeEditor *editor = [queryEditors objectAtIndex: i]; 
+    MDKAttribute *attribute = [editor attribute];
     NSDictionary *edinfo = [editor editorInfo];
     NSString *name = [edinfo objectForKey: @"attrname"];
     MDKOperatorType type = [[edinfo objectForKey: @"optype"] intValue];
     NSArray *values = [edinfo objectForKey: @"values"];
-    BOOL csens = [[edinfo objectForKey: @"casesens"] boolValue];
-  
-    [currentQuery appendSubqueryWithCompoundOperator: operator
-                                           attribute: name
-                                         searchValue: [values objectAtIndex: 0]
-                                        operatorType: type    
-                                       caseSensitive: csens];  
-    operator = GMDAndCompoundOperator;
+    BOOL fsfilter = [attribute isFsattribute];
     
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // DIVIDERLI TRA FILTRI E ALTRE COSE !!!!!!!!!!!!!!!!!!!!!!!!
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    if (fsfilter == NO) {
+      BOOL csens = [[edinfo objectForKey: @"casesens"] boolValue];
+      
+      if ([attribute type] != ARRAY) {
+        [currentQuery appendSubqueryWithCompoundOperator: operator
+                                               attribute: name
+                                             searchValue: [values objectAtIndex: 0]
+                                            operatorType: type    
+                                           caseSensitive: csens]; 
+        operator = GMDAndCompoundOperator;                                    
+      } else {
+        for (j = 0; j < [values count]; j++) {
+          [currentQuery appendSubqueryWithCompoundOperator: operator
+                                                 attribute: name
+                                               searchValue: [values objectAtIndex: j]
+                                              operatorType: type    
+                                             caseSensitive: csens];  
+          operator = GMDAndCompoundOperator;                                     
+        }
+      }
+      
+      onlyfilters = NO;
+
+    } else {
+      MDKFSFilter *filter = [MDKFSFilter filterForAttribute: attribute
+                                               operatorType: type
+                                                searchValue: [values objectAtIndex: 0]];
+      if (filter) {
+        [fsfilters addObject: filter];
+      }
+    }
   }
 
   [currentQuery closeSubqueries];
+
+  if ([searchPaths count]) {  
+    [currentQuery setSearchPaths: searchPaths];
+  }    
   
   if ([currentQuery buildQuery] == NO) {
     NSLog(@"unable to build \"%@\"", [currentQuery description]); 
     [NSApp terminate: self];
   } 
-  
-  [self prepareResultCategories];
-  
-  
-  
-  NSLog([currentQuery description]);
-  
-  
-  
-  
-  [currentQuery startGathering];
 
+  [currentQuery setFSFilters: fsfilters];    
+    
+  [self prepareResultCategories];
+    
+  if (onlyfilters == NO) {
+    closing = NO;
+    [currentQuery startGathering];
+  } else {
+    // ????????????????????????????????????????????
+  }
+  
   RELEASE (arp);
 }
 
@@ -1137,6 +1222,10 @@ static NSString *nibName = @"MDKWindow";
   if (query == currentQuery) {
     [progView stop];
     [self updateElementsLabel: globalCount];
+    
+    if (closing) {
+      [win close: nil];
+    }
   } 
 }
 
@@ -1157,15 +1246,24 @@ static NSString *nibName = @"MDKWindow";
 
 - (IBAction)stopSearchButtAction:(id)sender
 {
-  [currentQuery setUpdatesEnabled: NO];
-  [currentQuery stopQuery];
+  [self stopCurrentQuery];
+  
   rowsCount = 0;
   globalCount = 0;
-  [self updateCategoryControls: NO removeSubviews: YES];
-  [progView stop];  
+  [self updateCategoryControls: NO removeSubviews: YES];    
   [resultsView noteNumberOfRowsChanged];
   [resultsView setNeedsDisplayInRect: [resultsView visibleRect]];
+  [pathViewer showComponentsOfSelection: nil];
   [self updateElementsLabel: 0];
+}
+
+- (void)stopCurrentQuery
+{
+  if (currentQuery) {
+    [currentQuery setUpdatesEnabled: NO];
+    [currentQuery stopQuery];
+    [progView stop];
+  }
 }
 
 - (void)updateElementsLabel:(int)n
@@ -1178,7 +1276,12 @@ static NSString *nibName = @"MDKWindow";
 
 - (void)queryCategoriesDidChange:(NSNotification *)notif
 {
-  [self setupResults];
+  [self prepareResults];
+}
+
+- (MDKQuery *)currentQuery
+{
+  return currentQuery;
 }
 
 @end
@@ -1215,6 +1318,36 @@ static NSString *nibName = @"MDKWindow";
 	      writeRows:(NSArray *)rows
      toPasteboard:(NSPasteboard *)pboard
 {
+  NSMutableArray *paths = [NSMutableArray array];
+  NSMutableArray *parentPaths = [NSMutableArray array];
+  int i;
+
+  for (i = 0; i < [rows count]; i++) {
+    int index = [[rows objectAtIndex: i] intValue];
+    id nd = [catlist resultAtIndex: index];
+    
+    if ((*isMember)(nd, memberSel, FSNodeClass) && [nd isValid]) {
+      NSString *parentPath = [nd parentPath];
+      
+      if (([parentPaths containsObject: parentPath] == NO) && (i != 0)) {
+        NSString *msg = NSLocalizedString(@"You can't move objects with multiple parent paths!", @"");
+        NSRunAlertPanel(nil, msg, NSLocalizedString(@"Continue", @""), nil, nil);
+        return NO;
+      }
+
+      [paths addObject: [nd path]];
+      [parentPaths addObject: parentPath];    
+    }
+  }
+  
+  if ([paths count]) {
+    [pboard declareTypes: [NSArray arrayWithObject: NSFilenamesPboardType] 
+                                             owner: nil];
+    [pboard setPropertyList: paths forType: NSFilenamesPboardType];
+
+    return YES;  
+  }
+  
   return NO;
 }
 
@@ -1223,6 +1356,13 @@ static NSString *nibName = @"MDKWindow";
 //
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification
 {
+  NSArray *selected = [self selectedObjects];
+
+  [pathViewer showComponentsOfSelection: selected];
+  
+//  if ([selected count]) {
+//    [finder foundSelectionChanged: [FSNode pathsOfNodes: selected]];
+//  }
 }
 
 - (void)tableView:(NSTableView *)aTableView 
@@ -1236,7 +1376,7 @@ static NSString *nibName = @"MDKWindow";
     [aCell setHeadCell: NO];
       
     if (aTableColumn == nameColumn) {    
-      [aCell setIcon: [fsnodeRep iconOfSize: 24 forNode: nd]];    
+      [aCell setIcon: [fsnodeRep iconOfSize: ICNSIZE forNode: nd]];    
     } else if (aTableColumn == attrColumn) {
    
     }
@@ -1317,13 +1457,50 @@ static NSString *nibName = @"MDKWindow";
 
 - (void)doubleClickOnResultsView:(id)sender
 {
-  NSLog(@"doubleClickOnResultsView");
-  // sempliciter@hotmail.com
+  NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+  NSArray *selected = [self selectedObjects];
+  int i;
+  
+  for (i = 0; i < [selected count]; i++) {
+    FSNode *nd = [selected objectAtIndex: i];
+    
+    if ([nd isValid]) {
+      [ws openFile: [nd path]];
+    }
+  }
+}
+
+- (NSArray *)selectedObjects
+{
+  NSMutableArray *selected = [NSMutableArray array];
+  NSEnumerator *enumerator = [resultsView selectedRowEnumerator];
+  NSNumber *row;
+
+  while ((row = [enumerator nextObject])) {
+    id nd = [catlist resultAtIndex: [row intValue]];
+
+    if ((*isMember)(nd, memberSel, FSNodeClass) && [nd isValid]) {
+      [selected addObject: nd];
+    }
+  }
+
+  return selected; 
 }
 
 - (NSImage *)tableView:(NSTableView *)tableView 
       dragImageForRows:(NSArray *)dragRows
 {
+  if ([dragRows count] > 1) {
+    return [fsnodeRep multipleSelectionIconOfSize: ICNSIZE];
+  } else {
+    int index = [[dragRows objectAtIndex: 0] intValue];
+    FSNode *nd = [catlist resultAtIndex: index];
+    
+    if ((*isMember)(nd, memberSel, FSNodeClass) && [nd isValid]) {
+      return [fsnodeRep iconOfSize: ICNSIZE forNode: nd];    
+    }        
+  }
+
   return nil;
 }
 

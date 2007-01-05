@@ -137,5 +137,21 @@
 
 @end
 
+
+@interface MDKTextContentEditor : NSObject 
+{
+  NSTextField *searchField;
+  NSArray *textContentWords;
+  NSMutableCharacterSet *skipSet;  
+}
+
+- (id)initWithSearchField:(NSTextField *)field;
+
+- (void)setTextContentWords:(NSArray *)words;
+
+- (NSArray *)textContentWords;
+
+@end
+
 #endif // MDK_ATTRIBUTE_EDITOR_H
 

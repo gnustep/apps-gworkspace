@@ -614,6 +614,26 @@
 		buff = [buff stringByDeletingLastPathComponent];
   }
 
+  if ([node isDirectory] && [node isParentOfPath: fromPath]) {
+    NSArray *subNodes = [node subNodes];
+    
+    for (i = 0; i < [subNodes count]; i++) {
+      FSNode *nd = [subNodes objectAtIndex: i];
+      
+      if ([nd isDirectory]) {
+        int j;
+        
+        for (j = 0; j < count; j++) {
+          NSString *fname = [[sourcePaths objectAtIndex: j] lastPathComponent];
+          
+          if ([[nd name] isEqual: fname]) {
+            return NSDragOperationNone;
+          }
+        }
+      }
+    }
+  }	
+
   if ([node isApplication]) {
     for (i = 0; i < count; i++) {
       CREATE_AUTORELEASE_POOL(arp);

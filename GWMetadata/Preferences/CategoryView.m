@@ -350,8 +350,9 @@
   if (self) {
     cview = view;
     [self setBezeled: NO];
+    [self setEditable: NO];
+    [self setSelectable: NO];
     [self setDrawsBackground: NO];
-    [self setEnabled: NO];      
   }
   
   return self;

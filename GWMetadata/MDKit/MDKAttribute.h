@@ -42,21 +42,12 @@
   BOOL fsattribute;  
   NSString *fsfilter;
   
-  NSDictionary *editorInfo;
-  
-  int index;
-  BOOL inuse;
-  
+  NSDictionary *editorInfo;  
+  BOOL inuse;  
   id editor;
 }
 
 - (id)initWithAttributeInfo:(NSDictionary *)info;
-
-- (int)index;
-
-- (void)setIndex:(int)idx;
-
-- (NSComparisonResult)compareByIndex:(MDKAttribute *)other;
 
 - (BOOL)inUse;
 

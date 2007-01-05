@@ -160,9 +160,8 @@
     
     appname = [ws getBestAppInRole: nil forExtension: ext];
     
-    if (appName == nil) {
-      NSWarnLog(@"No known applications for file extension '%@'", ext);
-      return NO;
+    if (appname == nil) {
+      appname = defEditor;      
     }
   }
 

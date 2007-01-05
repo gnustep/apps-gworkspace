@@ -12,7 +12,7 @@ include $(GNUSTEP_MAKEFILES)/common.make
 SUBPROJECTS = MDKit \
               gmds \
 	      			Preferences \
-	      			Testing/GMDSClient
+	      			MDFinder
 						 
 -include GNUmakefile.preamble
 

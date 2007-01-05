@@ -38,7 +38,8 @@ MDKResultCell.m \
 MDKAttributeChooser.m \
 MDKAttribute.m \
 MDKAttributeView.m \
-MDKAttributeEditor.m
+MDKAttributeEditor.m \
+MDKFSFilter.m
 
 MDKit_HEADER_FILES = \
 MDKit.h \

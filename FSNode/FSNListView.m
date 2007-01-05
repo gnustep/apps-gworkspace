@@ -1682,6 +1682,27 @@ static NSString *defaultColumns = @"{ \
       prePath = [prePath stringByDeletingLastPathComponent];
     }
 
+    if ([node isDirectory] && [node isParentOfPath: basePath]) {
+      NSArray *subNodes = [node subNodes];
+      int i;
+
+      for (i = 0; i < [subNodes count]; i++) {
+        FSNode *nd = [subNodes objectAtIndex: i];
+
+        if ([nd isDirectory]) {
+          int j;
+
+          for (j = 0; j < count; j++) {
+            NSString *fname = [[sourcePaths objectAtIndex: j] lastPathComponent];
+
+            if ([[nd name] isEqual: fname]) {
+              return NSDragOperationNone;
+            }
+          }
+        }
+      }
+    }	
+
     isDragTarget = YES;	
     forceCopy = NO;
 
@@ -2258,6 +2279,27 @@ static NSString *defaultColumns = @"{ \
     }            
     prePath = [prePath stringByDeletingLastPathComponent];
   }
+
+  if ([node isDirectory] && [node isParentOfPath: fromPath]) {
+    NSArray *subNodes = [node subNodes];
+    int i;
+    
+    for (i = 0; i < [subNodes count]; i++) {
+      FSNode *nd = [subNodes objectAtIndex: i];
+      
+      if ([nd isDirectory]) {
+        int j;
+        
+        for (j = 0; j < count; j++) {
+          NSString *fname = [[sourcePaths objectAtIndex: j] lastPathComponent];
+          
+          if ([[nd name] isEqual: fname]) {
+            return NSDragOperationNone;
+          }
+        }
+      }
+    }
+  }	
 
   isDragTarget = YES;
   forceCopy = NO;

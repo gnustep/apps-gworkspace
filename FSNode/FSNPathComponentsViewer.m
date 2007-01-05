@@ -53,17 +53,7 @@ static NSImage *branchImage;
 {
   self = [super initWithFrame: frameRect];
   
-  if (self) {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
-    NSString *appName = [defaults stringForKey: @"DesktopApplicationName"];
-    NSString *selName = [defaults stringForKey: @"DesktopApplicationSelName"];
-
-    if (appName && selName) {
-		  Class desktopAppClass = [[NSBundle mainBundle] classNamed: appName];
-      SEL sel = NSSelectorFromString(selName);
-      desktopApp = [desktopAppClass performSelector: sel];
-    }
-  
+  if (self) {  
     components = [NSMutableArray new];
     [self setAutoresizingMask: NSViewWidthSizable];
   }
@@ -193,20 +183,22 @@ static NSImage *branchImage;
 
 - (void)doubleClickOnComponent:(FSNPathComponentView *)component
 {
+  NSWorkspace *ws = [NSWorkspace sharedWorkspace];
   FSNode *node = [component node];
+  NSString *path = [node path];
       
   if ([node isDirectory] || [node isMountPoint]) {
     if ([node isApplication]) {
-      [[NSWorkspace sharedWorkspace] launchApplication: [node path]];
+      [ws launchApplication: path];
     } else if ([node isPackage]) {
-      [desktopApp openFile: [node path]];
+      [ws openFile: path];
     } else {
-      [desktopApp newViewerAtPath: [node path]];
+      [ws selectFile: path inFileViewerRootedAtPath: path];    
     }        
   } else if ([node isPlain] || [node isExecutable]) {
-    [desktopApp openFile: [node path]];    
+    [ws openFile: path];    
   } else if ([node isApplication]) {
-    [[NSWorkspace sharedWorkspace] launchApplication: [node path]];    
+    [ws launchApplication: path];    
   }
 }
 

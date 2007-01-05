@@ -76,9 +76,7 @@
     
     ASSIGN (editorInfo, [info objectForKey: @"editor"]);
     
-    editor = nil;
-    
-    index = 0;
+    editor = nil;    
     inuse = NO;
   }
   
@@ -99,30 +97,6 @@
     return [name isEqual: [other name]];
   }
   return NO;
-}
-
-- (int)index
-{
-  return index;
-}
-
-- (void)setIndex:(int)idx
-{
-  index = idx;
-}
-
-- (NSComparisonResult)compareByIndex:(MDKAttribute *)other
-{
-  int i1 = [self index];
-  int i2 = [other index];
-
-  if (i1 < i2) {
-    return NSOrderedAscending;
-  } else if (i1 > i2) {
-    return NSOrderedDescending;
-  } 
-
-  return NSOrderedSame;
 }
 
 - (BOOL)inUse

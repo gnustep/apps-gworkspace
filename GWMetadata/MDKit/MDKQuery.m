@@ -130,8 +130,8 @@ enum {
   RELEASE (sqlDescription);
   RELEASE (sqlUpdatesDescription);
   TEST_RELEASE (categoryNames);
-  TEST_RELEASE (results);
   TEST_RELEASE (groupedResults);
+  TEST_RELEASE (fsfilters);
   
 	[super dealloc];
 }
@@ -383,7 +383,7 @@ enum {
     [sqlUpdatesDescription setObject: queryNumber forKey: @"qnumber"];
     
     categoryNames = nil;
-        
+    fsfilters = nil;    
     reportRawResults = NO;
     status = 0;    
     delegate = nil;
@@ -774,10 +774,6 @@ enum {
     }
 
     if ([self isBuilt] && [self isRoot]) {
-      ASSIGN (results, ([NSDictionary dictionaryWithObjectsAndKeys: 
-                                      [NSMutableArray array], @"nodes",
-                                      [NSMutableArray array], @"scores", nil]));
-      
       ASSIGN (groupedResults, [NSMutableDictionary dictionary]);
       ASSIGN (categoryNames, [MDKQuery categoryNames]);
       
@@ -804,6 +800,16 @@ enum {
 - (BOOL)isBuilt
 {
   return ((status & BUILT) == BUILT);
+}
+
+- (void)setFSFilters:(NSArray *)filters
+{
+  ASSIGN (fsfilters, filters);
+}
+
+- (NSArray *)fsfilters
+{
+  return fsfilters;
 }
 
 - (void)appendSQLToPreStatements:(NSString *)sqlstr
@@ -1629,7 +1635,7 @@ enum {
     status &= ~GATHERING;
   }
   
-  if (CHECKDELEGATE (queryDidEndGathering:)) {    
+  if (CHECKDELEGATE (queryDidEndGathering:)) {
     [delegate queryDidEndGathering: self];
   }  
   
@@ -1701,20 +1707,25 @@ enum {
       NSNumber *score = [line objectAtIndex: 1];
       
       if (node && [node isValid]) {
-        NSString *category = [qmanager categoryNameForNode: node];
+        BOOL caninsert = YES;
         
-        [self insertNode: node 
-                andScore: score 
-            inDictionary: [groupedResults objectForKey: category] 
-             needSorting: sort];
+        if (fsfilters && [fsfilters count]) {
+          caninsert = [qmanager filterNode: node withFSFilters: fsfilters];
+        }
       
-        [catnames addObject: category];
-      }
+        if (caninsert) {
+          NSString *category = [qmanager categoryNameForNode: node];
 
-      [self insertNode: node 
-              andScore: score 
-          inDictionary: results
-           needSorting: sort];
+          [self insertNode: node 
+                  andScore: score 
+              inDictionary: [groupedResults objectForKey: category] 
+               needSorting: sort];
+
+          if ([catnames containsObject: category] == NO) {
+            [catnames addObject: category];
+          }
+        }
+      }
     }
   
     if (CHECKDELEGATE (queryDidUpdateResults:forCategories:)) {      
@@ -1786,82 +1797,17 @@ enum {
 - (void)removePaths:(NSArray *)paths
 {
   CREATE_AUTORELEASE_POOL(arp);
-  NSMutableArray *resnodes = [results objectForKey: @"nodes"];
-  NSMutableArray *resscores = [results objectForKey: @"scores"];
   NSMutableArray *catnames = [NSMutableArray array];
-  BOOL removed = NO;
+  unsigned index;    
   unsigned i;
   
   for (i = 0; i < [paths count]; i++) {
     FSNode *node = [FSNode nodeWithPath: [paths objectAtIndex: i]];
-    unsigned index = [resnodes indexOfObject: node];
-
-    if (index != NSNotFound) {
-      NSString *catname;
-      NSDictionary *catdict;
-      NSMutableArray *catnodes;
-      NSMutableArray *catscores;
-      
-      [resnodes removeObjectAtIndex: index];
-      [resscores removeObjectAtIndex: index];      
-      
-      if ([node isValid]) {
-        catname = [qmanager categoryNameForNode: node];
-        catdict = [groupedResults objectForKey: catname];        
-        catnodes = [catdict objectForKey: @"nodes"];
-        catscores = [catdict objectForKey: @"scores"];
-      
-        index = [catnodes indexOfObject: node];
-      
-      } else {
-        unsigned j;
-      
-        for (j = 0; j < [categoryNames count]; j++) {
-          catname = [categoryNames objectAtIndex: j];
-          catdict = [groupedResults objectForKey: catname];
-          catnodes = [catdict objectForKey: @"nodes"];
-          catscores = [catdict objectForKey: @"scores"];
-
-          index = [catnodes indexOfObject: node];
-
-          if (index != NSNotFound) {
-            break;
-          }
-        }              
-      }
-      
-      if (index != NSNotFound) {
-        [catnodes removeObjectAtIndex: index];
-        [catscores removeObjectAtIndex: index]; 
-        [catnames addObject: catname];     
-      }
-      
-      removed = YES;      
-    }
-  }
-  
-  if (removed && CHECKDELEGATE (queryDidUpdateResults:forCategories:)) {        
-    [delegate queryDidUpdateResults: self forCategories: catnames];
-  }
-  
-  RELEASE (arp);
-}
-
-- (void)removeNode:(FSNode *)node
-{
-  NSMutableArray *resnodes = [results objectForKey: @"nodes"];
-  NSMutableArray *resscores = [results objectForKey: @"scores"];  
-  unsigned index = [resnodes indexOfObject: node];
-  
-  if (index != NSNotFound) {  
     NSString *catname;
     NSDictionary *catdict;
     NSMutableArray *catnodes;
     NSMutableArray *catscores;
-      
-    [resnodes removeObjectAtIndex: index];
-    [resscores removeObjectAtIndex: index];      
-    
+            
     if ([node isValid]) {
       catname = [qmanager categoryNameForNode: node];
       catdict = [groupedResults objectForKey: catname];        
@@ -1869,12 +1815,12 @@ enum {
       catscores = [catdict objectForKey: @"scores"];
 
       index = [catnodes indexOfObject: node];
-    
+
     } else {
-      unsigned i;
-    
-      for (i = 0; i < [categoryNames count]; i++) {
-        catname = [categoryNames objectAtIndex: i];
+      unsigned j;
+
+      for (j = 0; j < [categoryNames count]; j++) {
+        catname = [categoryNames objectAtIndex: j];
         catdict = [groupedResults objectForKey: catname];
         catnodes = [catdict objectForKey: @"nodes"];
         catscores = [catdict objectForKey: @"scores"];
@@ -1886,32 +1832,65 @@ enum {
         }
       }              
     }
-    
+
     if (index != NSNotFound) {
       [catnodes removeObjectAtIndex: index];
-      [catscores removeObjectAtIndex: index];      
-    
-      if (CHECKDELEGATE (queryDidUpdateResults:forCategories:)) {        
-        [delegate queryDidUpdateResults: self 
-                          forCategories: [NSArray arrayWithObject: catname]];
-      }      
-    }        
+      [catscores removeObjectAtIndex: index]; 
+      if ([catnames containsObject: catname] == NO) {
+        [catnames addObject: catname];     
+      }
+    }
   }
+  
+  if ((index != NSNotFound) && CHECKDELEGATE (queryDidUpdateResults:forCategories:)) {        
+    [delegate queryDidUpdateResults: self forCategories: catnames];
+  }
+  
+  RELEASE (arp);
 }
 
-- (NSDictionary *)results
-{
-  return results;
-}
+- (void)removeNode:(FSNode *)node
+{  
+  NSString *catname;
+  NSDictionary *catdict;
+  NSMutableArray *catnodes;
+  NSMutableArray *catscores;
+  unsigned index;
 
-- (NSArray *)resultNodes
-{
-  return [results objectForKey: @"nodes"];
-}
+  if ([node isValid]) {
+    catname = [qmanager categoryNameForNode: node];
+    catdict = [groupedResults objectForKey: catname];        
+    catnodes = [catdict objectForKey: @"nodes"];
+    catscores = [catdict objectForKey: @"scores"];
 
-- (unsigned)resultsCount
-{
-  return [[results objectForKey: @"nodes"] count];
+    index = [catnodes indexOfObject: node];
+
+  } else {
+    unsigned i;
+
+    for (i = 0; i < [categoryNames count]; i++) {
+      catname = [categoryNames objectAtIndex: i];
+      catdict = [groupedResults objectForKey: catname];
+      catnodes = [catdict objectForKey: @"nodes"];
+      catscores = [catdict objectForKey: @"scores"];
+
+      index = [catnodes indexOfObject: node];
+
+      if (index != NSNotFound) {
+        break;
+      }
+    }              
+  }
+
+  if (index != NSNotFound) {
+    [catnodes removeObjectAtIndex: index];
+    [catscores removeObjectAtIndex: index];      
+
+    if (CHECKDELEGATE (queryDidUpdateResults:forCategories:)) {        
+      [delegate queryDidUpdateResults: self 
+                        forCategories: [NSArray arrayWithObject: catname]];
+    }      
+  }  
 }
 
 - (NSDictionary *)groupedResults

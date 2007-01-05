@@ -29,12 +29,14 @@
 #include <AppKit/NSView.h>
 
 @class MDKQuery;
+@class MDKTextContentEditor;
 @class MDKResultsCategory;
 @class MDKAttribute;
 @class MDKAttributeView;
 @class MDKAttributeChooser;
 @class NSBox;
 @class NSPopUpButton;
+@class NSWindow;
 @class ProgrView;
 @class NSTextField;
 @class NSButton;
@@ -43,9 +45,12 @@
 @class MDKTableView;
 @class NSImage;
 @class FSNodeRep;
+@class FSNPathComponentsViewer;
 
 @interface MDKWindow: NSObject 
 {
+  id delegate;
+  
   NSMutableArray *attributes;
   NSMutableArray *attrViews;
   MDKAttributeChooser *chooser;
@@ -58,7 +63,8 @@
   IBOutlet NSBox *controlsBox;
   IBOutlet NSPopUpButton *placesPopUp;
   NSImage *onImage;
-  IBOutlet ProgrView *progView;
+  IBOutlet ProgrView *progView;  
+  IBOutlet NSButton *caseSensButt;  
   IBOutlet NSTextField *searchField;
   IBOutlet NSButton *startSearchButt;
   IBOutlet NSButton *stopSearchButt;
@@ -71,19 +77,22 @@
   NSTableColumn *nameColumn;
   NSTableColumn *attrColumn;  
   IBOutlet NSBox *pathBox;
+  FSNPathComponentsViewer *pathViewer;
   
   FSNodeRep *fsnodeRep;
   NSFileManager *fm;
   NSNotificationCenter *nc;
   NSNotificationCenter *dnc;
-
+  
+  BOOL closing;
+  
   //
   // queries
   //
   BOOL loadingAttributes;  
-  NSMutableCharacterSet *skipSet;  
-  NSArray *textContentWords;
   NSMutableArray *queryEditors;
+  NSMutableArray *searchPaths;
+  MDKTextContentEditor *textContentEditor;
   MDKQuery *currentQuery;
   NSArray *categoryNames;
   NSMutableDictionary *resultCategories;
@@ -92,21 +101,17 @@
   int globalCount;
 }
 
-- (void)loadAttributes;
+- (id)initWithDelegate:(id)adelegate
+            windowRect:(NSRect)wrect
+             savedInfo:(NSDictionary *)info;
 
-- (void)setupInterface;
+- (void)loadAttributes:(NSDictionary *)info;
 
-- (void)insertSavedSearchPlaces;
-
-- (NSArray *)searchPlaces;
+- (void)prepareInterface;
 
 - (void)setSearcheablePaths;
 
 - (void)searcheablePathsDidChange:(NSNotification *)notif;
-
-- (NSDictionary *)lastUsedAttributes;
-
-- (NSDictionary *)orderedAttributeNames;
 
 - (NSArray *)attributes;
 
@@ -114,12 +119,7 @@
 
 - (MDKAttribute *)firstUnusedAttribute;
 
-- (BOOL)isUsedAttributeWithName:(NSString *)name;
-
 - (MDKAttribute *)attributeWithName:(NSString *)name;
-
-- (MDKAttribute *)attributeWithName:(NSString *)name
-                            inArray:(NSArray *)attrarray;
 
 - (MDKAttribute *)attributeWithMenuName:(NSString *)mname;
 
@@ -130,22 +130,17 @@
 - (void)attributeView:(MDKAttributeView *)view 
     changeAttributeTo:(NSString *)menuname;
 
-- (unsigned)indexOfAttributeView:(MDKAttributeView *)view;
-
-
-
-
-
-
-
-
-
+- (NSDictionary *)statusInfo;
 
 - (void)activate;
 
 - (void)tile;
 
+- (NSWindow *)window;
+
 - (IBAction)placesPopUpdAction:(id)sender;
+
+- (IBAction)caseSensButtAction:(id)sender;
 
 - (IBAction)startSearchButtAction:(id)sender;
 
@@ -162,11 +157,9 @@
 
 @interface MDKWindow (queries)
 
-- (void)setupQueries;
+- (void)prepareQueries:(NSDictionary *)info;
 
-- (void)setupResults;
-
-- (void)controlTextDidChange:(NSNotification *)notif;
+- (void)prepareResults;
 
 - (void)editorStateDidChange:(NSNotification *)notif;
 
@@ -189,9 +182,13 @@
 
 - (IBAction)stopSearchButtAction:(id)sender;
 
+- (void)stopCurrentQuery;
+
 - (void)updateElementsLabel:(int)n;
 
 - (void)queryCategoriesDidChange:(NSNotification *)notif;
+
+- (MDKQuery *)currentQuery;
 
 @end
 
@@ -202,6 +199,8 @@
                 removeSubviews:(BOOL)remove;
 
 - (void)doubleClickOnResultsView:(id)sender;
+
+- (NSArray *)selectedObjects;
 
 - (NSImage *)tableView:(NSTableView *)tableView 
       dragImageForRows:(NSArray *)dragRows;
@@ -222,6 +221,13 @@
 - (void)stop;
 
 - (void)animate:(id)sender;
+
+@end
+
+
+@interface NSObject (MDKWindowDelegate)
+
+- (void)mdkwindowWillClose:(MDKWindow *)window;
 
 @end
 

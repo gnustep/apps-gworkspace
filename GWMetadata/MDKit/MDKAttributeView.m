@@ -209,13 +209,6 @@ static NSString *nibName = @"MDKAttributeView";
   
   if (attribute) {
     MDKAttribute *attr = [mdkwindow attributeWithMenuName: title];
-    unsigned index = [mdkwindow indexOfAttributeView: self];
-      
-    if ((index == 0) && [attr isFsattribute]) {
-      if ([[mdkwindow attributeWithName: @"GSMDItemTextContent"] inUse] == NO) {  
-        return NO;
-      }
-    }
     
     if ([usedAttributesNames containsObject: [attr name]]) {
       return NO;

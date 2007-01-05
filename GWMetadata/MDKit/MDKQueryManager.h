@@ -78,6 +78,9 @@
 
 - (NSString *)categoryNameForNode:(FSNode *)node;
 
+- (BOOL)filterNode:(FSNode *)node
+     withFSFilters:(NSArray *)filters;
+
 @end
 
 #endif // MDK_QUERY_MANAGER_H

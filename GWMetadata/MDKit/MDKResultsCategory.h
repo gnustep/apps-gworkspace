@@ -83,13 +83,7 @@
 
 - (int)globalCount;
 
-- (void)setShowFooter:(BOOL)value;
-
 - (BOOL)showFooter;
-
-- (BOOL)isClosed;
-
-- (BOOL)isShowingAll;
 
 - (void)setPrev:(MDKResultsCategory *)cat;
 

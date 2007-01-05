@@ -88,16 +88,13 @@ static NSImage *whiteArrowDown = nil;
   self = [super init];
   
   if (self) {
-    NSRect r;
-    
     if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
       NSLog(@"failed to load %@!", nibName);
       DESTROY (self);
       return self;
     }  
     
-    r = [headBox frame];
-    headView = [[ControlsView alloc] initWithFrame: r];
+    headView = [[ControlsView alloc] initWithFrame: [headBox frame]];
     [headView setColor: [NSColor disabledControlTextColor]];    
     [openCloseButt setImage: whiteArrowDown];
     [headView addSubview: openCloseButt];
@@ -105,8 +102,7 @@ static NSImage *whiteArrowDown = nil;
     [headView addSubview: nameLabel];
     [headView addSubview: topFiveHeadButt];
 
-    r = [footBox frame];
-    footView = [[ControlsView alloc] initWithFrame: r];
+    footView = [[ControlsView alloc] initWithFrame: [footBox frame]];
     [footView setColor: [NSColor controlBackgroundColor]];
     [footView addSubview: topFiveFootButt];
 
@@ -194,7 +190,8 @@ static NSImage *whiteArrowDown = nil;
   if (prev == nil) {
     range.location = 0;    
   } else {
-    NSRange pr = [prev range];        
+    NSRange pr = [prev range];  
+          
     range.location = (pr.location + pr.length);    
     globcount += [prev globalCount];
   } 
@@ -239,24 +236,9 @@ static NSImage *whiteArrowDown = nil;
   return globcount;
 }
 
-- (void)setShowFooter:(BOOL)value
-{
-  showFooter = value;
-}
-
 - (BOOL)showFooter
 {
   return showFooter;
-}
-
-- (BOOL)isClosed
-{
-  return closed;
-}
-
-- (BOOL)isShowingAll
-{
-  return showall;
 }
 
 - (void)setPrev:(MDKResultsCategory *)cat

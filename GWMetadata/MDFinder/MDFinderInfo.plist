@@ -1,0 +1,8 @@
+{
+    NSIcon = "MDFinder.tiff";
+    NSRole = "NSNone";
+    ApplicationDescription = "MDFinder";
+    ApplicationIcon = "MDFinder.tiff";
+    ApplicationName = "MDFinder";
+    ApplicationRelease = "0.1";
+}

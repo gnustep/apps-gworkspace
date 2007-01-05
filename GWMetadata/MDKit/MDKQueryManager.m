@@ -24,7 +24,13 @@
 
 #include <AppKit/AppKit.h>
 #include "MDKQueryManager.h"
+#include "MDKFSFilter.h"
 #include "FSNode.h"
+#include "config.h"
+
+#define GWDebugLog(format, args...) \
+  do { if (GW_DEBUG_LOG) \
+    NSLog(format , ## args); } while (0)
 
 static MDKQueryManager *queryManager = nil;
 
@@ -175,9 +181,9 @@ static MDKQueryManager *queryManager = nil;
     
   if (query) {
     if ([query isUpdating]) {    
-      NSLog(@"REMOVING UPDATING QUERY %i", [queries count]);
+      GWDebugLog(@"REMOVING UPDATING QUERY %i", [queries count]);
     } else {    
-      NSLog(@"REMOVING SIMPLE QUERY %i", [queries count]);
+      GWDebugLog(@"REMOVING SIMPLE QUERY %i", [queries count]);
     }
 
     if ([query isUpdating]) {
@@ -197,7 +203,7 @@ static MDKQueryManager *queryManager = nil;
       } else {
         [query updatingStarted];
         
-        NSLog(@"PERFORMING UPDATE (2) %i", [queries count]);
+        GWDebugLog(@"PERFORMING UPDATE (2) %i", [queries count]);
         
         [gmds performQuery: [query sqlUpdatesDescription]];
       }
@@ -323,7 +329,7 @@ static MDKQueryManager *queryManager = nil;
       if ([queries containsObject: query] == NO) {
         [queries addObject: query];
     
-        NSLog(@"INSERTING UPDATING QUERY %i", [queries count]);
+        GWDebugLog(@"INSERTING UPDATING QUERY %i", [queries count]);
       }
       
     } else {
@@ -336,7 +342,7 @@ static MDKQueryManager *queryManager = nil;
   if (count && (count == [queries count])) {  
     MDKQuery *query = [queries lastObject];
     
-    NSLog(@"PERFORMING UPDATE (1) %i", [queries count]);
+    GWDebugLog(@"PERFORMING UPDATE (1) %i", [queries count]);
     
     [query updatingStarted];
     [gmds performQuery: [query sqlUpdatesDescription]];
@@ -394,6 +400,20 @@ static NSArray *musicExtensions(void)
   return extensions;
 }
 
+static NSArray *sourceExtensions(void)
+{
+  static NSArray *extensions = nil;
+
+  if (extensions == nil) {
+    extensions = [[NSArray alloc] initWithObjects: @"asm", @"c", @"class", 
+                          @"cpp", @"cxx", @"cc", @"c++", @"h", @"hpp", 
+                          @"hxx", @"java", @"jar", @"m", @"mm", @"pl", 
+                          @"py", @"y", @"yxx", nil];
+  }
+
+  return extensions;
+}
+
 - (NSString *)categoryNameForNode:(FSNode *)node
 {
   NSString *category = nil;
@@ -408,6 +428,8 @@ static NSArray *musicExtensions(void)
     if (ext && [ext length]) {
       if ([ext isEqual: @"pdf"]) {
         category = @"pdfdocs";
+      } else if ([sourceExtensions() containsObject: ext]) {
+        category = @"sources";      
       } else if ([imageExtensions() containsObject: ext]) {
         category = @"images";      
       } else if ([movieExtensions() containsObject: ext]) {
@@ -429,4 +451,28 @@ static NSArray *musicExtensions(void)
   return category;
 }
 
+- (BOOL)filterNode:(FSNode *)node
+     withFSFilters:(NSArray *)filters
+{
+  int i;
+  
+  for (i = 0; i < [filters count]; i++) {
+    if ([[filters objectAtIndex: i] filterNode: node] == NO) {
+      return NO;
+    }
+  }
+    
+  return YES;
+}
+
 @end
+
+
+
+
+
+
+
+
+
+
