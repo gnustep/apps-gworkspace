@@ -47,8 +47,6 @@
   NSMutableArray *usedAttributesNames;
   
   NSString *otherstr;
-  
-  NSNotificationCenter *nc;
 }
 
 - (id)initInWindow:(MDKWindow *)awindow;

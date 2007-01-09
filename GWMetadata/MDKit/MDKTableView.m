@@ -84,6 +84,23 @@
   [super setFrame: rect];
 }
 
+- (void)keyDown:(NSEvent *)theEvent
+{
+	NSString *characters = [theEvent characters];
+	unichar character = 0;
+
+  if ([characters length] > 0) {
+		character = [characters characterAtIndex: 0];
+	}
+
+  if (character == NSCarriageReturnCharacter) {    
+    [self sendAction: [self doubleAction] to: [self target]];
+    return;
+  }      
+  
+  [super keyDown: theEvent];
+}
+
 @end
 
 

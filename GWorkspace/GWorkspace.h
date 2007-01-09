@@ -421,6 +421,13 @@
 @end
 
 
+@interface GWorkspace (SharedInspector)
+
+- (oneway void)showExternalSelection:(NSArray *)selection;
+
+@end
+
+
 @interface GWorkspace (WorkspaceApplication)
 
 - (BOOL)performFileOperation:(NSString *)operation 

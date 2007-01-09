@@ -238,9 +238,9 @@ static MDKQueryManager *queryManager = nil;
   return tableNumber++;
 }
 
-- (NSNumber *)queryNumber
+- (unsigned long)queryNumber
 {
-  return [NSNumber numberWithUnsignedLong: queryNumber++];  
+  return queryNumber++;  
 }
 
 - (void)connectGMDs

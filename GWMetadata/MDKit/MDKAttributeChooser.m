@@ -87,7 +87,8 @@ static NSString *nibName = @"MDKAttributeChooser";
     
     for (i = 0; i < [names count]; i++) {
       NSDictionary *info = [attrdict objectForKey: [names objectAtIndex: i]];
-      MDKAttribute *attribute = [[MDKAttribute alloc] initWithAttributeInfo: info];
+      MDKAttribute *attribute = [[MDKAttribute alloc] initWithAttributeInfo: info
+                                                                  forWindow: mdkwindow];
       NSString *menuname = [attribute menuName];
       unsigned count = [[menuNamesMatrix cells] count];
       

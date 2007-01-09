@@ -41,6 +41,9 @@
 #define DEFAULT_INCR 150
 #define MIN_W_HEIGHT 180
 
+#define OPEN_MAX 10
+
+
 @implementation GWSpatialViewer
 
 - (void)dealloc

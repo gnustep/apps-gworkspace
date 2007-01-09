@@ -1,19 +1,36 @@
+/* main.m
+ *  
+ * Copyright (C) 2007 Free Software Foundation, Inc.
+ *
+ * Author: Enrico Sersale <enrico@fibernet.ro>
+ * Date: January 2007
+ *
+ * This file is part of the GNUstep GWorkspace application
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
+ */
 
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include "MDFinder.h"
-
-void createMenu();
-NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str, 
-														NSString *comm, NSString *sel, NSString *key);
   
 int main(int argc, char **argv, char **env)
 {
 	CREATE_AUTORELEASE_POOL (pool);
 	NSApplication *app = [NSApplication sharedApplication];
-  
-	createMenu();
-	
+  	
   [app setDelegate: [MDFinder mdfinder]];    
 	[app run];
 	RELEASE (pool);
@@ -21,26 +38,3 @@ int main(int argc, char **argv, char **env)
   return 0;
 }
 
-void createMenu()
-{
-  NSMenu *mainMenu;
-
-	// Main
-  mainMenu = AUTORELEASE ([[NSMenu alloc] initWithTitle: @"OpenGLTest"]);
-    	
-	addItemToMenu(mainMenu, @"Show", @"", @"showwin:", @"a");
-	addItemToMenu(mainMenu, @"Activate context help", @"", @"activateContextHelp:", @";");
-	addItemToMenu(mainMenu, @"Quit", @"", @"terminate:", @"q");
-
-	[mainMenu update];
-
-	[[NSApplication sharedApplication] setMainMenu: mainMenu];		
-}
-
-NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str, 
-																NSString *comm, NSString *sel, NSString *key)
-{
-	NSMenuItem *item = [menu addItemWithTitle: NSLocalizedString(str, comm)
-												action: NSSelectorFromString(sel) keyEquivalent: key]; 
-	return item;
-}

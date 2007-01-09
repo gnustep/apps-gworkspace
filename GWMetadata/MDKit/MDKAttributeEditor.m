@@ -26,6 +26,7 @@
 #include <AppKit/AppKit.h>
 #include "MDKAttributeEditor.h"
 #include "MDKAttribute.h"
+#include "MDKWindow.h"
 
 enum {
   B_YES = 0,
@@ -93,6 +94,7 @@ static NSMutableCharacterSet *skipSet = nil;
 }
 
 + (id)editorForAttribute:(MDKAttribute *)attribute
+                inWindow:(MDKWindow *)window
 {
   int type = [attribute type];
   Class edclass;
@@ -118,7 +120,7 @@ static NSMutableCharacterSet *skipSet = nil;
       break;
   }
   
-  editor = [[edclass alloc] initForAttribute: attribute];
+  editor = [[edclass alloc] initForAttribute: attribute inWindow: window];
   
   return TEST_AUTORELEASE (editor);
 }
@@ -134,13 +136,15 @@ static NSMutableCharacterSet *skipSet = nil;
   [super dealloc];
 }
 
-- (id)initForAttribute:(MDKAttribute *)attr          
+- (id)initForAttribute:(MDKAttribute *)attr
+              inWindow:(MDKWindow *)window
 {
   [self subclassResponsibility: _cmd];
   return nil;
 }
 
 - (id)initForAttribute:(MDKAttribute *)attr
+              inWindow:(MDKWindow *)window
                nibName:(NSString *)nibname
 {
   self = [super init];
@@ -162,7 +166,7 @@ static NSMutableCharacterSet *skipSet = nil;
     RELEASE (win);
 
     attribute = attr;
-    
+    mdkwindow = window;
     stateChangeLock = 0;
     
     editorInfo = [NSMutableDictionary new];
@@ -327,9 +331,7 @@ static NSMutableCharacterSet *skipSet = nil;
   stateChangeLock = (stateChangeLock < 0) ? 0 : stateChangeLock;
 
   if (stateChangeLock == 0) {
-    [[NSNotificationCenter defaultCenter]
- 				    postNotificationName: @"MDKAttributeEditorStateDidChange"
-	 								        object: self];
+    [mdkwindow editorStateDidChange: self];
   }
 }
 
@@ -440,8 +442,11 @@ static NSMutableCharacterSet *skipSet = nil;
 }
 
 - (id)initForAttribute:(MDKAttribute *)attr
+              inWindow:(MDKWindow *)window
 {
-  self = [super initForAttribute: attr nibName: @"MDKStringEditor"];
+  self = [super initForAttribute: attr 
+                        inWindow: window
+                         nibName: @"MDKStringEditor"];
   
   if (self) {
     NSBundle *bundle = [NSBundle bundleForClass: [self class]];
@@ -481,7 +486,10 @@ static NSMutableCharacterSet *skipSet = nil;
     NSArray *values = [editorInfo objectForKey: @"values"];
     
     if ([values count]) {
-      [valueField setStringValue: [values objectAtIndex: 0]];
+      NSString *word = [values objectAtIndex: 0];
+      
+      word = [self removeWildcardsFromString: word];
+      [valueField setStringValue: word];
     }
   } else {
     entry = [info objectForKey: @"valmenu_index"];
@@ -642,8 +650,11 @@ static NSMutableCharacterSet *skipSet = nil;
 }
 
 - (id)initForAttribute:(MDKAttribute *)attr
+              inWindow:(MDKWindow *)window
 {
-  self = [super initForAttribute: attr nibName: @"MDKArrayEditor"];
+  self = [super initForAttribute: attr 
+                        inWindow: window
+                         nibName: @"MDKArrayEditor"];
   
   if (self) {
     NSBundle *bundle = [NSBundle bundleForClass: [self class]];
@@ -748,8 +759,11 @@ static NSMutableCharacterSet *skipSet = nil;
 }
 
 - (id)initForAttribute:(MDKAttribute *)attr
+              inWindow:(MDKWindow *)window
 {
-  self = [super initForAttribute: attr nibName: @"MDKNumberEditor"];
+  self = [super initForAttribute: attr 
+                        inWindow: window
+                         nibName: @"MDKNumberEditor"];
   
   if (self) {
     NSNumberFormatter *formatter = [NSNumberFormatter new];
@@ -899,8 +913,11 @@ static NSString *calformat = @"%m %d %Y";
 }
 
 - (id)initForAttribute:(MDKAttribute *)attr
+              inWindow:(MDKWindow *)window
 {
-  self = [super initForAttribute: attr nibName: @"MDKDateEditor"];
+  self = [super initForAttribute: attr 
+                        inWindow: window
+                         nibName: @"MDKDateEditor"];
   
   if (self) {
     NSDateFormatter *formatter;
@@ -1166,6 +1183,7 @@ static NSString *calformat = @"%m %d %Y";
 }
 
 - (id)initWithSearchField:(NSTextField *)field
+                 inWindow:(MDKWindow *)window
 {
   self = [super init];
   
@@ -1175,7 +1193,10 @@ static NSString *calformat = @"%m %d %Y";
     searchField = field;
     [searchField setDelegate: self];
     
+    mdkwindow = window;
+    
     ASSIGN (textContentWords, [NSArray array]);
+    wordsChanged = NO;
     
     skipSet = [NSMutableCharacterSet new];
 
@@ -1205,7 +1226,8 @@ static NSString *calformat = @"%m %d %Y";
 - (void)controlTextDidChange:(NSNotification *)notif
 {
   NSString *str = [searchField stringValue];
-  BOOL newquery = NO;
+
+  wordsChanged = NO;
     
   if ([str length]) {
     CREATE_AUTORELEASE_POOL(arp);
@@ -1230,20 +1252,18 @@ static NSString *calformat = @"%m %d %Y";
 
     if ([words count] && ([words isEqual: textContentWords] == NO)) {
       ASSIGN (textContentWords, words);
-      newquery = YES;
+      wordsChanged = YES;
     }      
     
     RELEASE (arp);
     
   } else {
     ASSIGN (textContentWords, [NSArray array]);
-    newquery = YES;
+    wordsChanged = YES;
   }
 
-  if (newquery) {
-    [[NSNotificationCenter defaultCenter]
- 				    postNotificationName: @"MDKAttributeEditorStateDidChange"
-	 								        object: self];
+  if (wordsChanged) {
+    [mdkwindow editorStateDidChange: self];
   }
 }
 
@@ -1258,9 +1278,11 @@ static NSString *calformat = @"%m %d %Y";
   return textContentWords;
 }
 
+- (BOOL)wordsChanged
+{
+  return wordsChanged;
+}
+
 @end
-
-
-
 
 

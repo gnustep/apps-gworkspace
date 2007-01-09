@@ -56,7 +56,7 @@
 
 - (unsigned long)tableNumber;
 
-- (NSNumber *)queryNumber;
+- (unsigned long)queryNumber;
 
 - (void)connectGMDs;
 

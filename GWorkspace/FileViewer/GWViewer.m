@@ -51,6 +51,9 @@
 #define COLLAPSE_LIMIT 35
 #define MID_LIMIT 110
 
+#define OPEN_MAX 10
+
+
 @implementation GWViewer
 
 - (void)dealloc
@@ -999,12 +1002,26 @@
 {
   if ([[baseNode path] isEqual: [gworkspace trashPath]] == NO) {
     NSArray *selection = [nodeView selectedNodes]; 
-
-    if (selection && [selection count]) {
+    int count = (selection ? [selection count] : 0);
+    
+    if (count) {
       NSMutableArray *dirs = [NSMutableArray array];
       int i;
 
-      for (i = 0; i < [selection count]; i++) {
+      if (count > OPEN_MAX) {
+        NSString *msg1 = NSLocalizedString(@"Are you sure you want to open", @"");
+        NSString *msg2 = NSLocalizedString(@"items?", @"");
+
+        if (NSRunAlertPanel(nil,
+                    [NSString stringWithFormat: @"%@ %i %@", msg1, count, msg2],
+                    NSLocalizedString(@"Cancel", @""),
+                    NSLocalizedString(@"Yes", @""),
+                    nil)) {
+          return;
+        }
+      }
+
+      for (i = 0; i < count; i++) {
         FSNode *node = [selection objectAtIndex: i];
 
         NS_DURING

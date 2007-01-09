@@ -351,7 +351,10 @@ enum {
 {
   self = [super init];
   
-  if (self) {  
+  if (self) {
+    unsigned long memaddr = (unsigned long)self;
+    unsigned long num;
+      
     attribute = nil;
     searchValue = nil;
    
@@ -362,8 +365,11 @@ enum {
     
     ASSIGN (srcTable, @"paths");
     qmanager = [MDKQueryManager queryManager];
-    ASSIGN (destTable, ([NSString stringWithFormat: @"tab_%i", [qmanager tableNumber]]));
-    ASSIGN (queryNumber, [qmanager queryNumber]);
+    num = [qmanager tableNumber] + memaddr;
+    ASSIGN (destTable, ([NSString stringWithFormat: @"tab_%i", num]));
+    
+    num = [qmanager queryNumber] + memaddr;     
+    ASSIGN (queryNumber, [NSNumber numberWithUnsignedLong: num]);
     joinTable = nil;
             
     subqueries = [NSMutableArray new];    

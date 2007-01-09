@@ -32,6 +32,9 @@
 #include "GWorkspace.h"
 #include "GWDesktopManager.h"
 
+#define OPEN_MAX 10
+
+
 static GWViewersManager *vwrsmanager = nil;
 
 @implementation GWViewersManager
@@ -605,9 +608,23 @@ static GWViewersManager *vwrsmanager = nil;
                   closeSender:(BOOL)close
 {
   NSArray *selreps = [[viewer nodeView] selectedReps];
+  int count = [selreps count];
   int i;
     
-  for (i = 0; i < [selreps count]; i++) {
+  if (count > OPEN_MAX) {
+    NSString *msg1 = NSLocalizedString(@"Are you sure you want to open", @"");
+    NSString *msg2 = NSLocalizedString(@"items?", @"");
+
+    if (NSRunAlertPanel(nil,
+                [NSString stringWithFormat: @"%@ %i %@", msg1, count, msg2],
+                NSLocalizedString(@"Cancel", @""),
+                NSLocalizedString(@"Yes", @""),
+                nil)) {
+      return;
+    }
+  }
+    
+  for (i = 0; i < count; i++) {
     FSNode *node = [[selreps objectAtIndex: i] node];
     
     if ([node hasValidPath]) {            

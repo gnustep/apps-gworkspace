@@ -91,8 +91,6 @@ static NSString *nibName = @"MDKAttributeView";
     
     ASSIGN (otherstr, NSLocalizedString(@"Other...", @""));
     [popUp addItemWithTitle: otherstr];
-    
-    nc = [NSNotificationCenter defaultCenter];
   }  
   
   return self;
@@ -112,8 +110,7 @@ static NSString *nibName = @"MDKAttributeView";
     
   if (editor) {
     [editorBox setContentView: [editor editorView]];
-    [nc postNotificationName: @"MDKAttributeEditorStateDidChange" 
-                      object: editor];     
+    [mdkwindow editorStateDidChange: editor];
   } else {
     NSLog(@"Missing editor for attribute %@", [attribute name]);
   }

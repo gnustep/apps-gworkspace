@@ -15,6 +15,7 @@ MDFinder_HAS_RESOURCE_BUNDLE = yes
 
 MDFinder_RESOURCE_FILES = \
     Resources/Images/* \
+    Resources/English.lproj 
 
 MDFinder_LANGUAGES = Resources/English 
 
@@ -24,6 +25,7 @@ MDFinder_OBJC_FILES = main.m \
                   MDFinder.m 
 
 ADDITIONAL_GUI_LIBS += -lMDKit
+ADDITIONAL_GUI_LIBS += -lFSNode
                   				 
 -include GNUmakefile.preamble
 

@@ -345,63 +345,6 @@
 
 
 
-/*
-- (NSRect)rectForFileOpWindow
-{
-  NSRect scr = [[NSScreen mainScreen] visibleFrame];
-  NSRect wrect = NSZeroRect;
-  int i;  
-
-  #define WMARGIN 50
-  #define WSHIFT 50
-
-  scr.origin.x += WMARGIN;
-  scr.origin.y += WMARGIN;
-  scr.size.width -= (WMARGIN * 2);
-  scr.size.height -= (WMARGIN * 2);
-
-	for (i = [fileOperations count] - 1; i >= 0; i--) {
-    FileOpInfo *op = [fileOperations objectAtIndex: i];
-
-    if ([op win]) {
-      NSRect wr = [op winRect];
-
-      if (NSEqualRects(wr, NSZeroRect) == NO) {
-        wrect = NSMakeRect(wr.origin.x + WSHIFT, 
-                           wr.origin.y - wr.size.height - WSHIFT,
-                           wr.size.width,
-                           wr.size.height);
-
-        if (NSContainsRect(scr, wrect) == NO) {
-          wrect = NSMakeRect(scr.origin.x, 
-                             scr.size.height - wr.size.height,
-                             wr.size.width, 
-                             wr.size.height);
-          break;
-        }
-      }
-    }
-  }
-
-  return wrect;
-}
-
-
-- (void)windowDidBecomeKey:(NSNotification *)aNotification
-{
-  NSArray *selection = [nodeView selectedPaths];  
-    
-  [vwrwin makeFirstResponder: nodeView];  
-
-  if ([selection count] == 0) {
-    selection = [NSArray arrayWithObject: [[nodeView shownNode] path]];
-  }
-
-  [self selectionChanged: selection];
-  [manager changeHistoryOwner: self];
-}
-
-*/
 
 
 

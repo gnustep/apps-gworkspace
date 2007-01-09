@@ -26,6 +26,7 @@
 #include <AppKit/AppKit.h>
 #include "MDKAttribute.h"
 #include "MDKAttributeEditor.h"
+#include "MDKWindow.h"
 #include "MDKQuery.h"
 
 @implementation MDKAttribute
@@ -44,6 +45,7 @@
 }
 
 - (id)initWithAttributeInfo:(NSDictionary *)info
+                  forWindow:(MDKWindow *)win
 {
   self = [super init];
 
@@ -76,6 +78,7 @@
     
     ASSIGN (editorInfo, [info objectForKey: @"editor"]);
     
+    window = win;
     editor = nil;    
     inuse = NO;
   }
@@ -167,7 +170,8 @@
 - (id)editor
 {
   if (editor == nil) {
-    ASSIGN (editor, [MDKAttributeEditor editorForAttribute: self]);
+    ASSIGN (editor, [MDKAttributeEditor editorForAttribute: self 
+                                                  inWindow: window]);
   }
 
   return editor;

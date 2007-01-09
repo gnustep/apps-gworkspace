@@ -1,8 +1,19 @@
 {
     NSIcon = "MDFinder.tiff";
-    NSRole = "NSNone";
+    NSRole = "Editor";
     ApplicationDescription = "MDFinder";
     ApplicationIcon = "MDFinder.tiff";
     ApplicationName = "MDFinder";
-    ApplicationRelease = "0.1";
+    ApplicationRelease = "1.0";
+    Authors = (
+      "Enrico Sersale <enrico\@fibernet.ro>"
+    );
+    Copyright = "Copyright (C) 2007 Free Software Foundation, Inc.";
+    CopyrightDescription = "Released under the GNU General Public License 2.0";
+  NSTypes = (
+      {
+        NSUnixExtensions = ( "mdss" );
+        NSIcon = "SavedSearch.tiff";
+      }        
+  );    
 }

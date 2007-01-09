@@ -28,6 +28,7 @@
 #include <Foundation/Foundation.h>
 
 @class FSNode;
+@class MDKQueryManager;
 
 enum {
   STRING,
@@ -99,7 +100,7 @@ typedef enum _MDKCompoundOperator
   BOOL reportRawResults;
   unsigned int status;    
   
-  id qmanager;
+  MDKQueryManager *qmanager;
   id delegate;
 }
 

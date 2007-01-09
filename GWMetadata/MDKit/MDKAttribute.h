@@ -27,6 +27,8 @@
 
 #include <Foundation/Foundation.h>
 
+@class MDKWindow;
+
 @interface MDKAttribute : NSObject 
 {
   NSString *name;
@@ -45,9 +47,11 @@
   NSDictionary *editorInfo;  
   BOOL inuse;  
   id editor;
+  id window;
 }
 
-- (id)initWithAttributeInfo:(NSDictionary *)info;
+- (id)initWithAttributeInfo:(NSDictionary *)info
+                  forWindow:(MDKWindow *)win;
 
 - (BOOL)inUse;
 

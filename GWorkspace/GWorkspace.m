@@ -71,6 +71,9 @@ static GWorkspace *gworkspace = nil;
   #define TSHF_MAXF 999
 #endif
 
+#define OPEN_MAX 10
+
+
 + (void)initialize
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -528,6 +531,11 @@ static GWorkspace *gworkspace = nil;
                 					object: nil];
   
   [self initializeWorkspace]; 
+}
+
+- (void)applicationDidBecomeActive:(NSNotification *)aNotification
+{
+  [self resetSelectedPaths];
 }
 
 - (BOOL)applicationShouldTerminate:(NSApplication *)app 
@@ -1139,11 +1147,25 @@ static GWorkspace *gworkspace = nil;
 
 - (void)openSelectedPaths:(NSArray *)paths newViewer:(BOOL)newv
 {
+  int count = [paths count];
   int i;
   
   [self setSelectedPaths: paths];      
+
+  if (count > OPEN_MAX) {
+    NSString *msg1 = NSLocalizedString(@"Are you sure you want to open", @"");
+    NSString *msg2 = NSLocalizedString(@"items?", @"");
   
-  for (i = 0; i < [paths count]; i++) {
+    if (NSRunAlertPanel(nil,
+                [NSString stringWithFormat: @"%@ %i %@", msg1, count, msg2],
+                NSLocalizedString(@"Cancel", @""),
+                NSLocalizedString(@"Yes", @""),
+                nil)) {
+      return;
+    }
+  }
+  
+  for (i = 0; i < count; i++) {
     NSString *apath = [paths objectAtIndex: i];
     
     if ([fm fileExistsAtPath: apath]) {
@@ -1774,7 +1796,7 @@ static GWorkspace *gworkspace = nil;
       }
     
       RETAIN (recyclerApp);
-      [ddbd setProtocolForProxy: @protocol(RecyclerAppProtocol)];
+      [recyclerApp setProtocolForProxy: @protocol(RecyclerAppProtocol)];
     
 	    [[NSNotificationCenter defaultCenter] addObserver: self
 	                   selector: @selector(recyclerConnectionDidDie:)
@@ -2434,11 +2456,25 @@ static GWorkspace *gworkspace = nil;
 - (void)openSelectionWithApp:(id)sender
 {
   NSString *appName = (NSString *)[(NSMenuItem *)sender representedObject];
-    
-  if (selectedPaths && [selectedPaths count]) {
+  int count = (selectedPaths ? [selectedPaths count] : 0);
+  
+  if (count) {
     int i;
-    
-    for (i = 0; i < [selectedPaths count]; i++) {
+
+    if (count > OPEN_MAX) {
+      NSString *msg1 = NSLocalizedString(@"Are you sure you want to open", @"");
+      NSString *msg2 = NSLocalizedString(@"items?", @"");
+
+      if (NSRunAlertPanel(nil,
+                  [NSString stringWithFormat: @"%@ %i %@", msg1, count, msg2],
+                  NSLocalizedString(@"Cancel", @""),
+                  NSLocalizedString(@"Yes", @""),
+                  nil)) {
+        return;
+      }
+    }
+
+    for (i = 0; i < count; i++) {
       NSString *path = [selectedPaths objectAtIndex: i];
     
       NS_DURING
@@ -2583,4 +2619,24 @@ static GWorkspace *gworkspace = nil;
 }
 
 @end
+
+
+@implementation GWorkspace (SharedInspector)
+
+- (oneway void)showExternalSelection:(NSArray *)selection
+{
+  if ([[inspector win] isVisible] == NO) {
+    [self showContentsInspector: nil];    
+  }  
+  
+  if (selection) {
+    [inspector setCurrentSelection: selection];
+  } else {
+    [self resetSelectedPaths];
+  }
+}
+
+@end
+
+
 

@@ -29,6 +29,7 @@
 #include "MDKQuery.h"
 
 @class MDKAttribute;
+@class MDKWindow;
 @class MDKStringEditor;
 @class NSBox;
 @class NSTextField;
@@ -56,13 +57,18 @@
   NSMutableDictionary *editorInfo;
   
   int stateChangeLock;
+  
+  id mdkwindow;
 }
 
-+ (id)editorForAttribute:(MDKAttribute *)attribute;
-
-- (id)initForAttribute:(MDKAttribute *)attr;
++ (id)editorForAttribute:(MDKAttribute *)attribute
+                inWindow:(MDKWindow *)window;
 
 - (id)initForAttribute:(MDKAttribute *)attr
+              inWindow:(MDKWindow *)window;
+
+- (id)initForAttribute:(MDKAttribute *)attr
+              inWindow:(MDKWindow *)window
                nibName:(NSString *)nibname;
 
 - (void)setDefaultValues:(NSDictionary *)info;
@@ -142,14 +148,19 @@
 {
   NSTextField *searchField;
   NSArray *textContentWords;
+  BOOL wordsChanged;
   NSMutableCharacterSet *skipSet;  
+  id mdkwindow;
 }
 
-- (id)initWithSearchField:(NSTextField *)field;
+- (id)initWithSearchField:(NSTextField *)field
+                 inWindow:(MDKWindow *)window;
 
 - (void)setTextContentWords:(NSArray *)words;
 
 - (NSArray *)textContentWords;
+
+- (BOOL)wordsChanged;
 
 @end
 

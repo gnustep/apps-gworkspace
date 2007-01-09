@@ -44,6 +44,7 @@
 #define WORD_MIN 3
 #define CELLS_HEIGHT (28.0)
 #define ICNSIZE 24
+#define OPEN_MAX 10
 
 BOOL isDotFile(NSString *path);
 NSString *pathSeparator(void);
@@ -75,38 +76,52 @@ static NSString *nibName = @"MDKWindow";
 {
   [dnc removeObserver: self];
   
-  RELEASE (win);
-  RELEASE (attributes);
-  RELEASE (attrViews);
-  TEST_RELEASE (chooser);
-  RELEASE (onImage);
-  freeTree(includePathsTree);
-  freeTree(excludedPathsTree);
-  RELEASE (excludedSuffixes);
-  RELEASE (queryEditors);
-  RELEASE (searchPaths);
-  RELEASE (textContentEditor);
-  RELEASE (currentQuery);
-  RELEASE (categoryNames);
-  RELEASE (resultCategories);
+  DESTROY (win);
+  DESTROY (attributes);
+  DESTROY (attrViews);
+  DESTROY (chooser);
+  DESTROY (onImage);
+  if (includePathsTree != NULL) {
+    freeTree(includePathsTree);
+    freeTree(excludedPathsTree);
+  }
+  DESTROY (excludedSuffixes);
+  DESTROY (queryEditors);
+  DESTROY (searchPaths);
+  DESTROY (textContentEditor);
+  DESTROY (currentQuery);
+  DESTROY (categoryNames);
+  DESTROY (resultCategories);
+  DESTROY (savepath);
   
 	[super dealloc];
 }
 
-- (id)initWithDelegate:(id)adelegate
-            windowRect:(NSRect)wrect
-             savedInfo:(NSDictionary *)info
+- (id)initWithContentsOfFile:(NSString *)path
+                  windowRect:(NSRect)wrect
+                    delegate:(id)adelegate
 {
   self = [super init];
 
   if (self) {
+    NSDictionary *info = nil;
+        
+    if (path) {    
+      info = [self savedInfoAtPath: path];
+    
+      if (info == nil) {
+        DESTROY (self);
+        return self;
+      }            
+    } 
+    
     if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
       NSLog(@"failed to load %@!", nibName);
       DESTROY (self);
       return self;
     }  
     
-    delegate = adelegate;
+    delegate = adelegate;    
     
     if (info) {
       NSString *str = [info objectForKey: @"window_frame"];
@@ -123,6 +138,12 @@ static NSString *nibName = @"MDKWindow";
       } else {
         [win setFrameUsingName: @"mdkwindow"];
       }
+    }
+    
+    if (path) {
+      [self setSavePath: path];
+    } else {
+      [win setTitle: NSLocalizedString(@"Untitled", @"")];
     }
     
     fm = [NSFileManager defaultManager];
@@ -150,6 +171,7 @@ static NSString *nibName = @"MDKWindow";
     
     chooser = nil;
     closing = NO;
+    [self setSaved: YES];
     
     if (info) {
       NSNumber *num = [info objectForKey: @"attributes_visible"];
@@ -164,6 +186,28 @@ static NSString *nibName = @"MDKWindow";
   }
   
   return self;
+}
+
+- (NSDictionary *)savedInfoAtPath:(NSString *)path
+{
+  NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: path];
+  id entry;
+  
+#define CHECK_ENTRY(e, c) do { \
+  if (dict) { \
+    entry = [dict objectForKey: e]; \
+    if ((entry == nil) || ([entry isKindOfClass: c] == NO)) dict = nil; \
+  } \
+} while (0)
+  
+  if (dict) {
+    CHECK_ENTRY (@"editors", [NSArray class]);
+    CHECK_ENTRY (@"text_content_words", [NSArray class]);
+    CHECK_ENTRY (@"window_frame", [NSString class]);
+    CHECK_ENTRY (@"search_places", [NSArray class]);
+  }
+  
+  return dict;
 }
 
 - (void)loadAttributes:(NSDictionary *)info
@@ -184,7 +228,8 @@ static NSString *nibName = @"MDKWindow";
   for (i = 0; i < [attrnames count]; i++) {
     NSDictionary *attrinfo = [attrdict objectForKey: [attrnames objectAtIndex: i]];
     
-    attribute = [[MDKAttribute alloc] initWithAttributeInfo: attrinfo];
+    attribute = [[MDKAttribute alloc] initWithAttributeInfo: attrinfo
+                                                  forWindow: self];
     [attributes addObject: attribute];
     RELEASE (attribute);
   }
@@ -302,7 +347,7 @@ static NSString *nibName = @"MDKWindow";
   [resultsView setAllowsColumnReordering: NO];
   [resultsView setAllowsColumnResizing: NO];
   [resultsView setAllowsEmptySelection: YES];
-  [resultsView setAllowsMultipleSelection: NO];
+  [resultsView setAllowsMultipleSelection: YES];
   [resultsView setRowHeight: CELLS_HEIGHT];
   [resultsView setIntercellSpacing: NSZeroSize];
   [resultsView setAutoresizesAllColumnsToFit: YES];
@@ -548,8 +593,7 @@ static NSString *nibName = @"MDKWindow";
     
     [self tile];
     
-    [nc postNotificationName: @"MDKAttributeEditorStateDidChange" 
-                      object: [attribute editor]];
+    [self editorStateDidChange: [attribute editor]];
   }
 }
 
@@ -563,8 +607,7 @@ static NSString *nibName = @"MDKWindow";
     unsigned i;
 
     [oldattribute setInUse: NO];    
-    [nc postNotificationName: @"MDKAttributeEditorStateDidChange" 
-                      object: [oldattribute editor]];    
+    [self editorStateDidChange: [oldattribute editor]];                     
     [attribute setInUse: YES];
     [view setAttribute: attribute];
     /* notification sent by MDKAttributeView */
@@ -573,6 +616,12 @@ static NSString *nibName = @"MDKWindow";
       [[attrViews objectAtIndex: i] updateMenuForAttributes: attributes];
     }    
   }
+}
+
+- (void)activate
+{
+  [win makeKeyAndOrderFront: nil];
+  [self tile];  
 }
 
 - (NSDictionary *)statusInfo
@@ -626,10 +675,26 @@ static NSString *nibName = @"MDKWindow";
   return info;
 }
 
-- (void)activate
+- (void)setSaved:(BOOL)value
 {
-  [win makeKeyAndOrderFront: nil];
-  [self tile];  
+  saved = value;  
+  [saveButt setEnabled: (saved == NO)];
+}
+
+- (BOOL)isSaved
+{
+  return saved;
+}
+
+- (void)setSavePath:(NSString *)path
+{
+  ASSIGN (savepath, path);
+  [win setTitle: [savepath lastPathComponent]];
+}
+
+- (NSString *)savePath
+{
+  return savepath;
 }
 
 #define ATBOXH (30.0)
@@ -734,6 +799,7 @@ static NSString *nibName = @"MDKWindow";
     }    
 
     if (loadingAttributes == NO) {
+      [self setSaved: NO];
       [self startSearchButtAction: startSearchButt];
     }
         
@@ -801,8 +867,7 @@ static NSString *nibName = @"MDKWindow";
 
 - (IBAction)caseSensButtAction:(id)sender
 {
-  [nc postNotificationName: @"MDKAttributeEditorStateDidChange"
-	 								  object: caseSensButt];
+  [self editorStateDidChange: caseSensButt];
 }
 
 - (IBAction)attributesButtAction:(id)sender
@@ -818,13 +883,11 @@ static NSString *nibName = @"MDKWindow";
 
 - (IBAction)saveButtAction:(id)sender
 {
-  NSDictionary *dict = [self statusInfo];
-
-  NSLog([dict description]);
-  
-  [dict writeToFile: @"/root/Desktop/aa.plist" atomically: YES];
-  
-//  NSLog(@"saveButtAction");
+  if (saved == NO) {
+    if (CHECKDELEGATE (saveQuery:)) {
+      [delegate saveQuery: nil];
+    }
+  }
 }
 
 - (void)showAttributeChooser:(MDKAttributeView *)sender
@@ -842,8 +905,7 @@ static NSString *nibName = @"MDKWindow";
     unsigned i;
 
     [oldattribute setInUse: NO];    
-    [nc postNotificationName: @"MDKAttributeEditorStateDidChange" 
-                      object: [oldattribute editor]];        
+    [self editorStateDidChange: [oldattribute editor]];                         
     [attr setInUse: YES];
     [attributes addObject: attr];
     
@@ -893,6 +955,12 @@ static NSString *nibName = @"MDKWindow";
 //
 // NSWindow delegate methods
 //
+- (void)windowDidBecomeKey:(NSNotification *)aNotification
+{
+  if (CHECKDELEGATE (setActiveWindow:)) {
+    [delegate setActiveWindow: self];
+  }
+}
 
 - (void)windowDidResize:(NSNotification *)notif
 {
@@ -903,13 +971,23 @@ static NSString *nibName = @"MDKWindow";
 
 - (BOOL)windowShouldClose:(id)sender
 {
+  BOOL canclose = YES;
+  
   if ([currentQuery isGathering] || [currentQuery waitingStart]) {
     closing = YES;
     [self stopCurrentQuery];        
-    return NO;
+    canclose = NO;
   }
 
-	return YES;
+  if (saved == NO) {
+    canclose = !(NSRunAlertPanel(nil,
+                          NSLocalizedString(@"The query is unsaved", @""),
+                          NSLocalizedString(@"Cancel", @""),
+                          NSLocalizedString(@"Close Anyway", @""),
+                          nil));        
+  }
+    
+	return canclose;
 }
 
 - (void)windowWillClose:(NSNotification *)aNotification
@@ -917,7 +995,10 @@ static NSString *nibName = @"MDKWindow";
   if (currentQuery) {
     [self stopCurrentQuery];  
     [win saveFrameUsingName: @"mdkwindow"];
-    [delegate mdkwindowWillClose: self];
+    
+    if (CHECKDELEGATE (mdkwindowWillClose:)) {
+      [delegate mdkwindowWillClose: self];
+    }
   }
 }
 
@@ -930,16 +1011,11 @@ static NSString *nibName = @"MDKWindow";
 {
   ASSIGN (currentQuery, [MDKQuery query]);
   queryEditors = [NSMutableArray new];
-  textContentEditor = [[MDKTextContentEditor alloc] initWithSearchField: searchField];
-
+  textContentEditor = [[MDKTextContentEditor alloc] initWithSearchField: searchField
+                                                               inWindow: self];
   rowsCount = 0;
   globalCount = 0;
-  
-  [nc addObserver: self
-         selector: @selector(editorStateDidChange:)
-	           name: @"MDKAttributeEditorStateDidChange"
-	         object: nil];
-    
+      
   [dnc addObserver: self
           selector: @selector(queryCategoriesDidChange:)
 	            name: @"MDKQueryCategoriesDidChange"
@@ -1025,22 +1101,18 @@ static NSString *nibName = @"MDKWindow";
   catlist = [resultCategories objectForKey: [categoryNames objectAtIndex: 0]];
 }
 
-- (void)editorStateDidChange:(NSNotification *)notif
+- (void)editorStateDidChange:(id)sender
 {
   if (loadingAttributes == NO) {
-    id sender = [notif object];  
-    NSArray *words = [textContentEditor textContentWords];
     BOOL newquery = NO;
-  
+      
     if (sender == caseSensButt) {
-      if ([words count]) {
+      if ([[textContentEditor textContentWords] count]) {
         newquery = YES;
       }    
 
     } else if (sender == textContentEditor) {      
-      if ([words count] || [queryEditors count]) {
-        newquery = YES;
-      }    
+      newquery = YES;
     
     } else {
       MDKAttribute *attribute = [sender attribute];      
@@ -1064,16 +1136,13 @@ static NSString *nibName = @"MDKWindow";
           [queryEditors removeObject: sender];
           newquery = YES;
         }    
-      }
-      
-      newquery = (([queryEditors count] && newquery) || [words count]);
+      }      
     }
-    
-    if (newquery) {
+        
+    if (newquery) { 
+      [self setSaved: NO];
       [self newQuery];
-    } else {
-      [self stopSearchButtAction: nil];
-    }
+    }    
   }
 }
 
@@ -1359,10 +1428,10 @@ static NSString *nibName = @"MDKWindow";
   NSArray *selected = [self selectedObjects];
 
   [pathViewer showComponentsOfSelection: selected];
-  
-//  if ([selected count]) {
-//    [finder foundSelectionChanged: [FSNode pathsOfNodes: selected]];
-//  }
+
+  if (CHECKDELEGATE (window:didChangeSelection:)) {
+    [delegate window: self didChangeSelection: selected];
+  }
 }
 
 - (void)tableView:(NSTableView *)aTableView 
@@ -1459,9 +1528,23 @@ static NSString *nibName = @"MDKWindow";
 {
   NSWorkspace *ws = [NSWorkspace sharedWorkspace];
   NSArray *selected = [self selectedObjects];
+  int count = [selected count];
   int i;
+
+  if (count > OPEN_MAX) {
+    NSString *msg1 = NSLocalizedString(@"Are you sure you want to open", @"");
+    NSString *msg2 = NSLocalizedString(@"items?", @"");
   
-  for (i = 0; i < [selected count]; i++) {
+    if (NSRunAlertPanel(nil,
+                [NSString stringWithFormat: @"%@ %i %@", msg1, count, msg2],
+                NSLocalizedString(@"Cancel", @""),
+                NSLocalizedString(@"Yes", @""),
+                nil)) {
+      return;
+    }
+  }
+  
+  for (i = 0; i < count; i++) {
     FSNode *nd = [selected objectAtIndex: i];
     
     if ([nd isValid]) {
@@ -1485,6 +1568,19 @@ static NSString *nibName = @"MDKWindow";
   }
 
   return selected; 
+}
+
+- (NSArray *)selectedPaths
+{
+  NSArray *selnodes = [self selectedObjects];
+  NSMutableArray *selpaths = [NSMutableArray array];
+  int i;
+  
+  for (i = 0; i < [selnodes count]; i++) {
+    [selpaths addObject: [[selnodes objectAtIndex: i] path]];
+  }
+
+  return [selpaths makeImmutableCopyOnFail: NO];
 }
 
 - (NSImage *)tableView:(NSTableView *)tableView 

@@ -48,9 +48,7 @@
 @class FSNPathComponentsViewer;
 
 @interface MDKWindow: NSObject 
-{
-  id delegate;
-  
+{  
   NSMutableArray *attributes;
   NSMutableArray *attrViews;
   MDKAttributeChooser *chooser;
@@ -85,6 +83,10 @@
   NSNotificationCenter *dnc;
   
   BOOL closing;
+  BOOL saved;  
+  NSString *savepath;
+  
+  id delegate;
   
   //
   // queries
@@ -101,9 +103,11 @@
   int globalCount;
 }
 
-- (id)initWithDelegate:(id)adelegate
-            windowRect:(NSRect)wrect
-             savedInfo:(NSDictionary *)info;
+- (id)initWithContentsOfFile:(NSString *)path
+                  windowRect:(NSRect)wrect
+                    delegate:(id)adelegate;
+
+- (NSDictionary *)savedInfoAtPath:(NSString *)path;
 
 - (void)loadAttributes:(NSDictionary *)info;
 
@@ -130,9 +134,17 @@
 - (void)attributeView:(MDKAttributeView *)view 
     changeAttributeTo:(NSString *)menuname;
 
+- (void)activate;
+
 - (NSDictionary *)statusInfo;
 
-- (void)activate;
+- (void)setSaved:(BOOL)value;
+
+- (BOOL)isSaved;
+
+- (void)setSavePath:(NSString *)path;
+
+- (NSString *)savePath;
 
 - (void)tile;
 
@@ -161,7 +173,7 @@
 
 - (void)prepareResults;
 
-- (void)editorStateDidChange:(NSNotification *)notif;
+- (void)editorStateDidChange:(id)sender;
 
 - (void)newQuery;
 
@@ -202,6 +214,8 @@
 
 - (NSArray *)selectedObjects;
 
+- (NSArray *)selectedPaths;
+
 - (NSImage *)tableView:(NSTableView *)tableView 
       dragImageForRows:(NSArray *)dragRows;
 
@@ -227,7 +241,14 @@
 
 @interface NSObject (MDKWindowDelegate)
 
+- (void)setActiveWindow:(MDKWindow *)window;
+
+- (void)window:(MDKWindow *)window 
+          didChangeSelection:(NSArray *)selection;
+
 - (void)mdkwindowWillClose:(MDKWindow *)window;
+
+- (void)saveQuery:(id)sender;
 
 @end
 
