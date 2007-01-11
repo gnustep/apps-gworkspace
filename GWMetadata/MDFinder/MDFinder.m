@@ -25,7 +25,6 @@
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include "MDFinder.h"
-#include "MDKit.h"
 #include "MDKWindow.h"
 #include "MDKQuery.h"
 #include "FSNode.h"

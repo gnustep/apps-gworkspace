@@ -224,6 +224,9 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
   int NumDirEntries;
   char IndentString[25];
 
+#define SET_IF_EXISTS(v, k) \
+  do { value = v; if (value) [imageInfo setObject: value forKey: k]; } while (0)
+
   if (NestingLevel > 4){
     ErrNonfatal("Maximum directory nesting exceeded (corrupt exif header)", 0,0);
     return;
@@ -259,6 +262,7 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
     unsigned char *ValuePtr;
     int ByteCount;
     unsigned char *DirEntry;
+    id value;
     
     DirEntry = DIR_ENTRY_ADDR(DirStart, de);
 
@@ -325,52 +329,49 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
 
       case TAG_EXIF_VERSION:
         {
-          [imageInfo setObject: removeUnprintables(ValuePtr, ByteCount)
-                        forKey: @"GSMDItemEXIFVersion"];
-          
+          SET_IF_EXISTS (removeUnprintables(ValuePtr, ByteCount),
+                                                   @"GSMDItemEXIFVersion");          
           break;
         }
     
       case TAG_X_RESOLUTION:
         {      
           int xres = (int)ConvertAnyFormat(ValuePtr, Format);
-      
-          [imageInfo setObject: [NSNumber numberWithInt: xres] 
-                        forKey: @"GSMDItemResolutionWidthDPI"];
+
+          SET_IF_EXISTS ([NSNumber numberWithInt: xres], 
+                                    @"GSMDItemResolutionWidthDPI");          
           break;
         }
 
       case TAG_Y_RESOLUTION:
         {      
           int yres = (int)ConvertAnyFormat(ValuePtr, Format);
-      
-          [imageInfo setObject: [NSNumber numberWithInt: yres] 
-                        forKey: @"GSMDItemResolutionHeightDPI"];
+
+          SET_IF_EXISTS ([NSNumber numberWithInt: yres], 
+                                      @"GSMDItemResolutionHeightDPI");          
           break;
         }
         
       case TAG_DOCUMENT_NAME:
-        {
-          [imageInfo setObject: removeUnprintables(ValuePtr, ByteCount)
-                        forKey: @"GSMDItemTitle"];
-          break;
-        }
+        SET_IF_EXISTS (removeUnprintables(ValuePtr, ByteCount),
+                                                      @"GSMDItemTitle");          
+        break;
       
       case TAG_ARTIST:
         {
           NSString *author = removeUnprintables(ValuePtr, ByteCount);
           
-          [imageInfo setObject: [NSArray arrayWithObject: author] 
-                        forKey: @"GSMDItemAuthors"];
+          if (author) {
+            [imageInfo setObject: [NSArray arrayWithObject: author] 
+                          forKey: @"GSMDItemAuthors"];
+          }
           break;
         }
       
       case TAG_COPYRIGHT:
-        {
-          [imageInfo setObject: removeUnprintables(ValuePtr, ByteCount)
-                        forKey: @"GSMDItemCopyright"];
-          break;
-        }
+        SET_IF_EXISTS (removeUnprintables(ValuePtr, ByteCount),
+                                                      @"GSMDItemCopyright");          
+        break;
         
         // TAG_INTER_COLOR_PROFILE
       /*********************************************/
@@ -378,30 +379,31 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
       case TAG_MAKE:
         strncpy(buff, (char *)ValuePtr, ByteCount < 31 ? ByteCount : 31);
         
-        [imageInfo setObject: [NSString stringWithCString: buff]
-                      forKey: @"GSMDItemAcquisitionMake"];
+        SET_IF_EXISTS ([NSString stringWithCString: buff],
+                                            @"GSMDItemAcquisitionMake");          
         break;
 
       case TAG_MODEL:
         strncpy(buff, (char *)ValuePtr, ByteCount < 39 ? ByteCount : 39);
-      
-        [imageInfo setObject: [NSString stringWithCString: buff]
-                      forKey: @"GSMDItemAcquisitionModel"];
+        
+        SET_IF_EXISTS ([NSString stringWithCString: buff],
+                                            @"GSMDItemAcquisitionModel");          
         break;
 
       case TAG_DATETIME_ORIGINAL:
         // If we get a DATETIME_ORIGINAL, we use that one.
         strncpy(buff, (char *)ValuePtr, strlen((char *)ValuePtr) + 1);
         
-        [imageInfo setObject: [NSString stringWithCString: buff]
-                      forKey: @"GSMDItemExposureTimeString"];
+        SET_IF_EXISTS ([NSString stringWithCString: buff],
+                                            @"GSMDItemExposureTimeString");          
 
       case TAG_DATETIME_DIGITIZED:
       case TAG_DATETIME:
         if ([imageInfo objectForKey: @"GSMDItemExposureTimeString"] == nil) {
           strncpy(buff, (char *)ValuePtr, strlen((char *)ValuePtr) + 1);
-          [imageInfo setObject: [NSString stringWithCString: buff]
-                        forKey: @"GSMDItemExposureTimeString"];      
+          
+          SET_IF_EXISTS ([NSString stringWithCString: buff],
+                                            @"GSMDItemExposureTimeString");          
         }
        
         break;
@@ -441,7 +443,12 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
 
           } else {
             strncpy(buff, (char *)ValuePtr + a, 199);
-            comments = [comments stringByAppendingString: [NSString stringWithCString: buff]];
+            
+            value = [NSString stringWithCString: buff];
+            
+            if (value) {
+              comments = [comments stringByAppendingString: value];
+            }
           }
           
           [imageInfo setObject: comments forKey: @"GSMDItemComment"];      
@@ -456,11 +463,11 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
           // Simplest way of expressing aperture, so I trust it the most.
           // (overwrite previously computd value if there is one)
 
-          [imageInfo setObject: [NSNumber numberWithFloat: aperture]
-                        forKey: @"GSMDItemFNumber"];
+          SET_IF_EXISTS ([NSNumber numberWithFloat: aperture], 
+                                                @"GSMDItemFNumber");          
 
-          [imageInfo setObject: [NSNumber numberWithFloat: aperture]
-                        forKey: @"GSMDItemMaxAperture"];
+          SET_IF_EXISTS ([NSNumber numberWithFloat: aperture], 
+                                                @"GSMDItemMaxAperture");          
 
           break;
         }
@@ -469,9 +476,8 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
         {
           float aperture = (float)exp(ConvertAnyFormat(ValuePtr, Format) * log(2) * 0.5);
 
-          [imageInfo setObject: [NSNumber numberWithFloat: aperture]
-                        forKey: @"GSMDItemAperture"];
-
+          SET_IF_EXISTS ([NSNumber numberWithFloat: aperture], 
+                                                @"GSMDItemFNumber");          
           break;
         }
         
@@ -481,9 +487,8 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
           // of how farthey are zoomed in.        
           float flen = (float)ConvertAnyFormat(ValuePtr, Format);
           
-          [imageInfo setObject: [NSNumber numberWithFloat: flen]
-                        forKey: @"GSMDItemFocalLength"];
-
+          SET_IF_EXISTS ([NSNumber numberWithFloat: flen], 
+                                                @"GSMDItemFocalLength");                    
           break;
         }
         
@@ -491,12 +496,9 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
         {
           // Inidcates the distacne the autofocus camera is focused to.
           // Tends to be less accurate as distance increases.
-        
           float distance = (float)ConvertAnyFormat(ValuePtr, Format);
-                              
-          [imageInfo setObject: [NSNumber numberWithFloat: distance]
-                        forKey: @"distance"];
-          
+                    
+          SET_IF_EXISTS ([NSNumber numberWithFloat: distance], @"distance"); 
           break;
         }
         
@@ -506,9 +508,8 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
           // (overwrite previously computd value if there is one)        
           float exptime = (float)ConvertAnyFormat(ValuePtr, Format);
                     
-          [imageInfo setObject: [NSNumber numberWithFloat: exptime]
-                        forKey: @"GSMDItemExposureTimeSeconds"];
-          
+          SET_IF_EXISTS ([NSNumber numberWithFloat: exptime], 
+                                                @"GSMDItemExposureTimeSeconds");                    
           break;
         }
         
@@ -518,8 +519,8 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
         if ([imageInfo objectForKey: @"GSMDItemExposureTimeSeconds"] == nil) {
           float exptime = (float)(1/exp(ConvertAnyFormat(ValuePtr, Format)*log(2)));
 
-          [imageInfo setObject: [NSNumber numberWithFloat: exptime]
-                        forKey: @"GSMDItemExposureTimeSeconds"];        
+          SET_IF_EXISTS ([NSNumber numberWithFloat: exptime], 
+                                                @"GSMDItemExposureTimeSeconds");                    
         }
         
         break;
@@ -532,12 +533,10 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
                       || (flash == 0x49) || (flash == 0x4d) || (flash == 0x4f) 
                       || (flash == 0x59) || (flash == 0x5d) || (flash == 0x5f));
 
-          [imageInfo setObject: [NSNumber numberWithUnsignedInt: flashused]
-                        forKey: @"GSMDItemFlashOnOff"];        
-
-          [imageInfo setObject: [NSNumber numberWithUnsignedInt: redeye]
-                        forKey: @"GSMDItemRedEyeOnOff"];        
-
+          SET_IF_EXISTS ([NSNumber numberWithUnsignedInt: flashused], 
+                                                       @"GSMDItemFlashOnOff");                    
+          SET_IF_EXISTS ([NSNumber numberWithUnsignedInt: redeye], 
+                                                       @"GSMDItemRedEyeOnOff");                    
           break;
         }
         
@@ -550,9 +549,9 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
             orientation = 0;
           }
 
-          [imageInfo setObject: [NSNumber numberWithInt: orientation] 
-                        forKey: @"GSMDItemOrientation"];        
-        }
+          SET_IF_EXISTS ([NSNumber numberWithInt: orientation], 
+                                                       @"GSMDItemOrientation");                    
+       }
         break;
         
       case TAG_EXIF_IMAGELENGTH:
@@ -568,9 +567,8 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
       case TAG_EXPOSURE_BIAS:
         {
           float bias = (float)ConvertAnyFormat(ValuePtr, Format);
-          
-          [imageInfo setObject: [NSNumber numberWithFloat: bias]
-                        forKey: @"exposurebias"];        
+
+          SET_IF_EXISTS ([NSNumber numberWithFloat: bias], @"exposurebias");          
           break;
         }
         
@@ -578,8 +576,7 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
         {
           int balance = (int)ConvertAnyFormat(ValuePtr, Format);
       
-          [imageInfo setObject: [NSNumber numberWithInt: balance]
-                        forKey: @"GSMDItemWhiteBalance"];              
+          SET_IF_EXISTS ([NSNumber numberWithInt: balance], @"GSMDItemWhiteBalance");
           break;
         }
         
@@ -587,8 +584,7 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
         {
           int lsource = (int)ConvertAnyFormat(ValuePtr, Format);
 
-          [imageInfo setObject: [NSNumber numberWithInt: lsource]
-                        forKey: @"lightsource"];                
+          SET_IF_EXISTS ([NSNumber numberWithInt: lsource], @"lightsource");
           break;
         }
         
@@ -660,9 +656,8 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
       case TAG_EXPOSURE_INDEX:
         if ([imageInfo objectForKey: @"GSMDItemISOSpeed"] == nil) {  
           int iso = (int)ConvertAnyFormat(ValuePtr, Format);
-      
-          [imageInfo setObject: [NSNumber numberWithInt: iso]
-                        forKey: @"GSMDItemISOSpeed"];        
+
+          SET_IF_EXISTS ([NSNumber numberWithInt: iso], @"GSMDItemISOSpeed");
         }
 
         break;
@@ -671,8 +666,7 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
         {
           int mode = (int)ConvertAnyFormat(ValuePtr, Format);
 
-          [imageInfo setObject: [NSNumber numberWithInt: mode]
-                        forKey: @"GSMDItemExposureMode"];        
+          SET_IF_EXISTS ([NSNumber numberWithInt: mode], @"GSMDItemExposureMode");
           break;
         }
         
@@ -684,18 +678,16 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
             // Fixes strange encoding on some older digicams.
             isoeq *= 200;
           }
-
-          [imageInfo setObject: [NSNumber numberWithInt: isoeq]
-                        forKey: @"GSMDItemISOSpeed"];        
+          
+          SET_IF_EXISTS ([NSNumber numberWithInt: isoeq], @"GSMDItemISOSpeed");
           break;
         }
         
       case TAG_DIGITALZOOMRATIO:
         {
       //    float zoom = (float)ConvertAnyFormat(ValuePtr, Format);
-          
-       //   [imageInfo setObject: [NSNumber numberWithFloat: zoom]
-       //                 forKey: @"digitalzoomratio"];        
+            
+       //   SET_IF_EXISTS ([NSNumber numberWithFloat: zoom], @"digitalzoomratio");
           break;
         }
         
@@ -741,9 +733,9 @@ static void ProcessExifDir(unsigned char *DirStart, unsigned char *OffsetBase,
           // if its present, use it to compute equivalent focal length instead of 
           // computing it from sensor geometry and actual focal length.        
           unsigned flength = (unsigned)ConvertAnyFormat(ValuePtr, Format);
-        
-          [imageInfo setObject: [NSNumber numberWithUnsignedInt: flength]
-                        forKey: @"focallength35mmequiv"];        
+          
+          SET_IF_EXISTS ([NSNumber numberWithUnsignedInt: flength], 
+                                                    @"focallength35mmequiv");
           break;
         }
     }

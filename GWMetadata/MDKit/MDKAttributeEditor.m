@@ -380,8 +380,13 @@ static NSMutableCharacterSet *skipSet = nil;
       break;
   
     case IS_NOT:
+      type = MDKNotEqualToOperatorType; 
+      break;
+          
     case CONTAINS_NOT:    
-      type = MDKNotEqualToOperatorType;    
+      type = MDKNotEqualToOperatorType; 
+      [editorInfo setObject: [NSNumber numberWithBool: YES] forKey: @"rightwild"];        
+      [editorInfo setObject: [NSNumber numberWithBool: YES] forKey: @"leftwild"];         
       break;
     
     case B_YES:

@@ -1251,7 +1251,7 @@ static NSString *nibName = @"MDKWindow";
     closing = NO;
     [currentQuery startGathering];
   } else {
-    // ????????????????????????????????????????????
+    // 
   }
   
   RELEASE (arp);
@@ -1547,8 +1547,35 @@ static NSString *nibName = @"MDKWindow";
   for (i = 0; i < count; i++) {
     FSNode *nd = [selected objectAtIndex: i];
     
-    if ([nd isValid]) {
-      [ws openFile: [nd path]];
+    if ([nd hasValidPath]) {   
+      NSString *path = [nd path];
+               
+      NS_DURING
+        {
+      if ([nd isDirectory]) {
+        if ([nd isPackage]) {    
+          if ([nd isApplication] == NO) {
+            [ws openFile: path];
+          } else {
+            [ws launchApplication: path];
+          }
+        } else {
+          [ws selectFile: path inFileViewerRootedAtPath: path]; 
+        } 
+      } else if ([nd isPlain]) {        
+        [ws openFile: path];
+      }
+        }
+      NS_HANDLER
+        {
+          NSRunAlertPanel(NSLocalizedString(@"error", @""), 
+              [NSString stringWithFormat: @"%@ %@!", 
+                        NSLocalizedString(@"Can't open ", @""), [nd name]],
+                                            NSLocalizedString(@"OK", @""), 
+                                            nil, 
+                                            nil);                                     
+        }
+      NS_ENDHANDLER      
     }
   }
 }

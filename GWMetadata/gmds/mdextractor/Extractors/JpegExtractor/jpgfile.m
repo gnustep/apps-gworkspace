@@ -10,6 +10,8 @@
 
 // Storage for simplified info extracted from file.
 
+#define SET_IF_EXISTS(v, k) \
+  do { value = v; if (value) [imageInfo setObject: value forKey: k]; } while (0)
 #define MAX_SECTIONS 100
 static Section_t Sections[MAX_SECTIONS];
 static int SectionsRead;
@@ -33,6 +35,7 @@ static void process_COM (const uchar *Data, int length,
 {
   int ch;
   char Comment[MAX_COMMENT+1];
+  id value;
   int nch;
   int a;
 
@@ -56,12 +59,13 @@ static void process_COM (const uchar *Data, int length,
     }
   }
 
-  Comment[nch] = '\0'; // Null terminate
-
-  [imageInfo setObject: [NSString stringWithCString: Comment]
-                forKey: @"GSMDItemComment"];
+  Comment[nch] = '\0'; // Null terminate  
+  SET_IF_EXISTS ([NSString stringWithCString: Comment], @"GSMDItemComment");
 }
 
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// AcquisitionModel 
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  
 //--------------------------------------------------------------------------
 // Process a SOFn marker.  This is useful for the image dimensions
@@ -72,25 +76,17 @@ static void process_SOFn (const uchar *Data, int marker,
   int data_precision = Data[2];
 //  int num_components = Data[7];
 //  BOOL isColor = (num_components >= 3);
-  
-  
-  [imageInfo setObject: [NSNumber numberWithInt: Get16m(Data+3)]
-                forKey: @"GSMDItemPixelHeight"];
-                
-  [imageInfo setObject: [NSNumber numberWithInt: Get16m(Data+5)]
-                forKey: @"GSMDItemPixelWidth"];
+  id value;
     
-//  [imageInfo setObject: [NSNumber numberWithUnsignedInt: isColor]
-//                forKey: @"iscolor"];
+#define SET_IF_EXISTS(v, k) \
+  do { value = v; if (value) [imageInfo setObject: value forKey: k]; } while (0)
   
-//  [imageInfo setObject: [NSNumber numberWithInt: marker]
-//                forKey: @"process"];
-
-  [imageInfo setObject: [NSNumber numberWithInt: data_precision]
-                forKey: @"GSMDItemBitsPerSample"];
-
-//  [imageInfo setObject: [NSNumber numberWithInt: num_components]
-//                forKey: @"colorcomponents"];
+  SET_IF_EXISTS ([NSNumber numberWithInt: Get16m(Data+3)], @"GSMDItemFNumber");
+  SET_IF_EXISTS ([NSNumber numberWithInt: Get16m(Data+5)], @"GSMDItemPixelWidth");
+//  SET_IF_EXISTS ([NSNumber numberWithUnsignedInt: isColor], @"iscolor");
+//  SET_IF_EXISTS ([NSNumber numberWithInt: marker], @"process");
+  SET_IF_EXISTS ([NSNumber numberWithInt: data_precision], @"GSMDItemBitsPerSample");
+//  SET_IF_EXISTS ([NSNumber numberWithInt: num_components], @"colorcomponents");
 }
 
 
