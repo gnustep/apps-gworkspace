@@ -2019,8 +2019,8 @@ static GWorkspace *gworkspace = nil;
   [d setObject: @"GWorkspace" forKey: @"ApplicationName"];
   [d setObject: NSLocalizedString(@"GNUstep Workspace Manager", @"")
       	forKey: @"ApplicationDescription"];
-  [d setObject: @"GWorkspace 0.8.3" forKey: @"ApplicationRelease"];
-  [d setObject: @"08 2006" forKey: @"FullVersionID"];
+  [d setObject: @"GWorkspace 0.8.4" forKey: @"ApplicationRelease"];
+  [d setObject: @"01 2007" forKey: @"FullVersionID"];
   [d setObject: [NSArray arrayWithObjects: 
                     @"Enrico Sersale <enrico@fibernet.ro>",
                     @"Documentation and Help contents by: \n"
@@ -2028,7 +2028,7 @@ static GWorkspace *gworkspace = nil;
                     nil]
         forKey: @"Authors"];
   [d setObject: NSLocalizedString(@"See http://www.gnustep.it/enrico/gworkspace", @"") forKey: @"URL"];
-  [d setObject: @"Copyright (C) 2003, 2004, 2005, 2006 Free Software Foundation, Inc."
+  [d setObject: @"Copyright (C) 2003, 2004, 2005, 2006, 2007 Free Software Foundation, Inc."
         forKey: @"Copyright"];
   [d setObject: NSLocalizedString(@"Released under the GNU General Public License 2.0", @"")
         forKey: @"CopyrightDescription"];

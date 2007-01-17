@@ -1,8 +1,10 @@
 {\rtf1\ansi\ansicpg10000\cocoartf102{\fonttbl\f0\fswiss Helvetica;}
 {\colortbl;\red0\green0\blue0;}
-\f0\fs36\b\pard\tx0\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\ql \uc0 Extracting metadata \uc0 \par
+\cf1\pard\tx0\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\ql\f0\fs24 \uc0 This is a metadata indexing and searching system similar to the various Spotlight, Beagle, etc. All the names actually used (for example for the MDFinder application) must be considered provvisional; I\rquote d need a single name for all the system and some good icons...\par
+\par
+\cf0\fs36\b \uc0 Extracting metadata \par
 \fs24\b0 \uc0 \par
-To be searcheable, the metadata of your files must be \cf0\cf1 \uc0 first \cf0 \uc0 extracted and indexed. \cf0\cf1 \uc0 \par
+To be searcheable, the metadata of your files must be \cf1 \uc0 first \cf0 \uc0 extracted and indexed. \cf0\cf1 \uc0 \par
 \cf0 \uc0 Launch SystemPreferences and click the\b \uc0  Indexing\b0 \uc0  icon. \par
 The \b \uc0 indexable paths\b0 \uc0  view shows the directories that can be indexed; the default values are your home directory and the GNUstep Documentation and Headers directories.  In the \b \uc0 excluded paths\b0 \uc0  view you can add subdirectories of the indexable directories that you don\rquote t want to be indexed.  \par
 Also all the file with a path extension listed in the \b \uc0 excluded suffixes\b0 \uc0  will be excluded by the indexing process.\par
@@ -10,7 +12,7 @@ To begin indexing select the \b \uc0 enable indexing\b0 \uc0   switch and press 
 This will start the \b \uc0 mdextractor\b0 \uc0  daemon, that is, the process that will first extract and then keep updated into the database the metadata contents of your files.  Clicking the \b \uc0 Show status\b0 \uc0  button will show a window where you can see the status of the indexing process.\par
 To extract text contents and other metadata attributes \b \uc0 mdextractor \b0 \uc0 uses a set of extractor bundles that actually understand these kinds of files: Abiword, Application (GNUstep application), Html, Jpeg, OpenOffice (writer),  Pdf, Rtf and Xml. A generic "Text" extractor is provided for the other files (if they \i \uc0 are\i0 \uc0  text files).\par
 \par
-    \cf0{{\NeXTGraphic pref1.tiff \width9600 \height7840} \uc0 \u-4 }\uc0 \par
+     \cf0{{\NeXTGraphic pref1.tiff \width9600 \height7840} \uc0 \u-4 }\uc0 \par
 \fs20\cf1 \uc0 T\cf0 \uc0 he "Paths" tab of the \cf0\cf1 \uc0 SystemPreferences \cf0 \uc0 "Indexing" \cf0\cf1 \uc0 module.\cf0 \uc0 \par
 \cf0\fs24\cf1 \uc0 \par
 The first time you run it, \cf0\b \uc0 mdextractor\cf0\cf1 \uc0  \b0 \uc0 will take some time to extract and index the contents of your files; this time can vary from a few minutes to some hours depending on the number and the size of the files; for example: if you limit the indexable paths to the GNUstep Applications, Headers and Documentation, the indexing time will be only one or two minutes; on the other hand, indexing about 2GB of sources - as I\rquote ve done for testing - needs about two hours.\par
@@ -21,7 +23,7 @@ When the indexing is done, \cf0\b \uc0 mdextractor\cf0\cf1 \uc0  \b0 \uc0 will c
 \par
 \cf0\cf1 \uc0 To perform a new search you must start the \b \uc0 MDFinder\b0 \uc0  application and choose \b \uc0 New \b0 \uc0 from the \b \uc0 File\b0 \uc0  menu.\cf0 \uc0 \par
 \par
-    \cf0{{\NeXTGraphic mdf.tiff \width9600 \height8080} \uc0 \u-4 }\uc0 \par
+     \cf0{{\NeXTGraphic mdf.tiff \width9600 \height8080} \uc0 \u-4 }\uc0 \par
 \fs20\cf1 \uc0 A MDFinder search window.\par
 \cf0\fs24 \uc0 \par
 A search can be saved to a file and loaded again into the \cf0\b\cf1 \uc0 MDFinder \cf0\b0 \uc0 application\cf0\cf1 \uc0 .\par
@@ -29,12 +31,12 @@ A\cf0 \uc0 ll the open windows will be updated automatically when the contents o
 \par
 \cf0\cf1 \uc0 Choosing "\b \uc0 Other..."\b0 \uc0  from any of the attribute popup menues displays the \b \uc0 Attribute Chooser\b0 \uc0  window where you can view a description and select an attribute that is not present in the popup.\cf0 \uc0 \par
 \par
-  \cf0{{\NeXTGraphic attrs.tiff \width8400 \height4900} \uc0 \u-4 }\uc0 \par
+   \cf0{{\NeXTGraphic attrs.tiff \width8400 \height4900} \uc0 \u-4 }\uc0 \par
 \fs20\cf1 \uc0 The Attribute Chooser window.\cf0\fs24 \uc0 \par
 \par
 In the \b \uc0 Search Results\b0 \uc0  tab of the SystemPreferences \b \uc0 Indexing\b0 \uc0  module you can choose the order used to show the results.\par
 \par
-     \cf0{{\NeXTGraphic pref2.tiff \width9600 \height7840} \uc0 \u-4 }\uc0 \par
+      \cf0{{\NeXTGraphic pref2.tiff \width9600 \height7840} \uc0 \u-4 }\uc0 \par
 \fs20\cf1 \uc0 T\cf0 \uc0 he "Search Results" tab of the \cf0\cf1 \uc0 SystemPreferences \cf0 \uc0 "Indexing" \cf0\cf1 \uc0 module.\cf0\fs24 \uc0 \par
 \cf0\cf1 \uc0 \par
 \par
