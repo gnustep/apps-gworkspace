@@ -115,9 +115,8 @@ static NSString *defaultColumns = @"{ \
 
     nameEditor = [FSNListViewNameEditor new];
     [nameEditor setDelegate: self];  
-    [nameEditor setEditable: YES];
-    [nameEditor setSelectable: YES];	   
-//	  [nameEditor setFont: [cellPrototype font]];
+    [nameEditor setEditable: NO];
+    [nameEditor setSelectable: NO];	   
 		[nameEditor setBezeled: NO];
 		[nameEditor setAlignment: NSLeftTextAlignment];
     
@@ -1398,7 +1397,7 @@ static NSString *defaultColumns = @"{ \
 
 - (void)stopRepNameEditing
 {
-  if (nameEditor && [[listView subviews] containsObject: nameEditor]) {
+  if ([[listView subviews] containsObject: nameEditor]) {
     [nameEditor abortEditing];
     [nameEditor setEditable: NO];
     [nameEditor setSelectable: NO];
@@ -1415,13 +1414,13 @@ static NSString *defaultColumns = @"{ \
 
 - (void)setEditorAtRow:(int)row
 {
+  [self stopRepNameEditing];
+
   if ([[listView selectedRowIndexes] count] == 1) {
     FSNListViewNodeRep *rep = [nodeReps objectAtIndex: row];  
     FSNode *nd = [rep node];
     BOOL canedit = (([rep isLocked] == NO) && ([nd isMountPoint] == NO));
     
-    [self stopRepNameEditing];
-  
     if (canedit) {   
       NSNumber *num = [NSNumber numberWithInt: FSNInfoNameType];
       unsigned col = [listView columnWithIdentifier: num];
@@ -1440,8 +1439,6 @@ static NSString *defaultColumns = @"{ \
 
       [nameEditor setNode: nd stringValue: [nd name] index: 0];
 
-      [nameEditor setEditable: YES];
-      [nameEditor setSelectable: YES];	
       [listView addSubview: nameEditor];
     }
   }
@@ -1506,9 +1503,9 @@ static NSString *defaultColumns = @"{ \
       NSArray *dirContents = [ednode subNodeNamesOfParent];
       NSMutableDictionary *opinfo = [NSMutableDictionary dictionary];
 
-      if (range.length > 0) {
+      if (([newname length] == 0) || (range.length > 0)) {
         NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
-                  NSLocalizedString(@"Invalid char in name", @""), 
+                  NSLocalizedString(@"Invalid name", @""), 
                             NSLocalizedString(@"Continue", @""), nil, nil);   
         CLEAREDITING;
       }	
@@ -2390,6 +2387,14 @@ static NSString *defaultColumns = @"{ \
 
 @implementation FSNListViewNameEditor
 
+int sortSubviews(id view1, id view2, void *context)
+{
+  if ([view1 isMemberOfClass: [FSNListViewNameEditor class]]) {
+    return NSOrderedAscending;
+  }  
+  return NSOrderedDescending;
+}
+
 - (void)dealloc
 {
   TEST_RELEASE (node);
@@ -2418,12 +2423,20 @@ static NSString *defaultColumns = @"{ \
   return index;
 }
 
-- (void)mouseDown:(NSEvent*)theEvent
+- (void)mouseDown:(NSEvent *)theEvent
 {
-  if ([self isEditable]) {
+  NSView *view = [self superview];
+  
+  if ([self isEditable] == NO) {
+    [self setSelectable: YES];  
+    [self setEditable: YES];       
     [[self window] makeFirstResponder: self];
+  } else {  
+    [super mouseDown: theEvent];
   }
-  [super mouseDown: theEvent];
+
+  [view sortSubviewsUsingFunction: (int (*)(id, id, void *))sortSubviews context: nil];  
+  [view setNeedsDisplayInRect: [self frame]];
 }
 
 @end
@@ -2460,9 +2473,6 @@ static NSString *defaultColumns = @"{ \
     [self setTarget: dsource];
     [self setDoubleAction: @selector(doubleClickOnListView:)];
   
-    editstamp = 0.0;
-    editindex = -1;
-
 		lastKeyPressed = 0.;
     charBuffer = nil;
   
@@ -2484,7 +2494,7 @@ static NSString *defaultColumns = @"{ \
   }
 }
 
-- (void)mouseDown:(NSEvent*)theEvent
+- (void)mouseDown:(NSEvent *)theEvent
 {
   NSPoint location;
   int clickCount;
@@ -2499,12 +2509,10 @@ static NSString *defaultColumns = @"{ \
   clickCount = [theEvent clickCount];
   
   if (clickCount >= 2) {
-    editindex = -1;
     return;
   }
 
   if ([theEvent modifierFlags] & NSShiftKeyMask) {
-    editindex = -1;
     return;
   }
   
@@ -2512,20 +2520,8 @@ static NSString *defaultColumns = @"{ \
   location = [self convertPoint: location fromView: nil];
   row = [self rowAtPoint: location];
   
-  if (row != -1) {
-    if (editindex != row) {
-      editindex = row;
-            
-    } else {
-      NSTimeInterval interval = ([theEvent timestamp] - editstamp);
-          
-      if ((interval > DOUBLE_CLICK_LIMIT)
-                                && (interval < EDIT_CLICK_LIMIT)) {
-        [dsource setEditorAtRow: row];
-      }
-    }
-    
-    editstamp = [theEvent timestamp];   
+  if (row != -1) {  
+    [dsource setEditorAtRow: row];
   }
 }
 
@@ -2902,3 +2898,5 @@ static NSString *defaultColumns = @"{ \
 }
 
 @end
+
+

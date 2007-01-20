@@ -1596,6 +1596,7 @@ static NSImage *branchImage;
       [self setAlignment: NSLeftTextAlignment];  
       [self setSelectable: YES];  
       [self setEditable: YES];  
+      [[self window] makeFirstResponder: self]; 
     }
     
   } else {

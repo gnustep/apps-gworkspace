@@ -711,7 +711,7 @@ static cutIMP cutTitle = NULL;
   return index;
 }
 
-- (void)mouseDown:(NSEvent*)theEvent
+- (void)mouseDown:(NSEvent *)theEvent
 {
   if ([self isEditable]) {
 	  [self setAlignment: NSLeftTextAlignment];

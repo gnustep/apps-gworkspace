@@ -2275,9 +2275,9 @@ pp.y = NSMaxY(br) + 1; \
       NSArray *dirContents = [ednode subNodeNamesOfParent];
       NSMutableDictionary *opinfo = [NSMutableDictionary dictionary];
 
-      if (range.length > 0) {
+      if (([newname length] == 0) || (range.length > 0)) {
         NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
-                  NSLocalizedString(@"Invalid char in name", @""), 
+                  NSLocalizedString(@"Invalid name", @""), 
                             NSLocalizedString(@"Continue", @""), nil, nil);   
         CLEAREDITING;
       }	

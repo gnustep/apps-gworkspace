@@ -301,8 +301,6 @@
 @interface FSNListView : NSTableView
 {
   id dsource;
-  NSTimeInterval editstamp;  
-  int editindex;  
   NSString *charBuffer;	
 	NSTimeInterval lastKeyPressed;
 }

@@ -979,7 +979,7 @@ static NSString *nibName = @"MDKWindow";
     canclose = NO;
   }
 
-  if (saved == NO) {
+  if ((savepath != nil) && (saved == NO)) {
     canclose = !(NSRunAlertPanel(nil,
                           NSLocalizedString(@"The query is unsaved", @""),
                           NSLocalizedString(@"Cancel", @""),
