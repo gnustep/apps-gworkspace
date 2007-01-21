@@ -120,6 +120,8 @@ static GWorkspace *gworkspace = nil;
 	RELEASE (defXterm);
 	RELEASE (defXtermArgs);
   RELEASE (selectedPaths);
+  RELEASE (trashContents);
+  RELEASE (trashPath);
   RELEASE (watchedPaths);
   TEST_RELEASE (fiend);
 	TEST_RELEASE (history);
@@ -407,7 +409,9 @@ static GWorkspace *gworkspace = nil;
   [fsnodeRep setUseThumbnails: boolentry];
   
 	selectedPaths = [[NSArray alloc] initWithObjects: NSHomeDirectory(), nil];
-
+  trashContents = [NSMutableArray new];
+  ASSIGN (trashPath, [self trashPath]);
+  
   startAppWin = [[StartAppWin alloc] init];
   
   watchedPaths = [[NSCountedSet alloc] initWithCapacity: 1];
@@ -485,50 +489,57 @@ static GWorkspace *gworkspace = nil;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-  [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
-                				selector: @selector(fileSystemWillChange:) 
-                					  name: @"GWFileSystemWillChangeNotification"
-                					object: nil];
+  NSNotificationCenter *nc = [NSDistributedNotificationCenter defaultCenter];
+  
+  [nc addObserver: self 
+         selector: @selector(fileSystemWillChange:) 
+             name: @"GWFileSystemWillChangeNotification"
+           object: nil];
 
-  [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
-                				selector: @selector(fileSystemDidChange:) 
-                					  name: @"GWFileSystemDidChangeNotification"
-                					object: nil];
+  [[NSNotificationCenter defaultCenter] addObserver: self 
+         selector: @selector(fileSystemDidChange:) 
+             name: @"GWFileSystemDidChangeNotification"
+           object: nil];
 
-  [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
-                				selector: @selector(changeDefaultEditor:) 
-                					  name: @"GWDefaultEditorChangedNotification"
-                					object: nil];
+  [nc addObserver: self 
+         selector: @selector(fileSystemDidChange:) 
+             name: @"GWFileSystemDidChangeNotification"
+           object: nil];
 
-  [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
-                        selector: @selector(thumbnailsDidChange:) 
-                					  name: @"GWThumbnailsDidChangeNotification"
-                					object: nil];
+  [nc addObserver: self 
+         selector: @selector(changeDefaultEditor:) 
+             name: @"GWDefaultEditorChangedNotification"
+           object: nil];
 
-  [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
-                        selector: @selector(removableMediaPathsDidChange:) 
-                					  name: @"GSRemovableMediaPathsDidChangeNotification"
-                					object: nil];
+  [nc addObserver: self 
+         selector: @selector(thumbnailsDidChange:) 
+             name: @"GWThumbnailsDidChangeNotification"
+           object: nil];
 
-  [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
-                        selector: @selector(reservedMountNamesDidChange:) 
-                					  name: @"GSReservedMountNamesDidChangeNotification"
-                					object: nil];
+  [nc addObserver: self 
+         selector: @selector(removableMediaPathsDidChange:) 
+             name: @"GSRemovableMediaPathsDidChangeNotification"
+           object: nil];
 
-  [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
-                        selector: @selector(hideDotsFileDidChange:) 
-                					  name: @"GSHideDotFilesDidChangeNotification"
-                					object: nil];
+  [nc addObserver: self 
+         selector: @selector(reservedMountNamesDidChange:) 
+             name: @"GSReservedMountNamesDidChangeNotification"
+           object: nil];
+ 
+  [nc addObserver: self 
+         selector: @selector(hideDotsFileDidChange:) 
+             name: @"GSHideDotFilesDidChangeNotification"
+           object: nil];
 
-  [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
-                        selector: @selector(customDirectoryIconDidChange:) 
-                					  name: @"GWCustomDirectoryIconDidChangeNotification"
-                					object: nil];
+  [nc addObserver: self 
+         selector: @selector(customDirectoryIconDidChange:) 
+             name: @"GWCustomDirectoryIconDidChangeNotification"
+           object: nil];
 
-  [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
-                        selector: @selector(applicationForExtensionsDidChange:) 
-                					  name: @"GWAppForExtensionDidChangeNotification"
-                					object: nil];
+  [nc addObserver: self 
+         selector: @selector(applicationForExtensionsDidChange:) 
+             name: @"GWAppForExtensionDidChangeNotification"
+           object: nil];
   
   [self initializeWorkspace]; 
 }
@@ -1026,22 +1037,7 @@ static GWorkspace *gworkspace = nil;
     return (([dtopManager isActive] == NO) || ([dtopManager dockActive] == NO));
 
   } else if ([title isEqual: NSLocalizedString(@"Empty Recycler", @"")]) {
-    if ([dtopManager isActive] || (recyclerApp != nil)) {
-      CREATE_AUTORELEASE_POOL(arp);
-      FSNode *node = [FSNode nodeWithPath: [self trashPath]];
-      NSArray *subNodes = [node subNodes];
-      int count = [subNodes count];
-      int i;  
-          
-      for (i = 0; i < [subNodes count]; i++) {
-        if ([[subNodes objectAtIndex: i] isReserved]) {
-          count --;
-        }
-      }  
-    
-      RELEASE (arp);
-      return (count != 0);
-    }
+    return ([trashContents count] != 0);
     
 	} else if ([title isEqual: NSLocalizedString(@"Check for disks", @"")]) {
     return [dtopManager isActive];
@@ -1096,16 +1092,35 @@ static GWorkspace *gworkspace = nil;
            
 - (void)fileSystemWillChange:(NSNotification *)notif
 {
-//  [[NSNotificationCenter defaultCenter]
-// 				postNotificationName: @"GWFileSystemWillChangeNotification"
-//	 								    object: [notif userInfo]];
 }
 
 - (void)fileSystemDidChange:(NSNotification *)notif
 {
-//	[[NSNotificationCenter defaultCenter]
-// 				postNotificationName: @"GWFileSystemDidChangeNotification"
-//	 								    object: [notif userInfo]];
+  NSDictionary *info = (NSDictionary *)[notif object];
+  NSString *source = [info objectForKey: @"source"];
+  NSString *destination = [info objectForKey: @"destination"];
+  
+  if ([source isEqual: trashPath] || [destination isEqual: trashPath]) {
+    CREATE_AUTORELEASE_POOL(arp);
+    FSNode *node = [FSNode nodeWithPath: trashPath];
+
+    [trashContents removeAllObjects];
+
+    if (node && [node isValid]) {
+      NSArray *subNodes = [node subNodes];
+      int i; 
+    
+      for (i = 0; i < [subNodes count]; i++) {
+        FSNode *subnode = [subNodes objectAtIndex: i];
+        
+        if ([subnode isReserved] == NO) {
+          [trashContents addObject: subnode];
+        }
+      }
+    }
+  
+    RELEASE (arp);
+  }
 }
 
 - (void)setSelectedPaths:(NSArray *)paths
@@ -1435,7 +1450,7 @@ static GWorkspace *gworkspace = nil;
 	  }
 
     [self performFileOperation: @"NSWorkspaceRecycleOperation"
-                    source: basePath destination: [self trashPath] 
+                    source: basePath destination: trashPath 
                                               files: files tag: &tag];
   }
 }
@@ -1745,7 +1760,32 @@ static GWorkspace *gworkspace = nil;
 {
   CREATE_AUTORELEASE_POOL(arp);
   NSDictionary *info = [NSUnarchiver unarchiveObjectWithData: dirinfo];
+  NSString *event = [info objectForKey: @"event"];
 
+  if ([event isEqual: @"GWFileDeletedInWatchedDirectory"]
+            || [event isEqual: @"GWFileCreatedInWatchedDirectory"]) {
+    NSString *path = [info objectForKey: @"path"];
+
+    if ([path isEqual: trashPath]) {
+      FSNode *node = [FSNode nodeWithPath: trashPath];
+
+      [trashContents removeAllObjects];
+
+      if (node && [node isValid]) {
+        NSArray *subNodes = [node subNodes];
+        int i; 
+
+        for (i = 0; i < [subNodes count]; i++) {
+          FSNode *subnode = [subNodes objectAtIndex: i];
+
+          if ([subnode isReserved] == NO) {
+            [trashContents addObject: subnode];
+          }
+        }
+      }
+    }
+  }
+  
 	[[NSNotificationCenter defaultCenter]
  				 postNotificationName: @"GWFileWatcherFileDidChangeNotification"
 	 								     object: info];  
@@ -2362,7 +2402,7 @@ static GWorkspace *gworkspace = nil;
             }  
 
             if (cutted) {
-              if ([source isEqual: [self trashPath]]) {
+              if ([source isEqual: trashPath]) {
                 operation = @"GWorkspaceRecycleOutOperation";
               } else {
 		            operation = NSWorkspaceMoveOperation;
@@ -2399,7 +2439,6 @@ static GWorkspace *gworkspace = nil;
 - (void)emptyRecycler:(id)sender
 {
   CREATE_AUTORELEASE_POOL(arp);
-  NSString *trashPath = [self trashPath];
   FSNode *node = [FSNode nodeWithPath: trashPath];
   NSMutableArray *subNodes = [[node subNodes] mutableCopy];
   int count = [subNodes count];

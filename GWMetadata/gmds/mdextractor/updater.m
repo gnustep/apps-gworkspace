@@ -549,6 +549,13 @@ do { \
   }                  
 }
 
+- (oneway void)watchedPathDidChange:(NSData *)info
+{
+
+
+
+}
+
 - (void)processPendingChanges:(id)sender
 {
   if (extracting == NO) {

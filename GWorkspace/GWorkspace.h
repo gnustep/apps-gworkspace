@@ -33,6 +33,7 @@
 #define NOXTERM 1
 
 @class NSWorkspace;
+@class FSNode;
 @class FSNodeRep;
 @class GWViewersManager;
 @class GWDesktopManager;
@@ -106,7 +107,9 @@
   FSNodeRep *fsnodeRep;
   
 	NSArray *selectedPaths;
-
+  NSMutableArray *trashContents;
+  NSString *trashPath;
+  
   id fswatcher;
   BOOL fswnotifications;
 	NSCountedSet *watchedPaths;

@@ -34,7 +34,7 @@
 
 @protocol	FSWClientProtocol
 
-- (oneway void)watchedPathDidChange:(NSData *)dirinfo;
+- (oneway void)watchedPathDidChange:(NSData *)info;
 
 - (oneway void)globalWatchedPathDidChange:(NSDictionary *)info;
 
