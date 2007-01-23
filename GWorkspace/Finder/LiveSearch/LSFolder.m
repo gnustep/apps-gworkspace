@@ -920,7 +920,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   NSArray *selected = [self selectedObjects];
 
   if ([selected count]) {
-    [finder foundSelectionChanged: [FSNode pathsOfNodes: selected]];
+    [finder foundSelectionChanged: selected];
   }
 }
 
@@ -1013,7 +1013,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   [pathViewer showComponentsOfSelection: selected];
   
   if ([selected count]) {
-    [finder foundSelectionChanged: [FSNode pathsOfNodes: selected]];
+    [finder foundSelectionChanged: selected];
   }
 }
 

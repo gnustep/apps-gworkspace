@@ -1031,59 +1031,51 @@ static GWorkspace *gworkspace = nil;
 
 - (BOOL)validateMenuItem:(id <NSMenuItem>)anItem
 {	
-	NSString *title = [anItem title];
+  SEL action = [anItem action];
 
-	if ([title isEqual: NSLocalizedString(@"Show Recycler", @"")]) {
+  if (sel_eq(action, @selector(showRecycler:))) {
     return (([dtopManager isActive] == NO) || ([dtopManager dockActive] == NO));
-
-  } else if ([title isEqual: NSLocalizedString(@"Empty Recycler", @"")]) {
+  
+  } else if (sel_eq(action, @selector(emptyRecycler:))) {
     return ([trashContents count] != 0);
-    
-	} else if ([title isEqual: NSLocalizedString(@"Check for disks", @"")]) {
+  
+  } else if (sel_eq(action, @selector(checkRemovableMedia:))) {  
     return [dtopManager isActive];
-        
-  } else if ([title isEqual: NSLocalizedString(@"Select Special Tab", @"")]
-              || [title isEqual: NSLocalizedString(@"Remove Current Tab", @"")]
-              || [title isEqual: NSLocalizedString(@"Rename Current Tab", @"")]
-              || [title isEqual: NSLocalizedString(@"Add Tab...", @"")]) {
+  
+  } else if (sel_eq(action, @selector(removeTShelfTab:))
+              || sel_eq(action, @selector(renameTShelfTab:))
+                      || sel_eq(action, @selector(addTShelfTab:))) {
     return [tshelfWin isVisible];
 
-  } else if ([title isEqual: NSLocalizedString(@"Activate context help", @"")]) {
+  } else if (sel_eq(action, @selector(activateContextHelp:))) {
     return ([NSHelpManager isContextHelpModeActive] == NO);
 
-  } else if ([title isEqual: NSLocalizedString(@"Logout", @"")]) {
+  } else if (sel_eq(action, @selector(logout:))) {
     return !loggingout;
-  }
-  
-	if ([title isEqual: NSLocalizedString(@"Cut", @"")]
-          || [title isEqual: NSLocalizedString(@"Copy", @"")]
-          || [title isEqual: NSLocalizedString(@"Paste", @"")]) {
+    
+  } else if (sel_eq(action, @selector(cut:))
+                || sel_eq(action, @selector(copy:))
+                  || sel_eq(action, @selector(paste:))) {
     NSWindow *kwin = [NSApp keyWindow];
 
-    if (kwin) {
-      if ([kwin isKindOfClass: [TShelfWin class]]) {
-        if ([tshelfWin isVisible] == NO) {
-          return NO;
-        } else {
-          TShelfViewItem *item = [[tshelfWin shelfView] selectedTabItem];
+    if (kwin && [kwin isKindOfClass: [TShelfWin class]]) {
+      TShelfViewItem *item = [[tshelfWin shelfView] selectedTabItem];
 
-          if (item) {
-            TShelfIconsView *iview = (TShelfIconsView *)[item view];
+      if (item) {
+        TShelfIconsView *iview = (TShelfIconsView *)[item view];
 
-            if ([iview iconsType] == DATA_TAB) {
-              if ([title isEqual: NSLocalizedString(@"Paste", @"")]) {
-                return YES;
-              } else {
-                return [iview hasSelectedIcon];
-              }
-            } else {
-              return NO;
-            }
+        if ([iview iconsType] == DATA_TAB) {
+          if (sel_eq(action, @selector(paste:))) {
+            return YES;
           } else {
-            return NO;
+            return [iview hasSelectedIcon];
           }
+        } else {
+          return NO;
         }
-      } 
+      } else {
+        return NO;
+      }               
     }
   }
   
@@ -2481,7 +2473,7 @@ static GWorkspace *gworkspace = nil;
 - (void)selectionChanged:(NSArray *)newsel
 {
   if (newsel && [newsel count] && ([vwrsManager orderingViewers] == NO)) {
-    [self setSelectedPaths: newsel];
+    [self setSelectedPaths: [FSNode pathsOfNodes: newsel]];
   }
 }
 

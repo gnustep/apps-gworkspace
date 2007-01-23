@@ -604,21 +604,21 @@ static GWDesktopManager *desktopManager = nil;
 - (BOOL)validateItem:(id)menuItem
 {
   if ([self isActive]) {
-    NSString *itemTitle = [menuItem title];
+    SEL action = [menuItem action];
     GWDesktopView *desktopView = [win desktopView];
 
-    if ([itemTitle isEqual: NSLocalizedString(@"Duplicate", @"")]
-        || [itemTitle isEqual: NSLocalizedString(@"Move to Recycler", @"")]
-        || [itemTitle isEqual: NSLocalizedString(@"Destroy", @"")]) {
+    if (sel_eq(action, @selector(duplicateFiles:))
+                || sel_eq(action, @selector(recycleFiles:))
+                      || sel_eq(action, @selector(deleteFiles:))) {
       return ([[desktopView selectedNodes] count] > 0);
 
-    } else if ([itemTitle isEqual: NSLocalizedString(@"Open", @"")]) {
+    } else if (sel_eq(action, @selector(openSelection:))) {
       NSArray *selection = [desktopView selectedNodes];
      
       return (selection && [selection count] 
             && ([selection isEqual: [NSArray arrayWithObject: dskNode]] == NO));
     
-    } else if ([itemTitle isEqual: NSLocalizedString(@"Open With...", @"")]) {
+    } else if (sel_eq(action, @selector(openWith:))) {
       NSArray *selection = [desktopView selectedNodes];
       BOOL canopen = YES;
       int i;
@@ -640,7 +640,7 @@ static GWDesktopManager *desktopManager = nil;
 
       return canopen;
       
-    } else if ([itemTitle isEqual: NSLocalizedString(@"Open as Folder", @"")]) {
+    } else if (sel_eq(action, @selector(openSelectionAsFolder:))) {
       NSArray *selection = [desktopView selectedNodes];
     
       if (selection && ([selection count] == 1)) {  

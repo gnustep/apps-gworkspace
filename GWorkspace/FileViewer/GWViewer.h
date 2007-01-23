@@ -60,6 +60,7 @@
   int resizeIncrement;
     
   FSNode *baseNode;
+  NSArray *baseNodeArray;
   NSArray *lastSelection;  
   NSMutableArray *watchedNodes;
 

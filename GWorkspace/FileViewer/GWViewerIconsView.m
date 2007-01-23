@@ -51,10 +51,10 @@
 - (void)selectionDidChange
 {
 	if (!(selectionMask & FSNCreatingSelectionMask)) {
-    NSArray *selection = [self selectedPaths];
+    NSArray *selection = [self selectedNodes];
 		
     if ([selection count] == 0) {
-      selection = [NSArray arrayWithObject: [node path]];
+      selection = [NSArray arrayWithObject: node];
     } else if (([viewer vtype] == SPATIAL) 
                         && [(NSWindow *)[viewer win] isKeyWindow]) {
       [manager selectedSpatialViewerChanged: viewer];

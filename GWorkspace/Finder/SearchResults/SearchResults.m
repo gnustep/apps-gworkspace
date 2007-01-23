@@ -709,7 +709,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
   NSArray *selected = [self selectedObjects];
 
   if ([selected count]) {
-    [finder foundSelectionChanged: [FSNode pathsOfNodes: selected]];
+    [finder foundSelectionChanged: selected];
   }
 }
 
@@ -800,7 +800,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
   [pathViewer showComponentsOfSelection: selected];
   
   if ([selected count]) {
-    [finder foundSelectionChanged: [FSNode pathsOfNodes: selected]];
+    [finder foundSelectionChanged: selected];
   }
 }
 

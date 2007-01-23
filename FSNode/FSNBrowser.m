@@ -163,7 +163,7 @@
   ASSIGN (baseNode, [FSNode nodeWithPath: [node path]]);
   [self readNodeInfo];
   [self loadColumnZero];
-  [self notifySelectionChange: [NSArray arrayWithObject: [node path]]];
+  [self notifySelectionChange: [NSArray arrayWithObject: node]];
 }
 
 - (void)setUsesCellsIcons:(BOOL)cicns
@@ -298,7 +298,7 @@
   if (selection && [selection count]) {
     FSNode *node = [selection objectAtIndex: 0];
     FSNBrowserColumn *bc;
-    NSArray *selPaths;
+    NSArray *selNodes;
     
     updateViewsLock++;
     
@@ -342,11 +342,11 @@
     updateViewsLock--;
     [self tile];
 
-    selPaths = [bc selectedPaths];
-    if (selPaths == nil) {
-      selPaths = [NSArray arrayWithObject: [[bc shownNode] path]];
+    selNodes = [bc selectedNodes];
+    if (selNodes == nil) {
+      selNodes = [NSArray arrayWithObject: [bc shownNode]];
     }
-    [self notifySelectionChange: selPaths];
+    [self notifySelectionChange: selNodes];
   }
 }
 
@@ -355,7 +355,7 @@
   if (selpaths && [selpaths count]) {
     FSNode *node = [FSNode nodeWithPath: [selpaths objectAtIndex: 0]];      
     FSNBrowserColumn *bc;
-    NSArray *selPaths;
+    NSArray *selNodes;
 
     updateViewsLock++;
 
@@ -397,11 +397,11 @@
     updateViewsLock--;
     [self tile];
 
-    selPaths = [bc selectedPaths];
-    if (selPaths == nil) {
-      selPaths = [NSArray arrayWithObject: [[bc shownNode] path]];
+    selNodes = [bc selectedNodes];
+    if (selNodes == nil) {
+      selNodes = [NSArray arrayWithObject: [bc shownNode]];
     }
-    [self notifySelectionChange: selPaths];
+    [self notifySelectionChange: selNodes];
   }
 }
 
@@ -600,7 +600,7 @@
   col = [self lastLoadedColumn];
 
   if (col) {
-    NSArray *selection = [col selectedPaths];
+    NSArray *selection = [col selectedNodes];
     int index = [col index];
 
     if (index < firstVisibleColumn) {
@@ -612,7 +612,7 @@
     if (selection) {
       if (selColumn && (index == lastColumnLoaded)) {
         if ([selection count] == 1) {
-          FSNode *node = [FSNode nodeWithPath: [selection objectAtIndex: 0]];
+          FSNode *node = [selection objectAtIndex: 0];
         
           if (([node isDirectory] == NO) || [node isPackage]) {
             [self addFillingColumn];
@@ -627,7 +627,7 @@
     
     } else {
       FSNode *node = [col shownNode];
-      [self notifySelectionChange: [NSArray arrayWithObject: [node path]]];
+      [self notifySelectionChange: [NSArray arrayWithObject: node]];
     }
   }
 
@@ -1130,7 +1130,7 @@
   NSArray *selection = [col selectedNodes];
   
   if ((selection == nil) || ([selection count] == 0)) {
-    [self notifySelectionChange: [NSArray arrayWithObject: [[col shownNode] path]]];
+    [self notifySelectionChange: [NSArray arrayWithObject: [col shownNode]]];
     return;
   }
 
@@ -1186,7 +1186,7 @@
   updateViewsLock--;
   [self tile];
   
-  [self notifySelectionChange: [col selectedPaths]];		  
+  [self notifySelectionChange: [col selectedNodes]];		  
 }
 
 - (void)doubleClickInMatrixOfColumn:(FSNBrowserColumn *)col
@@ -1822,7 +1822,7 @@
   
   if (bc) {
     [[bc cmatrix] deselectAllCells];
-    [self notifySelectionChange: [NSArray arrayWithObject: [[bc shownNode] path]]];
+    [self notifySelectionChange: [NSArray arrayWithObject: [bc shownNode]]];
   }
 }
 
@@ -1987,7 +1987,7 @@
 - (void)restoreLastSelection
 {
   if (lastSelection) {
-    [self selectRepsOfPaths: lastSelection];
+    [self selectRepsOfSubnodes: lastSelection];
   }
 }
 
@@ -2003,12 +2003,12 @@
     if (prev) {
       if ([prev selectCellOfNode: anode sendAction: YES] == nil) {
         [self setLastColumn: [prev index]];
-        [self notifySelectionChange: [NSArray arrayWithObject: [[prev shownNode] path]]];
+        [self notifySelectionChange: [NSArray arrayWithObject: [prev shownNode]]];
       }
     } else {
       [self setLastColumn: 0];
       [bc unselectAllCells];
-      [self notifySelectionChange: [NSArray arrayWithObject: [baseNode path]]];
+      [self notifySelectionChange: [NSArray arrayWithObject: baseNode]];
     }
     
     updateViewsLock--;

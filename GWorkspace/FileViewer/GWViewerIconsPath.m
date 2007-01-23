@@ -166,8 +166,7 @@
 - (void)showPathComponents:(NSArray *)components
                  selection:(NSArray *)selection
 {
-  NSString *firstsel = [selection objectAtIndex: 0];
-  FSNode *node = [FSNode nodeWithPath: firstsel];
+  FSNode *node = [selection objectAtIndex: 0];
   int count = [components count];
   FSNIcon *icon;
   int icncount;
@@ -206,8 +205,7 @@
       NSMutableArray *selnodes = [NSMutableArray array];
     
       for (i = 0; i < [selection count]; i++) {
-        NSString *selpath = [selection objectAtIndex: i];
-        FSNode *selnode = [FSNode nodeWithPath: selpath];
+        FSNode *selnode = [selection objectAtIndex: i];
         [selnodes addObject: selnode];
       }
       

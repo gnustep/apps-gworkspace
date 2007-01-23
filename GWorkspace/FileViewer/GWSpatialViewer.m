@@ -51,6 +51,7 @@
   [nc removeObserver: self];
   
   RELEASE (baseNode);
+  RELEASE (baseNodeArray);
   TEST_RELEASE (lastSelection);
   TEST_RELEASE (rootViewerKey);
   RELEASE (watchedNodes);
@@ -74,6 +75,7 @@
     id defEntry;
 
     ASSIGN (baseNode, [FSNode nodeWithPath: [node path]]);
+    ASSIGN (baseNodeArray, [NSArray arrayWithObject: baseNode]);
     fsnodeRep = [FSNodeRep sharedInstance];
     lastSelection = nil;
     watchedNodes = [NSMutableArray new];
@@ -458,7 +460,7 @@
   ASSIGN (lastSelection, newsel);
   [self updeateInfoLabels]; 
     
-  node = [FSNode nodeWithPath: [newsel objectAtIndex: 0]];   
+  node = [newsel objectAtIndex: 0];   
     
   if ([nodeView isSingleNode]) {    
     if ([node isEqual: baseNode] == NO) {
@@ -722,7 +724,7 @@
 
 - (void)windowDidBecomeKey:(NSNotification *)aNotification
 {
-  NSArray *selection = [nodeView selectedPaths];  
+  NSArray *selection = [nodeView selectedNodes];  
   int count = [selection count];
   
   [vwrwin makeFirstResponder: nodeView]; 
@@ -730,12 +732,12 @@
   [manager selectedSpatialViewerChanged: self];
 
   if (count == 0) {
-    selection = [NSArray arrayWithObject: [[nodeView shownNode] path]];
+    selection = [NSArray arrayWithObject: [nodeView shownNode]];
     [manager synchronizeSelectionInParentOfViewer: self];
   
   } else if (count == 1) {
     if (([nodeView isSingleNode] == NO)
-             || ([[selection objectAtIndex: 0] isEqual: [baseNode path]])) {
+             || ([[selection objectAtIndex: 0] isEqual: baseNode])) {
       [manager synchronizeSelectionInParentOfViewer: self];
     }
     
@@ -858,7 +860,7 @@
     if (selection && [selection count]) {
       if ([nodeView isSingleNode]) {
         [gworkspace duplicateFiles];
-      } else if ([selection isEqual: [NSArray arrayWithObject: baseNode]] == NO) {
+      } else if ([selection isEqual: baseNodeArray] == NO) {
         [gworkspace duplicateFiles];
       }
     }
@@ -879,7 +881,7 @@
     if (selection && [selection count]) {
       if ([nodeView isSingleNode]) {
         [gworkspace moveToTrash];
-      } else if ([selection isEqual: [NSArray arrayWithObject: baseNode]] == NO) {
+      } else if ([selection isEqual: baseNodeArray] == NO) {
         [gworkspace moveToTrash];
       }
     }
@@ -898,7 +900,7 @@
   if (selection && [selection count]) {
     if ([nodeView isSingleNode]) {
       [gworkspace deleteFiles];
-    } else if ([selection isEqual: [NSArray arrayWithObject: baseNode]] == NO) {
+    } else if ([selection isEqual: baseNodeArray] == NO) {
       [gworkspace deleteFiles];
     }
   }
@@ -924,12 +926,12 @@
   NSString *title = [sender title];
   
 	if ([title isEqual: NSLocalizedString(viewType, @"")] == NO) {
-    NSArray *selection = [nodeView selectedPaths];
+    NSArray *selection = [nodeView selectedNodes];
     int i;
     
     [nodeView updateNodeInfo: YES];
     if ([nodeView isSingleNode] && ([selection count] == 0)) {
-      selection = [NSArray arrayWithObject: [[nodeView shownNode] path]];
+      selection = [NSArray arrayWithObject: [nodeView shownNode]];
     }    
     RETAIN (selection);
     [scroll setDocumentView: nil];	
@@ -964,7 +966,7 @@
     [nodeView showContentsOfNode: baseNode]; 
     
     if ([selection count]) {
-      [nodeView selectRepsOfPaths: selection];
+      [nodeView selectRepsOfSubnodes: selection];
     }
     
     DESTROY (selection);
@@ -979,10 +981,10 @@
     [watchedNodes removeAllObjects];
     
     DESTROY (lastSelection);
-    selection = [nodeView selectedPaths];
+    selection = [nodeView selectedNodes];
     
     if ([selection count] == 0) {
-      selection = [NSArray arrayWithObject: [[nodeView shownNode] path]];
+      selection = [NSArray arrayWithObject: [nodeView shownNode]];
     }
     
     [self selectionChanged: selection];
@@ -1107,102 +1109,84 @@
 
 - (BOOL)validateItem:(id)menuItem
 {
-  NSString *itemTitle = [menuItem title];
-  NSString *menuTitle = [[menuItem menu] title];
+  if ([NSApp keyWindow] == vwrwin) {
+    SEL action = [menuItem action];
+    NSString *itemTitle = [menuItem title];
+    NSString *menuTitle = [[menuItem menu] title];
 
-  if ([menuTitle isEqual: NSLocalizedString(@"Icon Size", @"")]) {
-    return [nodeView respondsToSelector: @selector(setIconSize:)];
-  } else if ([menuTitle isEqual: NSLocalizedString(@"Icon Position", @"")]) {
-    return [nodeView respondsToSelector: @selector(setIconPosition:)];
-  } else if ([menuTitle isEqual: NSLocalizedString(@"Label Size", @"")]) {
-    return [nodeView respondsToSelector: @selector(setLabelTextSize:)];
-  } else if ([itemTitle isEqual: NSLocalizedString(@"Label Color...", @"")]) {
-    return [nodeView respondsToSelector: @selector(setTextColor:)];
-  } else if ([itemTitle isEqual: NSLocalizedString(@"Background Color...", @"")]) {
-    return [nodeView respondsToSelector: @selector(setBackgroundColor:)];
-  
-  } else if ([itemTitle isEqual: NSLocalizedString(@"Duplicate", @"")]
-       || [itemTitle isEqual: NSLocalizedString(@"Move to Recycler", @"")]
-       || [itemTitle isEqual: NSLocalizedString(@"Destroy", @"")]) {
-    NSArray *selection = [nodeView selectedNodes];
+    if ([menuTitle isEqual: NSLocalizedString(@"Icon Size", @"")]) {
+      return [nodeView respondsToSelector: @selector(setIconSize:)];
+    } else if ([menuTitle isEqual: NSLocalizedString(@"Icon Position", @"")]) {
+      return [nodeView respondsToSelector: @selector(setIconPosition:)];
+    } else if ([menuTitle isEqual: NSLocalizedString(@"Label Size", @"")]) {
+      return [nodeView respondsToSelector: @selector(setLabelTextSize:)];
+    } else if ([itemTitle isEqual: NSLocalizedString(@"Label Color...", @"")]) {
+      return [nodeView respondsToSelector: @selector(setTextColor:)];
+    } else if ([itemTitle isEqual: NSLocalizedString(@"Background Color...", @"")]) {
+      return [nodeView respondsToSelector: @selector(setBackgroundColor:)];
 
-    if (selection && [selection count]) {
-      if ([nodeView isSingleNode]) {
-        if ([itemTitle isEqual: NSLocalizedString(@"Move to Recycler", @"")]) {
-          return ([[baseNode path] isEqual: [gworkspace trashPath]] == NO);
-        } else {
-          return YES;
-        }
-        
-      } else if ([selection isEqual: [NSArray arrayWithObject: baseNode]] == NO) {
-        if ([itemTitle isEqual: NSLocalizedString(@"Move to Recycler", @"")]) {
-          return ([[baseNode path] isEqual: [gworkspace trashPath]] == NO);
-        } else {
-          return YES;
-        }
+    } else if (sel_eq(action, @selector(duplicateFiles:))
+                    || sel_eq(action, @selector(recycleFiles:))
+                        || sel_eq(action, @selector(deleteFiles:))) {
+      if (lastSelection && [lastSelection count]
+              && ([lastSelection isEqual: baseNodeArray] == NO)) {
+        return ([[baseNode path] isEqual: [gworkspace trashPath]] == NO);
       }
-    }
-    
-    return NO;
 
-  } else if ([itemTitle isEqual: NSLocalizedString(@"Open", @"")]) {
-    NSArray *selection = [nodeView selectedNodes];
+      return NO;
 
-    return (selection && [selection count] 
-            && ([selection isEqual: [NSArray arrayWithObject: baseNode]] == NO));
-    
-  } else if ([itemTitle isEqual: NSLocalizedString(@"Open as Folder", @"")]) {
-    NSArray *selection = [nodeView selectedNodes];
-    
-    if (selection && ([selection count] == 1)) {  
-      return [[selection objectAtIndex: 0] isPackage];
-    }
-    
-    return NO;
+    } else if (sel_eq(action, @selector(openSelection:))) {
+      if ([[baseNode path] isEqual: [gworkspace trashPath]] == NO) {
+        return (lastSelection && [lastSelection count] 
+                && ([lastSelection isEqual: baseNodeArray] == NO));
+      } 
 
-  } else if ([itemTitle isEqual: NSLocalizedString(@"Open With...", @"")]) {
-    NSArray *selection = [nodeView selectedNodes];
-    BOOL canopen = YES;
-    int i;
-        
-    if (selection && [selection count]
-          && ([selection isEqual: [NSArray arrayWithObject: baseNode]] == NO)) {
-      for (i = 0; i < [selection count]; i++) {
-        FSNode *node = [selection objectAtIndex: i];
-    
-        if (([node isPlain] == NO) 
-              && (([node isPackage] == NO) || [node isApplication])) {
-          canopen = NO;
-          break;
-        }
+      return NO;
+
+    } else if (sel_eq(action, @selector(openSelectionAsFolder:))) {
+      if (lastSelection && ([lastSelection count] == 1)) {  
+        return [[lastSelection objectAtIndex: 0] isPackage];
       }
-    } else {
-      canopen = NO;
-    }
-    
-    return canopen;
-    
-  } else if ([itemTitle isEqual: NSLocalizedString(@"New Folder", @"")]
-       || [itemTitle isEqual: NSLocalizedString(@"New File", @"")]) {
-    if ([[baseNode path] isEqual: [gworkspace trashPath]] == NO) {
-      return [[nodeView shownNode] isWritable];
-    }
-    
-    return NO;
 
-  } else if ([itemTitle isEqual: NSLocalizedString(@"Open", @"")]) {
-    return ([[baseNode path] isEqual: [gworkspace trashPath]] == NO);
+      return NO;
+
+    } else if (sel_eq(action, @selector(openWith:))) {
+      BOOL canopen = YES;
+      int i;
+
+      if (lastSelection && [lastSelection count]
+            && ([lastSelection isEqual: baseNodeArray] == NO)) {
+        for (i = 0; i < [lastSelection count]; i++) {
+          FSNode *node = [lastSelection objectAtIndex: i];
+
+          if (([node isPlain] == NO) 
+                && (([node isPackage] == NO) || [node isApplication])) {
+            canopen = NO;
+            break;
+          }
+        }
+      } else {
+        canopen = NO;
+      }
+
+      return canopen;
+
+    } else if (sel_eq(action, @selector(newFolder:))
+                                || sel_eq(action, @selector(newFile:))) {
+      if ([[baseNode path] isEqual: [gworkspace trashPath]] == NO) {
+        return [[nodeView shownNode] isWritable];
+      }
+
+      return NO;
+    } 
+    
+    return YES;
   }
-
-  return YES;
+  
+  return NO;
 }
 
 @end
-
-
-
-
-
 
 
 

@@ -456,12 +456,12 @@ static MDFinder *mdfinder = nil;
 
 - (BOOL)validateMenuItem:(NSMenuItem *)item
 {	
-	NSString *title = [item title];
+  SEL action = [item action];
 
-	if ([title isEqual: NSLocalizedString(@"Save", @"")]) {
+	if (sel_eq(action, @selector(saveQuery:))) {
     return ((activeWindow != nil) && ([activeWindow isSaved] == NO));
 
-  } else if ([title isEqual: NSLocalizedString(@"Save as...", @"")]) {
+  } else if (sel_eq(action, @selector(saveQueryAs:))) {
     return ((activeWindow != nil) && ([activeWindow savePath] != nil));
 	}
     

@@ -1667,10 +1667,10 @@ pp.y = NSMaxY(br) + 1; \
 - (void)selectionDidChange
 {
 	if (!(selectionMask & FSNCreatingSelectionMask)) {
-    NSArray *selection = [self selectedPaths];
+    NSArray *selection = [self selectedNodes];
 		
     if ([selection count] == 0) {
-      selection = [NSArray arrayWithObject: [node path]];
+      selection = [NSArray arrayWithObject: node];
     }
 
     if ((lastSelection == nil) || ([selection isEqual: lastSelection] == NO)) {
@@ -1709,7 +1709,7 @@ pp.y = NSMaxY(br) + 1; \
 - (void)restoreLastSelection
 {
   if (lastSelection) {
-    [self selectRepsOfPaths: lastSelection];
+    [self selectRepsOfSubnodes: lastSelection];
   }
 }
 
@@ -2077,7 +2077,7 @@ pp.y = NSMaxY(br) + 1; \
   [self stopRepNameEditing];
   
   if (lastSelection && ([lastSelection count] == 1)) {
-    editIcon = [self repOfSubnodePath: [lastSelection objectAtIndex: 0]]; 
+    editIcon = [self repOfSubnode: [lastSelection objectAtIndex: 0]]; 
   } 
   
   if (editIcon) {
