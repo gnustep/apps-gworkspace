@@ -237,31 +237,39 @@ static NSString *nibName = @"MDKWindow";
   if (info) {
     NSArray *editorsInfo = [info objectForKey: @"editors"];
     NSArray *words = [info objectForKey: @"text_content_words"];
-    
-    for (i = 0; i < [editorsInfo count]; i++) {
-      NSDictionary *edinfo = [editorsInfo objectAtIndex: i];
-      NSString *attrname = [edinfo objectForKey: @"attrname"];
-      MDKAttributeEditor *editor;
-      
-      attribute = [self attributeWithName: attrname];        
-      [attribute setInUse: YES];
-      
-      attrview = [[MDKAttributeView alloc] initInWindow: self];
-      [attrview setAttribute: attribute];
-      [[attrBox contentView] addSubview: [attrview mainBox]];
-      [attrViews addObject: attrview];
-      RELEASE (attrview);     
-      
-      editor = [attribute editor];
-      [editor restoreSavedState: edinfo];           
-      [queryEditors addObject: editor];      
-    }
-    
+
     if (words && [words count]) {
       [textContentEditor setTextContentWords: words];
     }
-            
+    
+    if (editorsInfo && [editorsInfo count]) {
+      for (i = 0; i < [editorsInfo count]; i++) {
+        NSDictionary *edinfo = [editorsInfo objectAtIndex: i];
+        NSString *attrname = [edinfo objectForKey: @"attrname"];
+        MDKAttributeEditor *editor;
+
+        attribute = [self attributeWithName: attrname];        
+        [attribute setInUse: YES];
+
+        attrview = [[MDKAttributeView alloc] initInWindow: self];
+        [attrview setAttribute: attribute];
+        [[attrBox contentView] addSubview: [attrview mainBox]];
+        [attrViews addObject: attrview];
+        RELEASE (attrview);     
+
+        editor = [attribute editor];
+        [editor restoreSavedState: edinfo];           
+        [queryEditors addObject: editor];      
+      }
+    } else {
+      attribute = nil;     
+    }
+                
   } else {
+    attribute = nil;  
+  }
+  
+  if (attribute == nil) {
     attribute = [self attributeWithName: @"GSMDItemFSName"];  
     [attribute setInUse: YES];
     
