@@ -820,19 +820,19 @@ static FSNodeRep *shared = nil;
 
 - (NSArray *)removableMediaPaths
 {
-  NSUserDefaults *defaults;
-  NSMutableDictionary *domain;
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  NSDictionary *domain;
   NSArray *removables;
-  
-  defaults = [NSUserDefaults standardUserDefaults];
-  [defaults synchronize];
-  domain = [[defaults persistentDomainForName: NSGlobalDomain] mutableCopy];
+    
+  domain = [defaults persistentDomainForName: NSGlobalDomain];
   removables = [domain objectForKey: @"GSRemovableMediaPaths"];
 
   if (removables == nil) {
+    CREATE_AUTORELEASE_POOL(arp);
+    NSMutableDictionary *mdomain = [domain mutableCopy];  
     unsigned int systype = [[NSProcessInfo processInfo] operatingSystem];
   
-    switch(systype) {
+    switch (systype) {
       case NSGNULinuxOperatingSystem:
         removables = [NSArray arrayWithObjects: @"/mnt/floppy", @"/mnt/cdrom", nil];
         break;
@@ -844,23 +844,33 @@ static FSNodeRep *shared = nil;
       default:
         break;
     }
+    
+    if (removables) {
+      [mdomain setObject: removables forKey: @"GSRemovableMediaPaths"];
+      [defaults setPersistentDomain: mdomain forName: NSGlobalDomain];
+      [defaults synchronize];
+    }
+    
+    RELEASE (mdomain);
+    RELEASE (arp);
   }
-
+    
   return removables;
 }
 
 - (NSArray *)reservedMountNames
 {
-  NSUserDefaults *defaults;
-  NSMutableDictionary *domain;
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  NSDictionary *domain;
   NSArray *reserved;
 
-  defaults = [NSUserDefaults standardUserDefaults];
   [defaults synchronize];
-  domain = [[defaults persistentDomainForName: NSGlobalDomain] mutableCopy];
+  domain = [defaults persistentDomainForName: NSGlobalDomain];
   reserved = [domain objectForKey: @"GSReservedMountNames"];
   
   if (reserved == nil) {
+    CREATE_AUTORELEASE_POOL(arp);
+    NSMutableDictionary *mdomain = [domain mutableCopy];  
     unsigned int systype = [[NSProcessInfo processInfo] operatingSystem];
   
     switch(systype) {
@@ -882,6 +892,15 @@ static FSNodeRep *shared = nil;
       default:
         break;
     }
+    
+    if (reserved) {
+      [mdomain setObject: reserved forKey: @"GSReservedMountNames"];
+      [defaults setPersistentDomain: mdomain forName: NSGlobalDomain];
+      [defaults synchronize];
+    }
+    
+    RELEASE (mdomain);
+    RELEASE (arp);
   }
 
   return reserved;

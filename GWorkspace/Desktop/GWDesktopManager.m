@@ -53,6 +53,7 @@ static GWDesktopManager *desktopManager = nil;
   TEST_RELEASE (dskNode);
   TEST_RELEASE (win);
   TEST_RELEASE (dock);
+  RELEASE (mpointWatcher);
     
 	[super dealloc];
 }
@@ -73,6 +74,7 @@ static GWDesktopManager *desktopManager = nil;
     ws = [NSWorkspace sharedWorkspace];
     gworkspace = [GWorkspace gworkspace];
     fsnodeRep = [FSNodeRep sharedInstance];
+    mpointWatcher = [[MPointWatcher alloc] initForManager: self];
     
     [self checkDesktopDirs];
 
@@ -147,10 +149,6 @@ static GWDesktopManager *desktopManager = nil;
 
 - (void)activateDesktop
 {
-  NSSet *volumes = [fsnodeRep volumes];
-  NSEnumerator *enumerator = [volumes objectEnumerator];
-  NSString *vpath;
-  
   [win activate];
   [[win desktopView] showMountedVolumes];
   [[win desktopView] showContentsOfNode: dskNode];
@@ -161,23 +159,14 @@ static GWDesktopManager *desktopManager = nil;
     [dock tile];
   }
   
-  while ((vpath = [enumerator nextObject])) {
-    [self addWatcherForPath: vpath];
-  }
+  [mpointWatcher startWatching];  
 }
 
 - (void)deactivateDesktop
 {
-  NSSet *volumes = [fsnodeRep volumes];
-  NSEnumerator *enumerator = [volumes objectEnumerator];
-  NSString *vpath;
-
   [win deactivate];
-  [self removeWatcherForPath: [dskNode path]];
-
-  while ((vpath = [enumerator nextObject])) {
-    [self removeWatcherForPath: vpath];
-  }
+  [self removeWatcherForPath: [dskNode path]];  
+  [mpointWatcher stopWatching];
 }
 
 - (BOOL)isActive
@@ -490,10 +479,7 @@ static GWDesktopManager *desktopManager = nil;
   NSString *path = [info objectForKey: @"path"];
   NSString *event = [info objectForKey: @"event"];
   
-  if ([[fsnodeRep volumes] containsObject: path]) {  
-    [[self desktopView] showMountedVolumes];
-  
-  } else if ([path isEqual: [dskNode path]]) {
+  if ([path isEqual: [dskNode path]]) {
     if ([event isEqual: @"GWWatchedPathDeleted"]) {
       NSRunAlertPanel(nil, 
                       NSLocalizedString(@"The Desktop directory has been deleted! Quiting now!", @""), 
@@ -518,6 +504,7 @@ static GWDesktopManager *desktopManager = nil;
 - (void)removableMediaPathsDidChange
 {
   [[self desktopView] showMountedVolumes];
+  [mpointWatcher startWatching];
 }
 
 - (void)hideDotsFileDidChange:(BOOL)hide
@@ -560,6 +547,11 @@ static GWDesktopManager *desktopManager = nil;
     [fsnodeRep unlockPaths: [NSArray arrayWithObject: volpath]];
     [[self desktopView] workspaceDidUnmountVolumeAtPath: volpath];
   }
+}
+
+- (void)mountedVolumesDidChange
+{
+  [[self desktopView] showMountedVolumes];
 }
 
 - (void)updateDefaults
@@ -816,6 +808,106 @@ static GWDesktopManager *desktopManager = nil;
 - (void)showTerminal
 {
   [gworkspace startXTermOnDirectory: [dskNode path]];
+}
+
+@end
+
+
+@implementation MPointWatcher
+
+- (void)dealloc
+{
+	if (timer && [timer isValid]) {
+		[timer invalidate];
+	}  
+  RELEASE (volinfo);  
+	[super dealloc];
+}
+
+- (id)initForManager:(GWDesktopManager *)mngr
+{
+  self = [super init];
+  
+  if (self) {
+    manager = mngr;    
+    volinfo = [NSMutableArray new];
+    active = NO;
+    fm = [NSFileManager defaultManager];
+    
+    timer = [NSTimer scheduledTimerWithTimeInterval: 1.0 
+												                     target: self 
+                                           selector: @selector(watchMountPoints:) 
+										                       userInfo: nil 
+                                            repeats: YES];
+  }
+  
+  return self;
+}
+
+- (void)startWatching
+{
+  NSSet *volumes = [[FSNodeRep sharedInstance] volumes];
+  NSEnumerator *enumerator = [volumes objectEnumerator];
+  NSString *path;
+  
+  [volinfo removeAllObjects];
+
+  while ((path = [enumerator nextObject])) {
+    NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: NO];
+    
+    if (attributes) {
+      NSDate *moddate = [attributes fileModificationDate];
+      NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+      
+      [dict setObject: path forKey: @"path"];
+      [dict setObject: moddate forKey: @"moddate"];
+      
+      [volinfo addObject: dict];  
+    }
+  }
+
+  active = YES;
+}
+
+- (void)stopWatching
+{
+  active = NO;
+  [volinfo removeAllObjects];
+}
+
+- (void)watchMountPoints:(id)sender
+{
+  if (active) {
+    int count = [volinfo count];
+    BOOL changed = NO;
+    int i;
+    
+    for (i = 0; i < count; i++) {
+      NSMutableDictionary *dict = [volinfo objectAtIndex: i];
+      NSString *path = [dict objectForKey: @"path"];
+      NSDate *moddate = [dict objectForKey: @"moddate"];
+      NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: NO];      
+      
+      if (attributes) {
+        NSDate *lastmod = [attributes fileModificationDate];
+      
+        if ([moddate isEqualToDate: lastmod] == NO) {
+          [dict setObject: lastmod forKey: @"moddate"];
+          changed = YES;
+        }
+        
+      } else {
+        [volinfo removeObjectAtIndex: i]; 
+        count--;
+        i--;
+        changed = YES;       
+      }      
+    }
+    
+    if (changed) {
+      [manager mountedVolumesDidChange]; 
+    }
+  }
 }
 
 @end

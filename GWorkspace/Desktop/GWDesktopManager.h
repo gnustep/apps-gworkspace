@@ -36,6 +36,7 @@ typedef enum DockPosition {
 @class GWorkspace;
 @class GWDesktopView;
 @class Dock;
+@class MPointWatcher;
 
 @interface GWDesktopManager : NSObject
 {
@@ -54,6 +55,7 @@ typedef enum DockPosition {
   
   GWorkspace *gworkspace;
   FSNodeRep *fsnodeRep;
+  MPointWatcher *mpointWatcher;
   id ws;
   NSFileManager *fm;
   NSNotificationCenter *nc;      
@@ -146,6 +148,8 @@ typedef enum DockPosition {
 
 - (void)mountedVolumeDidUnmount:(NSNotification *)notif;
 
+- (void)mountedVolumesDidChange;
+
 - (void)updateDefaults;
 
 - (void)setContextHelp;
@@ -175,6 +179,26 @@ typedef enum DockPosition {
 - (void)setLabelSize:(id)sender;
 - (void)selectAllInViewer;
 - (void)showTerminal;
+
+@end
+
+
+@interface MPointWatcher : NSObject
+{
+  NSMutableArray *volinfo;
+  NSTimer *timer;
+  BOOL active;
+  GWDesktopManager *manager;
+  NSFileManager *fm;
+}
+
+- (id)initForManager:(GWDesktopManager *)mngr;
+
+- (void)startWatching;
+
+- (void)stopWatching;
+
+- (void)watchMountPoints:(id)sender;
 
 @end
 

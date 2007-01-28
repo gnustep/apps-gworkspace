@@ -347,9 +347,9 @@ static NSString *nibName = @"Contents";
       if (currentViewer 
               && [currentViewer conformsToProtocol: @protocol(ContentViewersProtocol)]) {
         if ([currentPath isEqual: [currentViewer currentPath]]) {
-          [inspector removeWatcherForPath: currentPath];
+    //      [inspector removeWatcherForPath: currentPath];
           [currentViewer displayLastPath: YES];
-          [inspector addWatcherForPath: currentPath];
+    //      [inspector addWatcherForPath: currentPath];
         }
       }
     }
