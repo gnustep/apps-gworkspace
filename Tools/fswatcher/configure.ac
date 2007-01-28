@@ -8,17 +8,7 @@ fi
 #--------------------------------------------------------------------
 # Use config.guess, config.sub and install-sh provided by gnustep-make
 #--------------------------------------------------------------------
-AC_CHECK_HEADERS(dir.h unistd.h)
-AC_CHECK_FUNCS(getpwnam getpwuid geteuid getlogin)
-
 AC_CONFIG_AUX_DIR([$GNUSTEP_MAKEFILES])
-
-AC_CONFIG_HEADER([GWorkspace/config.h])
-AC_CONFIG_HEADER([Tools/ddbd/config.h])
-AC_CONFIG_HEADER([Tools/searchtool/config.h])
-AC_CONFIG_HEADER([Tools/lsfupdater/config.h])
-
-AC_CONFIG_SUBDIRS(FSNode Tools/fswatcher Inspector)
 
 #--------------------------------------------------------------------
 # Debug logging
@@ -33,9 +23,29 @@ else
  GW_DEBUG_LOG=1
 fi
 
+#--------------------------------------------------------------------
+# fswatcher-inotify
+#--------------------------------------------------------------------
+AC_ARG_WITH(inotify,
+  [  --with-inotify  Build fswatcher-inotify],
+  with_inotify=yes, with_inotify=no)
+  
+AC_SUBST(with_inotify)
+
+#--------------------------------------------------------------------
+# fswatcher-fam
+#--------------------------------------------------------------------
+AC_ARG_WITH(fam,
+  [  --with-fam  Build fswatcher-fam],
+  with_fam=yes, with_fam=no)
+  
+AC_SUBST(with_fam)
+
+
 AC_DEFINE_UNQUOTED([GW_DEBUG_LOG], [$GW_DEBUG_LOG], [debug logging])
 
-AC_CONFIG_FILES([GNUmakefile \
-									Tools/ddbd/GNUmakefile \
-									GWorkspace/GNUmakefile])
+AC_CONFIG_HEADER([config.h])
+
+AC_CONFIG_FILES([GNUmakefile])
+
 AC_OUTPUT

@@ -271,7 +271,7 @@ PACKAGE_VERSION=
 PACKAGE_STRING=
 PACKAGE_BUGREPORT=
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS with_inotify with_fam LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -784,6 +784,12 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-debug-log  		Enable debug logging
 
+Optional Packages:
+  --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
+  --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-inotify  Build fswatcher-inotify
+  --with-fam  Build fswatcher-fam
+
 _ACEOF
 fi
 
@@ -1226,6 +1232,9 @@ echo "$as_me: error: You must run the GNUstep initialization script first!" >&2;
    { (exit 1); exit 1; }; }
 fi
 
+#--------------------------------------------------------------------
+# Use config.guess, config.sub and install-sh provided by gnustep-make
+#--------------------------------------------------------------------
 ac_aux_dir=
 for ac_dir in $GNUSTEP_MAKEFILES $srcdir/$GNUSTEP_MAKEFILES; do
   if test -f $ac_dir/install-sh; then
@@ -1269,6 +1278,35 @@ else
  GW_DEBUG_LOG=1
 fi
 
+#--------------------------------------------------------------------
+# fswatcher-inotify
+#--------------------------------------------------------------------
+
+# Check whether --with-inotify or --without-inotify was given.
+if test "${with_inotify+set}" = set; then
+  withval="$with_inotify"
+  with_inotify=yes
+else
+  with_inotify=no
+fi;
+
+
+
+#--------------------------------------------------------------------
+# fswatcher-fam
+#--------------------------------------------------------------------
+
+# Check whether --with-fam or --without-fam was given.
+if test "${with_fam+set}" = set; then
+  withval="$with_fam"
+  with_fam=yes
+else
+  with_fam=no
+fi;
+
+
+
+
 
 cat >>confdefs.h <<_ACEOF
 #define GW_DEBUG_LOG $GW_DEBUG_LOG
@@ -1276,6 +1314,7 @@ _ACEOF
 
 
           ac_config_headers="$ac_config_headers config.h"
+
 
           ac_config_files="$ac_config_files GNUmakefile"
 
@@ -1890,6 +1929,8 @@ s,@ECHO_C@,$ECHO_C,;t t
 s,@ECHO_N@,$ECHO_N,;t t
 s,@ECHO_T@,$ECHO_T,;t t
 s,@LIBS@,$LIBS,;t t
+s,@with_inotify@,$with_inotify,;t t
+s,@with_fam@,$with_fam,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
 CEOF
@@ -2377,7 +2418,4 @@ if test "$no_create" != yes; then
   # would make configure fail if this is the last instruction.
   $ac_cs_success || { (exit 1); exit 1; }
 fi
-
-
-
 

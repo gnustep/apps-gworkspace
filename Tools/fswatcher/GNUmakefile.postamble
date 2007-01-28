@@ -1,13 +1,12 @@
 
 # Things to do before compiling
-#before-all::
+# before-all::
 
 # Things to do after compiling
 # after-all::
 
 # Things to do before installing
-#before-install::
-#before-all::
+# before-install::
   
 # Things to do after installing
 # after-install::
@@ -23,17 +22,17 @@
 
 # Things to do after cleaning
 # after-clean::
-#	rm -rf GWorkspace/Inspectors/Viewers/Library
+#	
 
 # Things to do before distcleaning
 # before-distclean::
 
 # Things to do after distcleaning
 after-distclean::
+	rm -f GNUmakefile
+	rm -f config.h config.status config.log config.cache config.h
 	rm -rf autom4te*.cache
-	rm -f config.status config.log config.cache TAGS  
-	rm -f config.status config.log config.cache config.h GNUmakefile  
-
+  
 # Things to do before checking
 # before-check::
 

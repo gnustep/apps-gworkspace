@@ -10,7 +10,20 @@ TOOL_NAME = fswatcher
 
 # The Objective-C source files to be compiled
 
-fswatcher_OBJC_FILES = fswatcher.m 
+WITH_INOTIFY=@with_inotify@
+WITH_FAM=@with_fam@
+
+ifeq ($(WITH_INOTIFY),yes)
+  fswatcher_OBJC_FILES = fswatcher-inotify.m
+else
+  ifeq ($(WITH_FAM),yes)
+    fswatcher_OBJC_FILES = fswatcher-fam.m
+  else
+    fswatcher_OBJC_FILES = fswatcher.m
+  endif
+endif
+
+fswatcher_TOOL_LIBS += -lDBKit
 
 # The Resource files to be copied into the app's resources directory
 

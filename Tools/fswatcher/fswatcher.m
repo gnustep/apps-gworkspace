@@ -23,7 +23,6 @@
  */
 
 #include "fswatcher.h"
-#include "GNUstep.h"
 
 @implementation	FSWClientInfo
 

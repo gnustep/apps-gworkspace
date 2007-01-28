@@ -2539,6 +2539,7 @@ int sortSubviews(id view1, id view2, void *context)
 
   switch (character) {
     case NSPageUpFunctionKey:
+      [dsource stopRepNameEditing];
 		  vRect = [self visibleRect];
 		  p = vRect.origin;
 		  x = p.x;
@@ -2550,6 +2551,7 @@ int sortSubviews(id view1, id view2, void *context)
 	    return;
 
     case NSPageDownFunctionKey:
+      [dsource stopRepNameEditing];
 		  vRect = [self visibleRect];
 		  p = vRect.origin;    
 		  x = p.x;
@@ -2561,10 +2563,12 @@ int sortSubviews(id view1, id view2, void *context)
 	    return;
 
     case NSUpArrowFunctionKey:
+      [dsource stopRepNameEditing];
 	    [dsource selectRepInPrevRow];
       return;
 
     case NSDownArrowFunctionKey:
+      [dsource stopRepNameEditing];
 	    [dsource selectRepInNextRow];
       return;
   

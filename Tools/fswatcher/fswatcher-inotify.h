@@ -1,9 +1,9 @@
-/* fswatcher.h
+/* fswatcher-inotify.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2007 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
- * Date: February 2004
+ * Author: Enrico Sersale <enrico@fibernet.ro>
+ * Date: Ianuary 2007
  *
  * This file is part of the GNUstep GWorkspace application
  *
@@ -22,9 +22,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#ifndef FSWATCHER_H
-#define FSWATCHER_H
+#ifndef FSWATCHER_INOTIFY_H
+#define FSWATCHER_INOTIFY_H
 
+#include <sys/inotify.h>
 #include <Foundation/Foundation.h>
 #include "DBKPathsTree.h"
 
@@ -87,35 +88,22 @@
 @end
 
 
-typedef struct {  
-  int has_syscall;
-  int has_cwd;
-  int has_path;
-  int has_second_path;
-  
-  unsigned long serial;
-  unsigned long sec;
-  unsigned long milli;
-  
-  unsigned long syscall;
-  
-  char basepath[PATH_MAX];
-  char fullpath[PATH_MAX];
-  char destpath[PATH_MAX];
-} audit_record;
-
-
 @interface FSWatcher: NSObject 
 {
   NSConnection *conn;
-  NSMutableSet *clientsInfo;  
-  NSMutableSet *watchers;
+  NSMutableArray *clientsInfo;  
+  NSMapTable *watchers;
+  NSMapTable *watchDescrMap;
   
-  NSCountedSet *watchedPaths;
+  NSFileHandle *inotifyHandle;
+  uint32_t filemask;
+  uint32_t dirmask;
+  NSString *lastMovedPath;
+  uint32_t moveCookie;
+  
   pcomp *includePathsTree;
   pcomp *excludePathsTree;  
   NSMutableSet *excludedSuffixes;
-  NSConnection *recReadConn;
      
   NSFileManager *fm;
   NSNotificationCenter *nc;
@@ -147,16 +135,18 @@ typedef struct {
                                 removeWatcherForPath:(NSString *)path;
                                 
 - (Watcher *)watcherForPath:(NSString *)path;
-                                
-- (void)watcherTimeOut:(NSTimer *)sender;
 
+- (Watcher *)watcherWithWatchDescriptor:(int)wd;
+                                
 - (void)removeWatcher:(Watcher *)awatcher;                                
                                 
 - (void)notifyClients:(NSDictionary *)info;
 
 - (void)notifyGlobalWatchingClients:(NSDictionary *)info;
 
-- (oneway void)logDataReady:(NSData *)data;
+- (void)checkLastMovedPath:(id)sender;
+
+- (void)inotifyDataReady:(NSNotification *)notif;
 
 @end
 
@@ -164,20 +154,15 @@ typedef struct {
 @interface Watcher: NSObject
 {
   NSString *watchedPath;  
-  BOOL isdir;
-  NSArray *pathContents;
+  int watchDescriptor;
+  BOOL isdir;  
   int listeners;
-  NSDate *date;
-	BOOL isOld;
-	NSFileManager *fm;
   FSWatcher *fswatcher;
-  NSTimer *timer;
 }
 
 - (id)initWithWatchedPath:(NSString *)path
+          watchDescriptor:(int)wdesc
                 fswatcher:(id)fsw;
-
-- (void)watchFile;
 
 - (void)addListener;
 
@@ -187,32 +172,11 @@ typedef struct {
 
 - (NSString *)watchedPath;
 
-- (BOOL)isOld;
+- (int)watchDescriptor;
 
-- (NSTimer *)timer;
-
-@end
-
-
-@interface FSWRecordsReader: NSObject
-{
-  NSString *logDir;
-  NSString *logPath;
-  FILE *stream;
-
-  id fsw;
-  NSFileManager *fm;
-}
-
-+ (void)recordsReader:(NSArray *)ports;
-
-- (id)initWithPorts:(NSArray *)ports;
-
-- (void)readLoop;
-
-- (void)readRecords;
+- (BOOL)isDirWatcher;
 
 @end
 
-#endif // FSWATCHER_H
+#endif // FSWATCHER_INOTIFY_H
 
