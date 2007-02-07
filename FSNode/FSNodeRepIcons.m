@@ -197,9 +197,12 @@ static unsigned char darkerLUT[256] = {
   }      
 
   if (icon == nil) {
-    icon = [NSImage imageNamed: @"Unknown"];
+    NSSize icnsize;
     
-    if (([icon size].width > size) || ([icon size].height > size)) {
+    icon = [NSImage imageNamed: @"Unknown"];
+    icnsize = [icon size];
+
+    if ((icnsize.width > size) || (icnsize.height > size)) {
       icon = [self resizedIcon: icon ofSize: size];
     }  
   }
@@ -241,8 +244,14 @@ static unsigned char darkerLUT[256] = {
                     
 {
   NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+  NSSize icnsize = [baseIcon size];
+  int basesize = 48;
+  
+  if ((icnsize.width > basesize) || (icnsize.height > basesize)) {
+    baseIcon = [self resizedIcon: baseIcon ofSize: basesize];
+  }  
 
-  [dict setObject: baseIcon forKey: [NSNumber numberWithInt: 48]];
+  [dict setObject: baseIcon forKey: [NSNumber numberWithInt: basesize]];
   [iconsCache setObject: dict forKey: key];
   
   return [self cachedIconOfSize: size forKey: key];
@@ -380,6 +389,39 @@ static unsigned char darkerLUT[256] = {
   return 0.8125;
 }
 
+- (NSImage *)resizedIcon:(NSImage *)icon 
+                  ofSize:(int)size
+{
+  CREATE_AUTORELEASE_POOL(arp);
+  NSSize icnsize = [icon size];
+  NSRect srcr = NSMakeRect(0, 0, icnsize.width, icnsize.height);
+  float fact = (icnsize.width >= icnsize.height) ? (icnsize.width / size) : (icnsize.height / size);
+  NSSize newsize = NSMakeSize(floor(icnsize.width / fact + 0.5), floor(icnsize.height / fact + 0.5));	
+  NSRect dstr = NSMakeRect(0, 0, newsize.width, newsize.height);
+  NSImage *newIcon = [[NSImage alloc] initWithSize: newsize];
+  NSBitmapImageRep *rep = nil;
+  
+  [newIcon lockFocus];
+
+  [icon drawInRect: dstr 
+          fromRect: srcr 
+         operation: NSCompositeSourceOver 
+          fraction: 1.0];
+
+  rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect: dstr];
+  [newIcon addRepresentation: rep];
+  RELEASE (rep);
+
+  [newIcon unlockFocus];
+
+  RELEASE (arp);
+
+  return AUTORELEASE (newIcon);  
+}
+
+/*
+// using nearest neighbour algorithm
+
 #define MIX_LIM 16
 
 - (NSImage *)resizedIcon:(NSImage *)icon 
@@ -391,7 +433,7 @@ static unsigned char darkerLUT[256] = {
   int spp = [rep samplesPerPixel];
   int bitsPerPixel = [rep bitsPerPixel];
   int bpp = bitsPerPixel / 8;
-  NSImage *newIcon;
+  NSImage *newIcon = nil;
 
 	if (((spp == 3) && (bitsPerPixel == 24)) 
         || ((spp == 4) && (bitsPerPixel == 32))
@@ -497,13 +539,33 @@ static unsigned char darkerLUT[256] = {
     }
 
   } else {
-    newIcon = [icon copy];  
+    NSSize icnsize = [icon size];
+    NSRect srcr = NSMakeRect(0, 0, icnsize.width, icnsize.height);
+    float fact = (icnsize.width >= icnsize.height) ? (icnsize.width / size) : (icnsize.height / size);
+    NSSize newsize = NSMakeSize(floor(icnsize.width / fact + 0.5), floor(icnsize.height / fact + 0.5));	
+    NSRect dstr = NSMakeRect(0, 0, newsize.width, newsize.height);
+    NSBitmapImageRep *rep = nil;
+    
+    newIcon = [[NSImage alloc] initWithSize: newsize];
+    [newIcon lockFocus];
+
+    [icon drawInRect: dstr 
+            fromRect: srcr 
+           operation: NSCompositeSourceOver 
+            fraction: 1.0];
+
+    rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect: dstr];
+    [newIcon addRepresentation: rep];
+    RELEASE (rep);
+    
+    [newIcon unlockFocus];
   }
 
   RELEASE (arp);
 
   return AUTORELEASE (newIcon);  
 }
+*/
 
 - (NSImage *)lighterIcon:(NSImage *)icon
 {

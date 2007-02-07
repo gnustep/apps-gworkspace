@@ -805,7 +805,7 @@ do { \
 	              name: NSConnectionDidDieNotification
 	            object: connection];
 
-  NSAssert(connection == [fswatcher connectionForProxy],
+  NSAssert(connection == [ddbd connectionForProxy],
 		                                  NSInternalInconsistencyException);
   RELEASE (ddbd);
   ddbd = nil;

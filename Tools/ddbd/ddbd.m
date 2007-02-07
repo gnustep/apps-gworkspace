@@ -52,8 +52,6 @@ static NSFileManager *fm = nil;
 
 - (void)dealloc
 {
-  [[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
-
   if (conn) {
     [nc removeObserver: self
 		              name: NSConnectionDidDieNotification
@@ -109,11 +107,6 @@ static NSFileManager *fm = nil;
            name: NSThreadWillExitNotification
          object: nil];    
     
-    [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
-                				  selector: @selector(fileSystemDidChange:) 
-                					    name: @"GWFileSystemDidChangeNotification"
-                					  object: nil];
-
     pathsManager = [[DDBPathsManager alloc] initWithBasePath: dbdir];
     pathslock = [NSRecursiveLock new];
     dirsManager = [[DDBDirsManager alloc] initWithBasePath: dbdir];
@@ -278,6 +271,28 @@ static NSFileManager *fm = nil;
   return interval;
 }
 
+- (oneway void)fileSystemDidChange:(NSData *)info
+{
+  NSDictionary *dict = [NSUnarchiver unarchiveObjectWithData: info];
+  NSMutableDictionary *updaterInfo = [NSMutableDictionary dictionary];
+    
+  [updaterInfo setObject: [NSNumber numberWithInt: DDBdFileOperationUpdate] 
+                  forKey: @"type"];
+  [updaterInfo setObject: dict forKey: @"taskdict"];
+
+  NS_DURING
+    {
+      [NSThread detachNewThreadSelector: @selector(updaterForTask:)
+		                           toTarget: [DBUpdater class]
+		                         withObject: updaterInfo];
+    }
+  NS_HANDLER
+    {
+      NSLog(@"A fatal error occured while detaching the thread!");
+    }
+  NS_ENDHANDLER
+}
+
 - (oneway void)synchronize
 {
   [pathslock lock];
@@ -316,31 +331,9 @@ static NSFileManager *fm = nil;
   return YES;
 }
 
-- (void)fileSystemDidChange:(NSNotification *)notif
-{
-  NSDictionary *info = [notif userInfo];
-  NSMutableDictionary *updaterInfo = [NSMutableDictionary dictionary];
-    
-  [updaterInfo setObject: [NSNumber numberWithInt: DDBdFileOperationUpdate] 
-                  forKey: @"type"];
-  [updaterInfo setObject: info forKey: @"taskdict"];
-
-  NS_DURING
-    {
-      [NSThread detachNewThreadSelector: @selector(updaterForTask:)
-		                           toTarget: [DBUpdater class]
-		                         withObject: updaterInfo];
-    }
-  NS_HANDLER
-    {
-      NSLog(@"A fatal error occured while detaching the thread!");
-    }
-  NS_ENDHANDLER
-}
-
 - (void)threadWillExit:(NSNotification *)notification
 {
-  NSLog(@"db update done");
+  GWDebugLog(@"db update done");
 }
 
 @end
@@ -374,7 +367,7 @@ static NSFileManager *fm = nil;
   
   RETAIN (self);
     
-  NSLog(@"starting db update");
+  GWDebugLog(@"starting db update");
 
   switch(type) {
     case DDBdInsertTreeUpdate:

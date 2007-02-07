@@ -50,6 +50,8 @@
 
 - (NSTimeInterval)timestampOfPath:(NSString *)path;
 
+- (oneway void)fileSystemDidChange:(NSData *)info;
+
 - (oneway void)synchronize;
 
 @end
@@ -63,8 +65,6 @@
 }
                                                      
 - (void)connectionBecameInvalid:(NSNotification *)notification;
-
-- (void)fileSystemDidChange:(NSNotification *)notif;
 
 - (void)threadWillExit:(NSNotification *)notification;
             

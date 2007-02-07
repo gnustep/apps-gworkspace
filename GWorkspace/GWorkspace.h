@@ -93,6 +93,8 @@
 - (oneway void)setAnnotations:(NSString *)annotations
                       forPath:(NSString *)path;
 
+- (oneway void)fileSystemDidChange:(NSData *)info;
+
 @end
 
 

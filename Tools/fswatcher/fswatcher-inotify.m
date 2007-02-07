@@ -483,20 +483,20 @@
       int wd = inotify_add_watch([inotifyHandle fileDescriptor], 
                                                   [path UTF8String], mask);
       
-      GWDebugLog(@"add watcher for: %@", path);      
-      [info addWatchedPath: path];
-  	  watcher = [[Watcher alloc] initWithWatchedPath: path 
-                                     watchDescriptor: wd
-                                           fswatcher: self];      
-      NSMapInsert (watchers, path, watcher);      
-      RELEASE (watcher);       
-
       if (wd != -1) { 
-        NSMapInsert (watchDescrMap, (void *)wd, (void *)watcher);       
+        GWDebugLog(@"add watcher for: %@", path);      
+        [info addWatchedPath: path];
+  	    watcher = [[Watcher alloc] initWithWatchedPath: path 
+                                       watchDescriptor: wd
+                                             fswatcher: self];      
+        NSMapInsert (watchers, path, watcher);
+        NSMapInsert (watchDescrMap, (void *)wd, (void *)watcher);      
+        RELEASE (watcher);       
+        
       } else {
         NSLog(@"Invalid watch descriptor returned by inotify_add_watch(). "
-              @"Using default NSTimer watching for: %@", path);  
-      }
+                                                @"No watcher for: %@", path);  
+      }    
     }
   }
 }
@@ -799,7 +799,7 @@ static inline BOOL isDotFile(NSString *path)
   
   if (self) { 
     NSFileManager *fm = [NSFileManager defaultManager];
-		NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: NO];
+		NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: YES];
     		
     ASSIGN (watchedPath, path); 
     watchDescriptor = wdesc;    

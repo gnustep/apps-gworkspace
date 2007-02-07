@@ -1,4 +1,4 @@
-/* GWViewerShelf.h
+/* GWViewerSplit.m
  *  
  * Copyright (C) 2004 Free Software Foundation, Inc.
  *
@@ -55,8 +55,10 @@
 	} else {
   	[diskInfoField setStringValue: @""]; 
   }
-   
-  [diskInfoField drawWithFrame: diskInfoRect inView: self];
+  
+  if (NSEqualRects(diskInfoRect, NSZeroRect) == NO) {
+    [diskInfoField drawWithFrame: diskInfoRect inView: self];
+  }
 }
 
 - (float)dividerThickness

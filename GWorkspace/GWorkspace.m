@@ -489,57 +489,53 @@ static GWorkspace *gworkspace = nil;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
-  NSNotificationCenter *nc = [NSDistributedNotificationCenter defaultCenter];
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  NSNotificationCenter *dnc = [NSDistributedNotificationCenter defaultCenter];
   
   [nc addObserver: self 
          selector: @selector(fileSystemWillChange:) 
              name: @"GWFileSystemWillChangeNotification"
            object: nil];
 
-  [[NSNotificationCenter defaultCenter] addObserver: self 
-         selector: @selector(fileSystemDidChange:) 
-             name: @"GWFileSystemDidChangeNotification"
-           object: nil];
-
   [nc addObserver: self 
          selector: @selector(fileSystemDidChange:) 
              name: @"GWFileSystemDidChangeNotification"
            object: nil];
 
-  [nc addObserver: self 
-         selector: @selector(changeDefaultEditor:) 
-             name: @"GWDefaultEditorChangedNotification"
-           object: nil];
+  [dnc addObserver: self 
+          selector: @selector(changeDefaultEditor:) 
+              name: @"GWDefaultEditorChangedNotification"
+            object: nil];
 
-  [nc addObserver: self 
-         selector: @selector(thumbnailsDidChange:) 
-             name: @"GWThumbnailsDidChangeNotification"
-           object: nil];
+  [dnc addObserver: self 
+          selector: @selector(thumbnailsDidChange:) 
+              name: @"GWThumbnailsDidChangeNotification"
+            object: nil];
 
-  [nc addObserver: self 
-         selector: @selector(removableMediaPathsDidChange:) 
-             name: @"GSRemovableMediaPathsDidChangeNotification"
-           object: nil];
+  [dnc addObserver: self 
+          selector: @selector(removableMediaPathsDidChange:) 
+              name: @"GSRemovableMediaPathsDidChangeNotification"
+            object: nil];
 
-  [nc addObserver: self 
-         selector: @selector(reservedMountNamesDidChange:) 
-             name: @"GSReservedMountNamesDidChangeNotification"
-           object: nil];
+  [dnc addObserver: self 
+          selector: @selector(reservedMountNamesDidChange:) 
+              name: @"GSReservedMountNamesDidChangeNotification"
+            object: nil];
  
-  [nc addObserver: self 
-         selector: @selector(hideDotsFileDidChange:) 
-             name: @"GSHideDotFilesDidChangeNotification"
-           object: nil];
+  [dnc addObserver: self 
+          selector: @selector(hideDotsFileDidChange:) 
+              name: @"GSHideDotFilesDidChangeNotification"
+            object: nil];
 
-  [nc addObserver: self 
-         selector: @selector(customDirectoryIconDidChange:) 
-             name: @"GWCustomDirectoryIconDidChangeNotification"
-           object: nil];
+  [dnc addObserver: self 
+          selector: @selector(customDirectoryIconDidChange:) 
+              name: @"GWCustomDirectoryIconDidChangeNotification"
+            object: nil];
 
-  [nc addObserver: self 
-         selector: @selector(applicationForExtensionsDidChange:) 
-             name: @"GWAppForExtensionDidChangeNotification"
-           object: nil];
+  [dnc addObserver: self 
+          selector: @selector(applicationForExtensionsDidChange:) 
+              name: @"GWAppForExtensionDidChangeNotification"
+            object: nil];
   
   [self initializeWorkspace]; 
 }
@@ -1089,30 +1085,37 @@ static GWorkspace *gworkspace = nil;
 - (void)fileSystemDidChange:(NSNotification *)notif
 {
   NSDictionary *info = (NSDictionary *)[notif object];
-  NSString *source = [info objectForKey: @"source"];
-  NSString *destination = [info objectForKey: @"destination"];
   
-  if ([source isEqual: trashPath] || [destination isEqual: trashPath]) {
-    CREATE_AUTORELEASE_POOL(arp);
-    FSNode *node = [FSNode nodeWithPath: trashPath];
+  if (info) { 
+    CREATE_AUTORELEASE_POOL(arp);   
+    NSString *source = [info objectForKey: @"source"];
+    NSString *destination = [info objectForKey: @"destination"];
+  
+    if ([source isEqual: trashPath] || [destination isEqual: trashPath]) {    
+      FSNode *node = [FSNode nodeWithPath: trashPath];
 
-    [trashContents removeAllObjects];
+      [trashContents removeAllObjects];
 
-    if (node && [node isValid]) {
-      NSArray *subNodes = [node subNodes];
-      int i; 
-    
-      for (i = 0; i < [subNodes count]; i++) {
-        FSNode *subnode = [subNodes objectAtIndex: i];
-        
-        if ([subnode isReserved] == NO) {
-          [trashContents addObject: subnode];
+      if (node && [node isValid]) {
+        NSArray *subNodes = [node subNodes];
+        int i; 
+
+        for (i = 0; i < [subNodes count]; i++) {
+          FSNode *subnode = [subNodes objectAtIndex: i];
+
+          if ([subnode isReserved] == NO) {
+            [trashContents addObject: subnode];
+          }
         }
-      }
+      }      
     }
-  
+    
+    if (ddbd != nil) {
+      [ddbd fileSystemDidChange: [NSArchiver archivedDataWithRootObject: info]];
+    }
+    
     RELEASE (arp);
-  }
+  } 
 }
 
 - (void)setSelectedPaths:(NSArray *)paths
