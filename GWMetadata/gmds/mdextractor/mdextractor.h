@@ -224,7 +224,7 @@
 
 - (void)processPendingChanges:(id)sender;
 
-- (void)connectFSWatcher;
+- (void)connectFSWatcher:(id)sender;
 
 - (void)fswatcherConnectionDidDie:(NSNotification *)notif;
 

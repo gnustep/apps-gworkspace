@@ -98,6 +98,10 @@
 @end
 
 
+@protocol	MDExtractorProtocol
+
+@end
+
 /* The protocol of the remote dnd source */
 @protocol GWRemoteFilesDraggingInfo
 - (oneway void)remoteDraggingDestinationReply:(NSData *)reply;
@@ -120,6 +124,7 @@
   BOOL recyclerCanQuit;
   
   id ddbd;
+  id mdextractor;
   
   PrefController *prefController;
   Fiend *fiend;
@@ -313,6 +318,10 @@
 
 - (void)ddbdSetAnnotations:(NSString *)annotations
                    forPath:(NSString *)path;
+
+- (void)connectMDExtractor;
+
+- (void)mdextractorConnectionDidDie:(NSNotification *)notif;
 
 - (void)slideImage:(NSImage *)image 
 							from:(NSPoint)fromPoint 

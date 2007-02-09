@@ -730,11 +730,16 @@ static inline BOOL isDotFile(NSString *path)
             [notifdict setObject: @"GWWatchedPathDeleted" forKey: @"event"];
             GWDebugLog(@"DELETE %@", fullpath); 
             
-          } else if (type == IN_CREATE || type == IN_MODIFY 
+          } else if (type == IN_CREATE) {
+            [notifdict setObject: @"GWFileCreatedInWatchedDirectory" 
+                          forKey: @"event"];        
+            GWDebugLog(@"CREATED %@", fullpath); 
+                     
+          } else if (type == IN_MODIFY 
                         || ((dirwatch == NO) && type == IN_CLOSE_WRITE)) {
             [notifdict setObject: @"GWWatchedFileModified" forKey: @"event"];        
             GWDebugLog(@"MODIFIED %@", fullpath); 
-                        
+                 
           } else if (type == IN_MOVED_FROM) {  
             ASSIGN (lastMovedPath, fullpath);
             moveCookie = eventp->cookie;          
@@ -754,7 +759,8 @@ static inline BOOL isDotFile(NSString *path)
               GWDebugLog(@"MOVED from: %@ to: %@", lastMovedPath, fullpath);
             
             } else {
-              [notifdict setObject: @"GWWatchedFileModified" forKey: @"event"];             
+              [notifdict setObject: @"GWFileCreatedInWatchedDirectory" 
+                            forKey: @"event"];             
               GWDebugLog(@"MOVED from not indexable path: %@", fullpath); 
             }
             

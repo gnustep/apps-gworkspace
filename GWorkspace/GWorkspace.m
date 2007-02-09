@@ -114,6 +114,7 @@ static GWorkspace *gworkspace = nil;
   }
   DESTROY (recyclerApp);
   DESTROY (ddbd);
+  DESTROY (mdextractor);
 	RELEASE (gwProcessName);
 	RELEASE (gwBundlePath);
 	RELEASE (defEditor);
@@ -472,7 +473,12 @@ static GWorkspace *gworkspace = nil;
   
   ddbd = nil;
   [self connectDDBd];
-  
+    
+  mdextractor = nil;
+  if ([defaults boolForKey: @"GSMetadataIndexingEnabled"]) {
+    [self connectMDExtractor];
+  }
+    
 	[defaults synchronize];
   terminating = NO;
   
@@ -547,6 +553,8 @@ static GWorkspace *gworkspace = nil;
 
 - (BOOL)applicationShouldTerminate:(NSApplication *)app 
 {
+  NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+  
 #define TEST_CLOSE(o, w) if ((o) && ([w isVisible])) [w close]
   
   if ([fileOpsManager operationsPending]) {
@@ -587,12 +595,12 @@ static GWorkspace *gworkspace = nil;
   TEST_CLOSE (startAppWin, [startAppWin win]);
 
   if (fswatcher) {
-    NSConnection *fswconn = [(NSDistantObject *)fswatcher connectionForProxy];
+    NSConnection *conn = [(NSDistantObject *)fswatcher connectionForProxy];
   
-    if ([fswconn isValid]) {
-      [[NSNotificationCenter defaultCenter] removeObserver: self
-	                        name: NSConnectionDidDieNotification
-	                      object: fswconn];
+    if ([conn isValid]) {
+      [nc removeObserver: self
+	                  name: NSConnectionDidDieNotification
+	                object: conn];
       [fswatcher unregisterClient: (id <FSWClientProtocol>)self];  
       DESTROY (fswatcher);
     }
@@ -603,24 +611,35 @@ static GWorkspace *gworkspace = nil;
   [finder stopAllSearchs];
   
   if (recyclerApp) {
-    NSConnection *rcconn = [(NSDistantObject *)recyclerApp connectionForProxy];
+    NSConnection *conn = [(NSDistantObject *)recyclerApp connectionForProxy];
   
-    if (rcconn && [rcconn isValid]) {
-      [[NSNotificationCenter defaultCenter] removeObserver: self
-	                        name: NSConnectionDidDieNotification
-	                      object: rcconn];
+    if (conn && [conn isValid]) {
+      [nc removeObserver: self
+	                  name: NSConnectionDidDieNotification
+	                object: conn];
       DESTROY (recyclerApp);
     }
   }
   
   if (ddbd) {
-    NSConnection *ddbdconn = [(NSDistantObject *)ddbd connectionForProxy];
+    NSConnection *conn = [(NSDistantObject *)ddbd connectionForProxy];
   
-    if (ddbdconn && [ddbdconn isValid]) {
-      [[NSNotificationCenter defaultCenter] removeObserver: self
-	                        name: NSConnectionDidDieNotification
-	                      object: ddbdconn];
+    if (conn && [conn isValid]) {
+      [nc removeObserver: self
+	                  name: NSConnectionDidDieNotification
+	                object: conn];
       DESTROY (ddbd);
+    }
+  }
+
+  if (mdextractor) {
+    NSConnection *conn = [(NSDistantObject *)mdextractor connectionForProxy];
+  
+    if (conn && [conn isValid]) {
+      [nc removeObserver: self
+	                  name: NSConnectionDidDieNotification
+	                object: conn];
+      DESTROY (mdextractor);
     }
   }
   		
@@ -1988,6 +2007,83 @@ static GWorkspace *gworkspace = nil;
   }
 }
 
+- (void)connectMDExtractor
+{
+  if (mdextractor == nil) {
+    mdextractor = [NSConnection rootProxyForConnectionWithRegisteredName: @"mdextractor" 
+                                                                    host: @""];
+
+    if (mdextractor == nil) {
+	    NSString *cmd;
+      int i;
+    
+      cmd = [[NSSearchPathForDirectoriesInDomains(
+                GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
+                                      stringByAppendingPathComponent: @"mdextractor"];    
+                
+      [startAppWin showWindowWithTitle: @"MDIndexing"
+                               appName: @"mdextractor"
+                             operation: NSLocalizedString(@"starting:", @"")
+                          maxProgValue: 80.0];
+    
+      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
+   
+      for (i = 1; i <= 80; i++) {
+        [startAppWin updateProgressBy: 1.0];
+	      [[NSRunLoop currentRunLoop] runUntilDate:
+		                     [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+
+        mdextractor = [NSConnection rootProxyForConnectionWithRegisteredName: @"mdextractor" 
+                                                                        host: @""];                  
+        if (mdextractor) {
+          [startAppWin updateProgressBy: 80.0 - i];
+          break;
+        }
+      }
+
+      [[startAppWin win] close];
+    }
+    
+    if (mdextractor) {
+      [mdextractor setProtocolForProxy: @protocol(MDExtractorProtocol)];
+      RETAIN (mdextractor);
+    
+	    [[NSNotificationCenter defaultCenter] addObserver: self
+	                   selector: @selector(mdextractorConnectionDidDie:)
+		                     name: NSConnectionDidDieNotification
+		                   object: [mdextractor connectionForProxy]];
+    } else {
+      NSRunAlertPanel(nil,
+              NSLocalizedString(@"unable to contact mdextractor!", @""),
+              NSLocalizedString(@"Ok", @""),
+              nil, 
+              nil);  
+    }
+  }
+}
+
+- (void)mdextractorConnectionDidDie:(NSNotification *)notif
+{
+  id connection = [notif object];
+
+  [[NSNotificationCenter defaultCenter] removeObserver: self
+	              name: NSConnectionDidDieNotification
+	            object: connection];
+
+  NSAssert(connection == [mdextractor connectionForProxy],
+		                                  NSInternalInconsistencyException);
+  RELEASE (mdextractor);
+  mdextractor = nil;
+
+  if (NSRunAlertPanel(nil,
+                    NSLocalizedString(@"The mdextractor connection died.\nDo you want to restart it?", @""),
+                    NSLocalizedString(@"Yes", @""),
+                    NSLocalizedString(@"No", @""),
+                    nil)) {
+    [self connectMDExtractor];                
+  }  
+}
+
 - (void)slideImage:(NSImage *)image 
 							from:(NSPoint)fromPoint 
 								to:(NSPoint)toPoint
@@ -2054,8 +2150,8 @@ static GWorkspace *gworkspace = nil;
   [d setObject: @"GWorkspace" forKey: @"ApplicationName"];
   [d setObject: NSLocalizedString(@"GNUstep Workspace Manager", @"")
       	forKey: @"ApplicationDescription"];
-  [d setObject: @"GWorkspace 0.8.4" forKey: @"ApplicationRelease"];
-  [d setObject: @"01 2007" forKey: @"FullVersionID"];
+  [d setObject: @"GWorkspace 0.8.5" forKey: @"ApplicationRelease"];
+  [d setObject: @"02 2007" forKey: @"FullVersionID"];
   [d setObject: [NSArray arrayWithObjects: 
                     @"Enrico Sersale <enrico@fibernet.ro>",
                     @"Documentation and Help contents by: \n"

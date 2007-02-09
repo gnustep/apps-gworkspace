@@ -572,7 +572,13 @@ static GWViewersManager *vwrsmanager = nil;
   id parentViewer = [self parentOfSpatialViewer: aviewer];
     
   if (parentViewer) {
+    id nodeView = [parentViewer nodeView];
+
     [parentViewer setOpened: YES repOfNode: [aviewer baseNode]];
+
+    if ([nodeView respondsToSelector: @selector(scrollSelectionToVisible)]) {
+      [nodeView scrollSelectionToVisible];
+    }  
   }
 }
 

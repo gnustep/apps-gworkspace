@@ -482,7 +482,7 @@ do { \
   RETAIN (lostPathsTimer);     
      
   fswatcher = nil;
-  [self connectFSWatcher];
+  [self connectFSWatcher: nil];
 }
 
 - (oneway void)globalWatchedPathDidChange:(NSDictionary *)info
@@ -497,7 +497,8 @@ do { \
     if ([event isEqual: @"GWWatchedPathDeleted"]) {
       exists = [NSNumber numberWithBool: NO];
 
-    } else if ([event isEqual: @"GWWatchedFileModified"]) {
+    } else if ([event isEqual: @"GWWatchedFileModified"]
+                  || [event isEqual: @"GWFileCreatedInWatchedDirectory"]) {
       exists = [NSNumber numberWithBool: YES];
 
     } else if ([event isEqual: @"GWWatchedPathRenamed"]) {
@@ -562,13 +563,27 @@ do { \
 
       [[NSRunLoop currentRunLoop] runUntilDate: date]; 
 
-      if ([event isEqual: @"GWWatchedFileModified"]) {
+      if ([event isEqual: @"GWWatchedFileModified"]
+            || [event isEqual: @"GWFileCreatedInWatchedDirectory"]) {
         if ([fm fileExistsAtPath: path]) {
           GWDebugLog(@"db update: %@", path);
 
-          if ([self updatePath: path] == NO) {      
-            NSLog(@"An error occurred while processing %@", path);
-          }        
+          if ([event isEqual: @"GWFileCreatedInWatchedDirectory"]) {
+            /* 
+               "GWFileCreatedInWatchedDirectory" is reported only by 
+               fswatcher-inotify.
+               In this case, if "path" is a directory, we must add 
+               also its contents.
+            */
+            if ([self addPath: path] == NO) {
+              NSLog(@"An error occurred while processing %@", path);
+            }                  
+          } else {
+            if ([self updatePath: path] == NO) {      
+              NSLog(@"An error occurred while processing %@", path);
+            }        
+          }          
+          
         } else {
           NSMutableDictionary *d = [NSMutableDictionary dictionary];
 
@@ -672,7 +687,7 @@ do { \
   }
 }
 
-- (void)connectFSWatcher
+- (void)connectFSWatcher:(id)sender
 {
   if (fswatcher == nil) {
     fswatcher = [NSConnection rootProxyForConnectionWithRegisteredName: @"fswatcher" 
@@ -734,7 +749,11 @@ do { \
 
   NSLog(@"The fswatcher connection died!");
 
-  [self connectFSWatcher];                
+  [NSTimer scheduledTimerWithTimeInterval: 5.0
+						                       target: self 
+                                 selector: @selector(connectFSWatcher:) 
+															   userInfo: nil 
+                                  repeats: NO];
 }
 
 @end
@@ -918,20 +937,22 @@ do { \
           
       for (i = 0; i < [contents count]; i++) {
         NSString *path = [contents objectAtIndex: i];
+        NSDictionary *attrs = [fm fileAttributesAtPath: path traverseLink: NO];
+        NSTimeInterval date = [[attrs fileModificationDate] timeIntervalSinceReferenceDate];        
         NSNumber *dbdate = [dbcontents objectForKey: path];
         
         if (dbdate == nil) {
           GWDebugLog(@"schedule-add %@", path);
           [self addPath: path];
           
-        } else {
-          NSDictionary *attrs = [fm fileAttributesAtPath: path traverseLink: NO];
-          NSTimeInterval date = [[attrs fileModificationDate] timeIntervalSinceReferenceDate];
-   
-          if ((date - [dbdate floatValue]) > 10) {
-            GWDebugLog(@"schedule-update %@ ---- %f - %f", path, date, [dbdate floatValue]);
-            [self updatePath: path];
+          if ([attributes fileType] == NSFileTypeDirectory) {
+            [directories addObject: path];
+            GWDebugLog(@"add-to-directories %@", path);
           }
+          
+        } else if ((date - [dbdate floatValue]) > 10) {
+          GWDebugLog(@"schedule-update %@ ---- %f - %f", path, date, [dbdate floatValue]);
+          [self updatePath: path];          
         }
       }    
     

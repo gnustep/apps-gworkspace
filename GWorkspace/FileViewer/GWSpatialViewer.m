@@ -927,6 +927,8 @@
   
 	if ([title isEqual: NSLocalizedString(viewType, @"")] == NO) {
     NSArray *selection = [nodeView selectedNodes];
+    NSArray *reps = [nodeView reps];
+    NSMutableArray *opennodes = [NSMutableArray array];
     int i;
     
     [nodeView updateNodeInfo: YES];
@@ -934,6 +936,17 @@
       selection = [NSArray arrayWithObject: [nodeView shownNode]];
     }    
     RETAIN (selection);
+    
+    for (i = 0; i < [reps count]; i++) {
+      id rep = [reps objectAtIndex: i];
+
+      if ([rep isOpened]) {
+        [opennodes addObject: [rep node]];
+      }
+    }
+
+    RETAIN (opennodes);
+    
     [scroll setDocumentView: nil];	
     
     if ([title isEqual: NSLocalizedString(@"Browser", @"")]) {
@@ -964,6 +977,16 @@
     [scroll setDocumentView: nodeView];	
     RELEASE (nodeView);                 
     [nodeView showContentsOfNode: baseNode]; 
+        
+    for (i = 0; i < [opennodes count]; i++) {
+      id rep = [nodeView repOfSubnode: [opennodes objectAtIndex: i]];
+
+      if (rep) {
+        [rep setOpened: YES];
+      }
+    }
+    
+    RELEASE (opennodes);
     
     if ([selection count]) {
       [nodeView selectRepsOfSubnodes: selection];
