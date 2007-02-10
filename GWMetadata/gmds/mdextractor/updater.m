@@ -937,22 +937,20 @@ do { \
           
       for (i = 0; i < [contents count]; i++) {
         NSString *path = [contents objectAtIndex: i];
-        NSDictionary *attrs = [fm fileAttributesAtPath: path traverseLink: NO];
-        NSTimeInterval date = [[attrs fileModificationDate] timeIntervalSinceReferenceDate];        
         NSNumber *dbdate = [dbcontents objectForKey: path];
         
         if (dbdate == nil) {
           GWDebugLog(@"schedule-add %@", path);
           [self addPath: path];
           
-          if ([attributes fileType] == NSFileTypeDirectory) {
-            [directories addObject: path];
-            GWDebugLog(@"add-to-directories %@", path);
+        } else {
+          NSDictionary *attrs = [fm fileAttributesAtPath: path traverseLink: NO];
+          NSTimeInterval date = [[attrs fileModificationDate] timeIntervalSinceReferenceDate];
+   
+          if ((date - [dbdate floatValue]) > 10) {
+            GWDebugLog(@"schedule-update %@ ---- %f - %f", path, date, [dbdate floatValue]);
+            [self updatePath: path];
           }
-          
-        } else if ((date - [dbdate floatValue]) > 10) {
-          GWDebugLog(@"schedule-update %@ ---- %f - %f", path, date, [dbdate floatValue]);
-          [self updatePath: path];          
         }
       }    
     
