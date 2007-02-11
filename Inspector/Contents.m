@@ -167,14 +167,10 @@ static NSString *nibName = @"Contents";
 {
 	int i;
   
-  if (path == nil) {
+  if ((path == nil) || ([fm fileExistsAtPath: path] == NO)) {
     return nil;
   }
-  
-  if ([fm fileExistsAtPath: path] == NO) {
-    return nil;
-  }
-  
+    
 	for (i = 0; i < [viewers count]; i++) {
 		id vwr = [viewers objectAtIndex: i];		
 		if ([vwr canDisplayPath: path]) {
@@ -207,7 +203,7 @@ static NSString *nibName = @"Contents";
 	NSString *winName;
 
   if (currentViewer) {
-    if ([currentViewer conformsToProtocol: @protocol(ContentViewersProtocol)]) {
+    if ([currentViewer respondsToSelector: @selector(stopTasks)]) {
       [currentViewer stopTasks];  
     }
   }   
@@ -240,8 +236,12 @@ static NSString *nibName = @"Contents";
       if ([textViewer tryToDisplayPath: path]) {
         [viewersBox setContentView: textViewer];
         currentViewer = textViewer;
-			  winName = NSLocalizedString(@"Text Inspector", @"");
-      
+			  winName = NSLocalizedString(@"Text Inspector", @"");      
+        if (currentPath == nil) {
+          ASSIGN (currentPath, path); 
+          [inspector addWatcherForPath: currentPath];
+        }
+        
       } else {
         [viewersBox setContentView: genericView];
         currentViewer = genericView;
@@ -292,7 +292,7 @@ static NSString *nibName = @"Contents";
 	id viewer;
 
   if (currentViewer) {
-    if ([currentViewer conformsToProtocol: @protocol(ContentViewersProtocol)]) {
+    if ([currentViewer respondsToSelector: @selector(stopTasks)]) {
       [currentViewer stopTasks]; 
     }
   }   
@@ -344,12 +344,11 @@ static NSString *nibName = @"Contents";
       [self showContentsAt: nil];
 
     } else if ([event isEqual: @"GWWatchedFileModified"]) {
-      if (currentViewer 
-              && [currentViewer conformsToProtocol: @protocol(ContentViewersProtocol)]) {
-        if ([currentPath isEqual: [currentViewer currentPath]]) {
-    //      [inspector removeWatcherForPath: currentPath];
-          [currentViewer displayLastPath: YES];
-    //      [inspector addWatcherForPath: currentPath];
+      if (currentViewer) {
+        if ([currentViewer respondsToSelector: @selector(displayPath:)]) {
+          [currentViewer displayPath: currentPath];
+        } else if (currentViewer == textViewer) {
+          [currentViewer tryToDisplayPath: currentPath];
         }
       }
     }

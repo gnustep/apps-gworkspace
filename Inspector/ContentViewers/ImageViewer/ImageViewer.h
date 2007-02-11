@@ -29,6 +29,7 @@
 #include <AppKit/NSView.h>
 #include "ContentViewersProtocol.h"
 
+@class NSImage;
 @class NSImageView;
 @class NSTextField;
 @class NSButton;
@@ -56,6 +57,7 @@
   BOOL valid;	
   
   NSImageView *imview;
+  NSImage *image;
   NSTextField *errLabel;
   NSTextField *widthLabel;
   NSTextField *heightLabel;  

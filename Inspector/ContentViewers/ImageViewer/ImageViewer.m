@@ -41,6 +41,7 @@
   }
 
   TEST_RELEASE (imagePath);	
+  TEST_RELEASE (image);	
   TEST_RELEASE (nextPath);	
   TEST_RELEASE (editPath);	
   RELEASE (extsarr);
@@ -143,6 +144,7 @@
     imagePath = nil;
     nextPath = nil;
     editPath = nil;
+    image = nil;
     
     [self setContextHelp];
   }
@@ -209,6 +211,7 @@
     if (forced) {
       [self displayPath: editPath];
     } else {
+      [imview setImage: image];
       [inspector contentsReadyAt: editPath];
     }
   }
@@ -302,7 +305,8 @@
   }
         
   if (imgdata) {
-    NSImage *image = [[NSImage alloc] initWithData: imgdata];
+    DESTROY (image);
+    image = [[NSImage alloc] initWithData: imgdata];
     
     if (image) {
       float width = [[imginfo objectForKey: @"width"] floatValue];
@@ -316,7 +320,6 @@
       }
 
       [imview setImage: image];
-      RELEASE (image);
 
       str = NSLocalizedString(@"Width:", @"");
       str = [NSString stringWithFormat: @"%@ %.0f", str, width];
@@ -374,6 +377,7 @@
 
 - (void)stopTasks
 {
+  [imview setImage: nil];
 }
 
 - (BOOL)canDisplayPath:(NSString *)path
