@@ -199,8 +199,7 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
     dbdir = [dbdir stringByAppendingPathComponent: @".db"];
 
     ASSIGN (indexedStatusPath, [dbdir stringByAppendingPathComponent: @"status.plist"]);
-    lockpath = [dbdir stringByAppendingPathComponent: @"extractors.lock"];
-    indexedStatusLock = [[NSDistributedLock alloc] initWithPath: lockpath];
+    lockpath = [dbdir stringByAppendingPathComponent: @"extractors.lock"];    
 
     errpath = [dbdir stringByAppendingPathComponent: @"error.log"];
         
@@ -215,11 +214,19 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
       return self;    
     }
 
+    indexedStatusLock = [[NSDistributedLock alloc] initWithPath: lockpath];
+
+    if (indexedStatusLock == nil) {
+      DESTROY (self);
+      return self;    
+    }
+
     if ([fm fileExistsAtPath: errpath] == NO) {
       [fm createFileAtPath: errpath contents: nil attributes: nil];
     }
     errHandle = [NSFileHandle fileHandleForWritingAtPath: errpath];
     RETAIN (errHandle);
+
 
     conn = [NSConnection defaultConnection];
     [conn setRootObject: self];
@@ -584,7 +591,7 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
     [status writeToFile: indexedStatusPath atomically: YES];
     [indexedStatusLock unlock];
     
- //   GWDebugLog(@"paths status updated"); 
+    GWDebugLog(@"paths status updated"); 
     
     RELEASE (arp);
   }
