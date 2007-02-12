@@ -635,12 +635,22 @@ static FSNodeRep *shared = nil;
         NSString *tumbpath = [thumbnailDir stringByAppendingPathComponent: tumbname]; 
 
         if ([fm fileExistsAtPath: tumbpath]) {
-          NSImage *tumb = [[NSImage alloc] initWithContentsOfFile: tumbpath];
-
+          NSImage *tumb = nil;
+        
+          NS_DURING
+            {
+          tumb = [[NSImage alloc] initWithContentsOfFile: tumbpath];
+          
           if (tumb) {
             [tumbsCache setObject: tumb forKey: key];
             RELEASE (tumb);
           }
+            }
+          NS_HANDLER
+            {
+          NSLog(@"BAD IMAGE '%@'", tumbpath);
+            }
+          NS_ENDHANDLER
         }
       }    
     }  
