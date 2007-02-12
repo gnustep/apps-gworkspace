@@ -734,7 +734,10 @@
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-  [[self window] makeKeyWindow];
+  NSWindow *win = [self window];
+  
+  [win makeMainWindow];
+  [win makeKeyWindow];
   
   if ([theEvent modifierFlags] != NSShiftKeyMask) {
     selectionMask = NSSingleSelectionMask;

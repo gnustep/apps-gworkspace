@@ -861,11 +861,7 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
           if (skip == NO) {
             NSString *app = nil;
             NSString *type = nil;        
-                    
-            #if 0 
-              [self logError: [NSString stringWithFormat: @"EXTRACT %@", subpath]];   // TOGLIERE !!!!
-            #endif
-            
+                                
             [sqlite executeQuery: @"BEGIN"];
             
             [ws getInfoForFile: subpath application: &app type: &type];

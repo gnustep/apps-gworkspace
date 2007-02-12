@@ -30,12 +30,16 @@
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
+  NSWindow *win = [self window];
   NSPoint location = [theEvent locationInWindow];
   NSPoint selfloc = [self convertPoint: location fromView: nil];
   BOOL onself = NO;
 	NSEvent *nextEvent = nil;
   BOOL startdnd = NO;
   NSSize offset;
+
+  [win makeMainWindow];
+  [win makeKeyWindow];
 
   if (icnPosition == NSImageOnly) {
     onself = [self mouse: selfloc inRect: icnBounds];
@@ -78,11 +82,11 @@
     
       if (dndSource) {
         while (1) {
-	        nextEvent = [[self window] nextEventMatchingMask:
+	        nextEvent = [win nextEventMatchingMask:
     							                  NSLeftMouseUpMask | NSLeftMouseDraggedMask];
 
           if ([nextEvent type] == NSLeftMouseUp) {
-            [[self window] postEvent: nextEvent atStart: NO];
+            [win postEvent: nextEvent atStart: NO];
             break;
 
           } else if (([nextEvent type] == NSLeftMouseDragged)
