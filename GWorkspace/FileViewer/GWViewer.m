@@ -291,11 +291,6 @@
         RELEASE (selection);
       }
     }
-
-    [self updeateInfoLabels];
-    [self tileViews];
-
-    [self scrollToBeginning];
         
     [nc addObserver: self 
            selector: @selector(columnsWidthChanged:) 
@@ -465,6 +460,7 @@
 {
   [vwrwin makeKeyAndOrderFront: nil];
   [self tileViews];
+  [self scrollToBeginning];    
 }
 
 - (void)deactivate
@@ -947,6 +943,11 @@
 // GWViewerWindow Delegate Methods
 //
 @implementation GWViewer (GWViewerWindowDelegateMethods)
+
+- (void)windowDidExpose:(NSNotification *)aNotification
+{
+  [self updeateInfoLabels];
+}
 
 - (void)windowDidBecomeKey:(NSNotification *)aNotification
 {
