@@ -1,7 +1,7 @@
 AC_PREREQ(2.52)
 AC_INIT
 
-if test -z "$GNUSTEP_SYSTEM_ROOT"; then
+if test -z "$GNUSTEP_MAKEFILES"; then
   AC_MSG_ERROR([You must run the GNUstep initialization script first!])
 fi
 
