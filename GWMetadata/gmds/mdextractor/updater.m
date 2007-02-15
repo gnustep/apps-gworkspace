@@ -676,7 +676,6 @@ do { \
 
         if ([now timeIntervalSinceDate: stamp] > SKIP_EXPIRE) {
           [fswupdateSkipBuff removeObjectForKey: path];
-     //     GWDebugLog(@"expired skip-info %@", path);
         }
       }
 

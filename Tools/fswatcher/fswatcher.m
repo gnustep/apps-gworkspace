@@ -23,6 +23,12 @@
  */
 
 #include "fswatcher.h"
+#include "config.h"
+
+#define GWDebugLog(format, args...) \
+  do { if (GW_DEBUG_LOG) \
+    NSLog(format , ## args); } while (0)
+
 
 @implementation	FSWClientInfo
 
@@ -105,11 +111,10 @@
 
 - (void)dealloc
 {
-  NSEnumerator *enumerator = [clientsInfo objectEnumerator];
-  FSWClientInfo *info;
-  
-  while ((info = [enumerator nextObject])) {
-    NSConnection *connection = [info connection];
+  int i;
+
+  for (i = 0; i < [clientsInfo count]; i++) {
+    NSConnection *connection = [[clientsInfo objectAtIndex: i] connection];
 
 		if (connection) {
       [nc removeObserver: self
@@ -125,8 +130,13 @@
     DESTROY (conn);
   }
   
+  [dnc removeObserver: self];
+  
   RELEASE (clientsInfo);
-  RELEASE (watchers);
+  NSZoneFree (NSDefaultMallocZone(), (void *)watchers);
+  freeTree(includePathsTree);
+  freeTree(excludePathsTree);
+  RELEASE (excludedSuffixes);
 
   [super dealloc];
 }
@@ -138,10 +148,7 @@
   if (self) {    
     fm = [NSFileManager defaultManager];	
     nc = [NSNotificationCenter defaultCenter];
-    
-    clientsInfo = [[NSMutableSet alloc] initWithCapacity: 1];
-    
-    watchers = [[NSMutableSet alloc] initWithCapacity: 1];
+    dnc = [NSDistributedNotificationCenter defaultCenter];
 
     conn = [NSConnection defaultConnection];
     [conn setRootObject: self];
@@ -152,11 +159,26 @@
 	    DESTROY (self);
 	    return self;
 	  }
+    
+    clientsInfo = [NSMutableArray new];    
+    watchers = NSCreateMapTable(NSObjectMapKeyCallBacks,
+	                                        NSObjectMapValueCallBacks, 0);
+      
+    includePathsTree = newTreeWithIdentifier(@"incl_paths");
+    excludePathsTree = newTreeWithIdentifier(@"excl_paths");
+    excludedSuffixes = [[NSMutableSet alloc] initWithCapacity: 1];
+      
+    [self setDefaultGlobalPaths];  
       
     [nc addObserver: self
            selector: @selector(connectionBecameInvalid:)
 	             name: NSConnectionDidDieNotification
 	           object: conn];
+
+    [dnc addObserver: self
+            selector: @selector(globalPathsChanged:)
+	              name: @"GSMetadataIndexedDirectoriesChanged"
+	            object: nil];
   }
   
   return self;    
@@ -214,35 +236,93 @@
 	}
 }
 
-- (oneway void)setGlobalIncludePaths:(NSArray *)ipaths
-                        excludePaths:(NSArray *)epaths
+- (void)setDefaultGlobalPaths
 {
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  id entry;
+  unsigned i;
+  
+  [defaults synchronize];
+
+  entry = [defaults arrayForKey: @"GSMetadataIndexablePaths"];
+  
+  if (entry) {
+    for (i = 0; i < [entry count]; i++) {
+      insertComponentsOfPath([entry objectAtIndex: i], includePathsTree);
+    }
+  
+  } else {
+    insertComponentsOfPath(NSHomeDirectory(), includePathsTree);
+
+    entry = NSSearchPathForDirectoriesInDomains(NSAllApplicationsDirectory, 
+                                                        NSAllDomainsMask, YES);
+    for (i = 0; i < [entry count]; i++) {
+      insertComponentsOfPath([entry objectAtIndex: i], includePathsTree);
+    }
+    
+    entry = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, 
+                                                      NSAllDomainsMask, YES);
+    for (i = 0; i < [entry count]; i++) {
+      NSString *dir = [entry objectAtIndex: i];
+      NSString *path = [dir stringByAppendingPathComponent: @"Headers"];
+
+      if ([fm fileExistsAtPath: path]) {
+        insertComponentsOfPath(path, includePathsTree);
+      }
+      
+      path = [dir stringByAppendingPathComponent: @"Documentation"];
+      
+      if ([fm fileExistsAtPath: path]) {
+        insertComponentsOfPath(path, includePathsTree);
+      }
+    }  
+  }
+
+  entry = [defaults arrayForKey: @"GSMetadataExcludedPaths"];
+
+  if (entry) {
+    for (i = 0; i < [entry count]; i++) {
+      insertComponentsOfPath([entry objectAtIndex: i], excludePathsTree);
+    }
+  }
+  
+  entry = [defaults arrayForKey: @"GSMetadataExcludedSuffixes"];
+  
+  if (entry == nil) {
+    entry = [NSArray arrayWithObjects: @"a", @"d", @"dylib", @"er1", 
+                                       @"err", @"extinfo", @"frag", @"la", 
+                                       @"log", @"o", @"out", @"part", 
+                                       @"sed", @"so", @"status", @"temp",
+                                       @"tmp",  
+                                       nil];
+  } 
+  
+  [excludedSuffixes addObjectsFromArray: entry];
 }
 
-- (oneway void)addGlobalIncludePath:(NSString *)path
+- (void)globalPathsChanged:(NSNotification *)notification
 {
-}
+  NSDictionary *info = [notification userInfo];
+  NSArray *indexable = [info objectForKey: @"GSMetadataIndexablePaths"];
+  NSArray *excluded = [info objectForKey: @"GSMetadataExcludedPaths"];
+  NSArray *suffixes = [info objectForKey: @"GSMetadataExcludedSuffixes"];
+  
+  unsigned i;
 
-- (oneway void)removeGlobalIncludePath:(NSString *)path
-{
-}
+  emptyTreeWithBase(includePathsTree);
+  
+  for (i = 0; i < [indexable count]; i++) {
+    insertComponentsOfPath([indexable objectAtIndex: i], includePathsTree);
+  }
 
-- (NSArray *)globalIncludePaths
-{
-  return nil;
-}
-
-- (oneway void)addGlobalExcludePath:(NSString *)path
-{
-}
-
-- (oneway void)removeGlobalExcludePath:(NSString *)path
-{
-}
-
-- (NSArray *)globalExcludePaths
-{
-  return nil;
+  emptyTreeWithBase(excludePathsTree);
+  
+  for (i = 0; i < [excluded count]; i++) {
+    insertComponentsOfPath([excluded objectAtIndex: i], excludePathsTree);
+  }
+  
+  [excludedSuffixes removeAllObjects];
+  [excludedSuffixes addObjectsFromArray: suffixes];
 }
 
 - (oneway void)registerClient:(id <FSWClientProtocol>)client
@@ -306,13 +386,14 @@
 
 - (FSWClientInfo *)clientInfoWithConnection:(NSConnection *)connection
 {
-  NSEnumerator *enumerator = [clientsInfo objectEnumerator];
-  FSWClientInfo *info;
+  int i;
 
-  while ((info = [enumerator nextObject])) {
+  for (i = 0; i < [clientsInfo count]; i++) {
+    FSWClientInfo *info = [clientsInfo objectAtIndex: i];
+  
 		if ([info connection] == connection) {
 			return info;
-		}
+		}  
   }
 
 	return nil;
@@ -320,14 +401,15 @@
 
 - (FSWClientInfo *)clientInfoWithRemote:(id)remote
 {
-  NSEnumerator *enumerator = [clientsInfo objectEnumerator];
-  FSWClientInfo *info;
+  int i;
 
-  while ((info = [enumerator nextObject])) {
+  for (i = 0; i < [clientsInfo count]; i++) {
+    FSWClientInfo *info = [clientsInfo objectAtIndex: i];
+  
 		if ([info client] == remote) {
 			return info;
 		}
-	}
+  }
 
 	return nil;
 }
@@ -348,18 +430,18 @@
     [NSException raise: NSInternalInconsistencyException
                 format: @"adding watcher for unregistered client"];
   }
-
-//  NSLog(@"addWatcherForPath %@", path);
   
   if (watcher) {
+    GWDebugLog(@"watcher found; adding listener for: %@", path);
     [info addWatchedPath: path];
     [watcher addListener]; 
         
   } else {
     if ([fm fileExistsAtPath: path]) {
+      GWDebugLog(@"add watcher for: %@", path);     
       [info addWatchedPath: path];
   	  watcher = [[Watcher alloc] initWithWatchedPath: path fswatcher: self];      
-  	  [watchers addObject: watcher];
+      NSMapInsert (watchers, path, watcher);
   	  RELEASE (watcher);  
     }
   }
@@ -381,10 +463,9 @@
     [NSException raise: NSInternalInconsistencyException
                 format: @"removing watcher for unregistered client"];
   }  
-  
-//  NSLog(@"removeWatcherForPath %@", path);
-  
+    
   if (watcher && ([watcher isOld] == NO)) {
+    GWDebugLog(@"remove listener for: %@", path);
     [info removeWatchedPath: path];
   	[watcher removeListener];  
   }
@@ -392,16 +473,7 @@
 
 - (Watcher *)watcherForPath:(NSString *)path
 {
-  NSEnumerator *enumerator = [watchers objectEnumerator];
-  Watcher *watcher;
-  
-  while ((watcher = [enumerator nextObject])) {
-    if ([watcher isWathcingPath: path] && ([watcher isOld] == NO)) { 
-      return watcher;
-    }
-  }
-  
-  return nil;
+  return (Watcher *)NSMapGet(watchers, path);
 }
 
 - (void)watcherTimeOut:(NSTimer *)sender
@@ -417,30 +489,139 @@
 
 - (void)removeWatcher:(Watcher *)watcher
 {
+  NSString *path = [watcher watchedPath];
 	NSTimer *timer = [watcher timer];
 
 	if (timer && [timer isValid]) {
 		[timer invalidate];
 	}
   
-  [watchers removeObject: watcher];
+  GWDebugLog(@"removed watcher for: %@", path);
+  
+  RETAIN (path);
+  NSMapRemove(watchers, path);  
+  RELEASE (path);
+}
+
+- (pcomp *)includePathsTree
+{
+  return includePathsTree;
+}
+
+- (pcomp *)excludePathsTree
+{
+  return excludePathsTree;
+}
+
+- (NSSet *)excludedSuffixes
+{
+  return excludedSuffixes;
+}
+
+static inline BOOL isDotFile(NSString *path)
+{
+  int len = ([path length] - 1);
+  unichar c;
+  int i;
+  
+  for (i = len; i >= 0; i--) {
+    c = [path characterAtIndex: i];
+    
+    if (c == '.') {
+      if ((i > 0) && ([path characterAtIndex: (i - 1)] == '/')) {
+        return YES;
+      }
+    }
+  }
+  
+  return NO;  
+}
+
+- (BOOL)isGlobalValidPath:(NSString *)path
+{
+  NSString *ext = [[path pathExtension] lowercaseString];
+
+  return (([excludedSuffixes containsObject: ext] == NO)
+                   && (isDotFile(path) == NO) 
+                   && inTreeFirstPartOfPath(path, includePathsTree)
+                   && (inTreeFirstPartOfPath(path, excludePathsTree) == NO));
 }
 
 - (void)notifyClients:(NSDictionary *)info
 {
   CREATE_AUTORELEASE_POOL(pool);
   NSString *path = [info objectForKey: @"path"];
+  NSString *event = [info objectForKey: @"event"];
   NSData *data = [NSArchiver archivedDataWithRootObject: info];
-  NSEnumerator *enumerator = [clientsInfo objectEnumerator];
-  FSWClientInfo *clinfo;
+  int i;
 
-  while ((clinfo = [enumerator nextObject])) {
+  for (i = 0; i < [clientsInfo count]; i++) {
+    FSWClientInfo *clinfo = [clientsInfo objectAtIndex: i];
+  
 		if ([clinfo isWathchingPath: path]) {
 			[[clinfo client] watchedPathDidChange: data];
 		}
   }
-
+  
+  if ([event isEqual: @"GWWatchedPathDeleted"] 
+                                && [self isGlobalValidPath: path]) {
+    GWDebugLog(@"DELETE %@", path);
+    [self notifyGlobalWatchingClients: info];
+    
+  } else if ([event isEqual: @"GWWatchedFileModified"] 
+                                      && [self isGlobalValidPath: path]) {
+    GWDebugLog(@"MODIFIED %@", path);
+    [self notifyGlobalWatchingClients: info];    
+    
+  } else if ([event isEqual: @"GWFileDeletedInWatchedDirectory"]) {
+    NSArray *files = [info objectForKey: @"files"];
+    
+    for (i = 0; i < [files count]; i++) {
+      NSString *fname = [files objectAtIndex: i];
+      NSString *fullpath = [path stringByAppendingPathComponent: fname];
+      
+      if ([self isGlobalValidPath: fullpath]) {
+        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+        
+        [dict setObject: fullpath forKey: @"path"];
+        [dict setObject: @"GWWatchedPathDeleted" forKey: @"event"];
+      
+        [self notifyGlobalWatchingClients: dict];
+      }      
+    }  
+  
+  } else if ([event isEqual: @"GWFileCreatedInWatchedDirectory"]) {
+    NSArray *files = [info objectForKey: @"files"];
+    
+    for (i = 0; i < [files count]; i++) {
+      NSString *fname = [files objectAtIndex: i];
+      NSString *fullpath = [path stringByAppendingPathComponent: fname];
+      
+      if ([self isGlobalValidPath: fullpath]) {
+        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+        
+        [dict setObject: fullpath forKey: @"path"];
+        [dict setObject: @"GWFileCreatedInWatchedDirectory" forKey: @"event"];
+      
+        [self notifyGlobalWatchingClients: dict];
+      }      
+    }      
+  }
+  
   RELEASE (pool);  
+}
+
+- (void)notifyGlobalWatchingClients:(NSDictionary *)info
+{
+  int i;
+
+  for (i = 0; i < [clientsInfo count]; i++) {
+    FSWClientInfo *clinfo = [clientsInfo objectAtIndex: i];
+
+    if ([clinfo isGlobal]) {
+      [[clinfo client] globalWatchedPathDidChange: info];
+    }
+  }
 }
 
 @end
@@ -480,10 +661,11 @@
     } else {
       isdir = NO;
     }
-    
+        
+    fswatcher = fsw;    
     listeners = 1;
 		isOld = NO;
-    fswatcher = fsw;
+        
     timer = [NSTimer scheduledTimerWithTimeInterval: 1.0 
 												                     target: fswatcher 
                                            selector: @selector(watcherTimeOut:) 
@@ -600,13 +782,11 @@
 
 - (void)addListener
 {
-//  NSLog(@"adding listener for: %@", watchedPath);
   listeners++;
 }
 
 - (void)removeListener
 { 
-//  NSLog(@"removing listener for: %@", watchedPath);
   listeners--;
   if (listeners <= 0) { 
 		isOld = YES;

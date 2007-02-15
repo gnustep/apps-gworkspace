@@ -26,6 +26,7 @@
 #define FSWATCHER_H
 
 #include <Foundation/Foundation.h>
+#include "DBKPathsTree.h"
 
 @class Watcher;
 
@@ -33,25 +34,12 @@
 
 - (oneway void)watchedPathDidChange:(NSData *)dirinfo;
 
+- (oneway void)globalWatchedPathDidChange:(NSDictionary *)dirinfo;
+
 @end
 
 
 @protocol	FSWatcherProtocol
-
-- (oneway void)setGlobalIncludePaths:(NSArray *)ipaths
-                        excludePaths:(NSArray *)epaths;
-
-- (oneway void)addGlobalIncludePath:(NSString *)path;
-
-- (oneway void)removeGlobalIncludePath:(NSString *)path;
-
-- (NSArray *)globalIncludePaths;
-
-- (oneway void)addGlobalExcludePath:(NSString *)path;
-
-- (oneway void)removeGlobalExcludePath:(NSString *)path;
-
-- (NSArray *)globalExcludePaths;
 
 - (oneway void)registerClient:(id <FSWClientProtocol>)client
               isGlobalWatcher:(BOOL)global;
@@ -101,10 +89,16 @@
 @interface FSWatcher: NSObject 
 {
   NSConnection *conn;
-  NSMutableSet *clientsInfo;
-  NSMutableSet *watchers;
+  NSMutableArray *clientsInfo;
+  NSMapTable *watchers;
+
+  pcomp *includePathsTree;
+  pcomp *excludePathsTree;  
+  NSMutableSet *excludedSuffixes;
+  
   NSFileManager *fm;
   NSNotificationCenter *nc; 
+  NSNotificationCenter *dnc;  
 }
 
 - (BOOL)connection:(NSConnection *)ancestor
@@ -112,20 +106,9 @@
 
 - (void)connectionBecameInvalid:(NSNotification *)notification;
 
-- (oneway void)setGlobalIncludePaths:(NSArray *)ipaths
-                        excludePaths:(NSArray *)epaths;
+- (void)setDefaultGlobalPaths;
 
-- (oneway void)addGlobalIncludePath:(NSString *)path;
-
-- (oneway void)removeGlobalIncludePath:(NSString *)path;
-
-- (NSArray *)globalIncludePaths;
-
-- (oneway void)addGlobalExcludePath:(NSString *)path;
-
-- (oneway void)removeGlobalExcludePath:(NSString *)path;
-
-- (NSArray *)globalExcludePaths;
+- (void)globalPathsChanged:(NSNotification *)notification;
 
 - (oneway void)registerClient:(id <FSWClientProtocol>)client
               isGlobalWatcher:(BOOL)global;
@@ -148,7 +131,17 @@
 
 - (void)removeWatcher:(Watcher *)awatcher;
 
+- (pcomp *)includePathsTree;
+
+- (pcomp *)excludePathsTree;  
+
+- (NSSet *)excludedSuffixes;
+
+- (BOOL)isGlobalValidPath:(NSString *)path;
+
 - (void)notifyClients:(NSDictionary *)info;
+
+- (void)notifyGlobalWatchingClients:(NSDictionary *)info;
       
 @end
 
