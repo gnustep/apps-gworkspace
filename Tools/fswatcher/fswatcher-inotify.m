@@ -626,14 +626,23 @@ static inline uint32_t eventType(uint32_t mask)
 static inline BOOL isDotFile(NSString *path)
 {
   int len = ([path length] - 1);
+  static unichar sep = 0;  
   unichar c;
   int i;
+  
+  if (sep == 0) {
+    #if defined(__MINGW32__)
+      sep = '\\';	
+    #else
+      sep = '/';	
+    #endif
+  }
   
   for (i = len; i >= 0; i--) {
     c = [path characterAtIndex: i];
     
     if (c == '.') {
-      if ((i > 0) && ([path characterAtIndex: (i - 1)] == '/')) {
+      if ((i > 0) && ([path characterAtIndex: (i - 1)] == sep)) {
         return YES;
       }
     }
