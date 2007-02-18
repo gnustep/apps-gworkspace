@@ -29,6 +29,12 @@
   do { if (GW_DEBUG_LOG) \
     NSLog(format , ## args); } while (0)
 
+static NSString *GWWatchedPathDeleted = @"GWWatchedPathDeleted";
+static NSString *GWFileDeletedInWatchedDirectory = @"GWFileDeletedInWatchedDirectory";
+static NSString *GWFileCreatedInWatchedDirectory = @"GWFileCreatedInWatchedDirectory";
+static NSString *GWWatchedFileModified = @"GWWatchedFileModified";
+static NSString *GWWatchedPathRenamed = @"GWWatchedPathRenamed";
+
 
 @implementation	FSWClientInfo
 
@@ -590,7 +596,7 @@
     NSMutableDictionary *notifdict = [NSMutableDictionary dictionary];
     
     [notifdict setObject: lastMovedPath forKey: @"path"];        
-    [notifdict setObject: @"GWWatchedPathDeleted" forKey: @"event"];
+    [notifdict setObject: GWWatchedPathDeleted forKey: @"event"];
     
     [self notifyGlobalWatchingClients: notifdict];   
     
@@ -680,24 +686,24 @@ static inline BOOL isDotFile(NSString *path)
             
         if (dirwatch) {    
           if (type == IN_DELETE_SELF || type == IN_MOVE_SELF) {     
-            [notifdict setObject: @"GWWatchedPathDeleted" forKey: @"event"];
+            [notifdict setObject: GWWatchedPathDeleted forKey: @"event"];
             
           } else if (type == IN_DELETE || type == IN_MOVED_FROM) {
             [notifdict setObject: [NSArray arrayWithObject: fname] 
                           forKey: @"files"];            
-            [notifdict setObject: @"GWFileDeletedInWatchedDirectory" 
+            [notifdict setObject: GWFileDeletedInWatchedDirectory 
                           forKey: @"event"];
             fullpath = [basepath stringByAppendingPathComponent: fname];
                            
           } else if (type == IN_CREATE || type == IN_MOVED_TO) {
             [notifdict setObject: [NSArray arrayWithObject: fname] 
                           forKey: @"files"];            
-            [notifdict setObject: @"GWFileCreatedInWatchedDirectory" 
+            [notifdict setObject: GWFileCreatedInWatchedDirectory 
                           forKey: @"event"];
             fullpath = [basepath stringByAppendingPathComponent: fname];
               
           } else if (type == IN_MODIFY) {
-            [notifdict setObject: @"GWWatchedFileModified" forKey: @"event"];
+            [notifdict setObject: GWWatchedFileModified forKey: @"event"];
             fullpath = [basepath stringByAppendingPathComponent: fname];
             
             if ([self watcherForPath: fullpath] != nil) { 
@@ -713,7 +719,7 @@ static inline BOOL isDotFile(NSString *path)
           
         } else {
           if (type == IN_MODIFY || type == IN_CLOSE_WRITE) {
-            [notifdict setObject: @"GWWatchedFileModified" forKey: @"event"];
+            [notifdict setObject: GWWatchedFileModified forKey: @"event"];
           } else {
             notify = NO;
           }
@@ -735,17 +741,17 @@ static inline BOOL isDotFile(NSString *path)
           
           if (type == IN_DELETE || type == IN_DELETE_SELF 
                                         || type == IN_MOVE_SELF) {       
-            [notifdict setObject: @"GWWatchedPathDeleted" forKey: @"event"];
+            [notifdict setObject: GWWatchedPathDeleted forKey: @"event"];
             GWDebugLog(@"DELETE %@", fullpath); 
             
           } else if (type == IN_CREATE) {
-            [notifdict setObject: @"GWFileCreatedInWatchedDirectory" 
+            [notifdict setObject: GWFileCreatedInWatchedDirectory 
                           forKey: @"event"];        
             GWDebugLog(@"CREATED %@", fullpath); 
                      
           } else if (type == IN_MODIFY 
                         || ((dirwatch == NO) && type == IN_CLOSE_WRITE)) {
-            [notifdict setObject: @"GWWatchedFileModified" forKey: @"event"];        
+            [notifdict setObject: GWWatchedFileModified forKey: @"event"];        
             GWDebugLog(@"MODIFIED %@", fullpath); 
                  
           } else if (type == IN_MOVED_FROM) {  
@@ -763,11 +769,11 @@ static inline BOOL isDotFile(NSString *path)
           } else if (type == IN_MOVED_TO) {              
             if ((eventp->cookie == moveCookie) && (lastMovedPath != nil)) {
               [notifdict setObject: lastMovedPath forKey: @"oldpath"];
-              [notifdict setObject: @"GWWatchedPathRenamed" forKey: @"event"];
+              [notifdict setObject: GWWatchedPathRenamed forKey: @"event"];
               GWDebugLog(@"MOVED from: %@ to: %@", lastMovedPath, fullpath);
             
             } else {
-              [notifdict setObject: @"GWFileCreatedInWatchedDirectory" 
+              [notifdict setObject: GWFileCreatedInWatchedDirectory 
                             forKey: @"event"];             
               GWDebugLog(@"MOVED from not indexable path: %@", fullpath); 
             }
