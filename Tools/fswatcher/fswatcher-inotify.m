@@ -190,7 +190,7 @@ static NSString *GWWatchedPathRenamed = @"GWWatchedPathRenamed";
 
     dirmask = (IN_CREATE | IN_DELETE | IN_DELETE_SELF 
                 | IN_MOVED_FROM | IN_MOVED_TO | IN_MOVE_SELF | IN_MODIFY);    
-    filemask = (IN_CLOSE_WRITE | IN_MODIFY);    
+    filemask = (IN_CLOSE_WRITE | IN_MODIFY | IN_DELETE_SELF | IN_MOVE_SELF);    
     lastMovedPath = nil;
     moveCookie = 0;
   
@@ -657,6 +657,171 @@ static inline BOOL isDotFile(NSString *path)
   return NO;  
 }
 
+
+/*
+#define EV_GRAIN (0.2)
+#define EV_TIMEOUT (0.5)
+
+- (void)queueEvent:(NSString *)event
+            atPath:(NSString *)path
+           forFile:(NSString *)fname
+{
+  NSMutableDictionary *dict = nil;
+  NSString *fullpath = path;
+  NSDate *now = [NSDate date];
+  BOOL exists = (event == GWFileCreatedInWatchedDirectory
+                            || event == GWWatchedFileModified 
+                              || event == GWWatchedPathRenamed);
+  
+  if (event == GWFileCreatedInWatchedDirectory
+          || event == GWFileDeletedInWatchedDirectory) {
+    fullpath = [path stringByAppendingPathComponent: fname];
+  }
+  
+  dict = [eventsQueue objectForKey: fullpath];
+  
+  if (dict) {
+    NSDate *stamp = [dict objectForKey: @"stamp"];
+    NSTimeInterval interval = [now timeIntervalSinceDate: stamp];
+    NSString *lastevent = [dict objectForKey: @"event"];
+    BOOL didexist = (lastevent == GWFileCreatedInWatchedDirectory
+                              || lastevent == GWWatchedFileModified 
+                                  || lastevent == GWWatchedPathRenamed);
+    
+    if (exists == didexist) {
+      [dict setObject: event forKey: @"event"];
+    } else {
+      if (interval < EV_GRAIN) {
+        [eventsQueue removeObjectForKey: fullpath];
+      } else {
+        [dict setObject: event forKey: @"event"];
+        [dict setObject: now forKey: @"stamp"];
+      }
+    }  
+      
+  } else {
+    dict = [NSMutableDictionary dictionary];
+    
+    [dict setObject: event forKey: @"event"];
+    [dict setObject: now forKey: @"stamp"];
+    
+    [eventsQueue setObject: dict forKey: fullpath];
+  }
+}
+
+- (void)queueGlobalEvent:(NSString *)event
+                 forPath:(NSString *)path
+                 oldPath:(NSString *)oldpath
+{
+  NSMutableDictionary *dict = [globalEventsQueue objectForKey: path];
+  NSDate *now = [NSDate date];
+  BOOL exists = (event == GWFileCreatedInWatchedDirectory
+                            || event == GWWatchedFileModified 
+                              || event == GWWatchedPathRenamed);
+  
+  if (dict) {
+    NSDate *stamp = [dict objectForKey: @"stamp"];
+    NSTimeInterval interval = [now timeIntervalSinceDate: stamp];
+    NSString *lastevent = [dict objectForKey: @"event"];
+    BOOL didexist = (lastevent == GWFileCreatedInWatchedDirectory
+                              || lastevent == GWWatchedFileModified 
+                                  || lastevent == GWWatchedPathRenamed);
+  
+    if (exists == didexist) {
+      [dict setObject: event forKey: @"event"];
+    } else {
+      if (interval < EV_GRAIN) {
+        [eventsQueue removeObjectForKey: fullpath];
+      } else {
+        [dict setObject: event forKey: @"event"];
+        [dict setObject: now forKey: @"stamp"];
+      }
+    }  
+  
+  } else {
+    dict = [NSMutableDictionary dictionary];
+    
+    [dict setObject: event forKey: @"event"];
+    [dict setObject: now forKey: @"stamp"];    
+    if (event == GWWatchedPathRenamed) {
+      [dict setObject: oldpath forKey: @"oldpath"]; 
+    }
+    
+    [globalEventsQueue setObject: dict forKey: fullpath];
+  }
+}
+
+- (void)processPendingEvents:(id)sender
+{
+  NSArray *paths = [eventsQueue allKeys];
+  NSDate *now = [NSDate date];
+  int i;
+  
+  RETAIN (paths);
+  
+  for (i = 0; i < [paths count]; i++) {
+    NSString *path = [paths objectAtIndex: i];
+    NSDictionary *dict = [eventsQueue objectForKey: path];
+    NSDate *stamp = [dict objectForKey: @"stamp"];
+
+    if ([now timeIntervalSinceDate: stamp] >= EV_TIMEOUT) {
+      NSMutableDictionary *notifdict = [NSMutableDictionary dictionary];
+      NSString *event = [dict objectForKey: @"event"];
+      NSString *basepath = path;
+      
+      [notifdict setObject: event forKey: @"event"];
+      
+      if (event == GWFileCreatedInWatchedDirectory
+          || event == GWFileDeletedInWatchedDirectory) {
+        NSString *fname = [path lastPathComponent];    
+        
+        [notifdict setObject: [NSArray arrayWithObject: fname] 
+                      forKey: @"files"];
+        
+        basepath = [path stringByDeletingLastPathComponent];          
+      }
+      
+      [notifdict setObject: basepath forKey: @"path"];
+      
+      [self notifyClients: notifdict];
+      
+      [eventsQueue removeObjectForKey: path];
+    }
+  }
+
+  RELEASE (paths);
+
+  paths = [globalEventsQueue allKeys];
+  
+  for (i = 0; i < [paths count]; i++) {
+    NSString *path = [paths objectAtIndex: i];
+    NSDictionary *dict = [eventsQueue objectForKey: path];
+    NSDate *stamp = [dict objectForKey: @"stamp"];
+
+    if ([now timeIntervalSinceDate: stamp] >= EV_TIMEOUT) {
+      NSMutableDictionary *notifdict = [NSMutableDictionary dictionary];
+      NSString *event = [dict objectForKey: @"event"];
+      
+      [notifdict setObject: event forKey: @"event"];
+      [notifdict setObject: path forKey: @"path"];
+  
+      if (event == GWWatchedPathRenamed) {
+        [notifdict setObject: [dict objectForKey: @"oldpath"] 
+                      forKey: @"oldpath"]; 
+      }
+    
+      [self notifyGlobalWatchingClients: notifdict];
+      
+      [globalEventsQueue removeObjectForKey: path];
+    }
+  }
+  
+  RELEASE (paths);
+}
+
+*/
+
+
 - (void)inotifyDataReady:(NSNotification *)notif
 {
   NSDictionary *info = [notif userInfo];
@@ -720,6 +885,8 @@ static inline BOOL isDotFile(NSString *path)
         } else {
           if (type == IN_MODIFY || type == IN_CLOSE_WRITE) {
             [notifdict setObject: GWWatchedFileModified forKey: @"event"];
+          } else if (type == IN_DELETE_SELF || type == IN_MOVE_SELF) {
+            [notifdict setObject: GWWatchedPathDeleted forKey: @"event"];          
           } else {
             notify = NO;
           }

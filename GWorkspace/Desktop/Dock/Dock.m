@@ -533,6 +533,15 @@
   [manager removeWatcherForPath: [manager trashPath]];
 }
 
+- (void)checkRemovedApp:(id)sender
+{
+  DockIcon *icon = (DockIcon *)[sender userInfo];
+  
+  if ([[icon node] isValid] == NO) {
+    [self removeIcon: icon];
+  }
+}
+
 - (void)drawRect:(NSRect)rect
 {  
   [super drawRect: rect];
@@ -626,28 +635,55 @@
 
 - (void)watchedPathChanged:(NSDictionary *)info
 {
+  CREATE_AUTORELEASE_POOL(arp);
   NSString *event = [info objectForKey: @"event"];
   NSString *path = [info objectForKey: @"path"];
     
   if ([event isEqual: @"GWWatchedPathDeleted"]) {
-    int count = [icons count];
     int i;
 
-    for (i = 0; i < count; i++) {
+    for (i = 0; i < [icons count]; i++) {
       DockIcon *icon = [icons objectAtIndex: i];
       
       if ([icon isSpecialIcon] == NO) {
         FSNode *node = [icon node];
         
         if ([path isEqual: [node path]]) {
-          [self removeIcon: icon];
-          count--;
-          i--;
+          [NSTimer scheduledTimerWithTimeInterval: 1.0 
+												                   target: self 
+                                         selector: @selector(checkRemovedApp:) 
+										                     userInfo: icon 
+                                          repeats: NO];
         }
       }
     }
     
   } else if ([event isEqual: @"GWFileDeletedInWatchedDirectory"]) {
+    NSArray *files = [info objectForKey: @"files"];
+    int i;
+    
+    for (i = 0; i < [files count]; i++) {
+      NSString *fname = [files objectAtIndex: i];
+      NSString *fullpath = [path stringByAppendingPathComponent: fname];
+      int j;
+      
+      for (j = 0; j < [icons count]; j++) {
+        DockIcon *icon = [icons objectAtIndex:j];
+
+        if ([icon isSpecialIcon] == NO) {
+          FSNode *node = [icon node];
+
+          if ([fullpath isEqual: [node path]]) {
+            [NSTimer scheduledTimerWithTimeInterval: 1.0 
+												                     target: self 
+                                           selector: @selector(checkRemovedApp:) 
+										                       userInfo: icon 
+                                            repeats: NO];
+          }
+        }
+      }
+    }
+    
     if ([path isEqual: [manager trashPath]]) {
       DockIcon *icon = [self trashIcon];  
       FSNode *node = [icon node];
@@ -681,6 +717,8 @@
       }
     }
   }
+  
+  RELEASE (arp);
 }
 
 - (void)unselectOtherReps:(id)arep

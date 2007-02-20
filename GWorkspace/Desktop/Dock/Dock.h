@@ -109,6 +109,8 @@
 
 - (void)updateDefaults;
 
+- (void)checkRemovedApp:(id)sender;
+
 @end
 
 

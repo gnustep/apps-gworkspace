@@ -547,6 +547,7 @@
 
 - (void)reloadFromColumn:(FSNBrowserColumn *)col
 {
+  CREATE_AUTORELEASE_POOL(arp);
 	int index = [col index];
   int i = 0;
 
@@ -633,6 +634,7 @@
 
   updateViewsLock--;
   [self tile];
+  RELEASE (arp);
 }
 
 - (void)reloadFromColumnWithNode:(FSNode *)anode
@@ -1642,9 +1644,10 @@
       [self reloadFromColumnWithPath: s]; 
     }
     
-  } else if ([event isEqual: @"GWFileDeletedInWatchedDirectory"]) {
-    [self removeCellsWithNames: [info objectForKey: @"files"]
-              inColumnWithPath: path];
+  } else if ([event isEqual: @"GWFileDeletedInWatchedDirectory"]) {    
+    if ([self isShowingPath: path]) {
+      [self reloadFromColumnWithPath: path]; 
+    }      
                  
   } else if ([event isEqual: @"GWFileCreatedInWatchedDirectory"]) {   
     [self addCellsWithNames: [info objectForKey: @"files"]
