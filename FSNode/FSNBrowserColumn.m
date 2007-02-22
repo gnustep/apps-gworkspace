@@ -47,7 +47,6 @@ static id <DesktopApplication> desktopApp = nil;
 
 - (void)dealloc
 {
-  TEST_RELEASE (matrix);
   RELEASE (cellPrototype);
   TEST_RELEASE (shownNode);
   TEST_RELEASE (oldNode);
@@ -130,6 +129,26 @@ static id <DesktopApplication> desktopApp = nil;
     }
     
     isDragTarget = NO;
+
+	  matrix = [[FSNBrowserMatrix alloc] initInColumn: self 
+                                          withFrame: [self bounds]
+		                                           mode: NSListModeMatrix 
+                                          prototype: cellPrototype
+		      					                   numberOfRows: 0 
+                                    numberOfColumns: 0 
+                                          acceptDnd: cellsIcon];
+
+	  [matrix setIntercellSpacing: NSMakeSize(0, 0)];
+    [matrix setCellSize: NSMakeSize([scroll contentSize].width, cellsHeight)];  
+	  [matrix setAutoscroll: YES];
+	  [matrix setAllowsEmptySelection: YES];
+    [matrix setBackgroundColor: backColor];
+    [matrix setCellBackgroundColor: backColor];
+	  [matrix setTarget: self];
+	  [matrix setAction: @selector(doClick:)];
+	  [matrix setDoubleAction: @selector(doDoubleClick:)];
+	  [scroll setDocumentView: matrix];
+    RELEASE (matrix);
   }
   
   return self;
@@ -138,7 +157,9 @@ static id <DesktopApplication> desktopApp = nil;
 - (void)setShowType:(FSNInfoType)type
 {
   if (infoType != type) {
+    NSArray *cells = [matrix cells];
     int lineh = floor([fsnodeRep heighOfFont: [cellPrototype font]]);
+    int i;
     
     infoType = type;
     DESTROY (extInfoType);
@@ -153,24 +174,21 @@ static id <DesktopApplication> desktopApp = nil;
       cellsHeight += (lineh +1);
     }
     
-    if (matrix) {
-      NSArray *cells = [matrix cells];
-      int i;
+    [self adjustMatrix];
 
-      [self adjustMatrix];
-
-	    for (i = 0; i < [cells count]; i++) {
-        [[cells objectAtIndex: i] setNodeInfoShowType: infoType];
-      }
-    }   
+	  for (i = 0; i < [cells count]; i++) {
+      [[cells objectAtIndex: i] setNodeInfoShowType: infoType];
+    }
   }
 }
 
 - (void)setExtendedShowType:(NSString *)type
 {
   if ((extInfoType == nil) || ([extInfoType isEqual: type] == NO)) {
+    NSArray *cells = [matrix cells];    
     int lineh = floor([fsnodeRep heighOfFont: [cellPrototype font]]);  
-  
+    int i;
+    
     infoType = FSNInfoExtendedType;
     ASSIGN (extInfoType, type);
 
@@ -182,17 +200,12 @@ static id <DesktopApplication> desktopApp = nil;
 
     cellsHeight += (lineh +1);
 
-    if (matrix) {
-      NSArray *cells = [matrix cells];
-      int i;
-      
-      [self adjustMatrix];
-      
-	    for (i = 0; i < [cells count]; i++) {
-        FSNBrowserCell *cell = [cells objectAtIndex: i];
-        [cell setExtendedShowType: extInfoType];
-      }
-    }   
+    [self adjustMatrix];
+
+	  for (i = 0; i < [cells count]; i++) {
+      FSNBrowserCell *cell = [cells objectAtIndex: i];
+      [cell setExtendedShowType: extInfoType];
+    }       
   }
 }
 
@@ -204,30 +217,26 @@ static id <DesktopApplication> desktopApp = nil;
   int i = 0;
 
   if (oldNode && anode && [oldNode isEqualToNode: anode] && [anode isValid]) {
+    NSArray *vnodes = nil;  
+    
     savedSelection = [self selectedNodes];
     
     if (savedSelection) {
       RETAIN (savedSelection);
     }
     
-    if (matrix) {
-      NSArray *vnodes = nil;
+    [matrix visibleCellsNodes: &vnodes scrollTuneSpace: &scrollTune];
 
-      [matrix visibleCellsNodes: &vnodes scrollTuneSpace: &scrollTune];
-    
-      if (vnodes) {
-        visibleNodes = [NSMutableArray new];
-        [visibleNodes addObjectsFromArray: vnodes];
-      }
-    }
+    if (vnodes) {
+      visibleNodes = [NSMutableArray new];
+      [visibleNodes addObjectsFromArray: vnodes];
+    }    
   }
-    
-  if (matrix) {
-    [matrix removeFromSuperviewWithoutNeedingDisplay];  
-    [scroll setDocumentView: nil];	  
-    DESTROY (matrix);
+      
+  if ([matrix numberOfColumns] > 0) {
+    [matrix removeColumn: 0];
   }
-
+  
   DESTROY (shownNode); 
   DESTROY (oldNode);
   isLoaded = NO;
@@ -247,7 +256,7 @@ static id <DesktopApplication> desktopApp = nil;
 
     if (visibleNodes) {
       int count = [visibleNodes count];
-
+      
       for (i = 0; i < count; i++) {
         FSNode *node = [visibleNodes objectAtIndex: i];
 
@@ -261,7 +270,13 @@ static id <DesktopApplication> desktopApp = nil;
       if ([visibleNodes count]) {
         cell = [self cellOfNode: [visibleNodes objectAtIndex: 0]];
         [matrix scrollToFirstPositionCell: cell withScrollTune: scrollTune];
+      
+      } else if ([[matrix cells] count]) {
+        [matrix scrollCellToVisibleAtRow: 0 column: 0];
       }
+      
+    } else if ([[matrix cells] count]) {
+      [matrix scrollCellToVisibleAtRow: 0 column: 0];
     }
                
     isLoaded = YES;
@@ -284,29 +299,15 @@ static id <DesktopApplication> desktopApp = nil;
   SEL compSel = [fsnodeRep compareSelectorForDirectory: [shownNode path]];
   int i;
 
-	matrix = [[FSNBrowserMatrix alloc] initInColumn: self 
-                                        withFrame: [self bounds]
-		                                         mode: NSListModeMatrix 
-                                        prototype: cellPrototype
-		      					                 numberOfRows: 0 
-                                  numberOfColumns: 0 
-                                        acceptDnd: cellsIcon];
-  
-	[matrix setIntercellSpacing: NSMakeSize(0, 0)];
-  [matrix setCellSize: NSMakeSize([scroll contentSize].width, cellsHeight)];  
-	[matrix setAutoscroll: YES];
-	[matrix setAllowsEmptySelection: YES];
-  [matrix setBackgroundColor: backColor];
-  [matrix setCellBackgroundColor: backColor];
-	[matrix setTarget: self];
-	[matrix setAction: @selector(doClick:)];
-	[matrix setDoubleAction: @selector(doDoubleClick:)];
-	[scroll setDocumentView: matrix];
+  if ([matrix numberOfColumns] > 0) {
+    [matrix removeColumn: 0];
+  }
 
   if (count == 0) {
+    [matrix setNeedsDisplay: YES];
 		return;
 	}
-
+  
   [matrix addColumn]; 
 
   for (i = 0; i < count; ++i) {
@@ -738,7 +739,7 @@ static id <DesktopApplication> desktopApp = nil;
 
 - (BOOL)selectFirstCell
 {
-  if (matrix && [[matrix cells] count]) {
+  if ([[matrix cells] count]) {
     [matrix selectCellAtRow: 0 column: 0];
     [matrix sendAction];
     return YES;
@@ -749,7 +750,7 @@ static id <DesktopApplication> desktopApp = nil;
 
 - (BOOL)selectCellWithPrefix:(NSString *)prefix
 {
-  if (matrix && [[matrix cells] count]) {
+  if ([[matrix cells] count]) {
     int n = [matrix numberOfRows];
     int s = [matrix selectedRow];
     NSString *cellstr = nil;
@@ -793,7 +794,7 @@ static id <DesktopApplication> desktopApp = nil;
 
 - (void)selectAll
 {
-  if (matrix && [[matrix cells] count]) {
+  if ([[matrix cells] count]) {
     NSArray *cells = [matrix cells];
     unsigned count = [cells count];
     FSNBrowserCell *cell;
@@ -864,9 +865,7 @@ static id <DesktopApplication> desktopApp = nil;
 
 - (void)unselectAllCells
 {
-  if (matrix) {
-    [matrix deselectAllCells];
-  }
+  [matrix deselectAllCells];
 }
 
 - (void)setEditorForCell:(FSNBrowserCell *)cell
@@ -995,38 +994,34 @@ static id <DesktopApplication> desktopApp = nil;
 
 - (void)lock
 {
-  if (matrix) {
-    NSArray *cells = [matrix cells];
-    int i;  
-  
-  	for (i = 0; i < [cells count]; i++) {
-			id cell = [cells objectAtIndex: i];
+  NSArray *cells = [matrix cells];
+  int i;  
 
-			if ([cell isEnabled]) {
-    		[cell setEnabled: NO];
-			}
-  	}
+  for (i = 0; i < [cells count]; i++) {
+		id cell = [cells objectAtIndex: i];
 
-  	[matrix setNeedsDisplay: YES];   
-	}
+		if ([cell isEnabled]) {
+    	[cell setEnabled: NO];
+		}
+  }
+
+  [matrix setNeedsDisplay: YES];   
 }
 
 - (void)unlock
 {
-  if (matrix) {
-    NSArray *cells = [matrix cells];
-    int i;  
-  
-  	for (i = 0; i < [cells count]; i++) {
-			id cell = [cells objectAtIndex: i];
+  NSArray *cells = [matrix cells];
+  int i;  
 
-			if ([cell isEnabled] == NO) {
-    		[cell setEnabled: YES];
-			}
-  	}
+  for (i = 0; i < [cells count]; i++) {
+		id cell = [cells objectAtIndex: i];
 
-  	[matrix setNeedsDisplay: YES];   
-	}
+		if ([cell isEnabled] == NO) {
+    	[cell setEnabled: YES];
+		}
+  }
+
+  [matrix setNeedsDisplay: YES];   
 }
 
 - (FSNBrowserCell *)cellOfNode:(FSNode *)node
@@ -1120,24 +1115,18 @@ static id <DesktopApplication> desktopApp = nil;
 - (void)setBackgroundColor:(NSColor *)acolor
 {
   ASSIGN (backColor, acolor);
-  if (matrix) {
-    [matrix setBackgroundColor: backColor];
-    [matrix setCellBackgroundColor: backColor];
-  }
+  [matrix setBackgroundColor: backColor];
+  [matrix setCellBackgroundColor: backColor];
 }
 
 - (void)mouseUp:(NSEvent *)theEvent
 {
-  if (matrix) {
-    NSPoint p = [theEvent locationInWindow];
-    int row, col;
-    
-    p = [matrix convertPoint: p fromView: nil];
+  NSPoint p = [theEvent locationInWindow];
+  int row, col;
 
-    if ([matrix getRow: &row column: &col forPoint: p] == NO) {
-      [browser clickInColumn: self];
-    }
-  } else {
+  p = [matrix convertPoint: p fromView: nil];
+
+  if ([matrix getRow: &row column: &col forPoint: p] == NO) {
     [browser clickInColumn: self];
   }
 }
@@ -1157,9 +1146,7 @@ static id <DesktopApplication> desktopApp = nil;
   CHECKRECT (r);
   [scroll setFrame: r];  
   
-  if (matrix) {
-    [self adjustMatrix];
-  }
+  [self adjustMatrix];
 }
 
 - (void)drawRect:(NSRect)rect

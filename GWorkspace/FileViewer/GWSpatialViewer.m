@@ -235,6 +235,9 @@
            selector: @selector(columnsWidthChanged:) 
                name: @"GWBrowserColumnWidthChangedNotification"
              object: nil];
+    
+    invalidated = NO;
+    closing = NO;    
   }
   
   return self;
@@ -424,6 +427,10 @@
   return invalidated;
 }
 
+- (BOOL)isClosing
+{
+  return closing;
+}
 
 - (void)setOpened:(BOOL)opened 
         repOfNode:(FSNode *)anode
@@ -450,6 +457,10 @@
 {
   FSNode *node;
   NSArray *components;
+
+  if (closing) {
+    return;
+  }
   
   [manager selectionChanged: newsel];
 
@@ -761,6 +772,7 @@
 - (void)windowWillClose:(NSNotification *)aNotification
 {
   if (invalidated == NO) {
+    closing = YES;
     [self updateDefaults];
     [manager viewerWillClose: self]; 
   }

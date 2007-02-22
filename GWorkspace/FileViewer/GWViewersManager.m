@@ -449,12 +449,7 @@ static GWViewersManager *vwrsmanager = nil;
   NSArray *watchedNodes = [aviewer watchedNodes];
   NSNumber *key = [aviewer rootViewerKey];
   id parentViewer = [self parentOfSpatialViewer: aviewer];
-  id desktopManager = [gworkspace desktopManager];  
   int i;
-
-  if ([desktopManager isActive]) {
-    [desktopManager deselectAllIcons];
-  }
   
   if (parentViewer && ([parentViewer invalidated] == NO)) {
     [parentViewer setOpened: NO repOfNode: node];
@@ -959,6 +954,15 @@ static GWViewersManager *vwrsmanager = nil;
 - (BOOL)orderingViewers
 {
   return orderingViewers;
+}
+
+- (void)updateDesktop
+{
+  id desktopManager = [gworkspace desktopManager];  
+
+  if ([desktopManager isActive]) {
+    [desktopManager deselectAllIcons];
+  }
 }
 
 - (void)updateDefaults

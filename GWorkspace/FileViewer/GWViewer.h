@@ -70,6 +70,7 @@
   int historyPosition;
   
   BOOL invalidated;
+  BOOL closing;
   
   GWViewersManager *manager;
   GWorkspace *gworkspace;
@@ -105,6 +106,7 @@
 - (void)scrollToBeginning;
 - (void)invalidate;
 - (BOOL)invalidated;
+- (BOOL)isClosing;
 
 - (void)setOpened:(BOOL)opened 
         repOfNode:(FSNode *)anode;

@@ -888,7 +888,7 @@
 	} else {
     NSMatrix *matrix = [selCol cmatrix];
     
-    if (matrix) {
+    if ([[matrix cells] count]) {
       int index = [selCol index];
       
       [matrix sendAction];
@@ -896,7 +896,8 @@
       if (index < ([columns count] - 1)) {
         selCol = [columns objectAtIndex: index + 1];
         matrix = [selCol cmatrix];
-        if (matrix) {
+        
+        if ([[matrix cells] count]) {
           if ([selCol selectFirstCell]) {
             [matrix sendAction];  
             [[self window] makeFirstResponder: matrix];
@@ -1346,7 +1347,7 @@
     matrix = [selCol cmatrix];
 	}
 	
-  if (matrix) {
+  if ([[matrix cells] count]) {
     [[self window] makeFirstResponder: matrix];
 	}
 	
@@ -1646,7 +1647,22 @@
     
   } else if ([event isEqual: @"GWFileDeletedInWatchedDirectory"]) {    
     if ([self isShowingPath: path]) {
+      FSNBrowserColumn *col;
+    
       [self reloadFromColumnWithPath: path]; 
+       
+      col = [self lastLoadedColumn];
+
+      if (col) {
+        NSArray *selection = [col selectedNodes];
+        
+        if (selection == nil) {
+          selection = [NSArray arrayWithObject: [col shownNode]];
+        }
+        
+        [viewer selectionChanged: selection];
+        [self synchronizeViewer];
+      }  
     }      
                  
   } else if ([event isEqual: @"GWFileCreatedInWatchedDirectory"]) {   
