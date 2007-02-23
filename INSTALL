@@ -2,9 +2,25 @@ Installing GWorkspace
 =========================
 
 GWorkspace requires GNUstep to be installed. Make sure that you have an
-up to date version on your system installed! 
+up to date version installed on your system! 
 
   ./configure
   make install
 
+If you are on Linux and want to use the new inotify-based fswatcher, you can pass --with-inotify to configure.
+
+To enable the new metadata indexing and searching system, cd into the GWMetadata directory and:
+
+  ./configure
+  make
+  make install
+
+To enable all the GWorkspace features you need also:
+
+* The PDFKit framework (version >= 0.9) downloadable from the GWorkspace home page.
+PDFKit is needed to build the pdf contents inspector and to extract metadata from pdf files.
+
+* System Preferences available from the GNUstep SVN repository.
+  svn co http://svn.gna.org/svn/gnustep/apps/systempreferences/trunk
+  If you install the GWMetadata system, SystemPreferences is needed to configure it. 
 

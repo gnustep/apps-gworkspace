@@ -44,6 +44,8 @@ typedef enum DockPosition {
   id win;
   BOOL usexbundle;
   
+  GWDesktopView *desktopView;
+  
   Dock *dock;
   BOOL hidedock;
   DockPosition dockPosition;

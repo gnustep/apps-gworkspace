@@ -504,6 +504,8 @@ static NSString *GWWatchedPathRenamed = @"GWWatchedPathRenamed";
       }    
     }
   }
+  
+  GWDebugLog(@"watchers: %i", NSCountMapTable(watchers));
 }
 
 - (oneway void)client:(id <FSWClientProtocol>)client
@@ -528,6 +530,8 @@ static NSString *GWWatchedPathRenamed = @"GWWatchedPathRenamed";
     [info removeWatchedPath: path];    
   	[watcher removeListener];  
   }
+  
+  GWDebugLog(@"watchers: %i", NSCountMapTable(watchers));
 }
 
 - (Watcher *)watcherForPath:(NSString *)path

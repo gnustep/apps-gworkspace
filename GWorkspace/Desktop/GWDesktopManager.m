@@ -67,7 +67,6 @@ static GWDesktopManager *desktopManager = nil;
     id defentry;
     NSString *path;
     id window = nil;
-    GWDesktopView *desktopView;
 
     fm = [NSFileManager defaultManager];
     nc = [NSNotificationCenter defaultCenter];
@@ -150,12 +149,12 @@ static GWDesktopManager *desktopManager = nil;
 - (void)activateDesktop
 {
   [win activate];
-  [[win desktopView] showMountedVolumes];
-  [[win desktopView] showContentsOfNode: dskNode];
+  [desktopView showMountedVolumes];
+  [desktopView showContentsOfNode: dskNode];
   [self addWatcherForPath: [dskNode path]];
     
   if ((hidedock == NO) && ([dock superview] == nil)) {
-    [[win desktopView] addSubview: dock];
+    [desktopView addSubview: dock];
     [dock tile];
   }
   
@@ -210,7 +209,6 @@ static GWDesktopManager *desktopManager = nil;
   usexbundle = value;
   
   if ([self isActive]) { 
-    GWDesktopView *desktopView = [win desktopView];
     id window = nil;  
     BOOL changed = NO;
     
@@ -275,7 +273,7 @@ static GWDesktopManager *desktopManager = nil;
 
 - (id)desktopView
 {
-  return [win desktopView];
+  return desktopView;
 }
 
 - (Dock *)dock
@@ -293,7 +291,7 @@ static GWDesktopManager *desktopManager = nil;
   dockPosition = pos;
   [dock setPosition: pos];
   [self setReservedFrames];
-  [[win desktopView] dockPositionDidChange];
+  [desktopView dockPositionDidChange];
 }
 
 - (void)setDockActive:(BOOL)value
@@ -302,12 +300,12 @@ static GWDesktopManager *desktopManager = nil;
   
   if (hidedock && [dock superview]) {
     [dock removeFromSuperview];
-    [[win desktopView] setNeedsDisplayInRect: dockReservedFrame];
+    [desktopView setNeedsDisplayInRect: dockReservedFrame];
     
   } else if ([dock superview] == nil) {
-    [[win desktopView] addSubview: dock];
+    [desktopView addSubview: dock];
     [dock tile];
-    [[win desktopView] setNeedsDisplayInRect: dockReservedFrame];
+    [desktopView setNeedsDisplayInRect: dockReservedFrame];
   }
 }
 
@@ -366,7 +364,7 @@ static GWDesktopManager *desktopManager = nil;
 
 - (NSImage *)tabbedShelfBackground
 {
-  return [[win desktopView] tshelfBackground];
+  return [desktopView tshelfBackground];
 }
 
 - (void)mouseEnteredTShelfActivateFrame
@@ -381,11 +379,9 @@ static GWDesktopManager *desktopManager = nil;
 
 - (void)deselectAllIcons
 {
-  GWDesktopView *view = [win desktopView];
-  
-  [view unselectOtherReps: nil];
-  [view selectionDidChange];
-  [view stopRepNameEditing];
+  [desktopView unselectOtherReps: nil];
+  [desktopView selectionDidChange];
+  [desktopView stopRepNameEditing];
 }
 
 - (void)deselectInSpatialViewers
@@ -565,7 +561,7 @@ static GWDesktopManager *desktopManager = nil;
   [defaults setBool: hidedock forKey: @"hidedock"];
   
   [dock updateDefaults];
-  [[win desktopView] updateDefaults];
+  [desktopView updateDefaults];
 }
 
 - (void)setContextHelp
@@ -597,7 +593,6 @@ static GWDesktopManager *desktopManager = nil;
 {
   if ([self isActive]) {
     SEL action = [menuItem action];
-    GWDesktopView *desktopView = [win desktopView];
 
     if (sel_eq(action, @selector(duplicateFiles:))
                 || sel_eq(action, @selector(recycleFiles:))
@@ -650,7 +645,7 @@ static GWDesktopManager *desktopManager = nil;
 
 - (void)openSelectionInNewViewer:(BOOL)newv
 {
-  NSArray *selreps = [[win desktopView] selectedReps];
+  NSArray *selreps = [desktopView selectedReps];
   int i;
     
   for (i = 0; i < [selreps count]; i++) {
@@ -697,7 +692,7 @@ static GWDesktopManager *desktopManager = nil;
 
 - (void)openSelectionAsFolder
 {
-  NSArray *selnodes = [[win desktopView] selectedNodes];
+  NSArray *selnodes = [desktopView selectedNodes];
   int i;
     
   for (i = 0; i < [selnodes count]; i++) {
@@ -728,14 +723,14 @@ static GWDesktopManager *desktopManager = nil;
 
 - (void)duplicateFiles
 {
-  if ([[[win desktopView] selectedNodes] count]) {
+  if ([[desktopView selectedNodes] count]) {
     [gworkspace duplicateFiles];
   }
 }
 
 - (void)recycleFiles
 {
-  if ([[[win desktopView] selectedNodes] count]) {
+  if ([[desktopView selectedNodes] count]) {
     [gworkspace moveToTrash];
   }
 }
@@ -747,7 +742,7 @@ static GWDesktopManager *desktopManager = nil;
 
 - (void)deleteFiles
 {
-  if ([[[win desktopView] selectedNodes] count]) {
+  if ([[desktopView selectedNodes] count]) {
     [gworkspace deleteFiles];
   }
 }
@@ -771,17 +766,17 @@ static GWDesktopManager *desktopManager = nil;
     type = FSNInfoNameType;
   } 
 
-  [(id <FSNodeRepContainer>)[win desktopView] setShowType: type];  
+  [desktopView setShowType: type];  
 }
 
 - (void)setExtendedShownType:(id)sender
 {
-  [(id <FSNodeRepContainer>)[win desktopView] setExtendedShowType: [sender title]]; 
+  [desktopView setExtendedShowType: [sender title]]; 
 }
 
 - (void)setIconsSize:(id)sender
 {
-  [(id <FSNodeRepContainer>)[win desktopView] setIconSize: [[sender title] intValue]];
+  [desktopView setIconSize: [[sender title] intValue]];
 }
 
 - (void)setIconsPosition:(id)sender
@@ -789,20 +784,20 @@ static GWDesktopManager *desktopManager = nil;
   NSString *title = [sender title];
 
   if ([title isEqual: NSLocalizedString(@"Left", @"")]) {
-    [(id <FSNodeRepContainer>)[win desktopView] setIconPosition: NSImageLeft];
+    [desktopView setIconPosition: NSImageLeft];
   } else {
-    [(id <FSNodeRepContainer>)[win desktopView] setIconPosition: NSImageAbove];
+    [desktopView setIconPosition: NSImageAbove];
   }
 }
 
 - (void)setLabelSize:(id)sender
 {
-  [[win desktopView] setLabelTextSize: [[sender title] intValue]];
+  [desktopView setLabelTextSize: [[sender title] intValue]];
 }
 
 - (void)selectAllInViewer
 {
-	[[win desktopView] selectAll];
+	[desktopView selectAll];
 }
 
 - (void)showTerminal

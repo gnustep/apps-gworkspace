@@ -995,6 +995,7 @@
 
 - (BOOL)windowShouldClose:(id)sender
 {
+  [manager updateDesktop];
 	return YES;
 }
 
