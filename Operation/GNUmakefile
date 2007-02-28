@@ -26,6 +26,12 @@ Operation_OBJC_FILES = \
 
 Operation_HEADER_FILES = \
          Operation.h 
+
+ifeq ($(findstring darwin, $(GNUSTEP_TARGET_OS)), darwin)
+  ifeq ($(OBJC_RUNTIME_LIB), gnu)
+    SHARED_LD_POSTFLAGS += -lgnustep-base -lgnustep-gui
+  endif
+endif
 						 
 -include GNUmakefile.preamble
 

@@ -47,7 +47,11 @@ FSNode_RESOURCE_FILES = \
 
 FSNode_LANGUAGES = Resources/English 
 
-#FSNode_LOCALIZED_RESOURCE_FILES = Localizable.strings  
+ifeq ($(findstring darwin, $(GNUSTEP_TARGET_OS)), darwin)
+  ifeq ($(OBJC_RUNTIME_LIB), gnu)
+    SHARED_LD_POSTFLAGS += -lgnustep-base -lgnustep-gui
+  endif
+endif
 
 SUBPROJECTS = ExtendedInfo 
 

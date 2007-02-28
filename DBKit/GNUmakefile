@@ -26,7 +26,13 @@ DBKPathsTree.h
 
 libDBKit_HEADER_FILES_DIR = .
 libDBKit_HEADER_FILES_INSTALL_DIR=DBKit
-                        
+
+ifeq ($(findstring darwin, $(GNUSTEP_TARGET_OS)), darwin)
+  ifeq ($(OBJC_RUNTIME_LIB), gnu)
+    SHARED_LD_POSTFLAGS += -lgnustep-base
+  endif
+endif
+
 include $(GNUSTEP_MAKEFILES)/library.make
 include $(GNUSTEP_MAKEFILES)/aggregate.make
 
