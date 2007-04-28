@@ -260,7 +260,7 @@
     RETAIN (components);
     RELEASE (arp);
     
-    return [components makeImmutableCopyOnFail: NO];
+    return [[components autorelease] makeImmutableCopyOnFail: NO];
     
   } else if ([secondNode isEqual: firstNode]) {
     return [NSArray arrayWithObject: firstNode];

@@ -25,6 +25,7 @@
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include <math.h>
+#include <unistd.h>
 #include "FSNListView.h"
 #include "FSNTextCell.h"
 #include "FSNFunctions.h"

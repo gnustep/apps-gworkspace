@@ -25,6 +25,7 @@
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
 #include <math.h>
+#include <unistd.h>
 #include "FSNBrowser.h"
 #include "FSNBrowserColumn.h"
 #include "FSNBrowserMatrix.h"
