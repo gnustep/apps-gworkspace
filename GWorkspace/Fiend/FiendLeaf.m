@@ -98,6 +98,7 @@
   win = [[NSWindow alloc] initWithContentRect: NSMakeRect(0, 0, 64, 64)
 					                  styleMask: NSBorderlessWindowMask  
                               backing: NSBackingStoreBuffered defer: NO];
+  [win setExcludedFromWindowsMenu: YES];
   [self setFrame: [[win contentView] bounds]];  
   [win setContentView: self];		
   [self setPosX: px posY: py relativeToPoint: p];

@@ -85,6 +85,7 @@
     [myWin setFrame: r display: NO];
     
     [myWin setReleasedWhenClosed: NO]; 
+    [myWin setExcludedFromWindowsMenu: YES];
     
     defaults = [NSUserDefaults standardUserDefaults];	
 

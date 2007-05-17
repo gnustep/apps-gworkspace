@@ -60,6 +60,7 @@
     int i;
     
 		[self setReleasedWhenClosed: NO];
+    [self setExcludedFromWindowsMenu: YES];
         
     tView = [[TShelfView alloc] initWithFrame: [[self contentView] bounds]];
     [self setContentView: tView];		
