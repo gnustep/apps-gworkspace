@@ -1016,10 +1016,9 @@
 
 - (void)dealloc
 {
+  [nc removeObserver: self];
+
   if (conn && [conn isValid]) {
-    [nc removeObserver: self
-	                name: NSConnectionDidDieNotification
-	              object: conn];
     DESTROY (application);  
     RELEASE (conn);  
   }
@@ -1232,7 +1231,6 @@
   if (application) {
     NS_DURING
       {
-    [nc removeObserver: self];
     [application terminate: nil];
       }
     NS_HANDLER

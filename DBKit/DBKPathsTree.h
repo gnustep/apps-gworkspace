@@ -22,10 +22,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-
 #ifndef DBK_PATHS_TREE_H
 #define DBK_PATHS_TREE_H
+
+#include <Foundation/Foundation.h>
 
 #define MAX_PATH_DEEP 256
 
