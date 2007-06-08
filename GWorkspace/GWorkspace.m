@@ -2150,10 +2150,10 @@ static GWorkspace *gworkspace = nil;
   [d setObject: @"GWorkspace" forKey: @"ApplicationName"];
   [d setObject: NSLocalizedString(@"GNUstep Workspace Manager", @"")
       	forKey: @"ApplicationDescription"];
-  [d setObject: @"GWorkspace 0.8.5" forKey: @"ApplicationRelease"];
-  [d setObject: @"02 2007" forKey: @"FullVersionID"];
+  [d setObject: @"GWorkspace 0.8.6" forKey: @"ApplicationRelease"];
+  [d setObject: @"06 2007" forKey: @"FullVersionID"];
   [d setObject: [NSArray arrayWithObjects: 
-                    @"Enrico Sersale <enrico@fibernet.ro>",
+                    @"Enrico Sersale <enrico.sersale@gmail.com>",
                     @"Documentation and Help contents by: \n"
                     @"Dennis Leeuw <dleeuw@made-it.com>", 
                     nil]

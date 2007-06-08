@@ -2,8 +2,8 @@
     ApplicationName = "GWorkspace";
     ApplicationDescription = "GNUstep Workspace Manager";
     ApplicationIcon = "FileManager.tiff";
-    ApplicationRelease = "GWorkspace-0.8.5";
-    NSBuildVersion = "0.8.5";
+    ApplicationRelease = "GWorkspace-0.8.6";
+    NSBuildVersion = "0.8.6";
     Authors = (
       "Enrico Sersale <enrico\@fibernet.ro>"
     );

@@ -35,6 +35,16 @@ fi
 
 AC_DEFINE_UNQUOTED([GW_DEBUG_LOG], [$GW_DEBUG_LOG], [debug logging])
 
+#--------------------------------------------------------------------
+# fswatcher-inotify
+#--------------------------------------------------------------------
+AC_ARG_WITH(inotify,
+  [  --with-inotify  Build fswatcher-inotify],
+  with_inotify=yes, with_inotify=no)
+  
+AC_SUBST(with_inotify)
+
+
 AC_CONFIG_FILES([GNUmakefile \
 									Tools/ddbd/GNUmakefile \
 									GWorkspace/GNUmakefile])
