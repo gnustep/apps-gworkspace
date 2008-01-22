@@ -1,2 +1,5 @@
+2008-01-22 Riccardo Mottola <rmottola@users.sourceforge.net>
 
-
+	* GWorkspace/FileViewer/GWViewer.m,
+	GWorkspace/FileViewer/GWSpatialViewer.m:
+	Removed special case for BSD operating systems since it broke NetBSD

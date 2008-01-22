@@ -553,9 +553,6 @@
     unsigned systemType = [fsnodeRep systemType];
     
     switch (systemType) {
-      case NSBSDOperatingSystem:
-        freeSize = (freeSize >> 8);
-        break;
 
       case NSMACHOperatingSystem:
         freeSize = (freeSize >> 8);

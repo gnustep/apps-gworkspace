@@ -4,3 +4,4 @@
 4- Add a cache system for Inspector ?
 5- Add nice Icons
 6- Rewrite/remove some Prefs
+7- fix dameons and recycler under NetBSD

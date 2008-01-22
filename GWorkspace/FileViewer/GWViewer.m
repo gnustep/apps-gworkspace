@@ -671,11 +671,8 @@
     unsigned long long freeSize = [freefs unsignedLongLongValue];
     unsigned systemType = [fsnodeRep systemType];
     
-    switch (systemType) {
-      case NSBSDOperatingSystem:
-        freeSize = (freeSize >> 8);
-        break;
-
+    switch (systemType)
+    {
       case NSMACHOperatingSystem:
         freeSize = (freeSize >> 8);
         break;
