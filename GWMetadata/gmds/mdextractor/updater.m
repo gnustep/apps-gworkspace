@@ -692,29 +692,34 @@ do { \
     fswatcher = [NSConnection rootProxyForConnectionWithRegisteredName: @"fswatcher" 
                                                                   host: @""];
 
-    if (fswatcher == nil) {
-	    NSString *cmd;
+    if (fswatcher == nil)
+    {
+      NSString *cmd;
+      NSMutableArray *arguments;
       int i;
     
       cmd = [[NSSearchPathForDirectoriesInDomains(
                 GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
                                       stringByAppendingPathComponent: @"fswatcher"];    
-                
-     [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
+      
+      arguments = [NSMutableArray arrayWithCapacity:2];
+      [arguments addObject:@"--daemon"];
+      [arguments addObject:@"--auto"];  
+      [NSTask launchedTaskWithLaunchPath: cmd arguments: arguments];
    
-      for (i = 0; i < 40; i++) {
-	      [[NSRunLoop currentRunLoop] runUntilDate:
-		                     [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+      for (i = 0; i < 40; i++)
+        [[NSRunLoop currentRunLoop] runUntilDate:
+            [NSDate dateWithTimeIntervalSinceNow: 0.1]];
 
         fswatcher = [NSConnection rootProxyForConnectionWithRegisteredName: @"fswatcher" 
                                                                       host: @""];                  
-        if (fswatcher) {
+        if (fswatcher)
           break;
-        }
       }
     }
     
-    if (fswatcher) {
+    if (fswatcher)
+    {
       RETAIN (fswatcher);
       [fswatcher setProtocolForProxy: @protocol(FSWatcherProtocol)];
     

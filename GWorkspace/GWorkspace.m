@@ -1669,12 +1669,15 @@ static GWorkspace *gworkspace = nil;
 
 - (void)connectFSWatcher
 {
-  if (fswatcher == nil) {
+  if (fswatcher == nil)
+  {
     fswatcher = [NSConnection rootProxyForConnectionWithRegisteredName: @"fswatcher" 
                                                                   host: @""];
 
-    if (fswatcher == nil) {
-	    NSString *cmd;
+    if (fswatcher == nil)
+    {
+      NSString *cmd;
+      NSMutableArray *arguments;
       int i;
     
       cmd = [[NSSearchPathForDirectoriesInDomains(
@@ -1686,7 +1689,10 @@ static GWorkspace *gworkspace = nil;
                              operation: NSLocalizedString(@"starting:", @"")
                           maxProgValue: 40.0];
     
-      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
+      arguments = [NSMutableArray arrayWithCapacity:2];
+      [arguments addObject:@"--daemon"];
+      [arguments addObject:@"--auto"];  
+      [NSTask launchedTaskWithLaunchPath: cmd arguments: arguments];
    
       for (i = 1; i <= 40; i++) {
         [startAppWin updateProgressBy: 1.0];
@@ -1695,7 +1701,8 @@ static GWorkspace *gworkspace = nil;
 
         fswatcher = [NSConnection rootProxyForConnectionWithRegisteredName: @"fswatcher" 
                                                                       host: @""];                  
-        if (fswatcher) {
+        if (fswatcher)
+	{
           [startAppWin updateProgressBy: 40.0 - i];
           break;
         }
@@ -1704,7 +1711,8 @@ static GWorkspace *gworkspace = nil;
       [[startAppWin win] close];
     }
     
-    if (fswatcher) {
+    if (fswatcher)
+    {
       RETAIN (fswatcher);
       [fswatcher setProtocolForProxy: @protocol(FSWatcherProtocol)];
     

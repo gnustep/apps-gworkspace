@@ -1,5 +1,15 @@
 2008-01-22 Riccardo Mottola <rmottola@users.sourceforge.net>
 
+	* GWorkspace/GWorkspace.m,
+	GWMetadata/gmds/mdextractor/updater.m:
+	start fswatcher with --daemon --auto
+	
+	* Tools/fswatcher/fswatcher.m:
+	shut down when the last connection closes
+
+
+2008-01-22 Riccardo Mottola <rmottola@users.sourceforge.net>
+
 	* GWorkspace/FileViewer/GWViewer.m,
 	GWorkspace/FileViewer/GWSpatialViewer.m:
 	Removed special case for BSD operating systems since it broke NetBSD
