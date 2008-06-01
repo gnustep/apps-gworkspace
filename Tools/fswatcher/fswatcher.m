@@ -29,13 +29,14 @@
   do { if (GW_DEBUG_LOG) \
     NSLog(format , ## args); } while (0)
 
+static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 
 @implementation	FSWClientInfo
 
 - (void)dealloc
 {
-	TEST_RELEASE (conn);
-	TEST_RELEASE (client);
+  TEST_RELEASE (conn);
+  TEST_RELEASE (client);
   RELEASE (wpaths);
   [super dealloc];
 }
@@ -44,9 +45,10 @@
 {
   self = [super init];
   
-  if (self) {
-		client = nil;
-		conn = nil;
+  if (self)
+  {
+    client = nil;
+    conn = nil;
     wpaths = [[NSCountedSet alloc] initWithCapacity: 1];
     global = NO;
   }
@@ -145,7 +147,8 @@
 {
   self = [super init];
   
-  if (self) {    
+  if (self)
+  {    
     fm = [NSFileManager defaultManager];	
     nc = [NSNotificationCenter defaultCenter];
     dnc = [NSDistributedNotificationCenter defaultCenter];
@@ -154,33 +157,32 @@
     [conn setRootObject: self];
     [conn setDelegate: self];
 
-    if ([conn registerName: @"fswatcher"] == NO) {
-	    NSLog(@"unable to register with name server - quiting.");
-	    DESTROY (self);
-	    return self;
-	  }
+    if ([conn registerName: @"fswatcher"] == NO)
+    {
+      NSLog(@"unable to register with name server - quiting.");
+      DESTROY (self);
+      return self;
+    }
     
-    clientsInfo = [NSMutableArray new];    
+    clientsInfo = [NSMutableArray new]; 
+
     watchers = NSCreateMapTable(NSObjectMapKeyCallBacks,
 	                                        NSObjectMapValueCallBacks, 0);
       
     includePathsTree = newTreeWithIdentifier(@"incl_paths");
     excludePathsTree = newTreeWithIdentifier(@"excl_paths");
     excludedSuffixes = [[NSMutableSet alloc] initWithCapacity: 1];
-      
     [self setDefaultGlobalPaths];  
-      
+
     [nc addObserver: self
            selector: @selector(connectionBecameInvalid:)
 	             name: NSConnectionDidDieNotification
 	           object: conn];
-
     [dnc addObserver: self
             selector: @selector(globalPathsChanged:)
 	              name: @"GSMetadataIndexedDirectoriesChanged"
 	            object: nil];
   }
-  
   return self;    
 }
 
@@ -211,29 +213,43 @@
 	              name: NSConnectionDidDieNotification
 	            object: connection];
 
-  if (connection == conn) {
+  NSLog(@"Connection became invalid");
+  if (connection == conn)
+  {
     NSLog(@"argh - fswatcher server root connection has been destroyed.");
     exit(EXIT_FAILURE);
     
-  } else {
-		FSWClientInfo *info = [self clientInfoWithConnection: connection];
+  } else
+  {
+    FSWClientInfo *info = [self clientInfoWithConnection: connection];
 	
-		if (info) {
+    if (info)
+    {
       NSSet *wpaths = [info watchedPaths];
       NSEnumerator *enumerator = [wpaths objectEnumerator];
       NSString *wpath;
       
-      while ((wpath = [enumerator nextObject])) {
+      while ((wpath = [enumerator nextObject]))
+      {
         Watcher *watcher = [self watcherForPath: wpath];
       
-        if (watcher) {
+        NSLog(@"No next in enumerator");
+        if (watcher)
+	{
           [watcher removeListener];
         }      
       }
-          
-			[clientsInfo removeObject: info];
-		}
-	}
+      
+      [clientsInfo removeObject: info];
+    }
+    if (auto_stop == YES && [clientsInfo count] == 1)
+      {
+	/* If there is nothing else using this process, and this is not
+	 * a daemon, then we can quietly terminate.
+	 */
+        exit(EXIT_SUCCESS);
+      }
+  }
 }
 
 - (void)setDefaultGlobalPaths
@@ -346,6 +362,7 @@
     [info setClient: client];  
     [info setGlobal: global];
   }
+  NSLog(@"register client %u", [clientsInfo count]);
 }
 
 - (oneway void)unregisterClient:(id <FSWClientProtocol>)client
@@ -381,7 +398,15 @@
 	              name: NSConnectionDidDieNotification
 	            object: connection];
 
-  [clientsInfo removeObject: info];  
+  [clientsInfo removeObject: info];
+  NSLog(@"unregister client %u", [clientsInfo count]);
+  if (auto_stop == YES && [clientsInfo count] == 1)
+    {
+      /* If there is nothing else using this process, and this is not
+       * a daemon, then we can quietly terminate.
+       */
+      exit(EXIT_SUCCESS);
+    }
 }
 
 - (FSWClientInfo *)clientInfoWithConnection:(NSConnection *)connection
@@ -833,13 +858,23 @@ int main(int argc, char** argv)
   static BOOL	is_daemon = NO;
   BOOL subtask = YES;
 
-  if ([[info arguments] containsObject: @"--daemon"]) {
+  if ([[info arguments] containsObject: @"--auto"] == YES)
+  {
+    auto_stop = YES;
+  }
+    
+  if ([[info arguments] containsObject: @"--daemon"])
+  {
     subtask = NO;
     is_daemon = YES;
   }
 
-  if (subtask) {
-    NSTask *task = [NSTask new];
+  if (subtask)
+  {
+    NSTask *task;
+    
+    
+    task = [NSTask new];
     
     NS_DURING
 	    {
@@ -868,10 +903,11 @@ int main(int argc, char** argv)
     FSWatcher *fsw = [[FSWatcher alloc] init];
     RELEASE (pool);
   
-    if (fsw != nil) {
-	    CREATE_AUTORELEASE_POOL (pool);
+    if (fsw != nil)
+    {
+      CREATE_AUTORELEASE_POOL (pool);
       [[NSRunLoop currentRunLoop] run];
-  	  RELEASE (pool);
+      RELEASE (pool);
     }
   }
     
