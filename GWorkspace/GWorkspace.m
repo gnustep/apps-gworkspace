@@ -115,17 +115,17 @@ static GWorkspace *gworkspace = nil;
   DESTROY (recyclerApp);
   DESTROY (ddbd);
   DESTROY (mdextractor);
-	RELEASE (gwProcessName);
-	RELEASE (gwBundlePath);
-	RELEASE (defEditor);
-	RELEASE (defXterm);
-	RELEASE (defXtermArgs);
+  RELEASE (gwProcessName);
+  RELEASE (gwBundlePath);
+  RELEASE (defEditor);
+  RELEASE (defXterm);
+  RELEASE (defXtermArgs);
   RELEASE (selectedPaths);
   RELEASE (trashContents);
   RELEASE (trashPath);
   RELEASE (watchedPaths);
   TEST_RELEASE (fiend);
-	TEST_RELEASE (history);
+  TEST_RELEASE (history);
   RELEASE (openWithController);
   RELEASE (runExtController);
   RELEASE (startAppWin);
@@ -140,7 +140,7 @@ static GWorkspace *gworkspace = nil;
   RELEASE (storedAppinfoPath);
   RELEASE (storedAppinfoLock);
     
-	[super dealloc];
+  [super dealloc];
 }
 
 - (void)createMenu
@@ -274,17 +274,17 @@ static GWorkspace *gworkspace = nil;
 		addItemToMenu(subenu, @"Go forward", @"", @"goForwardInHistory:", @"");
 	
   addItemToMenu(menu, @"Show Desktop", @"", @"showDesktop:", @"");
-	addItemToMenu(menu, @"Show Recycler", @"", @"showRecycler:", @"");
+  addItemToMenu(menu, @"Show Recycler", @"", @"showRecycler:", @"");
 
-	addItemToMenu(menu, @"Check for disks", @"", @"checkRemovableMedia:", @"E");
+  addItemToMenu(menu, @"Check for disks", @"", @"checkRemovableMedia:", @"E");
 	
-	// Windows
-	menuItem = addItemToMenu(mainMenu, @"Windows", @"", nil, @"");
-	windows = AUTORELEASE ([NSMenu new]);
-	[mainMenu setSubmenu: windows forItem: menuItem];		
-	addItemToMenu(windows, @"Arrange in Front", @"", nil, @"");
-	addItemToMenu(windows, @"Miniaturize Window", @"", nil, @"");
-	addItemToMenu(windows, @"Close Window", @"", @"closeMainWin:", @"w");
+  // Windows
+  menuItem = addItemToMenu(mainMenu, @"Windows", @"", nil, @"");
+  windows = AUTORELEASE ([NSMenu new]);
+  [mainMenu setSubmenu: windows forItem: menuItem];		
+  addItemToMenu(windows, @"Arrange in Front", @"", nil, @"");
+  addItemToMenu(windows, @"Miniaturize Window", @"", nil, @"");
+  addItemToMenu(windows, @"Close Window", @"", @"closeMainWin:", @"w");
 
 	// Services 
 	menuItem = addItemToMenu(mainMenu, @"Services", @"", nil, @"");
@@ -424,7 +424,8 @@ static GWorkspace *gworkspace = nil;
 
   dtopManager = [GWDesktopManager desktopManager];
     
-  if ([defaults boolForKey: @"no_desktop"] == NO) { 
+  if ([defaults boolForKey: @"no_desktop"] == NO)
+  { 
     id item;
    
     [dtopManager activateDesktop];
@@ -432,21 +433,21 @@ static GWorkspace *gworkspace = nil;
     item = [menu itemWithTitle: NSLocalizedString(@"Show Desktop", @"")];
     [item setTitle: NSLocalizedString(@"Hide Desktop", @"")];
 
-  } else if ([defaults boolForKey: @"uses_recycler"]) { 
+  } else if ([defaults boolForKey: @"uses_recycler"])
+  { 
     [self connectRecycler];
   }  
 
   tshelfPBFileNum = 0;
   [self createTabbedShelf];
-  if ([defaults boolForKey: @"tshelf"]) {
+  if ([defaults boolForKey: @"tshelf"])
     [self showTShelf: nil];
-  } else {
+  else
     [self hideTShelf: nil];
-  }
 
   prefController = [PrefController new];  
   
-	history = [[History alloc] init];
+  history = [[History alloc] init];
   
   openWithController = [[OpenWithController alloc] init];
   runExtController = [[RunExternalController alloc] init];
@@ -2158,8 +2159,8 @@ static GWorkspace *gworkspace = nil;
   [d setObject: @"GWorkspace" forKey: @"ApplicationName"];
   [d setObject: NSLocalizedString(@"GNUstep Workspace Manager", @"")
       	forKey: @"ApplicationDescription"];
-  [d setObject: @"GWorkspace 0.8.6" forKey: @"ApplicationRelease"];
-  [d setObject: @"06 2007" forKey: @"FullVersionID"];
+  [d setObject: @"GWorkspace 0.8.7" forKey: @"ApplicationRelease"];
+  [d setObject: @"06 2008" forKey: @"FullVersionID"];
   [d setObject: [NSArray arrayWithObjects: 
                     @"Enrico Sersale <enrico.sersale@gmail.com>",
                     @"Documentation and Help contents by: \n"
@@ -2167,7 +2168,7 @@ static GWorkspace *gworkspace = nil;
                     nil]
         forKey: @"Authors"];
   [d setObject: NSLocalizedString(@"See http://www.gnustep.it/enrico/gworkspace", @"") forKey: @"URL"];
-  [d setObject: @"Copyright (C) 2003, 2004, 2005, 2006, 2007 Free Software Foundation, Inc."
+  [d setObject: @"Copyright (C) 2003-2008 Free Software Foundation, Inc."
         forKey: @"Copyright"];
   [d setObject: NSLocalizedString(@"Released under the GNU General Public License 2.0", @"")
         forKey: @"CopyrightDescription"];
