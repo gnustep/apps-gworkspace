@@ -2154,26 +2154,8 @@ static GWorkspace *gworkspace = nil;
 
 - (void)showInfo:(id)sender
 {
-  NSMutableDictionary *d = AUTORELEASE ([NSMutableDictionary new]);
   
-  [d setObject: @"GWorkspace" forKey: @"ApplicationName"];
-  [d setObject: NSLocalizedString(@"GNUstep Workspace Manager", @"")
-      	forKey: @"ApplicationDescription"];
-  [d setObject: @"GWorkspace 0.8.7" forKey: @"ApplicationRelease"];
-  [d setObject: @"06 2008" forKey: @"FullVersionID"];
-  [d setObject: [NSArray arrayWithObjects: 
-                    @"Enrico Sersale <enrico.sersale@gmail.com>",
-                    @"Documentation and Help contents by: \n"
-                    @"Dennis Leeuw <dleeuw@made-it.com>", 
-                    nil]
-        forKey: @"Authors"];
-  [d setObject: NSLocalizedString(@"See http://www.gnustep.it/enrico/gworkspace", @"") forKey: @"URL"];
-  [d setObject: @"Copyright (C) 2003-2008 Free Software Foundation, Inc."
-        forKey: @"Copyright"];
-  [d setObject: NSLocalizedString(@"Released under the GNU General Public License 2.0", @"")
-        forKey: @"CopyrightDescription"];
-  
-  [NSApp orderFrontStandardInfoPanelWithOptions: d];
+  [NSApp orderFrontStandardInfoPanel: self];
 }
 
 - (void)showPreferences:(id)sender

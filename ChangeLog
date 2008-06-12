@@ -1,4 +1,13 @@
-2008-01-22 Riccardo Mottola <rmottola@users.sourceforge.net>
+2008-06-11 Riccardo Mottola <rmottola@users.sourceforge.net>
+
+	* GWorkspace/GWorkspace.m:
+	use standard info panel
+	* GWorkspace/GWorkspaceInfo.plist:
+	corrected version
+	* configure:
+	define package name and version
+
+2008-06-07 Riccardo Mottola <rmottola@users.sourceforge.net>
 
 	* GWorkspace/GWorkspace.m,
 	GWMetadata/gmds/mdextractor/updater.m:
