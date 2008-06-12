@@ -2,16 +2,19 @@
     ApplicationName = "GWorkspace";
     ApplicationDescription = "GNUstep Workspace Manager";
     ApplicationIcon = "FileManager.tiff";
-    ApplicationRelease = "GWorkspace-0.8.7";
-    NSBuildVersion = "0.8.7";
+    ApplicationRelease = "0.8.7";
+    NSBuildVersion = "06 2008";
     Authors = (
-      "Enrico Sersale <enrico\@fibernet.ro>"
+      "Enrico Sersale <enrico\@fibernet.ro>",
+      "Documentation and Help contents by:",
+      "Dennis Leeuw <dleeuw@made-it.com>"
     );
+    URL = "http://www.gnustep.it/enrico/gworkspace";
     Copyright = "Copyright (C) 2003-2008 Free Software Foundation, Inc.";
     CopyrightDescription = "Released under the GNU General Public License 2.0+";
     NSIcon = "FileManager.tiff";
     NSRole = "Viewer";
-  NSTypes = (
+    NSTypes = (
     {
       NSUnixExtensions = ( "inspector" );
       NSIcon = "MagnifyGlas.tiff";
