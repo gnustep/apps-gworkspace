@@ -5,7 +5,6 @@ SUBPROJECTS = \
 
 -include GNUmakefile.preamble
 
--include GNUmakefile.local
 
 include $(GNUSTEP_MAKEFILES)/aggregate.make
 
