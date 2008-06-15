@@ -1,3 +1,8 @@
+2008-06-15 Riccardo Mottola <rmottola@users.sourceforge.net>
+
+	* GWorkspace/FSNote/ExtendedInfo/GNUstep.h: deleted
+	* GWorkspace/FSNote/ExtendedInfo/GNUmakefile: removed local ref
+
 2008-06-11 Riccardo Mottola <rmottola@users.sourceforge.net>
 
 	* GWorkspace/GWorkspace.m:
