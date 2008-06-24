@@ -5,3 +5,5 @@
 5- Add nice Icons
 6- Rewrite/remove some Prefs
 7- fix dameons and recycler under NetBSD
+8- on icon click, if no fileviewer exists, a new one should be created like on mac
+9- check ddbd connection died messages
