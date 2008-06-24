@@ -10,7 +10,7 @@ fi
 #--------------------------------------------------------------------
 AC_CONFIG_AUX_DIR([$GNUSTEP_MAKEFILES])
 
-AC_CONFIG_SUBDIRS([ddbd fswatcher gmds lsfupdater searchtool thumbnailer wopen])
+AC_CONFIG_SUBDIRS([ddbd fswatcher lsfupdater searchtool thumbnailer wopen])
 
 AC_CONFIG_FILES([GNUmakefile])
 

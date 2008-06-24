@@ -646,7 +646,7 @@ enable_option_checking
       ac_precious_vars='build_alias
 host_alias
 target_alias'
-ac_subdirs_all='ddbd fswatcher gmds lsfupdater searchtool thumbnailer wopen'
+ac_subdirs_all='ddbd fswatcher lsfupdater searchtool thumbnailer wopen'
 
 # Initialize some variables set by options.
 ac_init_help=
@@ -1739,7 +1739,7 @@ ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
 
 
 
-subdirs="$subdirs ddbd fswatcher gmds lsfupdater searchtool thumbnailer wopen"
+subdirs="$subdirs ddbd fswatcher lsfupdater searchtool thumbnailer wopen"
 
 
 ac_config_files="$ac_config_files GNUmakefile"
