@@ -13,9 +13,8 @@ AC_CHECK_FUNCS(getpwnam getpwuid geteuid getlogin)
 
 AC_CONFIG_AUX_DIR([$GNUSTEP_MAKEFILES])
 AC_CONFIG_HEADER([config.h])
-AC_CONFIG_HEADER([ContentViewers/ImageViewer/resizer/config.h])
 
-AC_CANONICAL_TARGET([])
+AC_CONFIG_SUBDIRS([ContentViewers])
 
 #--------------------------------------------------------------------
 # Debug logging

@@ -1,19 +1,14 @@
 AC_PREREQ(2.52)
-AC_INIT(gworkspace, 0.4.7)
+AC_INIT
 
 if test -z "$GNUSTEP_MAKEFILES"; then
-  AC_MSG_ERROR([You must run the GNUstep initialization script first!])
+  AC_MSG_ERROR([You must set GNUSTEP_MAKEFILES or run the GNUstep initialization script first!])
 fi
 
 #--------------------------------------------------------------------
 # Use config.guess, config.sub and install-sh provided by gnustep-make
 #--------------------------------------------------------------------
-AC_CHECK_HEADERS(dir.h unistd.h)
-AC_CHECK_FUNCS(getpwnam getpwuid geteuid getlogin)
-
 AC_CONFIG_AUX_DIR([$GNUSTEP_MAKEFILES])
-
-AC_CONFIG_SUBDIRS([FSNode DBKit GWorkspace SQLite GWMetadata Tools Inspector Operation Recycler])
 
 #--------------------------------------------------------------------
 # Debug logging
@@ -30,15 +25,6 @@ fi
 
 AC_DEFINE_UNQUOTED([GW_DEBUG_LOG], [$GW_DEBUG_LOG], [debug logging])
 
-#--------------------------------------------------------------------
-# fswatcher-inotify
-#--------------------------------------------------------------------
-AC_ARG_WITH(inotify,
-  [  --with-inotify  Build fswatcher-inotify],
-  with_inotify=yes, with_inotify=no)
-  
-AC_SUBST(with_inotify)
-
-
 AC_CONFIG_FILES([GNUmakefile])
 AC_OUTPUT
+

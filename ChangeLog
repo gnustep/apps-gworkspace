@@ -1,3 +1,11 @@
+2008-06-24 Riccardo Mottola <rmottola@users.sourceforge.net>
+
+	* TODO:added notes
+	* configure/configure.ac: all were updated and regenerated
+	* GNUmakefile/GNUmakefile.in: most makefiles were renamed to .in to
+	comply with configure requirements  
+
+
 2008-06-15 Riccardo Mottola <rmottola@users.sourceforge.net>
 
 	* GWorkspace/FSNote/ExtendedInfo/GNUstep.h: deleted
