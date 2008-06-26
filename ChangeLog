@@ -2,6 +2,7 @@
 
 	* GWMetadata/gmds/mdextractor/updater.m: fixed missing bracket
 	* Configure system: added autoconf files
+	* Apps_wrappers: OpenOffice.app: added openoffice wrapper
 
 2008-06-24 Riccardo Mottola <rmottola@users.sourceforge.net>
 
