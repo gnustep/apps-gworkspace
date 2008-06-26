@@ -1,3 +1,7 @@
+2008-06-07 Riccardo Mottola <rmottola@users.sourceforge.net>
+
+	* GWMetadata/gmds/mdextractor/updater.m: fixed missing bracket
+
 2008-06-24 Riccardo Mottola <rmottola@users.sourceforge.net>
 
 	* TODO:added notes

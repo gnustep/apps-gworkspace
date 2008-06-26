@@ -708,6 +708,7 @@ do { \
       [NSTask launchedTaskWithLaunchPath: cmd arguments: arguments];
    
       for (i = 0; i < 40; i++)
+      {	
         [[NSRunLoop currentRunLoop] runUntilDate:
             [NSDate dateWithTimeIntervalSinceNow: 0.1]];
 
