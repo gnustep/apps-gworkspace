@@ -8,10 +8,10 @@ ADDITIONAL_OBJCFLAGS += -Wall
 ADDITIONAL_CFLAGS += -Wall
 
 # Additional include directories the compiler should search
-ADDITIONAL_INCLUDE_DIRS += -I../ 
+ADDITIONAL_INCLUDE_DIRS += -I../ @SQLITE_INCLUDE_DIRS@
 
 # Additional LDFLAGS to pass to the linker
-ADDITIONAL_LDFLAGS +=  -lsqlite3
+ADDITIONAL_LDFLAGS += @SQLITE_LIB_DIRS@
 
 # ADDITIONAL_TOOL_LIBS +=
 

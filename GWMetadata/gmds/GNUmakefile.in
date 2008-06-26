@@ -5,22 +5,14 @@ RPM_DISABLE_RELOCATABLE=YES
 
 include $(GNUSTEP_MAKEFILES)/common.make
 
-SUBPROJECTS = Extractors
-
-TOOL_NAME = mdextractor
-
-mdextractor_OBJC_FILES = mdextractor.m \
-                  updater.m 
-
-mdextractor_TOOL_LIBS += -lgnustep-gui
-mdextractor_TOOL_LIBS += -lMDKit
-mdextractor_TOOL_LIBS += -lDBKit
-
+SUBPROJECTS = \
+gmds \
+mdextractor \
+mdfind
+        
 -include GNUmakefile.preamble
 
 -include GNUmakefile.local
-
-include $(GNUSTEP_MAKEFILES)/tool.make
 
 include $(GNUSTEP_MAKEFILES)/aggregate.make
 

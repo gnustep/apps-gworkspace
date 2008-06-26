@@ -7,6 +7,8 @@ fi
 
 AC_CONFIG_AUX_DIR([$GNUSTEP_MAKEFILES])
 
+AC_CONFIG_SUBDIRS([gmds mdextractor mdfind])
+
 AC_CANONICAL_TARGET([])
 
 #--------------------------------------------------------------------
@@ -124,11 +126,8 @@ fi
 
 AC_DEFINE_UNQUOTED([GW_DEBUG_LOG], [$GW_DEBUG_LOG], [debug logging])
 
-AC_CONFIG_HEADER([gmds/config.h])
-AC_CONFIG_HEADER([mdextractor/config.h])
-AC_CONFIG_HEADER([mdextractor/Extractors/extractors.h])
 
-AC_CONFIG_FILES([gmds/GNUmakefile mdextractor/GNUmakefile mdextractor/Extractors/GNUmakefile])
+AC_CONFIG_FILES([GNUmakefile])
 
 AC_OUTPUT
 
