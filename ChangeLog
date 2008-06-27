@@ -1,3 +1,7 @@
+2008-06-27 Riccardo Mottola <rmottola@users.sourceforge.net>
+
+	* configure/configure.ac: updated and regenerated
+
 2008-06-26 Riccardo Mottola <rmottola@users.sourceforge.net>
 
 	* GWMetadata/gmds/mdextractor/updater.m: fixed missing bracket
