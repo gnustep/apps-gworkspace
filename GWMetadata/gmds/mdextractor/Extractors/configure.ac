@@ -56,6 +56,8 @@ fi
 
 AC_DEFINE_UNQUOTED([GW_DEBUG_LOG], [$GW_DEBUG_LOG], [debug logging])
 
+AC_CONFIG_HEADER([extractors.h])
+
 AC_CONFIG_FILES([GNUmakefile])
 
 AC_OUTPUT
