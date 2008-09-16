@@ -3,7 +3,7 @@
     ApplicationDescription = "GNUstep Workspace Manager";
     ApplicationIcon = "FileManager.tiff";
     ApplicationRelease = "0.8.7";
-    NSBuildVersion = "06 2008";
+    NSBuildVersion = "09 2008";
     Authors = (
       "Enrico Sersale <enrico\@fibernet.ro>",
       "Documentation and Help contents by:",
