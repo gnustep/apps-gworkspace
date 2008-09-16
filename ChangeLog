@@ -1,3 +1,7 @@
+2008-09-16 Riccardo Mottola <rmottola@users.sourceforge.net>
+
+	* GWorkspace/Preferences/DesktopPref.m: always convert to RGB color
+	
 2008-06-30 Nicola Pero <nicola.pero@meta-innovation.com>
 
 	* Tools/thumbnailer/GNUmakefile.in: Do not include bundle.make

@@ -48,10 +48,13 @@ static NSString *nibName = @"DesktopPref";
 {
   self = [super init];
 
-  if (self) {  
-		if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
+  if (self)
+  {  
+    if ([NSBundle loadNibNamed: nibName owner: self] == NO)
+    {
       NSLog(@"failed to load %@!", nibName);
-    } else {
+    } else
+    {
       NSString *impath;
       DockPosition dockpos;
       id cell;
@@ -87,11 +90,13 @@ static NSString *nibName = @"DesktopPref";
         ASSIGN (imagePath, impath);
       }
       
-      if (imagePath) {
+      if (imagePath)
+      {
         CREATE_AUTORELEASE_POOL (pool);
         NSImage *image = [[NSImage alloc] initWithContentsOfFile: imagePath];
         
-        if (image) {
+        if (image)
+	{
           [imageView setImage: image];
           RELEASE (image);
         }
@@ -163,7 +168,7 @@ static NSString *nibName = @"DesktopPref";
 
 - (void)colorChoosen:(id)sender
 {
-  [colorView setColor: [sender color]];      
+  [colorView setColor: [[sender color] colorUsingColorSpaceName: NSCalibratedRGBColorSpace]];      
   [colorView setNeedsDisplay: YES];
 }
 
