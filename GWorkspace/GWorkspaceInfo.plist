@@ -9,9 +9,9 @@
       "Documentation and Help contents by:",
       "Dennis Leeuw <dleeuw@made-it.com>"
     );
-    URL = "http://www.gnustep.it/enrico/gworkspace";
+    URL = "http://www.gnustep.org/experience/GWorkspace.html";
     Copyright = "Copyright (C) 2003-2008 Free Software Foundation, Inc.";
-    CopyrightDescription = "Released under the GNU General Public License 2.0+";
+    CopyrightDescription = "Released under the GNU General Public License 2.0 or later";
     NSIcon = "FileManager.tiff";
     NSRole = "Viewer";
     NSTypes = (
