@@ -8,6 +8,8 @@ include $(GNUSTEP_MAKEFILES)/common.make
 
 PACKAGE_NAME = @PACKAGE_NAME@
 VERSION = @PACKAGE_VERSION@
+SVN_BASE_URL = svn+ssh://svn.gna.org/svn/gnustep/apps
+SVN_MODULE_NAME = gworkspace
 
 #
 # subprojects
