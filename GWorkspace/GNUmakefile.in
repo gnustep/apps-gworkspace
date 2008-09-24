@@ -43,7 +43,8 @@ GWorkspace_RESOURCE_FILES = \
   Resources/Norvegian.lproj \
   Resources/Portuguese.lproj \
   Resources/Romanian.lproj \
-  Resources/Spanish.lproj
+  Resources/Spanish.lproj \
+  GWorkspaceInfo.plist
 
 GWorkspace_LANGUAGES = \
   Resources/English \
