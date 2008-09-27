@@ -1,3 +1,8 @@
+2008-09-27 17:42-EDT Gregory John Casamento <greg_casamento@yahoo.com>
+
+	* .dist-ignore: Remove GWorkspace.plist from this file so that it is
+	in the distribution.
+
 2008-09-16 Riccardo Mottola <rmottola@users.sourceforge.net>
 
 	* GWorkspace/Preferences/DesktopPref.m: always convert to RGB color

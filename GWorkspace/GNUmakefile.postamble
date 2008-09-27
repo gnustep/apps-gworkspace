@@ -56,7 +56,7 @@ after-clean::
 after-distclean::
 #	rm -rf Inspectors/Viewers/Library
 	rm -rf autom4te*.cache
-	rm -f config.status config.log config.cache config.h TAGS GNUmakefile GWorkspace/GWorkspaceInfo.plist
+	rm -f config.status config.log config.cache config.h TAGS GNUmakefile
 
 # Things to do before checking
 # before-check::
