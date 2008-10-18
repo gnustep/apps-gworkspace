@@ -1,3 +1,8 @@
+2008-09-16 Riccardo Mottola for Wolfgang Lux <wolfgang.lux@gmail.com>
+
+	* Recycler/RecyclerIcon.m, Recycler/Recycler.m: patches for dockability
+	of Recycler when not using WindowMaker
+    	
 2008-09-27 17:42-EDT Gregory John Casamento <greg_casamento@yahoo.com>
 
 	* .dist-ignore: Remove GWorkspace.plist from this file so that it is

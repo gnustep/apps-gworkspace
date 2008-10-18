@@ -143,6 +143,8 @@ static id <DesktopApplication> desktopApp = nil;
 
       [NSEvent stopPeriodicEvents];
     }
+    else
+      [[self nextResponder] tryToPerform:_cmd with:theEvent];
   } else {  
     id <workspaceAppProtocol> workspaceApp = [desktopApp workspaceApplication];
 

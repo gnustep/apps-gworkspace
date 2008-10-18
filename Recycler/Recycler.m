@@ -173,6 +173,7 @@ static Recycler *recycler = nil;
     [[[NSApp iconWindow] contentView] addSubview: recview];
 
   } else {
+    [recview removeFromSuperview];
     DESTROY (recview);
     recview = [[RecyclerView alloc] initWithWindow];
     [recview activate];
