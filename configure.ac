@@ -13,7 +13,7 @@ AC_CHECK_FUNCS(getpwnam getpwuid geteuid getlogin)
 
 AC_CONFIG_AUX_DIR([$GNUSTEP_MAKEFILES])
 
-AC_CONFIG_SUBDIRS([FSNode DBKit GWorkspace SQLite GWMetadata Tools Inspector Operation Recycler])
+AC_CONFIG_SUBDIRS([FSNode DBKit GWorkspace Tools Inspector Operation Recycler SQLite GWMetadata])
 
 #--------------------------------------------------------------------
 # Debug logging

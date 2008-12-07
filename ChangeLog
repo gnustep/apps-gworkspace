@@ -1,5 +1,11 @@
 2008-12-07 Richard Frith-Macdonald <rfm@gnu.org>
 
+	Change order of configure for subsirectories so that people without
+	sqlite can build more easily.  Remove makefiles which are generated
+	by configure.
+
+2008-12-07 Richard Frith-Macdonald <rfm@gnu.org>
+
 	* DBKit/GNUmakefile.in:
 	* FSNode/FSNodeRep.m:
 	* FSNode/GNUmakefile.in:
