@@ -30,6 +30,7 @@
 int main(int argc, char **argv, char **env)
 {
 	CREATE_AUTORELEASE_POOL (pool);
+  [NSObject enableDoubleReleaseCheck: YES];
   GWorkspace *gw = [GWorkspace gworkspace];
 	NSApplication *app = [NSApplication sharedApplication];
   
