@@ -23,6 +23,7 @@
  */
 
 #include <AppKit/AppKit.h>
+#include <GNUstepBase/NSTask+GS.h>
 #include "MDKQueryManager.h"
 #include "MDKFSFilter.h"
 #include "FSNode.h"
@@ -253,9 +254,7 @@ static MDKQueryManager *queryManager = nil;
 	    NSString *cmd;
       int i;
     
-      cmd = [[NSSearchPathForDirectoriesInDomains(
-                GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
-                                      stringByAppendingPathComponent: @"gmds"];    
+      cmd = [NSTask launchPathForTool: @"gmds"];    
                     
       [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
    

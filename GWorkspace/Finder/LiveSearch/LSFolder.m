@@ -23,6 +23,7 @@
  */
 
 #include <Foundation/Foundation.h>
+#include <GNUstepBase/NSTask+GS.h>
 #include <AppKit/AppKit.h>
 #include <math.h>
 #include "LSFolder.h"
@@ -271,8 +272,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 																 userInfo: nil 
                                   repeats: NO];
 
-  paths = NSSearchPathForDirectoriesInDomains(GSToolsDirectory, NSSystemDomainMask, YES);
-  cmd = [[paths objectAtIndex: 0] stringByAppendingPathComponent: @"lsfupdater"];
+  cmd = [NSTask launchPathForTool: @"lsfupdater"];
 
   [NSTask launchedTaskWithLaunchPath: cmd 
                            arguments: [NSArray arrayWithObject: cname]];

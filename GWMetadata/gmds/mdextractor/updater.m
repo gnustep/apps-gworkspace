@@ -23,6 +23,7 @@
  */
 
 #include <Foundation/Foundation.h>
+#include <GNUstepBase/NSTask+GS.h>
 #include <AppKit/AppKit.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -698,9 +699,7 @@ do { \
       NSMutableArray *arguments;
       int i;
     
-      cmd = [[NSSearchPathForDirectoriesInDomains(
-                GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
-                                      stringByAppendingPathComponent: @"fswatcher"];    
+      cmd = [NSTask launchPathForTool: @"fswatcher"];    
       
       arguments = [NSMutableArray arrayWithCapacity:2];
       [arguments addObject:@"--daemon"];
@@ -787,9 +786,7 @@ do { \
 	    NSString *cmd;
       int i;
     
-      cmd = [[NSSearchPathForDirectoriesInDomains(
-                GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
-                                      stringByAppendingPathComponent: @"ddbd"];    
+      cmd = [NSTask launchPathForTool: @"ddbd"];    
                 
      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
    

@@ -58,6 +58,7 @@ static NSString *nibName = @"Contents";
   
   if (self) {
     NSBundle *bundle;
+    NSEnumerator *enumerator;
     NSString *imagepath;
     NSString *bundlesDir;
     NSArray *bnames;
@@ -87,31 +88,35 @@ static NSString *nibName = @"Contents";
         
     r = [[viewersBox contentView] bounds];
 
-    bundlesDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSSystemDomainMask, YES) lastObject];
-    bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
-    bnames = [fm directoryContentsAtPath: bundlesDir];
+    enumerator = [NSSearchPathForDirectoriesInDomains
+      (NSLibraryDirectory, NSAllDomainsMask, YES) objectEnumerator];
+    while ((bundlesDir = [enumerator nextObject]) != nil)
+      {
+	bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
+	bnames = [fm directoryContentsAtPath: bundlesDir];
 
-    for (i = 0; i < [bnames count]; i++) {
-      NSString *bname = [bnames objectAtIndex: i];
-    
-      if ([[bname pathExtension] isEqual: @"inspector"]) {
-        NSString *bpath = [bundlesDir stringByAppendingPathComponent: bname];
-        
-        bundle = [NSBundle bundleWithPath: bpath]; 
-      
-        if (bundle) {
-          Class principalClass = [bundle principalClass];
-        
-          if ([principalClass conformsToProtocol: @protocol(ContentViewersProtocol)]) {	
-	          CREATE_AUTORELEASE_POOL (pool);
-            id vwr = [[principalClass alloc] initWithFrame: r inspector: self];
-        
-            [viewers addObject: vwr];            
-            RELEASE ((id)vwr);	
-            RELEASE (pool);		
-          }
-        }
-		  }
+	for (i = 0; i < [bnames count]; i++) {
+	  NSString *bname = [bnames objectAtIndex: i];
+	
+	  if ([[bname pathExtension] isEqual: @"inspector"]) {
+	    NSString *bpath = [bundlesDir stringByAppendingPathComponent: bname];
+	    
+	    bundle = [NSBundle bundleWithPath: bpath]; 
+	  
+	    if (bundle) {
+	      Class principalClass = [bundle principalClass];
+	    
+	      if ([principalClass conformsToProtocol: @protocol(ContentViewersProtocol)]) {	
+		      CREATE_AUTORELEASE_POOL (pool);
+		id vwr = [[principalClass alloc] initWithFrame: r inspector: self];
+	    
+		[viewers addObject: vwr];            
+		RELEASE ((id)vwr);	
+		RELEASE (pool);		
+	      }
+	    }
+		      }
+	}
     }
 
     textViewer = [[TextViewer alloc] initWithFrame: r forInspector: self];					

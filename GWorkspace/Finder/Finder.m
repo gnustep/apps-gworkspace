@@ -259,16 +259,22 @@ static Finder *finder = nil;
   int index;
   int i;
 
-  bundlesDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSSystemDomainMask, YES) lastObject];
-  bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
   bundlesPaths = [NSMutableArray array];
+  enumerator = [NSSearchPathForDirectoriesInDomains
+    (NSLibraryDirectory, NSAllDomainsMask, YES) objectEnumerator];
+  while ((bundlesDir = [enumerator nextObject]) != nil)
+    {
+      NSEnumerator *enumerator;
 
-  enumerator = [[fm directoryContentsAtPath: bundlesDir] objectEnumerator];
+      bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
+      enumerator = [[fm directoryContentsAtPath: bundlesDir] objectEnumerator];
 
-  while ((path = [enumerator nextObject])) {
-    if ([[path pathExtension] isEqual: @"finder"]) {
-			[bundlesPaths addObject: [bundlesDir stringByAppendingPathComponent: path]];
-		}
+      while ((path = [enumerator nextObject])) {
+	if ([[path pathExtension] isEqual: @"finder"]) {
+	  [bundlesPaths addObject:
+	    [bundlesDir stringByAppendingPathComponent: path]];
+	}
+      }
   }
 
   unsortedModules = [NSMutableArray array];

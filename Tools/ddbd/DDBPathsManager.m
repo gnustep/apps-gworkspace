@@ -50,6 +50,7 @@
   self = [super init];
 
   if (self) {
+    NSEnumerator *enumerator;
     NSString *path;
     NSBundle *bundle;
     NSString *bundlesDir;
@@ -77,33 +78,39 @@
     
     mdmodules = [NSMutableDictionary new];
     
-    bundlesDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSSystemDomainMask, YES) lastObject];
-    bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
-    bnames = [fm directoryContentsAtPath: bundlesDir];
+    enumerator = [NSSearchPathForDirectoriesInDomains
+      (NSLibraryDirectory, NSAllDomainsMask, YES) objectEnumerator];
+    while ((bundlesDir = [enumerator nextObject]) != nil)
+      {
+	bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
+	bnames = [fm directoryContentsAtPath: bundlesDir];
 
-    for (i = 0; i < [bnames count]; i++) {
-      NSString *bname = [bnames objectAtIndex: i];
-    
-      if ([[bname pathExtension] isEqual: @"mdm"]) {
-        NSString *bpath = [bundlesDir stringByAppendingPathComponent: bname];
-        
-        bundle = [NSBundle bundleWithPath: bpath]; 
-      
-        if (bundle) {
-          Class principalClass = [bundle principalClass];
-        
-          if ([principalClass conformsToProtocol: @protocol(MDModulesProtocol)]) {	
-	          CREATE_AUTORELEASE_POOL (pool);
-            id module = [[principalClass alloc] init];
-        
-            [mdmodules setObject: module forKey: [module mdtype]];
-        
-            RELEASE ((id)module);	
-            RELEASE (pool);		
-          }
-        }
-		  }
-    }
+	for (i = 0; i < [bnames count]; i++) {
+	  NSString *bname = [bnames objectAtIndex: i];
+	
+	  if ([[bname pathExtension] isEqual: @"mdm"]) {
+	    NSString *bpath;
+	    
+	    bpath = [bundlesDir stringByAppendingPathComponent: bname];
+	    bundle = [NSBundle bundleWithPath: bpath]; 
+	  
+	    if (bundle) {
+	      Class principalClass = [bundle principalClass];
+	    
+	      if ([principalClass conformsToProtocol:
+		@protocol(MDModulesProtocol)]) {	
+		CREATE_AUTORELEASE_POOL (pool);
+		id module = [[principalClass alloc] init];
+	    
+		[mdmodules setObject: module forKey: [module mdtype]];
+	    
+		RELEASE ((id)module);	
+		RELEASE (pool);		
+	      }
+	    }
+	  }
+	}
+      }
     
     [self addPath: pathsep()];
     [self synchronize];

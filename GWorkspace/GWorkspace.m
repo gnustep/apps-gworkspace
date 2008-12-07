@@ -23,6 +23,7 @@
  */
 
 #include <Foundation/Foundation.h>
+#include <GNUstepBase/NSTask+GS.h>
 #include <AppKit/AppKit.h>
 #include <math.h>
 #include "GWFunctions.h"
@@ -1681,9 +1682,7 @@ static GWorkspace *gworkspace = nil;
       NSMutableArray *arguments;
       int i;
     
-      cmd = [[NSSearchPathForDirectoriesInDomains(
-                GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
-                                      stringByAppendingPathComponent: @"fswatcher"];    
+      cmd = [NSTask launchPathForTool: @"fswatcher"];    
                 
       [startAppWin showWindowWithTitle: @"GWorkspace"
                                appName: @"fswatcher"
@@ -1915,9 +1914,7 @@ static GWorkspace *gworkspace = nil;
 	    NSString *cmd;
       int i;
     
-      cmd = [[NSSearchPathForDirectoriesInDomains(
-                GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
-                                      stringByAppendingPathComponent: @"ddbd"];    
+      cmd = [NSTask launchPathForTool: @"ddbd"];    
                 
       [startAppWin showWindowWithTitle: @"GWorkspace"
                                appName: @"ddbd"
@@ -2026,9 +2023,7 @@ static GWorkspace *gworkspace = nil;
 	    NSString *cmd;
       int i;
     
-      cmd = [[NSSearchPathForDirectoriesInDomains(
-                GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
-                                      stringByAppendingPathComponent: @"mdextractor"];    
+      cmd = [NSTask launchPathForTool: @"mdextractor"];    
                 
       [startAppWin showWindowWithTitle: @"MDIndexing"
                                appName: @"mdextractor"

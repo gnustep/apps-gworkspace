@@ -1,3 +1,79 @@
+2008-12-07 Richard Frith-Macdonald <rfm@gnu.org>
+
+	* DBKit/GNUmakefile.in:
+	* FSNode/FSNodeRep.m:
+	* FSNode/GNUmakefile.in:
+	* GNUmakefile.in:
+	* GWMetadata/gmds/gmds/GNUmakefile.in:
+	* GWMetadata/gmds/GNUmakefile.in:
+	* GWMetadata/gmds/mdextractor/Extractors/AbiwordExtractor/GNUmakefile.in:
+	* GWMetadata/gmds/mdextractor/Extractors/AppExtractor/GNUmakefile.in:
+	* GWMetadata/gmds/mdextractor/Extractors/GNUmakefile.in:
+	* GWMetadata/gmds/mdextractor/Extractors/HtmlExtractor/GNUmakefile.in:
+	* GWMetadata/gmds/mdextractor/Extractors/JpegExtractor/GNUmakefile.in:
+	* GWMetadata/gmds/mdextractor/Extractors/OpenOfficeExtractor/GNUmakefile.in:
+	* GWMetadata/gmds/mdextractor/Extractors/PdfExtractor/GNUmakefile.in:
+	* GWMetadata/gmds/mdextractor/Extractors/RtfExtractor/GNUmakefile.in:
+	* GWMetadata/gmds/mdextractor/Extractors/TextExtractor/GNUmakefile.in:
+	* GWMetadata/gmds/mdextractor/Extractors/XmlExtractor/GNUmakefile.in:
+	* GWMetadata/gmds/mdextractor/GNUmakefile.in:
+	* GWMetadata/gmds/mdextractor/mdextractor.m:
+	* GWMetadata/gmds/mdextractor/updater.m:
+	* GWMetadata/gmds/mdfind/GNUmakefile.in:
+	* GWMetadata/GNUmakefile.in:
+	* GWMetadata/MDKit/GNUmakefile.in:
+	* GWMetadata/MDKit/MDKQueryManager.m:
+	* GWMetadata/Preferences/MDIndexing.m:
+	* GWorkspace/Desktop/GWDesktopManager.m:
+	* GWorkspace/Finder/Finder.m:
+	* GWorkspace/Finder/LiveSearch/LSFolder.m:
+	* GWorkspace/Finder/Modules/FModuleAnnotations/GNUmakefile.in:
+	* GWorkspace/Finder/Modules/FModuleContents/GNUmakefile.in:
+	* GWorkspace/Finder/Modules/FModuleCrDate/GNUmakefile.in:
+	* GWorkspace/Finder/Modules/FModuleKind/GNUmakefile.in:
+	* GWorkspace/Finder/Modules/FModuleModDate/GNUmakefile.in:
+	* GWorkspace/Finder/Modules/FModuleName/GNUmakefile.in:
+	* GWorkspace/Finder/Modules/FModuleOwner/GNUmakefile.in:
+	* GWorkspace/Finder/Modules/FModuleSize/GNUmakefile.in:
+	* GWorkspace/Finder/Modules/GNUmakefile.in:
+	* GWorkspace/Finder/SearchResults/SearchResults.m:
+	* GWorkspace/GNUmakefile.in:
+	* GWorkspace/GWorkspace.m:
+	* Inspector/Contents.m:
+	* Inspector/ContentViewers/AppViewer/GNUmakefile.in:
+	* Inspector/ContentViewers/FolderViewer/GNUmakefile.in:
+	* Inspector/ContentViewers/GNUmakefile.in:
+	* Inspector/ContentViewers/IBViewViewer/GNUmakefile.in:
+	* Inspector/ContentViewers/ImageViewer/GNUmakefile.in:
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.m:
+	* Inspector/ContentViewers/ImageViewer/resizer/GNUmakefile.in:
+	* Inspector/ContentViewers/NSColorViewer/GNUmakefile.in:
+	* Inspector/ContentViewers/NSRTFViewer/GNUmakefile.in:
+	* Inspector/ContentViewers/NSTIFFViewer/GNUmakefile.in:
+	* Inspector/ContentViewers/PdfViewer/GNUmakefile.in:
+	* Inspector/ContentViewers/RtfViewer/GNUmakefile.in:
+	* Inspector/ContentViewers/SoundViewer/GNUmakefile.in:
+	* Inspector/GNUmakefile.in:
+	* Operation/GNUmakefile.in:
+	* Recycler/GNUmakefile.in:
+	* Recycler/Recycler.m:
+	* Tools/ddbd/DDBPathsManager.m:
+	* Tools/ddbd/GNUmakefile.in:
+	* Tools/ddbd/MDModules/GNUmakefile.in:
+	* Tools/ddbd/MDModules/MDModuleAnnotations/GNUmakefile.in:
+	* Tools/fswatcher/GNUmakefile.in:
+	* Tools/lsfupdater/GNUmakefile.in:
+	* Tools/lsfupdater/lsfupdater.m:
+	* Tools/searchtool/GNUmakefile.in:
+	* Tools/searchtool/searchtool.m:
+	* Tools/thumbnailer/GNUmakefile.in:
+	* Tools/thumbnailer/ImageThumbnailer/GNUmakefile.in:
+	* Tools/thumbnailer/main.m:
+	* Tools/wopen/GNUmakefile.in:
+	Updates to honor installation domain and install in right place.
+	Tool lookup fixed to locate tools wherever they are.
+	Bundle lookup changed to locate bundles in any domain.
+
 2008-09-16 Riccardo Mottola for Wolfgang Lux <wolfgang.lux@gmail.com>
 
 	* Recycler/RecyclerIcon.m, Recycler/Recycler.m: patches for dockability

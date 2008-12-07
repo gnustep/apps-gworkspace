@@ -1238,22 +1238,26 @@ do { \
 {
   NSString *bundlesDir;
   NSMutableArray *bundlesPaths;
+  NSEnumerator *e1;
   NSEnumerator *enumerator;
   NSString *dir;
   int i;
    
-  bundlesDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSSystemDomainMask, YES) lastObject];
-  bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
-
   bundlesPaths = [NSMutableArray array];
+  e1 = [NSSearchPathForDirectoriesInDomains
+    (NSLibraryDirectory, NSAllDomainsMask, YES) objectEnumerator];
+  while ((bundlesDir = [e1 nextObject]) != nil)
+    {
+      bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
+      enumerator = [[fm directoryContentsAtPath: bundlesDir] objectEnumerator];
 
-  enumerator = [[fm directoryContentsAtPath: bundlesDir] objectEnumerator];
-
-  while ((dir = [enumerator nextObject])) {
-    if ([[dir pathExtension] isEqual: @"extr"]) {
-			[bundlesPaths addObject: [bundlesDir stringByAppendingPathComponent: dir]];
-		}
-  }
+      while ((dir = [enumerator nextObject])) {
+	if ([[dir pathExtension] isEqual: @"extr"]) {
+	  [bundlesPaths addObject:
+	    [bundlesDir stringByAppendingPathComponent: dir]];
+	}
+      }
+    }
 
   extractors = [NSMutableDictionary new];
   

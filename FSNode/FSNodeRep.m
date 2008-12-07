@@ -146,15 +146,21 @@ static FSNodeRep *shared = nil;
 - (void)loadExtendedInfoModules
 {
   NSString *bundlesDir;
-  NSArray *bundlesPaths;
+  NSMutableArray *bundlesPaths;
+  NSEnumerator *enumerator;
   NSMutableArray *loaded;
   int i;
   
   bundlesPaths = [NSMutableArray array];
 
-  bundlesDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSSystemDomainMask, YES) lastObject];
-  bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
-  bundlesPaths = [self bundlesWithExtension: @"extinfo" inPath: bundlesDir];
+  enumerator = [NSSearchPathForDirectoriesInDomains
+    (NSLibraryDirectory, NSAllDomainsMask, YES) objectEnumerator];
+  while ((bundlesDir = [enumerator nextObject]) != nil)
+    {
+      bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
+      [bundlesPaths addObjectsFromArray:
+	[self bundlesWithExtension: @"extinfo" inPath: bundlesDir]];
+    }
 
   loaded = [NSMutableArray array];
   

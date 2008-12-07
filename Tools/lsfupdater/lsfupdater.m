@@ -23,6 +23,7 @@
  */
 
 #include <Foundation/Foundation.h>
+#include <GNUstepBase/NSTask+GS.h>
 #include <AppKit/AppKit.h>
 #include "FinderModulesProtocol.h"
 #include "config.h"
@@ -263,17 +264,22 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
 - (void)loadModules
 {
   CREATE_AUTORELEASE_POOL(arp);
+  NSEnumerator *enumerator;
   NSString *bundlesDir;
   BOOL isdir;
   NSMutableArray *bundlesPaths;
   NSArray *classNames;
   int i;
 
-  bundlesDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSSystemDomainMask, YES) lastObject];
-  bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
   bundlesPaths = [NSMutableArray array];
-  [bundlesPaths addObjectsFromArray: [self bundlesWithExtension: @"finder" 
-                                                         inPath: bundlesDir]];
+  enumerator = [NSSearchPathForDirectoriesInDomains
+    (NSLibraryDirectory, NSAllDomainsMask, YES) objectEnumerator];
+  while ((bundlesDir = [enumerator nextObject]) != nil)
+    {
+      bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
+      [bundlesPaths addObjectsFromArray:
+	[self bundlesWithExtension: @"finder" inPath: bundlesDir]];
+    }
 
   bundlesDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
   bundlesDir = [bundlesDir stringByAppendingPathComponent: @"GWorkspace"];
@@ -829,9 +835,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
 	    NSString *cmd;
       int i;
     
-      cmd = [[NSSearchPathForDirectoriesInDomains(
-                GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
-                                      stringByAppendingPathComponent: @"ddbd"];    
+      cmd = [NSTask launchPathForTool: @"ddbd"];    
                 
       [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
    

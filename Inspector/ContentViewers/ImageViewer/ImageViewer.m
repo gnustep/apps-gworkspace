@@ -23,6 +23,7 @@
  */
 
 #include <AppKit/AppKit.h>
+#include <GNUstepBase/NSTask+GS.h>
 #include "ImageViewer.h"
 #include <math.h>
 
@@ -181,8 +182,8 @@
   
   if ((resizer == nil) && (waitingResizer == NO)) {
     NSString *cname = [NSString stringWithFormat: @"search_%i", (unsigned long)self];
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(GSToolsDirectory, NSSystemDomainMask, YES);
-    NSString *cmd = [[paths objectAtIndex: 0] stringByAppendingPathComponent: @"resizer"];
+
+    NSString *cmd = [NSTask launchPathForTool: @"resizer"];
 
     waitingResizer = YES;
 

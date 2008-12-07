@@ -187,8 +187,9 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
 - (void)loadThumbnailers
 {
   NSString *bundlesDir;
-	NSMutableArray *bundlesPaths;
-	NSArray *bPaths;
+  NSEnumerator *enumerator;
+  NSMutableArray *bundlesPaths;
+  NSArray *bPaths;
   int i;
   
   TEST_RELEASE (thumbnailers);
@@ -200,14 +201,14 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
                           inDirectory: [[NSBundle mainBundle] resourcePath]];
 	[bundlesPaths addObjectsFromArray: bPaths];
 
-  bundlesDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
-  [bundlesPaths addObjectsFromArray: [self bundlesWithExtension: @"thumb" 
-			                                              inDirectory: bundlesDir]];
-
-  bundlesDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSSystemDomainMask, YES) lastObject];
-  bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
-  [bundlesPaths addObjectsFromArray: [self bundlesWithExtension: @"thumb" 
-			                                              inDirectory: bundlesDir]];
+  enumerator = [NSSearchPathForDirectoriesInDomains
+    (NSLibraryDirectory, NSAllDomainsMask, YES) objectEnumerator];
+  while ((bundlesDir = [enumerator nextObject]) != nil)
+    {
+      bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
+      [bundlesPaths addObjectsFromArray:
+	[self bundlesWithExtension: @"thumb" inDirectory: bundlesDir]];
+    }
 
   for (i = 0; i < [bundlesPaths count]; i++) {
 		NSString *bpath = [bundlesPaths objectAtIndex: i];

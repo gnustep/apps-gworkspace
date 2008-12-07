@@ -23,6 +23,7 @@
  */
 
 #include <Foundation/Foundation.h>
+#include <GNUstepBase/NSTask+GS.h>
 #include <AppKit/AppKit.h>
 #include <math.h>
 #include "SearchResults.h"
@@ -270,8 +271,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
 																 userInfo: nil 
                                   repeats: NO];
 
-  paths = NSSearchPathForDirectoriesInDomains(GSToolsDirectory, NSSystemDomainMask, YES);
-  cmd = [[paths objectAtIndex: 0] stringByAppendingPathComponent: @"searchtool"];
+  cmd = [NSTask launchPathForTool: @"searchtool"];
                                           
   [NSTask launchedTaskWithLaunchPath: cmd 
                            arguments: [NSArray arrayWithObject: cname]];

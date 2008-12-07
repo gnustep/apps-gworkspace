@@ -23,6 +23,7 @@
  */
 
 #include <AppKit/AppKit.h>
+#include <GNUstepBase/NSTask+GS.h>
 #include "MDIndexing.h"
 #include "CategoriesEditor.h"
 #include "StartAppWin.h"
@@ -760,9 +761,7 @@ return; \
 	    NSString *cmd;
       int i;
     
-      cmd = [[NSSearchPathForDirectoriesInDomains(
-                GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
-                                      stringByAppendingPathComponent: @"mdextractor"];    
+      cmd = [NSTask launchPathForTool: @"mdextractor"];    
                 
       [startAppWin showWindowWithTitle: @"MDIndexing"
                                appName: @"mdextractor"

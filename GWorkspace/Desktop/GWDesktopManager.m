@@ -250,18 +250,23 @@ static GWDesktopManager *desktopManager = nil;
 
 - (id)loadXWinBundle
 {
+  NSEnumerator	*enumerator;
   NSString *bpath;
   NSBundle *bundle;
   
-  bpath = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSSystemDomainMask, YES) lastObject];
-  bpath = [bpath stringByAppendingPathComponent: @"Bundles"];
-  bpath = [bpath stringByAppendingPathComponent: @"XDesktopWindow.bundle"];
+  enumerator = [NSSearchPathForDirectoriesInDomains
+    (NSLibraryDirectory, NSAllDomainsMask, YES) objectEnumerator];
+  while ((bpath = [enumerator nextObject]) != nil)
+    {
+      bpath = [bpath stringByAppendingPathComponent: @"Bundles"];
+      bpath = [bpath stringByAppendingPathComponent: @"XDesktopWindow.bundle"];
 
-  bundle = [NSBundle bundleWithPath: bpath];
+      bundle = [NSBundle bundleWithPath: bpath];
   
-  if (bundle) {
-    return [[[bundle principalClass] alloc] init];
-  }
+      if (bundle) {
+	return [[[bundle principalClass] alloc] init];
+      }
+    }
 
   return nil;
 }

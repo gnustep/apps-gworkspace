@@ -23,6 +23,7 @@
  */
 
 #include <Foundation/Foundation.h>
+#include <GNUstepBase/NSTask+GS.h>
 #include <AppKit/AppKit.h>
 #include "Recycler.h"
 #include "RecyclerView.h"
@@ -277,9 +278,7 @@ static Recycler *recycler = nil;
 	    NSString *cmd;
       int i;
     
-      cmd = [[NSSearchPathForDirectoriesInDomains(
-                GSToolsDirectory, NSSystemDomainMask, YES) objectAtIndex: 0]
-                                      stringByAppendingPathComponent: @"fswatcher"];    
+      cmd = [NSTask launchPathForTool: @"fswatcher"];    
                 
       [startAppWin showWindowWithTitle: @"Recycler"
                                appName: @"fswatcher"
