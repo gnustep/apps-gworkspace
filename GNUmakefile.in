@@ -1,6 +1,7 @@
-
 PACKAGE_NEEDS_CONFIGURE = YES
 
+GNUSTEP_CORE_SOFTWARE = YES
+export GNUSTEP_CORE_SOFTWARE
 include $(GNUSTEP_MAKEFILES)/common.make
 
 PACKAGE_NAME = @PACKAGE_NAME@
@@ -18,7 +19,7 @@ SUBPROJECTS = FSNode \
 	      			  Operation \
 	      			  Recycler \
 	      			  GWorkspace 
-						 
+
 -include GNUmakefile.preamble
 
 -include GNUmakefile.local
