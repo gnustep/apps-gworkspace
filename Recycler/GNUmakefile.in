@@ -1,8 +1,6 @@
-
-GNUSTEP_CORE_SOFTWARE = YES
+PACKAGE_NAME = gworkspace
 include $(GNUSTEP_MAKEFILES)/common.make
 
-PACKAGE_NAME = Recycler
 VERSION = 0.7
 
 #
@@ -29,7 +27,7 @@ Recycler_OBJC_FILES = main.m \
                      Dialogs/StartAppWin.m
 
 ADDITIONAL_GUI_LIBS += -lFSNode
-						 
+
 -include GNUmakefile.preamble
 
 -include GNUmakefile.local

@@ -1,5 +1,5 @@
 
-GNUSTEP_CORE_SOFTWARE = YES
+PACKAGE_NAME = gworkspace
 include $(GNUSTEP_MAKEFILES)/common.make
 
 BUNDLE_NAME = SoundViewer

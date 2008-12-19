@@ -1,11 +1,6 @@
-# Install into the system root by default
-GNUSTEP_INSTALLATION_DOMAIN=SYSTEM
-RPM_DISABLE_RELOCATABLE=YES
-
-GNUSTEP_CORE_SOFTWARE = YES
+PACKAGE_NAME = gworkspace
 include $(GNUSTEP_MAKEFILES)/common.make
 
-PACKAGE_NAME = MDFinder
 VERSION = 0.1
 
 APP_NAME = MDFinder
@@ -27,7 +22,7 @@ MDFinder_OBJC_FILES = main.m \
 
 ADDITIONAL_GUI_LIBS += -lMDKit
 ADDITIONAL_GUI_LIBS += -lFSNode
-                  				 
+
 -include GNUmakefile.preamble
 
 -include GNUmakefile.local
