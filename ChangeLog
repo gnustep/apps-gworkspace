@@ -1,3 +1,8 @@
+2009-02-01  Richard Frith-Macdonald <rfm@gnu.org>
+
+	* GWMetadata/Preferences/Info.plist:
+	Use standard info keys.
+
 2008-12-19  Nicola Pero <nicola.pero@meta-innovation.com>
 
 	* All GNUmakefiles: removed GNUSTEP_CORE_SOFTWARE=YES and

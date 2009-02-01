@@ -1,10 +1,10 @@
 
 {
-  GSBundleIdentifier = org.gnustep.mdindexingmodule;
-	GSBundleVersion = "1.0";
-	GSPrefPaneIconFile = "MDIndexing.tiff";
-	GSPrefPaneIconLabel = "Indexing";
+  CFBundleIdentifier = org.gnustep.mdindexingmodule;
+  GSBundleVersion = "1.0";
   NSExecutable = MDIndexing;
-	NSMainNibFile = MDIndexing;
-	NSPrincipalClass = MDIndexing;
+  NSMainNibFile = MDIndexing;
+  NSPrefPaneIconFile = "MDIndexing.tiff";
+  NSPrefPaneIconLabel = "Indexing";
+  NSPrincipalClass = MDIndexing;
 }
