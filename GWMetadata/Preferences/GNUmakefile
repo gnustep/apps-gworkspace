@@ -17,7 +17,6 @@ StartAppWin.m
 MDIndexing_PRINCIPAL_CLASS = MDIndexing
 
 MDIndexing_RESOURCE_FILES = \
-Info.plist \
 MDIndexing.tiff \
 Resources/categories.plist \
 Resources/Images/* \
