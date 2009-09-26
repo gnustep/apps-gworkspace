@@ -1,3 +1,10 @@
+2009-09-26 Riccardo Mottola <rmottola@users.sf.net>
+
+	* GWMetadata/Preferences:
+	renamed Info.plist to MDIndexingInfo.plist
+	* GWMetadata/Preferences/GNUmakefile:
+	Do not package Info.plist explicitely
+
 2009-02-01  Richard Frith-Macdonald <rfm@gnu.org>
 
 	* GWMetadata/Preferences/Info.plist:
