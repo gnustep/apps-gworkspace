@@ -37,7 +37,8 @@ Inspector_OBJC_FILES = \
          Functions.m
 
 Inspector_HEADER_FILES = \
-         Inspector.h 
+         Inspector.h \
+         ContentViewersProtocol.h
 
 ifeq ($(findstring darwin, $(GNUSTEP_TARGET_OS)), darwin)
   ifeq ($(OBJC_RUNTIME_LIB), gnu)
