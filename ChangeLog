@@ -1,4 +1,9 @@
 2009-11-06 Riccardo Mottola	
+	* Tools\searchtool\searchtool.m,
+	Tools\lsfupdater\lsfupdater.m:
+	Fix problems with undefined GW_DEBUG_LOG
+
+2009-11-06 Riccardo Mottola	
 	* GWMetadata/gmds/mdextractor/Extractors/HtmlExtractor/HtmlExtractor.m:
 	Fix stack smash, reported by Tim Kack
 

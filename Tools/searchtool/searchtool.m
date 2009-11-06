@@ -28,9 +28,7 @@
 #include "FinderModulesProtocol.h"
 #include "config.h"
 
-#define GWDebugLog(format, args...) \
-  do { if (GW_DEBUG_LOG) \
-    NSLog(format , ## args); } while (0)
+
 
 @protocol	Finder
 
@@ -365,7 +363,9 @@
 		                     name: NSConnectionDidDieNotification
 		                   object: [ddbd connectionForProxy]];
                        
+#ifdef GW_DEBUG_LOG
       GWDebugLog(@"ddbd connected!");     
+#endif
     } else {
       NSLog(@"unable to contact ddbd.");
     }
