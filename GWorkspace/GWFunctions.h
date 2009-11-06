@@ -30,6 +30,10 @@
 @class NSString;
 @class NSMenuItem;
 
+#ifndef GW_DEBUG_LOG
+#define GW_DEBUG_LOG 0
+#endif
+
 #define GWDebugLog(format, args...) \
   do { if (GW_DEBUG_LOG) \
     NSLog(format , ## args); } while (0)
