@@ -36,6 +36,11 @@
 #define ICNSIZE 48
 #define MAXDATA 1000
 
+#if defined(__MINGW__)
+#define SHPATH "/bin/sh"
+#define FILEPATH "/bin/file"
+#endif
+
 static NSString *nibName = @"Contents";
 
 @implementation Contents
@@ -49,7 +54,7 @@ static NSString *nibName = @"Contents";
   TEST_RELEASE (mainBox);
   TEST_RELEASE (pboardImage);
       
-	[super dealloc];
+  [super dealloc];
 }
 
 - (id)initForInspector:(id)insp
@@ -541,9 +546,9 @@ static NSString *nibName = @"Contents";
 
 - (id)initWithFrame:(NSRect)frameRect
 {
-	self = [super initWithFrame: frameRect];
+  self = [super initWithFrame: frameRect];
 	
-	if (self) {	
+  if (self) {	
     NSString *comm;
     NSRect r;
           
@@ -559,7 +564,7 @@ static NSString *nibName = @"Contents";
       ASSIGN (fileComm, comm);
     }
     
-		nc = [NSNotificationCenter defaultCenter];
+    nc = [NSNotificationCenter defaultCenter];
     
     r = NSMakeRect(0, 60, frameRect.size.width, 140);
     textview = [[NSTextView alloc] initWithFrame: r];
@@ -572,9 +577,9 @@ static NSString *nibName = @"Contents";
     
     [self addSubview: textview];
     RELEASE (textview);
-	}
-	
-	return self;
+  }
+
+  return self;
 }
 
 - (void)showInfoOfPath:(NSString *)path

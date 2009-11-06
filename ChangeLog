@@ -3,6 +3,9 @@
 	Tools\lsfupdater\lsfupdater.m:
 	Fix problems with undefined GW_DEBUG_LOG
 
+	* Inspector/Contents.m:
+	Backup values for MinGW not set by configure
+
 2009-11-06 Riccardo Mottola	
 	* GWMetadata/gmds/mdextractor/Extractors/HtmlExtractor/HtmlExtractor.m:
 	Fix stack smash, reported by Tim Kack
