@@ -363,9 +363,6 @@
 		                     name: NSConnectionDidDieNotification
 		                   object: [ddbd connectionForProxy]];
                        
-#ifdef GW_DEBUG_LOG
-      GWDebugLog(@"ddbd connected!");     
-#endif
     } else {
       NSLog(@"unable to contact ddbd.");
     }
