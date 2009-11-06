@@ -335,7 +335,7 @@ int escapeChar(char *buf, NSMutableString *str)
     i++;
   }
   
-  if (strncmp(buf + i, ";\0", 2)) {
+  if (strncmp(buf + i, ";\0", 2) == 0) {
     strncpy(token + i, buf + i, 1);   
   
   } else { /* if it does not seem to be a token, result is '&' */

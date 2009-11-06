@@ -1,3 +1,7 @@
+2009-11-06 Riccardo Mottola	
+	* GWMetadata/gmds/mdextractor/Extractors/HtmlExtractor/HtmlExtractor.m:
+	Fix stack smash, reported by Tim Kack
+
 2009-09-27 Riccardo Mottola <rmottola@users.sf.net>
 	* Inspector/GNUmakefile.in:
 	install ContentViewersProtocol.h
