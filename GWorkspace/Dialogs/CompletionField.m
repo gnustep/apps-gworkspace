@@ -22,12 +22,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "GWFunctions.h"
-#include "FSNFunctions.h"
-#include "CompletionField.h"
-#include "GNUstep.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import "GWFunctions.h"
+#import "FSNFunctions.h"
+#import "CompletionField.h"
+#import "GNUstep.h"
 
 @implementation CompletionField
 
@@ -36,22 +36,23 @@
   [super dealloc];
 }
 
-- (id)initForController:(id)cntrl
+- (id)init
 {
   self = [super init];
   
-  if (self) {
+  if (self)
+  {
     [self setRichText: NO];
     [self setImportsGraphics: NO];
     [self setUsesFontPanel: NO];
     [self setUsesRuler: NO];
     [self setEditable: YES];
-    controller = cntrl;
     fm = [NSFileManager defaultManager];
   }
   
   return self;  
 }
+
 
 - (void)setFrame:(NSRect)frameRect
 {

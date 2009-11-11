@@ -46,8 +46,9 @@ static NSString *nibName = @"RunExternal";
 {
   self = [super init];
   
-  if (self) {
-		if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
+  if (self)
+    {
+      if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
       NSLog(@"failed to load %@!", nibName);
       return self;
     } else {  
@@ -55,12 +56,6 @@ static NSString *nibName = @"RunExternal";
       NSString *paths = [environment objectForKey: @"PATH"];  
       
       ASSIGN (pathsArr, [paths componentsSeparatedByString: @":"]);
-  
-		  cfield = [[CompletionField alloc] initForController: self];
-      [cfield setFrame: [[fieldBox contentView] bounds]];
-      [cfield setNextKeyView: okButt]; 
-      [fieldBox setContentView: cfield];      
-      RELEASE (cfield);
       
       [win setDelegate: self];
       [win setFrameUsingName: @"run_external"];

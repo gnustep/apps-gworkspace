@@ -1,4 +1,16 @@
-2009-11-06 Riccardo Mottola	
+2009-11-11 Riccardo Mottola <rmottola@users.sf.net>
+	* GWorkspace/Dialogs/RunExternalController.h
+	GWorkspace/Dialogs/CompletionField.h
+	GWorkspace/Dialogs/RunExternalController.m
+	GWorkspace/Dialogs/OpenWithController.h
+	GWorkspace/Dialogs/CompletionField.m
+	GWorkspace/Dialogs/OpenWithController.m
+	GWorkspace/Resources/English.lproj/OpenWith.gorm
+	GWorkspace/Resources/English.lproj/RunExternal.gorm:
+	Instantiate the CompletionField inside the gorm file,
+	adjusted the init methods of fields and controllers.
+
+2009-11-06 Riccardo Mottola <rmottola@users.sf.net>
 	* Tools\searchtool\searchtool.m,
 	Tools\lsfupdater\lsfupdater.m:
 	Fix problems with undefined GW_DEBUG_LOG
@@ -6,7 +18,7 @@
 	* Inspector/Contents.m:
 	Backup values for MinGW not set by configure
 
-2009-11-06 Riccardo Mottola	
+2009-11-06 Riccardo Mottola <rmottola@users.sf.net>
 	* GWMetadata/gmds/mdextractor/Extractors/HtmlExtractor/HtmlExtractor.m:
 	Fix stack smash, reported by Tim Kack
 

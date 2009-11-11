@@ -23,18 +23,13 @@
  */
 
 
-#ifndef COMPLETION_FIELD_H
-#define COMPLETION_FIELD_H
-
-#include <AppKit/NSTextView.h>
+#import <AppKit/NSTextView.h>
 
 @interface CompletionField : NSTextView 
 {
   id fm;
   id controller;
 }
-
-- (id)initForController:(id)cntrl;
 
 @end
 
@@ -44,5 +39,3 @@
 - (void)completionFieldDidEndLine:(id)afield;
 
 @end
-
-#endif // COMPLETION_FIELD_H

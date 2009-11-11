@@ -23,10 +23,7 @@
  */
 
 
-#ifndef OPEN_WITH_CONTROLLER_H
-#define OPEN_WITH_CONTROLLER_H
-
-#include <Foundation/Foundation.h>
+#import <Foundation/Foundation.h>
 
 @class CompletionField;
 @class NSBox;
@@ -38,11 +35,10 @@
   IBOutlet id win;
   IBOutlet id firstLabel;
   IBOutlet id secondLabel;
-  IBOutlet NSBox *fieldBox;
   IBOutlet id cancelButt;
   IBOutlet id okButt;
 
-  CompletionField *cfield;
+  IBOutlet CompletionField *cfield;
   unsigned result;  
   
   NSArray *pathsArr;
@@ -63,5 +59,3 @@
 - (void)completionFieldDidEndLine:(id)afield;
 
 @end
-
-#endif // OPEN_WITH_CONTROLLER_H

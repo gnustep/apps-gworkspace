@@ -22,13 +22,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "OpenWithController.h"
-#include "CompletionField.h"
-#include "GWorkspace.h"
-#include "FSNode.h"
-#include "GNUstep.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import "OpenWithController.h"
+#import "CompletionField.h"
+#import "GWorkspace.h"
+#import "FSNode.h"
+#import "GNUstep.h"
 
 static NSString *nibName = @"OpenWith";
 
@@ -46,7 +46,7 @@ static NSString *nibName = @"OpenWith";
   self = [super init];
   
   if (self) {
-		if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
+    if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
       NSLog(@"failed to load %@!", nibName);
       return self;
     } else {    
@@ -54,12 +54,6 @@ static NSString *nibName = @"OpenWith";
       NSString *paths = [environment objectForKey: @"PATH"];  
       
       ASSIGN (pathsArr, [paths componentsSeparatedByString: @":"]);
-
-		  cfield = [[CompletionField alloc] initForController: self];
-      [cfield setFrame: [[fieldBox contentView] bounds]];
-      [cfield setNextKeyView: okButt]; 
-      [fieldBox setContentView: cfield];   
-      RELEASE (cfield);
     
       [win setInitialFirstResponder: cfield];
 

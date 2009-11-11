@@ -37,11 +37,10 @@
   IBOutlet id win;
   IBOutlet id titleLabel;
   IBOutlet id secondLabel;
-  IBOutlet NSBox *fieldBox;
   IBOutlet id cancelButt;
   IBOutlet id okButt;
   
-  CompletionField *cfield;
+  IBOutlet CompletionField *cfield;
   unsigned result;  
   
   NSArray *pathsArr;
