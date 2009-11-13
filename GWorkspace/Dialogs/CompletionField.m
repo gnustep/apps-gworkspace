@@ -36,10 +36,9 @@
   [super dealloc];
 }
 
-- (id)init
+- (id)initWithCoder: (NSCoder *) coder
 {
-  self = [super init];
-  
+  self = [super initWithCoder: coder];  
   if (self)
   {
     [self setRichText: NO];

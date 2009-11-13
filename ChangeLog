@@ -1,3 +1,9 @@
+2009-11-12 19:48-EST Gregory John Casamento <greg.casamento@gmail.com>
+
+	* GWorkspace/Dialogs/CompletionField.m: Override initWithCoder:
+	to initialize the filemanager so that we can search for matching
+	paths as the user enters the command.
+
 2009-11-11 Riccardo Mottola <rmottola@users.sf.net>
 	* GWorkspace/Dialogs/RunExternalController.h
 	GWorkspace/Dialogs/CompletionField.h
