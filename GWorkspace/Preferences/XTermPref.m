@@ -1,6 +1,6 @@
 /* XTermPref.m
  *  
- * Copyright (C) 2003 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2009 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -22,11 +22,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "XTermPref.h"
-#include "GWorkspace.h"
-#include "GNUstep.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import "XTermPref.h"
+#import "GWorkspace.h"
+#import "GNUstep.h"
 
 static NSString *nibName = @"XTermPref";
 
@@ -44,50 +44,58 @@ static NSString *nibName = @"XTermPref";
 {
   self = [super init];
 
-  if (self) {  
-		if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
-      NSLog(@"failed to load %@!", nibName);
-    } else {
-	    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];      
-      id entry;
+  if (self)
+    {  
+      if ([NSBundle loadNibNamed: nibName owner: self] == NO)
+	{
+	  NSLog(@"failed to load %@!", nibName);
+	}
+      else
+	{
+	  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];      
+	  id entry;
       
-      RETAIN (prefbox);
-      RELEASE (win);
+	  RETAIN (prefbox);
+	  RELEASE (win);
 
-	    useService = [defaults boolForKey: @"terminal_services"];
+	  useService = [defaults boolForKey: @"terminal_services"];
       
-      if (useService) {
-        [xtermField setSelectable: NO];
-        [argsField setSelectable: NO];
-        [setButt setEnabled: NO];
-        [serviceCheck setState: NSOnState];
-      } else {
-        [serviceCheck setState: NSOffState];
-      }
+	  if (useService)
+	    {
+	      [xtermField setSelectable: NO];
+	      [argsField setSelectable: NO];
+	      [setButt setEnabled: NO];
+	      [serviceCheck setState: NSOnState];
+	    } else
+	    {
+	      [serviceCheck setState: NSOffState];
+	    }
       
-	    entry = [defaults stringForKey: @"defxterm"];
-      if (entry) {
-        ASSIGN (xterm, entry);
-		    [xtermField setStringValue: xterm];
-      }
+	  entry = [defaults stringForKey: @"defxterm"];
+	  if (entry)
+	    {
+	      ASSIGN (xterm, entry);
+	      [xtermField setStringValue: xterm];
+	    }
 
-	    entry = [defaults stringForKey: @"defaultxtermargs"];
-      if (entry) {
-        ASSIGN (xtermArgs, entry);
-		    [argsField setStringValue: xtermArgs];
-      }
+	  entry = [defaults stringForKey: @"defaultxtermargs"];
+	  if (entry)
+	    {
+	      ASSIGN (xtermArgs, entry);
+	      [argsField setStringValue: xtermArgs];
+	    }
       
-      gw = [GWorkspace gworkspace]; 
+	  gw = [GWorkspace gworkspace]; 
   
-      /* Internationalization */
-      [serviceBox setTitle: NSLocalizedString(@"Terminal.app", @"")];
-      [serviceCheck setTitle: NSLocalizedString(@"Use Terminal service", @"")];
-      [xtermLabel setStringValue: NSLocalizedString(@"xterm", @"")];
-      [argsLabel setStringValue: NSLocalizedString(@"arguments", @"")];
-      [setButt setTitle: NSLocalizedString(@"Set", @"")];
-      [fieldsBox setTitle: NSLocalizedString(@"Terminal", @"")];
+	  /* Internationalization */
+	  [serviceBox setTitle: NSLocalizedString(@"Terminal.app", @"")];
+	  [serviceCheck setTitle: NSLocalizedString(@"Use Terminal service", @"")];
+	  [xtermLabel setStringValue: NSLocalizedString(@"xterm", @"")];
+	  [argsLabel setStringValue: NSLocalizedString(@"arguments", @"")];
+	  [setButt setTitle: NSLocalizedString(@"Set", @"")];
+	  [fieldsBox setTitle: NSLocalizedString(@"Terminal", @"")];
+	}
     }
-  }
   
   return self;
 }
@@ -106,17 +114,20 @@ static NSString *nibName = @"XTermPref";
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];      
 
-	useService = ([sender state] == NSOnState);
+  useService = ([sender state] == NSOnState);
 
-  if (useService) {
-    [xtermField setSelectable: NO];
-    [argsField setSelectable: NO];
-    [setButt setEnabled: NO];
-  } else {
-    [xtermField setSelectable: YES];
-    [argsField setSelectable: YES];
-    [setButt setEnabled: YES];
-  }
+  if (useService)
+    {
+      [xtermField setSelectable: NO];
+      [argsField setSelectable: NO];
+      [setButt setEnabled: NO];
+    }
+  else
+    {
+      [xtermField setSelectable: YES];
+      [argsField setSelectable: YES];
+      [setButt setEnabled: YES];
+    }
 
   [defaults setBool: useService forKey: @"terminal_services"];
   [gw setUseTerminalService: useService];
