@@ -450,7 +450,9 @@ if (rct.size.height < 0) rct.size.height = 0; \
   NSRect selrect;
   float x, y, w, h;
   int i;
-  
+
+  pp = NSMakePoint(0,0);
+
 #define scrollPointToVisible(p) \
 { \
 NSRect sr; \
