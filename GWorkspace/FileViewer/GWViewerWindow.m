@@ -22,9 +22,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <AppKit/AppKit.h>
-#include "GWViewerWindow.h"
-#include "GNUstep.h"
+#import <AppKit/AppKit.h>
+#import "GWViewerWindow.h"
+#import "GNUstep.h"
 
 @implementation GWViewerWindow
 
@@ -45,120 +45,115 @@
   return self; 
 }
 
-- (void)setDelegate:(id)adelegate
-{
-  delegate = adelegate;
-  [super setDelegate: adelegate];
-}
 
 - (BOOL)validateMenuItem:(id <NSMenuItem>)menuItem
 {	
-  return [delegate validateItem: menuItem];
+  return [[self delegate] validateItem: menuItem];
 }
 
 - (void)openSelection:(id)sender
 {
-  [delegate openSelectionInNewViewer: NO];
+  [[self delegate] openSelectionInNewViewer: NO];
 }
 
 - (void)openSelectionAsFolder:(id)sender
 {
-  [delegate openSelectionAsFolder];
+  [[self delegate] openSelectionAsFolder];
 }
 
 - (void)openWith:(id)sender
 {
-  [delegate openSelectionWith];
+  [[self delegate] openSelectionWith];
 }
 
 - (void)newFolder:(id)sender
 {
-  [delegate newFolder];
+  [[self delegate] newFolder];
 }
 
 - (void)newFile:(id)sender
 {
-  [delegate newFile];
+  [[self delegate] newFile];
 }
 
 - (void)duplicateFiles:(id)sender
 {
-  [delegate duplicateFiles];
+  [[self delegate] duplicateFiles];
 }
 
 - (void)recycleFiles:(id)sender
 {
-  [delegate recycleFiles];
+  [[self delegate] recycleFiles];
 }
 
 - (void)deleteFiles:(id)sender
 {
-  [delegate deleteFiles];
+  [[self delegate] deleteFiles];
 }
 
 - (void)goBackwardInHistory:(id)sender
 {
-  [delegate goBackwardInHistory];
+  [[self delegate] goBackwardInHistory];
 }
 
 - (void)goForwardInHistory:(id)sender
 {
-  [delegate goForwardInHistory];
+  [[self delegate] goForwardInHistory];
 }
 
 - (void)setViewerBehaviour:(id)sender
 {
-  [delegate setViewerBehaviour: sender];
+  [[self delegate] setViewerBehaviour: sender];
 }
 
 - (void)setViewerType:(id)sender
 {
-  [delegate setViewerType: sender];
+  [[self delegate] setViewerType: sender];
 }
 
 - (void)setShownType:(id)sender
 {
-  [delegate setShownType: sender];
+  [[self delegate] setShownType: sender];
 }
 
 - (void)setExtendedShownType:(id)sender
 {
-  [delegate setExtendedShownType: sender];
+  [[self delegate] setExtendedShownType: sender];
 }
 
 - (void)setIconsSize:(id)sender
 {
-  [delegate setIconsSize: sender];
+  [[self delegate] setIconsSize: sender];
 }
 
 - (void)setIconsPosition:(id)sender
 {
-  [delegate setIconsPosition: sender];
+  [[self delegate] setIconsPosition: sender];
 }
 
 - (void)setLabelSize:(id)sender
 {
-  [delegate setLabelSize: sender];
+  [[self delegate] setLabelSize: sender];
 }
 
 - (void)chooseLabelColor:(id)sender
 {
-  [delegate chooseLabelColor: sender];
+  [[self delegate] chooseLabelColor: sender];
 }
 
 - (void)chooseBackColor:(id)sender
 {
-  [delegate chooseBackColor: sender];
+  [[self delegate] chooseBackColor: sender];
 }
 
 - (void)selectAllInViewer:(id)sender
 {
-  [delegate selectAllInViewer];
+  [[self delegate] selectAllInViewer];
 }
 
 - (void)showTerminal:(id)sender
 {
-  [delegate showTerminal];
+  [[self delegate] showTerminal];
 }
 
 - (void)keyDown:(NSEvent *)theEvent 
@@ -174,21 +169,21 @@
 	switch (character) {
     case NSLeftArrowFunctionKey:
 			if ((flags & NSCommandKeyMask) || (flags & NSControlKeyMask)) {
-        [delegate goBackwardInHistory];
+        [[self delegate] goBackwardInHistory];
 			}
       return;
 
     case NSRightArrowFunctionKey:			
 			if ((flags & NSCommandKeyMask) || (flags & NSControlKeyMask)) {
-        [delegate goForwardInHistory];
+        [[self delegate] goForwardInHistory];
 	    } 
 			return;
       
     case NSBackspaceKey:			
       if (flags & NSShiftKeyMask) {
-        [delegate emptyTrash];
+        [[self delegate] emptyTrash];
       } else {
-        [delegate recycleFiles];
+        [[self delegate] recycleFiles];
       }
       return;
 	}

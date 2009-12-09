@@ -1,6 +1,6 @@
 /* GWViewer.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2009 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2004
@@ -22,17 +22,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#ifndef GWVIEWER_WINDOW_H
-#define GWVIEWER_WINDOW_H
 
-#include <Foundation/Foundation.h>
-#include <AppKit/NSWindow.h>
+#import <Foundation/Foundation.h>
+#import <AppKit/NSWindow.h>
 
 @class GWorkspace;
 
 @interface GWViewerWindow : NSWindow
 {
-  id delegate;
+
 }
 
 - (void)openSelection:(id)sender;
@@ -87,5 +85,3 @@
 - (void)showTerminal;
 
 @end
-
-#endif // GWVIEWER_WINDOW_H
