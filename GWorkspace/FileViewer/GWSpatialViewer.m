@@ -772,6 +772,7 @@
   if (invalidated == NO) {
     closing = YES;
     [self updateDefaults];
+    [vwrwin setDelegate: nil];
     [manager viewerWillClose: self]; 
   }
 }

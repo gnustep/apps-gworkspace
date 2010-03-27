@@ -1,3 +1,10 @@
+2010-03-27  Wolfgang Lux  <wolfgang.lux@gmail.com>
+
+	* GWorkspace/FileViewer/GWViewer.m (-windowWillClose:):
+	* GWorkspace/FileViewer/GWSpatialViewer.m (-windowWillClose:):
+	Set the window's delegate to nil to avoid crash when the viewer is
+	released before the window.
+
 2009-12-08 Riccardo Mottola <rmottola@users.sf.net>
 	* GWorkspace/FileViewer/GWViewerWindow.[h,m]:
 	removed local copy of delegate
