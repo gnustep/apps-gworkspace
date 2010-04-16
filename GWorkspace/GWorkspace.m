@@ -23,7 +23,6 @@
  */
 
 #include <Foundation/Foundation.h>
-#include <GNUstepBase/NSTask+GS.h>
 #include <AppKit/AppKit.h>
 #include <math.h>
 #include "GWFunctions.h"

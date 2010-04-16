@@ -23,7 +23,6 @@
  */
 
 #include <AppKit/AppKit.h>
-#include <GNUstepBase/NSTask+GS.h>
 #include "ImageViewer.h"
 #include <math.h>
 

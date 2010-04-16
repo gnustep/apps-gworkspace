@@ -1,3 +1,13 @@
+2010-03-16 Riccardo mottola <rmottola@users.sf.net>
+
+	* Tools/searchtool/searchtool.m
+	* Tools/lsfupdater/lsfupdater.m
+	* GWorkspace/GWorkspace.m
+	* GWorkspace/Finder/SearchResults/SearchResults.m
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.m
+	* Recycler/Recycler.m:
+	do not include <GNUstepBase/NSTask+GS.h>
+
 2010-03-27  Wolfgang Lux  <wolfgang.lux@gmail.com>
 
 	* GWorkspace/FileViewer/GWViewer.m (-windowWillClose:):
