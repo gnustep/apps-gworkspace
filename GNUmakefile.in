@@ -8,16 +8,23 @@ VERSION = @PACKAGE_VERSION@
 SVN_BASE_URL = svn+ssh://svn.gna.org/svn/gnustep/apps
 SVN_MODULE_NAME = gworkspace
 
+BUILD_GWMETADATA = @BUILD_GWMETADATA@
+
 #
 # subprojects
 #
 SUBPROJECTS = FSNode \
-	      			  DBKit \
-	      			  Tools \
-	      			  Inspector \
-	      			  Operation \
-	      			  Recycler \
-	      			  GWorkspace 
+	      DBKit \
+	      Tools \
+	      Inspector \
+	      Operation \
+	      Recycler \
+	      GWorkspace
+
+ifeq ($(BUILD_GWMETADATA),1)
+SUBPROJECTS += GWMetadata
+endif
+
 
 -include GNUmakefile.preamble
 
