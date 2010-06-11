@@ -1,6 +1,6 @@
 /* DBKFreeNodesPage.m
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2005
@@ -71,7 +71,8 @@
     
   currOffset = firstOffset;
   nextOffset = firstOffset;
-  
+  data = nil;
+
   while (nextOffset != 0) {
     data = [self dataOfPageAtOffset: nextOffset];    
     [self getOffsetsFromData: data];

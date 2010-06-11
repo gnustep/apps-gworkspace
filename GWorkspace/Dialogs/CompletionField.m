@@ -1,6 +1,6 @@
 /* CompletionField.m
  *  
- * Copyright (C) 2003 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -139,7 +139,7 @@ if ([path hasSuffix: pathSeparator] == NO) \
           NSMutableArray *common = [NSMutableArray array];
           unsigned *lengths = NSZoneMalloc (NSDefaultMallocZone(), sizeof(unsigned) * [contents count]);
           unsigned prefLength = 0;
-          int index;
+          int index = 0;;
 
           for (j = 0; j < [contents count]; j++) {
             lengths[j] = 0;

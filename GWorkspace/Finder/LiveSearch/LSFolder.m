@@ -1,6 +1,6 @@
 /* LSFolder.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: October 2004
@@ -23,7 +23,6 @@
  */
 
 #include <Foundation/Foundation.h>
-#include <GNUstepBase/NSTask+GS.h>
 #include <AppKit/AppKit.h>
 #include <math.h>
 #include "LSFolder.h"
@@ -230,7 +229,6 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 - (void)startUpdater
 {
   NSString *cname;
-  NSArray *paths;
   NSString *cmd;
 
   cname = [NSString stringWithFormat: @"search_%i", (unsigned long)self];

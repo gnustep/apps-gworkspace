@@ -1,6 +1,6 @@
 /* SearchResults.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -222,7 +222,6 @@ static NSString *lsfname = @"LiveSearch.lsf";
                    recursive:(BOOL)rec
 {
   NSString *cname;
-  NSArray *paths;
   NSString *cmd;
 
   [win makeKeyAndOrderFront: nil];

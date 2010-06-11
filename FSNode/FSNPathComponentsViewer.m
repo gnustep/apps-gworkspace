@@ -1,6 +1,6 @@
 /* FSNPathComponentsViewer.m
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: October 2005
@@ -91,8 +91,8 @@ static NSImage *branchImage;
   }
   
   for (i = 0; i < [selection count]; i++) {
-    FSNode *node = [selection objectAtIndex: i];
-    [allComponents addObject: [FSNode pathComponentsToNode: node]];
+    FSNode *fn = [selection objectAtIndex: i];
+    [allComponents addObject: [FSNode pathComponentsToNode: fn]];
   }
 
   for (i = 0; i < [allComponents count]; i++) {
@@ -141,6 +141,7 @@ static NSImage *branchImage;
   
   selcount = [newSelection count]; 
   
+  node = nil;
   for (i = 0; i < selcount; i++) {   
     FSNode *pn = nil;
     

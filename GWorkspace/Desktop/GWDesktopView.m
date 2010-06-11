@@ -1,6 +1,6 @@
 /* GWDesktopView.m
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -1084,7 +1084,7 @@
       NSString *fname = [files objectAtIndex: i];
       FSNode *subnode = [FSNode nodeWithRelativePath: fname parent: node];
       FSNIcon *icon = [self repOfSubnode: subnode];
-      int index;
+      int index = 0;
 
       if (i == 0) {
         if (insertIndex != -1) {
@@ -1721,8 +1721,8 @@ int sortDragged(id icn1, id icn2, void *context)
     for (i = 0; i < [sorted count]; i++) {
       FSNIcon *icon = [sorted objectAtIndex: i];
       int oldindex = [icon gridIndex];
-      int index;
-      int shift;
+      int index = 0;
+      int shift = 0;
     
       if (i == 0) {
         index = insertIndex;

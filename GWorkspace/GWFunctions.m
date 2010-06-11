@@ -1,6 +1,6 @@
 /* GWFunctions.m
  *  
- * Copyright (C) 2003 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -190,6 +190,8 @@ NSString *commonPrefixInArray(NSArray *a)
   while (index < minlngt) {
     NSString *s1, *s2;
     unichar c1, c2;
+
+    s1 = s2 = nil;
     
     for (i = 0; i < [a count]; i++) {
       s1 = [a objectAtIndex: i];
