@@ -305,6 +305,7 @@ void drawRightTabBezier(NSPoint origin, float tabh,
   NSPoint selp[2];
   NSBezierPath *bpath;
   int i;
+  NSPoint ipoint;
   
   if (backImage) {  
     [backImage compositeToPoint: NSZeroPoint operation: NSCompositeSourceOver];
@@ -320,14 +321,13 @@ void drawRightTabBezier(NSPoint origin, float tabh,
   selp[0] = NSZeroPoint;
   selp[1] = NSZeroPoint;
 
-	aRect.size.height -= TAB_H;
+  aRect.size.height -= TAB_H;
   
+  ipoint = NSMakePoint (0,0);
   for (i = count - 1; i >= 0; i--) {
 	  TShelfViewItem *anItem = [items objectAtIndex: i];
 	  NSRect r;
-	  NSPoint ipoint;
     
-          ipoint.x = ipoint.y = 0;
 	  if (i == (count - 1)) {
 	    ipoint.x = (int)(aRect.size.width - SPECIAL_TAB_W);
 	    ipoint.y = aRect.size.height;

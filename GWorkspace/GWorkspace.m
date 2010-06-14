@@ -22,7 +22,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <math.h>
+// #include <math.h>
+
+/* the following for getrlimit */
+#include <sys/types.h>
+#include <sys/time.h>
+#include <sys/resource.h>
+/* getrlimit */
 
 #import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
