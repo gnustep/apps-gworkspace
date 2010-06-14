@@ -6,6 +6,7 @@
 	* Tools/fswatcher/fswatcher.h
 	* GWorkspace/FileViewer/GWViewerPathsPopUp.m
 	* GWorkspace/Fiend/FiendLeaf.m:
+	* GWorkspace/WorkspaceApplication.m
 	Warning fixes.
 
 2010-06-11 Riccardo Mottola <rmottola@users.sf.net>

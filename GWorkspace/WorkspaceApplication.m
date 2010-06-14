@@ -1294,7 +1294,7 @@
       ASSIGN (conn, c);
       
 	  } else {
-      StartAppWin *startAppWin;
+      StartAppWin *startAppWin = nil;
       int i;
 
 	    if ((task == nil || [task isRunning] == NO) && (showProgress == NO)) {
