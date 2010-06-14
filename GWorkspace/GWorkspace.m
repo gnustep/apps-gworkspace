@@ -74,10 +74,6 @@ static GWorkspace *gworkspace = nil;
   #define TSHF_MAXF 999
 #endif
 
-#ifndef OPEN_MAX
-#warning OPEN_MAX undefined, setting a reasonable value
-#define OPEN_MAX 10
-#endif
 
 + (void)initialize
 {

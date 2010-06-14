@@ -44,7 +44,11 @@
 #define WORD_MIN 3
 #define CELLS_HEIGHT (28.0)
 #define ICNSIZE 24
+
+#if !defined(OPEN_MAX) || OPEN_MAX > 255
 #define OPEN_MAX 10
+#endif
+
 
 BOOL isDotFile(NSString *path);
 NSString *pathSeparator(void);

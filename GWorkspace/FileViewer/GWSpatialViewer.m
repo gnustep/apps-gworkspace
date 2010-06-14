@@ -42,11 +42,6 @@
 #define DEFAULT_INCR 150
 #define MIN_W_HEIGHT 180
 
-#ifndef OPEN_MAX
-#warning OPEN_MAX undefined, setting a reasonable value
-#define OPEN_MAX 10
-#endif
-
 
 @implementation GWSpatialViewer
 

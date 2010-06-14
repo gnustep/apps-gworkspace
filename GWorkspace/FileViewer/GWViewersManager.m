@@ -32,11 +32,6 @@
 #import "GWorkspace.h"
 #import "GWDesktopManager.h"
 
-#ifndef OPEN_MAX
-#warning OPEN_MAX undefined, setting a reasonable value
-#define OPEN_MAX 10
-#endif
-
 
 static GWViewersManager *vwrsmanager = nil;
 

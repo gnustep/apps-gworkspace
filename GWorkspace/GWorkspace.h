@@ -1,6 +1,6 @@
 /* GWorkspace.h
  *  
- * Copyright (C) 2003 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -25,12 +25,17 @@
 #ifndef GWORKSPACE_H
 #define GWORKSPACE_H
 
-#include <Foundation/Foundation.h>
-#include <AppKit/NSApplication.h>
-#include <AppKit/NSWorkspace.h>
+#import <Foundation/Foundation.h>
+#import <AppKit/NSApplication.h>
+#import <AppKit/NSWorkspace.h>
 
 #define NOEDIT 0
 #define NOXTERM 1
+
+#if !defined(OPEN_MAX) || OPEN_MAX > 255
+#define OPEN_MAX 10
+#endif
+
 
 @class NSWorkspace;
 @class FSNode;

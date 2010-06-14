@@ -52,11 +52,6 @@
 #define COLLAPSE_LIMIT 35
 #define MID_LIMIT 110
 
-#ifndef OPEN_MAX
-#warning OPEN_MAX undefined, setting a reasonable value
-#define OPEN_MAX 10
-#endif
-
 
 @implementation GWViewer
 
