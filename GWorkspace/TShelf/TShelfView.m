@@ -1,6 +1,6 @@
 /* TShelfView.m
  *  
- * Copyright (C) 2003 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -325,6 +325,7 @@ void drawRightTabBezier(NSPoint origin, float tabh,
 	  NSRect r;
 	  NSPoint ipoint;
     
+          ipoint.x = ipoint.y = 0;
 	  if (i == (count - 1)) {
 	    ipoint.x = (int)(aRect.size.width - SPECIAL_TAB_W);
 	    ipoint.y = aRect.size.height;
