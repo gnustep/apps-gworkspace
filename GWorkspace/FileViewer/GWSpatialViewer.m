@@ -1,6 +1,6 @@
 /* GWSpatialViewer.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2004
@@ -22,26 +22,30 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <AppKit/AppKit.h>
 #include <math.h>
-#include "GWSpatialViewer.h"
-#include "GWViewersManager.h"
-#include "GWViewerWindow.h"
-#include "GWViewerScrollView.h"
-#include "GWViewerBrowser.h"
-#include "GWViewerIconsView.h"
-#include "GWViewerListView.h"
-#include "GWViewerPathsPopUp.h"
-#include "GWorkspace.h"
-#include "GWFunctions.h"
-#include "FSNodeRep.h"
-#include "FSNIcon.h"
-#include "FSNFunctions.h"
+
+#import <AppKit/AppKit.h>
+#import "GWSpatialViewer.h"
+#import "GWViewersManager.h"
+#import "GWViewerWindow.h"
+#import "GWViewerScrollView.h"
+#import "GWViewerBrowser.h"
+#import "GWViewerIconsView.h"
+#import "GWViewerListView.h"
+#import "GWViewerPathsPopUp.h"
+#import "GWorkspace.h"
+#import "GWFunctions.h"
+#import "FSNodeRep.h"
+#import "FSNIcon.h"
+#import "FSNFunctions.h"
  
 #define DEFAULT_INCR 150
 #define MIN_W_HEIGHT 180
 
+#ifndef OPEN_MAX
+#warning OPEN_MAX undefined, setting a reasonable value
 #define OPEN_MAX 10
+#endif
 
 
 @implementation GWSpatialViewer

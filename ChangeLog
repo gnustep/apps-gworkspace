@@ -64,6 +64,11 @@
 	* FSNode/FSNode.m:
 	Cleaned up imports to use system GNUstep.h
 
+	* GWorkspace/GWorkspace.m
+	* GWorkspace/FileViewer/GWViewer.m
+	* GWorkspace/FileViewer/GWSpatialViewer.m
+	* GWorkspace/FileViewer/GWViewersManager.m
+	Warn about OPEN_MAX being undefined but do not override it by default.
 
 2010-06-11 Riccardo Mottola <rmottola@users.sf.net>
 

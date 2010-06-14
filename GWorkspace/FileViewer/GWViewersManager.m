@@ -1,6 +1,6 @@
 /* GWViewersManager.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2004
@@ -22,17 +22,20 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <AppKit/AppKit.h>
-#include "GWViewersManager.h"
-#include "GWViewer.h"
-#include "GWSpatialViewer.h"
-#include "GWViewerWindow.h"
-#include "History.h"
-#include "FSNFunctions.h"
-#include "GWorkspace.h"
-#include "GWDesktopManager.h"
+#import <AppKit/AppKit.h>
+#import "GWViewersManager.h"
+#import "GWViewer.h"
+#import "GWSpatialViewer.h"
+#import "GWViewerWindow.h"
+#import "History.h"
+#import "FSNFunctions.h"
+#import "GWorkspace.h"
+#import "GWDesktopManager.h"
 
+#ifndef OPEN_MAX
+#warning OPEN_MAX undefined, setting a reasonable value
 #define OPEN_MAX 10
+#endif
 
 
 static GWViewersManager *vwrsmanager = nil;

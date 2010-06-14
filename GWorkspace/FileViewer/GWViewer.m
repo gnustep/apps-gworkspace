@@ -1,6 +1,6 @@
 /* GWViewer.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2004
@@ -22,25 +22,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <AppKit/AppKit.h>
 #include <math.h>
-#include "GWViewer.h"
-#include "GWViewersManager.h"
-#include "GWViewerBrowser.h"
-#include "GWViewerIconsView.h"
-#include "GWViewerListView.h"
-#include "GWViewerWindow.h"
-#include "GWViewerScrollView.h"
-#include "GWViewerSplit.h"
-#include "GWViewerShelf.h"
-#include "GWViewerIconsPath.h"
-#include "GWorkspace.h"
-#include "GWFunctions.h"
-#include "FSNBrowser.h"
-#include "FSNIconsView.h"
-#include "FSNodeRep.h"
-#include "FSNIcon.h"
-#include "FSNFunctions.h"
+
+#import <AppKit/AppKit.h>
+#import "GWViewer.h"
+#import "GWViewersManager.h"
+#import "GWViewerBrowser.h"
+#import "GWViewerIconsView.h"
+#import "GWViewerListView.h"
+#import "GWViewerWindow.h"
+#import "GWViewerScrollView.h"
+#import "GWViewerSplit.h"
+#import "GWViewerShelf.h"
+#import "GWViewerIconsPath.h"
+#import "GWorkspace.h"
+#import "GWFunctions.h"
+#import "FSNBrowser.h"
+#import "FSNIconsView.h"
+#import "FSNodeRep.h"
+#import "FSNIcon.h"
+#import "FSNFunctions.h"
 
 #define DEFAULT_INCR 150
 #define MIN_WIN_H 300
@@ -51,7 +52,10 @@
 #define COLLAPSE_LIMIT 35
 #define MID_LIMIT 110
 
+#ifndef OPEN_MAX
+#warning OPEN_MAX undefined, setting a reasonable value
 #define OPEN_MAX 10
+#endif
 
 
 @implementation GWViewer
