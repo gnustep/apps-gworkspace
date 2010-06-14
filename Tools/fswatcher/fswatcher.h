@@ -1,6 +1,6 @@
 /* fswatcher.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: February 2004
@@ -30,7 +30,7 @@
 
 @class Watcher;
 
-@protocol	FSWClientProtocol
+@protocol	FSWClientProtocol <NSObject>
 
 - (oneway void)watchedPathDidChange:(NSData *)dirinfo;
 

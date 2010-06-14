@@ -381,7 +381,7 @@
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
 	NSPasteboard *pb;
-  NSDragOperation sourceDragMask;
+  NSDragOperation sourceDragMask = 0;
 	NSArray *sourcePaths;
 	NSString *fromPath;
   NSString *buff;

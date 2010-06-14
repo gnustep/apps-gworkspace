@@ -1,6 +1,6 @@
 /* GWViewerPathsPopUp.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2004
@@ -33,7 +33,7 @@
 {
   NSMenu *menu = [self menu];
   NSArray *components = [FSNode pathComponentsToNode: node];
-  NSString *progPath;
+  NSString *progPath = nil;
   int i;
   
   [self removeAllItems];
