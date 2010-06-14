@@ -1,6 +1,6 @@
 /* RecyclerPrefs.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2004
@@ -22,12 +22,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
 #include <math.h>
-#include "RecyclerPrefs.h"
-#include "Recycler.h"
-#include "GNUstep.h"
+
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import <GNUstepBase/GNUstep.h>
+
+#import "RecyclerPrefs.h"
+#import "Recycler.h"
+
+
 
 static NSString *nibName = @"PreferencesWin";
 
@@ -41,29 +45,31 @@ static NSString *nibName = @"PreferencesWin";
 
 - (id)init
 {
-	self = [super init];
+  self = [super init];
 
-  if (self) {
-		if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
-      NSLog(@"failed to load %@!", nibName);
-      DESTROY (self);
-      return self;
-    } else {
-      [win setFrameUsingName: @"recyclerprefs"];
-      [win setDelegate: self];
+  if (self)
+    {
+      if ([NSBundle loadNibNamed: nibName owner: self] == NO)
+	{
+	  NSLog(@"failed to load %@!", nibName);
+	  DESTROY (self);
+	  return self;
+	} else {
+	[win setFrameUsingName: @"recyclerprefs"];
+	[win setDelegate: self];
     
-      recycler = [Recycler recycler];
+	recycler = [Recycler recycler];
       
-      [dockButt setState: ([recycler isDocked] ? NSOnState: NSOffState)];
+	[dockButt setState: ([recycler isDocked] ? NSOnState: NSOffState)];
       
-      /* Internationalization */
-      [win setTitle: NSLocalizedString(@"Recycler Preferences", @"")];
-      [dockButt setTitle: NSLocalizedString(@"Dockable", @"")];    
-      [explLabel setStringValue: NSLocalizedString(@"Select to allow docking on the WindowMaker Dock", @"")];
-	  }			
-  }
+	/* Internationalization */
+	[win setTitle: NSLocalizedString(@"Recycler Preferences", @"")];
+	[dockButt setTitle: NSLocalizedString(@"Dockable", @"")];    
+	[explLabel setStringValue: NSLocalizedString(@"Select to allow docking on the WindowMaker Dock", @"")];
+      }			
+    }
   
-	return self;
+  return self;
 }
 
 - (IBAction)setDockable:(id)sender
@@ -89,7 +95,7 @@ static NSString *nibName = @"PreferencesWin";
 - (BOOL)windowShouldClose:(id)sender
 {
   [self updateDefaults];
-	return YES;
+  return YES;
 }
 
 @end

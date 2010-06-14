@@ -1,6 +1,6 @@
 /* FileOpInfo.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -22,12 +22,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "FileOpInfo.h"
-#include "Operation.h"
-#include "Functions.h"
-#include "GNUstep.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import <GNUstepBase/GNUstep.h>
+
+#import "FileOpInfo.h"
+#import "Operation.h"
+#import "Functions.h"
+
 
 #define PROGR_STEPS (100.0)
 static BOOL stopped = NO;
@@ -188,8 +190,10 @@ static NSString *nibName = @"FileOperationWin";
   NSArray *ports;
 
   if (confirm) {    
-	  NSString *title;
-	  NSString *msg, *msg1, *msg2;
+    NSString *title = nil;
+    NSString *msg = nil;
+    NSString *msg1 = nil;
+    NSString *msg2 = nil;
     NSString *items;
 
     if ([files count] > 1) {
@@ -506,7 +510,8 @@ static NSString *nibName = @"FileOperationWin";
   samename = [executor checkSameName];
   
   if (samename) {
-	  NSString *msg, *title;
+    NSString *msg = nil;
+    NSString *title = nil;
     int result;
     
 		if ([type isEqual: @"NSWorkspaceMoveOperation"]) {	

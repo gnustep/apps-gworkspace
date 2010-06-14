@@ -22,12 +22,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <AppKit/AppKit.h>
+#import <AppKit/AppKit.h>
+#import <GNUstepBase/GNUstep.h>
+
 #include "TShelfView.h"
 #include "TShelfViewItem.h"
 #include "TShelfIconsView.h"
 #include "GWorkspace.h"
-#include "GNUstep.h"
+
 
 #define SPECIAL_TAB_W 54
 #define BUTTORX 25

@@ -1,6 +1,6 @@
 /* ExtInfoRole.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -22,9 +22,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <AppKit/AppKit.h>
-#include "ExtInfoRole.h"
-#include "GNUstep.h"
+#import <AppKit/AppKit.h>
+#import <GNUstepBase/GNUstep.h>
+#import "ExtInfoRole.h"
+
 
 @implementation ExtInfoRole
 

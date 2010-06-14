@@ -1,6 +1,6 @@
 /* XTermPref.m
  *  
- * Copyright (C) 2003-2009 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -24,9 +24,10 @@
 
 #import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
+#import <GNUstepBase/GNUstep.h>
+
 #import "XTermPref.h"
 #import "GWorkspace.h"
-#import "GNUstep.h"
 
 static NSString *nibName = @"XTermPref";
 

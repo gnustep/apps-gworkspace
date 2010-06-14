@@ -24,10 +24,11 @@
 
 #import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
+#import <GNUstepBase/GNUstep.h>
+
 #import "GWFunctions.h"
 #import "FSNFunctions.h"
 #import "CompletionField.h"
-#import "GNUstep.h"
 
 @implementation CompletionField
 

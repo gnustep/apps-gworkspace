@@ -1,6 +1,6 @@
 /* GWorkspace.m
  *  
- * Copyright (C) 2003 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -22,33 +22,36 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
 #include <math.h>
-#include "GWFunctions.h"
-#include "FSNodeRep.h"
-#include "FSNFunctions.h"
-#include "GWorkspace.h"
-#include "Dialogs.h"
-#include "OpenWithController.h"
-#include "RunExternalController.h"
-#include "StartAppWin.h"
-#include "Preferences/PrefController.h"
-#include "Fiend/Fiend.h"
-#include "GWDesktopManager.h"
-#include "Dock.h"
-#include "GWViewersManager.h"
-#include "GWViewer.h"
-#include "GWSpatialViewer.h"
-#include "Finder.h"
-#include "Inspector.h"
-#include "Operation.h"
-#include "TShelf/TShelfWin.h"
-#include "TShelf/TShelfView.h"
-#include "TShelf/TShelfViewItem.h"
-#include "TShelf/TShelfIconsView.h"
-#include "History/History.h"
-#include "GNUstep.h"
+
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import <GNUstepBase/GNUstep.h>
+
+#import "GWFunctions.h"
+#import "FSNodeRep.h"
+#import "FSNFunctions.h"
+#import "GWorkspace.h"
+#import "Dialogs.h"
+#import "OpenWithController.h"
+#import "RunExternalController.h"
+#import "StartAppWin.h"
+#import "Preferences/PrefController.h"
+#import "Fiend/Fiend.h"
+#import "GWDesktopManager.h"
+#import "Dock.h"
+#import "GWViewersManager.h"
+#import "GWViewer.h"
+#import "GWSpatialViewer.h"
+#import "Finder.h"
+#import "Inspector.h"
+#import "Operation.h"
+#import "TShelf/TShelfWin.h"
+#import "TShelf/TShelfView.h"
+#import "TShelf/TShelfViewItem.h"
+#import "TShelf/TShelfIconsView.h"
+#import "History/History.h"
+
 
 static NSString *defaulteditor = @"nedit.app";
 static NSString *defaultxterm = @"xterm";

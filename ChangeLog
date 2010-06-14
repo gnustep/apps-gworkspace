@@ -10,6 +10,60 @@
 	* GWorkspace/TShelf/TShelfView.m:
 	Warning fixes.
 
+	* Recycler/GNUstep.h
+	* Tools/thumbnailer/GNUstep.h
+	* Operation/GNUstep.h
+	* GWorkspace/GNUstep.h
+	* FSNode/GNUstep.h
+	Deleted duplicate copies.
+
+	* Operation/FileOpInfo.m
+	* Operation/Operation.m
+	* Operation/Functions.m
+	* GWorkspace/main.m
+	* GWorkspace/Dialogs/RunExternalController.m
+	* GWorkspace/Dialogs/StartAppWin.m
+	* GWorkspace/Dialogs/CompletionField.m
+	* GWorkspace/Dialogs/OpenWithController.m
+	* GWorkspace/Dialogs/Dialogs.m
+	* GWorkspace/TShelf/TShelfIconsView.m
+	* GWorkspace/TShelf/TShelfIcon.m
+	* GWorkspace/TShelf/TShelfViewItem.m
+	* GWorkspace/TShelf/TShelfPBIcon.m
+	* GWorkspace/TShelf/TShelfView.m
+	* GWorkspace/TShelf/TShelfWin.m
+	* GWorkspace/Fiend/Fiend.m
+	* GWorkspace/Fiend/FiendLeaf.m
+	* GWorkspace/GWorkspace.m
+	* GWorkspace/FileViewer/GWViewerWindow.m
+	* GWorkspace/History/History.m
+	* GWorkspace/Preferences/IconsPref.m
+	* GWorkspace/Preferences/HiddenFilesPref.m
+	* GWorkspace/Preferences/OperationPrefs.m
+	* GWorkspace/Preferences/PrefController.m
+	* GWorkspace/Preferences/XTermPref.m
+	* GWorkspace/Preferences/HistoryPref.m
+	* GWorkspace/Preferences/DefSortOrderPref.m
+	* GWorkspace/Preferences/DefEditorPref.m
+	* GWorkspace/Preferences/BrowserViewerPref.m
+	* GWorkspace/GWFunctions.m
+	* GWorkspace/WorkspaceApplication.m
+	* Recycler/main.m
+	* Recycler/Dialogs/StartAppWin.m
+	* Recycler/RecyclerView.m
+	* Recycler/Preferences/RecyclerPrefs.m
+	* Recycler/Recycler.m
+	* Recycler/RecyclerIcon.m
+	* FSNode/FSNPathComponentsViewer.m
+	* FSNode/FSNBrowserMatrix.m
+	* FSNode/FSNFunctions.m
+	* FSNode/ExtendedInfo/Role/ExtInfoRole.m
+	* FSNode/FSNBrowser.m
+	* FSNode/FSNIcon.m
+	* FSNode/FSNode.m:
+	Cleaned up imports to use system GNUstep.h
+
+
 2010-06-11 Riccardo Mottola <rmottola@users.sf.net>
 
 	* DBKit/DBKFreeNodesPage.m

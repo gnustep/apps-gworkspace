@@ -1,6 +1,6 @@
 /* FSNIcon.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -22,14 +22,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
 #include <math.h>
-#include "FSNIcon.h"
-#include "FSNTextCell.h"
-#include "FSNode.h"
-#include "FSNFunctions.h"
-#include "GNUstep.h"
+
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import <GNUstepBase/GNUstep.h>
+
+#import "FSNIcon.h"
+#import "FSNTextCell.h"
+#import "FSNode.h"
+#import "FSNFunctions.h"
 
 #define BRANCH_SIZE 7
 #define ARROW_ORIGIN_X (BRANCH_SIZE + 4)

@@ -1,6 +1,6 @@
 /* RunExternalController.m
  *  
- * Copyright (C) 2003 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -23,13 +23,15 @@
  */
 
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "RunExternalController.h"
-#include "CompletionField.h"
-#include "GWorkspace.h"
-#include "FSNode.h"
-#include "GNUstep.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import <GNUstepBase/GNUstep.h>
+
+#import "RunExternalController.h"
+#import "CompletionField.h"
+#import "GWorkspace.h"
+#import "FSNode.h"
+
 
 static NSString *nibName = @"RunExternal";
 

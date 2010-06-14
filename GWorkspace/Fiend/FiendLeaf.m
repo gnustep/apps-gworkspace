@@ -1,6 +1,6 @@
 /* FiendLeaf.m
  *  
- * Copyright (C) 2003 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -22,16 +22,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "GWFunctions.h"
-#include "FiendLeaf.h"
-#include "Fiend.h"
-#include "GWorkspace.h"
-#include "FSNodeRep.h"
-#include "FSNFunctions.h"
-#include "GNUstep.h"
 #include <math.h>
+
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import <GNUstepBase/GNUstep.h>
+
+#import "GWFunctions.h"
+#import "FiendLeaf.h"
+#import "Fiend.h"
+#import "GWorkspace.h"
+#import "FSNodeRep.h"
+#import "FSNFunctions.h"
+
 
 #define ICON_SIZE 48
 #define INTERVALS 40.0

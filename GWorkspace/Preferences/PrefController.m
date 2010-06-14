@@ -1,6 +1,6 @@
 /* PrefController.m
  *  
- * Copyright (C) 2003 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -22,20 +22,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "PrefController.h"
-#include "DefEditorPref.h"
-#include "XTermPref.h"
-#include "DefSortOrderPref.h"
-#include "IconsPref.h"
-#include "HiddenFilesPref.h"
-#include "HistoryPref.h"
-#include "BrowserViewerPref.h"
-#include "DesktopPref.h"
-#include "OperationPrefs.h"
-#include "GWorkspace.h"
-#include "GNUstep.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import <GNUstepBase/GNUstep.h>
+
+#import "PrefController.h"
+#import "DefEditorPref.h"
+#import "XTermPref.h"
+#import "DefSortOrderPref.h"
+#import "IconsPref.h"
+#import "HiddenFilesPref.h"
+#import "HistoryPref.h"
+#import "BrowserViewerPref.h"
+#import "DesktopPref.h"
+#import "OperationPrefs.h"
+#import "GWorkspace.h"
+
 
 static NSString *nibName = @"PrefWindow";
 

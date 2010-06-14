@@ -22,13 +22,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
 #include <math.h>
-#include "FSNPathComponentsViewer.h"
-#include "FSNode.h"
-#include "FSNFunctions.h"
-#include "GNUstep.h"
+
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import <GNUstepBase/GNUstep.h>
+
+
+#import "FSNPathComponentsViewer.h"
+#import "FSNode.h"
+#import "FSNFunctions.h"
 
 #define BORDER 8.0
 

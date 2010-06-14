@@ -1,6 +1,6 @@
 /* TShelfWin.m
  *  
- * Copyright (C) 2003 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -22,14 +22,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "TShelfWin.h"
-#include "TShelfView.h"
-#include "TShelfViewItem.h"
-#include "TShelfIconsView.h"
-#include "Dialogs/Dialogs.h"
-#include "GNUstep.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import <GNUstepBase/GNUstep.h>
+
+#import "TShelfWin.h"
+#import "TShelfView.h"
+#import "TShelfViewItem.h"
+#import "TShelfIconsView.h"
+#import "Dialogs/Dialogs.h"
+
 
 #define SHELF_HEIGHT 106
 

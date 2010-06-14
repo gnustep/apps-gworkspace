@@ -1,6 +1,6 @@
 /* WorkspaceApplication.m
  *  
- * Copyright (C) 2006 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2006
@@ -22,9 +22,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
 #include <math.h>
+
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import <GNUstepBase/GNUstep.h>
+
 #include "GWorkspace.h"
 #include "GWFunctions.h"
 #include "FSNodeRep.h"
@@ -35,7 +38,6 @@
 #include "GWViewersManager.h"
 #include "Operation.h"
 #include "StartAppWin.h"
-#include "GNUstep.h"
 
 @implementation GWorkspace (WorkspaceApplication)
 

@@ -22,12 +22,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "GWFunctions.h"
 #include <math.h>
 #include <limits.h>
+
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import "GWFunctions.h"
+
 
 #define ONE_KB 1024
 #define ONE_MB (ONE_KB * ONE_KB)

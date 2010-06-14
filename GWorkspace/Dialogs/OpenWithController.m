@@ -1,6 +1,6 @@
 /* OpenWithController.m
  *  
- * Copyright (C) 2003 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -24,11 +24,13 @@
 
 #import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
+#import <GNUstepBase/GNUstep.h>
+
 #import "OpenWithController.h"
 #import "CompletionField.h"
 #import "GWorkspace.h"
 #import "FSNode.h"
-#import "GNUstep.h"
+
 
 static NSString *nibName = @"OpenWith";
 

@@ -1,6 +1,6 @@
 /* RecyclerView.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2004
@@ -22,13 +22,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
 #include <math.h>
-#include "RecyclerView.h"
-#include "RecyclerIcon.h"
-#include "FSNFunctions.h"
-#include "GNUstep.h"
+
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import <GNUstepBase/GNUstep.h>
+
+#import "RecyclerView.h"
+#import "RecyclerIcon.h"
+#import "FSNFunctions.h"
 
 #define WIN_SIZE 64
 #define ICN_SIZE 48

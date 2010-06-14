@@ -1,6 +1,6 @@
 /* Recycler.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2004
@@ -22,16 +22,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "Recycler.h"
-#include "RecyclerView.h"
-#include "Preferences/RecyclerPrefs.h"
-#include "Dialogs/StartAppWin.h"
-#include "FSNode.h"
-#include "FSNodeRep.h"
-#include "FSNFunctions.h"
-#include "GNUstep.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import <GNUstepBase/GNUstep.h>
+
+#import "Recycler.h"
+#import "RecyclerView.h"
+#import "Preferences/RecyclerPrefs.h"
+#import "Dialogs/StartAppWin.h"
+#import "FSNode.h"
+#import "FSNodeRep.h"
+#import "FSNFunctions.h"
+
 
 static Recycler *recycler = nil;
 

@@ -1,6 +1,6 @@
 /* GWViewerWindow.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2004
@@ -23,8 +23,9 @@
  */
 
 #import <AppKit/AppKit.h>
+#import <GNUstepBase/GNUstep.h>
 #import "GWViewerWindow.h"
-#import "GNUstep.h"
+
 
 @implementation GWViewerWindow
 

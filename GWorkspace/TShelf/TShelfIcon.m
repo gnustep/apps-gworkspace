@@ -1,6 +1,6 @@
 /* TShelfIcon.m
  *  
- * Copyright (C) 2003 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -22,15 +22,17 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "FSNodeRep.h"
-#include "FSNFunctions.h"
-#include "GWFunctions.h"
-#include "TShelfIcon.h"
-#include "TShelfIconsView.h"
-#include "GWorkspace.h"
-#include "GNUstep.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import <GNUstepBase/GNUstep.h>
+
+#import "FSNodeRep.h"
+#import "FSNFunctions.h"
+#import "GWFunctions.h"
+#import "TShelfIcon.h"
+#import "TShelfIconsView.h"
+#import "GWorkspace.h"
+
 
 #define ICON_SIZE 48
 
