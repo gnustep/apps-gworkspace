@@ -1,6 +1,6 @@
 /* DBKBTreeNode.m
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2005
@@ -94,11 +94,12 @@
   [self setNodeData: [tree dataForNode: self]];
 }
 
-- (void)unload
+- (BOOL)unload
 {
   [keys removeAllObjects];
   [subnodes removeAllObjects];
   loaded = NO;
+  return YES;
 }
 
 - (void)setNodeData:(NSData *)ndata

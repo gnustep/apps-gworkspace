@@ -1,6 +1,6 @@
 /* DBKBTreeNode.h
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2005
@@ -60,7 +60,8 @@
 
 - (void)loadNodeData;
 
-- (void)unload;
+/** we use BOOL so not to conflict with the signature of NSBundle's unload */
+- (BOOL)unload;
 
 - (void)setNodeData:(NSData *)ndata;
 
