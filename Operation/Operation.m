@@ -66,10 +66,10 @@
 
 - (void)performOperation:(NSDictionary *)opdict
 {
-	NSString *operation = [opdict objectForKey: @"operation"];
-	NSString *source = [opdict objectForKey: @"source"];
-	NSString *destination = [opdict objectForKey: @"destination"];
-	NSArray *files = [opdict objectForKey: @"files"];
+  NSString *operation = [opdict objectForKey: @"operation"];
+  NSString *source = [opdict objectForKey: @"source"];
+  NSString *destination = [opdict objectForKey: @"destination"];
+  NSArray *files = [opdict objectForKey: @"files"];
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   NSString *confirmString = [operation stringByAppendingString: @"Confirm"];
   BOOL confirm = !([defaults boolForKey: confirmString]);
@@ -111,6 +111,7 @@
     opbase = [source stringByDeletingLastPathComponent];
   }
   
+  action = MOVE;
   if ([operation isEqual: @"NSWorkspaceMoveOperation"]
                || [operation isEqual: @"NSWorkspaceRecycleOperation"]
                || [operation isEqual: @"GWorkspaceRecycleOutOperation"]) {    

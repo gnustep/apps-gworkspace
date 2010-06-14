@@ -7,6 +7,7 @@
 	* GWorkspace/FileViewer/GWViewerPathsPopUp.m
 	* GWorkspace/Fiend/FiendLeaf.m
 	* GWorkspace/WorkspaceApplication.m
+	* Inspector/ContentViewers/NSRTFViewer/NSRTFViewer.m
 	* GWorkspace/TShelf/TShelfView.m:
 	Warning fixes.
 
