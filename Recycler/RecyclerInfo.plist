@@ -2,7 +2,15 @@
     NSIcon = "Recycler.tiff";
     NSRole = "NSNone";
     ApplicationDescription = "Recycler";
+    ApplicationDescription = "Workspace Manager";
     ApplicationIcon = "Recycler.tiff";
     ApplicationName = "Recycler";
-    ApplicationRelease = "0.8.8;
+    ApplicationRelease = "0.8.8";
+    NSBuildVersion = "06 2010";
+    Authors = (
+      "Riccardo Mottola",
+      "Enrico Sersale"
+    );
+    Copyright = "Copyright (C) 2004-2010 Free Software Foundation, Inc.";
+    CopyrightDescription = "Released under the GNU General Public License 2.0 or later";
 }

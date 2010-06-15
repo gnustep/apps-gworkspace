@@ -555,21 +555,7 @@ static Recycler *recycler = nil;
 
 - (void)showInfo:(id)sender
 {
-  NSMutableDictionary *d = AUTORELEASE ([NSMutableDictionary new]);
-  [d setObject: @"Recycler" forKey: @"ApplicationName"];
-  [d setObject: NSLocalizedString(@"-----------------------", @"")
-      	forKey: @"ApplicationDescription"];
-  [d setObject: @"Desktop 0.7" forKey: @"ApplicationRelease"];
-  [d setObject: @"06 2004" forKey: @"FullVersionID"];
-  [d setObject: [NSArray arrayWithObjects: @"Enrico Sersale <enrico@imago.ro>.", nil]
-        forKey: @"Authors"];
-  [d setObject: NSLocalizedString(@"See http://www.gnustep.it/enrico/gworkspace", @"") forKey: @"URL"];
-  [d setObject: @"Copyright (C) 2004 Free Software Foundation, Inc."
-        forKey: @"Copyright"];
-  [d setObject: NSLocalizedString(@"Released under the GNU General Public License 2.0", @"")
-        forKey: @"CopyrightDescription"];
-  
-  [NSApp orderFrontStandardInfoPanelWithOptions: d];
+  [NSApp orderFrontStandardInfoPanel: self];
 }
 
 @end
