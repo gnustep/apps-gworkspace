@@ -1,6 +1,6 @@
 /* main.m
  *  
- * Copyright (C) 2003 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -112,10 +112,10 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
   RELEASE (thumbnailers);
   RELEASE (extProviders);
   RELEASE (thumbnailDir);
-  TEST_RELEASE (dictPath);
-  TEST_RELEASE (thumbsDict);
+  RELEASE (dictPath);
+  RELEASE (thumbsDict);
   DESTROY (conn);
-	[super dealloc];
+  [super dealloc];
 }
 
 - (id)init
