@@ -1,6 +1,6 @@
 /* FileOpInfo.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -22,8 +22,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#ifndef FILE_OP_INFO_H
-#define FILE_OP_INFO_H
 
 #import <Foundation/Foundation.h>
 
@@ -269,5 +267,3 @@
 
 @end
 
-
-#endif // FILE_OP_INFO_H
