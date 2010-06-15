@@ -1,6 +1,6 @@
 /* GWDesktopManager.m
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -50,12 +50,12 @@ static GWDesktopManager *desktopManager = nil;
 {
   [[ws notificationCenter] removeObserver: self];
   [nc removeObserver: self];
-  TEST_RELEASE (dskNode);
-  TEST_RELEASE (win);
-  TEST_RELEASE (dock);
+  RELEASE (dskNode);
+  RELEASE (win);
+  RELEASE (dock);
   RELEASE (mpointWatcher);
     
-	[super dealloc];
+  [super dealloc];
 }
 
 - (id)init

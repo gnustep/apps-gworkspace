@@ -1,6 +1,6 @@
 /* GWViewerIconsPath.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2004
@@ -47,7 +47,7 @@
 - (void)dealloc
 {
   RELEASE (icons);
-  TEST_RELEASE (extInfoType);
+  RELEASE (extInfoType);
   RELEASE (labelFont);
   RELEASE (backColor);
   RELEASE (textColor);

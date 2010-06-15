@@ -56,10 +56,10 @@
   RELEASE (leftArr);
   RELEASE (rightArr);
   RELEASE (currentName);
-  TEST_RELEASE (freePositions);
+  RELEASE (freePositions);
   RELEASE (tile);  
   RELEASE (myWin);
-	[super dealloc];
+  [super dealloc];
 }
 
 - (id)init

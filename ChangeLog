@@ -11,6 +11,28 @@
 	* Operation/Resources/English.lproj/FileOperationWin.gorm
 	Changed to use the standard NSProgressIndicator
 
+	* Tools/fswatcher/fswatcher-inotify.m
+	* Tools/fswatcher/fswatcher.m
+	* GWorkspace/Dialogs/StartAppWin.m
+	* GWorkspace/Fiend/Fiend.m
+	* GWorkspace/Fiend/FiendLeaf.m
+	* GWorkspace/TShelf/TShelfIconsView.m
+	* GWorkspace/TShelf/TShelfIcon.m
+	* GWorkspace/TShelf/TShelfViewItem.m
+	* GWorkspace/GWorkspace.m
+	* GWorkspace/FileViewer/GWViewer.m
+	* GWorkspace/FileViewer/GWViewerIconsPath.m
+	* GWorkspace/FileViewer/GWSpatialViewer.m
+	* GWorkspace/FileViewer/GWViewerShelf.m
+	* GWorkspace/Finder/SearchResults/SearchResults.m
+	* GWorkspace/Finder/Modules/FModuleOwner/FModuleOwner.m
+	* GWorkspace/Desktop/Dock/DockIcon.m
+	* GWorkspace/Desktop/Dock/Dock.m
+	* GWorkspace/Desktop/GWDesktopManager.m
+	* GWorkspace/Desktop/GWDesktopView.m
+	* GWorkspace/WorkspaceApplication.m
+	Removed TEST_ macros for conventional ones, they just waste a test instruction
+	
 2010-06-14 Riccardo Mottola <rmottola@users.sf.net>
 
 	* DBKit/DBKBTreeNode.[h,m]: change unload signature to BOOL to avoid

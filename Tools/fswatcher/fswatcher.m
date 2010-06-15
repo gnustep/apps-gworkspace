@@ -1,6 +1,6 @@
 /* fswatcher.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: February 2004
@@ -35,8 +35,8 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 
 - (void)dealloc
 {
-  TEST_RELEASE (conn);
-  TEST_RELEASE (client);
+  RELEASE (conn);
+  RELEASE (client);
   RELEASE (wpaths);
   [super dealloc];
 }

@@ -58,10 +58,10 @@ static NSString *lsfname = @"LiveSearch.lsf";
     DESTROY (toolConn);
   }
 
-  TEST_RELEASE (win);
-  TEST_RELEASE (searchCriteria);
-  TEST_RELEASE (foundObjects);
-  TEST_RELEASE (searchPaths);
+  RELEASE (win);
+  RELEASE (searchCriteria);
+  RELEASE (foundObjects);
+  RELEASE (searchPaths);
   RELEASE (elementsStr);
   DESTROY (conn);
         
@@ -70,7 +70,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
 
 - (id)init
 {
-	self = [super init];
+  self = [super init];
 
   if (self) {
     NSUserDefaults *defaults;

@@ -61,8 +61,8 @@
 
   RELEASE (baseNode);
   RELEASE (baseNodeArray);
-  TEST_RELEASE (lastSelection);
-  TEST_RELEASE (rootViewerKey);
+  RELEASE (lastSelection);
+  RELEASE (rootViewerKey);
   RELEASE (watchedNodes);
   RELEASE (vwrwin);
   RELEASE (viewType);

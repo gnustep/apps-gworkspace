@@ -48,9 +48,9 @@
   }
   RELEASE (paths);
   RELEASE (name);
-	TEST_RELEASE (hostname);
-	TEST_RELEASE (node);
-	RELEASE (namelabel);
+  RELEASE (hostname);
+  RELEASE (node);
+  RELEASE (namelabel);
   RELEASE (icon);
   RELEASE (highlightPath);
   [super dealloc];
@@ -175,8 +175,8 @@
 {
   int count;
 
-	TEST_RELEASE (paths);
-	TEST_RELEASE (node);
+  RELEASE (paths);
+  RELEASE (node);
 	paths = [[NSMutableArray alloc] initWithCapacity: 1];
 	[paths addObjectsFromArray: fpaths];
   count = [paths count];                    
@@ -217,7 +217,7 @@
 		} 			
 		ASSIGN (hostname, hname);			
   } else {
-		TEST_RELEASE (hostname);
+		RELEASE (hostname);
 		hostname = nil;
 	}
 

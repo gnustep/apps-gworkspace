@@ -1,6 +1,6 @@
 /* Dock.m
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -40,9 +40,9 @@
 {
   RELEASE (icons);
   RELEASE (backColor);
-  TEST_RELEASE (backImage);
+  RELEASE (backImage);
   
-	[super dealloc];
+  [super dealloc];
 }
 
 - (id)initForManager:(id)mngr

@@ -46,7 +46,7 @@
 {
   RELEASE (label);
   RELEASE (view);
-  TEST_RELEASE (color);
+  RELEASE (color);
   RELEASE (labfont);
   
   [super dealloc];

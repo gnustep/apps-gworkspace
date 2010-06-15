@@ -993,7 +993,7 @@
     DESTROY (app);
   }
   
-  return TEST_AUTORELEASE (app);  
+  return AUTORELEASE (app);  
 }
 
 + (id)appWithApplicationPath:(NSString *)apath
@@ -1013,7 +1013,7 @@
     [app connectApplication: YES];
   }
   
-  return TEST_AUTORELEASE (app);  
+  return AUTORELEASE (app);  
 }
 
 - (void)dealloc
@@ -1027,8 +1027,8 @@
   
   RELEASE (name);
   RELEASE (path);
-  TEST_RELEASE (identifier);
-  TEST_RELEASE (task);
+  RELEASE (identifier);
+  RELEASE (task);
     
   [super dealloc];
 }

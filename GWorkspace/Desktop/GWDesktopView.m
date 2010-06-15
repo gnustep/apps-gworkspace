@@ -61,9 +61,9 @@
 	}
   RELEASE (mountedVolumes);
   RELEASE (desktopInfo);
-  TEST_RELEASE (backImage);
-  TEST_RELEASE (imagePath);
-  TEST_RELEASE (dragIcon);
+  RELEASE (backImage);
+  RELEASE (imagePath);
+  RELEASE (dragIcon);
 
   [super dealloc];
 }

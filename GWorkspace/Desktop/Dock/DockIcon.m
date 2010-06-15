@@ -1,6 +1,6 @@
 /* DockIcon.m
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -36,10 +36,10 @@
 - (void)dealloc
 {
   RELEASE (appName);
-  TEST_RELEASE (highlightColor);
-  TEST_RELEASE (darkerColor);
-  TEST_RELEASE (highlightImage);
-  TEST_RELEASE (trashFullIcon);
+  RELEASE (highlightColor);
+  RELEASE (darkerColor);
+  RELEASE (highlightImage);
+  RELEASE (trashFullIcon);
   RELEASE (dragIcon);
   
   [super dealloc];

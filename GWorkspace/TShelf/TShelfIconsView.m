@@ -91,9 +91,9 @@
 	if (gpoints != NULL) {
 		NSZoneFree (NSDefaultMallocZone(), gpoints);
 	}
-	RELEASE (icons);  
-	RELEASE (watchedPaths);
-	TEST_RELEASE (dragImage);
+  RELEASE (icons);  
+  RELEASE (watchedPaths);
+  RELEASE (dragImage);
   RELEASE (focusedIconLabel);
   [super dealloc];
 }

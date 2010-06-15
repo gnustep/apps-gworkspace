@@ -77,13 +77,13 @@
 
 - (void)dealloc
 {
-  TEST_RELEASE (node);
-  TEST_RELEASE (layerName);
+  RELEASE (node);
+  RELEASE (layerName);
   RELEASE (tile);
-  TEST_RELEASE (hightile);	
-  TEST_RELEASE (icon);
-  TEST_RELEASE (namelabel);
-	[super dealloc];
+  RELEASE (hightile);	
+  RELEASE (icon);
+  RELEASE (namelabel);
+  [super dealloc];
 }
 
 - (id)initWithPosX:(int)px

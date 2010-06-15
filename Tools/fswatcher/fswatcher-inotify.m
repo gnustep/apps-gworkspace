@@ -1,6 +1,6 @@
 /* fswatcher-inotify.m
  *  
- * Copyright (C) 2007 Free Software Foundation, Inc.
+ * Copyright (C) 2007-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@fibernet.ro>
  * Date: Ianuary 2007
@@ -40,8 +40,8 @@ static NSString *GWWatchedPathRenamed = @"GWWatchedPathRenamed";
 
 - (void)dealloc
 {
-	TEST_RELEASE (conn);
-	TEST_RELEASE (client);
+  RELEASE (conn);
+  RELEASE (client);
   RELEASE (wpaths);
   [super dealloc];
 }

@@ -1,6 +1,6 @@
 /* GWViewerShelf.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2004
@@ -48,11 +48,12 @@
 	[self unsetWatchers];
   RELEASE (watchedPaths);
   RELEASE (icons);
-  TEST_RELEASE (extInfoType);
-	if (grid != NULL) {
-		NSZoneFree (NSDefaultMallocZone(), grid);
-	}
-  TEST_RELEASE (dragIcon);
+  RELEASE (extInfoType);
+  if (grid != NULL)
+    {
+      NSZoneFree (NSDefaultMallocZone(), grid);
+    }
+  RELEASE (dragIcon);
   RELEASE (focusedIconLabel);  
   RELEASE (backColor);
   RELEASE (textColor);
