@@ -1,3 +1,8 @@
+2010-06-15 Riccardo Mottola <rmottola@users.sf.net>
+
+	* Inspector/ContentViewers/NSRTFViewer/NSRTFViewer.m
+	Warning fix
+
 2010-06-14 Riccardo Mottola <rmottola@users.sf.net>
 
 	* DBKit/DBKBTreeNode.[h,m]: change unload signature to BOOL to avoid

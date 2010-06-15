@@ -123,7 +123,7 @@
              ofType:(NSString *)type
 {
   NSAttributedString *attrstr = nil;
-  int index;
+  int index = 0;
 
   index = -1;
   if ([type isEqual: NSStringPboardType]) {
