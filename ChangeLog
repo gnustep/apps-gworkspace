@@ -3,6 +3,14 @@
 	* Inspector/ContentViewers/NSRTFViewer/NSRTFViewer.m
 	Warning fix
 
+	* Operation/Resources/Images/progind.tiff
+	Deleted
+
+	* Operation/FileOpInfo.h
+	* Operation/FileOpInfo.m
+	* Operation/Resources/English.lproj/FileOperationWin.gorm
+	Changed to use the standard NSProgressIndicator
+
 2010-06-14 Riccardo Mottola <rmottola@users.sf.net>
 
 	* DBKit/DBKBTreeNode.[h,m]: change unload signature to BOOL to avoid

@@ -50,7 +50,6 @@ static NSString *nibName = @"FileOperationWin";
   TEST_RELEASE (notifNames);
   TEST_RELEASE (win);
   TEST_RELEASE (progInd);
-  TEST_RELEASE (progView);
   
   DESTROY (executor);
   DESTROY (execconn);
@@ -84,30 +83,26 @@ static NSString *nibName = @"FileOperationWin";
                     winrect:(NSRect)wrect
                  controller:(id)cntrl
 {
-	self = [super init];
+  self = [super init];
 
-  if (self) {
-    win = nil;
-    showwin = uwnd;
+  if (self)
+    {
+      win = nil;
+      showwin = uwnd;
   
-    if (showwin) {
-      NSRect r;
-      
-		  if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
-        NSLog(@"failed to load %@!", nibName);
-        DESTROY (self);
-        return self;
-      }
+      if (showwin) {
+	if ([NSBundle loadNibNamed: nibName owner: self] == NO)
+	  {
+	    NSLog(@"failed to load %@!", nibName);
+	    DESTROY (self);
+	    return self;
+	  }
       
       if (NSEqualRects(wrect, NSZeroRect) == NO) {
         [win setFrame: wrect display: NO];
       } else if ([win setFrameUsingName: @"fopinfo"] == NO) {
         [win setFrame: NSMakeRect(300, 300, 282, 102) display: NO];
       }
-
-      RETAIN (progInd);
-      r = [[progBox contentView] bounds];
-      progView = [[OpProgressView alloc] initWithFrame: r refreshInterval: 0.05];
 
       [fromLabel setStringValue: NSLocalizedString(@"From:", @"")];
       [toLabel setStringValue: NSLocalizedString(@"To:", @"")];
@@ -139,10 +134,10 @@ static NSString *nibName = @"FileOperationWin";
         NSString *ext = [newname pathExtension]; 
         NSString *base = [newname stringByDeletingPathExtension];        
         NSString *ntmp;
-	      NSString *destpath;        
+	NSString *destpath;        
         int count = 1;
 	      
-	      while (1) {
+	while (1) {
           if (count == 1) {
             ntmp = [NSString stringWithFormat: @"%@%@", base, copystr];
             if ([ext length]) {
@@ -393,8 +388,8 @@ static NSString *nibName = @"FileOperationWin";
       [toField setStringValue: @""];    
     }
     
-    [progBox setContentView: progView];
-    [progView start];
+    [progInd setIndeterminate: YES];
+    [progInd startAnimation: self];
   }
   
   [win orderFront: nil];
@@ -403,8 +398,8 @@ static NSString *nibName = @"FileOperationWin";
 
 - (void)setNumFiles:(int)n
 {
-  [progView stop];  
-  [progBox setContentView: progInd];
+  [progInd stopAnimation: self];
+  [progInd setIndeterminate: NO];
   [progInd setMinValue: 0.0];
   [progInd setMaxValue: n];
   [progInd setDoubleValue: 0.0];
@@ -419,8 +414,8 @@ static NSString *nibName = @"FileOperationWin";
 - (void)endOperation
 {
   if (showwin) {
-    if ([progBox contentView] == progView) {
-      [progView stop];  
+    if ([progInd isIndeterminate]) {
+      [progInd stopAnimation:self];  
     }
     [win saveFrameUsingName: @"fopinfo"];
     [win close];
@@ -453,17 +448,14 @@ static NSString *nibName = @"FileOperationWin";
     [notifNames addObject: name];
   }
   
-	[dict setObject: type forKey: @"operation"];	
+  [dict setObject: type forKey: @"operation"];	
   [dict setObject: source forKey: @"source"];	
   [dict setObject: destination forKey: @"destination"];	
   [dict setObject: notifNames forKey: @"files"];	
 
-  [nc postNotificationName: @"GWFileSystemWillChangeNotification"
-	 								  object: dict];
+  [nc postNotificationName: @"GWFileSystemWillChangeNotification" object: dict];
 
-	[dnc postNotificationName: @"GWFileSystemWillChangeNotification"
-	 								   object: nil 
-                   userInfo: dict];
+  [dnc postNotificationName: @"GWFileSystemWillChangeNotification" object: nil userInfo: dict];
   RELEASE (arp);
 }
 
@@ -472,7 +464,7 @@ static NSString *nibName = @"FileOperationWin";
   CREATE_AUTORELEASE_POOL(arp);
   NSMutableDictionary *notifObj = [NSMutableDictionary dictionary];		
 
-	[notifObj setObject: type forKey: @"operation"];	
+  [notifObj setObject: type forKey: @"operation"];	
   [notifObj setObject: source forKey: @"source"];	
   [notifObj setObject: destination forKey: @"destination"];	
   
@@ -489,12 +481,9 @@ static NSString *nibName = @"FileOperationWin";
   
   opdone = YES;			
 
-  [nc postNotificationName: @"GWFileSystemDidChangeNotification"
-	 								  object: notifObj];
+  [nc postNotificationName: @"GWFileSystemDidChangeNotification" object: notifObj];
 
-	[dnc postNotificationName: @"GWFileSystemDidChangeNotification"
-	 						       object: nil 
-                   userInfo: notifObj];  
+  [dnc postNotificationName: @"GWFileSystemDidChangeNotification" object: nil userInfo: notifObj];  
   RELEASE (arp);
 }
 
@@ -1311,14 +1300,13 @@ filename = [fileinfo objectForKey: @"name"];
 
 @end
 
-
+/*
 @implementation OpProgressView
 
 #define PROG_IND_MAX (-28)
 
 - (void)dealloc
 {
-  RELEASE (image);
   [super dealloc];
 }
 
@@ -1329,11 +1317,9 @@ filename = [fileinfo objectForKey: @"name"];
 
   if (self) {
     NSBundle *bundle = [NSBundle bundleForClass: [Operation class]];
-    NSString *path = [bundle pathForResource: @"progind" ofType: @"tiff"];
- 
-    image = [[NSImage alloc] initWithContentsOfFile: path];     
-    rfsh = refresh;
-    orx = PROG_IND_MAX;
+  
+    //    rfsh = refresh;
+    //    orx = PROG_IND_MAX;
   }
 
   return self;
@@ -1342,7 +1328,7 @@ filename = [fileinfo objectForKey: @"name"];
 - (void)start
 {
   progTimer = [NSTimer scheduledTimerWithTimeInterval: rfsh 
-						            target: self selector: @selector(animate:) 
+						            target: self selector: @selector(startAnimation:) 
 																					userInfo: nil repeats: YES];
 }
 
@@ -1369,4 +1355,6 @@ filename = [fileinfo objectForKey: @"name"];
                 operation: NSCompositeSourceOver];
 }
 
+
 @end
+*/

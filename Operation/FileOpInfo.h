@@ -25,10 +25,9 @@
 #ifndef FILE_OP_INFO_H
 #define FILE_OP_INFO_H
 
-#include <Foundation/Foundation.h>
+#import <Foundation/Foundation.h>
 
 @class FileOpExecutor;
-@class OpProgressView;
 
 
 @protocol FileOpInfoProtocol
@@ -110,9 +109,7 @@
   IBOutlet id fromField;
   IBOutlet id toLabel;
   IBOutlet id toField;
-  IBOutlet NSBox *progBox;
-  IBOutlet id progInd;
-  OpProgressView *progView;
+  IBOutlet NSProgressIndicator *progInd;
   IBOutlet id pauseButt;
   IBOutlet id stopButt;  
 }
@@ -272,24 +269,5 @@
 
 @end
 
-
-@interface OpProgressView : NSView 
-{
-  NSImage *image;
-  float orx;
-  float rfsh;
-  NSTimer *progTimer;
-}
-
-- (id)initWithFrame:(NSRect)frameRect 
-    refreshInterval:(float)refresh;
-
-- (void)start;
-
-- (void)stop;
-
-- (void)animate:(id)sender;
-
-@end
 
 #endif // FILE_OP_INFO_H
