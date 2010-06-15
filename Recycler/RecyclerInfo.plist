@@ -4,5 +4,5 @@
     ApplicationDescription = "Recycler";
     ApplicationIcon = "Recycler.tiff";
     ApplicationName = "Recycler";
-    ApplicationRelease = "0.7.1";
+    ApplicationRelease = "0.8.8;
 }
