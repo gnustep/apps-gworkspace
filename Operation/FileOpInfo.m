@@ -657,12 +657,12 @@ static NSString *nibName = @"FileOperationWin";
 
 - (void)dealloc
 {
-  TEST_RELEASE (operation);
-  TEST_RELEASE (source);
-  TEST_RELEASE (destination);
-  TEST_RELEASE (files);
-  TEST_RELEASE (procfiles);
-	[super dealloc];
+  RELEASE (operation);
+  RELEASE (source);
+  RELEASE (destination);
+  RELEASE (files);
+  RELEASE (procfiles);
+  [super dealloc];
 }
 
 - (id)init

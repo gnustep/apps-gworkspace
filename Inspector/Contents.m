@@ -377,7 +377,7 @@ static NSString *nibName = @"Contents";
 
 - (void)dealloc
 {
-  TEST_RELEASE (editPath);	
+  RELEASE (editPath);	
   [super dealloc];
 }
 
@@ -537,11 +537,11 @@ static NSString *nibName = @"Contents";
   if (task && [task isRunning]) {
     [task terminate];
 	}
-  TEST_RELEASE (task);
-  TEST_RELEASE (pipe);
-  TEST_RELEASE (shComm);
-  TEST_RELEASE (fileComm);  
-	[super dealloc];
+  RELEASE (task);
+  RELEASE (pipe);
+  RELEASE (shComm);
+  RELEASE (fileComm);  
+  [super dealloc];
 }
 
 - (id)initWithFrame:(NSRect)frameRect

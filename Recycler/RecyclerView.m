@@ -91,8 +91,8 @@
 - (void)dealloc
 {
   RELEASE (tile);
-  TEST_RELEASE (win);
-	[super dealloc];
+  RELEASE (win);
+  [super dealloc];
 }
 
 - (id)init

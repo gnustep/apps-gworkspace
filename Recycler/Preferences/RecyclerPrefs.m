@@ -39,7 +39,7 @@ static NSString *nibName = @"PreferencesWin";
 
 - (void)dealloc
 {
-  TEST_RELEASE (win);
+  RELEASE (win);
   [super dealloc];
 }
 

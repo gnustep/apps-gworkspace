@@ -39,7 +39,7 @@ static id <DesktopApplication> desktopApp = nil;
 
 - (void)dealloc
 {
-  TEST_RELEASE (trashFullIcon);
+  RELEASE (trashFullIcon);
   [super dealloc];
 }
 

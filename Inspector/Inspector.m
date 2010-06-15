@@ -1,6 +1,6 @@
 /* Inspector.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
@@ -45,12 +45,12 @@ static NSString *nibName = @"InspectorWin";
 - (void)dealloc
 {
   [nc removeObserver: self];
-  TEST_RELEASE (watchedPath);
-  TEST_RELEASE (currentPaths);
+  RELEASE (watchedPath);
+  RELEASE (currentPaths);
   RELEASE (inspectors);
-  TEST_RELEASE (win);
-    
-	[super dealloc];
+  RELEASE (win);
+   
+  [super dealloc];
 }
 
 - (id)init

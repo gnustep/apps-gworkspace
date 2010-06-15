@@ -1,6 +1,6 @@
 /* TimeDateView.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
@@ -34,16 +34,16 @@ static const int posy[4]  = { 1, 13, 29, 38 };
 
 - (void)dealloc
 {
-	TEST_RELEASE (maskImage);
-	TEST_RELEASE (hour1Image);
-	TEST_RELEASE (hour2Image);
-	TEST_RELEASE (hour3Image);
-	TEST_RELEASE (minute1Image);
-	TEST_RELEASE (minute2Image);
-	TEST_RELEASE (dayweekImage);
-	TEST_RELEASE (daymont1Image);
-	TEST_RELEASE (daymont2Image);
-	TEST_RELEASE (monthImage);
+  RELEASE (maskImage);
+  RELEASE (hour1Image);
+  RELEASE (hour2Image);
+  RELEASE (hour3Image);
+  RELEASE (minute1Image);
+  RELEASE (minute2Image);
+  RELEASE (dayweekImage);
+  RELEASE (daymont1Image);
+  RELEASE (daymont2Image);
+  RELEASE (monthImage);
   [super dealloc];
 }
 

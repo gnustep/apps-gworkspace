@@ -1,6 +1,6 @@
 /* Tools.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
@@ -39,12 +39,12 @@ static NSString *nibName = @"Tools";
 
 - (void)dealloc
 {
-	TEST_RELEASE (toolsBox); 
-	TEST_RELEASE (errLabel); 
-	TEST_RELEASE (mainBox);   
-	TEST_RELEASE (insppaths);
-  TEST_RELEASE (extensions);
-	TEST_RELEASE (currentApp);
+  RELEASE (toolsBox); 
+  RELEASE (errLabel); 
+  RELEASE (mainBox);   
+  RELEASE (insppaths);
+  RELEASE (extensions);
+  RELEASE (currentApp);
   
   [super dealloc];
 }
@@ -196,7 +196,7 @@ static NSString *nibName = @"Tools";
 		
   ASSIGN (insppaths, paths);
 
-	TEST_RELEASE (extensions);
+  RELEASE (extensions);
   extensions = [NSMutableArray new];
   extensionsAndApps = [NSMutableDictionary dictionary];
 
@@ -227,7 +227,7 @@ static NSString *nibName = @"Tools";
     NSString *ext = [extensions objectAtIndex: 0];
     commonApps = [NSArray arrayWithArray: [extensionsAndApps objectForKey: ext]];    
     currentApp = [ws getBestAppInRole: nil forExtension: ext];
-    TEST_RETAIN (currentApp);			
+    RETAIN (currentApp);			
 		
   } else {
     int j, n;
