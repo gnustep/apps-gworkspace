@@ -1,6 +1,6 @@
 /* DDBPathsManager.m
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2005
@@ -36,8 +36,8 @@
   RELEASE (mdstorage);
   RELEASE (vlfile);
   RELEASE (tree);
-  TEST_RELEASE (dummyPaths[0]);
-  TEST_RELEASE (dummyPaths[1]);
+  RELEASE (dummyPaths[0]);
+  RELEASE (dummyPaths[1]);
   RELEASE (dummyOffsets[0]);
   RELEASE (dummyOffsets[1]);
   RELEASE (mdmodules);
@@ -149,10 +149,10 @@
   
   [tree end];  
   DESTROY (dummyPaths[0]);
-  TEST_RETAIN (ddbpath);
+  RETAIN (ddbpath);
   RELEASE (arp);
   
-  return TEST_AUTORELEASE (ddbpath);  
+  return AUTORELEASE (ddbpath);  
 }
 
 - (DDBPath *)addPath:(NSString *)path
@@ -193,7 +193,7 @@
   DESTROY (dummyPaths[0]);  
   RELEASE (arp);
   
-  return TEST_AUTORELEASE (ddbpath);
+  return AUTORELEASE (ddbpath);
 }
 
 - (void)removePath:(NSString *)path
@@ -554,7 +554,7 @@
 - (void)dealloc
 {
   RELEASE (path);
-  TEST_RELEASE (mdpath);
+  RELEASE (mdpath);
       
   [super dealloc];
 }

@@ -1,6 +1,6 @@
 /* ddbd.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: February 2004
@@ -213,10 +213,10 @@ static NSFileManager *fm = nil;
     data = [NSArchiver archivedDataWithRootObject: directories]; 
   } 
 
-  TEST_RETAIN (data);
+  RETAIN (data);
   RELEASE (pool);
   
-  return TEST_AUTORELEASE (data);
+  return AUTORELEASE (data);
 }
 
 - (NSArray *)userMetadataForPath:(NSString *)apath
@@ -228,7 +228,7 @@ static NSFileManager *fm = nil;
   usrdata = [pathsManager metadataForPath: apath];
   [pathslock unlock];
 
-  TEST_RETAIN (usrdata);
+  RETAIN (usrdata);
   RELEASE (arp);
 
   return usrdata;
@@ -244,7 +244,7 @@ static NSFileManager *fm = nil;
                                      forPath: path];
   [pathslock unlock];
 
-  TEST_RETAIN (annotations);
+  RETAIN (annotations);
   RELEASE (arp);
 
   return annotations;

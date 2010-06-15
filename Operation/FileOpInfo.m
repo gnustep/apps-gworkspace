@@ -43,13 +43,13 @@ static NSString *nibName = @"FileOperationWin";
 {
   RELEASE (operationDict);
   RELEASE (type);
-  TEST_RELEASE (source);
-  TEST_RELEASE (destination);
-  TEST_RELEASE (files);
-  TEST_RELEASE (dupfiles);
-  TEST_RELEASE (notifNames);
-  TEST_RELEASE (win);
-  TEST_RELEASE (progInd);
+  RELEASE (source);
+  RELEASE (destination);
+  RELEASE (files);
+  RELEASE (dupfiles);
+  RELEASE (notifNames);
+  RELEASE (win);
+  RELEASE (progInd);
   
   DESTROY (executor);
   DESTROY (execconn);

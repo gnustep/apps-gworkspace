@@ -1,6 +1,6 @@
 /* Contents.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
@@ -48,11 +48,11 @@ static NSString *nibName = @"Contents";
 - (void)dealloc
 {
   RELEASE (viewers);
-  TEST_RELEASE (currentPath);
-  TEST_RELEASE (genericView);
-  TEST_RELEASE (noContsView);
-  TEST_RELEASE (mainBox);
-  TEST_RELEASE (pboardImage);
+  RELEASE (currentPath);
+  RELEASE (genericView);
+  RELEASE (noContsView);
+  RELEASE (mainBox);
+  RELEASE (pboardImage);
       
   [super dealloc];
 }

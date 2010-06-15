@@ -1,6 +1,6 @@
 /* DDBDirsManager.m
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2005
@@ -33,8 +33,8 @@
 {
   RELEASE (vlfile);
   RELEASE (tree);
-  TEST_RELEASE (dummyPaths[0]);
-  TEST_RELEASE (dummyPaths[1]);
+  RELEASE (dummyPaths[0]);
+  RELEASE (dummyPaths[1]);
   RELEASE (dummyOffsets[0]);
   RELEASE (dummyOffsets[1]);
       

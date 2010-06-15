@@ -36,6 +36,11 @@
 	* Tools/fswatcher/fswatcher.m
 	* Tools/lsfupdater/lsfupdater.m
 	* Tools/thumbnailer/main.m
+	* Tools/ddbd/DDBPathsManager.m
+	* Tools/ddbd/ddbd.m
+	* Tools/ddbd/DDBDirsManager.m
+	* Operation/FileOpInfo.m
+	* Inspector/Contents.m
 	Removed TEST_ macros for conventional ones, they just waste a test instruction
 	
 2010-06-14 Riccardo Mottola <rmottola@users.sf.net>
