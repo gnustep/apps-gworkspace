@@ -669,7 +669,7 @@ static inline BOOL isDotFile(NSString *path)
 		[timer invalidate];
 	}
   RELEASE (watchedPath);  
-  TEST_RELEASE (pathContents);
+  RELEASE (pathContents);
   RELEASE (date);  
   [super dealloc];
 }
@@ -792,7 +792,7 @@ static inline BOOL isDotFile(NSString *path)
         [fswatcher notifyClients: notifdict];
       }
 
-      TEST_RELEASE (oldconts);	
+      RELEASE (oldconts);	
 
       if (contentsChanged == NO) {
         [notifdict setObject: @"GWWatchedFileModified" forKey: @"event"];

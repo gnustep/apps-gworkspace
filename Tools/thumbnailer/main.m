@@ -192,7 +192,7 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
   NSArray *bPaths;
   int i;
   
-  TEST_RELEASE (thumbnailers);
+  RELEASE (thumbnailers);
   thumbnailers = [NSMutableArray new];
   
   bundlesPaths = [NSMutableArray array]; 

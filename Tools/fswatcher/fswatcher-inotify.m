@@ -144,7 +144,7 @@ static NSString *GWWatchedPathRenamed = @"GWWatchedPathRenamed";
   freeTree(excludePathsTree);
   RELEASE (excludedSuffixes);
   RELEASE (inotifyHandle);  
-  TEST_RELEASE (lastMovedPath);
+  RELEASE (lastMovedPath);
   
   [super dealloc];
 }

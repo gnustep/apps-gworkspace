@@ -32,6 +32,10 @@
 	* GWorkspace/Desktop/GWDesktopView.m
 	* GWorkspace/WorkspaceApplication.m
 	* Tools/thumbnailer/main.m
+	* Tools/fswatcher/fswatcher-inotify.m
+	* Tools/fswatcher/fswatcher.m
+	* Tools/lsfupdater/lsfupdater.m
+	* Tools/thumbnailer/main.m
 	Removed TEST_ macros for conventional ones, they just waste a test instruction
 	
 2010-06-14 Riccardo Mottola <rmottola@users.sf.net>

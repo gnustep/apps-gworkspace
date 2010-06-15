@@ -1,6 +1,6 @@
 /* lsfupdater.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -158,16 +158,16 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
     DESTROY (autoupdateTmr);
   }
   
-	DESTROY (lsfolder);
+  DESTROY (lsfolder);
   DESTROY (ddbd);
 
   RELEASE (modules);
-  TEST_RELEASE (searchPaths);
-  TEST_RELEASE (searchCriteria);
-  TEST_RELEASE (lastUpdate);
-  TEST_RELEASE (startSearch);
+  RELEASE (searchPaths);
+  RELEASE (searchCriteria);
+  RELEASE (lastUpdate);
+  RELEASE (startSearch);
   RELEASE (foundPaths);
-  TEST_RELEASE (directories);
+  RELEASE (directories);
   
   [super dealloc];
 }
