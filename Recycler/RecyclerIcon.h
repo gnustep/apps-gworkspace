@@ -1,6 +1,6 @@
 /* RecyclerIcon.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2004
@@ -22,11 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#ifndef RECYCLER_ICON_H
-#define RECYCLER_ICON_H
-
-#include <AppKit/NSView.h>
-#include "FSNIcon.h"
+#import <AppKit/NSView.h>
+#import "FSNIcon.h"
 
 @class NSColor;
 @class NSImage;
@@ -62,4 +59,3 @@
 
 @end
 
-#endif // RECYCLER_ICON_H

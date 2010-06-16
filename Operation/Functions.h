@@ -1,6 +1,6 @@
 /* Functions.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -23,13 +23,8 @@
  */
 
  
-#ifndef FUNCTIONS_H
-#define FUNCTIONS_H
-
-#include <Foundation/Foundation.h>
+#import <Foundation/Foundation.h>
 
 BOOL isSubpath(NSString *p1, NSString *p2);
 
 NSString *relativePathFittingInField(id field, NSString *fullPath);
-
-#endif

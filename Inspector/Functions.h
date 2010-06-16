@@ -1,6 +1,6 @@
 /* Functions.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
@@ -23,10 +23,7 @@
  */
 
  
-#ifndef FUNCTIONS_H
-#define FUNCTIONS_H
-
-#include "config.h"
+#import "config.h"
 
 @class NSString;
 @class NSMenuItem;
@@ -83,4 +80,3 @@ NSString *relativePathFit(id container, NSString *fullPath);
 
 NSString *fsDescription(unsigned long long size);
 
-#endif

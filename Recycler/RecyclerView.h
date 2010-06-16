@@ -1,6 +1,6 @@
 /* RecyclerView.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2004
@@ -22,12 +22,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#ifndef RECYCLER_VIEW_H
-#define RECYCLER_VIEW_H
-
-#include <AppKit/NSView.h>
-#include "Recycler.h"
-#include "FSNodeRep.h"
+#import <AppKit/NSView.h>
+#import "Recycler.h"
+#import "FSNodeRep.h"
 
 @class NSImage;
 @class RecyclerIcon;
@@ -81,4 +78,3 @@
 
 @end
 
-#endif // RECYCLER_VIEW_H

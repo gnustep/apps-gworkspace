@@ -1,3 +1,23 @@
+2010-06-16 Riccardo Mottola <rmottola@users.sf.net>
+
+	* Operation\FileOpInfo.m
+	* Operation\Operation.h
+	* Operation\Functions.h
+	* Inspector\Attributes.m
+	* Inspector\Contents.h
+	* Inspector\Annotations.h
+	* Inspector\ContentViewersProtocol.h
+	* Inspector\Contents.m
+	* Inspector\Annotations.m
+	* Inspector\Functions.h
+	* Inspector\Functions.m
+	* Inspector\IconView.h
+	* Inspector\Attributes.h
+	* Recycler\RecyclerView.h
+	* Recycler\Recycler.h
+	* Recycler\RecyclerIcon.h
+	Header cleanup
+
 2010-06-15 Riccardo Mottola <rmottola@users.sf.net>
 
 	* Inspector/ContentViewers/NSRTFViewer/NSRTFViewer.m

@@ -22,16 +22,17 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
 #include <math.h>
-#include "Contents.h"
-#include "ContentViewersProtocol.h"
-#include "Inspector.h"
-#include "IconView.h"
-#include "Functions.h"
-#include "FSNodeRep.h"
 #include "config.h"
+
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import "Contents.h"
+#import "ContentViewersProtocol.h"
+#import "Inspector.h"
+#import "IconView.h"
+#import "Functions.h"
+#import "FSNodeRep.h"
 
 #define ICNSIZE 48
 #define MAXDATA 1000

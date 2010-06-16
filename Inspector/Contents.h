@@ -1,6 +1,6 @@
 /* Contents.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
@@ -22,10 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#ifndef CONTENTS_H
-#define CONTENTS_H
 
-#include <Foundation/Foundation.h>
+#import <Foundation/Foundation.h>
 
 @class NSWorkspace;
 @class NSImage;
@@ -49,7 +47,7 @@
   NSView *noContsView;
   GenericView *genericView;
 
-	NSMutableArray *viewers;
+  NSMutableArray *viewers;
   id currentViewer;
   
   TextViewer *textViewer;
@@ -59,7 +57,7 @@
   NSImage *pboardImage;
   
   NSFileManager *fm;
-	NSWorkspace *ws;
+  NSWorkspace *ws;
   
   id inspector;
 }
@@ -139,4 +137,3 @@
 
 @end
 
-#endif // CONTENTS_H

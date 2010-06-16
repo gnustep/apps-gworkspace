@@ -22,9 +22,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#ifndef CONTENTVIEWERSPROTOCOL_H
-#define CONTENTVIEWERSPROTOCOL_H
-
 @protocol ContentViewersProtocol
 
 - (id)initWithFrame:(NSRect)frameRect
@@ -51,5 +48,4 @@
 
 @end 
 
-#endif // CONTENTVIEWERSPROTOCOL_H
 

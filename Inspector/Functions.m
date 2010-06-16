@@ -1,6 +1,6 @@
 /* Functions.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
@@ -22,10 +22,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "Functions.h"
 #include <limits.h>
+
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import "Functions.h"
 
 #define ONE_KB 1024
 #define ONE_MB (ONE_KB * ONE_KB)
@@ -33,16 +34,16 @@
 
 static inline NSString *cut_Text(NSString *filename, id label, int lenght)
 {
-	NSString *cutname = nil;
+  NSString *cutname = nil;
   NSString *reststr = nil;
   NSString *dots;
-	NSFont *labfont;
+  NSFont *labfont;
   NSDictionary *attr;
-	float w, cw, dotslenght;
-	int i;
+  float w, cw, dotslenght;
+  int i;
 
-	cw = 0;
-	labfont = [label font];
+  cw = 0;
+  labfont = [label font];
   
   attr = [NSDictionary dictionaryWithObjectsAndKeys: 
 			                        labfont, NSFontAttributeName, nil];  

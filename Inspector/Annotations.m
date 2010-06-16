@@ -1,6 +1,6 @@
 /* Annotations.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
@@ -22,15 +22,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
 #include <math.h>
-#include "Annotations.h"
-#include "Inspector.h"
-#include "IconView.h"
-#include "Functions.h"
-#include "FSNodeRep.h"
 #include "config.h"
+
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import "Annotations.h"
+#import "Inspector.h"
+#import "IconView.h"
+#import "Functions.h"
+#import "FSNodeRep.h"
 
 #define ICNSIZE 48
 
@@ -40,12 +41,12 @@ static NSString *nibName = @"Annotations";
 
 - (void)dealloc
 {
-  TEST_RELEASE (currentPath);
-  TEST_RELEASE (noContsView);
-  TEST_RELEASE (mainBox);
-  TEST_RELEASE (toolsBox);
+  RELEASE (currentPath);
+  RELEASE (noContsView);
+  RELEASE (mainBox);
+  RELEASE (toolsBox);
       
-	[super dealloc];
+  [super dealloc];
 }
 
 - (id)initForInspector:(id)insp

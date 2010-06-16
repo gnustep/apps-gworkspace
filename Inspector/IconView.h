@@ -1,6 +1,6 @@
 /* IconView.m
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2005
@@ -22,11 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#ifndef ICON_VIEW_H
-#define ICON_VIEW_H
-
-#include <Foundation/Foundation.h>
-#include <AppKit/NSImageView.h>
+#import <Foundation/Foundation.h>
+#import <AppKit/NSImageView.h>
 
 @interface IconView : NSImageView
 {
@@ -58,7 +55,4 @@
 - (unsigned int)draggingSourceOperationMaskForLocal:(BOOL)isLocal;
 
 @end
-
-#endif // TIMEDATEVIEW_H
-
 

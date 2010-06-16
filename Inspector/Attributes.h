@@ -1,6 +1,6 @@
 /* Attributes.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
@@ -22,10 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#ifndef ATTRIBUTES_H
-#define ATTRIBUTES_H
 
-#include <Foundation/Foundation.h>
+#import <Foundation/Foundation.h>
 
 @class NSImage;
 @class Sizer;
@@ -68,7 +66,7 @@
   IBOutlet id groupField;
 
   IBOutlet id changedDateBox;
-	IBOutlet id timeDateView;
+  IBOutlet id timeDateView;
   IBOutlet id permsBox;
 
   IBOutlet id readLabel;
@@ -162,4 +160,3 @@
 
 @end
 
-#endif // ATTRIBUTES_H
