@@ -51,12 +51,12 @@ static NSImage *branchImage;
     [self removeTrackingRect: trectTag];
   }
   RELEASE (node);
-	TEST_RELEASE (hostname);
-  TEST_RELEASE (selection);
-  TEST_RELEASE (selectionTitle);
-  TEST_RELEASE (extInfoType);
+  RELEASE (hostname);
+  RELEASE (selection);
+  RELEASE (selectionTitle);
+  RELEASE (extInfoType);
   RELEASE (icon);
-  TEST_RELEASE (selectedicon);
+  RELEASE (selectedicon);
   RELEASE (highlightPath);
   RELEASE (label);
   RELEASE (infolabel);
@@ -1558,7 +1558,7 @@ static NSImage *branchImage;
 
 - (void)dealloc
 {
-  TEST_RELEASE (node);
+  RELEASE (node);
   [super dealloc];
 }
 

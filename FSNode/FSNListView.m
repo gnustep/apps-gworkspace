@@ -1,6 +1,6 @@
 /* FSNListView.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: December 2004
@@ -22,13 +22,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
 #include <math.h>
 #include <unistd.h>
-#include "FSNListView.h"
-#include "FSNTextCell.h"
-#include "FSNFunctions.h"
+
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import "FSNListView.h"
+#import "FSNTextCell.h"
+#import "FSNFunctions.h"
 
 #define ICNSIZE (24)
 #define CELLS_HEIGHT (28.0)
@@ -69,11 +70,11 @@ static NSString *defaultColumns = @"{ \
 
 - (void)dealloc
 {
-  TEST_RELEASE (node);
-  TEST_RELEASE (extInfoType);
+  RELEASE (node);
+  RELEASE (extInfoType);
   RELEASE (nodeReps);
   RELEASE (nameEditor);
-  TEST_RELEASE (lastSelection);
+  RELEASE (lastSelection);
 
   [super dealloc];
 }
@@ -725,7 +726,7 @@ static NSString *defaultColumns = @"{ \
   
   RELEASE (arp);
   
-  return (TEST_AUTORELEASE (updatedInfo));
+  return (AUTORELEASE (updatedInfo));
 }
 
 - (void)reloadContents
@@ -1881,9 +1882,9 @@ static NSString *defaultColumns = @"{ \
 - (void)dealloc
 {
   RELEASE (icon); 
-  TEST_RELEASE (openicon); 
-  TEST_RELEASE (lockedicon); 
-  TEST_RELEASE (spopenicon); 
+  RELEASE (openicon); 
+  RELEASE (lockedicon); 
+  RELEASE (spopenicon); 
   RELEASE (extInfoStr); 
   [super dealloc];
 }
@@ -2398,7 +2399,7 @@ int sortSubviews(id view1, id view2, void *context)
 
 - (void)dealloc
 {
-  TEST_RELEASE (node);
+  RELEASE (node);
   [super dealloc];
 }
 
@@ -2447,7 +2448,7 @@ int sortSubviews(id view1, id view2, void *context)
 
 - (void)dealloc
 {
-  TEST_RELEASE (charBuffer);  
+  RELEASE (charBuffer);  
   RELEASE (dsource);  
   [super dealloc];
 }

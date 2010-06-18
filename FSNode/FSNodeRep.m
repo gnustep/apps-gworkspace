@@ -1,6 +1,6 @@
 /* FSNodeRep.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -22,13 +22,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
 #include <math.h>
-#include "FSNodeRep.h"
-#include "FSNFunctions.h"
-#include "ExtendedInfo.h"
-#include "config.h"
+
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import "FSNodeRep.h"
+#import "FSNFunctions.h"
+#import "ExtendedInfo.h"
+#import "config.h"
 
 #ifndef __APPLE__
   #if	defined(HAVE_GETMNTENT) && defined (MNT_DIR)
@@ -228,22 +229,22 @@ static FSNodeRep *shared = nil;
 
 - (void)dealloc
 {
-  TEST_RELEASE (extInfoModules);
-	TEST_RELEASE (lockedPaths);
-  TEST_RELEASE (volumes);
-  TEST_RELEASE (reservedNames);
-  TEST_RELEASE (rootPath);
-  TEST_RELEASE (hiddenPaths);
-  TEST_RELEASE (iconsCache);
-  TEST_RELEASE (tumbsCache);
-  TEST_RELEASE (thumbnailDir);
-  TEST_RELEASE (multipleSelIcon);
-  TEST_RELEASE (openFolderIcon);
-  TEST_RELEASE (hardDiskIcon);
-  TEST_RELEASE (openHardDiskIcon);
-  TEST_RELEASE (workspaceIcon);
-  TEST_RELEASE (trashIcon);
-  TEST_RELEASE (trashFullIcon);
+  RELEASE (extInfoModules);
+  RELEASE (lockedPaths);
+  RELEASE (volumes);
+  RELEASE (reservedNames);
+  RELEASE (rootPath);
+  RELEASE (hiddenPaths);
+  RELEASE (iconsCache);
+  RELEASE (tumbsCache);
+  RELEASE (thumbnailDir);
+  RELEASE (multipleSelIcon);
+  RELEASE (openFolderIcon);
+  RELEASE (hardDiskIcon);
+  RELEASE (openHardDiskIcon);
+  RELEASE (workspaceIcon);
+  RELEASE (trashIcon);
+  RELEASE (trashFullIcon);
         
   [super dealloc];
 }

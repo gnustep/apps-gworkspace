@@ -1,6 +1,6 @@
 /* FSNBrowserScroll.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2004
@@ -22,9 +22,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <AppKit/AppKit.h>
-#include "FSNBrowserScroll.h"
-#include "FSNBrowserColumn.h"
+#import <AppKit/AppKit.h>
+#import "FSNBrowserScroll.h"
+#import "FSNBrowserColumn.h"
 
 @implementation FSNBrowserScroll
 

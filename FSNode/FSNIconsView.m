@@ -1,6 +1,6 @@
 /* FSNIconsView.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -22,14 +22,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
 #include <math.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include "FSNIconsView.h"
-#include "FSNIcon.h"
-#include "FSNFunctions.h"
+
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+
+#import "FSNIconsView.h"
+#import "FSNIcon.h"
+#import "FSNFunctions.h"
 
 #define DEF_ICN_SIZE 48
 #define DEF_TEXT_SIZE 12
@@ -66,15 +68,15 @@ if (rct.size.height < 0) rct.size.height = 0; \
 
 - (void)dealloc
 {
-  TEST_RELEASE (node);
-  TEST_RELEASE (extInfoType);
+  RELEASE (node);
+  RELEASE (extInfoType);
   RELEASE (icons);
   RELEASE (labelFont);
   RELEASE (nameEditor);
   RELEASE (horizontalImage);
   RELEASE (verticalImage);
-  TEST_RELEASE (lastSelection);
-  TEST_RELEASE (charBuffer);
+  RELEASE (lastSelection);
+  RELEASE (charBuffer);
   RELEASE (backColor);
   RELEASE (textColor);
   RELEASE (disabledTextColor);
@@ -1013,7 +1015,7 @@ pp.y = NSMaxY(br) + 1; \
 
   RELEASE (arp);
   
-  return (TEST_AUTORELEASE (updatedInfo));
+  return (AUTORELEASE (updatedInfo));
 }
 
 - (void)reloadContents

@@ -1,6 +1,6 @@
 /* FSNBrowserColumn.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2004
@@ -22,14 +22,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <AppKit/AppKit.h>
 #include <math.h>
-#include "FSNBrowserColumn.h"
-#include "FSNBrowserCell.h"
-#include "FSNBrowserMatrix.h"
-#include "FSNBrowserScroll.h"
-#include "FSNBrowser.h"
-#include "FSNFunctions.h"
+
+#import <AppKit/AppKit.h>
+#import "FSNBrowserColumn.h"
+#import "FSNBrowserCell.h"
+#import "FSNBrowserMatrix.h"
+#import "FSNBrowserScroll.h"
+#import "FSNBrowser.h"
+#import "FSNFunctions.h"
 
 #define ICON_CELL_HEIGHT 28
 
@@ -48,9 +49,9 @@ static id <DesktopApplication> desktopApp = nil;
 - (void)dealloc
 {
   RELEASE (cellPrototype);
-  TEST_RELEASE (shownNode);
-  TEST_RELEASE (oldNode);
-  TEST_RELEASE (extInfoType);  
+  RELEASE (shownNode);
+  RELEASE (oldNode);
+  RELEASE (extInfoType);  
   RELEASE (backColor);
     
   [super dealloc];
@@ -282,8 +283,8 @@ static id <DesktopApplication> desktopApp = nil;
     isLoaded = YES;
   }
   
-  TEST_RELEASE (savedSelection);
-  TEST_RELEASE (visibleNodes);  
+  RELEASE (savedSelection);
+  RELEASE (visibleNodes);  
 }
 
 - (FSNode *)shownNode
@@ -485,8 +486,8 @@ static id <DesktopApplication> desktopApp = nil;
     [matrix scrollToFirstPositionCell: cell withScrollTune: scrollTune];
   }
 
-  TEST_RELEASE (selectedCells); 
-  TEST_RELEASE (visibleNodes);
+  RELEASE (selectedCells); 
+  RELEASE (visibleNodes);
   RELEASE (arp);
 }
 

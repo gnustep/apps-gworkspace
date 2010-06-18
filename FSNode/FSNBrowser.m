@@ -49,12 +49,12 @@
 - (void)dealloc
 {
   RELEASE (baseNode);
-  TEST_RELEASE (extInfoType);  
-  TEST_RELEASE (lastSelection);
+  RELEASE (extInfoType);  
+  RELEASE (lastSelection);
   RELEASE (columns);
-  TEST_RELEASE (nameEditor);
+  RELEASE (nameEditor);
   RELEASE (cellPrototype);
-  TEST_RELEASE (charBuffer);
+  RELEASE (charBuffer);
   RELEASE (backColor);
 
   [super dealloc];
@@ -1511,7 +1511,7 @@
       
   RELEASE (arp);
   
-  return (TEST_AUTORELEASE (updatedInfo));
+  return (AUTORELEASE (updatedInfo));
 }
 
 - (void)reloadContents

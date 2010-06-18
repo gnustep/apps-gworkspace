@@ -1,6 +1,6 @@
 /* DBKVarLenRecordsFile.m
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2005
@@ -22,8 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include "DBKVarLenRecordsFile.h"
-#include "DBKBTreeNode.h"
+#import "DBKVarLenRecordsFile.h"
+#import "DBKBTreeNode.h"
 
 #define FIRST_OFFSET 512
 
@@ -325,7 +325,7 @@
   
   RELEASE (arp);
   
-  return TEST_AUTORELEASE (offset);
+  return AUTORELEASE (offset);
 }
 
 

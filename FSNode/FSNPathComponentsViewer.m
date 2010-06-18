@@ -251,7 +251,7 @@ static NSImage *branchImage;
 - (void)dealloc
 {
   RELEASE (node);
-	TEST_RELEASE (hostname);
+  RELEASE (hostname);
   RELEASE (icon);
   RELEASE (label);
   RELEASE (fontAttr);

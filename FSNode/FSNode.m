@@ -33,20 +33,20 @@
 
 - (void)dealloc
 {
-  TEST_RELEASE (path);
-  TEST_RELEASE (relativePath);  
-  TEST_RELEASE (name);  
-  TEST_RELEASE (attributes);  
-  TEST_RELEASE (fileType);
-  TEST_RELEASE (typeDescription);
-  TEST_RELEASE (crDate);
-  TEST_RELEASE (crDateDescription);
-  TEST_RELEASE (modDate);
-  TEST_RELEASE (modDateDescription);
-  TEST_RELEASE (owner);
-  TEST_RELEASE (ownerId);
-  TEST_RELEASE (group);
-  TEST_RELEASE (groupId);
+  RELEASE (path);
+  RELEASE (relativePath);  
+  RELEASE (name);  
+  RELEASE (attributes);  
+  RELEASE (fileType);
+  RELEASE (typeDescription);
+  RELEASE (crDate);
+  RELEASE (crDateDescription);
+  RELEASE (modDate);
+  RELEASE (modDateDescription);
+  RELEASE (owner);
+  RELEASE (ownerId);
+  RELEASE (group);
+  RELEASE (groupId);
 
   [super dealloc];
 }
@@ -120,7 +120,7 @@
     application = nil;
                                       
     attributes = [fm fileAttributesAtPath: path traverseLink: NO];
-    TEST_RETAIN (attributes);
+    RETAIN (attributes);
   }
     
   return self;

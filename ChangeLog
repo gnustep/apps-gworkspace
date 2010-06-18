@@ -1,3 +1,20 @@
+2010-06-18 Riccardo Mottola
+
+	* DBKit/DBKVarLenRecordsFile.m
+	* DBKit/DBKBTree.m
+	* FSNode/FSNBrowserCell.m
+	* FSNode/FSNPathComponentsViewer.m
+	* FSNode/FSNBrowserColumn.m
+	* FSNode/FSNListView.m
+	* FSNode/FSNIconsView.m
+	* FSNode/FSNodeRep.m
+	* FSNode/FSNBrowser.m
+	* FSNode/FSNTextCell.m
+	* FSNode/FSNIcon.m
+	* FSNode/FSNBrowserScroll.m
+	* FSNode/FSNode.m
+	Header import clean up and TEST macro elimination.
+
 2010-06-16 Riccardo Mottola <rmottola@users.sf.net>
 
 	* Operation\FileOpInfo.m

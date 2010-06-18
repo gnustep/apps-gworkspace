@@ -1,6 +1,6 @@
 /* DBKBTree.m
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2005
@@ -22,10 +22,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include "DBKBTree.h"
-#include "DBKBTreeNode.h"
-#include "DBKFreeNodesPage.h"
-#include "DBKFixLenRecordsFile.h"
+#import "DBKBTree.h"
+#import "DBKBTreeNode.h"
+#import "DBKFreeNodesPage.h"
+#import "DBKFixLenRecordsFile.h"
 
 #define MIN_ORDER 3
 #define HEADLEN 512
@@ -39,7 +39,8 @@ NSRecursiveLock *dbkbtree_lock = nil;
 {
   static BOOL initialized = NO;
 
-  if (initialized == NO) {
+  if (initialized == NO)
+  {
     if ([self class] == [DBKBTree class]) {
       dbkbtree_lock = [NSRecursiveLock new];
     }
@@ -251,10 +252,10 @@ NSRecursiveLock *dbkbtree_lock = nil;
   [file setAutoflush: autoflush];
   [file flushIfNeeded];
   
-  TEST_RETAIN (insnode);
+  RETAIN (insnode);
   RELEASE (arp);
   
-  return TEST_AUTORELEASE (insnode);
+  return AUTORELEASE (insnode);
 }
 
 - (DBKBTreeNode *)insertKey:(id)key

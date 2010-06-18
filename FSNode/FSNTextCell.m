@@ -1,6 +1,6 @@
 /* FSNTextCell.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -22,9 +22,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "FSNTextCell.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import "FSNTextCell.h"
 
 static SEL cutNameSel = NULL;
 static cutIMP cutName = NULL;
@@ -51,10 +51,10 @@ static cutIMP cutDate = NULL;
 
 - (void)dealloc
 {
-  TEST_RELEASE (uncuttedTitle);
+  RELEASE (uncuttedTitle);
   RELEASE (fontAttr);
   RELEASE (dots);
-  TEST_RELEASE (icon);  
+  RELEASE (icon);  
   [super dealloc];
 }
 
@@ -96,7 +96,7 @@ static cutIMP cutDate = NULL;
   c->cutTitleSel = cutNameSel;
   c->cutTitle = cutName;   
 
-  TEST_RETAIN (icon);
+  RETAIN (icon);
 
   return c;
 }

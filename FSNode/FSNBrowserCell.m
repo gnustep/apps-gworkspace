@@ -1,6 +1,6 @@
 /* FSNBrowserCell.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -22,11 +22,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
 #include <math.h>
-#include "FSNBrowserCell.h"
-#include "FSNode.h"
+
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+
+#import "FSNBrowserCell.h"
+#import "FSNode.h"
 
 #define DEFAULT_ISIZE (24)
 #define HLIGHT_H_FACT (0.8125)
@@ -48,13 +50,13 @@ static cutIMP cutTitle = NULL;
 
 - (void)dealloc
 {
-  TEST_RELEASE (selection);
-  TEST_RELEASE (selectionTitle);
-  TEST_RELEASE (uncuttedTitle);
-  TEST_RELEASE (extInfoType);
-  TEST_RELEASE (infoCell); 
-  TEST_RELEASE (icon); 
-  TEST_RELEASE (selectedicon); 
+  RELEASE (selection);
+  RELEASE (selectionTitle);
+  RELEASE (uncuttedTitle);
+  RELEASE (extInfoType);
+  RELEASE (infoCell); 
+  RELEASE (icon); 
+  RELEASE (selectedicon); 
   RELEASE (dots);
   
   [super dealloc];
@@ -685,7 +687,7 @@ static cutIMP cutTitle = NULL;
 
 - (void)dealloc
 {
-  TEST_RELEASE (node);
+  RELEASE (node);
   [super dealloc];
 }
 
