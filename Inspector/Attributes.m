@@ -58,14 +58,14 @@ static BOOL sizeStop = NO;
   [nc removeObserver: self];  
   DESTROY (sizerConn);
   DESTROY (sizer);
-	TEST_RELEASE (mainBox);
-  TEST_RELEASE (calculateButt);
-	TEST_RELEASE (insppaths);
-	TEST_RELEASE (attributes);
-	TEST_RELEASE (currentPath);
-	TEST_RELEASE (onImage);
-	TEST_RELEASE (offImage);
-	TEST_RELEASE (multipleImage);  
+  RELEASE (mainBox);
+  RELEASE (calculateButt);
+  RELEASE (insppaths);
+  RELEASE (attributes);
+  RELEASE (currentPath);
+  RELEASE (onImage);
+  RELEASE (offImage);
+  RELEASE (multipleImage);  
   
   [super dealloc];
 }

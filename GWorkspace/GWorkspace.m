@@ -22,8 +22,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-// #include <math.h>
-
 /* the following for getrlimit */
 #include <sys/types.h>
 #include <sys/time.h>
@@ -954,7 +952,7 @@ static GWorkspace *gworkspace = nil;
     if ([fm fileExistsAtPath: helpPath]) {
       NSAttributedString *help = [[NSAttributedString alloc] initWithPath: helpPath
                                                        documentAttributes: NULL];
-      return TEST_AUTORELEASE (help);
+      return AUTORELEASE (help);
     }
   }
   

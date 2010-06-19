@@ -13,6 +13,8 @@
 	* FSNode/FSNIcon.m
 	* FSNode/FSNBrowserScroll.m
 	* FSNode/FSNode.m
+	* GWorkspace/GWorkspace.m
+	* Inspector/Attributes.m
 	Header import clean up and TEST macro elimination.
 
 2010-06-16 Riccardo Mottola <rmottola@users.sf.net>
