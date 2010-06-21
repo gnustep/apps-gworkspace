@@ -1,6 +1,6 @@
 /* FModuleModDate.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -22,10 +22,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
 #include <math.h>
-#include "FinderModulesProtocol.h"
+
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import "FinderModulesProtocol.h"
 
 static NSString *nibName = @"FModuleModDate";
 
@@ -87,30 +88,32 @@ static NSString *nibName = @"FModuleModDate";
 
 - (void)dealloc
 {
-  TEST_RELEASE (controlsBox);
-  TEST_RELEASE (whenPopUp);
-  TEST_RELEASE (dateField);
-  TEST_RELEASE (dateStepper); 
-  TEST_RELEASE (date);
+  RELEASE (controlsBox);
+  RELEASE (whenPopUp);
+  RELEASE (dateField);
+  RELEASE (dateStepper); 
+  RELEASE (date);
   [super dealloc];
 }
 
 - (id)initInterface
 {
-	self = [super init];
+  self = [super init];
 
-  if (self) {
-    NSDateFormatter *formatter;
-    NSRect r;
+  if (self)
+    {
+      NSDateFormatter *formatter;
+      NSRect r;
 
-		if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
-      NSLog(@"failed to load %@!", nibName);
-      DESTROY (self);
-      return self;
-    }
+      if ([NSBundle loadNibNamed: nibName owner: self] == NO)
+	{
+	  NSLog(@"failed to load %@!", nibName);
+	  DESTROY (self);
+	  return self;
+	}
 
-    RETAIN (controlsBox);
-    RELEASE (win);
+      RETAIN (controlsBox);
+      RELEASE (win);
 
     used = NO;
     index = 0;

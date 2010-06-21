@@ -1,6 +1,6 @@
 /* FindModuleView.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -22,12 +22,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "FindModuleView.h"
-#include "Finder.h"
-#include "LSFEditor.h"
-#include "FinderModulesProtocol.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import "FindModuleView.h"
+#import "Finder.h"
+#import "LSFEditor.h"
+#import "FinderModulesProtocol.h"
 
 static NSString *nibName = @"FindModuleView";
 
@@ -35,8 +35,8 @@ static NSString *nibName = @"FindModuleView";
 
 - (void)dealloc
 {
-  TEST_RELEASE (mainBox);
-  TEST_RELEASE (usedModulesNames);
+  RELEASE (mainBox);
+  RELEASE (usedModulesNames);
   [super dealloc];
 }
 

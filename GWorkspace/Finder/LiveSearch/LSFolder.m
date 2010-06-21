@@ -22,18 +22,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include <math.h>
-#include "LSFolder.h"
-#include "ResultsTableView.h"
-#include "FSNTextCell.h"
-#include "FSNPathComponentsViewer.h"
-#include "LSFEditor.h"
-#include "Finder.h"
-#include "FinderModulesProtocol.h"
-#include "GWorkspace.h"
-#include "GWFunctions.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import <math.h>
+#import "LSFolder.h"
+#import "ResultsTableView.h"
+#import "FSNTextCell.h"
+#import "FSNPathComponentsViewer.h"
+#import "LSFEditor.h"
+#import "Finder.h"
+#import "FinderModulesProtocol.h"
+#import "GWorkspace.h"
+#import "GWFunctions.h"
 
 #define CELLS_HEIGHT (28.0)
 
@@ -65,11 +65,11 @@ BOOL isPathInResults(NSString *path, NSArray *results);
     [gworkspace removeWatcherForPath: [node path]];
   }
   
-  TEST_RELEASE (node);
-  TEST_RELEASE (lsfinfo);
-  TEST_RELEASE (win);
-  TEST_RELEASE (foundObjects);
-  TEST_RELEASE (editor);      
+  RELEASE (node);
+  RELEASE (lsfinfo);
+  RELEASE (win);
+  RELEASE (foundObjects);
+  RELEASE (editor);      
   RELEASE (elementsStr);
   DESTROY (conn);
    

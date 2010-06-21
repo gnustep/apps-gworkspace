@@ -1,6 +1,6 @@
 /* FModuleAnnotations.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -22,9 +22,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "FinderModulesProtocol.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import "FinderModulesProtocol.h"
 
 static NSString *nibName = @"FModuleAnnotations";
 
@@ -56,8 +56,8 @@ static NSString *nibName = @"FModuleAnnotations";
 
 - (void)dealloc
 {
-  TEST_RELEASE (controlsBox);
-  TEST_RELEASE (contentsStr);
+  RELEASE (controlsBox);
+  RELEASE (contentsStr);
   [super dealloc];
 }
 
@@ -106,7 +106,7 @@ static NSString *nibName = @"FModuleAnnotations";
 - (id)initWithSearchCriteria:(NSDictionary *)criteria
                   searchTool:(id)tool
 {
-	self = [super init];
+  self = [super init];
 
   if (self) {
     ASSIGN (contentsStr, [criteria objectForKey: @"what"]);

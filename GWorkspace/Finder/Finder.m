@@ -1,6 +1,6 @@
 /* Finder.m
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -22,18 +22,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "Finder.h"
-#include "FinderModulesProtocol.h"
-#include "FindModuleView.h"
-#include "SearchPlacesBox.h"
-#include "SearchPlacesCell.h"
-#include "SearchResults.h"
-#include "LSFolder.h"
-#include "FSNodeRep.h"
-#include "GWorkspace.h"
-#include "GWFunctions.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import "Finder.h"
+#import "FinderModulesProtocol.h"
+#import "FindModuleView.h"
+#import "SearchPlacesBox.h"
+#import "SearchPlacesCell.h"
+#import "SearchResults.h"
+#import "LSFolder.h"
+#import "FSNodeRep.h"
+#import "GWorkspace.h"
+#import "GWFunctions.h"
 
 #define WINH (262.0)
 #define FMVIEWH (34.0)
@@ -66,14 +66,14 @@ static Finder *finder = nil;
 - (void)dealloc
 {
   [nc removeObserver: self];
-  TEST_RELEASE (modules);
+  RELEASE (modules);
   RELEASE (fmviews);
-  TEST_RELEASE (currentSelection);
-  TEST_RELEASE (win);
+  RELEASE (currentSelection);
+  RELEASE (win);
   RELEASE (searchResults);
   RELEASE (lsFolders);
     
-	[super dealloc];
+  [super dealloc];
 }
 
 - (id)init
@@ -136,7 +136,7 @@ static Finder *finder = nil;
     ms.width = cs.width;
     CHECKSIZE (ms);
     [placesMatrix setCellSize: ms];
-	  [placesScroll setDocumentView: placesMatrix];	
+    [placesScroll setDocumentView: placesMatrix];	
     RELEASE (placesMatrix);
   
     defentry = [defaults objectForKey: @"saved_places"];

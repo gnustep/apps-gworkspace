@@ -1,6 +1,6 @@
 /* FModuleName.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -22,9 +22,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "FinderModulesProtocol.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import "FinderModulesProtocol.h"
 
 static NSString *nibName = @"FModuleName";
 
@@ -55,49 +55,51 @@ static NSString *nibName = @"FModuleName";
 
 - (void)dealloc
 {
-  TEST_RELEASE (controlsBox);
-  TEST_RELEASE (searchStr);
+  RELEASE (controlsBox);
+  RELEASE (searchStr);
   [super dealloc];
 }
 
 - (id)initInterface
 {
-	self = [super init];
+  self = [super init];
 
-  if (self) {
-		if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
-      NSLog(@"failed to load %@!", nibName);
-      DESTROY (self);
-      return self;
-    }
+  if (self)
+    {
+      if ([NSBundle loadNibNamed: nibName owner: self] == NO)
+	{
+	  NSLog(@"failed to load %@!", nibName);
+	  DESTROY (self);
+	  return self;
+	}
 
-    RETAIN (controlsBox);
-    RELEASE (win);
+      RETAIN (controlsBox);
+      RELEASE (win);
 
-    used = NO;
-    index = 0;
+      used = NO;
+      index = 0;
     
-    searchStr = nil;
+      searchStr = nil;
     
-    [textField setStringValue: @""];
+      [textField setStringValue: @""];
 
-    /* Internationalization */    
-    [popUp removeAllItems];
-    [popUp insertItemWithTitle: NSLocalizedString(@"contains", @"") 
-                       atIndex: CONTAINS];
-    [popUp insertItemWithTitle: NSLocalizedString(@"is", @"") 
-                       atIndex: IS];
-    [popUp insertItemWithTitle: NSLocalizedString(@"contains not", @"") 
-                       atIndex: NOT_CONTAINS];
-    [popUp insertItemWithTitle: NSLocalizedString(@"starts with", @"") 
-                       atIndex: STARTS];
-    [popUp insertItemWithTitle: NSLocalizedString(@"ends with", @"") 
-                       atIndex: ENDS];
+      /* Internationalization */    
+      [popUp removeAllItems];
+      [popUp insertItemWithTitle: NSLocalizedString(@"contains", @"") 
+			 atIndex: CONTAINS];
+      [popUp insertItemWithTitle: NSLocalizedString(@"is", @"") 
+			 atIndex: IS];
+      [popUp insertItemWithTitle: NSLocalizedString(@"contains not", @"") 
+			 atIndex: NOT_CONTAINS];
+      [popUp insertItemWithTitle: NSLocalizedString(@"starts with", @"") 
+			 atIndex: STARTS];
+      [popUp insertItemWithTitle: NSLocalizedString(@"ends with", @"") 
+			 atIndex: ENDS];
                        
-    [popUp selectItemAtIndex: CONTAINS]; 
-  }
+      [popUp selectItemAtIndex: CONTAINS]; 
+    }
   
-	return self;
+  return self;
 }
 
 - (IBAction)popUpAction:(id)sender

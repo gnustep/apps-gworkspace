@@ -55,7 +55,7 @@ static GWViewersManager *vwrsmanager = nil;
   RELEASE (bviewerHelp);
   RELEASE (sviewerHelp);
     
-	[super dealloc];
+  [super dealloc];
 }
 
 - (id)init
@@ -395,7 +395,7 @@ static GWViewersManager *vwrsmanager = nil;
     [rootViewersKeys removeObjectAtIndex: 0];
   }
   
-  return TEST_AUTORELEASE (key);
+  return AUTORELEASE (key);
 }
 
 - (int)typeOfViewerForNode:(FSNode *)node

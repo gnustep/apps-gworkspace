@@ -3,6 +3,17 @@
 	* Operation/Operation.m
 	Fix spelling error.
 
+	* GWorkspace/FileViewer/GWViewersManager.m
+	* GWorkspace/Finder/Finder.m
+	* GWorkspace/Finder/LiveSearch/LSFolder.m
+	* GWorkspace/Finder/Modules/FModuleModDate/FModuleModDate.m
+	* GWorkspace/Finder/Modules/FModuleName/FModuleName.m
+	* GWorkspace/Finder/Modules/FModuleAnnotations/FModuleAnnotations.m
+	* GWorkspace/Finder/Modules/FModuleContents/FModuleContents.m
+	* GWorkspace/Finder/Modules/FModuleCrDate/FModuleCrDate.m
+	* GWorkspace/Finder/FindModuleView.m
+	Header import clean up and TEST macro elimination.
+
 2010-06-18 Riccardo Mottola
 
 	* DBKit/DBKVarLenRecordsFile.m
