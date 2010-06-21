@@ -158,7 +158,7 @@
 
     if ([self isLockedAction: action onPath: oppath]) {
       NSRunAlertPanel(nil, 
-                      NSLocalizedString(@"some files are in use by an other operation!", @""),
+                      NSLocalizedString(@"Some files are in use by another operation!", @""),
 					            NSLocalizedString(@"OK", @""), 
                       nil, 
                       nil);  
