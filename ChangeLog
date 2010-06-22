@@ -1,5 +1,7 @@
 2010-06-22  Richard Frith-Macdonald <rfm@gnu.org>
 
+	* Inspector/aclocal.m4:
+	* GWMetadata/gmds/mdextractor/Extractors/aclocal.m4:
 	* GWMetadata/gmds/aclocal.m4: Attempt to pass correct flags in to
 	build test by using 'gnustep-config'.
 
