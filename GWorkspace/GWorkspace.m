@@ -1910,55 +1910,67 @@ static GWorkspace *gworkspace = nil;
 
 - (void)connectDDBd
 {
-  if (ddbd == nil) {
-    ddbd = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
-                                                             host: @""];
+  if (ddbd == nil)
+    {
+      ddbd = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
+							       host: @""];
 
-    if (ddbd == nil) {
-	    NSString *cmd;
-      int i;
+      if (ddbd == nil)
+	{
+	  NSString *cmd;
+	  NSMutableArray *arguments;
+	  int i;
     
-      cmd = [NSTask launchPathForTool: @"ddbd"];    
+	  cmd = [NSTask launchPathForTool: @"ddbd"];    
                 
-      [startAppWin showWindowWithTitle: @"GWorkspace"
-                               appName: @"ddbd"
-                             operation: NSLocalizedString(@"starting:", @"")
-                          maxProgValue: 40.0];
-    
-      [NSTask launchedTaskWithLaunchPath: cmd arguments: nil];
+	  [startAppWin showWindowWithTitle: @"GWorkspace"
+				   appName: @"ddbd"
+				 operation: NSLocalizedString(@"starting:", @"")
+			      maxProgValue: 40.0];
+ 
+	  arguments = [NSMutableArray arrayWithCapacity:2];
+	  [arguments addObject:@"--daemon"];
+	  [arguments addObject:@"--auto"];  
+	  [NSTask launchedTaskWithLaunchPath: cmd arguments: arguments];
+
    
-      for (i = 1; i <= 40; i++) {
-        [startAppWin updateProgressBy: 1.0];
+	  for (i = 1; i <= 40; i++)
+	    {
+	      [startAppWin updateProgressBy: 1.0];
 	      [[NSRunLoop currentRunLoop] runUntilDate:
-		                     [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+					    [NSDate dateWithTimeIntervalSinceNow: 0.1]];
 
-        ddbd = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
-                                                                 host: @""];                  
-        if (ddbd) {
-          [startAppWin updateProgressBy: 40.0 - i];
-          break;
-        }
-      }
+	      ddbd = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
+								       host: @""];                  
+	      if (ddbd)
+		{
+		  [startAppWin updateProgressBy: 40.0 - i];
+		  break;
+		}
+	    }
 
-      [[startAppWin win] close];
-    }
+	  [[startAppWin win] close];
+	}
     
-    if (ddbd) {
-      RETAIN (ddbd);
-      [ddbd setProtocolForProxy: @protocol(DDBdProtocol)];
+      if (ddbd)
+	{
+	  RETAIN (ddbd);
+	  [ddbd setProtocolForProxy: @protocol(DDBdProtocol)];
     
-	    [[NSNotificationCenter defaultCenter] addObserver: self
-	                   selector: @selector(ddbdConnectionDidDie:)
-		                     name: NSConnectionDidDieNotification
-		                   object: [ddbd connectionForProxy]];
-    } else {
-      NSRunAlertPanel(nil,
-              NSLocalizedString(@"unable to contact ddbd.", @""),
-              NSLocalizedString(@"Ok", @""),
-              nil, 
-              nil);  
+	  [[NSNotificationCenter defaultCenter] addObserver: self
+						   selector: @selector(ddbdConnectionDidDie:)
+						       name: NSConnectionDidDieNotification
+						     object: [ddbd connectionForProxy]];
+	}
+      else
+	{
+	  NSRunAlertPanel(nil,
+			  NSLocalizedString(@"unable to contact ddbd.", @""),
+			  NSLocalizedString(@"Ok", @""),
+			  nil, 
+			  nil);  
+	}
     }
-  }
 }  
   
 - (void)ddbdConnectionDidDie:(NSNotification *)notif
