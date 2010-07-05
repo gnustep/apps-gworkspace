@@ -22,12 +22,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <AppKit/AppKit.h>
-#include "DBKBTreeNode.h"
-#include "DBKVarLenRecordsFile.h"
-#include "ddbd.h"
-#include "DDBPathsManager.h"
-#include "DDBDirsManager.h"
+#import <AppKit/AppKit.h>
+#import "DBKBTreeNode.h"
+#import "DBKVarLenRecordsFile.h"
+#import "ddbd.h"
+#import "DDBPathsManager.h"
+#import "DDBDirsManager.h"
 #include "config.h"
 
 #define GWDebugLog(format, args...) \
@@ -46,6 +46,8 @@ static DDBDirsManager *dirsManager = nil;
 static NSRecursiveLock *dirslock = nil; 
 
 static NSFileManager *fm = nil;
+
+static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 
 
 @implementation	DDBd
@@ -309,13 +311,19 @@ static NSFileManager *fm = nil;
   id connection = [notification object];
 
   [nc removeObserver: self
-	              name: NSConnectionDidDieNotification
-	            object: connection];
+		name: NSConnectionDidDieNotification
+	      object: connection];
 
-  if (connection == conn) {
-    NSLog(@"argh - ddbd root connection has been destroyed.");
-    exit(EXIT_FAILURE);
-  } 
+  if (connection == conn)
+    {
+      NSLog(@"argh - ddbd root connection has been destroyed.");
+      exit(EXIT_FAILURE);
+    }
+  else if (auto_stop == YES)
+    {
+      NSLog(@"ddbd: connection became invalid, shutting down");
+      exit(EXIT_SUCCESS);
+    }
 }
 
 - (BOOL)connection:(NSConnection *)ancestor
@@ -503,6 +511,11 @@ int main(int argc, char** argv)
   NSMutableArray *args = AUTORELEASE ([[info arguments] mutableCopy]);
   static BOOL	is_daemon = NO;
   BOOL subtask = YES;
+
+  if ([[info arguments] containsObject: @"--auto"] == YES)
+  {
+    auto_stop = YES;
+  }
 
   if ([[info arguments] containsObject: @"--daemon"]) {
     subtask = NO;
