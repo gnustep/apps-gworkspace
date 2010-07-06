@@ -1,6 +1,6 @@
 /* mdextractor.m
  *  
- * Copyright (C) 2006 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@dtedu.net>
  * Date: February 2006
@@ -22,15 +22,17 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <limits.h>
 #include <float.h>
-#include "mdextractor.h"
-#include "dbschema.h"
-#include "config.h"
+
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+
+#import "mdextractor.h"
+#import "dbschema.h"
+#import "config.h"
 
 #define DLENGTH 256
 #define MAX_RETRY 1000

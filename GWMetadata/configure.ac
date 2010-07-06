@@ -13,7 +13,7 @@ AC_CHECK_FUNCS(getpwnam getpwuid geteuid getlogin)
 
 AC_CONFIG_AUX_DIR([$GNUSTEP_MAKEFILES])
 
-AC_CONFIG_SUBDIRS(MDKit gmds)
+AC_CONFIG_SUBDIRS(MDKit MDFinder Preferences gmds)
 
 #--------------------------------------------------------------------
 # Determine the host, build, and target systems

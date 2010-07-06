@@ -1,3 +1,15 @@
+2010-07-06 Riccardo Mottola
+
+	* GWMetadata/configure.ac
+	* GWMetadata/configure
+	Configure all subprojects
+
+	* GWMetadata/gmds/mdextractor/updater.m
+	* GWMetadata/gmds/mdextractor/mdextractor.m
+	* GWMetadata/Preferences/MDIndexing.m
+	* GWMetadata/Preferences/MDIndexing.h
+	Fix imports.
+	
 2010-07-05 Riccardo Mottola
 
 	* GWorkspace/GWorkspace.m

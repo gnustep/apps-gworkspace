@@ -1,6 +1,6 @@
 /* MDIndexing.h
  *  
- * Copyright (C) 2006 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: February 2006
@@ -22,14 +22,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#ifndef MD_INDEXING_H
-#define MD_INDEXING_H
 
-#include <Foundation/Foundation.h>
+
+#import <Foundation/Foundation.h>
 #ifdef __APPLE__
-  #include <GSPreferencePanes/PreferencePanes.h>
+  #import <GSPreferencePanes/PreferencePanes.h>
 #else
-  #include <PreferencePanes/PreferencePanes.h>
+  #import <PreferencePanes/PreferencePanes.h>
 #endif
 
 @class NSMatrix;
@@ -165,6 +164,3 @@
 - (void)searchResultDidEndEditing;
 
 @end
-
-#endif // MD_INDEXING_H
-

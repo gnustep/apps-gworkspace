@@ -1,6 +1,6 @@
 /* MDIndexing.m
  *  
- * Copyright (C) 2006 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: February 2006
@@ -22,11 +22,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <AppKit/AppKit.h>
-#include <GNUstepBase/NSTask+GS.h>
-#include "MDIndexing.h"
-#include "CategoriesEditor.h"
-#include "StartAppWin.h"
+#import <AppKit/AppKit.h>
+#import "MDIndexing.h"
+#import "CategoriesEditor.h"
+#import "StartAppWin.h"
 
 BOOL subPathOfPath(NSString *p1, NSString *p2);
 
@@ -52,7 +51,7 @@ BOOL isDotFile(NSString *path);
   TEST_RELEASE (errorLogPath);
   TEST_RELEASE (errorWindow);
   
-	[super dealloc];
+  [super dealloc];
 }
 
 - (void)mainViewDidLoad
