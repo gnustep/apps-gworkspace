@@ -28,9 +28,9 @@
 #import <AppKit/AppKit.h>
 #import <GNUstepBase/GNUstep.h>
 
-#include "FSNodeRep.h"
-#include "DefEditorPref.h"
-#include "GWorkspace.h"
+#import "FSNodeRep.h"
+#import "DefEditorPref.h"
+#import "GWorkspace.h"
 
 
 
@@ -43,8 +43,8 @@ static NSString *nibName = @"DefEditorPref";
 
 - (void)dealloc
 {
-  TEST_RELEASE (prefbox);
-  TEST_RELEASE (ednode);
+  RELEASE (prefbox);
+  RELEASE (ednode);
   RELEASE (noEditorStr);
   RELEASE (font);
   [super dealloc];

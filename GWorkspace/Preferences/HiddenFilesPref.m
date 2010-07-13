@@ -46,13 +46,13 @@ if (sz.height < 0) sz.height = 0
 
 - (void)dealloc
 {
-	[[NSNotificationCenter defaultCenter] removeObserver: self];
-  TEST_RELEASE (prefbox);
+  [[NSNotificationCenter defaultCenter] removeObserver: self];
+  RELEASE (prefbox);
   RELEASE (currentNode);
   RELEASE (hiddenPaths);
-  TEST_RELEASE (leftMatrix);
-  TEST_RELEASE (rightMatrix); 
-  TEST_RELEASE (dirsMatrix); 
+  RELEASE (leftMatrix);
+  RELEASE (rightMatrix); 
+  RELEASE (dirsMatrix); 
   RELEASE (cellPrototipe); 
   [super dealloc];
 }

@@ -42,7 +42,7 @@ static NSString *nibName = @"OperationPrefs";
 
 - (void)dealloc
 {
-  TEST_RELEASE (prefbox);
+  RELEASE (prefbox);
   [super dealloc];
 }
 

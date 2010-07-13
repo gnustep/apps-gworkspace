@@ -1,6 +1,6 @@
 /* DesktopPref.m
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -22,14 +22,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "DesktopPref.h"
-#include "GWDesktopManager.h"
-#include "GWorkspace.h"
-#include "GWDesktopView.h"
-#include "Dock.h"
-#include "TShelf/TShelfWin.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import "DesktopPref.h"
+#import "GWDesktopManager.h"
+#import "GWorkspace.h"
+#import "GWDesktopView.h"
+#import "Dock.h"
+#import "TShelf/TShelfWin.h"
 
 static NSString *nibName = @"DesktopPref";
 
@@ -37,9 +37,9 @@ static NSString *nibName = @"DesktopPref";
 
 - (void)dealloc
 {
-  TEST_RELEASE (prefbox);
-  TEST_RELEASE (imagePath);
-  TEST_RELEASE (imagesDir);
+  RELEASE (prefbox);
+  RELEASE (imagePath);
+  RELEASE (imagesDir);
 
   [super dealloc];
 }
@@ -182,11 +182,11 @@ static NSString *nibName = @"DesktopPref";
 // Background image
 - (IBAction)chooseImage:(id)sender
 {
-	NSOpenPanel *openPanel;
-	int result;
+  NSOpenPanel *openPanel;
+  int result;
    
-	openPanel = [NSOpenPanel openPanel];
-	[openPanel setTitle: NSLocalizedString(@"Choose Image", @"")];	
+  openPanel = [NSOpenPanel openPanel];
+  [openPanel setTitle: NSLocalizedString(@"Choose Image", @"")];	
   [openPanel setAllowsMultipleSelection: NO];
   [openPanel setCanChooseFiles: YES];
   [openPanel setCanChooseDirectories: NO];
@@ -277,7 +277,7 @@ static NSString *nibName = @"DesktopPref";
 
 - (void)dealloc
 {
-  TEST_RELEASE (color);
+  RELEASE (color);
   [super dealloc];
 }
 

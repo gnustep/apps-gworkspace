@@ -35,9 +35,9 @@ static NSString *nibName = @"XTermPref";
 
 - (void)dealloc
 {
-  TEST_RELEASE (prefbox);
-  TEST_RELEASE (xterm);
-  TEST_RELEASE (xtermArgs);
+  RELEASE (prefbox);
+  RELEASE (xterm);
+  RELEASE (xtermArgs);
   [super dealloc];
 }
 

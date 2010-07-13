@@ -1,3 +1,17 @@
+2010-07-14 Riccardo Mottola <rmottola@users.sf.net>
+
+	* GWorkspace/Fiend/Fiend.m
+	* GWorkspace/Preferences/DesktopPref.m
+	* GWorkspace/Preferences/IconsPref.m
+	* GWorkspace/Preferences/HiddenFilesPref.m
+	* GWorkspace/Preferences/OperationPrefs.m
+	* GWorkspace/Preferences/XTermPref.m
+	* GWorkspace/Preferences/DefEditorPref.m
+	* GWorkspace/Finder/Modules/FModuleSize/FModuleSize.m
+	* GWorkspace/Finder/Modules/FModuleKind/FModuleKind.m
+	* GWorkspace/Desktop/Dock/Dock.m
+	Cleaned up Imports amd release macros.
+
 2010-07-06 Riccardo Mottola
 
 	* GWMetadata/configure.ac

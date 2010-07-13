@@ -45,7 +45,7 @@
   while ((wpath = [enumerator nextObject])) {
     [gw removeWatcherForPath: wpath];
   }
-	RELEASE (watchedPaths);
+  RELEASE (watchedPaths);
   
   [[NSNotificationCenter defaultCenter] removeObserver: self];	
 
@@ -624,7 +624,7 @@
   int posx, posy;
   int i, j, m, count;
       
-  TEST_RELEASE (freePositions);
+  RELEASE (freePositions);
   freePositions = [[NSMutableArray alloc] initWithCapacity: 1];
 
   positions = [self positionsAroundLeafAtPosX: 0 posY: 0];

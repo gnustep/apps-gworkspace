@@ -22,13 +22,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
 #include <math.h>
-#include "Dock.h"
-#include "DockIcon.h"
-#include "GWDesktopView.h"
-#include "GWorkspace.h"
+
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import "Dock.h"
+#import "DockIcon.h"
+#import "GWDesktopView.h"
+#import "GWorkspace.h"
 
 #define MAX_ICN_SIZE 48
 #define MIN_ICN_SIZE 16

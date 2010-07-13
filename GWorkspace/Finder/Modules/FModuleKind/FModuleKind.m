@@ -1,6 +1,6 @@
 /* FModuleKind.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -22,9 +22,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "FinderModulesProtocol.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import "FinderModulesProtocol.h"
 
 static NSString *nibName = @"FModuleKind";
 
@@ -60,7 +60,7 @@ static NSString *nibName = @"FModuleKind";
 
 - (void)dealloc
 {
-  TEST_RELEASE (controlsBox);
+  RELEASE (controlsBox);
   [super dealloc];
 }
 
