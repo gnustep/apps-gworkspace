@@ -1,6 +1,6 @@
 /* MDKQueryManager.m
  *  
- * Copyright (C) 2006 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@dtedu.net>
  * Date: October 2006
@@ -22,11 +22,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <AppKit/AppKit.h>
-#include <GNUstepBase/NSTask+GS.h>
-#include "MDKQueryManager.h"
-#include "MDKFSFilter.h"
-#include "FSNode.h"
+#import <AppKit/AppKit.h>
+#import "MDKQueryManager.h"
+#import "MDKFSFilter.h"
+#import "FSNode.h"
 #include "config.h"
 
 #define GWDebugLog(format, args...) \

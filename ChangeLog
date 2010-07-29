@@ -1,3 +1,8 @@
+2010-07-29 Riccardo Mottola <rmottola@users.sf.net>
+
+	* GWMetadata/MDKit/MDKQueryManager.m
+	Cleaned up headers.
+
 2010-07-14 Riccardo Mottola <rmottola@users.sf.net>
 
 	* GWorkspace/Fiend/Fiend.m
