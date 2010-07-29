@@ -32,7 +32,7 @@
 
 #import "mdextractor.h"
 #import "dbschema.h"
-#import "config.h"
+#include "config.h"
 
 #define DLENGTH 256
 #define MAX_RETRY 1000

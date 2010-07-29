@@ -22,16 +22,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <AppKit/AppKit.h>
+#include "config.h"
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <limits.h>
 #include <float.h>
 
 #import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
 
 #import "mdextractor.h"
-#import "config.h"
+
 
 #define GWDebugLog(format, args...) \
   do { if (GW_DEBUG_LOG) \
