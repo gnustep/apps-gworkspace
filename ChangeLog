@@ -1,3 +1,21 @@
+2010-07-31  Wolfgang Lux  <wolfgang.lux@gmail.com>
+
+	* GWorkspace/Desktop/GWDesktopManager.m (-validateItem:):
+	* GWorkspace/FileViewer/GWSpatialViewer.m (-validateItem:):
+	* GWorkspace/FileViewer/GWViewer.m (-validateItem:): Enable the
+	Open As Folder... command also for non-package directories so that
+	users can quickly open a new file viewer for any directory.
+
+	* GWorkspace/FileViewer/GWSpatialViewer.m (-validateItem:):
+	* GWorkspace/FileViewer/GWViewer.m (-validateItem:): Validate
+	items with action makeKeyAndOrderFront:. This fixes the defunct
+	Windows menu.
+
+	* GWorkspace/GWorkspace.h:
+	* GWorkspace/GWorkspace.m (-createMenu): Use standard actions for
+	the Arrange in Front, Miniaturize Window, and Close Window items
+	in the Windows menu.
+
 2010-07-29 Riccardo Mottola <rmottola@users.sf.net>
 
 	* GWMetadata/MDKit/MDKQueryManager.m

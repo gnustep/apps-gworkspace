@@ -349,7 +349,9 @@
 //
 // Menu Operations
 //
+#if 0
 - (void)closeMainWin:(id)sender;
+#endif
 
 - (void)logout:(id)sender;
 

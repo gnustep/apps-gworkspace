@@ -1178,7 +1178,7 @@
 
     } else if (sel_eq(action, @selector(openSelectionAsFolder:))) {
       if (lastSelection && ([lastSelection count] == 1)) {  
-        return [[lastSelection objectAtIndex: 0] isPackage];
+        return [[lastSelection objectAtIndex: 0] isDirectory];
       }
 
       return NO;
@@ -1214,6 +1214,11 @@
     } 
     
     return YES;
+  } else {
+    SEL action = [menuItem action];
+    if (sel_eq(action, @selector(makeKeyAndOrderFront:))) {
+      return YES;
+    }
   }
   
   return NO;

@@ -287,9 +287,9 @@ static GWorkspace *gworkspace = nil;
   menuItem = addItemToMenu(mainMenu, @"Windows", @"", nil, @"");
   windows = AUTORELEASE ([NSMenu new]);
   [mainMenu setSubmenu: windows forItem: menuItem];		
-  addItemToMenu(windows, @"Arrange in Front", @"", nil, @"");
-  addItemToMenu(windows, @"Miniaturize Window", @"", nil, @"");
-  addItemToMenu(windows, @"Close Window", @"", @"closeMainWin:", @"w");
+  addItemToMenu(windows, @"Arrange in Front", @"", @"arrangeInFront:", @"");
+  addItemToMenu(windows, @"Miniaturize Window", @"", @"performMiniaturize:", @"m");
+  addItemToMenu(windows, @"Close Window", @"", @"performClose:", @"w");
 
 	// Services 
 	menuItem = addItemToMenu(mainMenu, @"Services", @"", nil, @"");
@@ -2153,11 +2153,6 @@ static GWorkspace *gworkspace = nil;
 //
 // Menu Operations
 //
-- (void)closeMainWin:(id)sender
-{
-  [[NSApp keyWindow] performClose: sender];
-}
-
 - (void)logout:(id)sender
 {
   [self startLogout];

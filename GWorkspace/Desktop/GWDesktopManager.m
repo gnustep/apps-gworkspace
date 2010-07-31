@@ -636,7 +636,7 @@ static GWDesktopManager *desktopManager = nil;
       NSArray *selection = [desktopView selectedNodes];
     
       if (selection && ([selection count] == 1)) {  
-        return [[selection objectAtIndex: 0] isPackage];
+        return [[selection objectAtIndex: 0] isDirectory];
       }
     
       return NO;
