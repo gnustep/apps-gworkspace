@@ -281,7 +281,9 @@
 
     nextEvent = [win nextEventMatchingMask: NSLeftMouseUpMask | NSLeftMouseDraggedMask];
     if ([nextEvent type] == NSLeftMouseUp) {
+#if 0 // Ordering a window back after a single mouse click is outright annoying
 		  [win orderBack: self];
+#endif
       return;
     }
 
@@ -303,7 +305,9 @@
       [fiend draggedFiendLeaf: self atPoint: origin mouseUp: NO];  
     } 
 
+#if 0 // Ordering a window back after a single mouse click is outright annoying
 	  [win orderBack: self];
+#endif
     [fiend draggedFiendLeaf: self atPoint: [win frame].origin mouseUp: YES];
   
   } else {  

@@ -1,5 +1,11 @@
 2010-07-31  Wolfgang Lux  <wolfgang.lux@gmail.com>
 
+	* GWorkspace/Fiend/FiendLeaf.m (-mouseDown:): Don't order fiend
+	icons back after a single mouse click. This behavior is outright
+	annoying (to say the least).
+
+2010-07-31  Wolfgang Lux  <wolfgang.lux@gmail.com>
+
 	* GWorkspace/Desktop/GWDesktopManager.m (-validateItem:):
 	* GWorkspace/FileViewer/GWSpatialViewer.m (-validateItem:):
 	* GWorkspace/FileViewer/GWViewer.m (-validateItem:): Enable the
