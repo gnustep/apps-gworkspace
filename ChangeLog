@@ -1,3 +1,10 @@
+2010-08-09  Wolfgang Lux  <wolfgang.lux@gmail.com>
+
+	* GWorkspace/GWorkspaceInfo.plist:
+	* GWorkspace/GWorkspace.m (-applicationDidFinishLaunching:,
+	-openInWorkspace:userData:error:):
+	Implement an Open in Workspace service command.
+
 2010-07-31  Wolfgang Lux  <wolfgang.lux@gmail.com>
 
 	* GWorkspace/Fiend/FiendLeaf.m (-mouseDown:): Don't order fiend

@@ -15,6 +15,18 @@
     CopyrightDescription = "Released under the GNU General Public License 2.0 or later";
     NSIcon = "FileManager.tiff";
     NSRole = "Viewer";
+    NSServices = (
+      {
+        NSMenuItem = {
+          English = "Open in GWorkspace";
+          German = "In GWorkspace \U00F6ffnen";
+          default = "Open in GWorkspace";
+        };
+        NSMessage = openInWorkspace;
+        NSPortName = GWorkspace;
+        NSSendTypes = ( NSStringPboardType );
+      }
+    );
     NSTypes = (
     {
       NSUnixExtensions = ( "inspector" );

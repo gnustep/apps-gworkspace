@@ -504,6 +504,16 @@ static GWorkspace *gworkspace = nil;
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   NSNotificationCenter *dnc = [NSDistributedNotificationCenter defaultCenter];
   
+  NS_DURING
+    {
+      [NSApp setServicesProvider:self];
+    }
+  NS_HANDLER
+    {
+      NSLog(@"setServicesProvider: %@", localException);
+    }
+  NS_ENDHANDLER
+
   [nc addObserver: self 
          selector: @selector(fileSystemWillChange:) 
              name: @"GWFileSystemWillChangeNotification"
@@ -2148,6 +2158,24 @@ static GWorkspace *gworkspace = nil;
 	}
 	
 	return NO;
+}
+
+//
+// Workspace service
+//
+
+- (void)openInWorkspace:(NSPasteboard *)pboard
+	       userData:(NSString *)userData
+		  error:(NSString **)error
+{
+  NSArray *types = [pboard types];
+  if ([types containsObject: NSStringPboardType])
+    {
+      NSString *path = [pboard stringForType: NSStringPboardType];
+      path = [path stringByTrimmingCharactersInSet:
+		     [NSCharacterSet whitespaceAndNewlineCharacterSet]];
+      [self openSelectedPaths: [NSArray arrayWithObject: path] newViewer: YES];
+    }
 }
 
 //
