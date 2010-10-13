@@ -38,6 +38,7 @@
       },
       {
 	NSUnixExtensions = ( "webloc" );
+	NSIcon = "FileIcon_WebLink.tiff";
       }
   );
 }
