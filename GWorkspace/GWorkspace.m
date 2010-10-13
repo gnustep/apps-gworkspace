@@ -3,6 +3,7 @@
  * Copyright (C) 2003-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
+ *         Riccardo Mottola
  * Date: August 2001
  *
  * This file is part of the GNUstep GWorkspace application
@@ -1270,33 +1271,51 @@ static GWorkspace *gworkspace = nil;
 
 - (BOOL)openFile:(NSString *)fullPath
 {
-	NSString *appName = nil;
+  NSString *appName = nil;
   NSString *type = nil;
   BOOL success;
+  NSURL *aURL;
   
+  aURL = nil;
   [ws getInfoForFile: fullPath application: &appName type: &type];
   
-	if (appName == nil) {
-		appName = defEditor;
-	}		
+  if (appName == nil) {
+    appName = defEditor;
+  }
+
+  if (type == NSPlainFileType)
+    {
+      if ([[fullPath pathExtension] isEqualToString: @"webloc"])
+	{
+	  NSDictionary *weblocDict;
+	  NSString *urlString;
+
+	  weblocDict = [NSDictionary dictionaryWithContentsOfFile: fullPath];
+	  urlString = [weblocDict objectForKey:@"URL"];
+	  aURL = [NSURL URLWithString: urlString];
+        }
+    }	
   
   NS_DURING
     {
-  success = [ws openFile: fullPath withApplication: appName];
+      if (aURL == nil)
+	success = [ws openFile: fullPath withApplication: appName];
+      else
+	success = [ws openURL: aURL];
     }
   NS_HANDLER
     {
-  NSRunAlertPanel(NSLocalizedString(@"error", @""), 
-      [NSString stringWithFormat: @"%@ %@!", 
-          NSLocalizedString(@"Can't open ", @""), [fullPath lastPathComponent]],
-                                    NSLocalizedString(@"OK", @""), 
-                                    nil, 
-                                    nil);                                     
-  success = NO;
+      NSRunAlertPanel(NSLocalizedString(@"error", @""), 
+		      [NSString stringWithFormat: @"%@ %@!", 
+				NSLocalizedString(@"Can't open ", @""), [fullPath lastPathComponent]],
+		      NSLocalizedString(@"OK", @""), 
+		      nil, 
+		      nil);                                     
+      success = NO;
     }
   NS_ENDHANDLER  
   
-  return success;  
+    return success;  
 }
 
 - (BOOL)application:(NSApplication *)theApplication 

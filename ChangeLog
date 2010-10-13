@@ -1,3 +1,9 @@
+2010-10-13 Riccardo Mottola
+
+	* GWorkspace/GWorkspaceInfo.plist,
+	* GWorkspace/GWorkspace.m;
+	Implement opening of webloc files.
+
 2010-08-09  Wolfgang Lux  <wolfgang.lux@gmail.com>
 
 	* GWorkspace/GWorkspaceInfo.plist:

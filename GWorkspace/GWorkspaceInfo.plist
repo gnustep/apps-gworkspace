@@ -35,6 +35,9 @@
       {
         NSUnixExtensions = ( "lsf" );
         NSIcon = "LiveSearchFolder.tiff";
-      }        
+      },
+      {
+	NSUnixExtensions = ( "webloc" );
+      }
   );
 }
