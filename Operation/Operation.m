@@ -82,89 +82,107 @@
   FileOpInfo *info;
   int i;
 
-  if (files == nil) {
-    files = [NSArray arrayWithObject: @""];
-  }
+  if (files == nil)
+    {
+      files = [NSArray arrayWithObject: @""];
+    }
 
   opfiles = files;
 
   if ([operation isEqual: @"GWorkspaceRenameOperation"]
-               || [operation isEqual: @"GWorkspaceCreateDirOperation"]
-               || [operation isEqual: @"GWorkspaceCreateFileOperation"]) {    
-    confirm = NO;
-    usewin = NO;
-  }
+      || [operation isEqual: @"GWorkspaceCreateDirOperation"]
+      || [operation isEqual: @"GWorkspaceCreateFileOperation"])
+    {    
+      confirm = NO;
+      usewin = NO;
+    }
    
   if ([operation isEqual: @"NSWorkspaceMoveOperation"]
-         || [operation isEqual: @"NSWorkspaceCopyOperation"]
-         || [operation isEqual: @"NSWorkspaceLinkOperation"]
-         || [operation isEqual: @"NSWorkspaceDuplicateOperation"]
-         || [operation isEqual: @"NSWorkspaceRecycleOperation"]
-         || [operation isEqual: @"GWorkspaceRecycleOutOperation"]) {
-    opbase = source;
-  } else {
-    opbase = destination;
-  }
+      || [operation isEqual: @"NSWorkspaceCopyOperation"]
+      || [operation isEqual: @"NSWorkspaceLinkOperation"]
+      || [operation isEqual: @"NSWorkspaceDuplicateOperation"]
+      || [operation isEqual: @"NSWorkspaceRecycleOperation"]
+      || [operation isEqual: @"NSWorkspaceDestroyOperation"] 
+      || [operation isEqual: @"GWorkspaceRecycleOutOperation"])
+    {
+      opbase = source;
+    }
+  else
+    {
+      opbase = destination;
+    }
 
-  if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
-    opfiles = [NSArray arrayWithObject: [source lastPathComponent]];
-    opbase = [source stringByDeletingLastPathComponent];
-  }
+  if ([operation isEqual: @"GWorkspaceRenameOperation"])
+    {
+      opfiles = [NSArray arrayWithObject: [source lastPathComponent]];
+      opbase = [source stringByDeletingLastPathComponent];
+    }
   
   action = MOVE;
   if ([operation isEqual: @"NSWorkspaceMoveOperation"]
-               || [operation isEqual: @"NSWorkspaceRecycleOperation"]
-               || [operation isEqual: @"GWorkspaceRecycleOutOperation"]) {    
-    action = MOVE;
-  } else if ([operation isEqual: @"NSWorkspaceDestroyOperation"] 
-            || [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]) {
-    action = DESTROY;
-  } else if ([operation isEqual: @"NSWorkspaceCopyOperation"] 
-                || [operation isEqual: @"NSWorkspaceLinkOperation"]
-                || [operation isEqual: @"NSWorkspaceDuplicateOperation"]) {
-    action = COPY;
-  } else if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
-    action = RENAME;
-  } else if ([operation isEqual: @"GWorkspaceCreateDirOperation"] 
-            || [operation isEqual: @"GWorkspaceCreateFileOperation"]) {
-    action = CREATE;
-  }
+      || [operation isEqual: @"NSWorkspaceRecycleOperation"]
+      || [operation isEqual: @"GWorkspaceRecycleOutOperation"])
+    {    
+      action = MOVE;
+    } else if ([operation isEqual: @"NSWorkspaceDestroyOperation"] 
+	       || [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"])
+    {
+      action = DESTROY;
+    } else if ([operation isEqual: @"NSWorkspaceCopyOperation"] 
+	       || [operation isEqual: @"NSWorkspaceLinkOperation"]
+	       || [operation isEqual: @"NSWorkspaceDuplicateOperation"]) 
+    {
+      action = COPY;
+    } else if ([operation isEqual: @"GWorkspaceRenameOperation"])
+    {
+      action = RENAME;
+    } else if ([operation isEqual: @"GWorkspaceCreateDirOperation"] 
+	       || [operation isEqual: @"GWorkspaceCreateFileOperation"])
+    {
+      action = CREATE;
+    }
 
-	if ([self verifyFileAtPath: opbase forOperation: nil] == NO) {
-		return;
-	}
+  if ([self verifyFileAtPath: opbase forOperation: nil] == NO)
+    {
+      return;
+    }
 
   oppaths = [NSMutableArray array];
   filesInfo = [NSMutableArray array];
 
-	for (i = 0; i < [opfiles count]; i++) {
-		NSString *opfile = [opfiles objectAtIndex: i];
-		NSString *oppath = [opbase stringByAppendingPathComponent: opfile];
+  for (i = 0; i < [opfiles count]; i++)
+    {
+      NSString *opfile = [opfiles objectAtIndex: i];
+      NSString *oppath = [opbase stringByAppendingPathComponent: opfile];
 
-		if ([self verifyFileAtPath: oppath forOperation: operation]) {
-      NSDictionary *attributes = [fm fileAttributesAtPath: oppath traverseLink: NO];
-      NSData *date = [attributes objectForKey: NSFileModificationDate];
-      NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys: opfile, @"name", date, @"date", nil]; 
+      if ([self verifyFileAtPath: oppath forOperation: operation])
+	{
+	  NSDictionary *attributes = [fm fileAttributesAtPath: oppath traverseLink: NO];
+	  NSData *date = [attributes objectForKey: NSFileModificationDate];
+	  NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys: opfile, @"name", date, @"date", nil]; 
           
-      [oppaths addObject: oppath];
-      [filesInfo addObject: dict];
-		} else {
-			return;
-    }
+	  [oppaths addObject: oppath];
+	  [filesInfo addObject: dict];
+	} else
+	{
+	  return;
 	}
-  
-  for (i = 0; i < [oppaths count]; i++) {
-    NSString *oppath = [oppaths objectAtIndex: i];
-
-    if ([self isLockedAction: action onPath: oppath]) {
-      NSRunAlertPanel(nil, 
-                      NSLocalizedString(@"Some files are in use by another operation!", @""),
-					            NSLocalizedString(@"OK", @""), 
-                      nil, 
-                      nil);  
-      return;
     }
-  }
+  
+  for (i = 0; i < [oppaths count]; i++)
+    {
+      NSString *oppath = [oppaths objectAtIndex: i];
+
+      if ([self isLockedAction: action onPath: oppath])
+	{
+	  NSRunAlertPanel(nil, 
+			  NSLocalizedString(@"Some files are in use by another operation!", @""),
+			  NSLocalizedString(@"OK", @""), 
+			  nil, 
+			  nil);  
+	  return;
+	}
+    }
   
   info = [FileOpInfo operationOfType: operation
                                  ref: [self fileOpRef]

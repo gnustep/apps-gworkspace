@@ -961,21 +961,24 @@ filename = [fileinfo objectForKey: @"name"];
 
 - (void)doRemove
 {
-  while (1) {
-	  CHECK_DONE;	
-	  GET_FILENAME;  
+  while (1)
+    {
+      CHECK_DONE;	
+      GET_FILENAME;  
 	  
-	  if ([fm removeFileAtPath: [destination stringByAppendingPathComponent: filename]
-				             handler: self]) {
-      [procfiles addObject: filename];
+      if ([fm removeFileAtPath: [source stringByAppendingPathComponent: filename]
+		       handler: self])
+	{
+	  [procfiles addObject: filename];
+	}
+      [files removeObject: fileinfo];	 
+      RELEASE (fileinfo);   
     }
-	  [files removeObject: fileinfo];	 
-    RELEASE (fileinfo);   
-  }
 
-  if (([files count] == 0) || stopped) {
-    [self done];
-  }                                       
+  if (([files count] == 0) || stopped)
+    {
+      [self done];
+    }                                       
 }
 
 - (void)doDuplicate
