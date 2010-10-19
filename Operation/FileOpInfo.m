@@ -49,7 +49,6 @@ static NSString *nibName = @"FileOperationWin";
   RELEASE (dupfiles);
   RELEASE (notifNames);
   RELEASE (win);
-  RELEASE (progInd);
   
   DESTROY (executor);
   DESTROY (execconn);
