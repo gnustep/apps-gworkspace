@@ -108,7 +108,7 @@ static NSString *nibName = @"FileOperationWin";
       [pauseButt setTitle: NSLocalizedString(@"Pause", @"")];
       [stopButt setTitle: NSLocalizedString(@"Stop", @"")];      
     }
-    
+ 
     ref = rf;
     controller = cntrl;
     fm = [NSFileManager defaultManager];
@@ -126,56 +126,61 @@ static NSString *nibName = @"FileOperationWin";
       NSString *copystr = NSLocalizedString(@"_copy", @"");
       unsigned i;
       
-      for (i = 0; i < [files count]; i++) {
-        NSDictionary *fdict = [files objectAtIndex: i];
-        NSString *fname = [fdict objectForKey: @"name"]; 
-        NSString *newname = [NSString stringWithString: fname];
-        NSString *ext = [newname pathExtension]; 
-        NSString *base = [newname stringByDeletingPathExtension];        
-        NSString *ntmp;
-	NSString *destpath;        
-        int count = 1;
+      for (i = 0; i < [files count]; i++)
+	{
+	  NSDictionary *fdict = [files objectAtIndex: i];
+	  NSString *fname = [fdict objectForKey: @"name"]; 
+	  NSString *newname = [NSString stringWithString: fname];
+	  NSString *ext = [newname pathExtension]; 
+	  NSString *base = [newname stringByDeletingPathExtension];        
+	  NSString *ntmp;
+	  NSString *destpath;        
+	  int count = 1;
 	      
-	while (1) {
-          if (count == 1) {
-            ntmp = [NSString stringWithFormat: @"%@%@", base, copystr];
-            if ([ext length]) {
-              ntmp = [ntmp stringByAppendingPathExtension: ext];
-            }
-          } else {
-            ntmp = [NSString stringWithFormat: @"%@%@%i", base, copystr, count];
-            if ([ext length]) {
-              ntmp = [ntmp stringByAppendingPathExtension: ext];
-            }
-          }
+	  while (1)
+	    {
+	      if (count == 1)
+		{
+		  ntmp = [NSString stringWithFormat: @"%@%@", base, copystr];
+		  if ([ext length]) {
+		    ntmp = [ntmp stringByAppendingPathExtension: ext];
+		  }
+		} else
+		{
+		  ntmp = [NSString stringWithFormat: @"%@%@%i", base, copystr, count];
+		  if ([ext length]) {
+		    ntmp = [ntmp stringByAppendingPathExtension: ext];
+		  }
+		}
+	      destpath = [destination stringByAppendingPathComponent: ntmp];
 
-		      destpath = [destination stringByAppendingPathComponent: ntmp];
-
-		      if ([fm fileExistsAtPath: destpath] == NO) {
-            newname = ntmp;
-			      break;
-          } else {
-            count++;
-          }
+	    if ([fm fileExistsAtPath: destpath] == NO) {
+	      newname = ntmp;
+	      break;
+	    } else
+	      {
+		count++;
 	      }
+	  }
         
-        [dupfiles addObject: newname];
-      }
+	  [dupfiles addObject: newname];
+	}
     }
     
     operationDict = [NSMutableDictionary new];
     [operationDict setObject: type forKey: @"operation"]; 
     [operationDict setObject: [NSNumber numberWithInt: ref] forKey: @"ref"];
     [operationDict setObject: source forKey: @"source"]; 
-    [operationDict setObject: destination forKey: @"destination"]; 
+    if (destination != nil)
+      [operationDict setObject: destination forKey: @"destination"]; 
     [operationDict setObject: files forKey: @"files"]; 
 
     confirm = conf;
     executor = nil;
     opdone = NO;
-  }
+    }
   
-	return self;
+  return self;
 }
 
 - (void)startOperation
@@ -449,7 +454,8 @@ static NSString *nibName = @"FileOperationWin";
   
   [dict setObject: type forKey: @"operation"];	
   [dict setObject: source forKey: @"source"];	
-  [dict setObject: destination forKey: @"destination"];	
+  if (destination != nil)
+    [dict setObject: destination forKey: @"destination"];	
   [dict setObject: notifNames forKey: @"files"];	
 
   [nc postNotificationName: @"GWFileSystemWillChangeNotification" object: dict];
@@ -465,7 +471,8 @@ static NSString *nibName = @"FileOperationWin";
 
   [notifObj setObject: type forKey: @"operation"];	
   [notifObj setObject: source forKey: @"source"];	
-  [notifObj setObject: destination forKey: @"destination"];	
+  if (destination != nil)
+    [notifObj setObject: destination forKey: @"destination"];	
   
   if (executor) {
     NSData *data = [executor processedFiles];
@@ -1095,8 +1102,8 @@ filename = [fileinfo objectForKey: @"name"];
 {
   NSString *copystr = NSLocalizedString(@"_copy", @"");
   NSString *srcpath;
-	NSString *destpath;
-	NSString *newname;
+  NSString *destpath;
+  NSString *newname;
   NSString *ntmp;
 
   while (1) {

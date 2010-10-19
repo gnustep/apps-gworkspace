@@ -877,26 +877,34 @@ static Finder *finder = nil;
   BOOL copy, move, remove; 
   int i, j, count;
 
-  if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
-    srcpaths = [NSArray arrayWithObject: source];
-    dstpaths = [NSArray arrayWithObject: destination];
-  } else {
-    if ([operation isEqual: @"NSWorkspaceDuplicateOperation"]
-                || [operation isEqual: @"NSWorkspaceRecycleOperation"]) { 
-      for (i = 0; i < [files count]; i++) {
-        NSString *fname = [origfiles objectAtIndex: i];
-        [srcpaths addObject: [source stringByAppendingPathComponent: fname]];
-        fname = [files objectAtIndex: i];
-        [dstpaths addObject: [destination stringByAppendingPathComponent: fname]];
-      }
-    } else {  
-      for (i = 0; i < [files count]; i++) {
-        NSString *fname = [files objectAtIndex: i];
-        [srcpaths addObject: [source stringByAppendingPathComponent: fname]];
-        [dstpaths addObject: [destination stringByAppendingPathComponent: fname]];
-      }
+  if ([operation isEqual: @"GWorkspaceRenameOperation"])
+    {
+      srcpaths = [NSArray arrayWithObject: source];
+      dstpaths = [NSArray arrayWithObject: destination];
     }
-  }
+  else
+    {
+      if ([operation isEqual: @"NSWorkspaceDuplicateOperation"]
+	  || [operation isEqual: @"NSWorkspaceRecycleOperation"])
+	{ 
+	  for (i = 0; i < [files count]; i++) {
+	    NSString *fname = [origfiles objectAtIndex: i];
+	    [srcpaths addObject: [source stringByAppendingPathComponent: fname]];
+	    fname = [files objectAtIndex: i];
+	    [dstpaths addObject: [destination stringByAppendingPathComponent: fname]];
+	  }
+	}
+      else
+	{
+	  for (i = 0; i < [files count]; i++)
+	    {
+	      NSString *fname = [files objectAtIndex: i];
+	      [srcpaths addObject: [source stringByAppendingPathComponent: fname]];
+	      if (destination != nil)
+		[dstpaths addObject: [destination stringByAppendingPathComponent: fname]];
+	    }
+	}
+    }
 
   copy = ([operation isEqual: @"NSWorkspaceCopyOperation"]
                 || [operation isEqual: @"NSWorkspaceDuplicateOperation"]); 

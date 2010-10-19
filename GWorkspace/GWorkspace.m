@@ -2671,14 +2671,14 @@ static GWorkspace *gworkspace = nil;
 
 - (void)performFileOperation:(NSDictionary *)opinfo
 {
-	NSString *operation = [opinfo objectForKey: @"operation"];
-	NSString *source = [opinfo objectForKey: @"source"];
-	NSString *destination = [opinfo objectForKey: @"destination"];
-	NSArray *files = [opinfo objectForKey: @"files"];
-	int tag;
+  NSString *operation = [opinfo objectForKey: @"operation"];
+  NSString *source = [opinfo objectForKey: @"source"];
+  NSString *destination = [opinfo objectForKey: @"destination"];
+  NSArray *files = [opinfo objectForKey: @"files"];
+  int tag;
 	
-	[self performFileOperation: operation source: source 
-											destination: destination files: files tag: &tag];
+  [self performFileOperation: operation source: source 
+		 destination: destination files: files tag: &tag];
 }
 
 - (BOOL)filenamesWasCutted
@@ -2704,7 +2704,7 @@ static GWorkspace *gworkspace = nil;
   NSArray *srcPaths = [infoDict objectForKey: @"paths"];
   BOOL bookmark = [[infoDict objectForKey: @"bookmark"] boolValue];
   NSString *connName = [infoDict objectForKey: @"dndconn"];
-	NSArray *locContents = [fm directoryContentsAtPath: localPath];
+  NSArray *locContents = [fm directoryContentsAtPath: localPath];
   BOOL samename = NO;
   int i;
 

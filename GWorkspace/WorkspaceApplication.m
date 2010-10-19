@@ -47,27 +47,40 @@
                        files:(NSArray *)files 
                          tag:(int *)tag
 {
-  if (loggingout == NO) {
-    NSMutableDictionary *opdict = [NSMutableDictionary dictionary];
+  if (loggingout == NO)
+    {
+      NSMutableDictionary *opdict = [NSMutableDictionary dictionary];
 
-    [opdict setObject: operation forKey: @"operation"];
-    [opdict setObject: source forKey: @"source"];
-    [opdict setObject: destination forKey: @"destination"];
-    [opdict setObject: files forKey: @"files"];
+      if (operation != nil)
+	[opdict setObject: operation forKey: @"operation"];
+      else
+	NSLog(@"performFileOperation: operation can't be nil");
 
-    [fileOpsManager performOperation: opdict];
+      if (operation != nil)
+	[opdict setObject: source forKey: @"source"];
+      else
+	NSLog(@"performFileOperation: source is nil");
 
-    *tag = 0;
+      if (destination != nil)
+	[opdict setObject: destination forKey: @"destination"];
+
+      if (files != nil)
+	[opdict setObject: files forKey: @"files"];
+
+      [fileOpsManager performOperation: opdict];
+
+      *tag = 0;
     
-    return YES;
+      return YES;
   
-  } else {
-    NSRunAlertPanel(nil, 
-                  NSLocalizedString(@"GWorkspace is logging out!", @""),
-					        NSLocalizedString(@"Ok", @""), 
-                  nil, 
-                  nil);  
-  }
+    } else
+    {
+      NSRunAlertPanel(nil, 
+		      NSLocalizedString(@"GWorkspace is logging out!", @""),
+		      NSLocalizedString(@"Ok", @""), 
+		      nil, 
+		      nil);  
+    }
   
   return NO;
 }

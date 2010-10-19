@@ -1,3 +1,13 @@
+2010-10-20 Riccardo Mottola
+
+	* Operation/FileOpInfo.m
+	* GWorkspace/GWorkspace.m
+	* GWorkspace/Finder/Finder.m
+	* GWorkspace/WorkspaceApplication.m
+
+	Fix and guard all destination instances which were nil for
+	Destroy operation.
+
 2010-10-19  Wolfgang Lux  <wolfgang.lux@gmail.com>
 
 	* Operation/FileOpInfo.m (-dealloc): Remove incorrect release of
@@ -15,6 +25,8 @@
 	* GWorkspace/GWorkspaceInfo.plist,
 	* GWorkspace/GWorkspace.m;
 	Implement opening of webloc files.
+	* GWorkspace/Resources/Icons/FileIcon_WebLink.tiff
+	Added icon for WebLink, created under GPL
 
 2010-08-09  Wolfgang Lux  <wolfgang.lux@gmail.com>
 
