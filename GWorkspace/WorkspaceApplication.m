@@ -61,6 +61,8 @@
       else
 	NSLog(@"performFileOperation: source is nil");
 
+      if (destination == nil && [operation isEqualToString:@"NSWorkspaceRecycleOperation"])
+	destination = [self trashPath];
       if (destination != nil)
 	[opdict setObject: destination forKey: @"destination"];
 

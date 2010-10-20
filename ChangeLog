@@ -1,3 +1,9 @@
+2010-10-21 Riccardo Mottola
+
+	* GWorkspace/GWorkspace.m
+	* GWorkspace/WorkspaceApplication.m
+	If there is no destination for the Recycle operation, get the trash path.
+	
 2010-10-20 Riccardo Mottola
 
 	* Operation/FileOpInfo.m
