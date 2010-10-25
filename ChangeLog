@@ -1,9 +1,17 @@
+2010-10-25  Wolfgang Lux  <wolfgang.lux@gmail.com>
+
+	* GWorkspace/FileViewer/GWViewerShelf.h:
+	* GWorkspace/FileViewer/GWViewerShelf.m (-openSelectionInNewViewer):
+	Implement method so that double clicking an application or file
+	icon in the shelf opens the corresponding application.
+
 2010-10-21 Riccardo Mottola
 
 	* GWorkspace/GWorkspace.m
 	* GWorkspace/WorkspaceApplication.m
-	If there is no destination for the Recycle operation, get the trash path.
-	
+	If there is no destination for the Recycle operation, get the
+	trash path.
+
 2010-10-20 Riccardo Mottola
 
 	* Operation/FileOpInfo.m

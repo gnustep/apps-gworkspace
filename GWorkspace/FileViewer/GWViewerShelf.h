@@ -135,6 +135,7 @@
 - (void)repSelected:(id)arep;
 - (void)unselectOtherReps:(id)arep;
 - (NSArray *)selectedPaths;  
+- (void)openSelectionInNewViewer:(BOOL)newv;
 
 - (void)nodeContentsWillChange:(NSDictionary *)info;
 - (void)nodeContentsDidChange:(NSDictionary *)info;

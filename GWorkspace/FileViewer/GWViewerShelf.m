@@ -782,6 +782,11 @@
   return [NSArray arrayWithArray: selectedPaths];
 } 
 
+- (void)openSelectionInNewViewer:(BOOL)newv
+{
+  [viewer openSelectionInNewViewer: newv];
+}
+
 - (void)nodeContentsWillChange:(NSDictionary *)info
 {
   [self checkLockedReps];
