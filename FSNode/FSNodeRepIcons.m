@@ -148,7 +148,8 @@ static unsigned char darkerLUT[256] = {
       if ([fm isReadableFileAtPath: iconPath]) {
         key = iconPath;
 	    } else {
-        key = @"folder";
+	/* we may have more than one folder icon */
+        key = nodepath;
       }
     }   
     
