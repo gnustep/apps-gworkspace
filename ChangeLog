@@ -1,3 +1,8 @@
+2010-12-07 Riccardo Mottola
+
+	* GWorkspace/WorkspaceApplication.m:
+	Minor code cleanup.
+
 2010-11-11 Wolfgang Lux
 
 	* FSNode/FSNodeRepIcons.m

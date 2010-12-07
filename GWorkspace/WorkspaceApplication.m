@@ -55,7 +55,7 @@
 	[opdict setObject: operation forKey: @"operation"];
       else
 	NSLog(@"performFileOperation: operation can't be nil");
-
+ 
       if (operation != nil)
 	[opdict setObject: source forKey: @"source"];
       else
@@ -75,7 +75,8 @@
     
       return YES;
   
-    } else
+    }
+  else
     {
       NSRunAlertPanel(nil, 
 		      NSLocalizedString(@"GWorkspace is logging out!", @""),
