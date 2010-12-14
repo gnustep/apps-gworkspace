@@ -1,0 +1,42 @@
+#!/bin/sh
+# Usage: iceweasel [ -GSFilePath file ]
+# simple GNUstep launch script for iceweasel navigator
+#
+# -- ICEWEASEL should be the name you use to launch navigator from
+# -- the command line
+ICEWEASEL=/usr/bin/iceweasel
+# -- ICEWEASEL_NAME is the (beginning of the) name which is shown 
+# -- under ps or top.
+ICEWEASEL_NAME=iceweasel-bin
+#
+#--FUNCTIONS
+#
+usage()
+{
+echo Usage: `basename $0` '[ -GSFilePath file ]'
+exit 2
+}
+#-- MAIN
+#
+# -- establish name of file to be opened
+#
+if [ $# -eq 2 ] ; then
+  if [ "$1" = "-GSFilePath" ] ; then
+    file="$2"
+  else
+    usage
+  fi
+elif [ $# -eq 0 ] ; then
+  file=
+else
+  usage
+fi
+# -- check if iceweasel is running
+# -- is running
+ps -a | grep $ICEWEASEL_NAME
+if [ $? -eq 0 ] ; then
+  test -z "$file" || $ICEWEASEL -noraise -remote "openURL(file:${file},new-window)"
+else
+  $ICEWEASEL $file &
+fi
+

@@ -1,0 +1,16 @@
+{
+  NSExecutable = "iceweasel";
+  NSRole = "Viewer";
+  NSIcon = "iceweasel.png";
+	XAppWrapper = YES;
+  NSTypes = (
+    {
+      NSUnixExtensions = ( "html" );
+      NSIcon = "FileIcon_.html.tiff";
+    },
+    {
+      NSUnixExtensions = ( "htm" );
+      NSIcon = "FileIcon_.html.tiff";
+    }
+  );
+}
