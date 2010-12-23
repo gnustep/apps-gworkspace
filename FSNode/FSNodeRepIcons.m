@@ -1,8 +1,9 @@
 /* FSNodeRepIcons.m
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2010 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
+ *         Riccardo Mottola
  * Date: March 2005
  *
  * This file is part of the GNUstep FSNode framework
@@ -22,11 +23,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
 #include <math.h>
-#include "FSNodeRep.h"
-#include "FSNFunctions.h"
+
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import "FSNodeRep.h"
+#import "FSNFunctions.h"
 
 /*
  *****************************************************************************
@@ -127,86 +129,101 @@ static unsigned char darkerLUT[256] = {
   NSImage *baseIcon = nil;
   NSString *key = nil;
 
-  if ([node isDirectory]) {  
-    if ([node isApplication]) {
-      key = nodepath;
+  if ([node isDirectory])
+    {  
+      if ([node isApplication])
+	{
+	  key = nodepath;
 
-    } else if (([node isMountPoint] && [volumes containsObject: nodepath])
-                                      || [volumes containsObject: nodepath]) {
-      key = @"disk";
-      baseIcon = hardDiskIcon;                                
+	}
+      else if (([node isMountPoint] && [volumes containsObject: nodepath])
+	       || [volumes containsObject: nodepath])
+	{
+	  key = @"disk";
+	  baseIcon = hardDiskIcon;
 
-    } else if ([nodepath isEqual: rootPath]) {
-      key = @"root";
+	}
+      else if ([node isPackage] == NO)
+	{
+	  NSString *iconPath = [nodepath stringByAppendingPathComponent: @".dir.tiff"];
 
-    } else if ([nodepath isEqual: NSHomeDirectory()]) {
-      key = @"home";
-
-    } else if ([node isPackage] == NO) {
-	    NSString *iconPath = [nodepath stringByAppendingPathComponent: @".dir.tiff"];
-
-      if ([fm isReadableFileAtPath: iconPath]) {
-        key = iconPath;
-	    } else {
-	/* we may have more than one folder icon */
-        key = nodepath;
-      }
-    }   
+	  if ([fm isReadableFileAtPath: iconPath])
+	    {
+	      key = iconPath;
+	    }
+	  else
+	    {
+	      /* we may have more than one folder icon */
+	      key = nodepath;
+	    }
+	}   
     
-    if (key != nil) {
-      icon = [self cachedIconOfSize: size forKey: key];
+      if (key != nil)
+	{
+	  icon = [self cachedIconOfSize: size forKey: key];
     
-      if (icon == nil) {
-        if (baseIcon == nil) {
-          baseIcon = [ws iconForFile: nodepath];
-        }
+	  if (icon == nil)
+	    {
+	      if (baseIcon == nil)
+		{
+		  baseIcon = [ws iconForFile: nodepath];
+		}
     
-        icon = [self cachedIconOfSize: size forKey: key addBaseIcon: baseIcon];
-      }
-    }
-  }  
-    
-  if (icon == nil) { // NOT DIRECTORY
-    if (usesThumbnails) {
-      icon = [self thumbnailForPath: nodepath];
-      
-      if (icon) {
-        NSSize icnsize = [icon size];
-      
-        if ((icnsize.width > size) || (icnsize.height > size)) {
-          return [self resizedIcon: icon ofSize: size];
-        }  
-      }
-    }
-    
-    if (icon == nil) {
-      NSString *ext = [[nodepath pathExtension] lowercaseString];
-      
-      if (ext && ([ext isEqual: @""] == NO)) {
-        key = ext;
-      } else {
-        key = @"unknown";
-      }
-      
-      icon = [self cachedIconOfSize: size forKey: key];
-
-      if (icon == nil) {
-        baseIcon = [ws iconForFile: nodepath];
-        icon = [self cachedIconOfSize: size forKey: key addBaseIcon: baseIcon];
-      }
-    }      
-  }      
-
-  if (icon == nil) {
-    NSSize icnsize;
-    
-    icon = [NSImage imageNamed: @"Unknown"];
-    icnsize = [icon size];
-
-    if ((icnsize.width > size) || (icnsize.height > size)) {
-      icon = [self resizedIcon: icon ofSize: size];
+	      icon = [self cachedIconOfSize: size forKey: key addBaseIcon: baseIcon];
+	    }
+	}
     }  
-  }
+    
+  if (icon == nil)
+    { // NOT DIRECTORY
+      if (usesThumbnails)
+	{
+	  icon = [self thumbnailForPath: nodepath];
+      
+	  if (icon) {
+	    NSSize icnsize = [icon size];
+      
+	    if ((icnsize.width > size) || (icnsize.height > size))
+	      {
+		return [self resizedIcon: icon ofSize: size];
+	      }  
+	  }
+	}
+    
+      if (icon == nil)
+	{
+	  NSString *ext = [[nodepath pathExtension] lowercaseString];
+      
+	  if (ext && ([ext isEqual: @""] == NO))
+	    {
+	      key = ext;
+	    }
+	  else
+	    {
+	      key = @"unknown";
+	    }
+      
+	  icon = [self cachedIconOfSize: size forKey: key];
+
+	  if (icon == nil)
+	    {
+	      baseIcon = [ws iconForFile: nodepath];
+	      icon = [self cachedIconOfSize: size forKey: key addBaseIcon: baseIcon];
+	    }
+	}      
+    }      
+
+  if (icon == nil)
+    {
+      NSSize icnsize;
+    
+      icon = [NSImage imageNamed: @"Unknown"];
+      icnsize = [icon size];
+
+      if ((icnsize.width > size) || (icnsize.height > size)){
+	icon = [self resizedIcon: icon ofSize: size];
+      }  
+    }
   
   return icon;
 }

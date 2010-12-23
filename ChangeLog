@@ -1,3 +1,8 @@
+2010-12-24 Riccardo Mottola
+
+	* FSNode/FSNodeRepIcons.m
+	Do not read icons handled by NSWorkspace; some reformatting.
+
 2010-12-07 Riccardo Mottola
 
 	* GWorkspace/WorkspaceApplication.m:
