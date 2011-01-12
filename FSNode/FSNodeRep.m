@@ -1,6 +1,6 @@
 /* FSNodeRep.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2011 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -751,12 +751,15 @@ static FSNodeRep *shared = nil;
         mtab = [NSString stringWithContentsOfFile: mtabpath];
       }
 
-    } else if (systype == NSBSDOperatingSystem) {
+    } else if (systype == NSBSDOperatingSystem)
+      {
+	/* FIXME: this code appears to be FreeBSD only */
       NSTask *task = [NSTask new]; 
       NSPipe *pipe = [NSPipe pipe];
       NSFileHandle *handle = [pipe fileHandleForReading];
 
       [task setLaunchPath: @"mount"];
+      /* on FreeBSD this causes mount to return an mtab compatible output */
       [task setArguments: [NSArray arrayWithObject: @"-p"]];
       [task setStandardOutput: pipe];    
 
@@ -773,7 +776,7 @@ static FSNodeRep *shared = nil;
 
           memset(mtabuf, '\0', 1024);
 
-          for (i = 0; i < len; i++) {
+          for (i = 0; i < len && i < 1024; i++) {
             if (bytes[i] == '\t') {
               mtabuf[i] = ' ';
             } else {
