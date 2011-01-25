@@ -61,7 +61,7 @@ static FSNodeRep *shared = nil;
 - (void)loadExtendedInfoModules;
 
 - (NSArray *)bundlesWithExtension:(NSString *)extension 
-												   inPath:(NSString *)path;
+			   inPath:(NSString *)path;
 
 @end
 
@@ -263,39 +263,38 @@ static FSNodeRep *shared = nil;
   NSString *hdnFilePath = [path stringByAppendingPathComponent: @".hidden"];
   NSArray *hiddenNames = nil;  
 
-  if ([fm fileExistsAtPath: hdnFilePath]) {
-    NSString *str = [NSString stringWithContentsOfFile: hdnFilePath];
-	  hiddenNames = [str componentsSeparatedByString: @"\n"];
-	}
+  if ([fm fileExistsAtPath: hdnFilePath])
+    hiddenNames = [[NSString stringWithContentsOfFile: hdnFilePath] componentsSeparatedByString: @"\n"];
+ 
 
-  if (hiddenNames || hideSysFiles || [hiddenPaths count]) {
-    NSMutableArray *filteredNames = [NSMutableArray array];
-	  int i;
+  if (hiddenNames || hideSysFiles || [hiddenPaths count])
+    {
+      NSMutableArray *filteredNames = [NSMutableArray array];
+      int i;
 
-    for (i = 0; i < [fnames count]; i++) {
-      NSString *fname = [fnames objectAtIndex: i];
-      NSString *fpath = [path stringByAppendingPathComponent: fname];
-      BOOL hidden = NO;
+      for (i = 0; i < [fnames count]; i++)
+	{
+	  NSString *fname = [fnames objectAtIndex: i];
+	  NSString *fpath = [path stringByAppendingPathComponent: fname];
+	  BOOL hidden = NO;
     
-      if ([fname hasPrefix: @"."] && hideSysFiles) {
-        hidden = YES;  
-      }
+	  if ([fname hasPrefix: @"."] && hideSysFiles)
+	    hidden = YES;  
     
-      if (hiddenNames && [hiddenNames containsObject: fname]) {
-        hidden = YES;  
-      }
+	  if (hiddenNames && [hiddenNames containsObject: fname])
+	    hidden = YES;  
 
-      if ([hiddenPaths containsObject: fpath]) {
-        hidden = YES;  
-      }
+	  if ([hiddenPaths containsObject: fpath])
+	    hidden = YES;  
       
-      if (hidden == NO) {
-        [filteredNames addObject: fname];
-      }
-    }
+	  if (hidden == NO)
+	    {
+	      [filteredNames addObject: fname];
+	    }
+	}
   
-    return filteredNames;
-  }
+      return filteredNames;
+    }
   
   return fnames;
 }
@@ -378,7 +377,7 @@ static FSNodeRep *shared = nil;
     }
   } 
   
-	return defSortOrder;
+  return defSortOrder;
 }
 
 - (SEL)compareSelectorForDirectory:(NSString *)dirpath
@@ -713,10 +712,11 @@ static FSNodeRep *shared = nil;
 #if defined(HAVE_GETMNTENT) && defined(MNT_DIR)
   if ([[NSFileManager defaultManager] fileExistsAtPath: @"/etc/mtab"])
     {
+
       FILE *fp = fopen("/etc/mtab", "r");
       struct mntent	*mnt;
 
-      while ((mnt = getmntent(fp)) != 0)
+      while ((mnt = getmntent(fp)) != NULL )
 	{ 
 	  NSMutableDictionary *dict = [NSMutableDictionary dictionary];
 
@@ -742,7 +742,7 @@ static FSNodeRep *shared = nil;
 #else   // NO GETMNTENT
   unsigned int systype = [[NSProcessInfo processInfo] operatingSystem];
   NSString *mtab = nil;
-  NSLog(@"no getmntent");
+
   if (systype == NSGNULinuxOperatingSystem)
     {
       NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -1025,13 +1025,14 @@ static FSNodeRep *shared = nil;
   NSArray *reserved = [self reservedMountNames];
   unsigned i;
 
-  for (i = 0; i < [mounted count]; i++) {
-    NSDictionary *dict = [mounted objectAtIndex: i];
+  for (i = 0; i < [mounted count]; i++)
+    {
+      NSDictionary *dict = [mounted objectAtIndex: i];
 
-    if ([reserved containsObject: [dict objectForKey: @"name"]] == NO) {
-      [mpoints addObject: [dict objectForKey: @"dir"]];
+      if ([reserved containsObject: [dict objectForKey: @"name"]] == NO) {
+	[mpoints addObject: [dict objectForKey: @"dir"]];
+      }
     }
-  }
   
   return mpoints;
 }
