@@ -789,7 +789,7 @@ static FSNodeRep *shared = nil;
       NSPipe *pipe = [NSPipe pipe];
       NSFileHandle *handle = [pipe fileHandleForReading];
       NSString *mountStr = nil;
-      NSLog(@"BSD!");
+
       [task setLaunchPath: @"mount"];
       [task setStandardOutput: pipe];    
 
@@ -818,7 +818,6 @@ static FSNodeRep *shared = nil;
 	      if ([line length])
 		{
 		  NSArray	*parts1 = [line componentsSeparatedByString: @" on "];
-		  NSLog(@"parts1: %@", parts1);
 		  if ([parts1 count] == 2)
 		    {  
 		      NSMutableDictionary *dict = [NSMutableDictionary dictionary];
@@ -829,9 +828,19 @@ static FSNodeRep *shared = nil;
 			  /* FreeBSD
 			     /dev/ad0s1a on / (ufs, local)
 			  */
-			  NSArray	*parts2 = [[parts1 objectAtIndex: 1] componentsSeparatedByString: @" "];
+			  NSArray *parts2 = [[parts1 objectAtIndex: 1] componentsSeparatedByString: @" "];
+			  NSString *typeStr;
+			  NSRange endRange;
+
+			  typeStr = [parts2 objectAtIndex: 1];
 			  [dict setObject: [parts2 objectAtIndex: 0] forKey: @"dir"]; 
-			  //			  [dict setObject: [parts objectAtIndex: 2] forKey: @"type"];
+			  if ([typeStr length] > 2)
+			    {
+
+			      NSString *cleanTypeStr;
+			      cleanTypeStr = [typeStr substringWithRange: NSMakeRange(1, [typeStr length]-1)];
+			      [dict setObject: cleanTypeStr forKey: @"type"];
+			    }
 			}
 		      else
 			{
@@ -839,8 +848,7 @@ static FSNodeRep *shared = nil;
 			     /dev/wd0a on / type ffs (local)
 			     /dev/wd0f on /usr type ffs (local, nodev)
 			  */
-			  NSArray	*parts2 = [[parts1 objectAtIndex: 1] componentsSeparatedByString: @" "];
-			  NSLog(@"type found, supposing Open or Net BSD");
+			  NSArray *parts2 = [[parts1 objectAtIndex: 1] componentsSeparatedByString: @" "];
 			  if ([parts2 count] >= 4)
 			    {
 			      [dict setObject: [parts2 objectAtIndex: 0] forKey: @"dir"]; 
