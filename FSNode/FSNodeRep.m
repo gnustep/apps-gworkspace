@@ -710,131 +710,176 @@ static FSNodeRep *shared = nil;
   NSMutableArray *volumes = [NSMutableArray array];
   
 #ifndef __APPLE__
-  #if defined(HAVE_GETMNTENT) && defined(MNT_DIR)
-    if ([[NSFileManager defaultManager] fileExistsAtPath: @"/etc/mtab"]) {
+#if defined(HAVE_GETMNTENT) && defined(MNT_DIR)
+  if ([[NSFileManager defaultManager] fileExistsAtPath: @"/etc/mtab"])
+    {
       FILE *fp = fopen("/etc/mtab", "r");
       struct mntent	*mnt;
 
-      while ((mnt = getmntent(fp)) != 0) { 
-        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+      while ((mnt = getmntent(fp)) != 0)
+	{ 
+	  NSMutableDictionary *dict = [NSMutableDictionary dictionary];
 
-        [dict setObject: [NSString stringWithUTF8String: mnt->MNT_FSNAME]
-                 forKey: @"name"]; 
-        [dict setObject: [NSString stringWithUTF8String: mnt->MNT_DIR]
-                 forKey: @"dir"];  
-        [dict setObject: [NSString stringWithUTF8String: mnt->MNT_FSTYPE]
-                 forKey: @"type"];  
+	  [dict setObject: [NSString stringWithUTF8String: mnt->MNT_FSNAME]
+		   forKey: @"name"]; 
+	  [dict setObject: [NSString stringWithUTF8String: mnt->MNT_DIR]
+		   forKey: @"dir"];  
+	  [dict setObject: [NSString stringWithUTF8String: mnt->MNT_FSTYPE]
+		   forKey: @"type"];  
 
-        [volumes addObject: dict];
-      }
+	  [volumes addObject: dict];
+	}
 
       fclose(fp);
     
-    } else {
+    }
+  else
+    {
       /* FIXME add something for Hurd */
       
     }       
         
-  #else   // NO GETMNTENT
-    unsigned int systype = [[NSProcessInfo processInfo] operatingSystem];
-    NSString *mtab = nil;
-  
-    if (systype == NSGNULinuxOperatingSystem) {
+#else   // NO GETMNTENT
+  unsigned int systype = [[NSProcessInfo processInfo] operatingSystem];
+  NSString *mtab = nil;
+  NSLog(@"no getmntent");
+  if (systype == NSGNULinuxOperatingSystem)
+    {
       NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
       NSString *mtabpath = [defaults stringForKey: @"GSMtabPath"];
+      NSLog(@"Linux");
+      if (mtabpath == nil)
+	mtabpath = @"/etc/mtab";
+
+      if ([[NSFileManager defaultManager] fileExistsAtPath: mtabpath])
+	{
+	  mtab = [NSString stringWithContentsOfFile: mtabpath];
+	}
+      if (mtab)
+	{
+	  NSArray *lines = [mtab componentsSeparatedByString: @"\n"];
+	  int i;
       
-      if (mtabpath == nil) {
-        mtabpath = @"/etc/mtab";
-      }
+	  for (i = 0; i < [lines count]; i++)
+	    {
+	      NSString *line = [lines objectAtIndex: i];
+        
+	      if ([line length])
+		{
+		  NSArray	*parts = [line componentsSeparatedByString: @" "];
 
-      if ([[NSFileManager defaultManager] fileExistsAtPath: mtabpath]) {
-        mtab = [NSString stringWithContentsOfFile: mtabpath];
-      }
+		  if ([parts count] == 6)
+		    {  
+		      NSMutableDictionary *dict = [NSMutableDictionary dictionary];
 
-    } else if (systype == NSBSDOperatingSystem)
-      {
-	/* FIXME: this code appears to be FreeBSD only */
+		      [dict setObject: [parts objectAtIndex: 0] forKey: @"name"]; 
+		      [dict setObject: [parts objectAtIndex: 1] forKey: @"dir"]; 
+		      [dict setObject: [parts objectAtIndex: 2] forKey: @"type"]; 
+                        
+		      [volumes addObject: dict];
+		    }
+		}
+	    }
+	}
+    }
+  else if (systype == NSBSDOperatingSystem)
+    {
+      /* FIXME: this code appears to be FreeBSD only */
       NSTask *task = [NSTask new]; 
       NSPipe *pipe = [NSPipe pipe];
       NSFileHandle *handle = [pipe fileHandleForReading];
-
+      NSString *mountStr = nil;
+      NSLog(@"BSD!");
       [task setLaunchPath: @"mount"];
-      /* on FreeBSD this causes mount to return an mtab compatible output */
-      [task setArguments: [NSArray arrayWithObject: @"-p"]];
       [task setStandardOutput: pipe];    
 
       [task launch];
       [task waitUntilExit];
 
-      if ([task terminationStatus] == 0) {
-        NSData *data = [handle readDataToEndOfFile];
-        unsigned len = [data length];
+      if ([task terminationStatus] == 0)
+	{
+	  NSData *data = [handle readDataToEndOfFile];	      
+	  unsigned len = [data length];
 
-        if (len) {
-          const char *bytes = [data bytes];
-          int i;
-
-          memset(mtabuf, '\0', 1024);
-
-          for (i = 0; i < len && i < 1024; i++) {
-            if (bytes[i] == '\t') {
-              mtabuf[i] = ' ';
-            } else {
-              mtabuf[i] = bytes[i]; 
-            } 
-          }
-
-          mtab = [NSString stringWithUTF8String: mtabuf];
-        }
-      }
+	  mountStr = [[NSString alloc] initWithData: data encoding:NSUTF8StringEncoding];
+	}
 
       RELEASE (task);     
-    }
-    
-    if (mtab) {
-      NSArray *lines = [mtab componentsSeparatedByString: @"\n"];
-      int i;
+      NSLog(@"mountStr: %@", mountStr);
+      if (mountStr)
+	{
+	  NSArray *lines = [mountStr componentsSeparatedByString: @"\n"];
+	  int i;
       
-      for (i = 0; i < [lines count]; i++) {
-        NSString *line = [lines objectAtIndex: i];
+	  for (i = 0; i < [lines count]; i++)
+	    {
+	      NSString *line = [lines objectAtIndex: i];
         
-        if ([line length]) {
-          NSArray	*parts = [line componentsSeparatedByString: @" "];
+	      if ([line length])
+		{
+		  NSArray	*parts1 = [line componentsSeparatedByString: @" on "];
+		  NSLog(@"parts1: %@", parts1);
+		  if ([parts1 count] == 2)
+		    {  
+		      NSMutableDictionary *dict = [NSMutableDictionary dictionary];
 
-          if ([parts count] == 6) {  
-            NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-
-            [dict setObject: [parts objectAtIndex: 0] forKey: @"name"]; 
-            [dict setObject: [parts objectAtIndex: 1] forKey: @"dir"]; 
-            [dict setObject: [parts objectAtIndex: 2] forKey: @"type"]; 
-                        
-            [volumes addObject: dict];
-          }
-        }
-      }
+		      [dict setObject: [parts1 objectAtIndex: 0] forKey: @"name"];
+		      if ([[parts1 objectAtIndex: 1] rangeOfString: @" type "].location == NSNotFound)
+			{
+			  /* FreeBSD
+			     /dev/ad0s1a on / (ufs, local)
+			  */
+			  NSArray	*parts2 = [[parts1 objectAtIndex: 1] componentsSeparatedByString: @" "];
+			  [dict setObject: [parts2 objectAtIndex: 0] forKey: @"dir"]; 
+			  //			  [dict setObject: [parts objectAtIndex: 2] forKey: @"type"];
+			}
+		      else
+			{
+			  /* OpenBSD, NetBSD
+			     /dev/wd0a on / type ffs (local)
+			     /dev/wd0f on /usr type ffs (local, nodev)
+			  */
+			  NSArray	*parts2 = [[parts1 objectAtIndex: 1] componentsSeparatedByString: @" "];
+			  NSLog(@"type found, supposing Open or Net BSD");
+			  if ([parts2 count] >= 4)
+			    {
+			      [dict setObject: [parts2 objectAtIndex: 0] forKey: @"dir"]; 
+			      [dict setObject: [parts2 objectAtIndex: 2] forKey: @"type"];
+			    };
+			}                     
+		      [volumes addObject: dict];
+		    }
+		}
+	    }
+	}
+    }
+  else
+    {
+      NSLog(@"Unknown operating system: %u", systype);
     }
     
-  #endif
+#endif
 #else   // __APPLE__
   struct statfs *buf;
   int i, count;
   
   count = getmntinfo(&buf, 0);
   
-	for (i = 0; i < count; i++) {
-    NSMutableDictionary *dict = [NSMutableDictionary dictionary];  
+  for (i = 0; i < count; i++)
+    {
+      NSMutableDictionary *dict = [NSMutableDictionary dictionary];  
   
-    [dict setObject: [NSString stringWithUTF8String: buf[i].f_mntfromname]
-             forKey: @"name"]; 
-    [dict setObject: [NSString stringWithUTF8String: buf[i].f_mntonname]
-             forKey: @"dir"]; 
-    [dict setObject: [NSString stringWithUTF8String: buf[i].f_fstypename]
-             forKey: @"type"]; 
+      [dict setObject: [NSString stringWithUTF8String: buf[i].f_mntfromname]
+	       forKey: @"name"]; 
+      [dict setObject: [NSString stringWithUTF8String: buf[i].f_mntonname]
+	       forKey: @"dir"]; 
+      [dict setObject: [NSString stringWithUTF8String: buf[i].f_fstypename]
+	       forKey: @"type"]; 
 
-    [volumes addObject: dict];
-  }
+      [volumes addObject: dict];
+    }
 #endif
-    
+  NSLog(@"Volumes %@", volumes);   
   return volumes;
 }
 

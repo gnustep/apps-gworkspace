@@ -1,3 +1,8 @@
+2011-01-25 Riccardo Mottola <rm@gnu.org>
+
+	*  FSNode/FSNodeRep.m
+	Mount parsing code rewrite for more portability. Still unfinished.
+
 2011-01-12 Riccardo Mottola <rm@gnu.org>
 
 	*  FSNode/FSNodeRep.m
