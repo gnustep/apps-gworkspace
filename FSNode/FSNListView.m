@@ -1,6 +1,6 @@
 /* FSNListView.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2011 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: December 2004
@@ -1258,7 +1258,7 @@ static NSString *defaultColumns = @"{ \
   NSIndexSet *set = [listView selectedRowIndexes];
   int count = [set count];
   NSRange range = NSMakeRange(0, NSNotFound -1);
-  unsigned int *buf = NSZoneMalloc (NSDefaultMallocZone(), sizeof(unsigned int) * count);
+  NSUInteger *buf = NSZoneMalloc (NSDefaultMallocZone(), sizeof(unsigned int) * count);
   int selcount = [set getIndexes: buf maxCount: count inIndexRange: &range];
   NSMutableArray *selreps = [NSMutableArray array];
   int i;
@@ -1280,7 +1280,7 @@ static NSString *defaultColumns = @"{ \
   NSIndexSet *set = [listView selectedRowIndexes];
   int count = [set count];
   NSRange range = NSMakeRange(0, NSNotFound -1);
-  unsigned int *buf = NSZoneMalloc (NSDefaultMallocZone(), sizeof(unsigned int) * count);
+  NSUInteger *buf = NSZoneMalloc (NSDefaultMallocZone(), sizeof(unsigned int) * count);
   int selcount = [set getIndexes: buf maxCount: count inIndexRange: &range];
   NSMutableArray *selnodes = [NSMutableArray array];
   int i;
@@ -1302,7 +1302,7 @@ static NSString *defaultColumns = @"{ \
   NSIndexSet *set = [listView selectedRowIndexes];
   int count = [set count];
   NSRange range = NSMakeRange(0, NSNotFound -1);
-  unsigned int *buf = NSZoneMalloc (NSDefaultMallocZone(), sizeof(unsigned int) * count);
+  NSUInteger *buf = NSZoneMalloc (NSDefaultMallocZone(), sizeof(unsigned int) * count);
   int selcount = [set getIndexes: buf maxCount: count inIndexRange: &range];
   NSMutableArray *selpaths = [NSMutableArray array];
   int i;
@@ -1311,7 +1311,7 @@ static NSString *defaultColumns = @"{ \
     [selpaths addObject: [[[nodeReps objectAtIndex: buf[i]] node] path]];
   }
 
-	NSZoneFree (NSDefaultMallocZone(), buf);
+  NSZoneFree (NSDefaultMallocZone(), buf);
   RETAIN (selpaths);
   RELEASE (pool);
 

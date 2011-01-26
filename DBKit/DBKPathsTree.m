@@ -1,6 +1,6 @@
 /* DBKPathsTree.m
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2011 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: December 2005
@@ -22,7 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include "DBKPathsTree.h"
+#import "DBKPathsTree.h"
 
 #define GROW_FACTOR 32
 
@@ -60,7 +60,7 @@ static intIMP pathCompareImp = NULL;
   return identifier;
 }
 
-- (unsigned)hash
+- (NSUInteger)hash
 {
   return [identifier hash];
 }

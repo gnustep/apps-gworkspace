@@ -3,6 +3,10 @@
 	*  FSNode/FSNodeRep.m
 	Fix FreeBSD type parsing, cleanup.
 
+	* FSNode/FSNListView.m
+	* DBKit/DBKPathsTree.m
+	Warning fixes
+
 2011-01-25 Riccardo Mottola <rm@gnu.org>
 
 	*  FSNode/FSNodeRep.m
