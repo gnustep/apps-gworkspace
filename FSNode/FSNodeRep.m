@@ -698,12 +698,6 @@ static FSNodeRep *shared = nil;
 
 @implementation NSWorkspace (mounting)
 
-#if !defined(HAVE_GETMNTENT) || !defined(MNT_DIR)
-  #ifndef __APPLE__
-    static char mtabuf[1024] = "";
-  #endif
-#endif
-
 - (NSArray *)mountedVolumes
 {
   NSMutableArray *volumes = [NSMutableArray array];
@@ -784,7 +778,6 @@ static FSNodeRep *shared = nil;
     }
   else if (systype == NSBSDOperatingSystem)
     {
-      /* FIXME: this code appears to be FreeBSD only */
       NSTask *task = [NSTask new]; 
       NSPipe *pipe = [NSPipe pipe];
       NSFileHandle *handle = [pipe fileHandleForReading];
@@ -798,8 +791,7 @@ static FSNodeRep *shared = nil;
 
       if ([task terminationStatus] == 0)
 	{
-	  NSData *data = [handle readDataToEndOfFile];	      
-	  unsigned len = [data length];
+	  NSData *data = [handle readDataToEndOfFile];
 
 	  mountStr = [[NSString alloc] initWithData: data encoding:NSUTF8StringEncoding];
 	}
@@ -830,7 +822,6 @@ static FSNodeRep *shared = nil;
 			  */
 			  NSArray *parts2 = [[parts1 objectAtIndex: 1] componentsSeparatedByString: @" "];
 			  NSString *typeStr;
-			  NSRange endRange;
 
 			  typeStr = [parts2 objectAtIndex: 1];
 			  [dict setObject: [parts2 objectAtIndex: 0] forKey: @"dir"]; 
@@ -838,7 +829,7 @@ static FSNodeRep *shared = nil;
 			    {
 
 			      NSString *cleanTypeStr;
-			      cleanTypeStr = [typeStr substringWithRange: NSMakeRange(1, [typeStr length]-1)];
+			      cleanTypeStr = [typeStr substringWithRange: NSMakeRange(1, [typeStr length]-2)];
 			      [dict setObject: cleanTypeStr forKey: @"type"];
 			    }
 			}
