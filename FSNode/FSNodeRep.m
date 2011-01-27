@@ -37,6 +37,11 @@
   #include <sys/param.h>
   #include <sys/ucred.h>
   #include <sys/mount.h>
+  #ifdef __NetBSD__
+    #include <sys/types.h>
+    #include <sys/statvfs.h>
+    #define statfs statvfs
+  #endif
 #else 
   #if	defined(HAVE_GETMNTENT) && defined (MNT_DIR)
     #if	defined(HAVE_MNTENT_H)

@@ -1,3 +1,8 @@
+2011-01-28 Riccardo Mottola <rm@gnu.org>
+
+	*  FSNode/FSNodeRep.m
+	NetBSD compatibilty.
+
 2011-01-27 Riccardo Mottola <rm@gnu.org>
 
 	*  FSNode/FSNodeRep.m
