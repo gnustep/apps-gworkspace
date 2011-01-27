@@ -3,6 +3,7 @@
  * Copyright (C) 2004-2011 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
+ *         Riccardo Mottola <rm@gnu.org>
  * Date: March 2004
  *
  * This file is part of the GNUstep FSNode framework
@@ -31,7 +32,12 @@
 #import "ExtendedInfo.h"
 #import "config.h"
 
-#ifndef __APPLE__
+
+#ifdef HAVE_GETMNTINFO
+  #include <sys/param.h>
+  #include <sys/ucred.h>
+  #include <sys/mount.h>
+#else 
   #if	defined(HAVE_GETMNTENT) && defined (MNT_DIR)
     #if	defined(HAVE_MNTENT_H)
       #include <mntent.h>
@@ -41,12 +47,6 @@
       #undef HAVE_GETMNTENT
     #endif
   #endif
-#else
-  #ifdef HAVE_GETMNTINFO
-    #include <sys/param.h>
-    #include <sys/ucred.h>
-    #include <sys/mount.h>
-  #endif  
 #endif
 
 #define LABEL_W_FACT (8.0)
@@ -201,7 +201,7 @@ static FSNodeRep *shared = nil;
 }
 
 - (NSArray *)bundlesWithExtension:(NSString *)extension 
-													 inPath:(NSString *)path
+			   inPath:(NSString *)path
 {
   NSMutableArray *bundleList = [NSMutableArray array];
   NSEnumerator *enumerator;
@@ -701,12 +701,31 @@ static FSNodeRep *shared = nil;
 - (NSArray *)mountedVolumes
 {
   NSMutableArray *volumes = [NSMutableArray array];
+
+#ifdef HAVE_GETMNTINFO
+  /* most BSDs and derivatives inclusing Apple */
+  struct statfs *buf;
+  int i, count;
   
-#ifndef __APPLE__
-#if defined(HAVE_GETMNTENT) && defined(MNT_DIR)
+  count = getmntinfo(&buf, 0);
+  
+  for (i = 0; i < count; i++)
+    {
+      NSMutableDictionary *dict = [NSMutableDictionary dictionary];  
+  
+      [dict setObject: [NSString stringWithUTF8String: buf[i].f_mntfromname]
+	       forKey: @"name"]; 
+      [dict setObject: [NSString stringWithUTF8String: buf[i].f_mntonname]
+	       forKey: @"dir"]; 
+      [dict setObject: [NSString stringWithUTF8String: buf[i].f_fstypename]
+	       forKey: @"type"]; 
+
+      [volumes addObject: dict];
+    }
+#elif defined(HAVE_GETMNTENT) && defined(MNT_DIR)
+  /* most probably linux */
   if ([[NSFileManager defaultManager] fileExistsAtPath: @"/etc/mtab"])
     {
-
       FILE *fp = fopen("/etc/mtab", "r");
       struct mntent	*mnt;
 
@@ -732,152 +751,8 @@ static FSNodeRep *shared = nil;
       /* FIXME add something for Hurd */
       
     }       
-        
-#else   // NO GETMNTENT
-  unsigned int systype = [[NSProcessInfo processInfo] operatingSystem];
-  NSString *mtab = nil;
-
-  if (systype == NSGNULinuxOperatingSystem)
-    {
-      NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-      NSString *mtabpath = [defaults stringForKey: @"GSMtabPath"];
-      NSLog(@"Linux");
-      if (mtabpath == nil)
-	mtabpath = @"/etc/mtab";
-
-      if ([[NSFileManager defaultManager] fileExistsAtPath: mtabpath])
-	{
-	  mtab = [NSString stringWithContentsOfFile: mtabpath];
-	}
-      if (mtab)
-	{
-	  NSArray *lines = [mtab componentsSeparatedByString: @"\n"];
-	  int i;
-      
-	  for (i = 0; i < [lines count]; i++)
-	    {
-	      NSString *line = [lines objectAtIndex: i];
-        
-	      if ([line length])
-		{
-		  NSArray	*parts = [line componentsSeparatedByString: @" "];
-
-		  if ([parts count] == 6)
-		    {  
-		      NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-
-		      [dict setObject: [parts objectAtIndex: 0] forKey: @"name"]; 
-		      [dict setObject: [parts objectAtIndex: 1] forKey: @"dir"]; 
-		      [dict setObject: [parts objectAtIndex: 2] forKey: @"type"]; 
-                        
-		      [volumes addObject: dict];
-		    }
-		}
-	    }
-	}
-    }
-  else if (systype == NSBSDOperatingSystem)
-    {
-      NSTask *task = [NSTask new]; 
-      NSPipe *pipe = [NSPipe pipe];
-      NSFileHandle *handle = [pipe fileHandleForReading];
-      NSString *mountStr = nil;
-
-      [task setLaunchPath: @"mount"];
-      [task setStandardOutput: pipe];    
-
-      [task launch];
-      [task waitUntilExit];
-
-      if ([task terminationStatus] == 0)
-	{
-	  NSData *data = [handle readDataToEndOfFile];
-
-	  mountStr = [[NSString alloc] initWithData: data encoding:NSUTF8StringEncoding];
-	}
-
-      RELEASE (task);     
-      NSLog(@"mountStr: %@", mountStr);
-      if (mountStr)
-	{
-	  NSArray *lines = [mountStr componentsSeparatedByString: @"\n"];
-	  int i;
-      
-	  for (i = 0; i < [lines count]; i++)
-	    {
-	      NSString *line = [lines objectAtIndex: i];
-        
-	      if ([line length])
-		{
-		  NSArray	*parts1 = [line componentsSeparatedByString: @" on "];
-		  if ([parts1 count] == 2)
-		    {  
-		      NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-
-		      [dict setObject: [parts1 objectAtIndex: 0] forKey: @"name"];
-		      if ([[parts1 objectAtIndex: 1] rangeOfString: @" type "].location == NSNotFound)
-			{
-			  /* FreeBSD
-			     /dev/ad0s1a on / (ufs, local)
-			  */
-			  NSArray *parts2 = [[parts1 objectAtIndex: 1] componentsSeparatedByString: @" "];
-			  NSString *typeStr;
-
-			  typeStr = [parts2 objectAtIndex: 1];
-			  [dict setObject: [parts2 objectAtIndex: 0] forKey: @"dir"]; 
-			  if ([typeStr length] > 2)
-			    {
-
-			      NSString *cleanTypeStr;
-			      cleanTypeStr = [typeStr substringWithRange: NSMakeRange(1, [typeStr length]-2)];
-			      [dict setObject: cleanTypeStr forKey: @"type"];
-			    }
-			}
-		      else
-			{
-			  /* OpenBSD, NetBSD
-			     /dev/wd0a on / type ffs (local)
-			     /dev/wd0f on /usr type ffs (local, nodev)
-			  */
-			  NSArray *parts2 = [[parts1 objectAtIndex: 1] componentsSeparatedByString: @" "];
-			  if ([parts2 count] >= 4)
-			    {
-			      [dict setObject: [parts2 objectAtIndex: 0] forKey: @"dir"]; 
-			      [dict setObject: [parts2 objectAtIndex: 2] forKey: @"type"];
-			    };
-			}                     
-		      [volumes addObject: dict];
-		    }
-		}
-	    }
-	}
-    }
-  else
-    {
-      NSLog(@"Unknown operating system: %u", systype);
-    }
-    
 #endif
-#else   // __APPLE__
-  struct statfs *buf;
-  int i, count;
-  
-  count = getmntinfo(&buf, 0);
-  
-  for (i = 0; i < count; i++)
-    {
-      NSMutableDictionary *dict = [NSMutableDictionary dictionary];  
-  
-      [dict setObject: [NSString stringWithUTF8String: buf[i].f_mntfromname]
-	       forKey: @"name"]; 
-      [dict setObject: [NSString stringWithUTF8String: buf[i].f_mntonname]
-	       forKey: @"dir"]; 
-      [dict setObject: [NSString stringWithUTF8String: buf[i].f_fstypename]
-	       forKey: @"type"]; 
 
-      [volumes addObject: dict];
-    }
-#endif
   NSLog(@"Volumes %@", volumes);   
   return volumes;
 }
@@ -932,40 +807,43 @@ static FSNodeRep *shared = nil;
   domain = [defaults persistentDomainForName: NSGlobalDomain];
   reserved = [domain objectForKey: @"GSReservedMountNames"];
   
-  if (reserved == nil) {
-    CREATE_AUTORELEASE_POOL(arp);
-    NSMutableDictionary *mdomain = [domain mutableCopy];  
-    unsigned int systype = [[NSProcessInfo processInfo] operatingSystem];
+  if (reserved == nil)
+    {
+      CREATE_AUTORELEASE_POOL(arp);
+      NSMutableDictionary *mdomain = [domain mutableCopy];  
+      unsigned int systype = [[NSProcessInfo processInfo] operatingSystem];
   
-    switch(systype) {
-      case NSGNULinuxOperatingSystem:
-        reserved = [NSArray arrayWithObjects: @"proc", @"devpts", @"shm", 
-                                                    @"usbdevfs", @"devpts", 
-                                                    @"sysfs", @"tmpfs", nil];
-        break;
+      switch(systype)
+	{
+	case NSGNULinuxOperatingSystem:
+	  reserved = [NSArray arrayWithObjects: @"proc", @"devpts", @"shm", 
+			      @"usbdevfs", @"devpts", 
+			      @"sysfs", @"tmpfs", @"procfs", nil];
+	  break;
 
-      case NSBSDOperatingSystem:
-        reserved = [NSArray arrayWithObjects: @"devfs", nil];
-        break;
+	case NSBSDOperatingSystem:
+	  reserved = [NSArray arrayWithObjects: @"devfs", @"procfs", nil];
+	  break;
 
-      case NSMACHOperatingSystem:
-        reserved = [NSArray arrayWithObjects: @"devfs", @"fdesc", 
-                                                    @"<volfs>", nil];
-        break;
+	case NSMACHOperatingSystem:
+	  reserved = [NSArray arrayWithObjects: @"devfs", @"fdesc", 
+			      @"<volfs>", nil];
+	  break;
     
-      default:
-        break;
+	default:
+	  break;
+	}
+    
+      if (reserved)
+	{
+	  [mdomain setObject: reserved forKey: @"GSReservedMountNames"];
+	  [defaults setPersistentDomain: mdomain forName: NSGlobalDomain];
+	  [defaults synchronize];
+	}
+    
+      RELEASE (mdomain);
+      RELEASE (arp);
     }
-    
-    if (reserved) {
-      [mdomain setObject: reserved forKey: @"GSReservedMountNames"];
-      [defaults setPersistentDomain: mdomain forName: NSGlobalDomain];
-      [defaults synchronize];
-    }
-    
-    RELEASE (mdomain);
-    RELEASE (arp);
-  }
 
   return reserved;
 }

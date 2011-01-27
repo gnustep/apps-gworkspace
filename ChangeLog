@@ -1,3 +1,8 @@
+2011-01-27 Riccardo Mottola <rm@gnu.org>
+
+	*  FSNode/FSNodeRep.m
+	Switch checking of volumes to getmntinfo() and keep only /etc/mtab asl fallback.
+
 2011-01-26 Riccardo Mottola <rm@gnu.org>
 
 	*  FSNode/FSNodeRep.m
