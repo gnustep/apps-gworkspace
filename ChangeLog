@@ -1,3 +1,8 @@
+2011-02-02 Riccardo Mottola <rm@gnu.org>
+
+	*  FSNode/FSNodeRep.m
+	Use MNTAB constant.
+
 2011-01-28 Riccardo Mottola <rm@gnu.org>
 
 	*  FSNode/FSNodeRep.m

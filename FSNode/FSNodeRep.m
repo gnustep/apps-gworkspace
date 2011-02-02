@@ -731,7 +731,7 @@ static FSNodeRep *shared = nil;
   /* most probably linux */
   if ([[NSFileManager defaultManager] fileExistsAtPath: @"/etc/mtab"])
     {
-      FILE *fp = fopen("/etc/mtab", "r");
+      FILE *fp = fopen(MNTTAB, "r");
       struct mntent	*mnt;
 
       while ((mnt = getmntent(fp)) != NULL )
