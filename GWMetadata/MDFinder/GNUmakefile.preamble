@@ -13,9 +13,10 @@ ADDITIONAL_INCLUDE_DIRS += -I../../FSNode
 
 ADDITIONAL_LIB_DIRS += -L../MDKit/MDKit.framework/Versions/Current/$(GNUSTEP_TARGET_LDIR) 
 ADDITIONAL_LIB_DIRS += -L../../FSNode/FSNode.framework/Versions/Current/$(GNUSTEP_TARGET_LDIR)
+ADDITIONAL_LIB_DIRS += -L../../DBKit/$(GNUSTEP_OBJ_DIR)
 
 # Additional LDFLAGS to pass to the linker
 # ADDITIONAL_LDFLAGS += 
 
-# ADDITIONAL_TOOL_LIBS +=
+ADDITIONAL_TOOL_LIBS += -lFSNode -lDBKit
 

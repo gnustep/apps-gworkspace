@@ -1,3 +1,10 @@
+2011-02-21 Riccardo Mottola <rm@gnu.org>
+
+	* GWMetadata/gmds/mdextractor/GNUmakefile.preamble
+	* GWMetadata/gmds/mdfind/GNUmakefile.preamble
+	* GWMetadata/MDFinder/GNUmakefile.preamble
+	Build against build version of kits, patch by Sebastian Reitenbach
+
 2011-02-02 Riccardo Mottola <rm@gnu.org>
 
 	*  FSNode/FSNodeRep.m

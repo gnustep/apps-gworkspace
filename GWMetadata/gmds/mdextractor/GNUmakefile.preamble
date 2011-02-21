@@ -10,11 +10,11 @@ ADDITIONAL_CFLAGS += -Wall
 # Additional include directories the compiler should search
 ADDITIONAL_INCLUDE_DIRS += -I../ -I../../MDKit -I../../../DBKit
 
-ADDITIONAL_LIB_DIRS += -L../../MDKit/MDKit.framework/Versions/Current/$(GNUSTEP_TARGET_LDIR) 
+ADDITIONAL_LIB_DIRS += -L../../MDKit/MDKit.framework/Versions/Current/$(GNUSTEP_TARGET_LDIR)  -L../../../DBKit/$(GNUSTEP_OBJ_DIR) -L../../../FSNode/FSNode.framework/Versions/Current/$(GNUSTEP_TARGET_LDIR)
 ADDITIONAL_LIB_DIRS += -L../../../DBKit/$(GNUSTEP_OBJ_DIR)   
 
 # Additional LDFLAGS to pass to the linker
 # ADDITIONAL_LDFLAGS += 
 
-# ADDITIONAL_TOOL_LIBS +=
+ADDITIONAL_TOOL_LIBS += -lFSNode
 
