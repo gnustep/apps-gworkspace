@@ -1777,7 +1777,7 @@ enum {
 
         pos = (int)((first + last) / 2);
 
-        result = [[scores objectAtIndex: pos] compare: score];
+        result = [(NSNumber *)[scores objectAtIndex: pos] compare: score];
 
         if (result == NSOrderedSame) {
           result = [[nodes objectAtIndex: pos] compareAccordingToPath: node];
