@@ -1,6 +1,6 @@
-/* MDKQuery.h
+/* MDKQuery.m
  *  
- * Copyright (C) 2006 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2011 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@dtedu.net>
  * Date: August 2006
@@ -1807,12 +1807,17 @@ enum {
   unsigned index;    
   unsigned i;
   
+  index = 0;
   for (i = 0; i < [paths count]; i++) {
     FSNode *node = [FSNode nodeWithPath: [paths objectAtIndex: i]];
     NSString *catname;
     NSDictionary *catdict;
     NSMutableArray *catnodes;
     NSMutableArray *catscores;
+
+    catname = nil;
+    catscores = nil;
+    catnodes = nil;
             
     if ([node isValid]) {
       catname = [qmanager categoryNameForNode: node];
@@ -2029,7 +2034,7 @@ enum {
   attribute = [self scanAttributeName];  
   attrinfo = [[MDKQuery attributesInfo] objectForKey: attribute];
   attrtype = [[attrinfo objectForKey: @"type"] intValue];
-
+  optype = 0;
   if ([self scanString: @"<" intoString: NULL]) {
     optype = MDKLessThanOperatorType;
     CHK_ATTR_TYPE (@"<");

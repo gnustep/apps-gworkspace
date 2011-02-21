@@ -8,6 +8,10 @@
 	* GWMetadata/MDKit/MDKQuery.m
 	Warning fix through explicit cast.
 
+	* GWMetadata/MDKit/MDKQuery.m
+	* GWMetadata/MDKit/MDKWindow.m
+	Warning fixes.
+
 2011-02-02 Riccardo Mottola <rm@gnu.org>
 
 	*  FSNode/FSNodeRep.m

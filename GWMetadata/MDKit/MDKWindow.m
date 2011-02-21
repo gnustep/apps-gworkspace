@@ -1,6 +1,6 @@
 /* MDKWindow.m
  *  
- * Copyright (C) 2006 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2011 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@fibernet.ro>
  * Date: December 2006
@@ -226,7 +226,7 @@ static NSString *nibName = @"MDKWindow";
   
   attributes = [NSMutableArray new];
   attrViews = [NSMutableArray new];
-  
+  attribute = nil;  
   attrnames = [attrnames sortedArrayUsingSelector: @selector(compare:)];
   
   for (i = 0; i < [attrnames count]; i++) {
