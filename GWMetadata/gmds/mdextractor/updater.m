@@ -1,6 +1,6 @@
 /* updater.m
  *  
- * Copyright (C) 2006-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2011 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@dtedu.net>
  * Date: February 2006
@@ -862,11 +862,14 @@ do { \
 
 - (void)setupScheduledUpdater
 {
+  NSString *query;
+  NSArray *lines;
+  NSUInteger i;
+
   CREATE_AUTORELEASE_POOL(arp);
-  NSString *query = @"SELECT path FROM paths WHERE is_directory = 1";
-  NSArray *lines = [sqlite resultsOfQuery: query];
-  unsigned i;
-    
+  query = @"SELECT path FROM paths WHERE is_directory = 1";
+  lines = [sqlite resultsOfQuery: query];
+
   directories = [NSMutableArray new];
                                        
   for (i = 0; i < [lines count]; i++) {
@@ -889,15 +892,21 @@ do { \
 {
   if (extracting == NO) {
     CREATE_AUTORELEASE_POOL(arp);
-    unsigned count = [directories count];
+    NSUInteger count = [directories count];
     NSString *dir;
     NSDictionary *attributes;
     BOOL dirok;
-    unsigned i;
+    NSUInteger i;
   
-    if ((dirpos >= count) || (dirpos < 0)) {
+    if (count == 0)
+      {
+	[schedupdateTimer invalidate];
+	RELEASE(arp);
+	return;
+      }
+
+    if ((dirpos >= count) || (dirpos < 0))
       dirpos = 0;
-    }
   
     dir = [directories objectAtIndex: dirpos];
     attributes = [fm fileAttributesAtPath: dir traverseLink: NO];
@@ -912,7 +921,6 @@ do { \
       NSString *query;
       SQLitePreparedStatement *statement;
       NSArray *results;
-      unsigned i;
       
       query = @"SELECT path, moddate FROM paths "
               @"WHERE path > :minpath "

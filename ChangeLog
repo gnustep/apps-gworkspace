@@ -1,3 +1,9 @@
+2011-02-27 Riccardo Mottola <rm@gnu.org>
+
+	* GWMetadata/gmds/mdextractor/updater.m:
+	Patch by Philippe Roussell: handle empty directories correctly
+	and invalidate associated timer.
+	
 2011-02-21 Riccardo Mottola <rm@gnu.org>
 
 	* GWMetadata/gmds/mdextractor/GNUmakefile.preamble
