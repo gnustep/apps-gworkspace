@@ -900,7 +900,6 @@ do { \
   
     if (count == 0)
       {
-	[schedupdateTimer invalidate];
 	RELEASE(arp);
 	return;
       }
