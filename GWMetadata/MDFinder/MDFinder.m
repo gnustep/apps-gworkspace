@@ -1,6 +1,6 @@
 /* MDFinder.m
  *  
- * Copyright (C) 2007 Free Software Foundation, Inc.
+ * Copyright (C) 2007-2011 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@fibernet.ro>
  * Date: January 2007
@@ -458,10 +458,10 @@ static MDFinder *mdfinder = nil;
 {	
   SEL action = [item action];
 
-	if (sel_eq(action, @selector(saveQuery:))) {
+	if (sel_isEqual(action, @selector(saveQuery:))) {
     return ((activeWindow != nil) && ([activeWindow isSaved] == NO));
 
-  } else if (sel_eq(action, @selector(saveQueryAs:))) {
+  } else if (sel_isEqual(action, @selector(saveQueryAs:))) {
     return ((activeWindow != nil) && ([activeWindow savePath] != nil));
 	}
     

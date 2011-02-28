@@ -1,6 +1,6 @@
 /* GWorkspace.m
  *  
- * Copyright (C) 2003-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2011 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola
@@ -1065,29 +1065,29 @@ static GWorkspace *gworkspace = nil;
 {	
   SEL action = [anItem action];
 
-  if (sel_eq(action, @selector(showRecycler:))) {
+  if (sel_isEqual(action, @selector(showRecycler:))) {
     return (([dtopManager isActive] == NO) || ([dtopManager dockActive] == NO));
   
-  } else if (sel_eq(action, @selector(emptyRecycler:))) {
+  } else if (sel_isEqual(action, @selector(emptyRecycler:))) {
     return ([trashContents count] != 0);
   
-  } else if (sel_eq(action, @selector(checkRemovableMedia:))) {  
+  } else if (sel_isEqual(action, @selector(checkRemovableMedia:))) {  
     return [dtopManager isActive];
   
-  } else if (sel_eq(action, @selector(removeTShelfTab:))
-              || sel_eq(action, @selector(renameTShelfTab:))
-                      || sel_eq(action, @selector(addTShelfTab:))) {
+  } else if (sel_isEqual(action, @selector(removeTShelfTab:))
+              || sel_isEqual(action, @selector(renameTShelfTab:))
+                      || sel_isEqual(action, @selector(addTShelfTab:))) {
     return [tshelfWin isVisible];
 
-  } else if (sel_eq(action, @selector(activateContextHelp:))) {
+  } else if (sel_isEqual(action, @selector(activateContextHelp:))) {
     return ([NSHelpManager isContextHelpModeActive] == NO);
 
-  } else if (sel_eq(action, @selector(logout:))) {
+  } else if (sel_isEqual(action, @selector(logout:))) {
     return !loggingout;
     
-  } else if (sel_eq(action, @selector(cut:))
-                || sel_eq(action, @selector(copy:))
-                  || sel_eq(action, @selector(paste:))) {
+  } else if (sel_isEqual(action, @selector(cut:))
+                || sel_isEqual(action, @selector(copy:))
+                  || sel_isEqual(action, @selector(paste:))) {
     NSWindow *kwin = [NSApp keyWindow];
 
     if (kwin && [kwin isKindOfClass: [TShelfWin class]]) {
@@ -1097,7 +1097,7 @@ static GWorkspace *gworkspace = nil;
         TShelfIconsView *iview = (TShelfIconsView *)[item view];
 
         if ([iview iconsType] == DATA_TAB) {
-          if (sel_eq(action, @selector(paste:))) {
+          if (sel_isEqual(action, @selector(paste:))) {
             return YES;
           } else {
             return [iview hasSelectedIcon];

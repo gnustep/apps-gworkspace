@@ -1,6 +1,6 @@
 /* GWDesktopManager.m
  *  
- * Copyright (C) 2005-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2011 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -599,18 +599,18 @@ static GWDesktopManager *desktopManager = nil;
   if ([self isActive]) {
     SEL action = [menuItem action];
 
-    if (sel_eq(action, @selector(duplicateFiles:))
-                || sel_eq(action, @selector(recycleFiles:))
-                      || sel_eq(action, @selector(deleteFiles:))) {
+    if (sel_isEqual(action, @selector(duplicateFiles:))
+                || sel_isEqual(action, @selector(recycleFiles:))
+                      || sel_isEqual(action, @selector(deleteFiles:))) {
       return ([[desktopView selectedNodes] count] > 0);
 
-    } else if (sel_eq(action, @selector(openSelection:))) {
+    } else if (sel_isEqual(action, @selector(openSelection:))) {
       NSArray *selection = [desktopView selectedNodes];
      
       return (selection && [selection count] 
             && ([selection isEqual: [NSArray arrayWithObject: dskNode]] == NO));
     
-    } else if (sel_eq(action, @selector(openWith:))) {
+    } else if (sel_isEqual(action, @selector(openWith:))) {
       NSArray *selection = [desktopView selectedNodes];
       BOOL canopen = YES;
       int i;
@@ -632,7 +632,7 @@ static GWDesktopManager *desktopManager = nil;
 
       return canopen;
       
-    } else if (sel_eq(action, @selector(openSelectionAsFolder:))) {
+    } else if (sel_isEqual(action, @selector(openSelectionAsFolder:))) {
       NSArray *selection = [desktopView selectedNodes];
     
       if (selection && ([selection count] == 1)) {  

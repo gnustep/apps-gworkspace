@@ -1,6 +1,6 @@
 /* GWViewer.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2011 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2004
@@ -1467,9 +1467,9 @@
     } else if ([itemTitle isEqual: NSLocalizedString(@"Background Color...", @"")]) {
       return [nodeView respondsToSelector: @selector(setBackgroundColor:)];
 
-    } else if (sel_eq(action, @selector(duplicateFiles:))
-                    || sel_eq(action, @selector(recycleFiles:))
-                        || sel_eq(action, @selector(deleteFiles:))) {
+    } else if (sel_isEqual(action, @selector(duplicateFiles:))
+                    || sel_isEqual(action, @selector(recycleFiles:))
+                        || sel_isEqual(action, @selector(deleteFiles:))) {
       if (lastSelection && [lastSelection count]
               && ([lastSelection isEqual: baseNodeArray] == NO)) {
         return ([[baseNode path] isEqual: [gworkspace trashPath]] == NO);
@@ -1477,7 +1477,7 @@
 
       return NO;
 
-    } else if (sel_eq(action, @selector(openSelection:))) {
+    } else if (sel_isEqual(action, @selector(openSelection:))) {
       if ([[baseNode path] isEqual: [gworkspace trashPath]] == NO) {
         BOOL canopen = YES;
         int i;
@@ -1501,14 +1501,14 @@
 
       return NO;
 
-    } else if (sel_eq(action, @selector(openSelectionAsFolder:))) {
+    } else if (sel_isEqual(action, @selector(openSelectionAsFolder:))) {
       if (lastSelection && ([lastSelection count] == 1)) {  
         return [[lastSelection objectAtIndex: 0] isDirectory];
       }
 
       return NO;
 
-    } else if (sel_eq(action, @selector(openWith:))) {
+    } else if (sel_isEqual(action, @selector(openWith:))) {
       BOOL canopen = YES;
       int i;
 
@@ -1529,8 +1529,8 @@
 
       return canopen;
 
-    } else if (sel_eq(action, @selector(newFolder:))
-                                  || sel_eq(action, @selector(newFile:))) {
+    } else if (sel_isEqual(action, @selector(newFolder:))
+                                  || sel_isEqual(action, @selector(newFile:))) {
       if ([[baseNode path] isEqual: [gworkspace trashPath]] == NO) {
         return [[nodeView shownNode] isWritable];
       }
@@ -1541,7 +1541,7 @@
     return YES;   
   } else {
     SEL action = [menuItem action];
-    if (sel_eq(action, @selector(makeKeyAndOrderFront:))) {
+    if (sel_isEqual(action, @selector(makeKeyAndOrderFront:))) {
       return YES;
     }
   }
