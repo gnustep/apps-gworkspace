@@ -1,6 +1,6 @@
 /* SoundViewer.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2011 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
@@ -22,18 +22,18 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <AppKit/AppKit.h>
-#include "SoundViewer.h"
+#import <AppKit/AppKit.h>
+#import "SoundViewer.h"
 
 @implementation SoundViewer
 
 - (void)dealloc
 {
-	TEST_RELEASE (soundPath);
-	TEST_RELEASE (sound);
+  TEST_RELEASE (soundPath);
+  TEST_RELEASE (sound);
   RELEASE (playBox);  
   RELEASE (errLabel);
-	RELEASE (indicator);
+  RELEASE (indicator);
   [super dealloc];
 }
 
@@ -288,9 +288,9 @@
 	if ([types containsObject: [extension lowercaseString]]) {
 		return YES;
 	}
-//	if ([[NSSound soundUnfilteredFileTypes] containsObject: extension]) {
-//		return YES;
-//	}
+	if ([[NSSound soundUnfilteredFileTypes] containsObject: extension]) {
+		return YES;
+	}
 
 	return NO;
 }
