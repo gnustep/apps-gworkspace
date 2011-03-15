@@ -1,8 +1,13 @@
+2011-03-15 Riccardo Mottola <rm@gnu.org
+
+	* Inspector/ContentViewers/SoundViewer/SoundViewer.m:
+	Patch by Philippe to stop progress after playing ends.
+
 2011-03-11 Riccardo Mottola <rm@gnu.org
 
 	* Inspector/ContentViewers/SoundViewer/SoundViewer.m
 	De-comment sound playing
-	
+
 2011-02-28 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/GWorkspace.m

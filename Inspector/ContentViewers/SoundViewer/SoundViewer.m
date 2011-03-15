@@ -189,44 +189,52 @@
 {
   NSSound *snd;
   
-	if (sound) {
-		if ([sound isPlaying]) {
-			[sound stop];
-			[indicator stopAnimation: self];
-		}
-		DESTROY (sound);
+  if (sound)
+    {
+      if ([sound isPlaying]) 
+	{
+	  [sound stop];
+	  [indicator stopAnimation: self];
 	}
+      DESTROY (sound);
+    }
   
-	ASSIGN (soundPath, path);
+  ASSIGN (soundPath, path);
 
-  if ([self superview]) {      
-    [inspector contentsReadyAt: soundPath];
-  }
+  if ([self superview]) 
+    {      
+      [inspector contentsReadyAt: soundPath];
+    }
   
   snd = [[NSSound alloc] initWithContentsOfFile: soundPath 
                                     byReference: NO]; 
   
-  if (snd) {
-    ASSIGN (sound, snd);
-  
-		if (valid == NO) {
-			[errLabel removeFromSuperview]; 
-      [self addSubview: playBox];   
-			valid = YES;
-		}		  
+  if (snd)
+    {
+      ASSIGN (sound, snd);
+      [sound setDelegate: self];
+      if (valid == NO) 
+	{
+	  [errLabel removeFromSuperview]; 
+	  [self addSubview: playBox];   
+	  valid = YES;
+	}		  
     
-    [editButt setEnabled: YES];	
-    [[self window] makeFirstResponder: editButt];
+      [editButt setEnabled: YES];	
+      [[self window] makeFirstResponder: editButt];
     	
-  } else {
-    if (valid == YES) {
-      DESTROY (sound);
-			[playBox removeFromSuperview]; 
-      [self addSubview: errLabel]; 
-      [editButt setEnabled: NO];		      
-			valid = NO;
+    } 
+  else 
+    {
+      if (valid == YES) 
+	{
+	  DESTROY (sound);
+	  [playBox removeFromSuperview]; 
+	  [self addSubview: errLabel]; 
+	  [editButt setEnabled: NO];		      
+	  valid = NO;
+	}
     }
-  }
   
   DESTROY (snd);
 }
@@ -334,6 +342,11 @@
       }
     }
   }
+}
+
+- (void) sound:(NSSound *)sound didFinishPlaying:(BOOL)aBool
+{
+  [indicator stopAnimation: self];
 }
 
 @end
