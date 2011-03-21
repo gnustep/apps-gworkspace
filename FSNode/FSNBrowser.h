@@ -61,7 +61,7 @@
 	int currentshift;
 
   NSSize columnSize;
-  
+  NSInteger fontSize;
   BOOL simulatingDoubleClick;
   float mousePointX;
   float mousePointY;

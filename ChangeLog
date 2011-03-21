@@ -1,9 +1,16 @@
-2011-03-15 Riccardo Mottola <rm@gnu.org
+2011-03-21 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNBrowser.h
+	* FSNode/FSNBrowser.m
+
+	Patch by Philippe to use default font size instead of fixed 12.
+
+2011-03-15 Riccardo Mottola <rm@gnu.org>
 
 	* Inspector/ContentViewers/SoundViewer/SoundViewer.m:
 	Patch by Philippe to stop progress after playing ends.
 
-2011-03-11 Riccardo Mottola <rm@gnu.org
+2011-03-11 Riccardo Mottola <rm@gnu.org>
 
 	* Inspector/ContentViewers/SoundViewer/SoundViewer.m
 	De-comment sound playing

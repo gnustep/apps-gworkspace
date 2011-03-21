@@ -40,14 +40,15 @@
 #define DEFAULT_ISIZE 24
 
 #ifndef max
-  #define max(a,b) ((a) >= (b) ? (a):(b))
-  #define min(a,b) ((a) <= (b) ? (a):(b))
+#define max(a,b) ((a) >= (b) ? (a):(b))
+#define min(a,b) ((a) <= (b) ? (a):(b))
 #endif
 
 @implementation FSNBrowser
 
 - (void)dealloc
 {
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
   RELEASE (baseNode);
   RELEASE (extInfoType);  
   RELEASE (lastSelection);
@@ -74,12 +75,12 @@
     NSString *appName = [defaults stringForKey: @"DesktopApplicationName"];
     NSString *selName = [defaults stringForKey: @"DesktopApplicationSelName"];
     id defentry;
-		int i;
+    int i;
     
     fsnodeRep = [FSNodeRep sharedInstance];
     
     if (appName && selName) {
-		  Class desktopAppClass = [[NSBundle mainBundle] classNamed: appName];
+      Class desktopAppClass = [[NSBundle mainBundle] classNamed: appName];
       SEL sel = NSSelectorFromString(selName);
       desktopApp = [desktopAppClass performSelector: sel];
     }
@@ -110,21 +111,25 @@
     [self readNodeInfo];
     
     lastSelection = nil;
-		visibleColumns = vcols;
+    visibleColumns = vcols;
     
     scroller = scrl;
-	  [scroller setTarget: self];
-	  [scroller setAction: @selector(scrollViaScroller:)];    
+    [scroller setTarget: self];
+    [scroller setAction: @selector(scrollViaScroller:)];    
     
     cellsIcon = cicns;
     selColumn = selcol;
 
     updateViewsLock = 0;
    
+    if ([defaults objectForKey:@"NSFontSize"])
+      fontSize = [defaults integerForKey:@"NSFontSize"];
+    else
+      fontSize = 12;
     cellPrototype = [FSNBrowserCell new];
-    [cellPrototype setFont: [NSFont systemFontOfSize: 12]];
-    
-  	columns = [NSMutableArray new];
+    [cellPrototype setFont: [NSFont systemFontOfSize: fontSize]];
+
+    columns = [NSMutableArray new];
   
     nameEditor = nil;
   
@@ -133,33 +138,50 @@
       [nameEditor setDelegate: self];  
       [nameEditor setEditable: YES];
       [nameEditor setSelectable: YES];	   
-		  [nameEditor setFont: [cellPrototype font]];
-		  [nameEditor setBezeled: NO];
-		  [nameEditor setAlignment: NSLeftTextAlignment];
-  //	  [nameEditor setTextColor: textColor];
+      [nameEditor setFont: [cellPrototype font]];
+      [nameEditor setBezeled: NO];
+      [nameEditor setAlignment: NSLeftTextAlignment];
     }  
   
-		for (i = 0; i < visibleColumns; i++) {
+    for (i = 0; i < visibleColumns; i++) {
       [self createEmptyColumn];
-		}
+    }
 		    
-  	firstVisibleColumn = 0;
-  	lastVisibleColumn = visibleColumns - 1;	
-		currentshift = 0;	
-  	lastColumnLoaded = -1;
-  	alphaNumericalLastColumn = -1;
+    firstVisibleColumn = 0;
+    lastVisibleColumn = visibleColumns - 1;	
+    currentshift = 0;	
+    lastColumnLoaded = -1;
+    alphaNumericalLastColumn = -1;
 		
-  	skipUpdateScroller = NO;
-		lastKeyPressed = 0.;
-  	charBuffer = nil;
+    skipUpdateScroller = NO;
+    lastKeyPressed = 0.;
+    charBuffer = nil;
     simulatingDoubleClick = NO;    
-  	isLoaded = NO;	
+    isLoaded = NO;	
 
     viewer = nil;
     manager = nil;
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(defaultsChanged:) name:NSUserDefaultsDidChangeNotification object:nil];
   }
   
   return self;
+}
+
+- (void)defaultsChanged:(NSNotification *)not
+{
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
+  NSInteger newSize;
+
+  if ([defaults objectForKey:@"NSFontSize"]) {
+    newSize = [defaults integerForKey:@"NSFontSize"];
+    if (newSize != fontSize) {
+      fontSize = newSize;
+      [cellPrototype setFont: [NSFont systemFontOfSize: fontSize]];
+      [nameEditor setFont: [cellPrototype font]];
+      [self setVisibleColumns:[self visibleColumns]];
+    }
+  }
 }
 
 - (void)setBaseNode:(FSNode *)node
@@ -1720,7 +1742,7 @@
 
 - (int)labelTextSize
 {
-  return 12;
+  return fontSize;
 }
 
 - (int)iconPosition
