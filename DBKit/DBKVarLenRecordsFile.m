@@ -1,6 +1,6 @@
 /* DBKVarLenRecordsFile.m
  *  
- * Copyright (C) 2005-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2011 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2005
@@ -462,7 +462,7 @@
   return [offsetNum unsignedLongValue];
 }
 
-- (unsigned)hash
+- (NSUInteger)hash
 {
   return ([lengthNum hash] + [offsetNum hash]);
 }

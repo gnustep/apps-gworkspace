@@ -1,6 +1,6 @@
 /* WorkspaceApplication.m
  *  
- * Copyright (C) 2006-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2011 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2006
@@ -28,16 +28,16 @@
 #import <AppKit/AppKit.h>
 #import <GNUstepBase/GNUstep.h>
 
-#include "GWorkspace.h"
-#include "GWFunctions.h"
-#include "FSNodeRep.h"
-#include "FSNFunctions.h"
-#include "GWorkspace.h"
-#include "GWDesktopManager.h"
-#include "Dock.h"
-#include "GWViewersManager.h"
-#include "Operation.h"
-#include "StartAppWin.h"
+#import "GWorkspace.h"
+#import "GWFunctions.h"
+#import "FSNodeRep.h"
+#import "FSNFunctions.h"
+#import "GWorkspace.h"
+#import "GWDesktopManager.h"
+#import "Dock.h"
+#import "GWViewersManager.h"
+#import "Operation.h"
+#import "StartAppWin.h"
 
 @implementation GWorkspace (WorkspaceApplication)
 
@@ -1070,7 +1070,7 @@
   return self;
 }
 
-- (unsigned)hash
+- (NSUInteger)hash
 {
   return ([name hash] | [path hash]);
 }

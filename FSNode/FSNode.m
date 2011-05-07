@@ -1,6 +1,6 @@
 /* FSNode.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2011 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -126,7 +126,7 @@
   return self;
 }
 
-- (unsigned)hash
+- (NSUInteger)hash
 {
   return [path hash];
 }
@@ -661,9 +661,6 @@
     
 	if (fsize == 1) {
 		sizeStr = @"1 byte";
-	} else if (fsize < 0) {
-		sign = "-";
-		fsize = -fsize;
 	} 
   
 	if (fsize == 0) {

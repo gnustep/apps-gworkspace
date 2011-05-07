@@ -1,6 +1,6 @@
 /* FSNFunctions.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2011 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -98,31 +98,26 @@ int compareWithExtType(id *r1, id *r2, void *context)
 
 NSString *sizeDescription(unsigned long long size)
 {
-	NSString *sizeStr;
-	char *sign = "";
+  NSString *sizeStr;
+  char *sign = "";
     
-	if (size == 1) {
-		sizeStr = @"1 byte";
-	} else if (size < 0) {
-		sign = "-";
-		size = -size;
-	}
-	if (size == 0) {
-		sizeStr = @"0 bytes";
-	} else if (size < (10 * ONE_KB)) {
-		sizeStr = [NSString stringWithFormat:@"%s %d bytes", sign, (long)size];
-	} else if (size < (100 * ONE_KB)) {
- 		sizeStr = [NSString stringWithFormat:@"%s %3.2fKB", sign,
-                          					((double)size / (double)(ONE_KB))];
-	} else if (size < (100 * ONE_MB)) {
-		sizeStr = [NSString stringWithFormat:@"%s %3.2fMB", sign,
-                          					((double)size / (double)(ONE_MB))];
-	} else {
- 		sizeStr = [NSString stringWithFormat:@"%s %3.2fGB", sign,
-                          					((double)size / (double)(ONE_GB))];
-	}
+  if (size == 1)
+    sizeStr = @"1 byte";
+  else if (size == 0)
+    sizeStr = @"0 bytes";
+  else if (size < (10 * ONE_KB))
+    sizeStr = [NSString stringWithFormat:@"%s %d bytes", sign, (long)size];
+  else if (size < (100 * ONE_KB))
+    sizeStr = [NSString stringWithFormat:@"%s %3.2fKB", sign,
+			((double)size / (double)(ONE_KB))];
+  else if (size < (100 * ONE_MB))
+    sizeStr = [NSString stringWithFormat:@"%s %3.2fMB", sign,
+			((double)size / (double)(ONE_MB))];
+  else
+    sizeStr = [NSString stringWithFormat:@"%s %3.2fGB", sign,
+			((double)size / (double)(ONE_GB))];
 
-	return sizeStr;
+  return sizeStr;
 }
 
 NSArray *makePathsSelection(NSArray *selnodes)

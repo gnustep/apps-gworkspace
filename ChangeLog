@@ -1,3 +1,23 @@
+2011-05-07 Riccardo Mottola <rm@gnu.org>
+
+	* DBKit/DBKBTreeNode.m
+	* DBKit/DBKVarLenRecordsFile.m
+	* Tools/fswatcher/fswatcher.m
+	* Tools/wopen/wopen.m
+	* Tools/lsfupdater/lsfupdater.m
+	* Tools/ddbd/DDBPathsManager.m
+	* GWorkspace/GWFunctions.m
+	* GWorkspace/WorkspaceApplication.m
+	* Inspector/Attributes.m
+	* Inspector/Functions.m
+	* FSNode/FSNFunctions.m
+	* FSNode/FSNode.m
+	* GWMetadata/MDKit/MDKQueryManager.m
+	* GWMetadata/MDKit/MDKAttribute.m
+	* GWMetadata/gmds/mdextractor/mdextractor.m
+	* GWMetadata/gmds/mdextractor/Extractors/OpenOfficeExtractor/OpenOfficeExtractor.m
+	Warning fixes and code clean-up
+
 2011-03-21 Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNBrowser.h

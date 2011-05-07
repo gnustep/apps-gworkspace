@@ -1,6 +1,6 @@
 /* Attributes.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2011 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
@@ -689,16 +689,17 @@ if ([b tag] == MULTIPLE) perms |= v; \
 
 - (void)sizerConnDidDie:(NSNotification *)notification
 {
-	id diedconn = [notification object];
+  id diedconn = [notification object];
 
-  if (diedconn == sizerConn) {
-    [nc removeObserver: self
-	                name: NSConnectionDidDieNotification 
-                object: sizerConn];
-    DESTROY (sizer);
-    DESTROY (sizerConn);
-    NSLog(@"sizer connection died", @"");
-  }
+  if (diedconn == sizerConn)
+    {
+      [nc removeObserver: self
+		    name: NSConnectionDidDieNotification 
+		  object: sizerConn];
+      DESTROY (sizer);
+      DESTROY (sizerConn);
+      NSLog(@"sizer connection died");
+    }
 }
 
 - (void)setSizer:(id)anObject

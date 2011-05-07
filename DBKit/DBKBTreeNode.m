@@ -1,6 +1,6 @@
 /* DBKBTreeNode.m
  *  
- * Copyright (C) 2005-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2011 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2005
@@ -63,7 +63,7 @@
   return self;
 }
 
-- (unsigned)hash
+- (NSUInteger)hash
 {
   return [offset hash];
 }
