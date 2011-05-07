@@ -2,7 +2,7 @@
  *  wopen.m: Implementation of the wopen tool 
  *  for the GNUstep GWorkspace application
  *
- *   Copyright (C) 2002 Enrico Sersale <enrico@imago.ro>
+ *  Copyright (C) 2002-2011 Free Software Foundation, Inc.
  *
  *   Author: Enrico Sersale
  *   Date: September 2002
@@ -23,8 +23,8 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
 
 int main(int argc, char** argv, char **env_c)
 {
@@ -65,11 +65,12 @@ int main(int argc, char** argv, char **env_c)
 	  gworkspace = [NSConnection rootProxyForConnectionWithRegisteredName: @"GWorkspace"  
 								          host: @""];
       
-    if (gworkspace == nil) {
-      NSLog(@"can't contact GWorkspace. exiting now.", fpath);
-      [pool release];
-      exit(0);
-    } 
+    if (gworkspace == nil)
+      {
+	NSLog(@"can't contact GWorkspace via %@. exiting now.", fpath);
+	[pool release];
+	exit(0);
+      } 
     
     [gworkspace application: gworkspace openFile: fullPath];    
   }

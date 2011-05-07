@@ -1,6 +1,6 @@
 /* lsfupdater.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2011 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -22,9 +22,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "FinderModulesProtocol.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import "FinderModulesProtocol.h"
 #include "config.h"
 
 #ifndef GW_DEBUG_LOG
@@ -460,7 +460,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
 
 - (void)fastUpdate
 {
-  int count = [searchPaths count];
+  unsigned count = [searchPaths count];
   BOOL lsfdone = YES;
   int i;
 
@@ -470,7 +470,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
   
   [self getFoundPaths];
 
-  GWDebugLog(@"got %i found paths. checking...", [foundPaths count]);
+  GWDebugLog(@"got %lu found paths. checking...", [foundPaths count]);
   
   [self checkFoundPaths];
   
@@ -591,7 +591,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
         
     paths = [paths arrayByAddingObject: srcpath];
 
-    GWDebugLog(@"%i directories", [paths count]);
+    GWDebugLog(@"%lu directories", [paths count]);
     GWDebugLog(@"updating in %@", srcpath);    
     
     for (i = 0; i <= count; i++) {

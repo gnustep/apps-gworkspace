@@ -1,6 +1,6 @@
 /* fswatcher.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2011 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: February 2004
@@ -115,15 +115,17 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 {
   int i;
 
-  for (i = 0; i < [clientsInfo count]; i++) {
-    NSConnection *connection = [[clientsInfo objectAtIndex: i] connection];
+  for (i = 0; i < [clientsInfo count]; i++)
+    {
+      NSConnection *connection = [[clientsInfo objectAtIndex: i] connection];
 
-		if (connection) {
-      [nc removeObserver: self
-		                name: NSConnectionDidDieNotification
-		              object: connection];
-		}
-  }
+      if (connection)
+	{
+	  [nc removeObserver: self
+			name: NSConnectionDidDieNotification
+		      object: connection];
+	}
+    }
   
   if (conn) {
     [nc removeObserver: self
@@ -344,25 +346,28 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 - (oneway void)registerClient:(id <FSWClientProtocol>)client
               isGlobalWatcher:(BOOL)global
 {
-	NSConnection *connection = [(NSDistantObject *)client connectionForProxy];
+  NSConnection *connection = [(NSDistantObject *)client connectionForProxy];
   FSWClientInfo *info = [self clientInfoWithConnection: connection];
 
-	if (info == nil) {
-    [NSException raise: NSInternalInconsistencyException
-		            format: @"registration with unknown connection"];
-  }
+  if (info == nil)
+    {
+      [NSException raise: NSInternalInconsistencyException
+		  format: @"registration with unknown connection"];
+    }
 
-  if ([info client] != nil) { 
-    [NSException raise: NSInternalInconsistencyException
-		            format: @"registration with registered client"];
-  }
+  if ([info client] != nil)
+    { 
+      [NSException raise: NSInternalInconsistencyException
+		  format: @"registration with registered client"];
+    }
 
-  if ([(id)client isProxy] == YES) {
+  if ([(id)client isProxy] == YES)
+  {
     [(id)client setProtocolForProxy: @protocol(FSWClientProtocol)];
     [info setClient: client];  
     [info setGlobal: global];
   }
-  NSLog(@"register client %u", [clientsInfo count]);
+  NSLog(@"register client %lu", [clientsInfo count]);
 }
 
 - (oneway void)unregisterClient:(id <FSWClientProtocol>)client
@@ -399,7 +404,7 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 	            object: connection];
 
   [clientsInfo removeObject: info];
-  NSLog(@"unregister client %u", [clientsInfo count]);
+  NSLog(@"unregister client %lu", [clientsInfo count]);
   if (auto_stop == YES && [clientsInfo count] == 1)
     {
       /* If there is nothing else using this process, and this is not
@@ -413,15 +418,16 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 {
   int i;
 
-  for (i = 0; i < [clientsInfo count]; i++) {
-    FSWClientInfo *info = [clientsInfo objectAtIndex: i];
+  for (i = 0; i < [clientsInfo count]; i++)
+    {
+      FSWClientInfo *info = [clientsInfo objectAtIndex: i];
   
-		if ([info connection] == connection) {
-			return info;
-		}  
-  }
+      if ([info connection] == connection)
+	return info;
+		
+    }
 
-	return nil;
+  return nil;
 }
 
 - (FSWClientInfo *)clientInfoWithRemote:(id)remote

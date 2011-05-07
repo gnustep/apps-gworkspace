@@ -1,6 +1,6 @@
 /* DDBPathsManager.m
  *  
- * Copyright (C) 2005-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2011 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2005
@@ -22,12 +22,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include "DBKBTreeNode.h"
-#include "DBKVarLenRecordsFile.h"
-#include "DDBPathsManager.h"
-#include "DDBMDStorage.h"
-#include "MDModulesProtocol.h"
-#include "ddbd.h"
+#import "DBKBTreeNode.h"
+#import "DBKVarLenRecordsFile.h"
+#import "DDBPathsManager.h"
+#import "DDBMDStorage.h"
+#import "MDModulesProtocol.h"
+#import "ddbd.h"
 
 @implementation	DDBPathsManager
 
@@ -604,7 +604,7 @@
   }
 }
 
-- (unsigned)hash
+- (NSUInteger)hash
 {
   return [path hash];
 }
