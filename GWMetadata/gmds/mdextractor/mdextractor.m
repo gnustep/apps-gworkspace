@@ -1,6 +1,6 @@
 /* mdextractor.m
  *  
- * Copyright (C) 2006-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2011 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@dtedu.net>
  * Date: February 2006
@@ -832,7 +832,7 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
     
     [sqlite executeQuery: @"COMMIT"];
     
-    GWDebugLog(path);
+    GWDebugLog(@"%@", path);
     
     fcount++;
 
@@ -904,7 +904,7 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
                             filesCount: fcount
                            indexedDone: NO];
                            
-              GWDebugLog(@"updating %i", fcount);             
+              GWDebugLog(@"updating %lu", fcount);             
             }
           }
           

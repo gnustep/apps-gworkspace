@@ -1,6 +1,6 @@
 /* MDKAttribute.m
  *  
- * Copyright (C) 2006 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2011 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@fibernet.ro>
  * Date: December 2006
@@ -22,12 +22,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "MDKAttribute.h"
-#include "MDKAttributeEditor.h"
-#include "MDKWindow.h"
-#include "MDKQuery.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import "MDKAttribute.h"
+#import "MDKAttributeEditor.h"
+#import "MDKWindow.h"
+#import "MDKQuery.h"
 
 @implementation MDKAttribute
 
@@ -86,7 +86,7 @@
   return self;
 }
 
-- (unsigned)hash
+- (NSUInteger)hash
 {
   return [name hash];
 }

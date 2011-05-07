@@ -1,6 +1,6 @@
 /* OpenOfficeExtractor.m
  *  
- * Copyright (C) 2006 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2011 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@dtedu.net>
  * Date: July 2006
@@ -22,9 +22,9 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#include <AppKit/AppKit.h>
-#include "OpenOfficeExtractor.h"
-#include "extractors.h"
+#import <AppKit/AppKit.h>
+#import "OpenOfficeExtractor.h"
+#import "extractors.h"
 
 #define MAXFSIZE 600000
 #define WORD_MAX 40
@@ -238,7 +238,7 @@ static char *style = "<xsl:stylesheet "
 - (NSDictionary *)unzippedPathsForPath:(NSString *)path
 {
   NSMutableDictionary *paths = nil;
-  NSTask *task;
+  NSTask *task = nil;
   NSFileHandle *nullHandle;
 
   [fm removeFileAtPath: tempdir handler: nil]; 

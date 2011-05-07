@@ -1,6 +1,6 @@
 /* MDKQueryManager.m
  *  
- * Copyright (C) 2006-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2011 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@dtedu.net>
  * Date: October 2006
@@ -181,9 +181,9 @@ static MDKQueryManager *queryManager = nil;
     
   if (query) {
     if ([query isUpdating]) {    
-      GWDebugLog(@"REMOVING UPDATING QUERY %i", [queries count]);
+      GWDebugLog(@"REMOVING UPDATING QUERY %lu", [queries count]);
     } else {    
-      GWDebugLog(@"REMOVING SIMPLE QUERY %i", [queries count]);
+      GWDebugLog(@"REMOVING SIMPLE QUERY %lu", [queries count]);
     }
 
     if ([query isUpdating]) {
@@ -203,7 +203,7 @@ static MDKQueryManager *queryManager = nil;
       } else {
         [query updatingStarted];
         
-        GWDebugLog(@"PERFORMING UPDATE (2) %i", [queries count]);
+        GWDebugLog(@"PERFORMING UPDATE (2) %lu", [queries count]);
         
         [gmds performQuery: [query sqlUpdatesDescription]];
       }
@@ -327,7 +327,7 @@ static MDKQueryManager *queryManager = nil;
       if ([queries containsObject: query] == NO) {
         [queries addObject: query];
     
-        GWDebugLog(@"INSERTING UPDATING QUERY %i", [queries count]);
+        GWDebugLog(@"INSERTING UPDATING QUERY %lu", [queries count]);
       }
       
     } else {
@@ -340,7 +340,7 @@ static MDKQueryManager *queryManager = nil;
   if (count && (count == [queries count])) {  
     MDKQuery *query = [queries lastObject];
     
-    GWDebugLog(@"PERFORMING UPDATE (1) %i", [queries count]);
+    GWDebugLog(@"PERFORMING UPDATE (1) %lu", [queries count]);
     
     [query updatingStarted];
     [gmds performQuery: [query sqlUpdatesDescription]];
