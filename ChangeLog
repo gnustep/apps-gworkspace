@@ -1,3 +1,9 @@
+2011-05-10 Riccardo Mottola for Sebastian Reitenbach
+
+	* GWMetadata/gmds/mdfind/GNUmakefile.in
+	* GWMetadata/gmds/mdextractor/GNUmakefile.in
+	Correct makefiles to use local version and not installed one.
+	
 2011-05-07 Riccardo Mottola <rm@gnu.org>
 
 	* DBKit/DBKBTreeNode.m
