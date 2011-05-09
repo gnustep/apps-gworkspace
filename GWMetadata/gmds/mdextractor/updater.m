@@ -496,7 +496,7 @@ do { \
     NSMutableDictionary *dict = [NSMutableDictionary dictionary];  
     NSString *path = [info objectForKey: @"path"];
     NSString *event = [info objectForKey: @"event"];
-    NSNumber *exists;
+    NSNumber *exists = nil;
 
     if ([event isEqual: @"GWWatchedPathDeleted"]) {
       exists = [NSNumber numberWithBool: NO];
