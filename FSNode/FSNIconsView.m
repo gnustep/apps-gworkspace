@@ -1,6 +1,6 @@
 /* FSNIconsView.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2011 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -642,18 +642,18 @@ pp.y = NSMaxY(br) + 1; \
 
 - (void)keyDown:(NSEvent *)theEvent 
 {
-  NSString *characters = [theEvent characters];  
-  unichar character = 0;
-	NSRect vRect, hiddRect;
-	NSPoint p;
-	float x, y, w, h;
+  NSString *characters;  
+  unichar character;
+  NSRect vRect, hiddRect;
+  NSPoint p;
+  float x, y, w, h;
 
-	characters = [theEvent characters];
-	character = 0;
+  characters = [theEvent characters];
+  character = 0;
 		
-  if ([characters length] > 0) {
-		character = [characters characterAtIndex: 0];
-	}
+  if ([characters length] > 0)
+    character = [characters characterAtIndex: 0];
+
 	
   switch (character) {
     case NSPageUpFunctionKey:

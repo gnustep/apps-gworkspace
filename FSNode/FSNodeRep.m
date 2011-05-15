@@ -39,7 +39,7 @@
   #include <sys/mount.h>
   #ifdef __NetBSD__
     #include <sys/types.h>
-    #if __NetBSD_Version__ >= 3000000000
+    #if __NetBSD_Version__ >= 300000000
     #include <sys/statvfs.h>
     #define statfs statvfs
     #endif
