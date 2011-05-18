@@ -41,7 +41,9 @@
   #include <sys/types.h>
 #ifdef HAVE_SYS_STATVFS_H
   #include <sys/statvfs.h>
-  #define statfs statvfs
+  #ifdef __NetBSD__
+    #define statfs statvfs
+  #endif
 #endif
 #endif /* HAVE_SYSTYPES */
 #else 
