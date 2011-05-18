@@ -37,13 +37,13 @@
   #include <sys/param.h>
   #include <sys/ucred.h>
   #include <sys/mount.h>
-  #ifdef __NetBSD__
-    #include <sys/types.h>
-    #if __NetBSD_Version__ >= 300000000
-    #include <sys/statvfs.h>
-    #define statfs statvfs
-    #endif
-  #endif
+#ifdef HAVE_SYSTYPES
+  #include <sys/types.h>
+#ifdef HAVE_STATVFS
+  #include <sys/statvfs.h>
+  #define statfs statvfs
+#endif
+#endif /* HAVE_SYSTYPES */
 #else 
   #if	defined(HAVE_GETMNTENT) && defined (MNT_DIR)
     #if	defined(HAVE_MNTENT_H)

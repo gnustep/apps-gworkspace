@@ -18,7 +18,10 @@ AC_CONFIG_SUBDIRS([ExtendedInfo])
 AC_CHECK_FUNCS(getmntinfo)
 
 AC_CHECK_HEADERS(mntent.h)
-AC_CHECK_HEADERS(sys/mntent.h)
+AC_CHECK_HEADERS(sys/types.h sys/mntent.h)
+
+# support for NetBSD > 3.x
+AC_CHECK_HEADERS(sys/statvfs.h)
 
 AC_CHECK_MEMBER(struct mntent.mnt_dir,[AC_DEFINE(MNT_FSNAME,mnt_fsname,mntent structure member name)],,[#include <mntent.h>])
 AC_CHECK_MEMBER(struct mntent.mnt_mountp,[AC_DEFINE(MNT_FSNAME,mnt_special,mntent structure member name)],,[#include <sys/mntent.h>])

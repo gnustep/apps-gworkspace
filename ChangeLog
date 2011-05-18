@@ -5,7 +5,7 @@
 	Correct makefiles to use local version and not installed one.
 
 2011-05-10 Riccardo Mottola for Sebastian Reitenbach
-	
+
 	* GWMetadata/gmds/mdextractor/updater.m
 	Fix warning.
 
