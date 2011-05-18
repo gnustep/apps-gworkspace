@@ -37,9 +37,9 @@
   #include <sys/param.h>
   #include <sys/ucred.h>
   #include <sys/mount.h>
-#ifdef HAVE_SYSTYPES
+#ifdef HAVE_SYS_TYPES_H
   #include <sys/types.h>
-#ifdef HAVE_STATVFS
+#ifdef HAVE_SYS_STATVFS_H
   #include <sys/statvfs.h>
   #define statfs statvfs
 #endif
