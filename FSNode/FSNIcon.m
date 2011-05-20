@@ -1,6 +1,6 @@
 /* FSNIcon.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2011 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -1169,7 +1169,7 @@ static NSImage *branchImage;
 
 - (unsigned int)draggingSourceOperationMaskForLocal:(BOOL)flag
 {
-  return NSDragOperationAll;
+  return NSDragOperationEvery;
 }
 
 - (void)draggedImage:(NSImage *)anImage 
