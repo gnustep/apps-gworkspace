@@ -1,6 +1,6 @@
 /* SQLite.h
  *  
- * Copyright (C) 2006 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2011 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: May 2006
@@ -25,8 +25,11 @@
 #ifndef SQLITE_H
 #define SQLITE_H
 
-#include <Foundation/Foundation.h>
+#import <Foundation/Foundation.h>
+
+#define id sqlite_id
 #include <sqlite3.h>
+#undef id
 
 @class SQLitePreparedStatement;
 
