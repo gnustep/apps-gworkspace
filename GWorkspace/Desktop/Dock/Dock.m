@@ -1,6 +1,6 @@
 /* Dock.m
  *  
- * Copyright (C) 2005-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2011 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -520,14 +520,16 @@
   NSMutableDictionary *dict = [NSMutableDictionary dictionary];
   int i;  
 
-  for (i = 0; i < [icons count]; i++) {
-    DockIcon *icon = [icons objectAtIndex: i];    
+  for (i = 0; i < [icons count]; i++)
+    {
+      DockIcon *icon = [icons objectAtIndex: i];    
 
-    if (([icon isSpecialIcon] == NO) && [icon isDocked]) {
-      [dict setObject: [icon appName] forKey: [NSNumber numberWithInt: i]];
-      [manager removeWatcherForPath: [[icon node] path]];
+      if (([icon isSpecialIcon] == NO) && [icon isDocked])
+	{
+	  [dict setObject: [icon appName] forKey: [[NSNumber numberWithInt: i] stringValue]];
+	  [manager removeWatcherForPath: [[icon node] path]];
+	}
     }
-  }
 
   [defaults setObject: dict forKey: @"applications"];
   

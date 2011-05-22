@@ -1,3 +1,8 @@
+2011-05-22 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/Desktop/Dock/Dock.m
+	Fix bug found by Sebastian: use string for key.
+
 2011-05-21 Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNIcon.m
