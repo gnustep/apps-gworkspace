@@ -220,26 +220,28 @@ static NSString *defaultColumns = @"{ \
   NSArray *columns = [listView tableColumns];
   NSMutableDictionary *colsinfo = [NSMutableDictionary dictionary];
   
-  if (columns) { 
-    int i;
+  if (columns)
+    { 
+      int i;
 
-    for (i = 0; i < [columns count]; i++) {
-      NSTableColumn *column = [columns objectAtIndex: i];
-      NSNumber *identifier = [column identifier];
-      NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+      for (i = 0; i < [columns count]; i++)
+	{
+	  NSTableColumn *column = [columns objectAtIndex: i];
+	  NSNumber *identifier = [column identifier];
+	  NSMutableDictionary *dict = [NSMutableDictionary dictionary];
 
-      [dict setObject: [NSNumber numberWithInt: i] 
-               forKey: @"position"];
-      [dict setObject: identifier 
-               forKey: @"identifier"];
-      [dict setObject: [NSNumber numberWithFloat: [column width]] 
-               forKey: @"width"];
-      [dict setObject: [NSNumber numberWithFloat: [column minWidth]] 
-               forKey: @"minwidth"];
+	  [dict setObject: [NSNumber numberWithInt: i] 
+		   forKey: @"position"];
+	  [dict setObject: identifier 
+		   forKey: @"identifier"];
+	  [dict setObject: [NSNumber numberWithFloat: [column width]] 
+		   forKey: @"width"];
+	  [dict setObject: [NSNumber numberWithFloat: [column minWidth]] 
+		   forKey: @"minwidth"];
 
-      [colsinfo setObject: dict forKey: identifier];
+	  [colsinfo setObject: dict forKey: [identifier stringValue]];
+	}
     }
-  }
    
   return colsinfo;
 }
