@@ -441,6 +441,7 @@
 {
 	NSPoint p;
   NSSize s;
+  NSSize boundsSize;
       	
 	if(isSelect) {
     [[NSColor selectedControlColor] set];
@@ -448,7 +449,10 @@
 	}
 	
   s = [icon size];
-  p = NSMakePoint((rect.size.width - s.width) / 2, (rect.size.height - s.height) / 2);	
+  boundsSize = [self bounds].size;
+  p = NSMakePoint((boundsSize.width - s.width) / 2, (boundsSize.height - s.height) / 2);	
+  p = [self centerScanRect: NSMakeRect(p.x, p.y, 0, 0)].origin;
+
 	if (locked == NO) {
 		[icon compositeToPoint: p operation: NSCompositeSourceOver];
 	} else {

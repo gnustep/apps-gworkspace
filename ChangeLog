@@ -1,3 +1,9 @@
+2011-06-27  Eric Wasylishen  <ewasylishen@gmail.com>
+
+	* GWorkspace/TShelf/TShelfIcon.m (-drawRect:):
+	Round the drawing coordinates for the shelf icon.
+	Don't use the dirty rect parameter to position the icon.
+
 2011-05-23 Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNListView.m
