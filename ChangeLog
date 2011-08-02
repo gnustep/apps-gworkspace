@@ -1,3 +1,8 @@
+2011-08-02 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/Desktop/Dock/DockIcon.m
+	Fixed rounding of position.
+
 2011-06-27  Eric Wasylishen  <ewasylishen@gmail.com>
 
 	* GWorkspace/TShelf/TShelfIcon.m (-drawRect:):

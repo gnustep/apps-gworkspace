@@ -481,7 +481,7 @@
 
   rect.size.width = icnrect.size.width;
   rect.origin.x = (position == DockPositionLeft) ? 0 : scrrect.size.width - rect.size.width;
-  rect.origin.y = (scrrect.size.height - rect.size.height) / 2;
+  rect.origin.y = ceil((scrrect.size.height - rect.size.height) / 2);
   
   if (view) {
     [view setNeedsDisplayInRect: [self frame]];
