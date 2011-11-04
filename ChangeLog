@@ -1,3 +1,14 @@
+2011-11-04  Eric Wasylishen  <ewasylishen@gmail.com>
+
+	* GWorkspace/Preferences/PrefController.h: specify type of
+	popUp outlet to fix this dangerous warning:
+	Preferences/PrefController.m:82:5: warning: multiple methods named ‘-removeItemAtIndex:’ found [enabled by default]
+	/usr/local/include/AppKit/NSMenu.h:569:1: note: using ‘-(void)removeItemAtIndex:(int)index’
+	/usr/local/include/AppKit/NSToolbar.h:102:1: note: also found ‘-(void)removeItemAtIndex:(NSInteger)index’
+	* GWorkspace/Desktop/GWDesktopView.m:
+	* Inspector/ContentViewers/NSColorViewer/NSColorViewer.m:
+	use CGFloat instead of float for -[NSColor getRed:...]
+
 2011-08-02 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/Desktop/Dock/DockIcon.m

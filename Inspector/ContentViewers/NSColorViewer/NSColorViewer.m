@@ -145,8 +145,8 @@
 
   if (c && [c isKindOfClass: [NSColor class]]) {
     NSColor *color = [c colorUsingColorSpaceName: NSDeviceRGBColorSpace];
-    float red = 0.0, green = 0.0, blue = 0.0, alpha = 0.0;
-    float hue = 0.0, saturation = 0.0, brightness = 0.0;
+    CGFloat red = 0.0, green = 0.0, blue = 0.0, alpha = 0.0;
+    CGFloat hue = 0.0, saturation = 0.0, brightness = 0.0;
     
     if (valid == NO) {
       valid = YES;

@@ -36,7 +36,7 @@
 {
   IBOutlet id win;
   IBOutlet id topBox;
-  IBOutlet id popUp;
+  IBOutlet NSPopUpButton *popUp;
   IBOutlet id viewsBox;
   NSMutableArray *preferences;
   id currentPref;

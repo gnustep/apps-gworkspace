@@ -564,7 +564,7 @@
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
   NSMutableDictionary *indexes = [NSMutableDictionary dictionary];
   NSMutableDictionary *backColorDict = [NSMutableDictionary dictionary];
-  float red, green, blue, alpha;
+  CGFloat red, green, blue, alpha;
   int i;
 
   [backColor getRed: &red green: &green blue: &blue alpha: &alpha];
