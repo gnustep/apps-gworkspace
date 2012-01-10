@@ -444,11 +444,11 @@ if (rct.size.height < 0) rct.size.height = 0; \
 {
   unsigned int eventMask = NSLeftMouseUpMask | NSLeftMouseDraggedMask | NSPeriodicMask;
   NSDate *future = [NSDate distantFuture];
-  NSPoint	startp, sp;
+  NSPoint	sp;
   NSPoint	p, pp;
   NSRect visibleRect;
   NSRect oldRect; 
-  NSRect r, wr;
+  NSRect r;
   NSRect selrect;
   float x, y, w, h;
   int i;
@@ -479,12 +479,10 @@ pp.y = NSMaxY(br) + 1; \
 
   p = [theEvent locationInWindow];
   sp = [self convertPoint: p  fromView: nil];
-  startp = [self convertPoint: p fromView: nil];
   
   oldRect = NSZeroRect;  
 
 	[[self window] disableFlushWindow];
-  [self lockFocus];
 
   [NSEvent startPeriodicEventsAfterDelay: 0.02 withPeriod: 0.05];
 
@@ -510,76 +508,30 @@ pp.y = NSMaxY(br) + 1; \
       visibleRect = [self visibleRect];
     }
 
-    if ((sp.y < visibleRect.origin.y)
-          || (sp.y > (visibleRect.origin.y + visibleRect.size.height))) {
-      if (sp.y < visibleRect.origin.y) {
-        sp.y = visibleRect.origin.y - 1;
-      }
-      if (sp.y > (visibleRect.origin.y + visibleRect.size.height)) {
-        sp.y = (visibleRect.origin.y + visibleRect.size.height + 1);
-      }
-    } 
-
-    x = (pp.x >= sp.x) ? sp.x : pp.x;
-    y = (pp.y >= sp.y) ? sp.y : pp.y;
-    w = max(pp.x, sp.x) - min(pp.x, sp.x);
-    w = (w == 0) ? 1 : w;
-    h = max(pp.y, sp.y) - min(pp.y, sp.y);
-    h = (h == 0) ? 1 : h;
+    x = min(sp.x, pp.x);
+    y = min(sp.y, pp.y);
+    w = max(1, max(pp.x, sp.x) - min(pp.x, sp.x));
+    h = max(1, max(pp.y, sp.y) - min(pp.y, sp.y));
 
     r = NSMakeRect(x, y, w, h);
     
-    if (NSEqualRects(visibleRect, [self frame])) {
-      r = NSIntersectionRect(r, visibleRect);
-    }
+    // Erase the previous rect
     
-    wr = [self convertRect: r toView: nil];
-  
-    sp = startp;
+    [self setNeedsDisplayInRect: oldRect];
+    [[self window] displayIfNeeded];
 
-    if (NSEqualRects(oldRect, NSZeroRect) == NO) {
-		  [verticalImage compositeToPoint: NSMakePoint(NSMinX(oldRect), NSMinY(oldRect))
-		                         fromRect: NSMakeRect(0.0, 0.0, 1.0, oldRect.size.height)
-		                        operation: NSCompositeCopy];
+    // Draw the new rect
 
-		  [verticalImage compositeToPoint: NSMakePoint(NSMaxX(oldRect)-1, NSMinY(oldRect))
-		                         fromRect: NSMakeRect(1.0, 0.0, 1.0, oldRect.size.height)
-		                        operation: NSCompositeCopy];
-
-		  [horizontalImage compositeToPoint: NSMakePoint(NSMinX(oldRect), NSMinY(oldRect))
-		                           fromRect: NSMakeRect(0.0, 0.0, oldRect.size.width, 1.0)
-		                          operation: NSCompositeCopy];
-
-      [horizontalImage compositeToPoint: NSMakePoint(NSMinX(oldRect), NSMaxY(oldRect)-1)
-		                           fromRect: NSMakeRect(0.0, 1.0, oldRect.size.width, 1.0)
-		                          operation: NSCompositeCopy];
-    }
-    [self displayIfNeeded];
-
-    [verticalImage lockFocus];
-    NSCopyBits([[self window] gState], 
-            NSMakeRect(NSMinX(wr), NSMinY(wr), 
-                          1.0, r.size.height),
-			                          NSMakePoint(0.0, 0.0));
-    NSCopyBits([[self window] gState],
-			      NSMakeRect(NSMaxX(wr) -1, NSMinY(wr),
-				                  1.0, r.size.height),
-			                          NSMakePoint(1.0, 0.0));
-    [verticalImage unlockFocus];
-
-    [horizontalImage lockFocus];
-    NSCopyBits([[self window] gState],
-			      NSMakeRect(NSMinX(wr), NSMinY(wr),
-				                  r.size.width, 1.0),
-			                          NSMakePoint(0.0, 0.0));
-    NSCopyBits([[self window] gState],
-			      NSMakeRect(NSMinX(wr), NSMaxY(wr) -1,
-				                  r.size.width, 1.0),
-			                          NSMakePoint(0.0, 1.0));
-    [horizontalImage unlockFocus];
+    [self lockFocus];
 
     [[NSColor darkGrayColor] set];
     NSFrameRect(r);
+
+    [[[NSColor darkGrayColor] colorWithAlphaComponent: 0.33] set];
+    NSRectFillUsingOperation(r, NSCompositeSourceOver);
+
+    [self unlockFocus];
+
     oldRect = r;
 
     [[self window] enableFlushWindow];
@@ -591,38 +543,22 @@ pp.y = NSMaxY(br) + 1; \
   
   [NSEvent stopPeriodicEvents];
   [[self window] postEvent: theEvent atStart: NO];
-  
-  if (NSEqualRects(oldRect, NSZeroRect) == NO) {
-		[verticalImage compositeToPoint: NSMakePoint(NSMinX(oldRect), NSMinY(oldRect))
-		                       fromRect: NSMakeRect(0.0, 0.0, 1.0, oldRect.size.height)
-		                      operation: NSCompositeCopy];
 
-		[verticalImage compositeToPoint: NSMakePoint(NSMaxX(oldRect)-1, NSMinY(oldRect))
-		                       fromRect: NSMakeRect(1.0, 0.0, 1.0, oldRect.size.height)
-		                      operation: NSCompositeCopy];
+  // Erase the previous rect
 
-		[horizontalImage compositeToPoint: NSMakePoint(NSMinX(oldRect), NSMinY(oldRect))
-		                         fromRect: NSMakeRect(0.0, 0.0, oldRect.size.width, 1.0)
-		                        operation: NSCompositeCopy];
-
-    [horizontalImage compositeToPoint: NSMakePoint(NSMinX(oldRect), NSMaxY(oldRect)-1)
-		                         fromRect: NSMakeRect(0.0, 1.0, oldRect.size.width, 1.0)
-		                        operation: NSCompositeCopy];
-  }
+  [self setNeedsDisplayInRect: oldRect];
+  [[self window] displayIfNeeded];
   
   [[self window] enableFlushWindow];
   [[self window] flushWindow];
-  [self unlockFocus];
 
   selectionMask = FSNMultipleSelectionMask;
   selectionMask |= FSNCreatingSelectionMask;
 
-  x = (pp.x >= startp.x) ? startp.x : pp.x;
-  y = (pp.y >= startp.y) ? startp.y : pp.y;
-  w = max(pp.x, startp.x) - min(pp.x, startp.x);
-  w = (w == 0) ? 1 : w;
-  h = max(pp.y, startp.y) - min(pp.y, startp.y);
-  h = (h == 0) ? 1 : h;
+  x = min(sp.x, pp.x);
+  y = min(sp.y, pp.y);
+  w = max(1, max(pp.x, sp.x) - min(pp.x, sp.x));
+  h = max(1, max(pp.y, sp.y) - min(pp.y, sp.y));
 
   selrect = NSMakeRect(x, y, w, h);
   
