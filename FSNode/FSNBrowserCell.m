@@ -30,7 +30,7 @@
 #import "FSNBrowserCell.h"
 #import "FSNode.h"
 
-#define DEFAULT_ISIZE (24)
+#define DEFAULT_ISIZE (16)
 #define HLIGHT_H_FACT (0.8125)
 
 static id <DesktopApplication> desktopApp = nil;
@@ -379,9 +379,8 @@ static cutIMP cutTitle = NULL;
   DESTROY (selection);
   DESTROY (selectionTitle);
   ASSIGN (node, anode);
-  if (icon) {
-    [self setIcon];
-  }
+
+  [self setIcon];
   
   if (extInfoType) {
     [self setExtendedShowType: extInfoType];

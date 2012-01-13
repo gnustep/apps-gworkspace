@@ -1,3 +1,7 @@
+2012-01-12  Eric Wasylishen  <ewasylishen@gmail.com>
+
+	* FSNode/FSNBrowserCell.m: Enable browser icons
+
 2012-01-10  Eric Wasylishen  <ewasylishen@gmail.com>
 
 	* FSNode/FSNIconsView.m (-mouseDragged:): Rewrite selection
