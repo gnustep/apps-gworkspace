@@ -1,3 +1,8 @@
+2012-01-14  Eric Wasylishen  <ewasylishen@gmail.com>
+
+	* GWorkspace/Desktop/GWDesktopView.m (-mouseDragged:):
+	Copy selection rect rewrite from FSNode/FSNIconsView.m
+
 2012-01-12  Eric Wasylishen  <ewasylishen@gmail.com>
 
 	* FSNode/FSNBrowserCell.m: Enable browser icons

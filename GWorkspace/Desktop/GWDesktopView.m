@@ -769,7 +769,6 @@
   oldRect = NSZeroRect;  
 
 	[[self window] disableFlushWindow];
-  [self lockFocus];
 
   while ([theEvent type] != NSLeftMouseUp) {
     CREATE_AUTORELEASE_POOL (arp);
@@ -779,58 +778,30 @@
     locp = [theEvent locationInWindow];
     locp = [self convertPoint: locp fromView: nil];
     
-    x = (locp.x >= startp.x) ? startp.x : locp.x;
-    y = (locp.y >= startp.y) ? startp.y : locp.y;
-    w = max(locp.x, startp.x) - min(locp.x, startp.x);
-    w = (w == 0) ? 1 : w;
-    h = max(locp.y, startp.y) - min(locp.y, startp.y);
-    h = (h == 0) ? 1 : h;
+    x = min(startp.x, locp.x);
+    y = min(startp.y, locp.y);
+    w = max(1, max(locp.x, startp.x) - min(locp.x, startp.x));
+    h = max(1, max(locp.y, startp.y) - min(locp.y, startp.y));
 
     r = NSMakeRect(x, y, w, h);
     
-    if (NSEqualRects(oldRect, NSZeroRect) == NO) {
-		  [verticalImage compositeToPoint: NSMakePoint(NSMinX(oldRect), NSMinY(oldRect))
-		                         fromRect: NSMakeRect(0.0, 0.0, 1.0, oldRect.size.height)
-		                        operation: NSCompositeCopy];
+    
+    // Erase the previous rect
 
-		  [verticalImage compositeToPoint: NSMakePoint(NSMaxX(oldRect)-1, NSMinY(oldRect))
-		                         fromRect: NSMakeRect(1.0, 0.0, 1.0, oldRect.size.height)
-		                        operation: NSCompositeCopy];
+    [self setNeedsDisplayInRect: oldRect];
+    [[self window] displayIfNeeded];
 
-		  [horizontalImage compositeToPoint: NSMakePoint(NSMinX(oldRect), NSMinY(oldRect))
-		                           fromRect: NSMakeRect(0.0, 0.0, oldRect.size.width, 1.0)
-		                          operation: NSCompositeCopy];
+    // Draw the new rect
 
-      [horizontalImage compositeToPoint: NSMakePoint(NSMinX(oldRect), NSMaxY(oldRect)-1)
-		                           fromRect: NSMakeRect(0.0, 1.0, oldRect.size.width, 1.0)
-		                          operation: NSCompositeCopy];
-    }
-    [self displayIfNeeded];
-
-    [verticalImage lockFocus];
-    NSCopyBits([[self window] gState], 
-            NSMakeRect(NSMinX(r), NSMinY(r), 
-                          1.0, r.size.height),
-			                          NSMakePoint(0.0, 0.0));
-    NSCopyBits([[self window] gState],
-			      NSMakeRect(NSMaxX(r) -1, NSMinY(r),
-				                  1.0, r.size.height),
-			                          NSMakePoint(1.0, 0.0));
-    [verticalImage unlockFocus];
-
-    [horizontalImage lockFocus];
-    NSCopyBits([[self window] gState],
-			      NSMakeRect(NSMinX(r), NSMinY(r),
-				                  r.size.width, 1.0),
-			                          NSMakePoint(0.0, 0.0));
-    NSCopyBits([[self window] gState],
-			      NSMakeRect(NSMinX(r), NSMaxY(r) -1,
-				                  r.size.width, 1.0),
-			                          NSMakePoint(0.0, 1.0));
-    [horizontalImage unlockFocus];
+    [self lockFocus];
 
     [[NSColor darkGrayColor] set];
     NSFrameRect(r);
+    [[[NSColor darkGrayColor] colorWithAlphaComponent: 0.33] set];
+    NSRectFillUsingOperation(r, NSCompositeSourceOver);
+
+    [self unlockFocus];
+
     oldRect = r;
 
     [[self window] enableFlushWindow];
@@ -842,37 +813,20 @@
 
   [[self window] postEvent: theEvent atStart: NO];
   
-  if (NSEqualRects(oldRect, NSZeroRect) == NO) {
-		[verticalImage compositeToPoint: NSMakePoint(NSMinX(oldRect), NSMinY(oldRect))
-		                       fromRect: NSMakeRect(0.0, 0.0, 1.0, oldRect.size.height)
-		                      operation: NSCompositeCopy];
+  // Erase the previous rect
+  [self setNeedsDisplayInRect: oldRect];
+  [[self window] displayIfNeeded];
 
-		[verticalImage compositeToPoint: NSMakePoint(NSMaxX(oldRect)-1, NSMinY(oldRect))
-		                       fromRect: NSMakeRect(1.0, 0.0, 1.0, oldRect.size.height)
-		                      operation: NSCompositeCopy];
-
-		[horizontalImage compositeToPoint: NSMakePoint(NSMinX(oldRect), NSMinY(oldRect))
-		                         fromRect: NSMakeRect(0.0, 0.0, oldRect.size.width, 1.0)
-		                        operation: NSCompositeCopy];
-
-    [horizontalImage compositeToPoint: NSMakePoint(NSMinX(oldRect), NSMaxY(oldRect)-1)
-		                         fromRect: NSMakeRect(0.0, 1.0, oldRect.size.width, 1.0)
-		                        operation: NSCompositeCopy];
-  }
-  
   [[self window] enableFlushWindow];
   [[self window] flushWindow];
-  [self unlockFocus];
 
   selectionMask = FSNMultipleSelectionMask;
   selectionMask |= FSNCreatingSelectionMask;
 
-  x = (locp.x >= startp.x) ? startp.x : locp.x;
-  y = (locp.y >= startp.y) ? startp.y : locp.y;
-  w = max(locp.x, startp.x) - min(locp.x, startp.x);
-  w = (w == 0) ? 1 : w;
-  h = max(locp.y, startp.y) - min(locp.y, startp.y);
-  h = (h == 0) ? 1 : h;
+  x = min(startp.x, locp.x);
+  y = min(startp.y, locp.y);
+  w = max(1, max(locp.x, startp.x) - min(locp.x, startp.x));
+  h = max(1, max(locp.y, startp.y) - min(locp.y, startp.y));
 
   r = NSMakeRect(x, y, w, h);
 
