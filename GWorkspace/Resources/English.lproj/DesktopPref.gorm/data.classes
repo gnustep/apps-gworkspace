@@ -10,7 +10,6 @@
     };
     DesktopPref = {
 	Actions = (
-	    "colorChoosen:",
 	    "setColor:",
 	    "chooseImage:",
 	    "setImage:",
@@ -18,7 +17,6 @@
 	    "setUseImage:",
 	    "setUsesDock:",
 	    "setDockPosition:",
-	    "chooseColor:",
 	    "setOmnipresent:",
 	    "setTShelfAutohide:"
 	);
@@ -30,13 +28,10 @@
 	    dockPosLabel,
 	    dockPosMatrix,
 	    tabView,
-	    currColorBox,
-	    chooseColorButt,
-	    setColorButt,
+	    colorWell,
 	    imageView,
 	    imagePosMatrix,
 	    chooseImageButt,
-	    setImageButt,
 	    omnipresentCheck,
 	    hideTShelfCheck
 	);
@@ -44,9 +39,7 @@
     };
     FirstResponder = {
 	Actions = (
-	    "chooseColor:",
 	    "chooseImage:",
-	    "colorChoosen:",
 	    "setTShelfAutohide:",
 	    "orderFrontFontPanel:",
 	    "setColor:",

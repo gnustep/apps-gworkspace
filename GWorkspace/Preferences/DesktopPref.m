@@ -67,19 +67,11 @@ static NSString *nibName = @"DesktopPref";
       gworkspace = [GWorkspace gworkspace];
 
       // Color
-      r = [[currColorBox contentView] bounds];
-      colorView = [[ColorView alloc] initWithFrame: r];
-      [colorView setColor: [[manager desktopView] currentColor]]; 
-      [currColorBox setContentView: colorView];
-      RELEASE (colorView);
-
       [NSColorPanel setPickerMask: NSColorPanelWheelModeMask 
                                   | NSColorPanelRGBModeMask 
                                   | NSColorPanelColorListModeMask];
       [NSColorPanel setPickerMode: NSWheelModeColorPanel];
-      panel = [NSColorPanel sharedColorPanel];
-      [panel setTarget: self];
-      [panel setContinuous: YES];
+      [colorWell setColor: [[manager desktopView] currentColor]];
 
       // Background image  
       [imageView setEditable: NO];
@@ -105,7 +97,11 @@ static NSString *nibName = @"DesktopPref";
       
       [imagePosMatrix selectCellAtRow: [[manager desktopView] backImageStyle] column: 0];
       
-      [useImageSwitch setState: [[manager desktopView] useBackImage] ? NSOnState : NSOffState];
+      BOOL useImage = [[manager desktopView] useBackImage];
+      [imageView setEnabled: useImage];
+      [chooseImageButt setEnabled: useImage];
+      [imagePosMatrix setEnabled: useImage];
+      [useImageSwitch setState: useImage ? NSOnState : NSOffState];
 
       // General
       [omnipresentCheck setState: ([manager usesXBundle] ? NSOnState : NSOffState)];
@@ -116,14 +112,9 @@ static NSString *nibName = @"DesktopPref";
 
 
       /* Internationalization */
-      [[tabView tabViewItemAtIndex: 0] setLabel: NSLocalizedString(@"Back Color", @"")];
-      [[tabView tabViewItemAtIndex: 1] setLabel: NSLocalizedString(@"Back Image", @"")];
-      [[tabView tabViewItemAtIndex: 2] setLabel: NSLocalizedString(@"General", @"")];
+      [[tabView tabViewItemAtIndex: 0] setLabel: NSLocalizedString(@"Background", @"")];
+      [[tabView tabViewItemAtIndex: 1] setLabel: NSLocalizedString(@"General", @"")];
 
-      [currColorBox setTitle: NSLocalizedString(@"Current color", @"")];      
-      [chooseColorButt setTitle: NSLocalizedString(@"Choose", @"")];      
-      [setColorButt setTitle: NSLocalizedString(@"Set", @"")];    
-      
       cell = [imagePosMatrix cellAtRow: BackImageCenterStyle column: 0];
       [cell setTitle: NSLocalizedString(@"center", @"")];
       cell = [imagePosMatrix cellAtRow: BackImageFitStyle column: 0];
@@ -132,7 +123,6 @@ static NSString *nibName = @"DesktopPref";
       [cell setTitle: NSLocalizedString(@"tile", @"")];
       [useImageSwitch setTitle: NSLocalizedString(@"Use image", @"")];  
       [chooseImageButt setTitle: NSLocalizedString(@"Choose", @"")]; 
-      [setImageButt setTitle: NSLocalizedString(@"Set", @"")]; 
 
       [useDockCheck setTitle: NSLocalizedString(@"Show Dock", @"")];
       [dockPosLabel setStringValue: NSLocalizedString(@"Dock position:", @"")];
@@ -159,22 +149,10 @@ static NSString *nibName = @"DesktopPref";
 }
 
 // Color
-- (IBAction)chooseColor:(id)sender
-{
-  [panel setAction: @selector(colorChoosen:)];
-  [panel setColor: [colorView color]];
-  [NSApp orderFrontColorPanel: nil];
-}
-
-- (void)colorChoosen:(id)sender
-{
-  [colorView setColor: [[sender color] colorUsingColorSpaceName: NSCalibratedRGBColorSpace]];      
-  [colorView setNeedsDisplay: YES];
-}
 
 - (IBAction)setColor:(id)sender
 {
-  [[manager desktopView] setCurrentColor: [colorView color]];
+  [[manager desktopView] setCurrentColor: [colorWell color]];
   [gworkspace tshelfBackgroundDidChange];
 }
 
@@ -213,16 +191,18 @@ static NSString *nibName = @"DesktopPref";
     
     RELEASE (pool);
   }
-}
 
-- (IBAction)setImage:(id)sender
-{
   if (imagePath) {  
     [[manager desktopView] setBackImageAtPath: imagePath];
     [imagePosMatrix selectCellAtRow: [[manager desktopView] backImageStyle] 
                              column: 0];
     [gworkspace tshelfBackgroundDidChange];
   }
+}
+
+- (IBAction)setImage:(id)sender
+{
+  // FIXME: Handle image dropped on image view?
 }
 
 - (IBAction)setImageStyle:(id)sender
@@ -237,8 +217,12 @@ static NSString *nibName = @"DesktopPref";
 
 - (IBAction)setUseImage:(id)sender
 {
-  [[manager desktopView] setUseBackImage: ([sender state] == NSOnState) ? YES : NO];
+  BOOL useImage = ([sender state] == NSOnState);
+  [[manager desktopView] setUseBackImage: useImage];
   [gworkspace tshelfBackgroundDidChange];
+  [imageView setEnabled: useImage];
+  [chooseImageButt setEnabled: useImage];
+  [imagePosMatrix setEnabled: useImage];
 }
 
 
@@ -271,35 +255,3 @@ static NSString *nibName = @"DesktopPref";
 }
 
 @end
-
-
-@implementation ColorView
-
-- (void)dealloc
-{
-  RELEASE (color);
-  [super dealloc];
-}
-
-- (void)setColor:(NSColor *)c
-{
-  ASSIGN (color, c);
-}
-
-- (NSColor *)color
-{
-  return color;
-}
-
-- (void)drawRect:(NSRect)rect
-{
-  [super drawRect: rect];
-  
-  if (color) {
-    [color set];
-    NSRectFill(rect);
-  } 
-}
-
-@end
-

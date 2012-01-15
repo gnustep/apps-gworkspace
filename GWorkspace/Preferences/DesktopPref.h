@@ -50,10 +50,8 @@
   
   // Color
   NSColorPanel *panel;
-  IBOutlet NSBox *currColorBox;
+  IBOutlet NSColorWell *colorWell;
   ColorView *colorView;
-  IBOutlet id chooseColorButt;
-  IBOutlet id setColorButt;
 
   // Background image
   NSString *imagePath;
@@ -61,7 +59,6 @@
   IBOutlet NSImageView *imageView;
   IBOutlet id imagePosMatrix;
   IBOutlet id chooseImageButt;
-  IBOutlet id setImageButt;
   IBOutlet id useImageSwitch;
   
   // General
@@ -76,10 +73,6 @@
 }
 
 // Color
-- (IBAction)chooseColor:(id)sender;
-
-- (void)colorChoosen:(id)sender;
-
 - (IBAction)setColor:(id)sender;
 
 
