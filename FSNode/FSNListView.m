@@ -536,7 +536,7 @@ static NSString *defaultColumns = @"{ \
     
     if ([selected count]) {
       id rep = [selected objectAtIndex: 0];
-      int index = [nodeReps indexOfObjectIdenticalTo: rep];
+      NSUInteger index = [nodeReps indexOfObjectIdenticalTo: rep];
       
       [self selectReps: selected];
       
@@ -1162,7 +1162,7 @@ static NSString *defaultColumns = @"{ \
 
   for (i = 0; i < [reps count]; i++) {
     FSNListViewNodeRep *rep = [reps objectAtIndex: i];
-    unsigned int index = [nodeReps indexOfObjectIdenticalTo: rep];
+    NSUInteger index = [nodeReps indexOfObjectIdenticalTo: rep];
   
     if (index != NSNotFound) {
       [set addIndex: index];
@@ -1219,7 +1219,7 @@ static NSString *defaultColumns = @"{ \
 - (void)selectAll
 {
   NSMutableIndexSet *set = [NSMutableIndexSet indexSet];
-  unsigned int i;
+  NSUInteger i;
 
   for (i = 0; i < [nodeReps count]; i++) {
     FSNListViewNodeRep *rep = [nodeReps objectAtIndex: i];
@@ -1256,68 +1256,43 @@ static NSString *defaultColumns = @"{ \
 
 - (NSArray *)selectedReps
 {
-  CREATE_AUTORELEASE_POOL (pool);
   NSIndexSet *set = [listView selectedRowIndexes];
-  int count = [set count];
-  NSRange range = NSMakeRange(0, NSNotFound -1);
-  NSUInteger *buf = NSZoneMalloc (NSDefaultMallocZone(), sizeof(unsigned int) * count);
-  int selcount = [set getIndexes: buf maxCount: count inIndexRange: &range];
   NSMutableArray *selreps = [NSMutableArray array];
-  int i;
 
-  for (i = 0; i < selcount; i++) {
-    [selreps addObject: [nodeReps objectAtIndex: buf[i]]];
-  }
-
-	NSZoneFree (NSDefaultMallocZone(), buf);
-  RETAIN (selreps);
-  RELEASE (pool);
-
-  return [[selreps autorelease] makeImmutableCopyOnFail: NO];
+  NSUInteger i;
+  for (i = [set firstIndex]; i != NSNotFound; i = [set indexGreaterThanIndex: i])
+    {
+      [selreps addObject: [nodeReps objectAtIndex: i]];
+    }
+  return [NSArray arrayWithArray: selreps];
 }
 
 - (NSArray *)selectedNodes
 {
-  CREATE_AUTORELEASE_POOL (pool);
-  NSIndexSet *set = [listView selectedRowIndexes];
-  int count = [set count];
-  NSRange range = NSMakeRange(0, NSNotFound -1);
-  NSUInteger *buf = NSZoneMalloc (NSDefaultMallocZone(), sizeof(unsigned int) * count);
-  int selcount = [set getIndexes: buf maxCount: count inIndexRange: &range];
   NSMutableArray *selnodes = [NSMutableArray array];
-  int i;
 
-  for (i = 0; i < selcount; i++) {
-    [selnodes addObject: [[nodeReps objectAtIndex: buf[i]] node]];
-  }
+  NSEnumerator *e = [[self selectedReps] objectEnumerator];
+  id rep;
+  while ((rep = [e nextObject]) != nil)
+    {
+      [selnodes addObject: [rep node]];
+    }
 
-	NSZoneFree (NSDefaultMallocZone(), buf);
-  RETAIN (selnodes);
-  RELEASE (pool);
-
-  return [[selnodes autorelease] makeImmutableCopyOnFail: NO];
+  return [NSArray arrayWithArray: selnodes];
 }
 
 - (NSArray *)selectedPaths
 {
-  CREATE_AUTORELEASE_POOL (pool);
-  NSIndexSet *set = [listView selectedRowIndexes];
-  int count = [set count];
-  NSRange range = NSMakeRange(0, NSNotFound -1);
-  NSUInteger *buf = NSZoneMalloc (NSDefaultMallocZone(), sizeof(unsigned int) * count);
-  int selcount = [set getIndexes: buf maxCount: count inIndexRange: &range];
   NSMutableArray *selpaths = [NSMutableArray array];
-  int i;
 
-  for (i = 0; i < selcount; i++) {
-    [selpaths addObject: [[[nodeReps objectAtIndex: buf[i]] node] path]];
-  }
+  NSEnumerator *e = [[self selectedNodes] objectEnumerator];
+  id n;
+  while ((n = [e nextObject]) != nil)
+    {
+      [selpaths addObject: [n path]];
+    }
 
-  NSZoneFree (NSDefaultMallocZone(), buf);
-  RETAIN (selpaths);
-  RELEASE (pool);
-
-  return [[selpaths autorelease] makeImmutableCopyOnFail: NO];
+  return [NSArray arrayWithArray: selpaths];
 }
 
 - (void)selectionDidChange
