@@ -77,10 +77,7 @@
                                          nil];
     [self registerForDraggedTypes: pbTypes];    
 
-    if (1)
-      [self setBackColor: [[NSColor grayColor] colorWithAlphaComponent: 0.33]];
-    else
-      [self setBackColor: [[manager desktopView] currentColor]];
+    [self setBackColor: [[NSColor grayColor] colorWithAlphaComponent: 0.33]];
     
     [self createWorkspaceIcon];
 

@@ -1,3 +1,10 @@
+2012-02-16 Eric Wasylishen  <ewasylishen@gmail.com>
+
+	* GWorkspace/Desktop/GWDesktopView.m:
+	* GWorkspace/Desktop/Dock/Dock.m: Dont' set the dock background
+	colour based on the desktop background colour; leave it alone as
+	[[NSColor grayColor] colorWithAlphaComponent: 0.33].
+
 2012-01-16 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/Desktop/Dock/Dock.h

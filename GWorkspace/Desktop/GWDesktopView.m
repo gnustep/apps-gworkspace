@@ -1354,7 +1354,6 @@
 - (void)setBackgroundColor:(NSColor *)acolor
 {
   [super setBackgroundColor: acolor];
-  [[manager dock] setBackColor: backColor];
 }
           
 - (void)setTextColor:(NSColor *)acolor
@@ -1780,7 +1779,6 @@ int sortDragged(id icn1, id icn2, void *context)
   ASSIGN (backColor, color);
   [[self window] setBackgroundColor: backColor];
   [self setNeedsDisplay: YES];
-  [[manager dock] setBackColor: backColor];
 }
 
 - (void)createBackImage:(NSImage *)image
