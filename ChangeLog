@@ -1,3 +1,10 @@
+2012-01-16 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/Desktop/Dock/Dock.h
+	* GWorkspace/Desktop/Dock/Dock.m
+	* GWorkspace/Desktop/GWDesktopView.m
+	Really transparent Dock
+
 2012-01-31  Eric Wasylishen  <ewasylishen@gmail.com>
 
 	* FSNode/FSNListView.m: Rewrite some code broken by NSNotFound

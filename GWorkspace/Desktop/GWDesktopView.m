@@ -1836,7 +1836,6 @@ int sortDragged(id icn1, id icn2, void *context)
     ASSIGN (backImage, image);
   }
   
-  [[manager dock] setBackImage];
   RELEASE (pool);
 }
 
@@ -1873,7 +1872,6 @@ int sortDragged(id icn1, id icn2, void *context)
 {
   useBackImage = value;
   [self setNeedsDisplay: YES];
-  [[manager dock] setUseBackImage: useBackImage];  
 }
 
 - (BackImageStyle)backImageStyle

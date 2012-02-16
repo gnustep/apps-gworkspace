@@ -1,6 +1,6 @@
 /* Dock.h
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -43,8 +43,6 @@
   int iconSize;
 
   NSColor *backColor;
-  NSImage *backImage;
-  BOOL useBackImage;
   
   DockIcon *dndSourceIcon;
   BOOL isDragTarget;
@@ -100,10 +98,6 @@
 - (void)setPosition:(DockPosition)pos;
 
 - (void)setBackColor:(NSColor *)color;
-
-- (void)setBackImage;
-
-- (void)setUseBackImage:(BOOL)value;
 
 - (void)tile;
 

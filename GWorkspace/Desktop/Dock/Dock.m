@@ -1,6 +1,6 @@
 /* Dock.m
  *  
- * Copyright (C) 2005-2011 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -41,17 +41,17 @@
 {
   RELEASE (icons);
   RELEASE (backColor);
-  RELEASE (backImage);
   
   [super dealloc];
 }
 
 - (id)initForManager:(id)mngr
 {
-	self = [super initWithFrame: NSMakeRect(0, 0, 64, 64)];
+  self = [super initWithFrame: NSMakeRect(0, 0, 64, 64)];
   
-  if (self) {
-	  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
+  if (self)
+    {
+      NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
     NSDictionary *appsdict;
     NSArray *pbTypes;
     int i;
@@ -77,7 +77,10 @@
                                          nil];
     [self registerForDraggedTypes: pbTypes];    
 
-    [self setBackColor: [[manager desktopView] currentColor]];
+    if (1)
+      [self setBackColor: [[NSColor grayColor] colorWithAlphaComponent: 0.33]];
+    else
+      [self setBackColor: [[manager desktopView] currentColor]];
     
     [self createWorkspaceIcon];
 
@@ -127,7 +130,6 @@
                                appName: wsname
                               iconSize: iconSize];
   [icon setHighlightColor: backColor];
-  [icon setUseHlightImage: useBackImage];
   [icon setWsIcon: YES];   
   [icon setDocked: YES];   
   [icons insertObject: icon atIndex: 0];
@@ -144,7 +146,6 @@
                                         iconSize: iconSize];
 
   [icon setHighlightColor: backColor];
-  [icon setUseHlightImage: useBackImage];  
   [icon setTrashIcon: YES];  
   [icon setDocked: YES];                         
   [icons insertObject: icon atIndex: [icons count]];
@@ -174,7 +175,6 @@
       }
 
       [icon setHighlightColor: backColor];
-      [icon setUseHlightImage: useBackImage];
       [icons insertObject: icon atIndex: icnindex];
       [self addSubview: icon];
       RELEASE (icon);
@@ -403,7 +403,7 @@
     [self tile];
   }
 }
-
+/*
 - (void)setBackImage
 {
   NSImage *image = [[manager desktopView] backImage];
@@ -427,7 +427,8 @@
     [[icons objectAtIndex: i] setHighlightImage: backImage];
   }
 }
-
+*/
+ /*
 - (void)setUseBackImage:(BOOL)value
 {
   int i;
@@ -436,10 +437,10 @@
     [[icons objectAtIndex: i] setUseHlightImage: value];
   }
   
-  useBackImage = value;
+    useBackImage = value;
   [self setNeedsDisplay: YES];
 }
-
+ */
 - (void)tile
 {
   NSView *view = [self superview];
@@ -487,7 +488,6 @@
     [view setNeedsDisplayInRect: [self frame]];
   }
   [self setFrame: rect];
-  [self setBackImage];
   
   icnrect.origin.y = rect.size.height;
   
@@ -500,7 +500,6 @@
     
     icnrect.origin.y -= icnrect.size.height;
     [icon setFrame: icnrect];
-    [icon setHighlightImage: backImage];
     
     if ((targetIndex != -1) && (targetIndex == i)) {
       icnrect.origin.y -= icnrect.size.height;
@@ -551,10 +550,6 @@
   
   [backColor set];
   NSRectFill(rect);
-  
-  if (backImage && useBackImage) {
-    [backImage dissolveToPoint: NSZeroPoint fraction: 0.5];
-  }
 }
 
 @end
@@ -747,9 +742,8 @@
   NSColor *hlgtcolor = [acolor highlightWithLevel: 0.2];
   int i;
   
-  for (i = 0; i < [icons count]; i++) {
+  for (i = 0; i < [icons count]; i++)
     [[icons objectAtIndex: i] setHighlightColor: hlgtcolor];
-  }
   
   ASSIGN (backColor, hlgtcolor);
   if ([self superview]) {
