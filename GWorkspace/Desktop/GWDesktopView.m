@@ -1,8 +1,9 @@
 /* GWDesktopView.m
  *  
- * Copyright (C) 2005-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
+ *         Riccardo Mottola <rm@gnu.org>
  * Date: January 2005
  *
  * This file is part of the GNUstep GWorkspace application
@@ -563,11 +564,13 @@
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
   NSMutableDictionary *indexes = [NSMutableDictionary dictionary];
+  NSColor *tempColor;
   NSMutableDictionary *backColorDict = [NSMutableDictionary dictionary];
   CGFloat red, green, blue, alpha;
   int i;
 
-  [backColor getRed: &red green: &green blue: &blue alpha: &alpha];
+  tempColor = [backColor colorUsingColorSpaceName: NSCalibratedRGBColorSpace];
+  [tempColor getRed: &red green: &green blue: &blue alpha: &alpha];
   [backColorDict setObject: [NSNumber numberWithFloat: red] forKey: @"red"];
   [backColorDict setObject: [NSNumber numberWithFloat: green] forKey: @"green"];
   [backColorDict setObject: [NSNumber numberWithFloat: blue] forKey: @"blue"];

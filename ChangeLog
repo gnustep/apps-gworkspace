@@ -1,3 +1,9 @@
+2012-02-20 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/Desktop/GWDesktopView.m:
+	Always convert to RGB color space before exctracting
+	RGB components (fixes crash/exception on close with grey backs)
+
 2012-02-16 Eric Wasylishen  <ewasylishen@gmail.com>
 
 	* GWorkspace/Desktop/GWDesktopView.m:
