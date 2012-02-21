@@ -8,6 +8,13 @@
 	);
 	Super = NSView;
     };
+    ColorView = {
+	Actions = (
+	);
+	Outlets = (
+	);
+	Super = NSView;
+    };
     DesktopPref = {
 	Actions = (
 	    "setColor:",
@@ -15,38 +22,43 @@
 	    "setImage:",
 	    "setImageStyle:",
 	    "setUseImage:",
+	    "setOmnipresent:",
 	    "setUsesDock:",
 	    "setDockPosition:",
-	    "setOmnipresent:",
+	    "setDockStyle:",
 	    "setTShelfAutohide:"
 	);
 	Outlets = (
 	    win,
 	    prefbox,
-	    useImageSwitch,
-	    useDockCheck,
-	    dockPosLabel,
-	    dockPosMatrix,
 	    tabView,
 	    colorWell,
 	    imageView,
 	    imagePosMatrix,
 	    chooseImageButt,
+	    useImageSwitch,
 	    omnipresentCheck,
-	    hideTShelfCheck
+	    useDockCheck,
+	    dockPosLabel,
+	    dockPosMatrix,
+	    dockStyleLabel,
+	    dockStyleMatrix,
+	    hideTShelfCheck,
+	    gworkspace
 	);
 	Super = NSObject;
     };
     FirstResponder = {
 	Actions = (
 	    "chooseImage:",
-	    "setTShelfAutohide:",
 	    "orderFrontFontPanel:",
 	    "setColor:",
 	    "setDockPosition:",
+	    "setDockStyle:",
 	    "setImage:",
 	    "setImageStyle:",
 	    "setOmnipresent:",
+	    "setTShelfAutohide:",
 	    "setUseImage:",
 	    "setUsesDock:"
 	);

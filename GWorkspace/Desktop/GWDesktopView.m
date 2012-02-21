@@ -22,16 +22,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
- 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
+
 #include <math.h>
-#include "FSNodeRep.h"
-#include "FSNFunctions.h"
-#include "GWDesktopView.h"
-#include "GWDesktopIcon.h"
-#include "GWDesktopManager.h"
-#include "Dock.h"
+
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import "FSNodeRep.h"
+#import "FSNFunctions.h"
+#import "GWDesktopView.h"
+#import "GWDesktopIcon.h"
+#import "GWDesktopManager.h"
+#import "Dock.h"
 
 #define DEF_ICN_SIZE 48
 #define DEF_TEXT_SIZE 12
@@ -765,13 +766,17 @@
   float x, y, w, h;
   int i;
 
+  transparentSelection = NO;
+  if ([[manager dock] style] == DockStyleModern)
+    transparentSelection = YES;
+
   locp = [theEvent locationInWindow];
   locp = [self convertPoint: locp fromView: nil];
   startp = locp;
 
   oldRect = NSZeroRect;  
 
-	[[self window] disableFlushWindow];
+  [[self window] disableFlushWindow];
 
   while ([theEvent type] != NSLeftMouseUp) {
     CREATE_AUTORELEASE_POOL (arp);
@@ -800,8 +805,11 @@
 
     [[NSColor darkGrayColor] set];
     NSFrameRect(r);
-    [[[NSColor darkGrayColor] colorWithAlphaComponent: 0.33] set];
-    NSRectFillUsingOperation(r, NSCompositeSourceOver);
+    if (transparentSelection)
+      {
+        [[[NSColor darkGrayColor] colorWithAlphaComponent: 0.33] set];
+        NSRectFillUsingOperation(r, NSCompositeSourceOver);
+      }
 
     [self unlockFocus];
 

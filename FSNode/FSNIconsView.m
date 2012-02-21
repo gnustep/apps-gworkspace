@@ -1,6 +1,6 @@
 /* FSNIconsView.m
  *  
- * Copyright (C) 2004-2011 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -63,6 +63,12 @@ if (rct.size.height < 0) rct.size.height = 0; \
 [o setFrame: NSIntegralRect(rct)]; \
 }
 
+/* we redefine the dockstyle to read the preferences without including Dock.h" */
+typedef enum DockStyle
+{   
+  DockStyleClassic = 0,
+  DockStyleModern = 1
+} DockStyle;
 
 @implementation FSNIconsView
 
@@ -97,11 +103,17 @@ if (rct.size.height < 0) rct.size.height = 0; \
     fsnodeRep = [FSNodeRep sharedInstance];
     
     if (appName && selName) {
-		  Class desktopAppClass = [[NSBundle mainBundle] classNamed: appName];
+      Class desktopAppClass = [[NSBundle mainBundle] classNamed: appName];
       SEL sel = NSSelectorFromString(selName);
       desktopApp = [desktopAppClass performSelector: sel];
     }
-  
+
+    /* we tie the transparent selection to the modern dock style */
+    transparentSelection = NO;
+    defentry = [defaults objectForKey: @"dockstyle"];
+    if ([defentry intValue] == DockStyleModern)
+      transparentSelection = YES;
+
     ASSIGN (backColor, [NSColor windowBackgroundColor]);
     ASSIGN (textColor, [NSColor controlTextColor]);
     ASSIGN (disabledTextColor, [NSColor disabledControlTextColor]);
@@ -140,11 +152,11 @@ if (rct.size.height < 0) rct.size.height = 0; \
         
     nameEditor = [FSNIconNameEditor new];
     [nameEditor setDelegate: self];  
-		[nameEditor setFont: labelFont];
-		[nameEditor setBezeled: NO];
-		[nameEditor setAlignment: NSCenterTextAlignment];
-	  [nameEditor setBackgroundColor: backColor];
-	  [nameEditor setTextColor: textColor];
+    [nameEditor setFont: labelFont];
+    [nameEditor setBezeled: NO];
+    [nameEditor setAlignment: NSCenterTextAlignment];
+    [nameEditor setBackgroundColor: backColor];
+    [nameEditor setTextColor: textColor];
     [nameEditor setEditable: NO];
     [nameEditor setSelectable: NO];
     editIcon = nil;
@@ -527,8 +539,11 @@ pp.y = NSMaxY(br) + 1; \
     [[NSColor darkGrayColor] set];
     NSFrameRect(r);
 
-    [[[NSColor darkGrayColor] colorWithAlphaComponent: 0.33] set];
-    NSRectFillUsingOperation(r, NSCompositeSourceOver);
+    if (transparentSelection) 
+      {
+	[[[NSColor darkGrayColor] colorWithAlphaComponent: 0.33] set];
+	NSRectFillUsingOperation(r, NSCompositeSourceOver);
+      }
 
     [self unlockFocus];
 

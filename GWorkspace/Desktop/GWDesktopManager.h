@@ -22,16 +22,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#ifndef GW_DESKTOP_MANAGER
-#define GW_DESKTOP_MANAGER
 
-#include <Foundation/Foundation.h>
-#include "FSNodeRep.h"
+#import <Foundation/Foundation.h>
+#import "FSNodeRep.h"
 
 typedef enum DockPosition {   
   DockPositionLeft = 0,
   DockPositionRight = 1
 } DockPosition;
+
 
 @class GWorkspace;
 @class GWDesktopView;
@@ -212,5 +211,3 @@ typedef enum DockPosition {
 + (void)mountRemovableMedia;
 
 @end
-
-#endif // GW_DESKTOP_MANAGER

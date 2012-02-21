@@ -1,6 +1,6 @@
 /* DesktopPref.h
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -22,11 +22,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
  
-#ifndef DESKTOP_PREFS_H
-#define DESKTOP_PREFS_H
 
-#include <Foundation/Foundation.h>
-#include "PrefProtocol.h"
+#import <Foundation/Foundation.h>
+#import "PrefProtocol.h"
 
 @class GWDesktopManager;
 
@@ -65,7 +63,9 @@
   IBOutlet id omnipresentCheck;
   IBOutlet id useDockCheck;
   IBOutlet id dockPosLabel;
-  IBOutlet id dockPosMatrix;    
+  IBOutlet id dockPosMatrix;
+  IBOutlet id dockStyleLabel;
+  IBOutlet id dockStyleMatrix;
   IBOutlet id hideTShelfCheck;
 
   GWDesktopManager *manager;
@@ -93,10 +93,9 @@
 
 - (IBAction)setDockPosition:(id)sender;
 
-- (IBAction)setDockPosition:(id)sender;
+- (IBAction)setDockStyle:(id)sender;
 
 - (IBAction)setTShelfAutohide:(id)sender;
 
 @end
 
-#endif // DESKTOP_PREFS_H

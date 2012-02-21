@@ -1,3 +1,14 @@
+2012-02-21 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/Preferences/DesktopPref.[h,m]
+	* GWorkspace/Desktop/Dock/Dock.[h,m]
+	* GWorkspace/Desktop/GWDesktopManager.h
+	* GWorkspace/Desktop/GWDesktopView.m
+	* FSNode/FSNIconsView.[h,m]
+	* GWorkspace/Resources/English.lproj/DesktopPref.gorm
+	New dock style preference and conditioinally enable transparency
+	in dock and selections based on it.
+
 2012-02-20 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/Desktop/GWDesktopView.m:

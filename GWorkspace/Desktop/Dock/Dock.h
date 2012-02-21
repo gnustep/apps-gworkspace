@@ -22,12 +22,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#ifndef DOCK_H
-#define DOCK_H
 
-#include <AppKit/NSView.h>
-#include "GWDesktopManager.h"
-#include "FSNodeRep.h"
+#import <AppKit/NSView.h>
+#import "GWDesktopManager.h"
+#import "FSNodeRep.h"
 
 @class NSWindow;
 @class NSColor;
@@ -35,9 +33,16 @@
 @class DockIcon;
 @class GWorkspace;
 
+typedef enum DockStyle
+{   
+  DockStyleClassic = 0,
+  DockStyleModern = 1
+} DockStyle;
+
 @interface Dock : NSView 
 {
   DockPosition position;
+  DockStyle style;
 
   NSMutableArray *icons;
   int iconSize;
@@ -97,6 +102,10 @@
 
 - (void)setPosition:(DockPosition)pos;
 
+- (DockStyle)style;
+
+- (void)setStyle:(DockStyle)s;
+
 - (void)setBackColor:(NSColor *)color;
 
 - (void)tile;
@@ -146,5 +155,3 @@
 - (BOOL)isDragTarget;
 
 @end
-
-#endif // DOCK_H

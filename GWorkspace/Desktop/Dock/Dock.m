@@ -52,15 +52,21 @@
   if (self)
     {
       NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
-    NSDictionary *appsdict;
-    NSArray *pbTypes;
-    int i;
+      NSDictionary *appsdict;
+      NSArray *pbTypes;
+      int i;
+      id defEntry;
 
-    manager = mngr;
-    position = [manager dockPosition];
-    
+      manager = mngr;
+      position = [manager dockPosition];
+      
+      defEntry = [defaults objectForKey: @"dockstyle"];
+      style = DockStyleClassic;
+      if ([defEntry intValue] == DockStyleModern)
+	style = DockStyleModern;
+ 
     gw = [GWorkspace gworkspace];
-    fm = [NSFileManager defaultManager];    
+    fm = [NSFileManager defaultManager];
     ws = [NSWorkspace sharedWorkspace];
 
     icons = [NSMutableArray new];
@@ -77,8 +83,11 @@
                                          nil];
     [self registerForDraggedTypes: pbTypes];    
 
-    [self setBackColor: [[NSColor grayColor] colorWithAlphaComponent: 0.33]];
-    
+    if (style == DockStyleModern)
+      [self setBackColor: [[NSColor grayColor] colorWithAlphaComponent: 0.33]];
+    else
+      [self setBackColor: [NSColor grayColor]];
+      
     [self createWorkspaceIcon];
 
     appsdict = [defaults objectForKey: @"applications"];
@@ -386,6 +395,27 @@
   [self tile];
 }
 
+- (void)setStyle:(DockStyle)s
+{
+  if(style != s)
+    {
+      if (s == DockStyleClassic)
+	{
+	  [self setBackColor: [NSColor grayColor]];
+	}
+      else if (s == DockStyleModern)
+	{
+	  [self setBackColor: [[NSColor grayColor] colorWithAlphaComponent: 0.33]];
+	}
+    }
+  style = s;
+}
+
+- (DockStyle)style
+{
+  return style;
+}
+
 - (void)setBackColor:(NSColor *)color
 {
   NSColor *hlgtcolor = [color highlightWithLevel: 0.2];
@@ -400,44 +430,7 @@
     [self tile];
   }
 }
-/*
-- (void)setBackImage
-{
-  NSImage *image = [[manager desktopView] backImage];
-  int i;
 
-  DESTROY (backImage);
-
-  if (image) {
-    NSRect r = [self bounds];
-    
-    backImage = [[NSImage alloc] initWithSize: r.size];
-    [backImage lockFocus]; 
-    [image compositeToPoint: NSZeroPoint 
-                   fromRect: r
-                  operation: NSCompositeCopy];
-    [backImage unlockFocus];
-    [self setNeedsDisplay: YES];
-  }
-  
-  for (i = 0; i < [icons count]; i++) {
-    [[icons objectAtIndex: i] setHighlightImage: backImage];
-  }
-}
-*/
- /*
-- (void)setUseBackImage:(BOOL)value
-{
-  int i;
-
-  for (i = 0; i < [icons count]; i++) {
-    [[icons objectAtIndex: i] setUseHlightImage: value];
-  }
-  
-    useBackImage = value;
-  [self setNeedsDisplay: YES];
-}
- */
 - (void)tile
 {
   NSView *view = [self superview];
@@ -515,6 +508,9 @@
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
   NSMutableDictionary *dict = [NSMutableDictionary dictionary];
   int i;  
+
+  [defaults setObject: [NSNumber numberWithInt: style]
+               forKey: @"dockstyle"];
 
   for (i = 0; i < [icons count]; i++)
     {

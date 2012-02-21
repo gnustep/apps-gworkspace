@@ -1,6 +1,6 @@
 /* FSNIconsView.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -22,12 +22,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#ifndef FSN_ICONS_VIEW_H
-#define FSN_ICONS_VIEW_H
 
-#include <Foundation/Foundation.h>
-#include <AppKit/NSView.h>
-#include "FSNodeRep.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/NSView.h>
+#import "FSNodeRep.h"
 
 @class NSColor;
 @class NSFont;
@@ -59,15 +57,16 @@
   NSSize gridSize;
   int colcount;
 
-	BOOL isDragTarget;
+  BOOL isDragTarget;
   BOOL forceCopy;
   
   NSString *charBuffer;	
-	NSTimeInterval lastKeyPressed;
+  NSTimeInterval lastKeyPressed;
   
   NSColor *backColor;
   NSColor *textColor;
   NSColor *disabledTextColor;
+  BOOL transparentSelection;
 
   FSNodeRep *fsnodeRep;
 
@@ -192,5 +191,3 @@
 - (void)controlTextDidEndEditing:(NSNotification *)aNotification;
 
 @end
-
-#endif // FSN_ICONS_VIEW_H

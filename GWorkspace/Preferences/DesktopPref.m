@@ -57,6 +57,7 @@ static NSString *nibName = @"DesktopPref";
     {
       NSString *impath;
       DockPosition dockpos;
+      DockStyle dockstyle;
       id cell;
       NSRect r;
 
@@ -107,9 +108,12 @@ static NSString *nibName = @"DesktopPref";
       [omnipresentCheck setState: ([manager usesXBundle] ? NSOnState : NSOffState)];
       [useDockCheck setState: ([manager dockActive] ? NSOnState : NSOffState)];
       dockpos = [manager dockPosition];
-      [dockPosMatrix selectCellAtRow: 0 column: dockpos];
+      [dockPosMatrix selectCellAtRow: dockpos column: 0];
+      dockstyle = [[manager dock] style];
+      [dockStyleMatrix selectCellAtRow: dockstyle column: 0];
       [hideTShelfCheck setState: (([[gworkspace tabbedShelf] autohide]) ? NSOnState : NSOffState)];
-
+  
+  
 
       /* Internationalization */
       [[tabView tabViewItemAtIndex: 0] setLabel: NSLocalizedString(@"Background", @"")];
@@ -130,7 +134,11 @@ static NSString *nibName = @"DesktopPref";
       [cell setTitle: NSLocalizedString(@"Left", @"")];
       cell = [dockPosMatrix cellAtRow: 0 column: 1];
       [cell setTitle: NSLocalizedString(@"Right", @"")];
-   
+      [dockStyleLabel setStringValue: NSLocalizedString(@"Dock style:", @"")];
+      cell = [dockStyleMatrix cellAtRow: 0 column: 0];
+      [cell setTitle: NSLocalizedString(@"Classic", @"")];
+      cell = [dockStyleMatrix cellAtRow: 0 column: 1];
+      [cell setTitle: NSLocalizedString(@"Modern", @"")];
       [hideTShelfCheck setTitle: NSLocalizedString(@"Autohide Tabbed Shelf", @"")];
     }
   }
@@ -246,9 +254,17 @@ static NSString *nibName = @"DesktopPref";
   int row, col;
   
   [dockPosMatrix getRow: &row column: &col ofCell: cell];
-  [manager setDockPosition: (col == 0) ? DockPositionLeft : DockPositionRight];
+  [manager setDockPosition: (row == 0) ? DockPositionLeft : DockPositionRight];
 }
 
+- (IBAction)setDockStyle:(id)sender
+{
+  id cell = [dockStyleMatrix selectedCell];
+  int row, col;
+  
+  [dockStyleMatrix getRow: &row column: &col ofCell: cell];
+  [[manager dock] setStyle: (row == 0) ? DockStyleClassic : DockStyleModern];
+}
 - (IBAction)setTShelfAutohide:(id)sender
 {
   [[gworkspace tabbedShelf] setAutohide: ([sender state] == NSOnState)];
