@@ -756,6 +756,12 @@
 	}
 }
 
+static void GWHighlightFrameRect(NSRect aRect)
+{
+  NSHighlightRect(aRect);
+  NSHighlightRect(NSInsetRect(aRect, 1, 1));
+}
+
 - (void)mouseDragged:(NSEvent *)theEvent
 {
   unsigned int eventMask = NSLeftMouseUpMask | NSLeftMouseDraggedMask;
@@ -778,6 +784,8 @@
 
   [[self window] disableFlushWindow];
 
+  [self lockFocus];
+
   while ([theEvent type] != NSLeftMouseUp) {
     CREATE_AUTORELEASE_POOL (arp);
 
@@ -796,22 +804,25 @@
     
     // Erase the previous rect
 
-    [self setNeedsDisplayInRect: oldRect];
-    [[self window] displayIfNeeded];
+    if (transparentSelection)
+      {
+	[self setNeedsDisplayInRect: oldRect];
+	[[self window] displayIfNeeded];
+      }
+    else
+      GWHighlightFrameRect(oldRect);
 
     // Draw the new rect
 
-    [self lockFocus];
-
-    [[NSColor darkGrayColor] set];
-    NSFrameRect(r);
     if (transparentSelection)
       {
+	[[NSColor darkGrayColor] set];
+	NSFrameRect(r);
         [[[NSColor darkGrayColor] colorWithAlphaComponent: 0.33] set];
         NSRectFillUsingOperation(r, NSCompositeSourceOver);
       }
-
-    [self unlockFocus];
+    else
+      GWHighlightFrameRect(r);
 
     oldRect = r;
 
@@ -821,6 +832,8 @@
 
     DESTROY (arp);
   }
+
+  [self unlockFocus];
 
   [[self window] postEvent: theEvent atStart: NO];
   
