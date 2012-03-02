@@ -758,8 +758,7 @@
 
 static void GWHighlightFrameRect(NSRect aRect)
 {
-  NSHighlightRect(aRect);
-  NSHighlightRect(NSInsetRect(aRect, 1, 1));
+  NSFrameRectWithWidthUsingOperation(aRect, 1.0, GSCompositeHighlight);
 }
 
 - (void)mouseDragged:(NSEvent *)theEvent

@@ -1,3 +1,9 @@
+2012-03-02  Eric Wasylishen <ewasylishen@gmail.com>
+
+	* GWorkspace/Desktop/GWDesktopView.m: Draw highlight rect using
+	NSFrameRectWithWidthUsingOperation(aRect, 1.0, GSCompositeHighlight);
+	instead of filling the rect twice, which was much slower
+
 2012-03-02 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/Desktop/GWDesktopView.m
