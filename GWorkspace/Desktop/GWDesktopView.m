@@ -912,14 +912,60 @@ static void GWHighlightFrameRect(NSRect aRect)
 {  
   [super drawRect: rect];
     
-  if (backImage && useBackImage) {
-    [backImage compositeToPoint: imagePoint 
-                      operation: NSCompositeSourceOver];  
-  }
-
-	if (dragIcon) {
-		[dragIcon dissolveToPoint: dragPoint fraction: 0.3];
+  if (backImage && useBackImage)
+    {
+      NSSize imsize = [backImage size];
+      
+      if ((imsize.width >= screenFrame.size.width)
+	  || (imsize.height >= screenFrame.size.height))
+	{
+	  if (backImageStyle == BackImageTileStyle)
+	    {  
+	      backImageStyle = BackImageCenterStyle;
+	    }
 	}
+      
+      if (backImageStyle == BackImageFitStyle)
+	{
+	  [backImage drawInRect: NSMakeRect(0, 0, screenFrame.size.width, screenFrame.size.height)
+		       fromRect: NSZeroRect
+		      operation: NSCompositeSourceOver
+		       fraction: 1.0
+		 respectFlipped: YES
+			  hints: nil];
+	}
+      else if (backImageStyle == BackImageTileStyle)
+	{
+	  CGFloat x = 0;
+	  CGFloat y = screenFrame.size.width - imsize.width;
+
+	  while (y > (0 - imsize.height))
+	    {
+	      [backImage compositeToPoint: NSMakePoint(x, y) 
+				operation: NSCompositeSourceOver];
+	      x += imsize.width;
+	      if (x >= screenFrame.size.width)
+		{
+		  y -= imsize.height;
+		  x = 0;
+		}
+	    }
+	}
+      else
+	{
+	  NSPoint imagePoint;
+	  imagePoint.x = ((screenFrame.size.width - imsize.width) / 2);
+	  imagePoint.y = ((screenFrame.size.height - imsize.height) / 2);
+
+	  [backImage compositeToPoint: imagePoint
+			    operation: NSCompositeSourceOver];
+	}
+    }
+  
+  if (dragIcon)
+    {
+      [dragIcon dissolveToPoint: dragPoint fraction: 0.3];
+    }
 }
 
 @end
@@ -1806,58 +1852,7 @@ int sortDragged(id icn1, id icn2, void *context)
 
 - (void)createBackImage:(NSImage *)image
 {
-  CREATE_AUTORELEASE_POOL (pool);
-  NSSize imsize = [image size];
-  
-  if ((imsize.width >= screenFrame.size.width)
-                      || (imsize.height >= screenFrame.size.height)) {
-    if (backImageStyle == BackImageTileStyle) {  
-      backImageStyle = BackImageCenterStyle;
-    }
-  }
-  
-  if (backImageStyle == BackImageFitStyle) {
-    NSImage *newImage = [[NSImage alloc] initWithSize: screenFrame.size];
-  
-	  [image setScalesWhenResized: YES];
-	  [image setSize: screenFrame.size];
-    imagePoint = NSZeroPoint;
-    [newImage lockFocus];
-	  [image compositeToPoint: imagePoint operation: NSCompositeCopy];    
-    [newImage unlockFocus];
-    ASSIGN (backImage, newImage);
-    RELEASE (newImage);
-    
-  } else if (backImageStyle == BackImageTileStyle) {
-    NSImage *newImage = [[NSImage alloc] initWithSize: screenFrame.size];
-    float x = 0;
-    float y = screenFrame.size.width - imsize.width;
-
-    [newImage lockFocus];
-
-    while (y > (0 - imsize.height)) {
-      [image compositeToPoint: NSMakePoint(x, y) 
-                    operation: NSCompositeCopy];
-      x += imsize.width;
-      if (x >= screenFrame.size.width) {
-        y -= imsize.height;
-        x = 0;
-      }
-    }
-
-    [newImage unlockFocus];
-    
-    imagePoint = NSZeroPoint;
-    ASSIGN (backImage, newImage);
-    RELEASE (newImage);
-    
-  } else {
-    imagePoint.x = ((screenFrame.size.width - imsize.width) / 2);
-    imagePoint.y = ((screenFrame.size.height - imsize.height) / 2);
-    ASSIGN (backImage, image);
-  }
-  
-  RELEASE (pool);
+  ASSIGN(backImage, image);
 }
 
 - (NSImage *)backImage

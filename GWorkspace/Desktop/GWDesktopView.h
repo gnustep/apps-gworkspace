@@ -51,7 +51,6 @@ typedef enum BackImageStyle {
   
   NSImage *backImage;
   NSString *imagePath;
-  NSPoint imagePoint;
   BackImageStyle backImageStyle;
   BOOL useBackImage;
 

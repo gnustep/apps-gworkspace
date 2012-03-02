@@ -1,5 +1,11 @@
 2012-03-02  Eric Wasylishen <ewasylishen@gmail.com>
 
+	* GWorkspace/Desktop/GWDesktopView.m: Don't cache scaled background.
+	Fixes background not drawing with xlib and background set to "fit",
+	and probably saves a fair bit of memory.
+
+2012-03-02  Eric Wasylishen <ewasylishen@gmail.com>
+
 	* GWorkspace/Desktop/GWDesktopView.m: Draw highlight rect using
 	NSFrameRectWithWidthUsingOperation(aRect, 1.0, GSCompositeHighlight);
 	instead of filling the rect twice, which was much slower
