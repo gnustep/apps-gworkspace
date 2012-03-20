@@ -54,40 +54,41 @@ const double PDFResolution = 72.0;
 {
   self = [super initWithFrame: frameRect];
   
-  if(self) {
-    NSRect r = [self bounds];
-    NSRect vr;
-		id cell;
+  if(self)
+    {
+      NSRect r = [self bounds];
+      NSRect vr;
+      id cell;
 
-  #define MARGIN 3
+#define MARGIN 3
 		
-		vr = NSMakeRect(0, r.size.height - 25 - MARGIN, 25, 25);
-		backButt = [[NSButton alloc] initWithFrame: vr];
-		[backButt setButtonType: NSMomentaryLight];
-		[backButt setImagePosition: NSImageOnly];	
-		[backButt setImage: [NSImage imageNamed: @"common_ArrowUp.tiff"]];
-		[backButt setTarget: self];
-		[backButt setAction: @selector(previousPage:)];
-		[self addSubview: backButt]; 
+      vr = NSMakeRect(0, r.size.height - 25 - MARGIN, 25, 25);
+      nextButt = [[NSButton alloc] initWithFrame: vr];
+      [nextButt setButtonType: NSMomentaryLight];
+      [nextButt setImagePosition: NSImageOnly];	
+      [nextButt setImage: [NSImage imageNamed: @"common_ArrowUp.tiff"]];
+      [nextButt setTarget: self];
+      [nextButt setAction: @selector(nextPage:)];
+      [self addSubview: nextButt]; 
 
-    vr.origin.y -= 25;
-		nextButt = [[NSButton alloc] initWithFrame: vr];
-		[nextButt setButtonType: NSMomentaryLight];
-		[nextButt setImagePosition: NSImageOnly];	
-		[nextButt setImage: [NSImage imageNamed: @"common_ArrowDown.tiff"]];
-		[nextButt setTarget: self];
-		[nextButt setAction: @selector(nextPage:)];
-		[self addSubview: nextButt]; 
+      vr.origin.y -= 25;
+      backButt = [[NSButton alloc] initWithFrame: vr];
+      [backButt setButtonType: NSMomentaryLight];
+      [backButt setImagePosition: NSImageOnly];	
+      [backButt setImage: [NSImage imageNamed: @"common_ArrowDown.tiff"]];
+      [backButt setTarget: self];
+      [backButt setAction: @selector(previousPage:)];
+      [self addSubview: backButt]; 
 
-    vr.origin.x = 25 + MARGIN;
-    vr.size.width = r.size.width - vr.origin.x;
-    vr.size.height = 50;
-		scroll = [[NSScrollView alloc] initWithFrame: vr];
-    [scroll setBorderType: NSBezelBorder];
-		[scroll setHasHorizontalScroller: YES];
-  	[scroll setHasVerticalScroller: NO]; 
-		[scroll setAutoresizingMask: NSViewHeightSizable | NSViewWidthSizable];
-  	[self addSubview: scroll]; 
+      vr.origin.x = 25 + MARGIN;
+      vr.size.width = r.size.width - vr.origin.x;
+      vr.size.height = 50;
+      scroll = [[NSScrollView alloc] initWithFrame: vr];
+      [scroll setBorderType: NSBezelBorder];
+      [scroll setHasHorizontalScroller: YES];
+      [scroll setHasVerticalScroller: NO]; 
+      [scroll setAutoresizingMask: NSViewHeightSizable | NSViewWidthSizable];
+      [self addSubview: scroll]; 
 
     cell = AUTORELEASE ([NSButtonCell new]);
     [cell setButtonType: NSPushOnPushOffButton];
@@ -380,13 +381,40 @@ const double PDFResolution = 72.0;
 
 - (void)nextPage:(id)sender
 {
+  int index;
 
+
+  index = [matrix selectedColumn] + 1;
+  if (index <= 0)
+    return;
+
+  if (index < [pdfDoc countPages])
+    index++;
+  else
+    index = [pdfDoc countPages];
+
+  [matrix selectCellAtRow:0 column:index-1];
+  [matrix sendAction];
 }
 
 - (void)previousPage:(id)sender
 {
+  int index;
 
+  index = [matrix selectedColumn] + 1;
+  if (index <= 0)
+    return;
+
+  if (index > 1)
+    index--;
+  else
+    index = 1;
+
+  [matrix selectCellAtRow:0 column:index-1];
+  [matrix sendAction];
 }
+
+
 
 - (void)editFile:(id)sender
 {

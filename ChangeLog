@@ -1,5 +1,10 @@
 2012-03-20 Riccardo Mottola <rm@gnu.org>
 
+	* Inspector/ContentViewers/PdfViewer/PdfViewer.m
+	Make next and previous buttons work.
+
+2012-03-20 Riccardo Mottola <rm@gnu.org>
+
 	* Inspector/ContentViewers/PdfViewer/PdfViewer.[h,m]
 	Guard against invalid page numbers.
 
