@@ -1,3 +1,8 @@
+2012-03-20 Riccardo Mottola <rm@gnu.org>
+
+	* Inspector/ContentViewers/PdfViewer/PdfViewer.[h,m]
+	Guard against invalid page numbers.
+
 2012-03-06  Richard Stonehouse
 
 	* GWMetadata/gmds/mdextractor/GNUmakefile.preamble

@@ -1,6 +1,6 @@
 /* PdfViewer.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
@@ -22,12 +22,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#ifndef PDFVIEWER_H
-#define PDFVIEWER_H
 
-#include <Foundation/Foundation.h>
-#include <AppKit/NSView.h>
-#include "ContentViewersProtocol.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/NSView.h>
+#import "ContentViewersProtocol.h"
 
 @class NSImageView;
 @class NSTextField;
@@ -52,13 +50,13 @@
 
 @interface PdfViewer : NSView <ContentViewersProtocol>
 {
-	BOOL valid;
+  BOOL valid;
   
-	NSButton *backButt, *nextButt;
-	NSScrollView *scroll;
-	NSMatrix *matrix;
-	NSImageView *imageView;
-	NSTextField *errLabel;
+  NSButton *backButt, *nextButt;
+  NSScrollView *scroll;
+  NSMatrix *matrix;
+  NSImageView *imageView;
+  NSTextField *errLabel;
   NSButton *editButt;
 
   NSString *pdfPath;
@@ -83,4 +81,3 @@
 
 @end
 
-#endif // PDFVIEWER_H

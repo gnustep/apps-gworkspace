@@ -1,6 +1,6 @@
 /* PdfViewer.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
@@ -22,11 +22,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <AppKit/AppKit.h>
-#include <PDFKit/PDFDocument.h>
-#include <PDFKit/PDFImageRep.h>
 #include <math.h>
-#include "PdfViewer.h"
+
+#import <AppKit/AppKit.h>
+#import <PDFKit/PDFDocument.h>
+#import <PDFKit/PDFImageRep.h>
+#import "PdfViewer.h"
 
 #define MAXPAGES 9999
 
@@ -39,12 +40,12 @@ const double PDFResolution = 72.0;
   TEST_RELEASE (pdfPath);	
   TEST_RELEASE (pdfDoc);
   TEST_RELEASE (imageRep);
-	RELEASE (backButt);
-	RELEASE (nextButt);
-	RELEASE (scroll);
-	RELEASE (matrix);
-	RELEASE (imageView);
-	RELEASE (errLabel);
+  RELEASE (backButt);
+  RELEASE (nextButt);
+  RELEASE (scroll);
+  RELEASE (matrix);
+  RELEASE (imageView);
+  RELEASE (errLabel);
   [super dealloc];
 }
 
@@ -274,33 +275,43 @@ const double PDFResolution = 72.0;
 - (void)goToPage:(id)sender
 {
   NSImage *image = nil;
-  int index = [matrix selectedColumn] + 1;
-  NSSize imsize = [imageView bounds].size;
-  NSSize unscaledSize = NSMakeSize([pdfDoc pageWidth: index], 
-                                              [pdfDoc pageHeight: index]);  
+  int index;
+  NSSize imsize;
+  NSSize unscaledSize;
+                                              
 
-  if ((imsize.width < unscaledSize.width) 
-                        || (imsize.height < unscaledSize.height)) {
-    float rw, rh;
-	  NSSize scaledSize;
-    float xfactor, yfactor;  
+  index = [matrix selectedColumn] + 1;
+  if (index <= 0)
+    return;
 
-    rw = imsize.width / unscaledSize.width;
-    rh = imsize.height / unscaledSize.height;
+  imsize = [imageView bounds].size;
+  unscaledSize = NSMakeSize([pdfDoc pageWidth: index], [pdfDoc pageHeight: index]);
 
-    if (rw <= rh) {
-      scaledSize.width = unscaledSize.width * rw;
-      scaledSize.height = floor(imsize.width * unscaledSize.height / unscaledSize.width + 0.5);
-    } else {
-      scaledSize.height = unscaledSize.height * rh;
-      scaledSize.width  = floor(imsize.height * unscaledSize.width / unscaledSize.height + 0.5);    
+  if ((imsize.width < unscaledSize.width) || (imsize.height < unscaledSize.height))
+    {
+      float rw, rh;
+      NSSize scaledSize;
+      float xfactor, yfactor;  
+
+      rw = imsize.width / unscaledSize.width;
+      rh = imsize.height / unscaledSize.height;
+
+      if (rw <= rh)
+	{
+	  scaledSize.width = unscaledSize.width * rw;
+	  scaledSize.height = floor(imsize.width * unscaledSize.height / unscaledSize.width + 0.5);
+	}
+      else
+	{
+	  scaledSize.height = unscaledSize.height * rh;
+	  scaledSize.width  = floor(imsize.height * unscaledSize.width / unscaledSize.height + 0.5);    
+	}
+
+      xfactor = scaledSize.width / unscaledSize.width * PDFResolution;
+      yfactor = scaledSize.height / unscaledSize.height * PDFResolution;
+
+      [imageRep setResolution: (xfactor < yfactor ? xfactor : yfactor)];
     }
-
-    xfactor = scaledSize.width / unscaledSize.width * PDFResolution;
-    yfactor = scaledSize.height / unscaledSize.height * PDFResolution;
-
-    [imageRep setResolution: (xfactor < yfactor ? xfactor : yfactor)];
-  }
 
   [imageRep setPageNum: index];
   
