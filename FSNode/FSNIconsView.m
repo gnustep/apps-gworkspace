@@ -28,6 +28,7 @@
 
 #import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
+#import <GNUstepGUI/GSVersion.h>
 
 #import "FSNIconsView.h"
 #import "FSNIcon.h"
@@ -70,9 +71,18 @@ typedef enum DockStyle
   DockStyleModern = 1
 } DockStyle;
 
+#define SUPPORTS_XOR ((GNUSTEP_GUI_MAJOR_VERSION > 0)		\
+		      || (GNUSTEP_GUI_MAJOR_VERSION == 0	\
+			  && GNUSTEP_GUI_MINOR_VERSION > 22)	\
+		      || (GNUSTEP_GUI_MAJOR_VERSION == 0	\
+			  && GNUSTEP_GUI_MINOR_VERSION == 22	\
+			  && GNUSTEP_GUI_SUBMINOR_VERSION > 0))
+
 static void GWHighlightFrameRect(NSRect aRect)
 {
+#if SUPPORTS_XOR
   NSFrameRectWithWidthUsingOperation(aRect, 1.0, GSCompositeHighlight);
+#endif
 }
 
 
@@ -539,7 +549,9 @@ pp.y = NSMaxY(br) + 1; \
     r = NSMakeRect(x, y, w, h);
     
     // Erase the previous rect
-    if (transparentSelection || (!transparentSelection && scrolled))
+    if (transparentSelection
+	|| !SUPPORTS_XOR
+	|| (!transparentSelection && scrolled))
       {
 	[self setNeedsDisplayInRect: oldRect];
 	[[self window] displayIfNeeded];
@@ -549,14 +561,17 @@ pp.y = NSMaxY(br) + 1; \
 
     [self lockFocus];
 
-    if (transparentSelection)
+    if (transparentSelection || !SUPPORTS_XOR)
       {
 	[[NSColor darkGrayColor] set];
 	NSFrameRect(r);
-        [[[NSColor darkGrayColor] colorWithAlphaComponent: 0.33] set];
-        NSRectFillUsingOperation(r, NSCompositeSourceOver);
+	if (transparentSelection)
+	  {
+	    [[[NSColor darkGrayColor] colorWithAlphaComponent: 0.33] set];
+	    NSRectFillUsingOperation(r, NSCompositeSourceOver);
+	  }
       }
-    else 
+    else
       {
 	if (!NSEqualRects(oldRect, r) && !scrolled)
 	  {

@@ -1,5 +1,12 @@
 2012-03-22  Eric Wasylishen <ewasylishen@gmail.com>
 
+	* FSNode/FSNIconsView.m:
+	* GWorkspace/Desktop/GWDesktopView.m: XOR selection rect:
+	Add fallback code path for running on versions of GUI older than
+	trunk.
+
+2012-03-22  Eric Wasylishen <ewasylishen@gmail.com>
+
 	* FSNode/FSNTextCell.h:
 	* FSNode/FSNTextCell.m: Vertically center labels. Fixes bug 35423
 
