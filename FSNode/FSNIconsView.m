@@ -70,6 +70,12 @@ typedef enum DockStyle
   DockStyleModern = 1
 } DockStyle;
 
+static void GWHighlightFrameRect(NSRect aRect)
+{
+  NSFrameRectWithWidthUsingOperation(aRect, 1.0, GSCompositeHighlight);
+}
+
+
 @implementation FSNIconsView
 
 - (void)dealloc
@@ -494,11 +500,13 @@ pp.y = NSMaxY(br) + 1; \
   
   oldRect = NSZeroRect;  
 
-	[[self window] disableFlushWindow];
+  [[self window] disableFlushWindow];
 
   [NSEvent startPeriodicEventsAfterDelay: 0.02 withPeriod: 0.05];
 
   while ([theEvent type] != NSLeftMouseUp) {
+    BOOL scrolled = NO;
+
     CREATE_AUTORELEASE_POOL (arp);
 
     theEvent = [NSApp nextEventMatchingMask: eventMask
@@ -514,11 +522,14 @@ pp.y = NSMaxY(br) + 1; \
     
     visibleRect = [self visibleRect];
     
-    if ([self mouse: pp inRect: visibleRect] == NO) {
-      scrollPointToVisible(pp);
-      CONVERT_CHECK;
-      visibleRect = [self visibleRect];
-    }
+    if ([self mouse: pp inRect: visibleRect] == NO)
+      {
+	scrollPointToVisible(pp);
+	CONVERT_CHECK;
+	visibleRect = [self visibleRect];
+
+	scrolled = YES;
+      }
 
     x = min(sp.x, pp.x);
     y = min(sp.y, pp.y);
@@ -528,23 +539,36 @@ pp.y = NSMaxY(br) + 1; \
     r = NSMakeRect(x, y, w, h);
     
     // Erase the previous rect
-    
-    [self setNeedsDisplayInRect: oldRect];
-    [[self window] displayIfNeeded];
-
+    if (transparentSelection || (!transparentSelection && scrolled))
+      {
+	[self setNeedsDisplayInRect: oldRect];
+	[[self window] displayIfNeeded];
+      }
+ 
     // Draw the new rect
 
     [self lockFocus];
 
-    [[NSColor darkGrayColor] set];
-    NSFrameRect(r);
-
-    if (transparentSelection) 
+    if (transparentSelection)
       {
-	[[[NSColor darkGrayColor] colorWithAlphaComponent: 0.33] set];
-	NSRectFillUsingOperation(r, NSCompositeSourceOver);
+	[[NSColor darkGrayColor] set];
+	NSFrameRect(r);
+        [[[NSColor darkGrayColor] colorWithAlphaComponent: 0.33] set];
+        NSRectFillUsingOperation(r, NSCompositeSourceOver);
       }
-
+    else 
+      {
+	if (!NSEqualRects(oldRect, r) && !scrolled)
+	  {
+	    GWHighlightFrameRect(oldRect);
+	    GWHighlightFrameRect(r);
+	  }
+	else if (scrolled)
+	  {
+	    GWHighlightFrameRect(r);
+	  }
+      }
+     
     [self unlockFocus];
 
     oldRect = r;

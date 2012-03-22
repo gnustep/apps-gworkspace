@@ -1,3 +1,8 @@
+2012-03-22  Eric Wasylishen <ewasylishen@gmail.com>
+
+	* FSNode/FSNIconsView.m: Fix XOR-stlye selection rectangle. Now
+	works when scrolling.
+
 2012-03-20 Riccardo Mottola <rm@gnu.org>
 
 	* Inspector/ContentViewers/PdfViewer/PdfViewer.m
