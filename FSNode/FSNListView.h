@@ -202,7 +202,7 @@
 
 @interface FSNListViewDataSource (RepNameEditing)
 
-- (void)setEditorAtRow:(int)row;
+- (void)setEditorAtRow:(int)row withMouseDownEvent: (NSEvent *)anEvent;
 
 - (void)controlTextDidChange:(NSNotification *)aNotification;
 
@@ -303,6 +303,8 @@
   id dsource;
   NSString *charBuffer;	
 	NSTimeInterval lastKeyPressed;
+
+  NSTimer *clickTimer;
 }
 
 - (id)initWithFrame:(NSRect)frameRect

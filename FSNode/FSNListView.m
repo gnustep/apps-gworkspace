@@ -1391,7 +1391,7 @@ static NSString *defaultColumns = @"{ \
 
 @implementation FSNListViewDataSource (RepNameEditing)
 
-- (void)setEditorAtRow:(int)row
+- (void)setEditorAtRow:(int)row withMouseDownEvent: (NSEvent *)anEvent
 {
   [self stopRepNameEditing];
 
@@ -1419,6 +1419,11 @@ static NSString *defaultColumns = @"{ \
       [nameEditor setNode: nd stringValue: [nd name] index: 0];
 
       [listView addSubview: nameEditor];
+
+      if (anEvent != nil)
+	{
+	  [nameEditor mouseDown: anEvent];
+	}
     }
   }
 }
@@ -2473,35 +2478,59 @@ int sortSubviews(id view1, id view2, void *context)
   }
 }
 
-- (void)mouseDown:(NSEvent *)theEvent
+- (void)singleClick: (NSTimer *)aTimer
 {
+  NSEvent *theEvent = [aTimer userInfo];
   NSPoint location;
-  int clickCount;
   int row;
-  
-  [dsource setMouseFlags: [theEvent modifierFlags]];
-    
-  [dsource stopRepNameEditing];
-  
-  [super mouseDown: theEvent];
-  
-  clickCount = [theEvent clickCount];
-  
-  if (clickCount >= 2) {
-    return;
-  }
 
-  if ([theEvent modifierFlags] & NSShiftKeyMask) {
-    return;
-  }
-  
   location = [theEvent locationInWindow];
   location = [self convertPoint: location fromView: nil];
   row = [self rowAtPoint: location];
   
   if (row != -1) {  
-    [dsource setEditorAtRow: row];
+    [dsource setEditorAtRow: row withMouseDownEvent: theEvent];
   }
+  
+  [clickTimer release];
+  clickTimer = nil;
+}
+
+- (void)mouseDown:(NSEvent *)theEvent
+{
+  if (clickTimer != nil)
+    {
+      [clickTimer invalidate];
+      [clickTimer release];
+      clickTimer = nil;
+    }
+  
+  if ([theEvent clickCount] == 1
+      && (!([theEvent modifierFlags] & NSShiftKeyMask)))
+    {
+       NSPoint location;
+       int row;
+       
+       location = [theEvent locationInWindow];
+       location = [self convertPoint: location fromView: nil];
+       row = [self rowAtPoint: location];
+       
+       if (row == [self selectedRow])
+	 {
+	   // We clicked on an already-selected row.
+
+	   ASSIGN(clickTimer, [NSTimer scheduledTimerWithTimeInterval: 0.5 // FIXME: use [NSEvent doubleClickInterval]
+							       target: self
+							     selector: @selector(singleClick:)
+							     userInfo: theEvent
+							      repeats: NO]);
+	 }
+    }
+
+  [dsource setMouseFlags: [theEvent modifierFlags]];   
+  [dsource stopRepNameEditing];
+  
+  [super mouseDown: theEvent];
 }
 
 - (void)keyDown:(NSEvent *)theEvent

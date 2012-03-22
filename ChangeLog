@@ -1,5 +1,13 @@
 2012-03-22  Eric Wasylishen <ewasylishen@gmail.com>
 
+	* FSNode/FSNListView.h:
+	* FSNode/FSNListView.m: Fix double-click and single-click on
+	list rows. Single-click on a selected row only starts editing
+	after a short interval (0.5s); double-clicking opens the
+	double-clicked item.
+
+2012-03-22  Eric Wasylishen <ewasylishen@gmail.com>
+
 	* FSNode/FSNIconsView.m:
 	* GWorkspace/Desktop/GWDesktopView.m: XOR selection rect:
 	Add fallback code path for running on versions of GUI older than
