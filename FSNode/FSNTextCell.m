@@ -245,6 +245,9 @@ static cutIMP cutDate = NULL;
   cuttitle = (*cutTitle)(self, cutTitleSel, uncuttedTitle, textlenght);
   [self setStringValue: cuttitle];        
 
+  title_rect.size.height = titlesize.height;
+  title_rect.origin.y += ((cellFrame.size.height - titlesize.height) / 2.0);
+
   if (icon == nil) {
     [super drawInteriorWithFrame: title_rect inView: controlView];
     
@@ -258,9 +261,7 @@ static cutIMP cutDate = NULL;
     if ([controlView isFlipped]) {
 	    icon_rect.origin.y += icon_rect.size.height;
     }
-    
-    title_rect.size.height = titlesize.height;
-    title_rect.origin.y += ((cellFrame.size.height - titlesize.height) / 2.0);
+
     title_rect.origin.x += (icon_rect.size.width + (MARGIN * 2));	
     title_rect.size.width -= (icon_rect.size.width + (MARGIN * 2));	
     

@@ -1,5 +1,10 @@
 2012-03-22  Eric Wasylishen <ewasylishen@gmail.com>
 
+	* FSNode/FSNTextCell.m: Vertically center labels including those
+	with no icon.
+
+2012-03-22  Eric Wasylishen <ewasylishen@gmail.com>
+
 	* FSNode/FSNListView.h:
 	* FSNode/FSNListView.m: Fix double-click and single-click on
 	list rows. Single-click on a selected row only starts editing
