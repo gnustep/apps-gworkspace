@@ -67,7 +67,7 @@ static cutIMP cutDate = NULL;
                                                   forKey: NSFontAttributeName]);
     ASSIGN (dots, [NSString stringWithString: @"..."]);
     dtslenght = [dots sizeWithAttributes: fontAttr].width; 
-    titlelenght = 0.0;
+    titlesize = NSMakeSize(0, 0);
     icon = nil;
     dateCell = NO;
     cutTitleSel = cutNameSel;
@@ -104,7 +104,7 @@ static cutIMP cutDate = NULL;
 - (void)setStringValue:(NSString *)aString
 {
   [super setStringValue: aString];
-  titlelenght = [[self stringValue] sizeWithAttributes: fontAttr].width; 
+  titlesize = [[self stringValue] sizeWithAttributes: fontAttr]; 
 }
 
 - (void)setFont:(NSFont *)fontObj
@@ -112,7 +112,7 @@ static cutIMP cutDate = NULL;
   [super setFont: fontObj];
   ASSIGN (fontAttr, [NSDictionary dictionaryWithObject: [self font] 
                                                 forKey: NSFontAttributeName]);
-  titlelenght = [[self stringValue] sizeWithAttributes: fontAttr].width; 
+  titlesize = [[self stringValue] sizeWithAttributes: fontAttr]; 
   dtslenght = [dots sizeWithAttributes: fontAttr].width;     
 }
 
@@ -128,7 +128,7 @@ static cutIMP cutDate = NULL;
 
 - (float)uncuttedTitleLenght
 {
-  return titlelenght;
+  return titlesize.width;
 }
 
 - (void)setDateCell:(BOOL)value
@@ -259,6 +259,8 @@ static cutIMP cutDate = NULL;
 	    icon_rect.origin.y += icon_rect.size.height;
     }
     
+    title_rect.size.height = titlesize.height;
+    title_rect.origin.y += ((cellFrame.size.height - titlesize.height) / 2.0);
     title_rect.origin.x += (icon_rect.size.width + (MARGIN * 2));	
     title_rect.size.width -= (icon_rect.size.width + (MARGIN * 2));	
     

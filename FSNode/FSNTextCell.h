@@ -37,7 +37,7 @@ typedef NSString *(*cutIMP)(id, SEL, id, float);
 {
   NSDictionary *fontAttr;
   NSString *dots;
-  float titlelenght;
+  NSSize titlesize;
   float dtslenght;
   BOOL dateCell;
   NSString *uncuttedTitle; 
