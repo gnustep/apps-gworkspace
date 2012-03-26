@@ -40,6 +40,27 @@
 #define Y_MARGIN (4)
 #define EDIT_MARGIN (4)
 
+@interface GWTextField : NSTextField
+@end
+
+@implementation GWTextField
+
+- (id) initWithFrame: (NSRect)aFrame
+{
+  NSTextFieldCell *cell;
+
+  self = [super initWithFrame: aFrame];
+
+  cell =  [[[FSNTextCell alloc] init] autorelease];
+  [cell setDrawsBackground: YES];
+
+  [self setCell: cell];
+
+  return self;
+}
+
+@end
+
 
 @implementation GWViewerShelf
 
@@ -151,7 +172,7 @@
 
 		watchedPaths = [[NSCountedSet alloc] initWithCapacity: 1];
 
-    focusedIconLabel = [NSTextField new];
+    focusedIconLabel = [GWTextField new];
 		[focusedIconLabel setFont: [NSFont systemFontOfSize: 12]];
 		[focusedIconLabel setBezeled: NO];
 		[focusedIconLabel setAlignment: NSCenterTextAlignment];

@@ -1,4 +1,10 @@
-2012-03-22  Eric Wasylishen <ewasylishen@gmail.com>
+2012-03-26  Eric Wasylishen <ewasylishen@gmail.com>
+
+	* GWorkspace/FileViewer/GWViewerShelf.m: Use FSNTextCell for
+	focusedIconLabel to correct alignment problem introduced in the
+	last change.
+
+2012-03-26  Eric Wasylishen <ewasylishen@gmail.com>
 
 	* FSNode/FSNTextCell.m: Adjust vertically centering to match
 	calculation in  -[FSNListViewDataSource(RepNameEditing)
