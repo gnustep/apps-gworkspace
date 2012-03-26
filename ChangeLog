@@ -1,5 +1,11 @@
 2012-03-22  Eric Wasylishen <ewasylishen@gmail.com>
 
+	* FSNode/FSNTextCell.m: Adjust vertically centering to match
+	calculation in  -[FSNListViewDataSource(RepNameEditing)
+	setEditorAtRow:withMouseDownEvent:]
+
+2012-03-22  Eric Wasylishen <ewasylishen@gmail.com>
+
 	* FSNode/FSNTextCell.m: Vertically center labels including those
 	with no icon.
 

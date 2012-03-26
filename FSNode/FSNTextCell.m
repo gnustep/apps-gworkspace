@@ -264,6 +264,7 @@ static cutIMP cutDate = NULL;
 
     title_rect.origin.x += (icon_rect.size.width + (MARGIN * 2));	
     title_rect.size.width -= (icon_rect.size.width + (MARGIN * 2));	
+    title_rect = NSIntegralRect(title_rect);  
     
     [super drawInteriorWithFrame: title_rect inView: controlView];
 
