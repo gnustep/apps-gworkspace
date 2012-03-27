@@ -1,8 +1,10 @@
 /* GWSpatialViewer.m
  *  
- * Copyright (C) 2004-2011 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
+ *         Riccardo Mottola
+ *
  * Date: June 2004
  *
  * This file is part of the GNUstep GWorkspace application
@@ -101,7 +103,7 @@
         RETAIN (rootViewerKey);
       }
       
-      prefsname = [NSString stringWithFormat: @"viewer_at_%@_%i", 
+      prefsname = [NSString stringWithFormat: @"viewer_at_%@_%u", 
                             [node path], [rootViewerKey unsignedLongValue]];
 
     } else {
@@ -708,7 +710,7 @@
       NSString *prefsname;
     
       if (rootViewerKey != nil) {
-        prefsname = [NSString stringWithFormat: @"viewer_at_%@_%i", 
+        prefsname = [NSString stringWithFormat: @"viewer_at_%@_%u", 
                             [baseNode path], [rootViewerKey unsignedLongValue]];
       } else {
         prefsname = [NSString stringWithFormat: @"viewer_at_%@", [baseNode path]];

@@ -1,3 +1,10 @@
+2012-03-27 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/FileViewer/GWViewer.m
+	* GWorkspace/FileViewer/GWSpatialViewer.m
+	* GWorkspace/FileViewer/GWViewersManager.m
+	Save key in the viewer's list and format it as unsigned
+
 2012-03-26  Eric Wasylishen <ewasylishen@gmail.com>
 
 	* GWorkspace/FileViewer/GWViewerShelf.m: Use FSNTextCell for

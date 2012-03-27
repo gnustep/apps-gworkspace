@@ -1,6 +1,6 @@
-/* GWViewersManager.h
+/* GWViewersManager.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2004
@@ -978,12 +978,14 @@ static GWViewersManager *vwrsmanager = nil;
       [dict setObject: [[viewer baseNode] path] forKey: @"path"];
       [dict setObject: [NSNumber numberWithInt: [viewer vtype]] 
                forKey: @"type"];
+      if ([viewer rootViewerKey])
+	[dict setObject: [viewer rootViewerKey] forKey: @"key"];
                
       [viewersInfo addObject: dict];
     }
   }
   
-	[defaults setObject: viewersInfo forKey: @"viewersinfo"];
+  [defaults setObject: viewersInfo forKey: @"viewersinfo"];
   
   [defaults setObject: rootViewersKeys forKey: @"root_viewers_keys"];
 }
