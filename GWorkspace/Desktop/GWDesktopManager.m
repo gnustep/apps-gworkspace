@@ -1,6 +1,6 @@
 /* GWDesktopManager.m
  *  
- * Copyright (C) 2005-2011 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -22,15 +22,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <AppKit/AppKit.h>
-#include "GWDesktopManager.h"
-#include "GWDesktopWindow.h"
-#include "GWDesktopView.h"
-#include "Dock.h"
-#include "FSNFunctions.h"
-#include "GWorkspace.h"
-#include "GWViewersManager.h"
-#include "TShelf/TShelfWin.h"
+#import <AppKit/AppKit.h>
+#import "GWDesktopManager.h"
+#import "GWDesktopWindow.h"
+#import "GWDesktopView.h"
+#import "Dock.h"
+#import "FSNFunctions.h"
+#import "GWorkspace.h"
+#import "GWViewersManager.h"
+#import "TShelf/TShelfWin.h"
 
 #define RESV_MARGIN 10
 

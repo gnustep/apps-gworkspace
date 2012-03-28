@@ -22,6 +22,7 @@
 	* GWorkspace/Desktop/Dock/DockIcon.h
 	* GWorkspace/Desktop/Dock/DockIcon.m
 	* Inspector/ContentViewers/RtfViewer/RtfViewer.h
+	* GWorkspace/Desktop/GWDesktopManager.m
 	Fixed includes.
 
 2012-03-27 Riccardo Mottola <rm@gnu.org>

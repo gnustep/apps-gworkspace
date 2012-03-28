@@ -139,7 +139,7 @@
     
     if (viewerPrefs == nil) {
       defEntry = [defaults dictionaryForKey: prefsname];
-    
+      NSLog(@"prfsname %@", defEntry);
       if (defEntry) {
         viewerPrefs = [defEntry copy];
       } else {
@@ -148,7 +148,7 @@
     }
     
     viewType = [viewerPrefs objectForKey: @"viewtype"];
-    
+    NSLog(@"viewtype: %@", viewType);
     if (viewType == nil) {
       if (stype != nil) {
         viewType = stype;
@@ -165,7 +165,7 @@
     RETAIN (viewType);
     
     defEntry = [viewerPrefs objectForKey: @"shelfheight"];
-    
+    NSLog(@"height: %@", defEntry);
     if (defEntry) {
       shelfHeight = [defEntry floatValue];
     } else {
@@ -176,7 +176,7 @@
     [vwrwin setDelegate: self];
 
     defEntry = [viewerPrefs objectForKey: @"geometry"];
-    
+    NSLog(@"geometry: %@", defEntry);
     if (defEntry) {
       [vwrwin setFrameFromString: defEntry];
     } else {
