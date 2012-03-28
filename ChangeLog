@@ -1,3 +1,29 @@
+2012-03-28 Riccardo Mottola
+
+	* GWorkspace/FileViewer/GWViewerIconsView.m
+	* GWorkspace/FileViewer/GWViewerListView.m
+	* GWorkspace/FileViewer/GWViewer.h
+	* GWorkspace/FileViewer/GWViewerBrowser.h
+	* GWorkspace/FileViewer/GWViewerBrowser.m
+	* GWorkspace/FileViewer/GWViewerIconsPath.h
+	* GWorkspace/FileViewer/GWViewerScrollView.h
+	* GWorkspace/FileViewer/GWViewerSplit.h
+	* GWorkspace/FileViewer/GWViewersManager.h
+	* GWorkspace/FileViewer/GWSpatialViewer.h
+	* GWorkspace/FileViewer/GWViewerIconsPath.m
+	* GWorkspace/FileViewer/GWViewerScrollView.m
+	* GWorkspace/FileViewer/GWViewerSplit.m
+	* GWorkspace/FileViewer/GWViewerShelf.h
+	* Workspace/FileViewer/GWViewerPathsPopUp.h
+	* GWorkspace/FileViewer/GWViewerListView.h
+	* GWorkspace/FileViewer/GWViewerIconsView.h
+	* GWorkspace/FileViewer/GWViewerShelf.m
+	* GWorkspace/FileViewer/GWViewerPathsPopUp.m
+	* GWorkspace/Desktop/Dock/DockIcon.h
+	* GWorkspace/Desktop/Dock/DockIcon.m
+	* Inspector/ContentViewers/RtfViewer/RtfViewer.h
+	Fixed includes.
+
 2012-03-27 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/FileViewer/GWViewer.m

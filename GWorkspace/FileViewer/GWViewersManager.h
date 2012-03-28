@@ -1,6 +1,6 @@
 /* GWViewersManager.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2004
@@ -22,11 +22,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#ifndef GWVIEWERS_MANAGER_H
-#define GWVIEWERS_MANAGER_H
 
-#include <Foundation/Foundation.h>
-#include "FSNodeRep.h"
+#import <Foundation/Foundation.h>
+#import "FSNodeRep.h"
 
 #define BROWSING 0
 #define SPATIAL  1
@@ -161,5 +159,3 @@
            ofViewer:(id)viewer;
 
 @end
-
-#endif // GWVIEWERS_MANAGER_H

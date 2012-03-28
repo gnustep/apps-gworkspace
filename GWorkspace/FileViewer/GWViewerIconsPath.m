@@ -1,6 +1,6 @@
 /* GWViewerIconsPath.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2004
@@ -22,15 +22,17 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <AppKit/AppKit.h>
 #include <math.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include "FSNIcon.h"
-#include "FSNFunctions.h"
-#include "GWViewerIconsPath.h"
-#include "GWViewer.h"
-#include "GWorkspace.h"
+
+#import <AppKit/AppKit.h>
+
+#import "FSNIcon.h"
+#import "FSNFunctions.h"
+#import "GWViewerIconsPath.h"
+#import "GWViewer.h"
+#import "GWorkspace.h"
 
 #define DEF_ICN_SIZE 48
 #define DEF_TEXT_SIZE 12

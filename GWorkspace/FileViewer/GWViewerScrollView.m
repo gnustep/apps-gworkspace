@@ -1,6 +1,6 @@
 /* GWViewerScrollView.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: December 2004
@@ -22,11 +22,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <AppKit/AppKit.h>
-#include "FSNFunctions.h"
-#include "GWViewerScrollView.h"
-#include "GWViewer.h"
-#include "GWSpatialViewer.h"
+#import <AppKit/AppKit.h>
+
+#import "FSNFunctions.h"
+#import "GWViewerScrollView.h"
+#import "GWViewer.h"
+#import "GWSpatialViewer.h"
 
 @implementation GWViewerScrollView
 

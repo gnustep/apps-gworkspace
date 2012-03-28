@@ -22,10 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#ifndef GW_VIEWER_PATHS_POPUP_H
-#define GW_VIEWER_PATHS_POPUP_H
-
-#include <AppKit/NSPopUpButton.h>
+#import <AppKit/NSPopUpButton.h>
 
 @class FSNode;
 
@@ -41,5 +38,3 @@
 - (BOOL)closeViewer;
 
 @end
-
-#endif // GW_VIEWER_PATHS_POPUP_H

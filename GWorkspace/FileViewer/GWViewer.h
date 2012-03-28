@@ -1,6 +1,6 @@
 /* GWViewer.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2004
@@ -22,10 +22,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#ifndef GWVIEWER_H
-#define GWVIEWER_H
 
-#include <Foundation/Foundation.h>
+
+#import <Foundation/Foundation.h>
 
 @class GWViewersManager;
 @class FSNode;
@@ -170,4 +169,3 @@
 
 @end
 
-#endif // GWVIEWER_H

@@ -1,6 +1,6 @@
 /* GWViewerShelf.h
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2004
@@ -22,15 +22,17 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <AppKit/AppKit.h>
 #include <math.h>
-#include "GWViewerShelf.h"
-#include "GWViewer.h"
-#include "GWorkspace.h"
-#include "FSNBrowser.h"
-#include "FSNIconsView.h"
-#include "FSNIcon.h"
-#include "FSNFunctions.h"
+
+#import <AppKit/AppKit.h>
+
+#import "GWViewerShelf.h"
+#import "GWViewer.h"
+#import "GWorkspace.h"
+#import "FSNBrowser.h"
+#import "FSNIconsView.h"
+#import "FSNIcon.h"
+#import "FSNFunctions.h"
 
 #define DEF_ICN_SIZE 48
 #define DEF_TEXT_SIZE 12

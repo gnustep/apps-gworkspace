@@ -1,6 +1,6 @@
 /* GWViewerScrollView.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: December 2004
@@ -22,12 +22,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#ifndef GWVIEWER_SCROLL_VIEW_H
-#define GWVIEWER_SCROLL_VIEW_H
 
-#include <Foundation/Foundation.h>
-#include <AppKit/NSScrollView.h>
-#include "FSNodeRep.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/NSScrollView.h>
+#import "FSNodeRep.h"
 
 @interface GWViewerScrollView : NSScrollView
 {
@@ -56,6 +54,3 @@
 - (void)concludeDragOperation:(id <NSDraggingInfo>)sender;
 
 @end
-
-#endif // GWVIEWER_SCROLL_VIEW_H
-

@@ -1,6 +1,6 @@
 /* DockIcon.h
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -22,11 +22,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#ifndef DOCK_ICON_H
-#define DOCK_ICON_H
 
-#include <AppKit/NSView.h>
-#include "FSNIcon.h"
+
+#import <AppKit/NSView.h>
+#import "FSNIcon.h"
 
 @class NSColor;
 @class NSImage;
@@ -104,5 +103,3 @@
 - (void)setDraggedPaths:(NSArray *)paths;
 
 @end
-
-#endif // DOCK_ICON_H

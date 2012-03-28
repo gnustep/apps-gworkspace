@@ -1,6 +1,6 @@
 /* DockIcon.m
  *  
- * Copyright (C) 2005-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -22,14 +22,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
 #include <math.h>
 #include <unistd.h>
-#include "DockIcon.h"
-#include "Dock.h"
-#include "GWDesktopManager.h"
-#include "GWorkspace.h"
+
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+
+#import "DockIcon.h"
+#import "Dock.h"
+#import "GWDesktopManager.h"
+#import "GWorkspace.h"
 
 @implementation DockIcon
 

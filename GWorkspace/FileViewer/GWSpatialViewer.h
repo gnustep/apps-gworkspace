@@ -1,6 +1,6 @@
 /* GWSpatialViewer.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2004
@@ -22,10 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#ifndef GW_SPATIAL_VIEWER_H
-#define GW_SPATIAL_VIEWER_H
-
-#include <Foundation/Foundation.h>
+#import <Foundation/Foundation.h>
 
 @class GWViewersManager;
 @class GWViewerPathsPopUp;
@@ -157,4 +154,3 @@
 
 @end
 
-#endif // GW_SPATIAL_VIEWER_H

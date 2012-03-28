@@ -1,6 +1,6 @@
 /* GWViewerIconsPath.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2004
@@ -22,12 +22,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#ifndef GWVIEWER_ICONS_PATH_H
-#define GWVIEWER_ICONS_PATH_H
 
-#include <Foundation/Foundation.h>
-#include <AppKit/NSView.h>
-#include "FSNodeRep.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/NSView.h>
+#import "FSNodeRep.h"
 
 @class GWViewerPathsScroll;
 @class FSNIcon;
@@ -162,6 +160,4 @@
                     hitPart:(NSScrollerPart)hitpart;
 
 @end
-
-#endif // GWVIEWER_ICONS_PATH_H
 

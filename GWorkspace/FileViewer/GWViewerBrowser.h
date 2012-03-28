@@ -1,6 +1,6 @@
 /* GWViewerBrowser.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2004
@@ -22,11 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#ifndef GW_VIEWER_BROWSER_H
-#define GW_VIEWER_BROWSER_H
-
-#include <Foundation/Foundation.h>
-#include "FSNBrowser.h"
+#import <Foundation/Foundation.h>
+#import "FSNBrowser.h"
 
 @interface GWViewerBrowser : FSNBrowser
 {
@@ -42,4 +39,3 @@
 
 @end
 
-#endif // GW_VIEWER_BROWSER_H

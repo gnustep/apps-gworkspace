@@ -1,6 +1,6 @@
 /* GWViewerBrowser.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2004
@@ -22,13 +22,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <AppKit/AppKit.h>
-#include "GWViewerBrowser.h"
-#include "FSNBrowserColumn.h"
-#include "FSNBrowserMatrix.h"
-#include "FSNBrowserCell.h"
-#include "GWSpatialViewer.h"
-#include "GWViewersManager.h"
+#import <AppKit/AppKit.h>
+#import "GWViewerBrowser.h"
+#import "FSNBrowserColumn.h"
+#import "FSNBrowserMatrix.h"
+#import "FSNBrowserCell.h"
+#import "GWSpatialViewer.h"
+#import "GWViewersManager.h"
 
 @implementation GWViewerBrowser
 

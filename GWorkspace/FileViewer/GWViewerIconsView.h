@@ -1,6 +1,6 @@
 /* GWViewerIconsView.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2004
@@ -22,11 +22,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#ifndef GW_VIEWER_ICONS_VIEW_H
-#define GW_VIEWER_ICONS_VIEW_H
 
-#include <Foundation/Foundation.h>
-#include "FSNIconsView.h"
+#import <Foundation/Foundation.h>
+#import "FSNIconsView.h"
 
 @class GWViewersManager;
 
@@ -40,4 +38,3 @@
 
 @end
 
-#endif // GW_VIEWER_ICONS_VIEW_H

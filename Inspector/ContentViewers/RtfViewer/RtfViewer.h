@@ -1,6 +1,6 @@
 /* RtfViewer.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
@@ -22,12 +22,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#ifndef RTFVIEWER_H
-#define RTFVIEWER_H
+#import <Foundation/Foundation.h>
+#import <AppKit/NSView.h>
 
-#include <Foundation/Foundation.h>
-#include <AppKit/NSView.h>
-#include "ContentViewersProtocol.h"
+#import "ContentViewersProtocol.h"
 
 @class NSTextView;
 @class NSScrollView;
@@ -62,4 +60,3 @@
 
 @end
 
-#endif // RTFVIEWER_H

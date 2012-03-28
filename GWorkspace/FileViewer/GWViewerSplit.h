@@ -1,6 +1,6 @@
 /* GWViewerSplit.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2004
@@ -22,10 +22,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#ifndef GW_VIEWER_SPLIT_H
-#define GW_VIEWER_SPLIT_H
+#
 
-#include <AppKit/NSSplitView.h>
+#import <AppKit/NSSplitView.h>
 
 @class NSString;
 @class NSMutableArray;
@@ -41,5 +40,3 @@
 - (void)updateDiskSpaceInfo:(NSString *)info;
 
 @end
-
-#endif // GW_VIEWER_SPLIT_H
