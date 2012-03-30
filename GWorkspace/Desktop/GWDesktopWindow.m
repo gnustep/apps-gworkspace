@@ -1,6 +1,6 @@
 /* GWDesktopWindow.m
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -22,9 +22,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "GWDesktopWindow.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+
+#import "GWDesktopWindow.h"
 
 @implementation GWDesktopWindow
 
@@ -35,18 +36,18 @@
 
 - (id)init
 {	
-	self = [super initWithContentRect: [[NSScreen mainScreen] frame]
+  self = [super initWithContentRect: [[NSScreen mainScreen] frame]
                           styleMask: NSBorderlessWindowMask
-				  						      backing: NSBackingStoreBuffered
+			    backing: NSBackingStoreBuffered
                               defer: NO];
-	if (self) {
+  if (self) {
     [self setReleasedWhenClosed: NO];
     [self setExcludedFromWindowsMenu: YES];
     [self setAcceptsMouseMovedEvents: YES];
     [self setCanHide: NO];
-	}
+  }
   
-	return self;
+  return self;
 }
 
 - (void)activate

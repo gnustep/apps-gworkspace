@@ -1,6 +1,6 @@
 /* GWDesktopWindow.h
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -22,10 +22,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#ifndef GW_DESKTOP_WINDOW
-#define GW_DESKTOP_WINDOW
 
-#include <AppKit/NSWindow.h>
+
+#import <AppKit/NSWindow.h>
 
 @interface GWDesktopWindow : NSWindow
 {
@@ -81,4 +80,3 @@
 
 @end
 
-#endif // GW_DESKTOP_WINDOW
