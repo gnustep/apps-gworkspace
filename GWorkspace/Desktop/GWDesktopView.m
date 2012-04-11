@@ -929,13 +929,10 @@ static void GWHighlightFrameRect(NSRect aRect)
     {
       NSSize imsize = [backImage size];
       
-      if ((imsize.width >= screenFrame.size.width)
-	  || (imsize.height >= screenFrame.size.height))
+      if ((imsize.width >= screenFrame.size.width) || (imsize.height >= screenFrame.size.height))
 	{
 	  if (backImageStyle == BackImageTileStyle)
-	    {  
-	      backImageStyle = BackImageCenterStyle;
-	    }
+	    backImageStyle = BackImageCenterStyle;
 	}
       
       if (backImageStyle == BackImageFitStyle)
@@ -964,11 +961,46 @@ static void GWHighlightFrameRect(NSRect aRect)
 		}
 	    }
 	}
+      else if (backImageStyle == BackImageScaleStyle)
+	{
+	  float imRatio;
+	  float screenRatio;
+	  float scale;
+	  NSPoint imagePoint;
+
+	  imRatio = imsize.width / imsize.height;
+	  screenRatio = screenFrame.size.width / screenFrame.size.height;
+
+	  if (imRatio > screenRatio)
+	    {
+	      /* image is wider in aspect than screen */
+	      NSLog(@"wider");
+	      scale = imsize.width / screenFrame.size.width;
+	      imagePoint = NSMakePoint(0, (screenFrame.size.height - imsize.height/scale) / 2);
+	    }
+	  else
+	    {
+	      /* image is taller in aspect than screen */
+	      NSLog(@"taller");
+	      scale = imsize.height / screenFrame.size.height;
+	      imagePoint = NSMakePoint((screenFrame.size.width - imsize.width/scale) / 2, 0);
+	    }
+	  if (imsize.width >= screenFrame.size.width)
+	    {
+	    }
+	  NSLog(@"scale %f", scale);
+	  [backImage drawInRect: NSMakeRect(imagePoint.x, imagePoint.y, imsize.width / scale, imsize.height / scale)
+		       fromRect: NSZeroRect
+		      operation: NSCompositeSourceOver
+		       fraction: 1.0
+		 respectFlipped: YES
+			  hints: nil];
+
+	}
       else
 	{
 	  NSPoint imagePoint;
-	  imagePoint.x = ((screenFrame.size.width - imsize.width) / 2);
-	  imagePoint.y = ((screenFrame.size.height - imsize.height) / 2);
+	  imagePoint = NSMakePoint((screenFrame.size.width - imsize.width) / 2, (screenFrame.size.height - imsize.height) / 2);
 
 	  [backImage compositeToPoint: imagePoint
 			    operation: NSCompositeSourceOver];
@@ -1451,18 +1483,18 @@ static void GWHighlightFrameRect(NSRect aRect)
 
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
-	NSPasteboard *pb;
+  NSPasteboard *pb;
   NSDragOperation sourceDragMask;
-	NSArray *sourcePaths;
+  NSArray *sourcePaths;
   NSString *basePath;
   NSString *nodePath;
   NSString *prePath;
-	int count;
+  int count;
   int i;
   
-	isDragTarget = NO;	
-    
- 	pb = [sender draggingPasteboard];
+  isDragTarget = NO;	
+	
+  pb = [sender draggingPasteboard];
 
   if (pb && [[pb types] containsObject: NSFilenamesPboardType]) {
     sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 

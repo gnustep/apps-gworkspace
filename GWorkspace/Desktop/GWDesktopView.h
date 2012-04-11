@@ -1,6 +1,6 @@
 /* GWDesktopView.h
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -22,10 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#ifndef GW_DESKTOP_VIEW
-#define GW_DESKTOP_VIEW
-
-#include "FSNIconsView.h"
+#import "FSNIconsView.h"
 
 @class NSImage;
 @class GWDesktopManager;
@@ -33,7 +30,8 @@
 typedef enum BackImageStyle {
   BackImageCenterStyle = 0,
   BackImageFitStyle = 1,
-  BackImageTileStyle = 2
+  BackImageTileStyle = 2,
+  BackImageScaleStyle = 3
 } BackImageStyle;
 
 
@@ -44,10 +42,10 @@ typedef enum BackImageStyle {
   int gridcount;
   int rowcount;
 
-	NSImage *dragIcon;
+  NSImage *dragIcon;
   NSPoint dragPoint;
   int insertIndex;
-	BOOL dragLocalIcon;
+  BOOL dragLocalIcon;
   
   NSImage *backImage;
   NSString *imagePath;
@@ -144,5 +142,3 @@ typedef enum BackImageStyle {
 - (void)setBackImageStyle:(BackImageStyle)style;
 
 @end
-
-#endif // GW_DESKTOP_VIEW

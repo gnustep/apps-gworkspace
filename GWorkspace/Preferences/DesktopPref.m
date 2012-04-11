@@ -1,6 +1,6 @@
 /* DesktopPref.m
  *  
- * Copyright (C) 2005-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -53,7 +53,8 @@ static NSString *nibName = @"DesktopPref";
     if ([NSBundle loadNibNamed: nibName owner: self] == NO)
     {
       NSLog(@"failed to load %@!", nibName);
-    } else
+    }
+    else
     {
       NSString *impath;
       DockPosition dockpos;
@@ -125,6 +126,8 @@ static NSString *nibName = @"DesktopPref";
       [cell setTitle: NSLocalizedString(@"fit", @"")];
       cell = [imagePosMatrix cellAtRow: BackImageTileStyle column: 0];
       [cell setTitle: NSLocalizedString(@"tile", @"")];
+      cell = [imagePosMatrix cellAtRow: BackImageScaleStyle column: 0];
+      [cell setTitle: NSLocalizedString(@"scale", @"")];
       [useImageSwitch setTitle: NSLocalizedString(@"Use image", @"")];  
       [chooseImageButt setTitle: NSLocalizedString(@"Choose", @"")]; 
 

@@ -1,3 +1,11 @@
+2012-04-11 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/Preferences/DesktopPref.m
+	* GWorkspace/Desktop/GWDesktopView.h
+	* GWorkspace/Desktop/GWDesktopView.m
+	* GWorkspace/Resources/English.lproj/DesktopPref.gorm
+	New desktop background style, uniform scale
+
 2012-03-28 Riccardo Mottola
 
 	* GWorkspace/FileViewer/GWViewerIconsView.m
