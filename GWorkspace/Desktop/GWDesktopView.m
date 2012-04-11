@@ -974,21 +974,15 @@ static void GWHighlightFrameRect(NSRect aRect)
 	  if (imRatio > screenRatio)
 	    {
 	      /* image is wider in aspect than screen */
-	      NSLog(@"wider");
 	      scale = imsize.width / screenFrame.size.width;
 	      imagePoint = NSMakePoint(0, (screenFrame.size.height - imsize.height/scale) / 2);
 	    }
 	  else
 	    {
 	      /* image is taller in aspect than screen */
-	      NSLog(@"taller");
 	      scale = imsize.height / screenFrame.size.height;
 	      imagePoint = NSMakePoint((screenFrame.size.width - imsize.width/scale) / 2, 0);
 	    }
-	  if (imsize.width >= screenFrame.size.width)
-	    {
-	    }
-	  NSLog(@"scale %f", scale);
 	  [backImage drawInRect: NSMakeRect(imagePoint.x, imagePoint.y, imsize.width / scale, imsize.height / scale)
 		       fromRect: NSZeroRect
 		      operation: NSCompositeSourceOver
