@@ -318,3 +318,28 @@
 "Empty Recycler" = "Empty Recycler";
 "Empty the Recycler?" = "Empty the Recycler?";
 "Put Away" = "Put Away";
+
+/* DesktopPref.m */
+"Background"="Background";
+"General"="General";
+
+"center" = "Center";
+"fit" = "Fit";
+"tile" = "Tile";
+"scale" = "Scale";
+
+"Use image"="Use image";
+"Choose"="Choose";
+
+"Show Dock"="Show Dock";
+"Dock position:"="Dock position:";
+
+"Left"="Left";
+"Right"="Right";
+
+"Dock style:"="Dock style:";
+
+"Classic"="Classic";
+"Modern"="Modern";
+
+"Autohide Tabbed Shelf"="Autohide Tabbed Shelf";
