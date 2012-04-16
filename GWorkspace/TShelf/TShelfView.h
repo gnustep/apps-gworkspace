@@ -56,7 +56,7 @@
 
 - (void)selectTabItem:(TShelfViewItem *)item;
 
-- (void)selectTabItemAtIndex:(int)index;
+- (void)selectTabItemAtIndex:(NSUInteger)index;
 
 - (void)selectLastItem;
 
