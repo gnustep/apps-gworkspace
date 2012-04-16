@@ -1,8 +1,9 @@
 /* TShelfView.m
  *  
- * Copyright (C) 2003-20102Free Software Foundation, Inc.
+ * Copyright (C) 2003-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
+ *         Riccardo Mottola <rm@gnu.org>
  * Date: August 2001
  *
  * This file is part of the GNUstep GWorkspace application
@@ -300,7 +301,7 @@ void drawRightTabBezier(NSPoint origin, float tabh,
   NSRect aRect = [self bounds];
   NSPoint p = aRect.origin;
   NSSize s = aRect.size;
-  int count;  
+  NSUInteger count;  
   int itemxspace;
   NSImage *backImage;
   NSColor *scolor;
