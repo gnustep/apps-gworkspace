@@ -1,6 +1,6 @@
 /* TShelfView.m
  *  
- * Copyright (C) 2003-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2003-20102Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -25,10 +25,10 @@
 #import <AppKit/AppKit.h>
 #import <GNUstepBase/GNUstep.h>
 
-#include "TShelfView.h"
-#include "TShelfViewItem.h"
-#include "TShelfIconsView.h"
-#include "GWorkspace.h"
+#import "TShelfView.h"
+#import "TShelfViewItem.h"
+#import "TShelfIconsView.h"
+#import "GWorkspace.h"
 
 
 #define SPECIAL_TAB_W 54
@@ -108,7 +108,7 @@
 }
 
 - (BOOL)insertTabItem:(TShelfViewItem *)item
-		          atIndex:(int)index
+		          atIndex:(NSUInteger)index
 {
   if (lastItem) {
     if (index == [items count]) {
@@ -154,7 +154,7 @@
   return YES;
 }
 
-- (int)indexOfItem:(TShelfViewItem *)item
+- (NSUInteger)indexOfItem:(TShelfViewItem *)item
 {
   return [items indexOfObject: item];
 }

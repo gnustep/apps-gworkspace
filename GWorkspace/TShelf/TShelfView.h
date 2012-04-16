@@ -1,6 +1,6 @@
 /* TShelfView.h
  *  
- * Copyright (C) 2003 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -25,7 +25,7 @@
 #ifndef TABBED_SHELF_VIEW_H
 #define TABBED_SHELF_VIEW_H
  
-#include <AppKit/NSView.h>
+#import <AppKit/NSView.h>
 
 @class NSFont;
 @class NSImage;
@@ -39,20 +39,20 @@
   NSFont *font;
   NSFont *italicFont;
   TShelfViewItem *selected;
-  int selectedItem;
+  NSUInteger selectedItem;
   NSButton *ffButt, *rewButt;
 }
 
 - (void)addTabItem:(TShelfViewItem *)item;
 
 - (BOOL)insertTabItem:(TShelfViewItem *)item
-		          atIndex:(int)index;
+		          atIndex:(NSUInteger)index;
 
 - (void)setLastTabItem:(TShelfViewItem *)item;
                   
 - (BOOL)removeTabItem:(TShelfViewItem *)item;
 
-- (int)indexOfItem:(TShelfViewItem *)item;
+- (NSUInteger)indexOfItem:(TShelfViewItem *)item;
 
 - (void)selectTabItem:(TShelfViewItem *)item;
 

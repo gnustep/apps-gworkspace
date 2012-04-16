@@ -11,6 +11,10 @@
 	* GWMetadata/MDKit/MDKQuery.m
 	Change indexes to NSUInteger and other minor cleanups.
 
+	* GWorkspace/TShelf/TShelfView.m
+	* GWorkspace/TShelf/TShelfView.h
+	NSUInteger for indexes.
+
 2012-04-11 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/Preferences/DesktopPref.m
