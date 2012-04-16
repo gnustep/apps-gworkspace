@@ -67,7 +67,7 @@
     r.origin.x = rect.size.width - (BUTTSZ * 2 + BUTTSPACE);
                   
     rewButt = [[NSButton alloc] initWithFrame: r];
-		[rewButt setButtonType: NSMomentaryLight];    
+    [rewButt setButtonType: NSMomentaryLight];    
     [rewButt setBordered: NO];    
     [rewButt setTarget: self];
     [rewButt setAction: @selector (buttonsAction:)];
@@ -77,7 +77,7 @@
     r.origin.x += BUTTSPACE;
     
     ffButt = [[NSButton alloc] initWithFrame: r];
-		[ffButt setButtonType: NSMomentaryLight];    
+    [ffButt setButtonType: NSMomentaryLight];    
     [ffButt setBordered: NO];    
     [ffButt setTarget: self];
     [ffButt setAction: @selector (buttonsAction:)];
@@ -108,7 +108,7 @@
 }
 
 - (BOOL)insertTabItem:(TShelfViewItem *)item
-		          atIndex:(NSUInteger)index
+	      atIndex:(NSUInteger)index
 {
   if (lastItem) {
     if (index == [items count]) {
@@ -210,20 +210,17 @@
   [self setNeedsDisplay: YES]; 
 }
 
-- (void)selectTabItemAtIndex:(int)index
+- (void)selectTabItemAtIndex:(NSUInteger)index
 {
-  if (index < 0) {
-    [self selectTabItem: nil];
-  } else {
-    [self selectTabItem: [items objectAtIndex: index]];
-  }
+  [self selectTabItem: [items objectAtIndex: index]];
 }
 
 - (void)selectLastItem
 {
-  if (lastItem) {
-    [self selectTabItem: lastItem];
-  }
+  if (lastItem)
+    {
+      [self selectTabItem: lastItem];
+    }
 }
 
 - (NSFont *)font
@@ -247,7 +244,7 @@
 }
 
 void drawLeftTabBezier(NSPoint origin, float tabh, 
-                                NSColor *sc, NSColor *fc, BOOL seltab)
+		       NSColor *sc, NSColor *fc, BOOL seltab)
 {
   NSBezierPath *path = [NSBezierPath bezierPath];
   NSPoint endp = NSMakePoint(origin.x + BEZ_TAB_W, origin.y + tabh);
@@ -273,7 +270,7 @@ void drawLeftTabBezier(NSPoint origin, float tabh,
 }
 
 void drawRightTabBezier(NSPoint origin, float tabh, 
-                                 NSColor *sc, NSColor *fc, BOOL seltab)
+			NSColor *sc, NSColor *fc, BOOL seltab)
 {
   NSBezierPath *path = [NSBezierPath bezierPath];
   NSPoint endp = NSMakePoint(origin.x - BEZ_TAB_W, origin.y + tabh);
@@ -313,9 +310,8 @@ void drawRightTabBezier(NSPoint origin, float tabh,
   int i;
   NSPoint ipoint;
   
-  if (backImage) {  
+  if (backImage)
     [backImage compositeToPoint: NSZeroPoint operation: NSCompositeSourceOver];
-  }
   
   [[NSColor controlColor] set];
   NSRectFill(NSMakeRect(p.x, p.y, s.width, s.height - TAB_H));
@@ -330,42 +326,49 @@ void drawRightTabBezier(NSPoint origin, float tabh,
   aRect.size.height -= TAB_H;
   
   ipoint = NSMakePoint (0,0);
-  for (i = count - 1; i >= 0; i--) {
-	  TShelfViewItem *anItem = [items objectAtIndex: i];
-	  NSRect r;
+  for (i = count - 1; i >= 0; i--)
+    {
+      TShelfViewItem *anItem = [items objectAtIndex: i];
+      NSRect r;
     
-	  if (i == (count - 1)) {
-	    ipoint.x = (int)(aRect.size.width - SPECIAL_TAB_W);
-	    ipoint.y = aRect.size.height;
+      if (i == (count - 1))
+	{
+	  ipoint.x = (int)(aRect.size.width - SPECIAL_TAB_W);
+	  ipoint.y = aRect.size.height;
+	  
+	  if ([anItem tabState] == NSSelectedTab)
+	    {
+	      selp[0] = ipoint;
+	      fcolor = [NSColor controlColor];
+	    } 
+	  else
+	    {
+	      fcolor = [NSColor controlBackgroundColor];
+	    }
       
-      if ([anItem tabState] == NSSelectedTab) {
-        selp[0] = ipoint;
-        fcolor = [NSColor controlColor];
-      } else {
-        fcolor = [NSColor controlBackgroundColor];
-      }
+	  scolor = [NSColor whiteColor];
       
-      scolor = [NSColor whiteColor];
-      
-      drawLeftTabBezier(ipoint, TAB_H, scolor, fcolor, NO);
+	  drawLeftTabBezier(ipoint, TAB_H, scolor, fcolor, NO);
 
-	    r.origin.x = ipoint.x + LAB_MARGIN;
-	    r.origin.y = aRect.size.height;
-	    r.size.width = SPECIAL_TAB_W - LAB_MARGIN;
-	    r.size.height = TAB_H -1;
+	  r.origin.x = ipoint.x + LAB_MARGIN;
+	  r.origin.y = aRect.size.height;
+	  r.size.width = SPECIAL_TAB_W - LAB_MARGIN;
+	  r.size.height = TAB_H -1;
       
-      bpath = [NSBezierPath bezierPath];
-      [bpath setLineWidth: 1];
-      [bpath moveToPoint: NSMakePoint(r.origin.x, r.origin.y + TAB_H)];
-      [bpath relativeLineToPoint: NSMakePoint(r.size.width, 0)];
-      [scolor set];
-      [bpath stroke];
-      
-      [anItem drawImage: nil inRect: r];
+	  bpath = [NSBezierPath bezierPath];
+	  [bpath setLineWidth: 1];
+	  [bpath moveToPoint: NSMakePoint(r.origin.x, r.origin.y + TAB_H)];
+	  [bpath relativeLineToPoint: NSMakePoint(r.size.width, 0)];
+	  [scolor set];
+	  [bpath stroke];
+	  
+	  [anItem drawImage: nil inRect: r];
 
-	  } else {
-	    ipoint.y = aRect.size.height;
-
+	  }
+      else
+	{
+	  ipoint.y = aRect.size.height;
+	  
       if ([anItem tabState] == NSSelectedTab) {
         selp[1] = NSMakePoint(ipoint.x + BEZ_TAB_W, ipoint.y);
         fcolor = [NSColor controlColor];
