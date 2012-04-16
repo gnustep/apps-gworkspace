@@ -25,8 +25,8 @@
 #ifndef LS_FOLDER_H
 #define LS_FOLDER_H
 
-#include <Foundation/Foundation.h>
-#include "FSNodeRep.h"
+#import <Foundation/Foundation.h>
+#import "FSNodeRep.h"
 
 @class NSWindow;
 @class NSView;
@@ -186,7 +186,7 @@
 @interface ProgrView : NSView 
 {
   NSMutableArray *images;
-  int index;
+  unsigned index;
   float rfsh;
   NSTimer *progTimer;
   BOOL animating;

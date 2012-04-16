@@ -1,6 +1,6 @@
 /* DBKBTreeNode.m
  *  
- * Copyright (C) 2005-2011 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2005
@@ -22,8 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include "DBKBTreeNode.h"
-#include "DBKBTree.h"
+#import "DBKBTreeNode.h"
+#import "DBKBTree.h"
 
 @implementation	DBKBTreeNode
 
@@ -109,7 +109,7 @@
   unsigned datalen;
   unsigned offscount;
   NSArray *array;
-  int i;
+  NSUInteger i;
       
   array = [tree keysFromData: ndata withLength: &datalen];           
   [keys addObjectsFromArray: array];
@@ -145,8 +145,8 @@
 - (NSData *)nodeData
 {
   NSMutableData *nodeData = [NSMutableData dataWithCapacity: 1];
-  unsigned subcount;
-  int i;
+  NSUInteger subcount;
+  NSUInteger i;
   
   [nodeData appendData: [tree dataFromKeys: keys]];
 
@@ -189,7 +189,7 @@
 }
 
 - (void)insertKey:(id)key 
-          atIndex:(int)index
+          atIndex:(NSUInteger)index
 {
   [keys insertObject: key atIndex: index];
   [self save];
@@ -202,9 +202,9 @@
   int ins = 0;
 
   if (count) {
-    int first = 0;
-    int last = count;
-    int pos = 0; 
+    NSUInteger first = 0;
+    NSUInteger last = count;
+    NSUInteger pos = 0; 
     id k;
     NSComparisonResult result;
 
@@ -239,17 +239,17 @@
   return YES;
 }
 
-- (int)indexForKey:(id)key
+- (NSUInteger)indexForKey:(id)key
           existing:(BOOL *)exists
 {
   CREATE_AUTORELEASE_POOL(arp);
-  unsigned count = [keys count]; 
-  int ins = 0;
+  NSUInteger count = [keys count]; 
+  NSUInteger ins = 0;
 
   if (count) {
-    int first = 0;
-    int last = count;
-    int pos = 0; 
+    NSUInteger first = 0;
+    NSUInteger last = count;
+    NSUInteger pos = 0; 
     id k;
     NSComparisonResult result;
 
@@ -282,12 +282,12 @@
   return ins;  
 }
 
-- (int)indexOfKey:(id)key
+- (NSUInteger)indexOfKey:(id)key
 {
   return [keys indexOfObject: key];
 }
 
-- (id)keyAtIndex:(int)index
+- (id)keyAtIndex:(NSUInteger)index
 {
   return [keys objectAtIndex: index];
 }
@@ -311,13 +311,13 @@
   [self save];
 }
 
-- (void)removeKeyAtIndex:(int)index
+- (void)removeKeyAtIndex:(NSUInteger)index
 {
   [keys removeObjectAtIndex: index];
   [self save];
 }
 
-- (void)replaceKeyAtIndex:(int)index
+- (void)replaceKeyAtIndex:(NSUInteger)index
                   withKey:(id)key
 {
   [keys replaceObjectAtIndex: index withObject: key];
@@ -327,7 +327,7 @@
 - (void)replaceKey:(id)key
            withKey:(id)newkey
 {
-  int index = [self indexOfKey: key];
+  NSUInteger index = [self indexOfKey: key];
   
   if (index != NSNotFound) {
     [keys replaceObjectAtIndex: index withObject: newkey];
@@ -394,7 +394,7 @@
 - (id)successorKeyInNode:(DBKBTreeNode **)node
                   forKey:(id)key
 {
-  int index;
+  NSUInteger index;
   
   if (loaded == NO) {
     [self loadNodeData];
@@ -410,12 +410,12 @@
 }
 
 - (id)successorKeyInNode:(DBKBTreeNode **)node
-           forKeyAtIndex:(int)index
+           forKeyAtIndex:(NSUInteger)index
 {
   DBKBTreeNode *nextNode = nil;
   DBKBTreeNode *nextParent = nil;
   id key = nil;
-  int pos;
+  NSUInteger pos;
 
   if (loaded == NO) {
     [self loadNodeData];
@@ -470,7 +470,7 @@
 - (id)predecessorKeyInNode:(DBKBTreeNode **)node
                     forKey:(id)key
 {
-  int index;
+  NSUInteger index;
   
   if (loaded == NO) {
     [self loadNodeData];
@@ -486,12 +486,12 @@
 }
 
 - (id)predecessorKeyInNode:(DBKBTreeNode **)node
-             forKeyAtIndex:(int)index
+             forKeyAtIndex:(NSUInteger)index
 {
   DBKBTreeNode *nextNode = nil;
   DBKBTreeNode *nextParent = nil;
   id key = nil;
-  int pos;
+  NSUInteger pos;
 
   if (loaded == NO) {
     [self loadNodeData];
@@ -544,7 +544,7 @@
 }
 
 - (void)insertSubnode:(DBKBTreeNode *)node 
-              atIndex:(int)index
+              atIndex:(NSUInteger)index
 {
   [node setParent: self];
   [subnodes insertObject: node atIndex: index];
@@ -564,13 +564,13 @@
   [self save];
 }
 
-- (void)removeSubnodeAtIndex:(int)index
+- (void)removeSubnodeAtIndex:(NSUInteger)index
 {
   [subnodes removeObjectAtIndex: index];
   [self save];
 }
 
-- (void)replaceSubnodeAtIndex:(int)index
+- (void)replaceSubnodeAtIndex:(NSUInteger)index
                      withNode:(DBKBTreeNode *)node
 {
   [node setParent: self];
@@ -578,31 +578,31 @@
   [self save];
 }
 
-- (int)indexOfSubnode:(DBKBTreeNode *)node
+- (NSUInteger)indexOfSubnode:(DBKBTreeNode *)node
 {
   return [subnodes indexOfObject: node];
 }
 
-- (DBKBTreeNode *)subnodeAtIndex:(int)index
+- (DBKBTreeNode *)subnodeAtIndex:(NSUInteger)index
 {
   return [subnodes objectAtIndex: index];
 }
 
 - (BOOL)isFirstSubnode:(DBKBTreeNode *)node
 {
-  int index = [self indexOfSubnode: node];
+  NSUInteger index = [self indexOfSubnode: node];
   return ((index != NSNotFound) && (index == 0));
 }
 
 - (BOOL)isLastSubnode:(DBKBTreeNode *)node
 {
-  int index = [self indexOfSubnode: node];
+  NSUInteger index = [self indexOfSubnode: node];
   return ((index != NSNotFound) && (index == ([subnodes count] - 1)));
 }
 
 - (void)setSubnodes:(NSArray *)nodes
 {
-  int i;
+  NSUInteger i;
   
   [subnodes removeAllObjects];
   
@@ -621,7 +621,7 @@
 - (DBKBTreeNode *)leftSibling
 {
   if (parent) {
-    int index = [parent indexOfSubnode: self];
+    NSUInteger index = [parent indexOfSubnode: self];
 
     if (index > 0) {
       return [[parent subnodes] objectAtIndex: (index - 1)];
@@ -635,7 +635,7 @@
 {
   if (parent) {
     NSArray *pnodes = [parent subnodes];
-    int index = [parent indexOfSubnode: self];
+    NSUInteger index = [parent indexOfSubnode: self];
 
     if (index < ([pnodes count] - 1)) {
       return [pnodes objectAtIndex: (index + 1)];
@@ -645,15 +645,15 @@
   return nil;
 }
 
-- (void)splitSubnodeAtIndex:(int)index
+- (void)splitSubnodeAtIndex:(NSUInteger)index
 {
-  CREATE_AUTORELEASE_POOL(arp);
   DBKBTreeNode *subnode;
   DBKBTreeNode *newnode;
   NSArray *subkeys;
   NSArray *akeys;
   id key;
   NSArray *bkeys;
+  CREATE_AUTORELEASE_POOL(arp);
 
   subnode = [subnodes objectAtIndex: index];
 
@@ -701,13 +701,13 @@
   if (parent) {
     CREATE_AUTORELEASE_POOL(arp);
     DBKBTreeNode *lftnd;
-    int lcount = 0;
+    unsigned lcount = 0;
     DBKBTreeNode *rgtnd;
-    int rcount = 0;
+    unsigned rcount = 0;
     DBKBTreeNode *node;
     NSArray *ndkeys;
-    int index;
-    int i;
+    NSUInteger index;
+    NSUInteger i;
 
     lftnd = [self leftSibling];
     
@@ -781,7 +781,7 @@
 - (void)borrowFromRightSibling:(DBKBTreeNode *)sibling  
 {
   CREATE_AUTORELEASE_POOL(arp);
-  int index = [parent indexOfSubnode: self];
+  NSUInteger index = [parent indexOfSubnode: self];
 
   if ([sibling isLoaded] == NO) {
     [sibling loadNodeData];
@@ -809,9 +809,9 @@
 - (void)borrowFromLeftSibling:(DBKBTreeNode *)sibling 
 {  
   CREATE_AUTORELEASE_POOL(arp);
-  int index;
+  NSUInteger index;
   NSArray *lftkeys;
-  int lftkcount;
+  unsigned lftkcount;
 
   if ([sibling isLoaded] == NO) {
     [sibling loadNodeData];
@@ -825,7 +825,7 @@
 
   if ([sibling isLeaf] == NO) {  
     NSArray *lftnodes = [sibling subnodes];
-    int lftncount = [lftnodes count];
+    unsigned lftncount = [lftnodes count];
 
     [self insertSubnode: [lftnodes objectAtIndex: (lftncount - 1)] 
                 atIndex: 0];
@@ -860,20 +860,4 @@
 }
 
 @end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

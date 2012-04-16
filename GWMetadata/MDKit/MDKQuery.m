@@ -1751,7 +1751,7 @@ enum {
   NSMutableArray *scores = [dict objectForKey: @"scores"];
   
   if ([self isUpdating]) {
-    unsigned index = [nodes indexOfObject: node];
+    NSUInteger index = [nodes indexOfObject: node];
   
     if (index != NSNotFound) {
       [nodes removeObjectAtIndex: index];
@@ -1804,8 +1804,8 @@ enum {
 {
   CREATE_AUTORELEASE_POOL(arp);
   NSMutableArray *catnames = [NSMutableArray array];
-  unsigned index;    
-  unsigned i;
+  NSUInteger index;    
+  NSUInteger i;
   
   index = 0;
   for (i = 0; i < [paths count]; i++) {
@@ -1866,7 +1866,7 @@ enum {
   NSDictionary *catdict;
   NSMutableArray *catnodes;
   NSMutableArray *catscores;
-  unsigned index;
+  NSUInteger index;
 
   if ([node isValid]) {
     catname = [qmanager categoryNameForNode: node];
@@ -1877,7 +1877,7 @@ enum {
     index = [catnodes indexOfObject: node];
 
   } else {
-    unsigned i;
+    NSUInteger i;
 
     for (i = 0; i < [categoryNames count]; i++) {
       catname = [categoryNames objectAtIndex: i];

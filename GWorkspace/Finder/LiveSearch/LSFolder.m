@@ -1,6 +1,6 @@
 /* LSFolder.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: October 2004
@@ -22,9 +22,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
+#include <math.h>
+
 #import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
-#import <math.h>
+
 #import "LSFolder.h"
 #import "ResultsTableView.h"
 #import "FSNTextCell.h"
@@ -788,7 +790,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 - (void)selectObjects:(NSArray *)objects
 {
   NSMutableIndexSet *set = [NSMutableIndexSet indexSet];
-  unsigned int i;
+  NSUInteger i;
 
   for (i = 0; i < [foundObjects count]; i++) {
     FSNode *nd = [foundObjects objectAtIndex: i];
@@ -858,7 +860,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   NSString *destination = [info objectForKey: @"destination"];
   NSArray *files = [info objectForKey: @"files"];
   NSMutableArray *deletedObjects = [NSMutableArray array];
-  int i, j;
+  NSUInteger i, j;
 
   if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
     files = [NSArray arrayWithObject: [destination lastPathComponent]];
@@ -974,7 +976,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 {
   NSMutableArray *paths = [NSMutableArray array];
   NSMutableArray *parentPaths = [NSMutableArray array];
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [rows count]; i++) {
     int index = [[rows objectAtIndex: i] intValue];
@@ -1057,7 +1059,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
     
     if ([selected count]) {
       id nd = [selected objectAtIndex: 0];
-      int index = [foundObjects indexOfObjectIdenticalTo: nd];
+      NSUInteger index = [foundObjects indexOfObjectIdenticalTo: nd];
       
       [self selectObjects: selected];
       
@@ -1077,7 +1079,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   if ([dragRows count] > 1) {
     return [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: 24];
   } else {
-    int index = [[dragRows objectAtIndex: 0] intValue];
+    NSUInteger index = [[dragRows objectAtIndex: 0] unsignedIntegerValue];
     FSNode *nd = [foundObjects objectAtIndex: index];
     
     return [[FSNodeRep sharedInstance] iconOfSize: 24 forNode: nd];
@@ -1105,7 +1107,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   self = [super initWithFrame: frameRect];
 
   if (self) {
-    int i;
+    unsigned i;
   
     images = [NSMutableArray new];
   

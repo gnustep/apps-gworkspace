@@ -1,6 +1,6 @@
 /* DBKBTree.h
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2005
@@ -25,7 +25,7 @@
 #ifndef DBK_BTREE_H
 #define DBK_BTREE_H
 
-#include <Foundation/Foundation.h>
+#import <Foundation/Foundation.h>
 
 @class DBKBTreeNode;
 @class DBKFreeNodesPage;
@@ -84,10 +84,10 @@ extern NSRecursiveLock *dbkbtree_lock;
                      inNode:(DBKBTreeNode *)node;
 
 - (DBKBTreeNode *)nodeOfKey:(id)key
-                   getIndex:(int *)index;
+                   getIndex:(NSUInteger *)index;
 
 - (DBKBTreeNode *)nodeOfKey:(id)key
-                   getIndex:(int *)index
+                   getIndex:(NSUInteger *)index
                    didExist:(BOOL *)exists;
 
 - (DBKBTreeNode *)nodeOfKey:(id)key;
@@ -101,7 +101,7 @@ extern NSRecursiveLock *dbkbtree_lock;
 - (BOOL)deleteKey:(id)key;
 
 - (BOOL)deleteKey:(id)key
-          atIndex:(int)index
+          atIndex:(NSUInteger)index
            ofNode:(DBKBTreeNode *)node;
 
 - (NSNumber *)offsetForNewNode;

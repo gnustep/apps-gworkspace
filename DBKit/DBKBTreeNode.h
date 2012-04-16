@@ -78,16 +78,16 @@
 - (void)setParent:(DBKBTreeNode *)anode;
 
 - (void)insertKey:(id)key 
-          atIndex:(int)index;
+          atIndex:(NSUInteger)index;
 
 - (BOOL)insertKey:(id)key;
 
-- (int)indexForKey:(id)key
+- (NSUInteger)indexForKey:(id)key
           existing:(BOOL *)exists;
 
-- (int)indexOfKey:(id)key;
+- (NSUInteger)indexOfKey:(id)key;
 
-- (id)keyAtIndex:(int)index; 
+- (id)keyAtIndex:(NSUInteger)index; 
 
 - (void)setKeys:(NSArray *)newkeys;
 
@@ -95,9 +95,9 @@
 
 - (void)removeKey:(id)key;
 
-- (void)removeKeyAtIndex:(int)index;
+- (void)removeKeyAtIndex:(NSUInteger)index;
 
-- (void)replaceKeyAtIndex:(int)index
+- (void)replaceKeyAtIndex:(NSUInteger)index
                   withKey:(id)key;
 
 - (void)replaceKey:(id)key
@@ -113,29 +113,29 @@
                   forKey:(id)key;
 
 - (id)successorKeyInNode:(DBKBTreeNode **)node
-           forKeyAtIndex:(int)index;
+           forKeyAtIndex:(NSUInteger)index;
 
 - (id)predecessorKeyInNode:(DBKBTreeNode **)node
                     forKey:(id)key;
            
 - (id)predecessorKeyInNode:(DBKBTreeNode **)node
-             forKeyAtIndex:(int)index;
+             forKeyAtIndex:(NSUInteger)index;
 
 - (void)insertSubnode:(DBKBTreeNode *)node 
-              atIndex:(int)index;
+              atIndex:(NSUInteger)index;
            
 - (void)addSubnode:(DBKBTreeNode *)node;
            
 - (void)removeSubnode:(DBKBTreeNode *)node;
            
-- (void)removeSubnodeAtIndex:(int)index;
+- (void)removeSubnodeAtIndex:(NSUInteger)index;
            
-- (void)replaceSubnodeAtIndex:(int)index
+- (void)replaceSubnodeAtIndex:(NSUInteger)index
                      withNode:(DBKBTreeNode *)node;           
            
-- (int)indexOfSubnode:(DBKBTreeNode *)node;
+- (NSUInteger)indexOfSubnode:(DBKBTreeNode *)node;
 
-- (DBKBTreeNode *)subnodeAtIndex:(int)index;
+- (DBKBTreeNode *)subnodeAtIndex:(NSUInteger)index;
 
 - (BOOL)isFirstSubnode:(DBKBTreeNode *)node;
            
@@ -149,7 +149,7 @@
 
 - (DBKBTreeNode *)rightSibling;
 
-- (void)splitSubnodeAtIndex:(int)index;
+- (void)splitSubnodeAtIndex:(NSUInteger)index;
 
 - (BOOL)mergeWithBestSibling;
 

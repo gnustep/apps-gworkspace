@@ -1,6 +1,6 @@
 /* DBKBTree.m
  *  
- * Copyright (C) 2005-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2005
@@ -218,7 +218,7 @@ NSRecursiveLock *dbkbtree_lock = nil;
   CREATE_AUTORELEASE_POOL(arp);
   BOOL autoflush = [file autoflush];
   DBKBTreeNode *insnode = nil;
-  int index;
+  NSUInteger index;
   BOOL exists;
 
   [self checkBegin];  
@@ -274,7 +274,7 @@ NSRecursiveLock *dbkbtree_lock = nil;
     } 
     
   } else {
-    int index;
+    NSUInteger index;
     BOOL exists;
      
     index = [node indexForKey: key existing: &exists];
@@ -315,7 +315,7 @@ NSRecursiveLock *dbkbtree_lock = nil;
 }
 
 - (DBKBTreeNode *)nodeOfKey:(id)key
-                   getIndex:(int *)index
+                   getIndex:(NSUInteger *)index
 {
   CREATE_AUTORELEASE_POOL(arp);
   DBKBTreeNode *node = root;
@@ -349,7 +349,7 @@ NSRecursiveLock *dbkbtree_lock = nil;
 }
 
 - (DBKBTreeNode *)nodeOfKey:(id)key
-                   getIndex:(int *)index
+                   getIndex:(NSUInteger *)index
                    didExist:(BOOL *)exists
 {
   CREATE_AUTORELEASE_POOL(arp);
@@ -387,7 +387,7 @@ NSRecursiveLock *dbkbtree_lock = nil;
 {
   DBKBTreeNode *node;
   BOOL exists;
-  int index;
+  NSUInteger index;
 
   [self checkBegin];
   node = [self nodeOfKey: key getIndex: &index didExist: &exists];
@@ -407,7 +407,7 @@ NSRecursiveLock *dbkbtree_lock = nil;
   DBKBTreeNode *node;
   id key;
   BOOL exists;
-  int index;
+  NSUInteger index;
   
   [self checkBegin];
     
@@ -455,7 +455,7 @@ NSRecursiveLock *dbkbtree_lock = nil;
 {
   DBKBTreeNode *node;
   BOOL exists;
-  int index;
+  NSUInteger index;
   
   [self checkBegin];
   
@@ -475,7 +475,7 @@ NSRecursiveLock *dbkbtree_lock = nil;
 {
   CREATE_AUTORELEASE_POOL(arp);
   DBKBTreeNode *node;
-  int index;
+  NSUInteger index;
 
   [self checkBegin];
 
@@ -523,7 +523,7 @@ NSRecursiveLock *dbkbtree_lock = nil;
 }
 
 - (BOOL)deleteKey:(id)key
-          atIndex:(int)index
+          atIndex:(NSUInteger)index
            ofNode:(DBKBTreeNode *)node
 {
   DBKBTreeNode *chknode = nil;  

@@ -1,3 +1,16 @@
+2012-04-16 Riccardo Mottola <rm@gnu.org>
+
+	* DBKit/DBKBTree.h
+	* DBKit/DBKBTree.m
+	* DBKit/DBKBTreeNode.h
+	* DBKit/DBKBTreeNode.m
+	* FSNode/FSNode.h
+	* FSNode/FSNode.m
+	* GWorkspace/Finder/LiveSearch/LSFolder.h
+	* GWorkspace/Finder/LiveSearch/LSFolder.m
+	* GWMetadata/MDKit/MDKQuery.m
+	Change indexes to NSUInteger and other minor cleanups.
+
 2012-04-11 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/Preferences/DesktopPref.m

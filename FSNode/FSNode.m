@@ -1,6 +1,6 @@
 /* FSNode.m
  *  
- * Copyright (C) 2004-2011 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -155,7 +155,7 @@
   CREATE_AUTORELEASE_POOL(arp);
   NSMutableArray *nodes = [NSMutableArray array];
   NSArray *fnames = [fsnodeRep directoryContentsAtPath: path];
-  int i;
+  NSUInteger i;
   
   for (i = 0; i < [fnames count]; i++) {
     NSString *fname = [fnames objectAtIndex: i];
@@ -182,7 +182,7 @@
   NSMutableArray *nodes = [NSMutableArray array];
   NSArray *fnames = [fsnodeRep directoryContentsAtPath: [self parentPath]];
   FSNode *pnd = nil;
-  int i;
+  NSUInteger i;
   
   if (parent != nil) {
     pnd = [parent parent];
@@ -212,7 +212,7 @@
   CREATE_AUTORELEASE_POOL(arp);
   NSArray *pcomps = [self pathComponentsToNode: anode];
   NSMutableArray *components = [NSMutableArray array];
-  int i;
+  NSUInteger i;
   
   for (i = 0; i < [pcomps count]; i++) {
     NSString *pcomp = [pcomps objectAtIndex: i];
@@ -240,11 +240,11 @@
     CREATE_AUTORELEASE_POOL(arp);
     NSString *p1 = [firstNode path];
     NSString *p2 = [secondNode path];
-    int index = ([p1 isEqual: path_separator()]) ? [p1 length] : ([p1 length] +1);
+    NSUInteger index = ([p1 isEqual: path_separator()]) ? [p1 length] : ([p1 length] +1);
     NSArray *pcomps = [[p2 substringFromIndex: index] pathComponents];
     NSMutableArray *components = [NSMutableArray array];
     FSNode *node;
-    int i;
+    NSUInteger i;
     
     node = [self nodeWithPath: p1];
     [components addObject: node];
@@ -290,7 +290,7 @@
 {
   CREATE_AUTORELEASE_POOL(arp);
   NSMutableArray *paths = [NSMutableArray array];
-  int i;
+  NSUInteger i;
   
   for (i = 0; i < [nodes count]; i++) {
     [paths addObject: [[nodes objectAtIndex: i] path]];
@@ -302,16 +302,16 @@
   return [[paths autorelease] makeImmutableCopyOnFail: NO];
 }
 
-+ (unsigned int)indexOfNode:(FSNode *)anode 
++ (NSUInteger)indexOfNode:(FSNode *)anode 
                inComponents:(NSArray *)nodes
 {
   return [nodes indexOfObject: anode];
 }
 
-+ (unsigned int)indexOfNodeWithPath:(NSString *)apath 
++ (NSUInteger)indexOfNodeWithPath:(NSString *)apath 
                        inComponents:(NSArray *)nodes
 {
-  unsigned int i;
+  NSUInteger i;
 
   for (i = 0; i < [nodes count]; i++) {
     FSNode *node = [nodes objectAtIndex: i];
@@ -327,7 +327,7 @@
 + (FSNode *)subnodeWithName:(NSString *)aname 
                  inSubnodes:(NSArray *)subnodes
 {
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [subnodes count]; i++) {
     FSNode *node = [subnodes objectAtIndex: i];
@@ -343,7 +343,7 @@
 + (FSNode *)subnodeWithPath:(NSString *)apath 
                  inSubnodes:(NSArray *)subnodes
 {
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [subnodes count]; i++) {
     FSNode *node = [subnodes objectAtIndex: i];
@@ -366,7 +366,7 @@
     return YES;
   
   } else if (isSubpathOfPath(apath, nodepath)) {
-    int i;
+    NSUInteger i;
     
     if (files == nil) {
       return YES;
@@ -876,7 +876,7 @@
   NSString *source = [opinfo objectForKey: @"source"];
   NSString *destination = [opinfo objectForKey: @"destination"];
   NSArray *files = [opinfo objectForKey: @"files"];
-  int i;
+  NSUInteger i;
 
   if ([operation isEqual: @"GWorkspaceRenameOperation"]) {      
     files = [NSArray arrayWithObject: [source lastPathComponent]]; 
@@ -950,7 +950,7 @@
   NSString *source = [opinfo objectForKey: @"source"];
   NSString *destination = [opinfo objectForKey: @"destination"];	 
   NSArray *files = [opinfo objectForKey: @"files"];    
-  int i;  	 
+  NSUInteger i;  	 
 
   if ([operation isEqual: @"GWorkspaceRenameOperation"]) { 
     files = [NSArray arrayWithObject: [source lastPathComponent]]; 

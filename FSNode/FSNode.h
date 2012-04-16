@@ -1,6 +1,6 @@
 /* FSNode.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -25,7 +25,7 @@
 #ifndef FSNODE_H
 #define FSNODE_H
 
-#include <Foundation/Foundation.h>
+#import <Foundation/Foundation.h>
 
 @class NSImage;
 @class NSBezierPath;
@@ -106,10 +106,10 @@
 
 + (NSArray *)pathsOfNodes:(NSArray *)nodes;
 
-+ (unsigned int)indexOfNode:(FSNode *)anode 
++ (NSUInteger)indexOfNode:(FSNode *)anode 
                inComponents:(NSArray *)nodes;
 
-+ (unsigned int)indexOfNodeWithPath:(NSString *)apath 
++ (NSUInteger)indexOfNodeWithPath:(NSString *)apath 
                        inComponents:(NSArray *)nodes;
 
 + (FSNode *)subnodeWithName:(NSString *)aname 
