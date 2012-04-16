@@ -374,12 +374,15 @@ void drawRightTabBezier(NSPoint origin, float tabh,
 	{
 	  ipoint.y = aRect.size.height;
 	  
-      if ([anItem tabState] == NSSelectedTab) {
-        selp[1] = NSMakePoint(ipoint.x + BEZ_TAB_W, ipoint.y);
-        fcolor = [NSColor controlColor];
-      } else {
-        fcolor = [NSColor controlBackgroundColor];
-      }
+	  if ([anItem tabState] == NSSelectedTab)
+	    {
+	      selp[1] = NSMakePoint(ipoint.x + BEZ_TAB_W, ipoint.y);
+	      fcolor = [NSColor controlColor];
+	    }
+	  else
+	    {
+	      fcolor = [NSColor controlBackgroundColor];
+	    }
       
       scolor = [NSColor blackColor];
       drawRightTabBezier(NSMakePoint(ipoint.x + BEZ_TAB_W, ipoint.y), 
@@ -454,8 +457,8 @@ void drawRightTabBezier(NSPoint origin, float tabh,
 
 - (TShelfViewItem *)tabItemAtPoint:(NSPoint)point
 {
-  int count = [items count];
-  int i;
+  NSUInteger count = [items count];
+  NSUInteger i;
 
   point = [self convertPoint: point fromView: nil];
 
