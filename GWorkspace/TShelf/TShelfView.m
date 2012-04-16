@@ -138,7 +138,7 @@
 
 - (BOOL)removeTabItem:(TShelfViewItem *)item
 {
-  int i = [items indexOfObject: item];
+  NSUInteger i = [items indexOfObject: item];
   
   if ((i == NSNotFound) || (item == lastItem)) {
     return NO;
@@ -172,14 +172,18 @@
 {
   TShelfIconsView *selectedView;
 
-  if (selected != nil) {
-    [selected setTabState: NSBackgroundTab];
-    selectedView = (TShelfIconsView *)[selected view];
-    if ([selectedView iconsType] == DATA_TAB) {
-      [selectedView setCurrentPBIcon: nil];
+  if (item == nil)
+    return;
+
+  if (selected != nil)
+    {
+      [selected setTabState: NSBackgroundTab];
+      selectedView = (TShelfIconsView *)[selected view];
+      if ([selectedView iconsType] == DATA_TAB) {
+	[selectedView setCurrentPBIcon: nil];
+      }
+      [[selected view] removeFromSuperview];
     }
-	  [[selected view] removeFromSuperview];
-	}
 
   selected = item;
 
@@ -188,17 +192,19 @@
 
   selectedView = (TShelfIconsView *)[selected view];
 
-  if (selectedView != nil) {
-	  [self addSubview: selectedView];
-	  [selectedView setFrame: [self contentRect]];
-  	[selectedView resizeWithOldSuperviewSize: [selectedView frame].size]; 
-    [selectedView unselectOtherIcons: nil];
-    if ([selectedView iconsType] == DATA_TAB) {
-      [selectedView setCurrentPBIcon: nil];
+  if (selectedView != nil)
+    {
+      [self addSubview: selectedView];
+      [selectedView setFrame: [self contentRect]];
+      [selectedView resizeWithOldSuperviewSize: [selectedView frame].size]; 
+      [selectedView unselectOtherIcons: nil];
+      if ([selectedView iconsType] == DATA_TAB)
+	{
+	  [selectedView setCurrentPBIcon: nil];
+	}
+      [[self window] makeFirstResponder: [selected initialFirstResponder]];
     }
-	  [[self window] makeFirstResponder: [selected initialFirstResponder]];
-  }
-
+  
   [self setButtonsEnabled: (lastItem && (lastItem == selected))];
       
   [self setNeedsDisplay: YES]; 
