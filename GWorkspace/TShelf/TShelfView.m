@@ -300,9 +300,9 @@ void drawRightTabBezier(NSPoint origin, float tabh,
   NSRect aRect = [self bounds];
   NSPoint p = aRect.origin;
   NSSize s = aRect.size;
-  int count = [items count];  
-  int itemxspace = (int)((aRect.size.width - SPECIAL_TAB_W) / (count - 1));
-  NSImage *backImage = [[GWorkspace gworkspace] tshelfBackground];
+  int count;  
+  int itemxspace;
+  NSImage *backImage;
   NSColor *scolor;
   NSColor *fcolor;
   NSPoint selp[2];
@@ -310,8 +310,12 @@ void drawRightTabBezier(NSPoint origin, float tabh,
   int i;
   NSPoint ipoint;
   
+  backImage = [[GWorkspace gworkspace] tshelfBackground];
   if (backImage)
     [backImage compositeToPoint: NSZeroPoint operation: NSCompositeSourceOver];
+
+  count = [items count];
+  itemxspace = (int)((aRect.size.width - SPECIAL_TAB_W) / (count - 1));
   
   [[NSColor controlColor] set];
   NSRectFill(NSMakeRect(p.x, p.y, s.width, s.height - TAB_H));
