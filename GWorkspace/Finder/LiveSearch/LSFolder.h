@@ -1,6 +1,6 @@
 /* LSFolder.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: October 2004
@@ -30,6 +30,8 @@
 
 @class NSWindow;
 @class NSView;
+@class NSPopUpButton;
+@class NSButton;
 @class ResultsTableView;
 @class NSTableColumn;
 @class FSNPathComponentsViewer;
@@ -79,17 +81,17 @@
   NSFileManager *fm;
   NSNotificationCenter *nc;
   
-  IBOutlet id win;
+  IBOutlet NSWindow *win;
   BOOL forceclose;
 
   IBOutlet NSBox *topBox;
   IBOutlet NSBox *progBox; 
   ProgrView *progView;
-  IBOutlet id elementsLabel;
+  IBOutlet NSTextField *elementsLabel;
   NSString *elementsStr;
-  IBOutlet id editButt;
-  IBOutlet id autoupdatePopUp;
-  IBOutlet id updateButt;
+  IBOutlet NSButton *editButt;
+  IBOutlet NSPopUpButton *autoupdatePopUp;
+  IBOutlet NSButton *updateButt;
     
   IBOutlet NSScrollView *resultsScroll;
   ResultsTableView *resultsView;

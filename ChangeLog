@@ -15,6 +15,9 @@
 	* GWorkspace/TShelf/TShelfView.h
 	NSUInteger for indexes.
 
+	* GWorkspace/Finder/LiveSearch/LSFolder.h
+	Declare types to fix warnings.
+
 2012-04-11 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/Preferences/DesktopPref.m
