@@ -20,6 +20,7 @@
         NSMenuItem = {
           English = "Open in GWorkspace";
           German = "In GWorkspace \U00F6ffnen";
+	  French = "Ouvrir dans GWorkspace";
           default = "Open in GWorkspace";
         };
         NSMessage = openInWorkspace;

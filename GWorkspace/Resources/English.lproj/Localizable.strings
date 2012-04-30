@@ -5,15 +5,18 @@
 	"Info Panel..." = "Info Panel...";
 	"Preferences..." = "Preferences...";
 	"Help..." = "Help...";
+	"Activate context help" = "Activate context help";
 
 "File" = "File";
 	"Open" = "Open";
+	"Open With..." = "Open With...";
 	"Open as Folder" = "Open as Folder";
 	"Edit File" = "Edit File";
 	"New Folder" = "New Folder";
 	"New File" = "New File";
 	"Duplicate" = "Duplicate";	
 	"Destroy" = "Destroy";
+	"Move to Recycler" = "Move to Recycler";
 	"Empty Recycler" = "Empty Recycler";
 
 "Edit" = "Edit";
@@ -25,17 +28,31 @@
 "View" = "View";
 	"Browser" = "Browser";
 	"Icon" = "Icon";
+	"List" = "List";
+	"Viewer behaviour" = "Viewer behaviour";
+		"Browsing" = "Browsing";
+		"Spatial" = "Spatial";
+	"Show" = "Show";
+	        "Name only" = "Name only";
+		"Type" = "Type";
+		"Size" = "Size";
+		"Modification date" = "Modification date";
+		"Owner" = "Owner";
+	"Icon Size" = "Icon Size";
+	"Icon Position" = "Icon Position";
+	      	"Up" = "Up";
+		"Left" = "Left";
+	"Label Size" = "Label Size";
+	"Viewer" = "Viewer";
 		
 "Tools" = "Tools";
-	"Viewer" = "Viewer";
 	"Inspectors" = "Inspectors";
 		"Show Inspectors" = "Show Inspectors";
 		"Attributes" = "Attributes";
 		"Contents" = "Contents";
 		"Tools" = "Tools";	
-		"Permissions" = "Permissions";	
+		"Annotations" = "Annotations";	
 	"Finder" = "Finder";
-	"Processes..." = "Processes...";
 	"Fiend" = "Fiend";
 		"Show Fiend" = "Show Fiend";
 		"Hide Fiend" = "Hide Fiend";
@@ -43,8 +60,20 @@
 		"Remove Current Layer" = "Remove Current Layer";
 		"Rename Current Layer" = "Rename Current Layer";
 		"Layers" = "Layers";
-	"DeskTop Shelf" = "Desktop Shelf";	
-	"XTerm" = "XTerm";
+	"Tabbed Shelf" = "Tabbed Shelf";	
+		"Show Tabbed Shelf" = "Show Tabbed Shelf";
+		"Remove Current Tab" = "Remove Current Tab";
+		"Rename Current Tab" = "Rename Current Tab";
+		"Add Tab..." = "Add Tab...";
+	"Terminal" = "Terminal";
+	"Run..." = "Run...";
+	"History" = "History";
+		"Show History" = "Show History";
+		"Go backward" = "Go backward";
+		"Go forward" = "Go forward";
+	"Show Desktop" = "Show Desktop";
+	"Show Recycler" = "Show Recycler";
+	"Check for disks" = "Check for disks";
 	
 "Windows" = "Windows";
 	"Arrange in Front" = "Arrange in Front";
@@ -54,9 +83,14 @@
 "Services" = "Services";
 
 "Hide" = "Hide";
+"Hide Others" = "Hide Others";
+"Show All" = "Show All";
+
+"Print..." = "Print...";
 
 "Quit" = "Quit";
 	
+"Logout" = "Logout";
 	
 	
 /* ----------------------- File Operations strings --------------------------- *\

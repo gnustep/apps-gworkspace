@@ -9,20 +9,19 @@
 	"Info Panel..." = "À propos...";
 	"Preferences..." = "Préférences...";
 	"Help..." = "Aide...";
+	"Activate context help" = "Activer l'aide contextuelle";
 
 "File" = "Fichier";
 	"Open" = "Ouvrir";
-	"Open as Folder" = "Ouvrir le dossier";
 	"Open With..." = "Ouvrir avec ...";
+	"Open as Folder" = "Ouvrir le dossier";
 	"Edit File" = "Éditer le fichier";
 	"New Folder" = "Nouveau dossier";
 	"New File" = "Nouveau fichier";
 	"Duplicate" = "Dupliquer";	
 	"Destroy" = "Supprimer";
+	"Move to Recycler" = "Envoyer à la corbeille";
 	"Empty Recycler" = "Vider la corbeille";
-	"Put Away" = "Jeter";
-	"Run..." = "Démarrer ...";
-	"Print..." = "Imprimer ...";
 
 "Edit" = "Edition";
 	"Cut" = "Couper";
@@ -31,27 +30,33 @@
 	"Select All" = "Tout sélectionner";
 		
 "View" = "Affichage";
-	"Browser" = "Liste";
+	"Browser" = "Navigateur";
 	"Icon" = "Icône";
-	"Small Icon" = "Mini-icône";
+	"List" = "Liste";
+	"Viewer behaviour" = "Comportement";
+		"Browsing" = "Browsing";
+		"Spatial" = "Spatial";
+	"Show" = "Affiche";
+	        "Name only" = "Nom seulement";
+		"Type" = "Type";
+		"Size" = "Taille";
+		"Modification date" = "Date de modification";
+		"Owner" = "Propriétaire";
+	"Icon Size" = "Taille des icônes";
+	"Icon Position" = "Position des icônes";
+	      	"Up" = "Haut";
+		"Left" = "Gauche";
+	"Label Size" = "Taille du texte";
+	"Viewer" = "Visualisateur";
 		
 "Tools" = "Outils";
-	"Viewer" = "Visualisateur";
 	"Inspectors" = "Inspecteurs";
 		"Show Inspectors" = "Afficher les inspecteurs";
 		"Attributes" = "Attributs";
 		"Contents" = "Contenus";
 		"Tools" = "Outils";	
-		"Permissions" = "Droits";
-	"History" = "Historique";
-	"Show History" = "Voir l'historique";	
-	"Go backward" = "Revenir en arrière";	
-	"Go forward" = "Avancer";	
+		"Annotations" = "Annotations";
 	"Finder" = "Chercher un fichier";
-	"Applications..." = "Applications ...";
-	"File Operations..." = "Opérations sur fichier";
-
-	"Processes..." = "Processus...";
 	"Fiend" = "Fiend";
 		"Show Fiend" = "Montrer le Fiend";
 		"Hide Fiend" = "Masquer le Fiend";
@@ -59,8 +64,20 @@
 		"Remove Current Layer" = "Supprimer l'espace de travail courant";
 		"Rename Current Layer" = "Renommer l'espace de travail courant";
 		"Layers" = "Espaces de travail";
-	"DeskTop Shelf" = "Etagère du bureau";	
-	"XTerm" = "XTerm";
+	"Tabbed Shelf" = "Etagères";	
+		"Show Tabbed Shelf" = "Montrer les étagères";
+		"Remove Current Tab" = "Supprime l'étagère";
+		"Rename Current Tab" = "Renommer l'étagère";
+		"Add Tab..." = "Ajouter une étagère...";
+	"Terminal" = "Terminal";
+	"Run..." = "Exécuter...";
+	"History" = "Historique";
+		"Show History" = "Voir l'historique";	
+		"Go backward" = "Revenir en arrière";	
+		"Go forward" = "Avancer";	
+	"Show Desktop" = "Montrer le bureau";
+	"Show Recycler" = "Montrer la corbeille";
+	"Check for disks" = "Vérifier les lecteurs";
 	
 "Windows" = "Fenêtre";
 	"Arrange in Front" = "Mettre au premier plan";
@@ -71,8 +88,14 @@
 "Services" = "Services";
 
 "Hide" = "Masquer";
+"Hide Others" = "Masquer les autres";
+"Show All" = "Montrer tout";
+
+"Print..." = "Imprimer...";
 
 "Quit" = "Quitter";
+
+"Logout" = "Déconnexion";
 	
 	
 /* ----------------------- File Operations strings --------------------------- *\
@@ -345,7 +368,7 @@
 "Default Editor" = "Editeur par défaut";
 "No Default Editor" = "Pas d'éditeur par défaut";
 "Choose..." = "Sélectionner...";
-"Choose" = "Sélectionner...";
+"Choose" = "Sélectionner";
 "Editor" = "Editeur de texte";
 "XTerminal" = "Console X";
 "Sorting Order" = "Ordre de tri";
@@ -395,8 +418,8 @@
 
 /* Recycler strings */
 
-"Recycle: " = "Envoyer dans la Corbeille : ";
-"Recycler: " = "Corbeille : ";
+"Recycle: " = "Envoyer dans la Corbeille: ";
+"Recycler: " = "Corbeille: ";
 "Recycler" = "Corbeille";
 "the Recycler" = "la Corbeille";
 "\nto the Recycler" = "\nvers la Corbeille";
@@ -407,3 +430,27 @@
 "Put Away" = "Jeter";
 
 
+/* DesktopPref.m */
+"Background"="Background";
+"General"="General";
+
+"center" = "Center";
+"fit" = "Fit";
+"tile" = "Tile";
+"scale" = "Scale";
+
+"Use image"="Use image";
+"Choose"="Sélectionner";
+
+"Show Dock"="Show Dock";
+"Dock position:"="Dock position:";
+
+"Left"="Gauche";
+"Right"="Right";
+
+"Dock style:"="Dock style:";
+
+"Classic"="Classic";
+"Modern"="Modern";
+
+"Autohide Tabbed Shelf"="Autohide Tabbed Shelf";

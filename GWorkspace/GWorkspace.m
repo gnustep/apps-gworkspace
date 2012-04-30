@@ -1,6 +1,6 @@
 /* GWorkspace.m
  *  
- * Copyright (C) 2003-2011 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola
@@ -568,7 +568,7 @@ static GWorkspace *gworkspace = nil;
   [self resetSelectedPaths];
 }
 
-- (BOOL)applicationShouldTerminate:(NSApplication *)app 
+- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)app 
 {
   NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
   
@@ -580,7 +580,7 @@ static GWorkspace *gworkspace = nil;
 					        NSLocalizedString(@"Ok", @""), 
                   nil, 
                   nil);  
-    return NO;  
+    return NSTerminateCancel;  
   }
     
   if ((dontWarnOnQuit == NO) && (loggingout == NO)) {
@@ -589,7 +589,7 @@ static GWorkspace *gworkspace = nil;
                       NSLocalizedString(@"No", @""),
                       NSLocalizedString(@"Yes", @""),
                       nil)) {
-      return NO;
+      return NSTerminateCancel;
     }
   }
 
@@ -604,11 +604,11 @@ static GWorkspace *gworkspace = nil;
   terminating = YES;
 
   [self updateDefaults];
-
-	TEST_CLOSE (prefController, [prefController myWin]);
-	TEST_CLOSE (fiend, [fiend myWin]);
-	TEST_CLOSE (history, [history myWin]); 
-	TEST_CLOSE (tshelfWin, tshelfWin);
+  
+  TEST_CLOSE (prefController, [prefController myWin]);
+  TEST_CLOSE (fiend, [fiend myWin]);
+  TEST_CLOSE (history, [history myWin]); 
+  TEST_CLOSE (tshelfWin, tshelfWin);
   TEST_CLOSE (startAppWin, [startAppWin win]);
 
   if (fswatcher) {
@@ -660,7 +660,7 @@ static GWorkspace *gworkspace = nil;
     }
   }
   		
-	return YES;
+  return NSTerminateNow;
 }
 
 - (NSString *)defEditor
