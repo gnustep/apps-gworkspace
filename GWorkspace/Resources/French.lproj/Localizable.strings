@@ -109,17 +109,17 @@
 "You have not write permission\nfor" = "Vous n'avez pas les droits d'écrire\npour";
 "Continue" = "Continuer";
 
-"File Viewer" = "File Viewer";
+"File Viewer" = "Visualisateur de Fichier";
 
-"Quit!" = "Quit";
-"Do you really want to quit?" = "Do you really want to quit?";
-"Yes" = "Yes";
-"No" = "No";
+"Quit!" = "Quitter";
+"Do you really want to quit?" = "Voulez-vous réellement quitter ?";
+"Yes" = "Oui";
+"No" = "Non";
 
-"Log out" = "Log out";
-"Are you sure you want to quit\nall applications and log out now?" = "Are you sure you want to quit\nall applications and log out now?";
-"If you do nothing, the system will log out\nautomatically in" = "If you do nothing, the system will log out\nautomatically in";
-"seconds." = "seconds.";
+"Log out" = "Déconnexion";
+"Are you sure you want to quit\nall applications and log out now?" = "Etes-vous sûr de vouloir quitter toutes\nles applications et vous déconnecter immédiatement ?";
+"If you do nothing, the system will log out\nautomatically in" = "Sans action de votre part, le système se déconnectera\nautomatiquement dans ";
+"seconds." = "secondes.";
 
 /* FileOperation.m */
 
