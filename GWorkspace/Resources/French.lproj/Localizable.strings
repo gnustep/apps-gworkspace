@@ -336,17 +336,20 @@
 "The image must have the same" = "L'image doit avoir la même taille";
 "size as your screen." = "que votre écran.";
 	
-/* DefaultXTerm.m */             
-	
-"Set" = "Définir";	
+
+/* XTermPref.m */    
+"Terminal" = "Terminal";
+"Set" = "Appliquer";
+"Use Terminal service" = "Utiliser le service Terminal";
+"arguments" = "arguments";
 
 	
 /* BrowserViewsPreferences.m */  
 
 "Columns Width" = "Largeur des colonnes";
 "Use Default Settings" = "Param. par défaut";	
-"Browser" = "Liste";
-"Browser View" = "Affichage liste";
+"Browser" = "Navigateur";
+"Browser View" = "Affichage navigateur";
 	
 	
 /* FileWatchingPreferences.m */  
@@ -413,11 +416,17 @@
 "Select and move the files to hide or to show" = "Selectionnez et déplacez les fichiers à cacher ou afficher";
 
 /* IconViewsPreferences.m */
+"Icons" = "Icônes";
+"Thumbnails" = "Vignettes";
+"use thumbnails" = "utiliser les vignettes";
 "Title Width" = "Largeur du titre";
 "Icon View" = "Affichage icône";
 
-/* Recycler strings */
+/* HistoryPref.m */
+"History" = "Historique";
+"Number of saved paths" = "Nombre de chemins sauvegardés";
 
+/* Recycler strings */
 "Recycle: " = "Envoyer dans la Corbeille: ";
 "Recycler: " = "Corbeille: ";
 "Recycler" = "Corbeille";
@@ -431,26 +440,27 @@
 
 
 /* DesktopPref.m */
-"Background"="Background";
-"General"="General";
+"Desktop" = "Bureau";
+"Background"="Fond d'écran";
+"General"="Général";
 
-"center" = "Center";
+"center" = "Centrer";
 "fit" = "Fit";
-"tile" = "Tile";
+"tile" = "Répéter";
 "scale" = "Scale";
 
-"Use image"="Use image";
-"Choose"="Sélectionner";
+"Use image"="Image";
+"Choose"="Choisir";
 
-"Show Dock"="Show Dock";
-"Dock position:"="Dock position:";
+"Show Dock"="Montrer le Dock";
+"Dock position:"="Position du Dock:";
 
 "Left"="Gauche";
-"Right"="Right";
+"Right"="Droite";
 
-"Dock style:"="Dock style:";
+"Dock style:"="Style du Dock:";
 
-"Classic"="Classic";
-"Modern"="Modern";
+"Classic"="Classique";
+"Modern"="Moderne";
 
-"Autohide Tabbed Shelf"="Autohide Tabbed Shelf";
+"Autohide Tabbed Shelf"="Cacher automatiquement les étagères";

@@ -303,9 +303,11 @@
 "Unset Image" = "Unset Image";
 
 	
-/* DefaultXTerm.m */             
-	
-"Set" = "Set";	
+/* XTermPref.m */    
+"Terminal" = "Terminal";
+"Set" = "Set";
+"Use Terminal service" = "Use Terminal service";
+"arguments" = "arguments";
 
 	
 /* BrowserViewsPreferences.m */  
@@ -335,11 +337,16 @@
 "No Default Editor" = "No Default Editor";
 "Choose..." = "Choose...";
 
-
 /* IconViewsPreferences.m */
-
+"Icons" = "Icons";
+"Thumbnails" = "Thumbnails";
+"use thumbnails" = "use thumbnails";
 "Title Width" = "Title Width";
 "Icon View" = "Icon View";
+
+/* HistoryPref.m */
+"History" = "History";
+"Number of saved paths" = "Number of saved paths";
 
 /* Recycler strings */
 "Recycle: " = "Recycle: ";
@@ -354,6 +361,7 @@
 "Put Away" = "Put Away";
 
 /* DesktopPref.m */
+"Desktop" = "Desktop";
 "Background"="Background";
 "General"="General";
 
