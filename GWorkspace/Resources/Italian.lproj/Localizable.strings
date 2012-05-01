@@ -69,6 +69,17 @@
 "You have not write permission\nfor" = "Non hai permesso di scrittura\nper";
 "Continue" = "Continua";
 
+"File Viewer" = "File Viewer";
+
+"Quit!" = "Termina!";
+"Do you really want to quit?" = "Terminare veramente?";
+"Yes" = "Sì";
+"No" = "No";
+
+"Log out" = "Log out";
+"Are you sure you want to quit\nall applications and log out now?" = "Terminare tutte le applicazioni ed\nall eseguire log out ora?";
+"If you do nothing, the system will log out\nautomatically in" = "Se non si esegue nulla, il sistema terminerà\nautomaticamente in";
+"seconds." = "secondi.";
 
 /* FileOperation.m */
 
