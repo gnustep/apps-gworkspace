@@ -1,6 +1,6 @@
 /* FSNTextCell.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -65,7 +65,7 @@ static cutIMP cutDate = NULL;
   if (self) {
     ASSIGN (fontAttr, [NSDictionary dictionaryWithObject: [self font] 
                                                   forKey: NSFontAttributeName]);
-    ASSIGN (dots, [NSString stringWithString: @"..."]);
+    ASSIGN (dots, @"...");
     dtslenght = [dots sizeWithAttributes: fontAttr].width; 
     titlesize = NSMakeSize(0, 0);
     icon = nil;

@@ -1,3 +1,8 @@
+2012-06-13 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNTextCell.m
+	Use literal string directly
+
 2012-05-25 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/Resources/English.lproj/DesktopPref.gorm
