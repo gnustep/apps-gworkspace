@@ -306,7 +306,7 @@
   NSNumber *offset = nil;
   DBKBTreeNode *node;
   BOOL exists;
-  int index;
+  NSUInteger index;
   
   [freeOffsetsTree begin];
     

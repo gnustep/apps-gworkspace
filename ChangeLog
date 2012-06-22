@@ -1,3 +1,9 @@
+2012-06-21 Riccardo Mottola <rm@gnu.org>
+
+	* DBKit/DBKVarLenRecordsFile.m
+	* Tools/ddbd/DDBPathsManager.m
+	Warning fix (NSUInteger).
+
 2012-06-20 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/FileViewer/GWViewerShelf.m

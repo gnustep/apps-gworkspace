@@ -1,6 +1,6 @@
 /* DDBPathsManager.m
  *  
- * Copyright (C) 2005-2011 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2005
@@ -131,7 +131,7 @@
   DDBPath *ddbpath = nil;
   DBKBTreeNode *node;
   BOOL exists;
-  int index;
+  NSUInteger index;
 
   DESTROY (dummyPaths[1]);  
   DESTROY (dummyPaths[0]);  
@@ -200,7 +200,7 @@
 {
   CREATE_AUTORELEASE_POOL(arp);
   DBKBTreeNode *node; 
-  int index;
+  NSUInteger index;
   BOOL exists;
 
   DESTROY (dummyPaths[1]);
@@ -325,7 +325,7 @@
 {
   CREATE_AUTORELEASE_POOL(arp);
   DBKBTreeNode *node; 
-  int index;
+  NSUInteger index;
   BOOL exists;
   
   DESTROY (dummyPaths[1]);
