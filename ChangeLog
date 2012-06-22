@@ -1,3 +1,8 @@
+2012-06-20 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/FileViewer/GWViewerShelf.m
+	Add missing include and fix warning.
+
 2012-06-13 Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNTextCell.m

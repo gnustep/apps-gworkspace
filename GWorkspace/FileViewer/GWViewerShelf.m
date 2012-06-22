@@ -29,6 +29,7 @@
 #import "GWViewerShelf.h"
 #import "GWViewer.h"
 #import "GWorkspace.h"
+#import "FSNTextCell.h"
 #import "FSNBrowser.h"
 #import "FSNIconsView.h"
 #import "FSNIcon.h"
