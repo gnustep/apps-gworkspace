@@ -1,3 +1,4 @@
+
 PACKAGE_NAME = gworkspace
 include $(GNUSTEP_MAKEFILES)/common.make
 
