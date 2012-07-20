@@ -566,14 +566,7 @@ x += 6; \
     NSMutableArray *umountPaths = [NSMutableArray array];
     NSMutableDictionary *opinfo = [NSMutableDictionary dictionary];
     NSString *username = NSUserName();
-    BOOL iamRoot;
 
-	  #ifdef __WIN32__
-		  iamRoot = YES;
-	  #else
-		  iamRoot = (geteuid() == 0);
-	  #endif
-    
     for (i = 0; i < [paths count]; i++) {
       NSString *srcpath = [paths objectAtIndex: i];
 
@@ -586,16 +579,12 @@ x += 6; \
 
     for (i = 0; i < [umountPaths count]; i++) {
       NSString *umpath = [umountPaths objectAtIndex: i];
-	    NSDictionary *attrs = [fm fileAttributesAtPath: umpath traverseLink: NO];
-      NSString *usr = [attrs objectForKey: NSFileOwnerAccountName];
-      BOOL isMyFile = ([username isEqual: usr]);
       
-      if (iamRoot || isMyFile) {
-        [ws unmountAndEjectDeviceAtPath: umpath];
-      } else {
-		    NSString *err = NSLocalizedString(@"Error", @"");
-		    NSString *msg = NSLocalizedString(@"You must be root to umount\n", @"");
-		    NSString *buttstr = NSLocalizedString(@"Continue", @"");
+      if (![ws unmountAndEjectDeviceAtPath: umpath])
+      {
+	    NSString *err = NSLocalizedString(@"Error", @"");
+	    NSString *msg = NSLocalizedString(@"You are not allowed to umount\n", @"");
+	    NSString *buttstr = NSLocalizedString(@"Continue", @"");
         NSRunAlertPanel(err, [NSString stringWithFormat: @"%@ \"%@\"!\n", msg, umpath], buttstr, nil, nil);         
       }
     }

@@ -1,3 +1,11 @@
+2012-06-20: Sebastian Reitenbach <sebastia@l00-bugdead-prods.de>
+
+	* GWorkspace/Desktop/Dock/DockIcon.m
+	Fix unmounting of CD-Rom on OpenBSD that was mounted 
+	using kern.usermount facilities. The mount point changes
+	ownership to root:wheel, and the removed check prevented
+	trying to unmount the device.
+
 2012-06-21 Riccardo Mottola <rm@gnu.org>
 
 	* DBKit/DBKVarLenRecordsFile.m
