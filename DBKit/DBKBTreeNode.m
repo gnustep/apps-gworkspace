@@ -739,29 +739,32 @@
       [self insertKey: [[parent keys] objectAtIndex: index] atIndex: 0];
     }
     
-    if (node == rgtnd) {
-      for (i = 0; i < [ndkeys count]; i++) {
-        [self addKey: [ndkeys objectAtIndex: i]];  
+    if (node == rgtnd)
+      {
+	for (i = 0; i < [ndkeys count]; i++)
+	  [self addKey: [ndkeys objectAtIndex: i]];  
       }
-    } else {
-      for (i = [ndkeys count] - 1; i >= 0; i--) {
-        [self insertKey: [ndkeys objectAtIndex: i] atIndex: 0];
+    else
+      {
+      for (i = [ndkeys count]; i > 0; i--)
+        [self insertKey: [ndkeys objectAtIndex: i-1] atIndex: 0];
       }
-    }
 
-    if ([self isLeaf] == NO) {  
-      NSArray *ndnodes = [node subnodes];
-
-      if (node == rgtnd) {
-        for (i = 0; i < [ndnodes count]; i++) {
-          [self addSubnode: [ndnodes objectAtIndex: i]];  
-        }
-      } else {
-        for (i = [ndnodes count] - 1; i >= 0; i--) {
-          [self insertSubnode: [ndnodes objectAtIndex: i] atIndex: 0];
-        }
+    if ([self isLeaf] == NO)
+      {  
+	NSArray *ndnodes = [node subnodes];
+	
+	if (node == rgtnd)
+	  {
+	    for (i = 0; i < [ndnodes count]; i++)
+	      [self addSubnode: [ndnodes objectAtIndex: i]];  
+	  }
+	else
+	  {
+	    for (i = [ndnodes count]; i > 0; i--)
+	      [self insertSubnode: [ndnodes objectAtIndex: i-1] atIndex: 0];
+	  }
       }
-    }
 
     [parent removeKeyAtIndex: index];
     [tree nodeWillFreeOffset: [node offset]];

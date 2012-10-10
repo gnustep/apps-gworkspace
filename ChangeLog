@@ -1,3 +1,8 @@
+2012-10-10 Riccardo Mottola <rm@gnu.org>
+
+	* DBKit/DBKBTreeNode.m
+	Fix unsigned integer loop.
+
 2012-06-20: Sebastian Reitenbach <sebastia@l00-bugdead-prods.de>
 
 	* GWorkspace/Desktop/Dock/DockIcon.m
