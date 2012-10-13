@@ -218,13 +218,12 @@ NSRecursiveLock *dbkbtree_lock = nil;
   CREATE_AUTORELEASE_POOL(arp);
   BOOL autoflush = [file autoflush];
   DBKBTreeNode *insnode = nil;
-  NSUInteger index;
   BOOL exists;
 
   [self checkBegin];  
   [file setAutoflush: NO];
-  
-  index = [root indexForKey: key existing: &exists];
+
+  [root indexForKey: key existing: &exists];
   
   if (exists == NO) {  
     if ([[root keys] count] == maxkeys) {

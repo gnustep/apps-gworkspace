@@ -1,6 +1,6 @@
 /* DDBDirsManager.m
  *  
- * Copyright (C) 2005-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2005
@@ -101,7 +101,7 @@
 - (void)removeDirectory:(NSString *)dir
 {
   DBKBTreeNode *node; 
-  int index;
+  NSUInteger index;
   BOOL exists;
 
   DESTROY (dummyPaths[1]);
@@ -124,7 +124,7 @@
 
 - (void)insertDirsFromPaths:(NSArray *)paths
 {
-  unsigned i;
+  NSUInteger i;
 
   for (i = 0; i < [paths count]; i++) {
     CREATE_AUTORELEASE_POOL(arp);
@@ -163,7 +163,7 @@
 
 - (void)removeDirsFromPaths:(NSArray *)paths
 {
-  unsigned i, j;
+  NSUInteger i, j;
   
   for (i = 0; i < [paths count]; i++) {  
     CREATE_AUTORELEASE_POOL(arp);
@@ -189,7 +189,7 @@
   NSMutableArray *paths = [NSMutableArray array];
   NSMutableArray *toremove = [NSMutableArray array];
   NSArray *keys = nil;
-  int i;
+  NSUInteger i;
 
   [tree begin];
   
@@ -251,7 +251,7 @@
   NSRange range;
   unsigned kcount;
   unsigned long key;
-  int i;
+  unsigned i;
   
   range = NSMakeRange(0, sizeof(unsigned));
   [data getBytes: &kcount range: range];
@@ -273,8 +273,8 @@
 - (NSData *)dataFromKeys:(NSArray *)keys
 {
   NSMutableData *data = [NSMutableData dataWithCapacity: 1];
-  unsigned kcount = [keys count];
-  int i;
+  NSUInteger kcount = [keys count];
+  NSUInteger i;
   
   [data appendData: [NSData dataWithBytes: &kcount length: sizeof(unsigned)]];
     

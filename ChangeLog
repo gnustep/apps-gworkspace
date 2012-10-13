@@ -1,3 +1,11 @@
+2012-10-13 Riccardo Mottola <rm@gnu.org>
+
+	* DBKit/DBKBTree.m
+	* DBKit/DBKVarLenRecordsFile.m
+	* Tools/ddbd/DDBDirsManager.m
+	* Tools/ddbd/DDBPathsManager.m
+	More unisgned index fixes.
+
 2012-10-10 Riccardo Mottola <rm@gnu.org>
 
 	* DBKit/DBKBTreeNode.m

@@ -326,8 +326,7 @@
   CREATE_AUTORELEASE_POOL(arp);
   DBKBTreeNode *node; 
   NSUInteger index;
-  BOOL exists;
-  
+  BOOL exists;  
   DESTROY (dummyPaths[1]);
   ASSIGN (dummyPaths[0], ddbpath);  
 
@@ -354,7 +353,7 @@
                     forPath:(NSString *)dstpath
 {
   NSArray *types = [mdmodules allKeys];
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [types count]; i++) {
     NSString *type = [types objectAtIndex: i];
@@ -373,7 +372,7 @@
 - (void)duplicateDataOfPaths:(NSArray *)srcpaths
                     forPaths:(NSArray *)dstpaths
 {
-  int i, j;
+  NSUInteger i, j;
 
   for (i = 0; i < [srcpaths count]; i++) {
     CREATE_AUTORELEASE_POOL(arp);
@@ -412,7 +411,7 @@
   NSMutableArray *toremove = [NSMutableArray array];
   NSArray *keys = nil;
   NSString *dmstr[2];
-  int i;
+  NSUInteger i;
 
   [tree begin];
     
@@ -480,7 +479,7 @@
   NSRange range;
   unsigned kcount;
   unsigned long key;
-  int i;
+  unsigned i;
   
   range = NSMakeRange(0, sizeof(unsigned));
   [data getBytes: &kcount range: range];
@@ -503,7 +502,7 @@
 {
   NSMutableData *data = [NSMutableData dataWithCapacity: 1];
   unsigned kcount = [keys count];
-  int i;
+  NSUInteger i;
   
   [data appendData: [NSData dataWithBytes: &kcount length: sizeof(unsigned)]];
     

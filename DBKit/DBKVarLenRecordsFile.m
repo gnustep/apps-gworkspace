@@ -1,6 +1,6 @@
 /* DBKVarLenRecordsFile.m
  *  
- * Copyright (C) 2005-2011 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2005
@@ -343,7 +343,7 @@
   NSMutableArray *keys = [NSMutableArray array];
   NSRange range;
   unsigned kcount;
-  int i;
+  unsigned i;
   
   range = NSMakeRange(0, ulen);
   [data getBytes: &kcount range: range];
@@ -379,7 +379,7 @@
   CREATE_AUTORELEASE_POOL(arp);
   NSMutableData *data = [NSMutableData dataWithCapacity: 1];
   unsigned kcount = [keys count];
-  int i;
+  unsigned i;
   
   [data appendData: [NSData dataWithBytes: &kcount length: ulen]];
     
