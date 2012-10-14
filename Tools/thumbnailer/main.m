@@ -1,6 +1,6 @@
 /* main.m
  *  
- * Copyright (C) 2003-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -22,10 +22,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
 #include <math.h>
 #include <limits.h>
+
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
 
 #define TMBMAX (48.0)
 #define RESZLIM 4
@@ -190,7 +191,7 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
   NSEnumerator *enumerator;
   NSMutableArray *bundlesPaths;
   NSArray *bPaths;
-  int i;
+  NSUInteger i;
   
   RELEASE (thumbnailers);
   thumbnailers = [NSMutableArray new];
@@ -202,7 +203,7 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
 	[bundlesPaths addObjectsFromArray: bPaths];
 
   enumerator = [NSSearchPathForDirectoriesInDomains
-    (NSLibraryDirectory, NSAllDomainsMask, YES) objectEnumerator];
+		 (NSLibraryDirectory, NSAllDomainsMask, YES) objectEnumerator];
   while ((bundlesDir = [enumerator nextObject]) != nil)
     {
       bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
@@ -231,40 +232,46 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
 
 - (BOOL)addThumbnailer:(id)tmb
 {
-	NSString *description = [tmb description];
+  NSString *description = [tmb description];
   BOOL found = NO;
-  int i = 0;
+  NSUInteger i = 0;
   
-  if ([tmb conformsToProtocol: @protocol(TMBProtocol)]) {
-	  for (i = 0; i < [thumbnailers count]; i++) {
-		  id<TMBProtocol> thumb = [thumbnailers objectAtIndex: i];
+  if ([tmb conformsToProtocol: @protocol(TMBProtocol)])
+    {
+      for (i = 0; i < [thumbnailers count]; i++)
+	{
+	  id<TMBProtocol> thumb = [thumbnailers objectAtIndex: i];
+	  
+	  if ([[thumb description] isEqual: description])
+	    {
+	      found = YES;
+	      break;
+	    }
+	}
 
-      if ([[thumb description] isEqual: description]) {
-        found = YES;
-        break;
-      }
-	  }
-
-    if (found == NO) {
-      [thumbnailers addObject: tmb];
-      return YES;
+      if (found == NO)
+	{
+	  [thumbnailers addObject: tmb];
+	  return YES;
+	}
     }
-  }
   
   return NO;
 }
 
 - (id)thumbnailerForPath:(NSString *)path
 {
-  int i;
-
-	for (i = 0; i < [thumbnailers count]; i++) {
-		id<TMBProtocol> thumb = [thumbnailers objectAtIndex: i];
-        
-    if ([thumb canProvideThumbnailForPath: path]) {
-      return thumb;
-    }
-	}  
+  NSUInteger i;
+  
+  for (i = 0; i < [thumbnailers count]; i++)
+    {
+      id<TMBProtocol> thumb = [thumbnailers objectAtIndex: i];
+      
+      if ([thumb canProvideThumbnailForPath: path])
+	{
+	  return thumb;
+	}
+    }  
 
   return nil;
 }
@@ -323,18 +330,22 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
 	           userData:(NSString *)ud
 	              error:(NSString **)err
 {
-  if ([[pb types] indexOfObject: NSFilenamesPboardType] == NSNotFound) {
-    *err = @"No file name supplied on pasteboard";
-    return;
-  } else {
-	  NSArray *paths;
-    NSData *data;
-    NSMutableArray *added;
-    BOOL isdir;
-    int i;
+  NSArray *paths;
+  NSData *data;
+  NSMutableArray *added;
+  BOOL isdir;
+  NSUInteger i;
     
-    paths = [pb propertyListForType: NSFilenamesPboardType];
-    if (paths == nil) {
+
+  if ([[pb types] indexOfObject: NSFilenamesPboardType] == NSNotFound)
+    {
+      *err = @"No file name supplied on pasteboard";
+      return;
+    }
+    
+  paths = [pb propertyListForType: NSFilenamesPboardType];
+  if (paths == nil)
+    {
       *err = @"invalid pasteboard";
       return;
     }
@@ -408,33 +419,35 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
 
       [thumbsDict writeToFile: dictPath atomically: YES];
 
-	    [[NSDistributedNotificationCenter defaultCenter] 
-            postNotificationName: GWThumbnailsDidChangeNotification
-	 								        object: nil 
-                        userInfo: info];
+      [[NSDistributedNotificationCenter defaultCenter] 
+	postNotificationName: GWThumbnailsDidChangeNotification
+	object: nil 
+	userInfo: info];
     }
-  }
 }
 
 - (void)removeThumbnail:(NSPasteboard *)pb
 	             userData:(NSString *)ud
 	                error:(NSString **)err
 {
-  if ([[pb types] indexOfObject: NSFilenamesPboardType] == NSNotFound) {
-    *err = @"No file name supplied on pasteboard";
-    return;
-  } else {
-	  NSArray *paths;
-    NSMutableArray *deleted;
-    BOOL isdir;
-    int i;
-    
-    paths = [pb propertyListForType: NSFilenamesPboardType];
-    if (paths == nil) {
+  NSArray *paths;
+  NSMutableArray *deleted;
+  BOOL isdir;
+  NSUInteger i;
+
+  if ([[pb types] indexOfObject: NSFilenamesPboardType] == NSNotFound)
+    {
+      *err = @"No file name supplied on pasteboard";
+      return;
+    }
+  
+  paths = [pb propertyListForType: NSFilenamesPboardType];
+  if (paths == nil)
+    {
       *err = @"invalid pasteboard";
       return;
     }
-    
+  
     if ((thumbsDict == nil) || ([thumbsDict count] == 0)) {
       return;
     }
@@ -485,24 +498,26 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
 	 								        object: nil 
                         userInfo: info];
     }
-  }
 }
 
 - (void)thumbnailData:(NSPasteboard *)pb
 	           userData:(NSString *)ud
 	              error:(NSString **)err
 {
-  if ([[pb types] indexOfObject: NSFilenamesPboardType] == NSNotFound) {
-    *err = @"No file name supplied on pasteboard";
-    return;
-  } else {
-	  NSArray *paths;
-    NSString *path;
-    NSData *data;
-    BOOL isdir;
-    
-    paths = [pb propertyListForType: NSFilenamesPboardType];
-    if (paths == nil) {
+  NSArray *paths;
+  NSString *path;
+  NSData *data;
+  BOOL isdir;
+  
+  if ([[pb types] indexOfObject: NSFilenamesPboardType] == NSNotFound)
+    {
+      *err = @"No file name supplied on pasteboard";
+      return;
+    }
+ 
+  paths = [pb propertyListForType: NSFilenamesPboardType];
+  if (paths == nil)
+    {
       *err = @"invalid pasteboard";
       return;
     }
@@ -530,7 +545,6 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
         }
       }
     }
-  }  
 }
 
 - (BOOL)registerThumbnailData:(NSData *)data 
@@ -586,7 +600,7 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
 }          
 
 - (NSArray *)bundlesWithExtension:(NSString *)extension 
-											inDirectory:(NSString *)dirpath
+		      inDirectory:(NSString *)dirpath
 {
   NSMutableArray *bundleList = [NSMutableArray array];
   NSEnumerator *enumerator;
@@ -660,12 +674,10 @@ int main(int argc, char** argv)
   CREATE_AUTORELEASE_POOL(pool);
   NSProcessInfo *info = [NSProcessInfo processInfo];
   NSMutableArray *args = AUTORELEASE ([[info arguments] mutableCopy]);
-  static BOOL	is_daemon = NO;
   BOOL subtask = YES;
 
   if ([[info arguments] containsObject: @"--daemon"]) {
     subtask = NO;
-    is_daemon = YES;
   }
 
   if (subtask) {
