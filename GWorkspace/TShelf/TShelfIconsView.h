@@ -1,6 +1,6 @@
 /* TShelfIconsView.h
  *  
- * Copyright (C) 2003 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -25,7 +25,7 @@
 #ifndef TSHELF_ICONS_VIEW_H
 #define TSHELF_ICONS_VIEW_H
 
-#include <AppKit/NSView.h>
+#import <AppKit/NSView.h>
 
 #define MAXSHELFHEIGHT  100
 
@@ -42,11 +42,12 @@
   #define DATA_TAB 1
 #endif
 
-typedef struct {
+typedef struct
+{
   float x;  
   float y;  
-	int index;
-	int used; 
+  NSUInteger index;
+  int used; 
 } gridpoint;
 
 typedef gridpoint *(*GridPointIMP)(id, SEL, NSPoint);
@@ -66,25 +67,25 @@ typedef gridpoint *(*GridPointIMP)(id, SEL, NSPoint);
 @interface TShelfIconsView : NSView 
 {
   BOOL isLastView;
-	NSMutableArray *icons; 
+  NSMutableArray *icons; 
   int iconsType;
-	NSCountedSet *watchedPaths;
+  NSCountedSet *watchedPaths;
   int cellsWidth;
-	gridpoint *gpoints;
-	int pcount;
+  gridpoint *gpoints;
+  int pcount;
   
   id focusedIcon;
   NSTextField *focusedIconLabel;
   
-	BOOL isDragTarget;
-	NSImage *dragImage;
-	NSPoint dragPoint;
-	NSRect dragRect;	
-	SEL makePosSel;
+  BOOL isDragTarget;
+  NSImage *dragImage;
+  NSPoint dragPoint;
+  NSRect dragRect;	
+  SEL makePosSel;
   
-	IMP makePos;
-	SEL gridPointSel;
-	GridPointIMP gridPoint;
+  IMP makePos;
+  SEL gridPointSel;
+  GridPointIMP gridPoint;
   NSFileManager *fm;
   GWorkspace *gw;
 }
@@ -95,11 +96,11 @@ typedef gridpoint *(*GridPointIMP)(id, SEL, NSPoint);
 
 - (NSArray *)iconsDescription;
 
-- (void)addIconWithPaths:(NSArray *)iconpaths withGridIndex:(int)index;
+- (void)addIconWithPaths:(NSArray *)iconpaths withGridIndex:(NSUInteger)index;
 
 - (TShelfPBIcon *)addPBIconForDataAtPath:(NSString *)dpath 
                                 dataType:(NSString *)dtype
-					                 withGridIndex:(int)index; 
+                           withGridIndex:(NSUInteger)index; 
 
 - (void)removeIcon:(id)anIcon;
 

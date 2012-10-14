@@ -1,3 +1,12 @@
+2012-10-14 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/TShelf/TShelfWin.m
+	* GWorkspace/TShelf/TShelfIcon.h
+	* GWorkspace/TShelf/TShelfIcon.m
+	* GWorkspace/TShelf/TShelfIconsView.h
+	* GWorkspace/TShelf/TShelfIconsView.m
+	NSUInteger transition.
+
 2012-10-13 Riccardo Mottola <rm@gnu.org>
 
 	* DBKit/DBKBTree.m

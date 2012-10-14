@@ -1,6 +1,6 @@
 /* TShelfWin.m
  *  
- * Copyright (C) 2003-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -57,11 +57,11 @@
     NSDictionary *tshelfDict;
     id entry;
     NSArray *tabsArr;    
-		TShelfViewItem *item;
+    TShelfViewItem *item;
     TShelfIconsView *view;
-    int i;
-    
-		[self setReleasedWhenClosed: NO];
+    NSUInteger i;
+
+    [self setReleasedWhenClosed: NO];
     [self setExcludedFromWindowsMenu: YES];
         
     tView = [[TShelfView alloc] initWithFrame: [[self contentView] bounds]];
@@ -87,23 +87,23 @@
         NSArray *iconsArr = [tabDict objectForKey: @"icons"];
         NSNumber *iconsType = [tabDict objectForKey: @"iconstype"];
         int itype;
-    
+
         if (iconsType) {
           itype = [iconsType intValue];
         } else {
           itype = FILES_TAB;
         }
-    
+
         item = [[TShelfViewItem alloc] initWithTabType: itype];
         [item setLabel: label];
-        
         view = [[TShelfIconsView alloc] initWithIconsDescription: iconsArr
                                                        iconsType: itype
                               lastView: ([label isEqual: @"last"] ? YES : NO)];
+
         [view setFrame: NSMakeRect(0, 0, sizew, 80)];    
         [item setView: view];
         RELEASE (view);
-        
+ 
         if ([label isEqual: @"last"]) {
           [tView setLastTabItem: item];
         } else {
@@ -339,8 +339,7 @@
 {
   NSArray *items;
   TShelfViewItem *item;
-	NSString *title, *msg, *buttstr;
-  int index;
+  NSString *title, *msg, *buttstr;
   int result;
     
   if ([self isVisible] == NO) {
@@ -349,7 +348,6 @@
 
   items = [tView items];
   item = [tView selectedTabItem];
-  index = [tView indexOfItem: item];
   
   if (([items count] == 1) || (item == [tView lastTabItem])) {
 		msg = NSLocalizedString(@"You can't remove the last tab!", @"");

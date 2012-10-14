@@ -1,6 +1,6 @@
 /* TShelfIcon.m
  *  
- * Copyright (C) 2003-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -60,95 +60,102 @@
        inIconsView:(TShelfIconsView *)aview
 {
   self = [super init];
-  if (self) {
-    NSFont *font;
-    NSRect hlightRect;
-    int count;
-
-    fsnodeRep = [FSNodeRep sharedInstance];
-    fm = [NSFileManager defaultManager];
-    gw = [GWorkspace gworkspace];
-
-    [self setFrame: NSMakeRect(0, 0, 64, 52)];
-		paths = [NSMutableArray new];
-		[paths addObjectsFromArray: fpaths];
-    tview = aview;  
-    labelWidth = [tview cellsWidth] - 4;
-    font = [NSFont systemFontOfSize: 12];
-    isSelect = NO; 
-    locked = NO;
-    count = [paths count];                    
-
-    if (count == 1) {
-      singlepath = YES;
-      ASSIGN (node, [FSNode nodeWithPath: [paths objectAtIndex: 0]]);
-    
-			if ([[node path] isEqual: path_separator()]) {
-				ASSIGN (name, [node path]);
-				isRootIcon = YES;
-			} else {
-    		ASSIGN (name, [node name]);
-				isRootIcon = NO;
-			}
+  if (self)
+    {
+      NSFont *font;
+      NSRect hlightRect;
+      NSUInteger count;
       
-    } else {
-      node = nil;
-      singlepath = NO;
-			isRootIcon = NO;
-      name = [[NSString alloc] initWithFormat: @"%i items", count];
+      fsnodeRep = [FSNodeRep sharedInstance];
+      fm = [NSFileManager defaultManager];
+      gw = [GWorkspace gworkspace];
+
+      paths = [NSMutableArray new];
+      [paths addObjectsFromArray: fpaths];
+      tview = aview;  
+      labelWidth = [tview cellsWidth] - 4;
+      font = [NSFont systemFontOfSize: 12];
+      isSelect = NO; 
+      locked = NO;
+
+      count = [paths count];
+      if (count == 1)
+	{
+	  singlepath = YES;
+	  ASSIGN (node, [FSNode nodeWithPath: [paths objectAtIndex: 0]]);
+	  
+	  if ([[node path] isEqual: path_separator()])
+	    {
+	      ASSIGN (name, [node path]);
+	      isRootIcon = YES;
+	    }
+	  else
+	    {
+	      ASSIGN (name, [node name]);
+	      isRootIcon = NO;
+	    }
+	}
+      else
+	{
+	  node = nil;
+	  singlepath = NO;
+	  isRootIcon = NO;
+	  name = [[NSString alloc] initWithFormat: @"%u items", count];
+	}
+      
+      if (singlepath)
+	ASSIGN (icon, [fsnodeRep iconOfSize: ICON_SIZE forNode: node]);    
+      else
+	ASSIGN (icon, [fsnodeRep multipleSelectionIconOfSize: ICON_SIZE]);
+      
+      hlightRect = NSZeroRect;
+      hlightRect.size.width = (float)ICON_SIZE / 3 * 4;
+      hlightRect.size.height = hlightRect.size.width * [fsnodeRep highlightHeightFactor];
+      if ((hlightRect.size.height - ICON_SIZE) < 4)
+	hlightRect.size.height = ICON_SIZE + 4;
+      hlightRect = NSIntegralRect(hlightRect);
+      ASSIGN (highlightPath, [fsnodeRep highlightPathOfSize: hlightRect.size]);
+      
+      if (isRootIcon)
+	{
+	  NSHost *host = [NSHost currentHost];
+	  NSString *hname = [host name];
+	  NSRange range = [hname rangeOfString: @"."];
+	  
+	  if (range.length != 0)
+	    {	
+	      hname = [hname substringToIndex: range.location];
+	    } 			
+	  ASSIGN (hostname, hname);			
+	}
+      else
+	{
+	  hostname = nil;
+	}
+      
+      namelabel = [NSTextField new];    
+      [namelabel setFont: font];
+      [namelabel setBezeled: NO];
+      [namelabel setEditable: NO];
+      [namelabel setSelectable: NO];
+      [namelabel setAlignment: NSCenterTextAlignment];
+      [namelabel setDrawsBackground: NO];
+      [namelabel setTextColor: [NSColor controlTextColor]];
+      [self setLabelWidth]; 
+      [self setFrame: NSMakeRect(0, 0, 64, 52)];
+      [self registerForDraggedTypes: [NSArray arrayWithObjects: 
+						NSFilenamesPboardType, 
+					      @"GWLSFolderPboardType", 
+					      @"GWRemoteFilenamesPboardType", 
+					      nil]];
+      
+      position = NSMakePoint(0, 0);
+      gridindex = -1;
+      dragdelay = 0;
+      isDragTarget = NO;
+      onSelf = NO;
+      trectTag = -1;
     }
-
-    if (singlepath) {
-      ASSIGN (icon, [fsnodeRep iconOfSize: ICON_SIZE forNode: node]);    
-    } else {
-      ASSIGN (icon, [fsnodeRep multipleSelectionIconOfSize: ICON_SIZE]);
-    }
-        
-    hlightRect = NSZeroRect;
-    hlightRect.size.width = (float)ICON_SIZE / 3 * 4;
-    hlightRect.size.height = hlightRect.size.width * [fsnodeRep highlightHeightFactor];
-    if ((hlightRect.size.height - ICON_SIZE) < 4) {
-      hlightRect.size.height = ICON_SIZE + 4;
-    }
-    hlightRect = NSIntegralRect(hlightRect);
-    ASSIGN (highlightPath, [fsnodeRep highlightPathOfSize: hlightRect.size]);
-
-		if (isRootIcon) {
-			NSHost *host = [NSHost currentHost];
-			NSString *hname = [host name];
-			NSRange range = [hname rangeOfString: @"."];
-
-			if (range.length != 0) {	
-				hname = [hname substringToIndex: range.location];
-			} 			
-			ASSIGN (hostname, hname);			
-  	} else {
-			hostname = nil;
-		}
-
-    namelabel = [NSTextField new];    
-		[namelabel setFont: font];
-		[namelabel setBezeled: NO];
-		[namelabel setEditable: NO];
-		[namelabel setSelectable: NO];
-		[namelabel setAlignment: NSCenterTextAlignment];
-    [namelabel setDrawsBackground: NO];
-	  [namelabel setTextColor: [NSColor controlTextColor]];
-		[self setLabelWidth]; 
-    
-    [self registerForDraggedTypes: [NSArray arrayWithObjects: 
-                                              NSFilenamesPboardType, 
-                                              @"GWLSFolderPboardType", 
-                                              @"GWRemoteFilenamesPboardType", 
-                                              nil]];
-    
-		position = NSMakePoint(0, 0);
-		gridindex = -1;
-    dragdelay = 0;
-    isDragTarget = NO;
-    onSelf = NO;
-    trectTag = -1;
-  }
   
   return self;
 }
@@ -157,32 +164,33 @@
         atPosition:(NSPoint)pos
        inIconsView:(TShelfIconsView *)aview
 {
-	[self initForPaths: fpaths inIconsView: aview];
+  [self initForPaths: fpaths inIconsView: aview];
   position = NSMakePoint(pos.x, pos.y);
   return self;
 }
 
 - (id)initForPaths:(NSArray *)fpaths 
-				 gridIndex:(int)index
+	 gridIndex:(NSUInteger)index
        inIconsView:(TShelfIconsView *)aview
 {
-	[self initForPaths: fpaths inIconsView: aview];
-	gridindex = index;
+  [self initForPaths: fpaths inIconsView: aview];
+  gridindex = index;
   return self;
 }
 
 - (void)setPaths:(NSArray *)fpaths
 {
-  int count;
+  NSUInteger count;
 
   RELEASE (paths);
   RELEASE (node);
-	paths = [[NSMutableArray alloc] initWithCapacity: 1];
-	[paths addObjectsFromArray: fpaths];
+  paths = [[NSMutableArray alloc] initWithCapacity: 1];
+  [paths addObjectsFromArray: fpaths];
   count = [paths count];                    
 
-  if (count == 1) {
-    singlepath = YES;
+  if (count == 1)
+    {
+      singlepath = YES;
     
     ASSIGN (node, [FSNode nodeWithPath: [paths objectAtIndex: 0]]);
 
@@ -198,7 +206,7 @@
     DESTROY (node);
     singlepath = NO;
 		isRootIcon = NO;
-    name = [[NSString alloc] initWithFormat: @"%i items", count];
+    name = [[NSString alloc] initWithFormat: @"%u items", count];
   }
 
   if (singlepath) {
@@ -230,10 +238,10 @@
   position = NSMakePoint(pos.x, pos.y);
 }
 
-- (void)setPosition:(NSPoint)pos gridIndex:(int)index
+- (void)setPosition:(NSPoint)pos gridIndex:(NSUInteger)index
 {
   position = NSMakePoint(pos.x, pos.y);
-	gridindex = index;
+  gridindex = index;
 }
 
 - (NSPoint)position
@@ -241,32 +249,33 @@
   return position;
 }
 
-- (void)setGridIndex:(int)index
+- (void)setGridIndex:(NSUInteger)index
 {
-	gridindex = index;
+  gridindex = index;
 }
 
-- (int)gridindex
+- (NSUInteger)gridindex
 {
-	return gridindex;
+  return gridindex;
 }
 
 - (void)select
 {
-	isSelect = YES;
-  if (locked == NO) {
-    [namelabel setTextColor: [NSColor controlTextColor]];
-  }
+  isSelect = YES;
+  if (locked == NO)
+    {
+      [namelabel setTextColor: [NSColor controlTextColor]];
+    }
   [self setNeedsDisplay: YES];
 }
 
 - (void)unselect
 {
-	isSelect = NO;
+  isSelect = NO;
   if (locked == NO) {
     [namelabel setTextColor: [NSColor controlTextColor]];
   }
-	[self setNeedsDisplay: YES];
+  [self setNeedsDisplay: YES];
 }
 
 - (void)renewIcon
@@ -283,9 +292,9 @@
 {
   NSFont *font = [NSFont systemFontOfSize: 12];
   NSRect rect = [namelabel frame];
-	NSString *nstr = isRootIcon ? hostname : name;
+  NSString *nstr = isRootIcon ? hostname : name;
   
-	labelWidth = [tview cellsWidth] - 8;
+  labelWidth = [tview cellsWidth] - 8;
 	  
   if (isSelect) {
     [namelabel setFrame: NSMakeRect(0, 0, [font widthOfString: nstr] + 8, 14)];
@@ -439,15 +448,16 @@
 
 - (void)drawRect:(NSRect)rect
 {
-	NSPoint p;
+  NSPoint p;
   NSSize s;
   NSSize boundsSize;
       	
-	if(isSelect) {
-    [[NSColor selectedControlColor] set];
-    [highlightPath fill];
-	}
-	
+  if(isSelect)
+    {
+      [[NSColor selectedControlColor] set];
+      [highlightPath fill];
+    }
+  
   s = [icon size];
   boundsSize = [self bounds].size;
   p = NSMakePoint((boundsSize.width - s.width) / 2, (boundsSize.height - s.height) / 2);	
@@ -730,13 +740,13 @@
 
 - (void)concludeDragOperation:(id <NSDraggingInfo>)sender
 {
-	NSPasteboard *pb;
+  NSPasteboard *pb;
   NSDragOperation sourceDragMask;
-	NSArray *sourcePaths;
+  NSArray *sourcePaths;
   NSString *operation, *source;
   NSMutableArray *files;
   NSMutableDictionary *opDict;
-  int i;
+  NSUInteger i;
 
   isDragTarget = NO;
 

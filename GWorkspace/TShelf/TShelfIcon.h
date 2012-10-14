@@ -1,6 +1,6 @@
 /* TShelfIcon.h
  *  
- * Copyright (C) 2003 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -25,8 +25,8 @@
 #ifndef TSHELF_ICON_H
 #define TSHELF_ICON_H
 
-#include <Foundation/Foundation.h>
-#include <AppKit/NSView.h>
+#import <Foundation/Foundation.h>
+#import <AppKit/NSView.h>
 
 #define ONICON(p, s1, s2) ([self mouse: (p) \
 inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
@@ -47,19 +47,19 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 {
   NSMutableArray *paths;
   NSString *name;
-	NSString *hostname;
+  NSString *hostname;
   FSNode *node;
   BOOL singlepath;
-	BOOL isRootIcon;	
-	BOOL isPakage;	
+  BOOL isRootIcon;	
+  BOOL isPakage;	
   BOOL isSelect;
   BOOL locked;
   
-	NSImage *icon;
-	NSTextField *namelabel;  
+  NSImage *icon;
+  NSTextField *namelabel;  
   NSBezierPath *highlightPath;
-	NSPoint position;
-	int gridindex;
+  NSPoint position;
+  NSUInteger gridindex;
   int labelWidth;
   NSTrackingRectTag trectTag;
   
@@ -83,7 +83,7 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
        inIconsView:(TShelfIconsView *)aview;
 
 - (id)initForPaths:(NSArray *)fpaths 
-				 gridIndex:(int)index
+	 gridIndex:(NSUInteger)index
        inIconsView:(TShelfIconsView *)aview;
 
 - (void)setPaths:(NSArray *)fpaths;
@@ -98,13 +98,13 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 
 - (void)setPosition:(NSPoint)pos;
 
-- (void)setPosition:(NSPoint)pos gridIndex:(int)index;
+- (void)setPosition:(NSPoint)pos gridIndex:(NSUInteger)index;
 
 - (NSPoint)position;
 
-- (void)setGridIndex:(int)index;
+- (void)setGridIndex:(NSUInteger)index;
 
-- (int)gridindex;
+- (NSUInteger)gridindex;
 
 - (NSTextField *)myLabel;
 
@@ -132,8 +132,8 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 - (unsigned int)draggingSourceOperationMaskForLocal:(BOOL)flag;
 
 - (void)draggedImage:(NSImage *)anImage 
-						 endedAt:(NSPoint)aPoint 
-					 deposited:(BOOL)flag;
+             endedAt:(NSPoint)aPoint 
+           deposited:(BOOL)flag;
 
 @end
 
