@@ -536,7 +536,6 @@ pp.y = NSMaxY(br) + 1; \
       {
 	scrollPointToVisible(pp);
 	CONVERT_CHECK;
-	visibleRect = [self visibleRect];
 
 	scrolled = YES;
       }
