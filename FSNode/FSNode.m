@@ -656,29 +656,23 @@
 - (NSString *)sizeDescription
 {
   unsigned long long fsize = [self fileSize];
-	NSString *sizeStr;
-	char *sign = "";
+  NSString *sizeStr;
+  char *sign = "";
     
-	if (fsize == 1) {
-		sizeStr = @"1 byte";
-	} 
+  if (fsize == 1)
+    sizeStr = @"1 byte";
+  else if (fsize == 0)
+    sizeStr = @"0 bytes";
+  else if (fsize < (10 * ONE_KB))
+    sizeStr = [NSString stringWithFormat: @"%s%d bytes", sign, (long)fsize];
+  else if(fsize < (100 * ONE_KB))
+    sizeStr = [NSString stringWithFormat: @"%s%3.2f KB", sign, ((double)fsize / (double)(ONE_KB))];
+  else if(fsize < (100 * ONE_MB))
+    sizeStr = [NSString stringWithFormat: @"%s%3.2f MB", sign,((double)fsize / (double)(ONE_MB))];
+  else 
+    sizeStr = [NSString stringWithFormat:@"%s%3.2f GB", sign, ((double)fsize / (double)(ONE_GB))];
   
-	if (fsize == 0) {
-		sizeStr = @"0 bytes";
-	} else if (fsize < (10 * ONE_KB)) {
-		sizeStr = [NSString stringWithFormat: @"%s%d bytes", sign, (long)fsize];
-	} else if(fsize < (100 * ONE_KB)) {
- 		sizeStr = [NSString stringWithFormat: @"%s%3.2f KB", sign,
-                          					  ((double)fsize / (double)(ONE_KB))];
-	} else if(fsize < (100 * ONE_MB)) {
-		sizeStr = [NSString stringWithFormat: @"%s%3.2f MB", sign,
-                          					  ((double)fsize / (double)(ONE_MB))];
-	} else {
- 		sizeStr = [NSString stringWithFormat:@"%s%3.2f GB", sign,
-                          					  ((double)fsize / (double)(ONE_GB))];
-	}
-
-	return sizeStr;
+  return sizeStr;
 }
 
 - (NSString *)owner
