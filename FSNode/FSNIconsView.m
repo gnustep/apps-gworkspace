@@ -249,20 +249,21 @@ static void GWHighlightFrameRect(NSRect aRect)
   NSRect svr = [[self superview] frame];
   NSRect r = [self frame];
   NSRect maxr = [[NSScreen mainScreen] frame];
-	float px = 0 - gridSize.width;
+  float px = 0 - gridSize.width;
   float py = gridSize.height + Y_MARGIN;
   NSSize sz;
-  int poscount = 0;
-	int count = [icons count];
-	NSRect *irects = NSZoneMalloc (NSDefaultMallocZone(), sizeof(NSRect) * count);
+  NSUInteger poscount = 0;
+  NSUInteger count = [icons count];
+  NSRect *irects = NSZoneMalloc (NSDefaultMallocZone(), sizeof(NSRect) * count);
   NSCachedImageRep *rep = nil;
   NSArray *selection;
-  int i;
+  NSUInteger i;
 
   colcount = 0;
   
-	for (i = 0; i < count; i++) {
-    px += (gridSize.width + X_MARGIN);      
+  for (i = 0; i < count; i++)
+    {
+      px += (gridSize.width + X_MARGIN);      
     
     if (px >= (svr.size.width - gridSize.width)) {
       px = X_MARGIN; 
@@ -353,100 +354,116 @@ static void GWHighlightFrameRect(NSRect aRect)
 
 - (NSString *)selectIconWithPrefix:(NSString *)prefix
 {
-	int i;
+  NSUInteger i;
 
-	for (i = 0; i < [icons count]; i++) {
-		FSNIcon *icon = [icons objectAtIndex: i];
-    NSString *name = [icon shownInfo];
+  for (i = 0; i < [icons count]; i++)
+    {
+      FSNIcon *icon = [icons objectAtIndex: i];
+      NSString *name = [icon shownInfo];
     
-		if ([name hasPrefix: prefix]) {
-      [icon select];
-      [self scrollIconToVisible: icon];
-      
-			return name;
-		}
+      if ([name hasPrefix: prefix])
+	{
+	  [icon select];
+	  [self scrollIconToVisible: icon];
+	  
+	  return name;
 	}
+    }
   
   return nil;
 }
 
 - (void)selectIconInPrevLine
 {
-	FSNIcon *icon;
-	int i, pos = -1;
+  FSNIcon *icon;
+  NSUInteger i;
+  NSInteger pos = -1;
   
-	for (i = 0; i < [icons count]; i++) {
-		icon = [icons objectAtIndex: i];
-    
-		if ([icon isSelected]) {
-			pos = i - colcount;
-			break;
-		}
+  for (i = 0; i < [icons count]; i++)
+    {
+      icon = [icons objectAtIndex: i];
+      
+      if ([icon isSelected])
+	{
+	  pos = i - colcount;
+	  break;
 	}
+    }
   
-	if (pos >= 0) {
-		icon = [icons objectAtIndex: pos];
-		[icon select];
-    [self scrollIconToVisible: icon];
-	}
+  if (pos >= 0)
+    {
+      icon = [icons objectAtIndex: pos];
+      [icon select];
+      [self scrollIconToVisible: icon];
+    }
 }
 
 - (void)selectIconInNextLine
 {
-	FSNIcon *icon;
-	int i, pos = [icons count];
-    
-	for (i = 0; i < [icons count]; i++) {
-		icon = [icons objectAtIndex: i];
-    
-		if ([icon isSelected]) {
-			pos = i + colcount;
-			break;
-		}
-	}
+  FSNIcon *icon;
+  NSUInteger i;
+  NSUInteger pos = [icons count];
   
-	if (pos <= ([icons count] -1)) {
-		icon = [icons objectAtIndex: pos];
-		[icon select];
-    [self scrollIconToVisible: icon];
+  for (i = 0; i < [icons count]; i++)
+    {
+      icon = [icons objectAtIndex: i];
+      
+      if ([icon isSelected])
+	{
+	  pos = i + colcount;
+	  break;
 	}
+    }
+  
+  if (pos <= ([icons count] -1))
+    {
+      icon = [icons objectAtIndex: pos];
+      [icon select];
+      [self scrollIconToVisible: icon];
+    }
 }
 
 - (void)selectPrevIcon
 {
-	int i;
+  NSUInteger i;
     
-	for (i = 0; i < [icons count]; i++) {
-		FSNIcon *icon = [icons objectAtIndex: i];
-    
-		if ([icon isSelected]) {
-			if (i > 0) {
-        icon = [icons objectAtIndex: i - 1];  
-        [icon select];
-        [self scrollIconToVisible: icon];
-			} 
-      break;
-		}
+  for (i = 0; i < [icons count]; i++)
+    {
+      FSNIcon *icon = [icons objectAtIndex: i];
+      
+      if ([icon isSelected])
+	{
+	  if (i > 0)
+	    {
+	      icon = [icons objectAtIndex: i - 1];  
+	      [icon select];
+	      [self scrollIconToVisible: icon];
+	    } 
+	  break;
 	}
+    }
 }
 
 - (void)selectNextIcon
 {
-  int count = [icons count];
-	int i;
+  NSUInteger count = [icons count];
+  NSUInteger i;
     
-	for (i = 0; i < count; i++) {
-		FSNIcon *icon = [icons objectAtIndex: i];
+  for (i = 0; i < count; i++)
+    {
+      FSNIcon *icon = [icons objectAtIndex: i];
     
-		if ([icon isSelected]) {
-			if (i < (count - 1)) {
-				icon = [icons objectAtIndex: i + 1];
-        [icon select];
-        [self scrollIconToVisible: icon];
-			} 
-      break;
-		}
-	} 
+      if ([icon isSelected])
+	{
+	  if (i < (count - 1))
+	    {
+	      icon = [icons objectAtIndex: i + 1];
+	      [icon select];
+	      [self scrollIconToVisible: icon];
+	    } 
+	  break;
+	}
+    } 
 }
 
 - (void)mouseUp:(NSEvent *)theEvent
@@ -479,7 +496,7 @@ static void GWHighlightFrameRect(NSRect aRect)
   NSRect r;
   NSRect selrect;
   float x, y, w, h;
-  int i;
+  NSUInteger i;
 
   pp = NSMakePoint(0,0);
 
@@ -745,7 +762,7 @@ pp.y = NSMaxY(br) + 1; \
   NSDictionary *apps;
   NSEnumerator *app_enum;
   id key; 
-  int i;
+  NSUInteger i;
 
   if ([theEvent modifierFlags] == NSControlKeyMask) {
     return [super menuForEvent: theEvent];
@@ -843,7 +860,7 @@ pp.y = NSMaxY(br) + 1; \
 {
   CREATE_AUTORELEASE_POOL(arp);
   NSArray *subNodes = [anode subNodes];
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [icons count]; i++) {
     [[icons objectAtIndex: i] removeFromSuperview];
@@ -1011,7 +1028,7 @@ pp.y = NSMaxY(br) + 1; \
 {
   NSArray *selection = [self selectedNodes];
   NSMutableArray *opennodes = [NSMutableArray array];
-  int i;
+  NSUInteger i;
             
   RETAIN (selection);
   
@@ -1137,7 +1154,7 @@ pp.y = NSMaxY(br) + 1; \
   NSString *destination = [info objectForKey: @"destination"];
   NSArray *files = [info objectForKey: @"files"];
   NSString *ndpath = [node path];
-  int i; 
+  NSUInteger i; 
  
   if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
     files = [NSArray arrayWithObject: [source lastPathComponent]];
@@ -1214,7 +1231,7 @@ pp.y = NSMaxY(br) + 1; \
   NSString *event = [info objectForKey: @"event"];
   NSArray *files = [info objectForKey: @"files"];
   NSString *ndpath = [node path];
-  int i;
+  NSUInteger i;
 
   if ([event isEqual: @"GWFileDeletedInWatchedDirectory"]) {
     for (i = 0; i < [files count]; i++) {  
@@ -1249,7 +1266,7 @@ pp.y = NSMaxY(br) + 1; \
 - (void)setShowType:(FSNInfoType)type
 {
   if (infoType != type) {
-    int i;
+    NSUInteger i;
     
     infoType = type;
     DESTROY (extInfoType);
@@ -1297,7 +1314,7 @@ pp.y = NSMaxY(br) + 1; \
 
 - (void)setIconSize:(int)size
 {
-  int i;
+  NSUInteger i;
   
   iconSize = size;
   [self calculateGridSize];
@@ -1317,7 +1334,7 @@ pp.y = NSMaxY(br) + 1; \
 
 - (void)setLabelTextSize:(int)size
 {
-  int i;
+  NSUInteger i;
 
   labelTextSize = size;
   ASSIGN (labelFont, [NSFont systemFontOfSize: labelTextSize]);  
@@ -1340,7 +1357,7 @@ pp.y = NSMaxY(br) + 1; \
 
 - (void)setIconPosition:(int)pos
 {
-  int i;
+  NSUInteger i;
   
   iconPosition = pos;
   [self calculateGridSize];
@@ -1360,7 +1377,7 @@ pp.y = NSMaxY(br) + 1; \
 
 - (void)updateIcons
 {
-  int i;
+  NSUInteger i;
   
   for (i = 0; i < [icons count]; i++) {
     FSNIcon *icon = [icons objectAtIndex: i];
@@ -1371,7 +1388,7 @@ pp.y = NSMaxY(br) + 1; \
 
 - (id)repOfSubnode:(FSNode *)anode
 {
-  int i;
+  NSUInteger i;
   
   for (i = 0; i < [icons count]; i++) {
     FSNIcon *icon = [icons objectAtIndex: i];
@@ -1386,7 +1403,7 @@ pp.y = NSMaxY(br) + 1; \
 
 - (id)repOfSubnodePath:(NSString *)apath
 {
-  int i;
+  NSUInteger i;
   
   for (i = 0; i < [icons count]; i++) {
     FSNIcon *icon = [icons objectAtIndex: i];
@@ -1466,7 +1483,7 @@ pp.y = NSMaxY(br) + 1; \
 
 - (void)unselectOtherReps:(id)arep
 {
-  int i;
+  NSUInteger i;
 
   if (selectionMask & FSNMultipleSelectionMask) {
     return;
@@ -1483,12 +1500,12 @@ pp.y = NSMaxY(br) + 1; \
 
 - (void)selectReps:(NSArray *)reps
 {
-  int i;
+  NSUInteger i;
   
   selectionMask = NSSingleSelectionMask;
   selectionMask |= FSNCreatingSelectionMask;
   
-	[self unselectOtherReps: nil];
+  [self unselectOtherReps: nil];
   
   selectionMask = FSNMultipleSelectionMask;
   selectionMask |= FSNCreatingSelectionMask;
@@ -1504,12 +1521,12 @@ pp.y = NSMaxY(br) + 1; \
 
 - (void)selectRepsOfSubnodes:(NSArray *)nodes
 {
-  int i;
+  NSUInteger i;
   
   selectionMask = NSSingleSelectionMask;
   selectionMask |= FSNCreatingSelectionMask;
   
-	[self unselectOtherReps: nil];
+  [self unselectOtherReps: nil];
   
   selectionMask = FSNMultipleSelectionMask;
   selectionMask |= FSNCreatingSelectionMask;
@@ -1529,12 +1546,12 @@ pp.y = NSMaxY(br) + 1; \
 
 - (void)selectRepsOfPaths:(NSArray *)paths
 {
-  int i;
+  NSUInteger i;
   
   selectionMask = NSSingleSelectionMask;
   selectionMask |= FSNCreatingSelectionMask;
   
-	[self unselectOtherReps: nil];
+  [self unselectOtherReps: nil];
   
   selectionMask = FSNMultipleSelectionMask;
   selectionMask |= FSNCreatingSelectionMask;
@@ -1554,17 +1571,17 @@ pp.y = NSMaxY(br) + 1; \
 
 - (void)selectAll
 {
-	int i;
+  NSUInteger i;
 
   selectionMask = NSSingleSelectionMask;
   selectionMask |= FSNCreatingSelectionMask;
   
-	[self unselectOtherReps: nil];
+  [self unselectOtherReps: nil];
   
   selectionMask = FSNMultipleSelectionMask;
   selectionMask |= FSNCreatingSelectionMask;
   
-	for (i = 0; i < [icons count]; i++) {
+  for (i = 0; i < [icons count]; i++) {
     FSNIcon *icon = [icons objectAtIndex: i];
     FSNode *inode = [icon node];
     
@@ -1598,7 +1615,7 @@ pp.y = NSMaxY(br) + 1; \
 - (NSArray *)selectedReps
 {
   NSMutableArray *selectedReps = [NSMutableArray array];
-  int i;
+  NSUInteger i;
   
   for (i = 0; i < [icons count]; i++) {
     FSNIcon *icon = [icons objectAtIndex: i];
@@ -1614,7 +1631,7 @@ pp.y = NSMaxY(br) + 1; \
 - (NSArray *)selectedNodes
 {
   NSMutableArray *selectedNodes = [NSMutableArray array];
-  int i;
+  NSUInteger i;
   
   for (i = 0; i < [icons count]; i++) {
     FSNIcon *icon = [icons objectAtIndex: i];
@@ -1636,7 +1653,7 @@ pp.y = NSMaxY(br) + 1; \
 - (NSArray *)selectedPaths
 {
   NSMutableArray *selectedPaths = [NSMutableArray array];
-  int i, j;
+  NSUInteger i, j;
   
   for (i = 0; i < [icons count]; i++) {
     FSNIcon *icon = [icons objectAtIndex: i];
@@ -1659,7 +1676,7 @@ pp.y = NSMaxY(br) + 1; \
 
 - (void)selectionDidChange
 {
-	if (!(selectionMask & FSNCreatingSelectionMask)) {
+  if (!(selectionMask & FSNCreatingSelectionMask)) {
     NSArray *selection = [self selectedNodes];
 		
     if ([selection count] == 0) {
@@ -1677,7 +1694,7 @@ pp.y = NSMaxY(br) + 1; \
 
 - (void)checkLockedReps
 {
-  int i;
+  NSUInteger i;
   
   for (i = 0; i < [icons count]; i++) {
     [[icons objectAtIndex: i] checkLocked];
@@ -1771,9 +1788,9 @@ pp.y = NSMaxY(br) + 1; \
 
 - (void)setTextColor:(NSColor *)acolor
 {
-  int i;
+  NSUInteger i;
   
-	for (i = 0; i < [icons count]; i++) {
+  for (i = 0; i < [icons count]; i++) {
     [[icons objectAtIndex: i] setLabelTextColor: acolor];  
   }
   
@@ -1799,13 +1816,13 @@ pp.y = NSMaxY(br) + 1; \
 
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
-	NSPasteboard *pb;
+  NSPasteboard *pb;
   NSDragOperation sourceDragMask;
-	NSArray *sourcePaths;
+  NSArray *sourcePaths;
   NSString *basePath;
   NSString *nodePath;
   NSString *prePath;
-	int count;
+  NSUInteger count;
   
 	isDragTarget = NO;	
     
@@ -1864,13 +1881,13 @@ pp.y = NSMaxY(br) + 1; \
 
   if ([node isDirectory] && [node isParentOfPath: basePath]) {
     NSArray *subNodes = [node subNodes];
-    int i;
+    NSUInteger i;
     
     for (i = 0; i < [subNodes count]; i++) {
       FSNode *nd = [subNodes objectAtIndex: i];
       
       if ([nd isDirectory]) {
-        int j;
+        NSUInteger j;
         
         for (j = 0; j < count; j++) {
           NSString *fname = [[sourcePaths objectAtIndex: j] lastPathComponent];
@@ -1991,18 +2008,18 @@ pp.y = NSMaxY(br) + 1; \
 
 - (void)concludeDragOperation:(id <NSDraggingInfo>)sender
 {
-	NSPasteboard *pb;
+  NSPasteboard *pb;
   NSDragOperation sourceDragMask;
-	NSArray *sourcePaths;
+  NSArray *sourcePaths;
   NSString *operation, *source;
   NSMutableArray *files;
-	NSMutableDictionary *opDict;
-	NSString *trashPath;
-  int i;
+  NSMutableDictionary *opDict;
+  NSString *trashPath;
+  NSUInteger i;
+  
+  isDragTarget = NO;  
 
-	isDragTarget = NO;  
-
-	sourceDragMask = [sender draggingSourceOperationMask];
+  sourceDragMask = [sender draggingSourceOperationMask];
   pb = [sender draggingPasteboard];
     
   if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"]) {  
@@ -2145,7 +2162,7 @@ pp.y = NSMaxY(br) + 1; \
 
 - (void)stopRepNameEditing
 {
-  int i;
+  NSUInteger i;
 
   if ([[self subviews] containsObject: nameEditor]) {
     NSRect edrect = [nameEditor frame];
