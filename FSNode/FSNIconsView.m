@@ -2127,6 +2127,11 @@ pp.y = NSMaxY(br) + 1; \
         edrect.size.width = bw - edrect.origin.x;
       }    
     }
+    else
+      {
+	NSLog(@"Unexpected icon position in [FSNIconsView updateNameEditor]");
+	return;
+      }
 
     edrect = NSIntegralRect(edrect);
 
