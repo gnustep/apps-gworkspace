@@ -1,8 +1,13 @@
+2012-10-17 Riccardo Mottola <rm@gnu.org>
+
+	* Tools/ddbd/DDBMDStorage.m
+	Fix destroy before data access.
+
 2012-10-16 Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNode.m
 	Fix size calculation bug.
-	
+
 2012-10-14 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/TShelf/TShelfWin.m

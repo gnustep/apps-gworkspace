@@ -1,6 +1,6 @@
 /* DDBMDStorage.m
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2012 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2005
@@ -70,23 +70,26 @@
   
     exists = [fm fileExistsAtPath: basePath isDirectory: &isdir];
     
-    if (exists == NO) {
-      if ([fm createDirectoryAtPath: basePath attributes: nil] == NO) {
-        DESTROY (self);
-        [NSException raise: NSInvalidArgumentException
-		                format: @"cannot create directory at: %@", basePath];     
-        return self;
-      }    
+    if (exists == NO)
+      {
+	if ([fm createDirectoryAtPath: basePath attributes: nil] == NO)
+	  {
+	    [NSException raise: NSInvalidArgumentException
+			format: @"cannot create directory at: %@", basePath];
+	    DESTROY (self);
+	    return nil;
+	  }    
     
-      isdir = YES;
-    }
+	isdir = YES;
+      }
   
-    if (isdir == NO) {
-      DESTROY (self);
-      [NSException raise: NSInvalidArgumentException
-		              format: @"%@ is not a directory!", basePath];     
-      return self;
-    } 
+    if (isdir == NO)
+      {      
+	[NSException raise: NSInvalidArgumentException
+		    format: @"%@ is not a directory!", basePath];
+	DESTROY (self);
+	return nil;
+      } 
     
     if ([fm fileExistsAtPath: freepath]) {
       freeEntries = [NSMutableArray arrayWithContentsOfFile: freepath];
