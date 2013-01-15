@@ -63,6 +63,10 @@ static NSString *defaultxterm = @"xterm";
 
 static GWorkspace *gworkspace = nil;
 
+@interface	GWorkspace (PrivateMethods)
+- (void)_updateTrashContents;
+@end
+
 @implementation GWorkspace
 
 #ifndef byname
@@ -418,6 +422,7 @@ static GWorkspace *gworkspace = nil;
 	selectedPaths = [[NSArray alloc] initWithObjects: NSHomeDirectory(), nil];
   trashContents = [NSMutableArray new];
   ASSIGN (trashPath, [self trashPath]);
+  [self _updateTrashContents];
   
   startAppWin = [[StartAppWin alloc] init];
   
@@ -1128,22 +1133,7 @@ static GWorkspace *gworkspace = nil;
     NSString *destination = [info objectForKey: @"destination"];
   
     if ([source isEqual: trashPath] || [destination isEqual: trashPath]) {    
-      FSNode *node = [FSNode nodeWithPath: trashPath];
-
-      [trashContents removeAllObjects];
-
-      if (node && [node isValid]) {
-        NSArray *subNodes = [node subNodes];
-        int i; 
-
-        for (i = 0; i < [subNodes count]; i++) {
-          FSNode *subnode = [subNodes objectAtIndex: i];
-
-          if ([subnode isReserved] == NO) {
-            [trashContents addObject: subnode];
-          }
-        }
-      }      
+      [self _updateTrashContents];
     }
     
     if (ddbd != nil) {
@@ -1822,22 +1812,7 @@ static GWorkspace *gworkspace = nil;
     NSString *path = [info objectForKey: @"path"];
 
     if ([path isEqual: trashPath]) {
-      FSNode *node = [FSNode nodeWithPath: trashPath];
-
-      [trashContents removeAllObjects];
-
-      if (node && [node isValid]) {
-        NSArray *subNodes = [node subNodes];
-        int i; 
-
-        for (i = 0; i < [subNodes count]; i++) {
-          FSNode *subnode = [subNodes objectAtIndex: i];
-
-          if ([subnode isReserved] == NO) {
-            [trashContents addObject: subnode];
-          }
-        }
-      }
+      [self _updateTrashContents];
     }
   }
   
@@ -2816,4 +2791,27 @@ static GWorkspace *gworkspace = nil;
 @end
 
 
+@implementation	GWorkspace (PrivateMethods)
+
+- (void)_updateTrashContents
+{
+  FSNode *node = [FSNode nodeWithPath: trashPath];
+
+  [trashContents removeAllObjects];
+
+  if (node && [node isValid]) {
+    NSArray *subNodes = [node subNodes];
+    int i;
+
+    for (i = 0; i < [subNodes count]; i++) {
+      FSNode *subnode = [subNodes objectAtIndex: i];
+
+      if ([subnode isReserved] == NO) {
+	[trashContents addObject: subnode];
+      }
+    }
+  }
+}
+
+@end
 

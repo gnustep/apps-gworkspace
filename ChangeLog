@@ -1,3 +1,10 @@
+2013-01-15  Wolfgang Lux  <wolfgang.lux@gmail.com>
+
+	* GWorkspace/GWorkspace.m (-applicationWillFinishLaunching:,
+	(-fileSystemDidChange:, -watchedPathDidChange:, -_updateTrashContents):
+	Initialize trashContents attribute from actual trash contents and
+	avoid code duplication.
+
 2012-10-17 Riccardo Mottola <rm@gnu.org>
 
 	* Tools/ddbd/DDBMDStorage.m
