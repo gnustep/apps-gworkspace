@@ -1,3 +1,9 @@
+2013-01-15 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/GWorkspace.m
+	* GWorkspace/Desktop/Dock/DockIcon.m
+	Change count variable from int to NSUInteger
+
 2013-01-15  Wolfgang Lux  <wolfgang.lux@gmail.com>
 
 	* GWorkspace/GWorkspace.m (-applicationWillFinishLaunching:,

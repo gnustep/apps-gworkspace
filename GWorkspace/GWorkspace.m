@@ -1,6 +1,6 @@
 /* GWorkspace.m
  *  
- * Copyright (C) 2003-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola
@@ -2801,7 +2801,7 @@ static GWorkspace *gworkspace = nil;
 
   if (node && [node isValid]) {
     NSArray *subNodes = [node subNodes];
-    int i;
+    NSUInteger i;
 
     for (i = 0; i < [subNodes count]; i++) {
       FSNode *subnode = [subNodes objectAtIndex: i];

@@ -1,6 +1,6 @@
 /* DockIcon.m
  *  
- * Copyright (C) 2005-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -111,7 +111,7 @@
 
     if (isTrashIcon) {
       NSArray *subNodes;
-      int i, count;
+      NSUInteger i, count;
 
       ASSIGN (icon, [fsnodeRep trashIconOfSize: ceil(icnBounds.size.width)]);
       ASSIGN (trashFullIcon, [fsnodeRep trashFullIconOfSize: ceil(icnBounds.size.width)]);
@@ -533,7 +533,7 @@ x += 6; \
 
 - (void)setDraggedPaths:(NSArray *)paths
 {
-  int i;
+  NSUInteger i;
   
   [self unselect];
         
