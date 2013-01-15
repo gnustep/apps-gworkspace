@@ -274,28 +274,29 @@
     return;
   }
 
-	dialog = [[SympleDialog alloc] initWithTitle: NSLocalizedString(@"Add Tab", @"") 
-                                      editText: @""
-                                   switchTitle: NSLocalizedString(@"pasteboard tab", @"")];
-  AUTORELEASE (dialog);
-	[dialog center];
+  dialog = [[SympleDialog alloc] initWithTitle: NSLocalizedString(@"Add Tab", @"") 
+				      editText: @""
+				   switchTitle: NSLocalizedString(@"pasteboard tab", @"")];
+  [dialog center];
   [dialog makeKeyWindow];
   [dialog orderFrontRegardless];
-
+  
   result = [dialog runModal];
-	if (result != NSAlertDefaultReturn) {
+  [dialog release];
+  if (result != NSAlertDefaultReturn) {
     return;
   }  
 
   tabName = [dialog getEditFieldText];
 
-  if ([tabName length] == 0) {
-		NSString *msg = NSLocalizedString(@"No name supplied!", @"");
-		NSString *buttstr = NSLocalizedString(@"Continue", @"");		
-    NSRunAlertPanel(nil, msg, buttstr, nil, nil);  
-    return;
-  }
-
+  if ([tabName length] == 0)
+    {
+      NSString *msg = NSLocalizedString(@"No name supplied!", @"");
+      NSString *buttstr = NSLocalizedString(@"Continue", @"");		
+      NSRunAlertPanel(nil, msg, buttstr, nil, nil);  
+      return;
+    }
+  
   items = [tView items];
 
   duplicate = NO;
@@ -308,12 +309,13 @@
     }
   }
 
-  if (duplicate) {
-		NSString *msg = NSLocalizedString(@"Duplicate tab name!", @"");
-		NSString *buttstr = NSLocalizedString(@"Continue", @"");		
-    NSRunAlertPanel(nil, msg, buttstr, nil, nil);  
-    return;
-  }
+  if (duplicate)
+    {
+      NSString *msg = NSLocalizedString(@"Duplicate tab name!", @"");
+      NSString *buttstr = NSLocalizedString(@"Continue", @"");		
+      NSRunAlertPanel(nil, msg, buttstr, nil, nil);  
+      return;
+    }
   
   itype = ([dialog switchButtState] == NSOnState) ? DATA_TAB : FILES_TAB;
   
@@ -392,45 +394,49 @@
   if ([self isVisible] == NO) {
     return;
   }
-
+  
   items = [tView items];
   item = [tView selectedTabItem];
   oldName = [item label];
   index = [tView indexOfItem: item];
 
-  if (item == [tView lastTabItem]) {
-		NSString *msg = NSLocalizedString(@"You can't rename this tab!", @"");
-		NSString *buttstr = NSLocalizedString(@"Continue", @"");		
-    NSRunAlertPanel(nil, msg, buttstr, nil, nil);  
-    return;
-  }
-
-	dialog = [[SympleDialog alloc] initWithTitle: NSLocalizedString(@"Rename Tab", @"") 
+  if (item == [tView lastTabItem])
+    {
+      NSString *msg = NSLocalizedString(@"You can't rename this tab!", @"");
+      NSString *buttstr = NSLocalizedString(@"Continue", @"");		
+      NSRunAlertPanel(nil, msg, buttstr, nil, nil);  
+      return;
+    }
+  
+  dialog = [[SympleDialog alloc] initWithTitle: NSLocalizedString(@"Rename Tab", @"") 
                                       editText: oldName
                                    switchTitle: nil];
-  AUTORELEASE (dialog);
-	[dialog center];
+  
+  [dialog center];
   [dialog makeKeyWindow];
   [dialog orderFrontRegardless];
-
+  
   result = [dialog runModal];
-	if(result != NSAlertDefaultReturn) {
+  [dialog release];
+
+  if(result != NSAlertDefaultReturn) {
     return;
   }  
 
   tabName = [dialog getEditFieldText];
 
-  if ([tabName length] == 0) {
-		NSString *msg = NSLocalizedString(@"No name supplied!", @"");
-		NSString *buttstr = NSLocalizedString(@"Continue", @"");		
-    NSRunAlertPanel(nil, msg, buttstr, nil, nil);  
-    return;
-  }
-
+  if ([tabName length] == 0)
+    {
+      NSString *msg = NSLocalizedString(@"No name supplied!", @"");
+      NSString *buttstr = NSLocalizedString(@"Continue", @"");		
+      NSRunAlertPanel(nil, msg, buttstr, nil, nil);
+      return;
+    }
+  
   duplicate = NO;
   for (i = 0; i < [items count]; i++) {
     TShelfViewItem *itm = [items objectAtIndex: i];
-
+    
     if ([[itm label] isEqual: tabName]) {
       duplicate = YES;
       break;

@@ -1,5 +1,10 @@
 2013-01-15 Riccardo Mottola <rm@gnu.org>
 
+	* GWorkspace/TShelf/TShelfWin.m (addTab, renameTab)
+	Release dialog laterinstead of autoreleasing immediately.
+
+2013-01-15 Riccardo Mottola <rm@gnu.org>
+
 	* GWorkspace/GWorkspace.m
 	* GWorkspace/Desktop/Dock/DockIcon.m
 	Change count variable from int to NSUInteger
