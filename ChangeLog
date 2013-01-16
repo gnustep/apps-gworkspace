@@ -1,3 +1,8 @@
+2013-01-16 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/TShelf/TShelfIcon.m
+	Initialize by returning self correctly.
+
 2013-01-15 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/TShelf/TShelfWin.m (addTab, renameTab)

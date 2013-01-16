@@ -164,8 +164,11 @@
         atPosition:(NSPoint)pos
        inIconsView:(TShelfIconsView *)aview
 {
-  [self initForPaths: fpaths inIconsView: aview];
-  position = NSMakePoint(pos.x, pos.y);
+  self = [self initForPaths: fpaths inIconsView: aview];
+  if (self)
+    {
+      position = NSMakePoint(pos.x, pos.y);
+    }
   return self;
 }
 
@@ -173,8 +176,11 @@
 	 gridIndex:(NSUInteger)index
        inIconsView:(TShelfIconsView *)aview
 {
-  [self initForPaths: fpaths inIconsView: aview];
-  gridindex = index;
+  self = [self initForPaths: fpaths inIconsView: aview];
+  if (self)
+    {
+      gridindex = index;
+    }
   return self;
 }
 
