@@ -1,6 +1,6 @@
 /* Inspector.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
@@ -22,16 +22,17 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "Inspector.h"
-#include "ContentViewersProtocol.h"
-#include "Contents.h"
-#include "Attributes.h"
-#include "Tools.h"
-#include "Annotations.h"
-#include "IconView.h"
-#include "Functions.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+
+#import "Inspector.h"
+#import "ContentViewersProtocol.h"
+#import "Contents.h"
+#import "Attributes.h"
+#import "Tools.h"
+#import "Annotations.h"
+#import "IconView.h"
+#import "Functions.h"
 
 #define ATTRIBUTES   0
 #define CONTENTS     1
@@ -382,10 +383,11 @@ static NSString *nibName = @"InspectorWin";
       RELEASE (newimage);  
       RELEASE (newBitmapImageRep);
     }
-
-    RELEASE (image);  
+    
   } 
-  
+
+  [image release];
+
   if (data) {  
     NSString *dirpath = [currentPaths objectAtIndex: 0];
     NSString *imgpath = [dirpath stringByAppendingPathComponent: @".dir.tiff"];
