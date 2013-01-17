@@ -1,6 +1,6 @@
 /* FileOpInfo.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -784,53 +784,60 @@ static NSString *nibName = @"FileOperationWin";
 
 - (oneway void)calculateNumFiles
 {
-  int i, fnum = 0;
+  NSUInteger i;
+  NSUInteger fnum = 0;
 
-  for (i = 0; i < [files count]; i++) {
-    CREATE_AUTORELEASE_POOL (arp);
-    NSDictionary *dict = [files objectAtIndex: i];
-    NSString *name = [dict objectForKey: @"name"]; 
-    NSString *path = [source stringByAppendingPathComponent: name];       
-	  BOOL isDir = NO;
+  for (i = 0; i < [files count]; i++)
+    {
+      CREATE_AUTORELEASE_POOL (arp);
+      NSDictionary *dict = [files objectAtIndex: i];
+      NSString *name = [dict objectForKey: @"name"]; 
+      NSString *path = [source stringByAppendingPathComponent: name];       
+      BOOL isDir = NO;
     
-	  [fm fileExistsAtPath: path isDirectory: &isDir];
-    
-	  if (isDir) {
-      NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: path];
+      [fm fileExistsAtPath: path isDirectory: &isDir];
       
-      while (1) {
-        CREATE_AUTORELEASE_POOL (arp2);
-        NSString *dirEntry = [enumerator nextObject];
-      
-        if (dirEntry) {
-          if (stopped) {
-            break;
-          }
-			    fnum++;
-        
-        } else {
-          RELEASE (arp2);
-          break;
+      if (isDir)
+        {
+          NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: path];
+          
+          while (1)
+            {
+              CREATE_AUTORELEASE_POOL (arp2);
+              NSString *dirEntry = [enumerator nextObject];
+              
+              if (dirEntry)
+                {
+                  if (stopped)
+                    {
+                      RELEASE (arp2);
+                      break;
+                    }
+                  fnum++;
+                }
+              else
+                {
+                  RELEASE (arp2);
+                  break;
+                }
+              RELEASE (arp2);
+            }
+        }
+      else
+        {
+          fnum++;
         }
       
-        RELEASE (arp2);
-      }
-            
-	  } else {
-		  fnum++;
-	  }
-    
-    if (stopped) {
+      if (stopped)
+        {
+          RELEASE (arp);
+          break;
+        }
       RELEASE (arp);
-      break;
     }
-    
-    RELEASE (arp);
-  }
 
-  if (stopped) {
+  if (stopped)
     [self done];
-  }
 
   fcount = 0;
   stepcount = 0;

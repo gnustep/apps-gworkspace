@@ -3,6 +3,9 @@
 	* Inspector/Attributes.m (activateForPaths:)
 	Cleanup and fix warning.
 
+	* Operation/FileOpInfo.m (calculateNumFiles:)
+	Cleanup, fix missing release of arp2 on break and transition index to NSUInteger.
+
 2013-01-16 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/TShelf/TShelfIcon.m
@@ -58,10 +61,10 @@
 	* DBKit/DBKBTreeNode.m
 	Fix unsigned integer loop.
 
-2012-06-20: Sebastian Reitenbach <sebastia@l00-bugdead-prods.de>
+2012-06-20 Sebastian Reitenbach <sebastia@l00-bugdead-prods.de>
 
 	* GWorkspace/Desktop/Dock/DockIcon.m
-	Fix unmounting of CD-Rom on OpenBSD that was mounted 
+	Fix unmounting of CD-Rom on OpenBSD that was mounted
 	using kern.usermount facilities. The mount point changes
 	ownership to root:wheel, and the removed check prevented
 	trying to unmount the device.
