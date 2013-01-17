@@ -1,6 +1,6 @@
 /* FSNIconsView.m
  *  
- * Copyright (C) 2004-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -1968,6 +1968,7 @@ pp.y = NSMaxY(br) + 1; \
       p = [self convertPoint: p fromView: nil];
 
       if ([self mouse: p inRect: ir]) {
+        RELEASE (pool);
         break;
       }
       
