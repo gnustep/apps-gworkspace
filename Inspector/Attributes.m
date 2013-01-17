@@ -1,6 +1,6 @@
 /* Attributes.m
  *  
- * Copyright (C) 2004-2011 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
@@ -176,16 +176,16 @@ static BOOL sizeStop = NO;
 
 - (void)activateForPaths:(NSArray *)paths
 {
-	NSString *fpath;
-	NSString *ftype, *s;
-	NSString *usr, *grp, *tmpusr, *tmpgrp;
-	NSDate *date;
+  NSString *fpath;
+  NSString *ftype;
+  NSString *usr, *grp, *tmpusr, *tmpgrp;
+  NSDate *date;
   NSDate *tmpdate = nil;
-	NSCalendarDate *cdate;
-	NSDictionary *attrs;
-	unsigned long perms;
-	BOOL sameOwner, sameGroup;
-	int i;
+  NSCalendarDate *cdate;
+  NSDictionary *attrs;
+  unsigned long perms;
+  BOOL sameOwner, sameGroup;
+  int i;
 
   sizeStop = YES;
 
@@ -194,158 +194,172 @@ static BOOL sizeStop = NO;
     return;
   }
   	
-	attrs = [fm fileAttributesAtPath: [paths objectAtIndex: 0] traverseLink: NO];
+  attrs = [fm fileAttributesAtPath: [paths objectAtIndex: 0] traverseLink: NO];
 
-	ASSIGN (insppaths, paths);
-	pathscount = [insppaths count];	
-	ASSIGN (currentPath, [paths objectAtIndex: 0]);		
-	ASSIGN (attributes, attrs);	
+  ASSIGN (insppaths, paths);
+  pathscount = [insppaths count];	
+  ASSIGN (currentPath, [paths objectAtIndex: 0]);		
+  ASSIGN (attributes, attrs);	
 
-	[revertButt setEnabled: NO];
-	[okButt setEnabled: NO];
+  [revertButt setEnabled: NO];
+  [okButt setEnabled: NO];
   	
-	if (pathscount == 1) {   // Single Selection
-    FSNode *node = [FSNode nodeWithPath: currentPath];
-    NSImage *icon = [[FSNodeRep sharedInstance] iconOfSize: ICNSIZE forNode: node];
-    
-    [iconView setImage: icon];
-    [titleField setStringValue: [currentPath lastPathComponent]];
-  
-		usr = [attributes objectForKey: NSFileOwnerAccountName];
-		grp = [attributes objectForKey: NSFileGroupOwnerAccountName];
-		date = [attributes objectForKey: NSFileModificationDate];
-		perms = [[attributes objectForKey: NSFilePosixPermissions] unsignedLongValue];			
+  if (pathscount == 1)
+    { /* Single Selection */
 
-	#ifdef __WIN32__
-		iamRoot = YES;
-	#else
-		iamRoot = (geteuid() == 0);
-	#endif
-	
-		isMyFile = ([NSUserName() isEqual: usr]);
-    
-    [insideButt	setState: NSOffState];
-
-		ftype = [attributes objectForKey: NSFileType];
-		if ([ftype isEqual: NSFileTypeDirectory] == NO) {	
-      NSString *fsize = fsDescription([[attributes objectForKey: NSFileSize] unsignedLongLongValue]);
-		  [sizeField setStringValue: fsize]; 
-      [calculateButt setEnabled: NO];
-      [insideButt	setEnabled: NO];
-    } else {
-      [sizeField setStringValue: @"--"]; 
-
-      if (autocalculate) {
-        if (sizer == nil) {
-          [self startSizer];
-        } else {
-          [sizer computeSizeOfPaths: insppaths];
+      FSNode *node = [FSNode nodeWithPath: currentPath];
+      NSImage *icon = [[FSNodeRep sharedInstance] iconOfSize: ICNSIZE forNode: node];
+      
+      [iconView setImage: icon];
+      [titleField setStringValue: [currentPath lastPathComponent]];
+      
+      usr = [attributes objectForKey: NSFileOwnerAccountName];
+      grp = [attributes objectForKey: NSFileGroupOwnerAccountName];
+      date = [attributes objectForKey: NSFileModificationDate];
+      perms = [[attributes objectForKey: NSFilePosixPermissions] unsignedLongValue];			
+      
+#ifdef __WIN32__
+      iamRoot = YES;
+#else
+      iamRoot = (geteuid() == 0);
+#endif
+      
+      isMyFile = ([NSUserName() isEqual: usr]);
+      
+      [insideButt setState: NSOffState];
+      
+      ftype = [attributes objectForKey: NSFileType];
+      if ([ftype isEqual: NSFileTypeDirectory] == NO)
+        {	
+          NSString *fsize = fsDescription([[attributes objectForKey: NSFileSize] unsignedLongLongValue]);
+          [sizeField setStringValue: fsize]; 
+          [calculateButt setEnabled: NO];
+          [insideButt	setEnabled: NO];
         }
-      } else {
-        [calculateButt setEnabled: YES];
-      }
+      else
+        {
+          [sizeField setStringValue: @"--"]; 
+          
+          if (autocalculate)
+            {
+              if (sizer == nil)
+                [self startSizer];
+              else
+                [sizer computeSizeOfPaths: insppaths];
+            }
+          else
+            {
+              [calculateButt setEnabled: YES];
+            }
+          
+          [insideButt	setEnabled: YES];
+        }
+      
+                
+      if ([ftype isEqual: NSFileTypeSymbolicLink])
+        {
+          NSString *s;
 
-      [insideButt	setEnabled: YES];
-		}
-
-		s = [currentPath stringByDeletingLastPathComponent];
-
-		if ([ftype isEqual: NSFileTypeSymbolicLink]) {
-			s = [fm pathContentOfSymbolicLinkAtPath: currentPath];
-			s = relativePathFit(linkToField, s);
-			[linkToField setStringValue: s];
-      [linkToLabel setTextColor: [NSColor blackColor]];		
-			[linkToField setTextColor: [NSColor blackColor]];		      
-		} else {
-			[linkToField setStringValue: @""];
-      [linkToLabel setTextColor: [NSColor darkGrayColor]];		
-			[linkToField setTextColor: [NSColor darkGrayColor]];		
-		}
-			
-		[ownerField setStringValue: usr]; 
-		[groupField setStringValue: grp]; 
-
-    [self setPermissions: perms isActive: (iamRoot || isMyFile)];
-
-		cdate = [date dateWithCalendarFormat: nil timeZone: nil];	
-		[timeDateView setDate: cdate];
-
-	} else {	   // Multiple Selection
-    NSImage *icon = [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: ICNSIZE];
-    NSString *items = NSLocalizedString(@"items", @"");
-    
-    items = [NSString stringWithFormat: @"%i %@", [paths count], items];
-		[titleField setStringValue: items];  
-    [iconView setImage: icon];
-  
-		ftype = [attributes objectForKey: NSFileType];
-
-    [sizeField setStringValue: @"--"]; 
-
-    if (autocalculate) {
-      if (sizer == nil) {
-        [self startSizer];
-      } else {
-        [sizer computeSizeOfPaths: insppaths];
-      }
-    } else {
-      [calculateButt setEnabled: YES];
+          s = [fm pathContentOfSymbolicLinkAtPath: currentPath];
+          s = relativePathFit(linkToField, s);
+          [linkToField setStringValue: s];
+          [linkToLabel setTextColor: [NSColor blackColor]];		
+          [linkToField setTextColor: [NSColor blackColor]];		      
+        }
+      else
+        {
+          [linkToField setStringValue: @""];
+          [linkToLabel setTextColor: [NSColor darkGrayColor]];		
+          [linkToField setTextColor: [NSColor darkGrayColor]];		
+        }
+      
+      [ownerField setStringValue: usr]; 
+      [groupField setStringValue: grp]; 
+      
+      [self setPermissions: perms isActive: (iamRoot || isMyFile)];
+      
+      cdate = [date dateWithCalendarFormat: nil timeZone: nil];	
+      [timeDateView setDate: cdate];
+      
     }
+  else
+    { /* Multiple Selection */
+      NSImage *icon = [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: ICNSIZE];
+      NSString *items = NSLocalizedString(@"items", @"");
+      
+      items = [NSString stringWithFormat: @"%i %@", [paths count], items];
+      [titleField setStringValue: items];  
+      [iconView setImage: icon];
+  
+      ftype = [attributes objectForKey: NSFileType];
+      
+      [sizeField setStringValue: @"--"]; 
+      
+      if (autocalculate)
+        {
+          if (sizer == nil)
+            [self startSizer];
+          else
+            [sizer computeSizeOfPaths: insppaths];
+        }
+      else
+        {
+          [calculateButt setEnabled: YES];
+        }
     
-		usr = [attributes objectForKey: NSFileOwnerAccountName];
-		grp = [attributes objectForKey: NSFileGroupOwnerAccountName];
-		date = [attributes objectForKey: NSFileModificationDate];
-		perms = [[attributes objectForKey: NSFilePosixPermissions] unsignedLongValue];			
+      usr = [attributes objectForKey: NSFileOwnerAccountName];
+      grp = [attributes objectForKey: NSFileGroupOwnerAccountName];
+      date = [attributes objectForKey: NSFileModificationDate];
+      perms = [[attributes objectForKey: NSFilePosixPermissions] unsignedLongValue];			
 
-		sameOwner = YES;
-		sameGroup = YES;
+      sameOwner = YES;
+      sameGroup = YES;
 		
-		for (i = 0; i < [insppaths count]; i++) {
-			fpath = [insppaths objectAtIndex: i];
-			attrs = [fm fileAttributesAtPath: fpath traverseLink: NO];
-			tmpusr = [attrs objectForKey: NSFileOwnerAccountName];
-			if ([tmpusr isEqualToString: usr] == NO) {
-				sameOwner = NO;
-			}
-			tmpgrp = [attrs objectForKey: NSFileGroupOwnerAccountName];
-			if ([tmpgrp isEqualToString: grp] == NO) {
-				sameGroup = NO;
-			}
-			tmpdate = [date earlierDate: [attrs objectForKey: NSFileModificationDate]];
-		}
-		
-		if(sameOwner == NO) {
-			usr = @"-";
-		}
-		if(sameGroup == NO) {
-			grp = @"-";
-		}
+      for (i = 0; i < [insppaths count]; i++)
+        {
+          fpath = [insppaths objectAtIndex: i];
+          attrs = [fm fileAttributesAtPath: fpath traverseLink: NO];
+          tmpusr = [attrs objectForKey: NSFileOwnerAccountName];
+          if ([tmpusr isEqualToString: usr] == NO)
+            sameOwner = NO;
+          tmpgrp = [attrs objectForKey: NSFileGroupOwnerAccountName];
+          if ([tmpgrp isEqualToString: grp] == NO)
+            sameGroup = NO;
+          tmpdate = [date earlierDate: [attrs objectForKey: NSFileModificationDate]];
+        }
+      
+      if(sameOwner == NO)
+        usr = @"-";
 
-	#ifdef __WIN32__
-		iamRoot = YES;
-	#else
-		iamRoot = (geteuid() == 0);
-	#endif
+      if(sameGroup == NO)
+        grp = @"-";
 
-		isMyFile = ([NSUserName() isEqualToString: usr]);
+      
+#ifdef __WIN32__
+      iamRoot = YES;
+#else
+      iamRoot = (geteuid() == 0);
+#endif
+                
+      isMyFile = ([NSUserName() isEqualToString: usr]);
 		
-		cdate = [tmpdate dateWithCalendarFormat: nil timeZone: nil];	
+      cdate = [tmpdate dateWithCalendarFormat: nil timeZone: nil];	
 				
-		[linkToLabel setTextColor: [NSColor darkGrayColor]];		
-		[linkToField setStringValue: @""];
+      [linkToLabel setTextColor: [NSColor darkGrayColor]];		
+      [linkToField setStringValue: @""];
 
-		[ownerField setStringValue: usr]; 
-		[groupField setStringValue: grp]; 
+      [ownerField setStringValue: usr]; 
+      [groupField setStringValue: grp]; 
     
-    [insideButt	setEnabled: YES];
+      [insideButt setEnabled: YES];
     
-		[self setPermissions: 0 isActive: (iamRoot || isMyFile)];
+      [self setPermissions: 0 isActive: (iamRoot || isMyFile)];
 		
-		cdate = [date dateWithCalendarFormat: nil timeZone: nil];	
-		[timeDateView setDate: cdate];
-	}
+      cdate = [date dateWithCalendarFormat: nil timeZone: nil];	
+      [timeDateView setDate: cdate];
+    }
 	
-	[mainBox setNeedsDisplay: YES];
+  [mainBox setNeedsDisplay: YES];
 }
 
 - (IBAction)permsButtonsAction:(id)sender
