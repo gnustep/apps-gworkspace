@@ -159,7 +159,7 @@ static id <DesktopApplication> desktopApp = nil;
   if (infoType != type) {
     NSArray *cells = [matrix cells];
     int lineh = floor([fsnodeRep heighOfFont: [cellPrototype font]]);
-    int i;
+    NSUInteger i;
     
     infoType = type;
     DESTROY (extInfoType);
@@ -187,7 +187,7 @@ static id <DesktopApplication> desktopApp = nil;
   if ((extInfoType == nil) || ([extInfoType isEqual: type] == NO)) {
     NSArray *cells = [matrix cells];    
     int lineh = floor([fsnodeRep heighOfFont: [cellPrototype font]]);  
-    int i;
+    NSUInteger i;
     
     infoType = FSNInfoExtendedType;
     ASSIGN (extInfoType, type);
@@ -202,7 +202,7 @@ static id <DesktopApplication> desktopApp = nil;
 
     [self adjustMatrix];
 
-	  for (i = 0; i < [cells count]; i++) {
+    for (i = 0; i < [cells count]; i++) {
       FSNBrowserCell *cell = [cells objectAtIndex: i];
       [cell setExtendedShowType: extInfoType];
     }       
@@ -214,7 +214,6 @@ static id <DesktopApplication> desktopApp = nil;
   NSArray *savedSelection = nil;
   NSMutableArray *visibleNodes = nil;
   float scrollTune = 0;
-  int i = 0;
 
   if (oldNode && anode && [oldNode isEqualToNode: anode] && [anode isValid]) {
     NSArray *vnodes = nil;  
@@ -255,7 +254,8 @@ static id <DesktopApplication> desktopApp = nil;
     } 
 
     if (visibleNodes) {
-      int count = [visibleNodes count];
+      NSUInteger i;
+      NSUInteger count = [visibleNodes count];
       
       for (i = 0; i < count; i++) {
         FSNode *node = [visibleNodes objectAtIndex: i];
@@ -295,9 +295,9 @@ static id <DesktopApplication> desktopApp = nil;
 {
   NSAutoreleasePool *pool;
   NSArray *subNodes = [shownNode subNodes];
-  int count = [subNodes count];
+  NSUInteger count = [subNodes count];
   SEL compSel = [fsnodeRep compareSelectorForDirectory: [shownNode path]];
-  int i;
+  NSUInteger i;
 
   if ([matrix numberOfColumns] > 0)
     [matrix removeColumn: 0];
@@ -356,7 +356,7 @@ static id <DesktopApplication> desktopApp = nil;
     CREATE_AUTORELEASE_POOL(arp);
     NSArray *selectedNodes = [self selectedNodes];
     SEL compSel = [fsnodeRep compareSelectorForDirectory: [shownNode path]];
-    int i;
+    NSUInteger i;
 
     [matrix setIntercellSpacing: NSMakeSize(0, 0)];
     	  
@@ -420,7 +420,7 @@ static id <DesktopApplication> desktopApp = nil;
   id cell = nil;
   float scrollTune = 0;
   BOOL updated = NO;
-  int i;
+  NSUInteger i;
   
   selcells = [matrix selectedCells];
   
@@ -498,10 +498,10 @@ static id <DesktopApplication> desktopApp = nil;
 {
   NSArray *selected = [matrix selectedCells];
 
-	if (selected) {
+  if (selected) {
     NSMutableArray *cells = [NSMutableArray array];
     BOOL missing = NO;
-    int i;
+    NSUInteger i;
   
     for (i = 0; i < [selected count]; i++) {  
       FSNBrowserCell *cell = [selected objectAtIndex: i];
@@ -532,10 +532,10 @@ static id <DesktopApplication> desktopApp = nil;
 {
   NSArray *selected = [matrix selectedCells];
 
-	if (selected) {
+  if (selected) {
     NSMutableArray *nodes = [NSMutableArray array];
     BOOL missing = NO;
-    int i;
+    NSUInteger i;
   
     for (i = 0; i < [selected count]; i++) {  
       FSNode *node = [[selected objectAtIndex: i] node];
@@ -566,10 +566,10 @@ static id <DesktopApplication> desktopApp = nil;
 {
   NSArray *selected = [matrix selectedCells];
 
-	if (selected) {
+  if (selected) {
     NSMutableArray *paths = [NSMutableArray array];
     BOOL missing = NO;
-    int i;
+    NSUInteger i;
   
     for (i = 0; i < [selected count]; i++) {  
       FSNode *node = [[selected objectAtIndex: i] node];
@@ -658,7 +658,7 @@ static id <DesktopApplication> desktopApp = nil;
          sendAction:(BOOL)act
 {
   if (cells && [cells count]) {
-    int i;
+    NSUInteger i;
 
     [matrix deselectAllCells];
 
@@ -677,7 +677,7 @@ static id <DesktopApplication> desktopApp = nil;
 {
   if (nodes && [nodes count]) {
     NSArray *cells = [matrix cells];
-    int i;
+    NSUInteger i;
 
     [matrix deselectAllCells];
 
@@ -700,7 +700,7 @@ static id <DesktopApplication> desktopApp = nil;
 {
   if (paths && [paths count]) {
     NSArray *cells = [matrix cells];
-    int i;
+    NSUInteger i;
 
     [matrix deselectAllCells];
 
@@ -723,7 +723,7 @@ static id <DesktopApplication> desktopApp = nil;
 {
   if (names && [names count]) {
     NSArray *cells = [matrix cells];
-    int i;
+    NSUInteger i;
 
     [matrix deselectAllCells];
 
@@ -758,7 +758,7 @@ static id <DesktopApplication> desktopApp = nil;
     int n = [matrix numberOfRows];
     int s = [matrix selectedRow];
     NSString *cellstr = nil;
-    int i = 0;
+    NSUInteger i = 0;
     
     if (s != -1) {
       cellstr = [[matrix cellAtRow: s column: 0] stringValue];
@@ -800,11 +800,11 @@ static id <DesktopApplication> desktopApp = nil;
 {
   if ([[matrix cells] count]) {
     NSArray *cells = [matrix cells];
-    unsigned count = [cells count];
+    NSUInteger count = [cells count];
     FSNBrowserCell *cell;
     int selstart = 0;
     int selend = 0;
-    int i;
+    NSUInteger i;
         
     [matrix deselectAllCells];
 
@@ -885,7 +885,7 @@ static id <DesktopApplication> desktopApp = nil;
 - (void)checkLockedReps
 {
   NSArray *cells = [matrix cells];
-  int i;  
+  NSUInteger i;  
 
   for (i = 0; i < [cells count]; i++) {
     [[cells objectAtIndex: i] checkLocked];
@@ -896,7 +896,7 @@ static id <DesktopApplication> desktopApp = nil;
 
 - (void)lockCellsOfNodes:(NSArray *)nodes
 {
-  int i;
+  NSUInteger i;
   BOOL found = NO;
   
   for (i = 0; i < [nodes count]; i++) {
@@ -913,7 +913,7 @@ static id <DesktopApplication> desktopApp = nil;
 
 - (void)lockCellsWithPaths:(NSArray *)paths
 {
-  int i;
+  NSUInteger i;
   BOOL found = NO;
   
   for (i = 0; i < [paths count]; i++) {
@@ -930,7 +930,7 @@ static id <DesktopApplication> desktopApp = nil;
 
 - (void)lockCellsWithNames:(NSArray *)names
 {
-  int i;
+  NSUInteger i;
   BOOL found = NO;
   
   for (i = 0; i < [names count]; i++) {
@@ -947,7 +947,7 @@ static id <DesktopApplication> desktopApp = nil;
 
 - (void)unLockCellsOfNodes:(NSArray *)nodes
 {
-  int i;
+  NSUInteger i;
   BOOL found = NO;
 
   for (i = 0; i < [nodes count]; i++) {
@@ -964,7 +964,7 @@ static id <DesktopApplication> desktopApp = nil;
 
 - (void)unLockCellsWithPaths:(NSArray *)paths
 {
-  int i;
+  NSUInteger i;
   BOOL found = NO;
 
   for (i = 0; i < [paths count]; i++) {
@@ -981,7 +981,7 @@ static id <DesktopApplication> desktopApp = nil;
 
 - (void)unLockCellsWithNames:(NSArray *)names
 {
-  int i;
+  NSUInteger i;
   BOOL found = NO;
 
   for (i = 0; i < [names count]; i++) {
@@ -999,15 +999,15 @@ static id <DesktopApplication> desktopApp = nil;
 - (void)lock
 {
   NSArray *cells = [matrix cells];
-  int i;  
+  NSUInteger i;  
 
-  for (i = 0; i < [cells count]; i++) {
-		id cell = [cells objectAtIndex: i];
-
-		if ([cell isEnabled]) {
+  for (i = 0; i < [cells count]; i++)
+    {
+      id cell = [cells objectAtIndex: i];
+      
+      if ([cell isEnabled])
     	[cell setEnabled: NO];
-		}
-  }
+    }
 
   [matrix setNeedsDisplay: YES];   
 }
@@ -1015,7 +1015,7 @@ static id <DesktopApplication> desktopApp = nil;
 - (void)unlock
 {
   NSArray *cells = [matrix cells];
-  int i;  
+  NSUInteger i;  
 
   for (i = 0; i < [cells count]; i++) {
 		id cell = [cells objectAtIndex: i];
@@ -1031,15 +1031,15 @@ static id <DesktopApplication> desktopApp = nil;
 - (FSNBrowserCell *)cellOfNode:(FSNode *)node
 {
   NSArray *cells = [matrix cells];
-  int i;
+  NSUInteger i;
 
-	for (i = 0; i < [cells count]; i++) {
-	  FSNBrowserCell *cell = [cells objectAtIndex: i];
-    
-    if ([[cell node] isEqualToNode: node]) {
-      return cell;
-    } 
-	}
+  for (i = 0; i < [cells count]; i++)
+    {
+      FSNBrowserCell *cell = [cells objectAtIndex: i];
+      
+      if ([[cell node] isEqualToNode: node])
+        return cell;
+    }
 
   return nil;
 }            
@@ -1047,7 +1047,7 @@ static id <DesktopApplication> desktopApp = nil;
 - (FSNBrowserCell *)cellWithPath:(NSString *)path
 {
   NSArray *cells = [matrix cells];
-  int i;
+  NSUInteger i;
 
 	for (i = 0; i < [cells count]; i++) {
 	  FSNBrowserCell *cell = [cells objectAtIndex: i];
@@ -1063,7 +1063,7 @@ static id <DesktopApplication> desktopApp = nil;
 - (FSNBrowserCell *)cellWithName:(NSString *)name
 {
   NSArray *cells = [matrix cells];
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [cells count]; i++)
     {
@@ -1189,7 +1189,7 @@ static id <DesktopApplication> desktopApp = nil;
   NSString *basePath;
   NSString *nodePath;
   NSString *prePath;
-  int count;
+  NSUInteger count;
   
   isDragTarget = NO;	
   
@@ -1224,10 +1224,9 @@ static id <DesktopApplication> desktopApp = nil;
     return NSDragOperationNone;
   }
 
-	count = [sourcePaths count];
-	if (count == 0) {
-		return NSDragOperationNone;
-  } 
+  count = [sourcePaths count];
+  if (count == 0)
+    return NSDragOperationNone;
     
   if ([shownNode isWritable] == NO) {
     return NSDragOperationNone;
@@ -1258,13 +1257,13 @@ static id <DesktopApplication> desktopApp = nil;
 
   if ([shownNode isDirectory] && [shownNode isParentOfPath: basePath]) {
     NSArray *subNodes = [shownNode subNodes];
-    int i;
+    NSUInteger i;
     
     for (i = 0; i < [subNodes count]; i++) {
       FSNode *nd = [subNodes objectAtIndex: i];
       
       if ([nd isDirectory]) {
-        int j;
+        NSUInteger j;
         
         for (j = 0; j < count; j++) {
           NSString *fname = [[sourcePaths objectAtIndex: j] lastPathComponent];
@@ -1335,18 +1334,18 @@ static id <DesktopApplication> desktopApp = nil;
 
 - (void)concludeDragOperation:(id <NSDraggingInfo>)sender
 {
-	NSPasteboard *pb;
+  NSPasteboard *pb;
   NSDragOperation sourceDragMask;
-	NSArray *sourcePaths;
+  NSArray *sourcePaths;
   NSString *operation, *source;
   NSMutableArray *files;
-	NSMutableDictionary *opDict;
-	NSString *trashPath;
-  int i;
+  NSMutableDictionary *opDict;
+  NSString *trashPath;
+  NSUInteger i;
 
-	isDragTarget = NO;  
+  isDragTarget = NO;  
 
-	sourceDragMask = [sender draggingSourceOperationMask];
+  sourceDragMask = [sender draggingSourceOperationMask];
   pb = [sender draggingPasteboard];
     
   if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"]) {  
@@ -1366,9 +1365,8 @@ static id <DesktopApplication> desktopApp = nil;
     
   sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
   
-  if ([sourcePaths count] == 0) {
+  if ([sourcePaths count] == 0)
     return;
-  }
   
   source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
   
@@ -1391,15 +1389,15 @@ static id <DesktopApplication> desktopApp = nil;
   }
 
   files = [NSMutableArray array];    
-  for(i = 0; i < [sourcePaths count]; i++) {    
+  for(i = 0; i < [sourcePaths count]; i++)
+    
     [files addObject: [[sourcePaths objectAtIndex: i] lastPathComponent]];
-  }  
-
-	opDict = [NSMutableDictionary dictionary];
-	[opDict setObject: operation forKey: @"operation"];
-	[opDict setObject: source forKey: @"source"];
-	[opDict setObject: [shownNode path] forKey: @"destination"];
-	[opDict setObject: files forKey: @"files"];
+  
+  opDict = [NSMutableDictionary dictionary];
+  [opDict setObject: operation forKey: @"operation"];
+  [opDict setObject: source forKey: @"source"];
+  [opDict setObject: [shownNode path] forKey: @"destination"];
+  [opDict setObject: files forKey: @"files"];
 
   [desktopApp performFileOperation: opDict];
 }
