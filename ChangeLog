@@ -6,6 +6,9 @@
 	* Operation/FileOpInfo.m (calculateNumFiles:)
 	Cleanup, fix missing release of arp2 on break and transition index to NSUInteger.
 
+	* FSNode/FSNBrowserColumn.m
+	Release Autorelease pools correctly.
+
 2013-01-16 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/TShelf/TShelfIcon.m

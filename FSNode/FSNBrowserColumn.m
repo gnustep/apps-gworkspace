@@ -1,6 +1,6 @@
 /* FSNBrowserColumn.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2004
@@ -293,7 +293,7 @@ static id <DesktopApplication> desktopApp = nil;
 
 - (void)createRowsInMatrix
 {
-  CREATE_AUTORELEASE_POOL (pool);
+  NSAutoreleasePool *pool;
   NSArray *subNodes = [shownNode subNodes];
   int count = [subNodes count];
   SEL compSel = [fsnodeRep compareSelectorForDirectory: [shownNode path]];
@@ -309,6 +309,8 @@ static id <DesktopApplication> desktopApp = nil;
       return;
     }
   
+  pool = [[NSAutoreleasePool alloc] init];
+
   [matrix addColumn]; 
 
   for (i = 0; i < count; ++i)
@@ -1480,6 +1482,7 @@ static id <DesktopApplication> desktopApp = nil;
       break;
     }            
     prePath = [prePath stringByDeletingLastPathComponent];
+    RELEASE (arp);
   }
 
   if ([node isApplication]) {
