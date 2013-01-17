@@ -291,7 +291,7 @@ static BOOL sizeStop = NO;
       [titleField setStringValue: items];  
       [iconView setImage: icon];
   
-      ftype = [attributes objectForKey: NSFileType];
+      [attributes objectForKey: NSFileType];
       
       [sizeField setStringValue: @"--"]; 
       
@@ -309,8 +309,7 @@ static BOOL sizeStop = NO;
     
       usr = [attributes objectForKey: NSFileOwnerAccountName];
       grp = [attributes objectForKey: NSFileGroupOwnerAccountName];
-      date = [attributes objectForKey: NSFileModificationDate];
-      perms = [[attributes objectForKey: NSFilePosixPermissions] unsignedLongValue];			
+      date = [attributes objectForKey: NSFileModificationDate];		
 
       sameOwner = YES;
       sameGroup = YES;
@@ -341,9 +340,7 @@ static BOOL sizeStop = NO;
       iamRoot = (geteuid() == 0);
 #endif
                 
-      isMyFile = ([NSUserName() isEqualToString: usr]);
-		
-      cdate = [tmpdate dateWithCalendarFormat: nil timeZone: nil];	
+      isMyFile = ([NSUserName() isEqualToString: usr]);	
 				
       [linkToLabel setTextColor: [NSColor darkGrayColor]];		
       [linkToField setStringValue: @""];

@@ -1,6 +1,6 @@
 /* ddbd.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: February 2004
@@ -352,13 +352,13 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 - (void)dealloc
 {
   RELEASE (updinfo);
-	[super dealloc];
+  [super dealloc];
 }
 
 + (void)updaterForTask:(NSDictionary *)info
 {
   CREATE_AUTORELEASE_POOL(arp);
-  DBUpdater *updater = [[self alloc] init];
+  DBUpdater *updater = [[DBUpdater alloc] init];
   
   [updater setUpdaterTask: info];
 

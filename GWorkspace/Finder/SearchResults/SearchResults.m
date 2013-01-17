@@ -1,6 +1,6 @@
 /* SearchResults.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -22,19 +22,21 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
 #include <math.h>
-#include "SearchResults.h"
-#include "ResultsTableView.h"
-#include "FSNTextCell.h"
-#include "Finder.h"
-#include "FinderModulesProtocol.h"
-#include "FSNode.h"
-#include "FSNodeRep.h"
-#include "FSNPathComponentsViewer.h"
-#include "GWFunctions.h"
-#include "Dialogs/Dialogs.h"
+
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+
+#import "SearchResults.h"
+#import "ResultsTableView.h"
+#import "FSNTextCell.h"
+#import "Finder.h"
+#import "FinderModulesProtocol.h"
+#import "FSNode.h"
+#import "FSNodeRep.h"
+#import "FSNPathComponentsViewer.h"
+#import "GWFunctions.h"
+#import "Dialogs/Dialogs.h"
 
 #define CELLS_HEIGHT (28.0)
 
@@ -491,11 +493,10 @@ static NSString *lsfname = @"LiveSearch.lsf";
   NSString *destination = [info objectForKey: @"destination"];
   NSArray *files = [info objectForKey: @"files"];
   NSMutableArray *deletedObjects = [NSMutableArray array];
-  int i, j;
+  NSUInteger i, j;
 
   if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
     files = [NSArray arrayWithObject: [destination lastPathComponent]];
-    destination = [destination stringByDeletingLastPathComponent]; 
   }
 
   if ([operation isEqual: @"NSWorkspaceRecycleOperation"]) {
@@ -960,12 +961,10 @@ static NSString *lsfname = @"LiveSearch.lsf";
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-	NSEvent *nextEvent;
+  NSEvent *nextEvent;
   BOOL startdnd = NO;
   int dragdelay = 0;
-  NSPoint p = [theEvent locationInWindow];
-  
-  p = [self convertPoint: p fromView: nil];
+
   
 	if ([theEvent clickCount] == 1) {   
     while (1) {

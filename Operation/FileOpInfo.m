@@ -1113,10 +1113,11 @@ filename = [fileinfo objectForKey: @"name"];
   NSString *newname;
   NSString *ntmp;
 
-  while (1) {
-	  CHECK_DONE;      
-	  GET_FILENAME;  
-
+  while (1)
+    {
+      CHECK_DONE;      
+      GET_FILENAME;  
+      
     newname = [NSString stringWithString: filename];
     srcpath = [source stringByAppendingPathComponent: filename];
     destpath = [destination stringByAppendingPathComponent: newname];
@@ -1124,9 +1125,7 @@ filename = [fileinfo objectForKey: @"name"];
     if ([fm fileExistsAtPath: destpath]) {
       NSString *ext = [filename pathExtension]; 
       NSString *base = [filename stringByDeletingPathExtension]; 
-      int count = 1;
-      
-      newname = [NSString stringWithString: filename];
+      NSUInteger count = 1;
       
 	    while (1) {
         if (count == 1) {
