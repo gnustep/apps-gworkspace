@@ -1285,7 +1285,7 @@ filename = [fileinfo objectForKey: @"name"];
       if (found) {
         [self performOperation]; 
       } else {
-        result = [fileOp showErrorAlertWithMessage: @"File Operation Error!"];
+        [fileOp showErrorAlertWithMessage: @"File Operation Error!"];
         [self done];
       }
     } else {
@@ -1293,7 +1293,7 @@ filename = [fileinfo objectForKey: @"name"];
     }
   }
   
-	return YES;
+  return YES;
 }
 
 - (void)fileManager:(NSFileManager *)manager willProcessPath:(NSString *)path

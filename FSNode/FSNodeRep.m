@@ -1,6 +1,6 @@
 /* FSNodeRep.m
  *  
- * Copyright (C) 2004-2011 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola <rm@gnu.org>
@@ -1037,7 +1037,7 @@ static FSNodeRep *shared = nil;
 				              userInfo: userinfo];
 
     if (systype == NSGNULinuxOperatingSystem) {
-      task = [NSTask launchedTaskWithLaunchPath: @"eject"
+      [NSTask launchedTaskWithLaunchPath: @"eject"
 				                              arguments: [NSArray arrayWithObject: path]];
     }
     

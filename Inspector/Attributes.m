@@ -324,7 +324,6 @@ static BOOL sizeStop = NO;
           tmpgrp = [attrs objectForKey: NSFileGroupOwnerAccountName];
           if ([tmpgrp isEqualToString: grp] == NO)
             sameGroup = NO;
-          tmpdate = [date earlierDate: [attrs objectForKey: NSFileModificationDate]];
         }
       
       if(sameOwner == NO)
