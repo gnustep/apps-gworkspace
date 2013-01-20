@@ -230,7 +230,6 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
   usrdata = [pathsManager metadataForPath: apath];
   [pathslock unlock];
 
-  RETAIN (usrdata);
   RELEASE (arp);
 
   return usrdata;
@@ -246,7 +245,6 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
                                      forPath: path];
   [pathslock unlock];
 
-  RETAIN (annotations);
   RELEASE (arp);
 
   return annotations;
