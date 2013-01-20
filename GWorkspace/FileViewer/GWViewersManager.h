@@ -1,6 +1,6 @@
 /* GWViewersManager.h
  *  
- * Copyright (C) 2004-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2004
@@ -59,12 +59,12 @@
           inViewerWithBaseNode:(FSNode *)base;
             
 
-- (id)newViewerOfType:(unsigned)vtype
-             showType:(NSString *)stype
-              forNode:(FSNode *)node
-        showSelection:(BOOL)showsel
-       closeOldViewer:(id)oldvwr
-             forceNew:(BOOL)force;
+- (id)viewerOfType:(unsigned)vtype
+          showType:(NSString *)stype
+           forNode:(FSNode *)node
+     showSelection:(BOOL)showsel
+    closeOldViewer:(id)oldvwr
+          forceNew:(BOOL)force;
        
 - (void)setBehaviour:(NSString *)behaviour 
            forViewer:(id)aviewer;

@@ -1,6 +1,6 @@
 /* GWViewersManager.m
  *  
- * Copyright (C) 2004-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2004
@@ -125,13 +125,14 @@ static GWViewersManager *vwrsmanager = nil;
       int type = [[dict objectForKey: @"type"] intValue];
       FSNode *node = [FSNode nodeWithPath: path];
     
-      if (node && [node isValid]) {
-        [self newViewerOfType: type
-                     showType: nil
-                      forNode: node
-                showSelection: YES
-               closeOldViewer: NO
-                     forceNew: YES];
+      if (node && [node isValid])
+        {
+          [self viewerOfType: type
+                    showType: nil
+                     forNode: node
+               showSelection: YES
+              closeOldViewer: NO
+                    forceNew: YES];
       }
     }
 
@@ -160,12 +161,12 @@ static GWViewersManager *vwrsmanager = nil;
       }
     }
   
-    viewer = [self newViewerOfType: type
-                          showType: nil
-                           forNode: node
-                     showSelection: YES
-                    closeOldViewer: NO
-                          forceNew: NO];
+    viewer = [self viewerOfType: type
+                       showType: nil
+                        forNode: node
+                  showSelection: YES
+                 closeOldViewer: NO
+                       forceNew: NO];
   } else {
     if ([[viewer win] isVisible] == NO) {
   	  [viewer activate];
@@ -177,12 +178,12 @@ static GWViewersManager *vwrsmanager = nil;
         type = BROWSING;
       }
 
-      viewer = [self newViewerOfType: type
-                            showType: nil
-                             forNode: node
-                       showSelection: (type == BROWSING)
-                      closeOldViewer: NO
-                            forceNew: YES];
+      viewer = [self viewerOfType: type
+                         showType: nil
+                          forNode: node
+                    showSelection: (type == BROWSING)
+                   closeOldViewer: NO
+                         forceNew: YES];
     }
   }
   
@@ -211,25 +212,26 @@ static GWViewersManager *vwrsmanager = nil;
     
     if (([viewer vtype] == SPATIAL) 
             && [[viewer nodeView] isSingleNode]
-                              && (baseIsParent == NO)) { 
-      viewer = [self newViewerOfType: BROWSING
-                            showType: nil
-                             forNode: base
-                       showSelection: NO
-                      closeOldViewer: NO
-                            forceNew: YES];
-    }
+                              && (baseIsParent == NO))
+      { 
+        viewer = [self viewerOfType: BROWSING
+                           showType: nil
+                            forNode: base
+                      showSelection: NO
+                     closeOldViewer: NO
+                           forceNew: YES];
+      }
     
   } else {
     int type = [self typeOfViewerForNode: base];
     int newtype = ((type == SPATIAL) && baseIsParent) ? SPATIAL : BROWSING;
 
-    viewer = [self newViewerOfType: newtype
-                          showType: nil
-                           forNode: base
-                     showSelection: NO
-                    closeOldViewer: NO
-                          forceNew: NO];
+    viewer = [self viewerOfType: newtype
+                       showType: nil
+                        forNode: base
+                  showSelection: NO
+                 closeOldViewer: NO
+                       forceNew: NO];
   } 
   
   if (selection) {
@@ -237,12 +239,12 @@ static GWViewersManager *vwrsmanager = nil;
   }
 }
 
-- (id)newViewerOfType:(unsigned)vtype
-             showType:(NSString *)stype
-              forNode:(FSNode *)node
-        showSelection:(BOOL)showsel
-       closeOldViewer:(id)oldvwr
-             forceNew:(BOOL)force
+- (id)viewerOfType:(unsigned)vtype
+          showType:(NSString *)stype
+           forNode:(FSNode *)node
+     showSelection:(BOOL)showsel
+    closeOldViewer:(id)oldvwr
+          forceNew:(BOOL)force
 {
   id viewer = [self viewerOfType: vtype withBaseNode: node];
   int i;
@@ -637,12 +639,12 @@ static GWViewersManager *vwrsmanager = nil;
             [[NSWorkspace sharedWorkspace] launchApplication: [node path]];
           }
         } else {
-          [self newViewerOfType: [viewer vtype] 
-                       showType: nil
-                        forNode: node 
-                  showSelection: NO
-                 closeOldViewer: nil
-                       forceNew: NO];
+          [self viewerOfType: [viewer vtype] 
+                    showType: nil
+                     forNode: node 
+               showSelection: NO
+              closeOldViewer: nil
+                    forceNew: NO];
         } 
       } else if ([node isPlain]) {        
         [gworkspace openFile: [node path]];
@@ -689,12 +691,12 @@ static GWViewersManager *vwrsmanager = nil;
     FSNode *node = [selnodes objectAtIndex: i];
         
     if ([node isDirectory]) {
-      [self newViewerOfType: [viewer vtype] 
-                   showType: [viewer viewType]
-                    forNode: node
-              showSelection: NO
-             closeOldViewer: nil
-                   forceNew: force];
+      [self viewerOfType: [viewer vtype] 
+                showType: [viewer viewType]
+                 forNode: node
+           showSelection: NO
+          closeOldViewer: nil
+                forceNew: force];
     } else if ([node isPlain]) {        
       [gworkspace openFile: [node path]];
     }
@@ -1199,12 +1201,12 @@ if (*pos >= i) *pos -= n; \
       [nodeView scrollSelectionToVisible];
     }
   } else {
-    [self newViewerOfType: SPATIAL
-                 showType: nil
-                  forNode: node
-            showSelection: YES
-           closeOldViewer: nil
-                 forceNew: NO];
+    [self viewerOfType: SPATIAL
+              showType: nil
+               forNode: node
+         showSelection: YES
+        closeOldViewer: nil
+              forceNew: NO];
   }
 
   if (spatial) {

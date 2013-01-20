@@ -1,5 +1,15 @@
 2013-01-20 Riccardo Mottola <rm@gnu.org>
 
+	* GWorkspace/FileViewer/GWViewersManager.h
+	* GWorkspace/FileViewer/GWViewersManager.m
+	Rename newViewerOfType to viewerOfType since it does not return a new retained object.
+
+	* GWorkspace/FileViewer/GWSpatialViewer.m
+	* GWorkspace/GWorkspace.m
+	Update accordingly.
+
+2013-01-20 Riccardo Mottola <rm@gnu.org>
+
 	* Tools/ddbd/ddbd.m (userMetadataForPath:, annotationsForPath:)
 	Do not retain returned value.
 

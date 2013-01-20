@@ -1,6 +1,6 @@
 /* GWSpatialViewer.m
  *  
- * Copyright (C) 2004-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola
@@ -585,12 +585,12 @@
       vwr = self;
     }
   
-    [manager newViewerOfType: SPATIAL
-                    showType: nil
-                     forNode: node 
-               showSelection: NO
-              closeOldViewer: vwr
-                    forceNew: NO];
+    [manager viewerOfType: SPATIAL
+                 showType: nil
+                  forNode: node 
+            showSelection: NO
+           closeOldViewer: vwr
+                 forceNew: NO];
   } else {
     [nodeView showContentsOfNode: baseNode]; 
     [self scrollToBeginning];

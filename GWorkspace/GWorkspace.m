@@ -757,14 +757,15 @@ static GWorkspace *gworkspace = nil;
     newviewer = YES;
   } 
   
-  if (newviewer) {
-    viewer = [vwrsManager newViewerOfType: SPATIAL
-                                 showType: nil
-                                  forNode: parentnode
-                            showSelection: NO
-                           closeOldViewer: NO
-                                 forceNew: NO];
-  }
+  if (newviewer)
+    {
+      viewer = [vwrsManager viewerOfType: SPATIAL
+                                showType: nil
+                                 forNode: parentnode
+                           showSelection: NO
+                          closeOldViewer: NO
+                                forceNew: NO];
+    }
   
   nodeView = [viewer nodeView];
   
@@ -784,12 +785,12 @@ static GWorkspace *gworkspace = nil;
   FSNode *node = [FSNode nodeWithPath: path];
   unsigned type = [vwrsManager typeOfViewerForNode: node];
 
-  [vwrsManager newViewerOfType: type 
-                      showType: nil
-                       forNode: node 
-                 showSelection: NO
-                closeOldViewer: nil
-                      forceNew: NO];
+  [vwrsManager viewerOfType: type 
+                   showType: nil
+                    forNode: node 
+              showSelection: NO
+             closeOldViewer: nil
+                   forceNew: NO];
 }
 
 - (NSImage *)tshelfBackground
