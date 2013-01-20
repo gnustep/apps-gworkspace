@@ -1,3 +1,13 @@
+2013-01-21 Riccardo Mottola <rm@gnu.org>
+
+	* GWMetadata/MDKit/MDKQuery.m
+	Initialize value.
+
+2013-01-20 Riccardo Mottola <rm@gnu.org>
+
+	* Desktop/GWDesktopManager.m (loadXWinBundle)
+	Do not return a retained object.
+
 2013-01-20 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/FileViewer/GWViewersManager.h

@@ -1,6 +1,6 @@
 /* MDKQuery.m
  *  
- * Copyright (C) 2006-2011 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@dtedu.net>
  * Date: August 2006
@@ -22,10 +22,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include "MDKQuery.h"
-#include "MDKQueryManager.h"
+#import "MDKQuery.h"
+#import "MDKQueryManager.h"
 #include "SQLite.h"
-#include "FSNode.h"
+#import "FSNode.h"
 
 static NSArray *attrNames = nil;
 static NSDictionary *attrInfo = nil;
@@ -1807,7 +1807,7 @@ enum {
   NSUInteger index;    
   NSUInteger i;
   
-  index = 0;
+  index = NSNotFound;
   for (i = 0; i < [paths count]; i++) {
     FSNode *node = [FSNode nodeWithPath: [paths objectAtIndex: i]];
     NSString *catname;
@@ -1828,7 +1828,7 @@ enum {
       index = [catnodes indexOfObject: node];
 
     } else {
-      unsigned j;
+      NSUInteger j;
 
       for (j = 0; j < [categoryNames count]; j++) {
         catname = [categoryNames objectAtIndex: j];
@@ -1838,9 +1838,8 @@ enum {
 
         index = [catnodes indexOfObject: node];
 
-        if (index != NSNotFound) {
+        if (index != NSNotFound)
           break;
-        }
       }              
     }
 
@@ -1868,40 +1867,45 @@ enum {
   NSMutableArray *catscores;
   NSUInteger index;
 
-  if ([node isValid]) {
-    catname = [qmanager categoryNameForNode: node];
-    catdict = [groupedResults objectForKey: catname];        
-    catnodes = [catdict objectForKey: @"nodes"];
-    catscores = [catdict objectForKey: @"scores"];
-
-    index = [catnodes indexOfObject: node];
-
-  } else {
-    NSUInteger i;
-
-    for (i = 0; i < [categoryNames count]; i++) {
-      catname = [categoryNames objectAtIndex: i];
-      catdict = [groupedResults objectForKey: catname];
+  index = NSNotFound;
+  if ([node isValid])
+    {
+      catname = [qmanager categoryNameForNode: node];
+      catdict = [groupedResults objectForKey: catname];        
       catnodes = [catdict objectForKey: @"nodes"];
       catscores = [catdict objectForKey: @"scores"];
 
       index = [catnodes indexOfObject: node];
+    }
+  else
+    {
+      NSUInteger i;
 
-      if (index != NSNotFound) {
-        break;
-      }
-    }              
-  }
+      for (i = 0; i < [categoryNames count]; i++)
+        {
+          catname = [categoryNames objectAtIndex: i];
+          catdict = [groupedResults objectForKey: catname];
+          catnodes = [catdict objectForKey: @"nodes"];
+          catscores = [catdict objectForKey: @"scores"];
 
-  if (index != NSNotFound) {
-    [catnodes removeObjectAtIndex: index];
-    [catscores removeObjectAtIndex: index];      
+          index = [catnodes indexOfObject: node];
 
-    if (CHECKDELEGATE (queryDidUpdateResults:forCategories:)) {        
-      [delegate queryDidUpdateResults: self 
-                        forCategories: [NSArray arrayWithObject: catname]];
-    }      
-  }  
+          if (index != NSNotFound)
+            break;
+        }              
+    }
+
+  if (index != NSNotFound)
+    {
+      [catnodes removeObjectAtIndex: index];
+      [catscores removeObjectAtIndex: index];      
+
+      if (CHECKDELEGATE (queryDidUpdateResults:forCategories:))
+        {        
+          [delegate queryDidUpdateResults: self 
+                            forCategories: [NSArray arrayWithObject: catname]];
+        }      
+    }  
 }
 
 - (NSDictionary *)groupedResults
