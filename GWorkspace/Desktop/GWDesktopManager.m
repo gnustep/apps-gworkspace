@@ -1,6 +1,6 @@
 /* GWDesktopManager.m
  *  
- * Copyright (C) 2005-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -91,6 +91,7 @@ static GWDesktopManager *desktopManager = nil;
 
     if (usexbundle) {
       window = [self loadXWinBundle];
+      [window retain];
     }
 
     if (window == nil) {
@@ -264,7 +265,11 @@ static GWDesktopManager *desktopManager = nil;
       bundle = [NSBundle bundleWithPath: bpath];
   
       if (bundle) {
-	return [[[bundle principalClass] alloc] init];
+        id pC;
+
+        pC = [[[bundle principalClass] alloc] init];
+        [pC autorelease];
+	return pC;
       }
     }
 
