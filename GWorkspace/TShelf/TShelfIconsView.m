@@ -1,6 +1,6 @@
 /* TShelfIconsView.m
  *  
- * Copyright (C) 2003-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -357,10 +357,10 @@
   NSUInteger count = [icons count];
   NSUInteger i;
   
-  for (i = count - 1; i >= 0; i--)
+  for (i = 0; i < count; i++)
     {
-      TShelfPBIcon *icon = [icons objectAtIndex: i];
-
+      TShelfPBIcon *icon = [icons objectAtIndex: count-i];
+      
       if ([[icon dataType] isEqual: type])
 	{
 	  if ([[icon data] isEqual: data])
@@ -1316,62 +1316,72 @@
   NSPasteboard *pb = [sender draggingPasteboard];
   NSPoint p = [sender draggedImageLocation];
   gridpoint *gpoint;
-  int index;
-  int i;
+  NSUInteger index;
+  NSUInteger i;
 
   isDragTarget = NO;
 
-  if (dragImage != nil) {
-    DESTROY (dragImage);
-    [self setNeedsDisplay: YES];
-  }
-
+  if (dragImage != nil)
+    {
+      DESTROY (dragImage);
+      [self setNeedsDisplay: YES];
+    }
+  
   p = [self convertPoint: p fromView: [[self window] contentView]];
   gpoint = [self gridPointNearestToPoint: p];
   p = NSMakePoint(gpoint->x, gpoint->y);
   index = gpoint->index;
 
-  if (gpoint->used == 0) {
-    if (iconsType == FILES_TAB) {
-      NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
-      sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
-
-	    if (sourcePaths) {
-    	  for (i = 0; i < [icons count]; i++) {
-      	  TShelfIcon *icon = [icons objectAtIndex: i];
-      	  if ([[icon paths] isEqualToArray: sourcePaths]) {
-					  gpoints[[icon gridindex]].used = 0;
-					  gpoint->used = 1;					  
-					  [icon setGridIndex: index];
-        	  [self resizeWithOldSuperviewSize: [self frame].size];
-        	  return;
-      	  }
-    	  }
-
-			  [self addIconWithPaths: sourcePaths withGridIndex: index];
-	    }
-    } else {
-      NSData *data;
-      NSString *type;
-      
-      data = [self readSelectionFromPasteboard: pb ofType: &type];
-
-      if (data) {   
-        NSString *dpath = [gw tshelfPBFilePath];
-        
-        if ([data writeToFile: dpath atomically: YES]) {
-          TShelfPBIcon *icon;
-          
-          [self removePBIconsWithData: data ofType: type];
-        
-          icon = [self addPBIconForDataAtPath: dpath
-                                     dataType: type
-					                      withGridIndex: index];
-          [icon select];                      
+  if (gpoint->used == 0)
+    {
+      if (iconsType == FILES_TAB)
+        {
+          NSArray *sourcePaths; 
+          sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
+            
+          if (sourcePaths)
+            {
+              for (i = 0; i < [icons count]; i++)
+                {
+                  TShelfIcon *icon = [icons objectAtIndex: i];
+                  if ([[icon paths] isEqualToArray: sourcePaths])
+                    {
+                      gpoints[[icon gridindex]].used = 0;
+                      gpoint->used = 1;					  
+                      [icon setGridIndex: index];
+                      [self resizeWithOldSuperviewSize: [self frame].size];        	  
+                      return;
+                    }
+                }
+                
+              [self addIconWithPaths: sourcePaths withGridIndex: index];
+            }
         }
-      }
-    }  
-  }
+      else
+        {
+          NSData *data;
+          NSString *type;
+      
+          data = [self readSelectionFromPasteboard: pb ofType: &type];
+
+          if (data)
+            {   
+              NSString *dpath = [gw tshelfPBFilePath];
+        
+              if ([data writeToFile: dpath atomically: YES])
+                {
+                  TShelfPBIcon *icon;
+          
+                  [self removePBIconsWithData: data ofType: type];
+        
+                  icon = [self addPBIconForDataAtPath: dpath
+                                             dataType: type
+                                        withGridIndex: index];
+                  [icon select];                      
+                }
+            }
+        }  
+    }
 }
 
 @end

@@ -1,3 +1,8 @@
+2012-01-21 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/TShelf/TShelfIconsView.m
+	Fix warning and rewrite cycle cuinting upwards due to unsigned.
+
 2013-01-21 Riccardo Mottola <rm@gnu.org>
 
 	* GWMetadata/MDKit/MDKQuery.m
