@@ -1301,6 +1301,7 @@ static NSImage *branchImage;
       break;
     }            
     prePath = [prePath stringByDeletingLastPathComponent];
+    RELEASE (arp);
   }
 
   if ([node isDirectory] && [node isParentOfPath: fromPath]) {
