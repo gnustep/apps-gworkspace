@@ -1,6 +1,6 @@
 /* DBKFixLenRecordsFile.m
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2005
@@ -57,13 +57,13 @@
     if (isdir) {
       DESTROY (self);
       [NSException raise: NSInvalidArgumentException
-		              format: @"%@ is a directory!", path];     
+		              format: @"%@ is a directory!", apath];     
       return self;
     } else if (exists == NO) {
       if ([fm createFileAtPath: path contents: nil attributes: nil] == NO) {
         DESTROY (self);
         [NSException raise: NSInvalidArgumentException
-		                format: @"cannot create file at: %@", path];     
+		                format: @"cannot create file at: %@", apath];     
         return self;
       }
     }
@@ -73,7 +73,7 @@
     if (handle == nil) {
       DESTROY (self);
       [NSException raise: NSInvalidArgumentException
-		              format: @"cannot open file at: %@", path];     
+		              format: @"cannot open file at: %@", apath];     
       return self;
     }
 

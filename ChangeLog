@@ -1,5 +1,10 @@
 2012-01-25 Riccardo Mottola <rm@gnu.org>
 
+	* DBKit/DBKitFixLenRecordsFile.m
+	Do not use deallocated instance ivars.
+
+2012-01-25 Riccardo Mottola <rm@gnu.org>
+
 	* FSNode/FSNIcon.m
 	* GWorkspace/TShelf/TShelfIcon.m
 	Fix ARP memory leak.
