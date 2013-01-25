@@ -370,8 +370,6 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
   int type = [[info objectForKey: @"type"] intValue];
   
   ASSIGN (updinfo, dict);
-  
-  RETAIN (self);
     
   GWDebugLog(@"starting db update");
 
