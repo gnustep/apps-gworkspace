@@ -1,6 +1,6 @@
 /* TShelfIcon.m
  *  
- * Copyright (C) 2003-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -619,22 +619,24 @@
     return NSDragOperationNone;
   }
 
-	buff = [NSString stringWithString: [node path]];
-	while (1) {
-    CREATE_AUTORELEASE_POOL(arp);
+  buff = [NSString stringWithString: [node path]];
+  while (1)
+    {
+      CREATE_AUTORELEASE_POOL(arp);
 
-		for (i = 0; i < count; i++) {
-			if ([buff isEqual: [sourcePaths objectAtIndex: i]]) {
+      for (i = 0; i < count; i++) {
+        if ([buff isEqual: [sourcePaths objectAtIndex: i]]) {
+          RELEASE (arp);
+          return NSDragOperationNone;
+        }
+      }
+      if ([buff isEqual: path_separator()]) {
         RELEASE (arp);
- 		    return NSDragOperationNone;
-			}
-		}
-    if ([buff isEqual: path_separator()]) {
+        break;
+      }            
+      buff = [buff stringByDeletingLastPathComponent];
       RELEASE (arp);
-      break;
-    }            
-		buff = [buff stringByDeletingLastPathComponent];
-  }
+    }
 
   if ([node isDirectory] && [node isParentOfPath: fromPath]) {
     NSArray *subNodes = [node subNodes];
