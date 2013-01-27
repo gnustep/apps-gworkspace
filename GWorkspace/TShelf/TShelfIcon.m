@@ -548,18 +548,18 @@
 
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
-	NSPasteboard *pb;
+  NSPasteboard *pb;
   NSDragOperation sourceDragMask;
-	NSArray *sourcePaths;
-	NSString *fromPath;
+  NSArray *sourcePaths;
+  NSString *fromPath;
   NSString *buff;
-	unsigned i, count;
+  unsigned i, count;
 
-	CHECK_LOCK_RET (NSDragOperationNone);
-	
-	isDragTarget = NO;
-
-	pb = [sender draggingPasteboard];
+  CHECK_LOCK_RET (NSDragOperationNone);
+  
+  isDragTarget = NO;
+  
+  pb = [sender draggingPasteboard];
   sourcePaths = nil;
   
   if ([[pb types] containsObject: NSFilenamesPboardType]) {
@@ -591,51 +591,40 @@
     return NSDragOperationAll;
   }
   
-  if (node == nil) {
+  if (node == nil)
     return NSDragOperationNone;
-  }
   
   if ((([node isDirectory] == NO) && ([node isMountPoint] == NO)) 
                   || ([node isPackage] && ([node isApplication] == NO))) {
     return NSDragOperationNone;
   }
-
-	count = [sourcePaths count];
-	fromPath = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
-
-	if (count == 0) {
-		return NSDragOperationNone;
-  } 
-
-	if (([node isWritable] == NO) && ([node isApplication] == NO)) {
+  
+  count = [sourcePaths count];
+  fromPath = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
+  
+  if (count == 0)
     return NSDragOperationNone;
-	}
 
-	if ([[node path] isEqual: fromPath]) {
-		return NSDragOperationNone;
-  }  
-
-  if ([sourcePaths containsObject: [node path]]) {
+  if (([node isWritable] == NO) && ([node isApplication] == NO))
     return NSDragOperationNone;
-  }
+  
+  
+  if ([[node path] isEqual: fromPath])
+    return NSDragOperationNone;
+  
+
+  if ([sourcePaths containsObject: [node path]])
+    return NSDragOperationNone;
 
   buff = [NSString stringWithString: [node path]];
-  while (1)
+  while (![buff isEqual: path_separator()])
     {
-      CREATE_AUTORELEASE_POOL(arp);
-
-      for (i = 0; i < count; i++) {
-        if ([buff isEqual: [sourcePaths objectAtIndex: i]]) {
-          RELEASE (arp);
-          return NSDragOperationNone;
+      for (i = 0; i < count; i++)
+        {
+          if ([buff isEqual: [sourcePaths objectAtIndex: i]])
+            return NSDragOperationNone;
         }
-      }
-      if ([buff isEqual: path_separator()]) {
-        RELEASE (arp);
-        break;
-      }            
       buff = [buff stringByDeletingLastPathComponent];
-      RELEASE (arp);
     }
 
   if ([node isDirectory] && [node isParentOfPath: fromPath]) {
@@ -689,7 +678,7 @@
       return NSDragOperationAll;			
     } else if ([node isApplication] == NO) {
       forceCopy = YES;
-			return NSDragOperationCopy;			
+      return NSDragOperationCopy;			
     }
 	}
   
