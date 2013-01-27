@@ -1197,10 +1197,10 @@ static NSImage *branchImage;
 
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
-	NSPasteboard *pb;
+  NSPasteboard *pb;
   NSDragOperation sourceDragMask;
-	NSArray *sourcePaths;
-	NSString *fromPath;
+  NSArray *sourcePaths;
+  NSString *fromPath;
   NSString *nodePath;
   NSString *prePath;
 	unsigned i, count;
@@ -1229,7 +1229,7 @@ static NSImage *branchImage;
     }
   }
   
-	pb = [sender draggingPasteboard];
+  pb = [sender draggingPasteboard];
   sourcePaths = nil;
   
   if ([[pb types] containsObject: NSFilenamesPboardType]) {
@@ -1255,10 +1255,11 @@ static NSImage *branchImage;
     return NSDragOperationNone;
   }
   
-	count = [sourcePaths count];
-	if (count == 0) {
-		return NSDragOperationNone;
-  } 
+  count = [sourcePaths count];
+  if (count == 0)
+    {
+      return NSDragOperationNone;
+    } 
   
   nodePath = [node path];
   
@@ -1277,11 +1278,12 @@ static NSImage *branchImage;
     return NSDragOperationAll;  
   }
 
-	fromPath = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
+  fromPath = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
 
-	if ([nodePath isEqual: fromPath]) {
-		return NSDragOperationNone;
-  }  
+  if ([nodePath isEqual: fromPath])
+    {
+      return NSDragOperationNone;
+    }  
 
   if ([sourcePaths containsObject: nodePath]) {
     return NSDragOperationNone;
@@ -1289,20 +1291,13 @@ static NSImage *branchImage;
 
   prePath = [NSString stringWithString: nodePath];
 
-  while (1) {
-    CREATE_AUTORELEASE_POOL(arp);
-    
-    if ([sourcePaths containsObject: prePath]) {
-      RELEASE (arp);
-      return NSDragOperationNone;
+  while (![prePath isEqual: path_separator()])
+    {
+      if ([sourcePaths containsObject: prePath])
+        return NSDragOperationNone;
+      prePath = [prePath stringByDeletingLastPathComponent];
     }
-    if ([prePath isEqual: path_separator()]) {
-      RELEASE (arp);
-      break;
-    }            
-    prePath = [prePath stringByDeletingLastPathComponent];
-    RELEASE (arp);
-  }
+
 
   if ([node isDirectory] && [node isParentOfPath: fromPath]) {
     NSArray *subNodes = [node subNodes];

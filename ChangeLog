@@ -1,3 +1,8 @@
+2012-01-27 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNIcon.m
+	Simplify code and fix crash due to previous autorelease fix.
+
 2012-01-25 Riccardo Mottola <rm@gnu.org>
 
 	* Tools/ddbd/ddbd.m
