@@ -441,7 +441,7 @@ static id <DesktopApplication> desktopApp = nil;
 
     if (cell) {
       FSNode *node = [cell node];
-			int row, col;
+			NSInteger row, col;
       
 			if (visibleNodes && [visibleNodes containsObject: node]) {
 				[visibleNodes removeObject: node];
@@ -802,8 +802,8 @@ static id <DesktopApplication> desktopApp = nil;
     NSArray *cells = [matrix cells];
     NSUInteger count = [cells count];
     FSNBrowserCell *cell;
-    int selstart = 0;
-    int selend = 0;
+    NSUInteger selstart = 0;
+    NSUInteger selend = 0;
     NSUInteger i;
         
     [matrix deselectAllCells];
@@ -1133,7 +1133,7 @@ static id <DesktopApplication> desktopApp = nil;
 - (void)mouseUp:(NSEvent *)theEvent
 {
   NSPoint p = [theEvent locationInWindow];
-  int row, col;
+  NSInteger row, col;
 
   p = [matrix convertPoint: p fromView: nil];
 
@@ -1405,14 +1405,14 @@ static id <DesktopApplication> desktopApp = nil;
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
                       inMatrixCell:(id)cell
 {
-	NSPasteboard *pb = [sender draggingPasteboard];
+  NSPasteboard *pb = [sender draggingPasteboard];
   NSDragOperation sourceDragMask = [sender draggingSourceOperationMask];
   FSNode *node = [cell node];
   NSString *nodePath = [node path];
-	NSArray *sourcePaths;
-	NSString *fromPath;
+  NSArray *sourcePaths;
+  NSString *fromPath;
   NSString *prePath;
-	unsigned i, count;
+  NSUInteger i, count;
 
   if (([cell isEnabled] == NO) || ([node isDirectory] == NO) 
             || ([node isPackage] && ([node isApplication] == NO))
@@ -1503,7 +1503,7 @@ static id <DesktopApplication> desktopApp = nil;
       FSNode *nd = [subNodes objectAtIndex: i];
       
       if ([nd isDirectory]) {
-        int j;
+        NSUInteger j;
         
         for (j = 0; j < count; j++) {
           NSString *fname = [[sourcePaths objectAtIndex: j] lastPathComponent];
@@ -1543,7 +1543,7 @@ static id <DesktopApplication> desktopApp = nil;
   NSMutableArray *files;
   NSMutableDictionary *opDict;
   NSString *trashPath;
-  unsigned i;
+  NSUInteger i;
 
   if (([cell isEnabled] == NO) 
                   || ([cell isLeaf] && ([node isApplication] == NO))) {
@@ -1626,6 +1626,4 @@ static id <DesktopApplication> desktopApp = nil;
 }
 
 @end
-
-
 

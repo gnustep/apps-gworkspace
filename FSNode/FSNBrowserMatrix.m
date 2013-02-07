@@ -106,7 +106,7 @@
 - (void)scrollToFirstPositionCell:(id)aCell withScrollTune:(float)vtune
 {
   NSRect vr, cr;
-  int row, col;
+  NSInteger row, col;
   
   vr = [self visibleRect];
   
@@ -123,7 +123,7 @@
   
   if ([cell selectIcon]) {
     NSRect cellFrame;
-    int row, col;
+    NSInteger row, col;
   
     [self getRow: &row column: &col ofCell: aCell];
     cellFrame = [self cellFrameAtRow: row column: col];
@@ -136,7 +136,7 @@
 - (void)unSelectIconsOfCellsDifferentFrom:(id)aCell
 {
   NSArray *cells = [self cells];
-  int i = 0;
+  NSUInteger i = 0;
 
   for (i = 0; i < [cells count]; i++) {
     FSNBrowserCell *c = [cells objectAtIndex: i];  
@@ -144,7 +144,7 @@
     if (c != aCell) {
       if ([c unselectIcon]) {
         NSRect cellFrame;
-        int row, col;
+        NSInteger row, col;
   
         [self getRow: &row column: &col ofCell: c];
         cellFrame = [self cellFrameAtRow: row column: col];
@@ -175,7 +175,7 @@
   } else {
     int clickCount;
     NSPoint lastLocation;
-    int row, col;
+    NSInteger row, col;
     
     if (([self numberOfRows] == 0) || ([self numberOfColumns] == 0)) {
       [super mouseDown: theEvent];
@@ -208,7 +208,7 @@
         rect.size.height = size.height;
 
         if (NSPointInRect(lastLocation, rect)) {
-	        NSEvent *nextEvent;
+	  NSEvent *nextEvent;
           BOOL startdnd = NO;
           int dragdelay = 0;
                     
@@ -381,7 +381,7 @@
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
   NSPoint location;
-  int row, col;
+  NSInteger row, col;
   
   location = [[self window] mouseLocationOutsideOfEventStream];
   location = [self convertPoint: location fromView: nil];
@@ -412,7 +412,7 @@
 - (NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender
 {
   NSPoint location;
-  int row, col;
+  NSInteger row, col;
   
   location = [[self window] mouseLocationOutsideOfEventStream];
   location = [self convertPoint: location fromView: nil];

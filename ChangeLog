@@ -9,6 +9,9 @@
 	* GWorkspace/TShelf/TShelfIconsView.m
 	* Inspector/Attributes.h
 	  even more shutup to clang
+	* FSNode/FSNBrowserColumn.m
+	* FSNode/FSNBrowserMatrix.m
+	* (unsigned) int to NS(U)Integer conversion
 
 2012-01-27 Riccardo Mottola <rm@gnu.org>
 
