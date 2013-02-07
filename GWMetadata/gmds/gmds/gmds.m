@@ -633,9 +633,9 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
 
   /* only to avoid a compiler warning */
   if (0) {
-    NSLog(db_schema_tmp);
-    NSLog(user_db_schema);
-    NSLog(user_db_schema_tmp);
+    NSLog(@"%@", db_schema_tmp);
+    NSLog(@"%@", user_db_schema);
+    NSLog(@"%@", user_db_schema_tmp);
   }
 
   return YES;
