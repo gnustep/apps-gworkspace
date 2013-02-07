@@ -622,7 +622,7 @@ static Finder *finder = nil;
 - (IBAction)removeSearchPlaceButtAction:(id)sender
 {
   NSArray *cells = [placesMatrix selectedCells];
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [cells count]; i++) {
     [self removeSearchPlaceWithPath: [[cells objectAtIndex: i] path]];
@@ -632,13 +632,13 @@ static Finder *finder = nil;
 - (void)removeSearchPlaceWithPath:(NSString *)spath
 {
   NSArray *cells = [placesMatrix cells];
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [cells count]; i++) {
     SearchPlacesCell *cell = [cells objectAtIndex: i];
   
     if ([[cell path] isEqual: spath]) {
-      int row, col;
+      NSInteger row, col;
       
       [placesMatrix getRow: &row column: &col ofCell: cell];
       [placesMatrix removeRow: row];
@@ -661,7 +661,7 @@ static Finder *finder = nil;
   
   if (cells && [cells count]) {
     NSMutableArray *paths = [NSMutableArray array];  
-    int i;
+    NSUInteger i;
   
     for (i = 0; i < [cells count]; i++) {
       [paths addObject: [[cells objectAtIndex: i] path]];
@@ -679,7 +679,7 @@ static Finder *finder = nil;
   
   if (cells && [cells count]) {
     NSMutableArray *paths = [NSMutableArray array];  
-    int i;
+    NSUInteger i;
     
     RETAIN (cells);
     for (i = 0; i < [cells count]; i++) {
@@ -720,7 +720,7 @@ static Finder *finder = nil;
 {
   NSMutableDictionary *criteria = [NSMutableDictionary dictionary];
   NSArray *selection;
-  int i;
+  NSUInteger i;
 
   if (usesSearchPlaces == NO) {
     if (currentSelection == nil) {
@@ -777,7 +777,7 @@ static Finder *finder = nil;
 
 - (void)stopAllSearchs
 {
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [searchResults count]; i++) {
     SearchResults *results = [searchResults objectAtIndex: i];
@@ -791,7 +791,7 @@ static Finder *finder = nil;
 
 - (id)resultWithAddress:(unsigned long)address
 {
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [searchResults count]; i++) {
     SearchResults *results = [searchResults objectAtIndex: i];
@@ -826,7 +826,7 @@ static Finder *finder = nil;
 
 - (void)openFoundSelection:(NSArray *)selection
 {
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [selection count]; i++) {
     FSNode *node = [selection objectAtIndex: i];
@@ -850,7 +850,7 @@ static Finder *finder = nil;
 - (void)fileSystemWillChange:(NSNotification *)notif
 {
   NSDictionary *info = [notif object];
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [lsFolders count]; i++) {
     LSFolder *folder = [lsFolders objectAtIndex: i];
@@ -875,7 +875,7 @@ static Finder *finder = nil;
   NSMutableArray *srcpaths = [NSMutableArray array];
   NSMutableArray *dstpaths = [NSMutableArray array];
   BOOL copy, move, remove; 
-  int i, j, count;
+  NSUInteger i, j, count;
 
   if ([operation isEqual: @"GWorkspaceRenameOperation"])
     {
@@ -1022,9 +1022,9 @@ static Finder *finder = nil;
 {
   NSRect wrect = [win frame];
   NSRect mbrect = [modulesBox bounds];
-  int count = [fmviews count];
+  NSUInteger count = [fmviews count];
   float hspace = (count * FMVIEWH) + HMARGIN + BORDER;
-  int i;
+  NSUInteger i;
     
   if (mbrect.size.height != hspace) {  
     if (wrect.size.height != WINH) {
@@ -1063,7 +1063,7 @@ static Finder *finder = nil;
   NSArray *cells = [placesMatrix cells];
   NSMutableArray *savedPlaces = [NSMutableArray array];
   NSMutableArray *lsfpaths = [NSMutableArray array];
-  int i;
+  NSUInteger i;
 
   if (cells && [cells count]) {
     for (i = 0; i < [cells count]; i++) {
@@ -1175,7 +1175,7 @@ static Finder *finder = nil;
 
 - (LSFolder *)lsfolderWithNode:(FSNode *)node
 {
-  int i;
+  NSUInteger i;
   
   for (i = 0; i < [lsFolders count]; i++) {
     LSFolder *folder = [lsFolders objectAtIndex: i];
@@ -1190,7 +1190,7 @@ static Finder *finder = nil;
 
 - (LSFolder *)lsfolderWithPath:(NSString *)path
 {
-  int i;
+  NSUInteger i;
   
   for (i = 0; i < [lsFolders count]; i++) {
     LSFolder *folder = [lsFolders objectAtIndex: i];

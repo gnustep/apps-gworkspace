@@ -944,14 +944,14 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 //
 // NSTableDataSource protocol
 //
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
   return [foundObjects count];
 }
 
 - (id)tableView:(NSTableView *)aTableView
           objectValueForTableColumn:(NSTableColumn *)aTableColumn
-                                row:(int)rowIndex
+                                row:(NSInteger)rowIndex
 {
   FSNode *nd = [foundObjects objectAtIndex: rowIndex];
     
@@ -1020,7 +1020,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 - (void)tableView:(NSTableView *)aTableView 
   willDisplayCell:(id)aCell 
    forTableColumn:(NSTableColumn *)aTableColumn 
-              row:(int)rowIndex
+              row:(NSInteger)rowIndex
 {
   if (aTableColumn == nameColumn) {
     FSNTextCell *cell = (FSNTextCell *)[nameColumn dataCell];
