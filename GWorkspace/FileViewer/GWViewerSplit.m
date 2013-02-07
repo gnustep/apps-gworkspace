@@ -61,7 +61,7 @@
   }
 }
 
-- (float)dividerThickness
+- (CGFloat)dividerThickness
 {
   return 11;
 }

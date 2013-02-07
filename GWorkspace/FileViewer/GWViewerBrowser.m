@@ -34,14 +34,14 @@
 
 - (id)initWithBaseNode:(FSNode *)bsnode
               inViewer:(id)vwr
-		    visibleColumns:(int)vcols 
+        visibleColumns:(int)vcols 
               scroller:(NSScroller *)scrl
             cellsIcons:(BOOL)cicns
          editableCells:(BOOL)edcells
        selectionColumn:(BOOL)selcol
 {
   self = [super initWithBaseNode: bsnode
-		              visibleColumns: vcols 
+                  visibleColumns: vcols 
                         scroller: scrl
                       cellsIcons: cicns
                    editableCells: edcells    
@@ -90,12 +90,12 @@
       NSDictionary *apps;
       NSEnumerator *app_enum;
       id key; 
-      int i;
+      NSUInteger i;
   
       if (selnodes && [selnodes count]) {
         FSNBrowserMatrix *matrix = (FSNBrowserMatrix *)[bc cmatrix];
         FSNBrowserCell *cell;
-        int row, col;
+        NSInteger row, col;
         
         location = [matrix convertPoint: location fromView: self];
         
