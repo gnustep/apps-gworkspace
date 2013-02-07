@@ -565,7 +565,6 @@ x += 6; \
     NSMutableArray *files = [NSMutableArray array];
     NSMutableArray *umountPaths = [NSMutableArray array];
     NSMutableDictionary *opinfo = [NSMutableDictionary dictionary];
-    NSString *username = NSUserName();
 
     for (i = 0; i < [paths count]; i++) {
       NSString *srcpath = [paths objectAtIndex: i];

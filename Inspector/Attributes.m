@@ -180,7 +180,6 @@ static BOOL sizeStop = NO;
   NSString *ftype;
   NSString *usr, *grp, *tmpusr, *tmpgrp;
   NSDate *date;
-  NSDate *tmpdate = nil;
   NSCalendarDate *cdate;
   NSDictionary *attrs;
   unsigned long perms;

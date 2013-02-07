@@ -14,6 +14,9 @@
 	* (unsigned) int to NS(U)Integer conversion
 	* GWMetadata/Preferences/MDIndexing.m
 	  more (unsigned) int to NS(U)Integer conversion
+	* GWorkspace/Desktop/Dock/DockIcon.m
+	* Inspector/Attributes.m
+	* remove unused variables
 
 2012-01-27 Riccardo Mottola <rm@gnu.org>
 
