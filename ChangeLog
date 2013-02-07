@@ -2,6 +2,9 @@
 	* GWMetadata/gmds/gmds/gmds.m
 	* GWMetadata/gmds/mdextractor/mdextractor.m
 	  shutup clang warning about constant strings in NSLog
+	* Tools/ddbd/DDBDirsManager.m
+	* Tools/ddbd/MDModules/MDModuleAnnotations/MDModuleAnnotations.m
+	  even more shutup to clang
 
 2012-01-27 Riccardo Mottola <rm@gnu.org>
 

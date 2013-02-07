@@ -198,7 +198,7 @@
     ASSIGN (dummyPaths[1], [path stringByAppendingString: @"0"]);
   } else {
     ASSIGN (dummyPaths[0], path);
-    ASSIGN (dummyPaths[1], [NSString stringWithString: @"0"]);
+    ASSIGN (dummyPaths[1], @"0");
   }
 
   keys = [tree keysGreaterThenKey: dummyOffsets[0] 

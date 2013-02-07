@@ -50,8 +50,8 @@
   self = [super init];
   
   if (self) {   
-    ASSIGN (mdtype, [NSString stringWithString: @"GSMDItemFinderComment"]);  
-    ASSIGN (extension, [NSString stringWithString: @"annotations"]);  
+    ASSIGN (mdtype, @"GSMDItemFinderComment");  
+    ASSIGN (extension, @"annotations");  
     fm = [NSFileManager defaultManager];
   }
   
