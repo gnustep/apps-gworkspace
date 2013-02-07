@@ -290,9 +290,9 @@ BOOL isDotFile(NSString *path);
 {
   NSPreferencePaneUnselectReply oldReply = pathsUnselReply;
   NSArray *cells = [indexedMatrix cells];
-  int count = [cells count];
+  NSUInteger count = [cells count];
   id cell;
-  unsigned i;
+  NSUInteger i;
 
 #define IND_ERR_RETURN(x) \
 do { \
@@ -354,7 +354,7 @@ return; \
     cell = [indexedMatrix selectedCell];  
     
     if (cell) {  
-      int row, col;
+      NSInteger row, col;
       
       [indexedPaths removeObject: [cell stringValue]];
 
@@ -385,9 +385,9 @@ return; \
 {
   NSPreferencePaneUnselectReply oldReply = pathsUnselReply;
   NSArray *cells = [excludedMatrix cells];
-  int count = [cells count];
+  NSUInteger count = [cells count];
   id cell;
-  unsigned i;
+  NSUInteger i;
 
 #define EXCL_ERR_RETURN(x) \
 do { \
@@ -462,7 +462,7 @@ return; \
     cell = [excludedMatrix selectedCell];  
     
     if (cell) {  
-      int row, col;
+      NSInteger row, col;
       
       [excludedPaths removeObject: [cell stringValue]];
 
@@ -493,7 +493,7 @@ return; \
 {
   NSPreferencePaneUnselectReply oldReply = pathsUnselReply;
   NSArray *cells = [suffixMatrix cells];
-  int count = [cells count];
+  NSUInteger count = [cells count];
   id cell;
 
 #define SUFF_ERR_RETURN(x) \
@@ -544,7 +544,7 @@ return; \
     cell = [suffixMatrix selectedCell];  
     
     if (cell) {  
-      int row, col;
+      NSInteger row, col;
       
       [excludedSuffixes removeObject: [cell stringValue]];
 
@@ -581,7 +581,7 @@ return; \
 - (IBAction)revertButtAction:(id)sender
 {
   id cell;
-  unsigned i;
+  NSUInteger i;
 
   DESTROY (indexedPaths);
   DESTROY (excludedPaths);
