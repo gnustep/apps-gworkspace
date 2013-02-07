@@ -4,6 +4,7 @@
 	  shutup clang warning about constant strings in NSLog
 	* Tools/ddbd/DDBDirsManager.m
 	* Tools/ddbd/MDModules/MDModuleAnnotations/MDModuleAnnotations.m
+	* Tools/ddbd/DDBPathsManager.m
 	  even more shutup to clang
 
 2012-01-27 Riccardo Mottola <rm@gnu.org>

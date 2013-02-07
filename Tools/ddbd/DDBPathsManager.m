@@ -420,7 +420,7 @@
     dmstr[1] = [path stringByAppendingString: @"0"];
   } else {
     dmstr[0] = path;
-    dmstr[1] = [NSString stringWithString: @"0"];
+    dmstr[1] = @"0";
   }
 
   dummyPaths[0] = [[DDBPath alloc] initForPath: dmstr[0]];
