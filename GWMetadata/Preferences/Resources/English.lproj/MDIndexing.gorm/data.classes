@@ -47,7 +47,7 @@
 	    indexedScroll,
 	    indexedAdd,
 	    indexedRemove,
-	    _window,
+	    "_window",
 	    enableSwitch,
 	    applyButton,
 	    revertButton,
