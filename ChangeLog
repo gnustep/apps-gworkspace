@@ -27,6 +27,10 @@
 	* GWorkspace/Finder/Finder.m
 	* GWorkspace/Finder/SearchResults/SearchResults.m
 	  more (unsigned) int to NS(U)Integer conversion
+	* GWorkspace/History/History.m
+	* GWorkspace/Preferences/DesktopPref.m
+	* GWorkspace/Preferences/HiddenFilesPref.m
+	  more (unsigned) int to NS(U)Integer conversion
 
 2012-01-27 Riccardo Mottola <rm@gnu.org>
 

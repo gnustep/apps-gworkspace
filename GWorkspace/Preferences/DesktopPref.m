@@ -60,7 +60,6 @@ static NSString *nibName = @"DesktopPref";
       DockPosition dockpos;
       DockStyle dockstyle;
       id cell;
-      NSRect r;
 
       RETAIN (prefbox);
       RELEASE (win);
@@ -172,7 +171,7 @@ static NSString *nibName = @"DesktopPref";
 - (IBAction)chooseImage:(id)sender
 {
   NSOpenPanel *openPanel;
-  int result;
+  NSInteger result;
    
   openPanel = [NSOpenPanel openPanel];
   [openPanel setTitle: NSLocalizedString(@"Choose Image", @"")];	
@@ -188,7 +187,7 @@ static NSString *nibName = @"DesktopPref";
                                       file: nil 
                                      types: [NSImage imageFileTypes]];
                                      
-	if (result == NSOKButton) {
+  if (result == NSOKButton) {
     CREATE_AUTORELEASE_POOL (pool);
     NSString *impath = [openPanel filename];
     NSImage *image = [[NSImage alloc] initWithContentsOfFile: impath];
@@ -219,7 +218,7 @@ static NSString *nibName = @"DesktopPref";
 - (IBAction)setImageStyle:(id)sender
 {
   id cell = [imagePosMatrix selectedCell];
-  int row, col;
+  NSInteger row, col;
   
   [imagePosMatrix getRow: &row column: &col ofCell: cell];
   [[manager desktopView] setBackImageStyle: row];  
@@ -254,7 +253,7 @@ static NSString *nibName = @"DesktopPref";
 - (IBAction)setDockPosition:(id)sender
 {
   id cell = [dockPosMatrix selectedCell];
-  int row, col;
+  NSInteger row, col;
   
   [dockPosMatrix getRow: &row column: &col ofCell: cell];
   [manager setDockPosition: (row == 0) ? DockPositionLeft : DockPositionRight];
@@ -263,7 +262,7 @@ static NSString *nibName = @"DesktopPref";
 - (IBAction)setDockStyle:(id)sender
 {
   id cell = [dockStyleMatrix selectedCell];
-  int row, col;
+  NSInteger row, col;
   
   [dockStyleMatrix getRow: &row column: &col ofCell: cell];
   [[manager dock] setStyle: (row == 0) ? DockStyleClassic : DockStyleModern];

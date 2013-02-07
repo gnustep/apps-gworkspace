@@ -109,8 +109,8 @@
 
 - (void)setHistoryNodes:(NSArray *)nodes
 {
-  int count = (nodes ? [nodes count] : 0);
-	int i;
+  NSUInteger count = (nodes ? [nodes count] : 0);
+  NSUInteger i;
 
   [matrix renewRows: count columns: 1];
 	  
@@ -154,7 +154,7 @@
 - (void)matrixAction:(id)sender
 {
 	if (viewer) {
-	  int row, col;
+	  NSInteger row, col;
 
 	  [matrix getRow: &row column: &col ofCell: [matrix selectedCell]];
 
@@ -169,7 +169,7 @@
 	NSArray *cells = [matrix cells];
 	float mh = [matrix cellSize].height;
 	float maxw = [[scrollView contentView] bounds].size.width;
-	int i;
+	NSUInteger i;
 	
 	for (i = 0; i < [cells count]; i++) {
 		NSString *s = [[cells objectAtIndex: i] stringValue];

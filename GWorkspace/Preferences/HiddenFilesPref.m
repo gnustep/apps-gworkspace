@@ -595,14 +595,14 @@ if (sz.height < 0) sz.height = 0
 
 - (void)removeCellsWithNames:(NSArray *)names inMatrix:(NSMatrix *)matrix
 {
-	id cell;
-  int i;
+  id cell;
+  NSUInteger i;
 	
   for (i = 0; i < [names count]; i++) {
     cell = [self cellWithTitle: [names objectAtIndex: i] inMatrix: matrix];
 
     if (cell != nil) {    
-			int row, col;
+      NSInteger row, col;
 			
       [matrix getRow: &row column: &col ofCell: cell];  
       [matrix removeRow: row];    			
@@ -615,9 +615,10 @@ if (sz.height < 0) sz.height = 0
 
 - (void)selectCellsWithNames:(NSArray *)names inMatrix:(NSMatrix *)matrix
 {
-  int i, count, max;
-  int *selectedIndexes = NULL;		
-	NSMutableArray *cells;		
+  NSUInteger i, count;
+  NSInteger max;
+  NSInteger *selectedIndexes = NULL;
+  NSMutableArray *cells;
 
   cells = [NSMutableArray arrayWithCapacity: 1];
   for (i = 0; i < [names count]; i++) {
@@ -630,39 +631,39 @@ if (sz.height < 0) sz.height = 0
   }
   
   count = [cells count];
-	max = [matrix numberOfRows];
-	selectedIndexes = NSZoneMalloc(NSDefaultMallocZone(), sizeof(int) * count);
+  max = [matrix numberOfRows];
+  selectedIndexes = NSZoneMalloc(NSDefaultMallocZone(), sizeof(NSInteger) * count);
 
-	for (i = 0; i < count; i++) {
-	  NSCell *cell;
-	  int sRow, sColumn;
+  for (i = 0; i < count; i++) {
+    NSCell *cell;
+    NSInteger sRow, sColumn;
 		
-		cell = [cells objectAtIndex: i];
-	  [matrix getRow: &sRow column: &sColumn ofCell: cell];
-	  selectedIndexes[i] = sRow;
-	}
+    cell = [cells objectAtIndex: i];
+    [matrix getRow: &sRow column: &sColumn ofCell: cell];
+    selectedIndexes[i] = sRow;
+  }
   
-	for (i = 0; i < count; i++) {
-	  if (selectedIndexes[i] > max) {
-	    break;
-	  }
-	  [matrix selectCellAtRow: selectedIndexes[i] column: 0];
-	}
+  for (i = 0; i < count; i++) {
+    if (selectedIndexes[i] > max) {
+      break;
+    }
+    [matrix selectCellAtRow: selectedIndexes[i] column: 0];
+  }
 
-	NSZoneFree(NSDefaultMallocZone(), selectedIndexes);
+  NSZoneFree(NSDefaultMallocZone(), selectedIndexes);
 }
 
 - (id)cellWithTitle:(NSString *)title inMatrix:(NSMatrix *)matrix
 {
   NSArray *cells;
   id cell;
-  int i;
+  NSUInteger i;
   
   cells = [matrix cells]; 
   if (cells) {
-	  for (i = 0; i < [cells count]; i++) {
+    for (i = 0; i < [cells count]; i++) {
       cell = [cells objectAtIndex: i];                  
-		  if ([[cell stringValue] isEqualToString: title]) {    
+      if ([[cell stringValue] isEqualToString: title]) {    
         return cell;
       }
     }
