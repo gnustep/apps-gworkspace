@@ -1,6 +1,6 @@
 /* SQLite.m
  *  
- * Copyright (C) 2006 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: May 2006
@@ -28,8 +28,9 @@
 #include <sys/stat.h>
 #include <limits.h>
 #include <float.h>
-#include "SQLite.h"
 #include "config.h"
+
+#import "SQLite.h"
 
 #define GWDebugLog(format, args...) \
   do { if (GW_DEBUG_LOG) \
@@ -740,7 +741,7 @@
   return (sqlite3_reset(handle) == SQLITE_OK);
 }
 
-- (BOOL)finalize
+- (BOOL)finalizeStatement
 {
   int err = sqlite3_finalize(handle);
 

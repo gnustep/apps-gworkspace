@@ -1,6 +1,6 @@
 /* SQLite.h
  *  
- * Copyright (C) 2006-2011 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: May 2006
@@ -132,7 +132,7 @@
 
 - (BOOL)reset;
 
-- (BOOL)finalize;
+- (BOOL)finalizeStatement;
 
 - (NSString *)query;
 

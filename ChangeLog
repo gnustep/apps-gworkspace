@@ -1,3 +1,9 @@
+2012-03-07 Riccardo Mottola <rm@gnu.org>
+
+	* GWMetadata/MDKit/SQLite.h (finalize)
+	* GWMetadata/MDKit/SQLite.m (finalize)
+	Rename finalize to finalizeStatement to avoid clash with GC [NSObejct finalize+ method.
+
 2012-02-07: Sebastian Reitenbach <sebastia@l00-bugdead-prods.de>
 	* GWMetadata/gmds/gmds/gmds.m
 	* GWMetadata/gmds/mdextractor/mdextractor.m
