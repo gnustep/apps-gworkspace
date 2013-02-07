@@ -108,6 +108,8 @@
 	NSNotificationCenter *nc;  
 }
 
+- (id)initForInspector:(id)insp;
+
 - (NSView *)inspView;
 
 - (NSString *)winname;

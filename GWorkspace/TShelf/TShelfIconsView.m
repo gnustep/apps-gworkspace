@@ -161,7 +161,7 @@
 			} 
 		    }
 		  
-		  if ((canadd == YES))
+		  if (canadd == YES)
 		    {
 		      [self addIconWithPaths: iconpaths withGridIndex: index];
 		    }
