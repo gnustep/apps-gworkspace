@@ -17,6 +17,9 @@
 	* GWorkspace/Desktop/Dock/DockIcon.m
 	* Inspector/Attributes.m
 	* remove unused variables
+	* GWorkspace/Desktop/GWDesktopWindow.m
+	* GWorkspace/Desktop/XBundles/XDesktopWindow/XDesktopWindow.m
+	  more (unsigned) int to NS(U)Integer conversion
 
 2012-01-27 Riccardo Mottola <rm@gnu.org>
 

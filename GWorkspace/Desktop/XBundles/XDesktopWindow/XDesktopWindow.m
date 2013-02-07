@@ -196,7 +196,7 @@
 }
 
 - (void)orderWindow:(NSWindowOrderingMode)place 
-         relativeTo:(int)otherWin
+         relativeTo:(NSInteger)otherWin
 {
   [super orderWindow: place relativeTo: otherWin];
   [self setLevel: NSDesktopWindowLevel];
