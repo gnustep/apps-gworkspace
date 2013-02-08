@@ -1,6 +1,6 @@
 /* Fiend.m
  *  
- * Copyright (C) 2003-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -64,10 +64,11 @@
 
 - (id)init
 {
-	self = [super initWithFrame: NSMakeRect(0, 0, 64, 64)];
-  if (self) {
-	  NSUserDefaults *defaults;
-	  NSDictionary *myPrefs;
+  self = [super initWithFrame: NSMakeRect(0, 0, 64, 64)];
+  if (self)
+    {
+      NSUserDefaults *defaults;
+      NSDictionary *myPrefs;
     id leaf;
     NSRect r;
     int i, j;
@@ -228,18 +229,18 @@
     return;
   }
 
-	dialog = [[SympleDialog alloc] initWithTitle: NSLocalizedString(@"New Layer", @"") 
+  dialog = [[SympleDialog alloc] initWithTitle: NSLocalizedString(@"New Layer", @"") 
                                       editText: @""
                                    switchTitle: nil];
-  AUTORELEASE (dialog);
-	[dialog center];
+  [dialog center];
   [dialog makeKeyWindow];
   [dialog orderFrontRegardless];
   
   result = [dialog runModal];
-	if(result != NSAlertDefaultReturn) {
+  [dialog release];
+
+  if(result != NSAlertDefaultReturn)
     return;
-  }  
   
   layerName = [dialog getEditFieldText];
 
@@ -330,19 +331,19 @@
   if ([myWin isVisible] == NO) {
     return;
   }
-
-	dialog = [[SympleDialog alloc] initWithTitle: NSLocalizedString(@"Rename Layer", @"") 
+  
+  dialog = [[SympleDialog alloc] initWithTitle: NSLocalizedString(@"Rename Layer", @"") 
                                       editText: currentName
                                    switchTitle: nil];
-  AUTORELEASE (dialog);
-	[dialog center];
+  [dialog center];
   [dialog makeKeyWindow];
   [dialog orderFrontRegardless];
   
   result = [dialog runModal];
-	if(result != NSAlertDefaultReturn) {
+  [dialog release];
+  
+  if(result != NSAlertDefaultReturn)
     return;
-  }  
   
   layerName = [dialog getEditFieldText];
   if ([layerName isEqual: currentName]) {  

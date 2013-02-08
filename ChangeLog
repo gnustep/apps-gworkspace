@@ -1,4 +1,9 @@
-2012-03-08 Riccardo Mottola
+2013-02-08 Riccardo Mottola
+
+	* GWorkspace/Fiend/Fiend.m (renameCurrentLayer, addLayer)
+	Release dialog later and don't autorelease it too early.
+
+2013-02-08 Riccardo Mottola
 
 	* GWMetadata/Preferences/Resources/English.lproj/MDIndexing.gorm/
 	Slight cleanup
@@ -6,13 +11,13 @@
 	* DBKit/DBKBTree.m
 	Fix ARP leak
 
-2012-03-07 Riccardo Mottola <rm@gnu.org>
+2013-02-07 Riccardo Mottola <rm@gnu.org>
 
 	* GWMetadata/MDKit/SQLite.h (finalize)
 	* GWMetadata/MDKit/SQLite.m (finalize)
 	Rename finalize to finalizeStatement to avoid clash with GC [NSObejct finalize+ method.
 
-2012-02-07: Sebastian Reitenbach <sebastia@l00-bugdead-prods.de>
+2013-02-07 Sebastian Reitenbach <sebastia@l00-bugdead-prods.de>
 	* GWMetadata/gmds/gmds/gmds.m
 	* GWMetadata/gmds/mdextractor/mdextractor.m
 	  shutup clang warning about constant strings in NSLog
@@ -46,29 +51,29 @@
 	* GWorkspace/Preferences/HiddenFilesPref.m
 	  more (unsigned) int to NS(U)Integer conversion
 
-2012-01-27 Riccardo Mottola <rm@gnu.org>
+2013-01-27 Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNIcon.m
 	* GWorkspace/TShelf/TShelfIcon.m
 	Simplify code and fix crash due to previous autorelease fix.
 
-2012-01-25 Riccardo Mottola <rm@gnu.org>
+2013-01-25 Riccardo Mottola <rm@gnu.org>
 
 	* Tools/ddbd/ddbd.m
 	Fix memory leak by removing unnecessary retain to self.
 
-2012-01-25 Riccardo Mottola <rm@gnu.org>
+2013-01-25 Riccardo Mottola <rm@gnu.org>
 
 	* DBKit/DBKitFixLenRecordsFile.m
 	Do not use deallocated instance ivars.
 
-2012-01-25 Riccardo Mottola <rm@gnu.org>
+2013-01-25 Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNIcon.m
 	* GWorkspace/TShelf/TShelfIcon.m
 	Fix ARP memory leak.
 
-2012-01-21 Riccardo Mottola <rm@gnu.org>
+2013-01-21 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/TShelf/TShelfIconsView.m
 	Fix warning and rewrite cycle cuinting upwards due to unsigned.
