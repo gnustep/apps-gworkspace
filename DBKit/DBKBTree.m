@@ -1,6 +1,6 @@
 /* DBKBTree.m
  *  
- * Copyright (C) 2005-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2005
@@ -424,23 +424,28 @@ NSRecursiveLock *dbkbtree_lock = nil;
     }
   }
 
-  while (node != nil) { 
-    CREATE_AUTORELEASE_POOL(arp);
+  while (node != nil)
+    { 
+      CREATE_AUTORELEASE_POOL(arp);
     
-    key = [node successorKeyInNode: &node forKeyAtIndex: index];
+      key = [node successorKeyInNode: &node forKeyAtIndex: index];
     
-    if (key == nil) {
-      break;
-    }
+      if (key == nil)
+        {
+          RELEASE(arp);
+          break;
+        }
     
-    if (bkey && ([delegate compareNodeKey: key withKey: bkey] != NSOrderedAscending)) {
-      break;
-    }
+      if (bkey && ([delegate compareNodeKey: key withKey: bkey] != NSOrderedAscending))
+        {
+          RELEASE(arp);
+          break;
+        }
     
-    index = [node indexOfKey: key];
-    [keys addObject: key]; 
+      index = [node indexOfKey: key];
+      [keys addObject: key]; 
     
-    RELEASE (arp);
+      RELEASE (arp);
   }
 
   RETAIN (keys);

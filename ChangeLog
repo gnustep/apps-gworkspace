@@ -3,6 +3,9 @@
 	* GWMetadata/Preferences/Resources/English.lproj/MDIndexing.gorm/
 	Slight cleanup
 
+	* DBKit/DBKBTree.m
+	Fix ARP leak
+
 2012-03-07 Riccardo Mottola <rm@gnu.org>
 
 	* GWMetadata/MDKit/SQLite.h (finalize)
