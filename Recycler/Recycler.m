@@ -137,7 +137,7 @@ static Recycler *recycler = nil;
   terminating = NO;
 }
 
-- (BOOL)applicationShouldTerminate:(NSApplication *)app 
+- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)app 
 {
   terminating = YES;
   
@@ -156,7 +156,7 @@ static Recycler *recycler = nil;
   }
 
   [self updateDefaults];
-	return YES;
+	return NSTerminateNow;
 }
 
 - (oneway void)emptyTrash

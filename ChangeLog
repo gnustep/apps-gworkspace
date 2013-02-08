@@ -1,3 +1,8 @@
+2013-02-08 Sebastian Reitenbach <sebastia@l00-bugdead-prods.de>
+	* GWMetadata/MDFinder/MDFinder.m
+	* Recycler/Recycler.m
+	  move to newer API for applicationShouldTerminate
+
 2013-02-08 Riccardo Mottola
 
 	* GWorkspace/Fiend/Fiend.m (renameCurrentLayer, addLayer)

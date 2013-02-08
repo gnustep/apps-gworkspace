@@ -179,10 +179,10 @@ static MDFinder *mdfinder = nil;
   return YES;
 }
 
-- (BOOL)applicationShouldTerminate:(NSApplication *)app 
+- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)app 
 {
-  BOOL canterminate = YES;
-  int i;
+  NSUInteger canterminate = NSTerminateNow;
+  NSUInteger i;
   
   for (i = 0; i < [mdkwindows count]; i++) {
     MDKWindow *window = [mdkwindows objectAtIndex: i];
@@ -190,21 +190,21 @@ static MDFinder *mdfinder = nil;
     
     if ([query isGathering] || [query waitingStart]) {
       [window stopCurrentQuery];
-      canterminate = NO;
+      canterminate = NSTerminateCancel;
     }
   }
   
-  if (canterminate) {
+  if (canterminate == NSTerminateNow) {
     for (i = 0; i < [mdkwindows count]; i++) {
       MDKWindow *window = [mdkwindows objectAtIndex: i];
       
       if (([window savePath] != nil) && ([window isSaved] == NO)) {
-        canterminate = NO;
+        canterminate = NSTerminateCancel;
         break;
       }
     }
       
-    if (canterminate == NO) {
+    if (canterminate == NSTerminateCancel) {
       canterminate = !(NSRunAlertPanel(nil,
                           NSLocalizedString(@"You have unsaved queries", @""),
                           NSLocalizedString(@"Cancel", @""),
@@ -213,7 +213,7 @@ static MDFinder *mdfinder = nil;
     }    
   }
  
-  if (canterminate) { 
+  if (canterminate == NSTerminateNow) { 
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     
     [defaults setObject: lastSaveDir forKey: @"last_save_dir"];
