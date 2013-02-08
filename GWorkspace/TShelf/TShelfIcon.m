@@ -150,7 +150,7 @@
 					      nil]];
       
       position = NSMakePoint(0, 0);
-      gridindex = -1;
+      gridindex = NSNotFound;
       dragdelay = 0;
       isDragTarget = NO;
       onSelf = NO;
