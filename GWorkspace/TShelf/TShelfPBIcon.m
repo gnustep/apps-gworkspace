@@ -60,7 +60,7 @@
 
 - (id)initForPBDataAtPath:(NSString *)dpath
                    ofType:(NSString *)type
-				        gridIndex:(int)index
+                gridIndex:(NSUInteger)index
               inIconsView:(TShelfIconsView *)aview
 {
   self = [super init];
@@ -100,7 +100,7 @@
     }
     
     gridindex = index;
-		position = NSMakePoint(0, 0);
+    position = NSMakePoint(0, 0);
     isSelect = NO; 
     dragdelay = 0;
     tview = aview;  
@@ -158,12 +158,12 @@
   return position;
 }
 
-- (void)setGridIndex:(int)index
+- (void)setGridIndex:(NSUInteger)index
 {
-	gridindex = index;
+  gridindex = index;
 }
 
-- (int)gridindex
+- (NSUInteger)gridindex
 {
   return gridindex;
 }
@@ -180,8 +180,8 @@
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-	if ([theEvent clickCount] == 1) { 
-	  NSEvent *nextEvent;
+  if ([theEvent clickCount] == 1) { 
+    NSEvent *nextEvent;
     NSPoint location;
     NSSize offset;
     BOOL startdnd = NO;
@@ -216,13 +216,13 @@
 
 - (void)drawRect:(NSRect)rect
 {
-	NSPoint p;
+  NSPoint p;
   NSSize s;
       	
-	if(isSelect) {
+  if(isSelect) {
     [[NSColor selectedControlColor] set];
     [highlightPath fill];
-	}
+  }
 	
   s = [icon size];
   p = NSMakePoint((rect.size.width - s.width) / 2, (rect.size.height - s.height) / 2);	

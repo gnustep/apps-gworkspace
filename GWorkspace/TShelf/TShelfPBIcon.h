@@ -1,6 +1,6 @@
 /* TShelfPBIcon.h
  *  
- * Copyright (C) 2003 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -25,7 +25,7 @@
 #ifndef TSHELF_PB_ICON_H
 #define TSHELF_PB_ICON_H
 
-#include <AppKit/NSView.h>
+#import <AppKit/NSView.h>
 
 @class NSImage;
 @class NSBezierPath;
@@ -36,10 +36,10 @@
   NSString *dataPath;
   NSString *dataType;
 
-	NSImage *icon;
+  NSImage *icon;
   NSBezierPath *highlightPath;
-	NSPoint position;
-	int gridindex;
+  NSPoint position;
+  NSUInteger gridindex;
 
   TShelfIconsView *tview;
 
@@ -52,7 +52,7 @@
 
 - (id)initForPBDataAtPath:(NSString *)dpath
                    ofType:(NSString *)type
-				        gridIndex:(int)index
+                gridIndex:(NSUInteger)index
               inIconsView:(TShelfIconsView *)aview;
 
 - (NSString *)dataPath;
@@ -73,9 +73,9 @@
 
 - (NSPoint)position;
 
-- (void)setGridIndex:(int)index;
+- (void)setGridIndex:(NSUInteger)index;
 
-- (int)gridindex;
+- (NSUInteger)gridindex;
 
 - (NSTextField *)myLabel;
 
