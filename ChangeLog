@@ -1,5 +1,13 @@
 2013-02-12 Riccardo Mottola <rm@gnu.org>
 
+	* GWorkspace/TShelf/TShelfPBIcon.[h,m]:
+	NSUInteger transition.
+
+	* GWorkspace/TShelf/TShelfIconsView.m (iconCompare, pbiconCompare)
+	New compare methods to take in account NSNotFound
+
+2013-02-12 Riccardo Mottola <rm@gnu.org>
+
 	* GWMetadata/Preferences/MDIndexing.m
 	Transition to CGFloat and NSUInteger.
 
@@ -7,6 +15,11 @@
 	* GWMetadata/MDFinder/MDFinder.m
 	* Recycler/Recycler.m
 	  move to newer API for applicationShouldTerminate
+
+2013-02-08 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/TShelf/TShelfIcon.m
+	Fix -1 to be NSNotFound to complete transition to unsigned.
 
 2013-02-08 Riccardo Mottola
 

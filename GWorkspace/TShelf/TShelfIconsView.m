@@ -50,13 +50,18 @@
 
 - (NSComparisonResult)iconCompare:(id)other
 {
-	if ([other gridindex] > [self gridindex]) {
-		return NSOrderedAscending;	
-	} else {
-		return NSOrderedDescending;	
-	}
+  if ([other gridindex] == [self gridindex])
+    return NSOrderedSame;
 
-	return NSOrderedSame;
+  if ([other gridindex] == NSNotFound)
+    return NSOrderedAscending;
+  if ([self gridindex] == NSNotFound)
+    return NSOrderedDescending;
+
+  if ([other gridindex] > [self gridindex])
+    return NSOrderedAscending;	
+  
+  return NSOrderedDescending;	
 }
 
 @end
@@ -71,13 +76,18 @@
 
 - (NSComparisonResult)pbiconCompare:(id)other
 {
-	if ([other gridindex] > [self gridindex]) {
-		return NSOrderedAscending;	
-	} else {
-		return NSOrderedDescending;	
-	}
+  if ([other gridindex] == [self gridindex])
+    return NSOrderedSame;
 
-	return NSOrderedSame;
+  if ([other gridindex] == NSNotFound)
+    return NSOrderedAscending;
+  if ([self gridindex] == NSNotFound)
+    return NSOrderedDescending;
+
+  if ([other gridindex] > [self gridindex])
+    return NSOrderedAscending;	
+  
+  return NSOrderedDescending;	
 }
 
 @end
@@ -985,35 +995,39 @@
 
 - (void)resizeWithOldSuperviewSize:(NSSize)oldFrameSize
 {
-	int i;
+  NSUInteger i;
 				
-	if (gpoints == NULL) {
-		[super resizeWithOldSuperviewSize: oldFrameSize];
-		return;
-	}
-		
-	for (i = 0; i < pcount; i++) {	
-		gpoints[i].used = 0;
-	}
-	
-	for (i = 0; i < [icons count]; i++) {	
-		id icon	 = [icons objectAtIndex: i];
-		int index = [icon gridindex];		
-		gridpoint gpoint = gpoints[index];
-		NSPoint p = NSMakePoint(gpoint.x, gpoint.y);
-		NSRect r = NSMakeRect(p.x, p.y, 64, 52);
-
-		[icon setPosition: p];
-		[icon setFrame: NSIntegralRect(r)];
-		gpoints[index].used = 1;
-    
-    if (iconsType == FILES_TAB) {
-		  [self setLabelRectOfIcon: icon];		
+  if (gpoints == NULL)
+    {
+      [super resizeWithOldSuperviewSize: oldFrameSize];
+      return;
     }
-	}
+		
+  for (i = 0; i < pcount; i++)
+    {	
+      gpoints[i].used = 0;
+    }
 	
-	[self sortIcons];
-	[self setNeedsDisplay: YES];
+  for (i = 0; i < [icons count]; i++)
+    {	
+      id icon	 = [icons objectAtIndex: i];
+      NSUInteger index = [icon gridindex];		
+      gridpoint gpoint = gpoints[index];
+      NSPoint p = NSMakePoint(gpoint.x, gpoint.y);
+      NSRect r = NSMakeRect(p.x, p.y, 64, 52);
+      
+      [icon setPosition: p];
+      [icon setFrame: NSIntegralRect(r)];
+      gpoints[index].used = 1;
+      
+      if (iconsType == FILES_TAB)
+        {
+          [self setLabelRectOfIcon: icon];		
+        }
+    }
+	
+  [self sortIcons];
+  [self setNeedsDisplay: YES];
 }
 
 - (void)mouseDown:(NSEvent *)theEvent
@@ -1113,17 +1127,17 @@
      
   if (data && [[TShelfPBIcon dataTypes] containsObject: type]) {         
     NSString *dpath = [gw tshelfPBFilePath];
-		int index = -1; 
+    NSUInteger index = NSNotFound; 
     NSUInteger i;
     
-	  for (i = 0; i < pcount; i++) {
-		  if (gpoints[i].used == 0) {
+    for (i = 0; i < pcount; i++) {
+      if (gpoints[i].used == 0) {
         index = i;
-		    break;
+        break;
       }
     }
     
-    if (index == -1) {
+    if (index == NSNotFound) {
       NSRunAlertPanel(NSLocalizedString(@"Error!", @""),
                         NSLocalizedString(@"No space left on this tab", @""),
                         NSLocalizedString(@"Ok", @""),
