@@ -1,6 +1,6 @@
 /* MDIndexing.m
  *  
- * Copyright (C) 2006-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: February 2006
@@ -58,10 +58,10 @@ BOOL isDotFile(NSString *path);
 {
   if (loaded == NO) {
     id cell;
-    float fonth;
+    CGFloat fonth;
     int index;
     NSString *str;
-    int i;
+    NSUInteger i;
     
     fm = [NSFileManager defaultManager];
     nc = [NSNotificationCenter defaultCenter];
@@ -87,21 +87,21 @@ BOOL isDotFile(NSString *path);
     fonth = [[cell font] defaultLineHeightForFont];
 
     indexedMatrix = [[NSMatrix alloc] initWithFrame: NSMakeRect(0, 0, 100, 100)
-				            	              mode: NSRadioModeMatrix 
-                               prototype: cell
-			       							  numberOfRows: 0 
-                         numberOfColumns: 0];
+                                               mode: NSRadioModeMatrix 
+                                          prototype: cell
+                                       numberOfRows: 0 
+                                    numberOfColumns: 0];
     RELEASE (cell);                     
     [indexedMatrix setIntercellSpacing: NSZeroSize];
     [indexedMatrix setCellSize: NSMakeSize([indexedScroll contentSize].width, fonth)];
     [indexedMatrix setAutoscroll: YES];
-	  [indexedMatrix setAllowsEmptySelection: YES];
-	  [indexedScroll setDocumentView: indexedMatrix];	
+    [indexedMatrix setAllowsEmptySelection: YES];
+    [indexedScroll setDocumentView: indexedMatrix];	
     RELEASE (indexedMatrix);
 
     for (i = 0; i < [indexedPaths count]; i++) {
       NSString *name = [indexedPaths objectAtIndex: i];
-      int count = [[indexedMatrix cells] count];
+      NSUInteger count = [[indexedMatrix cells] count];
 
       [indexedMatrix insertRow: count];
       cell = [indexedMatrix cellAtRow: count column: 0];   
@@ -121,10 +121,10 @@ BOOL isDotFile(NSString *path);
     [excludedScroll setHasVerticalScroller: YES]; 
 
     excludedMatrix = [[NSMatrix alloc] initWithFrame: NSMakeRect(0, 0, 100, 100)
-				            	              mode: NSRadioModeMatrix 
-                               prototype: [[NSBrowserCell new] autorelease]
-			       							  numberOfRows: 0 
-                         numberOfColumns: 0];
+                                                mode: NSRadioModeMatrix 
+                                           prototype: [[NSBrowserCell new] autorelease]
+                                        numberOfRows: 0 
+                                     numberOfColumns: 0];
     [excludedMatrix setIntercellSpacing: NSZeroSize];
     [excludedMatrix setCellSize: NSMakeSize([excludedScroll contentSize].width, fonth)];
     [excludedMatrix setAutoscroll: YES];
@@ -134,7 +134,7 @@ BOOL isDotFile(NSString *path);
 
     for (i = 0; i < [excludedPaths count]; i++) {
       NSString *path = [excludedPaths objectAtIndex: i];
-      int count = [[excludedMatrix cells] count];
+      NSUInteger count = [[excludedMatrix cells] count];
 
       [excludedMatrix insertRow: count];
       cell = [excludedMatrix cellAtRow: count column: 0];   
@@ -154,20 +154,20 @@ BOOL isDotFile(NSString *path);
     [suffixScroll setHasVerticalScroller: YES]; 
 
     suffixMatrix = [[NSMatrix alloc] initWithFrame: NSMakeRect(0, 0, 100, 100)
-				            	              mode: NSRadioModeMatrix 
-                               prototype: [[NSBrowserCell new] autorelease]
-			       							  numberOfRows: 0 
-                         numberOfColumns: 0];
+                                              mode: NSRadioModeMatrix 
+                                         prototype: [[NSBrowserCell new] autorelease]
+                                      numberOfRows: 0 
+                                   numberOfColumns: 0];
     [suffixMatrix setIntercellSpacing: NSZeroSize];
     [suffixMatrix setCellSize: NSMakeSize([suffixScroll contentSize].width, fonth)];
     [suffixMatrix setAutoscroll: YES];
-	  [suffixMatrix setAllowsEmptySelection: YES];
-	  [suffixScroll setDocumentView: suffixMatrix];	
+    [suffixMatrix setAllowsEmptySelection: YES];
+    [suffixScroll setDocumentView: suffixMatrix];	
     RELEASE (suffixMatrix);
 
     for (i = 0; i < [excludedSuffixes count]; i++) {
       NSString *path = [excludedSuffixes objectAtIndex: i];
-      int count = [[suffixMatrix cells] count];
+      NSUInteger count = [[suffixMatrix cells] count];
 
       [suffixMatrix insertRow: count];
       cell = [suffixMatrix cellAtRow: count column: 0];   
@@ -599,7 +599,7 @@ return; \
   
   for (i = 0; i < [indexedPaths count]; i++) {
     NSString *name = [indexedPaths objectAtIndex: i];
-    int count = [[indexedMatrix cells] count];
+    NSUInteger count = [[indexedMatrix cells] count];
 
     [indexedMatrix insertRow: count];
     cell = [indexedMatrix cellAtRow: count column: 0];   
@@ -618,7 +618,7 @@ return; \
 
   for (i = 0; i < [excludedPaths count]; i++) {
     NSString *path = [excludedPaths objectAtIndex: i];
-    int count = [[excludedMatrix cells] count];
+    NSUInteger count = [[excludedMatrix cells] count];
 
     [excludedMatrix insertRow: count];
     cell = [excludedMatrix cellAtRow: count column: 0];   
@@ -637,7 +637,7 @@ return; \
 
   for (i = 0; i < [excludedSuffixes count]; i++) {
     NSString *suff = [excludedSuffixes objectAtIndex: i];
-    int count = [[suffixMatrix cells] count];
+    NSUInteger count = [[suffixMatrix cells] count];
 
     [suffixMatrix insertRow: count];
     cell = [suffixMatrix cellAtRow: count column: 0];   
@@ -665,10 +665,10 @@ return; \
 
 - (NSString *)chooseNewPath
 {
-	NSOpenPanel *openPanel = [NSOpenPanel openPanel];
-	int result;
+  NSOpenPanel *openPanel = [NSOpenPanel openPanel];
+  int result;
 
-	[openPanel setTitle: NSLocalizedString(@"Choose directory", @"")];	
+  [openPanel setTitle: NSLocalizedString(@"Choose directory", @"")];	
   [openPanel setAllowsMultipleSelection: NO];
   [openPanel setCanChooseFiles: NO];
   [openPanel setCanChooseDirectories: YES];
@@ -686,27 +686,28 @@ return; \
 {
   NSArray *cells = [matrix cells];
   
-  if (cells && [cells count]) {
-    NSSize cellsize = [matrix cellSize];
-    float margin = 10.0;
-    float maxw = margin;
-    NSDictionary *fontAttr;
-    unsigned i;
+  if (cells && [cells count])
+    {
+      NSSize cellsize = [matrix cellSize];
+      CGFloat margin = 10.0;
+      CGFloat maxw = margin;
+      NSDictionary *fontAttr;
+      NSUInteger i;
 
-    fontAttr = [NSDictionary dictionaryWithObject: [[cells objectAtIndex: 0] font] 
-                                           forKey: NSFontAttributeName];
+      fontAttr = [NSDictionary dictionaryWithObject: [[cells objectAtIndex: 0] font] 
+                                             forKey: NSFontAttributeName];
                                            
-    for (i = 0; i < [cells count]; i++) {
-      NSString *str = [[cells objectAtIndex: i] stringValue];
-      float strw = [str sizeWithAttributes: fontAttr].width + margin;
+      for (i = 0; i < [cells count]; i++) {
+        NSString *str = [[cells objectAtIndex: i] stringValue];
+        CGFloat strw = [str sizeWithAttributes: fontAttr].width + margin;
   
-      maxw = (strw > maxw) ? strw : maxw;
-    }
+        maxw = (strw > maxw) ? strw : maxw;
+      }
     
-    if (maxw > cellsize.width) {
-      [matrix setCellSize: NSMakeSize(maxw, cellsize.height)];
+      if (maxw > cellsize.width) {
+        [matrix setCellSize: NSMakeSize(maxw, cellsize.height)];
+      }
     }
-  }
 }
 
 - (void)setupDbPaths
@@ -915,7 +916,7 @@ return; \
   
     if (status) {
       NSMutableString *str = [NSMutableString string];
-      unsigned i;
+      NSUInteger i;
     
       for (i = 0; i < [status count]; i++) {
         NSDictionary *info = [status objectAtIndex: i];
@@ -1008,7 +1009,7 @@ return; \
     
   } else {
     NSArray *dirs;
-    unsigned i;
+    NSUInteger i;
     
     [indexedPaths addObject: NSHomeDirectory()];
 
@@ -1141,7 +1142,7 @@ BOOL isDotFile(NSString *path)
   int len = ([path length] - 1);
   static unichar sep = 0;  
   unichar c;
-  int i;
+  NSUInteger i;
   
   if (sep == 0) {
     #if defined(__MINGW32__)
