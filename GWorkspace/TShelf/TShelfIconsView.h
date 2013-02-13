@@ -1,6 +1,6 @@
 /* TShelfIconsView.h
  *  
- * Copyright (C) 2003-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -72,7 +72,7 @@ typedef gridpoint *(*GridPointIMP)(id, SEL, NSPoint);
   NSCountedSet *watchedPaths;
   int cellsWidth;
   gridpoint *gpoints;
-  int pcount;
+  NSUInteger pcount;
   
   id focusedIcon;
   NSTextField *focusedIconLabel;

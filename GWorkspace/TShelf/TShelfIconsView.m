@@ -908,15 +908,15 @@
 
 - (void)makePositions
 {
-  float wdt, hgt, x, y;
-	int i;
+  CGFloat wdt, hgt, x, y;
+  NSUInteger i;
   
   wdt = [self bounds].size.width;
   hgt = [self bounds].size.height;
 	
-	pcount = (int)((wdt - 16) / cellsWidth);
+  pcount = (NSUInteger)((wdt - 16) / cellsWidth);
 		
- 	if (gpoints != NULL) {
+  if (gpoints != NULL) {
 		NSZoneFree (NSDefaultMallocZone(), gpoints);
 	} 
 	gpoints = NSZoneMalloc (NSDefaultMallocZone(), sizeof(gridpoint) * pcount);		
@@ -943,14 +943,14 @@
 - (gridpoint *)gridPointNearestToPoint:(NSPoint)p
 {
   NSRect r = [self bounds];
-	float maxx = r.size.width;
-	float maxy = r.size.height;
+	CGFloat maxx = r.size.width;
+	CGFloat maxy = r.size.height;
 	float px = p.x;
 	float py = p.y;	
 	float minx = maxx;
 	float miny = maxy;
 	int pos = -1;
-	int i;
+	NSUInteger i;
 		
 	for (i = 0; i < pcount; i++) {
 		if (gpoints[i].y > 0) {
@@ -970,16 +970,17 @@
 
 - (BOOL)isFreePosition:(NSPoint)pos
 {
-	int i;
-	
-	for (i = 0; i < [icons count]; i++) {
-		NSPoint p = [[icons objectAtIndex: i] position];
-		if (NSEqualPoints(pos, p)) {
-			return NO;
-		}
-  }
-
-	return YES;
+  NSUInteger i;
+  
+  for (i = 0; i < [icons count]; i++)
+    {
+      NSPoint p = [[icons objectAtIndex: i] position];
+      if (NSEqualPoints(pos, p)) {
+        return NO;
+      }
+    }
+  
+  return YES;
 }
 
 - (int)cellsWidth
@@ -1191,12 +1192,13 @@
   
   DESTROY (dragImage);
   
-  if (iconsType == FILES_TAB) {
-	  if ((sourceDragMask == NSDragOperationCopy) 
-												  || (sourceDragMask == NSDragOperationLink)) {
-		  return NSDragOperationNone;
-	  }
-  }
+  if (iconsType == FILES_TAB)
+    {
+      if ((sourceDragMask == NSDragOperationCopy) || (sourceDragMask == NSDragOperationLink))
+        {
+          return NSDragOperationNone;
+        }
+    }
   
   if (iconsType == FILES_TAB) {  
     if ([[pb types] indexOfObject: NSFilenamesPboardType] != NSNotFound) {
@@ -1236,7 +1238,7 @@
 		DESTROY (dragImage);
 		dragPoint = [sender draggedImageLocation];	
 		dragPoint = [self convertPoint: dragPoint 
-													fromView: [[self window] contentView]];													
+                                      fromView: [[self window] contentView]];	
 		gpoint = [self gridPointNearestToPoint: dragPoint];						
 		dragPoint = NSMakePoint(gpoint->x, gpoint->y);
     ASSIGN (dragImage, [sender draggedImage]);
