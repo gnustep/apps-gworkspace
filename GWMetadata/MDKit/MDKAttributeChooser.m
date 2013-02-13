@@ -1,6 +1,6 @@
 /* MDKAttributeChooser.m
  *  
- * Copyright (C) 2006 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@fibernet.ro>
  * Date: December 2006
@@ -22,13 +22,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "MDKAttributeChooser.h"
-#include "MDKWindow.h"
-#include "MDKAttribute.h"
-#include "MDKAttributeView.h"
-#include "MDKQuery.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+
+#import "MDKAttributeChooser.h"
+#import "MDKWindow.h"
+#import "MDKAttribute.h"
+#import "MDKAttributeView.h"
+#import "MDKQuery.h"
 
 static NSString *nibName = @"MDKAttributeChooser";
 
@@ -164,7 +165,7 @@ static NSString *nibName = @"MDKAttributeChooser";
       case NUMBER:
         typestr = @"NSNumber";
         break;
-      case DATE:
+      case DATE_TYPE:
         typestr = @"NSDate";
         break;
       case DATA:

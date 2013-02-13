@@ -1,6 +1,6 @@
 /* gmsd.m
  *  
- * Copyright (C) 2006 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@dtedu.net>
  * Date: February 2006
@@ -51,7 +51,7 @@ enum {
   STRING,
   ARRAY,
   NUMBER,
-  DATE,
+  DATE_TYPE,
   DATA
 };
 

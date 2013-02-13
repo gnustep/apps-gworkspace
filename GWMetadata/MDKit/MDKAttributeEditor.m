@@ -1,6 +1,6 @@
 /* MDKAttributeEditor.m
  *  
- * Copyright (C) 2006 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@fibernet.ro>
  * Date: December 2006
@@ -22,11 +22,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "MDKAttributeEditor.h"
-#include "MDKAttribute.h"
-#include "MDKWindow.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+
+#import "MDKAttributeEditor.h"
+#import "MDKAttribute.h"
+#import "MDKWindow.h"
 
 enum {
   B_YES = 0,
@@ -105,7 +106,7 @@ static NSMutableCharacterSet *skipSet = nil;
       edclass = [MDKNumberEditor class];
       break;
 
-    case DATE:
+    case DATE_TYPE:
       edclass = [MDKDateEditor class];
       break;
 

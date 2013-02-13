@@ -1,6 +1,6 @@
 /* MDKQuery.h
  *  
- * Copyright (C) 2006 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@dtedu.net>
  * Date: August 2006
@@ -30,11 +30,12 @@
 @class FSNode;
 @class MDKQueryManager;
 
+/* we cannot use DATE because it clashes on windows with wtypes.h stuff */
 enum {
   STRING,
   ARRAY,
   NUMBER,
-  DATE,
+  DATE_TYPE,
   DATA
 };
 

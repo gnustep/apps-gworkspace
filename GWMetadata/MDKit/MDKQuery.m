@@ -958,7 +958,7 @@ enum {
           break;
           
         case NUMBER:
-        case DATE:
+        case DATE_TYPE:
           [self setOperatorFromType];
           break;
 
@@ -1007,7 +1007,7 @@ enum {
       }
     }
 
-  } else if (attrtype == DATE) {
+  } else if (attrtype == DATE_TYPE) {
     if ([searchValue floatValue] == 0.0) {
       return NO;
     }
@@ -1178,7 +1178,7 @@ enum {
       [sqlstr appendString: @"INTEGER)) "];
     }
   
-  } else if (attributeType == DATE) {
+  } else if (attributeType == DATE_TYPE) {
     [sqlstr appendFormat: @"(cast (%@ as REAL)) ", searchValue];
   
   } else {
