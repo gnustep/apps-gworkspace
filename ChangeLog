@@ -1,3 +1,11 @@
+2013-02-13 Riccardo Mottola <rm@gnu.org>
+
+	* GWMetadata/MDKit/MDKQuery.[h,m]
+	* GWMetadata/MDKit/MDKAttributeEditor.m
+	* GWMetadata/MDKit/MKDAttributeChooser.m
+	* GWMetadata/gmds/gmds/gmds.m
+	Rename DATE to DATE_TYPE to avoid conflict on windows with wtypes.h
+	
 2013-02-12 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/TShelf/TShelfPBIcon.[h,m]:
