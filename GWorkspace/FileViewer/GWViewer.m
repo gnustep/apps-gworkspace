@@ -1,6 +1,6 @@
 /* GWViewer.m
  *  
- * Copyright (C) 2004-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola
@@ -307,13 +307,13 @@
 - (void)createSubviews
 {
   NSRect r = [[vwrwin contentView] bounds];
-  float w = r.size.width;
+  CGFloat w = r.size.width;
 	float h = r.size.height;   
-  float d = 0.0;
+  CGFloat d = 0.0;
   int xmargin = 8;
   int ymargin = 6;
   int pathscrh = 98;
-  unsigned int resizeMask;
+  NSUInteger resizeMask;
   BOOL hasScroller;
   
   split = [[GWViewerSplit alloc] initWithFrame: r];
@@ -474,9 +474,9 @@
 - (void)tileViews
 {
   NSRect r = [split bounds];
-  float w = r.size.width;
-	float h = r.size.height;   
-  float d = [split dividerThickness];
+  CGFloat w = r.size.width;
+  CGFloat h = r.size.height;   
+  CGFloat d = [split dividerThickness];
     
   [shelf setFrame: NSMakeRect(0, 0, w, shelfHeight)];
   [lowBox setFrame: NSMakeRect(0, shelfHeight + d, w, h - shelfHeight - d)];
@@ -564,9 +564,9 @@
   }
 
   if ([components isEqual: watchedNodes] == NO) {
-    unsigned count = [components count];
+    NSUInteger count = [components count];
     unsigned pos = 0;
-    unsigned i;
+    NSUInteger i;
   
     for (i = 0; i < [watchedNodes count]; i++) { 
       FSNode *nd = [watchedNodes objectAtIndex: i];
@@ -908,7 +908,7 @@
 	[self tileViews];
 }
 
-- (float)splitView:(NSSplitView *)sender
+- (CGFloat)splitView:(NSSplitView *)sender
           constrainSplitPosition:(float)proposedPosition 
                                         	ofSubviewAt:(int)offset
 {
@@ -924,8 +924,8 @@
 }
 
 - (float)splitView:(NSSplitView *)sender 
-                  constrainMaxCoordinate:(float)proposedMax 
-                                        ofSubviewAt:(int)offset
+constrainMaxCoordinate:(CGFloat)proposedMax 
+       ofSubviewAt:(NSInteger)offset
 {
   if (proposedMax >= MAX_SHELF_HEIGHT) {
     return MAX_SHELF_HEIGHT;
@@ -934,9 +934,9 @@
   return proposedMax;
 }
 
-- (float)splitView:(NSSplitView *)sender 
-                  constrainMinCoordinate:(float)proposedMin 
-                                          ofSubviewAt:(int)offset
+- (CGFloat)splitView:(NSSplitView *)sender 
+constrainMinCoordinate:(CGFloat)proposedMin 
+       ofSubviewAt:(NSInteger)offset
 {
   if (proposedMin <= MIN_SHELF_HEIGHT) {
     return MIN_SHELF_HEIGHT;
@@ -1018,7 +1018,7 @@
 {
   if ([[baseNode path] isEqual: [gworkspace trashPath]] == NO) {
     NSArray *selection = [nodeView selectedNodes]; 
-    int count = (selection ? [selection count] : 0);
+    NSUInteger count = (selection ? [selection count] : 0);
     
     if (count) {
       NSMutableArray *dirs = [NSMutableArray array];
@@ -1219,9 +1219,9 @@
 {
   NSString *title = [sender title];
   
-	if ([title isEqual: NSLocalizedString(viewType, @"")] == NO) {
+  if ([title isEqual: NSLocalizedString(viewType, @"")] == NO) {
     NSArray *selection = [nodeView selectedNodes];
-    int i;
+    NSUInteger i;
     
     [nodeView updateNodeInfo: YES];
     if ([nodeView isSingleNode] && ([selection count] == 0)) {
@@ -1481,7 +1481,7 @@
     } else if (sel_isEqual(action, @selector(openSelection:))) {
       if ([[baseNode path] isEqual: [gworkspace trashPath]] == NO) {
         BOOL canopen = YES;
-        int i;
+        NSUInteger i;
 
         if (lastSelection && [lastSelection count] 
                 && ([lastSelection isEqual: baseNodeArray] == NO)) {

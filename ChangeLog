@@ -1,3 +1,8 @@
+2013-02-14 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/FileViewer/GWViewer.m
+	CGFloat and NSUInteger transition.
+
 2013-02-13 Riccardo Mottola <rm@gnu.org>
 
 	* GWMetadata/Preferences/MDIndexing.m (isDotFile)
