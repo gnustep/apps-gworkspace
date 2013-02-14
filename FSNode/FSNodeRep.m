@@ -97,6 +97,7 @@ static FSNodeRep *shared = nil;
     NSBundle *bundle = [NSBundle bundleForClass: [FSNodeRep class]];
     NSString *imagepath;
     BOOL isdir;
+    NSString *libraryDir;
     
     fm = [NSFileManager defaultManager];
     ws = [NSWorkspace sharedWorkspace];
@@ -125,13 +126,21 @@ static FSNodeRep *shared = nil;
     rootPath = path_separator();
     RETAIN (rootPath);
     
-    thumbnailDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
-    thumbnailDir = [thumbnailDir stringByAppendingPathComponent: @"Thumbnails"];
+    libraryDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
+    if (([fm fileExistsAtPath: libraryDir isDirectory: &isdir] && isdir) == NO)
+      {
+        if ([fm createDirectoryAtPath: libraryDir attributes: nil] == NO)
+          {
+            NSLog(@"Unable to create the Library directory. Quitting now");
+            [NSApp terminate: self];
+          }
+      }
+    thumbnailDir = [libraryDir stringByAppendingPathComponent: @"Thumbnails"];
     RETAIN (thumbnailDir);
     
     if (([fm fileExistsAtPath: thumbnailDir isDirectory: &isdir] && isdir) == NO) {
       if ([fm createDirectoryAtPath: thumbnailDir attributes: nil] == NO) {
-        NSLog(@"unable to create the thumbnails directory. Quiting now");
+        NSLog(@"Unable to create the thumbnails directory. Quitting now");
         [NSApp terminate: self];
       }
     }

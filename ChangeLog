@@ -1,5 +1,10 @@
 2013-02-14 Riccardo Mottola <rm@gnu.org>
 
+	* FSNode/FSNodeRep.m
+	Make sure the user Library dir exists
+
+2013-02-14 Riccardo Mottola <rm@gnu.org>
+
 	* GWorkspace/TShelf/TShelfIcon.m
 	* GWorkspace/TShelf/TShelfIconsView.m
 	* GWorkspace/TShelf/TShelfPBIcon.m
