@@ -263,15 +263,15 @@
 }
 
 - (void)draggedImage:(NSImage *)anImage 
-						 endedAt:(NSPoint)aPoint 
-					 deposited:(BOOL)flag
+             endedAt:(NSPoint)aPoint 
+           deposited:(BOOL)flag
 {
   dragdelay = 0;
 }
 
-- (unsigned int)draggingSourceOperationMaskForLocal:(BOOL)flag
+- (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)flag
 {
-  return NSDragOperationAll;
+  return NSDragOperationEvery;
 }
 
 @end

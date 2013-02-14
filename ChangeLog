@@ -1,8 +1,15 @@
 2013-02-14 Riccardo Mottola <rm@gnu.org>
 
+	* GWorkspace/TShelf/TShelfIcon.m
+	* GWorkspace/TShelf/TShelfIconsView.m
+	* GWorkspace/TShelf/TShelfPBIcon.m
+	Change NSDragOperationAll to NSDragOperationEvery
+
+2013-02-14 Riccardo Mottola <rm@gnu.org>
+
 	* GWorkspace/FileViewer/GWViewer.m
 	CGFloat and NSUInteger transition.
-	
+
 2013-02-14 Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNBrowserCell.h

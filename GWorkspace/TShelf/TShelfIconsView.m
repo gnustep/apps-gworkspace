@@ -1246,7 +1246,7 @@
 		[self setNeedsDisplay: YES];
     
     if (iconsType == FILES_TAB) { 
-      return NSDragOperationAll;
+      return NSDragOperationEvery;
     } else {
       return NSDragOperationCopy;
     }
@@ -1301,7 +1301,7 @@
 	}
   
   if (iconsType == FILES_TAB) { 
-    return NSDragOperationAll;
+    return NSDragOperationEvery;
   } else {
     return NSDragOperationCopy;
   }

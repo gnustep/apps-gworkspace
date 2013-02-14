@@ -537,9 +537,9 @@
 	}
 }
 
-- (unsigned int)draggingSourceOperationMaskForLocal:(BOOL)flag
+- (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)flag
 {
-  return NSDragOperationAll;
+  return NSDragOperationEvery;
 }
 
 @end
@@ -588,7 +588,7 @@
   if ([paths isEqualToArray: sourcePaths]) {
     onSelf = YES;
     isDragTarget = YES;
-    return NSDragOperationAll;
+    return NSDragOperationEvery;
   }
   
   if (node == nil)
@@ -675,7 +675,7 @@
 	} else {
     if ([[NSFileManager defaultManager] isWritableFileAtPath: fromPath]
                                                   || [node isApplication]) {
-      return NSDragOperationAll;			
+      return NSDragOperationEvery;			
     } else if ([node isApplication] == NO) {
       forceCopy = YES;
       return NSDragOperationCopy;			
@@ -705,7 +705,7 @@
 	} else if (sourceDragMask == NSDragOperationLink) {
 		return ([node isApplication] ? NSDragOperationMove : NSDragOperationLink);
 	} else {
-		return forceCopy ? NSDragOperationCopy : NSDragOperationAll;
+		return forceCopy ? NSDragOperationCopy : NSDragOperationEvery;
 	}
 
 	return NSDragOperationNone;
