@@ -1,6 +1,6 @@
 /* FSNListView.m
  *  
- * Copyright (C) 2004-2011 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: December 2004
@@ -2137,11 +2137,11 @@ static NSString *defaultColumns = @"{ \
   [self setLocked: [node isLocked]];
 }
 
-- (void)setGridIndex:(int)index
+- (void)setGridIndex:(NSUInteger)index
 {
 }
 
-- (int)gridIndex
+- (NSUInteger)gridIndex
 {
   return 0;
 }

@@ -1,6 +1,6 @@
 /* FSNBrowserCell.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -25,9 +25,9 @@
 #ifndef FSN_BROWSER_CELL_H
 #define FSN_BROWSER_CELL_H
 
-#include <Foundation/Foundation.h>
-#include <AppKit/NSBrowserCell.h>
-#include "FSNodeRep.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/NSBrowserCell.h>
+#import "FSNodeRep.h"
 
 typedef NSString *(*cutIMP)(id, SEL, id, float);
 

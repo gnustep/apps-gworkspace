@@ -1,6 +1,6 @@
 /* FSNBrowserCell.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -635,11 +635,11 @@ static cutIMP cutTitle = NULL;
 	return isLocked;
 }
 
-- (void)setGridIndex:(int)index
+- (void)setGridIndex:(NSUInteger)index
 {
 }
 
-- (int)gridIndex
+- (NSUInteger)gridIndex
 {
   return 0;
 }

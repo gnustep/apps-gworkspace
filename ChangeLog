@@ -1,5 +1,15 @@
 2013-02-14 Riccardo Mottola <rm@gnu.org>
 
+	* FSNode/FSNBrowserCell.h
+	* FSNode/FSNBrowserCell.m
+	* FSNode/FSNIcon.h
+	* FSNode/FSNIcon.m
+	* FSNode/FSNListView.m
+	* FSNode/FSNodeRep.h
+	NSUInteger transition.
+
+2013-02-14 Riccardo Mottola <rm@gnu.org>
+
 	* GWorkspace/TShelf/TShelfIconsView.m
 	CGFloat and NSUInteger transition.
 

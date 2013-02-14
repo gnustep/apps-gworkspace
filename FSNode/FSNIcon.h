@@ -1,6 +1,6 @@
 /* FSNIcon.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -25,9 +25,9 @@
 #ifndef FSN_ICON_H
 #define FSN_ICON_H
 
-#include <Foundation/Foundation.h>
-#include <AppKit/NSView.h>
-#include "FSNodeRep.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/NSView.h>
+#import "FSNodeRep.h"
 
 @class NSImage;
 @class NSFont;
@@ -50,7 +50,7 @@
   int iconSize;
   NSRect icnBounds;
   NSPoint icnPoint;
-  unsigned int icnPosition;
+  NSUInteger icnPosition;
 
   NSRect brImgBounds;
     
@@ -65,7 +65,7 @@
   NSRect infoRect;
   FSNInfoType showType;
 
-  unsigned int gridIndex;
+  NSUInteger gridIndex;
   
   BOOL isSelected;
   BOOL selectable;
@@ -98,10 +98,10 @@
      nodeInfoType:(FSNInfoType)type
      extendedType:(NSString *)exttype
          iconSize:(int)isize
-     iconPosition:(unsigned int)ipos
+     iconPosition:(NSUInteger)ipos
         labelFont:(NSFont *)lfont
         textColor:(NSColor *)tcolor
-        gridIndex:(int)gindex
+        gridIndex:(NSUInteger)gindex
         dndSource:(BOOL)dndsrc
         acceptDnd:(BOOL)dndaccept
         slideBack:(BOOL)slback;
@@ -120,11 +120,11 @@
 - (void)startExternalDragOnEvent:(NSEvent *)event
                  withMouseOffset:(NSSize)offset;
 
-- (unsigned int)draggingSourceOperationMaskForLocal:(BOOL)flag;
+- (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)flag;
 
 - (void)draggedImage:(NSImage *)anImage 
-						 endedAt:(NSPoint)aPoint 
-					 deposited:(BOOL)flag;
+	     endedAt:(NSPoint)aPoint 
+	   deposited:(BOOL)flag;
 
 @end
 

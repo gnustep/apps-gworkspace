@@ -98,10 +98,10 @@ static NSImage *branchImage;
      nodeInfoType:(FSNInfoType)type
      extendedType:(NSString *)exttype
          iconSize:(int)isize
-     iconPosition:(unsigned int)ipos
+     iconPosition:(NSUInteger)ipos
         labelFont:(NSFont *)lfont
         textColor:(NSColor *)tcolor
-        gridIndex:(int)gindex
+        gridIndex:(NSUInteger)gindex
         dndSource:(BOOL)dndsrc
         acceptDnd:(BOOL)dndaccept
         slideBack:(BOOL)slback
@@ -1087,12 +1087,12 @@ static NSImage *branchImage;
 	return isLocked;
 }
 
-- (void)setGridIndex:(int)index
+- (void)setGridIndex:(NSUInteger)index
 {
   gridIndex = index;
 }
 
-- (int)gridIndex
+- (NSUInteger)gridIndex
 {
   return gridIndex;
 }
@@ -1167,16 +1167,16 @@ static NSImage *branchImage;
   }
 }
 
-- (unsigned int)draggingSourceOperationMaskForLocal:(BOOL)flag
+- (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)flag
 {
   return NSDragOperationEvery;
 }
 
 - (void)draggedImage:(NSImage *)anImage 
-						 endedAt:(NSPoint)aPoint 
-					 deposited:(BOOL)flag
+             endedAt:(NSPoint)aPoint 
+           deposited:(BOOL)flag
 {
-	dragdelay = 0;
+  dragdelay = 0;
   onSelf = NO;
   
   if ([container respondsToSelector: @selector(restoreLastSelection)]) {
@@ -1203,7 +1203,7 @@ static NSImage *branchImage;
   NSString *fromPath;
   NSString *nodePath;
   NSString *prePath;
-	unsigned i, count;
+  NSUInteger i, count;
   
   isDragTarget = NO;
   onSelf = NO;
@@ -1445,16 +1445,16 @@ static NSImage *branchImage;
 
 - (void)concludeDragOperation:(id <NSDraggingInfo>)sender
 {
-	NSPasteboard *pb;
+  NSPasteboard *pb;
   NSDragOperation sourceDragMask;
-	NSArray *sourcePaths;
+  NSArray *sourcePaths;
   NSString *operation, *source;
   NSMutableArray *files;
-	NSMutableDictionary *opDict;
-	NSString *trashPath;
-  unsigned i;
+  NSMutableDictionary *opDict;
+  NSString *trashPath;
+  NSUInteger i;
 
-	isDragTarget = NO;  
+  isDragTarget = NO;  
 
   if (isLocked) {
     return;
