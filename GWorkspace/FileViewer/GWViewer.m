@@ -909,8 +909,8 @@
 }
 
 - (CGFloat)splitView:(NSSplitView *)sender
-          constrainSplitPosition:(float)proposedPosition 
-                                        	ofSubviewAt:(int)offset
+constrainSplitPosition:(CGFloat)proposedPosition 
+         ofSubviewAt:(NSInteger)offset
 {
   if (proposedPosition < COLLAPSE_LIMIT) {
     shelfHeight = MIN_SHELF_HEIGHT;
@@ -923,9 +923,9 @@
   return shelfHeight;
 }
 
-- (float)splitView:(NSSplitView *)sender 
+- (CGFloat)splitView:(NSSplitView *)sender 
 constrainMaxCoordinate:(CGFloat)proposedMax 
-       ofSubviewAt:(NSInteger)offset
+         ofSubviewAt:(NSInteger)offset
 {
   if (proposedMax >= MAX_SHELF_HEIGHT) {
     return MAX_SHELF_HEIGHT;
@@ -936,7 +936,7 @@ constrainMaxCoordinate:(CGFloat)proposedMax
 
 - (CGFloat)splitView:(NSSplitView *)sender 
 constrainMinCoordinate:(CGFloat)proposedMin 
-       ofSubviewAt:(NSInteger)offset
+         ofSubviewAt:(NSInteger)offset
 {
   if (proposedMin <= MIN_SHELF_HEIGHT) {
     return MIN_SHELF_HEIGHT;
@@ -1022,7 +1022,7 @@ constrainMinCoordinate:(CGFloat)proposedMin
     
     if (count) {
       NSMutableArray *dirs = [NSMutableArray array];
-      int i;
+      NSUInteger i;
 
       if (count > OPEN_MAX) {
         NSString *msg1 = NSLocalizedString(@"Are you sure you want to open", @"");
