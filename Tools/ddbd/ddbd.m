@@ -54,12 +54,12 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 
 - (void)dealloc
 {
-  if (conn) {
-    [nc removeObserver: self
-		              name: NSConnectionDidDieNotification
-		            object: conn];
-    DESTROY (conn);
-  }
+  if (conn)
+    {
+      [nc removeObserver: self
+                    name: NSConnectionDidDieNotification
+                  object: conn];
+    }
 
   RELEASE (dbdir);
             

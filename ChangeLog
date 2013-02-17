@@ -1,3 +1,8 @@
+2013-02-17 Riccardo Mottola <rm@gnu.org>
+
+	* Tools/ddbd/ddbd.m
+	Do not release the connection obtained with defaultConnection
+
 2013-02-14 Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNodeRep.m
