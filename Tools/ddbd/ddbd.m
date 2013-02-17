@@ -505,18 +505,17 @@ int main(int argc, char** argv)
   CREATE_AUTORELEASE_POOL(pool);
   NSProcessInfo *info = [NSProcessInfo processInfo];
   NSMutableArray *args = AUTORELEASE ([[info arguments] mutableCopy]);
-  static BOOL	is_daemon = NO;
   BOOL subtask = YES;
 
   if ([[info arguments] containsObject: @"--auto"] == YES)
-  {
-    auto_stop = YES;
-  }
+    {
+      auto_stop = YES;
+    }
 
-  if ([[info arguments] containsObject: @"--daemon"]) {
-    subtask = NO;
-    is_daemon = YES;
-  }
+  if ([[info arguments] containsObject: @"--daemon"])
+    {
+      subtask = NO;
+    }
 
   if (subtask) {
     NSTask *task = [NSTask new];
