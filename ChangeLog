@@ -1,5 +1,16 @@
 2013-02-20 Riccardo Mottola <rm@gnu.org>
 
+	* GWMetadata/MDKit/MDKWindow.m (isDotFile)
+	* GWMetadata/gmds/mdextractor/mdextractor.m (isDotFile)
+	Total rewrite taken from MDIndexing
+
+2013-02-20 Riccardo Mottola <rm@gnu.org>
+
+	* GWMetadata/Preferences/MDIndexing.m (isDotFile)
+	Fix exit condition.
+
+2013-02-20 Riccardo Mottola <rm@gnu.org>
+
 	* GWMetadata/MDKit/MDKWindow.h
 	* GWMetadata/MDKit/MDKWindow.m
 	NSInteger, NSUInteger and CGFloat transition
@@ -13,10 +24,6 @@
 
 	* FSNode/FSNodeRep.m
 	Make sure the user Library dir exists
-2013-02-20 Riccardo Mottola <rm@gnu.org>
-
-	* GWMetadata/Preferences/MDIndexing.m (isDotFile)
-	Fix exit condition.
 
 2013-02-14 Riccardo Mottola <rm@gnu.org>
 

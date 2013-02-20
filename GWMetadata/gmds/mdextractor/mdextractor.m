@@ -1,6 +1,6 @@
 /* mdextractor.m
  *  
- * Copyright (C) 2006-2011 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@dtedu.net>
  * Date: February 2006
@@ -1653,22 +1653,26 @@ void setUpdating(BOOL value)
 
 BOOL isDotFile(NSString *path)
 {
-  int len = ([path length] - 1);
-  unichar c;
-  int i;
-  
-  for (i = len; i >= 0; i--) {
-    c = [path characterAtIndex: i];
-    
-    if (c == '.') {
-      if ((i > 0) && ([path characterAtIndex: (i - 1)] == '/')) {
-        return YES;
-      }
+  NSArray *components;
+  NSEnumerator *e;
+  NSString *c;
+  BOOL found;
+
+  if (path == nil)
+    return NO;
+
+  found = NO;
+  components = [path pathComponents];
+  e = [components objectEnumerator];
+  while ((c = [e nextObject]) && !found)
+    {
+      if (([c length] > 0) && ([c characterAtIndex:0] == '.'))
+	found = YES;
     }
-  }
-  
-  return NO;  
+
+  return found;  
 }
+
 
 BOOL subPathOfPath(NSString *p1, NSString *p2)
 {

@@ -1725,31 +1725,26 @@ static NSString *nibName = @"MDKWindow";
 
 BOOL isDotFile(NSString *path)
 {
-  int len = ([path length] - 1);
-  static unichar sep = 0;  
-  unichar c;
-  int i;
-  
-  if (sep == 0) {
-    #if defined(__MINGW32__)
-      sep = '\\';	
-    #else
-      sep = '/';	
-    #endif
-  }
-  
-  for (i = len; i >= 0; i--) {
-    c = [path characterAtIndex: i];
-    
-    if (c == '.') {
-      if ((i > 0) && ([path characterAtIndex: (i - 1)] == sep)) {
-        return YES;
-      }
+  NSArray *components;
+  NSEnumerator *e;
+  NSString *c;
+  BOOL found;
+
+  if (path == nil)
+    return NO;
+
+  found = NO;
+  components = [path pathComponents];
+  e = [components objectEnumerator];
+  while ((c = [e nextObject]) && !found)
+    {
+      if (([c length] > 0) && ([c characterAtIndex:0] == '.'))
+	found = YES;
     }
-  }
-  
-  return NO;  
+
+  return found;  
 }
+
 
 NSString *pathSeparator(void)
 {
