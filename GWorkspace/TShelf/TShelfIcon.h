@@ -1,6 +1,6 @@
 /* TShelfIcon.h
  *  
- * Copyright (C) 2003-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -129,7 +129,7 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 
 - (void)declareAndSetShapeOnPasteboard:(NSPasteboard *)pb;
 
-- (unsigned int)draggingSourceOperationMaskForLocal:(BOOL)flag;
+- (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)flag;
 
 - (void)draggedImage:(NSImage *)anImage 
              endedAt:(NSPoint)aPoint 

@@ -88,7 +88,7 @@
 
 - (void)declareAndSetShapeOnPasteboard:(NSPasteboard *)pb;
 
-- (unsigned int)draggingSourceOperationMaskForLocal:(BOOL)flag;
+- (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)flag;
 
 - (void)draggedImage:(NSImage *)anImage 
 						 endedAt:(NSPoint)aPoint 
