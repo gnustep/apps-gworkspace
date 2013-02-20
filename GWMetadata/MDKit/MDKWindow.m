@@ -1,6 +1,6 @@
 /* MDKWindow.m
  *  
- * Copyright (C) 2006-2011 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@fibernet.ro>
  * Date: December 2006
@@ -22,20 +22,20 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
  
-#include <AppKit/AppKit.h>
-#include "MDKWindow.h"
-#include "MDKTableView.h"
-#include "MDKAttribute.h"
-#include "MDKAttributeView.h"
-#include "MDKAttributeEditor.h"
-#include "MDKFSFilter.h"
-#include "MDKAttributeChooser.h"
-#include "MDKQuery.h"
-#include "MDKResultsCategory.h"
-#include "DBKPathsTree.h"
-#include "FSNodeRep.h"
-#include "FSNPathComponentsViewer.h"
-#include "MDKResultCell.h"
+#import <AppKit/AppKit.h>
+#import "MDKWindow.h"
+#import "MDKTableView.h"
+#import "MDKAttribute.h"
+#import "MDKAttributeView.h"
+#import "MDKAttributeEditor.h"
+#import "MDKFSFilter.h"
+#import "MDKAttributeChooser.h"
+#import "MDKQuery.h"
+#import "MDKResultsCategory.h"
+#import "DBKPathsTree.h"
+#import "FSNodeRep.h"
+#import "FSNPathComponentsViewer.h"
+#import "MDKResultCell.h"
 
 #define CHECKDELEGATE(s) \
   (delegate && [delegate respondsToSelector: @selector(s)])
@@ -399,7 +399,7 @@ static NSString *nibName = @"MDKWindow";
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   id entry;
-  unsigned i;
+  NSUInteger i;
   
   [defaults synchronize];
   
@@ -437,8 +437,8 @@ static NSString *nibName = @"MDKWindow";
   NSArray *excluded = [info objectForKey: @"GSMetadataExcludedPaths"];
   NSArray *suffixes = [info objectForKey: @"GSMetadataExcludedSuffixes"];
   NSArray *items = [placesPopUp itemArray];
-  int count = [items count];
-  unsigned i;
+  NSUInteger count = [items count];
+  NSUInteger i;
 
   emptyTreeWithBase(includePathsTree);
 
@@ -481,7 +481,7 @@ static NSString *nibName = @"MDKWindow";
 - (NSArray *)usedAttributes
 {
   NSMutableArray *used = [NSMutableArray array];
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [attributes count]; i++) {
     MDKAttribute *attribute = [attributes objectAtIndex: i];
@@ -496,7 +496,7 @@ static NSString *nibName = @"MDKWindow";
 
 - (MDKAttribute *)firstUnusedAttribute
 {
-  int i;
+  NSUInteger i;
   
   for (i = 0; i < [attributes count]; i++) {
     MDKAttribute *attribute = [attributes objectAtIndex: i];
@@ -642,8 +642,8 @@ static NSString *nibName = @"MDKWindow";
   NSMutableArray *editorsInfo = [NSMutableArray array];
   NSArray *items = [placesPopUp itemArray];
   NSMutableArray *paths = [NSMutableArray array];
-  int index;
-  int i;
+  NSInteger index;
+  NSUInteger i;
   
   for (i = 0; i < [attrViews count]; i++) {
     MDKAttributeView *attrview = [attrViews objectAtIndex: i];
@@ -717,7 +717,7 @@ static NSString *nibName = @"MDKWindow";
 {
   NSView *view = [win contentView];
   NSRect abr = [attributesButt frame];
-  float ylim = abr.origin.y + abr.size.height;
+  CGFloat ylim = abr.origin.y + abr.size.height;
   NSRect atr = [attrBox frame];
   NSRect elr = [elementsLabel frame];
   NSRect rsr = [resultsScroll frame];
@@ -728,10 +728,10 @@ static NSString *nibName = @"MDKWindow";
     [attrBox setFrame: atr];
     
   } else {
-    unsigned count = [attrViews count];
-    float hspace = ATBOXH + ((count - 1) * ATVIEWH);
-    float posy;
-    unsigned i;
+    NSUInteger count = [attrViews count];
+    CGFloat hspace = ATBOXH + ((count - 1) * ATVIEWH);
+    CGFloat posy;
+    NSUInteger i;
   
     atr.origin.y = ylim - hspace;
     atr.size.height = hspace;
@@ -760,7 +760,7 @@ static NSString *nibName = @"MDKWindow";
   
   if (rsr.size.height <= RESLIMH) {
     NSRect wrect = [win frame];
-    float inc = RESLIMH - rsr.size.height + ATVIEWH;
+    CGFloat inc = RESLIMH - rsr.size.height + ATVIEWH;
     
     wrect.size.height += inc;
     wrect.origin.y -= inc;   
@@ -786,9 +786,9 @@ static NSString *nibName = @"MDKWindow";
 - (IBAction)placesPopUpdAction:(id)sender
 {
   NSArray *items = [sender itemArray];
-  int count = [items count];    
-  int index = [sender indexOfSelectedItem];
-  int i;
+  NSUInteger count = [items count];    
+  NSInteger index = [sender indexOfSelectedItem];
+  NSUInteger i;
   
   [searchPaths removeAllObjects];
   
@@ -942,7 +942,7 @@ static NSString *nibName = @"MDKWindow";
   NSString *bpath = [[NSBundle bundleForClass: [self class]] bundlePath];
   NSString *resPath = [bpath stringByAppendingPathComponent: @"Resources"];
   NSArray *languages = [NSUserDefaults userLanguages];
-  unsigned i;
+  NSUInteger i;
      
   for (i = 0; i < [languages count]; i++) {
     NSString *language = [languages objectAtIndex: i];
@@ -1049,7 +1049,7 @@ static NSString *nibName = @"MDKWindow";
     NSArray *places = [info objectForKey: @"search_places"];
     int index = [[info objectForKey: @"selected_search_place"] intValue];
     BOOL canselect = YES;
-    int i;
+    NSUInteger i;
     
     for (i = 0; i < [places count]; i++) {
       NSString *place = [places objectAtIndex: i];
@@ -1083,7 +1083,7 @@ static NSString *nibName = @"MDKWindow";
 - (void)prepareResults
 {
   NSDictionary *categoryInfo = [MDKQuery categoryInfo];
-  int i;
+  NSUInteger i;
  
   ASSIGN (categoryNames, [MDKQuery categoryNames]);
   DESTROY (resultCategories);
@@ -1166,7 +1166,7 @@ static NSString *nibName = @"MDKWindow";
   BOOL casesens;
   NSMutableArray *fsfilters;
   BOOL onlyfilters;
-  int i, j;
+  NSUInteger i, j;
 
   [currentQuery setUpdatesEnabled: NO];
   [currentQuery stopQuery];
@@ -1271,7 +1271,7 @@ static NSString *nibName = @"MDKWindow";
 
 - (void)prepareResultCategories
 {
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [categoryNames count]; i++) {
     NSString *catname = [categoryNames objectAtIndex: i];
@@ -1373,14 +1373,14 @@ static NSString *nibName = @"MDKWindow";
 //
 // NSTableDataSource protocol
 //
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
   return rowsCount;
 }
 
 - (id)tableView:(NSTableView *)aTableView
           objectValueForTableColumn:(NSTableColumn *)aTableColumn
-                                row:(int)rowIndex
+                                row:(NSInteger)rowIndex
 {
   id nd = [catlist resultAtIndex: rowIndex];
     
@@ -1404,7 +1404,7 @@ static NSString *nibName = @"MDKWindow";
   int i;
 
   for (i = 0; i < [rows count]; i++) {
-    int index = [[rows objectAtIndex: i] intValue];
+    NSInteger index = [[rows objectAtIndex: i] intValue];
     id nd = [catlist resultAtIndex: index];
     
     if ((*isMember)(nd, memberSel, FSNodeClass) && [nd isValid]) {
@@ -1449,7 +1449,7 @@ static NSString *nibName = @"MDKWindow";
 - (void)tableView:(NSTableView *)aTableView 
   willDisplayCell:(id)aCell 
    forTableColumn:(NSTableColumn *)aTableColumn 
-              row:(int)rowIndex
+              row:(NSInteger)rowIndex
 {
   id nd = [catlist resultAtIndex: rowIndex];
   
@@ -1478,7 +1478,7 @@ static NSString *nibName = @"MDKWindow";
                 removeSubviews:(BOOL)remove
 {
   NSArray *rviews = [resultsView subviews];
-  int i;
+  NSUInteger i;
   
   if (newranges) {
     [catlist calculateRanges];
@@ -1540,8 +1540,8 @@ static NSString *nibName = @"MDKWindow";
 {
   NSWorkspace *ws = [NSWorkspace sharedWorkspace];
   NSArray *selected = [self selectedObjects];
-  int count = [selected count];
-  int i;
+  NSUInteger count = [selected count];
+  NSUInteger i;
 
   if (count > OPEN_MAX) {
     NSString *msg1 = NSLocalizedString(@"Are you sure you want to open", @"");
@@ -1613,7 +1613,7 @@ static NSString *nibName = @"MDKWindow";
 {
   NSArray *selnodes = [self selectedObjects];
   NSMutableArray *selpaths = [NSMutableArray array];
-  int i;
+  NSUInteger i;
   
   for (i = 0; i < [selnodes count]; i++) {
     [selpaths addObject: [[selnodes objectAtIndex: i] path]];
@@ -1658,7 +1658,7 @@ static NSString *nibName = @"MDKWindow";
 
   if (self) {
     NSBundle *bundle = [NSBundle bundleForClass: [self class]];
-    int i;
+    NSUInteger i;
 
     images = [NSMutableArray new];
     

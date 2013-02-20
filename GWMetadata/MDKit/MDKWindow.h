@@ -1,6 +1,6 @@
 /* MDKWindow.h
  *  
- * Copyright (C) 2006 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@fibernet.ro>
  * Date: December 2006
@@ -25,8 +25,8 @@
 #ifndef MDK_WINDOW_H
 #define MDK_WINDOW_H
 
-#include <Foundation/Foundation.h>
-#include <AppKit/NSView.h>
+#import <Foundation/Foundation.h>
+#import <AppKit/NSView.h>
 
 @class MDKQuery;
 @class MDKTextContentEditor;
@@ -99,8 +99,8 @@
   NSArray *categoryNames;
   NSMutableDictionary *resultCategories;
   MDKResultsCategory *catlist;
-  int rowsCount;
-  int globalCount;
+  NSInteger rowsCount;
+  NSInteger globalCount;
 }
 
 - (id)initWithContentsOfFile:(NSString *)path
