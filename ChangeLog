@@ -13,6 +13,10 @@
 
 	* FSNode/FSNodeRep.m
 	Make sure the user Library dir exists
+2013-02-20 Riccardo Mottola <rm@gnu.org>
+
+	* GWMetadata/Preferences/MDIndexing.m (isDotFile)
+	Fix exit condition.
 
 2013-02-14 Riccardo Mottola <rm@gnu.org>
 

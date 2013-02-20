@@ -1150,7 +1150,7 @@ BOOL isDotFile(NSString *path)
   found = NO;
   components = [path pathComponents];
   e = [components objectEnumerator];
-  while ((c = [e nextObject]) || !found)
+  while ((c = [e nextObject]) && !found)
     {
       if (([c length] > 0) && ([c characterAtIndex:0] == '.'))
 	found = YES;
