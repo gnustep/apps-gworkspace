@@ -25,7 +25,7 @@
 #ifndef DDBD_H
 #define DDBD_H
 
-#include <Foundation/Foundation.h>
+#import <Foundation/Foundation.h>
 
 @protocol	DDBdProtocol
 

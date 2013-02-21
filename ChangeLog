@@ -1,5 +1,10 @@
 2013-02-21 Riccardo Mottola <rm@gnu.org>
 
+	* Tools/ddbd/ddbd.m
+	NSUInteger transition
+
+2013-02-21 Riccardo Mottola <rm@gnu.org>
+
 	* Tools/ddbd/DDBPathsManager.m
 	* Tools/ddbd/ddbd.m
 	Remove unneeded creation of autorelease pools or in case move them to the respective manager only.

@@ -1,6 +1,6 @@
 /* DDBPathsManager.m
  *  
- * Copyright (C) 2005-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2005
@@ -55,7 +55,7 @@
     NSBundle *bundle;
     NSString *bundlesDir;
     NSArray *bnames;
-    unsigned i;
+    NSUInteger i;
 
     ulen = sizeof(unsigned);
     llen = sizeof(unsigned long);
@@ -292,7 +292,7 @@
   CREATE_AUTORELEASE_POOL(arp);
   NSMutableArray *alldata = [NSMutableArray array];
   NSArray *types = [mdmodules allKeys];
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [types count]; i++) {
     NSString *type = [types objectAtIndex: i];
@@ -481,7 +481,7 @@
   NSRange range;
   unsigned kcount;
   unsigned long key;
-  unsigned i;
+  NSUInteger i;
   
   range = NSMakeRange(0, sizeof(unsigned));
   [data getBytes: &kcount range: range];
