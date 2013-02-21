@@ -145,7 +145,6 @@ static MDFinder *mdfinder = nil;
 
 - (void)applicationDidBecomeActive:(NSNotification *)aNotification
 {
-  NSLog(@"applicationDidBecomeActive");
 }
 
 - (BOOL)application:(NSApplication *)application 
