@@ -203,7 +203,6 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 
 - (NSData *)directoryTreeFromPath:(NSString *)apath
 {  
-  CREATE_AUTORELEASE_POOL(pool);
   NSArray *directories;  
   NSData *data = nil;
   
@@ -214,38 +213,29 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
   if ([directories count]) { 
     data = [NSArchiver archivedDataWithRootObject: directories]; 
   } 
-
-  RETAIN (data);
-  RELEASE (pool);
   
-  return AUTORELEASE (data);
+  return data;
 }
 
 - (NSArray *)userMetadataForPath:(NSString *)apath
 {
-  CREATE_AUTORELEASE_POOL(arp);
   NSArray *usrdata = nil;
   
   [pathslock lock];
   usrdata = [pathsManager metadataForPath: apath];
   [pathslock unlock];
 
-  RELEASE (arp);
-
   return usrdata;
 }
 
 - (NSString *)annotationsForPath:(NSString *)path
 {
-  CREATE_AUTORELEASE_POOL(arp);
   NSString *annotations = nil;
   
   [pathslock lock];
   annotations = [pathsManager metadataOfType: @"GSMDItemFinderComment" 
                                      forPath: path];
   [pathslock unlock];
-
-  RELEASE (arp);
 
   return annotations;
 }

@@ -289,6 +289,7 @@
 
 - (NSArray *)metadataForPath:(NSString *)apath
 {
+  CREATE_AUTORELEASE_POOL(arp);
   NSMutableArray *alldata = [NSMutableArray array];
   NSArray *types = [mdmodules allKeys];
   int i;
@@ -306,8 +307,9 @@
       [alldata addObject: dict];
     }
   }
-  
-  return alldata;
+  [alldata retain];
+  RELEASE (arp);
+  return [alldata autorelease];
 }
 
 - (NSTimeInterval)timestampOfPath:(NSString *)path
