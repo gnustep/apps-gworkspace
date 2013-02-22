@@ -1,3 +1,7 @@
+2013-02-22 Sebastian Reitenbach <sebastia@l00-bugdead-prods.de>
+	* Tools/ddbd/ddbd.m
+	reuse values already saved in args
+
 2013-02-21 Riccardo Mottola <rm@gnu.org>
 
 	* Tools/ddbd/ddbd.m

@@ -497,12 +497,12 @@ int main(int argc, char** argv)
   NSMutableArray *args = AUTORELEASE ([[info arguments] mutableCopy]);
   BOOL subtask = YES;
 
-  if ([[info arguments] containsObject: @"--auto"] == YES)
+  if ([args containsObject: @"--auto"] == YES)
     {
       auto_stop = YES;
     }
 
-  if ([[info arguments] containsObject: @"--daemon"])
+  if ([args containsObject: @"--daemon"])
     {
       subtask = NO;
     }
