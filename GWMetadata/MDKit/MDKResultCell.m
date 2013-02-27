@@ -1,6 +1,6 @@
 /* MDKResultCell.m
  *  
- * Copyright (C) 2006 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@fibernet.ro>
  * Date: December 2006
@@ -71,15 +71,8 @@
 {
   if (headCell == NO) {
     NSRect title_rect = cellFrame;
-    float textlenght = title_rect.size.width;
 
   #define MARGIN (2.0)
-
-    if (icon) {
-      textlenght -= ([icon size].width + (MARGIN * 2));
-    }
-
-    textlenght -= MARGIN;
 
     if (icon == nil) {
       [super drawInteriorWithFrame: title_rect inView: controlView];
