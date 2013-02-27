@@ -1,5 +1,11 @@
 2013-02-28 Riccardo Mottola <rm@gnu.org>
 
+	* GWMetadata/gmds/gmds/gmds.m
+	Clean up subtask creating and passed arguments, remove special
+	"--from-gmds" parameter and rely only on --daemon.
+
+2013-02-28 Riccardo Mottola <rm@gnu.org>
+
 	* GWMetadata/MDKit/MDKResultCell.m
 	Remove unused variable.
 

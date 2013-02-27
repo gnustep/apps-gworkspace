@@ -313,13 +313,17 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
     [defaults synchronize];
 
     task = [NSTask new];
-	  [task setLaunchPath: [[NSBundle mainBundle] executablePath]];
-    [args addObject: @"--from-gmds"];
+    [task setLaunchPath: [[NSBundle mainBundle] executablePath]];
+    [args removeObjectAtIndex: 0];
+    if (![args containsObject: @"--daemon"])
+      {
+        [args addObject: @"--daemon"];
+      }
     [task setArguments: args];
     RELEASE (args);
     [task setEnvironment: [info environment]];
-	  [task launch];
-	  RELEASE (task);
+    [task launch];
+    RELEASE (task);
 
     RELEASE (pool);
     
@@ -351,7 +355,7 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
 	            object: connection];
   
   if (connection == conn) {
-    NSLog(@"argh - gmds server root connection has been destroyed.");
+    NSLog(@"[gmds connectionDidDie]: Error: gmds server root connection has been destroyed.");
     exit(EXIT_FAILURE);
   }
   
@@ -707,38 +711,34 @@ int main(int argc, char** argv)
   NSProcessInfo *info = [NSProcessInfo processInfo];
   NSMutableArray *args = AUTORELEASE ([[info arguments] mutableCopy]);
 
-  if ([args containsObject: @"--from-gmds"] == NO) {  
-    static BOOL	is_daemon = NO;
-    BOOL subtask = YES;
+  BOOL subtask = YES;
 
-    if ([args containsObject: @"--daemon"]) {
-      subtask = NO;
-      is_daemon = YES;
-    }
+  if ([args containsObject: @"--daemon"])
+    subtask = NO;
 
-    if (subtask) {
+  if (subtask)
+    {
       NSTask *task = [NSTask new];
-
+    
       NS_DURING
-	      {
-	        [args removeObjectAtIndex: 0];
-	        [args addObject: @"--daemon"];
-	        [task setLaunchPath: [[NSBundle mainBundle] executablePath]];
-	        [task setArguments: args];
-	        [task setEnvironment: [info environment]];
-	        [task launch];
-	        DESTROY (task);
-	      }
+        {
+	  [args removeObjectAtIndex: 0];
+          [args addObject: @"--daemon"];
+          [task setLaunchPath: [[NSBundle mainBundle] executablePath]];
+          [task setArguments: args];
+          [task setEnvironment: [info environment]];
+          [task launch];
+          DESTROY (task);
+        }
       NS_HANDLER
-	      {
-	        fprintf (stderr, "unable to launch the gmds task. exiting.\n");
-	        DESTROY (task);
-	      }
+        {
+          fprintf (stderr, "unable to launch the gmds task. exiting.\n");
+          DESTROY (task);
+        }
       NS_ENDHANDLER
 
-      exit(EXIT_FAILURE);
+        exit(EXIT_FAILURE);
     }
-  }
     
   RELEASE(pool);
 
@@ -747,11 +747,12 @@ int main(int argc, char** argv)
     GMDS *gmds = [[GMDS alloc] init];
     RELEASE (pool);
   
-    if (gmds != nil) {
-	    CREATE_AUTORELEASE_POOL (pool);
-      [[NSRunLoop currentRunLoop] run];
-  	  RELEASE (pool);
-    }
+    if (gmds != nil)
+      {
+        CREATE_AUTORELEASE_POOL (pool);
+        [[NSRunLoop currentRunLoop] run];
+        RELEASE (pool);
+      }
   }
     
   exit(EXIT_SUCCESS);
