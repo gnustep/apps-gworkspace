@@ -1,3 +1,9 @@
+2013-03-04 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNIconsView.h
+	* FSNode/FSNListView.h
+	Fix warnings about not implemented protocols.
+
 2013-02-28 Riccardo Mottola <rm@gnu.org>
 
 	* GWMetadata/gmds/gmds/gmds.m
