@@ -1,6 +1,6 @@
 /* FSNIconsView.h
  *  
- * Copyright (C) 2004-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -25,6 +25,7 @@
 
 #import <Foundation/Foundation.h>
 #import <AppKit/NSView.h>
+#import <AppKit/NSTextField.h>
 #import "FSNodeRep.h"
 
 @class NSColor;
@@ -33,7 +34,7 @@
 @class FSNIcon;
 @class FSNIconNameEditor;
 
-@interface FSNIconsView : NSView
+@interface FSNIconsView : NSView <NSTextFieldDelegate>
 {
   FSNode *node;
   NSMutableArray *icons;

@@ -1,6 +1,6 @@
 /* FSNListView.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: December 2004
@@ -25,16 +25,17 @@
 #ifndef FSN_LIST_VIEW_H
 #define FSN_LIST_VIEW_H
 
-#include <Foundation/Foundation.h>
-#include <AppKit/NSTableView.h>
-#include "FSNodeRep.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/NSTableView.h>
+#import <AppKit/NSTextField.h>
+#import "FSNodeRep.h"
 
 @class NSTableColumn;
 @class FSNListView;
 @class FSNListViewNodeRep;
 @class FSNListViewNameEditor;
 
-@interface FSNListViewDataSource : NSObject
+@interface FSNListViewDataSource : NSObject <NSTextFieldDelegate>
 {
   FSNListView *listView;
     
