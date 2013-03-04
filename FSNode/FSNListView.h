@@ -46,8 +46,8 @@
 
   NSArray *lastSelection;
 
-  unsigned int mouseFlags;    
-	BOOL isDragTarget;
+  NSUInteger mouseFlags;    
+  BOOL isDragTarget;
   BOOL forceCopy;
   FSNListViewNodeRep *dndTarget;
   unsigned int dragOperation;
@@ -76,7 +76,7 @@
 
 - (void)sortNodeReps;
 
-- (void)setMouseFlags:(unsigned int)flags;
+- (void)setMouseFlags:(NSUInteger)flags;
 
 - (void)doubleClickOnListView:(id)sender;
 
@@ -107,12 +107,12 @@
 
 - (id)tableView:(NSTableView *)aTableView
           objectValueForTableColumn:(NSTableColumn *)aTableColumn
-                                row:(int)rowIndex;
+                                row:(NSInteger)rowIndex;
 
 - (void)tableView:(NSTableView *)aTableView 
             setObjectValue:(id)anObject 
             forTableColumn:(NSTableColumn *)aTableColumn 
-                       row:(int)rowIndex;
+                       row:(NSInteger)rowIndex;
 
 - (BOOL)tableView:(NSTableView *)aTableView
 	      writeRows:(NSArray *)rows
@@ -120,12 +120,12 @@
 
 - (NSDragOperation)tableView:(NSTableView *)tableView 
                 validateDrop:(id <NSDraggingInfo>)info 
-                 proposedRow:(int)row 
+                 proposedRow:(NSInteger)row 
        proposedDropOperation:(NSTableViewDropOperation)operation;
 
 - (BOOL)tableView:(NSTableView *)tableView 
        acceptDrop:(id <NSDraggingInfo>)info 
-              row:(int)row 
+              row:(NSInteger)row 
     dropOperation:(NSTableViewDropOperation)operation;
     
 //
@@ -134,12 +134,12 @@
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification;
 
 - (BOOL)tableView:(NSTableView *)aTableView 
-  shouldSelectRow:(int)rowIndex;
+  shouldSelectRow:(NSInteger)rowIndex;
 
 - (void)tableView:(NSTableView *)aTableView 
   willDisplayCell:(id)aCell 
    forTableColumn:(NSTableColumn *)aTableColumn 
-              row:(int)rowIndex;
+              row:(NSInteger)rowIndex;
               
 - (void)tableView:(NSTableView *)tableView 
             mouseDownInHeaderOfTableColumn:(NSTableColumn *)tableColumn;
@@ -149,7 +149,7 @@
 
 - (BOOL)tableView:(NSTableView *)aTableView 
             shouldEditTableColumn:(NSTableColumn *)aTableColumn 
-                              row:(int)rowIndex;   
+                              row:(NSInteger)rowIndex;   
 
 @end
 
@@ -303,7 +303,7 @@
 {
   id dsource;
   NSString *charBuffer;	
-	NSTimeInterval lastKeyPressed;
+  NSTimeInterval lastKeyPressed;
 
   NSTimer *clickTimer;
 }

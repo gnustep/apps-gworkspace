@@ -287,7 +287,7 @@ static NSString *defaultColumns = @"{ \
   }
 }
 
-- (void)setMouseFlags:(unsigned int)flags
+- (void)setMouseFlags:(NSUInteger)flags
 {
   mouseFlags = flags;
 }
@@ -1571,7 +1571,7 @@ static NSString *defaultColumns = @"{ \
 - (NSDragOperation)listViewDraggingEntered:(id <NSDraggingInfo>)sender
 {
   NSPoint location;
-  int row;
+  NSInteger row;
   
   isDragTarget = NO;
   dndTarget = nil;
@@ -1599,13 +1599,13 @@ static NSString *defaultColumns = @"{ \
   }     
 
   if (dragOperation == NSDragOperationNone) {
-	  NSPasteboard *pb;
+    NSPasteboard *pb;
     NSDragOperation sourceDragMask;
-	  NSArray *sourcePaths;
+    NSArray *sourcePaths;
     NSString *basePath;
     NSString *nodePath;
     NSString *prePath;
-	  int count;
+    NSUInteger count;
 
     dndTarget = nil;
     isDragTarget = NO;
@@ -1665,13 +1665,13 @@ static NSString *defaultColumns = @"{ \
 
     if ([node isDirectory] && [node isParentOfPath: basePath]) {
       NSArray *subNodes = [node subNodes];
-      int i;
+      NSUInteger i;
 
       for (i = 0; i < [subNodes count]; i++) {
         FSNode *nd = [subNodes objectAtIndex: i];
 
         if ([nd isDirectory]) {
-          int j;
+          NSUInteger j;
 
           for (j = 0; j < count; j++) {
             NSString *fname = [[sourcePaths objectAtIndex: j] lastPathComponent];
