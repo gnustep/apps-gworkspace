@@ -326,53 +326,60 @@ static GWorkspace *gworkspace = nil;
 
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
-	NSUserDefaults *defaults;
-	id entry;
+  NSUserDefaults *defaults;
+  id entry;
   BOOL boolentry;
   NSArray *extendedInfo;
   NSMenu *menu;
   NSString *lockpath;
-  int i;
+  NSUInteger i;
   
   [self createMenu];
     
-	[isa registerForServices];
+  [isa registerForServices];
   
   ASSIGN (gwProcessName, [[NSProcessInfo processInfo] processName]);
   ASSIGN (gwBundlePath, [[NSBundle mainBundle] bundlePath]);
   
   fm = [NSFileManager defaultManager];
-	ws = [NSWorkspace sharedWorkspace];
+  ws = [NSWorkspace sharedWorkspace];
   fsnodeRep = [FSNodeRep sharedInstance];  
     
   extendedInfo = [fsnodeRep availableExtendedInfoNames];
   menu = [[[NSApp mainMenu] itemWithTitle: NSLocalizedString(@"View", @"")] submenu];
   menu = [[menu itemWithTitle: NSLocalizedString(@"Show", @"")] submenu];
 
-  for (i = 0; i < [extendedInfo count]; i++) {
-	  [menu addItemWithTitle: [extendedInfo objectAtIndex: i] 
-										action: @selector(setExtendedShownType:) 
-             keyEquivalent: @""];
-  }
+  for (i = 0; i < [extendedInfo count]; i++)
+    {
+      [menu addItemWithTitle: [extendedInfo objectAtIndex: i] 
+                      action: @selector(setExtendedShownType:) 
+               keyEquivalent: @""];
+    }
 	    
-	defaults = [NSUserDefaults standardUserDefaults];
-	[defaults setObject: gwProcessName forKey: @"GSWorkspaceApplication"];
+  defaults = [NSUserDefaults standardUserDefaults];
+  [defaults setObject: gwProcessName forKey: @"GSWorkspaceApplication"];
 
   [fsnodeRep setVolumes: [ws removableMediaPaths]];
         
-	entry = [defaults objectForKey: @"reserved_names"];
-	if (entry) {
-    [fsnodeRep setReservedNames: entry];
-	} else {
-    [fsnodeRep setReservedNames: [NSArray arrayWithObjects: @".gwdir", @".gwsort", nil]];
-  }
+  entry = [defaults objectForKey: @"reserved_names"];
+  if (entry) 
+    {
+      [fsnodeRep setReservedNames: entry];
+    } 
+  else 
+    {
+      [fsnodeRep setReservedNames: [NSArray arrayWithObjects: @".gwdir", @".gwsort", nil]];
+    }
         
-	entry = [defaults stringForKey: @"defaulteditor"];
-	if (entry == nil) {
-		defEditor = [[NSString alloc] initWithString: defaulteditor];
-	} else {
-		ASSIGN (defEditor, entry);
-  }
+  entry = [defaults stringForKey: @"defaulteditor"];
+  if (entry == nil)
+    {
+      defEditor = [[NSString alloc] initWithString: defaulteditor];
+    } 
+  else 
+    {
+      ASSIGN (defEditor, entry);
+    }
 
 	entry = [defaults stringForKey: @"defxterm"];
 	if (entry == nil) {
@@ -419,7 +426,7 @@ static GWorkspace *gworkspace = nil;
   boolentry = [defaults boolForKey: @"use_thumbnails"];
   [fsnodeRep setUseThumbnails: boolentry];
   
-	selectedPaths = [[NSArray alloc] initWithObjects: NSHomeDirectory(), nil];
+  selectedPaths = [[NSArray alloc] initWithObjects: NSHomeDirectory(), nil];
   trashContents = [NSMutableArray new];
   ASSIGN (trashPath, [self trashPath]);
   [self _updateTrashContents];
@@ -467,11 +474,10 @@ static GWorkspace *gworkspace = nil;
   
   fiend = [[Fiend alloc] init];
   
-  if ([defaults boolForKey: @"usefiend"]) {
+  if ([defaults boolForKey: @"usefiend"])
     [self showFiend: nil];
-  } else {
+  else
     [self hideFiend: nil];
-  }
     
   vwrsManager = [GWViewersManager viewersManager];
   [vwrsManager showViewers];
@@ -485,13 +491,13 @@ static GWorkspace *gworkspace = nil;
   
   ddbd = nil;
   [self connectDDBd];
-    
+  
   mdextractor = nil;
   if ([defaults boolForKey: @"GSMetadataIndexingEnabled"]) {
     [self connectMDExtractor];
   }
     
-	[defaults synchronize];
+  [defaults synchronize];
   terminating = NO;
   
   [self setContextHelp];
@@ -616,53 +622,61 @@ static GWorkspace *gworkspace = nil;
   TEST_CLOSE (tshelfWin, tshelfWin);
   TEST_CLOSE (startAppWin, [startAppWin win]);
 
-  if (fswatcher) {
-    NSConnection *conn = [(NSDistantObject *)fswatcher connectionForProxy];
+  if (fswatcher)
+    {
+      NSConnection *conn = [(NSDistantObject *)fswatcher connectionForProxy];
   
-    if ([conn isValid]) {
-      [nc removeObserver: self
-	                  name: NSConnectionDidDieNotification
-	                object: conn];
-      [fswatcher unregisterClient: (id <FSWClientProtocol>)self];  
-      DESTROY (fswatcher);
+      if ([conn isValid])
+        {
+          [nc removeObserver: self
+                        name: NSConnectionDidDieNotification
+                      object: conn];
+          [fswatcher unregisterClient: (id <FSWClientProtocol>)self];  
+          DESTROY (fswatcher);
+        }
     }
-  }
 
   [inspector updateDefaults];
 
   [finder stopAllSearchs];
   
-  if (recyclerApp) {
-    NSConnection *conn = [(NSDistantObject *)recyclerApp connectionForProxy];
+  if (recyclerApp)
+    {
+      NSConnection *conn = [(NSDistantObject *)recyclerApp connectionForProxy];
   
-    if (conn && [conn isValid]) {
-      [nc removeObserver: self
-	                  name: NSConnectionDidDieNotification
-	                object: conn];
-      DESTROY (recyclerApp);
+      if (conn && [conn isValid])
+        {
+          [nc removeObserver: self
+                        name: NSConnectionDidDieNotification
+                      object: conn];
+          DESTROY (recyclerApp);
+        }
     }
-  }
   
-  if (ddbd) {
-    NSConnection *conn = [(NSDistantObject *)ddbd connectionForProxy];
+  if (ddbd)
+    {
+      NSConnection *conn = [(NSDistantObject *)ddbd connectionForProxy];
   
-    if (conn && [conn isValid]) {
-      [nc removeObserver: self
-	                  name: NSConnectionDidDieNotification
-	                object: conn];
-      DESTROY (ddbd);
+      if (conn && [conn isValid])
+        {
+          [nc removeObserver: self
+                        name: NSConnectionDidDieNotification
+                      object: conn];
+          DESTROY (ddbd);
+        }
     }
-  }
 
-  if (mdextractor) {
-    NSConnection *conn = [(NSDistantObject *)mdextractor connectionForProxy];
+  if (mdextractor)
+    {
+      NSConnection *conn = [(NSDistantObject *)mdextractor connectionForProxy];
   
-    if (conn && [conn isValid]) {
-      [nc removeObserver: self
-	                  name: NSConnectionDidDieNotification
-	                object: conn];
-      DESTROY (mdextractor);
-    }
+      if (conn && [conn isValid])
+        {
+          [nc removeObserver: self
+                        name: NSConnectionDidDieNotification
+                      object: conn];
+          DESTROY (mdextractor);
+        }
   }
   		
   return NSTerminateNow;
