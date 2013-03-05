@@ -2274,17 +2274,20 @@ static GWorkspace *gworkspace = nil;
   NSMenu *menu = [[[NSApp mainMenu] itemWithTitle: NSLocalizedString(@"Tools", @"")] submenu];
   id item;
 
-	if (recyclerApp == nil) {
-    recyclerCanQuit = NO; 
-    [self connectRecycler];
-    item = [menu itemWithTitle: NSLocalizedString(@"Show Recycler", @"")];
-    [item setTitle: NSLocalizedString(@"Hide Recycler", @"")];
-  } else {
-    recyclerCanQuit = YES;
-    [recyclerApp terminateApplication];
-    item = [menu itemWithTitle: NSLocalizedString(@"Hide Recycler", @"")];
-    [item setTitle: NSLocalizedString(@"Show Recycler", @"")];
-  }
+  if (recyclerApp == nil)
+    {
+      recyclerCanQuit = NO; 
+      [self connectRecycler];
+      item = [menu itemWithTitle: NSLocalizedString(@"Show Recycler", @"")];
+      [item setTitle: NSLocalizedString(@"Hide Recycler", @"")];
+    }
+  else
+    {
+      recyclerCanQuit = YES;
+      [recyclerApp terminateApplication];
+      item = [menu itemWithTitle: NSLocalizedString(@"Hide Recycler", @"")];
+      [item setTitle: NSLocalizedString(@"Show Recycler", @"")];
+    }
 }
 
 - (void)showFinder:(id)sender
@@ -2294,24 +2297,25 @@ static GWorkspace *gworkspace = nil;
 
 - (void)showFiend:(id)sender
 {
-	NSMenu *menu = [[[NSApp mainMenu] itemWithTitle: NSLocalizedString(@"Tools", @"")] submenu];
-	menu = [[menu itemWithTitle: NSLocalizedString(@"Fiend", @"")] submenu];
+  NSMenu *menu = [[[NSApp mainMenu] itemWithTitle: NSLocalizedString(@"Tools", @"")] submenu];
+  menu = [[menu itemWithTitle: NSLocalizedString(@"Fiend", @"")] submenu];
 
-  while (1) {
-    if ([menu numberOfItems] == 0) {
-      break;
+  while (1)
+    {
+      if ([menu numberOfItems] == 0)
+        break;
+
+      [menu removeItemAtIndex: 0];
     }
-    [menu removeItemAtIndex: 0];
-  }
 
-	[menu addItemWithTitle: NSLocalizedString(@"Hide Fiend", @"") 
-													action: @selector(hideFiend:) keyEquivalent: @""];	
-	[menu addItemWithTitle: NSLocalizedString(@"Remove Current Layer", @"") 
-										action: @selector(removeFiendLayer:) keyEquivalent: @""];	
-	[menu addItemWithTitle: NSLocalizedString(@"Rename Current Layer", @"") 
-										action: @selector(renameFiendLayer:) keyEquivalent: @""];	
-	[menu addItemWithTitle: NSLocalizedString(@"Add Layer...", @"") 
-										action: @selector(addFiendLayer:) keyEquivalent: @""];								
+  [menu addItemWithTitle: NSLocalizedString(@"Hide Fiend", @"") 
+                  action: @selector(hideFiend:) keyEquivalent: @""];	
+  [menu addItemWithTitle: NSLocalizedString(@"Remove Current Layer", @"") 
+                  action: @selector(removeFiendLayer:) keyEquivalent: @""];	
+  [menu addItemWithTitle: NSLocalizedString(@"Rename Current Layer", @"") 
+                  action: @selector(renameFiendLayer:) keyEquivalent: @""];	
+  [menu addItemWithTitle: NSLocalizedString(@"Add Layer...", @"") 
+                  action: @selector(addFiendLayer:) keyEquivalent: @""];								
 
   [fiend activate];
 }

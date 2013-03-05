@@ -86,7 +86,7 @@ static Finder *finder = nil;
     NSArray *usedModules;
     NSRect rect;
     NSSize cs, ms;
-    int i;
+    NSUInteger i;
     
     if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
       NSLog(@"failed to load %@!", nibName);
@@ -121,16 +121,16 @@ static Finder *finder = nil;
     RELEASE (placesScroll);  
   
     placesMatrix = [[NSMatrix alloc] initWithFrame: NSMakeRect(0, 0, 100, 100)
-				            	              mode: NSListModeMatrix 
-                               prototype: [[SearchPlacesCell new] autorelease]
-			       							  numberOfRows: 0 
-                         numberOfColumns: 0];
+                                              mode: NSListModeMatrix 
+                                         prototype: [[SearchPlacesCell new] autorelease]
+                                      numberOfRows: 0 
+                                   numberOfColumns: 0];
     [placesMatrix setTarget: self];
     [placesMatrix setAction: @selector(placesMatrixAction:)];
     [placesMatrix setIntercellSpacing: NSZeroSize];
     [placesMatrix setCellSize: NSMakeSize(1, CELLS_HEIGHT)];
     [placesMatrix setAutoscroll: YES];
-	  [placesMatrix setAllowsEmptySelection: YES];
+    [placesMatrix setAllowsEmptySelection: YES];
     cs = [placesScroll contentSize];
     ms = [placesMatrix cellSize];
     ms.width = cs.width;
@@ -256,8 +256,8 @@ static Finder *finder = nil;
   NSMutableArray *unsortedModules;
   NSDictionary *lastUsedModules;
   NSArray *usedNames;
-  int index;
-  int i;
+  NSUInteger index;
+  NSUInteger i;
 
   bundlesPaths = [NSMutableArray array];
   enumerator = [NSSearchPathForDirectoriesInDomains
@@ -279,24 +279,26 @@ static Finder *finder = nil;
 
   unsortedModules = [NSMutableArray array];
 
-  for (i = 0; i < [bundlesPaths count]; i++) {
-    CREATE_AUTORELEASE_POOL(arp);
-    NSString *bpath = [bundlesPaths objectAtIndex: i];
-    NSBundle *bundle = [NSBundle bundleWithPath: bpath];
+  for (i = 0; i < [bundlesPaths count]; i++)
+    {
+      CREATE_AUTORELEASE_POOL(arp);
+      NSString *bpath = [bundlesPaths objectAtIndex: i];
+      NSBundle *bundle = [NSBundle bundleWithPath: bpath];
      
-    if (bundle) {
-			Class principalClass = [bundle principalClass];
+      if (bundle)
+        {
+          Class principalClass = [bundle principalClass];
 
-			if ([principalClass conformsToProtocol: @protocol(FinderModulesProtocol)]) {	
-        id module = [[principalClass alloc] initInterface];
+          if ([principalClass conformsToProtocol: @protocol(FinderModulesProtocol)]) {	
+            id module = [[principalClass alloc] initInterface];
         
-        [unsortedModules addObject: module];
-	  		RELEASE ((id)module);			
-			}
-    }
+            [unsortedModules addObject: module];
+            RELEASE ((id)module);			
+          }
+        }
     
-    RELEASE (arp);
-  }
+      RELEASE (arp);
+    }
 
   if ([unsortedModules count] == 0) {  
     NSRunAlertPanel(NSLocalizedString(@"error", @""), 
@@ -350,7 +352,7 @@ static Finder *finder = nil;
 - (NSArray *)usedModules
 {
   NSMutableArray *used = [NSMutableArray array];
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [modules count]; i++) {
     id module = [modules objectAtIndex: i];
@@ -365,7 +367,7 @@ static Finder *finder = nil;
 
 - (id)firstUnusedModule
 {
-  int i;
+  NSUInteger i;
   
   for (i = 0; i < [modules count]; i++) {
     id module = [modules objectAtIndex: i];
@@ -380,7 +382,7 @@ static Finder *finder = nil;
 
 - (id)moduleWithName:(NSString *)mname
 {
-  int i;
+  NSUInteger i;
   
   for (i = 0; i < [modules count]; i++) {
     id module = [modules objectAtIndex: i];
@@ -401,8 +403,8 @@ static Finder *finder = nil;
     int index = [fmviews indexOfObjectIdenticalTo: aview];  
     id module = [self firstUnusedModule];
     id fmview = [[FindModuleView alloc] initWithDelegate: self];
-    int count;
-    int i;
+    NSUInteger count;
+    NSUInteger i;
     
     [module setInUse: YES];
     [fmview setModule: module];
@@ -434,8 +436,8 @@ static Finder *finder = nil;
 - (void)removeModule:(FindModuleView *)aview
 {
   if ([fmviews count] > 1) {
-    int count;
-    int i;
+    NSUInteger count;
+    NSUInteger i;
 
     [[aview module] setInUse: NO];
     [[aview mainBox] removeFromSuperview];
@@ -464,7 +466,7 @@ static Finder *finder = nil;
   id module = [self moduleWithName: mname];
 
   if (module && ([aview module] != module)) {
-    int i;
+    NSUInteger i;
 
     [[aview module] setInUse: NO];
     [module setInUse: YES];
@@ -479,7 +481,7 @@ static Finder *finder = nil;
 - (IBAction)chooseSearchPlacesType:(id)sender
 {
   NSArray *cells = [placesMatrix cells];
-  int i;
+  NSUInteger i;
   
   usesSearchPlaces = ([sender indexOfSelectedItem] == PLACES);
   
@@ -1023,7 +1025,7 @@ static Finder *finder = nil;
   NSRect wrect = [win frame];
   NSRect mbrect = [modulesBox bounds];
   NSUInteger count = [fmviews count];
-  float hspace = (count * FMVIEWH) + HMARGIN + BORDER;
+  CGFloat hspace = (count * FMVIEWH) + HMARGIN + BORDER;
   NSUInteger i;
     
   if (mbrect.size.height != hspace) {  
@@ -1040,7 +1042,7 @@ static Finder *finder = nil;
     FindModuleView *fmview = [fmviews objectAtIndex: i];
     NSBox *fmbox = [fmview mainBox];
     NSRect mbr = [fmbox frame];
-    float posy = mbrect.size.height - (FMVIEWH * (i + 1)) - BORDER;
+    CGFloat posy = mbrect.size.height - (FMVIEWH * (i + 1)) - BORDER;
     
     if (mbr.origin.y != posy) {
       mbr.origin.y = posy;
