@@ -1,6 +1,6 @@
 /* fswatcher.m
  *  
- * Copyright (C) 2004-2011 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: February 2004
@@ -29,6 +29,7 @@
   do { if (GW_DEBUG_LOG) \
     NSLog(format , ## args); } while (0)
 
+static BOOL	is_daemon = NO;		/* Currently running as daemon.	 */
 static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 
 @implementation	FSWClientInfo
@@ -235,7 +236,7 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
       {
         Watcher *watcher = [self watcherForPath: wpath];
       
-        NSLog(@"No next in enumerator");
+        NSLog(@"fswatcher: No next in enumerator in watched paths");
         if (watcher)
 	{
           [watcher removeListener];
@@ -244,7 +245,8 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
       
       [clientsInfo removeObject: info];
     }
-    if (auto_stop == YES && [clientsInfo count] == 1)
+
+    if (auto_stop == YES && [clientsInfo count] <= 1)
       {
 	/* If there is nothing else using this process, and this is not
 	 * a daemon, then we can quietly terminate.
@@ -258,7 +260,7 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   id entry;
-  unsigned i;
+  NSUInteger i;
   
   [defaults synchronize];
 
@@ -325,7 +327,7 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
   NSArray *excluded = [info objectForKey: @"GSMetadataExcludedPaths"];
   NSArray *suffixes = [info objectForKey: @"GSMetadataExcludedSuffixes"];
   
-  unsigned i;
+  NSUInteger i;
 
   emptyTreeWithBase(includePathsTree);
   
@@ -378,7 +380,7 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
   NSEnumerator *enumerator;
   NSString *wpath;
 
-	if (info == nil) {
+  if (info == nil) {
     [NSException raise: NSInternalInconsistencyException
 		            format: @"unregistration with unknown connection"];
   }
@@ -404,8 +406,8 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 	            object: connection];
 
   [clientsInfo removeObject: info];
-  NSLog(@"unregister client %lu", [clientsInfo count]);
-  if (auto_stop == YES && [clientsInfo count] == 1)
+
+  if (auto_stop == YES && [clientsInfo count] <= 1)
     {
       /* If there is nothing else using this process, and this is not
        * a daemon, then we can quietly terminate.
@@ -833,7 +835,7 @@ static inline BOOL isDotFile(NSString *path)
   } 
 }
 
-- (BOOL)isWathcingPath:(NSString *)apath
+- (BOOL)isWatchingPath:(NSString *)apath
 {
   return ([apath isEqualToString: watchedPath]);
 }
@@ -861,7 +863,6 @@ int main(int argc, char** argv)
   CREATE_AUTORELEASE_POOL(pool);
   NSProcessInfo *info = [NSProcessInfo processInfo];
   NSMutableArray *args = AUTORELEASE ([[info arguments] mutableCopy]);
-  static BOOL	is_daemon = NO;
   BOOL subtask = YES;
 
   if ([[info arguments] containsObject: @"--auto"] == YES)

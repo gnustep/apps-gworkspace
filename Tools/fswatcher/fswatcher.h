@@ -1,6 +1,6 @@
 /* fswatcher.h
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: February 2004
@@ -25,8 +25,8 @@
 #ifndef FSWATCHER_H
 #define FSWATCHER_H
 
-#include <Foundation/Foundation.h>
-#include "DBKPathsTree.h"
+#import <Foundation/Foundation.h>
+#import "DBKPathsTree.h"
 
 @class Watcher;
 
@@ -75,7 +75,7 @@
 
 - (void)removeWatchedPath:(NSString *)path;
 
-- (BOOL)isWathchingPath:(NSString *)path;
+- (BOOL)isWatchingPath:(NSString *)path;
 
 - (NSSet *)watchedPaths;
 
