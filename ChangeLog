@@ -1,5 +1,10 @@
 2013-03-06 Riccardo Mottola <rm@gnu.org>
 
+	* GWorkspace/GWorkspace.m
+	Always shut down the Recycler on exit.
+
+2013-03-06 Riccardo Mottola <rm@gnu.org>
+
 	* Tools/fswatcher/fswatcher.m
 	Handle is_auto and is_daemon like gdnc.
 
