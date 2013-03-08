@@ -1,3 +1,8 @@
+2013-03-08 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/GWorkspace.m
+	Shut down the recycler after removign the connection observer.
+
 2013-03-06 Riccardo Mottola <rm@gnu.org>
 
 	* Tools/fswatcher/fswatcher.m (isDotFile)

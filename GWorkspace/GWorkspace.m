@@ -644,7 +644,6 @@ static GWorkspace *gworkspace = nil;
     {
       NSConnection *conn;
 
-      [recyclerApp terminateApplication];
       conn = [(NSDistantObject *)recyclerApp connectionForProxy];
   
       if (conn && [conn isValid])
@@ -652,6 +651,7 @@ static GWorkspace *gworkspace = nil;
           [nc removeObserver: self
                         name: NSConnectionDidDieNotification
                       object: conn];
+          [recyclerApp terminateApplication];
           DESTROY (recyclerApp);
         }
     }
