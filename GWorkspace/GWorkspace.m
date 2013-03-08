@@ -631,7 +631,11 @@ static GWorkspace *gworkspace = nil;
           [nc removeObserver: self
                         name: NSConnectionDidDieNotification
                       object: conn];
-          [fswatcher unregisterClient: (id <FSWClientProtocol>)self];  
+          NS_DURING
+            [fswatcher unregisterClient: (id <FSWClientProtocol>)self];  
+          NS_HANDLER
+            NSLog(@"[GWorkspace shouldTerminateApplication] uunregister fswatcher: %@", [localException description]);
+          NS_ENDHANDLER
           DESTROY (fswatcher);
         }
     }
