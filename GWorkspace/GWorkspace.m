@@ -1168,19 +1168,40 @@ static GWorkspace *gworkspace = nil;
 
 - (void)setSelectedPaths:(NSArray *)paths
 {
-  if (paths && ([selectedPaths isEqualToArray: paths] == NO)) {
-    ASSIGN (selectedPaths, paths);
+ 
+  if (paths && ([selectedPaths isEqualToArray: paths] == NO))
+    {
+      NSUInteger i;
+      NSMutableArray *onlyDirPaths;
+      NSFileManager *fileMgr;
+
+      ASSIGN (selectedPaths, paths);
     
-    if ([[inspector win] isVisible]) {
-      [inspector setCurrentSelection: paths];
-    }
+      if ([[inspector win] isVisible])
+        {
+          [inspector setCurrentSelection: paths];
+        }
+      
+      /* we extract from the selection only valid directories */
+      onlyDirPaths = [[NSMutableArray arrayWithCapacity:1] retain];
+      fileMgr = [NSFileManager defaultManager];
+      for (i = 0; i < [paths count]; i++)
+        {
+          NSString *p;
+          BOOL isDir;
+          p = [paths objectAtIndex:i];
+          if([fileMgr fileExistsAtPath:p isDirectory:&isDir])
+            if (isDir)
+              [onlyDirPaths addObject:p];
+        }
+      if ([onlyDirPaths count] > 0)
+        [finder setCurrentSelection: onlyDirPaths];
+      [onlyDirPaths release];
     
-    [finder setCurrentSelection: paths];
-    
-	  [[NSNotificationCenter defaultCenter]
+      [[NSNotificationCenter defaultCenter]
  				 postNotificationName: @"GWCurrentSelectionChangedNotification"
-	 								     object: nil];      
-  }
+                                               object: nil];      
+    }
 }
 
 - (void)resetSelectedPaths

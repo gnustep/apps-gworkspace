@@ -1,5 +1,10 @@
 2013-03-08 Riccardo Mottola <rm@gnu.org>
 
+	* GWorkspace/GWorkspace.m (setSelectedPaths)
+	Set the Finder to selection only to directories and not files.
+
+2013-03-08 Riccardo Mottola <rm@gnu.org>
+
 	* GWorkspace/GWorkspace.m
 	Trap exception.
 
