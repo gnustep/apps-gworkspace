@@ -1,6 +1,6 @@
 /* Finder.m
  *  
- * Copyright (C) 2005-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -498,43 +498,44 @@ static Finder *finder = nil;
 
 - (NSDragOperation)draggingEnteredInSearchPlaces:(id <NSDraggingInfo>)sender
 {
-  if (usesSearchPlaces) {
-	  NSPasteboard *pb = [sender draggingPasteboard];
+  if (usesSearchPlaces)
+    {
+      NSPasteboard *pb = [sender draggingPasteboard];
 
-    splacesDndTarget = NO;
+      splacesDndTarget = NO;
 
-    if ([[pb types] containsObject: NSFilenamesPboardType]) {
-	    NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
-      NSArray *cells = [placesMatrix cells];
-      int count = [sourcePaths count];
-      int i;
+      if ([[pb types] containsObject: NSFilenamesPboardType])
+        {
+          NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
+          NSArray *cells = [placesMatrix cells];
+          NSUInteger count = [sourcePaths count];
+          NSUInteger i;
 
-	    if (count == 0) {
-		    return NSDragOperationNone;
-      } 
+          if (count == 0)
+            return NSDragOperationNone;
 
-      for (i = 0; i < [cells count]; i++) {
-        SearchPlacesCell *cell = [cells objectAtIndex: i];
+          for (i = 0; i < [cells count]; i++)
+            {
+              SearchPlacesCell *cell = [cells objectAtIndex: i];
 
-        if ([sourcePaths containsObject: [cell path]]) {
-		      return NSDragOperationNone;
+              if ([sourcePaths containsObject: [cell path]])
+                return NSDragOperationNone;
+            }
+
+          splacesDndTarget = YES;    
+
+          return [sender draggingSourceOperationMask];
         }
-      }
-
-      splacesDndTarget = YES;    
-
-      return [sender draggingSourceOperationMask];
     }
-  }
     
   return NSDragOperationNone;
 }
 
 - (NSDragOperation)draggingUpdatedInSearchPlaces:(id <NSDraggingInfo>)sender
 {
-	if (splacesDndTarget && usesSearchPlaces) {
-		return [sender draggingSourceOperationMask];
-	}
+  if (splacesDndTarget && usesSearchPlaces) {
+    return [sender draggingSourceOperationMask];
+  }
   return NSDragOperationNone;
 }
 
@@ -545,7 +546,7 @@ static Finder *finder = nil;
 
     if ([[pb types] containsObject: NSFilenamesPboardType]) {
       NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
-      int i;  
+      NSUInteger i;  
 
       for (i = 0; i < [sourcePaths count]; i++) {
         [self addSearchPlaceWithPath: [sourcePaths objectAtIndex: i]];
@@ -558,37 +559,37 @@ static Finder *finder = nil;
 
 - (IBAction)addSearchPlaceFromDialog:(id)sender
 {
-	NSOpenPanel *openPanel;
+  NSOpenPanel *openPanel;
   NSArray *filenames;
-	int result;
-  int i;
+  NSInteger result;
+  NSUInteger i;
   
-	openPanel = [NSOpenPanel openPanel];
-	[openPanel setTitle: NSLocalizedString(@"open", @"")];	
-	[openPanel setAllowsMultipleSelection: YES];
-	[openPanel setCanChooseFiles: YES];
-	[openPanel setCanChooseDirectories: YES];
+  openPanel = [NSOpenPanel openPanel];
+  [openPanel setTitle: NSLocalizedString(@"open", @"")];	
+  [openPanel setAllowsMultipleSelection: YES];
+  [openPanel setCanChooseFiles: YES];
+  [openPanel setCanChooseDirectories: YES];
 
-	result = [openPanel runModalForDirectory: systemRoot() 
+  result = [openPanel runModalForDirectory: systemRoot() 
                                       file: nil 
-							                       types: nil];
-	if (result != NSOKButton) {
-		return;
-	}
+                                     types: nil];
+  if (result != NSOKButton)
+    return;
 	
   filenames = [openPanel filenames];
 
-  for (i = 0; i < [filenames count]; i++) {
-    [self addSearchPlaceWithPath: [filenames objectAtIndex: i]];
-  }
+  for (i = 0; i < [filenames count]; i++)
+    {
+      [self addSearchPlaceWithPath: [filenames objectAtIndex: i]];
+    }
 }
 
 - (void)addSearchPlaceWithPath:(NSString *)spath
 {
   NSArray *cells = [placesMatrix cells];  
-  int count = [cells count];
+  NSUInteger count = [cells count];
   BOOL found = NO;
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [cells count]; i++) {
     NSString *srchpath = [[cells objectAtIndex: i] path];
