@@ -1,5 +1,10 @@
 2013-03-10 Riccardo Mottola <rm@gnu.org>
 
+	* GWorkspace/GWorkspace.m
+	Change Yes/No in quit panel to make it consistent with logout.
+
+2013-03-10 Riccardo Mottola <rm@gnu.org>
+
 	* GWorkspace/Finder/LiveSearch/LSFolder.h
 	* GWorkspace/Finder/LiveSearch/LSFolder.m
 	* GWorkspace/Finder/SearchResults/SearchResults.h

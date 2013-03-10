@@ -594,14 +594,17 @@ static GWorkspace *gworkspace = nil;
     return NSTerminateCancel;  
   }
     
-  if ((dontWarnOnQuit == NO) && (loggingout == NO)) {
-    if (NSRunAlertPanel(NSLocalizedString(@"Quit!", @""),
-                      NSLocalizedString(@"Do you really want to quit?", @""),
-                      NSLocalizedString(@"No", @""),
-                      NSLocalizedString(@"Yes", @""),
-                      nil)) {
-      return NSTerminateCancel;
-    }
+  if ((dontWarnOnQuit == NO) && (loggingout == NO))
+    {
+      if (NSRunAlertPanel(NSLocalizedString(@"Quit!", @""),
+			  NSLocalizedString(@"Do you really want to quit?", @""),
+			  NSLocalizedString(@"Yes", @""),
+			  NSLocalizedString(@"No", @""),
+			  nil,
+			  nil) != NSAlertDefaultReturn)
+      {
+	return NSTerminateCancel;
+      }
   }
 
   if (logoutTimer && [logoutTimer isValid]) {
@@ -882,7 +885,7 @@ static GWorkspace *gworkspace = nil;
 
 - (void)updateDefaults
 {
-	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   id entry;
 
   [tshelfWin saveDefaults];  
@@ -919,10 +922,10 @@ static GWorkspace *gworkspace = nil;
   [dtopManager updateDefaults];
   [defaults setBool: ![dtopManager isActive] forKey: @"no_desktop"];
 
-	[finder updateDefaults];
-      
-	[defaults setObject: defEditor forKey: @"defaulteditor"];
-	[defaults setObject: defXterm forKey: @"defxterm"];
+  [finder updateDefaults];
+  
+  [defaults setObject: defEditor forKey: @"defaulteditor"];
+  [defaults setObject: defXterm forKey: @"defxterm"];
   if (defXtermArgs != nil) {
 	  [defaults setObject: defXtermArgs forKey: @"defaultxtermargs"];
   }
@@ -977,22 +980,24 @@ static GWorkspace *gworkspace = nil;
   NSString *bpath = [[NSBundle mainBundle] bundlePath];
   NSString *resPath = [bpath stringByAppendingPathComponent: @"Resources"];
   NSArray *languages = [NSUserDefaults userLanguages];
-  unsigned i;
+  NSUInteger i;
      
-  for (i = 0; i < [languages count]; i++) {
-    NSString *language = [languages objectAtIndex: i];
-    NSString *langDir = [NSString stringWithFormat: @"%@.lproj", language];  
-    NSString *helpPath = [langDir stringByAppendingPathComponent: @"Help"];
-  
-    helpPath = [resPath stringByAppendingPathComponent: helpPath];
-    helpPath = [helpPath stringByAppendingPathComponent: fileName];
-  
-    if ([fm fileExistsAtPath: helpPath]) {
-      NSAttributedString *help = [[NSAttributedString alloc] initWithPath: helpPath
-                                                       documentAttributes: NULL];
+  for (i = 0; i < [languages count]; i++)
+    {
+      NSString *language = [languages objectAtIndex: i];
+      NSString *langDir = [NSString stringWithFormat: @"%@.lproj", language];  
+      NSString *helpPath = [langDir stringByAppendingPathComponent: @"Help"];
+      
+      helpPath = [resPath stringByAppendingPathComponent: helpPath];
+      helpPath = [helpPath stringByAppendingPathComponent: fileName];
+      
+      if ([fm fileExistsAtPath: helpPath])
+	{
+	  NSAttributedString *help = [[NSAttributedString alloc] initWithPath: helpPath
+								 documentAttributes: NULL];
       return AUTORELEASE (help);
+	}
     }
-  }
   
   return nil;
 }
@@ -1027,7 +1032,7 @@ static GWorkspace *gworkspace = nil;
 
 - (int)defaultSortType
 {
-	return [fsnodeRep defaultSortOrder];
+  return [fsnodeRep defaultSortOrder];
 }
 
 - (void)setDefaultSortType:(int)type
@@ -1037,7 +1042,7 @@ static GWorkspace *gworkspace = nil;
 
 - (void)createTabbedShelf
 {
-	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   id entry;
   NSString *basePath;
   BOOL isdir;
