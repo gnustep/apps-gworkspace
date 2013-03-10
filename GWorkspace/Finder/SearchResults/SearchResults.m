@@ -966,29 +966,38 @@ static NSString *lsfname = @"LiveSearch.lsf";
   int dragdelay = 0;
 
   
-	if ([theEvent clickCount] == 1) {   
-    while (1) {
-	    nextEvent = [[self window] nextEventMatchingMask:
-    							              NSLeftMouseUpMask | NSLeftMouseDraggedMask];
-
-      if ([nextEvent type] == NSLeftMouseUp) {
-        [[self window] postEvent: nextEvent atStart: NO];
-        break;
-
-      } else if ([nextEvent type] == NSLeftMouseDragged) {
-	      if (dragdelay < 5) {
-          dragdelay++;
-        } else {        
-          startdnd = YES;        
-          break;
-        }
-      }
-    }
-
-    if (startdnd == YES) {  
-      [self startExternalDragOnEvent: theEvent];    
-    } 
-  }              
+  if ([theEvent clickCount] == 1)
+    {   
+      while (1)
+	{
+	  nextEvent = [[self window] nextEventMatchingMask:
+				       NSLeftMouseUpMask | NSLeftMouseDraggedMask];
+	  
+	  if ([nextEvent type] == NSLeftMouseUp)
+	    {
+	      [[self window] postEvent: nextEvent atStart: NO];
+	      break;
+	      
+	    }
+	  else if ([nextEvent type] == NSLeftMouseDragged)
+	    {
+	      if (dragdelay < 5)
+		{
+		  dragdelay++;
+		}
+	      else
+		{        
+		  startdnd = YES;        
+		  break;
+		}
+	    }
+	}
+      
+      if (startdnd == YES)
+	{  
+	[self startExternalDragOnEvent: theEvent];    
+	} 
+    }              
 }
 
 - (void)drawRect:(NSRect)rect
@@ -1024,7 +1033,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
         slideBack: YES];
 }
 
-- (unsigned int)draggingSourceOperationMaskForLocal:(BOOL)flag
+- (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)flag
 {
   return NSDragOperationAll;
 }
@@ -1035,7 +1044,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
 }
 
 - (void)draggedImage:(NSImage *)anImage 
-						 endedAt:(NSPoint)aPoint 
+	     endedAt:(NSPoint)aPoint 
            deposited:(BOOL)flag
 {
   [self setNeedsDisplay: YES];

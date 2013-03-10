@@ -177,7 +177,7 @@
 
 - (void)startExternalDragOnEvent:(NSEvent *)event;
 
-- (unsigned int)draggingSourceOperationMaskForLocal:(BOOL)flag;
+- (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)flag;
 
 - (BOOL)ignoreModifierKeysWhileDragging;
 

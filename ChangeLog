@@ -6,6 +6,10 @@
 	* GWorkspace/Finder/SearchResults/SearchResults.m
 	NSTimeInterval transition
 
+	* GWorkspace/Finder/SearchResults/SearchResults.h
+	* GWorkspace/Finder/SearchResults/SearchResults.m
+	NSDragOperation
+
 2013-03-10 Sebastian Reitenbach <sebastia@l00-bugdead-prods.de>
 	* Tools/searchtool/searchtool.m
 	  Indentation
