@@ -1,76 +1,113 @@
-﻿/* Sé que la traducción es muy mejorable */
-/* He revisado y actualizado la traducción. Quique */
+/* Se que la traduccion es muy mejorable */
+/* He revisado y actualizado la traduccion. Quique */
 
 /* ----------------------- menu strings --------------------------- *\
 /* main.m */
 
-"Info" = "Información";
-	"Info Panel..." = "Panel de información...";
-	"Preferences..." = "Preferencias...";
-	"Help..." = "Ayuda...";
+"Info" = "Informaci\U00F3n";
+        "Info Panel..." = "Panel de informaci\U00F3n...";
+        "Preferences..." = "Preferencias...";
+        "Help..." = "Ayuda...";
+        "Activate context help" = "Activar ayuda de contexto";
 
 "File" = "Fichero";
-	"Open" = "Abrir";
-	"Open as Folder" = "Abrir como carpeta";
-	"Edit File" = "Editar fichero";
-	"New Folder" = "Nueva carpeta";
-	"New File" = "Nuevo fichero";
-	"Duplicate" = "Duplicar";	
-	"Destroy" = "Destruir";
-	"Empty Recycler" = "Vaciar papelera";
+        "Open" = "Abrir";
+        "Open With..." = "Abrir con...";
+        "Open as Folder" = "Abrir como Carpeta";
+        "Edit File" = "Editar Fichero";
+        "New Folder" = "Nueva Carpeta";
+        "New File" = "Nuevo Fichero";
+        "Duplicate" = "Duplicar";        
+        "Destroy" = "Destruir";
+        "Move to Recycler" = "Mover a la Papelera";
+        "Empty Recycler" = "Vaciar Papelera";
 
 "Edit" = "Editar";
-	"Cut" = "Cortar";
-	"Copy" = "Copiar";
-	"Paste" = "Pegar";
-	"Select All" = "Seleccionar todo";
-		
+        "Cut" = "Cortar";
+        "Copy" = "Copiar";
+        "Paste" = "Pegar";
+        "Select All" = "Seleccionar todo";
+                
 "View" = "Ver";
-	"Browser" = "Ojeador";
-	"Icon" = "Iconos";
-		
+        "Browser" = "Ojeador";
+        "Icon" = "Iconos";
+        "List" = "Lista";
+        "Viewer behaviour" = "Estilo de visor";
+                "Browsing" = "Ojeador";
+                "Spatial" = "Espacial";
+        "Show" = "Mostrar";
+                "Name only" = "Solo nombre";
+                "Modification date" = "Fecha de modificaci\U00F3n";
+                "Role" = "Rol";
+        "Icon Size" = "Tama\U00F1o de icono";
+        "Icon Position" = "Posici\U00F3n del icono";
+                "Up" = "Arriba";
+                "Left" = "Izquierda";
+        "Label Size" = "Tama\U00F1o de etiqueta";
+                
 "Tools" = "Herramientas";
-	"Viewer" = "Visor";
-	"Inspectors" = "Inspectores";
-		"Show Inspectors" = "Mostrar inspectores";
-		"Attributes" = "Atributos";
-		"Contents" = "Contenidos";
-		"Tools" = "Herramientas";	
-		"Permissions" = "Permisos";	
-	"Finder" = "Buscador";
-	"Processes..." = "Procesos...";
-	"Fiend" = "Fiend";
-		"Show Fiend" = "Mostrar Fiend"; /* R// Arreglar esto  Q// En francés e italiano no lo traducen */
-		"Hide Fiend" = "Ocultar Fiend";
-		"Add Layer..." = "Añadir capa...";
-		"Remove Current Layer" = "Quitar la capa actual";
-		"Rename Current Layer" = "Renombrar la capa actual";
-		"Layers" = "Capas";
-	"DeskTop Shelf" = "DeskTop Shelf"; /* Q// En francés lo traducen como Etagère, es decir, estante */	
-	"XTerm" = "XTerm";
-	
+        "Viewer" = "Visor";
+        "Inspectors" = "Inspectores";
+                "Show Inspectors" = "Mostrar inspectores";
+                "Attributes" = "Atributos";
+                "Contents" = "Contenidos";
+                "Tools" = "Herramientas";        
+                "Annotations" = "Anotaciones";        
+        "Fiend" = "Buscador";
+        "Tabbed Shelf" = "Barra de pesta\U00F1as";
+                "Show Tabbed Shelf" = "Mostrar Barra de Pesta\U00F1as";
+                "Remove Current Tab" = "Remover pesta\U00F1a actual";
+                "Rename Current Tab" = "Renombrar pesta\U00F1a actual";
+                "Add Tab..." = "A\U00F1adir pesta\U00F1a";
+        "Run..." = "Ejecutar...";
+        "History" = "Historia";
+                "Show History" = "Mostrar Historia";
+                "Go backward" = "Ir atrar";
+                "Go forward" = "Ir adelante";
+        "Show Desktop" = "Mostrar Escritorio";
+        "Hide Recycler" = "Ocultar Papelera";
+        "Check for disks" = "Verificar discos";
+        "Processes..." = "Procesos...";
+        "Fiend" = "Fiend";
+                "Show Fiend" = "Mostrar Fiend"; /* R// Arreglar esto  Q// En frances e italiano no lo traducen */
+                "Hide Fiend" = "Ocultar Fiend";
+                "Add Layer..." = "A\U00F1adir capa...";
+                "Remove Current Layer" = "Quitar la capa actual";
+                "Rename Current Layer" = "Renombrar la capa actual";
+                "Layers" = "Capas";
+        "DeskTop Shelf" = "DeskTop Shelf"; /* Q// En frances lo traducen como Etagere, es decir, estante */        
+        "XTerm" = "XTerm";
+        
 "Windows" = "Ventanas";
-	"Arrange in Front" = "Traer al frente";
-	"Miniaturize Window" = "Miniaturizar ventana";
-	"Close Window" = "Cerrar ventana";
-	
+        "Arrange in Front" = "Traer al frente";
+        "Miniaturize Window" = "Miniaturizar Ventana";
+        "Close Window" = "Cerrar Ventana";
+        
 "Services" = "Servicios";
 
 "Hide" = "Ocultar";
 
+"Hide Others" = "Ocultar Otros";
+
+"Show All" = "Mostrar Todo";
+
+"Print..." = "Impresi\U00F3n";
+
 "Quit" = "Salir";
-	
-	
-	
+
+"Logout" = "Cerrar sesi\U00F3n";
+        
+        
+        
 /* ----------------------- File Operations strings --------------------------- *\
 
 /* GWorkspace.m */
 
-"GNUstep Workspace Manager" = "Gestor de escritorio de GNUstep";
+"GNUstep Workspace Manager" = "Gestor de Escritorio de GNUstep";
 "See http://www.gnustep.it/enrico/gworkspace" = "Vea http://www.gnustep.it/enrico/gworkspace";
-"Released under the GNU General Public License 2.0" = "Publicado bajo la Licencia Pública General GNU 2.0";
+"Released under the GNU General Public License 2.0" = "Publicado bajo la Licencia P\U00FAblica General GNU 2.0";
 "Error" = "Error";
-"You have not write permission\nfor" = "No tiene permisos de escritura\npara"; /* R// ?  ¿Cuál es el problema? */
+"You have not write permission\nfor" = "No tiene permisos de escritura\npara"; /* R// ?  Cual es el problema? */
 "Continue" = "Continuar";
 
 
@@ -86,9 +123,9 @@
 "Link" = "Enlazar";
 "Link " = "Enlazar ";
 "Delete" = "Borrar";
-"Delete the selected objects?" = "¿Borrar los objetos seleccionados?";
+"Delete the selected objects?" = "\U00BFBorrar los objetos seleccionados?";
 "Duplicate" = "Duplicar";
-"Duplicate the selected objects?" = "¿Duplicar los objetos seleccionados?";
+"Duplicate the selected objects?" = "\U00BFDuplicar los objetos seleccionados?";
 "From:" = "De:";
 "To:" = "A:";
 "In:" = "En:";
@@ -99,20 +136,20 @@
 "Linking" = "Enlazando";
 "Duplicating" = "Duplicando";
 "Destroying" = "Destruyendo";
-"File Operation Completed" = "Operación de fichero completada";
-"Backgrounder connection died!" = "La conexión con Backgrounder se ha roto"; /* R// Jarl  Q// Consultada la traducción italiana */
-"Some items have the same name;\ndo you want to substitute them?" = "Algunos elementos tienen el mismo nombre;\n¿Quiere sustituirlos?";
+"File Operation Completed" = "Operaci\U00F3n de fichero completada";
+"Backgrounder connection died!" = "La conexi\U00F3n con Backgrounder se ha roto"; /* R// Jarl  Q// Consultada la traduccion italiana */
+"Some items have the same name;\ndo you want to substitute them?" = "Algunos elementos tienen el mismo nombre;\n\U00BFQuiere sustituirlos?";
 "Error" = "Error";
-"File Operation Error!" = "¡Error en la operación de ficheros!";
+"File Operation Error!" = "\U00A1Error en la operaci\U00F3n de ficheros!";
 
 
 /* ColumnIcon.m */
 
 "You have not write permission\nfor " = "No tiene permisos de escritura\npara ";
-"The name " = "¡El nombre ";
-" is already in use!" = " ya está en uso!";
-"Cannot rename " = "No puedo renombrar ";
-"Invalid char in name" = "Carácter no válido en el nombre";
+"The name " = "\U00A1El nombre ";
+" is already in use!" = " ya est\U00E1 en uso!";
+"Cannot rename " = "No se puede renombrar ";
+"Invalid char in name" = "Car\U00E1cter no v\U00E1lido en el nombre";
 
 
 /* ----------------------- Inspectors strings --------------------------- *\
@@ -128,10 +165,10 @@
 /* AttributesPanel.m */
 
 "Attributes" = "Atributos";
-"Attributes Inspector" = "Inspector de atributos";
+"Attributes Inspector" = "Inspector de Atributos";
 "Path:" = "Ruta:";
 "Link To:" = "Enlazar a:";
-"Size:" = "Tamaño:";
+"Size:" = "Tama\U00F1o:";
 "Owner:" = "Propietario:";
 "Group:" = "Grupo:";
 "Changed" = "Cambiado";
@@ -144,31 +181,31 @@
 "Contents" = "Contenidos";
 "Contents Inspector" = "Inspector de contenidos";
 "No Contents Inspector" = "Sin inspector de contenidos";
-"No Contents Inspector\nFor Multiple Selection" = "No hay Inspector de\ncontenidos para\nselección múltiple";
+"No Contents Inspector\nFor Multiple Selection" = "No hay Inspector de\ncontenidos para\nselecci\U00F3n m\U00FAltiple";
 
 
 /* FolderViewer.m */
 
 "Sort method applies to the\ncontents of the selected folder,\nNOT to its parent folder"
-  = "El método de ordenación se\naplica al contenido de la\ncarpeta seleccionada, NO\na la carpeta superior";
+  = "El m\U00E9todo de ordenaci\U00F3n se\naplica al contenido de la\ncarpeta seleccionada, NO\na la carpeta superior";
 "Sort by" = "Ordenar por";
 "Name" = "Nombre";
 "Type" = "Clase";
 "Date" = "Fecha";
-"Size" = "Tamaño";
+"Size" = "Tama\U00F1o";
 "Owner" = "Propietario";
-"Folder Inspector" = "Inspector de Carpetas";	
+"Folder Inspector" = "Inspector de Carpetas";        
 
 
 /* ImageViewer.m */
 
-"Image Inspector" = "Inspector de imágenes";
+"Image Inspector" = "Inspector de im\U00E1genes";
 
 
 /* AppViewer.m */
 
 "Open these kinds of documents:" = "Abrir este tipo de documentos:";
-"Invalid Contents" = "Contenido no válido";
+"Invalid Contents" = "Contenido no v\U00E1lido";
 "App Inspector" = "Inspector de aplicaciones";
 
 
@@ -176,7 +213,7 @@
 
 "UNIX Permissions" = "Permisos UNIX";
 "Access Control" = "Control de acceso";
-"Also apply to files inside selection" = "Aplicar también a los ficheros de la selección";
+"Also apply to files inside selection" = "Aplicar tambi\U00E9n a los ficheros de la selecci\U00F3n";
 
 
 /* ToolsPanel.m */
@@ -184,17 +221,17 @@
 "Tools" = "Herramientas";
 "Tools Inspector" = "Inspector de herramientas";
 "No Tools Inspector" = "Sin Inspector de herramientas";
-"Set Default" = "Definir por defecto"; /* Me gusta más que Poner por omisión */
+"Set Default" = "Definir por defecto"; /* Me gusta mas que Poner por omision */
 
 
 /* AppsView.m */
-	
+        
 "Double-click to open selected document(s)" =
 "Doble clic para abrir los documentos seleccionados";
 "Default:" = "Por defecto:";
-"Path:" = "Ruta:";		
+"Path:" = "Ruta:";                
 "Click 'Set Default' to set default application\nfor all documents with this extension" 
-  ="Pulse 'Por defecto' para elegir la\naplicación predeterminada a usar para todos\nlos documentos con esta extensión";
+  ="Pulse 'Por defecto' para elegir la\naplicaci\U00F3n predeterminada a usar para todos\nlos documentos con esta extensi\U00F3n";
 
 
 /* PermsBox.m */
@@ -202,7 +239,7 @@
 "Permissions" = "Permisos";
 "Read" = "Lectura";
 "Write" = "Escritura";
-"Execute" = "Ejecución";
+"Execute" = "Ejecuci\U00F3n";
 "Owner" = "Propietario";
 "Group" = "Grupo";
 "Other" = "Otros";
@@ -230,27 +267,27 @@
 /* Finder.m */
 
 "Finder" = "Buscar";
-"Find items with names that match" = "Buscar elementos cuyo nombre case";
-"Find items with contents that match" = "Buscar elementos cuyo contenido case";
-"No selection!" = "¡Ninguna selección!";
-"No arguments!" = "¡Ningún argumento!";
+"Find items with names that match" = "Buscar elementos cuyos nombres coincidan";
+"Find items with contents that match" = "Buscar elementos cuyo contenido coincida";
+"No selection!" = "\U00A1Ninguna selecci\U00F3n!";
+"No arguments!" = "\U00A1Ning\U00FAn argumento!";
 
 
 /* ----------------------- Fiend strings --------------------------- *\
 
 /* Fiend.m */
-/* R// A ver cómo lo traducimos */
+/* R// A ver como lo traducimos */
 
 "New Layer" = "Nueva capa";
-"A layer with this name is already present!" = "¡Ya hay una capa con ese nombre!";
-"You can't remove the last layer!" = "¡No puede borrar la última capa!";
+"A layer with this name is already present!" = "\U00A1Ya hay una capa con ese nombre!";
+"You can't remove the last layer!" = "\U00A1No puede borrar la \U00FAltima capa!";
 "Remove layer" = "Quitar capa";
-"Are you sure that you want to remove this layer?" = "¿Está seguro de querer quitar esta capa?";
+"Are you sure that you want to remove this layer?" = "\U00BFEst\U00E1 seguro de querer quitar esta capa?";
 "Rename Layer" = "Renombrar capa";
-"You can't dock multiple paths!" = "¡No puede aparcar rutas múltiples!";
-"This object is already present in this layer!" = "¡Este objeto ya está en esta capa!";
-	
-			
+"You can't dock multiple paths!" = "\U00A1No puede aparcar rutas m\U00FAltiples!";
+"This object is already present in this layer!" = "\U00A1Este objeto ya est\U00E1 en esta capa!";
+        
+                        
 /* ----------------------- Preference strings --------------------------- *\
 
 /* PreferencesWin.m */
@@ -261,30 +298,30 @@
 /* BackWinPreferences.m */       
 
 /* R// Traducir shelf  Q// En principio, estante o balda */
-"DeskTop Shelf" = "Shelf de escritorio";	
+"DeskTop Shelf" = "Shelf de escritorio";        
 "DeskTop Color" = "Color de escritorio";
 "red" = "rojo";
 "green" = "verde";
 "blue" = "azul";
 "Set Color" = "Poner color";
-"Push the \"Set Image\" button\nto set your DeskTop image.\nThe image must have the same\nsize of your screen." = "Pulse el botón \"Poner imagen\" para poner su\nimagen de escritorio. La imagen debe tener el\nmismo tamño que la pantalla.";
+"Push the \"Set Image\" button\nto set your DeskTop image.\nThe image must have the same\nsize of your screen." = "Pulse el bot\U00F3n \"Poner imagen\" para poner su\nimagen de escritorio. La imagen debe tener el\nmismo tama\U00F1o que la pantalla.";
 
 "Set Image" = "Poner imagen";
 "Unset Image" = "Quitar imagen";
 
-	
+        
 /* DefaultXTerm.m */             
-	
-"Set" = "Poner";	
+        
+"Set" = "Poner";        
 
-	
+        
 /* BrowserViewsPreferences.m */  
 
 "Column Width" = "Anchura de columnas";
-"Use Default Settings" = "Usar ajustes predeterminados";	
+"Use Default Settings" = "Usar ajustes predeterminados";        
 "Browser" = "Ojeador";
-	
-	
+        
+        
 /* FileWatchingPreferences.m */  
 
 /* timeout */
@@ -292,14 +329,14 @@
 "timeout" = "timeout";
 "frequency" = "frecuencia";
 "Values will apply to the \nnew watchers from now, \nto the existing ones, after the first timeout" = 
-"Los valores se aplicarán a\nlos nuevos vigilantes desde ahora,\ny a los ya existentes a partir del primer timeout";
-	
-	
+"Los valores se aplicar\U00E1n a\nlos nuevos vigilantes desde ahora,\ny a los ya existentes a partir del primer timeout";
+        
+        
 /* ShelfPreferences.m */
-	
+        
 "Shelf" = "Shelf";
-	
-	
+        
+        
 /* DefaultEditor.m */            
 
 "Default Editor" = "Editor predeterminado";
@@ -309,17 +346,17 @@
 
 /* IconViewsPreferences.m */
 
-"Title Width" = "Anchura del título";
+"Title Width" = "Anchura del t\U00EDtulo";
 "Icon View" = "Ver por iconos";
 
 /* Recycler strings */
 "Recycle: " = "Enviar a la papelera: ";
 "Recycler: " = "Papelera: ";
 "Recycler" = "Papelera";
-"the Recycler" = "la papelera";
-"\nto the Recycler" = "\na la papelera";
-"Move from the Recycler " = "Mover de la papelera ";
+"the Recycler" = "la Papelera";
+"\nto the Recycler" = "\na la Papelera";
+"Move from the Recycler " = "Mover de la Papelera ";
 "In" = "En";
 "Empty Recycler" = "Vaciar papelera";
-"Empty the Recycler?" = "¿Vaciar la papelera?";
+"Empty the Recycler?" = "\U00BFVaciar la Papelera?";
 "Put Away" = "Tirar";
