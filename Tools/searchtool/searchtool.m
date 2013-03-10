@@ -89,7 +89,7 @@
 - (void)dealloc
 {
   [nc removeObserver: self];
-	DESTROY (finder);
+  DESTROY (finder);
   DESTROY (ddbd);
   [super dealloc];
 }
@@ -109,7 +109,7 @@
     
     if (conn == nil) {
       NSLog(@"failed to contact Finder - bye.");
-	    exit(1);           
+      exit(1);           
     } 
 
     [nc addObserver: self
@@ -136,8 +136,8 @@
   id conn = [notification object];
 
   [nc removeObserver: self
-	              name: NSConnectionDidDieNotification
-	            object: conn];
+		name: NSConnectionDidDieNotification
+  	      object: conn];
 
   if (done == NO) {
     NSLog(@"finder connection has been destroyed.");
@@ -184,7 +184,7 @@
     NSBundle *bundle = [NSBundle bundleWithPath: bpath];
      
     if (bundle) {
-			Class principalClass = [bundle principalClass];
+      Class principalClass = [bundle principalClass];
       NSString *className = NSStringFromClass(principalClass);
 
       if ([classNames containsObject: className]) {
@@ -301,7 +301,7 @@
 }
 
 - (NSArray *)bundlesWithExtension:(NSString *)extension 
-													 inPath:(NSString *)path
+			   inPath:(NSString *)path
 {
   NSMutableArray *bundleList = [NSMutableArray array];
   NSEnumerator *enumerator;
@@ -309,14 +309,14 @@
   BOOL isDir;
   
   if ((([fm fileExistsAtPath: path isDirectory: &isDir]) && isDir) == NO) {
-		return nil;
+    return nil;
   }
 	  
   enumerator = [[fm directoryContentsAtPath: path] objectEnumerator];
   while ((dir = [enumerator nextObject])) {
     if ([[dir pathExtension] isEqualToString: extension]) {
-			[bundleList addObject: [path stringByAppendingPathComponent: dir]];
-		}
+      [bundleList addObject: [path stringByAppendingPathComponent: dir]];
+    }
   }
   
   return bundleList;
@@ -334,7 +334,7 @@
                                                              host: @""];
 
     if (ddbd == nil) {
-	    NSString *cmd;
+      NSString *cmd;
       int i;
     
       cmd = [NSTask launchPathForTool: @"ddbd"];    
@@ -343,7 +343,7 @@
    
       for (i = 0; i < 40; i++) {
         [[NSRunLoop currentRunLoop] runUntilDate:
-		                       [NSDate dateWithTimeIntervalSinceNow: 0.1]];
+            [NSDate dateWithTimeIntervalSinceNow: 0.1]];
 
         ddbd = [NSConnection rootProxyForConnectionWithRegisteredName: @"ddbd" 
                                                                  host: @""];                  
@@ -357,10 +357,10 @@
       RETAIN (ddbd);
       [ddbd setProtocolForProxy: @protocol(DDBd)];
     
-	    [[NSNotificationCenter defaultCenter] addObserver: self
-	                   selector: @selector(ddbdConnectionDidDie:)
-		                     name: NSConnectionDidDieNotification
-		                   object: [ddbd connectionForProxy]];
+      [[NSNotificationCenter defaultCenter] addObserver: self
+					       selector: @selector(ddbdConnectionDidDie:)
+		                     		   name: NSConnectionDidDieNotification
+		                   		 object: [ddbd connectionForProxy]];
                        
     } else {
       NSLog(@"unable to contact ddbd.");
@@ -373,11 +373,11 @@
   id connection = [notif object];
 
   [nc removeObserver: self
-	              name: NSConnectionDidDieNotification
-	            object: connection];
+		name: NSConnectionDidDieNotification
+	      object: connection];
 
   NSAssert(connection == [ddbd connectionForProxy],
-		                                  NSInternalInconsistencyException);
+		NSInternalInconsistencyException);
   RELEASE (ddbd);
   ddbd = nil;
 }
@@ -412,7 +412,4 @@ int main(int argc, char** argv)
   RELEASE (pool);  
   exit(0);
 }
-
-
-
 
