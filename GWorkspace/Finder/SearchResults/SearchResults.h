@@ -1,6 +1,6 @@
 /* SearchResults.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -25,8 +25,8 @@
 #ifndef SEARCH_RESULTS_H
 #define SEARCH_RESULTS_H
 
-#include <Foundation/Foundation.h>
-#include "FSNodeRep.h"
+#import <Foundation/Foundation.h>
+#import "FSNodeRep.h"
 
 @class Finder;
 @class NSWindow;
@@ -149,13 +149,13 @@
 {
   NSMutableArray *images;
   int index;
-  float rfsh;
+  NSTimeInterval rfsh;
   NSTimer *progTimer;
   BOOL animating;
 }
 
 - (id)initWithFrame:(NSRect)frameRect 
-    refreshInterval:(float)refresh;
+    refreshInterval:(NSTimeInterval)refresh;
 
 - (void)start;
 

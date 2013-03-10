@@ -1,3 +1,11 @@
+2013-03-10 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/Finder/LiveSearch/LSFolder.h
+	* GWorkspace/Finder/LiveSearch/LSFolder.m
+	* GWorkspace/Finder/SearchResults/SearchResults.h
+	* GWorkspace/Finder/SearchResults/SearchResults.m
+	NSTimeInterval transition
+
 2013-03-10 Sebastian Reitenbach <sebastia@l00-bugdead-prods.de>
 	* Tools/searchtool/searchtool.m
 	  Indentation

@@ -1,6 +1,6 @@
 /* LSFolder.m
  *  
- * Copyright (C) 2004-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: October 2004
@@ -82,7 +82,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
            withNode:(FSNode *)anode
       needsIndexing:(BOOL)index
 {
-	self = [super init];
+  self = [super init];
 
   if (self) {
     NSDictionary *dict = nil;
@@ -267,11 +267,11 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   waitingUpdater = YES;  
 
   [NSTimer scheduledTimerWithTimeInterval: 5.0 
-						                       target: self
-                                 selector: @selector(checkUpdater:) 
-																 userInfo: nil 
-                                  repeats: NO];
-
+	   target: self
+	   selector: @selector(checkUpdater:) 
+	   userInfo: nil 
+	   repeats: NO];
+  
   cmd = [NSTask launchPathForTool: @"lsfupdater"];
 
   [NSTask launchedTaskWithLaunchPath: cmd 
@@ -397,9 +397,10 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 }
          
 - (BOOL)connection:(NSConnection*)ancestor 
-								shouldMakeNewConnection:(NSConnection*)newConn
+shouldMakeNewConnection:(NSConnection*)newConn
 {
-	if (ancestor == conn) {
+  if (ancestor == conn)
+    {
     ASSIGN (updaterconn, newConn);
     [updaterconn setDelegate: self];
 
@@ -414,7 +415,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 
 - (void)connectionDidDie:(NSNotification *)notification
 {
-	id diedconn = [notification object];
+  id diedconn = [notification object];
 
   [nc removeObserver: self
 	              name: NSConnectionDidDieNotification 
@@ -1102,7 +1103,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 }
 
 - (id)initWithFrame:(NSRect)frameRect 
-    refreshInterval:(float)refresh
+    refreshInterval:(NSTimeInterval)refresh
 {
   self = [super initWithFrame: frameRect];
 
@@ -1128,8 +1129,8 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   index = 0;
   animating = YES;
   progTimer = [NSTimer scheduledTimerWithTimeInterval: rfsh 
-						            target: self selector: @selector(animate:) 
-																					userInfo: nil repeats: YES];
+		       target: self selector: @selector(animate:) 
+		       userInfo: nil repeats: YES];
 }
 
 - (void)stop

@@ -1,6 +1,6 @@
 /* LSFolder.h
  *  
- * Copyright (C) 2004-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: October 2004
@@ -189,13 +189,13 @@
 {
   NSMutableArray *images;
   unsigned index;
-  float rfsh;
+  NSTimeInterval rfsh;
   NSTimer *progTimer;
   BOOL animating;
 }
 
 - (id)initWithFrame:(NSRect)frameRect 
-    refreshInterval:(float)refresh;
+    refreshInterval:(NSTimeInterval)refresh;
 
 - (void)start;
 
