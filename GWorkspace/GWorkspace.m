@@ -200,7 +200,7 @@ static GWorkspace *gworkspace = nil;
   [menu addItemWithTitle:_(@"Browser") action:@selector(setViewerType:) keyEquivalent:@"b"];
   [menu addItemWithTitle:_(@"Icon") action:@selector(setViewerType:) keyEquivalent:@"i"];
   [menu addItemWithTitle:_(@"List") action:@selector(setViewerType:) keyEquivalent:@"l"];
-  menuItem = addItemToMenu(menu, @"Viewer behaviour", @"", nil, @"");
+  menuItem = [menu addItemWithTitle:_(@"Viewer behaviour") action:NULL keyEquivalent:@""];
   subMenu = AUTORELEASE ([NSMenu new]);
   [menu setSubmenu: subMenu forItem: menuItem];
   [subMenu addItemWithTitle:_(@"Browsing") action:@selector(setViewerBehaviour:) keyEquivalent:@"B"];
@@ -253,13 +253,13 @@ static GWorkspace *gworkspace = nil;
   menuItem = [menu addItemWithTitle:_(@"Inspectors") action:NULL keyEquivalent:@""];
   subMenu = AUTORELEASE ([NSMenu new]);
   [menu setSubmenu: subMenu forItem: menuItem];	
-  addItemToMenu(subMenu, @"Show Inspectors", @"", nil, @"");
-  addItemToMenu(subMenu, @"Attributes", @"", @"showAttributesInspector:", @"1");
-  addItemToMenu(subMenu, @"Contents", @"", @"showContentsInspector:", @"2");
-  addItemToMenu(subMenu, @"Tools", @"", @"showToolsInspector:", @"3");
-  addItemToMenu(subMenu, @"Annotations", @"", @"showAnnotationsInspector:", @"4");
+  [subMenu addItemWithTitle:_(@"Show Inspectors") action:NULL keyEquivalent:@""];
+  [subMenu addItemWithTitle:_(@"Attributes") action:@selector(showAttributesInspector:) keyEquivalent:@"1"];
+  [subMenu addItemWithTitle:_(@"Contents") action:@selector(showContentsInspector:) keyEquivalent:@"2"];
+  [subMenu addItemWithTitle:_(@"Tools") action:@selector(showToolsInspector:) keyEquivalent:@"3"];
+  [subMenu addItemWithTitle:_(@"Annotations") action:@selector(showAnnotationsInspector:) keyEquivalent:@"4"];
 
-  addItemToMenu(menu, @"Finder", @"", @"showFinder:", @"f");
+  [menu addItemWithTitle:_(@"Finder") action:@selector(showFinder:) keyEquivalent:@"f"];
 
   menuItem = [menu addItemWithTitle:_(@"Fiend") action:NULL keyEquivalent:@""];
   subMenu = AUTORELEASE ([NSMenu new]);
