@@ -1,3 +1,8 @@
+2013-03-13 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/GWorkspace.m
+	Replace addItemToMenu() with standard addItemWithTitle
+
 2013-03-12 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/FileViewer/GWViewerIconsPath.h
