@@ -589,75 +589,87 @@ static inline BOOL isDotFile(NSString *path)
   NSString *path = [info objectForKey: @"path"];
   NSString *event = [info objectForKey: @"event"];
   NSData *data = [NSArchiver archivedDataWithRootObject: info];
-  int i;
+  NSUInteger i;
 
-  for (i = 0; i < [clientsInfo count]; i++) {
-    FSWClientInfo *clinfo = [clientsInfo objectAtIndex: i];
+  for (i = 0; i < [clientsInfo count]; i++)
+    {
+      FSWClientInfo *clinfo = [clientsInfo objectAtIndex: i];
   
-		if ([clinfo isWatchingPath: path]) {
-			[[clinfo client] watchedPathDidChange: data];
-		}
-  }
+      if ([clinfo isWatchingPath: path])
+	{
+	  [[clinfo client] watchedPathDidChange: data];
+	}
+    }
   
   if ([event isEqual: @"GWWatchedPathDeleted"] 
-                                && [self isGlobalValidPath: path]) {
-    GWDebugLog(@"DELETE %@", path);
-    [self notifyGlobalWatchingClients: info];
+      && [self isGlobalValidPath: path])
+    {
+      GWDebugLog(@"DELETE %@", path);
+      [self notifyGlobalWatchingClients: info];
     
-  } else if ([event isEqual: @"GWWatchedFileModified"] 
-                                      && [self isGlobalValidPath: path]) {
-    GWDebugLog(@"MODIFIED %@", path);
-    [self notifyGlobalWatchingClients: info];    
+    }
+  else if ([event isEqual: @"GWWatchedFileModified"] 
+	   && [self isGlobalValidPath: path])
+    {
+      GWDebugLog(@"MODIFIED %@", path);
+      [self notifyGlobalWatchingClients: info];    
     
-  } else if ([event isEqual: @"GWFileDeletedInWatchedDirectory"]) {
-    NSArray *files = [info objectForKey: @"files"];
+    } 
+  else if ([event isEqual: @"GWFileDeletedInWatchedDirectory"])
+    {
+      NSArray *files = [info objectForKey: @"files"];
     
-    for (i = 0; i < [files count]; i++) {
-      NSString *fname = [files objectAtIndex: i];
-      NSString *fullpath = [path stringByAppendingPathComponent: fname];
+      for (i = 0; i < [files count]; i++)
+	{
+	  NSString *fname = [files objectAtIndex: i];
+	  NSString *fullpath = [path stringByAppendingPathComponent: fname];
       
-      if ([self isGlobalValidPath: fullpath]) {
-        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-        
-        [dict setObject: fullpath forKey: @"path"];
-        [dict setObject: @"GWWatchedPathDeleted" forKey: @"event"];
+	  if ([self isGlobalValidPath: fullpath])
+	    {
+	      NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+	      
+	      [dict setObject: fullpath forKey: @"path"];
+	      [dict setObject: @"GWWatchedPathDeleted" forKey: @"event"];
       
-        [self notifyGlobalWatchingClients: dict];
-      }      
-    }  
+	      [self notifyGlobalWatchingClients: dict];
+	    }      
+	}  
   
-  } else if ([event isEqual: @"GWFileCreatedInWatchedDirectory"]) {
-    NSArray *files = [info objectForKey: @"files"];
-    
-    for (i = 0; i < [files count]; i++) {
-      NSString *fname = [files objectAtIndex: i];
-      NSString *fullpath = [path stringByAppendingPathComponent: fname];
-      
-      if ([self isGlobalValidPath: fullpath]) {
-        NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-        
-        [dict setObject: fullpath forKey: @"path"];
-        [dict setObject: @"GWFileCreatedInWatchedDirectory" forKey: @"event"];
-      
-        [self notifyGlobalWatchingClients: dict];
-      }      
-    }      
   }
+  else if ([event isEqual: @"GWFileCreatedInWatchedDirectory"])
+    {
+      NSArray *files = [info objectForKey: @"files"];
+      
+      for (i = 0; i < [files count]; i++)
+	{
+	  NSString *fname = [files objectAtIndex: i];
+	  NSString *fullpath = [path stringByAppendingPathComponent: fname];
+	  
+	  if ([self isGlobalValidPath: fullpath]) {
+	    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+	    
+	    [dict setObject: fullpath forKey: @"path"];
+	    [dict setObject: @"GWFileCreatedInWatchedDirectory" forKey: @"event"];
+	    
+	    [self notifyGlobalWatchingClients: dict];
+	  }      
+	}      
+    }
   
   RELEASE (pool);  
 }
 
 - (void)notifyGlobalWatchingClients:(NSDictionary *)info
 {
-  int i;
+  NSUInteger i;
 
-  for (i = 0; i < [clientsInfo count]; i++) {
-    FSWClientInfo *clinfo = [clientsInfo objectAtIndex: i];
-
-    if ([clinfo isGlobal]) {
-      [[clinfo client] globalWatchedPathDidChange: info];
+  for (i = 0; i < [clientsInfo count]; i++)
+    {
+      FSWClientInfo *clinfo = [clientsInfo objectAtIndex: i];
+      
+      if ([clinfo isGlobal])
+	[[clinfo client] globalWatchedPathDidChange: info];
     }
-  }
 }
 
 @end
@@ -667,9 +679,9 @@ static inline BOOL isDotFile(NSString *path)
 
 - (void)dealloc
 { 
-	if (timer && [timer isValid]) {
-		[timer invalidate];
-	}
+  if (timer && [timer isValid])
+    [timer invalidate];
+ 
   RELEASE (watchedPath);  
   RELEASE (pathContents);
   RELEASE (date);  
@@ -681,9 +693,10 @@ static inline BOOL isDotFile(NSString *path)
 {
   self = [super init];
   
-  if (self) { 
-		NSDictionary *attributes;
-		NSString *type;
+  if (self)
+    { 
+      NSDictionary *attributes;
+      NSString *type;
     		
     ASSIGN (watchedPath, path);    
 		fm = [NSFileManager defaultManager];	
@@ -719,12 +732,13 @@ static inline BOOL isDotFile(NSString *path)
   NSDate *moddate;
   NSMutableDictionary *notifdict;
 
-	if (isOld) {
-    RELEASE (pool);  
-		return;
-	}
+  if (isOld)
+    {
+      RELEASE (pool);  
+      return;
+    }
 	
-	attributes = [fm fileAttributesAtPath: watchedPath traverseLink: YES];
+  attributes = [fm fileAttributesAtPath: watchedPath traverseLink: YES];
 
   if (attributes == nil) {
     notifdict = [NSMutableDictionary dictionary];
