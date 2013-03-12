@@ -153,8 +153,8 @@
   NSArray *pathContents;
   int listeners;
   NSDate *date;
-	BOOL isOld;
-	NSFileManager *fm;
+  BOOL isOld;
+  NSFileManager *fm;
   FSWatcher *fswatcher;
   NSTimer *timer;
 }
@@ -168,7 +168,7 @@
 
 - (void)removeListener;
 
-- (BOOL)isWathcingPath:(NSString *)apath;
+- (BOOL)isWatchingPath:(NSString *)apath;
 
 - (NSString *)watchedPath;
 

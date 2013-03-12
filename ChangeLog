@@ -1,5 +1,11 @@
 2013-03-12 Riccardo Mottola <rm@gnu.org>
 
+	* Tools/fswatcher/fswatcher.h
+	* Tools/fswatcher/fswatcher.m
+	Fix typo.
+
+2013-03-12 Riccardo Mottola <rm@gnu.org>
+
 	* FSNode/FSNBrowser.h
 	Fix warning about missing protocol
 

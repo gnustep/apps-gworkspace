@@ -87,7 +87,7 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
   [wpaths removeObject: path];
 }
 
-- (BOOL)isWathchingPath:(NSString *)path
+- (BOOL)isWatchingPath:(NSString *)path
 {
   return [wpaths containsObject: path];
 }
@@ -594,7 +594,7 @@ static inline BOOL isDotFile(NSString *path)
   for (i = 0; i < [clientsInfo count]; i++) {
     FSWClientInfo *clinfo = [clientsInfo objectAtIndex: i];
   
-		if ([clinfo isWathchingPath: path]) {
+		if ([clinfo isWatchingPath: path]) {
 			[[clinfo client] watchedPathDidChange: data];
 		}
   }
