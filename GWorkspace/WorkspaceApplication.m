@@ -139,11 +139,12 @@
 - (NSArray *)launchedApplications
 {
   NSMutableArray *launched = [NSMutableArray array];
-  unsigned i;
+  NSUInteger i;
   
-  for (i = 0; i < [launchedApps count]; i++) {
-    [launched addObject: [[launchedApps objectAtIndex: i] appInfo]];
-  }
+  for (i = 0; i < [launchedApps count]; i++)
+    {
+      [launched addObject: [[launchedApps objectAtIndex: i] appInfo]];
+    }
 
   return [launched makeImmutableCopyOnFail: NO];
 }
@@ -354,7 +355,7 @@
 
 - (void)initializeWorkspace
 {
-	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
   autoLogoutDelay = [defaults integerForKey: @"GSAutoLogoutDelay"];
   
@@ -563,7 +564,7 @@
   GWLaunchedApp *app = [self launchedAppWithPath: path andName: name];
 
   if (app) {
-    unsigned i;
+    NSUInteger i;
     
     for (i = 0; i < [launchedApps count]; i++) {
       GWLaunchedApp *a = [launchedApps objectAtIndex: i];
@@ -674,17 +675,20 @@
 - (GWLaunchedApp *)launchedAppWithPath:(NSString *)path
                                andName:(NSString *)name
 {
-  if ((path != nil) && (name != nil)) {
-    unsigned i;
+  if ((path != nil) && (name != nil))
+    {
+      NSUInteger i;
 
-    for (i = 0; i < [launchedApps count]; i++) {
-      GWLaunchedApp *app = [launchedApps objectAtIndex: i];
+      for (i = 0; i < [launchedApps count]; i++)
+        {
+          GWLaunchedApp *app = [launchedApps objectAtIndex: i];
 
-      if (([[app path] isEqual: path]) && ([[app name] isEqual: name])) {
-        return app;
-      }
+          if (([[app path] isEqual: path]) && ([[app name] isEqual: name]))
+            {
+              return app;
+            }
+        }
     }
-  }
     
   return nil;
 }
@@ -750,22 +754,24 @@
   NSDictionary *oldapps = nil;
   NSMutableDictionary *newapps = nil;
   BOOL modified = NO;
-  unsigned i;
+  NSUInteger i;
     
-  if ([storedAppinfoLock tryLock] == NO) {
-    unsigned sleeps = 0;
+  if ([storedAppinfoLock tryLock] == NO)
+    {
+      unsigned sleeps = 0;
 
-    if ([[storedAppinfoLock lockDate] timeIntervalSinceNow] < -20.0) {
-	    NS_DURING
-	      {
-	    [storedAppinfoLock breakLock];
-	      }
-	    NS_HANDLER
-	      {
-      NSLog(@"Unable to break lock %@ ... %@", storedAppinfoLock, localException);
-	      }
-	    NS_ENDHANDLER
-    }
+      if ([[storedAppinfoLock lockDate] timeIntervalSinceNow] < -20.0)
+        {
+          NS_DURING
+            {
+              [storedAppinfoLock breakLock];
+            }
+          NS_HANDLER
+            {
+              NSLog(@"Unable to break lock %@ ... %@", storedAppinfoLock, localException);
+            }
+          NS_ENDHANDLER
+            }
     
     for (sleeps = 0; sleeps < 10; sleeps++) {
 	    if ([storedAppinfoLock tryLock] == YES) {
@@ -800,31 +806,37 @@
     newapps = [oldapps mutableCopy];
   }
   
-  for (i = 0; i < [apps count]; i++) {
-    GWLaunchedApp *app = [apps objectAtIndex: i];
-    NSString *appname = [app name];
-    NSDictionary *oldInfo = [newapps objectForKey: appname];
+  for (i = 0; i < [apps count]; i++)
+    {
+      GWLaunchedApp *app = [apps objectAtIndex: i];
+      NSString *appname = [app name];
+      NSDictionary *oldInfo = [newapps objectForKey: appname];
 
-    if ([app isRunning] == NO) {
-      if (oldInfo != nil) {
-        [newapps removeObjectForKey: appname];
+      if ([app isRunning] == NO)
+        {
+          if (oldInfo != nil)
+            {
+              [newapps removeObjectForKey: appname];
 	      modified = YES;
 	    }
 
-    } else {
-      NSDictionary *info = [app appInfo];
+        }
+      else
+        {
+          NSDictionary *info = [app appInfo];
 
-      if ([info isEqual: oldInfo] == NO) {
-        [newapps setObject: info forKey: appname];
-	      modified = YES;
-      }
+          if ([info isEqual: oldInfo] == NO) {
+            [newapps setObject: info forKey: appname];
+            modified = YES;
+          }
+        }
     }
-  }
   
-  if (modified) {
-    [runningInfo setObject: newapps forKey: @"GSLaunched"];
-    [runningInfo writeToFile: storedAppinfoPath atomically: YES];
-  }
+  if (modified)
+    {
+      [runningInfo setObject: newapps forKey: @"GSLaunched"];
+      [runningInfo writeToFile: storedAppinfoPath atomically: YES];
+    }
 
   RELEASE (newapps);  
   [storedAppinfoLock unlock];
@@ -835,43 +847,51 @@
 {
   NSArray *oldrunning = [self storedAppInfo];
 
-  if (oldrunning && [oldrunning count]) {
-    NSMutableArray *toremove = [NSMutableArray array];
-    unsigned i;
+  if (oldrunning && [oldrunning count])
+    {
+      NSMutableArray *toremove = [NSMutableArray array];
+      NSUInteger i;
     
-    for (i = 0; i < [oldrunning count]; i++) {
-      NSDictionary *dict = [oldrunning objectAtIndex: i];
-      NSString *name = [dict objectForKey: @"NSApplicationName"];
-      NSString *path = [dict objectForKey: @"NSApplicationPath"];
-      NSNumber *ident = [dict objectForKey: @"NSApplicationProcessIdentifier"];
+      for (i = 0; i < [oldrunning count]; i++)
+        {
+          NSDictionary *dict = [oldrunning objectAtIndex: i];
+          NSString *name = [dict objectForKey: @"NSApplicationName"];
+          NSString *path = [dict objectForKey: @"NSApplicationPath"];
+          NSNumber *ident = [dict objectForKey: @"NSApplicationProcessIdentifier"];
     
-      if (name && path && ident) {
-        GWLaunchedApp *app = [GWLaunchedApp appWithApplicationPath: path
-                                                   applicationName: name
-                                                 processIdentifier: ident
-                                                      checkRunning: YES];
+          if (name && path && ident)
+            {
+              GWLaunchedApp *app = [GWLaunchedApp appWithApplicationPath: path
+                                                         applicationName: name
+                                                       processIdentifier: ident
+                                                            checkRunning: YES];
         
-        if ((app != nil) && [app isRunning]) {
-          BOOL hidden = [app isApplicationHidden];
+              if ((app != nil) && [app isRunning])
+                {
+                  BOOL hidden = [app isApplicationHidden];
           
-          [launchedApps addObject: app];
-          [app setHidden: hidden];
-          [[dtopManager dock] appDidLaunch: path appName: name];
+                  [launchedApps addObject: app];
+                  [app setHidden: hidden];
+                  [[dtopManager dock] appDidLaunch: path appName: name];
           
-          if (hidden) {
-            [[dtopManager dock] appDidHide: name];
-          }
+                  if (hidden)
+                    {
+                      [[dtopManager dock] appDidHide: name];
+                    }
           
-        } else if (app != nil) {
-          [toremove addObject: app];
+                }
+              else if (app != nil)
+                {
+                  [toremove addObject: app];
+                }
+            }
         }
-      }
-    }
     
-    if ([toremove count]) {
-      [self updateStoredAppInfoWithLaunchedApps: toremove];
+      if ([toremove count])
+        {
+          [self updateStoredAppInfoWithLaunchedApps: toremove];
+        }
     }
-  }
 }
 
 - (void)startLogout
@@ -947,53 +967,57 @@
 {
   BOOL canterminate = YES;
 
-  if ([launchedApps count] > 1) {
-    NSMutableArray *launched = [NSMutableArray array];
-    GWLaunchedApp *gwapp = [self launchedAppWithPath: gwBundlePath andName: gwProcessName];
-    NSMutableString *appNames = [NSMutableString string];
-    NSString *msg = nil;
-    unsigned count;
-    unsigned i;
+  if ([launchedApps count] > 1)
+    {
+      NSMutableArray *launched = [NSMutableArray array];
+      GWLaunchedApp *gwapp = [self launchedAppWithPath: gwBundlePath andName: gwProcessName];
+      NSMutableString *appNames = [NSMutableString string];
+      NSString *msg = nil;
+      NSUInteger count;
+      NSUInteger i;
 
-    [launched addObjectsFromArray: launchedApps];
-    [launched removeObject: gwapp];
+      [launched addObjectsFromArray: launchedApps];
+      [launched removeObject: gwapp];
     
-    count = [launched count];
+      count = [launched count];
     
-    for (i = 0; i < count; i++) {
-      GWLaunchedApp *app = [launched objectAtIndex: i];
+      for (i = 0; i < count; i++)
+        {
+          GWLaunchedApp *app = [launched objectAtIndex: i];
       
-      [appNames appendString: [app name]];
+          [appNames appendString: [app name]];
 
-      if (i < (count - 1)) {
-        [appNames appendString: @", "];
-      }
-    }
+          if (i < (count - 1))
+            [appNames appendString: @", "];
+        }
     
-    msg = [NSString stringWithFormat: @"%@\n%@\n%@",
-                          NSLocalizedString(@"The following applications:", @""),
-                          appNames, 
-                          NSLocalizedString(@"refuse to terminate.", @"")];    
+      msg = [NSString stringWithFormat: @"%@\n%@\n%@",
+                      NSLocalizedString(@"The following applications:", @""),
+                      appNames, 
+                      NSLocalizedString(@"refuse to terminate.", @"")];    
 
-    if (NSRunAlertPanel(NSLocalizedString(@"Logout", @""),
-                            msg,
-                            NSLocalizedString(@"Kill applications", @""),
-                            NSLocalizedString(@"Cancel logout", @""),
-                            nil)) {
-      for (i = 0; i < [launched count]; i++) {
-        [[launched objectAtIndex: i] terminateTask];      
-      }    
+      if (NSRunAlertPanel(NSLocalizedString(@"Logout", @""),
+                          msg,
+                          NSLocalizedString(@"Kill applications", @""),
+                          NSLocalizedString(@"Cancel logout", @""),
+                          nil))
+        {
+          for (i = 0; i < [launched count]; i++)
+            {
+              [[launched objectAtIndex: i] terminateTask];      
+            }    
       
-    } else {
-      canterminate = NO;
+        }
+      else
+        {
+          canterminate = NO;
+        }
     }
-  }
   
-  if (canterminate) {  
+  if (canterminate)
     [NSApp terminate: self];
-  } else {
+  else
     loggingout = NO;
-  }
 }
 
 @end
@@ -1169,13 +1193,13 @@
 {
   NS_DURING
     {
-  [application activateIgnoringOtherApps: YES];
+      [application activateIgnoringOtherApps: YES];
     }
   NS_HANDLER
     {
-  NSLog(@"Unable to activate %@", name);
-  NSLog(@"GWorkspace caught exception %@: %@", 
-	        [localException name], [localException reason]);
+      NSLog(@"Unable to activate %@", name);
+      NSLog(@"GWorkspace caught exception %@: %@", 
+            [localException name], [localException reason]);
     }
   NS_ENDHANDLER
 }    
@@ -1194,13 +1218,13 @@
 {
   NS_DURING
     {
-  [application hide: nil];
+      [application hide: nil];
     }
   NS_HANDLER
     {
-  NSLog(@"Unable to hide %@", name);
-  NSLog(@"GWorkspace caught exception %@: %@", 
-	        [localException name], [localException reason]);
+      NSLog(@"Unable to hide %@", name);
+      NSLog(@"GWorkspace caught exception %@: %@", 
+            [localException name], [localException reason]);
     }
   NS_ENDHANDLER
 }    

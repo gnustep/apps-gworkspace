@@ -1,5 +1,10 @@
 2013-03-12 Riccardo Mottola <rm@gnu.org>
 
+	* GWorkspace/WorkspaceApplication.m
+	NSUInteger transition and cleanups.
+
+2013-03-12 Riccardo Mottola <rm@gnu.org>
+
 	* GWorkspace/WorkspaceApplication.m (startLogout)
 	Add logout timer to the Modal loop.
 
