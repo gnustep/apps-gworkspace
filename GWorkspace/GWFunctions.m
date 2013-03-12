@@ -1,6 +1,6 @@
 /* GWFunctions.m
  *  
- * Copyright (C) 2003-2011 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -300,12 +300,3 @@ NSRect rectForWindow(NSArray *otherwins, NSRect proposedRect, BOOL checkKey)
   
   return NSIntegralRect(wr);
 }
-
-NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str, 
-																NSString *comm, NSString *sel, NSString *key)
-{
-	NSMenuItem *item = [menu addItemWithTitle: NSLocalizedString(str, comm)
-												action: NSSelectorFromString(sel) keyEquivalent: key]; 
-	return item;
-}
-

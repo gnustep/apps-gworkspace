@@ -1,6 +1,6 @@
 /* GWFunctions.h
  *  
- * Copyright (C) 2003 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -55,22 +55,6 @@ if (release) RELEASE (label); \
 }
 #endif
 
-#ifndef MAKE_LOCALIZED_LABEL
-#define MAKE_LOCALIZED_LABEL(label, rect, str, comm, align, release, view) { \
-label = [[NSTextField alloc] initWithFrame: rect];	\
-[label setFont: [NSFont systemFontOfSize: 12]]; \
-if (align == 'c') [label setAlignment: NSCenterTextAlignment]; \
-else if (align == 'r') [label setAlignment: NSRightTextAlignment]; \
-else [label setAlignment: NSLeftTextAlignment]; \
-[label setBackgroundColor: [NSColor windowBackgroundColor]]; \
-[label setBezeled: NO]; \
-[label setEditable: NO]; \
-[label setSelectable: NO]; \
-if (str) [label setStringValue: NSLocalizedString(str, comm)]; \
-[view addSubview: label]; \
-if (release) RELEASE (label); \
-}
-#endif
 
 #ifndef STROKE_LINE
 #define STROKE_LINE(c, x1, y1, x2, y2) { \
@@ -106,8 +90,5 @@ NSString *commonPrefixInArray(NSArray *a);
 NSString *fileSizeDescription(unsigned long long size);
 
 NSRect rectForWindow(NSArray *otherwins, NSRect proposedRect, BOOL checkKey);
-
-NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str, 
-														NSString *comm, NSString *sel, NSString *key);
 
 #endif

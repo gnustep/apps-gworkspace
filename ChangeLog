@@ -1,5 +1,11 @@
 2013-03-13 Riccardo Mottola <rm@gnu.org>
 
+	* GWorkspace/GWFunctions.[h,m]
+	Remove addItemToMenu and MAKE_LOCALIZED_LABEL since they make using
+	make_strings impossible.
+
+2013-03-13 Riccardo Mottola <rm@gnu.org>
+
 	* GWorkspace/GWorkspace.m
 	Replace addItemToMenu() with standard addItemWithTitle
 
