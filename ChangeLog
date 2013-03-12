@@ -1,5 +1,10 @@
 2013-03-12 Riccardo Mottola <rm@gnu.org>
 
+	* FSNode/FSNBrowser.h
+	Fix warning about missing protocol
+
+2013-03-12 Riccardo Mottola <rm@gnu.org>
+
 	* GWorkspace/WorkspaceApplication.m
 	NSUInteger transition and cleanups.
 

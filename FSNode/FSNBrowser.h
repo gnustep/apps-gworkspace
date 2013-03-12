@@ -1,6 +1,6 @@
 /* FSNBrowser.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2004
@@ -25,16 +25,16 @@
 #ifndef FSN_BROWSER_H
 #define FSN_BROWSER_H
 
-#include <Foundation/Foundation.h>
-#include <AppKit/NSView.h>
-#include "FSNodeRep.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/NSView.h>
+#import "FSNodeRep.h"
 
 @class FSNBrowserColumn;
 @class FSNBrowserCell;
 @class FSNCellNameEditor;
 @class NSScroller;
 
-@interface FSNBrowser : NSView 
+@interface FSNBrowser : NSView <NSTextFieldDelegate>
 {
   FSNode *baseNode;
   FSNInfoType infoType;
@@ -52,13 +52,13 @@
   BOOL cellsIcon;
   BOOL selColumn;
   
-	BOOL isLoaded;
+  BOOL isLoaded;
     
-	int visibleColumns;
+  int visibleColumns;
   int lastColumnLoaded;
   int firstVisibleColumn;
   int lastVisibleColumn;	
-	int currentshift;
+  int currentshift;
 
   NSSize columnSize;
   NSInteger fontSize;
@@ -67,7 +67,7 @@
   float mousePointY;
   
   NSString *charBuffer;	
-	NSTimeInterval lastKeyPressed;
+  NSTimeInterval lastKeyPressed;
   int alphaNumericalLastColumn;
 
   NSColor *backColor;
