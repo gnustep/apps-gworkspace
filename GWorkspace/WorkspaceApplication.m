@@ -1,6 +1,6 @@
 /* WorkspaceApplication.m
  *  
- * Copyright (C) 2006-2011 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2006
@@ -878,63 +878,69 @@
 {
   NSString *msg = [NSString stringWithFormat: @"%@\n%@%i %@",
         NSLocalizedString(@"Are you sure you want to quit\nall applications and log out now?", @""),
-        NSLocalizedString(@"If you do nothing, the system will log out\nautomatically in", @""),
+        NSLocalizedString(@"If you do nothing, the system will log out\nautomatically in ", @""),
         autoLogoutDelay,
         NSLocalizedString(@"seconds.", @"")];
   
   loggingout = YES;
   logoutDelay = 30;
   
-  if (logoutTimer && [logoutTimer isValid]) {
+  if (logoutTimer && [logoutTimer isValid])
     [logoutTimer invalidate];
-  }
 
   ASSIGN (logoutTimer, [NSTimer scheduledTimerWithTimeInterval: autoLogoutDelay
-											                          target: self 
-                                              selector: @selector(doLogout:) 
-															                userInfo: nil 
-                                               repeats: NO]);
+                                                        target: self 
+                                                      selector: @selector(doLogout:) 
+                                                      userInfo: nil 
+                                                       repeats: NO]);
+  /* we will display a modal panel, so we add the timer to the modal runloop */
+  [[NSRunLoop currentRunLoop] addTimer: logoutTimer forMode: NSModalPanelRunLoopMode];
                                         
   if (NSRunAlertPanel(NSLocalizedString(@"Logout", @""),
                       msg,
                       NSLocalizedString(@"Log out", @""),
                       NSLocalizedString(@"Cancel", @""),
-                      nil)) {
-    [logoutTimer invalidate]; 
-    [self doLogout: nil];
-  } else {
-    [logoutTimer invalidate]; 
-    DESTROY (logoutTimer);
-    loggingout = NO;
-  }
+                      nil))
+    {
+      [logoutTimer invalidate]; 
+      [self doLogout: nil];
+    }
+  else
+    {
+      [logoutTimer invalidate]; 
+      DESTROY (logoutTimer);
+      loggingout = NO;
+    }
 }
 
 - (void)doLogout:(id)sender
 {
   NSMutableArray *launched = [NSMutableArray array];
   GWLaunchedApp *gwapp = [self launchedAppWithPath: gwBundlePath andName: gwProcessName];
-  unsigned i;
-
+  NSUInteger i;
+  
   [launched addObjectsFromArray: launchedApps];
   [launched removeObject: gwapp];
   
-  for (i = 0; i < [launched count]; i++) {
-    [[launched objectAtIndex: i] terminateApplication];      
-  }
-
+  for (i = 0; i < [launched count]; i++)
+    [[launched objectAtIndex: i] terminateApplication];
+  
   [launched removeAllObjects];
   [launched addObjectsFromArray: launchedApps];
   [launched removeObject: gwapp];
     
-  if ([launched count]) {
-    ASSIGN (logoutTimer, [NSTimer scheduledTimerWithTimeInterval: logoutDelay
-											                      target: self 
-                                          selector: @selector(terminateTasks:) 
-															            userInfo: nil 
-                                           repeats: NO]);
-  } else {
-    [NSApp terminate: self];
-  }
+  if ([launched count])
+    {
+      ASSIGN (logoutTimer, [NSTimer scheduledTimerWithTimeInterval: logoutDelay
+                                                            target: self 
+                                                          selector: @selector(terminateTasks:) 
+                                                          userInfo: nil 
+                                                           repeats: NO]);
+    }
+  else
+    {
+      [NSApp terminate: self];
+    }
 }
 
 - (void)terminateTasks:(id)sender
