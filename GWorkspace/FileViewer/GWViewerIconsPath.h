@@ -1,6 +1,6 @@
 /* GWViewerIconsPath.h
  *  
- * Copyright (C) 2004-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2004
@@ -31,7 +31,7 @@
 @class FSNIcon;
 @class FSNIconNameEditor;
 
-@interface GWViewerIconsPath : NSView
+@interface GWViewerIconsPath : NSView <NSTextFieldDelegate>
 {
   NSMutableArray *icons;
   
@@ -46,7 +46,7 @@
   FSNInfoType infoType;
   NSString *extInfoType;
   
-	int visibleIcons;
+  int visibleIcons;
   int firstVisibleIcon;
   int lastVisibleIcon;	
   int shift;  

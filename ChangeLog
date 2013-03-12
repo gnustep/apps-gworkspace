@@ -1,5 +1,15 @@
 2013-03-12 Riccardo Mottola <rm@gnu.org>
 
+	* GWorkspace/FileViewer/GWViewerIconsPath.h
+	Fix warning about missing protocol
+
+2013-03-12 Riccardo Mottola <rm@gnu.org>
+
+	* Tools/fswatcher/fswatcher.m
+	NSUInteger transition and indentation.
+
+2013-03-12 Riccardo Mottola <rm@gnu.org>
+
 	* Tools/fswatcher/fswatcher.h
 	* Tools/fswatcher/fswatcher.m
 	Fix typo.
