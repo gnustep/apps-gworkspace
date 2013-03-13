@@ -1,7 +1,7 @@
 /* Se que la traduccion es muy mejorable */
 /* He revisado y actualizado la traduccion. Quique */
 
-/* ----------------------- menu strings --------------------------- *\
+/* ----------------------- menu strings --------------------------- */
 /* main.m */
 
 "Info" = "Informaci\U00F3n";
@@ -99,7 +99,7 @@
         
         
         
-/* ----------------------- File Operations strings --------------------------- *\
+/* ----------------------- File Operations strings --------------------------- */
 
 /* GWorkspace.m */
 
@@ -152,7 +152,7 @@
 "Invalid char in name" = "Car\U00E1cter no v\U00E1lido en el nombre";
 
 
-/* ----------------------- Inspectors strings --------------------------- *\
+/* ----------------------- Inspectors strings --------------------------- */
 
 /* InspectorsWin.m */
 
@@ -245,7 +245,7 @@
 "Other" = "Otros";
 
 
-/* ----------------------- Processes strings --------------------------- *\
+/* ----------------------- Processes strings --------------------------- */
 
 /* Processes.m */
 
@@ -262,7 +262,7 @@
 "Background" = "Segundo plano"; /* R// revisar  Q// Yo lo veo bien  */
 
 
-/* ----------------------- Finder strings --------------------------- *\
+/* ----------------------- Finder strings --------------------------- */
 
 /* Finder.m */
 
@@ -273,7 +273,7 @@
 "No arguments!" = "\U00A1Ning\U00FAn argumento!";
 
 
-/* ----------------------- Fiend strings --------------------------- *\
+/* ----------------------- Fiend strings --------------------------- */
 
 /* Fiend.m */
 /* R// A ver como lo traducimos */
@@ -288,7 +288,7 @@
 "This object is already present in this layer!" = "\U00A1Este objeto ya est\U00E1 en esta capa!";
         
                         
-/* ----------------------- Preference strings --------------------------- *\
+/* ----------------------- Preference strings --------------------------- */
 
 /* PreferencesWin.m */
 
