@@ -236,7 +236,6 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
       {
         Watcher *watcher = [self watcherForPath: wpath];
       
-        NSLog(@"fswatcher: No next in enumerator in watched paths");
         if (watcher)
 	{
           [watcher removeListener];
@@ -251,6 +250,7 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 	/* If there is nothing else using this process, and this is not
 	 * a daemon, then we can quietly terminate.
 	 */
+        NSLog(@"No more clients, shutting down.");
         exit(EXIT_SUCCESS);
       }
   }
