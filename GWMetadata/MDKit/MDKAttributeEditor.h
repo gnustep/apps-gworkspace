@@ -1,6 +1,6 @@
 /* MDKAttributeEditor.h
  *  
- * Copyright (C) 2006 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@fibernet.ro>
  * Date: December 2006
@@ -25,8 +25,8 @@
 #ifndef MDK_ATTRIBUTE_EDITOR_H
 #define MDK_ATTRIBUTE_EDITOR_H
 
-#include <Foundation/Foundation.h>
-#include "MDKQuery.h"
+#import <Foundation/Foundation.h>
+#import "MDKQuery.h"
 
 @class MDKAttribute;
 @class MDKWindow;
@@ -38,7 +38,7 @@
 @class NSStepper;
 @class NSView;
 
-@interface MDKAttributeEditor : NSObject 
+@interface MDKAttributeEditor : NSObject <NSTextFieldDelegate>
 {
   IBOutlet id win;
   IBOutlet NSBox *editorBox;
