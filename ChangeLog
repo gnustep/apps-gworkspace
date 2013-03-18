@@ -1,3 +1,8 @@
+2013-03-18 Riccardo Mottola <rm@gnu.org>
+
+	* GWMetadata/MDKit/MDKAttributeEditor.h
+	Fix protocol warning.
+
 2013-03-13 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/GWFunctions.[h,m]
