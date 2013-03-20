@@ -1,6 +1,6 @@
 /* Functions.h
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
@@ -44,23 +44,6 @@ else [label setAlignment: NSLeftTextAlignment]; \
 [label setEditable: NO]; \
 [label setSelectable: NO]; \
 if (str) [label setStringValue: str]; \
-[view addSubview: label]; \
-if (release) RELEASE (label); \
-}
-#endif
-
-#ifndef MAKE_LOCALIZED_LABEL
-#define MAKE_LOCALIZED_LABEL(label, rect, str, comm, align, release, view) { \
-label = [[NSTextField alloc] initWithFrame: rect];	\
-[label setFont: [NSFont systemFontOfSize: 12]]; \
-if (align == 'c') [label setAlignment: NSCenterTextAlignment]; \
-else if (align == 'r') [label setAlignment: NSRightTextAlignment]; \
-else [label setAlignment: NSLeftTextAlignment]; \
-[label setBackgroundColor: [NSColor windowBackgroundColor]]; \
-[label setBezeled: NO]; \
-[label setEditable: NO]; \
-[label setSelectable: NO]; \
-if (str) [label setStringValue: NSLocalizedString(str, comm)]; \
 [view addSubview: label]; \
 if (release) RELEASE (label); \
 }

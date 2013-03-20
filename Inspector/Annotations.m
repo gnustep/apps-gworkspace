@@ -1,6 +1,6 @@
 /* Annotations.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
@@ -71,7 +71,7 @@ static NSString *nibName = @"Annotations";
     currentPath = nil;
 
     noContsView = [[NSView alloc] initWithFrame: [[toolsBox contentView] bounds]];
-    MAKE_LOCALIZED_LABEL (label, NSMakeRect(2, 125, 254, 65), @"No Annotations Inspector", @"", 'c', YES, noContsView);		  
+    MAKE_LABEL (label, NSMakeRect(2, 125, 254, 65), _(@"No Annotations Inspector"), 'c', YES, noContsView);		  
     [label setFont: [NSFont systemFontOfSize: 18]];
     [label setTextColor: [NSColor grayColor]];				
   }

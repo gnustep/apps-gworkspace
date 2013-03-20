@@ -1,6 +1,6 @@
 /* Contents.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
@@ -129,7 +129,7 @@ static NSString *nibName = @"Contents";
     genericView = [[GenericView alloc] initWithFrame: r];					
 
     noContsView = [[NSView alloc] initWithFrame: r];
-    MAKE_LOCALIZED_LABEL (label, NSMakeRect(2, 125, 254, 65), @"No Contents Inspector", @"", 'c', YES, noContsView);		  
+    MAKE_LABEL (label, NSMakeRect(2, 125, 254, 65), _(@"No Contents Inspector"), 'c', YES, noContsView);		  
     [label setFont: [NSFont systemFontOfSize: 18]];
     [label setTextColor: [NSColor grayColor]];				
 
