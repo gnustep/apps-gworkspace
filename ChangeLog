@@ -1,5 +1,10 @@
 2013-03-20 Riccardo Mottola <rm@gnu.org>
 
+	* GWMetadata/MDKit/MDKAttributeEditor.h
+	Fix protocol warning.
+
+2013-03-20 Riccardo Mottola <rm@gnu.org>
+
 	* Inspector/Annotations.m
 	* Inspector/Contents.m
 	* Inspector/Functions.h

@@ -144,7 +144,7 @@
 @end
 
 
-@interface MDKTextContentEditor : NSObject 
+@interface MDKTextContentEditor : NSObject <NSTextFieldDelegate>
 {
   NSTextField *searchField;
   NSArray *textContentWords;
