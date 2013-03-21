@@ -1,3 +1,8 @@
+2013-03-21 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNListView.m
+	NSInteger fixes.
+
 2013-03-20 Riccardo Mottola <rm@gnu.org>
 
 	* GWMetadata/MDKit/MDKAttributeEditor.h

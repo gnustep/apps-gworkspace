@@ -396,7 +396,7 @@ static NSString *defaultColumns = @"{ \
 
 - (id)tableView:(NSTableView *)aTableView
           objectValueForTableColumn:(NSTableColumn *)aTableColumn
-                                row:(int)rowIndex
+                                row:(NSInteger)rowIndex
 {
   int ident = [[aTableColumn identifier] intValue];
   FSNListViewNodeRep *rep = [nodeReps objectAtIndex: rowIndex];
@@ -435,7 +435,7 @@ static NSString *defaultColumns = @"{ \
 - (void)tableView:(NSTableView *)aTableView 
             setObjectValue:(id)anObject 
             forTableColumn:(NSTableColumn *)aTableColumn 
-                       row:(int)rowIndex
+                       row:(NSInteger)rowIndex
 {
 }
 
@@ -444,7 +444,7 @@ static NSString *defaultColumns = @"{ \
      toPasteboard:(NSPasteboard *)pboard
 {
   NSMutableArray *paths = [NSMutableArray array];
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [rows count]; i++) {
     int index = [[rows objectAtIndex: i] intValue];
@@ -462,7 +462,7 @@ static NSString *defaultColumns = @"{ \
 
 - (NSDragOperation)tableView:(NSTableView *)tableView 
                 validateDrop:(id <NSDraggingInfo>)info 
-                 proposedRow:(int)row 
+                 proposedRow:(NSInteger)row 
        proposedDropOperation:(NSTableViewDropOperation)operation
 {
   return NSDragOperationNone;
@@ -470,7 +470,7 @@ static NSString *defaultColumns = @"{ \
 
 - (BOOL)tableView:(NSTableView *)tableView 
        acceptDrop:(id <NSDraggingInfo>)info 
-              row:(int)row 
+              row:(NSInteger)row 
     dropOperation:(NSTableViewDropOperation)operation
 {
   return NO;
@@ -485,7 +485,7 @@ static NSString *defaultColumns = @"{ \
 }
 
 - (BOOL)tableView:(NSTableView *)aTableView 
-  shouldSelectRow:(int)rowIndex
+  shouldSelectRow:(NSInteger)rowIndex
 {
   return ((rowIndex != -1) 
                 && ([[nodeReps objectAtIndex: rowIndex] isLocked] == NO));
@@ -494,7 +494,7 @@ static NSString *defaultColumns = @"{ \
 - (void)tableView:(NSTableView *)aTableView 
   willDisplayCell:(id)aCell 
    forTableColumn:(NSTableColumn *)aTableColumn 
-              row:(int)rowIndex
+              row:(NSInteger)rowIndex
 {
   int ident = [[aTableColumn identifier] intValue];
   FSNTextCell *cell = (FSNTextCell *)[aTableColumn dataCell];
@@ -564,7 +564,7 @@ static NSString *defaultColumns = @"{ \
 
 - (BOOL)tableView:(NSTableView *)aTableView 
             shouldEditTableColumn:(NSTableColumn *)aTableColumn 
-                              row:(int)rowIndex
+                              row:(NSInteger)rowIndex
 {
   return NO;
 }
@@ -581,7 +581,7 @@ static NSString *defaultColumns = @"{ \
   NSDictionary *colsDescr;
   NSArray *nodes;
   BOOL keepinfo;
-  int i;
+  NSUInteger i;
   
   keepinfo = (node && ([self keepsColumnsInfo] || [node isEqual: anode]));
   
