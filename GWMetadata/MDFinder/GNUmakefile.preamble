@@ -18,5 +18,5 @@ ADDITIONAL_LIB_DIRS += -L../../DBKit/$(GNUSTEP_OBJ_DIR)
 # Additional LDFLAGS to pass to the linker
 # ADDITIONAL_LDFLAGS += 
 
-ADDITIONAL_TOOL_LIBS += -lFSNode -lDBKit
+ADDITIONAL_GUI_LIBS += -lFSNode -lMDKit
 

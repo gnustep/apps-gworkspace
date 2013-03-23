@@ -20,10 +20,7 @@ MDFinder_LANGUAGES = Resources/English
 MDFinder_OBJC_FILES = main.m \
                   MDFinder.m 
 
-ADDITIONAL_GUI_LIBS += -lMDKit
-ADDITIONAL_GUI_LIBS += -lFSNode
-
--include GNUmakefile.preamble
+include GNUmakefile.preamble
 
 -include GNUmakefile.local
 
