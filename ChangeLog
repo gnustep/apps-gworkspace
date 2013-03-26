@@ -1,3 +1,9 @@
+2013-03-26 Riccardo Mottola <rm@gnu.org>
+
+	* GWMetadata/MDFinder/GNUmakefile.preamble
+	Fix so that DBKit and MDKit are resolved from the build tree and not
+	the installed versions.
+
 2013-03-21 Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNListView.m

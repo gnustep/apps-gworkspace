@@ -11,12 +11,12 @@ ADDITIONAL_CFLAGS += -Wall
 ADDITIONAL_INCLUDE_DIRS += -I../MDKit
 ADDITIONAL_INCLUDE_DIRS += -I../../FSNode 
 
-ADDITIONAL_LIB_DIRS += -L../MDKit/MDKit.framework/Versions/Current/$(GNUSTEP_TARGET_LDIR) 
-ADDITIONAL_LIB_DIRS += -L../../FSNode/FSNode.framework/Versions/Current/$(GNUSTEP_TARGET_LDIR)
-ADDITIONAL_LIB_DIRS += -L../../DBKit/$(GNUSTEP_OBJ_DIR)
+ADDITIONAL_LIB_DIRS += -L../MDKit/MDKit.framework
+ADDITIONAL_LIB_DIRS += -L../../FSNode/FSNode.framework
+ADDITIONAL_LIB_DIRS += -L../../DBKit/obj
 
 # Additional LDFLAGS to pass to the linker
 # ADDITIONAL_LDFLAGS += 
 
-ADDITIONAL_GUI_LIBS += -lFSNode -lMDKit
+ADDITIONAL_GUI_LIBS += -lFSNode -lMDKit -lDBKit
 
