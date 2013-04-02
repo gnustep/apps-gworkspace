@@ -1249,7 +1249,7 @@ filename = [fileinfo objectForKey: @"name"];
     return YES;
   }
 
-  path = [NSString stringWithString: [errorDict objectForKey: @"Path"]];
+  path = [NSString stringWithString: [errorDict objectForKey: @"NSFilePath"]];
   
   msg = [NSString stringWithFormat: @"%@ %@\n%@ %@\n",
 							NSLocalizedString(@"File operation error:", @""),

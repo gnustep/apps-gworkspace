@@ -1,3 +1,8 @@
+2013-04-03 Riccardo Mottola <rm@gnu.org>
+
+	* Operation/FileOpInfo.m (fileManager shouldProceedAfterError)
+	Decode path from error correctly (Thanks Sebastian)
+
 2013-03-26 Riccardo Mottola <rm@gnu.org>
 
 	* GWMetadata/MDFinder/GNUmakefile.preamble
