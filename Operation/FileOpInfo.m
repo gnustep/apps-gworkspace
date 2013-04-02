@@ -294,21 +294,21 @@ static NSString *nibName = @"FileOperationWin";
   NS_ENDHANDLER
 }
 
-- (int)requestUserConfirmationWithMessage:(NSString *)message 
+- (NSInteger)requestUserConfirmationWithMessage:(NSString *)message 
                                     title:(NSString *)title
 {  
   return NSRunAlertPanel(NSLocalizedString(title, @""),
-												 NSLocalizedString(message, @""),
-											   NSLocalizedString(@"Ok", @""), 
-												 NSLocalizedString(@"Cancel", @""), 
+			 NSLocalizedString(message, @""),
+			 NSLocalizedString(@"Ok", @""), 
+			 NSLocalizedString(@"Cancel", @""), 
                          nil);       
 }
 
-- (int)showErrorAlertWithMessage:(NSString *)message
+- (NSInteger)showErrorAlertWithMessage:(NSString *)message
 {  
   return NSRunAlertPanel(nil, 
                          NSLocalizedString(message, @""), 
-												 NSLocalizedString(@"Ok", @""), 
+			 NSLocalizedString(@"Ok", @""), 
                          nil, 
                          nil);
 }
@@ -999,8 +999,8 @@ filename = [fileinfo objectForKey: @"name"];
   NSString *copystr = NSLocalizedString(@"_copy", @"");
   NSString *base;
   NSString *ext;
-	NSString *destpath;
-	NSString *newname;
+  NSString *destpath;
+  NSString *newname;
   NSString *ntmp;
 
   while (1) {
@@ -1052,25 +1052,28 @@ filename = [fileinfo objectForKey: @"name"];
 
 - (void)doRename
 {
-	GET_FILENAME;    
+  GET_FILENAME;    
   
-	if ([fm movePath: source toPath: destination handler: self]) {         
-    [procfiles addObject: filename];
+  if ([fm movePath: source toPath: destination handler: self])
+    {         
+      [procfiles addObject: filename];
   
-  } else {
-    /* check for broken symlink */
-    NSDictionary *attributes = [fm fileAttributesAtPath: source traverseLink: NO];
+    }
+  else
+    {
+      /* check for broken symlink */
+      NSDictionary *attributes = [fm fileAttributesAtPath: source traverseLink: NO];
   
-    if (attributes && ([attributes fileType] == NSFileTypeSymbolicLink)
-                                    && ([fm fileExistsAtPath: source] == NO)) {
-      if ([fm copyPath: source toPath: destination handler: self]
-                      && [fm removeFileAtPath: source handler: self]) {
-        [procfiles addObject: filename];
+      if (attributes && ([attributes fileType] == NSFileTypeSymbolicLink)
+	  && ([fm fileExistsAtPath: source] == NO)) {
+	if ([fm copyPath: source toPath: destination handler: self]
+	    && [fm removeFileAtPath: source handler: self]) {
+	  [procfiles addObject: filename];
+	}
       }
     }
-  }
   
-	[files removeObject: fileinfo];
+  [files removeObject: fileinfo];
   RELEASE (fileinfo);	
 
   [self done];
@@ -1078,13 +1081,13 @@ filename = [fileinfo objectForKey: @"name"];
 
 - (void)doNewFolder
 {
-	GET_FILENAME;  
+  GET_FILENAME;  
 
-	if ([fm createDirectoryAtPath: [destination stringByAppendingPathComponent: filename]
-				             attributes: nil]) {
+  if ([fm createDirectoryAtPath: [destination stringByAppendingPathComponent: filename]
+		     attributes: nil]) {
     [procfiles addObject: filename];
   }
-	[files removeObject: fileinfo];	
+  [files removeObject: fileinfo];	
   RELEASE (fileinfo);
 
   [self done];
@@ -1092,14 +1095,14 @@ filename = [fileinfo objectForKey: @"name"];
 
 - (void)doNewFile
 {
-	GET_FILENAME;  
+  GET_FILENAME;  
 
-	if ([fm createFileAtPath: [destination stringByAppendingPathComponent: filename]
-				          contents: nil
+  if ([fm createFileAtPath: [destination stringByAppendingPathComponent: filename]
+		  contents: nil
                 attributes: nil]) {
     [procfiles addObject: filename];
   }
-	[files removeObject: fileinfo];	
+  [files removeObject: fileinfo];	
   RELEASE (fileinfo);
   
   [self done];
@@ -1179,32 +1182,38 @@ filename = [fileinfo objectForKey: @"name"];
 - (BOOL)removeExisting:(NSDictionary *)info
 {
   NSString *fname =  [info objectForKey: @"name"];
-	NSString *destpath = [destination stringByAppendingPathComponent: fname]; 
+  NSString *destpath = [destination stringByAppendingPathComponent: fname]; 
   BOOL isdir;
     
-	canupdate = NO; 
+  canupdate = NO; 
   
-	if ([fm fileExistsAtPath: destpath isDirectory: &isdir]) {
-    if (onlyolder) {
-      NSDictionary *attributes = [fm fileAttributesAtPath: destpath traverseLink: NO];
-      NSDate *dstdate = [attributes objectForKey: NSFileModificationDate];
-      NSDate *srcdate = [info objectForKey: @"date"];
+  if ([fm fileExistsAtPath: destpath isDirectory: &isdir])
+    {
+      if (onlyolder)
+	{
+	  NSDictionary *attributes = [fm fileAttributesAtPath: destpath traverseLink: NO];
+	  NSDate *dstdate = [attributes objectForKey: NSFileModificationDate];
+	  NSDate *srcdate = [info objectForKey: @"date"];
     
-      if ([srcdate isEqual: dstdate] == NO) {
-        if ([[srcdate earlierDate: dstdate] isEqual: srcdate]) {
-          canupdate = YES;
-          return NO;
-        }
-      } else {
-        canupdate = YES;
-        return NO;
-      }
-    }
-  
-		[fm removeFileAtPath: destpath handler: self]; 
+	  if ([srcdate isEqual: dstdate] == NO)
+	    {
+	      if ([[srcdate earlierDate: dstdate] isEqual: srcdate])
+		{
+		  canupdate = YES;
+		  return NO;
+		}
+	    }
+	  else
+	    {
+	      canupdate = YES;
+	      return NO;
+	    }
 	}
   
-	canupdate = YES;
+      [fm removeFileAtPath: destpath handler: self]; 
+    }
+  
+  canupdate = YES;
   
   return YES;
 }
@@ -1259,27 +1268,30 @@ filename = [fileinfo objectForKey: @"name"];
 
   result = [fileOp requestUserConfirmationWithMessage: msg title: @"Error"];
     
-  if (result != NSAlertDefaultReturn) {
-    [self done];
+  if (result != NSAlertDefaultReturn)
+    {
+      [self done];
+    }
+  else
+    {  
+      BOOL found = NO;
     
-	} else {  
-    BOOL found = NO;
-    
-    while (1) { 
-      NSDictionary *info = [self infoForFilename: [path lastPathComponent]];
+      while (1)
+	{ 
+	  NSDictionary *info = [self infoForFilename: [path lastPathComponent]];
           
-      if ([path isEqual: source]) {
-        break;      
-      }    
+	  if ([path isEqual: source])
+	    break;      
      
-      if (info) {
-        [files removeObject: info];
-        found = YES;
-        break;
-      }
+	  if (info)
+	    {
+	      [files removeObject: info];
+	      found = YES;
+	      break;
+	    }
          
-      path = [path stringByDeletingLastPathComponent];
-    }   
+	  path = [path stringByDeletingLastPathComponent];
+	}   
     
     if ([files count]) {
       if (found) {

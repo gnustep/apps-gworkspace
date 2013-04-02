@@ -1,6 +1,6 @@
 /* FileOpInfo.h
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -32,10 +32,10 @@
 
 - (void)registerExecutor:(id)anObject;
                             
-- (int)requestUserConfirmationWithMessage:(NSString *)message 
+- (NSInteger)requestUserConfirmationWithMessage:(NSString *)message 
                                     title:(NSString *)title;
 
-- (int)showErrorAlertWithMessage:(NSString *)message;
+- (NSInteger)showErrorAlertWithMessage:(NSString *)message;
 
 - (void)setNumFiles:(int)n;
 
@@ -134,10 +134,10 @@
 
 - (void)startOperation;
 
-- (int)requestUserConfirmationWithMessage:(NSString *)message 
+- (NSInteger)requestUserConfirmationWithMessage:(NSString *)message 
                                     title:(NSString *)title;
 
-- (int)showErrorAlertWithMessage:(NSString *)message;
+- (NSInteger)showErrorAlertWithMessage:(NSString *)message;
 
 - (IBAction)pause:(id)sender;
 
@@ -182,17 +182,17 @@
 
 @interface FileOpExecutor: NSObject
 {
-	NSString *operation;
-	NSString *source;
-	NSString *destination;
-	NSMutableArray *files;
-	NSMutableArray *procfiles;
-	NSDictionary *fileinfo;
-	NSString *filename;
+  NSString *operation;
+  NSString *source;
+  NSString *destination;
+  NSMutableArray *files;
+  NSMutableArray *procfiles;
+  NSDictionary *fileinfo;
+  NSString *filename;
   int fcount;
   float progstep;
   int stepcount;
-	BOOL canupdate;
+  BOOL canupdate;
   BOOL samename;
   BOOL onlyolder;
   NSFileManager *fm;
