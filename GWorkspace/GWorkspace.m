@@ -47,7 +47,6 @@
 #import "Dock.h"
 #import "GWViewersManager.h"
 #import "GWViewer.h"
-#import "GWSpatialViewer.h"
 #import "Finder.h"
 #import "Inspector.h"
 #import "Operation.h"
@@ -200,11 +199,6 @@ static GWorkspace *gworkspace = nil;
   [menu addItemWithTitle:_(@"Browser") action:@selector(setViewerType:) keyEquivalent:@"b"];
   [menu addItemWithTitle:_(@"Icon") action:@selector(setViewerType:) keyEquivalent:@"i"];
   [menu addItemWithTitle:_(@"List") action:@selector(setViewerType:) keyEquivalent:@"l"];
-  menuItem = [menu addItemWithTitle:_(@"Viewer behaviour") action:NULL keyEquivalent:@""];
-  subMenu = AUTORELEASE ([NSMenu new]);
-  [menu setSubmenu: subMenu forItem: menuItem];
-  [subMenu addItemWithTitle:_(@"Browsing") action:@selector(setViewerBehaviour:) keyEquivalent:@"B"];
-  [subMenu addItemWithTitle:_(@"Spatial") action:@selector(setViewerBehaviour:) keyEquivalent:@"S"];
 	
   menuItem = [menu addItemWithTitle:_(@"Show") action:NULL keyEquivalent:@""];
   subMenu = AUTORELEASE ([NSMenu new]);
@@ -745,76 +739,39 @@ static GWorkspace *gworkspace = nil;
   NSArray *selection = [NSArray arrayWithArray: paths];
   id viewer = [vwrsManager rootViewer];
   id nodeView = nil;
-  BOOL newviewer = NO;
 
-  if ([paths count] == 1) {
-    FSNode *node = [FSNode nodeWithPath: [paths objectAtIndex: 0]];
-  
-    if ([node isDirectory] && ([node isPackage] == NO)) {
-      parentnode = [FSNode nodeWithPath: [node path]];
-      selection = [NSArray arrayWithObject: [node path]];
-    }
-  }
-    
-  if (viewer == nil) {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSString *path = path_separator();
-    NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", path];
-    NSDictionary *viewerPrefs = [defaults objectForKey: prefsname];
-    int type = BROWSING;
-    
-    if (viewerPrefs) {
-      id entry = [viewerPrefs objectForKey: @"spatial"];
-   
-      if (entry) {
-        type = ([entry boolValue] ? SPATIAL : BROWSING);
-      }
-    }
-  
-    if (type == BROWSING) {
-      viewer = [vwrsManager showRootViewer];
-    } else {
-      newviewer = YES;
-    }
-    
-  } else if ([viewer vtype] == SPATIAL) {
-    newviewer = YES;
-  } 
-  
-  if (newviewer)
+  if ([paths count] == 1)
     {
-      viewer = [vwrsManager viewerOfType: SPATIAL
-                                showType: nil
-                                 forNode: parentnode
-                           showSelection: NO
-                          closeOldViewer: NO
-                                forceNew: NO];
+      FSNode *node = [FSNode nodeWithPath: [paths objectAtIndex: 0]];
+      
+      if ([node isDirectory] && ([node isPackage] == NO))
+        {
+          parentnode = [FSNode nodeWithPath: [node path]];
+          selection = [NSArray arrayWithObject: [node path]];
+        }
     }
+  
+  if (viewer == nil)
+    viewer = [vwrsManager showRootViewer];
+  
   
   nodeView = [viewer nodeView];
-  
-  if ([viewer vtype] == BROWSING) {
-    [nodeView showContentsOfNode: parentnode];
-  }
-  
+  [nodeView showContentsOfNode: parentnode];
   [nodeView selectRepsOfPaths: selection];
   
-  if ([nodeView respondsToSelector: @selector(scrollSelectionToVisible)]) {
+  if ([nodeView respondsToSelector: @selector(scrollSelectionToVisible)])
     [nodeView scrollSelectionToVisible];
-  }
 }
 
 - (void)newViewerAtPath:(NSString *)path
 {
   FSNode *node = [FSNode nodeWithPath: path];
-  unsigned type = [vwrsManager typeOfViewerForNode: node];
 
-  [vwrsManager viewerOfType: type 
-                   showType: nil
-                    forNode: node 
-              showSelection: NO
-             closeOldViewer: nil
-                   forceNew: NO];
+  [vwrsManager viewerForNode: node 
+                    showType: nil
+               showSelection: NO
+              closeOldViewer: nil
+                    forceNew: NO];
 }
 
 - (NSImage *)tshelfBackground

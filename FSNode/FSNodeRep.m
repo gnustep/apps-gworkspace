@@ -920,6 +920,7 @@ static FSNodeRep *shared = nil;
   NSArray *reserved = [self reservedMountNames];
   unsigned i;
 
+  NSLog(@"mountedLcoalVolumePaths");
   for (i = 0; i < [mounted count]; i++)
     {
       NSDictionary *dict = [mounted objectAtIndex: i];
@@ -941,6 +942,7 @@ static FSNodeRep *shared = nil;
   NSMutableArray *names = [NSMutableArray array];  
   unsigned i;
 
+  NSLog(@"mountedRemovableMedia");
   for (i = 0; i < [mounted count]; i++) {
     NSDictionary *dict = [mounted objectAtIndex: i];
     NSString *name = [dict objectForKey: @"name"];

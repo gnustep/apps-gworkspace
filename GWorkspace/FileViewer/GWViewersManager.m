@@ -25,7 +25,6 @@
 #import <AppKit/AppKit.h>
 #import "GWViewersManager.h"
 #import "GWViewer.h"
-#import "GWSpatialViewer.h"
 #import "GWViewerWindow.h"
 #import "History.h"
 #import "FSNFunctions.h"
@@ -51,9 +50,7 @@ static GWViewersManager *vwrsmanager = nil;
   [nc removeObserver: self];
   RELEASE (viewers);
   RELEASE (rootViewersKeys);
-  RELEASE (spatialViewersHistory);
   RELEASE (bviewerHelp);
-  RELEASE (sviewerHelp);
     
   [super dealloc];
 }
@@ -69,18 +66,14 @@ static GWViewersManager *vwrsmanager = nil;
     gworkspace = [GWorkspace gworkspace];
     helpManager = [NSHelpManager sharedHelpManager];    
     ASSIGN (bviewerHelp, [gworkspace contextHelpFromName: @"BViewer.rtfd"]);
-    ASSIGN (sviewerHelp, [gworkspace contextHelpFromName: @"SViewer.rtfd"]);
     
     viewers = [NSMutableArray new];
     orderingViewers = NO;
     
     rootViewersKeys = [NSMutableArray new];
-    if (entry) {
+    if (entry)
       [rootViewersKeys addObjectsFromArray: entry];
-    }
     
-    spatialViewersHistory = [NSMutableArray new]; 
-    spvHistoryPos = 0;  
     historyWindow = [gworkspace historyWindow]; 
     nc = [NSNotificationCenter defaultCenter];
 
@@ -116,28 +109,30 @@ static GWViewersManager *vwrsmanager = nil;
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];  
   NSArray *viewersInfo = [defaults objectForKey: @"viewersinfo"];
 
-  if (viewersInfo && [viewersInfo count]) {
-    int i;
+  if (viewersInfo && [viewersInfo count])
+    {
+      NSUInteger i;
     
-    for (i = 0; i < [viewersInfo count]; i++) {
-      NSDictionary *dict = [viewersInfo objectAtIndex: i];
-      NSString *path = [dict objectForKey: @"path"];
-      int type = [[dict objectForKey: @"type"] intValue];
-      FSNode *node = [FSNode nodeWithPath: path];
-    
-      if (node && [node isValid])
+      for (i = 0; i < [viewersInfo count]; i++)
         {
-          [self viewerOfType: type
-                    showType: nil
-                     forNode: node
-               showSelection: YES
-              closeOldViewer: NO
-                    forceNew: YES];
-      }
-    }
+          NSDictionary *dict = [viewersInfo objectAtIndex: i];
+          NSString *path = [dict objectForKey: @"path"];
+          FSNode *node = [FSNode nodeWithPath: path];
+    
+          if (node && [node isValid])
+            {
+              [self viewerForNode: node
+                         showType: nil
+                    showSelection: YES
+                   closeOldViewer: NO
+                         forceNew: YES];
+            }
+        }
 
-  } else {
-    [self showRootViewer];
+    }
+  else
+    {
+      [self showRootViewer];
   }
 }
 
@@ -146,182 +141,112 @@ static GWViewersManager *vwrsmanager = nil;
   NSString *path = path_separator();
   FSNode *node = [FSNode nodeWithPath: path];
   id viewer = [self rootViewer];
-  int type = BROWSING;
   
-  if (viewer == nil) {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", path];
-    NSDictionary *viewerPrefs = [defaults objectForKey: prefsname];
+  if (viewer == nil)
+    {
   
-    if (viewerPrefs) {
-      id entry = [viewerPrefs objectForKey: @"spatial"];
-   
-      if (entry) {
-        type = ([entry boolValue] ? SPATIAL : BROWSING);
-      }
+      viewer = [self viewerForNode: node
+                          showType: nil
+                     showSelection: YES
+                    closeOldViewer: NO
+                          forceNew: NO];
     }
-  
-    viewer = [self viewerOfType: type
-                       showType: nil
-                        forNode: node
-                  showSelection: YES
-                 closeOldViewer: NO
-                       forceNew: NO];
-  } else {
-    if ([[viewer win] isVisible] == NO) {
-  	  [viewer activate];
-      
-    } else {
-      if ([self viewerOfType: SPATIAL withBaseNode: node] == nil) {
-        type = [self typeOfViewerForNode: node];
-      } else {
-        type = BROWSING;
-      }
-
-      viewer = [self viewerOfType: type
-                         showType: nil
-                          forNode: node
-                    showSelection: (type == BROWSING)
-                   closeOldViewer: NO
-                         forceNew: YES];
+  else
+    {
+      if ([[viewer win] isVisible] == NO)
+        {
+          [viewer activate];
+        }
+      else
+        {
+          viewer = [self viewerForNode: node
+                              showType: nil
+                         showSelection: YES
+                        closeOldViewer: NO
+                              forceNew: YES];
+        }
     }
-  }
   
   return viewer;
 }
 
 - (void)selectRepOfNode:(FSNode *)node
-          inViewerWithBaseNode:(FSNode *)base
+   inViewerWithBaseNode:(FSNode *)base
 {
   BOOL inRootViewer = [[base path] isEqual: path_separator()];
   BOOL baseIsParent = [[node parentPath] isEqual: [base path]];
   NSArray *selection = [NSArray arrayWithObject: node];
   id viewer = nil;
   
-  if ([base isEqual: node] || ([node isSubnodeOfNode: base] == NO)) {
-    baseIsParent = YES;
-    selection = nil;      
-  }
-  
-  if (inRootViewer) {  
-    viewer = [self rootViewer];
-    
-    if (viewer == nil) {
-      viewer = [self showRootViewer];
+  if ([base isEqual: node] || ([node isSubnodeOfNode: base] == NO))
+    {
+      baseIsParent = YES;
+      selection = nil;      
     }
+  
+  if (inRootViewer)
+    {  
+      viewer = [self rootViewer];
     
-    if (([viewer vtype] == SPATIAL) 
-            && [[viewer nodeView] isSingleNode]
-                              && (baseIsParent == NO))
-      { 
-        viewer = [self viewerOfType: BROWSING
+      if (viewer == nil)
+        {
+          viewer = [self showRootViewer];
+        }
+    
+    }
+  else
+    {
+      viewer = [self viewerForNode : base
                            showType: nil
-                            forNode: base
                       showSelection: NO
                      closeOldViewer: NO
-                           forceNew: YES];
-      }
-    
-  } else {
-    int type = [self typeOfViewerForNode: base];
-    int newtype = ((type == SPATIAL) && baseIsParent) ? SPATIAL : BROWSING;
-
-    viewer = [self viewerOfType: newtype
-                       showType: nil
-                        forNode: base
-                  showSelection: NO
-                 closeOldViewer: NO
-                       forceNew: NO];
-  } 
+                           forceNew: NO];
+    } 
   
-  if (selection) {
-    [[viewer nodeView] selectRepsOfSubnodes: selection];  
-  }
+  if (selection)
+    {
+      [[viewer nodeView] selectRepsOfSubnodes: selection];  
+    }
 }
 
-- (id)viewerOfType:(unsigned)vtype
+- (id)viewerForNode:(FSNode *)node
           showType:(NSString *)stype
-           forNode:(FSNode *)node
      showSelection:(BOOL)showsel
     closeOldViewer:(id)oldvwr
           forceNew:(BOOL)force
 {
-  id viewer = [self viewerOfType: vtype withBaseNode: node];
-  int i;
+  id viewer = [self viewerWithBaseNode: node];
     
-  if ((viewer == nil) || (force && (vtype != SPATIAL))) {
-    Class c = (vtype == SPATIAL) ? [GWSpatialViewer class] : [GWViewer class];
-    GWViewerWindow *win = [GWViewerWindow new];
-    
-    [win setReleasedWhenClosed: NO];
-    
-    viewer = [[c alloc] initForNode: node 
-                           inWindow: win 
-                           showType: stype
-                      showSelection: showsel]; 
-                        
-    [viewers addObject: viewer];
-    RELEASE (win);
-    RELEASE (viewer);
-  } 
-
-  if (oldvwr) {
-    [helpManager removeContextHelpForObject: [[oldvwr win] contentView]];
-    [[oldvwr win] close]; 
-  }
+  if ((viewer == nil) || (force))
+    {
+      Class c = [GWViewer class];
+      GWViewerWindow *win = [GWViewerWindow new];
+      
+      [win setReleasedWhenClosed: NO];
+      
+      viewer = [[c alloc] initForNode: node 
+                             inWindow: win 
+                             showType: stype
+                        showSelection: showsel]; 
+      
+      [viewers addObject: viewer];
+      RELEASE (win);
+      RELEASE (viewer);
+    } 
+  
+  if (oldvwr)
+    {
+      [helpManager removeContextHelpForObject: [[oldvwr win] contentView]];
+      [[oldvwr win] close]; 
+    }
   
   [viewer activate];
   
-  if (vtype == SPATIAL) {
-    NSArray *reps = [[viewer nodeView] reps];  
 
-    for (i = 0; i < [reps count]; i++) {
-      id rep = [reps objectAtIndex: i];  
-
-      if ([self viewerOfType: SPATIAL showingNode: [rep node]]) {
-        [rep setOpened: YES];
-      }
-    }
-   
-    [helpManager setContextHelp: sviewerHelp 
-                      forObject: [[viewer win] contentView]];
-    
-  } else {
-    [helpManager setContextHelp: bviewerHelp
-                      forObject: [[viewer win] contentView]];
-  }
+  [helpManager setContextHelp: bviewerHelp
+                    forObject: [[viewer win] contentView]];
        
   return viewer;
-}
-
-- (void)setBehaviour:(NSString *)behaviour 
-           forViewer:(id)aviewer
-{
-  int vtype = ([behaviour isEqual: NSLocalizedString(@"Spatial", @"")] ? SPATIAL : BROWSING);
-
-  if (vtype != [aviewer vtype]) {
-    Class c = (vtype == SPATIAL) ? [GWSpatialViewer class] : [GWViewer class];
-    GWViewerWindow *win = RETAIN ([aviewer win]);
-    FSNode *node = RETAIN ([aviewer baseNode]);
-    id viewer;
-    
-    [aviewer windowWillClose: nil];
-    
-    viewer = [[c alloc] initForNode: node 
-                           inWindow: win 
-                           showType: nil
-                      showSelection: YES];   
-    [viewers addObject: viewer];
-    RELEASE (viewer);
-    RELEASE (node);
-    RELEASE (win);
-    
-    [viewer activate];
-    [viewer windowDidBecomeKey: nil];
-
-    [helpManager setContextHelp: (vtype == SPATIAL) ? sviewerHelp : bviewerHelp
-                      forObject: [[viewer win] contentView]];
-  }
 }
 
 - (NSArray *)viewersForBaseNode:(FSNode *)node
@@ -340,34 +265,36 @@ static GWViewersManager *vwrsmanager = nil;
   return vwrs;
 }
 
-- (id)viewerOfType:(unsigned)type
-      withBaseNode:(FSNode *)node
+- (id)viewerWithBaseNode:(FSNode *)node
 {
-  int i;
+  NSUInteger i;
   
-  for (i = 0; i < [viewers count]; i++) {
-    id viewer = [viewers objectAtIndex: i];
+  for (i = 0; i < [viewers count]; i++)
+    {
+      id viewer = [viewers objectAtIndex: i];
 
-    if (([viewer vtype] == type) && [[viewer baseNode] isEqual: node]) {
-      return viewer;
+      if ([[viewer baseNode] isEqual: node])
+        {
+          return viewer;
+        }
     }
-  }
   
   return nil;
 }
 
-- (id)viewerOfType:(unsigned)type
-       showingNode:(FSNode *)node
+- (id)viewerShowingNode:(FSNode *)node
 {
-  int i;
+  NSUInteger i;
   
-  for (i = 0; i < [viewers count]; i++) {
-    id viewer = [viewers objectAtIndex: i];
+  for (i = 0; i < [viewers count]; i++)
+    {
+      id viewer = [viewers objectAtIndex: i];
 
-    if (([viewer vtype] == type) && [viewer isShowingNode: node]) {
-      return viewer;
+      if ([viewer isShowingNode: node])
+        {
+          return viewer;
+        }
     }
-  }
   
   return nil;
 }
@@ -400,47 +327,6 @@ static GWViewersManager *vwrsmanager = nil;
   return AUTORELEASE (key);
 }
 
-- (int)typeOfViewerForNode:(FSNode *)node
-{
-  NSFileManager *fm = [NSFileManager defaultManager];
-  NSString *path = [node path];
-  NSString *dictPath = [path stringByAppendingPathComponent: @".gwdir"];
-  NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", path];
-  NSDictionary *viewerPrefs = nil;
-
-  if ([node isWritable] && ([fm fileExistsAtPath: dictPath])) {
-    viewerPrefs = [NSDictionary dictionaryWithContentsOfFile: dictPath];
-  }
-  
-  if (viewerPrefs == nil) {
-    viewerPrefs = [[NSUserDefaults standardUserDefaults] objectForKey: prefsname];
-  }
-  
-  if (viewerPrefs) {
-    id entry = [viewerPrefs objectForKey: @"spatial"];
-  
-    if (entry) {
-      return ([entry boolValue] ? SPATIAL : BROWSING);
-    }
-  }
-  
-  return BROWSING;
-}
-
-- (id)parentOfSpatialViewer:(id)aviewer
-{
-  if ([aviewer isSpatial]) {
-    FSNode *node = [aviewer baseNode];
-
-    if ([[node path] isEqual: path_separator()] == NO) {
-      FSNode *parentNode = [FSNode nodeWithPath: [node parentPath]];
-
-      return [self viewerOfType: SPATIAL showingNode: parentNode];
-    }
-  }
-      
-  return nil;  
-}
 
 - (void)viewerWillClose:(id)aviewer
 {
@@ -448,36 +334,31 @@ static GWViewersManager *vwrsmanager = nil;
   NSString *path = [node path];
   NSArray *watchedNodes = [aviewer watchedNodes];
   NSNumber *key = [aviewer rootViewerKey];
-  id parentViewer = [self parentOfSpatialViewer: aviewer];
-  int i;
-  
-  if (parentViewer && ([parentViewer invalidated] == NO)) {
-    [parentViewer setOpened: NO repOfNode: node];
-  }
-  
-  if ([node isValid] == NO) {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];  
-    NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", path]; 
-    NSDictionary *vwrprefs = [defaults dictionaryForKey: prefsname];
-    
-    if (vwrprefs) {
-      [defaults removeObjectForKey: prefsname];
-    } 
-    
-    [NSWindow removeFrameUsingName: prefsname]; 
-  }
-  
-  for (i = 0; i < [watchedNodes count]; i++) {
-    [gworkspace removeWatcherForPath: [[watchedNodes objectAtIndex: i] path]];
-  }
+  NSUInteger i;
 
-  if (aviewer == [historyWindow viewer]) {
-    [self changeHistoryOwner: nil];
-  }
+  
+  if ([node isValid] == NO)
+    {
+      NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];  
+      NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", path]; 
+      NSDictionary *vwrprefs = [defaults dictionaryForKey: prefsname];
       
-  if (key) {
+      if (vwrprefs)
+        {
+          [defaults removeObjectForKey: prefsname];
+        } 
+    
+      [NSWindow removeFrameUsingName: prefsname]; 
+    }
+  
+  for (i = 0; i < [watchedNodes count]; i++)
+    [gworkspace removeWatcherForPath: [[watchedNodes objectAtIndex: i] path]];
+
+  if (aviewer == [historyWindow viewer])
+    [self changeHistoryOwner: nil];
+      
+  if (key)
     [rootViewersKeys insertObject: key atIndex: 0];
-  }
 
   [helpManager removeContextHelpForObject: [[aviewer win] contentView]];
   [viewers removeObject: aviewer];
@@ -486,116 +367,39 @@ static GWViewersManager *vwrsmanager = nil;
 - (void)closeInvalidViewers:(NSArray *)vwrs
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-  int i, j;
+  NSUInteger i, j;
 
-  for (i = 0; i < [vwrs count]; i++) {
-    id viewer = [vwrs objectAtIndex: i];
-    NSString *vpath = [[viewer baseNode] path];
-    NSArray *watchedNodes = [viewer watchedNodes];
-    id parentViewer = [self parentOfSpatialViewer: viewer];
-    NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", vpath]; 
-    NSDictionary *vwrprefs = [defaults dictionaryForKey: prefsname];
+  for (i = 0; i < [vwrs count]; i++)
+    {
+      id viewer = [vwrs objectAtIndex: i];
+      NSString *vpath = [[viewer baseNode] path];
+      NSArray *watchedNodes = [viewer watchedNodes];
+      NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", vpath]; 
+      NSDictionary *vwrprefs = [defaults dictionaryForKey: prefsname];
     
-    if (parentViewer && ([vwrs containsObject: parentViewer] == NO)) {
-      [parentViewer setOpened: NO repOfNode: [viewer baseNode]];
-    }
 
-    if (vwrprefs) {
-      [defaults removeObjectForKey: prefsname];
-    } 
+      if (vwrprefs)
+        [defaults removeObjectForKey: prefsname];
 
-    [NSWindow removeFrameUsingName: prefsname]; 
+      [NSWindow removeFrameUsingName: prefsname]; 
     
-    for (j = 0; j < [watchedNodes count]; j++) {
-      [gworkspace removeWatcherForPath: [[watchedNodes objectAtIndex: j] path]];
+      for (j = 0; j < [watchedNodes count]; j++)
+        [gworkspace removeWatcherForPath: [[watchedNodes objectAtIndex: j] path]];
     }
-  }
       
-  for (i = 0; i < [vwrs count]; i++) {
-    id viewer = [vwrs objectAtIndex: i];
-    NSDate *limit = [NSDate dateWithTimeIntervalSinceNow: 0.1];
+  for (i = 0; i < [vwrs count]; i++)
+    {
+      id viewer = [vwrs objectAtIndex: i];
+      NSDate *limit = [NSDate dateWithTimeIntervalSinceNow: 0.1];
     
-    if (viewer == [historyWindow viewer]) {
-      [self changeHistoryOwner: nil];
+      if (viewer == [historyWindow viewer])
+        [self changeHistoryOwner: nil];
+
+      [viewer deactivate];
+      [[NSRunLoop currentRunLoop] runUntilDate: limit];
+      [helpManager removeContextHelpForObject: [[viewer win] contentView]];
+      [viewers removeObject: viewer];
     }
-
-    [viewer deactivate];
-	  [[NSRunLoop currentRunLoop] runUntilDate: limit];
-    [helpManager removeContextHelpForObject: [[viewer win] contentView]];
-    [viewers removeObject: viewer];
-  }
-}
-
-
-/* 
- * deselects the current selection in all the spatial viewers 
- * different from "aviewer"
- */
-- (void)selectedSpatialViewerChanged:(id)aviewer
-{
-  if ((aviewer == nil) || ([aviewer isSpatial] && [[aviewer win] isKeyWindow])) {
-    int i;
-    
-    orderingViewers = YES;
-    
-    for (i = 0; i < [viewers count]; i++) {
-      id viewer = [viewers objectAtIndex: i];
-
-      if ((viewer != aviewer) && [viewer isSpatial]) {
-        [viewer unselectAllReps];
-      }
-    }
-    
-    if (aviewer != nil) {
-      id desktopManager = [gworkspace desktopManager];
-      
-      if ([desktopManager isActive]) {
-        [desktopManager deselectAllIcons];
-      }
-    }
-    
-    orderingViewers = NO;
-  }
-}
-
-/* 
- * highligts the icon corresponding to the base node of "aviewer"
- * in its parent viewer
- */
-- (void)synchronizeSelectionInParentOfViewer:(id)aviewer
-{
-  id parentViewer = [self parentOfSpatialViewer: aviewer];
-    
-  if (parentViewer) {
-    id nodeView = [parentViewer nodeView];
-
-    [parentViewer setOpened: YES repOfNode: [aviewer baseNode]];
-
-    if ([nodeView respondsToSelector: @selector(scrollSelectionToVisible)]) {
-      [nodeView scrollSelectionToVisible];
-    }  
-  }
-}
-
-/* 
- * When a "single node" viewer opens or a "multiple node" viewer shows 
- * a new column, avoids duplicate views in the other spatial viewers.
- */
-- (void)viewer:(id)aviewer didShowNode:(FSNode *)node
-{
-  if ([aviewer isSpatial]) {
-    int i;
-
-    for (i = 0; i < [viewers count]; i++) {
-      id viewer = [viewers objectAtIndex: i];
-
-      if ((viewer != aviewer) && ([viewer isSpatial]) 
-                        && [viewer isShowingNode: node]) {
-        [viewer unloadFromNode: node];
-        break;
-      }
-    }
-  }  
 }
 
 - (void)selectionChanged:(NSArray *)selection
@@ -609,98 +413,113 @@ static GWViewersManager *vwrsmanager = nil;
                   closeSender:(BOOL)close
 {
   NSArray *selreps = [[viewer nodeView] selectedReps];
-  int count = [selreps count];
-  int i;
+  NSUInteger count = [selreps count];
+  NSUInteger i;
     
-  if (count > OPEN_MAX) {
-    NSString *msg1 = NSLocalizedString(@"Are you sure you want to open", @"");
-    NSString *msg2 = NSLocalizedString(@"items?", @"");
+  if (count > OPEN_MAX)
+    {
+      NSString *msg1 = NSLocalizedString(@"Are you sure you want to open", @"");
+      NSString *msg2 = NSLocalizedString(@"items?", @"");
 
-    if (NSRunAlertPanel(nil,
-                [NSString stringWithFormat: @"%@ %i %@", msg1, count, msg2],
-                NSLocalizedString(@"Cancel", @""),
-                NSLocalizedString(@"Yes", @""),
-                nil)) {
-      return;
-    }
-  }
-    
-  for (i = 0; i < count; i++) {
-    FSNode *node = [[selreps objectAtIndex: i] node];
-    
-    if ([node hasValidPath]) {            
-      NS_DURING
+      if (NSRunAlertPanel(nil,
+                          [NSString stringWithFormat: @"%@ %i %@", msg1, count, msg2],
+                          NSLocalizedString(@"Cancel", @""),
+                          NSLocalizedString(@"Yes", @""),
+                          nil))
         {
-      if ([node isDirectory]) {
-        if ([node isPackage]) {    
-          if ([node isApplication] == NO) {
-            [gworkspace openFile: [node path]];
-          } else {
-            [[NSWorkspace sharedWorkspace] launchApplication: [node path]];
-          }
-        } else {
-          [self viewerOfType: [viewer vtype] 
-                    showType: nil
-                     forNode: node 
-               showSelection: NO
-              closeOldViewer: nil
-                    forceNew: NO];
-        } 
-      } else if ([node isPlain]) {        
-        [gworkspace openFile: [node path]];
-      }
+          return;
         }
-      NS_HANDLER
+    }
+    
+  for (i = 0; i < count; i++)
+    {
+      FSNode *node = [[selreps objectAtIndex: i] node];
+      
+      if ([node hasValidPath])
+        {            
+          NS_DURING
+            {
+              if ([node isDirectory])
+                {
+                  if ([node isPackage])
+                    {    
+                      if ([node isApplication] == NO)
+                        [gworkspace openFile: [node path]];
+                      else
+                        [[NSWorkspace sharedWorkspace] launchApplication: [node path]];
+                    }
+                  else
+                    {
+                      [self viewerForNode: node 
+                                 showType: nil
+                            showSelection: NO
+                           closeOldViewer: nil
+                                 forceNew: NO];
+                    } 
+                }
+              else if ([node isPlain])
+                {        
+                  [gworkspace openFile: [node path]];
+                }
+            }
+          NS_HANDLER
+            {
+              NSRunAlertPanel(NSLocalizedString(@"error", @""), 
+                              [NSString stringWithFormat: @"%@ %@!", 
+                                        NSLocalizedString(@"Can't open ", @""), [node name]],
+                              NSLocalizedString(@"OK", @""), 
+                              nil, 
+                              nil);                                     
+            }
+          NS_ENDHANDLER
+            
+            }
+      else
         {
           NSRunAlertPanel(NSLocalizedString(@"error", @""), 
-              [NSString stringWithFormat: @"%@ %@!", 
-                        NSLocalizedString(@"Can't open ", @""), [node name]],
-                                            NSLocalizedString(@"OK", @""), 
-                                            nil, 
-                                            nil);                                     
+                          [NSString stringWithFormat: @"%@ %@!", 
+                                    NSLocalizedString(@"Can't open ", @""), [node name]],
+                          NSLocalizedString(@"OK", @""), 
+                          nil, 
+                          nil);                                     
         }
-      NS_ENDHANDLER
-    
-    } else {
-      NSRunAlertPanel(NSLocalizedString(@"error", @""), 
-          [NSString stringWithFormat: @"%@ %@!", 
-                    NSLocalizedString(@"Can't open ", @""), [node name]],
-                                        NSLocalizedString(@"OK", @""), 
-                                        nil, 
-                                        nil);                                     
     }
-  }
-
-  if (close) {
-    [[viewer win] close]; 
-  }
+  
+  if (close)
+    {
+      [[viewer win] close]; 
+    }
 }
 
 - (void)openAsFolderSelectionInViewer:(id)viewer
 {
   NSArray *selnodes = [[viewer nodeView] selectedNodes];
   BOOL force = NO;
-  int i;
+  NSUInteger i;
   
-  if ((selnodes == nil) || ([selnodes count] == 0)) {
-    selnodes = [NSArray arrayWithObject: [[viewer nodeView] shownNode]];
-    force = YES;
-  }
-  
-  for (i = 0; i < [selnodes count]; i++) {
-    FSNode *node = [selnodes objectAtIndex: i];
-        
-    if ([node isDirectory]) {
-      [self viewerOfType: [viewer vtype] 
-                showType: [viewer viewType]
-                 forNode: node
-           showSelection: NO
-          closeOldViewer: nil
-                forceNew: force];
-    } else if ([node isPlain]) {        
-      [gworkspace openFile: [node path]];
+  if ((selnodes == nil) || ([selnodes count] == 0))
+    {
+      selnodes = [NSArray arrayWithObject: [[viewer nodeView] shownNode]];
+      force = YES;
     }
-  }
+  
+  for (i = 0; i < [selnodes count]; i++)
+    {
+      FSNode *node = [selnodes objectAtIndex: i];
+        
+      if ([node isDirectory])
+        {
+          [self viewerForNode: node
+                     showType: [viewer viewType]
+                showSelection: NO
+               closeOldViewer: nil
+                     forceNew: force];
+        }
+      else if ([node isPlain])
+        {        
+          [gworkspace openFile: [node path]];
+        }
+    }
 }
 
 - (void)openWithSelectionInViewer:(id)viewer
@@ -969,23 +788,24 @@ static GWViewersManager *vwrsmanager = nil;
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];  
   NSMutableArray *viewersInfo = [NSMutableArray array];
-  int i;  
+  NSUInteger i;  
 
-  for (i = 0; i < [viewers count]; i++) {
-    id viewer = [viewers objectAtIndex: i];
+  for (i = 0; i < [viewers count]; i++)
+    {
+      id viewer = [viewers objectAtIndex: i];
 
-    if ([viewer invalidated] == NO) {
-      NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+      if ([viewer invalidated] == NO)
+        {
+          NSMutableDictionary *dict = [NSMutableDictionary dictionary];
       
-      [dict setObject: [[viewer baseNode] path] forKey: @"path"];
-      [dict setObject: [NSNumber numberWithInt: [viewer vtype]] 
-               forKey: @"type"];
-      if ([viewer rootViewerKey])
-	[dict setObject: [viewer rootViewerKey] forKey: @"key"];
+          [dict setObject: [[viewer baseNode] path] forKey: @"path"];
+
+          if ([viewer rootViewerKey])
+            [dict setObject: [viewer rootViewerKey] forKey: @"key"];
                
-      [viewersInfo addObject: dict];
+          [viewersInfo addObject: dict];
+        }
     }
-  }
   
   [defaults setObject: viewersInfo forKey: @"viewersinfo"];
   
@@ -999,60 +819,64 @@ static GWViewersManager *vwrsmanager = nil;
 
 - (void)addNode:(FSNode *)node toHistoryOfViewer:(id)viewer
 {
-  if ([node isValid] && (settingHistoryPath == NO)) {
-    BOOL spatial = [viewer isSpatial];
-    NSMutableArray *history = (spatial ? spatialViewersHistory: [viewer history]);
-    int position = (spatial ? spvHistoryPos : [viewer historyPosition]);
-    id hisviewer = [historyWindow viewer];
-    int cachemax = [gworkspace maxHistoryCache];
-    int count;
-
-    while ([history count] > cachemax) {
-      [history removeObjectAtIndex: 0];
-      if (position > 0) {
-        position--;
-      }
-    }
-    
-    count = [history count];
-    
-	  if (position == (count - 1)) {
-		  if ([[history lastObject] isEqual: node] == NO) {
-			  [history insertObject: node atIndex: count];
-		  }
-      position = [history count] - 1;
-
-    } else if (count > (position + 1)) {
-      BOOL equalpos = [[history objectAtIndex: position] isEqual: node];
-      BOOL equalnext = [[history objectAtIndex: position + 1] isEqual: node];
-    
-		  if (((equalpos == NO) && (equalnext == NO)) || equalnext) {
-			  position++;
-        
-        if (equalnext == NO) {
-			    [history insertObject: node atIndex: position];
+  if ([node isValid] && (settingHistoryPath == NO))
+    {
+      NSMutableArray *history = [viewer history];
+      int position = [viewer historyPosition];
+      id hisviewer = [historyWindow viewer];
+      int cachemax = [gworkspace maxHistoryCache];
+      int count;
+      
+      while ([history count] > cachemax)
+        {
+          [history removeObjectAtIndex: 0];
+          if (position > 0) {
+            position--;
+          }
         }
-        
-			  while ((position + 1) < [history count]) {
-				  int last = [history count] - 1;
-				  [history removeObjectAtIndex: last];
-			  }
-		  }
-	  }
-
-    [self removeDuplicatesInHistory: history position: &position];
-
-    if (spatial) {
-      spvHistoryPos = position;
-    } else {
+    
+      count = [history count];
+      
+      if (position == (count - 1))
+        {
+          if ([[history lastObject] isEqual: node] == NO)
+            {
+              [history insertObject: node atIndex: count];
+            }
+          position = [history count] - 1;
+          
+        }
+      else if (count > (position + 1))
+        {
+          BOOL equalpos = [[history objectAtIndex: position] isEqual: node];
+          BOOL equalnext = [[history objectAtIndex: position + 1] isEqual: node];
+          
+          if (((equalpos == NO) && (equalnext == NO)) || equalnext)
+            {
+              position++;
+              
+              if (equalnext == NO)
+                {
+                  [history insertObject: node atIndex: position];
+                }
+              
+              while ((position + 1) < [history count])
+                {
+                  int last = [history count] - 1;
+                  [history removeObjectAtIndex: last];
+                }
+            }
+        }
+      
+      [self removeDuplicatesInHistory: history position: &position];
+      
       [viewer setHistoryPosition: position];
+      
+      if (viewer == hisviewer) 
+        {
+          [historyWindow setHistoryNodes: history position: position];
+        }
     }
-
-    if ((viewer == hisviewer) 
-                || (spatial && (hisviewer && [hisviewer isSpatial]))) {
-      [historyWindow setHistoryNodes: history position: position];
-    }
-  }
 }
 
 - (void)removeDuplicatesInHistory:(NSMutableArray *)history
@@ -1120,16 +944,17 @@ if (*pos >= i) *pos -= n; \
 
 - (void)changeHistoryOwner:(id)viewer
 {
-  if (viewer && (viewer != [historyWindow viewer])) {
-    BOOL spatial = [viewer isSpatial];
-    NSMutableArray *history = (spatial ? spatialViewersHistory: [viewer history]);
-    int position = (spatial ? spvHistoryPos : [viewer historyPosition]);
+  if (viewer && (viewer != [historyWindow viewer]))
+    {
+      NSMutableArray *history = [viewer history];
+      int position = [viewer historyPosition];
   
-    [historyWindow setHistoryNodes: history position: position];
+      [historyWindow setHistoryNodes: history position: position];
 
-  } else if (viewer == nil) {
-    [historyWindow setHistoryNodes: nil];
-  }
+    } else if (viewer == nil)
+    {
+      [historyWindow setHistoryNodes: nil];
+    }
 
   [historyWindow setViewer: viewer];  
 }
@@ -1137,45 +962,46 @@ if (*pos >= i) *pos -= n; \
 - (void)goToHistoryPosition:(int)pos 
                    ofViewer:(id)viewer
 {
-  if (viewer) {
-    BOOL spatial = [viewer isSpatial];
-    NSMutableArray *history = (spatial ? spatialViewersHistory: [viewer history]);
-    int position = (spatial ? spvHistoryPos : [viewer historyPosition]);
+  if (viewer)
+    {
+      NSMutableArray *history = [viewer history];
+      int position = [viewer historyPosition];
  
-    [self removeDuplicatesInHistory: history position: &position];
+      [self removeDuplicatesInHistory: history position: &position];
 
-	  if ((pos >= 0) && (pos < [history count])) {
-      [self setPosition: pos inHistory: history ofViewer: viewer];
+      if ((pos >= 0) && (pos < [history count]))
+        {
+          [self setPosition: pos inHistory: history ofViewer: viewer];
+        }
     }
-  }
 }
 
 - (void)goBackwardInHistoryOfViewer:(id)viewer
 {
-  BOOL spatial = [viewer isSpatial];
-  NSMutableArray *history = (spatial ? spatialViewersHistory: [viewer history]);
-  int position = (spatial ? spvHistoryPos : [viewer historyPosition]);
+  NSMutableArray *history = [viewer history];
+  int position = [viewer historyPosition];
 
   [self removeDuplicatesInHistory: history position: &position];
 
-  if ((position > 0) && (position < [history count])) {
-    position--;
-    [self setPosition: position inHistory: history ofViewer: viewer];
-  }
+  if ((position > 0) && (position < [history count]))
+    {
+      position--;
+      [self setPosition: position inHistory: history ofViewer: viewer];
+    }
 }
 
 - (void)goForwardInHistoryOfViewer:(id)viewer
 {
-  BOOL spatial = [viewer isSpatial];
-  NSMutableArray *history = (spatial ? spatialViewersHistory: [viewer history]);
-  int position = (spatial ? spvHistoryPos : [viewer historyPosition]);
+  NSMutableArray *history = [viewer history];
+  int position = [viewer historyPosition];
 
   [self removeDuplicatesInHistory: history position: &position];
   
-  if ((position >= 0) && (position < ([history count] - 1))) {
-    position++;
-    [self setPosition: position inHistory: history ofViewer: viewer];
-  }
+  if ((position >= 0) && (position < ([history count] - 1)))
+    {
+      position++;
+      [self setPosition: position inHistory: history ofViewer: viewer];
+    }
 }
 
 - (void)setPosition:(int)position
@@ -1183,37 +1009,24 @@ if (*pos >= i) *pos -= n; \
            ofViewer:(id)viewer
 {
   FSNode *node = [history objectAtIndex: position];
-  BOOL spatial = [viewer isSpatial];
-
-  settingHistoryPath = YES;
-
-  if (spatial == NO) {
-    id nodeView = [viewer nodeView];
+  id nodeView = [viewer nodeView];
   
-    if ([[viewer viewType] isEqual: @"Browser"] == NO) {
+  settingHistoryPath = YES;
+  
+  if ([[viewer viewType] isEqual: @"Browser"] == NO)
+    {
       [nodeView showContentsOfNode: node];
-    } else {
+    }
+  else
+    {
       [nodeView showContentsOfNode: [FSNode nodeWithPath: [node parentPath]]];
       [nodeView selectRepsOfSubnodes: [NSArray arrayWithObject: node]];
     }
 
-    if ([nodeView respondsToSelector: @selector(scrollSelectionToVisible)]) {
-      [nodeView scrollSelectionToVisible];
-    }
-  } else {
-    [self viewerOfType: SPATIAL
-              showType: nil
-               forNode: node
-         showSelection: YES
-        closeOldViewer: nil
-              forceNew: NO];
-  }
+  if ([nodeView respondsToSelector: @selector(scrollSelectionToVisible)])
+    [nodeView scrollSelectionToVisible];
 
-  if (spatial) {
-    spvHistoryPos = position;
-  } else {
-    [viewer setHistoryPosition: position];
-  }
+  [viewer setHistoryPosition: position];
 
   [historyWindow setHistoryPosition: position];
 

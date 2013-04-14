@@ -1,6 +1,6 @@
 /* GWViewer.h
  *  
- * Copyright (C) 2004-2009 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2004
@@ -43,7 +43,6 @@
 - (void)deleteFiles:(id)sender;
 - (void)goBackwardInHistory:(id)sender;
 - (void)goForwardInHistory:(id)sender;
-- (void)setViewerBehaviour:(id)sender;
 - (void)setViewerType:(id)sender;
 - (void)setShownType:(id)sender;
 - (void)setExtendedShownType:(id)sender;

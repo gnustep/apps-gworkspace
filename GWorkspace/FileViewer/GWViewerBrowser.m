@@ -1,6 +1,6 @@
 /* GWViewerBrowser.m
  *  
- * Copyright (C) 2004-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2004
@@ -27,7 +27,6 @@
 #import "FSNBrowserColumn.h"
 #import "FSNBrowserMatrix.h"
 #import "FSNBrowserCell.h"
-#import "GWSpatialViewer.h"
 #import "GWViewersManager.h"
 
 @implementation GWViewerBrowser
@@ -57,105 +56,20 @@
 
 - (void)notifySelectionChange:(NSArray *)newsel
 {
-  if (newsel) {
-    if ((lastSelection == nil) || ([newsel isEqual: lastSelection] == NO)) {
-      if ([newsel count] == 0) {
-        newsel = [NSArray arrayWithObject: baseNode]; 
-      } else if (([viewer vtype] == SPATIAL) 
-                        && [(NSWindow *)[viewer win] isKeyWindow]) {
-        [manager selectedSpatialViewerChanged: viewer];
-      }
-
-      ASSIGN (lastSelection, newsel);
-      [viewer selectionChanged: newsel];
-      [self synchronizeViewer];
-    } 
-  }
-}
-
-- (NSMenu *)menuForEvent:(NSEvent *)theEvent
-{
-  if (([theEvent type] == NSRightMouseDown) && ([viewer vtype] == SPATIAL)) {  
-    FSNBrowserColumn *bc = [self lastLoadedColumn];
-    NSPoint location = [theEvent locationInWindow];
-
-    location = [self convertPoint: location fromView: nil];
-    
-    if (bc && [self mouse: location inRect: [bc frame]]) {
-      NSArray *selnodes = [bc selectedNodes];
-      NSAutoreleasePool *pool;
-      NSMenu *menu;
-      NSMenuItem *menuItem;
-      NSString *firstext; 
-      NSDictionary *apps;
-      NSEnumerator *app_enum;
-      id key; 
-      NSUInteger i;
-  
-      if (selnodes && [selnodes count]) {
-        FSNBrowserMatrix *matrix = (FSNBrowserMatrix *)[bc cmatrix];
-        FSNBrowserCell *cell;
-        NSInteger row, col;
-        
-        location = [matrix convertPoint: location fromView: self];
-        
-        if ([matrix getRow: &row column: &col forPoint: location] == NO) {
-          return [super menuForEvent: theEvent];
-        }
-        
-        cell = [matrix cellAtRow: row column: col];
-        
-        if ([selnodes containsObject: [cell node]] == NO) {
-          return [super menuForEvent: theEvent];
-        }
-        
-        firstext = [[[selnodes objectAtIndex: 0] path] pathExtension];
-
-        for (i = 0; i < [selnodes count]; i++) {
-          FSNode *snode = [selnodes objectAtIndex: i];
-          NSString *selpath = [snode path];
-          NSString *ext = [selpath pathExtension];   
-
-          if ([ext isEqual: firstext] == NO) {
-            return [super menuForEvent: theEvent];  
-          }
-
-          if ([snode isDirectory] == NO) {
-            if ([snode isPlain] == NO) {
-              return [super menuForEvent: theEvent];
+  if (newsel)
+    {
+      if ((lastSelection == nil) || ([newsel isEqual: lastSelection] == NO))
+        {
+          if ([newsel count] == 0)
+            {
+              newsel = [NSArray arrayWithObject: baseNode]; 
             }
-          } else {
-            if (([snode isPackage] == NO) || [snode isApplication]) {
-              return [super menuForEvent: theEvent];
-            } 
-          }
-        }
 
-        menu = [[NSMenu alloc] initWithTitle: NSLocalizedString(@"Open with", @"")];
-        apps = [[NSWorkspace sharedWorkspace] infoForExtension: firstext];
-        app_enum = [[apps allKeys] objectEnumerator];
-
-        pool = [NSAutoreleasePool new];
-
-        while ((key = [app_enum nextObject])) {
-          menuItem = [NSMenuItem new];    
-          key = [key stringByDeletingPathExtension];
-          [menuItem setTitle: key];
-          [menuItem setTarget: desktopApp];      
-          [menuItem setAction: @selector(openSelectionWithApp:)];      
-          [menuItem setRepresentedObject: key];            
-          [menu addItem: menuItem];
-          RELEASE (menuItem);
-        }
-
-        RELEASE (pool);
-
-        return [menu autorelease];
-      }    
-    }  
-  }
-  
-  return [super menuForEvent: theEvent]; 
+          ASSIGN (lastSelection, newsel);
+          [viewer selectionChanged: newsel];
+          [self synchronizeViewer];
+        } 
+    }
 }
 
 @end

@@ -1,6 +1,6 @@
 /* GWViewer.h
  *  
- * Copyright (C) 2004-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2004
@@ -96,8 +96,6 @@
 - (NSString *)viewType;
 - (BOOL)isRootViewer;
 - (NSNumber *)rootViewerKey;
-- (BOOL)isSpatial;
-- (int)vtype;
 
 - (void)activate;
 - (void)deactivate;
@@ -154,7 +152,6 @@
 - (void)deleteFiles;
 - (void)goBackwardInHistory;
 - (void)goForwardInHistory;
-- (void)setViewerBehaviour:(id)sender;
 - (void)setViewerType:(id)sender;
 - (void)setShownType:(id)sender;
 - (void)setExtendedShownType:(id)sender;

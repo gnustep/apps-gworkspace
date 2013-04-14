@@ -1,6 +1,6 @@
 /* GWDesktopManager.h
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -109,8 +109,6 @@ typedef enum DockPosition {
 - (void)mouseExitedTShelfActiveFrame;
 
 - (void)deselectAllIcons;
-
-- (void)deselectInSpatialViewers;
 
 - (void)addWatcherForPath:(NSString *)path;
 

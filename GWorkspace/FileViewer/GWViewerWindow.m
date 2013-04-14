@@ -1,6 +1,6 @@
 /* GWViewerWindow.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2004
@@ -100,11 +100,6 @@
 - (void)goForwardInHistory:(id)sender
 {
   [[self delegate] goForwardInHistory];
-}
-
-- (void)setViewerBehaviour:(id)sender
-{
-  [[self delegate] setViewerBehaviour: sender];
 }
 
 - (void)setViewerType:(id)sender

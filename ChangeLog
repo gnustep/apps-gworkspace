@@ -1,3 +1,29 @@
+2013-04-14 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/Resources/English.lproj/Help/SViewer.rtfd
+	* GWorkspace/FileViewer/GWSpatialViewer.h
+	* GWorkspace/FileViewer/GWSpatialViewer.m
+	Deleted
+
+	* FSNode/FSNBrowser.m
+	* FSNode/FSNodeRep.m
+	* GWorkspace/Desktop/GWDesktopManager.h
+	* GWorkspace/Desktop/GWDesktopManager.m
+	* GWorkspace/Desktop/GWDesktopView.m
+	* GWorkspace/FileViewer/GWViewer.h
+	* GWorkspace/FileViewer/GWViewer.m
+	* GWorkspace/FileViewer/GWViewerBrowser.m
+	* GWorkspace/FileViewer/GWViewerIconsView.m
+	* GWorkspace/FileViewer/GWViewerListView.m
+	* GWorkspace/FileViewer/GWViewerScrollView.m
+	* GWorkspace/FileViewer/GWViewerWindow.h
+	* GWorkspace/FileViewer/GWViewerWindow.m
+	* GWorkspace/FileViewer/GWViewersManager.h
+	* GWorkspace/FileViewer/GWViewersManager.m
+	* GWorkspace/GNUmakefile.in
+	* GWorkspace/GWorkspace.m
+	Removed spatial viewer support.
+
 2013-04-03 Riccardo Mottola <rm@gnu.org>
 
 	* Operation/FileOpInfo.m

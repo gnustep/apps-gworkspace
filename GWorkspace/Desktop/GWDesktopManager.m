@@ -394,11 +394,6 @@ static GWDesktopManager *desktopManager = nil;
   [desktopView stopRepNameEditing];
 }
 
-- (void)deselectInSpatialViewers
-{
-  [[gworkspace viewersManager] selectedSpatialViewerChanged: nil];
-}
-
 - (void)addWatcherForPath:(NSString *)path
 {
   [gworkspace addWatcherForPath: path];

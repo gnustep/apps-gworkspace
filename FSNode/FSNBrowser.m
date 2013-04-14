@@ -1,6 +1,6 @@
 /* FSNBrowser.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2004
@@ -1158,60 +1158,71 @@
   int added = 0;
   NSArray *selection = [col selectedNodes];
   
-  if ((selection == nil) || ([selection count] == 0)) {
-    [self notifySelectionChange: [NSArray arrayWithObject: [col shownNode]]];
-    return;
-  }
-
-  if (selColumn) {
-    if ((pos == visibleColumns) && (index == ([columns count] -1))) {
-      NSPoint p = [[self window] mouseLocationOutsideOfEventStream];
-      
-      mousePointX = p.x;
-      mousePointY = p.y;
-      simulatingDoubleClick = YES;
-
-      [NSTimer scheduledTimerWithTimeInterval: 0.3
-											                 target: self 
-                                     selector: @selector(doubleClikTimeOut:) 
-																		 userInfo: nil 
-                                      repeats: NO];
+  if ((selection == nil) || ([selection count] == 0))
+    {
+      [self notifySelectionChange: [NSArray arrayWithObject: [col shownNode]]];
+      return;
     }
-  }
 
+  if (selColumn)
+    {
+      if ((pos == visibleColumns) && (index == ([columns count] -1)))
+        {
+          NSPoint p = [[self window] mouseLocationOutsideOfEventStream];
+          
+          mousePointX = p.x;
+          mousePointY = p.y;
+          simulatingDoubleClick = YES;
+          
+          [NSTimer scheduledTimerWithTimeInterval: 0.3
+                                           target: self 
+                                         selector: @selector(doubleClikTimeOut:)
+                                         userInfo: nil 
+                                          repeats: NO];
+        }
+    }
+  
   currentshift = 0;
   updateViewsLock++;
   
   [self setLastColumn: index];
   
-  if ([selection count] == 1) {
-    FSNode *node = [selection objectAtIndex: 0];
-  
-    if ([node isDirectory] && ([node isPackage] == NO)) {
-      [self addAndLoadColumnForNode: node];
-      if (manager) {
-        [manager viewer: viewer didShowNode: node];
-      }
-      added = 1;
+  if ([selection count] == 1)
+    {
+      FSNode *node = [selection objectAtIndex: 0];
       
-    } else if (selColumn) {
+      if ([node isDirectory] && ([node isPackage] == NO))
+        {
+          [self addAndLoadColumnForNode: node];
+          added = 1;
+          
+        }
+      else if (selColumn)
+        {
+          [self addFillingColumn];
+        }  
+      
+    }
+  else if (selColumn)
+    {
       [self addFillingColumn];
-    }  
-    
-  } else if (selColumn) {
-    [self addFillingColumn];
-  } 
+    } 
   
-  if (selColumn == NO) {
-    if (mustshift && (pos < visibleColumns)) { 
-		  [self setShift: visibleColumns - pos - added];
-	  }
-  } else {
-    if (mustshift && (pos < (visibleColumns - 1))) { 
-		  [self setShift: visibleColumns - pos - 1];
-	  }
-  }
-    
+  if (selColumn == NO)
+    {
+      if (mustshift && (pos < visibleColumns))
+        { 
+          [self setShift: visibleColumns - pos - added];
+        }
+    }
+  else
+    {
+      if (mustshift && (pos < (visibleColumns - 1)))
+        { 
+          [self setShift: visibleColumns - pos - 1];
+        }
+    }
+  
   updateViewsLock--;
   [self tile];
   

@@ -70,7 +70,6 @@ Desktop/Dock/Dock.m \
 Desktop/Dock/DockIcon.m \
 FileViewer/GWViewersManager.m \
 FileViewer/GWViewer.m \
-FileViewer/GWSpatialViewer.m \
 FileViewer/GWViewerWindow.m \
 FileViewer/GWViewerBrowser.m \
 FileViewer/GWViewerIconsView.m \

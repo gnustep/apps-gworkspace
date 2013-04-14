@@ -1,6 +1,6 @@
 /* GWViewerIconsView.m
  *  
- * Copyright (C) 2004-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2004
@@ -25,7 +25,6 @@
 #import <AppKit/AppKit.h>
 #import "GWViewerIconsView.h"
 #import "FSNIcon.h"
-#import "GWSpatialViewer.h"
 #import "GWViewer.h"
 #import "GWViewersManager.h"
 
@@ -40,33 +39,32 @@
 {
   self = [super init];
   
-  if (self) {
-		viewer = vwr;
-    manager = [GWViewersManager viewersManager];
-  }
+  if (self)
+    {
+      viewer = vwr;
+      manager = [GWViewersManager viewersManager];
+    }
   
   return self;
 }
 
 - (void)selectionDidChange
 {
-	if (!(selectionMask & FSNCreatingSelectionMask)) {
-    NSArray *selection = [self selectedNodes];
+  if (!(selectionMask & FSNCreatingSelectionMask))
+    {
+      NSArray *selection = [self selectedNodes];
 		
-    if ([selection count] == 0) {
-      selection = [NSArray arrayWithObject: node];
-    } else if (([viewer vtype] == SPATIAL) 
-                        && [(NSWindow *)[viewer win] isKeyWindow]) {
-      [manager selectedSpatialViewerChanged: viewer];
-    }
+      if ([selection count] == 0)
+        selection = [NSArray arrayWithObject: node];
 
-    if ((lastSelection == nil) || ([selection isEqual: lastSelection] == NO)) {
-      ASSIGN (lastSelection, selection);
-      [viewer selectionChanged: selection];
-    }
+      if ((lastSelection == nil) || ([selection isEqual: lastSelection] == NO))
+        {
+          ASSIGN (lastSelection, selection);
+          [viewer selectionChanged: selection];
+        }
     
-    [self updateNameEditor];
-	}
+      [self updateNameEditor];
+    }
 }
 
 - (void)openSelectionInNewViewer:(BOOL)newv
@@ -76,21 +74,18 @@
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-  if ([theEvent modifierFlags] != NSShiftKeyMask) {
-    selectionMask = NSSingleSelectionMask;
-    selectionMask |= FSNCreatingSelectionMask;
-		[self unselectOtherReps: nil];
-    selectionMask = NSSingleSelectionMask;
+  if ([theEvent modifierFlags] != NSShiftKeyMask)
+    {
+      selectionMask = NSSingleSelectionMask;
+      selectionMask |= FSNCreatingSelectionMask;
+      [self unselectOtherReps: nil];
+      selectionMask = NSSingleSelectionMask;
     
-    DESTROY (lastSelection);
-    [self selectionDidChange];
-    [self stopRepNameEditing];
-    
-    if ([viewer vtype] == SPATIAL) {
-      [manager selectedSpatialViewerChanged: viewer];
-      [manager synchronizeSelectionInParentOfViewer: viewer];
+      DESTROY (lastSelection);
+      [self selectionDidChange];
+      [self stopRepNameEditing];
+   
     }
-	}
 }
 
 @end

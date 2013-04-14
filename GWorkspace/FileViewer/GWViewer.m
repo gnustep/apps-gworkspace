@@ -449,16 +449,6 @@
   return rootViewerKey;
 }
 
-- (BOOL)isSpatial
-{
-  return NO;
-}
-
-- (int)vtype
-{
-  return BROWSING;
-}
-
 - (void)activate
 {
   [vwrwin makeKeyAndOrderFront: nil];
@@ -1208,11 +1198,6 @@ constrainMinCoordinate:(CGFloat)proposedMin
 - (void)goForwardInHistory
 {
   [manager goForwardInHistoryOfViewer: self];
-}
-
-- (void)setViewerBehaviour:(id)sender
-{
-  [manager setBehaviour: [sender title] forViewer: self];
 }
 
 - (void)setViewerType:(id)sender

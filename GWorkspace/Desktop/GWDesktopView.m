@@ -1,6 +1,6 @@
 /* GWDesktopView.m
  *  
- * Copyright (C) 2005-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola <rm@gnu.org>
@@ -744,17 +744,16 @@
   [win makeMainWindow];
   [win makeKeyWindow];
   
-  if ([theEvent modifierFlags] != NSShiftKeyMask) {
-    selectionMask = NSSingleSelectionMask;
-    selectionMask |= FSNCreatingSelectionMask;
-		[self unselectOtherReps: nil];
-    selectionMask = NSSingleSelectionMask;
+  if ([theEvent modifierFlags] != NSShiftKeyMask)
+    {
+      selectionMask = NSSingleSelectionMask;
+      selectionMask |= FSNCreatingSelectionMask;
+      [self unselectOtherReps: nil];
+      selectionMask = NSSingleSelectionMask;
     
-    DESTROY (lastSelection);
-    [self selectionDidChange];
-    
-    [manager deselectInSpatialViewers];
-	}
+      DESTROY (lastSelection);
+      [self selectionDidChange];
+    }
 }
 
 #define SUPPORTS_XOR ((GNUSTEP_GUI_MAJOR_VERSION > 0)		\
@@ -1382,19 +1381,17 @@ static void GWHighlightFrameRect(NSRect aRect)
 
 - (void)selectionDidChange
 {
-	if (!(selectionMask & FSNCreatingSelectionMask)) {
-    NSArray *selection = [self selectedNodes];
+  if (!(selectionMask & FSNCreatingSelectionMask))
+    {
+      NSArray *selection = [self selectedNodes];
 		
-    if ([selection count] == 0) {
-      selection = [NSArray arrayWithObject: node];
-    } else {
-      [manager deselectInSpatialViewers];
+      if ([selection count] == 0)
+        selection = [NSArray arrayWithObject: node];
+      
+      ASSIGN (lastSelection, selection);
+      [desktopApp selectionChanged: selection];
+      [self updateNameEditor];
     }
-
-    ASSIGN (lastSelection, selection);
-    [desktopApp selectionChanged: selection];
-    [self updateNameEditor];
-	}
 }
 
 - (void)openSelectionInNewViewer:(BOOL)newv

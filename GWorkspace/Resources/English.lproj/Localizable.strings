@@ -29,9 +29,6 @@
 	"Browser" = "Browser";
 	"Icon" = "Icon";
 	"List" = "List";
-	"Viewer behaviour" = "Viewer behaviour";
-		"Browsing" = "Browsing";
-		"Spatial" = "Spatial";
 	"Show" = "Show";
 	        "Name only" = "Name only";
 		"Type" = "Type";
