@@ -1,6 +1,6 @@
 /* BrowserViewerPref.m
  *  
- * Copyright (C) 2003-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -29,13 +29,12 @@
 #import "BrowserViewerPref.h"
 
 
-#define EXAMPLE_X 10
-#define EXAMPLE_Y 6
-#define EXAMPLE_H 99  
 #define RESIZER_W 16
 #define RESIZER_Y 48
 
+#define MINIMUM_WIDTH 120
 #define DEFAULT_WIDTH 150
+#define MAXIMUM_WIDTH 362
 
 static NSString *nibName = @"BrowserViewerPref";
 
@@ -64,7 +63,7 @@ static NSString *nibName = @"BrowserViewerPref";
 - (void)drawRect:(NSRect)rect
 {
   [super drawRect: rect];
-	[arrow compositeToPoint: NSZeroPoint operation: NSCompositeSourceOver];
+  [arrow compositeToPoint: NSZeroPoint operation: NSCompositeSourceOver];
 }
 
 @end
@@ -82,35 +81,39 @@ static NSString *nibName = @"BrowserViewerPref";
 {
   self = [super init];
   
-  if (self) {
-		if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
-      NSLog(@"failed to load %@!", nibName);
-    } else { 
-      NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-      NSString *widthStr = [defaults objectForKey: @"browserColsWidth"];
+  if (self)
+    {
+      if ([NSBundle loadNibNamed: nibName owner: self] == NO)
+        {
+          NSLog(@"failed to load %@!", nibName);
+        }
+      else
+        { 
+          NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+          NSString *widthStr = [defaults objectForKey: @"browserColsWidth"];
       
-      RETAIN (prefbox);
-      RELEASE (win);
+          RETAIN (prefbox);
+          RELEASE (win);
 
-      if (widthStr) {
-        columnsWidth = [widthStr intValue];
-      } else {
-        columnsWidth = DEFAULT_WIDTH;
-      }
+          if (widthStr)
+            columnsWidth = [widthStr intValue];
+          else
+            columnsWidth = DEFAULT_WIDTH;
 
-      [colExample setBorderType: NSBezelBorder];
-		  [colExample setHasHorizontalScroller: NO];
+          [colExample setBorderType: NSBezelBorder];
+          [colExample setHasHorizontalScroller: NO];
   	  [colExample setHasVerticalScroller: YES]; 
 
-      resizer = [[Resizer alloc] initForController: self];
-      [resizer setFrame: NSMakeRect(0, 0, RESIZER_W, RESIZER_W)];
-	    [resizerBox setContentView: resizer]; 
+          resizer = [[Resizer alloc] initForController: self];
+          [resizer setFrame: NSMakeRect(0, 0, RESIZER_W, RESIZER_W)];
+          [resizerBox setContentView: resizer];
+          [self tile]; 
             
-      /* Internationalization */
-      [controlsbox setTitle: NSLocalizedString(@"Columns Width", @"")];  
-      [setButt setTitle: NSLocalizedString(@"Use Default Settings", @"")];  
+          /* Internationalization */
+          [controlsbox setTitle: NSLocalizedString(@"Columns Width", @"")];  
+          [setButt setTitle: NSLocalizedString(@"Use Default Settings", @"")];  
+        }
     }
-  }
   
   return self;
 }
@@ -127,17 +130,20 @@ static NSString *nibName = @"BrowserViewerPref";
 
 - (void)tile
 {
-  [colExample setFrame: NSMakeRect(EXAMPLE_X, EXAMPLE_Y, columnsWidth, EXAMPLE_H)];    
-  [resizerBox setFrameOrigin: NSMakePoint(columnsWidth + EXAMPLE_X, RESIZER_Y)];  
+  NSRect frameRect;
+
+  frameRect = [colExample frame];
+  frameRect.size.width = columnsWidth;
+  [colExample setFrame: frameRect];    
+  [resizerBox setFrameOrigin: NSMakePoint(columnsWidth + frameRect.origin.x, RESIZER_Y)];  
   [controlsbox setNeedsDisplay: YES];
 }
 
 - (void)mouseDownOnResizer:(NSEvent *)theEvent
 {
   NSApplication	*app = [NSApplication sharedApplication];
-  NSDate *farAway = [NSDate distantFuture];
   int orx = (int)[controlsbox convertPoint: [theEvent locationInWindow] fromView: nil].x;
-  unsigned int eventMask = NSLeftMouseUpMask | NSLeftMouseDraggedMask;
+  NSUInteger eventMask = NSLeftMouseUpMask | NSLeftMouseDraggedMask;
   int newWidth = (int)[colExample bounds].size.width;
   NSEvent	*e;
   
@@ -145,33 +151,38 @@ static NSString *nibName = @"BrowserViewerPref";
   [[NSRunLoop currentRunLoop] limitDateForMode: NSEventTrackingRunLoopMode];
 
   e = [app nextEventMatchingMask: eventMask
-		                   untilDate: farAway
-			                    inMode: NSEventTrackingRunLoopMode
-			                   dequeue: YES];
+                       untilDate: [NSDate distantFuture]
+                          inMode: NSEventTrackingRunLoopMode
+                         dequeue: YES];
 
-  while ([e type] != NSLeftMouseUp) {
-    int x = (int)[controlsbox convertPoint: [e locationInWindow] fromView: nil].x;
-    int diff = x - orx;
+  while ([e type] != NSLeftMouseUp)
+    {
+      int x = (int)[controlsbox convertPoint: [e locationInWindow] fromView: nil].x;
+      int diff = x - orx;
     
-    if ((newWidth + diff < 230) && (newWidth + diff > 120)) {                
-      newWidth += diff;
-      
-      [resizerBox setFrameOrigin: NSMakePoint(EXAMPLE_X + newWidth, RESIZER_Y)];
-      [resizerBox setNeedsDisplay: YES];
+    if ((newWidth + diff < MAXIMUM_WIDTH) && (newWidth + diff > MINIMUM_WIDTH))
+      {
+        NSRect frameExample;
+
+        frameExample = [colExample frame];
+        newWidth += diff;      
+        [resizerBox setFrameOrigin: NSMakePoint(frameExample.origin.x + newWidth, RESIZER_Y)];
+        [resizerBox setNeedsDisplay: YES];
   
-      [colExample setFrame: NSMakeRect(EXAMPLE_X, EXAMPLE_Y, newWidth, EXAMPLE_H)];        
-      [colExample setNeedsDisplay: YES];  
+        frameExample.size.width = newWidth;
+        [colExample setFrame: frameExample];
+        [colExample setNeedsDisplay: YES];  
 
-      [controlsbox setNeedsDisplay: YES];
+        [controlsbox setNeedsDisplay: YES];
 
-      orx = x;
+        orx = x;
     }
     
     e = [app nextEventMatchingMask: eventMask
-		                     untilDate: farAway
-			                      inMode: NSEventTrackingRunLoopMode
-			                     dequeue: YES];
-  }
+                         untilDate: [NSDate distantFuture]
+                            inMode: NSEventTrackingRunLoopMode
+                           dequeue: YES];
+    }
   
   [controlsbox unlockFocus];
   [self setNewWidth: (int)[colExample bounds].size.width];
@@ -187,10 +198,10 @@ static NSString *nibName = @"BrowserViewerPref";
                
   columnsWidth = w;
   
-	[[NSNotificationCenter defaultCenter]
+  [[NSNotificationCenter defaultCenter]
  				 postNotificationName: @"GWBrowserColumnWidthChangedNotification"
-	 								     object: [NSNumber numberWithInt: w]];  
-                       
+                                               object: [NSNumber numberWithInt: w]];  
+  
   [defaults synchronize];                           
 }
 

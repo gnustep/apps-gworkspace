@@ -1,6 +1,6 @@
 /* BrowserViewerPref.h
  *  
- * Copyright (C) 2003 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -26,10 +26,10 @@
 #ifndef BROWSERVIEWERPREF_H
 #define BROWSERVIEWERPREF_H
 
-#include <AppKit/NSView.h>
+#import <Foundation/Foundation.h>
+#import <AppKit/NSView.h>
 
-#include <Foundation/Foundation.h>
-#include "PrefProtocol.h"
+#import "PrefProtocol.h"
 
 @class NSEvent;
 

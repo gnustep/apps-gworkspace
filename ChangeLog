@@ -1,3 +1,10 @@
+2013-04-22 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/Preferences/BrowserViewerPref.h
+	* GWorkspace/Preferences/BrowserViewerPref.m
+	* GWorkspace/Resources/English.lproj/BrowserViewerPref.gorm
+	Clean up Browser preferences code and allow a max. width of 362.
+
 2013-04-14 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/Resources/English.lproj/Help/SViewer.rtfd
