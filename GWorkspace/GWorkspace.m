@@ -771,7 +771,8 @@ static GWorkspace *gworkspace = nil;
                     showType: nil
                showSelection: NO
               closeOldViewer: nil
-                    forceNew: NO];
+                    forceNew: NO
+	             withKey: nil];
 }
 
 - (NSImage *)tshelfBackground

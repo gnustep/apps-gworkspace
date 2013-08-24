@@ -38,9 +38,10 @@ static GWViewersManager *vwrsmanager = nil;
 
 + (GWViewersManager *)viewersManager
 {
-	if (vwrsmanager == nil) {
-		vwrsmanager = [[GWViewersManager alloc] init];
-	}	
+  if (vwrsmanager == nil)
+    {
+      vwrsmanager = [[GWViewersManager alloc] init];
+    }	
   return vwrsmanager;
 }
 
@@ -49,7 +50,6 @@ static GWViewersManager *vwrsmanager = nil;
   [[NSDistributedNotificationCenter defaultCenter] removeObserver: self];
   [nc removeObserver: self];
   RELEASE (viewers);
-  RELEASE (rootViewersKeys);
   RELEASE (bviewerHelp);
     
   [super dealloc];
@@ -61,7 +61,6 @@ static GWViewersManager *vwrsmanager = nil;
   
   if (self) {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];  
-    id entry = [defaults objectForKey: @"root_viewers_keys"];
     
     gworkspace = [GWorkspace gworkspace];
     helpManager = [NSHelpManager sharedHelpManager];    
@@ -69,10 +68,6 @@ static GWViewersManager *vwrsmanager = nil;
     
     viewers = [NSMutableArray new];
     orderingViewers = NO;
-    
-    rootViewersKeys = [NSMutableArray new];
-    if (entry)
-      [rootViewersKeys addObjectsFromArray: entry];
     
     historyWindow = [gworkspace historyWindow]; 
     nc = [NSNotificationCenter defaultCenter];
@@ -118,6 +113,7 @@ static GWViewersManager *vwrsmanager = nil;
           NSDictionary *dict = [viewersInfo objectAtIndex: i];
           NSString *path = [dict objectForKey: @"path"];
           FSNode *node = [FSNode nodeWithPath: path];
+	  NSString *key = [dict objectForKey: @"key"];
     
           if (node && [node isValid])
             {
@@ -125,7 +121,8 @@ static GWViewersManager *vwrsmanager = nil;
                          showType: nil
                     showSelection: YES
                    closeOldViewer: NO
-                         forceNew: YES];
+                         forceNew: YES
+		          withKey: key];
             }
         }
 
@@ -146,10 +143,11 @@ static GWViewersManager *vwrsmanager = nil;
     {
   
       viewer = [self viewerForNode: node
-                          showType: nil
+		     showType: nil
                      showSelection: YES
-                    closeOldViewer: NO
-                          forceNew: NO];
+		     closeOldViewer: NO
+		     forceNew: NO
+		     withKey: nil];
     }
   else
     {
@@ -163,7 +161,8 @@ static GWViewersManager *vwrsmanager = nil;
                               showType: nil
                          showSelection: YES
                         closeOldViewer: NO
-                              forceNew: YES];
+                              forceNew: YES
+			       withKey: nil];
         }
     }
   
@@ -200,7 +199,8 @@ static GWViewersManager *vwrsmanager = nil;
                            showType: nil
                       showSelection: NO
                      closeOldViewer: NO
-                           forceNew: NO];
+                           forceNew: NO
+		            withKey: nil];
     } 
   
   if (selection)
@@ -214,6 +214,7 @@ static GWViewersManager *vwrsmanager = nil;
      showSelection:(BOOL)showsel
     closeOldViewer:(id)oldvwr
           forceNew:(BOOL)force
+	   withKey:(NSString *)key
 {
   id viewer = [self viewerWithBaseNode: node];
     
@@ -225,9 +226,10 @@ static GWViewersManager *vwrsmanager = nil;
       [win setReleasedWhenClosed: NO];
       
       viewer = [[c alloc] initForNode: node 
-                             inWindow: win 
-                             showType: stype
-                        showSelection: showsel]; 
+			     inWindow: win 
+			     showType: stype
+			showSelection: showsel
+			      withKey: key]; 
       
       [viewers addObject: viewer];
       RELEASE (win);
@@ -306,25 +308,12 @@ static GWViewersManager *vwrsmanager = nil;
   for (i = 0; i < [viewers count]; i++) {
     id viewer = [viewers objectAtIndex: i];
 
-    if ([viewer isRootViewer]) {
+    if ([viewer isFirstRootViewer]) {
       return viewer;
     }
   }
 
   return nil;
-}
-
-- (NSNumber *)nextRootViewerKey
-{
-  NSNumber *key = nil;
-    
-  if ([rootViewersKeys count]) {
-    key = [rootViewersKeys objectAtIndex: 0];
-    RETAIN (key);
-    [rootViewersKeys removeObjectAtIndex: 0];
-  }
-  
-  return AUTORELEASE (key);
 }
 
 
@@ -333,16 +322,18 @@ static GWViewersManager *vwrsmanager = nil;
   FSNode *node = [aviewer baseNode];
   NSString *path = [node path];
   NSArray *watchedNodes = [aviewer watchedNodes];
-  NSNumber *key = [aviewer rootViewerKey];
   NSUInteger i;
 
   
   if ([node isValid] == NO)
     {
       NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];  
-      NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", path]; 
-      NSDictionary *vwrprefs = [defaults dictionaryForKey: prefsname];
-      
+      NSString *prefsname;
+      NSDictionary *vwrprefs;
+
+      prefsname = [aviewer defaultsKey];
+
+      vwrprefs = [defaults dictionaryForKey: prefsname];
       if (vwrprefs)
         {
           [defaults removeObjectForKey: prefsname];
@@ -356,9 +347,6 @@ static GWViewersManager *vwrsmanager = nil;
 
   if (aviewer == [historyWindow viewer])
     [self changeHistoryOwner: nil];
-      
-  if (key)
-    [rootViewersKeys insertObject: key atIndex: 0];
 
   [helpManager removeContextHelpForObject: [[aviewer win] contentView]];
   [viewers removeObject: aviewer];
@@ -454,7 +442,8 @@ static GWViewersManager *vwrsmanager = nil;
                                  showType: nil
                             showSelection: NO
                            closeOldViewer: nil
-                                 forceNew: NO];
+                                 forceNew: NO
+			          withKey: nil];
                     } 
                 }
               else if ([node isPlain])
@@ -513,7 +502,8 @@ static GWViewersManager *vwrsmanager = nil;
                      showType: [viewer viewType]
                 showSelection: NO
                closeOldViewer: nil
-                     forceNew: force];
+                     forceNew: force
+		      withKey: nil];
         }
       else if ([node isPlain])
         {        
@@ -800,16 +790,14 @@ static GWViewersManager *vwrsmanager = nil;
       
           [dict setObject: [[viewer baseNode] path] forKey: @"path"];
 
-          if ([viewer rootViewerKey])
-            [dict setObject: [viewer rootViewerKey] forKey: @"key"];
+          if ([viewer defaultsKey])
+            [dict setObject: [viewer defaultsKey] forKey: @"key"];
                
           [viewersInfo addObject: dict];
         }
     }
   
   [defaults setObject: viewersInfo forKey: @"viewersinfo"];
-  
-  [defaults setObject: rootViewersKeys forKey: @"root_viewers_keys"];
 }
 
 @end

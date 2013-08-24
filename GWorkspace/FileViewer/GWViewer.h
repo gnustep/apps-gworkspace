@@ -52,8 +52,10 @@
   
   NSDictionary *viewerPrefs;
   NSString *viewType;
-  BOOL rootviewer;
-  NSNumber *rootViewerKey;
+
+  BOOL rootViewer; /* base path = root */
+  BOOL firstRootViewer; /* special first viewer */
+  NSString *defaultsKeyStr;
 
   int visibleCols;
   int resizeIncrement;
@@ -80,7 +82,9 @@
 - (id)initForNode:(FSNode *)node
          inWindow:(GWViewerWindow *)win
          showType:(NSString *)stype
-    showSelection:(BOOL)showsel;
+    showSelection:(BOOL)showsel
+	  withKey:(NSString *)key;
+
 - (void)createSubviews;
 - (FSNode *)baseNode;
 - (BOOL)isShowingNode:(FSNode *)anode;
@@ -94,8 +98,12 @@
 - (id)nodeView;
 - (id)shelf;
 - (NSString *)viewType;
-- (BOOL)isRootViewer;
-- (NSNumber *)rootViewerKey;
+
+/* the first among root viewers, the default Viewer */
+- (BOOL)isFirstRootViewer;
+
+/* returns the key used in the defaults (prefsname) */
+- (NSString *)defaultsKey;
 
 - (void)activate;
 - (void)deactivate;

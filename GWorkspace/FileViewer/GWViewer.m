@@ -63,7 +63,7 @@
   RELEASE (baseNode);
   RELEASE (baseNodeArray);
   RELEASE (lastSelection);
-  RELEASE (rootViewerKey);
+  RELEASE (defaultsKeyStr);
   RELEASE (watchedNodes);
   RELEASE (vwrwin);
   RELEASE (viewType);
@@ -77,6 +77,7 @@
          inWindow:(GWViewerWindow *)win
          showType:(NSString *)stype
     showSelection:(BOOL)showsel
+	  withKey:(NSString *)key
 {
   self = [super init];
   
@@ -104,27 +105,43 @@
       resizeIncrement = DEFAULT_INCR;
     }
     
-    rootviewer = ([[baseNode path] isEqual: path_separator()]
-                && ([[manager viewersForBaseNode: baseNode] count] == 0));
+    rootViewer = [[baseNode path] isEqual: path_separator()];
+    firstRootViewer = (rootViewer && ([[manager viewersForBaseNode: baseNode] count] == 0));
     
-    if ((rootviewer == NO) && [[baseNode path] isEqual: path_separator()]) {
-      rootViewerKey = [manager nextRootViewerKey];
-      
-      if (rootViewerKey == nil) {
-        ASSIGN (rootViewerKey, [NSNumber numberWithUnsignedLong: (unsigned long)self]);
-      } else {
-        RETAIN (rootViewerKey);
-      }
-      
-      prefsname = [NSString stringWithFormat: @"viewer_at_%@_%u", 
-                            [node path], [rootViewerKey unsignedLongValue]];
+    if (rootViewer == YES)
+      {
+	NSLog(@"Making new root viewer");
+	if (firstRootViewer)
+	  {
+	    prefsname = @"root_viewer";
+	  }
+	else
+	  {
+	    if (key == nil)
+	      {
+		NSNumber *rootViewerKey;
 
-    } else {
-      rootViewerKey = nil;
-      prefsname = [NSString stringWithFormat: @"viewer_at_%@", [node path]];
-    }
-    
-    if ([baseNode isWritable] && (rootviewer == NO) && (rootViewerKey == nil)
+		NSLog(@"Getting new root viewer key");
+		rootViewerKey = [NSNumber numberWithUnsignedLong: (unsigned long)self];
+
+		prefsname = [NSString stringWithFormat: @"%lu_viewer_at_%@", [rootViewerKey unsignedLongValue], [node path]];
+	      }
+	    else
+	      {
+		NSLog(@"Assigning: %@", key);
+		prefsname = [key retain];
+	      }
+	  }
+      }
+    else
+      {
+	NSLog(@"Making standard viewer");
+	prefsname = [NSString stringWithFormat: @"viewer_at_%@", [node path]];
+      }
+
+    defaultsKeyStr = [prefsname retain];
+    NSLog(@"created preferences key: %@", defaultsKeyStr);
+    if ([baseNode isWritable] && (rootViewer == NO)
             && ([[fsnodeRep volumes] containsObject: [baseNode path]] == NO)) {
 		  NSString *dictPath = [[baseNode path] stringByAppendingPathComponent: @".gwdir"];
 
@@ -138,8 +155,8 @@
     }
     
     if (viewerPrefs == nil) {
-      defEntry = [defaults dictionaryForKey: prefsname];
-      NSLog(@"prfsname %@", defEntry);
+      defEntry = [defaults dictionaryForKey: defaultsKeyStr];
+      NSLog(@"for %@ got prefsname %@", defaultsKeyStr, defEntry);
       if (defEntry) {
         viewerPrefs = [defEntry copy];
       } else {
@@ -201,10 +218,10 @@
     [vwrwin setMinSize: NSMakeSize(resizeIncrement * 2, MIN_WIN_H)];    
     [vwrwin setResizeIncrements: NSMakeSize(resizeIncrement, 1)];
 
-    if (rootviewer) {
+    if (firstRootViewer) {
       [vwrwin setTitle: NSLocalizedString(@"File Viewer", @"")];
     } else {
-      if (rootViewerKey == nil) {   
+      if (rootViewer) {   
         [vwrwin setTitle: [NSString stringWithFormat: @"%@ - %@", [node name], [node parentPath]]];   
       } else {
         [vwrwin setTitle: [NSString stringWithFormat: @"%@", [node name]]];   
@@ -217,7 +234,7 @@
 
     if (defEntry && [defEntry count]) {
       [shelf setContents: defEntry];
-    } else if (rootviewer || rootViewerKey) {
+    } else if (rootViewer) {
       NSDictionary *sfdict = [NSDictionary dictionaryWithObjectsAndKeys:
                         [NSNumber numberWithInt: 0], @"index", 
                         [NSArray arrayWithObject: NSHomeDirectory()], @"paths", 
@@ -439,14 +456,14 @@
   return viewType;
 }
 
-- (BOOL)isRootViewer
+- (BOOL)isFirstRootViewer
 {
-  return rootviewer;
+  return firstRootViewer;
 }
 
-- (NSNumber *)rootViewerKey
+- (NSString *)defaultsKey
 {
-  return rootViewerKey;
+  return defaultsKeyStr;
 }
 
 - (void)activate
@@ -833,9 +850,6 @@
       updatedprefs = [NSMutableDictionary dictionary];
     }
 
-    [updatedprefs setObject: [NSNumber numberWithBool: NO]
-                     forKey: @"spatial"];
-
     [updatedprefs setObject: [NSNumber numberWithBool: [nodeView isSingleNode]]
                      forKey: @"singlenode"];
 
@@ -860,23 +874,14 @@
 
     [baseNode checkWritable];
 
-    if ([baseNode isWritable] && (rootviewer == NO) && (rootViewerKey == nil)
+    if ([baseNode isWritable] && (rootViewer == NO)
               && ([[fsnodeRep volumes] containsObject: [baseNode path]] == NO)) {
       NSString *dictPath = [[baseNode path] stringByAppendingPathComponent: @".gwdir"];
 
       [updatedprefs writeToFile: dictPath atomically: YES];
     } else {
-      NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
-      NSString *prefsname;
-    
-      if (rootViewerKey != nil) {
-        prefsname = [NSString stringWithFormat: @"viewer_at_%@_%u", 
-                            [baseNode path], [rootViewerKey unsignedLongValue]];
-      } else {
-        prefsname = [NSString stringWithFormat: @"viewer_at_%@", [baseNode path]];
-      }
-    
-      [defaults setObject: updatedprefs forKey: prefsname];
+      NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	    
+      [defaults setObject: updatedprefs forKey: defaultsKeyStr];
     }
     
     ASSIGN (viewerPrefs, [updatedprefs makeImmutableCopyOnFail: NO]);

@@ -32,7 +32,6 @@
 @interface GWViewersManager : NSObject
 {
   NSMutableArray *viewers;
-  NSMutableArray *rootViewersKeys;
   BOOL orderingViewers;
   GWorkspace *gworkspace;
   History *historyWindow;
@@ -57,7 +56,8 @@
           showType:(NSString *)stype
      showSelection:(BOOL)showsel
     closeOldViewer:(id)oldvwr
-          forceNew:(BOOL)force;
+          forceNew:(BOOL)force
+	   withKey:(NSString *)key;
            
 - (NSArray *)viewersForBaseNode:(FSNode *)node;
 
@@ -67,7 +67,6 @@
 
 - (id)rootViewer;
 
-- (NSNumber *)nextRootViewerKey;
 
 - (void)viewerWillClose:(id)aviewer;
 

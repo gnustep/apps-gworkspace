@@ -1,3 +1,12 @@
+2013-08-24 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/FileViewer/GWViewer.h
+	* GWorkspace/FileViewer/GWViewer.m
+	* GWorkspace/FileViewer/GWViewersManager.h
+	* GWorkspace/FileViewer/GWViewersManager.m
+	* GWorkspace/GWorkspace.m
+	Change key assignment and management for Viewers, set it on creation of a new viewer and store it inside the viewer-array and not separately.
+
 2013-04-22 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/Preferences/BrowserViewerPref.h
