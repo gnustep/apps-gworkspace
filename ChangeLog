@@ -1,3 +1,9 @@
+2013-08-27 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNFunctions.m
+	* FSNode/FSNode.m
+	Fix warning and call from sizeDescription sizeDescription() avoiding code duplication. Remove sign info useless with an unsigned parameter.
+
 2013-08-24 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/FileViewer/GWViewer.h

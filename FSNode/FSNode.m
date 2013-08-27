@@ -1,6 +1,6 @@
 /* FSNode.m
  *  
- * Copyright (C) 2004-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -649,29 +649,14 @@
   return filesize;
 }
 
-#define ONE_KB 1024
-#define ONE_MB (ONE_KB * ONE_KB)
-#define ONE_GB (ONE_KB * ONE_MB)
 
 - (NSString *)sizeDescription
 {
   unsigned long long fsize = [self fileSize];
   NSString *sizeStr;
-  char *sign = "";
+
+  sizeStr = sizeDescription(fsize);
     
-  if (fsize == 1)
-    sizeStr = @"1 byte";
-  else if (fsize == 0)
-    sizeStr = @"0 bytes";
-  else if (fsize < (10 * ONE_KB))
-    sizeStr = [NSString stringWithFormat: @"%s%d bytes", sign, (long)fsize];
-  else if(fsize < (100 * ONE_KB))
-    sizeStr = [NSString stringWithFormat: @"%s%3.2f KB", sign, ((double)fsize / (double)(ONE_KB))];
-  else if(fsize < (100 * ONE_MB))
-    sizeStr = [NSString stringWithFormat: @"%s%3.2f MB", sign,((double)fsize / (double)(ONE_MB))];
-  else 
-    sizeStr = [NSString stringWithFormat:@"%s%3.2f GB", sign, ((double)fsize / (double)(ONE_GB))];
-  
   return sizeStr;
 }
 
