@@ -272,9 +272,9 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
     [touchQueries addObject: @"select count(attribute) from attributes;"];
     
     [NSTimer scheduledTimerWithTimeInterval: TOUCH_INTERVAL 
-						                         target: self 
+                                     target: self 
                                    selector: @selector(touchTables:) 
-																   userInfo: nil 
+                                   userInfo: nil 
                                     repeats: YES];
   }
   
@@ -298,7 +298,7 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
     }
 
     ln = [connum unsignedLongValue];
-    ASSIGN (connectionName, ([NSString stringWithFormat: @"gmds_%i", ln]));
+    ASSIGN (connectionName, ([NSString stringWithFormat: @"gmds_%lu", ln]));
 
     if ([conn registerName: connectionName] == NO) {
       NSLog(@"unable to register with name server - quiting.");
