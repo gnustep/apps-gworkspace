@@ -937,7 +937,7 @@ return; \
           [str appendFormat: @"  end:     %@\n", [endTime description]];
         }
         if (fcount) {
-          [str appendFormat: @"  files:    %i\n", [fcount unsignedLongValue]];
+          [str appendFormat: @"  files:    %lu\n", [fcount unsignedLongValue]];
         }
 
         if (subPaths && [subPaths count]) {
@@ -963,7 +963,7 @@ return; \
               [str appendFormat: @"      end:     %@\n", [endTime description]];
             }
             if (fcount) {
-              [str appendFormat: @"      files:    %i\n", [fcount unsignedLongValue]];
+              [str appendFormat: @"      files:    %lu\n", [fcount unsignedLongValue]];
             }          
           }
         }
