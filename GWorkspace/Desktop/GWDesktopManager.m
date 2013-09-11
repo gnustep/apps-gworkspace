@@ -467,11 +467,16 @@ static GWDesktopManager *desktopManager = nil;
     [NSApp terminate: self];
   }
 
-  if ([dskNode involvedByFileOperation: opinfo]) {
-    [[self desktopView] nodeContentsDidChange: opinfo];  
-  }
+  /* update the desktop view, but only if it is visible */
+  if ([self isActive] && [dskNode involvedByFileOperation: opinfo])
+    {
+      [[self desktopView] nodeContentsDidChange: opinfo];  
+    }
   
-  [dock nodeContentsDidChange: opinfo];  
+  if ([self dockActive])
+    {
+      [dock nodeContentsDidChange: opinfo];
+    }
 }
 
 - (void)watcherNotification:(NSNotification *)notif
@@ -480,21 +485,26 @@ static GWDesktopManager *desktopManager = nil;
   NSString *path = [info objectForKey: @"path"];
   NSString *event = [info objectForKey: @"event"];
   
-  if ([path isEqual: [dskNode path]]) {
-    if ([event isEqual: @"GWWatchedPathDeleted"]) {
-      NSRunAlertPanel(nil, 
-                      NSLocalizedString(@"The Desktop directory has been deleted! Quiting now!", @""), 
-                      NSLocalizedString(@"OK", @""), 
-                      nil, 
-                      nil);                                     
-      [NSApp terminate: self];
-
-    } else {
-      [[self desktopView] watchedPathChanged: info];
+  if ([path isEqual: [dskNode path]])
+    {
+      if ([event isEqual: @"GWWatchedPathDeleted"])
+        {
+          NSRunAlertPanel(nil, 
+                          NSLocalizedString(@"The Desktop directory has been deleted! Quiting now!", @""), 
+                          NSLocalizedString(@"OK", @""), 
+                          nil, 
+                          nil);                                     
+          [NSApp terminate: self];
+        }
+      /* update the desktop view, but only if active */
+      else if ([self isActive]) 
+        {
+          [[self desktopView] watchedPathChanged: info];
+        }
     }
-  }
-
-  [dock watchedPathChanged: info];  
+  /* update the dock, if active */
+  if ([self dockActive])
+    [dock watchedPathChanged: info];  
 }
 
 - (void)thumbnailsDidChangeInPaths:(NSArray *)paths
