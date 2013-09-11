@@ -1,3 +1,9 @@
+2013-09-11 Riccardo Mottola <rm@gnu.org>
+
+	* Operation/Operation.h
+	* Operation/Operation.m
+	operation reference updated to NSUInteger and others.
+
 2013-08-27 Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNFunctions.m

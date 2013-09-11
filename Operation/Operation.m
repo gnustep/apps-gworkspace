@@ -1,6 +1,6 @@
 /* Operation.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -80,7 +80,7 @@
   NSMutableArray *filesInfo;
   int action;
   FileOpInfo *info;
-  int i;
+  NSUInteger i;
 
   if (files == nil)
     {
@@ -201,7 +201,7 @@
 - (BOOL)isLockedAction:(int)action
                 onPath:(NSString *)path 
 {
-  int i;
+  NSUInteger i;
   
   for (i = 0; i < [fileOperations count]; i++) {
     FileOpInfo *info = [fileOperations objectAtIndex: i];
@@ -224,7 +224,7 @@
   NSArray *opfiles = [opinfo files];
   NSMutableArray *opsrcpaths = [NSMutableArray array];
   NSMutableArray *opdstpaths = [NSMutableArray array];
-  int i;
+  NSUInteger i;
 
   if ([optype isEqual: @"NSWorkspaceDuplicateOperation"] == NO) {
     for (i = 0; i < [opfiles count]; i++) {
@@ -337,9 +337,9 @@
   [fileOperations removeObject: op];
 }
 
-- (FileOpInfo *)fileOpWithRef:(int)ref
+- (FileOpInfo *)fileOpWithRef:(NSUInteger)ref
 {
-  int i;
+  NSUInteger i;
   
   for (i = 0; i < [fileOperations count]; i++) {
     FileOpInfo *op = [fileOperations objectAtIndex: i];
@@ -352,7 +352,7 @@
   return nil;
 }
 
-- (int)fileOpRef
+- (NSUInteger)fileOpRef
 {
   return fopRef++;
 }
@@ -361,7 +361,7 @@
 {
   NSRect scr = [[NSScreen mainScreen] visibleFrame];
   NSRect wrect = NSZeroRect;
-  int i;  
+  NSUInteger i;  
 
   #define WMARGIN 50
   #define WSHIFT 50
@@ -371,7 +371,7 @@
   scr.size.width -= (WMARGIN * 2);
   scr.size.height -= (WMARGIN * 2);
 
-	for (i = [fileOperations count] - 1; i >= 0; i--) {
+  for (i = [fileOperations count]; i > 0; i--) {
     FileOpInfo *op = [fileOperations objectAtIndex: i];
 
     if ([op win]) {
@@ -447,7 +447,7 @@
 - (BOOL)ascendentOfPath:(NSString *)path 
                 inPaths:(NSArray *)paths
 {
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [paths count]; i++) {  
     if (isSubpath([paths objectAtIndex: i], path)) {
@@ -461,7 +461,7 @@
 - (BOOL)descendentOfPath:(NSString *)path 
                  inPaths:(NSArray *)paths
 {
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [paths count]; i++) {  
     if (isSubpath(path, [paths objectAtIndex: i])) {

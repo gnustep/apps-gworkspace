@@ -1,6 +1,6 @@
 /* Operation.h
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -37,7 +37,7 @@ enum {
 @interface Operation : NSObject 
 {
   NSMutableArray *fileOperations;
-  int fopRef;
+  NSUInteger fopRef;
   
   BOOL filenamesCutted;
     
@@ -60,9 +60,9 @@ enum {
                      
 - (void)endOfFileOperation:(FileOpInfo *)op;
 
-- (int)fileOpRef;
+- (NSUInteger)fileOpRef;
 
-- (FileOpInfo *)fileOpWithRef:(int)ref;
+- (FileOpInfo *)fileOpWithRef:(NSUInteger)ref;
 
 - (NSRect)rectForFileOpWindow;
 
