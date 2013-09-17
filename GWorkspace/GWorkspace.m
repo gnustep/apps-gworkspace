@@ -330,7 +330,7 @@ static GWorkspace *gworkspace = nil;
   
   [self createMenu];
     
-  [isa registerForServices];
+  [[self class] registerForServices];
   
   ASSIGN (gwProcessName, [[NSProcessInfo processInfo] processName]);
   ASSIGN (gwBundlePath, [[NSBundle mainBundle] bundlePath]);

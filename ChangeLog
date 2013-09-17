@@ -1,3 +1,8 @@
+2013-09-17 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/GWorkspace.m
+	Change [isa class] to [self class]
+
 2013-09-12 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/Desktop/GWDesktopManager.m
