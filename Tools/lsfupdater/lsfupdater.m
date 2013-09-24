@@ -1,6 +1,6 @@
 /* lsfupdater.m
  *  
- * Copyright (C) 2005-2011 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -470,7 +470,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
   
   [self getFoundPaths];
 
-  GWDebugLog(@"got %lu found paths. checking...", [foundPaths count]);
+  GWDebugLog(@"got %lu found paths. checking...", (unsigned long)[foundPaths count]);
   
   [self checkFoundPaths];
   
@@ -591,7 +591,7 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
         
     paths = [paths arrayByAddingObject: srcpath];
 
-    GWDebugLog(@"%lu directories", [paths count]);
+    GWDebugLog(@"%lu directories", (unsigned long)[paths count]);
     GWDebugLog(@"updating in %@", srcpath);    
     
     for (i = 0; i <= count; i++) {

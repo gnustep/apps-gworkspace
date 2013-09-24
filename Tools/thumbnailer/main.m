@@ -1,6 +1,6 @@
 /* main.m
  *  
- * Copyright (C) 2003-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -323,7 +323,7 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
   if (thumbref >= (LONG_MAX - 1)) {
     thumbref = 0;
   }
-  return [NSString stringWithFormat: @"%x", thumbref];
+  return [NSString stringWithFormat: @"%lx", thumbref];
 }
 
 - (void)makeThumbnail:(NSPasteboard *)pb

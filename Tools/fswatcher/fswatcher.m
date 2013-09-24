@@ -369,7 +369,7 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
     [info setClient: client];  
     [info setGlobal: global];
   }
-  NSLog(@"register client %lu", [clientsInfo count]);
+  NSLog(@"register client %lu", (unsigned long)[clientsInfo count]);
 }
 
 - (oneway void)unregisterClient:(id <FSWClientProtocol>)client
