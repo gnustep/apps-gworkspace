@@ -233,7 +233,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
   NSString *cname;
   NSString *cmd;
 
-  cname = [NSString stringWithFormat: @"search_%i", (unsigned long)self];
+  cname = [NSString stringWithFormat: @"search_%lu", (unsigned long)self];
 
   if (conn == nil) {
     conn = [[NSConnection alloc] initWithReceivePort: (NSPort *)[NSPort port] 

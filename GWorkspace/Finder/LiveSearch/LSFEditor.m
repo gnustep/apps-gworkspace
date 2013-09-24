@@ -1,6 +1,6 @@
 /* LSFEditor.m
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -22,14 +22,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <AppKit/AppKit.h>
-#include "LSFEditor.h"
-#include "LSFolder.h"
-#include "FindModuleView.h"
-#include "FinderModulesProtocol.h"
-#include "Finder.h"
-#include "SearchPlacesCell.h"
-#include "GWFunctions.h"
+#import <AppKit/AppKit.h>
+#import "LSFEditor.h"
+#import "LSFolder.h"
+#import "FindModuleView.h"
+#import "FinderModulesProtocol.h"
+#import "Finder.h"
+#import "SearchPlacesCell.h"
+#import "GWFunctions.h"
 
 #define WINH (186.0)
 #define FMVIEWH (34.0)
@@ -64,7 +64,7 @@ static NSString *nibName = @"LSFEditor";
     NSArray *searchPaths;
     SEL compareSel;
     NSSize cs, ms;
-    int i;
+    NSUInteger i;
     
     folder = fldr;
     finder = [Finder finder];
@@ -149,7 +149,7 @@ static NSString *nibName = @"LSFEditor";
   NSDictionary *searchCriteria = [folder searchCriteria];
   NSArray *names = [searchCriteria allKeys];
   NSArray *usedModules;
-  int i;
+  NSUInteger i;
 
   while ([fmviews count] > 0) {
     FindModuleView *view = [fmviews objectAtIndex: 0];
@@ -211,7 +211,7 @@ static NSString *nibName = @"LSFEditor";
 - (NSArray *)usedModules
 {
   NSMutableArray *used = [NSMutableArray array];
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [modules count]; i++) {
     id module = [modules objectAtIndex: i];
@@ -226,7 +226,7 @@ static NSString *nibName = @"LSFEditor";
 
 - (id)firstUnusedModule
 {
-  int i;
+  NSUInteger i;
   
   for (i = 0; i < [modules count]; i++) {
     id module = [modules objectAtIndex: i];
@@ -262,8 +262,8 @@ static NSString *nibName = @"LSFEditor";
     int index = [fmviews indexOfObjectIdenticalTo: aview];  
     id module = [self firstUnusedModule];
     id fmview = [[FindModuleView alloc] initWithDelegate: self];
-    int count;
-    int i;
+    NSUInteger count;
+    NSUInteger i;
     
     [module setInUse: YES];
     [fmview setModule: module];
