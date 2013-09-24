@@ -1,6 +1,6 @@
 /* ImageViewer.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
@@ -22,8 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <AppKit/AppKit.h>
-#include "ImageViewer.h"
+#import <AppKit/AppKit.h>
+#import "ImageViewer.h"
 #include <math.h>
 
 @implementation ImageViewer
@@ -40,10 +40,10 @@
     DESTROY (resizerConn);
   }
 
-  TEST_RELEASE (imagePath);	
-  TEST_RELEASE (image);	
-  TEST_RELEASE (nextPath);	
-  TEST_RELEASE (editPath);	
+  RELEASE (imagePath);	
+  RELEASE (image);	
+  RELEASE (nextPath);	
+  RELEASE (editPath);	
   RELEASE (extsarr);
   RELEASE (imview);
   RELEASE (errLabel);
@@ -165,7 +165,7 @@
   ASSIGN (imagePath, path);
 
   if (conn == nil) {
-    NSString *cname = [NSString stringWithFormat: @"search_%i", (unsigned long)self];
+    NSString *cname = [NSString stringWithFormat: @"search_%lu", (unsigned long)self];
 
     conn = [[NSConnection alloc] initWithReceivePort: (NSPort *)[NSPort port] 
 																			      sendPort: nil];
@@ -180,7 +180,7 @@
   }
   
   if ((resizer == nil) && (waitingResizer == NO)) {
-    NSString *cname = [NSString stringWithFormat: @"search_%i", (unsigned long)self];
+    NSString *cname = [NSString stringWithFormat: @"search_%lu", (unsigned long)self];
 
     NSString *cmd = [NSTask launchPathForTool: @"resizer"];
 
