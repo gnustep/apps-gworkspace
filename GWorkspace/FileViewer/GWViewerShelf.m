@@ -1,6 +1,6 @@
 /* GWViewerShelf.h
  *  
- * Copyright (C) 2004-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2004
@@ -914,127 +914,149 @@
 - (void)watchedPathChanged:(NSDictionary *)info
 {
   NSString *path = [info objectForKey: @"path"];
-	NSString *event = [info objectForKey: @"event"];
-	NSEnumerator *enumerator;
+  NSString *event = [info objectForKey: @"event"];
+  NSEnumerator *enumerator;
   NSString *wpath;
   BOOL contained = NO;
-
-	if ([event isEqual: @"GWFileCreatedInWatchedDirectory"]) {
-		return;
-	}
+  
+  if ([event isEqual: @"GWFileCreatedInWatchedDirectory"])
+    {
+      return;
+    }
   
   enumerator = [watchedPaths objectEnumerator];
   
-	while ((wpath = [enumerator nextObject])) {
-		if (([wpath isEqual: path]) || (isSubpathOfPath(path, wpath))) {
-			contained = YES;
-			break;
-		}
-  }
-
-  if (contained) {
-		int count = [icons count];
-    BOOL updated = NO;
-    FSNIcon *icon;
-	  int i;
-
-		if ([event isEqual: @"GWWatchedPathDeleted"]) {		
-			for (i = 0; i < count; i++) {
-        icon = [icons objectAtIndex: i];
-        
-        if ([[icon node] isSubnodeOfPath: path]) {
-          [self removeRep: icon];
-          updated = YES;
-					count--;
-					i--;        
+  while ((wpath = [enumerator nextObject]))
+    {
+      if (([wpath isEqual: path]) || (isSubpathOfPath(path, wpath)))
+        {
+          contained = YES;
+          break;
         }
-			}
-
-      if (updated) {
-        [self tile];
-        [self setNeedsDisplay: YES];
-      }
-      
-			return;
-		}		
-
-		if ([event isEqual: @"GWFileDeletedInWatchedDirectory"]) { 
-			NSArray *files = [info objectForKey: @"files"];
-
-			for (i = 0; i < count; i++) {
-				int j;
-				
-				icon = [icons objectAtIndex: i];
-
-        if ([icon isShowingSelection] == NO) {
-          FSNode *node = [icon node];
-
-	        for (j = 0; j < [files count]; j++) {
-						NSString *fname = [files objectAtIndex: j];
-						NSString *fpath = [path stringByAppendingPathComponent: fname];
-          
-            if ([[node path] isEqual: fpath] || [node isSubnodeOfPath: fpath]) {
-              [self removeRep: icon];
-              updated = YES;
-              count--;
-              i--;
-              break;
-            }
-          }
-          
-        } else {
-          FSNode *node = [icon node];
-          NSArray *selection = [icon selection];
-        
-	        for (j = 0; j < [files count]; j++) {
-						NSString *fname = [files objectAtIndex: j];
-						NSString *fpath = [path stringByAppendingPathComponent: fname];
-						BOOL deleted = NO;
-						int m;
-        
-						if (deleted) {
-							break;
-						}
-
-						if ([node isSubnodeOfPath: fpath]) {
-							[self removeRep: icon];
-              updated = YES;
-							count--;
-							i--;
-							break;
-						}
-
-            for (m = 0; m < [selection count]; m++) {
-              node = [selection objectAtIndex: m];
-        
-              if ([[node path] isEqual: fpath]) {
-								[self removeRep: icon];
-                updated = YES;
-								count--;
-								i--;			
-								deleted = YES;
-								break;	
-              }
-            }
-          }
-        } 
-      }
-  
-      if (updated) {
-        [self tile];
-        [self setNeedsDisplay: YES];
-      }
     }
-  }
+
+  if (contained)
+    {
+      NSUInteger count = [icons count];
+      BOOL updated = NO;
+      FSNIcon *icon;
+      NSUInteger i;
+      
+      if ([event isEqual: @"GWWatchedPathDeleted"])
+        {		
+          for (i = 0; i < count; i++)
+            {
+              icon = [icons objectAtIndex: i];
+              
+              if ([[icon node] isSubnodeOfPath: path])
+                {
+                  [self removeRep: icon];
+                  updated = YES;
+                  count--;
+                  i--;        
+                }
+            }
+          
+          if (updated)
+            {
+              [self tile];
+              [self setNeedsDisplay: YES];
+            }
+          
+          return;
+        }		
+
+      if ([event isEqual: @"GWFileDeletedInWatchedDirectory"])
+        { 
+          NSArray *files = [info objectForKey: @"files"];
+          
+          for (i = 0; i < count; i++)
+            {
+              NSUInteger j;
+				
+              icon = [icons objectAtIndex: i];
+
+              if ([icon isShowingSelection] == NO)
+                {
+                  FSNode *node = [icon node];
+                  
+                  for (j = 0; j < [files count]; j++)
+                    {
+                      NSString *fname = [files objectAtIndex: j];
+                      NSString *fpath = [path stringByAppendingPathComponent: fname];
+                      
+                      if ([[node path] isEqual: fpath] || [node isSubnodeOfPath: fpath])
+                        {
+                          [self removeRep: icon];
+                          updated = YES;
+                          count--;
+                          i--;
+                          break;
+                        }
+                    }
+                  
+                }
+              else
+                {
+                  FSNode *node = [icon node];
+                  NSArray *selection = [icon selection];
+                  
+                  for (j = 0; j < [files count]; j++)
+                    {
+                      NSString *fname = [files objectAtIndex: j];
+                      NSString *fpath = [path stringByAppendingPathComponent: fname];
+                      BOOL deleted = NO;
+                      NSUInteger m;
+                      
+                      if (deleted)
+                        {
+                          break;
+                        }
+
+                      if ([node isSubnodeOfPath: fpath])
+                        {
+                          [self removeRep: icon];
+                          updated = YES;
+                          count--;
+                          i--;
+                          break;
+                        }
+
+                      for (m = 0; m < [selection count]; m++)
+                        {
+                          node = [selection objectAtIndex: m];
+                          
+                          if ([[node path] isEqual: fpath])
+                            {
+                              [self removeRep: icon];
+                              updated = YES;
+                              count--;
+                              i--;			
+                              deleted = YES;
+                              break;	
+                            }
+                        }
+                    }
+                } 
+            }
+          
+          if (updated)
+            {
+              [self tile];
+              [self setNeedsDisplay: YES];
+            }
+        }
+    }
 }
 
 - (void)checkLockedReps
 {
-  int i;
+  NSUInteger i;
   
-  for (i = 0; i < [icons count]; i++) {
-    [[icons objectAtIndex: i] checkLocked];
-  }
+  for (i = 0; i < [icons count]; i++)
+    {
+      [[icons objectAtIndex: i] checkLocked];
+    }
 }
 
 - (FSNSelectionMask)selectionMask
@@ -1081,42 +1103,48 @@
 
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
-	NSPasteboard *pb = [sender draggingPasteboard];
+  NSPasteboard *pb = [sender draggingPasteboard];
   NSDragOperation sourceDragMask = [sender draggingSourceOperationMask];
 
   DESTROY (dragIcon);
   isDragTarget = NO;	
   dragLocalIcon = NO;    
 
-	if ((sourceDragMask == NSDragOperationCopy) 
-												|| (sourceDragMask == NSDragOperationLink)) {
-		return NSDragOperationNone;
-	}
-
-  if (pb && [[pb types] containsObject: NSFilenamesPboardType]) {
-    NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
-    int count = [sourcePaths count];
-    FSNode *baseNode = [viewer baseNode];
-    NSString *basePath;
-    int i;
-        
-	  if (count == 0) {
-		  return NSDragOperationNone;
-    } 
-
-    for (i = 0; i < count; i++) {
-      NSString *path = [sourcePaths objectAtIndex: i];
-    
-      if ([baseNode isParentOfPath: path] == NO) {
-        return NSDragOperationNone;
-      } 
-    }  
-    
-    basePath = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
-    if ([basePath isEqual: [gworkspace trashPath]]) {
+  if ((sourceDragMask == NSDragOperationCopy) 
+      || (sourceDragMask == NSDragOperationLink))
+    {
       return NSDragOperationNone;
     }
-    
+  
+  if (pb && [[pb types] containsObject: NSFilenamesPboardType])
+    {
+      NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
+      NSUInteger count = [sourcePaths count];
+      FSNode *baseNode = [viewer baseNode];
+      NSString *basePath;
+      NSUInteger i;
+      
+      if (count == 0)
+        {
+          return NSDragOperationNone;
+        } 
+      
+      for (i = 0; i < count; i++)
+        {
+          NSString *path = [sourcePaths objectAtIndex: i];
+          
+          if ([baseNode isParentOfPath: path] == NO)
+            {
+              return NSDragOperationNone;
+            } 
+        }  
+      
+      basePath = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
+      if ([basePath isEqual: [gworkspace trashPath]])
+        {
+          return NSDragOperationNone;
+        }
+      
     if (count == 1) {
       dragLocalIcon = ([self iconForPath: [sourcePaths objectAtIndex: 0]] != nil);
     } else {

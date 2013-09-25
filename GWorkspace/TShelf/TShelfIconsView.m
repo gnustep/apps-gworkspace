@@ -1345,7 +1345,6 @@
   
   p = [self convertPoint: p fromView: [[self window] contentView]];
   gpoint = [self gridPointNearestToPoint: p];
-  p = NSMakePoint(gpoint->x, gpoint->y);
   index = gpoint->index;
 
   if (gpoint->used == 0)

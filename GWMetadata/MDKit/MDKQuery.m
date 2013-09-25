@@ -1846,7 +1846,7 @@ enum {
     if (index != NSNotFound) {
       [catnodes removeObjectAtIndex: index];
       [catscores removeObjectAtIndex: index]; 
-      if ([catnames containsObject: catname] == NO) {
+      if (catname && [catnames containsObject: catname] == NO) {
         [catnames addObject: catname];     
       }
     }

@@ -59,41 +59,40 @@ static GWViewersManager *vwrsmanager = nil;
 {
   self = [super init];
   
-  if (self) {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];  
-    
-    gworkspace = [GWorkspace gworkspace];
-    helpManager = [NSHelpManager sharedHelpManager];    
-    ASSIGN (bviewerHelp, [gworkspace contextHelpFromName: @"BViewer.rtfd"]);
-    
-    viewers = [NSMutableArray new];
-    orderingViewers = NO;
-    
-    historyWindow = [gworkspace historyWindow]; 
-    nc = [NSNotificationCenter defaultCenter];
-
-    [nc addObserver: self 
-           selector: @selector(fileSystemWillChange:) 
-               name: @"GWFileSystemWillChangeNotification"
-             object: nil];
-
-    [nc addObserver: self 
-           selector: @selector(fileSystemDidChange:) 
-               name: @"GWFileSystemDidChangeNotification"
-             object: nil];
-
-    [nc addObserver: self 
-           selector: @selector(watcherNotification:) 
-               name: @"GWFileWatcherFileDidChangeNotification"
-             object: nil];    
-    
-    [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
-                				selector: @selector(sortTypeDidChange:) 
-                					  name: @"GWSortTypeDidChangeNotification"
-                					object: nil];
-    
-    [[FSNodeRep sharedInstance] setLabelWFactor: 9.0];    
-  }
+  if (self)
+    {
+      gworkspace = [GWorkspace gworkspace];
+      helpManager = [NSHelpManager sharedHelpManager];    
+      ASSIGN (bviewerHelp, [gworkspace contextHelpFromName: @"BViewer.rtfd"]);
+      
+      viewers = [NSMutableArray new];
+      orderingViewers = NO;
+      
+      historyWindow = [gworkspace historyWindow]; 
+      nc = [NSNotificationCenter defaultCenter];
+      
+      [nc addObserver: self 
+             selector: @selector(fileSystemWillChange:) 
+                 name: @"GWFileSystemWillChangeNotification"
+               object: nil];
+      
+      [nc addObserver: self 
+             selector: @selector(fileSystemDidChange:) 
+                 name: @"GWFileSystemDidChangeNotification"
+               object: nil];
+      
+      [nc addObserver: self 
+             selector: @selector(watcherNotification:) 
+                 name: @"GWFileWatcherFileDidChangeNotification"
+               object: nil];    
+      
+      [[NSDistributedNotificationCenter defaultCenter] addObserver: self 
+                                                          selector: @selector(sortTypeDidChange:) 
+                                                              name: @"GWSortTypeDidChangeNotification"
+                                                            object: nil];
+      
+      [[FSNodeRep sharedInstance] setLabelWFactor: 9.0];    
+    }
   
   return self;
 }
@@ -173,13 +172,11 @@ static GWViewersManager *vwrsmanager = nil;
    inViewerWithBaseNode:(FSNode *)base
 {
   BOOL inRootViewer = [[base path] isEqual: path_separator()];
-  BOOL baseIsParent = [[node parentPath] isEqual: [base path]];
   NSArray *selection = [NSArray arrayWithObject: node];
   id viewer = nil;
   
   if ([base isEqual: node] || ([node isSubnodeOfNode: base] == NO))
     {
-      baseIsParent = YES;
       selection = nil;      
     }
   
@@ -320,7 +317,6 @@ static GWViewersManager *vwrsmanager = nil;
 - (void)viewerWillClose:(id)aviewer
 {
   FSNode *node = [aviewer baseNode];
-  NSString *path = [node path];
   NSArray *watchedNodes = [aviewer watchedNodes];
   NSUInteger i;
 
