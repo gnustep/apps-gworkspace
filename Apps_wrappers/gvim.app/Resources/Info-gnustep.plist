@@ -1,0 +1,32 @@
+{
+  NSExecutable = "gvim";
+  NSIcon = "vim48x48.tiff";
+  NSRole = "Editor";
+	XAppWrapper = YES;
+  NSTypes = (
+    {
+      NSUnixExtensions = ( "txt", "text" );
+      NSIcon = "FileIcon_txt.tiff";
+    },
+    {
+      NSUnixExtensions = ( "c", "cc", "cpp" );
+      NSIcon = "FileIcon_.c.tiff";
+    },
+    {
+      NSUnixExtensions = ( "m", "mm" );
+      NSIcon = "FileIcon_.m.tiff";
+    },
+    {
+      NSUnixExtensions = ( "h" );
+      NSIcon = "FileIcon_.h.tiff";
+    },
+    {
+      NSUnixExtensions = ( "java" );
+      NSIcon = "FileIcon_.java.tiff";
+    },
+    {
+      NSUnixExtensions = ( "class" );
+      NSIcon = "FileIcon_.class.tiff";
+    }  
+  );
+}
