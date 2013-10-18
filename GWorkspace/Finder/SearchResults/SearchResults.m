@@ -881,7 +881,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
   self = [super initWithFrame: frameRect];
 
   if (self) {
-    int i;
+    unsigned i;
   
     images = [NSMutableArray new];
   

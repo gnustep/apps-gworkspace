@@ -1,6 +1,6 @@
 /* ImageViewer.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
@@ -25,9 +25,9 @@
 #ifndef IMAGEVIEWER_H
 #define IMAGEVIEWER_H
 
-#include <Foundation/Foundation.h>
-#include <AppKit/NSView.h>
-#include "ContentViewersProtocol.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/NSView.h>
+#import "ContentViewersProtocol.h"
 
 @class NSImage;
 @class NSImageView;
@@ -100,14 +100,14 @@
 @interface ProgressView : NSView 
 {
   NSMutableArray *images;
-  int index;
-  float rfsh;
+  NSUInteger index;
+  NSTimeInterval rfsh;
   NSTimer *progTimer;
   BOOL animating;
 }
 
 - (id)initWithFrame:(NSRect)frameRect 
-    refreshInterval:(float)refresh;
+    refreshInterval:(NSTimeInterval)refresh;
 
 - (void)start;
 

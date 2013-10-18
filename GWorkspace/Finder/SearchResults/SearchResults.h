@@ -148,7 +148,7 @@
 @interface ProgressView : NSView 
 {
   NSMutableArray *images;
-  int index;
+  NSUInteger index;
   NSTimeInterval rfsh;
   NSTimer *progTimer;
   BOOL animating;

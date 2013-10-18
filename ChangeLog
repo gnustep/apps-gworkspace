@@ -1,3 +1,11 @@
+2013-10-18 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/Finder/SearchResults/SearchResults.h
+	* GWorkspace/Finder/SearchResults/SearchResults.m
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.h
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.m
+	Update types to NSUInteger and NSTimeInterval
+
 2013-09-25 Riccardo Mottola <rm@gnu.org>
 
 	* Tools/thumbnailer/main.m

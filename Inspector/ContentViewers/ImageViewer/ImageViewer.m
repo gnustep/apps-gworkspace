@@ -483,12 +483,12 @@
 }
 
 - (id)initWithFrame:(NSRect)frameRect 
-    refreshInterval:(float)refresh
+    refreshInterval:(NSTimeInterval)refresh
 {
   self = [super initWithFrame: frameRect];
 
   if (self) {
-    int i;
+    NSUInteger i;
   
     images = [NSMutableArray new];
   
@@ -509,8 +509,8 @@
   index = 0;
   animating = YES;
   progTimer = [NSTimer scheduledTimerWithTimeInterval: rfsh 
-						            target: self selector: @selector(animate:) 
-																					userInfo: nil repeats: YES];
+                                               target: self selector: @selector(animate:) 
+                                             userInfo: nil repeats: YES];
 }
 
 - (void)stop
