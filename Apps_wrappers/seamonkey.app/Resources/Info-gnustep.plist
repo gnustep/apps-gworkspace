@@ -1,0 +1,16 @@
+{
+  NSExecutable = "seamonkey";
+  NSRole = "Viewer";
+  NSIcon = "seamonkey48.tiff";
+	XAppWrapper = YES;
+  NSTypes = (
+    {
+      NSUnixExtensions = ( "html" );
+      NSIcon = "FileIcon_html.tiff";
+    },
+    {
+      NSUnixExtensions = ( "htm" );
+      NSIcon = "FileIcon_html.tiff";
+    }
+  );
+}
