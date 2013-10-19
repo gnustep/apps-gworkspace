@@ -1,6 +1,6 @@
 #!/bin/sh
 
-APP=/usr/lib/openoffice/program/swriter
+APP=soffice
 
 if [ $# -eq 2 ] ; then
   $APP "$2" &
