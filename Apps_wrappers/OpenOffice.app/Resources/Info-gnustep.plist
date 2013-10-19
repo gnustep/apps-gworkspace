@@ -1,0 +1,19 @@
+{
+  NSExecutable = "OpenOffice";
+  NSIcon = "OpenOffice.tiff";
+	XAppWrapper = YES;
+  NSTypes = (
+    {
+      NSUnixExtensions = ( "sdw", "sxw", "stw", "doc", "rtf", "odt" );
+      NSIcon = "FileIcon_.abw.tiff";
+    },
+    {
+      NSUnixExtensions = ( "txt", "text" );
+      NSIcon = "FileIcon_.txt.tiff";
+    },
+    {
+      NSUnixExtensions = ( "html", "htm", "xhtml" );
+      NSIcon = "FileIcon_.html.tiff";
+    }
+  );
+}
