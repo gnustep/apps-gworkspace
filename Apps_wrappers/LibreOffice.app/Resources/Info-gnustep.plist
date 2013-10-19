@@ -1,5 +1,5 @@
 {
-  NSExecutable = "StarOffice";
+  NSExecutable = "LibreOffice";
   NSIcon = "StarOffice.tiff";
 	XAppWrapper = YES;
   NSTypes = (
