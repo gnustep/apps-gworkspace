@@ -7,5 +7,5 @@
       NSUnixExtensions = ( "spdrs60" );
       NSIcon = "spdrs60_48.tiff";
     }
-  )
+  );
 }

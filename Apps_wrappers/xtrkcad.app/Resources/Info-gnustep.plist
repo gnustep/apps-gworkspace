@@ -7,5 +7,5 @@
       NSUnixExtensions = ( "xtc" );
       NSIcon = "xtrkcad.tiff";
     }
-  )
+  );
 }
