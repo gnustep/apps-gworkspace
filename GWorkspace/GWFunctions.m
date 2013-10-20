@@ -241,7 +241,7 @@ NSString *fileSizeDescription(unsigned long long size)
   else if(size == 0)
     sizeStr = @"0 bytes";
   else if(size < (10 * ONE_KB))
-    sizeStr = [NSString stringWithFormat:@"%s %d bytes", sign, (long)size];
+    sizeStr = [NSString stringWithFormat:@"%s %ld bytes", sign, (long)size];
   else if(size < (100 * ONE_KB))
     sizeStr = [NSString stringWithFormat:@"%s %3.2fKB", sign,
 			((double)size / (double)(ONE_KB))];

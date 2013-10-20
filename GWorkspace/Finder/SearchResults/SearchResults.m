@@ -232,7 +232,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
   ASSIGN (searchCriteria, criteria);
   recursive = rec;
   
-  cname = [NSString stringWithFormat: @"search_%i", [self memAddress]];
+  cname = [NSString stringWithFormat: @"search_%lu", [self memAddress]];
 
   if (conn == nil) {
     conn = [[NSConnection alloc] initWithReceivePort: (NSPort *)[NSPort port] 
@@ -359,7 +359,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
     [resultsView noteNumberOfRowsChanged];
   }
 
-  [elementsLabel setStringValue: [NSString stringWithFormat: @"%i %@", 
+  [elementsLabel setStringValue: [NSString stringWithFormat: @"%"PRIuPTR" %@", 
                                           [foundObjects count], elementsStr]];
   RELEASE (pool);
 }

@@ -366,7 +366,7 @@ enum {
     ASSIGN (srcTable, @"paths");
     qmanager = [MDKQueryManager queryManager];
     num = [qmanager tableNumber] + memaddr;
-    ASSIGN (destTable, ([NSString stringWithFormat: @"tab_%i", num]));
+    ASSIGN (destTable, ([NSString stringWithFormat: @"tab_%lu", num]));
     
     num = [qmanager queryNumber] + memaddr;     
     ASSIGN (queryNumber, [NSNumber numberWithUnsignedLong: num]);

@@ -419,7 +419,7 @@ static cutIMP cutTitle = NULL;
     ASSIGN (icon, [fsnodeRep multipleSelectionIconOfSize: icnsize]);
     icnh = [icon size].height;
   }  
-  ASSIGN (selectionTitle, ([NSString stringWithFormat: @"%i %@", 
+  ASSIGN (selectionTitle, ([NSString stringWithFormat: @"%"PRIuPTR" %@", 
                   [selection count], NSLocalizedString(@"elements", @"")]));
   [self setStringValue: selectionTitle];
 

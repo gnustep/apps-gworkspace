@@ -705,7 +705,7 @@ static NSImage *branchImage;
 	}
   
   if (isLeaf == NO) {
-    [[isa branchImage] compositeToPoint: brImgBounds.origin operation: NSCompositeSourceOver];
+    [[object_getClass(self) branchImage] compositeToPoint: brImgBounds.origin operation: NSCompositeSourceOver];
   }
 }
 
@@ -770,7 +770,7 @@ static NSImage *branchImage;
     
   ASSIGN (node, [selnodes objectAtIndex: 0]);
   ASSIGN (selection, selnodes);
-  ASSIGN (selectionTitle, ([NSString stringWithFormat: @"%i %@", 
+  ASSIGN (selectionTitle, ([NSString stringWithFormat: @"%"PRIuPTR" %@", 
                   [selection count], NSLocalizedString(@"elements", @"")]));
   ASSIGN (icon, [fsnodeRep multipleSelectionIconOfSize: iconSize]);
   drawicon = icon;

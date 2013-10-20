@@ -132,7 +132,7 @@ static NSString *nibName = @"Annotations";
     NSImage *icon = [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: ICNSIZE];
     NSString *items = NSLocalizedString(@"items", @"");
     
-    items = [NSString stringWithFormat: @"%i %@", [paths count], items];
+    items = [NSString stringWithFormat: @"%"PRIuPTR" %@", [paths count], items];
 		[titleField setStringValue: items];  
     [iconView setImage: icon];
 

@@ -296,7 +296,8 @@ static NSImage *whiteArrowDown = nil;
 
       if (range.length > MIN_LINES) {
         str = NSLocalizedString(@"more...", @"");
-        str = [NSString stringWithFormat: @"%i %@", ([results count] - MIN_LINES), str];
+        str = [NSString stringWithFormat: @"%"PRIuPTR" %@",
+			([results count] - MIN_LINES), str];
         [topFiveFootButt setTitle: str];
         [topFiveFootButt setTag: ALL_RESULTS];      
       }

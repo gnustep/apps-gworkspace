@@ -158,7 +158,7 @@ static const int posy[4]  = { 1, 13, 29, 38 };
 	ASSIGN (monthImage, image);
   RELEASE (image);
 
-  [yearlabel setStringValue: [NSString stringWithFormat: @"%d", [adate yearOfCommonEra]]];
+  [yearlabel setStringValue: [NSString stringWithFormat: @"%"PRIiPTR, [adate yearOfCommonEra]]];
 
   RELEASE (pool);
 	[self setNeedsDisplay: YES];

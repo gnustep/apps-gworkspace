@@ -354,7 +354,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
       [resultsView noteNumberOfRowsChanged];
     }
 
-    [elementsLabel setStringValue: [NSString stringWithFormat: @"%i %@", 
+    [elementsLabel setStringValue: [NSString stringWithFormat: @"%"PRIuPTR" %@", 
                                           [foundObjects count], elementsStr]];
   } 
 
@@ -365,7 +365,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 {
   CREATE_AUTORELEASE_POOL(pool);
   [foundObjects removeObject: [FSNode nodeWithPath: path]];
-  [elementsLabel setStringValue: [NSString stringWithFormat: @"%i %@", 
+  [elementsLabel setStringValue: [NSString stringWithFormat: @"%"PRIuPTR" %@", 
                                         [foundObjects count], elementsStr]];
   [resultsView noteNumberOfRowsChanged];
   [pathViewer showComponentsOfSelection: [self selectedObjects]];
@@ -375,7 +375,7 @@ BOOL isPathInResults(NSString *path, NSArray *results);
 - (void)clearFoundPaths
 {
   [foundObjects removeAllObjects];
-  [elementsLabel setStringValue: [NSString stringWithFormat: @"%i %@", 
+  [elementsLabel setStringValue: [NSString stringWithFormat: @"%"PRIuPTR" %@", 
                                         [foundObjects count], elementsStr]];
   [resultsView noteNumberOfRowsChanged];
   [pathViewer showComponentsOfSelection: nil];

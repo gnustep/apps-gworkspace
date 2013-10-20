@@ -7,6 +7,29 @@
 	NSProgressIndicator uses doubles, so GWorkspace
 	should use doubles too
 
+	* FSNode/FSNBrowserCell.m
+	* FSNode/FSNIcon.m
+	* GWMetadata/MDKit/MDKQuery.m
+	* GWMetadata/MDKit/MDKResultsCategory.m
+	* GWMetadata/MDKit/MDKWindow.m
+	* GWMetadata/gmds/mdextractor/Extractors/HtmlExtractor/HtmlExtractor.m
+	* GWorkspace/FileViewer/GWViewer.m
+	* GWorkspace/FileViewer/GWViewersManager.m
+	* GWorkspace/Finder/Finder.m
+	* GWorkspace/Finder/LiveSearch/LSFolder.m
+	* GWorkspace/Finder/SearchResults/SearchResults.m
+	* GWorkspace/GWFunctions.m
+	* GWorkspace/TShelf/TShelfIcon.m
+	* Inspector/Annotations.m
+	* Inspector/Attributes.m
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.m
+	* Inspector/Contents.m
+	* Inspector/Functions.m
+	* Inspector/TimeDateView.m
+	* Operation/FileOpInfo.m
+	* Tools/ddbd/DDBMDStorage.m
+	fix warnings emitted by clang, mostly format strings
+
 2013-10-18 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/Finder/SearchResults/SearchResults.h

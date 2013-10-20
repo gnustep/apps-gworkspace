@@ -406,7 +406,7 @@ static GWViewersManager *vwrsmanager = nil;
       NSString *msg2 = NSLocalizedString(@"items?", @"");
 
       if (NSRunAlertPanel(nil,
-                          [NSString stringWithFormat: @"%@ %i %@", msg1, count, msg2],
+                          [NSString stringWithFormat: @"%@ %"PRIuPTR" %@", msg1, count, msg2],
                           NSLocalizedString(@"Cancel", @""),
                           NSLocalizedString(@"Yes", @""),
                           nil))

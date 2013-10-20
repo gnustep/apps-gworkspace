@@ -1548,7 +1548,8 @@ static NSString *nibName = @"MDKWindow";
     NSString *msg2 = NSLocalizedString(@"items?", @"");
   
     if (NSRunAlertPanel(nil,
-                [NSString stringWithFormat: @"%@ %i %@", msg1, count, msg2],
+                [NSString stringWithFormat: @"%@ %"PRIuPTR" %@",
+						msg1, count, msg2],
                 NSLocalizedString(@"Cancel", @""),
                 NSLocalizedString(@"Yes", @""),
                 nil)) {
@@ -1663,7 +1664,7 @@ static NSString *nibName = @"MDKWindow";
     images = [NSMutableArray new];
     
     for (i = 0; i < IMAGES; i++) {
-      NSString *imname = [NSString stringWithFormat: @"anim-logo-%d", i];
+      NSString *imname = [NSString stringWithFormat: @"anim-logo-%"PRIuPTR, i];
       NSString *impath = [bundle pathForResource: imname ofType: @"tiff"];
       NSImage *image = [[NSImage alloc] initWithContentsOfFile: impath];
       

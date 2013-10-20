@@ -288,7 +288,7 @@ do { \
     /* detecting end of markup */    
     if ((isScript == NO) && isMarkup && (strncmp(inbuf + i, "\x3e", 1) == 0)) {
 	    if (spaceAdded == NO) {
-        [outstr appendFormat: @"%C", 0x20]; 
+              [outstr appendFormat: @"%C", 0x20]; 
 	      spaceAdded = YES;
 	    }
       

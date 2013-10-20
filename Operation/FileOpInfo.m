@@ -196,7 +196,7 @@ static NSString *nibName = @"FileOperationWin";
     NSString *items;
 
     if ([files count] > 1) {
-      items = [NSString stringWithFormat: @"%i %@", [files count], NSLocalizedString(@"items", @"")];
+      items = [NSString stringWithFormat: @"%"PRIuPTR" %@", [files count], NSLocalizedString(@"items", @"")];
     } else {
       items = NSLocalizedString(@"one item", @"");
     }
@@ -1137,7 +1137,7 @@ filename = [fileinfo objectForKey: @"name"];
             ntmp = [ntmp stringByAppendingPathExtension: ext];
           }
         } else {
-          ntmp = [NSString stringWithFormat: @"%@%@%i", base, copystr, count];
+          ntmp = [NSString stringWithFormat: @"%@%@%"PRIuPTR, base, copystr, count];
           if ([ext length]) {
             ntmp = [ntmp stringByAppendingPathExtension: ext];
           }

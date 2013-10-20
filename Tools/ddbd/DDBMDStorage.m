@@ -62,7 +62,7 @@
     pnum = NSZoneMalloc([self zone], sizeof(int) * depth);
 
     str = [[NSNumber numberWithUnsignedInt: (levcount - 1)] stringValue];
-    ASSIGN (formstr, ([NSString stringWithFormat: @"%%0%ii", [str length]]));
+    ASSIGN (formstr, ([NSString stringWithFormat: @"%%0%"PRIuPTR"i", [str length]]));
 
     ASSIGN (freepath, [basePath stringByAppendingPathComponent: @"free"]);
 
