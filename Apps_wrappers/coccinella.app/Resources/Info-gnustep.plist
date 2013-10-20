@@ -1,0 +1,5 @@
+{
+  NSExecutable = "coccinella";
+  NSIcon = "coccinella.tiff";
+  XAppWrapper = YES;
+}

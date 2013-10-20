@@ -1,0 +1,11 @@
+{
+  NSExecutable = "xtrkcad";
+  NSIcon = "xtrkcad.tiff";
+  XAppWrapper = YES;
+  NSTypes = (
+    {
+      NSUnixExtensions = ( "xtc" );
+      NSIcon = "xtrkcad.tiff";
+    }
+  )
+}

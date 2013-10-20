@@ -1,0 +1,11 @@
+{
+  NSExecutable = "spdrs60";
+  NSIcon = "spdrs60_48.tiff";
+  XAppWrapper = YES;
+  NSTypes = (
+    {
+      NSUnixExtensions = ( "spdrs60" );
+      NSIcon = "spdrs60_48.tiff";
+    }
+  )
+}

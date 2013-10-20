@@ -1,0 +1,11 @@
+{
+  NSExecutable = "qlandkartegt";
+  NSIcon = "qlandkartegt.tiff";
+  XAppWrapper = YES;
+  NSTypes = (
+    {
+      NSUnixExtensions = ( "gpx", "qlb" );
+      NSIcon = "qlandkartegt.tiff";
+    }
+  )
+}
