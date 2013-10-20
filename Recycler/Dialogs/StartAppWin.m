@@ -68,7 +68,7 @@ static NSString *nibName = @"StartAppWin";
 
 - (void)showWindowWithTitle:(NSString *)title
                     appName:(NSString *)appname
-               maxProgValue:(float)maxvalue
+               maxProgValue:(double)maxvalue
 {
   if (win) {
     [win setTitle: title];
@@ -84,7 +84,7 @@ static NSString *nibName = @"StartAppWin";
   }
 }
                  
-- (void)updateProgressBy:(float)incr
+- (void)updateProgressBy:(double)incr
 {
   [progInd incrementBy: incr];
 }

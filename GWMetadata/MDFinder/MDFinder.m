@@ -563,7 +563,7 @@ static MDFinder *mdfinder = nil;
 - (void)showWindowWithTitle:(NSString *)title
                     appName:(NSString *)appname
                   operation:(NSString *)operation
-               maxProgValue:(float)maxvalue
+               maxProgValue:(double)maxvalue
 {
   if (win) {
     [win setTitle: title];
@@ -580,7 +580,7 @@ static MDFinder *mdfinder = nil;
   }
 }
                  
-- (void)updateProgressBy:(float)incr
+- (void)updateProgressBy:(double)incr
 {
   [progInd incrementBy: incr];
 }

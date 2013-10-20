@@ -38,9 +38,9 @@
 - (void)showWindowWithTitle:(NSString *)title
                     appName:(NSString *)appname
                   operation:(NSString *)operation              
-               maxProgValue:(float)maxvalue;
+               maxProgValue:(double)maxvalue;
 
-- (void)updateProgressBy:(float)incr;
+- (void)updateProgressBy:(double)incr;
 
 - (NSWindow *)win;
 

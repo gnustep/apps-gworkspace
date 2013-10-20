@@ -93,7 +93,7 @@
     RELEASE (playButt);
 		
 		indicator = [[NSProgressIndicator alloc] 
-												initWithFrame: NSMakeRect(10, 6, 172, 16)];
+				initWithFrame: NSMakeRect(10, 6, 172, 16)];
 		[indicator setIndeterminate: YES];
 		[playBox addSubview: indicator]; 
 								

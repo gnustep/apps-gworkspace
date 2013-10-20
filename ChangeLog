@@ -1,3 +1,12 @@
+2013-10-20: Sebastian Reitenbach <sebastia@l00-bugdead-prods.de>
+	* GWMetadata/MDFinder/MDFinder.[h|m]
+	* GWMetadata/Preferences/StartAppWin.[h|m]
+	* GWorkspace/Dialogs/StartAppWin.[h|m]
+	* Inspector/ContentViewers/SoundViewer/SoundViewer.m
+	* Recycler/Dialogs/StartAppWin.[h|m]
+	NSProgressIndicator uses doubles, so GWorkspace
+	should use doubles too
+
 2013-10-18 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/Finder/SearchResults/SearchResults.h
