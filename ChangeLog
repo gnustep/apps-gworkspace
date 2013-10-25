@@ -1,3 +1,9 @@
+2013-10-25 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/FileViewer/GWViewer.m
+	No not set first responder explicitely, let GUI handle that.
+	(fixes infinite loop in panels while renaming files)
+
 2013-10-20: Sebastian Reitenbach <sebastia@l00-bugdead-prods.de>
 	* GWMetadata/MDFinder/MDFinder.[h|m]
 	* GWMetadata/Preferences/StartAppWin.[h|m]

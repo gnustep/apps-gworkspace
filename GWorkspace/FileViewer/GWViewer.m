@@ -955,9 +955,7 @@ constrainMinCoordinate:(CGFloat)proposedMin
 
 - (void)windowDidBecomeKey:(NSNotification *)aNotification
 {
-  NSArray *selection = [nodeView selectedNodes];  
-    
-  [vwrwin makeFirstResponder: nodeView];  
+  NSArray *selection = [nodeView selectedNodes];
 
   if ([selection count] == 0) {
     selection = [NSArray arrayWithObject: [nodeView shownNode]];
@@ -1208,7 +1206,7 @@ constrainMinCoordinate:(CGFloat)proposedMin
 - (void)setViewerType:(id)sender
 {
   NSString *title = [sender title];
-  
+
   if ([title isEqual: NSLocalizedString(viewType, @"")] == NO) {
     NSArray *selection = [nodeView selectedNodes];
     NSUInteger i;
