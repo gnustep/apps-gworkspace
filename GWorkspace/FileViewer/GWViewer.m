@@ -957,12 +957,13 @@ constrainMinCoordinate:(CGFloat)proposedMin
 {
   NSArray *selection = [nodeView selectedNodes];
 
-  if ([selection count] == 0) {
-    selection = [NSArray arrayWithObject: [nodeView shownNode]];
-  }
-  
   [manager updateDesktop];
-  [self selectionChanged: selection];
+  if ([selection count] == 0)
+    {
+      selection = [NSArray arrayWithObject: [nodeView shownNode]];
+      [self selectionChanged: selection];
+    }
+  
   [manager changeHistoryOwner: self];
 }
 
