@@ -26,6 +26,13 @@
 
 #import <Foundation/Foundation.h>
 
+typedef enum
+  {
+    GWViewTypeBrowser = 1,
+    GWViewTypeIcon,
+    GWViewTypeList
+  } GWViewType;
+
 @class GWViewersManager;
 @class FSNode;
 @class FSNodeRep;
@@ -51,7 +58,7 @@
   id nodeView;
   
   NSDictionary *viewerPrefs;
-  NSString *viewType;
+  GWViewType viewType;
 
   BOOL rootViewer; /* base path = root */
   BOOL firstRootViewer; /* special first viewer */
@@ -81,7 +88,7 @@
 
 - (id)initForNode:(FSNode *)node
          inWindow:(GWViewerWindow *)win
-         showType:(NSString *)stype
+         showType:(GWViewType)stype
     showSelection:(BOOL)showsel
 	  withKey:(NSString *)key;
 
@@ -97,7 +104,7 @@
 - (GWViewerWindow *)win;
 - (id)nodeView;
 - (id)shelf;
-- (NSString *)viewType;
+- (GWViewType)viewType;
 
 /* the first among root viewers, the default Viewer */
 - (BOOL)isFirstRootViewer;

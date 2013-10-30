@@ -195,14 +195,23 @@ static GWorkspace *gworkspace = nil;
   // View
   menuItem = [mainMenu addItemWithTitle:_(@"View") action:NULL keyEquivalent:@""];
   menu = AUTORELEASE ([NSMenu new]);
-  [mainMenu setSubmenu: menu forItem: menuItem];	
-  [menu addItemWithTitle:_(@"Browser") action:@selector(setViewerType:) keyEquivalent:@"b"];
-  [menu addItemWithTitle:_(@"Icon") action:@selector(setViewerType:) keyEquivalent:@"i"];
-  [menu addItemWithTitle:_(@"List") action:@selector(setViewerType:) keyEquivalent:@"l"];
+  [mainMenu setSubmenu: menu forItem: menuItem];
+  menuItem = [[NSMenuItem alloc] initWithTitle:_(@"Browser") action:@selector(setViewerType:) keyEquivalent:@"b"];
+  [menuItem setTag:GWViewTypeBrowser];
+  [menuItem autorelease];
+  [menu addItem:menuItem];
+  menuItem = [[NSMenuItem alloc] initWithTitle:_(@"Icon") action:@selector(setViewerType:) keyEquivalent:@"i"];
+  [menuItem setTag:GWViewTypeIcon];
+  [menuItem autorelease];
+  [menu addItem:menuItem];
+  menuItem = [[NSMenuItem alloc] initWithTitle:_(@"List") action:@selector(setViewerType:) keyEquivalent:@"l"];
+  [menuItem setTag:GWViewTypeList];
+  [menuItem autorelease];
+  [menu addItem:menuItem];
 	
   menuItem = [menu addItemWithTitle:_(@"Show") action:NULL keyEquivalent:@""];
   subMenu = AUTORELEASE ([NSMenu new]);
-  [menu setSubmenu: subMenu forItem: menuItem];	
+  [menu setSubmenu: subMenu forItem: menuItem];
   [subMenu addItemWithTitle:_(@"Name only") action:@selector(setShownType:) keyEquivalent:@""];
   [subMenu addItemWithTitle:_(@"Type") action:@selector(setShownType:) keyEquivalent:@""];
   [subMenu addItemWithTitle:_(@"Size") action:@selector(setShownType:) keyEquivalent:@""];
@@ -768,7 +777,7 @@ static GWorkspace *gworkspace = nil;
   FSNode *node = [FSNode nodeWithPath: path];
 
   [vwrsManager viewerForNode: node 
-                    showType: nil
+                    showType: 0
                showSelection: NO
               closeOldViewer: nil
                     forceNew: NO

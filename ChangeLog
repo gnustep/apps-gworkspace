@@ -1,4 +1,13 @@
-2013.10-27 Riccardo Mottola <rm@gnu.org>
+2013-10-30 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/FileViewer/GWViewer.h
+	* GWorkspace/FileViewer/GWViewer.m
+	* GWorkspace/FileViewer/GWViewersManager.h
+	* GWorkspace/FileViewer/GWViewersManager.m
+	* GWorkspace/GWorkspace.m
+	Change browser type to an enumerated type from String and update menus accordingly.
+
+2013-10-27 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/FileViewer/GWViewer.m
 	Optimize by changing the selection only if it really changed.

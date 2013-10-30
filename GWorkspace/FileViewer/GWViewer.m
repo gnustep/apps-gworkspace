@@ -66,7 +66,6 @@
   RELEASE (defaultsKeyStr);
   RELEASE (watchedNodes);
   RELEASE (vwrwin);
-  RELEASE (viewType);
   RELEASE (viewerPrefs);
   RELEASE (history);
   
@@ -75,7 +74,7 @@
 
 - (id)initForNode:(FSNode *)node
          inWindow:(GWViewerWindow *)win
-         showType:(NSString *)stype
+         showType:(GWViewType)stype
     showSelection:(BOOL)showsel
 	  withKey:(NSString *)key
 {
@@ -86,6 +85,7 @@
     NSString *prefsname;
     id defEntry;
     NSRect r;
+    NSString *viewTypeStr;
         
     ASSIGN (baseNode, [FSNode nodeWithPath: [node path]]);
     ASSIGN (baseNodeArray, [NSArray arrayWithObject: baseNode]);
@@ -110,7 +110,6 @@
     
     if (rootViewer == YES)
       {
-	NSLog(@"Making new root viewer");
 	if (firstRootViewer)
 	  {
 	    prefsname = @"root_viewer";
@@ -121,26 +120,22 @@
 	      {
 		NSNumber *rootViewerKey;
 
-		NSLog(@"Getting new root viewer key");
 		rootViewerKey = [NSNumber numberWithUnsignedLong: (unsigned long)self];
 
 		prefsname = [NSString stringWithFormat: @"%lu_viewer_at_%@", [rootViewerKey unsignedLongValue], [node path]];
 	      }
 	    else
 	      {
-		NSLog(@"Assigning: %@", key);
 		prefsname = [key retain];
 	      }
 	  }
       }
     else
       {
-	NSLog(@"Making standard viewer");
 	prefsname = [NSString stringWithFormat: @"viewer_at_%@", [node path]];
       }
 
     defaultsKeyStr = [prefsname retain];
-    NSLog(@"created preferences key: %@", defaultsKeyStr);
     if ([baseNode isWritable] && (rootViewer == NO)
             && ([[fsnodeRep volumes] containsObject: [baseNode path]] == NO)) {
 		  NSString *dictPath = [[baseNode path] stringByAppendingPathComponent: @".gwdir"];
@@ -156,7 +151,6 @@
     
     if (viewerPrefs == nil) {
       defEntry = [defaults dictionaryForKey: defaultsKeyStr];
-      NSLog(@"for %@ got prefsname %@", defaultsKeyStr, defEntry);
       if (defEntry) {
         viewerPrefs = [defEntry copy];
       } else {
@@ -164,25 +158,29 @@
       }
     }
     
-    viewType = [viewerPrefs objectForKey: @"viewtype"];
-    NSLog(@"viewtype: %@", viewType);
-    if (viewType == nil) {
-      if (stype != nil) {
-        viewType = stype;
-      } else {
-        viewType = @"Browser";
+    viewType = GWViewTypeBrowser;
+    viewTypeStr = [viewerPrefs objectForKey: @"viewtype"];
+    if (viewTypeStr == nil)
+      {
+        if (stype != 0)
+          {
+            viewType = stype;
+          }
       }
-    }
-    if (([viewType isEqual: @"Icon"] == NO)
-              && ([viewType isEqual: @"List"] == NO)
-              && ([viewType isEqual: @"Browser"] == NO)) {
-      viewType = @"Browser";
-    }
-
-    RETAIN (viewType);
+    else if ([viewTypeStr isEqual: @"Browser"])
+      {
+        viewType = GWViewTypeBrowser;
+      }
+    else if ([viewTypeStr isEqual: @"List"])
+      {
+        viewType = GWViewTypeList;
+      }
+    else if ([viewTypeStr isEqual: @"Icon"])
+      {
+        viewType = GWViewTypeIcon;
+      }
     
     defEntry = [viewerPrefs objectForKey: @"shelfheight"];
-    NSLog(@"height: %@", defEntry);
     if (defEntry) {
       shelfHeight = [defEntry floatValue];
     } else {
@@ -193,7 +191,6 @@
     [vwrwin setDelegate: self];
 
     defEntry = [viewerPrefs objectForKey: @"geometry"];
-    NSLog(@"geometry: %@", defEntry);
     if (defEntry) {
       [vwrwin setFrameFromString: defEntry];
     } else {
@@ -242,19 +239,19 @@
       [shelf setContents: [NSArray arrayWithObject: sfdict]];
     }
     
-    if ([viewType isEqual: @"Icon"]) {
+    if (viewType == GWViewTypeIcon) {
       nodeView = [[GWViewerIconsView alloc] initForViewer: self];
       
       [pathsScroll setDelegate: pathsView];
       
-    } else if ([viewType isEqual: @"List"]) { 
+    } else if (viewType == GWViewTypeList) { 
       NSRect r = [[nviewScroll contentView] bounds];
       
       nodeView = [[GWViewerListView alloc] initWithFrame: r forViewer: self];
        
       [pathsScroll setDelegate: pathsView];
        
-    } else if ([viewType isEqual: @"Browser"]) {    
+    } else if (viewType == GWViewTypeBrowser ) {    
       nodeView = [[GWViewerBrowser alloc] initWithBaseNode: baseNode
                                       inViewer: self
 		                            visibleColumns: visibleCols
@@ -325,7 +322,7 @@
 {
   NSRect r = [[vwrwin contentView] bounds];
   CGFloat w = r.size.width;
-	float h = r.size.height;   
+  CGFloat h = r.size.height;   
   CGFloat d = 0.0;
   int xmargin = 8;
   int ymargin = 6;
@@ -372,7 +369,7 @@
   r = [[pathsScroll contentView] bounds];
   pathsView = [[GWViewerIconsPath alloc] initWithFrame: r 
                    visibleIcons: visibleCols forViewer: self
-                   ownsScroller: ([viewType isEqual: @"Browser"] == NO)];
+                   ownsScroller: (viewType != GWViewTypeBrowser)];
   resizeMask = NSViewNotSizable;
   [pathsView setAutoresizingMask: resizeMask];
   [pathsScroll setDocumentView: pathsView];
@@ -381,7 +378,7 @@
   r = NSMakeRect(xmargin, 0, w - (xmargin * 2), h - pathscrh - ymargin);
   nviewScroll = [[GWViewerScrollView alloc] initWithFrame: r inViewer: self];
   [nviewScroll setBorderType: NSBezelBorder];
-  hasScroller = ([viewType isEqual: @"Icon"] || [viewType isEqual: @"List"]);
+  hasScroller = ((viewType ==GWViewTypeIcon) || (viewType ==GWViewTypeList));
   [nviewScroll setHasHorizontalScroller: hasScroller];
   [nviewScroll setHasVerticalScroller: hasScroller];
   resizeMask = NSViewNotSizable | NSViewWidthSizable | NSViewHeightSizable;
@@ -451,7 +448,7 @@
   return shelf;
 }
 
-- (NSString *)viewType
+- (GWViewType)viewType
 {
   return viewType;
 }
@@ -636,7 +633,7 @@
     if ([node isDirectory] && ([node isPackage] == NO)) {
       nodetoshow = node;
       
-      if ([viewType isEqual: @"Browser"] == NO) {
+      if (viewType != GWViewTypeBrowser) {
         selection = nil;
       } else {
         selection = [NSArray arrayWithObject: node];
@@ -842,9 +839,18 @@
 
 - (void)updateDefaults
 {
-  if ([baseNode isValid]) {
-    NSMutableDictionary *updatedprefs = [nodeView updateNodeInfo: NO];
-    id defEntry;
+  if ([baseNode isValid])
+    {
+      NSMutableDictionary *updatedprefs = [nodeView updateNodeInfo: NO];
+      id defEntry;
+      NSString *viewTypeStr;
+
+      if (viewType == GWViewTypeIcon)
+        viewTypeStr = @"Icon";
+      else if (viewType == GWViewTypeList)
+        viewTypeStr = @"List";
+      else
+        viewTypeStr = @"Browser";
 
     if (updatedprefs == nil) {
       updatedprefs = [NSMutableDictionary dictionary];
@@ -853,7 +859,7 @@
     [updatedprefs setObject: [NSNumber numberWithBool: [nodeView isSingleNode]]
                      forKey: @"singlenode"];
 
-    [updatedprefs setObject: viewType forKey: @"viewtype"];
+    [updatedprefs setObject: viewTypeStr forKey: @"viewtype"];
 
     [updatedprefs setObject: [NSNumber numberWithFloat: shelfHeight]
                      forKey: @"shelfheight"];
@@ -1206,121 +1212,132 @@ constrainMinCoordinate:(CGFloat)proposedMin
 
 - (void)setViewerType:(id)sender
 {
-  NSString *title = [sender title];
+  NSInteger tag = [sender tag];
 
-  if ([title isEqual: NSLocalizedString(viewType, @"")] == NO) {
-    NSArray *selection = [nodeView selectedNodes];
-    NSUInteger i;
+  if (tag > 0)
+    {
+      NSArray *selection = [nodeView selectedNodes];
+      NSUInteger i;
     
-    [nodeView updateNodeInfo: YES];
-    if ([nodeView isSingleNode] && ([selection count] == 0)) {
-      selection = [NSArray arrayWithObject: [nodeView shownNode]];
-    }
-    RETAIN (selection);
+      [nodeView updateNodeInfo: YES];
+      if ([nodeView isSingleNode] && ([selection count] == 0))
+        selection = [NSArray arrayWithObject: [nodeView shownNode]];
+ 
+      RETAIN (selection);
     
-    [nviewScroll setDocumentView: nil];	
+      [nviewScroll setDocumentView: nil];	
     
-    if ([title isEqual: NSLocalizedString(@"Browser", @"")]) {
-      [pathsScroll setDelegate: nil];
-      [pathsView setOwnsScroller: NO];
+      if (tag == GWViewTypeBrowser)
+        {
+          [pathsScroll setDelegate: nil];
+          [pathsView setOwnsScroller: NO];
 
-      [nviewScroll setHasVerticalScroller: NO];
-      [nviewScroll setHasHorizontalScroller: NO];
+          [nviewScroll setHasVerticalScroller: NO];
+          [nviewScroll setHasHorizontalScroller: NO];
 
-      nodeView = [[GWViewerBrowser alloc] initWithBaseNode: baseNode
-                                      inViewer: self
-		                            visibleColumns: visibleCols
-                                      scroller: [pathsScroll horizontalScroller]
-                                    cellsIcons: NO
-                                 editableCells: NO
-                               selectionColumn: YES];
+          nodeView = [[GWViewerBrowser alloc] initWithBaseNode: baseNode
+                                                      inViewer: self
+                                                visibleColumns: visibleCols
+                                                      scroller: [pathsScroll horizontalScroller]
+                                                    cellsIcons: NO
+                                                 editableCells: NO
+                                               selectionColumn: YES];
       
-      ASSIGN (viewType, @"Browser");
-      
-    } else if ([title isEqual: NSLocalizedString(@"Icon", @"")]) {
-      NSScroller *scroller = RETAIN ([pathsScroll horizontalScroller]);
-
-      [pathsScroll setHasHorizontalScroller: NO];
-      [pathsScroll setHorizontalScroller: scroller]; 
-      [pathsScroll setHasHorizontalScroller: YES];
-      RELEASE (scroller);
-      
-      [pathsView setOwnsScroller: YES];
-      [pathsScroll setDelegate: pathsView];
-
-      [nviewScroll setHasVerticalScroller: YES];
-      [nviewScroll setHasHorizontalScroller: YES];
-   
-      nodeView = [[GWViewerIconsView alloc] initForViewer: self];
-      
-      ASSIGN (viewType, @"Icon");
-      
-    } else if ([title isEqual: NSLocalizedString(@"List", @"")]) {
-      NSRect r = [[nviewScroll contentView] bounds];
-
-      NSScroller *scroller = RETAIN ([pathsScroll horizontalScroller]);
-
-      [pathsScroll setHasHorizontalScroller: NO];
-      [pathsScroll setHorizontalScroller: scroller]; 
-      [pathsScroll setHasHorizontalScroller: YES];
-      RELEASE (scroller);
-      
-      [pathsView setOwnsScroller: YES];
-      [pathsScroll setDelegate: pathsView];
-
-      [nviewScroll setHasVerticalScroller: YES];
-      [nviewScroll setHasHorizontalScroller: YES];
-
-      nodeView = [[GWViewerListView alloc] initWithFrame: r forViewer: self];
-
-      ASSIGN (viewType, @"List");
-    }
-    
-    [nviewScroll setDocumentView: nodeView];	
-    RELEASE (nodeView); 
-    [nodeView showContentsOfNode: baseNode]; 
-                    
-    if ([selection count]) {
-      if ([nodeView isSingleNode]) {
-        FSNode *basend = [selection objectAtIndex: 0];
-        
-        if ([basend isEqual: baseNode] == NO) {
-          if (([selection count] > 1) 
-                || (([basend isDirectory] == NO) || ([basend isPackage]))) {            
-            basend = [FSNode nodeWithPath: [basend parentPath]];
-          }
+          viewType = GWViewTypeBrowser;
         }
+      else if (tag == GWViewTypeIcon)
+        {
+          NSScroller *scroller = RETAIN ([pathsScroll horizontalScroller]);
 
-        [nodeView showContentsOfNode: basend];
-        [nodeView selectRepsOfSubnodes: selection];
+          [pathsScroll setHasHorizontalScroller: NO];
+          [pathsScroll setHorizontalScroller: scroller]; 
+          [pathsScroll setHasHorizontalScroller: YES];
+          RELEASE (scroller);
+      
+          [pathsView setOwnsScroller: YES];
+          [pathsScroll setDelegate: pathsView];
 
-      } else {
-        [nodeView selectRepsOfSubnodes: selection];
-      }
+          [nviewScroll setHasVerticalScroller: YES];
+          [nviewScroll setHasHorizontalScroller: YES];
+   
+          nodeView = [[GWViewerIconsView alloc] initForViewer: self];
+      
+          viewType = GWViewTypeIcon;     
+        }
+      else if (tag == GWViewTypeList)
+        {
+          NSRect r = [[nviewScroll contentView] bounds];
+
+          NSScroller *scroller = RETAIN ([pathsScroll horizontalScroller]);
+
+          [pathsScroll setHasHorizontalScroller: NO];
+          [pathsScroll setHorizontalScroller: scroller]; 
+          [pathsScroll setHasHorizontalScroller: YES];
+          RELEASE (scroller);
+      
+          [pathsView setOwnsScroller: YES];
+          [pathsScroll setDelegate: pathsView];
+
+          [nviewScroll setHasVerticalScroller: YES];
+          [nviewScroll setHasHorizontalScroller: YES];
+
+          nodeView = [[GWViewerListView alloc] initWithFrame: r forViewer: self];
+
+          viewType = GWViewTypeList;
+        }
+    
+      [nviewScroll setDocumentView: nodeView];	
+      RELEASE (nodeView); 
+      [nodeView showContentsOfNode: baseNode]; 
+                    
+      if ([selection count])
+        {
+          if ([nodeView isSingleNode])
+            {
+              FSNode *basend = [selection objectAtIndex: 0];
+        
+              if ([basend isEqual: baseNode] == NO)
+                {
+                  if (([selection count] > 1) || (([basend isDirectory] == NO) || ([basend isPackage])))
+                    {
+                      basend = [FSNode nodeWithPath: [basend parentPath]];
+                    }
+                }
+              
+              [nodeView showContentsOfNode: basend];
+              [nodeView selectRepsOfSubnodes: selection];
+              
+            }
+          else
+            {
+              [nodeView selectRepsOfSubnodes: selection];
+            }
+        }
+      
+      DESTROY (selection);
+    
+      [self scrollToBeginning];
+
+      [vwrwin makeFirstResponder: nodeView]; 
+
+      for (i = 0; i < [watchedNodes count]; i++)
+        {  
+          [gworkspace removeWatcherForPath: [[watchedNodes objectAtIndex: i] path]];
+        }
+      [watchedNodes removeAllObjects];
+      
+      DESTROY (lastSelection);
+      selection = [nodeView selectedNodes];
+      
+      if ([selection count] == 0)
+        {
+          selection = [NSArray arrayWithObject: [nodeView shownNode]];
+        }
+      
+      [self selectionChanged: selection];
+      
+      [self updateDefaults];
     }
-    
-    DESTROY (selection);
-    
-    [self scrollToBeginning];
-
-    [vwrwin makeFirstResponder: nodeView]; 
-
-    for (i = 0; i < [watchedNodes count]; i++) {  
-      [gworkspace removeWatcherForPath: [[watchedNodes objectAtIndex: i] path]];
-    }
-    [watchedNodes removeAllObjects];
-    
-    DESTROY (lastSelection);
-    selection = [nodeView selectedNodes];
-    
-    if ([selection count] == 0) {
-      selection = [NSArray arrayWithObject: [nodeView shownNode]];
-    }
-    
-    [self selectionChanged: selection];
-    
-    [self updateDefaults];
-  }
 }
 
 - (void)setShownType:(id)sender

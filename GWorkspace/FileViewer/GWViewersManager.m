@@ -117,7 +117,7 @@ static GWViewersManager *vwrsmanager = nil;
           if (node && [node isValid])
             {
               [self viewerForNode: node
-                         showType: nil
+                         showType: 0
                     showSelection: YES
                    closeOldViewer: NO
                          forceNew: YES
@@ -142,7 +142,7 @@ static GWViewersManager *vwrsmanager = nil;
     {
   
       viewer = [self viewerForNode: node
-		     showType: nil
+		     showType: 0
                      showSelection: YES
 		     closeOldViewer: NO
 		     forceNew: NO
@@ -157,7 +157,7 @@ static GWViewersManager *vwrsmanager = nil;
       else
         {
           viewer = [self viewerForNode: node
-                              showType: nil
+                              showType: 0
                          showSelection: YES
                         closeOldViewer: NO
                               forceNew: YES
@@ -193,7 +193,7 @@ static GWViewersManager *vwrsmanager = nil;
   else
     {
       viewer = [self viewerForNode : base
-                           showType: nil
+                           showType: 0
                       showSelection: NO
                      closeOldViewer: NO
                            forceNew: NO
@@ -207,7 +207,7 @@ static GWViewersManager *vwrsmanager = nil;
 }
 
 - (id)viewerForNode:(FSNode *)node
-          showType:(NSString *)stype
+          showType:(GWViewType)stype
      showSelection:(BOOL)showsel
     closeOldViewer:(id)oldvwr
           forceNew:(BOOL)force
@@ -251,7 +251,7 @@ static GWViewersManager *vwrsmanager = nil;
 - (NSArray *)viewersForBaseNode:(FSNode *)node
 {
   NSMutableArray *vwrs = [NSMutableArray array];
-  int i;
+  NSUInteger i;
   
   for (i = 0; i < [viewers count]; i++) {
     id viewer = [viewers objectAtIndex: i];
@@ -435,7 +435,7 @@ static GWViewersManager *vwrsmanager = nil;
                   else
                     {
                       [self viewerForNode: node 
-                                 showType: nil
+                                 showType: 0
                             showSelection: NO
                            closeOldViewer: nil
                                  forceNew: NO
@@ -997,7 +997,7 @@ if (*pos >= i) *pos -= n; \
   
   settingHistoryPath = YES;
   
-  if ([[viewer viewType] isEqual: @"Browser"] == NO)
+  if ([viewer viewType] != GWViewTypeBrowser)
     {
       [nodeView showContentsOfNode: node];
     }

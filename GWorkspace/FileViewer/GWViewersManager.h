@@ -25,6 +25,7 @@
 
 #import <Foundation/Foundation.h>
 #import "FSNodeRep.h"
+#import "GWViewer.h"
 
 @class GWorkspace;
 @class History;
@@ -53,7 +54,7 @@
             
 
 - (id)viewerForNode:(FSNode *)node
-          showType:(NSString *)stype
+          showType:(GWViewType)stype
      showSelection:(BOOL)showsel
     closeOldViewer:(id)oldvwr
           forceNew:(BOOL)force
