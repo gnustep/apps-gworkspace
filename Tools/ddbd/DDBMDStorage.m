@@ -51,7 +51,7 @@
   if (self) {
     NSString *str;
     BOOL exists, isdir;  
-    int i;
+    unsigned i;
     
     ASSIGN (basePath, apath);
     levcount = lcount;
@@ -62,7 +62,7 @@
     pnum = NSZoneMalloc([self zone], sizeof(int) * depth);
 
     str = [[NSNumber numberWithUnsignedInt: (levcount - 1)] stringValue];
-    ASSIGN (formstr, ([NSString stringWithFormat: @"%%0%"PRIuPTR"i", [str length]]));
+    ASSIGN (formstr, ([NSString stringWithFormat: @"%%0%lui", (unsigned long)[str length]]));
 
     ASSIGN (freepath, [basePath stringByAppendingPathComponent: @"free"]);
 
