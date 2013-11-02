@@ -411,7 +411,7 @@ static cutIMP cutTitle = NULL;
 
 - (void)showSelection:(NSArray *)selnodes
 {
-  int i;
+  NSUInteger i;
 
   ASSIGN (node, [selnodes objectAtIndex: 0]);
   ASSIGN (selection, selnodes);
@@ -419,8 +419,8 @@ static cutIMP cutTitle = NULL;
     ASSIGN (icon, [fsnodeRep multipleSelectionIconOfSize: icnsize]);
     icnh = [icon size].height;
   }  
-  ASSIGN (selectionTitle, ([NSString stringWithFormat: @"%"PRIuPTR" %@", 
-                  [selection count], NSLocalizedString(@"elements", @"")]));
+  ASSIGN (selectionTitle, ([NSString stringWithFormat: @"%lu %@", 
+                                     (unsigned long)[selection count], NSLocalizedString(@"elements", @"")]));
   [self setStringValue: selectionTitle];
 
   [self setLocked: NO];

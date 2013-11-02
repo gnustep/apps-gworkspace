@@ -493,7 +493,7 @@
     images = [NSMutableArray new];
   
     for (i = 0; i < IMAGES; i++) {
-      NSString *imname = [NSString stringWithFormat: @"anim-logo-%"PRIuPTR".tiff", i];
+      NSString *imname = [NSString stringWithFormat: @"anim-logo-%lu.tiff", (unsigned long)i];
       [images addObject: [NSImage imageNamed: imname]];    
     }
   

@@ -1029,7 +1029,7 @@ constrainMinCoordinate:(CGFloat)proposedMin
         NSString *msg2 = NSLocalizedString(@"items?", @"");
 
         if (NSRunAlertPanel(nil,
-                    [NSString stringWithFormat: @"%@ %"PRIuPTR" %@", msg1, count, msg2],
+                            [NSString stringWithFormat: @"%@ %lu %@", msg1, (unsigned long)count, msg2],
                     NSLocalizedString(@"Cancel", @""),
                     NSLocalizedString(@"Yes", @""),
                     nil)) {

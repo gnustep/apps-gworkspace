@@ -100,7 +100,7 @@
 	  node = nil;
 	  singlepath = NO;
 	  isRootIcon = NO;
-	  name = [[NSString alloc] initWithFormat: @"%"PRIuPTR" items", count];
+	  name = [[NSString alloc] initWithFormat: @"%lu items", (unsigned long)count];
 	}
       
       if (singlepath)
@@ -212,7 +212,7 @@
     DESTROY (node);
     singlepath = NO;
 		isRootIcon = NO;
-    name = [[NSString alloc] initWithFormat: @"%"PRIuPTR" items", count];
+                name = [[NSString alloc] initWithFormat: @"%lu items", (unsigned long)count];
   }
 
   if (singlepath) {

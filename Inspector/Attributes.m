@@ -286,7 +286,7 @@ static BOOL sizeStop = NO;
       NSImage *icon = [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: ICNSIZE];
       NSString *items = NSLocalizedString(@"items", @"");
       
-      items = [NSString stringWithFormat: @"%"PRIuPTR" %@", [paths count], items];
+      items = [NSString stringWithFormat: @"%lu %@", (unsigned long)[paths count], items];
       [titleField setStringValue: items];  
       [iconView setImage: icon];
   

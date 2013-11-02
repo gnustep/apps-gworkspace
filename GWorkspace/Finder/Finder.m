@@ -712,7 +712,7 @@ static Finder *finder = nil;
   if ([currentSelection count] == 1) {
     title = [[currentSelection objectAtIndex: 0] lastPathComponent];
   } else {
-    title = [NSString stringWithFormat: @"%"PRIuPTR" %@", [currentSelection count], elmstr];
+    title = [NSString stringWithFormat: @"%lu %@", (unsigned long)[currentSelection count], elmstr];
   }
 
   [[wherePopUp itemAtIndex: SELECTION] setTitle: title];

@@ -1,3 +1,20 @@
+2013-11-01 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNBrowserCell.m
+	* GWMetadata/MDKit/MDKResultsCategory.m
+	* GWMetadata/MDKit/MDKWindow.m
+	* GWorkspace/FileViewer/GWViewer.m
+	* GWorkspace/Finder/Finder.m
+	* GWorkspace/Finder/LiveSearch/LSFolder.m
+	* GWorkspace/Finder/SearchResults/SearchResults.m
+	* GWorkspace/TShelf/TShelfIcon.m
+	* Inspector/Annotations.m
+	* Inspector/Attributes.m
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.m
+	* Inspector/Contents.m
+	* Operation/FileOpInfo.m
+	Revert horrible PRIuPTR and change to unsinged long cast style.
+
 2013-10-30 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/FileViewer/GWViewer.h

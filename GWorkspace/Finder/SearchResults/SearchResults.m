@@ -359,8 +359,8 @@ static NSString *lsfname = @"LiveSearch.lsf";
     [resultsView noteNumberOfRowsChanged];
   }
 
-  [elementsLabel setStringValue: [NSString stringWithFormat: @"%"PRIuPTR" %@", 
-                                          [foundObjects count], elementsStr]];
+  [elementsLabel setStringValue: [NSString stringWithFormat: @"%lu %@", 
+                                           (unsigned long)[foundObjects count], elementsStr]];
   RELEASE (pool);
 }
 
