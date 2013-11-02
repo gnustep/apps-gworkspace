@@ -766,12 +766,12 @@ static NSImage *branchImage;
 
 - (void)showSelection:(NSArray *)selnodes
 {
-  int i;
+  NSUInteger i;
     
   ASSIGN (node, [selnodes objectAtIndex: 0]);
   ASSIGN (selection, selnodes);
-  ASSIGN (selectionTitle, ([NSString stringWithFormat: @"%"PRIuPTR" %@", 
-                  [selection count], NSLocalizedString(@"elements", @"")]));
+  ASSIGN (selectionTitle, ([NSString stringWithFormat: @"%lu %@", 
+                                     (unsigned long)[selection count], NSLocalizedString(@"elements", @"")]));
   ASSIGN (icon, [fsnodeRep multipleSelectionIconOfSize: iconSize]);
   drawicon = icon;
   DESTROY (selectedicon);
