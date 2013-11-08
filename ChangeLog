@@ -1,5 +1,13 @@
 2013-11-08 Riccardo Mottola <rm@gnu.org>
 
+	* FSNode/FSNBrowser.m
+	* FSNode/FSNIconsView.m
+	* FSNode/FSNListView.m
+	* GWorkspace/FileViewer/GWViewerIconsPath.m
+	controlTextDidEndEditing: do not check for write permission: you can change a filename without!
+
+2013-11-08 Riccardo Mottola <rm@gnu.org>
+
 	* GWorkspace/FileViewer/GWViewerIconsPath.m (controlTextDidEndEditing)
 	Call updateNameEditor instead of just stopRepNameEditing to make control editable again after the error alert.
 

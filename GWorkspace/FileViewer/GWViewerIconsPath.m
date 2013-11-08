@@ -781,52 +781,27 @@
 - (void)controlTextDidEndEditing:(NSNotification *)aNotification
 {
   FSNode *ednode = [nameEditor node];
-  BOOL writable = [ednode isWritable];
 
-  if (writable == NO)
+  if ([ednode isParentWritable] == NO)
     {
-      /* check for broken symlink */     
-      if ([ednode isLink] && ([ednode hasValidPath] == NO))
-        { 
-          BOOL iamRoot;
-  
-#ifdef __WIN32__
-          iamRoot = YES;
-#else
-          iamRoot = (geteuid() == 0);
-#endif
-      
-          writable = (iamRoot || [[ednode owner] isEqual: NSUserName()]);          
-        }
-    
-      if (writable == NO)
-        {
-          NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
-                          [NSString stringWithFormat: @"%@\"%@\"!\n", 
-                                    NSLocalizedString(@"You do not have write permission for ", @""), 
-                                    [ednode name]], NSLocalizedString(@"Continue", @""), nil, nil);   
-          [self updateNameEditor];
-          return;
-        }
-    }
-  
-  if (writable)
-    {    
-    if ([ednode isParentWritable] == NO) {
       NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
                       [NSString stringWithFormat: @"%@\"%@\"!\n", 
                                 NSLocalizedString(@"You do not have write permission for ", @""), 
                                 [ednode parentName]], NSLocalizedString(@"Continue", @""), nil, nil);
       [self updateNameEditor];
       return;
-
-    } else if ([ednode isSubnodeOfPath: [[GWorkspace gworkspace] trashPath]]) {
+      
+    }
+  if ([ednode isSubnodeOfPath: [[GWorkspace gworkspace] trashPath]])
+    {
       NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
                       NSLocalizedString(@"You can't rename an object that is in the Recycler", @""), 
                       NSLocalizedString(@"Continue", @""), nil, nil);
       [self updateNameEditor];
       return;
-    } else {
+    } 
+  else
+    {
       NSString *newname = [nameEditor stringValue];
       NSString *newpath = [[ednode parentPath] stringByAppendingPathComponent: newname];
       NSString *extension = [newpath pathExtension];
@@ -834,56 +809,61 @@
       NSRange range = [newname rangeOfCharacterFromSet: notAllowSet];
       NSArray *dirContents = [ednode subNodeNamesOfParent];
       NSMutableDictionary *opinfo = [NSMutableDictionary dictionary];
-
-      if (([newname length] == 0) || (range.length > 0)) {
-        NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
-                  NSLocalizedString(@"Invalid name", @""), 
-                            NSLocalizedString(@"Continue", @""), nil, nil);   
-        [self updateNameEditor];
-        return;
-      }	
-
-      if (([extension length] 
-              && ([ednode isDirectory] && ([ednode isPackage] == NO)))) {
-        NSString *msg = NSLocalizedString(@"Are you sure you want to add the extension ", @"");
-
-        msg = [msg stringByAppendingFormat: @"\"%@\" ", extension];
-        msg = [msg stringByAppendingString: NSLocalizedString(@"to the end of the name?", @"")];
-        msg = [msg stringByAppendingString: NSLocalizedString(@"\nif you make this change, your folder may appear as a single file.", @"")];
-
-        if (NSRunAlertPanel(@"", msg, 
-                            NSLocalizedString(@"Cancel", @""), 
-				                    NSLocalizedString(@"OK", @""), 
-                            nil) == NSAlertDefaultReturn) {
-          [self updateNameEditor];
-          return;
-        }
-      }
-
-      if ([dirContents containsObject: newname]) {
-        if ([newname isEqual: [ednode name]]) {
-          [self updateNameEditor];
-          return;
-        } else {
+      
+      if (([newname length] == 0) || (range.length > 0))
+        {
           NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
-            [NSString stringWithFormat: @"%@\"%@\" %@ ", 
-                NSLocalizedString(@"The name ", @""), 
-                newname, NSLocalizedString(@" is already in use!", @"")], 
-                              NSLocalizedString(@"Continue", @""), nil, nil);   
+                          NSLocalizedString(@"Invalid name", @""), 
+                          NSLocalizedString(@"Continue", @""), nil, nil);   
           [self updateNameEditor];
           return;
+        }	
+      
+      if (([extension length] 
+           && ([ednode isDirectory] && ([ednode isPackage] == NO))))
+        {
+          NSString *msg = NSLocalizedString(@"Are you sure you want to add the extension ", @"");
+          
+          msg = [msg stringByAppendingFormat: @"\"%@\" ", extension];
+          msg = [msg stringByAppendingString: NSLocalizedString(@"to the end of the name?", @"")];
+          msg = [msg stringByAppendingString: NSLocalizedString(@"\nif you make this change, your folder may appear as a single file.", @"")];
+          
+          if (NSRunAlertPanel(@"", msg, 
+                              NSLocalizedString(@"Cancel", @""), 
+                              NSLocalizedString(@"OK", @""), 
+                              nil) == NSAlertDefaultReturn) {
+            [self updateNameEditor];
+            return;
+          }
         }
-      }
-
+      
+      if ([dirContents containsObject: newname])
+        {
+          if ([newname isEqual: [ednode name]])
+            {
+              [self updateNameEditor];
+              return;
+            }
+          else
+            {
+              NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
+                              [NSString stringWithFormat: @"%@\"%@\" %@ ", 
+                                        NSLocalizedString(@"The name ", @""), 
+                                        newname, NSLocalizedString(@" is already in use!", @"")], 
+                              NSLocalizedString(@"Continue", @""), nil, nil);   
+              [self updateNameEditor];
+              return;
+            }
+        }
+      
       [opinfo setObject: @"GWorkspaceRenameOperation" forKey: @"operation"];	
       [opinfo setObject: [ednode path] forKey: @"source"];	
       [opinfo setObject: newpath forKey: @"destination"];	
       [opinfo setObject: [NSArray arrayWithObject: @""] forKey: @"files"];	
-
+      
       [self stopRepNameEditing];
       [[GWorkspace gworkspace] performFileOperation: opinfo];         
     }
-  }
 }
 
 @end

@@ -1435,36 +1435,12 @@ static NSString *defaultColumns = @"{ \
 - (void)controlTextDidEndEditing:(NSNotification *)aNotification
 {
   FSNode *ednode = [nameEditor node];
-  BOOL writable = [ednode isWritable];
 
 #define CLEAREDITING \
   [self stopRepNameEditing]; \
   return 
     
-  if (writable == NO) {
-    /* check for broken symlink */     
-    if ([ednode isLink] && ([ednode hasValidPath] == NO)) { 
-      BOOL iamRoot;
-      
-      #ifdef __WIN32__
-		    iamRoot = YES;
-	    #else
-		    iamRoot = (geteuid() == 0);
-	    #endif
-      
-      writable = (iamRoot || [[ednode owner] isEqual: NSUserName()]);          
-    }
-    
-    if (writable == NO) {
-      NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
-            [NSString stringWithFormat: @"%@\"%@\"!\n", 
-                NSLocalizedString(@"You do not have write permission for ", @""), 
-                      [ednode name]], NSLocalizedString(@"Continue", @""), nil, nil);   
-      CLEAREDITING;
-    }
-  } 
-
-  if (writable) {    
+   
     if ([ednode isParentWritable] == NO) {
       NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
             [NSString stringWithFormat: @"%@\"%@\"!\n", 
@@ -1523,7 +1499,7 @@ static NSString *defaultColumns = @"{ \
         }
       }
 
-	    [opinfo setObject: @"GWorkspaceRenameOperation" forKey: @"operation"];	
+      [opinfo setObject: @"GWorkspaceRenameOperation" forKey: @"operation"];	
       [opinfo setObject: [ednode path] forKey: @"source"];	
       [opinfo setObject: newpath forKey: @"destination"];	
       [opinfo setObject: [NSArray arrayWithObject: @""] forKey: @"files"];	
@@ -1531,7 +1507,7 @@ static NSString *defaultColumns = @"{ \
       [self stopRepNameEditing];
       [desktopApp performFileOperation: opinfo];         
     }
-  }
+
 }
 
 @end
