@@ -570,7 +570,7 @@
 - (NSArray *)selectedNodes
 {
   NSMutableArray *selectedNodes = [NSMutableArray array];
-  int i;
+  NSUInteger i;
   
   for (i = 0; i < [icons count]; i++) {
     FSNIcon *icon = [icons objectAtIndex: i];
@@ -592,7 +592,7 @@
 - (NSArray *)selectedPaths
 {
   NSMutableArray *selectedPaths = [NSMutableArray array];
-  int i, j;
+  NSUInteger i, j;
   
   for (i = 0; i < [icons count]; i++) {
     FSNIcon *icon = [icons objectAtIndex: i];
@@ -615,11 +615,12 @@
 
 - (void)checkLockedReps
 {
-  int i;
+  NSUInteger i;
   
-  for (i = 0; i < [icons count]; i++) {
-    [[icons objectAtIndex: i] checkLocked];
-  }
+  for (i = 0; i < [icons count]; i++)
+    {
+      [[icons objectAtIndex: i] checkLocked];
+    }
 }
 
 - (FSNSelectionMask)selectionMask
@@ -673,11 +674,11 @@
     FSNode *ednode = [editIcon node];
     NSString *nodeDescr = [editIcon shownInfo];
     NSRect icnr = [editIcon frame];
-    float centerx = icnr.origin.x + (icnr.size.width / 2);    
+    CGFloat centerx = icnr.origin.x + (icnr.size.width / 2);    
     NSRect labr = [editIcon labelRect];
     int margin = [fsnodeRep labelMargin];
-    float bw = [self bounds].size.width - EDIT_MARGIN;
-    float edwidth = 0.0; 
+    CGFloat bw = [self bounds].size.width - EDIT_MARGIN;
+    CGFloat edwidth = 0.0; 
     NSRect edrect;
 
     [editIcon setNameEdited: YES];
@@ -782,47 +783,49 @@
   FSNode *ednode = [nameEditor node];
   BOOL writable = [ednode isWritable];
 
-#define CLEAREDITING \
-  [self stopRepNameEditing]; \
-  return 
+  if (writable == NO)
+    {
+      /* check for broken symlink */     
+      if ([ednode isLink] && ([ednode hasValidPath] == NO))
+        { 
+          BOOL iamRoot;
   
-  if (writable == NO) {
-    /* check for broken symlink */     
-    if ([ednode isLink] && ([ednode hasValidPath] == NO)) { 
-      BOOL iamRoot;
+#ifdef __WIN32__
+          iamRoot = YES;
+#else
+          iamRoot = (geteuid() == 0);
+#endif
       
-      #ifdef __WIN32__
-		    iamRoot = YES;
-	    #else
-		    iamRoot = (geteuid() == 0);
-	    #endif
-      
-      writable = (iamRoot || [[ednode owner] isEqual: NSUserName()]);          
-    }
+          writable = (iamRoot || [[ednode owner] isEqual: NSUserName()]);          
+        }
     
-    if (writable == NO) {
-      NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
-            [NSString stringWithFormat: @"%@\"%@\"!\n", 
-                NSLocalizedString(@"You do not have write permission for ", @""), 
-                      [ednode name]], NSLocalizedString(@"Continue", @""), nil, nil);   
-      CLEAREDITING;
+      if (writable == NO)
+        {
+          NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
+                          [NSString stringWithFormat: @"%@\"%@\"!\n", 
+                                    NSLocalizedString(@"You do not have write permission for ", @""), 
+                                    [ednode name]], NSLocalizedString(@"Continue", @""), nil, nil);   
+          [self updateNameEditor];
+          return;
+        }
     }
-  }
   
-  if (writable) {    
+  if (writable)
+    {    
     if ([ednode isParentWritable] == NO) {
       NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
-            [NSString stringWithFormat: @"%@\"%@\"!\n", 
-                NSLocalizedString(@"You do not have write permission for ", @""), 
-                    [ednode parentName]], NSLocalizedString(@"Continue", @""), nil, nil);   
-      CLEAREDITING;
+                      [NSString stringWithFormat: @"%@\"%@\"!\n", 
+                                NSLocalizedString(@"You do not have write permission for ", @""), 
+                                [ednode parentName]], NSLocalizedString(@"Continue", @""), nil, nil);
+      [self updateNameEditor];
+      return;
 
     } else if ([ednode isSubnodeOfPath: [[GWorkspace gworkspace] trashPath]]) {
       NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
-              NSLocalizedString(@"You can't rename an object that is in the Recycler", @""), 
-              NSLocalizedString(@"Continue", @""), nil, nil);   
-      CLEAREDITING;
-
+                      NSLocalizedString(@"You can't rename an object that is in the Recycler", @""), 
+                      NSLocalizedString(@"Continue", @""), nil, nil);
+      [self updateNameEditor];
+      return;
     } else {
       NSString *newname = [nameEditor stringValue];
       NSString *newpath = [[ednode parentPath] stringByAppendingPathComponent: newname];
@@ -836,7 +839,8 @@
         NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
                   NSLocalizedString(@"Invalid name", @""), 
                             NSLocalizedString(@"Continue", @""), nil, nil);   
-        CLEAREDITING;
+        [self updateNameEditor];
+        return;
       }	
 
       if (([extension length] 
@@ -851,24 +855,27 @@
                             NSLocalizedString(@"Cancel", @""), 
 				                    NSLocalizedString(@"OK", @""), 
                             nil) == NSAlertDefaultReturn) {
-          CLEAREDITING;
+          [self updateNameEditor];
+          return;
         }
       }
 
       if ([dirContents containsObject: newname]) {
         if ([newname isEqual: [ednode name]]) {
-          CLEAREDITING;
+          [self updateNameEditor];
+          return;
         } else {
           NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
             [NSString stringWithFormat: @"%@\"%@\" %@ ", 
                 NSLocalizedString(@"The name ", @""), 
                 newname, NSLocalizedString(@" is already in use!", @"")], 
                               NSLocalizedString(@"Continue", @""), nil, nil);   
-          CLEAREDITING;
+          [self updateNameEditor];
+          return;
         }
       }
 
-	    [opinfo setObject: @"GWorkspaceRenameOperation" forKey: @"operation"];	
+      [opinfo setObject: @"GWorkspaceRenameOperation" forKey: @"operation"];	
       [opinfo setObject: [ednode path] forKey: @"source"];	
       [opinfo setObject: newpath forKey: @"destination"];	
       [opinfo setObject: [NSArray arrayWithObject: @""] forKey: @"files"];	

@@ -1,3 +1,8 @@
+2013-11-08 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/FileViewer/GWViewerIconsPath.m (controlTextDidEndEditing)
+	Call updateNameEditor instead of just stopRepNameEditing to make control editable again after the error alert.
+
 2013-11-01 Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNBrowserCell.m
