@@ -54,14 +54,14 @@
   return self;
 }
 
-- (void)setFilenamesCutted:(BOOL)value
+- (void)setFilenamesCut:(BOOL)value
 {
-  filenamesCutted = value;
+  filenamesCut = value;
 }
 
-- (BOOL)filenamesWasCutted
+- (BOOL)filenamesWasCut
 {
-  return filenamesCutted;
+  return filenamesCut;
 }
 
 - (void)performOperation:(NSDictionary *)opdict

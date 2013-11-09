@@ -1,3 +1,23 @@
+2013-11-09 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNBrowser.h
+	* FSNode/FSNBrowser.m
+	* FSNode/FSNIconsView.h
+	* FSNode/FSNIconsView.m
+	* FSNode/FSNListView.h
+	* FSNode/FSNListView.m
+	* FSNode/FSNodeRep.h
+	* GWorkspace/Desktop/GWDesktopView.m
+	* GWorkspace/GWorkspace.h
+	* GWorkspace/GWorkspace.m
+	* Operation/Operation.h
+	* Operation/Operation.m
+	* Recycler/Recycler.h
+	* Recycler/Recycler.m
+	* Recycler/RecyclerView.h
+	* Recycler/RecyclerView.m
+	Rename Cutted to Cut.
+
 2013-11-08 Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNBrowser.m

@@ -2098,7 +2098,7 @@
 }
 
 - (BOOL)validatePasteOfFilenames:(NSArray *)names
-                       wasCutted:(BOOL)cutted
+                       wasCut:(BOOL)cut
 {
   FSNode *node = [self nodeOfLastColumn];
   NSString *nodePath = [node path];

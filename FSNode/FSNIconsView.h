@@ -150,7 +150,7 @@
 - (BOOL)needsDndProxy;
 - (BOOL)involvedByFileOperation:(NSDictionary *)opinfo;
 - (BOOL)validatePasteOfFilenames:(NSArray *)names
-                       wasCutted:(BOOL)cutted;
+                       wasCut:(BOOL)cut;
 - (void)setBackgroundColor:(NSColor *)acolor;
 - (NSColor *)backgroundColor;
 - (void)setTextColor:(NSColor *)acolor;

@@ -2444,7 +2444,7 @@ static GWorkspace *gworkspace = nil;
                    owner: nil];
 
         if ([pb setPropertyList: selection forType: NSFilenamesPboardType]) {
-          [fileOpsManager setFilenamesCutted: YES];
+          [fileOpsManager setFilenamesCut: YES];
         }
       }
     } 
@@ -2486,7 +2486,7 @@ static GWorkspace *gworkspace = nil;
                    owner: nil];
 
         if ([pb setPropertyList: selection forType: NSFilenamesPboardType]) {
-          [fileOpsManager setFilenamesCutted: NO];
+          [fileOpsManager setFilenamesCut: NO];
         }
       }
     }
@@ -2514,7 +2514,7 @@ static GWorkspace *gworkspace = nil;
         NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType];   
 
         if (sourcePaths) {
-          BOOL cutted = [fileOpsManager filenamesWasCutted];
+          BOOL cut = [fileOpsManager filenamesWasCut];
           id nodeView;
 
           if ([vwrsManager hasViewerWithWindow: kwin]) {
@@ -2524,7 +2524,7 @@ static GWorkspace *gworkspace = nil;
           }
 
           if ([nodeView validatePasteOfFilenames: sourcePaths
-                                       wasCutted: cutted]) {
+                                       wasCut: cut]) {
             NSMutableDictionary *opDict = [NSMutableDictionary dictionary];
             NSString *source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
             NSString *destination = [[nodeView shownNode] path];
@@ -2537,7 +2537,7 @@ static GWorkspace *gworkspace = nil;
               [files addObject: [spath lastPathComponent]];
             }  
 
-            if (cutted) {
+            if (cut) {
               if ([source isEqual: trashPath]) {
                 operation = @"GWorkspaceRecycleOutOperation";
               } else {
@@ -2685,14 +2685,14 @@ static GWorkspace *gworkspace = nil;
 		 destination: destination files: files tag: &tag];
 }
 
-- (BOOL)filenamesWasCutted
+- (BOOL)filenamesWasCut
 {
-  return [fileOpsManager filenamesWasCutted];
+  return [fileOpsManager filenamesWasCut];
 }
 
-- (void)setFilenamesCutted:(BOOL)value
+- (void)setFilenamesCut:(BOOL)value
 {
-  [fileOpsManager setFilenamesCutted: value];
+  [fileOpsManager setFilenamesCut: value];
 }
 
 - (void)lsfolderDragOperation:(NSData *)opinfo

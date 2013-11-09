@@ -1,6 +1,6 @@
 /* RecyclerView.h
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2004
@@ -66,7 +66,7 @@
 - (FSNSelectionMask)selectionMask;
 
 - (BOOL)validatePasteOfFilenames:(NSArray *)names
-                       wasCutted:(BOOL)cutted;
+                       wasCut:(BOOL)cut;
 
 - (NSColor *)backgroundColor;
 

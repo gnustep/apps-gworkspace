@@ -39,15 +39,15 @@ enum {
   NSMutableArray *fileOperations;
   NSUInteger fopRef;
   
-  BOOL filenamesCutted;
+  BOOL filenamesCut;
     
   NSFileManager *fm;  
   NSNotificationCenter *nc; 
 }
 
-- (void)setFilenamesCutted:(BOOL)value;
+- (void)setFilenamesCut:(BOOL)value;
 
-- (BOOL)filenamesWasCutted;
+- (BOOL)filenamesWasCut;
 
 - (void)performOperation:(NSDictionary *)opdict;
 

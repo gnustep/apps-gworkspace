@@ -195,7 +195,7 @@
 - (BOOL)needsDndProxy;
 - (BOOL)involvedByFileOperation:(NSDictionary *)opinfo;
 - (BOOL)validatePasteOfFilenames:(NSArray *)names
-                       wasCutted:(BOOL)cutted;
+                       wasCut:(BOOL)cut;
 - (void)stopRepNameEditing;
 
 @end
@@ -366,7 +366,7 @@
 - (BOOL)needsDndProxy;
 - (BOOL)involvedByFileOperation:(NSDictionary *)opinfo;
 - (BOOL)validatePasteOfFilenames:(NSArray *)names
-                       wasCutted:(BOOL)cutted;
+                       wasCut:(BOOL)cut;
 - (void)stopRepNameEditing;
 
 @end

@@ -245,7 +245,7 @@ typedef enum FSNSelectionMask {
 - (BOOL)involvedByFileOperation:(NSDictionary *)opinfo;
 
 - (BOOL)validatePasteOfFilenames:(NSArray *)names
-                       wasCutted:(BOOL)cutted;
+                       wasCut:(BOOL)cut;
 
 - (void)setNameEditorForRep:(id)arep;
 

@@ -1,6 +1,6 @@
 /* RecyclerView.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2004
@@ -275,18 +275,18 @@
 }
 
 - (BOOL)validatePasteOfFilenames:(NSArray *)names
-                       wasCutted:(BOOL)cutted
+                       wasCut:(BOOL)cut
 {
   NSMutableArray *sourcePaths = [names mutableCopy];
   NSString *basePath;
   NSString *nodePath = [[icon node] path];
   NSString *prePath = [NSString stringWithString: nodePath];
-	int count = [names count];
+  NSUInteger count = [names count];
   int i;
   
   AUTORELEASE (sourcePaths);
 
-	if (count == 0) {
+  if (count == 0) {
 		return NO;
   } 
 
@@ -328,7 +328,7 @@
     return NO;
   }
 
-  return cutted;
+  return cut;
 }
 
 - (NSColor *)backgroundColor

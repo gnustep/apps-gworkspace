@@ -1738,13 +1738,13 @@ pp.y = NSMaxY(br) + 1; \
 }
 
 - (BOOL)validatePasteOfFilenames:(NSArray *)names
-                       wasCutted:(BOOL)cutted
+                       wasCut:(BOOL)cut
 {
   NSString *nodePath = [node path];
   NSString *prePath = [NSString stringWithString: nodePath];
   NSString *basePath;
   
-	if ([names count] == 0) {
+  if ([names count] == 0) {
 		return NO;
   } 
 

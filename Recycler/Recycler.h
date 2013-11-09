@@ -1,6 +1,6 @@
 /* Recycler.h
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2004
@@ -69,9 +69,9 @@
 
 - (oneway void)performOperation:(NSData *)opinfo;
 
-- (oneway void)setFilenamesCutted:(BOOL)value;
+- (oneway void)setFilenamesCut:(BOOL)value;
 
-- (BOOL)filenamesWasCutted;
+- (BOOL)filenamesWasCut;
 
 @end
 

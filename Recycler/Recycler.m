@@ -1,6 +1,6 @@
 /* Recycler.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2004
@@ -508,9 +508,9 @@ static Recycler *recycler = nil;
       [self contactWorkspaceApp];
 
       if (workspaceApplication) {
-        BOOL cutted = [(id <OperationProtocol>)workspaceApplication filenamesWasCutted];
+        BOOL cut = [(id <OperationProtocol>)workspaceApplication filenamesWasCut];
         
-        if ([recview validatePasteOfFilenames: sourcePaths wasCutted: cutted]) {
+        if ([recview validatePasteOfFilenames: sourcePaths wasCut: cut]) {
           NSString *source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
           NSString *destination = trashPath;
           NSMutableArray *files = [NSMutableArray array];
@@ -522,7 +522,7 @@ static Recycler *recycler = nil;
             [files addObject: [spath lastPathComponent]];
           }  
         
-          if (cutted) {
+          if (cut) {
             if ([source isEqual: trashPath]) {
               operation = @"GWorkspaceRecycleOutOperation";
             } else {

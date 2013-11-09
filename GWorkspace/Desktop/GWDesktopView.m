@@ -1400,18 +1400,18 @@ static void GWHighlightFrameRect(NSRect aRect)
 }
 
 - (BOOL)validatePasteOfFilenames:(NSArray *)names
-                       wasCutted:(BOOL)cutted
+                       wasCut:(BOOL)cut
 {
   NSMutableArray *sourcePaths = [names mutableCopy];
   NSString *basePath;
   NSString *nodePath = [node path];
   NSString *prePath = [NSString stringWithString: nodePath];
-	int count = [names count];
+  NSUInteger count = [names count];
   int i;
   
   AUTORELEASE (sourcePaths);
 
-	if (count == 0) {
+  if (count == 0) {
 		return NO;
   } 
 

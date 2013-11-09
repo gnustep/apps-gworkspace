@@ -1338,19 +1338,21 @@ static NSString *defaultColumns = @"{ \
 }
 
 - (BOOL)validatePasteOfFilenames:(NSArray *)names
-                       wasCutted:(BOOL)cutted
+                       wasCut:(BOOL)cut
 {
   NSString *nodePath = [node path];
   NSString *prePath = [NSString stringWithString: nodePath];
   NSString *basePath;
   
-	if ([names count] == 0) {
-		return NO;
-  } 
+  if ([names count] == 0)
+    {
+      return NO;
+    } 
 
-  if ([node isWritable] == NO) {
-    return NO;
-  }
+  if ([node isWritable] == NO)
+    {
+      return NO;
+    }
     
   basePath = [[names objectAtIndex: 0] stringByDeletingLastPathComponent];
   if ([basePath isEqual: nodePath]) {
@@ -2828,9 +2830,9 @@ int sortSubviews(id view1, id view2, void *context)
 }
 
 - (BOOL)validatePasteOfFilenames:(NSArray *)names
-                       wasCutted:(BOOL)cutted
+                       wasCut:(BOOL)cut
 {
-  return [dsource validatePasteOfFilenames: names wasCutted: cutted];
+  return [dsource validatePasteOfFilenames: names wasCut: cut];
 }
 
 - (void)stopRepNameEditing

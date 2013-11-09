@@ -1,6 +1,6 @@
 /* GWorkspace.h
  *  
- * Copyright (C) 2003-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -419,9 +419,9 @@
 
 - (void)performFileOperation:(NSDictionary *)opinfo;
 
-- (BOOL)filenamesWasCutted;
+- (BOOL)filenamesWasCut;
 
-- (void)setFilenamesCutted:(BOOL)value;
+- (void)setFilenamesCut:(BOOL)value;
 
 - (void)lsfolderDragOperation:(NSData *)opinfo
               concludedAtPath:(NSString *)path;
