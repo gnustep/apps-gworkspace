@@ -36,7 +36,6 @@
 static id <DesktopApplication> desktopApp = nil;
 
 static NSString *dots = @"...";
-static float dtslenght = 0.0;  
 static NSDictionary *fontAttr = nil;
 
 static NSFont *infoFont = nil;
@@ -57,7 +56,6 @@ static cutIMP cutTitle = NULL;
   RELEASE (infoCell); 
   RELEASE (icon); 
   RELEASE (selectedicon); 
-  RELEASE (dots);
   
   [super dealloc];
 }
@@ -76,7 +74,7 @@ static cutIMP cutTitle = NULL;
       NSString *selName = [defaults stringForKey: @"DesktopApplicationSelName"];
 
       if (appName && selName) {
-		    Class desktopAppClass = [[NSBundle mainBundle] classNamed: appName];
+        Class desktopAppClass = [[NSBundle mainBundle] classNamed: appName];
         SEL sel = NSSelectorFromString(selName);
         desktopApp = [desktopAppClass performSelector: sel];
       }
@@ -84,7 +82,7 @@ static cutIMP cutTitle = NULL;
       fontAttr = [NSDictionary dictionaryWithObject: [NSFont systemFontOfSize: 12]
                                              forKey: NSFontAttributeName];
       RETAIN (fontAttr);
-      dtslenght = [dots sizeWithAttributes: fontAttr].width;     
+
       infoFont = [NSFont systemFontOfSize: 10];
       infoFont = [[NSFontManager sharedFontManager] convertFont: infoFont 
                                                     toHaveTrait: NSItalicFontMask];
@@ -462,8 +460,7 @@ static cutIMP cutTitle = NULL;
 {
   [super setFont: fontObj];
   ASSIGN (fontAttr, [NSDictionary dictionaryWithObject: [self font] 
-                                                forKey: NSFontAttributeName]);
-  dtslenght = [dots sizeWithAttributes: fontAttr].width;     
+                                                forKey: NSFontAttributeName]); 
 }
 
 - (NSFont *)labelFont

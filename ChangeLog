@@ -1,3 +1,8 @@
+2013-11-20 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNBrowserCell.m
+	Remove unused dtslenght.
+
 2013-11-09 Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNBrowser.h
