@@ -1,0 +1,5 @@
+{
+  NSExecutable = "opennx";
+  NSIcon = "nx.png";
+  XAppWrapper = YES;
+}

@@ -1,0 +1,10 @@
+#!/bin/sh
+
+APP=opennx
+
+if [ $# -eq 2 ] ; then
+  $APP "$2" &
+else
+  $APP &
+fi
+
