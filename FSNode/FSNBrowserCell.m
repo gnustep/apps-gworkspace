@@ -37,10 +37,6 @@ static id <DesktopApplication> desktopApp = nil;
 
 static NSString *dots = @"...";
 
-static SEL cutTitleSel = NULL;
-static cutIMP cutTitle = NULL;
-
-
 @implementation FSNBrowserCell
 
 - (void)dealloc
@@ -61,9 +57,6 @@ static cutIMP cutTitle = NULL;
   static BOOL initialized = NO;
 
   if (initialized == NO) {
-    cutTitleSel = @selector(cutTitle:toFitWidth:);
-    cutTitle = (cutIMP)[self instanceMethodForSelector: cutTitleSel];   
-  
     if (desktopApp == nil) {
       NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
       NSString *appName = [defaults stringForKey: @"DesktopApplicationName"];
@@ -84,27 +77,31 @@ static cutIMP cutTitle = NULL;
 {
   self = [super init];
   
-  if (self) {
-    infoheight = floor([[FSNodeRep sharedInstance] heighOfFont: [self font]]);
-    node = nil;
-    selection = nil;
-    selectionTitle = nil;
-    showType = FSNInfoNameType;
-    extInfoType = nil;
-    icon = nil;
-    selectedicon = nil;
-    icnsize = DEFAULT_ISIZE;
-    
-    isLocked = NO;
-    iconSelected = NO;
-    isOpened = NO;
-    nameEdited = NO;
-    
-    [self setAllowsMixedState: NO];
-    
-    fsnodeRep = [FSNodeRep sharedInstance];
-  }
+  if (self)
+    {
+      cutTitleSel = @selector(cutTitle:toFitWidth:);
+      cutTitleImp = (cutTitleIMP)[self methodForSelector: cutTitleSel];
 
+      infoheight = floor([[FSNodeRep sharedInstance] heighOfFont: [self font]]);
+      node = nil;
+      selection = nil;
+      selectionTitle = nil;
+      showType = FSNInfoNameType;
+      extInfoType = nil;
+      icon = nil;
+      selectedicon = nil;
+      icnsize = DEFAULT_ISIZE;
+      
+      isLocked = NO;
+      iconSelected = NO;
+      isOpened = NO;
+      nameEdited = NO;
+      
+      [self setAllowsMixedState: NO];
+      
+    fsnodeRep = [FSNodeRep sharedInstance];
+    }
+  
   return self;
 }
 
@@ -229,7 +226,7 @@ static cutIMP cutTitle = NULL;
 
     textlenght -= MARGIN;
     ASSIGN (uncuttedTitle, [self stringValue]);
-    cuttitle = (*cutTitle)(self, cutTitleSel, uncuttedTitle, textlenght);
+    cuttitle = (*cutTitleImp)(self, cutTitleSel, uncuttedTitle, textlenght);
     [self setStringValue: cuttitle];        
 
     [self setShowsFirstResponder: NO];

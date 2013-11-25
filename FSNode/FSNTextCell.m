@@ -26,28 +26,10 @@
 #import <AppKit/AppKit.h>
 #import "FSNTextCell.h"
 
-static SEL cutNameSel = NULL;
-static cutIMP cutName = NULL;
 
-static SEL cutDateSel = NULL;
-static cutIMP cutDate = NULL;
 
 
 @implementation FSNTextCell
-
-+ (void)initialize
-{
-  static BOOL initialized = NO;
-
-  if (initialized == NO) {
-    cutNameSel = @selector(cutTitle:toFitWidth:);
-    cutName = (cutIMP)[self instanceMethodForSelector: cutNameSel];    
-    cutDateSel = @selector(cutTitle:toFitWidth:);
-    cutDate = (cutIMP)[self instanceMethodForSelector: cutDateSel];    
-
-    initialized = YES;
-  }
-}
 
 - (void)dealloc
 {
@@ -62,16 +44,19 @@ static cutIMP cutDate = NULL;
 {
   self = [super init];
 
-  if (self) {
-    ASSIGN (fontAttr, [NSDictionary dictionaryWithObject: [self font] 
-                                                  forKey: NSFontAttributeName]);
-    ASSIGN (dots, @"...");
-    titlesize = NSMakeSize(0, 0);
-    icon = nil;
-    dateCell = NO;
-    cutTitleSel = cutNameSel;
-    cutTitle = cutName;    
-  }
+  if (self)
+    {
+      cutTitleSel = @selector(cutTitle:toFitWidth:);
+      cutTitleImp = (cutTitleIMP)[self methodForSelector: cutTitleSel];
+      cutDateTitleSel = @selector(cutTitle:toFitWidth:);
+      cutDateTitleImp = (cutDateTitleIMP)[self methodForSelector: cutDateTitleSel];
+      ASSIGN (fontAttr, [NSDictionary dictionaryWithObject: [self font]
+				      forKey: NSFontAttributeName]);
+      ASSIGN (dots, @"...");
+      titlesize = NSMakeSize(0, 0);
+      icon = nil;
+      dateCell = NO;
+    }
 
   return self;
 }
@@ -91,8 +76,10 @@ static cutIMP cutDate = NULL;
     c->uncuttedTitle = nil;
   }
   
-  c->cutTitleSel = cutNameSel;
-  c->cutTitle = cutName;   
+  c->cutTitleSel = cutTitleSel;
+  c->cutTitleImp = cutTitleImp;
+  c->cutDateTitleSel = cutDateTitleSel;
+  c->cutDateTitleImp = cutDateTitleImp;
 
   RETAIN (icon);
 
@@ -131,14 +118,6 @@ static cutIMP cutDate = NULL;
 - (void)setDateCell:(BOOL)value
 {
   dateCell = value;
-
-  if (dateCell) {
-    cutTitleSel = cutDateSel;
-    cutTitle = cutDate; 
-  } else {
-    cutTitleSel = cutNameSel;
-    cutTitle = cutName;  
-  }
 }
 
 - (BOOL)isDateCell
@@ -239,7 +218,15 @@ static cutIMP cutDate = NULL;
   
   textlenght -= MARGIN;
   ASSIGN (uncuttedTitle, [self stringValue]);
-  cuttitle = (*cutTitle)(self, cutTitleSel, uncuttedTitle, textlenght);
+  if (dateCell)
+    {
+      cuttitle = (*cutTitleImp)(self, cutTitleSel, uncuttedTitle, textlenght);
+    }
+  else
+    {
+      cuttitle = (*cutDateTitleImp)(self, cutDateTitleSel, uncuttedTitle, textlenght);
+    }
+
   [self setStringValue: cuttitle];        
 
   title_rect.size.height = titlesize.height;

@@ -29,19 +29,23 @@
 #include <AppKit/NSTextFieldCell.h>
 #include "FSNodeRep.h"
 
-typedef NSString *(*cutIMP)(id, SEL, id, float);
+typedef NSString *(*cutTitleIMP)(id, SEL, id, float);
+typedef NSString *(*cutDateTitleIMP)(id, SEL, id, float);
 
 @class NSImage;
 
 @interface FSNTextCell : NSTextFieldCell 
 {
+  SEL cutTitleSel;
+  cutTitleIMP cutTitleImp;
+  SEL cutDateTitleSel;
+  cutDateTitleIMP cutDateTitleImp;
+
   NSDictionary *fontAttr;
   NSString *dots;
   NSSize titlesize;
   BOOL dateCell;
   NSString *uncuttedTitle; 
-	SEL cutTitleSel;
-	cutIMP cutTitle;
   NSImage *icon;
 }
 
