@@ -1,5 +1,10 @@
 2013-11-25 Riccardo Mottola <rm@gnu.org>
 
+	* FSNode/FSNBrowserCell.m
+	use fontAttr only inside (cutTitle:toFitWidth:) and remove it as a static-initialized variable.
+
+2013-11-25 Riccardo Mottola <rm@gnu.org>
+
 	* FSNode/FSNBrowserCell.h
 	* FSNode/FSNBrowserCell.m
 	Do not use a separate infoFont, but just NSCell's font.

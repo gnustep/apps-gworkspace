@@ -36,7 +36,6 @@
 static id <DesktopApplication> desktopApp = nil;
 
 static NSString *dots = @"...";
-static NSDictionary *fontAttr = nil;
 
 static SEL cutTitleSel = NULL;
 static cutIMP cutTitle = NULL;
@@ -75,10 +74,6 @@ static cutIMP cutTitle = NULL;
         SEL sel = NSSelectorFromString(selName);
         desktopApp = [desktopAppClass performSelector: sel];
       }
-
-      fontAttr = [NSDictionary dictionaryWithObject: [NSFont systemFontOfSize: 12]
-                                             forKey: NSFontAttributeName];
-      RETAIN (fontAttr);
     }
    
     initialized = YES;
@@ -161,6 +156,11 @@ static cutIMP cutTitle = NULL;
 - (NSString *)cutTitle:(NSString *)title 
             toFitWidth:(float)width
 {
+  NSDictionary *fontAttr;
+
+  fontAttr = [NSDictionary dictionaryWithObject: [NSFont systemFontOfSize: 12]
+			   forKey: NSFontAttributeName];
+
   if ([title sizeWithAttributes: fontAttr].width > width) {
     int tl = [title length];
   
@@ -451,9 +451,8 @@ static cutIMP cutTitle = NULL;
 - (void)setFont:(NSFont *)fontObj
 {
   [super setFont: fontObj];
-  ASSIGN (fontAttr, [NSDictionary dictionaryWithObject: [self font] 
-                                                forKey: NSFontAttributeName]); 
 }
+
 
 - (NSFont *)labelFont
 {
