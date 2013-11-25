@@ -38,9 +38,6 @@ static id <DesktopApplication> desktopApp = nil;
 static NSString *dots = @"...";
 static NSDictionary *fontAttr = nil;
 
-static NSFont *infoFont = nil;
-static int infoheight = 0;
-
 static SEL cutTitleSel = NULL;
 static cutIMP cutTitle = NULL;
 
@@ -82,12 +79,6 @@ static cutIMP cutTitle = NULL;
       fontAttr = [NSDictionary dictionaryWithObject: [NSFont systemFontOfSize: 12]
                                              forKey: NSFontAttributeName];
       RETAIN (fontAttr);
-
-      infoFont = [NSFont systemFontOfSize: 10];
-      infoFont = [[NSFontManager sharedFontManager] convertFont: infoFont 
-                                                    toHaveTrait: NSItalicFontMask];
-      RETAIN (infoFont);
-      infoheight = floor([[FSNodeRep sharedInstance] heighOfFont: infoFont]);
     }
    
     initialized = YES;
@@ -98,7 +89,8 @@ static cutIMP cutTitle = NULL;
 {
   self = [super init];
   
-  if (self) {       
+  if (self) {
+    infoheight = floor([[FSNodeRep sharedInstance] heighOfFont: [self font]]);
     node = nil;
     selection = nil;
     selectionTitle = nil;
@@ -521,7 +513,7 @@ static cutIMP cutTitle = NULL;
     DESTROY (infoCell);
   } else if (infoCell == nil) {
     infoCell = [NSCell new];
-    [infoCell setFont: infoFont];
+    [infoCell setFont: [self font]];
   }
   
   switch(showType) {
