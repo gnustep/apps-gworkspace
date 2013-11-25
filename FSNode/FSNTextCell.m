@@ -1,6 +1,6 @@
 /* FSNTextCell.m
  *  
- * Copyright (C) 2004-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -66,7 +66,6 @@ static cutIMP cutDate = NULL;
     ASSIGN (fontAttr, [NSDictionary dictionaryWithObject: [self font] 
                                                   forKey: NSFontAttributeName]);
     ASSIGN (dots, @"...");
-    dtslenght = [dots sizeWithAttributes: fontAttr].width; 
     titlesize = NSMakeSize(0, 0);
     icon = nil;
     dateCell = NO;
@@ -84,7 +83,6 @@ static cutIMP cutDate = NULL;
   c->fontAttr = [fontAttr copyWithZone: zone];
   c->dots = [dots copyWithZone: zone];
 
-  c->dtslenght = dtslenght;
   c->dateCell = dateCell;
   
   if (uncuttedTitle) {
@@ -112,8 +110,7 @@ static cutIMP cutDate = NULL;
   [super setFont: fontObj];
   ASSIGN (fontAttr, [NSDictionary dictionaryWithObject: [self font] 
                                                 forKey: NSFontAttributeName]);
-  titlesize = [[self stringValue] sizeWithAttributes: fontAttr]; 
-  dtslenght = [dots sizeWithAttributes: fontAttr].width;     
+  titlesize = [[self stringValue] sizeWithAttributes: fontAttr];   
 }
 
 - (void)setIcon:(NSImage *)icn
