@@ -50,8 +50,7 @@ typedef NSString *(*cutTitleIMP)(id, SEL, id, float);
   NSCell *infoCell;
   NSRect titleRect;
   NSRect infoRect;
-  int infoheight;
-  
+
   NSImage *icon;
   NSImage *selectedicon;
   int icnsize;

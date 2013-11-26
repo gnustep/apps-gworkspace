@@ -82,7 +82,6 @@ static NSString *dots = @"...";
       cutTitleSel = @selector(cutTitle:toFitWidth:);
       cutTitleImp = (cutTitleIMP)[self methodForSelector: cutTitleSel];
 
-      infoheight = floor([[FSNodeRep sharedInstance] heighOfFont: [self font]]);
       node = nil;
       selection = nil;
       selectionTitle = nil;
@@ -211,7 +210,8 @@ static NSString *dots = @"...";
     NSColor *backcolor = [cvwin backgroundColor];
     float textlenght = cellFrame.size.width;
     BOOL showsFirstResponder = [self showsFirstResponder];
-    NSString *cuttitle;  
+    NSString *cuttitle;
+    int infoheight = 0;
 
     titleRect = cellFrame;
 
@@ -234,6 +234,8 @@ static NSString *dots = @"...";
     if (icon == nil) {
       if (nameEdited == NO) {
         if (infoCell) {
+          infoheight = floor([[FSNodeRep sharedInstance] heighOfFont: [infoCell font]]);
+
           if (([self isHighlighted] || [self state]) && (nameEdited == NO)) {
 	          [[self highlightColorInView: controlView] set];
             NSRectFill(cellFrame);
@@ -507,10 +509,16 @@ static NSString *dots = @"...";
   
   if (showType == FSNInfoNameType) {
     DESTROY (infoCell);
-  } else if (infoCell == nil) {
-    infoCell = [NSCell new];
-    [infoCell setFont: [self font]];
   }
+  else if (infoCell == nil)
+    {
+      NSFont *infoFont;
+      
+      infoFont = [[NSFontManager sharedFontManager] convertFont: [self font] 	 
+                                                    toHaveTrait: NSItalicFontMask];
+      infoCell = [NSCell new];
+      [infoCell setFont: infoFont];
+    }
   
   switch(showType) {
     case FSNInfoKindType:

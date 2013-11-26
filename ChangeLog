@@ -2,6 +2,12 @@
 
 	* FSNode/FSNBrowserCell.h
 	* FSNode/FSNBrowserCell.m
+	Reinstantiate special infoFont, but only as local variable and not ivar.
+
+2013-11-25 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNBrowserCell.h
+	* FSNode/FSNBrowserCell.m
 	* FSNode/FSNTextCell.h
 	* FSNode/FSNTextCell.m
 	Clean up IMP caching, cleaner names and instance variables instead of statics.
