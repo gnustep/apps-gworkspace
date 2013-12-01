@@ -25,22 +25,14 @@
 #ifndef FSN_TEXT_CELL_H
 #define FSN_TEXT_CELL_H
 
-#include <Foundation/Foundation.h>
-#include <AppKit/NSTextFieldCell.h>
-#include "FSNodeRep.h"
-
-typedef NSString *(*cutTitleIMP)(id, SEL, id, float);
-typedef NSString *(*cutDateTitleIMP)(id, SEL, id, float);
+#import <Foundation/Foundation.h>
+#import <AppKit/NSTextFieldCell.h>
+#import "FSNodeRep.h"
 
 @class NSImage;
 
 @interface FSNTextCell : NSTextFieldCell 
 {
-  SEL cutTitleSel;
-  cutTitleIMP cutTitleImp;
-  SEL cutDateTitleSel;
-  cutDateTitleIMP cutDateTitleImp;
-
   NSDictionary *fontAttr;
   NSString *dots;
   NSSize titlesize;
