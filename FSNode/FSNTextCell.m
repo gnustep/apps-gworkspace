@@ -128,12 +128,14 @@
 - (NSString *)cutTitle:(NSString *)title 
             toFitWidth:(float)width
 {
-  if ([title sizeWithAttributes: fontAttr].width > width) {
-    int tl = [title length];
+  int tl = [title length];
   
-    if (tl <= 5) {
+  if (tl <= 5)
+    {
       return dots;
-    } else {
+    }
+  else
+    {
       int fpto = (tl / 2) - 2;
       int spfr = fpto + 3;
       NSString *fp = [title substringToIndex: fpto];
@@ -164,7 +166,6 @@
       
       return dotted;
     }
-  }
   
   return title;
 }
@@ -172,62 +173,69 @@
 - (NSString *)cutDateTitle:(NSString *)title 
                 toFitWidth:(float)width
 {
-  if ([title sizeWithAttributes: fontAttr].width > width) {
-    int tl = [title length];
+  NSUInteger tl = [title length];
     
-    if (tl <= 5) {
+  if (tl <= 5)
+    {
       return dots;
-    } else {
+    }
+  else
+    {
       NSString *format = @"%b %d %Y";
       NSCalendarDate *date = [NSCalendarDate dateWithString: title
                                              calendarFormat: format];
-      if (date) {
-        NSString *descr;
+      if (date)
+        {
+          NSString *descr;
         
-        format = @"%m/%d/%y";
-        descr = [date descriptionWithCalendarFormat: format 
-                            timeZone: [NSTimeZone localTimeZone] locale: nil];
+          format = @"%m/%d/%y";
+          descr = [date descriptionWithCalendarFormat: format 
+                                             timeZone: [NSTimeZone localTimeZone] locale: nil];
         
-        if ([descr sizeWithAttributes: fontAttr].width > width) {
-          return [self cutTitle: descr toFitWidth: width];
-        } else {
-          return descr;
+          if ([descr sizeWithAttributes: fontAttr].width > width) {
+            return [self cutTitle: descr toFitWidth: width];
+          } else {
+            return descr;
+          }
+        
         }
-        
-      } else {
-        return [self cutTitle: title toFitWidth: width];
-      }
+      else
+        {
+          return [self cutTitle: title toFitWidth: width];
+        }
     }
-  }
   
   return title;
 }
 
 - (void)drawInteriorWithFrame:(NSRect)cellFrame 
-		                   inView:(NSView *)controlView
+                       inView:(NSView *)controlView
 {
   NSRect title_rect = cellFrame;
-  float textlenght = title_rect.size.width;
-  NSString *cuttitle;  
+  CGFloat textlength;
+  NSString *cutTitle;  
 
 #define MARGIN (2.0)
  
-  if (icon) {
-    textlenght -= ([icon size].width + (MARGIN * 2));
-  }
-  
-  textlenght -= MARGIN;
+  textlength = title_rect.size.width - MARGIN;
+  if (icon)
+    textlength -= ([icon size].width + (MARGIN * 2));
+
   ASSIGN (uncuttedTitle, [self stringValue]);
-  if (dateCell)
+  /* we calculate the reduced title only if necessary */
+  cutTitle = nil;
+  if ([uncuttedTitle sizeWithAttributes: fontAttr].width > textlength)
     {
-      cuttitle = (*cutTitleImp)(self, cutTitleSel, uncuttedTitle, textlenght);
+      if (dateCell)
+        cutTitle = [self cutDateTitle:uncuttedTitle toFitWidth:textlength];
+      else
+        cutTitle = [self cutTitle:uncuttedTitle toFitWidth:textlength];
+      [self setStringValue: cutTitle];
     }
   else
     {
-      cuttitle = (*cutDateTitleImp)(self, cutDateTitleSel, uncuttedTitle, textlenght);
+      [self setStringValue: uncuttedTitle];
     }
-
-  [self setStringValue: cuttitle];        
 
   title_rect.size.height = titlesize.height;
   title_rect.origin.y += ((cellFrame.size.height - titlesize.height) / 2.0);
@@ -255,8 +263,10 @@
     [icon compositeToPoint: icon_rect.origin 
 	               operation: NSCompositeSourceOver];
   }
-  
-  [self setStringValue: uncuttedTitle];          
+
+  /* we reset the title to the orginal string */
+  if (cutTitle)
+    [self setStringValue: uncuttedTitle];          
 }
 
 - (BOOL)startTrackingAt:(NSPoint)startPoint inView:(NSView *)controlView

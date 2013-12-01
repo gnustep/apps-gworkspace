@@ -1,4 +1,10 @@
-2013-11-25 Riccardo Mottola <rm@gnu.org>
+2013-12-01 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNBrowserCell.m
+	Optimize drawing code, calculate dot clipping there and not inside the
+	clipping methods.
+
+2013-11-26 Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNBrowserCell.h
 	* FSNode/FSNBrowserCell.m
@@ -18,7 +24,7 @@
 	use fontAttr only inside (cutTitle:toFitWidth:) and remove it as a static-initialized variable.
 
 	* FSNode/FSNTextCell.h
-	* FSNode/FSNTextCell.m 
+	* FSNode/FSNTextCell.m
 	Remove unused dtslenght.
 
 2013-11-25 Riccardo Mottola <rm@gnu.org>

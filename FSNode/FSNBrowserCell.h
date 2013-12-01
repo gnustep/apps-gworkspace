@@ -29,17 +29,12 @@
 #import <AppKit/NSBrowserCell.h>
 #import "FSNodeRep.h"
 
-typedef NSString *(*cutTitleIMP)(id, SEL, id, float);
-
 @class FSNode;
 @class NSImage;
 @class NSTextFieldCell;
 
 @interface FSNBrowserCell : NSBrowserCell <FSNodeRep>
 {
-  SEL cutTitleSel;
-  cutTitleIMP cutTitleImp;
-
   FSNode *node;
   NSArray *selection;
   NSString *selectionTitle; 

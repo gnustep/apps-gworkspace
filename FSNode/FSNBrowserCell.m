@@ -79,9 +79,6 @@ static NSString *dots = @"...";
   
   if (self)
     {
-      cutTitleSel = @selector(cutTitle:toFitWidth:);
-      cutTitleImp = (cutTitleIMP)[self methodForSelector: cutTitleSel];
-
       node = nil;
       selection = nil;
       selectionTitle = nil;
@@ -98,7 +95,7 @@ static NSString *dots = @"...";
       
       [self setAllowsMixedState: NO];
       
-    fsnodeRep = [FSNodeRep sharedInstance];
+      fsnodeRep = [FSNodeRep sharedInstance];
     }
   
   return self;
@@ -210,7 +207,6 @@ static NSString *dots = @"...";
     NSColor *backcolor = [cvwin backgroundColor];
     float textlenght = cellFrame.size.width;
     BOOL showsFirstResponder = [self showsFirstResponder];
-    NSString *cuttitle;
     int infoheight = 0;
 
     titleRect = cellFrame;
@@ -226,8 +222,7 @@ static NSString *dots = @"...";
 
     textlenght -= MARGIN;
     ASSIGN (uncuttedTitle, [self stringValue]);
-    cuttitle = (*cutTitleImp)(self, cutTitleSel, uncuttedTitle, textlenght);
-    [self setStringValue: cuttitle];        
+    [self setStringValue: [self cutTitle:uncuttedTitle toFitWidth:textlenght]];        
 
     [self setShowsFirstResponder: NO];
 
