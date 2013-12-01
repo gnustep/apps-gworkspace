@@ -666,47 +666,54 @@ static NSImage *branchImage;
 
 - (void)drawRect:(NSRect)rect
 {	 
-  if (isSelected) {
-    [[NSColor selectedControlColor] set];
-    [highlightPath fill];
-    
-    if (icnPosition != NSImageOnly) {
-      if (nameEdited == NO) {
-        NSFrameRect(labelRect);
-        NSRectFill(labelRect);  
-        [label drawWithFrame: labelRect inView: self];
-      }
-      
-      if ((showType != FSNInfoNameType) && [[infolabel stringValue] length]) {
-        [infolabel drawWithFrame: infoRect inView: self];
-      }
+  if (isSelected)
+    {
+      [[NSColor selectedControlColor] set];
+      [highlightPath fill];
+      if (nameEdited == NO)
+        {
+          NSFrameRect(labelRect);
+          NSRectFill(labelRect);  
+        }
     }
-  } else {
-    if (icnPosition != NSImageOnly) {
-      if (nameEdited == NO) {
-        [[container backgroundColor] set];
-        [label drawWithFrame: labelRect inView: self];
-      }
-      
-      if ((showType != FSNInfoNameType) && [[infolabel stringValue] length]) {
-        [infolabel drawWithFrame: infoRect inView: self];
-      }
+  else
+    {
+      if (nameEdited == NO)
+        {
+          [[container backgroundColor] set];
+        }
     }  
-  }
-
-	if (isLocked == NO) {	
-    if (isOpened == NO) {	
-      [drawicon compositeToPoint: icnPoint operation: NSCompositeSourceOver];
-    } else {
-      [drawicon dissolveToPoint: icnPoint fraction: 0.5];
+  if (icnPosition != NSImageOnly)
+    {
+      if (nameEdited == NO)
+        {
+          [label drawWithFrame: labelRect inView: self];
+        }
+      
+      if ((showType != FSNInfoNameType) && [[infolabel stringValue] length])
+        {
+          [infolabel drawWithFrame: infoRect inView: self];
+        }
     }
-	} else {						
-    [drawicon dissolveToPoint: icnPoint fraction: 0.3];
-	}
+
+  if (isLocked == NO)
+    {	
+      if (isOpened == NO)
+        {
+          [drawicon compositeToPoint: icnPoint operation: NSCompositeSourceOver];
+        }
+      else
+        {
+          [drawicon dissolveToPoint: icnPoint fraction: 0.5];
+        }
+    }
+  else
+    {	
+      [drawicon dissolveToPoint: icnPoint fraction: 0.3];
+    }
   
-  if (isLeaf == NO) {
+  if (isLeaf == NO)
     [[object_getClass(self) branchImage] compositeToPoint: brImgBounds.origin operation: NSCompositeSourceOver];
-  }
 }
 
 
