@@ -27,13 +27,11 @@
 #import "FSNTextCell.h"
 
 
-
-
 @implementation FSNTextCell
 
 - (void)dealloc
 {
-  RELEASE (uncuttedTitle);
+  RELEASE (uncutTitle);
   RELEASE (fontAttr);
   RELEASE (dots);
   RELEASE (icon);  
@@ -46,10 +44,6 @@
 
   if (self)
     {
-      cutTitleSel = @selector(cutTitle:toFitWidth:);
-      cutTitleImp = (cutTitleIMP)[self methodForSelector: cutTitleSel];
-      cutDateTitleSel = @selector(cutTitle:toFitWidth:);
-      cutDateTitleImp = (cutDateTitleIMP)[self methodForSelector: cutDateTitleSel];
       ASSIGN (fontAttr, [NSDictionary dictionaryWithObject: [self font]
 				      forKey: NSFontAttributeName]);
       ASSIGN (dots, @"...");
@@ -70,16 +64,11 @@
 
   c->dateCell = dateCell;
   
-  if (uncuttedTitle) {
-    c->uncuttedTitle = [uncuttedTitle copyWithZone: zone];
+  if (uncutTitle) {
+    c->uncutTitle = [uncutTitle copyWithZone: zone];
   } else {
-    c->uncuttedTitle = nil;
+    c->uncutTitle = nil;
   }
-  
-  c->cutTitleSel = cutTitleSel;
-  c->cutTitleImp = cutTitleImp;
-  c->cutDateTitleSel = cutDateTitleSel;
-  c->cutDateTitleImp = cutDateTitleImp;
 
   RETAIN (icon);
 
@@ -110,7 +99,7 @@
   return icon;
 }
 
-- (float)uncuttedTitleLenght
+- (float)uncutTitleLenght
 {
   return titlesize.width;
 }
@@ -221,20 +210,20 @@
   if (icon)
     textlength -= ([icon size].width + (MARGIN * 2));
 
-  ASSIGN (uncuttedTitle, [self stringValue]);
+  ASSIGN (uncutTitle, [self stringValue]);
   /* we calculate the reduced title only if necessary */
   cutTitle = nil;
-  if ([uncuttedTitle sizeWithAttributes: fontAttr].width > textlength)
+  if ([uncutTitle sizeWithAttributes: fontAttr].width > textlength)
     {
       if (dateCell)
-        cutTitle = [self cutDateTitle:uncuttedTitle toFitWidth:textlength];
+        cutTitle = [self cutDateTitle:uncutTitle toFitWidth:textlength];
       else
-        cutTitle = [self cutTitle:uncuttedTitle toFitWidth:textlength];
+        cutTitle = [self cutTitle:uncutTitle toFitWidth:textlength];
       [self setStringValue: cutTitle];
     }
   else
     {
-      [self setStringValue: uncuttedTitle];
+      [self setStringValue: uncutTitle];
     }
 
   title_rect.size.height = titlesize.height;
@@ -266,7 +255,7 @@
 
   /* we reset the title to the orginal string */
   if (cutTitle)
-    [self setStringValue: uncuttedTitle];          
+    [self setStringValue: uncutTitle];          
 }
 
 - (BOOL)startTrackingAt:(NSPoint)startPoint inView:(NSView *)controlView

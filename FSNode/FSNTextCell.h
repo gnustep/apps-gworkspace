@@ -37,7 +37,7 @@
   NSString *dots;
   NSSize titlesize;
   BOOL dateCell;
-  NSString *uncuttedTitle; 
+  NSString *uncutTitle; 
   NSImage *icon;
 }
 
@@ -45,7 +45,7 @@
 
 - (NSImage *)icon;
 
-- (float)uncuttedTitleLenght;
+- (float)uncutTitleLenght;
 
 - (void)setDateCell:(BOOL)value;
 

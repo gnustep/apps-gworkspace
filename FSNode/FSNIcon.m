@@ -176,13 +176,13 @@ static NSImage *branchImage;
     }
     
     labelRect = NSZeroRect;
-    labelRect.size.width = [label uncuttedTitleLenght] + [fsnodeRep labelMargin];
+    labelRect.size.width = [label uncutTitleLenght] + [fsnodeRep labelMargin];
     labelRect.size.height = [fsnodeRep heighOfFont: [label font]];
     labelRect = NSIntegralRect(labelRect);
 
     infoRect = NSZeroRect;
     if ((showType != FSNInfoNameType) && [[infolabel stringValue] length]) {
-      infoRect.size.width = [infolabel uncuttedTitleLenght] + [fsnodeRep labelMargin];
+      infoRect.size.width = [infolabel uncutTitleLenght] + [fsnodeRep labelMargin];
     } else {
       infoRect.size.width = labelRect.size.width;
     }
@@ -282,7 +282,7 @@ static NSImage *branchImage;
   if (icnPosition == NSImageAbove) {
     float hlx, hly;
 
-    labelRect.size.width = [label uncuttedTitleLenght] + lblmargin;
+    labelRect.size.width = [label uncutTitleLenght] + lblmargin;
   
     if (labelRect.size.width >= frameRect.size.width) {
       labelRect.size.width = frameRect.size.width;
@@ -293,7 +293,7 @@ static NSImage *branchImage;
 
     if (showType != FSNInfoNameType) {
       if (hasinfo) {
-        infoRect.size.width = [infolabel uncuttedTitleLenght] + lblmargin;
+        infoRect.size.width = [infolabel uncutTitleLenght] + lblmargin;
       } else {
         infoRect.size.width = labelRect.size.width;
       }
@@ -351,7 +351,7 @@ static NSImage *branchImage;
       icnspacew += BRANCH_SIZE;
     }
     
-    labelRect.size.width = myrintf([label uncuttedTitleLenght] + lblmargin);
+    labelRect.size.width = myrintf([label uncutTitleLenght] + lblmargin);
     
     if (labelRect.size.width >= (frameRect.size.width - icnspacew)) {
       labelRect.size.width = (frameRect.size.width - icnspacew);
@@ -359,7 +359,7 @@ static NSImage *branchImage;
     
     if (showType != FSNInfoNameType) {
       if (hasinfo) {
-        infoRect.size.width = [infolabel uncuttedTitleLenght] + lblmargin;
+        infoRect.size.width = [infolabel uncutTitleLenght] + lblmargin;
       } else {
         infoRect.size.width = labelRect.size.width;
       }
@@ -831,13 +831,13 @@ static NSImage *branchImage;
 
   [infolabel setFont: infoFont];
 
-  labelRect.size.width = myrintf([label uncuttedTitleLenght] + lblmargin);
+  labelRect.size.width = myrintf([label uncutTitleLenght] + lblmargin);
   labelRect.size.height = myrintf([fsnodeRep heighOfFont: [label font]]);
   labelRect = NSIntegralRect(labelRect);
 
   infoRect = NSZeroRect;
   if ((showType != FSNInfoNameType) && [[infolabel stringValue] length]) {
-    infoRect.size.width = [infolabel uncuttedTitleLenght] + lblmargin;
+    infoRect.size.width = [infolabel uncutTitleLenght] + lblmargin;
   } else {
     infoRect.size.width = labelRect.size.width;
   }
@@ -883,7 +883,7 @@ static NSImage *branchImage;
   hlightRect.origin.y = 0;
   ASSIGN (highlightPath, [fsnodeRep highlightPathOfSize: hlightRect.size]); 
 
-  labelRect.size.width = [label uncuttedTitleLenght] + [fsnodeRep labelMargin];
+  labelRect.size.width = [label uncutTitleLenght] + [fsnodeRep labelMargin];
   labelRect.size.height = [fsnodeRep heighOfFont: [label font]];
 
   [self tile];

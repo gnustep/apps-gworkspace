@@ -38,7 +38,7 @@
   FSNode *node;
   NSArray *selection;
   NSString *selectionTitle; 
-  NSString *uncuttedTitle; 
+  NSString *uncutTitle; 
   NSString *extInfoType;
 
   FSNInfoType showType;

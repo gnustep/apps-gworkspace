@@ -43,7 +43,7 @@ static NSString *dots = @"...";
 {
   RELEASE (selection);
   RELEASE (selectionTitle);
-  RELEASE (uncuttedTitle);
+  RELEASE (uncutTitle);
   RELEASE (extInfoType);
   RELEASE (infoCell); 
   RELEASE (icon); 
@@ -221,8 +221,8 @@ static NSString *dots = @"...";
     }
 
     textlenght -= MARGIN;
-    ASSIGN (uncuttedTitle, [self stringValue]);
-    [self setStringValue: [self cutTitle:uncuttedTitle toFitWidth:textlenght]];        
+    ASSIGN (uncutTitle, [self stringValue]);
+    [self setStringValue: [self cutTitle:uncutTitle toFitWidth:textlenght]];        
 
     [self setShowsFirstResponder: NO];
 
@@ -350,7 +350,7 @@ static NSString *dots = @"...";
       NSDottedFrameRect(cellFrame);
     }
 
-    [self setStringValue: uncuttedTitle]; 
+    [self setStringValue: uncutTitle]; 
   }         
 }
 
