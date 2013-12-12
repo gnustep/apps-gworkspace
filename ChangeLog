@@ -1,5 +1,14 @@
 2013-12-12 Riccardo Mottola <rm@gnu.org>
 
+	* GWorkspace/GWorkspace.h
+	* GWorkspace/GWorkspace.m
+	* GWorkspace/FileViewer/GWViewer.m
+	* GWorkspace/FileViewer/GWViewersManager.m
+	* GWMetadata/MDKit/MDKWindow.m
+	Use specific MAX_FILES_TO_OPEN_DIALOG instead of OPEN_MAX, which is the maximum number of open files
+
+2013-12-12 Riccardo Mottola <rm@gnu.org>
+
 	* FSNode/FSNodeRep.m (mountedVolumes)
 	use setmntent() and _PATH_MOUNTED to retrieve mounted volumes
 

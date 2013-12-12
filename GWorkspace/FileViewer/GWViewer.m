@@ -1024,7 +1024,7 @@ constrainMinCoordinate:(CGFloat)proposedMin
       NSMutableArray *dirs = [NSMutableArray array];
       NSUInteger i;
 
-      if (count > OPEN_MAX) {
+      if (count > MAX_FILES_TO_OPEN_DIALOG) {
         NSString *msg1 = NSLocalizedString(@"Are you sure you want to open", @"");
         NSString *msg2 = NSLocalizedString(@"items?", @"");
 

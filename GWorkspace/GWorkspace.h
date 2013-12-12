@@ -32,9 +32,8 @@
 #define NOEDIT 0
 #define NOXTERM 1
 
-#if !defined(OPEN_MAX) || OPEN_MAX > 255
-#define OPEN_MAX 10
-#endif
+/* defines the maximum number of files to open before issuing a dialog */
+#define MAX_FILES_TO_OPEN_DIALOG 8
 
 
 @class NSWorkspace;

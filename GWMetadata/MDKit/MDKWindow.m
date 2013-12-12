@@ -45,9 +45,8 @@
 #define CELLS_HEIGHT (28.0)
 #define ICNSIZE 24
 
-#if !defined(OPEN_MAX) || OPEN_MAX > 255
-#define OPEN_MAX 10
-#endif
+/* defines the maximum number of files to open before issuing a dialog */
+#define MAX_FILES_TO_OPEN_DIALOG 8
 
 
 BOOL isDotFile(NSString *path);
@@ -1543,7 +1542,7 @@ static NSString *nibName = @"MDKWindow";
   NSUInteger count = [selected count];
   NSUInteger i;
 
-  if (count > OPEN_MAX) {
+  if (count > MAX_FILES_TO_OPEN_DIALOG) {
     NSString *msg1 = NSLocalizedString(@"Are you sure you want to open", @"");
     NSString *msg2 = NSLocalizedString(@"items?", @"");
   

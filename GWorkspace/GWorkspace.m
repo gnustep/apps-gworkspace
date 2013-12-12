@@ -1198,12 +1198,12 @@ static GWorkspace *gworkspace = nil;
 
 - (void)openSelectedPaths:(NSArray *)paths newViewer:(BOOL)newv
 {
-  int count = [paths count];
-  int i;
+  NSUInteger count = [paths count];
+  NSUInteger i;
   
   [self setSelectedPaths: paths];      
 
-  if (count > OPEN_MAX) {
+  if (count > MAX_FILES_TO_OPEN_DIALOG) {
     NSString *msg1 = NSLocalizedString(@"Are you sure you want to open", @"");
     NSString *msg2 = NSLocalizedString(@"items?", @"");
   
@@ -2631,12 +2631,12 @@ static GWorkspace *gworkspace = nil;
 - (void)openSelectionWithApp:(id)sender
 {
   NSString *appName = (NSString *)[(NSMenuItem *)sender representedObject];
-  int count = (selectedPaths ? [selectedPaths count] : 0);
+  NSUInteger count = (selectedPaths ? [selectedPaths count] : 0);
   
   if (count) {
-    int i;
+    NSUInteger i;
 
-    if (count > OPEN_MAX) {
+    if (count > MAX_FILES_TO_OPEN_DIALOG) {
       NSString *msg1 = NSLocalizedString(@"Are you sure you want to open", @"");
       NSString *msg2 = NSLocalizedString(@"items?", @"");
 
