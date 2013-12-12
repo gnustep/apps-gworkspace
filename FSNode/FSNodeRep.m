@@ -741,12 +741,11 @@ static FSNodeRep *shared = nil;
       [volumes addObject: dict];
     }
 #elif defined(HAVE_GETMNTENT) && defined(MNT_DIR)
-  /* most probably linux */
-  if ([[NSFileManager defaultManager] fileExistsAtPath: @"/etc/mtab"])
-    {
-      FILE *fp = fopen(MNTTAB, "r");
-      struct mntent	*mnt;
+  FILE *fp = setmntent(_PATH_MOUNTED, "r");
+  struct mntent	*mnt;
 
+  if (fp)
+    {
       while ((mnt = getmntent(fp)) != NULL )
 	{ 
 	  NSMutableDictionary *dict = [NSMutableDictionary dictionary];
@@ -760,15 +759,9 @@ static FSNodeRep *shared = nil;
 
 	  [volumes addObject: dict];
 	}
-
-      fclose(fp);
-    
-    }
-  else
-    {
-      /* FIXME add something for Hurd */
       
-    }       
+      endmntent(fp);
+    }            
 #endif
 
   NSLog(@"Volumes %@", volumes);   
