@@ -537,76 +537,86 @@ x += 6; \
   
   [self unselect];
         
-  if ([self isSpecialIcon] == NO) {
-    for (i = 0; i < [paths count]; i++) {
-      NSString *path = [paths objectAtIndex: i];
-      FSNode *nod = [FSNode nodeWithPath: path];
-
-      if ([nod isPlain] || ([nod isPackage] && ([nod isApplication] == NO))) {
-        NS_DURING
-          {
-        [ws openFile: path withApplication: appName];
-          }
-        NS_HANDLER
-          {
-        NSRunAlertPanel(NSLocalizedString(@"error", @""), 
-            [NSString stringWithFormat: @"%@ %@!", 
-                NSLocalizedString(@"Can't open ", @""), [path lastPathComponent]],
-                                          NSLocalizedString(@"OK", @""), 
-                                          nil, 
-                                          nil);                                     
-          }
-        NS_ENDHANDLER  
-      }
+  if ([self isSpecialIcon] == NO)
+    {
+      for (i = 0; i < [paths count]; i++)
+        {
+          NSString *path = [paths objectAtIndex: i];
+          FSNode *nod = [FSNode nodeWithPath: path];
+          
+          if ([nod isPlain] || ([nod isPackage] && ([nod isApplication] == NO)))
+            {
+              NS_DURING
+                {
+                  [ws openFile: path withApplication: appName];
+                }
+              NS_HANDLER
+                {
+                  NSRunAlertPanel(NSLocalizedString(@"error", @""), 
+                                  [NSString stringWithFormat: @"%@ %@!", 
+                                            NSLocalizedString(@"Can't open ", @""), [path lastPathComponent]],
+                                  NSLocalizedString(@"OK", @""), 
+                                  nil, 
+                                  nil);                                     
+                }
+              NS_ENDHANDLER  
+             }
+        } 
     }
-
-  } else if (isTrashIcon) {
-    NSArray *vpaths = [ws mountedLocalVolumePaths];
-    NSMutableArray *files = [NSMutableArray array];
-    NSMutableArray *umountPaths = [NSMutableArray array];
-    NSMutableDictionary *opinfo = [NSMutableDictionary dictionary];
-
-    for (i = 0; i < [paths count]; i++) {
-      NSString *srcpath = [paths objectAtIndex: i];
-
-      if ([vpaths containsObject: srcpath]) {
-        [umountPaths addObject: srcpath];
-      } else {
-        [files addObject: [srcpath lastPathComponent]];
-      }
-    }
-
-    for (i = 0; i < [umountPaths count]; i++) {
-      NSString *umpath = [umountPaths objectAtIndex: i];
+  else if (isTrashIcon) // FIXME this is largely similar to RecyclerIcon ####
+    {
+      NSArray *vpaths = [ws mountedLocalVolumePaths];
+      NSMutableArray *files = [NSMutableArray array];
+      NSMutableArray *umountPaths = [NSMutableArray array];
+      NSMutableDictionary *opinfo = [NSMutableDictionary dictionary];
       
-      if (![ws unmountAndEjectDeviceAtPath: umpath])
+      for (i = 0; i < [paths count]; i++)
+        {
+          NSString *srcpath = [paths objectAtIndex: i];
+          
+          if ([vpaths containsObject: srcpath])
+            {
+              [umountPaths addObject: srcpath];
+            }
+          else
+            {
+              [files addObject: [srcpath lastPathComponent]];
+            }
+        }
+      
+    for (i = 0; i < [umountPaths count]; i++)
       {
+        NSString *umpath = [umountPaths objectAtIndex: i];
+        
+        if (![ws unmountAndEjectDeviceAtPath: umpath])
+          {
 	    NSString *err = NSLocalizedString(@"Error", @"");
 	    NSString *msg = NSLocalizedString(@"You are not allowed to umount\n", @"");
 	    NSString *buttstr = NSLocalizedString(@"Continue", @"");
-        NSRunAlertPanel(err, [NSString stringWithFormat: @"%@ \"%@\"!\n", msg, umpath], buttstr, nil, nil);         
+            NSRunAlertPanel(err, [NSString stringWithFormat: @"%@ \"%@\"!\n", msg, umpath], buttstr, nil, nil);         
+          }
+      }
+    
+    if ([files count])
+      {
+        NSString *fromPath = [[paths objectAtIndex: 0] stringByDeletingLastPathComponent];
+        
+        if ([fm isWritableFileAtPath: fromPath] == NO) {
+          NSString *err = NSLocalizedString(@"Error", @"");
+          NSString *msg = NSLocalizedString(@"You do not have write permission\nfor", @"");
+          NSString *buttstr = NSLocalizedString(@"Continue", @"");
+          NSRunAlertPanel(err, [NSString stringWithFormat: @"%@ \"%@\"!\n", msg, fromPath], buttstr, nil, nil);   
+          return;
+        }
+        
+        [opinfo setObject: @"NSWorkspaceRecycleOperation" forKey: @"operation"];
+        [opinfo setObject: fromPath forKey: @"source"];
+        [opinfo setObject: [node path] forKey: @"destination"];
+        [opinfo setObject: files forKey: @"files"];
+        
+        [[GWDesktopManager desktopManager] performFileOperation: opinfo];
       }
     }
-
-    if ([files count]) {
-	    NSString *fromPath = [[paths objectAtIndex: 0] stringByDeletingLastPathComponent];
-    
-	    if ([fm isWritableFileAtPath: fromPath] == NO) {
-		    NSString *err = NSLocalizedString(@"Error", @"");
-		    NSString *msg = NSLocalizedString(@"You do not have write permission\nfor", @"");
-		    NSString *buttstr = NSLocalizedString(@"Continue", @"");
-        NSRunAlertPanel(err, [NSString stringWithFormat: @"%@ \"%@\"!\n", msg, fromPath], buttstr, nil, nil);   
-		    return;
-	    }
-    
-      [opinfo setObject: @"NSWorkspaceRecycleOperation" forKey: @"operation"];
-      [opinfo setObject: fromPath forKey: @"source"];
-      [opinfo setObject: [node path] forKey: @"destination"];
-      [opinfo setObject: files forKey: @"files"];
-
-      [[GWDesktopManager desktopManager] performFileOperation: opinfo];
-    }
-  }
 }
 
 @end
