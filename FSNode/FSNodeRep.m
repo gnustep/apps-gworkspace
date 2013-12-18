@@ -1014,39 +1014,45 @@ static FSNodeRep *shared = nil;
   unsigned int systype = [[NSProcessInfo processInfo] operatingSystem];
   NSArray	*volumes = [self mountedLocalVolumePaths];
 
-  if ([volumes containsObject: path]) {
-    NSDictionary *userinfo;
-    NSTask *task;
-
-    userinfo = [NSDictionary dictionaryWithObject: path forKey: @"NSDevicePath"];
-
-    [[self notificationCenter] postNotificationName: NSWorkspaceWillUnmountNotification
-				                object: self
-				              userInfo: userinfo];
-
-    task = [NSTask launchedTaskWithLaunchPath: @"umount"
-				                            arguments: [NSArray arrayWithObject: path]];
-
-    if (task) {
-      [task waitUntilExit];
-      if ([task terminationStatus] != 0) {
-	      return NO;
-	    } 
-    } else {
-      return NO;
+  if ([volumes containsObject: path])
+    {
+      NSDictionary *userinfo;
+      NSTask *task;
+      
+      userinfo = [NSDictionary dictionaryWithObject: path forKey: @"NSDevicePath"];
+      
+      [[self notificationCenter] postNotificationName: NSWorkspaceWillUnmountNotification
+                                               object: self
+                                             userInfo: userinfo];
+      
+      task = [NSTask launchedTaskWithLaunchPath: @"umount"
+                                      arguments: [NSArray arrayWithObject: path]];
+      
+      if (task)
+        {
+          [task waitUntilExit];
+          if ([task terminationStatus] != 0)
+            {
+              return NO;
+            } 
+        }
+      else
+        {
+          return NO;
+        }
+      
+      [[self notificationCenter] postNotificationName: NSWorkspaceDidUnmountNotification
+                                               object: self
+                                             userInfo: userinfo];
+      
+      if (systype == NSGNULinuxOperatingSystem)
+        {
+          [NSTask launchedTaskWithLaunchPath: @"eject"
+                                   arguments: [NSArray arrayWithObject: path]];
+        }
+      
+      return YES;
     }
-
-    [[self notificationCenter] postNotificationName: NSWorkspaceDidUnmountNotification
-				                object: self
-				              userInfo: userinfo];
-
-    if (systype == NSGNULinuxOperatingSystem) {
-      [NSTask launchedTaskWithLaunchPath: @"eject"
-				                              arguments: [NSArray arrayWithObject: path]];
-    }
-    
-    return YES;
-  }
   
   return NO;
 }
