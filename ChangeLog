@@ -1,3 +1,8 @@
+2013-12-18 Riccardo Mottola <rm@gnu.org>
+
+	* Recycler/RecyclerIcon.m
+	Uniform with code from DockIcon so that also the standard Recycler may finally unmount volumes!
+
 2013-12-12 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/GWorkspace.h

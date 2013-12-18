@@ -1,8 +1,10 @@
 /* RecyclerIcon.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
+ *         Riccardo Mottola <rm@gnu.org>
+ *
  * Date: June 2004
  *
  * This file is part of the GNUstep Recycler application
@@ -214,58 +216,71 @@ static id <DesktopApplication> desktopApp = nil;
   return isDragTarget;
 }
 
+// FIXME: this code is now very similar to what is in DockIcon, it should be generalized
+
 - (void)concludeDragOperation:(id <NSDraggingInfo>)sender
 {
   NSPasteboard *pb = [sender draggingPasteboard];
 
   [self unselect];
   isDragTarget = NO;
-        
-  if ([[pb types] containsObject: NSFilenamesPboardType]) {
-    NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
-    NSString *source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
-
-    if ([[NSFileManager defaultManager] isWritableFileAtPath: source]) {
-   //   NSArray *vpaths = [ws mountedLocalVolumePaths];
+  
+  if ([[pb types] containsObject: NSFilenamesPboardType])
+    {
+      NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
+      NSString *source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
+      NSArray *vpaths = [ws mountedLocalVolumePaths];
       NSMutableArray *files = [NSMutableArray array];
-   //   NSMutableArray *umountPaths = [NSMutableArray array];
-      int i;
+      NSMutableArray *umountPaths = [NSMutableArray array];
+      NSUInteger i;
 
-      for (i = 0; i < [sourcePaths count]; i++) {
-        NSString *srcpath = [sourcePaths objectAtIndex: i];
-        FSNode *nd = [FSNode nodeWithPath: srcpath];
 
-        if ([nd isMountPoint] == NO) {
-          [files addObject: [srcpath lastPathComponent]];
+      for (i = 0; i < [sourcePaths count]; i++)
+        {
+          NSString *srcpath = [sourcePaths objectAtIndex: i];
+
+          if ([vpaths containsObject: srcpath])
+            {
+              [umountPaths addObject: srcpath];
+            }
+          else
+            {
+              [files addObject: [srcpath lastPathComponent]];
+            }
         }
 
-    //    if ([vpaths containsObject: srcpath]) {
-    //      [umountPaths addObject: srcpath];
-    //    } else {
-    //      [files addObject: [srcpath lastPathComponent]];
-    //    }
-      }
 
-   //   for (i = 0; i < [umountPaths count]; i++) {
-   //     [ws unmountAndEjectDeviceAtPath: [umountPaths objectAtIndex: i]];
-   //   }
+      for (i = 0; i < [umountPaths count]; i++)
+        {
+          NSString *umpath = [umountPaths objectAtIndex: i];
+      
+          if (![ws unmountAndEjectDeviceAtPath: umpath])
+            {
+              NSString *err = NSLocalizedString(@"Error", @"");
+              NSString *msg = NSLocalizedString(@"You are not allowed to umount\n", @"");
+              NSString *buttstr = NSLocalizedString(@"Continue", @"");
+              NSRunAlertPanel(err, [NSString stringWithFormat: @"%@ \"%@\"!\n", msg, umpath], buttstr, nil, nil);         
+            }
+        }
 
-      if ([files count]) {
-	      if ([[NSFileManager defaultManager] isWritableFileAtPath: source] == NO) {
-		      NSString *err = NSLocalizedString(@"Error", @"");
-		      NSString *msg = NSLocalizedString(@"You do not have write permission\nfor", @"");
-		      NSString *buttstr = NSLocalizedString(@"Continue", @"");
-          NSRunAlertPanel(err, [NSString stringWithFormat: @"%@ \"%@\"!\n", msg, source], buttstr, nil, nil);   
-		      return;
-	      }
 
-        [desktopApp performFileOperation: @"NSWorkspaceRecycleOperation"
-		                              source: source
-		                         destination: [node path]
-		                               files: files];
-      }
+      if ([files count])
+        {
+          if ([[NSFileManager defaultManager] isWritableFileAtPath: source] == NO)
+            {
+              NSString *err = NSLocalizedString(@"Error", @"");
+              NSString *msg = NSLocalizedString(@"You do not have write permission\nfor", @"");
+              NSString *buttstr = NSLocalizedString(@"Continue", @"");
+              NSRunAlertPanel(err, [NSString stringWithFormat: @"%@ \"%@\"!\n", msg, source], buttstr, nil, nil);   
+              return;
+            }
+
+          [desktopApp performFileOperation: @"NSWorkspaceRecycleOperation"
+                                    source: source
+                               destination: [node path]
+                                     files: files];
+        }
     }
-  }
 }
 
 @end
