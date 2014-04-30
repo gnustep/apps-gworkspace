@@ -1,6 +1,6 @@
 /* FSNIcon.m
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2014 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -94,6 +94,51 @@ static NSImage *branchImage;
   return branchImage;
 }
 
+/* we try to find a good host name.
+ * We try to find something different from localhost, if possibile without dots,
+ * else the first part of the qualified hostname gets taken */
++ (NSString *)getBestHostName
+{
+  NSHost *host = [NSHost currentHost];
+  NSString *hname;
+  NSRange range;
+  NSArray *hnames;
+
+  hnames = [host names];
+  if ([hnames count] > 0)
+    {
+      hname = [hnames objectAtIndex:0];
+
+      if ([hnames count] > 1)
+        {
+          NSUInteger i;
+
+          for (i = 0; i < [hnames count]; i++)
+            {
+              NSString *better;
+
+              better = [hnames objectAtIndex:i];
+              if (![better isEqualToString:@"localhost"])
+                {
+                  if ([hname isEqualToString:@"localhost"] || [hname isEqualToString:@"127.0.0.1"])
+                    hname = better;
+                  else if ([better rangeOfString:@"."].location == NSNotFound)
+                    hname = better;
+                }
+            }
+        }
+
+      range = [hname rangeOfString: @"."];
+      if (range.length != 0)
+        hname = [hname substringToIndex: range.location];
+    }
+  else
+    {
+      hname = @"unknown";
+    }
+  return hname;
+}
+
 - (id)initForNode:(FSNode *)anode
      nodeInfoType:(FSNInfoType)type
      extendedType:(NSString *)exttype
@@ -144,17 +189,13 @@ static NSImage *branchImage;
     hlightRect = NSIntegralRect(hlightRect);
     ASSIGN (highlightPath, [fsnodeRep highlightPathOfSize: hlightRect.size]);
         
-		if ([[node path] isEqual: path_separator()] && ([node isMountPoint] == NO)) {
-		  NSHost *host = [NSHost currentHost];
-		  NSString *hname = [host name];
-		  NSRange range = [hname rangeOfString: @"."];
+    if ([[node path] isEqual: path_separator()] && ([node isMountPoint] == NO))
+      {
+	NSString *hname;
 
-		  if (range.length != 0) {	
-			  hname = [hname substringToIndex: range.location];
-		  } 			
-      
-		  ASSIGN (hostname, hname);
-		} 
+	hname = [FSNIcon getBestHostName];
+        ASSIGN (hostname, hname);
+      } 
     
     label = [FSNTextCell new];
     [label setFont: lfont];
@@ -731,17 +772,13 @@ static NSImage *branchImage;
   drawicon = icon;
   DESTROY (selectedicon);
   
-  if ([[node path] isEqual: path_separator()] && ([node isMountPoint] == NO)) {
-    NSHost *host = [NSHost currentHost];
-    NSString *hname = [host name];
-    NSRange range = [hname rangeOfString: @"."];
+  if ([[node path] isEqual: path_separator()] && ([node isMountPoint] == NO))
+    { 
+      NSString *hname;
 
-    if (range.length != 0) {	
-      hname = [hname substringToIndex: range.location];
-    } 			
-      
-    ASSIGN (hostname, hname);
-  } 
+      hname = [FSNIcon getBestHostName];
+      ASSIGN (hostname, hname);
+    } 
   
   if (extInfoType) {
     [self setExtendedShowType: extInfoType];
