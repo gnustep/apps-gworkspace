@@ -315,16 +315,19 @@ static NSString *nibName = @"FileOperationWin";
 
 - (IBAction)pause:(id)sender
 {
-	if (paused == NO) {
-		[pauseButt setTitle: NSLocalizedString(@"Continue", @"")];
-		[stopButt setEnabled: NO];	
-    paused = YES;
-	} else {
-		[pauseButt setTitle: NSLocalizedString(@"Pause", @"")];
-		[stopButt setEnabled: YES];	
-    paused = NO;
-		[executor performOperation];
-	}
+  if (paused == NO)
+    {
+      [pauseButt setTitle: NSLocalizedString(@"Continue", @"")];
+      [stopButt setEnabled: NO];	
+      paused = YES;
+    }
+  else
+    {
+      [pauseButt setTitle: NSLocalizedString(@"Pause", @"")];
+      [stopButt setEnabled: YES];	
+      paused = NO;
+      [executor performOperation];
+    }
 }
 
 - (IBAction)stop:(id)sender
@@ -504,12 +507,14 @@ static NSString *nibName = @"FileOperationWin";
   [executor setOperation: opinfo];  
   samename = [executor checkSameName];
   
-  if (samename) {
-    NSString *msg = nil;
-    NSString *title = nil;
-    int result;
+  if (samename)
+    {
+      NSString *msg = nil;
+      NSString *title = nil;
+      int result;
     
-		if ([type isEqual: @"NSWorkspaceMoveOperation"]) {	
+      if ([type isEqual: @"NSWorkspaceMoveOperation"])
+	{	
 			msg = @"Some items have the same name;\ndo you want to replace them?";
 			title = @"Move";
 		
@@ -556,17 +561,18 @@ static NSString *nibName = @"FileOperationWin";
 }
 
 - (BOOL)connection:(NSConnection*)ancestor 
-								shouldMakeNewConnection:(NSConnection*)newConn
+shouldMakeNewConnection:(NSConnection*)newConn
 {
-	if (ancestor == execconn) {
-  	[newConn setDelegate: self];
-  	[nc addObserver: self 
-					 selector: @selector(connectionDidDie:)
-	    				 name: NSConnectionDidDieNotification 
-             object: newConn];
-  	return YES;
-	}
-		
+  if (ancestor == execconn)
+    {
+      [newConn setDelegate: self];
+      [nc addObserver: self 
+	  selector: @selector(connectionDidDie:)
+	  name: NSConnectionDidDieNotification 
+	  object: newConn];
+      return YES;
+    }
+  
   return NO;
 }
 
@@ -853,29 +859,46 @@ static NSString *nibName = @"FileOperationWin";
 
 - (oneway void)performOperation
 {
-	canupdate = YES; 
-          
-	if ([operation isEqual: @"NSWorkspaceMoveOperation"]
-						|| [operation isEqual: @"GWorkspaceRecycleOutOperation"]) {
-		[self doMove];
-	} else if ([operation isEqual: @"NSWorkspaceCopyOperation"]) {  
-		[self doCopy];
-	} else if ([operation isEqual: @"NSWorkspaceLinkOperation"]) {
-		[self doLink];
-	} else if ([operation isEqual: @"NSWorkspaceDestroyOperation"]
-					|| [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]) {
-		[self doRemove];
-	} else if ([operation isEqual: @"NSWorkspaceDuplicateOperation"]) {
-		[self doDuplicate];
-	} else if ([operation isEqual: @"NSWorkspaceRecycleOperation"]) {
-		[self doTrash];
-	} else if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
-		[self doRename];
-	} else if ([operation isEqual: @"GWorkspaceCreateDirOperation"]) {
-		[self doNewFolder];
-	} else if ([operation isEqual: @"GWorkspaceCreateFileOperation"]) {
-		[self doNewFile];
-  }
+  canupdate = YES; 
+  
+  if ([operation isEqual: @"NSWorkspaceMoveOperation"]
+      || [operation isEqual: @"GWorkspaceRecycleOutOperation"])
+    {
+      [self doMove];
+    }
+  else if ([operation isEqual: @"NSWorkspaceCopyOperation"])
+    {  
+      [self doCopy];
+    }
+  else if ([operation isEqual: @"NSWorkspaceLinkOperation"])
+    {
+      [self doLink];
+    }
+  else if ([operation isEqual: @"NSWorkspaceDestroyOperation"]
+	   || [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"])
+    {
+      [self doRemove];
+    }
+  else if ([operation isEqual: @"NSWorkspaceDuplicateOperation"])
+    {
+      [self doDuplicate];
+    }
+  else if ([operation isEqual: @"NSWorkspaceRecycleOperation"])
+    {
+      [self doTrash];
+    }
+  else if ([operation isEqual: @"GWorkspaceRenameOperation"])
+    {
+      [self doRename];
+    }
+  else if ([operation isEqual: @"GWorkspaceCreateDirOperation"])
+    {
+      [self doNewFolder];
+    }
+  else if ([operation isEqual: @"GWorkspaceCreateFileOperation"])
+    {
+      [self doNewFile];
+    }
 }
 
 - (NSData *)processedFiles
@@ -893,17 +916,19 @@ filename = [fileinfo objectForKey: @"name"];
 
 - (void)doMove
 {
-  while (1) {
-	  CHECK_DONE;	
-	  GET_FILENAME;    
+  while (1)
+    {
+      CHECK_DONE;	
+      GET_FILENAME;    
 
-    if ((samename == NO) || (samename && [self removeExisting: fileinfo])) {
-      NSString *src = [source stringByAppendingPathComponent: filename];
-      NSString *dst = [destination stringByAppendingPathComponent: filename];
+      if ((samename == NO) || (samename && [self removeExisting: fileinfo]))
+	{
+	  NSString *src = [source stringByAppendingPathComponent: filename];
+	  NSString *dst = [destination stringByAppendingPathComponent: filename];
       
-	    if ([fm movePath: src toPath: dst handler: self]) {    
-        [procfiles addObject: filename];	
-      
+	  if ([fm movePath: src toPath: dst handler: self])
+	    {    
+	      [procfiles addObject: filename];	
       } else {
         /* check for broken symlink */
         NSDictionary *attributes = [fm fileAttributesAtPath: src traverseLink: NO];
