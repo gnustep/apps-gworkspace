@@ -954,24 +954,28 @@ filename = [fileinfo objectForKey: @"name"];
 
 - (void)doCopy
 {
-  while (1) {
-	  CHECK_DONE;	
-	  GET_FILENAME;   
-
-    if ((samename == NO) || (samename && [self removeExisting: fileinfo])) {
-	    if ([fm copyPath: [source stringByAppendingPathComponent: filename]
-				        toPath: [destination stringByAppendingPathComponent: filename]
-	 		         handler: self]) {
-        [procfiles addObject: filename];	
-      }
+  while (1)
+    {
+      CHECK_DONE;	
+      GET_FILENAME;   
+      
+      if ((samename == NO) || (samename && [self removeExisting: fileinfo]))
+        {
+          if ([fm copyPath: [source stringByAppendingPathComponent: filename]
+                    toPath: [destination stringByAppendingPathComponent: filename]
+                   handler: self])
+            {
+              [procfiles addObject: filename];	
+            }
+        }
+      [files removeObject: fileinfo];	
+      RELEASE (fileinfo); 
     }
-	  [files removeObject: fileinfo];	
-    RELEASE (fileinfo); 
-  }
-
-  if (([files count] == 0) || stopped) {
-    [self done];
-  }                                          
+  
+  if (([files count] == 0) || stopped)
+    {
+      [self done];
+    }                                          
 }
 
 - (void)doLink
