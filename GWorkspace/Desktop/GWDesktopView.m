@@ -1,6 +1,6 @@
 /* GWDesktopView.m
  *  
- * Copyright (C) 2005-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2014 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola <rm@gnu.org>
@@ -1107,11 +1107,11 @@ static void GWHighlightFrameRect(NSRect aRect)
   }
 
   if ([[node path] isEqual: source]
-        && ([operation isEqual: @"NSWorkspaceMoveOperation"]
-            || [operation isEqual: @"NSWorkspaceDestroyOperation"]
-            || [operation isEqual: @"GWorkspaceRenameOperation"]
-			      || [operation isEqual: @"NSWorkspaceRecycleOperation"]
-			      || [operation isEqual: @"GWorkspaceRecycleOutOperation"])) {
+      && ([operation isEqual: NSWorkspaceMoveOperation]
+	  || [operation isEqual: NSWorkspaceDestroyOperation]
+	  || [operation isEqual: @"GWorkspaceRenameOperation"]
+	  || [operation isEqual: NSWorkspaceRecycleOperation]
+	  || [operation isEqual: @"GWorkspaceRecycleOutOperation"])) {
     for (i = 0; i < [files count]; i++) {
       NSString *fname = [files objectAtIndex: i];
       FSNode *subnode = [FSNode nodeWithRelativePath: fname parent: node];
@@ -1134,13 +1134,13 @@ static void GWHighlightFrameRect(NSRect aRect)
   }
 
   if ([[node path] isEqual: destination]
-          && ([operation isEqual: @"NSWorkspaceMoveOperation"]   
-              || [operation isEqual: @"NSWorkspaceCopyOperation"]
-              || [operation isEqual: @"NSWorkspaceLinkOperation"]
-              || [operation isEqual: @"NSWorkspaceDuplicateOperation"]
-              || [operation isEqual: @"GWorkspaceCreateDirOperation"]
-              || [operation isEqual: @"GWorkspaceRenameOperation"]
-				      || [operation isEqual: @"GWorkspaceRecycleOutOperation"])) { 
+      && ([operation isEqual: NSWorkspaceMoveOperation]   
+	  || [operation isEqual: NSWorkspaceCopyOperation]
+	  || [operation isEqual: NSWorkspaceLinkOperation]
+	  || [operation isEqual: NSWorkspaceDuplicateOperation]
+	  || [operation isEqual: @"GWorkspaceCreateDirOperation"]
+	  || [operation isEqual: @"GWorkspaceRenameOperation"]
+	  || [operation isEqual: @"GWorkspaceRecycleOutOperation"])) { 
     for (i = 0; i < [files count]; i++) {
       NSString *fname = [files objectAtIndex: i];
       FSNode *subnode = [FSNode nodeWithRelativePath: fname parent: node];

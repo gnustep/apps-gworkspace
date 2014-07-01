@@ -1,6 +1,6 @@
 /* ddbd.m
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2014 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: February 2004
@@ -403,9 +403,9 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 {
   NSString *operation = [updinfo objectForKey: @"operation"];
 
-  if ([operation isEqual: @"NSWorkspaceMoveOperation"] 
-                || [operation isEqual: @"NSWorkspaceCopyOperation"]
-                || [operation isEqual: @"NSWorkspaceDuplicateOperation"]
+  if ([operation isEqual: NSWorkspaceMoveOperation] 
+                || [operation isEqual: NSWorkspaceCopyOperation]
+                || [operation isEqual: NSWorkspaceDuplicateOperation]
                 || [operation isEqual: @"GWorkspaceRenameOperation"]) {
     CREATE_AUTORELEASE_POOL(arp);
     NSString *source = [updinfo objectForKey: @"source"];
@@ -420,7 +420,7 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
       srcpaths = [NSArray arrayWithObject: source];
       dstpaths = [NSArray arrayWithObject: destination];
     } else {
-      if ([operation isEqual: @"NSWorkspaceDuplicateOperation"]) { 
+      if ([operation isEqual: NSWorkspaceDuplicateOperation]) { 
         for (i = 0; i < [files count]; i++) {
           NSString *fname = [origfiles objectAtIndex: i];
           [srcpaths addObject: [source stringByAppendingPathComponent: fname]];

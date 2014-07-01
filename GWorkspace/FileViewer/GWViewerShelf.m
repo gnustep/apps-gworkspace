@@ -1,6 +1,6 @@
 /* GWViewerShelf.h
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2014 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2004
@@ -824,7 +824,7 @@
   NSArray *files = [info objectForKey: @"files"];
   int i;
 
-  if ([operation isEqual: @"NSWorkspaceRecycleOperation"]) {
+  if ([operation isEqual: NSWorkspaceRecycleOperation]) {
 		files = [info objectForKey: @"origfiles"];
   }	
   
@@ -846,12 +846,12 @@
     source = [source stringByDeletingLastPathComponent];
   }	
 
-  if ([operation isEqual: @"NSWorkspaceMoveOperation"] 
-        || [operation isEqual: @"NSWorkspaceDestroyOperation"]
-				|| [operation isEqual: @"GWorkspaceRenameOperation"]
-				|| [operation isEqual: @"NSWorkspaceRecycleOperation"]
-				|| [operation isEqual: @"GWorkspaceRecycleOutOperation"]
-				|| [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]) {
+  if ([operation isEqual: NSWorkspaceMoveOperation] 
+      || [operation isEqual: NSWorkspaceDestroyOperation]
+      || [operation isEqual: @"GWorkspaceRenameOperation"]
+      || [operation isEqual: NSWorkspaceRecycleOperation]
+      || [operation isEqual: @"GWorkspaceRecycleOutOperation"]
+      || [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]) {
     NSMutableArray *oppaths = [NSMutableArray array];
     int count = [icons count];
     BOOL updated = NO;

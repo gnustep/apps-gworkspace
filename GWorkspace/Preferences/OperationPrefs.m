@@ -1,6 +1,6 @@
 /* OperationPrefs.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2014 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -149,14 +149,14 @@ confirmString = [s stringByAppendingString: @"Confirm"]; \
 [defaults setBool: (([[cells objectAtIndex: x] state] == NSOnState) ? NO : YES) \
 forKey: confirmString]
 
-  CHECK_CONFIRM (MOVEOP, @"NSWorkspaceMoveOperation");
-  CHECK_CONFIRM (COPYOP, @"NSWorkspaceCopyOperation");
-  CHECK_CONFIRM (LINKOP, @"NSWorkspaceLinkOperation");
-  CHECK_CONFIRM (RECYCLEOP, @"NSWorkspaceRecycleOperation");
+  CHECK_CONFIRM (MOVEOP, NSWorkspaceMoveOperation);
+  CHECK_CONFIRM (COPYOP, NSWorkspaceCopyOperation);
+  CHECK_CONFIRM (LINKOP, NSWorkspaceLinkOperation);
+  CHECK_CONFIRM (RECYCLEOP, NSWorkspaceRecycleOperation);
   CHECK_CONFIRM (RECYCLEOP, @"GWorkspaceRecycleOutOperation");
   CHECK_CONFIRM (RECYCLEOP, @"GWorkspaceEmptyRecyclerOperation");
-  CHECK_CONFIRM (DUPLICATEOP, @"NSWorkspaceDuplicateOperation");
-  CHECK_CONFIRM (DESTROYOP, @"NSWorkspaceDestroyOperation");
+  CHECK_CONFIRM (DUPLICATEOP, NSWorkspaceDuplicateOperation);
+  CHECK_CONFIRM (DESTROYOP, NSWorkspaceDestroyOperation);
 
   [defaults synchronize];
 }

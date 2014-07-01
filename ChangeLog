@@ -1,3 +1,25 @@
+2014-07-01 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNBrowser.m
+	* FSNode/FSNIconsView.m
+	* FSNode/FSNListView.m
+	* FSNode/FSNode.m
+	* GWorkspace/Desktop/Dock/DockIcon.m
+	* GWorkspace/Desktop/GWDesktopView.m
+	* GWorkspace/FileViewer/GWViewer.m
+	* GWorkspace/FileViewer/GWViewerShelf.m
+	* GWorkspace/Finder/Finder.m
+	* GWorkspace/Finder/LiveSearch/LSFolder.m
+	* GWorkspace/Finder/SearchResults/SearchResults.m
+	* GWorkspace/GWorkspace.m
+	* GWorkspace/Preferences/OperationPrefs.m
+	* GWorkspace/WorkspaceApplication.m
+	* Operation/FileOpInfo.m
+	* Operation/Operation.m
+	* Recycler/RecyclerIcon.m
+	* Tools/ddbd/ddbd.m
+	Replaced operation constant values with their true NSWorkspace*Operation constants
+
 2014-04-30 Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNIcon.m

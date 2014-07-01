@@ -1,6 +1,6 @@
 /* FSNode.m
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2014 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -863,10 +863,10 @@
   } 
 
   if ([self isSubnodeOfPath: source]) {
-    if ([operation isEqual: @"NSWorkspaceMoveOperation"]
-        || [operation isEqual: @"NSWorkspaceDestroyOperation"]
+    if ([operation isEqual: NSWorkspaceMoveOperation]
+        || [operation isEqual: NSWorkspaceDestroyOperation]
         || [operation isEqual: @"GWorkspaceRenameOperation"]
-			  || [operation isEqual: @"NSWorkspaceRecycleOperation"]
+			  || [operation isEqual: NSWorkspaceRecycleOperation]
 			  || [operation isEqual: @"GWorkspaceRecycleOutOperation"]
 			  || [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]) { 
       for (i = 0; i < [files count]; i++) {
@@ -881,11 +881,11 @@
   }
 
   if ([self isSubnodeOfPath: destination]) {
-    if ([operation isEqual: @"NSWorkspaceMoveOperation"]
-          || [operation isEqual: @"NSWorkspaceCopyOperation"]
-          || [operation isEqual: @"NSWorkspaceLinkOperation"]
-				  || [operation isEqual: @"NSWorkspaceRecycleOperation"]
-				  || [operation isEqual: @"GWorkspaceRecycleOutOperation"]) { 
+    if ([operation isEqual: NSWorkspaceMoveOperation]
+          || [operation isEqual: NSWorkspaceCopyOperation]
+          || [operation isEqual: NSWorkspaceLinkOperation]
+	|| [operation isEqual: NSWorkspaceRecycleOperation]
+	|| [operation isEqual: @"GWorkspaceRecycleOutOperation"]) { 
       for (i = 0; i < [files count]; i++) {
         NSString *fname = [files objectAtIndex: i];
         NSString *fpath = [destination stringByAppendingPathComponent: fname];

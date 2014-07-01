@@ -1,6 +1,6 @@
 /* WorkspaceApplication.m
  *  
- * Copyright (C) 2006-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2014 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2006
@@ -61,7 +61,7 @@
       else
 	NSLog(@"performFileOperation: source is nil");
 
-      if (destination == nil && [operation isEqualToString:@"NSWorkspaceRecycleOperation"])
+      if (destination == nil && [operation isEqualToString:NSWorkspaceRecycleOperation])
 	destination = [self trashPath];
       if (destination != nil)
 	[opdict setObject: destination forKey: @"destination"];

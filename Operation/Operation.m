@@ -1,6 +1,6 @@
 /* Operation.m
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2014 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -97,12 +97,12 @@
       usewin = NO;
     }
    
-  if ([operation isEqual: @"NSWorkspaceMoveOperation"]
-      || [operation isEqual: @"NSWorkspaceCopyOperation"]
-      || [operation isEqual: @"NSWorkspaceLinkOperation"]
-      || [operation isEqual: @"NSWorkspaceDuplicateOperation"]
-      || [operation isEqual: @"NSWorkspaceRecycleOperation"]
-      || [operation isEqual: @"NSWorkspaceDestroyOperation"] 
+  if ([operation isEqual: NSWorkspaceMoveOperation]
+      || [operation isEqual: NSWorkspaceCopyOperation]
+      || [operation isEqual: NSWorkspaceLinkOperation]
+      || [operation isEqual: NSWorkspaceDuplicateOperation]
+      || [operation isEqual: NSWorkspaceRecycleOperation]
+      || [operation isEqual: NSWorkspaceDestroyOperation] 
       || [operation isEqual: @"GWorkspaceRecycleOutOperation"])
     {
       opbase = source;
@@ -119,18 +119,18 @@
     }
   
   action = MOVE;
-  if ([operation isEqual: @"NSWorkspaceMoveOperation"]
-      || [operation isEqual: @"NSWorkspaceRecycleOperation"]
+  if ([operation isEqual: NSWorkspaceMoveOperation]
+      || [operation isEqual: NSWorkspaceRecycleOperation]
       || [operation isEqual: @"GWorkspaceRecycleOutOperation"])
     {    
       action = MOVE;
-    } else if ([operation isEqual: @"NSWorkspaceDestroyOperation"] 
+    } else if ([operation isEqual: NSWorkspaceDestroyOperation] 
 	       || [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"])
     {
       action = DESTROY;
-    } else if ([operation isEqual: @"NSWorkspaceCopyOperation"] 
-	       || [operation isEqual: @"NSWorkspaceLinkOperation"]
-	       || [operation isEqual: @"NSWorkspaceDuplicateOperation"]) 
+    } else if ([operation isEqual: NSWorkspaceCopyOperation] 
+	       || [operation isEqual: NSWorkspaceLinkOperation]
+	       || [operation isEqual: NSWorkspaceDuplicateOperation]) 
     {
       action = COPY;
     } else if ([operation isEqual: @"GWorkspaceRenameOperation"])
@@ -226,7 +226,7 @@
   NSMutableArray *opdstpaths = [NSMutableArray array];
   NSUInteger i;
 
-  if ([optype isEqual: @"NSWorkspaceDuplicateOperation"] == NO) {
+  if ([optype isEqual: NSWorkspaceDuplicateOperation] == NO) {
     for (i = 0; i < [opfiles count]; i++) {
       NSDictionary *fdict = [opfiles objectAtIndex: i];
       NSString *opfile = [fdict objectForKey: @"name"];
@@ -256,8 +256,8 @@
     path = [path stringByDeletingLastPathComponent];
   }
 
-  if ([optype isEqual: @"NSWorkspaceMoveOperation"]
-                    || [optype isEqual: @"NSWorkspaceRecycleOperation"]
+  if ([optype isEqual: NSWorkspaceMoveOperation]
+                    || [optype isEqual: NSWorkspaceRecycleOperation]
                     || [optype isEqual: @"GWorkspaceRecycleOutOperation"]) {
     //
     // source
@@ -285,9 +285,9 @@
     }
   }
 
-  if ([optype isEqual: @"NSWorkspaceCopyOperation"]
-                  || [optype isEqual: @"NSWorkspaceLinkOperation"]
-                  || [optype isEqual: @"NSWorkspaceDuplicateOperation"]) {
+  if ([optype isEqual: NSWorkspaceCopyOperation]
+                  || [optype isEqual: NSWorkspaceLinkOperation]
+                  || [optype isEqual: NSWorkspaceDuplicateOperation]) {
     //
     // source
     //    
@@ -317,7 +317,7 @@
     }
   }
 
-  if ([optype isEqual: @"NSWorkspaceDestroyOperation"]
+  if ([optype isEqual: NSWorkspaceDestroyOperation]
             || [optype isEqual: @"GWorkspaceEmptyRecyclerOperation"]) {
     //             
     // destination
@@ -424,7 +424,7 @@
 		
     NSRunAlertPanel(err, [NSString stringWithFormat: @"%@%@", chpath, msg], buttstr, nil, nil);   
 
-		[notifObj setObject: @"NSWorkspaceDestroyOperation" forKey: @"operation"];	
+		[notifObj setObject: NSWorkspaceDestroyOperation forKey: @"operation"];	
   	[notifObj setObject: basePath forKey: @"source"];	
   	[notifObj setObject: basePath forKey: @"destination"];	
   	[notifObj setObject: [NSArray arrayWithObject: [chpath lastPathComponent]] 

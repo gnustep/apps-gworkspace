@@ -1,6 +1,6 @@
 /* GWorkspace.m
  *  
- * Copyright (C) 2003-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2014 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola
@@ -1503,7 +1503,7 @@ static GWorkspace *gworkspace = nil;
 		  return;
 	  }
 
-    [self performFileOperation: @"NSWorkspaceRecycleOperation"
+    [self performFileOperation: NSWorkspaceRecycleOperation
                     source: basePath destination: trashPath 
                                               files: files tag: &tag];
   }
@@ -2678,7 +2678,7 @@ static GWorkspace *gworkspace = nil;
   NSArray *files = [opinfo objectForKey: @"files"];
   int tag;
 
-  if (destination == nil && [operation isEqualToString:@"NSWorkspaceRecycleOperation"])
+  if (destination == nil && [operation isEqualToString:NSWorkspaceRecycleOperation])
     destination = [self trashPath];
 
   [self performFileOperation: operation source: source 

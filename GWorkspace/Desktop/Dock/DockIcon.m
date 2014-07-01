@@ -1,6 +1,6 @@
 /* DockIcon.m
  *  
- * Copyright (C) 2005-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2014 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -609,7 +609,7 @@ x += 6; \
           return;
         }
         
-        [opinfo setObject: @"NSWorkspaceRecycleOperation" forKey: @"operation"];
+        [opinfo setObject: NSWorkspaceRecycleOperation forKey: @"operation"];
         [opinfo setObject: fromPath forKey: @"source"];
         [opinfo setObject: [node path] forKey: @"destination"];
         [opinfo setObject: files forKey: @"files"];

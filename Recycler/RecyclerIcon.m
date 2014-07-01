@@ -1,6 +1,6 @@
 /* RecyclerIcon.m
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2014 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola <rm@gnu.org>
@@ -275,7 +275,7 @@ static id <DesktopApplication> desktopApp = nil;
               return;
             }
 
-          [desktopApp performFileOperation: @"NSWorkspaceRecycleOperation"
+          [desktopApp performFileOperation: NSWorkspaceRecycleOperation
                                     source: source
                                destination: [node path]
                                      files: files];

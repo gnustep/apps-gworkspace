@@ -1,6 +1,6 @@
 /* Finder.m
  *  
- * Copyright (C) 2005-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2014 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -887,8 +887,8 @@ static Finder *finder = nil;
     }
   else
     {
-      if ([operation isEqual: @"NSWorkspaceDuplicateOperation"]
-	  || [operation isEqual: @"NSWorkspaceRecycleOperation"])
+      if ([operation isEqual: NSWorkspaceDuplicateOperation]
+	  || [operation isEqual: NSWorkspaceRecycleOperation])
 	{ 
 	  for (i = 0; i < [files count]; i++) {
 	    NSString *fname = [origfiles objectAtIndex: i];
@@ -909,14 +909,14 @@ static Finder *finder = nil;
 	}
     }
 
-  copy = ([operation isEqual: @"NSWorkspaceCopyOperation"]
-                || [operation isEqual: @"NSWorkspaceDuplicateOperation"]); 
+  copy = ([operation isEqual: NSWorkspaceCopyOperation]
+                || [operation isEqual: NSWorkspaceDuplicateOperation]); 
 
-  move = ([operation isEqual: @"NSWorkspaceMoveOperation"] 
+  move = ([operation isEqual: NSWorkspaceMoveOperation] 
                 || [operation isEqual: @"GWorkspaceRenameOperation"]); 
 
-  remove = ([operation isEqual: @"NSWorkspaceDestroyOperation"]
-				        || [operation isEqual: @"NSWorkspaceRecycleOperation"]);
+  remove = ([operation isEqual: NSWorkspaceDestroyOperation]
+				        || [operation isEqual: NSWorkspaceRecycleOperation]);
 
   // Search Places
   if (move || remove) {

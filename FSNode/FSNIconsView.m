@@ -1,6 +1,6 @@
 /* FSNIconsView.m
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2014 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -1167,13 +1167,13 @@ pp.y = NSMaxY(br) + 1; \
   }
 
   if ([ndpath isEqual: source]) {
-    if ([operation isEqual: @"NSWorkspaceMoveOperation"]
-              || [operation isEqual: @"NSWorkspaceDestroyOperation"]
+    if ([operation isEqual: NSWorkspaceMoveOperation]
+              || [operation isEqual: NSWorkspaceDestroyOperation]
               || [operation isEqual: @"GWorkspaceRenameOperation"]
-              || [operation isEqual: @"NSWorkspaceRecycleOperation"]
+              || [operation isEqual: NSWorkspaceRecycleOperation]
 			        || [operation isEqual: @"GWorkspaceRecycleOutOperation"]) {
       
-      if ([operation isEqual: @"NSWorkspaceRecycleOperation"]) {
+      if ([operation isEqual: NSWorkspaceRecycleOperation]) {
 		    files = [info objectForKey: @"origfiles"];
       }	
               
@@ -1191,17 +1191,17 @@ pp.y = NSMaxY(br) + 1; \
   }
 
   if ([ndpath isEqual: destination]
-          && ([operation isEqual: @"NSWorkspaceMoveOperation"]   
-              || [operation isEqual: @"NSWorkspaceCopyOperation"]
-              || [operation isEqual: @"NSWorkspaceLinkOperation"]
-              || [operation isEqual: @"NSWorkspaceDuplicateOperation"]
+          && ([operation isEqual: NSWorkspaceMoveOperation]   
+              || [operation isEqual: NSWorkspaceCopyOperation]
+              || [operation isEqual: NSWorkspaceLinkOperation]
+              || [operation isEqual: NSWorkspaceDuplicateOperation]
               || [operation isEqual: @"GWorkspaceCreateDirOperation"]
               || [operation isEqual: @"GWorkspaceCreateFileOperation"]
-              || [operation isEqual: @"NSWorkspaceRecycleOperation"]
+              || [operation isEqual: NSWorkspaceRecycleOperation]
               || [operation isEqual: @"GWorkspaceRenameOperation"]
 				      || [operation isEqual: @"GWorkspaceRecycleOutOperation"])) { 
     
-    if ([operation isEqual: @"NSWorkspaceRecycleOperation"]) {
+    if ([operation isEqual: NSWorkspaceRecycleOperation]) {
 		  files = [info objectForKey: @"files"];
     }	
 

@@ -1,6 +1,6 @@
 /* LSFolder.m
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2014 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: October 2004
@@ -868,15 +868,16 @@ shouldMakeNewConnection:(NSConnection*)newConn
     destination = [destination stringByDeletingLastPathComponent]; 
   }
 
-  if ([operation isEqual: @"NSWorkspaceRecycleOperation"]) {
+  if ([operation isEqual: NSWorkspaceRecycleOperation]) {
 		files = [info objectForKey: @"origfiles"];
   }	
   
-  if ([operation isEqual: @"NSWorkspaceMoveOperation"] 
-        || [operation isEqual: @"NSWorkspaceDestroyOperation"]
-				|| [operation isEqual: @"NSWorkspaceRecycleOperation"]
-				|| [operation isEqual: @"GWorkspaceRecycleOutOperation"]
-				|| [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]) {
+  if ([operation isEqual: NSWorkspaceMoveOperation] 
+        || [operation isEqual: NSWorkspaceDestroyOperation]
+      || [operation isEqual: NSWorkspaceRecycleOperation]
+      || [operation isEqual: @"GWorkspaceRecycleOutOperation"]
+      || [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"])
+    {
     for (i = 0; i < [files count]; i++) {
       NSString *fname = [files objectAtIndex: i];
       NSString *fullPath = [source stringByAppendingPathComponent: fname];

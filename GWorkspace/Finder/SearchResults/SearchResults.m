@@ -1,6 +1,6 @@
 /* SearchResults.m
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2014 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -499,13 +499,13 @@ static NSString *lsfname = @"LiveSearch.lsf";
     files = [NSArray arrayWithObject: [destination lastPathComponent]];
   }
 
-  if ([operation isEqual: @"NSWorkspaceRecycleOperation"]) {
+  if ([operation isEqual: NSWorkspaceRecycleOperation]) {
 		files = [info objectForKey: @"origfiles"];
   }	
   
-  if ([operation isEqual: @"NSWorkspaceMoveOperation"] 
-        || [operation isEqual: @"NSWorkspaceDestroyOperation"]
-				|| [operation isEqual: @"NSWorkspaceRecycleOperation"]
+  if ([operation isEqual: NSWorkspaceMoveOperation] 
+        || [operation isEqual: NSWorkspaceDestroyOperation]
+				|| [operation isEqual: NSWorkspaceRecycleOperation]
 				|| [operation isEqual: @"GWorkspaceRecycleOutOperation"]
 				|| [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]) {
     for (i = 0; i < [files count]; i++) {
@@ -612,19 +612,19 @@ static NSString *lsfname = @"LiveSearch.lsf";
 {
   SympleDialog *dialog;
   NSString *folderName;
-	NSArray *contents;
+  NSArray *contents;
   int result;
 
-	dialog = [[SympleDialog alloc] initWithTitle: NSLocalizedString(@"New Live Search", @"") 
+  dialog = [[SympleDialog alloc] initWithTitle: NSLocalizedString(@"New Live Search", @"") 
                                       editText: lsfname
                                    switchTitle: nil];
   AUTORELEASE (dialog);
-	[dialog center];
+  [dialog center];
   [dialog makeKeyWindow];
   [dialog orderFrontRegardless];
 
   result = [dialog runModal];
-	if (result != NSAlertDefaultReturn) {
+  if (result != NSAlertDefaultReturn) {
     return;
   }  
 

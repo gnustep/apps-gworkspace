@@ -1,6 +1,6 @@
 /* FileOpInfo.m
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2014 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -122,7 +122,7 @@ static NSString *nibName = @"FileOperationWin";
     
     dupfiles = [NSMutableArray new];
     
-    if ([type isEqual: @"NSWorkspaceDuplicateOperation"]) {    
+    if ([type isEqual: NSWorkspaceDuplicateOperation]) {    
       NSString *copystr = NSLocalizedString(@"_copy", @"");
       unsigned i;
       
@@ -201,7 +201,7 @@ static NSString *nibName = @"FileOperationWin";
       items = NSLocalizedString(@"one item", @"");
     }
     
-	  if ([type isEqual: @"NSWorkspaceMoveOperation"]) {
+	  if ([type isEqual: NSWorkspaceMoveOperation]) {
 		  title = NSLocalizedString(@"Move", @"");
       msg1 = [NSString stringWithFormat: @"%@ %@ %@: ", 
                                             NSLocalizedString(@"Move", @""), 
@@ -209,7 +209,7 @@ static NSString *nibName = @"FileOperationWin";
                                             NSLocalizedString(@"from", @"")];
 		  msg2 = NSLocalizedString(@"\nto: ", @"");
 		  msg = [NSString stringWithFormat: @"%@%@%@%@?", msg1, source, msg2, destination];
-    } else if ([type isEqual: @"NSWorkspaceCopyOperation"]) {
+    } else if ([type isEqual: NSWorkspaceCopyOperation]) {
 		  title = NSLocalizedString(@"Copy", @"");
       msg1 = [NSString stringWithFormat: @"%@ %@ %@: ", 
                                             NSLocalizedString(@"Copy", @""), 
@@ -217,7 +217,7 @@ static NSString *nibName = @"FileOperationWin";
                                             NSLocalizedString(@"from", @"")];
 		  msg2 = NSLocalizedString(@"\nto: ", @"");
 		  msg = [NSString stringWithFormat: @"%@%@%@%@?", msg1, source, msg2, destination];
-	  } else if ([type isEqual: @"NSWorkspaceLinkOperation"]) {
+	  } else if ([type isEqual: NSWorkspaceLinkOperation]) {
 		  title = NSLocalizedString(@"Link", @"");
       msg1 = [NSString stringWithFormat: @"%@ %@ %@: ", 
                                             NSLocalizedString(@"Link", @""), 
@@ -225,7 +225,7 @@ static NSString *nibName = @"FileOperationWin";
                                             NSLocalizedString(@"from", @"")];
 		  msg2 = NSLocalizedString(@"\nto: ", @"");
 		  msg = [NSString stringWithFormat: @"%@%@%@%@?", msg1, source, msg2, destination];
-	  } else if ([type isEqual: @"NSWorkspaceRecycleOperation"]) {
+	  } else if ([type isEqual: NSWorkspaceRecycleOperation]) {
 		  title = NSLocalizedString(@"Recycler", @"");
       msg1 = [NSString stringWithFormat: @"%@ %@ %@: ", 
                                             NSLocalizedString(@"Move", @""), 
@@ -244,17 +244,17 @@ static NSString *nibName = @"FileOperationWin";
 	  } else if ([type isEqual: @"GWorkspaceEmptyRecyclerOperation"]) {
 		  title = NSLocalizedString(@"Recycler", @"");
 		  msg = NSLocalizedString(@"Empty the Recycler?", @"");
-	  } else if ([type isEqual: @"NSWorkspaceDestroyOperation"]) {
+	  } else if ([type isEqual: NSWorkspaceDestroyOperation]) {
 		  title = NSLocalizedString(@"Delete", @"");
 		  msg = NSLocalizedString(@"Delete the selected objects?", @"");
-	  } else if ([type isEqual: @"NSWorkspaceDuplicateOperation"]) {
+	  } else if ([type isEqual: NSWorkspaceDuplicateOperation]) {
 		  title = NSLocalizedString(@"Duplicate", @"");
 		  msg = NSLocalizedString(@"Duplicate the selected objects?", @"");
 	  }
         
     if (NSRunAlertPanel(title, msg, 
                         NSLocalizedString(@"OK", @""), 
-				                NSLocalizedString(@"Cancel", @""), 
+			NSLocalizedString(@"Cancel", @""), 
                         nil) != NSAlertDefaultReturn) {
       [self endOperation];
       return;
@@ -338,42 +338,42 @@ static NSString *nibName = @"FileOperationWin";
 - (void)showProgressWin
 {  
   if ([win isVisible] == NO) {
-    if ([type isEqual: @"NSWorkspaceMoveOperation"]) {
+    if ([type isEqual: NSWorkspaceMoveOperation]) {
       [win setTitle: NSLocalizedString(@"Move", @"")];
       [fromLabel setStringValue: NSLocalizedString(@"From:", @"")];
       [fromField setStringValue: relativePathFittingInField(fromField, source)];
       [toLabel setStringValue: NSLocalizedString(@"To:", @"")];
       [toField setStringValue: relativePathFittingInField(fromField, destination)];
     
-    } else if ([type isEqual: @"NSWorkspaceCopyOperation"]) {
+    } else if ([type isEqual: NSWorkspaceCopyOperation]) {
       [win setTitle: NSLocalizedString(@"Copy", @"")];
       [fromLabel setStringValue: NSLocalizedString(@"From:", @"")];
       [fromField setStringValue: relativePathFittingInField(fromField, source)];
       [toLabel setStringValue: NSLocalizedString(@"To:", @"")];
       [toField setStringValue: relativePathFittingInField(fromField, destination)];
     
-    } else if ([type isEqual: @"NSWorkspaceLinkOperation"]) {
+    } else if ([type isEqual: NSWorkspaceLinkOperation]) {
       [win setTitle: NSLocalizedString(@"Link", @"")];
       [fromLabel setStringValue: NSLocalizedString(@"From:", @"")];
       [fromField setStringValue: relativePathFittingInField(fromField, source)];
       [toLabel setStringValue: NSLocalizedString(@"To:", @"")];
       [toField setStringValue: relativePathFittingInField(fromField, destination)];
     
-    } else if ([type isEqual: @"NSWorkspaceDuplicateOperation"]) {
+    } else if ([type isEqual: NSWorkspaceDuplicateOperation]) {
       [win setTitle: NSLocalizedString(@"Duplicate", @"")];
       [fromLabel setStringValue: NSLocalizedString(@"In:", @"")];
       [fromField setStringValue: relativePathFittingInField(fromField, destination)];
       [toLabel setStringValue: @""];
       [toField setStringValue: @""];
     
-    } else if ([type isEqual: @"NSWorkspaceDestroyOperation"]) {
+    } else if ([type isEqual: NSWorkspaceDestroyOperation]) {
       [win setTitle: NSLocalizedString(@"Destroy", @"")];
       [fromLabel setStringValue: NSLocalizedString(@"In:", @"")];
       [fromField setStringValue: relativePathFittingInField(fromField, destination)];
       [toLabel setStringValue: @""];
       [toField setStringValue: @""];
     
-    } else if ([type isEqual: @"NSWorkspaceRecycleOperation"]) {
+    } else if ([type isEqual: NSWorkspaceRecycleOperation]) {
       [win setTitle: NSLocalizedString(@"Move", @"")];
       [fromLabel setStringValue: NSLocalizedString(@"From:", @"")];
       [fromField setStringValue: relativePathFittingInField(fromField, source)];
@@ -513,20 +513,20 @@ static NSString *nibName = @"FileOperationWin";
       NSString *title = nil;
       int result;
     
-      if ([type isEqual: @"NSWorkspaceMoveOperation"])
+      if ([type isEqual: NSWorkspaceMoveOperation])
 	{	
 			msg = @"Some items have the same name;\ndo you want to replace them?";
 			title = @"Move";
 		
-		} else if ([type isEqual: @"NSWorkspaceCopyOperation"]) {
+		} else if ([type isEqual: NSWorkspaceCopyOperation]) {
 			msg = @"Some items have the same name;\ndo you want to replace them?";
 			title = @"Copy";
 
-		} else if ([type isEqual: @"NSWorkspaceLinkOperation"]) {
+		} else if ([type isEqual: NSWorkspaceLinkOperation]) {
 			msg = @"Some items have the same name;\ndo you want to replace them?";
 			title = @"Link";
 
-		} else if ([type isEqual: @"NSWorkspaceRecycleOperation"]) {
+		} else if ([type isEqual: NSWorkspaceRecycleOperation]) {
 			msg = @"Some items have the same name;\ndo you want to replace them?";
 			title = @"Recycle";
 
@@ -766,15 +766,15 @@ shouldMakeNewConnection:(NSConnection*)newConn
 	}
 	
 	if (samename) {
-		if (([operation isEqual: @"NSWorkspaceMoveOperation"]) 
-          || ([operation isEqual: @"NSWorkspaceCopyOperation"])
-          || ([operation isEqual: @"NSWorkspaceLinkOperation"])
+		if (([operation isEqual: NSWorkspaceMoveOperation]) 
+          || ([operation isEqual: NSWorkspaceCopyOperation])
+          || ([operation isEqual: NSWorkspaceLinkOperation])
           || ([operation isEqual: @"GWorkspaceRecycleOutOperation"])) {
       return YES;
       
-		} else if (([operation isEqual: @"NSWorkspaceDestroyOperation"]) 
-          || ([operation isEqual: @"NSWorkspaceDuplicateOperation"])
-          || ([operation isEqual: @"NSWorkspaceRecycleOperation"])
+		} else if (([operation isEqual: NSWorkspaceDestroyOperation]) 
+          || ([operation isEqual: NSWorkspaceDuplicateOperation])
+          || ([operation isEqual: NSWorkspaceRecycleOperation])
           || ([operation isEqual: @"GWorkspaceEmptyRecyclerOperation"])) {
       return NO;
 		} 
@@ -861,29 +861,29 @@ shouldMakeNewConnection:(NSConnection*)newConn
 {
   canupdate = YES; 
   
-  if ([operation isEqual: @"NSWorkspaceMoveOperation"]
+  if ([operation isEqual: NSWorkspaceMoveOperation]
       || [operation isEqual: @"GWorkspaceRecycleOutOperation"])
     {
       [self doMove];
     }
-  else if ([operation isEqual: @"NSWorkspaceCopyOperation"])
+  else if ([operation isEqual: NSWorkspaceCopyOperation])
     {  
       [self doCopy];
     }
-  else if ([operation isEqual: @"NSWorkspaceLinkOperation"])
+  else if ([operation isEqual: NSWorkspaceLinkOperation])
     {
       [self doLink];
     }
-  else if ([operation isEqual: @"NSWorkspaceDestroyOperation"]
+  else if ([operation isEqual: NSWorkspaceDestroyOperation]
 	   || [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"])
     {
       [self doRemove];
     }
-  else if ([operation isEqual: @"NSWorkspaceDuplicateOperation"])
+  else if ([operation isEqual: NSWorkspaceDuplicateOperation])
     {
       [self doDuplicate];
     }
-  else if ([operation isEqual: @"NSWorkspaceRecycleOperation"])
+  else if ([operation isEqual: NSWorkspaceRecycleOperation])
     {
       [self doTrash];
     }

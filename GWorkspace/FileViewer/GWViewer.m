@@ -1,6 +1,6 @@
 /* GWViewer.m
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2014 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola
@@ -724,21 +724,21 @@
       destination = [destination stringByDeletingLastPathComponent]; 
     }
 
-    if ([operation isEqual: @"NSWorkspaceMoveOperation"] 
-          || [operation isEqual: @"NSWorkspaceCopyOperation"]
-          || [operation isEqual: @"NSWorkspaceLinkOperation"]
-          || [operation isEqual: @"NSWorkspaceDuplicateOperation"]
+    if ([operation isEqual: NSWorkspaceMoveOperation] 
+          || [operation isEqual: NSWorkspaceCopyOperation]
+          || [operation isEqual: NSWorkspaceLinkOperation]
+          || [operation isEqual: NSWorkspaceDuplicateOperation]
           || [operation isEqual: @"GWorkspaceCreateDirOperation"]
           || [operation isEqual: @"GWorkspaceCreateFileOperation"]
-          || [operation isEqual: @"NSWorkspaceRecycleOperation"]
+          || [operation isEqual: NSWorkspaceRecycleOperation]
           || [operation isEqual: @"GWorkspaceRenameOperation"]
 			    || [operation isEqual: @"GWorkspaceRecycleOutOperation"]) { 
       [nodeView reloadFromNode: [FSNode nodeWithPath: destination]];
     }
 
-    if ([operation isEqual: @"NSWorkspaceMoveOperation"]
-          || [operation isEqual: @"NSWorkspaceDestroyOperation"]
-				  || [operation isEqual: @"NSWorkspaceRecycleOperation"]
+    if ([operation isEqual: NSWorkspaceMoveOperation]
+          || [operation isEqual: NSWorkspaceDestroyOperation]
+				  || [operation isEqual: NSWorkspaceRecycleOperation]
 				  || [operation isEqual: @"GWorkspaceRecycleOutOperation"]
 				  || [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]) {
       [nodeView reloadFromNode: [FSNode nodeWithPath: source]];
