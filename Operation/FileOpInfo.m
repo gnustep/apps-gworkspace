@@ -957,7 +957,7 @@ filename = [fileinfo objectForKey: @"name"];
   while (1)
     {
       CHECK_DONE;	
-      GET_FILENAME;   
+      GET_FILENAME;
       
       if ((samename == NO) || (samename && [self removeExisting: fileinfo]))
         {
