@@ -1,3 +1,9 @@
+2014-09-10 Riccardo Mottola <rm@gnu.org>
+
+	* Operation/FileOpInfo.h
+	* Operation/FileOpInfo.m
+	Store information about operation and processed file in the caller, re-detach the operation executor thread when resuming from pause. Fix doCopy pause/resume this way.
+
 2014-07-01 Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNBrowser.m

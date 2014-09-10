@@ -46,6 +46,7 @@ static NSString *nibName = @"FileOperationWin";
   RELEASE (source);
   RELEASE (destination);
   RELEASE (files);
+  RELEASE (procFiles);
   RELEASE (dupfiles);
   RELEASE (notifNames);
   RELEASE (win);
@@ -118,7 +119,8 @@ static NSString *nibName = @"FileOperationWin";
     ASSIGN (type, tp);
     ASSIGN (source, src);
     ASSIGN (destination, dst);
-    ASSIGN (files, fls);
+    files = [[NSMutableArray arrayWithArray:fls] retain];
+    procFiles = [[NSMutableArray alloc] init];
     
     dupfiles = [NSMutableArray new];
     
@@ -185,89 +187,112 @@ static NSString *nibName = @"FileOperationWin";
 
 - (void)startOperation
 {
+  if (confirm)
+    {    
+      NSString *title = nil;
+      NSString *msg = nil;
+      NSString *msg1 = nil;
+      NSString *msg2 = nil;
+      NSString *items;
+
+      if ([files count] > 1)
+        {
+          items = [NSString stringWithFormat: @"%lu %@", (unsigned long)[files count], NSLocalizedString(@"items", @"")];
+        }
+      else
+        {
+          items = NSLocalizedString(@"one item", @"");
+        }
+    
+      if ([type isEqual: NSWorkspaceMoveOperation])
+        {
+          title = NSLocalizedString(@"Move", @"");
+          msg1 = [NSString stringWithFormat: @"%@ %@ %@: ", 
+                           NSLocalizedString(@"Move", @""), 
+                           items, 
+                           NSLocalizedString(@"from", @"")];
+          msg2 = NSLocalizedString(@"\nto: ", @"");
+          msg = [NSString stringWithFormat: @"%@%@%@%@?", msg1, source, msg2, destination];
+        }
+      else if ([type isEqual: NSWorkspaceCopyOperation])
+        {
+          title = NSLocalizedString(@"Copy", @"");
+          msg1 = [NSString stringWithFormat: @"%@ %@ %@: ", 
+                           NSLocalizedString(@"Copy", @""), 
+                           items, 
+                           NSLocalizedString(@"from", @"")];
+          msg2 = NSLocalizedString(@"\nto: ", @"");
+          msg = [NSString stringWithFormat: @"%@%@%@%@?", msg1, source, msg2, destination];
+        }
+      else if ([type isEqual: NSWorkspaceLinkOperation])
+        {
+          title = NSLocalizedString(@"Link", @"");
+          msg1 = [NSString stringWithFormat: @"%@ %@ %@: ", 
+                           NSLocalizedString(@"Link", @""), 
+                           items, 
+                           NSLocalizedString(@"from", @"")];
+          msg2 = NSLocalizedString(@"\nto: ", @"");
+          msg = [NSString stringWithFormat: @"%@%@%@%@?", msg1, source, msg2, destination];
+        }
+      else if ([type isEqual: NSWorkspaceRecycleOperation])
+        {
+          title = NSLocalizedString(@"Recycler", @"");
+          msg1 = [NSString stringWithFormat: @"%@ %@ %@: ", 
+                           NSLocalizedString(@"Move", @""), 
+                           items, 
+                           NSLocalizedString(@"from", @"")];
+          msg2 = NSLocalizedString(@"\nto the Recycler", @"");
+          msg = [NSString stringWithFormat: @"%@%@%@?", msg1, source, msg2];
+        }
+      else if ([type isEqual: @"GWorkspaceRecycleOutOperation"])
+        {
+          title = NSLocalizedString(@"Recycler", @"");
+          msg1 = [NSString stringWithFormat: @"%@ %@ %@ ", 
+                           NSLocalizedString(@"Move", @""), 
+                           items, 
+                           NSLocalizedString(@"from the Recycler", @"")];
+          msg2 = NSLocalizedString(@"\nto: ", @"");
+          msg = [NSString stringWithFormat: @"%@%@%@?", msg1, msg2, destination];
+        }
+      else if ([type isEqual: @"GWorkspaceEmptyRecyclerOperation"])
+        {
+          title = NSLocalizedString(@"Recycler", @"");
+          msg = NSLocalizedString(@"Empty the Recycler?", @"");
+        }
+      else if ([type isEqual: NSWorkspaceDestroyOperation])
+        {
+          title = NSLocalizedString(@"Delete", @"");
+          msg = NSLocalizedString(@"Delete the selected objects?", @"");
+        }
+      else if ([type isEqual: NSWorkspaceDuplicateOperation])
+        {
+          title = NSLocalizedString(@"Duplicate", @"");
+          msg = NSLocalizedString(@"Duplicate the selected objects?", @"");
+        }
+      
+      if (NSRunAlertPanel(title, msg, 
+                          NSLocalizedString(@"OK", @""), 
+                          NSLocalizedString(@"Cancel", @""), 
+                          nil) != NSAlertDefaultReturn) {
+        [self endOperation];
+        return;
+      }
+    }
+  [self detachOperationThread];
+}
+
+-(void)detachOperationThread
+{
   NSPort *port[2];
   NSArray *ports;
 
-  if (confirm) {    
-    NSString *title = nil;
-    NSString *msg = nil;
-    NSString *msg1 = nil;
-    NSString *msg2 = nil;
-    NSString *items;
-
-    if ([files count] > 1) {
-      items = [NSString stringWithFormat: @"%lu %@", (unsigned long)[files count], NSLocalizedString(@"items", @"")];
-    } else {
-      items = NSLocalizedString(@"one item", @"");
-    }
-    
-	  if ([type isEqual: NSWorkspaceMoveOperation]) {
-		  title = NSLocalizedString(@"Move", @"");
-      msg1 = [NSString stringWithFormat: @"%@ %@ %@: ", 
-                                            NSLocalizedString(@"Move", @""), 
-                                            items, 
-                                            NSLocalizedString(@"from", @"")];
-		  msg2 = NSLocalizedString(@"\nto: ", @"");
-		  msg = [NSString stringWithFormat: @"%@%@%@%@?", msg1, source, msg2, destination];
-    } else if ([type isEqual: NSWorkspaceCopyOperation]) {
-		  title = NSLocalizedString(@"Copy", @"");
-      msg1 = [NSString stringWithFormat: @"%@ %@ %@: ", 
-                                            NSLocalizedString(@"Copy", @""), 
-                                            items, 
-                                            NSLocalizedString(@"from", @"")];
-		  msg2 = NSLocalizedString(@"\nto: ", @"");
-		  msg = [NSString stringWithFormat: @"%@%@%@%@?", msg1, source, msg2, destination];
-	  } else if ([type isEqual: NSWorkspaceLinkOperation]) {
-		  title = NSLocalizedString(@"Link", @"");
-      msg1 = [NSString stringWithFormat: @"%@ %@ %@: ", 
-                                            NSLocalizedString(@"Link", @""), 
-                                            items, 
-                                            NSLocalizedString(@"from", @"")];
-		  msg2 = NSLocalizedString(@"\nto: ", @"");
-		  msg = [NSString stringWithFormat: @"%@%@%@%@?", msg1, source, msg2, destination];
-	  } else if ([type isEqual: NSWorkspaceRecycleOperation]) {
-		  title = NSLocalizedString(@"Recycler", @"");
-      msg1 = [NSString stringWithFormat: @"%@ %@ %@: ", 
-                                            NSLocalizedString(@"Move", @""), 
-                                            items, 
-                                            NSLocalizedString(@"from", @"")];
-		  msg2 = NSLocalizedString(@"\nto the Recycler", @"");
-		  msg = [NSString stringWithFormat: @"%@%@%@?", msg1, source, msg2];
-	  } else if ([type isEqual: @"GWorkspaceRecycleOutOperation"]) {
-		  title = NSLocalizedString(@"Recycler", @"");
-      msg1 = [NSString stringWithFormat: @"%@ %@ %@ ", 
-                                            NSLocalizedString(@"Move", @""), 
-                                            items, 
-                                            NSLocalizedString(@"from the Recycler", @"")];
-		  msg2 = NSLocalizedString(@"\nto: ", @"");
-		  msg = [NSString stringWithFormat: @"%@%@%@?", msg1, msg2, destination];
-	  } else if ([type isEqual: @"GWorkspaceEmptyRecyclerOperation"]) {
-		  title = NSLocalizedString(@"Recycler", @"");
-		  msg = NSLocalizedString(@"Empty the Recycler?", @"");
-	  } else if ([type isEqual: NSWorkspaceDestroyOperation]) {
-		  title = NSLocalizedString(@"Delete", @"");
-		  msg = NSLocalizedString(@"Delete the selected objects?", @"");
-	  } else if ([type isEqual: NSWorkspaceDuplicateOperation]) {
-		  title = NSLocalizedString(@"Duplicate", @"");
-		  msg = NSLocalizedString(@"Duplicate the selected objects?", @"");
-	  }
-        
-    if (NSRunAlertPanel(title, msg, 
-                        NSLocalizedString(@"OK", @""), 
-			NSLocalizedString(@"Cancel", @""), 
-                        nil) != NSAlertDefaultReturn) {
-      [self endOperation];
-      return;
-    }
-  } 
-
   port[0] = (NSPort *)[NSPort port];
   port[1] = (NSPort *)[NSPort port];
-
+  
   ports = [NSArray arrayWithObjects: port[1], port[0], nil];
 
   execconn = [[NSConnection alloc] initWithReceivePort: port[0]
-				                                      sendPort: port[1]];
+                                              sendPort: port[1]];
   [execconn setRootObject: self];
   [execconn setDelegate: self];
   
@@ -317,22 +342,63 @@ static NSString *nibName = @"FileOperationWin";
 {
   if (paused == NO)
     {
+      NSLog(@"start pause remaining files: %d", [files count]);
       [pauseButt setTitle: NSLocalizedString(@"Continue", @"")];
       [stopButt setEnabled: NO];	
       paused = YES;
     }
   else
     {
+      NSLog(@"continue from pause");
+      [self detachOperationThread];
       [pauseButt setTitle: NSLocalizedString(@"Pause", @"")];
       [stopButt setEnabled: YES];	
       paused = NO;
-      [executor performOperation];
+      NSLog(@"performing operation....");
     }
 }
 
 - (IBAction)stop:(id)sender
 {
   stopped = YES;   
+}
+
+- (void)removeProcessedFiles
+{
+  NSData *pFData;
+  NSArray *pFiles;
+  NSUInteger i;
+
+
+  NSLog(@"removing processed files");
+  pFData = [executor processedFiles];
+  pFiles = [NSUnarchiver unarchiveObjectWithData: pFData];
+
+  NSLog(@"remove files: %@", pFiles);
+  for (i = 0; i < [pFiles count]; i++)
+    {
+      NSDictionary *fi;
+      NSUInteger j;
+      BOOL found;
+
+      j = 0;
+      found = NO;
+      while (j < [files count] && !found)
+        {
+          fi = [files objectAtIndex:j];
+
+          if ([[pFiles objectAtIndex:i] isEqualTo:[fi objectForKey:@"name"]])
+            found = YES;
+          else
+            i++;
+        }
+      if (found)
+        {
+          [procFiles addObject:[files objectAtIndex:j]];
+          [files removeObjectAtIndex:j];
+        }
+    }
+  NSLog(@"removeFile - remaining files... %d", [files count]);
 }
 
 - (void)showProgressWin
@@ -410,7 +476,6 @@ static NSString *nibName = @"FileOperationWin";
   [progInd setMinValue: 0.0];
   [progInd setMaxValue: n];
   [progInd setDoubleValue: 0.0];
-  [executor performOperation]; 
 }
 
 - (void)setProgIndicatorValue:(int)n
@@ -479,9 +544,9 @@ static NSString *nibName = @"FileOperationWin";
   
   if (executor) {
     NSData *data = [executor processedFiles];
-    NSArray *procFiles = [NSUnarchiver unarchiveObjectWithData: data];
+    NSArray *processedFiles = [NSUnarchiver unarchiveObjectWithData: data];
     
-    [notifObj setObject: procFiles forKey: @"files"];	
+    [notifObj setObject: processedFiles forKey: @"files"];	
     [notifObj setObject: notifNames forKey: @"origfiles"];	
   } else {
     [notifObj setObject: notifNames forKey: @"files"];
@@ -504,60 +569,72 @@ static NSString *nibName = @"FileOperationWin";
   [anObject setProtocolForProxy: @protocol(FileOpExecutorProtocol)];
   executor = (id <FileOpExecutorProtocol>)[anObject retain];
   
-  [executor setOperation: opinfo];  
-  samename = [executor checkSameName];
-  
-  if (samename)
+  [executor setOperation: opinfo];
+
+  if ([procFiles count] == 0)
     {
-      NSString *msg = nil;
-      NSString *title = nil;
-      int result;
-    
-      if ([type isEqual: NSWorkspaceMoveOperation])
-	{	
-			msg = @"Some items have the same name;\ndo you want to replace them?";
-			title = @"Move";
-		
-		} else if ([type isEqual: NSWorkspaceCopyOperation]) {
-			msg = @"Some items have the same name;\ndo you want to replace them?";
-			title = @"Copy";
-
-		} else if ([type isEqual: NSWorkspaceLinkOperation]) {
-			msg = @"Some items have the same name;\ndo you want to replace them?";
-			title = @"Link";
-
-		} else if ([type isEqual: NSWorkspaceRecycleOperation]) {
-			msg = @"Some items have the same name;\ndo you want to replace them?";
-			title = @"Recycle";
-
-		} else if ([type isEqual: @"GWorkspaceRecycleOutOperation"]) {
-			msg = @"Some items have the same name;\ndo you want to replace them?";
-			title = @"Recycle";
-		}
-        
-    result = NSRunAlertPanel(NSLocalizedString(title, @""),
-														 NSLocalizedString(msg, @""),
-														 NSLocalizedString(@"OK", @""), 
-														 NSLocalizedString(@"Cancel", @""), 
-                             NSLocalizedString(@"Only older", @"")); 
-
-		if (result == NSAlertAlternateReturn) {  
-      [controller endOfFileOperation: self];
-      return;   
-		} else if (result == NSAlertOtherReturn) {  
-      [executor setOnlyOlder];
-    }
-  } 
+      samename = [executor checkSameName];
       
-  if (showwin) {
+      if (samename)
+        {
+          NSString *msg = nil;
+          NSString *title = nil;
+          int result;
+    
+          onlyOlder = NO;
+          if ([type isEqual: NSWorkspaceMoveOperation])
+            {	
+              msg = @"Some items have the same name;\ndo you want to replace them?";
+              title = @"Move";		
+            }
+          else if ([type isEqual: NSWorkspaceCopyOperation])
+            {
+              msg = @"Some items have the same name;\ndo you want to replace them?";
+              title = @"Copy";
+            }
+          else if ([type isEqual: NSWorkspaceLinkOperation]) 
+            {
+              msg = @"Some items have the same name;\ndo you want to replace them?";
+              title = @"Link";
+            }
+          else if ([type isEqual: NSWorkspaceRecycleOperation])
+            {
+              msg = @"Some items have the same name;\ndo you want to replace them?";
+              title = @"Recycle";
+            }
+          else if ([type isEqual: @"GWorkspaceRecycleOutOperation"])
+            {
+              msg = @"Some items have the same name;\ndo you want to replace them?";
+              title = @"Recycle";
+            }
+      
+          result = NSRunAlertPanel(NSLocalizedString(title, @""),							 NSLocalizedString(msg, @""),
+                                   NSLocalizedString(@"OK", @""), 
+                                   NSLocalizedString(@"Cancel", @""), 
+                                   NSLocalizedString(@"Only older", @"")); 
+      
+          if (result == NSAlertAlternateReturn)
+            {
+              [controller endOfFileOperation: self];
+              return;   
+            }
+          else if (result == NSAlertOtherReturn) 
+            {  
+              onlyOlder = YES;
+            }
+        }
+    }
+
+  [executor setOnlyOlder:onlyOlder];
+      
+  if (showwin)
     [self showProgressWin];
-  }
 
   [self sendWillChangeNotification]; 
   
   stopped = NO;
   paused = NO;   
-  [executor calculateNumFiles];
+  [executor calculateNumFiles:[procFiles count]];
 }
 
 - (BOOL)connection:(NSConnection*)ancestor 
@@ -652,7 +729,7 @@ shouldMakeNewConnection:(NSConnection*)newConn
   NSPort *port[2];
   NSConnection *conn;
   FileOpExecutor *executor;
-                              
+
   port[0] = [thePorts objectAtIndex: 0];             
   port[1] = [thePorts objectAtIndex: 1];             
 
@@ -783,84 +860,96 @@ shouldMakeNewConnection:(NSConnection*)newConn
   return NO;
 }
 
-- (void)setOnlyOlder
+- (void)setOnlyOlder:(BOOL)flag
 {
-  onlyolder = YES;
+  onlyolder = flag;
 }
 
-- (oneway void)calculateNumFiles
+- (oneway void)calculateNumFiles:(NSUInteger)continueFrom
 {
   NSUInteger i;
   NSUInteger fnum = 0;
 
-  for (i = 0; i < [files count]; i++)
+  if (continueFrom == 0)
     {
-      CREATE_AUTORELEASE_POOL (arp);
-      NSDictionary *dict = [files objectAtIndex: i];
-      NSString *name = [dict objectForKey: @"name"]; 
-      NSString *path = [source stringByAppendingPathComponent: name];       
-      BOOL isDir = NO;
-    
-      [fm fileExistsAtPath: path isDirectory: &isDir];
-      
-      if (isDir)
+      NSLog(@"calculating num files");
+      for (i = 0; i < [files count]; i++)
         {
-          NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: path];
+          CREATE_AUTORELEASE_POOL (arp);
+          NSDictionary *dict = [files objectAtIndex: i];
+          NSString *name = [dict objectForKey: @"name"]; 
+          NSString *path = [source stringByAppendingPathComponent: name];       
+          BOOL isDir = NO;
           
-          while (1)
+          [fm fileExistsAtPath: path isDirectory: &isDir];
+          
+          if (isDir)
             {
-              CREATE_AUTORELEASE_POOL (arp2);
-              NSString *dirEntry = [enumerator nextObject];
+              NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: path];
               
-              if (dirEntry)
+              while (1)
                 {
-                  if (stopped)
+                  CREATE_AUTORELEASE_POOL (arp2);
+                  NSString *dirEntry = [enumerator nextObject];
+                  
+                  if (dirEntry)
+                    {
+                      if (stopped)
+                        {
+                          RELEASE (arp2);
+                          break;
+                        }
+                      fnum++;
+                    }
+                  else
                     {
                       RELEASE (arp2);
                       break;
                     }
-                  fnum++;
-                }
-              else
-                {
                   RELEASE (arp2);
-                  break;
                 }
-              RELEASE (arp2);
             }
-        }
-      else
-        {
-          fnum++;
+          else
+            {
+              fnum++;
+            }
+          
+          if (stopped)
+            {
+              RELEASE (arp);
+              break;
+            }
+          RELEASE (arp);
         }
       
       if (stopped)
+        [self done];
+      
+      fcount = 0;
+      stepcount = 0;
+      
+      if (fnum < PROGR_STEPS)
         {
-          RELEASE (arp);
-          break;
+          progstep = 1.0;
         }
-      RELEASE (arp);
+      else
+        {
+          progstep = fnum / PROGR_STEPS;
+        }
+      [fileOp setNumFiles: fnum];
     }
-
-  if (stopped)
-    [self done];
-
-  fcount = 0;
-  stepcount = 0;
-  
-  if (fnum < PROGR_STEPS) {
-    progstep = 1.0;
-  } else {
-    progstep = fnum / PROGR_STEPS;
-  }
-  
-  [fileOp setNumFiles: fnum];
+  else
+    {
+      fcount = continueFrom;
+      stepcount = continueFrom;
+    }
+  [self performOperation];
 }
 
 - (oneway void)performOperation
 {
   canupdate = YES; 
-  
+  NSLog(@"performOperation: %@", operation);  
   if ([operation isEqual: NSWorkspaceMoveOperation]
       || [operation isEqual: @"GWorkspaceRecycleOutOperation"])
     {
@@ -954,6 +1043,7 @@ filename = [fileinfo objectForKey: @"name"];
 
 - (void)doCopy
 {
+  NSLog(@"start files... %d", [files count]);
   while (1)
     {
       CHECK_DONE;	
@@ -968,14 +1058,20 @@ filename = [fileinfo objectForKey: @"name"];
               [procfiles addObject: filename];	
             }
         }
-      [files removeObject: fileinfo];	
+      [files removeObject: fileinfo];
+      NSLog(@"files... %d", [files count]);
       RELEASE (fileinfo); 
     }
   
   if (([files count] == 0) || stopped)
     {
       [self done];
-    }                                          
+    }
+  else if (paused)
+    {
+      NSLog(@"paused, communicating back that we processed: %d", [procfiles count]);
+      [fileOp removeProcessedFiles];
+    }
 }
 
 - (void)doLink

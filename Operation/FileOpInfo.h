@@ -1,6 +1,6 @@
 /* FileOpInfo.h
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2014 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -43,6 +43,8 @@
 
 - (void)sendDidChangeNotification;
 
+- (void)removeProcessedFiles;
+
 - (oneway void)endOperation;
 
 @end
@@ -58,9 +60,9 @@
 
 - (BOOL)checkSameName;
 
-- (void)setOnlyOlder;
+- (void)setOnlyOlder:(BOOL)flag;
 
-- (oneway void)calculateNumFiles;
+- (oneway void)calculateNumFiles:(NSUInteger)continueFrom;
 
 - (oneway void)performOperation;
 
@@ -84,16 +86,18 @@
   NSString *type;
   NSString *source;
   NSString *destination;
-  NSArray *files;
+  NSMutableArray *files;
   NSMutableArray *dupfiles;
+  NSMutableArray *procFiles;
   int ref;
   
   NSMutableDictionary *operationDict;
   NSMutableArray *notifNames;
-  
+
   BOOL confirm;
   BOOL showwin;
   BOOL opdone;
+  BOOL onlyOlder;
   NSConnection *execconn;
   id <FileOpExecutorProtocol> executor;
   NSNotificationCenter *nc;
@@ -133,6 +137,8 @@
                  controller:(id)cntrl;
 
 - (void)startOperation;
+
+- (void)detachOperationThread;
 
 - (NSInteger)requestUserConfirmationWithMessage:(NSString *)message 
                                     title:(NSString *)title;
@@ -206,10 +212,6 @@
 - (BOOL)setOperation:(NSData *)opinfo;
 
 - (BOOL)checkSameName;
-
-- (void)setOnlyOlder;
-
-- (void)calculateNumFiles;
 
 - (void)performOperation;
 
