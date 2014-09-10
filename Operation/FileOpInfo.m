@@ -1014,36 +1014,42 @@ filename = [fileinfo objectForKey: @"name"];
 	{
 	  NSString *src = [source stringByAppendingPathComponent: filename];
 	  NSString *dst = [destination stringByAppendingPathComponent: filename];
-      
+	  
 	  if ([fm movePath: src toPath: dst handler: self])
 	    {    
 	      [procfiles addObject: filename];	
-      } else {
-        /* check for broken symlink */
-        NSDictionary *attributes = [fm fileAttributesAtPath: src traverseLink: NO];
-        
-        if (attributes && ([attributes fileType] == NSFileTypeSymbolicLink)
-                                        && ([fm fileExistsAtPath: src] == NO)) {
-          if ([fm copyPath: src toPath: dst handler: self]
-                          && [fm removeFileAtPath: src handler: self]) {
-        	  [procfiles addObject: filename];
-          }
-        }
-      }
+	    }
+	  else
+	    {
+	      /* check for broken symlink */
+	      NSDictionary *attributes = [fm fileAttributesAtPath: src traverseLink: NO];
+	      
+	      if (attributes && ([attributes fileType] == NSFileTypeSymbolicLink) && ([fm fileExistsAtPath: src] == NO))
+		{
+		  if ([fm copyPath: src toPath: dst handler: self] && [fm removeFileAtPath: src handler: self])
+		    {
+		      [procfiles addObject: filename];
+		    }
+		}
+	    }
+	}
+      
+      [files removeObject: fileinfo];	
+      RELEASE (fileinfo);
     }
-    
- 	  [files removeObject: fileinfo];	
-    RELEASE (fileinfo);
-  }
-  
-  if (([files count] == 0) || stopped) {
-    [self done];
-  }
+
+  if (([files count] == 0) || stopped)
+    {
+      [self done];
+    }
+  else if (paused)
+    {
+      [fileOp removeProcessedFiles];
+    }
 }
 
 - (void)doCopy
 {
-  NSLog(@"start files... %d", [files count]);
   while (1)
     {
       CHECK_DONE;	
@@ -1059,7 +1065,6 @@ filename = [fileinfo objectForKey: @"name"];
             }
         }
       [files removeObject: fileinfo];
-      NSLog(@"files... %d", [files count]);
       RELEASE (fileinfo); 
     }
   
@@ -1069,32 +1074,39 @@ filename = [fileinfo objectForKey: @"name"];
     }
   else if (paused)
     {
-      NSLog(@"paused, communicating back that we processed: %d", [procfiles count]);
       [fileOp removeProcessedFiles];
     }
 }
 
 - (void)doLink
 {
-  while (1) {
-	  CHECK_DONE;	
-	  GET_FILENAME;    
+  while (1)
+    {
+      CHECK_DONE;	
+      GET_FILENAME;    
     
-    if ((samename == NO) || (samename && [self removeExisting: fileinfo])) {
-      NSString *dst = [destination stringByAppendingPathComponent: filename];
-      NSString *src = [source stringByAppendingPathComponent: filename];
-  
-      if ([fm createSymbolicLinkAtPath: dst pathContent: src]) {
-        [procfiles addObject: filename];	      
-      }
+      if ((samename == NO) || (samename && [self removeExisting: fileinfo]))
+	{
+	  NSString *dst = [destination stringByAppendingPathComponent: filename];
+	  NSString *src = [source stringByAppendingPathComponent: filename];
+	  
+	  if ([fm createSymbolicLinkAtPath: dst pathContent: src])
+	    {
+	      [procfiles addObject: filename];	      
+	    }
+	}
+      [files removeObject: fileinfo];	   
+      RELEASE (fileinfo);     
     }
-	  [files removeObject: fileinfo];	   
-    RELEASE (fileinfo);     
-  }
-
-  if (([files count] == 0) || stopped) {
-    [self done];
-  }                                            
+  
+  if (([files count] == 0) || stopped)
+    {
+      [self done];
+    }
+  else if (paused)
+    {
+      [fileOp removeProcessedFiles];
+    }                                         
 }
 
 - (void)doRemove
@@ -1116,7 +1128,11 @@ filename = [fileinfo objectForKey: @"name"];
   if (([files count] == 0) || stopped)
     {
       [self done];
-    }                                       
+    }
+  else if (paused)
+    {
+      [fileOp removeProcessedFiles];
+    }                            
 }
 
 - (void)doDuplicate
@@ -1169,10 +1185,15 @@ filename = [fileinfo objectForKey: @"name"];
 	  [files removeObject: fileinfo];
     RELEASE (fileinfo);	       
   }
-  
-  if (([files count] == 0) || stopped) {
-    [self done];
-  }                                             
+
+  if (([files count] == 0) || stopped)
+    {
+      [self done];
+    }
+  else if (paused)
+    {
+      [fileOp removeProcessedFiles];
+    }                                        
 }
 
 - (void)doRename
@@ -1298,10 +1319,15 @@ filename = [fileinfo objectForKey: @"name"];
 	  [files removeObject: fileinfo];	 
     RELEASE (fileinfo);  
   }
-  
-  if (([files count] == 0) || stopped) {
-    [self done];
-  }                                             
+
+  if (([files count] == 0) || stopped)
+    {
+      [self done];
+    }
+  else if (paused)
+    {
+      [fileOp removeProcessedFiles];
+    }                                             
 }
 
 - (BOOL)removeExisting:(NSDictionary *)info
