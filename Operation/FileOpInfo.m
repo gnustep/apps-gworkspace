@@ -281,6 +281,17 @@ static NSString *nibName = @"FileOperationWin";
   [self detachOperationThread];
 }
 
+- (void) threadWillExit: (NSNotification *)notification
+{
+  NSLog(@"%@",NSStringFromSelector(_cmd));
+  [[NSNotificationCenter defaultCenter] 
+    removeObserver:self
+	      name:NSThreadWillExitNotification
+	    object:nil];
+
+  executor = nil;
+}
+
 -(void)detachOperationThread
 {
   NSPort *port[2];
@@ -299,7 +310,12 @@ static NSString *nibName = @"FileOperationWin";
   [nc addObserver: self
          selector: @selector(connectionDidDie:)
              name: NSConnectionDidDieNotification
-           object: execconn];    
+           object: execconn];      
+
+  [nc addObserver: self
+         selector: @selector(threadWillExit:)
+             name: NSThreadWillExitNotification
+           object: nil];  
 
   NS_DURING
     {
