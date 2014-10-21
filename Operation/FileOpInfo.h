@@ -45,7 +45,7 @@
 
 - (void)removeProcessedFiles;
 
-- (oneway void)endOperation;
+- (void)endOperation;
 
 @end
 
@@ -75,8 +75,6 @@
 - (BOOL)isPaused;
 
 - (void)done;
-
-- (oneway void)exitThread;
 
 @end
 
