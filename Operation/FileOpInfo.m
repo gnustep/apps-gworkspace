@@ -41,6 +41,8 @@ static NSString *nibName = @"FileOperationWin";
 
 - (void)dealloc
 {
+  [nc removeObserver: self];
+
   RELEASE (operationDict);
   RELEASE (type);
   RELEASE (source);
@@ -283,11 +285,13 @@ static NSString *nibName = @"FileOperationWin";
 
 - (void) threadWillExit: (NSNotification *)notification
 {
-  NSLog(@"%@",NSStringFromSelector(_cmd));
-  [[NSNotificationCenter defaultCenter] 
-    removeObserver:self
-	      name:NSThreadWillExitNotification
-	    object:nil];
+  [nc removeObserver:self
+                name:NSThreadWillExitNotification
+              object:nil];
+  
+  [nc removeObserver: self
+                name: NSConnectionDidDieNotification 
+              object: execconn];
 
   executor = nil;
 }
@@ -385,8 +389,6 @@ static NSString *nibName = @"FileOperationWin";
   NSArray *pFiles;
   NSUInteger i;
 
-
-  NSLog(@"removing processed files");
   pFData = [executor processedFiles];
   pFiles = [NSUnarchiver unarchiveObjectWithData: pFData];
 
@@ -508,8 +510,6 @@ static NSString *nibName = @"FileOperationWin";
     [win saveFrameUsingName: @"fopinfo"];
     [win close];
   }
-
-  [nc removeObserver: self];
   
   if (executor) {
     [nc removeObserver: self
@@ -525,8 +525,8 @@ static NSString *nibName = @"FileOperationWin";
 - (void)sendWillChangeNotification
 {
   CREATE_AUTORELEASE_POOL(arp);
-	NSMutableDictionary *dict = [NSMutableDictionary dictionary];	
-  int i;
+  NSMutableDictionary *dict = [NSMutableDictionary dictionary];	
+  NSUInteger i;
     
   notifNames = [NSMutableArray new];
   
@@ -888,7 +888,6 @@ shouldMakeNewConnection:(NSConnection*)newConn
 
   if (continueFrom == 0)
     {
-      NSLog(@"calculating num files");
       for (i = 0; i < [files count]; i++)
         {
           CREATE_AUTORELEASE_POOL (arp);
@@ -1403,7 +1402,7 @@ filename = [fileinfo objectForKey: @"name"];
 - (void)done
 {
   [fileOp sendDidChangeNotification];
-  [fileOp endOperation];  
+  [fileOp endOperation];
 }
 
 - (BOOL)fileManager:(NSFileManager *)manager 
