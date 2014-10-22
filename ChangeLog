@@ -1,3 +1,9 @@
+2014-09-22 Riccardo Mottola <rm@gnu.org>
+
+	* Operation/FileOpInfo.h
+	* Operation/FileOpInfo.m
+	Fix memory leak on pause, allow stopping of operation also when paused.
+
 2014-10-21 Riccardo Mottola <rm@gnu.org>
 
 	* Operation/FileOpInfo.h

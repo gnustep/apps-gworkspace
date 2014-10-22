@@ -3,6 +3,7 @@
  * Copyright (C) 2004-2014 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
+ *         Riccardo Mottola <rm@gnu.org>
  * Date: March 2004
  *
  * This file is part of the GNUstep GWorkspace application
@@ -363,16 +364,14 @@ static NSString *nibName = @"FileOperationWin";
   if (paused == NO)
     {
       NSLog(@"start pause remaining files: %d", [files count]);
-      [pauseButt setTitle: NSLocalizedString(@"Continue", @"")];
-      [stopButt setEnabled: NO];	
+      [pauseButt setTitle: NSLocalizedString(@"Continue", @"")];	
       paused = YES;
     }
   else
     {
       NSLog(@"continue from pause");
       [self detachOperationThread];
-      [pauseButt setTitle: NSLocalizedString(@"Pause", @"")];
-      [stopButt setEnabled: YES];	
+      [pauseButt setTitle: NSLocalizedString(@"Pause", @"")];	
       paused = NO;
       NSLog(@"performing operation....");
     }
@@ -380,6 +379,10 @@ static NSString *nibName = @"FileOperationWin";
 
 - (IBAction)stop:(id)sender
 {
+  if (paused)
+    {
+      [self endOperation];
+    }
   stopped = YES;   
 }
 
@@ -501,23 +504,28 @@ static NSString *nibName = @"FileOperationWin";
   [progInd setDoubleValue: n];
 }
 
+- (void)cleanUpExecutor
+{
+  if (executor)
+    {
+      [nc removeObserver: self
+                    name: NSConnectionDidDieNotification 
+                  object: execconn];
+      DESTROY (executor);
+      DESTROY (execconn);
+    }
+}
+
 - (void)endOperation
 {
-  if (showwin) {
-    if ([progInd isIndeterminate]) {
-      [progInd stopAnimation:self];  
+  if (showwin)
+    {
+      if ([progInd isIndeterminate])
+        [progInd stopAnimation:self];
+
+      [win saveFrameUsingName: @"fopinfo"];
+      [win close];
     }
-    [win saveFrameUsingName: @"fopinfo"];
-    [win close];
-  }
-  
-  if (executor) {
-    [nc removeObserver: self
-	                name: NSConnectionDidDieNotification 
-                object: execconn];
-    DESTROY (executor);
-    DESTROY (execconn);
-  }
   
   [controller endOfFileOperation: self];
 }
@@ -1053,14 +1061,16 @@ filename = [fileinfo objectForKey: @"name"];
       RELEASE (fileinfo);
     }
 
+  [fileOp sendDidChangeNotification];
   if (([files count] == 0) || stopped)
     {
-      [self done];
+      [fileOp endOperation];
     }
   else if (paused)
     {
       [fileOp removeProcessedFiles];
     }
+  [fileOp cleanUpExecutor];
 }
 
 - (void)doCopy
@@ -1083,14 +1093,16 @@ filename = [fileinfo objectForKey: @"name"];
       RELEASE (fileinfo); 
     }
   
+  [fileOp sendDidChangeNotification];
   if (([files count] == 0) || stopped)
     {
-      [self done];
+      [fileOp endOperation];
     }
   else if (paused)
     {
       [fileOp removeProcessedFiles];
     }
+  [fileOp cleanUpExecutor];
 }
 
 - (void)doLink
@@ -1114,14 +1126,16 @@ filename = [fileinfo objectForKey: @"name"];
       RELEASE (fileinfo);     
     }
   
+  [fileOp sendDidChangeNotification];
   if (([files count] == 0) || stopped)
     {
-      [self done];
+      [fileOp endOperation];
     }
   else if (paused)
     {
       [fileOp removeProcessedFiles];
-    }                                         
+    }
+  [fileOp cleanUpExecutor];
 }
 
 - (void)doRemove
@@ -1140,14 +1154,16 @@ filename = [fileinfo objectForKey: @"name"];
       RELEASE (fileinfo);   
     }
 
+  [fileOp sendDidChangeNotification];
   if (([files count] == 0) || stopped)
     {
-      [self done];
+      [fileOp endOperation];
     }
   else if (paused)
     {
       [fileOp removeProcessedFiles];
-    }                            
+    }
+  [fileOp cleanUpExecutor];                      
 }
 
 - (void)doDuplicate
@@ -1201,14 +1217,16 @@ filename = [fileinfo objectForKey: @"name"];
     RELEASE (fileinfo);	       
   }
 
+  [fileOp sendDidChangeNotification];
   if (([files count] == 0) || stopped)
     {
-      [self done];
+      [fileOp endOperation];
     }
   else if (paused)
     {
       [fileOp removeProcessedFiles];
-    }                                        
+    }
+  [fileOp cleanUpExecutor];                                  
 }
 
 - (void)doRename
@@ -1237,7 +1255,9 @@ filename = [fileinfo objectForKey: @"name"];
   [files removeObject: fileinfo];
   RELEASE (fileinfo);	
 
-  [self done];
+  [fileOp sendDidChangeNotification];
+  [fileOp endOperation];
+  [fileOp cleanUpExecutor];
 }
 
 - (void)doNewFolder
@@ -1251,7 +1271,9 @@ filename = [fileinfo objectForKey: @"name"];
   [files removeObject: fileinfo];	
   RELEASE (fileinfo);
 
-  [self done];
+  [fileOp sendDidChangeNotification];
+  [fileOp endOperation];
+  [fileOp cleanUpExecutor];
 }
 
 - (void)doNewFile
@@ -1266,7 +1288,9 @@ filename = [fileinfo objectForKey: @"name"];
   [files removeObject: fileinfo];	
   RELEASE (fileinfo);
   
-  [self done];
+  [fileOp sendDidChangeNotification];
+  [fileOp endOperation];
+  [fileOp cleanUpExecutor];
 }
 
 - (void)doTrash
@@ -1335,14 +1359,16 @@ filename = [fileinfo objectForKey: @"name"];
     RELEASE (fileinfo);  
   }
 
+  [fileOp sendDidChangeNotification];
   if (([files count] == 0) || stopped)
     {
-      [self done];
+      [fileOp endOperation];
     }
   else if (paused)
     {
       [fileOp removeProcessedFiles];
-    }                                             
+    }
+  [fileOp cleanUpExecutor];                                         
 }
 
 - (BOOL)removeExisting:(NSDictionary *)info

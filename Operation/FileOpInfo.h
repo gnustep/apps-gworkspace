@@ -45,6 +45,8 @@
 
 - (void)removeProcessedFiles;
 
+- (void)cleanUpExecutor;
+
 - (void)endOperation;
 
 @end
@@ -153,6 +155,10 @@
 
 - (void)setProgIndicatorValue:(int)n;
 
+- (void)removeProcessedFiles;
+
+- (void)cleanUpExecutor;
+
 - (void)endOperation;
 
 - (void)sendWillChangeNotification;
@@ -211,7 +217,9 @@
 
 - (BOOL)checkSameName;
 
-- (void)performOperation;
+- (oneway void)calculateNumFiles:(NSUInteger)continueFrom;
+
+- (oneway void)performOperation;
 
 - (NSData *)processedFiles;
 
