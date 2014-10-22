@@ -76,8 +76,6 @@
 
 - (BOOL)isPaused;
 
-- (void)done;
-
 @end
 
 
@@ -222,8 +220,6 @@
 - (oneway void)performOperation;
 
 - (NSData *)processedFiles;
-
-- (void)done;
 
 - (void)doMove;
 

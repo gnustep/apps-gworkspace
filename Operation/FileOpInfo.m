@@ -363,17 +363,14 @@ static NSString *nibName = @"FileOperationWin";
 {
   if (paused == NO)
     {
-      NSLog(@"start pause remaining files: %d", [files count]);
       [pauseButt setTitle: NSLocalizedString(@"Continue", @"")];	
       paused = YES;
     }
   else
     {
-      NSLog(@"continue from pause");
       [self detachOperationThread];
       [pauseButt setTitle: NSLocalizedString(@"Pause", @"")];	
       paused = NO;
-      NSLog(@"performing operation....");
     }
 }
 
@@ -841,8 +838,8 @@ shouldMakeNewConnection:(NSConnection*)newConn
 
 - (BOOL)checkSameName
 {
-	NSArray *dirContents;
-	int i;
+  NSArray *dirContents;
+  NSUInteger i;
     
 	samename = NO;
 
@@ -853,33 +850,40 @@ shouldMakeNewConnection:(NSConnection*)newConn
 	  return NO;
   }
   
-	if (destination && [files count]) {
-		dirContents = [fm directoryContentsAtPath: destination];
-		for (i = 0; i < [files count]; i++) {
-      NSDictionary *dict = [files objectAtIndex: i];
-      NSString *name = [dict objectForKey: @"name"]; 
+  if (destination && [files count])
+    {
+      dirContents = [fm directoryContentsAtPath: destination];
+      for (i = 0; i < [files count]; i++)
+        {
+          NSDictionary *dict = [files objectAtIndex: i];
+          NSString *name = [dict objectForKey: @"name"]; 
     
-      if ([dirContents containsObject: name]) {
-        samename = YES;
-        break;
-      }
-		}
-	}
+          if ([dirContents containsObject: name])
+            {
+              samename = YES;
+              break;
+            }
+        }
+    }
 	
-	if (samename) {
-		if (([operation isEqual: NSWorkspaceMoveOperation]) 
+  if (samename)
+    {
+      if (([operation isEqual: NSWorkspaceMoveOperation]) 
           || ([operation isEqual: NSWorkspaceCopyOperation])
           || ([operation isEqual: NSWorkspaceLinkOperation])
-          || ([operation isEqual: @"GWorkspaceRecycleOutOperation"])) {
-      return YES;
-      
-		} else if (([operation isEqual: NSWorkspaceDestroyOperation]) 
-          || ([operation isEqual: NSWorkspaceDuplicateOperation])
-          || ([operation isEqual: NSWorkspaceRecycleOperation])
-          || ([operation isEqual: @"GWorkspaceEmptyRecyclerOperation"])) {
-      return NO;
-		} 
-	}
+          || ([operation isEqual: @"GWorkspaceRecycleOutOperation"]))
+        {
+          return YES;
+          
+        }
+      else if (([operation isEqual: NSWorkspaceDestroyOperation]) 
+               || ([operation isEqual: NSWorkspaceDuplicateOperation])
+               || ([operation isEqual: NSWorkspaceRecycleOperation])
+               || ([operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]))
+        {
+          return NO;
+        } 
+    }
   
   return NO;
 }
@@ -946,7 +950,10 @@ shouldMakeNewConnection:(NSConnection*)newConn
         }
       
       if (stopped)
-        [self done];
+        {
+          [fileOp endOperation];
+          [fileOp cleanUpExecutor];
+        }
       
       fcount = 0;
       stepcount = 0;
@@ -1425,11 +1432,6 @@ filename = [fileinfo objectForKey: @"name"];
   return nil;
 }
 
-- (void)done
-{
-  [fileOp sendDidChangeNotification];
-  [fileOp endOperation];
-}
 
 - (BOOL)fileManager:(NSFileManager *)manager 
               shouldProceedAfterError:(NSDictionary *)errorDict
@@ -1462,7 +1464,8 @@ filename = [fileinfo objectForKey: @"name"];
     
   if (result != NSAlertDefaultReturn)
     {
-      [self done];
+      [fileOp endOperation];
+      [fileOp cleanUpExecutor];
     }
   else
     {  
@@ -1485,15 +1488,23 @@ filename = [fileinfo objectForKey: @"name"];
 	  path = [path stringByDeletingLastPathComponent];
 	}   
     
-    if ([files count]) {
-      if (found) {
-        [self performOperation]; 
-      } else {
-        [fileOp showErrorAlertWithMessage: @"File Operation Error!"];
-        [self done];
+    if ([files count])
+      {
+        if (found)
+          {
+            [self performOperation]; 
+          }
+        else
+          {
+            [fileOp showErrorAlertWithMessage: @"File Operation Error!"];
+            [fileOp endOperation];
+            [fileOp cleanUpExecutor];
+          }
       }
-    } else {
-      [self done];
+    else
+      {
+        [fileOp endOperation];
+        [fileOp cleanUpExecutor];
     }
   }
   
@@ -1512,9 +1523,11 @@ filename = [fileinfo objectForKey: @"name"];
     }
   }
   
-  if (stopped) {
-    [self done];
-  }                                             
+  if (stopped)
+    {
+      [fileOp endOperation];
+      [fileOp cleanUpExecutor];
+    }                                             
 }
 
 @end
