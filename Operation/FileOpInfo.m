@@ -508,6 +508,7 @@ static NSString *nibName = @"FileOperationWin";
       [nc removeObserver: self
                     name: NSConnectionDidDieNotification 
                   object: execconn];
+      [execconn setRootObject:nil];
       DESTROY (executor);
       DESTROY (execconn);
     }
@@ -525,6 +526,7 @@ static NSString *nibName = @"FileOperationWin";
     }
   
   [controller endOfFileOperation: self];
+  [execconn setRootObject:nil];
 }
 
 - (void)sendWillChangeNotification
