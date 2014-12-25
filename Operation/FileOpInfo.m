@@ -40,6 +40,11 @@ static NSString *nibName = @"FileOperationWin";
 
 @implementation FileOpInfo
 
+- (NSString *)description
+{
+  return [NSString stringWithFormat: @"%@ from: %@ to: %@", type, source, destination];
+}
+
 - (void)dealloc
 {
   [nc removeObserver: self];
@@ -1033,7 +1038,7 @@ if (([files count] == 0) || stopped || paused) break
 #define GET_FILENAME \
 fileinfo = [files objectAtIndex: 0]; \
 RETAIN (fileinfo); \
-filename = [fileinfo objectForKey: @"name"]; 
+filename = [fileinfo objectForKey: @"name"];
 
 - (void)doMove
 {
