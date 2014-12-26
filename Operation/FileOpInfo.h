@@ -183,7 +183,7 @@
 
 - (NSWindow *)win;
 
-- (void)getWinRect: (Rect*)rptr;
+- (void)getWinRect: (NSRect*)rptr;
 
 @end 
 
