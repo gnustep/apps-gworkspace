@@ -375,8 +375,9 @@
     FileOpInfo *op = [fileOperations objectAtIndex: i];
 
     if ([op win]) {
-      NSRect wr = [op winRect];
+      NSRect wr;
 
+      [op getWinRect: &wr];
       if (NSEqualRects(wr, NSZeroRect) == NO) {
         wrect = NSMakeRect(wr.origin.x + WSHIFT, 
                            wr.origin.y - wr.size.height - WSHIFT,

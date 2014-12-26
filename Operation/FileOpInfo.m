@@ -738,12 +738,12 @@ shouldMakeNewConnection:(NSConnection*)newConn
   return win;
 }
 
-- (NSRect)winRect
+- (void) getWinRect: (NSRect*)rptr
 {
+  *rptr = NSZeroRect;
   if (win && [win isVisible]) {
-    return [win frame];
+    *rptr = [win frame];
   }
-  return NSZeroRect;
 }
 
 @end
