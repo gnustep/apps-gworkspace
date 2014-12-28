@@ -1,6 +1,6 @@
 /* Finder.h
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2014 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -32,21 +32,27 @@
 @class NSMatrix;
 @class FindModuleView;
 @class LSFolder;
+@class NSPopUpButton;
+@class NSWindow;
+@class NSBox;
+@class NSTextField;
+@class NSButton;
+@class SearchPlacesBox;
 
 @interface Finder : NSObject 
 {
-  IBOutlet id win;
-  IBOutlet id searchLabel;
-  IBOutlet id wherePopUp;
-  IBOutlet id placesBox;
+  IBOutlet NSWindow *win;
+  IBOutlet NSTextField *searchLabel;
+  IBOutlet NSPopUpButton *wherePopUp;
+  IBOutlet SearchPlacesBox *placesBox;
   NSScrollView *placesScroll;
   NSMatrix *placesMatrix;
-  IBOutlet id addPlaceButt;
-  IBOutlet id removePlaceButt;
-  IBOutlet id itemsLabel;
+  IBOutlet NSButton *addPlaceButt;
+  IBOutlet NSButton *removePlaceButt;
+  IBOutlet NSTextField *itemsLabel;
   IBOutlet NSBox *modulesBox;
-  IBOutlet id recursiveSwitch;
-  IBOutlet id findButt;
+  IBOutlet NSButton *recursiveSwitch;
+  IBOutlet NSButton *findButt;
 
   NSMutableArray *modules;
   NSMutableArray *fmviews;
