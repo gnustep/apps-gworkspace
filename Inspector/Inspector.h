@@ -1,6 +1,6 @@
 /* Inspector.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2014 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
@@ -32,17 +32,19 @@
 @class Contents;
 @class Tools;
 @class IconView;
+@class NSPopUpButton;
+@class NSWindow;
 
 @interface Inspector : NSObject 
 {
-  IBOutlet id win;
-  IBOutlet id popUp;
+  IBOutlet NSWindow *win;
+  IBOutlet NSPopUpButton *popUp;
   IBOutlet NSBox *inspBox;
 
   NSMutableArray *inspectors;
-	id currentInspector;
+  id currentInspector;
 
-	NSArray *currentPaths;
+  NSArray *currentPaths;
   NSString *watchedPath;
     
   NSNotificationCenter *nc; 
