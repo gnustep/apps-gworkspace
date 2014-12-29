@@ -986,7 +986,7 @@ shouldMakeNewConnection:(NSConnection*)newConn
 - (oneway void)performOperation
 {
   canupdate = YES; 
-  NSLog(@"performOperation: %@", operation);  
+
   if ([operation isEqual: NSWorkspaceMoveOperation]
       || [operation isEqual: @"GWorkspaceRecycleOutOperation"])
     {
