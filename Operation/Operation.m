@@ -362,38 +362,46 @@
   NSRect scr = [[NSScreen mainScreen] visibleFrame];
   NSRect wrect = NSZeroRect;
   NSUInteger i;  
-
-  #define WMARGIN 50
-  #define WSHIFT 50
-
+  
+#define WMARGIN 40
+#define WSHIFT 40
+  
+  if ([fileOperations count] == 0)
+    return wrect;
+  
   scr.origin.x += WMARGIN;
   scr.origin.y += WMARGIN;
   scr.size.width -= (WMARGIN * 2);
   scr.size.height -= (WMARGIN * 2);
+  
+  i = [fileOperations count];
+  while (i > 0 && NSEqualRects(wrect, NSZeroRect) == YES)
+    {
+      FileOpInfo *op = [fileOperations objectAtIndex: i-1];
+  
+      if ([op win])
+        {
+          NSRect wr;
 
-  for (i = [fileOperations count]; i > 0; i--) {
-    FileOpInfo *op = [fileOperations objectAtIndex: i];
-
-    if ([op win]) {
-      NSRect wr;
-
-      [op getWinRect: &wr];
-      if (NSEqualRects(wr, NSZeroRect) == NO) {
-        wrect = NSMakeRect(wr.origin.x + WSHIFT, 
-                           wr.origin.y - wr.size.height - WSHIFT,
-                           wr.size.width,
-                           wr.size.height);
-
-        if (NSContainsRect(scr, wrect) == NO) {
-          wrect = NSMakeRect(scr.origin.x, 
-                             scr.size.height - wr.size.height,
-                             wr.size.width, 
-                             wr.size.height);
-          break;
+          [op getWinRect: &wr];
+          if (NSEqualRects(wr, NSZeroRect) == NO)
+            {
+              wrect = NSMakeRect(wr.origin.x + WSHIFT, 
+                                 wr.origin.y - wr.size.height - WSHIFT,
+                                 wr.size.width,
+                                 wr.size.height);
+              
+              if (NSContainsRect(scr, wrect) == NO)
+                {
+                  wrect = NSMakeRect(scr.origin.x, 
+                                     scr.size.height - wr.size.height,
+                                     wr.size.width, 
+                                     wr.size.height);
+                }
+            }
         }
-      }
+      i--;
     }
-  }
 
   return wrect;
 }
