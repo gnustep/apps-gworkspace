@@ -655,6 +655,7 @@
 
 - (void)applicationTerminated:(GWLaunchedApp *)app
 {
+  NSLog(@"WorkspaceApplication applicationTerminated: %@", app);
   if (app == activeApplication) {
     activeApplication = nil;
   }
