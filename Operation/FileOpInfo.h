@@ -27,6 +27,10 @@
 
 @class FileOpExecutor;
 
+@class NSWindow;
+@class NSTextField;
+@class NSButton;
+@class NSProgressIndicator;
 
 @protocol FileOpInfoProtocol
 
@@ -104,14 +108,14 @@
     
   id controller;  
 
-  IBOutlet id win;
-  IBOutlet id fromLabel;
-  IBOutlet id fromField;
-  IBOutlet id toLabel;
-  IBOutlet id toField;
+  IBOutlet NSWindow *win;
+  IBOutlet NSTextField *fromLabel;
+  IBOutlet NSTextField *fromField;
+  IBOutlet NSTextField *toLabel;
+  IBOutlet NSTextField *toField;
   IBOutlet NSProgressIndicator *progInd;
-  IBOutlet id pauseButt;
-  IBOutlet id stopButt;  
+  IBOutlet NSButton *pauseButt;
+  IBOutlet NSButton *stopButt;  
 }
 
 + (id)operationOfType:(NSString *)tp
