@@ -1,6 +1,6 @@
 /* main.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-20104Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2004
@@ -33,32 +33,32 @@ void createMenu();
 
 int main(int argc, char **argv, char **env)
 {
-	CREATE_AUTORELEASE_POOL (pool);
+  CREATE_AUTORELEASE_POOL (pool);
   Recycler *recycler = [Recycler recycler];
-	NSApplication *app = [NSApplication sharedApplication];
+  NSApplication *app = [NSApplication sharedApplication];
 
-	createMenu();
+  createMenu();
 
   [app setDelegate: recycler];    
-	[app run];
-	RELEASE (pool);
+  [app run];
+  RELEASE (pool);
   
   return 0;
 }
 
-NSMenuItem *addMenuItem(NSMenu *menu, NSString *str, 
-																NSString *comm, NSString *sel, NSString *key)
+id<NSMenuItem> addMenuItem(NSMenu *menu, NSString *str, 
+                        NSString *comm, NSString *sel, NSString *key)
 {
-	NSMenuItem *item = [menu addItemWithTitle: NSLocalizedString(str, comm)
-												action: NSSelectorFromString(sel) keyEquivalent: key]; 
-	return item;
+  id<NSMenuItem>item = [menu addItemWithTitle: NSLocalizedString(str, comm)
+                                       action: NSSelectorFromString(sel) keyEquivalent: key]; 
+  return item;
 }
 
 void createMenu()
 {
   NSMenu *mainMenu;
-	NSMenu *info, *file, *edit;
-	NSMenuItem *menuItem;
+  NSMenu *info, *file, *edit;
+  id<NSMenuItem> menuItem;
 
 	// Main
   mainMenu = AUTORELEASE ([[NSMenu alloc] initWithTitle: @"Recycler"]);

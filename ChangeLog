@@ -1,3 +1,9 @@
+2014-12-30 Riccardo Mottola <rm@gnu.org>
+
+	* Recycler/main.m
+	* GWorkspace/GWorkspace.m
+	Fix warnings: update code to use id<NSMenuItem> and not NSMenuItem*
+
 2014-12-29 Riccardo Mottola <rm@gnu.org>
 
 	* Operation/Operation.m (rectForFileOpWindow)

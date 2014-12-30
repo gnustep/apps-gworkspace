@@ -158,7 +158,7 @@ static GWorkspace *gworkspace = nil;
   NSMenu *menu;
   NSMenu *subMenu;
   NSMenu *windows, *services;  
-  NSMenuItem *menuItem;
+  id<NSMenuItem> menuItem;
     	
   // Info
   menuItem = [mainMenu addItemWithTitle:_(@"Info") action:NULL keyEquivalent:@""];
