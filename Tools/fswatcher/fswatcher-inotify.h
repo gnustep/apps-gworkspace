@@ -26,8 +26,7 @@
 #define FSWATCHER_INOTIFY_H
 
 #include <sys/types.h>
-#include "local_inotify.h"
-#include "local_inotify_syscalls.h"
+#include <sys/inotify.h>
 #include <Foundation/Foundation.h>
 #include "DBKPathsTree.h"
 
