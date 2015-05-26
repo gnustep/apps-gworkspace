@@ -1474,7 +1474,8 @@ static GWorkspace *gworkspace = nil;
   NSArray *vpaths = [ws mountedLocalVolumePaths];
   NSMutableArray *umountPaths = [NSMutableArray array];
   NSMutableArray *files = [NSMutableArray array];
-  int tag, i;
+  NSUInteger i;
+  int tag;
 
   for (i = 0; i < [selectedPaths count]; i++) {
     NSString *path = [selectedPaths objectAtIndex: i];
@@ -1490,23 +1491,25 @@ static GWorkspace *gworkspace = nil;
     [ws unmountAndEjectDeviceAtPath: [umountPaths objectAtIndex: i]];
   }
 
-  if ([files count]) {
-    NSString *basePath = [NSString stringWithString: [selectedPaths objectAtIndex: 0]];
+  if ([files count])
+    {
+      NSString *basePath = [NSString stringWithString: [selectedPaths objectAtIndex: 0]];
 
-    basePath = [basePath stringByDeletingLastPathComponent];
+      basePath = [basePath stringByDeletingLastPathComponent];
 
-	  if ([fm isWritableFileAtPath: basePath] == NO) {
-		  NSString *err = NSLocalizedString(@"Error", @"");
-		  NSString *msg = NSLocalizedString(@"You do not have write permission\nfor", @"");
-		  NSString *buttstr = NSLocalizedString(@"Continue", @"");
-      NSRunAlertPanel(err, [NSString stringWithFormat: @"%@ \"%@\"!\n", msg, basePath], buttstr, nil, nil);   
-		  return;
-	  }
+      if ([fm isWritableFileAtPath: basePath] == NO)
+        {
+          NSString *err = NSLocalizedString(@"Error", @"");
+          NSString *msg = NSLocalizedString(@"You do not have write permission\nfor", @"");
+          NSString *buttstr = NSLocalizedString(@"Continue", @"");
+          NSRunAlertPanel(err, [NSString stringWithFormat: @"%@ \"%@\"!\n", msg, basePath], buttstr, nil, nil);   
+          return;
+        }
 
-    [self performFileOperation: NSWorkspaceRecycleOperation
-                    source: basePath destination: trashPath 
-                                              files: files tag: &tag];
-  }
+      [self performFileOperation: NSWorkspaceRecycleOperation
+                          source: basePath destination: trashPath 
+                           files: files tag: &tag];
+    }
 }
 
 - (BOOL)verifyFileAtPath:(NSString *)path
