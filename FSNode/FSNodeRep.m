@@ -1,6 +1,6 @@
 /* FSNodeRep.m
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2015 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola <rm@gnu.org>
@@ -168,7 +168,7 @@ static FSNodeRep *shared = nil;
   NSMutableArray *bundlesPaths;
   NSEnumerator *enumerator;
   NSMutableArray *loaded;
-  int i;
+  NSUInteger i;
   
   bundlesPaths = [NSMutableArray array];
 
@@ -913,7 +913,7 @@ static FSNodeRep *shared = nil;
   NSArray *reserved = [self reservedMountNames];
   unsigned i;
 
-  NSLog(@"mountedLcoalVolumePaths");
+  NSLog(@"FSNodeRep: mountedLocalVolumePaths");
   for (i = 0; i < [mounted count]; i++)
     {
       NSDictionary *dict = [mounted objectAtIndex: i];
