@@ -1,5 +1,11 @@
 2015-05-26 Riccardo Mottola <rm@gnu.org>
 
+	* Operation/Operation.m
+	* Operation/Resources/English.lproj/Localizable.strings
+	Verify and protect certain directories from file operations.
+
+2015-05-26 Riccardo Mottola <rm@gnu.org>
+
 	* GWorkspace/FileViewer/GWViewer.m
 	Regenerate and propagate selection on windows key change, even if it did not change inside the viewer.
 
@@ -495,7 +501,6 @@
 	* FSNode/FSNIconsView.h
 	* FSNode/FSNListView.h
 	Fix warnings about not implemented protocols.
-
 2013-02-28 Riccardo Mottola <rm@gnu.org>
 
 	* GWMetadata/gmds/gmds/gmds.m

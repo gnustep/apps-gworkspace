@@ -101,6 +101,8 @@
 "Some items have the same name;\ndo you want to substitute them?" = "Some items have the same name;\ndo you want to substitute them?";
 "Error" = "Error";
 "File Operation Error!" = "File Operation Error!";
+": no such file or directory!" = ": no such file or directory!";
+": Directory Protected!" = ": Directory Protected!";
 
 
 /* ColumnIcon.m */

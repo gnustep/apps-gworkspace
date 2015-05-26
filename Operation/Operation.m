@@ -1,6 +1,6 @@
 /* Operation.m
  *  
- * Copyright (C) 2004-2014 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2015 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -411,46 +411,104 @@
 {
   NSString *chpath = path;
   BOOL valid;
+  BOOL isDir;
   
   if (operation && ([operation isEqual: @"GWorkspaceCreateDirOperation"]
-                  || [operation isEqual: @"GWorkspaceCreateFileOperation"])) {    
-    chpath = [path stringByDeletingLastPathComponent];
-  }
+                  || [operation isEqual: @"GWorkspaceCreateFileOperation"]))
+    {    
+      chpath = [path stringByDeletingLastPathComponent];
+    }
   
-  valid = [fm fileExistsAtPath: chpath];
+  valid = [fm fileExistsAtPath: chpath isDirectory:&isDir];
   
-  if (valid == NO) {
+  if (valid == NO)
+    {
     /* case of broken symlink */
     valid = ([fm fileAttributesAtPath: chpath traverseLink: NO] != nil);
   }
   
-  if (valid == NO) {
-		NSString *err = NSLocalizedString(@"Error", @"");
-		NSString *msg = NSLocalizedString(@": no such file or directory!", @"");
-		NSString *buttstr = NSLocalizedString(@"Continue", @"");
-		NSMutableDictionary *notifObj = [NSMutableDictionary dictionaryWithCapacity: 1];		
-		NSString *basePath = [chpath stringByDeletingLastPathComponent];
-		
-    NSRunAlertPanel(err, [NSString stringWithFormat: @"%@%@", chpath, msg], buttstr, nil, nil);   
-
-		[notifObj setObject: NSWorkspaceDestroyOperation forKey: @"operation"];	
-  	[notifObj setObject: basePath forKey: @"source"];	
-  	[notifObj setObject: basePath forKey: @"destination"];	
-  	[notifObj setObject: [NSArray arrayWithObject: [chpath lastPathComponent]] 
-                 forKey: @"files"];	
-
-    [[NSDistributedNotificationCenter defaultCenter]
+  if (valid == NO)
+    {
+      NSString *err = NSLocalizedString(@"Error", @"");
+      NSString *msg = NSLocalizedString(@": no such file or directory!", @"");
+      NSString *buttstr = NSLocalizedString(@"Continue", @"");
+      NSMutableDictionary *notifObj = [NSMutableDictionary dictionaryWithCapacity: 1];		
+      NSString *basePath = [chpath stringByDeletingLastPathComponent];
+      
+      NSRunAlertPanel(err, [NSString stringWithFormat: @"%@%@", chpath, msg], buttstr, nil, nil);   
+      
+      [notifObj setObject: NSWorkspaceDestroyOperation forKey: @"operation"];	
+      [notifObj setObject: basePath forKey: @"source"];	
+      [notifObj setObject: basePath forKey: @"destination"];	
+      [notifObj setObject: [NSArray arrayWithObject: [chpath lastPathComponent]] 
+                   forKey: @"files"];	
+      
+      [[NSDistributedNotificationCenter defaultCenter]
  				postNotificationName: @"GWFileSystemWillChangeNotification"
-	 								object: nil userInfo: notifObj];
-
-    [[NSDistributedNotificationCenter defaultCenter]
+                                              object: nil userInfo: notifObj];
+      
+      [[NSDistributedNotificationCenter defaultCenter]
  				postNotificationName: @"GWFileSystemDidChangeNotification"
-	 								object: nil userInfo: notifObj];
+                                              object: nil userInfo: notifObj];
+      
+      return NO;
+    }
+  else
+    {
+      if ([operation isEqual: NSWorkspaceMoveOperation]
+          || [operation isEqual: NSWorkspaceRecycleOperation]
+          || [operation isEqual: NSWorkspaceDestroyOperation] 
+          || [operation isEqual: @"GWorkspaceRecycleOutOperation"]
+          || [operation isEqual: @"GWorkspaceRenameOperation"])
+        {
+          if (isDir)
+            {
+              NSArray *specialPathArray;
+              NSString *fullPath;
+              BOOL protected = NO;
 
-		return NO;
-	}
-	
-	return YES;
+              NSString *err = NSLocalizedString(@"Error", @"");
+              NSString *msg = NSLocalizedString(@": Directory Protected!", @"");
+              NSString *buttstr = NSLocalizedString(@"Continue", @"");
+              NSMutableDictionary *notifObj = [NSMutableDictionary dictionaryWithCapacity: 1];		
+      
+              
+              fullPath = [path stringByExpandingTildeInPath];
+              specialPathArray = NSSearchPathForDirectoriesInDomains(NSApplicationDirectory, NSAllDomainsMask, YES);
+              if ([specialPathArray indexOfObject:fullPath] != NSNotFound)
+                protected = YES;
+
+              if (!protected)
+                {
+                  specialPathArray = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSAllDomainsMask, YES);
+                  if ([specialPathArray indexOfObject:fullPath] != NSNotFound)
+                    protected = YES;
+                }
+
+              if (!protected)
+                {
+                  specialPathArray = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSAllDomainsMask, YES);
+                  if ([specialPathArray indexOfObject:fullPath] != NSNotFound)
+                    protected = YES;
+                }
+
+              if (!protected)
+                {
+                  specialPathArray = NSSearchPathForDirectoriesInDomains(NSDesktopDirectory, NSAllDomainsMask, YES);
+                  if ([specialPathArray indexOfObject:fullPath] != NSNotFound)
+                    protected = YES;;
+                }
+
+              if (protected)
+                {
+                  NSRunAlertPanel(err, [NSString stringWithFormat: @"%@%@", path, msg], buttstr, nil, nil);
+                  return NO;
+                }
+            }        
+        }
+    }
+  
+  return YES;
 }
 
 - (BOOL)ascendentOfPath:(NSString *)path 
