@@ -116,13 +116,13 @@
 {	
   FSNodeRep *fsnodeRep;
   
-	NSArray *selectedPaths;
+  NSArray *selectedPaths;
   NSMutableArray *trashContents;
   NSString *trashPath;
   
   id fswatcher;
   BOOL fswnotifications;
-	NSCountedSet *watchedPaths;
+  NSCountedSet *watchedPaths;
   
   id recyclerApp;
   BOOL recyclerCanQuit;
@@ -134,7 +134,7 @@
   Fiend *fiend;
   
   History *history;
-	int maxHistoryCache;
+  int maxHistoryCache;
     
   GWViewersManager *vwrsManager;
   GWDesktopManager *dtopManager;  
@@ -156,7 +156,7 @@
   
   NSString *gwProcessName;  	      
   NSString *gwBundlePath;  	      
-	NSString *defEditor;
+  NSString *defEditor;
   NSString *defXterm;
   NSString *defXtermArgs;
   BOOL teminalService;
