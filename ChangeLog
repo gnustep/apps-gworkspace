@@ -1,6 +1,12 @@
 2015-05-26 Riccardo Mottola <rm@gnu.org>
 
 	* Tools/fswatcher/fswatcher-inotify.h
+	* Tools/fswatcher/fswatcher-inotify.m
+	Cleanup and implement --auto and --daemon like fswatcher.m
+
+2015-05-26 Riccardo Mottola <rm@gnu.org>
+
+	* Tools/fswatcher/fswatcher-inotify.h
 	Use linux inotify, as suggested by Adrian Bunk
 
 	* Tools/fswatcher/local_inotify.h

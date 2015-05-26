@@ -1,9 +1,9 @@
 /* fswatcher-inotify.h
  *  
- * Copyright (C) 2007 Free Software Foundation, Inc.
+ * Copyright (C) 2007-2015 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@fibernet.ro>
- * Date: Ianuary 2007
+ * Date: January 2007
  *
  * This file is part of the GNUstep GWorkspace application
  *
@@ -27,12 +27,12 @@
 
 #include <sys/types.h>
 #include <sys/inotify.h>
-#include <Foundation/Foundation.h>
+#import <Foundation/Foundation.h>
 #include "DBKPathsTree.h"
 
 @class Watcher;
 
-@protocol	FSWClientProtocol
+@protocol	FSWClientProtocol <NSObject>
 
 - (oneway void)watchedPathDidChange:(NSData *)dirinfo;
 

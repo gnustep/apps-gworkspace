@@ -1,9 +1,9 @@
 /* fswatcher-inotify.m
  *  
- * Copyright (C) 2007-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2007-2015 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@fibernet.ro>
- * Date: Ianuary 2007
+ * Date: January 2007
  *
  * This file is part of the GNUstep GWorkspace application
  *
@@ -22,12 +22,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include "fswatcher-inotify.h"
+#import "fswatcher-inotify.h"
 #include "config.h"
 
 #define GWDebugLog(format, args...) \
   do { if (GW_DEBUG_LOG) \
     NSLog(format , ## args); } while (0)
+
+static BOOL	is_daemon = NO;		/* Currently running as daemon.	 */
+static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 
 static NSString *GWWatchedPathDeleted = @"GWWatchedPathDeleted";
 static NSString *GWFileDeletedInWatchedDirectory = @"GWFileDeletedInWatchedDirectory";
@@ -50,12 +53,13 @@ static NSString *GWWatchedPathRenamed = @"GWWatchedPathRenamed";
 {
   self = [super init];
   
-  if (self) {
-		client = nil;
-		conn = nil;
-    wpaths = [[NSCountedSet alloc] initWithCapacity: 1];
-    global = NO;
-  }
+  if (self)
+    {
+      client = nil;
+      conn = nil;
+      wpaths = [[NSCountedSet alloc] initWithCapacity: 1];
+      global = NO;
+    }
   
   return self;
 }
@@ -119,15 +123,17 @@ static NSString *GWWatchedPathRenamed = @"GWWatchedPathRenamed";
 {
   int i;
 
-  for (i = 0; i < [clientsInfo count]; i++) {
-    NSConnection *connection = [[clientsInfo objectAtIndex: i] connection];
+  for (i = 0; i < [clientsInfo count]; i++)
+    {
+      NSConnection *connection = [[clientsInfo objectAtIndex: i] connection];
 
-		if (connection) {
-      [nc removeObserver: self
-		                name: NSConnectionDidDieNotification
-		              object: connection];
-		}
-  }
+      if (connection)
+	{
+	  [nc removeObserver: self
+			name: NSConnectionDidDieNotification
+		      object: connection];
+	}
+    }
   
   if (conn) {
     [nc removeObserver: self
@@ -153,30 +159,33 @@ static NSString *GWWatchedPathRenamed = @"GWWatchedPathRenamed";
 {
   self = [super init];
   
-  if (self) {    
-    int fd;
+  if (self)
+    {    
+      int fd;
 
-    fm = [NSFileManager defaultManager];	
-    nc = [NSNotificationCenter defaultCenter];
-    dnc = [NSDistributedNotificationCenter defaultCenter];
-               
-    conn = [NSConnection defaultConnection];
-    [conn setRootObject: self];
-    [conn setDelegate: self];
+      fm = [NSFileManager defaultManager];	
+      nc = [NSNotificationCenter defaultCenter];
+      dnc = [NSDistributedNotificationCenter defaultCenter];
+      
+      conn = [NSConnection defaultConnection];
+      [conn setRootObject: self];
+      [conn setDelegate: self];
     
-    if ([conn registerName: @"fswatcher"] == NO) {
-	    NSLog(@"unable to register with name server.");
-	    DESTROY (self);
-	    return self;
-	  }
+      if ([conn registerName: @"fswatcher"] == NO)
+	{
+	  NSLog(@"unable to register with name server.");
+	  DESTROY (self);
+	  return self;
+	}
 
-    fd = inotify_init();  
+      fd = inotify_init();  
   
-    if (fd == -1) {
-      NSLog(@"inotify_init() failed!");
-      DESTROY (self);
-      return self;  
-    }
+      if (fd == -1)
+	{
+	  NSLog(@"inotify_init() failed!");
+	  DESTROY (self);
+	  return self;  
+	}
     
     inotifyHandle = [[NSFileHandle alloc] initWithFileDescriptor: fd 
                                                   closeOnDealloc: YES];  
@@ -255,29 +264,41 @@ static NSString *GWWatchedPathRenamed = @"GWWatchedPathRenamed";
 	              name: NSConnectionDidDieNotification
 	            object: connection];
 
-  if (connection == conn) {
-    NSLog(@"argh - fswatcher server root connection has been destroyed.");
-    exit(EXIT_FAILURE);
-    
-  } else {
-		FSWClientInfo *info = [self clientInfoWithConnection: connection];
-	
-		if (info) {
-      NSSet *wpaths = [info watchedPaths];
-      NSEnumerator *enumerator = [wpaths objectEnumerator];
-      NSString *wpath;
+  if (connection == conn)
+    {
+      NSLog(@"argh - fswatcher server root connection has been destroyed.");
+      exit(EXIT_FAILURE);  
+    }
+  else
+    {
+      FSWClientInfo *info = [self clientInfoWithConnection: connection];
       
-      while ((wpath = [enumerator nextObject])) {
-        Watcher *watcher = [self watcherForPath: wpath];
-      
-        if (watcher) {
-          [watcher removeListener];
-        }      
-      }
-          
-			[clientsInfo removeObject: info];
-		}
+      if (info)
+	{
+	  NSSet *wpaths = [info watchedPaths];
+	  NSEnumerator *enumerator = [wpaths objectEnumerator];
+	  NSString *wpath;
+	  
+	  while ((wpath = [enumerator nextObject]))
+	    {
+	      Watcher *watcher = [self watcherForPath: wpath];
+	      
+	      if (watcher)
+		[watcher removeListener];
+	    }
+	  
+	  [clientsInfo removeObject: info];
 	}
+      
+      if (auto_stop == YES && [clientsInfo count] <= 1)
+	{
+	  /* If there is nothing else using this process, and this is not
+	   * a daemon, then we can quietly terminate.
+	   */
+	  NSLog(@"No more clients, shutting down.");
+	  exit(EXIT_SUCCESS);
+	}
+    }
 }
 
 - (void)setDefaultGlobalPaths
@@ -425,7 +446,15 @@ static NSString *GWWatchedPathRenamed = @"GWWatchedPathRenamed";
 	              name: NSConnectionDidDieNotification
 	            object: connection];
 
-  [clientsInfo removeObject: info];  
+  [clientsInfo removeObject: info];
+  
+  if (auto_stop == YES && [clientsInfo count] <= 1)
+    {
+      /* If there is nothing else using this process, and this is not
+       * a daemon, then we can quietly terminate.
+       */
+      exit(EXIT_SUCCESS);
+    }
 }
 
 - (FSWClientInfo *)clientInfoWithConnection:(NSConnection *)connection
@@ -1046,11 +1075,17 @@ int main(int argc, char** argv)
   static BOOL	is_daemon = NO;
   BOOL subtask = YES;
 
-  if ([[info arguments] containsObject: @"--daemon"]) {
+  if ([[info arguments] containsObject: @"--auto"] == YES)
+  {
+    auto_stop = YES;
+  }
+    
+  if ([[info arguments] containsObject: @"--daemon"])
+  {
     subtask = NO;
     is_daemon = YES;
   }
-
+  
   if (subtask) {
     NSTask *task = [NSTask new];
     
