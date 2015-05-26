@@ -1,6 +1,6 @@
 /* GWViewer.m
  *  
- * Copyright (C) 2004-2014 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2015 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola
@@ -533,9 +533,8 @@
   FSNode *node;
   NSArray *components;
 
-  if (closing) {
+  if (closing)
     return;
-  }
 
   [manager selectionChanged: newsel];
 
@@ -967,8 +966,8 @@ constrainMinCoordinate:(CGFloat)proposedMin
   if ([selection count] == 0)
     {
       selection = [NSArray arrayWithObject: [nodeView shownNode]];
-      [self selectionChanged: selection];
     }
+  [self selectionChanged: selection];
   
   [manager changeHistoryOwner: self];
 }

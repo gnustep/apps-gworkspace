@@ -3,7 +3,7 @@
     ApplicationDescription = "GNUstep Workspace Manager";
     ApplicationIcon = "FileManager.tiff";
     ApplicationRelease = "0.9.3";
-    NSBuildVersion = "12 2014";
+    NSBuildVersion = "05 2015";
     Authors = (
       "Riccardo Mottola",
       "Enrico Sersale",
@@ -11,7 +11,7 @@
       "Dennis Leeuw <dleeuw@made-it.com>"
     );
     URL = "http://www.gnustep.org/experience/GWorkspace.html";
-    Copyright = "Copyright (C) 2003-2014 Free Software Foundation, Inc.";
+    Copyright = "Copyright (C) 2003-2015 Free Software Foundation, Inc.";
     CopyrightDescription = "Released under the GNU General Public License 2.0 or later";
     NSIcon = "FileManager.tiff";
     NSRole = "Viewer";
