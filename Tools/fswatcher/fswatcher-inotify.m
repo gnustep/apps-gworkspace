@@ -24,6 +24,7 @@
 
 #import "fswatcher-inotify.h"
 #include "config.h"
+#include <unistd.h>
 
 #define GWDebugLog(format, args...) \
   do { if (GW_DEBUG_LOG) \
@@ -121,7 +122,7 @@ static NSString *GWWatchedPathRenamed = @"GWWatchedPathRenamed";
 
 - (void)dealloc
 {
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [clientsInfo count]; i++)
     {
@@ -305,7 +306,7 @@ static NSString *GWWatchedPathRenamed = @"GWWatchedPathRenamed";
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   id entry;
-  unsigned i;
+  NSUInteger i;
   
   [defaults synchronize];
 
@@ -372,7 +373,7 @@ static NSString *GWWatchedPathRenamed = @"GWWatchedPathRenamed";
   NSArray *excluded = [info objectForKey: @"GSMetadataExcludedPaths"];
   NSArray *suffixes = [info objectForKey: @"GSMetadataExcludedSuffixes"];
   
-  unsigned i;
+  NSUInteger i;
 
   emptyTreeWithBase(includePathsTree);
   
@@ -393,19 +394,21 @@ static NSString *GWWatchedPathRenamed = @"GWWatchedPathRenamed";
 - (oneway void)registerClient:(id <FSWClientProtocol>)client
               isGlobalWatcher:(BOOL)global
 {
-	NSConnection *connection = [(NSDistantObject *)client connectionForProxy];
+  NSConnection *connection = [(NSDistantObject *)client connectionForProxy];
   FSWClientInfo *info = [self clientInfoWithConnection: connection];
 
-	if (info == nil) {
-    [NSException raise: NSInternalInconsistencyException
-		            format: @"registration with unknown connection"];
-  }
+  if (info == nil)
+    {
+      [NSException raise: NSInternalInconsistencyException
+		  format: @"registration with unknown connection"];
+    }
 
-  if ([info client] != nil) { 
-    [NSException raise: NSInternalInconsistencyException
-		            format: @"registration with registered client"];
-  }
-
+  if ([info client] != nil)
+    { 
+      [NSException raise: NSInternalInconsistencyException
+		  format: @"registration with registered client"];
+    }
+  
   if ([(id)client isProxy] == YES) {
     [(id)client setProtocolForProxy: @protocol(FSWClientProtocol)];
     [info setClient: client];  
@@ -415,13 +418,13 @@ static NSString *GWWatchedPathRenamed = @"GWWatchedPathRenamed";
 
 - (oneway void)unregisterClient:(id <FSWClientProtocol>)client
 {
-	NSConnection *connection = [(NSDistantObject *)client connectionForProxy];
+  NSConnection *connection = [(NSDistantObject *)client connectionForProxy];
   FSWClientInfo *info = [self clientInfoWithConnection: connection];
   NSSet *wpaths;
   NSEnumerator *enumerator;
   NSString *wpath;
 
-	if (info == nil) {
+  if (info == nil) {
     [NSException raise: NSInternalInconsistencyException
 		            format: @"unregistration with unknown connection"];
   }
@@ -459,7 +462,7 @@ static NSString *GWWatchedPathRenamed = @"GWWatchedPathRenamed";
 
 - (FSWClientInfo *)clientInfoWithConnection:(NSConnection *)connection
 {
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [clientsInfo count]; i++) {
     FSWClientInfo *info = [clientsInfo objectAtIndex: i];
@@ -474,27 +477,27 @@ static NSString *GWWatchedPathRenamed = @"GWWatchedPathRenamed";
 
 - (FSWClientInfo *)clientInfoWithRemote:(id)remote
 {
-  int i;
+  NSUInteger i;
 
-  for (i = 0; i < [clientsInfo count]; i++) {
-    FSWClientInfo *info = [clientsInfo objectAtIndex: i];
+  for (i = 0; i < [clientsInfo count]; i++)
+    {
+      FSWClientInfo *info = [clientsInfo objectAtIndex: i];
+      
+      if ([info client] == remote)
+	return info;
+    }
   
-		if ([info client] == remote) {
-			return info;
-		}
-  }
-
-	return nil;
+  return nil;
 }
 
 - (oneway void)client:(id <FSWClientProtocol>)client
                               addWatcherForPath:(NSString *)path
 {
-	NSConnection *connection = [(NSDistantObject *)client connectionForProxy];
+  NSConnection *connection = [(NSDistantObject *)client connectionForProxy];
   FSWClientInfo *info = [self clientInfoWithConnection: connection];
   Watcher *watcher = [self watcherForPath: path];
 
-	if (info == nil) {
+  if (info == nil) {
     [NSException raise: NSInternalInconsistencyException
 		            format: @"adding watcher from unknown connection"];
   }
@@ -540,7 +543,7 @@ static NSString *GWWatchedPathRenamed = @"GWWatchedPathRenamed";
 - (oneway void)client:(id <FSWClientProtocol>)client
                                 removeWatcherForPath:(NSString *)path
 {
-	NSConnection *connection = [(NSDistantObject *)client connectionForProxy];
+  NSConnection *connection = [(NSDistantObject *)client connectionForProxy];
   FSWClientInfo *info = [self clientInfoWithConnection: connection];
   Watcher *watcher = [self watcherForPath: path];
   
@@ -597,7 +600,7 @@ static NSString *GWWatchedPathRenamed = @"GWWatchedPathRenamed";
   CREATE_AUTORELEASE_POOL(pool);
   NSString *path = [info objectForKey: @"path"];
   NSData *data = [NSArchiver archivedDataWithRootObject: info];
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [clientsInfo count]; i++) {
     FSWClientInfo *clinfo = [clientsInfo objectAtIndex: i];
@@ -612,7 +615,7 @@ static NSString *GWWatchedPathRenamed = @"GWWatchedPathRenamed";
 
 - (void)notifyGlobalWatchingClients:(NSDictionary *)info
 {
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [clientsInfo count]; i++) {
     FSWClientInfo *clinfo = [clientsInfo objectAtIndex: i];

@@ -114,7 +114,7 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 
 - (void)dealloc
 {
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [clientsInfo count]; i++)
     {
@@ -418,7 +418,7 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 
 - (FSWClientInfo *)clientInfoWithConnection:(NSConnection *)connection
 {
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [clientsInfo count]; i++)
     {
@@ -434,17 +434,17 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 
 - (FSWClientInfo *)clientInfoWithRemote:(id)remote
 {
-  int i;
+  NSUInteger i;
 
-  for (i = 0; i < [clientsInfo count]; i++) {
-    FSWClientInfo *info = [clientsInfo objectAtIndex: i];
-  
-		if ([info client] == remote) {
-			return info;
-		}
-  }
+  for (i = 0; i < [clientsInfo count]; i++)
+    {
+      FSWClientInfo *info = [clientsInfo objectAtIndex: i];
+      
+      if ([info client] == remote)
+	return info;
+    }
 
-	return nil;
+  return nil;
 }
 
 - (oneway void)client:(id <FSWClientProtocol>)client
