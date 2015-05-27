@@ -496,7 +496,7 @@
                 {
                   specialPathArray = NSSearchPathForDirectoriesInDomains(NSDesktopDirectory, NSAllDomainsMask, YES);
                   if ([specialPathArray indexOfObject:fullPath] != NSNotFound)
-                    protected = YES;;
+                    protected = YES;
                 }
 
               if (protected)
