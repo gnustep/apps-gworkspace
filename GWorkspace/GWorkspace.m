@@ -23,10 +23,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
+#include "config.h"
+
 /* the following for getrlimit */
 #include <sys/types.h>
 #include <sys/time.h>
+#ifdef HAVE_SYS_RESOURCE_H
 #include <sys/resource.h>
+#endif
 /* getrlimit */
 
 #import <Foundation/Foundation.h>

@@ -1,3 +1,11 @@
+	2015-09-16 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/GWorkspace.m
+	* GWorkspace/config.h.in
+	* GWorkspace/configure
+	* GWorkspace/configure.ac
+	Add check for sys/resource.h
+
 2015-05-26 Riccardo Mottola <rm@gnu.org>
 
 	* Operation/Operation.m

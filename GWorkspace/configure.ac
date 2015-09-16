@@ -5,6 +5,8 @@ if test -z "$GNUSTEP_MAKEFILES"; then
   AC_MSG_ERROR([You must run the GNUstep initialization script first!])
 fi
 
+AC_CHECK_HEADERS([sys/resource.h])
+
 #--------------------------------------------------------------------
 # Use config.guess, config.sub and install-sh provided by gnustep-make
 #--------------------------------------------------------------------
@@ -28,7 +30,6 @@ else
 fi
 
 AC_DEFINE_UNQUOTED([GW_DEBUG_LOG], [$GW_DEBUG_LOG], [debug logging])
-
 
 AC_CONFIG_FILES([GNUmakefile])
 
