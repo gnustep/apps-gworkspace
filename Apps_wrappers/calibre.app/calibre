@@ -1,0 +1,16 @@
+#!/bin/sh
+
+if [ "$1" = "-GSFilePath" ] || [ "$1" = "-GSTempPath" ]; then
+   file="$2"
+else
+   file="$1"
+fi
+
+if [ -z "$file" ]; then 
+   calibre &
+   exit
+else
+   calibre $file
+   exit
+fi
+

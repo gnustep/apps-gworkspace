@@ -1,0 +1,28 @@
+{
+  NSExecutable = "calibre";
+  NSIcon = "calibre.tiff";
+  NSRole = "Viewer";
+	XAppWrapper = YES;
+  NSTypes = (
+    {
+      NSUnixExtensions = ( "lrf" );
+      NSIcon = "calibre-lrf.tiff";
+    },
+    {
+      NSUnixExtensions = ( "epub", "pobi" );
+      NSIcon = "calibre-mobi.tiff";
+    },
+    {
+      NSUnixExtensions = ( "azw2" );
+      NSIcon = "calibre-azw2.tiff";
+    },
+    {
+      NSUnixExtensions = ( "azw3" );
+      NSIcon = "calibre-azw3.tiff";
+    },
+    {
+      NSUnixExtensions = ( "tpz", "azw", "azw1" );
+      NSIcon = "calibre-tpz.tiff";
+    }
+  );
+}
