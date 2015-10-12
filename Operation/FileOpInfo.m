@@ -1,6 +1,6 @@
 /* FileOpInfo.m
  *  
- * Copyright (C) 2004-2014 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2015 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola <rm@gnu.org>
@@ -397,7 +397,6 @@ static NSString *nibName = @"FileOperationWin";
   pFData = [executor processedFiles];
   pFiles = [NSUnarchiver unarchiveObjectWithData: pFData];
 
-  NSLog(@"remove files: %@", pFiles);
   for (i = 0; i < [pFiles count]; i++)
     {
       NSDictionary *fi;
@@ -421,7 +420,6 @@ static NSString *nibName = @"FileOperationWin";
           [files removeObjectAtIndex:j];
         }
     }
-  NSLog(@"removeFile - remaining files... %d", [files count]);
 }
 
 - (void)showProgressWin
