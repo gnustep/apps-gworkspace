@@ -1,7 +1,16 @@
 2015-10-12 Riccardo Mottola <rm@gnu.org>
 
+	* GWorkspace/FileViewer/GWViewersManager.m (viewerForNode)
+	* GWorkspace/GWorkspace.m
+	Remove unnused parameter closeOldViewer (was always nil)
+
+2015-10-12 Riccardo Mottola <rm@gnu.org>
+
 	* Operation/Operation.m
 	Remove unused variable.
+
+	* GWorkspace/FileViewer/GWViewersManager.m
+	Fix warnings of NO vs. nil
 
 2015-09-16 Riccardo Mottola <rm@gnu.org>
 

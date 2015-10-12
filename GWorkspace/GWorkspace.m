@@ -1,6 +1,6 @@
 /* GWorkspace.m
  *  
- * Copyright (C) 2003-2014 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2015 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola
@@ -783,7 +783,6 @@ static GWorkspace *gworkspace = nil;
   [vwrsManager viewerForNode: node 
                     showType: 0
                showSelection: NO
-              closeOldViewer: nil
                     forceNew: NO
 	             withKey: nil];
 }

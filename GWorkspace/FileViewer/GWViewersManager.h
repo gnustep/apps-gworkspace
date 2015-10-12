@@ -56,7 +56,6 @@
 - (id)viewerForNode:(FSNode *)node
           showType:(GWViewType)stype
      showSelection:(BOOL)showsel
-    closeOldViewer:(id)oldvwr
           forceNew:(BOOL)force
 	   withKey:(NSString *)key;
            

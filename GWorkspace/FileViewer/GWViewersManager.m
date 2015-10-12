@@ -1,6 +1,6 @@
 /* GWViewersManager.m
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2015 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2004
@@ -119,7 +119,6 @@ static GWViewersManager *vwrsmanager = nil;
               [self viewerForNode: node
                          showType: 0
                     showSelection: YES
-                   closeOldViewer: NO
                          forceNew: YES
 		          withKey: key];
             }
@@ -144,7 +143,6 @@ static GWViewersManager *vwrsmanager = nil;
       viewer = [self viewerForNode: node
 		     showType: 0
                      showSelection: YES
-		     closeOldViewer: NO
 		     forceNew: NO
 		     withKey: nil];
     }
@@ -159,7 +157,6 @@ static GWViewersManager *vwrsmanager = nil;
           viewer = [self viewerForNode: node
                               showType: 0
                          showSelection: YES
-                        closeOldViewer: NO
                               forceNew: YES
 			       withKey: nil];
         }
@@ -195,7 +192,6 @@ static GWViewersManager *vwrsmanager = nil;
       viewer = [self viewerForNode : base
                            showType: 0
                       showSelection: NO
-                     closeOldViewer: NO
                            forceNew: NO
 		            withKey: nil];
     } 
@@ -209,7 +205,6 @@ static GWViewersManager *vwrsmanager = nil;
 - (id)viewerForNode:(FSNode *)node
           showType:(GWViewType)stype
      showSelection:(BOOL)showsel
-    closeOldViewer:(id)oldvwr
           forceNew:(BOOL)force
 	   withKey:(NSString *)key
 {
@@ -232,12 +227,6 @@ static GWViewersManager *vwrsmanager = nil;
       RELEASE (win);
       RELEASE (viewer);
     } 
-  
-  if (oldvwr)
-    {
-      [helpManager removeContextHelpForObject: [[oldvwr win] contentView]];
-      [[oldvwr win] close]; 
-    }
   
   [viewer activate];
   
@@ -437,7 +426,6 @@ static GWViewersManager *vwrsmanager = nil;
                       [self viewerForNode: node 
                                  showType: 0
                             showSelection: NO
-                           closeOldViewer: nil
                                  forceNew: NO
 			          withKey: nil];
                     } 
@@ -497,7 +485,6 @@ static GWViewersManager *vwrsmanager = nil;
           [self viewerForNode: node
                      showType: [viewer viewType]
                 showSelection: NO
-               closeOldViewer: nil
                      forceNew: force
 		      withKey: nil];
         }
