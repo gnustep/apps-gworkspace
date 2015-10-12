@@ -1,3 +1,8 @@
+2015-10-12 Riccardo Mottola <rm@gnu.org>
+
+	* Operation/Operation.m
+	Remove unused variable.
+
 2015-09-16 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/GWorkspace.m

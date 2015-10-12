@@ -469,8 +469,7 @@
 
               NSString *err = NSLocalizedString(@"Error", @"");
               NSString *msg = NSLocalizedString(@": Directory Protected!", @"");
-              NSString *buttstr = NSLocalizedString(@"Continue", @"");
-              NSMutableDictionary *notifObj = [NSMutableDictionary dictionaryWithCapacity: 1];		
+              NSString *buttstr = NSLocalizedString(@"Continue", @"");	
       
               
               fullPath = [path stringByExpandingTildeInPath];
