@@ -1,6 +1,6 @@
 /* FSNIconsView.m
  *  
- * Copyright (C) 2004-2014 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2015 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -1952,7 +1952,7 @@ pp.y = NSMaxY(br) + 1; \
 
     sc = (abs(xsc) >= abs(ysc)) ? xsc : ysc;
           
-    for (i = 0; i < abs(sc / margin); i++) {
+    for (i = 0; i < (int)fabsf(sc / margin); i++) {
       CREATE_AUTORELEASE_POOL (pool);
       NSDate *limit = [NSDate dateWithTimeIntervalSinceNow: 0.01];
       int x = (abs(xsc) >= i) ? (xsc > 0 ? margin : -margin) : 0;

@@ -1,3 +1,8 @@
+2015-10-15 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNIconsView.m
+	Use fabsf() with float argument
+
 2015-10-12 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/FileViewer/GWViewersManager.m (viewerForNode)
