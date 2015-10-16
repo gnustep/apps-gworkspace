@@ -124,118 +124,77 @@
   if (srcImage && [srcImage isValid]) {
     NSData *srcData = [srcImage TIFFRepresentation];
     NSBitmapImageRep *srcRep = [NSBitmapImageRep imageRepWithData: srcData];
-    int spp = [srcRep samplesPerPixel];
+    NSInteger srcSpp = [srcRep samplesPerPixel];
     int bitsPerPixel = [srcRep bitsPerPixel];
-    NSSize srcsize = NSMakeSize([srcRep pixelsWide], [srcRep pixelsHigh]);
+    NSInteger srcsizeW = [srcRep pixelsWide];
+    NSInteger srcsizeH = [srcRep pixelsHigh];
+    NSInteger srcBytesPerPixel = [srcRep bitsPerPixel] / 8;
+    NSInteger srcBytesPerRow = [srcRep bytesPerRow];
 
-    [info setObject: [NSNumber numberWithFloat: srcsize.width] forKey: @"width"];
-    [info setObject: [NSNumber numberWithFloat: srcsize.height] forKey: @"height"];
+    [info setObject: [NSNumber numberWithFloat: (float)srcsizeW] forKey: @"width"];
+    [info setObject: [NSNumber numberWithFloat: (float)srcsizeH] forKey: @"height"];
 
-    if (((imsize.width < srcsize.width) || (imsize.height < srcsize.height))
-                                && (((spp == 3) && (bitsPerPixel == 24)) 
-                                    || ((spp == 4) && (bitsPerPixel == 32))
-                                    || ((spp == 1) && (bitsPerPixel == 8))
-                                    || ((spp == 2) && (bitsPerPixel == 16)))) {            
-      int bpp = bitsPerPixel / 8;
-      BOOL hasAlpha = [srcRep hasAlpha];
-      BOOL isColor = hasAlpha ? (spp > 2) : (spp > 1);
-      NSString *colorSpaceName = isColor ? NSCalibratedRGBColorSpace : NSCalibratedWhiteColorSpace;
-      NSSize dstsize;
+    if (((imsize.width < srcsizeW) || (imsize.height < srcsizeH))
+                                && (((srcSpp == 3) && (bitsPerPixel == 24)) 
+                                    || ((srcSpp == 4) && (bitsPerPixel == 32))
+                                    || ((srcSpp == 1) && (bitsPerPixel == 8))
+                                    || ((srcSpp == 2) && (bitsPerPixel == 16)))) {
+      NSInteger destSamplesPerPixel = srcSpp;
+      NSInteger destBytesPerRow;
+      NSInteger destBytesPerPixel;
+      NSInteger dstsizeW, dstsizeH;
       float xratio, yratio;
       NSBitmapImageRep *dstRep;
       NSData *tiffData;
       unsigned char *srcData;
       unsigned char *destData;
       unsigned x, y;
+      unsigned i;
       
-      if ((imsize.width / srcsize.width) <= (imsize.height / srcsize.height)) {
-        dstsize.width = floor(imsize.width + 0.5);
-        dstsize.height = floor(dstsize.width * srcsize.height / srcsize.width + 0.5);
+      if ((imsize.width / srcsizeW) <= (imsize.height / srcsizeH)) {
+        dstsizeW = floor(imsize.width + 0.5);
+        dstsizeH = floor(dstsizeW * srcsizeH / srcsizeW + 0.5);
       } else {
-        dstsize.height = floor(imsize.height + 0.5);
-        dstsize.width = floor(dstsize.height * srcsize.width / srcsize.height + 0.5);    
+        dstsizeH = floor(imsize.height + 0.5);
+        dstsizeW= floor(dstsizeH * srcsizeW / srcsizeH + 0.5);    
       }
 
-      xratio = srcsize.width / dstsize.width;
-      yratio = srcsize.height / dstsize.height;
-    
-      dstRep = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: NULL
-                              pixelsWide: (int)dstsize.width
-                              pixelsHigh: (int)dstsize.height
-                              bitsPerSample: 8
-                              samplesPerPixel: (isColor ? 3 : 1)
-                              hasAlpha: NO
-                              isPlanar: NO
-                              colorSpaceName: colorSpaceName
-                              bytesPerRow: 0
-                              bitsPerPixel: 0];
+      xratio = (float)srcsizeW / (float)dstsizeW;
+      yratio = (float)srcsizeH / (float)dstsizeH;
+
+      destSamplesPerPixel = [srcRep samplesPerPixel];
+      dstRep = [[NSBitmapImageRep alloc]
+                     initWithBitmapDataPlanes:NULL
+                     pixelsWide:dstsizeW
+                     pixelsHigh:dstsizeH
+                     bitsPerSample:8
+                     samplesPerPixel:destSamplesPerPixel
+                     hasAlpha:[srcRep hasAlpha]
+                     isPlanar:NO
+                     colorSpaceName:[srcRep colorSpaceName]
+                     bytesPerRow:0
+                     bitsPerPixel:0];
 
       srcData = [srcRep bitmapData];
       destData = [dstRep bitmapData];
 
-      for (y = 0; y < (int)(dstsize.height); y++) {
-        int px[2], py[2]; 
-        
-        py[0] = floor(y * yratio);
-        py[1] = ceil((y + 1) * yratio);
-        py[1] = ((py[1] > srcsize.height) ? (int)(srcsize.height) : py[1]);
-                        
-        for (x = 0; x < (int)(dstsize.width); x++) {
-          int expos = (int)(bpp * (floor(y * yratio) * srcsize.width + floor(x * xratio)));        
-          unsigned expix[4] = { 0, 0, 0, 0 };
-          unsigned pix[4] = { 0, 0, 0, 0 };
-          int count = 0;
-          unsigned char c;
-          int i, j;
+      destBytesPerRow = [dstRep bytesPerRow];
+      destBytesPerPixel = [dstRep bitsPerPixel] / 8;
 
-          expix[0] = srcData[expos];
-
-          if (isColor) {
-            expix[1] = srcData[expos + 1];
-            expix[2] = srcData[expos + 2];
-          }
-
-          px[0] = floor(x * xratio);
-          px[1] = ceil((x + 1) * xratio);
-          px[1] = ((px[1] > srcsize.width) ? (int)(srcsize.width) : px[1]);
-          
-          for (i = px[0]; i < px[1]; i++) {
-            for (j = py[0]; j < py[1]; j++) {
-              int pos = (int)(bpp * (j * srcsize.width + i));
-
-              pix[0] += srcData[pos];
-              
-              if (isColor) {
-                pix[1] += srcData[pos + 1];
-                pix[2] += srcData[pos + 2];
-              }
-
-              count++;
-            }
-          }
-
-          c = (unsigned char)(pix[0] / count);
-          *destData++ = ((abs(c - expix[0]) < MIX_LIM) ? (unsigned char)expix[0] : c);
-          
-          if (isColor) {
-            c = (unsigned char)(pix[1] / count);
-            *destData++ = ((abs(c - expix[1]) < MIX_LIM) ? (unsigned char)expix[1] : c);
-
-            c = (unsigned char)(pix[2] / count);
-            *destData++ = ((abs(c - expix[2]) < MIX_LIM) ? (unsigned char)expix[2] : c);
-          }
-        }
-      }
+      for (y = 0; y < dstsizeH; y++)
+        for (x = 0; x < dstsizeW; x++)
+          for (i = 0; i < srcSpp; i++)
+            destData[destBytesPerRow * y + destBytesPerPixel * x + i] = srcData[srcBytesPerRow * (int)(y * yratio)  + srcBytesPerPixel * (int)(x * xratio) + i];
   
       NS_DURING
-		    {
+        {
           tiffData = [dstRep TIFFRepresentation];   
-		    }
-	    NS_HANDLER
-		    {
-			    tiffData = nil;
-	      }
-	    NS_ENDHANDLER
+        }
+      NS_HANDLER
+        {
+          tiffData = nil;
+        }
+      NS_ENDHANDLER
 
       if (tiffData) {
         [info setObject: tiffData forKey: @"imgdata"];
@@ -281,22 +240,3 @@ int main(int argc, char** argv)
   RELEASE (pool);  
   exit(0);
 }
-
-
-  /* 
-      // original nearest neighbour algorithm
-    
-      for (y = 0; y < (int)dstsize.height; y++) {
-        for (x = 0; x < (int)dstsize.width; x++) {
-          int pos = (int)(bpp * (floor(y * yratio) * srcsize.width + floor(x * xratio)));
-
-          *destData++ = srcData[pos];
-
-          if (isColor) {
-            *destData++ = srcData[pos + 1];
-            *destData++ = srcData[pos + 2];
-          }
-        }
-      }
-  */    
-  
