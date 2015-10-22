@@ -1,8 +1,9 @@
 /* ImageThumbnailer.m
  *  
- * Copyright (C) 2003 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2015 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
+ *         Riccardo Mottola <rm@gnu.org>
  * Date: August 2001
  *
  * This file is part of the GNUstep GWorkspace application
@@ -22,10 +23,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
 #include <math.h>
-#include "ImageThumbnailer.h"
+#import "ImageThumbnailer.h"
 
 #define TMBMAX (48.0)
 #define RESZLIM 4
@@ -50,130 +51,84 @@
   NSImage *image = [[NSImage alloc] initWithContentsOfFile: path];
 
   if (image && [image isValid]) {
-    NSData *tiffdata = [image TIFFRepresentation];
-    NSBitmapImageRep *rep = [NSBitmapImageRep imageRepWithData: tiffdata];
-    int spp = [rep samplesPerPixel];
-    int bitsPerPixel = [rep bitsPerPixel];
-    int bpp = bitsPerPixel / 8; 
+    NSData *tiffData = [image TIFFRepresentation];
+    NSBitmapImageRep *srcRep = [NSBitmapImageRep imageRepWithData: tiffData];
+    int srcSpp = [srcRep samplesPerPixel];
+    int bitsPerPixel = [srcRep bitsPerPixel];
     
-	  if (((spp == 3) && (bitsPerPixel == 24)) 
-        || ((spp == 4) && (bitsPerPixel == 32))
-        || ((spp == 1) && (bitsPerPixel == 8))
-        || ((spp == 2) && (bitsPerPixel == 16))) {
+	  if (((srcSpp == 3) && (bitsPerPixel == 24)) 
+        || ((srcSpp == 4) && (bitsPerPixel == 32))
+        || ((srcSpp == 1) && (bitsPerPixel == 8))
+        || ((srcSpp == 2) && (bitsPerPixel == 16))) {
       NSSize imsize = [image size];
     
       if ((imsize.width <= TMBMAX) && (imsize.height <= TMBMAX) 
                               && (imsize.width >= (TMBMAX - RESZLIM)) 
-                                      && (imsize.height >= (TMBMAX - RESZLIM))) {
-        RETAIN (tiffdata);
-        RELEASE (image);
-        RELEASE (arp);
-
-        return AUTORELEASE (tiffdata);
-        
-      } else {
-        float fact = (imsize.width >= imsize.height) ? (imsize.width / TMBMAX) : (imsize.height / TMBMAX);
-        NSSize newsize = NSMakeSize(floor(imsize.width / fact + 0.5), floor(imsize.height / fact + 0.5));	        
-        float xratio = imsize.width / newsize.width;
-        float yratio = imsize.height / newsize.height;
-        BOOL hasAlpha = [rep hasAlpha];
-        BOOL isColor = hasAlpha ? (spp > 2) : (spp > 1);
-        NSString *colorSpaceName = isColor ? NSCalibratedRGBColorSpace : NSCalibratedWhiteColorSpace;      
-        NSBitmapImageRep *newrep;
-        unsigned char *srcData;
-        unsigned char *dstData;    
-        unsigned x, y;
-        NSData *data = nil;
-  
-        newrep = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: NULL
-                                pixelsWide: (int)newsize.width
-                                pixelsHigh: (int)newsize.height
-                                bitsPerSample: 8
-                                samplesPerPixel: (isColor ? 4 : 2)
-                                hasAlpha: YES
-                                isPlanar: NO
-                                colorSpaceName: colorSpaceName
-                                bytesPerRow: 0
-                                bitsPerPixel: 0];
-  
-        srcData = [rep bitmapData];
-        dstData = [newrep bitmapData];
-
-        for (y = 0; y < (int)(newsize.height); y++) {
-          int px[2], py[2]; 
-
-          py[0] = floor(y * yratio);
-          py[1] = ceil((y + 1) * yratio);
-          py[1] = ((py[1] > imsize.height) ? (int)(imsize.height) : py[1]);
-
-          for (x = 0; x < (int)(newsize.width); x++) {
-            int expos = (int)(bpp * (floor(y * yratio) * imsize.width + floor(x * xratio)));        
-            unsigned expix[4] = { 0, 0, 0, 0 };      
-            unsigned pix[4] = { 0, 0, 0, 0 };
-            int count = 0;
-            unsigned char c;
-            int i, j;
-
-            expix[0] = srcData[expos];
-
-            if (isColor) {
-              expix[1] = srcData[expos + 1];
-              expix[2] = srcData[expos + 2];
-              expix[3] = (hasAlpha ? srcData[expos + 3] : 255);
-            } else {
-              expix[1] = (hasAlpha ? srcData[expos + 1] : 255);
-            }
-
-            px[0] = floor(x * xratio);
-            px[1] = ceil((x + 1) * xratio);
-            px[1] = ((px[1] > imsize.width) ? (int)(imsize.width) : px[1]);
-
-            for (i = px[0]; i < px[1]; i++) {
-              for (j = py[0]; j < py[1]; j++) {
-                int pos = (int)(bpp * (j * imsize.width + i));
-
-                pix[0] += srcData[pos];
-
-                if (isColor) {
-                  pix[1] += srcData[pos + 1];
-                  pix[2] += srcData[pos + 2];
-                  pix[3] += (hasAlpha ? srcData[pos + 3] : 255);
-                } else {
-                  pix[1] += (hasAlpha ? srcData[pos + 1] : 255);
-                }
-
-                count++;
-              }
-            }
-
-            c = (unsigned char)(pix[0] / count);
-            *dstData++ = ((abs(c - expix[0]) < MIX_LIM) ? (unsigned char)expix[0] : c);
-
-            if (isColor) {
-              c = (unsigned char)(pix[1] / count);
-              *dstData++ = ((abs(c - expix[1]) < MIX_LIM) ? (unsigned char)expix[1] : c);
-
-              c = (unsigned char)(pix[2] / count);
-              *dstData++ = ((abs(c - expix[2]) < MIX_LIM) ? (unsigned char)expix[2] : c);
-
-              c = (unsigned char)(pix[3] / count);
-              *dstData++ = ((abs(c - expix[3]) < MIX_LIM) ? (unsigned char)expix[3] : c);
-
-            } else {
-              c = (unsigned char)(pix[1] / count);
-              *dstData++ = ((abs(c - expix[1]) < MIX_LIM) ? (unsigned char)expix[1] : c);
-            }
-          }
+                                      && (imsize.height >= (TMBMAX - RESZLIM)))
+        {
+          RETAIN (tiffData);
+          RELEASE (image);
+          RELEASE (arp);
+          
+          return AUTORELEASE (tiffData);
         }
+      else
+        {
+          NSInteger srcBytesPerPixel = [srcRep bitsPerPixel] / 8;
+          NSInteger srcBytesPerRow = [srcRep bytesPerRow];
+          NSInteger destSamplesPerPixel = srcSpp;
+          NSInteger destBytesPerRow;
+          NSInteger destBytesPerPixel;
+          NSInteger dstsizeW, dstsizeH;
+          float fact = (imsize.width >= imsize.height) ? (imsize.width / TMBMAX) : (imsize.height / TMBMAX);
+          	        
+          float xratio;
+          float yratio;
+          NSBitmapImageRep *dstRep;
+          unsigned char *srcData;
+          unsigned char *destData;    
+          unsigned x, y;
+          unsigned i;
+          NSData *tiffData;
 
-        data = [newrep TIFFRepresentation];
-        RETAIN (data);
+          dstsizeW = (NSInteger)floor(imsize.width / fact + 0.5);
+          dstsizeH = (NSInteger)floor(imsize.height / fact + 0.5);
+          
+          xratio = imsize.width / (float)dstsizeW;
+          yratio = imsize.height / (float)dstsizeH;
+          
+          destSamplesPerPixel = [srcRep samplesPerPixel];
+          dstRep = [[NSBitmapImageRep alloc]
+                     initWithBitmapDataPlanes:NULL
+                                   pixelsWide:dstsizeW
+                                   pixelsHigh:dstsizeH
+                                bitsPerSample:8
+                              samplesPerPixel:destSamplesPerPixel
+                                     hasAlpha:[srcRep hasAlpha]
+                                     isPlanar:NO
+                               colorSpaceName:[srcRep colorSpaceName]
+                                  bytesPerRow:0
+                                 bitsPerPixel:0];
 
-        RELEASE (image);
-        RELEASE (newrep);
-        RELEASE (arp);
-
-        return AUTORELEASE (data);
+          srcData = [srcRep bitmapData];
+          destData = [dstRep bitmapData];
+          
+          destBytesPerRow = [dstRep bytesPerRow];
+          destBytesPerPixel = [dstRep bitsPerPixel] / 8;
+          
+          for (y = 0; y < dstsizeH; y++)
+            for (x = 0; x < dstsizeW; x++)
+              for (i = 0; i < srcSpp; i++)
+                destData[destBytesPerRow * y + destBytesPerPixel * x + i] = srcData[srcBytesPerRow * (int)(y * yratio)  + srcBytesPerPixel * (int)(x * xratio) + i];
+          
+          tiffData = [dstRep TIFFRepresentation];
+          RETAIN (tiffData);
+          
+          RELEASE (image);
+          RELEASE (dstRep);
+          RELEASE (arp);
+          
+        return AUTORELEASE (tiffData);
       }
     }
   }    
