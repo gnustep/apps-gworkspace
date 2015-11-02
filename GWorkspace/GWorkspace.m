@@ -230,8 +230,8 @@ static GWorkspace *gworkspace = nil;
   [subMenu addItemWithTitle:_(@"32") action:@selector(setIconsSize:) keyEquivalent:@""];
   [subMenu addItemWithTitle:_(@"36") action:@selector(setIconsSize:) keyEquivalent:@""];
   [subMenu addItemWithTitle:_(@"40") action:@selector(setIconsSize:) keyEquivalent:@""];
-  [subMenu addItemWithTitle:_(@"44") action:@selector(setIconsSize:) keyEquivalent:@""];
   [subMenu addItemWithTitle:_(@"48") action:@selector(setIconsSize:) keyEquivalent:@""];
+  [subMenu addItemWithTitle:_(@"64") action:@selector(setIconsSize:) keyEquivalent:@""];
       
   menuItem = [menu  addItemWithTitle:_(@"Icon Position") action:NULL keyEquivalent:@""];
   subMenu = AUTORELEASE ([NSMenu new]);

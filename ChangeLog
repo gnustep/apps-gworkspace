@@ -1,4 +1,9 @@
-2015-10-22 Riccardo Mottola <rm@gnu.org>
+2015-11-02 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/GWorkspace.m
+	Add 64px icons, remove 44
+
+015-10-22 Riccardo Mottola <rm@gnu.org>
 
 	* Tools/thumbnailer/ImageThumbnailer/ImageThumbnailer.m
 	Fix resize nearest neigbour algorithm by adapting PRICE's scale one. The code had problems with different bytes per samples and alpha, which are now preserved.
