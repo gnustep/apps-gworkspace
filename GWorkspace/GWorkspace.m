@@ -238,7 +238,13 @@ static GWorkspace *gworkspace = nil;
   [menu setSubmenu: subMenu forItem: menuItem];	
   [subMenu addItemWithTitle:_(@"Up") action:@selector(setIconsPosition:) keyEquivalent:@""];
   [subMenu addItemWithTitle:_(@"Left") action:@selector(setIconsPosition:) keyEquivalent:@""];
-      
+
+  menuItem = [menu addItemWithTitle:_(@"Thumbnails") action:NULL keyEquivalent:@""];
+  subMenu = AUTORELEASE ([NSMenu new]);
+  [menu setSubmenu: subMenu forItem: menuItem];	
+  [subMenu addItemWithTitle:_(@"Make thumbnail(s)") action:@selector(makeThumbnails:) keyEquivalent:@""];
+  [subMenu addItemWithTitle:_(@"Remove thumbnail(s)") action:@selector(removeThumbnails:) keyEquivalent:@""];
+
   menuItem = [menu addItemWithTitle:_(@"Label Size") action:NULL keyEquivalent:@""];
   subMenu = AUTORELEASE ([NSMenu new]);
   [menu setSubmenu: subMenu forItem: menuItem];

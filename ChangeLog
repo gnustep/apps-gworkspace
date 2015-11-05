@@ -1,3 +1,9 @@
+2015-11-05 Riccardo Mottola <rm@gnu.org>
+
+	* Tools/thumbnailer
+	* GWorkspace/Thumbnailer
+	Moved thumbnailer from Tools to GWorkspace.
+
 2015-11-02 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/GWorkspace.m

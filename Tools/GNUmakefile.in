@@ -6,7 +6,6 @@ SUBPROJECTS = \
         searchtool \
         lsfupdater \
         ddbd \
-        thumbnailer \
         wopen 
 
 -include GNUmakefile.preamble
