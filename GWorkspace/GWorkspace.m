@@ -1217,7 +1217,7 @@ static GWorkspace *gworkspace = nil;
     NSString *msg2 = NSLocalizedString(@"items?", @"");
   
     if (NSRunAlertPanel(nil,
-                [NSString stringWithFormat: @"%@ %i %@", msg1, count, msg2],
+                        [NSString stringWithFormat: @"%@ %lu %@", msg1, (unsigned long)count, msg2],
                 NSLocalizedString(@"Cancel", @""),
                 NSLocalizedString(@"Yes", @""),
                 nil)) {
@@ -2653,7 +2653,7 @@ static GWorkspace *gworkspace = nil;
       NSString *msg2 = NSLocalizedString(@"items?", @"");
 
       if (NSRunAlertPanel(nil,
-                  [NSString stringWithFormat: @"%@ %i %@", msg1, count, msg2],
+                          [NSString stringWithFormat: @"%@ %lu %@", msg1, (unsigned long)count, msg2],
                   NSLocalizedString(@"Cancel", @""),
                   NSLocalizedString(@"Yes", @""),
                   nil)) {
