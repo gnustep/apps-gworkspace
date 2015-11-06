@@ -1,8 +1,9 @@
 /* GWThumbnailer.h
  *  
- * Copyright (C) 2003-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2015 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
+ *         Riccardo Mottola <rm@gnu.org>
  * Date: August 2001
  *
  * This file is part of the GNUstep GWorkspace application
@@ -72,19 +73,15 @@
 
 - (BOOL)removeThumbnailForPath:(NSString *)path;
 
-- (void)makeThumbnail:(NSPasteboard *)pb
-	           userData:(NSString *)ud
-	              error:(NSString **)err;
+- (void)makeThumbnails:(NSString*)path;
 
-- (void)removeThumbnail:(NSPasteboard *)pb
-	             userData:(NSString *)ud
-	                error:(NSString **)err;
+- (void)removeThumbnails:(NSString*)path;
 
 - (void)thumbnailData:(NSPasteboard *)pb
 	           userData:(NSString *)ud
 	              error:(NSString **)err;
 
-- (NSArray *)bundlesWithExtension:(NSString *)extension 
-											inDirectory:(NSString *)dirpath;
+- (NSArray *)bundlesWithExtension:(NSString *)extension
+inDirectory:(NSString *)dirpath;
 
 @end

@@ -1,8 +1,9 @@
 /* GWThumbnailer.m
  *  
- * Copyright (C) 2003-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2015 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
+ *         Riccardo Mottola <rm@gnu.org>
  * Date: August 2001
  *
  * This file is part of the GNUstep GWorkspace application
@@ -254,33 +255,15 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
   return [NSString stringWithFormat: @"%lx", thumbref];
 }
 
-- (void)makeThumbnail:(NSPasteboard *)pb
-	           userData:(NSString *)ud
-	              error:(NSString **)err
+- (void)makeThumbnails:(NSString *)path
 {
-  NSArray *paths;
   NSData *data;
   NSMutableArray *added;
   BOOL isdir;
   NSUInteger i;
-  
-  if ([[pb types] indexOfObject: NSFilenamesPboardType] == NSNotFound)
-    {
-      *err = @"No file name supplied on pasteboard";
-      return;
-    }
-    
-  paths = [pb propertyListForType: NSFilenamesPboardType];
-  if (paths == nil)
-    {
-      *err = @"invalid pasteboard";
-      return;
-    }
 
-    added = [NSMutableArray array];
 
-    if ([paths count] == 1) {
-      NSString *path = [paths objectAtIndex: 0];
+  added = [NSMutableArray array];
 
       if ([fm fileExistsAtPath: path isDirectory: &isdir]) {
         if (isdir) {
@@ -301,37 +284,9 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
               }
             }
           }
-        } else {
-          id<TMBProtocol> tmb = [self thumbnailerForPath: path];
-
-          if (tmb) {
-            data = [tmb makeThumbnailForPath: path];
-
-            if (data && [self registerThumbnailData: data
-                                            forPath: path
-                                      nameExtension: [tmb fileNameExtension]]) {
-              [added addObject: path];
-            }
-          }
         }
       }
       
-    } else {
-      for (i = 0; i < [paths count]; i++) {
-        NSString *path = [paths objectAtIndex: i];
-        id<TMBProtocol> tmb = [self thumbnailerForPath: path];
-
-        if (tmb) {
-          data = [tmb makeThumbnailForPath: path];
-
-          if (data && [self registerThumbnailData: data 
-                                          forPath: path
-                                    nameExtension: [tmb fileNameExtension]]) {
-            [added addObject: path];
-          }
-        }
-      }   
-    }
 
     if ([added count]) {
       NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
@@ -353,27 +308,12 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
     }
 }
 
-- (void)removeThumbnail:(NSPasteboard *)pb
-	             userData:(NSString *)ud
-	                error:(NSString **)err
+- (void)removeThumbnails:(NSString *)path
 {
-  NSArray *paths;
   NSMutableArray *deleted;
   BOOL isdir;
   NSUInteger i;
 
-  if ([[pb types] indexOfObject: NSFilenamesPboardType] == NSNotFound)
-    {
-      *err = @"No file name supplied on pasteboard";
-      return;
-    }
-  
-  paths = [pb propertyListForType: NSFilenamesPboardType];
-  if (paths == nil)
-    {
-      *err = @"invalid pasteboard";
-      return;
-    }
   
     if ((thumbsDict == nil) || ([thumbsDict count] == 0)) {
       return;
@@ -381,8 +321,6 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
     
     deleted = [NSMutableArray array];
     
-    if ([paths count] == 1) {
-      NSString *path = [paths objectAtIndex: 0];
 
       if ([fm fileExistsAtPath: path isDirectory: &isdir]) {
         if (isdir) {
@@ -402,15 +340,6 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
           }
         }
       }
-    } else {
-      for (i = 0; i < [paths count]; i++) {
-        NSString *path = [paths objectAtIndex: i];
-
-        if ([self removeThumbnailForPath: path]) {
-          [deleted addObject: path];
-        }
-      }   
-    }
         
     if ([deleted count]) {
       NSMutableDictionary *info = [NSMutableDictionary dictionary];

@@ -1568,13 +1568,9 @@ constrainMinCoordinate:(CGFloat)proposedMin
   if (path)
     {
       Thumbnailer *t;
-      NSPasteboard *pb;
       
       t = [[Thumbnailer alloc] init];
-      pb = [NSPasteboard generalPasteboard];
-      [pb declareTypes: [NSArray arrayWithObjects:NSFilenamesPboardType,nil] owner:self];
-      [pb setPropertyList:[NSArray arrayWithObject:path] forType:NSFilenamesPboardType];
-      [t makeThumbnail:pb userData:nil error:NULL];
+      [t makeThumbnails:path];
       [t release];
     }
 }
@@ -1588,13 +1584,9 @@ constrainMinCoordinate:(CGFloat)proposedMin
     if (path)
     {
       Thumbnailer *t;
-      NSPasteboard *pb;
       
       t = [[Thumbnailer alloc] init];
-      pb = [NSPasteboard generalPasteboard];
-      [pb declareTypes: [NSArray arrayWithObjects:NSFilenamesPboardType,nil] owner:self];
-      [pb setPropertyList:[NSArray arrayWithObject:path] forType:NSFilenamesPboardType];
-      [t removeThumbnail:pb userData:nil error:NULL];
+      [t removeThumbnails:path];
       [t release];
     }
 }

@@ -1,5 +1,12 @@
 2015-11-06 Riccardo Mottola <rm@gnu.org>
 
+	* GWorkspace/FileViewer/GWViewer.m
+	* GWorkspace/Thumbnailer/GWThumbnailer.h
+	* GWorkspace/Thumbnailer/GWThumbnailer.m
+	Simplify parameters for direct call.
+
+2015-11-06 Riccardo Mottola <rm@gnu.org>
+
 	* GWorkspace/FileViewer/GWViewer.h
 	* GWorkspace/FileViewer/GWViewer.m
 	* GWorkspace/Thumbnailer/GWThumbnailer.h
