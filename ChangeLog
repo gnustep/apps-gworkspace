@@ -1,3 +1,12 @@
+2015-11-06 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/FileViewer/GWViewer.h
+	* GWorkspace/FileViewer/GWViewer.m
+	* GWorkspace/Thumbnailer/GWThumbnailer.h
+	* GWorkspace/Thumbnailer/GWThumbnailer.m
+	Call makre and remove thumbnails directly and not in a service,
+	remove the corresponding service and just instantiate the class.
+
 2015-11-05 Riccardo Mottola <rm@gnu.org>
 
 	* Tools/thumbnailer

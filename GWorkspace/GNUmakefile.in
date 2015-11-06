@@ -9,8 +9,8 @@ VERSION = @PACKAGE_VERSION@
 #
 # subprojects
 #
-SUBPROJECTS = Finder/Modules 
-SUBPROJECTS = Thumbnailer
+SUBPROJECTS = Finder/Modules \
+	Thumbnailer
 
 #
 # MAIN APP
@@ -111,7 +111,9 @@ Dialogs/RunExternalController.m \
 Dialogs/CompletionField.m \
 Dialogs/StartAppWin.m \
 Fiend/Fiend.m \
-Fiend/FiendLeaf.m 
+Fiend/FiendLeaf.m \
+Thumbnailer/GWThumbnailer.m \
+
 
 -include GNUmakefile.preamble
 

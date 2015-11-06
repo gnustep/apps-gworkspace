@@ -43,6 +43,7 @@
 #import "FSNodeRep.h"
 #import "FSNIcon.h"
 #import "FSNFunctions.h"
+#import "Thumbnailer/GWThumbnailer.h"
 
 #define DEFAULT_INCR 150
 #define MIN_WIN_H 300
@@ -1482,7 +1483,10 @@ constrainMinCoordinate:(CGFloat)proposedMin
       }
 
       return NO;
-
+    } else if (sel_isEqual(action, @selector(makeThumbnails:)) || sel_isEqual(action, @selector(removeThumbnails:)))
+      {
+        /* Make or Remove Thumbnails */
+        return YES;
     } else if (sel_isEqual(action, @selector(openSelection:))) {
       if ([[baseNode path] isEqual: [gworkspace trashPath]] == NO) {
         BOOL canopen = YES;
@@ -1553,6 +1557,46 @@ constrainMinCoordinate:(CGFloat)proposedMin
   }
   
   return NO;
+}
+
+- (void)makeThumbnails:(id)sender
+{
+  NSString *path;
+
+  path = [[nodeView shownNode] path];
+  NSLog(@"make thumbnails in path: %@", path);
+  if (path)
+    {
+      Thumbnailer *t;
+      NSPasteboard *pb;
+      
+      t = [[Thumbnailer alloc] init];
+      pb = [NSPasteboard generalPasteboard];
+      [pb declareTypes: [NSArray arrayWithObjects:NSFilenamesPboardType,nil] owner:self];
+      [pb setPropertyList:[NSArray arrayWithObject:path] forType:NSFilenamesPboardType];
+      [t makeThumbnail:pb userData:nil error:NULL];
+      [t release];
+    }
+}
+
+- (void)removeThumbnails:(id)sender
+{
+  NSString *path;
+
+  path = [baseNode path];
+  NSLog(@"remove thumbnails in: %@", path);
+    if (path)
+    {
+      Thumbnailer *t;
+      NSPasteboard *pb;
+      
+      t = [[Thumbnailer alloc] init];
+      pb = [NSPasteboard generalPasteboard];
+      [pb declareTypes: [NSArray arrayWithObjects:NSFilenamesPboardType,nil] owner:self];
+      [pb setPropertyList:[NSArray arrayWithObject:path] forType:NSFilenamesPboardType];
+      [t removeThumbnail:pb userData:nil error:NULL];
+      [t release];
+    }
 }
 
 @end

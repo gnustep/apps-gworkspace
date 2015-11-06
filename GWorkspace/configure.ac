@@ -12,7 +12,7 @@ AC_CHECK_HEADERS([sys/resource.h])
 #--------------------------------------------------------------------
 AC_CONFIG_AUX_DIR([$GNUSTEP_MAKEFILES])
 
-AC_CONFIG_SUBDIRS([Finder/Modules])
+AC_CONFIG_SUBDIRS([Finder/Modules Thumbnailer])
 
 AC_CONFIG_HEADER([config.h])
 

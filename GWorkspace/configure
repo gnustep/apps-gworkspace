@@ -684,7 +684,7 @@ LDFLAGS
 LIBS
 CPPFLAGS
 CPP'
-ac_subdirs_all='Finder/Modules'
+ac_subdirs_all='Finder/Modules Thumbnailer'
 
 # Initialize some variables set by options.
 ac_init_help=
@@ -3209,7 +3209,7 @@ ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
 
 
 
-subdirs="$subdirs Finder/Modules"
+subdirs="$subdirs Finder/Modules Thumbnailer"
 
 
 ac_config_headers="$ac_config_headers config.h"

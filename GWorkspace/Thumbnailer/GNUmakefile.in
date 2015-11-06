@@ -2,23 +2,18 @@
 PACKAGE_NAME = gworkspace
 include $(GNUSTEP_MAKEFILES)/common.make
 
-# The application to be compiled
-SERVICE_NAME = thumbnailer
 
 #
 # subprojects
 #
 SUBPROJECTS = ImageThumbnailer
 
-# The Objective-C source files to be compiled
-thumbnailer_OBJC_FILES = main.m
-
 -include GNUmakefile.preamble
 -include GNUmakefile.local
 
-include $(GNUSTEP_MAKEFILES)/tool.make
-include $(GNUSTEP_MAKEFILES)/service.make
-include $(GNUSTEP_MAKEFILES)/aggregate.make
+-include $(GNUSTEP_MAKEFILES)/tool.make
+-include $(GNUSTEP_MAKEFILES)/service.make
+-include $(GNUSTEP_MAKEFILES)/aggregate.make
 
 -include GNUmakefile.local.service
 -include GNUmakefile.postamble

@@ -1,4 +1,4 @@
-/* main.m
+/* GWThumbnailer.m
  *  
  * Copyright (C) 2003-2013 Free Software Foundation, Inc.
  *
@@ -27,78 +27,14 @@
 
 #import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
+#import "GWThumbnailer.h"
 
 #define TMBMAX (48.0)
 #define RESZLIM 4
 
 static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNotification";
 
-@protocol TMBProtocol
 
-- (BOOL)canProvideThumbnailForPath:(NSString *)path;
-
-- (NSData *)makeThumbnailForPath:(NSString *)path;
-
-- (NSString *)fileNameExtension;
-
-- (NSString *)description;
-
-@end
-
-@protocol ThumbnailerProtocol
-
-- (BOOL)registerExternalProvider:(id<TMBProtocol>)provider;
-
-@end
-
-@interface Thumbnailer: NSObject <ThumbnailerProtocol>
-{
-  NSMutableArray *thumbnailers;
-  NSMutableDictionary *extProviders;
-  id current;
-  NSString *thumbnailDir;
-  NSString *dictPath;
-  NSMutableDictionary *thumbsDict;
-  long thumbref; 
-  NSTimer *timer; 
-  NSConnection *conn;
-  NSFileManager *fm;
-}
-
-- (void)loadThumbnailers;
-
-- (BOOL)addThumbnailer:(id)tmb;
-
-- (id)thumbnailerForPath:(NSString *)path;
-
-- (NSString *)nextThumbName;
-
-- (void)checkThumbnails:(id)sender;
-
-- (BOOL)registerThumbnailData:(NSData *)data 
-                      forPath:(NSString *)path
-                nameExtension:(NSString *)ext;
-
-- (BOOL)removeThumbnailForPath:(NSString *)path;
-
-- (void)makeThumbnail:(NSPasteboard *)pb
-	           userData:(NSString *)ud
-	              error:(NSString **)err;
-
-- (void)removeThumbnail:(NSPasteboard *)pb
-	             userData:(NSString *)ud
-	                error:(NSString **)err;
-
-- (void)thumbnailData:(NSPasteboard *)pb
-	           userData:(NSString *)ud
-	              error:(NSString **)err;
-
-- (NSArray *)bundlesWithExtension:(NSString *)extension 
-											inDirectory:(NSString *)dirpath;
-
-- (void)connectionDidDie:(NSNotification *)notification;
-
-@end
 
 @implementation Thumbnailer
 
@@ -166,20 +102,12 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
 
     [thumbsDict writeToFile: dictPath atomically: YES];
 
-    conn = [[NSConnection alloc] initWithReceivePort: (NSPort *)[NSPort port] 
-																			      sendPort: nil];
-    [conn setRootObject: self];
-    [conn registerName: @"thumbnailer"];
-    [conn setDelegate: self];
 
-    [[NSNotificationCenter defaultCenter] addObserver: self
-           selector: @selector(connectionDidDie:)
-               name: NSConnectionDidDieNotification
-             object: conn];    
-        
+    /* FIXME: this could be a problem with different instances for View
     timer = [NSTimer scheduledTimerWithTimeInterval: 10.0 target: self 
           										      selector: @selector(checkThumbnails:) 
-                                                userInfo: nil repeats: YES];                                             
+                                                userInfo: nil repeats: YES];   
+    */                                          
   }
 
   return self;
@@ -335,8 +263,7 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
   NSMutableArray *added;
   BOOL isdir;
   NSUInteger i;
-    
-
+  
   if ([[pb types] indexOfObject: NSFilenamesPboardType] == NSNotFound)
     {
       *err = @"No file name supplied on pasteboard";
@@ -632,95 +559,6 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
   return NO;  
 }
 
-- (BOOL)connection:(NSConnection*)ancestor 
-								shouldMakeNewConnection:(NSConnection*)newConn
-{
-	if (ancestor == conn) {
-    [newConn setDelegate: self];
-
-  	[[NSNotificationCenter defaultCenter] addObserver: self 
-									selector: @selector(connectionDidDie:)
-	    								name: NSConnectionDidDieNotification object: newConn];
-    return YES;
-  }
-		
-  return NO;
-}
-
-- (void)connectionDidDie:(NSNotification *)notification
-{
-	id diedconn = [notification object];
-	
-  [[NSNotificationCenter defaultCenter] removeObserver: self
-	                      name: NSConnectionDidDieNotification object: diedconn];
-
-  if (diedconn == conn) {
-		NSLog(@"argh - thumbnailer root connection has been destroyed.");
-		exit(1);
-	} else {
-    id provider = [extProviders objectForKey: diedconn];
-  
-    if (provider) {
-      [thumbnailers removeObject: provider];
-      [extProviders removeObjectForKey: diedconn];
-    }
-  }
-}
 
 @end
-
-int main(int argc, char** argv)
-{
-  CREATE_AUTORELEASE_POOL(pool);
-  NSProcessInfo *info = [NSProcessInfo processInfo];
-  NSMutableArray *args = AUTORELEASE ([[info arguments] mutableCopy]);
-  BOOL subtask = YES;
-
-  if ([[info arguments] containsObject: @"--daemon"]) {
-    subtask = NO;
-  }
-
-  if (subtask) {
-    NSTask *task = [NSTask new];
-    
-    NS_DURING
-	    {
-	      [args removeObjectAtIndex: 0];
-	      [args addObject: @"--daemon"];
-	      [task setLaunchPath: [[NSBundle mainBundle] executablePath]];
-	      [task setArguments: args];
-	      [task setEnvironment: [info environment]];
-	      [task launch];
-	      DESTROY (task);
-	    }
-    NS_HANDLER
-	    {
-	      fprintf (stderr, "unable to launch the thumbnailer task. exiting.\n");
-	      DESTROY (task);
-	    }
-    NS_ENDHANDLER
-      
-    exit(EXIT_FAILURE);
-  }
-  
-  RELEASE(pool);
-
-  {
-    CREATE_AUTORELEASE_POOL (pool);
-	  Thumbnailer *thumbnailer = [[Thumbnailer alloc] init];
-    RELEASE (pool);
-
-    if (thumbnailer != nil) {
-	    CREATE_AUTORELEASE_POOL (pool);
-
-      [NSApplication sharedApplication];
-      NSRegisterServicesProvider(thumbnailer, @"Thumbnailer");
-      [[NSRunLoop currentRunLoop] run];
-
-  	  RELEASE (pool);
-    }
-  }
-    
-  exit(EXIT_SUCCESS);
-}
 
