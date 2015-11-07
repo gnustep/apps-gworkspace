@@ -28,8 +28,6 @@
 #include <math.h>
 #import "ImageThumbnailer.h"
 
-#define TMBMAX (48.0)
-#define RESZLIM 4
 #define MIX_LIM 16
 
 @implementation ImageThumbnailer

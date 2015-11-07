@@ -1,8 +1,9 @@
 /* ImageThumbnailer.h
  *  
- * Copyright (C) 2003 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2015 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
+ *         Riccardo Mottola <rm@gnu.org>
  * Date: August 2001
  *
  * This file is part of the GNUstep GWorkspace application
@@ -23,19 +24,9 @@
  */
 
 
-#include <Foundation/Foundation.h>
+#import <Foundation/Foundation.h>
+#import "GWThumbnailer.h"
 
-@protocol TMBProtocol
-
-- (BOOL)canProvideThumbnailForPath:(NSString *)path;
-
-- (NSData *)makeThumbnailForPath:(NSString *)path;
-
-- (NSString *)fileNameExtension;
-
-- (NSString *)description;
-
-@end
 
 @interface ImageThumbnailer: NSObject <TMBProtocol>
 {
