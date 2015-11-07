@@ -1579,9 +1579,9 @@ constrainMinCoordinate:(CGFloat)proposedMin
 {
   NSString *path;
 
-  path = [baseNode path];
+  path = [[nodeView shownNode] path];
   NSLog(@"remove thumbnails in: %@", path);
-    if (path)
+  if (path)
     {
       Thumbnailer *t;
       
