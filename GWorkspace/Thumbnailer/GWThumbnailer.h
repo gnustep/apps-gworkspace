@@ -23,7 +23,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-
+#define TMBMAX (64.0)
+#define RESZLIM 4
 
 @protocol TMBProtocol
 

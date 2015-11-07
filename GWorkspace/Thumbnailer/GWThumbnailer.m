@@ -30,8 +30,6 @@
 #import <AppKit/AppKit.h>
 #import "GWThumbnailer.h"
 
-#define TMBMAX (48.0)
-#define RESZLIM 4
 
 static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNotification";
 
