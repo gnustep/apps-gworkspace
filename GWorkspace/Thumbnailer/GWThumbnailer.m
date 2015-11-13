@@ -354,52 +354,6 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
     }
 }
 
-- (void)thumbnailData:(NSPasteboard *)pb
-	           userData:(NSString *)ud
-	              error:(NSString **)err
-{
-  NSArray *paths;
-  NSString *path;
-  NSData *data;
-  BOOL isdir;
-  
-  if ([[pb types] indexOfObject: NSFilenamesPboardType] == NSNotFound)
-    {
-      *err = @"No file name supplied on pasteboard";
-      return;
-    }
- 
-  paths = [pb propertyListForType: NSFilenamesPboardType];
-  if (paths == nil)
-    {
-      *err = @"invalid pasteboard";
-      return;
-    }
-
-    if ([paths count] > 1) {
-      return;
-    }
-    
-    path = [paths objectAtIndex: 0];
-
-    if ([fm fileExistsAtPath: path isDirectory: &isdir]) {
-      if (isdir) {
-        return;    
-      } else {
-        id<TMBProtocol> tmb = [self thumbnailerForPath: path];
-
-        if (tmb) {
-          data = [tmb makeThumbnailForPath: path];
-
-          if (data) {
-            [pb declareTypes: [NSArray arrayWithObject: NSTIFFPboardType] 
-                       owner: nil];
-            [pb setData: data forType: NSTIFFPboardType];           
-          }
-        }
-      }
-    }
-}
 
 - (BOOL)registerThumbnailData:(NSData *)data 
                       forPath:(NSString *)path

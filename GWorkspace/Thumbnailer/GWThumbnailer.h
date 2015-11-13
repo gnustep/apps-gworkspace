@@ -78,9 +78,6 @@
 
 - (void)removeThumbnails:(NSString*)path;
 
-- (void)thumbnailData:(NSPasteboard *)pb
-	           userData:(NSString *)ud
-	              error:(NSString **)err;
 
 - (NSArray *)bundlesWithExtension:(NSString *)extension
 inDirectory:(NSString *)dirpath;
