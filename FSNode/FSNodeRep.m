@@ -107,19 +107,19 @@ static FSNodeRep *shared = nil;
     
     oldresize = [[NSUserDefaults standardUserDefaults] boolForKey: @"old_resize"];
     
-    imagepath = [bundle pathForResource: @"MultipleSelection" ofType: @"tiff"];
+    imagepath = [bundle pathForImageResource: @"MultipleSelection"];
     multipleSelIcon = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
-    imagepath = [bundle pathForResource: @"FolderOpen" ofType: @"tiff"];
+    imagepath = [bundle pathForImageResource: @"FolderOpen"];
     openFolderIcon = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
-    imagepath = [bundle pathForResource: @"HardDisk" ofType: @"tiff"];
+    imagepath = [bundle pathForImageResource: @"HardDisk"];
     hardDiskIcon = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
-    imagepath = [bundle pathForResource: @"HardDiskOpen" ofType: @"tiff"];
+    imagepath = [bundle pathForImageResource: @"HardDiskOpen"];
     openHardDiskIcon = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
-    imagepath = [bundle pathForResource: @"Workspace" ofType: @"tiff"];
+    imagepath = [bundle pathForImageResource: @"Workspace"];
     workspaceIcon = [[NSImage alloc] initWithContentsOfFile: imagepath];
-    imagepath = [bundle pathForResource: @"Recycler" ofType: @"tiff"];
+    imagepath = [bundle pathForImageResource: @"Recycler"];
     trashIcon = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
-    imagepath = [bundle pathForResource: @"RecyclerFull" ofType: @"tiff"];
+    imagepath = [bundle pathForImageResource: @"RecyclerFull"];
     trashFullIcon = [[NSImage alloc] initWithContentsOfFile: imagepath];
     
     iconsCache = [NSMutableDictionary new];

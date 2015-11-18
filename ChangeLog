@@ -1,9 +1,14 @@
+2015-11-18  Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNodeRep.m
+	Use pathForImageResource: instead of pathForResource
+
 2015-11-07 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/Thumbnailer/GWThumbnailer.h
 	* GWorkspace/Thumbnailer/GWThumbnailer.m
 	Define maximum icon size to 64.
-	
+
 	* GWorkspace/Thumbnailer/ImageThumbnailer/GNUmakefile.preamble
 	* GWorkspace/Thumbnailer/ImageThumbnailer/ImageThumbnailer.h
 	* GWorkspace/Thumbnailer/ImageThumbnailer/ImageThumbnailer.m
