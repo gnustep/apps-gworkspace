@@ -106,9 +106,8 @@ static FSNodeRep *shared = nil;
     labelWFactor = LABEL_W_FACT;
     
     oldresize = [[NSUserDefaults standardUserDefaults] boolForKey: @"old_resize"];
-    
-    imagepath = [bundle pathForImageResource: @"MultipleSelection"];
-    multipleSelIcon = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
+
+    multipleSelIcon = [[NSImage imageNamed:NSImageNameMultipleDocuments] retain];
     imagepath = [bundle pathForImageResource: @"FolderOpen"];
     openFolderIcon = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
     imagepath = [bundle pathForImageResource: @"HardDisk"];
@@ -117,10 +116,8 @@ static FSNodeRep *shared = nil;
     openHardDiskIcon = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
     imagepath = [bundle pathForImageResource: @"Workspace"];
     workspaceIcon = [[NSImage alloc] initWithContentsOfFile: imagepath];
-    imagepath = [bundle pathForImageResource: @"Recycler"];
-    trashIcon = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
-    imagepath = [bundle pathForImageResource: @"RecyclerFull"];
-    trashFullIcon = [[NSImage alloc] initWithContentsOfFile: imagepath];
+    trashIcon = [[NSImage imageNamed:NSImageNameTrashEmpty] retain];
+    trashFullIcon = [[NSImage imageNamed:NSImageNameTrashFull] retain];
     
     iconsCache = [NSMutableDictionary new];
     rootPath = path_separator();

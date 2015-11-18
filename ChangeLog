@@ -1,3 +1,8 @@
+2015-11-19  Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNodeRep.m
+	Use constants for common images from GNUstep, do not provide those icons.
+
 2015-11-18  Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNodeRep.m
