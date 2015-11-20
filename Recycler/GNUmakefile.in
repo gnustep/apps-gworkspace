@@ -13,7 +13,7 @@ Recycler_APPLICATION_ICON=Recycler.tiff
 Recycler_HAS_RESOURCE_BUNDLE = yes
 
 Recycler_RESOURCE_FILES = \
-    Resources/Images/* \
+    Resources/Recycler.tiff \
     Resources/English.lproj 
 
 Recycler_LANGUAGES = Resources/English 
