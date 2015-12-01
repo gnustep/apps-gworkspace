@@ -81,7 +81,7 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
     if (([fm fileExistsAtPath: thumbnailDir isDirectory: &isdir] && isdir) == NO) {
       if ([fm createDirectoryAtPath: thumbnailDir attributes: nil] == NO) {
         NSLog(@"no thumbnails directory");
-        exit(0);
+        return nil;
       }
     }
     
@@ -138,23 +138,27 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
 	[self bundlesWithExtension: @"thumb" inDirectory: bundlesDir]];
     }
 
-  for (i = 0; i < [bundlesPaths count]; i++) {
-		NSString *bpath = [bundlesPaths objectAtIndex: i];
-		NSBundle *bundle = [NSBundle bundleWithPath: bpath]; 
-		
-		if (bundle) {
-			Class principalClass = [bundle principalClass];
-			
-			if (principalClass) {
-				if ([principalClass conformsToProtocol: @protocol(TMBProtocol)]) {	
-					id<TMBProtocol> tmb = [[principalClass alloc] init];
+  for (i = 0; i < [bundlesPaths count]; i++)
+    {
+      NSString *bpath = [bundlesPaths objectAtIndex: i];
+      NSBundle *bundle = [NSBundle bundleWithPath: bpath]; 
+      
+      if (bundle)
+        {
+          Class principalClass = [bundle principalClass];
+          
+          if (principalClass)
+            {
+              if ([principalClass conformsToProtocol: @protocol(TMBProtocol)])
+                {
+                  id<TMBProtocol> tmb = [[principalClass alloc] init];
 
-          [self addThumbnailer: tmb];
-          RELEASE ((id)tmb);
-				}
-			}
+                  [self addThumbnailer: tmb];
+                  RELEASE ((id)tmb);
+                }
+            }
   	}
-	}
+    }
 }
 
 - (BOOL)addThumbnailer:(id)tmb
@@ -208,7 +212,7 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
   if (thumbsDict && [thumbsDict count]) {
     NSArray *paths = RETAIN ([thumbsDict allKeys]);
     NSMutableArray *deleted = [NSMutableArray array];
-    int i;
+    NSUInteger i;
 
     for (i = 0; i < [paths count]; i++) {
       NSString *path = [paths objectAtIndex: i];
@@ -263,29 +267,30 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
 
   added = [NSMutableArray array];
 
-      if ([fm fileExistsAtPath: path isDirectory: &isdir]) {
-        if (isdir) {
-          NSArray *contents = [fm directoryContentsAtPath: path];
-
-          for (i = 0; i < [contents count]; i++) {
-            NSString *fname = [contents objectAtIndex: i];
-            NSString *fullPath = [path stringByAppendingPathComponent: fname];
-            id<TMBProtocol> tmb = [self thumbnailerForPath: fullPath];
-            
-            if (tmb) {
+  if ([fm fileExistsAtPath: path isDirectory: &isdir] && isdir)
+    {
+      NSArray *contents = [fm directoryContentsAtPath: path];
+      
+      for (i = 0; i < [contents count]; i++)
+        {
+          NSString *fname = [contents objectAtIndex: i];
+          NSString *fullPath = [path stringByAppendingPathComponent: fname];
+          id<TMBProtocol> tmb = [self thumbnailerForPath: fullPath];
+          
+          if (tmb)
+            {
               data = [tmb makeThumbnailForPath: fullPath];
               
               if (data && [self registerThumbnailData: data 
                                               forPath: fullPath
-                                        nameExtension: [tmb fileNameExtension]]) {
-                [added addObject: fullPath];
-              }
+                                        nameExtension: [tmb fileNameExtension]])
+                {
+                  [added addObject: fullPath];
+                }
             }
-          }
         }
-      }
+    }
       
-
     if ([added count]) {
       NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
       NSMutableDictionary *info = [NSMutableDictionary dictionary];
@@ -320,7 +325,8 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
     deleted = [NSMutableArray array];
     
 
-      if ([fm fileExistsAtPath: path isDirectory: &isdir]) {
+    if ([fm fileExistsAtPath: path isDirectory: &isdir])
+      {
         if (isdir) {
           NSArray *contents = [fm directoryContentsAtPath: path];
           
@@ -421,9 +427,10 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
 	  
   enumerator = [[fm directoryContentsAtPath: dirpath] objectEnumerator];
   while ((dir = [enumerator nextObject])) {
-    if ([[dir pathExtension] isEqualToString: extension]) {
-			[bundleList addObject: [dirpath stringByAppendingPathComponent: dir]];
-		}
+    if ([[dir pathExtension] isEqualToString: extension])
+      {
+        [bundleList addObject: [dirpath stringByAppendingPathComponent: dir]];
+      }
   }
   
   return bundleList;
