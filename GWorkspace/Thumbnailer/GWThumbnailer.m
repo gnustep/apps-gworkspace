@@ -49,6 +49,7 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
 {
   if (nil == sharedThumbnailerInstance)
     {
+      NSLog(@"first shared instance");
       sharedThumbnailerInstance = [[Thumbnailer allocWithZone:NULL] init];
       countInstances = 1;
     }
@@ -93,7 +94,7 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     id entry;
     BOOL isdir;
-       
+
     fm = [NSFileManager defaultManager];
     extProviders = [NSMutableDictionary new];
     [self loadThumbnailers];
@@ -130,7 +131,8 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
       thumbsDict = [NSMutableDictionary new];
     }  
 
-    [thumbsDict writeToFile: dictPath atomically: YES];
+    [self writeDictToFile];
+
 
 
     /* FIXME: this could be a problem with different instances for View
@@ -141,6 +143,12 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
   }
 
   return self;
+}
+
+- (void)writeDictToFile
+{
+  NSLog(@"writing to: %@", dictPath);
+  [thumbsDict writeToFile: dictPath atomically: YES];
 }
 
 
@@ -269,9 +277,9 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
         NSMutableDictionary *info = [NSMutableDictionary dictionary];
 
         [info setObject: deleted forKey: @"deleted"];	
-        [info setObject: [NSArray array] forKey: @"created"];	
-      
-        [thumbsDict writeToFile: dictPath atomically: YES];
+        [info setObject: [NSArray array] forKey: @"created"];
+
+        [self writeDictToFile];
       
         [[NSDistributedNotificationCenter defaultCenter] 
             postNotificationName: GWThumbnailsDidChangeNotification
@@ -332,10 +340,10 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
                    forKey: @"thumbref"];
       [defaults synchronize];
 
-	    [info setObject: [NSArray array] forKey: @"deleted"];	
+      [info setObject: [NSArray array] forKey: @"deleted"];	
       [info setObject: added forKey: @"created"];	
 
-      [thumbsDict writeToFile: dictPath atomically: YES];
+      [self writeDictToFile];
 
       [[NSDistributedNotificationCenter defaultCenter] 
 	postNotificationName: GWThumbnailsDidChangeNotification
@@ -383,9 +391,9 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
       NSMutableDictionary *info = [NSMutableDictionary dictionary];
       
       [info setObject: deleted forKey: @"deleted"];	
-      [info setObject: [NSArray array] forKey: @"created"];	
-      
-      [thumbsDict writeToFile: dictPath atomically: YES];
+      [info setObject: [NSArray array] forKey: @"created"];
+
+      [self writeDictToFile];
       
       [[NSDistributedNotificationCenter defaultCenter] 
             postNotificationName: GWThumbnailsDidChangeNotification

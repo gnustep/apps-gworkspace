@@ -2,6 +2,12 @@
 
 	* GWorkspace/Thumbnailer/GWThumbnailer.h
 	* GWorkspace/Thumbnailer/GWThumbnailer.m
+	Factor out writing thumbnail dictionary in a common method.
+
+2015-12-02 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/Thumbnailer/GWThumbnailer.h
+	* GWorkspace/Thumbnailer/GWThumbnailer.m
 	* GWorkspace/FileViewer/GWViewer.m
 	Make the thumbnailer a (releasable) singleton and instantiate it through sharedThumbnailer. It may be released, but if it exists, it is a singleton.
 

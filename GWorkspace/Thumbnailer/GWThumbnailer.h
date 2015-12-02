@@ -51,9 +51,12 @@
   NSTimer *timer; 
   NSConnection *conn;
   NSFileManager *fm;
+  NSLock *dictLock;
 }
 
 + (Thumbnailer *)sharedThumbnailer;
+
+- (void)writeDictToFile;
 
 - (void)loadThumbnailers;
 
