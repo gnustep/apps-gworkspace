@@ -436,16 +436,6 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
   return bundleList;
 }
 
-- (BOOL)registerExternalProvider:(id<TMBProtocol>)provider
-{
-  if ([self addThumbnailer: provider]) {
- 	  NSConnection *connection = [(NSDistantObject*)provider connectionForProxy];
-    [extProviders setObject: provider forKey: connection];
-    return YES;
-  }
-
-  return NO;  
-}
 
 
 @end

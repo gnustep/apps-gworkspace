@@ -38,13 +38,8 @@
 
 @end
 
-@protocol ThumbnailerProtocol
 
-- (BOOL)registerExternalProvider:(id<TMBProtocol>)provider;
-
-@end
-
-@interface Thumbnailer: NSObject <ThumbnailerProtocol>
+@interface Thumbnailer: NSObject
 {
   NSMutableArray *thumbnailers;
   NSMutableDictionary *extProviders;
