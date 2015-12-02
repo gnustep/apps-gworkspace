@@ -4,7 +4,7 @@
     ApplicationIcon = "FileManager.tiff";
     ApplicationRelease = "0.9.3";
     NSBuildVersion = "05 2015";
-    CFBundleIdentifier = "org.gnustep.GWorkspace"
+    CFBundleIdentifier = "org.gnustep.GWorkspace";
     Authors = (
       "Riccardo Mottola",
       "Enrico Sersale",

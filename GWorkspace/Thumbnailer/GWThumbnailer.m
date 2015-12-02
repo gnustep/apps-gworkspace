@@ -30,6 +30,8 @@
 #import <AppKit/AppKit.h>
 #import "GWThumbnailer.h"
 
+static Thumbnailer *sharedThumbnailerInstance = nil;
+static NSInteger countInstances = 0;
 
 static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNotification";
 
@@ -37,21 +39,50 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
 
 @implementation Thumbnailer
 
+/* A singleton that can be released. However, once one existance exists,
+   all instances will be the same object.
+
+   This way we can insure that only one Thumbnail dictionary exists in memory
+*/
+
++ (Thumbnailer *)sharedThumbnailer
+{
+  if (nil == sharedThumbnailerInstance)
+    {
+      sharedThumbnailerInstance = [[Thumbnailer allocWithZone:NULL] init];
+      countInstances = 1;
+    }
+  else
+    {
+      countInstances++;
+      NSLog(@"returning existing instance, %lu", (long)countInstances);
+    }
+  return sharedThumbnailerInstance;
+}
+
 - (void)dealloc
 {
-  [[NSNotificationCenter defaultCenter] removeObserver: self];
+  countInstances--;
 
-  if (timer && [timer isValid]) {
-    [timer invalidate];
-  }
+  if (countInstances < 0)
+    NSLog(@"Something went wrong!");
+  if (countInstances == 0)
+    {
+      NSLog(@"Last thumbnailer instance, dealloc'ing");
+      [[NSNotificationCenter defaultCenter] removeObserver: self];
+
+      if (timer && [timer isValid])
+        [timer invalidate];
   
-  RELEASE (thumbnailers);
-  RELEASE (extProviders);
-  RELEASE (thumbnailDir);
-  RELEASE (dictPath);
-  RELEASE (thumbsDict);
-  DESTROY (conn);
-  [super dealloc];
+      RELEASE (thumbnailers);
+      RELEASE (extProviders);
+      RELEASE (thumbnailDir);
+      RELEASE (dictPath);
+      RELEASE (thumbsDict);
+      DESTROY (conn);
+      sharedThumbnailerInstance = nil;
+      [super dealloc];
+    }
 }
 
 - (id)init
@@ -111,6 +142,7 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
 
   return self;
 }
+
 
 - (void)loadThumbnailers
 {
@@ -232,19 +264,20 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
 
     RELEASE (paths); 
     
-    if ([deleted count]) {
-      NSMutableDictionary *info = [NSMutableDictionary dictionary];
+    if ([deleted count])
+      {
+        NSMutableDictionary *info = [NSMutableDictionary dictionary];
 
-	    [info setObject: deleted forKey: @"deleted"];	
-      [info setObject: [NSArray array] forKey: @"created"];	
+        [info setObject: deleted forKey: @"deleted"];	
+        [info setObject: [NSArray array] forKey: @"created"];	
       
-      [thumbsDict writeToFile: dictPath atomically: YES];
+        [thumbsDict writeToFile: dictPath atomically: YES];
       
-	    [[NSDistributedNotificationCenter defaultCenter] 
+        [[NSDistributedNotificationCenter defaultCenter] 
             postNotificationName: GWThumbnailsDidChangeNotification
-	 								        object: nil 
+                          object: nil 
                         userInfo: info];
-    }
+      }
   }   
 }
 
@@ -345,19 +378,20 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
         }
       }
         
-    if ([deleted count]) {
+    if ([deleted count])
+      {
       NSMutableDictionary *info = [NSMutableDictionary dictionary];
-
-	    [info setObject: deleted forKey: @"deleted"];	
+      
+      [info setObject: deleted forKey: @"deleted"];	
       [info setObject: [NSArray array] forKey: @"created"];	
       
       [thumbsDict writeToFile: dictPath atomically: YES];
       
-	    [[NSDistributedNotificationCenter defaultCenter] 
+      [[NSDistributedNotificationCenter defaultCenter] 
             postNotificationName: GWThumbnailsDidChangeNotification
-	 								        object: nil 
+                          object: nil 
                         userInfo: info];
-    }
+      }
 }
 
 

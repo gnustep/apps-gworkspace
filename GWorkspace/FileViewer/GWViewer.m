@@ -1564,12 +1564,11 @@ constrainMinCoordinate:(CGFloat)proposedMin
   NSString *path;
 
   path = [[nodeView shownNode] path];
-  NSLog(@"make thumbnails in path: %@", path);
   if (path)
     {
       Thumbnailer *t;
       
-      t = [[Thumbnailer alloc] init];
+      t = [Thumbnailer sharedThumbnailer];
       [t makeThumbnails:path];
       [t release];
     }
@@ -1580,12 +1579,11 @@ constrainMinCoordinate:(CGFloat)proposedMin
   NSString *path;
 
   path = [[nodeView shownNode] path];
-  NSLog(@"remove thumbnails in: %@", path);
   if (path)
     {
       Thumbnailer *t;
       
-      t = [[Thumbnailer alloc] init];
+      t = [Thumbnailer sharedThumbnailer];
       [t removeThumbnails:path];
       [t release];
     }

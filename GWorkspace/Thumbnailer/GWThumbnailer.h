@@ -53,6 +53,8 @@
   NSFileManager *fm;
 }
 
++ (Thumbnailer *)sharedThumbnailer;
+
 - (void)loadThumbnailers;
 
 - (BOOL)addThumbnailer:(id)tmb;
