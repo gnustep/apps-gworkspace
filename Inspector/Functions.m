@@ -1,6 +1,6 @@
 /* Functions.m
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2015 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
@@ -32,52 +32,6 @@
 #define ONE_MB (ONE_KB * ONE_KB)
 #define ONE_GB (ONE_KB * ONE_MB)
 
-static inline NSString *cut_Text(NSString *filename, id label, int lenght)
-{
-  NSString *cutname = nil;
-  NSString *reststr = nil;
-  NSString *dots;
-  NSFont *labfont;
-  NSDictionary *attr;
-  float w, cw, dotslenght;
-  int i;
-
-  cw = 0;
-  labfont = [label font];
-  
-  attr = [NSDictionary dictionaryWithObjectsAndKeys: 
-			                        labfont, NSFontAttributeName, nil];  
-  
-  dots = @"...";  
-	dotslenght = [dots sizeWithAttributes: attr].width;  
-  w = [filename sizeWithAttributes: attr].width;
-  
-	if (w > lenght) {
-		i = 0;
-		while (cw <= (lenght - dotslenght)) {
-			if (i == [filename length]) {
-				break;
-      }
-			cutname = [filename substringToIndex: i];
-			reststr = [filename substringFromIndex: i];
-      cw = [cutname sizeWithAttributes: attr].width;
-			i++;
-		}	
-		if ([cutname isEqual: filename] == NO) {      
-			if ([reststr length] <= 3) { 
-				return filename;
-			} else {
-				cutname = [cutname stringByAppendingString: dots];
-      }
-		} else {
-			return filename;
-		}	
-	} else {
-		return filename;
-	}
-  
-	return cutname;
-}
 
 static NSString *fix_path(NSString *s, const char *c)
 {
