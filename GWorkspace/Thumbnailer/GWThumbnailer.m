@@ -339,8 +339,7 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
       [defaults setObject: [NSNumber numberWithLong: thumbref] 
                    forKey: @"thumbref"];
       [defaults synchronize];
-
-      [info setObject: [NSArray array] forKey: @"deleted"];	
+	
       [info setObject: added forKey: @"created"];	
 
       [self writeDictToFile];
@@ -391,7 +390,6 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
       NSMutableDictionary *info = [NSMutableDictionary dictionary];
       
       [info setObject: deleted forKey: @"deleted"];	
-      [info setObject: [NSArray array] forKey: @"created"];
 
       [self writeDictToFile];
       

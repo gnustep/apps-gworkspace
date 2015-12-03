@@ -1583,7 +1583,7 @@ static GWorkspace *gworkspace = nil;
 
     thumbnailDir = [thumbnailDir stringByAppendingPathComponent: @"Thumbnails"];
   
-    if ([deleted count]) {
+    if (deleted && [deleted count]) {
       for (i = 0; i < [deleted count]; i++) {
         NSString *path = [deleted objectAtIndex: i];
         NSString *dir = [path stringByDeletingLastPathComponent];
@@ -1603,7 +1603,7 @@ static GWorkspace *gworkspace = nil;
       [tmbdirs removeAllObjects];
     }
 
-    if ([created count]) {
+    if (created && [created count]) {
       NSString *dictName = @"thumbnails.plist";
       NSString *dictPath = [thumbnailDir stringByAppendingPathComponent: dictName];
       

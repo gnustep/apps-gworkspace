@@ -1,3 +1,13 @@
+2015-12-03 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNIcon.m
+	* FSNode/FSNPathComponentsViewer.m
+	Use NSBrowserCell image for branch image, so that it uses the current theme.
+
+	* GWorkspace/GWorkspace.m
+	* GWorkspace/Thumbnailer/GWThumbnailer.m
+	In the icon changed notification, pass in side the info object only the actually created/deleted icons: do not put an empty object with the missing ones. Saves space in the info object.
+
 2015-12-02 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/Thumbnailer/GWThumbnailer.h
