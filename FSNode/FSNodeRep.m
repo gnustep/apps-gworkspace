@@ -114,8 +114,6 @@ static FSNodeRep *shared = nil;
     hardDiskIcon = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
     imagepath = [bundle pathForImageResource: @"HardDiskOpen"];
     openHardDiskIcon = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
-    imagepath = [bundle pathForImageResource: @"Workspace"];
-    workspaceIcon = [[NSImage alloc] initWithContentsOfFile: imagepath];
     trashIcon = [[NSImage imageNamed:NSImageNameTrashEmpty] retain];
     trashFullIcon = [[NSImage imageNamed:NSImageNameTrashFull] retain];
     
@@ -257,7 +255,6 @@ static FSNodeRep *shared = nil;
   RELEASE (openFolderIcon);
   RELEASE (hardDiskIcon);
   RELEASE (openHardDiskIcon);
-  RELEASE (workspaceIcon);
   RELEASE (trashIcon);
   RELEASE (trashFullIcon);
         

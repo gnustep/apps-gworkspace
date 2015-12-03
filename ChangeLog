@@ -1,5 +1,12 @@
 2015-12-03 Riccardo Mottola <rm@gnu.org>
 
+	* FSNode/FSNodeRep.h
+	* FSNode/FSNodeRep.m
+	* FSNode/FSNodeRepIcons.m
+	Remove unused workspace icon.
+
+2015-12-03 Riccardo Mottola <rm@gnu.org>
+
 	* FSNode/FSNIcon.m
 	* FSNode/FSNPathComponentsViewer.m
 	Use NSBrowserCell image for branch image, so that it uses the current theme.

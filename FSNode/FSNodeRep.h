@@ -370,7 +370,6 @@ typedef enum FSNSelectionMask {
   NSImage *openFolderIcon;
   NSImage *hardDiskIcon;
   NSImage *openHardDiskIcon;
-  NSImage *workspaceIcon;
   NSImage *trashIcon;
   NSImage *trashFullIcon;
   
@@ -484,8 +483,6 @@ typedef enum FSNSelectionMask {
 
 - (NSImage *)openFolderIconOfSize:(int)size 
                           forNode:(FSNode *)node;
-
-- (NSImage *)workspaceIconOfSize:(int)size;
 
 - (NSImage *)trashIconOfSize:(int)size;
 

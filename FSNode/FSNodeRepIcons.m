@@ -1,6 +1,6 @@
 /* FSNodeRepIcons.m
  *  
- * Copyright (C) 2005-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2015 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola
@@ -325,16 +325,6 @@ static unsigned char darkerLUT[256] = {
   return icon;
 }
 
-- (NSImage *)workspaceIconOfSize:(int)size
-{
-  NSSize icnsize = [workspaceIcon size];
-
-  if ((icnsize.width > size) || (icnsize.height > size)) {
-    return [self resizedIcon: workspaceIcon ofSize: size];
-  }  
-  
-  return workspaceIcon;
-}
 
 - (NSImage *)trashIconOfSize:(int)size
 {
