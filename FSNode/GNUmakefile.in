@@ -19,8 +19,9 @@ FSNode_OBJC_FILES = \
          FSNIcon.m \
          FSNIconsView.m \
          FSNListView.m \
-         FSNPathComponentsViewer.m
-                
+         FSNPathComponentsViewer.m \
+
+
 FSNode_HEADER_FILES = \
          FSNode.h \
          FSNodeRep.h \
@@ -34,10 +35,11 @@ FSNode_HEADER_FILES = \
          FSNIcon.h \
          FSNIconsView.h \
          FSNListView.h \
-         FSNPathComponentsViewer.h
-        
+         FSNPathComponentsViewer.h \
+
+
 FSNode_HAS_RESOURCE_BUNDLE = yes                                          
-        
+
 FSNode_RESOURCE_FILES = \
     Resources/Images/* \
     Resources/English.lproj 

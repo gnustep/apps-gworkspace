@@ -67,26 +67,25 @@ static NSImage *branchImage;
 {
   static BOOL initialized = NO;
 
-  if (initialized == NO) {
-    NSBundle *bundle = [NSBundle bundleForClass: [FSNodeRep class]];
-    NSString *imagepath = [bundle pathForResource: @"ArrowRight" ofType: @"tiff"];
+  if (initialized == NO)
+    {
+      if (desktopApp == nil)
+        {
+          NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+          NSString *appName = [defaults stringForKey: @"DesktopApplicationName"];
+          NSString *selName = [defaults stringForKey: @"DesktopApplicationSelName"];
 
-    if (desktopApp == nil) {
-      NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-      NSString *appName = [defaults stringForKey: @"DesktopApplicationName"];
-      NSString *selName = [defaults stringForKey: @"DesktopApplicationSelName"];
+          if (appName && selName)
+            {
+              Class desktopAppClass = [[NSBundle mainBundle] classNamed: appName];
+              SEL sel = NSSelectorFromString(selName);
+              desktopApp = [desktopAppClass performSelector: sel];
+            }
+        }
 
-      if (appName && selName) {
-		    Class desktopAppClass = [[NSBundle mainBundle] classNamed: appName];
-        SEL sel = NSSelectorFromString(selName);
-        desktopApp = [desktopAppClass performSelector: sel];
-      }
+      branchImage = [NSBrowserCell branchImage];
+      initialized = YES;
     }
-
-    branchImage = [[NSImage alloc] initWithContentsOfFile: imagepath];
-  
-    initialized = YES;
-  }
 }
 
 + (NSImage *)branchImage

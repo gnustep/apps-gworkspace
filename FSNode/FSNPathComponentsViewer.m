@@ -263,13 +263,12 @@ static NSImage *branchImage;
 {
   static BOOL initialized = NO;
 
-  if (initialized == NO) {
-    NSBundle *bundle = [NSBundle bundleForClass: [FSNodeRep class]];
-    NSString *imagepath = [bundle pathForResource: @"ArrowRight" ofType: @"tiff"];
-
-    branchImage = [[NSImage alloc] initWithContentsOfFile: imagepath];
-    initialized = YES;
-  }
+  if (initialized == NO)
+    {
+      
+      branchImage = [NSBrowserCell branchImage];
+      initialized = YES;
+    }
 }
 
 - (id)initForNode:(FSNode *)anode
