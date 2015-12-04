@@ -52,6 +52,7 @@
   NSConnection *conn;
   NSFileManager *fm;
   NSLock *dictLock;
+  NSMutableArray *pathsInProcessing;
 }
 
 + (Thumbnailer *)sharedThumbnailer;

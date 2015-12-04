@@ -1,6 +1,12 @@
 2015-12-04 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/Thumbnailer/GWThumbnailer.h
+	* GWorkspace/Thumbnailer/GWThumbnailer.m
+	removeThumbnails, makeThumbnails: execute work in separate thread. Add pathsInProcessing to keep track of which paths are in process and do not allow to make/remove thumbnails on them.
+
+2015-12-04 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/Thumbnailer/GWThumbnailer.h
 	* GWorkspace/Thumbnailer/GWThumbnailer.m (writeDictToFile)
 	Lock critical section.
 

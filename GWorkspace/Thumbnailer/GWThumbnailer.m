@@ -49,14 +49,12 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
 {
   if (nil == sharedThumbnailerInstance)
     {
-      NSLog(@"first shared instance");
       sharedThumbnailerInstance = [[Thumbnailer allocWithZone:NULL] init];
       countInstances = 1;
     }
   else
     {
       countInstances++;
-      NSLog(@"returning existing instance, %lu", (long)countInstances);
     }
   return sharedThumbnailerInstance;
 }
@@ -82,6 +80,7 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
       RELEASE (thumbsDict);
       DESTROY (conn);
       DESTROY (dictLock);
+      RELEASE (pathsInProcessing);
       sharedThumbnailerInstance = nil;
       [super dealloc];
     }
@@ -98,6 +97,8 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
 
     if (!dictLock)
       dictLock = [[NSLock alloc] init];
+
+    pathsInProcessing = [[NSMutableArray alloc] init];
 
     fm = [NSFileManager defaultManager];
     extProviders = [NSMutableDictionary new];
@@ -152,7 +153,7 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
 - (void)writeDictToFile
 {
   [dictLock lock];
-  NSLog(@"writing to: %@", dictPath);
+  NSLog(@"(%d) writing to: %@", (int)countInstances, dictPath);
   [thumbsDict writeToFile: dictPath atomically: YES];
   [dictLock unlock];
 }
@@ -304,7 +305,7 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
   return [NSString stringWithFormat: @"%lx", thumbref];
 }
 
-- (void)makeThumbnails:(NSString *)path
+- (void)_makeThumbnails:(NSString *)path
 {
   NSData *data;
   NSMutableArray *added;
@@ -312,6 +313,7 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
   NSUInteger i;
 
 
+  NSLog(@"_makeThumbnails (%u): %@", (int)countInstances, path);
   added = [NSMutableArray array];
 
   if ([fm fileExistsAtPath: path isDirectory: &isdir] && isdir)
@@ -355,9 +357,18 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
 	object: nil 
 	userInfo: info];
     }
+  [pathsInProcessing removeObject:path];
 }
 
-- (void)removeThumbnails:(NSString *)path
+- (void)makeThumbnails:(NSString *)path
+{
+  if ([pathsInProcessing containsObject:path])
+    return;
+  [pathsInProcessing addObject:path];
+  [NSThread detachNewThreadSelector:@selector(_makeThumbnails:) toTarget:self withObject:path];
+}
+
+- (void)_removeThumbnails:(NSString *)path
 {
   NSMutableArray *deleted;
   BOOL isdir;
@@ -404,8 +415,18 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
                           object: nil 
                         userInfo: info];
       }
+
+  [pathsInProcessing removeObject:path];
 }
 
+
+- (void)removeThumbnails:(NSString *)path
+{
+  if ([pathsInProcessing containsObject:path])
+    return;
+  [pathsInProcessing addObject:path];
+  [NSThread detachNewThreadSelector:@selector(_removeThumbnails:) toTarget:self withObject:path];
+}
 
 - (BOOL)registerThumbnailData:(NSData *)data 
                       forPath:(NSString *)path
