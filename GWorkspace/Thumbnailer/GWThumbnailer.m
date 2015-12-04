@@ -311,8 +311,9 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
   NSMutableArray *added;
   BOOL isdir;
   NSUInteger i;
+  NSAutoreleasePool *arp;
 
-
+  arp = [NSAutoreleasePool new];
   NSLog(@"_makeThumbnails (%u): %@", (int)countInstances, path);
   added = [NSMutableArray array];
 
@@ -358,6 +359,7 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
 	userInfo: info];
     }
   [pathsInProcessing removeObject:path];
+  [arp drain];
 }
 
 - (void)makeThumbnails:(NSString *)path
@@ -373,6 +375,9 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
   NSMutableArray *deleted;
   BOOL isdir;
   NSUInteger i;
+  NSAutoreleasePool *arp;
+
+  arp = [NSAutoreleasePool new];
 
   
     if ((thumbsDict == nil) || ([thumbsDict count] == 0)) {
@@ -417,6 +422,7 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
       }
 
   [pathsInProcessing removeObject:path];
+  [arp drain];
 }
 
 
