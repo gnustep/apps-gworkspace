@@ -81,6 +81,7 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
       RELEASE (dictPath);
       RELEASE (thumbsDict);
       DESTROY (conn);
+      DESTROY (dictLock);
       sharedThumbnailerInstance = nil;
       [super dealloc];
     }
@@ -94,6 +95,9 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     id entry;
     BOOL isdir;
+
+    if (!dictLock)
+      dictLock = [[NSLock alloc] init];
 
     fm = [NSFileManager defaultManager];
     extProviders = [NSMutableDictionary new];
@@ -147,8 +151,10 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
 
 - (void)writeDictToFile
 {
+  [dictLock lock];
   NSLog(@"writing to: %@", dictPath);
   [thumbsDict writeToFile: dictPath atomically: YES];
+  [dictLock unlock];
 }
 
 
