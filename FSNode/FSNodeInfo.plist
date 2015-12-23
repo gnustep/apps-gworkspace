@@ -1,0 +1,9 @@
+{
+  NSExecutable = "FSNode";
+  NSMainNibFile = "";
+  NSPrincipalClass = "FSNode";
+  CFBundleIdentifier = "org.gnustep.FSNode";
+  Classes = 
+("FSNode", "FSNodeRep", "FSNTextCell", "FSNBrowserCell", "FSNCellNameEditor", "FSNBrowserScroll", "FSNBrowserMatrix", "FSNBrowserColumn", "FSNBrowser", "FSNIcon", "FSNIconNameEditor", "FSNIconsView", "FSNListView", "FSNListViewDataSource", "FSNListViewNameEditor", "FSNListViewNodeRep", "FSNPathComponentView", "FSNPathComponentsViewer")
+  ;
+}
