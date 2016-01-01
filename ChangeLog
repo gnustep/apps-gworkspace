@@ -1,3 +1,9 @@
+2016-01-01 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNodeRep.h
+	* FSNode/FSNodeRep.m
+	Make nc ivar local instead.
+
 2015-12-04 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/Thumbnailer/GWThumbnailer.h

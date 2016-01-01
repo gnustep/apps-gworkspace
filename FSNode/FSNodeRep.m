@@ -1,6 +1,6 @@
 /* FSNodeRep.m
  *  
- * Copyright (C) 2004-2015 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola <rm@gnu.org>
@@ -98,6 +98,7 @@ static FSNodeRep *shared = nil;
     NSString *imagepath;
     BOOL isdir;
     NSString *libraryDir;
+    NSNotificationCenter *nc;
     
     fm = [NSFileManager defaultManager];
     ws = [NSWorkspace sharedWorkspace];
