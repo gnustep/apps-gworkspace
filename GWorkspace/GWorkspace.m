@@ -1266,7 +1266,7 @@ static GWorkspace *gworkspace = nil;
 - (void)openSelectedPathsWith
 {
   BOOL canopen = YES;
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [selectedPaths count]; i++) {
     FSNode *node = [FSNode nodeWithPath: [selectedPaths objectAtIndex: i]];
@@ -1430,7 +1430,8 @@ static GWorkspace *gworkspace = nil;
 {
   NSString *basePath;
   NSMutableArray *files;
-  int tag, i;
+  int tag;
+  NSUInteger i;
 
   basePath = [NSString stringWithString: [selectedPaths objectAtIndex: 0]];
   basePath = [basePath stringByDeletingLastPathComponent];
@@ -1456,7 +1457,8 @@ static GWorkspace *gworkspace = nil;
 {
   NSString *basePath;
   NSMutableArray *files;
-  int tag, i;
+  int tag;
+  NSUInteger i;
 
   basePath = [NSString stringWithString: [selectedPaths objectAtIndex: 0]];
   basePath = [basePath stringByDeletingLastPathComponent];
@@ -1572,18 +1574,19 @@ static GWorkspace *gworkspace = nil;
   NSArray *deleted = [info objectForKey: @"deleted"];	
   NSArray *created = [info objectForKey: @"created"];	
   NSMutableArray *tmbdirs = [NSMutableArray array];
-  int i;
+  NSUInteger i;
 
   [fsnodeRep thumbnailsDidChange: info];
 
-  if ([fsnodeRep usesThumbnails] == NO) {
+  if ([fsnodeRep usesThumbnails] == NO)
     return;
-  } else {
-    NSString *thumbnailDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
 
-    thumbnailDir = [thumbnailDir stringByAppendingPathComponent: @"Thumbnails"];
+  NSString *thumbnailDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
+
+  thumbnailDir = [thumbnailDir stringByAppendingPathComponent: @"Thumbnails"];
   
-    if (deleted && [deleted count]) {
+  if (deleted && [deleted count])
+    {
       for (i = 0; i < [deleted count]; i++) {
         NSString *path = [deleted objectAtIndex: i];
         NSString *dir = [path stringByDeletingLastPathComponent];
@@ -1596,9 +1599,8 @@ static GWorkspace *gworkspace = nil;
       [vwrsManager thumbnailsDidChangeInPaths: tmbdirs];
       [dtopManager thumbnailsDidChangeInPaths: tmbdirs];
 
-      if ([tshelfWin isVisible]) {
+      if ([tshelfWin isVisible])
         [tshelfWin updateIcons]; 
-		  }
 
       [tmbdirs removeAllObjects];
     }
@@ -1631,7 +1633,6 @@ static GWorkspace *gworkspace = nil;
         [tshelfWin updateIcons]; 
 		  }
     }
-  }
 }
 
 - (void)removableMediaPathsDidChange:(NSNotification *)notif
