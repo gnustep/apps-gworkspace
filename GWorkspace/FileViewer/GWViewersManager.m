@@ -1,6 +1,6 @@
 /* GWViewersManager.m
  *  
- * Copyright (C) 2004-2015 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2004
@@ -184,8 +184,7 @@ static GWViewersManager *vwrsmanager = nil;
       if (viewer == nil)
         {
           viewer = [self showRootViewer];
-        }
-    
+        }  
     }
   else
     {
@@ -616,7 +615,7 @@ static GWViewersManager *vwrsmanager = nil;
 
 - (void)thumbnailsDidChangeInPaths:(NSArray *)paths
 {
-  int i;  
+  NSUInteger i;  
 
   for (i = 0; i < [viewers count]; i++) {
     id viewer = [viewers objectAtIndex: i];
@@ -625,7 +624,7 @@ static GWViewersManager *vwrsmanager = nil;
       if (paths == nil) {
         [viewer reloadFromNode: [viewer baseNode]];
       } else {
-        int j;
+        NSUInteger j;
       
         for (j = 0; j < [paths count]; j++) {
           NSString *path = [paths objectAtIndex: j];
@@ -648,7 +647,7 @@ static GWViewersManager *vwrsmanager = nil;
 - (void)hideDotsFileDidChange:(BOOL)hide
 {
   NSMutableArray *viewersToClose = [NSMutableArray array];
-  int i;  
+  NSUInteger i;  
 
   for (i = 0; i < [viewers count]; i++) {
     id viewer = [viewers objectAtIndex: i];
@@ -673,7 +672,7 @@ static GWViewersManager *vwrsmanager = nil;
 - (void)hiddenFilesDidChange:(NSArray *)paths
 {
   NSMutableArray *viewersToClose = [NSMutableArray array];
-  int i, j;  
+  NSUInteger i, j;  
 
   for (i = 0; i < [viewers count]; i++) {
     id viewer = [viewers objectAtIndex: i];
@@ -699,7 +698,7 @@ static GWViewersManager *vwrsmanager = nil;
 
 - (BOOL)hasViewerWithWindow:(id)awindow
 {
-  int i;  
+  NSUInteger i;  
 
   for (i = 0; i < [viewers count]; i++) {
     id viewer = [viewers objectAtIndex: i];
@@ -714,7 +713,7 @@ static GWViewersManager *vwrsmanager = nil;
 
 - (id)viewerWithWindow:(id)awindow
 {
-  int i;  
+  NSUInteger i;  
 
   for (i = 0; i < [viewers count]; i++) {
     id viewer = [viewers objectAtIndex: i];
@@ -730,7 +729,7 @@ static GWViewersManager *vwrsmanager = nil;
 - (NSArray *)viewerWindows
 {
   NSMutableArray *wins = [NSMutableArray array];
-  int i;  
+  NSUInteger i;  
 
   for (i = 0; i < [viewers count]; i++) {
     id viewer = [viewers objectAtIndex: i];
