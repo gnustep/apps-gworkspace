@@ -176,6 +176,7 @@
 "Changed" = "Changed";
 "Revert" = "Revert";
 "OK" = "OK";
+"also apply to files inside selection" = "Apply to subfolders";
 
 
 /* ContentsPanel.m */

@@ -181,7 +181,7 @@
 "Changed" = "Modifié";
 "Revert" = "Revenir";
 "OK" = "Ok";
-
+"also apply to files inside selection" = "Appliquer aux sous-dossiers";
 
 /* ContentsPanel.m */
 
