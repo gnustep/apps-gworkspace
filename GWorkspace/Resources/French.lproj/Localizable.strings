@@ -73,6 +73,7 @@
 		"Go backward" = "Revenir en arrière";	
 		"Go forward" = "Avancer";	
 	"Show Desktop" = "Montrer le bureau";
+        "Hide Desktop" = "Masquer le bureau";
 	"Show Recycler" = "Montrer la corbeille";
 	"Check for disks" = "Vérifier les lecteurs";
 	

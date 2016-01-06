@@ -69,6 +69,7 @@
 		"Go backward" = "Go backward";
 		"Go forward" = "Go forward";
 	"Show Desktop" = "Show Desktop";
+        "Hide Desktop" = "Hide Desktop";
 	"Show Recycler" = "Show Recycler";
 	"Check for disks" = "Check for disks";
 	
