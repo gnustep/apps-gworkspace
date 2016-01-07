@@ -71,6 +71,7 @@
 	"Show Desktop" = "Show Desktop";
         "Hide Desktop" = "Hide Desktop";
 	"Show Recycler" = "Show Recycler";
+        "Hide Recycler" = "Hide Recycler";
 	"Check for disks" = "Check for disks";
 	
 "Windows" = "Windows";
@@ -199,7 +200,6 @@
 "Type" = "Type";
 "Date" = "Date";
 "Size" = "Size";
-"Owner" = "Owner";
 "Folder Inspector" = "Folder Inspector";	
 
 
@@ -245,7 +245,7 @@
 "Read" = "Read";
 "Write" = "Write";
 "Execute" = "Execute";
-"Owner" = "Owner";
+"Owner_short" = "Owner";
 "Group" = "Group";
 "Other" = "Other";
 

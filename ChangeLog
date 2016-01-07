@@ -1,3 +1,11 @@
+2016-01-07 Riccardo Mottola <rm@gnu.org>
+
+	* Inspector/Attributes.m
+	* GWorkspace/Resources/English.lproj/Localizable.strings
+	* GWorkspace/Resources/French.lproj/Localizable.strings
+	* GWorkspace/Resources/German.lproj/Localizable.string
+	Localize Owner strong to Owner_short
+
 2016-01-05 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/FileViewer/GWViewersManager.m

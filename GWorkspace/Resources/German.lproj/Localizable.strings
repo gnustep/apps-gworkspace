@@ -261,7 +261,7 @@ which ends in "kann <the file> nicht umbenennen"
 "Read" = "Lesen";
 "Write" = "Schreiben";
 "Execute" = "Ausführen";
-"Owner" = "Besitzer";
+"Owner_short" = "Besitzer";
 "Group" = "Gruppe";
 "Others" = "Andere";
 

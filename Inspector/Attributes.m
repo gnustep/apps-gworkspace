@@ -1,6 +1,6 @@
 /* Attributes.m
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
@@ -153,7 +153,7 @@ static BOOL sizeStop = NO;
     [readLabel setStringValue: NSLocalizedString(@"Read", @"")];
     [writeLabel setStringValue: NSLocalizedString(@"Write", @"")];
     [executeLabel setStringValue: NSLocalizedString(@"Execute", @"")];
-    [uLabel setStringValue: NSLocalizedString(@"Owner", @"")];
+    [uLabel setStringValue: NSLocalizedString(@"Owner_short", @"")];
     [gLabel setStringValue: NSLocalizedString(@"Group", @"")];
     [oLabel setStringValue: NSLocalizedString(@"Others", @"")];
     [insideButt setTitle: NSLocalizedString(@"also apply to files inside selection", @"")];

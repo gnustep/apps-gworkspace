@@ -75,6 +75,7 @@
 	"Show Desktop" = "Montrer le bureau";
         "Hide Desktop" = "Masquer le bureau";
 	"Show Recycler" = "Montrer la corbeille";
+        "Hide Recycler" = "Masquer la corbeille";
 	"Check for disks" = "Vérifier les lecteurs";
 	
 "Windows" = "Fenêtre";
@@ -177,7 +178,7 @@
 "Path:" = "Nom complet :";
 "Link To:" = "Lié à :";
 "Size:" = "Taille :";
-"Owner:" = "Propriétaire :";
+"Owner:" = "Propr.:";
 "Group:" = "Groupe :";
 "Changed" = "Modifié";
 "Revert" = "Revenir";
@@ -201,7 +202,6 @@
 "Type" = "Type";
 "Date" = "Date";
 "Size" = "Taille";
-"Owner" = "Propriétaire";
 "Folder Inspector" = "Inspecteur de dossiers";	
 /* Ajouts 25052003 */
 "%@ available on hard disk"= "%@ disponibles sur le disque dur";
@@ -252,7 +252,7 @@
 "Read" = "Lire";
 "Write" = "Ecrire";
 "Execute" = "Executer";
-"Owner" = "Propriétaire";
+"Owner_short" = "Propr.";
 "Group" = "Groupe";
 "Other" = "Autre";
 
@@ -389,7 +389,6 @@
 "Type" = "Type";
 "Date" = "Date";
 "Size" = "Taille";
-"Owner" = "Propriétaire";
 "Set" = "Appliquer";
 "Icons Animation" = "Animation d'icônes";
 "Hidden Files" = "Fichiers cachés";
