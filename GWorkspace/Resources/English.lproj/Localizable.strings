@@ -40,6 +40,8 @@
 	      	"Up" = "Up";
 		"Left" = "Left";
 	"Label Size" = "Label Size";
+        "Make thumbnail(s)" = "Make thumbnail(s)";
+        "Remove thumbnail(s)" = "Remove thumbnail(s)";
 	"Viewer" = "Viewer";
 		
 "Tools" = "Tools";
@@ -59,6 +61,7 @@
 		"Layers" = "Layers";
 	"Tabbed Shelf" = "Tabbed Shelf";	
 		"Show Tabbed Shelf" = "Show Tabbed Shelf";
+                "Hide Tabbed Shelf" = "Hide Tabbed Shelf";
 		"Remove Current Tab" = "Remove Current Tab";
 		"Rename Current Tab" = "Rename Current Tab";
 		"Add Tab..." = "Add Tab...";
@@ -351,7 +354,7 @@
 /* IconViewsPreferences.m */
 "Icons" = "Icons";
 "Thumbnails" = "Thumbnails";
-"use thumbnails" = "use thumbnails";
+"use thumbnails" = "Use thumbnails";
 "Title Width" = "Title Width";
 "Icon View" = "Icon View";
 

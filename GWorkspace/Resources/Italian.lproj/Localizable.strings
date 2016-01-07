@@ -26,7 +26,9 @@
 	"Browser" = "Browser";
 	"Icon" = "Icone";
                 "Owner" = "Proprietario";
-		
+        "Make thumbnail(s)" = "Crea miniature";
+        "Remove thumbnail(s)" = "Rimuovi miniature";
+ 
 "Tools" = "Strumenti";
 	"Viewer" = "Viewer";
 	"Inspectors" = "Ispettori";
@@ -36,7 +38,6 @@
 		"Tools" = "Strumenti";	
 		"Permissions" = "Permessi";	
 	"Finder" = "Finder";
-	"Processes..." = "Processi...";
 	"Fiend" = "Fiend";
 		"Show Fiend" = "Mostra il Fiend";
 		"Hide Fiend" = "Nascondi il Fiend";
@@ -44,11 +45,24 @@
 		"Remove Current Layer" = "Rimuovi il Livello corrente";
 		"Rename Current Layer" = "Rinomina il Livello corrente";
 		"Layers" = "Livelli";
+	"Tabbed Shelf" = "Scaffalatura";	
+		"Show Tabbed Shelf" = "Mostra Scaffalatura";
+                "Hide Tabbed Shelf" = "Nascondi Scaffalatura";
+		"Remove Current Tab" = "Rimuovi Scaffale Corrente";
+		"Rename Current Tab" = "Rinomina Scaffale Corrente";
+		"Add Tab..." = "Aggiungi Scaffale...";
+	"Terminal" = "Terminale";
+	"Run..." = "Esegui...";
+	"History" = "Cronologia";
+		"Show History" = "Mostra Cronologia";
+		"Go backward" = "Indietro";
+		"Go forward" = "Avanti";
         "Show Desktop" = "Mostra Scrivania";
         "Hide Desktop" = "Nascondi Scrivania";
 	"Show Recycler" = "Mostra Cestino";
         "Hide Recycler" = "Nascondi Cestino";
-	
+	"Check for disks" = "Verifica dischi";
+
 "Windows" = "Finestre";
 	"Arrange in Front" = "Porta davanti";
 	"Miniaturize Window" = "Miniaturizza la Finestra";
@@ -57,8 +71,14 @@
 "Services" = "Servizi";
 
 "Hide" = "Nascondi";
+"Hide Others" = "Nascondi Altri";
+"Show All" = "Mostra Tutti";
+
+"Print..." = "Stampa...";
 
 "Quit" = "Esci";
+
+"Logout" = "Termina Sessione";
 
 /* ----------------------- File Operations strings --------------------------- *\
 
@@ -311,6 +331,9 @@
 
 /* IconViewsPreferences.m */
 
+"Icons" = "Icone";
+"Thumbnails" = "Miniature";
+"use thumbnails" = "Usa miniature";
 "Title Width" = "Larg. Titolo";
 "Icon View" = "Vista per Icone";
 

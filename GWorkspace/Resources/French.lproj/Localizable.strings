@@ -44,6 +44,8 @@
 	      	"Up" = "Haut";
 		"Left" = "Gauche";
 	"Label Size" = "Taille du texte";
+        "Make thumbnail(s)" = "Make thumbnail(s)";
+        "Remove thumbnail(s)" = "Remove thumbnail(s)";
 	"Viewer" = "Visualisateur";
 		
 "Tools" = "Outils";
@@ -63,6 +65,7 @@
 		"Layers" = "Espaces de travail";
 	"Tabbed Shelf" = "Etagères";	
 		"Show Tabbed Shelf" = "Montrer les étagères";
+                "Show Tabbed Shelf" = "Masquer les étagères";
 		"Remove Current Tab" = "Supprime l'étagère";
 		"Rename Current Tab" = "Renommer l'étagère";
 		"Add Tab..." = "Ajouter une étagère...";
@@ -178,7 +181,7 @@
 "Path:" = "Nom complet:";
 "Link to:" = "Lié à:";
 "Size:" = "Taille:";
-"Calculate" = "Calculeur";
+"Calculate" = "Calculer";
 "Owner:" = "Propr.:";
 "Group:" = "Groupe:";
 "Changed" = "Modifié";
