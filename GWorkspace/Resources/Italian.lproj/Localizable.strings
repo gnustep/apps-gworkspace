@@ -140,7 +140,7 @@
 "Attributes" = "Attributi";
 "Attributes Inspector" = "Ispettore Attributi";
 "Path:" = "Path:";
-"Link to:" = "Collegamento a:";
+"Link to:" = "Coll. a:";
 "Size:" = "Dimensioni:";
 "Calculate" = "Calcola";
 "Owner:" = "Propr.:";
@@ -161,7 +161,7 @@
 /* FolderViewer.m */
 
 "Sort method applies to the\ncontents of the selected folder,\nNOT to its parent folder"
-  = "L'odinamento si applica al\ncontenuto della cartella selezionata,\nNON alla directory che la contiene";
+  = "L'ordinamento si applica al\ncontenuto della cartella selezionata,\nNON alla directory che la contiene";
 "Sort by" = "Ordinamento";
 "Name" = "Nome";
 "Type" = "Tipo";

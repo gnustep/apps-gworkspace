@@ -155,7 +155,7 @@ static BOOL sizeStop = NO;
     [executeLabel setStringValue: NSLocalizedString(@"Execute", @"")];
     [uLabel setStringValue: NSLocalizedString(@"Owner_short", @"")];
     [gLabel setStringValue: NSLocalizedString(@"Group", @"")];
-    [oLabel setStringValue: NSLocalizedString(@"Others", @"")];
+    [oLabel setStringValue: NSLocalizedString(@"Other", @"")];
     [insideButt setTitle: NSLocalizedString(@"also apply to files inside selection", @"")];
     [revertButt setTitle: NSLocalizedString(@"Revert", @"")];
     [okButt setTitle: NSLocalizedString(@"OK", @"")];

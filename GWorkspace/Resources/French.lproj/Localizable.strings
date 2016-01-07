@@ -175,12 +175,12 @@
 
 "Attributes" = "Attributs";
 "Attributes Inspector" = "Inspecteur d'attributs";
-"Path:" = "Nom complet :";
-"Link to:" = "Lié à :";
-"Size:" = "Taille :";
+"Path:" = "Nom complet:";
+"Link to:" = "Lié à:";
+"Size:" = "Taille:";
 "Calculate" = "Calculeur";
 "Owner:" = "Propr.:";
-"Group:" = "Groupe :";
+"Group:" = "Groupe:";
 "Changed" = "Modifié";
 "Revert" = "Revenir";
 "OK" = "Ok";
