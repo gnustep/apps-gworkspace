@@ -176,8 +176,9 @@
 "Attributes" = "Attributs";
 "Attributes Inspector" = "Inspecteur d'attributs";
 "Path:" = "Nom complet :";
-"Link To:" = "Lié à :";
+"Link to:" = "Lié à :";
 "Size:" = "Taille :";
+"Calculate" = "Calculeur";
 "Owner:" = "Propr.:";
 "Group:" = "Groupe :";
 "Changed" = "Modifié";

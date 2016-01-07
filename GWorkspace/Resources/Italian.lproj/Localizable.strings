@@ -25,6 +25,7 @@
 "View" = "Vista";
 	"Browser" = "Browser";
 	"Icon" = "Icone";
+                "Owner" = "Proprietario";
 		
 "Tools" = "Strumenti";
 	"Viewer" = "Viewer";
@@ -43,8 +44,10 @@
 		"Remove Current Layer" = "Rimuovi il Livello corrente";
 		"Rename Current Layer" = "Rinomina il Livello corrente";
 		"Layers" = "Livelli";
-	"DeskTop Shelf" = "Scaffale Scrivania";	
-	"XTerm" = "XTerm";
+        "Show Desktop" = "Mostra Scrivania";
+        "Hide Desktop" = "Nascondi Scrivania";
+	"Show Recycler" = "Mostra Cestino";
+        "Hide Recycler" = "Nascondi Cestino";
 	
 "Windows" = "Finestre";
 	"Arrange in Front" = "Porta davanti";
@@ -137,9 +140,10 @@
 "Attributes" = "Attributi";
 "Attributes Inspector" = "Ispettore Attributi";
 "Path:" = "Path:";
-"Link To:" = "Link a:";
+"Link to:" = "Collegamento a:";
 "Size:" = "Dimensioni:";
-"Owner:" = "Proprietario:";
+"Calculate" = "Calcola";
+"Owner:" = "Propr.:";
 "Group:" = "Gruppo:";
 "Changed" = "Modificato";
 "Revert" = "Annulla";
@@ -163,7 +167,6 @@
 "Type" = "Tipo";
 "Date" = "Data";
 "Size" = "Dimensioni";
-"Owner" = "Propr.";
 "Folder Inspector" = "Ispettore Cartelle";	
 
 
@@ -179,11 +182,7 @@
 "App Inspector" = "Ispettore App";
 
 
-/* PermissionsPanel.m */
 
-"UNIX Permissions" = "Permissioni UNIX";
-"Access Control" = "Controllo Accesso";
-"Also apply to files inside selection" = "Applica anche ai files nella selezione";
 
 
 /* ToolsPanel.m */
@@ -196,7 +195,7 @@
 
 /* AppsView.m */
 	
-"Double-click to open selected document(s)" = "Due-click per aprire i documenti selezionati";	
+"Double-click to open selected document(s)" = "Doppio click per aprire i documenti selezionati";	
 "Default:" = "Default:";	
 "Path:" = "Path:";
 "Click 'Set Default' to set default application\nfor all documents with this extension" 
@@ -205,11 +204,11 @@
 
 /* PermsBox.m */
 
-"Permissions" = "Permissioni";
-"Read" = "Leggi";
-"Write" = "Scrivi";
-"Execute" = "Esegui";
-"Owner" = "Propr.";
+"Permissions" = "Permessi";
+"Read" = "Lettura";
+"Write" = "Scrittura";
+"Execute" = "Esec.";
+"Owner_short" = "Propr.";
 "Group" = "Gruppo";
 "Other" = "Altri";
 

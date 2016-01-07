@@ -171,8 +171,9 @@
 "Attributes" = "Attributes";
 "Attributes Inspector" = "Attributes Inspector";
 "Path:" = "Path:";
-"Link To:" = "Link To:";
+"Link to:" = "Link To:";
 "Size:" = "Size:";
+"Calculate" = "Calculate";
 "Owner:" = "Owner:";
 "Group:" = "Group:";
 "Changed" = "Changed";

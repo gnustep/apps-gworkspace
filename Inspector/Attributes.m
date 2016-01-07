@@ -139,8 +139,8 @@ static BOOL sizeStop = NO;
     [oexebutt setAlternateImage: onImage];     
     [oexebutt setTag: SINGLE];       
 
-	  [revertButt setEnabled: NO];
-	  [okButt setEnabled: NO];
+    [revertButt setEnabled: NO];
+    [okButt setEnabled: NO];
   
     /* Internationalization */
     [linkToLabel setStringValue: NSLocalizedString(@"Link to:", @"")];
@@ -161,7 +161,7 @@ static BOOL sizeStop = NO;
     [okButt setTitle: NSLocalizedString(@"OK", @"")];
   } 
 		
-	return self;
+  return self;
 }
 
 - (NSView *)inspView
