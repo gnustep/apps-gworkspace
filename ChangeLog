@@ -1,3 +1,8 @@
+2016-01-11 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/Thumbnailer/GWThumbnailer.m (makeThumbnailForPath)
+	Use actual pixel dimensions and not size, or resolutions different than 72dpi will make wrong thumbnails.
+
 2016-01-07 Riccardo Mottola <rm@gnu.org>
 
 	* Inspector/Attributes.m

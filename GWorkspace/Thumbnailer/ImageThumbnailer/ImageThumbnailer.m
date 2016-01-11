@@ -1,6 +1,6 @@
 /* ImageThumbnailer.m
  *  
- * Copyright (C) 2003-2015 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola <rm@gnu.org>
@@ -58,16 +58,15 @@
         || ((srcSpp == 4) && (bitsPerPixel == 32))
         || ((srcSpp == 1) && (bitsPerPixel == 8))
         || ((srcSpp == 2) && (bitsPerPixel == 16))) {
-      NSSize imsize = [image size];
     
-      if ((imsize.width <= TMBMAX) && (imsize.height <= TMBMAX) 
-                              && (imsize.width >= (TMBMAX - RESZLIM)) 
-                                      && (imsize.height >= (TMBMAX - RESZLIM)))
+      if (([srcRep pixelsWide] <= TMBMAX) && ([srcRep pixelsHigh]<= TMBMAX) 
+                              && ([srcRep pixelsWide] >= (TMBMAX - RESZLIM)) 
+                                      && ([srcRep pixelsHigh] >= (TMBMAX - RESZLIM)))
         {
           RETAIN (tiffData);
           RELEASE (image);
           RELEASE (arp);
-          
+
           return AUTORELEASE (tiffData);
         }
       else
@@ -78,7 +77,7 @@
           NSInteger destBytesPerRow;
           NSInteger destBytesPerPixel;
           NSInteger dstsizeW, dstsizeH;
-          float fact = (imsize.width >= imsize.height) ? (imsize.width / TMBMAX) : (imsize.height / TMBMAX);
+          float fact = ([srcRep pixelsWide] >= [srcRep pixelsHigh]) ? ([srcRep pixelsWide] / TMBMAX) : ([srcRep pixelsHigh] / TMBMAX);
           	        
           float xratio;
           float yratio;
@@ -89,11 +88,11 @@
           unsigned i;
           NSData *tiffData;
 
-          dstsizeW = (NSInteger)floor(imsize.width / fact + 0.5);
-          dstsizeH = (NSInteger)floor(imsize.height / fact + 0.5);
-          
-          xratio = imsize.width / (float)dstsizeW;
-          yratio = imsize.height / (float)dstsizeH;
+          dstsizeW = (NSInteger)floor([srcRep pixelsWide] / fact + 0.5);
+          dstsizeH = (NSInteger)floor([srcRep pixelsHigh] / fact + 0.5);
+ 
+          xratio = [srcRep pixelsWide] / (float)dstsizeW;
+          yratio = [srcRep pixelsHigh] / (float)dstsizeH;
           
           destSamplesPerPixel = [srcRep samplesPerPixel];
           dstRep = [[NSBitmapImageRep alloc]
