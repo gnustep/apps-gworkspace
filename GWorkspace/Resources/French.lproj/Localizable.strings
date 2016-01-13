@@ -164,6 +164,18 @@
 "Invalid char in name" = "Le nom contient un caractère invalide";
 
 
+/* -------------------------Viewers Strings ----------------------------- *\
+
+/* GWViewer.m */
+"free" = "de libre";
+
+/* GWViewersManager.m */
+"Are you sure you want to open" = "Voulez-vous vraiment ouvrir";
+"items?" = "éléments ?";
+"error" = "erreur";
+"Can't open " = "Impossible d'ouvrir ";
+
+
 /* ----------------------- Inspectors strings --------------------------- *\
 
 /* InspectorsWin.m */

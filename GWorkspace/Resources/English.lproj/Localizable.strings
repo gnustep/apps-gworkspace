@@ -159,7 +159,20 @@
 "Invalid char in name" = "Invalid character in name";
 
 
-/* ----------------------- Inspectors strings --------------------------- *\
+/* ----------------------------- Viewers Strings ----------------------------- *\
+
+/* GWViewer.m */
+"free" = "free";
+
+/* GWViewersManager.m */
+
+"Are you sure you want to open" = "Are you sure you want to open";
+"items?" = "items?";
+"error" = "error";
+"Can't open " = "Can't open ";
+
+
+/* ---------------------------- Inspectors strings --------------------------- *\
 
 /* InspectorsWin.m */
 
