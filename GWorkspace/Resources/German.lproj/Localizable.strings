@@ -194,7 +194,6 @@ which ends in "kann <the file> nicht umbenennen"
 "Group:" = "Gruppe:";
 "Changed" = "Geändert";
 "Revert" = "Zurücksetzen";
-"OK" = "OK";
 "also apply to files inside selection" = "Auch in Unterordner setzen";
 
 /* ContentsPanel.m */

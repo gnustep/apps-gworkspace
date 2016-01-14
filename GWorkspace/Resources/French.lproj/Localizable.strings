@@ -125,7 +125,7 @@
 
 /* FileOperation.m */
 
-"OK" = "Ok";
+"OK" = "OK";
 "Cancel" = "Annuler";
 "Move" = "Déplacer";
 "Move from: " = "Déplacer depuis : ";
@@ -198,7 +198,6 @@
 "Group:" = "Groupe:";
 "Changed" = "Modifié";
 "Revert" = "Revenir";
-"OK" = "Ok";
 "also apply to files inside selection" = "Appliquer aux sous-dossiers";
 
 /* ContentsPanel.m */
