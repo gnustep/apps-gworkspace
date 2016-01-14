@@ -5,15 +5,18 @@
 	"Info Panel..." = "Pannello Informazioni...";
 	"Preferences..." = "Preferenze...";
 	"Help..." = "Aiuto...";
+        "Activate context help" = "Attiva guita contestuale";
 
 "File" = "Archivio";
 	"Open" = "Apri";
+        "Open With..." = "Apri con...";
 	"Open as Folder" = "Apri come Cartella";
 	"Edit File" = "Edita File";
 	"New Folder" = "Nuova Cartella";
 	"New File" = "Nuovo File";
 	"Duplicate" = "Duplica";	
 	"Destroy" = "Distruggi";
+        "Move to Recycler" = "Sposta nel Cestino";
 	"Empty Recycler" = "Vuota il Cestino";
 
 "Edit" = "Edit";
@@ -25,12 +28,23 @@
 "View" = "Vista";
 	"Browser" = "Browser";
 	"Icon" = "Icone";
+        "List" = "Lista";
+        "Show" = "Mostra";
+	        "Name only" = "Nome soltanto";
+		"Type" = "Tipo";
+		"Size" = "Dimensione";
+		"Modification date" = "Data modifica";
                 "Owner" = "Proprietario";
+        "Icon Size" = "Dimensione Icone";
+	"Icon Position" = "Posizione Icone";
+	      	"Up" = "Alto";
+		"Left" = "Sinistra";
+	"Label Size" = "Dimensione Etichette";
         "Make thumbnail(s)" = "Crea miniature";
         "Remove thumbnail(s)" = "Rimuovi miniature";
  
 "Tools" = "Strumenti";
-	"Viewer" = "Viewer";
+	"Viewer" = "Vista";
 	"Inspectors" = "Ispettori";
 		"Show Inspectors" = "Mostra gli Ispettori";
 		"Attributes" = "Attributi";
