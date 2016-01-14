@@ -32,18 +32,20 @@
 	    win,
 	    prefbox,
 	    tabView,
+	    colorLabel,
 	    colorWell,
 	    imageView,
 	    imagePosMatrix,
 	    chooseImageButt,
 	    useImageSwitch,
 	    omnipresentCheck,
+	    hideTShelfCheck,
+	    dockBox,
 	    useDockCheck,
 	    dockPosLabel,
 	    dockPosMatrix,
 	    dockStyleLabel,
 	    dockStyleMatrix,
-	    hideTShelfCheck,
 	    gworkspace
 	);
 	Super = NSObject;

@@ -44,8 +44,8 @@
 	      	"Up" = "Haut";
 		"Left" = "Gauche";
 	"Label Size" = "Taille du texte";
-        "Make thumbnail(s)" = "Make thumbnail(s)";
-        "Remove thumbnail(s)" = "Remove thumbnail(s)";
+        "Make thumbnail(s)" = "Créer les vignettes";
+        "Remove thumbnail(s)" = "Retirer les vignettes";
 	"Viewer" = "Visualisateur";
 		
 "Tools" = "Outils";
@@ -467,6 +467,7 @@
 "Background"="Fond d'écran";
 "General"="Général";
 
+"Color:" = "Couleur:";
 "center" = "Centrer";
 "fit" = "Fit";
 "tile" = "Répéter";
@@ -475,15 +476,16 @@
 "Use image"="Image";
 "Choose"="Choisir";
 
+"Dock" = "Dock";
 "Show Dock"="Montrer le Dock";
-"Dock position:"="Position du Dock:";
+"Position:"="Position:";
 
+"Style:"="Style:";
 "Left"="Gauche";
 "Right"="Droite";
-
-"Dock style:"="Style du Dock:";
 
 "Classic"="Classique";
 "Modern"="Moderne";
 
+"Omnipresent"="Omnipresent";
 "Autohide Tabbed Shelf"="Cacher automatiquement les étagères";

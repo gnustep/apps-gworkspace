@@ -411,20 +411,29 @@ which ends in "kann <the file> nicht umbenennen"
 
 
 /* Desktop */
-"Back Color" = "Hintergrundfarbe";
-	"Current color" = "Aktuelle Farbe";
+"Desktop" = "Schreibtisch";
+"Background"="Hintergrund";
+"General"="Generell";
+
+"Color:" = "Farbe:";
 "Back Image" = "Hintergrundbild";
 	"center" = "zentriert";
 	"fit" = "skaliert";
 	"tile" = "gekachelt";
 	"Use image" = "Bild verwenden";
+
+"Dock" = "Dock";
+
 "General" = "Allgemein";
-	"Omnipresent" = "Omnipräsent";
+	
 	"Show Dock" = "Dock anzeigen";
-	"Dock position" = "Dockposition";
+"Position" = "Position";
+"Style:"="Stil:";
 	"Left" = "Links";
 	"Right" = "Rechts";
-	"Autohide Tabbed Shelf" = "Tabbed Schelf einfahren";
+
+"Omnipresent" = "Omnipräsent";
+"Autohide Tabbed Shelf" = "Tabbed Schelf einfahren";
 
 /* Browser */
 "Aspect" = "Aspekt";

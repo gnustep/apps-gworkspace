@@ -355,24 +355,26 @@
 "Background"="Sfondo";
 "General"="Generale";
 
+"Color:" = "Colore:";
 "center" = "Centra";
 "fit" = "Adatta";
 "tile" = "Piastrella";
 "scale" = "Scala";
 
-"Use image"="Immagine";
+"Use image"="Usa Immagine";
 "Choose"="Scegli";
 
+"Dock" = "Molo";
 "Show Dock"="Mostra Molo";
-"Dock position:"="Posizione Molo:";
+"Position:"="Posizione:";
 
+"Style:"="Stile:";
 "Left"="Left";
 "Right"="Right";
-
-"Dock style:"="Stile Molo:";
 
 "Classic"="Classic";
 "Modern"="Moderno";
 
+"Omnipresent"="Onnipresente";
 "Autohide Tabbed Shelf"="Nascondi Scaffale Automaticamente";
 

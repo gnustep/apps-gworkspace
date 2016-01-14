@@ -383,6 +383,7 @@
 "Background"="Background";
 "General"="General";
 
+"Color:" = "Color:";
 "center" = "Center";
 "fit" = "Fit";
 "tile" = "Tile";
@@ -391,15 +392,16 @@
 "Use image"="Use image";
 "Choose"="Choose";
 
+"Dock" = "Dock";
 "Show Dock"="Show Dock";
-"Dock position:"="Dock position:";
+"Position:"="Position:";
 
+"Style:"="Style:";
 "Left"="Left";
 "Right"="Right";
-
-"Dock style:"="Dock style:";
 
 "Classic"="Classic";
 "Modern"="Modern";
 
+"Omnipresent"="Omnipresent";
 "Autohide Tabbed Shelf"="Autohide Tabbed Shelf";

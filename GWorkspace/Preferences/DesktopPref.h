@@ -1,8 +1,9 @@
 /* DesktopPref.h
  *  
- * Copyright (C) 2005-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
+ *         Riccardo Mottola <rm@gnu.org>
  * Date: January 2005
  *
  * This file is part of the GNUstep GWorkspace application
@@ -48,6 +49,7 @@
   
   // Color
   NSColorPanel *panel;
+  IBOutlet NSTextField *colorLabel;
   IBOutlet NSColorWell *colorWell;
   ColorView *colorView;
 
@@ -55,18 +57,21 @@
   NSString *imagePath;
   NSString *imagesDir;  
   IBOutlet NSImageView *imageView;
-  IBOutlet id imagePosMatrix;
-  IBOutlet id chooseImageButt;
-  IBOutlet id useImageSwitch;
+  IBOutlet NSMatrix *imagePosMatrix;
+  IBOutlet NSButton *chooseImageButt;
+  IBOutlet NSButton *useImageSwitch;
   
   // General
-  IBOutlet id omnipresentCheck;
-  IBOutlet id useDockCheck;
-  IBOutlet id dockPosLabel;
-  IBOutlet id dockPosMatrix;
-  IBOutlet id dockStyleLabel;
-  IBOutlet id dockStyleMatrix;
-  IBOutlet id hideTShelfCheck;
+  IBOutlet NSButton *omnipresentCheck;
+  IBOutlet NSButton *hideTShelfCheck;
+
+  // Dock
+  IBOutlet NSBox *dockBox;
+  IBOutlet NSButton *useDockCheck;
+  IBOutlet NSTextField *dockPosLabel;
+  IBOutlet NSMatrix *dockPosMatrix;
+  IBOutlet NSTextField *dockStyleLabel;
+  IBOutlet NSMatrix *dockStyleMatrix;
 
   GWDesktopManager *manager;
   id gworkspace;

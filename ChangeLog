@@ -1,3 +1,14 @@
+2016-01-14 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/Preferences/DesktopPref.h
+	* GWorkspace/Preferences/DesktopPref.m
+	* GWorkspace/Resources/English.lproj/DesktopPref.gorm
+	* GWorkspace/Resources/English.lproj/Localizable.strings
+	* GWorkspace/Resources/French.lproj/Localizable.strings
+	* GWorkspace/Resources/German.lproj/Localizable.strings
+	* GWorkspace/Resources/Italian.lproj/Localizable.strings
+	Improve translation of Desktop Preference, move items, add strings.
+
 2016-01-11 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/Thumbnailer/GWThumbnailer.m (makeThumbnailForPath)

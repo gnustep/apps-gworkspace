@@ -1,8 +1,9 @@
 /* DesktopPref.m
  *  
- * Copyright (C) 2005-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
+ *         Riccardo Mottola <rm@gnu.org>
  * Date: January 2005
  *
  * This file is part of the GNUstep GWorkspace application
@@ -119,6 +120,7 @@ static NSString *nibName = @"DesktopPref";
       [[tabView tabViewItemAtIndex: 0] setLabel: NSLocalizedString(@"Background", @"")];
       [[tabView tabViewItemAtIndex: 1] setLabel: NSLocalizedString(@"General", @"")];
 
+      [colorLabel setStringValue:_(@"Color:")];
       cell = [imagePosMatrix cellAtRow: BackImageCenterStyle column: 0];
       [cell setTitle: NSLocalizedString(@"center", @"")];
       cell = [imagePosMatrix cellAtRow: BackImageFitStyle column: 0];
@@ -130,17 +132,20 @@ static NSString *nibName = @"DesktopPref";
       [useImageSwitch setTitle: NSLocalizedString(@"Use image", @"")];  
       [chooseImageButt setTitle: NSLocalizedString(@"Choose", @"")]; 
 
+      [dockBox setTitle: _(@"Dock")];
       [useDockCheck setTitle: NSLocalizedString(@"Show Dock", @"")];
-      [dockPosLabel setStringValue: NSLocalizedString(@"Dock position:", @"")];
+      [dockPosLabel setStringValue: NSLocalizedString(@"Position:", @"")];
       cell = [dockPosMatrix cellAtRow: 0 column: 0];
       [cell setTitle: NSLocalizedString(@"Left", @"")];
       cell = [dockPosMatrix cellAtRow: 0 column: 1];
       [cell setTitle: NSLocalizedString(@"Right", @"")];
-      [dockStyleLabel setStringValue: NSLocalizedString(@"Dock style:", @"")];
+      [dockStyleLabel setStringValue: NSLocalizedString(@"Style:", @"")];
       cell = [dockStyleMatrix cellAtRow: 0 column: 0];
       [cell setTitle: NSLocalizedString(@"Classic", @"")];
       cell = [dockStyleMatrix cellAtRow: 0 column: 1];
       [cell setTitle: NSLocalizedString(@"Modern", @"")];
+
+      [omnipresentCheck setTitle: _(@"Omnipresent")];
       [hideTShelfCheck setTitle: NSLocalizedString(@"Autohide Tabbed Shelf", @"")];
     }
   }
