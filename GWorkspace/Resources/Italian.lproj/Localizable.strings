@@ -161,20 +161,20 @@
 "Attributes Inspector" = "Ispettore Attributi";
 "Path:" = "Path:";
 "Link to:" = "Coll. a:";
-"Size:" = "Dimensioni:";
+"Size:" = "Dimens.:";
 "Calculate" = "Calcola";
 "Owner:" = "Propr.:";
 "Group:" = "Gruppo:";
 "Changed" = "Modificato";
 "Revert" = "Annulla";
-
+"also apply to files inside selection" = "Applica a sottocartelle";
 
 /* ContentsPanel.m */
 
 "Contents" = "Contenuti";
 "Contents Inspector" = "Ispettore Contenuti";
 "No Contents Inspector" = "Nessun Ispettore";
-"No Contents Inspector\nFor Multiple Selection" = "Nessun Ispettore\nper una selezione multipla";
+"No Contents Inspector\nFor Multiple Selection" = "Nessun Ispettore\nper selezione multipla";
 
 
 /* FolderViewer.m */
@@ -238,7 +238,7 @@
 
 "Processes" = "Processi";
 "No Background Process" = "Nessun processo in background";
-"Kill" = "Kill";
+"Kill" = "Termina";
 "Path: " = "Path: ";
 "Status: " = "Stato: ";
 
@@ -264,13 +264,13 @@
 
 /* Fiend.m */
 
-"New Layer" = "Nuovo Layer";
-"A layer with this name is already present!" = "E' già presente un layer con lo stesso nome!";
-"You can't remove the last layer!" = "Non si puo eliminare l'ultimo layer!";
-"Remove layer" = "Remove layer";
-"Are you sure that you want to remove this layer?" = "Sei sicuro di voler rimuovere questo layer?";
-"Rename Layer" = "Rename Layer";
-"You can't dock multiple paths!" = "Non puoi aggiungere path multiple!";
+"New Layer" = "Nuovo Livello";
+"A layer with this name is already present!" = "E' già presente un livello vcon lo stesso nome!";
+"You can't remove the last layer!" = "Non si può eliminare l'ultimo livello!";
+"Remove layer" = "Rimuovi livello";
+"Are you sure that you want to remove this layer?" = "Sei sicuro di voler rimuovere questo livello?";
+"Rename Layer" = "Rinomina Livello";
+"You can't dock multiple paths!" = "Non puoi aggiungere percorsi multipli!";
 "This object is already present in this layer!" = "Questo oggetto e già presente in questo layer!";
 
 
@@ -338,16 +338,41 @@
 
 /* Recycler strings */
 
-"Recycle: " = "Recicla: ";
-"Recycler: " = "Reciclatore: ";
-"Recycler" = "Reciclatore";
-"the Recycler" = "il reciclatore";
-"\nto the Recycler" = "\nnel reciclatore";
-"Move from the Recycler " = "Sposto dal reciclatore ";
+"Recycle: " = "Cestinare: ";
+"Recycler: " = "Cestino: ";
+"Recycler" = "Cestino";
+"the Recycler" = "il Cestino";
+"\nto the Recycler" = "\nnel Cestino";
+"Move from the Recycler " = "Sposta dal Cestino ";
 "In" = "In";
-"Empty Recycler" = "Vuota il reciclatore";
-"Empty the Recycler?" = "Vuoto il reciclatore?";
-"Put Away" = "Rimetti a posto";
+"Empty Recycler" = "Svuotare il Cestino";
+"Empty the Recycler?" = "Svuotare il Cestino?";
+"Put Away" = "Ripristina";
 
-/* ì (i') à (a') */
+
+/* DesktopPref.m */
+"Desktop" = "Scrivania";
+"Background"="Sfondo";
+"General"="Generale";
+
+"center" = "Centra";
+"fit" = "Adatta";
+"tile" = "Piastrella";
+"scale" = "Scala";
+
+"Use image"="Immagine";
+"Choose"="Scegli";
+
+"Show Dock"="Mostra Molo";
+"Dock position:"="Posizione Molo:";
+
+"Left"="Left";
+"Right"="Right";
+
+"Dock style:"="Stile Molo:";
+
+"Classic"="Classic";
+"Modern"="Moderno";
+
+"Autohide Tabbed Shelf"="Nascondi Scaffale Automaticamente";
 
