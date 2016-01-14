@@ -66,12 +66,12 @@
 		"Remove Current Layer" = "Aktuelle Schicht entfernen";
 		"Rename Current Layer" = "Aktuelle Schicht umbenennen";
 		"Layers" = "Schichten";
-	"Tabbed Shelf" = "Tabbed Shelf";
-		"Show Tabbed Shelf" = "Tabbed Shelf anzeigen";
-		"Hide Tabbed Shelf" = "Tabbed Shelf ausblenden";
-		"Remove Current Tab" = "Aktuellen Tab entfernen";
-		"Rename Current Tab" = "Aktuellen Tab umbenennen";
-		"Add Tab..." = "Tab hinzufügen...";
+	"Tabbed Shelf" = "Fach";
+		"Show Tabbed Shelf" = "Fach anzeigen";
+		"Hide Tabbed Shelf" = "Fach ausblenden";
+		"Remove Current Tab" = "Aktuelle Lasche entfernen";
+		"Rename Current Tab" = "Aktuelle Lascheumbenennen";
+		"Add Tab..." = "Lasche hinzufügen...";
 	"Terminal" = "Terminal";
 	"Show Desktop" = "Arbeitsfläche anzeigen";
 	"Hide Desktop" = "Arbeitsfläche ausblenden";
@@ -227,14 +227,6 @@ which ends in "kann <the file> nicht umbenennen"
 "Open these kinds of documents:" = "Öffne diese Dokumenttypen:";
 "Invalid Contents" = "Ungültiger Inhalt";
 "App Inspector" = "Applikations-Inspektor";
-
-
-/* PermissionsPanel.m */
-
-"UNIX Permissions" = "UNIX Dateirechte";
-"Access Control" = "Zugriffskontrolle";
-/* "Also apply to files inside selection" = "Auch auf Dateien inner-\nhalb der Auswahl anwenden"; */
-"Also apply to files inside selection" = "Innerhalb der Auswahl anwenden";
 
 
 /* ToolsPanel.m */
@@ -433,12 +425,12 @@ which ends in "kann <the file> nicht umbenennen"
 	"Right" = "Rechts";
 
 "Omnipresent" = "Omnipräsent";
-"Autohide Tabbed Shelf" = "Tabbed Schelf einfahren";
+"Autohide Tabbed Shelf" = "Fach selbstätig einfahren";
 
 /* Browser */
 "Aspect" = "Aspekt";
 "Icons in Browser Cells" = "Symbole in Browserzellen zeigen";
-"Uses Shelf" = "Shelf verwenden";
+"Uses Shelf" = "Regal verwenden";
 "Columns Width" = "Spaltenbreite";
 
 /* History */
