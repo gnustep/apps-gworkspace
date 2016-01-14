@@ -182,7 +182,7 @@
 "Access Control" = "Access Control";
 
 
-/* AttributesPanel.m */
+/* Attributes.m */
 
 "Attributes" = "Attributes";
 "Attributes Inspector" = "Attributes Inspector";
@@ -231,14 +231,7 @@
 "App Inspector" = "App Inspector";
 
 
-/* PermissionsPanel.m */
-
-"UNIX Permissions" = "UNIX Permissions";
-"Access Control" = "Access Control";
-"Also apply to files inside selection" = "Also apply to files inside selection";
-
-
-/* ToolsPanel.m */
+/* Tools.m */
 
 "Tools" = "Tools";
 "Tools Inspector" = "Tools Inspector";
