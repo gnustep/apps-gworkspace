@@ -27,6 +27,8 @@
 
 #import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
+#import <GNUstepGUI/GSTheme.h>
+
 #import "FSNodeRep.h"
 #import "FSNFunctions.h"
 #import "ExtendedInfo.h"
@@ -89,6 +91,20 @@ static FSNodeRep *shared = nil;
   }
 }
 
+/*
+ * Loads and caches named images
+ * Images coming from GSTheme need to be recached on a theme change
+ */
+- (void)cacheIcons
+{
+  [multipleSelIcon release];
+  multipleSelIcon = [[NSImage imageNamed:NSImageNameMultipleDocuments] retain];
+  [trashIcon release];
+  trashIcon = [[NSImage imageNamed:NSImageNameTrashEmpty] retain];
+  [trashFullIcon retain];
+  trashFullIcon = [[NSImage imageNamed:NSImageNameTrashFull] retain];
+}
+
 - (id)initSharedInstance
 {    
   self = [super init];
@@ -108,15 +124,16 @@ static FSNodeRep *shared = nil;
     
     oldresize = [[NSUserDefaults standardUserDefaults] boolForKey: @"old_resize"];
 
-    multipleSelIcon = [[NSImage imageNamed:NSImageNameMultipleDocuments] retain];
+    /* images coming form GSTheme */
+    [self cacheIcons];
+
+    /* images for which we provide our own resources */
     imagepath = [bundle pathForImageResource: @"FolderOpen"];
     openFolderIcon = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
     imagepath = [bundle pathForImageResource: @"HardDisk"];
     hardDiskIcon = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
     imagepath = [bundle pathForImageResource: @"HardDiskOpen"];
     openHardDiskIcon = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
-    trashIcon = [[NSImage imageNamed:NSImageNameTrashEmpty] retain];
-    trashFullIcon = [[NSImage imageNamed:NSImageNameTrashFull] retain];
     
     iconsCache = [NSMutableDictionary new];
     rootPath = path_separator();
@@ -153,6 +170,9 @@ static FSNodeRep *shared = nil;
     [self loadExtendedInfoModules];
     
     systype = [[NSProcessInfo processInfo] operatingSystem];
+
+    /* we observe a theme change to re-cache icons */
+    [nc addObserver:self selector:@selector(themeDidActivate:) name:GSThemeDidActivateNotification object:nil];
   }
     
   return self;
@@ -234,6 +254,13 @@ static FSNodeRep *shared = nil;
   }
   
   return bundleList;
+}
+
+- (void)themeDidActivate:(id)sender
+{
+  /* we clean the cache of theme-derived images */
+  [iconsCache removeAllObjects];
+  [self cacheIcons];
 }
 
 @end

@@ -1,3 +1,8 @@
+2016-01-16 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNodeRep.m
+	Listen to GSThemeDidActivateNotification to detect a theme change and refetch all cached icons.
+
 2016-01-14 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/Preferences/DesktopPref.h
