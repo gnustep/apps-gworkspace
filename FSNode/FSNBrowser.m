@@ -2219,12 +2219,15 @@
   return 
     
 
-    if ([ednode isParentWritable] == NO) {
-      NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
-            [NSString stringWithFormat: @"%@\"%@\"!\n", 
-                NSLocalizedString(@"You do not have write permission for ", @""), 
-                    [ednode parentName]], NSLocalizedString(@"Continue", @""), nil, nil);   
-      CLEAREDITING;
+    if ([ednode isParentWritable] == NO)
+      {
+        NSRunAlertPanel(
+                        NSLocalizedStringFromTableInBundle(@"Error", nil, [NSBundle bundleForClass:[self class]], @""),
+                        [NSString stringWithFormat: @"%@ \"%@\"!\n",
+                                  NSLocalizedStringFromTableInBundle(@"You do not have write permission for", nil, [NSBundle bundleForClass:[self class]], @""), 
+                                  [ednode parentName]],
+                        NSLocalizedStringFromTableInBundle(@"Continue", nil, [NSBundle bundleForClass:[self class]], @""), nil, nil);   
+    CLEAREDITING;
 
     } else if ([ednode isSubnodeOfPath: [desktopApp trashPath]]) {
       NSRunAlertPanel(NSLocalizedString(@"Error", @""), 

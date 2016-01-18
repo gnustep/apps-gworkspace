@@ -317,7 +317,7 @@ static NSString *defaultColumns = @"{ \
 
 - (void)unSelectIconsOfRepsDifferentFrom:(id)aRep
 {
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [nodeReps count]; i++) {
     FSNListViewNodeRep *rep = [nodeReps objectAtIndex: i];  
@@ -354,20 +354,22 @@ static NSString *defaultColumns = @"{ \
 
 - (NSString *)selectRepWithPrefix:(NSString *)prefix
 {
-	int i;
+  NSUInteger i;
 
-	for (i = 0; i < [nodeReps count]; i++) {
-    FSNListViewNodeRep *rep = [nodeReps objectAtIndex: i];  
-    NSString *name = [[rep node] name];
+  for (i = 0; i < [nodeReps count]; i++)
+    {
+      FSNListViewNodeRep *rep = [nodeReps objectAtIndex: i];  
+      NSString *name = [[rep node] name];
     
-		if ([name hasPrefix: prefix]) {
-      [listView deselectAll: self];
-      [self selectReps: [NSArray arrayWithObject: rep]];
-      [listView scrollRowToVisible: i];
-      
-			return name;
-		}
-	}
+      if ([name hasPrefix: prefix])
+        {
+          [listView deselectAll: self];
+          [self selectReps: [NSArray arrayWithObject: rep]];
+          [listView scrollRowToVisible: i];
+          
+          return name;
+        }
+    }
   
   return nil;
 }
@@ -736,7 +738,7 @@ static NSString *defaultColumns = @"{ \
   CREATE_AUTORELEASE_POOL (pool);
   NSMutableArray *selection = [[self selectedNodes] mutableCopy];
   NSMutableArray *opennodes = [NSMutableArray array];
-  int i, count;
+  NSUInteger i, count;
 
   for (i = 0; i < [nodeReps count]; i++) {
     FSNListViewNodeRep *rep = [nodeReps objectAtIndex: i];
@@ -795,7 +797,7 @@ static NSString *defaultColumns = @"{ \
     
   } else if ([node isSubnodeOfNode: anode]) {
     NSArray *components = [FSNode nodeComponentsFromNode: anode toNode: node];
-    int i;
+    NSUInteger i;
   
     for (i = 0; i < [components count]; i++) {
       FSNode *component = [components objectAtIndex: i];
@@ -849,7 +851,7 @@ static NSString *defaultColumns = @"{ \
   NSArray *files = [info objectForKey: @"files"];
   NSString *ndpath = [node path];
   BOOL needsreload = NO;
-  int i; 
+  NSUInteger i; 
 
   [self stopRepNameEditing];
 
@@ -1443,11 +1445,14 @@ static NSString *defaultColumns = @"{ \
   return 
     
    
-    if ([ednode isParentWritable] == NO) {
-      NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
-            [NSString stringWithFormat: @"%@\"%@\"!\n", 
-                NSLocalizedString(@"You do not have write permission for ", @""), 
-                    [ednode parentName]], NSLocalizedString(@"Continue", @""), nil, nil);   
+    if ([ednode isParentWritable] == NO)
+      {
+        NSRunAlertPanel(
+                        NSLocalizedStringFromTableInBundle(@"Error", nil, [NSBundle bundleForClass:[self class]], @""), 
+                        [NSString stringWithFormat: @"%@ \"%@\"!\n", 
+                                  NSLocalizedStringFromTableInBundle(@"You do not have write permission for", nil, [NSBundle bundleForClass:[self class]], @""), 
+                                  [ednode parentName]],
+                        NSLocalizedStringFromTableInBundle(@"Continue", nil, [NSBundle bundleForClass:[self class]], @""), nil, nil);   
       CLEAREDITING;
 
     } else if ([ednode isSubnodeOfPath: [desktopApp trashPath]]) {

@@ -1,6 +1,6 @@
 /* FSNIconsView.m
  *  
- * Copyright (C) 2004-2015 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -2245,11 +2245,14 @@ pp.y = NSMaxY(br) + 1; \
   return 
  
   
-    if ([ednode isParentWritable] == NO) {
-      NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
-            [NSString stringWithFormat: @"%@\"%@\"!\n", 
-                NSLocalizedString(@"You do not have write permission for ", @""), 
-                    [ednode parentName]], NSLocalizedString(@"Continue", @""), nil, nil);   
+    if ([ednode isParentWritable] == NO)
+      {
+        NSRunAlertPanel(
+                        NSLocalizedStringFromTableInBundle(@"Error", nil, [NSBundle bundleForClass:[self class]], @""), 
+                        [NSString stringWithFormat: @"%@ \"%@\"!\n", 
+                                  NSLocalizedStringFromTableInBundle(@"You do not have write permission for", nil, [NSBundle bundleForClass:[self class]], @""), 
+                    [ednode parentName]],
+                        NSLocalizedStringFromTableInBundle(@"Continue", nil, [NSBundle bundleForClass:[self class]], @""), nil, nil);   
       CLEAREDITING;
 
     } else if ([ednode isSubnodeOfPath: [desktopApp trashPath]]) {

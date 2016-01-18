@@ -1,5 +1,13 @@
 2016-01-18 Riccardo Mottola <rm@gnu.org>
 
+	* FSNode/FSNBrowser.m
+	* FSNode/FSNIconsView.m
+	* FSNode/FSNListView.m
+	* FSNode/FSNode.m
+	Localizations inside the Framework
+
+2016-01-18 Riccardo Mottola <rm@gnu.org>
+
 	* GWorkspace/Desktop/GWDesktopView.m
 	Fix reading of defaults.
 

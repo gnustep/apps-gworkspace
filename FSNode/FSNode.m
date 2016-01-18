@@ -1,6 +1,6 @@
 /* FSNode.m
  *  
- * Copyright (C) 2004-2014 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -28,6 +28,7 @@
 #import "FSNode.h"
 #import "FSNodeRep.h"
 #import "FSNFunctions.h"
+
 
 @implementation FSNode
 
@@ -557,34 +558,34 @@
     flags.unknown = 1;
   } 
 
-  ASSIGN (typeDescription, NSLocalizedString(@"symbolic link", @""));
+  ASSIGN (typeDescription, NSLocalizedStringFromTableInBundle(@"symbolic link", nil, [NSBundle bundleForClass:[self class]], @""));
 }
 
 - (NSString *)typeDescription
 {
   if (typeDescription == nil) {
     if ([self isPlain]) {
-      ASSIGN (typeDescription, NSLocalizedString(@"plain file", @""));
+      ASSIGN (typeDescription, NSLocalizedStringFromTableInBundle(@"plain file", nil, [NSBundle bundleForClass:[self class]], @""));
     } else if ([self isDirectory]) {
       if ([self isApplication]) {
-        ASSIGN (typeDescription, NSLocalizedString(@"application", @""));
+        ASSIGN (typeDescription, NSLocalizedStringFromTableInBundle(@"application", nil, [NSBundle bundleForClass:[self class]], @""));
       } else if ([self isPackage]) {
-        ASSIGN (typeDescription, NSLocalizedString(@"plain file", @""));
+        ASSIGN (typeDescription, NSLocalizedStringFromTableInBundle(@"package", nil, [NSBundle bundleForClass:[self class]], @""));
       } else if ([self isMountPoint]) {
-        ASSIGN (typeDescription, NSLocalizedString(@"mount point", @""));
+        ASSIGN (typeDescription, NSLocalizedStringFromTableInBundle(@"mount point", nil, [NSBundle bundleForClass:[self class]], @""));
       } else {
-        ASSIGN (typeDescription, NSLocalizedString(@"directory", @""));
+        ASSIGN (typeDescription, NSLocalizedStringFromTableInBundle(@"directory", nil, [NSBundle bundleForClass:[self class]], @""));
       }
     } else if ([self isLink]) {
-      ASSIGN (typeDescription, NSLocalizedString(@"symbolic link", @""));
+      ASSIGN (typeDescription, NSLocalizedStringFromTableInBundle(@"symbolic link", nil, [NSBundle bundleForClass:[self class]], @""));
     } else if ([self isSocket]) {
-      ASSIGN (typeDescription, NSLocalizedString(@"socket", @""));
+      ASSIGN (typeDescription, NSLocalizedStringFromTableInBundle(@"socket", nil, [NSBundle bundleForClass:[self class]], @""));
     } else if ([self isCharspecial]) {
-      ASSIGN (typeDescription, NSLocalizedString(@"character special", @""));
+      ASSIGN (typeDescription, NSLocalizedStringFromTableInBundle(@"character special", nil, [NSBundle bundleForClass:[self class]], @""));
     } else if ([self isBlockspecial]) {
-      ASSIGN (typeDescription, NSLocalizedString(@"block special", @""));
+      ASSIGN (typeDescription, NSLocalizedStringFromTableInBundle(@"block special", nil, [NSBundle bundleForClass:[self class]], @""));
     } else {
-      ASSIGN (typeDescription, NSLocalizedString(@"unknown", @""));
+      ASSIGN (typeDescription, NSLocalizedStringFromTableInBundle(@"unknown", nil, [NSBundle bundleForClass:[self class]], @""));
     }
   }
 
