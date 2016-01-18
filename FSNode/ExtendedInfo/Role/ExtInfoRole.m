@@ -1,6 +1,6 @@
 /* ExtInfoRole.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -36,7 +36,7 @@
 
 - (NSString *)menuName
 {
-  return NSLocalizedString(@"Role", @"");
+  return NSLocalizedStringFromTableInBundle(@"Role", nil, [NSBundle bundleForClass:[self class]], @"");
 }
 
 - (NSDictionary *)extendedInfoForNode:(FSNode *)anode
@@ -51,7 +51,7 @@
       if (role) {
         NSMutableDictionary *dict = [NSMutableDictionary dictionary];
 
-        [dict setObject: NSLocalizedString(role, @"")
+        [dict setObject: NSLocalizedStringFromTableInBundle(role, nil, [NSBundle bundleForClass:[self class]], @"")
                  forKey: @"labelstr"];
       
         return dict;

@@ -18,11 +18,18 @@ Role_PRINCIPAL_CLASS = ExtInfoRole
 
 ADDITIONAL_GUI_LIBS += -lFSNode
 
-#Role_LANGUAGES = English Italian Romanian
+Role_LANGUAGES = \
+	English \
+	Italian \
+	German \
+	French \
 
 #Role_LOCALIZED_RESOURCE_FILES = Localizable.strings
 
-#Role_RESOURCE_FILES = Localizable.strings
+Role_RESOURCE_FILES = \
+	Resources/Localizable.strings \
+	Resources/*.lproj \
+
 
 -include GNUmakefile.preamble
 
