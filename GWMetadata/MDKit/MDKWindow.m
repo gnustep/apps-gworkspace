@@ -1,6 +1,6 @@
 /* MDKWindow.m
  *  
- * Copyright (C) 2006-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@fibernet.ro>
  * Date: December 2006
@@ -543,12 +543,12 @@ static NSString *nibName = @"MDKWindow";
   NSArray *usedAttributes = [self usedAttributes];
 
   if ([usedAttributes count] < [attributes count]) {
-    int index = [attrViews indexOfObjectIdenticalTo: view];  
+    NSUInteger index = [attrViews indexOfObjectIdenticalTo: view];  
     MDKAttribute *attr = [self firstUnusedAttribute];
     MDKAttributeView *attrview = [[MDKAttributeView alloc] initInWindow: self];
-    int count;
-    int attrcount;
-    int i;
+    NSUInteger count;
+    NSUInteger attrcount;
+    NSUInteger i;
 
     [attr setInUse: YES];
     [attrview setAttribute: attr];

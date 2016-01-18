@@ -1,6 +1,6 @@
 /* LSFEditor.m
  *  
- * Copyright (C) 2005-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -259,7 +259,7 @@ static NSString *nibName = @"LSFEditor";
   NSArray *usedModules = [self usedModules];
 
   if ([usedModules count] < [modules count]) {
-    int index = [fmviews indexOfObjectIdenticalTo: aview];  
+    NSUInteger index = [fmviews indexOfObjectIdenticalTo: aview];  
     id module = [self firstUnusedModule];
     id fmview = [[FindModuleView alloc] initWithDelegate: self];
     NSUInteger count;

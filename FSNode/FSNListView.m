@@ -376,7 +376,7 @@ static NSString *defaultColumns = @"{ \
 
 - (void)redisplayRep:(id)aRep
 {
-  int row = [nodeReps indexOfObjectIdenticalTo: aRep];
+  NSUInteger row = [nodeReps indexOfObjectIdenticalTo: aRep];
   NSRect rect = [listView rectOfRow: row];
   [listView setNeedsDisplayInRect: rect];
 }
@@ -934,7 +934,7 @@ static NSString *defaultColumns = @"{ \
         FSNListViewNodeRep *rep = [self repOfSubnodePath: fpath]; 
         
         if (rep) {  
-          int index = [nodeReps indexOfObjectIdenticalTo: rep];
+          NSUInteger index = [nodeReps indexOfObjectIdenticalTo: rep];
         
           [self selectReps: [NSArray arrayWithObject: rep]];
           [listView scrollRowToVisible: index];
@@ -1244,7 +1244,7 @@ static NSString *defaultColumns = @"{ \
     
   if ([selected count]) {
     id rep = [selected objectAtIndex: 0];
-    int index = [nodeReps indexOfObjectIdenticalTo: rep];
+    NSUInteger index = [nodeReps indexOfObjectIdenticalTo: rep];
     [listView scrollRowToVisible: index];
   } else if ([nodeReps count]) {
     [listView scrollRowToVisible: 0];

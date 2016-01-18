@@ -1,6 +1,6 @@
 /* Dock.m
  *  
- * Copyright (C) 2005-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -778,7 +778,7 @@
   icon = [self iconContainingPoint: location];
                  
   if (icon) {
-    int index = [icons indexOfObjectIdenticalTo: icon];
+    NSUInteger index = [icons indexOfObjectIdenticalTo: icon];
         
     if (dndSourceIcon && ([sender draggingSource] == dndSourceIcon)) {
       if (icon != dndSourceIcon) {
@@ -805,7 +805,7 @@
         FSNode *node = [FSNode nodeWithPath: path];
       
         if ([node isApplication] && ([icon isSpecialIcon] == NO)) {
-          int i;
+          NSUInteger i;
           
           for (i = 0; i < [icons count]; i++) {
             if ([[[icons objectAtIndex: i] node] isEqualToNode: node]) {
@@ -870,7 +870,7 @@
   }
     
   if (icon) {
-    int index = [icons indexOfObjectIdenticalTo: icon];
+    NSUInteger index = [icons indexOfObjectIdenticalTo: icon];
 
     if (dndSourceIcon && ([sender draggingSource] == dndSourceIcon)) {
       if ((icon != dndSourceIcon) && ([icon isSpecialIcon] == NO)) {
@@ -915,7 +915,7 @@
     }   
   }
 
-	return NSDragOperationNone;
+  return NSDragOperationNone;
 }
 
 - (void)draggingExited:(id <NSDraggingInfo>)sender
@@ -978,7 +978,7 @@
         if ([node isApplication]) {
           if ((icon == nil) || (icon && ([icon isTrashIcon] == NO))) {
             BOOL duplicate = NO;
-            int i;
+            NSUInteger i;
 
             for (i = 0; i < [icons count]; i++) {
               DockIcon *icon = [icons objectAtIndex: i];

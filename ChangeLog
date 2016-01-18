@@ -1,5 +1,14 @@
 2016-01-18 Riccardo Mottola <rm@gnu.org>
 
+	* FSNode/FSNListView.m
+	* GWMetadata/MDKit/MDKWindow.m
+	* GWorkspace/Desktop/Dock/Dock.m
+	* GWorkspace/Finder/Finder.m
+	* GWorkspace/Finder/LiveSearch/LSFEditor.m
+	indexOfObjectIdenticalTo returns a NSUInteger
+
+2016-01-18 Riccardo Mottola <rm@gnu.org>
+
 	* FSNode/FSNBrowser.m
 	* FSNode/FSNIconsView.m
 	* FSNode/FSNListView.m
