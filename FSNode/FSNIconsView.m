@@ -795,7 +795,7 @@ pp.y = NSMaxY(br) + 1; \
       }
     }
     
-    menu = [[NSMenu alloc] initWithTitle: NSLocalizedString(@"Open with", @"")];
+    menu = [[NSMenu alloc] initWithTitle: NSLocalizedStringFromTableInBundle(@"Open with", nil, [NSBundle bundleForClass:[self class]], @"")];
     apps = [[NSWorkspace sharedWorkspace] infoForExtension: firstext];
     app_enum = [[apps allKeys] objectEnumerator];
 
