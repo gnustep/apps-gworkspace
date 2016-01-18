@@ -1,6 +1,6 @@
 /* FSNListView.m
  *  
- * Copyright (C) 2004-2014 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: December 2004
@@ -172,28 +172,28 @@ static NSString *defaultColumns = @"{ \
 
   switch(type) {
     case FSNInfoNameType:
-      [[column headerCell] setStringValue: NSLocalizedString(@"Name", @"")];
+      [[column headerCell] setStringValue: NSLocalizedStringFromTableInBundle(@"Name", nil, [NSBundle bundleForClass:[self class]], @"")];
       break;
     case FSNInfoKindType:
-      [[column headerCell] setStringValue: NSLocalizedString(@"Type", @"")];
+      [[column headerCell] setStringValue: NSLocalizedStringFromTableInBundle(@"Type", nil, [NSBundle bundleForClass:[self class]], @"")];
       break;
     case FSNInfoDateType:
-      [[column headerCell] setStringValue: NSLocalizedString(@"Date Modified", @"")];
+      [[column headerCell] setStringValue: NSLocalizedStringFromTableInBundle(@"Date Modified", nil, [NSBundle bundleForClass:[self class]], @"")];
       break;
     case FSNInfoSizeType:
-      [[column headerCell] setStringValue: NSLocalizedString(@"Size", @"")];
+      [[column headerCell] setStringValue: NSLocalizedStringFromTableInBundle(@"Size", nil, [NSBundle bundleForClass:[self class]], @"")];
       break;
     case FSNInfoOwnerType:
-      [[column headerCell] setStringValue: NSLocalizedString(@"Owner", @"")];
+      [[column headerCell] setStringValue: NSLocalizedStringFromTableInBundle(@"Owner", nil, [NSBundle bundleForClass:[self class]], @"")];
       break;
     case FSNInfoParentType:
-      [[column headerCell] setStringValue: NSLocalizedString(@"Parent", @"")];
+      [[column headerCell] setStringValue: NSLocalizedStringFromTableInBundle(@"Parent", nil, [NSBundle bundleForClass:[self class]], @"")];
       break;
     case FSNInfoExtendedType:
-      [[column headerCell] setStringValue: NSLocalizedString(extInfoType, @"")];
+      [[column headerCell] setStringValue: extInfoType]; /* should come Localized from the ExtInfo bundle */
       break;
     default:
-      [[column headerCell] setStringValue: NSLocalizedString(@"Name", @"")];
+      [[column headerCell] setStringValue: NSLocalizedStringFromTableInBundle(@"Name", nil, [NSBundle bundleForClass:[self class]], @"")];
       break;      
   }
 

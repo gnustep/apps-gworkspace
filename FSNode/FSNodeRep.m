@@ -706,12 +706,13 @@ static FSNodeRep *shared = nil;
 - (NSArray *)availableExtendedInfoNames
 {
   NSMutableArray *names = [NSMutableArray array];
-  int i;
+  NSUInteger i;
   
-  for (i = 0; i < [extInfoModules count]; i++) {
-    id module = [extInfoModules objectAtIndex: i];
-    [names addObject: NSLocalizedString([module menuName], @"")];
-  }
+  for (i = 0; i < [extInfoModules count]; i++)
+    {
+      id module = [extInfoModules objectAtIndex: i];
+      [names addObject: [module menuName]];
+    }
   
   return names;
 }
@@ -719,16 +720,18 @@ static FSNodeRep *shared = nil;
 - (NSDictionary *)extendedInfoOfType:(NSString *)type
                              forNode:(FSNode *)anode
 {
-  int i;
+  NSUInteger i;
 
-  for (i = 0; i < [extInfoModules count]; i++) {
-    id module = [extInfoModules objectAtIndex: i];
-    NSString *mname = NSLocalizedString([module menuName], @"");
-  
-    if ([mname isEqual: type]) {
-      return [module extendedInfoForNode: anode];
+  for (i = 0; i < [extInfoModules count]; i++)
+    {
+      id module = [extInfoModules objectAtIndex: i];
+      NSString *mname = [module menuName];
+      
+      if ([mname isEqual: type])
+        {
+          return [module extendedInfoForNode: anode];
+        }
     }
-  }
   
   return nil;
 }
@@ -907,7 +910,7 @@ static FSNodeRep *shared = nil;
 {
   NSArray *mounted = ((info == nil) ? [self mountedVolumes] : info);
   NSArray *removables = [self removableMediaPaths];
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [mounted count]; i++) {
     NSDictionary *dict = [mounted objectAtIndex: i];
@@ -955,7 +958,7 @@ static FSNodeRep *shared = nil;
   NSArray *removables = [self removableMediaPaths];
   NSArray *reserved = [self reservedMountNames];
   NSMutableArray *names = [NSMutableArray array];  
-  unsigned i;
+  NSUInteger i;
 
   NSLog(@"mountedRemovableMedia");
   for (i = 0; i < [mounted count]; i++) {
@@ -997,7 +1000,7 @@ static FSNodeRep *shared = nil;
   NSArray *mountedMedia = [self mountedRemovableMedia]; 
   NSMutableArray *willMountMedia = [NSMutableArray array];
   NSMutableArray *newlyMountedMedia = [NSMutableArray array];
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [removables count]; i++) {
     NSString *removable = [removables objectAtIndex: i];

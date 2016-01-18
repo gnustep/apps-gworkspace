@@ -1,3 +1,14 @@
+2016-01-18 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/ExtendedInfo/Role/ExtInfoRole.m
+	* FSNode/ExtendedInfo/Role/GNUmakefile.in
+	Localizations inside the Bundle.
+
+	* FSNode/FSNListView.m
+	* FSNode/FSNodeRep.m
+	* FSNode/GNUmakefile.in
+	Localizations inside the Framework
+
 2016-01-16 Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNodeRep.m

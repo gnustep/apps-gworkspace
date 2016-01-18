@@ -42,9 +42,15 @@ FSNode_HAS_RESOURCE_BUNDLE = yes
 
 FSNode_RESOURCE_FILES = \
     Resources/Images/* \
-    Resources/English.lproj 
+    Resources/*.lproj \
 
-FSNode_LANGUAGES = Resources/English 
+FSNode_LANGUAGES = \
+	English \
+	Italian \
+	German \
+	French \
+
+
 
 ifeq ($(findstring darwin, $(GNUSTEP_TARGET_OS)), darwin)
   ifeq ($(OBJC_RUNTIME_LIB), gnu)
