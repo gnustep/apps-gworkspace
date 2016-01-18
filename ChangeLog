@@ -1,5 +1,10 @@
 2016-01-18 Riccardo Mottola <rm@gnu.org>
 
+	* GWorkspace/Desktop/GWDesktopView.m
+	Fix reading of defaults.
+
+2016-01-18 Riccardo Mottola <rm@gnu.org>
+
 	* FSNode/ExtendedInfo/Role/ExtInfoRole.m
 	* FSNode/ExtendedInfo/Role/GNUmakefile.in
 	Localizations inside the Bundle.

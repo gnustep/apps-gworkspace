@@ -1,6 +1,6 @@
 /* GWDesktopView.m
  *  
- * Copyright (C) 2005-2014 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola <rm@gnu.org>
@@ -539,7 +539,7 @@
 
     if (infoType == FSNInfoExtendedType) {
       DESTROY (extInfoType);
-      dskinfo = [dskinfo objectForKey: @"ext_info_type"];
+      entry = [dskinfo objectForKey: @"ext_info_type"];
 
       if (entry) {
         NSArray *availableTypes = [fsnodeRep availableExtendedInfoNames];
