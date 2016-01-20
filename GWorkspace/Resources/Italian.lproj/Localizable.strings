@@ -1,4 +1,4 @@
-﻿/* ----------------------- menu strings --------------------------- *\
+﻿/* ----------------------- menu strings --------------------------- */
 /* main.m */
 
 "Info" = "Info";
@@ -49,7 +49,6 @@
 		"Show Inspectors" = "Mostra gli Ispettori";
 		"Attributes" = "Attributi";
 		"Contents" = "Contenuto";
-		"Tools" = "Strumenti";	
 		"Permissions" = "Permessi";	
 	"Finder" = "Finder";
 	"Fiend" = "Fiend";
@@ -139,14 +138,12 @@
 "Stop" = "Stop";
 "Pause" = "Pausa";
 "Moving" = "Sposta";
-"Copying" = "Copia";
 "Linking" = "Collega";
 "Duplicating" = "Duplica";
 "Destroying" = "Cancellazione";
 "File Operation Completed" = "Operazione Terminata";
 "Backgrounder connection died!" = "La connessione con Backgrounder è terminata!";
 "Some items have the same name;\ndo you want to sobstitute them?" = "Alcuni elementi hanno lo stesso nome;\nSostituirli?";
-"Error" = "Errore";
 "File Operation Error!" = "Errore nell'operazione sui files!";
 
 
@@ -163,15 +160,11 @@
 
 /* InspectorsWin.m */
 
-"Attributes" = "Attributi";
-"Contents" = "Contenuti";
-"Tools" = "Strumenti";
 "Access Control" = "Controllo Accesso";
 
 
 /* AttributesPanel.m */
 
-"Attributes" = "Attributi";
 "Attributes Inspector" = "Ispettore Attributi";
 "Path:" = "Path:";
 "Link to:" = "Coll. a:";
@@ -185,7 +178,6 @@
 
 /* ContentsPanel.m */
 
-"Contents" = "Contenuti";
 "Contents Inspector" = "Ispettore Contenuti";
 "No Contents Inspector" = "Nessun Ispettore";
 "No Contents Inspector\nFor Multiple Selection" = "Nessun Ispettore\nper selezione multipla";
@@ -197,9 +189,7 @@
   = "L'ordinamento si applica al\ncontenuto della cartella selezionata,\nNON alla directory che la contiene";
 "Sort by" = "Ordinamento";
 "Name" = "Nome";
-"Type" = "Tipo";
 "Date" = "Data";
-"Size" = "Dimensioni";
 "Folder Inspector" = "Ispettore Cartelle";	
 
 
@@ -220,7 +210,6 @@
 
 /* ToolsPanel.m */
 
-"Tools" = "Strumenti";
 "Tools Inspector" = "Ispettore Strumenti";
 "No Tools Inspector" = "Nessun Ispettore";
 "Set Default" = "Set Default";

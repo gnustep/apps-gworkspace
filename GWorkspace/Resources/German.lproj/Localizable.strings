@@ -1,4 +1,4 @@
-﻿/*GWorkspace German strings, updated by Ingolf Jandt 2006 *\
+﻿/* GWorkspace German strings, updated by Ingolf Jandt 2006 */
 
 /* ----------------------- menu strings --------------------------- *\
 /* main.m */
@@ -36,6 +36,8 @@
 	"List" = "Liste";
 	"Show" = "Zeige";
 		"Name only" = "Nur Namen";
+		"Type" = "Type";
+		"Size" = "Größe";
 		"Modification date" = "Änderungsdatum";
 		"Role" = "Funktion";
 	"Icon Size" = "Symbolgröße";
@@ -50,7 +52,6 @@
 		"Show Inspectors" = "Inspektoren anzeigen";
 		"Attributes" = "Attribute";
 		"Contents" = "Inhalt";
-		"Tools" = "Werkzeuge";	
 		"Annotations" = "Notizen";
 	"History" = "Verlauf";
 		"Show History" = "Verlauf anzeigen";
@@ -129,7 +130,6 @@
 "Move" = "Verschieben";
 "Move from: " = "Verschieben von: ";
 "\nto: " = "\nnach: ";
-"Copy" = "Kopieren";
 "Copy from: " = "Kopieren von: ";
 "Link" = "Link";
 "Link " = "Link ";
@@ -150,7 +150,6 @@
 "File Operation Completed" = "Dateioperation vollständig";
 "Backgrounder connection died!" = "Backgrounder-Verbindung gestorben!";
 "Some items have the same name;\ndo you want to sobstitute them?" = "Einige Gegenstände haben den selben Namen;\nwollen Sie diese ersetzen?";
-"Error" = "Fehler";
 "File Operation Error!" = "Fehler bei Dateioperation!";
 
 
@@ -176,15 +175,11 @@ which ends in "kann <the file> nicht umbenennen"
 
 /* InspectorsWin.m */
 
-"Attributes" = "Attribute";
-"Contents" = "Inhalt";
-"Tools" = "Werkzeuge";
 "Access Control" = "Zugriffskontrolle";
 
 
 /* AttributesPanel.m */
 
-"Attributes" = "Attribute";
 "Attributes Inspector" = "Attribut-Inspektor";
 "Path:" = "Pfad:";
 "Link to:" = "Verweis zu:";
@@ -198,7 +193,6 @@ which ends in "kann <the file> nicht umbenennen"
 
 /* ContentsPanel.m */
 
-"Contents" = "Inhalt";
 "Contents Inspector" = "Inhalts-Inspektor";
 "No Contents Inspector" = "Kein Inhalts-Inspektor";
 "No Contents Inspector\nFor Multiple Selection" = "Kein Inhalts-Inspektor\nfür mehrfache Auswahl";
@@ -210,9 +204,7 @@ which ends in "kann <the file> nicht umbenennen"
   = "Sortier-Methode trifft auf die\nInhalte des ausgewählten Ordners zu,\nNICHT auf dessen übergerordneten Ordner";
 "Sort by" = "Sortieren nach:";
 "Name" = "Name";
-"Type" = "Typ";
 "Date" = "Datum";
-"Size" = "Größe";
 "Owner" = "Besitzer";
 "Folder Inspector" = "Verzeichnis-Inspektor";	
 
@@ -231,7 +223,6 @@ which ends in "kann <the file> nicht umbenennen"
 
 /* ToolsPanel.m */
 
-"Tools" = "Werkzeuge";
 "Tools Inspector" = "Werkzeug-Inspektor";
 "No Tools Inspector" = "Kein Werkzeug-Inspektor";
 "Set Default" = "Standard setzen";

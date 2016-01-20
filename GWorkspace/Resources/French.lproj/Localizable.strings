@@ -53,7 +53,6 @@
 		"Show Inspectors" = "Afficher les inspecteurs";
 		"Attributes" = "Attributs";
 		"Contents" = "Contenus";
-		"Tools" = "Outils";	
 		"Annotations" = "Annotations";
 	"Finder" = "Chercher un fichier";
 	"Fiend" = "Fiend";
@@ -130,7 +129,6 @@
 "Move" = "Déplacer";
 "Move from: " = "Déplacer depuis : ";
 "\nto: " = "\nvers : ";
-"Copy" = "Copier";
 "Copy from: " = "Copie depuis : ";
 "Link" = "Lier";
 "Link " = "Lier ";
@@ -151,7 +149,6 @@
 "File Operation Completed" = "Opération sur fichier terminée";
 "Backgrounder connection died!" = "Interruption de la connexion !";
 "Some items have the same name;\ndo you want to sobstitute them?" = "Des éléments ont le même nom ;\nvoulez-vous en remplacer le nom ?";
-"Error" = "Erreur";
 "File Operation Error!" = "Erreur de manipulation de fichier !";
 
 
@@ -180,15 +177,11 @@
 
 /* InspectorsWin.m */
 
-"Attributes" = "Attributs";
-"Contents" = "Contenus";
-"Tools" = "Outils";
 "Access Control" = "Contrôle des accès";
 
 
 /* AttributesPanel.m */
 
-"Attributes" = "Attributs";
 "Attributes Inspector" = "Inspecteur d'attributs";
 "Path:" = "Nom complet:";
 "Link to:" = "Lié à:";
@@ -202,7 +195,6 @@
 
 /* ContentsPanel.m */
 
-"Contents" = "Contenus";
 "Contents Inspector" = "Inspecteur de contenus";
 "No Contents Inspector" = "Pas d'inspecteur de contenus";
 "No Contents Inspector\nFor Multiple Selection" = "Pas d'inspecteur de contenus\npour des sélections multiples";
@@ -214,9 +206,7 @@
   = "La méthode de tri s'applique aux\ncontenus des dossiers sélectionnés,\nPAS aux dossiers parents";
 "Sort by" = "Trier par";
 "Name" = "Nom";
-"Type" = "Type";
 "Date" = "Date";
-"Size" = "Taille";
 "Folder Inspector" = "Inspecteur de dossiers";	
 /* Ajouts 25052003 */
 "%@ available on hard disk"= "%@ disponibles sur le disque dur";
@@ -246,7 +236,6 @@
 
 /* ToolsPanel.m */
 
-"Tools" = "Outils";
 "Tools Inspector" = "Inspecteur d'outils";
 "No Tools Inspector" = "Pas d'inspecteur d'outils";
 "Set Default" = "Définir par défaut";
@@ -300,7 +289,6 @@
 "No arguments!" = "Pas d'argument!";
 "Search for items whose:"="Recherche de fichiers à partir des critères ci-dessous :";
 "file name" = "Nom";
-"kind" = "Type";
 "size (KB)" = "Taille (KB)";
 "owner" = "Propriétaire";
 "date created" = "Date création";
@@ -401,7 +389,6 @@
 "Sorting Order" = "Ordre de tri";
 "Sort by" = "Trier par";
 "Name" = "Nom";
-"Type" = "Type";
 "Date" = "Date";
 "Size" = "Taille";
 "Set" = "Appliquer";

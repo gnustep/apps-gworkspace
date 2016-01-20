@@ -1,4 +1,4 @@
-﻿/* ----------------------- menu strings --------------------------- *\
+﻿/* ----------------------- menu strings --------------------------- */
 /* main.m */
 
 "Info" = "Info";
@@ -49,7 +49,6 @@
 		"Show Inspectors" = "Show Inspectors";
 		"Attributes" = "Attributes";
 		"Contents" = "Contents";
-		"Tools" = "Tools";	
 		"Annotations" = "Annotations";	
 	"Finder" = "Finder";
 	"Fiend" = "Fiend";
@@ -125,7 +124,6 @@
 "Move" = "Move";
 "Move from: " = "Move from: ";
 "\nto: " = "\nto: ";
-"Copy" = "Copy";
 "Copy from: " = "Copy from: ";
 "Link" = "Link";
 "Link " = "Link ";
@@ -146,7 +144,6 @@
 "File Operation Completed" = "File Operation Completed";
 "Backgrounder connection died!" = "Background connection died!";
 "Some items have the same name;\ndo you want to substitute them?" = "Some items have the same name;\ndo you want to substitute them?";
-"Error" = "Error";
 "File Operation Error!" = "File Operation Error!";
 
 
@@ -176,15 +173,11 @@
 
 /* InspectorsWin.m */
 
-"Attributes" = "Attributes";
-"Contents" = "Contents";
-"Tools" = "Tools";
 "Access Control" = "Access Control";
 
 
 /* Attributes.m */
 
-"Attributes" = "Attributes";
 "Attributes Inspector" = "Attributes Inspector";
 "Path:" = "Path:";
 "Link to:" = "Link To:";
@@ -199,7 +192,6 @@
 
 /* ContentsPanel.m */
 
-"Contents" = "Contents";
 "Contents Inspector" = "Contents Inspector";
 "No Contents Inspector" = "No Contents Inspector";
 "No Contents Inspector\nFor Multiple Selection" = "No Contents Inspector\nfor Multiple Selection";
@@ -212,9 +204,7 @@
   = "Sort method applies to the\ncontents of the selected folder,\nNOT to its parent folder";
 "Sort by" = "Sort by";
 "Name" = "Name";
-"Type" = "Type";
 "Date" = "Date";
-"Size" = "Size";
 "Folder Inspector" = "Folder Inspector";	
 
 
@@ -232,7 +222,6 @@
 
 /* Tools.m */
 
-"Tools" = "Tools";
 "Tools Inspector" = "Tools Inspector";
 "No Tools Inspector" = "No Tools Inspector";
 "Set Default" = "Set Default";
