@@ -1,8 +1,9 @@
 /* GWViewerIconsPath.m
  *  
- * Copyright (C) 2004-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
+ *         Riccardo Mottola <rm@gnu.org>
  * Date: July 2004
  *
  * This file is part of the GNUstep GWorkspace application
@@ -784,19 +785,13 @@
 
   if ([ednode isParentWritable] == NO)
     {
-      NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
-                      [NSString stringWithFormat: @"%@\"%@\"!\n", 
-                                NSLocalizedString(@"You do not have write permission for ", @""), 
-                                [ednode parentName]], NSLocalizedString(@"Continue", @""), nil, nil);
+      showAlertNoPermission([FSNode class], [ednode parentName]);
       [self updateNameEditor];
       return;
-      
     }
   if ([ednode isSubnodeOfPath: [[GWorkspace gworkspace] trashPath]])
     {
-      NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
-                      NSLocalizedString(@"You can't rename an object that is in the Recycler", @""), 
-                      NSLocalizedString(@"Continue", @""), nil, nil);
+      showAlertInRecycler([FSNode class]);
       [self updateNameEditor];
       return;
     } 
@@ -812,29 +807,19 @@
       
       if (([newname length] == 0) || (range.length > 0))
         {
-          NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
-                          NSLocalizedString(@"Invalid name", @""), 
-                          NSLocalizedString(@"Continue", @""), nil, nil);   
-          [self updateNameEditor];
+	  showAlertInvalidName([FSNode class]);
+	  [self updateNameEditor];
           return;
         }	
       
       if (([extension length] 
            && ([ednode isDirectory] && ([ednode isPackage] == NO))))
         {
-          NSString *msg = NSLocalizedString(@"Are you sure you want to add the extension ", @"");
-          
-          msg = [msg stringByAppendingFormat: @"\"%@\" ", extension];
-          msg = [msg stringByAppendingString: NSLocalizedString(@"to the end of the name?", @"")];
-          msg = [msg stringByAppendingString: NSLocalizedString(@"\nif you make this change, your folder may appear as a single file.", @"")];
-          
-          if (NSRunAlertPanel(@"", msg, 
-                              NSLocalizedString(@"Cancel", @""), 
-                              NSLocalizedString(@"OK", @""), 
-                              nil) == NSAlertDefaultReturn) {
-            [self updateNameEditor];
-            return;
-          }
+          if (showAlertExtensionChange([FSNode class], extension) == NSAlertDefaultReturn)
+            {
+	      [self updateNameEditor];
+	      return;
+	    }
         }
       
       if ([dirContents containsObject: newname])
@@ -846,11 +831,7 @@
             }
           else
             {
-              NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
-                              [NSString stringWithFormat: @"%@\"%@\" %@ ", 
-                                        NSLocalizedString(@"The name ", @""), 
-                                        newname, NSLocalizedString(@" is already in use!", @"")], 
-                              NSLocalizedString(@"Continue", @""), nil, nil);   
+              showAlertNameInUse([FSNode class], newname);
               [self updateNameEditor];
               return;
             }

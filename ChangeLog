@@ -1,3 +1,13 @@
+2016-01-20 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNBrowser.m
+	* FSNode/FSNFunctions.h
+	* FSNode/FSNFunctions.m
+	* FSNode/FSNIconsView.m
+	* FSNode/FSNListView.m
+	* GWorkspace/FileViewer/GWViewerIconsPath.m
+	Group controlTextDidEndEditing in FSFunctions in utility functions and use bundle-localized strings, use these functions in all places.
+
 2016-01-18 Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNListView.m

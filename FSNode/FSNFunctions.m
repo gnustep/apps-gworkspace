@@ -1,8 +1,9 @@
 /* FSNFunctions.m
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
+ *         Riccardo Mottola <rm@gnu.org>
  * Date: March 2004
  *
  * This file is part of the GNUstep FSNode framework
@@ -133,3 +134,62 @@ double myrintf(double a)
 	return (floor(a + 0.5));         
 }
 
+
+/* --- Text Field Editing Error Messages */
+
+void showAlertNoPermission(Class c, NSString *name)
+{
+  NSRunAlertPanel(
+                  NSLocalizedStringFromTableInBundle(@"Error", nil, [NSBundle bundleForClass:c], @""), 
+                  [NSString stringWithFormat: @"%@ \"%@\"!\n", 
+                            NSLocalizedStringFromTableInBundle(@"You do not have write permission for", nil, [NSBundle bundleForClass:c], @""), 
+                            name],
+                  NSLocalizedStringFromTableInBundle(@"Continue", nil, [NSBundle bundleForClass:c], @""),
+                  nil, nil);   
+}
+
+void showAlertInRecycler(Class c)
+{
+  NSRunAlertPanel(NSLocalizedStringFromTableInBundle(@"Error", nil, [NSBundle bundleForClass:c], @""),
+                  NSLocalizedStringFromTableInBundle(@"You can't rename an object that is in the Recycler", nil, [NSBundle bundleForClass:c], @""),
+                  NSLocalizedStringFromTableInBundle(@"Continue", nil, [NSBundle bundleForClass:c], @"")
+                  , nil, nil);   
+}
+
+void showAlertInvalidName(Class c)
+{
+  NSLog(@"Class %@ Bundle %@", c, [NSBundle bundleForClass:c]);
+  NSRunAlertPanel(NSLocalizedStringFromTableInBundle(@"Error", nil, [NSBundle bundleForClass:c], @""),
+                  NSLocalizedStringFromTableInBundle(@"Invalid name", nil, [NSBundle bundleForClass:c], @""),
+                  NSLocalizedStringFromTableInBundle(@"Continue", nil, [NSBundle bundleForClass:c], @""),
+                  nil, nil);  
+}
+
+NSInteger showAlertExtensionChange(Class c, NSString *extension)
+{
+  NSString *msg;
+  NSInteger r;
+
+  msg = NSLocalizedStringFromTableInBundle(@"Are you sure you want to add the extension", nil, [NSBundle bundleForClass:c], @"");
+
+  msg = [msg stringByAppendingFormat: @"\"%@\" ", extension];
+  msg = [msg stringByAppendingString: NSLocalizedStringFromTableInBundle(@"to the end of the name?", nil, [NSBundle bundleForClass:c], @"")];
+  msg = [msg stringByAppendingString: NSLocalizedStringFromTableInBundle(@"\nif you make this change, your folder may appear as a single file.", nil, [NSBundle bundleForClass:c], @"")];
+
+  r = NSRunAlertPanel(@"", msg, 
+                      NSLocalizedStringFromTableInBundle(@"Cancel", nil, [NSBundle bundleForClass:c], @""), 
+                      NSLocalizedStringFromTableInBundle(@"OK", nil, [NSBundle bundleForClass:c], @""), 
+                      nil);
+  return r;
+}
+
+void showAlertNameInUse(Class c, NSString *newname)
+{
+  NSRunAlertPanel(
+                  NSLocalizedStringFromTableInBundle(@"Error", nil, [NSBundle bundleForClass:c], @""),
+                  [NSString stringWithFormat: @"%@\"%@\" %@ ", 
+                            NSLocalizedStringFromTableInBundle(@"The name ", nil, [NSBundle bundleForClass:c], @""),
+                            newname,
+                            NSLocalizedStringFromTableInBundle(@" is already in use!", nil, [NSBundle bundleForClass:c], @"")], 
+                  NSLocalizedStringFromTableInBundle(@"Continue", nil, [NSBundle bundleForClass:c], @""), nil, nil); 
+}

@@ -3,6 +3,7 @@
  * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
+ *         Riccardo Mottola <rm@gnu.org>
  * Date: March 2004
  *
  * This file is part of the GNUstep FSNode framework
@@ -2247,21 +2248,16 @@ pp.y = NSMaxY(br) + 1; \
   
     if ([ednode isParentWritable] == NO)
       {
-        NSRunAlertPanel(
-                        NSLocalizedStringFromTableInBundle(@"Error", nil, [NSBundle bundleForClass:[self class]], @""), 
-                        [NSString stringWithFormat: @"%@ \"%@\"!\n", 
-                                  NSLocalizedStringFromTableInBundle(@"You do not have write permission for", nil, [NSBundle bundleForClass:[self class]], @""), 
-                    [ednode parentName]],
-                        NSLocalizedStringFromTableInBundle(@"Continue", nil, [NSBundle bundleForClass:[self class]], @""), nil, nil);   
-      CLEAREDITING;
-
-    } else if ([ednode isSubnodeOfPath: [desktopApp trashPath]]) {
-      NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
-              NSLocalizedString(@"You can't rename an object that is in the Recycler", @""), 
-              NSLocalizedString(@"Continue", @""), nil, nil);   
-      CLEAREDITING;
-
-    } else {
+	showAlertNoPermission([FSNode class], [ednode parentName]);
+	CLEAREDITING;
+      }
+    else if ([ednode isSubnodeOfPath: [desktopApp trashPath]])
+      {
+	showAlertInRecycler([FSNode class]);
+	CLEAREDITING;
+      }
+    else
+      {
       NSString *newname = [nameEditor stringValue];
       NSString *newpath = [[ednode parentPath] stringByAppendingPathComponent: newname];
       NSString *extension = [newpath pathExtension];
@@ -2270,41 +2266,33 @@ pp.y = NSMaxY(br) + 1; \
       NSArray *dirContents = [ednode subNodeNamesOfParent];
       NSMutableDictionary *opinfo = [NSMutableDictionary dictionary];
 
-      if (([newname length] == 0) || (range.length > 0)) {
-        NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
-                  NSLocalizedString(@"Invalid name", @""), 
-                            NSLocalizedString(@"Continue", @""), nil, nil);   
-        CLEAREDITING;
-      }	
+      if (([newname length] == 0) || (range.length > 0))
+	{
+	  showAlertInvalidName([FSNode class]);
+	  CLEAREDITING;
+	}
 
       if (([extension length] 
-              && ([ednode isDirectory] && ([ednode isPackage] == NO)))) {
-        NSString *msg = NSLocalizedString(@"Are you sure you want to add the extension ", @"");
+              && ([ednode isDirectory] && ([ednode isPackage] == NO))))
+	{
+          if (showAlertExtensionChange([FSNode class], extension) == NSAlertDefaultReturn)
+            {
+              CLEAREDITING;
+            }
+	}
 
-        msg = [msg stringByAppendingFormat: @"\"%@\" ", extension];
-        msg = [msg stringByAppendingString: NSLocalizedString(@"to the end of the name?", @"")];
-        msg = [msg stringByAppendingString: NSLocalizedString(@"\nif you make this change, your folder may appear as a single file.", @"")];
-
-        if (NSRunAlertPanel(@"", msg, 
-                            NSLocalizedString(@"Cancel", @""), 
-				                    NSLocalizedString(@"OK", @""), 
-                            nil) == NSAlertDefaultReturn) {
-          CLEAREDITING;
-        }
-      }
-
-      if ([dirContents containsObject: newname]) {
-        if ([newname isEqual: [ednode name]]) {
-          CLEAREDITING;
-        } else {
-          NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
-            [NSString stringWithFormat: @"%@\"%@\" %@ ", 
-                NSLocalizedString(@"The name ", @""), 
-                newname, NSLocalizedString(@" is already in use!", @"")], 
-                              NSLocalizedString(@"Continue", @""), nil, nil);   
-          CLEAREDITING;
-        }
-      }
+      if ([dirContents containsObject: newname])
+	{
+	  if ([newname isEqual: [ednode name]])
+	    {
+	      CLEAREDITING;
+	    }
+	  else
+	    {
+	      showAlertNameInUse([FSNode class], newname);
+	      CLEAREDITING;
+	    }
+	}
 
       [opinfo setObject: @"GWorkspaceRenameOperation" forKey: @"operation"];	
       [opinfo setObject: [ednode path] forKey: @"source"];	
