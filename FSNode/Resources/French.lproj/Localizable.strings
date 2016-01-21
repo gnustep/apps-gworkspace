@@ -1,0 +1,173 @@
+/***
+French.lproj/Localizable.strings
+updated by make_strings 2016-01-22 00:30:18 +0100
+add comments above this one
+***/
+
+
+/*** Keys found in multiple places ***/
+
+/* File: ../FSNBrowserColumn.m:1619 */
+/* Flag: untranslated */
+/* File: ../FSNFunctions.m:181 */
+/* Flag: untranslated */
+/* File: ../FSNIcon.m:1584 */
+/* Flag: untranslated */
+"OK" = "OK";
+
+/* File: ../FSNBrowserCell.m:407 */
+/* Flag: untranslated */
+/* File: ../FSNIcon.m:817 */
+/* Flag: untranslated */
+"elements" = "elements";
+
+/* File: ../FSNBrowserColumn.m:1616 */
+/* Flag: untranslated */
+/* File: ../FSNIcon.m:1581 */
+/* Flag: untranslated */
+"error" = "error";
+
+/* File: ../FSNBrowserColumn.m:1618 */
+/* Flag: untranslated */
+/* File: ../FSNIcon.m:1583 */
+/* Flag: untranslated */
+"Can't open " = "Can't open ";
+
+/* File: ../FSNListView.m:150 */
+/* Flag: untranslated */
+/* File: ../FSNListView.m:171 */
+/* Flag: untranslated */
+"Name" = "Name";
+
+/* File: ../FSNode.m:561 */
+/* Flag: untranslated */
+/* File: ../FSNode.m:580 */
+/* Flag: untranslated */
+"symbolic link" = "symbolic link";
+
+/* File: ../FSNFunctions.m:143 */
+/* Flag: untranslated */
+/* File: ../FSNFunctions.m:153 */
+/* Flag: untranslated */
+/* File: ../FSNFunctions.m:162 */
+/* Flag: untranslated */
+/* File: ../FSNFunctions.m:189 */
+/* Flag: untranslated */
+"Error" = "Error";
+
+/* File: ../FSNFunctions.m:147 */
+/* Flag: untranslated */
+/* File: ../FSNFunctions.m:155 */
+/* Flag: untranslated */
+/* File: ../FSNFunctions.m:164 */
+/* Flag: untranslated */
+/* File: ../FSNFunctions.m:194 */
+/* Flag: untranslated */
+"Continue" = "Continue";
+
+
+/*** Unmatched/untranslated keys ***/
+
+/* File: ../FSNFunctions.m:145 */
+/* Flag: untranslated */
+"You do not have write permission for"
+  = "You do not have write permission for";
+
+/* File: ../FSNFunctions.m:154 */
+/* Flag: untranslated */
+"You can't rename an object that is in the Recycler"
+  = "You can't rename an object that is in the Recycler";
+
+/* File: ../FSNFunctions.m:163 */
+/* Flag: untranslated */
+"Invalid name" = "Invalid name";
+
+/* File: ../FSNFunctions.m:173 */
+/* Flag: untranslated */
+"Are you sure you want to add the extension"
+  = "Are you sure you want to add the extension";
+
+/* File: ../FSNFunctions.m:176 */
+/* Flag: untranslated */
+"to the end of the name?" = "to the end of the name?";
+
+/* File: ../FSNFunctions.m:177 */
+/* Flag: untranslated */
+"\nif you make this change, your folder may appear as a single file."
+  = "\nif you make this change, your folder may appear as a single file.";
+
+/* File: ../FSNFunctions.m:180 */
+/* Flag: untranslated */
+"Cancel" = "Cancel";
+
+/* File: ../FSNFunctions.m:191 */
+/* Flag: untranslated */
+"The name " = "The name ";
+
+/* File: ../FSNFunctions.m:193 */
+/* Flag: untranslated */
+" is already in use!" = " is already in use!";
+
+/* File: ../FSNIconsView.m:799 */
+/* Flag: untranslated */
+"Open with" = "Open with";
+
+/* File: ../FSNListView.m:153 */
+/* Flag: untranslated */
+"Type" = "Type";
+
+/* File: ../FSNListView.m:156 */
+/* Flag: untranslated */
+"Date Modified" = "Date Modified";
+
+/* File: ../FSNListView.m:159 */
+/* Flag: untranslated */
+"Size" = "Size";
+
+/* File: ../FSNListView.m:162 */
+/* Flag: untranslated */
+"Owner" = "Owner";
+
+/* File: ../FSNListView.m:165 */
+/* Flag: untranslated */
+"Parent" = "Parent";
+
+/* File: ../FSNode.m:568 */
+/* Flag: untranslated */
+"plain file" = "plain file";
+
+/* File: ../FSNode.m:571 */
+/* Flag: untranslated */
+"application" = "application";
+
+/* File: ../FSNode.m:573 */
+/* Flag: untranslated */
+"package" = "package";
+
+/* File: ../FSNode.m:575 */
+/* Flag: untranslated */
+"mount point" = "mount point";
+
+/* File: ../FSNode.m:577 */
+/* Flag: untranslated */
+"directory" = "directory";
+
+/* File: ../FSNode.m:582 */
+/* Flag: untranslated */
+"socket" = "socket";
+
+/* File: ../FSNode.m:584 */
+/* Flag: untranslated */
+"character special" = "character special";
+
+/* File: ../FSNode.m:586 */
+/* Flag: untranslated */
+"block special" = "block special";
+
+/* File: ../FSNode.m:588 */
+/* Flag: untranslated */
+"unknown" = "unknown";
+
+/* File: <dummy>:0 */
+/* Flag: unmatched */
+"Application" = "Application";
