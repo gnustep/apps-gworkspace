@@ -173,10 +173,6 @@ which ends in "kann <the file> nicht umbenennen"
 
 /* ----------------------- Inspectors strings --------------------------- *\
 
-/* InspectorsWin.m */
-
-"Access Control" = "Zugriffskontrolle";
-
 
 /* AttributesPanel.m */
 
@@ -190,6 +186,13 @@ which ends in "kann <the file> nicht umbenennen"
 "Changed" = "Geändert";
 "Revert" = "Zurücksetzen";
 "also apply to files inside selection" = "Auch in Unterordner setzen";
+"Permissions" = "Zugriffsrechte";
+"Read" = "Lesen";
+"Write" = "Schreiben";
+"Execute" = "Ausführen";
+"Owner_short" = "Besitzer";
+"Group" = "Gruppe";
+"Others" = "Andere";
 
 /* ContentsPanel.m */
 
@@ -228,41 +231,7 @@ which ends in "kann <the file> nicht umbenennen"
 "Set Default" = "Standard setzen";
 
 
-/* AppsView.m */
-	
-"Double-click to open selected document(s)" = "Doppelt klicken, um Dokument(e) zu öffnen";	
-"Default:" = "Standard:";
-"Path:" = "Pfad:";		
-"Click 'Set Default' to set default application\nfor all documents with this extension" 
-  = "Klick 'Standard setzen', um die Anwendung. \nfür alle Dokumente dieser Endung zu setzen";
 
-
-/* PermsBox.m */
-
-"Permissions" = "Zugriffsrechte";
-"Read" = "Lesen";
-"Write" = "Schreiben";
-"Execute" = "Ausführen";
-"Owner_short" = "Besitzer";
-"Group" = "Gruppe";
-"Others" = "Andere";
-
-
-/* ----------------------- Processes strings --------------------------- *\
-
-/* Processes.m */
-
-"Processes" = "Prozesse";
-"No Background Process" = "Kein Hintergrundprozess";
-"Kill" = "Beenden";
-"Path: " = "Pfad: ";
-"Status: " = "Status: ";
-
-
-/* ProcsView.m */
-
-"Applications" = "Programme";
-"Background" = "Hintergrund";
 
 
 /* ----------------------- Finder strings --------------------------- *\

@@ -171,10 +171,6 @@
 
 /* ---------------------------- Inspectors strings --------------------------- *\
 
-/* InspectorsWin.m */
-
-"Access Control" = "Access Control";
-
 
 /* Attributes.m */
 
@@ -188,6 +184,13 @@
 "Changed" = "Changed";
 "Revert" = "Revert";
 "also apply to files inside selection" = "Apply to subfolders";
+"Permissions" = "Permissions";
+"Read" = "Read";
+"Write" = "Write";
+"Execute" = "Execute";
+"Owner_short" = "Owner";
+"Group" = "Group";
+"Other" = "Other";
 
 
 /* ContentsPanel.m */
@@ -227,41 +230,6 @@
 "Set Default" = "Set Default";
 
 
-/* AppsView.m */
-	
-"Double-click to open selected document(s)" = "Double-click to open selected document(s)";	
-"Default:" = "Default:";
-"Path:" = "Path:";		
-"Click 'Set Default' to set default application\nfor all documents with this extension" 
-  = "Click 'Set Default' to set default application\nfor all documents with this extension";
-
-
-/* PermsBox.m */
-
-"Permissions" = "Permissions";
-"Read" = "Read";
-"Write" = "Write";
-"Execute" = "Execute";
-"Owner_short" = "Owner";
-"Group" = "Group";
-"Other" = "Other";
-
-
-/* ----------------------- Processes strings --------------------------- *\
-
-/* Processes.m */
-
-"Processes" = "Processes";
-"No Background Process" = "No Background Processes";
-"Kill" = "Kill";
-"Path: " = "Path: ";
-"Status: " = "Status: ";
-
-
-/* ProcsView.m */
-
-"Applications" = "Applications";
-"Background" = "Background";
 
 
 /* ----------------------- Finder strings --------------------------- *\

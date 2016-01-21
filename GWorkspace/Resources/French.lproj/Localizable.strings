@@ -175,10 +175,6 @@
 
 /* ----------------------- Inspectors strings --------------------------- *\
 
-/* InspectorsWin.m */
-
-"Access Control" = "Contrôle des accès";
-
 
 /* AttributesPanel.m */
 
@@ -192,6 +188,13 @@
 "Changed" = "Modifié";
 "Revert" = "Revenir";
 "also apply to files inside selection" = "Appliquer aux sous-dossiers";
+"Permissions" = "Droits";
+"Read" = "Lire";
+"Write" = "Ecrire";
+"Execute" = "Executer";
+"Owner_short" = "Propr.";
+"Group" = "Groupe";
+"Other" = "Autre";
 
 /* ContentsPanel.m */
 
@@ -227,13 +230,6 @@
 "App Inspector" = "Inspecteur d'application";
 
 
-/* PermissionsPanel.m */
-
-"UNIX Permissions" = "Droits UNIX";
-"Access Control" = "Contrôle des accès";
-"Also apply to files inside selection" = "S'applique aussi aux fichiers sélectionnés";
-
-
 /* ToolsPanel.m */
 
 "Tools Inspector" = "Inspecteur d'outils";
@@ -250,32 +246,7 @@
   = "Cliquez sur 'Définir par défaut' pour définir l'application \nqui sera associée à tous les documents ayant cette extension";
 
 
-/* PermsBox.m */
 
-"Permissions" = "Droits";
-"Read" = "Lire";
-"Write" = "Ecrire";
-"Execute" = "Executer";
-"Owner_short" = "Propr.";
-"Group" = "Groupe";
-"Other" = "Autre";
-
-
-/* ----------------------- Processes strings --------------------------- *\
-
-/* Processes.m */
-
-"Processes" = "Processus";
-"No Background Process" = "Pas de tâche de fond";
-"Kill" = "Tuer";
-"Path: " = "Nom complet : ";
-"Status: " = "Etat : ";
-
-
-/* ProcsView.m */
-
-"Applications" = "Applications";
-"Background" = "Fond d'écran";
 
 
 /* ----------------------- Finder strings --------------------------- *\
