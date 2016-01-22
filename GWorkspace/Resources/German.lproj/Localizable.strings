@@ -174,7 +174,7 @@ which ends in "kann <the file> nicht umbenennen"
 /* ----------------------- Inspectors strings --------------------------- *\
 
 
-/* AttributesPanel.m */
+/* Attributes.m */
 
 "Attributes Inspector" = "Attribut-Inspektor";
 "Path:" = "Pfad:";

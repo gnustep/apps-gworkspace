@@ -176,7 +176,7 @@
 /* ----------------------- Inspectors strings --------------------------- *\
 
 
-/* AttributesPanel.m */
+/* Attributes.m */
 
 "Attributes Inspector" = "Inspecteur d'attributs";
 "Path:" = "Nom complet:";

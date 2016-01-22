@@ -11,7 +11,7 @@
 	"Open" = "Apri";
         "Open With..." = "Apri con...";
 	"Open as Folder" = "Apri come Cartella";
-	"Edit File" = "Edita File";
+	"Edit File" = "Modifica File";
 	"New Folder" = "Nuova Cartella";
 	"New File" = "Nuovo File";
 	"Duplicate" = "Duplica";	
@@ -19,7 +19,7 @@
         "Move to Recycler" = "Sposta nel Cestino";
 	"Empty Recycler" = "Vuota il Cestino";
 
-"Edit" = "Edit";
+"Edit" = "Modifica";
 	"Cut" = "Taglia";
 	"Copy" = "Copia";
 	"Paste" = "Incolla";
@@ -158,7 +158,7 @@
 /* ----------------------- Inspectors strings --------------------------- *\
 
 
-/* AttributesPanel.m */
+/* Attributes.m */
 
 "Attributes Inspector" = "Ispettore Attributi";
 "Path:" = "Path:";
