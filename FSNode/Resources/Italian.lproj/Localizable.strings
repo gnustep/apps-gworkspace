@@ -8,158 +8,120 @@ add comments above this one
 /*** Keys found in multiple places ***/
 
 /* File: ../FSNBrowserColumn.m:1619 */
-/* Flag: untranslated */
 /* File: ../FSNFunctions.m:181 */
-/* Flag: untranslated */
 /* File: ../FSNIcon.m:1584 */
-/* Flag: untranslated */
 "OK" = "OK";
 
 /* File: ../FSNBrowserCell.m:407 */
-/* Flag: untranslated */
 /* File: ../FSNIcon.m:817 */
 "elements" = "elementi";
 
 /* File: ../FSNBrowserColumn.m:1616 */
-/* Flag: untranslated */
 /* File: ../FSNIcon.m:1581 */
 "error" = "errore";
 
 /* File: ../FSNBrowserColumn.m:1618 */
-/* Flag: untranslated */
 /* File: ../FSNIcon.m:1583 */
-/* Flag: untranslated */
-"Can't open " = "Can't open ";
+"Can't open " = "Impossibile aprire ";
 
 /* File: ../FSNListView.m:150 */
-/* Flag: untranslated */
 /* File: ../FSNListView.m:171 */
-/* Flag: untranslated */
-"Name" = "Name";
+"Name" = "Nome";
 
 /* File: ../FSNode.m:561 */
-/* Flag: untranslated */
 /* File: ../FSNode.m:580 */
 "symbolic link" = "collegamento simbolico";
 
 /* File: ../FSNFunctions.m:143 */
-/* Flag: untranslated */
 /* File: ../FSNFunctions.m:153 */
-/* Flag: untranslated */
 /* File: ../FSNFunctions.m:162 */
-/* Flag: untranslated */
 /* File: ../FSNFunctions.m:189 */
-/* Flag: untranslated */
-"Error" = "Error";
+"Error" = "Errore";
 
 /* File: ../FSNFunctions.m:147 */
-/* Flag: untranslated */
 /* File: ../FSNFunctions.m:155 */
-/* Flag: untranslated */
 /* File: ../FSNFunctions.m:164 */
-/* Flag: untranslated */
 /* File: ../FSNFunctions.m:194 */
-/* Flag: untranslated */
-"Continue" = "Continue";
+"Continue" = "Continua";
 
 
 /*** Unmatched/untranslated keys ***/
 
 /* File: ../FSNFunctions.m:145 */
-/* Flag: untranslated */
 "You do not have write permission for"
-  = "You do not have write permission for";
+  = "Non si dispongono i permessi per";
 
 /* File: ../FSNFunctions.m:154 */
-/* Flag: untranslated */
 "You can't rename an object that is in the Recycler"
-  = "You can't rename an object that is in the Recycler";
+  = "Impossibile rinominare un oggetto nel Cestino";
 
 /* File: ../FSNFunctions.m:163 */
-/* Flag: untranslated */
-"Invalid name" = "Invalid name";
+"Invalid name" = "Nome non valido";
 
 /* File: ../FSNFunctions.m:173 */
-/* Flag: untranslated */
 "Are you sure you want to add the extension"
-  = "Are you sure you want to add the extension";
+  = "Si è sicuri di aggiungere l'estensione";
 
 /* File: ../FSNFunctions.m:176 */
 /* Flag: untranslated */
-"to the end of the name?" = "to the end of the name?";
+"to the end of the name?" = "al alla fine del nome?";
 
 /* File: ../FSNFunctions.m:177 */
-/* Flag: untranslated */
 "\nif you make this change, your folder may appear as a single file."
-  = "\nif you make this change, your folder may appear as a single file.";
+  = "\neffettuando la modifica, la cartella potrebbe apparire come archivio.";
 
 /* File: ../FSNFunctions.m:180 */
-/* Flag: untranslated */
-"Cancel" = "Cancel";
+"Cancel" = "Annulla";
 
 /* File: ../FSNFunctions.m:191 */
-/* Flag: untranslated */
-"The name " = "The name ";
+"The name " = "Il nome ";
 
 /* File: ../FSNFunctions.m:193 */
-/* Flag: untranslated */
-" is already in use!" = " is already in use!";
+" is already in use!" = " è già in uso!";
 
 /* File: ../FSNListView.m:153 */
-/* Flag: untranslated */
-"Type" = "Type";
+"Type" = "Tipo";
 
 /* File: ../FSNListView.m:156 */
-/* Flag: untranslated */
-"Date Modified" = "Date Modified";
+"Date Modified" = "Data Modifica";
 
 /* File: ../FSNListView.m:159 */
-/* Flag: untranslated */
-"Size" = "Size";
+"Size" = "Dim.";
 
 /* File: ../FSNListView.m:162 */
-/* Flag: untranslated */
-"Owner" = "Owner";
+"Owner" = "Proprietario";
 
 /* File: ../FSNListView.m:165 */
-/* Flag: untranslated */
-"Parent" = "Parent";
+"Parent" = "Padre";
 
 /* File: ../FSNode.m:568 */
-/* Flag: untranslated */
-"plain file" = "plain file";
+"plain file" = "archivio semplice";
 
 /* File: ../FSNode.m:571 */
-/* Flag: untranslated */
-"application" = "application";
+"application" = "Applicazione";
 
 /* File: ../FSNode.m:573 */
-/* Flag: untranslated */
-"package" = "package";
+"package" = "Pacchetto";
 
 /* File: ../FSNode.m:575 */
-/* Flag: untranslated */
 "mount point" = "mount point";
 
 /* File: ../FSNode.m:577 */
-/* Flag: untranslated */
-"directory" = "directory";
+"directory" = "cartella";
 
 /* File: ../FSNode.m:582 */
 /* Flag: untranslated */
 "socket" = "socket";
 
 /* File: ../FSNode.m:584 */
-/* Flag: untranslated */
-"character special" = "character special";
+"character special" = "speciale carattere";
 
 /* File: ../FSNode.m:586 */
 /* Flag: untranslated */
-"block special" = "block special";
+"block special" = "speciale blocco";
 
 /* File: ../FSNode.m:588 */
-/* Flag: untranslated */
-"unknown" = "unknown";
+"unknown" = "sconosciuto";
 
 /* File: <dummy>:0 */
 /* Flag: unmatched */
