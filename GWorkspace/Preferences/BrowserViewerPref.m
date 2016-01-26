@@ -1,6 +1,6 @@
 /* BrowserViewerPref.m
  *  
- * Copyright (C) 2003-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -110,7 +110,7 @@ static NSString *nibName = @"BrowserViewerPref";
           [self tile]; 
             
           /* Internationalization */
-          [controlsbox setTitle: NSLocalizedString(@"Columns Width", @"")];  
+          [controlsbox setTitle: NSLocalizedString(@"Column Width", @"")];  
           [setButt setTitle: NSLocalizedString(@"Use Default Settings", @"")];  
         }
     }
