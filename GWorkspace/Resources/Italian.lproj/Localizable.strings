@@ -252,60 +252,33 @@
 "GWorkspace Preferences" = "Preferenze di GWorkspace";
 
 
-/* BackWinPreferences.m */       
-
-"DeskTop Shelf" = "Shelf della Scrivania";	
-"DeskTop Color" = "Colore Scrivania";
-"red" = "rosso";
-"green" = "verde";
-"blue" = "blu";
-"Set Color" = "Scegli Colore";
-"Push the \"Set Image\" button\nto set your DeskTop image.\nThe image must have the same\nsize of your screen." = 
-  "Click su \"Scegli un immagine\"\nper scegliere l'immagine di sfondo.\nL'immagine deve avere le\ndimensioni dello schermo.";
-"Set Image" = "Scegli un immagine";
-"Unset Image" = "Togli l'immagine";
-
-	
 /* DefaultXTerm.m */             
 	
+"Terminal" = "Terminal";
 "Set" = "Scegli";
+"Use Terminal service" = "Utilizza il servizio Terminale";
+"arguments" = "argomenti";
 	
 	
-/* BrowserViewsPreferences.m */  
+/* BrowserViewerPref.m */  
 	
 "Column Width" = "Larg. Colonne";
 "Use Default Settings" = "Usa i valori default";	
-"Browser" = "Browser";
-	
-	
-/* FileWatchingPreferences.m */  
-	
-"File System Watching" = "Controllo File System";
-"timeout" = "scadenza";
-"frequency" = "frequenza";
-"Values will apply to the \nnew watchers from now, \nto the existing ones, after the first timeout" = 
-  "I valori si applicheranno ai\nnuovi watchers da adesso, \na quelli esistenti, dopo la prima scadenza";
-	
-	
-/* ShelfPreferences.m */
-	
-"Shelf" = "Shelf";
 	
 	
 /* DefaultEditor.m */            
 
 "Default Editor" = "Editore Default";
 "No Default Editor" = "Nessun Editore Default";
-"Choose..." = "Scegli...";
+"Choose" = "Scegli";
 
 
-/* IconViewsPreferences.m */
+/* IconsPrefs.m */
 
 "Icons" = "Icone";
 "Thumbnails" = "Miniature";
 "use thumbnails" = "Usa miniature";
 "Title Width" = "Larg. Titolo";
-"Icon View" = "Vista per Icone";
 
 /* Recycler strings */
 

@@ -266,20 +266,6 @@ which ends in "kann <the file> nicht umbenennen"
 "GWorkspace Preferences" = "GWorkspace Grundeinstellungen";
 
 
-/* BackWinPreferences.m */       
-
-"Desktop Shelf" = "Desktop Shelf";	
-"Desktop Color" = "Desktop-Farbe";
-"red" = "rot";
-"green" = "grün";
-"blue" = "blau";
-"Set Color" = "Farbe setzen";
-"Push the \"Set Image\" button\nto set your DeskTop image.\nThe image must have the same\nsize of your screen." = 
-  "Klicken Sie den \"Bild setzen\"-Button,\num Ihr Desktop-Bild zu setzen.\nDas Bild muss die gleiche\nGröße wie Ihr Bildschirm haben.";
-"Set Image" = "Bild setzen";
-"Unset Image" = "Bild aufheben";
-"Activate desktop" = "Desktop aktivieren";
-	
 /* DefaultXTerm.m */             
 
 "Use Terminal service" = "Terminal-Service verwenden";
@@ -288,39 +274,23 @@ which ends in "kann <the file> nicht umbenennen"
 "arguments" = "Argumente";
 
 	
-/* BrowserViewsPreferences.m */  
+/* BrowserViewerPref.m */   
 
 "Column Width" = "Spaltenbreite";
 "Use Default Settings" = "Standards benutzen";	
-"Browser" = "Browser";
-	
-	
-/* FileWatchingPreferences.m */  
-	
-"File System Watching" = "Datei-Überwachung";
-"timeout" = "Auszeit";
-"frequency" = "Frequenz";
-"Values will apply to the \nnew watchers from now, \nto the existing ones, after the first timeout" = 
-   "Werte wirken von jetzt an auf neue\n Überwachungen, auf die existier-\nenden nach der ersten Auszeit";
-	
-	
-/* ShelfPreferences.m */
-	
-"Shelf" = "Shelf";
-"Default" = "Standard";
 	
 	
 /* DefaultEditor.m */            
 
 "Default Editor" = "Standard-Editor";
 "No Default Editor" = "Kein Standard-Editor";
-"Choose..." = "Auswählen...";
 "Choose" = "Auswählen";
 
-/* IconViewsPreferences.m */
-
+/* IconsPrefs.m */
+"Icons" = "Symbole";
+"Thumbnails" = "Thumbnails";
+"use thumbnails" = "Thumbnails verwenden";
 "Title Width" = "Titelbreite";
-"Icon View" = "Symbolansicht";
 
 /* Sorting order */
 "Sorting Order" = "Sortierreihenfolge";
@@ -340,9 +310,6 @@ which ends in "kann <the file> nicht umbenennen"
 
 /* Icons */
 
-"Icons" = "Symbole";
-"Thumbnails" = "Thumbnails";
-"use thumbnails" = "Thumbnails verwenden";
 "Animate icons" = "Symbole animieren";
 "when changing a path" = "beim Pfadwechsel";
 "when opening a file" = "beim Dateiöffnen";

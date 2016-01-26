@@ -302,24 +302,6 @@
 "GWorkspace Preferences" = "Préférences de GWorkspace";
 
 
-/* BackWinPreferences.m */       
-
-"DeskTop Shelf" = "Etagère du bureau";	
-"DeskTop Color" = "Couleur du bureau";
-"red" = "rouge";
-"green" = "vert";
-"blue" = "bleu";
-"Set Color" = "Appliquer la couleur";
-"Push the \"Set Image\" button\nto set your DeskTop image.\nThe image must have the same\nsize of your screen." = 
-  "Cliquez sur le bouton\"Appliquer l'image\"\npour installer l'image sur votre bureau.\nCette image doit avoir la même\ntaille que l'écran.";
-"Set Image" = "Appliquer l'image";
-"Unset Image" = "Retirer l'image";
-"Push the 'Set Image' button" = "Cliquez sur le bouton 'Appliquer l'image'";
-"to set you Destop image" = "pour appliquer l'image au fonds de votre bureau." ;
-"The image must have the same" = "L'image doit avoir la même taille";
-"size as your screen." = "que votre écran.";
-	
-
 /* XTermPref.m */    
 "Terminal" = "Terminal";
 "Set" = "Appliquer";
@@ -327,36 +309,25 @@
 "arguments" = "arguments";
 
 	
-/* BrowserViewsPreferences.m */  
+/* BrowserViewerPref.m */  
 
 "Columns Width" = "Largeur des colonnes";
 "Use Default Settings" = "Param. par défaut";	
-"Browser" = "Navigateur";
-"Browser View" = "Affichage navigateur";
-	
-	
-/* FileWatchingPreferences.m */  
-	
-"File System Watching" = "Consultation du système de fichier";
-"timeout" = "délai d'attente dépassé";
-"frequency" = "fréquence";
-"Values will apply to the \nnew watchers from now, \nto the existing ones, after the first timeout" = 
-   "A partir de maintenant, les paramètres seront \nappliquées aux nouveaux arrivants";
-
-	
-/* ShelfPreferences.m */
-	
-"Shelf" = "Etagère";
 	
 	
 /* DefaultEditor.m */            
 
 "Default Editor" = "Editeur par défaut";
 "No Default Editor" = "Pas d'éditeur par défaut";
-"Choose..." = "Sélectionner...";
 "Choose" = "Sélectionner";
+
+/* IconsPrefs.m */
+"Icons" = "Icônes";
+"Thumbnails" = "Vignettes";
+"use thumbnails" = "utiliser les vignettes";
+"Title Width" = "Largeur du titre";
+
 "Editor" = "Editeur de texte";
-"XTerminal" = "Console X";
 "Sorting Order" = "Ordre de tri";
 "Sort by" = "Trier par";
 "Name" = "Nom";
@@ -396,12 +367,6 @@
 "Hidden files" = "Fichiers cachés";
 "Select and move the files to hide or to show" = "Selectionnez et déplacez les fichiers à cacher ou afficher";
 
-/* IconViewsPreferences.m */
-"Icons" = "Icônes";
-"Thumbnails" = "Vignettes";
-"use thumbnails" = "utiliser les vignettes";
-"Title Width" = "Largeur du titre";
-"Icon View" = "Affichage icône";
 
 /* HistoryPref.m */
 "History" = "Historique";
