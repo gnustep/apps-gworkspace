@@ -218,18 +218,21 @@
 
 
 
-
-
 /* ----------------------- Finder strings --------------------------- *\
 
 /* Finder.m */
 
-"Finder" = "Finder";
-"Find items with names that match" = "Cerca elementi con nome adeguato";
-"Find items with contents that match" = "Cerca elementi con contenuto adeguato";
+"Finder" = "Ricerca";
 "No selection!" = "Nessuna selezione!";
 "No arguments!" = "Nessun argomento!";
-
+"Search in:" = "Cerca in:";
+"Current selection" = "Selezione corrente";
+"Add" = "Aggiungi";
+"Remove" = "Rimuovi";
+"Search for items whose:" = "Cerca per oggetti che:";
+"Specific places" = "Posti specifici";
+"Recursive" = "Ricorsivamente";
+"Search" = "Cerca";
 
 /* ----------------------- Fiend strings --------------------------- *\
 

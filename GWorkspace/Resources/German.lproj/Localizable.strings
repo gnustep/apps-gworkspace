@@ -239,11 +239,16 @@ which ends in "kann <the file> nicht umbenennen"
 /* Finder.m */
 
 "Finder" = "Dateisuche";
-"Find items with names that match" = "Nach passenden Namen suchen";
-"Find items with contents that match" = "Nach passenden Inhalten suchen";
 "No selection!" = "Keine Auswahl!";
 "No arguments!" = "Keine Argumente!";
-
+"Search in:" = "Suche in:";
+"Current selection" = "Aktuelle Auswahl";
+"Add" = "Hinzufügen ";
+"Remove" = "Entfernen";
+"Search for items whose:" = "Suche für Objekte welche:";
+"Specific places" = "Bestimmte Orte";
+"Recursive" = "Rekursiv";
+"Search" = "Suche";
 
 /* ----------------------- Fiend strings --------------------------- *\
 

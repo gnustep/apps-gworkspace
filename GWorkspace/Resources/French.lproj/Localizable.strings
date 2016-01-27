@@ -254,11 +254,11 @@
 /* Finder.m */
 
 "Finder" = "Rechercher";
-"Find items with names that match" = "Rechercher les éléments nommés";
-"Find items with contents that match" = "Rechercher les éléments contenant le texte";
 "No selection!" = "Pas de sélection!";
 "No arguments!" = "Pas d'argument!";
 "Search for items whose:"="Recherche de fichiers à partir des critères ci-dessous :";
+"Recursive" = "Recursivement";
+
 "file name" = "Nom";
 "size (KB)" = "Taille (KB)";
 "owner" = "Propriétaire";

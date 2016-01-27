@@ -237,10 +237,16 @@
 /* Finder.m */
 
 "Finder" = "Finder";
-"Find items with names that match" = "Search by name";
-"Find items with contents that match" = "Search by contents";
 "No selection!" = "No selection!";
 "No arguments!" = "No arguments!";
+"Search in:" = "Search in:";
+"Current selection" = "Current selection";
+"Add" = "Add";
+"Remove" = "Remove";
+"Search for items whose:" = "Search for items whose:";
+"Specific places" = "Specific places";
+"Recursive" = "Recurisve";
+"Search" = "Search";
 
 
 /* ----------------------- Fiend strings --------------------------- *\

@@ -225,7 +225,7 @@ static Finder *finder = nil;
     [addPlaceButt setTitle: NSLocalizedString(@"Add", @"")];
     [removePlaceButt setTitle: NSLocalizedString(@"Remove", @"")];
     [itemsLabel setStringValue: NSLocalizedString(@"Search for items whose:", @"")];
-    [recursiveSwitch setStringValue: NSLocalizedString(@"recursive", @"")];
+    [recursiveSwitch setTitle: NSLocalizedString(@"Recursive", @"")];
     [findButt setTitle: NSLocalizedString(@"Search", @"")];
         
     usesSearchPlaces = [defaults boolForKey: @"uses_search_places"];

@@ -1,3 +1,9 @@
+2016-01-27  Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/Resources/English.lproj/Finder.gorm
+	* Workspace/Finder/Finder.m
+	Fix "recursive" button translation.
+
 2016-01-26 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/Preferences/BrowserViewerPref.m
