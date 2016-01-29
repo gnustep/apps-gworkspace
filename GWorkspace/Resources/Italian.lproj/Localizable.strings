@@ -5,7 +5,7 @@
 	"Info Panel..." = "Pannello Informazioni...";
 	"Preferences..." = "Preferenze...";
 	"Help..." = "Aiuto...";
-        "Activate context help" = "Attiva guita contestuale";
+        "Activate context help" = "Attiva guida contestuale";
 
 "File" = "Archivio";
 	"Open" = "Apri";
@@ -209,7 +209,6 @@
 
 
 
-
 /* ToolsPanel.m */
 
 "Tools Inspector" = "Ispettore Strumenti";
@@ -233,6 +232,57 @@
 "Specific places" = "Posti specifici";
 "Recursive" = "Ricorsivamente";
 "Search" = "Cerca";
+
+/* names */
+"contains" = "contiene";
+"is" = "è";
+"contains not" = "non contiene";
+"starts with" = "inizia con";
+"ends with" = "termina con";
+"name" = "Nome";
+
+/* type */
+"type"="Tipo";
+
+/* size */
+"size"="Dimensione";
+
+/* annotations */
+"annotations"="Annotazioni";
+
+/* owner */
+"owner"="Proprietario";
+
+/* date */
+"date created"="Data creazione";
+"date modified"="Data modifica";
+"is today" = "è oggi";
+"is within" = "è";
+"is before" = "è prima";
+"is after" = "è dopo";
+"is exactly" = "è esattamente";
+"the last day" = "Ieri";
+"the last 2 days" = "Ultimi 2 giorni";
+"the last 3 days" =  "Ultimi 3 giorni";
+"the last week" = "Ultima settimana";
+"the last 2 weeks" = "Ultime 2 settimane";
+"the last 3 weeks" = "Ultime 3 settimane";
+"the last month" = "Ultimo mese";
+"the last 2 months" = "Ultimi 2 mesi";
+"the last 3 months" = "Ultimi 3 mesi";
+"the last 6 months" = "Ultimi 6 mesi";
+
+/* kinds */
+"is not" = "non è";
+"plain file" = "Archivio";
+"folder" = "Cartella";
+"tool" = "Strumento";
+"symbolic link" = "collegamento simbolico";
+"application" = "Applicazione";
+
+/* contents */
+"contents"="Contenuto";
+"includes"="contiene";
 
 /* ----------------------- Fiend strings --------------------------- *\
 
