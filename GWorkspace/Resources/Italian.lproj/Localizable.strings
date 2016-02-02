@@ -241,14 +241,17 @@
 "ends with" = "termina con";
 "name" = "Nome";
 
-/* type */
-"type"="Tipo";
-
 /* size */
 "size"="Dimensione";
+"greater than"="maggiore di";
+"less than"="minore di";
 
 /* annotations */
 "annotations"="Annotazioni";
+"contains one of"="contiene uno di";
+"contains all of"="contiene tutti";
+"with exactly"="con esattamente";
+"without one of"="escludendo";
 
 /* owner */
 "owner"="Proprietario";
@@ -272,12 +275,14 @@
 "the last 3 months" = "Ultimi 3 mesi";
 "the last 6 months" = "Ultimi 6 mesi";
 
-/* kinds */
+
+/* type */
+"type"="Tipo";
 "is not" = "non è";
 "plain file" = "Archivio";
 "folder" = "Cartella";
 "tool" = "Strumento";
-"symbolic link" = "collegamento simbolico";
+"symbolic link" = "Collegamento simbolico";
 "application" = "Applicazione";
 
 /* contents */

@@ -1,6 +1,6 @@
 /* FModuleSize.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -80,8 +80,8 @@ static NSString *nibName = @"FModuleSize";
 
     /* Internationalization */    
     [popUp removeAllItems];
-    [popUp insertItemWithTitle: NSLocalizedString(@"greater then", @"") atIndex: 0];
-    [popUp insertItemWithTitle: NSLocalizedString(@"less then", @"") atIndex: 1];
+    [popUp insertItemWithTitle: NSLocalizedString(@"greater than", @"") atIndex: 0];
+    [popUp insertItemWithTitle: NSLocalizedString(@"less than", @"") atIndex: 1];
     [popUp selectItemAtIndex: 0]; 
   }
   

@@ -1,3 +1,8 @@
+2016-02-02  Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/Finder/Modules/FModuleSize/FModuleSize.m
+	Fix spelling error.
+
 2016-01-27  Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/Resources/English.lproj/Finder.gorm
