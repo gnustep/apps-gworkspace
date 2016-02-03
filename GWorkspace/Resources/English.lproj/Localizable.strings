@@ -230,8 +230,6 @@
 "Set Default" = "Set Default";
 
 
-
-
 /* ----------------------- Finder strings --------------------------- *\
 
 /* Finder.m */
@@ -247,6 +245,63 @@
 "Specific places" = "Specific places";
 "Recursive" = "Recursive";
 "Search" = "Search";
+
+
+/* names */
+"contains" = "contains";
+"is" = "is";
+"contains not" = "contains not";
+"starts with" = "starts with";
+"ends with" = "ends with";
+"name" = "Name";
+
+/* size */
+"size"="Size";
+"greater than"="greater than";
+"less than"="less than";
+
+/* annotations */
+"annotations"="Annotations";
+"contains one of"="contains one of";
+"contains all of"="contains all of";
+"with exactly"="with exactly";
+"without one of"="without one of";
+
+/* owner */
+"owner"="Owner";
+
+/* date */
+"date created"="Data created";
+"date modified"="Data modified";
+"is today" = "is today";
+"is within" = "is within";
+"is before" = "is before";
+"is after" = "is after";
+"is exactly" = "is exactly";
+"the last day" = "the last day";
+"the last 2 days" = "the last 2 days";
+"the last 3 days" =  "the last 3 days";
+"the last week" = "the last week";
+"the last 2 weeks" = "the last 2 weeks";
+"the last 3 weeks" = "the last 3 weeks";
+"the last month" = "the last month";
+"the last 2 months" = "the last 2 months";
+"the last 3 months" = "the last 3 months";
+"the last 6 months" = "the last 6 months";
+
+
+/* type */
+"type"="Type";
+"is not" = "is not";
+"plain file" = "Plain file";
+"folder" = "Folder";
+"tool" = "Tool";
+"symbolic link" = "Symbolic link";
+"application" = "Application";
+
+/* contents */
+"contents"="Contents";
+"includes"="includes";
 
 
 /* ----------------------- Fiend strings --------------------------- *\
