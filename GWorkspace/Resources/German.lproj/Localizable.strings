@@ -250,6 +250,64 @@ which ends in "kann <the file> nicht umbenennen"
 "Recursive" = "Rekursiv";
 "Search" = "Suche";
 
+
+/* names */
+"contains" = "enthält";
+"is" = "ist";
+"contains not" = "enthält nicht";
+"starts with" = "beginnt mit";
+"ends with" = "endet mit";
+"name" = "Name";
+
+/* size */
+"size"="Größe";
+"greater than"="größer als";
+"less than"="kleiner als";
+
+/* annotations */
+"annotations"="Anmerkungen";
+"contains one of"="enthält eins von";
+"contains all of"="enthält alle";
+"with exactly"="mit genau";
+"without one of"="ohne eins von";
+
+/* owner */
+"owner"="Besitzer";
+
+/* date */
+"date created"="Erstellungsdatum";
+"date modified"="Änderungsdatum";
+"is today" = "it heute";
+"is within" = "ist zwischen";
+"is before" = "ist vor";
+"is after" = "ist nach";
+"is exactly" = "ist genau";
+"the last day" = "der letzte Tag";
+"the last 2 days" = "die letzten 2 Tage";
+"the last 3 days" =  "die letzten 3 Tage";
+"the last week" = "die letzte Woche";
+"the last 2 weeks" = "die letzten 2 Wochen";
+"the last 3 weeks" = "die letzten 3 Wochen";
+"the last month" = "der letzte Monat";
+"the last 2 months" = "die letzten 2 Monaten";
+"the last 3 months" = "die letzten 3 Monaten";
+"the last 6 months" = "die letzten 6 Monaten";
+
+
+/* type */
+"type"="Typ";
+"is not" = "ist nicht";
+"plain file" = "Datei";
+"folder" = "Order";
+"tool" = "Werkzeug";
+"symbolic link" = "Symb. Verweis";
+"application" = "Anwendung";
+
+/* contents */
+"contents"="Inhalt";
+"includes"="enthält";
+
+
 /* ----------------------- Fiend strings --------------------------- *\
 
 /* Fiend.m */
@@ -351,7 +409,7 @@ which ends in "kann <the file> nicht umbenennen"
 "General" = "Allgemein";
 	
 	"Show Dock" = "Dock anzeigen";
-"Position" = "Position";
+	      "Position" = "Position";
 "Style:"="Stil:";
 	"Left" = "Links";
 	"Right" = "Rechts";
