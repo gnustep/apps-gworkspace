@@ -209,13 +209,13 @@ static NSMutableCharacterSet *skipSet = nil;
           title = NSLocalizedString(@"ends with", @"");
           break;
         case LESS_THEN:
-          title = NSLocalizedString(@"less then", @"");
+          title = NSLocalizedString(@"less than", @"");
           break;
         case EQUAL_TO:
           title = NSLocalizedString(@"equal to", @"");
           break;
         case GREATER_THEN:
-          title = NSLocalizedString(@"greater then", @"");
+          title = NSLocalizedString(@"greater than", @"");
           break;
         case TODAY:
           title = NSLocalizedString(@"is today", @"");
