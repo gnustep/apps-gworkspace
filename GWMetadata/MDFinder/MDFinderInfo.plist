@@ -5,10 +5,11 @@
     ApplicationIcon = "MDFinder.tiff";
     ApplicationName = "MDFinder";
     ApplicationRelease = "1.0";
+    CFBundleIdentifier = "org.gnustep.GWorkspace.MDFinder";
     Authors = (
       "Enrico Sersale <enrico\@fibernet.ro>"
     );
-    Copyright = "Copyright (C) 2007 Free Software Foundation, Inc.";
+    Copyright = "Copyright (C) 2007-2016 Free Software Foundation, Inc.";
     CopyrightDescription = "Released under the GNU General Public License 2.0";
   NSTypes = (
       {
