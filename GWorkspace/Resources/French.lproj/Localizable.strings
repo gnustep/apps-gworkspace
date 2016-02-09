@@ -1,9 +1,9 @@
 ﻿/* ----------------------- menu strings --------------------------- */
 /* Traduction réalisée par Stéphane PERON <speron@telys.com> 
  * et Xavier BARRIER <xavier.barrier@proxyware.fr> 
+ * Mise à jour 2016 par Riccardo Mottola et Bertrand Dekoninck
  */
 /* main.m */
-
 
 "Info" = "Informations";
 	"Info Panel..." = "À propos...";
@@ -23,7 +23,7 @@
 	"Move to Recycler" = "Envoyer à la corbeille";
 	"Empty Recycler" = "Vider la corbeille";
 
-"Edit" = "Edition";
+"Edit" = "Édition";
 	"Cut" = "Couper";
 	"Copy" = "Copier";
 	"Paste" = "Coller";
@@ -33,7 +33,7 @@
 	"Browser" = "Navigateur";
 	"Icon" = "Icône";
 	"List" = "Liste";
-	"Show" = "Affiche";
+	"Show" = "Afficher";
 	        "Name only" = "Nom seulement";
 		"Type" = "Type";
 		"Size" = "Taille";
@@ -65,7 +65,7 @@
 	"Tabbed Shelf" = "Etagères";	
 		"Show Tabbed Shelf" = "Montrer les étagères";
                 "Show Tabbed Shelf" = "Masquer les étagères";
-		"Remove Current Tab" = "Supprime l'étagère";
+		"Remove Current Tab" = "Supprimer l'étagère";
 		"Rename Current Tab" = "Renommer l'étagère";
 		"Add Tab..." = "Ajouter une étagère...";
 	"Terminal" = "Terminal";
@@ -230,7 +230,7 @@
 "App Inspector" = "Inspecteur d'application";
 
 
-/* ToolsPanel.m */
+/* Tools.m */
 
 "Tools Inspector" = "Inspecteur d'outils";
 "No Tools Inspector" = "Pas d'inspecteur d'outils";
@@ -256,30 +256,74 @@
 "Finder" = "Rechercher";
 "No selection!" = "Pas de sélection!";
 "No arguments!" = "Pas d'argument!";
+"Search in:" = "Dans :";
+"Current selection" = "Selection courante";
+"Add" = "Ajouter";
+"Remove" = "Retirer";
 "Search for items whose:"="Recherche de fichiers à partir des critères ci-dessous :";
+"Specific places" = "Choix de l'utilisateur";
 "Recursive" = "Recursivement";
+"Search" = "Chercher";
 
-"file name" = "Nom";
-"size (KB)" = "Taille (KB)";
-"owner" = "Propriétaire";
-"date created" = "Date création";
-"date modified" = "Date modif.";
-"contents" = "Contenu";
-"includes" = "contient";
-"contains" = "contenant";
-"doesn't contain" = "ne contenant pas";
+
+/* names */
+"contains" = "contient";
 "is" = "est";
-"is not" = "est différent";
-"starts with" = "commence par";
+"contains not" = "ne contient pas";
+"starts with" = "commence par ";
 "ends with" = "finit par";
-"no value" = "n'est pas un critère";
-"plain file" = "fichier commun";
-"directory" = "répertoire";
-"shell executable" ="exécutable de shell";
-"symbolic link" = "lien symbolique";
-"application" = "application";
-"is less than" = "est inférieure à";
-"is greater than"= "est supérieure à";
+"name" = "Le nom";
+
+/* size */
+"size"="Taille";
+"greater than"="supérieure à";
+"less than"="inférieure à";
+
+/* annotations */
+"annotations"="Les annotations";
+"contains one of"="contiennent l'un de";
+"contains all of"="contiennent tout";
+"with exactly"="sont exactement";
+"without one of"="n'ont pas l'un de";
+
+/* owner */
+"owner"="Le propriétaire";
+
+
+/* date */
+"date created"="Crée";
+"date modified"="Modifié";
+"is today" = "aujourd'hui";
+"is within" = "depuis";
+"is before" = "avant le";
+"is after" = "après le";
+"is exactly" = "exactement le";
+"the last day" = "hier";
+"the last 2 days" = "2 jours";
+"the last 3 days" =  "3 jours";
+"the last week" = "1 semaine";
+"the last 2 weeks" = "2 semaines";
+"the last 3 weeks" = "3 semaines";
+"the last month" = "1 mois";
+"the last 2 months" = "2 mois";
+"the last 3 months" = "3 mois";
+"the last 6 months" = "6 mois";
+
+
+/* type */
+"type"="Le type";
+"is not" = "n'est pas";
+"plain file" = "Fichier standart";
+"folder" = "Dossier";
+"tool" = "Outil";
+"symbolic link" = "Lien symbolique";
+"application" = "Application";
+
+
+/* contents */
+"contents"="Le contenu";
+"includes"="est";
+
 
 /* ----------------------- Fiend strings --------------------------- *\
 
