@@ -312,7 +312,7 @@
 
 /* DefaultXTerm.m */             
 	
-"Terminal" = "Terminal";
+"Terminal" = "Terminale";
 "Set" = "Scegli";
 "Use Terminal service" = "Utilizza il servizio Terminale";
 "arguments" = "argomenti";
@@ -354,19 +354,6 @@
 "use thumbnails" = "Usa miniature";
 "Title Width" = "Larg. Titolo";
 
-/* Recycler strings */
-
-"Recycle: " = "Cestinare: ";
-"Recycler: " = "Cestino: ";
-"Recycler" = "Cestino";
-"the Recycler" = "il Cestino";
-"\nto the Recycler" = "\nnel Cestino";
-"Move from the Recycler " = "Sposta dal Cestino ";
-"In" = "In";
-"Empty Recycler" = "Svuotare il Cestino";
-"Empty the Recycler?" = "Svuotare il Cestino?";
-"Put Away" = "Ripristina";
-
 
 /* DesktopPref.m */
 "Desktop" = "Scrivania";
@@ -386,6 +373,20 @@
 
 /* HistoryPref.m */
 "Number of saved paths"="Numero di percorsi salvati";
+
+/* Recycler strings */
+
+"Recycle: " = "Cestinare: ";
+"Recycler: " = "Cestino: ";
+"Recycler" = "Cestino";
+"the Recycler" = "il Cestino";
+"\nto the Recycler" = "\nnel Cestino";
+"Move from the Recycler " = "Sposta dal Cestino ";
+"In" = "In";
+"Empty Recycler" = "Svuotare il Cestino";
+"Empty the Recycler?" = "Svuotare il Cestino?";
+"Put Away" = "Ripristina";
+
 
 "Color:" = "Colore:";
 "center" = "Centra";

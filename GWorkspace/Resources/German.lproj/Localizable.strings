@@ -340,20 +340,13 @@ which ends in "kann <the file> nicht umbenennen"
 /* BrowserViewerPref.m */   
 
 "Column Width" = "Spaltenbreite";
-"Use Default Settings" = "Standards benutzen";	
-	
-	
+"Use Default Settings" = "Standards benutzen";
+
 /* DefaultEditor.m */            
 
 "Default Editor" = "Standard-Editor";
 "No Default Editor" = "Kein Standard-Editor";
 "Choose" = "Auswählen";
-
-/* IconsPrefs.m */
-"Icons" = "Symbole";
-"Thumbnails" = "Thumbnails";
-"use thumbnails" = "Thumbnails verwenden";
-"Title Width" = "Titelbreite";
 
 /* Sorting order */
 "Sorting Order" = "Sortierreihenfolge";
@@ -361,8 +354,31 @@ which ends in "kann <the file> nicht umbenennen"
 "The method will apply to all the folders" = "Diese Methode gilt für alle Ordner, für die";
 "that have no order specified" = "keine Reihenfolge festgelegt ist";
 
-/* File Operations*/
+/* HiddenFilesPref.m */
+"Files" = "Dateien";
+"Folders" = "Ordner";
+"Activate changes" = "Aktivieren";
+"Hidden Files" = "Versteckte Dateien";
+"Load" = "Laden";
+"Hidden files" = "Versteckte Dateien";
+"Shown files" = "Sichtbare Dateien";
+"Select and move the files to hide or to show" = "Dateien zum Zeigen/Verstecken auswählen und verschieben";
+"Hidden directories" = "Versteckte Ordner";
+
+/* IconsPrefs.m */
+"Icons" = "Symbole";
+"Thumbnails" = "Thumbnails";
+"use thumbnails" = "Thumbnails verwenden";
+"Title Width" = "Titelbreite";
+
+/* DesktopPref.m */
+"Desktop" = "Schreibtisch";
+"Background"="Hintergrund";
+"General"="Generell";
+
+/* OperationPrefs.m */
 "File Operations" = "Dateioperationen";
+"Operation Preferences"="Operationeinstellungen";
 "Status Window" = "Statusfenster";
 "Confirmation" = "Bestätigung";
 "Show status window" = "Statusfenster zeigen";
@@ -371,31 +387,10 @@ which ends in "kann <the file> nicht umbenennen"
 "Uncheck the buttons to allow automatic confirmation" = "Deaktivieren Sie Optionen, um automatische";
 "of file operations" = "Bestätigung von Dateioperationen zu erlauben";
 
-/* Icons */
-
-"Animate icons" = "Symbole animieren";
-"when changing a path" = "beim Pfadwechsel";
-"when opening a file" = "beim Dateiöffnen";
-"sliding back after file operation" = "Nach Dateioperation zurückrutschen";
-"Activate changes" = "Änderungen aktivieren";
-
-/* Hidden Files */
-"Files" = "Dateien";
-"Folders" = "Ordner";
-"Hidden Files" = "Versteckte Dateien";
-"Hidden files" = "Versteckte Dateien";
-"Shown files" = "Sichtbare Dateien";
-"Load" = "Laden";
-"Select and move the files to hide or to show" = "Dateien zum Zeigen oder Verstecken auswählen und verschieben";
-"Hidden directories" = "Versteckte Ordner";
-"add" = "hinzufügen";
-"remove" = "entfernen";
+/* History */
+"Number of saved paths" = "Anzahl der gespeicherten Pfade";
 
 
-/* Desktop */
-"Desktop" = "Schreibtisch";
-"Background"="Hintergrund";
-"General"="Generell";
 
 "Color:" = "Farbe:";
 "Back Image" = "Hintergrundbild";
@@ -416,12 +411,3 @@ which ends in "kann <the file> nicht umbenennen"
 
 "Omnipresent" = "Omnipräsent";
 "Autohide Tabbed Shelf" = "Fach selbstätig einfahren";
-
-/* Browser */
-"Aspect" = "Aspekt";
-"Icons in Browser Cells" = "Symbole in Browserzellen zeigen";
-"Uses Shelf" = "Regal verwenden";
-"Columns Width" = "Spaltenbreite";
-
-/* History */
-"Number of saved paths" = "Anzahl der gespeicherten Pfade";

@@ -366,22 +366,6 @@
 "use thumbnails" = "Use thumbnails";
 "Title Width" = "Title Width";
 
-/* HistoryPref.m */
-"History" = "History";
-"Number of saved paths" = "Number of saved paths";
-
-/* Recycler strings */
-"Recycle: " = "Recycle: ";
-"Recycler: " = "Recycler: ";
-"Recycler" = "Recycler";
-"the Recycler" = "the Recycler";
-"\nto the Recycler" = "\nto the Recycler";
-"Move from the Recycler " = "Move from the Recycler ";
-"In" = "In";
-"Empty Recycler" = "Empty Recycler";
-"Empty the Recycler?" = "Empty the Recycler?";
-"Put Away" = "Put Away";
-
 /* DesktopPref.m */
 "Desktop" = "Desktop";
 "Background"="Background";
@@ -400,6 +384,18 @@
 
 /* HistoryPref.m */
 "Number of saved paths"="Number of saved paths";
+
+/* Recycler strings */
+"Recycle: " = "Recycle: ";
+"Recycler: " = "Recycler: ";
+"Recycler" = "Recycler";
+"the Recycler" = "the Recycler";
+"\nto the Recycler" = "\nto the Recycler";
+"Move from the Recycler " = "Move from the Recycler ";
+"In" = "In";
+"Empty Recycler" = "Empty Recycler";
+"Empty the Recycler?" = "Empty the Recycler?";
+"Put Away" = "Put Away";
 
 "Color:" = "Color:";
 "center" = "Center";

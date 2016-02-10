@@ -365,21 +365,38 @@
 "No Default Editor" = "Pas d'éditeur par défaut";
 "Choose" = "Sélectionner";
 
+
+/* DefSortOrderPref.m */
+"Sorting Order" = "Ordre de tri";
+"The method will apply to all the folders" = "Cette méthode s'appliquera à tous les dossiers";
+"that have no order specified" = "qui n'ont pas d'ordre de tri spécifié";
+
+/* HiddenFilesPref.m */
+"Hidden Files" = "Fichiers cachés";
+"Shown files" = "Fichiers visibles";
+"Hidden files" = "Fichiers cachés";
+"Select and move the files to hide or to show" = "Selectionnez et déplacez les fichiers à cacher ou afficher";
+
 /* IconsPrefs.m */
 "Icons" = "Icônes";
 "Thumbnails" = "Vignettes";
 "use thumbnails" = "utiliser les vignettes";
 "Title Width" = "Largeur du titre";
 
+/* DesktopPref.m */
+"Desktop" = "Bureau";
+"Background"="Fond d'écran";
+"General"="Général";
+
 "Editor" = "Editeur de texte";
-"Sorting Order" = "Ordre de tri";
+
 "Sort by" = "Trier par";
 "Name" = "Nom";
 "Date" = "Date";
 "Size" = "Taille";
 "Set" = "Appliquer";
 "Icons Animation" = "Animation d'icônes";
-"Hidden Files" = "Fichiers cachés";
+
 "File Operations" = "Opérations sur fichier";
 "DeskTop" = "Bureau";
 "failed to load %@!" = "Impossible de charger %@ !";
@@ -398,22 +415,12 @@
 "Uncheck the buttons to allow automatic confirmation" = "Décochez les buttons pour une confirmation systématique";
 "of file operations" = "des opérations sur fichier" ;
 
-"The method will apply to all the folders" = "Cette méthode s'appliquera à tous les dossiers";
-"that have no order specified" = "qui n'ont pas d'ordre de tri spécifié" ;
+
 "Check this option to show a status window" = "Cochez cette option pour voir une fenêtre de progression";
 "during the file operations"  = "lors des opérations sur fichier";
 
-"when changing a path" = "en changeant de répertoire";
-"when opening a file" = "en ouvrant un fichier";
-"sliding back after file operation" = "en revenant en arrière" ;
-"Animate icons" = "Animation des icônes";
-"Shown files" = "Fichiers visibles";
-"Hidden files" = "Fichiers cachés";
-"Select and move the files to hide or to show" = "Selectionnez et déplacez les fichiers à cacher ou afficher";
-
 
 /* HistoryPref.m */
-"History" = "Historique";
 "Number of saved paths" = "Nombre de chemins sauvegardés";
 
 /* Recycler strings */
@@ -428,11 +435,6 @@
 "Empty the Recycler?" = "Vider la Corbeille ?";
 "Put Away" = "Jeter";
 
-
-/* DesktopPref.m */
-"Desktop" = "Bureau";
-"Background"="Fond d'écran";
-"General"="Général";
 
 "Color:" = "Couleur:";
 "center" = "Centrer";
