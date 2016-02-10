@@ -326,10 +326,26 @@
 	
 /* DefaultEditor.m */            
 
+"Editor" = "Editore";
 "Default Editor" = "Editore Default";
 "No Default Editor" = "Nessun Editore Default";
 "Choose" = "Scegli";
 
+/* DefSortOrderPref.m */
+"Sorting Order" = "Ordinamento";
+"The method will apply to all the folders" = "Il metodo scelto si applicherà a tutte le cartelle";
+"that have no order specified" = "che non ne hanno uno specificato.";
+
+/* HiddenFilesPref.m */
+"Hidden Files" = "Archivi Nascosti";
+"Files" = "Archivi";
+"Folders" = "Cartelle";
+"Activate changes" = "Attiva modifiche";
+"Load" = "Carica";
+"Hidden files" = "File nascosti";
+"Shown files" = "File visualizzati";
+"Select and move the files to hide or to show" = "Seleziona e sposta gli archivi da mostrare o nascondere";
+"Hidden directories" = "Cartelle nascoste";
 
 /* IconsPrefs.m */
 
@@ -356,6 +372,20 @@
 "Desktop" = "Scrivania";
 "Background"="Sfondo";
 "General"="Generale";
+
+/* OperationPrefs.m */
+"File Operations" = "Operazioni Archivi";
+"Operation Preferences"="Preferenze Operazioni";
+"Status Window"="Finestra di Stato";
+"Confirmation"="Conferma";
+"Show status window"="Mostra finestra di stato";
+"Check this option to show a status window"="Spunta per mostrare una finestra di stato";
+"during the file operations"="durante le operazioni sugli archivi";
+"Uncheck the buttons to allow automatic confirmation"="Togliere la spunta per conferma automatica";
+"of file operations"="delle operazioni";
+
+/* HistoryPref.m */
+"Number of saved paths"="Numero di percorsi salvati";
 
 "Color:" = "Colore:";
 "center" = "Centra";

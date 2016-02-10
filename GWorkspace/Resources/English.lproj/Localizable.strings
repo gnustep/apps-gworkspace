@@ -344,6 +344,22 @@
 "No Default Editor" = "No Default Editor";
 "Choose" = "Choose";
 
+/* DefSortOrderPref.m */
+"Sorting Order" = "Sorting Order";
+"The method will apply to all the folders" = "The method will apply to all the folders";
+"that have no order specified" = "that have no order specified";
+
+/* HiddenFilesPref.m */
+"Hidden Files" = "Hidden Files";
+"Files" = "Files";
+"Folders" = "Folders";
+"Activate changes" = "Activate changes";
+"Load" = "Load";
+"Hidden files" = "Hidden files";
+"Shown files" = "Shown files";
+"Select and move the files to hide or to show" = "Select and move the files to hide or to show";
+"Hidden directories" = "Hidden directories";
+
 /* IconsPrefs.m */
 "Icons" = "Icons";
 "Thumbnails" = "Thumbnails";
@@ -370,6 +386,20 @@
 "Desktop" = "Desktop";
 "Background"="Background";
 "General"="General";
+
+/* OperationPrefs.m */
+"File Operations" = "File Operations";
+"Operation Preferences"="Operation Preferences";
+"Status Window"="Status Window";
+"Confirmation"="Confirmation";
+"Show status window"="Show status window";
+"Check this option to show a status window"="Check this option to show a status window";
+"during the file operations"="during the file operations";
+"Uncheck the buttons to allow automatic confirmation"="Uncheck the buttons to allow automatic confirmation";
+"of file operations"="of file operations";
+
+/* HistoryPref.m */
+"Number of saved paths"="Number of saved paths";
 
 "Color:" = "Color:";
 "center" = "Center";
