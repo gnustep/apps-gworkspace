@@ -434,16 +434,18 @@ if (sz.height < 0) sz.height = 0
 
 - (IBAction)activateChanges:(id)sender
 {
-  if ([currentNode isWritable] == NO) {
-    NSString *message = @"You have not write permission\nfor";
-    message = [message stringByAppendingString: [currentNode name]]; 
-    
-    NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
-                        NSLocalizedString(message, @""), 
-												NSLocalizedString(@"Continue", @""), 
-                        nil, nil);
-    return;
-  } else {
+  if ([currentNode isWritable] == NO)
+    {
+      NSString *message = NSLocalizedString(@"You have not write permission\nfor","");
+      message = [message stringByAppendingString: [currentNode name]]; 
+      
+      NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
+                      message, 
+                      NSLocalizedString(@"Continue", @""), 
+                      nil, nil);
+      return;
+    }
+  else {
     NSString *base = [currentNode path];
     NSMutableArray *paths = [NSMutableArray array];
     NSArray *cells = [leftMatrix cells];
