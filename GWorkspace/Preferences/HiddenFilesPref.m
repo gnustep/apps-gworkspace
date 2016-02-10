@@ -479,7 +479,7 @@ if (sz.height < 0) sz.height = 0
   NSInteger result;
   
   openPanel = [NSOpenPanel openPanel];
-  [openPanel setTitle: @"hide"];	
+  [openPanel setTitle: _(@"Hide")];	
   [openPanel setAllowsMultipleSelection: NO];
   [openPanel setCanChooseFiles: NO];
   [openPanel setCanChooseDirectories: YES];

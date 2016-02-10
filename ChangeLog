@@ -1,6 +1,11 @@
 2016-02-10  Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/Preferences/HiddenFilesPref.m
+	Localize panel title.
+
+2016-02-10  Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/Preferences/HiddenFilesPref.m
 	Clean up types as well as certain key localizations.
 
 2016-02-02  Riccardo Mottola <rm@gnu.org>
