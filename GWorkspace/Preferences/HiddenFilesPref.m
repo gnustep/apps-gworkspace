@@ -1,6 +1,6 @@
 /* HiddenFilesPref.m
  *  
- * Copyright (C) 2003-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -128,7 +128,7 @@ if (sz.height < 0) sz.height = 0
       
       if ([hpaths count]) { 
         NSSize cs, ms;
-        int i;
+        NSUInteger i;
        
         [hiddenPaths addObjectsFromArray: hpaths];
         
@@ -166,7 +166,7 @@ if (sz.height < 0) sz.height = 0
                                                             
       /* Internationalization */
       {
-        int tabindex;
+        NSInteger tabindex;
         NSTabViewItem *item;
         
         tabindex = [tabView indexOfTabViewItemWithIdentifier: @"Files"];
@@ -183,8 +183,8 @@ if (sz.height < 0) sz.height = 0
         [shownlabel setStringValue: NSLocalizedString(@"Shown files", @"")];
         [labelinfo setStringValue: NSLocalizedString(@"Select and move the files to hide or to show", @"")];
         [hiddenDirslabel setStringValue: NSLocalizedString(@"Hidden directories", @"")];
-        [addDirButt setTitle: NSLocalizedString(@"add", @"")];
-        [removeDirButt setTitle: NSLocalizedString(@"remove", @"")];
+        [addDirButt setTitle: NSLocalizedString(@"Add", @"")];
+        [removeDirButt setTitle: NSLocalizedString(@"Remove", @"")];
         [setDirButt setTitle: NSLocalizedString(@"Activate changes", @"")];
       }
     }
@@ -286,15 +286,15 @@ if (sz.height < 0) sz.height = 0
 {
   NSArray *subNodes;
   NSMutableArray *hiddenFiles;
-	BOOL hideSysFiles;
+  BOOL hideSysFiles;
   NSString *h; 
-  int i, count;
+  NSUInteger i, count;
 
   [self clearAll];
 	
   subNodes = [currentNode subNodes];
 
-	h = [[currentNode path] stringByAppendingPathComponent: @".hidden"];
+  h = [[currentNode path] stringByAppendingPathComponent: @".hidden"];
   
   if ([fm fileExistsAtPath: h]) {
 	  h = [NSString stringWithContentsOfFile: h];
@@ -320,7 +320,7 @@ if (sz.height < 0) sz.height = 0
 		NSMutableArray *mutableNodes = AUTORELEASE ([subNodes mutableCopy]);
     
     if (hiddenFiles) {
-      int count = [mutableNodes count];
+      NSUInteger count = [mutableNodes count];
       
       for (i = 0; i < count; i++) {
         FSNode *node = [mutableNodes objectAtIndex: i];
@@ -333,7 +333,7 @@ if (sz.height < 0) sz.height = 0
       }
     }
     
-		if (hideSysFiles) {
+    if (hideSysFiles) {
 	    int j = [mutableNodes count] - 1;
 	    
 	    while (j >= 0) {
@@ -398,7 +398,7 @@ if (sz.height < 0) sz.height = 0
 
   if (cells) {
     NSMutableArray *names = [NSMutableArray arrayWithCapacity: 1];
-    int i;
+    NSUInteger i;
     
     for (i = 0; i < [cells count]; i++) {
       NSString *name = [[cells objectAtIndex: i] stringValue];  
@@ -418,7 +418,7 @@ if (sz.height < 0) sz.height = 0
 
   if (cells) {
     NSMutableArray *names = [NSMutableArray arrayWithCapacity: 1];
-    int i;
+    NSUInteger i;
     
     for (i = 0; i < [cells count]; i++) {
       NSString *name = [[cells objectAtIndex: i] stringValue];  
@@ -435,10 +435,10 @@ if (sz.height < 0) sz.height = 0
 - (IBAction)activateChanges:(id)sender
 {
   if ([currentNode isWritable] == NO) {
-    NSString *message = @"You have not write access to ";
+    NSString *message = @"You have not write permission\nfor";
     message = [message stringByAppendingString: [currentNode name]]; 
     
-    NSRunAlertPanel(NSLocalizedString(@"error", @""), 
+    NSRunAlertPanel(NSLocalizedString(@"Error", @""), 
                         NSLocalizedString(message, @""), 
 												NSLocalizedString(@"Continue", @""), 
                         nil, nil);
@@ -452,7 +452,7 @@ if (sz.height < 0) sz.height = 0
       NSMutableArray *names;
       NSString *hconts;
       NSString *h;		
-      int i;
+      NSUInteger i;
      
       names = [NSMutableArray arrayWithCapacity: 1];    
       for (i = 0; i < [cells count]; i++) {
@@ -474,12 +474,12 @@ if (sz.height < 0) sz.height = 0
 
 - (IBAction)addDir:(id)sender
 {
-	NSOpenPanel *openPanel;
-	NSString *hidePath;
-	int result;
-     
-	openPanel = [NSOpenPanel openPanel];
-	[openPanel setTitle: @"hide"];	
+  NSOpenPanel *openPanel;
+  NSString *hidePath;
+  NSInteger result;
+  
+  openPanel = [NSOpenPanel openPanel];
+  [openPanel setTitle: @"hide"];	
   [openPanel setAllowsMultipleSelection: NO];
   [openPanel setCanChooseFiles: NO];
   [openPanel setCanChooseDirectories: YES];
@@ -487,15 +487,14 @@ if (sz.height < 0) sz.height = 0
   result = [openPanel runModalForDirectory: path_separator() 
                                       file: nil 
                                      types: nil];
-	if(result != NSOKButton) {
-		return;
-  }
+  if(result != NSOKButton)
+    return;
   
-	hidePath = [NSString stringWithString: [openPanel filename]];
+  hidePath = [NSString stringWithString: [openPanel filename]];
 
   if ([hiddenPaths containsObject: hidePath] == NO) {
     NSSize cs, ms;
-    int i;
+    NSUInteger i;
         
     [hiddenPaths addObject: hidePath];
 
@@ -511,7 +510,7 @@ if (sz.height < 0) sz.height = 0
     [dirsMatrix setIntercellSpacing: NSZeroSize];
     [dirsMatrix setCellSize: NSMakeSize(130, LINEH)];
     [dirsMatrix setAutoscroll: YES];
-	  [dirsMatrix setAllowsEmptySelection: YES];
+    [dirsMatrix setAllowsEmptySelection: YES];
     cs = [hiddenDirsScroll contentSize];
     ms = [dirsMatrix cellSize];
     ms.width = cs.width;
@@ -542,7 +541,7 @@ if (sz.height < 0) sz.height = 0
 
   if (cells) {
     NSMutableArray *paths = [NSMutableArray arrayWithCapacity: 1];
-    int i;
+    NSUInteger i;
     
     for (i = 0; i < [cells count]; i++) {
       NSString *path = [[cells objectAtIndex: i] stringValue];  
@@ -564,9 +563,9 @@ if (sz.height < 0) sz.height = 0
 
 - (void)addCellsWithNames:(NSArray *)names inMatrix:(NSMatrix *)matrix
 {
-	id cell;
+  id cell;
   NSSize cs, ms;  
-  int i;
+  NSUInteger i;
 		
   [matrix setIntercellSpacing: NSMakeSize(0, 0)];
 	  
