@@ -1,6 +1,6 @@
 /* OperationPrefs.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -25,8 +25,8 @@
 #ifndef OPERATION_PREFS_H
 #define OPERATION_PREFS_H
 
-#include <Foundation/Foundation.h>
-#include "PrefProtocol.h"
+#import <Foundation/Foundation.h>
+#import "PrefProtocol.h"
 
 @interface OperationPrefs : NSObject <PrefProtocol>
 {
@@ -34,14 +34,14 @@
   IBOutlet id prefbox;
   IBOutlet id tabView;
 
-  id statusItem;
+  NSTabViewItem *statusItem;
   IBOutlet id statusBox;
   IBOutlet id statChooseButt;
   IBOutlet id statuslabel;
   IBOutlet id statusinfo1;
   IBOutlet id statusinfo2;
 
-  id confirmItem;
+  NSTabViewItem *confirmItem;
   IBOutlet id confirmBox;
   IBOutlet id confMatrix;
   IBOutlet id labelinfo1;
