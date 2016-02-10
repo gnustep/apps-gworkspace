@@ -387,8 +387,24 @@
 "Desktop" = "Bureau";
 "Background"="Fond d'écran";
 "General"="Général";
+"Color:" = "Couleur:";
+"center" = "Centrer";
+"fit" = "Fit";
+"tile" = "Répéter";
+"scale" = "Scale";
+"Use image"="Image";
+"Choose"="Choisir";
+"Dock" = "Dock";
+"Show Dock"="Montrer le Dock";
+"Position:"="Position:";
+"Style:"="Style:";
+"Left"="Gauche";
+"Right"="Droite";
+"Classic"="Classique";
+"Modern"="Moderne";
+"Omnipresent"="Omnipresent";
+"Autohide Tabbed Shelf"="Cacher automatiquement les étagères";
 
-"Editor" = "Editeur de texte";
 
 "Sort by" = "Trier par";
 "Name" = "Nom";
@@ -398,7 +414,6 @@
 "Icons Animation" = "Animation d'icônes";
 
 "File Operations" = "Opérations sur fichier";
-"DeskTop" = "Bureau";
 "failed to load %@!" = "Impossible de charger %@ !";
 "Xterm" = "Terminal xterm";
 "Arguments" = "Arguments";
@@ -434,27 +449,3 @@
 "Empty Recycler" = "Vider la Corbeille";
 "Empty the Recycler?" = "Vider la Corbeille ?";
 "Put Away" = "Jeter";
-
-
-"Color:" = "Couleur:";
-"center" = "Centrer";
-"fit" = "Fit";
-"tile" = "Répéter";
-"scale" = "Scale";
-
-"Use image"="Image";
-"Choose"="Choisir";
-
-"Dock" = "Dock";
-"Show Dock"="Montrer le Dock";
-"Position:"="Position:";
-
-"Style:"="Style:";
-"Left"="Gauche";
-"Right"="Droite";
-
-"Classic"="Classique";
-"Modern"="Moderne";
-
-"Omnipresent"="Omnipresent";
-"Autohide Tabbed Shelf"="Cacher automatiquement les étagères";

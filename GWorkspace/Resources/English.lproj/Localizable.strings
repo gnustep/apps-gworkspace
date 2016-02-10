@@ -370,6 +370,29 @@
 "Desktop" = "Desktop";
 "Background"="Background";
 "General"="General";
+"Color:" = "Color:";
+"center" = "Center";
+"fit" = "Fit";
+"tile" = "Tile";
+"scale" = "Scale";
+
+"Use image"="Use image";
+"Choose"="Choose";
+
+"Dock" = "Dock";
+"Show Dock"="Show Dock";
+"Position:"="Position:";
+
+"Style:"="Style:";
+"Left"="Left";
+"Right"="Right";
+
+"Classic"="Classic";
+"Modern"="Modern";
+
+"Omnipresent"="Omnipresent";
+"Autohide Tabbed Shelf"="Autohide Tabbed Shelf";
+
 
 /* OperationPrefs.m */
 "File Operations" = "File Operations";
@@ -397,25 +420,3 @@
 "Empty the Recycler?" = "Empty the Recycler?";
 "Put Away" = "Put Away";
 
-"Color:" = "Color:";
-"center" = "Center";
-"fit" = "Fit";
-"tile" = "Tile";
-"scale" = "Scale";
-
-"Use image"="Use image";
-"Choose"="Choose";
-
-"Dock" = "Dock";
-"Show Dock"="Show Dock";
-"Position:"="Position:";
-
-"Style:"="Style:";
-"Left"="Left";
-"Right"="Right";
-
-"Classic"="Classic";
-"Modern"="Modern";
-
-"Omnipresent"="Omnipresent";
-"Autohide Tabbed Shelf"="Autohide Tabbed Shelf";

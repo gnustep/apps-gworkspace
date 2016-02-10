@@ -375,6 +375,21 @@ which ends in "kann <the file> nicht umbenennen"
 "Desktop" = "Schreibtisch";
 "Background"="Hintergrund";
 "General"="Generell";
+"Color:" = "Farbe:";
+"center" = "Zentriert";
+"fit" = "Skaliert";
+"tile" = "Gekachelt";
+"Use image" = "Bild verwenden";
+"Dock" = "Dock";
+"General" = "Allgemein";
+"Show Dock" = "Dock anzeigen";
+"Position" = "Position";
+"Style:"="Stil:";
+"Left" = "Links";
+"Right" = "Rechts";
+
+"Omnipresent" = "Omnipräsent";
+"Autohide Tabbed Shelf" = "Fach selbstätig einfahren";
 
 /* OperationPrefs.m */
 "File Operations" = "Dateioperationen";
@@ -392,22 +407,4 @@ which ends in "kann <the file> nicht umbenennen"
 
 
 
-"Color:" = "Farbe:";
-"Back Image" = "Hintergrundbild";
-	"center" = "zentriert";
-	"fit" = "skaliert";
-	"tile" = "gekachelt";
-	"Use image" = "Bild verwenden";
 
-"Dock" = "Dock";
-
-"General" = "Allgemein";
-	
-	"Show Dock" = "Dock anzeigen";
-	      "Position" = "Position";
-"Style:"="Stil:";
-	"Left" = "Links";
-	"Right" = "Rechts";
-
-"Omnipresent" = "Omnipräsent";
-"Autohide Tabbed Shelf" = "Fach selbstätig einfahren";

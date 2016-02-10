@@ -359,6 +359,24 @@
 "Desktop" = "Scrivania";
 "Background"="Sfondo";
 "General"="Generale";
+"Color:" = "Colore:";
+"center" = "Centra";
+"fit" = "Adatta";
+"tile" = "Piastrella";
+"scale" = "Scala";
+"Use image"="Usa Immagine";
+"Choose"="Scegli";
+"Dock" = "Molo";
+"Show Dock"="Mostra Molo";
+"Position:"="Posizione:";
+"Style:"="Stile:";
+"Left"="Sinistra";
+"Right"="Destra";
+"Classic"="Classic";
+"Modern"="Moderno";
+
+"Omnipresent"="Onnipresente";
+"Autohide Tabbed Shelf"="Nascondi Scaffale Automaticamente";
 
 /* OperationPrefs.m */
 "File Operations" = "Operazioni Archivi";
@@ -388,26 +406,5 @@
 "Put Away" = "Ripristina";
 
 
-"Color:" = "Colore:";
-"center" = "Centra";
-"fit" = "Adatta";
-"tile" = "Piastrella";
-"scale" = "Scala";
 
-"Use image"="Usa Immagine";
-"Choose"="Scegli";
-
-"Dock" = "Molo";
-"Show Dock"="Mostra Molo";
-"Position:"="Posizione:";
-
-"Style:"="Stile:";
-"Left"="Left";
-"Right"="Right";
-
-"Classic"="Classic";
-"Modern"="Moderno";
-
-"Omnipresent"="Onnipresente";
-"Autohide Tabbed Shelf"="Nascondi Scaffale Automaticamente";
 
