@@ -1,5 +1,11 @@
 2016-02-10  Riccardo Mottola <rm@gnu.org>
 
+	* FSNode/FSNodeRep.h
+	* FSNode/FSNodeRep.m
+	Remove getFileSystemInfoForPath of category already implemented in class.
+
+2016-02-10  Riccardo Mottola <rm@gnu.org>
+
 	* GWorkspace/Preferences/HiddenFilesPref.m
 	Localize panel title.
 

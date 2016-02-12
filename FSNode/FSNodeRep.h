@@ -518,13 +518,6 @@ typedef enum FSNSelectionMask {
 		                  isWritable:(BOOL *)writableFlag
 		               isUnmountable:(BOOL *)unmountableFlag
 		                 description:(NSString **)description
-			                      type:(NSString **)fileSystemType;
-
-- (BOOL)getFileSystemInfoForPath:(NSString *)fullPath
-		                 isRemovable:(BOOL *)removableFlag
-		                  isWritable:(BOOL *)writableFlag
-		               isUnmountable:(BOOL *)unmountableFlag
-		                 description:(NSString **)description
 			                      type:(NSString **)fileSystemType
                 usingVolumesInfo:(NSArray *)info;
                             

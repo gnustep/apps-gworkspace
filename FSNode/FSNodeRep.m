@@ -884,21 +884,6 @@ static FSNodeRep *shared = nil;
   return reserved;
 }
 
-- (BOOL)getFileSystemInfoForPath:(NSString *)fullPath
-		                 isRemovable:(BOOL *)removableFlag
-		                  isWritable:(BOOL *)writableFlag
-		               isUnmountable:(BOOL *)unmountableFlag
-		                 description:(NSString **)description
-			                      type:(NSString **)fileSystemType
-{
-  return [self getFileSystemInfoForPath: fullPath
-		                 isRemovable: removableFlag
-		                  isWritable: writableFlag
-		               isUnmountable: unmountableFlag
-		                 description: description
-			                      type: fileSystemType
-                usingVolumesInfo: nil];
-}
 
 - (BOOL)getFileSystemInfoForPath:(NSString *)fullPath
 		                 isRemovable:(BOOL *)removableFlag
@@ -938,7 +923,7 @@ static FSNodeRep *shared = nil;
   NSArray *reserved = [self reservedMountNames];
   unsigned i;
 
-  NSLog(@"FSNodeRep: mountedLocalVolumePaths");
+  
   for (i = 0; i < [mounted count]; i++)
     {
       NSDictionary *dict = [mounted objectAtIndex: i];
@@ -947,7 +932,7 @@ static FSNodeRep *shared = nil;
 	[mpoints addObject: [dict objectForKey: @"dir"]];
       }
     }
-  
+  NSLog(@"FSNodeRep: mountedLocalVolumePaths: %@", mpoints);
   return mpoints;
 }
 
@@ -960,7 +945,6 @@ static FSNodeRep *shared = nil;
   NSMutableArray *names = [NSMutableArray array];  
   NSUInteger i;
 
-  NSLog(@"mountedRemovableMedia");
   for (i = 0; i < [mounted count]; i++) {
     NSDictionary *dict = [mounted objectAtIndex: i];
     NSString *name = [dict objectForKey: @"name"];
@@ -991,6 +975,7 @@ static FSNodeRep *shared = nil;
 	  }
   }
 
+  NSLog(@"mountedRemovableMedia: %@", names);
   return names;
 }
 
