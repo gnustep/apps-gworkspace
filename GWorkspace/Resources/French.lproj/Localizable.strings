@@ -359,8 +359,9 @@
 "Use Default Settings" = "Param. par défaut";	
 	
 	
-/* DefaultEditor.m */            
+/* DefaultEditor.m */
 
+"Editor" = "Éditeur";
 "Default Editor" = "Editeur par défaut";
 "No Default Editor" = "Pas d'éditeur par défaut";
 "Choose" = "Sélectionner";

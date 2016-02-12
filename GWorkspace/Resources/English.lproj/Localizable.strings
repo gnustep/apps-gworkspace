@@ -338,8 +338,9 @@
 "Use Default Settings" = "Use Default Settings";	
 
 	
-/* DefaultEditor.m */            
+/* DefaultEditor.m */
 
+"Editor" = "Editor";
 "Default Editor" = "Default Editor";
 "No Default Editor" = "No Default Editor";
 "Choose" = "Choose";

@@ -344,6 +344,7 @@ which ends in "kann <the file> nicht umbenennen"
 
 /* DefaultEditor.m */            
 
+"Editor" = "Editor";
 "Default Editor" = "Standard-Editor";
 "No Default Editor" = "Kein Standard-Editor";
 "Choose" = "Auswählen";
