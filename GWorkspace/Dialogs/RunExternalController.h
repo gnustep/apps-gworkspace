@@ -1,6 +1,6 @@
 /* RunExternalController.h
  *  
- * Copyright (C) 2003 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -26,19 +26,19 @@
 #ifndef RUN_EXTERNAL_CONTROLLER_H
 #define RUN_EXTERNAL_CONTROLLER_H
 
-#include <Foundation/Foundation.h>
+#import <Foundation/Foundation.h>
 
 @class CompletionField;
-@class NSBox;
+@class NSTextField;
 @class NSWindow;
 
 @interface RunExternalController : NSObject 
 {
-  IBOutlet id win;
-  IBOutlet id titleLabel;
-  IBOutlet id secondLabel;
-  IBOutlet id cancelButt;
-  IBOutlet id okButt;
+  IBOutlet NSWindow *win;
+  IBOutlet NSTextField *titleLabel;
+  IBOutlet NSTextField *secondLabel;
+  IBOutlet NSButton *cancelButt;
+  IBOutlet NSButton *okButt;
   
   IBOutlet CompletionField *cfield;
   unsigned result;  
