@@ -916,26 +916,6 @@ static FSNodeRep *shared = nil;
   return NO;
 }
 
-- (NSArray *)mountedLocalVolumePaths
-{
-  NSMutableArray *mpoints = [NSMutableArray array];
-  NSArray *mounted = [self mountedVolumes];
-  NSArray *reserved = [self reservedMountNames];
-  unsigned i;
-
-  
-  for (i = 0; i < [mounted count]; i++)
-    {
-      NSDictionary *dict = [mounted objectAtIndex: i];
-
-      if ([reserved containsObject: [dict objectForKey: @"name"]] == NO) {
-	[mpoints addObject: [dict objectForKey: @"dir"]];
-      }
-    }
-  NSLog(@"FSNodeRep: mountedLocalVolumePaths: %@", mpoints);
-  return mpoints;
-}
-
 - (NSArray *)mountedRemovableMedia
 {
   NSMutableArray *mpoints = [NSMutableArray array];

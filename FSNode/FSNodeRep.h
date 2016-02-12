@@ -520,8 +520,6 @@ typedef enum FSNSelectionMask {
 		                 description:(NSString **)description
 			                      type:(NSString **)fileSystemType
                 usingVolumesInfo:(NSArray *)info;
-                            
-- (NSArray *)mountedLocalVolumePaths;
 
 - (NSArray *)mountedRemovableMedia;
 
