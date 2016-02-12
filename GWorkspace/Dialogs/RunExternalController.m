@@ -63,6 +63,7 @@ static NSString *nibName = @"RunExternal";
       [win setFrameUsingName: @"run_external"];
       [win setInitialFirstResponder: cfield];
 
+      [win setTitle:NSLocalizedString(@"Run", @"")];
       [titleLabel setStringValue:NSLocalizedString(@"Run", @"")];
       [secondLabel setStringValue:NSLocalizedString(@"Type the command to execute:", @"")];
       [okButt setTitle:NSLocalizedString(@"OK", @"")];
