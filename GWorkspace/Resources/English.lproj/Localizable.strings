@@ -409,6 +409,13 @@
 /* HistoryPref.m */
 "Number of saved paths"="Number of saved paths";
 
+/* -------- */
+
+/* RunExternalController.m */
+"Run" = "Run";
+"Type the command to execute:"="Type the command to execute:";
+
+
 /* Recycler strings */
 "Recycle: " = "Recycle: ";
 "Recycler: " = "Recycler: ";

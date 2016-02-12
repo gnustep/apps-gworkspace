@@ -392,6 +392,13 @@
 /* HistoryPref.m */
 "Number of saved paths"="Numero di percorsi salvati";
 
+/* -------- */
+
+/* RunExternalController.m */
+"Run" = "Esegui";
+"Type the command to execute:"="Digitare il comando da esegure";
+
+
 /* Recycler strings */
 
 "Recycle: " = "Cestinare: ";

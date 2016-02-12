@@ -1,8 +1,15 @@
-2016-02-10  Riccardo Mottola <rm@gnu.org>
+2016-02-12  Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNodeRep.h
 	* FSNode/FSNodeRep.m
 	Remove mountedLocalVolumePaths already implemented in NSWorkspace.
+
+	* GWorkspace/Dialogs/RunExternalController.h
+	* GWorkspace/Dialogs/RunExternalController.m
+	Localize panel labels and titles.
+
+	* GWorkspace/Resources/English.lproj/RunExternal.gorm
+	Make labels larger.
 
 2016-02-12  Riccardo Mottola <rm@gnu.org>
 

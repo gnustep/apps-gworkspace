@@ -409,3 +409,8 @@ which ends in "kann <the file> nicht umbenennen"
 
 
 
+/* -------- */
+
+/* RunExternalController.m */
+"Run" = "Ausführen";
+"Type the command to execute:"="Befehl eingeben:";
