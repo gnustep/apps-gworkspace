@@ -1,3 +1,8 @@
+2016-02-13  Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNodeRep.m
+	Delete unmountAndEjectDeviceAtPath custom implementation and use AppKit's one.
+
 2016-02-12  Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNodeRep.h
