@@ -1,3 +1,9 @@
+2016-02-15  Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNodeRep.h
+	* FSNode/FSNodeRep.m
+	Delete mountedRemovableMedia custom implementation.
+
 2016-02-13  Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNodeRep.m

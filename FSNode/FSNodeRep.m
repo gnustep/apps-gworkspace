@@ -916,48 +916,6 @@ static FSNodeRep *shared = nil;
   return NO;
 }
 
-- (NSArray *)mountedRemovableMedia
-{
-  NSMutableArray *mpoints = [NSMutableArray array];
-  NSArray *mounted = [self mountedVolumes];
-  NSArray *removables = [self removableMediaPaths];
-  NSArray *reserved = [self reservedMountNames];
-  NSMutableArray *names = [NSMutableArray array];  
-  NSUInteger i;
-
-  for (i = 0; i < [mounted count]; i++) {
-    NSDictionary *dict = [mounted objectAtIndex: i];
-    NSString *name = [dict objectForKey: @"name"];
-    NSString *dir = [dict objectForKey: @"dir"];
-
-    if (([reserved containsObject: name] == NO) 
-                        && [removables containsObject: dir]) {
-      [mpoints addObject: dir];
-    }
-  }
-
-  for (i = 0; i < [mpoints count]; i++) {
-    BOOL removableFlag;
-    BOOL writableFlag;
-    BOOL unmountableFlag;
-    NSString *description;
-    NSString *fileSystemType;
-    NSString *name = [mpoints objectAtIndex: i];
-
-    if ([self getFileSystemInfoForPath: name
-		              isRemovable: &removableFlag
-		              isWritable: &writableFlag
-		              isUnmountable: &unmountableFlag
-		              description: &description
-		              type: &fileSystemType
-      usingVolumesInfo: mounted] && removableFlag) {
-	    [names addObject: name];
-	  }
-  }
-
-  NSLog(@"mountedRemovableMedia: %@", names);
-  return names;
-}
 
 - (NSArray *)mountNewRemovableMedia
 {
