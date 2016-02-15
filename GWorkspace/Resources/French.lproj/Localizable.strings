@@ -62,7 +62,7 @@
 		"Remove Current Layer" = "Supprimer l'espace de travail courant";
 		"Rename Current Layer" = "Renommer l'espace de travail courant";
 		"Layers" = "Espaces de travail";
-	"Tabbed Shelf" = "Etagères";	
+	"Tabbed Shelf" = "Étagères";
 		"Show Tabbed Shelf" = "Montrer les étagères";
                 "Show Tabbed Shelf" = "Masquer les étagères";
 		"Remove Current Tab" = "Supprimer l'étagère";
@@ -191,7 +191,7 @@
 "Permissions" = "Droits";
 "Read" = "Lire";
 "Write" = "Ecrire";
-"Execute" = "Executer";
+"Execute" = "Exécuter";
 "Owner_short" = "Propr.";
 "Group" = "Groupe";
 "Other" = "Autre";
@@ -362,7 +362,7 @@
 /* DefaultEditor.m */
 
 "Editor" = "Éditeur";
-"Default Editor" = "Editeur par défaut";
+"Default Editor" = "Éditeur par défaut";
 "No Default Editor" = "Pas d'éditeur par défaut";
 "Choose" = "Sélectionner";
 
@@ -438,6 +438,13 @@
 
 /* HistoryPref.m */
 "Number of saved paths" = "Nombre de chemins sauvegardés";
+
+/* -------- */
+
+/* RunExternalController.m */
+"Run" = "Exécuter";
+"Type the command to execute:"="Entrer la commande à exécuter :";
+
 
 /* Recycler strings */
 "Recycle: " = "Envoyer dans la Corbeille: ";
