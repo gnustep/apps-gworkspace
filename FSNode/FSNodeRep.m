@@ -917,46 +917,6 @@ static FSNodeRep *shared = nil;
 }
 
 
-- (NSArray *)mountNewRemovableMedia
-{
-  NSArray *removables = [self removableMediaPaths];
-  NSArray *mountedMedia = [self mountedRemovableMedia]; 
-  NSMutableArray *willMountMedia = [NSMutableArray array];
-  NSMutableArray *newlyMountedMedia = [NSMutableArray array];
-  NSUInteger i;
-
-  for (i = 0; i < [removables count]; i++) {
-    NSString *removable = [removables objectAtIndex: i];
-    
-    if ([mountedMedia containsObject: removable] == NO) {
-      [willMountMedia addObject: removable];
-    }
-  }  
-  
-  for (i = 0; i < [willMountMedia count]; i++) {
-    NSString *media = [willMountMedia objectAtIndex: i];
-    NSTask *task = [NSTask launchedTaskWithLaunchPath: @"mount"
-                                arguments: [NSArray arrayWithObject: media]];
-      
-    if (task) {
-      [task waitUntilExit];
-      
-      if ([task terminationStatus] == 0) {
-        NSDictionary *userinfo = [NSDictionary dictionaryWithObject: media 
-                                                      forKey: @"NSDevicePath"];
-
-        [[self notificationCenter] postNotificationName: NSWorkspaceDidMountNotification
-                                  object: self
-                                userInfo: userinfo];
-
-        [newlyMountedMedia addObject: media];
-      }
-    }
-  }
-
-  return newlyMountedMedia;
-}
-
 
 @end
 

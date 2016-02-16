@@ -521,8 +521,6 @@ typedef enum FSNSelectionMask {
 			                      type:(NSString **)fileSystemType
                 usingVolumesInfo:(NSArray *)info;
 
-- (NSArray *)mountNewRemovableMedia;
-
 @end
 
 #endif // FSNODE_REP_H
