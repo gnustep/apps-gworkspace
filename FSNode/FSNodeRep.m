@@ -834,38 +834,6 @@ static FSNodeRep *shared = nil;
 }
 
 
-- (BOOL)getFileSystemInfoForPath:(NSString *)fullPath
-		                 isRemovable:(BOOL *)removableFlag
-		                  isWritable:(BOOL *)writableFlag
-		               isUnmountable:(BOOL *)unmountableFlag
-		                 description:(NSString **)description
-			                      type:(NSString **)fileSystemType
-                usingVolumesInfo:(NSArray *)info
-{
-  NSArray *mounted = ((info == nil) ? [self mountedVolumes] : info);
-  NSArray *removables = [self removableMediaPaths];
-  NSUInteger i;
-
-  for (i = 0; i < [mounted count]; i++) {
-    NSDictionary *dict = [mounted objectAtIndex: i];
-    NSString *mountPoint = [dict objectForKey: @"dir"];
-    NSString *fsType = [dict objectForKey: @"type"];
-  
-    if ([mountPoint isEqual: fullPath]) {  
-      *removableFlag = [removables containsObject: mountPoint];
-      *writableFlag = [[NSFileManager defaultManager] isWritableFileAtPath: fullPath];
-      *unmountableFlag = YES;
-      *description = fsType;
-      *fileSystemType = fsType;
-
-      return YES;
-    }
-  }
-  
-  return NO;
-}
-
-
 
 @end
 
