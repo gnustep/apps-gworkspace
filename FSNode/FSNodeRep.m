@@ -741,57 +741,6 @@ static FSNodeRep *shared = nil;
 
 @implementation NSWorkspace (mounting)
 
-- (NSArray *)mountedVolumes
-{
-  NSMutableArray *volumes = [NSMutableArray array];
-
-#ifdef HAVE_GETMNTINFO
-  /* most BSDs and derivatives inclusing Apple */
-  struct statfs *buf;
-  int i, count;
-  
-  count = getmntinfo(&buf, 0);
-  
-  for (i = 0; i < count; i++)
-    {
-      NSMutableDictionary *dict = [NSMutableDictionary dictionary];  
-  
-      [dict setObject: [NSString stringWithUTF8String: buf[i].f_mntfromname]
-	       forKey: @"name"]; 
-      [dict setObject: [NSString stringWithUTF8String: buf[i].f_mntonname]
-	       forKey: @"dir"]; 
-      [dict setObject: [NSString stringWithUTF8String: buf[i].f_fstypename]
-	       forKey: @"type"]; 
-
-      [volumes addObject: dict];
-    }
-#elif defined(HAVE_GETMNTENT) && defined(MNT_DIR)
-  FILE *fp = setmntent(_PATH_MOUNTED, "r");
-  struct mntent	*mnt;
-
-  if (fp)
-    {
-      while ((mnt = getmntent(fp)) != NULL )
-	{ 
-	  NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-
-	  [dict setObject: [NSString stringWithUTF8String: mnt->MNT_FSNAME]
-		   forKey: @"name"]; 
-	  [dict setObject: [NSString stringWithUTF8String: mnt->MNT_DIR]
-		   forKey: @"dir"];  
-	  [dict setObject: [NSString stringWithUTF8String: mnt->MNT_FSTYPE]
-		   forKey: @"type"];  
-
-	  [volumes addObject: dict];
-	}
-      
-      endmntent(fp);
-    }            
-#endif
-
-  NSLog(@"Volumes %@", volumes);   
-  return volumes;
-}
 
 - (NSArray *)removableMediaPaths
 {

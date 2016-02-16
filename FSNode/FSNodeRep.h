@@ -507,8 +507,6 @@ typedef enum FSNSelectionMask {
 
 @interface NSWorkspace (mounting)
 
-- (NSArray *)mountedVolumes;
-
 - (NSArray *)removableMediaPaths;
 
 - (NSArray *)reservedMountNames;
