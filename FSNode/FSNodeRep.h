@@ -505,11 +505,5 @@ typedef enum FSNSelectionMask {
 @end
 
 
-@interface NSWorkspace (mounting)
-
-- (NSArray *)removableMediaPaths;
-
-@end
-
 #endif // FSNODE_REP_H
 
