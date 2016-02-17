@@ -782,57 +782,6 @@ static FSNodeRep *shared = nil;
   return removables;
 }
 
-- (NSArray *)reservedMountNames
-{
-  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-  NSDictionary *domain;
-  NSArray *reserved;
-
-  [defaults synchronize];
-  domain = [defaults persistentDomainForName: NSGlobalDomain];
-  reserved = [domain objectForKey: @"GSReservedMountNames"];
-  
-  if (reserved == nil)
-    {
-      CREATE_AUTORELEASE_POOL(arp);
-      NSMutableDictionary *mdomain = [domain mutableCopy];  
-      unsigned int systype = [[NSProcessInfo processInfo] operatingSystem];
-  
-      switch(systype)
-	{
-	case NSGNULinuxOperatingSystem:
-	  reserved = [NSArray arrayWithObjects: @"proc", @"devpts", @"shm", 
-			      @"usbdevfs", @"devpts", 
-			      @"sysfs", @"tmpfs", @"procfs", nil];
-	  break;
-
-	case NSBSDOperatingSystem:
-	  reserved = [NSArray arrayWithObjects: @"devfs", @"procfs", nil];
-	  break;
-
-	case NSMACHOperatingSystem:
-	  reserved = [NSArray arrayWithObjects: @"devfs", @"fdesc", 
-			      @"<volfs>", nil];
-	  break;
-    
-	default:
-	  break;
-	}
-    
-      if (reserved)
-	{
-	  [mdomain setObject: reserved forKey: @"GSReservedMountNames"];
-	  [defaults setPersistentDomain: mdomain forName: NSGlobalDomain];
-	  [defaults synchronize];
-	}
-    
-      RELEASE (mdomain);
-      RELEASE (arp);
-    }
-
-  return reserved;
-}
-
 
 
 @end
