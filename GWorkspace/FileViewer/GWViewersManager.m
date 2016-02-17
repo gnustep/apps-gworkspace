@@ -61,8 +61,11 @@ static GWViewersManager *vwrsmanager = nil;
   
   if (self)
     {
+      NSNotificationCenter *wsnc;
+      
       gworkspace = [GWorkspace gworkspace];
-      helpManager = [NSHelpManager sharedHelpManager];    
+      helpManager = [NSHelpManager sharedHelpManager];
+      wsnc = [[NSWorkspace sharedWorkspace] notificationCenter];
       ASSIGN (bviewerHelp, [gworkspace contextHelpFromName: @"BViewer.rtfd"]);
       
       viewers = [NSMutableArray new];
@@ -90,8 +93,20 @@ static GWViewersManager *vwrsmanager = nil;
                                                           selector: @selector(sortTypeDidChange:) 
                                                               name: @"GWSortTypeDidChangeNotification"
                                                             object: nil];
+
+      // should perhaps volume notification be distributed?
+      [wsnc addObserver: self 
+               selector: @selector(newVolumeMounted:) 
+                   name: NSWorkspaceDidMountNotification
+                 object: nil];
       
-      [[FSNodeRep sharedInstance] setLabelWFactor: 9.0];    
+      
+      [wsnc addObserver: self 
+               selector: @selector(mountedVolumeDidUnmount:) 
+                   name: NSWorkspaceDidUnmountNotification
+                 object: nil];
+      
+      [[FSNodeRep sharedInstance] setLabelWFactor: 9.0];
     }
   
   return self;
@@ -780,6 +795,30 @@ static GWViewersManager *vwrsmanager = nil;
     }
   
   [defaults setObject: viewersInfo forKey: @"viewersinfo"];
+}
+
+- (void)newVolumeMounted:(NSNotification *)notif
+{
+  NSDictionary *dict = [notif userInfo];  
+  NSString *volpath = [dict objectForKey: @"NSDevicePath"];
+  FSNodeRep *fnr = [FSNodeRep sharedInstance];
+
+  if (volpath)
+    [fnr addVolumeAt:volpath];
+  else
+    NSLog(@"newVolumeMounted notification received with empty NSDevicePath");
+}
+
+- (void)mountedVolumeDidUnmount:(NSNotification *)notif
+{
+  NSDictionary *dict = [notif userInfo];  
+  NSString *volpath = [dict objectForKey: @"NSDevicePath"];
+  FSNodeRep *fnr = [FSNodeRep sharedInstance];
+
+  if (volpath)
+    [fnr removeVolumeAt:volpath];
+  else
+    NSLog(@"mountedVolumeDidUnmount notification received with empty NSDevicePath");
 }
 
 @end

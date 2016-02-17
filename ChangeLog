@@ -1,5 +1,10 @@
 2016-02-17  Riccardo Mottola <rm@gnu.org>
 
+	* GWorkspace/FileViewer/GWViewersManager.m
+	Listen to NSWorkspaceDidMountNotification and NSWorkspaceDidUnmountNotification and update FSNodeRep accordingly.
+
+2016-02-17  Riccardo Mottola <rm@gnu.org>
+
 	* FSNode/FSNodeRep.m
 	* GWorkspace/GWorkspace.m
 	Self initialize FSNodeRep with removable medias and don't go through GWorkspace which used a non-API method.
