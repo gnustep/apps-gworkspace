@@ -1,6 +1,6 @@
 /* GWorkspace.m
  *  
- * Copyright (C) 2003-2015 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola
@@ -371,8 +371,6 @@ static GWorkspace *gworkspace = nil;
 	    
   defaults = [NSUserDefaults standardUserDefaults];
   [defaults setObject: gwProcessName forKey: @"GSWorkspaceApplication"];
-
-  [fsnodeRep setVolumes: [ws removableMediaPaths]];
         
   entry = [defaults objectForKey: @"reserved_names"];
   if (entry) 

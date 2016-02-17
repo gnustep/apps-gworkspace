@@ -165,6 +165,7 @@ static FSNodeRep *shared = nil;
     lockedPaths = [NSMutableArray new];	
     hiddenPaths = [NSArray new];
     volumes = [[NSMutableSet alloc] initWithCapacity: 1];
+    [self setVolumes:[ws mountedRemovableMedia]];
     reservedNames = [[NSMutableSet alloc] initWithCapacity: 1];
     
     [self loadExtendedInfoModules];
