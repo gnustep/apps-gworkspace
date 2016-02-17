@@ -1635,7 +1635,11 @@ static GWorkspace *gworkspace = nil;
 
 - (void)removableMediaPathsDidChange:(NSNotification *)notif
 {
-  [fsnodeRep setVolumes: [ws removableMediaPaths]];
+  NSArray *removables;
+
+  removables = [[[NSUserDefaults standardUserDefaults] persistentDomainForName: NSGlobalDomain] objectForKey: @"GSRemovableMediaPaths"];
+
+  [fsnodeRep setVolumes: removables];
   [dtopManager removableMediaPathsDidChange];
 }
 
