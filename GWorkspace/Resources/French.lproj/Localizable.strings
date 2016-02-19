@@ -212,10 +212,7 @@
 "Date" = "Date";
 "Folder Inspector" = "Inspecteur de dossiers";	
 /* Ajouts 25052003 */
-"%@ available on hard disk"= "%@ disponibles sur le disque dur";
-"available on hard disk"= "disponibles sur le disque dur";
-"unknown volume size" = "Taille du lecteur inconnue";
-"File Viewer" = "Fichiers";
+"unknown volume size" = "Taille du lecteur inconnue";// Fixme BD : string to be added to other english string file
 /* Fin ajouts */
 
 /* ImageViewer.m */
@@ -374,8 +371,12 @@
 
 /* HiddenFilesPref.m */
 "Hidden Files" = "Fichiers cachés";
-"Shown files" = "Fichiers visibles";
+"Files" = "Fichiers";
+"Folders" = "Folders";
+"Activate changes" = "Appliquer";
+"Load" = "Load";
 "Hidden files" = "Fichiers cachés";
+"Shown files" = "Fichiers visibles";
 "Select and move the files to hide or to show" = "Selectionnez et déplacez les fichiers à cacher ou afficher";
 
 /* IconsPrefs.m */
@@ -393,47 +394,39 @@
 "fit" = "Fit";
 "tile" = "Répéter";
 "scale" = "Scale";
+
 "Use image"="Image";
 "Choose"="Choisir";
+
 "Dock" = "Dock";
 "Show Dock"="Montrer le Dock";
 "Position:"="Position:";
+
 "Style:"="Style:";
 "Left"="Gauche";
 "Right"="Droite";
+
 "Classic"="Classique";
 "Modern"="Moderne";
+
 "Omnipresent"="Omnipresent";
 "Autohide Tabbed Shelf"="Cacher automatiquement les étagères";
 
 
-"Sort by" = "Trier par";
-"Name" = "Nom";
-"Date" = "Date";
-"Size" = "Taille";
-"Set" = "Appliquer";
-"Icons Animation" = "Animation d'icônes";
-
-"File Operations" = "Opérations sur fichier";
-"failed to load %@!" = "Impossible de charger %@ !";
-"Xterm" = "Terminal xterm";
-"Arguments" = "Arguments";
-"Desktop Color" = "Couleur du bureau";
-"Deactivate" = "Désactiver";
-"Activate" = "Activer";
-"Activate changes" = "Appliquer";
-"Default" = "Standard";
-"Status Window" = "Fenêtre de progression";
-"Confirmation" = "Confirmation";
-"Show status window" ="Afficher la progression";
-"Load" = "Charg.";
-
-"Uncheck the buttons to allow automatic confirmation" = "Décochez les buttons pour une confirmation systématique";
-"of file operations" = "des opérations sur fichier" ;
+/* OperationPrefs.m */
+"File Operations" = "Opérations sur fichiers";
+"Operation Preferences"="Préférences des opérations";
+"Status Window"="Fenêtre de progression";
+"Confirmation"="Confirmation";
+"Show status window"="Montrer la progression";
+"Check this option to show a status window"="Cocher cette option pour voir une fenêtre de progression";
+"during the file operations"="lors des opérations sur fichier";
+"Uncheck the buttons to allow automatic confirmation"="Décocher les boutons pour permettre une confirmation automatique";
+"of file operations"="des opérations sur fichier";
 
 
-"Check this option to show a status window" = "Cochez cette option pour voir une fenêtre de progression";
-"during the file operations"  = "lors des opérations sur fichier";
+
+"failed to load %@!" = "Impossible de charger %@ !"; // Fixme BD : string only present in NSLogs, not translated outside of french stringfile.
 
 
 /* HistoryPref.m */
