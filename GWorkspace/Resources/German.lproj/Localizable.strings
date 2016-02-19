@@ -360,11 +360,11 @@ which ends in "kann <the file> nicht umbenennen"
 "Folders" = "Ordner";
 "Activate changes" = "Aktivieren";
 "Hidden Files" = "Versteckte Dateien";
+"Hidden directories" = "Versteckte Ordner";
 "Load" = "Laden";
 "Hidden files" = "Versteckte Dateien";
 "Shown files" = "Sichtbare Dateien";
 "Select and move the files to hide or to show" = "Dateien zum Zeigen/Verstecken auswählen und verschieben";
-"Hidden directories" = "Versteckte Ordner";
 
 /* IconsPrefs.m */
 "Icons" = "Symbole";
