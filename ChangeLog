@@ -1,5 +1,10 @@
 2016-02-22  Riccardo Mottola <rm@gnu.org>
 
+	* GWorkspace/GWorkspace.m
+	Allow disk checking also without desktop.
+
+2016-02-22  Riccardo Mottola <rm@gnu.org>
+
 	* GWorkspace/Fiend/FiendLeaf.m
 	* GWorkspace/GWorkspace.m
 	* GWorkspace/WorkspaceApplication.m

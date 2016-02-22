@@ -1076,10 +1076,6 @@ static GWorkspace *gworkspace = nil;
   
   } else if (sel_isEqual(action, @selector(emptyRecycler:))) {
     return ([trashContents count] != 0);
-  
-  } else if (sel_isEqual(action, @selector(checkRemovableMedia:))) {  
-    return [dtopManager isActive];
-  
   } else if (sel_isEqual(action, @selector(removeTShelfTab:))
               || sel_isEqual(action, @selector(renameTShelfTab:))
                       || sel_isEqual(action, @selector(addTShelfTab:))) {
@@ -1117,7 +1113,7 @@ static GWorkspace *gworkspace = nil;
     }
   }
   
-	return YES;
+  return YES;
 }
            
 - (void)fileSystemWillChange:(NSNotification *)notif
