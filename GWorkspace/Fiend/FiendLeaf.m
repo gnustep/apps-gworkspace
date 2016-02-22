@@ -1,6 +1,6 @@
 /* FiendLeaf.m
  *  
- * Copyright (C) 2003-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -96,7 +96,7 @@
 {
   NSWindow *win;
   
-	self = [super init];
+  self = [super init];
 
   win = [[NSWindow alloc] initWithContentRect: NSMakeRect(0, 0, 64, 64)
 					                  styleMask: NSBorderlessWindowMask  
@@ -564,7 +564,7 @@
   NSDragOperation sourceDragMask = [sender draggingSourceOperationMask];
   NSPasteboard *pb = [sender draggingPasteboard];  
   NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
-	int i = 0;
+  NSUInteger i = 0;
 
   ASSIGN (icon, [[FSNodeRep sharedInstance] iconOfSize: ICON_SIZE 
                                                forNode: node]);
@@ -573,7 +573,7 @@
   if ([node isApplication] == NO) {
     NSString *operation, *source;
     NSMutableArray *files;
-    int tag;
+    NSInteger tag;
     
     source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
 
@@ -624,7 +624,7 @@
     }
   }
   
-	isDragTarget = NO;
+  isDragTarget = NO;
 }
 
 @end

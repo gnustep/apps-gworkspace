@@ -1428,7 +1428,7 @@ static GWorkspace *gworkspace = nil;
 {
   NSString *basePath;
   NSMutableArray *files;
-  int tag;
+  NSInteger tag;
   NSUInteger i;
 
   basePath = [NSString stringWithString: [selectedPaths objectAtIndex: 0]];
@@ -1455,7 +1455,7 @@ static GWorkspace *gworkspace = nil;
 {
   NSString *basePath;
   NSMutableArray *files;
-  int tag;
+  NSInteger tag;
   NSUInteger i;
 
   basePath = [NSString stringWithString: [selectedPaths objectAtIndex: 0]];
@@ -1484,7 +1484,7 @@ static GWorkspace *gworkspace = nil;
   NSMutableArray *umountPaths = [NSMutableArray array];
   NSMutableArray *files = [NSMutableArray array];
   NSUInteger i;
-  int tag;
+  NSInteger tag;
 
   for (i = 0; i < [selectedPaths count]; i++) {
     NSString *path = [selectedPaths objectAtIndex: i];

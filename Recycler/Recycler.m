@@ -1,6 +1,6 @@
 /* Recycler.m
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: June 2004
@@ -402,17 +402,18 @@ static Recycler *recycler = nil;
 		             destination:(NSString *)destination
 		                   files:(NSArray *)files
 {
-  int tag;
+  NSInteger tag;
 
   if ([ws performFileOperation: operation 
                         source: source
-		               destination: destination
-		                     files: files
-			                     tag: &tag] == NO) {
-    NSRunAlertPanel(nil, 
-        NSLocalizedString(@"Unable to contact GWorkspace", @""), 
-                            NSLocalizedString(@"OK", @""), nil, nil);                                     
-  }
+                   destination: destination
+                         files: files
+                           tag: &tag] == NO)
+    {
+      NSRunAlertPanel(nil, 
+                      NSLocalizedString(@"Unable to contact GWorkspace", @""), 
+                      NSLocalizedString(@"OK", @""), nil, nil);                                     
+    }
 }
 
 - (void)concludeRemoteFilesDragOperation:(NSData *)opinfo

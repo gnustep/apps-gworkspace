@@ -1,6 +1,6 @@
 /* WorkspaceApplication.m
  *  
- * Copyright (C) 2006-2014 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2006
@@ -45,7 +45,7 @@
                       source:(NSString *)source 
                  destination:(NSString *)destination 
                        files:(NSArray *)files 
-                         tag:(int *)tag
+                         tag:(NSInteger *)tag
 {
   if (loggingout == NO)
     {
