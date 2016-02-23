@@ -2276,11 +2276,20 @@ static GWorkspace *gworkspace = nil;
   NSMenu *menu = [[[NSApp mainMenu] itemWithTitle: NSLocalizedString(@"Tools", @"")] submenu];
   id item;
 
-  if ([dtopManager isActive] == NO) {
-    [dtopManager activateDesktop];
-    item = [menu itemWithTitle: NSLocalizedString(@"Show Desktop", @"")];
-    [item setTitle: NSLocalizedString(@"Hide Desktop", @"")];
-  } else {
+  if ([dtopManager isActive] == NO)
+    {
+      [dtopManager activateDesktop];
+      item = [menu itemWithTitle: NSLocalizedString(@"Show Desktop", @"")];
+      [item setTitle: NSLocalizedString(@"Hide Desktop", @"")];
+      if (recyclerApp)
+	{
+	  recyclerCanQuit = YES;
+	  [recyclerApp terminateApplication];
+	  item = [menu itemWithTitle: NSLocalizedString(@"Hide Recycler", @"")];
+	  [item setTitle: NSLocalizedString(@"Show Recycler", @"")];
+	}
+    }
+  else {
     [dtopManager deactivateDesktop];
     item = [menu itemWithTitle: NSLocalizedString(@"Hide Desktop", @"")];
     [item setTitle: NSLocalizedString(@"Show Desktop", @"")];
