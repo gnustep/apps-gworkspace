@@ -225,7 +225,7 @@
 
 - (DockIcon *)iconForApplicationName:(NSString *)name
 {
-  int i;
+  NSUInteger i;
   
   for (i = 0; i < [icons count]; i++) {
     DockIcon *icon = [icons objectAtIndex: i];
@@ -255,7 +255,7 @@
 
 - (DockIcon *)trashIcon
 {
-  int i;
+  NSUInteger i;
   
   for (i = 0; i < [icons count]; i++) {
     DockIcon *icon = [icons objectAtIndex: i];
@@ -270,7 +270,7 @@
 
 - (DockIcon *)iconContainingPoint:(NSPoint)p
 {
-  int i;
+  NSUInteger i;
   
   for (i = 0; i < [icons count]; i++) {
     DockIcon *icon = [icons objectAtIndex: i];
@@ -436,10 +436,10 @@
   NSView *view = [self superview];
   NSRect scrrect = [[NSScreen mainScreen] frame];
   int oldIcnSize = iconSize;
-  float maxheight = scrrect.size.height;
+  CGFloat maxheight = scrrect.size.height;
   NSRect icnrect = NSZeroRect;  
   NSRect rect = NSZeroRect;
-  int i;
+  NSUInteger i;
 
   iconSize = MAX_ICN_SIZE;
   
@@ -507,7 +507,7 @@
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
   NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-  int i;  
+  NSUInteger i;  
 
   [defaults setObject: [NSNumber numberWithInt: style]
                forKey: @"dockstyle"];
@@ -556,7 +556,7 @@
 	NSString *source = [info objectForKey: @"source"];	  
 	NSString *destination = [info objectForKey: @"destination"];	 
 	NSArray *files = [info objectForKey: @"files"];	 
-  int i, count;
+  NSUInteger i, count;
   
   if ([operation isEqual: NSWorkspaceMoveOperation]
         || [operation isEqual: NSWorkspaceDestroyOperation]
@@ -609,7 +609,7 @@
     
     if ([basePath isEqual: trashPath]) {
       NSArray *subNodes = [node subNodes];
-      int count = [subNodes count];
+      NSUInteger count = [subNodes count];
     
       for (i = 0; i < [subNodes count]; i++) {
         if ([[subNodes objectAtIndex: i] isReserved]) {
@@ -631,7 +631,7 @@
   NSString *path = [info objectForKey: @"path"];
     
   if ([event isEqual: @"GWWatchedPathDeleted"]) {
-    int i;
+    NSUInteger i;
 
     for (i = 0; i < [icons count]; i++) {
       DockIcon *icon = [icons objectAtIndex: i];
@@ -651,7 +651,7 @@
     
   } else if ([event isEqual: @"GWFileDeletedInWatchedDirectory"]) {
     NSArray *files = [info objectForKey: @"files"];
-    int i;
+    NSUInteger i;
     
     for (i = 0; i < [files count]; i++) {
       NSString *fname = [files objectAtIndex: i];
@@ -698,7 +698,7 @@
       DockIcon *icon = [self trashIcon];  
       FSNode *node = [icon node];
       NSArray *subNodes = [node subNodes];
-      int i;
+      NSUInteger i;
 
       for (i = 0; i < [subNodes count]; i++) {
         if ([[subNodes objectAtIndex: i] isReserved] == NO) {
@@ -714,7 +714,7 @@
 
 - (void)unselectOtherReps:(id)arep
 {
-  int i;
+  NSUInteger i;
   
   for (i = 0; i < [icons count]; i++) {
     DockIcon *icon = [icons objectAtIndex: i];    
@@ -733,7 +733,7 @@
 - (void)setBackgroundColor:(NSColor *)acolor
 {
   NSColor *hlgtcolor = [acolor highlightWithLevel: 0.2];
-  int i;
+  NSUInteger i;
   
   for (i = 0; i < [icons count]; i++)
     [[icons objectAtIndex: i] setHighlightColor: hlgtcolor];
