@@ -1,6 +1,6 @@
 /* GWDesktopView.h
  *  
- * Copyright (C) 2005-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -65,6 +65,8 @@ typedef enum BackImageStyle {
 - (void)workspaceWillUnmountVolumeAtPath:(NSString *)vpath;
 
 - (void)workspaceDidUnmountVolumeAtPath:(NSString *)vpath;
+
+- (void)unlockVolumeAtPath:(NSString *)path;
 
 - (void)showMountedVolumes;
 

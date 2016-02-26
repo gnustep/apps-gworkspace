@@ -593,7 +593,8 @@ x += 6; \
 	    NSString *err = NSLocalizedString(@"Error", @"");
 	    NSString *msg = NSLocalizedString(@"You are not allowed to umount\n", @"");
 	    NSString *buttstr = NSLocalizedString(@"Continue", @"");
-            NSRunAlertPanel(err, [NSString stringWithFormat: @"%@ \"%@\"!\n", msg, umpath], buttstr, nil, nil);         
+            NSRunAlertPanel(err, [NSString stringWithFormat: @"%@ \"%@\"!\n", msg, umpath], buttstr, nil, nil);
+	    [[GWDesktopManager desktopManager] unlockVolumeAtPath:umpath];
           }
       }
     

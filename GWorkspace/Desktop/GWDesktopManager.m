@@ -560,6 +560,12 @@ static GWDesktopManager *desktopManager = nil;
   }
 }
 
+- (void)unlockVolumeAtPath:(NSString *)volpath
+{
+  [fsnodeRep unlockPaths: [NSArray arrayWithObject: volpath]];
+  [[self desktopView] unlockVolumeAtPath: volpath];
+}
+
 - (void)mountedVolumesDidChange
 {
   [[self desktopView] showMountedVolumes];

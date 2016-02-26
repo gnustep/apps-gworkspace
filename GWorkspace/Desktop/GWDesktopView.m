@@ -147,6 +147,11 @@
   }
 }
 
+- (void)unlockVolumeAtPath:(NSString *)path
+{
+  [self checkLockedReps];
+}
+
 - (void)showMountedVolumes
 {
   NSArray *rvpaths = [[NSWorkspace sharedWorkspace] mountedRemovableMedia];

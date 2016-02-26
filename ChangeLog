@@ -1,3 +1,12 @@
+2016-02-26 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/Desktop/Dock/DockIcon.m
+	* GWorkspace/Desktop/GWDesktopManager.h
+	* GWorkspace/Desktop/GWDesktopManager.m
+	* GWorkspace/Desktop/GWDesktopView.h
+	* GWorkspace/Desktop/GWDesktopView.m
+	Implement unlock methods and use them when unmounting fails.
+
 2016-02-23  Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/GWorkspace.m
