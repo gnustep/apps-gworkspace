@@ -89,6 +89,8 @@
     } else {
       ASSIGN (path, relativePath);
     }
+    ASSIGN (name, NSLocalizedStringFromTableInBundle(name, nil, [NSBundle bundleForClass:[self class]], @""));
+
         
     flags.readable = -1;
     flags.writable = -1;

@@ -146,3 +146,11 @@ add comments above this one
 "package" = "package";
 /* File: ../FSNode.m:582 */
 "socket" = "socket";
+
+"Desktop"="Desktop";
+"Music"="Music";
+"Images"="Images";
+"Documents"="Documents";
+"Downloads"="Downloads";
+"Applications"="Applications";
+"Tools"="Tools";

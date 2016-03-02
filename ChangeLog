@@ -1,5 +1,13 @@
 2016-03-02 Riccardo Mottola <rm@gnu.org>
 
+	* Inspector/Attributes.m
+	Use FSNode's name, not just the last path component.
+
+	* FSNode/FSNode.m
+	Localize the name of the node (perhaps this should be done selectively?).
+
+2016-03-02 Riccardo Mottola <rm@gnu.org>
+
 	* FSNode/FSNFunctions.m
 	Do not retain a string constant.
 
