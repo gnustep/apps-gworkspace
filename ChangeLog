@@ -1,3 +1,8 @@
+2016-03-02 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNFunctions.m
+	Do not retain a string constant.
+
 2016-02-26 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/Desktop/Dock/DockIcon.m

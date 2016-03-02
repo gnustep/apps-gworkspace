@@ -41,8 +41,6 @@ NSString *path_separator(void)
     #else
       separator = @"/";	
     #endif
-
-    RETAIN (separator);
   }
 
   return separator;
