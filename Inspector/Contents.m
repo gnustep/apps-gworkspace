@@ -1,6 +1,6 @@
 /* Contents.m
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
@@ -176,42 +176,47 @@ static NSString *nibName = @"Contents";
 
 - (id)viewerForPath:(NSString *)path
 {
-	int i;
+  NSInteger i;
   
   if ((path == nil) || ([fm fileExistsAtPath: path] == NO)) {
     return nil;
   }
     
-	for (i = 0; i < [viewers count]; i++) {
-		id vwr = [viewers objectAtIndex: i];		
-		if ([vwr canDisplayPath: path]) {
-			return vwr;
-    }				
-	}
-
-	return nil;
+  for (i = 0; i < [viewers count]; i++)
+    {
+      id vwr = [viewers objectAtIndex: i];		
+      if ([vwr canDisplayPath: path])
+        {
+          return vwr;
+        }				
+    }
+  
+  return nil;
 }
 
 - (id)viewerForDataOfType:(NSString *)type
 {
-  int i;
+  NSInteger i;
   
-	for (i = 0; i < [viewers count]; i++) {
-		id vwr = [viewers objectAtIndex: i];		
-    
-    if ([vwr respondsToSelector: @selector(canDisplayDataOfType:)]) {
-      if ([vwr canDisplayDataOfType: type]) {
-			  return vwr;
-      }
-    } 				
-	}
+  for (i = 0; i < [viewers count]; i++)
+    {
+      id vwr = [viewers objectAtIndex: i];		
+      
+      if ([vwr respondsToSelector: @selector(canDisplayDataOfType:)])
+        {
+          if ([vwr canDisplayDataOfType: type])
+            {
+              return vwr;
+            }
+        } 				
+    }
   
   return nil;
 }
 
 - (void)showContentsAt:(NSString *)path
 {
-	NSString *winName;
+  NSString *winName;
 
   if (currentViewer) {
     if ([currentViewer respondsToSelector: @selector(stopTasks)]) {
@@ -219,8 +224,9 @@ static NSString *nibName = @"Contents";
     }
   }   
     	      
-	if (path && [fm fileExistsAtPath: path]) {
-		id viewer = [self viewerForPath: path];
+  if (path && [fm fileExistsAtPath: path])
+    {
+      id viewer = [self viewerForPath: path];
 
     if (currentPath && ([currentPath isEqual: path] == NO)) {
       [inspector removeWatcherForPath: currentPath];
