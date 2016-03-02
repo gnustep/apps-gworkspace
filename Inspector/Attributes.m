@@ -210,7 +210,7 @@ static BOOL sizeStop = NO;
       NSImage *icon = [[FSNodeRep sharedInstance] iconOfSize: ICNSIZE forNode: node];
       
       [iconView setImage: icon];
-      [titleField setStringValue: [currentPath lastPathComponent]];
+      [titleField setStringValue: [node name]];
       
       usr = [attributes objectForKey: NSFileOwnerAccountName];
       grp = [attributes objectForKey: NSFileGroupOwnerAccountName];
