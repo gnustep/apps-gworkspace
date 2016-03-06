@@ -171,3 +171,11 @@ add comments above this one
 /* File: <dummy>:0 */
 /* Flag: unmatched */
 "Application" = "Application";
+
+"Desktop"="Bureau";
+"Music"="Musique";
+"Images"="Images";
+"Documents"="Documents";
+"Downloads"="Téléchargement";
+"Applications"="Applications";
+"Tools"="Outils";
