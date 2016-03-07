@@ -35,7 +35,7 @@
 - (void)dealloc
 {
   RELEASE (path);
-  RELEASE (relativePath);  
+  RELEASE (relativePath);
   RELEASE (name);  
   RELEASE (attributes);  
   RELEASE (fileType);
@@ -70,13 +70,16 @@
   self = [super init];
     
   if (self) {
+    NSString *lastPathComponent;
+    
     fsnodeRep = [FSNodeRep sharedInstance];
     fm = [NSFileManager defaultManager];
     ws = [NSWorkspace sharedWorkspace];
     
     parent = aparent;
     ASSIGN (relativePath, rpath);
-    ASSIGN (name, [relativePath lastPathComponent]);
+    lastPathComponent = [[relativePath lastPathComponent] retain];
+    name = nil;
     
     if (parent) {
       NSString *parentPath = [parent path];
@@ -85,12 +88,10 @@
         parentPath = @"";
       }
       ASSIGN (path, ([NSString stringWithFormat: @"%@%@%@", 
-                                      parentPath, path_separator(), name]));
+                                      parentPath, path_separator(), lastPathComponent]));
     } else {
       ASSIGN (path, relativePath);
     }
-    ASSIGN (name, NSLocalizedStringFromTableInBundle(name, nil, [NSBundle bundleForClass:[self class]], @""));
-
         
     flags.readable = -1;
     flags.writable = -1;
@@ -124,6 +125,14 @@
                                       
     attributes = [fm fileAttributesAtPath: path traverseLink: NO];
     RETAIN (attributes);
+
+    /* we localize only directories which could be special */
+    if ([self isDirectory])
+      ASSIGN (name, NSLocalizedStringFromTableInBundle(lastPathComponent, nil, [NSBundle bundleForClass:[self class]], @""));
+    else
+      ASSIGN (name, lastPathComponent);
+    
+    [lastPathComponent release];
   }
     
   return self;
