@@ -2099,8 +2099,17 @@ if test -z "$GNUSTEP_MAKEFILES"; then
 fi
 
 #--------------------------------------------------------------------
-# Use config.guess, config.sub and install-sh provided by gnustep-make
+# Find the compiler
 #--------------------------------------------------------------------
+if test "$CC" = ""; then
+  CC=`gnustep-config --variable=CC`
+fi
+if test "$CPP" = ""; then
+  CPP=`gnustep-config --variable=CPP`
+fi
+if test "$CXX" = ""; then
+  CXX=`gnustep-config --variable=CXX`
+fi
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -2890,7 +2899,6 @@ ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
-
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -3027,6 +3035,17 @@ ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+MAKECC=`gnustep-config --variable=CC`
+if test "$CC" != "$MAKECC"; then
+  as_fn_error $? "You are running configure with the compiler ($CC) set to a different value from that used by gnustep-make ($MAKECC).  Please run configure again with your environment set to match your gnustep-make" "$LINENO" 5
+  exit 1
+fi
+
+#--------------------------------------------------------------------
+# Use config.guess, config.sub and install-sh provided by gnustep-make
+#--------------------------------------------------------------------
 
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for grep that handles long lines and -e" >&5
@@ -3556,7 +3575,7 @@ $as_echo_n "checking for PDFKit... " >&6; }
 int
 main ()
 {
-[[PDFDocument class]];
+[PDFDocument class];
   ;
   return 0;
 }

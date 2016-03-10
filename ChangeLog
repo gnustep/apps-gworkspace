@@ -1,5 +1,13 @@
 2016-03-10 Riccardo Mottola <rm@gnu.org>
 
+	* Inspector/aclocal.m4 (AC_CHECK_PDFKIT)
+	Fix redundant []
+
+	* Inspector/configure.ac
+	Inherit CC and CXX compiler settings.
+
+2016-03-10 Riccardo Mottola <rm@gnu.org>
+
 	* FSNode/FSNodeRepIcons.m (iconOfSize: forNode:)
 	Traverse links to get thumbnails inside linked folders, mark direct symlinked folders and images with a link icon.
 
