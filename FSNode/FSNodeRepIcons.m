@@ -157,7 +157,7 @@ static unsigned char darkerLUT[256] = {
 	      key = nodepath;
 	    }
 	}   
-    
+
       if (key != nil)
 	{
 	  icon = [self cachedIconOfSize: size forKey: key];
@@ -168,7 +168,19 @@ static unsigned char darkerLUT[256] = {
 		{
 		  baseIcon = [ws iconForFile: nodepath];
 		}
-    
+
+	      if ([node isLink])
+		{
+		  NSImage *linkIcon;
+		  
+		  linkIcon = [NSImage imageNamed:@"common_linkCursor"];
+		  baseIcon = [baseIcon copy];
+		  [baseIcon lockFocus];
+		  [linkIcon compositeToPoint:NSMakePoint(0,0) operation:NSCompositeSourceOver];
+		  [baseIcon unlockFocus];
+		  [baseIcon autorelease];
+		}
+  
 	      icon = [self cachedIconOfSize: size forKey: key addBaseIcon: baseIcon];
 	    }
 	}
@@ -178,10 +190,25 @@ static unsigned char darkerLUT[256] = {
     { // NOT DIRECTORY
       if (usesThumbnails)
 	{
-	  icon = [self thumbnailForPath: nodepath];
+	  NSString *realPath;
+
+	  realPath = [nodepath stringByResolvingSymlinksInPath];
+	  icon = [self thumbnailForPath: realPath];
       
 	  if (icon) {
 	    NSSize icnsize = [icon size];
+
+	    if ([node isLink])
+	      {
+		NSImage *linkIcon;
+		
+		linkIcon = [NSImage imageNamed:@"common_linkCursor"];
+		icon = [icon copy];
+		[icon lockFocus];
+		[linkIcon compositeToPoint:NSMakePoint(0,0) operation:NSCompositeSourceOver];
+		[icon unlockFocus];
+		[icon autorelease];
+	      }	    
       
 	    if ((icnsize.width > size) || (icnsize.height > size))
 	      {
@@ -208,6 +235,17 @@ static unsigned char darkerLUT[256] = {
 	  if (icon == nil)
 	    {
 	      baseIcon = [ws iconForFile: nodepath];
+	      if ([node isLink])
+		{
+		  NSImage *linkIcon;
+		  
+		  linkIcon = [NSImage imageNamed:@"common_linkCursor"];
+		  baseIcon = [baseIcon copy];
+		  [baseIcon lockFocus];
+		  [linkIcon compositeToPoint:NSMakePoint(0,0) operation:NSCompositeSourceOver];
+		  [baseIcon unlockFocus];
+		  [baseIcon autorelease];
+		}
 	      icon = [self cachedIconOfSize: size forKey: key addBaseIcon: baseIcon];
 	    }
 	}      
@@ -224,7 +262,7 @@ static unsigned char darkerLUT[256] = {
 	icon = [self resizedIcon: icon ofSize: size];
       }  
     }
-  
+
   return icon;
 }
 
