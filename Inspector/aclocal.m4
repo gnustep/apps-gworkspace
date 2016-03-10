@@ -15,7 +15,7 @@ AC_DEFUN(AC_CHECK_PDFKIT,[
   AC_LINK_IFELSE(
           [AC_LANG_PROGRAM(
                   [[#include <PDFKit/PDFDocument.h>]],
-                  [[[[PDFDocument class]];]])],
+                  [[[PDFDocument class]];])],
 	  $1;
 	  have_pdfkit=yes,
 	  $2;
