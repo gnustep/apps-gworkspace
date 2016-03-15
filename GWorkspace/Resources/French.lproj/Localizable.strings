@@ -64,7 +64,7 @@
 		"Layers" = "Espaces de travail";
 	"Tabbed Shelf" = "Étagères";
 		"Show Tabbed Shelf" = "Montrer les étagères";
-                "Show Tabbed Shelf" = "Masquer les étagères";
+                "Hide Tabbed Shelf" = "Masquer les étagères";
 		"Remove Current Tab" = "Supprimer l'étagère";
 		"Rename Current Tab" = "Renommer l'étagère";
 		"Add Tab..." = "Ajouter une étagère...";
@@ -372,10 +372,11 @@
 /* HiddenFilesPref.m */
 "Hidden Files" = "Fichiers cachés";
 "Files" = "Fichiers";
-"Folders" = "Folders";
+"Folders" = "Dossiers";
 "Activate changes" = "Appliquer";
 "Load" = "Load";
 "Hidden files" = "Fichiers cachés";
+"Hidden directories" = "Dossiers cachés";
 "Shown files" = "Fichiers visibles";
 "Select and move the files to hide or to show" = "Selectionnez et déplacez les fichiers à cacher ou afficher";
 
@@ -400,16 +401,16 @@
 
 "Dock" = "Dock";
 "Show Dock"="Montrer le Dock";
-"Position:"="Position:";
+"Position:"="Position :";
 
-"Style:"="Style:";
+"Style:"="Style :";
 "Left"="Gauche";
 "Right"="Droite";
 
 "Classic"="Classique";
 "Modern"="Moderne";
 
-"Omnipresent"="Omnipresent";
+"Omnipresent"="Omniprésent";
 "Autohide Tabbed Shelf"="Cacher automatiquement les étagères";
 
 
@@ -421,8 +422,8 @@
 "Show status window"="Montrer la progression";
 "Check this option to show a status window"="Cocher cette option pour voir une fenêtre de progression";
 "during the file operations"="lors des opérations sur fichier";
-"Uncheck the buttons to allow automatic confirmation"="Décocher les boutons pour permettre une confirmation automatique";
-"of file operations"="des opérations sur fichier";
+"Uncheck the buttons to allow automatic confirmation"="Décocher les boutons pour permettre une confirmation";
+"of file operations"="automatique des opérations sur fichier";
 
 
 
