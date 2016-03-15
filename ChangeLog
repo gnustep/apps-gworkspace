@@ -1,3 +1,8 @@
+2016-03-15 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/Preferences/DesktopPref.m
+	Fix column vs. row selection.
+
 2016-03-10 Riccardo Mottola <rm@gnu.org>
 
 	* Inspector/aclocal.m4 (AC_CHECK_PDFKIT)

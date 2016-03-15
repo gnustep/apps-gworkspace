@@ -137,12 +137,12 @@ static NSString *nibName = @"DesktopPref";
       [dockPosLabel setStringValue: NSLocalizedString(@"Position:", @"")];
       cell = [dockPosMatrix cellAtRow: 0 column: 0];
       [cell setTitle: NSLocalizedString(@"Left", @"")];
-      cell = [dockPosMatrix cellAtRow: 0 column: 1];
+      cell = [dockPosMatrix cellAtRow: 1 column: 0];
       [cell setTitle: NSLocalizedString(@"Right", @"")];
       [dockStyleLabel setStringValue: NSLocalizedString(@"Style:", @"")];
       cell = [dockStyleMatrix cellAtRow: 0 column: 0];
       [cell setTitle: NSLocalizedString(@"Classic", @"")];
-      cell = [dockStyleMatrix cellAtRow: 0 column: 1];
+      cell = [dockStyleMatrix cellAtRow: 1 column: 0];
       [cell setTitle: NSLocalizedString(@"Modern", @"")];
 
       [omnipresentCheck setTitle: _(@"Omnipresent")];
