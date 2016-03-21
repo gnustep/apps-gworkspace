@@ -1,6 +1,6 @@
 /* IconView.m
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2005
@@ -22,10 +22,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "IconView.h"
-#include "Inspector.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import "IconView.h"
+#import "Inspector.h"
 
 @implementation IconView
 

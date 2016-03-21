@@ -1,6 +1,6 @@
 /* Tools.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
@@ -22,14 +22,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
 #include <math.h>
-#include "Tools.h"
-#include "Inspector.h"
-#include "IconView.h"
-#include "Functions.h"
-#include "FSNodeRep.h"
+#import "Tools.h"
+#import "Inspector.h"
+#import "IconView.h"
+#import "Functions.h"
+#import "FSNodeRep.h"
 
 #define ICNSIZE 48
 
@@ -128,71 +128,84 @@ static NSString *nibName = @"Tools";
 - (void)activateForPaths:(NSArray *)paths
 {
   BOOL toolsok = YES;
-	int pathscount;
-	int i;
+  NSInteger pathscount;
+  NSInteger i;
 
   if (paths == nil) {
     DESTROY (insppaths);
     return;
   }
 
-	[okButt setEnabled: NO];		  
+  [okButt setEnabled: NO];		  
 
-	pathscount = [paths count];
-
-	if (pathscount == 1) { 
-    FSNode *node = [FSNode nodeWithPath: [paths objectAtIndex: 0]];
-    NSImage *icon = [[FSNodeRep sharedInstance] iconOfSize: ICNSIZE forNode: node];
+  pathscount = [paths count];
   
-    [iconView setImage: icon];
-    [titleField setStringValue: [node name]];
-  } else {
-    NSImage *icon = [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: ICNSIZE];
-    NSString *items = NSLocalizedString(@"items", @"");
-    items = [NSString stringWithFormat: @"%i %@", pathscount, items];
-		[titleField setStringValue: items];  
-    [iconView setImage: icon];
-  }
-   
-  for (i = 0; i < [paths count]; i++) {
-    FSNode *node = [FSNode nodeWithPath: [paths objectAtIndex: i]];
-  
-    if ([node isValid]) {
-		  if ([node isPlain] == NO) {
-			  toolsok = NO;		
-			  break;
-      }
-    } else {  
-      toolsok = NO;		
-      break;
+  if (pathscount == 1)
+    { 
+      FSNode *node = [FSNode nodeWithPath: [paths objectAtIndex: 0]];
+      NSImage *icon = [[FSNodeRep sharedInstance] iconOfSize: ICNSIZE forNode: node];
+      
+      [iconView setImage: icon];
+      [titleField setStringValue: [node name]];
     }
+  else
+    {
+      NSImage *icon = [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: ICNSIZE];
+      NSString *items = NSLocalizedString(@"items", @"");
+      items = [NSString stringWithFormat: @"%li %@", (long int)pathscount, items];
+      [titleField setStringValue: items];  
+      [iconView setImage: icon];
+    }
+   
+  for (i = 0; i < [paths count]; i++)
+    {
+      FSNode *node = [FSNode nodeWithPath: [paths objectAtIndex: i]];
+  
+      if ([node isValid])
+        {
+          if ([node isPlain] == NO)
+            {
+              toolsok = NO;		
+              break;
+            }
+        }
+      else
+        {  
+          toolsok = NO;		
+          break;
+        }
   }
     
-	if (toolsok == YES) {		  	
-		if (valid == NO) {
-      [errLabel removeFromSuperview];
-      [mainBox addSubview: toolsBox];
-			valid = YES;
-		}
-    [self findApplicationsForPaths: paths];
-		
-	} else {
-		if (valid == YES) {
-      [toolsBox removeFromSuperview];
-      [mainBox addSubview: errLabel];
-			valid = NO;
-		}
-	}
+  if (toolsok == YES)
+    {		  	
+      if (valid == NO)
+        {
+          [errLabel removeFromSuperview];
+          [mainBox addSubview: toolsBox];
+          valid = YES;
+        }
+      [self findApplicationsForPaths: paths];
+      
+    }
+  else
+    {
+      if (valid == YES)
+        {
+          [toolsBox removeFromSuperview];
+          [mainBox addSubview: errLabel];
+          valid = NO;
+        }
+    }
 }
 
 - (void)findApplicationsForPaths:(NSArray *)paths
 {
-	NSMutableDictionary *extensionsAndApps;
+  NSMutableDictionary *extensionsAndApps;
   NSMutableArray *commonApps;   
   NSString *s;
-	id cell;
-	BOOL appsforext;
-  int i, count;
+  id cell;
+  BOOL appsforext;
+  NSInteger i, count;
 		
   ASSIGN (insppaths, paths);
 
@@ -200,39 +213,47 @@ static NSString *nibName = @"Tools";
   extensions = [NSMutableArray new];
   extensionsAndApps = [NSMutableDictionary dictionary];
 
-	DESTROY (currentApp);
-	[defAppField setStringValue: @""];
-	[defPathField setStringValue: @""];
-
-	appsforext = YES;
+  DESTROY (currentApp);
+  [defAppField setStringValue: @""];
+  [defPathField setStringValue: @""];
+  
+  appsforext = YES;
 	
-  for (i = 0; i < [insppaths count]; i++) {
-    NSString *ext = [[insppaths objectAtIndex: i] pathExtension];		
-
-    if ([extensions containsObject: ext] == NO) { 
-		  NSDictionary *extinfo = [ws infoForExtension: ext];
-			
-      if (extinfo) {
-		    NSMutableArray *appsnames = [NSMutableArray arrayWithCapacity: 1];
-				[appsnames addObjectsFromArray: [extinfo allKeys]];
-        [extensionsAndApps setObject: appsnames forKey: ext];
-				[extensions addObject: ext];				
-      } else {
-				appsforext = NO;
-			}
-    }            
-  }   
-				
+  for (i = 0; i < [insppaths count]; i++)
+    {
+      NSString *ext = [[insppaths objectAtIndex: i] pathExtension];		
+      
+      if ([extensions containsObject: ext] == NO)
+        { 
+          NSDictionary *extinfo = [ws infoForExtension: ext];
+          
+          if (extinfo)
+            {
+              NSMutableArray *appsnames = [NSMutableArray arrayWithCapacity: 1];
+              [appsnames addObjectsFromArray: [extinfo allKeys]];
+              [extensionsAndApps setObject: appsnames forKey: ext];
+              [extensions addObject: ext];				
+            }
+          else
+            {
+              appsforext = NO;
+            }
+        }            
+    }   
+  
   if ([extensions count] == 1) {
     NSString *ext = [extensions objectAtIndex: 0];
-    commonApps = [NSArray arrayWithArray: [extensionsAndApps objectForKey: ext]];    
+    commonApps = [NSMutableArray arrayWithArray: [extensionsAndApps objectForKey: ext]];    
     currentApp = [ws getBestAppInRole: nil forExtension: ext];
     RETAIN (currentApp);			
 		
-  } else {
-    int j, n;
+  }
+  else
+    {
+      NSInteger j, n;
 		
-		for (i = 0; i < [extensions count]; i++) {
+      for (i = 0; i < [extensions count]; i++)
+        {
 			NSString *ext1 = [extensions objectAtIndex: i];
 			NSMutableArray *a1 = [extensionsAndApps objectForKey: ext1];			
 			
@@ -267,7 +288,7 @@ static NSString *nibName = @"Tools";
 			}
     }
 		
-		if ([commonApps count] != 0) {
+    if ([commonApps count] != 0) {
 			BOOL iscommapp = YES;		
 			NSString *ext1 = [extensions objectAtIndex: 0];
 
@@ -346,10 +367,10 @@ static NSString *nibName = @"Tools";
 {
   NSString *s;
 	
-	ASSIGN (currentApp, [[sender selectedCell] title]);	
+  ASSIGN (currentApp, [[sender selectedCell] title]);	
   s = [ws fullPathForApplication: currentApp];
   s = relativePathFit(defPathField, s);
-	[defPathField setStringValue: s];
+  [defPathField setStringValue: s];
   [defAppField setStringValue: [currentApp stringByDeletingPathExtension]];  
 }
 
@@ -362,12 +383,13 @@ static NSString *nibName = @"Tools";
   id cell;
   FSNode *node;
   NSImage *icon;
-  int i, count;
+  NSInteger i, count;
   
-  for (i = 0; i < [extensions count]; i++) {
-    ext = [extensions objectAtIndex: i];  		
-    [ws setBestApp: currentApp inRole: nil forExtension: ext];  
-  }
+  for (i = 0; i < [extensions count]; i++)
+    {
+      ext = [extensions objectAtIndex: i];  		
+      [ws setBestApp: currentApp inRole: nil forExtension: ext];  
+    }
 
   changedInfo = [NSDictionary dictionaryWithObjectsAndKeys: 
                                                   currentApp, @"app", 
@@ -382,24 +404,27 @@ static NSString *nibName = @"Tools";
   [newApps addObject: currentApp];
   
   cells = [matrix cells];
-	for(i = 0; i < [cells count]; i++) {
-    app = [[cells objectAtIndex: i] title];
-		if ([app isEqual: currentApp] == NO) {
-      [newApps insertObject: app atIndex: [newApps count]];
-		}
-  }
+  for(i = 0; i < [cells count]; i++)
+    {
+      app = [[cells objectAtIndex: i] title];
+      if ([app isEqual: currentApp] == NO)
+        {
+          [newApps insertObject: app atIndex: [newApps count]];
+        }
+    }
   
-	count = [newApps count];
-	[matrix renewRows: 1 columns: count];
+  count = [newApps count];
+  [matrix renewRows: 1 columns: count];
   
-  for (i = 0; i < count; i++) {
-		cell = [matrix cellAtRow: 0 column: i];
-		app = [newApps objectAtIndex: i];
-		[cell setTitle: app];
-    node = [FSNode nodeWithPath: [ws fullPathForApplication: app]];
-    icon = [[FSNodeRep sharedInstance] iconOfSize: ICNSIZE forNode: node];
-		[cell setImage: icon];
-	}
+  for (i = 0; i < count; i++)
+    {
+      cell = [matrix cellAtRow: 0 column: i];
+      app = [newApps objectAtIndex: i];
+      [cell setTitle: app];
+      node = [FSNode nodeWithPath: [ws fullPathForApplication: app]];
+      icon = [[FSNodeRep sharedInstance] iconOfSize: ICNSIZE forNode: node];
+      [cell setImage: icon];
+    }
 
   [matrix scrollCellToVisibleAtRow: 0 column: 0];
   [matrix selectCellAtRow: 0 column: 0];
@@ -407,26 +432,27 @@ static NSString *nibName = @"Tools";
 
 - (void)openFile:(id)sender
 {
-  int i;
+  NSInteger i;
   
-  for (i = 0; i < [insppaths count]; i++) {
-    NSString *fpath = [insppaths objectAtIndex: i];
+  for (i = 0; i < [insppaths count]; i++)
+    {
+      NSString *fpath = [insppaths objectAtIndex: i];
         
-    NS_DURING
-      {
-    [ws openFile: fpath withApplication: [[sender selectedCell] title]];
-      }
-    NS_HANDLER
-      {
-    NSRunAlertPanel(NSLocalizedString(@"error", @""), 
-        [NSString stringWithFormat: @"%@ %@!", 
-          NSLocalizedString(@"Can't open ", @""), [fpath lastPathComponent]],
-                                      NSLocalizedString(@"OK", @""), 
-                                      nil, 
-                                      nil);                                     
-      }
-    NS_ENDHANDLER  
-  }
+      NS_DURING
+        {
+          [ws openFile: fpath withApplication: [[sender selectedCell] title]];
+        }
+      NS_HANDLER
+        {
+          NSRunAlertPanel(NSLocalizedString(@"error", @""), 
+                          [NSString stringWithFormat: @"%@ %@!", 
+                                    NSLocalizedString(@"Can't open ", @""), [fpath lastPathComponent]],
+                          NSLocalizedString(@"OK", @""), 
+                          nil, 
+                          nil);                                     
+        }
+      NS_ENDHANDLER  
+        }
 }
 
 - (void)watchedPathDidChange:(NSDictionary *)info
