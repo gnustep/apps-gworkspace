@@ -113,7 +113,7 @@
 
 "Log out" = "Log out";
 "Are you sure you want to quit\nall applications and log out now?" = "Terminare tutte le applicazioni ed\nall eseguire log out ora?";
-"If you do nothing, the system will log out\nautomatically in" = "Se non si esegue nulla, il sistema terminerà\nautomaticamente in";
+"If you do nothing, the system will log out\nautomatically in " = "Se non si esegue nulla, il sistema terminerà\nautomaticamente in ";
 "seconds." = "secondi.";
 
 /* FileOperation.m */
