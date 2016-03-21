@@ -128,7 +128,7 @@
 "Yes" = "Jes";
 
 "Are you sure you want to quit\nall applications and log out now?" = "Ĉu vi certas ke vi volas\nfinigi ĉiujn aplikojn kaj adiaŭi?";
-"If you do nothing, the system will log out\nautomatically in" = "Se vi faros nenion sistemo\naŭtomate finos post ";
+"If you do nothing, the system will log out\nautomatically in " = "Se vi faros nenion sistemo\naŭtomate finos post ";
 "seconds." = "sekundoj.";
 
 "Error" = "Eraro";
