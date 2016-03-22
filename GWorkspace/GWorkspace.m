@@ -2696,7 +2696,7 @@ static GWorkspace *gworkspace = nil;
   NSString *source = [opinfo objectForKey: @"source"];
   NSString *destination = [opinfo objectForKey: @"destination"];
   NSArray *files = [opinfo objectForKey: @"files"];
-  int tag;
+  NSInteger tag;
 
   if (destination == nil && [operation isEqualToString:NSWorkspaceRecycleOperation])
     destination = [self trashPath];

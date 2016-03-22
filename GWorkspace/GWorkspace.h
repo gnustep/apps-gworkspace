@@ -1,6 +1,6 @@
 /* GWorkspace.h
  *  
- * Copyright (C) 2003-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -454,7 +454,7 @@
                       source:(NSString *)source 
                  destination:(NSString *)destination 
                        files:(NSArray *)files 
-                         tag:(int *)tag;
+                         tag:(NSInteger *)tag;
 
 - (BOOL)selectFile:(NSString *)fullPath
 							inFileViewerRootedAtPath:(NSString *)rootFullpath;
