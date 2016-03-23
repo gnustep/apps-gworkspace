@@ -1,3 +1,8 @@
+2016-03-23 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/Desktop/GWDesktopManager.m
+	Enable thumbnail generation also for the desktop
+
 2016-03-22 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/GWorkspace.h

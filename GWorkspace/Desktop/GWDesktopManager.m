@@ -1,6 +1,6 @@
 /* GWDesktopManager.m
  *  
- * Copyright (C) 2005-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -31,6 +31,7 @@
 #import "GWorkspace.h"
 #import "GWViewersManager.h"
 #import "TShelf/TShelfWin.h"
+#import "Thumbnailer/GWThumbnailer.h"
 
 #define RESV_MARGIN 10
 
@@ -443,6 +444,36 @@ static GWDesktopManager *desktopManager = nil;
     NSLog(@"Error! A fatal error occured while detaching the thread.");
   }
   NS_ENDHANDLER
+}
+
+- (void)makeThumbnails:(id)sender
+{
+  NSString *path;
+
+  path = [dskNode path];
+  if (path)
+    {
+      Thumbnailer *t;
+      
+      t = [Thumbnailer sharedThumbnailer];
+      [t makeThumbnails:path];
+      [t release];
+    }
+}
+
+- (void)removeThumbnails:(id)sender
+{
+  NSString *path;
+
+  path = [dskNode path];
+  if (path)
+    {
+      Thumbnailer *t;
+      
+      t = [Thumbnailer sharedThumbnailer];
+      [t removeThumbnails:path];
+      [t release];
+    }
 }
 
 - (void)fileSystemWillChange:(NSNotification *)notif
