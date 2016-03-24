@@ -451,6 +451,7 @@ static GWDesktopManager *desktopManager = nil;
   NSString *path;
 
   path = [dskNode path];
+  path = [path stringByResolvingSymlinksInPath];
   if (path)
     {
       Thumbnailer *t;
@@ -466,6 +467,7 @@ static GWDesktopManager *desktopManager = nil;
   NSString *path;
 
   path = [dskNode path];
+  path = [path stringByResolvingSymlinksInPath];
   if (path)
     {
       Thumbnailer *t;

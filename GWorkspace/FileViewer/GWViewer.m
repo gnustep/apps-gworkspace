@@ -1564,6 +1564,7 @@ constrainMinCoordinate:(CGFloat)proposedMin
   NSString *path;
 
   path = [[nodeView shownNode] path];
+  path = [path stringByResolvingSymlinksInPath];
   if (path)
     {
       Thumbnailer *t;
@@ -1579,6 +1580,7 @@ constrainMinCoordinate:(CGFloat)proposedMin
   NSString *path;
 
   path = [[nodeView shownNode] path];
+  path = [path stringByResolvingSymlinksInPath];
   if (path)
     {
       Thumbnailer *t;
