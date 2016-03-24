@@ -3,7 +3,7 @@
  * Copyright (C) 2004 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
- * Date: March 2004
+ * Date: March 2004-2016
  *
  * This file is part of the GNUstep GWorkspace application
  *
@@ -42,16 +42,16 @@
 
 - (void)setInUse:(BOOL)value;
 
-- (int)index;
+- (NSInteger)index;
 
-- (void)setIndex:(int)idx;
+- (void)setIndex:(NSInteger)idx;
 
 - (NSDictionary *)searchCriteria;
 
 - (BOOL)checkPath:(NSString *)path 
    withAttributes:(NSDictionary *)attributes;
 
-- (int)compareModule:(id <FinderModulesProtocol>)module;
+- (NSComparisonResult)compareModule:(id <FinderModulesProtocol>)module;
 
 - (BOOL)reliesOnModDate;
 

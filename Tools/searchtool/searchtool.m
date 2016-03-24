@@ -1,6 +1,6 @@
 /* searchtool.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: February 2004
@@ -22,10 +22,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "FinderModulesProtocol.h"
-#include "config.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import "FinderModulesProtocol.h"
+#import "config.h"
 
 
 
@@ -159,7 +159,7 @@
   BOOL isdir;
   NSMutableArray *bundlesPaths;
   NSEnumerator *enumerator;
-  int i;
+  NSUInteger i;
 
   bundlesPaths = [NSMutableArray array];
   enumerator = [NSSearchPathForDirectoriesInDomains
@@ -201,7 +201,7 @@
     NSString *path = [paths objectAtIndex: i];
     NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: YES];
     NSString *type = [attributes fileType];
-    int j;
+    NSUInteger j;
     
     if (type == NSFileTypeDirectory) {
       CREATE_AUTORELEASE_POOL(arp1);
