@@ -11,6 +11,9 @@
 	* GWorkspace/Finder/Modules/FinderModulesProtocol.h
 	use NSInteger and NSComparisonResult instead of int.
 
+	* Tools/searchtool/searchtool.m
+	Clean up code and make it more robust.
+
 2016-03-23 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/Desktop/GWDesktopManager.m
