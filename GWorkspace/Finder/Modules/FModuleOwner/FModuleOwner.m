@@ -1,6 +1,6 @@
 /* FModuleOwner.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -22,9 +22,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "FinderModulesProtocol.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import "FinderModulesProtocol.h"
 
 static NSString *nibName = @"FModuleOwner";
 
@@ -34,12 +34,12 @@ static NSString *nibName = @"FModuleOwner";
   IBOutlet id controlsBox;
   IBOutlet id popUp;
   IBOutlet id textField;
-  int index;
+  NSInteger index;
   BOOL used;
 
   NSFileManager *fm;
   NSString *owner;
-  int how;
+  NSInteger how;
 }
 
 - (IBAction)popUpAction:(id)sender; 
@@ -60,10 +60,10 @@ static NSString *nibName = @"FModuleOwner";
 
 - (id)initInterface
 {
-	self = [super init];
+  self = [super init];
 
   if (self) {
-		if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
+    if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
       NSLog(@"failed to load %@!", nibName);
       DESTROY (self);
       return self;
@@ -86,13 +86,13 @@ static NSString *nibName = @"FModuleOwner";
     [popUp selectItemAtIndex: 0]; 
   }
   
-	return self;
+  return self;
 }
 
 - (id)initWithSearchCriteria:(NSDictionary *)criteria
                   searchTool:(id)tool
 {
-	self = [super init];
+  self = [super init];
 
   if (self) {
     ASSIGN (owner, [criteria objectForKey: @"what"]);
@@ -100,7 +100,7 @@ static NSString *nibName = @"FModuleOwner";
     fm = [NSFileManager defaultManager];
   }
   
-	return self;
+  return self;
 }
 
 - (IBAction)popUpAction:(id)sender
@@ -113,7 +113,7 @@ static NSString *nibName = @"FModuleOwner";
   NSString *str = [info objectForKey: @"what"];
 
   if (num) {
-    [popUp selectItemAtIndex: [num intValue]];
+    [popUp selectItemAtIndex: [num integerValue]];
   }
   
   if (str && [str length]) {
@@ -141,12 +141,12 @@ static NSString *nibName = @"FModuleOwner";
   used = value;
 }
 
-- (int)index
+- (NSInteger)index
 {
   return index;
 }
 
-- (void)setIndex:(int)idx
+- (void)setIndex:(NSInteger)idx
 {
   index = idx;
 }
@@ -157,10 +157,10 @@ static NSString *nibName = @"FModuleOwner";
   
   if ([str length] != 0) {
     NSMutableDictionary *criteria = [NSMutableDictionary dictionary];
-    int idx = [popUp indexOfSelectedItem];
+    NSInteger idx = [popUp indexOfSelectedItem];
   
     [criteria setObject: str forKey: @"what"];
-    [criteria setObject: [NSNumber numberWithInt: idx] forKey: @"how"];
+    [criteria setObject: [NSNumber numberWithInteger: idx] forKey: @"how"];
     
     return criteria;
   }
@@ -175,10 +175,10 @@ static NSString *nibName = @"FModuleOwner";
   return (how == IS) ? found : !found;
 }
 
-- (int)compareModule:(id <FinderModulesProtocol>)module
+- (NSComparisonResult)compareModule:(id <FinderModulesProtocol>)module
 {
-  int i1 = [self index];
-  int i2 = [module index];
+  NSInteger i1 = [self index];
+  NSInteger i2 = [module index];
 
   if (i1 < i2) {
     return NSOrderedAscending;

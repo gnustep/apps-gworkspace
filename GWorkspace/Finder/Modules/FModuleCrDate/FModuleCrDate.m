@@ -1,6 +1,6 @@
 /* FModuleCrDate.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -39,13 +39,13 @@ static NSString *nibName = @"FModuleCrDate";
   IBOutlet id dateField;
   IBOutlet id dateStepper;
   double stepperValue;
-  int index;
+  NSInteger index;
   BOOL used;
 
   NSFileManager *fm;
   NSCalendarDate *date;
   NSTimeInterval interval;
-  int how;
+  NSInteger how;
 }
 
 - (IBAction)popUpAction:(id)sender; 
@@ -193,7 +193,7 @@ static NSString *nibName = @"FModuleCrDate";
 - (IBAction)popUpAction:(id)sender
 {
   if (sender == isPopUp) {
-    int idx = [sender indexOfSelectedItem];
+    NSInteger idx = [sender indexOfSelectedItem];
     NSView *view = [controlsBox contentView];
     NSArray *views = [view subviews];
 
@@ -269,7 +269,7 @@ static NSString *nibName = @"FModuleCrDate";
   NSNumber *num = [info objectForKey: @"how"];
   
   if (num) {
-    int idx = [num intValue];
+    NSInteger idx = [num integerValue];
 
     [isPopUp selectItemAtIndex: idx];
     [self popUpAction: isPopUp];
@@ -341,12 +341,12 @@ static NSString *nibName = @"FModuleCrDate";
   used = value;
 }
 
-- (int)index
+- (NSInteger)index
 {
   return index;
 }
 
-- (void)setIndex:(int)idx
+- (void)setIndex:(NSInteger)idx
 {
   index = idx;
 }
@@ -356,7 +356,7 @@ static NSString *nibName = @"FModuleCrDate";
   NSMutableDictionary *criteria = [NSMutableDictionary dictionary];
   NSCalendarDate *cdate = [NSCalendarDate calendarDate];
   NSTimeInterval limit = 0.0;
-  int idx = [isPopUp indexOfSelectedItem];
+  NSInteger idx = [isPopUp indexOfSelectedItem];
   
   if (idx == TODAY) {
     NSCalendarDate *midnight;
@@ -458,10 +458,10 @@ static NSString *nibName = @"FModuleCrDate";
   return NO;
 }
 
-- (int)compareModule:(id <FinderModulesProtocol>)module
+- (NSComparisonResult)compareModule:(id <FinderModulesProtocol>)module
 {
-  int i1 = [self index];
-  int i2 = [module index];
+  NSInteger i1 = [self index];
+  NSInteger i2 = [module index];
 
   if (i1 < i2) {
     return NSOrderedAscending;

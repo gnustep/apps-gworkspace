@@ -1,6 +1,6 @@
 /* FModuleName.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -34,11 +34,11 @@ static NSString *nibName = @"FModuleName";
   IBOutlet id controlsBox;
   IBOutlet id popUp;
   IBOutlet id textField;
-  int index;
+  NSInteger index;
   BOOL used;
   
   NSString *searchStr;
-  int how;
+  NSInteger how;
 }
 
 - (IBAction)popUpAction:(id)sender; 
@@ -109,14 +109,14 @@ static NSString *nibName = @"FModuleName";
 - (id)initWithSearchCriteria:(NSDictionary *)criteria
                   searchTool:(id)tool
 {
-	self = [super init];
+  self = [super init];
 
   if (self) {
     ASSIGN (searchStr, [criteria objectForKey: @"what"]);
-    how = [[criteria objectForKey: @"how"] intValue];
+    how = [[criteria objectForKey: @"how"] integerValue];
   }
   
-	return self;
+  return self;
 }
 
 - (void)setControlsState:(NSDictionary *)info
@@ -125,7 +125,7 @@ static NSString *nibName = @"FModuleName";
   NSString *str = [info objectForKey: @"what"];
 
   if (num) {
-    [popUp selectItemAtIndex: [num intValue]];
+    [popUp selectItemAtIndex: [num integerValue]];
   }
   
   if (str && [str length]) {
@@ -153,12 +153,12 @@ static NSString *nibName = @"FModuleName";
   used = value;
 }
 
-- (int)index
+- (NSInteger)index
 {
   return index;
 }
 
-- (void)setIndex:(int)idx
+- (void)setIndex:(NSInteger)idx
 {
   index = idx;
 }
@@ -169,10 +169,10 @@ static NSString *nibName = @"FModuleName";
   
   if ([str length] != 0) {
     NSMutableDictionary *criteria = [NSMutableDictionary dictionary];
-    int idx = [popUp indexOfSelectedItem];
+    NSInteger idx = [popUp indexOfSelectedItem];
   
     [criteria setObject: str forKey: @"what"];
-    [criteria setObject: [NSNumber numberWithInt: idx] forKey: @"how"];
+    [criteria setObject: [NSNumber numberWithInteger: idx] forKey: @"how"];
     
     return criteria;
   }
@@ -214,10 +214,10 @@ static NSString *nibName = @"FModuleName";
   return pathok;
 }
 
-- (int)compareModule:(id <FinderModulesProtocol>)module
+- (NSComparisonResult)compareModule:(id <FinderModulesProtocol>)module
 {
-  int i1 = [self index];
-  int i2 = [module index];
+  NSInteger i1 = [self index];
+  NSInteger i2 = [module index];
 
   if (i1 < i2) {
     return NSOrderedAscending;

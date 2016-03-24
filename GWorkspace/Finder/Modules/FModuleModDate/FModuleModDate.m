@@ -1,6 +1,6 @@
 /* FModuleModDate.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -39,13 +39,13 @@ static NSString *nibName = @"FModuleModDate";
   IBOutlet id dateField;
   IBOutlet id dateStepper;
   double stepperValue;
-  int index;
+  NSInteger index;
   BOOL used;
 
   NSFileManager *fm;
   NSCalendarDate *date;
   NSTimeInterval interval;
-  int how;
+  NSInteger how;
 }
 
 - (IBAction)popUpAction:(id)sender; 
@@ -175,7 +175,7 @@ static NSString *nibName = @"FModuleModDate";
 - (id)initWithSearchCriteria:(NSDictionary *)criteria
                   searchTool:(id)tool
 {
-	self = [super init];
+  self = [super init];
 
   if (self) {
     how = [[criteria objectForKey: @"how"] intValue];
@@ -189,13 +189,13 @@ static NSString *nibName = @"FModuleModDate";
     fm = [NSFileManager defaultManager];
   }
   
-	return self;
+  return self;
 }
 
 - (IBAction)popUpAction:(id)sender
 {
   if (sender == isPopUp) {
-    int idx = [sender indexOfSelectedItem];
+    NSInteger idx = [sender indexOfSelectedItem];
     NSView *view = [controlsBox contentView];
     NSArray *views = [view subviews];
 
@@ -271,14 +271,14 @@ static NSString *nibName = @"FModuleModDate";
   NSNumber *num = [info objectForKey: @"how"];
   
   if (num) {
-    int idx = [num intValue];
+    NSInteger idx = [num integerValue];
 
     [isPopUp selectItemAtIndex: idx];
     [self popUpAction: isPopUp];
 
     if (idx == WITHIN) {
       NSNumber *limnum = [info objectForKey: @"limit"];
-      int whenidx = 0;
+      NSInteger whenidx = 0;
 
       if (limnum) {
         double limit = [limnum doubleValue];
@@ -343,12 +343,12 @@ static NSString *nibName = @"FModuleModDate";
   used = value;
 }
 
-- (int)index
+- (NSInteger)index
 {
   return index;
 }
 
-- (void)setIndex:(int)idx
+- (void)setIndex:(NSInteger)idx
 {
   index = idx;
 }
@@ -358,7 +358,7 @@ static NSString *nibName = @"FModuleModDate";
   NSMutableDictionary *criteria = [NSMutableDictionary dictionary];
   NSCalendarDate *cdate = [NSCalendarDate calendarDate];
   NSTimeInterval limit = 0.0;
-  int idx = [isPopUp indexOfSelectedItem];
+  NSInteger idx = [isPopUp indexOfSelectedItem];
   
   if (idx == TODAY) {
     NSCalendarDate *midnight;
@@ -374,7 +374,7 @@ static NSString *nibName = @"FModuleModDate";
     limit = [midnight timeIntervalSinceNow];
          
   } else if (idx == WITHIN) {
-    int when = [whenPopUp indexOfSelectedItem];
+    NSInteger when = [whenPopUp indexOfSelectedItem];
 
     switch(when) {
       case LAST_DAY:
@@ -460,10 +460,10 @@ static NSString *nibName = @"FModuleModDate";
   return NO;
 }
 
-- (int)compareModule:(id <FinderModulesProtocol>)module
+- (NSComparisonResult)compareModule:(id <FinderModulesProtocol>)module
 {
-  int i1 = [self index];
-  int i2 = [module index];
+  NSInteger i1 = [self index];
+  NSInteger i2 = [module index];
 
   if (i1 < i2) {
     return NSOrderedAscending;

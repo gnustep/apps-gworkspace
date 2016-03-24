@@ -36,12 +36,12 @@ static NSString *nibName = @"FModuleSize";
   IBOutlet id controlsBox;
   IBOutlet id popUp;
   IBOutlet id textField;
-  int index;
+  NSInteger index;
   BOOL used;
 
   NSFileManager *fm;
   unsigned long long size;
-  int how;
+  NSInteger how;
 }
 
 - (IBAction)popUpAction:(id)sender; 
@@ -61,7 +61,7 @@ static NSString *nibName = @"FModuleSize";
 
 - (id)initInterface
 {
-	self = [super init];
+  self = [super init];
 
   if (self) {
 		if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
@@ -91,7 +91,7 @@ static NSString *nibName = @"FModuleSize";
 - (id)initWithSearchCriteria:(NSDictionary *)criteria
                   searchTool:(id)tool
 {
-	self = [super init];
+  self = [super init];
 
   if (self) {
     size = [[criteria objectForKey: @"what"] unsignedLongLongValue];
@@ -99,7 +99,7 @@ static NSString *nibName = @"FModuleSize";
     fm = [NSFileManager defaultManager];
   }
   
-	return self;
+  return self;
 }
 
 - (IBAction)popUpAction:(id)sender
@@ -112,7 +112,7 @@ static NSString *nibName = @"FModuleSize";
   NSNumber *sizenum = [info objectForKey: @"what"];
 
   if (idxnum) {
-    [popUp selectItemAtIndex: [idxnum intValue]];
+    [popUp selectItemAtIndex: [idxnum integerValue]];
   }
 
   if (sizenum) {
@@ -140,12 +140,12 @@ static NSString *nibName = @"FModuleSize";
   used = value;
 }
 
-- (int)index
+- (NSInteger)index
 {
   return index;
 }
 
-- (void)setIndex:(int)idx
+- (void)setIndex:(NSInteger)idx
 {
   index = idx;
 }
@@ -159,10 +159,10 @@ static NSString *nibName = @"FModuleSize";
   
     if ((sz > 0) && (sz < INT_MAX)) {
       NSMutableDictionary *criteria = [NSMutableDictionary dictionary];
-      int idx = [popUp indexOfSelectedItem];
+      NSInteger idx = [popUp indexOfSelectedItem];
   
       [criteria setObject: [NSNumber numberWithLong: sz] forKey: @"what"];  
-      [criteria setObject: [NSNumber numberWithInt: idx] forKey: @"how"];
+      [criteria setObject: [NSNumber numberWithInteger: idx] forKey: @"how"];
   
       return criteria;
     }
@@ -185,10 +185,10 @@ static NSString *nibName = @"FModuleSize";
   return NO;
 }
 
-- (int)compareModule:(id <FinderModulesProtocol>)module
+- (NSComparisonResult)compareModule:(id <FinderModulesProtocol>)module
 {
-  int i1 = [self index];
-  int i2 = [module index];
+  NSInteger i1 = [self index];
+  NSInteger i2 = [module index];
 
   if (i1 < i2) {
     return NSOrderedAscending;

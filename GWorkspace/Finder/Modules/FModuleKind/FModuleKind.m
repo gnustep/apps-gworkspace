@@ -1,6 +1,6 @@
 /* FModuleKind.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -34,13 +34,13 @@ static NSString *nibName = @"FModuleKind";
   IBOutlet id controlsBox;
   IBOutlet id isPopUp;
   IBOutlet id typePopUp;
-  int index;
+  NSInteger index;
   BOOL used;
 
   NSFileManager *fm;
   NSWorkspace *ws;
-  int kind;
-  int how;
+  NSInteger kind;
+  NSInteger how;
 }
 
 - (IBAction)popUpAction:(id)sender; 
@@ -105,8 +105,8 @@ static NSString *nibName = @"FModuleKind";
 	self = [super init];
 
   if (self) {
-    kind = [[criteria objectForKey: @"what"] intValue];
-    how = [[criteria objectForKey: @"how"] intValue];
+    kind = [[criteria objectForKey: @"what"] integerValue];
+    how = [[criteria objectForKey: @"how"] integerValue];
     fm = [NSFileManager defaultManager];
     ws = [NSWorkspace sharedWorkspace];
   }
@@ -153,24 +153,24 @@ static NSString *nibName = @"FModuleKind";
   used = value;
 }
 
-- (int)index
+- (NSInteger)index
 {
   return index;
 }
 
-- (void)setIndex:(int)idx
+- (void)setIndex:(NSInteger)idx
 {
   index = idx;
 }
 
 - (NSDictionary *)searchCriteria
 {
-  int is = [isPopUp indexOfSelectedItem];
-  int type = [typePopUp indexOfSelectedItem];
+  NSInteger is = [isPopUp indexOfSelectedItem];
+  NSInteger type = [typePopUp indexOfSelectedItem];
   NSMutableDictionary *criteria = [NSMutableDictionary dictionary];
 
-  [criteria setObject: [NSNumber numberWithInt: is] forKey: @"how"];
-  [criteria setObject: [NSNumber numberWithInt: type] forKey: @"what"];
+  [criteria setObject: [NSNumber numberWithInteger: is] forKey: @"how"];
+  [criteria setObject: [NSNumber numberWithInteger: type] forKey: @"what"];
 
   return criteria;
 }
@@ -212,10 +212,10 @@ static NSString *nibName = @"FModuleKind";
   return (how == IS) ? found : !found;
 }
 
-- (int)compareModule:(id <FinderModulesProtocol>)module
+- (NSComparisonResult)compareModule:(id <FinderModulesProtocol>)module
 {
-  int i1 = [self index];
-  int i2 = [module index];
+  NSInteger i1 = [self index];
+  NSInteger i2 = [module index];
 
   if (i1 < i2) {
     return NSOrderedAscending;

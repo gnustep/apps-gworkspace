@@ -1,6 +1,6 @@
 /* FModuleAnnotations.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -34,11 +34,11 @@ static NSString *nibName = @"FModuleAnnotations";
   IBOutlet id controlsBox;
   IBOutlet id popUp;
   IBOutlet id textField;
-  int index;
+  NSInteger index;
   BOOL used;
 
   NSString *contentsStr;
-  int how;
+  NSInteger how;
   
   id searchtool;
 }
@@ -63,7 +63,7 @@ static NSString *nibName = @"FModuleAnnotations";
 
 - (id)initInterface
 {
-	self = [super init];
+  self = [super init];
 
   if (self) {
 		if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
@@ -96,7 +96,7 @@ static NSString *nibName = @"FModuleAnnotations";
     [popUp selectItemAtIndex: ONE_WORD]; 
   }
   
-	return self;
+  return self;
 }
 
 - (IBAction)popUpAction:(id)sender
@@ -110,11 +110,11 @@ static NSString *nibName = @"FModuleAnnotations";
 
   if (self) {
     ASSIGN (contentsStr, [criteria objectForKey: @"what"]);
-    how = [[criteria objectForKey: @"how"] intValue];
+    how = [[criteria objectForKey: @"how"] integerValue];
     searchtool = tool;
   }
   
-	return self;
+  return self;
 }
 
 - (void)setControlsState:(NSDictionary *)info
@@ -151,12 +151,12 @@ static NSString *nibName = @"FModuleAnnotations";
   used = value;
 }
 
-- (int)index
+- (NSInteger)index
 {
   return index;
 }
 
-- (void)setIndex:(int)idx
+- (void)setIndex:(NSInteger)idx
 {
   index = idx;
 }
@@ -167,10 +167,10 @@ static NSString *nibName = @"FModuleAnnotations";
   
   if ([str length] != 0) {
     NSMutableDictionary *criteria = [NSMutableDictionary dictionary];
-    int idx = [popUp indexOfSelectedItem];
+    NSInteger idx = [popUp indexOfSelectedItem];
   
     [criteria setObject: str forKey: @"what"];
-    [criteria setObject: [NSNumber numberWithInt: idx] forKey: @"how"];
+    [criteria setObject: [NSNumber numberWithInteger: idx] forKey: @"how"];
     
     return criteria;
   }
@@ -193,7 +193,7 @@ static NSString *nibName = @"FModuleAnnotations";
       found = (range.location != NSNotFound);    
     } else {
       NSArray *words = [contentsStr componentsSeparatedByString: @" "];
-      unsigned i;
+      NSUInteger i;
 
       for (i = 0; i < [words count]; i++) {
         NSString *word = [words objectAtIndex: i];
@@ -231,10 +231,10 @@ static NSString *nibName = @"FModuleAnnotations";
   return found;
 }
 
-- (int)compareModule:(id <FinderModulesProtocol>)module
+- (NSComparisonResult)compareModule:(id <FinderModulesProtocol>)module
 {
-  int i1 = [self index];
-  int i2 = [module index];
+  NSInteger i1 = [self index];
+  NSInteger i2 = [module index];
 
   if (i1 < i2) {
     return NSOrderedAscending;

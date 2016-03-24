@@ -1,6 +1,6 @@
 /* FModuleContents.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -22,9 +22,9 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "FinderModulesProtocol.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import "FinderModulesProtocol.h"
 
 #define MAXFSIZE 600000
 
@@ -36,7 +36,7 @@ static NSString *nibName = @"FModuleContents";
   IBOutlet id controlsBox;
   IBOutlet id label;
   IBOutlet id textField;
-  int index;
+  NSInteger index;
   BOOL used;
 
   NSString *searchStr;
@@ -57,7 +57,7 @@ static NSString *nibName = @"FModuleContents";
 
 - (id)initInterface
 {
-	self = [super init];
+  self = [super init];
 
   if (self) {
 		if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
@@ -80,13 +80,13 @@ static NSString *nibName = @"FModuleContents";
     [label setStringValue: NSLocalizedString(@"includes", @"")];
   }
   
-	return self;
+  return self;
 }
 
 - (id)initWithSearchCriteria:(NSDictionary *)criteria
                   searchTool:(id)tool
 {
-	self = [super init];
+  self = [super init];
 
   if (self) {
     ASSIGN (searchStr, [criteria objectForKey: @"what"]);
@@ -126,12 +126,12 @@ static NSString *nibName = @"FModuleContents";
   used = value;
 }
 
-- (int)index
+- (NSInteger)index
 {
   return index;
 }
 
-- (void)setIndex:(int)idx
+- (void)setIndex:(NSInteger)idx
 {
   index = idx;
 }
@@ -161,7 +161,7 @@ static NSString *nibName = @"FModuleContents";
     if (length) {
       const char *bytesStr = (const char *)[contents bytes];
       unsigned testlen = ((length < 256) ? length : 256);
-      int i;
+      unsigned i;
       
       for (i = 0; i < testlen; i++) {
         if (bytesStr[i] == 0x00) {
@@ -179,10 +179,10 @@ static NSString *nibName = @"FModuleContents";
   return contains;
 }
 
-- (int)compareModule:(id <FinderModulesProtocol>)module
+- (NSComparisonResult)compareModule:(id <FinderModulesProtocol>)module
 {
-  int i1 = [self index];
-  int i2 = [module index];
+  NSInteger i1 = [self index];
+  NSInteger i2 = [module index];
 
   if (i1 < i2) {
     return NSOrderedAscending;
