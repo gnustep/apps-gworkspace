@@ -1,6 +1,6 @@
 /* FSNodeRepIcons.m
  *  
- * Copyright (C) 2005-2015 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola
@@ -257,6 +257,19 @@ static unsigned char darkerLUT[256] = {
     
       icon = [NSImage imageNamed: @"Unknown"];
       icnsize = [icon size];
+      
+      if ([node isLink])
+        {
+          NSImage *linkIcon;
+          
+          linkIcon = [NSImage imageNamed:@"common_linkCursor"];
+          icon = [baseIcon copy];
+          [icon lockFocus];
+          [linkIcon compositeToPoint:NSMakePoint(0,0) operation:NSCompositeSourceOver];
+          [icon unlockFocus];
+          [icon autorelease];
+        }
+      
 
       if ((icnsize.width > size) || (icnsize.height > size)){
 	icon = [self resizedIcon: icon ofSize: size];
