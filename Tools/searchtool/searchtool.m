@@ -211,7 +211,7 @@
       CREATE_AUTORELEASE_POOL(arp1);
       NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: path];
       
-      while (1) {
+      while (!stopped) {
         CREATE_AUTORELEASE_POOL(arp2);
         NSString *currentPath = [enumerator nextObject];
       
