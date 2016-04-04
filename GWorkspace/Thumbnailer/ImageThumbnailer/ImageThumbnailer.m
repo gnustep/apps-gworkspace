@@ -116,7 +116,7 @@
           for (y = 0; y < dstsizeH; y++)
             for (x = 0; x < dstsizeW; x++)
               for (i = 0; i < srcSpp; i++)
-                destData[destBytesPerRow * y + destBytesPerPixel * x + i] = srcData[srcBytesPerRow * (int)(y * yratio)  + srcBytesPerPixel * (int)(x * xratio) + i];
+                destData[destBytesPerRow * y + destBytesPerPixel * x + i] = srcData[srcBytesPerRow * (int)floorf(y * yratio)  + srcBytesPerPixel * (int)floorf(x * xratio) + i];
           
           tiffData = [dstRep TIFFRepresentation];
           RETAIN (tiffData);
