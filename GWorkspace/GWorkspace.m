@@ -967,9 +967,17 @@ static GWorkspace *gworkspace = nil;
       
       if ([fm fileExistsAtPath: helpPath])
 	{
-	  NSAttributedString *help = [[NSAttributedString alloc] initWithPath: helpPath
-								 documentAttributes: NULL];
-      return AUTORELEASE (help);
+	  NS_DURING
+	    {
+	      NSAttributedString *help = [[NSAttributedString alloc] initWithPath: helpPath
+							       documentAttributes: NULL];
+	      return AUTORELEASE (help);
+	    }
+	  NS_HANDLER
+	    {
+	      return nil;
+	    }
+	  NS_ENDHANDLER;
 	}
     }
   
