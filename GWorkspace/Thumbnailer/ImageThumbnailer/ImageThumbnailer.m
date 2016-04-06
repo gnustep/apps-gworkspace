@@ -48,13 +48,14 @@
   CREATE_AUTORELEASE_POOL(arp);
   NSImage *image = [[NSImage alloc] initWithContentsOfFile: path];
 
-  if (image && [image isValid]) {
-    NSData *tiffData = [image TIFFRepresentation];
-    NSBitmapImageRep *srcRep = [NSBitmapImageRep imageRepWithData: tiffData];
-    int srcSpp = [srcRep samplesPerPixel];
-    int bitsPerPixel = [srcRep bitsPerPixel];
-    
-	  if (((srcSpp == 3) && (bitsPerPixel == 24)) 
+  if (image && [image isValid])
+    {
+      NSData *tiffData = [image TIFFRepresentation];
+      NSBitmapImageRep *srcRep = [NSBitmapImageRep imageRepWithData: tiffData];
+      NSInteger srcSpp = [srcRep samplesPerPixel];
+      NSInteger bitsPerPixel = [srcRep bitsPerPixel];
+      
+      if (((srcSpp == 3) && (bitsPerPixel == 24)) 
         || ((srcSpp == 4) && (bitsPerPixel == 32))
         || ((srcSpp == 1) && (bitsPerPixel == 8))
         || ((srcSpp == 2) && (bitsPerPixel == 16))) {
@@ -85,7 +86,7 @@
           unsigned char *srcData;
           unsigned char *destData;    
           unsigned x, y;
-          unsigned i;
+          NSInteger i;
           NSData *tiffData;
 
           dstsizeW = (NSInteger)floor([srcRep pixelsWide] / fact + 0.5);
@@ -127,8 +128,16 @@
           
         return AUTORELEASE (tiffData);
       }
+      }
+      else
+	{
+	  NSLog(@"Unsupported image depth/format: %@", path);
+	}
     }
-  }    
+  else
+    {
+      NSLog(@"Invalid image: %@", path);
+    }
   
   RELEASE (image);  
   RELEASE (arp);
