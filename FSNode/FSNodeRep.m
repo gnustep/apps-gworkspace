@@ -311,7 +311,7 @@ static FSNodeRep *shared = nil;
   if (hiddenNames || hideSysFiles || [hiddenPaths count])
     {
       NSMutableArray *filteredNames = [NSMutableArray array];
-      int i;
+      NSUInteger i;
 
       for (i = 0; i < [fnames count]; i++)
 	{
@@ -488,7 +488,7 @@ static FSNodeRep *shared = nil;
 
 - (void)lockNodes:(NSArray *)nodes
 {
-	int i;
+  NSUInteger i;
 	  
 	for (i = 0; i < [nodes count]; i++) {
     NSString *path = [[nodes objectAtIndex: i] path];
@@ -530,67 +530,69 @@ static FSNodeRep *shared = nil;
 
 - (void)unlockNodes:(NSArray *)nodes
 {
-	int i;
+  NSUInteger i;
 	  
-	for (i = 0; i < [nodes count]; i++) {
-    NSString *path = [[nodes objectAtIndex: i] path];
+  for (i = 0; i < [nodes count]; i++)
+    {
+      NSString *path = [[nodes objectAtIndex: i] path];
 	
 		if ([lockedPaths containsObject: path]) {
 			[lockedPaths removeObject: path];
 		} 
-	}
+    }
 }
 
 - (void)unlockPaths:(NSArray *)paths
 {
-	int i;
+  NSUInteger i;
 	  
-	for (i = 0; i < [paths count]; i++) {
-    NSString *path = [paths objectAtIndex: i];
-	
-		if ([lockedPaths containsObject: path]) {
-			[lockedPaths removeObject: path];
-		} 
-	}
+  for (i = 0; i < [paths count]; i++)
+    {
+      NSString *path = [paths objectAtIndex: i];
+      
+      if ([lockedPaths containsObject: path])
+        {
+          [lockedPaths removeObject: path];
+        } 
+    }
 }
 
 - (BOOL)isNodeLocked:(FSNode *)node
 {
   NSString *path = [node path];
-	int i;  
+  NSUInteger i;  
   
-	if ([lockedPaths containsObject: path]) {
-		return YES;
-	}
+  if ([lockedPaths containsObject: path])
+    return YES;
 	
-	for (i = 0; i < [lockedPaths count]; i++) {
-		NSString *lpath = [lockedPaths objectAtIndex: i];
-	
-    if (isSubpathOfPath(lpath, path)) {
-			return YES;
-		}
-	}
-	
-	return NO;
+  for (i = 0; i < [lockedPaths count]; i++)
+    {
+      NSString *lpath = [lockedPaths objectAtIndex: i];
+      
+      if (isSubpathOfPath(lpath, path)) {
+        return YES;
+      }
+    }
+  
+  return NO;
 }
 
 - (BOOL)isPathLocked:(NSString *)path
 {
-	int i;  
+  NSUInteger i;  
   
-	if ([lockedPaths containsObject: path]) {
-		return YES;
-	}
-	
-	for (i = 0; i < [lockedPaths count]; i++) {
-		NSString *lpath = [lockedPaths objectAtIndex: i];
-	
-    if (isSubpathOfPath(lpath, path)) {
-			return YES;
-		}
-	}
-	
-	return NO;
+  if ([lockedPaths containsObject: path])
+    return YES;
+  
+  for (i = 0; i < [lockedPaths count]; i++)
+    {
+      NSString *lpath = [lockedPaths objectAtIndex: i];
+      
+      if (isSubpathOfPath(lpath, path))
+        return YES;
+    }
+  
+  return NO;
 }
 
 - (void)setVolumes:(NSArray *)vls
@@ -657,7 +659,7 @@ static FSNodeRep *shared = nil;
 {
   NSArray *deleted = [info objectForKey: @"deleted"];	
   NSArray *created = [info objectForKey: @"created"];	
-  int i;
+  NSUInteger i;
 
   if (usesThumbnails == NO) {
     return;
