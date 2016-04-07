@@ -389,7 +389,7 @@ typedef enum FSNSelectionMask {
 
 - (void)setLabelWFactor:(float)f;
 
-- (float)heighOfFont:(NSFont *)font;
+- (float)heightOfFont:(NSFont *)font;
 
 - (int)defaultIconBaseShift;
 

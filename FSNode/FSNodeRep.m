@@ -355,7 +355,7 @@ static FSNodeRep *shared = nil;
   labelWFactor = f;
 }
 
-- (float)heighOfFont:(NSFont *)font
+- (float)heightOfFont:(NSFont *)font
 {
 //  return [font defaultLineHeightForFont];
   return ([font pointSize] * FONT_H_FACT);

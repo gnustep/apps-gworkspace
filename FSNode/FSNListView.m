@@ -1409,7 +1409,7 @@ static NSString *defaultColumns = @"{ \
       unsigned col = [listView columnWithIdentifier: num];
       NSRect r = [listView frameOfCellAtColumn: col row: row];
       NSFont *edfont = [nameEditor font];
-      float fnheight = [fsnodeRep heighOfFont: edfont]; 
+      float fnheight = [fsnodeRep heightOfFont: edfont]; 
       
       float xshift = [[rep icon] size].width + 4;
   

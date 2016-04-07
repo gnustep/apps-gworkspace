@@ -287,7 +287,7 @@
     highlightSize.height = iconSize + 4;
   }
 
-  labelSize.height = myrintf([fsnodeRep heighOfFont: labelFont]);
+  labelSize.height = myrintf([fsnodeRep heightOfFont: labelFont]);
   gridSize.height = highlightSize.height + labelSize.height;
 }
 

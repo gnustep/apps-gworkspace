@@ -1,6 +1,6 @@
 /* History.m
  *  
- * Copyright (C) 2003-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -78,7 +78,7 @@
     [matrix setDoubleAction: @selector(matrixAction:)];
     [matrix setIntercellSpacing: NSZeroSize];
     ms.width = [[scrollView contentView] bounds].size.width;
-    ms.height = [[FSNodeRep sharedInstance] heighOfFont: [NSFont systemFontOfSize: 12]];
+    ms.height = [[FSNodeRep sharedInstance] heightOfFont: [NSFont systemFontOfSize: 12]];
     
     [matrix setCellSize: ms];
     [matrix setAutoscroll: YES];

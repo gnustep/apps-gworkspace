@@ -1,6 +1,6 @@
 /* FSNIcon.m
  *  
- * Copyright (C) 2004-2014 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -217,7 +217,7 @@ static NSImage *branchImage;
     
     labelRect = NSZeroRect;
     labelRect.size.width = [label uncutTitleLenght] + [fsnodeRep labelMargin];
-    labelRect.size.height = [fsnodeRep heighOfFont: [label font]];
+    labelRect.size.height = [fsnodeRep heightOfFont: [label font]];
     labelRect = NSIntegralRect(labelRect);
 
     infoRect = NSZeroRect;
@@ -226,7 +226,7 @@ static NSImage *branchImage;
     } else {
       infoRect.size.width = labelRect.size.width;
     }
-    infoRect.size.height = [fsnodeRep heighOfFont: [infolabel font]];
+    infoRect.size.height = [fsnodeRep heightOfFont: [infolabel font]];
     infoRect = NSIntegralRect(infoRect);
 
     icnPosition = ipos;
@@ -875,7 +875,7 @@ static NSImage *branchImage;
   [infolabel setFont: infoFont];
 
   labelRect.size.width = myrintf([label uncutTitleLenght] + lblmargin);
-  labelRect.size.height = myrintf([fsnodeRep heighOfFont: [label font]]);
+  labelRect.size.height = myrintf([fsnodeRep heightOfFont: [label font]]);
   labelRect = NSIntegralRect(labelRect);
 
   infoRect = NSZeroRect;
@@ -884,7 +884,7 @@ static NSImage *branchImage;
   } else {
     infoRect.size.width = labelRect.size.width;
   }
-  infoRect.size.height = [fsnodeRep heighOfFont: infoFont];
+  infoRect.size.height = [fsnodeRep heightOfFont: infoFont];
   infoRect = NSIntegralRect(infoRect);
 
   [self tile];
@@ -927,7 +927,7 @@ static NSImage *branchImage;
   ASSIGN (highlightPath, [fsnodeRep highlightPathOfSize: hlightRect.size]); 
 
   labelRect.size.width = [label uncutTitleLenght] + [fsnodeRep labelMargin];
-  labelRect.size.height = [fsnodeRep heighOfFont: [label font]];
+  labelRect.size.height = [fsnodeRep heightOfFont: [label font]];
 
   [self tile];
 }

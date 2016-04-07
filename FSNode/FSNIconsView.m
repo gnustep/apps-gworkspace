@@ -217,7 +217,7 @@ static void GWHighlightFrameRect(NSRect aRect)
     highlightSize.height = iconSize + 4;
   }
 
-  labelSize.height = floor([fsnodeRep heighOfFont: labelFont]);
+  labelSize.height = floor([fsnodeRep heightOfFont: labelFont]);
   labelSize.width = [fsnodeRep labelWFactor] * labelTextSize;
 
   gridSize.height = highlightSize.height;

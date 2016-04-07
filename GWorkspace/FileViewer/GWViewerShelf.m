@@ -1,6 +1,6 @@
 /* GWViewerShelf.h
  *  
- * Copyright (C) 2004-2014 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2004
@@ -376,7 +376,7 @@
     highlightSize.height = iconSize + 4;
   }
 
-  labelSize.height = myrintf([fsnodeRep heighOfFont: labelFont]);
+  labelSize.height = myrintf([fsnodeRep heightOfFont: labelFont]);
   labelSize.width = gridSize.width;
   gridSize.height = highlightSize.height + labelSize.height;
 }
@@ -501,7 +501,7 @@
   hlightRect.size.width = ceil(iconSize / 3 * 4);
   hlightRect.size.height = ceil(hlightRect.size.width * [fsnodeRep highlightHeightFactor]);
   hlightRect.origin.x = ceil((gridSize.width - hlightRect.size.width) / 2);   
-  hlightRect.origin.y = floor([fsnodeRep heighOfFont: labelFont]);
+  hlightRect.origin.y = floor([fsnodeRep heightOfFont: labelFont]);
   
   icnBounds.origin.x += hlightRect.origin.x + ((hlightRect.size.width - iconSize) / 2);
   icnBounds.origin.y += hlightRect.origin.y + ((hlightRect.size.height - iconSize) / 2);
@@ -512,13 +512,13 @@
 - (void)tile
 {
   NSArray *subviews = [self subviews];
-  int i;
+  NSUInteger i;
 
   [self makeIconsGrid];
   
   for (i = 0; i < [icons count]; i++) {
     FSNIcon *icon = [icons objectAtIndex: i];
-    int index = [icon gridIndex];
+    NSUInteger index = [icon gridIndex];
     
     if (index < gridcount) {
       if ([subviews containsObject: icon] == NO) {

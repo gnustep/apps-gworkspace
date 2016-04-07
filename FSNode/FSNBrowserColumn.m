@@ -1,6 +1,6 @@
 /* FSNBrowserColumn.m
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2004
@@ -113,7 +113,7 @@ static id <DesktopApplication> desktopApp = nil;
       [self setFrame: rect];
     
       fsnodeRep = [FSNodeRep sharedInstance];
-      lineh = floor([fsnodeRep heighOfFont: [acell font]]);
+      lineh = floor([fsnodeRep heightOfFont: [acell font]]);
     
       scroll = [[FSNBrowserScroll alloc] initWithFrame: rect 
 					      inColumn: self acceptDnd: cellsIcon];
@@ -158,7 +158,7 @@ static id <DesktopApplication> desktopApp = nil;
 {
   if (infoType != type) {
     NSArray *cells = [matrix cells];
-    int lineh = floor([fsnodeRep heighOfFont: [cellPrototype font]]);
+    int lineh = floor([fsnodeRep heightOfFont: [cellPrototype font]]);
     NSUInteger i;
     
     infoType = type;
@@ -186,7 +186,7 @@ static id <DesktopApplication> desktopApp = nil;
 {
   if ((extInfoType == nil) || ([extInfoType isEqual: type] == NO)) {
     NSArray *cells = [matrix cells];    
-    int lineh = floor([fsnodeRep heighOfFont: [cellPrototype font]]);  
+    int lineh = floor([fsnodeRep heightOfFont: [cellPrototype font]]);  
     NSUInteger i;
     
     infoType = FSNInfoExtendedType;

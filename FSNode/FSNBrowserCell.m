@@ -1,6 +1,6 @@
 /* FSNBrowserCell.m
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: March 2004
@@ -229,7 +229,7 @@ static NSString *dots = @"...";
     if (icon == nil) {
       if (nameEdited == NO) {
         if (infoCell) {
-          infoheight = floor([[FSNodeRep sharedInstance] heighOfFont: [infoCell font]]);
+          infoheight = floor([[FSNodeRep sharedInstance] heightOfFont: [infoCell font]]);
 
           if (([self isHighlighted] || [self state]) && (nameEdited == NO)) {
 	          [[self highlightColorInView: controlView] set];
@@ -430,7 +430,7 @@ static NSString *dots = @"...";
 {
   if (selection) {
     NSMutableArray *selpaths = [NSMutableArray array];
-    int i;
+    NSUInteger i;
 
     for (i = 0; i < [selection count]; i++) {
       [selpaths addObject: [[selection objectAtIndex: i] path]];

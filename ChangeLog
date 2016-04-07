@@ -3,6 +3,21 @@
 	* FSNode/FSNodeRep.m
 	Cleanup and use NSUInteger
 
+	* FSNode/FSNBrowser.m
+	* FSNode/FSNBrowserCell.m
+	* FSNode/FSNBrowserColumn.m
+	* FSNode/FSNIcon.m
+	* FSNode/FSNIconsView.m
+	* FSNode/FSNListView.m
+	* FSNode/FSNPathComponentsViewer.m
+	* FSNode/FSNodeRep.h
+	* FSNode/FSNodeRep.m
+	* GWorkspace/Desktop/GWDesktopView.m
+	* GWorkspace/FileViewer/GWViewerIconsPath.m
+	* GWorkspace/FileViewer/GWViewerShelf.m
+	* GWorkspace/History/History.
+	Refactor heighOfFont to heightOfFont
+
 2016-04-06 17:41-EDT Gregory John Casamento <greg.casamento@gmail.com>
 
 	* GWorkspace/GWorkspace.m: Add exception handler when loading

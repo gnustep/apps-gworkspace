@@ -1,6 +1,6 @@
 /* FSNPathComponentsViewer.m
  *  
- * Copyright (C) 2005-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: October 2005
@@ -346,7 +346,7 @@ static NSImage *branchImage;
       
   if (labelRect.size.width <= ([self bounds].size.width - minwidth)) {
     labelRect.origin.x = iconRect.size.width + ELEM_MARGIN;
-    labelRect.size.height = [fsnodeRep heighOfFont: [label font]];
+    labelRect.size.height = [fsnodeRep heightOfFont: [label font]];
     labelRect.origin.y = (iconRect.size.height - labelRect.size.height) / 2;  
     labelRect = NSIntegralRect(labelRect);  
   } else {

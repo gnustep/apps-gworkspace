@@ -2169,7 +2169,7 @@
     if (canedit) {   
       NSMatrix *matrix = [col cmatrix];
       NSFont *edfont = [nameEditor font];
-      float fnheight = [fsnodeRep heighOfFont: edfont];
+      float fnheight = [fsnodeRep heightOfFont: edfont];
       NSRect r = [cell labelRect];
       
       r = [matrix convertRect: r toView: self];
