@@ -1,3 +1,8 @@
+2016-04-12 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/Desktop/Dock/Dock.m
+	Use numeric search to sort icons index array.
+
 2016-04-07 Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNodeRep.m

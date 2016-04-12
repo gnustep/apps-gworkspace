@@ -35,6 +35,19 @@
 #define MIN_ICN_SIZE 16
 #define ICN_INCR 4
 
+/* small category to access NSNUmericSearch through a selector */
+
+@interface NSString (NumericSort)
+- (NSComparisonResult)numericCompare:(NSString *)s;
+@end
+
+@implementation NSString (NumericSort)
+- (NSComparisonResult)numericCompare:(NSString *)s
+{
+  return [self compare:s options:NSNumericSearch];
+}
+@end
+
 @implementation Dock
 
 - (void)dealloc
@@ -95,7 +108,7 @@
     if (appsdict) {
       NSArray *indexes = [appsdict allKeys];
     
-      indexes = [indexes sortedArrayUsingSelector: @selector(compare:)];
+      indexes = [indexes sortedArrayUsingSelector: @selector(numericCompare:)];
     
       for (i = 0; i < [indexes count]; i++) {
         NSNumber *index = [indexes objectAtIndex: i];
