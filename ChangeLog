@@ -3,6 +3,9 @@
 	* GWorkspace/Desktop/Dock/Dock.m
 	Use numeric search to sort icons index array.
 
+	* FSNode/Resources/Images/HardDisk.tiff
+	New icon by Bertrand
+
 2016-04-07 Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNodeRep.m
