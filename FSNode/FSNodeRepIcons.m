@@ -134,14 +134,12 @@ static unsigned char darkerLUT[256] = {
       if ([node isApplication])
 	{
 	  key = nodepath;
-
 	}
       else if (([node isMountPoint] && [volumes containsObject: nodepath])
 	       || [volumes containsObject: nodepath])
 	{
 	  key = @"disk";
 	  baseIcon = hardDiskIcon;
-
 	}
       else if ([node isPackage] == NO)
 	{
