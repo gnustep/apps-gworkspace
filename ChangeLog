@@ -1,3 +1,8 @@
+2016-04-13 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNodeRepIcons.m
+	Use different cache keys for icons and icons with link badge. Remove fail-over case which should not happen and Log a warning instead.
+
 2016-04-12 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/Desktop/Dock/Dock.m

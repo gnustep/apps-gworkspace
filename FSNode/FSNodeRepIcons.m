@@ -185,14 +185,13 @@ static unsigned char darkerLUT[256] = {
 	    }
 	}
     }  
-    
-  if (icon == nil)
+  else
     { // NOT DIRECTORY
+      NSString *realPath;
+
+      realPath = [nodepath stringByResolvingSymlinksInPath];
       if (usesThumbnails)
 	{
-	  NSString *realPath;
-
-	  realPath = [nodepath stringByResolvingSymlinksInPath];
 	  icon = [self thumbnailForPath: realPath];
       
 	  if (icon) {
@@ -216,12 +215,13 @@ static unsigned char darkerLUT[256] = {
 	      }  
 	  }
 	}
-    
+      // no thumbnail found
       if (icon == nil)
 	{
-	  NSString *ext = [[nodepath pathExtension] lowercaseString];
+          NSString *linkKey;
+	  NSString *ext = [[realPath pathExtension] lowercaseString];
       
-	  if (ext && ([ext isEqual: @""] == NO))
+	  if (ext && [ext length])
 	    {
 	      key = ext;
 	    }
@@ -229,8 +229,14 @@ static unsigned char darkerLUT[256] = {
 	    {
 	      key = @"unknown";
 	    }
-      
-	  icon = [self cachedIconOfSize: size forKey: key];
+          linkKey = nil;
+          if ([node isLink])
+            {
+              linkKey = [key stringByAppendingString:@"_linked"];
+              icon = [self cachedIconOfSize: size forKey: linkKey];
+            }
+          if (icon == nil)
+            icon = [self cachedIconOfSize: size forKey: key];
 
 	  if (icon == nil)
 	    {
@@ -245,35 +251,19 @@ static unsigned char darkerLUT[256] = {
 		  [linkIcon compositeToPoint:NSMakePoint(0,0) operation:NSCompositeSourceOver];
 		  [baseIcon unlockFocus];
 		  [baseIcon autorelease];
+                  icon = [self cachedIconOfSize: size forKey: linkKey addBaseIcon: baseIcon];
 		}
-	      icon = [self cachedIconOfSize: size forKey: key addBaseIcon: baseIcon];
+              else
+                {
+                  icon = [self cachedIconOfSize: size forKey: key addBaseIcon: baseIcon];
+                }
 	    }
 	}      
     }      
 
   if (icon == nil)
     {
-      NSSize icnsize;
-    
-      icon = [NSImage imageNamed: @"Unknown"];
-      icnsize = [icon size];
-      
-      if ([node isLink])
-        {
-          NSImage *linkIcon;
-          
-          linkIcon = [NSImage imageNamed:@"common_linkCursor"];
-          icon = [baseIcon copy];
-          [icon lockFocus];
-          [linkIcon compositeToPoint:NSMakePoint(0,0) operation:NSCompositeSourceOver];
-          [icon unlockFocus];
-          [icon autorelease];
-        }
-      
-
-      if ((icnsize.width > size) || (icnsize.height > size)){
-	icon = [self resizedIcon: icon ofSize: size];
-      }  
+      NSLog(@"Warning: No icon found for %@", nodepath);
     }
 
   return icon;
