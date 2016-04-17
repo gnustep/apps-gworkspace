@@ -154,7 +154,12 @@ static unsigned char darkerLUT[256] = {
 	      /* we may have more than one folder icon */
 	      key = nodepath;
 	    }
-	}   
+	}
+      else
+        {
+          /* a bundle */
+          key = nodepath;
+        }
 
       if (key != nil)
 	{
@@ -162,11 +167,12 @@ static unsigned char darkerLUT[256] = {
     
 	  if (icon == nil)
 	    {
-	      if (baseIcon == nil)
-		{
-		  baseIcon = [ws iconForFile: nodepath];
-		}
+              baseIcon = [ws iconForFile: nodepath];
 
+              if (baseIcon == nil)
+                {
+                  NSLog(@"no WS icon for %@", nodepath);
+                }
 	      if ([node isLink])
 		{
 		  NSImage *linkIcon;
