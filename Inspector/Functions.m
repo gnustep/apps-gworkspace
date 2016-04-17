@@ -1,6 +1,6 @@
 /* Functions.m
  *  
- * Copyright (C) 2004-2015 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
@@ -63,39 +63,42 @@ NSString *fixpath(NSString *s, const char *c)
 
 NSString *relativePathFit(id container, NSString *fullPath)
 {
-	NSArray *pathcomps;
-	float cntwidth;
-	NSFont *font;	
-	NSString *path;
+  NSArray *pathcomps;
+  float cntwidth;
+  NSFont *font;	
+  NSString *path;
   NSString *relpath = nil;		
-	int i;
+  NSUInteger i;
+  NSString *prefix;
 						
-	cntwidth = [container bounds].size.width;
-	font = [container font];
+  cntwidth = [container bounds].size.width;
+  font = [container font];
 
-	if([font widthOfString: fullPath] < cntwidth) {
-		return fullPath;
-	}
+  prefix = @"/(..)";
+  if (![fullPath isAbsolutePath])
+    prefix = @"..";
+        
+  if([font widthOfString: fullPath] < cntwidth)
+    return fullPath;
   	
-	cntwidth = cntwidth - [font widthOfString: fixpath(@"../", 0)];
-		
-	pathcomps = [fullPath pathComponents];
-	i = [pathcomps count] - 1;
-	path = [NSString stringWithString: [pathcomps objectAtIndex: i]];
-	
-	while(i > 0) {
-		i--;		
-		if([font widthOfString: path] < cntwidth) {
-			relpath = [NSString stringWithString: path];
-		} else {
-			break;
-    }						
-		path = [NSString stringWithFormat: @"%@%@%@", [pathcomps objectAtIndex: i], fixpath(@"/", 0), path];
-	}
-	
-	relpath = [NSString stringWithFormat: @"%@%@", fixpath(@"../", 0), relpath];
-	
-	return relpath;
+  cntwidth = cntwidth - [font widthOfString: prefix];
+  
+  pathcomps = [fullPath pathComponents];
+  i = [pathcomps count] - 1;
+  path = [NSString stringWithString: [pathcomps objectAtIndex: i]];
+  relpath = path;
+  while(i > 0)
+    {
+      i--;		
+      if([font widthOfString: path] < cntwidth)
+        relpath = [NSString stringWithString: path];
+      else
+        break;
+      path = [[pathcomps objectAtIndex: i] stringByAppendingPathComponent:path];;
+    }
+  relpath = [prefix stringByAppendingPathComponent:relpath];
+  
+  return relpath;
 }
 
 NSString *fsDescription(unsigned long long size)
