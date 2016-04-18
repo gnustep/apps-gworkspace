@@ -167,7 +167,8 @@ static unsigned char darkerLUT[256] = {
     
 	  if (icon == nil)
 	    {
-              baseIcon = [ws iconForFile: nodepath];
+              if (baseIcon == nil)
+                baseIcon = [ws iconForFile: nodepath];
 
               if (baseIcon == nil)
                 {
