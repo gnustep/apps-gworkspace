@@ -177,7 +177,7 @@ static unsigned char darkerLUT[256] = {
 	      if ([node isLink])
 		{
 		  NSImage *linkIcon;
-		  
+
 		  linkIcon = [NSImage imageNamed:@"common_linkCursor"];
 		  baseIcon = [baseIcon copy];
 		  [baseIcon lockFocus];
@@ -240,16 +240,22 @@ static unsigned char darkerLUT[256] = {
               linkKey = [key stringByAppendingString:@"_linked"];
               icon = [self cachedIconOfSize: size forKey: linkKey];
             }
-          if (icon == nil)
-            icon = [self cachedIconOfSize: size forKey: key];
-
+          else
+            {
+              icon = [self cachedIconOfSize: size forKey: key];
+            }
+          
 	  if (icon == nil)
 	    {
-	      baseIcon = [ws iconForFile: nodepath];
+              // we look up the cache, but only in the full size to composite later
+              baseIcon = [self cachedIconOfSize: 48 forKey: key];
+              if (baseIcon == nil)
+                baseIcon = [ws iconForFile: nodepath];
+
 	      if ([node isLink])
 		{
 		  NSImage *linkIcon;
-		  
+
 		  linkIcon = [NSImage imageNamed:@"common_linkCursor"];
 		  baseIcon = [baseIcon copy];
 		  [baseIcon lockFocus];
