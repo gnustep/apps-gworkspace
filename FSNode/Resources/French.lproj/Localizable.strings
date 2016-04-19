@@ -1,4 +1,4 @@
-/***
+ï»¿/***
 French.lproj/Localizable.strings
 updated by make_strings 2016-01-22 00:30:18 +0100
 add comments above this one
@@ -176,6 +176,6 @@ add comments above this one
 "Music"="Musique";
 "Images"="Images";
 "Documents"="Documents";
-"Downloads"="TÃ©lÃ©chargement";
+"Downloads"="Téléchargement";
 "Applications"="Applications";
 "Tools"="Outils";
