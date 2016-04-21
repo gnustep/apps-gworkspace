@@ -1,6 +1,6 @@
 /* Resizer.m
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -121,36 +121,56 @@
   NSMutableDictionary *info = [NSMutableDictionary dictionary];
   NSImage *srcImage = [[NSImage alloc] initWithContentsOfFile: path];
 
-  if (srcImage && [srcImage isValid]) {
-    NSData *srcData = [srcImage TIFFRepresentation];
-    NSBitmapImageRep *srcRep = [NSBitmapImageRep imageRepWithData: srcData];
-    NSInteger srcSpp = [srcRep samplesPerPixel];
-    int bitsPerPixel = [srcRep bitsPerPixel];
-    NSInteger srcsizeW = [srcRep pixelsWide];
-    NSInteger srcsizeH = [srcRep pixelsHigh];
-    NSInteger srcBytesPerPixel = [srcRep bitsPerPixel] / 8;
-    NSInteger srcBytesPerRow = [srcRep bytesPerRow];
-
-    [info setObject: [NSNumber numberWithFloat: (float)srcsizeW] forKey: @"width"];
-    [info setObject: [NSNumber numberWithFloat: (float)srcsizeH] forKey: @"height"];
-
-    if (((imsize.width < srcsizeW) || (imsize.height < srcsizeH))
-                                && (((srcSpp == 3) && (bitsPerPixel == 24)) 
-                                    || ((srcSpp == 4) && (bitsPerPixel == 32))
-                                    || ((srcSpp == 1) && (bitsPerPixel == 8))
-                                    || ((srcSpp == 2) && (bitsPerPixel == 16)))) {
-      NSInteger destSamplesPerPixel = srcSpp;
-      NSInteger destBytesPerRow;
-      NSInteger destBytesPerPixel;
-      NSInteger dstsizeW, dstsizeH;
-      float xratio, yratio;
-      NSBitmapImageRep *dstRep;
-      NSData *tiffData;
-      unsigned char *srcData;
-      unsigned char *destData;
-      unsigned x, y;
-      unsigned i;
+  if (srcImage && [srcImage isValid])
+    {
+      NSData *srcData = [srcImage TIFFRepresentation];
+      NSBitmapImageRep *srcRep;
+      NSInteger srcSpp;
+      NSInteger bitsPerPixel;
+      NSInteger srcsizeW;
+      NSInteger srcsizeH;
+      NSInteger srcBytesPerPixel;
+      NSInteger srcBytesPerRow;
+      NSEnumerator *repEnum;
+      NSImageRep *imgRep;
+    
+      repEnum = [[srcImage representations] objectEnumerator];
+      srcRep = nil;
+      imgRep = nil;
+      while (srcRep == nil && (imgRep = [repEnum nextObject]))
+        {
+          if ([imgRep isKindOfClass:[NSBitmapImageRep class]])
+            srcRep = (NSBitmapImageRep *)imgRep;
+        }
       
+      srcSpp = [srcRep samplesPerPixel];
+      bitsPerPixel = [srcRep bitsPerPixel];
+      srcsizeW = [srcRep pixelsWide];
+      srcsizeH = [srcRep pixelsHigh];
+      srcBytesPerPixel = [srcRep bitsPerPixel] / 8;
+      srcBytesPerRow = [srcRep bytesPerRow];
+      
+      [info setObject: [NSNumber numberWithFloat: (float)srcsizeW] forKey: @"width"];
+      [info setObject: [NSNumber numberWithFloat: (float)srcsizeH] forKey: @"height"];
+      
+      if (((imsize.width < srcsizeW) || (imsize.height < srcsizeH))
+          && (((srcSpp == 3) && (bitsPerPixel == 24)) 
+              || ((srcSpp == 4) && (bitsPerPixel == 32))
+              || ((srcSpp == 1) && (bitsPerPixel == 8))
+              || ((srcSpp == 2) && (bitsPerPixel == 16))))
+        {
+          NSInteger destSamplesPerPixel = srcSpp;
+          NSInteger destBytesPerRow;
+          NSInteger destBytesPerPixel;
+          NSInteger dstsizeW, dstsizeH;
+          float xratio, yratio;
+          NSBitmapImageRep *dstRep;
+          NSData *tiffData;
+          unsigned char *srcData;
+          unsigned char *destData;
+          unsigned x, y;
+          unsigned i;
+          
       if ((imsize.width / srcsizeW) <= (imsize.height / srcsizeH)) {
         dstsizeW = floor(imsize.width + 0.5);
         dstsizeH = floor(dstsizeW * srcsizeH / srcsizeW + 0.5);

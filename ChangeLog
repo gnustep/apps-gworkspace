@@ -1,3 +1,9 @@
+2016-04-21 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/Thumbnailer/ImageThumbnailer/ImageThumbnailer.m
+	* Inspector/ContentViewers/ImageViewer/resizer/Resizer.m
+	Generate thumbnail and preview only from the first available Bitmap representation: this means for multipage tiffs that the first page is used. Works around unidentified issues in certain setups where images failed to display. A better solution might be needed in the future in GUI itself.
+
 2016-04-13 Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNodeRepIcons.m

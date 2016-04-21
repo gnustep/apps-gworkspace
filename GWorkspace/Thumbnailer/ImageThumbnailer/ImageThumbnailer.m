@@ -50,20 +50,37 @@
 
   if (image && [image isValid])
     {
-      NSData *tiffData = [image TIFFRepresentation];
-      NSBitmapImageRep *srcRep = [NSBitmapImageRep imageRepWithData: tiffData];
-      NSInteger srcSpp = [srcRep samplesPerPixel];
-      NSInteger bitsPerPixel = [srcRep bitsPerPixel];
+      NSData *tiffData;
+      NSEnumerator *repEnum;
+      NSBitmapImageRep *srcRep;
+      NSInteger srcSpp;
+      NSInteger bitsPerPixel;
+      NSImageRep *imgRep;
+ 
+      repEnum = [[image representations] objectEnumerator];
+      srcRep = nil;
+      imgRep = nil;
+      while (srcRep == nil && (imgRep = [repEnum nextObject]))
+        {
+          if ([imgRep isKindOfClass:[NSBitmapImageRep class]])
+            srcRep = (NSBitmapImageRep *)imgRep;
+        }
+      if (nil == srcRep)
+        return nil;
       
+      srcSpp = [srcRep samplesPerPixel];
+      bitsPerPixel = [srcRep bitsPerPixel];
       if (((srcSpp == 3) && (bitsPerPixel == 24)) 
         || ((srcSpp == 4) && (bitsPerPixel == 32))
         || ((srcSpp == 1) && (bitsPerPixel == 8))
-        || ((srcSpp == 2) && (bitsPerPixel == 16))) {
+        || ((srcSpp == 2) && (bitsPerPixel == 16)))
+        {
     
       if (([srcRep pixelsWide] <= TMBMAX) && ([srcRep pixelsHigh]<= TMBMAX) 
                               && ([srcRep pixelsWide] >= (TMBMAX - RESZLIM)) 
                                       && ([srcRep pixelsHigh] >= (TMBMAX - RESZLIM)))
         {
+          tiffData = [srcRep TIFFRepresentation];
           RETAIN (tiffData);
           RELEASE (image);
           RELEASE (arp);
@@ -92,8 +109,8 @@
           dstsizeW = (NSInteger)floor([srcRep pixelsWide] / fact + 0.5);
           dstsizeH = (NSInteger)floor([srcRep pixelsHigh] / fact + 0.5);
  
-          xratio = [srcRep pixelsWide] / (float)dstsizeW;
-          yratio = [srcRep pixelsHigh] / (float)dstsizeH;
+          xratio = (float)[srcRep pixelsWide] / (float)dstsizeW;
+          yratio = (float)[srcRep pixelsHigh] / (float)dstsizeH;
           
           destSamplesPerPixel = [srcRep samplesPerPixel];
           dstRep = [[NSBitmapImageRep alloc]
@@ -145,71 +162,6 @@
   return nil;
 }
 
-/*
-- (NSData *)makeThumbnailForPath:(NSString *)path
-{
-  CREATE_AUTORELEASE_POOL(arp);
-  NSImage *image = [[NSImage alloc] initWithContentsOfFile: path];
-
-  if (image && [image isValid]) {
-    NSSize size = [image size];
-    NSRect srcr = NSMakeRect(0, 0, size.width, size.height);
-	  NSRect dstr = NSZeroRect;  
-    NSImageRep *rep = [image bestRepresentationForDevice: nil];
-    NSImage *newimage = nil;
-    NSBitmapImageRep *newBitmapImageRep = nil;
-    NSData *data = nil;
-
-    if ((size.width <= TMBMAX) && (size.height <= TMBMAX) 
-                            && (size.width >= (TMBMAX - RESZLIM)) 
-                                    && (size.height >= (TMBMAX - RESZLIM))) {
- 	    if ([rep isKindOfClass: [NSBitmapImageRep class]]) {
-        data = [(NSBitmapImageRep *)rep TIFFRepresentation];
-        if (data) {
-          RELEASE (image);
-          RETAIN (data);
-          RELEASE (arp);
-          
-          return [data autorelease];
-        }
-      }
-    }
-
-    if (size.width >= size.height) {
-      dstr.size.width = TMBMAX;
-      dstr.size.height = TMBMAX * size.height / size.width;
-    } else {
-      dstr.size.height = TMBMAX;
-      dstr.size.width = TMBMAX * size.width / size.height;
-    }  
-          
-    newimage = [[NSImage alloc] initWithSize: dstr.size];
-    [newimage lockFocus];
-
-    [image drawInRect: dstr 
-             fromRect: srcr 
-            operation: NSCompositeSourceOver 
-             fraction: 1.0];
-
-    newBitmapImageRep = [[NSBitmapImageRep alloc] initWithFocusedViewRect: dstr];
-    [newimage unlockFocus];
-
-    data = [newBitmapImageRep TIFFRepresentation];
-    RETAIN (data);
-    
-    RELEASE (image);
-    RELEASE (newimage);
-    RELEASE (newBitmapImageRep);
-    RELEASE (arp);
-    
-    return [data autorelease];
-  }
-
-  RELEASE (arp);
-    
-  return nil;
-}
-*/
 
 - (NSString *)fileNameExtension
 {
