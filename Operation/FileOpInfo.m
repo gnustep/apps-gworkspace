@@ -145,7 +145,7 @@ static NSString *nibName = @"FileOperationWin";
 	  NSString *base = [newname stringByDeletingPathExtension];        
 	  NSString *ntmp;
 	  NSString *destpath;        
-	  int count = 1;
+	  NSUInteger count = 1;
 	      
 	  while (1)
 	    {
