@@ -2595,9 +2595,7 @@ static GWorkspace *gworkspace = nil;
 
 - (void)checkRemovableMedia:(id)sender
 {
-  if ([dtopManager isActive]) {
-    [dtopManager checkNewRemovableMedia];
-  }	
+  [dtopManager checkNewRemovableMedia];	
 }
 
 - (void)emptyRecycler:(id)sender

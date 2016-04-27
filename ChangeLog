@@ -1,3 +1,8 @@
+2016-04-28 Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/GWorkspace.m
+	Make disk mount available also without an active desktop.
+
 2016-04-21 Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/Thumbnailer/ImageThumbnailer/ImageThumbnailer.m
