@@ -2621,7 +2621,7 @@ static GWorkspace *gworkspace = nil;
     NSMutableDictionary *opinfo = [NSMutableDictionary dictionary];
 
     for (i = 0; i < [subNodes count]; i++) {
-      [files addObject: [(FSNode *)[subNodes objectAtIndex: i] name]];
+      [files addObject: [[(FSNode *)[subNodes objectAtIndex: i] path] lastPathComponent]];
     }
 
     [opinfo setObject: @"GWorkspaceEmptyRecyclerOperation" forKey: @"operation"];
