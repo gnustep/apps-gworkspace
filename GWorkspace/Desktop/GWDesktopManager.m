@@ -700,7 +700,7 @@ static GWDesktopManager *desktopManager = nil;
 - (void)openSelectionInNewViewer:(BOOL)newv
 {
   NSArray *selreps = [desktopView selectedReps];
-  int i;
+  NSUInteger i;
     
   for (i = 0; i < [selreps count]; i++) {
     FSNode *node = [[selreps objectAtIndex: i] node];
@@ -929,7 +929,7 @@ static GWDesktopManager *desktopManager = nil;
   if (active) {
     int count = [volinfo count];
     BOOL changed = NO;
-    int i;
+    NSUInteger i;
     
     for (i = 0; i < count; i++) {
       NSMutableDictionary *dict = [volinfo objectAtIndex: i];
