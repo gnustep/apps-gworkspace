@@ -1379,10 +1379,10 @@ static GWorkspace *gworkspace = nil;
             isDirectory:(BOOL)directory
 {
   NSString *fullPath;
-	NSString *fileName;
-	NSString *operation;
+  NSString *fileName;
+  NSString *operation;
   NSMutableDictionary *notifObj;  
-  int suff;
+  unsigned suff;
     
 	if ([self verifyFileAtPath: basePath] == NO) {
 		return;
@@ -1419,8 +1419,8 @@ static GWorkspace *gworkspace = nil;
     }     
   }
 
-	notifObj = [NSMutableDictionary dictionaryWithCapacity: 1];		
-	[notifObj setObject: operation forKey: @"operation"];	
+  notifObj = [NSMutableDictionary dictionaryWithCapacity: 1];		
+  [notifObj setObject: operation forKey: @"operation"];	
   [notifObj setObject: basePath forKey: @"source"];	
   [notifObj setObject: basePath forKey: @"destination"];	
   [notifObj setObject: [NSArray arrayWithObject: fileName] forKey: @"files"];	
@@ -1707,7 +1707,7 @@ static GWorkspace *gworkspace = nil;
   NSDictionary *changedInfo = [notif userInfo];
   NSString *app = [changedInfo objectForKey: @"app"];
   NSArray *extensions = [changedInfo objectForKey: @"exts"];
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [extensions count]; i++) {
     [[NSWorkspace sharedWorkspace] setBestApp: app
@@ -1737,7 +1737,7 @@ static GWorkspace *gworkspace = nil;
     {
       NSString *cmd;
       NSMutableArray *arguments;
-      int i;
+      unsigned i;
     
       cmd = [NSTask launchPathForTool: @"fswatcher"];    
                 
@@ -1760,7 +1760,7 @@ static GWorkspace *gworkspace = nil;
                                                                       host: @""];                  
         if (fswatcher)
 	{
-          [startAppWin updateProgressBy: 40.0 - i];
+          [startAppWin updateProgressBy: 40.0 - (double)i];
           break;
         }
       }
@@ -1869,7 +1869,7 @@ static GWorkspace *gworkspace = nil;
       
       if (recyclerApp == nil)
         {
-          int i;
+          unsigned i;
           
           [startAppWin showWindowWithTitle: @"GWorkspace"
                                    appName: @"Recycler"
@@ -1887,7 +1887,7 @@ static GWorkspace *gworkspace = nil;
                                                                               host: @""];                  
               if (recyclerApp)
                 {
-                  [startAppWin updateProgressBy: 80.0 - i];
+                  [startAppWin updateProgressBy: 80.0 - (double)i];
                   break;
                 }
             }
@@ -1964,7 +1964,7 @@ static GWorkspace *gworkspace = nil;
 	{
 	  NSString *cmd;
 	  NSMutableArray *arguments;
-	  int i;
+	  unsigned i;
     
 	  cmd = [NSTask launchPathForTool: @"ddbd"];    
                 
@@ -1989,7 +1989,7 @@ static GWorkspace *gworkspace = nil;
 								       host: @""];                  
 	      if (ddbd)
 		{
-		  [startAppWin updateProgressBy: 40.0 - i];
+		  [startAppWin updateProgressBy: 40.0 - (double)i];
 		  break;
 		}
 	    }
@@ -2082,7 +2082,7 @@ static GWorkspace *gworkspace = nil;
 
     if (mdextractor == nil) {
 	    NSString *cmd;
-      int i;
+      unsigned i;
     
       cmd = [NSTask launchPathForTool: @"mdextractor"];    
                 
@@ -2101,7 +2101,7 @@ static GWorkspace *gworkspace = nil;
         mdextractor = [NSConnection rootProxyForConnectionWithRegisteredName: @"mdextractor" 
                                                                         host: @""];                  
         if (mdextractor) {
-          [startAppWin updateProgressBy: 80.0 - i];
+          [startAppWin updateProgressBy: 80.0 - (double)i];
           break;
         }
       }
@@ -2604,7 +2604,7 @@ static GWorkspace *gworkspace = nil;
   FSNode *node = [FSNode nodeWithPath: trashPath];
   NSMutableArray *subNodes = [[node subNodes] mutableCopy];
   int count = [subNodes count];
-  int i;  
+  NSUInteger i;  
   
   for (i = 0; i < count; i++) {
     FSNode *nd = [subNodes objectAtIndex: i];
