@@ -1,6 +1,6 @@
 /* ImageViewer.m
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
@@ -26,19 +26,28 @@
 #import "ImageViewer.h"
 #include <math.h>
 
+@interface Resizer : NSObject
+{
+  id viewer;
+  NSNotificationCenter *nc; 
+}
+
+- (void)readImageAtPath:(NSString *)path
+                setSize:(NSSize)imsize;
+
+@end
+
 @implementation ImageViewer
 
 - (void)dealloc
 {
   [nc removeObserver: self];  
 
-  if (resizerConn != nil) {
-    if (resizer != nil) {
-      [resizer terminate];
+  if (resizerConn != nil)
+    {
+      DESTROY (resizer);    
+      DESTROY (resizerConn);
     }
-    DESTROY (resizer);    
-    DESTROY (resizerConn);
-  }
 
   RELEASE (imagePath);	
   RELEASE (image);	
@@ -163,37 +172,12 @@
   }
   
   ASSIGN (imagePath, path);
-
-  if (conn == nil) {
-    NSString *cname = [NSString stringWithFormat: @"search_%lu", (unsigned long)self];
-
-    conn = [[NSConnection alloc] initWithReceivePort: (NSPort *)[NSPort port] 
-																			      sendPort: nil];
-    [conn setRootObject: self];
-    [conn registerName: cname];
-    [conn setDelegate: self];
-
-    [nc addObserver: self
-           selector: @selector(connectionDidDie:)
-               name: NSConnectionDidDieNotification
-             object: conn];    
-  }
   
   if ((resizer == nil) && (waitingResizer == NO)) {
-    NSString *cname = [NSString stringWithFormat: @"search_%lu", (unsigned long)self];
-
-    NSString *cmd = [NSTask launchPathForTool: @"resizer"];
 
     waitingResizer = YES;
+    resizer = [[Resizer alloc] init];
 
-    [NSTimer scheduledTimerWithTimeInterval: 5.0 
-						                         target: self
-                                   selector: @selector(checkResizer:) 
-																   userInfo: nil 
-                                    repeats: NO];
-
-    [NSTask launchedTaskWithLaunchPath: cmd 
-                             arguments: [NSArray arrayWithObject: cname]];
   } else {
     NSSize imsize = [imview bounds].size;
     
@@ -217,16 +201,6 @@
   }
 }
 
-- (void)checkResizer:(id)sender
-{
-  if (waitingResizer && (resizer == nil)) {
-    NSRunAlertPanel(nil, 
-                    NSLocalizedString(@"unable to launch the resizer task.", @""), 
-                    NSLocalizedString(@"Continue", @""), 
-                    nil, 
-                    nil);
-  }
-}
 
 - (void)setResizer:(id)anObject
 {
@@ -235,9 +209,7 @@
     
     imsize.width -= 4;
     imsize.height -= 4;
-    [anObject setProtocolForProxy: @protocol(ImageResizerProtocol)];
-    resizer = (id <ImageResizerProtocol>)anObject;
-    RETAIN (resizer);
+    resizer = [[Resizer alloc] init];
     waitingResizer = NO;
     [self addSubview: progView]; 
     [progView start];    
@@ -245,61 +217,14 @@
   }
 }
 
-- (BOOL)connection:(NSConnection *)ancestor 
-								shouldMakeNewConnection:(NSConnection *)newConn
+
+
+- (void)imageReady:(NSDictionary *)imginfo
 {
-	if (ancestor == conn) {
-    ASSIGN (resizerConn, newConn);
-  	[resizerConn setDelegate: self];
-    
-  	[nc addObserver: self 
-					 selector: @selector(connectionDidDie:)
-	    				 name: NSConnectionDidDieNotification 
-             object: resizerConn];
-	}
-		
-  return YES;
-}
-
-- (void)connectionDidDie:(NSNotification *)notification
-{
-	id diedconn = [notification object];
-
-  [nc removeObserver: self
-	              name: NSConnectionDidDieNotification 
-              object: diedconn];
-
-  if ((diedconn == conn) || (resizerConn && (diedconn == resizerConn))) {
-    DESTROY (resizer);
-    DESTROY (resizerConn);
-    waitingResizer = NO;
-    
-    if ([[self subviews] containsObject: progView]) {
-      [progView stop];
-      [progView removeFromSuperview];  
-    }
-
-    if (diedconn == conn) {
-      DESTROY (conn);
-    } 
-    
-    DESTROY (imagePath);
-
-    NSRunAlertPanel(nil, 
-                    NSLocalizedString(@"resizer connection died.", @""), 
-                    NSLocalizedString(@"Continue", @""), 
-                    nil, 
-                    nil);
-  }
-}
-
-- (void)imageReady:(NSData *)data
-{
-  NSDictionary *imginfo = [NSUnarchiver unarchiveObjectWithData: data];
   NSData *imgdata = [imginfo objectForKey: @"imgdata"];
   BOOL imgok = YES;
   NSString *lastPath;
-  
+  NSLog(@"ImageViewer - imageReady");
   if ([self superview]) {      
     [inspector contentsReadyAt: imagePath];
   }

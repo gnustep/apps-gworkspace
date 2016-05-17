@@ -2,8 +2,6 @@
 PACKAGE_NAME = gworkspace
 include $(GNUSTEP_MAKEFILES)/common.make
 
-SUBPROJECTS = resizer 
-
 BUNDLE_NAME = ImageViewer
 BUNDLE_EXTENSION = .inspector
 
@@ -14,7 +12,8 @@ OBJCFLAGS += -Wall
 #
 # We are creating a bundle
 #
-ImageViewer_OBJC_FILES = ImageViewer.m 
+ImageViewer_OBJC_FILES = ImageViewer.m \
+	Resizer.m
 
 ImageViewer_PRINCIPAL_CLASS = ImageViewer
 

@@ -33,9 +33,9 @@
 
 @protocol ImageViewerProtocol
 
-- (oneway void)setResizer:(id)anObject;
+- (void)setResizer:(id)anObject;
 
-- (oneway void)imageReady:(NSData *)data;
+- (void)imageReady:(NSDictionary *)info;
 
 @end
 
@@ -46,71 +46,14 @@
   NSNotificationCenter *nc; 
 }
 
-- (id)initWithConnectionName:(NSString *)cname;
-
-- (void)connectionDidDie:(NSNotification *)notification;
-
 - (void)readImageAtPath:(NSString *)path
                 setSize:(NSSize)imsize;
-
-- (void)terminate;
 
 @end
 
 
 @implementation Resizer
 
-- (void)dealloc
-{
-  [nc removeObserver: self];
-	DESTROY (viewer);
-  [super dealloc];
-}
-
-- (id)initWithConnectionName:(NSString *)cname
-{
-  self = [super init];
-  
-  if (self) {
-    NSConnection *conn;
-    id anObject;
-
-    nc = [NSNotificationCenter defaultCenter];
-            
-    conn = [NSConnection connectionWithRegisteredName: cname host: nil];
-    
-    if (conn == nil) {
-      NSLog(@"failed to contact the Image Viewer - bye.");
-	    exit(1);           
-    } 
-
-    [nc addObserver: self
-           selector: @selector(connectionDidDie:)
-               name: NSConnectionDidDieNotification
-             object: conn];    
-    
-    anObject = [conn rootProxy];
-    [anObject setProtocolForProxy: @protocol(ImageViewerProtocol)];
-    viewer = (id <ImageViewerProtocol>)anObject;
-    RETAIN (viewer);
-
-    [viewer setResizer: self];
-  }
-  
-  return self;
-}
-
-- (void)connectionDidDie:(NSNotification *)notification
-{
-  id conn = [notification object];
-
-  [nc removeObserver: self
-	              name: NSConnectionDidDieNotification
-	            object: conn];
-
-  NSLog(@"Image Viewer connection has been destroyed.");
-  exit(0);
-}
 
 #define MIX_LIM 16
 
@@ -120,7 +63,7 @@
   CREATE_AUTORELEASE_POOL(arp);
   NSMutableDictionary *info = [NSMutableDictionary dictionary];
   NSImage *srcImage = [[NSImage alloc] initWithContentsOfFile: path];
-
+  NSLog(@"Resizer - readImage");
   if (srcImage && [srcImage isValid])
     {
       NSData *srcData = [srcImage TIFFRepresentation];
@@ -229,34 +172,10 @@
     RELEASE (srcImage);
   }
   
-  [viewer imageReady: [NSArchiver archivedDataWithRootObject: info]];
+  [viewer imageReady: info];
   
   RELEASE (arp);
 }
 
-- (void)terminate
-{
-  exit(0);
-}
 
 @end
-
-
-int main(int argc, char** argv)
-{
-  CREATE_AUTORELEASE_POOL (pool);
-  
-  if (argc > 1) {
-    NSString *conname = [NSString stringWithCString: argv[1]];
-    Resizer *resizer = [[Resizer alloc] initWithConnectionName: conname];
-    
-    if (resizer) {
-      [[NSRunLoop currentRunLoop] run];
-    }
-  } else {
-    NSLog(@"no connection name.");
-  }
-  
-  RELEASE (pool);  
-  exit(0);
-}

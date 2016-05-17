@@ -44,10 +44,8 @@
 
 @protocol ImageResizerProtocol
 
-- (oneway void)readImageAtPath:(NSString *)path
+- (void)readImageAtPath:(NSString *)path
                        setSize:(NSSize)imsize;
-
-- (oneway void)terminate;
 
 @end
 
@@ -79,16 +77,9 @@
   NSWorkspace *ws;
 }
 
-- (void)checkResizer:(id)sender;
-
 - (void)setResizer:(id)anObject;
 
-- (BOOL)connection:(NSConnection *)ancestor 
-								shouldMakeNewConnection:(NSConnection *)newConn;
-
-- (void)connectionDidDie:(NSNotification *)notification;
-
-- (void)imageReady:(NSData *)data;
+- (void)imageReady:(NSDictionary *)info;
 
 - (void)editFile:(id)sender;
 

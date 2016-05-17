@@ -1,7 +1,7 @@
 PACKAGE_NAME = gworkspace
 include $(GNUSTEP_MAKEFILES)/common.make
 
-VERSION = 0.7
+VERSION = 0.9.4
 
 #
 # MAIN APP
