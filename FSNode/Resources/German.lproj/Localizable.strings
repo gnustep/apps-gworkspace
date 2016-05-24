@@ -168,6 +168,10 @@ add comments above this one
 /* Flag: untranslated */
 "unknown" = "unknown";
 
-/* File: <dummy>:0 */
-/* Flag: unmatched */
+"Desktop" = "Schreibtisch";
+"Music" = "Musik";
+"Images" = "Bilder";
+"Documents" = "Dokumente";
+"Downloads" = "Heruntergeladet";
+"Tools" = "Werkzuege";
 "Application" = "Applikation";
