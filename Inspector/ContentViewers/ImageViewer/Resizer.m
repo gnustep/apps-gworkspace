@@ -22,10 +22,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
 #include <math.h>
-#include "config.h"
+
+#import "Resizer.h"
 
 #define GWDebugLog(format, args...) \
   do { if (GW_DEBUG_LOG) \
@@ -33,27 +34,69 @@
 
 @protocol ImageViewerProtocol
 
-- (void)setResizer:(id)anObject;
+- (oneway void)setResizer:(id)anObject;
 
-- (void)imageReady:(NSDictionary *)info;
+- (oneway void)imageReady:(NSData *)data;
 
 @end
 
 
-@interface Resizer : NSObject
+
+
+
+@implementation ImageResizer
+
+- (void)dealloc
 {
-  id viewer;
-  NSNotificationCenter *nc; 
+  [nc removeObserver: self];
+	DESTROY (viewer);
+  [super dealloc];
 }
 
-- (void)readImageAtPath:(NSString *)path
-                setSize:(NSSize)imsize;
+- (id)initWithConnectionName:(NSString *)cname
+{
+  self = [super init];
+  
+  if (self) {
+    NSConnection *conn;
+    id anObject;
 
-@end
+    nc = [NSNotificationCenter defaultCenter];
 
+    conn = [NSConnection connectionWithRegisteredName: cname host: nil];
+    
+    if (conn == nil) {
+      NSLog(@"failed to contact the Image Viewer - bye.");
+	    exit(1);           
+    } 
 
-@implementation Resizer
+    [nc addObserver: self
+           selector: @selector(connectionDidDie:)
+               name: NSConnectionDidDieNotification
+             object: conn];    
+    
+    anObject = [conn rootProxy];
+    [anObject setProtocolForProxy: @protocol(ImageViewerProtocol)];
+    viewer = (id <ImageViewerProtocol>)anObject;
+    RETAIN (viewer);
 
+    [viewer setResizer: self];
+  }
+  
+  return self;
+}
+
+- (void)connectionDidDie:(NSNotification *)notification
+{
+  id conn = [notification object];
+
+  [nc removeObserver: self
+	              name: NSConnectionDidDieNotification
+	            object: conn];
+
+  NSLog(@"Image Viewer connection has been destroyed.");
+  exit(0);
+}
 
 #define MIX_LIM 16
 
@@ -63,7 +106,7 @@
   CREATE_AUTORELEASE_POOL(arp);
   NSMutableDictionary *info = [NSMutableDictionary dictionary];
   NSImage *srcImage = [[NSImage alloc] initWithContentsOfFile: path];
-  NSLog(@"Resizer - readImage");
+
   if (srcImage && [srcImage isValid])
     {
       NSData *srcData = [srcImage TIFFRepresentation];
@@ -172,10 +215,16 @@
     RELEASE (srcImage);
   }
   
-  [viewer imageReady: info];
+  [viewer imageReady: [NSArchiver archivedDataWithRootObject: info]];
   
   RELEASE (arp);
 }
 
+- (void)terminate
+{
+  NSLog(@"Should terminate - doing nothing");
+}
 
 @end
+
+
