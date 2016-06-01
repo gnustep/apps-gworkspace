@@ -3,6 +3,7 @@
  * Copyright (C) 2005-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
+ *         Riccardo Mottola <rm@gnu.org>
  * Date: January 2005
  *
  * This file is part of the GNUstep Inspector application
@@ -46,44 +47,34 @@
 
 @implementation ImageResizer
 
++ (void)connectWithPorts:(NSArray *)portArray
+{
+  NSAutoreleasePool *pool;
+  ImageResizer *serverObject;
+
+  pool = [[NSAutoreleasePool alloc] init];
+
+  serverConnection = [NSConnection connectionWithReceivePort: [portArray objectAtIndex:0]
+                                                    sendPort: [portArray objectAtIndex:1]];
+
+  serverObject = [[self alloc] init];
+  if (serverObject)
+    {
+      NSLog(@"setting server");
+      [[serverConnection rootProxy] setServer:serverObject];
+      [serverObject release];
+      [[NSRunLoop currentRunLoop] run];
+    }
+  [pool release];
+  [NSThread exit];
+}
+
+
 - (void)dealloc
 {
   [nc removeObserver: self];
 	DESTROY (viewer);
   [super dealloc];
-}
-
-- (id)initWithConnectionName:(NSString *)cname
-{
-  self = [super init];
-  
-  if (self) {
-    NSConnection *conn;
-    id anObject;
-
-    nc = [NSNotificationCenter defaultCenter];
-
-    conn = [NSConnection connectionWithRegisteredName: cname host: nil];
-    
-    if (conn == nil) {
-      NSLog(@"failed to contact the Image Viewer - bye.");
-	    exit(1);           
-    } 
-
-    [nc addObserver: self
-           selector: @selector(connectionDidDie:)
-               name: NSConnectionDidDieNotification
-             object: conn];    
-    
-    anObject = [conn rootProxy];
-    [anObject setProtocolForProxy: @protocol(ImageViewerProtocol)];
-    viewer = (id <ImageViewerProtocol>)anObject;
-    RETAIN (viewer);
-
-    [viewer setResizer: self];
-  }
-  
-  return self;
 }
 
 - (void)connectionDidDie:(NSNotification *)notification
@@ -214,9 +205,7 @@
     
     RELEASE (srcImage);
   }
-  
-  [viewer imageReady: [NSArchiver archivedDataWithRootObject: info]];
-  
+  [[serverConnection rootProxy] imageReady: [NSArchiver archivedDataWithRootObject: info]];
   RELEASE (arp);
 }
 

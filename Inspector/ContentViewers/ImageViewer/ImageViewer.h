@@ -35,7 +35,7 @@
 @class NSButton;
 @class NSWorkspace;
 @class ProgressView;
-
+@class ImageResizer;
 @protocol ContentInspectorProtocol
 
 - (void)contentsReadyAt:(NSString *)path;
@@ -71,7 +71,7 @@
   NSConnection *conn;  
   NSConnection *resizerConn;
   BOOL waitingResizer;
-  id resizer;
+  ImageResizer *resizer;
   
   id <ContentInspectorProtocol>inspector;
   NSFileManager *fm;
@@ -84,7 +84,7 @@
 - (void)setResizer:(id)anObject;
 
 - (BOOL)connection:(NSConnection *)ancestor 
-								shouldMakeNewConnection:(NSConnection *)newConn;
+shouldMakeNewConnection:(NSConnection *)newConn;
 
 - (void)connectionDidDie:(NSNotification *)notification;
 

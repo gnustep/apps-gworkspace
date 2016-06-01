@@ -23,10 +23,13 @@ h
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
+
+NSConnection *serverConnection;
+
 @interface ImageResizer : NSObject
 {
   id viewer;
-  NSNotificationCenter *nc; 
+  NSNotificationCenter *nc;
 }
 
 - (id)initWithConnectionName:(NSString *)cname;

@@ -1,8 +1,9 @@
 /* ImageViewer.m
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
+ *         Riccardo Mottola <rm@gnu.org>
  * Date: January 2004
  *
  * This file is part of the GNUstep Inspector application
@@ -159,42 +160,41 @@
   DESTROY (editPath);
   [editButt setEnabled: NO];		
   
-  if (imagePath) {
-    ASSIGN (nextPath, path);
-    return;
-  }
+  if (imagePath)
+    {
+      ASSIGN (nextPath, path);
+      return;
+    }
   
   ASSIGN (imagePath, path);
 
-  if (conn == nil) {
-    NSString *cname = [NSString stringWithFormat: @"search_%lu", (unsigned long)self];
+  if (conn == nil)
+    {
+      NSPort *p1;
+      NSPort *p2;  
+      NSString *cname;
 
-    conn = [[NSConnection alloc] initWithReceivePort: (NSPort *)[NSPort port] 
-																			      sendPort: nil];
-    [conn setRootObject: self];
-    [conn registerName: cname];
-    [conn setDelegate: self];
+      p1 = [NSPort port];
+      p2 = [NSPort port];
+      cname = [NSString stringWithFormat: @"search_%lu", (unsigned long)self];
 
-    [nc addObserver: self
-           selector: @selector(connectionDidDie:)
-               name: NSConnectionDidDieNotification
-             object: conn];    
-  }
+      conn = [[NSConnection alloc] initWithReceivePort: p1 
+                                              sendPort: p2];
+      [conn setRootObject:self];
+
+      [NSThread detachNewThreadSelector: @selector(connectWithPorts:)
+                               toTarget: [ImageResizer class]
+                             withObject: [NSArray arrayWithObjects: p2, p1, nil]];
+
+      [nc addObserver: self
+             selector: @selector(connectionDidDie:)
+                 name: NSConnectionDidDieNotification
+               object: conn];    
+    }
   
-  if ((resizer == nil) && (waitingResizer == NO)) {
-    NSString *cname = [NSString stringWithFormat: @"search_%lu", (unsigned long)self];
-
-    waitingResizer = YES;
-
-    [NSTimer scheduledTimerWithTimeInterval: 5.0 
-						                         target: self
-                                   selector: @selector(checkResizer:) 
-																   userInfo: nil 
-                                    repeats: NO];
-    ImageResizer *resizer = [[ImageResizer alloc] initWithConnectionName: cname];
-  } else {
+  if (!(resizer == nil)) {
     NSSize imsize = [imview bounds].size;
-    
+
     imsize.width -= 4;
     imsize.height -= 4;
     [self addSubview: progView]; 
@@ -226,6 +226,11 @@
   }
 }
 
+- (void)setServer:(id)anObject
+{
+  [self setResizer:anObject];
+}
+
 - (void)setResizer:(id)anObject
 {
   if (resizer == nil) {
@@ -244,18 +249,18 @@
 }
 
 - (BOOL)connection:(NSConnection *)ancestor 
-								shouldMakeNewConnection:(NSConnection *)newConn
+shouldMakeNewConnection:(NSConnection *)newConn
 {
-	if (ancestor == conn) {
+  if (ancestor == conn) {
     ASSIGN (resizerConn, newConn);
-  	[resizerConn setDelegate: self];
+    [resizerConn setDelegate: self];
     
-  	[nc addObserver: self 
-					 selector: @selector(connectionDidDie:)
-	    				 name: NSConnectionDidDieNotification 
+    [nc addObserver: self 
+           selector: @selector(connectionDidDie:)
+               name: NSConnectionDidDieNotification 
              object: resizerConn];
-	}
-		
+  }
+  
   return YES;
 }
 
@@ -293,11 +298,13 @@
 
 - (void)imageReady:(NSData *)data
 {
-  NSDictionary *imginfo = [NSUnarchiver unarchiveObjectWithData: data];
-  NSData *imgdata = [imginfo objectForKey: @"imgdata"];
+  NSDictionary *imginfo;
+  NSData *imgdata;
   BOOL imgok = YES;
   NSString *lastPath;
-  
+
+  imginfo = [NSUnarchiver unarchiveObjectWithData: data];
+  imgdata = [imginfo objectForKey: @"imgdata"];
   if ([self superview]) {      
     [inspector contentsReadyAt: imagePath];
   }
