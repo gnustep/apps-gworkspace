@@ -169,11 +169,9 @@
     {
       NSPort *p1;
       NSPort *p2;  
-      NSString *cname;
 
       p1 = [NSPort port];
       p2 = [NSPort port];
-      cname = [NSString stringWithFormat: @"search_%lu", (unsigned long)self];
 
       conn = [[NSConnection alloc] initWithReceivePort: p1 
                                               sendPort: p2];
@@ -213,17 +211,6 @@
   }
 }
 
-- (void)checkResizer:(id)sender
-{
-  if (waitingResizer && (resizer == nil)) {
-    NSRunAlertPanel(nil, 
-                    NSLocalizedString(@"unable to launch the resizer task.", @""), 
-                    NSLocalizedString(@"Continue", @""), 
-                    nil, 
-                    nil);
-  }
-}
-
 - (void)setServer:(id)anObject
 {
     NSSize imsize = [imview bounds].size;
@@ -231,7 +218,7 @@
     imsize.width -= 4;
     imsize.height -= 4;
     [anObject setProtocolForProxy: @protocol(ImageResizerProtocol)];
-    resizer = (id <ImageResizerProtocol>)anObject;
+    resizer = (ImageResizer *)anObject;
     RETAIN (resizer);
     waitingResizer = NO;
     [self addSubview: progView]; 
