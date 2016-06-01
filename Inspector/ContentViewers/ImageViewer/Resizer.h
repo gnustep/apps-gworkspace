@@ -28,17 +28,12 @@ NSConnection *serverConnection;
 
 @interface ImageResizer : NSObject
 {
-  id viewer;
-  NSNotificationCenter *nc;
+
 }
 
 - (id)initWithConnectionName:(NSString *)cname;
 
-- (void)connectionDidDie:(NSNotification *)notification;
-
 - (void)readImageAtPath:(NSString *)path
                 setSize:(NSSize)imsize;
-
-- (void)terminate;
 
 @end

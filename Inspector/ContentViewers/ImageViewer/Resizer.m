@@ -60,7 +60,6 @@
   serverObject = [[self alloc] init];
   if (serverObject)
     {
-      NSLog(@"setting server");
       [[serverConnection rootProxy] setServer:serverObject];
       [serverObject release];
       [[NSRunLoop currentRunLoop] run];
@@ -72,22 +71,9 @@
 
 - (void)dealloc
 {
-  [nc removeObserver: self];
-	DESTROY (viewer);
   [super dealloc];
 }
 
-- (void)connectionDidDie:(NSNotification *)notification
-{
-  id conn = [notification object];
-
-  [nc removeObserver: self
-	              name: NSConnectionDidDieNotification
-	            object: conn];
-
-  NSLog(@"Image Viewer connection has been destroyed.");
-  exit(0);
-}
 
 #define MIX_LIM 16
 
@@ -214,10 +200,6 @@
   RELEASE (arp);
 }
 
-- (void)terminate
-{
-  NSLog(@"Should terminate - doing nothing");
-}
 
 @end
 
