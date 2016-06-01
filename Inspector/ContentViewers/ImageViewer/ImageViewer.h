@@ -79,16 +79,12 @@
   NSWorkspace *ws;
 }
 
-- (void)checkResizer:(id)sender;
-
-- (void)setResizer:(id)anObject;
-
 - (BOOL)connection:(NSConnection *)ancestor 
 shouldMakeNewConnection:(NSConnection *)newConn;
 
 - (void)connectionDidDie:(NSNotification *)notification;
 
-- (void)imageReady:(NSData *)data;
+- (void)imageReady:(NSDictionary *)imginfo;
 
 - (void)editFile:(id)sender;
 

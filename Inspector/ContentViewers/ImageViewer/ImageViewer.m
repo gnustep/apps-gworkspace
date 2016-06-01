@@ -36,9 +36,6 @@
   [nc removeObserver: self];  
 
   if (resizerConn != nil) {
-    if (resizer != nil) {
-      [resizer terminate];
-    }
     DESTROY (resizer);    
     DESTROY (resizerConn);
   }
@@ -192,15 +189,16 @@
                object: conn];    
     }
   
-  if (!(resizer == nil)) {
-    NSSize imsize = [imview bounds].size;
+  if (!(resizer == nil))
+    {
+      NSSize imsize = [imview bounds].size;
 
-    imsize.width -= 4;
-    imsize.height -= 4;
-    [self addSubview: progView]; 
-    [progView start];
-    [resizer readImageAtPath: imagePath setSize: imsize];
-  }
+      imsize.width -= 4;
+      imsize.height -= 4;
+      [self addSubview: progView]; 
+      [progView start];
+      [resizer readImageAtPath: imagePath setSize: imsize];
+    }
 }
 
 - (void)displayLastPath:(BOOL)forced
@@ -228,14 +226,8 @@
 
 - (void)setServer:(id)anObject
 {
-  [self setResizer:anObject];
-}
-
-- (void)setResizer:(id)anObject
-{
-  if (resizer == nil) {
     NSSize imsize = [imview bounds].size;
-    
+
     imsize.width -= 4;
     imsize.height -= 4;
     [anObject setProtocolForProxy: @protocol(ImageResizerProtocol)];
@@ -245,7 +237,6 @@
     [self addSubview: progView]; 
     [progView start];    
     [resizer readImageAtPath: imagePath setSize: imsize];
-  }
 }
 
 - (BOOL)connection:(NSConnection *)ancestor 
@@ -296,23 +287,25 @@ shouldMakeNewConnection:(NSConnection *)newConn
   }
 }
 
-- (void)imageReady:(NSData *)imgdata
+- (void)imageReady:(NSDictionary *)imginfo
 {
-  NSDictionary *imginfo;
+  NSData *imgdata;
   BOOL imgok;
   NSString *lastPath;
 
+  if (imginfo == nil)
+    return;
+
+  imgdata = [imginfo objectForKey:@"imgdata"];
   imgok = NO;
   if (imgdata)
     {
-      [imgdata retain];
-      
       if ([self superview])
         [inspector contentsReadyAt: imagePath];
       
       DESTROY (image);
       image = [[NSImage alloc] initWithData: imgdata];
-      [imgdata release];
+
       imgok = YES;
       if (image)
         {

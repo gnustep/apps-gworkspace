@@ -83,10 +83,7 @@
   CREATE_AUTORELEASE_POOL(arp);
   NSMutableDictionary *info = [NSMutableDictionary dictionary];
   NSImage *srcImage = [[NSImage alloc] initWithContentsOfFile: path];
-  NSData *returnData;
-  
-  returnData = nil;
-  
+
   if (srcImage && [srcImage isValid])
     {
       NSData *srcData = [srcImage TIFFRepresentation];
@@ -183,20 +180,18 @@
       NS_ENDHANDLER
 
       if (tiffData) {
-        returnData = tiffData;
+        [info setObject: tiffData forKey:@"imgdata"];
       } 
 
       RELEASE (dstRep);
       
     } else {
-        returnData = srcData;
+        [info setObject: srcData forKey:@"imgdata"];
     }
     
     RELEASE (srcImage);
   }
-  [returnData retain];
-  [[serverConnection rootProxy] imageReady: returnData];
-  [returnData release];
+  [[serverConnection rootProxy] imageReady: info];
   RELEASE (arp);
 }
 
