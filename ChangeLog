@@ -1,5 +1,11 @@
 2016-06-01 Riccardo Mottola <rm@gnu.org>
 
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.m
+	* Inspector/ContentViewers/ImageViewer/Resizer.m
+	Pass data directly without Archiving/Unarchiving.
+
+2016-06-01 Riccardo Mottola <rm@gnu.org>
+
 	* Inspector/ContentViewers/ImageViewer/ImageViewer.h
 	* Inspector/ContentViewers/ImageViewer/ImageViewer.m
 	* Inspector/ContentViewers/ImageViewer/Resizer.h

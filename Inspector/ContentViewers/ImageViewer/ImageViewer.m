@@ -296,64 +296,62 @@ shouldMakeNewConnection:(NSConnection *)newConn
   }
 }
 
-- (void)imageReady:(NSData *)data
+- (void)imageReady:(NSData *)imgdata
 {
   NSDictionary *imginfo;
-  NSData *imgdata;
-  BOOL imgok = YES;
+  BOOL imgok;
   NSString *lastPath;
 
-  imginfo = [NSUnarchiver unarchiveObjectWithData: data];
-  imgdata = [imginfo objectForKey: @"imgdata"];
-  if ([self superview]) {      
-    [inspector contentsReadyAt: imagePath];
-  }
-        
-  if (imgdata) {
-    DESTROY (image);
-    image = [[NSImage alloc] initWithData: imgdata];
-    
-    if (image) {
-      float width = [[imginfo objectForKey: @"width"] floatValue];
-      float height = [[imginfo objectForKey: @"height"] floatValue];
-      NSString *str;
-
-      if (valid == NO) {
-        valid = YES;
-        [errLabel removeFromSuperview];
-        [self addSubview: imview]; 
-      }
-
-      [imview setImage: image];
-
-      str = NSLocalizedString(@"Width:", @"");
-      str = [NSString stringWithFormat: @"%@ %.0f", str, width];
-      [widthLabel setStringValue: str];
-
-      str = NSLocalizedString(@"Height:", @"");
-      str = [NSString stringWithFormat: @"%@ %.0f", str, height];
-      [heightLabel setStringValue: str];
-
-      ASSIGN (editPath, imagePath);
-      [editButt setEnabled: YES];		
-      [[self window] makeFirstResponder: editButt];
+  imgok = NO;
+  if (imgdata)
+    {
+      [imgdata retain];
       
-    } else {
-      imgok = NO;
+      if ([self superview])
+        [inspector contentsReadyAt: imagePath];
+      
+      DESTROY (image);
+      image = [[NSImage alloc] initWithData: imgdata];
+      [imgdata release];
+      imgok = YES;
+      if (image)
+        {
+          float width = [[imginfo objectForKey: @"width"] floatValue];
+          float height = [[imginfo objectForKey: @"height"] floatValue];
+          NSString *str;
+
+          if (valid == NO)
+            {
+              valid = YES;
+              [errLabel removeFromSuperview];
+              [self addSubview: imview]; 
+            }
+
+          [imview setImage: image];
+
+          str = NSLocalizedString(@"Width:", @"");
+          str = [NSString stringWithFormat: @"%@ %.0f", str, width];
+          [widthLabel setStringValue: str];
+
+          str = NSLocalizedString(@"Height:", @"");
+          str = [NSString stringWithFormat: @"%@ %.0f", str, height];
+          [heightLabel setStringValue: str];
+
+          ASSIGN (editPath, imagePath);
+          [editButt setEnabled: YES];		
+          [[self window] makeFirstResponder: editButt];
+        }
     }
-    
-  } else {
-    imgok = NO;
-  }
+
   
   if (imgok == NO) {
     if (valid == YES) {
       valid = NO;
       [imview removeFromSuperview];
-			[self addSubview: errLabel];
+      [self addSubview: errLabel];
       [widthLabel setStringValue: @""];
       [heightLabel setStringValue: @""];
-			[editButt setEnabled: NO];		
+      [editButt setEnabled: NO];		
     }
   }
   
