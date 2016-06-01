@@ -69,8 +69,6 @@
   NSString *editPath;
   
   NSConnection *conn;  
-  NSConnection *resizerConn;
-  BOOL waitingResizer;
   ImageResizer *resizer;
   
   id <ContentInspectorProtocol>inspector;
@@ -78,9 +76,6 @@
   NSNotificationCenter *nc;
   NSWorkspace *ws;
 }
-
-- (BOOL)connection:(NSConnection *)ancestor 
-shouldMakeNewConnection:(NSConnection *)newConn;
 
 - (void)connectionDidDie:(NSNotification *)notification;
 

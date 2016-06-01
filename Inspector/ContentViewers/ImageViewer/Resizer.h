@@ -31,8 +31,6 @@ NSConnection *serverConnection;
 
 }
 
-- (id)initWithConnectionName:(NSString *)cname;
-
 - (void)readImageAtPath:(NSString *)path
                 setSize:(NSSize)imsize;
 

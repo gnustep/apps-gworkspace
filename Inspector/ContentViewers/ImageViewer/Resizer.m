@@ -37,7 +37,7 @@
 
 - (oneway void)setResizer:(id)anObject;
 
-- (oneway void)imageReady:(NSData *)data;
+- (oneway void)imageReady:(NSDictionary *)dict;
 
 @end
 
@@ -60,7 +60,7 @@
   serverObject = [[self alloc] init];
   if (serverObject)
     {
-      [[serverConnection rootProxy] setServer:serverObject];
+      [(id)[serverConnection rootProxy] setServer:serverObject];
       [serverObject release];
       [[NSRunLoop currentRunLoop] run];
     }
@@ -191,7 +191,7 @@
     
     RELEASE (srcImage);
   }
-  [[serverConnection rootProxy] imageReady: info];
+  [(id <ImageViewerProtocol>)[serverConnection rootProxy] imageReady: info];
   RELEASE (arp);
 }
 

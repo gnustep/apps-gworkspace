@@ -35,11 +35,7 @@
 {
   [nc removeObserver: self];  
 
-  if (resizerConn != nil) {
-    DESTROY (resizer);    
-    DESTROY (resizerConn);
-  }
-
+  DESTROY (resizer);    
   RELEASE (imagePath);	
   RELEASE (image);	
   RELEASE (nextPath);	
@@ -140,7 +136,6 @@
     valid = YES;
     
     resizer = nil;
-    waitingResizer = NO;
     imagePath = nil;
     nextPath = nil;
     editPath = nil;
@@ -220,27 +215,11 @@
     [anObject setProtocolForProxy: @protocol(ImageResizerProtocol)];
     resizer = (ImageResizer *)anObject;
     RETAIN (resizer);
-    waitingResizer = NO;
     [self addSubview: progView]; 
     [progView start];    
     [resizer readImageAtPath: imagePath setSize: imsize];
 }
 
-- (BOOL)connection:(NSConnection *)ancestor 
-shouldMakeNewConnection:(NSConnection *)newConn
-{
-  if (ancestor == conn) {
-    ASSIGN (resizerConn, newConn);
-    [resizerConn setDelegate: self];
-    
-    [nc addObserver: self 
-           selector: @selector(connectionDidDie:)
-               name: NSConnectionDidDieNotification 
-             object: resizerConn];
-  }
-  
-  return YES;
-}
 
 - (void)connectionDidDie:(NSNotification *)notification
 {
@@ -250,10 +229,8 @@ shouldMakeNewConnection:(NSConnection *)newConn
 	              name: NSConnectionDidDieNotification 
               object: diedconn];
 
-  if ((diedconn == conn) || (resizerConn && (diedconn == resizerConn))) {
+  if ((diedconn == conn)) {
     DESTROY (resizer);
-    DESTROY (resizerConn);
-    waitingResizer = NO;
     
     if ([[self subviews] containsObject: progView]) {
       [progView stop];
