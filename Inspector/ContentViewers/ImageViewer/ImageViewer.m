@@ -206,7 +206,7 @@
   }
 }
 
-- (void)setServer:(id)anObject
+- (void)setResizer:(id)anObject
 {
     NSSize imsize = [imview bounds].size;
 

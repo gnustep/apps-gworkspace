@@ -77,6 +77,8 @@
   NSWorkspace *ws;
 }
 
+- (void)setResizer:(id)anObject;
+
 - (void)connectionDidDie:(NSNotification *)notification;
 
 - (void)imageReady:(NSDictionary *)imginfo;
