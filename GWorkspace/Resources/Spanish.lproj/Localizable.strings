@@ -35,15 +35,17 @@
         "Show" = "Mostrar";
                 "Name only" = "Solo nombre";
                 "Modification date" = "Fecha de modificaci\U00F3n";
-                "Role" = "Rol";
+                "Owner" = "Proprietario";
         "Icon Size" = "Tama\U00F1o de icono";
         "Icon Position" = "Posici\U00F3n del icono";
                 "Up" = "Arriba";
                 "Left" = "Izquierda";
         "Label Size" = "Tama\U00F1o de etiqueta";
-                
+        "Make thumbnail(s)" = "Crear icono(s)";
+        "Remove thumbnail(s)" = "Retirar icono(s)";
+         "Viewer" = "Visor";
+           
 "Tools" = "Herramientas";
-        "Viewer" = "Visor";
         "Inspectors" = "Inspectores";
                 "Show Inspectors" = "Mostrar inspectores";
                 "Attributes" = "Atributos";
@@ -51,29 +53,28 @@
                 "Tools" = "Herramientas";        
                 "Annotations" = "Anotaciones";        
         "Fiend" = "Buscador";
+                "Show Fiend" = "Mostrar Buscador";
+                "Hide Fiend" = "Ocultar Buscador";
+                "Add Layer..." = "A\U00F1adir capa...";
+                "Remove Current Layer" = "Quitar la capa actual";
+                "Rename Current Layer" = "Renombrar la capa actual";
+                "Layers" = "Capas";
         "Tabbed Shelf" = "Barra de pesta\U00F1as";
                 "Show Tabbed Shelf" = "Mostrar Barra de Pesta\U00F1as";
                 "Remove Current Tab" = "Remover pesta\U00F1a actual";
                 "Rename Current Tab" = "Renombrar pesta\U00F1a actual";
                 "Add Tab..." = "A\U00F1adir pesta\U00F1a";
+        "Terminal" = "Terminal";
         "Run..." = "Ejecutar...";
         "History" = "Historia";
                 "Show History" = "Mostrar Historia";
                 "Go backward" = "Ir atrar";
                 "Go forward" = "Ir adelante";
         "Show Desktop" = "Mostrar Escritorio";
+        "Hide Desktop" = "Ocultar Escritorio";
+        "Show Recycler" = "Mostrarar Papelera";
         "Hide Recycler" = "Ocultar Papelera";
         "Check for disks" = "Verificar discos";
-        "Processes..." = "Procesos...";
-        "Fiend" = "Fiend";
-                "Show Fiend" = "Mostrar Fiend"; /* R// Arreglar esto  Q// En frances e italiano no lo traducen */
-                "Hide Fiend" = "Ocultar Fiend";
-                "Add Layer..." = "A\U00F1adir capa...";
-                "Remove Current Layer" = "Quitar la capa actual";
-                "Rename Current Layer" = "Renombrar la capa actual";
-                "Layers" = "Capas";
-        "DeskTop Shelf" = "DeskTop Shelf"; /* Q// En frances lo traducen como Etagere, es decir, estante */        
-        "XTerm" = "XTerm";
         
 "Windows" = "Ventanas";
         "Arrange in Front" = "Traer al frente";
@@ -83,9 +84,7 @@
 "Services" = "Servicios";
 
 "Hide" = "Ocultar";
-
 "Hide Others" = "Ocultar Otros";
-
 "Show All" = "Mostrar Todo";
 
 "Print..." = "Impresi\U00F3n";
@@ -107,6 +106,15 @@
 "You have not write permission\nfor" = "No tiene permisos de escritura\npara"; /* R// ?  Cual es el problema? */
 "Continue" = "Continuar";
 
+"File Viewer" = "Visor de Ficheros";
+
+"Quit!" = "Cellar";
+
+"Do you really want to quit?" = "\U00BFRealmente desea salir?";
+"Yes" = "Si;
+"No" = "No";
+
+"Log out" = "Cerrar sesi\U00F3n";
 
 /* FileOperation.m */
 
