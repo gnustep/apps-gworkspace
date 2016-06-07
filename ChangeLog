@@ -1,3 +1,9 @@
+2016-06-07 Riccardo Mottola <rm@gnu.org>
+
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.h
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.m
+	Do not watch for the connection dieing, we suppose it stable being local now.
+
 2016-06-01 Riccardo Mottola <rm@gnu.org>
 
 	* Inspector/ContentViewers/ImageViewer/ImageViewer.m

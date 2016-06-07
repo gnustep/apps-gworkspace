@@ -33,8 +33,6 @@
 
 - (void)dealloc
 {
-  [nc removeObserver: self];  
-
   DESTROY (resizer);    
   RELEASE (imagePath);	
   RELEASE (image);	
@@ -130,7 +128,6 @@
 
     inspector = insp;
     fm = [NSFileManager defaultManager];
-    nc = [NSNotificationCenter defaultCenter];
     ws = [NSWorkspace sharedWorkspace];
         
     valid = YES;
@@ -174,12 +171,7 @@
 
       [NSThread detachNewThreadSelector: @selector(connectWithPorts:)
                                toTarget: [ImageResizer class]
-                             withObject: [NSArray arrayWithObjects: p2, p1, nil]];
-
-      [nc addObserver: self
-             selector: @selector(connectionDidDie:)
-                 name: NSConnectionDidDieNotification
-               object: conn];    
+                             withObject: [NSArray arrayWithObjects: p2, p1, nil]];   
     }
   
   if (!(resizer == nil))
@@ -221,35 +213,6 @@
 }
 
 
-- (void)connectionDidDie:(NSNotification *)notification
-{
-	id diedconn = [notification object];
-
-  [nc removeObserver: self
-	              name: NSConnectionDidDieNotification 
-              object: diedconn];
-
-  if ((diedconn == conn)) {
-    DESTROY (resizer);
-    
-    if ([[self subviews] containsObject: progView]) {
-      [progView stop];
-      [progView removeFromSuperview];  
-    }
-
-    if (diedconn == conn) {
-      DESTROY (conn);
-    } 
-    
-    DESTROY (imagePath);
-
-    NSRunAlertPanel(nil, 
-                    NSLocalizedString(@"resizer connection died.", @""), 
-                    NSLocalizedString(@"Continue", @""), 
-                    nil, 
-                    nil);
-  }
-}
 
 - (void)imageReady:(NSDictionary *)imginfo
 {
@@ -382,12 +345,12 @@
 
 - (void)editFile:(id)sender
 {
-	NSString *appName;
+  NSString *appName;
   NSString *type;
 
   [ws getInfoForFile: editPath application: &appName type: &type];
 
-	if (appName) {
+  if (appName) {
     NS_DURING
       {
     [ws openFile: editPath withApplication: appName];
@@ -410,7 +373,7 @@
   NSString *bpath = [[NSBundle bundleForClass: [self class]] bundlePath];
   NSString *resPath = [bpath stringByAppendingPathComponent: @"Resources"];
   NSArray *languages = [NSUserDefaults userLanguages];
-  unsigned i;
+  NSUInteger i;
      
   for (i = 0; i < [languages count]; i++) {
     NSString *language = [languages objectAtIndex: i];
