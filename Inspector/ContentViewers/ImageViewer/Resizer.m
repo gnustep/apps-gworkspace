@@ -60,7 +60,7 @@
   serverObject = [[self alloc] init];
   if (serverObject)
     {
-      [(id)[serverConnection rootProxy] setServer:serverObject];
+      [(id)[serverConnection rootProxy] setResizer:serverObject];
       [serverObject release];
       [[NSRunLoop currentRunLoop] run];
     }
