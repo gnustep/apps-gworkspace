@@ -25,8 +25,8 @@
 #ifndef INSPECTOR_H
 #define INSPECTOR_H
 
-#include <Foundation/Foundation.h>
-#include "FSNodeRep.h"
+#import <Foundation/Foundation.h>
+#import "FSNodeRep.h"
 
 @class Attributes;
 @class Contents;
