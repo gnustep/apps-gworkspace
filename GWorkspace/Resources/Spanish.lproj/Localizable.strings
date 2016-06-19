@@ -1,11 +1,8 @@
-/* Se que la traduccion es muy mejorable */
-/* He revisado y actualizado la traduccion. Quique */
-
-/* ----------------------- menu strings --------------------------- */
+﻿/* ----------------------- menu strings --------------------------- */
 /* main.m */
 
-"Info" = "Informaci\U00F3n";
-        "Info Panel..." = "Panel de informaci\U00F3n...";
+"Info" = "Información";
+        "Info Panel..." = "Panel de información...";
         "Preferences..." = "Preferencias...";
         "Help..." = "Ayuda...";
         "Activate context help" = "Activar ayuda de contexto";
@@ -34,13 +31,13 @@
         "List" = "Lista";
         "Show" = "Mostrar";
                 "Name only" = "Solo nombre";
-                "Modification date" = "Fecha de modificaci\U00F3n";
+                "Modification date" = "Fecha de modificación";
                 "Owner" = "Proprietario";
-        "Icon Size" = "Tama\U00F1o de icono";
-        "Icon Position" = "Posici\U00F3n del icono";
+        "Icon Size" = "Tamaño de icono";
+        "Icon Position" = "Posición del icono";
                 "Up" = "Arriba";
                 "Left" = "Izquierda";
-        "Label Size" = "Tama\U00F1o de etiqueta";
+        "Label Size" = "Tamaño de etiqueta";
         "Make thumbnail(s)" = "Crear icono(s)";
         "Remove thumbnail(s)" = "Retirar icono(s)";
          "Viewer" = "Visor";
@@ -55,15 +52,15 @@
         "Fiend" = "Buscador";
                 "Show Fiend" = "Mostrar Buscador";
                 "Hide Fiend" = "Ocultar Buscador";
-                "Add Layer..." = "A\U00F1adir capa...";
+                "Add Layer..." = "Añadir capa...";
                 "Remove Current Layer" = "Quitar la capa actual";
                 "Rename Current Layer" = "Renombrar la capa actual";
                 "Layers" = "Capas";
-        "Tabbed Shelf" = "Barra de pesta\U00F1as";
-                "Show Tabbed Shelf" = "Mostrar Barra de Pesta\U00F1as";
-                "Remove Current Tab" = "Remover pesta\U00F1a actual";
-                "Rename Current Tab" = "Renombrar pesta\U00F1a actual";
-                "Add Tab..." = "A\U00F1adir pesta\U00F1a";
+        "Tabbed Shelf" = "Barra de pestañas";
+                "Show Tabbed Shelf" = "Mostrar Barra de Pestañas";
+                "Remove Current Tab" = "Remover pestaña actual";
+                "Rename Current Tab" = "Renombrar pestaña actual";
+                "Add Tab..." = "Añadir pestaña";
         "Terminal" = "Terminal";
         "Run..." = "Ejecutar...";
         "History" = "Historia";
@@ -87,11 +84,11 @@
 "Hide Others" = "Ocultar Otros";
 "Show All" = "Mostrar Todo";
 
-"Print..." = "Impresi\U00F3n";
+"Print..." = "Impresión";
 
 "Quit" = "Salir";
 
-"Logout" = "Cerrar sesi\U00F3n";
+"Logout" = "Cerrar sesión";
         
         
         
@@ -114,7 +111,7 @@
 "Yes" = "Si";
 "No" = "No";
 
-"Log out" = "Cerrar sesi\U00F3n";
+"Log out" = "Cerrar sesión";
 
 /* FileOperation.m */
 
@@ -141,17 +138,17 @@
 "Linking" = "Enlazando";
 "Duplicating" = "Duplicando";
 "Destroying" = "Destruyendo";
-"File Operation Completed" = "Operaci\U00F3n de fichero completada";
-"Backgrounder connection died!" = "La conexi\U00F3n con Backgrounder se ha roto"; /* R// Jarl  Q// Consultada la traduccion italiana */
+"File Operation Completed" = "Operación de fichero completada";
+"Backgrounder connection died!" = "La conexión con Backgrounder se ha roto"; /* R// Jarl  Q// Consultada la traduccion italiana */
 "Some items have the same name;\ndo you want to substitute them?" = "Algunos elementos tienen el mismo nombre;\n\U00BFQuiere sustituirlos?";
 "Error" = "Error";
-"File Operation Error!" = "\U00A1Error en la operaci\U00F3n de ficheros!";
+"File Operation Error!" = "¿Error en la operación de ficheros!";
 
 
 /* ColumnIcon.m */
 
 "You have not write permission\nfor " = "No tiene permisos de escritura\npara ";
-"The name " = "\U00A1El nombre ";
+"The name " = "¿El nombre ";
 " is already in use!" = " ya est\U00E1 en uso!";
 "Cannot rename " = "No se puede renombrar ";
 "Invalid char in name" = "Car\U00E1cter no v\U00E1lido en el nombre";
@@ -173,7 +170,7 @@
 "Attributes Inspector" = "Inspector de Atributos";
 "Path:" = "Ruta:";
 "Link To:" = "Enlazar a:";
-"Size:" = "Tama\U00F1o:";
+"Size:" = "Tamaño:";
 "Owner:" = "Propietario:";
 "Group:" = "Grupo:";
 "Changed" = "Cambiado";
@@ -186,18 +183,18 @@
 "Contents" = "Contenidos";
 "Contents Inspector" = "Inspector de contenidos";
 "No Contents Inspector" = "Sin inspector de contenidos";
-"No Contents Inspector\nFor Multiple Selection" = "No hay Inspector de\ncontenidos para\nselecci\U00F3n m\U00FAltiple";
+"No Contents Inspector\nFor Multiple Selection" = "No hay Inspector de\ncontenidos para\nselección m\U00FAltiple";
 
 
 /* FolderViewer.m */
 
 "Sort method applies to the\ncontents of the selected folder,\nNOT to its parent folder"
-  = "El m\U00E9todo de ordenaci\U00F3n se\naplica al contenido de la\ncarpeta seleccionada, NO\na la carpeta superior";
+  = "El m\U00E9todo de ordenación se\naplica al contenido de la\ncarpeta seleccionada, NO\na la carpeta superior";
 "Sort by" = "Ordenar por";
 "Name" = "Nombre";
 "Type" = "Clase";
 "Date" = "Fecha";
-"Size" = "Tama\U00F1o";
+"Size" = "Tamaño";
 "Owner" = "Propietario";
 "Folder Inspector" = "Inspector de Carpetas";        
 
@@ -218,7 +215,7 @@
 
 "UNIX Permissions" = "Permisos UNIX";
 "Access Control" = "Control de acceso";
-"Also apply to files inside selection" = "Aplicar tambi\U00E9n a los ficheros de la selecci\U00F3n";
+"Also apply to files inside selection" = "Aplicar tambi\U00E9n a los ficheros de la selección";
 
 
 /* ToolsPanel.m */
@@ -236,7 +233,7 @@
 "Default:" = "Por defecto:";
 "Path:" = "Ruta:";                
 "Click 'Set Default' to set default application\nfor all documents with this extension" 
-  ="Pulse 'Por defecto' para elegir la\naplicaci\U00F3n predeterminada a usar para todos\nlos documentos con esta extensi\U00F3n";
+  ="Pulse 'Por defecto' para elegir la\naplicación predeterminada a usar para todos\nlos documentos con esta extensión";
 
 
 /* PermsBox.m */
@@ -244,7 +241,7 @@
 "Permissions" = "Permisos";
 "Read" = "Lectura";
 "Write" = "Escritura";
-"Execute" = "Ejecuci\U00F3n";
+"Execute" = "Ejecución";
 "Owner" = "Propietario";
 "Group" = "Grupo";
 "Other" = "Otros";
@@ -274,8 +271,8 @@
 "Finder" = "Buscar";
 "Find items with names that match" = "Buscar elementos cuyos nombres coincidan";
 "Find items with contents that match" = "Buscar elementos cuyo contenido coincida";
-"No selection!" = "\U00A1Ninguna selecci\U00F3n!";
-"No arguments!" = "\U00A1Ning\U00FAn argumento!";
+"No selection!" = "¿Ninguna selección!";
+"No arguments!" = "¿Ning\U00FAn argumento!";
 
 
 /* ----------------------- Fiend strings --------------------------- */
@@ -284,13 +281,13 @@
 /* R// A ver como lo traducimos */
 
 "New Layer" = "Nueva capa";
-"A layer with this name is already present!" = "\U00A1Ya hay una capa con ese nombre!";
-"You can't remove the last layer!" = "\U00A1No puede borrar la \U00FAltima capa!";
+"A layer with this name is already present!" = "¿Ya hay una capa con ese nombre!";
+"You can't remove the last layer!" = "¿No puede borrar la \U00FAltima capa!";
 "Remove layer" = "Quitar capa";
 "Are you sure that you want to remove this layer?" = "\U00BFEst\U00E1 seguro de querer quitar esta capa?";
 "Rename Layer" = "Renombrar capa";
-"You can't dock multiple paths!" = "\U00A1No puede aparcar rutas m\U00FAltiples!";
-"This object is already present in this layer!" = "\U00A1Este objeto ya est\U00E1 en esta capa!";
+"You can't dock multiple paths!" = "¿No puede aparcar rutas m\U00FAltiples!";
+"This object is already present in this layer!" = "¿Este objeto ya est\U00E1 en esta capa!";
         
                         
 /* ----------------------- Preference strings --------------------------- */
@@ -309,7 +306,7 @@
 "green" = "verde";
 "blue" = "azul";
 "Set Color" = "Poner color";
-"Push the \"Set Image\" button\nto set your DeskTop image.\nThe image must have the same\nsize of your screen." = "Pulse el bot\U00F3n \"Poner imagen\" para poner su\nimagen de escritorio. La imagen debe tener el\nmismo tama\U00F1o que la pantalla.";
+"Push the \"Set Image\" button\nto set your DeskTop image.\nThe image must have the same\nsize of your screen." = "Pulse el botón \"Poner imagen\" para poner su\nimagen de escritorio. La imagen debe tener el\nmismo tamaño que la pantalla.";
 
 "Set Image" = "Poner imagen";
 "Unset Image" = "Quitar imagen";
