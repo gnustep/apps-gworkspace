@@ -26,7 +26,7 @@
         "Select All" = "Seleccionar todo";
                 
 "View" = "Ver";
-        "Browser" = "Ojeador";
+        "Browser" = "Navigador";
         "Icon" = "Iconos";
         "List" = "Lista";
         "Show" = "Mostrar";
@@ -173,15 +173,8 @@
 
 /* ----------------------- Inspectors strings --------------------------- */
 
-/* InspectorsWin.m */
 
-"Attributes" = "Atributos";
-"Contents" = "Contenido";
-"Tools" = "Herramientas";
-"Access Control" = "Control de acceso";
-
-
-/* AttributesPanel.m */
+/* Attributes.m */
 
 "Attributes Inspector" = "Inspector de Atributos";
 "Path:" = "Ruta:";
@@ -232,55 +225,12 @@
 "App Inspector" = "Inspector de aplicaciones";
 
 
-/* PermissionsPanel.m */
+/* Tools.m */
 
-"Also apply to files inside selection" = "Aplicar tambi\U00E9n a los ficheros de la selección";
-
-
-/* ToolsPanel.m */
-
-"Tools" = "Herramientas";
 "Tools Inspector" = "Inspector de herramientas";
 "No Tools Inspector" = "Sin Inspector de herramientas";
 "Set Default" = "Definir por defecto"; /* Me gusta mas que Poner por omision */
 
-
-/* AppsView.m */
-        
-"Double-click to open selected document(s)" =
-"Doble clic para abrir los documentos seleccionados";
-"Default:" = "Por defecto:";
-"Path:" = "Ruta:";                
-"Click 'Set Default' to set default application\nfor all documents with this extension" 
-  ="Pulse 'Por defecto' para elegir la\naplicación predeterminada a usar para todos\nlos documentos con esta extensión";
-
-
-/* PermsBox.m */
-
-"Permissions" = "Permisos";
-"Read" = "Lectura";
-"Write" = "Escritura";
-"Execute" = "Ejecución";
-"Owner" = "Propietario";
-"Group" = "Grupo";
-"Other" = "Otros";
-
-
-/* ----------------------- Processes strings --------------------------- */
-
-/* Processes.m */
-
-"Processes" = "Procesos";
-"No Background Process" = "Sin procesos en segundo plano";
-"Kill" = "Matar";
-"Path: " = "Ruta: ";
-"Status: " = "Estado: ";
-
-
-/* ProcsView.m */
-
-"Applications" = "Aplicaciones";
-"Background" = "Segundo plano"; /* R// revisar  Q// Yo lo veo bien  */
 
 
 /* ----------------------- Finder strings --------------------------- */
@@ -288,24 +238,70 @@
 /* Finder.m */
 
 "Finder" = "Buscador";
-"Find items with names that match" = "Buscar elementos cuyos nombres coincidan";
-"Find items with contents that match" = "Buscar elementos cuyo contenido coincida";
-"No selection!" = "¿Ninguna selección!";
-"No arguments!" = "¿Ning\U00FAn argumento!";
+"No selection!" = "¡Ninguna selección!";
+"Search in:" = "Buscar en:";
+"Current selection" = "Selección actual";
+"Add" = "Añadir";
+"Remove" = "Remover";
+"Search for items whose:" = "Buscar items con:";
+"Specific places" = "Lugares específicos";
+"Recursive" = "Recursivo";
+"Search" = "Buscar";
 
+/* names */
+"contains" = "contiene";
+"is" = "es";
+"contains not" = "no contiene";
+"starts with" = "comienza con";
+"ends with" = "termina con";
+"name" = "Nombre"; 
+
+/* size */
+"size"="Tamaño";
+"greater than"="mayor que";
+"less than"="menos que";
+
+/* annotations */
+"annotations"="anotaciones";
+"contains one of"="contiene uno de";
+"contains all of"="contiene todos de";
+"with exactly"="con exactamente";
+"without one of"="sin uno de";
+
+/* owner */
+"owner"="Propierario";
+
+/* date */
+"date created"="fecha de creación";
+"date modified"="fecha de modificación";
+"is today" = "es hoy";
+"is within" = "está dentro";
+"is before" = "está antes";
+"is after" = "está después";
+"is exactly" = "es exactamente";
+"the last day" = "el útlimo día";
+"the last 2 days" = "los últimos 2 días";
+"the last 3 days" =  "los últimos 3 días";
+"the last week" = "la última semana";
+"the last 2 weeks" = "las últimas 2 semanas";
+"the last 3 weeks" = "las últimas 3 semanas";
+"the last month" = "el último mes";
+"the last 2 months" = "los últimos 2 meses";
+"the last 3 months" = "los últimos 3 meses";
+"the last 6 months" = "los últimos 6 meses";
 
 /* ----------------------- Fiend strings --------------------------- */
 
 /* Fiend.m */
 
 "New Layer" = "Nueva Capa";
-"A layer with this name is already present!" = "¿Ya hay una capa con ese nombre!";
-"You can't remove the last layer!" = "¿No puede borrar la \U00FAltima capa!";
+"A layer with this name is already present!" = "¡Ya hay una capa con ese nombre!";
+"You can't remove the last layer!" = "¡No puede borrar la última capa!";
 "Remove layer" = "Quitar capa";
-"Are you sure that you want to remove this layer?" = "¿Está seguro de querer quitar esta capa?";
+"Are you sure that you want to remove this layer?" = "¿Estás seguro de querer quitar esta capa?";
 "Rename Layer" = "Renombrar capa";
-"You can't dock multiple paths!" = "¿No puede aparcar rutas m\U00FAltiples!";
-"This object is already present in this layer!" = "¿Este objeto ya está en esta capa!";
+"You can't dock multiple paths!" = "¡No puede aparcar rutas múltiples!";
+"This object is already present in this layer!" = "¡Este objeto ya está en esta capa!";
         
                         
 /* ----------------------- Preference strings --------------------------- */
@@ -315,59 +311,94 @@
 "GWorkspace Preferences" = "Preferencias de GWorkspace";
 
 
-/* BackWinPreferences.m */       
+/* XTermPref.m */    
+"Terminal" = "Terminal";
+"Set" = "Poner";
+"Use Terminal service" = "Usar Terminal de servicios"; 
+"arguments" = "argumentos";
 
-/* R// Traducir shelf  Q// En principio, estante o balda */
-"DeskTop Shelf" = "Shelf de escritorio";        
-"DeskTop Color" = "Color de escritorio";
-"red" = "rojo";
-"green" = "verde";
-"blue" = "azul";
-"Set Color" = "Poner color";
-"Push the \"Set Image\" button\nto set your DeskTop image.\nThe image must have the same\nsize of your screen." = "Pulse el botón \"Poner imagen\" para poner su\nimagen de escritorio. La imagen debe tener el\nmismo tamaño que la pantalla.";
-
-"Set Image" = "Poner imagen";
-"Unset Image" = "Quitar imagen";
-
-        
-/* DefaultXTerm.m */             
-        
-"Set" = "Poner";        
-
-        
-/* BrowserViewsPreferences.m */  
+/* BrowserViewerPref.m */  
 
 "Column Width" = "Anchura de columnas";
-"Use Default Settings" = "Usar ajustes predeterminados";        
-"Browser" = "Ojeador";
-        
-        
-/* FileWatchingPreferences.m */  
+"Use Default Settings" = "Usar ajustes predeterminados";	
 
-/* timeout */
-"File System Watching" = "Vigilancia del sistema de ficheros";
-"timeout" = "timeout";
-"frequency" = "frecuencia";
-"Values will apply to the \nnew watchers from now, \nto the existing ones, after the first timeout" = 
-"Los valores se aplicar\U00E1n a\nlos nuevos vigilantes desde ahora,\ny a los ya existentes a partir del primer timeout";
-        
-        
-/* ShelfPreferences.m */
-        
-"Shelf" = "Shelf";
-        
-        
-/* DefaultEditor.m */            
+/* DefaultEditor.m */
 
+"Editor" = "Editor";
 "Default Editor" = "Editor predeterminado";
-"No Default Editor" = "Sin editor predeterminado";
-"Choose..." = "Elija...";
+"No Default Editor" = "No Default Editor";
+"Choose" = "Elija";
+
+/* DefSortOrderPref.m */
+"Sorting Order" = "Ordenador";
+"The method will apply to all the folders" = "El método se aplicará a todas las carpetas";
+"that have no order specified" = "no tiene orden específico";
+
+/* HiddenFilesPref.m */
+"Hidden Files" = "Archivos ocultos";
+"Files" = "Archivos";
+"Folders" = "Carpetas";
+"Activate changes" = "Active cambio";
+"Load" = "Cargar";
+"Hidden files" = "Archivos ocultados";
+"Shown files" = "Archivos Mostrados";
+"Select and move the files to hide or to show" = "Selecciona y oculta o muestra los archivos";
+"Hidden directories" = "Directorios ocultados";
+
+/* IconsPrefs.m */
+"Icons" = "Iconos";
+"Thumbnails" = "Miniaturas";
+"use thumbnails" = "Usar miniaturas";
+"Title Width" = "Anchura del título";
+
+/* DesktopPref.m */
+"Desktop" = "Escritorio";
+"Background"="Fondo";
+"General"="General";
+"Color:" = "Color:";
+"center" = "Centrar";
+"fit" = "ajuste";
+"tile" = "teja";
+"scale" = "escala";
+
+"Use image"="Usar imagen";
+"Choose"="Elija";
+
+"Dock" = "Dock";
+"Show Dock"="Mostrar el Dock";
+"Position:"="Posición:";
+
+"Style:"="Estilo:";
+"Left"="Izquierda";
+"Right"="Derecha";
+
+"Classic"="Clásico";
+"Modern"="Moderno";
+
+"Omnipresent"="Omnipresente";
+"Autohide Tabbed Shelf"="Auto-esconder Pestañas";
 
 
-/* IconViewsPreferences.m */
+/* OperationPrefs.m */
+"File Operations" = "Operaciones de fichero";
+"Operation Preferences"="Preferencias de operaciones";
+"Status Window"="Ventana de estatus";
+"Confirmation"="Confirmación";
+"Show status window"="Mostrar ventana de estatus";
+"Check this option to show a status window"="Marcar esta opción para mostra la ventana de estatus";
+"during the file operations"="durante la operación de archivos";
+"Uncheck the buttons to allow automatic confirmation"="Desmarcar los botones para permitir confirmación automática";
+"of file operations"="the operaciones de archivo";
 
-"Title Width" = "Anchura del t\U00EDtulo";
-"Icon View" = "Ver por iconos";
+/* HistoryPref.m */
+"Number of saved paths"="Número de rutas guardadas";
+
+/* -------- */
+
+/* RunExternalController.m */
+"Run" = "Ejecutar";
+"Type the command to execute:"="Escribe el comando a ejecutar";
+
 
 /* Recycler strings */
 "Recycle: " = "Enviar a la papelera: ";
