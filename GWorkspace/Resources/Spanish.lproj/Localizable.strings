@@ -207,7 +207,7 @@
 "Contents Inspector" = "Inspector de contenidos";
 "No Contents Inspector" = "Sin inspector de contenidos";
 "No Contents Inspector\nFor Multiple Selection" = "No hay Inspector de\ncontenidos para\nselección múltiple";
-"No Contents Inspectors found!" = "No Contents Inspectors found!";
+"No Contents Inspectors found!" = "Sin inspector de contenidos encontrados!";
 
 /* FolderViewer.m */
 
