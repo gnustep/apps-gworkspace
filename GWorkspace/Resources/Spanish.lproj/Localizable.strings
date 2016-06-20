@@ -1,4 +1,10 @@
-﻿/* ----------------------- menu strings --------------------------- */
+﻿/* 
+ translations enhanced by:
+ Eduardo Osorio Armenta
+ Andres Morales
+*/
+
+/* ----------------------- menu strings --------------------------- */
 /* main.m */
 
 "Info" = "Información";
