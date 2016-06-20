@@ -194,7 +194,7 @@
 "Revert" = "Revertir";
 "also apply to files inside selection" = "Aplicar a las subcarpetas";
 "Permissions" = "Permisos";
-"Read" = "Leer;
+"Read" = "Leer";
 "Write" = "Escribir";
 "Execute" = "Ejecutar";
 "Owner_short" = "Proprietario";
