@@ -32,7 +32,7 @@
         "Select All" = "Seleccionar todo";
                 
 "View" = "Ver";
-        "Browser" = "Navigador";
+        "Browser" = "Navegador";
         "Icon" = "Iconos";
         "List" = "Lista";
         "Show" = "Mostrar";
@@ -66,7 +66,7 @@
                 "Layers" = "Capas";
         "Tabbed Shelf" = "Barra de pestañas";
                 "Show Tabbed Shelf" = "Mostrar Barra de Pestañas";
-                "Hide Tabbed Shelf" = "Oculutar Barra de Pestañas";
+                "Hide Tabbed Shelf" = "Ocultar Barra de Pestañas";
                 "Remove Current Tab" = "Remover pestaña actual";
                 "Rename Current Tab" = "Renombrar pestaña actual";
                 "Add Tab..." = "Añadir pestaña";
@@ -152,7 +152,6 @@
 "File Operation Completed" = "Operación de fichero completada";
 "Backgrounder connection died!" = "La conexión con Backgrounder se ha perdido";
 "Some items have the same name;\ndo you want to substitute them?" = "Algunos elementos tienen el mismo nombre;\n¿Quiere sustituirlos?";
-"Error" = "Error";
 "File Operation Error!" = "¡Error en la operación de ficheros!";
 
 
@@ -164,7 +163,7 @@
 "Cannot rename " = "No se puede renombrar ";
 "Invalid char in name" = "Carácter no válido en el nombre";
 
-/* ----------------------------- Viewers Strings ----------------------------- *\
+/* ----------------------------- Viewers Strings ----------------------------- */
 
 /* GWViewer.m */
 "free" = "libre";
@@ -196,7 +195,7 @@
 "Read" = "Leer";
 "Write" = "Escribir";
 "Execute" = "Ejecutar";
-"Owner_short" = "Proprietario";
+"Owner_short" = "Propietario";
 "Group" = "Grupo";
 "Other" = "Otro";
 
@@ -205,7 +204,7 @@
 
 "Contents Inspector" = "Inspector de contenidos";
 "No Contents Inspector" = "Sin inspector de contenidos";
-"No Contents Inspector\nFor Multiple Selection" = "No hay Inspector de\ncontenidos para\nselección múltiple";
+"No Contents Inspector\nFor Multiple Selection" = "No hay Inspector de\ncontenidos para\nSelección Múltiple";
 "No Contents Inspectors found!" = "Sin inspector de contenidos encontrados!";
 
 /* FolderViewer.m */
@@ -214,7 +213,6 @@
   = "El método de ordenación se\naplica al contenido de la\ncarpeta seleccionada, NO\na la carpeta superior";
 "Sort by" = "Ordenar por";
 "Name" = "Nombre";
-"Type" = "Clase";
 "Date" = "Fecha";
 "Folder Inspector" = "Inspector de Carpetas";        
 
