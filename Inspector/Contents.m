@@ -52,6 +52,7 @@ static NSString *nibName = @"Contents";
   RELEASE (currentPath);
   RELEASE (genericView);
   RELEASE (noContsView);
+  RELEASE (textViewer);
   RELEASE (mainBox);
   RELEASE (pboardImage);
       
@@ -113,15 +114,15 @@ static NSString *nibName = @"Contents";
 	      Class principalClass = [bundle principalClass];
 	    
 	      if ([principalClass conformsToProtocol: @protocol(ContentViewersProtocol)]) {	
-		      CREATE_AUTORELEASE_POOL (pool);
+                CREATE_AUTORELEASE_POOL (pool);
 		id vwr = [[principalClass alloc] initWithFrame: r inspector: self];
 	    
 		[viewers addObject: vwr];            
-		RELEASE ((id)vwr);	
+		[vwr release];	
 		RELEASE (pool);		
 	      }
 	    }
-		      }
+          }
 	}
     }
 
@@ -668,9 +669,9 @@ static NSString *nibName = @"Contents";
                   value: [NSFont systemFontOfSize: 18] 
                   range: range];
 
-	[storage addAttribute: NSForegroundColorAttributeName 
-										value: [NSColor darkGrayColor] 
-										range: range];			
+  [storage addAttribute: NSForegroundColorAttributeName 
+                  value: [NSColor darkGrayColor] 
+                  range: range];			
 
   RELEASE (attrstr);
   RELEASE (style);
