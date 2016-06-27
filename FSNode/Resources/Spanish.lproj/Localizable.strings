@@ -1,4 +1,153 @@
-﻿"Desktop"="Escritorio";
+﻿/***
+English.lproj/Localizable.strings
+updated by make_strings 2016-06-25 00:30:18 +0100
+add comments above this one
+***/
+
+
+/*** Keys found in multiple places ***/
+
+/* File: ../FSNFunctions.m:147 */
+/* File: ../FSNFunctions.m:155 */
+/* Flag: untranslated */
+/* File: ../FSNFunctions.m:164 */
+/* Flag: untranslated */
+/* File: ../FSNFunctions.m:194 */
+/* Flag: untranslated */
+"Continue" = "Continuar";
+
+/* File: ../FSNBrowserColumn.m:1619 */
+/* File: ../FSNFunctions.m:181 */
+/* Flag: untranslated */
+/* File: ../FSNIcon.m:1584 */
+/* Flag: untranslated */
+"OK" = "OK";
+
+/* File: ../FSNBrowserCell.m:407 */
+/* Flag: untranslated */
+/* File: ../FSNIcon.m:817 */
+/* Flag: untranslated */
+/* File: <dummy>:0 */
+/* Flag: unmatched */
+"elements" = "elementos";
+
+/* File: ../FSNBrowserColumn.m:1616 */
+/* Flag: untranslated */
+/* File: ../FSNIcon.m:1581 */
+/* Flag: untranslated */
+/* File: <dummy>:0 */
+/* Flag: unmatched */
+"error" = "error";
+
+/* File: ../FSNBrowserColumn.m:1618 */
+/* Flag: untranslated */
+/* File: ../FSNIcon.m:1583 */
+/* Flag: untranslated */
+/* File: <dummy>:0 */
+/* Flag: unmatched */
+"Can't open " = "No se puede abrir ";
+
+/* File: ../FSNListView.m:150 */
+/* Flag: untranslated */
+/* File: ../FSNListView.m:171 */
+/* Flag: untranslated */
+/* File: <dummy>:0 */
+/* Flag: unmatched */
+"Name" = "Nombre";
+
+/* File: ../FSNode.m:561 */
+/* Flag: untranslated */
+/* File: ../FSNode.m:580 */
+/* Flag: untranslated */
+/* File: <dummy>:0 */
+/* Flag: unmatched *
+"symbolic link" = "enlace simbólico";
+
+/* File: ../FSNode.m:568 */
+/* Flag: untranslated */
+/* File: <dummy>:0 */
+/* Flag: unmatched */
+"plain file" = "archivo plano";
+
+/* File: ../FSNode.m:588 */
+/* Flag: untranslated */
+/* File: <dummy>:0 */
+/* Flag: unmatched */
+"unknown" = "desconocido";
+
+
+/*** Unmatched/untranslated keys ***/
+
+/* File: <dummy>:0 */
+/* Flag: unmatched */
+"Application" = "Aplicación";
+
+
+/*** Strings from ../FSNFunctions.m ***/
+/* File: ../FSNFunctions.m:193 */
+" is already in use!" = "¡esta en uso!";
+/* File: ../FSNFunctions.m:173 */
+"Are you sure you want to add the extension"
+  = "Seguro que desea añadir la extensión";
+/* File: ../FSNFunctions.m:180 */
+"Cancel" = "Cancelar";
+/* File: ../FSNFunctions.m:189 */
+/* File: ../FSNFunctions.m:162 */
+/* File: ../FSNFunctions.m:153 */
+/* File: ../FSNFunctions.m:143 */
+"Error" = "Error";
+/* File: ../FSNFunctions.m:163 */
+"Invalid name" = "Nombre inválido";
+/* File: ../FSNFunctions.m:191 */
+"The name " = "El nombre ";
+/* File: ../FSNFunctions.m:154 */
+"You can't rename an object that is in the Recycler"
+  = "No se puede cambiar el nombre de un objeto que se encuentra en la papelera";
+/* File: ../FSNFunctions.m:145 */
+"You do not have write permission for"
+  = "Usted no tiene permiso de escritura para";
+/* File: ../FSNFunctions.m:177 */
+"\nif you make this change, your folder may appear as a single file."
+  = "\nsi realiza este cambio, la carpeta puede aparecer como un solo archivo.";
+/* File: ../FSNFunctions.m:176 */
+"to the end of the name?" = "al final del nombre?";
+
+
+/*** Strings from ../FSNIconsView.m ***/
+/* File: ../FSNIconsView.m:799 */
+"Open with" = "Abrir con";
+
+
+/*** Strings from ../FSNListView.m ***/
+/* File: ../FSNListView.m:156 */
+"Date Modified" = "Fecha modificada.";
+/* File: ../FSNListView.m:162 */
+"Owner" = "Propietario";
+/* File: ../FSNListView.m:165 */
+"Parent" = "Padre";
+/* File: ../FSNListView.m:159 */
+"Size" = "Tamaño";
+/* File: ../FSNListView.m:153 */
+"Type" = "Tipo";
+
+
+/*** Strings from ../FSNode.m ***/
+/* File: ../FSNode.m:571 */
+"application" = "aplicación";
+/* File: ../FSNode.m:586 */
+"block special" = "bloque especial";
+/* File: ../FSNode.m:584 */
+"character special" = "carácter special";
+/* File: ../FSNode.m:577 */
+"directory" = "directorio";
+/* File: ../FSNode.m:575 */
+"mount point" = "punto de montaje";
+/* File: ../FSNode.m:573 */
+"package" = "paquete";
+/* File: ../FSNode.m:582 */
+"socket" = "enchufe";
+
+"Desktop"="Escritorio";
 "Music"="Música";
 "Images"="Imágenes";
 "Documents"="Documentos";
