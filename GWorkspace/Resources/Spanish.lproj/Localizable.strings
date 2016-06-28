@@ -57,9 +57,10 @@
                 "Contents" = "Contenidos";
                 "Tools" = "Herramientas";
                 "Annotations" = "Anotaciones";
-        "Fiend" = "Fiend";
-                "Show Fiend" = "Mostrar Fiend";
-                "Hide Fiend" = "Ocultar Fiend";
+        "Finder" = "Buscador";
+        "Fiend" = "Duente";
+                "Show Fiend" = "Mostrar el Duende";
+                "Hide Fiend" = "Ocultar el Duende";
                 "Add Layer..." = "Añadir capa...";
                 "Remove Current Layer" = "Quitar la capa actual";
                 "Rename Current Layer" = "Renombrar la capa actual";
@@ -185,7 +186,7 @@
 "Path:" = "Ruta:";
 "Link To:" = "Enlazar a:";
 "Size:" = "Tamaño:";
-"Calculate"="Calcular";
+"Calculate" = "Calcular";
 "Owner:" = "Propietario:";
 "Group:" = "Grupo:";
 "Changed" = "Cambiado";
@@ -214,7 +215,7 @@
 "Sort by" = "Ordenar por";
 "Name" = "Nombre";
 "Date" = "Fecha";
-"Folder Inspector" = "Inspector de Carpetas";        
+"Folder Inspector" = "Inspector de Carpetas";
 
 
 /* ImageViewer.m */
@@ -241,12 +242,11 @@
 
 /* Finder.m */
 
-"Finder" = "Buscador";
 "No selection!" = "¡Ninguna selección!";
 "Search in:" = "Buscar en:";
 "Current selection" = "Selección actual";
 "Add" = "Añadir";
-"Remove" = "Remover";
+"Remove" = "Eliminar";
 "Search for items whose:" = "Buscar items con:";
 "Specific places" = "Lugares específicos";
 "Recursive" = "Recursivo";
@@ -258,26 +258,26 @@
 "contains not" = "no contiene";
 "starts with" = "comienza con";
 "ends with" = "termina con";
-"name" = "Nombre"; 
+"name" = "nombre"; 
 
 /* size */
-"size"="Tamaño";
-"greater than"="mayor que";
-"less than"="menos que";
+"size" = "Tamaño";
+"greater than" = "mayor que";
+"less than" = "menos que";
 
 /* annotations */
-"annotations"="anotaciones";
-"contains one of"="contiene uno de";
-"contains all of"="contiene todos de";
-"with exactly"="con exactamente";
-"without one of"="sin uno de";
+"annotations" = "anotaciones";
+"contains one of" = "contiene uno de";
+"contains all of" = "contiene todos de";
+"with exactly" = "con exactamente";
+"without one of" = "sin uno de";
 
 /* owner */
-"owner"="Propierario";
+"owner" = "Propierario";
 
 /* date */
-"date created"="fecha de creación";
-"date modified"="fecha de modificación";
+"date created" = "fecha de creación";
+"date modified" = "fecha de modificación";
 "is today" = "es hoy";
 "is within" = "está dentro";
 "is before" = "está antes";
@@ -294,6 +294,19 @@
 "the last 3 months" = "los últimos 3 meses";
 "the last 6 months" = "los últimos 6 meses";
 
+/* type */
+"type" = "tipo";
+"is not" = "no es";
+"plain file" = "archivo plano";
+"folder" = "carpeta";
+"tool" = "herramienta";
+"symbolic link" = "enlace simbólico";
+"application" = "aplicación";
+
+/* contents */
+"contents" = "contenido";
+"includes" = "que incluya";
+
 /* ----------------------- Fiend strings --------------------------- */
 
 /* Fiend.m */
@@ -306,8 +319,8 @@
 "Rename Layer" = "Renombrar capa";
 "You can't dock multiple paths!" = "¡No puede aparcar rutas múltiples!";
 "This object is already present in this layer!" = "¡Este objeto ya está en esta capa!";
-        
-                        
+
+
 /* ----------------------- Preference strings --------------------------- */
 
 /* PreferencesWin.m */
@@ -315,16 +328,16 @@
 "GWorkspace Preferences" = "Preferencias de GWorkspace";
 
 
-/* XTermPref.m */    
+/* XTermPref.m */
 "Terminal" = "Terminal";
-"Set" = "Poner";
+"Set" = "Aplicar";
 "Use Terminal service" = "Usar Terminal de servicios"; 
 "arguments" = "argumentos";
 
-/* BrowserViewerPref.m */  
+/* BrowserViewerPref.m */
 
 "Column Width" = "Anchura de columnas";
-"Use Default Settings" = "Usar ajustes predeterminados";	
+"Use Default Settings" = "Usar ajustes predeterminados";
 
 /* DefaultEditor.m */
 
@@ -334,7 +347,7 @@
 "Choose" = "Elija";
 
 /* DefSortOrderPref.m */
-"Sorting Order" = "Ordenador";
+"Sorting Order" = "Orden de clasificación";
 "The method will apply to all the folders" = "El método se aplicará a todas las carpetas";
 "that have no order specified" = "no tiene orden específico";
 
@@ -342,12 +355,12 @@
 "Hidden Files" = "Archivos ocultos";
 "Files" = "Archivos";
 "Folders" = "Carpetas";
-"Activate changes" = "Active cambio";
+"Activate changes" = "Activar cambios";
 "Load" = "Cargar";
-"Hidden files" = "Archivos ocultados";
-"Shown files" = "Archivos Mostrados";
-"Select and move the files to hide or to show" = "Selecciona y oculta o muestra los archivos";
-"Hidden directories" = "Directorios ocultados";
+"Hidden files" = "Archivos ocultos";
+"Shown files" = "Archivos visibles";
+"Select and move the files to hide or to show" = "Seleccionar y mover los archivos para ocultar o mostrar";
+"Hidden directories" = "Directorios ocultos";
 
 /* IconsPrefs.m */
 "Icons" = "Iconos";
@@ -366,7 +379,6 @@
 "scale" = "escala";
 
 "Use image"="Usar imagen";
-"Choose"="Elija";
 
 "Dock" = "Dock";
 "Show Dock"="Mostrar el Dock";
@@ -385,23 +397,23 @@
 
 /* OperationPrefs.m */
 "File Operations" = "Operaciones de fichero";
-"Operation Preferences"="Preferencias de operaciones";
-"Status Window"="Ventana de estatus";
-"Confirmation"="Confirmación";
-"Show status window"="Mostrar ventana de estatus";
+"Operation Preferences" = "Preferencias de operaciones";
+"Status Window" = "Ventana de estatus";
+"Confirmation" = "Confirmación";
+"Show status window" = "Mostrar ventana de estatus";
 "Check this option to show a status window"="Marcar esta opción para mostra la ventana de estatus";
-"during the file operations"="durante la operación de archivos";
+"during the file operations" = "durante la operación de archivos";
 "Uncheck the buttons to allow automatic confirmation"="Desmarcar los botones para permitir confirmación automática";
-"of file operations"="the operaciones de archivo";
+"of file operations" = "the operaciones de archivo";
 
 /* HistoryPref.m */
-"Number of saved paths"="Número de rutas guardadas";
+"Number of saved paths" = "Número de rutas guardadas";
 
 /* -------- */
 
 /* RunExternalController.m */
 "Run" = "Ejecutar";
-"Type the command to execute:"="Escribe el comando a ejecutar";
+"Type the command to execute:" = "Escribe el comando a ejecutar";
 
 
 /* Recycler strings */
