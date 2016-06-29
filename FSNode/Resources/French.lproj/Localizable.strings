@@ -19,31 +19,31 @@ add comments above this one
 /* Flag: untranslated */
 /* File: ../FSNIcon.m:817 */
 /* Flag: untranslated */
-"elements" = "elements";
+"elements" = "éléments";
 
 /* File: ../FSNBrowserColumn.m:1616 */
 /* Flag: untranslated */
 /* File: ../FSNIcon.m:1581 */
 /* Flag: untranslated */
-"error" = "error";
+"error" = "erreur";
 
 /* File: ../FSNBrowserColumn.m:1618 */
 /* Flag: untranslated */
 /* File: ../FSNIcon.m:1583 */
 /* Flag: untranslated */
-"Can't open " = "Can't open ";
+"Can't open " = "Impossible d'ouvrir ";
 
 /* File: ../FSNListView.m:150 */
 /* Flag: untranslated */
 /* File: ../FSNListView.m:171 */
 /* Flag: untranslated */
-"Name" = "Name";
+"Name" = "Nom";
 
 /* File: ../FSNode.m:561 */
 /* Flag: untranslated */
 /* File: ../FSNode.m:580 */
 /* Flag: untranslated */
-"symbolic link" = "symbolic link";
+"symbolic link" = "lien symbolique";
 
 /* File: ../FSNFunctions.m:143 */
 /* Flag: untranslated */
@@ -53,7 +53,7 @@ add comments above this one
 /* Flag: untranslated */
 /* File: ../FSNFunctions.m:189 */
 /* Flag: untranslated */
-"Error" = "Error";
+"Error" = "Erreur";
 
 /* File: ../FSNFunctions.m:147 */
 /* Flag: untranslated */
@@ -63,7 +63,7 @@ add comments above this one
 /* Flag: untranslated */
 /* File: ../FSNFunctions.m:194 */
 /* Flag: untranslated */
-"Continue" = "Continue";
+"Continue" = "Continuer";
 
 
 /*** Unmatched/untranslated keys ***/
@@ -71,46 +71,46 @@ add comments above this one
 /* File: ../FSNFunctions.m:145 */
 /* Flag: untranslated */
 "You do not have write permission for"
-  = "You do not have write permission for";
+  = "Vous n'avez pas les droits d'écriture pour";
 
 /* File: ../FSNFunctions.m:154 */
 /* Flag: untranslated */
 "You can't rename an object that is in the Recycler"
-  = "You can't rename an object that is in the Recycler";
+  = "Vous ne pouvez renommer un objet dans la corbeille";
 
 /* File: ../FSNFunctions.m:163 */
 /* Flag: untranslated */
-"Invalid name" = "Invalid name";
+"Invalid name" = "Nom invalide";
 
 /* File: ../FSNFunctions.m:173 */
 /* Flag: untranslated */
 "Are you sure you want to add the extension"
-  = "Are you sure you want to add the extension";
+  = "Êtes-vous sûr de vouloir ajouter l'extension";
 
 /* File: ../FSNFunctions.m:176 */
 /* Flag: untranslated */
-"to the end of the name?" = "to the end of the name?";
+"to the end of the name?" = "à la fin du nom ?";
 
 /* File: ../FSNFunctions.m:177 */
 /* Flag: untranslated */
 "\nif you make this change, your folder may appear as a single file."
-  = "\nif you make this change, your folder may appear as a single file.";
+  = "\nsi vous changez ceci, le dossier ressemblera à un simple fichier.";
 
 /* File: ../FSNFunctions.m:180 */
 /* Flag: untranslated */
-"Cancel" = "Cancel";
+"Cancel" = "Annuler";
 
 /* File: ../FSNFunctions.m:191 */
 /* Flag: untranslated */
-"The name " = "The name ";
+"The name " = "Le nom ";
 
 /* File: ../FSNFunctions.m:193 */
 /* Flag: untranslated */
-" is already in use!" = " is already in use!";
+" is already in use!" = " est déjà pris !";
 
 /* File: ../FSNIconsView.m:799 */
 /* Flag: untranslated */
-"Open with" = "Open with";
+"Open with" = "Ouvrir avec";
 
 /* File: ../FSNListView.m:153 */
 /* Flag: untranslated */
@@ -118,15 +118,15 @@ add comments above this one
 
 /* File: ../FSNListView.m:156 */
 /* Flag: untranslated */
-"Date Modified" = "Date Modified";
+"Date Modified" = "Date de modification";
 
 /* File: ../FSNListView.m:159 */
 /* Flag: untranslated */
-"Size" = "Size";
+"Size" = "Taille";
 
 /* File: ../FSNListView.m:162 */
 /* Flag: untranslated */
-"Owner" = "Owner";
+"Owner" = "Propriétaire";
 
 /* File: ../FSNListView.m:165 */
 /* Flag: untranslated */
@@ -134,7 +134,7 @@ add comments above this one
 
 /* File: ../FSNode.m:568 */
 /* Flag: untranslated */
-"plain file" = "plain file";
+"plain file" = "simple fichier";
 
 /* File: ../FSNode.m:571 */
 /* Flag: untranslated */
@@ -142,15 +142,15 @@ add comments above this one
 
 /* File: ../FSNode.m:573 */
 /* Flag: untranslated */
-"package" = "package";
+"package" = "paquet";
 
 /* File: ../FSNode.m:575 */
 /* Flag: untranslated */
-"mount point" = "mount point";
+"mount point" = "point de montage";
 
 /* File: ../FSNode.m:577 */
 /* Flag: untranslated */
-"directory" = "directory";
+"directory" = "dossier";
 
 /* File: ../FSNode.m:582 */
 /* Flag: untranslated */
@@ -158,15 +158,15 @@ add comments above this one
 
 /* File: ../FSNode.m:584 */
 /* Flag: untranslated */
-"character special" = "character special";
+"character special" = "caractère spécial";
 
 /* File: ../FSNode.m:586 */
 /* Flag: untranslated */
-"block special" = "block special";
+"block special" = "bloc spécial";
 
 /* File: ../FSNode.m:588 */
 /* Flag: untranslated */
-"unknown" = "unknown";
+"unknown" = "inconnu";
 
 /* File: <dummy>:0 */
 /* Flag: unmatched */
