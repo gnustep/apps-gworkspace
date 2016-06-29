@@ -271,8 +271,8 @@
 "owner"="Owner";
 
 /* date */
-"date created"="Data created";
-"date modified"="Data modified";
+"date created"="Date created";
+"date modified"="Date modified";
 "is today" = "is today";
 "is within" = "is within";
 "is before" = "is before";
