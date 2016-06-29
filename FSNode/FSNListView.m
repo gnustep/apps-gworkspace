@@ -172,28 +172,28 @@ static NSString *defaultColumns = @"{ \
 
   switch(type) {
     case FSNInfoNameType:
-      [[column headerCell] setStringValue: NSLocalizedStringFromTableInBundle(@"Name", nil, [NSBundle bundleForClass:[self class]], @"")];
+      [[column headerCell] setStringValue: NSLocalizedStringFromTableInBundle(@"Name", nil, [NSBundle bundleForClass:[FSNode class]], @"")];
       break;
     case FSNInfoKindType:
-      [[column headerCell] setStringValue: NSLocalizedStringFromTableInBundle(@"Type", nil, [NSBundle bundleForClass:[self class]], @"")];
+      [[column headerCell] setStringValue: NSLocalizedStringFromTableInBundle(@"Type", nil, [NSBundle bundleForClass:[FSNode class]], @"")];
       break;
     case FSNInfoDateType:
-      [[column headerCell] setStringValue: NSLocalizedStringFromTableInBundle(@"Date Modified", nil, [NSBundle bundleForClass:[self class]], @"")];
+      [[column headerCell] setStringValue: NSLocalizedStringFromTableInBundle(@"Date Modified", nil, [NSBundle bundleForClass:[FSNode class]], @"")];
       break;
     case FSNInfoSizeType:
-      [[column headerCell] setStringValue: NSLocalizedStringFromTableInBundle(@"Size", nil, [NSBundle bundleForClass:[self class]], @"")];
+      [[column headerCell] setStringValue: NSLocalizedStringFromTableInBundle(@"Size", nil, [NSBundle bundleForClass:[FSNode class]], @"")];
       break;
     case FSNInfoOwnerType:
-      [[column headerCell] setStringValue: NSLocalizedStringFromTableInBundle(@"Owner", nil, [NSBundle bundleForClass:[self class]], @"")];
+      [[column headerCell] setStringValue: NSLocalizedStringFromTableInBundle(@"Owner", nil, [NSBundle bundleForClass:[FSNode class]], @"")];
       break;
     case FSNInfoParentType:
-      [[column headerCell] setStringValue: NSLocalizedStringFromTableInBundle(@"Parent", nil, [NSBundle bundleForClass:[self class]], @"")];
+      [[column headerCell] setStringValue: NSLocalizedStringFromTableInBundle(@"Parent", nil, [NSBundle bundleForClass:[FSNode class]], @"")];
       break;
     case FSNInfoExtendedType:
       [[column headerCell] setStringValue: extInfoType]; /* should come Localized from the ExtInfo bundle */
       break;
     default:
-      [[column headerCell] setStringValue: NSLocalizedStringFromTableInBundle(@"Name", nil, [NSBundle bundleForClass:[self class]], @"")];
+      [[column headerCell] setStringValue: NSLocalizedStringFromTableInBundle(@"Name", nil, [NSBundle bundleForClass:[FSNode class]], @"")];
       break;      
   }
 
