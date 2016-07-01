@@ -50,9 +50,9 @@
 		"Attributes" = "Attributi";
 		"Contents" = "Contenuto";	
 	"Finder" = "Finder";
-	"Fiend" = "Fiend";
-		"Show Fiend" = "Mostra il Fiend";
-		"Hide Fiend" = "Nascondi il Fiend";
+	"Fiend" = "Folletto";
+		"Show Fiend" = "Mostra il Folletto";
+		"Hide Fiend" = "Nascondi il Folletto";
 		"Add Layer..." = "Aggiungi un Livello...";
 		"Remove Current Layer" = "Rimuovi il Livello corrente";
 		"Rename Current Layer" = "Rinomina il Livello corrente";
