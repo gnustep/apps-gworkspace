@@ -1235,21 +1235,24 @@ static GWorkspace *gworkspace = nil;
 
       NS_DURING
         {
-      [ws getInfoForFile: apath application: &defApp type: &type];     
+	  [ws getInfoForFile: apath application: &defApp type: &type];     
 
-      if (type != nil) {
-        if ((type == NSDirectoryFileType) || (type == NSFilesystemFileType)) {
-          if (newv) {    
-            [self newViewerAtPath: apath];    
-          }
-        } else if ((type == NSPlainFileType) 
-                            || ([type isEqual: NSShellCommandFileType])) {
-          [self openFile: apath];
-
-        } else if (type == NSApplicationFileType) {
-          [ws launchApplication: apath];
-        }
-      }
+	  if (type != nil)
+	    {
+	      if ((type == NSDirectoryFileType) || (type == NSFilesystemFileType))
+		{
+		  if (newv)
+		    [self newViewerAtPath: apath];    
+		}
+	      else if ((type == NSPlainFileType) || ([type isEqual: NSShellCommandFileType]))
+		{
+		  [self openFile: apath];
+		}
+	      else if (type == NSApplicationFileType)
+		{
+		  [ws launchApplication: apath];
+		}
+	    }
         }
       NS_HANDLER
         {
@@ -1310,7 +1313,7 @@ static GWorkspace *gworkspace = nil;
 	  urlString = [weblocDict objectForKey:@"URL"];
 	  aURL = [NSURL URLWithString: urlString];
         }
-    }	
+    }
   
   NS_DURING
     {
