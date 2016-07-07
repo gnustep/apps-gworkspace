@@ -3,7 +3,7 @@
     ApplicationDescription = "GNUstep Workspace Manager";
     ApplicationIcon = "FileManager.tiff";
     ApplicationRelease = "0.9.4";
-    NSBuildVersion = "05 2016";
+    NSBuildVersion = "07 2016";
     CFBundleIdentifier = "org.gnustep.GWorkspace";
     Authors = (
       "Riccardo Mottola",
