@@ -1,2 +1,20 @@
-GWorkspace is a clone of the NeXT workspace manager with some added 
-features as spatial viewing, an advanced database based search system, etc. 
+GWorkspace is GNUstep's Workspace Manager and offers a a File Manager and a Desktop.
+Inspired by the NeXT workspace manager, it incorporates modern features and offers many conveniencies.
+
+File Manager:
+     * Classical column browser view
+     * List view
+     * Icons view with possibility of Thumbnails
+
+Recycler (stand-alone or integrated in Desktop's Dock)
+
+Desktop (can be shown or hidden) with Dock and Tabbed shelf to keep order in favourites and running applications.
+
+Contents inspector with image previewing and extensible through plug-in bundles.
+
+Volume checking and unmounting.
+
+Optional search (database backed) and live folders.
+
+GWorkspace implements NSWorkspace, so it offers to GNUstep applications services to open files through it as well as copy and recycle operations.
+
