@@ -48,7 +48,8 @@
 	"Inspectors" = "Ispettori";
 		"Show Inspectors" = "Mostra gli Ispettori";
 		"Attributes" = "Attributi";
-		"Contents" = "Contenuto";	
+		"Contents" = "Contenuto";
+                "Annotations" = "Annotazioni";
 	"Finder" = "Finder";
 	"Fiend" = "Folletto";
 		"Show Fiend" = "Mostra il Folletto";
