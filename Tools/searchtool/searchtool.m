@@ -25,7 +25,6 @@
 #import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
 #import "FinderModulesProtocol.h"
-#import "config.h"
 
 
 

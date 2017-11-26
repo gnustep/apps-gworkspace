@@ -30,9 +30,8 @@ after-clean::
 
 # Things to do after distcleaning
 after-distclean::
-	rm -rf autom4te*.cache
-	rm -f config.status config.log config.cache TAGS  
-	rm -f config.status config.log config.cache config.h GNUmakefile inspector.make 
+	rm -f TAGS
+	rm -f inspector.make
 
 # Things to do before checking
 # before-check::

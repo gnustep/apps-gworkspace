@@ -23,6 +23,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
+#include <config.h>
 #import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
 #include <math.h>

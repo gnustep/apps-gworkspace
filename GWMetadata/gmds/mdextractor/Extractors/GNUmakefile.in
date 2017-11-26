@@ -4,29 +4,20 @@ include $(GNUSTEP_MAKEFILES)/common.make
 
 PDFKIT=@have_pdfkit@
 
+SUBPROJECTS = \
+  TextExtractor \
+  HtmlExtractor \
+  RtfExtractor \
+  OpenOfficeExtractor \
+  AbiwordExtractor \
+  XmlExtractor \
+  JpegExtractor \
+  AppExtractor   
+
 ifneq ($(PDFKIT),no)
-SUBPROJECTS = \
-  TextExtractor \
-  HtmlExtractor \
-  RtfExtractor \
-  PdfExtractor \
-  OpenOfficeExtractor \
-  AbiwordExtractor \
-  XmlExtractor \
-  JpegExtractor \
-  AppExtractor   
-else
-SUBPROJECTS = \
-  TextExtractor \
-  HtmlExtractor \
-  RtfExtractor \
-  OpenOfficeExtractor \
-  AbiwordExtractor \
-  XmlExtractor \
-  JpegExtractor \
-  AppExtractor   
+SUBPROJECTS += PdfExtractor
 endif
-  
+
 -include GNUmakefile.preamble
 
 -include GNUmakefile.local

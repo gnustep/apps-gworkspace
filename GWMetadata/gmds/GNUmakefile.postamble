@@ -29,8 +29,7 @@
 
 # Things to do after distcleaning
 after-distclean::
-	rm -rf autom4te*.cache
-	rm -f config.status config.log config.cache TAGS config.h
+	rm -f TAGS
   
 # Things to do before checking
 # before-check::
