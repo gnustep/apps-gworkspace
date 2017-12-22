@@ -274,7 +274,7 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
     [conn setDelegate: self];
     
     if ([conn registerName: @"gmds"] == NO) {
-	    NSLog(@"unable to register with name server - quiting.");
+	    NSLog(@"unable to register with name server - quitting.");
 	    DESTROY (self);
 	    return self;
 	  }
@@ -325,7 +325,7 @@ static void attribute_score(sqlite3_context *context, int argc, sqlite3_value **
     ASSIGN (connectionName, ([NSString stringWithFormat: @"gmds_%lu", ln]));
 
     if ([conn registerName: connectionName] == NO) {
-      NSLog(@"unable to register with name server - quiting.");
+      NSLog(@"unable to register with name server - quitting.");
       exit(EXIT_FAILURE);
     }
 

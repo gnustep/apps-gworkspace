@@ -310,7 +310,7 @@ static NSString *nibName = @"MDKWindow";
   onImage = [NSImage imageNamed: @"common_2DCheckMark"];
   RETAIN (onImage);
 
-  ttstr = NSLocalizedString(@"Restrict the search to choosen places.", @"");
+  ttstr = NSLocalizedString(@"Restrict the search to chosen places.", @"");
   [placesPopUp setTitle: NSLocalizedString(@"Search in...", @"")];
   [placesPopUp setToolTip: ttstr]; 
   

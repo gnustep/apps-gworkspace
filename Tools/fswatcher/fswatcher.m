@@ -162,7 +162,7 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 
     if ([conn registerName: @"fswatcher"] == NO)
     {
-      NSLog(@"unable to register with name server - quiting.");
+      NSLog(@"unable to register with name server - quitting.");
       DESTROY (self);
       return self;
     }

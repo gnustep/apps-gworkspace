@@ -441,7 +441,7 @@ static GWDesktopManager *desktopManager = nil;
   }
   NS_HANDLER
   {
-    NSLog(@"Error! A fatal error occured while detaching the thread.");
+    NSLog(@"Error! A fatal error occurred while detaching the thread.");
   }
   NS_ENDHANDLER
 }
@@ -493,7 +493,7 @@ static GWDesktopManager *desktopManager = nil;
 
   if ([dskNode isValid] == NO) {
     NSRunAlertPanel(nil, 
-                    NSLocalizedString(@"The Desktop directory has been deleted! Quiting now!", @""), 
+                    NSLocalizedString(@"The Desktop directory has been deleted! Quitting now!", @""),
                     NSLocalizedString(@"OK", @""), 
                     nil, 
                     nil);                                     
@@ -523,7 +523,7 @@ static GWDesktopManager *desktopManager = nil;
       if ([event isEqual: @"GWWatchedPathDeleted"])
         {
           NSRunAlertPanel(nil, 
-                          NSLocalizedString(@"The Desktop directory has been deleted! Quiting now!", @""), 
+                          NSLocalizedString(@"The Desktop directory has been deleted! Quitting now!", @""),
                           NSLocalizedString(@"OK", @""), 
                           nil, 
                           nil);                                     

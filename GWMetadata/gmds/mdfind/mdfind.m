@@ -230,7 +230,7 @@
       @"  >    greater than (only for numeric values and dates)\n"
       @"  >=   greater than or equal (only for numeric values and dates)\n"
       @"\n"
-      @"Value comparision modifiers for string values:\n"
+      @"Value comparison modifiers for string values:\n"
       @"Appending the 'c' character to the search value (ex. \"value\"c),\n"
       @"makes the query case insensitive.\n"      
       @"You can use the '*' wildcard to match substrings anywhere in the\n"

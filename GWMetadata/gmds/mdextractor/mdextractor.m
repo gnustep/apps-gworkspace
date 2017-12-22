@@ -262,7 +262,7 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
     [conn setDelegate: self];
 
     if ([conn registerName: @"mdextractor"] == NO) {
-	    NSLog(@"unable to register with name server - quiting.");
+	    NSLog(@"unable to register with name server - quitting.");
 	    DESTROY (self);
 	    return self;
 	  }

@@ -691,7 +691,7 @@ if ([b tag] == MULTIPLE) perms |= v; \
   }
   NS_HANDLER
   {
-    NSLog(@"Error! A fatal error occured while detaching the thread.");
+    NSLog(@"Error! A fatal error occurred while detaching the thread.");
   }
   NS_ENDHANDLER
 }
