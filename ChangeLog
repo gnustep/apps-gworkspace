@@ -33,6 +33,16 @@
 
 2017-12-22  Yavor Doganov  <yavor@gnu.org>
 
+       * GWorkspace/Desktop/GWDesktopView.m (sortDragged)
+       (concludeDragOperation:):
+       * FSNode/FSNListView.m (sortNodeReps, sortSubviews, mouseDown:):
+       * FSNode/FSNIconsView.m (sortIcons):
+       * FSNode/FSNFunctions.m (compareWithExtType):
+       * FSNode/FSNFunctions.h: Use NSComparisonResult instead of int as
+       return type of sort functions.
+
+2017-12-22  Yavor Doganov  <yavor@gnu.org>
+
 	* GWMetadata/MDKit/MDKWindow.m
 	* GWMetadata/gmds/gmds/gmds.m
 	* GWMetadata/gmds/mdextractor/mdextractor.m

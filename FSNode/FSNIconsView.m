@@ -198,7 +198,7 @@ static void GWHighlightFrameRect(NSRect aRect)
 - (void)sortIcons
 {
   if (infoType == FSNInfoExtendedType) {
-    [icons sortUsingFunction: (int (*)(id, id, void*))compareWithExtType
+    [icons sortUsingFunction: (NSComparisonResult (*)(id, id, void*))compareWithExtType
                      context: (void *)NULL];
   } else {
     [icons sortUsingSelector: [fsnodeRep compareSelectorForDirectory: [node path]]];
