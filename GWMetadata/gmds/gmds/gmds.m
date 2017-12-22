@@ -94,12 +94,13 @@ static void path_moved(sqlite3_context *context, int argc, sqlite3_value **argv)
   int newblen = strlen((const char *)newbase);
   const unsigned char *oldpath = sqlite3_value_text(argv[2]);
   int oldplen = strlen((const char *)oldpath);
-  char newpath[PATH_MAX] = "";
+  char *newpath;
   int i = newblen;
   int j;
   
-  strncpy(newpath, (const char *)newbase, newblen);  
-  
+  newpath = malloc(newblen + oldplen - oldblen + 1);
+  strncpy(newpath, (const char *)newbase, newblen + oldplen - oldblen + 1);
+
   for (j = oldblen; j < oldplen; j++) {
     newpath[i] = oldpath[j];
     i++;
@@ -108,6 +109,8 @@ static void path_moved(sqlite3_context *context, int argc, sqlite3_value **argv)
   newpath[i] = '\0';
   
   sqlite3_result_text(context, newpath, strlen(newpath), SQLITE_TRANSIENT);
+
+  free(newpath);
 }
 
 static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)

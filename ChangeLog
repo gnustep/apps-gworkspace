@@ -1,3 +1,10 @@
+2017-12-22  Svante Signell  <svante.signell@gmail.com>
+            Yavor Doganov  <yavor@gnu.org>
+
+	* GWMetadata/gmds/mdextractor/mdextractor.m (path_moved):
+	* GWMetadata/gmds/gmds/gmds.m (path_moved): Avoid PATH_MAX and
+	allocate string dynamically; fixes build failure on GNU/Hurd.
+
 2016-06-07 Riccardo Mottola <rm@gnu.org>
 
 	* Inspector/ContentViewers/ImageViewer/ImageViewer.h
