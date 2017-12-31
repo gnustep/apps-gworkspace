@@ -79,6 +79,12 @@
 
 	Contributed at https://savannah.gnu.org/bugs/?52731.
 
+2017-11-26  Yavor Doganov  <yavor@gnu.org>
+
+	Large patch that simplifies the build system.
+
+	Contributed at https://savannah.gnu.org/bugs/?52518.
+
 2016-06-07 Riccardo Mottola <rm@gnu.org>
 
 	* Inspector/ContentViewers/ImageViewer/ImageViewer.h

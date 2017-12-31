@@ -9,6 +9,7 @@ TOOL_NAME = lsfupdater
 
 lsfupdater_OBJC_FILES = lsfupdater.m 
 
+ADDITIONAL_INCLUDE_DIRS += -I../../FSNode
 ADDITIONAL_TOOL_LIBS += -lgnustep-gui $(SYSTEM_LIBS)
 
 # The Resource files to be copied into the app's resources directory

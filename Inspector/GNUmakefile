@@ -45,7 +45,9 @@ ifeq ($(findstring darwin, $(GNUSTEP_TARGET_OS)), darwin)
     SHARED_LD_POSTFLAGS += -lgnustep-base -lgnustep-gui -lFSNode
   endif
 endif
-					 
+
+LIBRARIES_DEPEND_UPON = $(GUI_LIBS) $(FND_LIBS) $(OBJC_LIBS) -lFSNode
+
 -include GNUmakefile.preamble
 
 -include GNUmakefile.local

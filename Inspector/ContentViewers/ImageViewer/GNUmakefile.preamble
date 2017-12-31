@@ -9,7 +9,7 @@ ADDITIONAL_OBJCFLAGS += -Wall
 ADDITIONAL_CFLAGS += -Wall
 
 # Additional include directories the compiler should search
-ADDITIONAL_INCLUDE_DIRS += -I../..
+ADDITIONAL_INCLUDE_DIRS += -I../.. -I../../../FSNode
 
 # Additional LDFLAGS to pass to the linker
 ADDITIONAL_LDFLAGS += 

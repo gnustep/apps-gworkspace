@@ -24,7 +24,7 @@
 
 #import <AppKit/AppKit.h>
 #import "OpenOfficeExtractor.h"
-#import "extractors.h"
+#include "config.h"
 
 #define MAXFSIZE 600000
 #define WORD_MAX 40

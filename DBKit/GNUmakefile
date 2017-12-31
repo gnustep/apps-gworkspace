@@ -29,6 +29,8 @@ ifeq ($(findstring darwin, $(GNUSTEP_TARGET_OS)), darwin)
   endif
 endif
 
+LIBRARIES_DEPEND_UPON = $(FND_LIBS) $(OBJC_LIBS)
+
 include $(GNUSTEP_MAKEFILES)/library.make
 include $(GNUSTEP_MAKEFILES)/aggregate.make
 

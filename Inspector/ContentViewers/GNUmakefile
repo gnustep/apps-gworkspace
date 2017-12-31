@@ -4,29 +4,19 @@ include $(GNUSTEP_MAKEFILES)/common.make
 
 include ../inspector.make
 
+SUBPROJECTS = \
+  FolderViewer \
+  ImageViewer \
+  SoundViewer \
+  AppViewer \
+  RtfViewer \
+  NSTIFFViewer \
+  NSRTFViewer \
+  NSColorViewer \
+  IBViewViewer
+
 ifneq ($(PDFKIT),no)
-SUBPROJECTS = \
-  FolderViewer \
-  ImageViewer \
-  SoundViewer \
-  AppViewer \
-  RtfViewer \
-  PdfViewer \
-  NSTIFFViewer \
-  NSRTFViewer \
-  NSColorViewer \
-  IBViewViewer
-else
-SUBPROJECTS = \
-  FolderViewer \
-  ImageViewer \
-  SoundViewer \
-  AppViewer \
-  RtfViewer \
-  NSTIFFViewer \
-  NSRTFViewer \
-  NSColorViewer \
-  IBViewViewer
+SUBPROJECTS += PdfViewer
 endif
 
 -include GNUmakefile.preamble

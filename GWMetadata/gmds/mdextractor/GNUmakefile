@@ -15,7 +15,7 @@ mdextractor_TOOL_LIBS += -L../../../DBKit/$(GNUSTEP_OBJ_DIR) -lDBKit
 mdextractor_TOOL_LIBS += -L../../../FSNode/FSNode.framework -lFSNode
 ADDITIONAL_INCLUDE_DIRS += -I../../../GWMetadata/MDKit
 ADDITIONAL_INCLUDE_DIRS += -I../../../GWMetadata/gmds
-ADDITIONAL_INCLUDE_DIRS += -I../../../DBKit
+ADDITIONAL_INCLUDE_DIRS += -I../../../DBKit -I../../../FSNode
 
 -include GNUmakefile.preamble
 

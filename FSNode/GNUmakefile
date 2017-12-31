@@ -59,6 +59,8 @@ ifeq ($(findstring darwin, $(GNUSTEP_TARGET_OS)), darwin)
   endif
 endif
 
+LIBRARIES_DEPEND_UPON = $(GUI_LIBS) $(FND_LIBS) $(OBJC_LIBS)
+
 SUBPROJECTS = ExtendedInfo 
 
 -include GNUmakefile.preamble
