@@ -31,6 +31,22 @@
 	character (reserved to nul-terminator), although it's unlikely
 	that'll make a difference.
 
+2017-12-22  Yavor Doganov  <yavor@gnu.org>
+
+	* GWMetadata/MDKit/MDKWindow.m
+	* GWMetadata/gmds/gmds/gmds.m
+	* GWMetadata/gmds/mdextractor/mdextractor.m
+	* GWMetadata/gmds/mdfind/mdfind.m
+	* GWorkspace/Desktop/GWDesktopManager.m
+	* GWorkspace/Finder/Finder.m
+	* Inspector/Attributes.m
+	* Operation/FileOpInfo.m
+	* Tools/ddbd/ddbd.m
+	* Tools/fswatcher/fswatcher.m:
+	Various spelling fixes.
+
+	Fixes https://savannah.gnu.org/bugs/index.php?52726.
+
 2017-12-22  Svante Signell  <svante.signell@gmail.com>
             Yavor Doganov  <yavor@gnu.org>
 
