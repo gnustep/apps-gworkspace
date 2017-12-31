@@ -1,5 +1,27 @@
 2017-12-31  Ivan Vucica  <ivan@vucica.net>
 
+	* Apps_wrappers/coccinella.app/Resources/Info-gnustep.plist
+	* Apps_wrappers/coccinella.app/coccinella.tiff
+	* Apps_wrappers/opennx.app/Resources/Info-gnustep.plist
+	* Apps_wrappers/qlandkartegt.app/Resources/Info-gnustep.plist
+	* Apps_wrappers/qlandkartegt.app/qlandkartegt.tiff
+	* Apps_wrappers/spdrs60.app/Resources/Info-gnustep.plist
+	* Apps_wrappers/spdrs60.app/spdrs60_48.tiff
+	* Apps_wrappers/vi.app/vi.tiff
+	* Apps_wrappers/xtrkcad.app/Resources/Info-gnustep.plist
+	* Apps_wrappers/xtrkcad.app/xtrkcad.tiff
+	* GWMetadata/Preferences/MDIndexing.tiff
+	* GWMetadata/Preferences/Resources/Images/documents.tiff
+	* GWMetadata/Preferences/Resources/Images/music.tiff
+	* GWMetadata/Preferences/Resources/Images/pdfdocs.tiff
+	* GWMetadata/Preferences/Resources/Images/plainfiles.tiff
+	* GWMetadata/Preferences/Resources/Images/sources.tiff:
+	Remove executable flag.
+
+	Fixes https://savannah.gnu.org/bugs/index.php?52727.
+
+2017-12-31  Ivan Vucica  <ivan@vucica.net>
+
 	* GWMetadata/gmds/mdextractor/mdextractor.m (path_moved):
 	* GWMetadata/gmds/gmds/gmds.m (path_moved):
 	Annotate what's happening in path_moved(), hopefully making
