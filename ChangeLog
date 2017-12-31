@@ -1,5 +1,18 @@
 2017-12-31  Ivan Vucica  <ivan@vucica.net>
 
+	* FSNode/FSNIconsView.m
+	* FSNode/FSNListView.m
+	* GWorkspace/Desktop/GWDesktopView.m:
+	Remove extraneous casts when passing sorting functions.
+
+	* FSNode/FSNFunctions.h
+	* FSNode/FSNFunctions.m:
+	There is no reason for compareWithExtType to accept an id*
+	in place of id. Therefore both id* arguments have been
+	changed to id, eliminating need for some casts.
+
+2017-12-31  Ivan Vucica  <ivan@vucica.net>
+
 	* Apps_wrappers/coccinella.app/Resources/Info-gnustep.plist
 	* Apps_wrappers/coccinella.app/coccinella.tiff
 	* Apps_wrappers/opennx.app/Resources/Info-gnustep.plist

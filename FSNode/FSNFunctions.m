@@ -73,7 +73,7 @@ NSString *subtractFirstPartFromPath(NSString *path, NSString *firstpart)
 	return path_separator();
 }
 
-NSComparisonResult compareWithExtType(id *r1, id *r2, void *context)
+NSComparisonResult compareWithExtType(id r1, id r2, void *context)
 {
   FSNInfoType t1 = [(id <FSNodeRep>)r1 nodeInfoShowType];
   FSNInfoType t2 = [(id <FSNodeRep>)r2 nodeInfoShowType];

@@ -1778,7 +1778,7 @@ NSComparisonResult sortDragged(id icn1, id icn2, void *context)
       firstinrow++;
     }
 
-    sorted = [removed sortedArrayUsingFunction: (NSComparisonResult (*)(id, id, void *))sortDragged
+    sorted = [removed sortedArrayUsingFunction: sortDragged
                                        context: (void *)sortIndexes];
 
     for (i = 0; i < [sorted count]; i++) {

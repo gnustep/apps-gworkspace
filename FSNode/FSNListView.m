@@ -277,7 +277,7 @@ static NSString *defaultColumns = @"{ \
     [nodeReps sortUsingSelector: sortingSel];
 
   } else {
-    [nodeReps sortUsingFunction: (NSComparisonResult (*)(id, id, void*))compareWithExtType
+    [nodeReps sortUsingFunction: compareWithExtType
                         context: (void *)NULL];
   }
 
