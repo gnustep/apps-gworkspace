@@ -88,26 +88,47 @@ static void path_exists(sqlite3_context *context, int argc, sqlite3_value **argv
 
 static void path_moved(sqlite3_context *context, int argc, sqlite3_value **argv)
 {
+  // old dirname, and its length
   const unsigned char *oldbase = sqlite3_value_text(argv[0]);
   int oldblen = strlen((const char *)oldbase);
+
+  // new dirname, and its length
   const unsigned char *newbase = sqlite3_value_text(argv[1]);
   int newblen = strlen((const char *)newbase);
+
+  // old full path, and its length
   const unsigned char *oldpath = sqlite3_value_text(argv[2]);
   int oldplen = strlen((const char *)oldpath);
-  char *newpath;
+
+  // new full path, and its length
+  char *newpath = NULL;
+  int newplen = newblen + (oldplen - oldblen);
+
   int i = newblen;
   int j;
-  
-  newpath = malloc(newblen + oldplen - oldblen + 1);
-  strncpy(newpath, (const char *)newbase, newblen + oldplen - oldblen + 1);
 
+  /////
+
+  // allocate space for new path + nul terminator
+  newpath = malloc(newplen + 1);
+
+  // copy the new dirname over, but restrict up to allocated space.
+  // add a null terminator in case the newbase is exactly newplen
+  // in size.
+  strncpy(newpath, (const char *)newbase, newplen);
+  newpath[newplen] = '\0';
+
+  // concatenate the new pathname.
+  // equivalent of: strncat(newpath, oldpath+oldblen, newplen),
+  // which may be safer as it will also add a nul terminator at
+  // newpath[newplen].
   for (j = oldblen; j < oldplen; j++) {
     newpath[i] = oldpath[j];
     i++;
   }
-  
   newpath[i] = '\0';
-  
+
+  // return the path.
   sqlite3_result_text(context, newpath, strlen(newpath), SQLITE_TRANSIENT);
 
   free(newpath);

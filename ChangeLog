@@ -1,9 +1,22 @@
+2017-12-31  Ivan Vucica  <ivan@vucica.net>
+
+	* GWMetadata/gmds/mdextractor/mdextractor.m (path_moved):
+	* GWMetadata/gmds/gmds/gmds.m (path_moved):
+	Annotate what's happening in path_moved(), hopefully making
+	it slightly more readable.
+
+	Don't pass a +1 to strncpy(); we actually don't have that extra
+	character (reserved to nul-terminator), although it's unlikely
+	that'll make a difference.
+
 2017-12-22  Svante Signell  <svante.signell@gmail.com>
             Yavor Doganov  <yavor@gnu.org>
 
 	* GWMetadata/gmds/mdextractor/mdextractor.m (path_moved):
 	* GWMetadata/gmds/gmds/gmds.m (path_moved): Avoid PATH_MAX and
 	allocate string dynamically; fixes build failure on GNU/Hurd.
+
+	Contributed at https://savannah.gnu.org/bugs/?52731.
 
 2016-06-07 Riccardo Mottola <rm@gnu.org>
 
