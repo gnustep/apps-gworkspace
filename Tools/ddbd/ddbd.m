@@ -94,7 +94,7 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
     [conn setDelegate: self];
 
     if ([conn registerName: @"ddbd"] == NO) {
-	    NSLog(@"unable to register with name server - quiting.");
+	    NSLog(@"unable to register with name server - quitting.");
 	    DESTROY (self);
 	    return self;
 	  }
@@ -172,7 +172,7 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
     }
   NS_HANDLER
     {
-      NSLog(@"A fatal error occured while detaching the thread!");
+      NSLog(@"A fatal error occurred while detaching the thread!");
     }
   NS_ENDHANDLER
 }
@@ -196,7 +196,7 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
     }
   NS_HANDLER
     {
-      NSLog(@"A fatal error occured while detaching the thread!");
+      NSLog(@"A fatal error occurred while detaching the thread!");
     }
   NS_ENDHANDLER
 }
@@ -278,7 +278,7 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
     }
   NS_HANDLER
     {
-      NSLog(@"A fatal error occured while detaching the thread!");
+      NSLog(@"A fatal error occurred while detaching the thread!");
     }
   NS_ENDHANDLER
 }

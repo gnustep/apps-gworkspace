@@ -302,7 +302,7 @@ static Finder *finder = nil;
 
   if ([unsortedModules count] == 0) {  
     NSRunAlertPanel(NSLocalizedString(@"error", @""), 
-                    NSLocalizedString(@"No Finder modules! Quiting now.", @""), 
+                    NSLocalizedString(@"No Finder modules! Quitting now.", @""),
                     NSLocalizedString(@"OK", @""), nil, nil);                                     
     [NSApp terminate: self];
   }

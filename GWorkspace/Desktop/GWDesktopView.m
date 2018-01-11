@@ -1693,7 +1693,7 @@ static void GWHighlightFrameRect(NSRect aRect)
 	return YES;
 }
 
-int sortDragged(id icn1, id icn2, void *context)
+NSComparisonResult sortDragged(id icn1, id icn2, void *context)
 {
   NSArray *indexes = (NSArray *)context;
   int pos1 = [icn1 gridIndex];
@@ -1778,7 +1778,7 @@ int sortDragged(id icn1, id icn2, void *context)
       firstinrow++;
     }
 
-    sorted = [removed sortedArrayUsingFunction: (int (*)(id, id, void *))sortDragged 
+    sorted = [removed sortedArrayUsingFunction: sortDragged
                                        context: (void *)sortIndexes];
 
     for (i = 0; i < [sorted count]; i++) {

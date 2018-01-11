@@ -336,7 +336,7 @@ static NSString *nibName = @"FileOperationWin";
   NS_HANDLER
     {
       NSRunAlertPanel(nil, 
-                      NSLocalizedString(@"A fatal error occured while detaching the thread!", @""), 
+                      NSLocalizedString(@"A fatal error occurred while detaching the thread!", @""),
                       NSLocalizedString(@"Continue", @""), 
                       nil, 
                       nil);

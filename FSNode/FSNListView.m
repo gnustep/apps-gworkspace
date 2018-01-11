@@ -277,7 +277,7 @@ static NSString *defaultColumns = @"{ \
     [nodeReps sortUsingSelector: sortingSel];
 
   } else {
-    [nodeReps sortUsingFunction: (int (*)(id, id, void*))compareWithExtType
+    [nodeReps sortUsingFunction: compareWithExtType
                         context: (void *)NULL];
   }
 
@@ -2339,7 +2339,7 @@ static NSString *defaultColumns = @"{ \
 
 @implementation FSNListViewNameEditor
 
-int sortSubviews(id view1, id view2, void *context)
+NSComparisonResult sortSubviews(id view1, id view2, void *context)
 {
   if ([view1 isMemberOfClass: [FSNListViewNameEditor class]]) {
     return NSOrderedAscending;
@@ -2387,7 +2387,7 @@ int sortSubviews(id view1, id view2, void *context)
     [super mouseDown: theEvent];
   }
 
-  [view sortSubviewsUsingFunction: (int (*)(id, id, void *))sortSubviews context: nil];  
+  [view sortSubviewsUsingFunction: (NSComparisonResult (*)(id, id, void *))sortSubviews context: nil];
   [view setNeedsDisplayInRect: [self frame]];
 }
 
