@@ -12,8 +12,6 @@ AC_CHECK_HEADERS([sys/resource.h])
 #--------------------------------------------------------------------
 AC_CONFIG_AUX_DIR([$GNUSTEP_MAKEFILES])
 
-AC_CONFIG_SUBDIRS([Finder/Modules Thumbnailer])
-
 AC_CONFIG_HEADER([config.h])
 
 #--------------------------------------------------------------------
@@ -31,6 +29,19 @@ fi
 
 AC_DEFINE_UNQUOTED([GW_DEBUG_LOG], [$GW_DEBUG_LOG], [debug logging])
 
-AC_CONFIG_FILES([GNUmakefile])
+AC_CONFIG_FILES([
+  GNUmakefile
+  Finder/Modules/GNUmakefile
+  Finder/Modules/FModuleAnnotations/GNUmakefile
+  Finder/Modules/FModuleContents/GNUmakefile
+  Finder/Modules/FModuleCrDate/GNUmakefile
+  Finder/Modules/FModuleKind/GNUmakefile
+  Finder/Modules/FModuleModDate/GNUmakefile
+  Finder/Modules/FModuleName/GNUmakefile
+  Finder/Modules/FModuleOwner/GNUmakefile
+  Finder/Modules/FModuleSize/GNUmakefile
+  Thumbnailer/GNUmakefile
+  Thumbnailer/ImageThumbnailer/GNUmakefile
+  ])
 
 AC_OUTPUT

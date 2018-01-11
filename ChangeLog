@@ -1,89 +1,17 @@
 2018-01-11 Riccardo Mottola <rm@gnu.org>
+<<<<<<< HEAD
 
 	* FSNode/configure
 	* FSNode/configure.ac
 	Remove sub-folder configures and merge into top-level
 
 2017-12-31  Ivan Vucica  <ivan@vucica.net>
+=======
+>>>>>>> b936cf375f2767e1fed573068d0ebda42cac8750
 
-	* FSNode/FSNIconsView.m
-	* FSNode/FSNListView.m
-	* GWorkspace/Desktop/GWDesktopView.m:
-	Remove extraneous casts when passing sorting functions.
-
-	* FSNode/FSNFunctions.h
-	* FSNode/FSNFunctions.m:
-	There is no reason for compareWithExtType to accept an id*
-	in place of id. Therefore both id* arguments have been
-	changed to id, eliminating need for some casts.
-
-2017-12-31  Ivan Vucica  <ivan@vucica.net>
-
-	* Apps_wrappers/coccinella.app/Resources/Info-gnustep.plist
-	* Apps_wrappers/coccinella.app/coccinella.tiff
-	* Apps_wrappers/opennx.app/Resources/Info-gnustep.plist
-	* Apps_wrappers/qlandkartegt.app/Resources/Info-gnustep.plist
-	* Apps_wrappers/qlandkartegt.app/qlandkartegt.tiff
-	* Apps_wrappers/spdrs60.app/Resources/Info-gnustep.plist
-	* Apps_wrappers/spdrs60.app/spdrs60_48.tiff
-	* Apps_wrappers/vi.app/vi.tiff
-	* Apps_wrappers/xtrkcad.app/Resources/Info-gnustep.plist
-	* Apps_wrappers/xtrkcad.app/xtrkcad.tiff
-	* GWMetadata/Preferences/MDIndexing.tiff
-	* GWMetadata/Preferences/Resources/Images/documents.tiff
-	* GWMetadata/Preferences/Resources/Images/music.tiff
-	* GWMetadata/Preferences/Resources/Images/pdfdocs.tiff
-	* GWMetadata/Preferences/Resources/Images/plainfiles.tiff
-	* GWMetadata/Preferences/Resources/Images/sources.tiff:
-	Remove executable flag.
-
-	Fixes https://savannah.gnu.org/bugs/index.php?52727.
-
-2017-12-31  Ivan Vucica  <ivan@vucica.net>
-
-	* GWMetadata/gmds/mdextractor/mdextractor.m (path_moved):
-	* GWMetadata/gmds/gmds/gmds.m (path_moved):
-	Annotate what's happening in path_moved(), hopefully making
-	it slightly more readable.
-
-	Don't pass a +1 to strncpy(); we actually don't have that extra
-	character (reserved to nul-terminator), although it's unlikely
-	that'll make a difference.
-
-2017-12-22  Yavor Doganov  <yavor@gnu.org>
-
-       * GWorkspace/Desktop/GWDesktopView.m (sortDragged)
-       (concludeDragOperation:):
-       * FSNode/FSNListView.m (sortNodeReps, sortSubviews, mouseDown:):
-       * FSNode/FSNIconsView.m (sortIcons):
-       * FSNode/FSNFunctions.m (compareWithExtType):
-       * FSNode/FSNFunctions.h: Use NSComparisonResult instead of int as
-       return type of sort functions.
-
-2017-12-22  Yavor Doganov  <yavor@gnu.org>
-
-	* GWMetadata/MDKit/MDKWindow.m
-	* GWMetadata/gmds/gmds/gmds.m
-	* GWMetadata/gmds/mdextractor/mdextractor.m
-	* GWMetadata/gmds/mdfind/mdfind.m
-	* GWorkspace/Desktop/GWDesktopManager.m
-	* GWorkspace/Finder/Finder.m
-	* Inspector/Attributes.m
-	* Operation/FileOpInfo.m
-	* Tools/ddbd/ddbd.m
-	* Tools/fswatcher/fswatcher.m:
-	Various spelling fixes.
-
-	Fixes https://savannah.gnu.org/bugs/index.php?52726.
-
-2017-12-22  Svante Signell  <svante.signell@gmail.com>
-            Yavor Doganov  <yavor@gnu.org>
-
-	* GWMetadata/gmds/mdextractor/mdextractor.m (path_moved):
-	* GWMetadata/gmds/gmds/gmds.m (path_moved): Avoid PATH_MAX and
-	allocate string dynamically; fixes build failure on GNU/Hurd.
-
-	Contributed at https://savannah.gnu.org/bugs/?52731.
+	* GWorkspace/configure.ac
+	* GWorkspace/configure
+	Remove sub-folder configures and merge into top-level
 
 2016-06-07 Riccardo Mottola <rm@gnu.org>
 
