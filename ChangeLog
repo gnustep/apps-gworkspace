@@ -1,3 +1,9 @@
+2018-01-11 Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/configure
+	* FSNode/configure.ac
+	Remove sub-folder configures and merge into top-level
+
 2017-12-31  Ivan Vucica  <ivan@vucica.net>
 
 	* FSNode/FSNIconsView.m
