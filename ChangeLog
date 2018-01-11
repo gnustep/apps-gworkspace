@@ -1,13 +1,8 @@
 2018-01-11 Riccardo Mottola <rm@gnu.org>
-<<<<<<< HEAD
 
 	* FSNode/configure
 	* FSNode/configure.ac
 	Remove sub-folder configures and merge into top-level
-
-2017-12-31  Ivan Vucica  <ivan@vucica.net>
-=======
->>>>>>> b936cf375f2767e1fed573068d0ebda42cac8750
 
 	* GWorkspace/configure.ac
 	* GWorkspace/configure
