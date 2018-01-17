@@ -28,7 +28,8 @@
 # before-distclean::
 
 # Things to do after distcleaning
-# after-distclean::
+after-distclean::
+	rm -f config.status config.log config.cache TAGS GNUmakefile
 
 # Things to do before checking
 # before-check::

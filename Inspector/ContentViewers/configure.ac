@@ -13,7 +13,6 @@ AC_CHECK_FUNCS(getpwnam getpwuid geteuid getlogin)
 
 AC_CONFIG_AUX_DIR([$GNUSTEP_MAKEFILES])
 
-AC_CONFIG_SUBDIRS([AppViewer FolderViewer IBViewViewer ImageViewer NSColorViewer NSRTFViewer NSTIFFViewer PdfViewer RtfViewer SoundViewer])
 
 #--------------------------------------------------------------------
 # Debug logging
@@ -30,6 +29,18 @@ fi
 
 AC_DEFINE_UNQUOTED([GW_DEBUG_LOG], [$GW_DEBUG_LOG], [debug logging])
 
-AC_CONFIG_FILES([GNUmakefile])
+AC_CONFIG_FILES([
+  GNUmakefile
+  AppViewer/GNUmakefile
+  FolderViewer/GNUmakefile
+  IBViewViewer/GNUmakefile
+  ImageViewer/GNUmakefile
+  NSColorViewer/GNUmakefile
+  NSRTFViewer/GNUmakefile
+  NSTIFFViewer/GNUmakefile
+  PdfViewer/GNUmakefile
+  RtfViewer/GNUmakefile
+  SoundViewer/GNUmakefile
+  ])
 AC_OUTPUT
 
