@@ -93,6 +93,6 @@ fi
 
 AC_SUBST(have_pdfkit)
 
-AC_CONFIG_FILES([GNUmakefile inspector.make])
+AC_CONFIG_FILES([GNUmakefile])
 AC_OUTPUT
 
