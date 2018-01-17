@@ -688,7 +688,7 @@ LDFLAGS
 LIBS
 CPPFLAGS
 CPP'
-ac_subdirs_all='FSNode DBKit GWorkspace Tools Inspector Operation Recycler
+ac_subdirs_all='FSNode DBKit GWorkspace Inspector Operation Recycler
 GWMetadata'
 
 # Initialize some variables set by options.
@@ -3368,7 +3368,7 @@ ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
 
 
 
-subdirs="$subdirs FSNode DBKit GWorkspace Tools Inspector Operation Recycler"
+subdirs="$subdirs FSNode DBKit GWorkspace Inspector Operation Recycler"
 
 
 
@@ -3426,8 +3426,8 @@ fi
 
 
 
+ac_config_files="$ac_config_files GNUmakefile Tools/GNUmakefile Tools/ddbd/GNUmakefile Tools/ddbd/MDModules/GNUmakefile Tools/ddbd/MDModules/MDModuleAnnotations/GNUmakefile Tools/fswatcher/GNUmakefile Tools/lsfupdater/GNUmakefile Tools/searchtool/GNUmakefile Tools/wopen/GNUmakefile"
 
-ac_config_files="$ac_config_files GNUmakefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -4135,6 +4135,14 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "GNUmakefile") CONFIG_FILES="$CONFIG_FILES GNUmakefile" ;;
+    "Tools/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Tools/GNUmakefile" ;;
+    "Tools/ddbd/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Tools/ddbd/GNUmakefile" ;;
+    "Tools/ddbd/MDModules/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Tools/ddbd/MDModules/GNUmakefile" ;;
+    "Tools/ddbd/MDModules/MDModuleAnnotations/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Tools/ddbd/MDModules/MDModuleAnnotations/GNUmakefile" ;;
+    "Tools/fswatcher/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Tools/fswatcher/GNUmakefile" ;;
+    "Tools/lsfupdater/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Tools/lsfupdater/GNUmakefile" ;;
+    "Tools/searchtool/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Tools/searchtool/GNUmakefile" ;;
+    "Tools/wopen/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Tools/wopen/GNUmakefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

@@ -35,7 +35,7 @@ AC_CHECK_FUNCS(getpwnam getpwuid geteuid getlogin)
 
 AC_CONFIG_AUX_DIR([$GNUSTEP_MAKEFILES])
 
-AC_CONFIG_SUBDIRS([FSNode DBKit GWorkspace Tools Inspector Operation Recycler])
+AC_CONFIG_SUBDIRS([FSNode DBKit GWorkspace Inspector Operation Recycler])
 
 
 AC_ARG_ENABLE(gwmetadata,
@@ -73,6 +73,16 @@ AC_ARG_WITH(inotify,
   
 AC_SUBST(with_inotify)
 
+AC_CONFIG_FILES([
+  GNUmakefile
+  Tools/GNUmakefile
+  Tools/ddbd/GNUmakefile
+  Tools/ddbd/MDModules/GNUmakefile
+  Tools/ddbd/MDModules/MDModuleAnnotations/GNUmakefile
+  Tools/fswatcher/GNUmakefile
+  Tools/lsfupdater/GNUmakefile
+  Tools/searchtool/GNUmakefile
+  Tools/wopen/GNUmakefile
+  ])
 
-AC_CONFIG_FILES([GNUmakefile])
 AC_OUTPUT
