@@ -29,7 +29,6 @@
 
 # Things to do after distcleaning
 after-distclean::
-	rm -f config.h 
 
 # Things to do before checking
 # before-check::
