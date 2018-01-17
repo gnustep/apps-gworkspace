@@ -1,8 +1,9 @@
 /* ddbd.m
  *  
- * Copyright (C) 2004-2014 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2018 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
+ *         Riccardo Mottola <rm@gnu.org>
  * Date: February 2004
  *
  * This file is part of the GNUstep GWorkspace application
@@ -414,11 +415,11 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
     NSArray *origfiles = [updinfo objectForKey: @"origfiles"];
     NSMutableArray *srcpaths = [NSMutableArray array];
     NSMutableArray *dstpaths = [NSMutableArray array];
-    int i;
+    NSUInteger i;
     
     if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
-      srcpaths = [NSArray arrayWithObject: source];
-      dstpaths = [NSArray arrayWithObject: destination];
+      srcpaths = [NSMutableArray arrayWithObject: source];
+      dstpaths = [NSMutableArray arrayWithObject: destination];
     } else {
       if ([operation isEqual: NSWorkspaceDuplicateOperation]) { 
         for (i = 0; i < [files count]; i++) {
