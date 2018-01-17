@@ -1,8 +1,9 @@
 /* Finder.m
  *  
- * Copyright (C) 2005-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2018 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
+ *         Riccardo Mottola <rm@gnu.org>
  * Date: January 2005
  *
  * This file is part of the GNUstep GWorkspace application
@@ -882,8 +883,8 @@ static Finder *finder = nil;
 
   if ([operation isEqual: @"GWorkspaceRenameOperation"])
     {
-      srcpaths = [NSArray arrayWithObject: source];
-      dstpaths = [NSArray arrayWithObject: destination];
+      srcpaths = [NSMutableArray arrayWithObject: source];
+      dstpaths = [NSMutableArray arrayWithObject: destination];
     }
   else
     {
