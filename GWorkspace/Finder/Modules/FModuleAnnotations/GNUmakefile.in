@@ -17,9 +17,9 @@ FModuleAnnotations_RESOURCE_FILES = \
     Resources/Images/* \
     Resources/FModuleAnnotations.gorm
 
--include GNUmakefile.preamble
+include GNUmakefile.preamble
 
 include $(GNUSTEP_MAKEFILES)/bundle.make
 
--include GNUmakefile.postamble
+include GNUmakefile.postamble
 

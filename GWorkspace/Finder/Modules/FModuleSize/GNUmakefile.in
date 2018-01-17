@@ -17,9 +17,9 @@ FModuleSize_RESOURCE_FILES = \
     Resources/Images/* \
     Resources/FModuleSize.gorm
 
--include GNUmakefile.preamble
+include GNUmakefile.preamble
 
 include $(GNUSTEP_MAKEFILES)/bundle.make
 
--include GNUmakefile.postamble
+include GNUmakefile.postamble
 

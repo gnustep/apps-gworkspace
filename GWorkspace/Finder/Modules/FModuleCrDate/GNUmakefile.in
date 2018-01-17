@@ -21,5 +21,5 @@ FModuleCrDate_RESOURCE_FILES = \
 
 include $(GNUSTEP_MAKEFILES)/bundle.make
 
--include GNUmakefile.postamble
+include GNUmakefile.postamble
 
