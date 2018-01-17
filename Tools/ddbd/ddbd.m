@@ -450,8 +450,8 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 
 BOOL subpath(NSString *p1, NSString *p2)
 {
-  int l1 = [p1 length];
-  int l2 = [p2 length];  
+  NSUInteger l1 = [p1 length];
+  NSUInteger l2 = [p2 length];  
 
   if ((l1 > l2) || ([p1 isEqualToString: p2])) {
     return NO;
