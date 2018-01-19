@@ -3231,7 +3231,7 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
-ac_config_files="$ac_config_files GNUmakefile Finder/Modules/GNUmakefile Finder/Modules/FModuleAnnotations/GNUmakefile Finder/Modules/FModuleContents/GNUmakefile Finder/Modules/FModuleCrDate/GNUmakefile Finder/Modules/FModuleKind/GNUmakefile Finder/Modules/FModuleModDate/GNUmakefile Finder/Modules/FModuleName/GNUmakefile Finder/Modules/FModuleOwner/GNUmakefile Finder/Modules/FModuleSize/GNUmakefile Thumbnailer/GNUmakefile Thumbnailer/ImageThumbnailer/GNUmakefile"
+ac_config_files="$ac_config_files GNUmakefile Finder/Modules/FModuleAnnotations/GNUmakefile Finder/Modules/FModuleContents/GNUmakefile Finder/Modules/FModuleCrDate/GNUmakefile Finder/Modules/FModuleKind/GNUmakefile Finder/Modules/FModuleModDate/GNUmakefile Finder/Modules/FModuleName/GNUmakefile Finder/Modules/FModuleOwner/GNUmakefile Finder/Modules/FModuleSize/GNUmakefile Thumbnailer/GNUmakefile Thumbnailer/ImageThumbnailer/GNUmakefile"
 
 
 cat >confcache <<\_ACEOF
@@ -3925,7 +3925,6 @@ do
   case $ac_config_target in
     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
     "GNUmakefile") CONFIG_FILES="$CONFIG_FILES GNUmakefile" ;;
-    "Finder/Modules/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Finder/Modules/GNUmakefile" ;;
     "Finder/Modules/FModuleAnnotations/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Finder/Modules/FModuleAnnotations/GNUmakefile" ;;
     "Finder/Modules/FModuleContents/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Finder/Modules/FModuleContents/GNUmakefile" ;;
     "Finder/Modules/FModuleCrDate/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Finder/Modules/FModuleCrDate/GNUmakefile" ;;

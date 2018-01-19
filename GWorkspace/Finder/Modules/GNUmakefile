@@ -19,5 +19,5 @@ SUBPROJECTS = \
 
 include $(GNUSTEP_MAKEFILES)/aggregate.make
 
--include GNUmakefile.postamble
+include GNUmakefile.postamble
 

@@ -1,13 +1,13 @@
 
 # Things to do before compiling
-#before-all:: 
+# before-all::
 
 # Things to do after compiling
 # after-all::
 
 # Things to do before installing
-# before-install:: 
-
+# before-install::
+  
 # Things to do after installing
 # after-install::
 
@@ -22,13 +22,14 @@
 
 # Things to do after cleaning
 # after-clean::
+#	
 
 # Things to do before distcleaning
 # before-distclean::
 
 # Things to do after distcleaning
-#after-distclean:: 
-	rm -f GNUmakefile
+after-distclean::
+	rm -f GNUmakefile 
 
 # Things to do before checking
 # before-check::

@@ -149,9 +149,6 @@ AC_CONFIG_HEADERS([MDKit/config.h gmds/mdextractor/Extractors/extractors.h])
 AC_CONFIG_FILES([
   GNUmakefile
   MDKit/GNUmakefile
-  Preferences/GNUmakefile
-  MDFinder/GNUmakefile
-  gmds/GNUmakefile
   gmds/gmds/GNUmakefile
   gmds/gmds/GNUmakefile.preamble
   gmds/mdextractor/GNUmakefile

@@ -31,7 +31,6 @@ AC_DEFINE_UNQUOTED([GW_DEBUG_LOG], [$GW_DEBUG_LOG], [debug logging])
 
 AC_CONFIG_FILES([
   GNUmakefile
-  Finder/Modules/GNUmakefile
   Finder/Modules/FModuleAnnotations/GNUmakefile
   Finder/Modules/FModuleContents/GNUmakefile
   Finder/Modules/FModuleCrDate/GNUmakefile

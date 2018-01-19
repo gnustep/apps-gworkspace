@@ -26,4 +26,4 @@ include GNUmakefile.preamble
 
 include $(GNUSTEP_MAKEFILES)/application.make
 
--include GNUmakefile.postamble
+include GNUmakefile.postamble

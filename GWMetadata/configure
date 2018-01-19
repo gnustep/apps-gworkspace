@@ -3814,7 +3814,7 @@ _ACEOF
 ac_config_headers="$ac_config_headers MDKit/config.h gmds/mdextractor/Extractors/extractors.h"
 
 
-ac_config_files="$ac_config_files GNUmakefile MDKit/GNUmakefile Preferences/GNUmakefile MDFinder/GNUmakefile gmds/GNUmakefile gmds/gmds/GNUmakefile gmds/gmds/GNUmakefile.preamble gmds/mdextractor/GNUmakefile gmds/mdextractor/Extractors/GNUmakefile"
+ac_config_files="$ac_config_files GNUmakefile MDKit/GNUmakefile gmds/gmds/GNUmakefile gmds/gmds/GNUmakefile.preamble gmds/mdextractor/GNUmakefile gmds/mdextractor/Extractors/GNUmakefile"
 
 
 cat >confcache <<\_ACEOF
@@ -4510,9 +4510,6 @@ do
     "gmds/mdextractor/Extractors/extractors.h") CONFIG_HEADERS="$CONFIG_HEADERS gmds/mdextractor/Extractors/extractors.h" ;;
     "GNUmakefile") CONFIG_FILES="$CONFIG_FILES GNUmakefile" ;;
     "MDKit/GNUmakefile") CONFIG_FILES="$CONFIG_FILES MDKit/GNUmakefile" ;;
-    "Preferences/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Preferences/GNUmakefile" ;;
-    "MDFinder/GNUmakefile") CONFIG_FILES="$CONFIG_FILES MDFinder/GNUmakefile" ;;
-    "gmds/GNUmakefile") CONFIG_FILES="$CONFIG_FILES gmds/GNUmakefile" ;;
     "gmds/gmds/GNUmakefile") CONFIG_FILES="$CONFIG_FILES gmds/gmds/GNUmakefile" ;;
     "gmds/gmds/GNUmakefile.preamble") CONFIG_FILES="$CONFIG_FILES gmds/gmds/GNUmakefile.preamble" ;;
     "gmds/mdextractor/GNUmakefile") CONFIG_FILES="$CONFIG_FILES gmds/mdextractor/GNUmakefile" ;;
