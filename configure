@@ -3426,7 +3426,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files GNUmakefile Operation/GNUmakefile Recycler/GNUmakefile Tools/GNUmakefile Tools/ddbd/GNUmakefile Tools/ddbd/MDModules/GNUmakefile Tools/ddbd/MDModules/MDModuleAnnotations/GNUmakefile Tools/fswatcher/GNUmakefile Tools/lsfupdater/GNUmakefile Tools/searchtool/GNUmakefile Tools/wopen/GNUmakefile"
+ac_config_files="$ac_config_files GNUmakefile Operation/GNUmakefile Recycler/GNUmakefile Tools/ddbd/MDModules/GNUmakefile Tools/ddbd/MDModules/MDModuleAnnotations/GNUmakefile Tools/fswatcher/GNUmakefile"
 
 
 cat >confcache <<\_ACEOF
@@ -4137,14 +4137,9 @@ do
     "GNUmakefile") CONFIG_FILES="$CONFIG_FILES GNUmakefile" ;;
     "Operation/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Operation/GNUmakefile" ;;
     "Recycler/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Recycler/GNUmakefile" ;;
-    "Tools/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Tools/GNUmakefile" ;;
-    "Tools/ddbd/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Tools/ddbd/GNUmakefile" ;;
     "Tools/ddbd/MDModules/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Tools/ddbd/MDModules/GNUmakefile" ;;
     "Tools/ddbd/MDModules/MDModuleAnnotations/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Tools/ddbd/MDModules/MDModuleAnnotations/GNUmakefile" ;;
     "Tools/fswatcher/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Tools/fswatcher/GNUmakefile" ;;
-    "Tools/lsfupdater/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Tools/lsfupdater/GNUmakefile" ;;
-    "Tools/searchtool/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Tools/searchtool/GNUmakefile" ;;
-    "Tools/wopen/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Tools/wopen/GNUmakefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

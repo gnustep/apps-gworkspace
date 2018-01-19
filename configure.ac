@@ -77,14 +77,9 @@ AC_CONFIG_FILES([
   GNUmakefile
   Operation/GNUmakefile
   Recycler/GNUmakefile
-  Tools/GNUmakefile
-  Tools/ddbd/GNUmakefile
   Tools/ddbd/MDModules/GNUmakefile
   Tools/ddbd/MDModules/MDModuleAnnotations/GNUmakefile
   Tools/fswatcher/GNUmakefile
-  Tools/lsfupdater/GNUmakefile
-  Tools/searchtool/GNUmakefile
-  Tools/wopen/GNUmakefile
   ])
 
 AC_OUTPUT
