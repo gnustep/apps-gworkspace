@@ -77,8 +77,6 @@ AC_CONFIG_FILES([
   GNUmakefile
   Operation/GNUmakefile
   Recycler/GNUmakefile
-  Tools/ddbd/MDModules/GNUmakefile
-  Tools/ddbd/MDModules/MDModuleAnnotations/GNUmakefile
   Tools/fswatcher/GNUmakefile
   ])
 

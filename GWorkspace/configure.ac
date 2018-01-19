@@ -39,8 +39,6 @@ AC_CONFIG_FILES([
   Finder/Modules/FModuleName/GNUmakefile
   Finder/Modules/FModuleOwner/GNUmakefile
   Finder/Modules/FModuleSize/GNUmakefile
-  Thumbnailer/GNUmakefile
-  Thumbnailer/ImageThumbnailer/GNUmakefile
   ])
 
 AC_OUTPUT

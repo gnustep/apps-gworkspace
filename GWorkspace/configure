@@ -3231,7 +3231,7 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
-ac_config_files="$ac_config_files GNUmakefile Finder/Modules/FModuleAnnotations/GNUmakefile Finder/Modules/FModuleContents/GNUmakefile Finder/Modules/FModuleCrDate/GNUmakefile Finder/Modules/FModuleKind/GNUmakefile Finder/Modules/FModuleModDate/GNUmakefile Finder/Modules/FModuleName/GNUmakefile Finder/Modules/FModuleOwner/GNUmakefile Finder/Modules/FModuleSize/GNUmakefile Thumbnailer/GNUmakefile Thumbnailer/ImageThumbnailer/GNUmakefile"
+ac_config_files="$ac_config_files GNUmakefile Finder/Modules/FModuleAnnotations/GNUmakefile Finder/Modules/FModuleContents/GNUmakefile Finder/Modules/FModuleCrDate/GNUmakefile Finder/Modules/FModuleKind/GNUmakefile Finder/Modules/FModuleModDate/GNUmakefile Finder/Modules/FModuleName/GNUmakefile Finder/Modules/FModuleOwner/GNUmakefile Finder/Modules/FModuleSize/GNUmakefile"
 
 
 cat >confcache <<\_ACEOF
@@ -3933,8 +3933,6 @@ do
     "Finder/Modules/FModuleName/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Finder/Modules/FModuleName/GNUmakefile" ;;
     "Finder/Modules/FModuleOwner/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Finder/Modules/FModuleOwner/GNUmakefile" ;;
     "Finder/Modules/FModuleSize/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Finder/Modules/FModuleSize/GNUmakefile" ;;
-    "Thumbnailer/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Thumbnailer/GNUmakefile" ;;
-    "Thumbnailer/ImageThumbnailer/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Thumbnailer/ImageThumbnailer/GNUmakefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac
