@@ -1,8 +1,8 @@
 
 PACKAGE_NEEDS_CONFIGURE = YES
 
-ADDITIONAL_INCLUDE_DIRS += @ADDITIONAL_INCLUDE_DIRS@
-ADDITIONAL_LIB_DIRS += @ADDITIONAL_LIB_DIRS@
+ADDITIONAL_INCLUDE_DIRS += @SQLITE_INCLUDE_DIRS@
+ADDITIONAL_LIB_DIRS += @SQLITE_LIB_DIRS@
 
 PACKAGE_NAME = gworkspace
 include $(GNUSTEP_MAKEFILES)/common.make
@@ -23,8 +23,8 @@ MDKit_RESOURCE_FILES = \
     Resources/Images/* \
     Resources/English.lproj
 
-MDKit_LANGUAGES = Resources/English 
-		    
+MDKit_LANGUAGES = Resources/English
+
 MDKit_OBJC_FILES = \
 SQLite.m \
 MDKQuery.m \
@@ -55,7 +55,7 @@ ifeq ($(findstring darwin, $(GNUSTEP_TARGET_OS)), darwin)
     SHARED_LD_POSTFLAGS += -lgnustep-base -lgnustep-gui -lFSNode -lDBKit
   endif
 endif
-    				 
+
 -include GNUmakefile.preamble
 
 -include GNUmakefile.local

@@ -492,7 +492,7 @@ enum {
 
 - (MDKQuery *)queryWithDestTable:(NSString *)tab
 {
-  unsigned i;
+  NSUInteger i;
   
   if ([destTable isEqual: tab]) {
     return self;
@@ -585,7 +585,7 @@ enum {
 
   if (parentQuery) {
     NSArray *subs = [parentQuery subqueries];
-    unsigned index = [subs indexOfObject: self];
+    NSUInteger index = [subs indexOfObject: self];
     
     if (index > 0) {
       sibling = [subs objectAtIndex: index - 1];
@@ -768,7 +768,7 @@ enum {
 - (BOOL)buildQuery
 {
   if ([self isClosed]) {
-    unsigned i;
+    NSUInteger i;
     
     status |= BUILT;
     
@@ -885,7 +885,7 @@ enum {
 - (NSString *)description
 {
   NSMutableString *descr = [NSMutableString string];
-  unsigned i;
+  NSUInteger i;
   
   if ([self isRoot] == NO) {
     [descr appendString: @"("];
@@ -1188,8 +1188,8 @@ enum {
   [sqlstr appendFormat: @"AND attributes.path_id = %@.id ", srcTable];      
 
   if (searchPaths) {
-    unsigned count = [searchPaths count];
-    unsigned i;
+    NSUInteger count = [searchPaths count];
+    NSUInteger i;
 
     [sqlstr appendString: @"AND ("];
 
@@ -1760,13 +1760,13 @@ enum {
   }
   
   if (sort) {
-    unsigned count = [nodes count];    
-    int ins = 0;
+    NSUInteger count = [nodes count];    
+    NSUInteger ins = 0;
 
     if (count) {
-      int first = 0;
-      int last = count;
-      int pos = 0; 
+      NSUInteger first = 0;
+      NSUInteger last = count;
+      NSUInteger pos = 0; 
       NSComparisonResult result;
 
       while (1) {
@@ -1775,7 +1775,7 @@ enum {
           break;
         }
 
-        pos = (int)((first + last) / 2);
+        pos = (NSUInteger)((first + last) / 2);
 
         result = [(NSNumber *)[scores objectAtIndex: pos] compare: score];
 
@@ -2201,8 +2201,8 @@ static NSString *path_sep(void)
 
 BOOL subPathOfPath(NSString *p1, NSString *p2)
 {
-  int l1 = [p1 length];
-  int l2 = [p2 length];  
+  NSUInteger l1 = [p1 length];
+  NSUInteger l2 = [p2 length];  
 
   if ((l1 > l2) || ([p1 isEqual: p2])) {
     return NO;
