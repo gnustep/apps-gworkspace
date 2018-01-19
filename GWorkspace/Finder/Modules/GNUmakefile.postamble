@@ -28,7 +28,7 @@
 
 # Things to do after distcleaning
 #after-distclean:: 
-	rm -f GNUmakefile
+#	rm -f GNUmakefile
 
 # Things to do before checking
 # before-check::
