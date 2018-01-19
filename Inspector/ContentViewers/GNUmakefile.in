@@ -2,6 +2,10 @@
 PACKAGE_NAME = gworkspace
 include $(GNUSTEP_MAKEFILES)/common.make
 
+PDFKIT=@have_pdfkit@
+SH_PATH=@SH_PATH@
+FILE_PATH=@FILE_PATH@
+
 
 ifneq ($(PDFKIT),no)
 SUBPROJECTS = \
