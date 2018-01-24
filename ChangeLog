@@ -10,6 +10,9 @@
 	* GWMetadata/gmds/mdextractor/mdextractor.m
 	Return correct object in case of exception!
 
+	* GWorkspace/TShelf/TShelfView.m
+	Minor cleanup and compare pointer against nil and not NO.
+
 2018-01-17  Riccardo Mottola <rm@gnu.org>
 
 	* Tools/ddbd/ddbd.m
