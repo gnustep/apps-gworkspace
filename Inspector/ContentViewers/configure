@@ -3355,7 +3355,7 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
-ac_config_files="$ac_config_files GNUmakefile AppViewer/GNUmakefile FolderViewer/GNUmakefile IBViewViewer/GNUmakefile ImageViewer/GNUmakefile NSColorViewer/GNUmakefile NSRTFViewer/GNUmakefile NSTIFFViewer/GNUmakefile PdfViewer/GNUmakefile RtfViewer/GNUmakefile SoundViewer/GNUmakefile"
+ac_config_files="$ac_config_files GNUmakefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -4063,16 +4063,6 @@ for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
     "GNUmakefile") CONFIG_FILES="$CONFIG_FILES GNUmakefile" ;;
-    "AppViewer/GNUmakefile") CONFIG_FILES="$CONFIG_FILES AppViewer/GNUmakefile" ;;
-    "FolderViewer/GNUmakefile") CONFIG_FILES="$CONFIG_FILES FolderViewer/GNUmakefile" ;;
-    "IBViewViewer/GNUmakefile") CONFIG_FILES="$CONFIG_FILES IBViewViewer/GNUmakefile" ;;
-    "ImageViewer/GNUmakefile") CONFIG_FILES="$CONFIG_FILES ImageViewer/GNUmakefile" ;;
-    "NSColorViewer/GNUmakefile") CONFIG_FILES="$CONFIG_FILES NSColorViewer/GNUmakefile" ;;
-    "NSRTFViewer/GNUmakefile") CONFIG_FILES="$CONFIG_FILES NSRTFViewer/GNUmakefile" ;;
-    "NSTIFFViewer/GNUmakefile") CONFIG_FILES="$CONFIG_FILES NSTIFFViewer/GNUmakefile" ;;
-    "PdfViewer/GNUmakefile") CONFIG_FILES="$CONFIG_FILES PdfViewer/GNUmakefile" ;;
-    "RtfViewer/GNUmakefile") CONFIG_FILES="$CONFIG_FILES RtfViewer/GNUmakefile" ;;
-    "SoundViewer/GNUmakefile") CONFIG_FILES="$CONFIG_FILES SoundViewer/GNUmakefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac
