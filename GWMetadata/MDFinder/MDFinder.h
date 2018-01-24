@@ -1,6 +1,6 @@
 /* MDFinder.h
  *  
- * Copyright (C) 2007 Free Software Foundation, Inc.
+ * Copyright (C) 2007-2018 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@fibernet.ro>
  * Date: January 2007
@@ -25,7 +25,7 @@
 #ifndef MDFINDER_H
 #define MDFINDER_H
 
-#include <Foundation/Foundation.h>
+#import <Foundation/Foundation.h>
 
 @class MDKWindow;
 @class StartAppWin;
@@ -112,7 +112,7 @@
 @end 
 
 
-NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str, 
+id<NSMenuItem> addItemToMenu(NSMenu *menu, NSString *str, 
 														NSString *comm, NSString *sel, NSString *key);
 
 #endif // MDFINDER_H

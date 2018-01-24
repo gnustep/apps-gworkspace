@@ -1,6 +1,6 @@
 /* MDFinder.m
  *  
- * Copyright (C) 2007-2011 Free Software Foundation, Inc.
+ * Copyright (C) 2007-2018 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@fibernet.ro>
  * Date: January 2007
@@ -22,12 +22,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <Foundation/Foundation.h>
-#include <AppKit/AppKit.h>
-#include "MDFinder.h"
-#include "MDKWindow.h"
-#include "MDKQuery.h"
-#include "FSNode.h"
+#import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+#import "MDFinder.h"
+#import "MDKWindow.h"
+#import "MDKQuery.h"
+#import "FSNode.h"
 
 static MDFinder *mdfinder = nil;
 
@@ -69,60 +69,60 @@ static MDFinder *mdfinder = nil;
 {
   NSMenu *mainMenu = [NSMenu new];
   NSMenu *menu;
-	NSMenu *windows, *services;  
-	NSMenuItem *menuItem;
+  NSMenu *windows, *services;  
+  id<NSMenuItem> menuItem;
 
-	// Info 	
-	menuItem = addItemToMenu(mainMenu, @"Info", @"", nil, @"");
-	menu = AUTORELEASE ([NSMenu new]);
-	[mainMenu setSubmenu: menu forItem: menuItem];	
-	addItemToMenu(menu, @"Activate context help", @"", @"activateContextHelp:", @";");
+  // Info 	
+  menuItem = addItemToMenu(mainMenu, @"Info", @"", nil, @"");
+  menu = AUTORELEASE ([NSMenu new]);
+  [mainMenu setSubmenu: menu forItem: menuItem];	
+  addItemToMenu(menu, @"Activate context help", @"", @"activateContextHelp:", @";");
 
-	// File
-	menuItem = addItemToMenu(mainMenu, @"File", @"", nil, @"");
-	menu = AUTORELEASE ([NSMenu new]);
-	[mainMenu setSubmenu: menu forItem: menuItem];		
-	addItemToMenu(menu, @"New", @"", @"newQuery:", @"n");
-	addItemToMenu(menu, @"Open...", @"", @"openQuery:", @"o");
-	addItemToMenu(menu, @"Save", @"", @"saveQuery:", @"s");
-	addItemToMenu(menu, @"Save as...", @"", @"saveQueryAs:", @"");
+  // File
+  menuItem = addItemToMenu(mainMenu, @"File", @"", nil, @"");
+  menu = AUTORELEASE ([NSMenu new]);
+  [mainMenu setSubmenu: menu forItem: menuItem];		
+  addItemToMenu(menu, @"New", @"", @"newQuery:", @"n");
+  addItemToMenu(menu, @"Open...", @"", @"openQuery:", @"o");
+  addItemToMenu(menu, @"Save", @"", @"saveQuery:", @"s");
+  addItemToMenu(menu, @"Save as...", @"", @"saveQueryAs:", @"");
 
-	// Edit
-	menuItem = addItemToMenu(mainMenu, @"Edit", @"", nil, @"");
-	menu = AUTORELEASE ([NSMenu new]);
-	[mainMenu setSubmenu: menu forItem: menuItem];	
-	addItemToMenu(menu, @"Cut", @"", @"cut:", @"x");
-	addItemToMenu(menu, @"Copy", @"", @"copy:", @"c");
-	addItemToMenu(menu, @"Paste", @"", @"paste:", @"v");
-    	
-	// Windows
-	menuItem = addItemToMenu(mainMenu, @"Windows", @"", nil, @"");
-	windows = AUTORELEASE ([NSMenu new]);
-	[mainMenu setSubmenu: windows forItem: menuItem];		
-	addItemToMenu(windows, @"Arrange in Front", @"", nil, @"");
-	addItemToMenu(windows, @"Miniaturize Window", @"", nil, @"");
-	addItemToMenu(windows, @"Close Window", @"", @"closeMainWin:", @"w");
+  // Edit
+  menuItem = addItemToMenu(mainMenu, @"Edit", @"", nil, @"");
+  menu = AUTORELEASE ([NSMenu new]);
+  [mainMenu setSubmenu: menu forItem: menuItem];	
+  addItemToMenu(menu, @"Cut", @"", @"cut:", @"x");
+  addItemToMenu(menu, @"Copy", @"", @"copy:", @"c");
+  addItemToMenu(menu, @"Paste", @"", @"paste:", @"v");
+  
+  // Windows
+  menuItem = addItemToMenu(mainMenu, @"Windows", @"", nil, @"");
+  windows = AUTORELEASE ([NSMenu new]);
+  [mainMenu setSubmenu: windows forItem: menuItem];		
+  addItemToMenu(windows, @"Arrange in Front", @"", nil, @"");
+  addItemToMenu(windows, @"Miniaturize Window", @"", nil, @"");
+  addItemToMenu(windows, @"Close Window", @"", @"closeMainWin:", @"w");
+  
+  // Services 
+  menuItem = addItemToMenu(mainMenu, @"Services", @"", nil, @"");
+  services = AUTORELEASE ([NSMenu new]);
+  [mainMenu setSubmenu: services forItem: menuItem];		
+  
+  // Hide
+  addItemToMenu(mainMenu, @"Hide", @"", @"hide:", @"h");
+  
+  // Print
+  addItemToMenu(mainMenu, @"Print...", @"", @"print:", @"p");
+  
+  // Quit
+  addItemToMenu(mainMenu, @"Quit", @"", @"terminate:", @"q");
+  
+  [mainMenu update];
 
-	// Services 
-	menuItem = addItemToMenu(mainMenu, @"Services", @"", nil, @"");
-	services = AUTORELEASE ([NSMenu new]);
-	[mainMenu setSubmenu: services forItem: menuItem];		
-
-	// Hide
-	addItemToMenu(mainMenu, @"Hide", @"", @"hide:", @"h");
-
-	// Print
-	addItemToMenu(mainMenu, @"Print...", @"", @"print:", @"p");
-	
-	// Quit
-	addItemToMenu(mainMenu, @"Quit", @"", @"terminate:", @"q");
-
-	[mainMenu update];
-
-	[NSApp setServicesMenu: services];
-	[NSApp setWindowsMenu: windows];
-	[NSApp setMainMenu: mainMenu];		
-
+  [NSApp setServicesMenu: services];
+  [NSApp setWindowsMenu: windows];
+  [NSApp setMainMenu: mainMenu];		
+  
   RELEASE (mainMenu);
   
   workspaceApp = nil;
@@ -598,7 +598,7 @@ static MDFinder *mdfinder = nil;
 @end
 
 
-NSMenuItem *addItemToMenu(NSMenu *menu, NSString *str, 
+id<NSMenuItem> addItemToMenu(NSMenu *menu, NSString *str, 
 																NSString *comm, NSString *sel, NSString *key)
 {
   return [menu addItemWithTitle: NSLocalizedString(str, comm)
