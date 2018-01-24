@@ -1,6 +1,6 @@
 /* FileOpInfo.m
  *  
- * Copyright (C) 2004-2015 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2018 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola <rm@gnu.org>
@@ -157,7 +157,7 @@ static NSString *nibName = @"FileOperationWin";
 		  }
 		} else
 		{
-		  ntmp = [NSString stringWithFormat: @"%@%@%i", base, copystr, count];
+		  ntmp = [NSString stringWithFormat: @"%@%@%lu", base, copystr, (unsigned long)count];
 		  if ([ext length]) {
 		    ntmp = [ntmp stringByAppendingPathExtension: ext];
 		  }

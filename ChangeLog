@@ -4,6 +4,9 @@
 	* GWMetadata/MDFinder/MDFinder.m
 	Fix warnings: make NSMenuItem follow protocol.
 
+	* Operation/FileOpInfo.m
+	Fix string format warning.
+
 2018-01-17  Riccardo Mottola <rm@gnu.org>
 
 	* Tools/ddbd/ddbd.m
