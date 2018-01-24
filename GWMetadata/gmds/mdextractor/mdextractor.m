@@ -1,6 +1,6 @@
 /* mdextractor.m
  *  
- * Copyright (C) 2006-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2018 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@dtedu.net>
  * Date: February 2006
@@ -560,7 +560,7 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
 
       if (sleeps >= 10) {
         NSLog(@"Unable to obtain lock %@", indexedStatusLock);
-        return [NSDictionary dictionary];
+        return [NSArray dictionary];
 	    }
     }
 
