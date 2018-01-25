@@ -1,6 +1,6 @@
 /* MDKQuery.m
  *  
- * Copyright (C) 2006-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2018 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@dtedu.net>
  * Date: August 2006
@@ -133,7 +133,7 @@ enum {
   TEST_RELEASE (groupedResults);
   TEST_RELEASE (fsfilters);
   
-	[super dealloc];
+  [super dealloc];
 }
 
 + (void)initialize
@@ -242,7 +242,7 @@ enum {
   NSDictionary *domain = [defaults persistentDomainForName: @"MDKQuery"];
   NSArray *userSet = [domain objectForKey: @"user-attributes"];
   NSMutableDictionary *attributes = [NSMutableDictionary dictionary];
-  unsigned i;
+  NSUInteger i;
 
   for (i = 0; i < [attrNames count]; i++) {
     NSString *attrname = [attrNames objectAtIndex: i];
@@ -1986,9 +1986,9 @@ enum {
   }
 
   if ([self scanString: @"(" intoString: NULL]) {
-    PARSEXCEPT (!(((parsed & SUBOPEN) == SUBOPEN) 
+    PARSEXCEPT ((!(((parsed & SUBOPEN) == SUBOPEN) 
                       || ((parsed & COMPOUND) == COMPOUND)
-                      || ((parsed == 0) && (currentQuery == rootQuery))), 
+                  || ((parsed == 0) && (currentQuery == rootQuery)))), 
                                       @"subquery without compound operator");
     parsed &= ~(COMPOUND | SUBCLOSE | COMPARISION);  
     parsed |= SUBOPEN;
@@ -2146,7 +2146,7 @@ enum {
 
 - (BOOL)scanQueryKeyword:(NSString *)key
 {
-  unsigned loc = [self scanLocation];
+  NSUInteger loc = [self scanLocation];
   
   [self setCaseSensitive: NO];
   
