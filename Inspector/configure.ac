@@ -35,7 +35,6 @@ AC_CHECK_FUNCS(getpwnam getpwuid geteuid getlogin)
 AC_CONFIG_AUX_DIR([$GNUSTEP_MAKEFILES])
 AC_CONFIG_HEADER([config.h])
 
-AC_CONFIG_SUBDIRS([ContentViewers])
 
 #--------------------------------------------------------------------
 # Debug logging
@@ -93,6 +92,9 @@ fi
 
 AC_SUBST(have_pdfkit)
 
-AC_CONFIG_FILES([GNUmakefile])
+AC_CONFIG_FILES([
+  GNUmakefile
+  ContentViewers/GNUmakefile
+  ])
 AC_OUTPUT
 
