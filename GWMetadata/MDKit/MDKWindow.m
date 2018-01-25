@@ -1,6 +1,6 @@
 /* MDKWindow.m
  *  
- * Copyright (C) 2006-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2018 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@fibernet.ro>
  * Date: December 2006
@@ -792,7 +792,7 @@ static NSString *nibName = @"MDKWindow";
   [searchPaths removeAllObjects];
   
   if ((index != 0) && (index != count-1)) {
-    NSMenuItem *item = [sender selectedItem];    
+    id<NSMenuItem> item = [sender selectedItem];
     NSString *path = [item representedObject];
         
     for (i = 1; i < count -1; i++) {
@@ -1126,7 +1126,7 @@ static NSString *nibName = @"MDKWindow";
       newquery = YES;
     
     } else {
-      MDKAttribute *attribute = [sender attribute];      
+      MDKAttribute *attribute = (MDKAttribute *)[sender attribute];
 
       if ([attribute inUse]) {  
         if ([sender hasValidValues]) {    
