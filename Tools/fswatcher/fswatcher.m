@@ -1,6 +1,6 @@
 /* fswatcher.m
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2018 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: February 2004
@@ -22,7 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include "fswatcher.h"
+#import "fswatcher.h"
 #include "config.h"
 
 #define GWDebugLog(format, args...) \

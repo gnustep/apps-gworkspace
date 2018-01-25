@@ -30,7 +30,6 @@
   do { if (GW_DEBUG_LOG) \
     NSLog(format , ## args); } while (0)
 
-static BOOL	is_daemon = NO;		/* Currently running as daemon.	 */
 static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 
 static NSString *GWWatchedPathDeleted = @"GWWatchedPathDeleted";
@@ -1075,7 +1074,6 @@ int main(int argc, char** argv)
   CREATE_AUTORELEASE_POOL(pool);
   NSProcessInfo *info = [NSProcessInfo processInfo];
   NSMutableArray *args = AUTORELEASE ([[info arguments] mutableCopy]);
-  static BOOL	is_daemon = NO;
   BOOL subtask = YES;
 
   if ([[info arguments] containsObject: @"--auto"] == YES)
@@ -1086,7 +1084,6 @@ int main(int argc, char** argv)
   if ([[info arguments] containsObject: @"--daemon"])
   {
     subtask = NO;
-    is_daemon = YES;
   }
   
   if (subtask) {
