@@ -560,8 +560,8 @@ static void time_stamp(sqlite3_context *context, int argc, sqlite3_value **argv)
 
       if (sleeps >= 10) {
         NSLog(@"Unable to obtain lock %@", indexedStatusLock);
-        return [NSArray dictionary];
-	    }
+        return [NSArray array];
+      }
     }
 
     status = [NSArray arrayWithContentsOfFile: indexedStatusPath];
