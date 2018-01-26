@@ -1,6 +1,6 @@
 /* MDKAttributeView.h
  *  
- * Copyright (C) 2006 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2018 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@fibernet.ro>
  * Date: December 2006
@@ -25,10 +25,10 @@
 #ifndef MDK_ATTRIBUTE_VIEW_H
 #define MDK_ATTRIBUTE_VIEW_H
 
-#include <Foundation/Foundation.h>
+#import <Foundation/Foundation.h>
 
 @class NSBox;
-@class NSPopUpMenu;
+@class NSPopUpButton;
 @class NSButton;
 @class MDKWindow;
 @class MDKAttribute;
@@ -37,7 +37,7 @@
 {
   IBOutlet id win;
   IBOutlet NSBox *mainBox;
-  IBOutlet NSPopUpMenu *popUp;
+  IBOutlet NSPopUpButton *popUp;
   IBOutlet NSBox *editorBox;
   IBOutlet NSButton *removeButt;
   IBOutlet NSButton *addButt;

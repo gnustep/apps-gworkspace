@@ -1,6 +1,6 @@
 /* MDKAttributeEditor.h
  *  
- * Copyright (C) 2006-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2018 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@fibernet.ro>
  * Date: December 2006
@@ -33,7 +33,7 @@
 @class MDKStringEditor;
 @class NSBox;
 @class NSTextField;
-@class NSPopUpMenu;
+@class NSPopUpButton;
 @class NSButton;
 @class NSStepper;
 @class NSView;
@@ -43,13 +43,13 @@
   IBOutlet id win;
   IBOutlet NSBox *editorBox;
   
-  IBOutlet NSPopUpMenu *operatorPopup;
+  IBOutlet NSPopUpButton *operatorPopup;
   
   IBOutlet NSBox *valueBox;  
   IBOutlet NSTextField *valueField;
   
   IBOutlet NSBox *firstValueBox;
-  IBOutlet NSPopUpMenu *valuesPopup;
+  IBOutlet NSPopUpButton *valuesPopup;
   
   IBOutlet NSBox *secondValueBox;
   
