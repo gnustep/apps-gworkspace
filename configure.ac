@@ -30,12 +30,14 @@ fi
 #--------------------------------------------------------------------
 # Use config.guess, config.sub and install-sh provided by gnustep-make
 #--------------------------------------------------------------------
-AC_CHECK_HEADERS(dir.h unistd.h)
+AC_CONFIG_AUX_DIR([$GNUSTEP_MAKEFILES])
+
+AC_CHECK_HEADERS(dir.h unistd.h sys/resource.h)
 AC_CHECK_FUNCS(getpwnam getpwuid geteuid getlogin)
 
 AC_CONFIG_AUX_DIR([$GNUSTEP_MAKEFILES])
 
-AC_CONFIG_SUBDIRS([FSNode DBKit GWorkspace Inspector])
+AC_CONFIG_SUBDIRS([FSNode DBKit Inspector])
 
 
 AC_ARG_ENABLE(gwmetadata,
@@ -48,6 +50,9 @@ else
   BUILD_GWMETADATA=0
 fi
 AC_SUBST(BUILD_GWMETADATA)
+
+AC_CONFIG_HEADER([GWorkspace/config.h])
+
 
 #--------------------------------------------------------------------
 # Debug logging
@@ -75,6 +80,15 @@ AC_SUBST(with_inotify)
 
 AC_CONFIG_FILES([
   GNUmakefile
+  GWorkspace/GNUmakefile
+  GWorkspace/Finder/Modules/FModuleAnnotations/GNUmakefile
+  GWorkspace/Finder/Modules/FModuleContents/GNUmakefile
+  GWorkspace/Finder/Modules/FModuleCrDate/GNUmakefile
+  GWorkspace/Finder/Modules/FModuleKind/GNUmakefile
+  GWorkspace/Finder/Modules/FModuleModDate/GNUmakefile
+  GWorkspace/Finder/Modules/FModuleName/GNUmakefile
+  GWorkspace/Finder/Modules/FModuleOwner/GNUmakefile
+  GWorkspace/Finder/Modules/FModuleSize/GNUmakefile
   Operation/GNUmakefile
   Recycler/GNUmakefile
   Tools/fswatcher/GNUmakefile
