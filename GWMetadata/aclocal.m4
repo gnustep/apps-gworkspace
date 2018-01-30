@@ -15,11 +15,11 @@ AC_DEFUN(AC_CHECK_PDFKIT,[
   AC_MSG_CHECKING([for PDFKit])
 
   AC_LINK_IFELSE(
-          AC_LANG_PROGRAM(
+          [AC_LANG_PROGRAM(
                   [[#include <Foundation/Foundation.h>
                     #include <AppKit/AppKit.h>
                     #include <PDFKit/PDFDocument.h>]],
-                  [[[[PDFDocument class]];]]),
+                  [[[PDFDocument class];]])],
 	  $1;
 	  have_pdfkit=yes,
 	  $2;
