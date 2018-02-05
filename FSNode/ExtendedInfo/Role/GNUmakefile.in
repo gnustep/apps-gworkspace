@@ -16,7 +16,7 @@ Role_OBJC_FILES = ExtInfoRole.m
 
 Role_PRINCIPAL_CLASS = ExtInfoRole
 
-ADDITIONAL_GUI_LIBS += -lFSNode
+LIBRARIES_DEPEND_UPON += -lFSNode
 
 Role_LANGUAGES = \
 	English \

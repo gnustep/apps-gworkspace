@@ -15,4 +15,4 @@ ADDITIONAL_LDFLAGS +=
 
 ADDITIONAL_TOOL_LIBS +=
 
-thumbnailer_TOOL_LIBS += -lgnustep-gui $(SYSTEM_LIBS)
+thumbnailer_TOOL_LIBS += $(GUI_LIBS) $(SYSTEM_LIBS)
