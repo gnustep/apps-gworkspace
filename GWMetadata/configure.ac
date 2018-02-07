@@ -151,7 +151,6 @@ AC_CONFIG_FILES([
   MDKit/GNUmakefile
   gmds/gmds/GNUmakefile
   gmds/gmds/GNUmakefile.preamble
-  gmds/mdextractor/GNUmakefile
   gmds/mdextractor/Extractors/GNUmakefile
   ])
 

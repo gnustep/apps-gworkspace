@@ -3814,7 +3814,7 @@ _ACEOF
 ac_config_headers="$ac_config_headers MDKit/config.h gmds/mdextractor/Extractors/extractors.h"
 
 
-ac_config_files="$ac_config_files GNUmakefile MDKit/GNUmakefile gmds/gmds/GNUmakefile gmds/gmds/GNUmakefile.preamble gmds/mdextractor/GNUmakefile gmds/mdextractor/Extractors/GNUmakefile"
+ac_config_files="$ac_config_files GNUmakefile MDKit/GNUmakefile gmds/gmds/GNUmakefile gmds/gmds/GNUmakefile.preamble gmds/mdextractor/Extractors/GNUmakefile"
 
 
 cat >confcache <<\_ACEOF
@@ -4512,7 +4512,6 @@ do
     "MDKit/GNUmakefile") CONFIG_FILES="$CONFIG_FILES MDKit/GNUmakefile" ;;
     "gmds/gmds/GNUmakefile") CONFIG_FILES="$CONFIG_FILES gmds/gmds/GNUmakefile" ;;
     "gmds/gmds/GNUmakefile.preamble") CONFIG_FILES="$CONFIG_FILES gmds/gmds/GNUmakefile.preamble" ;;
-    "gmds/mdextractor/GNUmakefile") CONFIG_FILES="$CONFIG_FILES gmds/mdextractor/GNUmakefile" ;;
     "gmds/mdextractor/Extractors/GNUmakefile") CONFIG_FILES="$CONFIG_FILES gmds/mdextractor/Extractors/GNUmakefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;

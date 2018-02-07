@@ -81,16 +81,6 @@ AC_SUBST(with_inotify)
 AC_CONFIG_FILES([
   GNUmakefile
   GWorkspace/GNUmakefile
-  GWorkspace/Finder/Modules/FModuleAnnotations/GNUmakefile
-  GWorkspace/Finder/Modules/FModuleContents/GNUmakefile
-  GWorkspace/Finder/Modules/FModuleCrDate/GNUmakefile
-  GWorkspace/Finder/Modules/FModuleKind/GNUmakefile
-  GWorkspace/Finder/Modules/FModuleModDate/GNUmakefile
-  GWorkspace/Finder/Modules/FModuleName/GNUmakefile
-  GWorkspace/Finder/Modules/FModuleOwner/GNUmakefile
-  GWorkspace/Finder/Modules/FModuleSize/GNUmakefile
-  Operation/GNUmakefile
-  Recycler/GNUmakefile
   Tools/fswatcher/GNUmakefile
   ])
 

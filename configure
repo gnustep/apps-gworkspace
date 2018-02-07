@@ -3460,7 +3460,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files GNUmakefile GWorkspace/GNUmakefile GWorkspace/Finder/Modules/FModuleAnnotations/GNUmakefile GWorkspace/Finder/Modules/FModuleContents/GNUmakefile GWorkspace/Finder/Modules/FModuleCrDate/GNUmakefile GWorkspace/Finder/Modules/FModuleKind/GNUmakefile GWorkspace/Finder/Modules/FModuleModDate/GNUmakefile GWorkspace/Finder/Modules/FModuleName/GNUmakefile GWorkspace/Finder/Modules/FModuleOwner/GNUmakefile GWorkspace/Finder/Modules/FModuleSize/GNUmakefile Operation/GNUmakefile Recycler/GNUmakefile Tools/fswatcher/GNUmakefile"
+ac_config_files="$ac_config_files GNUmakefile GWorkspace/GNUmakefile Tools/fswatcher/GNUmakefile"
 
 
 cat >confcache <<\_ACEOF
@@ -4155,16 +4155,6 @@ do
     "GWorkspace/config.h") CONFIG_HEADERS="$CONFIG_HEADERS GWorkspace/config.h" ;;
     "GNUmakefile") CONFIG_FILES="$CONFIG_FILES GNUmakefile" ;;
     "GWorkspace/GNUmakefile") CONFIG_FILES="$CONFIG_FILES GWorkspace/GNUmakefile" ;;
-    "GWorkspace/Finder/Modules/FModuleAnnotations/GNUmakefile") CONFIG_FILES="$CONFIG_FILES GWorkspace/Finder/Modules/FModuleAnnotations/GNUmakefile" ;;
-    "GWorkspace/Finder/Modules/FModuleContents/GNUmakefile") CONFIG_FILES="$CONFIG_FILES GWorkspace/Finder/Modules/FModuleContents/GNUmakefile" ;;
-    "GWorkspace/Finder/Modules/FModuleCrDate/GNUmakefile") CONFIG_FILES="$CONFIG_FILES GWorkspace/Finder/Modules/FModuleCrDate/GNUmakefile" ;;
-    "GWorkspace/Finder/Modules/FModuleKind/GNUmakefile") CONFIG_FILES="$CONFIG_FILES GWorkspace/Finder/Modules/FModuleKind/GNUmakefile" ;;
-    "GWorkspace/Finder/Modules/FModuleModDate/GNUmakefile") CONFIG_FILES="$CONFIG_FILES GWorkspace/Finder/Modules/FModuleModDate/GNUmakefile" ;;
-    "GWorkspace/Finder/Modules/FModuleName/GNUmakefile") CONFIG_FILES="$CONFIG_FILES GWorkspace/Finder/Modules/FModuleName/GNUmakefile" ;;
-    "GWorkspace/Finder/Modules/FModuleOwner/GNUmakefile") CONFIG_FILES="$CONFIG_FILES GWorkspace/Finder/Modules/FModuleOwner/GNUmakefile" ;;
-    "GWorkspace/Finder/Modules/FModuleSize/GNUmakefile") CONFIG_FILES="$CONFIG_FILES GWorkspace/Finder/Modules/FModuleSize/GNUmakefile" ;;
-    "Operation/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Operation/GNUmakefile" ;;
-    "Recycler/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Recycler/GNUmakefile" ;;
     "Tools/fswatcher/GNUmakefile") CONFIG_FILES="$CONFIG_FILES Tools/fswatcher/GNUmakefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;

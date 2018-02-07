@@ -27,9 +27,9 @@
 # before-distclean::
 
 # Things to do after distcleaning
-after-distclean:: 
-	rm -f TAGS
-	rm GNUmakefile
+#after-distclean:: 
+#	rm -f TAGS
+#	rm GNUmakefile
 
 # Things to do before checking
 # before-check::

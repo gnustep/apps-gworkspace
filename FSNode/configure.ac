@@ -49,10 +49,5 @@ AC_DEFINE_UNQUOTED([GW_DEBUG_LOG], [$GW_DEBUG_LOG], [debug logging])
 
 AC_CONFIG_HEADER([config.h])
 
-AC_CONFIG_FILES([
-  GNUmakefile
-  ExtendedInfo/GNUmakefile
-  ExtendedInfo/Role/GNUmakefile
-  ])
 
 AC_OUTPUT
