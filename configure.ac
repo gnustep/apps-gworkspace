@@ -37,7 +37,7 @@ AC_CHECK_FUNCS(getpwnam getpwuid geteuid getlogin)
 
 AC_CONFIG_AUX_DIR([$GNUSTEP_MAKEFILES])
 
-AC_CONFIG_SUBDIRS([FSNode DBKit Inspector])
+AC_CONFIG_SUBDIRS([FSNode Inspector])
 
 
 AC_ARG_ENABLE(gwmetadata,

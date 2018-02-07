@@ -688,7 +688,7 @@ LDFLAGS
 LIBS
 CPPFLAGS
 CPP'
-ac_subdirs_all='FSNode DBKit Inspector
+ac_subdirs_all='FSNode Inspector
 GWMetadata'
 
 # Initialize some variables set by options.
@@ -3398,7 +3398,7 @@ ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
 
 
 
-subdirs="$subdirs FSNode DBKit Inspector"
+subdirs="$subdirs FSNode Inspector"
 
 
 
