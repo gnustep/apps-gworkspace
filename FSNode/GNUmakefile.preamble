@@ -18,3 +18,5 @@ ADDITIONAL_INCLUDE_DIRS += -IExtendedInfo -I..
 # Additional directories to be created during installation
 ADDITIONAL_INSTALL_DIRS +=
 
+LIBRARIES_DEPEND_UPON += -lm
+
