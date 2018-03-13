@@ -1,3 +1,8 @@
+2018-03-13  Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/Resources/Japanese.lproj/Localizable.strings
+	Add Japanese locale by Chubei Nakagawa
+
 2018-01-25  Riccardo Mottola <rm@gnu.org>
 
 	* GWMetadata/gmds/mdextractor/mdextractor.m
