@@ -1,8 +1,9 @@
 /* AppViewer.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2018 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: January 2004
  *
  * This file is part of the GNUstep Inspector application
@@ -22,8 +23,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <AppKit/AppKit.h>
-#include "AppViewer.h"
+#import <AppKit/AppKit.h>
+#import "AppViewer.h"
 
 @implementation AppViewer
 
@@ -197,22 +198,32 @@
 		  [matrix renewRows: 1 columns: count];
 		  [matrix sizeToCells];
 
-      for (i = 0; i < count; i++) {
-        NSString *ext = [extensions objectAtIndex: i];
-			  NSString *icnname = [iconsdict objectForKey: ext];
-			  NSString *iconPath = [bundle pathForImageResource: icnname];
+      for (i = 0; i < count; i++)
+	{
+	  NSString *ext = [extensions objectAtIndex: i];
+	  NSString *icnname;
+	  NSString *iconPath;
 
-        cell = [matrix cellAtRow: 0 column: i];
-        [cell setTitle: ext];
-        
-        if (iconPath && [fm fileExistsAtPath: iconPath]) {
-          NSImage *image = [[NSImage alloc] initWithContentsOfFile: iconPath]; 
-        
-			    [cell setImage: image];     
-          RELEASE (image);
-        }
-		  }
-		  [matrix sizeToCells];
+	  cell = [matrix cellAtRow: 0 column: i];
+	  [cell setTitle: ext];
+
+	  icnname = [iconsdict objectForKey: ext];
+	  if ([icnname length] > 0)
+	    {
+	      iconPath = [bundle pathForImageResource: icnname];
+	      if (iconPath && [fm fileExistsAtPath: iconPath])
+		{
+		  NSImage *image = [[NSImage alloc] initWithContentsOfFile: iconPath];
+		  [cell setImage: image];
+		  RELEASE (image);
+		}
+	    }
+	  else
+	    {
+	      [cell setImage: nil]; // reset icon
+	    }
+	}
+      [matrix sizeToCells];
       
 		  if (valid == NO) {
 			  [errLabel removeFromSuperview]; 
