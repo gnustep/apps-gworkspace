@@ -78,7 +78,7 @@ typedef enum BackImageStyle {
 
 - (BOOL)isFreeGridIndex:(int)index;
 
-- (FSNIcon *)iconWithGridIndex:(int)index;
+- (FSNIcon *)iconWithGridIndex:(NSUInteger)index;
 
 - (NSArray *)iconsWithGridOriginX:(float)x;
 

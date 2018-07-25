@@ -1,6 +1,6 @@
 /* GWDesktopView.m
  *  
- * Copyright (C) 2005-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2018 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola <rm@gnu.org>
@@ -157,7 +157,7 @@
   NSArray *rvpaths = [[NSWorkspace sharedWorkspace] mountedRemovableMedia];
 
   if ([mountedVolumes isEqual: rvpaths] == NO) {
-    int count = [icons count];
+    NSUInteger count = [icons count];
     int i;
         
     [mountedVolumes removeAllObjects];
@@ -197,7 +197,7 @@
 
 - (void)tile
 {
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [icons count]; i++) {
     FSNIcon *icon = [icons objectAtIndex: i];
@@ -251,47 +251,48 @@
     }
   } 
   
-	return -1;
+  return -1;
 }
 
 - (BOOL)isFreeGridIndex:(int)index
 {
-	int i;
+  NSUInteger i;
 	
-  if ((index < 0) || (index >= gridcount)) {
+  if ((index < 0) || (index >= gridcount))
     return NO;
-  }
   
-	for (i = 0; i < [icons count]; i++) {
-		if ([[icons objectAtIndex: i] gridIndex] == index) {
-			return NO;
-		}
-  }
+  for (i = 0; i < [icons count]; i++)
+    {
+      if ([[icons objectAtIndex: i] gridIndex] == index) {
+	return NO;
+      }
+    }
   
-	return YES;
+  return YES;
 }
 
-- (FSNIcon *)iconWithGridIndex:(int)index
+- (FSNIcon *)iconWithGridIndex:(NSUInteger)index
 {
-	int i;
+  NSUInteger i;
 	
-	for (i = 0; i < [icons count]; i++) {
-    FSNIcon *icon = [icons objectAtIndex: i];
-    
-		if ([icon gridIndex] == index) {
-			return icon;
-		}
-  }
+  for (i = 0; i < [icons count]; i++)
+    {
+      FSNIcon *icon = [icons objectAtIndex: i];
+      
+      if ([icon gridIndex] == index) {
+	return icon;
+      }
+    }
   
-	return nil;
+  return nil;
 }
 
 - (NSArray *)iconsWithGridOriginX:(float)x
 {
   NSMutableArray *icns = [NSMutableArray array];
-  int i;
+  NSUInteger i;
   
-	for (i = 0; i < [icons count]; i++) {
+  for (i = 0; i < [icons count]; i++) {
     FSNIcon *icon = [icons objectAtIndex: i];
     NSPoint p = [icon frame].origin;
     
@@ -376,13 +377,13 @@
   NSRect tshfr = [manager tshelfReservedFrame];
   NSRect mmfr = [manager macmenuReservedFrame];
   NSRect gridrect = screenFrame;
-  int ymargin;
+  unsigned ymargin;
   NSPoint gpnt;
-  int i;
+  unsigned i;
   
-	if (grid != NULL) {
-		NSZoneFree (NSDefaultMallocZone(), grid);
-	}
+  if (grid != NULL) {
+    NSZoneFree (NSDefaultMallocZone(), grid);
+  }
   
   [self calculateGridSize];
   
@@ -404,9 +405,9 @@
   
   colcount = (int)(gridrect.size.width / (gridSize.width + X_MARGIN));  
   rowcount = (int)(gridrect.size.height / (gridSize.height + ymargin));
-	gridcount = colcount * rowcount;
+  gridcount = colcount * rowcount;
 
-	grid = NSZoneMalloc (NSDefaultMallocZone(), sizeof(NSRect) * gridcount);	
+  grid = NSZoneMalloc (NSDefaultMallocZone(), sizeof(NSRect) * gridcount);	
     
   gpnt.x = gridrect.size.width + gridrect.origin.x;
   gpnt.y = gridrect.size.height + gridrect.origin.y;
@@ -574,7 +575,7 @@
   NSColor *tempColor;
   NSMutableDictionary *backColorDict = [NSMutableDictionary dictionary];
   CGFloat red, green, blue, alpha;
-  int i;
+  NSUInteger i;
 
   tempColor = [backColor colorUsingColorSpaceName: NSCalibratedRGBColorSpace];
   [tempColor getRed: &red green: &green blue: &blue alpha: &alpha];
@@ -625,13 +626,14 @@
 
 - (void)selectIconInPrevLine
 {
-	int i;
+  NSUInteger i;
   
-	for (i = 0; i < [icons count]; i++) {
-		FSNIcon *icon = [icons objectAtIndex: i];
-    int index = [icon gridIndex];
+  for (i = 0; i < [icons count]; i++)
+    {
+      FSNIcon *icon = [icons objectAtIndex: i];
+      int index = [icon gridIndex];
     
-		if ([icon isSelected]) {
+      if ([icon isSelected]) {
       FSNIcon *prev;
       
       while (index > 0) {
@@ -652,9 +654,10 @@
 
 - (void)selectIconInNextLine
 {
-	int i;
+  NSUInteger i;
   
-	for (i = 0; i < [icons count]; i++) {
+  for (i = 0; i < [icons count]; i++)
+    {
 		FSNIcon *icon = [icons objectAtIndex: i];
     int index = [icon gridIndex];
     
