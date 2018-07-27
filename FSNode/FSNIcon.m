@@ -138,6 +138,20 @@ static NSImage *branchImage;
   return hname;
 }
 
+- (NSString*) description
+{
+  NSString *s;
+
+  s = [super description];
+  s = [s stringByAppendingString:@" {"];
+  s = [s stringByAppendingString:[node path]];
+  if ([node isMountPoint])
+    s = [s stringByAppendingString:@" isMountPoint "];
+  s = [s stringByAppendingString: [NSString stringWithFormat:@" gridIndex: %d", gridIndex]];
+  s = [s stringByAppendingString:@" }"];
+  return s;
+}
+
 - (id)initForNode:(FSNode *)anode
      nodeInfoType:(FSNInfoType)type
      extendedType:(NSString *)exttype
