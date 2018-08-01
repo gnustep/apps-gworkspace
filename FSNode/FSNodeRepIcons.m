@@ -1,6 +1,6 @@
 /* FSNodeRepIcons.m
  *  
- * Copyright (C) 2005-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2018 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola
@@ -135,8 +135,7 @@ static unsigned char darkerLUT[256] = {
 	{
 	  key = nodepath;
 	}
-      else if (([node isMountPoint] && [volumes containsObject: nodepath])
-	       || [volumes containsObject: nodepath])
+      else if ([node isMountPoint] || [volumes containsObject: nodepath])
 	{
 	  key = @"disk";
 	  baseIcon = hardDiskIcon;
@@ -358,8 +357,7 @@ static unsigned char darkerLUT[256] = {
       icon = [self darkerIcon: [self iconOfSize: size forNode: node]];
     }      
   } else {
-    if (([node isMountPoint] && [volumes containsObject: [node path]])
-                                    || [volumes containsObject: [node path]]) {
+    if ([node isMountPoint] || [volumes containsObject: [node path]]) {
       icon = [self darkerIcon: hardDiskIcon];
     } else {
       icon = [self darkerIcon: [self iconOfSize: size forNode: node]];
