@@ -159,9 +159,6 @@
   if ([mountedVolumes isEqual: rvpaths] == NO) {
     NSUInteger count = [icons count];
     int i;
-        
-    [mountedVolumes removeAllObjects];
-    [mountedVolumes addObjectsFromArray: rvpaths];
 
     for (i = 0; i < count; i++) {
       FSNIcon *icon = [icons objectAtIndex: i];
@@ -173,14 +170,15 @@
       }
     }
 
+    [mountedVolumes removeAllObjects];
+    [mountedVolumes addObjectsFromArray: rvpaths];
+
     for (i = 0; i < [mountedVolumes count]; i++) {
       NSString *vpath = [mountedVolumes objectAtIndex: i];
 
       if ([vpath isEqual: path_separator()] == NO) {
-        FSNode *vnode = [FSNode nodeWithPath: vpath];
 
-        [vnode setMountPoint: YES];
-        [self addRepForSubnode: vnode];
+	[self newVolumeMountedAtPath:vpath];
       }
     }
 
