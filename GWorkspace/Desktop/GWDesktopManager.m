@@ -1,8 +1,10 @@
 /* GWDesktopManager.m
  *  
- * Copyright (C) 2005-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2018 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola <rm@gnu.org>
+ *
  * Date: January 2005
  *
  * This file is part of the GNUstep GWorkspace application
@@ -866,97 +868,84 @@ static GWDesktopManager *desktopManager = nil;
 
 - (void)dealloc
 {
-	if (timer && [timer isValid]) {
-		[timer invalidate];
-	}  
-  RELEASE (volinfo);  
-	[super dealloc];
+  if (timer && [timer isValid])
+    {
+      [timer invalidate];
+    }
+
+  RELEASE (mountedRemovableVolumes);
+  [super dealloc];
 }
 
 - (id)initForManager:(GWDesktopManager *)mngr
 {
   self = [super init];
   
-  if (self) {
-    manager = mngr;    
-    volinfo = [NSMutableArray new];
-    active = NO;
-    fm = [NSFileManager defaultManager];
-    
-    timer = [NSTimer scheduledTimerWithTimeInterval: 1.0 
-												                     target: self 
-                                           selector: @selector(watchMountPoints:) 
-										                       userInfo: nil 
-                                            repeats: YES];
-  }
+  if (self)
+    {
+      manager = mngr;
+      active = NO;
+      fm = [NSFileManager defaultManager];
+
+      timer = [NSTimer scheduledTimerWithTimeInterval: 1.5
+					       target: self
+					     selector: @selector(watchMountPoints:)
+					     userInfo: nil
+					      repeats: YES];
+    }
   
   return self;
 }
 
 - (void)startWatching
 {
-  NSSet *volumes = [[FSNodeRep sharedInstance] volumes];
-  NSEnumerator *enumerator = [volumes objectEnumerator];
-  NSString *path;
-  
-  [volinfo removeAllObjects];
-
-  while ((path = [enumerator nextObject])) {
-    NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: NO];
-    
-    if (attributes) {
-      NSDate *moddate = [attributes fileModificationDate];
-      NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-      
-      [dict setObject: path forKey: @"path"];
-      [dict setObject: moddate forKey: @"moddate"];
-      
-      [volinfo addObject: dict];  
-    }
-  }
-
+  [mountedRemovableVolumes release];
+  mountedRemovableVolumes = [[NSWorkspace sharedWorkspace] mountedRemovableMedia];
+  [mountedRemovableVolumes retain];
   active = YES;
 }
 
 - (void)stopWatching
 {
   active = NO;
-  [volinfo removeAllObjects];
+  [mountedRemovableVolumes release];
+  mountedRemovableVolumes = nil;
 }
 
 - (void)watchMountPoints:(id)sender
 {
-  if (active) {
-    int count = [volinfo count];
-    BOOL changed = NO;
-    NSUInteger i;
-    
-    for (i = 0; i < count; i++) {
-      NSMutableDictionary *dict = [volinfo objectAtIndex: i];
-      NSString *path = [dict objectForKey: @"path"];
-      NSDate *moddate = [dict objectForKey: @"moddate"];
-      NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: NO];      
-      
-      if (attributes) {
-        NSDate *lastmod = [attributes fileModificationDate];
-      
-        if ([moddate isEqualToDate: lastmod] == NO) {
-          [dict setObject: lastmod forKey: @"moddate"];
-          changed = YES;
-        }
-        
-      } else {
-        [volinfo removeObjectAtIndex: i]; 
-        count--;
-        i--;
-        changed = YES;       
-      }      
+  if (active)
+    {
+      BOOL removed = NO;
+      BOOL added = NO;
+      NSUInteger i;
+      NSArray *newVolumes = [[NSWorkspace sharedWorkspace] mountedRemovableMedia];
+
+      for (i = 0; i < [mountedRemovableVolumes count]; i++)
+	{
+	  NSString *vol;
+
+	  vol = [mountedRemovableVolumes objectAtIndex:i];
+	  if (![newVolumes containsObject:vol])
+	    removed |= YES;
+	}
+
+      for (i = 0; i < [newVolumes count]; i++)
+	{
+	  NSString *vol;
+
+	  vol = [newVolumes objectAtIndex:i];
+	  if (![mountedRemovableVolumes containsObject:vol])
+	    added |= YES;
+	}
+
+      if (added || removed)
+	[manager mountedVolumesDidChange];
+
+      [mountedRemovableVolumes release];
+      mountedRemovableVolumes = newVolumes;
+      [mountedRemovableVolumes retain];
     }
-    
-    if (changed) {
-      [manager mountedVolumesDidChange]; 
-    }
-  }
 }
 
 @end

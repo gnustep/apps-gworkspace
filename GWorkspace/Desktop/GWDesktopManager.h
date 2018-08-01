@@ -1,6 +1,6 @@
 /* GWDesktopManager.h
  *  
- * Copyright (C) 2005-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2018 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2005
@@ -186,7 +186,7 @@ typedef enum DockPosition {
 
 @interface MPointWatcher : NSObject
 {
-  NSMutableArray *volinfo;
+  NSArray *mountedRemovableVolumes;
   NSTimer *timer;
   BOOL active;
   GWDesktopManager *manager;

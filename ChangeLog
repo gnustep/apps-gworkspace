@@ -3,6 +3,10 @@
 	* FSNode/FSNodeRepIcons.m
 	Fix inconsistent condition for  [volumes containsObject: nodepath]
 
+	* GWorkspace/Desktop/GWDesktopManager.h
+	* GWorkspace/Desktop/GWDesktopManager.m
+	Track mounted volumes by checking additions/removals instead of modification of mount points.
+
 
 2018-07-06  Riccardo Mottola <rm@gnu.org>
 
