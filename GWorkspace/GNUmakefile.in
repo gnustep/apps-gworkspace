@@ -43,6 +43,7 @@ GWorkspace_RESOURCE_FILES = \
   Resources/Romanian.lproj \
   Resources/Spanish.lproj \
   Resources/Japanese.lproj \
+  Resources/Polish.lproj \
   GWorkspaceInfo.plist
 
 GWorkspace_LANGUAGES = \
@@ -58,7 +59,8 @@ GWorkspace_LANGUAGES = \
   Resources/Portuguese \
   Resources/Romanian \
   Resources/Spanish \
-  Resources/Japanese
+  Resources/Japanese \
+  Resources/Polish
 
 # The Objective-C source files to be compiled
 GWorkspace_OBJC_FILES = main.m \
