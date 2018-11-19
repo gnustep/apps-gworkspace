@@ -154,36 +154,53 @@
 
 - (void)showMountedVolumes
 {
-  NSArray *rvpaths = [[NSWorkspace sharedWorkspace] mountedRemovableMedia];
+  NSArray *rvPaths;
+  NSMutableArray *newVolumes;
+  NSUInteger i;
+  BOOL added;
 
-  if ([mountedVolumes isEqual: rvpaths] == NO) {
-    NSUInteger count = [icons count];
-    int i;
+  added = NO;
 
-    for (i = 0; i < count; i++) {
-      FSNIcon *icon = [icons objectAtIndex: i];
+  rvPaths = [[NSWorkspace sharedWorkspace] mountedRemovableMedia];
+  newVolumes = [NSMutableArray arrayWithCapacity:1];
 
-      if ([[icon node] isMountPoint]) {
-        [self removeRep: icon];
-        count--;
-        i--;
-      }
+  for (i = 0; i < [mountedVolumes count]; i++)
+    {
+      NSString *v;
+
+      v = [mountedVolumes objectAtIndex:i];
+      if ([rvPaths indexOfObject:v] == NSNotFound)
+	{
+	  NSLog(@"removing: %@", v);
+	  [mountedVolumes removeObjectAtIndex:i];
+	  [self workspaceDidUnmountVolumeAtPath: v];
+	}
     }
 
-    [mountedVolumes removeAllObjects];
-    [mountedVolumes addObjectsFromArray: rvpaths];
+  for (i = 0; i < [rvPaths count]; i++)
+    {
+      NSString *v;
 
-    for (i = 0; i < [mountedVolumes count]; i++) {
-      NSString *vpath = [mountedVolumes objectAtIndex: i];
-
-      if ([vpath isEqual: path_separator()] == NO) {
-
-	[self newVolumeMountedAtPath:vpath];
-      }
+      v = [rvPaths objectAtIndex:i];
+      if ([mountedVolumes indexOfObject:v] == NSNotFound)
+	{
+	  [newVolumes addObject:v];
+	  if ([v isEqual: path_separator()] == NO)
+	    {
+	      NSLog(@"new volume: %@", v);
+	      [self newVolumeMountedAtPath:v];
+	    }
+	  added = YES;
+	}
     }
 
-    [self tile];  
-  }
+  // we add new volumes at once at the end, or we disturb our for cycle
+  // we Tile only when adding, since workspaceDidUnmountVolumeAtPath does it for us
+  if (added)
+    {
+      [mountedVolumes addObjectsFromArray:newVolumes];
+      [self tile];
+    }
 }
 
 - (void)dockPositionDidChange

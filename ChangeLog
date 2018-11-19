@@ -1,3 +1,8 @@
+2018-11-19  Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/Desktop/GWDesktopView.m (showMountedVolumes)
+	Improve handling of added and removed volumes.
+
 2018-08-01  Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNodeRepIcons.m
