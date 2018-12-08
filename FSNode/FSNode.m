@@ -501,9 +501,7 @@
         flags.package = 1;
 	    } else if (type == NSPlainFileType) {
         flags.package = 1;
-      } else if (type == NSFilesystemFileType) {
-        flags.mountpoint = 1;
-      } 
+      }
 
     } else if (fileType == NSFileTypeSymbolicLink) {
       NSDictionary *attrs = [fm fileAttributesAtPath: path traverseLink: YES];
