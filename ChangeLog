@@ -1,3 +1,7 @@
+2020-01-31  Riccardo Mottola <rm@gnu.org>
+	* Inspector/ContentViewers/ImageViewer/Resizer.m
+	Update Scaling code to Bilinear from PRICE.
+
 2018-12-08  Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNode.m
