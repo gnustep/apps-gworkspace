@@ -1,6 +1,6 @@
 /* ImageThumbnailer.m
  *  
- * Copyright (C) 2003-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2020 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola <rm@gnu.org>
@@ -94,29 +94,34 @@
           NSInteger destSamplesPerPixel = srcSpp;
           NSInteger destBytesPerRow;
           NSInteger destBytesPerPixel;
-          NSInteger dstsizeW, dstsizeH;
+          NSInteger dstSizeW, dstSizeH;
           float fact = ([srcRep pixelsWide] >= [srcRep pixelsHigh]) ? ([srcRep pixelsWide] / TMBMAX) : ([srcRep pixelsHigh] / TMBMAX);
           	        
-          float xratio;
-          float yratio;
+          float xRatio;
+          float yRatio;
           NSBitmapImageRep *dstRep;
           unsigned char *srcData;
           unsigned char *destData;    
           unsigned x, y;
           NSInteger i;
           NSData *tiffData;
+	  NSInteger srcSizeW;
+	  NSInteger srcSizeH;
 
-          dstsizeW = (NSInteger)floor([srcRep pixelsWide] / fact + 0.5);
-          dstsizeH = (NSInteger)floor([srcRep pixelsHigh] / fact + 0.5);
+	  srcSizeW = [srcRep pixelsWide];
+	  srcSizeH = [srcRep pixelsHigh];
+
+          dstSizeW = (NSInteger)floor([srcRep pixelsWide] / fact + 0.5);
+          dstSizeH = (NSInteger)floor([srcRep pixelsHigh] / fact + 0.5);
  
-          xratio = (float)[srcRep pixelsWide] / (float)dstsizeW;
-          yratio = (float)[srcRep pixelsHigh] / (float)dstsizeH;
+          xRatio = (float)[srcRep pixelsWide] / (float)dstSizeW;
+          yRatio = (float)[srcRep pixelsHigh] / (float)dstSizeH;
           
           destSamplesPerPixel = [srcRep samplesPerPixel];
           dstRep = [[NSBitmapImageRep alloc]
                      initWithBitmapDataPlanes:NULL
-                                   pixelsWide:dstsizeW
-                                   pixelsHigh:dstsizeH
+                                   pixelsWide:dstSizeW
+                                   pixelsHigh:dstSizeH
                                 bitsPerSample:8
                               samplesPerPixel:destSamplesPerPixel
                                      hasAlpha:[srcRep hasAlpha]
@@ -131,10 +136,60 @@
           destBytesPerRow = [dstRep bytesPerRow];
           destBytesPerPixel = [dstRep bitsPerPixel] / 8;
           
-          for (y = 0; y < dstsizeH; y++)
-            for (x = 0; x < dstsizeW; x++)
-              for (i = 0; i < srcSpp; i++)
-                destData[destBytesPerRow * y + destBytesPerPixel * x + i] = srcData[srcBytesPerRow * (int)floorf(y * yratio)  + srcBytesPerPixel * (int)floorf(x * xratio) + i];
+          for (y = 0; y < dstSizeH; y++)
+	    {
+	      for (x = 0; x < dstSizeW; x++)
+		{
+		  register NSInteger x0, y0;
+		  register float xDiff, yDiff;
+		  float xFloat, yFloat;
+		  NSInteger x1, y1;
+		  int xStep, yStep;
+
+		  // we use integer part of the ratio, so that we can set the next pixel to at least one apart
+		  xStep = floorf(xRatio);
+		  yStep = floorf(yRatio);
+		  if (xStep == 0) xStep = 1;
+		  if (yStep == 0) yStep = 1;
+		  xFloat = (float)x * xRatio;
+		  yFloat = (float)y * yRatio;
+		  x0 = (NSInteger)floorf(xFloat);
+		  y0 = (NSInteger)floorf(yFloat);
+		  x1 = x0 + xStep;
+		  y1 = y0 + yStep;
+
+		  // these are the weight w and h, normalized to the distance 1 : x1-x0
+		  xDiff = (xFloat - (float)x0)/(float)xStep;
+		  yDiff = (yFloat - (float)y0)/(float)yStep;
+
+		  if (x1 >= srcSizeW )
+		    {
+		      x1 = srcSizeW-1;
+		      xDiff = 0;
+		    }
+		  if (y1 >= srcSizeH )
+		    {
+		      y1 = srcSizeH-1;
+		      yDiff = 0;
+		    }
+		  
+		  for (i = 0; i < srcSpp; i++)
+		    {
+		      int v1, v2, v3, v4;
+
+		      v1 = srcData[srcBytesPerRow * y0 + srcBytesPerPixel * x0 + i];
+		      v2 = srcData[srcBytesPerRow * y0 + srcBytesPerPixel * x1 + i];
+		      v3 = srcData[srcBytesPerRow * y1 + srcBytesPerPixel * x0 + i];
+		      v4 = srcData[srcBytesPerRow * y1 + srcBytesPerPixel * x1 + i];
+		      
+		      destData[destBytesPerRow * y + destBytesPerPixel * x + i] = \
+			(int)(v1*(1-xDiff)*(1-yDiff) +                            \
+			      v2*xDiff*(1-yDiff) +				  \
+			      v3*yDiff*(1-xDiff) +	                          \
+			      v4*xDiff*yDiff);
+		    }
+		}
+	    }
           
           tiffData = [dstRep TIFFRepresentation];
           RETAIN (tiffData);
