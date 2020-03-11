@@ -213,9 +213,9 @@
 		      v4 = srcData[srcBytesPerRow * y1 + srcBytesPerPixel * x1 + i];
                   
 		      destData[destBytesPerRow * y + destBytesPerPixel * x + i] = \
-			(int)(v1*(1-xDiff)*(1-yDiff) +			\
-			      v2*xDiff*(1-yDiff) +				\
-			      v3*yDiff*(1-xDiff) +				\
+			(int)(v1*(1-xDiff)*(1-yDiff) +                            \
+			      v2*xDiff*(1-yDiff) +				  \
+			      v3*yDiff*(1-xDiff) +		                  \
 			      v4*xDiff*yDiff);
 		    }
 		}
