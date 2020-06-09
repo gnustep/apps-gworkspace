@@ -11,7 +11,7 @@ test4.m \
 test5.m \
 test6.m 
 
-ADDITIONAL_TOOL_LIBS += -lDBKit $(SYSTEM_LIBS)
+ADDITIONAL_LIB_DIRS += -lDBKit
 
 -include GNUmakefile.preamble
 

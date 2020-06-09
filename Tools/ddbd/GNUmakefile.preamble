@@ -15,5 +15,5 @@ ADDITIONAL_INCLUDE_DIRS += -I../../GWorkspace
 # Additional LDFLAGS to pass to the linker
 # ADDITIONAL_LDFLAGS += 
 
-ADDITIONAL_TOOL_LIBS += -L../../DBKit/$(GNUSTEP_OBJ_DIR)
+ADDITIONAL_LIB_DIRS += -L../../DBKit/$(GNUSTEP_OBJ_DIR)
 
