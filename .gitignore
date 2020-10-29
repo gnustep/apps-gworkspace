@@ -1,0 +1,37 @@
+# .gitignore - List of filenames git should ignore
+
+# Filenames that should be ignored wherever they appear
+*~
+*.rej
+*.orig
+*.pyc
+*.log
+*.pyo
+TAGS
+tags
+ID
+.DS_Store*
+
+# Vim swap files.
+.*.sw[a-z]
+
+# User files that may appear at the root
+configure
+config.cache
+config.log
+config.status
+config.h
+GNUmakefile
+
+# Build directories
+obj
+derived_src
+
+# Build results
+*.inspector
+*.app
+*.thumb
+*.mdm
+*.finder
+*.framework
+*.extinfo
