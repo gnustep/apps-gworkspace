@@ -1,8 +1,9 @@
 /* ImageViewer.h
  *  
- * Copyright (C) 2004-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2020 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: January 2004
  *
  * This file is part of the GNUstep Inspector application
@@ -36,6 +37,7 @@
 @class NSWorkspace;
 @class ProgressView;
 @class ImageResizer;
+
 @protocol ContentInspectorProtocol
 
 - (void)contentsReadyAt:(NSString *)path;
@@ -51,7 +53,7 @@
 
 @end
 
-@interface ImageViewer : NSView <ContentViewersProtocol>
+@interface ImageViewer : NSView <ContentViewersProtocol, ImageViewerProtocol>
 {
   NSArray *extsarr;
   BOOL valid;	
@@ -76,9 +78,9 @@
   NSWorkspace *ws;
 }
 
-- (void)setResizer:(id)anObject;
+- (oneway void)setResizer:(id)anObject;
 
-- (void)imageReady:(NSDictionary *)imginfo;
+- (oneway void)imageReady:(NSDictionary *)imginfo;
 
 - (void)editFile:(id)sender;
 

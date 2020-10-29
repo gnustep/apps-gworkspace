@@ -33,24 +33,13 @@
   do { if (GW_DEBUG_LOG) \
     NSLog(format , ## args); } while (0)
 
-@protocol ImageViewerProtocol
-
-- (oneway void)setResizer:(id)anObject;
-
-- (oneway void)imageReady:(NSDictionary *)dict;
-
-@end
-
-
-
-
-
 @implementation ImageResizer
 
 + (void)connectWithPorts:(NSArray *)portArray
 {
   NSAutoreleasePool *pool;
   ImageResizer *serverObject;
+  NSConnection *serverConnection;
 
   pool = [[NSAutoreleasePool alloc] init];
 
@@ -76,6 +65,11 @@
 
 
 #define MIX_LIM 16
+
+- (void)setProxy:(id <ImageViewerProtocol>)ivp
+{
+  imageViewerProxy = ivp;
+}
 
 - (void)readImageAtPath:(NSString *)path
                 setSize:(NSSize)imsize
@@ -243,7 +237,7 @@
     
       RELEASE (srcImage);
     }
-  [(id <ImageViewerProtocol>)[serverConnection rootProxy] imageReady: info];
+  [imageViewerProxy imageReady: info];
   RELEASE (arp);
 }
 

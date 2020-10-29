@@ -1,8 +1,9 @@
 /* ContentViewersProtocol.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2020 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: January 2004
  *
  * This file is part of the GNUstep GWorkspace application
@@ -48,4 +49,12 @@
 
 @end 
 
+/* Proxy for DO connection */
 
+@protocol ImageViewerProtocol
+
+- (oneway void)setResizer:(id)anObject;
+
+- (oneway void)imageReady:(NSDictionary *)dict;
+
+@end

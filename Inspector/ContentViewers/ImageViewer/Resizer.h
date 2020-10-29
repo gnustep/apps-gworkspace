@@ -1,9 +1,10 @@
 /* Resizer.m
 h
  *  
- * Copyright (C) 2005-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2020 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: May 2016
  *
  * This file is part of the GNUstep Inspector application
@@ -23,13 +24,14 @@ h
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-
-NSConnection *serverConnection;
+#import "ContentViewersProtocol.h"
 
 @interface ImageResizer : NSObject
 {
-
+  id <ImageViewerProtocol> imageViewerProxy;
 }
+
+- (void)setProxy:(id <ImageViewerProtocol>)ivp;
 
 - (void)readImageAtPath:(NSString *)path
                 setSize:(NSSize)imsize;

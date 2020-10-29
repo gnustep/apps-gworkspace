@@ -198,7 +198,7 @@
   }
 }
 
-- (void)setResizer:(id)anObject
+- (oneway void)setResizer:(id)anObject
 {
     NSSize imsize = [imview bounds].size;
 
@@ -207,6 +207,7 @@
     [anObject setProtocolForProxy: @protocol(ImageResizerProtocol)];
     resizer = (ImageResizer *)anObject;
     RETAIN (resizer);
+    [resizer setProxy: self];
     [self addSubview: progView]; 
     [progView start];    
     [resizer readImageAtPath: imagePath setSize: imsize];
@@ -214,7 +215,7 @@
 
 
 
-- (void)imageReady:(NSDictionary *)imginfo
+- (oneway void)imageReady:(NSDictionary *)imginfo
 {
   NSData *imgdata;
   BOOL imgok;
