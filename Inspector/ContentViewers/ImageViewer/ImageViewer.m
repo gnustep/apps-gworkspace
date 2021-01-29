@@ -1,6 +1,6 @@
 /* ImageViewer.m
  *  
- * Copyright (C) 2004-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2021 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola <rm@gnu.org>
@@ -148,6 +148,8 @@
 {
   DESTROY (editPath);
   [editButt setEnabled: NO];		
+  [widthLabel setStringValue: @""];
+  [heightLabel setStringValue: @""];
   
   if (imagePath)
     {
