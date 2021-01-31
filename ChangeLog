@@ -1,3 +1,8 @@
+2021-01-31  Riccardo Mottola <rm@gnu.org>
+
+	* Inspector/ContentViewers/AppViewer/AppViewer.m
+	Cleanup code and fix display of extensions without a valid icons.
+
 2020-10-29  Riccardo Mottola <rm@gnu.org>
 
 	* Inspector/ContentViewers/ImageViewer/ImageViewer.h
