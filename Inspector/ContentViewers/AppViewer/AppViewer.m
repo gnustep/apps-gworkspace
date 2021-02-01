@@ -126,14 +126,14 @@
 {
   NSBundle *bundle;
   NSDictionary *info;
-  BOOL infok;
+  BOOL infoIsOk;
   
   ASSIGN (currentPath, path);
 
   if ([self superview])      
     [inspector contentsReadyAt: currentPath];
   
-  infok = YES;
+  infoIsOk = NO;
   bundle = [NSBundle bundleWithPath: currentPath];
   info = [bundle infoDictionary]; 
 
@@ -147,7 +147,7 @@
 	  NSMutableArray *extensions = [NSMutableArray array];  
 	  NSMutableDictionary *iconsdict = [NSMutableDictionary dictionary];
 	  NSString *iname;
-	  id cell;     
+	  NSCell *cell;
 	  NSUInteger i, j, count;
     
 	  for (i = 0; i < [typesAndIcons count]; i++)
@@ -180,22 +180,6 @@
 	    }
 
 	  count = [extensions count];
-	  for (i = 0; i < count; i++)
-	    {
-	      NSString *ext1 = [extensions objectAtIndex: i];
-	      NSString *icnname1 = [iconsdict objectForKey: ext1];
-
-	      for (j = 0; j < count; j++)
-		{
-		  NSString *ext2 = [extensions objectAtIndex: j];
-		  NSString *icnname2 = [iconsdict objectForKey: ext2];
-
-		  if ((i != j) && ([icnname1 isEqual: icnname2]))
-		    {
-		      [iconsdict removeObjectForKey: ext1];
-		    }
-		}
-	    }
 
 	  [matrix renewRows: 1 columns: count];
 	  [matrix sizeToCells];
@@ -233,19 +217,12 @@
 	      [self addSubview: explField];       
 	      [self addSubview: scroll];       
 	      valid = YES;
-	    }		
+	    }
+          infoIsOk = YES;
 	}
-      else
-	{
-	  infok = NO;  
-	}
-    }
-  else
-    { 
-      infok = NO;  		
     }
   
-  if (infok == NO && valid == YES)
+  if (infoIsOk == NO && valid == YES)
     {
       [explField removeFromSuperview]; 
       [scroll removeFromSuperview]; 
