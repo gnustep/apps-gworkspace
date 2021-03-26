@@ -38,6 +38,10 @@
     {
       NSUnixExtensions = ( "wmf", "pnm", "bmp", "psd", "psp", "raw", "sgi", "xwd" );
       NSIcon = "GenericImage.tiff";
+    },
+    {
+      NSUnixExtensions = ( "svg" );
+      NSIcon = "FileIcon_.svg.tiff";
     }
   );
 }
