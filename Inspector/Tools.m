@@ -1,8 +1,9 @@
 /* Tools.m
  *  
- * Copyright (C) 2004-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2021 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          RIccardo Mottola
  * Date: January 2004
  *
  * This file is part of the GNUstep GWorkspace application
@@ -108,7 +109,6 @@ static NSString *nibName = @"Tools";
     insppaths = nil;
 		currentApp = nil;
     extensions = nil;
-		valid = YES;
     [okButt setEnabled: NO]; 
 	}
   
@@ -127,8 +127,7 @@ static NSString *nibName = @"Tools";
 
 - (void)activateForPaths:(NSArray *)paths
 {
-  BOOL toolsok = YES;
-  NSInteger pathscount;
+  BOOL toolsOK = YES;
   NSInteger i;
 
   if (paths == nil) {
@@ -138,9 +137,7 @@ static NSString *nibName = @"Tools";
 
   [okButt setEnabled: NO];		  
 
-  pathscount = [paths count];
-  
-  if (pathscount == 1)
+  if ([paths count] == 1)
     { 
       FSNode *node = [FSNode nodeWithPath: [paths objectAtIndex: 0]];
       NSImage *icon = [[FSNodeRep sharedInstance] iconOfSize: ICNSIZE forNode: node];
@@ -152,7 +149,7 @@ static NSString *nibName = @"Tools";
     {
       NSImage *icon = [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: ICNSIZE];
       NSString *items = NSLocalizedString(@"items", @"");
-      items = [NSString stringWithFormat: @"%li %@", (long int)pathscount, items];
+      items = [NSString stringWithFormat: @"%lu %@", (long unsigned)[paths count], items];
       [titleField setStringValue: items];  
       [iconView setImage: icon];
     }
@@ -161,44 +158,27 @@ static NSString *nibName = @"Tools";
     {
       FSNode *node = [FSNode nodeWithPath: [paths objectAtIndex: i]];
   
-      if ([node isValid])
-        {
-          if ([node isPlain] == NO)
-            {
-              toolsok = NO;		
-              break;
-            }
-        }
-      else
+      if (![node isValid])
         {  
-          toolsok = NO;		
+          toolsOK = NO;
           break;
         }
   }
-    
-  if (toolsok == YES)
-    {		  	
-      if (valid == NO)
-        {
-          [errLabel removeFromSuperview];
-          [mainBox addSubview: toolsBox];
-          valid = YES;
-        }
-      [self findApplicationsForPaths: paths];
-      
+
+  // We have a valid node and found applications to open it
+  if (toolsOK && [self findApplicationsForPaths: paths])
+    {
+      [errLabel removeFromSuperview];
+      [mainBox addSubview: toolsBox];
     }
   else
     {
-      if (valid == YES)
-        {
-          [toolsBox removeFromSuperview];
-          [mainBox addSubview: errLabel];
-          valid = NO;
-        }
+      [toolsBox removeFromSuperview];
+      [mainBox addSubview: errLabel];
     }
 }
 
-- (void)findApplicationsForPaths:(NSArray *)paths
+- (BOOL)findApplicationsForPaths:(NSArray *)paths
 {
   NSMutableDictionary *extensionsAndApps;
   NSMutableArray *commonApps;   
@@ -206,7 +186,7 @@ static NSString *nibName = @"Tools";
   id cell;
   BOOL appsforext;
   NSInteger i, count;
-		
+
   ASSIGN (insppaths, paths);
 
   RELEASE (extensions);
@@ -239,8 +219,11 @@ static NSString *nibName = @"Tools";
               appsforext = NO;
             }
         }            
-    }   
-  
+    }
+
+  if (!appsforext)
+    return NO;
+
   if ([extensions count] == 1) {
     NSString *ext = [extensions objectAtIndex: 0];
     commonApps = [NSMutableArray arrayWithArray: [extensionsAndApps objectForKey: ext]];    
@@ -315,52 +298,60 @@ static NSString *nibName = @"Tools";
 		}
   }
 
-  if (([commonApps count] != 0) && (currentApp != nil) && (appsforext == YES)) {
- 	  [okButt setEnabled: YES];
-  }	else {
- 	  [okButt setEnabled: NO];
-  }
-	
-	count = [commonApps count];
-	
-	[matrix renewRows: 1 columns: count];
-	[matrix sizeToCells];
-	
-	if (appsforext) {
-		for (i = 0; i < count; i++) {
-			NSString *appName = [commonApps objectAtIndex: i];
-      FSNode *node = [FSNode nodeWithPath: [ws fullPathForApplication: appName]];
-      NSImage *icon = [[FSNodeRep sharedInstance] iconOfSize: ICNSIZE forNode: node];
+  if (currentApp == nil)
+    return NO;
 
-			cell = [matrix cellAtRow: 0 column: i];
-			[cell setImage: icon];
-			[cell setTitle: appName];
-		}
-    
-		[matrix sizeToCells];
+  if ([commonApps count] == 0)
+    return NO;
+
+  [okButt setEnabled: YES];
+
+  count = [commonApps count];
+
+  [matrix renewRows: 1 columns: count];
+  [matrix sizeToCells];
+
+  if (appsforext)
+    {
+      for (i = 0; i < count; i++)
+	{
+	  NSString *appName = [commonApps objectAtIndex: i];
+	  FSNode *node = [FSNode nodeWithPath: [ws fullPathForApplication: appName]];
+	  NSImage *icon = [[FSNodeRep sharedInstance] iconOfSize: ICNSIZE forNode: node];
+
+	  cell = [matrix cellAtRow: 0 column: i];
+	  [cell setImage: icon];
+	  [cell setTitle: appName];
 	}
+
+      [matrix sizeToCells];
+    }
 	
-	if (currentApp != nil) {
-		NSArray *cells = [matrix cells];
+  if (currentApp != nil)
+    {
+      NSArray *cells = [matrix cells];
 		
-		for(i = 0; i < [cells count]; i++) {
-			cell = [cells objectAtIndex: i];
-			if(cell && ([[cell title] isEqualToString: currentApp])) {
-				[matrix selectCellAtRow: 0 column: i];
-				[matrix scrollCellToVisibleAtRow: 0 column: i];
-				break;
-			}
-		}
-
-	  [defAppField setStringValue: [currentApp stringByDeletingPathExtension]];
-    s = [ws fullPathForApplication: currentApp];
-		if (s != nil) {
-    	s = relativePathFit(defPathField, s);
-		} else {
-			s = @"";
-		}
-	  [defPathField setStringValue: s];
+      for(i = 0; i < [cells count]; i++)
+	{
+	  cell = [cells objectAtIndex: i];
+	  if(cell && ([[cell title] isEqualToString: currentApp]))
+	    {
+	      [matrix selectCellAtRow: 0 column: i];
+	      [matrix scrollCellToVisibleAtRow: 0 column: i];
+	      break;
+	    }
 	}
+
+      [defAppField setStringValue: [currentApp stringByDeletingPathExtension]];
+      s = [ws fullPathForApplication: currentApp];
+      if (s != nil)
+	s = relativePathFit(defPathField, s);
+      else
+	s = @"";
+      [defPathField setStringValue: s];
+    }
+
+  return YES;
 }
 
 - (void)setCurrentApplication:(id)sender

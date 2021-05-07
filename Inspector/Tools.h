@@ -1,8 +1,9 @@
 /* Tools.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2021 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola
  * Date: January 2004
  *
  * This file is part of the GNUstep GWorkspace application
@@ -41,7 +42,6 @@
 
   IBOutlet id toolsBox;  
   NSTextField *errLabel;
-	BOOL valid;
 
   IBOutlet id explLabel1;
   IBOutlet NSScrollView *scrollView;
@@ -74,7 +74,7 @@
 
 - (void)activateForPaths:(NSArray *)paths;
 
-- (void)findApplicationsForPaths:(NSArray *)paths;   
+- (BOOL)findApplicationsForPaths:(NSArray *)paths;
 
 - (IBAction)setDefaultApplication:(id)sender;
 

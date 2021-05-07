@@ -1,3 +1,9 @@
+2021-05-08  Riccardo Mottola <rm@gnu.org>
+
+	* Inspector/Tools.h
+	* Inspector/Tools.h
+	In findApplicationsForPaths return now early and a BOOL for success or failure finding applications. Use this return in activateForPaths to cleanup tool list if none were found and use this to enable tool display for directories.
+
 2021-01-31  Riccardo Mottola <rm@gnu.org>
 
 	* Inspector/ContentViewers/AppViewer/AppViewer.m
