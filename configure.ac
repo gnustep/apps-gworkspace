@@ -27,6 +27,13 @@ if test "$CC" != "$MAKECC"; then
   exit 1
 fi
 
+AC_SUBST(CC)
+AC_SUBST(CPP)
+AC_SUBST(CXX)
+export CC
+export CPP
+export CXX
+
 #--------------------------------------------------------------------
 # Use config.guess, config.sub and install-sh provided by gnustep-make
 #--------------------------------------------------------------------
