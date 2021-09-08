@@ -61,6 +61,7 @@
   
   FSNTextCell *label;
   NSRect labelRect;
+  BOOL drawLabelBackground;
   FSNTextCell *infolabel;
   NSRect infoRect;
   FSNInfoType showType;

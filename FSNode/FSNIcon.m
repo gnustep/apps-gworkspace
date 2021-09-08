@@ -1,8 +1,9 @@
 /* FSNIcon.m
  *  
- * Copyright (C) 2004-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2021 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: March 2004
  *
  * This file is part of the GNUstep FSNode framework
@@ -307,7 +308,9 @@ static NSImage *branchImage;
     
     dragdelay = 0;
     isDragTarget = NO;
-    onSelf = NO;    
+    onSelf = NO;
+
+    drawLabelBackground = NO;
   }
   
   return self;
@@ -741,6 +744,8 @@ static NSImage *branchImage;
     {
       if (nameEdited == NO)
         {
+	  [label setBackgroundColor:[NSColor controlColor]];
+	  [label setDrawsBackground: drawLabelBackground];
           [label drawWithFrame: labelRect inView: self];
         }
       

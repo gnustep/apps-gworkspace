@@ -1,3 +1,11 @@
+2021-09-09  Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNIcon.h
+	* FSNode/FSNIcon.m
+	* FSNode/FSNTextCell.m
+	* GWorkspace/Desktop/GWDesktopIcon.m
+	Allow the background od an Icon Label to be drawn and have Desktop Icons use this.
+
 2021-05-21  Riccardo Mottola <rm@gnu.org>
 
 	* configure

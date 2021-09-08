@@ -1,8 +1,10 @@
 /* GWDesktopIcon.m
  *  
- * Copyright (C) 2005 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2021 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola <rm@gnu.org>
+ *
  * Date: January 2005
  *
  * This file is part of the GNUstep GWorkspace application
@@ -27,6 +29,38 @@
 #include "GWDesktopIcon.h"
 
 @implementation GWDesktopIcon
+
+- (id)initForNode:(FSNode *)anode
+     nodeInfoType:(FSNInfoType)type
+     extendedType:(NSString *)exttype
+         iconSize:(int)isize
+     iconPosition:(NSUInteger)ipos
+        labelFont:(NSFont *)lfont
+        textColor:(NSColor *)tcolor
+        gridIndex:(NSUInteger)gindex
+        dndSource:(BOOL)dndsrc
+        acceptDnd:(BOOL)dndaccept
+        slideBack:(BOOL)slback
+{
+  self = [super initForNode: anode
+	       nodeInfoType: type
+	       extendedType: exttype
+		   iconSize: isize
+	       iconPosition: ipos
+		  labelFont: lfont
+		  textColor: tcolor
+		  gridIndex: gindex
+		  dndSource: dndsrc
+		  acceptDnd: dndaccept
+		  slideBack: slback];
+
+  if (self)
+    {
+      drawLabelBackground = YES;
+    }
+
+  return self;
+}
 
 - (void)mouseDown:(NSEvent *)theEvent
 {

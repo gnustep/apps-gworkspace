@@ -1,8 +1,9 @@
 /* FSNTextCell.m
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2021 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: March 2004
  *
  * This file is part of the GNUstep FSNode framework
@@ -231,7 +232,6 @@
 
   if (icon == nil) {
     [super drawInteriorWithFrame: title_rect inView: controlView];
-    
   } else {
     NSRect icon_rect;    
 
@@ -240,22 +240,22 @@
     icon_rect.origin.x += MARGIN;
     icon_rect.origin.y += ((cellFrame.size.height - icon_rect.size.height) / 2.0);
     if ([controlView isFlipped]) {
-	    icon_rect.origin.y += icon_rect.size.height;
+      icon_rect.origin.y += icon_rect.size.height;
     }
 
     title_rect.origin.x += (icon_rect.size.width + (MARGIN * 2));	
     title_rect.size.width -= (icon_rect.size.width + (MARGIN * 2));	
-    title_rect = NSIntegralRect(title_rect);  
-    
+    title_rect = NSIntegralRect(title_rect);
+
     [super drawInteriorWithFrame: title_rect inView: controlView];
 
     [icon compositeToPoint: icon_rect.origin 
-	               operation: NSCompositeSourceOver];
+		 operation: NSCompositeSourceOver];
   }
 
   /* we reset the title to the orginal string */
   if (cutTitle)
-    [self setStringValue: uncutTitle];          
+    [self setStringValue: uncutTitle];
 }
 
 - (BOOL)startTrackingAt:(NSPoint)startPoint inView:(NSView *)controlView
