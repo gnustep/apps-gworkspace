@@ -34,7 +34,7 @@
   NSPoint location = [theEvent locationInWindow];
   NSPoint selfloc = [self convertPoint: location fromView: nil];
   BOOL onself = NO;
-	NSEvent *nextEvent = nil;
+  NSEvent *nextEvent = nil;
   BOOL startdnd = NO;
   NSSize offset;
 
@@ -45,7 +45,7 @@
     onself = [self mouse: selfloc inRect: icnBounds];
   } else {
     onself = ([self mouse: selfloc inRect: icnBounds]
-                        || [self mouse: selfloc inRect: labelRect]);
+	      || [self mouse: selfloc inRect: labelRect]);
   }
 
   if (onself) {
@@ -53,45 +53,45 @@
       return;
     }
 
-	  if ([theEvent clickCount] == 1) {
+    if ([theEvent clickCount] == 1) {
       if (isSelected == NO) {
         [container stopRepNameEditing];
         [container repSelected: self];
       }
       
-		  if ([theEvent modifierFlags] & NSShiftKeyMask) {
+      if ([theEvent modifierFlags] & NSShiftKeyMask) {
         [container setSelectionMask: FSNMultipleSelectionMask];
          
-			  if (isSelected) {
+	if (isSelected) {
           if ([container selectionMask] == FSNMultipleSelectionMask) {
-				    [self unselect];
+	    [self unselect];
             [container selectionDidChange];	
-				    return;
+	    return;
           }
         } else {
-				  [self select];
-			  }
+	  [self select];
+	}
         
-		  } else {
+      } else {
         [container setSelectionMask: NSSingleSelectionMask];
         
         if (isSelected == NO) {
-				  [self select];
-			  }
-		  }
+	  [self select];
+	}
+      }
     
       if (dndSource) {
         while (1) {
-	        nextEvent = [win nextEventMatchingMask:
-    							                  NSLeftMouseUpMask | NSLeftMouseDraggedMask];
+	  nextEvent = [win nextEventMatchingMask:
+			     NSLeftMouseUpMask | NSLeftMouseDraggedMask];
 
           if ([nextEvent type] == NSLeftMouseUp) {
             [win postEvent: nextEvent atStart: NO];
             break;
 
           } else if (([nextEvent type] == NSLeftMouseDragged)
-                            && ([self mouse: selfloc inRect: icnBounds])) {
-	          if (dragdelay < 5) {
+		     && ([self mouse: selfloc inRect: icnBounds])) {
+	    if (dragdelay < 5) {
               dragdelay++;
             } else {     
               NSPoint p = [nextEvent locationInWindow];
@@ -109,7 +109,7 @@
       }
       
       editstamp = [theEvent timestamp];       
-	  } 
+    }
     
   } else {
     [container mouseDown: theEvent];
