@@ -85,6 +85,7 @@ static GWDesktopManager *desktopManager = nil;
 
     defaults = [NSUserDefaults standardUserDefaults];	
 
+    singleClickLaunch = [defaults boolForKey: @"singleclicklaunch"];
     defentry = [defaults objectForKey: @"dockposition"];
     dockPosition = defentry ? [defentry intValue] : DockPositionRight;
 
@@ -287,6 +288,18 @@ static GWDesktopManager *desktopManager = nil;
 - (id)desktopView
 {
   return desktopView;
+}
+
+
+- (BOOL)singleClickLaunch
+{
+  return singleClickLaunch;
+}
+
+- (void)setSingleClickLaunch:(BOOL)value
+{
+  singleClickLaunch = value;
+  [dock setSingleClickLaunch:singleClickLaunch];
 }
 
 - (Dock *)dock
@@ -612,6 +625,8 @@ static GWDesktopManager *desktopManager = nil;
 
   [defaults setObject: [NSNumber numberWithInt: dockPosition]
                forKey: @"dockposition"];
+
+  [defaults setBool: singleClickLaunch forKey: @"singleclicklaunch"];
 
   [defaults setBool: usexbundle forKey: @"xbundle"];
   [defaults setBool: hidedock forKey: @"hidedock"];
@@ -961,6 +976,3 @@ static GWDesktopManager *desktopManager = nil;
 }
 
 @end
-
-
-

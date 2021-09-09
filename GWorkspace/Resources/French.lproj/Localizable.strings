@@ -412,6 +412,7 @@
 
 "Omnipresent"="Omniprésent";
 "Autohide Tabbed Shelf"="Cacher automatiquement les étagères";
+"Single Click Launch"="Lancement simple clic";
 
 
 /* OperationPrefs.m */

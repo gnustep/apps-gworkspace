@@ -64,6 +64,7 @@
   // General
   IBOutlet NSButton *omnipresentCheck;
   IBOutlet NSButton *hideTShelfCheck;
+  IBOutlet NSButton *launchSingleClick;
 
   // Dock
   IBOutlet NSBox *dockBox;
@@ -101,6 +102,8 @@
 - (IBAction)setDockStyle:(id)sender;
 
 - (IBAction)setTShelfAutohide:(id)sender;
+
+- (IBAction)setSingleClickLaunch:(id)sender;
 
 @end
 

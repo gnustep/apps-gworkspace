@@ -391,6 +391,7 @@ which ends in "kann <the file> nicht umbenennen"
 
 "Omnipresent" = "Omnipräsent";
 "Autohide Tabbed Shelf" = "Fach selbstätig einfahren";
+"Single Click Launch"="Einzelklickstart";
 
 /* OperationPrefs.m */
 "File Operations" = "Dateioperationen";

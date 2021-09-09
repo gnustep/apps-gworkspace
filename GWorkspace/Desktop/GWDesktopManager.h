@@ -44,7 +44,8 @@ typedef enum DockPosition {
   BOOL usexbundle;
   
   GWDesktopView *desktopView;
-  
+
+  BOOL singleClickLaunch;
   Dock *dock;
   BOOL hidedock;
   DockPosition dockPosition;
@@ -82,6 +83,10 @@ typedef enum DockPosition {
 
 - (id)desktopView;
 
+- (BOOL)singleClickLaunch;
+
+- (void)setSingleClickLaunch:(BOOL)value;
+
 - (Dock *)dock;
 
 - (DockPosition)dockPosition;
@@ -117,7 +122,7 @@ typedef enum DockPosition {
 - (void)showRootViewer;
 
 - (BOOL)selectFile:(NSString *)fullPath
-											inFileViewerRootedAtPath:(NSString *)rootFullpath;
+inFileViewerRootedAtPath:(NSString *)rootFullpath;
 
 - (void)performFileOperation:(NSDictionary *)opinfo;
                       

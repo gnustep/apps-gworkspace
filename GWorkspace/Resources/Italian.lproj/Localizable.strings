@@ -378,6 +378,7 @@
 
 "Omnipresent"="Onnipresente";
 "Autohide Tabbed Shelf"="Nascondi Scaffale Automaticamente";
+"Single Click Launch"="Avvio con click singolo";
 
 /* OperationPrefs.m */
 "File Operations" = "Operazioni Archivi";

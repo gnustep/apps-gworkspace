@@ -75,6 +75,8 @@
     docked = NO;
     launched = NO;
     apphidden = NO;
+
+    minimumLaunchClicks = 2;
     
     nc = [NSNotificationCenter defaultCenter];
     fm = [NSFileManager defaultManager];
@@ -162,6 +164,11 @@
 - (BOOL)isDocked
 {
   return docked;
+}
+
+- (void)setSingleClickLaunch:(BOOL)value
+{
+  minimumLaunchClicks = (value == YES) ? 1 : 2;
 }
 
 - (void)setLaunched:(BOOL)value
@@ -265,7 +272,7 @@
 
 - (void)mouseUp:(NSEvent *)theEvent
 {
-  if ([theEvent clickCount] > 1) {  
+  if ([theEvent clickCount] >= minimumLaunchClicks) {
     if ([self isSpecialIcon] == NO) {
       if (launched == NO) {
         [ws launchApplication: appName];
@@ -281,44 +288,47 @@
       NSString *path = [node path];
       [[GWDesktopManager desktopManager] selectFile: path inFileViewerRootedAtPath: path];
     }
-  }  
+  }
 }
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-	NSEvent *nextEvent = nil;
+  NSEvent *nextEvent = nil;
   BOOL startdnd = NO;
     
-	if ([theEvent clickCount] == 1) {
-    [self select];
-    
-    dragdelay = 0;
-    [(Dock *)container setDndSourceIcon: nil];
-    
-    while (1) {
-	    nextEvent = [[self window] nextEventMatchingMask:
-    							              NSLeftMouseUpMask | NSLeftMouseDraggedMask];
+  if ([theEvent clickCount] == 1)
+    {
+      [self select];
 
-      if ([nextEvent type] == NSLeftMouseUp) {
-        [[self window] postEvent: nextEvent atStart: NO];
-	      [self unselect];
-        break;
+      dragdelay = 0;
+      [(Dock *)container setDndSourceIcon: nil];
 
-      } else if (([nextEvent type] == NSLeftMouseDragged)
-                                          && ([self isSpecialIcon] == NO)) {
-	      if (dragdelay < 5) {
-          dragdelay++;
-        } else {     
-          startdnd = YES;        
-          break;
-        }
+    while (1)
+      {
+	nextEvent = [[self window] nextEventMatchingMask:
+				     NSLeftMouseUpMask | NSLeftMouseDraggedMask];
+
+	if ([nextEvent type] == NSLeftMouseUp) {
+	  [[self window] postEvent: nextEvent atStart: NO];
+	  [self unselect];
+	  break;
+
+	} else if (([nextEvent type] == NSLeftMouseDragged)
+		   && ([self isSpecialIcon] == NO)) {
+	  if (dragdelay < 5) {
+	    dragdelay++;
+	  } else {
+	    startdnd = YES;
+	    break;
+	  }
+	}
+      }
+
+    if (startdnd == YES)
+      {
+	[self startExternalDragOnEvent: theEvent withMouseOffset: NSZeroSize];
       }
     }
-
-    if (startdnd == YES) {  
-      [self startExternalDragOnEvent: theEvent withMouseOffset: NSZeroSize];
-    } 
-	} 
 }
 
 - (NSMenu *)menuForEvent:(NSEvent *)theEvent

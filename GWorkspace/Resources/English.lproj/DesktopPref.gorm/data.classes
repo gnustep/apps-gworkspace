@@ -26,7 +26,8 @@
 	    "setUsesDock:",
 	    "setDockPosition:",
 	    "setDockStyle:",
-	    "setTShelfAutohide:"
+	    "setTShelfAutohide:",
+	    "setSingleClickLaunch:"
 	);
 	Outlets = (
 	    win,
@@ -40,6 +41,7 @@
 	    useImageSwitch,
 	    omnipresentCheck,
 	    hideTShelfCheck,
+	    launchSingleClick,
 	    dockBox,
 	    useDockCheck,
 	    dockPosLabel,
@@ -60,6 +62,7 @@
 	    "setImage:",
 	    "setImageStyle:",
 	    "setOmnipresent:",
+	    "setSingleClickLaunch:",
 	    "setTShelfAutohide:",
 	    "setUseImage:",
 	    "setUsesDock:"

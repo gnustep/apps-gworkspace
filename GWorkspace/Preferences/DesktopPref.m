@@ -107,14 +107,13 @@ static NSString *nibName = @"DesktopPref";
 
       // General
       [omnipresentCheck setState: ([manager usesXBundle] ? NSOnState : NSOffState)];
+      [launchSingleClick setState: ([manager singleClickLaunch] ? NSOnState : NSOffState)];
       [useDockCheck setState: ([manager dockActive] ? NSOnState : NSOffState)];
       dockpos = [manager dockPosition];
       [dockPosMatrix selectCellAtRow: dockpos column: 0];
       dockstyle = [[manager dock] style];
       [dockStyleMatrix selectCellAtRow: dockstyle column: 0];
       [hideTShelfCheck setState: (([[gworkspace tabbedShelf] autohide]) ? NSOnState : NSOffState)];
-  
-  
 
       /* Internationalization */
       [[tabView tabViewItemAtIndex: 0] setLabel: NSLocalizedString(@"Background", @"")];
@@ -147,6 +146,7 @@ static NSString *nibName = @"DesktopPref";
 
       [omnipresentCheck setTitle: _(@"Omnipresent")];
       [hideTShelfCheck setTitle: NSLocalizedString(@"Autohide Tabbed Shelf", @"")];
+      [launchSingleClick setTitle: NSLocalizedString(@"Single Click Launch", @"")];
     }
   }
 
@@ -275,6 +275,11 @@ static NSString *nibName = @"DesktopPref";
 - (IBAction)setTShelfAutohide:(id)sender
 {
   [[gworkspace tabbedShelf] setAutohide: ([sender state] == NSOnState)];
+}
+
+- (IBAction)setSingleClickLaunch:(id)sender
+{
+  [manager setSingleClickLaunch: ([sender state] == NSOnState)];
 }
 
 @end

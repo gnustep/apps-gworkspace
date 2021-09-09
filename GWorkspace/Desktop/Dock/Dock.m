@@ -77,6 +77,8 @@
       style = DockStyleClassic;
       if ([defEntry intValue] == DockStyleModern)
 	style = DockStyleModern;
+
+      singleClickLaunch = [defaults boolForKey: @"singleclicklaunch"];
  
     gw = [GWorkspace gworkspace];
     fm = [NSFileManager defaultManager];
@@ -195,6 +197,7 @@
 
       [icon setHighlightColor: backColor];
       [icons insertObject: icon atIndex: icnindex];
+      [icon setSingleClickLaunch: singleClickLaunch];
       [self addSubview: icon];
       RELEASE (icon);
       
@@ -402,6 +405,19 @@
   }
 }
 
+- (void)setSingleClickLaunch:(BOOL)value
+{
+  NSUInteger i;
+
+  singleClickLaunch = value;
+  for (i = 0; i < [icons count]; i++)
+    {
+      DockIcon *icon = [icons objectAtIndex: i];
+
+      [icon setSingleClickLaunch: singleClickLaunch];
+    }
+}
+
 - (void)setPosition:(DockPosition)pos
 {
   position = pos;
@@ -524,6 +540,7 @@
 
   [defaults setObject: [NSNumber numberWithInt: style]
                forKey: @"dockstyle"];
+  [defaults setBool: singleClickLaunch forKey: @"singleclicklaunch"];
 
   for (i = 0; i < [icons count]; i++)
     {
@@ -534,6 +551,8 @@
 	  [dict setObject: [icon appName] forKey: [[NSNumber numberWithInt: i] stringValue]];
 	  [manager removeWatcherForPath: [[icon node] path]];
 	}
+
+      [icon setSingleClickLaunch: singleClickLaunch];
     }
 
   [defaults setObject: dict forKey: @"applications"];

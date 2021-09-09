@@ -1,5 +1,22 @@
 2021-09-09  Riccardo Mottola <rm@gnu.org>
 
+	* GWorkspace/Desktop/Dock/Dock.h
+	* GWorkspace/Desktop/Dock/Dock.m
+	* GWorkspace/Desktop/Dock/DockIcon.h
+	* GWorkspace/Desktop/Dock/DockIcon.m
+	* GWorkspace/Desktop/GWDesktopManager.h
+	* GWorkspace/Desktop/GWDesktopManager.m
+	* GWorkspace/Preferences/DesktopPref.h
+	* GWorkspace/Preferences/DesktopPref.m
+	* GWorkspace/Resources/English.lproj/DesktopPref.gorm
+	* GWorkspace/Resources/English.lproj/Localizable.strings
+	* GWorkspace/Resources/French.lproj/Localizable.strings
+	* GWorkspace/Resources/German.lproj/Localizable.strings
+	* GWorkspace/Resources/Italian.lproj/Localizable.strings:
+	Add single-click launch preference and apply it to the Dock.
+
+2021-09-09  Riccardo Mottola <rm@gnu.org>
+
 	* FSNode/FSNIcon.h
 	* FSNode/FSNIcon.m
 	* FSNode/FSNTextCell.m
