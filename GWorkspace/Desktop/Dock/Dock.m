@@ -1,8 +1,9 @@
 /* Dock.m
  *  
- * Copyright (C) 2005-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2021 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: January 2005
  *
  * This file is part of the GNUstep GWorkspace application
@@ -72,7 +73,7 @@
 
       manager = mngr;
       position = [manager dockPosition];
-      
+
       defEntry = [defaults objectForKey: @"dockstyle"];
       style = DockStyleClassic;
       if ([defEntry intValue] == DockStyleModern)
@@ -80,55 +81,58 @@
 
       singleClickLaunch = [defaults boolForKey: @"singleclicklaunch"];
  
-    gw = [GWorkspace gworkspace];
-    fm = [NSFileManager defaultManager];
-    ws = [NSWorkspace sharedWorkspace];
+      gw = [GWorkspace gworkspace];
+      fm = [NSFileManager defaultManager];
+      ws = [NSWorkspace sharedWorkspace];
 
-    icons = [NSMutableArray new];
-    iconSize = MAX_ICN_SIZE;
+      icons = [NSMutableArray new];
+      iconSize = MAX_ICN_SIZE;
                                 
-    dndSourceIcon = nil;
-    isDragTarget = NO;  
-    dragdelay = 0;
-    targetIndex = -1;
-    targetRect = NSZeroRect;
+      dndSourceIcon = nil;
+      isDragTarget = NO;
+      dragdelay = 0;
+      targetIndex = -1;
+      targetRect = NSZeroRect;
     
-    pbTypes = [NSArray arrayWithObjects: NSFilenamesPboardType, 
-                                         @"DockIconPboardType", 
-                                         nil];
-    [self registerForDraggedTypes: pbTypes];    
+      pbTypes = [NSArray arrayWithObjects: NSFilenamesPboardType,
+			 @"DockIconPboardType",
+			 nil];
+      [self registerForDraggedTypes: pbTypes];
 
-    if (style == DockStyleModern)
-      [self setBackColor: [[NSColor grayColor] colorWithAlphaComponent: 0.33]];
-    else
-      [self setBackColor: [NSColor grayColor]];
+      if (style == DockStyleModern)
+	[self setBackColor: [[NSColor grayColor] colorWithAlphaComponent: 0.33]];
+      else
+	[self setBackColor: [NSColor grayColor]];
       
-    [self createWorkspaceIcon];
+      [self createWorkspaceIcon];
 
-    appsdict = [defaults objectForKey: @"applications"];
+      appsdict = [defaults objectForKey: @"applications"];
       
-    if (appsdict) {
-      NSArray *indexes = [appsdict allKeys];
+      if (appsdict)
+	{
+	  NSArray *indexes = [appsdict allKeys];
     
-      indexes = [indexes sortedArrayUsingSelector: @selector(numericCompare:)];
+	  indexes = [indexes sortedArrayUsingSelector: @selector(numericCompare:)];
     
-      for (i = 0; i < [indexes count]; i++) {
-        NSNumber *index = [indexes objectAtIndex: i];
-        NSString *name = [[appsdict objectForKey: index] stringByDeletingPathExtension];
-        NSString *path = [ws fullPathForApplication: name];
+	  for (i = 0; i < [indexes count]; i++)
+	    {
+	      NSNumber *index = [indexes objectAtIndex: i];
+	      NSString *name = [[appsdict objectForKey: index] stringByDeletingPathExtension];
+	      NSString *path = [ws fullPathForApplication: name];
         
-        if (path) {
-          DockIcon *icon = [self addIconForApplicationAtPath: path
-                                                    withName: name 
-                                                     atIndex: [index intValue]];
-          [icon setDocked: YES];
-        }
-      }
+	      if (path)
+		{
+		  DockIcon *icon = [self addIconForApplicationAtPath: path
+							    withName: name
+							     atIndex: [index intValue]];
+		  [icon setDocked: YES];
+		}
+	    }
+	}
+
+      [self createTrashIcon];
     }
 
-    [self createTrashIcon];
-  }
-  
   return self;  
 }
 
@@ -256,7 +260,7 @@
 
 - (DockIcon *)workspaceAppIcon
 {
-  int i;
+  NSUInteger i;
   
   for (i = 0; i < [icons count]; i++) {
     DockIcon *icon = [icons objectAtIndex: i];
@@ -662,84 +666,96 @@
   NSString *event = [info objectForKey: @"event"];
   NSString *path = [info objectForKey: @"path"];
     
-  if ([event isEqual: @"GWWatchedPathDeleted"]) {
-    NSUInteger i;
-
-    for (i = 0; i < [icons count]; i++) {
-      DockIcon *icon = [icons objectAtIndex: i];
-      
-      if ([icon isSpecialIcon] == NO) {
-        FSNode *node = [icon node];
-        
-        if ([path isEqual: [node path]]) {
-          [NSTimer scheduledTimerWithTimeInterval: 1.0 
-												                   target: self 
-                                         selector: @selector(checkRemovedApp:) 
-										                     userInfo: icon 
-                                          repeats: NO];
-        }
-      }
-    }
-    
-  } else if ([event isEqual: @"GWFileDeletedInWatchedDirectory"]) {
-    NSArray *files = [info objectForKey: @"files"];
-    NSUInteger i;
-    
-    for (i = 0; i < [files count]; i++) {
-      NSString *fname = [files objectAtIndex: i];
-      NSString *fullpath = [path stringByAppendingPathComponent: fname];
-      int j;
-      
-      for (j = 0; j < [icons count]; j++) {
-        DockIcon *icon = [icons objectAtIndex:j];
-
-        if ([icon isSpecialIcon] == NO) {
-          FSNode *node = [icon node];
-
-          if ([fullpath isEqual: [node path]]) {
-            [NSTimer scheduledTimerWithTimeInterval: 1.0 
-												                     target: self 
-                                           selector: @selector(checkRemovedApp:) 
-										                       userInfo: icon 
-                                            repeats: NO];
-          }
-        }
-      }
-    }
-    
-    if ([path isEqual: [manager trashPath]]) {
-      DockIcon *icon = [self trashIcon];  
-      FSNode *node = [icon node];
-      NSArray *subNodes = [node subNodes];
-      int count = [subNodes count];
-      int i;
-
-      for (i = 0; i < [subNodes count]; i++) {
-        if ([[subNodes objectAtIndex: i] isReserved]) {
-          count --;
-        }
-      }
-      
-      if (count == 0) {
-        [icon setTrashFull: NO];
-      }
-    }
-    
-  } else if ([event isEqual: @"GWFileCreatedInWatchedDirectory"]) {
-    if ([path isEqual: [manager trashPath]]) {
-      DockIcon *icon = [self trashIcon];  
-      FSNode *node = [icon node];
-      NSArray *subNodes = [node subNodes];
+  if ([event isEqual: @"GWWatchedPathDeleted"])
+    {
       NSUInteger i;
 
-      for (i = 0; i < [subNodes count]; i++) {
-        if ([[subNodes objectAtIndex: i] isReserved] == NO) {
-          [icon setTrashFull: YES];
-          break;
-        }
+      for (i = 0; i < [icons count]; i++) {
+	DockIcon *icon = [icons objectAtIndex: i];
+      
+	if ([icon isSpecialIcon] == NO) {
+	  FSNode *node = [icon node];
+        
+	  if ([path isEqual: [node path]]) {
+	    [NSTimer scheduledTimerWithTimeInterval: 1.0
+					     target: self
+					   selector: @selector(checkRemovedApp:)
+					   userInfo: icon
+					    repeats: NO];
+	  }
+	}
       }
+    
     }
-  }
+  else if ([event isEqual: @"GWFileDeletedInWatchedDirectory"])
+    {
+      NSArray *files = [info objectForKey: @"files"];
+      NSUInteger i;
+    
+      for (i = 0; i < [files count]; i++)
+	{
+	  NSString *fname = [files objectAtIndex: i];
+	  NSString *fullpath = [path stringByAppendingPathComponent: fname];
+	  int j;
+      
+	  for (j = 0; j < [icons count]; j++)
+	    {
+	      DockIcon *icon = [icons objectAtIndex:j];
+
+	      if ([icon isSpecialIcon] == NO) {
+		FSNode *node = [icon node];
+
+		if ([fullpath isEqual: [node path]])
+		  {
+		    [NSTimer scheduledTimerWithTimeInterval: 1.0
+						     target: self
+						   selector: @selector(checkRemovedApp:)
+						   userInfo: icon
+						    repeats: NO];
+		  }
+	      }
+	    }
+	}
+    
+      if ([path isEqual: [manager trashPath]])
+	{
+	  DockIcon *icon = [self trashIcon];
+	  FSNode *node = [icon node];
+	  NSArray *subNodes = [node subNodes];
+	  int count = [subNodes count];
+	  int i;
+
+	  for (i = 0; i < [subNodes count]; i++) {
+	    if ([[subNodes objectAtIndex: i] isReserved]) {
+	      count --;
+	    }
+	  }
+      
+	  if (count == 0) {
+	    [icon setTrashFull: NO];
+	  }
+	}
+    
+    }
+  else if ([event isEqual: @"GWFileCreatedInWatchedDirectory"])
+    {
+      if ([path isEqual: [manager trashPath]])
+	{
+	  DockIcon *icon = [self trashIcon];
+	  FSNode *node = [icon node];
+	  NSArray *subNodes = [node subNodes];
+	  NSUInteger i;
+
+	  for (i = 0; i < [subNodes count]; i++)
+	    {
+	      if ([[subNodes objectAtIndex: i] isReserved] == NO)
+		{
+		  [icon setTrashFull: YES];
+		  break;
+		}
+	    }
+	}
+    }
   
   RELEASE (arp);
 }
@@ -921,7 +937,7 @@
       if (pb && [[pb types] containsObject: @"DockIconPboardType"]) {
         if ((targetIndex != index) && ([icon isTrashIcon] == NO)) {
           targetIndex = index;
-          [self tile]; 
+          [self tile];
           return NSDragOperationMove;
         }
 
@@ -937,8 +953,8 @@
           } else {
             [icon unselect];
           }
-         
-        } else if ((targetIndex != index) && ([icon isTrashIcon] == NO)) { 
+
+        } else if ((targetIndex != index) && ([icon isTrashIcon] == NO)) {
           targetIndex = index;
           [self tile]; 
           return NSDragOperationMove;

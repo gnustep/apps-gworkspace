@@ -1,8 +1,9 @@
 /* DockIcon.m
  *  
- * Copyright (C) 2005-2014 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2021 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: January 2005
  *
  * This file is part of the GNUstep GWorkspace application
@@ -196,20 +197,22 @@
 
 - (void)animateLaunch
 {
-	launching = YES;
-	dissFract = 0.2;
+  launching = YES;
+  dissFract = 0.2;
     
-	while (1) {
-		NSDate *date = [NSDate dateWithTimeIntervalSinceNow: 0.02];
-		[[NSRunLoop currentRunLoop] runUntilDate: date];
-		[self display];
+  while (1)
+    {
+      NSDate *date = [NSDate dateWithTimeIntervalSinceNow: 0.02];
+      [[NSRunLoop currentRunLoop] runUntilDate: date];
+      [self display];
 
-    dissFract += 0.05;
-	  if (dissFract >= 1) {
-		  launching = NO;
-      break;
-	  }
+      dissFract += 0.05;
+      if (dissFract >= 1)
+	{
+	  launching = NO;
+	  break;
 	}
+    }
   
   [self setNeedsDisplay: YES];
 }
@@ -426,9 +429,9 @@
   }
 }
 
-- (void)draggedImage:(NSImage *)anImage 
-						 endedAt:(NSPoint)aPoint 
-					 deposited:(BOOL)flag
+- (void)draggedImage:(NSImage *)anImage
+	     endedAt:(NSPoint)aPoint
+	   deposited:(BOOL)flag
 {
 	dragdelay = 0;
   [self setIsDndSourceIcon: NO];
@@ -631,4 +634,3 @@ x += 6; \
 }
 
 @end
-

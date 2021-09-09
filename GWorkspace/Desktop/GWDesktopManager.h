@@ -1,8 +1,9 @@
 /* GWDesktopManager.h
  *  
- * Copyright (C) 2005-2018 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2021 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: January 2005
  *
  * This file is part of the GNUstep GWorkspace application
