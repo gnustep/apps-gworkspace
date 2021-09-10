@@ -65,10 +65,12 @@
     [self setExcludedFromWindowsMenu: YES];
         
     tView = [[TShelfView alloc] initWithFrame: [[self contentView] bounds]];
-    [self setContentView: tView];		
+    [self setContentView: tView];
+
+    defaults = [NSUserDefaults standardUserDefaults];
+
+    singleClickLaunch = [defaults boolForKey: @"singleclicklaunch"];
     
-    defaults = [NSUserDefaults standardUserDefaults];	
-        
     tshelfDict = [defaults objectForKey: @"tabshelf"];
     if (tshelfDict == nil) {
       tshelfDict = [NSDictionary dictionary];
@@ -78,6 +80,7 @@
     autohide = (entry && [entry boolValue]);
         
     tabsArr = [tshelfDict objectForKey: @"tabs"];
+
     
     if (tabsArr) {
       for (i = 0; i < [tabsArr count]; i++) {
@@ -102,6 +105,7 @@
 
         [view setFrame: NSMakeRect(0, 0, sizew, 80)];    
         [item setView: view];
+	[view setSingleClickLaunch: singleClickLaunch];
         RELEASE (view);
  
         if ([label isEqual: @"last"]) {
@@ -255,6 +259,18 @@
 - (BOOL)autohide
 {
   return autohide;
+}
+
+- (BOOL)singleClickLaunch
+{
+  NSLog(@"TShelfWin - singleClickLaunch");
+  return singleClickLaunch;
+}
+
+- (void)setSingleClickLaunch:(BOOL)value
+{
+  singleClickLaunch = value;
+  [tView setSingleClickLaunch: singleClickLaunch];
 }
 
 - (void)addTab
@@ -520,6 +536,7 @@
                  forKey: @"auto_hide"];
 
   [defaults setObject: tshelfDict forKey: @"tabshelf"];
+  [defaults setBool: singleClickLaunch forKey: @"singleclicklaunch"];
 }
 
 - (BOOL)canBecomeKeyWindow

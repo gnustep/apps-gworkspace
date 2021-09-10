@@ -156,6 +156,8 @@ typedef gridpoint *(*GridPointIMP)(id, SEL, NSPoint);
 
 - (int)cellsWidth;
 
+- (void)setSingleClickLaunch:(BOOL)value;
+
 @end
 
 @interface TShelfIconsView(PBoardOperations)

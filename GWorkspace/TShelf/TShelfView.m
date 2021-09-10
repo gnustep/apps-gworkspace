@@ -522,4 +522,19 @@ void drawRightTabBezier(NSPoint origin, float tabh,
   return YES;
 }
 
+- (void)setSingleClickLaunch:(BOOL)value
+{
+  NSUInteger i;
+
+  for (i = 0; i < [items count]; i++)
+    {
+      TShelfViewItem *tViewItem;
+      TShelfIconsView *iView;
+
+      tViewItem = [items objectAtIndex: i];
+      iView = (TShelfIconsView *)[tViewItem view];
+      [iView setSingleClickLaunch: value];
+    }
+}
+
 @end

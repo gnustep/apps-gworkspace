@@ -78,6 +78,8 @@
 
 - (NSRect)contentRect;
 
+- (void)setSingleClickLaunch:(BOOL)value;
+
 @end
 
 #endif // TABBED_SHELF_VIEW_H

@@ -279,6 +279,7 @@ static NSString *nibName = @"DesktopPref";
 - (IBAction)setSingleClickLaunch:(id)sender
 {
   [manager setSingleClickLaunch: ([sender state] == NSOnState)];
+  [[gworkspace tabbedShelf] setSingleClickLaunch: ([sender state] == NSOnState)];
 }
 
 @end

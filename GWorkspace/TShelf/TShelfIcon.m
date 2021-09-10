@@ -1,8 +1,9 @@
 /* TShelfIcon.m
  *  
- * Copyright (C) 2003-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2021 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: August 2001
  *
  * This file is part of the GNUstep GWorkspace application
@@ -155,6 +156,7 @@
       isDragTarget = NO;
       onSelf = NO;
       trectTag = -1;
+      minimumLaunchClicks = 2;
     }
   
   return self;
@@ -366,12 +368,13 @@
 
 - (void)mouseUp:(NSEvent *)theEvent
 {
-	if ([theEvent clickCount] > 1) {  		
-		if (locked == NO) {				
-			[tview openCurrentSelection: paths];
-		} 
-    [self unselect];
-	}  
+  if ([theEvent clickCount] >= minimumLaunchClicks)
+    {
+      if (locked == NO)
+	[tview openCurrentSelection: paths];
+
+      [self unselect];
+    }
 }
 
 - (void)mouseDown:(NSEvent *)theEvent
@@ -379,47 +382,60 @@
   unsigned eventmask = NSAlternateKeyMask | NSCommandKeyMask | NSControlKeyMask;
 
   CHECK_LOCK;
-  
-	if ([theEvent clickCount] == 1) { 
-	  NSEvent *nextEvent;
-    NSPoint location;
-    NSSize offset;
-    BOOL startdnd = NO;
+
+  if ([theEvent clickCount] == 1)
+    {
+      NSEvent *nextEvent;
+      NSPoint location;
+      NSSize offset;
+      BOOL startdnd = NO;
    
-    if (isSelect == NO) {  
-      [self select];
-    }
+      if (isSelect == NO)
+	{
+	  [self select];
+	}
 
-    location = [theEvent locationInWindow];
+      location = [theEvent locationInWindow];
     
-    while (1) {
-	    nextEvent = [[self window] nextEventMatchingMask:
-    							              NSLeftMouseUpMask | NSLeftMouseDraggedMask];
+      while (1)
+	{
+	  nextEvent = [[self window] nextEventMatchingMask:
+				       NSLeftMouseUpMask | NSLeftMouseDraggedMask];
 
-      if ([nextEvent type] == NSLeftMouseUp) {
-        if ([theEvent modifierFlags] & eventmask) {
-          [tview setCurrentSelection: paths];
-        }
-        [self unselect];
-        break;
+	  if ([nextEvent type] == NSLeftMouseUp)
+	    {
+	      if ([theEvent modifierFlags] & eventmask)
+		{
+		  [tview setCurrentSelection: paths];
+		}
+	      // post again, or mouse-up gets eaten
+	      [[self window] postEvent: nextEvent atStart: NO];
+	      [self unselect];
+	      break;
 
-      } else if ([nextEvent type] == NSLeftMouseDragged) {
-	      if (dragdelay < 5) {
-          dragdelay++;
-        } else {      
-          NSPoint p = [nextEvent locationInWindow];
-          offset = NSMakeSize(p.x - location.x, p.y - location.y); 
-          startdnd = YES;        
-          break;
-        }
-      }
+	    }
+	  else if ([nextEvent type] == NSLeftMouseDragged)
+	    {
+	      if (dragdelay < 5)
+		{
+		  dragdelay++;
+		}
+	      else
+		{
+		  NSPoint p = [nextEvent locationInWindow];
+		  offset = NSMakeSize(p.x - location.x, p.y - location.y);
+		  startdnd = YES;
+		  break;
+		}
+	    }
+	}
+
+      if (startdnd)
+	{
+	  [tview setFocusedIcon: nil];
+	  [self startExternalDragOnEvent: theEvent withMouseOffset: offset];
+	}
     }
-
-    if (startdnd) {  
-      [tview setFocusedIcon: nil];
-      [self startExternalDragOnEvent: theEvent withMouseOffset: offset];    
-    }    
-  }           
 }
 
 - (void)mouseEntered:(NSEvent *)theEvent
@@ -474,6 +490,11 @@
 	} else {
 		[icon dissolveToPoint: p fraction: 0.3];
 	}
+}
+
+- (void)setSingleClickLaunch:(BOOL)value
+{
+  minimumLaunchClicks = (value == YES) ? 1 : 2;
 }
 
 @end
@@ -666,21 +687,21 @@
   ASSIGN (icon, [fsnodeRep openFolderIconOfSize: ICON_SIZE forNode: node]);
   [self setNeedsDisplay: YES];
 
-	sourceDragMask = [sender draggingSourceOperationMask];
+  sourceDragMask = [sender draggingSourceOperationMask];
 
-	if (sourceDragMask == NSDragOperationCopy) {
-		return ([node isApplication] ? NSDragOperationMove : NSDragOperationCopy);
-	} else if (sourceDragMask == NSDragOperationLink) {
-		return ([node isApplication] ? NSDragOperationMove : NSDragOperationLink);
-	} else {
+  if (sourceDragMask == NSDragOperationCopy) {
+    return ([node isApplication] ? NSDragOperationMove : NSDragOperationCopy);
+  } else if (sourceDragMask == NSDragOperationLink) {
+    return ([node isApplication] ? NSDragOperationMove : NSDragOperationLink);
+  } else {
     if ([[NSFileManager defaultManager] isWritableFileAtPath: fromPath]
-                                                  || [node isApplication]) {
-      return NSDragOperationEvery;			
+	|| [node isApplication]) {
+      return NSDragOperationEvery;
     } else if ([node isApplication] == NO) {
       forceCopy = YES;
-      return NSDragOperationCopy;			
+      return NSDragOperationCopy;
     }
-	}
+  }
   
   return NSDragOperationNone;
 }

@@ -1,8 +1,9 @@
 /* TShelfWin.h
  *  
- * Copyright (C) 2003 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2021 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: August 2001
  *
  * This file is part of the GNUstep GWorkspace application
@@ -40,6 +41,7 @@
   TShelfView *tView;
   BOOL autohide;
   BOOL autohidden;
+  BOOL singleClickLaunch;
 }
 
 - (TShelfView *)shelfView;
@@ -55,6 +57,10 @@
 - (void)setAutohide:(BOOL)value;
 
 - (BOOL)autohide;
+
+- (BOOL)singleClickLaunch;
+
+- (void)setSingleClickLaunch:(BOOL)value;
 
 - (void)addTab;
 

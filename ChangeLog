@@ -1,3 +1,16 @@
+2021-09-10  Riccardo Mottola <rm@gnu.org>
+
+	* GWorkspace/Preferences/DesktopPref.m
+	* GWorkspace/TShelf/TShelfIcon.h
+	* GWorkspace/TShelf/TShelfIcon.m
+	* GWorkspace/TShelf/TShelfIconsView.h
+	* GWorkspace/TShelf/TShelfIconsView.m
+	* GWorkspace/TShelf/TShelfView.h
+	* GWorkspace/TShelf/TShelfView.m
+	* GWorkspace/TShelf/TShelfWin.h
+	* GWorkspace/TShelf/TShelfWin.m:
+	Also Tabbed Shelf shall respect single-click launch.
+	
 2021-09-09  Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/Desktop/Dock/Dock.h
