@@ -1,6 +1,6 @@
 /* DesktopPref.m
  *  
- * Copyright (C) 2005-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2021 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola <rm@gnu.org>
@@ -50,105 +50,105 @@ static NSString *nibName = @"DesktopPref";
   self = [super init];
 
   if (self)
-  {  
-    if ([NSBundle loadNibNamed: nibName owner: self] == NO)
     {
-      NSLog(@"failed to load %@!", nibName);
-    }
-    else
-    {
-      NSString *impath;
-      DockPosition dockpos;
-      DockStyle dockstyle;
-      id cell;
-
-      RETAIN (prefbox);
-      RELEASE (win);
-
-      manager = [GWDesktopManager desktopManager];
-      gworkspace = [GWorkspace gworkspace];
-
-      // Color
-      [NSColorPanel setPickerMask: NSColorPanelWheelModeMask 
-                                  | NSColorPanelRGBModeMask 
-                                  | NSColorPanelColorListModeMask];
-      [NSColorPanel setPickerMode: NSWheelModeColorPanel];
-      [colorWell setColor: [[manager desktopView] currentColor]];
-
-      // Background image  
-      [imageView setEditable: NO];
-      [imageView setImageScaling: NSScaleProportionally];
-
-      impath = [[manager desktopView] backImagePath];
-      if (impath) {
-        ASSIGN (imagePath, impath);
-      }
-      
-      if (imagePath)
-      {
-        CREATE_AUTORELEASE_POOL (pool);
-        NSImage *image = [[NSImage alloc] initWithContentsOfFile: imagePath];
-        
-        if (image)
+      if ([NSBundle loadNibNamed: nibName owner: self] == NO)
 	{
-          [imageView setImage: image];
-          RELEASE (image);
-        }
-        RELEASE (pool);
-      }
-      
-      [imagePosMatrix selectCellAtRow: [[manager desktopView] backImageStyle] column: 0];
-      
-      BOOL useImage = [[manager desktopView] useBackImage];
-      [imageView setEnabled: useImage];
-      [chooseImageButt setEnabled: useImage];
-      [imagePosMatrix setEnabled: useImage];
-      [useImageSwitch setState: useImage ? NSOnState : NSOffState];
+	  NSLog(@"failed to load %@!", nibName);
+	}
+      else
+	{
+	  NSString *impath;
+	  DockPosition dockpos;
+	  DockStyle dockstyle;
+	  id cell;
 
-      // General
-      [omnipresentCheck setState: ([manager usesXBundle] ? NSOnState : NSOffState)];
-      [useDockCheck setState: ([manager dockActive] ? NSOnState : NSOffState)];
-      dockpos = [manager dockPosition];
-      [dockPosMatrix selectCellAtRow: dockpos column: 0];
-      dockstyle = [[manager dock] style];
-      [dockStyleMatrix selectCellAtRow: dockstyle column: 0];
-      [hideTShelfCheck setState: (([[gworkspace tabbedShelf] autohide]) ? NSOnState : NSOffState)];
-  
-  
+	  RETAIN (prefbox);
+	  RELEASE (win);
 
-      /* Internationalization */
-      [[tabView tabViewItemAtIndex: 0] setLabel: NSLocalizedString(@"Background", @"")];
-      [[tabView tabViewItemAtIndex: 1] setLabel: NSLocalizedString(@"General", @"")];
+	  manager = [GWDesktopManager desktopManager];
+	  gworkspace = [GWorkspace gworkspace];
 
-      [colorLabel setStringValue:_(@"Color:")];
-      cell = [imagePosMatrix cellAtRow: BackImageCenterStyle column: 0];
-      [cell setTitle: NSLocalizedString(@"center", @"")];
-      cell = [imagePosMatrix cellAtRow: BackImageFitStyle column: 0];
-      [cell setTitle: NSLocalizedString(@"fit", @"")];
-      cell = [imagePosMatrix cellAtRow: BackImageTileStyle column: 0];
-      [cell setTitle: NSLocalizedString(@"tile", @"")];
-      cell = [imagePosMatrix cellAtRow: BackImageScaleStyle column: 0];
-      [cell setTitle: NSLocalizedString(@"scale", @"")];
-      [useImageSwitch setTitle: NSLocalizedString(@"Use image", @"")];  
-      [chooseImageButt setTitle: NSLocalizedString(@"Choose", @"")]; 
+	  // Color
+	  [NSColorPanel setPickerMask: NSColorPanelWheelModeMask
+			| NSColorPanelRGBModeMask
+			| NSColorPanelColorListModeMask];
+	  [NSColorPanel setPickerMode: NSWheelModeColorPanel];
+	  [colorWell setColor: [[manager desktopView] currentColor]];
 
-      [dockBox setTitle: _(@"Dock")];
-      [useDockCheck setTitle: NSLocalizedString(@"Show Dock", @"")];
-      [dockPosLabel setStringValue: NSLocalizedString(@"Position:", @"")];
-      cell = [dockPosMatrix cellAtRow: 0 column: 0];
-      [cell setTitle: NSLocalizedString(@"Left", @"")];
-      cell = [dockPosMatrix cellAtRow: 1 column: 0];
-      [cell setTitle: NSLocalizedString(@"Right", @"")];
-      [dockStyleLabel setStringValue: NSLocalizedString(@"Style:", @"")];
-      cell = [dockStyleMatrix cellAtRow: 0 column: 0];
-      [cell setTitle: NSLocalizedString(@"Classic", @"")];
-      cell = [dockStyleMatrix cellAtRow: 1 column: 0];
-      [cell setTitle: NSLocalizedString(@"Modern", @"")];
+	  // Background image
+	  [imageView setEditable: NO];
+	  [imageView setImageScaling: NSScaleProportionally];
 
-      [omnipresentCheck setTitle: _(@"Omnipresent")];
-      [hideTShelfCheck setTitle: NSLocalizedString(@"Autohide Tabbed Shelf", @"")];
+	  impath = [[manager desktopView] backImagePath];
+	  if (impath) {
+	    ASSIGN (imagePath, impath);
+	  }
+
+	  if (imagePath)
+	    {
+	      CREATE_AUTORELEASE_POOL (pool);
+	      NSImage *image = [[NSImage alloc] initWithContentsOfFile: imagePath];
+
+	      if (image)
+		{
+		  [imageView setImage: image];
+		  RELEASE (image);
+		}
+	      RELEASE (pool);
+	    }
+
+	  [imagePosMatrix selectCellAtRow: [[manager desktopView] backImageStyle] column: 0];
+
+	  BOOL useImage = [[manager desktopView] useBackImage];
+	  [imageView setEnabled: useImage];
+	  [chooseImageButt setEnabled: useImage];
+	  [imagePosMatrix setEnabled: useImage];
+	  [useImageSwitch setState: useImage ? NSOnState : NSOffState];
+
+	  // General
+	  [omnipresentCheck setState: ([manager usesXBundle] ? NSOnState : NSOffState)];
+	  [launchSingleClick setState: ([manager singleClickLaunch] ? NSOnState : NSOffState)];
+	  [useDockCheck setState: ([manager dockActive] ? NSOnState : NSOffState)];
+	  dockpos = [manager dockPosition];
+	  [dockPosMatrix selectCellAtRow: dockpos column: 0];
+	  dockstyle = [[manager dock] style];
+	  [dockStyleMatrix selectCellAtRow: dockstyle column: 0];
+	  [hideTShelfCheck setState: (([[gworkspace tabbedShelf] autohide]) ? NSOnState : NSOffState)];
+
+	  /* Internationalization */
+	  [[tabView tabViewItemAtIndex: 0] setLabel: NSLocalizedString(@"Background", @"")];
+	  [[tabView tabViewItemAtIndex: 1] setLabel: NSLocalizedString(@"General", @"")];
+
+	  [colorLabel setStringValue:_(@"Color:")];
+	  cell = [imagePosMatrix cellAtRow: BackImageCenterStyle column: 0];
+	  [cell setTitle: NSLocalizedString(@"center", @"")];
+	  cell = [imagePosMatrix cellAtRow: BackImageFitStyle column: 0];
+	  [cell setTitle: NSLocalizedString(@"fit", @"")];
+	  cell = [imagePosMatrix cellAtRow: BackImageTileStyle column: 0];
+	  [cell setTitle: NSLocalizedString(@"tile", @"")];
+	  cell = [imagePosMatrix cellAtRow: BackImageScaleStyle column: 0];
+	  [cell setTitle: NSLocalizedString(@"scale", @"")];
+	  [useImageSwitch setTitle: NSLocalizedString(@"Use image", @"")];
+	  [chooseImageButt setTitle: NSLocalizedString(@"Choose", @"")];
+
+	  [dockBox setTitle: _(@"Dock")];
+	  [useDockCheck setTitle: NSLocalizedString(@"Show Dock", @"")];
+	  [dockPosLabel setStringValue: NSLocalizedString(@"Position:", @"")];
+	  cell = [dockPosMatrix cellAtRow: 0 column: 0];
+	  [cell setTitle: NSLocalizedString(@"Left", @"")];
+	  cell = [dockPosMatrix cellAtRow: 1 column: 0];
+	  [cell setTitle: NSLocalizedString(@"Right", @"")];
+	  [dockStyleLabel setStringValue: NSLocalizedString(@"Style:", @"")];
+	  cell = [dockStyleMatrix cellAtRow: 0 column: 0];
+	  [cell setTitle: NSLocalizedString(@"Classic", @"")];
+	  cell = [dockStyleMatrix cellAtRow: 1 column: 0];
+	  [cell setTitle: NSLocalizedString(@"Modern", @"")];
+
+	  [omnipresentCheck setTitle: _(@"Omnipresent")];
+	  [hideTShelfCheck setTitle: NSLocalizedString(@"Autohide Tabbed Shelf", @"")];
+	  [launchSingleClick setTitle: NSLocalizedString(@"Single Click Launch", @"")];
+	}
     }
-  }
 
   return self;
 }
@@ -164,7 +164,6 @@ static NSString *nibName = @"DesktopPref";
 }
 
 // Color
-
 - (IBAction)setColor:(id)sender
 {
   [[manager desktopView] setCurrentColor: [colorWell color]];
@@ -177,7 +176,7 @@ static NSString *nibName = @"DesktopPref";
 {
   NSOpenPanel *openPanel;
   NSInteger result;
-   
+
   openPanel = [NSOpenPanel openPanel];
   [openPanel setTitle: NSLocalizedString(@"Choose Image", @"")];	
   [openPanel setAllowsMultipleSelection: NO];
@@ -187,7 +186,7 @@ static NSString *nibName = @"DesktopPref";
   if (imagesDir == nil) {
     ASSIGN (imagesDir, NSHomeDirectory());
   }
-  
+
   result = [openPanel runModalForDirectory: imagesDir
                                       file: nil 
                                      types: [NSImage imageFileTypes]];
@@ -275,6 +274,12 @@ static NSString *nibName = @"DesktopPref";
 - (IBAction)setTShelfAutohide:(id)sender
 {
   [[gworkspace tabbedShelf] setAutohide: ([sender state] == NSOnState)];
+}
+
+- (IBAction)setSingleClickLaunch:(id)sender
+{
+  [manager setSingleClickLaunch: ([sender state] == NSOnState)];
+  [[gworkspace tabbedShelf] setSingleClickLaunch: ([sender state] == NSOnState)];
 }
 
 @end

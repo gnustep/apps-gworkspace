@@ -40,10 +40,11 @@
   BOOL trashFull;
   BOOL docked;
   BOOL launched;
-	BOOL launching;
+  BOOL launching;
   BOOL apphidden;  
   BOOL appactive;  
-  float dissFract;	
+  float dissFract;
+  int minimumLaunchClicks;
     
   NSColor *darkerColor;
   NSColor *highlightColor;
@@ -79,6 +80,8 @@
 - (void)setDocked:(BOOL)value;
 
 - (BOOL)isDocked;
+
+- (void)setSingleClickLaunch:(BOOL)value;
 
 - (void)setLaunched:(BOOL)value;
 

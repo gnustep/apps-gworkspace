@@ -1,8 +1,9 @@
 /* TShelfIcon.h
  *  
- * Copyright (C) 2003-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2021 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: August 2001
  *
  * This file is part of the GNUstep GWorkspace application
@@ -73,6 +74,7 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
   BOOL isDragTarget;
   BOOL forceCopy;
   BOOL onSelf;
+  int minimumLaunchClicks;
 }
 
 - (id)initForPaths:(NSArray *)fpaths 
@@ -119,6 +121,8 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 - (void)setLocked:(BOOL)value;
 
 - (BOOL)isLocked;
+
+- (void)setSingleClickLaunch:(BOOL)value;
 
 @end
 

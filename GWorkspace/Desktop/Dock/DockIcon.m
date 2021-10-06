@@ -1,8 +1,9 @@
 /* DockIcon.m
  *  
- * Copyright (C) 2005-2014 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2021 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: January 2005
  *
  * This file is part of the GNUstep GWorkspace application
@@ -75,6 +76,8 @@
     docked = NO;
     launched = NO;
     apphidden = NO;
+
+    minimumLaunchClicks = 2;
     
     nc = [NSNotificationCenter defaultCenter];
     fm = [NSFileManager defaultManager];
@@ -164,6 +167,11 @@
   return docked;
 }
 
+- (void)setSingleClickLaunch:(BOOL)value
+{
+  minimumLaunchClicks = (value == YES) ? 1 : 2;
+}
+
 - (void)setLaunched:(BOOL)value
 {
   launched = value;
@@ -189,20 +197,22 @@
 
 - (void)animateLaunch
 {
-	launching = YES;
-	dissFract = 0.2;
+  launching = YES;
+  dissFract = 0.2;
     
-	while (1) {
-		NSDate *date = [NSDate dateWithTimeIntervalSinceNow: 0.02];
-		[[NSRunLoop currentRunLoop] runUntilDate: date];
-		[self display];
+  while (1)
+    {
+      NSDate *date = [NSDate dateWithTimeIntervalSinceNow: 0.02];
+      [[NSRunLoop currentRunLoop] runUntilDate: date];
+      [self display];
 
-    dissFract += 0.05;
-	  if (dissFract >= 1) {
-		  launching = NO;
-      break;
-	  }
+      dissFract += 0.05;
+      if (dissFract >= 1)
+	{
+	  launching = NO;
+	  break;
 	}
+    }
   
   [self setNeedsDisplay: YES];
 }
@@ -265,7 +275,7 @@
 
 - (void)mouseUp:(NSEvent *)theEvent
 {
-  if ([theEvent clickCount] > 1) {  
+  if ([theEvent clickCount] >= minimumLaunchClicks) {
     if ([self isSpecialIcon] == NO) {
       if (launched == NO) {
         [ws launchApplication: appName];
@@ -281,44 +291,47 @@
       NSString *path = [node path];
       [[GWDesktopManager desktopManager] selectFile: path inFileViewerRootedAtPath: path];
     }
-  }  
+  }
 }
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-	NSEvent *nextEvent = nil;
+  NSEvent *nextEvent = nil;
   BOOL startdnd = NO;
     
-	if ([theEvent clickCount] == 1) {
-    [self select];
-    
-    dragdelay = 0;
-    [(Dock *)container setDndSourceIcon: nil];
-    
-    while (1) {
-	    nextEvent = [[self window] nextEventMatchingMask:
-    							              NSLeftMouseUpMask | NSLeftMouseDraggedMask];
+  if ([theEvent clickCount] == 1)
+    {
+      [self select];
 
-      if ([nextEvent type] == NSLeftMouseUp) {
-        [[self window] postEvent: nextEvent atStart: NO];
-	      [self unselect];
-        break;
+      dragdelay = 0;
+      [(Dock *)container setDndSourceIcon: nil];
 
-      } else if (([nextEvent type] == NSLeftMouseDragged)
-                                          && ([self isSpecialIcon] == NO)) {
-	      if (dragdelay < 5) {
-          dragdelay++;
-        } else {     
-          startdnd = YES;        
-          break;
-        }
+    while (1)
+      {
+	nextEvent = [[self window] nextEventMatchingMask:
+				     NSLeftMouseUpMask | NSLeftMouseDraggedMask];
+
+	if ([nextEvent type] == NSLeftMouseUp) {
+	  [[self window] postEvent: nextEvent atStart: NO];
+	  [self unselect];
+	  break;
+
+	} else if (([nextEvent type] == NSLeftMouseDragged)
+		   && ([self isSpecialIcon] == NO)) {
+	  if (dragdelay < 5) {
+	    dragdelay++;
+	  } else {
+	    startdnd = YES;
+	    break;
+	  }
+	}
+      }
+
+    if (startdnd == YES)
+      {
+	[self startExternalDragOnEvent: theEvent withMouseOffset: NSZeroSize];
       }
     }
-
-    if (startdnd == YES) {  
-      [self startExternalDragOnEvent: theEvent withMouseOffset: NSZeroSize];
-    } 
-	} 
 }
 
 - (NSMenu *)menuForEvent:(NSEvent *)theEvent
@@ -416,9 +429,9 @@
   }
 }
 
-- (void)draggedImage:(NSImage *)anImage 
-						 endedAt:(NSPoint)aPoint 
-					 deposited:(BOOL)flag
+- (void)draggedImage:(NSImage *)anImage
+	     endedAt:(NSPoint)aPoint
+	   deposited:(BOOL)flag
 {
 	dragdelay = 0;
   [self setIsDndSourceIcon: NO];
@@ -621,4 +634,3 @@ x += 6; \
 }
 
 @end
-

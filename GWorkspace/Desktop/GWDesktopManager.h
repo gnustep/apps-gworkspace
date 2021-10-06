@@ -1,8 +1,9 @@
 /* GWDesktopManager.h
  *  
- * Copyright (C) 2005-2018 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2021 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: January 2005
  *
  * This file is part of the GNUstep GWorkspace application
@@ -44,7 +45,8 @@ typedef enum DockPosition {
   BOOL usexbundle;
   
   GWDesktopView *desktopView;
-  
+
+  BOOL singleClickLaunch;
   Dock *dock;
   BOOL hidedock;
   DockPosition dockPosition;
@@ -82,6 +84,10 @@ typedef enum DockPosition {
 
 - (id)desktopView;
 
+- (BOOL)singleClickLaunch;
+
+- (void)setSingleClickLaunch:(BOOL)value;
+
 - (Dock *)dock;
 
 - (DockPosition)dockPosition;
@@ -117,7 +123,7 @@ typedef enum DockPosition {
 - (void)showRootViewer;
 
 - (BOOL)selectFile:(NSString *)fullPath
-											inFileViewerRootedAtPath:(NSString *)rootFullpath;
+inFileViewerRootedAtPath:(NSString *)rootFullpath;
 
 - (void)performFileOperation:(NSDictionary *)opinfo;
                       

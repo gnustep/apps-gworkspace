@@ -1,8 +1,9 @@
 /* FSNIcon.m
  *  
- * Copyright (C) 2004-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2021 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: March 2004
  *
  * This file is part of the GNUstep FSNode framework
@@ -307,7 +308,9 @@ static NSImage *branchImage;
     
     dragdelay = 0;
     isDragTarget = NO;
-    onSelf = NO;    
+    onSelf = NO;
+
+    drawLabelBackground = NO;
   }
   
   return self;
@@ -580,7 +583,7 @@ static NSImage *branchImage;
   NSPoint location = [theEvent locationInWindow];
   NSPoint selfloc = [self convertPoint: location fromView: nil];
   BOOL onself = NO;
-	NSEvent *nextEvent = nil;
+  NSEvent *nextEvent = nil;
   BOOL startdnd = NO;
   NSSize offset;
 
@@ -588,7 +591,7 @@ static NSImage *branchImage;
     onself = [self mouse: selfloc inRect: icnBounds];
   } else {
     onself = ([self mouse: selfloc inRect: icnBounds]
-                        || [self mouse: selfloc inRect: labelRect]);
+	      || [self mouse: selfloc inRect: labelRect]);
   }
 
   if (onself) {
@@ -596,54 +599,54 @@ static NSImage *branchImage;
       return;
     }
     
-	  if ([theEvent clickCount] == 1) {
+    if ([theEvent clickCount] == 1) {
       if (isSelected == NO) {
         if ([container respondsToSelector: @selector(stopRepNameEditing)]) {
           [container stopRepNameEditing];
         }
       }
       
-		  if ([theEvent modifierFlags] & NSShiftKeyMask) {
+      if ([theEvent modifierFlags] & NSShiftKeyMask) {
         if ([container respondsToSelector: @selector(setSelectionMask:)]) {
           [container setSelectionMask: FSNMultipleSelectionMask];
         }
          
-			  if (isSelected) {
+	if (isSelected) {
           if ([container selectionMask] == FSNMultipleSelectionMask) {
-				    [self unselect];
+	    [self unselect];
             if ([container respondsToSelector: @selector(selectionDidChange)]) {
               [container selectionDidChange];	
             }
-				    return;
+	    return;
           }
         } else {
-				  [self select];
-			  }
+	  [self select];
+	}
         
-		  } else {
+      } else {
         if ([container respondsToSelector: @selector(setSelectionMask:)]) {
           [container setSelectionMask: NSSingleSelectionMask];
         }
         
         if (isSelected == NO) {
-				  [self select];
+	  [self select];
           
-			  } else {
+	} else {
           NSTimeInterval interval = ([theEvent timestamp] - editstamp);
         
           if ((interval > DOUBLE_CLICK_LIMIT) 
-                            && [self mouse: location inRect: labelRect]) {
+	      && [self mouse: location inRect: labelRect]) {
             if ([container respondsToSelector: @selector(setNameEditorForRep:)]) {
               [container setNameEditorForRep: self];
             }
           } 
         }
-		  }
+      }
     
       if (dndSource) {
         while (1) {
-	        nextEvent = [[self window] nextEventMatchingMask:
-    							                  NSLeftMouseUpMask | NSLeftMouseDraggedMask];
+	  nextEvent = [[self window] nextEventMatchingMask:
+				       NSLeftMouseUpMask | NSLeftMouseDraggedMask];
 
           if ([nextEvent type] == NSLeftMouseUp) {
             [[self window] postEvent: nextEvent atStart: NO];
@@ -655,8 +658,8 @@ static NSImage *branchImage;
             break;
 
           } else if (([nextEvent type] == NSLeftMouseDragged)
-                            && ([self mouse: selfloc inRect: icnBounds])) {
-	          if (dragdelay < 5) {
+		     && ([self mouse: selfloc inRect: icnBounds])) {
+	    if (dragdelay < 5) {
               dragdelay++;
             } else {    
               NSPoint p = [nextEvent locationInWindow];
@@ -681,7 +684,7 @@ static NSImage *branchImage;
       }
       
       editstamp = [theEvent timestamp];       
-	  } 
+    }
     
   } else {
     [container mouseDown: theEvent];
@@ -741,6 +744,8 @@ static NSImage *branchImage;
     {
       if (nameEdited == NO)
         {
+	  [label setBackgroundColor:[NSColor controlColor]];
+	  [label setDrawsBackground: drawLabelBackground];
           [label drawWithFrame: labelRect inView: self];
         }
       

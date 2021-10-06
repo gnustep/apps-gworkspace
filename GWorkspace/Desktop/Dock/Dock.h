@@ -43,6 +43,7 @@ typedef enum DockStyle
 {
   DockPosition position;
   DockStyle style;
+  BOOL singleClickLaunch;
 
   NSMutableArray *icons;
   int iconSize;
@@ -99,6 +100,8 @@ typedef enum DockStyle
 - (void)appDidUnhide:(NSString *)appName;
 
 - (void)iconMenuAction:(id)sender;
+
+- (void)setSingleClickLaunch:(BOOL)value;
 
 - (void)setPosition:(DockPosition)pos;
 

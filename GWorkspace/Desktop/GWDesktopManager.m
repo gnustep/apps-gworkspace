@@ -1,6 +1,6 @@
 /* GWDesktopManager.m
  *  
- * Copyright (C) 2005-2018 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2021 Free Software Foundation, Inc.
  *
  * Authors: Enrico Sersale <enrico@imago.ro>
  *          Riccardo Mottola <rm@gnu.org>
@@ -43,9 +43,10 @@ static GWDesktopManager *desktopManager = nil;
 
 + (GWDesktopManager *)desktopManager
 {
-	if (desktopManager == nil) {
-		desktopManager = [[GWDesktopManager alloc] init];
-	}	
+  if (desktopManager == nil)
+    {
+      desktopManager = [[GWDesktopManager alloc] init];
+    }
   return desktopManager;
 }
 
@@ -57,7 +58,7 @@ static GWDesktopManager *desktopManager = nil;
   RELEASE (win);
   RELEASE (dock);
   RELEASE (mpointWatcher);
-    
+
   [super dealloc];
 }
 
@@ -66,7 +67,7 @@ static GWDesktopManager *desktopManager = nil;
   self = [super init];
   
   if (self) {
-    NSUserDefaults *defaults;	
+    NSUserDefaults *defaults;
     id defentry;
     NSString *path;
     id window = nil;
@@ -85,6 +86,7 @@ static GWDesktopManager *desktopManager = nil;
 
     defaults = [NSUserDefaults standardUserDefaults];	
 
+    singleClickLaunch = [defaults boolForKey: @"singleclicklaunch"];
     defentry = [defaults objectForKey: @"dockposition"];
     dockPosition = defentry ? [defentry intValue] : DockPositionRight;
 
@@ -130,19 +132,19 @@ static GWDesktopManager *desktopManager = nil;
              object: nil];    
     
     [[ws notificationCenter] addObserver: self 
-                				  selector: @selector(newVolumeMounted:) 
-                					    name: NSWorkspaceDidMountNotification
-                					  object: nil];
+				selector: @selector(newVolumeMounted:)
+				    name: NSWorkspaceDidMountNotification
+				  object: nil];
 
     [[ws notificationCenter] addObserver: self 
-                				  selector: @selector(mountedVolumeWillUnmount:) 
-                					    name: NSWorkspaceWillUnmountNotification
-                					  object: nil];
+				selector: @selector(mountedVolumeWillUnmount:)
+				    name: NSWorkspaceWillUnmountNotification
+				  object: nil];
 
     [[ws notificationCenter] addObserver: self 
-                				  selector: @selector(mountedVolumeDidUnmount:) 
-                					    name: NSWorkspaceDidUnmountNotification
-                					  object: nil];
+				selector: @selector(mountedVolumeDidUnmount:)
+				    name: NSWorkspaceDidUnmountNotification
+				  object: nil];
 
     [self setContextHelp];
   }
@@ -200,12 +202,12 @@ static GWDesktopManager *desktopManager = nil;
 
   path = [NSHomeDirectory() stringByAppendingPathComponent: @".Trash"]; 
 
-	if ([fm fileExistsAtPath: path isDirectory: &isdir] == NO) {
+  if ([fm fileExistsAtPath: path isDirectory: &isdir] == NO) {
     if ([fm createDirectoryAtPath: path attributes: nil] == NO) {
       NSLog(@"Can't create the Recycler directory! Quitting now.");
       [NSApp terminate: self];
     }
-	}
+  }
 }
 
 - (void)setUsesXBundle:(BOOL)value
@@ -287,6 +289,18 @@ static GWDesktopManager *desktopManager = nil;
 - (id)desktopView
 {
   return desktopView;
+}
+
+
+- (BOOL)singleClickLaunch
+{
+  return singleClickLaunch;
+}
+
+- (void)setSingleClickLaunch:(BOOL)value
+{
+  singleClickLaunch = value;
+  [dock setSingleClickLaunch:singleClickLaunch];
 }
 
 - (Dock *)dock
@@ -413,7 +427,7 @@ static GWDesktopManager *desktopManager = nil;
 }
 
 - (BOOL)selectFile:(NSString *)fullPath
-											inFileViewerRootedAtPath:(NSString *)rootFullpath
+inFileViewerRootedAtPath:(NSString *)rootFullpath
 {
   return [gworkspace selectFile: fullPath inFileViewerRootedAtPath: rootFullpath];
 }
@@ -613,6 +627,8 @@ static GWDesktopManager *desktopManager = nil;
   [defaults setObject: [NSNumber numberWithInt: dockPosition]
                forKey: @"dockposition"];
 
+  [defaults setBool: singleClickLaunch forKey: @"singleclicklaunch"];
+
   [defaults setBool: usexbundle forKey: @"xbundle"];
   [defaults setBool: hidedock forKey: @"hidedock"];
   
@@ -749,7 +765,7 @@ static GWDesktopManager *desktopManager = nil;
 - (void)openSelectionAsFolder
 {
   NSArray *selnodes = [desktopView selectedNodes];
-  int i;
+  unsigned i;
     
   for (i = 0; i < [selnodes count]; i++) {
     FSNode *node = [selnodes objectAtIndex: i];
@@ -853,7 +869,7 @@ static GWDesktopManager *desktopManager = nil;
 
 - (void)selectAllInViewer
 {
-	[desktopView selectAll];
+  [desktopView selectAll];
 }
 
 - (void)showTerminal
@@ -961,6 +977,3 @@ static GWDesktopManager *desktopManager = nil;
 }
 
 @end
-
-
-

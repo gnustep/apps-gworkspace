@@ -1,8 +1,9 @@
 /* TShelfIconsView.m
  *  
- * Copyright (C) 2003-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2021 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: August 2001
  *
  * This file is part of the GNUstep GWorkspace application
@@ -35,6 +36,7 @@
 #import "TShelfIcon.h"
 #import "TShelfPBIcon.h"
 #import "GWorkspace.h"
+#import "TShelfWin.h"
 
 
 #define CELLS_WIDTH (80)
@@ -277,6 +279,8 @@
   TShelfIcon *icon = [[TShelfIcon alloc] initForPaths: iconpaths 
 					    gridIndex: index inIconsView: self];
   NSString *watched = [[iconpaths objectAtIndex: 0] stringByDeletingLastPathComponent];
+  NSLog(@"addIcon! single click %d", [(TShelfWin *)[gw tabbedShelf] singleClickLaunch]);
+  [icon setSingleClickLaunch:[(TShelfWin *)[gw tabbedShelf] singleClickLaunch]];
   
   if (gpoints != NULL)
     {
@@ -289,9 +293,9 @@
   [icons addObject: icon];  
   [self addSubview: icon];
   [self addSubview: [icon myLabel]];		
-  RELEASE (icon);    
-  [self sortIcons];	
-  [self resizeWithOldSuperviewSize: [self frame].size];  
+  RELEASE (icon);
+  [self sortIcons];
+  [self resizeWithOldSuperviewSize: [self frame].size];
   
   if ([watchedPaths containsObject: watched] == NO)
     [self setWatcherForPath: watched];
@@ -1037,7 +1041,7 @@
   
   if (iconsType == DATA_TAB) {
     [self setCurrentPBIcon: nil];
-  }
+    }
 }
 
 - (void)drawRect:(NSRect)rect
@@ -1062,6 +1066,19 @@
 - (BOOL)acceptsFirstMouse:(NSEvent *)theEvent
 {
 	return YES;
+}
+
+- (void)setSingleClickLaunch:(BOOL)value
+{
+  NSUInteger i;
+
+  for (i = 0; i < [icons count]; i++)
+    {
+      TShelfIcon *icon;
+
+      icon = [icons objectAtIndex: i];
+      [icon setSingleClickLaunch: value];
+    }
 }
 
 @end
