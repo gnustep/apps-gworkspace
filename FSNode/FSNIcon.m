@@ -40,6 +40,13 @@
 #define DOUBLE_CLICK_LIMIT  300
 #define EDIT_CLICK_LIMIT   1000
 
+/* we redefine the dockstyle to read the preferences without including Dock.h" */
+typedef enum DockStyle
+{
+  DockStyleClassic = 0,
+  DockStyleModern = 1
+} DockStyle;
+
 static id <DesktopApplication> desktopApp = nil;
 
 static NSImage *branchImage;
@@ -61,6 +68,7 @@ static NSImage *branchImage;
   RELEASE (highlightPath);
   RELEASE (label);
   RELEASE (infolabel);
+  RELEASE (labelFrameColor);
   [super dealloc];
 }
 
@@ -171,6 +179,7 @@ static NSImage *branchImage;
     NSFontManager *fmanager = [NSFontManager sharedFontManager];
     NSFont *infoFont;
     NSRect r = NSZeroRect;
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     
     fsnodeRep = [FSNodeRep sharedInstance];
     
@@ -309,6 +318,14 @@ static NSImage *branchImage;
     dragdelay = 0;
     isDragTarget = NO;
     onSelf = NO;
+
+    labelFrameColor = [NSColor controlColor];
+    if ([[defaults objectForKey: @"dockstyle"] intValue] == DockStyleModern)
+      {
+	labelFrameColor = [labelFrameColor colorUsingColorSpaceName:NSCalibratedRGBColorSpace];
+	labelFrameColor = [labelFrameColor colorWithAlphaComponent:0.5];
+      }
+    [labelFrameColor retain];
 
     drawLabelBackground = NO;
   }
@@ -744,8 +761,8 @@ static NSImage *branchImage;
     {
       if (nameEdited == NO)
         {
-	  [label setBackgroundColor:[NSColor controlColor]];
-	  [label setDrawsBackground: drawLabelBackground];
+          [label setBackgroundColor:labelFrameColor];
+          [label setDrawsBackground: drawLabelBackground];
           [label drawWithFrame: labelRect inView: self];
         }
       

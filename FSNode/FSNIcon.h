@@ -62,6 +62,7 @@
   FSNTextCell *label;
   NSRect labelRect;
   BOOL drawLabelBackground;
+  NSColor *labelFrameColor;
   FSNTextCell *infolabel;
   NSRect infoRect;
   FSNInfoType showType;

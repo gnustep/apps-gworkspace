@@ -1,3 +1,10 @@
+2021-10-12  Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNIcon.h
+	* FSNode/FSNIcon.m
+	If modern style is selected, draw the frame with a subtle alpha
+	channel.
+
 2021-09-10  Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/Preferences/DesktopPref.m
