@@ -96,6 +96,7 @@ TShelf/TShelfWin.m \
 TShelf/TShelfView.m \
 TShelf/TShelfViewItem.m \
 TShelf/TShelfIcon.m \
+TShelf/TShelfFileIcon.m \
 TShelf/TShelfPBIcon.m \
 TShelf/TShelfIconsView.m \
 Preferences/PrefController.m \

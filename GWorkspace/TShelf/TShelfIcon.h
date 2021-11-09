@@ -28,6 +28,7 @@
 
 #import <Foundation/Foundation.h>
 #import <AppKit/NSView.h>
+#import <AppKit/NSDragging.h>
 
 #define ONICON(p, s1, s2) ([self mouse: (p) \
 inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
