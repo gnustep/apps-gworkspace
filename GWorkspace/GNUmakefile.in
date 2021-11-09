@@ -95,9 +95,9 @@ Finder/LiveSearch/LSFEditor.m \
 TShelf/TShelfWin.m \
 TShelf/TShelfView.m \
 TShelf/TShelfViewItem.m \
-TShelf/TShelfIconsView.m \
 TShelf/TShelfIcon.m \
 TShelf/TShelfPBIcon.m \
+TShelf/TShelfIconsView.m \
 Preferences/PrefController.m \
 Preferences/DefEditorPref.m \
 Preferences/XTermPref.m \

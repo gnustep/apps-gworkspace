@@ -32,9 +32,9 @@
 
 #import "FSNodeRep.h"
 #import "FSNFunctions.h"
-#import "TShelfIconsView.h"
 #import "TShelfIcon.h"
 #import "TShelfPBIcon.h"
+#import "TShelfIconsView.h"
 #import "GWorkspace.h"
 #import "TShelfWin.h"
 
