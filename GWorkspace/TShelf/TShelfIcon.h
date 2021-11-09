@@ -53,7 +53,6 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
   FSNode *node;
   BOOL singlepath;
   BOOL isRootIcon;
-  BOOL isPackage;
   BOOL isSelected;
   BOOL locked;
   
