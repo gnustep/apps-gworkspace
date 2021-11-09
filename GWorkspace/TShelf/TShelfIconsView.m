@@ -33,6 +33,7 @@
 #import "FSNodeRep.h"
 #import "FSNFunctions.h"
 #import "TShelfIcon.h"
+#import "TShelfFileIcon.h"
 #import "TShelfPBIcon.h"
 #import "TShelfIconsView.h"
 #import "GWorkspace.h"
@@ -259,7 +260,7 @@
 		
       if (iconsType == FILES_TAB)
 	{
-	  [dict setObject: [icon paths] forKey: @"paths"];
+	  [dict setObject: [(TShelfFileIcon *)icon paths] forKey: @"paths"];
 	}
       else
 	{
@@ -276,10 +277,10 @@
 - (void)addIconWithPaths:(NSArray *)iconpaths 
 	   withGridIndex:(NSUInteger)index 
 {
-  TShelfIcon *icon = [[TShelfIcon alloc] initForPaths: iconpaths 
-					    gridIndex: index inIconsView: self];
+  TShelfFileIcon *icon = [[TShelfFileIcon alloc] initForPaths: iconpaths
+                                                    gridIndex: index inIconsView: self];
   NSString *watched = [[iconpaths objectAtIndex: 0] stringByDeletingLastPathComponent];
-  NSLog(@"addIcon! single click %d", [(TShelfWin *)[gw tabbedShelf] singleClickLaunch]);
+
   [icon setSingleClickLaunch:[(TShelfWin *)[gw tabbedShelf] singleClickLaunch]];
   
   if (gpoints != NULL)
@@ -554,7 +555,7 @@
 
       for (i = 0; i < count; i++)
 	{
-	  TShelfIcon *icon = [icons objectAtIndex: i];
+	  TShelfFileIcon *icon = [icons objectAtIndex: i];
 	  NSArray *iconpaths = [icon paths];
 	  NSUInteger j;
 
@@ -584,7 +585,7 @@
       for (i = 0; i < count; i++)
 	{
 	  BOOL deleted = NO;
-	  TShelfIcon *icon = [icons objectAtIndex: i];
+	  TShelfFileIcon *icon = [icons objectAtIndex: i];
 	  NSArray *iconpaths = [icon paths];
 	  NSUInteger j;
 	  
@@ -592,13 +593,13 @@
 	    {
 	      NSString *op = [iconpaths objectAtIndex: j];
 	      NSUInteger m;
-	      
+
 	      for (m = 0; m < [hpaths count]; m++)
 		{
 		  NSString *fp = [hpaths objectAtIndex: m]; 
 		  
 		  if (isSubpathOfPath(fp, op) || [fp isEqual: op])
-		    {  
+		    {
 		      [self removeIcon: icon];
 		      count--;
 		      i--;
@@ -630,39 +631,48 @@
   NSArray *files = [dict objectForKey: @"files"];	 
 
   if ([operation isEqual: NSWorkspaceMoveOperation] 
-        || [operation isEqual: NSWorkspaceDestroyOperation]
-				|| [operation isEqual: @"GWorkspaceRenameOperation"]
-				|| [operation isEqual: NSWorkspaceRecycleOperation]
-				|| [operation isEqual: @"GWorkspaceRecycleOutOperation"]
-				|| [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]) {
-    NSMutableArray *paths = [NSMutableArray array];
-    NSArray *iconpaths;
-    NSUInteger i, j, m;
+      || [operation isEqual: NSWorkspaceDestroyOperation]
+      || [operation isEqual: @"GWorkspaceRenameOperation"]
+      || [operation isEqual: NSWorkspaceRecycleOperation]
+      || [operation isEqual: @"GWorkspaceRecycleOutOperation"]
+      || [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"])
+    {
+      NSMutableArray *paths = [NSMutableArray array];
+      NSArray *iconpaths;
+      NSUInteger i, j, m;
 
-    for (i = 0; i < [files count]; i++) {
-      NSString *s = [source stringByAppendingPathComponent: [files objectAtIndex: i]];
-      [paths addObject: s];
+      for (i = 0; i < [files count]; i++)
+	{
+	  NSString *s = [source stringByAppendingPathComponent: [files objectAtIndex: i]];
+	  [paths addObject: s];
+	}
+
+      for (i = 0; i < [icons count]; i++)
+	{
+	  TShelfIcon *icon = [icons objectAtIndex: i];
+
+	  if ([icon isKindOfClass:[TShelfFileIcon class]])
+	    {
+	      iconpaths = [(TShelfFileIcon *)icon paths];
+
+	      for (j = 0; j < [iconpaths count]; j++)
+		{
+		  NSString *op = [iconpaths objectAtIndex: j];
+
+		  for (m = 0; m < [paths count]; m++)
+		    {
+		      NSString *fp = [paths objectAtIndex: m];
+
+		      if ([op hasPrefix: fp])
+			{
+			  [icon setLocked: YES];
+			  break;
+			}
+		    }
+		}
+	    } // if TShelfFileIcon
+	}
     }
-
-	  for (i = 0; i < [icons count]; i++) {
-		  TShelfIcon *icon = [icons objectAtIndex: i];
-      
-      iconpaths = [icon paths];
-
-	    for (j = 0; j < [iconpaths count]; j++) {
-        NSString *op = [iconpaths objectAtIndex: j];
-
-	      for (m = 0; m < [paths count]; m++) {
-          NSString *fp = [paths objectAtIndex: m]; 
-
-          if ([op hasPrefix: fp]) {
-            [icon setLocked: YES]; 
-            break;
-          }
-        }
-      }
-	  }
-  }
 
   RELEASE (arp);
 }
@@ -675,59 +685,67 @@
   NSString *source = [dict objectForKey: @"source"];
   NSArray *files = [dict objectForKey: @"files"];
   
-  if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
-		files = [NSArray arrayWithObject: [source lastPathComponent]];
-    source = [source stringByDeletingLastPathComponent];
-  }	
+  if ([operation isEqual: @"GWorkspaceRenameOperation"])
+    {
+      files = [NSArray arrayWithObject: [source lastPathComponent]];
+      source = [source stringByDeletingLastPathComponent];
+    }
 		                    
   if ([operation isEqual: NSWorkspaceMoveOperation] 
-        || [operation isEqual: NSWorkspaceDestroyOperation]
-				|| [operation isEqual: @"GWorkspaceRenameOperation"]
-				|| [operation isEqual: NSWorkspaceRecycleOperation]
-				|| [operation isEqual: @"GWorkspaceRecycleOutOperation"]
-				|| [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"]) {
-    NSMutableArray *paths = [NSMutableArray arrayWithCapacity: 1];
-    TShelfIcon *icon;
-    NSArray *iconpaths;
-    NSUInteger count;
-    NSUInteger i, j, m;
+      || [operation isEqual: NSWorkspaceDestroyOperation]
+      || [operation isEqual: @"GWorkspaceRenameOperation"]
+      || [operation isEqual: NSWorkspaceRecycleOperation]
+      || [operation isEqual: @"GWorkspaceRecycleOutOperation"]
+      || [operation isEqual: @"GWorkspaceEmptyRecyclerOperation"])
+    {
+      NSMutableArray *paths = [NSMutableArray arrayWithCapacity: 1];
+      TShelfIcon *icon;
+      NSArray *iconpaths;
+      NSUInteger count;
+      NSUInteger i, j, m;
 
-    for (i = 0; i < [files count]; i++) {
-      NSString *s = [source stringByAppendingPathComponent: [files objectAtIndex: i]];
-      [paths addObject: s];
-    }
+      for (i = 0; i < [files count]; i++)
+	{
+	  NSString *s = [source stringByAppendingPathComponent: [files objectAtIndex: i]];
+	  [paths addObject: s];
+	}
         
-    count = [icons count];  
-	  for (i = 0; i < count; i++) {
-      BOOL deleted = NO;
-		  icon = [icons objectAtIndex: i];
-      iconpaths = [icon paths];
+      count = [icons count];  
+      for (i = 0; i < count; i++)
+	{
+	  BOOL deleted = NO;
+	  icon = [icons objectAtIndex: i];
+	  if ([icon isKindOfClass:[TShelfFileIcon class]])
+	    {
+	      iconpaths = [(TShelfFileIcon *)icon paths];
 
-	    for (j = 0; j < [iconpaths count]; j++) {
-        NSString *op = [iconpaths objectAtIndex: j];
+	      for (j = 0; j < [iconpaths count]; j++)
+		{
+		  NSString *op = [iconpaths objectAtIndex: j];
 
-	      for (m = 0; m < [paths count]; m++) {
-          NSString *fp = [paths objectAtIndex: m]; 
+		  for (m = 0; m < [paths count]; m++)
+		    {
+		      NSString *fp = [paths objectAtIndex: m]; 
 
-          if ([op hasPrefix: fp]) {
-            [self removeIcon: icon];
-            count--;
-            i--;
-            deleted = YES;
-            break;
-          }
+		      if ([op hasPrefix: fp])
+			{
+			  [self removeIcon: icon];
+			  count--;
+			  i--;
+			  deleted = YES;
+			  break;
+			}
 
-          if (deleted) {
-            break;
-          } 
-        }
+		      if (deleted)
+			break;
+		    }
 
-        if (deleted) {
-          break;
-        }       
-      }
-	  }
-  }
+		  if (deleted)
+		    break;
+		}
+	    } // if TShelfFileIcon
+	}
+    }
   
   RELEASE (arp);
 }
@@ -735,10 +753,10 @@
 - (void)watcherNotification:(NSNotification *)notification
 {
   CREATE_AUTORELEASE_POOL(arp);
-	NSDictionary *notifdict = (NSDictionary *)[notification object];
+  NSDictionary *notifdict = (NSDictionary *)[notification object];
   NSString *path = [notifdict objectForKey: @"path"];
-	NSString *event = [notifdict objectForKey: @"event"];
-	NSEnumerator *enumerator;
+  NSString *event = [notifdict objectForKey: @"event"];
+  NSEnumerator *enumerator;
   NSString *wpath;
   BOOL contained = NO;
   NSUInteger i;
@@ -1375,7 +1393,7 @@
             {
               for (i = 0; i < [icons count]; i++)
                 {
-                  TShelfIcon *icon = [icons objectAtIndex: i];
+                  TShelfFileIcon *icon = [icons objectAtIndex: i];
                   if ([[icon paths] isEqualToArray: sourcePaths])
                     {
                       gpoints[[icon gridIndex]].used = 0;

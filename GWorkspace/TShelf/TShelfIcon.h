@@ -30,6 +30,11 @@
 #import <AppKit/NSView.h>
 #import <AppKit/NSDragging.h>
 
+#define ICON_SIZE 48
+
+#define CHECK_LOCK if (locked) return
+#define CHECK_LOCK_RET(x) if (locked) return x
+
 #define ONICON(p, s1, s2) ([self mouse: (p) \
 inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 ((int)(s1).height - (int)(s2).height) >> 1, 48, 48)])
@@ -39,20 +44,13 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 @class NSTextField;
 @class NSImage;
 @class NSBezierPath;
-@class NSWorkspace;
 @class TShelfIconsView;
-@class FSNode;
-@class FSNodeRep;
-@class GWorkspace;
+
 
 @interface TShelfIcon : NSView
 {
-  NSMutableArray *paths;
   NSString *name;
-  NSString *hostname;
-  FSNode *node;
-  BOOL singlepath;
-  BOOL isRootIcon;
+
   BOOL isSelected;
   BOOL locked;
   
@@ -66,29 +64,12 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
   
   TShelfIconsView *tview;
   
-  FSNodeRep *fsnodeRep;
-  NSFileManager *fm;
-  GWorkspace *gw;
-  
   int dragDelay;
   BOOL isDragTarget;
-  BOOL forceCopy;
+
   BOOL onSelf;
   int minimumLaunchClicks;
 }
-
-- (id)initForPaths:(NSArray *)fpaths 
-       inIconsView:(TShelfIconsView *)aview;
-
-- (id)initForPaths:(NSArray *)fpaths 
-        atPosition:(NSPoint)pos
-       inIconsView:(TShelfIconsView *)aview;
-
-- (id)initForPaths:(NSArray *)fpaths 
-	 gridIndex:(NSUInteger)index
-       inIconsView:(TShelfIconsView *)aview;
-
-- (void)setPaths:(NSArray *)fpaths;
 
 - (void)select;
 
@@ -111,10 +92,6 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 - (NSTextField *)myLabel;
 
 - (NSString *)shownName;
-
-- (NSArray *)paths;
-
-- (BOOL)isSinglePath;
 
 - (BOOL)isSelected;
 

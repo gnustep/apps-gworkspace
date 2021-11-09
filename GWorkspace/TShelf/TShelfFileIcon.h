@@ -28,7 +28,41 @@
 
 #import "TShelfIcon.h"
 
+@class FSNode;
+@class FSNodeRep;
+@class GWorkspace;
+
 @interface TShelfFileIcon : TShelfIcon
+{
+  NSMutableArray *paths;
+  NSString *hostname;
+  FSNode *node;
+  BOOL singlepath;
+  BOOL isRootIcon;
+  FSNodeRep *fsnodeRep;
+  NSFileManager *fm;
+  GWorkspace *gw;
+
+  BOOL forceCopy;
+}
+
+- (id)initForPaths:(NSArray *)fpaths
+       inIconsView:(TShelfIconsView *)aview;
+
+- (id)initForPaths:(NSArray *)fpaths
+        atPosition:(NSPoint)pos
+       inIconsView:(TShelfIconsView *)aview;
+
+- (id)initForPaths:(NSArray *)fpaths
+	 gridIndex:(NSUInteger)index
+       inIconsView:(TShelfIconsView *)aview;
+
+- (void)setPaths:(NSArray *)fpaths;
+
+- (NSArray *)paths;
+
+- (BOOL)isSinglePath;
+
 @end
 
 #endif // TSHELF_FILEICON_H
