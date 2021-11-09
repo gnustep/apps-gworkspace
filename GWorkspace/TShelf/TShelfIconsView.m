@@ -52,15 +52,15 @@
 
 - (NSComparisonResult)iconCompare:(id)other
 {
-  if ([other gridindex] == [self gridindex])
+  if ([other gridIndex] == [self gridIndex])
     return NSOrderedSame;
 
-  if ([other gridindex] == NSNotFound)
+  if ([other gridIndex] == NSNotFound)
     return NSOrderedAscending;
-  if ([self gridindex] == NSNotFound)
+  if ([self gridIndex] == NSNotFound)
     return NSOrderedDescending;
 
-  if ([other gridindex] > [self gridindex])
+  if ([other gridIndex] > [self gridIndex])
     return NSOrderedAscending;	
   
   return NSOrderedDescending;	
@@ -78,15 +78,15 @@
 
 - (NSComparisonResult)pbiconCompare:(id)other
 {
-  if ([other gridindex] == [self gridindex])
+  if ([other gridIndex] == [self gridIndex])
     return NSOrderedSame;
 
-  if ([other gridindex] == NSNotFound)
+  if ([other gridIndex] == NSNotFound)
     return NSOrderedAscending;
-  if ([self gridindex] == NSNotFound)
+  if ([self gridIndex] == NSNotFound)
     return NSOrderedDescending;
 
-  if ([other gridindex] > [self gridindex])
+  if ([other gridIndex] > [self gridIndex])
     return NSOrderedAscending;	
   
   return NSOrderedDescending;	
@@ -254,7 +254,7 @@
       NSUInteger index;
 
       icon = [icons objectAtIndex: i];
-      index = [icon gridindex];
+      index = [icon gridIndex];
       [dict setObject: [NSNumber numberWithInt: index] forKey: @"index"];
 		
       if (iconsType == FILES_TAB)
@@ -319,11 +319,11 @@
       }
     }
 
-  [icons addObject: icon];  
+  [icons addObject: icon];
   [self addSubview: icon];
-  RELEASE (icon);    
-  [self sortIcons];	
-  [self resizeWithOldSuperviewSize: [self frame].size]; 
+  RELEASE (icon);
+  [self sortIcons];
+  [self resizeWithOldSuperviewSize: [self frame].size];
   
   return icon; 
 }
@@ -333,7 +333,7 @@
   if (anIcon)
     {
       id label = [anIcon myLabel];
-      NSUInteger index = [anIcon gridindex];	
+      NSUInteger index = [anIcon gridIndex];
 
     if (iconsType == FILES_TAB) {
 	    NSString *watched = [[[anIcon paths] objectAtIndex: 0] stringByDeletingLastPathComponent];
@@ -419,7 +419,7 @@
   
   for (i = 0; i < [icons count]; i++) {
     TShelfIcon *icon = [icons objectAtIndex: i];
-    if ([icon isSelect]) {  
+    if ([icon isSelected]) {
       return YES;
     }
   }  
@@ -527,7 +527,7 @@
   
   for (i = 0; i < [icons count]; i++) {
     id icon = [icons objectAtIndex: i];
-    if ([icon isSelect]) {  
+    if ([icon isSelected]) {  
       return icon;
     }
   }  
@@ -1014,9 +1014,9 @@
     }
 	
   for (i = 0; i < [icons count]; i++)
-    {	
+    {
       id icon	 = [icons objectAtIndex: i];
-      NSUInteger index = [icon gridindex];		
+      NSUInteger index = [icon gridIndex];
       gridpoint gpoint = gpoints[index];
       NSPoint p = NSMakePoint(gpoint.x, gpoint.y);
       NSRect r = NSMakeRect(p.x, p.y, 64, 52);
@@ -1378,7 +1378,7 @@
                   TShelfIcon *icon = [icons objectAtIndex: i];
                   if ([[icon paths] isEqualToArray: sourcePaths])
                     {
-                      gpoints[[icon gridindex]].used = 0;
+                      gpoints[[icon gridIndex]].used = 0;
                       gpoint->used = 1;					  
                       [icon setGridIndex: index];
                       [self resizeWithOldSuperviewSize: [self frame].size];        	  

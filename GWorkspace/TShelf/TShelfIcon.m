@@ -76,7 +76,7 @@
       tview = aview;  
       labelWidth = [tview cellsWidth] - 4;
       font = [NSFont systemFontOfSize: 12];
-      isSelect = NO; 
+      isSelected = NO;
       locked = NO;
 
       count = [paths count];
@@ -151,8 +151,8 @@
 					      nil]];
       
       position = NSMakePoint(0, 0);
-      gridindex = NSNotFound;
-      dragdelay = 0;
+      gridIndex = NSNotFound;
+      dragDelay = 0;
       isDragTarget = NO;
       onSelf = NO;
       trectTag = -1;
@@ -181,7 +181,7 @@
   self = [self initForPaths: fpaths inIconsView: aview];
   if (self)
     {
-      gridindex = index;
+      gridIndex = index;
     }
   return self;
 }
@@ -249,7 +249,7 @@
 - (void)setPosition:(NSPoint)pos gridIndex:(NSUInteger)index
 {
   position = NSMakePoint(pos.x, pos.y);
-  gridindex = index;
+  gridIndex = index;
 }
 
 - (NSPoint)position
@@ -259,17 +259,17 @@
 
 - (void)setGridIndex:(NSUInteger)index
 {
-  gridindex = index;
+  gridIndex = index;
 }
 
-- (NSUInteger)gridindex
+- (NSUInteger)gridIndex
 {
-  return gridindex;
+  return gridIndex;
 }
 
 - (void)select
 {
-  isSelect = YES;
+  isSelected = YES;
   if (locked == NO)
     {
       [namelabel setTextColor: [NSColor controlTextColor]];
@@ -279,7 +279,7 @@
 
 - (void)unselect
 {
-  isSelect = NO;
+  isSelected = NO;
   if (locked == NO) {
     [namelabel setTextColor: [NSColor controlTextColor]];
   }
@@ -304,7 +304,7 @@
   
   labelWidth = [tview cellsWidth] - 8;
 	  
-  if (isSelect) {
+  if (isSelected) {
     [namelabel setFrame: NSMakeRect(0, 0, [font widthOfString: nstr] + 8, 14)];
     [namelabel setStringValue: nstr];
   } else {
@@ -339,9 +339,9 @@
   return singlepath;
 }
 
-- (BOOL)isSelect
+- (BOOL)isSelected
 {
-  return isSelect;
+  return isSelected;
 }
 
 - (void)setLocked:(BOOL)value
@@ -390,7 +390,7 @@
       NSSize offset;
       BOOL startdnd = NO;
    
-      if (isSelect == NO)
+      if (isSelected == NO)
 	{
 	  [self select];
 	}
@@ -416,9 +416,9 @@
 	    }
 	  else if ([nextEvent type] == NSLeftMouseDragged)
 	    {
-	      if (dragdelay < 5)
+	      if (dragDelay < 5)
 		{
-		  dragdelay++;
+		  dragDelay++;
 		}
 	      else
 		{
@@ -474,7 +474,7 @@
   NSSize s;
   NSSize boundsSize;
       	
-  if(isSelect)
+  if(isSelected)
     {
       [[NSColor selectedControlColor] set];
       [highlightPath fill];
@@ -544,7 +544,7 @@
     aPoint = [self convertPoint: aPoint fromView: nil];
   
     if (NSPointInRect(aPoint, r1) || NSPointInRect(aPoint, r2)) {
-	    dragdelay = 0;
+	    dragDelay = 0;
 	    onSelf = NO;
 	    [self unselect];	
       return;
@@ -552,7 +552,7 @@
     
     [tview removeIcon: self];	
 	} else {
-	  dragdelay = 0;
+	  dragDelay = 0;
 	  onSelf = NO;
 	  [self unselect];	
 	}

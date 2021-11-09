@@ -1,8 +1,9 @@
 /* TShelfPBIcon.m
  *  
- * Copyright (C) 2003-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2021 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: August 2001
  *
  * This file is part of the GNUstep GWorkspace application
@@ -99,11 +100,11 @@
       ASSIGN (icon, [NSImage imageNamed: @"Pboard.tiff"]);
     }
     
-    gridindex = index;
+    gridIndex = index;
     position = NSMakePoint(0, 0);
-    isSelect = NO; 
-    dragdelay = 0;
-    tview = aview;  
+    isSelected = NO; 
+    dragDelay = 0;
+    tview = aview; 
   }
   
   return self;
@@ -133,19 +134,19 @@
 {
   [tview unselectOtherIcons: self];
   [tview setCurrentPBIcon: self];
-	isSelect = YES;
+  isSelected = YES;
   [self setNeedsDisplay: YES];
 }
 
 - (void)unselect
 {
-	isSelect = NO;
+	isSelected = NO;
 	[self setNeedsDisplay: YES];
 }
 
-- (BOOL)isSelect
+- (BOOL)isSelected
 {
-  return isSelect;
+  return isSelected;
 }
 
 - (void)setPosition:(NSPoint)pos
@@ -160,12 +161,12 @@
 
 - (void)setGridIndex:(NSUInteger)index
 {
-  gridindex = index;
+  gridIndex = index;
 }
 
-- (NSUInteger)gridindex
+- (NSUInteger)gridIndex
 {
-  return gridindex;
+  return gridIndex;
 }
 
 - (NSTextField *)myLabel
@@ -197,8 +198,8 @@
       if ([nextEvent type] == NSLeftMouseUp) {
         break;
       } else if ([nextEvent type] == NSLeftMouseDragged) {
-	      if(dragdelay < 5) {
-          dragdelay++;
+	      if(dragDelay < 5) {
+          dragDelay++;
         } else {      
           NSPoint p = [nextEvent locationInWindow];
           offset = NSMakeSize(p.x - location.x, p.y - location.y); 
@@ -219,7 +220,7 @@
   NSPoint p;
   NSSize s;
       	
-  if(isSelect) {
+  if(isSelected) {
     [[NSColor selectedControlColor] set];
     [highlightPath fill];
   }
@@ -266,7 +267,7 @@
              endedAt:(NSPoint)aPoint 
            deposited:(BOOL)flag
 {
-  dragdelay = 0;
+  dragDelay = 0;
 }
 
 - (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)flag

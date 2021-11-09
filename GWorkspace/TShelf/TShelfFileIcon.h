@@ -4,7 +4,7 @@
  *
  * Authors: Enrico Sersale <enrico@imago.ro>
  *          Riccardo Mottola <rm@gnu.org>
- * Date: August 2001
+ * Date: November 2021
  *
  * This file is part of the GNUstep GWorkspace application
  *

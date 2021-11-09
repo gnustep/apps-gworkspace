@@ -1,8 +1,9 @@
 /* TShelfPBIcon.h
  *  
- * Copyright (C) 2003-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2021 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: August 2001
  *
  * This file is part of the GNUstep GWorkspace application
@@ -39,13 +40,13 @@
   NSImage *icon;
   NSBezierPath *highlightPath;
   NSPoint position;
-  NSUInteger gridindex;
+  NSUInteger gridIndex;
 
   TShelfIconsView *tview;
 
-  BOOL isSelect;
+  BOOL isSelected;
   
-  int dragdelay;
+  int dragDelay;
 }
 
 + (NSArray *)dataTypes;
@@ -67,7 +68,7 @@
 
 - (void)unselect;
 
-- (BOOL)isSelect;
+- (BOOL)isSelected;
 
 - (void)setPosition:(NSPoint)pos;
 
@@ -75,7 +76,7 @@
 
 - (void)setGridIndex:(NSUInteger)index;
 
-- (NSUInteger)gridindex;
+- (NSUInteger)gridIndex;
 
 - (NSTextField *)myLabel;
 

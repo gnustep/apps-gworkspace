@@ -52,16 +52,16 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
   NSString *hostname;
   FSNode *node;
   BOOL singlepath;
-  BOOL isRootIcon;	
-  BOOL isPakage;	
-  BOOL isSelect;
+  BOOL isRootIcon;
+  BOOL isPackage;
+  BOOL isSelected;
   BOOL locked;
   
   NSImage *icon;
   NSTextField *namelabel;  
   NSBezierPath *highlightPath;
   NSPoint position;
-  NSUInteger gridindex;
+  NSUInteger gridIndex;
   int labelWidth;
   NSTrackingRectTag trectTag;
   
@@ -71,7 +71,7 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
   NSFileManager *fm;
   GWorkspace *gw;
   
-  int dragdelay;
+  int dragDelay;
   BOOL isDragTarget;
   BOOL forceCopy;
   BOOL onSelf;
@@ -107,7 +107,7 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 
 - (void)setGridIndex:(NSUInteger)index;
 
-- (NSUInteger)gridindex;
+- (NSUInteger)gridIndex;
 
 - (NSTextField *)myLabel;
 
@@ -117,7 +117,7 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 
 - (BOOL)isSinglePath;
 
-- (BOOL)isSelect;
+- (BOOL)isSelected;
 
 - (void)setLocked:(BOOL)value;
 
