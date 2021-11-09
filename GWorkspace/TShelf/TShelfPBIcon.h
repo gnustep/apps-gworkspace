@@ -28,25 +28,16 @@
 
 #import <AppKit/NSView.h>
 
+#import "TShelfIcon.h"
+
 @class NSImage;
 @class NSBezierPath;
 @class TShelfIconsView;
 
-@interface TShelfPBIcon : NSView
+@interface TShelfPBIcon : TShelfIcon
 {
   NSString *dataPath;
   NSString *dataType;
-
-  NSImage *icon;
-  NSBezierPath *highlightPath;
-  NSPoint position;
-  NSUInteger gridIndex;
-
-  TShelfIconsView *tview;
-
-  BOOL isSelected;
-  
-  int dragDelay;
 }
 
 + (NSArray *)dataTypes;
@@ -63,22 +54,6 @@
 - (NSData *)data;
 
 - (NSImage *)icon;
-
-- (void)select;
-
-- (void)unselect;
-
-- (BOOL)isSelected;
-
-- (void)setPosition:(NSPoint)pos;
-
-- (NSPoint)position;
-
-- (void)setGridIndex:(NSUInteger)index;
-
-- (NSUInteger)gridIndex;
-
-- (NSTextField *)myLabel;
 
 @end
 

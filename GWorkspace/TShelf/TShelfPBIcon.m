@@ -53,8 +53,6 @@
 {
   RELEASE (dataPath);
   RELEASE (dataType);
-  RELEASE (highlightPath);
-  RELEASE (icon);
 
   [super dealloc];
 }
@@ -142,31 +140,6 @@
 {
 	isSelected = NO;
 	[self setNeedsDisplay: YES];
-}
-
-- (BOOL)isSelected
-{
-  return isSelected;
-}
-
-- (void)setPosition:(NSPoint)pos
-{
-  position = NSMakePoint(pos.x, pos.y);
-}
-
-- (NSPoint)position
-{
-  return position;
-}
-
-- (void)setGridIndex:(NSUInteger)index
-{
-  gridIndex = index;
-}
-
-- (NSUInteger)gridIndex
-{
-  return gridIndex;
 }
 
 - (NSTextField *)myLabel
