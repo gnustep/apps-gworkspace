@@ -53,8 +53,6 @@
 
 - (NSData *)data;
 
-- (NSImage *)icon;
-
 @end
 
 @interface TShelfPBIcon (DraggingSource)

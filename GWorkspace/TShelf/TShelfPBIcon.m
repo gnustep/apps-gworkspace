@@ -123,11 +123,6 @@
   return [NSData dataWithContentsOfFile: dataPath];
 }
 
-- (NSImage *)icon
-{
-  return icon;
-}
-
 - (void)select
 {
   [tview unselectOtherIcons: self];
