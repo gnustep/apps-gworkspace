@@ -308,31 +308,34 @@
 }
 
 - (void)draggedImage:(NSImage *)anImage 
-						 endedAt:(NSPoint)aPoint 
-					 deposited:(BOOL)flag
+             endedAt:(NSPoint)aPoint
+           deposited:(BOOL)flag
 {
-	if (flag == NO) {  
-    NSRect r1 = [self frame];
-    NSRect r2 = [namelabel frame];
+  if (flag == NO)
+    {
+      NSRect r1 = [self frame];
+      NSRect r2 = [namelabel frame];
 
-    r1.origin.x = r1.origin.y = r2.origin.x = r2.origin.y = 0;
+      r1.origin.x = r1.origin.y = r2.origin.x = r2.origin.y = 0;
 
-    aPoint = [[self window] convertScreenToBase: aPoint];
-    aPoint = [self convertPoint: aPoint fromView: nil];
+      aPoint = [[self window] convertScreenToBase: aPoint];
+      aPoint = [self convertPoint: aPoint fromView: nil];
   
-    if (NSPointInRect(aPoint, r1) || NSPointInRect(aPoint, r2)) {
-	    dragDelay = 0;
-	    onSelf = NO;
-	    [self unselect];	
-      return;
-    }
+      if (NSPointInRect(aPoint, r1) || NSPointInRect(aPoint, r2)) {
+        dragDelay = 0;
+        onSelf = NO;
+        [self unselect];
+        return;
+      }
     
-    [tview removeIcon: self];	
-	} else {
-	  dragDelay = 0;
-	  onSelf = NO;
-	  [self unselect];	
-	}
+      [tview removeIcon: self];
+    }
+  else
+    {
+      dragDelay = 0;
+      onSelf = NO;
+      [self unselect];
+    }
 }
 
 - (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)flag
