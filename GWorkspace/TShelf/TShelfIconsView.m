@@ -374,7 +374,7 @@
   
   for (i = 0; i < count; i++)
     {
-      TShelfPBIcon *icon = [icons objectAtIndex: count-i];
+      TShelfPBIcon *icon = [icons objectAtIndex: count-i-1];
       
       if ([[icon dataType] isEqual: type])
 	{
