@@ -75,6 +75,8 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 
 - (void)unselect;
 
+- (NSImage *)icon;
+
 - (void)renewIcon;
 
 - (void)setLabelWidth;

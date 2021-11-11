@@ -65,8 +65,6 @@
       tview = aview;
       labelWidth = [tview cellsWidth] - 4;
       font = [NSFont systemFontOfSize: 12];
-      isSelected = NO;
-      locked = NO;
 
       count = [paths count];
       if (count == 1)
@@ -139,9 +137,7 @@
 					      @"GWRemoteFilenamesPboardType",
 					      nil]];
 
-      position = NSMakePoint(0, 0);
       gridIndex = NSNotFound;
-      dragDelay = 0;
       isDragTarget = NO;
       onSelf = NO;
       trectTag = -1;

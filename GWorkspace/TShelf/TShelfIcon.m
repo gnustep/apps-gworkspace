@@ -47,6 +47,24 @@
   [super dealloc];
 }
 
+- (id)init
+{
+  self = [super init];
+  if (self)
+    {
+       isSelected = NO;
+       locked = NO;
+       position = NSMakePoint(0, 0);
+       gridIndex = NSNotFound;
+       dragDelay = 0;
+       isDragTarget = NO;
+       onSelf = NO;
+       trectTag = -1;
+       minimumLaunchClicks = 2;
+    }
+  return self;
+}
+
 - (void)setPosition:(NSPoint)pos
 {
   position = NSMakePoint(pos.x, pos.y);
@@ -90,6 +108,11 @@
     [namelabel setTextColor: [NSColor controlTextColor]];
   }
   [self setNeedsDisplay: YES];
+}
+
+- (NSImage *)icon
+{
+  return icon;
 }
 
 - (void)renewIcon

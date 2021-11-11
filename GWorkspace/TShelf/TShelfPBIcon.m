@@ -98,9 +98,6 @@
     }
     
     gridIndex = index;
-    position = NSMakePoint(0, 0);
-    isSelected = NO; 
-    dragDelay = 0;
     tview = aview; 
   }
   
