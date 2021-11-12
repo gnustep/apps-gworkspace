@@ -156,7 +156,7 @@ static NSImage *branchImage;
   s = [s stringByAppendingString:[node path]];
   if ([node isMountPoint])
     s = [s stringByAppendingString:@" isMountPoint "];
-  s = [s stringByAppendingString: [NSString stringWithFormat:@" gridIndex: %d", gridIndex]];
+  s = [s stringByAppendingString: [NSString stringWithFormat:@" gridIndex: %u", (unsigned)gridIndex]];
   s = [s stringByAppendingString:@" }"];
   return s;
 }
