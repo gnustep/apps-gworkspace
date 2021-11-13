@@ -57,16 +57,9 @@
 
 @interface TShelfPBIcon (DraggingSource)
 
-- (void)startExternalDragOnEvent:(NSEvent *)event
-                 withMouseOffset:(NSSize)offset;
-
 - (void)declareAndSetShapeOnPasteboard:(NSPasteboard *)pb;
 
 - (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)flag;
-
-- (void)draggedImage:(NSImage *)anImage 
-						 endedAt:(NSPoint)aPoint 
-					 deposited:(BOOL)flag;
 
 @end
 

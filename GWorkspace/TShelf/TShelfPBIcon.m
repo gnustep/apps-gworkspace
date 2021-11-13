@@ -205,11 +205,6 @@
 
 @implementation TShelfPBIcon (DraggingSource)
 
-- (void)startExternalDragOnEvent:(NSEvent *)event
-                 withMouseOffset:(NSSize)offset
-{
-  [super startExternalDragOnEvent:event withMouseOffset:offset];
-}
 
 - (void)declareAndSetShapeOnPasteboard:(NSPasteboard *)pb
 {
@@ -220,13 +215,6 @@
       [pb declareTypes: [NSArray arrayWithObject: dataType] owner: nil];
       [pb setData: data forType: dataType];
     }
-}
-
-- (void)draggedImage:(NSImage *)anImage 
-             endedAt:(NSPoint)aPoint 
-           deposited:(BOOL)flag
-{
-  [super draggedImage:anImage endedAt:aPoint deposited:flag];
 }
 
 - (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)flag

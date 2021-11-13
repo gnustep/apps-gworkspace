@@ -100,7 +100,9 @@
       hlightRect.size.width = (float)ICON_SIZE / 3 * 4;
       hlightRect.size.height = hlightRect.size.width * [fsnodeRep highlightHeightFactor];
       if ((hlightRect.size.height - ICON_SIZE) < 4)
-	hlightRect.size.height = ICON_SIZE + 4;
+	{
+	  hlightRect.size.height = ICON_SIZE + 4;
+	}
       hlightRect = NSIntegralRect(hlightRect);
       ASSIGN (highlightPath, [fsnodeRep highlightPathOfSize: hlightRect.size]);
 
@@ -201,16 +203,20 @@
     }
   else
     {
-      DESTROY (node);
+      node = nil;
       singlepath = NO;
       isRootIcon = NO;
       name = [[NSString alloc] initWithFormat: @"%lu items", (unsigned long)count];
     }
 
   if (singlepath)
-    ASSIGN (icon, [fsnodeRep iconOfSize: ICON_SIZE forNode: node]);
+    {
+      ASSIGN (icon, [fsnodeRep iconOfSize: ICON_SIZE forNode: node]);
+    }
   else
-    ASSIGN (icon, [fsnodeRep multipleSelectionIconOfSize: ICON_SIZE]);
+    {
+      ASSIGN (icon, [fsnodeRep multipleSelectionIconOfSize: ICON_SIZE]);
+    }
 
   if (isRootIcon)
     {
@@ -361,12 +367,6 @@
 @end
 
 @implementation TShelfFileIcon (DraggingSource)
-
-- (void)startExternalDragOnEvent:(NSEvent *)event
-                 withMouseOffset:(NSSize)offset
-{
-  [super startExternalDragOnEvent:event withMouseOffset:offset];
-}
 
 - (void)declareAndSetShapeOnPasteboard:(NSPasteboard *)pb
 {
