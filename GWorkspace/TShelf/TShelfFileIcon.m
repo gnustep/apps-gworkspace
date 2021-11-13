@@ -372,18 +372,7 @@
 {
   NSArray *dndtypes = [NSArray arrayWithObject: NSFilenamesPboardType];
   [pb declareTypes: dndtypes owner: nil];
-
-  if ([pb setPropertyList: paths forType: NSFilenamesPboardType] == NO)
-    {
-      return;
-    }
-}
-
-- (void)draggedImage:(NSImage *)anImage
-	     endedAt:(NSPoint)aPoint
-	   deposited:(BOOL)flag
-{
-  [super draggedImage:anImage endedAt:aPoint deposited:flag];
+  [pb setPropertyList: paths forType: NSFilenamesPboardType];
 }
 
 - (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)flag
