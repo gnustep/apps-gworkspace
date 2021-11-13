@@ -69,41 +69,17 @@
 
 @end
 
-@interface TShelfPBIcon (TShelfIconsViewSorting)
-
-- (NSComparisonResult)pbiconCompare:(id)other;
-
-@end
-
-@implementation TShelfPBIcon (TShelfIconsViewSorting)
-
-- (NSComparisonResult)pbiconCompare:(id)other
-{
-  if ([other gridIndex] == [self gridIndex])
-    return NSOrderedSame;
-
-  if ([other gridIndex] == NSNotFound)
-    return NSOrderedAscending;
-  if ([self gridIndex] == NSNotFound)
-    return NSOrderedDescending;
-
-  if ([other gridIndex] > [self gridIndex])
-    return NSOrderedAscending;	
-  
-  return NSOrderedDescending;	
-}
-
-@end
 
 @implementation TShelfIconsView
 
 - (void) dealloc
 {
   [[NSNotificationCenter defaultCenter] removeObserver: self];
-	[self unsetWatchers];
-	if (gpoints != NULL) {
-		NSZoneFree (NSDefaultMallocZone(), gpoints);
-	}
+  [self unsetWatchers];
+  if (gpoints != NULL)
+    {
+      NSZoneFree (NSDefaultMallocZone(), gpoints);
+    }
   RELEASE (icons);  
   RELEASE (watchedPaths);
   RELEASE (dragImage);
@@ -495,7 +471,7 @@
 
 - (void)sortIcons
 {
-  SEL sel = (iconsType == FILES_TAB) ? @selector(iconCompare:) : @selector(pbiconCompare:);
+  SEL sel = @selector(iconCompare:);
   [icons sortUsingSelector: sel];
 }
 
