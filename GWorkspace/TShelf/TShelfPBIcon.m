@@ -196,11 +196,6 @@
     }       
 }
 
-- (void)drawRect:(NSRect)rect
-{
-  [super drawRect:rect];
-}
-
 @end
 
 @implementation TShelfPBIcon (DraggingSource)
