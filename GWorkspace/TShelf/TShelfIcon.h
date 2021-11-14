@@ -101,6 +101,8 @@ inRect: NSMakeRect(((int)(s1).width - (int)(s2).width) >> 1,\
 
 - (BOOL)isLocked;
 
+- (NSComparisonResult)iconCompare:(id)other;
+
 - (void)setSingleClickLaunch:(BOOL)value;
 
 @end

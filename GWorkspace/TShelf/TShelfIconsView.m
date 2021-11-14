@@ -43,32 +43,6 @@
 #define CELLS_WIDTH (80)
 #define EDIT_MARGIN (4)
 
-@interface TShelfIcon (TShelfIconsViewSorting)
-
-- (NSComparisonResult)iconCompare:(id)other;
-
-@end
-
-@implementation TShelfIcon (TShelfIconsViewSorting)
-
-- (NSComparisonResult)iconCompare:(id)other
-{
-  if ([other gridIndex] == [self gridIndex])
-    return NSOrderedSame;
-
-  if ([other gridIndex] == NSNotFound)
-    return NSOrderedAscending;
-  if ([self gridIndex] == NSNotFound)
-    return NSOrderedDescending;
-
-  if ([other gridIndex] > [self gridIndex])
-    return NSOrderedAscending;	
-  
-  return NSOrderedDescending;	
-}
-
-@end
-
 
 @implementation TShelfIconsView
 

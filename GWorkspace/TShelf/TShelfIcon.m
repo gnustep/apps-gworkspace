@@ -117,6 +117,7 @@
 
 - (void)renewIcon
 {
+  //
 }
 
 - (void)setLabelWidth
@@ -296,6 +297,22 @@
 	} else {
 		[icon dissolveToPoint: p fraction: 0.3];
 	}
+}
+
+- (NSComparisonResult)iconCompare:(id)other
+{
+  if ([other gridIndex] == [self gridIndex])
+    return NSOrderedSame;
+
+  if ([other gridIndex] == NSNotFound)
+    return NSOrderedAscending;
+  if ([self gridIndex] == NSNotFound)
+    return NSOrderedDescending;
+
+  if ([other gridIndex] > [self gridIndex])
+    return NSOrderedAscending;
+
+  return NSOrderedDescending;
 }
 
 - (void)setSingleClickLaunch:(BOOL)value
