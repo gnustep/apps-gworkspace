@@ -312,7 +312,7 @@
 				     NSLeftMouseUpMask | NSLeftMouseDraggedMask];
 
 	if ([nextEvent type] == NSLeftMouseUp) {
-	  [[self window] postEvent: nextEvent atStart: NO];
+	  [[self window] postEvent: nextEvent atStart: YES];
 	  [self unselect];
 	  break;
 

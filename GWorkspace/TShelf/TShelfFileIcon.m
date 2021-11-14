@@ -335,7 +335,7 @@
 		  [tview setCurrentSelection: paths];
 		}
 	      // post again, or mouse-up gets eaten
-	      [[self window] postEvent: nextEvent atStart: NO];
+	      [[self window] postEvent: nextEvent atStart: YES];
 	      [self unselect];
 	      break;
 
