@@ -1,8 +1,9 @@
 /* TShelfPBIcon.m
  *  
- * Copyright (C) 2003-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2021 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: August 2001
  *
  * This file is part of the GNUstep GWorkspace application
@@ -32,7 +33,6 @@
 #import "TShelfIconsView.h"
 #import "GWorkspace.h"
 
-#define ICON_SIZE 48
 
 @implementation TShelfPBIcon
 
@@ -52,8 +52,6 @@
 {
   RELEASE (dataPath);
   RELEASE (dataType);
-  RELEASE (highlightPath);
-  RELEASE (icon);
 
   [super dealloc];
 }
@@ -99,11 +97,8 @@
       ASSIGN (icon, [NSImage imageNamed: @"Pboard.tiff"]);
     }
     
-    gridindex = index;
-    position = NSMakePoint(0, 0);
-    isSelect = NO; 
-    dragdelay = 0;
-    tview = aview;  
+    gridIndex = index;
+    tview = aview; 
   }
   
   return self;
@@ -124,48 +119,18 @@
   return [NSData dataWithContentsOfFile: dataPath];
 }
 
-- (NSImage *)icon
-{
-  return icon;
-}
-
 - (void)select
 {
   [tview unselectOtherIcons: self];
   [tview setCurrentPBIcon: self];
-	isSelect = YES;
+  isSelected = YES;
   [self setNeedsDisplay: YES];
 }
 
 - (void)unselect
 {
-	isSelect = NO;
-	[self setNeedsDisplay: YES];
-}
-
-- (BOOL)isSelect
-{
-  return isSelect;
-}
-
-- (void)setPosition:(NSPoint)pos
-{
-  position = NSMakePoint(pos.x, pos.y);
-}
-
-- (NSPoint)position
-{
-  return position;
-}
-
-- (void)setGridIndex:(NSUInteger)index
-{
-  gridindex = index;
-}
-
-- (NSUInteger)gridindex
-{
-  return gridindex;
+  isSelected = NO;
+  [self setNeedsDisplay: YES];
 }
 
 - (NSTextField *)myLabel
@@ -180,93 +145,71 @@
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-  if ([theEvent clickCount] == 1) { 
-    NSEvent *nextEvent;
-    NSPoint location;
-    NSSize offset;
-    BOOL startdnd = NO;
-   
-    [self select];
+  CHECK_LOCK;
 
-    location = [theEvent locationInWindow];
-    
-    while (1) {
-	    nextEvent = [[self window] nextEventMatchingMask:
-    							              NSLeftMouseUpMask | NSLeftMouseDraggedMask];
+  if ([theEvent clickCount] == 1)
+    {
+      NSEvent *nextEvent;
+      NSPoint location;
+      NSSize offset;
+      BOOL startdnd = NO;
 
-      if ([nextEvent type] == NSLeftMouseUp) {
-        break;
-      } else if ([nextEvent type] == NSLeftMouseDragged) {
-	      if(dragdelay < 5) {
-          dragdelay++;
-        } else {      
-          NSPoint p = [nextEvent locationInWindow];
-          offset = NSMakeSize(p.x - location.x, p.y - location.y); 
-          startdnd = YES;        
-          break;
+      if (isSelected == NO)
+	{
+	  [self select];
+	}
+
+      location = [theEvent locationInWindow];
+
+      while (1)
+        {
+          nextEvent = [[self window] nextEventMatchingMask:
+                                       NSLeftMouseUpMask | NSLeftMouseDraggedMask];
+
+          if ([nextEvent type] == NSLeftMouseUp)
+            {
+              // post again, or mouse-up gets eaten
+	      [[self window] postEvent: nextEvent atStart: NO];
+	      [self unselect];
+              break;
+            }
+          else if ([nextEvent type] == NSLeftMouseDragged)
+            {
+	      if(dragDelay < 5)
+                {
+                  dragDelay++;
+                }
+              else
+                {
+                  NSPoint p = [nextEvent locationInWindow];
+                  offset = NSMakeSize(p.x - location.x, p.y - location.y);
+                  startdnd = YES;
+                  break;
+                }
+            }
         }
-      }
-    }
 
-    if (startdnd == YES) {  
-      [self startExternalDragOnEvent: theEvent withMouseOffset: offset];    
-    }    
-  }           
-}
-
-- (void)drawRect:(NSRect)rect
-{
-  NSPoint p;
-  NSSize s;
-      	
-  if(isSelect) {
-    [[NSColor selectedControlColor] set];
-    [highlightPath fill];
-  }
-	
-  s = [icon size];
-  p = NSMakePoint((rect.size.width - s.width) / 2, (rect.size.height - s.height) / 2);	
-  [icon compositeToPoint: p operation: NSCompositeSourceOver];
+      if (startdnd == YES)
+        {
+          [self startExternalDragOnEvent: theEvent withMouseOffset: offset];    
+        }
+    }       
 }
 
 @end
 
 @implementation TShelfPBIcon (DraggingSource)
 
-- (void)startExternalDragOnEvent:(NSEvent *)event
-                 withMouseOffset:(NSSize)offset
-{
-  NSPasteboard *pb = [NSPasteboard pasteboardWithName: NSDragPboard];	
-  NSPoint dragPoint;
-	
-  [self declareAndSetShapeOnPasteboard: pb];
-
-  ICONCENTER (self, icon, dragPoint);
-  	  
-  [self dragImage: icon
-               at: dragPoint 
-           offset: offset
-            event: event
-       pasteboard: pb
-           source: self
-        slideBack: NO];
-}
 
 - (void)declareAndSetShapeOnPasteboard:(NSPasteboard *)pb
 {
   NSData *data = [NSData dataWithContentsOfFile: dataPath];
 
-  if (data) {
-    [pb declareTypes: [NSArray arrayWithObject: dataType] owner: nil];
-    [pb setData: data forType: dataType];
-  }
-}
-
-- (void)draggedImage:(NSImage *)anImage 
-             endedAt:(NSPoint)aPoint 
-           deposited:(BOOL)flag
-{
-  dragdelay = 0;
+  if (data)
+    {
+      [pb declareTypes: [NSArray arrayWithObject: dataType] owner: nil];
+      [pb setData: data forType: dataType];
+    }
 }
 
 - (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)flag

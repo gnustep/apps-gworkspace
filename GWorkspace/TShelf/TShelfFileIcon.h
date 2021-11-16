@@ -1,10 +1,10 @@
-/* TShelfPBIcon.h
+/* TShelfIcon.h
  *  
  * Copyright (C) 2003-2021 Free Software Foundation, Inc.
  *
  * Authors: Enrico Sersale <enrico@imago.ro>
  *          Riccardo Mottola <rm@gnu.org>
- * Date: August 2001
+ * Date: November 2021
  *
  * This file is part of the GNUstep GWorkspace application
  *
@@ -23,45 +23,46 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#ifndef TSHELF_PB_ICON_H
-#define TSHELF_PB_ICON_H
-
-#import <AppKit/NSView.h>
+#ifndef TSHELF_FILEICON_H
+#define TSHELF_FILEICON_H
 
 #import "TShelfIcon.h"
 
-@class NSImage;
-@class NSBezierPath;
-@class TShelfIconsView;
+@class FSNode;
+@class FSNodeRep;
+@class GWorkspace;
 
-@interface TShelfPBIcon : TShelfIcon
+@interface TShelfFileIcon : TShelfIcon
 {
-  NSString *dataPath;
-  NSString *dataType;
+  NSMutableArray *paths;
+  NSString *hostname;
+  FSNode *node;
+  BOOL singlepath;
+  BOOL isRootIcon;
+  FSNodeRep *fsnodeRep;
+  NSFileManager *fm;
+  GWorkspace *gw;
+
+  BOOL forceCopy;
 }
 
-+ (NSArray *)dataTypes;
+- (id)initForPaths:(NSArray *)fpaths
+       inIconsView:(TShelfIconsView *)aview;
 
-- (id)initForPBDataAtPath:(NSString *)dpath
-                   ofType:(NSString *)type
-                gridIndex:(NSUInteger)index
-              inIconsView:(TShelfIconsView *)aview;
+- (id)initForPaths:(NSArray *)fpaths
+        atPosition:(NSPoint)pos
+       inIconsView:(TShelfIconsView *)aview;
 
-- (NSString *)dataPath;
+- (id)initForPaths:(NSArray *)fpaths
+	 gridIndex:(NSUInteger)index
+       inIconsView:(TShelfIconsView *)aview;
 
-- (NSString *)dataType;
+- (void)setPaths:(NSArray *)fpaths;
 
-- (NSData *)data;
+- (NSArray *)paths;
 
-@end
-
-@interface TShelfPBIcon (DraggingSource)
-
-- (void)declareAndSetShapeOnPasteboard:(NSPasteboard *)pb;
-
-- (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)flag;
+- (BOOL)isSinglePath;
 
 @end
 
-#endif // TSHELF_PB_ICON_H
-
+#endif // TSHELF_FILEICON_H
