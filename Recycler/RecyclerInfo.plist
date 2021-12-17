@@ -5,13 +5,13 @@
     ApplicationDescription = "Workspace Manager";
     ApplicationIcon = "Recycler.tiff";
     ApplicationName = "Recycler";
-    ApplicationRelease = "0.9.4";
-    NSBuildVersion = "07 2016";
+    ApplicationRelease = "1.0.0';
+    NSBuildVersion = "12 2021";
     CFBundleIdentifier = "org.gnustep.GWorkspace.Recycler";
     Authors = (
       "Riccardo Mottola",
       "Enrico Sersale"
     );
-    Copyright = "Copyright (C) 2004-2016 Free Software Foundation, Inc.";
+    Copyright = "Copyright (C) 2004-2021 Free Software Foundation, Inc.";
     CopyrightDescription = "Released under the GNU General Public License 2.0 or later";
 }

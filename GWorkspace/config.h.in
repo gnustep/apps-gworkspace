@@ -1,7 +1,22 @@
-/* config.h.in.  Generated from configure.ac by autoheader.  */
+/* GWorkspace/config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* debug logging */
 #undef GW_DEBUG_LOG
+
+/* Define to 1 if you have the <dir.h> header file. */
+#undef HAVE_DIR_H
+
+/* Define to 1 if you have the `geteuid' function. */
+#undef HAVE_GETEUID
+
+/* Define to 1 if you have the `getlogin' function. */
+#undef HAVE_GETLOGIN
+
+/* Define to 1 if you have the `getpwnam' function. */
+#undef HAVE_GETPWNAM
+
+/* Define to 1 if you have the `getpwuid' function. */
+#undef HAVE_GETPWUID
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H

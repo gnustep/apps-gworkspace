@@ -4,5 +4,5 @@
     ApplicationDescription = "Operation";
     ApplicationIcon = "Operation.tiff";
     ApplicationName = "Operation";
-    ApplicationRelease = "0.9.1";
+    ApplicationRelease = "1.0.0";
 }
