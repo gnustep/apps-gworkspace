@@ -1,8 +1,9 @@
 /* FSNBrowserColumn.m
  *  
- * Copyright (C) 2004-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2022 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: July 2004
  *
  * This file is part of the GNUstep GWorkspace application
@@ -675,24 +676,24 @@ static id <DesktopApplication> desktopApp = nil;
 - (void)selectCellsOfNodes:(NSArray *)nodes 
                 sendAction:(BOOL)act
 {
-  if (nodes && [nodes count]) {
-    NSArray *cells = [matrix cells];
-    NSUInteger i;
+  if (nodes && [nodes count])
+    {
+      NSArray *cells = [matrix cells];
+      NSUInteger i;
 
-    [matrix deselectAllCells];
+      [matrix deselectAllCells];
 
-	  for (i = 0; i < [cells count]; i++) {
-	    FSNBrowserCell *cell = [cells objectAtIndex: i];
+      for (i = 0; i < [cells count]; i++)
+	{
+	  FSNBrowserCell *cell = [cells objectAtIndex: i];
 
-      if ([nodes containsObject: [cell node]]) {
-        [matrix selectCell: cell];
-      } 
-	  }
+	  if ([nodes containsObject: [cell node]])
+	    [matrix selectCell: cell];
+	}
 
-    if ([cells count] && act) {
-      [matrix sendAction];
+      if ([cells count] && act)
+	[matrix sendAction];
     }
-  }
 }
 
 - (void)selectCellsWithPaths:(NSArray *)paths 
@@ -754,117 +755,125 @@ static id <DesktopApplication> desktopApp = nil;
 
 - (BOOL)selectCellWithPrefix:(NSString *)prefix
 {
-  if ([[matrix cells] count]) {
-    int n = [matrix numberOfRows];
-    int s = [matrix selectedRow];
-    NSString *cellstr = nil;
-    NSUInteger i = 0;
-    
-    if (s != -1) {
-      cellstr = [[matrix cellAtRow: s column: 0] stringValue];
+  if ([[matrix cells] count])
+    {
+      NSInteger n = [matrix numberOfRows];
+      NSInteger s = [matrix selectedRow];
+      NSString *cellStr = nil;
+      NSUInteger i = 0;
+
+      // Nothing eselected
+      if (s != -1)
+	cellStr = [[matrix cellAtRow: s column: 0] stringValue];
+
+      if (cellStr && ([cellStr length] > 0) && [cellStr hasPrefix: prefix])
+	return YES;
+
+      for (i = s + 1; i < n; i++)
+	{
+	  cellStr = [[matrix cellAtRow: i column: 0] stringValue];
+
+	  if (([cellStr length] > 0) && ([cellStr hasPrefix: prefix]))
+	    {
+	      [matrix deselectAllCells];
+	      [matrix selectCellAtRow: i column: 0];
+	      [matrix scrollCellToVisibleAtRow: i column: 0];
+	      [matrix sendAction];
+	      return YES;
+	    }
+	}
+
+      for (i = 0; i < s; i++)
+	{
+	  cellStr = [[matrix cellAtRow: i column: 0] stringValue];
+
+	  if (([cellStr length] > 0) && ([cellStr hasPrefix: prefix]))
+	    {
+	      [matrix deselectAllCells];
+	      [matrix selectCellAtRow: i column: 0];
+	      [matrix scrollCellToVisibleAtRow: i column: 0];
+	      [matrix sendAction];
+	      return YES;
+	    }
+	}
     }
-    
-    if (cellstr && ([cellstr length] > 0) && [cellstr hasPrefix: prefix]) {
-      return YES;
-    }
-    
-	  for (i = s + 1; i < n; i++) {
-      cellstr = [[matrix cellAtRow: i column: 0] stringValue];
-    
-			if (([cellstr length] > 0) && ([cellstr hasPrefix: prefix])) {
-        [matrix deselectAllCells];
-        [matrix selectCellAtRow: i column: 0];
-		  	[matrix scrollCellToVisibleAtRow: i column: 0];
-		  	[matrix sendAction];
-		  	return YES;
-			}
-	  }
-    
-		for (i = 0; i < s; i++) {
-      cellstr = [[matrix cellAtRow: i column: 0] stringValue];
-    
-			if (([cellstr length] > 0) && ([cellstr hasPrefix: prefix])) {
-        [matrix deselectAllCells];
-        [matrix selectCellAtRow: i column: 0];
-		  	[matrix scrollCellToVisibleAtRow: i column: 0];
-		  	[matrix sendAction];
-		  	return YES;
-			}
-		}
-  }
-    
+
   return NO;
 }
 
 - (void)selectAll
 {
-  if ([[matrix cells] count]) {
-    NSArray *cells = [matrix cells];
-    NSUInteger count = [cells count];
-    FSNBrowserCell *cell;
-    NSUInteger selstart = 0;
-    NSUInteger selend = 0;
-    NSUInteger i;
-        
-    [matrix deselectAllCells];
+  NSArray *cells = [matrix cells];
 
-    while (selstart < count) {
-      cell = [cells objectAtIndex: selstart];
-      
-      if ([[cell node] isReserved] == NO) {
-        break;
-      } 
-      
-      selstart++;
-    } 
-    
-    i = selstart;
+  if ([cells count])
+    {
+      NSUInteger count = [cells count];
+      FSNBrowserCell *cell;
+      NSInteger selStart = 0;
+      NSInteger selEnd = 0;
+      NSInteger i;
 
-    while (i < count) {
-      cell = [cells objectAtIndex: i];
-      
-      if ([[cell node] isReserved] == NO) {
-        selend = i;
+      [matrix deselectAllCells];
+      while (selStart < count)
+	{
+	  cell = [cells objectAtIndex: selStart];
 
-      } else {
-        [matrix setSelectionFrom: selstart 
-                              to: selend
-                          anchor: selstart 
-                       highlight: YES];
-        
-        selstart = i + 1;
-        
-        while (selstart < count) {        
-          cell = [cells objectAtIndex: selstart];
+	  if ([[cell node] isReserved] == NO)
+	    break;
 
-          if ([[cell node] isReserved] == NO) {
-            break;
-          }
+	  selStart++;
+	}
+
+      i = selStart;
+      while (i < count)
+	{
+	  cell = [cells objectAtIndex: i];
+
+	  if ([[cell node] isReserved] == NO)
+	    {
+	      selEnd = i;
+	    }
+	  else
+	    {
+	      [matrix setSelectionFrom: selStart
+				    to: selEnd
+				anchor: selStart
+			     highlight: YES];
+	      selStart = i + 1;
+
+	      while (selStart < count)
+		{
+		  cell = [cells objectAtIndex: selStart];
+
+		  if ([[cell node] isReserved] == NO)
+		    break;
            
-          selstart++;
-          i++;
-        }
-      }
-      
-      i++;
-    }
+		  selStart++;
+		  i++;
+		}
+	    }
+	  i++;
+	}
     
-    if (selstart < count) {
-      [matrix setSelectionFrom: selstart 
-                            to: selend 
-                        anchor: selstart 
-                     highlight: YES];
-    }
+      if (selStart < count)
+	{
+	  [matrix setSelectionFrom: selStart
+				to: selEnd
+			    anchor: selStart
+			 highlight: YES];
+	}
 
-    [matrix sendAction];
-        
-  } else {
-    FSNBrowserColumn *col = [browser columnBeforeColumn: self];
-  
-    if (col) {
-      [col selectAll];
+      [matrix sendAction];
     }
-  }
+  else
+    {
+      FSNBrowserColumn *col = [browser columnBeforeColumn: self];
+
+      if (col)
+	{
+	  [col selectAll];
+	}
+    }
 }
 
 - (void)unselectAllCells

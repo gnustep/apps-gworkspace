@@ -1,3 +1,8 @@
+2022-06-29  Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNBrowserColumn.m
+	Cleanup of selection code, use proper NSInteger for Matrix access
+
 2021-10-12  Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNIcon.h
@@ -17,7 +22,7 @@
 	* GWorkspace/TShelf/TShelfWin.h
 	* GWorkspace/TShelf/TShelfWin.m:
 	Also Tabbed Shelf shall respect single-click launch.
-	
+
 2021-09-09  Riccardo Mottola <rm@gnu.org>
 
 	* GWorkspace/Desktop/Dock/Dock.h
