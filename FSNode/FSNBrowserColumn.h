@@ -1,6 +1,6 @@
 /* FSNBrowserColumn.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2022 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: July 2004
@@ -47,7 +47,7 @@
   FSNode *oldNode;
   FSNInfoType infoType;
   NSString *extInfoType;  
-  int index;
+  NSInteger index;
   BOOL isLoaded;
   BOOL isLeaf;
 
@@ -61,7 +61,7 @@
 }
 
 - (id)initInBrowser:(FSNBrowser *)abrowser
-            atIndex:(int)ind
+            atIndex:(NSInteger)ind
       cellPrototype:(FSNBrowserCell *)acell
           cellsIcon:(BOOL)cicon
        nodeInfoType:(FSNInfoType)type
@@ -156,7 +156,7 @@
                                 
 - (NSMatrix *)cmatrix;
                 
-- (int)index;                
+- (NSInteger)index;                
 
 - (BOOL)isLoaded;                
 

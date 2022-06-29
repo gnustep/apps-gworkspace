@@ -1,6 +1,12 @@
 2022-06-29  Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNBrowserColumn.m
+	* FSNode/FSNBrowserColumn.h
+	Switch index to NSInteger
+
+2022-06-29  Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNBrowserColumn.m
 	Cleanup of selection code, use proper NSInteger for Matrix access
 
 2021-10-12  Riccardo Mottola <rm@gnu.org>

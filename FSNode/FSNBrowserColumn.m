@@ -80,7 +80,7 @@ static id <DesktopApplication> desktopApp = nil;
 }
 
 - (id)initInBrowser:(FSNBrowser *)abrowser
-            atIndex:(int)ind
+            atIndex:(NSInteger)ind
       cellPrototype:(FSNBrowserCell *)acell
           cellsIcon:(BOOL)cicon
        nodeInfoType:(FSNInfoType)type
@@ -1113,7 +1113,7 @@ static id <DesktopApplication> desktopApp = nil;
   return matrix;
 }
 
-- (int)index
+- (NSInteger)index
 {
   return index;
 }
