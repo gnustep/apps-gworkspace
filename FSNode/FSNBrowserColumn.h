@@ -51,7 +51,7 @@
   BOOL isLoaded;
   BOOL isLeaf;
 
-	BOOL isDragTarget;
+  BOOL isDragTarget;
   BOOL forceCopy;
   
   FSNBrowser *browser;
