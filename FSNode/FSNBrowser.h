@@ -1,8 +1,9 @@
 /* FSNBrowser.h
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2022 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: July 2004
  *
  * This file is part of the GNUstep GWorkspace application
@@ -54,10 +55,10 @@
   
   BOOL isLoaded;
     
-  int visibleColumns;
-  int lastColumnLoaded;
-  int firstVisibleColumn;
-  int lastVisibleColumn;	
+  NSInteger visibleColumns;
+  NSInteger lastColumnLoaded;
+  NSInteger firstVisibleColumn;
+  NSInteger lastVisibleColumn;	
   int currentshift;
 
   NSSize columnSize;
@@ -68,7 +69,7 @@
   
   NSString *charBuffer;	
   NSTimeInterval lastKeyPressed;
-  int alphaNumericalLastColumn;
+  NSInteger alphaNumericalLastColumn;
 
   NSColor *backColor;
 	
@@ -89,8 +90,8 @@
 
 - (void)setUsesCellsIcons:(BOOL)cicns;
 - (void)setUsesSelectionColumn:(BOOL)selcol;
-- (void)setVisibleColumns:(int)vcols;
-- (int)visibleColumns;
+- (void)setVisibleColumns:(NSInteger)vcols;
+- (NSInteger)visibleColumns;
 
 - (void)showSubnode:(FSNode *)node;
 - (void)showSelection:(NSArray *)selection;
@@ -100,7 +101,7 @@
 - (FSNBrowserColumn *)createEmptyColumn;
 - (void)addAndLoadColumnForNode:(FSNode *)node;
 - (void)addFillingColumn;
-- (void)unloadFromColumn:(int)column;
+- (void)unloadFromColumn:(NSInteger)column;
 - (void)reloadColumnWithNode:(FSNode *)anode;
 - (void)reloadColumnWithPath:(NSString *)cpath;
 - (void)reloadFromColumn:(FSNBrowserColumn *)col;
@@ -113,7 +114,7 @@
 - (void)updateScroller;
 - (void)scrollColumnsLeftBy:(int)shiftAmount;
 - (void)scrollColumnsRightBy:(int)shiftAmount;
-- (void)scrollColumnToVisible:(int)column;
+- (void)scrollColumnToVisible:(NSInteger)column;
 - (void)moveLeft;
 - (void)moveRight;
 - (void)setShift:(int)s;
@@ -133,9 +134,9 @@
 - (void)removeCellsWithNames:(NSArray *)names 
             inColumnWithPath:(NSString *)cpath;
 
-- (int)firstVisibleColumn;
-- (int)lastColumnLoaded;
-- (int)lastVisibleColumn;
+- (NSInteger)firstVisibleColumn;
+- (NSInteger)lastColumnLoaded;
+- (NSInteger)lastVisibleColumn;
 - (FSNBrowserColumn *)selectedColumn;
 - (FSNBrowserColumn *)lastLoadedColumn;
 - (FSNBrowserColumn *)columnWithNode:(FSNode *)anode;
