@@ -1,8 +1,9 @@
 /* FSNBrowserMatrix.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2022 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: July 2004
  *
  * This file is part of the GNUstep GWorkspace application
@@ -35,7 +36,7 @@
 @interface FSNBrowserMatrix : NSMatrix
 {
   FSNBrowserColumn *column;
-  unsigned int mouseFlags;
+  NSUInteger mouseFlags;
   NSTimeInterval editstamp;  
   int editindex;  
   BOOL acceptDnd;
@@ -60,9 +61,9 @@
 
 - (void)unSelectIconsOfCellsDifferentFrom:(id)aCell;
 
-- (unsigned int )mouseFlags;
+- (NSUInteger)mouseFlags;
 
-- (void)setMouseFlags:(unsigned int)flags;
+- (void)setMouseFlags:(NSUInteger)flags;
 
 @end
 

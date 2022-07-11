@@ -1,8 +1,9 @@
 /* FSNBrowserMatrix.m
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2022 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: July 2004
  *
  * This file is part of the GNUstep GWorkspace application
@@ -154,12 +155,12 @@
   }
 }
 
-- (unsigned int )mouseFlags
+- (NSUInteger)mouseFlags
 {
   return mouseFlags;
 }
 
-- (void)setMouseFlags:(unsigned int)flags
+- (void)setMouseFlags:(NSUInteger)flags
 {
   mouseFlags = flags;
 }
