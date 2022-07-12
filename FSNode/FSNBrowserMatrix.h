@@ -46,10 +46,10 @@
 
 - (id)initInColumn:(FSNBrowserColumn *)col
          withFrame:(NSRect)frameRect 
-              mode:(int)aMode 
+              mode:(NSMatrixMode)aMode
          prototype:(FSNBrowserCell *)aCell 
-      numberOfRows:(int)numRows
-   numberOfColumns:(int)numColumns
+      numberOfRows:(NSInteger)numRows
+   numberOfColumns:(NSInteger)numColumns
          acceptDnd:(BOOL)dnd;
 
 - (void)visibleCellsNodes:(NSArray **)nodes

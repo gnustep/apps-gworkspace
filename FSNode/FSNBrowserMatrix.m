@@ -46,30 +46,32 @@
 
 - (id)initInColumn:(FSNBrowserColumn *)col
          withFrame:(NSRect)frameRect 
-              mode:(int)aMode 
+              mode:(NSMatrixMode)aMode
          prototype:(FSNBrowserCell *)aCell 
-      numberOfRows:(int)numRows
-   numberOfColumns:(int)numColumns
+      numberOfRows:(NSInteger)numRows
+   numberOfColumns:(NSInteger)numColumns
          acceptDnd:(BOOL)dnd
 {
-  self = [super initWithFrame: frameRect mode: aMode prototype: aCell 
-                        numberOfRows: numRows numberOfColumns: numColumns];
+  self = [super initWithFrame: frameRect mode: aMode prototype: aCell
+		 numberOfRows: numRows numberOfColumns: numColumns];
 
-  if (self) {
-    column = col;
-    mouseFlags = 0;
-    dndTarget = nil;
-    acceptDnd = dnd;
-    if (acceptDnd) {
-      [self registerForDraggedTypes: [NSArray arrayWithObjects: 
-                                            NSFilenamesPboardType, 
-                                            @"GWLSFolderPboardType", 
-                                            @"GWRemoteFilenamesPboardType", 
-                                            nil]];    
+  if (self)
+    {
+      column = col;
+      mouseFlags = 0;
+      dndTarget = nil;
+      acceptDnd = dnd;
+      if (acceptDnd)
+	{
+	  [self registerForDraggedTypes: [NSArray arrayWithObjects:
+						    NSFilenamesPboardType,
+						  @"GWLSFolderPboardType",
+						  @"GWRemoteFilenamesPboardType",
+						  nil]];
+	}
+      editstamp = 0.0;
+      editindex = -1;
     }
-    editstamp = 0.0;
-    editindex = -1;
-  }
   
   return self;
 }
@@ -84,7 +86,7 @@
     float ylim = vr.origin.y + vr.size.height - [self cellSize].height;
     NSMutableArray *vnodes = [NSMutableArray array];
     BOOL found = NO;
-    int i;
+    NSUInteger i;
  
     for (i = 0; i < [cells count]; i++) {
       NSRect cr = [self cellFrameAtRow: i column: 0];
