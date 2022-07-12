@@ -1,8 +1,9 @@
 /* FSNIcon.h
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2022 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: March 2004
  *
  * This file is part of the GNUstep FSNode framework
@@ -151,17 +152,14 @@
 @interface FSNIconNameEditor : NSTextField
 {
   FSNode *node;
-  int index;
   NSView <FSNodeRepContainer> *container;
 }  
 
 - (void)setNode:(FSNode *)anode 
-    stringValue:(NSString *)str
-          index:(int)idx;
+    stringValue:(NSString *)str;
 
 - (FSNode *)node;
 
-- (int)index;
 
 @end
 

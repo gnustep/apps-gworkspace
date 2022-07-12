@@ -1,6 +1,6 @@
 /* FSNIcon.m
  *  
- * Copyright (C) 2004-2021 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2022 Free Software Foundation, Inc.
  *
  * Authors: Enrico Sersale <enrico@imago.ro>
  *          Riccardo Mottola <rm@gnu.org>
@@ -1639,24 +1639,17 @@ static NSImage *branchImage;
 
 - (void)setNode:(FSNode *)anode 
     stringValue:(NSString *)str
-          index:(int)idx
 {
   DESTROY (node);
   if (anode) {
     ASSIGN (node, anode);
   } 
   [self setStringValue: str];
-  index = idx;
 }
 
 - (FSNode *)node
 {
   return node;
-}
-
-- (int)index
-{
-  return index;
 }
 
 - (void)viewDidMoveToSuperview

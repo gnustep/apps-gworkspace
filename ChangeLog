@@ -1,3 +1,11 @@
+2022-07-12  Riccardo Mottola <rm@gnu.org>
+
+	* FSNode/FSNIcon.h
+	* FSNode/FSNIcon.m
+	* FSNode/FSNIconsView.m
+	* GWorkspace/FileViewer/GWViewerIconsPath.m
+	remove index from FSNIconNameEditor, unused.
+
 2022-07-11  Riccardo Mottola <rm@gnu.org>
 	* FSNode/FSNBrowserMatrix.[h,m]:
 	mouseFlags has to be NSUInteger coming from NSEvent modifierFlags.

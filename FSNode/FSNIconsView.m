@@ -1,9 +1,9 @@
 /* FSNIconsView.m
  *  
- * Copyright (C) 2004-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2022 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
- *         Riccardo Mottola <rm@gnu.org>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: March 2004
  *
  * This file is part of the GNUstep FSNode framework
@@ -2146,8 +2146,7 @@ pp.y = NSMaxY(br) + 1; \
     }
 
     [nameEditor setNode: ednode 
-            stringValue: nodeDescr
-                  index: 0];
+            stringValue: nodeDescr];
 
     [nameEditor setBackgroundColor: [NSColor selectedControlColor]];
 
@@ -2176,7 +2175,7 @@ pp.y = NSMaxY(br) + 1; \
     [nameEditor abortEditing];
     [nameEditor setEditable: NO];
     [nameEditor setSelectable: NO];
-    [nameEditor setNode: nil stringValue: @"" index: -1];
+    [nameEditor setNode: nil stringValue: @""];
     [nameEditor removeFromSuperview];
     [self setNeedsDisplayInRect: edrect];
   }
