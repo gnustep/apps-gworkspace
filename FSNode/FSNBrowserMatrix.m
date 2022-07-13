@@ -70,7 +70,7 @@
 						  nil]];
 	}
       editstamp = 0.0;
-      editindex = -1;
+      editIndex = -1;
     }
   
   return self;
@@ -169,107 +169,121 @@
 
 - (void)mouseDown:(NSEvent*)theEvent
 {
+  int clickCount;
+  NSPoint lastLocation;
+  NSInteger row, col;
+
   mouseFlags = [theEvent modifierFlags];
   
-  if (acceptDnd == NO) {
-    [super mouseDown: theEvent];
-    return;
-    
-  } else {
-    int clickCount;
-    NSPoint lastLocation;
-    NSInteger row, col;
-    
-    if (([self numberOfRows] == 0) || ([self numberOfColumns] == 0)) {
+  if (acceptDnd == NO)
+    {
       [super mouseDown: theEvent];
-      return; 
+      return;
     }
 
-    [column stopCellEditing];
-    
-    clickCount = [theEvent clickCount];
+  if (([self numberOfRows] == 0) || ([self numberOfColumns] == 0))
+    {
+      [super mouseDown: theEvent];
+      return;
+    }
 
-    if (clickCount >= 2) {
-      editindex = -1;
+  [column stopCellEditing];
+    
+  clickCount = [theEvent clickCount];
+
+  if (clickCount >= 2)
+    {
+      editIndex = -1;
       [self sendDoubleAction];
       return;
     }
 
-    lastLocation = [theEvent locationInWindow];
-    lastLocation = [self convertPoint: lastLocation
-		                         fromView: nil];
+  lastLocation = [theEvent locationInWindow];
+  lastLocation = [self convertPoint: lastLocation
+			   fromView: nil];
 
-    if ([self getRow: &row column: &col forPoint: lastLocation]) {
+  if ([self getRow: &row column: &col forPoint: lastLocation])
+    {
       FSNBrowserCell *cell = [[self cells] objectAtIndex: row];
       NSRect rect = [self cellFrameAtRow: row column: col];
       
-      if ([cell isEnabled]) {
-        int sz = [cell iconSize];
-        NSSize size = NSMakeSize(sz, sz);
+      if ([cell isEnabled])
+	{
+	  int sz = [cell iconSize];
+	  NSSize size = NSMakeSize(sz, sz);
 
-        rect.size.width = size.width;
-        rect.size.height = size.height;
+	  rect.size.width = size.width;
+	  rect.size.height = size.height;
 
-        if (NSPointInRect(lastLocation, rect)) {
-	  NSEvent *nextEvent;
-          BOOL startdnd = NO;
-          int dragdelay = 0;
+	  if (NSPointInRect(lastLocation, rect))
+	    {
+	      NSEvent *nextEvent;
+	      BOOL startdnd = NO;
+	      int dragdelay = 0;
+
+	      editIndex = -1;
+	      if (!([theEvent modifierFlags] & NSShiftKeyMask))
+		{
+		  [self deselectAllCells];
+		  if (editIndex != row)
+		    {
+		      editIndex = row;
+		    }
+		}
                     
-          if (!([theEvent modifierFlags] & NSShiftKeyMask)) {
-            [self deselectAllCells];   
-            if (editindex != row) {
-              editindex = row;
-            }
-          } else {
-            editindex = -1;
-          }
-                    
-          [self selectCellAtRow: row column: col]; 
-          [self sendAction];
+	      [self selectCellAtRow: row column: col];
+	      [self sendAction];
           
-          while (1) {
-	          nextEvent = [[self window] nextEventMatchingMask:
-    							                    NSLeftMouseUpMask | NSLeftMouseDraggedMask];
+	      while (1)
+		{
+		  nextEvent = [[self window] nextEventMatchingMask:
+					       NSLeftMouseUpMask | NSLeftMouseDraggedMask];
 
-            if ([nextEvent type] == NSLeftMouseUp) {  
-              [[self window] postEvent: nextEvent atStart: NO];
-              break;
+		  if ([nextEvent type] == NSLeftMouseUp)
+		    {
+		      [[self window] postEvent: nextEvent atStart: NO];
+		      break;
 
-            } else if ([nextEvent type] == NSLeftMouseDragged) {
-	            if (dragdelay < 5) {
-                dragdelay++;
-              } else {      
-                editindex = -1;  
-                startdnd = YES;        
-                break;
-              }
-            }
-          }
+		    }
+		  else if ([nextEvent type] == NSLeftMouseDragged)
+		    {
+		      if (dragdelay < 5)
+			{
+			  dragdelay++;
+			}
+		      else
+			{
+			  editIndex = -1;
+			  startdnd = YES;
+			  break;
+			}
+		    }
+		}
 
-          if (startdnd) {  
-            [self startExternalDragOnEvent: theEvent];    
-          } 
+	      if (startdnd)
+		[self startExternalDragOnEvent: theEvent];
                         
-        } else {
-          [super mouseDown: theEvent];
+	    }
+	  else
+	    {
+	      [super mouseDown: theEvent];
           
-          if (editindex != row) {
-            editindex = row;
+	      if (editIndex != row) {
+		editIndex = row;
             
-          } else {
-            NSTimeInterval interval = ([theEvent timestamp] - editstamp);
+	      } else {
+		NSTimeInterval interval = ([theEvent timestamp] - editstamp);
           
-            if ((interval > DOUBLE_CLICK_LIMIT)
-                                && (interval < EDIT_CLICK_LIMIT)) {
-              [column setEditorForCell: cell];
-            } 
-          }
-        }
+		if ((interval > DOUBLE_CLICK_LIMIT)
+		    && (interval < EDIT_CLICK_LIMIT)) {
+		  [column setEditorForCell: cell];
+		}
+	      }
+	    }
         
-        editstamp = [theEvent timestamp];
-      }
+	  editstamp = [theEvent timestamp];
+	}
     }
-  }
 }
 
 - (BOOL)acceptsFirstResponder
@@ -377,7 +391,7 @@
       [self unSelectIconsOfCellsDifferentFrom: nil];
     }
   }
-  
+
   return dragOperation;
 }
 
@@ -416,7 +430,7 @@
 {
   NSPoint location;
   NSInteger row, col;
-  
+
   location = [[self window] mouseLocationOutsideOfEventStream];
   location = [self convertPoint: location fromView: nil];
 
