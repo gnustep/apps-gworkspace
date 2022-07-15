@@ -44,7 +44,7 @@
   NSArray *selection;
   NSString *selectionTitle;
   NSString *extInfoType;
-  
+
   NSImage *icon;
   NSImage *selectedicon;
   NSImage *drawicon;

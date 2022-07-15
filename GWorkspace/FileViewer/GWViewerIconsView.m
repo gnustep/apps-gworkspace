@@ -1,8 +1,9 @@
 /* GWViewerIconsView.m
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2022 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authora: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: June 2004
  *
  * This file is part of the GNUstep GWorkspace application
@@ -32,7 +33,7 @@
 
 - (void)dealloc
 {
-	[super dealloc];
+  [super dealloc];
 }
 
 - (id)initForViewer:(id)vwr

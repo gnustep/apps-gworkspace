@@ -1,8 +1,9 @@
 /* GWViewerShelf.h
  *  
- * Copyright (C) 2004-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2022 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale <enrico@imago.ro>
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: July 2004
  *
  * This file is part of the GNUstep GWorkspace application
@@ -31,7 +32,7 @@
 
 @interface GWViewerShelf : NSView
 {
-	NSMutableArray *icons; 
+  NSMutableArray *icons;
 
   int iconSize;
   int labelTextSize;
@@ -43,9 +44,9 @@
 
   NSRect *grid;
   NSSize gridSize;  
-  int gridcount;
-  int colcount;
-  int rowcount;
+  NSInteger gridCount;
+  NSInteger colCount;
+  NSInteger rowCount;
   
   id focusedIcon;
   NSTextField *focusedIconLabel;  
@@ -54,8 +55,8 @@
   
   NSImage *dragIcon;
   NSPoint dragPoint;
-  int insertIndex;
-	BOOL dragLocalIcon;
+  NSInteger insertIndex;
+  BOOL dragLocalIcon;
   BOOL isDragTarget;
 
   NSColor *backColor;
@@ -76,10 +77,10 @@
 - (NSArray *)contentsInfo;
 
 - (id)addIconForNode:(FSNode *)node
-             atIndex:(int)index;
+             atIndex:(NSInteger)index;
 
 - (id)addIconForSelection:(NSArray *)selection
-                  atIndex:(int)index;
+                  atIndex:(NSInteger)index;
 
 - (id)iconForNode:(FSNode *)node;
 
@@ -93,17 +94,17 @@
 
 - (void)makeIconsGrid;
 
-- (int)firstFreeGridIndex;
+- (NSInteger)firstFreeGridIndex;
 
-- (int)firstFreeGridIndexAfterIndex:(int)index;
+- (NSInteger)firstFreeGridIndexAfterIndex:(NSInteger)index;
 
-- (BOOL)isFreeGridIndex:(int)index;
+- (BOOL)isFreeGridIndex:(NSInteger)index;
 
-- (id)iconWithGridIndex:(int)index;
+- (id)iconWithGridIndex:(NSInteger)index;
 
-- (int)indexOfGridRectContainingPoint:(NSPoint)p;
+- (NSInteger)indexOfGridRectContainingPoint:(NSPoint)p;
 
-- (NSRect)iconBoundsInGridAtIndex:(int)index;
+- (NSRect)iconBoundsInGridAtIndex:(NSInteger)index;
 
 - (void)tile;
 

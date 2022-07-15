@@ -883,7 +883,7 @@ static NSImage *branchImage;
 {
   if (selection) {
     NSMutableArray *selpaths = [NSMutableArray array];
-    int i;
+    NSUInteger i;
 
     for (i = 0; i < [selection count]; i++) {
       [selpaths addObject: [[selection objectAtIndex: i] path]];
