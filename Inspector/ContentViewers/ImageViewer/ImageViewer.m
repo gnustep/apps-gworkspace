@@ -1,6 +1,6 @@
 /* ImageViewer.m
  *  
- * Copyright (C) 2004-2021 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2022 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola <rm@gnu.org>
@@ -37,8 +37,7 @@
   RELEASE (imagePath);	
   RELEASE (image);	
   RELEASE (nextPath);	
-  RELEASE (editPath);	
-  RELEASE (extsarr);
+  RELEASE (editPath);
   RELEASE (imview);
   RELEASE (errLabel);
   RELEASE (progView);
@@ -122,9 +121,6 @@
     [editButt setEnabled: NO];		
 		[self addSubview: editButt]; 
     RELEASE (editButt);
-
-    ASSIGN (extsarr, ([NSArray arrayWithObjects: @"tiff", @"tif", @"png", 
-                                            @"jpeg", @"jpg", @"gif", nil]));
 
     inspector = insp;
     fm = [NSFileManager defaultManager];
@@ -324,7 +320,7 @@
 		return NO;
 	}
 
-  if ([extsarr containsObject: [extension lowercaseString]]) {
+  if ([[NSImage imageFileTypes] containsObject: [extension lowercaseString]]) {
     return YES;
   }
 
