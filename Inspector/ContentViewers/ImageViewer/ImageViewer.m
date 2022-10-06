@@ -211,6 +211,12 @@
   if (imginfo == nil)
     return;
 
+  if ([imagePath isEqualToString:[imginfo objectForKey: @"imgpath"]] == NO)
+    {
+      NSLog(@"ImageViewer: trying to display inconsistent image");
+      return;
+    }
+
   imgdata = [imginfo objectForKey:@"imgdata"];
   imgok = NO;
   if (imgdata)

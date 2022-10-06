@@ -109,6 +109,7 @@
       
       [info setObject: [NSNumber numberWithFloat: (float)srcSizeW] forKey: @"width"];
       [info setObject: [NSNumber numberWithFloat: (float)srcSizeH] forKey: @"height"];
+      [info setObject: path forKey: @"imgpath"];
       
       if (((imsize.width < srcSizeW) || (imsize.height < srcSizeH))
           && (((srcSpp == 3) && (bitsPerPixel == 24)) 
