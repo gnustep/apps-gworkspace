@@ -203,17 +203,6 @@
   RELEASE (pool);
 }
 
-- (void)displayLastPath:(BOOL)forced
-{
-  if (editPath) {
-    if (forced) {
-      [self displayPath: editPath];
-    } else {
-      [inspector contentsReadyAt: editPath];
-    }
-  }
-}
-
 - (void)displayData:(NSData *)data 
              ofType:(NSString *)type
 {

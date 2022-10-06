@@ -1,3 +1,17 @@
+2022-10-06  Riccardo Mottola <rm@gnu.org>
+	* Inspector/ContentViewers/AppViewer/AppViewer.m
+	* Inspector/ContentViewers/FolderViewer/FolderViewer.m
+	* Inspector/ContentViewers/IBViewViewer/IBViewViewer.m
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.m
+	* Inspector/ContentViewers/NSColorViewer/NSColorViewer.m
+	* Inspector/ContentViewers/NSRTFViewer/NSRTFViewer.m
+	* Inspector/ContentViewers/NSTIFFViewer/NSTIFFViewer.m
+	* Inspector/ContentViewers/PdfViewer/PdfViewer.m
+	* Inspector/ContentViewers/RtfViewer/RtfViewer.m
+	* Inspector/ContentViewers/SoundViewer/SoundViewer.m
+	* Inspector/ContentViewersProtocol.h
+	* Inspector/Contents.m
+
 2022-07-12  Riccardo Mottola <rm@gnu.org>
 
 	* FSNode/FSNIcon.h

@@ -108,10 +108,6 @@
 {
 }
 
-- (void)displayLastPath:(BOOL)forced
-{
-}
-
 - (void)displayData:(NSData *)data 
              ofType:(NSString *)type
 {

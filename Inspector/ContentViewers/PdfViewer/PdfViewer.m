@@ -262,17 +262,6 @@ const double PDFResolution = 72.0;
   }
 }
 
-- (void)displayLastPath:(BOOL)forced
-{
-  if (pdfPath) {
-    if (forced) {
-      [self displayPath: pdfPath];
-    } else {
-      [inspector contentsReadyAt: pdfPath];
-    }
-  }
-}
-
 - (void)goToPage:(id)sender
 {
   NSImage *image = nil;

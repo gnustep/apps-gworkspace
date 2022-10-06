@@ -239,17 +239,6 @@
   DESTROY (snd);
 }
 
-- (void)displayLastPath:(BOOL)forced
-{
-  if (soundPath) {
-    if (forced) {
-      [self displayPath: soundPath];
-    } else {
-      [inspector contentsReadyAt: soundPath];
-    }
-  }
-}
-
 - (void)displayData:(NSData *)data 
              ofType:(NSString *)type
 {

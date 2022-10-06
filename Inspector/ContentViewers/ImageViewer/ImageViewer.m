@@ -184,17 +184,6 @@
     }
 }
 
-- (void)displayLastPath:(BOOL)forced
-{
-  if (editPath) {
-    if (forced) {
-      [self displayPath: editPath];
-    } else {
-      [imview setImage: image];
-      [inspector contentsReadyAt: editPath];
-    }
-  }
-}
 
 - (oneway void)setResizer:(id)anObject
 {

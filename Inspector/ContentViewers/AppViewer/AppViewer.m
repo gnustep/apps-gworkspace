@@ -231,11 +231,6 @@
     }
 }
 
-- (void)displayLastPath:(BOOL)forced
-{
-  [self displayPath: currentPath];
-}
-
 - (void)displayData:(NSData *)data 
              ofType:(NSString *)type
 {

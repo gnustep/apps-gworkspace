@@ -239,11 +239,7 @@ static NSString *nibName = @"Contents";
       winName = [viewer winname];
       [viewersBox setContentView: viewer];
     
-      if ([path isEqual: [viewer currentPath]]) {
-        [viewer displayLastPath: NO];
-      } else {
-			  [viewer displayPath: path];
-      }
+      [viewer displayPath: path];
 		} else {
       FSNode *node = [FSNode nodeWithPath: path];
       NSImage *icon = [[FSNodeRep sharedInstance] iconOfSize: ICNSIZE forNode: node];

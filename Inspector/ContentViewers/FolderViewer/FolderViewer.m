@@ -149,13 +149,6 @@
 	[matrix selectCellAtRow: [self sortTypeForPath: path] column: 0];
 }
 
-- (void)displayLastPath:(BOOL)forced
-{
-  if (currentPath) {
-    [self displayPath: currentPath];
-  }
-}
-
 - (void)displayData:(NSData *)data 
              ofType:(NSString *)type
 {
