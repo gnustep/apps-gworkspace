@@ -292,9 +292,10 @@ static FSNodeRep *shared = nil;
 
 + (FSNodeRep *)sharedInstance
 {
-	if (shared == nil) {
-		shared = [[FSNodeRep alloc] initSharedInstance];
-	}	
+  if (shared == nil)
+    {
+      shared = [[FSNodeRep alloc] initSharedInstance];
+    }
   return shared;
 }
 
@@ -474,58 +475,66 @@ static FSNodeRep *shared = nil;
 {
   NSString *path = [node path];
     
-	if ([lockedPaths containsObject: path] == NO) {
-		[lockedPaths addObject: path];
-	} 
+  if ([lockedPaths containsObject: path] == NO)
+    {
+      [lockedPaths addObject: path];
+    }
 }
 
 - (void)lockPath:(NSString *)path
 {
-	if ([lockedPaths containsObject: path] == NO) {
-		[lockedPaths addObject: path];
-	} 
+  if ([lockedPaths containsObject: path] == NO)
+    {
+      [lockedPaths addObject: path];
+    }
 }
 
 - (void)lockNodes:(NSArray *)nodes
 {
   NSUInteger i;
 	  
-	for (i = 0; i < [nodes count]; i++) {
-    NSString *path = [[nodes objectAtIndex: i] path];
+  for (i = 0; i < [nodes count]; i++)
+    {
+      NSString *path = [[nodes objectAtIndex: i] path];
     
-		if ([lockedPaths containsObject: path] == NO) {
-			[lockedPaths addObject: path];
-		} 
+      if ([lockedPaths containsObject: path] == NO)
+	{
+	  [lockedPaths addObject: path];
 	}
+    }
 }
 
 - (void)lockPaths:(NSArray *)paths
 {
-	int i;
+  NSUInteger i;
 	  
-	for (i = 0; i < [paths count]; i++) {
-    NSString *path = [paths objectAtIndex: i];
+  for (i = 0; i < [paths count]; i++)
+    {
+      NSString *path = [paths objectAtIndex: i];
     
-		if ([lockedPaths containsObject: path] == NO) {
-			[lockedPaths addObject: path];
-		} 
+      if ([lockedPaths containsObject: path] == NO)
+	{
+	  [lockedPaths addObject: path];
 	}
+    }
 }
 
 - (void)unlockNode:(FSNode *)node
 {
   NSString *path = [node path];
 
-	if ([lockedPaths containsObject: path]) {
-		[lockedPaths removeObject: path];
-	} 
+  if ([lockedPaths containsObject: path])
+    {
+      [lockedPaths removeObject: path];
+    }
 }
 
 - (void)unlockPath:(NSString *)path
 {
-	if ([lockedPaths containsObject: path]) {
-		[lockedPaths removeObject: path];
-	} 
+  if ([lockedPaths containsObject: path])
+    {
+      [lockedPaths removeObject: path];
+    }
 }
 
 - (void)unlockNodes:(NSArray *)nodes
@@ -536,9 +545,10 @@ static FSNodeRep *shared = nil;
     {
       NSString *path = [[nodes objectAtIndex: i] path];
 	
-		if ([lockedPaths containsObject: path]) {
-			[lockedPaths removeObject: path];
-		} 
+      if ([lockedPaths containsObject: path])
+	{
+	  [lockedPaths removeObject: path];
+	}
     }
 }
 
