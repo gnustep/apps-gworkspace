@@ -263,7 +263,7 @@ static id <DesktopApplication> desktopApp = nil;
       if (visibleNodes)
 	{
 	  NSUInteger i;
-	  NSUInteger count = [visibleNodes count];
+	  NSInteger count = [visibleNodes count];
       
 	  for (i = 0; i < count; i++)
 	    {
@@ -311,7 +311,7 @@ static id <DesktopApplication> desktopApp = nil;
   NSArray *subNodes = [shownNode subNodes];
   NSUInteger count = [subNodes count];
   SEL compSel = [fsnodeRep compareSelectorForDirectory: [shownNode path]];
-  NSUInteger i;
+  NSInteger i;
 
   if ([matrix numberOfColumns] > 0)
     [matrix removeColumn: 0];
@@ -800,7 +800,7 @@ static id <DesktopApplication> desktopApp = nil;
       NSInteger n = [matrix numberOfRows];
       NSInteger s = [matrix selectedRow];
       NSString *cellStr = nil;
-      NSUInteger i = 0;
+      NSInteger i = 0;
 
       // Nothing eselected
       if (s != -1)

@@ -1144,26 +1144,30 @@ static NSImage *branchImage;
 
 - (void)checkLocked
 {
-  if (selection == nil) {
-    [self setLocked: [node isLocked]];
-    
-  } else {
-    int i;
-    
-    [self setLocked: NO];
-    
-    for (i = 0; i < [selection count]; i++) {
-      if ([[selection objectAtIndex: i] isLocked]) {
-        [self setLocked: YES];
-        break;
-      }
+  if (selection == nil)
+    {
+      [self setLocked: [node isLocked]];
     }
-  }
+  else
+    {
+      NSUInteger i;
+    
+      [self setLocked: NO];
+    
+      for (i = 0; i < [selection count]; i++)
+	{
+	  if ([[selection objectAtIndex: i] isLocked])
+	    {
+	      [self setLocked: YES];
+	      break;
+	    }
+	}
+    }
 }
 
 - (BOOL)isLocked
 {
-	return isLocked;
+  return isLocked;
 }
 
 - (void)setGridIndex:(NSUInteger)index
@@ -1509,7 +1513,7 @@ static NSImage *branchImage;
     [self setNeedsDisplay: YES];   
   }
   
-	onSelf = NO;
+  onSelf = NO;
 }
 
 - (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender

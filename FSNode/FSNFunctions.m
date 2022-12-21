@@ -118,7 +118,7 @@ NSString *sizeDescription(unsigned long long size)
 NSArray *makePathsSelection(NSArray *selnodes)
 {
   NSMutableArray *selpaths = [NSMutableArray array]; 
-  int i;
+  NSUInteger i;
 
   for (i = 0; i < [selnodes count]; i++) {
     [selpaths addObject: [[selnodes objectAtIndex: i] path]];
@@ -129,7 +129,7 @@ NSArray *makePathsSelection(NSArray *selnodes)
 
 double myrintf(double a)
 {
-	return (floor(a + 0.5));         
+  return (floor(a + 0.5));
 }
 
 
