@@ -208,17 +208,18 @@
   BOOL imgok;
   NSString *lastPath;
 
-  if (imginfo == nil)
-    return;
+  imgok = NO;
 
-  if ([imagePath isEqualToString:[imginfo objectForKey: @"imgpath"]] == NO)
+  if (nil != imginfo)
     {
-      NSLog(@"ImageViewer: trying to display inconsistent image");
-      return;
+      imgdata = [imginfo objectForKey:@"imgdata"];
+      if ([imagePath isEqualToString:[imginfo objectForKey: @"imgpath"]] == NO)
+	{
+	  NSLog(@"ImageViewer: trying to display inconsistent image");
+	  imgdata = nil;
+	}
     }
 
-  imgdata = [imginfo objectForKey:@"imgdata"];
-  imgok = NO;
   if (imgdata)
     {
       if ([self superview])
@@ -257,7 +258,6 @@
         }
     }
 
-  
   if (imgok == NO) {
     if (valid == YES) {
       valid = NO;
