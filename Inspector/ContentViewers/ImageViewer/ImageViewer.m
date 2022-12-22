@@ -33,10 +33,9 @@
 
 - (void)dealloc
 {
-  DESTROY (resizer);    
-  RELEASE (imagePath);	
-  RELEASE (image);	
-  RELEASE (nextPath);	
+  DESTROY (resizer);
+  RELEASE (imagePath);
+  RELEASE (image);
   RELEASE (editPath);
   RELEASE (imview);
   RELEASE (errLabel);
@@ -130,14 +129,13 @@
     
     resizer = nil;
     imagePath = nil;
-    nextPath = nil;
     editPath = nil;
     image = nil;
     
     [self setContextHelp];
   }
 	
-	return self;
+  return self;
 }
 
 - (void)displayPath:(NSString *)path
@@ -147,14 +145,7 @@
   [widthLabel setStringValue: @""];
   [heightLabel setStringValue: @""];
   
-  if (imagePath)
-    {
-      ASSIGN (nextPath, path);
-      return;
-    }
-  
   ASSIGN (imagePath, path);
-
   if (conn == nil)
     {
       NSPort *p1;
@@ -206,17 +197,16 @@
 {
   NSData *imgdata;
   BOOL imgok;
-  NSString *lastPath;
 
   imgok = NO;
-
+  imgdata = nil;
   if (nil != imginfo)
     {
       imgdata = [imginfo objectForKey:@"imgdata"];
       if ([imagePath isEqualToString:[imginfo objectForKey: @"imgpath"]] == NO)
 	{
 	  NSLog(@"ImageViewer: trying to display inconsistent image");
-	  imgdata = nil;
+	  return;
 	}
     }
 
@@ -255,6 +245,7 @@
           ASSIGN (editPath, imagePath);
           [editButt setEnabled: YES];		
           [[self window] makeFirstResponder: editButt];
+	  DESTROY (imagePath);
         }
     }
 
@@ -265,21 +256,12 @@
       [self addSubview: errLabel];
       [widthLabel setStringValue: @""];
       [heightLabel setStringValue: @""];
-      [editButt setEnabled: NO];		
+      [editButt setEnabled: NO];
     }
   }
   
   [progView stop];
   [progView removeFromSuperview];  
-  
-  lastPath = [NSString stringWithString: imagePath];
-  DESTROY (imagePath);
-
-  if (nextPath && ([nextPath isEqual: lastPath] == NO)) {
-    NSString *next = [NSString stringWithString: nextPath];
-    DESTROY (nextPath);    
-    [self displayPath: next];
-  }
 }
 
 - (void)displayData:(NSData *)data 

@@ -67,7 +67,6 @@
   NSButton *editButt;
   
   NSString *imagePath;
-  NSString *nextPath;
   NSString *editPath;
   
   NSConnection *conn;  

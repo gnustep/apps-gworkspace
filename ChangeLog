@@ -1,4 +1,11 @@
-2022-10-06  Riccardo Mottola <rm@gnu.org>
+2022-12-22  Riccardo Mottola <rm@gnu.org>
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.h
+	* Inspector/ContentViewers/ImageViewer/ImageViewer.m:
+	Cleanup checking of image consistency, remove lastPath.
+	If the image isn't the current one, don't show it invalid:
+	we suppose another resizer task is running in the background.
+
+2022-12-21  Riccardo Mottola <rm@gnu.org>
 	* Inspector/ContentViewers/ImageViewer/ImageViewer.m
 	Try to handle failure of resized image better.
 
