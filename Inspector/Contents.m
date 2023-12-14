@@ -1,8 +1,10 @@
 /* Contents.m
  *  
- * Copyright (C) 2004-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2023 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
+ * Author: Riccardo Mottola <rm@gnu.org>
+ *
  * Date: January 2004
  *
  * This file is part of the GNUstep GWorkspace application
@@ -63,68 +65,89 @@ static NSString *nibName = @"Contents";
 {
   self = [super init];
   
-  if (self) {
-    NSBundle *bundle;
-    NSEnumerator *enumerator;
-    NSString *imagepath;
-    NSString *bundlesDir;
-    NSArray *bnames;
-    id label;
-    unsigned i;
-    NSRect r;
+  if (self)
+    {
+      NSBundle *bundle;
+      NSEnumerator *enumerator;
+      NSString *imagepath;
+      NSString *bundlesDir;
+      NSArray *bnames;
+      id label;
+      unsigned i;
+      NSRect r;
 
-    if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
-      NSLog(@"failed to load %@!", nibName);
-      [NSApp terminate: self];
-    } 
+      if ([NSBundle loadNibNamed: nibName owner: self] == NO)
+        {
+          NSLog(@"failed to load %@!", nibName);
+          [NSApp terminate: self];
+        }
 
-    RETAIN (mainBox);
-    RELEASE (win);
-    
-    inspector = insp;
-    [iconView setInspector: inspector];
-    viewers = [NSMutableArray new];
-    currentPath = nil;
+      RETAIN (mainBox);
+      RELEASE (win);
 
-    fm = [NSFileManager defaultManager];	
-    ws = [NSWorkspace sharedWorkspace];
+      inspector = insp;
+      [iconView setInspector: inspector];
+      viewers = [NSMutableArray new];
+      currentPath = nil;
 
-    bundle = [NSBundle bundleForClass: [inspector class]];
-    imagepath = [bundle pathForResource: @"Pboard" ofType: @"tiff"];
-    pboardImage = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
-        
-    r = [[viewersBox contentView] bounds];
+      fm = [NSFileManager defaultManager];
+      ws = [NSWorkspace sharedWorkspace];
 
-    enumerator = [NSSearchPathForDirectoriesInDomains
-      (NSLibraryDirectory, NSAllDomainsMask, YES) objectEnumerator];
-    while ((bundlesDir = [enumerator nextObject]) != nil)
-      {
-	bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
-	bnames = [fm directoryContentsAtPath: bundlesDir];
+      bundle = [NSBundle bundleForClass: [inspector class]];
+      imagepath = [bundle pathForResource: @"Pboard" ofType: @"tiff"];
+      pboardImage = [[NSImage alloc] initWithContentsOfFile: imagepath];
 
-	for (i = 0; i < [bnames count]; i++) {
-	  NSString *bname = [bnames objectAtIndex: i];
+      r = [[viewersBox contentView] bounds];
+
+      enumerator = [NSSearchPathForDirectoriesInDomains
+                     (NSLibraryDirectory, NSAllDomainsMask, YES) objectEnumerator];
+      while ((bundlesDir = [enumerator nextObject]) != nil)
+        {
+          bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
+          bnames = [fm directoryContentsAtPath: bundlesDir];
+
+          for (i = 0; i < [bnames count]; i++)
+            {
+              NSString *bname = [bnames objectAtIndex: i];
 	
-	  if ([[bname pathExtension] isEqual: @"inspector"]) {
-	    NSString *bpath = [bundlesDir stringByAppendingPathComponent: bname];
-	    
-	    bundle = [NSBundle bundleWithPath: bpath]; 
-	  
-	    if (bundle) {
-	      Class principalClass = [bundle principalClass];
-	    
-	      if ([principalClass conformsToProtocol: @protocol(ContentViewersProtocol)]) {	
-                CREATE_AUTORELEASE_POOL (pool);
-		id vwr = [[principalClass alloc] initWithFrame: r inspector: self];
-	    
-		[viewers addObject: vwr];            
-		[vwr release];	
-		RELEASE (pool);		
-	      }
-	    }
+              if ([[bname pathExtension] isEqual: @"inspector"])
+                {
+                  NSString *bpath = [bundlesDir stringByAppendingPathComponent: bname];
+
+                  bundle = [NSBundle bundleWithPath: bpath];
+
+                  if (bundle)
+                    {
+                      Class principalClass = [bundle principalClass];
+
+                      if ([principalClass conformsToProtocol: @protocol(ContentViewersProtocol)])
+                        {
+                          CREATE_AUTORELEASE_POOL (pool);
+                          id vwr = [[principalClass alloc] initWithFrame: r inspector: self];
+
+                          [viewers addObject: vwr];
+                          [vwr release];
+                          RELEASE (pool);
+                        }
+                    }
+                }
+            }
+        }
+
+    // We reorter viewers and put the ImageViewer at the end, so that specialized viewers,
+    // e.g. PDF Viewer, can take precedence
+    // String comparison, so no class import is needed
+    for (i = 0; i < [viewers count]; i++)
+      {
+        id vwr = [viewers objectAtIndex: i];
+
+        if ([NSStringFromClass([vwr class]) isEqualToString:@"ImageViewer"])
+          {
+            [viewers removeObjectAtIndex: i];
+            [viewers addObject: vwr];
+            break;
           }
-	}
-    }
+      }
 
     textViewer = [[TextViewer alloc] initWithFrame: r forInspector: self];					
     genericView = [[GenericView alloc] initWithFrame: r];					
@@ -171,7 +194,7 @@ static NSString *nibName = @"Contents";
       DESTROY (currentPath);
     }    
 	
-	  [[inspector win] setTitle: [self winname]];    
+    [[inspector win] setTitle: [self winname]];
   }
 }
 
@@ -197,7 +220,7 @@ static NSString *nibName = @"Contents";
 
 - (id)viewerForDataOfType:(NSString *)type
 {
-  NSInteger i;
+  NSUInteger i;
   
   for (i = 0; i < [viewers count]; i++)
     {
