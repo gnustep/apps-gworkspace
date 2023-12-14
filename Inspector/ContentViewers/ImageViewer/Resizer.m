@@ -1,6 +1,6 @@
 /* Resizer.m
  *  
- * Copyright (C) 2005-2020 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2023 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola <rm@gnu.org>
@@ -75,7 +75,7 @@
                 setSize:(NSSize)imsize
 {
   CREATE_AUTORELEASE_POOL(arp);
-  NSMutableDictionary *info = [NSMutableDictionary dictionary];
+  NSMutableDictionary *info = nil;
   NSImage *srcImage = [[NSImage alloc] initWithContentsOfFile: path];
 
   if (srcImage && [srcImage isValid])
@@ -90,7 +90,9 @@
       NSInteger srcBytesPerRow;
       NSEnumerator *repEnum;
       NSImageRep *imgRep;
-    
+
+      info = [NSMutableDictionary dictionary];
+
       repEnum = [[srcImage representations] objectEnumerator];
       srcImageRep = nil;
       imgRep = nil;
