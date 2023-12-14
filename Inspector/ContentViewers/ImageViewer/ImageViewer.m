@@ -282,26 +282,29 @@
 - (BOOL)canDisplayPath:(NSString *)path
 {
   NSDictionary *attributes;
-	NSString *defApp, *fileType, *extension;
+  NSString *defApp, *fileType, *extension;
 
   attributes = [fm fileAttributesAtPath: path traverseLink: YES];
-  if ([attributes objectForKey: NSFileType] == NSFileTypeDirectory) {
-    return NO;
-  }		
+  if ([attributes objectForKey: NSFileType] == NSFileTypeDirectory)
+    {
+      return NO;
+    }
 		
-	[ws getInfoForFile: path application: &defApp type: &fileType];
-	extension = [path pathExtension];
+  [ws getInfoForFile: path application: &defApp type: &fileType];
+  extension = [path pathExtension];
 	
   if (([fileType isEqual: NSPlainFileType] == NO)
-                  && ([fileType isEqual: NSShellCommandFileType] == NO)) {
-		return NO;
-	}
+      && ([fileType isEqual: NSShellCommandFileType] == NO))
+    {
+      return NO;
+    }
 
-  if ([[NSImage imageFileTypes] containsObject: [extension lowercaseString]]) {
-    return YES;
-  }
+  if ([[NSImage imageFileTypes] containsObject: [extension lowercaseString]])
+    {
+      return YES;
+    }
 
-	return NO;
+  return NO;
 }
 
 - (BOOL)canDisplayDataOfType:(NSString *)type
@@ -311,12 +314,12 @@
 
 - (NSString *)winname
 {
-	return NSLocalizedString(@"Image Inspector", @"");	
+  return NSLocalizedString(@"Image Inspector", @"");
 }
 
 - (NSString *)description
 {
-	return NSLocalizedString(@"This Inspector allow you view the content of an Image file", @"");	
+  return NSLocalizedString(@"This Inspector allow you view the content of an Image file", @"");
 }
 
 - (void)editFile:(id)sender
@@ -329,11 +332,11 @@
   if (appName) {
     NS_DURING
       {
-    [ws openFile: editPath withApplication: appName];
+        [ws openFile: editPath withApplication: appName];
       }
     NS_HANDLER
       {
-    NSRunAlertPanel(NSLocalizedString(@"error", @""), 
+        NSRunAlertPanel(NSLocalizedString(@"error", @""),
         [NSString stringWithFormat: @"%@ %@!", 
           NSLocalizedString(@"Can't open ", @""), [editPath lastPathComponent]],
                                       NSLocalizedString(@"OK", @""), 
