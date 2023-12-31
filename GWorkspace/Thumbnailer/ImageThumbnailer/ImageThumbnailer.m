@@ -46,7 +46,17 @@
 - (NSData *)makeThumbnailForPath:(NSString *)path
 {
   CREATE_AUTORELEASE_POOL(arp);
-  NSImage *image = [[NSImage alloc] initWithContentsOfFile: path];
+
+  NSImage *image = [NSImage alloc];
+
+  @try
+    {
+      [image initWithContentsOfFile: path];
+    }
+  @catch (NSException *exception)
+    {
+      NSLog(@"Error while loading image %@: Caught %@: %@", path,  [exception name], [exception reason]);
+    }
 
   if (image && [image isValid])
     {
