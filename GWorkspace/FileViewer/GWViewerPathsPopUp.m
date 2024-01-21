@@ -48,13 +48,13 @@
     } else {
       progPath = [progPath stringByAppendingPathComponent: path];
     }
-  
+
     [item setTitle: path];
     [item setRepresentedObject: progPath]; 
     [menu addItem: item];
     RELEASE (item);  
   }
-  
+
   [self selectItemAtIndex: ([components count] - 1)];
 }
 
@@ -62,30 +62,32 @@
 {
   NSArray *items = [[self menu] itemArray];
   int i;
-  
-  for (i = 0; i < [items count]; i++) {
-    [[items objectAtIndex: i] setEnabled: enabled];
-  }
+
+  for (i = 0; i < [items count]; i++)
+    {
+      [[items objectAtIndex: i] setEnabled: enabled];
+    }
 }
 
 - (BOOL)closeViewer
 {
-	return closeViewer;
+  return closeViewer;
 }
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
   RETAIN (self);
 
-	closeViewer = (([theEvent modifierFlags] == NSAlternateKeyMask)
-                          || ([theEvent modifierFlags] == NSControlKeyMask));
-                          
+  closeViewer = (([theEvent modifierFlags] == NSAlternateKeyMask)
+		 || ([theEvent modifierFlags] == NSControlKeyMask));
+
   [super mouseDown: theEvent];
 
-  if ([self superview]) {
-    [self selectItemAtIndex: ([self numberOfItems] - 1)];
-  } 
-  
+  if ([self superview])
+    {
+      [self selectItemAtIndex: ([self numberOfItems] - 1)];
+    }
+
   RELEASE (self);
 }
 

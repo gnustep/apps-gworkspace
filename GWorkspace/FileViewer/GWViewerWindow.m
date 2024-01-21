@@ -37,7 +37,7 @@
 - (id)init
 {
   unsigned int style = NSTitledWindowMask | NSClosableWindowMask 
-				                  | NSMiniaturizableWindowMask | NSResizableWindowMask;
+    | NSMiniaturizableWindowMask | NSResizableWindowMask;
 
   self = [super initWithContentRect: NSZeroRect
                           styleMask: style
@@ -155,36 +155,43 @@
 - (void)keyDown:(NSEvent *)theEvent 
 {
   unsigned flags = [theEvent modifierFlags];
-	NSString *characters = [theEvent characters];
+  NSString *characters = [theEvent characters];
   unichar character = 0;
 		
-  if ([characters length] > 0) {
-		character = [characters characterAtIndex: 0];
-	}
+  if ([characters length] > 0)
+    {
+      character = [characters characterAtIndex: 0];
+    }
 		
-	switch (character) {
+  switch (character)
+    {
     case NSLeftArrowFunctionKey:
-			if ((flags & NSCommandKeyMask) || (flags & NSControlKeyMask)) {
-        [[self delegate] goBackwardInHistory];
-			}
+      if ((flags & NSCommandKeyMask) || (flags & NSControlKeyMask))
+	{
+	  [[self delegate] goBackwardInHistory];
+	}
       return;
 
     case NSRightArrowFunctionKey:			
-			if ((flags & NSCommandKeyMask) || (flags & NSControlKeyMask)) {
-        [[self delegate] goForwardInHistory];
-	    } 
-			return;
-      
-    case NSBackspaceKey:			
-      if (flags & NSShiftKeyMask) {
-        [[self delegate] emptyTrash];
-      } else {
-        [[self delegate] recycleFiles];
-      }
+      if ((flags & NSCommandKeyMask) || (flags & NSControlKeyMask))
+	{
+	  [[self delegate] goForwardInHistory];
+	} 
       return;
+
+    case NSBackspaceKey:
+      if (flags & NSShiftKeyMask)
+	{
+	  [[self delegate] emptyTrash];
 	}
+      else
+	{
+	  [[self delegate] recycleFiles];
+	}
+      return;
+    }
 	
-	[super keyDown: theEvent];
+  [super keyDown: theEvent];
 }
 
 - (void)print:(id)sender
