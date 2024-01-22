@@ -669,26 +669,27 @@
   NSNumber *freefs = [attributes objectForKey: NSFileSystemFreeSize];
   NSString *labelstr;
   
-	if (freefs == nil) {  
-		labelstr = NSLocalizedString(@"unknown volume size", @"");    
-	} else {
-    unsigned long long freeSize = [freefs unsignedLongLongValue];
-    unsigned systemType = [fsnodeRep systemType];
-    
-    switch (systemType)
+  if (freefs == nil)
     {
-      case NSMACHOperatingSystem:
-        freeSize = (freeSize >> 8);
-        break;
-        
-      default:
-        break;
+      labelstr = NSLocalizedString(@"unknown volume size", @"");
     }
-    
-		labelstr = [NSString stringWithFormat: @"%@ %@", 
-                                      sizeDescription(freeSize),
-                                            NSLocalizedString(@"free", @"")];
+  else
+    {
+      unsigned long long freeSize = [freefs unsignedLongLongValue];
+      unsigned systemType = [fsnodeRep systemType];
+
+      switch (systemType)
+	{
+	case NSMACHOperatingSystem:
+	  freeSize = (freeSize >> 8);
+	  break;
+	default:
+	  break;
 	}
+      labelstr = [NSString stringWithFormat: @"%@ %@",
+			   sizeDescription(freeSize),
+			   NSLocalizedString(@"free", @"")];
+    }
 
   [split updateDiskSpaceInfo: labelstr];
 }
@@ -724,7 +725,7 @@
       destination = [destination stringByDeletingLastPathComponent]; 
     }
 
-    if ([operation isEqual: NSWorkspaceMoveOperation] 
+    if ([operation isEqual: NSWorkspaceMoveOperation]
           || [operation isEqual: NSWorkspaceCopyOperation]
           || [operation isEqual: NSWorkspaceLinkOperation]
           || [operation isEqual: NSWorkspaceDuplicateOperation]
@@ -1421,37 +1422,46 @@ constrainMinCoordinate:(CGFloat)proposedMin
 
 - (void)selectAllInViewer
 {
-	[nodeView selectAll];
+  [nodeView selectAll];
 }
 
 - (void)showTerminal
 {
   NSString *path;
 
-  if ([nodeView isSingleNode]) {
-	  path = [[nodeView shownNode] path];
-    
-  } else {
-    NSArray *selection = [nodeView selectedNodes];
-    
-    if (selection) {
-      FSNode *node = [selection objectAtIndex: 0];
-      
-      if ([selection count] > 1) {
-        path = [node parentPath];
-        
-      } else {
-        if ([node isDirectory] && ([node isPackage] == NO)) {
-          path = [node path];
-      
-        } else {
-          path = [node parentPath];
-        }
-      }
-    } else {
+  if ([nodeView isSingleNode])
+    {
       path = [[nodeView shownNode] path];
     }
-  }
+  else
+    {
+      NSArray *selection = [nodeView selectedNodes];
+
+      if (selection)
+	{
+	  FSNode *node = [selection objectAtIndex: 0];
+
+	  if ([selection count] > 1)
+	    {
+	      path = [node parentPath];
+	    }
+	  else
+	    {
+	      if ([node isDirectory] && ([node isPackage] == NO))
+		{
+		  path = [node path];
+		}
+	      else
+		{
+		  path = [node parentPath];
+		}
+	    }
+	}
+      else
+	{
+	  path = [[nodeView shownNode] path];
+	}
+    }
 
   [gworkspace startXTermOnDirectory: path];
 }

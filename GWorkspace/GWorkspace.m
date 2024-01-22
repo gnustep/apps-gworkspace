@@ -705,17 +705,17 @@ static GWorkspace *gworkspace = nil;
 
 - (NSString *)defEditor
 {
-	return defEditor;
+  return defEditor;
 }
 
 - (NSString *)defXterm
 {
-	return defXterm;
+  return defXterm;
 }
 
 - (NSString *)defXtermArgs
 {
-	return defXtermArgs;
+  return defXtermArgs;
 }
 
 - (GWViewersManager *)viewersManager
@@ -730,7 +730,7 @@ static GWorkspace *gworkspace = nil;
 
 - (History *)historyWindow
 {
-	return history;
+  return history;
 }
 
 - (id)rootViewer
@@ -770,7 +770,6 @@ static GWorkspace *gworkspace = nil;
   
   if (viewer == nil)
     viewer = [vwrsManager showRootViewer];
-  
   
   nodeView = [viewer nodeView];
   [nodeView showContentsOfNode: parentnode];
@@ -815,11 +814,11 @@ static GWorkspace *gworkspace = nil;
 {
   NSString *tshelfPBFileNName;
 
-	tshelfPBFileNum++;
-  
-	if (tshelfPBFileNum >= TSHF_MAXF) {
-		tshelfPBFileNum = 0;
-	}
+  tshelfPBFileNum++;
+  if (tshelfPBFileNum >= TSHF_MAXF)
+    {
+      tshelfPBFileNum = 0;
+    }
   
   tshelfPBFileNName = [NSString stringWithFormat: @"%i", tshelfPBFileNum];
   
@@ -864,45 +863,53 @@ static GWorkspace *gworkspace = nil;
 
   [tshelfWin saveDefaults];  
    
-	if ([tshelfWin isVisible]) {
-		[defaults setBool: YES forKey: @"tshelf"];
-	} else {
-		[defaults setBool: NO forKey: @"tshelf"];
-	}
+  if ([tshelfWin isVisible])
+    {
+    [defaults setBool: YES forKey: @"tshelf"];
+    }
+  else
+    {
+      [defaults setBool: NO forKey: @"tshelf"];
+    }
   [defaults setObject: [NSString stringWithFormat: @"%i", tshelfPBFileNum]
                forKey: @"tshelfpbfnum"];
-		
-	if ([[prefController myWin] isVisible]) {  
-		[prefController updateDefaults]; 
-	}
+
+  if ([[prefController myWin] isVisible])
+    {
+      [prefController updateDefaults]; 
+    }
 	
-	if ((fiend != nil) && ([[fiend myWin] isVisible])) {  
-		[fiend updateDefaults]; 
-    [defaults setBool: YES forKey: @"usefiend"];
-	} else {
-    [defaults setBool: NO forKey: @"usefiend"];
-	}
-  
-	[history updateDefaults];
-  
+  if ((fiend != nil) && ([[fiend myWin] isVisible]))
+    {
+      [fiend updateDefaults]; 
+      [defaults setBool: YES forKey: @"usefiend"];
+    }
+  else
+    {
+      [defaults setBool: NO forKey: @"usefiend"];
+    }
+
+  [history updateDefaults];
+
   [defaults setObject: [fsnodeRep hiddenPaths] 
                forKey: @"hiddendirs"];
 
   entry = [NSNumber numberWithInt: [fsnodeRep defaultSortOrder]];
   [defaults setObject: entry forKey: @"default_sortorder"];
-  
+
   [vwrsManager updateDefaults];
 
   [dtopManager updateDefaults];
   [defaults setBool: ![dtopManager isActive] forKey: @"no_desktop"];
 
   [finder updateDefaults];
-  
+
   [defaults setObject: defEditor forKey: @"defaulteditor"];
   [defaults setObject: defXterm forKey: @"defxterm"];
-  if (defXtermArgs != nil) {
-	  [defaults setObject: defXtermArgs forKey: @"defaultxtermargs"];
-  }
+  if (defXtermArgs != nil)
+    {
+      [defaults setObject: defXtermArgs forKey: @"defaultxtermargs"];
+    }
 
   [defaults setBool: teminalService forKey: @"terminal_services"];
 	
@@ -1530,31 +1537,31 @@ static GWorkspace *gworkspace = nil;
 
 - (BOOL)verifyFileAtPath:(NSString *)path
 {
-	if ([fm fileExistsAtPath: path] == NO) {
-		NSString *err = NSLocalizedString(@"Error", @"");
-		NSString *msg = NSLocalizedString(@": no such file or directory!", @"");
-		NSString *buttstr = NSLocalizedString(@"Continue", @"");
-		NSMutableDictionary *notifObj = [NSMutableDictionary dictionaryWithCapacity: 1];		
-		NSString *basePath = [path stringByDeletingLastPathComponent];
+  if ([fm fileExistsAtPath: path] == NO)
+    {
+      NSString *err = NSLocalizedString(@"Error", @"");
+      NSString *msg = NSLocalizedString(@": no such file or directory!", @"");
+      NSString *buttstr = NSLocalizedString(@"Continue", @"");
+      NSMutableDictionary *notifObj = [NSMutableDictionary dictionaryWithCapacity: 1];		
+      NSString *basePath = [path stringByDeletingLastPathComponent];
 		
-    NSRunAlertPanel(err, [NSString stringWithFormat: @"%@%@", path, msg], buttstr, nil, nil);   
+      NSRunAlertPanel(err, [NSString stringWithFormat: @"%@%@", path, msg], buttstr, nil, nil);   
 
-		[notifObj setObject: NSWorkspaceDestroyOperation forKey: @"operation"];	
-  	[notifObj setObject: basePath forKey: @"source"];	
-  	[notifObj setObject: basePath forKey: @"destination"];	
-  	[notifObj setObject: [NSArray arrayWithObjects: path, nil] forKey: @"files"];	
+      [notifObj setObject: NSWorkspaceDestroyOperation forKey: @"operation"];	
+      [notifObj setObject: basePath forKey: @"source"];	
+      [notifObj setObject: basePath forKey: @"destination"];	
+      [notifObj setObject: [NSArray arrayWithObjects: path, nil] forKey: @"files"];	
 
-		[[NSNotificationCenter defaultCenter]
+      [[NSNotificationCenter defaultCenter]
  					 postNotificationName: @"GWFileSystemWillChangeNotification"
-	 									object: notifObj];
-
-		[[NSNotificationCenter defaultCenter]
+						       object: notifObj];
+      [[NSNotificationCenter defaultCenter]
  				  postNotificationName: @"GWFileSystemDidChangeNotification"
-	 									object: notifObj];
-		return NO;
-	}
+						object: notifObj];
+      return NO;
+    }
 	
-	return YES;
+  return YES;
 }
 
 - (void)setUsesThumbnails:(BOOL)value

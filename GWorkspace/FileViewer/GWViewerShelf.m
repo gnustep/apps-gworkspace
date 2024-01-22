@@ -1253,11 +1253,12 @@
     return NSDragOperationNone;
   }
   
-	if ((sourceDragMask == NSDragOperationCopy) 
-												|| (sourceDragMask == NSDragOperationLink)) {
-		return NSDragOperationNone;
-	}
-  
+  if ((sourceDragMask == NSDragOperationCopy) 
+      || (sourceDragMask == NSDragOperationLink))
+    {
+      return NSDragOperationNone;
+    }
+
   return NSDragOperationAll;
 }
 
