@@ -37,7 +37,7 @@
 {
   RELEASE (fileOperations);
     
-	[super dealloc];
+  [super dealloc];
 }
 
 - (id)init
@@ -304,7 +304,7 @@
     // destination
     //
     if ((action == MOVE) || (action == RENAME) 
-                              || (action == DESTROY) || (action == CREATE)) {
+	|| (action == DESTROY) || (action == CREATE)) {
       if ([self descendentOfPath: path inPaths: opdstpaths]) {
         return YES;
       }
