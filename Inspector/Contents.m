@@ -242,65 +242,82 @@ static NSString *nibName = @"Contents";
 {
   NSString *winName;
 
-  if (currentViewer) {
-    if ([currentViewer respondsToSelector: @selector(stopTasks)]) {
-      [currentViewer stopTasks];  
+  // No change in selection? leave current path
+  if (currentPath && [currentPath isEqual:path])
+    {
+      NSLog(@"trying to redisplay %@", path);
+      return;
     }
-  }   
-    	      
+
+  // we change content to new path or to nil
+  // stop current work (e.g. resizing)
+  if (currentViewer && [currentViewer respondsToSelector: @selector(stopTasks)])
+    {
+      [currentViewer stopTasks];
+    }
+
+  // stop watching the displayed content, since we change it
+  [inspector removeWatcherForPath: currentPath];
+  DESTROY (currentPath);
+
+  // Are we going to display the new path?
   if (path && [fm fileExistsAtPath: path])
     {
-      id viewer = [self viewerForPath: path];
+      id viewer;
 
-    if (currentPath && ([currentPath isEqual: path] == NO)) {
-      [inspector removeWatcherForPath: currentPath];
-      DESTROY (currentPath);
-    }
-        
-		if (viewer) {
-      currentViewer = viewer;
-      winName = [viewer winname];
-      [viewersBox setContentView: viewer];
+      viewer = [self viewerForPath: path];
+      if (viewer)
+	{
+	  currentViewer = viewer;
+	  winName = [viewer winname];
+	  [viewersBox setContentView: viewer];
     
-      [viewer displayPath: path];
-		} else {
-      FSNode *node = [FSNode nodeWithPath: path];
-      NSImage *icon = [[FSNodeRep sharedInstance] iconOfSize: ICNSIZE forNode: node];
-
-      [iconView setImage: icon];
-      [titleField setStringValue: [node name]];
-
-      if ([textViewer tryToDisplayPath: path]) {
-        [viewersBox setContentView: textViewer];
-        currentViewer = textViewer;
-			  winName = NSLocalizedString(@"Text Inspector", @"");      
-        if (currentPath == nil) {
-          ASSIGN (currentPath, path); 
-          [inspector addWatcherForPath: currentPath];
-        }
-        
-      } else {
-        [viewersBox setContentView: genericView];
-        currentViewer = genericView;
-        [genericView showInfoOfPath: path];
-			  winName = NSLocalizedString(@"Contents Inspector", @"");
-      }  
-    }
-		
-	} else {  
-    [iconView setImage: nil];
-    [titleField setStringValue: @""];
-    [viewersBox setContentView: noContsView];
-    currentViewer = noContsView;
-		winName = NSLocalizedString(@"Contents Inspector", @"");
-    
-    if (currentPath) {
-      [inspector removeWatcherForPath: currentPath];
-      DESTROY (currentPath);
-    }    
+	  [viewer displayPath: path];
 	}
+      else
+	{
+	  FSNode *node = [FSNode nodeWithPath: path];
+	  NSImage *icon = [[FSNodeRep sharedInstance] iconOfSize: ICNSIZE forNode: node];
+
+	  [iconView setImage: icon];
+	  [titleField setStringValue: [node name]];
+
+	  if ([textViewer tryToDisplayPath: path])
+	    {
+	      [viewersBox setContentView: textViewer];
+	      currentViewer = textViewer;
+	      winName = NSLocalizedString(@"Text Inspector", @"");
+	      if (currentPath == nil)
+		{
+		  ASSIGN (currentPath, path);
+		  [inspector addWatcherForPath: currentPath];
+		}
+	    }
+	  else
+	    {
+	      [viewersBox setContentView: genericView];
+	      currentViewer = genericView;
+	      [genericView showInfoOfPath: path];
+	      winName = NSLocalizedString(@"Contents Inspector", @"");
+	    }
+	}
+    }
+  else
+    {
+      [iconView setImage: nil];
+      [titleField setStringValue: @""];
+      [viewersBox setContentView: noContsView];
+      currentViewer = noContsView;
+      winName = NSLocalizedString(@"Contents Inspector", @"");
+
+      if (currentPath)
+	{
+	  [inspector removeWatcherForPath: currentPath];
+	  DESTROY (currentPath);
+	}
+    }
 	
-	[[inspector win] setTitle: winName];
+  [[inspector win] setTitle: winName];
 }
 
 - (void)contentsReadyAt:(NSString *)path
