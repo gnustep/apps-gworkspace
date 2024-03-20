@@ -1,6 +1,6 @@
 /* Resizer.m
  *  
- * Copyright (C) 2005-2023 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2024 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola <rm@gnu.org>
@@ -64,8 +64,6 @@
 }
 
 
-#define MIX_LIM 16
-
 - (void)setProxy:(id <ImageViewerProtocol>)ivp
 {
   imageViewerProxy = ivp;
@@ -80,14 +78,9 @@
 
   if (srcImage && [srcImage isValid])
     {
-      NSData *srcData = [srcImage TIFFRepresentation];
       NSBitmapImageRep *srcImageRep;
-      NSInteger srcSpp;
-      NSInteger bitsPerPixel;
       NSInteger srcSizeW;
       NSInteger srcSizeH;
-      NSInteger srcBytesPerPixel;
-      NSInteger srcBytesPerRow;
       NSEnumerator *repEnum;
       NSImageRep *imgRep;
 
@@ -102,33 +95,21 @@
             srcImageRep = (NSBitmapImageRep *)imgRep;
         }
       
-      srcSpp = [srcImageRep samplesPerPixel];
-      bitsPerPixel = [srcImageRep bitsPerPixel];
       srcSizeW = [srcImageRep pixelsWide];
       srcSizeH = [srcImageRep pixelsHigh];
-      srcBytesPerPixel = [srcImageRep bitsPerPixel] / 8;
-      srcBytesPerRow = [srcImageRep bytesPerRow];
       
       [info setObject: [NSNumber numberWithFloat: (float)srcSizeW] forKey: @"width"];
       [info setObject: [NSNumber numberWithFloat: (float)srcSizeH] forKey: @"height"];
       [info setObject: path forKey: @"imgpath"];
       
-      if (((imsize.width < srcSizeW) || (imsize.height < srcSizeH))
-          && (((srcSpp == 3) && (bitsPerPixel == 24)) 
-              || ((srcSpp == 4) && (bitsPerPixel == 32))
-              || ((srcSpp == 1) && (bitsPerPixel == 8))
-              || ((srcSpp == 2) && (bitsPerPixel == 16))))
+      if ((imsize.width < srcSizeW) || (imsize.height < srcSizeH))
         {
 	  NSInteger srcSamplesPerPixel;
-          NSInteger destSamplesPerPixel = srcSpp;
-          NSInteger destBytesPerRow;
-          NSInteger destBytesPerPixel;
+          NSInteger destSamplesPerPixel;
           NSInteger dstSizeW, dstSizeH;
           float xRatio, yRatio;
           NSBitmapImageRep *dstRep;
           NSData *tiffData;
-          unsigned char *srcData;
-          unsigned char *destData;
           unsigned x, y;
           unsigned i;
           
@@ -149,19 +130,13 @@
                      initWithBitmapDataPlanes:NULL
 				   pixelsWide:dstSizeW
 				   pixelsHigh:dstSizeH
-				bitsPerSample:8
+				bitsPerSample:[srcImageRep bitsPerSample]
 			      samplesPerPixel:destSamplesPerPixel
 				     hasAlpha:[srcImageRep hasAlpha]
-				     isPlanar:NO
+				     isPlanar:[srcImageRep isPlanar]
 			       colorSpaceName:[srcImageRep colorSpaceName]
 				  bytesPerRow:0
 				 bitsPerPixel:0];
-
-	  srcData = [srcImageRep bitmapData];
-	  destData = [dstRep bitmapData];
-
-	  destBytesPerRow = [dstRep bytesPerRow];
-	  destBytesPerPixel = [dstRep bitsPerPixel] / 8;
 
 	  for (y = 0; y < dstSizeH; y++)
 	    {
@@ -172,12 +147,19 @@
 		  float xFloat, yFloat;
 		  NSInteger x1, y1;
 		  int xStep, yStep;
+                  NSUInteger srcPixel1[5];
+                  NSUInteger srcPixel2[5];
+                  NSUInteger srcPixel3[5];
+                  NSUInteger srcPixel4[5];
+                  NSUInteger destPixel[5];
 
 		  // we use integer part of the ratio, so that we can set the next pixel to at least one apart
 		  xStep = floorf(xRatio);
 		  yStep = floorf(yRatio);
-		  if (xStep == 0) xStep = 1;
-		  if (yStep == 0) yStep = 1;
+		  if (xStep == 0)
+                    xStep = 1;
+		  if (yStep == 0)
+                    yStep = 1;
 		  xFloat = (float)x * xRatio;
 		  yFloat = (float)y * yRatio;
 		  x0 = (NSInteger)floorf(xFloat);
@@ -199,23 +181,22 @@
 		      y1 = srcSizeH-1;
 		      yDiff = 0;
 		    }
+
+                  [srcImageRep getPixel: srcPixel1 atX:x0 y:y0];
+                  [srcImageRep getPixel: srcPixel2 atX:x1 y:y0];
+                  [srcImageRep getPixel: srcPixel3 atX:x0 y:y1];
+                  [srcImageRep getPixel: srcPixel4 atX:x1 y:y1];
               
 		  for (i = 0; i < srcSamplesPerPixel; i++)
 		    {
-		      int v1, v2, v3, v4;
-
-		      v1 = srcData[srcBytesPerRow * y0 + srcBytesPerPixel * x0 + i];
-		      v2 = srcData[srcBytesPerRow * y0 + srcBytesPerPixel * x1 + i];
-		      v3 = srcData[srcBytesPerRow * y1 + srcBytesPerPixel * x0 + i];
-		      v4 = srcData[srcBytesPerRow * y1 + srcBytesPerPixel * x1 + i];
-                  
-		      destData[destBytesPerRow * y + destBytesPerPixel * x + i] = \
-			(int)(v1*(1-xDiff)*(1-yDiff) +                            \
-			      v2*xDiff*(1-yDiff) +				  \
-			      v3*yDiff*(1-xDiff) +		                  \
-			      v4*xDiff*yDiff);
+		      destPixel[i] = \
+			(NSUInteger)(srcPixel1[i]*(1-xDiff)*(1-yDiff) +         \
+                                     srcPixel2[i]*xDiff*(1-yDiff) +             \
+                                     srcPixel3[i]*yDiff*(1-xDiff) +             \
+                                     srcPixel4[i]*xDiff*yDiff);
 		    }
-		}
+                  [dstRep setPixel: destPixel atX: x y:y];
+                }
 	    }
   
 	  NS_DURING
@@ -227,17 +208,18 @@
 	      tiffData = nil;
 	    }
 	  NS_ENDHANDLER
-
-	    if (tiffData) {
-	      [info setObject: tiffData forKey:@"imgdata"];
-	    } 
-
-	  RELEASE (dstRep);
+	    if (tiffData)
+              {
+                [info setObject: tiffData forKey:@"imgdata"];
+              }
+	    RELEASE (dstRep);
+	}
+      else
+        {
+          NSData *srcData = [srcImage TIFFRepresentation];
+          [info setObject: srcData forKey:@"imgdata"];
+        }
       
-	} else {
-        [info setObject: srcData forKey:@"imgdata"];
-      }
-    
       RELEASE (srcImage);
     }
   [imageViewerProxy imageReady: info];
