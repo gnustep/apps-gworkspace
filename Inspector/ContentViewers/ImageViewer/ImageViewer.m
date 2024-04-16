@@ -1,6 +1,6 @@
 /* ImageViewer.m
  *  
- * Copyright (C) 2004-2022 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2024 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  *         Riccardo Mottola <rm@gnu.org>
@@ -269,7 +269,7 @@
 {
 }
 
-- (NSString *)currentPath
+- (NSString *)path
 {
   return editPath;
 }

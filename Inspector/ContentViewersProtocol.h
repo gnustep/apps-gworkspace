@@ -1,6 +1,6 @@
 /* ContentViewersProtocol.h
  *  
- * Copyright (C) 2004-2020 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2024 Free Software Foundation, Inc.
  *
  * Authors: Enrico Sersale <enrico@imago.ro>
  *          Riccardo Mottola <rm@gnu.org>
@@ -33,7 +33,7 @@
 - (void)displayData:(NSData *)data 
              ofType:(NSString *)type;
 
-- (NSString *)currentPath;
+- (NSString *)path;
 
 - (void)stopTasks;
 
