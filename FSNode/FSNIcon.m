@@ -1389,7 +1389,7 @@ static NSImage *branchImage;
       FSNode *nd = [subNodes objectAtIndex: i];
       
       if ([nd isDirectory]) {
-        int j;
+        NSUInteger j;
         
         for (j = 0; j < count; j++) {
           NSString *fname = [[sourcePaths objectAtIndex: j] lastPathComponent];
