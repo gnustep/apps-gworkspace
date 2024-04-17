@@ -74,8 +74,9 @@
 {
   CREATE_AUTORELEASE_POOL(arp);
   NSMutableDictionary *info = nil;
-  NSImage *srcImage = [[NSImage alloc] initWithContentsOfFile: path];
+  NSImage *srcImage;
 
+  srcImage = [[NSImage alloc] initWithContentsOfFile: path];
   if (srcImage && [srcImage isValid])
     {
       NSBitmapImageRep *srcImageRep;
@@ -112,14 +113,17 @@
           NSData *tiffData;
           unsigned x, y;
           unsigned i;
-          
-	  if ((imsize.width / srcSizeW) <= (imsize.height / srcSizeH)) {
-	    dstSizeW = floor(imsize.width + 0.5);
-	    dstSizeH = floor(dstSizeW * srcSizeH / srcSizeW + 0.5);
-	  } else {
-	    dstSizeH = floor(imsize.height + 0.5);
-	    dstSizeW= floor(dstSizeH * srcSizeW / srcSizeH + 0.5);    
-	  }
+
+	  if ((imsize.width / srcSizeW) <= (imsize.height / srcSizeH))
+	    {
+	      dstSizeW = floor(imsize.width + 0.5);
+	      dstSizeH = floor(dstSizeW * srcSizeH / srcSizeW + 0.5);
+	    }
+	  else
+	    {
+	      dstSizeH = floor(imsize.height + 0.5);
+	      dstSizeW= floor(dstSizeH * srcSizeW / srcSizeH + 0.5);
+	    }
 
 	  xRatio = (float)srcSizeW / (float)dstSizeW;
 	  yRatio = (float)srcSizeH / (float)dstSizeH;
@@ -216,11 +220,21 @@
 	}
       else
         {
-          NSData *srcData = [srcImage TIFFRepresentation];
-          [info setObject: srcData forKey:@"imgdata"];
+          if (srcImageRep)
+	    {
+	      [info setObject: [srcImageRep TIFFRepresentation] forKey:@"imgdata"];
+	    }
+	  else
+	    {
+	      NSLog(@"(not resized) no valid image representation for %@", path);
+	    }
         }
       
       RELEASE (srcImage);
+    }
+  else
+    {
+      NSLog(@"No image or not valid for %@", path);
     }
   [imageViewerProxy imageReady: info];
   RELEASE (arp);
