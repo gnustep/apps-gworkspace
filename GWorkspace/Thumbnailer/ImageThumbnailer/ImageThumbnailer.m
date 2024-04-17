@@ -34,7 +34,7 @@
 
 - (void)dealloc
 {
-	[super dealloc];
+  [super dealloc];
 }
 
 - (BOOL)canProvideThumbnailForPath:(NSString *)path
@@ -54,7 +54,6 @@
       NSEnumerator *repEnum;
       NSBitmapImageRep *srcRep;
       NSInteger srcSpp;
-      NSInteger bitsPerPixel;
       NSImageRep *imgRep;
  
       repEnum = [[image representations] objectEnumerator];
@@ -69,12 +68,6 @@
         return nil;
       
       srcSpp = [srcRep samplesPerPixel];
-      bitsPerPixel = [srcRep bitsPerPixel];
-      if (((srcSpp == 3) && (bitsPerPixel == 24)) 
-        || ((srcSpp == 4) && (bitsPerPixel == 32))
-        || ((srcSpp == 1) && (bitsPerPixel == 8))
-        || ((srcSpp == 2) && (bitsPerPixel == 16)))
-        {
     
       if (([srcRep pixelsWide] <= TMBMAX) && ([srcRep pixelsHigh]<= TMBMAX) 
                               && ([srcRep pixelsWide] >= (TMBMAX - RESZLIM)) 
@@ -89,19 +82,12 @@
         }
       else
         {
-          NSInteger srcBytesPerPixel = [srcRep bitsPerPixel] / 8;
-          NSInteger srcBytesPerRow = [srcRep bytesPerRow];
-          NSInteger destSamplesPerPixel = srcSpp;
-          NSInteger destBytesPerRow;
-          NSInteger destBytesPerPixel;
           NSInteger dstSizeW, dstSizeH;
           float fact = ([srcRep pixelsWide] >= [srcRep pixelsHigh]) ? ([srcRep pixelsWide] / TMBMAX) : ([srcRep pixelsHigh] / TMBMAX);
           	        
           float xRatio;
           float yRatio;
           NSBitmapImageRep *dstRep;
-          unsigned char *srcData;
-          unsigned char *destData;    
           unsigned x, y;
           NSInteger i;
           NSData *tiffData;
@@ -117,24 +103,17 @@
           xRatio = (float)[srcRep pixelsWide] / (float)dstSizeW;
           yRatio = (float)[srcRep pixelsHigh] / (float)dstSizeH;
           
-          destSamplesPerPixel = [srcRep samplesPerPixel];
           dstRep = [[NSBitmapImageRep alloc]
                      initWithBitmapDataPlanes:NULL
                                    pixelsWide:dstSizeW
                                    pixelsHigh:dstSizeH
-                                bitsPerSample:8
-                              samplesPerPixel:destSamplesPerPixel
+                                bitsPerSample:[srcRep bitsPerSample]
+                              samplesPerPixel:[srcRep samplesPerPixel]
                                      hasAlpha:[srcRep hasAlpha]
-                                     isPlanar:NO
+                                     isPlanar:[srcRep isPlanar]
                                colorSpaceName:[srcRep colorSpaceName]
                                   bytesPerRow:0
                                  bitsPerPixel:0];
-
-          srcData = [srcRep bitmapData];
-          destData = [dstRep bitmapData];
-          
-          destBytesPerRow = [dstRep bytesPerRow];
-          destBytesPerPixel = [dstRep bitsPerPixel] / 8;
           
           for (y = 0; y < dstSizeH; y++)
 	    {
@@ -145,12 +124,19 @@
 		  float xFloat, yFloat;
 		  NSInteger x1, y1;
 		  int xStep, yStep;
+		  NSUInteger srcPixel1[5];
+                  NSUInteger srcPixel2[5];
+                  NSUInteger srcPixel3[5];
+                  NSUInteger srcPixel4[5];
+                  NSUInteger destPixel[5];
 
 		  // we use integer part of the ratio, so that we can set the next pixel to at least one apart
 		  xStep = floorf(xRatio);
 		  yStep = floorf(yRatio);
-		  if (xStep == 0) xStep = 1;
-		  if (yStep == 0) yStep = 1;
+		  if (xStep == 0)
+		    xStep = 1;
+		  if (yStep == 0)
+		    yStep = 1;
 		  xFloat = (float)x * xRatio;
 		  yFloat = (float)y * yRatio;
 		  x0 = (NSInteger)floorf(xFloat);
@@ -172,22 +158,26 @@
 		      y1 = srcSizeH-1;
 		      yDiff = 0;
 		    }
-		  
+
+		  [srcRep getPixel: srcPixel1 atX:x0 y:y0];
+                  [srcRep getPixel: srcPixel2 atX:x1 y:y0];
+                  [srcRep getPixel: srcPixel3 atX:x0 y:y1];
+                  [srcRep getPixel: srcPixel4 atX:x1 y:y1];
+
+		  destPixel[0] = 0;
+		  destPixel[1] = 0;
+		  destPixel[2] = 0;
+		  destPixel[3] = 0;
+		  destPixel[4] = 0;
 		  for (i = 0; i < srcSpp; i++)
 		    {
-		      int v1, v2, v3, v4;
-
-		      v1 = srcData[srcBytesPerRow * y0 + srcBytesPerPixel * x0 + i];
-		      v2 = srcData[srcBytesPerRow * y0 + srcBytesPerPixel * x1 + i];
-		      v3 = srcData[srcBytesPerRow * y1 + srcBytesPerPixel * x0 + i];
-		      v4 = srcData[srcBytesPerRow * y1 + srcBytesPerPixel * x1 + i];
-		      
-		      destData[destBytesPerRow * y + destBytesPerPixel * x + i] = \
-			(int)(v1*(1-xDiff)*(1-yDiff) +                            \
-			      v2*xDiff*(1-yDiff) +				  \
-			      v3*yDiff*(1-xDiff) +	                          \
-			      v4*xDiff*yDiff);
+		      destPixel[i] = \
+			(NSUInteger)(srcPixel1[i]*(1-xDiff)*(1-yDiff) + \
+				     srcPixel2[i]*xDiff*(1-yDiff) +	\
+				     srcPixel3[i]*yDiff*(1-xDiff) +	\
+				     srcPixel4[i]*xDiff*yDiff);
 		    }
+                  [dstRep setPixel: destPixel atX: x y:y];
 		}
 	    }
           
@@ -198,12 +188,7 @@
           RELEASE (dstRep);
           RELEASE (arp);
           
-        return AUTORELEASE (tiffData);
-      }
-      }
-      else
-	{
-	  NSLog(@"Unsupported image depth/format: %@", path);
+	  return AUTORELEASE (tiffData);
 	}
     }
   else
