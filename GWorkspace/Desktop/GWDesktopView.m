@@ -673,11 +673,12 @@
 	    {
 	      prev = [self iconWithGridIndex: index-1];
 
-	      if (prev) {
-		[prev select];
-		break;
-	      }
-	      i--;
+	      if (prev)
+		{
+		  [prev select];
+		  break;
+		}
+	      index--;
 	    }
 
 	  break;
