@@ -87,8 +87,6 @@ NSString *pathRemovingPrefix(NSString *path, NSString *prefix);
 
 NSString *commonPrefixInArray(NSArray *a);
 
-NSString *fileSizeDescription(unsigned long long size);
-
 NSRect rectForWindow(NSArray *otherwins, NSRect proposedRect, BOOL checkKey);
 
 #endif

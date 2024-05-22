@@ -61,5 +61,3 @@ NSString *fixpath(NSString *s, const char *c);
 
 NSString *relativePathFit(id container, NSString *fullPath);
 
-NSString *fsDescription(unsigned long long size);
-
