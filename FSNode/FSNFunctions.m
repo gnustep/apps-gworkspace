@@ -91,7 +91,7 @@ NSComparisonResult compareWithExtType(id r1, id r2, void *context)
   return NSOrderedSame;
 }
 
-#define ONE_KB 1024LU
+#define ONE_KB 1024LLU
 #define ONE_MB (ONE_KB * ONE_KB)
 #define ONE_GB (ONE_KB * ONE_MB)
 #define ONE_TB (ONE_KB * ONE_GB)
