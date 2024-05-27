@@ -1,8 +1,8 @@
 /* FSNFunctions.m
  *  
- * Copyright (C) 2004-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2024 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Author: Enrico Sersale
  *         Riccardo Mottola <rm@gnu.org>
  * Date: March 2004
  *
@@ -91,26 +91,29 @@ NSComparisonResult compareWithExtType(id r1, id r2, void *context)
   return NSOrderedSame;
 }
 
-#define ONE_KB 1024
+#define ONE_KB 1024LLU
 #define ONE_MB (ONE_KB * ONE_KB)
 #define ONE_GB (ONE_KB * ONE_MB)
+#define ONE_TB (ONE_KB * ONE_GB)
 
 NSString *sizeDescription(unsigned long long size)
 {
   NSString *sizeStr;
-    
+
   if (size == 1)
     sizeStr = @"1 byte";
   else if (size == 0)
     sizeStr = @"0 bytes";
-  else if (size < (10 * ONE_KB))
+  else if (size < (ONE_KB))
     sizeStr = [NSString stringWithFormat:@" %ld bytes", (long)size];
-  else if (size < (100 * ONE_KB))
+  else if (size < (ONE_MB))
     sizeStr = [NSString stringWithFormat:@" %3.2fKB", ((double)size / (double)(ONE_KB))];
-  else if (size < (100 * ONE_MB))
+  else if (size < (ONE_GB))
     sizeStr = [NSString stringWithFormat:@" %3.2fMB", ((double)size / (double)(ONE_MB))];
-  else
+  else if (size < (ONE_TB))
     sizeStr = [NSString stringWithFormat:@" %3.2fGB", ((double)size / (double)(ONE_GB))];
+  else
+    sizeStr = [NSString stringWithFormat:@" %3.2fTB", ((double)size / (double)(ONE_TB))];
 
   return sizeStr;
 }

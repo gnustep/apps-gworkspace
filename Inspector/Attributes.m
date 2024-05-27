@@ -2,7 +2,8 @@
  *  
  * Copyright (C) 2004-2024 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale
+ * Authors: Enrico Sersale
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: January 2004
  *
  * This file is part of the GNUstep GWorkspace application
@@ -29,6 +30,7 @@
 
 #import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
+#import "FSNFunctions.h"
 #import "Attributes.h"
 #import "Inspector.h"
 #import "IconView.h"
@@ -230,7 +232,7 @@ static BOOL sizeStop = NO;
       ftype = [attributes objectForKey: NSFileType];
       if ([ftype isEqual: NSFileTypeDirectory] == NO)
         {	
-          NSString *fsize = fsDescription([[attributes objectForKey: NSFileSize] unsignedLongLongValue]);
+          NSString *fsize = sizeDescription([[attributes objectForKey: NSFileSize] unsignedLongLongValue]);
           [sizeField setStringValue: fsize]; 
           [calculateButt setEnabled: NO];
           [insideButt	setEnabled: NO];
@@ -849,7 +851,7 @@ if ([b tag] == MULTIPLE) perms |= v; \
 	}	
 
   if (sizeStop == NO) {
-    [attributes sizeReady: fsDescription(dirsize)]; 
+    [attributes sizeReady: sizeDescription(dirsize)];
   }
 }
 
