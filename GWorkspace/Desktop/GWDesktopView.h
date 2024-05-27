@@ -1,8 +1,9 @@
 /* GWDesktopView.h
  *  
- * Copyright (C) 2005-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2024 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
+ *         Riccardo Mottola <rm@gnu.org>
  * Date: January 2005
  *
  * This file is part of the GNUstep GWorkspace application
@@ -39,12 +40,12 @@ typedef enum BackImageStyle {
 {
   NSRect screenFrame;  
   NSRect *grid;
-  int gridcount;
-  int rowcount;
+  NSInteger gridcount;
+  NSInteger rowcount;
 
   NSImage *dragIcon;
   NSPoint dragPoint;
-  int insertIndex;
+  NSUInteger insertIndex;
   BOOL dragLocalIcon;
   
   NSImage *backImage;
@@ -72,11 +73,11 @@ typedef enum BackImageStyle {
 
 - (void)dockPositionDidChange;
 
-- (int)firstFreeGridIndex;
+- (NSUInteger)firstFreeGridIndex;
 
-- (int)firstFreeGridIndexAfterIndex:(int)index;
+- (NSUInteger)firstFreeGridIndexAfterIndex:(NSUInteger)index;
 
-- (BOOL)isFreeGridIndex:(int)index;
+- (BOOL)isFreeGridIndex:(NSUInteger)index;
 
 - (FSNIcon *)iconWithGridIndex:(NSUInteger)index;
 
@@ -84,9 +85,9 @@ typedef enum BackImageStyle {
 
 - (NSArray *)iconsWithGridOriginY:(float)y;
 
-- (int)indexOfGridRectContainingPoint:(NSPoint)p;
+- (NSUInteger)indexOfGridRectContainingPoint:(NSPoint)p;
 
-- (NSRect)iconBoundsInGridAtIndex:(int)index;
+- (NSRect)iconBoundsInGridAtIndex:(NSUInteger)index;
 
 - (void)makeIconsGrid;
 
