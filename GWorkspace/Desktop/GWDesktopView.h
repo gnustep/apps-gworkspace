@@ -40,8 +40,8 @@ typedef enum BackImageStyle {
 {
   NSRect screenFrame;  
   NSRect *grid;
-  int gridcount;
-  int rowcount;
+  NSInteger gridcount;
+  NSInteger rowcount;
 
   NSImage *dragIcon;
   NSPoint dragPoint;

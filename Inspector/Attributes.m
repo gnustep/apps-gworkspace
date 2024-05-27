@@ -1,8 +1,8 @@
 /* Attributes.m
  *  
- * Copyright (C) 2004-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2024 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Author: Enrico Sersale
  * Date: January 2004
  *
  * This file is part of the GNUstep GWorkspace application
@@ -184,7 +184,7 @@ static BOOL sizeStop = NO;
   NSDictionary *attrs;
   unsigned long perms;
   BOOL sameOwner, sameGroup;
-  int i;
+  NSUInteger i;
 
   sizeStop = YES;
 
@@ -388,17 +388,18 @@ static BOOL sizeStop = NO;
 
 - (IBAction)changePermissions:(id)sender
 {
-	NSMutableDictionary *attrs;
-	NSDirectoryEnumerator *enumerator;	
-	NSString *path, *fpath;
-	unsigned long oldperms, newperms;
-  int i;
-	BOOL isdir;
-	BOOL recursive;
-  
+  NSMutableDictionary *attrs;
+  NSDirectoryEnumerator *enumerator;
+  NSString *path, *fpath;
+  unsigned long oldperms, newperms;
+  NSUInteger i;
+  BOOL isdir;
+  BOOL recursive;
+
   recursive = ([insideButt isEnabled] && ([insideButt state] == NSOnState));
-  
-	if (pathscount == 1) {
+
+  if (pathscount == 1)
+    {
 		oldperms = [[attributes objectForKey: NSFilePosixPermissions] unsignedLongValue];
 		newperms = [self getPermissions: oldperms];		
 		attrs = [attributes mutableCopy];
@@ -599,7 +600,7 @@ else [b setState: NSOffState]; \
 
 - (unsigned long)getPermissions:(unsigned long)oldperms
 {
-	unsigned long perms = 0;
+  unsigned long perms = 0;
 
 #define GET_BUTTON_STATE(b, v) { \
 if ([b state] == NSOnState) { \
@@ -763,7 +764,7 @@ if ([b tag] == MULTIPLE) perms |= v; \
   sizer = [[Sizer alloc] initWithAttributesConnection: conn];
   [attrs setSizer: sizer];
   RELEASE (sizer);
-	
+
   [[NSRunLoop currentRunLoop] run];
   [pool release];
 }
@@ -784,26 +785,28 @@ if ([b tag] == MULTIPLE) perms |= v; \
 
 - (void)computeSizeOfPaths:(NSArray *)paths
 {
-	unsigned long long dirsize = 0;
-	unsigned long long fsize = 0;
-  int i;
+  unsigned long long dirsize = 0;
+  unsigned long long fsize = 0;
+  NSUInteger i;
 	
   sizeStop = NO;
   
- 	for (i = 0; i < [paths count]; i++) {
-    CREATE_AUTORELEASE_POOL (arp1);
-		NSString *path, *filePath;
-		NSDictionary *fileAttrs;
-		BOOL isdir;
-		
-    if (sizeStop) {
-      RELEASE (arp1);
-      return;
-    }
-    
-		path = [paths objectAtIndex: i];
-		 
-		fileAttrs = [fm fileAttributesAtPath: path traverseLink: NO];
+  for (i = 0; i < [paths count]; i++)
+    {
+      CREATE_AUTORELEASE_POOL (arp1);
+      NSString *path, *filePath;
+      NSDictionary *fileAttrs;
+      BOOL isdir;
+
+      if (sizeStop)
+	{
+	  RELEASE (arp1);
+	  return;
+	}
+
+      path = [paths objectAtIndex: i];
+
+      fileAttrs = [fm fileAttributesAtPath: path traverseLink: NO];
 		if (fileAttrs) {
 			fsize = [[fileAttrs objectForKey: NSFileSize] unsignedLongLongValue];
 			dirsize += fsize;
