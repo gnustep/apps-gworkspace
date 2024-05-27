@@ -428,7 +428,6 @@
   colcount = (int)(gridrect.size.width / (gridSize.width + X_MARGIN));
   rowcount = (int)(gridrect.size.height / (gridSize.height + ymargin));
   gridcount = colcount * rowcount;
-  NSLog(@"gridcount: %d, rowcount %d", gridcount, rowcount);
 
   grid = NSZoneMalloc (NSDefaultMallocZone(), sizeof(NSRect) * gridcount);	
     
@@ -1453,7 +1452,7 @@ static void GWHighlightFrameRect(NSRect aRect)
   NSString *nodePath = [node path];
   NSString *prePath = [NSString stringWithString: nodePath];
   NSUInteger count = [names count];
-  NSInteger i;  // FIXME convert to unsigned when loop condition is rewritten
+  NSUInteger i;
   
   AUTORELEASE (sourcePaths);
 
@@ -1485,16 +1484,21 @@ static void GWHighlightFrameRect(NSRect aRect)
     prePath = [prePath stringByDeletingLastPathComponent];
   }
 
-  for (i = 0; i < count; i++) {
-    NSString *srcpath = [sourcePaths objectAtIndex: i];
-    FSNIcon *icon = [self repOfSubnodePath: srcpath];
+  i = 0;
+  while(i < [sourcePaths count])
+    {
+      NSString *srcpath = [sourcePaths objectAtIndex: i];
+      FSNIcon *icon = [self repOfSubnodePath: srcpath];
     
-    if (icon && [[icon node] isMountPoint]) {
-      [sourcePaths removeObject: srcpath];
-      count--; //FIXME needs to be rewritten for unsigned
-      i--;
+      if (icon && [[icon node] isMountPoint])
+	{
+	  [sourcePaths removeObject: srcpath];
+	}
+      else
+	{
+	  i++;
+	}
     }
-  }    
   
   if ([sourcePaths count] == 0) {
     return NO;
@@ -1764,7 +1768,7 @@ NSComparisonResult sortDragged(id icn1, id icn2, void *context)
   NSMutableArray *files;
   NSMutableDictionary *opDict;
   NSString *trashPath;
-  NSInteger i;
+  NSInteger i; // FIXME see if it can be made unsigned
 
   DESTROY (dragIcon);
   if ([self isFreeGridIndex: insertIndex])
@@ -1798,8 +1802,8 @@ NSComparisonResult sortDragged(id icn1, id icn2, void *context)
     NSMutableArray *removed = [NSMutableArray array];
     NSArray *sorted = nil;
     NSMutableArray *sortIndexes = [NSMutableArray array];
-    int firstinrow = gridcount - rowcount;
-    int row = 0; // FIXME check and update type
+    NSUInteger firstinrow = gridcount - rowcount;
+    NSUInteger row = 0;
 
     for (i = 0; i < [sourcePaths count]; i++) {
       NSString *locPath = [sourcePaths objectAtIndex: i];
