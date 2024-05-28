@@ -1901,7 +1901,7 @@ NSComparisonResult sortDragged(id icn1, id icn2, void *context)
 
       while (firstinrow < gridcount)
 	{
-	  for (i = firstinrow; i >= row; i -= rowcount)
+	  for (i = firstinrow; i >= (NSInteger)row; i -= rowcount)
 	    {
 	      [sortIndexes insertObject: [NSNumber numberWithInteger: i]
 				atIndex: [sortIndexes count]];
