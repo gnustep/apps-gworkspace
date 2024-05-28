@@ -2,7 +2,7 @@
  *  
  * Copyright (C) 2005-2024 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Author: Enrico SersalE
  *         Riccardo Mottola <rm@gnu.org>
  * Date: January 2005
  *
@@ -28,7 +28,8 @@
 @class NSImage;
 @class GWDesktopManager;
 
-typedef enum BackImageStyle {
+typedef enum BackImageStyle
+{
   BackImageCenterStyle = 0,
   BackImageFitStyle = 1,
   BackImageTileStyle = 2,

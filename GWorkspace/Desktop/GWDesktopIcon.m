@@ -2,7 +2,7 @@
  *  
  * Copyright (C) 2005-2021 Free Software Foundation, Inc.
  *
- * Authors: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale
  *          Riccardo Mottola <rm@gnu.org>
  *
  * Date: January 2005
@@ -75,79 +75,104 @@
   [win makeMainWindow];
   [win makeKeyWindow];
 
-  if (icnPosition == NSImageOnly) {
-    onself = [self mouse: selfloc inRect: icnBounds];
-  } else {
-    onself = ([self mouse: selfloc inRect: icnBounds]
-	      || [self mouse: selfloc inRect: labelRect]);
-  }
-
-  if (onself) {
-    if (selectable == NO) {
-      return;
+  if (icnPosition == NSImageOnly)
+    {
+      onself = [self mouse: selfloc inRect: icnBounds];
+    }
+  else
+    {
+      onself = ([self mouse: selfloc inRect: icnBounds]
+		|| [self mouse: selfloc inRect: labelRect]);
     }
 
-    if ([theEvent clickCount] == 1) {
-      if (isSelected == NO) {
-        [container stopRepNameEditing];
-        [container repSelected: self];
-      }
+  if (onself)
+    {
+      if (selectable == NO)
+	{
+	  return;
+	}
+
+      if ([theEvent clickCount] == 1)
+	{
+	  if (isSelected == NO) {
+	    [container stopRepNameEditing];
+	    [container repSelected: self];
+	  }
       
-      if ([theEvent modifierFlags] & NSShiftKeyMask) {
-        [container setSelectionMask: FSNMultipleSelectionMask];
+	  if ([theEvent modifierFlags] & NSShiftKeyMask)
+	    {
+	      [container setSelectionMask: FSNMultipleSelectionMask];
          
-	if (isSelected) {
-          if ([container selectionMask] == FSNMultipleSelectionMask) {
-	    [self unselect];
-            [container selectionDidChange];	
-	    return;
-          }
-        } else {
-	  [self select];
-	}
+	      if (isSelected)
+		{
+		  if ([container selectionMask] == FSNMultipleSelectionMask)
+		    {
+		      [self unselect];
+		      [container selectionDidChange];
+		      return;
+		    }
+		}
+	      else
+		{
+		  [self select];
+		}
         
-      } else {
-        [container setSelectionMask: NSSingleSelectionMask];
+	    }
+	  else
+	    {
+	      [container setSelectionMask: NSSingleSelectionMask];
         
-        if (isSelected == NO) {
-	  [self select];
-	}
-      }
+	      if (isSelected == NO)
+		{
+		  [self select];
+		}
+	    }
     
-      if (dndSource) {
-        while (1) {
-	  nextEvent = [win nextEventMatchingMask:
-			     NSLeftMouseUpMask | NSLeftMouseDraggedMask];
+	  if (dndSource)
+	    {
+	      while (1)
+		{
+		  nextEvent = [win nextEventMatchingMask:
+				     NSLeftMouseUpMask | NSLeftMouseDraggedMask];
 
-          if ([nextEvent type] == NSLeftMouseUp) {
-            [win postEvent: nextEvent atStart: YES];
-            break;
+		  if ([nextEvent type] == NSLeftMouseUp)
+		    {
+		      [win postEvent: nextEvent atStart: YES];
+		      break;
 
-          } else if (([nextEvent type] == NSLeftMouseDragged)
-		     && ([self mouse: selfloc inRect: icnBounds])) {
-	    if (dragdelay < 5) {
-              dragdelay++;
-            } else {     
-              NSPoint p = [nextEvent locationInWindow];
-              offset = NSMakeSize(p.x - location.x, p.y - location.y); 
-              startdnd = YES;        
-              break;
-            }
-          }
-        }
-      }
-      
-      if (startdnd == YES) {  
-        [container stopRepNameEditing];
-        [self startExternalDragOnEvent: theEvent withMouseOffset: offset];   
-      }
-      
-      editstamp = [theEvent timestamp];       
+		    }
+		  else if (([nextEvent type] == NSLeftMouseDragged)
+			   && ([self mouse: selfloc inRect: icnBounds]))
+		    {
+		      if (dragdelay < 5)
+			{
+			  dragdelay++;
+			}
+		      else
+			{
+			  NSPoint p = [nextEvent locationInWindow];
+			  offset = NSMakeSize(p.x - location.x, p.y - location.y);
+			  startdnd = YES;
+			  break;
+			}
+		    }
+		}
+	    }
+
+	  if (startdnd == YES)
+	    {
+	      [container stopRepNameEditing];
+	      [self startExternalDragOnEvent: theEvent withMouseOffset: offset];
+	    }
+
+	  editstamp = [theEvent timestamp];
+	}
+    
     }
-    
-  } else {
-    [container mouseDown: theEvent];
-  }
+  else
+    {
+      [container mouseDown: theEvent];
+    }
 }
 
 @end

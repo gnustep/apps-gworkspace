@@ -2,7 +2,8 @@
  *  
  * Copyright (C) 2005-2012 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Author: Enrico Sersale
+ *         Riccardo Mottola
  * Date: January 2005
  *
  * This file is part of the GNUstep GWorkspace application
@@ -40,13 +41,14 @@
                           styleMask: NSBorderlessWindowMask
 			    backing: NSBackingStoreBuffered
                               defer: NO];
-  if (self) {
-    [self setReleasedWhenClosed: NO];
-    [self setExcludedFromWindowsMenu: YES];
-    [self setAcceptsMouseMovedEvents: YES];
-    [self setCanHide: NO];
-  }
-  
+  if (self)
+    {
+      [self setReleasedWhenClosed: NO];
+      [self setExcludedFromWindowsMenu: YES];
+      [self setAcceptsMouseMovedEvents: YES];
+      [self setCanHide: NO];
+    }
+
   return self;
 }
 
@@ -152,7 +154,7 @@
 
 - (void)keyDown:(NSEvent *)theEvent 
 {	
-	[super keyDown: theEvent];
+  [super keyDown: theEvent];
 }
 
 - (void)setDelegate:(id)adelegate
@@ -168,7 +170,7 @@
 
 - (void)print:(id)sender
 {
-	[super print: sender];
+  [super print: sender];
 }
 
 - (void)orderWindow:(NSWindowOrderingMode)place 
@@ -180,12 +182,12 @@
 
 - (BOOL)canBecomeKeyWindow
 {
-	return YES;
+  return YES;
 }
 
 - (BOOL)canBecomeMainWindow
 {
-	return YES;
+  return YES;
 }
 
 @end
