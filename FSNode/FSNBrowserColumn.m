@@ -2,7 +2,7 @@
  *  
  * Copyright (C) 2004-2022 Free Software Foundation, Inc.
  *
- * Authors: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale
  *          Riccardo Mottola <rm@gnu.org>
  * Date: July 2004
  *
@@ -443,9 +443,10 @@ static id <DesktopApplication> desktopApp = nil;
   
   selcells = [matrix selectedCells];
   
-  if (selcells && [selcells count]) {
-    selectedCells = [selcells mutableCopy];
-  }
+  if (selcells && [selcells count])
+    {
+      selectedCells = [selcells mutableCopy];
+    }
 
   [matrix visibleCellsNodes: &vnodes scrollTuneSpace: &scrollTune];
   
@@ -530,7 +531,7 @@ static id <DesktopApplication> desktopApp = nil;
       NSMutableArray *cells = [NSMutableArray array];
       BOOL missing = NO;
       NSUInteger i;
-  
+
       for (i = 0; i < [selected count]; i++)
 	{  
 	  FSNBrowserCell *cell = [selected objectAtIndex: i];
@@ -566,7 +567,7 @@ static id <DesktopApplication> desktopApp = nil;
       NSMutableArray *nodes = [NSMutableArray array];
       BOOL missing = NO;
       NSUInteger i;
-  
+
       for (i = 0; i < [selected count]; i++)
 	{  
 	  FSNode *node = [[selected objectAtIndex: i] node];
@@ -604,13 +605,12 @@ static id <DesktopApplication> desktopApp = nil;
       NSMutableArray *paths = [NSMutableArray array];
       BOOL missing = NO;
       NSUInteger i;
-  
+
       for (i = 0; i < [selected count]; i++)
 	{  
 	  FSNode *node = [[selected objectAtIndex: i] node];
       
 	  if ([node isValid])
-       
 	    [paths addObject: [node path]];
 	  else
 	    missing = YES;
@@ -637,9 +637,10 @@ static id <DesktopApplication> desktopApp = nil;
         sendAction:(BOOL)act
 {
   [matrix selectCell: cell];
-  if (act) {
-    [matrix sendAction];
-  }
+  if (act)
+    {
+      [matrix sendAction];
+    }
 }
 
 - (FSNBrowserCell *)selectCellOfNode:(FSNode *)node
@@ -647,14 +648,16 @@ static id <DesktopApplication> desktopApp = nil;
 {
   FSNBrowserCell *cell = [self cellOfNode: node];  
 
-  if (cell) {
-    [matrix selectCell: cell];
-    if (act) {
-      [matrix sendAction];
-    }
-    return cell;
+  if (cell)
+    {
+      [matrix selectCell: cell];
+      if (act)
+	{
+	  [matrix sendAction];
+	}
+      return cell;
   }
-  
+
   return nil;
 }
                 
@@ -663,14 +666,16 @@ static id <DesktopApplication> desktopApp = nil;
 {
   FSNBrowserCell *cell = [self cellWithPath: path];  
 
-  if (cell) {
-    [matrix selectCell: cell];
-    if (act) {
-      [matrix sendAction];
+  if (cell)
+    {
+      [matrix selectCell: cell];
+      if (act)
+	{
+	  [matrix sendAction];
+	}
+      return cell;
     }
-    return cell;
-  }
-  
+
   return nil;
 }
                 
@@ -680,14 +685,16 @@ static id <DesktopApplication> desktopApp = nil;
 {
   FSNBrowserCell *cell = [self cellWithName: name];  
 
-  if (cell) {
-    [matrix selectCell: cell];
-    if (act) {
-      [matrix sendAction];
+  if (cell)
+    {
+      [matrix selectCell: cell];
+      if (act)
+	{
+	  [matrix sendAction];
+	}
+      return cell;
     }
-    return cell;
-  }
-  
+
   return nil;
 }
 
@@ -788,8 +795,8 @@ static id <DesktopApplication> desktopApp = nil;
       [matrix selectCellAtRow: 0 column: 0];
       [matrix sendAction];
       return YES;
-    }  
-  
+    }
+
   return NO;
 }
 
@@ -934,11 +941,12 @@ static id <DesktopApplication> desktopApp = nil;
   NSArray *cells = [matrix cells];
   NSUInteger i;  
 
-  for (i = 0; i < [cells count]; i++) {
-    [[cells objectAtIndex: i] checkLocked];
-  }
+  for (i = 0; i < [cells count]; i++)
+    {
+      [[cells objectAtIndex: i] checkLocked];
+    }
 
-  [matrix setNeedsDisplay: YES];   
+  [matrix setNeedsDisplay: YES];
 }
 
 - (void)lockCellsOfNodes:(NSArray *)nodes
@@ -946,14 +954,16 @@ static id <DesktopApplication> desktopApp = nil;
   NSUInteger i;
   BOOL found = NO;
   
-  for (i = 0; i < [nodes count]; i++) {
-    FSNBrowserCell *cell = [self cellOfNode: [nodes objectAtIndex: i]];
+  for (i = 0; i < [nodes count]; i++)
+    {
+      FSNBrowserCell *cell = [self cellOfNode: [nodes objectAtIndex: i]];
     
-    if (cell && [cell isEnabled]) {   
-      [cell setEnabled: NO];
-      found = YES;
+      if (cell && [cell isEnabled])
+	{
+	  [cell setEnabled: NO];
+	  found = YES;
+	}
     }
-  }
 		
   [matrix setNeedsDisplay: found];   
 }
@@ -963,15 +973,17 @@ static id <DesktopApplication> desktopApp = nil;
   NSUInteger i;
   BOOL found = NO;
   
-  for (i = 0; i < [paths count]; i++) {
-    FSNBrowserCell *cell = [self cellWithPath: [paths objectAtIndex: i]];
+  for (i = 0; i < [paths count]; i++)
+    {
+      FSNBrowserCell *cell = [self cellWithPath: [paths objectAtIndex: i]];
     
-    if (cell && [cell isEnabled]) {   
-      [cell setEnabled: NO];
-      found = YES;
+      if (cell && [cell isEnabled])
+	{
+	  [cell setEnabled: NO];
+	  found = YES;
+	}
     }
-  }
-		
+
   [matrix setNeedsDisplay: found];   
 }
 
@@ -980,15 +992,17 @@ static id <DesktopApplication> desktopApp = nil;
   NSUInteger i;
   BOOL found = NO;
   
-  for (i = 0; i < [names count]; i++) {
-    FSNBrowserCell *cell = [self cellWithName: [names objectAtIndex: i]];
-    
-    if (cell && [cell isEnabled]) {   
-      [cell setEnabled: NO];
-      found = YES;
+  for (i = 0; i < [names count]; i++)
+    {
+      FSNBrowserCell *cell = [self cellWithName: [names objectAtIndex: i]];
+
+      if (cell && [cell isEnabled])
+	{
+	  [cell setEnabled: NO];
+	  found = YES;
+	}
     }
-  }
-		
+
   [matrix setNeedsDisplay: found];   
 }
 
@@ -997,16 +1011,18 @@ static id <DesktopApplication> desktopApp = nil;
   NSUInteger i;
   BOOL found = NO;
 
-  for (i = 0; i < [nodes count]; i++) {
-    FSNBrowserCell *cell = [self cellOfNode: [nodes objectAtIndex: i]];
-    
-    if (cell && ([cell isEnabled] == NO)) { 
-      [cell setEnabled: YES];
-      found = YES;
+  for (i = 0; i < [nodes count]; i++)
+    {
+      FSNBrowserCell *cell = [self cellOfNode: [nodes objectAtIndex: i]];
+
+      if (cell && ([cell isEnabled] == NO))
+	{
+	  [cell setEnabled: YES];
+	  found = YES;
+	}
     }
-  }
-		
-  [matrix setNeedsDisplay: found];   
+
+  [matrix setNeedsDisplay: found];
 }
 
 - (void)unLockCellsWithPaths:(NSArray *)paths
@@ -1014,16 +1030,18 @@ static id <DesktopApplication> desktopApp = nil;
   NSUInteger i;
   BOOL found = NO;
 
-  for (i = 0; i < [paths count]; i++) {
-    FSNBrowserCell *cell = [self cellWithPath: [paths objectAtIndex: i]];
-    
-    if (cell && ([cell isEnabled] == NO)) { 
-      [cell setEnabled: YES];
-      found = YES;
+  for (i = 0; i < [paths count]; i++)
+    {
+      FSNBrowserCell *cell = [self cellWithPath: [paths objectAtIndex: i]];
+
+      if (cell && ([cell isEnabled] == NO))
+	{
+	  [cell setEnabled: YES];
+	  found = YES;
+	}
     }
-  }
-		
-  [matrix setNeedsDisplay: found];   
+
+  [matrix setNeedsDisplay: found];
 }
 
 - (void)unLockCellsWithNames:(NSArray *)names
@@ -1031,15 +1049,17 @@ static id <DesktopApplication> desktopApp = nil;
   NSUInteger i;
   BOOL found = NO;
 
-  for (i = 0; i < [names count]; i++) {
-    FSNBrowserCell *cell = [self cellWithName: [names objectAtIndex: i]];
-    
-    if (cell && ([cell isEnabled] == NO)) { 
-      [cell setEnabled: YES];
-      found = YES;
+  for (i = 0; i < [names count]; i++)
+    {
+      FSNBrowserCell *cell = [self cellWithName: [names objectAtIndex: i]];
+
+      if (cell && ([cell isEnabled] == NO))
+	{
+	  [cell setEnabled: YES];
+	  found = YES;
+	}
     }
-  }
-		
+
   [matrix setNeedsDisplay: found];   
 }
 
@@ -1051,7 +1071,7 @@ static id <DesktopApplication> desktopApp = nil;
   for (i = 0; i < [cells count]; i++)
     {
       id cell = [cells objectAtIndex: i];
-      
+
       if ([cell isEnabled])
     	[cell setEnabled: NO];
     }
@@ -1083,7 +1103,7 @@ static id <DesktopApplication> desktopApp = nil;
   for (i = 0; i < [cells count]; i++)
     {
       FSNBrowserCell *cell = [cells objectAtIndex: i];
-      
+
       if ([[cell node] isEqualToNode: node])
         return cell;
     }
@@ -1099,7 +1119,7 @@ static id <DesktopApplication> desktopApp = nil;
   for (i = 0; i < [cells count]; i++)
     {
       FSNBrowserCell *cell = [cells objectAtIndex: i];
-    
+
       if ([[[cell node] path] isEqual: path])
 	return cell;
     }
@@ -1115,7 +1135,7 @@ static id <DesktopApplication> desktopApp = nil;
   for (i = 0; i < [cells count]; i++)
     {
       FSNBrowserCell *cell = [cells objectAtIndex: i];
-    
+
       if ([[[cell node] name] isEqual: name])
 	return cell;
     
@@ -1184,21 +1204,22 @@ static id <DesktopApplication> desktopApp = nil;
 
   p = [matrix convertPoint: p fromView: nil];
 
-  if ([matrix getRow: &row column: &col forPoint: p] == NO) {
-    [browser clickInColumn: self];
-  }
+  if ([matrix getRow: &row column: &col forPoint: p] == NO)
+    {
+      [browser clickInColumn: self];
+    }
 }
 
 - (void)setFrame:(NSRect)frameRect
 {
-  NSRect r = NSMakeRect(1, 0, frameRect.size.width -1, frameRect.size.height);
-  
+  NSRect r = NSMakeRect(1, 0, frameRect.size.width - 1, frameRect.size.height);
+
   if (index == [browser firstVisibleColumn])
     {
       r.origin.x = 0;
       r.size.width += 1;
     }
-  
+
   CHECKRECT (frameRect);
   [super setFrame: frameRect]; 
    
@@ -1214,7 +1235,7 @@ static id <DesktopApplication> desktopApp = nil;
 - (void)drawRect:(NSRect)rect
 {
   [super drawRect: rect];
-  
+
   if (index != [browser firstVisibleColumn])
     {
       [[NSColor blackColor] set];  
@@ -1237,109 +1258,135 @@ static id <DesktopApplication> desktopApp = nil;
   NSString *nodePath;
   NSString *prePath;
   NSUInteger count;
-  
-  isDragTarget = NO;	
-  
-  if ((shownNode == nil) || ([shownNode isValid] == NO)) {
-    return NSDragOperationNone;
-  }
 
-  if ([shownNode isDirectory]) {
-    if ([shownNode isSubnodeOfPath: [desktopApp trashPath]]) { 
+  isDragTarget = NO;	
+
+  if ((shownNode == nil) || ([shownNode isValid] == NO))
+    {
       return NSDragOperationNone;
     }
-  }	
-  
+
+  if ([shownNode isDirectory])
+    {
+      if ([shownNode isSubnodeOfPath: [desktopApp trashPath]])
+	{
+	  return NSDragOperationNone;
+	}
+    }
+
   pb = [sender draggingPasteboard];
 
-  if (pb && [[pb types] containsObject: NSFilenamesPboardType]) {
-    sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
-       
-  } else if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"]) {
-    NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"]; 
-    NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
-    
-    sourcePaths = [pbDict objectForKey: @"paths"];
-    
-  } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {
-    NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
-    NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
-    
-    sourcePaths = [pbDict objectForKey: @"paths"];
-    
-  } else {
-    return NSDragOperationNone;
-  }
+  if (pb && [[pb types] containsObject: NSFilenamesPboardType])
+    {
+      sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
+    }
+  else if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"])
+    {
+      NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"];
+      NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
+
+      sourcePaths = [pbDict objectForKey: @"paths"];
+    }
+  else if ([[pb types] containsObject: @"GWLSFolderPboardType"])
+    {
+      NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"];
+      NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
+
+      sourcePaths = [pbDict objectForKey: @"paths"];
+    }
+  else
+    {
+      return NSDragOperationNone;
+    }
 
   count = [sourcePaths count];
   if (count == 0)
     return NSDragOperationNone;
     
-  if ([shownNode isWritable] == NO) {
-    return NSDragOperationNone;
-  }
-    
+  if ([shownNode isWritable] == NO)
+    {
+      return NSDragOperationNone;
+    }
+
   nodePath = [shownNode path];
 
   basePath = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
-  if ([basePath isEqual: nodePath]) {
-    return NSDragOperationNone;
-  }
-  
-  if ([sourcePaths containsObject: nodePath]) {
-    return NSDragOperationNone;
-  }
+  if ([basePath isEqual: nodePath])
+    {
+      return NSDragOperationNone;
+    }
+
+  if ([sourcePaths containsObject: nodePath])
+    {
+      return NSDragOperationNone;
+    }
 
   prePath = [NSString stringWithString: nodePath];
 
-  while (1) {
-    if ([sourcePaths containsObject: prePath]) {
-      return NSDragOperationNone;
+  while (1)
+    {
+      if ([sourcePaths containsObject: prePath])
+	{
+	  return NSDragOperationNone;
+	}
+      if ([prePath isEqual: path_separator()])
+	{
+	  break;
+	}
+      prePath = [prePath stringByDeletingLastPathComponent];
     }
-    if ([prePath isEqual: path_separator()]) {
-      break;
-    }            
-    prePath = [prePath stringByDeletingLastPathComponent];
-  }
 
-  if ([shownNode isDirectory] && [shownNode isParentOfPath: basePath]) {
-    NSArray *subNodes = [shownNode subNodes];
-    NSUInteger i;
-    
-    for (i = 0; i < [subNodes count]; i++) {
-      FSNode *nd = [subNodes objectAtIndex: i];
-      
-      if ([nd isDirectory]) {
-        NSUInteger j;
-        
-        for (j = 0; j < count; j++) {
-          NSString *fname = [[sourcePaths objectAtIndex: j] lastPathComponent];
-          
-          if ([[nd name] isEqual: fname]) {
-            return NSDragOperationNone;
-          }
-        }
-      }
+  if ([shownNode isDirectory] && [shownNode isParentOfPath: basePath])
+    {
+      NSArray *subNodes = [shownNode subNodes];
+      NSUInteger i;
+
+      for (i = 0; i < [subNodes count]; i++)
+	{
+	  FSNode *nd = [subNodes objectAtIndex: i];
+
+	  if ([nd isDirectory])
+	    {
+	      NSUInteger j;
+
+	      for (j = 0; j < count; j++)
+		{
+		  NSString *fname = [[sourcePaths objectAtIndex: j] lastPathComponent];
+
+		  if ([[nd name] isEqual: fname])
+		    {
+		      return NSDragOperationNone;
+		    }
+		}
+	    }
+	}
     }
-  }	
 
   isDragTarget = YES;	
   forceCopy = NO;
-    
+
   sourceDragMask = [sender draggingSourceOperationMask];
 
-  if (sourceDragMask == NSDragOperationCopy) {
-    return NSDragOperationCopy;
-  } else if (sourceDragMask == NSDragOperationLink) {
-    return NSDragOperationLink;
-  } else {
-    if ([[NSFileManager defaultManager] isWritableFileAtPath: basePath]) {
-      return NSDragOperationAll;			
-    } else {
-      forceCopy = YES;
-      return NSDragOperationCopy;			
+  if (sourceDragMask == NSDragOperationCopy)
+    {
+      return NSDragOperationCopy;
     }
-  }		
+  else if (sourceDragMask == NSDragOperationLink)
+    {
+      return NSDragOperationLink;
+    }
+  else
+    {
+      if ([[NSFileManager defaultManager] isWritableFileAtPath: basePath])
+	{
+	  return NSDragOperationAll;
+	}
+      else
+	{
+	  forceCopy = YES;
+	  return NSDragOperationCopy;
+	}
+    }
 
   isDragTarget = NO;	
   return NSDragOperationNone;
@@ -1348,18 +1395,24 @@ static id <DesktopApplication> desktopApp = nil;
 - (NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender
 {
   NSDragOperation sourceDragMask = [sender draggingSourceOperationMask];
-  
-  if (isDragTarget == NO) {
-    return NSDragOperationNone;
-  }
 
-  if (sourceDragMask == NSDragOperationCopy) {
-    return NSDragOperationCopy;
-  } else if (sourceDragMask == NSDragOperationLink) {
-    return NSDragOperationLink;
-  } else {
-    return forceCopy ? NSDragOperationCopy : NSDragOperationAll;
-  }
+  if (isDragTarget == NO)
+    {
+      return NSDragOperationNone;
+    }
+
+  if (sourceDragMask == NSDragOperationCopy)
+    {
+      return NSDragOperationCopy;
+    }
+  else if (sourceDragMask == NSDragOperationLink)
+    {
+      return NSDragOperationLink;
+    }
+  else
+    {
+      return forceCopy ? NSDragOperationCopy : NSDragOperationAll;
+    }
 
   return NSDragOperationNone;
 }

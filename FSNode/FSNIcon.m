@@ -2,7 +2,7 @@
  *  
  * Copyright (C) 2004-2022 Free Software Foundation, Inc.
  *
- * Authors: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale
  *          Riccardo Mottola <rm@gnu.org>
  * Date: March 2004
  *
@@ -55,9 +55,10 @@ static NSImage *branchImage;
 
 - (void)dealloc
 {
-  if (trectTag != -1) {
-    [self removeTrackingRect: trectTag];
-  }
+  if (trectTag != -1)
+    {
+      [self removeTrackingRect: trectTag];
+    }
   RELEASE (node);
   RELEASE (hostname);
   RELEASE (selection);
@@ -175,160 +176,182 @@ static NSImage *branchImage;
 {
   self = [super init];
 
-  if (self) {
-    NSFontManager *fmanager = [NSFontManager sharedFontManager];
-    NSFont *infoFont;
-    NSRect r = NSZeroRect;
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+  if (self)
+    {
+      NSFontManager *fmanager = [NSFontManager sharedFontManager];
+      NSFont *infoFont;
+      NSRect r = NSZeroRect;
+      NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+
+      fsnodeRep = [FSNodeRep sharedInstance];
+
+      iconSize = isize;
+      icnBounds = NSMakeRect(0, 0, iconSize, iconSize);
+      icnPoint = NSZeroPoint;
+      brImgBounds = NSMakeRect(0, 0, BRANCH_SIZE, BRANCH_SIZE);
     
-    fsnodeRep = [FSNodeRep sharedInstance];
+      ASSIGN (node, anode);
+      selection = nil;
+      selectionTitle = nil;
     
-    iconSize = isize;
-    icnBounds = NSMakeRect(0, 0, iconSize, iconSize);
-    icnPoint = NSZeroPoint;
-    brImgBounds = NSMakeRect(0, 0, BRANCH_SIZE, BRANCH_SIZE);
-    
-    ASSIGN (node, anode);
-    selection = nil;
-    selectionTitle = nil;
-    
-    ASSIGN (icon, [fsnodeRep iconOfSize: iconSize forNode: node]);
-    drawicon = icon;
-    selectedicon = nil;
-    
-    dndSource = dndsrc;
-    acceptDnd = dndaccept;
-    slideBack = slback;
-    
-    selectable = YES;
-    isLeaf = YES;
-    
-    hlightRect = NSZeroRect;
-    hlightRect.size.width = iconSize / 3 * 4;
-    hlightRect.size.height = hlightRect.size.width * [fsnodeRep highlightHeightFactor];
-    if ((hlightRect.size.height - iconSize) < 4) {
-      hlightRect.size.height = iconSize + 4;
-    }
-    hlightRect = NSIntegralRect(hlightRect);
-    ASSIGN (highlightPath, [fsnodeRep highlightPathOfSize: hlightRect.size]);
+      ASSIGN (icon, [fsnodeRep iconOfSize: iconSize forNode: node]);
+      drawicon = icon;
+      selectedicon = nil;
+
+      dndSource = dndsrc;
+      acceptDnd = dndaccept;
+      slideBack = slback;
+
+      selectable = YES;
+      isLeaf = YES;
+
+      hlightRect = NSZeroRect;
+      hlightRect.size.width = iconSize / 3 * 4;
+      hlightRect.size.height = hlightRect.size.width * [fsnodeRep highlightHeightFactor];
+      if ((hlightRect.size.height - iconSize) < 4)
+	{
+	  hlightRect.size.height = iconSize + 4;
+	}
+      hlightRect = NSIntegralRect(hlightRect);
+      ASSIGN (highlightPath, [fsnodeRep highlightPathOfSize: hlightRect.size]);
         
-    if ([[node path] isEqual: path_separator()] && ([node isMountPoint] == NO))
-      {
-	NSString *hname;
+      if ([[node path] isEqual: path_separator()] && ([node isMountPoint] == NO))
+	{
+	  NSString *hname;
 
-	hname = [FSNIcon getBestHostName];
-        ASSIGN (hostname, hname);
-      } 
+	  hname = [FSNIcon getBestHostName];
+	  ASSIGN (hostname, hname);
+	}
     
-    label = [FSNTextCell new];
-    [label setFont: lfont];
-    [label setTextColor: tcolor];
+      label = [FSNTextCell new];
+      [label setFont: lfont];
+      [label setTextColor: tcolor];
 
-    infoFont = [fmanager convertFont: lfont 
-                              toSize: ([lfont pointSize] - 2)];
-    infoFont = [fmanager convertFont: infoFont 
-                         toHaveTrait: NSItalicFontMask];
+      infoFont = [fmanager convertFont: lfont
+				toSize: ([lfont pointSize] - 2)];
+      infoFont = [fmanager convertFont: infoFont
+			   toHaveTrait: NSItalicFontMask];
 
-    infolabel = [FSNTextCell new];
-    [infolabel setFont: infoFont];
-    [infolabel setTextColor: tcolor];
+      infolabel = [FSNTextCell new];
+      [infolabel setFont: infoFont];
+      [infolabel setTextColor: tcolor];
 
-    if (exttype) {
-      [self setExtendedShowType: exttype];
-    } else {
-      [self setNodeInfoShowType: type];  
+      if (exttype)
+	{
+	  [self setExtendedShowType: exttype];
+	}
+      else
+	{
+	  [self setNodeInfoShowType: type];
+	}
+    
+      labelRect = NSZeroRect;
+      labelRect.size.width = [label uncutTitleLenght] + [fsnodeRep labelMargin];
+      labelRect.size.height = [fsnodeRep heightOfFont: [label font]];
+      labelRect = NSIntegralRect(labelRect);
+
+      infoRect = NSZeroRect;
+      if ((showType != FSNInfoNameType) && [[infolabel stringValue] length])
+	{
+	  infoRect.size.width = [infolabel uncutTitleLenght] + [fsnodeRep labelMargin];
+	}
+      else
+	{
+	  infoRect.size.width = labelRect.size.width;
+	}
+      infoRect.size.height = [fsnodeRep heightOfFont: [infolabel font]];
+      infoRect = NSIntegralRect(infoRect);
+
+      icnPosition = ipos;
+      gridIndex = gindex;
+    
+      if (icnPosition == NSImageLeft)
+	{
+	  [label setAlignment: NSLeftTextAlignment];
+	  [infolabel setAlignment: NSLeftTextAlignment];
+      
+	  r.size.width = hlightRect.size.width + labelRect.size.width;
+	  r.size.height = hlightRect.size.height;
+
+	  if (showType != FSNInfoNameType)
+	    {
+	      float lbsh = labelRect.size.height + infoRect.size.height;
+
+	      if (lbsh > hlightRect.size.height)
+		{
+		  r.size.height = lbsh;
+		}
+	    }
+    
+	}
+      else if (icnPosition == NSImageAbove)
+	{
+	  [label setAlignment: NSCenterTextAlignment];
+	  [infolabel setAlignment: NSCenterTextAlignment];
+      
+	  if (labelRect.size.width > hlightRect.size.width)
+	    {
+	      r.size.width = labelRect.size.width;
+	    }
+	  else
+	    {
+	      r.size.width = hlightRect.size.width;
+	    }
+      
+	  r.size.height = labelRect.size.height + hlightRect.size.height;
+      
+	  if (showType != FSNInfoNameType)
+	    {
+	      r.size.height += infoRect.size.height;
+	    }
+      
+	}
+      else if (icnPosition == NSImageOnly)
+	{
+	  r.size.width = hlightRect.size.width;
+	  r.size.height = hlightRect.size.height;
+      
+	}
+      else
+	{
+	  r.size = icnBounds.size;
+	}
+    
+      trectTag = -1;
+      [self setFrame: NSIntegralRect(r)];
+    
+      if (acceptDnd)
+	{
+	  NSArray *pbTypes = [NSArray arrayWithObjects: NSFilenamesPboardType,
+				      @"GWLSFolderPboardType",
+				      @"GWRemoteFilenamesPboardType",
+				      nil];
+	  [self registerForDraggedTypes: pbTypes];
+	}
+
+      isLocked = [node isLocked];
+
+      container = nil;
+
+      isSelected = NO;
+      isOpened = NO;
+      nameEdited = NO;
+      editstamp = 0.0;
+
+      dragdelay = 0;
+      isDragTarget = NO;
+      onSelf = NO;
+
+      labelFrameColor = [NSColor controlColor];
+      if ([[defaults objectForKey: @"dockstyle"] intValue] == DockStyleModern)
+	{
+	  labelFrameColor = [labelFrameColor colorUsingColorSpaceName:NSCalibratedRGBColorSpace];
+	  labelFrameColor = [labelFrameColor colorWithAlphaComponent:0.5];
+	}
+      [labelFrameColor retain];
+
+      drawLabelBackground = NO;
     }
-    
-    labelRect = NSZeroRect;
-    labelRect.size.width = [label uncutTitleLenght] + [fsnodeRep labelMargin];
-    labelRect.size.height = [fsnodeRep heightOfFont: [label font]];
-    labelRect = NSIntegralRect(labelRect);
-
-    infoRect = NSZeroRect;
-    if ((showType != FSNInfoNameType) && [[infolabel stringValue] length]) {
-      infoRect.size.width = [infolabel uncutTitleLenght] + [fsnodeRep labelMargin];
-    } else {
-      infoRect.size.width = labelRect.size.width;
-    }
-    infoRect.size.height = [fsnodeRep heightOfFont: [infolabel font]];
-    infoRect = NSIntegralRect(infoRect);
-
-    icnPosition = ipos;
-    gridIndex = gindex;
-    
-    if (icnPosition == NSImageLeft) {
-      [label setAlignment: NSLeftTextAlignment];
-      [infolabel setAlignment: NSLeftTextAlignment];
-      
-      r.size.width = hlightRect.size.width + labelRect.size.width;    
-      r.size.height = hlightRect.size.height;
-
-      if (showType != FSNInfoNameType) {
-        float lbsh = labelRect.size.height + infoRect.size.height;
-
-        if (lbsh > hlightRect.size.height) {
-          r.size.height = lbsh;
-        }
-      } 
-    
-    } else if (icnPosition == NSImageAbove) {
-      [label setAlignment: NSCenterTextAlignment];
-      [infolabel setAlignment: NSCenterTextAlignment];
-      
-      if (labelRect.size.width > hlightRect.size.width) {
-        r.size.width = labelRect.size.width;
-      } else {
-        r.size.width = hlightRect.size.width;
-      }
-      
-      r.size.height = labelRect.size.height + hlightRect.size.height;
-      
-      if (showType != FSNInfoNameType) {
-        r.size.height += infoRect.size.height;
-      }
-      
-    } else if (icnPosition == NSImageOnly) {
-      r.size.width = hlightRect.size.width;
-      r.size.height = hlightRect.size.height;
-      
-    } else {
-      r.size = icnBounds.size;
-    }
-    
-    trectTag = -1;
-    [self setFrame: NSIntegralRect(r)];
-    
-    if (acceptDnd) {
-      NSArray *pbTypes = [NSArray arrayWithObjects: NSFilenamesPboardType, 
-                                                    @"GWLSFolderPboardType", 
-                                                    @"GWRemoteFilenamesPboardType", 
-                                                    nil];
-      [self registerForDraggedTypes: pbTypes];    
-    }
-
-    isLocked = [node isLocked];
-
-    container = nil;
-
-    isSelected = NO; 
-    isOpened = NO;
-    nameEdited = NO;
-    editstamp = 0.0;
-    
-    dragdelay = 0;
-    isDragTarget = NO;
-    onSelf = NO;
-
-    labelFrameColor = [NSColor controlColor];
-    if ([[defaults objectForKey: @"dockstyle"] intValue] == DockStyleModern)
-      {
-	labelFrameColor = [labelFrameColor colorUsingColorSpaceName:NSCalibratedRGBColorSpace];
-	labelFrameColor = [labelFrameColor colorWithAlphaComponent:0.5];
-      }
-    [labelFrameColor retain];
-
-    drawLabelBackground = NO;
-  }
   
   return self;
 }
