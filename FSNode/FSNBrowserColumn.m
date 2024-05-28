@@ -1367,11 +1367,11 @@ static id <DesktopApplication> desktopApp = nil;
 
   sourceDragMask = [sender draggingSourceOperationMask];
 
-  if (sourceDragMask == NSDragOperationCopy)
+  if (sourceDragMask & NSDragOperationCopy)
     {
       return NSDragOperationCopy;
     }
-  else if (sourceDragMask == NSDragOperationLink)
+  else if (sourceDragMask & NSDragOperationLink)
     {
       return NSDragOperationLink;
     }
@@ -1401,11 +1401,12 @@ static id <DesktopApplication> desktopApp = nil;
       return NSDragOperationNone;
     }
 
-  if (sourceDragMask == NSDragOperationCopy)
+  NSLog(@"FSNBrowserColumn draggingUpdated - determine operation %lu ", sourceDragMask);
+  if (sourceDragMask & NSDragOperationCopy)
     {
       return NSDragOperationCopy;
     }
-  else if (sourceDragMask == NSDragOperationLink)
+  else if (sourceDragMask & NSDragOperationLink)
     {
       return NSDragOperationLink;
     }
@@ -1475,9 +1476,9 @@ static id <DesktopApplication> desktopApp = nil;
   if ([source isEqual: trashPath]) {
     operation = @"GWorkspaceRecycleOutOperation";
   } else {	
-    if (sourceDragMask == NSDragOperationCopy) {
+    if (sourceDragMask & NSDragOperationCopy) {
       operation = NSWorkspaceCopyOperation;
-    } else if (sourceDragMask == NSDragOperationLink) {
+    } else if (sourceDragMask & NSDragOperationLink) {
       operation = NSWorkspaceLinkOperation;
     } else {
       if ([[NSFileManager defaultManager] isWritableFileAtPath: source]) {
@@ -1615,9 +1616,9 @@ static id <DesktopApplication> desktopApp = nil;
     }
   }	
 
-  if (sourceDragMask == NSDragOperationCopy) {
+  if (sourceDragMask & NSDragOperationCopy) {
     return ([node isApplication] ? NSDragOperationMove : NSDragOperationCopy);
-  } else if (sourceDragMask == NSDragOperationLink) {
+  } else if (sourceDragMask & NSDragOperationLink) {
     return ([node isApplication] ? NSDragOperationMove : NSDragOperationLink);
   } else {
     if ([[NSFileManager defaultManager] isWritableFileAtPath: fromPath]
@@ -1684,11 +1685,11 @@ static id <DesktopApplication> desktopApp = nil;
 	}
       else
 	{	
-	  if (sourceDragMask == NSDragOperationCopy)
+	  if (sourceDragMask & NSDragOperationCopy)
 	    {
 	      operation = NSWorkspaceCopyOperation;
 	    }
-	  else if (sourceDragMask == NSDragOperationLink)
+	  else if (sourceDragMask & NSDragOperationLink)
 	    {
 	      operation = NSWorkspaceLinkOperation;
 	    }

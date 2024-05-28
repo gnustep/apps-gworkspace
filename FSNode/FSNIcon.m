@@ -1453,14 +1453,14 @@ static NSImage *branchImage;
   
 	sourceDragMask = [sender draggingSourceOperationMask];
 
-	if (sourceDragMask == NSDragOperationCopy) {
+	if (sourceDragMask & NSDragOperationCopy) {
     if ([node isApplication]) {
       return (onApplication ? NSDragOperationCopy : NSDragOperationMove);
     } else {
       return NSDragOperationCopy;
     }
     
-	} else if (sourceDragMask == NSDragOperationLink) {
+	} else if (sourceDragMask & NSDragOperationLink) {
     if ([node isApplication]) {
       return (onApplication ? NSDragOperationLink : NSDragOperationMove);
     } else {
@@ -1503,16 +1503,24 @@ static NSImage *branchImage;
     }
   }
 
+  NSLog(@"FSNIcon draggingUpdated - determine operation %lu ", (unsigned long)sourceDragMask);
+  if (sourceDragMask & NSDragOperationEvery)
+    NSLog(@"NSDragOperationEvery");
+  if (sourceDragMask & NSDragOperationCopy)
+    NSLog(@"NSDragOperationCopy");
+  if (sourceDragMask & NSDragOperationMove)
+    NSLog(@"NSDragOperationMove");
+ 
   if (isDragTarget == NO) {
     return NSDragOperationNone;
-  } else if (sourceDragMask == NSDragOperationCopy) {
+  } else if (sourceDragMask & NSDragOperationCopy) {
     if ([node isApplication]) {
       return (onApplication ? NSDragOperationCopy : NSDragOperationMove);
     } else {
       return NSDragOperationCopy;
     }
     
-	} else if (sourceDragMask == NSDragOperationLink) {
+	} else if (sourceDragMask & NSDragOperationLink) {
     if ([node isApplication]) {
       return (onApplication ? NSDragOperationLink : NSDragOperationMove);
     } else {
@@ -1604,9 +1612,9 @@ static NSImage *branchImage;
     if ([source isEqual: trashPath]) {
       operation = @"GWorkspaceRecycleOutOperation";
 	  } else {	
-		  if (sourceDragMask == NSDragOperationCopy) {
+		  if (sourceDragMask & NSDragOperationCopy) {
 			  operation = NSWorkspaceCopyOperation;
-		  } else if (sourceDragMask == NSDragOperationLink) {
+		  } else if (sourceDragMask & NSDragOperationLink) {
 			  operation = NSWorkspaceLinkOperation;
 		  } else {
         if ([[NSFileManager defaultManager] isWritableFileAtPath: source]) {

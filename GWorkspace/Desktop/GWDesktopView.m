@@ -1685,11 +1685,11 @@ static void GWHighlightFrameRect(NSRect aRect)
 
   sourceDragMask = [sender draggingSourceOperationMask];
 
-  if (sourceDragMask == NSDragOperationCopy)
+  if (sourceDragMask & NSDragOperationCopy)
     {
       return NSDragOperationCopy;
     }
-  else if (sourceDragMask == NSDragOperationLink)
+  else if (sourceDragMask & NSDragOperationLink)
     {
       return NSDragOperationLink;
     }
@@ -1770,12 +1770,20 @@ static void GWHighlightFrameRect(NSRect aRect)
       return NSDragOperationNone;
   }
 
-  if (sourceDragMask == NSDragOperationCopy)
+  NSLog(@"GWDesktopView draggingUpdated - determine operation %lu ", sourceDragMask);
+  if (sourceDragMask & NSDragOperationEvery)
+    NSLog(@"NSDragOperationEvery");
+  if (sourceDragMask & NSDragOperationCopy)
+    NSLog(@"NSDragOperationCopy");
+  if (sourceDragMask & NSDragOperationMove)
+    NSLog(@"NSDragOperationMove");
+ 
+  if (sourceDragMask & NSDragOperationCopy)
     {
       return NSDragOperationCopy;
     }
   else if
-    (sourceDragMask == NSDragOperationLink)
+    (sourceDragMask & NSDragOperationLink)
     {
       return NSDragOperationLink;
     }
@@ -1990,11 +1998,11 @@ NSComparisonResult sortDragged(id icn1, id icn2, void *context)
     }
   else
     {
-      if (sourceDragMask == NSDragOperationCopy)
+      if (sourceDragMask & NSDragOperationCopy)
 	{
 	  operation = NSWorkspaceCopyOperation;
 	}
-      else if (sourceDragMask == NSDragOperationLink)
+      else if (sourceDragMask & NSDragOperationLink)
 	{
 	  operation = NSWorkspaceLinkOperation;
 	}
