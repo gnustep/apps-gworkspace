@@ -98,96 +98,106 @@ static NSString *nibName = @"FileOperationWin";
       win = nil;
       showwin = uwnd;
   
-      if (showwin) {
-	if ([NSBundle loadNibNamed: nibName owner: self] == NO)
-	  {
-	    NSLog(@"failed to load %@!", nibName);
-	    DESTROY (self);
-	    return self;
-	  }
-      
-      if (NSEqualRects(wrect, NSZeroRect) == NO) {
-        [win setFrame: wrect display: NO];
-      } else if ([win setFrameUsingName: @"fopinfo"] == NO) {
-        [win setFrame: NSMakeRect(300, 300, 282, 102) display: NO];
-      }
-
-      [fromLabel setStringValue: NSLocalizedString(@"From:", @"")];
-      [toLabel setStringValue: NSLocalizedString(@"To:", @"")];
-      [pauseButt setTitle: NSLocalizedString(@"Pause", @"")];
-      [stopButt setTitle: NSLocalizedString(@"Stop", @"")];      
-    }
- 
-    ref = rf;
-    controller = cntrl;
-    fm = [NSFileManager defaultManager];
-    nc = [NSNotificationCenter defaultCenter];
-    dnc = [NSDistributedNotificationCenter defaultCenter];
-    
-    ASSIGN (type, tp);
-    ASSIGN (source, src);
-    ASSIGN (destination, dst);
-    files = [[NSMutableArray arrayWithArray:fls] retain];
-    procFiles = [[NSMutableArray alloc] init];
-    
-    dupfiles = [NSMutableArray new];
-    
-    if ([type isEqual: NSWorkspaceDuplicateOperation]) {    
-      NSString *copystr = NSLocalizedString(@"_copy", @"");
-      unsigned i;
-      
-      for (i = 0; i < [files count]; i++)
+      if (showwin)
 	{
-	  NSDictionary *fdict = [files objectAtIndex: i];
-	  NSString *fname = [fdict objectForKey: @"name"]; 
-	  NSString *newname = [NSString stringWithString: fname];
-	  NSString *ext = [newname pathExtension]; 
-	  NSString *base = [newname stringByDeletingPathExtension];        
-	  NSString *ntmp;
-	  NSString *destpath;        
-	  NSUInteger count = 1;
-	      
-	  while (1)
+	  if ([NSBundle loadNibNamed: nibName owner: self] == NO)
 	    {
-	      if (count == 1)
-		{
-		  ntmp = [NSString stringWithFormat: @"%@%@", base, copystr];
-		  if ([ext length]) {
-		    ntmp = [ntmp stringByAppendingPathExtension: ext];
-		  }
-		} else
-		{
-		  ntmp = [NSString stringWithFormat: @"%@%@%lu", base, copystr, (unsigned long)count];
-		  if ([ext length]) {
-		    ntmp = [ntmp stringByAppendingPathExtension: ext];
-		  }
-		}
-	      destpath = [destination stringByAppendingPathComponent: ntmp];
+	      NSLog(@"failed to load %@!", nibName);
+	      DESTROY (self);
+	      return self;
+	    }
+      
+	  if (NSEqualRects(wrect, NSZeroRect) == NO)
+	    {
+	      [win setFrame: wrect display: NO];
+	    }
+	  else if ([win setFrameUsingName: @"fopinfo"] == NO)
+	    {
+	      [win setFrame: NSMakeRect(300, 300, 282, 102) display: NO];
+	    }
 
-	    if ([fm fileExistsAtPath: destpath] == NO) {
-	      newname = ntmp;
-	      break;
-	    } else
-	      {
-		count++;
-	      }
-	  }
-        
-	  [dupfiles addObject: newname];
+	  [fromLabel setStringValue: NSLocalizedString(@"From:", @"")];
+	  [toLabel setStringValue: NSLocalizedString(@"To:", @"")];
+	  [pauseButt setTitle: NSLocalizedString(@"Pause", @"")];
+	  [stopButt setTitle: NSLocalizedString(@"Stop", @"")];
 	}
-    }
+ 
+      ref = rf;
+      controller = cntrl;
+      fm = [NSFileManager defaultManager];
+      nc = [NSNotificationCenter defaultCenter];
+      dnc = [NSDistributedNotificationCenter defaultCenter];
     
-    operationDict = [NSMutableDictionary new];
-    [operationDict setObject: type forKey: @"operation"]; 
-    [operationDict setObject: [NSNumber numberWithInt: ref] forKey: @"ref"];
-    [operationDict setObject: source forKey: @"source"]; 
-    if (destination != nil)
-      [operationDict setObject: destination forKey: @"destination"]; 
-    [operationDict setObject: files forKey: @"files"]; 
+      ASSIGN (type, tp);
+      ASSIGN (source, src);
+      ASSIGN (destination, dst);
+      files = [[NSMutableArray arrayWithArray:fls] retain];
+      procFiles = [[NSMutableArray alloc] init];
+    
+      dupfiles = [NSMutableArray new];
+    
+      if ([type isEqual: NSWorkspaceDuplicateOperation])
+	{
+	  NSString *copystr = NSLocalizedString(@"_copy", @"");
+	  unsigned i;
 
-    confirm = conf;
-    executor = nil;
-    opdone = NO;
+	  for (i = 0; i < [files count]; i++)
+	    {
+	      NSDictionary *fdict = [files objectAtIndex: i];
+	      NSString *fname = [fdict objectForKey: @"name"];
+	      NSString *newname = [NSString stringWithString: fname];
+	      NSString *ext = [newname pathExtension];
+	      NSString *base = [newname stringByDeletingPathExtension];
+	      NSString *ntmp;
+	      NSString *destpath;
+	      NSUInteger count = 1;
+
+	      while (1)
+		{
+		  if (count == 1)
+		    {
+		      ntmp = [NSString stringWithFormat: @"%@%@", base, copystr];
+		      if ([ext length])
+			{
+			  ntmp = [ntmp stringByAppendingPathExtension: ext];
+			}
+		    }
+		  else
+		    {
+		      ntmp = [NSString stringWithFormat: @"%@%@%lu", base, copystr, (unsigned long)count];
+		      if ([ext length])
+			{
+			  ntmp = [ntmp stringByAppendingPathExtension: ext];
+			}
+		    }
+		  destpath = [destination stringByAppendingPathComponent: ntmp];
+
+		  if ([fm fileExistsAtPath: destpath] == NO)
+		    {
+		      newname = ntmp;
+		      break;
+		    }
+		  else
+		    {
+		      count++;
+		    }
+		}
+        
+	      [dupfiles addObject: newname];
+	    }
+	}
+    
+      operationDict = [NSMutableDictionary new];
+      [operationDict setObject: type forKey: @"operation"];
+      [operationDict setObject: [NSNumber numberWithInt: ref] forKey: @"ref"];
+      [operationDict setObject: source forKey: @"source"];
+      if (destination != nil)
+	[operationDict setObject: destination forKey: @"destination"];
+      [operationDict setObject: files forKey: @"files"];
+
+      confirm = conf;
+      executor = nil;
+      opdone = NO;
     }
   
   return self;
@@ -425,63 +435,71 @@ static NSString *nibName = @"FileOperationWin";
 - (void)showProgressWin
 {  
   if ([win isVisible] == NO) {
-    if ([type isEqual: NSWorkspaceMoveOperation]) {
-      [win setTitle: NSLocalizedString(@"Move", @"")];
-      [fromLabel setStringValue: NSLocalizedString(@"From:", @"")];
-      [fromField setStringValue: relativePathFittingInField(fromField, source)];
-      [toLabel setStringValue: NSLocalizedString(@"To:", @"")];
-      [toField setStringValue: relativePathFittingInField(fromField, destination)];
-    
-    } else if ([type isEqual: NSWorkspaceCopyOperation]) {
-      [win setTitle: NSLocalizedString(@"Copy", @"")];
-      [fromLabel setStringValue: NSLocalizedString(@"From:", @"")];
-      [fromField setStringValue: relativePathFittingInField(fromField, source)];
-      [toLabel setStringValue: NSLocalizedString(@"To:", @"")];
-      [toField setStringValue: relativePathFittingInField(fromField, destination)];
-    
-    } else if ([type isEqual: NSWorkspaceLinkOperation]) {
-      [win setTitle: NSLocalizedString(@"Link", @"")];
-      [fromLabel setStringValue: NSLocalizedString(@"From:", @"")];
-      [fromField setStringValue: relativePathFittingInField(fromField, source)];
-      [toLabel setStringValue: NSLocalizedString(@"To:", @"")];
-      [toField setStringValue: relativePathFittingInField(fromField, destination)];
-    
-    } else if ([type isEqual: NSWorkspaceDuplicateOperation]) {
-      [win setTitle: NSLocalizedString(@"Duplicate", @"")];
-      [fromLabel setStringValue: NSLocalizedString(@"In:", @"")];
-      [fromField setStringValue: relativePathFittingInField(fromField, destination)];
-      [toLabel setStringValue: @""];
-      [toField setStringValue: @""];
-    
-    } else if ([type isEqual: NSWorkspaceDestroyOperation]) {
-      [win setTitle: NSLocalizedString(@"Destroy", @"")];
-      [fromLabel setStringValue: NSLocalizedString(@"In:", @"")];
-      [fromField setStringValue: relativePathFittingInField(fromField, destination)];
-      [toLabel setStringValue: @""];
-      [toField setStringValue: @""];
-    
-    } else if ([type isEqual: NSWorkspaceRecycleOperation]) {
-      [win setTitle: NSLocalizedString(@"Move", @"")];
-      [fromLabel setStringValue: NSLocalizedString(@"From:", @"")];
-      [fromField setStringValue: relativePathFittingInField(fromField, source)];
-      [toLabel setStringValue: NSLocalizedString(@"To:", @"")];
-      [toField setStringValue: NSLocalizedString(@"the Recycler", @"")];
-        
-    } else if ([type isEqual: @"GWorkspaceRecycleOutOperation"]) {
-      [win setTitle: NSLocalizedString(@"Move", @"")];
-      [fromLabel setStringValue: NSLocalizedString(@"From:", @"")];
-      [fromField setStringValue: NSLocalizedString(@"the Recycler", @"")];
-      [toLabel setStringValue: NSLocalizedString(@"To:", @"")];
-      [toField setStringValue: relativePathFittingInField(fromField, destination)];
-                            
-    } else if ([type isEqual: @"GWorkspaceEmptyRecyclerOperation"]) {
-      [win setTitle: NSLocalizedString(@"Destroy", @"")];
-      [fromLabel setStringValue: NSLocalizedString(@"In:", @"")];
-      [fromField setStringValue: NSLocalizedString(@"the Recycler", @"")];
-      [toLabel setStringValue: @""];
-      [toField setStringValue: @""];    
-    }
-    
+    if ([type isEqual: NSWorkspaceMoveOperation])
+      {
+	[win setTitle: NSLocalizedString(@"Move", @"")];
+	[fromLabel setStringValue: NSLocalizedString(@"From:", @"")];
+	[fromField setStringValue: relativePathFittingInField(fromField, source)];
+	[toLabel setStringValue: NSLocalizedString(@"To:", @"")];
+	[toField setStringValue: relativePathFittingInField(fromField, destination)];
+      }
+    else if ([type isEqual: NSWorkspaceCopyOperation])
+      {
+	[win setTitle: NSLocalizedString(@"Copy", @"")];
+	[fromLabel setStringValue: NSLocalizedString(@"From:", @"")];
+	[fromField setStringValue: relativePathFittingInField(fromField, source)];
+	[toLabel setStringValue: NSLocalizedString(@"To:", @"")];
+	[toField setStringValue: relativePathFittingInField(fromField, destination)];
+      }
+    else if ([type isEqual: NSWorkspaceLinkOperation])
+      {
+	[win setTitle: NSLocalizedString(@"Link", @"")];
+	[fromLabel setStringValue: NSLocalizedString(@"From:", @"")];
+	[fromField setStringValue: relativePathFittingInField(fromField, source)];
+	[toLabel setStringValue: NSLocalizedString(@"To:", @"")];
+	[toField setStringValue: relativePathFittingInField(fromField, destination)];
+      }
+    else if ([type isEqual: NSWorkspaceDuplicateOperation])
+      {
+	[win setTitle: NSLocalizedString(@"Duplicate", @"")];
+	[fromLabel setStringValue: NSLocalizedString(@"In:", @"")];
+	[fromField setStringValue: relativePathFittingInField(fromField, destination)];
+	[toLabel setStringValue: @""];
+	[toField setStringValue: @""];
+      }
+    else if ([type isEqual: NSWorkspaceDestroyOperation])
+      {
+	[win setTitle: NSLocalizedString(@"Destroy", @"")];
+	[fromLabel setStringValue: NSLocalizedString(@"In:", @"")];
+	[fromField setStringValue: relativePathFittingInField(fromField, destination)];
+	[toLabel setStringValue: @""];
+	[toField setStringValue: @""];
+      }
+    else if ([type isEqual: NSWorkspaceRecycleOperation])
+      {
+	[win setTitle: NSLocalizedString(@"Move", @"")];
+	[fromLabel setStringValue: NSLocalizedString(@"From:", @"")];
+	[fromField setStringValue: relativePathFittingInField(fromField, source)];
+	[toLabel setStringValue: NSLocalizedString(@"To:", @"")];
+	[toField setStringValue: NSLocalizedString(@"the Recycler", @"")];
+      }
+    else if ([type isEqual: @"GWorkspaceRecycleOutOperation"])
+      {
+	[win setTitle: NSLocalizedString(@"Move", @"")];
+	[fromLabel setStringValue: NSLocalizedString(@"From:", @"")];
+	[fromField setStringValue: NSLocalizedString(@"the Recycler", @"")];
+	[toLabel setStringValue: NSLocalizedString(@"To:", @"")];
+	[toField setStringValue: relativePathFittingInField(fromField, destination)];
+      }
+    else if ([type isEqual: @"GWorkspaceEmptyRecyclerOperation"])
+      {
+	[win setTitle: NSLocalizedString(@"Destroy", @"")];
+	[fromLabel setStringValue: NSLocalizedString(@"In:", @"")];
+	[fromField setStringValue: NSLocalizedString(@"the Recycler", @"")];
+	[toLabel setStringValue: @""];
+	[toField setStringValue: @""];
+      }
+
     [progInd setIndeterminate: YES];
     [progInd startAnimation: self];
   }
@@ -537,15 +555,16 @@ static NSString *nibName = @"FileOperationWin";
   CREATE_AUTORELEASE_POOL(arp);
   NSMutableDictionary *dict = [NSMutableDictionary dictionary];	
   NSUInteger i;
-    
+
   notifNames = [NSMutableArray new];
-  
-  for (i = 0; i < [files count]; i++) {
-    NSDictionary *fdict = [files objectAtIndex: i];
-    NSString *name = [fdict objectForKey: @"name"]; 
-    [notifNames addObject: name];
-  }
-  
+
+  for (i = 0; i < [files count]; i++)
+    {
+      NSDictionary *fdict = [files objectAtIndex: i];
+      NSString *name = [fdict objectForKey: @"name"];
+      [notifNames addObject: name];
+    }
+
   [dict setObject: type forKey: @"operation"];	
   [dict setObject: source forKey: @"source"];	
   if (destination != nil)
@@ -685,15 +704,16 @@ shouldMakeNewConnection:(NSConnection*)newConn
 	              name: NSConnectionDidDieNotification 
               object: [notification object]];
 
-  if (opdone == NO) {
-    NSRunAlertPanel(nil, 
-                    NSLocalizedString(@"executor connection died!", @""), 
-                    NSLocalizedString(@"Continue", @""), 
-                    nil, 
-                    nil);
-    [self sendDidChangeNotification];
-    [self endOperation];
-  }
+  if (opdone == NO)
+    {
+      NSRunAlertPanel(nil,
+		      NSLocalizedString(@"executor connection died!", @""),
+		      NSLocalizedString(@"Continue", @""),
+		      nil,
+		      nil);
+      [self sendDidChangeNotification];
+      [self endOperation];
+    }
 }
 
 - (NSString *)type
@@ -739,9 +759,10 @@ shouldMakeNewConnection:(NSConnection*)newConn
 - (void) getWinRect: (NSRect*)rptr
 {
   *rptr = NSZeroRect;
-  if (win && [win isVisible]) {
-    *rptr = [win frame];
-  }
+  if (win && [win isVisible])
+    {
+      *rptr = [win frame];
+    }
 }
 
 @end
@@ -845,8 +866,8 @@ shouldMakeNewConnection:(NSConnection*)newConn
 {
   NSArray *dirContents;
   NSUInteger i;
-    
-	samename = NO;
+
+  samename = NO;
 
   if (([operation isEqual: @"GWorkspaceRenameOperation"])
         || ([operation isEqual: @"GWorkspaceCreateDirOperation"])
@@ -879,7 +900,6 @@ shouldMakeNewConnection:(NSConnection*)newConn
           || ([operation isEqual: @"GWorkspaceRecycleOutOperation"]))
         {
           return YES;
-          
         }
       else if (([operation isEqual: NSWorkspaceDestroyOperation]) 
                || ([operation isEqual: NSWorkspaceDuplicateOperation])

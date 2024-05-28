@@ -1569,95 +1569,113 @@ static void GWHighlightFrameRect(NSRect aRect)
 	
   pb = [sender draggingPasteboard];
 
-  if (pb && [[pb types] containsObject: NSFilenamesPboardType]) {
-    sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
-       
-  } else if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"]) {
-    NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"]; 
-    NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
-    
+  if (pb && [[pb types] containsObject: NSFilenamesPboardType])
+    {
+      sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
+    }
+  else if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"])
+    {
+      NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"];
+      NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
+
     sourcePaths = [pbDict objectForKey: @"paths"];
+    }
+  else if ([[pb types] containsObject: @"GWLSFolderPboardType"])
+    {
+      NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"];
+      NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
 
-  } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {
-    NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
-    NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
-    
-    sourcePaths = [pbDict objectForKey: @"paths"];
+      sourcePaths = [pbDict objectForKey: @"paths"];
+    }
+  else
+    {
+      return NSDragOperationNone;
+    }
 
-  } else {
-    return NSDragOperationNone;
-  }
+  count = [sourcePaths count];
+  if (count == 0)
+    {
+      return NSDragOperationNone;
+    }
 
-	count = [sourcePaths count];
-	if (count == 0) {
-		return NSDragOperationNone;
-  } 
-    
   dragLocalIcon = YES;    
-    
+
   for (i = 0; i < [sourcePaths count]; i++) {
     NSString *srcpath = [sourcePaths objectAtIndex: i];
   
-    if ([self repOfSubnodePath: srcpath] == nil) {
-      dragLocalIcon = NO;
-    }
-  }    
-    
-  if (dragLocalIcon) {  
-    isDragTarget = YES;	
-    dragPoint = NSZeroPoint;
-    DESTROY (dragIcon);
-    insertIndex = NSNotFound;
-    return NSDragOperationAll;
+    if ([self repOfSubnodePath: srcpath] == nil)
+      {
+	dragLocalIcon = NO;
+      }
   }
 
-  if ([node isWritable] == NO) {
-    return NSDragOperationNone;
+  if (dragLocalIcon)
+    {
+      isDragTarget = YES;
+      dragPoint = NSZeroPoint;
+      DESTROY (dragIcon);
+      insertIndex = NSNotFound;
+      return NSDragOperationAll;
   }
-    
+
+  if ([node isWritable] == NO)
+    {
+      return NSDragOperationNone;
+    }
+
   nodePath = [node path];
 
   basePath = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
-  if ([basePath isEqual: nodePath]) {
-    return NSDragOperationNone;
-  }
+  if ([basePath isEqual: nodePath])
+    {
+      return NSDragOperationNone;
+    }
 
-  if ([sourcePaths containsObject: nodePath]) {
-    return NSDragOperationNone;
-  }
+  if ([sourcePaths containsObject: nodePath])
+    {
+      return NSDragOperationNone;
+    }
 
   prePath = [NSString stringWithString: nodePath];
 
-  while (1) {
-    if ([sourcePaths containsObject: prePath]) {
-      return NSDragOperationNone;
+  while (1)
+    {
+      if ([sourcePaths containsObject: prePath])
+	{
+	  return NSDragOperationNone;
+	}
+      if ([prePath isEqual: path_separator()])
+	{
+	  break;
+	}
+      prePath = [prePath stringByDeletingLastPathComponent];
     }
-    if ([prePath isEqual: path_separator()]) {
-      break;
-    }            
-    prePath = [prePath stringByDeletingLastPathComponent];
-  }
 
-  if ([node isDirectory] && [node isParentOfPath: basePath]) {
-    NSArray *subNodes = [node subNodes];
-    NSUInteger i;
-    
-    for (i = 0; i < [subNodes count]; i++) {
-      FSNode *nd = [subNodes objectAtIndex: i];
-      
-      if ([nd isDirectory]) {
-        NSUInteger j;
-        
-        for (j = 0; j < count; j++) {
-          NSString *fname = [[sourcePaths objectAtIndex: j] lastPathComponent];
-          
-          if ([[nd name] isEqual: fname]) {
-            return NSDragOperationNone;
-          }
-        }
-      }
+  if ([node isDirectory] && [node isParentOfPath: basePath])
+    {
+      NSArray *subNodes = [node subNodes];
+      NSUInteger i;
+
+      for (i = 0; i < [subNodes count]; i++)
+	{
+	  FSNode *nd = [subNodes objectAtIndex: i];
+
+	  if ([nd isDirectory])
+	    {
+	      NSUInteger j;
+
+	      for (j = 0; j < count; j++)
+		{
+		  NSString *fname = [[sourcePaths objectAtIndex: j] lastPathComponent];
+
+		  if ([[nd name] isEqual: fname])
+		    {
+		      return NSDragOperationNone;
+		    }
+		}
+	    }
+	}
     }
-  }	
 
   isDragTarget = YES;	
   forceCopy = NO;
@@ -1667,18 +1685,26 @@ static void GWHighlightFrameRect(NSRect aRect)
 
   sourceDragMask = [sender draggingSourceOperationMask];
 
-	if (sourceDragMask == NSDragOperationCopy) {
-		return NSDragOperationCopy;
-	} else if (sourceDragMask == NSDragOperationLink) {
-		return NSDragOperationLink;
-	} else {
-    if ([[NSFileManager defaultManager] isWritableFileAtPath: basePath]) {
-      return NSDragOperationAll;			
-    } else {
-      forceCopy = YES;
-			return NSDragOperationCopy;			
+  if (sourceDragMask == NSDragOperationCopy)
+    {
+      return NSDragOperationCopy;
     }
-	}		
+  else if (sourceDragMask == NSDragOperationLink)
+    {
+      return NSDragOperationLink;
+    }
+  else
+    {
+      if ([[NSFileManager defaultManager] isWritableFileAtPath: basePath])
+	{
+	  return NSDragOperationAll;
+	}
+      else
+	{
+	  forceCopy = YES;
+	  return NSDragOperationCopy;
+	}
+    }
 
   isDragTarget = NO;	
   return NSDragOperationNone;
@@ -1707,46 +1733,58 @@ static void GWHighlightFrameRect(NSRect aRect)
 
   index = [self indexOfGridRectContainingPoint: dpoint];
 
-  if ([self isFreeGridIndex: index]) {
-    NSImage *img = [sender draggedImage];
-    NSSize sz = [img size];
-    NSRect irect = [self iconBoundsInGridAtIndex: index];
+  if ([self isFreeGridIndex: index])
+    {
+      NSImage *img = [sender draggedImage];
+      NSSize sz = [img size];
+      NSRect irect = [self iconBoundsInGridAtIndex: index];
     
-    dragPoint.x = ceil(irect.origin.x + ((irect.size.width - sz.width) / 2));
-    dragPoint.y = ceil(irect.origin.y + ((irect.size.height - sz.height) / 2));
+      dragPoint.x = ceil(irect.origin.x + ((irect.size.width - sz.width) / 2));
+      dragPoint.y = ceil(irect.origin.y + ((irect.size.height - sz.height) / 2));
     
-    if (dragIcon == nil) {
-      ASSIGN (dragIcon, img); 
-    }
+      if (dragIcon == nil)
+	{
+	  ASSIGN (dragIcon, img);
+	}
   
-    if (insertIndex != index) {
-      [self setNeedsDisplayInRect: grid[index]];
+      if (insertIndex != index)
+	{
+	  [self setNeedsDisplayInRect: grid[index]];
       
-      if (insertIndex != NSNotFound) {
-        [self setNeedsDisplayInRect: grid[insertIndex]];
-      }
-    }
-    
-    insertIndex = index;
-    
-  } else {
-    DESTROY (dragIcon);
-    if (insertIndex != NSNotFound) {
-      [self setNeedsDisplayInRect: grid[insertIndex]];
-    }
-    insertIndex = NSNotFound;
-    return NSDragOperationNone;
-  }
-
-  if (sourceDragMask == NSDragOperationCopy) {
-		return NSDragOperationCopy;
-	} else if (sourceDragMask == NSDragOperationLink) {
-		return NSDragOperationLink;
-	} else {
-		return forceCopy ? NSDragOperationCopy : NSDragOperationAll;
+	  if (insertIndex != NSNotFound)
+	    {
+	      [self setNeedsDisplayInRect: grid[insertIndex]];
+	    }
 	}
 
-	return NSDragOperationNone;
+      insertIndex = index;
+    }
+  else
+    {
+      DESTROY (dragIcon);
+      if (insertIndex != NSNotFound)
+	{
+	  [self setNeedsDisplayInRect: grid[insertIndex]];
+	}
+      insertIndex = NSNotFound;
+      return NSDragOperationNone;
+  }
+
+  if (sourceDragMask == NSDragOperationCopy)
+    {
+      return NSDragOperationCopy;
+    }
+  else if
+    (sourceDragMask == NSDragOperationLink)
+    {
+      return NSDragOperationLink;
+    }
+  else
+    {
+      return forceCopy ? NSDragOperationCopy : NSDragOperationAll;
+    }
+
+  return NSDragOperationNone;
 }
 
 - (void)draggingExited:(id <NSDraggingInfo>)sender
@@ -1754,14 +1792,16 @@ static void GWHighlightFrameRect(NSRect aRect)
   NSPoint dpoint = [sender draggingLocation];
 
   DESTROY (dragIcon);
-  if (insertIndex != NSNotFound) {
-    [self setNeedsDisplayInRect: grid[insertIndex]];
-  }
-	isDragTarget = NO;
+  if (insertIndex != NSNotFound)
+    {
+      [self setNeedsDisplayInRect: grid[insertIndex]];
+    }
+  isDragTarget = NO;
 
-  if (NSPointInRect(dpoint, [manager tshelfReservedFrame]) == NO) {
-    [manager mouseExitedTShelfActiveFrame];
-  }
+  if (NSPointInRect(dpoint, [manager tshelfReservedFrame]) == NO)
+    {
+      [manager mouseExitedTShelfActiveFrame];
+    }
 }
 
 - (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
@@ -1781,14 +1821,18 @@ NSComparisonResult sortDragged(id icn1, id icn2, void *context)
   NSUInteger pos2 = [icn2 gridIndex];
   NSUInteger i;
 
-  for (i = 0; i < [indexes count]; i++) {
-    NSNumber *n = [indexes objectAtIndex: i];
-    
-    if ([n unsignedIntegerValue] == pos1) {
-      return NSOrderedAscending;
-    } else if ([n intValue] == pos2) {
-      return NSOrderedDescending;
-    }
+  for (i = 0; i < [indexes count]; i++)
+    {
+      NSNumber *n = [indexes objectAtIndex: i];
+
+    if ([n unsignedIntegerValue] == pos1)
+      {
+	return NSOrderedAscending;
+      }
+    else if ([n intValue] == pos2)
+      {
+	return NSOrderedDescending;
+      }
   }
 
   return NSOrderedSame;
