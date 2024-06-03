@@ -1381,7 +1381,7 @@ static NSImage *branchImage;
 
   if (onSelf) {
     isDragTarget = YES;
-    return NSDragOperationAll;  
+    return NSDragOperationEvery;
   }
 
   fromPath = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
@@ -1448,35 +1448,41 @@ static NSImage *branchImage;
   forceCopy = NO;
   
   onApplication = ([node isApplication]
-                      && [container respondsToSelector: @selector(baseNode)]
-                                      && [node isEqual: [container baseNode]]);   
+		   && [container respondsToSelector: @selector(baseNode)]
+		   && [node isEqual: [container baseNode]]);   
   
-	sourceDragMask = [sender draggingSourceOperationMask];
+  sourceDragMask = [sender draggingSourceOperationMask];
 
-	if (sourceDragMask & NSDragOperationCopy) {
+  if (sourceDragMask & NSDragOperationMove)
+    {
+      NSLog(@"FSNIcon dragginEntered - Move");
+      return NSDragOperationMove;
+    }
+
+  if (sourceDragMask & NSDragOperationCopy) {
     if ([node isApplication]) {
       return (onApplication ? NSDragOperationCopy : NSDragOperationMove);
     } else {
       return NSDragOperationCopy;
     }
     
-	} else if (sourceDragMask & NSDragOperationLink) {
+  } else if (sourceDragMask & NSDragOperationLink) {
     if ([node isApplication]) {
       return (onApplication ? NSDragOperationLink : NSDragOperationMove);
     } else {
       return NSDragOperationLink;
     }
   
-	} else {  
+  } else {  
     if ([[NSFileManager defaultManager] isWritableFileAtPath: fromPath]
                           || ([node isApplication] && (onApplication == NO))) {
-      return NSDragOperationAll;			
+      return NSDragOperationAll;
     } else if (([node isApplication] == NO) || onApplication) {
       forceCopy = YES;
-			return NSDragOperationCopy;			
+      return NSDragOperationCopy;			
     }
-	}
-    
+  }
+
   return NSDragOperationNone;
 }
 
@@ -1504,23 +1510,26 @@ static NSImage *branchImage;
   }
 
   NSLog(@"FSNIcon draggingUpdated - determine operation %lu ", (unsigned long)sourceDragMask);
-  if (sourceDragMask & NSDragOperationEvery)
+  if (sourceDragMask == NSDragOperationEvery)
     NSLog(@"NSDragOperationEvery");
-  if (sourceDragMask & NSDragOperationCopy)
-    NSLog(@"NSDragOperationCopy");
   if (sourceDragMask & NSDragOperationMove)
     NSLog(@"NSDragOperationMove");
- 
+  else if (sourceDragMask & NSDragOperationCopy)
+    NSLog(@"NSDragOperationCopy");
+
   if (isDragTarget == NO) {
     return NSDragOperationNone;
+  } else if (sourceDragMask & NSDragOperationMove) {
+    NSLog(@"FSNIcon - NSDragOperatiomMove");
+    return NSDragOperationMove;
   } else if (sourceDragMask & NSDragOperationCopy) {
     if ([node isApplication]) {
+      NSLog(@"onApplication ? %d", onApplication);
       return (onApplication ? NSDragOperationCopy : NSDragOperationMove);
     } else {
       return NSDragOperationCopy;
     }
-    
-	} else if (sourceDragMask & NSDragOperationLink) {
+  } else if (sourceDragMask & NSDragOperationLink) {
     if ([node isApplication]) {
       return (onApplication ? NSDragOperationLink : NSDragOperationMove);
     } else {
@@ -1605,25 +1614,35 @@ static NSImage *branchImage;
     
   sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
 
-  if (([node isApplication] == NO) || onApplication) {
-    source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
-    trashPath = [desktopApp trashPath];
+  if (([node isApplication] == NO) || onApplication)
+    {
+      source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
+      trashPath = [desktopApp trashPath];
 
-    if ([source isEqual: trashPath]) {
-      operation = @"GWorkspaceRecycleOutOperation";
-	  } else {	
-		  if (sourceDragMask & NSDragOperationCopy) {
-			  operation = NSWorkspaceCopyOperation;
-		  } else if (sourceDragMask & NSDragOperationLink) {
-			  operation = NSWorkspaceLinkOperation;
-		  } else {
-        if ([[NSFileManager defaultManager] isWritableFileAtPath: source]) {
-			    operation = NSWorkspaceMoveOperation;
-        } else {
-			    operation = NSWorkspaceCopyOperation;
-        }
-		  }
-    }
+      if ([source isEqual: trashPath])
+	{
+	  operation = @"GWorkspaceRecycleOutOperation";
+	}
+      else
+	{
+	  if (sourceDragMask & NSDragOperationMove)
+	    {
+	      NSLog(@"FSNIcon: concludeDragOperation - NSWorkspaceMoveOperation");
+	      if ([[NSFileManager defaultManager] isWritableFileAtPath: source]) {
+		operation = NSWorkspaceMoveOperation;
+	      } else {
+		operation = NSWorkspaceCopyOperation;
+	      }
+	    }
+	  else if (sourceDragMask & NSDragOperationCopy)
+	    {
+	      operation = NSWorkspaceCopyOperation;
+	    }
+	  else if (sourceDragMask & NSDragOperationLink)
+	    {
+	      operation = NSWorkspaceLinkOperation;
+	    }
+	}
 
     files = [NSMutableArray arrayWithCapacity: 1];    
     for(i = 0; i < [sourcePaths count]; i++) {    

@@ -1655,20 +1655,25 @@ static NSString *defaultColumns = @"{ \
     isDragTarget = YES;	
     forceCopy = NO;
 
-	  sourceDragMask = [sender draggingSourceOperationMask];
+    sourceDragMask = [sender draggingSourceOperationMask];
 
-	  if (sourceDragMask == NSDragOperationCopy) {
-		  return NSDragOperationCopy;
-	  } else if (sourceDragMask == NSDragOperationLink) {
-		  return NSDragOperationLink;
-	  } else {
-      if ([[NSFileManager defaultManager] isWritableFileAtPath: basePath]) {
-        return NSDragOperationAll;			
-      } else {
-        forceCopy = YES;
-			  return NSDragOperationCopy;			
+    if (sourceDragMask & NSDragOperationMove)
+      {
+	if ([[NSFileManager defaultManager] isWritableFileAtPath: basePath])
+	  {
+	    return NSDragOperationMove;
+	  }
+	forceCopy = YES;
+	return NSDragOperationCopy;
       }
-	  }		
+    if (sourceDragMask & NSDragOperationCopy)
+      {
+	return NSDragOperationCopy;
+      }
+    if (sourceDragMask & NSDragOperationLink)
+      {
+	return NSDragOperationLink;
+      }
   }
 
   return dragOperation;
@@ -1703,17 +1708,22 @@ static NSString *defaultColumns = @"{ \
 
     dndTarget = nil;  
 
-	  if (isDragTarget == NO) {
-		  return NSDragOperationNone;
-	  }
+    if (isDragTarget == NO) {
+      return NSDragOperationNone;
+    }
 
-	  if (sourceDragMask == NSDragOperationCopy) {
-		  return NSDragOperationCopy;
-	  } else if (sourceDragMask == NSDragOperationLink) {
-		  return NSDragOperationLink;
-	  } else {
-		  return forceCopy ? NSDragOperationCopy : NSDragOperationAll;
-	  }
+    if (sourceDragMask & NSDragOperationMove)
+      {
+	return forceCopy ? NSDragOperationCopy : NSDragOperationMove;
+      }
+    if (sourceDragMask & NSDragOperationCopy)
+      {
+	return NSDragOperationCopy;
+      }
+    if (sourceDragMask & NSDragOperationLink)
+      {
+	return NSDragOperationLink;
+      }
   }
 
   return dragOperation;
@@ -1791,18 +1801,18 @@ static NSString *defaultColumns = @"{ \
 
     if ([source isEqual: trashPath]) {
       operation = @"GWorkspaceRecycleOutOperation";
-	  } else {	
-		  if (sourceDragMask == NSDragOperationCopy) {
-			  operation = NSWorkspaceCopyOperation;
-		  } else if (sourceDragMask == NSDragOperationLink) {
-			  operation = NSWorkspaceLinkOperation;
-		  } else {
+    } else {
+      if (sourceDragMask & NSDragOperationMove) {
         if ([[NSFileManager defaultManager] isWritableFileAtPath: source]) {
-			    operation = NSWorkspaceMoveOperation;
+	  operation = NSWorkspaceMoveOperation;
         } else {
-			    operation = NSWorkspaceCopyOperation;
+	  operation = NSWorkspaceCopyOperation;
         }
-		  }
+      } else if (sourceDragMask & NSDragOperationCopy) {
+	operation = NSWorkspaceCopyOperation;
+      } else if (sourceDragMask & NSDragOperationLink) {
+	operation = NSWorkspaceLinkOperation;
+      }
     }
 
     files = [NSMutableArray array];    
@@ -2253,21 +2263,25 @@ static NSString *defaultColumns = @"{ \
   isDragTarget = YES;
   forceCopy = NO;
 
-	sourceDragMask = [sender draggingSourceOperationMask];
+  sourceDragMask = [sender draggingSourceOperationMask];
 
-	if (sourceDragMask == NSDragOperationCopy) {
-		return NSDragOperationCopy;
-	} else if (sourceDragMask == NSDragOperationLink) {
-		return NSDragOperationLink;
-	} else {
-    if ([[NSFileManager defaultManager] isWritableFileAtPath: fromPath]) {
-      return NSDragOperationAll;			
-    } else {
-      forceCopy = YES;
-			return NSDragOperationCopy;			
+  if (sourceDragMask & NSDragOperationMove) {
+    if ([[NSFileManager defaultManager] isWritableFileAtPath: fromPath])
+      {
+	return NSDragOperationMove;
+      }
+    forceCopy = YES;
+    return NSDragOperationCopy;
+  }
+  if (sourceDragMask & NSDragOperationCopy)
+    {
+      return NSDragOperationCopy;
     }
-	}
-    
+  if (sourceDragMask & NSDragOperationLink)
+    {
+      return NSDragOperationLink;
+    }
+
   return NSDragOperationNone;
 }
 

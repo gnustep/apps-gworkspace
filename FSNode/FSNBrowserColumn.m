@@ -1367,25 +1367,22 @@ static id <DesktopApplication> desktopApp = nil;
 
   sourceDragMask = [sender draggingSourceOperationMask];
 
+  if (sourceDragMask & NSDragOperationMove)
+    {
+      if ([[NSFileManager defaultManager] isWritableFileAtPath: basePath])
+	{
+	  return NSDragOperationMove;
+	}
+      forceCopy = YES;
+      return NSDragOperationCopy;
+    }
   if (sourceDragMask & NSDragOperationCopy)
     {
       return NSDragOperationCopy;
     }
-  else if (sourceDragMask & NSDragOperationLink)
+  if (sourceDragMask & NSDragOperationLink)
     {
       return NSDragOperationLink;
-    }
-  else
-    {
-      if ([[NSFileManager defaultManager] isWritableFileAtPath: basePath])
-	{
-	  return NSDragOperationAll;
-	}
-      else
-	{
-	  forceCopy = YES;
-	  return NSDragOperationCopy;
-	}
     }
 
   isDragTarget = NO;	
@@ -1402,17 +1399,17 @@ static id <DesktopApplication> desktopApp = nil;
     }
 
   NSLog(@"FSNBrowserColumn draggingUpdated - determine operation %lu ", sourceDragMask);
+  if (sourceDragMask & NSDragOperationMove)
+    {
+      return forceCopy ? NSDragOperationCopy : NSDragOperationAll;
+    }
   if (sourceDragMask & NSDragOperationCopy)
     {
       return NSDragOperationCopy;
     }
-  else if (sourceDragMask & NSDragOperationLink)
+  if (sourceDragMask & NSDragOperationLink)
     {
       return NSDragOperationLink;
-    }
-  else
-    {
-      return forceCopy ? NSDragOperationCopy : NSDragOperationAll;
     }
 
   return NSDragOperationNone;
@@ -1473,21 +1470,32 @@ static id <DesktopApplication> desktopApp = nil;
   
   trashPath = [desktopApp trashPath];
 
-  if ([source isEqual: trashPath]) {
-    operation = @"GWorkspaceRecycleOutOperation";
-  } else {	
-    if (sourceDragMask & NSDragOperationCopy) {
-      operation = NSWorkspaceCopyOperation;
-    } else if (sourceDragMask & NSDragOperationLink) {
-      operation = NSWorkspaceLinkOperation;
-    } else {
-      if ([[NSFileManager defaultManager] isWritableFileAtPath: source]) {
-	operation = NSWorkspaceMoveOperation;
-      } else {
-	operation = NSWorkspaceCopyOperation;
-      }
+  if ([source isEqual: trashPath])
+    {
+      operation = @"GWorkspaceRecycleOutOperation";
     }
-  }
+  else
+    {
+      if (sourceDragMask & NSDragOperationMove)
+	{
+	  if ([[NSFileManager defaultManager] isWritableFileAtPath: source])
+	    {
+	      operation = NSWorkspaceMoveOperation;
+	    }
+	  else
+	    {
+	      operation = NSWorkspaceCopyOperation;
+	    }
+	}
+      if (sourceDragMask & NSDragOperationCopy)
+	{
+	  operation = NSWorkspaceCopyOperation;
+	}
+      if (sourceDragMask & NSDragOperationLink)
+	{
+	  operation = NSWorkspaceLinkOperation;
+	}
+    }
 
   files = [NSMutableArray array];    
   for (i = 0; i < [sourcePaths count]; i++)
@@ -1616,19 +1624,24 @@ static id <DesktopApplication> desktopApp = nil;
     }
   }	
 
-  if (sourceDragMask & NSDragOperationCopy) {
-    return ([node isApplication] ? NSDragOperationMove : NSDragOperationCopy);
-  } else if (sourceDragMask & NSDragOperationLink) {
-    return ([node isApplication] ? NSDragOperationMove : NSDragOperationLink);
-  } else {
-    if ([[NSFileManager defaultManager] isWritableFileAtPath: fromPath]
-	|| [node isApplication]) {
-      return NSDragOperationAll;			
-    } else {
-      return NSDragOperationCopy;			
+  if (sourceDragMask & NSDragOperationMove)
+    {
+      if ([[NSFileManager defaultManager] isWritableFileAtPath: fromPath]
+	  || [node isApplication])
+	{
+	  return NSDragOperationMove;
+	}
+      return NSDragOperationCopy;
     }
-  }
-    
+  if (sourceDragMask & NSDragOperationCopy)
+    {
+      return ([node isApplication] ? NSDragOperationMove : NSDragOperationCopy);
+    }
+  if (sourceDragMask & NSDragOperationLink)
+    {
+      return ([node isApplication] ? NSDragOperationMove : NSDragOperationLink);
+    }
+
   return NSDragOperationNone;
 }
 
@@ -1685,15 +1698,7 @@ static id <DesktopApplication> desktopApp = nil;
 	}
       else
 	{	
-	  if (sourceDragMask & NSDragOperationCopy)
-	    {
-	      operation = NSWorkspaceCopyOperation;
-	    }
-	  else if (sourceDragMask & NSDragOperationLink)
-	    {
-	      operation = NSWorkspaceLinkOperation;
-	    }
-	  else
+	  if (sourceDragMask & NSDragOperationMove)
 	    {
 	      if ([[NSFileManager defaultManager] isWritableFileAtPath: source])
 		{
@@ -1703,6 +1708,14 @@ static id <DesktopApplication> desktopApp = nil;
 		{
 		  operation = NSWorkspaceCopyOperation;
 		}
+	    }
+	  else if (sourceDragMask & NSDragOperationCopy)
+	    {
+	      operation = NSWorkspaceCopyOperation;
+	    }
+	  else if (sourceDragMask & NSDragOperationLink)
+	    {
+	      operation = NSWorkspaceLinkOperation;
 	    }
 	}
 

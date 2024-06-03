@@ -1685,25 +1685,25 @@ static void GWHighlightFrameRect(NSRect aRect)
 
   sourceDragMask = [sender draggingSourceOperationMask];
 
-  if (sourceDragMask & NSDragOperationCopy)
+  if (sourceDragMask & NSDragOperationMove)
     {
+      NSLog(@"GWDesktopView: draggingEntered - NSDragOperationMove");
+
+      if ([[NSFileManager defaultManager] isWritableFileAtPath: basePath])
+	{
+	  return NSDragOperationMove;
+	}
+      forceCopy = YES;
+      return NSDragOperationCopy;
+    }
+  else if (sourceDragMask & NSDragOperationCopy)
+    {
+      NSLog(@"GWDesktopView: draggingEntered - NSDragOperationCopy");
       return NSDragOperationCopy;
     }
   else if (sourceDragMask & NSDragOperationLink)
     {
       return NSDragOperationLink;
-    }
-  else
-    {
-      if ([[NSFileManager defaultManager] isWritableFileAtPath: basePath])
-	{
-	  return NSDragOperationAll;
-	}
-      else
-	{
-	  forceCopy = YES;
-	  return NSDragOperationCopy;
-	}
     }
 
   isDragTarget = NO;	
@@ -1769,28 +1769,26 @@ static void GWHighlightFrameRect(NSRect aRect)
       insertIndex = NSNotFound;
       return NSDragOperationNone;
   }
-
-  NSLog(@"GWDesktopView draggingUpdated - determine operation %lu ", sourceDragMask);
-  if (sourceDragMask & NSDragOperationEvery)
-    NSLog(@"NSDragOperationEvery");
-  if (sourceDragMask & NSDragOperationCopy)
-    NSLog(@"NSDragOperationCopy");
+  NSLog(@"draggingUpdated. mask %lu", sourceDragMask);
   if (sourceDragMask & NSDragOperationMove)
-    NSLog(@"NSDragOperationMove");
- 
+    {
+      NSLog(@"GWDesktopView: draggingUpdated - NSDragOperatiomMove");
+      if (forceCopy)
+	{
+	  return NSDragOperationCopy;
+	}
+      return NSDragOperationMove;
+    }
   if (sourceDragMask & NSDragOperationCopy)
     {
+      NSLog(@"GWDesktopView: draggingUpdated - NSDragOperationCopy");
       return NSDragOperationCopy;
     }
-  else if
-    (sourceDragMask & NSDragOperationLink)
+  if (sourceDragMask & NSDragOperationLink)
     {
       return NSDragOperationLink;
     }
-  else
-    {
-      return forceCopy ? NSDragOperationCopy : NSDragOperationAll;
-    }
+
 
   return NSDragOperationNone;
 }
@@ -1857,6 +1855,7 @@ NSComparisonResult sortDragged(id icn1, id icn2, void *context)
   NSString *trashPath;
   NSInteger i; // FIXME see if it can be made unsigned
 
+  NSLog(@"GWDesktopView concludeDragOperation ");
   DESTROY (dragIcon);
   if ([self isFreeGridIndex: insertIndex])
     {
@@ -1865,6 +1864,7 @@ NSComparisonResult sortDragged(id icn1, id icn2, void *context)
   isDragTarget = NO;
 
   sourceDragMask = [sender draggingSourceOperationMask];
+  NSLog(@"concludeDragOperation. mask %lu", sourceDragMask);
   pb = [sender draggingPasteboard];
     
   if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"])
@@ -1998,8 +1998,15 @@ NSComparisonResult sortDragged(id icn1, id icn2, void *context)
     }
   else
     {
-      if (sourceDragMask & NSDragOperationCopy)
+      NSLog(@"not recycle. mask %lu", sourceDragMask);
+      if (sourceDragMask & NSDragOperationMove)
 	{
+	  NSLog(@"GWDesktopView: concludeDragOperation - NSWorkspaceMoveOperation");
+	  operation = NSWorkspaceMoveOperation;
+	}
+      else if (sourceDragMask & NSDragOperationCopy)
+	{
+	  NSLog(@"GWDesktopView: concludeDragOperation - NSWorkspaceCopyOperation");
 	  operation = NSWorkspaceCopyOperation;
 	}
       else if (sourceDragMask & NSDragOperationLink)
@@ -2008,12 +2015,15 @@ NSComparisonResult sortDragged(id icn1, id icn2, void *context)
 	}
       else
 	{
+	  NSLog(@"GWDesktopView: concludeDragOperation - else ?");
 	  if ([[NSFileManager defaultManager] isWritableFileAtPath: source])
 	    {
+	      NSLog(@"GWDesktopView: concludeDragOperation - else  - NSWorkspaceMoveOperation");
 	      operation = NSWorkspaceMoveOperation;
 	    }
 	  else
 	    {
+	      NSLog(@"GWDesktopView: concludeDragOperation else - NSWorkspaceCopyOperation");
 	      operation = NSWorkspaceCopyOperation;
 	    }
 	}
