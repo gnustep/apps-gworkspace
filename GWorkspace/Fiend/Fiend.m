@@ -1029,19 +1029,18 @@
 
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
-	NSPasteboard *pb = [sender draggingPasteboard];
+  NSPasteboard *pb = [sender draggingPasteboard];
 	
-  if([[pb types] indexOfObject: NSFilenamesPboardType] != NSNotFound) {
-  	NSDragOperation sourceDragMask = [sender draggingSourceOperationMask];
-		
-		if ((sourceDragMask == NSDragOperationCopy) 
-											|| (sourceDragMask == NSDragOperationLink)) {
-			return NSDragOperationNone;
-		}
-	
-    isDragTarget = YES;
-  	return NSDragOperationAll;
-  }
+  if([[pb types] indexOfObject: NSFilenamesPboardType] != NSNotFound)
+    {
+      NSDragOperation sourceDragMask = [sender draggingSourceOperationMask];
+
+      if (sourceDragMask & NSDragOperationMove)
+	{
+	  isDragTarget = YES;
+	  return NSDragOperationMove;
+	}
+    }
      
   return NSDragOperationNone;
 }
@@ -1050,18 +1049,18 @@
 {
   NSDragOperation sourceDragMask;
 	
-	if (isDragTarget == NO) {
-		return NSDragOperationNone;
-	}
+  if (isDragTarget == NO)
+    {
+      return NSDragOperationNone;
+    }
 
-	sourceDragMask = [sender draggingSourceOperationMask];
+  sourceDragMask = [sender draggingSourceOperationMask];
+  if (sourceDragMask & NSDragOperationMove)
+    {
+      return NSDragOperationMove;
+    }
 
-	if ((sourceDragMask == NSDragOperationCopy) 
-												|| (sourceDragMask == NSDragOperationLink)) {
-		return NSDragOperationNone;
-	}
-
-	return NSDragOperationAll;
+  return NSDragOperationNone;
 }
 
 - (void)draggingExited:(id <NSDraggingInfo>)sender

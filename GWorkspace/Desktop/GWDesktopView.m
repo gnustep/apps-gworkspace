@@ -1615,7 +1615,7 @@ static void GWHighlightFrameRect(NSRect aRect)
       dragPoint = NSZeroPoint;
       DESTROY (dragIcon);
       insertIndex = NSNotFound;
-      return NSDragOperationAll;
+      return NSDragOperationEvery;
   }
 
   if ([node isWritable] == NO)

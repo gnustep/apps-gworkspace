@@ -1456,7 +1456,13 @@ static NSImage *branchImage;
   if (sourceDragMask & NSDragOperationMove)
     {
       NSLog(@"FSNIcon dragginEntered - Move");
-      return NSDragOperationMove;
+      if ([[NSFileManager defaultManager] isWritableFileAtPath: fromPath]
+	  || ([node isApplication] && (onApplication == NO))) {
+	return NSDragOperationMove;
+      } else if (([node isApplication] == NO) || onApplication) {
+	forceCopy = YES;
+	return NSDragOperationCopy;
+      }
     }
 
   if (sourceDragMask & NSDragOperationCopy) {
@@ -1473,14 +1479,6 @@ static NSImage *branchImage;
       return NSDragOperationLink;
     }
   
-  } else {  
-    if ([[NSFileManager defaultManager] isWritableFileAtPath: fromPath]
-                          || ([node isApplication] && (onApplication == NO))) {
-      return NSDragOperationAll;
-    } else if (([node isApplication] == NO) || onApplication) {
-      forceCopy = YES;
-      return NSDragOperationCopy;			
-    }
   }
 
   return NSDragOperationNone;
@@ -1521,7 +1519,7 @@ static NSImage *branchImage;
     return NSDragOperationNone;
   } else if (sourceDragMask & NSDragOperationMove) {
     NSLog(@"FSNIcon - NSDragOperatiomMove");
-    return NSDragOperationMove;
+    return forceCopy ? NSDragOperationCopy : NSDragOperationMove;
   } else if (sourceDragMask & NSDragOperationCopy) {
     if ([node isApplication]) {
       NSLog(@"onApplication ? %d", onApplication);
@@ -1535,11 +1533,7 @@ static NSImage *branchImage;
     } else {
       return NSDragOperationLink;
     }
-
-	} else {
-		return forceCopy ? NSDragOperationCopy : NSDragOperationAll;
-	}
-
+  }
 	return NSDragOperationNone;
 }
 
