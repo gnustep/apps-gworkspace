@@ -1401,7 +1401,7 @@ static id <DesktopApplication> desktopApp = nil;
   NSLog(@"FSNBrowserColumn draggingUpdated - determine operation %lu ", sourceDragMask);
   if (sourceDragMask & NSDragOperationMove)
     {
-      return forceCopy ? NSDragOperationCopy : NSDragOperationAll;
+      return forceCopy ? NSDragOperationCopy : NSDragOperationMove;
     }
   if (sourceDragMask & NSDragOperationCopy)
     {

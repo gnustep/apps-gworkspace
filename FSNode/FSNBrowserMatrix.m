@@ -370,7 +370,7 @@
 
 - (unsigned int)draggingSourceOperationMaskForLocal:(BOOL)flag
 {
-  return NSDragOperationAll;
+  return NSDragOperationEvery;
 }
 
 @end
