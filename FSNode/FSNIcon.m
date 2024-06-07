@@ -1,6 +1,6 @@
 /* FSNIcon.m
- *  
- * Copyright (C) 2004-2022 Free Software Foundation, Inc.
+ *
+ * Copyright (C) 2004-2024 Free Software Foundation, Inc.
  *
  * Authors: Enrico Sersale
  *          Riccardo Mottola <rm@gnu.org>
@@ -12,12 +12,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
@@ -189,11 +189,11 @@ static NSImage *branchImage;
       icnBounds = NSMakeRect(0, 0, iconSize, iconSize);
       icnPoint = NSZeroPoint;
       brImgBounds = NSMakeRect(0, 0, BRANCH_SIZE, BRANCH_SIZE);
-    
+
       ASSIGN (node, anode);
       selection = nil;
       selectionTitle = nil;
-    
+
       ASSIGN (icon, [fsnodeRep iconOfSize: iconSize forNode: node]);
       drawicon = icon;
       selectedicon = nil;
@@ -214,7 +214,7 @@ static NSImage *branchImage;
 	}
       hlightRect = NSIntegralRect(hlightRect);
       ASSIGN (highlightPath, [fsnodeRep highlightPathOfSize: hlightRect.size]);
-        
+
       if ([[node path] isEqual: path_separator()] && ([node isMountPoint] == NO))
 	{
 	  NSString *hname;
@@ -222,7 +222,7 @@ static NSImage *branchImage;
 	  hname = [FSNIcon getBestHostName];
 	  ASSIGN (hostname, hname);
 	}
-    
+
       label = [FSNTextCell new];
       [label setFont: lfont];
       [label setTextColor: tcolor];
@@ -244,7 +244,7 @@ static NSImage *branchImage;
 	{
 	  [self setNodeInfoShowType: type];
 	}
-    
+
       labelRect = NSZeroRect;
       labelRect.size.width = [label uncutTitleLenght] + [fsnodeRep labelMargin];
       labelRect.size.height = [fsnodeRep heightOfFont: [label font]];
@@ -264,12 +264,12 @@ static NSImage *branchImage;
 
       icnPosition = ipos;
       gridIndex = gindex;
-    
+
       if (icnPosition == NSImageLeft)
 	{
 	  [label setAlignment: NSLeftTextAlignment];
 	  [infolabel setAlignment: NSLeftTextAlignment];
-      
+
 	  r.size.width = hlightRect.size.width + labelRect.size.width;
 	  r.size.height = hlightRect.size.height;
 
@@ -282,13 +282,13 @@ static NSImage *branchImage;
 		  r.size.height = lbsh;
 		}
 	    }
-    
+
 	}
       else if (icnPosition == NSImageAbove)
 	{
 	  [label setAlignment: NSCenterTextAlignment];
 	  [infolabel setAlignment: NSCenterTextAlignment];
-      
+
 	  if (labelRect.size.width > hlightRect.size.width)
 	    {
 	      r.size.width = labelRect.size.width;
@@ -297,29 +297,27 @@ static NSImage *branchImage;
 	    {
 	      r.size.width = hlightRect.size.width;
 	    }
-      
+
 	  r.size.height = labelRect.size.height + hlightRect.size.height;
-      
+
 	  if (showType != FSNInfoNameType)
 	    {
 	      r.size.height += infoRect.size.height;
 	    }
-      
 	}
       else if (icnPosition == NSImageOnly)
 	{
 	  r.size.width = hlightRect.size.width;
 	  r.size.height = hlightRect.size.height;
-      
 	}
       else
 	{
 	  r.size = icnBounds.size;
 	}
-    
+
       trectTag = -1;
       [self setFrame: NSIntegralRect(r)];
-    
+
       if (acceptDnd)
 	{
 	  NSArray *pbTypes = [NSArray arrayWithObjects: NSFilenamesPboardType,
@@ -352,16 +350,17 @@ static NSImage *branchImage;
 
       drawLabelBackground = NO;
     }
-  
+
   return self;
 }
 
 - (void)setSelectable:(BOOL)value
 {
-  if ((icnPosition == NSImageOnly) && (selectable != value)) {
-    selectable = value;
-    [self tile];
-  }
+  if ((icnPosition == NSImageOnly) && (selectable != value))
+    {
+      selectable = value;
+      [self tile];
+    }
 }
 
 - (NSRect)iconBounds
@@ -375,209 +374,250 @@ static NSImage *branchImage;
   NSSize sz = [icon size];
   int lblmargin = [fsnodeRep labelMargin];
   BOOL hasinfo = ([[infolabel stringValue] length] > 0);
-    
-  if (icnPosition == NSImageAbove) {
-    float hlx, hly;
 
-    labelRect.size.width = [label uncutTitleLenght] + lblmargin;
-  
-    if (labelRect.size.width >= frameRect.size.width) {
-      labelRect.size.width = frameRect.size.width;
-      labelRect.origin.x = 0;
-    } else {
-      labelRect.origin.x = (frameRect.size.width - labelRect.size.width) / 2;
+  if (icnPosition == NSImageAbove)
+    {
+      float hlx, hly;
+
+      labelRect.size.width = [label uncutTitleLenght] + lblmargin;
+
+      if (labelRect.size.width >= frameRect.size.width)
+	{
+	  labelRect.size.width = frameRect.size.width;
+	  labelRect.origin.x = 0;
+	}
+      else
+	{
+	  labelRect.origin.x = (frameRect.size.width - labelRect.size.width) / 2;
+	}
+
+      if (showType != FSNInfoNameType)
+	{
+	  if (hasinfo)
+	    {
+	      infoRect.size.width = [infolabel uncutTitleLenght] + lblmargin;
+	    }
+	  else
+	    {
+	      infoRect.size.width = labelRect.size.width;
+	    }
+
+	  if (infoRect.size.width >= frameRect.size.width)
+	    {
+	      infoRect.size.width = frameRect.size.width;
+	      infoRect.origin.x = 0;
+	    }
+	  else
+	    {
+	      infoRect.origin.x = (frameRect.size.width - infoRect.size.width) / 2;
+	    }
+	}
+
+      if (showType == FSNInfoNameType)
+	{
+	  labelRect.origin.y = 0;
+	  labelRect.origin.y += lblmargin / 2;
+	  labelRect = NSIntegralRect(labelRect);
+	  infoRect = labelRect;
+	}
+      else
+	{
+	  infoRect.origin.y = 0;
+	  infoRect.origin.y += lblmargin / 2;
+	  infoRect = NSIntegralRect(infoRect);
+
+	  labelRect.origin.y = infoRect.origin.y + infoRect.size.height;
+	  labelRect = NSIntegralRect(labelRect);
+	}
+
+      hlx = myrintf((frameRect.size.width - hlightRect.size.width) / 2);
+      hly = myrintf(frameRect.size.height - hlightRect.size.height);
+
+      if ((hlightRect.origin.x != hlx) || (hlightRect.origin.y != hly))
+	{
+	  NSAffineTransform *transform = [NSAffineTransform transform];
+
+	  [transform translateXBy: hlx - hlightRect.origin.x
+			      yBy: hly - hlightRect.origin.y];
+
+	  [highlightPath transformUsingAffineTransform: transform];
+
+	  hlightRect.origin.x = hlx;
+	  hlightRect.origin.y = hly;
+	}
+
+      icnBounds.origin.x = hlightRect.origin.x + ((hlightRect.size.width - iconSize) / 2);
+      icnBounds.origin.y = hlightRect.origin.y + ((hlightRect.size.height - iconSize) / 2);
+      icnBounds = NSIntegralRect(icnBounds);
+
+      icnPoint.x = myrintf(hlightRect.origin.x + ((hlightRect.size.width - sz.width) / 2));
+      icnPoint.y = myrintf(hlightRect.origin.y + ((hlightRect.size.height - sz.height) / 2));
+
     }
+  else if (icnPosition == NSImageLeft)
+    {
+      float icnspacew = hlightRect.size.width;
+      float hryorigin = 0;
 
-    if (showType != FSNInfoNameType) {
-      if (hasinfo) {
-        infoRect.size.width = [infolabel uncutTitleLenght] + lblmargin;
-      } else {
-        infoRect.size.width = labelRect.size.width;
-      }
-      
-      if (infoRect.size.width >= frameRect.size.width) {
-        infoRect.size.width = frameRect.size.width;
-        infoRect.origin.x = 0;
-      } else {
-        infoRect.origin.x = (frameRect.size.width - infoRect.size.width) / 2;
-      }
-    }
+      if (isLeaf == NO)
+	{
+	  icnspacew += BRANCH_SIZE;
+	}
 
-    if (showType == FSNInfoNameType) {
-      labelRect.origin.y = 0;
-      labelRect.origin.y += lblmargin / 2;
-      labelRect = NSIntegralRect(labelRect);
-      infoRect = labelRect;
-      
-    } else {
-      infoRect.origin.y = 0;
-      infoRect.origin.y += lblmargin / 2;
+      labelRect.size.width = myrintf([label uncutTitleLenght] + lblmargin);
+
+      if (labelRect.size.width >= (frameRect.size.width - icnspacew))
+	{
+	  labelRect.size.width = (frameRect.size.width - icnspacew);
+	}
+
+      if (showType != FSNInfoNameType)
+	{
+	  if (hasinfo)
+	    {
+	      infoRect.size.width = [infolabel uncutTitleLenght] + lblmargin;
+	    }
+	  else
+	    {
+	      infoRect.size.width = labelRect.size.width;
+	    }
+
+	  if (infoRect.size.width >= (frameRect.size.width - icnspacew))
+	    {
+	      infoRect.size.width = (frameRect.size.width - icnspacew);
+	    }
+	}
+      else
+	{
+	  infoRect.size.width = labelRect.size.width;
+	}
+
       infoRect = NSIntegralRect(infoRect);
-    
-      labelRect.origin.y = infoRect.origin.y + infoRect.size.height;
+
+      if (showType != FSNInfoNameType)
+	{
+	  float lbsh = labelRect.size.height + infoRect.size.height;
+
+	  if (lbsh > hlightRect.size.height)
+	    {
+	      hryorigin = myrintf((lbsh - hlightRect.size.height) / 2);
+	    }
+	}
+
+      if ((hlightRect.origin.x != 0) || (hlightRect.origin.y != hryorigin))
+	{
+	  NSAffineTransform *transform = [NSAffineTransform transform];
+
+	  [transform translateXBy: 0 - hlightRect.origin.x
+			      yBy: hryorigin - hlightRect.origin.y];
+
+	  [highlightPath transformUsingAffineTransform: transform];
+
+	  hlightRect.origin.x = 0;
+	  hlightRect.origin.y = hryorigin;
+	}
+
+      icnBounds.origin.x = (hlightRect.size.width - iconSize) / 2;
+      icnBounds.origin.y = hlightRect.origin.y + ((hlightRect.size.height - iconSize) / 2);
+      icnBounds = NSIntegralRect(icnBounds);
+
+      icnPoint.x = myrintf((hlightRect.size.width - sz.width) / 2);
+      icnPoint.y = myrintf(hlightRect.origin.y + ((hlightRect.size.height - sz.height) / 2));
+
+      labelRect.origin.x = hlightRect.size.width;
+      infoRect.origin.x = hlightRect.size.width;
+
+      if (showType != FSNInfoNameType)
+	{
+	  float lbsh = labelRect.size.height + infoRect.size.height;
+
+	  infoRect.origin.y = 0;
+
+	  if (hasinfo){
+	    if (hlightRect.size.height > lbsh) {
+	      infoRect.origin.y = (hlightRect.size.height - lbsh) / 2;
+	    }
+
+	    labelRect.origin.y = infoRect.origin.y + infoRect.size.height;
+	  }
+	  else
+	    {
+	      if (hlightRect.size.height > lbsh)
+		{
+		  labelRect.origin.y = (hlightRect.size.height - labelRect.size.height) / 2;
+		}
+	      else
+		{
+		  labelRect.origin.y = (lbsh - labelRect.size.height) / 2;
+		}
+	    }
+
+	}
+      else
+	{
+	  labelRect.origin.y = (hlightRect.size.height - labelRect.size.height) / 2;
+	}
+
+      infoRect = NSIntegralRect(infoRect);
       labelRect = NSIntegralRect(labelRect);
-    } 
-        
-    hlx = myrintf((frameRect.size.width - hlightRect.size.width) / 2);
-    hly = myrintf(frameRect.size.height - hlightRect.size.height);
 
-    if ((hlightRect.origin.x != hlx) || (hlightRect.origin.y != hly)) {
-      NSAffineTransform *transform = [NSAffineTransform transform];
+    }
+  else if (icnPosition == NSImageOnly)
+    {
+      if (selectable)
+	{
+	  float hlx = myrintf((frameRect.size.width - hlightRect.size.width) / 2);
+	  float hly = myrintf((frameRect.size.height - hlightRect.size.height) / 2);
 
-      [transform translateXBy: hlx - hlightRect.origin.x
-                          yBy: hly - hlightRect.origin.y];
+	  if ((hlightRect.origin.x != hlx) || (hlightRect.origin.y != hly))
+	    {
+	      NSAffineTransform *transform = [NSAffineTransform transform];
 
-      [highlightPath transformUsingAffineTransform: transform];
+	      [transform translateXBy: hlx - hlightRect.origin.x
+				  yBy: hly - hlightRect.origin.y];
 
-      hlightRect.origin.x = hlx;
-      hlightRect.origin.y = hly;      
+	      [highlightPath transformUsingAffineTransform: transform];
+
+	      hlightRect.origin.x = hlx;
+	      hlightRect.origin.y = hly;
+	    }
+	}
+
+      icnBounds.origin.x = (frameRect.size.width - iconSize) / 2;
+      icnBounds.origin.y = (frameRect.size.height - iconSize) / 2;
+      icnBounds = NSIntegralRect(icnBounds);
+
+      icnPoint.x = myrintf((frameRect.size.width - sz.width) / 2);
+      icnPoint.y = myrintf((frameRect.size.height - sz.height) / 2);
     }
 
-    icnBounds.origin.x = hlightRect.origin.x + ((hlightRect.size.width - iconSize) / 2);
-    icnBounds.origin.y = hlightRect.origin.y + ((hlightRect.size.height - iconSize) / 2);
-    icnBounds = NSIntegralRect(icnBounds);
-
-    icnPoint.x = myrintf(hlightRect.origin.x + ((hlightRect.size.width - sz.width) / 2));
-    icnPoint.y = myrintf(hlightRect.origin.y + ((hlightRect.size.height - sz.height) / 2));
-
-  } else if (icnPosition == NSImageLeft) {
-    float icnspacew = hlightRect.size.width;
-    float hryorigin = 0;
-    
-    if (isLeaf == NO) {
-      icnspacew += BRANCH_SIZE;
-    }
-    
-    labelRect.size.width = myrintf([label uncutTitleLenght] + lblmargin);
-    
-    if (labelRect.size.width >= (frameRect.size.width - icnspacew)) {
-      labelRect.size.width = (frameRect.size.width - icnspacew);
-    } 
-    
-    if (showType != FSNInfoNameType) {
-      if (hasinfo) {
-        infoRect.size.width = [infolabel uncutTitleLenght] + lblmargin;
-      } else {
-        infoRect.size.width = labelRect.size.width;
-      }
-      
-      if (infoRect.size.width >= (frameRect.size.width - icnspacew)) {
-        infoRect.size.width = (frameRect.size.width - icnspacew);
-      }
-       
-    } else {
-      infoRect.size.width = labelRect.size.width;
-    }
-    
-    infoRect = NSIntegralRect(infoRect);
-
-    if (showType != FSNInfoNameType) {
-      float lbsh = labelRect.size.height + infoRect.size.height;
-
-      if (lbsh > hlightRect.size.height) {
-        hryorigin = myrintf((lbsh - hlightRect.size.height) / 2);
-      }
-    }
-
-    if ((hlightRect.origin.x != 0) || (hlightRect.origin.y != hryorigin)) {
-      NSAffineTransform *transform = [NSAffineTransform transform];
-
-      [transform translateXBy: 0 - hlightRect.origin.x
-                          yBy: hryorigin - hlightRect.origin.y];
-
-      [highlightPath transformUsingAffineTransform: transform];
-
-      hlightRect.origin.x = 0;
-      hlightRect.origin.y = hryorigin;      
-    }
-
-    icnBounds.origin.x = (hlightRect.size.width - iconSize) / 2;
-    icnBounds.origin.y = hlightRect.origin.y + ((hlightRect.size.height - iconSize) / 2);
-    icnBounds = NSIntegralRect(icnBounds);
-
-    icnPoint.x = myrintf((hlightRect.size.width - sz.width) / 2);
-    icnPoint.y = myrintf(hlightRect.origin.y + ((hlightRect.size.height - sz.height) / 2));
-
-    labelRect.origin.x = hlightRect.size.width;
-    infoRect.origin.x = hlightRect.size.width;
-
-    if (showType != FSNInfoNameType) {
-      float lbsh = labelRect.size.height + infoRect.size.height;
-
-      infoRect.origin.y = 0;
-    
-      if (hasinfo) {
-        if (hlightRect.size.height > lbsh) {
-          infoRect.origin.y = (hlightRect.size.height - lbsh) / 2;
-        }
-
-        labelRect.origin.y = infoRect.origin.y + infoRect.size.height;
-        
-      } else {
-        if (hlightRect.size.height > lbsh) {
-          labelRect.origin.y = (hlightRect.size.height - labelRect.size.height) / 2;
-        } else {
-          labelRect.origin.y = (lbsh - labelRect.size.height) / 2;
-        }
-      }
-      
-    } else {
-      labelRect.origin.y = (hlightRect.size.height - labelRect.size.height) / 2;
-    }
-
-    infoRect = NSIntegralRect(infoRect);
-    labelRect = NSIntegralRect(labelRect);
-
-  } else if (icnPosition == NSImageOnly) {
-    if (selectable) {
-      float hlx = myrintf((frameRect.size.width - hlightRect.size.width) / 2);
-      float hly = myrintf((frameRect.size.height - hlightRect.size.height) / 2);
-    
-      if ((hlightRect.origin.x != hlx) || (hlightRect.origin.y != hly)) {
-        NSAffineTransform *transform = [NSAffineTransform transform];
-    
-        [transform translateXBy: hlx - hlightRect.origin.x
-                            yBy: hly - hlightRect.origin.y];
-    
-        [highlightPath transformUsingAffineTransform: transform];
-      
-        hlightRect.origin.x = hlx;
-        hlightRect.origin.y = hly;      
-      }
-    }
-    
-    icnBounds.origin.x = (frameRect.size.width - iconSize) / 2;
-    icnBounds.origin.y = (frameRect.size.height - iconSize) / 2;
-    icnBounds = NSIntegralRect(icnBounds);
-
-    icnPoint.x = myrintf((frameRect.size.width - sz.width) / 2);
-    icnPoint.y = myrintf((frameRect.size.height - sz.height) / 2);
-  } 
-    
   brImgBounds.origin.x = frameRect.size.width - ARROW_ORIGIN_X;
   brImgBounds.origin.y = myrintf(icnBounds.origin.y + (icnBounds.size.height / 2) - (BRANCH_SIZE / 2));
   brImgBounds = NSIntegralRect(brImgBounds);
 
-  if ([self window]) {
-    if (trectTag != -1) {
-      [self removeTrackingRect: trectTag];
+  if ([self window])
+    {
+      if (trectTag != -1)
+	{
+	  [self removeTrackingRect: trectTag];
+	}
+
+      trectTag = [self addTrackingRect: icnBounds
+				 owner: self
+			      userData: nil
+			  assumeInside: NO];
     }
-  
-    trectTag = [self addTrackingRect: icnBounds 
-                               owner: self 
-                            userData: nil
-                        assumeInside: NO]; 
-  }
-    
-  [self setNeedsDisplay: YES]; 
+
+  [self setNeedsDisplay: YES];
 }
 
 - (NSMenu *)menuForEvent:(NSEvent *)theEvent
 {
-  if (([theEvent type] == NSRightMouseDown) && isSelected) {
-    return [container menuForEvent: theEvent];
-  }
-  return [super menuForEvent: theEvent]; 
+  if (([theEvent type] == NSRightMouseDown) && isSelected)
+    {
+      return [container menuForEvent: theEvent];
+    }
+  return [super menuForEvent: theEvent];
 }
 
 - (void)viewDidMoveToSuperview
@@ -593,29 +633,37 @@ static NSImage *branchImage;
 
   location = [self convertPoint: location fromView: nil];
 
-  if (icnPosition == NSImageOnly) {
-    onself = [self mouse: location inRect: icnBounds];
-  } else {
-    onself = ([self mouse: location inRect: icnBounds]
-                        || [self mouse: location inRect: labelRect]);
-  }
-     
-  if ([container respondsToSelector: @selector(setSelectionMask:)]) {
-    [container setSelectionMask: NSSingleSelectionMask];
-  }
+  if (icnPosition == NSImageOnly)
+    {
+      onself = [self mouse: location inRect: icnBounds];
+    }
+  else
+    {
+      onself = ([self mouse: location inRect: icnBounds]
+		|| [self mouse: location inRect: labelRect]);
+    }
 
-  if (onself) {
-	  if (([node isLocked] == NO) && ([theEvent clickCount] > 1)) {
-      if ([container respondsToSelector: @selector(openSelectionInNewViewer:)]) {
-        BOOL newv = (([theEvent modifierFlags] & NSControlKeyMask)
-                        || ([theEvent modifierFlags] & NSAlternateKeyMask));
+  if ([container respondsToSelector: @selector(setSelectionMask:)])
+    {
+      [container setSelectionMask: NSSingleSelectionMask];
+    }
 
-        [container openSelectionInNewViewer: newv];
-      }
-    }  
-  } else {
-    [container mouseUp: theEvent];
-  }
+  if (onself)
+    {
+      if (([node isLocked] == NO) && ([theEvent clickCount] > 1))
+	{
+	  if ([container respondsToSelector: @selector(openSelectionInNewViewer:)]) {
+	    BOOL newv = (([theEvent modifierFlags] & NSControlKeyMask)
+			 || ([theEvent modifierFlags] & NSAlternateKeyMask));
+
+	    [container openSelectionInNewViewer: newv];
+	  }
+	}
+    }
+  else
+    {
+      [container mouseUp: theEvent];
+    }
 }
 
 - (void)mouseDown:(NSEvent *)theEvent
@@ -627,122 +675,158 @@ static NSImage *branchImage;
   BOOL startdnd = NO;
   NSSize offset;
 
-  if (icnPosition == NSImageOnly) {
-    onself = [self mouse: selfloc inRect: icnBounds];
-  } else {
-    onself = ([self mouse: selfloc inRect: icnBounds]
-	      || [self mouse: selfloc inRect: labelRect]);
-  }
-
-  if (onself) {
-    if (selectable == NO) {
-      return;
+  if (icnPosition == NSImageOnly)
+    {
+      onself = [self mouse: selfloc inRect: icnBounds];
     }
-    
-    if ([theEvent clickCount] == 1) {
-      if (isSelected == NO) {
-        if ([container respondsToSelector: @selector(stopRepNameEditing)]) {
-          [container stopRepNameEditing];
-        }
-      }
-      
-      if ([theEvent modifierFlags] & NSShiftKeyMask) {
-        if ([container respondsToSelector: @selector(setSelectionMask:)]) {
-          [container setSelectionMask: FSNMultipleSelectionMask];
-        }
-         
-	if (isSelected) {
-          if ([container selectionMask] == FSNMultipleSelectionMask) {
-	    [self unselect];
-            if ([container respondsToSelector: @selector(selectionDidChange)]) {
-              [container selectionDidChange];	
-            }
-	    return;
-          }
-        } else {
-	  [self select];
+  else
+    {
+      onself = ([self mouse: selfloc inRect: icnBounds]
+		|| [self mouse: selfloc inRect: labelRect]);
+    }
+
+  if (onself)
+    {
+      if (selectable == NO)
+	{
+	  return;
 	}
-        
-      } else {
-        if ([container respondsToSelector: @selector(setSelectionMask:)]) {
-          [container setSelectionMask: NSSingleSelectionMask];
-        }
-        
-        if (isSelected == NO) {
-	  [self select];
-          
-	} else {
-          NSTimeInterval interval = ([theEvent timestamp] - editstamp);
-        
-          if ((interval > DOUBLE_CLICK_LIMIT) 
-	      && [self mouse: location inRect: labelRect]) {
-            if ([container respondsToSelector: @selector(setNameEditorForRep:)]) {
-              [container setNameEditorForRep: self];
-            }
-          } 
-        }
-      }
-    
-      if (dndSource) {
-        while (1) {
-	  nextEvent = [[self window] nextEventMatchingMask:
-				       NSLeftMouseUpMask | NSLeftMouseDraggedMask];
 
-          if ([nextEvent type] == NSLeftMouseUp) {
-            [[self window] postEvent: nextEvent atStart: NO];
-            
-            if ([container respondsToSelector: @selector(repSelected:)]) {
-              [container repSelected: self];
-            }
-            
-            break;
+      if ([theEvent clickCount] == 1)
+	{
+	  if (isSelected == NO)
+	    {
+	      if ([container respondsToSelector: @selector(stopRepNameEditing)])
+		{
+		  [container stopRepNameEditing];
+		}
+	    }
 
-          } else if (([nextEvent type] == NSLeftMouseDragged)
-		     && ([self mouse: selfloc inRect: icnBounds])) {
-	    if (dragdelay < 5) {
-              dragdelay++;
-            } else {    
-              NSPoint p = [nextEvent locationInWindow];
-              offset = NSMakeSize(p.x - location.x, p.y - location.y); 
-              startdnd = YES;        
-              break;
-            }
-          } 
-        }
-      } 
-      
-      if (startdnd) {  
-        if ([container respondsToSelector: @selector(stopRepNameEditing)]) {
-          [container stopRepNameEditing];
-        }
-        
-        if ([container respondsToSelector: @selector(setFocusedRep:)]) {
-          [container setFocusedRep: nil];
-        }
-        
-        [self startExternalDragOnEvent: theEvent withMouseOffset: offset];
-      }
-      
-      editstamp = [theEvent timestamp];       
+	  if ([theEvent modifierFlags] & NSShiftKeyMask)
+	    {
+	      if ([container respondsToSelector: @selector(setSelectionMask:)])
+		{
+		  [container setSelectionMask: FSNMultipleSelectionMask];
+		}
+
+	      if (isSelected)
+		{
+		  if ([container selectionMask] == FSNMultipleSelectionMask)
+		    {
+		      [self unselect];
+		      if ([container respondsToSelector: @selector(selectionDidChange)])
+			{
+			  [container selectionDidChange];
+			}
+		      return;
+		    }
+		}
+	      else
+		{
+		  [self select];
+		}
+	    }
+	  else
+	    {
+	      if ([container respondsToSelector: @selector(setSelectionMask:)])
+		{
+		  [container setSelectionMask: NSSingleSelectionMask];
+		}
+
+	      if (isSelected == NO)
+		{
+		  [self select];
+		}
+	      else
+		{
+		  NSTimeInterval interval = ([theEvent timestamp] - editstamp);
+
+		  if ((interval > DOUBLE_CLICK_LIMIT)
+		      && [self mouse: location inRect: labelRect])
+		    {
+		      if ([container respondsToSelector: @selector(setNameEditorForRep:)])
+			{
+			  [container setNameEditorForRep: self];
+			}
+		    }
+		}
+	    }
+
+	  if (dndSource)
+	    {
+	      while (1)
+		{
+		  nextEvent = [[self window] nextEventMatchingMask:
+					       NSLeftMouseUpMask | NSLeftMouseDraggedMask];
+
+		  if ([nextEvent type] == NSLeftMouseUp)
+		    {
+		      [[self window] postEvent: nextEvent atStart: NO];
+
+		      if ([container respondsToSelector: @selector(repSelected:)])
+			{
+			  [container repSelected: self];
+			}
+
+		      break;
+
+		    }
+		  else if (([nextEvent type] == NSLeftMouseDragged)
+			   && ([self mouse: selfloc inRect: icnBounds]))
+		    {
+		      if (dragdelay < 5)
+			{
+			  dragdelay++;
+			}
+		      else
+			{
+			  NSPoint p = [nextEvent locationInWindow];
+			  offset = NSMakeSize(p.x - location.x, p.y - location.y);
+			  startdnd = YES;
+			  break;
+			}
+		    }
+		}
+	    }
+
+	  if (startdnd)
+	    {
+	      if ([container respondsToSelector: @selector(stopRepNameEditing)])
+		{
+		  [container stopRepNameEditing];
+		}
+
+	      if ([container respondsToSelector: @selector(setFocusedRep:)])
+		{
+		  [container setFocusedRep: nil];
+		}
+
+	      [self startExternalDragOnEvent: theEvent withMouseOffset: offset];
+	    }
+
+	  editstamp = [theEvent timestamp];
+	}
     }
-    
-  } else {
-    [container mouseDown: theEvent];
-  }
+  else
+    {
+      [container mouseDown: theEvent];
+    }
 }
 
 - (void)mouseEntered:(NSEvent *)theEvent
 {
-  if ([container respondsToSelector: @selector(setFocusedRep:)]) {
-    [container setFocusedRep: self];
-  }
+  if ([container respondsToSelector: @selector(setFocusedRep:)])
+    {
+      [container setFocusedRep: self];
+    }
 }
 
 - (void)mouseExited:(NSEvent *)theEvent
 {
-  if ([container respondsToSelector: @selector(setFocusedRep:)]) {
-    [container setFocusedRep: nil];
-  }
+  if ([container respondsToSelector: @selector(setFocusedRep:)])
+    {
+      [container setFocusedRep: nil];
+    }
 }
 
 - (BOOL)acceptsFirstMouse:(NSEvent *)theEvent
@@ -762,7 +846,7 @@ static NSImage *branchImage;
 }
 
 - (void)drawRect:(NSRect)rect
-{	 
+{
   if (isSelected)
     {
       [[NSColor selectedControlColor] set];
@@ -770,7 +854,7 @@ static NSImage *branchImage;
       if (nameEdited == NO)
         {
           NSFrameRect(labelRect);
-          NSRectFill(labelRect);  
+          NSRectFill(labelRect);
         }
     }
   else
@@ -779,7 +863,7 @@ static NSImage *branchImage;
         {
           [[container backgroundColor] set];
         }
-    }  
+    }
   if (icnPosition != NSImageOnly)
     {
       if (nameEdited == NO)
@@ -788,7 +872,7 @@ static NSImage *branchImage;
           [label setDrawsBackground: drawLabelBackground];
           [label drawWithFrame: labelRect inView: self];
         }
-      
+
       if ((showType != FSNInfoNameType) && [[infolabel stringValue] length])
         {
           [infolabel drawWithFrame: infoRect inView: self];
@@ -796,7 +880,7 @@ static NSImage *branchImage;
     }
 
   if (isLocked == NO)
-    {	
+    {
       if (isOpened == NO)
         {
           [drawicon compositeToPoint: icnPoint operation: NSCompositeSourceOver];
@@ -807,10 +891,10 @@ static NSImage *branchImage;
         }
     }
   else
-    {	
+    {
       [drawicon dissolveToPoint: icnPoint fraction: 0.3];
     }
-  
+
   if (isLeaf == NO)
     [[object_getClass(self) branchImage] compositeToPoint: brImgBounds.origin operation: NSCompositeSourceOver];
 }
@@ -824,26 +908,29 @@ static NSImage *branchImage;
   DESTROY (selection);
   DESTROY (selectionTitle);
   DESTROY (hostname);
-  
+
   ASSIGN (node, anode);
   ASSIGN (icon, [fsnodeRep iconOfSize: iconSize forNode: node]);
   drawicon = icon;
   DESTROY (selectedicon);
-  
+
   if ([[node path] isEqual: path_separator()] && ([node isMountPoint] == NO))
-    { 
+    {
       NSString *hname;
 
       hname = [FSNIcon getBestHostName];
       ASSIGN (hostname, hname);
-    } 
-  
-  if (extInfoType) {
-    [self setExtendedShowType: extInfoType];
-  } else {
-    [self setNodeInfoShowType: showType];  
-  }
-  
+    }
+
+  if (extInfoType)
+    {
+      [self setExtendedShowType: extInfoType];
+    }
+  else
+    {
+      [self setNodeInfoShowType: showType];
+    }
+
   [self setLocked: [node isLocked]];
   [self tile];
 }
@@ -854,11 +941,14 @@ static NSImage *branchImage;
 {
   [self setNode: anode];
 
-  if (exttype) {
-    [self setExtendedShowType: exttype];
-  } else {
-    [self setNodeInfoShowType: type];  
-  }
+  if (exttype)
+    {
+      [self setExtendedShowType: exttype];
+    }
+  else
+    {
+      [self setNodeInfoShowType: type];
+    }
 }
 
 - (FSNode *)node
@@ -869,25 +959,27 @@ static NSImage *branchImage;
 - (void)showSelection:(NSArray *)selnodes
 {
   NSUInteger i;
-    
+
   ASSIGN (node, [selnodes objectAtIndex: 0]);
   ASSIGN (selection, selnodes);
-  ASSIGN (selectionTitle, ([NSString stringWithFormat: @"%lu %@", 
+  ASSIGN (selectionTitle, ([NSString stringWithFormat: @"%lu %@",
                                      (unsigned long)[selection count], NSLocalizedString(@"elements", @"")]));
   ASSIGN (icon, [fsnodeRep multipleSelectionIconOfSize: iconSize]);
   drawicon = icon;
   DESTROY (selectedicon);
-  
+
   [label setStringValue: selectionTitle];
   [infolabel setStringValue: @""];
-  
+
   [self setLocked: NO];
-  for (i = 0; i < [selnodes count]; i++) {
-    if ([fsnodeRep isNodeLocked: [selnodes objectAtIndex: i]]) {
-      [self setLocked: YES];
-      break;
+  for (i = 0; i < [selnodes count]; i++)
+    {
+      if ([fsnodeRep isNodeLocked: [selnodes objectAtIndex: i]])
+	{
+	  [self setLocked: YES];
+	  break;
+	}
     }
-  }
 
   [self tile];
 }
@@ -904,17 +996,19 @@ static NSImage *branchImage;
 
 - (NSArray *)pathsSelection
 {
-  if (selection) {
-    NSMutableArray *selpaths = [NSMutableArray array];
-    NSUInteger i;
+  if (selection)
+    {
+      NSMutableArray *selpaths = [NSMutableArray array];
+      NSUInteger i;
 
-    for (i = 0; i < [selection count]; i++) {
-      [selpaths addObject: [[selection objectAtIndex: i] path]];
+      for (i = 0; i < [selection count]; i++)
+	{
+	  [selpaths addObject: [[selection objectAtIndex: i] path]];
+	}
+
+      return [NSArray arrayWithArray: selpaths];
     }
 
-    return [NSArray arrayWithArray: selpaths];
-  }
-  
   return nil;
 }
 
@@ -926,9 +1020,9 @@ static NSImage *branchImage;
 
   [label setFont: fontObj];
 
-  infoFont = [fmanager convertFont: fontObj 
+  infoFont = [fmanager convertFont: fontObj
                             toSize: ([fontObj pointSize] - 2)];
-  infoFont = [fmanager convertFont: infoFont 
+  infoFont = [fmanager convertFont: infoFont
                        toHaveTrait: NSItalicFontMask];
 
   [infolabel setFont: infoFont];
@@ -938,11 +1032,14 @@ static NSImage *branchImage;
   labelRect = NSIntegralRect(labelRect);
 
   infoRect = NSZeroRect;
-  if ((showType != FSNInfoNameType) && [[infolabel stringValue] length]) {
-    infoRect.size.width = [infolabel uncutTitleLenght] + lblmargin;
-  } else {
-    infoRect.size.width = labelRect.size.width;
-  }
+  if ((showType != FSNInfoNameType) && [[infolabel stringValue] length])
+    {
+      infoRect.size.width = [infolabel uncutTitleLenght] + lblmargin;
+    }
+  else
+    {
+      infoRect.size.width = labelRect.size.width;
+    }
   infoRect.size.height = [fsnodeRep heightOfFont: infoFont];
   infoRect = NSIntegralRect(infoRect);
 
@@ -969,21 +1066,25 @@ static NSImage *branchImage;
 {
   iconSize = isize;
   icnBounds = NSMakeRect(0, 0, iconSize, iconSize);
-  if (selection == nil) {
-    ASSIGN (icon, [fsnodeRep iconOfSize: iconSize forNode: node]);
-  } else {
-    ASSIGN (icon, [fsnodeRep multipleSelectionIconOfSize: iconSize]);
-  }
+  if (selection == nil)
+    {
+      ASSIGN (icon, [fsnodeRep iconOfSize: iconSize forNode: node]);
+    }
+  else
+    {
+      ASSIGN (icon, [fsnodeRep multipleSelectionIconOfSize: iconSize]);
+    }
   drawicon = icon;
   DESTROY (selectedicon);
   hlightRect.size.width = myrintf(iconSize / 3 * 4);
   hlightRect.size.height = myrintf(hlightRect.size.width * [fsnodeRep highlightHeightFactor]);
-  if ((hlightRect.size.height - iconSize) < 4) {
-    hlightRect.size.height = iconSize + 4;
-  }
+  if ((hlightRect.size.height - iconSize) < 4)
+    {
+      hlightRect.size.height = iconSize + 4;
+    }
   hlightRect.origin.x = 0;
   hlightRect.origin.y = 0;
-  ASSIGN (highlightPath, [fsnodeRep highlightPathOfSize: hlightRect.size]); 
+  ASSIGN (highlightPath, [fsnodeRep highlightPathOfSize: hlightRect.size]);
 
   labelRect.size.width = [label uncutTitleLenght] + [fsnodeRep labelMargin];
   labelRect.size.height = [fsnodeRep heightOfFont: [label font]];
@@ -1000,14 +1101,17 @@ static NSImage *branchImage;
 {
   icnPosition = ipos;
 
-  if (icnPosition == NSImageLeft) {
-    [label setAlignment: NSLeftTextAlignment];
-    [infolabel setAlignment: NSLeftTextAlignment];
-  } else if (icnPosition == NSImageAbove) {
-    [label setAlignment: NSCenterTextAlignment];
-    [infolabel setAlignment: NSCenterTextAlignment];
-  } 
-  
+  if (icnPosition == NSImageLeft)
+    {
+      [label setAlignment: NSLeftTextAlignment];
+      [infolabel setAlignment: NSLeftTextAlignment];
+    }
+  else if (icnPosition == NSImageAbove)
+    {
+      [label setAlignment: NSCenterTextAlignment];
+      [infolabel setAlignment: NSCenterTextAlignment];
+    }
+
   [self tile];
 }
 
