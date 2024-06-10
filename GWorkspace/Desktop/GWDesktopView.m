@@ -1230,9 +1230,10 @@ static void GWHighlightFrameRect(NSRect aRect)
 	    {
 	      FSNIcon *icon = [self repOfSubnode: subnode];
 
-	      if (icon) {
-		insertIndex = [icon gridIndex];
-	      }
+	      if (icon)
+		{
+		  insertIndex = [icon gridIndex];
+		}
 	    }
 
 	  [self removeRepOfSubnode: subnode];
@@ -1262,14 +1263,16 @@ static void GWHighlightFrameRect(NSRect aRect)
 	  if ([self isFreeGridIndex: insertIndex])
 	    {
 	      index = insertIndex;
-	    } else {
-	    index = [self firstFreeGridIndexAfterIndex: insertIndex];
+	    }
+	  else
+	    {
+	      index = [self firstFreeGridIndexAfterIndex: insertIndex];
 
-	    if (index == NSNotFound)
-	      {
-		index = [self firstFreeGridIndex];
-	      }
-	  }
+	      if (index == NSNotFound)
+		{
+		  index = [self firstFreeGridIndex];
+		}
+	    }
 	}
       else
 	{
@@ -1646,7 +1649,7 @@ static void GWHighlightFrameRect(NSRect aRect)
       NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"];
       NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
 
-    sourcePaths = [pbDict objectForKey: @"paths"];
+      sourcePaths = [pbDict objectForKey: @"paths"];
     }
   else if ([[pb types] containsObject: @"GWLSFolderPboardType"])
     {
@@ -1837,7 +1840,7 @@ static void GWHighlightFrameRect(NSRect aRect)
 	}
       insertIndex = NSNotFound;
       return NSDragOperationNone;
-  }
+    }
   NSLog(@"draggingUpdated. mask %lu", sourceDragMask);
   if (sourceDragMask & NSDragOperationMove)
     {
@@ -1900,15 +1903,15 @@ NSComparisonResult sortDragged(id icn1, id icn2, void *context)
     {
       NSNumber *n = [indexes objectAtIndex: i];
 
-    if ([n unsignedIntegerValue] == pos1)
-      {
-	return NSOrderedAscending;
-      }
-    else if ([n intValue] == pos2)
-      {
-	return NSOrderedDescending;
-      }
-  }
+      if ([n unsignedIntegerValue] == pos1)
+	{
+	  return NSOrderedAscending;
+	}
+      else if ([n intValue] == pos2)
+	{
+	  return NSOrderedDescending;
+	}
+    }
 
   return NSOrderedSame;
 }

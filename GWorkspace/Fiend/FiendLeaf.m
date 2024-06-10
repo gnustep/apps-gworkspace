@@ -150,7 +150,7 @@
 	namelabel = nil;
       }
 
-    [self registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, nil]];  
+    [self registerForDraggedTypes: [NSArray arrayWithObjects: NSFilenamesPboardType, nil]];
 
   }
   else
@@ -716,7 +716,7 @@
 				  nil);
 		}
 	      NS_ENDHANDLER
-	    }
+		}
 	}
     }
 

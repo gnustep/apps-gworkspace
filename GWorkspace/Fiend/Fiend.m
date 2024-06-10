@@ -290,20 +290,22 @@
       return;
     }
 
-  if ([layers count] == 1) {
-    msg = NSLocalizedString(@"You can't remove the last layer!", @"");
-    buttstr = NSLocalizedString(@"Continue", @"");
-    NSRunAlertPanel(nil, msg, buttstr, nil, nil);
-    return;
-  }
+  if ([layers count] == 1)
+    {
+      msg = NSLocalizedString(@"You can't remove the last layer!", @"");
+      buttstr = NSLocalizedString(@"Continue", @"");
+      NSRunAlertPanel(nil, msg, buttstr, nil, nil);
+      return;
+    }
 
   title = NSLocalizedString(@"Remove layer", @"");
   msg = NSLocalizedString(@"Are you sure that you want to remove this layer?", @"");
   buttstr = NSLocalizedString(@"Continue", @"");
   result = NSRunAlertPanel(title, msg, NSLocalizedString(@"OK", @""), buttstr, NULL);
-  if(result != NSAlertDefaultReturn) {
-    return;
-  }
+  if(result != NSAlertDefaultReturn)
+    {
+      return;
+    }
 
   names = [layers allKeys];
   index = [names indexOfObject: currentName];

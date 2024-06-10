@@ -1,8 +1,9 @@
 /* FiendLeaf.h
- *  
- * Copyright (C) 2003 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Copyright (C) 2003-2024 Free Software Foundation, Inc.
+ *
+ * Authora: Enrico Sersale
+ *          Riccardo Mottola
  * Date: August 2001
  *
  * This file is part of the GNUstep GWorkspace application
@@ -11,12 +12,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
@@ -35,7 +36,7 @@
 @class GWorkspace;
 @class FSNode;
 
-@interface LeafPosition : NSObject 
+@interface LeafPosition : NSObject
 {
   NSRect r;
   int posx, posy;
@@ -59,20 +60,20 @@
   FSNode *node;
   NSString *layerName;
   NSImage *tile, *hightile, *icon;
-	NSTextFieldCell *namelabel;
-  	
-	BOOL isGhost;
+  NSTextFieldCell *namelabel;
+
+  BOOL isGhost;
   BOOL isDragTarget;
-  BOOL forceCopy;  
+  BOOL forceCopy;
   int posx, posy;
-	
+
   NSTimer *dissTimer;
-  float dissFraction;	
-	int dissCounter;
-	BOOL dissolving;
+  float dissFraction;
+  int dissCounter;
+  BOOL dissolving;
 
   NSFileManager *fm;
-	NSWorkspace *ws;
+  NSWorkspace *ws;
   GWorkspace *gw;
   Fiend *fiend;
 }
@@ -81,8 +82,8 @@
               posY:(int)py
    relativeToPoint:(NSPoint)p
            forPath:(NSString *)apath
-           inFiend:(Fiend *)afiend 
-         layerName:(NSString *)lname 
+           inFiend:(Fiend *)afiend
+         layerName:(NSString *)lname
         ghostImage:(NSImage *)ghostimage;
 
 - (void)setPosX:(int)px posY:(int)py relativeToPoint:(NSPoint)p;
@@ -124,4 +125,3 @@
 @end
 
 #endif // FIENDLEAF_H
-
