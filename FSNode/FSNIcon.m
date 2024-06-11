@@ -1414,90 +1414,111 @@ static NSImage *branchImage;
   NSString *nodePath;
   NSString *prePath;
   NSUInteger i, count;
-  
+
   isDragTarget = NO;
   onSelf = NO;
-	
-  if (selection || isLocked || ([node isDirectory] == NO) 
-            || (([node isWritable] == NO) && ([node isApplication] == NO))) {
-    return NSDragOperationNone;
-  }
-  
-  if ([node isDirectory]) {
-    if ([node isSubnodeOfPath: [desktopApp trashPath]]) { 
+
+  if (selection || isLocked || ([node isDirectory] == NO)
+      || (([node isWritable] == NO) && ([node isApplication] == NO)))
+    {
       return NSDragOperationNone;
     }
-  }	
-  
-  if ([node isPackage] && ([node isApplication] == NO)) {
-    if ([container respondsToSelector: @selector(baseNode)]) { 
-      if ([node isEqual: [container baseNode]] == NO) {
-        return NSDragOperationNone;
-      }
-    } else {
-      return NSDragOperationNone;
+
+  if ([node isDirectory])
+    {
+      if ([node isSubnodeOfPath: [desktopApp trashPath]])
+	{
+	  return NSDragOperationNone;
+	}
     }
-  }
-  
+
+  if ([node isPackage] && ([node isApplication] == NO))
+    {
+      if ([container respondsToSelector: @selector(baseNode)])
+	{
+	  if ([node isEqual: [container baseNode]] == NO)
+	    {
+	      return NSDragOperationNone;
+	    }
+	}
+      else
+	{
+	  return NSDragOperationNone;
+	}
+    }
+
   pb = [sender draggingPasteboard];
   sourcePaths = nil;
-  
-  if ([[pb types] containsObject: NSFilenamesPboardType]) {
-    sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
-       
-  } else if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"]) {
-    if ([node isPackage] == NO) {
-      NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"]; 
-      NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
 
-      sourcePaths = [pbDict objectForKey: @"paths"];
+  if ([[pb types] containsObject: NSFilenamesPboardType])
+    {
+      sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
     }
-  } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {
-    if ([node isPackage] == NO) {
-      NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
-      NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
-    
-      sourcePaths = [pbDict objectForKey: @"paths"];
+  else if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"])
+    {
+      if ([node isPackage] == NO)
+	{
+	  NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"];
+	  NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
+
+	  sourcePaths = [pbDict objectForKey: @"paths"];
+	}
+    } else if ([[pb types] containsObject: @"GWLSFolderPboardType"])
+    {
+      if ([node isPackage] == NO)
+	{
+	  NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"];
+	  NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
+
+	  sourcePaths = [pbDict objectForKey: @"paths"];
+	}
     }
-  }
-  
-  if (sourcePaths == nil) {
+
+  if (sourcePaths == nil)
+    {
     return NSDragOperationNone;
-  }
-  
+    }
+
   count = [sourcePaths count];
   if (count == 0)
     {
       return NSDragOperationNone;
-    } 
-  
-  nodePath = [node path];
-  
-  if (selection) {
-    if ([selection isEqual: sourcePaths]) {
-      onSelf = YES;
-    }  
-  } else if (count == 1) {
-    if ([nodePath isEqual: [sourcePaths objectAtIndex: 0]]) {
-      onSelf = YES;
-    }  
-  }
+    }
 
-  if (onSelf) {
-    isDragTarget = YES;
-    return NSDragOperationEvery;
-  }
+  nodePath = [node path];
+
+  if (selection)
+    {
+      if ([selection isEqual: sourcePaths])
+	{
+	  onSelf = YES;
+	}
+    }
+  else if (count == 1)
+    {
+      if ([nodePath isEqual: [sourcePaths objectAtIndex: 0]])
+	{
+	  onSelf = YES;
+	}
+    }
+
+  if (onSelf)
+    {
+      isDragTarget = YES;
+      return NSDragOperationEvery;
+    }
 
   fromPath = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
 
   if ([nodePath isEqual: fromPath])
     {
       return NSDragOperationNone;
-    }  
+    }
 
-  if ([sourcePaths containsObject: nodePath]) {
-    return NSDragOperationNone;
-  }
+  if ([sourcePaths containsObject: nodePath])
+    {
+      return NSDragOperationNone;
+    }
 
   prePath = [NSString stringWithString: nodePath];
 
@@ -1509,81 +1530,100 @@ static NSImage *branchImage;
     }
 
 
-  if ([node isDirectory] && [node isParentOfPath: fromPath]) {
-    NSArray *subNodes = [node subNodes];
-    
-    for (i = 0; i < [subNodes count]; i++) {
-      FSNode *nd = [subNodes objectAtIndex: i];
-      
-      if ([nd isDirectory]) {
-        NSUInteger j;
-        
-        for (j = 0; j < count; j++) {
-          NSString *fname = [[sourcePaths objectAtIndex: j] lastPathComponent];
-          
-          if ([[nd name] isEqual: fname]) {
-            return NSDragOperationNone;
-          }
-        }
-      }
-    }
-  }	
+  if ([node isDirectory] && [node isParentOfPath: fromPath])
+    {
+      NSArray *subNodes = [node subNodes];
 
-  if ([node isApplication]) {
-    if (([container respondsToSelector: @selector(baseNode)] == NO)
-                        || ([node isEqual: [container baseNode]] == NO)) { 
-      for (i = 0; i < count; i++) {
-        CREATE_AUTORELEASE_POOL(arp);
-        FSNode *nd = [FSNode nodeWithPath: [sourcePaths objectAtIndex: i]];
+      for (i = 0; i < [subNodes count]; i++)
+	{
+	  FSNode *nd = [subNodes objectAtIndex: i];
 
-        if (([nd isPlain] == NO) && ([nd isPackage] == NO)) {
-          RELEASE (arp);
-          return NSDragOperationNone;
-        }
-        RELEASE (arp);
-      }
-      
-    } else if ([node isEqual: [container baseNode]] == NO) {
-      return NSDragOperationNone;
+	  if ([nd isDirectory])
+	    {
+	      NSUInteger j;
+
+	      for (j = 0; j < count; j++) {
+		NSString *fname = [[sourcePaths objectAtIndex: j] lastPathComponent];
+
+		if ([[nd name] isEqual: fname])
+		  {
+		    return NSDragOperationNone;
+		  }
+	      }
+	    }
+	}
     }
-  }
+
+  if ([node isApplication])
+    {
+      if (([container respondsToSelector: @selector(baseNode)] == NO)
+	  || ([node isEqual: [container baseNode]] == NO))
+	{
+	  for (i = 0; i < count; i++)
+	    {
+	      CREATE_AUTORELEASE_POOL(arp);
+	      FSNode *nd = [FSNode nodeWithPath: [sourcePaths objectAtIndex: i]];
+
+	      if (([nd isPlain] == NO) && ([nd isPackage] == NO))
+		{
+		  RELEASE (arp);
+		  return NSDragOperationNone;
+		}
+	      RELEASE (arp);
+	    }
+	}
+      else if ([node isEqual: [container baseNode]] == NO)
+	{
+	  return NSDragOperationNone;
+	}
+    }
 
   isDragTarget = YES;
   forceCopy = NO;
-  
+
   onApplication = ([node isApplication]
 		   && [container respondsToSelector: @selector(baseNode)]
-		   && [node isEqual: [container baseNode]]);   
-  
+		   && [node isEqual: [container baseNode]]);
+
   sourceDragMask = [sender draggingSourceOperationMask];
 
   if (sourceDragMask & NSDragOperationMove)
     {
       NSLog(@"FSNIcon dragginEntered - Move");
       if ([[NSFileManager defaultManager] isWritableFileAtPath: fromPath]
-	  || ([node isApplication] && (onApplication == NO))) {
-	return NSDragOperationMove;
-      } else if (([node isApplication] == NO) || onApplication) {
-	forceCopy = YES;
-	return NSDragOperationCopy;
-      }
+	  || ([node isApplication] && (onApplication == NO)))
+	{
+	  return NSDragOperationMove;
+	}
+      else if (([node isApplication] == NO) || onApplication)
+	{
+	  forceCopy = YES;
+	  return NSDragOperationCopy;
+	}
     }
 
-  if (sourceDragMask & NSDragOperationCopy) {
-    if ([node isApplication]) {
-      return (onApplication ? NSDragOperationCopy : NSDragOperationMove);
-    } else {
-      return NSDragOperationCopy;
+  if (sourceDragMask & NSDragOperationCopy)
+    {
+      if ([node isApplication])
+	{
+	  return (onApplication ? NSDragOperationCopy : NSDragOperationMove);
+	}
+      else
+	{
+	  return NSDragOperationCopy;
+	}
     }
-    
-  } else if (sourceDragMask & NSDragOperationLink) {
-    if ([node isApplication]) {
-      return (onApplication ? NSDragOperationLink : NSDragOperationMove);
-    } else {
-      return NSDragOperationLink;
+  else if (sourceDragMask & NSDragOperationLink)
+    {
+      if ([node isApplication])
+	{
+	  return (onApplication ? NSDragOperationLink : NSDragOperationMove);
+	}
+      else
+	{
+	  return NSDragOperationLink;
+	}
     }
-  
-  }
 
   return NSDragOperationNone;
 }
@@ -1593,23 +1633,27 @@ static NSImage *branchImage;
   NSDragOperation sourceDragMask = [sender draggingSourceOperationMask];
   NSPoint p = [self convertPoint: [sender draggingLocation] fromView: nil];
 
-  if ([self mouse: p inRect: icnBounds] == NO) {
-    if (drawicon == selectedicon) {
-      drawicon = icon;
-      [self setNeedsDisplay: YES];
+  if ([self mouse: p inRect: icnBounds] == NO)
+    {
+      if (drawicon == selectedicon)
+	{
+	  drawicon = icon;
+	  [self setNeedsDisplay: YES];
+	}
+      return [container draggingUpdated: sender];
     }
-    return [container draggingUpdated: sender];
-    
-  } else {
-    if ((selectedicon == nil) && isDragTarget && (onSelf == NO)) {
-      ASSIGN (selectedicon, [fsnodeRep openFolderIconOfSize: iconSize forNode: node]);
+  else
+    {
+      if ((selectedicon == nil) && isDragTarget && (onSelf == NO))
+	{
+	  ASSIGN (selectedicon, [fsnodeRep openFolderIconOfSize: iconSize forNode: node]);
+	}
+      if (selectedicon && (drawicon == icon) && isDragTarget && (onSelf == NO))
+	{
+	  drawicon = selectedicon;
+	  [self setNeedsDisplay: YES];
+	}
     }
-  
-    if (selectedicon && (drawicon == icon) && isDragTarget && (onSelf == NO)) {
-      drawicon = selectedicon;
-      [self setNeedsDisplay: YES];
-    }
-  }
 
   NSLog(@"FSNIcon draggingUpdated - determine operation %lu ", (unsigned long)sourceDragMask);
   if (sourceDragMask == NSDragOperationEvery)
@@ -1619,38 +1663,52 @@ static NSImage *branchImage;
   else if (sourceDragMask & NSDragOperationCopy)
     NSLog(@"NSDragOperationCopy");
 
-  if (isDragTarget == NO) {
-    return NSDragOperationNone;
-  } else if (sourceDragMask & NSDragOperationMove) {
-    NSLog(@"FSNIcon - NSDragOperatiomMove");
-    return forceCopy ? NSDragOperationCopy : NSDragOperationMove;
-  } else if (sourceDragMask & NSDragOperationCopy) {
-    if ([node isApplication]) {
-      NSLog(@"onApplication ? %d", onApplication);
-      return (onApplication ? NSDragOperationCopy : NSDragOperationMove);
-    } else {
-      return NSDragOperationCopy;
+  if (isDragTarget == NO)
+    {
+      return NSDragOperationNone;
     }
-  } else if (sourceDragMask & NSDragOperationLink) {
-    if ([node isApplication]) {
-      return (onApplication ? NSDragOperationLink : NSDragOperationMove);
-    } else {
-      return NSDragOperationLink;
+  else if (sourceDragMask & NSDragOperationMove)
+    {
+      NSLog(@"FSNIcon - NSDragOperatiomMove");
+      return forceCopy ? NSDragOperationCopy : NSDragOperationMove;
     }
-  }
-	return NSDragOperationNone;
+  else if (sourceDragMask & NSDragOperationCopy)
+    {
+      if ([node isApplication])
+	{
+	  NSLog(@"onApplication ? %d", onApplication);
+	  return (onApplication ? NSDragOperationCopy : NSDragOperationMove);
+	}
+      else
+	{
+	  return NSDragOperationCopy;
+	}
+    }
+  else if (sourceDragMask & NSDragOperationLink)
+    {
+      if ([node isApplication])
+	{
+	  return (onApplication ? NSDragOperationLink : NSDragOperationMove);
+	}
+      else
+	{
+	  return NSDragOperationLink;
+	}
+    }
+  return NSDragOperationNone;
 }
 
 - (void)draggingExited:(id <NSDraggingInfo>)sender
 {
-  isDragTarget = NO;  
-  
-  if (onSelf == NO) { 
-    drawicon = icon;
-    [container setNeedsDisplayInRect: [self frame]];   
-    [self setNeedsDisplay: YES];   
-  }
-  
+  isDragTarget = NO;
+
+  if (onSelf == NO)
+    {
+      drawicon = icon;
+      [container setNeedsDisplayInRect: [self frame]];
+      [self setNeedsDisplay: YES];
+    }
+
   onSelf = NO;
 }
 
@@ -1675,41 +1733,47 @@ static NSImage *branchImage;
   NSString *trashPath;
   NSUInteger i;
 
-  isDragTarget = NO;  
+  isDragTarget = NO;
 
-  if (isLocked) {
-    return;
-  }
+  if (isLocked)
+    {
+      return;
+    }
 
-  if (onSelf) {
-		[container resizeWithOldSuperviewSize: [container frame].size]; 
-    onSelf = NO;		
-    return;
-  }	
+  if (onSelf)
+    {
+      [container resizeWithOldSuperviewSize: [container frame].size];
+      onSelf = NO;
+      return;
+    }
 
   drawicon = icon;
   [self setNeedsDisplay: YES];
 
-	sourceDragMask = [sender draggingSourceOperationMask];
+  sourceDragMask = [sender draggingSourceOperationMask];
   pb = [sender draggingPasteboard];
 
-  if ([node isPackage] == NO) {    
-    if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"]) {  
-      NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"]; 
+  if ([node isPackage] == NO)
+    {
+      if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"])
+	{
+	  NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"];
 
-      [desktopApp concludeRemoteFilesDragOperation: pbData
-                                       atLocalPath: [node path]];
-      return;
+	  [desktopApp concludeRemoteFilesDragOperation: pbData
+					   atLocalPath: [node path]];
+	  return;
 
-    } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {  
-      NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
+	}
+      else if ([[pb types] containsObject: @"GWLSFolderPboardType"])
+	{
+	  NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"];
 
-      [desktopApp lsfolderDragOperation: pbData
-                        concludedAtPath: [node path]];
-      return;
+	  [desktopApp lsfolderDragOperation: pbData
+			    concludedAtPath: [node path]];
+	  return;
+	}
     }
-  }
-    
+
   sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
 
   if (([node isApplication] == NO) || onApplication)
@@ -1726,11 +1790,14 @@ static NSImage *branchImage;
 	  if (sourceDragMask & NSDragOperationMove)
 	    {
 	      NSLog(@"FSNIcon: concludeDragOperation - NSWorkspaceMoveOperation");
-	      if ([[NSFileManager defaultManager] isWritableFileAtPath: source]) {
-		operation = NSWorkspaceMoveOperation;
-	      } else {
-		operation = NSWorkspaceCopyOperation;
-	      }
+	      if ([[NSFileManager defaultManager] isWritableFileAtPath: source])
+		{
+		  operation = NSWorkspaceMoveOperation;
+		}
+	      else
+		{
+		  operation = NSWorkspaceCopyOperation;
+		}
 	    }
 	  else if (sourceDragMask & NSDragOperationCopy)
 	    {
@@ -1742,40 +1809,44 @@ static NSImage *branchImage;
 	    }
 	}
 
-    files = [NSMutableArray arrayWithCapacity: 1];    
-    for(i = 0; i < [sourcePaths count]; i++) {    
-      [files addObject: [[sourcePaths objectAtIndex: i] lastPathComponent]];
-    }  
+      files = [NSMutableArray arrayWithCapacity: 1];
+      for(i = 0; i < [sourcePaths count]; i++)
+	{
+	  [files addObject: [[sourcePaths objectAtIndex: i] lastPathComponent]];
+	}
 
-	  opDict = [NSMutableDictionary dictionaryWithCapacity: 4];
-	  [opDict setObject: operation forKey: @"operation"];
-	  [opDict setObject: source forKey: @"source"];
-	  [opDict setObject: [node path] forKey: @"destination"];
-	  [opDict setObject: files forKey: @"files"];
+      opDict = [NSMutableDictionary dictionaryWithCapacity: 4];
+      [opDict setObject: operation forKey: @"operation"];
+      [opDict setObject: source forKey: @"source"];
+      [opDict setObject: [node path] forKey: @"destination"];
+      [opDict setObject: files forKey: @"files"];
 
-    [desktopApp performFileOperation: opDict];
+      [desktopApp performFileOperation: opDict];
 
-  } else {
-    for (i = 0; i < [sourcePaths count]; i++) {  
-      NSString *path = [sourcePaths objectAtIndex: i];
-    
-      NS_DURING
-        {
-      [[NSWorkspace sharedWorkspace] openFile: path 
-                              withApplication: [node name]];
-        }
-      NS_HANDLER
-        {
-      NSRunAlertPanel(NSLocalizedString(@"error", @""), 
-          [NSString stringWithFormat: @"%@ %@!", 
-                    NSLocalizedString(@"Can't open ", @""), [node name]],
-                                        NSLocalizedString(@"OK", @""), 
-                                        nil, 
-                                        nil);                                     
-        }
-      NS_ENDHANDLER  
     }
-  }
+  else
+    {
+      for (i = 0; i < [sourcePaths count]; i++)
+	{
+	  NSString *path = [sourcePaths objectAtIndex: i];
+
+	  NS_DURING
+	    {
+	      [[NSWorkspace sharedWorkspace] openFile: path
+				      withApplication: [node name]];
+	    }
+	  NS_HANDLER
+	    {
+	      NSRunAlertPanel(NSLocalizedString(@"error", @""),
+			      [NSString stringWithFormat: @"%@ %@!",
+					NSLocalizedString(@"Can't open ", @""), [node name]],
+			      NSLocalizedString(@"OK", @""),
+			      nil,
+			      nil);
+	    }
+	  NS_ENDHANDLER
+	}
+    }
 }
 
 @end
@@ -1789,13 +1860,14 @@ static NSImage *branchImage;
   [super dealloc];
 }
 
-- (void)setNode:(FSNode *)anode 
+- (void)setNode:(FSNode *)anode
     stringValue:(NSString *)str
 {
   DESTROY (node);
-  if (anode) {
-    ASSIGN (node, anode);
-  } 
+  if (anode)
+    {
+      ASSIGN (node, anode);
+    }
   [self setStringValue: str];
 }
 
@@ -1812,19 +1884,21 @@ static NSImage *branchImage;
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-  if ([self isEditable] == NO) {
-    if ([container respondsToSelector: @selector(canStartRepNameEditing)]
-                                      && [container canStartRepNameEditing]) {  
-      [self setAlignment: NSLeftTextAlignment];  
-      [self setSelectable: YES];  
-      [self setEditable: YES];  
-      [[self window] makeFirstResponder: self]; 
+  if ([self isEditable] == NO)
+    {
+      if ([container respondsToSelector: @selector(canStartRepNameEditing)]
+	  && [container canStartRepNameEditing])
+	{
+	  [self setAlignment: NSLeftTextAlignment];
+	  [self setSelectable: YES];
+	  [self setEditable: YES];
+	  [[self window] makeFirstResponder: self];
+	}
     }
-    
-  } else {
-    [super mouseDown: theEvent];
-  }
+  else
+    {
+      [super mouseDown: theEvent];
+    }
 }
 
 @end
-
