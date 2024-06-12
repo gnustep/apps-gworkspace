@@ -1524,7 +1524,7 @@ static NSImage *branchImage;
   if (onSelf)
     {
       isDragTarget = YES;
-      return NSDragOperationEvery;
+      return NSDragOperationMove;
     }
 
   fromPath = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
@@ -1605,7 +1605,6 @@ static NSImage *branchImage;
 		   && [node isEqual: [container baseNode]]);
 
   sourceDragMask = [sender draggingSourceOperationMask];
-
   if (sourceDragMask & NSDragOperationMove)
     {
       if ([[NSFileManager defaultManager] isWritableFileAtPath: fromPath]

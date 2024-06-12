@@ -52,7 +52,7 @@
 
 - (void)concludeDragOperation:(id <NSDraggingInfo>)sender;
 
-- (unsigned int)draggingSourceOperationMaskForLocal:(BOOL)isLocal;
+- (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)isLocal;
 
 @end
 

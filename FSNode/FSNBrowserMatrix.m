@@ -387,7 +387,7 @@
     }
 }
 
-- (unsigned int)draggingSourceOperationMaskForLocal:(BOOL)flag
+- (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)flag
 {
   return NSDragOperationEvery;
 }

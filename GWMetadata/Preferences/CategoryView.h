@@ -63,7 +63,7 @@
 
 - (void)stateButtonAction:(id)sender;
 
-- (unsigned int)draggingSourceOperationMaskForLocal:(BOOL)flag;
+- (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)flag;
 
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender;
 - (NSDragOperation)draggingUpdated:(id <NSDraggingInfo>)sender;

@@ -318,7 +318,7 @@ static NSString *nibName = @"InspectorWin";
 
   if ([NSImage canInitWithPasteboard: [sender draggingPasteboard]]) {
     [iview setDndTarget: YES];
-    return NSDragOperationAll;
+    return NSDragOperationEvery;
   }    
   
   return NSDragOperationNone;
