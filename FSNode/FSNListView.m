@@ -2483,7 +2483,6 @@ shouldEditTableColumn:(NSTableColumn *)aTableColumn
   forceCopy = NO;
 
   sourceDragMask = [sender draggingSourceOperationMask];
-
   if (sourceDragMask & NSDragOperationMove)
     {
       if ([[NSFileManager defaultManager] isWritableFileAtPath: fromPath])
@@ -3100,6 +3099,11 @@ NSComparisonResult sortSubviews(id view1, id view2, void *context)
 
 
 @implementation FSNListView (DraggingDestination)
+
+- (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)flag
+{
+  return NSDragOperationEvery;
+}
 
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
