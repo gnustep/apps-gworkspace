@@ -1130,14 +1130,15 @@ static NSImage *branchImage;
   showType = type;
   DESTROY (extInfoType);
 
-  if (selection) {
-    [label setStringValue: selectionTitle];
-    [infolabel setStringValue: @""];
-    return;
-  }
-   
+  if (selection)
+    {
+      [label setStringValue: selectionTitle];
+      [infolabel setStringValue: @""];
+      return;
+    }
+
   [label setStringValue: (hostname ? hostname : [node name])];
-   
+
   switch(showType) {
     case FSNInfoNameType:
       [infolabel setStringValue: @""];
@@ -1163,20 +1164,22 @@ static NSImage *branchImage;
 - (BOOL)setExtendedShowType:(NSString *)type
 {
   ASSIGN (extInfoType, type);
-  showType = FSNInfoExtendedType;   
+  showType = FSNInfoExtendedType;
 
   [self setNodeInfoShowType: showType];
 
-  if (selection == nil) {
-    NSDictionary *info = [fsnodeRep extendedInfoOfType: type forNode: node];
+  if (selection == nil)
+    {
+      NSDictionary *info = [fsnodeRep extendedInfoOfType: type forNode: node];
 
-    if (info) {
-      [infolabel setStringValue: [info objectForKey: @"labelstr"]]; 
-      return YES;
+      if (info)
+	{
+	  [infolabel setStringValue: [info objectForKey: @"labelstr"]];
+	  return YES;
+	}
     }
-  }
-  
-  return NO; 
+
+  return NO;
 }
 
 - (FSNInfoType)nodeInfoShowType
@@ -1191,18 +1194,20 @@ static NSImage *branchImage;
 
 - (void)setNameEdited:(BOOL)value
 {
-  if (nameEdited != value) {
-    nameEdited = value;
-    [self setNeedsDisplay: YES];
-  }
+  if (nameEdited != value)
+    {
+      nameEdited = value;
+      [self setNeedsDisplay: YES];
+    }
 }
 
 - (void)setLeaf:(BOOL)flag
 {
-  if (isLeaf != flag) {
-    isLeaf = flag;
-    [self tile]; 
-  }
+  if (isLeaf != flag)
+    {
+      isLeaf = flag;
+      [self tile];
+    }
 }
 
 - (BOOL)isLeaf
@@ -1212,19 +1217,22 @@ static NSImage *branchImage;
 
 - (void)select
 {
-  if (isSelected) {
-    return;
-  }
+  if (isSelected)
+    {
+      return;
+    }
   isSelected = YES;
-  
-  if ([container respondsToSelector: @selector(unselectOtherReps:)]) {
-    [container unselectOtherReps: self];
-  }
-  if ([container respondsToSelector: @selector(selectionDidChange)]) {
-    [container selectionDidChange];	
-  }
-  
-  [self setNeedsDisplay: YES]; 
+
+  if ([container respondsToSelector: @selector(unselectOtherReps:)])
+    {
+      [container unselectOtherReps: self];
+    }
+  if ([container respondsToSelector: @selector(selectionDidChange)])
+    {
+      [container selectionDidChange];
+    }
+
+  [self setNeedsDisplay: YES];
 }
 
 - (void)unselect
@@ -1243,11 +1251,12 @@ static NSImage *branchImage;
 
 - (void)setOpened:(BOOL)value
 {
-  if (isOpened == value) {
-    return;
-  }
+  if (isOpened == value)
+    {
+      return;
+    }
   isOpened = value;
-  [self setNeedsDisplay: YES]; 
+  [self setNeedsDisplay: YES];
 }
 
 - (BOOL)isOpened
@@ -1257,16 +1266,17 @@ static NSImage *branchImage;
 
 - (void)setLocked:(BOOL)value
 {
-	if (isLocked == value) {
-		return;
-	}
-	isLocked = value;
-	[label setTextColor: (isLocked ? [container disabledTextColor] 
-                                            : [container textColor])];
-	[infolabel setTextColor: (isLocked ? [container disabledTextColor] 
-                                            : [container textColor])];
-                                                
-	[self setNeedsDisplay: YES];		
+  if (isLocked == value)
+    {
+      return;
+    }
+  isLocked = value;
+  [label setTextColor: (isLocked ? [container disabledTextColor]
+			: [container textColor])];
+  [infolabel setTextColor: (isLocked ? [container disabledTextColor]
+			    : [container textColor])];
+
+  [self setNeedsDisplay: YES];
 }
 
 - (void)checkLocked
@@ -1350,31 +1360,36 @@ static NSImage *branchImage;
 - (void)startExternalDragOnEvent:(NSEvent *)event
                  withMouseOffset:(NSSize)offset
 {
-  if ([container respondsToSelector: @selector(selectedPaths)]) {
-    NSArray *selectedPaths = [container selectedPaths];
-    NSPasteboard *pb = [NSPasteboard pasteboardWithName: NSDragPboard];	
+  if ([container respondsToSelector: @selector(selectedPaths)])
+    {
+      NSArray *selectedPaths = [container selectedPaths];
+      NSPasteboard *pb = [NSPasteboard pasteboardWithName: NSDragPboard];
 
-    [pb declareTypes: [NSArray arrayWithObject: NSFilenamesPboardType] 
-               owner: nil];
+      [pb declareTypes: [NSArray arrayWithObject: NSFilenamesPboardType]
+		 owner: nil];
 
-    if ([pb setPropertyList: selectedPaths forType: NSFilenamesPboardType]) {
-      NSImage *dragIcon;
+      if ([pb setPropertyList: selectedPaths forType: NSFilenamesPboardType])
+	{
+	  NSImage *dragIcon;
 
-      if ([selectedPaths count] == 1) {
-        dragIcon = icon;
-      } else {
-        dragIcon = [fsnodeRep multipleSelectionIconOfSize: iconSize];
-      }     
+	  if ([selectedPaths count] == 1)
+	    {
+	      dragIcon = icon;
+	    }
+	  else
+	    {
+	      dragIcon = [fsnodeRep multipleSelectionIconOfSize: iconSize];
+	    }
 
-      [self dragImage: dragIcon
-                   at: icnPoint
-               offset: offset
-                event: event
-           pasteboard: pb
-               source: self
-            slideBack: slideBack];
+	  [self dragImage: dragIcon
+		       at: icnPoint
+		   offset: offset
+		    event: event
+	       pasteboard: pb
+		   source: self
+		slideBack: slideBack];
+	}
     }
-  }
 }
 
 - (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)flag
@@ -1382,22 +1397,25 @@ static NSImage *branchImage;
   return NSDragOperationEvery;
 }
 
-- (void)draggedImage:(NSImage *)anImage 
-             endedAt:(NSPoint)aPoint 
+- (void)draggedImage:(NSImage *)anImage
+             endedAt:(NSPoint)aPoint
            deposited:(BOOL)flag
 {
   dragdelay = 0;
   onSelf = NO;
-  
-  if ([container respondsToSelector: @selector(restoreLastSelection)]) {
-    [container restoreLastSelection];
-  }
-  
-  if (flag == NO) {
-    if ([container respondsToSelector: @selector(removeUndepositedRep:)]) {
-      [container removeUndepositedRep: self];
+
+  if ([container respondsToSelector: @selector(restoreLastSelection)])
+    {
+      [container restoreLastSelection];
     }
-  }
+
+  if (flag == NO)
+    {
+      if ([container respondsToSelector: @selector(removeUndepositedRep:)])
+	{
+	  [container removeUndepositedRep: self];
+	}
+    }
 }
 
 @end
@@ -1463,7 +1481,8 @@ static NSImage *branchImage;
 
 	  sourcePaths = [pbDict objectForKey: @"paths"];
 	}
-    } else if ([[pb types] containsObject: @"GWLSFolderPboardType"])
+    }
+  else if ([[pb types] containsObject: @"GWLSFolderPboardType"])
     {
       if ([node isPackage] == NO)
 	{
@@ -1589,7 +1608,6 @@ static NSImage *branchImage;
 
   if (sourceDragMask & NSDragOperationMove)
     {
-      NSLog(@"FSNIcon dragginEntered - Move");
       if ([[NSFileManager defaultManager] isWritableFileAtPath: fromPath]
 	  || ([node isApplication] && (onApplication == NO)))
 	{
@@ -1613,7 +1631,8 @@ static NSImage *branchImage;
 	  return NSDragOperationCopy;
 	}
     }
-  else if (sourceDragMask & NSDragOperationLink)
+
+  if (sourceDragMask & NSDragOperationLink)
     {
       if ([node isApplication])
 	{
@@ -1655,28 +1674,20 @@ static NSImage *branchImage;
 	}
     }
 
-  NSLog(@"FSNIcon draggingUpdated - determine operation %lu ", (unsigned long)sourceDragMask);
-  if (sourceDragMask == NSDragOperationEvery)
-    NSLog(@"NSDragOperationEvery");
-  if (sourceDragMask & NSDragOperationMove)
-    NSLog(@"NSDragOperationMove");
-  else if (sourceDragMask & NSDragOperationCopy)
-    NSLog(@"NSDragOperationCopy");
-
   if (isDragTarget == NO)
     {
       return NSDragOperationNone;
     }
-  else if (sourceDragMask & NSDragOperationMove)
+
+  if (sourceDragMask & NSDragOperationMove)
     {
-      NSLog(@"FSNIcon - NSDragOperatiomMove");
       return forceCopy ? NSDragOperationCopy : NSDragOperationMove;
     }
-  else if (sourceDragMask & NSDragOperationCopy)
+
+  if (sourceDragMask & NSDragOperationCopy)
     {
       if ([node isApplication])
 	{
-	  NSLog(@"onApplication ? %d", onApplication);
 	  return (onApplication ? NSDragOperationCopy : NSDragOperationMove);
 	}
       else
@@ -1684,7 +1695,8 @@ static NSImage *branchImage;
 	  return NSDragOperationCopy;
 	}
     }
-  else if (sourceDragMask & NSDragOperationLink)
+
+  if (sourceDragMask & NSDragOperationLink)
     {
       if ([node isApplication])
 	{
@@ -1695,6 +1707,7 @@ static NSImage *branchImage;
 	  return NSDragOperationLink;
 	}
     }
+
   return NSDragOperationNone;
 }
 
@@ -1789,7 +1802,6 @@ static NSImage *branchImage;
 	{
 	  if (sourceDragMask & NSDragOperationMove)
 	    {
-	      NSLog(@"FSNIcon: concludeDragOperation - NSWorkspaceMoveOperation");
 	      if ([[NSFileManager defaultManager] isWritableFileAtPath: source])
 		{
 		  operation = NSWorkspaceMoveOperation;

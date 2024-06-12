@@ -1988,7 +1988,6 @@ static void GWHighlightFrameRect(NSRect aRect)
       NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
 
       sourcePaths = [pbDict objectForKey: @"paths"];
-
     }
   else if ([[pb types] containsObject: @"GWLSFolderPboardType"])
     {
@@ -2216,7 +2215,7 @@ static void GWHighlightFrameRect(NSRect aRect)
 				       atLocalPath: [node path]];
       return;
     }
-  else if ([[pb types] containsObject: @"GWLSFolderPboardType"])
+  if ([[pb types] containsObject: @"GWLSFolderPboardType"])
     {
       NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"];
 
@@ -2246,7 +2245,6 @@ static void GWHighlightFrameRect(NSRect aRect)
 	{
 	  if ([[NSFileManager defaultManager] isWritableFileAtPath: source])
 	    {
-	      NSLog(@"FSNIconsView concludeDragOperation - move");
 	      operation = NSWorkspaceMoveOperation;
 	    }
 	  else
@@ -2256,7 +2254,6 @@ static void GWHighlightFrameRect(NSRect aRect)
 	}
       else if (sourceDragMask & NSDragOperationCopy)
 	{
-	  NSLog(@"FSNIconsView concludeDragOperation - copy");
 	  operation = NSWorkspaceCopyOperation;
 	}
       else if (sourceDragMask / NSDragOperationLink)

@@ -1730,7 +1730,6 @@ shouldEditTableColumn:(NSTableColumn *)aTableColumn
       if (pb && [[pb types] containsObject: NSFilenamesPboardType])
 	{
 	  sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
-
 	}
       else if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"])
 	{
@@ -1738,7 +1737,6 @@ shouldEditTableColumn:(NSTableColumn *)aTableColumn
 	  NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
 
 	  sourcePaths = [pbDict objectForKey: @"paths"];
-
 	}
       else if ([[pb types] containsObject: @"GWLSFolderPboardType"])
 	{
@@ -1746,7 +1744,6 @@ shouldEditTableColumn:(NSTableColumn *)aTableColumn
 	  NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
 
 	  sourcePaths = [pbDict objectForKey: @"paths"];
-
 	}
       else
 	{
@@ -1951,7 +1948,7 @@ shouldEditTableColumn:(NSTableColumn *)aTableColumn
 	dndValidRect = NSZeroRect;
 	return;
       }
-    else if ([[pb types] containsObject: @"GWLSFolderPboardType"])
+    if ([[pb types] containsObject: @"GWLSFolderPboardType"])
       {
 	NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"];
 
@@ -2106,9 +2103,11 @@ shouldEditTableColumn:(NSTableColumn *)aTableColumn
 	      [openicon lockFocus];
 	      [opicn dissolveToPoint: NSZeroPoint fraction: 0.5];
 	      [openicon unlockFocus];
-	    } else {
-	    ASSIGN (openicon, opicn);
-	  }
+	    }
+	  else
+	    {
+	      ASSIGN (openicon, opicn);
+	    }
 	}
     }
 

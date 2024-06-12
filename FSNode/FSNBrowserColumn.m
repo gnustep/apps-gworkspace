@@ -1394,7 +1394,6 @@ static id <DesktopApplication> desktopApp = nil;
       return NSDragOperationNone;
     }
 
-  NSLog(@"FSNBrowserColumn draggingUpdated - determine operation %lu ", sourceDragMask);
   if (sourceDragMask & NSDragOperationMove)
     {
       return forceCopy ? NSDragOperationCopy : NSDragOperationMove;
@@ -1451,13 +1450,14 @@ static id <DesktopApplication> desktopApp = nil;
       return;
 
     }
-  else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {
-    NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"];
+  else if ([[pb types] containsObject: @"GWLSFolderPboardType"])
+    {
+      NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"];
 
-    [desktopApp lsfolderDragOperation: pbData
-                      concludedAtPath: [shownNode path]];
-    return;
-  }
+      [desktopApp lsfolderDragOperation: pbData
+			concludedAtPath: [shownNode path]];
+      return;
+    }
 
   sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
 
@@ -1485,11 +1485,11 @@ static id <DesktopApplication> desktopApp = nil;
 	      operation = NSWorkspaceCopyOperation;
 	    }
 	}
-      if (sourceDragMask & NSDragOperationCopy)
+      else if (sourceDragMask & NSDragOperationCopy)
 	{
 	  operation = NSWorkspaceCopyOperation;
 	}
-      if (sourceDragMask & NSDragOperationLink)
+      else if (sourceDragMask & NSDragOperationLink)
 	{
 	  operation = NSWorkspaceLinkOperation;
 	}
@@ -1774,7 +1774,7 @@ static id <DesktopApplication> desktopApp = nil;
 			      nil);
 	    }
 	  NS_ENDHANDLER
-	    }
+	}
     }
 }
 
