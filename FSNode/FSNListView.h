@@ -1,6 +1,6 @@
 /* FSNListView.h
  *
- * Copyright (C) 2004-2023 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2024 Free Software Foundation, Inc.
  *
  * Authors: Enrico Sersale
  *          Riccardo Mottola
@@ -105,7 +105,7 @@
 
 @interface FSNListViewDataSource (NSTableViewDataSource)
 
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView;
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView;
 
 - (id)tableView:(NSTableView *)aTableView
           objectValueForTableColumn:(NSTableColumn *)aTableColumn
@@ -393,7 +393,7 @@
 
 @interface NSDictionary (TableColumnSort)
 
-- (int)compareTableColumnInfo:(NSDictionary *)info;
+- (NSComparisonResult)compareTableColumnInfo:(NSDictionary *)info;
 
 @end
 

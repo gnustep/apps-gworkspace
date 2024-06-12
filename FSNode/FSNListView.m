@@ -409,7 +409,7 @@ static NSString *defaultColumns = @"{ \
 
 @implementation FSNListViewDataSource (NSTableViewDataSource)
 
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
   return [nodeReps count];
 }
@@ -3140,7 +3140,7 @@ NSComparisonResult sortSubviews(id view1, id view2, void *context)
 
 @implementation NSDictionary (TableColumnSort)
 
-- (int)compareTableColumnInfo:(NSDictionary *)info
+- (NSComparisonResult)compareTableColumnInfo:(NSDictionary *)info
 {
   NSNumber *p1 = [self objectForKey: @"position"];
   NSNumber *p2 = [info objectForKey: @"position"];
