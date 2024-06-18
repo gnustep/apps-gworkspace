@@ -75,9 +75,9 @@
   [inspector concludeDragOperation: sender inIconView: self];
 }
 
-- (unsigned int)draggingSourceOperationMaskForLocal:(BOOL)isLocal
+- (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)isLocal
 {
-  return NSDragOperationAll;
+  return NSDragOperationEvery;
 }
 
 @end

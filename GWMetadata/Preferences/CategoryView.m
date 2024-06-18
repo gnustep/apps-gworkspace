@@ -223,9 +223,9 @@
   }  
 }
 
-- (unsigned int)draggingSourceOperationMaskForLocal:(BOOL)flag
+- (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)flag
 {
-  return NSDragOperationAll;
+  return NSDragOperationEvery;
 }
 
 - (BOOL)ignoreModifierKeysWhileDragging
@@ -246,7 +246,7 @@
       insertpos = ([self mouse: p inRect: targetRects[0]] ? UP : DOWN); 
       isDragTarget = YES;
       [self setNeedsDisplay: YES];
-      return NSDragOperationAll;        
+      return NSDragOperationEvery;
     }    
   } 
   
@@ -271,10 +271,10 @@
                     || ((pos == DOWN) && (otherind != infoind + 1))) {
         insertpos = pos;
         [self setNeedsDisplay: YES];
-        return NSDragOperationAll;         
+        return NSDragOperationEvery;
       } 
     } else {
-      return NSDragOperationAll; 
+      return NSDragOperationEvery;
     }
   }
   

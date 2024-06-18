@@ -1,8 +1,9 @@
 /* FSNListView.m
- *  
- * Copyright (C) 2004-2016 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Copyright (C) 2004-2024 Free Software Foundation, Inc.
+ *
+ * Authors: Enrico Sersale
+ *          Riccardo Mottola
  * Date: December 2004
  *
  * This file is part of the GNUstep FSNode framework
@@ -11,12 +12,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
@@ -83,49 +84,52 @@ static NSString *defaultColumns = @"{ \
 {
   self = [super init];
 
-  if (self) {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	
-    NSString *appName = [defaults stringForKey: @"DesktopApplicationName"];
-    NSString *selName = [defaults stringForKey: @"DesktopApplicationSelName"];
-    id defentry;
-    
-    listView = aview;
-    
-    fsnodeRep = [FSNodeRep sharedInstance];
-    
-    if (appName && selName) {
-		  Class desktopAppClass = [[NSBundle mainBundle] classNamed: appName];
-      SEL sel = NSSelectorFromString(selName);
-      desktopApp = [desktopAppClass performSelector: sel];
+  if (self)
+    {
+      NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+      NSString *appName = [defaults stringForKey: @"DesktopApplicationName"];
+      NSString *selName = [defaults stringForKey: @"DesktopApplicationSelName"];
+      id defentry;
+
+      listView = aview;
+
+      fsnodeRep = [FSNodeRep sharedInstance];
+
+      if (appName && selName)
+	{
+	  Class desktopAppClass = [[NSBundle mainBundle] classNamed: appName];
+	  SEL sel = NSSelectorFromString(selName);
+	  desktopApp = [desktopAppClass performSelector: sel];
+	}
+
+      defentry = [defaults objectForKey: @"hligh_table_col"];
+      hlighColId = defentry ? [defentry intValue] : FSNInfoNameType;
+
+      extInfoType = nil;
+      defentry = [defaults objectForKey: @"extended_info_type"];
+
+      if (defentry)
+	{
+	  NSArray *availableTypes = [fsnodeRep availableExtendedInfoNames];
+
+	  if ([availableTypes containsObject: defentry]) {
+	    ASSIGN (extInfoType, defentry);
+	  }
+	}
+
+      nodeReps = [NSMutableArray new];
+
+      nameEditor = [FSNListViewNameEditor new];
+      [nameEditor setDelegate: self];
+      [nameEditor setEditable: NO];
+      [nameEditor setSelectable: NO];
+      [nameEditor setBezeled: NO];
+      [nameEditor setAlignment: NSLeftTextAlignment];
+
+      mouseFlags = 0;
+      isDragTarget = NO;
     }
-    
-    defentry = [defaults objectForKey: @"hligh_table_col"];
-    hlighColId = defentry ? [defentry intValue] : FSNInfoNameType;
-    
-    extInfoType = nil;
-    defentry = [defaults objectForKey: @"extended_info_type"];
 
-    if (defentry) {
-      NSArray *availableTypes = [fsnodeRep availableExtendedInfoNames];
-
-      if ([availableTypes containsObject: defentry]) {
-        ASSIGN (extInfoType, defentry);
-      }
-    }
-    
-    nodeReps = [NSMutableArray new];    
-
-    nameEditor = [FSNListViewNameEditor new];
-    [nameEditor setDelegate: self];  
-    [nameEditor setEditable: NO];
-    [nameEditor setSelectable: NO];	   
-		[nameEditor setBezeled: NO];
-		[nameEditor setAlignment: NSLeftTextAlignment];
-    
-    mouseFlags = 0;
-    isDragTarget = NO;
-  }
-  
   return self;
 }
 
@@ -142,17 +146,19 @@ static NSString *defaultColumns = @"{ \
 - (void)createColumns:(NSDictionary *)info
 {
   NSArray *keys = [info keysSortedByValueUsingSelector: @selector(compareTableColumnInfo:)];
-  NSTableColumn *column; 
+  NSTableColumn *column;
   int i;
 
-  for (i = 0; i < [keys count]; i++) {
-    [self addColumn: [info objectForKey: [keys objectAtIndex: i]]];
-  }
+  for (i = 0; i < [keys count]; i++)
+    {
+      [self addColumn: [info objectForKey: [keys objectAtIndex: i]]];
+    }
 
   column = [listView tableColumnWithIdentifier: [NSNumber numberWithInt: hlighColId]];
-  if (column) {
-    [listView setHighlightedTableColumn: column];
-  }
+  if (column)
+    {
+      [listView setHighlightedTableColumn: column];
+    }
 }
 
 - (void)addColumn:(NSDictionary *)info
@@ -162,7 +168,7 @@ static NSString *defaultColumns = @"{ \
   float width = [[info objectForKey: @"width"] floatValue];
   float minwidth = [[info objectForKey: @"minwidth"] floatValue];
   NSTableColumn *column = [[NSTableColumn alloc] initWithIdentifier: identifier];
-  
+
   [column setDataCell: AUTORELEASE ([[FSNTextCell alloc] init])];
   [column setEditable: NO];
   [column setResizable: YES];
@@ -170,7 +176,8 @@ static NSString *defaultColumns = @"{ \
   [column setMinWidth: minwidth];
   [column setWidth: width];
 
-  switch(type) {
+  switch(type)
+    {
     case FSNInfoNameType:
       [[column headerCell] setStringValue: NSLocalizedStringFromTableInBundle(@"Name", nil, [NSBundle bundleForClass:[FSNode class]], @"")];
       break;
@@ -194,8 +201,8 @@ static NSString *defaultColumns = @"{ \
       break;
     default:
       [[column headerCell] setStringValue: NSLocalizedStringFromTableInBundle(@"Name", nil, [NSBundle bundleForClass:[FSNode class]], @"")];
-      break;      
-  }
+      break;
+    }
 
   [listView addTableColumn: column];
   RELEASE (column);
@@ -203,25 +210,27 @@ static NSString *defaultColumns = @"{ \
 
 - (void)removeColumnWithIdentifier:(NSNumber *)identifier
 {
-  if ([identifier intValue] != FSNInfoNameType) {
-    NSTableColumn *column = [listView tableColumnWithIdentifier: identifier];
+  if ([identifier intValue] != FSNInfoNameType)
+    {
+      NSTableColumn *column = [listView tableColumnWithIdentifier: identifier];
 
-    if (column) {
-      [listView removeTableColumn: column];
-      hlighColId = FSNInfoNameType;
-      [self sortNodeReps];
-      [listView reloadData];
+      if (column)
+	{
+	  [listView removeTableColumn: column];
+	  hlighColId = FSNInfoNameType;
+	  [self sortNodeReps];
+	  [listView reloadData];
+	}
     }
-  }
 }
 
 - (NSDictionary *)columnsDescription
 {
   NSArray *columns = [listView tableColumns];
   NSMutableDictionary *colsinfo = [NSMutableDictionary dictionary];
-  
+
   if (columns)
-    { 
+    {
       int i;
 
       for (i = 0; i < [columns count]; i++)
@@ -230,19 +239,19 @@ static NSString *defaultColumns = @"{ \
 	  NSNumber *identifier = [column identifier];
 	  NSMutableDictionary *dict = [NSMutableDictionary dictionary];
 
-	  [dict setObject: [NSNumber numberWithInt: i] 
+	  [dict setObject: [NSNumber numberWithInt: i]
 		   forKey: @"position"];
-	  [dict setObject: identifier 
+	  [dict setObject: identifier
 		   forKey: @"identifier"];
-	  [dict setObject: [NSNumber numberWithFloat: [column width]] 
+	  [dict setObject: [NSNumber numberWithFloat: [column width]]
 		   forKey: @"width"];
-	  [dict setObject: [NSNumber numberWithFloat: [column minWidth]] 
+	  [dict setObject: [NSNumber numberWithFloat: [column minWidth]]
 		   forKey: @"minwidth"];
 
 	  [colsinfo setObject: dict forKey: [identifier stringValue]];
 	}
     }
-   
+
   return colsinfo;
 }
 
@@ -250,41 +259,46 @@ static NSString *defaultColumns = @"{ \
 {
   NSTableColumn *column;
 
-  if (hlighColId != FSNInfoExtendedType) {
-    SEL sortingSel;
-  
-    switch(hlighColId) {
-      case FSNInfoNameType:
-        sortingSel = @selector(compareAccordingToName:);
-        break;
-      case FSNInfoKindType:
-        sortingSel = @selector(compareAccordingToKind:);
-        break;
-      case FSNInfoDateType:
-        sortingSel = @selector(compareAccordingToDate:);
-        break;
-      case FSNInfoSizeType:
-        sortingSel = @selector(compareAccordingToSize:);
-        break;
-      case FSNInfoOwnerType:
-        sortingSel = @selector(compareAccordingToOwner:);
-        break;
-      default:
-        sortingSel = @selector(compareAccordingToName:);
-        break;
-    }
-  
-    [nodeReps sortUsingSelector: sortingSel];
+  if (hlighColId != FSNInfoExtendedType)
+    {
+      SEL sortingSel;
 
-  } else {
-    [nodeReps sortUsingFunction: compareWithExtType
-                        context: (void *)NULL];
-  }
+      switch(hlighColId)
+	{
+	case FSNInfoNameType:
+	  sortingSel = @selector(compareAccordingToName:);
+	  break;
+	case FSNInfoKindType:
+	  sortingSel = @selector(compareAccordingToKind:);
+	  break;
+	case FSNInfoDateType:
+	  sortingSel = @selector(compareAccordingToDate:);
+	  break;
+	case FSNInfoSizeType:
+	  sortingSel = @selector(compareAccordingToSize:);
+	  break;
+	case FSNInfoOwnerType:
+	  sortingSel = @selector(compareAccordingToOwner:);
+	  break;
+	default:
+	  sortingSel = @selector(compareAccordingToName:);
+	  break;
+	}
+
+      [nodeReps sortUsingSelector: sortingSel];
+
+    }
+  else
+    {
+      [nodeReps sortUsingFunction: compareWithExtType
+			  context: (void *)NULL];
+    }
 
   column = [listView tableColumnWithIdentifier: [NSNumber numberWithInt: hlighColId]];
-  if (column) {
-    [listView setHighlightedTableColumn: column];
-  }
+  if (column)
+    {
+      [listView setHighlightedTableColumn: column];
+    }
 }
 
 - (void)setMouseFlags:(NSUInteger)flags
@@ -309,47 +323,51 @@ static NSString *defaultColumns = @"{ \
 
 - (void)selectIconOfRep:(id)aRep
 {
-  if ([aRep selectIcon: YES]) {
-    [self redisplayRep: aRep];
-    [self unSelectIconsOfRepsDifferentFrom: aRep];    
-  } 
+  if ([aRep selectIcon: YES])
+    {
+      [self redisplayRep: aRep];
+      [self unSelectIconsOfRepsDifferentFrom: aRep];
+    }
 }
 
 - (void)unSelectIconsOfRepsDifferentFrom:(id)aRep
 {
   NSUInteger i;
 
-  for (i = 0; i < [nodeReps count]; i++) {
-    FSNListViewNodeRep *rep = [nodeReps objectAtIndex: i];  
-  
-    if ((rep != aRep) && [rep selectIcon: NO]) {
-      [self redisplayRep: rep];
+  for (i = 0; i < [nodeReps count]; i++)
+    {
+      FSNListViewNodeRep *rep = [nodeReps objectAtIndex: i];
+
+      if ((rep != aRep) && [rep selectIcon: NO]) {
+	[self redisplayRep: rep];
+      }
     }
-  }
 }
 
 - (void)selectRepInPrevRow
 {
   int row = [listView selectedRow];
 
-  if ((row != -1) && (row > 0)) {
-    row--;
-    [listView selectRowIndexes: [NSIndexSet indexSetWithIndex: row] 
-          byExtendingSelection: NO];
-    [listView scrollRowToVisible: row];
-  }
+  if ((row != -1) && (row > 0))
+    {
+      row--;
+      [listView selectRowIndexes: [NSIndexSet indexSetWithIndex: row]
+	    byExtendingSelection: NO];
+      [listView scrollRowToVisible: row];
+    }
 }
 
 - (void)selectRepInNextRow
 {
   int row = [listView selectedRow];
 
-  if ((row != -1) && (row < ([nodeReps count] -1))) {
-    row++;
-    [listView selectRowIndexes: [NSIndexSet indexSetWithIndex: row] 
-          byExtendingSelection: NO];
-    [listView scrollRowToVisible: row];
-  }
+  if ((row != -1) && (row < ([nodeReps count] -1)))
+    {
+      row++;
+      [listView selectRowIndexes: [NSIndexSet indexSetWithIndex: row]
+	    byExtendingSelection: NO];
+      [listView scrollRowToVisible: row];
+    }
 }
 
 - (NSString *)selectRepWithPrefix:(NSString *)prefix
@@ -358,19 +376,19 @@ static NSString *defaultColumns = @"{ \
 
   for (i = 0; i < [nodeReps count]; i++)
     {
-      FSNListViewNodeRep *rep = [nodeReps objectAtIndex: i];  
+      FSNListViewNodeRep *rep = [nodeReps objectAtIndex: i];
       NSString *name = [[rep node] name];
-    
+
       if ([name hasPrefix: prefix])
         {
           [listView deselectAll: self];
           [self selectReps: [NSArray arrayWithObject: rep]];
           [listView scrollRowToVisible: i];
-          
+
           return name;
         }
     }
-  
+
   return nil;
 }
 
@@ -391,20 +409,21 @@ static NSString *defaultColumns = @"{ \
 
 @implementation FSNListViewDataSource (NSTableViewDataSource)
 
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
   return [nodeReps count];
 }
 
 - (id)tableView:(NSTableView *)aTableView
-          objectValueForTableColumn:(NSTableColumn *)aTableColumn
-                                row:(NSInteger)rowIndex
+objectValueForTableColumn:(NSTableColumn *)aTableColumn
+	    row:(NSInteger)rowIndex
 {
   int ident = [[aTableColumn identifier] intValue];
   FSNListViewNodeRep *rep = [nodeReps objectAtIndex: rowIndex];
   FSNode *nd = [rep node];
 
-  switch(ident) {
+  switch(ident)
+    {
     case FSNInfoNameType:
       return [nd name];
       break;
@@ -429,50 +448,51 @@ static NSString *defaultColumns = @"{ \
     default:
       return [nd name];
       break;
-  }
-    
+    }
+
   return [NSString string];
 }
 
-- (void)tableView:(NSTableView *)aTableView 
-            setObjectValue:(id)anObject 
-            forTableColumn:(NSTableColumn *)aTableColumn 
-                       row:(NSInteger)rowIndex
+- (void)tableView:(NSTableView *)aTableView
+   setObjectValue:(id)anObject
+   forTableColumn:(NSTableColumn *)aTableColumn
+	      row:(NSInteger)rowIndex
 {
 }
 
 - (BOOL)tableView:(NSTableView *)aTableView
-	      writeRows:(NSArray *)rows
+	writeRows:(NSArray *)rows
      toPasteboard:(NSPasteboard *)pboard
 {
   NSMutableArray *paths = [NSMutableArray array];
   NSUInteger i;
 
-  for (i = 0; i < [rows count]; i++) {
-    int index = [[rows objectAtIndex: i] intValue];
-    FSNListViewNodeRep *rep = [nodeReps objectAtIndex: index];
+  for (i = 0; i < [rows count]; i++)
+    {
+      int index = [[rows objectAtIndex: i] intValue];
+      FSNListViewNodeRep *rep = [nodeReps objectAtIndex: index];
 
-    [paths addObject: [[rep node] path]];
-  }
+      [paths addObject: [[rep node] path]];
+    }
 
-  [pboard declareTypes: [NSArray arrayWithObject: NSFilenamesPboardType] 
-                                           owner: nil];
+  [pboard declareTypes: [NSArray arrayWithObject: NSFilenamesPboardType]
+		 owner: nil];
   [pboard setPropertyList: paths forType: NSFilenamesPboardType];
 
   return YES;
 }
 
-- (NSDragOperation)tableView:(NSTableView *)tableView 
-                validateDrop:(id <NSDraggingInfo>)info 
-                 proposedRow:(NSInteger)row 
+- (NSDragOperation)tableView:(NSTableView *)tableView
+                validateDrop:(id <NSDraggingInfo>)info
+                 proposedRow:(NSInteger)row
        proposedDropOperation:(NSTableViewDropOperation)operation
 {
   return NSDragOperationNone;
 }
 
-- (BOOL)tableView:(NSTableView *)tableView 
-       acceptDrop:(id <NSDraggingInfo>)info 
-              row:(NSInteger)row 
+- (BOOL)tableView:(NSTableView *)tableView
+       acceptDrop:(id <NSDraggingInfo>)info
+              row:(NSInteger)row
     dropOperation:(NSTableViewDropOperation)operation
 {
   return NO;
@@ -486,87 +506,104 @@ static NSString *defaultColumns = @"{ \
   [self selectionDidChange];
 }
 
-- (BOOL)tableView:(NSTableView *)aTableView 
+- (BOOL)tableView:(NSTableView *)aTableView
   shouldSelectRow:(NSInteger)rowIndex
 {
-  return ((rowIndex != -1) 
-                && ([[nodeReps objectAtIndex: rowIndex] isLocked] == NO));
+  return ((rowIndex != -1)
+	  && ([[nodeReps objectAtIndex: rowIndex] isLocked] == NO));
 }
 
-- (void)tableView:(NSTableView *)aTableView 
-  willDisplayCell:(id)aCell 
-   forTableColumn:(NSTableColumn *)aTableColumn 
+- (void)tableView:(NSTableView *)aTableView
+  willDisplayCell:(id)aCell
+   forTableColumn:(NSTableColumn *)aTableColumn
               row:(NSInteger)rowIndex
 {
   int ident = [[aTableColumn identifier] intValue];
   FSNTextCell *cell = (FSNTextCell *)[aTableColumn dataCell];
   FSNListViewNodeRep *rep = [nodeReps objectAtIndex: rowIndex];
 
-  if (ident == FSNInfoNameType) {
-    if ([rep iconSelected]) {
-      [cell setIcon: [rep openIcon]];
-    } else if ([rep isLocked]) {
-      [cell setIcon: [rep lockedIcon]];
-    } else if ([rep isOpened]) {
-      [cell setIcon: [rep spatialOpenIcon]];
-    } else {
-      [cell setIcon: [rep icon]];
+  if (ident == FSNInfoNameType)
+    {
+      if ([rep iconSelected])
+	{
+	  [cell setIcon: [rep openIcon]];
+	}
+      else if ([rep isLocked])
+	{
+	  [cell setIcon: [rep lockedIcon]];
+	}
+      else if ([rep isOpened])
+	{
+	  [cell setIcon: [rep spatialOpenIcon]];
+	}
+      else {
+	[cell setIcon: [rep icon]];
+      }
     }
-  } else if (ident == FSNInfoDateType) {
-    [cell setDateCell: YES];
-  }
+  else if (ident == FSNInfoDateType)
+    {
+      [cell setDateCell: YES];
+    }
 
-  if ([rep isLocked]) {
-    [cell setTextColor: [NSColor disabledControlTextColor]];
-  } else {
-    [cell setTextColor: [NSColor controlTextColor]];
-  }
+  if ([rep isLocked])
+    {
+      [cell setTextColor: [NSColor disabledControlTextColor]];
+    }
+  else
+    {
+      [cell setTextColor: [NSColor controlTextColor]];
+    }
 }
 
-- (void)tableView:(NSTableView *)tableView 
-            mouseDownInHeaderOfTableColumn:(NSTableColumn *)tableColumn
+- (void)tableView:(NSTableView *)tableView
+mouseDownInHeaderOfTableColumn:(NSTableColumn *)tableColumn
 {
   FSNInfoType newOrder = [[tableColumn identifier] intValue];
 
-  if (newOrder != hlighColId) {
-    NSArray *selected = [self selectedReps];
-    
-    [listView deselectAll: self];
-    hlighColId = newOrder;
-    [self sortNodeReps];
-    [listView reloadData];
-    
-    if ([selected count]) {
-      id rep = [selected objectAtIndex: 0];
-      NSUInteger index = [nodeReps indexOfObjectIdenticalTo: rep];
-      
-      [self selectReps: selected];
-      
-      if (index != NSNotFound) {
-        [listView scrollRowToVisible: index];
-      }
+  if (newOrder != hlighColId)
+    {
+      NSArray *selected = [self selectedReps];
+
+      [listView deselectAll: self];
+      hlighColId = newOrder;
+      [self sortNodeReps];
+      [listView reloadData];
+
+      if ([selected count])
+	{
+	  id rep = [selected objectAtIndex: 0];
+	  NSUInteger index = [nodeReps indexOfObjectIdenticalTo: rep];
+
+	  [self selectReps: selected];
+
+	  if (index != NSNotFound) {
+	    [listView scrollRowToVisible: index];
+	  }
+	}
     }
-  }
 
   [listView setHighlightedTableColumn: tableColumn];
 }
 
-- (NSImage *)tableView:(NSTableView *)tableView 
+- (NSImage *)tableView:(NSTableView *)tableView
       dragImageForRows:(NSArray *)dragRows
 {
-  if ([dragRows count] > 1) {
-    return [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: 24];
-  } else {
-    int index = [[dragRows objectAtIndex: 0] intValue];
-    return [[nodeReps objectAtIndex: index] icon];
-  }
+  if ([dragRows count] > 1)
+    {
+      return [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: 24];
+    }
+  else
+    {
+      int index = [[dragRows objectAtIndex: 0] intValue];
+      return [[nodeReps objectAtIndex: index] icon];
+    }
 
   return nil;
 }
 
-- (BOOL)tableView:(NSTableView *)aTableView 
-            shouldEditTableColumn:(NSTableColumn *)aTableColumn 
-                              row:(NSInteger)rowIndex
+- (BOOL)tableView:(NSTableView *)aTableView
+shouldEditTableColumn:(NSTableColumn *)aTableColumn
+	      row:(NSInteger)rowIndex
 {
   return NO;
 }
@@ -584,95 +621,108 @@ static NSString *defaultColumns = @"{ \
   NSArray *nodes;
   BOOL keepinfo;
   NSUInteger i;
-  
+
   keepinfo = (node && ([self keepsColumnsInfo] || [node isEqual: anode]));
-  
+
   ASSIGN (node, anode);
-  
-  if (keepinfo == NO) {
-    info = [self readNodeInfo];
-  
-    if (info) {
-      colsInfo = [info objectForKey: @"list_view_columns"];
+
+  if (keepinfo == NO)
+    {
+      info = [self readNodeInfo];
+      if (info)
+	{
+	  colsInfo = [info objectForKey: @"list_view_columns"];
+	}
+
+      if ((colsInfo == nil) || ([colsInfo count] == 0))
+	{
+	  colsInfo = [defaultColumns propertyList];
+	}
+
+      colsDescr = [self columnsDescription];
+
+      if ([colsDescr count] == 0)
+	{
+	  [self createColumns: colsInfo];
+
+	}
+      else if ([colsDescr isEqual: colsInfo] == NO)
+	{
+	  while ([listView numberOfColumns] > 0)
+	    {
+	      [listView removeTableColumn: [[listView tableColumns] objectAtIndex: 0]];
+	    }
+
+	  [self createColumns: colsInfo];
+	}
     }
 
-    if ((colsInfo == nil) || ([colsInfo count] == 0)) {
-      colsInfo = [defaultColumns propertyList];
-    }
-    
-    colsDescr = [self columnsDescription];
-
-    if ([colsDescr count] == 0) {
-      [self createColumns: colsInfo];
-
-    } else if ([colsDescr isEqual: colsInfo] == NO) {
-      while ([listView numberOfColumns] > 0) {
-        [listView removeTableColumn: [[listView tableColumns] objectAtIndex: 0]];  
-      }
-
-      [self createColumns: colsInfo];
-    }
-  }
-  
   [listView deselectAll: self];
 
   nodes = [anode subNodes];
   [nodeReps removeAllObjects];
 
-  for (i = 0; i < [nodes count]; i++) {
-    [self addRepForSubnode: [nodes objectAtIndex: i]];
-  }
-  
+  for (i = 0; i < [nodes count]; i++)
+    {
+      [self addRepForSubnode: [nodes objectAtIndex: i]];
+    }
+
   [self sortNodeReps];
-  [listView reloadData];  
+  [listView reloadData];
 
   DESTROY (lastSelection);
-  [self selectionDidChange];  
+  [self selectionDidChange];
 }
 
 - (NSDictionary *)readNodeInfo
 {
   FSNode *infoNode = [self infoNode];
-  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	      
+  NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
   NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", [infoNode path]];
   NSDictionary *nodeDict = nil;
 
   if ([infoNode isWritable]
-          && ([[fsnodeRep volumes] containsObject: [node path]] == NO)) {
-    NSString *infoPath = [[infoNode path] stringByAppendingPathComponent: @".gwdir"];
-  
-    if ([[NSFileManager defaultManager] fileExistsAtPath: infoPath]) {
-      NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: infoPath];
+      && ([[fsnodeRep volumes] containsObject: [node path]] == NO))
+    {
+      NSString *infoPath = [[infoNode path] stringByAppendingPathComponent: @".gwdir"];
 
-      if (dict) {
-        nodeDict = [NSDictionary dictionaryWithDictionary: dict];
-      }   
-    }
-  }
-  
-  if (nodeDict == nil) {
-    id defEntry = [defaults dictionaryForKey: prefsname];
+      if ([[NSFileManager defaultManager] fileExistsAtPath: infoPath]) {
+	NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: infoPath];
 
-    if (defEntry) {
-      nodeDict = [NSDictionary dictionaryWithDictionary: defEntry];
-    }
-  }
-
-  if (nodeDict) {
-    id entry = [nodeDict objectForKey: @"hligh_table_col"]; 
-    hlighColId = entry ? [entry intValue] : hlighColId;
-
-    entry = [nodeDict objectForKey: @"ext_info_type"];
-
-    if (entry) {
-      NSArray *availableTypes = [[FSNodeRep sharedInstance] availableExtendedInfoNames];
-
-      if ([availableTypes containsObject: entry]) {
-        ASSIGN (extInfoType, entry);
+	if (dict)
+	  {
+	    nodeDict = [NSDictionary dictionaryWithDictionary: dict];
+	  }
       }
     }
-  }
-        
+
+  if (nodeDict == nil)
+    {
+      id defEntry = [defaults dictionaryForKey: prefsname];
+
+      if (defEntry)
+	{
+	  nodeDict = [NSDictionary dictionaryWithDictionary: defEntry];
+	}
+    }
+
+  if (nodeDict)
+    {
+      id entry = [nodeDict objectForKey: @"hligh_table_col"];
+      hlighColId = entry ? [entry intValue] : hlighColId;
+
+      entry = [nodeDict objectForKey: @"ext_info_type"];
+
+      if (entry)
+	{
+	  NSArray *availableTypes = [[FSNodeRep sharedInstance] availableExtendedInfoNames];
+
+	  if ([availableTypes containsObject: entry]) {
+	    ASSIGN (extInfoType, entry);
+	  }
+	}
+    }
+
   return nodeDict;
 }
 
@@ -682,54 +732,65 @@ static NSString *defaultColumns = @"{ \
   FSNode *infoNode = [self infoNode];
   NSMutableDictionary *updatedInfo = nil;
 
-  if ([infoNode isValid]) {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];	      
-    NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", [infoNode path]];
-    NSString *infoPath = [[infoNode path] stringByAppendingPathComponent: @".gwdir"];
-    BOOL writable = ([infoNode isWritable] && ([[fsnodeRep volumes] containsObject: [node path]] == NO));
-    
-    if (writable) {
-      if ([[NSFileManager defaultManager] fileExistsAtPath: infoPath]) {
-        NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: infoPath];
+  if ([infoNode isValid])
+    {
+      NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+      NSString *prefsname = [NSString stringWithFormat: @"viewer_at_%@", [infoNode path]];
+      NSString *infoPath = [[infoNode path] stringByAppendingPathComponent: @".gwdir"];
+      BOOL writable = ([infoNode isWritable] && ([[fsnodeRep volumes] containsObject: [node path]] == NO));
 
-        if (dict) {
-          updatedInfo = [dict mutableCopy];
-        }   
-      }
-  
-    } else { 
-      NSDictionary *prefs = [defaults dictionaryForKey: prefsname];
-  
-      if (prefs) {
-        updatedInfo = [prefs mutableCopy];
-      }
+      if (writable)
+	{
+	  if ([[NSFileManager defaultManager] fileExistsAtPath: infoPath])
+	    {
+	      NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile: infoPath];
+
+	      if (dict)
+		{
+		  updatedInfo = [dict mutableCopy];
+		}
+	    }
+
+	}
+      else
+	{
+	  NSDictionary *prefs = [defaults dictionaryForKey: prefsname];
+
+	  if (prefs)
+	    {
+	      updatedInfo = [prefs mutableCopy];
+	    }
+	}
+
+      if (updatedInfo == nil)
+	{
+	  updatedInfo = [NSMutableDictionary new];
+	}
+
+      [updatedInfo setObject: [self columnsDescription]
+		      forKey: @"list_view_columns"];
+
+      [updatedInfo setObject: [NSNumber numberWithInt: hlighColId]
+		      forKey: @"hligh_table_col"];
+
+      if (extInfoType)
+	{
+	  [updatedInfo setObject: extInfoType forKey: @"ext_info_type"];
+	}
+
+      if (ondisk)
+	{
+	  if (writable)
+	    {
+	      [updatedInfo writeToFile: infoPath atomically: YES];
+	    } else {
+	    [defaults setObject: updatedInfo forKey: prefsname];
+	  }
+	}
     }
 
-    if (updatedInfo == nil) {
-      updatedInfo = [NSMutableDictionary new];
-    }
-	
-    [updatedInfo setObject: [self columnsDescription] 
-                    forKey: @"list_view_columns"];
-  
-    [updatedInfo setObject: [NSNumber numberWithInt: hlighColId] 
-                    forKey: @"hligh_table_col"];
-
-    if (extInfoType) {
-      [updatedInfo setObject: extInfoType forKey: @"ext_info_type"];
-    }
-    
-    if (ondisk) {
-      if (writable) {
-        [updatedInfo writeToFile: infoPath atomically: YES];
-      } else {
-        [defaults setObject: updatedInfo forKey: prefsname];
-      }
-    }
-  }
-  
   RELEASE (arp);
-  
+
   return (AUTORELEASE (updatedInfo));
 }
 
@@ -740,49 +801,56 @@ static NSString *defaultColumns = @"{ \
   NSMutableArray *opennodes = [NSMutableArray array];
   NSUInteger i, count;
 
-  for (i = 0; i < [nodeReps count]; i++) {
-    FSNListViewNodeRep *rep = [nodeReps objectAtIndex: i];
+  for (i = 0; i < [nodeReps count]; i++)
+    {
+      FSNListViewNodeRep *rep = [nodeReps objectAtIndex: i];
 
-    if ([rep isOpened]) {
-      [opennodes addObject: [rep node]];
+      if ([rep isOpened])
+	{
+	  [opennodes addObject: [rep node]];
+	}
     }
-  }
-  
+
   RETAIN (opennodes);
 
   [self showContentsOfNode: node];
-  
+
   count = [selection count];
-  
-  for (i = 0; i < count; i++) {
-    FSNode *nd = [selection objectAtIndex: i]; 
-    
-    if ([nd isValid] == NO) {
-      [selection removeObjectAtIndex: i];
-      count--;
-      i--;
+
+  for (i = 0; i < count; i++)
+    {
+      FSNode *nd = [selection objectAtIndex: i];
+
+      if ([nd isValid] == NO)
+	{
+	  [selection removeObjectAtIndex: i];
+	  count--;
+	  i--;
+	}
     }
-  }
-  
-  for (i = 0; i < [opennodes count]; i++) {
-    FSNode *nd = [opennodes objectAtIndex: i]; 
-    
-    if ([nd isValid]) { 
-      FSNListViewNodeRep *rep = [self repOfSubnode: nd];
-      
-      if (rep) {
-        [rep setOpened: YES];
-      }
+
+  for (i = 0; i < [opennodes count]; i++)
+    {
+      FSNode *nd = [opennodes objectAtIndex: i];
+
+      if ([nd isValid])
+	{
+	  FSNListViewNodeRep *rep = [self repOfSubnode: nd];
+
+	  if (rep) {
+	    [rep setOpened: YES];
+	  }
+	}
     }
-  }
-  
+
   RELEASE (opennodes);
 
   [self checkLockedReps];
 
-  if ([selection count]) {
-    [self selectRepsOfSubnodes: selection];
-  }
+  if ([selection count])
+    {
+      [self selectRepsOfSubnodes: selection];
+    }
 
   RELEASE (selection);
   [self selectionDidChange];
@@ -792,23 +860,28 @@ static NSString *defaultColumns = @"{ \
 
 - (void)reloadFromNode:(FSNode *)anode
 {
-  if ([node isEqual: anode]) {
-    [self reloadContents];
-    
-  } else if ([node isSubnodeOfNode: anode]) {
-    NSArray *components = [FSNode nodeComponentsFromNode: anode toNode: node];
-    NSUInteger i;
-  
-    for (i = 0; i < [components count]; i++) {
-      FSNode *component = [components objectAtIndex: i];
-    
-      if ([component isValid] == NO) {
-        component = [FSNode nodeWithPath: [component parentPath]];
-        [self showContentsOfNode: component];
-        break;
-      }
+  if ([node isEqual: anode])
+    {
+      [self reloadContents];
+
     }
-  }
+  else if ([node isSubnodeOfNode: anode])
+    {
+      NSArray *components = [FSNode nodeComponentsFromNode: anode toNode: node];
+      NSUInteger i;
+
+      for (i = 0; i < [components count]; i++)
+	{
+	  FSNode *component = [components objectAtIndex: i];
+
+	  if ([component isValid] == NO)
+	    {
+	      component = [FSNode nodeWithPath: [component parentPath]];
+	      [self showContentsOfNode: component];
+	      break;
+	    }
+	}
+    }
 }
 
 - (FSNode *)baseNode
@@ -833,9 +906,10 @@ static NSString *defaultColumns = @"{ \
 
 - (void)sortTypeChangedAtPath:(NSString *)path
 {
-  if ((path == nil) || [[node path] isEqual: path]) {
-    [self reloadContents];
-  }
+  if ((path == nil) || [[node path] isEqual: path])
+    {
+      [self reloadContents];
+    }
 }
 
 - (void)nodeContentsWillChange:(NSDictionary *)info
@@ -851,99 +925,114 @@ static NSString *defaultColumns = @"{ \
   NSArray *files = [info objectForKey: @"files"];
   NSString *ndpath = [node path];
   BOOL needsreload = NO;
-  NSUInteger i; 
+  NSUInteger i;
 
   [self stopRepNameEditing];
 
-  if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
-    files = [NSArray arrayWithObject: [source lastPathComponent]];
-    source = [source stringByDeletingLastPathComponent]; 
-  }
+  if ([operation isEqual: @"GWorkspaceRenameOperation"])
+    {
+      files = [NSArray arrayWithObject: [source lastPathComponent]];
+      source = [source stringByDeletingLastPathComponent];
+    }
 
-  if (([ndpath isEqual: source] == NO) && ([ndpath isEqual: destination] == NO)) {    
-    [self reloadContents];
-    return;
-  }
-  
-  if ([ndpath isEqual: source]) {
-    if ([operation isEqual: NSWorkspaceMoveOperation]
-              || [operation isEqual: NSWorkspaceDestroyOperation]
-              || [operation isEqual: NSWorkspaceRecycleOperation]
-              || [operation isEqual: @"GWorkspaceRenameOperation"]
-	|| [operation isEqual: @"GWorkspaceRecycleOutOperation"]) {
+  if (([ndpath isEqual: source] == NO) && ([ndpath isEqual: destination] == NO))
+    {
+      [self reloadContents];
+      return;
+    }
 
-      if ([operation isEqual: NSWorkspaceRecycleOperation]) {
-		    files = [info objectForKey: @"origfiles"];
-      }	
+  if ([ndpath isEqual: source])
+    {
+      if ([operation isEqual: NSWorkspaceMoveOperation]
+	  || [operation isEqual: NSWorkspaceDestroyOperation]
+	  || [operation isEqual: NSWorkspaceRecycleOperation]
+	  || [operation isEqual: @"GWorkspaceRenameOperation"]
+	  || [operation isEqual: @"GWorkspaceRecycleOutOperation"]) {
 
-      for (i = 0; i < [files count]; i++) {
-        NSString *fname = [files objectAtIndex: i];
-        FSNode *subnode = [FSNode nodeWithRelativePath: fname parent: node];
-        [self removeRepOfSubnode: subnode];
+	if ([operation isEqual: NSWorkspaceRecycleOperation]) {
+	  files = [info objectForKey: @"origfiles"];
+	}
+
+	for (i = 0; i < [files count]; i++)
+	  {
+	    NSString *fname = [files objectAtIndex: i];
+	    FSNode *subnode = [FSNode nodeWithRelativePath: fname parent: node];
+	    [self removeRepOfSubnode: subnode];
+	  }
+	needsreload = YES;
       }
-      needsreload = YES;
-    } 
-  }
+    }
 
-  if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
-    files = [NSArray arrayWithObject: [destination lastPathComponent]];
-    destination = [destination stringByDeletingLastPathComponent]; 
-  }
+  if ([operation isEqual: @"GWorkspaceRenameOperation"])
+    {
+      files = [NSArray arrayWithObject: [destination lastPathComponent]];
+      destination = [destination stringByDeletingLastPathComponent];
+    }
 
   if ([ndpath isEqual: destination]
-          && ([operation isEqual: NSWorkspaceMoveOperation]   
-              || [operation isEqual: NSWorkspaceCopyOperation]
-              || [operation isEqual: NSWorkspaceLinkOperation]
-              || [operation isEqual: NSWorkspaceDuplicateOperation]
-              || [operation isEqual: @"GWorkspaceCreateDirOperation"]
-              || [operation isEqual: @"GWorkspaceCreateFileOperation"]
-              || [operation isEqual: NSWorkspaceRecycleOperation]
-              || [operation isEqual: @"GWorkspaceRenameOperation"]
-	      || [operation isEqual: @"GWorkspaceRecycleOutOperation"])) { 
+      && ([operation isEqual: NSWorkspaceMoveOperation]
+	  || [operation isEqual: NSWorkspaceCopyOperation]
+	  || [operation isEqual: NSWorkspaceLinkOperation]
+	  || [operation isEqual: NSWorkspaceDuplicateOperation]
+	  || [operation isEqual: @"GWorkspaceCreateDirOperation"]
+	  || [operation isEqual: @"GWorkspaceCreateFileOperation"]
+	  || [operation isEqual: NSWorkspaceRecycleOperation]
+	  || [operation isEqual: @"GWorkspaceRenameOperation"]
+	  || [operation isEqual: @"GWorkspaceRecycleOutOperation"]))
+    {
 
-    if ([operation isEqual: NSWorkspaceRecycleOperation]) {
-		  files = [info objectForKey: @"files"];
-    }	
+      if ([operation isEqual: NSWorkspaceRecycleOperation])
+	{
+	  files = [info objectForKey: @"files"];
+	}
 
-    for (i = 0; i < [files count]; i++) {
-      NSString *fname = [files objectAtIndex: i];
-      FSNode *subnode = [FSNode nodeWithRelativePath: fname parent: node];
-      FSNListViewNodeRep *rep = [self repOfSubnode: subnode];
-      
-      if (rep) {
-        [rep setNode: subnode];
-      } else {
-        [self addRepForSubnode: subnode];
-      }
+      for (i = 0; i < [files count]; i++)
+	{
+	  NSString *fname = [files objectAtIndex: i];
+	  FSNode *subnode = [FSNode nodeWithRelativePath: fname parent: node];
+	  FSNListViewNodeRep *rep = [self repOfSubnode: subnode];
+
+	  if (rep)
+	    {
+	      [rep setNode: subnode];
+	    }
+	  else
+	    {
+	      [self addRepForSubnode: subnode];
+	    }
+	}
+      needsreload = YES;
     }
-    needsreload = YES;
-  }
 
   [self checkLockedReps];
-  
-  if (needsreload) {
-    [self sortNodeReps];
-    [listView reloadData];
-    
-    if ([[listView window] isKeyWindow]) {
-      if ([operation isEqual: @"GWorkspaceRenameOperation"] 
-            || [operation isEqual: @"GWorkspaceCreateDirOperation"]
-            || [operation isEqual: @"GWorkspaceCreateFileOperation"]) {
-        NSString *fname = [files objectAtIndex: 0];
-        NSString *fpath = [destination stringByAppendingPathComponent: fname];
-        FSNListViewNodeRep *rep = [self repOfSubnodePath: fpath]; 
-        
-        if (rep) {  
-          NSUInteger index = [nodeReps indexOfObjectIdenticalTo: rep];
-        
-          [self selectReps: [NSArray arrayWithObject: rep]];
-          [listView scrollRowToVisible: index];
-        }
-      }
+
+  if (needsreload)
+    {
+      [self sortNodeReps];
+      [listView reloadData];
+
+      if ([[listView window] isKeyWindow])
+	{
+	  if ([operation isEqual: @"GWorkspaceRenameOperation"]
+	      || [operation isEqual: @"GWorkspaceCreateDirOperation"]
+	      || [operation isEqual: @"GWorkspaceCreateFileOperation"])
+	    {
+	      NSString *fname = [files objectAtIndex: 0];
+	      NSString *fpath = [destination stringByAppendingPathComponent: fname];
+	      FSNListViewNodeRep *rep = [self repOfSubnodePath: fpath];
+
+	      if (rep)
+		{
+		  NSUInteger index = [nodeReps indexOfObjectIdenticalTo: rep];
+
+		  [self selectReps: [NSArray arrayWithObject: rep]];
+		  [listView scrollRowToVisible: index];
+		}
+	    }
+	}
     }
-  }  
-  
-  [listView setNeedsDisplay: YES];  
+
+  [listView setNeedsDisplay: YES];
   [self selectionDidChange];
 }
 
@@ -952,49 +1041,59 @@ static NSString *defaultColumns = @"{ \
   NSString *event = [info objectForKey: @"event"];
   NSArray *files = [info objectForKey: @"files"];
   NSString *ndpath = [node path];
-  BOOL needsreload = NO;  
+  BOOL needsreload = NO;
   int i;
 
-  if ([event isEqual: @"GWFileDeletedInWatchedDirectory"]) {
-    for (i = 0; i < [files count]; i++) {  
-      NSString *fname = [files objectAtIndex: i];
-      NSString *fpath = [ndpath stringByAppendingPathComponent: fname];  
-      [self removeRepOfSubnodePath: fpath];
+  if ([event isEqual: @"GWFileDeletedInWatchedDirectory"])
+    {
+      for (i = 0; i < [files count]; i++)
+	{
+	  NSString *fname = [files objectAtIndex: i];
+	  NSString *fpath = [ndpath stringByAppendingPathComponent: fname];
+	  [self removeRepOfSubnodePath: fpath];
+	}
+      needsreload = YES;
+
     }
-    needsreload = YES;
-    
-  } else if ([event isEqual: @"GWFileCreatedInWatchedDirectory"]) {
-    for (i = 0; i < [files count]; i++) {  
-      NSString *fname = [files objectAtIndex: i];
-      FSNode *subnode = [FSNode nodeWithRelativePath: fname parent: node];
-      
-      if (subnode && [subnode isValid]) {
-        FSNListViewNodeRep *rep = [self repOfSubnode: subnode];
-      
-        if (rep) {
-          [rep setNode: subnode];
-        } else {
-          [self addRepForSubnode: subnode];
-        }
-      }  
+  else if ([event isEqual: @"GWFileCreatedInWatchedDirectory"])
+    {
+      for (i = 0; i < [files count]; i++)
+	{
+	  NSString *fname = [files objectAtIndex: i];
+	  FSNode *subnode = [FSNode nodeWithRelativePath: fname parent: node];
+
+	  if (subnode && [subnode isValid])
+	    {
+	      FSNListViewNodeRep *rep = [self repOfSubnode: subnode];
+
+	      if (rep)
+		{
+		  [rep setNode: subnode];
+		}
+	      else
+		{
+		  [self addRepForSubnode: subnode];
+		}
+	    }
+	}
+
+      needsreload = YES;
     }
-    
-    needsreload = YES;
-  }
 
   [self sortNodeReps];
-  if (needsreload) {
-    [listView deselectAll: self];
-    [listView reloadData];
-  }
-  [listView setNeedsDisplay: YES];  
+  if (needsreload)
+    {
+      [listView deselectAll: self];
+      [listView reloadData];
+    }
+  [listView setNeedsDisplay: YES];
   [self selectionDidChange];
 }
 
 //
 // Attenzione! I due metodi che seguono sono usati solo per aggiungere
 // o togliere colonne. Non hanno nessuna relazione con "hlighColId",
-// come invece avviene per gli altri NodeRepContainer. 
+// come invece avviene per gli altri NodeRepContainer.
 // "hlighColId" viene settato solo cliccando sulla headerCell
 // di una colonna.
 //
@@ -1004,80 +1103,88 @@ static NSString *defaultColumns = @"{ \
   NSNumber *num = [NSNumber numberWithInt: type];
   NSTableColumn *column = [listView tableColumnWithIdentifier: num];
 
-  if (column == nil) {
-    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-    float width, minwidth;
+  if (column == nil)
+    {
+      NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+      float width, minwidth;
 
-    switch(type) {
-      case FSNInfoKindType:
-      case FSNInfoOwnerType:
-        width = 80.0;
-        minwidth = 80.0;
-        break;
-      case FSNInfoDateType:
-      case FSNInfoParentType:
-      case FSNInfoExtendedType:
-        width = 90.0;
-        minwidth = 80.0;
-        break;
-      case FSNInfoSizeType:
-        width = 50.0;
-        minwidth = 50.0;
-        break;
-      default:
-        width = 80.0;
-        minwidth = 80.0;
-        break;      
+      switch(type)
+	{
+	case FSNInfoKindType:
+	case FSNInfoOwnerType:
+	  width = 80.0;
+	  minwidth = 80.0;
+	  break;
+	case FSNInfoDateType:
+	case FSNInfoParentType:
+	case FSNInfoExtendedType:
+	  width = 90.0;
+	  minwidth = 80.0;
+	  break;
+	case FSNInfoSizeType:
+	  width = 50.0;
+	  minwidth = 50.0;
+	  break;
+	default:
+	  width = 80.0;
+	  minwidth = 80.0;
+	  break;
+	}
+
+      [dict setObject: num forKey: @"identifier"];
+      [dict setObject: [NSNumber numberWithFloat: width]
+	       forKey: @"width"];
+      [dict setObject: [NSNumber numberWithFloat: minwidth]
+	       forKey: @"minwidth"];
+
+      [self addColumn: dict];
+
     }
-
-    [dict setObject: num forKey: @"identifier"];
-    [dict setObject: [NSNumber numberWithFloat: width] 
-             forKey: @"width"];
-    [dict setObject: [NSNumber numberWithFloat: minwidth] 
-             forKey: @"minwidth"];
-    
-    [self addColumn: dict];
-
-  } else {
-    [self removeColumnWithIdentifier: num];
-  }
+  else
+    {
+      [self removeColumnWithIdentifier: num];
+    }
 }
 
 - (void)setExtendedShowType:(NSString *)type
 {
   BOOL wasequal = (extInfoType && [extInfoType isEqual: type]);
 
-  if (extInfoType) {
-    NSNumber *num = [NSNumber numberWithInt: FSNInfoExtendedType];
-    NSTableColumn *column = [listView tableColumnWithIdentifier: num];
+  if (extInfoType)
+    {
+      NSNumber *num = [NSNumber numberWithInt: FSNInfoExtendedType];
+      NSTableColumn *column = [listView tableColumnWithIdentifier: num];
 
-    if (column) {
-      [self removeColumnWithIdentifier: num];
-    }
-    
-    DESTROY (extInfoType);
-  }
+      if (column)
+	{
+	  [self removeColumnWithIdentifier: num];
+	}
 
-  if (wasequal == NO) {
-    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
-    int i;
-    
-    [dict setObject: [NSNumber numberWithInt: FSNInfoExtendedType]
-             forKey: @"identifier"];
-    [dict setObject: [NSNumber numberWithFloat: 90.0] 
-             forKey: @"width"];
-    [dict setObject: [NSNumber numberWithFloat: 80.0] 
-             forKey: @"minwidth"];
-    
-    ASSIGN (extInfoType, type);
-
-    for (i = 0; i < [nodeReps count]; i++) {
-      FSNListViewNodeRep *rep = [nodeReps objectAtIndex: i];
-      [rep setExtendedShowType: extInfoType];
+      DESTROY (extInfoType);
     }
 
-    [self addColumn: dict];
-  }
+  if (wasequal == NO)
+    {
+      NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+      int i;
+
+      [dict setObject: [NSNumber numberWithInt: FSNInfoExtendedType]
+	       forKey: @"identifier"];
+      [dict setObject: [NSNumber numberWithFloat: 90.0]
+	       forKey: @"width"];
+      [dict setObject: [NSNumber numberWithFloat: 80.0]
+	       forKey: @"minwidth"];
+
+      ASSIGN (extInfoType, type);
+
+      for (i = 0; i < [nodeReps count]; i++)
+	{
+	  FSNListViewNodeRep *rep = [nodeReps objectAtIndex: i];
+	  [rep setExtendedShowType: extInfoType];
+	}
+
+      [self addColumn: dict];
+    }
 }
 
 - (FSNInfoType)showType
@@ -1088,30 +1195,34 @@ static NSString *defaultColumns = @"{ \
 - (id)repOfSubnode:(FSNode *)anode
 {
   int i;
-  
-  for (i = 0; i < [nodeReps count]; i++) {
-    FSNListViewNodeRep *rep = [nodeReps objectAtIndex: i];
-  
-    if ([[rep node] isEqual: anode]) {
-      return rep;
+
+  for (i = 0; i < [nodeReps count]; i++)
+    {
+      FSNListViewNodeRep *rep = [nodeReps objectAtIndex: i];
+
+      if ([[rep node] isEqual: anode])
+	{
+	  return rep;
+	}
     }
-  }
-  
+
   return nil;
 }
 
 - (id)repOfSubnodePath:(NSString *)apath
 {
   int i;
-  
-  for (i = 0; i < [nodeReps count]; i++) {
-    FSNListViewNodeRep *rep = [nodeReps objectAtIndex: i];
-  
-    if ([[[rep node] path] isEqual: apath]) {
-      return rep;
+
+  for (i = 0; i < [nodeReps count]; i++)
+    {
+      FSNListViewNodeRep *rep = [nodeReps objectAtIndex: i];
+
+      if ([[[rep node] path] isEqual: apath])
+	{
+	  return rep;
+	}
     }
-  }
-  
+
   return nil;
 }
 
@@ -1121,26 +1232,28 @@ static NSString *defaultColumns = @"{ \
                                                          dataSource: self];
   [nodeReps addObject: rep];
   RELEASE (rep);
-  
+
   return rep;
 }
 
 - (void)removeRepOfSubnode:(FSNode *)anode
 {
   FSNListViewNodeRep *rep = [self repOfSubnode: anode];
-  
-  if (rep) {
-    [nodeReps removeObject: rep];
-  }
+
+  if (rep)
+    {
+      [nodeReps removeObject: rep];
+    }
 }
 
 - (void)removeRepOfSubnodePath:(NSString *)apath
 {
   FSNListViewNodeRep *rep = [self repOfSubnodePath: apath];
-  
-  if (rep) {
-    [nodeReps removeObject: rep];
-  }
+
+  if (rep)
+    {
+      [nodeReps removeObject: rep];
+    }
 }
 
 - (void)unloadFromNode:(FSNode *)anode
@@ -1151,10 +1264,11 @@ static NSString *defaultColumns = @"{ \
 
 - (void)unselectOtherReps:(id)arep
 {
-  if (arep == nil) {
-    [listView deselectAll: self];
-    [listView setNeedsDisplay: YES];
-  }
+  if (arep == nil)
+    {
+      [listView deselectAll: self];
+      [listView setNeedsDisplay: YES];
+    }
 }
 
 - (void)selectReps:(NSArray *)reps
@@ -1162,20 +1276,22 @@ static NSString *defaultColumns = @"{ \
   NSMutableIndexSet *set = [NSMutableIndexSet indexSet];
   int i;
 
-  for (i = 0; i < [reps count]; i++) {
-    FSNListViewNodeRep *rep = [reps objectAtIndex: i];
-    NSUInteger index = [nodeReps indexOfObjectIdenticalTo: rep];
-  
-    if (index != NSNotFound) {
-      [set addIndex: index];
+  for (i = 0; i < [reps count]; i++)
+    {
+      FSNListViewNodeRep *rep = [reps objectAtIndex: i];
+      NSUInteger index = [nodeReps indexOfObjectIdenticalTo: rep];
+
+      if (index != NSNotFound) {
+	[set addIndex: index];
+      }
     }
-  }
-  
-  if ([set count]) {
-    [listView deselectAll: self];
-    [listView selectRowIndexes: set byExtendingSelection: NO];
-    [listView setNeedsDisplay: YES];
-  }
+
+  if ([set count])
+    {
+      [listView deselectAll: self];
+      [listView selectRowIndexes: set byExtendingSelection: NO];
+      [listView setNeedsDisplay: YES];
+    }
 }
 
 - (void)selectRepsOfSubnodes:(NSArray *)nodes
@@ -1183,19 +1299,21 @@ static NSString *defaultColumns = @"{ \
   NSMutableIndexSet *set = [NSMutableIndexSet indexSet];
   unsigned int i;
 
-  for (i = 0; i < [nodeReps count]; i++) {
-    FSNListViewNodeRep *rep = [nodeReps objectAtIndex: i];
-  
-    if ([nodes containsObject: [rep node]]) {
-      [set addIndex: i];
-    }
-  }
+  for (i = 0; i < [nodeReps count]; i++)
+    {
+      FSNListViewNodeRep *rep = [nodeReps objectAtIndex: i];
 
-  if ([set count]) {
-    [listView deselectAll: self];
-    [listView selectRowIndexes: set byExtendingSelection: NO];
-    [listView setNeedsDisplay: YES];
-  }
+      if ([nodes containsObject: [rep node]]) {
+	[set addIndex: i];
+      }
+    }
+
+  if ([set count])
+    {
+      [listView deselectAll: self];
+      [listView selectRowIndexes: set byExtendingSelection: NO];
+      [listView setNeedsDisplay: YES];
+    }
 }
 
 - (void)selectRepsOfPaths:(NSArray *)paths
@@ -1203,13 +1321,15 @@ static NSString *defaultColumns = @"{ \
   NSMutableIndexSet *set = [NSMutableIndexSet indexSet];
   unsigned int i;
 
-  for (i = 0; i < [nodeReps count]; i++) {
-    FSNListViewNodeRep *rep = [nodeReps objectAtIndex: i];
-  
-    if ([paths containsObject: [[rep node] path]]) {
-      [set addIndex: i];
+  for (i = 0; i < [nodeReps count]; i++)
+    {
+      FSNListViewNodeRep *rep = [nodeReps objectAtIndex: i];
+
+      if ([paths containsObject: [[rep node] path]])
+	{
+	  [set addIndex: i];
+	}
     }
-  }
 
   if ([set count]) {
     [listView deselectAll: self];
@@ -1223,13 +1343,15 @@ static NSString *defaultColumns = @"{ \
   NSMutableIndexSet *set = [NSMutableIndexSet indexSet];
   NSUInteger i;
 
-  for (i = 0; i < [nodeReps count]; i++) {
-    FSNListViewNodeRep *rep = [nodeReps objectAtIndex: i];
-  
-    if ([[rep node] isReserved] == NO) {
-      [set addIndex: i];
+  for (i = 0; i < [nodeReps count]; i++)
+    {
+      FSNListViewNodeRep *rep = [nodeReps objectAtIndex: i];
+
+      if ([[rep node] isReserved] == NO)
+	{
+	  [set addIndex: i];
+	}
     }
-  }
 
   if ([set count]) {
     [listView deselectAll: self];
@@ -1241,7 +1363,7 @@ static NSString *defaultColumns = @"{ \
 - (void)scrollSelectionToVisible
 {
   NSArray *selected = [self selectedReps];
-    
+
   if ([selected count]) {
     id rep = [selected objectAtIndex: 0];
     NSUInteger index = [nodeReps indexOfObjectIdenticalTo: rep];
@@ -1301,28 +1423,31 @@ static NSString *defaultColumns = @"{ \
 {
   NSArray *selection = [self selectedNodes];
 
-  if ([selection count] == 0) {
-    selection = [NSArray arrayWithObject: node];
-  }
+  if ([selection count] == 0)
+    {
+      selection = [NSArray arrayWithObject: node];
+    }
 
-  if ((lastSelection == nil) || ([selection isEqual: lastSelection] == NO)) {
-    ASSIGN (lastSelection, selection);
-    [desktopApp selectionChanged: selection];
-  }
+  if ((lastSelection == nil) || ([selection isEqual: lastSelection] == NO))
+    {
+      ASSIGN (lastSelection, selection);
+      [desktopApp selectionChanged: selection];
+    }
 }
 
 - (void)checkLockedReps
 {
   int i;
-  
-  for (i = 0; i < [nodeReps count]; i++) {
-    [[nodeReps objectAtIndex: i] checkLocked];
-  }
+
+  for (i = 0; i < [nodeReps count]; i++)
+    {
+      [[nodeReps objectAtIndex: i] checkLocked];
+    }
 }
 
 - (void)openSelectionInNewViewer:(BOOL)newv
 {
-  [desktopApp openSelectionInNewViewer: newv];  
+  [desktopApp openSelectionInNewViewer: newv];
 }
 
 - (void)setLastShownNode:(FSNode *)anode
@@ -1345,49 +1470,55 @@ static NSString *defaultColumns = @"{ \
   NSString *nodePath = [node path];
   NSString *prePath = [NSString stringWithString: nodePath];
   NSString *basePath;
-  
+
   if ([names count] == 0)
     {
       return NO;
-    } 
+    }
 
   if ([node isWritable] == NO)
     {
       return NO;
     }
-    
-  basePath = [[names objectAtIndex: 0] stringByDeletingLastPathComponent];
-  if ([basePath isEqual: nodePath]) {
-    return NO;
-  }  
-    
-  if ([names containsObject: nodePath]) {
-    return NO;
-  }
 
-  while (1) {
-    if ([names containsObject: prePath]) {
+  basePath = [[names objectAtIndex: 0] stringByDeletingLastPathComponent];
+  if ([basePath isEqual: nodePath])
+    {
       return NO;
     }
-    if ([prePath isEqual: path_separator()]) {
-      break;
-    }            
-    prePath = [prePath stringByDeletingLastPathComponent];
-  }
+
+  if ([names containsObject: nodePath])
+    {
+      return NO;
+    }
+
+  while (1)
+    {
+      if ([names containsObject: prePath])
+	{
+	  return NO;
+	}
+      if ([prePath isEqual: path_separator()])
+	{
+	  break;
+	}
+      prePath = [prePath stringByDeletingLastPathComponent];
+    }
 
   return YES;
 }
 
 - (void)stopRepNameEditing
 {
-  if ([[listView subviews] containsObject: nameEditor]) {
-    [nameEditor abortEditing];
-    [nameEditor setEditable: NO];
-    [nameEditor setSelectable: NO];
-    [nameEditor setNode: nil stringValue: @"" index: -1];
-    [nameEditor removeFromSuperview];
-    [listView setNeedsDisplayInRect: [nameEditor frame]];
-  }
+  if ([[listView subviews] containsObject: nameEditor])
+    {
+      [nameEditor abortEditing];
+      [nameEditor setEditable: NO];
+      [nameEditor setSelectable: NO];
+      [nameEditor setNode: nil stringValue: @"" index: -1];
+      [nameEditor removeFromSuperview];
+      [listView setNeedsDisplayInRect: [nameEditor frame]];
+    }
 }
 
 @end
@@ -1399,37 +1530,39 @@ static NSString *defaultColumns = @"{ \
 {
   [self stopRepNameEditing];
 
-  if ([[listView selectedRowIndexes] count] == 1) {
-    FSNListViewNodeRep *rep = [nodeReps objectAtIndex: row];  
-    FSNode *nd = [rep node];
-    BOOL canedit = (([rep isLocked] == NO) && ([nd isMountPoint] == NO));
-    
-    if (canedit) {   
-      NSNumber *num = [NSNumber numberWithInt: FSNInfoNameType];
-      unsigned col = [listView columnWithIdentifier: num];
-      NSRect r = [listView frameOfCellAtColumn: col row: row];
-      NSFont *edfont = [nameEditor font];
-      float fnheight = [fsnodeRep heightOfFont: edfont]; 
-      
-      float xshift = [[rep icon] size].width + 4;
-  
-      r.origin.y += ((r.size.height - fnheight) / 2);
-      r.size.height = fnheight;
-      r.origin.x += xshift;
-      r.size.width -= xshift;
-      r = NSIntegralRect(r);  
-      [nameEditor setFrame: r];
+  if ([[listView selectedRowIndexes] count] == 1)
+    {
+      FSNListViewNodeRep *rep = [nodeReps objectAtIndex: row];
+      FSNode *nd = [rep node];
+      BOOL canedit = (([rep isLocked] == NO) && ([nd isMountPoint] == NO));
 
-      [nameEditor setNode: nd stringValue: [nd name] index: 0];
-
-      [listView addSubview: nameEditor];
-
-      if (anEvent != nil)
+      if (canedit)
 	{
-	  [nameEditor mouseDown: anEvent];
+	  NSNumber *num = [NSNumber numberWithInt: FSNInfoNameType];
+	  unsigned col = [listView columnWithIdentifier: num];
+	  NSRect r = [listView frameOfCellAtColumn: col row: row];
+	  NSFont *edfont = [nameEditor font];
+	  float fnheight = [fsnodeRep heightOfFont: edfont];
+
+	  float xshift = [[rep icon] size].width + 4;
+
+	  r.origin.y += ((r.size.height - fnheight) / 2);
+	  r.size.height = fnheight;
+	  r.origin.x += xshift;
+	  r.size.width -= xshift;
+	  r = NSIntegralRect(r);
+	  [nameEditor setFrame: r];
+
+	  [nameEditor setNode: nd stringValue: [nd name] index: 0];
+
+	  [listView addSubview: nameEditor];
+
+	  if (anEvent != nil)
+	    {
+	      [nameEditor mouseDown: anEvent];
+	    }
 	}
     }
-  }
 }
 
 - (void)controlTextDidChange:(NSNotification *)aNotification
@@ -1440,23 +1573,23 @@ static NSString *defaultColumns = @"{ \
 {
   FSNode *ednode = [nameEditor node];
 
-#define CLEAREDITING \
-  [self stopRepNameEditing]; \
-  return 
-    
-   
-    if ([ednode isParentWritable] == NO)
-      {
-        showAlertNoPermission([FSNode class], [ednode parentName]);
-        CLEAREDITING;
-      }
-    else if ([ednode isSubnodeOfPath: [desktopApp trashPath]])
-      {
-        showAlertInRecycler([FSNode class]);
-        CLEAREDITING;
-      }
-    else
-      {
+#define CLEAREDITING				\
+  [self stopRepNameEditing];			\
+  return
+
+
+  if ([ednode isParentWritable] == NO)
+    {
+      showAlertNoPermission([FSNode class], [ednode parentName]);
+      CLEAREDITING;
+    }
+  else if ([ednode isSubnodeOfPath: [desktopApp trashPath]])
+    {
+      showAlertInRecycler([FSNode class]);
+      CLEAREDITING;
+    }
+  else
+    {
       NSString *newname = [nameEditor stringValue];
       NSString *newpath = [[ednode parentPath] stringByAppendingPathComponent: newname];
       NSString *extension = [newpath pathExtension];
@@ -1465,13 +1598,14 @@ static NSString *defaultColumns = @"{ \
       NSArray *dirContents = [ednode subNodeNamesOfParent];
       NSMutableDictionary *opinfo = [NSMutableDictionary dictionary];
 
-      if (([newname length] == 0) || (range.length > 0)) {
-        showAlertInvalidName([FSNode class]);
-        CLEAREDITING;
-      }	
+      if (([newname length] == 0) || (range.length > 0))
+	{
+	  showAlertInvalidName([FSNode class]);
+	  CLEAREDITING;
+	}
 
-      if (([extension length] 
-              && ([ednode isDirectory] && ([ednode isPackage] == NO))))
+      if (([extension length]
+	   && ([ednode isDirectory] && ([ednode isPackage] == NO))))
         {
           if (showAlertExtensionChange([FSNode class], extension) == NSAlertDefaultReturn)
             {
@@ -1491,13 +1625,13 @@ static NSString *defaultColumns = @"{ \
           }
       }
 
-      [opinfo setObject: @"GWorkspaceRenameOperation" forKey: @"operation"];	
-      [opinfo setObject: [ednode path] forKey: @"source"];	
-      [opinfo setObject: newpath forKey: @"destination"];	
-      [opinfo setObject: [NSArray arrayWithObject: @""] forKey: @"files"];	
+      [opinfo setObject: @"GWorkspaceRenameOperation" forKey: @"operation"];
+      [opinfo setObject: [ednode path] forKey: @"source"];
+      [opinfo setObject: newpath forKey: @"destination"];
+      [opinfo setObject: [NSArray arrayWithObject: @""] forKey: @"files"];
 
       [self stopRepNameEditing];
-      [desktopApp performFileOperation: opinfo];         
+      [desktopApp performFileOperation: opinfo];
     }
 
 }
@@ -1509,30 +1643,35 @@ static NSString *defaultColumns = @"{ \
 
 - (BOOL)checkDraggingLocation:(NSPoint)loc
 {
-  if (NSEqualRects(dndValidRect, NSZeroRect)) {
-    NSNumber *num = [NSNumber numberWithInt: FSNInfoNameType];
-    unsigned col = [listView columnWithIdentifier: num];
-    
-    dndValidRect = [listView rectOfColumn: col];
-  }
-  
+  if (NSEqualRects(dndValidRect, NSZeroRect))
+    {
+      NSNumber *num = [NSNumber numberWithInt: FSNInfoNameType];
+      unsigned col = [listView columnWithIdentifier: num];
+
+      dndValidRect = [listView rectOfColumn: col];
+    }
+
   return NSPointInRect(loc, dndValidRect);
 }
 
 - (NSDragOperation)checkReturnValueForRep:(FSNListViewNodeRep *)arep
                          withDraggingInfo:(id <NSDraggingInfo>)sender
 {
-  if (dndTarget != arep) {
-    dndTarget = arep;
-    dragOperation = [dndTarget repDraggingEntered: sender];
-    
-    if (dragOperation != NSDragOperationNone) {
-      [self selectIconOfRep: dndTarget];
-    } else {
-      [self unSelectIconsOfRepsDifferentFrom: nil];
+  if (dndTarget != arep)
+    {
+      dndTarget = arep;
+      dragOperation = [dndTarget repDraggingEntered: sender];
+
+      if (dragOperation != NSDragOperationNone)
+	{
+	  [self selectIconOfRep: dndTarget];
+	}
+      else
+	{
+	  [self unSelectIconsOfRepsDifferentFrom: nil];
+	}
     }
-  }
-  
+
   return dragOperation;
 }
 
@@ -1540,136 +1679,163 @@ static NSString *defaultColumns = @"{ \
 {
   NSPoint location;
   NSInteger row;
-  
+
   isDragTarget = NO;
   dndTarget = nil;
   dragOperation = NSDragOperationNone;
   dndValidRect = NSZeroRect;
-  
+
   location = [[listView window] mouseLocationOutsideOfEventStream];
   location = [listView convertPoint: location fromView: nil];
   row = [listView rowAtPoint: location];
-  
-  if (row != -1) {
-    if ([self checkDraggingLocation: location]) {
-      dndTarget = [nodeReps objectAtIndex: row];
-      dragOperation = [dndTarget repDraggingEntered: sender];
 
-      if (dragOperation != NSDragOperationNone) {
-        [self selectIconOfRep: dndTarget];
-      } else {
-        [self unSelectIconsOfRepsDifferentFrom: nil];
+  if (row != -1)
+    {
+      if ([self checkDraggingLocation: location])
+	{
+	  dndTarget = [nodeReps objectAtIndex: row];
+	  dragOperation = [dndTarget repDraggingEntered: sender];
+
+	  if (dragOperation != NSDragOperationNone)
+	    {
+	      [self selectIconOfRep: dndTarget];
+	    }
+	  else
+	    {
+	      [self unSelectIconsOfRepsDifferentFrom: nil];
+	    }
+	}
+      else
+	{
+	  [self unSelectIconsOfRepsDifferentFrom: nil];
+	  dragOperation = NSDragOperationNone;
+	}
+    }
+
+  if (dragOperation == NSDragOperationNone)
+    {
+      NSPasteboard *pb;
+      NSDragOperation sourceDragMask;
+      NSArray *sourcePaths;
+      NSString *basePath;
+      NSString *nodePath;
+      NSString *prePath;
+      NSUInteger count;
+
+      dndTarget = nil;
+      isDragTarget = NO;
+
+      pb = [sender draggingPasteboard];
+
+      if (pb && [[pb types] containsObject: NSFilenamesPboardType])
+	{
+	  sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
+	}
+      else if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"])
+	{
+	  NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"];
+	  NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
+
+	  sourcePaths = [pbDict objectForKey: @"paths"];
+	}
+      else if ([[pb types] containsObject: @"GWLSFolderPboardType"])
+	{
+	  NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"];
+	  NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
+
+	  sourcePaths = [pbDict objectForKey: @"paths"];
+	}
+      else
+	{
+	  return NSDragOperationNone;
+	}
+
+      count = [sourcePaths count];
+      if (count == 0) {
+	return NSDragOperationNone;
       }
-    } else {
-      [self unSelectIconsOfRepsDifferentFrom: nil];
-      dragOperation = NSDragOperationNone;
+
+      if ([node isWritable] == NO)
+	{
+	  return NSDragOperationNone;
+	}
+
+      nodePath = [node path];
+
+      basePath = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
+      if ([basePath isEqual: nodePath])
+	{
+	  return NSDragOperationNone;
+	}
+
+      if ([sourcePaths containsObject: nodePath])
+	{
+	  return NSDragOperationNone;
+	}
+
+      prePath = [NSString stringWithString: nodePath];
+
+      while (1)
+	{
+	  if ([sourcePaths containsObject: prePath])
+	    {
+	      return NSDragOperationNone;
+	    }
+	  if ([prePath isEqual: path_separator()])
+	    {
+	      break;
+	    }
+	  prePath = [prePath stringByDeletingLastPathComponent];
+	}
+
+      if ([node isDirectory] && [node isParentOfPath: basePath])
+	{
+	  NSArray *subNodes = [node subNodes];
+	  NSUInteger i;
+
+	  for (i = 0; i < [subNodes count]; i++)
+	    {
+	      FSNode *nd = [subNodes objectAtIndex: i];
+
+	      if ([nd isDirectory])
+		{
+		  NSUInteger j;
+
+		  for (j = 0; j < count; j++)
+		    {
+		      NSString *fname = [[sourcePaths objectAtIndex: j] lastPathComponent];
+
+		      if ([[nd name] isEqual: fname]) {
+			return NSDragOperationNone;
+		      }
+		    }
+		}
+	    }
+	}
+
+      isDragTarget = YES;
+      forceCopy = NO;
+
+      sourceDragMask = [sender draggingSourceOperationMask];
+
+      if (sourceDragMask & NSDragOperationMove)
+	{
+	  if ([[NSFileManager defaultManager] isWritableFileAtPath: basePath])
+	    {
+	      return NSDragOperationMove;
+	    }
+	  forceCopy = YES;
+	  return NSDragOperationCopy;
+	}
+      if (sourceDragMask & NSDragOperationCopy)
+	{
+	  return NSDragOperationCopy;
+	}
+      if (sourceDragMask & NSDragOperationLink)
+	{
+	  return NSDragOperationLink;
+	}
     }
-  }     
-
-  if (dragOperation == NSDragOperationNone) {
-    NSPasteboard *pb;
-    NSDragOperation sourceDragMask;
-    NSArray *sourcePaths;
-    NSString *basePath;
-    NSString *nodePath;
-    NSString *prePath;
-    NSUInteger count;
-
-    dndTarget = nil;
-    isDragTarget = NO;
-
-    pb = [sender draggingPasteboard];
-
-    if (pb && [[pb types] containsObject: NSFilenamesPboardType]) {
-      sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
-
-    } else if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"]) {
-      NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"]; 
-      NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
-
-      sourcePaths = [pbDict objectForKey: @"paths"];
-
-    } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {
-      NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
-      NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
-
-      sourcePaths = [pbDict objectForKey: @"paths"];
-
-    } else {
-      return NSDragOperationNone;
-    }
-
-	  count = [sourcePaths count];
-	  if (count == 0) {
-		  return NSDragOperationNone;
-    } 
-
-    if ([node isWritable] == NO) {
-      return NSDragOperationNone;
-    }
-
-    nodePath = [node path];
-
-    basePath = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
-    if ([basePath isEqual: nodePath]) {
-      return NSDragOperationNone;
-    }
-
-    if ([sourcePaths containsObject: nodePath]) {
-      return NSDragOperationNone;
-    }
-
-    prePath = [NSString stringWithString: nodePath];
-
-    while (1) {
-      if ([sourcePaths containsObject: prePath]) {
-        return NSDragOperationNone;
-      }
-      if ([prePath isEqual: path_separator()]) {
-        break;
-      }            
-      prePath = [prePath stringByDeletingLastPathComponent];
-    }
-
-    if ([node isDirectory] && [node isParentOfPath: basePath]) {
-      NSArray *subNodes = [node subNodes];
-      NSUInteger i;
-
-      for (i = 0; i < [subNodes count]; i++) {
-        FSNode *nd = [subNodes objectAtIndex: i];
-
-        if ([nd isDirectory]) {
-          NSUInteger j;
-
-          for (j = 0; j < count; j++) {
-            NSString *fname = [[sourcePaths objectAtIndex: j] lastPathComponent];
-
-            if ([[nd name] isEqual: fname]) {
-              return NSDragOperationNone;
-            }
-          }
-        }
-      }
-    }	
-
-    isDragTarget = YES;	
-    forceCopy = NO;
-
-	  sourceDragMask = [sender draggingSourceOperationMask];
-
-	  if (sourceDragMask == NSDragOperationCopy) {
-		  return NSDragOperationCopy;
-	  } else if (sourceDragMask == NSDragOperationLink) {
-		  return NSDragOperationLink;
-	  } else {
-      if ([[NSFileManager defaultManager] isWritableFileAtPath: basePath]) {
-        return NSDragOperationAll;			
-      } else {
-        forceCopy = YES;
-			  return NSDragOperationCopy;			
-      }
-	  }		
-  }
 
   return dragOperation;
 }
@@ -1678,43 +1844,56 @@ static NSString *defaultColumns = @"{ \
 {
   NSPoint location;
   int row;
-  
+
   location = [[listView window] mouseLocationOutsideOfEventStream];
   location = [listView convertPoint: location fromView: nil];
-  
+
   row = [listView rowAtPoint: location];
-  
-  if (row != -1) {
-    if ([self checkDraggingLocation: location]) {
-      [self checkReturnValueForRep: [nodeReps objectAtIndex: row] 
-                  withDraggingInfo: sender];
-    } else {
-      [self unSelectIconsOfRepsDifferentFrom: nil];
+
+  if (row != -1)
+    {
+      if ([self checkDraggingLocation: location])
+	{
+	  [self checkReturnValueForRep: [nodeReps objectAtIndex: row]
+		      withDraggingInfo: sender];
+	}
+      else
+	{
+	  [self unSelectIconsOfRepsDifferentFrom: nil];
+	  dndTarget = nil;
+	  dragOperation = NSDragOperationNone;
+	}
+    }
+  else
+    {
       dndTarget = nil;
       dragOperation = NSDragOperationNone;
     }
-  } else {
-    dndTarget = nil;
-    dragOperation = NSDragOperationNone;
-  }
-  
-  if (dragOperation == NSDragOperationNone) {
-    NSDragOperation sourceDragMask = [sender draggingSourceOperationMask];
 
-    dndTarget = nil;  
+  if (dragOperation == NSDragOperationNone)
+    {
+      NSDragOperation sourceDragMask = [sender draggingSourceOperationMask];
 
-	  if (isDragTarget == NO) {
-		  return NSDragOperationNone;
-	  }
+      dndTarget = nil;
 
-	  if (sourceDragMask == NSDragOperationCopy) {
-		  return NSDragOperationCopy;
-	  } else if (sourceDragMask == NSDragOperationLink) {
-		  return NSDragOperationLink;
-	  } else {
-		  return forceCopy ? NSDragOperationCopy : NSDragOperationAll;
-	  }
-  }
+      if (isDragTarget == NO)
+	{
+	  return NSDragOperationNone;
+	}
+
+      if (sourceDragMask & NSDragOperationMove)
+	{
+	  return forceCopy ? NSDragOperationCopy : NSDragOperationMove;
+	}
+      if (sourceDragMask & NSDragOperationCopy)
+	{
+	  return NSDragOperationCopy;
+	}
+      if (sourceDragMask & NSDragOperationLink)
+	{
+	  return NSDragOperationLink;
+	}
+    }
 
   return dragOperation;
 }
@@ -1723,7 +1902,7 @@ static NSString *defaultColumns = @"{ \
 {
   isDragTarget = NO;
   dndTarget = nil;
-  dndValidRect = NSZeroRect;  
+  dndValidRect = NSZeroRect;
   [self unSelectIconsOfRepsDifferentFrom: nil];
 }
 
@@ -1739,46 +1918,52 @@ static NSString *defaultColumns = @"{ \
 
 - (void)listViewConcludeDragOperation:(id <NSDraggingInfo>)sender
 {
-  if (dndTarget) {
+  if (dndTarget)
+    {
     [dndTarget repConcludeDragOperation: sender];
     [self unSelectIconsOfRepsDifferentFrom: nil];
-  } else {
-	  NSPasteboard *pb;
+  }
+  else
+    {
+    NSPasteboard *pb;
     NSDragOperation sourceDragMask;
-	  NSArray *sourcePaths;
+    NSArray *sourcePaths;
     NSString *operation, *source;
     NSMutableArray *files;
-	  NSMutableDictionary *opDict;
-	  NSString *trashPath;
+    NSMutableDictionary *opDict;
+    NSString *trashPath;
     int i;
 
-	  sourceDragMask = [sender draggingSourceOperationMask];
+    sourceDragMask = [sender draggingSourceOperationMask];
     pb = [sender draggingPasteboard];
 
-    if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"]) {  
-      NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"]; 
+    if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"])
+      {
+	NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"];
 
-      [desktopApp concludeRemoteFilesDragOperation: pbData
-                                       atLocalPath: [node path]];
-      isDragTarget = NO;
-      dndTarget = nil;
-      dndValidRect = NSZeroRect;
-      return;
-      
-    } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {  
-      NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
+	[desktopApp concludeRemoteFilesDragOperation: pbData
+					 atLocalPath: [node path]];
+	isDragTarget = NO;
+	dndTarget = nil;
+	dndValidRect = NSZeroRect;
+	return;
+      }
+    if ([[pb types] containsObject: @"GWLSFolderPboardType"])
+      {
+	NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"];
 
-      [desktopApp lsfolderDragOperation: pbData
-                        concludedAtPath: [node path]];
-      isDragTarget = NO;
-      dndTarget = nil;
-      dndValidRect = NSZeroRect;
-      return;
-    }
+	[desktopApp lsfolderDragOperation: pbData
+			  concludedAtPath: [node path]];
+	isDragTarget = NO;
+	dndTarget = nil;
+	dndValidRect = NSZeroRect;
+	return;
+      }
 
     sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
 
-    if ([sourcePaths count] == 0) {
+    if ([sourcePaths count] == 0)
+      {
       isDragTarget = NO;
       dndTarget = nil;
       dndValidRect = NSZeroRect;
@@ -1789,36 +1974,49 @@ static NSString *defaultColumns = @"{ \
 
     trashPath = [desktopApp trashPath];
 
-    if ([source isEqual: trashPath]) {
-      operation = @"GWorkspaceRecycleOutOperation";
-	  } else {	
-		  if (sourceDragMask == NSDragOperationCopy) {
-			  operation = NSWorkspaceCopyOperation;
-		  } else if (sourceDragMask == NSDragOperationLink) {
-			  operation = NSWorkspaceLinkOperation;
-		  } else {
-        if ([[NSFileManager defaultManager] isWritableFileAtPath: source]) {
-			    operation = NSWorkspaceMoveOperation;
-        } else {
-			    operation = NSWorkspaceCopyOperation;
-        }
-		  }
-    }
+    if ([source isEqual: trashPath])
+      {
+	operation = @"GWorkspaceRecycleOutOperation";
+      }
 
-    files = [NSMutableArray array];    
-    for(i = 0; i < [sourcePaths count]; i++) {    
-      [files addObject: [[sourcePaths objectAtIndex: i] lastPathComponent]];
-    }  
+    else
+      {
+	if (sourceDragMask & NSDragOperationMove)
+	  {
+	    if ([[NSFileManager defaultManager] isWritableFileAtPath: source])
+	      {
+		operation = NSWorkspaceMoveOperation;
+	      }
+	    else
+	      {
+		operation = NSWorkspaceCopyOperation;
+	      }
+	  }
+	else if (sourceDragMask & NSDragOperationCopy)
+	  {
+	    operation = NSWorkspaceCopyOperation;
+	  }
+	else if (sourceDragMask & NSDragOperationLink)
+	  {
+	    operation = NSWorkspaceLinkOperation;
+	  }
+      }
 
-	  opDict = [NSMutableDictionary dictionary];
-	  [opDict setObject: operation forKey: @"operation"];
-	  [opDict setObject: source forKey: @"source"];
-	  [opDict setObject: [node path] forKey: @"destination"];
-	  [opDict setObject: files forKey: @"files"];
+    files = [NSMutableArray array];
+    for(i = 0; i < [sourcePaths count]; i++)
+      {
+	[files addObject: [[sourcePaths objectAtIndex: i] lastPathComponent]];
+      }
+
+    opDict = [NSMutableDictionary dictionary];
+    [opDict setObject: operation forKey: @"operation"];
+    [opDict setObject: source forKey: @"source"];
+    [opDict setObject: [node path] forKey: @"destination"];
+    [opDict setObject: files forKey: @"files"];
 
     [desktopApp performFileOperation: opDict];
-  }
-  
+    }
+
   isDragTarget = NO;
   dndTarget = nil;
   dndValidRect = NSZeroRect;
@@ -1831,11 +2029,11 @@ static NSString *defaultColumns = @"{ \
 
 - (void)dealloc
 {
-  RELEASE (icon); 
-  RELEASE (openicon); 
-  RELEASE (lockedicon); 
-  RELEASE (spopenicon); 
-  RELEASE (extInfoStr); 
+  RELEASE (icon);
+  RELEASE (openicon);
+  RELEASE (lockedicon);
+  RELEASE (spopenicon);
+  RELEASE (extInfoStr);
   [super dealloc];
 }
 
@@ -1843,26 +2041,27 @@ static NSString *defaultColumns = @"{ \
        dataSource:(FSNListViewDataSource *)fsnds
 {
   self = [super init];
-  
-  if (self) {
-    dataSource = fsnds;
-    fsnodeRep = [FSNodeRep sharedInstance];
 
-    ASSIGN (node, anode);
-    ASSIGN (icon, [fsnodeRep iconOfSize: ICNSIZE forNode: node]);
-    
-    openicon = nil;
-    lockedicon = nil;
-    spopenicon = nil;
-    
-    ASSIGN (extInfoStr, [NSString string]);
-    
-    isLocked = NO;
-    iconSelected = NO;
-    isOpened = NO;
-    wasOpened = NO;
-    nameEdited = NO;
-  }
+  if (self)
+    {
+      dataSource = fsnds;
+      fsnodeRep = [FSNodeRep sharedInstance];
+
+      ASSIGN (node, anode);
+      ASSIGN (icon, [fsnodeRep iconOfSize: ICNSIZE forNode: node]);
+
+      openicon = nil;
+      lockedicon = nil;
+      spopenicon = nil;
+
+      ASSIGN (extInfoStr, [NSString string]);
+
+      isLocked = NO;
+      iconSelected = NO;
+      isOpened = NO;
+      wasOpened = NO;
+      nameEdited = NO;
+    }
 
   return self;
 }
@@ -1889,24 +2088,29 @@ static NSString *defaultColumns = @"{ \
 
 - (BOOL)selectIcon:(BOOL)value
 {
-  if ((iconSelected != value) || (isOpened != wasOpened)) {
-    iconSelected = value;
+  if ((iconSelected != value) || (isOpened != wasOpened))
+    {
+      iconSelected = value;
 
-    if (iconSelected && ((openicon == nil) || (isOpened != wasOpened))) {
-      NSImage *opicn = [fsnodeRep openFolderIconOfSize: ICNSIZE forNode: node];
+      if (iconSelected && ((openicon == nil) || (isOpened != wasOpened)))
+	{
+	  NSImage *opicn = [fsnodeRep openFolderIconOfSize: ICNSIZE forNode: node];
 
-      if (isOpened) {
-        DESTROY (openicon);
-        openicon = [[NSImage alloc] initWithSize: [opicn size]];
-        [openicon lockFocus];
-        [opicn dissolveToPoint: NSZeroPoint fraction: 0.5];
-        [openicon unlockFocus];
-      } else {
-        ASSIGN (openicon, opicn);
-      }
+	  if (isOpened)
+	    {
+	      DESTROY (openicon);
+	      openicon = [[NSImage alloc] initWithSize: [opicn size]];
+	      [openicon lockFocus];
+	      [opicn dissolveToPoint: NSZeroPoint fraction: 0.5];
+	      [openicon unlockFocus];
+	    }
+	  else
+	    {
+	      ASSIGN (openicon, opicn);
+	    }
+	}
     }
-  }
-  
+
   return YES;
 }
 
@@ -1922,7 +2126,7 @@ static NSString *defaultColumns = @"{ \
 - (void)setNode:(FSNode *)anode
 {
   ASSIGN (node, anode);
-  ASSIGN (icon, [fsnodeRep iconOfSize: ICNSIZE forNode: node]);  
+  ASSIGN (icon, [fsnodeRep iconOfSize: ICNSIZE forNode: node]);
   [self setLocked: [node isLocked]];
 }
 
@@ -2006,9 +2210,10 @@ static NSString *defaultColumns = @"{ \
 {
   NSDictionary *info = [fsnodeRep extendedInfoOfType: type forNode: node];
 
-  if (info) {
-    ASSIGN (extInfoStr, [info objectForKey: @"labelstr"]);
-  }
+  if (info)
+    {
+      ASSIGN (extInfoStr, [info objectForKey: @"labelstr"]);
+    }
 
   return YES;
 }
@@ -2059,19 +2264,21 @@ static NSString *defaultColumns = @"{ \
 {
   wasOpened = isOpened;
 
-  if (isOpened != value) {
-    isOpened = value;
+  if (isOpened != value)
+    {
+      isOpened = value;
 
-    if (isOpened && (spopenicon == nil)) {
-      spopenicon = [[NSImage alloc] initWithSize: [icon size]];
-      [spopenicon lockFocus];
-      [icon dissolveToPoint: NSZeroPoint fraction: 0.5];
-      [spopenicon unlockFocus];
-    } 
-    
-    [self selectIcon: iconSelected];
-    [dataSource redisplayRep: self];
-  }
+      if (isOpened && (spopenicon == nil))
+	{
+	  spopenicon = [[NSImage alloc] initWithSize: [icon size]];
+	  [spopenicon lockFocus];
+	  [icon dissolveToPoint: NSZeroPoint fraction: 0.5];
+	  [spopenicon unlockFocus];
+	}
+
+      [self selectIcon: iconSelected];
+      [dataSource redisplayRep: self];
+    }
 }
 
 - (BOOL)isOpened
@@ -2081,18 +2288,20 @@ static NSString *defaultColumns = @"{ \
 
 - (void)setLocked:(BOOL)value
 {
-  if (isLocked != value) {
-    isLocked = value;
+  if (isLocked != value)
+    {
+      isLocked = value;
 
-    if (isLocked && (lockedicon == nil)) {
-      lockedicon = [[NSImage alloc] initWithSize: [icon size]];
-      [lockedicon lockFocus];
-      [icon dissolveToPoint: NSZeroPoint fraction: 0.3];
-      [lockedicon unlockFocus];
+      if (isLocked && (lockedicon == nil))
+	{
+	  lockedicon = [[NSImage alloc] initWithSize: [icon size]];
+	  [lockedicon lockFocus];
+	  [icon dissolveToPoint: NSZeroPoint fraction: 0.3];
+	  [lockedicon unlockFocus];
+	}
+
+      [dataSource redisplayRep: self];
     }
-    
-    [dataSource redisplayRep: self];
-  }
 }
 
 - (BOOL)isLocked
@@ -2156,180 +2365,219 @@ static NSString *defaultColumns = @"{ \
 
 - (NSDragOperation)repDraggingEntered:(id <NSDraggingInfo>)sender
 {
-	NSPasteboard *pb;
+  NSPasteboard *pb;
   NSDragOperation sourceDragMask;
-	NSArray *sourcePaths;
-	NSString *fromPath;
+  NSArray *sourcePaths;
+  NSString *fromPath;
   NSString *nodePath;
   NSString *prePath;
-	int count;
+  int count;
 
   isDragTarget = NO;
-	
-  if (isLocked || ([node isDirectory] == NO) 
-                    || [node isPackage] || ([node isWritable] == NO)) {
-    return NSDragOperationNone;
-  }
 
-  if ([node isDirectory]) {
-    id <DesktopApplication> desktopApp = [dataSource desktopApp];
-
-    if ([node isSubnodeOfPath: [desktopApp trashPath]]) { 
+  if (isLocked || ([node isDirectory] == NO)
+      || [node isPackage] || ([node isWritable] == NO))
+    {
       return NSDragOperationNone;
     }
-  }	
-  	
-	pb = [sender draggingPasteboard];
 
-  if ([[pb types] containsObject: NSFilenamesPboardType]) {
-    sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
-       
-  } else if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"]) {
-    NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"]; 
-    NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
-    
-    sourcePaths = [pbDict objectForKey: @"paths"];
+  if ([node isDirectory])
+    {
+      id <DesktopApplication> desktopApp = [dataSource desktopApp];
 
-  } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {
-    NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
-    NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
-    
-    sourcePaths = [pbDict objectForKey: @"paths"];
+      if ([node isSubnodeOfPath: [desktopApp trashPath]])
+	{
+	  return NSDragOperationNone;
+	}
+    }
 
-  } else {
-    return NSDragOperationNone;
-  }
-  
-	count = [sourcePaths count];
-	if (count == 0) {
-		return NSDragOperationNone;
-  } 
-  
+  pb = [sender draggingPasteboard];
+
+  if ([[pb types] containsObject: NSFilenamesPboardType])
+    {
+      sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
+
+    }
+  else if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"])
+    {
+      NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"];
+      NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
+
+      sourcePaths = [pbDict objectForKey: @"paths"];
+
+    }
+  else if ([[pb types] containsObject: @"GWLSFolderPboardType"])
+    {
+      NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"];
+      NSDictionary *pbDict = [NSUnarchiver unarchiveObjectWithData: pbData];
+
+      sourcePaths = [pbDict objectForKey: @"paths"];
+
+    }
+  else
+    {
+      return NSDragOperationNone;
+    }
+
+  count = [sourcePaths count];
+  if (count == 0)
+    {
+      return NSDragOperationNone;
+    }
+
   nodePath = [node path];
 
-	fromPath = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
+  fromPath = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
 
-	if ([nodePath isEqual: fromPath]) {
-		return NSDragOperationNone;
-  }  
+  if ([nodePath isEqual: fromPath])
+    {
+      return NSDragOperationNone;
+    }
 
-  if ([sourcePaths containsObject: nodePath]) {
-    return NSDragOperationNone;
-  }
+  if ([sourcePaths containsObject: nodePath])
+    {
+      return NSDragOperationNone;
+    }
 
   prePath = [NSString stringWithString: nodePath];
 
-  while (1) {
-    if ([sourcePaths containsObject: prePath]) {
-      return NSDragOperationNone;
+  while (1)
+    {
+      if ([sourcePaths containsObject: prePath])
+	{
+	  return NSDragOperationNone;
+	}
+      if ([prePath isEqual: path_separator()])
+	{
+	  break;
+	}
+      prePath = [prePath stringByDeletingLastPathComponent];
     }
-    if ([prePath isEqual: path_separator()]) {
-      break;
-    }            
-    prePath = [prePath stringByDeletingLastPathComponent];
-  }
 
-  if ([node isDirectory] && [node isParentOfPath: fromPath]) {
-    NSArray *subNodes = [node subNodes];
-    int i;
-    
-    for (i = 0; i < [subNodes count]; i++) {
-      FSNode *nd = [subNodes objectAtIndex: i];
-      
-      if ([nd isDirectory]) {
-        int j;
-        
-        for (j = 0; j < count; j++) {
-          NSString *fname = [[sourcePaths objectAtIndex: j] lastPathComponent];
-          
-          if ([[nd name] isEqual: fname]) {
-            return NSDragOperationNone;
-          }
-        }
-      }
+  if ([node isDirectory] && [node isParentOfPath: fromPath])
+    {
+      NSArray *subNodes = [node subNodes];
+      int i;
+
+      for (i = 0; i < [subNodes count]; i++)
+	{
+	  FSNode *nd = [subNodes objectAtIndex: i];
+
+	  if ([nd isDirectory]) {
+	    int j;
+
+	    for (j = 0; j < count; j++)
+	      {
+		NSString *fname = [[sourcePaths objectAtIndex: j] lastPathComponent];
+
+		if ([[nd name] isEqual: fname])
+		  {
+		    return NSDragOperationNone;
+		  }
+	      }
+	  }
+	}
     }
-  }	
 
   isDragTarget = YES;
   forceCopy = NO;
 
-	sourceDragMask = [sender draggingSourceOperationMask];
-
-	if (sourceDragMask == NSDragOperationCopy) {
-		return NSDragOperationCopy;
-	} else if (sourceDragMask == NSDragOperationLink) {
-		return NSDragOperationLink;
-	} else {
-    if ([[NSFileManager defaultManager] isWritableFileAtPath: fromPath]) {
-      return NSDragOperationAll;			
-    } else {
-      forceCopy = YES;
-			return NSDragOperationCopy;			
-    }
+  sourceDragMask = [sender draggingSourceOperationMask];
+  if (sourceDragMask & NSDragOperationMove)
+    {
+      if ([[NSFileManager defaultManager] isWritableFileAtPath: fromPath])
+	{
+	  return NSDragOperationMove;
 	}
-    
+      forceCopy = YES;
+      return NSDragOperationCopy;
+    }
+  if (sourceDragMask & NSDragOperationCopy)
+    {
+      return NSDragOperationCopy;
+    }
+  if (sourceDragMask & NSDragOperationLink)
+    {
+      return NSDragOperationLink;
+    }
+
   return NSDragOperationNone;
 }
 
 - (void)repConcludeDragOperation:(id <NSDraggingInfo>)sender
 {
   id <DesktopApplication> desktopApp = [dataSource desktopApp];
-	NSPasteboard *pb = [sender draggingPasteboard];
+  NSPasteboard *pb = [sender draggingPasteboard];
   NSDragOperation sourceDragMask = [sender draggingSourceOperationMask];
-	NSArray *sourcePaths;
+  NSArray *sourcePaths;
   NSString *operation, *source;
   NSMutableArray *files;
-	NSMutableDictionary *opDict;
-	NSString *trashPath;
+  NSMutableDictionary *opDict;
+  NSString *trashPath;
   int i;
 
-  if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"]) {  
-    NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"]; 
+  if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"])
+    {
+      NSData *pbData = [pb dataForType: @"GWRemoteFilenamesPboardType"];
 
-    [desktopApp concludeRemoteFilesDragOperation: pbData
-                                     atLocalPath: [node path]];
-    return;
-    
-  } else if ([[pb types] containsObject: @"GWLSFolderPboardType"]) {  
-    NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"]; 
+      [desktopApp concludeRemoteFilesDragOperation: pbData
+				       atLocalPath: [node path]];
+      return;
 
-    [desktopApp lsfolderDragOperation: pbData
-                      concludedAtPath: [node path]];
-    return;
-  }
+    }
+  else if ([[pb types] containsObject: @"GWLSFolderPboardType"])
+    {
+      NSData *pbData = [pb dataForType: @"GWLSFolderPboardType"];
+
+      [desktopApp lsfolderDragOperation: pbData
+			concludedAtPath: [node path]];
+      return;
+    }
 
   sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
 
   source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
-  
+
   trashPath = [desktopApp trashPath];
 
-  if ([source isEqual: trashPath]) {
-    operation = @"GWorkspaceRecycleOutOperation";
-	} else {	
-		if (sourceDragMask == NSDragOperationCopy) {
-			operation = NSWorkspaceCopyOperation;
-		} else if (sourceDragMask == NSDragOperationLink) {
-			operation = NSWorkspaceLinkOperation;
-		} else {
-      if ([[NSFileManager defaultManager] isWritableFileAtPath: source]) {
-			  operation = NSWorkspaceMoveOperation;
-      } else {
-			  operation = NSWorkspaceCopyOperation;
-      }
-		}
-  }
-  
-  files = [NSMutableArray arrayWithCapacity: 1];    
-  for(i = 0; i < [sourcePaths count]; i++) {    
-    [files addObject: [[sourcePaths objectAtIndex: i] lastPathComponent]];
-  }  
+  if ([source isEqual: trashPath])
+    {
+      operation = @"GWorkspaceRecycleOutOperation";
+    }
+  else
+    {
+      if (sourceDragMask == NSDragOperationCopy)
+	{
+	  operation = NSWorkspaceCopyOperation;
+	}
+      else if (sourceDragMask == NSDragOperationLink)
+	{
+	  operation = NSWorkspaceLinkOperation;
+	}
+      else
+	{
+	  if ([[NSFileManager defaultManager] isWritableFileAtPath: source])
+	    {
+	      operation = NSWorkspaceMoveOperation;
+	    }
+	  else
+	    {
+	      operation = NSWorkspaceCopyOperation;
+	    }
+	}
+    }
 
-	opDict = [NSMutableDictionary dictionaryWithCapacity: 4];
-	[opDict setObject: operation forKey: @"operation"];
-	[opDict setObject: source forKey: @"source"];
-	[opDict setObject: [node path] forKey: @"destination"];
-	[opDict setObject: files forKey: @"files"];
+  files = [NSMutableArray arrayWithCapacity: 1];
+  for(i = 0; i < [sourcePaths count]; i++)
+    {
+      [files addObject: [[sourcePaths objectAtIndex: i] lastPathComponent]];
+    }
+
+  opDict = [NSMutableDictionary dictionaryWithCapacity: 4];
+  [opDict setObject: operation forKey: @"operation"];
+  [opDict setObject: source forKey: @"source"];
+  [opDict setObject: [node path] forKey: @"destination"];
+  [opDict setObject: files forKey: @"files"];
 
   [desktopApp performFileOperation: opDict];
 }
@@ -2343,7 +2591,7 @@ NSComparisonResult sortSubviews(id view1, id view2, void *context)
 {
   if ([view1 isMemberOfClass: [FSNListViewNameEditor class]]) {
     return NSOrderedAscending;
-  }  
+  }
   return NSOrderedDescending;
 }
 
@@ -2353,14 +2601,15 @@ NSComparisonResult sortSubviews(id view1, id view2, void *context)
   [super dealloc];
 }
 
-- (void)setNode:(FSNode *)anode 
+- (void)setNode:(FSNode *)anode
     stringValue:(NSString *)str
           index:(int)idx
 {
   DESTROY (node);
-  if (anode) {
-    ASSIGN (node, anode);
-  } 
+  if (anode)
+    {
+      ASSIGN (node, anode);
+    }
   [self setStringValue: str];
   index = idx;
 }
@@ -2378,14 +2627,17 @@ NSComparisonResult sortSubviews(id view1, id view2, void *context)
 - (void)mouseDown:(NSEvent *)theEvent
 {
   NSView *view = [self superview];
-  
-  if ([self isEditable] == NO) {
-    [self setSelectable: YES];  
-    [self setEditable: YES];       
-    [[self window] makeFirstResponder: self];
-  } else {  
-    [super mouseDown: theEvent];
-  }
+
+  if ([self isEditable] == NO)
+    {
+      [self setSelectable: YES];
+      [self setEditable: YES];
+      [[self window] makeFirstResponder: self];
+    }
+  else
+    {
+      [super mouseDown: theEvent];
+    }
 
   [view sortSubviewsUsingFunction: (NSComparisonResult (*)(id, id, void *))sortSubviews context: nil];
   [view setNeedsDisplayInRect: [self frame]];
@@ -2398,8 +2650,8 @@ NSComparisonResult sortSubviews(id view1, id view2, void *context)
 
 - (void)dealloc
 {
-  RELEASE (charBuffer);  
-  RELEASE (dsource);  
+  RELEASE (charBuffer);
+  RELEASE (dsource);
   [super dealloc];
 }
 
@@ -2408,42 +2660,44 @@ NSComparisonResult sortSubviews(id view1, id view2, void *context)
 {
   self = [super initWithFrame: frameRect];
 
-  if (self) {
-    [self setDrawsGrid: NO];
-    [self setAllowsColumnSelection: NO];
-    [self setAllowsColumnReordering: YES];
-    [self setAllowsColumnResizing: YES];
-    [self setAllowsEmptySelection: YES];
-    [self setAllowsMultipleSelection: YES];
-    [self setRowHeight: CELLS_HEIGHT];
-    [self setIntercellSpacing: NSZeroSize];
+  if (self)
+    {
+      [self setDrawsGrid: NO];
+      [self setAllowsColumnSelection: NO];
+      [self setAllowsColumnReordering: YES];
+      [self setAllowsColumnResizing: YES];
+      [self setAllowsEmptySelection: YES];
+      [self setAllowsMultipleSelection: YES];
+      [self setRowHeight: CELLS_HEIGHT];
+      [self setIntercellSpacing: NSZeroSize];
 
-    dsource = [[dsclass alloc] initForListView: self];
+      dsource = [[dsclass alloc] initForListView: self];
 
-    [self setDataSource: dsource]; 
-    [self setDelegate: dsource];
-    [self setTarget: dsource];
-    [self setDoubleAction: @selector(doubleClickOnListView:)];
-  
-		lastKeyPressed = 0.;
-    charBuffer = nil;
-  
-    [self registerForDraggedTypes: [NSArray arrayWithObjects: 
-                                                NSFilenamesPboardType, 
-                                                @"GWLSFolderPboardType", 
-                                                @"GWRemoteFilenamesPboardType", 
-                                                nil]];    
-  }
-  
+      [self setDataSource: dsource];
+      [self setDelegate: dsource];
+      [self setTarget: dsource];
+      [self setDoubleAction: @selector(doubleClickOnListView:)];
+
+      lastKeyPressed = 0.;
+      charBuffer = nil;
+
+      [self registerForDraggedTypes: [NSArray arrayWithObjects:
+                                                NSFilenamesPboardType,
+					      @"GWLSFolderPboardType",
+					      @"GWRemoteFilenamesPboardType",
+					      nil]];
+    }
+
   return self;
 }
 
 - (void)checkSize
 {
   id sview = [self superview];
-  if (sview && ([self bounds].size.width < [sview bounds].size.width)) {
-    [self sizeLastColumnToFit];  
-  }
+  if (sview && ([self bounds].size.width < [sview bounds].size.width))
+    {
+      [self sizeLastColumnToFit];
+    }
 }
 
 - (void)singleClick: (NSTimer *)aTimer
@@ -2455,11 +2709,12 @@ NSComparisonResult sortSubviews(id view1, id view2, void *context)
   location = [theEvent locationInWindow];
   location = [self convertPoint: location fromView: nil];
   row = [self rowAtPoint: location];
-  
-  if (row != -1) {  
-    [dsource setEditorAtRow: row withMouseDownEvent: theEvent];
-  }
-  
+
+  if (row != -1)
+    {
+      [dsource setEditorAtRow: row withMouseDownEvent: theEvent];
+    }
+
   [clickTimer release];
   clickTimer = nil;
 }
@@ -2472,120 +2727,130 @@ NSComparisonResult sortSubviews(id view1, id view2, void *context)
       [clickTimer release];
       clickTimer = nil;
     }
-  
+
   if ([theEvent clickCount] == 1
       && (!([theEvent modifierFlags] & NSShiftKeyMask)))
     {
-       NSPoint location;
-       int row;
-       
-       location = [theEvent locationInWindow];
-       location = [self convertPoint: location fromView: nil];
-       row = [self rowAtPoint: location];
-       
-       if (row == [self selectedRow])
-	 {
-	   // We clicked on an already-selected row.
+      NSPoint location;
+      int row;
 
-	   ASSIGN(clickTimer, [NSTimer scheduledTimerWithTimeInterval: 0.5 // FIXME: use [NSEvent doubleClickInterval]
-							       target: self
-							     selector: @selector(singleClick:)
-							     userInfo: theEvent
-							      repeats: NO]);
-	 }
+      location = [theEvent locationInWindow];
+      location = [self convertPoint: location fromView: nil];
+      row = [self rowAtPoint: location];
+
+      if (row == [self selectedRow])
+	{
+	  // We clicked on an already-selected row.
+
+	  ASSIGN(clickTimer, [NSTimer scheduledTimerWithTimeInterval: 0.5 // FIXME: use [NSEvent doubleClickInterval]
+							      target: self
+							    selector: @selector(singleClick:)
+							    userInfo: theEvent
+							     repeats: NO]);
+	}
     }
 
-  [dsource setMouseFlags: [theEvent modifierFlags]];   
+  [dsource setMouseFlags: [theEvent modifierFlags]];
   [dsource stopRepNameEditing];
-  
+
   [super mouseDown: theEvent];
 }
 
 - (void)keyDown:(NSEvent *)theEvent
 {
-	NSString *characters = [theEvent characters];
-	unichar character = 0;
-	NSRect vRect, hiddRect;
-	NSPoint p;
-	float x, y, w, h;
+  NSString *characters = [theEvent characters];
+  unichar character = 0;
+  NSRect vRect, hiddRect;
+  NSPoint p;
+  float x, y, w, h;
 
-  if ([characters length] > 0) {
-		character = [characters characterAtIndex: 0];
-	}
+  if ([characters length] > 0)
+    {
+      character = [characters characterAtIndex: 0];
+    }
 
-  switch (character) {
+  switch (character)
+    {
     case NSPageUpFunctionKey:
       [dsource stopRepNameEditing];
-		  vRect = [self visibleRect];
-		  p = vRect.origin;
-		  x = p.x;
-		  y = p.y - vRect.size.height;
-		  w = vRect.size.width;
-		  h = vRect.size.height;
-		  hiddRect = NSMakeRect(x, y, w, h);
-		  [self scrollRectToVisible: hiddRect];
-	    return;
+      vRect = [self visibleRect];
+      p = vRect.origin;
+      x = p.x;
+      y = p.y - vRect.size.height;
+      w = vRect.size.width;
+      h = vRect.size.height;
+      hiddRect = NSMakeRect(x, y, w, h);
+      [self scrollRectToVisible: hiddRect];
+      return;
 
     case NSPageDownFunctionKey:
       [dsource stopRepNameEditing];
-		  vRect = [self visibleRect];
-		  p = vRect.origin;    
-		  x = p.x;
-		  y = p.y + vRect.size.height;
-		  w = vRect.size.width;
-		  h = vRect.size.height;
-		  hiddRect = NSMakeRect(x, y, w, h);
-		  [self scrollRectToVisible: hiddRect];
-	    return;
+      vRect = [self visibleRect];
+      p = vRect.origin;
+      x = p.x;
+      y = p.y + vRect.size.height;
+      w = vRect.size.width;
+      h = vRect.size.height;
+      hiddRect = NSMakeRect(x, y, w, h);
+      [self scrollRectToVisible: hiddRect];
+      return;
 
     case NSUpArrowFunctionKey:
       [dsource stopRepNameEditing];
-	    [dsource selectRepInPrevRow];
+      [dsource selectRepInPrevRow];
       return;
 
     case NSDownArrowFunctionKey:
       [dsource stopRepNameEditing];
-	    [dsource selectRepInNextRow];
+      [dsource selectRepInNextRow];
       return;
-  
-		case NSCarriageReturnCharacter:
+
+    case NSCarriageReturnCharacter:
       {
-        unsigned flags = [theEvent modifierFlags];
-        BOOL closesndr = ((flags == NSAlternateKeyMask) 
-                                  || (flags == NSControlKeyMask));
-        [dsource openSelectionInNewViewer: closesndr];
-        return;
+	unsigned flags = [theEvent modifierFlags];
+	BOOL closesndr = ((flags == NSAlternateKeyMask)
+			  || (flags == NSControlKeyMask));
+	[dsource openSelectionInNewViewer: closesndr];
+	return;
       }
-      
-    default:    
+
+    default:
       break;
-  }
-
-  if (([characters length] > 0) && (character < 0xF700)) {														
-		SEL icnwpSel = @selector(selectRepWithPrefix:);
-		IMP icnwp = [dsource methodForSelector: icnwpSel];
-  
-    if (charBuffer == nil) {
-      charBuffer = [characters substringToIndex: 1];
-      RETAIN (charBuffer);
-      lastKeyPressed = 0.0;
-    } else {
-      if ([theEvent timestamp] - lastKeyPressed < 500.0) {
-        ASSIGN (charBuffer, ([charBuffer stringByAppendingString:
-				    															[characters substringToIndex: 1]]));
-      } else {
-        ASSIGN (charBuffer, ([characters substringToIndex: 1]));
-        lastKeyPressed = 0.0;
-      }														
-    }	
-    
-    lastKeyPressed = [theEvent timestamp];
-
-    if ((*icnwp)(dsource, icnwpSel, charBuffer)) {
-      return;
     }
-	}  
-  
+
+  if (([characters length] > 0) && (character < 0xF700))
+    {
+      SEL icnwpSel = @selector(selectRepWithPrefix:);
+      IMP icnwp = [dsource methodForSelector: icnwpSel];
+
+      if (charBuffer == nil)
+	{
+	  charBuffer = [characters substringToIndex: 1];
+	  RETAIN (charBuffer);
+	  lastKeyPressed = 0.0;
+	}
+      else
+	{
+	  if ([theEvent timestamp] - lastKeyPressed < 500.0)
+	    {
+	      ASSIGN (charBuffer, ([charBuffer stringByAppendingString:
+					  [characters substringToIndex: 1]]));
+	    }
+	  else
+	    {
+	      ASSIGN (charBuffer, ([characters substringToIndex: 1]));
+	      lastKeyPressed = 0.0;
+	    }
+	}
+
+      lastKeyPressed = [theEvent timestamp];
+
+      if ((*icnwp)(dsource, icnwpSel, charBuffer))
+	{
+	  return;
+	}
+    }
+
   [super keyDown: theEvent];
 }
 
@@ -2602,21 +2867,21 @@ NSComparisonResult sortSubviews(id view1, id view2, void *context)
 }
 
 - (NSImage *)dragImageForRows:(NSArray *)dragRows
-			                  event:(NSEvent *)dragEvent 
-	            dragImageOffset:(NSPointPointer)dragImageOffset
+			event:(NSEvent *)dragEvent
+	      dragImageOffset:(NSPointPointer)dragImageOffset
 {
   id deleg = [self delegate];
-  
+
   if ([deleg respondsToSelector: @selector(tableView:dragImageForRows:)]) {
     NSImage *image = [deleg tableView: self dragImageForRows: dragRows];
     if (image) {
       return image;
     }
   }
-      
+
   return [super dragImageForRows: dragRows
-  		                     event: dragEvent 
-		             dragImageOffset: dragImageOffset];
+			   event: dragEvent
+		 dragImageOffset: dragImageOffset];
 }
 
 @end
@@ -2835,6 +3100,11 @@ NSComparisonResult sortSubviews(id view1, id view2, void *context)
 
 @implementation FSNListView (DraggingDestination)
 
+- (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)flag
+{
+  return NSDragOperationEvery;
+}
+
 - (NSDragOperation)draggingEntered:(id <NSDraggingInfo>)sender
 {
   return [dsource listViewDraggingEntered: sender];
@@ -2870,7 +3140,7 @@ NSComparisonResult sortSubviews(id view1, id view2, void *context)
 
 @implementation NSDictionary (TableColumnSort)
 
-- (int)compareTableColumnInfo:(NSDictionary *)info
+- (NSComparisonResult)compareTableColumnInfo:(NSDictionary *)info
 {
   NSNumber *p1 = [self objectForKey: @"position"];
   NSNumber *p2 = [info objectForKey: @"position"];
@@ -2878,5 +3148,3 @@ NSComparisonResult sortSubviews(id view1, id view2, void *context)
 }
 
 @end
-
-

@@ -180,7 +180,7 @@ static id <DesktopApplication> desktopApp = nil;
               
   if ([[pb types] containsObject: NSFilenamesPboardType]) {
     isDragTarget = YES;  
-    return NSDragOperationAll;
+    return NSDragOperationEvery;
   }
   
   isDragTarget = NO; 
@@ -194,7 +194,7 @@ static id <DesktopApplication> desktopApp = nil;
   if ([[pb types] containsObject: NSFilenamesPboardType]) {
     isDragTarget = YES;  
     [self select];
-    return NSDragOperationAll;
+    return NSDragOperationEvery;
   }
   
   isDragTarget = NO; 

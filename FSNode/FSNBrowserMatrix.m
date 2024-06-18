@@ -1,8 +1,8 @@
 /* FSNBrowserMatrix.m
- *  
- * Copyright (C) 2004-2022 Free Software Foundation, Inc.
  *
- * Authors: Enrico Sersale <enrico@imago.ro>
+ * Copyright (C) 2004-2024 Free Software Foundation, Inc.
+ *
+ * Authors: Enrico Sersale
  *          Riccardo Mottola <rm@gnu.org>
  * Date: July 2004
  *
@@ -12,12 +12,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
@@ -45,9 +45,9 @@
 }
 
 - (id)initInColumn:(FSNBrowserColumn *)col
-         withFrame:(NSRect)frameRect 
+         withFrame:(NSRect)frameRect
               mode:(NSMatrixMode)aMode
-         prototype:(FSNBrowserCell *)aCell 
+         prototype:(FSNBrowserCell *)aCell
       numberOfRows:(NSInteger)numRows
    numberOfColumns:(NSInteger)numColumns
          acceptDnd:(BOOL)dnd
@@ -72,7 +72,7 @@
       editstamp = 0.0;
       editIndex = -1;
     }
-  
+
   return self;
 }
 
@@ -81,58 +81,63 @@
 {
   NSArray *cells = [self cells];
 
-  if (cells && [cells count]) {
-    NSRect vr = [self visibleRect];
-    float ylim = vr.origin.y + vr.size.height - [self cellSize].height;
-    NSMutableArray *vnodes = [NSMutableArray array];
-    BOOL found = NO;
-    NSUInteger i;
- 
-    for (i = 0; i < [cells count]; i++) {
-      NSRect cr = [self cellFrameAtRow: i column: 0];
+  if (cells && [cells count])
+    {
+      NSRect vr = [self visibleRect];
+      float ylim = vr.origin.y + vr.size.height - [self cellSize].height;
+      NSMutableArray *vnodes = [NSMutableArray array];
+      BOOL found = NO;
+      NSUInteger i;
 
-      if ((cr.origin.y >= vr.origin.y) && (cr.origin.y <= ylim)) {
-        if (found == NO) {
-          *tspace = cr.origin.y - vr.origin.y;
-          found = YES;
-        }        
-        [vnodes addObject: [[cells objectAtIndex: i] node]];
-      }
+      for (i = 0; i < [cells count]; i++)
+	{
+	  NSRect cr = [self cellFrameAtRow: i column: 0];
+
+	  if ((cr.origin.y >= vr.origin.y) && (cr.origin.y <= ylim))
+	    {
+	      if (found == NO) {
+		*tspace = cr.origin.y - vr.origin.y;
+		found = YES;
+	      }
+	      [vnodes addObject: [[cells objectAtIndex: i] node]];
+	    }
+	}
+
+      if ([vnodes count])
+	{
+	  *nodes = vnodes;
+	}
     }
-    
-    if ([vnodes count]) {
-      *nodes = vnodes;
-    }
-  }
 }
 
 - (void)scrollToFirstPositionCell:(id)aCell withScrollTune:(float)vtune
 {
   NSRect vr, cr;
   NSInteger row, col;
-  
+
   vr = [self visibleRect];
-  
+
   [self getRow: &row column: &col ofCell: aCell];
   cr = [self cellFrameAtRow: row column: col];
   cr.size.height = vr.size.height - vtune;
-    
+
   [self scrollRectToVisible: cr];
-} 
+}
 
 - (void)selectIconOfCell:(id)aCell
 {
   FSNBrowserCell *cell = (FSNBrowserCell *)aCell;
-  
-  if ([cell selectIcon]) {
-    NSRect cellFrame;
-    NSInteger row, col;
-  
-    [self getRow: &row column: &col ofCell: aCell];
-    cellFrame = [self cellFrameAtRow: row column: col];
-    [self setNeedsDisplayInRect: cellFrame];
-  }
-  
+
+  if ([cell selectIcon])
+    {
+      NSRect cellFrame;
+      NSInteger row, col;
+
+      [self getRow: &row column: &col ofCell: aCell];
+      cellFrame = [self cellFrameAtRow: row column: col];
+      [self setNeedsDisplayInRect: cellFrame];
+    }
+
   [self unSelectIconsOfCellsDifferentFrom: cell];
 }
 
@@ -141,20 +146,23 @@
   NSArray *cells = [self cells];
   NSUInteger i = 0;
 
-  for (i = 0; i < [cells count]; i++) {
-    FSNBrowserCell *c = [cells objectAtIndex: i];  
-  
-    if (c != aCell) {
-      if ([c unselectIcon]) {
-        NSRect cellFrame;
-        NSInteger row, col;
-  
-        [self getRow: &row column: &col ofCell: c];
-        cellFrame = [self cellFrameAtRow: row column: col];
-        [self setNeedsDisplayInRect: cellFrame];
-      }
+  for (i = 0; i < [cells count]; i++)
+    {
+      FSNBrowserCell *c = [cells objectAtIndex: i];
+
+      if (c != aCell)
+	{
+	  if ([c unselectIcon])
+	    {
+	      NSRect cellFrame;
+	      NSInteger row, col;
+
+	      [self getRow: &row column: &col ofCell: c];
+	      cellFrame = [self cellFrameAtRow: row column: col];
+	      [self setNeedsDisplayInRect: cellFrame];
+	    }
+	}
     }
-  }
 }
 
 - (NSUInteger)mouseFlags
@@ -174,7 +182,7 @@
   NSInteger row, col;
 
   mouseFlags = [theEvent modifierFlags];
-  
+
   if (acceptDnd == NO)
     {
       [super mouseDown: theEvent];
@@ -188,7 +196,7 @@
     }
 
   [column stopCellEditing];
-    
+
   clickCount = [theEvent clickCount];
 
   if (clickCount >= 2)
@@ -206,7 +214,7 @@
     {
       FSNBrowserCell *cell = [[self cells] objectAtIndex: row];
       NSRect rect = [self cellFrameAtRow: row column: col];
-      
+
       if ([cell isEnabled])
 	{
 	  int sz = [cell iconSize];
@@ -230,10 +238,10 @@
 		      editIndex = row;
 		    }
 		}
-                    
+
 	      [self selectCellAtRow: row column: col];
 	      [self sendAction];
-          
+
 	      while (1)
 		{
 		  nextEvent = [[self window] nextEventMatchingMask:
@@ -262,25 +270,26 @@
 
 	      if (startdnd)
 		[self startExternalDragOnEvent: theEvent];
-                        
 	    }
 	  else
 	    {
 	      [super mouseDown: theEvent];
-          
-	      if (editIndex != row) {
-		editIndex = row;
-            
-	      } else {
-		NSTimeInterval interval = ([theEvent timestamp] - editstamp);
-          
-		if ((interval > DOUBLE_CLICK_LIMIT)
-		    && (interval < EDIT_CLICK_LIMIT)) {
-		  [column setEditorForCell: cell];
+
+	      if (editIndex != row)
+		{
+		  editIndex = row;
 		}
-	      }
+	      else
+		{
+		  NSTimeInterval interval = ([theEvent timestamp] - editstamp);
+
+		  if ((interval > DOUBLE_CLICK_LIMIT)
+		      && (interval < EDIT_CLICK_LIMIT)) {
+		    [column setEditorForCell: cell];
+		  }
+		}
 	    }
-        
+
 	  editstamp = [theEvent timestamp];
 	}
     }
@@ -303,31 +312,37 @@
 
   if (count) {
     NSPoint dragPoint = [event locationInWindow];
-    NSPasteboard *pb = [NSPasteboard pasteboardWithName: NSDragPboard];	
+    NSPasteboard *pb = [NSPasteboard pasteboardWithName: NSDragPboard];
     int iconSize = [[self prototype] iconSize];
     NSImage *dragIcon;
 
     [self declareAndSetShapeOnPasteboard: pb];
 
-    if (count > 1) {
-      dragIcon = [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: iconSize];
-    } else {
-      FSNBrowserCell *cell = [selectedCells objectAtIndex: 0];
-      FSNode *node = [cell node];
-
-      if (node && [node isValid]) {
-        dragIcon = [[FSNodeRep sharedInstance] iconOfSize: iconSize forNode: node];
-      } else {
-        return;
+    if (count > 1)
+      {
+	dragIcon = [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: iconSize];
       }
-    } 
+    else
+      {
+	FSNBrowserCell *cell = [selectedCells objectAtIndex: 0];
+	FSNode *node = [cell node];
+
+	if (node && [node isValid])
+	  {
+	    dragIcon = [[FSNodeRep sharedInstance] iconOfSize: iconSize forNode: node];
+	  }
+	else
+	  {
+	    return;
+	  }
+      }
 
     dragPoint = [self convertPoint: dragPoint fromView: nil];
     dragPoint.x -= (iconSize / 2);
     dragPoint.y += (iconSize / 2);
 
     [self dragImage: dragIcon
-                 at: dragPoint 
+                 at: dragPoint
              offset: NSZeroSize
               event: event
          pasteboard: pb
@@ -336,9 +351,9 @@
   }
 }
 
-- (void)draggedImage:(NSImage *)anImage 
-						 endedAt:(NSPoint)aPoint 
-					 deposited:(BOOL)flag
+- (void)draggedImage:(NSImage *)anImage
+	     endedAt:(NSPoint)aPoint
+	   deposited:(BOOL)flag
 {
 }
 
@@ -347,30 +362,34 @@
   NSArray *selectedCells = [self selectedCells];
   NSMutableArray *selection = [NSMutableArray array];
   NSArray *dndtypes;
-  int i; 
+  int i;
 
-  for (i = 0; i < [selectedCells count]; i++) {
-    FSNBrowserCell *cell = [selectedCells objectAtIndex: i];
-    FSNode *node = [cell node];
-  
-    if (node && [node isValid]) {
-      [selection addObject: [node path]];
-    }
-  }
-  
-  if ([selection count]) { 	
-    dndtypes = [NSArray arrayWithObject: NSFilenamesPboardType];
-    [pb declareTypes: dndtypes owner: nil];
+  for (i = 0; i < [selectedCells count]; i++)
+    {
+      FSNBrowserCell *cell = [selectedCells objectAtIndex: i];
+      FSNode *node = [cell node];
 
-    if ([pb setPropertyList: selection forType: NSFilenamesPboardType] == NO) {
-      return;
+      if (node && [node isValid])
+	{
+	  [selection addObject: [node path]];
+	}
     }
-  }
+
+  if ([selection count])
+    {
+      dndtypes = [NSArray arrayWithObject: NSFilenamesPboardType];
+      [pb declareTypes: dndtypes owner: nil];
+
+      if ([pb setPropertyList: selection forType: NSFilenamesPboardType] == NO)
+	{
+	  return;
+	}
+    }
 }
 
-- (unsigned int)draggingSourceOperationMaskForLocal:(BOOL)flag
+- (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)flag
 {
-  return NSDragOperationAll;
+  return NSDragOperationEvery;
 }
 
 @end
@@ -384,12 +403,15 @@
   if (dndTarget != acell) {
     dndTarget = acell;
     dragOperation = [column draggingEntered: sender inMatrixCell: dndTarget];
-    
-    if (dragOperation != NSDragOperationNone) {
-      [self selectIconOfCell: dndTarget];
-    } else {
-      [self unSelectIconsOfCellsDifferentFrom: nil];
-    }
+
+    if (dragOperation != NSDragOperationNone)
+      {
+	[self selectIconOfCell: dndTarget];
+      }
+    else
+      {
+	[self unSelectIconsOfCellsDifferentFrom: nil];
+      }
   }
 
   return dragOperation;
@@ -399,30 +421,34 @@
 {
   NSPoint location;
   NSInteger row, col;
-  
+
   location = [[self window] mouseLocationOutsideOfEventStream];
   location = [self convertPoint: location fromView: nil];
-  
+
   dndTarget = nil;
-  
-  if ([self getRow: &row column: &col forPoint: location]) {
-    dndTarget = [[self cells] objectAtIndex: row];  
-    dragOperation = [column draggingEntered: sender inMatrixCell: dndTarget];
-    
-    if (dragOperation != NSDragOperationNone) {
-      [self selectIconOfCell: dndTarget];
-    } else {
-      [self unSelectIconsOfCellsDifferentFrom: nil];
+
+  if ([self getRow: &row column: &col forPoint: location])
+    {
+      dndTarget = [[self cells] objectAtIndex: row];
+      dragOperation = [column draggingEntered: sender inMatrixCell: dndTarget];
+
+      if (dragOperation != NSDragOperationNone)
+	{
+	  [self selectIconOfCell: dndTarget];
+	}
+      else
+	{
+	  [self unSelectIconsOfCellsDifferentFrom: nil];
+	}
+
+      if (dragOperation == NSDragOperationNone) {
+	dndTarget = nil;
+	return [column draggingEntered: sender];
+      }
+
+      return dragOperation;
     }
-    
-    if (dragOperation == NSDragOperationNone) {
-      dndTarget = nil;
-      return [column draggingEntered: sender];
-    }
-    
-    return dragOperation;
-  }
-  
+
   return NSDragOperationNone;
 }
 
@@ -434,18 +460,20 @@
   location = [[self window] mouseLocationOutsideOfEventStream];
   location = [self convertPoint: location fromView: nil];
 
-  if ([self getRow: &row column: &col forPoint: location]) {
-    FSNBrowserCell *cell = [[self cells] objectAtIndex: row];  
-    
-    [self checkReturnValueForCell: cell withDraggingInfo: sender];
+  if ([self getRow: &row column: &col forPoint: location])
+    {
+      FSNBrowserCell *cell = [[self cells] objectAtIndex: row];
 
-    if (dragOperation == NSDragOperationNone) {
-      dndTarget = nil;
-      return [column draggingUpdated: sender];
+      [self checkReturnValueForCell: cell withDraggingInfo: sender];
+
+      if (dragOperation == NSDragOperationNone)
+	{
+	  dndTarget = nil;
+	  return [column draggingUpdated: sender];
+	}
+
+      return dragOperation;
     }
-    
-    return dragOperation;
-  }
 
   return NSDragOperationNone;
 }
@@ -463,17 +491,20 @@
 
 - (BOOL)performDragOperation:(id <NSDraggingInfo>)sender
 {
-	return YES;
+  return YES;
 }
 
 - (void)concludeDragOperation:(id <NSDraggingInfo>)sender
 {
-  if (dndTarget) {
-    [column concludeDragOperation: sender inMatrixCell: dndTarget];
-    [self unSelectIconsOfCellsDifferentFrom: nil];
-  } else {
-    [column concludeDragOperation: sender];
-  }
+  if (dndTarget)
+    {
+      [column concludeDragOperation: sender inMatrixCell: dndTarget];
+      [self unSelectIconsOfCellsDifferentFrom: nil];
+    }
+  else
+    {
+      [column concludeDragOperation: sender];
+    }
 }
 
 @end

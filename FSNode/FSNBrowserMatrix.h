@@ -74,7 +74,7 @@
 
 - (void)declareAndSetShapeOnPasteboard:(NSPasteboard *)pb;
 
-- (unsigned int)draggingSourceOperationMaskForLocal:(BOOL)flag;
+- (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)flag;
 
 @end
 

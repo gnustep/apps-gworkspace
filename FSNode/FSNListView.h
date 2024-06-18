@@ -1,8 +1,10 @@
 /* FSNListView.h
- *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Copyright (C) 2004-2024 Free Software Foundation, Inc.
+ *
+ * Authors: Enrico Sersale
+ *          Riccardo Mottola
+ *
  * Date: December 2004
  *
  * This file is part of the GNUstep FSNode framework
@@ -11,12 +13,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
@@ -38,7 +40,7 @@
 @interface FSNListViewDataSource : NSObject <NSTextFieldDelegate>
 {
   FSNListView *listView;
-    
+
   FSNode *node;
   NSMutableArray *nodeReps;
   FSNInfoType hlighColId;
@@ -46,7 +48,7 @@
 
   NSArray *lastSelection;
 
-  NSUInteger mouseFlags;    
+  NSUInteger mouseFlags;
   BOOL isDragTarget;
   BOOL forceCopy;
   FSNListViewNodeRep *dndTarget;
@@ -54,7 +56,7 @@
   NSRect dndValidRect;
 
   FSNListViewNameEditor *nameEditor;
-      
+
   FSNodeRep *fsnodeRep;
 
   id <DesktopApplication> desktopApp;
@@ -103,53 +105,53 @@
 
 @interface FSNListViewDataSource (NSTableViewDataSource)
 
-- (int)numberOfRowsInTableView:(NSTableView *)aTableView;
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView;
 
 - (id)tableView:(NSTableView *)aTableView
           objectValueForTableColumn:(NSTableColumn *)aTableColumn
                                 row:(NSInteger)rowIndex;
 
-- (void)tableView:(NSTableView *)aTableView 
-            setObjectValue:(id)anObject 
-            forTableColumn:(NSTableColumn *)aTableColumn 
+- (void)tableView:(NSTableView *)aTableView
+            setObjectValue:(id)anObject
+            forTableColumn:(NSTableColumn *)aTableColumn
                        row:(NSInteger)rowIndex;
 
 - (BOOL)tableView:(NSTableView *)aTableView
 	      writeRows:(NSArray *)rows
      toPasteboard:(NSPasteboard *)pboard;
 
-- (NSDragOperation)tableView:(NSTableView *)tableView 
-                validateDrop:(id <NSDraggingInfo>)info 
-                 proposedRow:(NSInteger)row 
+- (NSDragOperation)tableView:(NSTableView *)tableView
+                validateDrop:(id <NSDraggingInfo>)info
+                 proposedRow:(NSInteger)row
        proposedDropOperation:(NSTableViewDropOperation)operation;
 
-- (BOOL)tableView:(NSTableView *)tableView 
-       acceptDrop:(id <NSDraggingInfo>)info 
-              row:(NSInteger)row 
+- (BOOL)tableView:(NSTableView *)tableView
+       acceptDrop:(id <NSDraggingInfo>)info
+              row:(NSInteger)row
     dropOperation:(NSTableViewDropOperation)operation;
-    
+
 //
 // NSTableView delegate methods
 //
 - (void)tableViewSelectionDidChange:(NSNotification *)aNotification;
 
-- (BOOL)tableView:(NSTableView *)aTableView 
+- (BOOL)tableView:(NSTableView *)aTableView
   shouldSelectRow:(NSInteger)rowIndex;
 
-- (void)tableView:(NSTableView *)aTableView 
-  willDisplayCell:(id)aCell 
-   forTableColumn:(NSTableColumn *)aTableColumn 
+- (void)tableView:(NSTableView *)aTableView
+  willDisplayCell:(id)aCell
+   forTableColumn:(NSTableColumn *)aTableColumn
               row:(NSInteger)rowIndex;
-              
-- (void)tableView:(NSTableView *)tableView 
+
+- (void)tableView:(NSTableView *)tableView
             mouseDownInHeaderOfTableColumn:(NSTableColumn *)tableColumn;
 
-- (NSImage *)tableView:(NSTableView *)tableView 
+- (NSImage *)tableView:(NSTableView *)tableView
       dragImageForRows:(NSArray *)dragRows;
 
-- (BOOL)tableView:(NSTableView *)aTableView 
-            shouldEditTableColumn:(NSTableColumn *)aTableColumn 
-                              row:(NSInteger)rowIndex;   
+- (BOOL)tableView:(NSTableView *)aTableView
+            shouldEditTableColumn:(NSTableColumn *)aTableColumn
+                              row:(NSInteger)rowIndex;
 
 @end
 
@@ -195,7 +197,7 @@
 - (BOOL)needsDndProxy;
 - (BOOL)involvedByFileOperation:(NSDictionary *)opinfo;
 - (BOOL)validatePasteOfFilenames:(NSArray *)names
-                       wasCut:(BOOL)cut;
+                          wasCut:(BOOL)cut;
 - (void)stopRepNameEditing;
 
 @end
@@ -242,7 +244,7 @@
   NSImage *lockedicon;
   NSImage *spopenicon;
   NSString *extInfoStr;
-  
+
   BOOL isLocked;
   BOOL iconSelected;
   BOOL isOpened;
@@ -250,9 +252,9 @@
   BOOL nameEdited;
   BOOL isDragTarget;
   BOOL forceCopy;
-  
+
   FSNListViewDataSource *dataSource;
-  FSNodeRep *fsnodeRep;  
+  FSNodeRep *fsnodeRep;
 }
 
 - (id)initForNode:(FSNode *)anode
@@ -286,9 +288,9 @@
 {
   FSNode *node;
   int index;
-}  
+}
 
-- (void)setNode:(FSNode *)anode 
+- (void)setNode:(FSNode *)anode
     stringValue:(NSString *)str
           index:(int)idx;
 
@@ -302,7 +304,7 @@
 @interface FSNListView : NSTableView
 {
   id dsource;
-  NSString *charBuffer;	
+  NSString *charBuffer;
   NSTimeInterval lastKeyPressed;
 
   NSTimer *clickTimer;
@@ -312,13 +314,13 @@
     dataSourceClass:(Class)dsclass;
 
 - (void)checkSize;
-    
+
 @end
 
 
 @interface NSObject (FSNListViewDelegateMethods)
 
-- (NSImage *)tableView:(NSTableView *)tableView 
+- (NSImage *)tableView:(NSTableView *)tableView
       dragImageForRows:(NSArray *)dragRows;
 
 @end
@@ -366,7 +368,7 @@
 - (BOOL)needsDndProxy;
 - (BOOL)involvedByFileOperation:(NSDictionary *)opinfo;
 - (BOOL)validatePasteOfFilenames:(NSArray *)names
-                       wasCut:(BOOL)cut;
+                          wasCut:(BOOL)cut;
 - (void)stopRepNameEditing;
 
 @end
@@ -391,7 +393,7 @@
 
 @interface NSDictionary (TableColumnSort)
 
-- (int)compareTableColumnInfo:(NSDictionary *)info;
+- (NSComparisonResult)compareTableColumnInfo:(NSDictionary *)info;
 
 @end
 

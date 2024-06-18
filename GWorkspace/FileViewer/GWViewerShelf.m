@@ -1,8 +1,8 @@
 /* GWViewerShelf.h
  *  
- * Copyright (C) 2004-2022 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2024 Free Software Foundation, Inc.
  *
- * Authors: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale
  *          Riccardo Mottola <rm@gnu.org>
  * Date: July 2004
  *
@@ -1143,8 +1143,8 @@
   isDragTarget = NO;	
   dragLocalIcon = NO;    
 
-  if ((sourceDragMask == NSDragOperationCopy) 
-      || (sourceDragMask == NSDragOperationLink))
+  if ((sourceDragMask & NSDragOperationCopy)
+      || (sourceDragMask & NSDragOperationLink))
     {
       return NSDragOperationNone;
     }
@@ -1189,7 +1189,7 @@
     DESTROY (dragIcon);
     insertIndex = -1;
     
-    return NSDragOperationAll;  
+    return NSDragOperationEvery;
   }
   
   return NSDragOperationNone;
@@ -1207,8 +1207,8 @@
   
   sourceDragMask = [sender draggingSourceOperationMask];
   
-  if ((sourceDragMask == NSDragOperationCopy) 
-      || (sourceDragMask == NSDragOperationLink)) {
+  if ((sourceDragMask & NSDragOperationCopy)
+      || (sourceDragMask & NSDragOperationLink)) {
     if (dragIcon) {
       DESTROY (dragIcon);
       if (insertIndex != -1) {
@@ -1253,13 +1253,13 @@
     return NSDragOperationNone;
   }
   
-  if ((sourceDragMask == NSDragOperationCopy) 
-      || (sourceDragMask == NSDragOperationLink))
+  if ((sourceDragMask & NSDragOperationCopy)
+      || (sourceDragMask & NSDragOperationLink))
     {
       return NSDragOperationNone;
     }
 
-  return NSDragOperationAll;
+  return NSDragOperationEvery;
 }
 
 - (void)draggingExited:(id <NSDraggingInfo>)sender

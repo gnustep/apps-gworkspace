@@ -1035,7 +1035,7 @@ static NSString *lsfname = @"LiveSearch.lsf";
 
 - (NSDragOperation)draggingSourceOperationMaskForLocal:(BOOL)flag
 {
-  return NSDragOperationAll;
+  return NSDragOperationEvery;
 }
 
 - (BOOL)ignoreModifierKeysWhileDragging
