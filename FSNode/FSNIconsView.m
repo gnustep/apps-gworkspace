@@ -279,7 +279,7 @@ static void GWHighlightFrameRect(NSRect aRect)
   NSArray *selection;
   NSUInteger i;
 
-  colcount = 0;
+  colItemsCount = 0;
 
   for (i = 0; i < count; i++)
     {
@@ -290,9 +290,9 @@ static void GWHighlightFrameRect(NSRect aRect)
 	  px = X_MARGIN;
 	  py += (gridSize.height + Y_MARGIN);
 
-	  if (colcount < poscount)
+	  if (colItemsCount < poscount)
 	    {
-	      colcount = poscount;
+	      colItemsCount = poscount;
 	    }
 	  poscount = 0;
 	}
@@ -411,7 +411,7 @@ static void GWHighlightFrameRect(NSRect aRect)
 
       if ([icon isSelected])
 	{
-	  pos = i - colcount;
+	  pos = i - colItemsCount;
 	  break;
 	}
     }
@@ -436,7 +436,7 @@ static void GWHighlightFrameRect(NSRect aRect)
 
       if ([icon isSelected])
 	{
-	  pos = i + colcount;
+	  pos = i + colItemsCount;
 	  break;
 	}
     }

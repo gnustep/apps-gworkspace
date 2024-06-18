@@ -56,7 +56,7 @@
   int iconPosition;
 
   NSSize gridSize;
-  int colcount;
+  NSInteger colItemsCount;
 
   BOOL isDragTarget;
   BOOL forceCopy;

@@ -222,7 +222,7 @@
       FSNIcon *icon = [icons objectAtIndex: i];
       NSUInteger index = [icon gridIndex];
 
-      if (index < gridcount)
+      if (index < gridItemsCount)
 	{
 	  if (NSEqualRects(grid[index], [icon frame]) == NO)
 	    {
@@ -244,7 +244,7 @@
 {
   NSUInteger i;
 
-  for (i = 0; i < gridcount; i++)
+  for (i = 0; i < gridItemsCount; i++)
     {
       if ([self isFreeGridIndex: i])
 	{
@@ -259,7 +259,7 @@
 {
   NSUInteger ind;
 
-  for (ind = index + 1; ind < gridcount; ind++)
+  for (ind = index + 1; ind < gridItemsCount; ind++)
     {
       if ([self isFreeGridIndex: ind])
 	{
@@ -274,7 +274,7 @@
 {
   NSUInteger i;
 
-  if ((index == NSNotFound) || (index >= gridcount))
+  if ((index == NSNotFound) || (index >= gridItemsCount))
     return NO;
 
   for (i = 0; i < [icons count]; i++)
@@ -357,7 +357,7 @@
 {
   NSUInteger i;
 
-  for (i = 0; i < gridcount; i++)
+  for (i = 0; i < gridItemsCount; i++)
     {
       if (NSPointInRect(p, grid[i]))
 	{
@@ -440,18 +440,18 @@
       ymargin = Y_MARGIN;
     }
 
-  colcount = (int)(gridrect.size.width / (gridSize.width + X_MARGIN));
-  rowcount = (int)(gridrect.size.height / (gridSize.height + ymargin));
-  gridcount = colcount * rowcount;
+  colItemsCount = (NSInteger)(gridrect.size.width / (gridSize.width + X_MARGIN));
+  rowItemsCount = (NSInteger)(gridrect.size.height / (gridSize.height + ymargin));
+  gridItemsCount = colItemsCount * rowItemsCount;
 
-  grid = NSZoneMalloc (NSDefaultMallocZone(), sizeof(NSRect) * gridcount);
+  grid = NSZoneMalloc (NSDefaultMallocZone(), sizeof(NSRect) * gridItemsCount);
 
   gpnt.x = gridrect.size.width + gridrect.origin.x;
   gpnt.y = gridrect.size.height + gridrect.origin.y;
 
   gpnt.x -= (gridSize.width + X_MARGIN);
 
-  for (i = 0; i < gridcount; i++)
+  for (i = 0; i < gridItemsCount; i++)
     {
       gpnt.y -= (gridSize.height + ymargin);
 
@@ -466,7 +466,7 @@
       grid[i].size = gridSize;
     }
 
-  gpnt = grid[gridcount - 1].origin;
+  gpnt = grid[gridItemsCount - 1].origin;
 
   if (gpnt.x != (gridrect.origin.x + X_MARGIN))
     {
@@ -475,9 +475,9 @@
 
       diffx /= (int)(gridrect.size.width / (gridSize.width + X_MARGIN));
 
-      for (i = 0; i < gridcount; i++)
+      for (i = 0; i < gridItemsCount; i++)
 	{
-	  if (div(i, rowcount).rem == 0)
+	  if (div(i, rowItemsCount).rem == 0)
 	    {
 	      xshft += diffx;
 	    }
@@ -490,11 +490,11 @@
       float diffy = gpnt.y - (gridrect.origin.y + ymargin);
       float yshft = 0.0;
 
-      diffy /= rowcount;
+      diffy /= rowItemsCount;
 
-      for (i = 0; i < gridcount; i++)
+      for (i = 0; i < gridItemsCount; i++)
 	{
-	  if (div(i, rowcount).rem == 0)
+	  if (div(i, rowItemsCount).rem == 0)
 	    {
 	      yshft = 0.0;
 	    }
@@ -503,7 +503,7 @@
 	}
     }
 
-  for (i = 0; i < gridcount; i++)
+  for (i = 0; i < gridItemsCount; i++)
     {
       grid[i] = NSIntegralRect(grid[i]);
     }
@@ -727,7 +727,7 @@
 	{
 	  FSNIcon *next;
 
-	  while (index < gridcount)
+	  while (index < gridItemsCount)
 	    {
 	      index++;
 
@@ -762,7 +762,7 @@
 	    {
 	      FSNIcon *prev;
 
-	      while (index < gridcount)
+	      while (index < gridItemsCount)
 		{
 		  index++;
 		  prev = [self iconWithGridIndex: index];
@@ -1164,7 +1164,7 @@ static void GWHighlightFrameRect(NSRect aRect)
 	    {
 	      NSUInteger index = [indnum unsignedIntegerValue];
 
-	      if (index >= gridcount)
+	      if (index >= gridItemsCount)
 		index = [self firstFreeGridIndex];
 
 	      if (index != NSNotFound)
@@ -1956,7 +1956,7 @@ NSComparisonResult sortDragged(id icn1, id icn2, void *context)
       NSMutableArray *removed = [NSMutableArray array];
       NSArray *sorted = nil;
       NSMutableArray *sortIndexes = [NSMutableArray array];
-      NSUInteger firstinrow = gridcount - rowcount;
+      NSUInteger firstinrow = gridItemsCount - rowItemsCount;
       NSUInteger row = 0;
 
       for (i = 0; i < [sourcePaths count]; i++)
@@ -1971,9 +1971,9 @@ NSComparisonResult sortDragged(id icn1, id icn2, void *context)
 	    }
 	}
 
-      while (firstinrow < gridcount)
+      while (firstinrow < gridItemsCount)
 	{
-	  for (i = firstinrow; i >= (NSInteger)row; i -= rowcount)
+	  for (i = firstinrow; i >= (NSInteger)row; i -= rowItemsCount)
 	    {
 	      [sortIndexes insertObject: [NSNumber numberWithInteger: i]
 				atIndex: [sortIndexes count]];
@@ -2001,7 +2001,7 @@ NSComparisonResult sortDragged(id icn1, id icn2, void *context)
 	    {
 	      index = oldindex - shift;
 
-	      if ((oldindex - shift) || (index >= gridcount))
+	      if ((oldindex - shift) || (index >= gridItemsCount))
 		{
 		  index = [self firstFreeGridIndexAfterIndex: insertIndex];
 		}
