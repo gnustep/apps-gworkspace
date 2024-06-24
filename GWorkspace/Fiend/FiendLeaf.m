@@ -655,6 +655,7 @@
       NSMutableArray *files;
       NSInteger tag;
 
+      operation = nil;
       source = [[sourcePaths objectAtIndex: 0] stringByDeletingLastPathComponent];
 
       if ([source isEqual: [gw trashPath]])

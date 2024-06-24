@@ -1739,13 +1739,15 @@ static NSImage *branchImage;
   NSPasteboard *pb;
   NSDragOperation sourceDragMask;
   NSArray *sourcePaths;
-  NSString *operation, *source;
+  NSString *operation;
+  NSString *source;
   NSMutableArray *files;
   NSMutableDictionary *opDict;
   NSString *trashPath;
   NSUInteger i;
 
   isDragTarget = NO;
+  operation = nil;
 
   if (isLocked)
     {

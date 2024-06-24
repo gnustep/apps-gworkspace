@@ -1430,13 +1430,15 @@ static id <DesktopApplication> desktopApp = nil;
   NSPasteboard *pb;
   NSDragOperation sourceDragMask;
   NSArray *sourcePaths;
-  NSString *operation, *source;
+  NSString *operation;
+  NSString *source;
   NSMutableArray *files;
   NSMutableDictionary *opDict;
   NSString *trashPath;
   NSUInteger i;
 
   isDragTarget = NO;
+  operation = nil;
 
   sourceDragMask = [sender draggingSourceOperationMask];
   pb = [sender draggingPasteboard];
@@ -1672,11 +1674,14 @@ static id <DesktopApplication> desktopApp = nil;
   NSPasteboard *pb = [sender draggingPasteboard];
   NSDragOperation sourceDragMask = [sender draggingSourceOperationMask];
   NSArray *sourcePaths;
-  NSString *operation, *source;
+  NSString *operation;
+  NSString *source;
   NSMutableArray *files;
   NSMutableDictionary *opDict;
   NSString *trashPath;
   NSUInteger i;
+
+  operation = nil;
 
   if (([cell isEnabled] == NO)
       || ([cell isLeaf] && ([node isApplication] == NO)))

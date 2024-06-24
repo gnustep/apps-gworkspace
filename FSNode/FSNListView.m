@@ -1928,14 +1928,16 @@ shouldEditTableColumn:(NSTableColumn *)aTableColumn
     NSPasteboard *pb;
     NSDragOperation sourceDragMask;
     NSArray *sourcePaths;
-    NSString *operation, *source;
+    NSString *operation;
+    NSString *source;
     NSMutableArray *files;
     NSMutableDictionary *opDict;
     NSString *trashPath;
-    int i;
+    NSUInteger i;
 
     sourceDragMask = [sender draggingSourceOperationMask];
     pb = [sender draggingPasteboard];
+    operation = nil;
 
     if ([[pb types] containsObject: @"GWRemoteFilenamesPboardType"])
       {
