@@ -1,8 +1,8 @@
 /* HtmlExtractor.m
  *  
- * Copyright (C) 2006 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2024 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@dtedu.net>
+ * Author: Enrico Sersale
  * Date: May 2006
  *
  * This file is part of the GNUstep GWorkspace application
@@ -171,14 +171,14 @@ int escapeChar(char *buf, NSMutableString *str);
 
 void strip(const char *inbuf, NSMutableString *outstr, NSMutableDictionary *metadict) 
 {
-  int len = strlen(inbuf);
+  size_t len = strlen(inbuf);
   BOOL isScript = NO;
   BOOL isMarkup = NO;
   BOOL isMeta = NO;  
   BOOL isTitle = NO;  
   BOOL spaceAdded = NO;  
-  int offset;
-  int i;
+  size_t offset;
+  size_t i;
 
 #define CHK_POS(x, l) \
 do { \
@@ -248,13 +248,11 @@ do { \
         i++;
         CHK_POS (i, len);
       }
-
-      memset(endstr, '\0', 16);
       
       if (isTitle) {
-        strncpy(endstr, "</title>", 8);
+        strcpy(endstr, "</title>");
       } else {
-        strncpy(endstr, "/>", 2);
+        strcpy(endstr, "/>");
       }
             
       while (strncmp(inbuf + i, endstr, strlen(endstr)) != 0) {
