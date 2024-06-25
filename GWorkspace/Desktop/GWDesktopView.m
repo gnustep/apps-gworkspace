@@ -839,18 +839,9 @@
     }
 }
 
-#define SUPPORTS_XOR ((GNUSTEP_GUI_MAJOR_VERSION > 0)		\
-		      || (GNUSTEP_GUI_MAJOR_VERSION == 0	\
-			  && GNUSTEP_GUI_MINOR_VERSION > 22)	\
-		      || (GNUSTEP_GUI_MAJOR_VERSION == 0	\
-			  && GNUSTEP_GUI_MINOR_VERSION == 22	\
-			  && GNUSTEP_GUI_SUBMINOR_VERSION > 0))
-
 static void GWHighlightFrameRect(NSRect aRect)
 {
-#if SUPPORTS_XOR
   NSFrameRectWithWidthUsingOperation(aRect, 1.0, GSCompositeHighlight);
-#endif
 }
 
 - (void)mouseDragged:(NSEvent *)theEvent
@@ -895,8 +886,7 @@ static void GWHighlightFrameRect(NSRect aRect)
 
 
       // Erase the previous rect
-
-      if (transparentSelection || !SUPPORTS_XOR)
+      if (transparentSelection)
 	{
 	  [self setNeedsDisplayInRect: oldRect];
 	  [[self window] displayIfNeeded];
@@ -907,16 +897,12 @@ static void GWHighlightFrameRect(NSRect aRect)
 	}
 
       // Draw the new rect
-
-      if (transparentSelection || !SUPPORTS_XOR)
+      if (transparentSelection)
 	{
 	  [[NSColor darkGrayColor] set];
 	  NSFrameRect(r);
-	  if (transparentSelection)
-	    {
-	      [[[NSColor darkGrayColor] colorWithAlphaComponent: 0.33] set];
-	      NSRectFillUsingOperation(r, NSCompositeSourceOver);
-	    }
+          [[[NSColor darkGrayColor] colorWithAlphaComponent: 0.33] set];
+          NSRectFillUsingOperation(r, NSCompositeSourceOver);
 	}
       else
 	{

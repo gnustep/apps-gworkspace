@@ -72,18 +72,9 @@ typedef enum DockStyle
   DockStyleModern = 1
 } DockStyle;
 
-#define SUPPORTS_XOR ((GNUSTEP_GUI_MAJOR_VERSION > 0)		\
-		      || (GNUSTEP_GUI_MAJOR_VERSION == 0	\
-			  && GNUSTEP_GUI_MINOR_VERSION > 22)	\
-		      || (GNUSTEP_GUI_MAJOR_VERSION == 0	\
-			  && GNUSTEP_GUI_MINOR_VERSION == 22	\
-			  && GNUSTEP_GUI_SUBMINOR_VERSION > 0))
-
 static void GWHighlightFrameRect(NSRect aRect)
 {
-#if SUPPORTS_XOR
   NSFrameRectWithWidthUsingOperation(aRect, 1.0, GSCompositeHighlight);
-#endif
 }
 
 
@@ -595,7 +586,6 @@ static void GWHighlightFrameRect(NSRect aRect)
 
       // Erase the previous rect
       if (transparentSelection
-	  || !SUPPORTS_XOR
 	  || (!transparentSelection && scrolled))
 	{
 	  [self setNeedsDisplayInRect: oldRect];
@@ -605,7 +595,7 @@ static void GWHighlightFrameRect(NSRect aRect)
       // Draw the new rect
       [self lockFocus];
 
-      if (transparentSelection || !SUPPORTS_XOR)
+      if (transparentSelection)
 	{
 	  [[NSColor darkGrayColor] set];
 	  NSFrameRect(r);
