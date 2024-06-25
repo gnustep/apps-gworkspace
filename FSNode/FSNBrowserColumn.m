@@ -801,18 +801,19 @@ static id <DesktopApplication> desktopApp = nil;
   if ([[matrix cells] count])
     {
       NSInteger n = [matrix numberOfRows];
-      NSInteger s = [matrix selectedRow];
+      NSInteger selRow = [matrix selectedRow];
       NSString *cellStr = nil;
       NSInteger i = 0;
 
-      // Nothing eselected
-      if (s != -1)
-	cellStr = [[matrix cellAtRow: s column: 0] stringValue];
+      // Nothing selected
+      if (selRow != -1)
+	cellStr = [[matrix cellAtRow: selRow column: 0] stringValue];
 
       if (cellStr && ([cellStr length] > 0) && [cellStr hasPrefix: prefix])
 	return YES;
 
-      for (i = s + 1; i < n; i++)
+      // look after current selection
+      for (i = selRow + 1; i < n; i++)
 	{
 	  cellStr = [[matrix cellAtRow: i column: 0] stringValue];
 
@@ -826,7 +827,8 @@ static id <DesktopApplication> desktopApp = nil;
 	    }
 	}
 
-      for (i = 0; i < s; i++)
+      // look before current selection
+      for (i = 0; i < selRow; i++)
 	{
 	  cellStr = [[matrix cellAtRow: i column: 0] stringValue];
 
