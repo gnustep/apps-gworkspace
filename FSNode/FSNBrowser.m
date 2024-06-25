@@ -1,8 +1,8 @@
 /* FSNBrowser.m
  *  
- * Copyright (C) 2004-2022 Free Software Foundation, Inc.                                                               
+ * Copyright (C) 2004-2024 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Author: Enrico Sersale
  *         Riccardo Mottola <rm@gnu.org>
  * Date: July 2004
  *
@@ -1356,6 +1356,7 @@
     case NSCarriageReturnCharacter:
       [(FSNBrowserMatrix *)matrix setMouseFlags: [theEvent modifierFlags]];
       [matrix sendDoubleAction];
+      DESTROY(charBuffer);
       return;
   }  
   
@@ -1386,15 +1387,11 @@
 		{
 		  NSString *transition = [charBuffer stringByAppendingString:
 						[characters substringToIndex: 1]];
-		  RELEASE (charBuffer);
-		  charBuffer = transition;
-		  RETAIN (charBuffer);
+		  ASSIGN(charBuffer, transition);
 		}
 	      else
 		{
-		  RELEASE (charBuffer);
-		  charBuffer = [characters substringToIndex: 1];
-		  RETAIN (charBuffer);
+		  ASSIGN(charBuffer, [characters substringToIndex: 1]);
 		}
 	    }
 		
