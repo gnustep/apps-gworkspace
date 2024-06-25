@@ -176,7 +176,7 @@ static void GWHighlightFrameRect(NSRect aRect)
       editIcon = nil;
 
       isDragTarget = NO;
-      lastKeyPressed = 0.;
+      lastKeyPressedTime = 0.0;
       charBuffer = nil;
       selectionMask = NSSingleSelectionMask;
 
@@ -758,11 +758,11 @@ static void GWHighlightFrameRect(NSRect aRect)
       if (charBuffer == nil) {
 	charBuffer = [characters substringToIndex: 1];
 	RETAIN (charBuffer);
-	lastKeyPressed = 0.0;
+	lastKeyPressedTime = 0.0;
       }
       else
 	{
-	  if ([theEvent timestamp] - lastKeyPressed < 500.0)
+	  if ([theEvent timestamp] - lastKeyPressedTime < 500.0)
 	    {
 	      ASSIGN (charBuffer, ([charBuffer stringByAppendingString:
 					  [characters substringToIndex: 1]]));
@@ -770,11 +770,11 @@ static void GWHighlightFrameRect(NSRect aRect)
 	  else
 	    {
 	      ASSIGN (charBuffer, ([characters substringToIndex: 1]));
-	      lastKeyPressed = 0.0;
+	      lastKeyPressedTime = 0.0;
 	    }
 	}
 
-      lastKeyPressed = [theEvent timestamp];
+      lastKeyPressedTime = [theEvent timestamp];
 
       if ((*icnwp)(self, icnwpSel, charBuffer)) {
 	return;

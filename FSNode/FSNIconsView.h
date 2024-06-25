@@ -1,8 +1,9 @@
 /* FSNIconsView.h
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2024 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale
+ *          Riccardo Mottola
  * Date: March 2004
  *
  * This file is part of the GNUstep FSNode framework
@@ -62,7 +63,7 @@
   BOOL forceCopy;
   
   NSString *charBuffer;	
-  NSTimeInterval lastKeyPressed;
+  NSTimeInterval lastKeyPressedTime;
   
   NSColor *backColor;
   NSColor *textColor;

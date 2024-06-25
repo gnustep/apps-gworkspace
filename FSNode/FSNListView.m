@@ -2680,7 +2680,7 @@ NSComparisonResult sortSubviews(id view1, id view2, void *context)
       [self setTarget: dsource];
       [self setDoubleAction: @selector(doubleClickOnListView:)];
 
-      lastKeyPressed = 0.;
+      lastKeyPressedTime = 0.0;
       charBuffer = nil;
 
       [self registerForDraggedTypes: [NSArray arrayWithObjects:
@@ -2829,11 +2829,11 @@ NSComparisonResult sortSubviews(id view1, id view2, void *context)
 	{
 	  charBuffer = [characters substringToIndex: 1];
 	  RETAIN (charBuffer);
-	  lastKeyPressed = 0.0;
+	  lastKeyPressedTime = 0.0;
 	}
       else
 	{
-	  if ([theEvent timestamp] - lastKeyPressed < 500.0)
+	  if ([theEvent timestamp] - lastKeyPressedTime < 500.0)
 	    {
 	      ASSIGN (charBuffer, ([charBuffer stringByAppendingString:
 					  [characters substringToIndex: 1]]));
@@ -2841,11 +2841,11 @@ NSComparisonResult sortSubviews(id view1, id view2, void *context)
 	  else
 	    {
 	      ASSIGN (charBuffer, ([characters substringToIndex: 1]));
-	      lastKeyPressed = 0.0;
+	      lastKeyPressedTime = 0.0;
 	    }
 	}
 
-      lastKeyPressed = [theEvent timestamp];
+      lastKeyPressedTime = [theEvent timestamp];
 
       if ((*icnwp)(dsource, icnwpSel, charBuffer))
 	{
