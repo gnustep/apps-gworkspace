@@ -2762,6 +2762,7 @@ NSComparisonResult sortSubviews(id view1, id view2, void *context)
 {
   NSString *characters = [theEvent characters];
   unichar character = 0;
+  NSString *characterStr = nil;
   NSRect vRect, hiddRect;
   NSPoint p;
   float x, y, w, h;
@@ -2769,6 +2770,7 @@ NSComparisonResult sortSubviews(id view1, id view2, void *context)
   if ([characters length] > 0)
     {
       character = [characters characterAtIndex: 0];
+      characterStr = [characters substringToIndex: 1];
     }
 
   switch (character)
@@ -2813,44 +2815,45 @@ NSComparisonResult sortSubviews(id view1, id view2, void *context)
 	BOOL closesndr = ((flags == NSAlternateKeyMask)
 			  || (flags == NSControlKeyMask));
 	[dsource openSelectionInNewViewer: closesndr];
+	DESTROY(charBuffer);
 	return;
       }
-
+    case 0x01B: // Escape
+      DESTROY(charBuffer);
+      return;
     default:
       break;
     }
 
   if (([characters length] > 0) && (character < 0xF700))
     {
-      SEL icnwpSel = @selector(selectRepWithPrefix:);
-      IMP icnwp = [dsource methodForSelector: icnwpSel];
+      if (charBuffer != nil)
+	{
+	  if ([theEvent timestamp] - lastKeyPressedTime < 5.0) // seconds
+	    {
+	      NSString *appendBuffer = [charBuffer stringByAppendingString:characterStr];
 
-      if (charBuffer == nil)
-	{
-	  charBuffer = [characters substringToIndex: 1];
-	  RETAIN (charBuffer);
-	  lastKeyPressedTime = 0.0;
-	}
-      else
-	{
-	  if ([theEvent timestamp] - lastKeyPressedTime < 500.0)
-	    {
-	      ASSIGN (charBuffer, ([charBuffer stringByAppendingString:
-					  [characters substringToIndex: 1]]));
-	    }
-	  else
-	    {
-	      ASSIGN (charBuffer, ([characters substringToIndex: 1]));
-	      lastKeyPressedTime = 0.0;
+	      // Try selecting
+	      if ([dsource selectRepWithPrefix:appendBuffer])
+		{
+		  ASSIGN(charBuffer, appendBuffer);
+		  return;
+		}
+	      // unable to select - fall-through and reinit as if typed is first char
 	    }
 	}
 
+      ASSIGN(charBuffer, characterStr);
       lastKeyPressedTime = [theEvent timestamp];
 
-      if ((*icnwp)(dsource, icnwpSel, charBuffer))
+      // Try selecting
+      if ([dsource selectRepWithPrefix:charBuffer])
 	{
 	  return;
 	}
+
+      // Selection failed, reinitialize and use mismatching character as new buffer beginning
+      DESTROY(charBuffer);
     }
 
   [super keyDown: theEvent];
