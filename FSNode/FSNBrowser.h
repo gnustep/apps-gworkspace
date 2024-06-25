@@ -68,7 +68,7 @@
   float mousePointY;
   
   NSString *charBuffer;	
-  NSTimeInterval lastKeyPressed;
+  NSTimeInterval lastKeyPressedTime;
   NSInteger alphaNumericalLastColumn;
 
   NSColor *backColor;
