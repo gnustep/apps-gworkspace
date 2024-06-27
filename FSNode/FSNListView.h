@@ -305,7 +305,7 @@
 {
   id dsource;
   NSString *charBuffer;
-  NSTimeInterval lastKeyPressed;
+  NSTimeInterval lastKeyPressedTime;
 
   NSTimer *clickTimer;
 }
