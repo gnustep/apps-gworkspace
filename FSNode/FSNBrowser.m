@@ -152,7 +152,7 @@
     lastVisibleColumn = visibleColumns - 1;	
     currentshift = 0;	
     lastColumnLoaded = -1;
-    alphaNumericalLastColumn = -1;
+    typingBufferColumn = -1;
 		
     skipUpdateScroller = NO;
     lastKeyPressedTime = 0.0;
@@ -1385,7 +1385,7 @@
 	  if (charBuffer != nil)
 	    {
 	      if (([theEvent timestamp] - lastKeyPressedTime < 5.0) // seconds
-		  && (alphaNumericalLastColumn == index))
+		  && (typingBufferColumn == index))
 		{
 		  NSString *appendBuffer = [charBuffer stringByAppendingString:characterStr];
 
@@ -1401,7 +1401,7 @@
 	    }
 
 	  ASSIGN(charBuffer, characterStr);
-	  alphaNumericalLastColumn = index;
+	  typingBufferColumn = index;
 	  lastKeyPressedTime = [theEvent timestamp];
 
 	  // Try selecting
