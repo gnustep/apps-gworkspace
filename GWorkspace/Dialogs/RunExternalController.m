@@ -1,8 +1,9 @@
 /* RunExternalController.m
  *  
- * Copyright (C) 2003-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2024 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale
+ *          Riccardo Mottola
  * Date: August 2001
  *
  * This file is part of the GNUstep GWorkspace application
@@ -77,30 +78,51 @@ static NSString *nibName = @"RunExternal";
 }
 
 - (NSString *)checkCommand:(NSString *)comm
-{  
-  if ([comm isAbsolutePath]) {
-    FSNode *node = [FSNode nodeWithPath: comm];
-  
-    if (node && [node isPlain] && [node isExecutable]) {
-      return comm;
-    }
-  } else {
-    int i;
-    
-    for (i = 0; i < [pathsArr count]; i++) {
-      NSString *basePath = [pathsArr objectAtIndex: i];
-      NSArray *contents = [fm directoryContentsAtPath: basePath];
+{
+  if ([comm isAbsolutePath])
+    {
+      FSNode *node = [FSNode nodeWithPath: comm];
 
-      if (contents && [contents containsObject: comm]) {
-        NSString *fullPath = [basePath stringByAppendingPathComponent: comm];
-
-        if ([fm isExecutableFileAtPath: fullPath]) {
-          return fullPath;
+      if ([node isApplication])
+        {
+          // standardize path, to remove e.g. trailing /
+          return [comm stringByStandardizingPath];
         }
-      }
+
+      if (node && [node isPlain] && [node isExecutable])
+        {
+          return comm;
+        }
     }
-  }
-    
+  else
+    {
+      NSUInteger i;
+
+      // check if we suppose an application
+      if ([comm hasSuffix:@".app"])
+        {
+          NSLog(@"assume app name");
+          return comm;
+        }
+      else
+        {
+          // we look for a standard tool or executable
+          for (i = 0; i < [pathsArr count]; i++)
+            {
+              NSString *basePath = [pathsArr objectAtIndex: i];
+              NSArray *contents = [fm directoryContentsAtPath: basePath];
+
+              if (contents && [contents containsObject: comm]) {
+                NSString *fullPath = [basePath stringByAppendingPathComponent: comm];
+
+                if ([fm isExecutableFileAtPath: fullPath]) {
+                  return fullPath;
+                }
+              }
+            }
+        }
+    }
+
   return nil;
 }
 
@@ -124,7 +146,7 @@ static NSString *nibName = @"RunExternal";
 - (IBAction)okButtAction:(id)sender
 {
   NSString *str = [cfield string];
-  int i;
+  NSUInteger i;
 
   if ([str length]) {
     NSArray *components = [str componentsSeparatedByString: @" "];
@@ -136,14 +158,19 @@ static NSString *nibName = @"RunExternal";
     }
 
     command = [self checkCommand: command];
-
-    if (command) {
-      [NSTask launchedTaskWithLaunchPath: command arguments: args];
-      [win close];
-    } else {
-      NSRunAlertPanel(NULL, NSLocalizedString(@"No executable found!", @""),
-                                  NSLocalizedString(@"OK", @""), NULL, NULL);   
-    }
+    if (command)
+      {
+        if ([command hasSuffix:@".app"])
+          [[NSWorkspace sharedWorkspace] launchApplication: command];
+        else
+          [NSTask launchedTaskWithLaunchPath: command arguments: args];
+        [win close];
+      }
+    else
+      {
+        NSRunAlertPanel(NULL, NSLocalizedString(@"No executable found!", @""),
+                        NSLocalizedString(@"OK", @""), NULL, NULL);
+      }
   }
 }
 
