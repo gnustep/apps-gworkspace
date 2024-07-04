@@ -69,29 +69,52 @@ static NSString *nibName = @"OpenWith";
 
 - (NSString *)checkCommand:(NSString *)comm
 {
-  if ([comm isAbsolutePath]) {
-    FSNode *node = [FSNode nodeWithPath: comm];
-  
-    if (node && [node isPlain] && [node isExecutable]) {
-      return comm;
-    }
-  } else {
-    int i;
-  
-    for (i = 0; i < [pathsArr count]; i++) {
-      NSString *basePath = [pathsArr objectAtIndex: i];
-      NSArray *contents = [fm directoryContentsAtPath: basePath];
+  if ([comm isAbsolutePath])
+    {
+      FSNode *node = [FSNode nodeWithPath: comm];
 
-      if (contents && [contents containsObject: comm]) {
-        NSString *fullPath = [basePath stringByAppendingPathComponent: comm];
-
-        if ([fm isExecutableFileAtPath: fullPath]) {
-          return fullPath;
+      if ([node isApplication])
+        {
+          // standardize path, to remove e.g. trailing /
+          return [comm stringByStandardizingPath];
         }
-      }
+
+      if (node && [node isPlain] && [node isExecutable])
+        {
+          return comm;
+        }
     }
-  }
-     
+  else
+    {
+      NSUInteger i;
+
+      // check if we suppose an application
+      if ([comm hasSuffix:@".app"])
+        {
+          NSLog(@"assume app name");
+          return comm;
+        }
+      else
+        {
+          // we look for a standard tool or executable
+          for (i = 0; i < [pathsArr count]; i++)
+            {
+              NSString *basePath = [pathsArr objectAtIndex: i];
+              NSArray *contents = [fm directoryContentsAtPath: basePath];
+
+              if (contents && [contents containsObject: comm])
+                {
+                  NSString *fullPath = [basePath stringByAppendingPathComponent: comm];
+
+                  if ([fm isExecutableFileAtPath: fullPath])
+                    {
+                      return fullPath;
+                    }
+                }
+            }
+        }
+    }
+
   return nil;
 }
 
@@ -101,50 +124,72 @@ static NSString *nibName = @"OpenWith";
 
   [NSApp runModalForWindow: win];
   
-  if (result == NSAlertDefaultReturn) {
-    NSString *str = [cfield string];
-    int i;
-    
-    if ([str length]) {
-      NSArray *components = [str componentsSeparatedByString: @" "];
-      NSMutableArray *args = [NSMutableArray array];
-      NSString *command = [components objectAtIndex: 0];
-          
-      for (i = 1; i < [components count]; i++) {
-        [args addObject: [components objectAtIndex: i]];
-      }
-      
-      command = [self checkCommand: command];
-      
-      if (command) {
-        NSWorkspace *ws = [NSWorkspace sharedWorkspace];
-        
-        for (i = 0; i < [selpaths count]; i++) {
-          NSString *spath = [selpaths objectAtIndex: i];
-          NSString *defApp = nil, *fileType = nil;
-          
-          [ws getInfoForFile: spath application: &defApp type: &fileType];
-          
-          if ((fileType == nil) 
-              || (([fileType isEqual: NSPlainFileType] == NO)
-                    && ([fileType isEqual: NSShellCommandFileType] == NO))) {
-            NSRunAlertPanel(NULL, NSLocalizedString(@"Can't edit a directory!", @""),
-                                    NSLocalizedString(@"OK", @""), NULL, NULL);
-            RELEASE (selpaths);
-            return;   
-          }
-       
-          [args addObject: spath];
+  if (result == NSAlertDefaultReturn)
+    {
+      NSString *str = [cfield string];
+      NSUInteger i;
+
+      if ([str length])
+        {
+          NSArray *components = [str componentsSeparatedByString: @" "];
+          NSMutableArray *args = [NSMutableArray array];
+          NSString *command = [components objectAtIndex: 0];
+
+          for (i = 1; i < [components count]; i++)
+            {
+              [args addObject: [components objectAtIndex: i]];
+            }
+
+          command = [self checkCommand: command];
+
+          if (command)
+            {
+              NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+
+              for (i = 0; i < [selpaths count]; i++)
+                {
+                  NSString *spath = [selpaths objectAtIndex: i];
+                  NSString *defApp = nil, *fileType = nil;
+
+                  [ws getInfoForFile: spath application: &defApp type: &fileType];
+
+                  if ((fileType == nil)
+                      || (([fileType isEqual: NSPlainFileType] == NO)
+                          && ([fileType isEqual: NSShellCommandFileType] == NO)))
+                    {
+                      NSRunAlertPanel(NULL, NSLocalizedString(@"Can't edit a directory!", @""),
+                                      NSLocalizedString(@"OK", @""), NULL, NULL);
+                      RELEASE (selpaths);
+                      return;
+                    }
+
+                  [args addObject: spath];
+                }
+
+              if ([command hasSuffix:@".app"])
+                {
+                  NSUInteger i;
+
+                  for (i = 0; i < [selpaths count]; i++)
+                    {
+                      NSString *fileName = [selpaths objectAtIndex:i];
+
+                      [[NSWorkspace sharedWorkspace] openFile:fileName withApplication: command];
+                    }
+                }
+              else
+                {
+                  [NSTask launchedTaskWithLaunchPath: command arguments: args];
+                }
+            }
+          else
+            {
+              NSRunAlertPanel(NULL, NSLocalizedString(@"No executable found!", @""),
+                              NSLocalizedString(@"OK", @""), NULL, NULL);
+            }
         }
-        
-        [NSTask launchedTaskWithLaunchPath: command arguments: args];
-      } else {
-        NSRunAlertPanel(NULL, NSLocalizedString(@"No executable found!", @""),
-                                    NSLocalizedString(@"OK", @""), NULL, NULL);   
-      }
     }
-  }
-  
+
   RELEASE (selpaths);
 }
 
