@@ -112,13 +112,15 @@ static NSString *nibName = @"RunExternal";
               NSString *basePath = [pathsArr objectAtIndex: i];
               NSArray *contents = [fm directoryContentsAtPath: basePath];
 
-              if (contents && [contents containsObject: comm]) {
-                NSString *fullPath = [basePath stringByAppendingPathComponent: comm];
+              if (contents && [contents containsObject: comm])
+                {
+                  NSString *fullPath = [basePath stringByAppendingPathComponent: comm];
 
-                if ([fm isExecutableFileAtPath: fullPath]) {
-                  return fullPath;
+                  if ([fm isExecutableFileAtPath: fullPath])
+                    {
+                      return fullPath;
+                    }
                 }
-              }
             }
         }
     }
@@ -148,30 +150,32 @@ static NSString *nibName = @"RunExternal";
   NSString *str = [cfield string];
   NSUInteger i;
 
-  if ([str length]) {
-    NSArray *components = [str componentsSeparatedByString: @" "];
-    NSMutableArray *args = [NSMutableArray array];
-    NSString *command = [components objectAtIndex: 0];
+  if ([str length])
+    {
+      NSArray *components = [str componentsSeparatedByString: @" "];
+      NSMutableArray *args = [NSMutableArray array];
+      NSString *command = [components objectAtIndex: 0];
 
-    for (i = 1; i < [components count]; i++) {
-      [args addObject: [components objectAtIndex: i]];
+      for (i = 1; i < [components count]; i++)
+        {
+          [args addObject: [components objectAtIndex: i]];
+        }
+
+      command = [self checkCommand: command];
+      if (command)
+        {
+          if ([command hasSuffix:@".app"])
+            [[NSWorkspace sharedWorkspace] launchApplication: command];
+          else
+            [NSTask launchedTaskWithLaunchPath: command arguments: args];
+          [win close];
+        }
+      else
+        {
+          NSRunAlertPanel(NULL, NSLocalizedString(@"No executable found!", @""),
+                          NSLocalizedString(@"OK", @""), NULL, NULL);
+        }
     }
-
-    command = [self checkCommand: command];
-    if (command)
-      {
-        if ([command hasSuffix:@".app"])
-          [[NSWorkspace sharedWorkspace] launchApplication: command];
-        else
-          [NSTask launchedTaskWithLaunchPath: command arguments: args];
-        [win close];
-      }
-    else
-      {
-        NSRunAlertPanel(NULL, NSLocalizedString(@"No executable found!", @""),
-                        NSLocalizedString(@"OK", @""), NULL, NULL);
-      }
-  }
 }
 
 - (void)completionFieldDidEndLine:(id)afield
