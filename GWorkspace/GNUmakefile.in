@@ -111,6 +111,7 @@ Preferences/OperationPrefs.m \
 Preferences/DesktopPref.m \
 History/History.m \
 Dialogs/Dialogs.m \
+Dialogs/ExecuteController.m \
 Dialogs/OpenWithController.m \
 Dialogs/RunExternalController.m \
 Dialogs/CompletionField.m \

@@ -1,9 +1,11 @@
-/* RunExternalController.h
+/* ExecuteController.h
  *  
- * Copyright (C) 2003-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2024 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
- * Date: August 2001
+ * Authors: Enrico Sersale
+ *          Riccardo Mottola
+ *
+ * Date: July 2024
  *
  * This file is part of the GNUstep GWorkspace application
  *
@@ -22,21 +24,44 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
+#ifndef EXECUTE_CONTROLLER_H
+#define EXECUTE_CONTROLLER_H
 
-#ifndef RUN_EXTERNAL_CONTROLLER_H
-#define RUN_EXTERNAL_CONTROLLER_H
 
 #import <Foundation/Foundation.h>
-#import "ExecuteController.h"
 
-@class NSTextField;
+@class CompletionField;
+@class NSBox;
 @class NSWindow;
 
-@interface RunExternalController : ExecuteController
+@interface ExecuteController : NSObject 
 {
+  IBOutlet id win;
+  IBOutlet NSTextField *titleLabel;
+  IBOutlet id firstLabel;
+  IBOutlet id secondLabel;
+  IBOutlet id cancelButt;
+  IBOutlet id okButt;
+
+  IBOutlet CompletionField *cfield;
+  NSInteger result;
+
+  NSArray *pathsArr;
+  NSFileManager *fm;
 }
 
+- (NSString *)checkCommand:(NSString *)comm;
+
+- (void)activate;
+
+- (NSWindow *)win;
+
+- (IBAction)cancelButtAction:(id)sender;
+
+- (IBAction)okButtAction:(id)sender;
+
+- (void)completionFieldDidEndLine:(id)afield;
 
 @end
 
-#endif // RUN_EXTERNAL_CONTROLLER_H
+#endif

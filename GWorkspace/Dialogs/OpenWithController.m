@@ -38,8 +38,6 @@ static NSString *nibName = @"OpenWith";
 
 - (void)dealloc
 {
-  RELEASE (win);
-  RELEASE (pathsArr);
   [super dealloc];
 }
 
@@ -47,75 +45,20 @@ static NSString *nibName = @"OpenWith";
 {
   self = [super init];
   
-  if (self) {
-    if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
-      NSLog(@"failed to load %@!", nibName);
-      return self;
-    } else {    
-      NSDictionary *environment = [[NSProcessInfo processInfo] environment];
-      NSString *paths = [environment objectForKey: @"PATH"];  
-      
-      ASSIGN (pathsArr, [paths componentsSeparatedByString: @":"]);
-    
-      [win setInitialFirstResponder: cfield];
-
-      fm = [NSFileManager defaultManager];
-      gw = [GWorkspace gworkspace];
-    }
-  }
-  
-  return self;  
-}
-
-- (NSString *)checkCommand:(NSString *)comm
-{
-  if ([comm isAbsolutePath])
+  if (self)
     {
-      FSNode *node = [FSNode nodeWithPath: comm];
-
-      if ([node isApplication])
+      if ([NSBundle loadNibNamed: nibName owner: self] == NO)
         {
-          // standardize path, to remove e.g. trailing /
-          return [comm stringByStandardizingPath];
-        }
-
-      if (node && [node isPlain] && [node isExecutable])
-        {
-          return comm;
-        }
-    }
-  else
-    {
-      NSUInteger i;
-
-      // check if we suppose an application
-      if ([comm hasSuffix:@".app"])
-        {
-          NSLog(@"assume app name");
-          return comm;
+          NSLog(@"failed to load %@!", nibName);
+          return self;
         }
       else
         {
-          // we look for a standard tool or executable
-          for (i = 0; i < [pathsArr count]; i++)
-            {
-              NSString *basePath = [pathsArr objectAtIndex: i];
-              NSArray *contents = [fm directoryContentsAtPath: basePath];
-
-              if (contents && [contents containsObject: comm])
-                {
-                  NSString *fullPath = [basePath stringByAppendingPathComponent: comm];
-
-                  if ([fm isExecutableFileAtPath: fullPath])
-                    {
-                      return fullPath;
-                    }
-                }
-            }
+          gw = [GWorkspace gworkspace];
         }
     }
 
-  return nil;
+  return self;
 }
 
 - (void)activate
@@ -193,10 +136,6 @@ static NSString *nibName = @"OpenWith";
   RELEASE (selpaths);
 }
 
-- (NSWindow *)win
-{
-  return win;
-}
 
 - (IBAction)cancelButtAction:(id)sender
 {

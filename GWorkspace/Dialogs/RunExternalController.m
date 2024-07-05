@@ -31,7 +31,6 @@
 #import "RunExternalController.h"
 #import "CompletionField.h"
 #import "GWorkspace.h"
-#import "FSNode.h"
 
 
 static NSString *nibName = @"RunExternal";
@@ -40,110 +39,35 @@ static NSString *nibName = @"RunExternal";
 
 - (void)dealloc
 {
-  RELEASE (win);
-  RELEASE (pathsArr);
   [super dealloc];
 }
 
 - (id)init
 {
   self = [super init];
-  
+
   if (self)
     {
-      if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
-      NSLog(@"failed to load %@!", nibName);
-      return self;
-    } else {  
-      NSDictionary *environment = [[NSProcessInfo processInfo] environment];
-      NSString *paths = [environment objectForKey: @"PATH"];  
-      
-      ASSIGN (pathsArr, [paths componentsSeparatedByString: @":"]);
-      
-      [win setDelegate: self];
-      [win setFrameUsingName: @"run_external"];
-      [win setInitialFirstResponder: cfield];
-
-      [win setTitle:NSLocalizedString(@"Run", @"")];
-      [titleLabel setStringValue:NSLocalizedString(@"Run", @"")];
-      [secondLabel setStringValue:NSLocalizedString(@"Type the command to execute:", @"")];
-      [okButt setTitle:NSLocalizedString(@"OK", @"")];
-      [cancelButt setTitle:NSLocalizedString(@"Cancel", @"")];
-      
-      fm = [NSFileManager defaultManager];
-    }
-  }
-  
-  return self;  
-}
-
-- (NSString *)checkCommand:(NSString *)comm
-{
-  if ([comm isAbsolutePath])
-    {
-      FSNode *node = [FSNode nodeWithPath: comm];
-
-      if ([node isApplication])
+      if ([NSBundle loadNibNamed: nibName owner: self] == NO)
         {
-          // standardize path, to remove e.g. trailing /
-          return [comm stringByStandardizingPath];
-        }
-
-      if (node && [node isPlain] && [node isExecutable])
-        {
-          return comm;
-        }
-    }
-  else
-    {
-      NSUInteger i;
-
-      // check if we suppose an application
-      if ([comm hasSuffix:@".app"])
-        {
-          NSLog(@"assume app name");
-          return comm;
+          NSLog(@"failed to load %@!", nibName);
+          return self;
         }
       else
         {
-          // we look for a standard tool or executable
-          for (i = 0; i < [pathsArr count]; i++)
-            {
-              NSString *basePath = [pathsArr objectAtIndex: i];
-              NSArray *contents = [fm directoryContentsAtPath: basePath];
+          [win setFrameUsingName: @"run_external"];
 
-              if (contents && [contents containsObject: comm])
-                {
-                  NSString *fullPath = [basePath stringByAppendingPathComponent: comm];
-
-                  if ([fm isExecutableFileAtPath: fullPath])
-                    {
-                      return fullPath;
-                    }
-                }
-            }
+          [win setTitle:NSLocalizedString(@"Run", @"")];
+          [titleLabel setStringValue:NSLocalizedString(@"Run", @"")];
+          [secondLabel setStringValue:NSLocalizedString(@"Type the command to execute:", @"")];
+          [okButt setTitle:NSLocalizedString(@"OK", @"")];
+          [cancelButt setTitle:NSLocalizedString(@"Cancel", @"")];
         }
     }
 
-  return nil;
+  return self;
 }
 
-- (void)activate
-{
-  [win makeKeyAndOrderFront: nil];
-  [cfield setString: @""];
-  [win makeFirstResponder: cfield];
-}
-
-- (NSWindow *)win
-{
-  return win;
-}
-
-- (IBAction)cancelButtAction:(id)sender
-{
-  [win close];
-}
 
 - (IBAction)okButtAction:(id)sender
 {
@@ -180,11 +104,13 @@ static NSString *nibName = @"RunExternal";
 
 - (void)completionFieldDidEndLine:(id)afield
 {
+  [super completionFieldDidEndLine:afield];
   [win makeFirstResponder: okButt];
 }
 
 - (void)windowWillClose:(NSNotification *)aNotification
 {
+  [super windowWillClose:aNotification];
   [win saveFrameUsingName: @"run_external"];
 }
 
