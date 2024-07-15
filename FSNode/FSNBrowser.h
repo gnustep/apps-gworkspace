@@ -1,8 +1,8 @@
 /* FSNBrowser.h
  *  
- * Copyright (C) 2004-2022 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2024 Free Software Foundation, Inc.
  *
- * Authors: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale
  *          Riccardo Mottola <rm@gnu.org>
  * Date: July 2004
  *
@@ -69,7 +69,7 @@
   
   NSString *charBuffer;	
   NSTimeInterval lastKeyPressedTime;
-  NSInteger alphaNumericalLastColumn;
+  NSInteger typingBufferColumn;
 
   NSColor *backColor;
 	

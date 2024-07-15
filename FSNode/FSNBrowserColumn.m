@@ -805,15 +805,12 @@ static id <DesktopApplication> desktopApp = nil;
       NSString *cellStr = nil;
       NSInteger i = 0;
 
-      // Nothing selected
-      if (selRow != -1)
-	cellStr = [[matrix cellAtRow: selRow column: 0] stringValue];
+      // Nothing selected start from first
+      if (selRow == -1)
+	selRow = 0;
 
-      if (cellStr && ([cellStr length] > 0) && [cellStr hasPrefix: prefix])
-	return YES;
-
-      // look after current selection
-      for (i = selRow + 1; i < n; i++)
+      // look at or after current selection
+      for (i = selRow; i < n; i++)
 	{
 	  cellStr = [[matrix cellAtRow: i column: 0] stringValue];
 

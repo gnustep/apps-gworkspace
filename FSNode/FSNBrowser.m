@@ -152,7 +152,7 @@
     lastVisibleColumn = visibleColumns - 1;	
     currentshift = 0;	
     lastColumnLoaded = -1;
-    alphaNumericalLastColumn = -1;
+    typingBufferColumn = -1;
 		
     skipUpdateScroller = NO;
     lastKeyPressedTime = 0.0;
@@ -1298,6 +1298,7 @@
 {
   NSString *characters = [theEvent characters];
   unichar character = 0;
+  NSString *characterStr = nil;
   FSNBrowserColumn *column = [self selectedColumn];
   NSMatrix *matrix;
 
@@ -1318,6 +1319,7 @@
   if ([characters length] > 0)
     {
       character = [characters characterAtIndex: 0];
+      characterStr = [characters substringToIndex: 1];
     }
 
   switch (character)
@@ -1358,6 +1360,11 @@
       [matrix sendDoubleAction];
       DESTROY(charBuffer);
       return;
+    case 0x01B: // Escape
+      DESTROY(charBuffer);
+      return;
+    default:
+      break;
   }  
   
   if (([characters length] > 0) && (character < 0xF700))
@@ -1366,7 +1373,7 @@
 
       if (column)
 	{
-	  int index = [column index];
+	  NSInteger index = [column index];
 
 	  matrix = [column cmatrix];
 
@@ -1374,38 +1381,39 @@
 	    {
 	      return;
 	    }
-      
-	  if (charBuffer == nil)
+
+	  if (charBuffer != nil)
 	    {
-	      charBuffer = [characters substringToIndex: 1];
-	      RETAIN (charBuffer);
-	    }
-	  else
-	    {
-	      if (([theEvent timestamp] - lastKeyPressedTime < 500.0)
-		  && (alphaNumericalLastColumn == index))
+	      if (([theEvent timestamp] - lastKeyPressedTime < 5.0) // seconds
+		  && (typingBufferColumn == index))
 		{
-		  NSString *appendBuff = [charBuffer stringByAppendingString:
-                                                [characters substringToIndex: 1]];
-		  ASSIGN(charBuffer, appendBuff);
-		}
-	      else
-		{
-		  ASSIGN(charBuffer, [characters substringToIndex: 1]);
+		  NSString *appendBuffer = [charBuffer stringByAppendingString:characterStr];
+
+		  // Try selecting
+		  if ([column selectCellWithPrefix: appendBuffer])
+		    {
+		      ASSIGN(charBuffer, appendBuffer);
+		      [[self window] makeFirstResponder: matrix];
+		      return;
+		    }
+		  // unable to select - fall-through and reinit as if typed is first char
 		}
 	    }
-		
-	  alphaNumericalLastColumn = index;
+
+	  ASSIGN(charBuffer, characterStr);
+	  typingBufferColumn = index;
 	  lastKeyPressedTime = [theEvent timestamp];
-		
+
+	  // Try selecting
 	  if ([column selectCellWithPrefix: charBuffer])
             {
               [[self window] makeFirstResponder: matrix];
               return;
             }
-	}
 
-      lastKeyPressedTime = 0.0;
+	  // Selection failed, reinitialize and use mismatching character as new buffer beginning
+	  DESTROY(charBuffer);
+	}
     }
 
   [super keyDown: theEvent];

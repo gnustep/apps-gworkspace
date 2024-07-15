@@ -176,7 +176,7 @@ static void GWHighlightFrameRect(NSRect aRect)
       editIcon = nil;
 
       isDragTarget = NO;
-      lastKeyPressed = 0.;
+      lastKeyPressedTime = 0.0;
       charBuffer = nil;
       selectionMask = NSSingleSelectionMask;
 
@@ -670,6 +670,7 @@ static void GWHighlightFrameRect(NSRect aRect)
 {
   NSString *characters;
   unichar character;
+  NSString *characterStr = nil;
   NSRect vRect, hiddRect;
   NSPoint p;
   float x, y, w, h;
@@ -678,9 +679,13 @@ static void GWHighlightFrameRect(NSRect aRect)
   character = 0;
 
   if ([characters length] > 0)
-    character = [characters characterAtIndex: 0];
+    {
+      character = [characters characterAtIndex: 0];
+      characterStr = [characters substringToIndex: 1];
+    }
 
-  switch (character) {
+  switch (character)
+    {
     case NSPageUpFunctionKey:
 		  vRect = [self visibleRect];
 		  p = vRect.origin;
@@ -745,40 +750,42 @@ static void GWHighlightFrameRect(NSRect aRect)
       [self openSelectionInNewViewer: closesndr];
       return;
     }
-
+  case 0x01B: // Escape
+    DESTROY(charBuffer);
+    return;
   default:
     break;
   }
 
   if (([characters length] > 0) && (character < 0xF700))
     {
-      SEL icnwpSel = @selector(selectIconWithPrefix:);
-      IMP icnwp = [self methodForSelector: icnwpSel];
-
-      if (charBuffer == nil) {
-	charBuffer = [characters substringToIndex: 1];
-	RETAIN (charBuffer);
-	lastKeyPressed = 0.0;
-      }
-      else
+      if (charBuffer != nil)
 	{
-	  if ([theEvent timestamp] - lastKeyPressed < 500.0)
+	  if ([theEvent timestamp] - lastKeyPressedTime < 5.0)
 	    {
-	      ASSIGN (charBuffer, ([charBuffer stringByAppendingString:
-					  [characters substringToIndex: 1]]));
-	    }
-	  else
-	    {
-	      ASSIGN (charBuffer, ([characters substringToIndex: 1]));
-	      lastKeyPressed = 0.0;
+	      NSString *appendBuffer = [charBuffer stringByAppendingString:characterStr];
+
+	      // Try selecting
+	      if ([self selectIconWithPrefix: appendBuffer])
+		{
+		  ASSIGN(charBuffer, appendBuffer);
+		  return;
+		}
+	      // unable to select - fall-through and reinit as if typed is first char
 	    }
 	}
 
-      lastKeyPressed = [theEvent timestamp];
+      ASSIGN(charBuffer, characterStr);
+      lastKeyPressedTime = [theEvent timestamp];
 
-      if ((*icnwp)(self, icnwpSel, charBuffer)) {
-	return;
-      }
+      // Try selecting
+      if ([self selectIconWithPrefix: charBuffer])
+	{
+	  return;
+	}
+
+      // Selection failed, reinitialize and use mismatching character as new buffer beginning
+      DESTROY(charBuffer);
     }
 
   [super keyDown: theEvent];
