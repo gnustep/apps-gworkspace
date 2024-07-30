@@ -87,27 +87,7 @@ static NSString *nibName = @"OpenWith";
 
           if (command)
             {
-              NSWorkspace *ws = [NSWorkspace sharedWorkspace];
-
-              for (i = 0; i < [selpaths count]; i++)
-                {
-                  NSString *spath = [selpaths objectAtIndex: i];
-                  NSString *defApp = nil, *fileType = nil;
-
-                  [ws getInfoForFile: spath application: &defApp type: &fileType];
-
-                  if ((fileType == nil)
-                      || (([fileType isEqual: NSPlainFileType] == NO)
-                          && ([fileType isEqual: NSShellCommandFileType] == NO)))
-                    {
-                      NSRunAlertPanel(NULL, NSLocalizedString(@"Can't edit a directory!", @""),
-                                      NSLocalizedString(@"OK", @""), NULL, NULL);
-                      RELEASE (selpaths);
-                      return;
-                    }
-
-                  [args addObject: spath];
-                }
+	      [args addObjectsFromArray:selpaths];
 
               if ([command hasSuffix:@".app"])
                 {
