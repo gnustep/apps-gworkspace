@@ -307,6 +307,16 @@
 "Title Width" = "Címszélesség";
 "Icon View" = "Ikonnézet";
 
+/* OpenWithController */
+"Open With" = "Open With";
+"Type the name or the path of the application" = "Írja be az aktuális kijelölés megnyitásához";
+"to use to open the current selection" = "használandó alkalmazás nevét vagy elérési útját";
+
+/* RunExternalController.m */
+"Run" = "Run";
+"Type the command to execute:"="Írja be a végrehajtandó parancsot";
+
+
 /* Recycler strings */
 
 "Recycle: " = "Áthelyezés a szemetesbe: ";

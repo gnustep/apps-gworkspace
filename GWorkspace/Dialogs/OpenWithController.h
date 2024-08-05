@@ -24,38 +24,14 @@
 
 
 #import <Foundation/Foundation.h>
+#import "ExecuteController.h"
 
-@class CompletionField;
-@class NSBox;
-@class NSWindow;
+
 @class GWorkspace;
 
-@interface OpenWithController : NSObject 
+@interface OpenWithController : ExecuteController
 {
-  IBOutlet id win;
-  IBOutlet id firstLabel;
-  IBOutlet id secondLabel;
-  IBOutlet id cancelButt;
-  IBOutlet id okButt;
-
-  IBOutlet CompletionField *cfield;
-  unsigned result;  
-  
-  NSArray *pathsArr;
-  NSFileManager *fm;
   GWorkspace *gw;  
 }
-
-- (NSString *)checkCommand:(NSString *)comm;
-
-- (void)activate;
-
-- (NSWindow *)win;
-
-- (IBAction)cancelButtAction:(id)sender;
-
-- (IBAction)okButtAction:(id)sender;
-
-- (void)completionFieldDidEndLine:(id)afield;
 
 @end

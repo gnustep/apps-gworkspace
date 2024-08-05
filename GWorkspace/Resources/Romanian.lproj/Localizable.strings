@@ -3,7 +3,7 @@
 
 "Info" = "Info";
 	"Info Panel..." = "Panou Informaþii...";
-	"Preferences..." = "Preferinþe...";
+	"Preferences..." = "Preferințe...";
 	"Help..." = "Ajutor...";
 
 "File" = "Fiºier";
@@ -145,7 +145,7 @@
 /* FolderViewer.m */
 
 "Sort method applies to the\ncontents of the selected folder,\nNOT to its parent folder"
-  = "Ordonarea se aplicã\nconþinutului dosarului selectat,\nNU directorului care îl conþine";
+  = "Ordonarea se aplică\nconþinutului dosarului selectat,\nNU directorului care îl conþine";
 "Sort by" = "Ordonare";
 "Name" = "Nume";
 "Type" = "Tip";
@@ -171,7 +171,7 @@
 
 "UNIX Permissions" = "Permisii UNIX";
 "Access Control" = "Control Acces";
-"Also apply to files inside selection" = "Aplicã ºi fiºierelor dinãuntrul selectãrii";
+"Also apply to files inside selection" = "Aplică și fișierelor dinãuntrul selectării";
 
 
 /* ToolsPanel.m */
@@ -201,15 +201,24 @@
 "Group" = "Grup";
 "Other" = "Alþii";
 
+/* OpenWithController */
+"Open With" = "Deschis cu"
+"Type the name or the path of the application" = "Type the name or the path of the application";
+"to use to open the current selection" = "to use to open the current selection";
+
+/* RunExternalController.m */
+"Run" = "Run";
+"Type the command to execute:"="Type the command to execute:";
+
 
 /* Recycler strings */
-"Recycle: " = "Coº: ";
-"Recycler: " = "Coº: ";
-"Recycler" = "Coº";
-"the Recycler" = "Coºul";
-"\nto the Recycler" = "\nîn coº";
-"Move from the Recycler " = "Mut din coº ";
+"Recycle: " = "Coș: ";
+"Recycler: " = "Coș: ";
+"Recycler" = "Coș";
+"the Recycler" = "Coșul";
+"\nto the Recycler" = "\nîn coș";
+"Move from the Recycler " = "Mut din coș ";
 "In" = "În";
-"Empty Recycler" = "Goleºte Coºul";
-"Empty the Recycler?" = "Golesc Coºul?";
+"Empty Recycler" = "Golește Coșul";
+"Empty the Recycler?" = "Golesc Coșul?";
 "Put Away" = "Pune la loc";

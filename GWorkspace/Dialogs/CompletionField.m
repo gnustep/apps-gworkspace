@@ -1,8 +1,9 @@
 /* CompletionField.m
  *  
- * Copyright (C) 2003-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2024 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale
+ *          Riccardo Mottola
  * Date: August 2001
  *
  * This file is part of the GNUstep GWorkspace application
@@ -72,158 +73,224 @@
 #define CHECK_SEPARATOR \
 if ([path hasSuffix: pathSeparator] == NO) \
 [path appendString: pathSeparator]
- 
+
   if (([eventstr isEqual: @"\r"] == NO)
-                              && ([eventstr isEqual: @"\t"] == NO)) { 
-                               
-    [super keyDown: theEvent];
-  }
-  
-  if ([eventstr isEqual: @"\t"] && [str length]) {
-    CREATE_AUTORELEASE_POOL(arp);
-    NSString *pathSeparator = path_separator();
-    NSArray *components = [str componentsSeparatedByString: pathSeparator];
-    NSMutableString *path = [NSMutableString string];
-    int i, j, m, n;
-    
-    if ([[components objectAtIndex: 0] isEqual: str]) {
-      RELEASE (arp);
-      return;
+      && ([eventstr isEqual: @"\t"] == NO))
+    {
+      [super keyDown: theEvent];
     }
-        
-    [path appendString: pathSeparator];
-    
-    for (i = 0; i < [components count]; i++) {
-      NSString *component = [components objectAtIndex: i];
-      NSString *teststr = [path stringByAppendingString: component];
-      BOOL isDir;
-      
-      if (([fm fileExistsAtPath: teststr isDirectory: &isDir] && isDir)
-                                          && ([path isEqual: teststr] == NO)) {
-        NSArray *contents = [fm directoryContentsAtPath: teststr];
-        
-        if (contents && ([str hasSuffix: pathSeparator] == NO)) {
-          BOOL found = NO;
-        
-          for (j = 0; j < [contents count]; j++) {
-            NSString *fname = [contents objectAtIndex: j];
-            
-            if ([fname hasPrefix: component] && (![fname isEqual: component])) {
-              found = YES; 
+
+  if ([eventstr isEqual: @"\t"] && [str length])
+    {
+      CREATE_AUTORELEASE_POOL(arp);
+      NSString *pathSeparator = path_separator();
+      NSArray *components = [str componentsSeparatedByString: pathSeparator];
+      NSMutableString *path = [NSMutableString string];
+      NSUInteger i, j, m, n;
+
+      if ([[components objectAtIndex: 0] isEqual: str])
+        {
+          NSArray *appPaths;
+          NSMutableArray *appBundles;
+          NSUInteger i;
+          NSString *completedAppName = nil;
+
+          appPaths = NSStandardApplicationPaths();
+          appBundles = [[NSMutableArray  alloc] initWithCapacity:1];
+          for (i = 0; i < [appPaths count]; i++)
+            {
+              NSArray *contents;
+              NSUInteger j;
+
+              contents = [fm directoryContentsAtPath: [appPaths objectAtIndex:i]];
+              [appBundles addObjectsFromArray:contents];
             }
-          }
-        
-          if (found) {
-            CHECK_SEPARATOR;
-            [path appendString: component];
-            NSBeep();
-          } else {
-            CHECK_SEPARATOR;
-            [path appendString: component];
-            if (isDir) {
-              [path appendString: pathSeparator];
-            }
-          }
           
-        } else {
-          CHECK_SEPARATOR;
-          [path appendString: component];
-          if (isDir) {
-            [path appendString: pathSeparator];
-          }
-        }
-        
-      } else {
-        NSArray *contents = [fm directoryContentsAtPath: path];
+          for (i = 0; i < [appBundles count]; i++)
+            {
+              NSString *appToCheck = [appBundles objectAtIndex:i];
 
-        if (contents) {
-          NSMutableArray *common = [NSMutableArray array];
-          unsigned *lengths = NSZoneMalloc (NSDefaultMallocZone(), sizeof(unsigned) * [contents count]);
-          unsigned prefLength = 0;
-          int index = 0;;
-
-          for (j = 0; j < [contents count]; j++) {
-            lengths[j] = 0;
-          }
-
-          for (j = 0; j < [contents count]; j++) {
-            NSString *fname = [contents objectAtIndex: j];
-
-            if ([fname hasPrefix: component]) {
-              NSRange range = [fname rangeOfString: component];
-
-              if (range.length >= prefLength) {
-                prefLength = range.length;
-                lengths[j] = range.length;
-                index = j;
-              }
-
-              [common addObject: fname];
-            }
-          }
-
-          if (prefLength != 0) {
-            BOOL found = NO;
-
-            for (m = 0; m < [contents count]; m++) {
-              unsigned l1 = lengths[m];
-
-              for (n = 0; n < [contents count]; n++) {
-                unsigned l2 = lengths[n];
-
-                if ((m != n) && ((l1 != 0) && (l2 != 0))) {
-                  if ((l1 == l2) && (l1 == prefLength)) {
-                    found = YES;
-                    break;
-                  }
+              // for simplicity, we complete with the first app found
+              if ([appToCheck hasPrefix: str] || [appToCheck isEqualToString:str])
+                {
+                  completedAppName = appToCheck;
                 }
-              }
-
-              if (found) {
-                break;
-              }
             }
 
-            if (found == NO) {
-              NSString *cprefix = commonPrefixInArray(common);
-              
-              if (cprefix) {
-                CHECK_SEPARATOR;
-                [path appendString: cprefix];
-
-                if ([fm fileExistsAtPath: path isDirectory: &isDir]) {
-                  if (isDir) {
-                    [path appendString: pathSeparator];
-                  }
-                } else {
-                  NSBeep();
-                }
-              } else {
-                CHECK_SEPARATOR;
-                [path appendString: [contents objectAtIndex: index]];
-                [path appendString: pathSeparator];
-              }
-            } else {
-              NSString *cprefix = commonPrefixInArray(common);
-
-              if (cprefix) {
-                CHECK_SEPARATOR;
-                [path appendString: cprefix];
-              } else {
-                NSString *s = [[contents objectAtIndex: index] substringToIndex: prefLength];
-                [path appendString: s];
-              }
-
-              NSZoneFree (NSDefaultMallocZone(), lengths);
-              NSBeep();
-              break;
-            }
-          }
-
-          NSZoneFree (NSDefaultMallocZone(), lengths);
+          [self setString: completedAppName];
+          [appBundles release];
+          RELEASE (arp);
+          return;
         }
-      }
-    }
+
+      [path appendString: pathSeparator];
+      for (i = 0; i < [components count]; i++)
+        {
+          NSString *component = [components objectAtIndex: i];
+          NSString *teststr = [path stringByAppendingString: component];
+          BOOL isDir;
+
+          if (([fm fileExistsAtPath: teststr isDirectory: &isDir] && isDir)
+              && ([path isEqual: teststr] == NO))
+            {
+              NSArray *contents = [fm directoryContentsAtPath: teststr];
+
+              if (contents && ([str hasSuffix: pathSeparator] == NO))
+                {
+                  BOOL found = NO;
+
+                  for (j = 0; j < [contents count]; j++)
+                    {
+                      NSString *fname = [contents objectAtIndex: j];
+
+                      if ([fname hasPrefix: component] && (![fname isEqual: component]))
+                        {
+                          found = YES;
+                        }
+                    }
+
+                  if (found)
+                    {
+                      CHECK_SEPARATOR;
+                      [path appendString: component];
+                      NSBeep();
+                    }
+                  else
+                    {
+                      CHECK_SEPARATOR;
+                      [path appendString: component];
+                      if (isDir)
+                        {
+                          [path appendString: pathSeparator];
+                        }
+                    }
+                }
+              else
+                {
+                  CHECK_SEPARATOR;
+                  [path appendString: component];
+                  if (isDir)
+                    {
+                      [path appendString: pathSeparator];
+                    }
+                }
+            }
+          else
+            {
+              NSArray *contents = [fm directoryContentsAtPath: path];
+
+              if (contents)
+                {
+                  NSMutableArray *common = [NSMutableArray array];
+                  NSUInteger *lengths = NSZoneMalloc (NSDefaultMallocZone(), sizeof(NSUInteger) * [contents count]);
+                  NSUInteger prefLength = 0;
+                  NSUInteger index = 0;
+
+                  for (j = 0; j < [contents count]; j++)
+                    {
+                      lengths[j] = 0;
+                    }
+
+                  for (j = 0; j < [contents count]; j++)
+                    {
+                      NSString *fname = [contents objectAtIndex: j];
+
+                      if ([fname hasPrefix: component])
+                        {
+                          NSRange range = [fname rangeOfString: component];
+
+                          if (range.length >= prefLength)
+                            {
+                              prefLength = range.length;
+                              lengths[j] = range.length;
+                              index = j;
+                            }
+
+                          [common addObject: fname];
+                        }
+                    }
+
+                  if (prefLength != 0)
+                    {
+                      BOOL found = NO;
+
+                      for (m = 0; m < [contents count]; m++)
+                        {
+                          NSUInteger l1 = lengths[m];
+
+                          for (n = 0; n < [contents count]; n++)
+                            {
+                              NSUInteger l2 = lengths[n];
+
+                              if ((m != n) && ((l1 != 0) && (l2 != 0)))
+                                {
+                                  if ((l1 == l2) && (l1 == prefLength))
+                                    {
+                                      found = YES;
+                                      break;
+                                    }
+                                }
+                            }
+
+                          if (found)
+                            {
+                              break;
+                            }
+                        }
+
+                      if (found == NO)
+                        {
+                          NSString *cprefix = commonPrefixInArray(common);
+
+                          if (cprefix)
+                            {
+                              CHECK_SEPARATOR;
+                              [path appendString: cprefix];
+
+                              if ([fm fileExistsAtPath: path isDirectory: &isDir])
+                                {
+                                  if (isDir)
+                                    {
+                                      [path appendString: pathSeparator];
+                                    }
+                                }
+                              else
+                                {
+                                  NSBeep();
+                                }
+                            }
+                          else
+                            {
+                              CHECK_SEPARATOR;
+                              [path appendString: [contents objectAtIndex: index]];
+                              [path appendString: pathSeparator];
+                            }
+                        }
+                      else
+                        {
+                          NSString *cprefix = commonPrefixInArray(common);
+
+                          if (cprefix)
+                            {
+                              CHECK_SEPARATOR;
+                              [path appendString: cprefix];
+                            }
+                          else
+                            {
+                              NSString *s = [[contents objectAtIndex: index] substringToIndex: prefLength];
+                              [path appendString: s];
+                            }
+
+                          NSZoneFree (NSDefaultMallocZone(), lengths);
+                          NSBeep();
+                          break;
+                        }
+                    }
+
+                  NSZoneFree (NSDefaultMallocZone(), lengths);
+                }
+            }
+        }
   
     [self setString: path];
     RELEASE (arp);

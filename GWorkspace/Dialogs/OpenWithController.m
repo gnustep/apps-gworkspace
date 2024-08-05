@@ -1,8 +1,9 @@
 /* OpenWithController.m
  *  
- * Copyright (C) 2003-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2024 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale
+ *          Riccardo Mottola
  * Date: August 2001
  *
  * This file is part of the GNUstep GWorkspace application
@@ -32,126 +33,59 @@
 #import "FSNode.h"
 
 
-static NSString *nibName = @"OpenWith";
-
 @implementation OpenWithController
 
 - (void)dealloc
 {
-  RELEASE (win);
-  RELEASE (pathsArr);
   [super dealloc];
 }
 
-- (id)init
+- (instancetype)init
 {
-  self = [super init];
+  self = [super initWithNibName:@"OpenWith"];
   
-  if (self) {
-    if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
-      NSLog(@"failed to load %@!", nibName);
-      return self;
-    } else {    
-      NSDictionary *environment = [[NSProcessInfo processInfo] environment];
-      NSString *paths = [environment objectForKey: @"PATH"];  
-      
-      ASSIGN (pathsArr, [paths componentsSeparatedByString: @":"]);
-    
-      [win setInitialFirstResponder: cfield];
-
-      fm = [NSFileManager defaultManager];
+  if (self)
+    {
       gw = [GWorkspace gworkspace];
-    }
-  }
-  
-  return self;  
-}
 
-- (NSString *)checkCommand:(NSString *)comm
-{
-  if ([comm isAbsolutePath]) {
-    FSNode *node = [FSNode nodeWithPath: comm];
-  
-    if (node && [node isPlain] && [node isExecutable]) {
-      return comm;
+      [win setTitle:NSLocalizedString(@"Open With", @"")];
+      [firstLabel setStringValue:NSLocalizedString(@"Type the name or the path of the application", @"")];
+      [secondLabel setStringValue:NSLocalizedString(@"to use to open the current selection", @"")];
     }
-  } else {
-    int i;
-  
-    for (i = 0; i < [pathsArr count]; i++) {
-      NSString *basePath = [pathsArr objectAtIndex: i];
-      NSArray *contents = [fm directoryContentsAtPath: basePath];
 
-      if (contents && [contents containsObject: comm]) {
-        NSString *fullPath = [basePath stringByAppendingPathComponent: comm];
-
-        if ([fm isExecutableFileAtPath: fullPath]) {
-          return fullPath;
-        }
-      }
-    }
-  }
-     
-  return nil;
+  return self;
 }
 
 - (void)activate
 {
   NSArray *selpaths = RETAIN ([gw selectedPaths]);
+  NSWorkspace *ws = [NSWorkspace sharedWorkspace];
+  NSUInteger i;
+
+  // first we check incoming selection or it is useless to check for a command
+  for (i = 0; i < [selpaths count]; i++)
+    {
+      NSString *spath = [selpaths objectAtIndex: i];
+      NSString *defApp = nil, *fileType = nil;
+
+      [ws getInfoForFile: spath application: &defApp type: &fileType];
+
+      if ((fileType == nil)
+          || (([fileType isEqual: NSPlainFileType] == NO)
+              && ([fileType isEqual: NSShellCommandFileType] == NO)))
+        {
+          NSRunAlertPanel(NULL, NSLocalizedString(@"Can't edit a directory!", @""),
+                          NSLocalizedString(@"OK", @""), NULL, NULL);
+          RELEASE (selpaths);
+          return;
+        }
+    }
 
   [NSApp runModalForWindow: win];
-  
-  if (result == NSAlertDefaultReturn) {
-    NSString *str = [cfield string];
-    int i;
-    
-    if ([str length]) {
-      NSArray *components = [str componentsSeparatedByString: @" "];
-      NSMutableArray *args = [NSMutableArray array];
-      NSString *command = [components objectAtIndex: 0];
-          
-      for (i = 1; i < [components count]; i++) {
-        [args addObject: [components objectAtIndex: i]];
-      }
-      
-      command = [self checkCommand: command];
-      
-      if (command) {
-        NSWorkspace *ws = [NSWorkspace sharedWorkspace];
-        
-        for (i = 0; i < [selpaths count]; i++) {
-          NSString *spath = [selpaths objectAtIndex: i];
-          NSString *defApp = nil, *fileType = nil;
-          
-          [ws getInfoForFile: spath application: &defApp type: &fileType];
-          
-          if ((fileType == nil) 
-              || (([fileType isEqual: NSPlainFileType] == NO)
-                    && ([fileType isEqual: NSShellCommandFileType] == NO))) {
-            NSRunAlertPanel(NULL, NSLocalizedString(@"Can't edit a directory!", @""),
-                                    NSLocalizedString(@"OK", @""), NULL, NULL);
-            RELEASE (selpaths);
-            return;   
-          }
-       
-          [args addObject: spath];
-        }
-        
-        [NSTask launchedTaskWithLaunchPath: command arguments: args];
-      } else {
-        NSRunAlertPanel(NULL, NSLocalizedString(@"No executable found!", @""),
-                                    NSLocalizedString(@"OK", @""), NULL, NULL);   
-      }
-    }
-  }
-  
+
   RELEASE (selpaths);
 }
 
-- (NSWindow *)win
-{
-  return win;
-}
 
 - (IBAction)cancelButtAction:(id)sender
 {
@@ -162,9 +96,51 @@ static NSString *nibName = @"OpenWith";
 
 - (IBAction)okButtAction:(id)sender
 {
+  NSString *str = [cfield string];
+  NSUInteger i;
   result = NSAlertDefaultReturn;
   [NSApp stopModal];
   [win close];
+
+  if ([str length])
+    {
+      NSArray *selpaths = [gw selectedPaths];
+      NSArray *components = [str componentsSeparatedByString: @" "];
+      NSMutableArray *args = [NSMutableArray array];
+      NSString *command = [components objectAtIndex: 0];
+
+      for (i = 1; i < [components count]; i++)
+        {
+          [args addObject: [components objectAtIndex: i]];
+        }
+
+      command = [self checkCommand: command];
+
+      if (command)
+        {
+          if ([command hasSuffix:@".app"])
+            {
+              NSUInteger i;
+
+              for (i = 0; i < [selpaths count]; i++)
+                {
+                  NSString *fileName = [selpaths objectAtIndex:i];
+
+                  [[NSWorkspace sharedWorkspace] openFile:fileName withApplication: command];
+                }
+            }
+          else
+            {
+              [args addObjectsFromArray:selpaths];
+              [NSTask launchedTaskWithLaunchPath: command arguments: args];
+            }
+        }
+      else
+        {
+          NSRunAlertPanel(NULL, NSLocalizedString(@"No executable found!", @""),
+                          NSLocalizedString(@"OK", @""), NULL, NULL);
+        }
+    }
 }
 
 - (void)completionFieldDidEndLine:(id)afield

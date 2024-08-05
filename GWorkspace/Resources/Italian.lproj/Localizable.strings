@@ -396,6 +396,11 @@
 
 /* -------- */
 
+/* OpenWithController */
+"Open With" = "Apri Con";
+"Type the name or the path of the application" = "Digitare il comando o il percorso dell'applicazione";
+"to use to open the current selection" = "da usare per aprire la selezione corrente";
+
 /* RunExternalController.m */
 "Run" = "Esegui";
 "Type the command to execute:"="Digitare il comando da esegure";
