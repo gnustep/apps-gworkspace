@@ -32,6 +32,7 @@
 #import "CompletionField.h"
 #import "FSNode.h"
 
+
 @implementation ExecuteController
 
 - (void)dealloc
@@ -41,12 +42,18 @@
   [super dealloc];
 }
 
-- (id)init
+- (instancetype)initWithNibName:(NSString *)nibName
 {
   self = [super init];
   
   if (self)
     {
+      if ([NSBundle loadNibNamed: nibName owner: self] == NO)
+        {
+          NSLog(@"failed to load %@!", nibName);
+          [self release];
+          return nil;
+        }
     }
 
   return self;

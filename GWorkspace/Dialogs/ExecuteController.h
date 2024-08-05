@@ -50,6 +50,8 @@
   NSFileManager *fm;
 }
 
+- (instancetype)initWithNibName:(NSString *)nibName NS_DESIGNATED_INITIALIZER;
+
 - (NSString *)checkCommand:(NSString *)comm;
 
 - (void)activate;

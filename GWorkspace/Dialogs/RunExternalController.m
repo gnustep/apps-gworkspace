@@ -33,8 +33,6 @@
 #import "GWorkspace.h"
 
 
-static NSString *nibName = @"RunExternal";
-
 @implementation RunExternalController
 
 - (void)dealloc
@@ -42,27 +40,20 @@ static NSString *nibName = @"RunExternal";
   [super dealloc];
 }
 
-- (id)init
+- (instancetype)init
 {
-  self = [super init];
+  self = [super initWithNibName:@"RunExternal"];
 
   if (self)
     {
-      if ([NSBundle loadNibNamed: nibName owner: self] == NO)
-        {
-          NSLog(@"failed to load %@!", nibName);
-          return self;
-        }
-      else
-        {
-          [win setFrameUsingName: @"run_external"];
+      [win setFrameUsingName: @"run_external"];
 
-          [win setTitle:NSLocalizedString(@"Run", @"")];
-          [titleLabel setStringValue:NSLocalizedString(@"Run", @"")];
-          [secondLabel setStringValue:NSLocalizedString(@"Type the command to execute:", @"")];
-          [okButt setTitle:NSLocalizedString(@"OK", @"")];
-          [cancelButt setTitle:NSLocalizedString(@"Cancel", @"")];
-        }
+      [win setTitle:NSLocalizedString(@"Run", @"")];
+      [titleLabel setStringValue:NSLocalizedString(@"Run", @"")];
+      [secondLabel setStringValue:NSLocalizedString(@"Type the command to execute:", @"")];
+      [okButt setTitle:NSLocalizedString(@"OK", @"")];
+      [cancelButt setTitle:NSLocalizedString(@"Cancel", @"")];
+
     }
 
   return self;

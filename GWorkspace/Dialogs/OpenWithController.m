@@ -33,8 +33,6 @@
 #import "FSNode.h"
 
 
-static NSString *nibName = @"OpenWith";
-
 @implementation OpenWithController
 
 - (void)dealloc
@@ -42,21 +40,13 @@ static NSString *nibName = @"OpenWith";
   [super dealloc];
 }
 
-- (id)init
+- (instancetype)init
 {
-  self = [super init];
+  self = [super initWithNibName:@"OpenWith"];
   
   if (self)
     {
-      if ([NSBundle loadNibNamed: nibName owner: self] == NO)
-        {
-          NSLog(@"failed to load %@!", nibName);
-          return self;
-        }
-      else
-        {
-          gw = [GWorkspace gworkspace];
-        }
+      gw = [GWorkspace gworkspace];
     }
 
   return self;
