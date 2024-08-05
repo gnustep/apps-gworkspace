@@ -47,6 +47,10 @@
   if (self)
     {
       gw = [GWorkspace gworkspace];
+
+      [win setTitle:NSLocalizedString(@"Open With", @"")];
+      [firstLabel setStringValue:NSLocalizedString(@"Type the name or the path of the application", @"")];
+      [secondLabel setStringValue:NSLocalizedString(@"to use to open the current selection", @"")];
     }
 
   return self;

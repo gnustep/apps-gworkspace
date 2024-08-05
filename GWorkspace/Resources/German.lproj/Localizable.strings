@@ -11,6 +11,7 @@
 
 "File" = "Datei";
 	"Open" = "Öffnen";
+        "Open With..." = "Öffnen mit";
 	"Open as Folder" = "Als Ordner öffnen";
 	"New Folder" = "Neuer Ordner";
 	"New File" = "Neue Datei";
@@ -411,6 +412,11 @@ which ends in "kann <the file> nicht umbenennen"
 
 
 /* -------- */
+
+/* OpenWithController */
+"Open With" = "Öffnen mit";
+"Type the name or the path of the application" = "Geben Sie den Namen oder den Pfad der Anwendung ein,";
+"to use to open the current selection" = "";
 
 /* RunExternalController.m */
 "Run" = "Ausführen";

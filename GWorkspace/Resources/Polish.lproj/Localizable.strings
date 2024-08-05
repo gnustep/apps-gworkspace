@@ -411,6 +411,11 @@
 
 /* -------- */
 
+/* OpenWithController */
+"Open With" = "Otwórz z";
+"Type the name or the path of the application" = "Wpisz nazwę lub ścieżkę aplikacji, której";
+"to use to open the current selection" = "chcesz użyć do otwarcia bieżącego zaznaczenia";
+
 /* RunExternalController.m */
 "Run" = "Uruchom";
 "Type the command to execute:"="Wpisz polecenie do wykonania:";
