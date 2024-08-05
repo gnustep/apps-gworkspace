@@ -54,6 +54,11 @@
           [self release];
           return nil;
         }
+      else
+        {
+          [okButt setTitle:NSLocalizedString(@"OK", @"")];
+          [cancelButt setTitle:NSLocalizedString(@"Cancel", @"")];
+        }
     }
 
   return self;

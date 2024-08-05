@@ -51,8 +51,8 @@
       [win setTitle:NSLocalizedString(@"Run", @"")];
       [titleLabel setStringValue:NSLocalizedString(@"Run", @"")];
       [secondLabel setStringValue:NSLocalizedString(@"Type the command to execute:", @"")];
-      [okButt setTitle:NSLocalizedString(@"OK", @"")];
-      [cancelButt setTitle:NSLocalizedString(@"Cancel", @"")];
+      //     [okButt setTitle:NSLocalizedString(@"OK", @"")];
+      //      [cancelButt setTitle:NSLocalizedString(@"Cancel", @"")];
 
     }
 
