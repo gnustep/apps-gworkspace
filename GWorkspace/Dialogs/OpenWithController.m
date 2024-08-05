@@ -83,11 +83,6 @@
 
   [NSApp runModalForWindow: win];
 
-  if (result == NSAlertDefaultReturn)
-    {
-      NSLog(@"ok!");
-    }
-
   RELEASE (selpaths);
 }
 
