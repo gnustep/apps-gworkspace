@@ -1,8 +1,9 @@
 /* Annotations.m
  *  
- * Copyright (C) 2004-2013 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2024 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: January 2004
  *
  * This file is part of the GNUstep GWorkspace application
@@ -130,10 +131,12 @@ static NSString *nibName = @"Annotations";
     
   } else {
     NSImage *icon = [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: ICNSIZE];
-    NSString *items = NSLocalizedString(@"items", @"");
+    NSString *items;
     
-    items = [NSString stringWithFormat: @"%lu %@", (unsigned long)[paths count], items];
-		[titleField setStringValue: items];  
+    items = [NSString stringWithFormat: @"%lu %@",
+                      (unsigned long)[paths count],
+                      NSLocalizedString(@"Items", @"")];
+    [titleField setStringValue: items];  
     [iconView setImage: icon];
 
     if ([[[mainBox contentView] subviews] containsObject: toolsBox]) {

@@ -1,9 +1,9 @@
 /* Tools.m
  *  
- * Copyright (C) 2004-2021 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2024 Free Software Foundation, Inc.
  *
- * Authors: Enrico Sersale <enrico@imago.ro>
- *          RIccardo Mottola
+ * Authors: Enrico Sersale
+ *          Riccardo Mottola
  * Date: January 2004
  *
  * This file is part of the GNUstep GWorkspace application
@@ -109,6 +109,8 @@ static NSString *nibName = @"Tools";
     insppaths = nil;
 		currentApp = nil;
     extensions = nil;
+
+    [okButt setTitle: NSLocalizedString(@"Set Default", @"")];
     [okButt setEnabled: NO]; 
 	}
   
@@ -148,8 +150,11 @@ static NSString *nibName = @"Tools";
   else
     {
       NSImage *icon = [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: ICNSIZE];
-      NSString *items = NSLocalizedString(@"items", @"");
-      items = [NSString stringWithFormat: @"%lu %@", (long unsigned)[paths count], items];
+      NSString *items;
+
+      items = [NSString stringWithFormat: @"%lu %@",
+                        (long unsigned)[paths count],
+                        NSLocalizedString(@"Items", @"")];
       [titleField setStringValue: items];  
       [iconView setImage: icon];
     }

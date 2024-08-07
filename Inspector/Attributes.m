@@ -286,9 +286,9 @@ static BOOL sizeStop = NO;
   else
     { /* Multiple Selection */
       NSImage *icon = [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: ICNSIZE];
-      NSString *items = NSLocalizedString(@"items", @"");
+      NSString *items;
       
-      items = [NSString stringWithFormat: @"%lu %@", (unsigned long)[paths count], items];
+      items = [NSString stringWithFormat: @"%lu %@", (unsigned long)[paths count], NSLocalizedString(@"Items", @"")];
       [titleField setStringValue: items];  
       [iconView setImage: icon];
   

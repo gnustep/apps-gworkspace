@@ -156,8 +156,9 @@
 "Invalid char in name" = "Carattere non valido nel nome";
 
 
-/* ----------------------- Inspectors strings --------------------------- *\
+/* ----------------------- Inspectors strings --------------------------- */
 
+"Items" = "Elementi";
 
 /* Attributes.m */
 
@@ -182,7 +183,7 @@
 /* ContentsPanel.m */
 
 "Contents Inspector" = "Ispettore Contenuti";
-"No Contents Inspector" = "Nessun Ispettore";
+"No Contents Inspector" = "Nessun Ispettore Contenuti";
 "No Contents Inspector\nFor Multiple Selection" = "Nessun Ispettore\nper selezione multipla";
 
 
@@ -213,8 +214,8 @@
 /* ToolsPanel.m */
 
 "Tools Inspector" = "Ispettore Strumenti";
-"No Tools Inspector" = "Nessun Ispettore";
-"Set Default" = "Set Default";
+"No Tools Inspector" = "Nessun Ispettore Strumenti";
+"Set Default" = "Imp. Predefinito";
 
 
 
@@ -229,7 +230,7 @@
 "Current selection" = "Selezione corrente";
 "Add" = "Aggiungi";
 "Remove" = "Rimuovi";
-"Search for items whose:" = "Cerca per oggetti che:";
+"Search for items whose:" = "Cerca per elementi che:";
 "Specific places" = "Posti specifici";
 "Recursive" = "Ricorsivamente";
 "Search" = "Cerca";

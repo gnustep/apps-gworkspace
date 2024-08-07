@@ -156,7 +156,7 @@
 "Invalid char in name" = "Niedozwolony znak w nazwie";
 
 
-/* ----------------------------- Viewers Strings ----------------------------- *\
+/* ----------------------------- Viewers Strings ----------------------------- */
 
 /* GWViewer.m */
 "free" = "wolne";
@@ -169,8 +169,9 @@
 "Can't open " = "Nie można otworzyć ";
 
 
-/* ---------------------------- Inspectors strings --------------------------- *\
+/* ---------------------------- Inspectors strings --------------------------- */
 
+"Items" = "Elementy";
 
 /* Attributes.m */
 
@@ -230,7 +231,7 @@
 "Set Default" = "Ustaw jako domyslne";
 
 
-/* ----------------------- Finder strings --------------------------- *\
+/* ----------------------- Finder strings --------------------------- */
 
 /* Finder.m */
 
@@ -304,7 +305,7 @@
 "includes"="zawiera";
 
 
-/* ----------------------- Fiend strings --------------------------- *\
+/* ----------------------- Fiend strings --------------------------- */
 
 /* Fiend.m */
 
@@ -318,7 +319,7 @@
 "This object is already present in this layer!" = "Ten obiekt już jest w tej warstwie!";
 	
 			
-/* ----------------------- Preference strings --------------------------- *\
+/* ----------------------- Preference strings --------------------------- */
 
 /* PreferencesWin.m */
 

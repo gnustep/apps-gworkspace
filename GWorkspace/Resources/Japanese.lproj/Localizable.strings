@@ -94,7 +94,7 @@
 "Logout" = "ログアウト";
 	
 	
-/* ----------------------- File Operations strings --------------------------- *\
+/* ----------------------- File Operations strings --------------------------- */
 
 /* GWorkspace.m */
 
@@ -156,21 +156,22 @@
 "Invalid char in name" = "名前に使用できない文字が含まれています";
 
 
-/* ----------------------------- Viewers Strings ----------------------------- *\
+/* ----------------------------- Viewers Strings ----------------------------- */
 
 /* GWViewer.m */
 "free" = "フリー";
 
 /* GWViewersManager.m */
 
-"Are you sure you want to open" = "Are you sure you want to open";
-"items?" = "items?";
+"Are you sure you want to open" = "本当に開きますか";
+"items?" = "箇条?";
 "error" = "エラー";
 "Can't open " = "開けません ";
 
 
-/* ---------------------------- Inspectors strings --------------------------- *\
+/* ---------------------------- Inspectors strings --------------------------- */
 
+"Items" = "箇条";
 
 /* Attributes.m */
 
@@ -230,7 +231,7 @@
 "Set Default" = "Set Default";
 
 
-/* ----------------------- Finder strings --------------------------- *\
+/* ----------------------- Finder strings --------------------------- */
 
 /* Finder.m */
 

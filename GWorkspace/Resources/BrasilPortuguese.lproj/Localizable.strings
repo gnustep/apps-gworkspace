@@ -1,6 +1,6 @@
 ﻿/* Tradução feita por Tiago Ribeiro <tiagor@mac.com> */
 
-/* ----------------------- menu strings --------------------------- *\
+/* ----------------------- menu strings --------------------------- */
 /* main.m */
 
 "Info" = "Info";
@@ -61,7 +61,7 @@
 	
 	
 	
-/* ----------------------- File Operations strings --------------------------- *\
+/* ----------------------- File Operations strings --------------------------- */
 
 /* GWorkspace.m */
 
@@ -100,7 +100,7 @@
 "Destroying" = "Apagando";
 "File Operation Completed" = "Operação de Arquivos Completada";
 "Backgrounder connection died!" = "Conexção de segundo plano interrompida"; /* R// Jarl */
-"Some items have the same name;\ndo you want to substitute them?" = "Alguns ítems têm o mesmo\nnome; Deseja substituí-los?";
+"Some items have the same name;\ndo you want to substitute them?" = "Alguns ítens têm o mesmo\nnome; Deseja substituí-los?";
 "Error" = "Erro";
 "File Operation Error!" = "Erro na Operação de Arquivos!";
 
@@ -114,7 +114,9 @@
 "Invalid char in name" = "Caractere inválido no nome";
 
 
-/* ----------------------- Inspectors strings --------------------------- *\
+/* ----------------------- Inspectors strings --------------------------- */
+
+"Items" = "Itens";
 
 /* InspectorsWin.m */
 
@@ -207,7 +209,7 @@
 "Other" = "Outros";
 
 
-/* ----------------------- Processes strings --------------------------- *\
+/* ----------------------- Processes strings --------------------------- */
 
 /* Processes.m */
 
@@ -224,13 +226,13 @@
 "Background" = "Segundo Plano"; /* R// revisar */
 
 
-/* ----------------------- Finder strings --------------------------- *\
+/* ----------------------- Finder strings --------------------------- */
 
 /* Finder.m */
 
 "Finder" = "Buscador";
 "Find items with names that match" = "Buscar ítens com nomes que combinem";
-"Find items with contents that match" = "Buscar ítems com conteúdo que combine";
+"Find items with contents that match" = "Buscar ítens com conteúdo que combine";
 "No selection!" = "Não há nenhuma seleção!";
 "No arguments!" = "Não há argumentos!";
 
@@ -249,7 +251,7 @@
 "This object is already present in this layer!" = "Este objeto já está nesta camada!";
 	
 			
-/* ----------------------- Preference strings --------------------------- *\
+/* ----------------------- Preference strings --------------------------- */
 
 /* PreferencesWin.m */
 

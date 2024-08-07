@@ -1,4 +1,4 @@
-﻿/* ----------------------- menu strings --------------------------- *\
+﻿/* ----------------------- menu strings --------------------------- */
 /* main.m */
 
 "Info" = "Info";
@@ -80,7 +80,7 @@
 	
 	
 	
-/* ----------------------- File Operations strings --------------------------- *\
+/* ----------------------- File Operations strings --------------------------- */
 
 /* GWorkspace.m */
 
@@ -134,7 +134,9 @@
 "Invalid char in name" = "Ugyldig tegn i navnet";
 
 
-/* ----------------------- Inspectors strings --------------------------- *\
+/* ----------------------- Inspectors strings --------------------------- */
+
+"Items" = "Elementer";
 
 /* InspectorsWin.m */
 
@@ -229,7 +231,7 @@
 "Other" = "Andre";
 
 
-/* ----------------------- Processes strings --------------------------- *\
+/* ----------------------- Processes strings --------------------------- */
 
 /* Processes.m */
 
@@ -246,7 +248,7 @@
 "Background" = "Bakgrunn";
 
 
-/* ----------------------- Finder strings --------------------------- *\
+/* ----------------------- Finder strings --------------------------- */
 
 /* Finder.m */
 
@@ -257,7 +259,7 @@
 "No arguments!" = "Inge argumenter.";
 
 
-/* ----------------------- Fiend strings --------------------------- *\
+/* ----------------------- Fiend strings --------------------------- */
 
 /* Fiend.m */
 
@@ -271,7 +273,7 @@
 "This object is already present in this layer!" = "Dette objektet eksisterer allerede i dette skrivebordet.";
 	
 			
-/* ----------------------- Preferences strings --------------------------- *\
+/* ----------------------- Preferences strings --------------------------- */
 
 /* PreferencesWin.m */
 

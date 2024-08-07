@@ -61,7 +61,7 @@
 "Quit" = "Kilépés";
 	
 	
-/* ----------------------- File Operations strings --------------------------- *\
+/* ----------------------- File Operations strings --------------------------- */
 
 /* GWorkspace.m */
 
@@ -114,7 +114,9 @@
 "Invalid char in name" = "A név nem elfogadható írásjelet tartalmaz";
 
 
-/* ----------------------- Inspectors strings --------------------------- *\
+/* ----------------------- Inspectors strings --------------------------- */
+
+"Items" = "Elemek";
 
 /* InspectorsWin.m */
 
@@ -206,7 +208,7 @@
 "Other" = "Egyéb";
 
 
-/* ----------------------- Processes strings --------------------------- *\
+/* ----------------------- Processes strings --------------------------- */
 
 /* Processes.m */
 
@@ -223,7 +225,7 @@
 "Background" = "Háttér";
 
 
-/* ----------------------- Finder strings --------------------------- *\
+/* ----------------------- Finder strings --------------------------- */
 
 /* Finder.m */
 
@@ -234,7 +236,7 @@
 "No arguments!" = "Nincs semmi megadva!";
 
 
-/* ----------------------- Fiend strings --------------------------- *\
+/* ----------------------- Fiend strings --------------------------- */
 
 /* Fiend.m */
 
@@ -248,7 +250,7 @@
 "This object is already present in this layer!" = "Ez az elem már szerepel ezen a munkaasztalon!";
 	
 			
-/* ----------------------- Preferences strings --------------------------- *\
+/* ----------------------- Preferences strings --------------------------- */
 
 /* PreferencesWin.m */
 

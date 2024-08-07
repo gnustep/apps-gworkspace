@@ -1,6 +1,6 @@
 ﻿/* Traduzido a partir do Español, espero que esteja bom */
 
-/* ----------------------- menu strings --------------------------- *\
+/* ----------------------- menu strings --------------------------- */
 /* main.m */
 
 "Info" = "Informações";
@@ -61,7 +61,7 @@
 	
 	
 	
-/* ----------------------- File Operations strings --------------------------- *\
+/* ----------------------- File Operations strings --------------------------- */
 
 /* GWorkspace.m */
 
@@ -114,7 +114,9 @@
 "Invalid char in name" = "Caractere não válido no nome";
 
 
-/* ----------------------- Inspectors strings --------------------------- *\
+/* ----------------------- Inspectors strings --------------------------- */
+
+"Items" = "Itens";
 
 /* InspectorsWin.m */
 
@@ -234,7 +236,7 @@
 "No arguments!" = "Sem argumentos!";
 
 
-/* ----------------------- Fiend strings --------------------------- *\
+/* ----------------------- Fiend strings --------------------------- */
 
 /* Fiend.m - Como traduzir Fiend? */
 
@@ -248,7 +250,7 @@
 "This object is already present in this layer!" = "Este objeto já está nesta camada!"
 	
 			
-/* ----------------------- Preference strings --------------------------- *\
+/* ----------------------- Preference strings --------------------------- */
 
 /* PreferencesWin.m */
 

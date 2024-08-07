@@ -113,7 +113,7 @@
 "Logout" = "Adiaŭu";	
 	
 	
-/* ----------------------- File Operations strings --------------------------- *\
+/* ----------------------- File Operations strings --------------------------- */
 
 /* GWorkspace.m */
 
@@ -225,7 +225,9 @@
 "Invalid char in name" = "Malvalida signo en nomo";
 
 
-/* ----------------------- Inspectors strings --------------------------- *\
+/* ----------------------- Inspectors strings --------------------------- */
+
+"Items" = "Anoj";
 
 /* InspectorsWin.m */
 
@@ -324,7 +326,7 @@
 "Background" = "Fono";
 
 
-/* ----------------------- Finder strings --------------------------- *\
+/* ----------------------- Finder strings --------------------------- */
 
 /* Finder.m */
 
@@ -335,7 +337,7 @@
 "No arguments!" = "Neniuj operandoj.";
 
 
-/* ----------------------- Fiend strings --------------------------- *\
+/* ----------------------- Fiend strings --------------------------- */
 
 /* Fiend.m */
 
@@ -348,7 +350,7 @@
 "You can't dock multiple paths!" = "Vi ne povas doki pluroblajn dosierindikojn";
 "This object is already present in this layer!" = "Ĉi tiu objekto jam ekzistas sur tiu tabulo.";
 			
-/* ----------------------- Preferences strings --------------------------- *\
+/* ----------------------- Preferences strings --------------------------- */
 
 /* PreferencesWin.m */
 

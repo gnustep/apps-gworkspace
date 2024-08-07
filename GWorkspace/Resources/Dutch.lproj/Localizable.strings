@@ -116,7 +116,9 @@
 "Invalid char in name" = "Er is een ongeldig karakter in de naam";
 
 
-/* ----------------------- Inspectors strings --------------------------- *\
+/* ----------------------- Inspectors strings --------------------------- */
+
+"Items" = "Items";
 
 /* InspectorsWin.m */
 
@@ -205,7 +207,7 @@
 "Other" = "Andere";
 
 
-/* ----------------------- Processes strings --------------------------- *\
+/* ----------------------- Processes strings --------------------------- */
 
 /* Processes.m */
 
@@ -222,7 +224,7 @@
 "Background" = "Achtergrond";
 
 
-/* ----------------------- Finder strings --------------------------- *\
+/* ----------------------- Finder strings --------------------------- */
 
 /* Finder.m */
 
@@ -233,7 +235,7 @@
 "No arguments!" = "Geen argumenten!";
 
 
-/* ----------------------- Fiend strings --------------------------- *\
+/* ----------------------- Fiend strings --------------------------- */
 
 /* Fiend.m */
 
@@ -247,7 +249,7 @@
 "This object is already present in this layer!" = "Dit object zit al in de laag!"; 
 	
 			
-/* ----------------------- Preferences strings --------------------------- *\
+/* ----------------------- Preferences strings --------------------------- */
 
 /* PreferencesWin.m */
 

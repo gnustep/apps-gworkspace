@@ -1,4 +1,4 @@
-﻿/* ----------------------- menu strings --------------------------- *\
+﻿/* ----------------------- menu strings --------------------------- */
 /* main.m */
 
 "Info" = "Info";
@@ -57,7 +57,7 @@
 
 "Quit" = "Ieºi";
 
-/* ----------------------- File Operations strings --------------------------- *\
+/* ----------------------- File Operations strings --------------------------- */
 
 /* GWorkspace.m */
 
@@ -110,7 +110,9 @@
 "Invalid char in name" = "Caracter invalid în nume";
 
 
-/* ----------------------- Inspectors strings --------------------------- *\
+/* ----------------------- Inspectors strings --------------------------- */
+
+"Items" = "Elemente";
 
 /* InspectorsWin.m */
 

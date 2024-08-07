@@ -172,13 +172,14 @@
 /* GWViewersManager.m */
 
 "Are you sure you want to open" = "¿Seguro que desea abrir";
-"items?" = "articulos?";
+"items?" = "elementos?";
 "error" = "error";
 "Can't open " = "No se puede abrir ";
 
 
 /* ----------------------- Inspectors strings --------------------------- */
 
+"Items" = "Elementos";
 
 /* Attributes.m */
 

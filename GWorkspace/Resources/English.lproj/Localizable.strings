@@ -94,7 +94,7 @@
 "Logout" = "Logout";
 	
 	
-/* ----------------------- File Operations strings --------------------------- *\
+/* ----------------------- File Operations strings --------------------------- */
 
 /* GWorkspace.m */
 
@@ -156,7 +156,7 @@
 "Invalid char in name" = "Invalid character in name";
 
 
-/* ----------------------------- Viewers Strings ----------------------------- *\
+/* ----------------------------- Viewers Strings ----------------------------- */
 
 /* GWViewer.m */
 "free" = "free";
@@ -169,8 +169,9 @@
 "Can't open " = "Can't open ";
 
 
-/* ---------------------------- Inspectors strings --------------------------- *\
+/* ---------------------------- Inspectors strings --------------------------- */
 
+"Items" = "Items";
 
 /* Attributes.m */
 
@@ -230,7 +231,7 @@
 "Set Default" = "Set Default";
 
 
-/* ----------------------- Finder strings --------------------------- *\
+/* ----------------------- Finder strings --------------------------- */
 
 /* Finder.m */
 
@@ -304,7 +305,7 @@
 "includes"="includes";
 
 
-/* ----------------------- Fiend strings --------------------------- *\
+/* ----------------------- Fiend strings --------------------------- */
 
 /* Fiend.m */
 
@@ -318,7 +319,7 @@
 "This object is already present in this layer!" = "This object is already present in this layer!";
 	
 			
-/* ----------------------- Preference strings --------------------------- *\
+/* ----------------------- Preference strings --------------------------- */
 
 /* PreferencesWin.m */
 

@@ -1,8 +1,8 @@
 /* Contents.m
  *  
- * Copyright (C) 2004-2023 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2024 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Author: Enrico Sersale
  * Author: Riccardo Mottola <rm@gnu.org>
  *
  * Date: January 2004
@@ -180,9 +180,11 @@ static NSString *nibName = @"Contents";
     
   } else {
     NSImage *icon = [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: ICNSIZE];
-    NSString *items = NSLocalizedString(@"items", @"");
+    NSString *items;
     
-    items = [NSString stringWithFormat: @"%lu %@", (unsigned long)[paths count], items];
+    items = [NSString stringWithFormat: @"%lu %@",
+                      (unsigned long)[paths count],
+                      NSLocalizedString(@"Items", @"")];
 		[titleField setStringValue: items];  
     [iconView setImage: icon];
     
