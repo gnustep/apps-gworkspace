@@ -76,92 +76,95 @@ static BOOL sizeStop = NO;
 {
   self = [super init];
   
-  if (self) {
-    NSBundle *bundle = [NSBundle bundleForClass: [insp class]];
-    NSString *imagepath;
+  if (self)
+    {
+      NSBundle *bundle = [NSBundle bundleForClass: [insp class]];
+      NSString *imagepath;
 
-    if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
-      NSLog(@"failed to load %@!", nibName);
-      DESTROY (self);
-      return self;
-    } 
+      if ([NSBundle loadNibNamed: nibName owner: self] == NO)
+        {
+          NSLog(@"failed to load %@!", nibName);
+          DESTROY (self);
+          return self;
+        } 
 
-    RETAIN (mainBox);
-    RELEASE (win);
+      RETAIN (mainBox);
+      RELEASE (win);
 
-    inspector = insp;
-    [iconView setInspector: inspector];
-		insppaths = nil;
-		attributes = nil;    
-    currentPath = nil;
-    sizer = nil;
+      inspector = insp;
+      [iconView setInspector: inspector];
+      insppaths = nil;
+      attributes = nil;    
+      currentPath = nil;
+      sizer = nil;
     
-    fm = [NSFileManager defaultManager];	
-    nc = [NSNotificationCenter defaultCenter];
+      fm = [NSFileManager defaultManager];	
+      nc = [NSNotificationCenter defaultCenter];
     
-    autocalculate = [[NSUserDefaults standardUserDefaults] boolForKey: @"auto_calculate_sizes"];
-    RETAIN (calculateButt);
+      autocalculate = [[NSUserDefaults standardUserDefaults] boolForKey: @"auto_calculate_sizes"];
+      RETAIN (calculateButt);
     
-    if (autocalculate) {
-      [calculateButt removeFromSuperview];
-    }
+      if (autocalculate)
+        {
+          [calculateButt removeFromSuperview];
+        }
         
-    imagepath = [bundle pathForResource: @"switchOn" ofType: @"tiff"];
-    onImage = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
-    imagepath = [bundle pathForResource: @"switchOff" ofType: @"tiff"];
-    offImage = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
-    imagepath = [bundle pathForResource: @"switchMultiple" ofType: @"tiff"];
-    multipleImage = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
+      imagepath = [bundle pathForResource: @"switchOn" ofType: @"tiff"];
+      onImage = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
+      imagepath = [bundle pathForResource: @"switchOff" ofType: @"tiff"];
+      offImage = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
+      imagepath = [bundle pathForResource: @"switchMultiple" ofType: @"tiff"];
+      multipleImage = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
 
-    [ureadbutt setImage: offImage];
-    [ureadbutt setAlternateImage: onImage];           
-    [ureadbutt setTag: SINGLE];           
-    [greadbutt setImage: offImage];
-    [greadbutt setAlternateImage: onImage]; 
-    [greadbutt setTag: SINGLE];               
-    [oreadbutt setImage: offImage];
-    [oreadbutt setAlternateImage: onImage];  
-    [oreadbutt setTag: SINGLE];             
-    [uwritebutt setImage: offImage];
-    [uwritebutt setAlternateImage: onImage]; 
-    [uwritebutt setTag: SINGLE];              
-    [gwritebutt setImage: offImage];
-    [gwritebutt setAlternateImage: onImage]; 
-    [gwritebutt setTag: SINGLE];              
-    [owritebutt setImage: offImage];
-    [owritebutt setAlternateImage: onImage]; 
-    [owritebutt setTag: SINGLE];              
-    [uexebutt setImage: offImage];
-    [uexebutt setAlternateImage: onImage];   
-    [uexebutt setTag: SINGLE];             
-    [gexebutt setImage: offImage];
-    [gexebutt setAlternateImage: onImage];   
-    [gexebutt setTag: SINGLE];             
-    [oexebutt setImage: offImage];
-    [oexebutt setAlternateImage: onImage];     
-    [oexebutt setTag: SINGLE];       
+      [ureadbutt setImage: offImage];
+      [ureadbutt setAlternateImage: onImage];           
+      [ureadbutt setTag: SINGLE];           
+      [greadbutt setImage: offImage];
+      [greadbutt setAlternateImage: onImage]; 
+      [greadbutt setTag: SINGLE];               
+      [oreadbutt setImage: offImage];
+      [oreadbutt setAlternateImage: onImage];  
+      [oreadbutt setTag: SINGLE];             
+      [uwritebutt setImage: offImage];
+      [uwritebutt setAlternateImage: onImage]; 
+      [uwritebutt setTag: SINGLE];              
+      [gwritebutt setImage: offImage];
+      [gwritebutt setAlternateImage: onImage]; 
+      [gwritebutt setTag: SINGLE];              
+      [owritebutt setImage: offImage];
+      [owritebutt setAlternateImage: onImage]; 
+      [owritebutt setTag: SINGLE];              
+      [uexebutt setImage: offImage];
+      [uexebutt setAlternateImage: onImage];   
+      [uexebutt setTag: SINGLE];             
+      [gexebutt setImage: offImage];
+      [gexebutt setAlternateImage: onImage];   
+      [gexebutt setTag: SINGLE];             
+      [oexebutt setImage: offImage];
+      [oexebutt setAlternateImage: onImage];     
+      [oexebutt setTag: SINGLE];       
 
-    [revertButt setEnabled: NO];
-    [okButt setEnabled: NO];
+      [revertButt setEnabled: NO];
+      [okButt setEnabled: NO];
   
-    /* Internationalization */
-    [linkToLabel setStringValue: NSLocalizedString(@"Link to:", @"")];
-    [sizeLabel setStringValue: NSLocalizedString(@"Size:", @"")];
-    [calculateButt setTitle: NSLocalizedString(@"Calculate", @"")];
-    [ownerLabel setStringValue: NSLocalizedString(@"Owner:", @"")];
-    [groupLabel setStringValue: NSLocalizedString(@"Group:", @"")];
-    [changedDateBox setTitle: NSLocalizedString(@"Changed", @"")];
-    [permsBox setTitle: NSLocalizedString(@"Permissions", @"")];
-    [readLabel setStringValue: NSLocalizedString(@"Read", @"")];
-    [writeLabel setStringValue: NSLocalizedString(@"Write", @"")];
-    [executeLabel setStringValue: NSLocalizedString(@"Execute", @"")];
-    [uLabel setStringValue: NSLocalizedString(@"Owner_short", @"")];
-    [gLabel setStringValue: NSLocalizedString(@"Group", @"")];
-    [oLabel setStringValue: NSLocalizedString(@"Other", @"")];
-    [insideButt setTitle: NSLocalizedString(@"also apply to files inside selection", @"")];
-    [revertButt setTitle: NSLocalizedString(@"Revert", @"")];
-    [okButt setTitle: NSLocalizedString(@"OK", @"")];
-  } 
+      /* Internationalization */
+      [linkToLabel setStringValue: NSLocalizedString(@"Link to:", @"")];
+      [sizeLabel setStringValue: NSLocalizedString(@"Size:", @"")];
+      [calculateButt setTitle: NSLocalizedString(@"Calculate", @"")];
+      [ownerLabel setStringValue: NSLocalizedString(@"Owner:", @"")];
+      [groupLabel setStringValue: NSLocalizedString(@"Group:", @"")];
+      [changedDateBox setTitle: NSLocalizedString(@"Changed", @"")];
+      [permsBox setTitle: NSLocalizedString(@"Permissions", @"")];
+      [readLabel setStringValue: NSLocalizedString(@"Read", @"")];
+      [writeLabel setStringValue: NSLocalizedString(@"Write", @"")];
+      [executeLabel setStringValue: NSLocalizedString(@"Execute", @"")];
+      [uLabel setStringValue: NSLocalizedString(@"Owner_short", @"")];
+      [gLabel setStringValue: NSLocalizedString(@"Group", @"")];
+      [oLabel setStringValue: NSLocalizedString(@"Other", @"")];
+      [insideButt setTitle: NSLocalizedString(@"also apply to files inside selection", @"")];
+      [revertButt setTitle: NSLocalizedString(@"Revert", @"")];
+      [okButt setTitle: NSLocalizedString(@"OK", @"")];
+    } 
 		
   return self;
 }
@@ -361,26 +364,33 @@ static BOOL sizeStop = NO;
 
 - (IBAction)permsButtonsAction:(id)sender
 {
-	if (multiplePaths == YES) {
-		if ([sender state] == NSOffState) {
-			if ([sender tag] == MULTIPLE) {
-				[sender setImage: offImage];	
-				[sender setTag: SINGLE];	
-      }
-		} else {
-			if ([sender tag] == SINGLE) {
-				[sender setImage: multipleImage];
-				[sender setTag: MULTIPLE];	
-			}
-		}
-	}	
+  if (multiplePaths == YES)
+    {
+      if ([sender state] == NSOffState)
+        {
+          if ([sender tag] == MULTIPLE)
+            {
+              [sender setImage: offImage];	
+              [sender setTag: SINGLE];	
+            }
+        }
+      else
+        {
+          if ([sender tag] == SINGLE)
+            {
+              [sender setImage: multipleImage];
+              [sender setTag: MULTIPLE];	
+            }
+        }
+    }	
 
-	if ((iamRoot || isMyFile) == NO) {
-		return;
-	}
+  if ((iamRoot || isMyFile) == NO)
+    {
+      return;
+    }
 
-	[revertButt setEnabled: YES];	
-	[okButt setEnabled: YES];
+  [revertButt setEnabled: YES];	
+  [okButt setEnabled: YES];
 }
 
 - (IBAction)insideButtonAction:(id)sender
@@ -402,201 +412,219 @@ static BOOL sizeStop = NO;
 
   if (pathscount == 1)
     {
-		oldperms = [[attributes objectForKey: NSFilePosixPermissions] unsignedLongValue];
-		newperms = [self getPermissions: oldperms];		
-		attrs = [attributes mutableCopy];
-		[attrs setObject: [NSNumber numberWithInt: newperms] forKey: NSFilePosixPermissions];
-		[fm changeFileAttributes: attrs atPath: currentPath];	
-    RELEASE (attrs);
+      oldperms = [[attributes objectForKey: NSFilePosixPermissions] unsignedLongValue];
+      newperms = [self getPermissions: oldperms];		
+      attrs = [attributes mutableCopy];
+      [attrs setObject: [NSNumber numberWithInt: newperms] forKey: NSFilePosixPermissions];
+      [fm changeFileAttributes: attrs atPath: currentPath];	
+      RELEASE (attrs);
 
-		[fm fileExistsAtPath: currentPath isDirectory: &isdir];
+      [fm fileExistsAtPath: currentPath isDirectory: &isdir];
 
-		if (isdir && recursive) {
-			enumerator = [fm enumeratorAtPath: currentPath];
+      if (isdir && recursive)
+        {
+          enumerator = [fm enumeratorAtPath: currentPath];
       
-      while ((fpath = [enumerator nextObject])) {
-        CREATE_AUTORELEASE_POOL(arp);  
+          while ((fpath = [enumerator nextObject]))
+            {
+              CREATE_AUTORELEASE_POOL(arp);  
       
-				fpath = [currentPath stringByAppendingPathComponent: fpath];
-				attrs = [[fm fileAttributesAtPath: fpath traverseLink: NO] mutableCopy];
-				oldperms = [[attrs objectForKey: NSFilePosixPermissions] unsignedLongValue];	
-				newperms = [self getPermissions: oldperms];			
-				[attrs setObject: [NSNumber numberWithInt: newperms] forKey: NSFilePosixPermissions];
-				[fm changeFileAttributes: attrs atPath: fpath];
-        RELEASE (attrs);
+              fpath = [currentPath stringByAppendingPathComponent: fpath];
+              attrs = [[fm fileAttributesAtPath: fpath traverseLink: NO] mutableCopy];
+              oldperms = [[attrs objectForKey: NSFilePosixPermissions] unsignedLongValue];	
+              newperms = [self getPermissions: oldperms];			
+              [attrs setObject: [NSNumber numberWithInt: newperms] forKey: NSFilePosixPermissions];
+              [fm changeFileAttributes: attrs atPath: fpath];
+              RELEASE (attrs);
         
-        RELEASE (arp);
-      }
+              RELEASE (arp);
+            }
                   
-			ASSIGN (attributes, [fm fileAttributesAtPath: currentPath traverseLink: NO]);	
-			[self setPermissions: 0 isActive: YES];
+          ASSIGN (attributes, [fm fileAttributesAtPath: currentPath traverseLink: NO]);	
+          [self setPermissions: 0 isActive: YES];
 
-		} else {
-			ASSIGN (attributes, [fm fileAttributesAtPath: currentPath traverseLink: NO]);	
-			newperms = [[attributes objectForKey: NSFilePosixPermissions] unsignedLongValue];				
-			[self setPermissions: newperms isActive: YES];
-		}
-	
-	} else {
-		for (i = 0; i < [insppaths count]; i++) {
-			path = [insppaths objectAtIndex: i];			
- 			attrs = [[fm fileAttributesAtPath: path traverseLink: NO] mutableCopy];
-			oldperms = [[attrs objectForKey: NSFilePosixPermissions] unsignedLongValue];	
-			newperms = [self getPermissions: oldperms];			
-			[attrs setObject: [NSNumber numberWithInt: newperms] forKey: NSFilePosixPermissions];
-			[fm changeFileAttributes: attrs atPath: path];	
-      RELEASE (attrs);			
-
-			[fm fileExistsAtPath: path isDirectory: &isdir];
-     
-			if (isdir && recursive) {
-				enumerator = [fm enumeratorAtPath: path];
-        
-        while ((fpath = [enumerator nextObject])) {
-          CREATE_AUTORELEASE_POOL(arp);  
-
-					fpath = [path stringByAppendingPathComponent: fpath];
-					attrs = [[fm fileAttributesAtPath: fpath traverseLink: NO] mutableCopy];
-					oldperms = [[attrs objectForKey: NSFilePosixPermissions] unsignedLongValue];	
-					newperms = [self getPermissions: oldperms];			
-					[attrs setObject: [NSNumber numberWithInt: newperms] forKey: NSFilePosixPermissions];
-					[fm changeFileAttributes: attrs atPath: fpath];
-					RELEASE (attrs);
-
-          RELEASE (arp);
         }
-			}
-		}
-		
-		ASSIGN (attributes, [fm fileAttributesAtPath: currentPath traverseLink: NO]);	
-		[self setPermissions: 0 isActive: YES];
-	}
+      else
+        {
+          ASSIGN (attributes, [fm fileAttributesAtPath: currentPath traverseLink: NO]);	
+          newperms = [[attributes objectForKey: NSFilePosixPermissions] unsignedLongValue];				
+          [self setPermissions: newperms isActive: YES];
+        }	
+    }
+  else
+    {
+      for (i = 0; i < [insppaths count]; i++)
+        {
+          path = [insppaths objectAtIndex: i];			
+          attrs = [[fm fileAttributesAtPath: path traverseLink: NO] mutableCopy];
+          oldperms = [[attrs objectForKey: NSFilePosixPermissions] unsignedLongValue];	
+          newperms = [self getPermissions: oldperms];			
+          [attrs setObject: [NSNumber numberWithInt: newperms] forKey: NSFilePosixPermissions];
+          [fm changeFileAttributes: attrs atPath: path];	
+          RELEASE (attrs);			
 
-	[okButt setEnabled: NO];
-	[revertButt setEnabled: NO];
+          [fm fileExistsAtPath: path isDirectory: &isdir];
+     
+          if (isdir && recursive)
+            {
+              enumerator = [fm enumeratorAtPath: path];
+        
+              while ((fpath = [enumerator nextObject]))
+                {
+                  CREATE_AUTORELEASE_POOL(arp);  
+
+                  fpath = [path stringByAppendingPathComponent: fpath];
+                  attrs = [[fm fileAttributesAtPath: fpath traverseLink: NO] mutableCopy];
+                  oldperms = [[attrs objectForKey: NSFilePosixPermissions] unsignedLongValue];	
+                  newperms = [self getPermissions: oldperms];			
+                  [attrs setObject: [NSNumber numberWithInt: newperms] forKey: NSFilePosixPermissions];
+                  [fm changeFileAttributes: attrs atPath: fpath];
+                  RELEASE (attrs);
+
+                  RELEASE (arp);
+                }
+            }
+        }
+		
+      ASSIGN (attributes, [fm fileAttributesAtPath: currentPath traverseLink: NO]);	
+      [self setPermissions: 0 isActive: YES];
+    }
+
+  [okButt setEnabled: NO];
+  [revertButt setEnabled: NO];
 }
 
 - (IBAction)revertToOldPermissions:(id)sender
 {
-	if(pathscount == 1) {
-		unsigned long perms = [[attributes objectForKey: NSFilePosixPermissions] unsignedLongValue];
-		[self setPermissions: perms isActive: YES];	
-	} else {
-		[self setPermissions: 0 isActive: YES];
-	}
-	
-	[revertButt setEnabled: NO];
-	[okButt setEnabled: NO];
+  if(pathscount == 1)
+    {
+      unsigned long perms = [[attributes objectForKey: NSFilePosixPermissions] unsignedLongValue];
+      [self setPermissions: perms isActive: YES];	
+    }
+  else
+    {
+      [self setPermissions: 0 isActive: YES];
+    }
+
+  [revertButt setEnabled: NO];
+  [okButt setEnabled: NO];
 }
 
 - (void)setPermissions:(unsigned long)perms 
               isActive:(BOOL)active
 {
-	if (active == NO) {
-		[ureadbutt setEnabled: NO];						
-		[uwritebutt setEnabled: NO];	
-		[uexebutt setEnabled: NO];	
-
-	#ifndef __WIN32__
-		[greadbutt setEnabled: NO];						
-		[gwritebutt setEnabled: NO];
-		[gexebutt setEnabled: NO];			
-		[oreadbutt setEnabled: NO];						
-		[owritebutt setEnabled: NO];
-		[oexebutt setEnabled: NO];	
-	#endif
-								
-	} else {
-		[ureadbutt setEnabled: YES];						
-		[uwritebutt setEnabled: YES];		
-		[uexebutt setEnabled: YES];	
-
-	#ifndef __WIN32__
-		[greadbutt setEnabled: YES];						
-		[gwritebutt setEnabled: YES];		
-		[gexebutt setEnabled: YES];	
-		[oreadbutt setEnabled: YES];						
-		[owritebutt setEnabled: YES];			
-		[oexebutt setEnabled: YES];	
-	#endif
-	}
-
-	if (perms == 0) {
-		multiplePaths = YES;
-		[ureadbutt setImage: multipleImage];
-		[ureadbutt setState: NSOffState];
-    [ureadbutt setTag: MULTIPLE];           
-		[uwritebutt setImage: multipleImage];
-		[uwritebutt setState: NSOffState];
-    [uwritebutt setTag: MULTIPLE];               
-		[uexebutt setImage: multipleImage];
-		[uexebutt setState: NSOffState];	
-    [uexebutt setTag: MULTIPLE];           
-
-	#ifndef __WIN32__
-		[greadbutt setImage: multipleImage];
-		[greadbutt setState: NSOffState];
-    [greadbutt setTag: MULTIPLE];               
-		[gwritebutt setImage: multipleImage];
-		[gwritebutt setState: NSOffState];
-    [gwritebutt setTag: MULTIPLE];               
-		[gexebutt setImage: multipleImage];
-		[gexebutt setState: NSOffState];
-    [gexebutt setTag: MULTIPLE];               
-		[oreadbutt setImage: multipleImage];
-		[oreadbutt setState: NSOffState];
-    [oreadbutt setTag: MULTIPLE];               
-		[owritebutt setImage: multipleImage];
-		[owritebutt setState: NSOffState];
-    [owritebutt setTag: MULTIPLE];               
-		[oexebutt setImage: multipleImage];
-		[oexebutt setState: NSOffState];
-    [oexebutt setTag: MULTIPLE];           
-	#endif
-	
-		return;
-	} else {
-		multiplePaths = NO;
-		[ureadbutt setImage: offImage];
-    [ureadbutt setTag: SINGLE];               
-		[uwritebutt setImage: offImage];
-    [uwritebutt setTag: SINGLE];               
-		[uexebutt setImage: offImage];	
-    [uexebutt setTag: SINGLE];           
-
-	#ifndef __WIN32__
-		[greadbutt setImage: offImage];
-    [greadbutt setTag: SINGLE];               
-		[gwritebutt setImage: offImage];
-    [gwritebutt setTag: SINGLE];               
-		[gexebutt setImage: offImage];
-    [gexebutt setTag: SINGLE];               
-		[oreadbutt setImage: offImage];
-    [oreadbutt setTag: SINGLE];               
-		[owritebutt setImage: offImage];
-    [owritebutt setTag: SINGLE];               
-		[oexebutt setImage: offImage];
-    [oexebutt setTag: SINGLE];           
-    
-	#endif
-	}
-
-#define SET_BUTTON_STATE(b, v) { \
-if ((perms & v) == v) [b setState: NSOnState]; \
-else [b setState: NSOffState]; \
-}
-
-	SET_BUTTON_STATE (ureadbutt, S_IRUSR);				
-	SET_BUTTON_STATE (uwritebutt, S_IWUSR);
-	SET_BUTTON_STATE (uexebutt, S_IXUSR);
+  if (active == NO)
+    {
+      [ureadbutt setEnabled: NO];						
+      [uwritebutt setEnabled: NO];	
+      [uexebutt setEnabled: NO];	
 
 #ifndef __WIN32__
-	SET_BUTTON_STATE (greadbutt, S_IRGRP);
-	SET_BUTTON_STATE (gwritebutt, S_IWGRP);
-	SET_BUTTON_STATE (gexebutt, S_IXGRP);
-	SET_BUTTON_STATE (oreadbutt, S_IROTH);
-	SET_BUTTON_STATE (owritebutt, S_IWOTH);
-	SET_BUTTON_STATE (oexebutt, S_IXOTH);
+      [greadbutt setEnabled: NO];						
+      [gwritebutt setEnabled: NO];
+      [gexebutt setEnabled: NO];			
+      [oreadbutt setEnabled: NO];						
+      [owritebutt setEnabled: NO];
+      [oexebutt setEnabled: NO];	
+#endif
+								
+    }
+  else
+    {
+      [ureadbutt setEnabled: YES];						
+      [uwritebutt setEnabled: YES];		
+      [uexebutt setEnabled: YES];	
+
+#ifndef __WIN32__
+      [greadbutt setEnabled: YES];						
+      [gwritebutt setEnabled: YES];		
+      [gexebutt setEnabled: YES];	
+      [oreadbutt setEnabled: YES];						
+      [owritebutt setEnabled: YES];			
+      [oexebutt setEnabled: YES];	
+#endif
+    }
+
+  if (perms == 0)
+    {
+      multiplePaths = YES;
+      [ureadbutt setImage: multipleImage];
+      [ureadbutt setState: NSOffState];
+      [ureadbutt setTag: MULTIPLE];           
+      [uwritebutt setImage: multipleImage];
+      [uwritebutt setState: NSOffState];
+      [uwritebutt setTag: MULTIPLE];               
+      [uexebutt setImage: multipleImage];
+      [uexebutt setState: NSOffState];	
+      [uexebutt setTag: MULTIPLE];           
+
+#ifndef __WIN32__
+      [greadbutt setImage: multipleImage];
+      [greadbutt setState: NSOffState];
+      [greadbutt setTag: MULTIPLE];               
+      [gwritebutt setImage: multipleImage];
+      [gwritebutt setState: NSOffState];
+      [gwritebutt setTag: MULTIPLE];               
+      [gexebutt setImage: multipleImage];
+      [gexebutt setState: NSOffState];
+      [gexebutt setTag: MULTIPLE];               
+      [oreadbutt setImage: multipleImage];
+      [oreadbutt setState: NSOffState];
+      [oreadbutt setTag: MULTIPLE];               
+      [owritebutt setImage: multipleImage];
+      [owritebutt setState: NSOffState];
+      [owritebutt setTag: MULTIPLE];               
+      [oexebutt setImage: multipleImage];
+      [oexebutt setState: NSOffState];
+      [oexebutt setTag: MULTIPLE];           
+#endif
+	
+      return;
+    }
+  else
+    {
+      multiplePaths = NO;
+      [ureadbutt setImage: offImage];
+      [ureadbutt setTag: SINGLE];               
+      [uwritebutt setImage: offImage];
+      [uwritebutt setTag: SINGLE];               
+      [uexebutt setImage: offImage];	
+      [uexebutt setTag: SINGLE];           
+
+#ifndef __WIN32__
+      [greadbutt setImage: offImage];
+      [greadbutt setTag: SINGLE];               
+      [gwritebutt setImage: offImage];
+      [gwritebutt setTag: SINGLE];               
+      [gexebutt setImage: offImage];
+      [gexebutt setTag: SINGLE];               
+      [oreadbutt setImage: offImage];
+      [oreadbutt setTag: SINGLE];               
+      [owritebutt setImage: offImage];
+      [owritebutt setTag: SINGLE];               
+      [oexebutt setImage: offImage];
+      [oexebutt setTag: SINGLE];           
+    
+#endif
+    }
+
+#define SET_BUTTON_STATE(b, v)                          \
+  {                                                     \
+    if ((perms & v) == v) [b setState: NSOnState];      \
+    else [b setState: NSOffState];                      \
+  }
+
+  SET_BUTTON_STATE (ureadbutt, S_IRUSR);				
+  SET_BUTTON_STATE (uwritebutt, S_IWUSR);
+  SET_BUTTON_STATE (uexebutt, S_IXUSR);
+
+#ifndef __WIN32__
+  SET_BUTTON_STATE (greadbutt, S_IRGRP);
+  SET_BUTTON_STATE (gwritebutt, S_IWGRP);
+  SET_BUTTON_STATE (gexebutt, S_IXGRP);
+  SET_BUTTON_STATE (oreadbutt, S_IROTH);
+  SET_BUTTON_STATE (owritebutt, S_IWOTH);
+  SET_BUTTON_STATE (oexebutt, S_IXOTH);
 #endif
 }
 
@@ -604,36 +632,42 @@ else [b setState: NSOffState]; \
 {
   unsigned long perms = 0;
 
-#define GET_BUTTON_STATE(b, v) { \
-if ([b state] == NSOnState) { \
-perms |= v; \
-} else { \
-if ((oldperms & v) == v) { \
-if ([b tag] == MULTIPLE) perms |= v; \
-} } \
-}
+#define GET_BUTTON_STATE(b, v)                          \
+  {                                                     \
+    if ([b state] == NSOnState)                         \
+      {                                                 \
+        perms |= v;                                     \
+      }                                                 \
+    else                                                \
+      {                                                 \
+        if ((oldperms & v) == v)                        \
+          {                                             \
+            if ([b tag] == MULTIPLE) perms |= v;        \
+          }                                             \
+      }                                                 \
+  }
 
-	GET_BUTTON_STATE (ureadbutt, S_IRUSR);
-	GET_BUTTON_STATE (uwritebutt, S_IWUSR);
-	GET_BUTTON_STATE (uexebutt, S_IXUSR);
+  GET_BUTTON_STATE (ureadbutt, S_IRUSR);
+  GET_BUTTON_STATE (uwritebutt, S_IWUSR);
+  GET_BUTTON_STATE (uexebutt, S_IXUSR);
 
 #ifndef __WIN32__	
-	if ((oldperms & S_ISUID) == S_ISUID) perms |= S_ISUID;
+  if ((oldperms & S_ISUID) == S_ISUID) perms |= S_ISUID;
 
-	GET_BUTTON_STATE (greadbutt, S_IRGRP);
-	GET_BUTTON_STATE (gwritebutt, S_IWGRP);
-	GET_BUTTON_STATE (gexebutt, S_IXGRP);
+  GET_BUTTON_STATE (greadbutt, S_IRGRP);
+  GET_BUTTON_STATE (gwritebutt, S_IWGRP);
+  GET_BUTTON_STATE (gexebutt, S_IXGRP);
 		
-	if ((oldperms & S_ISGID) == S_ISGID) perms |= S_ISGID;
+  if ((oldperms & S_ISGID) == S_ISGID) perms |= S_ISGID;
 
-	GET_BUTTON_STATE (oreadbutt, S_IROTH);
-	GET_BUTTON_STATE (owritebutt, S_IWOTH);
-	GET_BUTTON_STATE (oexebutt, S_IXOTH);
+  GET_BUTTON_STATE (oreadbutt, S_IROTH);
+  GET_BUTTON_STATE (owritebutt, S_IWOTH);
+  GET_BUTTON_STATE (oexebutt, S_IXOTH);
 		
-	if ((oldperms & S_ISVTX) == S_ISVTX) perms |= S_ISVTX;
+  if ((oldperms & S_ISVTX) == S_ISVTX) perms |= S_ISVTX;
 #endif
 
-	return perms;
+  return perms;
 }
 
 - (void)watchedPathDidChange:(NSDictionary *)info
@@ -643,26 +677,34 @@ if ([b tag] == MULTIPLE) perms |= v; \
 - (void)setCalculateSizes:(BOOL)value
 {
   autocalculate = value;
-  
-  if (autocalculate) {
-    if ([calculateButt superview]) {
-      [calculateButt removeFromSuperview];
+
+  if (autocalculate)
+    {
+      if ([calculateButt superview])
+        {
+          [calculateButt removeFromSuperview];
+        }
     }
-  } else {
-    if ([calculateButt superview] == nil) {
-      [mainBox addSubview: calculateButt];
+  else
+    {
+      if ([calculateButt superview] == nil)
+        {
+          [mainBox addSubview: calculateButt];
+        }
     }
-  }
 }
 
 - (IBAction)calculateSizes:(id)sender
 {
-  if (sizer == nil) {
-    [self startSizer];
-  } else {
-    [sizeField setStringValue: @"--"]; 
-    [sizer computeSizeOfPaths: insppaths];
-  }
+  if (sizer == nil)
+    {
+      [self startSizer];
+    }
+  else
+    {
+      [sizeField setStringValue: @"--"]; 
+      [sizer computeSizeOfPaths: insppaths];
+    }
   [calculateButt setEnabled: NO];
 }
 
@@ -716,21 +758,23 @@ if ([b tag] == MULTIPLE) perms |= v; \
 
 - (void)setSizer:(id)anObject
 {
-  if (sizer == nil) {
-    [anObject setProtocolForProxy: @protocol(SizerProtocol)];
-    sizer = (id <SizerProtocol>)anObject;
-    RETAIN (sizer);
-    if (insppaths) {
-      sizeStop = YES;
-      [sizeField setStringValue: @"--"];
-      [sizer computeSizeOfPaths: insppaths];
+  if (sizer == nil)
+    {
+      [anObject setProtocolForProxy: @protocol(SizerProtocol)];
+      sizer = (id <SizerProtocol>)anObject;
+      RETAIN (sizer);
+      if (insppaths)
+        {
+          sizeStop = YES;
+          [sizeField setStringValue: @"--"];
+          [sizer computeSizeOfPaths: insppaths];
+        }
     }
-  }
 }
 
 - (void)sizeReady:(NSString *)sizeStr
 {
-	[sizeField setStringValue: sizeStr]; 
+  [sizeField setStringValue: sizeStr]; 
 }
 
 - (void)updateDefaults
@@ -775,12 +819,13 @@ if ([b tag] == MULTIPLE) perms |= v; \
 {
   self = [super init];
   
-  if (self) {
-    id attrs = (id)[conn rootProxy];
-    [attrs setProtocolForProxy: @protocol(AttributesSizeProtocol)];
-    attributes = (id <AttributesSizeProtocol>)attrs;
-    fm = [NSFileManager defaultManager];	
-  }
+  if (self)
+    {
+      id attrs = (id)[conn rootProxy];
+      [attrs setProtocolForProxy: @protocol(AttributesSizeProtocol)];
+      attributes = (id <AttributesSizeProtocol>)attrs;
+      fm = [NSFileManager defaultManager];	
+    }
   
   return self;
 }
@@ -809,50 +854,59 @@ if ([b tag] == MULTIPLE) perms |= v; \
       path = [paths objectAtIndex: i];
 
       fileAttrs = [fm fileAttributesAtPath: path traverseLink: NO];
-		if (fileAttrs) {
-			fsize = [[fileAttrs objectForKey: NSFileSize] unsignedLongLongValue];
-			dirsize += fsize;
-		}
+      if (fileAttrs)
+        {
+          fsize = [[fileAttrs objectForKey: NSFileSize] unsignedLongLongValue];
+          dirsize += fsize;
+        }
      
-		[fm fileExistsAtPath: path isDirectory: &isdir];
+      [fm fileExistsAtPath: path isDirectory: &isdir];
           
-		if (isdir) {
-			NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: path];
-			
-      while (1) {
-        CREATE_AUTORELEASE_POOL (arp2);
-        
-        filePath = [enumerator nextObject];
-      
-        if (filePath) {
-          if (sizeStop) {
-            RELEASE (arp2);
-            RELEASE (arp1);
-            return;
-          }
-        
-			    filePath = [path stringByAppendingPathComponent: filePath];
-			    fileAttrs = [fm fileAttributesAtPath: filePath traverseLink: NO];
-			    if (fileAttrs) {
-				    fsize = [[fileAttrs objectForKey: NSFileSize] unsignedLongLongValue];
-				    dirsize += fsize;
-			    }
-      
-        } else {
-          RELEASE (arp2);
-          break;   
-        } 
-      
-        RELEASE (arp2);
-      }
-		}
-    
-    RELEASE (arp1);
-	}	
+      if (isdir)
+        {
+          NSDirectoryEnumerator *enumerator = [fm enumeratorAtPath: path];
 
-  if (sizeStop == NO) {
-    [attributes sizeReady: sizeDescription(dirsize)];
-  }
+          while (1)
+            {
+              CREATE_AUTORELEASE_POOL (arp2);
+
+              filePath = [enumerator nextObject];
+
+              if (filePath)
+                {
+                  if (sizeStop)
+                    {
+                      RELEASE (arp2);
+                      RELEASE (arp1);
+                      return;
+                    }
+
+                  filePath = [path stringByAppendingPathComponent: filePath];
+                  fileAttrs = [fm fileAttributesAtPath: filePath traverseLink: NO];
+                  if (fileAttrs)
+                    {
+                      fsize = [[fileAttrs objectForKey: NSFileSize] unsignedLongLongValue];
+                      dirsize += fsize;
+                    }
+      
+                }
+              else
+                {
+                  RELEASE (arp2);
+                  break;   
+                }
+      
+              RELEASE (arp2);
+            }
+        }
+    
+      RELEASE (arp1);
+    }	
+
+  if (sizeStop == NO)
+    {
+      [attributes sizeReady: sizeDescription(dirsize)];
+    }
 }
 
 @end

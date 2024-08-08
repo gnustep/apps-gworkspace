@@ -50,71 +50,73 @@ static NSString *nibName = @"Tools";
   [super dealloc];
 }
 
-- (id)initForInspector:(id)insp
+- (instancetype)initForInspector:(id)insp
 {
   self = [super init];
   
-  if (self) {
-    NSRect r;
-    id cell;
+  if (self)
+    {
+      NSRect r;
+      id cell;
   
-    if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
-      NSLog(@"failed to load %@!", nibName);
-      DESTROY (self);
-      return self;
-    } 
+      if ([NSBundle loadNibNamed: nibName owner: self] == NO)
+        {
+          NSLog(@"failed to load %@!", nibName);
+          DESTROY (self);
+          return self;
+        } 
     
-    RETAIN (mainBox);
-    RETAIN (toolsBox);
-    RELEASE (win); 
+      RETAIN (mainBox);
+      RETAIN (toolsBox);
+      RELEASE (win); 
 
-    inspector = insp;
-    [iconView setInspector: inspector];
-    ws = [NSWorkspace sharedWorkspace];
+      inspector = insp;
+      [iconView setInspector: inspector];
+      ws = [NSWorkspace sharedWorkspace];
 
-    [scrollView setBorderType: NSBezelBorder];
-    [scrollView setHasHorizontalScroller: YES];
-    [scrollView setHasVerticalScroller: NO]; 
+      [scrollView setBorderType: NSBezelBorder];
+      [scrollView setHasHorizontalScroller: YES];
+      [scrollView setHasVerticalScroller: NO]; 
 
-  	cell = [NSButtonCell new];
-  	[cell setButtonType: NSPushOnPushOffButton];
-  	[cell setImagePosition: NSImageOnly]; 
+      cell = [NSButtonCell new];
+      [cell setButtonType: NSPushOnPushOffButton];
+      [cell setImagePosition: NSImageOnly]; 
 
-  	matrix = [[NSMatrix alloc] initWithFrame: NSZeroRect
-			      	  					mode: NSRadioModeMatrix prototype: cell
-		       							    			numberOfRows: 0 numberOfColumns: 0];
-    RELEASE (cell);
-		[matrix setIntercellSpacing: NSZeroSize];
-    [matrix setCellSize: NSMakeSize(64, [[scrollView contentView] bounds].size.height)];
-		[matrix setAllowsEmptySelection: YES];
-  	[matrix setTarget: self];		
-  	[matrix setAction: @selector(setCurrentApplication:)];		
-  	[matrix setDoubleAction: @selector(openFile:)];		    
-		[scrollView setDocumentView: matrix];	
-    RELEASE (matrix);
+      matrix = [[NSMatrix alloc] initWithFrame: NSZeroRect
+                                          mode: NSRadioModeMatrix prototype: cell
+                                  numberOfRows: 0 numberOfColumns: 0];
+      RELEASE (cell);
+      [matrix setIntercellSpacing: NSZeroSize];
+      [matrix setCellSize: NSMakeSize(64, [[scrollView contentView] bounds].size.height)];
+      [matrix setAllowsEmptySelection: YES];
+      [matrix setTarget: self];		
+      [matrix setAction: @selector(setCurrentApplication:)];		
+      [matrix setDoubleAction: @selector(openFile:)];		    
+      [scrollView setDocumentView: matrix];	
+      RELEASE (matrix);
 
-    r = [toolsBox bounds];
-    r.origin.y = 165;
-    r.size.height = 25;
-  	errLabel = [[NSTextField alloc] initWithFrame: r];	
-  	[errLabel setAlignment: NSCenterTextAlignment];
-		[errLabel setFont: [NSFont systemFontOfSize: 18]];
-  	[errLabel setBackgroundColor: [NSColor windowBackgroundColor]];
-  	[errLabel setTextColor: [NSColor darkGrayColor]];	
-  	[errLabel setBezeled: NO];
-  	[errLabel setEditable: NO];
-  	[errLabel setSelectable: NO];
-		[errLabel setStringValue: NSLocalizedString(@"No Tools Inspector", @"")];
+      r = [toolsBox bounds];
+      r.origin.y = 165;
+      r.size.height = 25;
+      errLabel = [[NSTextField alloc] initWithFrame: r];	
+      [errLabel setAlignment: NSCenterTextAlignment];
+      [errLabel setFont: [NSFont systemFontOfSize: 18]];
+      [errLabel setBackgroundColor: [NSColor windowBackgroundColor]];
+      [errLabel setTextColor: [NSColor darkGrayColor]];	
+      [errLabel setBezeled: NO];
+      [errLabel setEditable: NO];
+      [errLabel setSelectable: NO];
+      [errLabel setStringValue: NSLocalizedString(@"No Tools Inspector", @"")];
 
-    insppaths = nil;
-		currentApp = nil;
-    extensions = nil;
+      insppaths = nil;
+      currentApp = nil;
+      extensions = nil;
 
-    [okButt setTitle: NSLocalizedString(@"Set Default", @"")];
-    [okButt setEnabled: NO]; 
-	}
+      [okButt setTitle: NSLocalizedString(@"Set Default", @"")];
+      [okButt setEnabled: NO]; 
+    }
   
-	return self;
+  return self;
 }
 
 - (NSView *)inspView
@@ -132,10 +134,11 @@ static NSString *nibName = @"Tools";
   BOOL toolsOK = YES;
   NSInteger i;
 
-  if (paths == nil) {
-    DESTROY (insppaths);
-    return;
-  }
+  if (paths == nil)
+    {
+      DESTROY (insppaths);
+      return;
+    }
 
   [okButt setEnabled: NO];		  
 
@@ -188,7 +191,7 @@ static NSString *nibName = @"Tools";
   NSMutableDictionary *extensionsAndApps;
   NSMutableArray *commonApps;   
   NSString *s;
-  id cell;
+  NSCell *cell;
   BOOL appsforext;
   NSInteger i, count;
 
@@ -242,66 +245,80 @@ static NSString *nibName = @"Tools";
 		
       for (i = 0; i < [extensions count]; i++)
         {
-			NSString *ext1 = [extensions objectAtIndex: i];
-			NSMutableArray *a1 = [extensionsAndApps objectForKey: ext1];			
+          NSString *ext1 = [extensions objectAtIndex: i];
+          NSMutableArray *a1 = [extensionsAndApps objectForKey: ext1];			
 			
-			for (j = 0; j < [extensions count]; j++) {
-				NSString *ext2 = [extensions objectAtIndex: j];
-				NSMutableArray *a2 = [extensionsAndApps objectForKey: ext2];
+          for (j = 0; j < [extensions count]; j++)
+            {
+              NSString *ext2 = [extensions objectAtIndex: j];
+              NSMutableArray *a2 = [extensionsAndApps objectForKey: ext2];
 				
-				count = [a1 count];			
-				for (n = 0; n < count; n++) {
-					NSString *s = [a1 objectAtIndex: n];
-					if ([a2 containsObject: s] == NO) {
-						[a1 removeObject: s];
-						count--;
-						n--;
-					}
-				}
-				[extensionsAndApps setObject: a1 forKey: ext1];
-			}
-		}
+              count = [a1 count];			
+              for (n = 0; n < count; n++) {
+                NSString *s = [a1 objectAtIndex: n];
+                if ([a2 containsObject: s] == NO)
+                  {
+                    [a1 removeObject: s];
+                    count--;
+                    n--;
+                  }
+              }
+              [extensionsAndApps setObject: a1 forKey: ext1];
+            }
+        }
 
-    commonApps = [NSMutableArray array];
+      commonApps = [NSMutableArray array];
 
-    for (i = 0; i < [extensions count]; i++) {
-      NSString *ext = [extensions objectAtIndex: i];
-			NSArray *apps = [extensionsAndApps objectForKey: ext];
+      for (i = 0; i < [extensions count]; i++)
+        {
+          NSString *ext = [extensions objectAtIndex: i];
+          NSArray *apps = [extensionsAndApps objectForKey: ext];
 			
-			for (j = 0; j < [apps count]; j++) {
-				NSString *app = [apps objectAtIndex: j];
-				if ([commonApps containsObject: app] == NO) {
-					[commonApps addObject: app];
-				}
-			}
-    }
+          for (j = 0; j < [apps count]; j++)
+            {
+              NSString *app = [apps objectAtIndex: j];
+              if ([commonApps containsObject: app] == NO)
+                {
+                  [commonApps addObject: app];
+                }
+            }
+        }
 		
-    if ([commonApps count] != 0) {
-			BOOL iscommapp = YES;		
-			NSString *ext1 = [extensions objectAtIndex: 0];
+      if ([commonApps count] != 0)
+        {
+          BOOL iscommapp = YES;		
+          NSString *ext1 = [extensions objectAtIndex: 0];
 
-			currentApp = [ws getBestAppInRole: nil forExtension: ext1];
+          currentApp = [ws getBestAppInRole: nil forExtension: ext1];
 			
-			if ([commonApps containsObject: currentApp]) {
-    		for (i = 1; i < [extensions count]; i++) {
-					NSString *ext2 = [extensions objectAtIndex: i];
-					NSString *app = [ws getBestAppInRole: nil forExtension: ext2];
+          if ([commonApps containsObject: currentApp])
+            {
+              for (i = 1; i < [extensions count]; i++)
+                {
+                  NSString *ext2 = [extensions objectAtIndex: i];
+                  NSString *app = [ws getBestAppInRole: nil forExtension: ext2];
 
-					if ([currentApp isEqual: app] == NO) {
-						iscommapp = NO;
-					}
-    		}
-			} else {
-				currentApp = nil;
-			}
+                  if ([currentApp isEqual: app] == NO)
+                    {
+                      iscommapp = NO;
+                    }
+                }
+            }
+          else
+            {
+              currentApp = nil;
+            }
 
-			if ((iscommapp == YES) && (currentApp != nil) && appsforext) {
-				RETAIN (currentApp);		
-			} else {
-				currentApp = nil;
-			}
-		}
-  }
+          if ((iscommapp == YES) && (currentApp != nil) && appsforext)
+            {
+              RETAIN (currentApp);		
+            }
+          else
+            {
+              currentApp = nil;
+            }
+        }
+    }
 
   if (currentApp == nil)
     return NO;
@@ -388,13 +405,13 @@ static NSString *nibName = @"Tools";
     }
 
   changedInfo = [NSDictionary dictionaryWithObjectsAndKeys: 
-                                                  currentApp, @"app", 
-                                                  extensions, @"exts", nil];
+                                currentApp, @"app", 
+                              extensions, @"exts", nil];
   
-	[[NSDistributedNotificationCenter defaultCenter]
+  [[NSDistributedNotificationCenter defaultCenter]
  				   postNotificationName: @"GWAppForExtensionDidChangeNotification"
-	 								       object: nil
-                       userInfo: changedInfo];  
+                                                 object: nil
+                                               userInfo: changedInfo];  
   
   newApps = [NSMutableArray arrayWithCapacity: 1];
   [newApps addObject: currentApp];

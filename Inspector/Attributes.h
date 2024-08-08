@@ -1,8 +1,9 @@
 /* Attributes.h
  *  
- * Copyright (C) 2004-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2024 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Author: Enrico Sersale
+ *         Riccardo Mottola
  * Date: January 2004
  *
  * This file is part of the GNUstep GWorkspace application
@@ -25,8 +26,14 @@
 
 #import <Foundation/Foundation.h>
 
+@class NSWindow;
 @class NSImage;
+@class NSTextField;
+@class NSButton;
 @class Sizer;
+@class IconView;
+@class TimeDateView;
+
 
 @protocol SizerProtocol
 
@@ -47,65 +54,65 @@
 
 @interface Attributes : NSObject
 {
-  IBOutlet id win;
-  IBOutlet id mainBox;
+  IBOutlet NSWindow *win;
+  IBOutlet NSBox *mainBox;
 
-  IBOutlet id topBox;
-  IBOutlet id iconView;
-  IBOutlet id titleField;
+  IBOutlet NSBox *topBox;
+  IBOutlet IconView *iconView;
+  IBOutlet NSTextField *titleField;
 
-  IBOutlet id linkToLabel;
-  IBOutlet id linkToField;
+  IBOutlet NSTextField *linkToLabel;
+  IBOutlet NSTextField *linkToField;
   
-  IBOutlet id sizeLabel;
-  IBOutlet id sizeField;
-  IBOutlet id calculateButt;
-  IBOutlet id ownerLabel;
-  IBOutlet id ownerField;
-  IBOutlet id groupLabel;
-  IBOutlet id groupField;
+  IBOutlet NSTextField *sizeLabel;
+  IBOutlet NSTextField *sizeField;
+  IBOutlet NSButton *calculateButt;
+  IBOutlet NSTextField *ownerLabel;
+  IBOutlet NSTextField *ownerField;
+  IBOutlet NSTextField *groupLabel;
+  IBOutlet NSTextField *groupField;
 
-  IBOutlet id changedDateBox;
-  IBOutlet id timeDateView;
-  IBOutlet id permsBox;
+  IBOutlet NSBox *changedDateBox;
+  IBOutlet TimeDateView *timeDateView;
+  IBOutlet NSBox *permsBox;
 
-  IBOutlet id readLabel;
-  IBOutlet id writeLabel;
-  IBOutlet id executeLabel;
-  IBOutlet id uLabel;
-  IBOutlet id gLabel;
-  IBOutlet id oLabel;
-  IBOutlet id ureadbutt;
-  IBOutlet id uwritebutt;
-  IBOutlet id uexebutt;
-  IBOutlet id greadbutt;
-  IBOutlet id gwritebutt;
-  IBOutlet id gexebutt;
-  IBOutlet id oreadbutt;
-  IBOutlet id owritebutt;
-  IBOutlet id oexebutt; 
-  IBOutlet id insideButt;
+  IBOutlet NSTextField *readLabel;
+  IBOutlet NSTextField *writeLabel;
+  IBOutlet NSTextField *executeLabel;
+  IBOutlet NSTextField *uLabel;
+  IBOutlet NSTextField *gLabel;
+  IBOutlet NSTextField *oLabel;
+  IBOutlet NSButton *ureadbutt;
+  IBOutlet NSButton *uwritebutt;
+  IBOutlet NSButton *uexebutt;
+  IBOutlet NSButton *greadbutt;
+  IBOutlet NSButton *gwritebutt;
+  IBOutlet NSButton *gexebutt;
+  IBOutlet NSButton *oreadbutt;
+  IBOutlet NSButton *owritebutt;
+  IBOutlet NSButton *oexebutt; 
+  IBOutlet NSButton *insideButt;
 
-  IBOutlet id revertButt;
-  IBOutlet id okButt;
+  IBOutlet NSButton *revertButt;
+  IBOutlet NSButton *okButt;
 
-	NSArray *insppaths;
-	int pathscount;
+  NSArray *insppaths;
+  NSUInteger pathscount;
   
-	NSDictionary *attributes;
-	BOOL iamRoot, isMyFile;
-	NSImage *onImage, *offImage, *multipleImage;
-	BOOL multiplePaths;
+  NSDictionary *attributes;
+  BOOL iamRoot, isMyFile;
+  NSImage *onImage, *offImage, *multipleImage;
+  BOOL multiplePaths;
     
-	NSString *currentPath;	
+  NSString *currentPath;	
     
   NSConnection *sizerConn;
-  id sizer;
+  id <SizerProtocol>sizer;
   BOOL autocalculate;
   id inspector;
   
-	NSFileManager *fm;
-	NSNotificationCenter *nc;  
+  NSFileManager *fm;
+  NSNotificationCenter *nc;  
 }
 
 - (id)initForInspector:(id)insp;

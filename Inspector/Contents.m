@@ -175,38 +175,41 @@ static NSString *nibName = @"Contents";
 
 - (void)activateForPaths:(NSArray *)paths
 {
-  if ([paths count] == 1) {
-    [self showContentsAt: [paths objectAtIndex: 0]];
+  if ([paths count] == 1)
+    {
+      [self showContentsAt: [paths objectAtIndex: 0]];
+    }
+  else
+    {
+      NSImage *icon = [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: ICNSIZE];
+      NSString *items;
     
-  } else {
-    NSImage *icon = [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: ICNSIZE];
-    NSString *items;
+      items = [NSString stringWithFormat: @"%lu %@",
+                        (unsigned long)[paths count],
+                        NSLocalizedString(@"Items", @"")];
+      [titleField setStringValue: items];  
+      [iconView setImage: icon];
     
-    items = [NSString stringWithFormat: @"%lu %@",
-                      (unsigned long)[paths count],
-                      NSLocalizedString(@"Items", @"")];
-		[titleField setStringValue: items];  
-    [iconView setImage: icon];
+      [viewersBox setContentView: noContsView];
+      currentViewer = noContsView;
     
-    [viewersBox setContentView: noContsView];
-    currentViewer = noContsView;
-    
-    if (currentPath) {
-      [inspector removeWatcherForPath: currentPath];
-      DESTROY (currentPath);
-    }    
+      if (currentPath) {
+        [inspector removeWatcherForPath: currentPath];
+        DESTROY (currentPath);
+      }    
 	
-    [[inspector win] setTitle: [self winname]];
-  }
+      [[inspector win] setTitle: [self winname]];
+    }
 }
 
 - (id)viewerForPath:(NSString *)path
 {
   NSInteger i;
   
-  if ((path == nil) || ([fm fileExistsAtPath: path] == NO)) {
-    return nil;
-  }
+  if ((path == nil) || ([fm fileExistsAtPath: path] == NO))
+    {
+      return nil;
+    }
     
   for (i = 0; i < [viewers count]; i++)
     {
@@ -637,33 +640,36 @@ static NSString *nibName = @"Contents";
     NSString *str;
 	  NSFileHandle *handle;  
   
-    [nc removeObserver: self];
-    if (task && [task isRunning]) {
-		  [task terminate];
-	  }
-    DESTROY (task);		
+          [nc removeObserver: self];
+          if (task && [task isRunning])
+            {
+              [task terminate];
+            }
+          DESTROY (task);		
     
-    task = [NSTask new]; 
-    [task setLaunchPath: shComm];
-    str = [NSString stringWithFormat: @"%@ -b \"%@\"", fileComm, path];
-    [task setArguments: [NSArray arrayWithObjects: @"-c", str, nil]];
-    ASSIGN (pipe, [NSPipe pipe]);
-    [task setStandardOutput: pipe];
+          task = [NSTask new]; 
+          [task setLaunchPath: shComm];
+          str = [NSString stringWithFormat: @"%@ -b \"%@\"", fileComm, path];
+          [task setArguments: [NSArray arrayWithObjects: @"-c", str, nil]];
+          ASSIGN (pipe, [NSPipe pipe]);
+          [task setStandardOutput: pipe];
 
-    handle = [pipe fileHandleForReading];
-    [nc addObserver: self
-    		   selector: @selector(dataFromTask:)
-    				   name: NSFileHandleReadToEndOfFileCompletionNotification
-    			   object: handle];
+          handle = [pipe fileHandleForReading];
+          [nc addObserver: self
+                 selector: @selector(dataFromTask:)
+                     name: NSFileHandleReadToEndOfFileCompletionNotification
+                   object: handle];
 
-    [handle readToEndOfFileInBackgroundAndNotify];    
+          [handle readToEndOfFileInBackgroundAndNotify];    
 
-    [task launch];   
+          [task launch];   
        
-    RELEASE (pool);   
-  } else {  
-    [self showString: NSLocalizedString(@"No Contents Inspector", @"")];
-  }        
+          RELEASE (pool);   
+  }
+  else
+    {  
+      [self showString: NSLocalizedString(@"No Contents Inspector", @"")];
+    }        
 }
 
 - (void)dataFromTask:(NSNotification *)notif
@@ -673,12 +679,15 @@ static NSString *nibName = @"Contents";
   NSData *data = [userInfo objectForKey: NSFileHandleNotificationDataItem];
   NSString *str;
   
-  if (data && [data length]) {
-    str = [[NSString alloc] initWithData: data 
-                                encoding: [NSString defaultCStringEncoding]];
-  } else {
-    str = [[NSString alloc] initWithString: NSLocalizedString(@"No Contents Inspector", @"")];
-  }
+  if (data && [data length])
+    {
+      str = [[NSString alloc] initWithData: data 
+                                  encoding: [NSString defaultCStringEncoding]];
+    }
+  else
+    {
+      str = [[NSString alloc] initWithString: NSLocalizedString(@"No Contents Inspector", @"")];
+    }
   
   [self showString: str];
   

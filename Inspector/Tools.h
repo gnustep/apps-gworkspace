@@ -1,8 +1,8 @@
 /* Tools.h
  *  
- * Copyright (C) 2004-2021 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2024 Free Software Foundation, Inc.
  *
- * Authors: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale
  *          Riccardo Mottola
  * Date: January 2004
  *
@@ -30,34 +30,36 @@
 
 @class NSMatrix;
 @class NSTextField;
+@class NSButton;
 @class NSWorkspace;
+@class IconView;
 
 @interface Tools : NSObject
 {
-  IBOutlet id win;
-  IBOutlet id mainBox;
-  IBOutlet id topBox;
-  IBOutlet id iconView;
-  IBOutlet id titleField;
+  IBOutlet NSWindow *win;
+  IBOutlet NSBox *mainBox;
+  IBOutlet NSBox *topBox;
+  IBOutlet IconView *iconView;
+  IBOutlet NSTextField *titleField;
 
-  IBOutlet id toolsBox;  
+  IBOutlet NSBox *toolsBox;  
   NSTextField *errLabel;
 
   IBOutlet id explLabel1;
   IBOutlet NSScrollView *scrollView;
   NSMatrix *matrix; 
 
-  IBOutlet id defAppLabel;
-  IBOutlet id defAppField;
-  IBOutlet id defPathLabel;
-  IBOutlet id defPathField;
+  IBOutlet NSTextField *defAppLabel;
+  IBOutlet NSTextField *defAppField;
+  IBOutlet NSTextField *defPathLabel;
+  IBOutlet NSTextField *defPathField;
 
-  IBOutlet id explLabel2;
-  IBOutlet id explLabel3;
+  IBOutlet NSTextField *explLabel2;
+  IBOutlet NSTextField *explLabel3;
 
-  IBOutlet id okButt;
+  IBOutlet NSButton *okButt;
 
-	NSArray *insppaths;
+  NSArray *insppaths;
   NSString *currentApp;
   NSMutableArray *extensions;
 
@@ -66,7 +68,7 @@
   id inspector;
 }
 
-- (id)initForInspector:(id)insp;
+- (instancetype)initForInspector:(id)insp;
 
 - (NSView *)inspView;
 

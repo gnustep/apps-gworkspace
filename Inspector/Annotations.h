@@ -1,8 +1,10 @@
 /* Annotations.h
  *  
- * Copyright (C) 2005-2010 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2024 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale
+ *          Riccardo Mottola
+ *
  * Date: February 2005
  *
  * This file is part of the GNUstep GWorkspace application
@@ -25,19 +27,22 @@
 
 #import <Foundation/Foundation.h>
 
+@class NSWindow;
 @class FSNode;
 @class NSView;
+@class IconView;
+@class NSTextView;
 
 @interface Annotations: NSObject
 {
-  IBOutlet id win;
+  IBOutlet NSWindow *win;
   IBOutlet NSBox *mainBox;
   IBOutlet NSBox *topBox;
-  IBOutlet id iconView;
-  IBOutlet id titleField;
+  IBOutlet IconView *iconView;
+  IBOutlet NSTextField *titleField;
   IBOutlet NSBox *toolsBox;
-  IBOutlet id textView;
-  IBOutlet id okButt;
+  IBOutlet NSTextView *textView;
+  IBOutlet NSButton *okButt;
 
   NSString *currentPath;
   NSView *noContsView; 
@@ -45,7 +50,7 @@
   id desktopApp;
 }
 
-- (id)initForInspector:(id)insp;
+- (instancetype)initForInspector:(id)insp;
 
 - (NSView *)inspView;
 

@@ -50,32 +50,35 @@ static NSString *nibName = @"Annotations";
   [super dealloc];
 }
 
-- (id)initForInspector:(id)insp
+- (instancetype)initForInspector:(id)insp
 {
   self = [super init];
   
-  if (self) {
-    id label;
+  if (self)
+    {
+      id label;
 
-    if ([NSBundle loadNibNamed: nibName owner: self] == NO) {
-      NSLog(@"failed to load %@!", nibName);
-      [NSApp terminate: self];
-    } 
+      if ([NSBundle loadNibNamed: nibName owner: self] == NO)
+        {
+          NSLog(@"failed to load %@!", nibName);
+          DESTROY(self);
+          return nil;
+        } 
 
-    RETAIN (mainBox);
-    RETAIN (toolsBox);
-    RELEASE (win);
+      RETAIN (mainBox);
+      RETAIN (toolsBox);
+      RELEASE (win);
     
-    inspector = insp;
-    [iconView setInspector: inspector];
-    desktopApp = [inspector desktopApp];
-    currentPath = nil;
+      inspector = insp;
+      [iconView setInspector: inspector];
+      desktopApp = [inspector desktopApp];
+      currentPath = nil;
 
-    noContsView = [[NSView alloc] initWithFrame: [[toolsBox contentView] bounds]];
-    MAKE_LABEL (label, NSMakeRect(2, 125, 254, 65), _(@"No Annotations Inspector"), 'c', YES, noContsView);		  
-    [label setFont: [NSFont systemFontOfSize: 18]];
-    [label setTextColor: [NSColor grayColor]];				
-  }
+      noContsView = [[NSView alloc] initWithFrame: [[toolsBox contentView] bounds]];
+      MAKE_LABEL (label, NSMakeRect(2, 125, 254, 65), _(@"No Annotations Inspector"), 'c', YES, noContsView);		  
+      [label setFont: [NSFont systemFontOfSize: 18]];
+      [label setTextColor: [NSColor grayColor]];				
+    }
   
   return self;
 }
@@ -92,93 +95,108 @@ static NSString *nibName = @"Annotations";
 
 - (void)activateForPaths:(NSArray *)paths
 {
-  if ([paths count] == 1) {
-    FSNode *node = [FSNode nodeWithPath: [paths objectAtIndex: 0]];
-    NSImage *icon = [[FSNodeRep sharedInstance] iconOfSize: ICNSIZE forNode: node];
+  if ([paths count] == 1)
+    {
+      FSNode *node = [FSNode nodeWithPath: [paths objectAtIndex: 0]];
+      NSImage *icon = [[FSNodeRep sharedInstance] iconOfSize: ICNSIZE forNode: node];
 
-    if (currentPath) {
-      [inspector removeWatcherForPath: currentPath];
-    }  
+      if (currentPath)
+        {
+          [inspector removeWatcherForPath: currentPath];
+        }  
 
-    ASSIGN (currentPath, [node path]);
-    [inspector addWatcherForPath: currentPath];
+      ASSIGN (currentPath, [node path]);
+      [inspector addWatcherForPath: currentPath];
   
-    [iconView setImage: icon];
-    [titleField setStringValue: [node name]];
+      [iconView setImage: icon];
+      [titleField setStringValue: [node name]];
   
-    if ([[[mainBox contentView] subviews] containsObject: noContsView]) {
-      [noContsView removeFromSuperview];
-      [[mainBox contentView] addSubview: toolsBox];
-    }
+      if ([[[mainBox contentView] subviews] containsObject: noContsView])
+        {
+          [noContsView removeFromSuperview];
+          [[mainBox contentView] addSubview: toolsBox];
+        }
     
-    [textView setString: @""];
+      [textView setString: @""];
 
-    if (([desktopApp ddbdactive] == NO) && ([desktopApp terminating] == NO)) {
-      [desktopApp connectDDBd];
-    }
+      if (([desktopApp ddbdactive] == NO) && ([desktopApp terminating] == NO))
+        {
+          [desktopApp connectDDBd];
+        }
 
-    if ([desktopApp ddbdactive]) {
-      NSString *contents = [desktopApp ddbdGetAnnotationsForPath: currentPath];
+      if ([desktopApp ddbdactive])
+        {
+          NSString *contents = [desktopApp ddbdGetAnnotationsForPath: currentPath];
 
-      if (contents) {
-        [textView setString: contents];
-      } 
+          if (contents)
+            {
+              [textView setString: contents];
+            } 
       
-      [okButt setEnabled: YES];
-    } else {
-      [okButt setEnabled: NO];
+          [okButt setEnabled: YES];
+        }
+      else
+        {
+          [okButt setEnabled: NO];
+        }
     }
+  else
+    {
+      NSImage *icon = [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: ICNSIZE];
+      NSString *items;
     
-  } else {
-    NSImage *icon = [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: ICNSIZE];
-    NSString *items;
-    
-    items = [NSString stringWithFormat: @"%lu %@",
-                      (unsigned long)[paths count],
-                      NSLocalizedString(@"Items", @"")];
-    [titleField setStringValue: items];  
-    [iconView setImage: icon];
+      items = [NSString stringWithFormat: @"%lu %@",
+                        (unsigned long)[paths count],
+                        NSLocalizedString(@"Items", @"")];
+      [titleField setStringValue: items];  
+      [iconView setImage: icon];
 
-    if ([[[mainBox contentView] subviews] containsObject: toolsBox]) {
-      [toolsBox removeFromSuperview];
-      [[mainBox contentView] addSubview: noContsView];
-    }
+      if ([[[mainBox contentView] subviews] containsObject: toolsBox])
+        {
+          [toolsBox removeFromSuperview];
+          [[mainBox contentView] addSubview: noContsView];
+        }
     
-    if (currentPath) {
-      [inspector removeWatcherForPath: currentPath];
-      DESTROY (currentPath);
-    }  
-  }
+      if (currentPath)
+        {
+          [inspector removeWatcherForPath: currentPath];
+          DESTROY (currentPath);
+        }  
+    }
 }
 
 - (IBAction)setAnnotations:(id)sender
 {
   NSString *contents = [textView string];
 
-  if ([contents length]) {
-    [desktopApp ddbdSetAnnotations: contents forPath: currentPath];
-  }
+  if ([contents length])
+    {
+      [desktopApp ddbdSetAnnotations: contents forPath: currentPath];
+    }
 }
 
 - (void)watchedPathDidChange:(NSDictionary *)info
 {
   NSString *path = [info objectForKey: @"path"];
 
-  if (currentPath && [currentPath isEqual: path]) {
-    if ([[info objectForKey: @"event"] isEqual: @"GWWatchedPathDeleted"]) {
-      [iconView setImage: nil];
-      [titleField setStringValue: @""];
+  if (currentPath && [currentPath isEqual: path])
+    {
+      if ([[info objectForKey: @"event"] isEqual: @"GWWatchedPathDeleted"])
+        {
+          [iconView setImage: nil];
+          [titleField setStringValue: @""];
       
-      if ([[[mainBox contentView] subviews] containsObject: toolsBox]) {
-        [toolsBox removeFromSuperview];
-        [[mainBox contentView] addSubview: noContsView];
-      }
+          if ([[[mainBox contentView] subviews] containsObject: toolsBox])
+            {
+              [toolsBox removeFromSuperview];
+              [[mainBox contentView] addSubview: noContsView];
+            }
       
-      [inspector removeWatcherForPath: currentPath];
+          [inspector removeWatcherForPath: currentPath];
             
-      DESTROY (currentPath);
+          DESTROY (currentPath);
+        }
     }
-  }
 }
 
 @end
