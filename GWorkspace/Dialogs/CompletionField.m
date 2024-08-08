@@ -100,7 +100,6 @@ if ([path hasSuffix: pathSeparator] == NO) \
           for (i = 0; i < [appPaths count]; i++)
             {
               NSArray *contents;
-              NSUInteger j;
 
               contents = [fm directoryContentsAtPath: [appPaths objectAtIndex:i]];
               [appBundles addObjectsFromArray:contents];
