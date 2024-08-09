@@ -201,14 +201,13 @@ static BOOL sizeStop = NO;
   attrs = [fm fileAttributesAtPath: [paths objectAtIndex: 0] traverseLink: NO];
 
   ASSIGN (insppaths, paths);
-  pathscount = [insppaths count];	
   ASSIGN (currentPath, [paths objectAtIndex: 0]);		
   ASSIGN (attributes, attrs);	
 
   [revertButt setEnabled: NO];
   [okButt setEnabled: NO];
   	
-  if (pathscount == 1)
+  if ([insppaths count] == 1)
     { /* Single Selection */
 
       FSNode *node = [FSNode nodeWithPath: currentPath];
@@ -410,7 +409,7 @@ static BOOL sizeStop = NO;
 
   recursive = ([insideButt isEnabled] && ([insideButt state] == NSOnState));
 
-  if (pathscount == 1)
+  if ([insppaths count] == 1)
     {
       oldperms = [[attributes objectForKey: NSFilePosixPermissions] unsignedLongValue];
       newperms = [self getPermissions: oldperms];		
@@ -496,7 +495,7 @@ static BOOL sizeStop = NO;
 
 - (IBAction)revertToOldPermissions:(id)sender
 {
-  if(pathscount == 1)
+  if([insppaths count] == 1)
     {
       unsigned long perms = [[attributes objectForKey: NSFilePosixPermissions] unsignedLongValue];
       [self setPermissions: perms isActive: YES];	

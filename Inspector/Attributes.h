@@ -97,7 +97,6 @@
   IBOutlet NSButton *okButt;
 
   NSArray *insppaths;
-  NSUInteger pathscount;
   
   NSDictionary *attributes;
   BOOL iamRoot, isMyFile;
