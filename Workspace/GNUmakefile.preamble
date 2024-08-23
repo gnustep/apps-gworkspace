@@ -9,7 +9,7 @@ ADDITIONAL_OBJCFLAGS += -Wall
 ADDITIONAL_CFLAGS += -Wall 
 
 # Additional include directories the compiler should search
-ADDITIONAL_INCLUDE_DIRS += -IGWorkspace -I../GWorkspace -I../../GWorkspace
+ADDITIONAL_INCLUDE_DIRS += -IWorkspace -I../Workspace -I../../Workspace
 ADDITIONAL_INCLUDE_DIRS += -IDesktop -I../Desktop 
 ADDITIONAL_INCLUDE_DIRS += -IDesktop/Dock
 ADDITIONAL_INCLUDE_DIRS += -IFinder -I../Finder 

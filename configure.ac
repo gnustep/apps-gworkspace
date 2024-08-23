@@ -58,7 +58,7 @@ else
 fi
 AC_SUBST(BUILD_GWMETADATA)
 
-AC_CONFIG_HEADER([GWorkspace/config.h])
+AC_CONFIG_HEADER([Workspace/config.h])
 
 
 #--------------------------------------------------------------------
@@ -87,7 +87,7 @@ AC_SUBST(with_inotify)
 
 AC_CONFIG_FILES([
   GNUmakefile
-  GWorkspace/GNUmakefile
+  Workspace/GNUmakefile
   Tools/fswatcher/GNUmakefile
   ])
 

@@ -1,5 +1,5 @@
 
-PACKAGE_NAME = gworkspace
+PACKAGE_NAME = workspace
 include $(GNUSTEP_MAKEFILES)/common.make
 
 # The application to be compiled

@@ -1,7 +1,7 @@
 
 PACKAGE_NEEDS_CONFIGURE = YES
 
-PACKAGE_NAME = gworkspace
+PACKAGE_NAME = workspace
 include $(GNUSTEP_MAKEFILES)/common.make
 
 SUBPROJECTS = MDModules 

@@ -22,7 +22,7 @@
 
 # Things to do after cleaning
 #after-clean::
-#	rm -rf GWorkspace/Inspectors/Viewers/Library
+#	rm -rf Workspace/Inspectors/Viewers/Library
 
 # Things to do before distcleaning
 # before-distclean::

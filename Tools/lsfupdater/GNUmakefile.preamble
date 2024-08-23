@@ -1,5 +1,5 @@
 # Additional include directories the compiler should search
-ADDITIONAL_INCLUDE_DIRS += -I../../GWorkspace
+ADDITIONAL_INCLUDE_DIRS += -I../../Workspace
 
 # Additional LDFLAGS to pass to the linker
 # ADDITIONAL_LDFLAGS += 

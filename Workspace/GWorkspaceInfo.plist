@@ -1,10 +1,10 @@
  {
-    ApplicationName = "GWorkspace";
+    ApplicationName = "Workspace";
     ApplicationDescription = "GNUstep Workspace Manager";
     ApplicationIcon = "FileManager.tiff";
     ApplicationRelease = "1.0.0";
     NSBuildVersion = "12 2021";
-    CFBundleIdentifier = "org.gnustep.GWorkspace";
+    CFBundleIdentifier = "org.gnustep.Workspace";
     Authors = (
       "Riccardo Mottola",
       "Enrico Sersale",
@@ -19,14 +19,14 @@
     NSServices = (
       {
         NSMenuItem = {
-          English = "Open in GWorkspace";
-          German = "In GWorkspace \U00F6ffnen";
-	  French = "Ouvrir dans GWorkspace";
-	  Italian = "Aprire in GWorkspace";
-          default = "Open in GWorkspace";
+          English = "Open in Workspace";
+          German = "In Workspace \U00F6ffnen";
+	  French = "Ouvrir dans Workspace";
+	  Italian = "Aprire in Workspace";
+          default = "Open in Workspace";
         };
         NSMessage = openInWorkspace;
-        NSPortName = GWorkspace;
+        NSPortName = Workspace;
         NSSendTypes = ( NSStringPboardType );
       }
     );

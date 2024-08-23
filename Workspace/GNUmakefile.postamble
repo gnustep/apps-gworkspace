@@ -1,7 +1,7 @@
 
 # Things to do before compiling
 before-all::
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/GWorkspace
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Workspace
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Desktop
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Desktop/Dock
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Finder
@@ -20,7 +20,7 @@ before-all::
 # Things to do before installing
 before-install::
 before-all::
-	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/GWorkspace
+	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Workspace
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/FileViewer
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Desktop  
 	$(MKDIRS) ./$(GNUSTEP_OBJ_DIR)/Desktop/Dock
@@ -47,7 +47,7 @@ before-all::
 
 # Things to do after cleaning
 after-clean::
-#	rm -rf GWorkspace/Inspectors/Viewers/Library
+#	rm -rf Workspace/Inspectors/Viewers/Library
 
 # Things to do before distcleaning
 # before-distclean::

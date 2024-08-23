@@ -1,7 +1,7 @@
 
 PACKAGE_NEEDS_CONFIGURE = YES
 
-PACKAGE_NAME = gworkspace
+PACKAGE_NAME = workspace
 include $(GNUSTEP_MAKEFILES)/common.make
 
 VERSION = @PACKAGE_VERSION@
@@ -15,11 +15,11 @@ SUBPROJECTS = Finder/Modules \
 #
 # MAIN APP
 #
-APP_NAME = GWorkspace
-GWorkspace_PRINCIPAL_CLASS = GWorkspace
-GWorkspace_APPLICATION_ICON=FileManager.tiff
+APP_NAME = Workspace
+Workspace_PRINCIPAL_CLASS = GWorkspace
+Workspace_APPLICATION_ICON=FileManager.tiff
 
-GWorkspace_HAS_RESOURCE_BUNDLE = yes
+Workspace_HAS_RESOURCE_BUNDLE = yes
 
 #
 # Additional libraries
@@ -28,7 +28,7 @@ ADDITIONAL_GUI_LIBS += -lFSNode
 ADDITIONAL_GUI_LIBS += -lInspector
 ADDITIONAL_GUI_LIBS += -lOperation
 
-GWorkspace_RESOURCE_FILES = \
+Workspace_RESOURCE_FILES = \
   Resources/Icons/* \
   Resources/English.lproj \
   Resources/BrasilPortuguese.lproj \
@@ -46,7 +46,7 @@ GWorkspace_RESOURCE_FILES = \
   Resources/Polish.lproj \
   GWorkspaceInfo.plist
 
-GWorkspace_LANGUAGES = \
+Workspace_LANGUAGES = \
   Resources/English \
   Resources/BrasilPortuguese \
   Resources/Dutch \
@@ -63,7 +63,7 @@ GWorkspace_LANGUAGES = \
   Resources/Polish
 
 # The Objective-C source files to be compiled
-GWorkspace_OBJC_FILES = main.m \
+Workspace_OBJC_FILES = main.m \
 GWFunctions.m \
 GWorkspace.m \
 WorkspaceApplication.m \
