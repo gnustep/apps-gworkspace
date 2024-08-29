@@ -363,8 +363,6 @@ typedef enum FSNSelectionMask {
   NSMutableDictionary *tumbsCache;
   NSString *thumbnailDir;
   BOOL usesThumbnails;  
-  
-  BOOL oldresize;  
 
   NSImage *multipleSelIcon;
   NSImage *openFolderIcon;

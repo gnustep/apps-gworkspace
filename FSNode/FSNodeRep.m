@@ -121,8 +121,6 @@ static FSNodeRep *shared = nil;
     nc = [NSNotificationCenter defaultCenter];
           
     labelWFactor = LABEL_W_FACT;
-    
-    oldresize = [[NSUserDefaults standardUserDefaults] boolForKey: @"old_resize"];
 
     /* images coming form GSTheme */
     [self cacheIcons];
