@@ -54,7 +54,7 @@
   int iconSize;
   int labelTextSize;
   NSFont *labelFont;
-  int iconPosition;
+  NSCellImagePosition iconPosition;
 
   NSSize gridSize;
   NSInteger colItemsCount;
@@ -119,8 +119,8 @@
 - (int)iconSize;
 - (void)setLabelTextSize:(int)size;
 - (int)labelTextSize;
-- (void)setIconPosition:(int)pos;
-- (int)iconPosition;
+- (void)setIconPosition:(NSCellImagePosition)pos;
+- (NSCellImagePosition)iconPosition;
 - (void)updateIcons;
 - (id)repOfSubnode:(FSNode *)anode;
 - (id)repOfSubnodePath:(NSString *)apath;

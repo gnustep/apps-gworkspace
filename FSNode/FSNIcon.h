@@ -51,7 +51,7 @@
   int iconSize;
   NSRect icnBounds;
   NSPoint icnPoint;
-  NSUInteger icnPosition;
+  NSCellImagePosition icnPosition;
 
   NSRect brImgBounds;
     

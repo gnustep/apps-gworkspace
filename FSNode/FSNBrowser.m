@@ -468,23 +468,27 @@
   FSNBrowserColumn *bc;
   NSInteger i;
 			
-  if (lastColumnLoaded + 1 >= [columns count]) {
-    i = [columns indexOfObject: [self createEmptyColumn]];
-	} else {
-    i = lastColumnLoaded + 1;
-	}
-  
+  if (lastColumnLoaded + 1 >= [columns count])
+    {
+      i = [columns indexOfObject: [self createEmptyColumn]];
+    }
+  else
+    {
+      i = lastColumnLoaded + 1;
+    }
+
   bc = [columns objectAtIndex: i];
   [bc showContentsOfNode: node];
-  
+
   updateViewsLock++;
   [self setLastColumn: i];
   isLoaded = YES;
 
-  if ((i > 0) && ((i - 1) == lastVisibleColumn)) { 
-    [self scrollColumnsRightBy: 1];
-	} 
-  
+  if ((i > 0) && ((i - 1) == lastVisibleColumn))
+    {
+      [self scrollColumnsRightBy: 1];
+    }
+
   updateViewsLock--;
   [self tile];
 }
@@ -1813,7 +1817,7 @@
   return fontSize;
 }
 
-- (int)iconPosition
+- (NSCellImagePosition)iconPosition
 {
   return NSImageLeft;
 }

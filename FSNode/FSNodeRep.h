@@ -79,9 +79,9 @@ typedef enum FSNSelectionMask {
 
 - (int)iconSize;
 
-- (void)setIconPosition:(unsigned int)ipos;
+- (void)setIconPosition:(NSCellImagePosition)ipos;
 
-- (int)iconPosition;
+- (NSCellImagePosition)iconPosition;
 
 - (NSRect)labelRect;
 

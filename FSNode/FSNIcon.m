@@ -1097,7 +1097,7 @@ static NSImage *branchImage;
   return iconSize;
 }
 
-- (void)setIconPosition:(unsigned int)ipos
+- (void)setIconPosition:(NSCellImagePosition)ipos
 {
   icnPosition = ipos;
 
@@ -1115,7 +1115,7 @@ static NSImage *branchImage;
   [self tile];
 }
 
-- (int)iconPosition
+- (NSCellImagePosition)iconPosition
 {
   return icnPosition;
 }

@@ -1459,7 +1459,7 @@ static void GWHighlightFrameRect(NSRect aRect)
   return labelTextSize;
 }
 
-- (void)setIconPosition:(int)pos
+- (void)setIconPosition:(NSCellImagePosition)pos
 {
   NSUInteger i;
 
@@ -1475,7 +1475,7 @@ static void GWHighlightFrameRect(NSRect aRect)
   [self tile];
 }
 
-- (int)iconPosition
+- (NSCellImagePosition)iconPosition
 {
   return iconPosition;
 }
@@ -2296,7 +2296,7 @@ static void GWHighlightFrameRect(NSRect aRect)
       NSString *nodeDescr = [editIcon shownInfo];
       NSRect icnr = [editIcon frame];
       NSRect labr = [editIcon labelRect];
-      int ipos = [editIcon iconPosition];
+      NSCellImagePosition ipos = [editIcon iconPosition];
       int margin = [fsnodeRep labelMargin];
       float bw = [self bounds].size.width - EDIT_MARGIN;
       float edwidth = 0.0;
@@ -2410,7 +2410,7 @@ static void GWHighlightFrameRect(NSRect aRect)
 - (void)controlTextDidChange:(NSNotification *)aNotification
 {
   NSRect icnr = [editIcon frame];
-  int ipos = [editIcon iconPosition];
+  NSCellImagePosition ipos = [editIcon iconPosition];
   float edwidth = [[nameEditor font] widthOfString: [nameEditor stringValue]];
   int margin = [fsnodeRep labelMargin];
   float bw = [self bounds].size.width - EDIT_MARGIN;

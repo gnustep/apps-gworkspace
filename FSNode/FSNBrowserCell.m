@@ -473,11 +473,11 @@ static NSString *dots = @"...";
   return icnsize;
 }
 
-- (void)setIconPosition:(unsigned int)ipos
+- (void)setIconPosition:(NSCellImagePosition)ipos
 {
 }
 
-- (int)iconPosition
+- (NSCellImagePosition)iconPosition
 {
   return NSImageLeft;
 }

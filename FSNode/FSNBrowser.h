@@ -173,7 +173,7 @@
 - (FSNInfoType)showType;
 - (int)iconSize;
 - (int)labelTextSize;
-- (int)iconPosition;
+- (NSCellImagePosition)iconPosition;
 - (void)updateIcons;
 - (id)repOfSubnode:(FSNode *)anode;
 - (id)repOfSubnodePath:(NSString *)apath;

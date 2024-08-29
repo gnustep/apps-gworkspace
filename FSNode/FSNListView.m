@@ -2193,11 +2193,11 @@ shouldEditTableColumn:(NSTableColumn *)aTableColumn
   return ICNSIZE;
 }
 
-- (void)setIconPosition:(unsigned int)ipos
+- (void)setIconPosition:(NSCellImagePosition)ipos
 {
 }
 
-- (int)iconPosition
+- (NSCellImagePosition)iconPosition
 {
   return NSImageLeft;
 }
