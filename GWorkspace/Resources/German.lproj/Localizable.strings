@@ -171,6 +171,19 @@ which ends in "kann <the file> nicht umbenennen"
 
 "Invalid char in name" = "Ungültiges Zeichen im Namen";
 
+/* ----------------------------- Viewers Strings ----------------------------- */
+
+/* GWViewer.m */
+"free" = "frei";
+
+/* GWViewersManager.m */
+
+"Are you sure you want to open" = "Wirklich ";
+"items?" = "Elemente öffnen?";
+"error" = "Fehler";
+"Can't open " = "Unmöglich zu öffnen ";
+
+
 
 /* ----------------------- Inspectors strings --------------------------- */
 

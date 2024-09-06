@@ -155,6 +155,17 @@
 "Cannot rename " = "Non posso rinominare ";
 "Invalid char in name" = "Carattere non valido nel nome";
 
+/* ----------------------------- Viewers Strings ----------------------------- */
+
+/* GWViewer.m */
+"free" = "liberi";
+
+/* GWViewersManager.m */
+
+"Are you sure you want to open" = "Sicuri di aprire";
+"items?" = "elementi?";
+"error" = "errore";
+"Can't open " = "Impossibile aprire ";
 
 /* ----------------------- Inspectors strings --------------------------- */
 
