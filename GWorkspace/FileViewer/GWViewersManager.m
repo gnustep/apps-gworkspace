@@ -303,15 +303,17 @@ static GWViewersManager *vwrsmanager = nil;
 
 - (id)rootViewer
 {
-  int i;
+  NSUInteger i;
 
-  for (i = 0; i < [viewers count]; i++) {
-    id viewer = [viewers objectAtIndex: i];
+  for (i = 0; i < [viewers count]; i++)
+    {
+      id viewer = [viewers objectAtIndex: i];
 
-    if ([viewer isFirstRootViewer]) {
-      return viewer;
+      if ([viewer isFirstRootViewer])
+	{
+	  return viewer;
+	}
     }
-  }
 
   return nil;
 }
@@ -517,11 +519,12 @@ static GWViewersManager *vwrsmanager = nil;
 - (void)sortTypeDidChange:(NSNotification *)notif
 {
   NSString *notifPath = [notif object];
-  int i;
+  NSUInteger i;
 
-  for (i = 0; i < [viewers count]; i++) {
-    [[[viewers objectAtIndex: i] nodeView] sortTypeChangedAtPath: notifPath];
-  }  
+  for (i = 0; i < [viewers count]; i++)
+    {
+      [[[viewers objectAtIndex: i] nodeView] sortTypeChangedAtPath: notifPath];
+    }
 }
 
 - (void)fileSystemWillChange:(NSNotification *)notif
