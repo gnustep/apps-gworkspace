@@ -171,21 +171,25 @@ static unsigned char darkerLUT[256] = {
 
               if (baseIcon == nil)
                 {
-                  NSLog(@"no WS icon for %@", nodepath);
+                  NSLog(@"no icon in cache for key %@ and no WS icon for %@", key, nodepath);
                 }
-	      if ([node isLink])
-		{
-		  NSImage *linkIcon;
 
-		  linkIcon = [NSImage imageNamed:@"common_linkCursor"];
-		  baseIcon = [baseIcon copy];
-		  [baseIcon lockFocus];
-		  [linkIcon compositeToPoint:NSMakePoint(0,0) operation:NSCompositeSourceOver];
-		  [baseIcon unlockFocus];
-		  [baseIcon autorelease];
-		}
+              if (baseIcon != nil)
+                {
+                  if ([node isLink])
+                    {
+                      NSImage *linkIcon;
+
+                      linkIcon = [NSImage imageNamed:@"common_linkCursor"];
+                      baseIcon = [baseIcon copy];
+                      [baseIcon lockFocus];
+                      [linkIcon compositeToPoint:NSMakePoint(0,0) operation:NSCompositeSourceOver];
+                      [baseIcon unlockFocus];
+                      [baseIcon autorelease];
+                    }
   
-	      icon = [self cachedIconOfSize: size forKey: key addBaseIcon: baseIcon];
+                  icon = [self cachedIconOfSize: size forKey: key addBaseIcon: baseIcon];
+                }
 	    }
 	}
     }  
