@@ -676,7 +676,7 @@
   else
     {
       unsigned long long freeSize = [freefs unsignedLongLongValue];
-      unsigned systemType = [fsnodeRep systemType];
+      NSUInteger systemType = [[NSProcessInfo processInfo] operatingSystem];
 
       switch (systemType)
 	{
@@ -1602,19 +1602,3 @@ constrainMinCoordinate:(CGFloat)proposedMin
 }
 
 @end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

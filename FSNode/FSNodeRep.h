@@ -356,8 +356,6 @@ typedef enum FSNSelectionMask {
   NSMutableSet *reservedNames;
   NSMutableSet *volumes;
   NSString *rootPath;
-
-  unsigned systype;
     
   NSMutableDictionary *iconsCache;
   NSMutableDictionary *tumbsCache;
@@ -442,8 +440,6 @@ typedef enum FSNSelectionMask {
 - (NSSet *)reservedNames;
 
 - (BOOL)isReservedName:(NSString *)name;
-
-- (unsigned)systemType;
 
 - (void)setUseThumbnails:(BOOL)value;
 
