@@ -117,7 +117,6 @@ static FSNodeRep *shared = nil;
     NSNotificationCenter *nc;
     
     fm = [NSFileManager defaultManager];
-    ws = [NSWorkspace sharedWorkspace];
     nc = [NSNotificationCenter defaultCenter];
           
     labelWFactor = LABEL_W_FACT;
@@ -163,12 +162,10 @@ static FSNodeRep *shared = nil;
     lockedPaths = [NSMutableArray new];	
     hiddenPaths = [NSArray new];
     volumes = [[NSMutableSet alloc] initWithCapacity: 1];
-    [self setVolumes:[ws mountedRemovableMedia]];
+    [self setVolumes:[[NSWorkspace sharedWorkspace] mountedRemovableMedia]];
     reservedNames = [[NSMutableSet alloc] initWithCapacity: 1];
     
     [self loadExtendedInfoModules];
-    
-    systype = [[NSProcessInfo processInfo] operatingSystem];
 
     /* we observe a theme change to re-cache icons */
     [nc addObserver:self selector:@selector(themeDidActivate:) name:GSThemeDidActivateNotification object:nil];
@@ -640,10 +637,6 @@ static FSNodeRep *shared = nil;
   return [reservedNames containsObject: name];
 }
 
-- (unsigned)systemType
-{
-  return systype;
-}
 
 - (void)setUseThumbnails:(BOOL)value
 {

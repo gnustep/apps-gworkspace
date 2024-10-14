@@ -167,7 +167,7 @@ static unsigned char darkerLUT[256] = {
 	  if (icon == nil)
 	    {
               if (baseIcon == nil)
-                baseIcon = [ws iconForFile: nodepath];
+                baseIcon = [[NSWorkspace sharedWorkspace] iconForFile: nodepath];
 
               if (baseIcon == nil)
                 {
@@ -253,7 +253,7 @@ static unsigned char darkerLUT[256] = {
               // we look up the cache, but only in the full size to composite later
               baseIcon = [self cachedIconOfSize: 48 forKey: key];
               if (baseIcon == nil)
-                baseIcon = [ws iconForFile: nodepath];
+                baseIcon = [[NSWorkspace sharedWorkspace] iconForFile: nodepath];
 
 	      if ([node isLink])
 		{
