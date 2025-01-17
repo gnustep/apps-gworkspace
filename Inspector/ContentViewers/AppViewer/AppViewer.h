@@ -43,13 +43,13 @@
 @interface AppViewer : NSView <ContentViewersProtocol>
 {
   NSString *currentPath;
-	BOOL valid;
+  BOOL valid;
 
-	NSMatrix *matrix;
-	NSScrollView *scroll;
+  NSMatrix *matrix;
+  NSScrollView *scroll;
   NSTextField *errLabel;
-	NSTextField *explField;
-  
+  NSTextField *explField;
+
   id <ContentInspectorProtocol>inspector;
   NSWorkspace *ws;
 }

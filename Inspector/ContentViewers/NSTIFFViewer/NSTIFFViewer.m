@@ -158,7 +158,7 @@
   }
 }
 
-- (NSString *)currentPath
+- (NSString *)path
 {
   return nil;
 }
@@ -169,7 +169,7 @@
 
 - (BOOL)canDisplayPath:(NSString *)path
 {
-	return NO;
+  return NO;
 }
 
 - (BOOL)canDisplayDataOfType:(NSString *)type

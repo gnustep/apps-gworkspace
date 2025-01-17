@@ -1,8 +1,8 @@
 /* AppViewer.m
  *  
- * Copyright (C) 2004-2021 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2025 Free Software Foundation, Inc.
  *
- * Authors: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale
  *          Riccardo Mottola <rm@gnu.org>
  * Date: January 2004
  *
@@ -236,7 +236,7 @@
 {
 }
 
-- (NSString *)currentPath
+- (NSString *)path
 {
   return currentPath;
 }

@@ -44,7 +44,7 @@
 
 @interface NSTIFFViewer : NSView <ContentViewersProtocol>
 {
-	BOOL valid;
+  BOOL valid;
   NSString *typeDescriprion;
   NSImage *icon;
   
