@@ -1,8 +1,8 @@
 /* FolderViewer.m
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2025 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Author: Enrico Sersale
  * Date: January 2004
  *
  * This file is part of the GNUstep Inspector application
@@ -22,8 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02111 USA.
  */
 
-#include <AppKit/AppKit.h>
-#include "FolderViewer.h"
+#import <AppKit/AppKit.h>
+#import "FolderViewer.h"
 
 #define byname 0
 #define bykind 1
@@ -45,89 +45,90 @@
           inspector:(id)insp
 {
   self = [super initWithFrame: frameRect];
-  
-	if (self) {
-	  id cell;
-    id label;
-  
-		sortBox = [[NSBox alloc] initWithFrame: NSMakeRect(57, 125, 137, 135)];
-  	[sortBox setBorderType: NSGrooveBorder];
-		[sortBox setTitle: NSLocalizedString(@"Sort by", @"")];
-  	[sortBox setTitlePosition: NSAtTop];
-		[sortBox setContentViewMargins: NSMakeSize(2, 2)]; 
-		[self addSubview: sortBox]; 
-    RELEASE (sortBox);
-    
-    cell = [NSButtonCell new];
-    [cell setButtonType: NSRadioButton];
-    [cell setBordered: NO];
-    [cell setImagePosition: NSImageLeft];
-    
-    matrix = [[NSMatrix alloc] 
+
+  if (self)
+    {
+      id cell;
+      id label;
+
+      sortBox = [[NSBox alloc] initWithFrame: NSMakeRect(57, 125, 137, 135)];
+      [sortBox setBorderType: NSGrooveBorder];
+      [sortBox setTitle: NSLocalizedString(@"Sort by", @"")];
+      [sortBox setTitlePosition: NSAtTop];
+      [sortBox setContentViewMargins: NSMakeSize(2, 2)];
+      [self addSubview: sortBox];
+      RELEASE (sortBox);
+
+      cell = [NSButtonCell new];
+      [cell setButtonType: NSRadioButton];
+      [cell setBordered: NO];
+      [cell setImagePosition: NSImageLeft];
+
+      matrix = [[NSMatrix alloc]
 				  initWithFrame: NSMakeRect(40, 12, 80, 95)
-						  		  mode: NSRadioModeMatrix prototype: cell
-														  numberOfRows: 5 numberOfColumns: 1];
-    RELEASE (cell);
-    
-	  [matrix setCellSize: NSMakeSize(80, 16)];	
-	  [matrix setIntercellSpacing: NSMakeSize(1, 2)];	
-	  [sortBox setContentView: matrix]; 
-    [matrix setFrame: NSMakeRect(40, 12, 80, 95)];
-    RELEASE (matrix);
+					   mode: NSRadioModeMatrix prototype: cell
+				   numberOfRows: 5 numberOfColumns: 1];
+      RELEASE (cell);
 
-    cell = [matrix cellAtRow: byname column: 0];
-    [cell setTitle: NSLocalizedString(@"Name", @"")];
-    [cell setTag: byname];
-    cell = [matrix cellAtRow: bykind column: 0];
-    [cell setTitle: NSLocalizedString(@"Type", @"")];
-    [cell setTag: bykind];
-    cell = [matrix cellAtRow: bydate column: 0];
-    [cell setTitle: NSLocalizedString(@"Date", @"")];
-    [cell setTag: bydate];
-    cell = [matrix cellAtRow: bysize column: 0];
-    [cell setTitle: NSLocalizedString(@"Size", @"")];
-    [cell setTag: bysize];
-    cell = [matrix cellAtRow: byowner column: 0];
-    [cell setTitle: NSLocalizedString(@"Owner", @"")];
-    [cell setTag: byowner];
+      [matrix setCellSize: NSMakeSize(80, 16)];
+      [matrix setIntercellSpacing: NSMakeSize(1, 2)];
+      [sortBox setContentView: matrix];
+      [matrix setFrame: NSMakeRect(40, 12, 80, 95)];
+      RELEASE (matrix);
 
-	  [matrix sizeToCells];
-	  [matrix setTarget: self];
-	  [matrix setAction: @selector(setNewSortType:)];
+      cell = [matrix cellAtRow: byname column: 0];
+      [cell setTitle: NSLocalizedString(@"Name", @"")];
+      [cell setTag: byname];
+      cell = [matrix cellAtRow: bykind column: 0];
+      [cell setTitle: NSLocalizedString(@"Type", @"")];
+      [cell setTag: bykind];
+      cell = [matrix cellAtRow: bydate column: 0];
+      [cell setTitle: NSLocalizedString(@"Date", @"")];
+      [cell setTag: bydate];
+      cell = [matrix cellAtRow: bysize column: 0];
+      [cell setTitle: NSLocalizedString(@"Size", @"")];
+      [cell setTag: bysize];
+      cell = [matrix cellAtRow: byowner column: 0];
+      [cell setTitle: NSLocalizedString(@"Owner", @"")];
+      [cell setTag: byowner];
 
-		label = [[NSTextField alloc] initWithFrame: NSMakeRect(8, 55, 240, 60)];	
-		[label setFont: [NSFont systemFontOfSize: 12]];
-		[label setAlignment: NSCenterTextAlignment];
-		[label setBackgroundColor: [NSColor windowBackgroundColor]];
-		[label setTextColor: [NSColor darkGrayColor]];	
-		[label setBezeled: NO];
-		[label setEditable: NO];
-		[label setSelectable: NO];
-		[label setStringValue: NSLocalizedString(@"Sort method applies to the\ncontents of the selected folder,\nNOT to its parent folder", @"")];
-		[self addSubview: label]; 
-    RELEASE (label);
-    
-	  okButt = [[NSButton alloc] initWithFrame: NSMakeRect(141, 10, 115, 25)];
-	  [okButt setButtonType: NSMomentaryLight];
-    [okButt setImage: [NSImage imageNamed: @"common_ret.tiff"]];
-    [okButt setImagePosition: NSImageRight];
-	  [okButt setTitle: NSLocalizedString(@"Ok", @"")];
-    [okButt setEnabled: NO];		
-		[self addSubview: okButt]; 
-    RELEASE (okButt);
-    
-    currentPath = nil;
+      [matrix sizeToCells];
+      [matrix setTarget: self];
+      [matrix setAction: @selector(setNewSortType:)];
 
-    inspector = insp;
-    fm = [NSFileManager defaultManager];
-    ws = [NSWorkspace sharedWorkspace];
-				
-		valid = YES;
-    
-    [self setContextHelp];
-	}
-  
-	return self;
+      label = [[NSTextField alloc] initWithFrame: NSMakeRect(8, 55, 240, 60)];
+      [label setFont: [NSFont systemFontOfSize: 12]];
+      [label setAlignment: NSCenterTextAlignment];
+      [label setBackgroundColor: [NSColor windowBackgroundColor]];
+      [label setTextColor: [NSColor darkGrayColor]];
+      [label setBezeled: NO];
+      [label setEditable: NO];
+      [label setSelectable: NO];
+      [label setStringValue: NSLocalizedString(@"Sort method applies to the\ncontents of the selected folder,\nNOT to its parent folder", @"")];
+      [self addSubview: label];
+      RELEASE (label);
+
+      okButt = [[NSButton alloc] initWithFrame: NSMakeRect(141, 10, 115, 25)];
+      [okButt setButtonType: NSMomentaryLight];
+      [okButt setImage: [NSImage imageNamed: @"common_ret.tiff"]];
+      [okButt setImagePosition: NSImageRight];
+      [okButt setTitle: NSLocalizedString(@"Ok", @"")];
+      [okButt setEnabled: NO];
+      [self addSubview: okButt];
+      RELEASE (okButt);
+
+      currentPath = nil;
+
+      inspector = insp;
+      fm = [NSFileManager defaultManager];
+      ws = [NSWorkspace sharedWorkspace];
+
+      valid = YES;
+
+      [self setContextHelp];
+    }
+
+  return self;
 }
 
 - (void)displayPath:(NSString *)path
@@ -154,7 +155,7 @@
 {
 }
 
-- (NSString *)currentPath
+- (NSString *)path
 {
   return currentPath;
 }
@@ -165,8 +166,9 @@
 
 - (BOOL)canDisplayPath:(NSString *)path
 {
-	NSString *defApp, *fileType;
-	[ws getInfoForFile: path application: &defApp type: &fileType];
+  NSString *defApp, *fileType;
+
+  [ws getInfoForFile: path application: &defApp type: &fileType];
   return ([fileType isEqual: NSFilesystemFileType]
                           || [fileType isEqual: NSDirectoryFileType]);
 }
@@ -200,12 +202,12 @@
     }
   } 
   
-	return byname;
+  return byname;
 }
 
 - (void)setNewSortType:(id)sender
 {
-	sortType = [[sender selectedCell] tag];
+  sortType = [[sender selectedCell] tag];
 
   if ([fm isWritableFileAtPath: currentPath]) {
     NSString *sortstr = [NSString stringWithFormat: @"%i", sortType];
@@ -228,7 +230,7 @@
   NSString *resPath = [bpath stringByAppendingPathComponent: @"Resources"];
   NSArray *languages = [NSUserDefaults userLanguages];
   unsigned i;
-     
+
   for (i = 0; i < [languages count]; i++) {
     NSString *language = [languages objectAtIndex: i];
     NSString *langDir = [NSString stringWithFormat: @"%@.lproj", language];  

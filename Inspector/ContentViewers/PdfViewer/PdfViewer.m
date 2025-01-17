@@ -172,14 +172,15 @@ const double PDFResolution = 72.0;
   
   doc = [PDFDocument documentFromFile: pdfPath];
 
-  if ([doc isOk] && ([doc errorCode] == 0)) {
-    int npages;
-    NSSize imageSize;
-	  NSBundle *bundle;
-	  NSString *imagePath;
-	  NSImage *miniPage;
-    id cell;
-    int i;
+  if ([doc isOk] && ([doc errorCode] == 0))
+    {
+      int npages;
+      NSSize imageSize;
+      NSBundle *bundle;
+      NSString *imagePath;
+      NSImage *miniPage;
+      id cell;
+      int i;
 
     if (valid == NO) {
       valid = YES;
@@ -318,7 +319,7 @@ const double PDFResolution = 72.0;
 {
 }
 
-- (NSString *)currentPath
+- (NSString *)path
 {
   return pdfPath;
 }
@@ -331,7 +332,7 @@ const double PDFResolution = 72.0;
 - (BOOL)canDisplayPath:(NSString *)path
 {
   NSDictionary *attributes;
-	NSString *defApp, *fileType;
+  NSString *defApp, *fileType;
 
   attributes = [[NSFileManager defaultManager] fileAttributesAtPath: path
                                                        traverseLink: YES];
@@ -407,7 +408,7 @@ const double PDFResolution = 72.0;
 
 - (void)editFile:(id)sender
 {
-	NSString *appName;
+  NSString *appName;
   NSString *type;
 
   [ws getInfoForFile: pdfPath application: &appName type: &type];

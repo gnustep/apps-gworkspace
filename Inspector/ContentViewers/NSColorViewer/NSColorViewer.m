@@ -172,7 +172,7 @@
   }
 }
 
-- (NSString *)currentPath
+- (NSString *)path
 {
   return nil;
 }
