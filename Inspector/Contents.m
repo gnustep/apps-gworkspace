@@ -327,16 +327,19 @@ static NSString *nibName = @"Contents";
 
 - (void)contentsReadyAt:(NSString *)path
 {
-  FSNode *node = [FSNode nodeWithPath: path];
-  NSImage *icon = [[FSNodeRep sharedInstance] iconOfSize: ICNSIZE forNode: node];
+  FSNode *node;
+  NSImage *icon;
 
-  [iconView setImage: icon];
+  node = [FSNode nodeWithPath: path];
   [titleField setStringValue: [node name]];
+  icon = [[FSNodeRep sharedInstance] iconOfSize: ICNSIZE forNode: node];
+  [iconView setImage: icon];
 
-  if (currentPath == nil) {
-    ASSIGN (currentPath, path); 
-    [inspector addWatcherForPath: currentPath];
-  }
+  if (currentPath == nil)
+    {
+      ASSIGN (currentPath, path);
+      [inspector addWatcherForPath: currentPath];
+    }
 }
 
 - (BOOL)canDisplayDataOfType:(NSString *)type
