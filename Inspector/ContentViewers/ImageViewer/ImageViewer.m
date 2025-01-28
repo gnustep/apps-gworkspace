@@ -83,7 +83,7 @@
     [heightLabel setSelectable: NO];
     [heightLabel setAlignment: NSRightTextAlignment];
     [heightLabel setStringValue: @""];
-    [self addSubview: heightLabel]; 
+    [self addSubview: heightLabel];
     RELEASE (heightLabel);
 
     r.origin.x = 2;
@@ -110,28 +110,28 @@
     r.origin.y = 10;
     r.size.width = 115;
     r.size.height = 25;
-	  editButt = [[NSButton alloc] initWithFrame: r];
-	  [editButt setButtonType: NSMomentaryLight];
+    editButt = [[NSButton alloc] initWithFrame: r];
+    [editButt setButtonType: NSMomentaryLight];
     [editButt setImage: [NSImage imageNamed: @"common_ret.tiff"]];
     [editButt setImagePosition: NSImageRight];
-	  [editButt setTitle: NSLocalizedString(@"Edit", @"")];
-	  [editButt setTarget: self];
-	  [editButt setAction: @selector(editFile:)];	
-    [editButt setEnabled: NO];		
-		[self addSubview: editButt]; 
+    [editButt setTitle: NSLocalizedString(@"Edit", @"")];
+    [editButt setTarget: self];
+    [editButt setAction: @selector(editFile:)];
+    [editButt setEnabled: NO];
+    [self addSubview: editButt];
     RELEASE (editButt);
 
     inspector = insp;
     fm = [NSFileManager defaultManager];
     ws = [NSWorkspace sharedWorkspace];
-        
+
     valid = YES;
-    
+
     resizer = nil;
     imagePath = nil;
     editPath = nil;
     image = nil;
-    
+
     [self setContextHelp];
   }
 	
@@ -200,31 +200,40 @@
 
   imgok = NO;
   imgdata = nil;
+
+  // whether we have or not read an image, we declare the content is ready
+  // at most we won't display it, otherwise other data does not update
+  if ([self superview])
+    [inspector contentsReadyAt: imagePath];
+
   if (nil != imginfo)
     {
       imgdata = [imginfo objectForKey:@"imgdata"];
+
+      // since resizing is async, we check if we still need the generated image
       if ([imagePath isEqualToString:[imginfo objectForKey: @"imgpath"]] == NO)
 	{
 	  NSLog(@"ImageViewer: trying to display inconsistent image");
 	  return;
 	}
     }
+  else
+    {
+      NSLog(@"imageReady without imginfo");
+    }
 
   if (imgdata)
     {
-      if ([self superview])
-        [inspector contentsReadyAt: imagePath];
-      
       DESTROY (image);
       image = [[NSImage alloc] initWithData: imgdata];
 
-      imgok = YES;
       if (image)
         {
           float width = [[imginfo objectForKey: @"width"] floatValue];
           float height = [[imginfo objectForKey: @"height"] floatValue];
           NSString *str;
 
+	  imgok = YES;
           if (valid == NO)
             {
               valid = YES;
@@ -247,10 +256,14 @@
           [[self window] makeFirstResponder: editButt];
 	  DESTROY (imagePath);
         }
+      else
+	{
+	  NSLog(@"no image returned");
+	}
     }
 
-  if (imgok == NO) {
-    if (valid == YES) {
+  if (imgok == NO)
+    {
       valid = NO;
       [imview removeFromSuperview];
       [self addSubview: errLabel];
@@ -258,8 +271,7 @@
       [heightLabel setStringValue: @""];
       [editButt setEnabled: NO];
     }
-  }
-  
+
   [progView stop];
   [progView removeFromSuperview];  
 }
