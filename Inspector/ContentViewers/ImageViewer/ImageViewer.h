@@ -73,7 +73,7 @@
   ImageResizer *resizer;
   
   id <ContentInspectorProtocol>inspector;
-  NSFileManager *fm;
+
   NSWorkspace *ws;
 }
 
