@@ -438,9 +438,10 @@ static NSString *nibName = @"Contents";
 {
   self = [super initWithFrame: frameRect];
   
-  if (self) {
+  if (self)
+    {
     NSRect r = [self bounds];
-        
+
     r.origin.y += 45;
     r.size.height -= 45;
     scrollView = [[NSScrollView alloc] initWithFrame: r];
@@ -490,46 +491,49 @@ static NSString *nibName = @"Contents";
     ws = [NSWorkspace sharedWorkspace];
   }
 	
-	return self;
+  return self;
 }
 
 - (BOOL)tryToDisplayPath:(NSString *)path
 {
   NSFileManager *fm = [NSFileManager defaultManager];
   NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: YES];
-  
+
   DESTROY (editPath);
   [editButt setEnabled: NO];	
 
-  if (attributes && ([attributes fileType] != NSFileTypeDirectory)) {
-	  NSString *app = nil, *type = nil;
-    
-    [ws getInfoForFile: path application: &app type: &type];
-    
-    if (type && ((type == NSPlainFileType) || (type == NSShellCommandFileType))) {
-      NSData *data = [self textContentsAtPath: path withAttributes: attributes];
+  if (attributes && ([attributes fileType] != NSFileTypeDirectory))
+    {
+      NSString *app = nil, *type = nil;
 
-      if (data) {
-        CREATE_AUTORELEASE_POOL (pool);
-        NSString *str = [[NSString alloc] initWithData: data
-                                  encoding: [NSString defaultCStringEncoding]];
-        NSAttributedString *attrstr = [[NSAttributedString alloc] initWithString: str];
+      [ws getInfoForFile: path application: &app type: &type];
 
-        [[textView textStorage] setAttributedString: attrstr];
-		    [[textView textStorage] addAttribute: NSFontAttributeName 
-                                       value: [NSFont systemFontOfSize: 8.0] 
-                                       range: NSMakeRange(0, [attrstr length])];
-        RELEASE (str);
-        RELEASE (attrstr);
-        [editButt setEnabled: YES];			
-        ASSIGN (editPath, path);
-        RELEASE (pool);
+      if (type && ((type == NSPlainFileType) || (type == NSShellCommandFileType)))
+	{
+	  NSData *data = [self textContentsAtPath: path withAttributes: attributes];
 
-        return YES;
-      }
+	  if (data)
+	    {
+	      CREATE_AUTORELEASE_POOL (pool);
+	      NSString *str = [[NSString alloc] initWithData: data
+						    encoding: [NSString defaultCStringEncoding]];
+	      NSAttributedString *attrstr = [[NSAttributedString alloc] initWithString: str];
+
+	      [[textView textStorage] setAttributedString: attrstr];
+	      [[textView textStorage] addAttribute: NSFontAttributeName
+					     value: [NSFont systemFontOfSize: 8.0]
+					     range: NSMakeRange(0, [attrstr length])];
+	      RELEASE (str);
+	      RELEASE (attrstr);
+	      [editButt setEnabled: YES];
+	      ASSIGN (editPath, path);
+	      RELEASE (pool);
+
+	      return YES;
+	    }
+	}
     }
-  }                                                     
-    
+
   return NO;
 }
 
@@ -638,12 +642,13 @@ static NSString *nibName = @"Contents";
 {
   [self showString: @""];
 
-  if (shComm && fileComm) {  
-    CREATE_AUTORELEASE_POOL (pool);
-    NSString *str;
-	  NSFileHandle *handle;  
-  
-          [nc removeObserver: self];
+  if (shComm && fileComm)
+    {
+      CREATE_AUTORELEASE_POOL (pool);
+      NSString *str;
+      NSFileHandle *handle;
+
+      [nc removeObserver: self];
           if (task && [task isRunning])
             {
               [task terminate];
