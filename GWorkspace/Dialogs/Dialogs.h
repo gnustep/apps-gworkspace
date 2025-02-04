@@ -49,18 +49,18 @@
   NSButton *switchButt;
   NSButton *cancelbutt, *okbutt;	
   BOOL useSwitch;
-  int result;
+  NSModalResponse result;
 }
 
 - (id)initWithTitle:(NSString *)title 
            editText:(NSString *)etext
         switchTitle:(NSString *)swtitle;
 
-- (int)runModal;
+- (NSModalResponse)runModal;
 
 - (NSString *)getEditFieldText;
 
-- (int)switchButtState;
+- (NSControlStateValue)switchButtState;
 
 - (void)buttonAction:(id)sender;
 

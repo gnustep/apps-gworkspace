@@ -138,7 +138,7 @@
   return self;
 }
 
-- (int)runModal
+- (NSModalResponse)runModal
 {
   [[NSApplication sharedApplication] runModalForWindow: self];
   return result;
@@ -149,17 +149,17 @@
 	return [editfield stringValue];
 }
 
-- (int)switchButtState
+- (NSControlStateValue)switchButtState
 {
   if (useSwitch) {
     return [switchButt state];
   }
-  return 0;
+  return NSOffState;
 }
 
 - (void)buttonAction:(id)sender
 {
-	if (sender == okbutt) {
+  if (sender == okbutt) {
     result = NSAlertDefaultReturn;
   } else {
     result = NSAlertAlternateReturn;
