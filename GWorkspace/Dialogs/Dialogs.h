@@ -1,6 +1,6 @@
 /* Dialogs.h
  *  
- * Copyright (C) 2003 Free Software Foundation, Inc.
+ * Copyright (C) 2003-2025 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: August 2001
@@ -33,7 +33,7 @@
 @class NSTextField;
 @class NSButton;
 
-@interface SympleDialogView : NSView
+@interface GWDialogView : NSView
 {
   BOOL useSwitch;
 }
@@ -42,14 +42,14 @@
 
 @end
 
-@interface SympleDialog : NSWindow
+@interface GWDialog : NSWindow
 {
-	SympleDialogView *dialogView;
-	NSTextField *titlefield, *editfield;	
+  GWDialogView *dialogView;
+  NSTextField *titlefield, *editfield;	
   NSButton *switchButt;
-	NSButton *cancelbutt, *okbutt;	
+  NSButton *cancelbutt, *okbutt;	
   BOOL useSwitch;
-	int result;
+  int result;
 }
 
 - (id)initWithTitle:(NSString *)title 

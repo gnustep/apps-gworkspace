@@ -610,14 +610,14 @@ static NSString *lsfname = @"LiveSearch.lsf";
 
 - (void)createLiveSearchFolderAtPath:(NSString *)path
 {
-  SympleDialog *dialog;
+  GWDialog *dialog;
   NSString *folderName;
   NSArray *contents;
   int result;
 
-  dialog = [[SympleDialog alloc] initWithTitle: NSLocalizedString(@"New Live Search", @"") 
-                                      editText: lsfname
-                                   switchTitle: nil];
+  dialog = [[GWDialog alloc] initWithTitle: NSLocalizedString(@"New Live Search", @"") 
+                                  editText: lsfname
+                               switchTitle: nil];
   AUTORELEASE (dialog);
   [dialog center];
   [dialog makeKeyWindow];

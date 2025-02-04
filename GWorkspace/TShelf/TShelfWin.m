@@ -275,7 +275,7 @@
 
 - (void)addTab
 {
-  SympleDialog *dialog;
+  GWDialog *dialog;
   NSString *tabName;
   int itype;
   NSArray *items;
@@ -290,9 +290,9 @@
     return;
   }
 
-  dialog = [[SympleDialog alloc] initWithTitle: NSLocalizedString(@"Add Tab", @"") 
-				      editText: @""
-				   switchTitle: NSLocalizedString(@"pasteboard tab", @"")];
+  dialog = [[GWDialog alloc] initWithTitle: NSLocalizedString(@"Add Tab", @"") 
+                                  editText: @""
+                               switchTitle: NSLocalizedString(@"pasteboard tab", @"")];
   [dialog center];
   [dialog makeKeyWindow];
   [dialog orderFrontRegardless];
@@ -397,7 +397,7 @@
 
 - (void)renameTab
 {
-  SympleDialog *dialog;
+  GWDialog *dialog;
   NSString *oldName;
   NSString *tabName;
   NSArray *items;
@@ -424,9 +424,9 @@
       return;
     }
   
-  dialog = [[SympleDialog alloc] initWithTitle: NSLocalizedString(@"Rename Tab", @"") 
-                                      editText: oldName
-                                   switchTitle: nil];
+  dialog = [[GWDialog alloc] initWithTitle: NSLocalizedString(@"Rename Tab", @"") 
+                                  editText: oldName
+                               switchTitle: nil];
   
   [dialog center];
   [dialog makeKeyWindow];

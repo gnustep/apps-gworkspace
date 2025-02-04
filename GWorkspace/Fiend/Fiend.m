@@ -232,7 +232,7 @@
 
 - (void)addLayer
 {
-  SympleDialog *dialog;
+  GWDialog *dialog;
   NSString *layerName;
   NSMutableArray *leaves;
   int result;
@@ -242,9 +242,9 @@
       return;
     }
 
-  dialog = [[SympleDialog alloc] initWithTitle: NSLocalizedString(@"New Layer", @"") 
-                                      editText: @""
-                                   switchTitle: nil];
+  dialog = [[GWDialog alloc] initWithTitle: NSLocalizedString(@"New Layer", @"") 
+                                  editText: @""
+                               switchTitle: nil];
   [dialog center];
   [dialog makeKeyWindow];
   [dialog orderFrontRegardless];
@@ -345,7 +345,7 @@
 
 - (void)renameCurrentLayer
 {
-  SympleDialog *dialog;
+  GWDialog *dialog;
   NSString *layerName;
   NSMutableArray *leaves;
   int result;
@@ -355,9 +355,9 @@
       return;
     }
 
-  dialog = [[SympleDialog alloc] initWithTitle: NSLocalizedString(@"Rename Layer", @"")
-                                      editText: currentName
-                                   switchTitle: nil];
+  dialog = [[GWDialog alloc] initWithTitle: NSLocalizedString(@"Rename Layer", @"")
+                                  editText: currentName
+                               switchTitle: nil];
   [dialog center];
   [dialog makeKeyWindow];
   [dialog orderFrontRegardless];
