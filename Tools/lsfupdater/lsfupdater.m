@@ -807,19 +807,23 @@ BOOL subPathOfPath(NSString *p1, NSString *p2);
 - (void)insertShorterPath:(NSString *)path 
                   inArray:(NSMutableArray *)array
 {
-  int count = [array count];
-  int i;
+  NSInteger i;
 
-  for (i = 0; i < [array count]; i++) {
-    NSString *str = [array objectAtIndex: i];
+  i = 0;
+  while (i < [array count])
+    {
+      NSString *str = [array objectAtIndex: i];
 
-    if (subPathOfPath(path, str) || [path isEqual: str]) {
-      [array removeObjectAtIndex: i];
-      count--;
-      i--;
+      if (subPathOfPath(path, str) || [path isEqual: str])
+	{
+	  [array removeObjectAtIndex: i];
+	}
+      else
+	{
+	  i++;
+	}
     }
-  }
-  
+
   [array addObject: path];
 }
 

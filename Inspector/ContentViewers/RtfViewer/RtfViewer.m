@@ -134,72 +134,81 @@
   NSAttributedString *attrstr = nil;
   NSFont *font = nil;  
 
-  if ([self superview]) {      
-    [inspector contentsReadyAt: path];
-  }
-  
-  if (([ext isEqual: @"rtf"] == NO) && ([ext isEqual: @"rtfd"] == NO)) {
-    NSDictionary *dict = [[NSFileManager defaultManager] 
+  if ([self superview])
+    {
+      [inspector contentsReadyAt: path];
+    }
+
+  if (([ext isEqual: @"rtf"] == NO) && ([ext isEqual: @"rtfd"] == NO))
+    {
+      NSDictionary *dict = [[NSFileManager defaultManager]
                               fileAttributesAtPath: path traverseLink: YES];
-    int nbytes = [[dict objectForKey: NSFileSize] intValue];
-    NSFileHandle *handle = [NSFileHandle fileHandleForReadingAtPath: path];
-    int maxbytes = 0;
-    
-    data = [NSMutableData new];
+      int nbytes = [[dict objectForKey: NSFileSize] intValue];
+      NSFileHandle *handle = [NSFileHandle fileHandleForReadingAtPath: path];
+      int maxbytes = 0;
+
+      data = [NSMutableData new];
   
-    do {
-      maxbytes += MAXDATA;
+      do {
+	maxbytes += MAXDATA;
 
-      [(NSMutableData *)data appendData: 
-          [handle readDataOfLength: ((nbytes >= MAXDATA) ? MAXDATA : nbytes)]];
+	[(NSMutableData *)data appendData:
+		 [handle readDataOfLength: ((nbytes >= MAXDATA) ? MAXDATA : nbytes)]];
 
-      s = [[NSString alloc] initWithData: data
-                                encoding: [NSString defaultCStringEncoding]];
-    } while ((s == nil) && (maxbytes < nbytes));
+	s = [[NSString alloc] initWithData: data
+				  encoding: [NSString defaultCStringEncoding]];
+      } while ((s == nil) && (maxbytes < nbytes));
 
-    [handle closeFile];
-    RELEASE (data);
+      [handle closeFile];
+      RELEASE (data);
 
-    attrstr = [[NSAttributedString alloc] initWithString: s];
-    RELEASE (s);
-    AUTORELEASE (attrstr);
+      attrstr = [[NSAttributedString alloc] initWithString: s];
+      RELEASE (s);
+      AUTORELEASE (attrstr);
 
-    font = [NSFont systemFontOfSize: 8.0];
+      font = [NSFont systemFontOfSize: 8.0];
 
-  } else if ([ext isEqual: @"rtf"] || [ext isEqual: @"rtfd"]) {
-    attrstr = [[NSAttributedString alloc] initWithPath: path
-                                    documentAttributes: NULL];
-    TEST_AUTORELEASE (attrstr);
-  }
-  
-  if (attrstr) {
-    ASSIGN (editPath, path);
-  
-    if (valid == NO) {
-      valid = YES;
-      [errLabel removeFromSuperview];
-      [self addSubview: scrollView]; 
+    }
+  else if ([ext isEqual: @"rtf"] || [ext isEqual: @"rtfd"])
+    {
+      attrstr = [[NSAttributedString alloc] initWithPath: path
+				      documentAttributes: NULL];
+      TEST_AUTORELEASE (attrstr);
     }
   
-    [[textView textStorage] setAttributedString: attrstr];
-    
-    if (font) {
-		  [[textView textStorage] addAttribute: NSFontAttributeName 
-                                     value: font 
-                                     range: NSMakeRange(0, [attrstr length])];
+  if (attrstr)
+    {
+      ASSIGN (editPath, path);
+
+      if (valid == NO)
+	{
+	  valid = YES;
+	  [errLabel removeFromSuperview];
+	  [self addSubview: scrollView];
+	}
+
+      [[textView textStorage] setAttributedString: attrstr];
+
+      if (font)
+	{
+	  [[textView textStorage] addAttribute: NSFontAttributeName
+					 value: font
+					 range: NSMakeRange(0, [attrstr length])];
+	}
+
+      [editButt setEnabled: YES];
+      [[self window] makeFirstResponder: editButt];
     }
-    
-    [editButt setEnabled: YES];			
-    [[self window] makeFirstResponder: editButt];
-    
-  } else {
-    if (valid == YES) {
-      valid = NO;
-      [scrollView removeFromSuperview];
-			[self addSubview: errLabel];
-			[editButt setEnabled: NO];			
+  else
+    {
+      if (valid == YES)
+	{
+	  valid = NO;
+	  [scrollView removeFromSuperview];
+	  [self addSubview: errLabel];
+	  [editButt setEnabled: NO];
+	}
     }
-  }
   
   RELEASE (pool);
 }
@@ -267,7 +276,7 @@
 
   [ws getInfoForFile: editPath application: &appName type: &type];
 
-	if (appName != nil) {
+  if (appName != nil) {
     NS_DURING
       {
     [ws openFile: editPath withApplication: appName];

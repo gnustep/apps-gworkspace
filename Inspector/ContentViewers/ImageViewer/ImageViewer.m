@@ -60,7 +60,7 @@
     [imview setImageFrameStyle: NSImageFrameGrayBezel];
     [imview setImageAlignment: NSImageAlignCenter];
     [imview setImageScaling: NSScaleNone];
-    [self addSubview: imview]; 
+    [self addSubview: imview];
     
     r.origin.x = 10;
     r.origin.y -= 20;
@@ -122,7 +122,6 @@
     RELEASE (editButt);
 
     inspector = insp;
-    fm = [NSFileManager defaultManager];
     ws = [NSWorkspace sharedWorkspace];
 
     valid = YES;
@@ -238,7 +237,7 @@
             {
               valid = YES;
               [errLabel removeFromSuperview];
-              [self addSubview: imview]; 
+              [self addSubview: imview];
             }
 
           [imview setImage: image];
@@ -296,7 +295,7 @@
   NSDictionary *attributes;
   NSString *defApp, *fileType, *extension;
 
-  attributes = [fm fileAttributesAtPath: path traverseLink: YES];
+  attributes = [[NSFileManager defaultManager] fileAttributesAtPath: path traverseLink: YES];
   if ([attributes objectForKey: NSFileType] == NSFileTypeDirectory)
     {
       return NO;
@@ -305,8 +304,7 @@
   [ws getInfoForFile: path application: &defApp type: &fileType];
   extension = [path pathExtension];
 	
-  if (([fileType isEqual: NSPlainFileType] == NO)
-      && ([fileType isEqual: NSShellCommandFileType] == NO))
+  if ([fileType isEqual: NSPlainFileType] == NO)
     {
       return NO;
     }
@@ -373,7 +371,7 @@
   
     helpPath = [resPath stringByAppendingPathComponent: helpPath];
   
-    if ([fm fileExistsAtPath: helpPath]) {
+    if ([[NSFileManager defaultManager] fileExistsAtPath: helpPath]) {
       NSAttributedString *help = [[NSAttributedString alloc] initWithPath: helpPath
                                                        documentAttributes: NULL];
       if (help) {

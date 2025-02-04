@@ -1,6 +1,6 @@
 /* PdfViewer.m
  *  
- * Copyright (C) 2004-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2025 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale <enrico@imago.ro>
  * Date: January 2004
@@ -69,7 +69,7 @@ const double PDFResolution = 72.0;
       [nextButt setImage: [NSImage imageNamed: @"common_ArrowUp.tiff"]];
       [nextButt setTarget: self];
       [nextButt setAction: @selector(nextPage:)];
-      [self addSubview: nextButt]; 
+      [self addSubview: nextButt];
 
       vr.origin.y -= 25;
       backButt = [[NSButton alloc] initWithFrame: vr];
@@ -90,72 +90,71 @@ const double PDFResolution = 72.0;
       [scroll setAutoresizingMask: NSViewHeightSizable | NSViewWidthSizable];
       [self addSubview: scroll]; 
 
-    cell = AUTORELEASE ([NSButtonCell new]);
-    [cell setButtonType: NSPushOnPushOffButton];
-    [cell setImagePosition: NSImageOverlaps]; 
+      cell = AUTORELEASE ([NSButtonCell new]);
+      [cell setButtonType: NSPushOnPushOffButton];
+      [cell setImagePosition: NSImageOverlaps];
 						
-    matrix = [[NSMatrix alloc] initWithFrame: NSZeroRect
-				            				mode: NSRadioModeMatrix prototype: cell
-			       												numberOfRows: 0 numberOfColumns: 0];
-    [matrix setIntercellSpacing: NSZeroSize];
-    [matrix setCellSize: NSMakeSize(26, [[scroll contentView] bounds].size.height)];
-		[matrix setAllowsEmptySelection: YES];
-		[matrix setTarget: self];
-		[matrix setAction: @selector(goToPage:)];
-		[scroll setDocumentView: matrix];	
+      matrix = [[NSMatrix alloc] initWithFrame: NSZeroRect
+					  mode: NSRadioModeMatrix prototype: cell
+				  numberOfRows: 0 numberOfColumns: 0];
+      [matrix setIntercellSpacing: NSZeroSize];
+      [matrix setCellSize: NSMakeSize(26, [[scroll contentView] bounds].size.height)];
+      [matrix setAllowsEmptySelection: YES];
+      [matrix setTarget: self];
+      [matrix setAction: @selector(goToPage:)];
+      [scroll setDocumentView: matrix];
 
-    vr.size.height = vr.origin.y - 42 - MARGIN;
-    vr.origin.x = 0;
-    vr.origin.y = 42;
-    vr.size.width = r.size.width;
-		imageView = [[NSImageView alloc] initWithFrame: vr];
-    [imageView setImageFrameStyle: NSImageFrameGrayBezel];
- //   [imageView setImageScaling: NSScaleNone];
-		[imageView setImageAlignment: NSImageAlignCenter];
-		[imageView setEditable: NO];
-  	[self addSubview: imageView]; 
+      vr.size.height = vr.origin.y - 42 - MARGIN;
+      vr.origin.x = 0;
+      vr.origin.y = 42;
+      vr.size.width = r.size.width;
+      imageView = [[NSImageView alloc] initWithFrame: vr];
+      [imageView setImageFrameStyle: NSImageFrameGrayBezel];
+      //   [imageView setImageScaling: NSScaleNone];
+      [imageView setImageAlignment: NSImageAlignCenter];
+      [imageView setEditable: NO];
+      [self addSubview: imageView];
 
-    vr.origin.x = 2;
-    vr.origin.y = 170;
-    vr.size.width = r.size.width - 4;
-    vr.size.height = 25;
-		errLabel = [[NSTextField alloc] initWithFrame: vr];	
-		[errLabel setFont: [NSFont systemFontOfSize: 18]];
-		[errLabel setAlignment: NSCenterTextAlignment];
-		[errLabel setBackgroundColor: [NSColor windowBackgroundColor]];
-		[errLabel setTextColor: [NSColor grayColor]];	
-		[errLabel setBezeled: NO];
-		[errLabel setEditable: NO];
-		[errLabel setSelectable: NO];
-		[errLabel setStringValue: NSLocalizedString(@"Invalid Contents", @"")];
+      vr.origin.x = 2;
+      vr.origin.y = 170;
+      vr.size.width = r.size.width - 4;
+      vr.size.height = 25;
+      errLabel = [[NSTextField alloc] initWithFrame: vr];
+      [errLabel setFont: [NSFont systemFontOfSize: 18]];
+      [errLabel setAlignment: NSCenterTextAlignment];
+      [errLabel setBackgroundColor: [NSColor windowBackgroundColor]];
+      [errLabel setTextColor: [NSColor darkGrayColor]];
+      [errLabel setBezeled: NO];
+      [errLabel setEditable: NO];
+      [errLabel setSelectable: NO];
+      [errLabel setStringValue: NSLocalizedString(@"Invalid Contents", @"")];
 
-    vr.origin.x = 141;
-    vr.origin.y = 10;
-    vr.size.width = 115;
-    vr.size.height = 25;
-	  editButt = [[NSButton alloc] initWithFrame: vr];
-	  [editButt setButtonType: NSMomentaryLight];
-    [editButt setImage: [NSImage imageNamed: @"common_ret.tiff"]];
-    [editButt setImagePosition: NSImageRight];
-	  [editButt setTitle: NSLocalizedString(@"Edit", @"")];
-	  [editButt setTarget: self];
-	  [editButt setAction: @selector(editFile:)];	
-    [editButt setEnabled: NO];		
-		[self addSubview: editButt]; 
-    RELEASE (editButt);
+      vr.origin.x = 141;
+      vr.origin.y = 10;
+      vr.size.width = 115;
+      vr.size.height = 25;
+      editButt = [[NSButton alloc] initWithFrame: vr];
+      [editButt setButtonType: NSMomentaryLight];
+      [editButt setImage: [NSImage imageNamed: @"common_ret.tiff"]];
+      [editButt setImagePosition: NSImageRight];
+      [editButt setTitle: NSLocalizedString(@"Edit", @"")];
+      [editButt setTarget: self];
+      [editButt setAction: @selector(editFile:)];
+      [editButt setEnabled: NO];
+      [self addSubview: editButt];
+      RELEASE (editButt);
 
-    inspector = insp;    
-		fm = [NSFileManager defaultManager];		
-		ws = [NSWorkspace sharedWorkspace];
+      inspector = insp;
+      fm = [NSFileManager defaultManager];
+      ws = [NSWorkspace sharedWorkspace];
 
-		valid = YES;
-		
-    pdfPath = nil;
-    
-    [self setContextHelp];
-	}
-	
-	return self;
+      valid = YES;
+      pdfPath = nil;
+
+      [self setContextHelp];
+    }
+
+  return self;
 }
 
 - (void)displayPath:(NSString *)path
@@ -182,91 +181,100 @@ const double PDFResolution = 72.0;
       id cell;
       int i;
 
-    if (valid == NO) {
-      valid = YES;
-      [errLabel removeFromSuperview];
-      [self addSubview: backButt]; 
-      [self addSubview: nextButt]; 
-      [self addSubview: scroll]; 
-      [self addSubview: imageView]; 
+      if (!valid)
+	{
+	  valid = YES;
+	  [errLabel removeFromSuperview];
+	  [self addSubview: backButt];
+	  [self addSubview: nextButt];
+	  [self addSubview: scroll];
+	  [self addSubview: imageView];
+	}
+
+      [imageView setImage: nil];
+
+      [editButt setEnabled: YES];
+      [[self window] makeFirstResponder: editButt];
+
+      if (matrix)
+	{
+	  [matrix removeFromSuperview];
+	  [scroll setDocumentView: nil];
+	  DESTROY (matrix);
+	}
+
+      cell = AUTORELEASE ([NSButtonCell new]);
+      [cell setButtonType: NSPushOnPushOffButton];
+      [cell setImagePosition: NSImageOverlaps];
+
+      matrix = [[NSMatrix alloc] initWithFrame: NSZeroRect
+					  mode: NSRadioModeMatrix prototype: cell
+				  numberOfRows: 0 numberOfColumns: 0];
+      [matrix setIntercellSpacing: NSZeroSize];
+      [matrix setCellSize: NSMakeSize(26, [[scroll contentView] bounds].size.height)];
+      [matrix setAllowsEmptySelection: YES];
+      [matrix setTarget: self];
+      [matrix setAction: @selector(goToPage:)];
+      [scroll setDocumentView: matrix];
+
+      bundle = [NSBundle bundleForClass: [self class]];
+      imagePath = [bundle pathForResource: @"page" ofType: @"tiff" inDirectory: nil];
+      miniPage = [[NSImage alloc] initWithContentsOfFile: imagePath];
+
+      npages = [doc countPages];
+
+      for (i = 0; i < npages; i++)
+	{
+	  [matrix addColumn];
+
+	  cell = [matrix cellAtRow: 0 column: i];
+	  if (i < 100)
+	    {
+	      [cell setFont: [NSFont systemFontOfSize: 10]];
+	    }
+	  else
+	    {
+	      [cell setFont: [NSFont systemFontOfSize: 8]];
+	    }
+	  [cell setImage: miniPage];
+	  [cell setTitle: [NSString stringWithFormat: @"%i", i+1]];
+	}
+      [matrix sizeToCells];
+      RELEASE (miniPage);
+
+      DESTROY (imageRep);
+      ASSIGN (pdfDoc, doc);
+
+      imageSize = NSMakeSize([pdfDoc pageWidth: 1],
+			     [pdfDoc pageHeight: 1]);
+      imageRep = [[PDFImageRep alloc] initWithDocument: pdfDoc];
+      [imageRep setSize: imageSize];
     }
-    
-    [imageView setImage: nil];
-    
-    [editButt setEnabled: YES];		
-    [[self window] makeFirstResponder: editButt];
-    
-	  if (matrix) {
-		  [matrix removeFromSuperview];	
-		  [scroll setDocumentView: nil];		
-		  DESTROY (matrix);
-	  }
-    
-  	cell = AUTORELEASE ([NSButtonCell new]);
-  	[cell setButtonType: NSPushOnPushOffButton];
-  	[cell setImagePosition: NSImageOverlaps]; 
-
-  	matrix = [[NSMatrix alloc] initWithFrame: NSZeroRect
-				            				mode: NSRadioModeMatrix prototype: cell
-			       												numberOfRows: 0 numberOfColumns: 0];
-  	[matrix setIntercellSpacing: NSZeroSize];
-  	[matrix setCellSize: NSMakeSize(26, [[scroll contentView] bounds].size.height)];
-		[matrix setAllowsEmptySelection: YES];
-		[matrix setTarget: self];
-		[matrix setAction: @selector(goToPage:)];
-		[scroll setDocumentView: matrix];	
-
-		bundle = [NSBundle bundleForClass: [self class]];
-		imagePath = [bundle pathForResource: @"page" ofType: @"tiff" inDirectory: nil];		
-		miniPage = [[NSImage alloc] initWithContentsOfFile: imagePath];
-    
-    npages = [doc countPages];
-    
-		for (i = 0; i < npages; i++) {
-      [matrix addColumn];
-
-			cell = [matrix cellAtRow: 0 column: i];
-			if (i < 100) {
-				[cell setFont: [NSFont systemFontOfSize: 10]];
-			} else {
-				[cell setFont: [NSFont systemFontOfSize: 8]];
-			}
-			[cell setImage: miniPage];     
-			[cell setTitle: [NSString stringWithFormat: @"%i", i+1]];     
-		}
-		[matrix sizeToCells];
-		RELEASE (miniPage);	    
-
-    DESTROY (imageRep);
-    ASSIGN (pdfDoc, doc);
-
-    imageSize = NSMakeSize([pdfDoc pageWidth: 1],
-                                    [pdfDoc pageHeight: 1]);
-    imageRep = [[PDFImageRep alloc] initWithDocument: pdfDoc];
-    [imageRep setSize: imageSize];
-
-  } else {
-    if (valid) {
-      valid = NO;
-      [backButt removeFromSuperview];
-      [nextButt removeFromSuperview];
-      [scroll removeFromSuperview];
-      [imageView removeFromSuperview];
-			[self addSubview: errLabel];      
-			[editButt setEnabled: NO];		
+  else
+    {
+      if (valid)
+	{
+	  valid = NO;
+	  [backButt removeFromSuperview];
+	  [nextButt removeFromSuperview];
+	  [scroll removeFromSuperview];
+	  [imageView removeFromSuperview];
+	  [self addSubview: errLabel];
+	  [editButt setEnabled: NO];
+	}
     }
-  }
-  
-  if (valid) {
-    [matrix selectCellAtRow: 0 column: 0];
-    [matrix sendAction];
+
+  if (valid)
+    {
+      [matrix selectCellAtRow: 0 column: 0];
+      [matrix sendAction];
   }
 }
 
 - (void)goToPage:(id)sender
 {
   NSImage *image = nil;
-  int index;
+  NSInteger index;
   NSSize imsize;
   NSSize unscaledSize;
                                               
@@ -336,22 +344,25 @@ const double PDFResolution = 72.0;
 
   attributes = [[NSFileManager defaultManager] fileAttributesAtPath: path
                                                        traverseLink: YES];
-  if ([attributes objectForKey: NSFileType] == NSFileTypeDirectory) {
-    return NO;
-  }		
-		
-	[ws getInfoForFile: path application: &defApp type: &fileType];
+  if ([attributes objectForKey: NSFileType] == NSFileTypeDirectory)
+    {
+      return NO;
+    }
+
+  [ws getInfoForFile: path application: &defApp type: &fileType];
 
   if(([fileType isEqual: NSPlainFileType] == NO)
-                  && ([fileType isEqual: NSShellCommandFileType] == NO)) {
-    return NO;
-  }
-	
-	if ([[[path pathExtension] lowercaseString] isEqual: @"pdf"]) {
-		return YES;
-	}
+     && ([fileType isEqual: NSShellCommandFileType] == NO))
+    {
+      return NO;
+    }
 
-	return NO;
+  if ([[[path pathExtension] lowercaseString] isEqual: @"pdf"])
+    {
+      return YES;
+    }
+
+  return NO;
 }
 
 - (BOOL)canDisplayDataOfType:(NSString *)type
@@ -361,12 +372,12 @@ const double PDFResolution = 72.0;
 
 - (NSString *)winname
 {
-	return NSLocalizedString(@"Pdf Inspector", @"");	
+  return NSLocalizedString(@"Pdf Inspector", @"");
 }
 
 - (NSString *)description
 {
-	return NSLocalizedString(@"This Inspector allow you View the content of a PDF file", @"");	
+  return NSLocalizedString(@"This Inspector allow you View the content of a PDF file", @"");
 }
 
 - (void)nextPage:(id)sender
