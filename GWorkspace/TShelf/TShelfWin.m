@@ -333,7 +333,7 @@
       return;
     }
   
-  itype = ([dialog switchButtState] == NSOnState) ? DATA_TAB : FILES_TAB;
+  itype = ([dialog switchButtonState] == NSOnState) ? DATA_TAB : FILES_TAB;
   
   item = [tView selectedTabItem];
   index = [tView indexOfItem: item];

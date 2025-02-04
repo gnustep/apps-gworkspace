@@ -38,29 +38,29 @@
   BOOL useSwitch;
 }
 
-- (id)initWithFrame:(NSRect)frameRect useSwitch:(BOOL)swtch;
+- (id)initWithFrame:(NSRect)frameRect useSwitch:(BOOL)aBool;
 
 @end
 
 @interface GWDialog : NSWindow
 {
   GWDialogView *dialogView;
-  NSTextField *titlefield, *editfield;	
+  NSTextField *titleField, *editField;
   NSButton *switchButt;
-  NSButton *cancelbutt, *okbutt;	
+  NSButton *cancelButt, *okButt;
   BOOL useSwitch;
   NSModalResponse result;
 }
 
 - (id)initWithTitle:(NSString *)title 
-           editText:(NSString *)etext
-        switchTitle:(NSString *)swtitle;
+           editText:(NSString *)eText
+        switchTitle:(NSString *)swTitle;
 
 - (NSModalResponse)runModal;
 
 - (NSString *)getEditFieldText;
 
-- (NSControlStateValue)switchButtState;
+- (NSControlStateValue)switchButtonState;
 
 - (void)buttonAction:(id)sender;
 
