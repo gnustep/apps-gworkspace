@@ -303,11 +303,6 @@
 		
   [ws getInfoForFile: path application: &defApp type: &fileType];
   extension = [path pathExtension];
-	
-  if ([fileType isEqual: NSPlainFileType] == NO)
-    {
-      return NO;
-    }
 
   if ([[NSImage imageFileTypes] containsObject: [extension lowercaseString]])
     {

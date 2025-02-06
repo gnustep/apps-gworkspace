@@ -241,11 +241,6 @@
   }		
 
   [ws getInfoForFile: path application: &defApp type: &fileType];
-	
-  if (([fileType isEqual: NSPlainFileType] == NO)
-                  && ([fileType isEqual: NSShellCommandFileType] == NO)) {
-    return NO;
-  }
 
   if ([extsarr containsObject: extension]) {
     return YES;

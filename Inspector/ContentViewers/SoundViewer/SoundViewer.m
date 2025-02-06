@@ -274,11 +274,6 @@
   }		
 			
 	[ws getInfoForFile: path application: &defApp type: &fileType];
-	
-  if(([fileType isEqual: NSPlainFileType] == NO)
-                  && ([fileType isEqual: NSShellCommandFileType] == NO)) {
-    return NO;
-  }
 
 	extension = [path pathExtension];
 	types = [NSArray arrayWithObjects: @"aiff", @"wav", @"snd", @"au", nil];
