@@ -37,6 +37,7 @@
 {
   RELEASE (path);
   RELEASE (relativePath);
+  RELEASE (lastPathComponent);
   RELEASE (name);  
   RELEASE (attributes);  
   RELEASE (fileType);
@@ -71,8 +72,6 @@
   self = [super init];
     
   if (self) {
-    NSString *lastPathComponent;
-    
     fsnodeRep = [FSNodeRep sharedInstance];
     fm = [NSFileManager defaultManager];
     ws = [NSWorkspace sharedWorkspace];
@@ -132,8 +131,6 @@
       ASSIGN (name, NSLocalizedStringFromTableInBundle(lastPathComponent, nil, [NSBundle bundleForClass:[self class]], @""));
     else
       ASSIGN (name, lastPathComponent);
-    
-    [lastPathComponent release];
   }
     
   return self;
@@ -444,6 +441,13 @@
   return relativePath;
 }
 
+/** use as never-translated name */
+- (NSString *)lastPathComponent
+{
+  return lastPathComponent;
+}
+
+/** essentially lastPathComponent which might be translated */
 - (NSString *)name
 {
   return name;
