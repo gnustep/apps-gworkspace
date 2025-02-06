@@ -311,7 +311,7 @@
       break;
     }
     
-    nd = [FSNode nodeWithRelativePath: [nd relativePath] parent: [bc shownNode]];
+    nd = [FSNode nodeWithRelativePath: [[nd relativePath] lastPathComponent] parent: [bc shownNode]];
     [self addAndLoadColumnForNode: nd];
   }
   
