@@ -1,8 +1,9 @@
 /* FSNode.m
  *  
- * Copyright (C) 2004-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2025 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale
+ *          Riccardo Mottola
  * Date: March 2004
  *
  * This file is part of the GNUstep FSNode framework
@@ -410,7 +411,7 @@
 
 - (NSString *)parentName
 {
-  return [[self parentPath] lastPathComponent];
+  return [parent name];
 }
 
 - (BOOL)isSubnodeOfNode:(FSNode *)anode
