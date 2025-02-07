@@ -1143,8 +1143,11 @@
   isDragTarget = NO;	
   dragLocalIcon = NO;    
 
-  if ((sourceDragMask & NSDragOperationCopy)
-      || (sourceDragMask & NSDragOperationLink))
+
+  if (!((sourceDragMask & NSDragOperationMove) ||
+        (sourceDragMask & NSDragOperationLink) ||
+        (sourceDragMask & NSDragOperationCopy)
+        ))
     {
       return NSDragOperationNone;
     }
@@ -1178,20 +1181,23 @@
           return NSDragOperationNone;
         }
       
-    if (count == 1) {
-      dragLocalIcon = ([self iconForPath: [sourcePaths objectAtIndex: 0]] != nil);
-    } else {
-      dragLocalIcon = ([self iconForPathsSelection: sourcePaths] != nil);
-    }
+    if (count == 1)
+      {
+        dragLocalIcon = ([self iconForPath: [sourcePaths objectAtIndex: 0]] != nil);
+      }
+    else
+      {
+        dragLocalIcon = ([self iconForPathsSelection: sourcePaths] != nil);
+      }
 
     isDragTarget = YES;	
     dragPoint = NSZeroPoint;
     DESTROY (dragIcon);
     insertIndex = -1;
     
-    return NSDragOperationEvery;
+    return NSDragOperationMove;
   }
-  
+
   return NSDragOperationNone;
 }
 
@@ -1207,17 +1213,22 @@
   
   sourceDragMask = [sender draggingSourceOperationMask];
   
-  if ((sourceDragMask & NSDragOperationCopy)
-      || (sourceDragMask & NSDragOperationLink)) {
-    if (dragIcon) {
-      DESTROY (dragIcon);
-      if (insertIndex != -1) {
-        [self setNeedsDisplayInRect: grid[insertIndex]];
-      }
-    }                   
-    return NSDragOperationNone;
-  }	
-  
+  if (!((sourceDragMask & NSDragOperationMove) ||
+        (sourceDragMask & NSDragOperationLink) ||
+        (sourceDragMask & NSDragOperationCopy)
+        ))
+    {
+      if (dragIcon)
+        {
+          DESTROY (dragIcon);
+          if (insertIndex != -1)
+            {
+              [self setNeedsDisplayInRect: grid[insertIndex]];
+            }
+        }
+      return NSDragOperationNone;
+    }
+
   dpoint = [sender draggingLocation];
   dpoint = [self convertPoint: dpoint fromView: nil];
   index = [self indexOfGridRectContainingPoint: dpoint];
@@ -1231,7 +1242,7 @@
     dragPoint.y = ceil(irect.origin.y + ((irect.size.height - sz.height) / 2));
       
     if (dragIcon == nil) {
-      ASSIGN (dragIcon, img); 
+      ASSIGN (dragIcon, img);
     }
   
     if (insertIndex != index) {
@@ -1252,12 +1263,6 @@
     insertIndex = -1;
     return NSDragOperationNone;
   }
-  
-  if ((sourceDragMask & NSDragOperationCopy)
-      || (sourceDragMask & NSDragOperationLink))
-    {
-      return NSDragOperationNone;
-    }
 
   return NSDragOperationEvery;
 }

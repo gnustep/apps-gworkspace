@@ -1,8 +1,9 @@
 /* FSNode.m
  *  
- * Copyright (C) 2004-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2025 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale
+ *          Riccardo Mottola
  * Date: March 2004
  *
  * This file is part of the GNUstep FSNode framework
@@ -36,6 +37,7 @@
 {
   RELEASE (path);
   RELEASE (relativePath);
+  RELEASE (lastPathComponent);
   RELEASE (name);  
   RELEASE (attributes);  
   RELEASE (fileType);
@@ -70,8 +72,6 @@
   self = [super init];
     
   if (self) {
-    NSString *lastPathComponent;
-    
     fsnodeRep = [FSNodeRep sharedInstance];
     fm = [NSFileManager defaultManager];
     ws = [NSWorkspace sharedWorkspace];
@@ -131,8 +131,6 @@
       ASSIGN (name, NSLocalizedStringFromTableInBundle(lastPathComponent, nil, [NSBundle bundleForClass:[self class]], @""));
     else
       ASSIGN (name, lastPathComponent);
-    
-    [lastPathComponent release];
   }
     
   return self;
@@ -410,7 +408,7 @@
 
 - (NSString *)parentName
 {
-  return [[self parentPath] lastPathComponent];
+  return [parent name];
 }
 
 - (BOOL)isSubnodeOfNode:(FSNode *)anode
@@ -443,6 +441,13 @@
   return relativePath;
 }
 
+/** use as never-translated name */
+- (NSString *)lastPathComponent
+{
+  return lastPathComponent;
+}
+
+/** essentially lastPathComponent which might be translated */
 - (NSString *)name
 {
   return name;

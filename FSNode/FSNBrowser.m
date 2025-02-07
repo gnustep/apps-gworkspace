@@ -301,7 +301,7 @@
     FSNBrowserColumn *bc = [columns objectAtIndex: column + i];
     FSNode *nd = [components objectAtIndex: i];
     FSNBrowserCell *cell = [bc selectCellOfNode: nd sendAction: NO];
-    
+
     if (cell) {
       if ([cell isLeaf]) {
         break;
@@ -311,7 +311,7 @@
       break;
     }
     
-    nd = [FSNode nodeWithRelativePath: [nd name] parent: [bc shownNode]];
+    nd = [FSNode nodeWithRelativePath: [nd lastPathComponent] parent: [bc shownNode]];
     [self addAndLoadColumnForNode: nd];
   }
   
@@ -326,9 +326,9 @@
     FSNode *node = [selection objectAtIndex: 0];
     FSNBrowserColumn *bc;
     NSArray *selNodes;
-    
+
     updateViewsLock++;
-    
+
     if ([selection count] > 1) {
       BOOL alldirs = YES;
       int i;
