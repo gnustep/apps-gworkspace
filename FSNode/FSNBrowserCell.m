@@ -196,162 +196,201 @@ static NSString *dots = @"...";
 }
 
 - (void)drawInteriorWithFrame:(NSRect)cellFrame 
-		                   inView:(NSView *)controlView
+                       inView:(NSView *)controlView
 {
 #define MARGIN (2.0)
 #define LEAF_MARGIN (5.0)
 
   NSWindow *cvwin = [controlView window];
 
-  if (cvwin) {
-    NSColor *backcolor = [cvwin backgroundColor];
-    float textlenght = cellFrame.size.width;
-    BOOL showsFirstResponder = [self showsFirstResponder];
-    int infoheight = 0;
+  if (cvwin)
+    {
+      NSColor *backcolor = [cvwin backgroundColor];
+      float textlenght = cellFrame.size.width;
+      BOOL showsFirstResponder = [self showsFirstResponder];
+      int infoheight = 0;
 
-    titleRect = cellFrame;
+      titleRect = cellFrame;
 
-    if (icon) {
-      textlenght -= ([icon size].width + (MARGIN * 2));
-    }
-    if ([self isLeaf]) {
-      textlenght -= LEAF_MARGIN; 
-    } else {
-      textlenght -= (LEAF_MARGIN + 16); 
-    }
-
-    textlenght -= MARGIN;
-    ASSIGN (uncutTitle, [self stringValue]);
-    [self setStringValue: [self cutTitle:uncutTitle toFitWidth:textlenght]];        
-
-    [self setShowsFirstResponder: NO];
-
-    if (icon == nil) {
-      if (nameEdited == NO) {
-        if (infoCell) {
-          infoheight = floor([[FSNodeRep sharedInstance] heightOfFont: [infoCell font]]);
-
-          if (([self isHighlighted] || [self state]) && (nameEdited == NO)) {
-	          [[self highlightColorInView: controlView] set];
-            NSRectFill(cellFrame);
-          }
-
-          titleRect.size.height -= infoheight;
-
-          if ([controlView isFlipped]) {
-            titleRect.origin.y += cellFrame.size.height;
-            titleRect.origin.y -= (titleRect.size.height + infoheight);
-          } else {
-            titleRect.origin.y += infoheight;
-          }
-
-          [super drawInteriorWithFrame: titleRect inView: controlView];
-
-        } else {
-          [super drawInteriorWithFrame: titleRect inView: controlView];
+      if (icon)
+        {
+          textlenght -= ([icon size].width + (MARGIN * 2));
+        }
+      if ([self isLeaf])
+        {
+          textlenght -= LEAF_MARGIN;
+        }
+      else
+        {
+          textlenght -= (LEAF_MARGIN + 16);
         }
 
-      } else {
-        [backcolor set];
-        NSRectFill(cellFrame);
-      }
+      textlenght -= MARGIN;
+      ASSIGN (uncutTitle, [self stringValue]);
+      [self setStringValue: [self cutTitle:uncutTitle toFitWidth:textlenght]];
 
-      if (infoCell) {
-        infoRect = NSMakeRect(cellFrame.origin.x + 2, cellFrame.origin.y + 3,
-                                        cellFrame.size.width - 2, infoheight);
+      [self setShowsFirstResponder: NO];
 
-        if ([controlView isFlipped]) {
-	        infoRect.origin.y += (cellFrame.size.height - infoRect.size.height);
-          infoRect.origin.y -= 6;
+      if (icon == nil)
+        {
+          if (nameEdited == NO)
+            {
+              if (infoCell)
+                {
+                  infoheight = floor([[FSNodeRep sharedInstance] heightOfFont: [infoCell font]]);
+
+                  if (([self isHighlighted] || [self state]) && (nameEdited == NO))
+                    {
+                      [[self highlightColorInView: controlView] set];
+                      NSRectFill(cellFrame);
+                    }
+
+                  titleRect.size.height -= infoheight;
+
+                  if ([controlView isFlipped])
+                    {
+                      titleRect.origin.y += cellFrame.size.height;
+                      titleRect.origin.y -= (titleRect.size.height + infoheight);
+                    }
+                  else
+                    {
+                      titleRect.origin.y += infoheight;
+                    }
+
+                  [super drawInteriorWithFrame: titleRect inView: controlView];
+                }
+              else
+                {
+                  [super drawInteriorWithFrame: titleRect inView: controlView];
+                }
+            }
+          else
+            {
+              [backcolor set];
+              NSRectFill(cellFrame);
+            }
+
+          if (infoCell)
+            {
+              infoRect = NSMakeRect(cellFrame.origin.x + 2, cellFrame.origin.y + 3,
+                                    cellFrame.size.width - 2, infoheight);
+
+              if ([controlView isFlipped])
+                {
+                  infoRect.origin.y += (cellFrame.size.height - infoRect.size.height);
+                  infoRect.origin.y -= 6;
+                }
+
+              [infoCell drawInteriorWithFrame: infoRect inView: controlView];
+            }
         }
+      else
+        {
+          NSRect icon_rect;
 
-        [infoCell drawInteriorWithFrame: infoRect inView: controlView];
-      } 
-
-    } else {
-      NSRect icon_rect;    
-
-      if (([self isHighlighted] || [self state]) && (nameEdited == NO)) {
+          if (([self isHighlighted] || [self state]) && (nameEdited == NO))
+            {
 	      [[self highlightColorInView: controlView] set];
-        NSRectFill(cellFrame);
-      } 
-	    
-      if (infoCell) {
-        titleRect.size.height -= infoheight;
+              NSRectFill(cellFrame);
+            }
 
-        if ([controlView isFlipped]) {
-          titleRect.origin.y += cellFrame.size.height;
-          titleRect.origin.y -= (titleRect.size.height + infoheight);
-        } else {
-          titleRect.origin.y += infoheight;
-        }
-      }
+          if (infoCell) {
+            titleRect.size.height -= infoheight;
 
-      icon_rect.origin = titleRect.origin;
-      icon_rect.size = NSMakeSize(icnsize, icnh);
-      icon_rect.origin.x += MARGIN;
-      icon_rect.origin.y += ((titleRect.size.height - icon_rect.size.height) / 2.0);
+            if ([controlView isFlipped])
+              {
+                titleRect.origin.y += cellFrame.size.height;
+                titleRect.origin.y -= (titleRect.size.height + infoheight);
+              }
+            else
+              {
+                titleRect.origin.y += infoheight;
+              }
+          }
 
-      if ([controlView isFlipped]) {
-        if (infoCell) {
-          icon_rect.origin.y += cellFrame.size.height;
-          icon_rect.origin.y -= (titleRect.size.height + infoheight);
-        }
+          icon_rect.origin = titleRect.origin;
+          icon_rect.size = NSMakeSize(icnsize, icnh);
+          icon_rect.origin.x += MARGIN;
+          icon_rect.origin.y += ((titleRect.size.height - icon_rect.size.height) / 2.0);
+
+          if ([controlView isFlipped])
+            {
+              if (infoCell)
+                {
+                  icon_rect.origin.y += cellFrame.size.height;
+                  icon_rect.origin.y -= (titleRect.size.height + infoheight);
+                }
 
 	      icon_rect.origin.y += icon_rect.size.height;
-      }
+            }
 
-      titleRect.origin.x += (icon_rect.size.width + (MARGIN * 2));	
-      titleRect.size.width -= (icon_rect.size.width + (MARGIN * 2));	
+          titleRect.origin.x += (icon_rect.size.width + (MARGIN * 2));
+          titleRect.size.width -= (icon_rect.size.width + (MARGIN * 2));
 
-      if (nameEdited == NO) {        
-        [super drawInteriorWithFrame: titleRect inView: controlView];
-      }
+          if (nameEdited == NO)
+            {
+              [super drawInteriorWithFrame: titleRect inView: controlView];
+            }
 
-      if (infoCell) {
-        infoRect = NSMakeRect(cellFrame.origin.x + 2, cellFrame.origin.y + 3,
-                                        cellFrame.size.width - 2, infoheight);
+          if (infoCell)
+            {
+              infoRect = NSMakeRect(cellFrame.origin.x + 2, cellFrame.origin.y + 3,
+                                    cellFrame.size.width - 2, infoheight);
 
-        if ([controlView isFlipped]) {
-	        infoRect.origin.y += (cellFrame.size.height - infoRect.size.height);
-          infoRect.origin.y -= 6;
+              if ([controlView isFlipped])
+                {
+                  infoRect.origin.y += (cellFrame.size.height - infoRect.size.height);
+                  infoRect.origin.y -= 6;
+                }
+
+              [infoCell drawInteriorWithFrame: infoRect inView: controlView];
+            }
+
+          [controlView lockFocus];
+
+          if ([self isEnabled])
+            {
+              if (iconSelected)
+                {
+                  if (isOpened == NO)
+                    {
+                      [selectedicon compositeToPoint: icon_rect.origin
+                                           operation: NSCompositeSourceOver];
+                    }
+                  else
+                    {
+                      [selectedicon dissolveToPoint: icon_rect.origin fraction: 0.5];
+                    }
+                }
+              else
+                {
+                  if (isOpened == NO)
+                    {
+                      [icon compositeToPoint: icon_rect.origin
+                                   operation: NSCompositeSourceOver];
+                    }
+                  else
+                    {
+                      [icon dissolveToPoint: icon_rect.origin fraction: 0.5];
+                    }
+                }
+            }
+          else
+            {
+              [icon dissolveToPoint: icon_rect.origin fraction: 0.3];
+            }
+
+          [controlView unlockFocus];
         }
 
-        [infoCell drawInteriorWithFrame: infoRect inView: controlView];
-      }
-
-      [controlView lockFocus];
-
-      if ([self isEnabled]) {
-        if (iconSelected) {
-          if (isOpened == NO) {	
-            [selectedicon compositeToPoint: icon_rect.origin 
-	                           operation: NSCompositeSourceOver];
-          } else {
-            [selectedicon dissolveToPoint: icon_rect.origin fraction: 0.5];
-          }
-        } else {
-          if (isOpened == NO) {	
-            [icon compositeToPoint: icon_rect.origin 
-	                       operation: NSCompositeSourceOver];
-          } else {              
-            [icon dissolveToPoint: icon_rect.origin fraction: 0.5];
-          }
+      if (showsFirstResponder)
+        {
+          [self setShowsFirstResponder: showsFirstResponder];
+          NSDottedFrameRect(cellFrame);
         }
-      } else {
-			  [icon dissolveToPoint: icon_rect.origin fraction: 0.3];
-      }
 
-      [controlView unlockFocus];
+      [self setStringValue: uncutTitle];
     }
-
-    if (showsFirstResponder) {
-      [self setShowsFirstResponder: showsFirstResponder];
-      NSDottedFrameRect(cellFrame);
-    }
-
-    [self setStringValue: uncutTitle]; 
-  }         
 }
 
 

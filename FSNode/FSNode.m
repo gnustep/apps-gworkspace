@@ -71,67 +71,72 @@
 {    
   self = [super init];
     
-  if (self) {
-    fsnodeRep = [FSNodeRep sharedInstance];
-    fm = [NSFileManager defaultManager];
-    ws = [NSWorkspace sharedWorkspace];
+  if (self)
+    {
+      fsnodeRep = [FSNodeRep sharedInstance];
+      fm = [NSFileManager defaultManager];
+      ws = [NSWorkspace sharedWorkspace];
+
+      parent = aparent;
+      ASSIGN (relativePath, rpath);
+      lastPathComponent = [[relativePath lastPathComponent] retain];
+      name = nil;
     
-    parent = aparent;
-    ASSIGN (relativePath, rpath);
-    lastPathComponent = [[relativePath lastPathComponent] retain];
-    name = nil;
-    
-    if (parent) {
-      NSString *parentPath = [parent path];
+      if (parent)
+        {
+          NSString *parentPath = [parent path];
       
-      if ([parentPath isEqual: path_separator()]) {
-        parentPath = @"";
-      }
-      ASSIGN (path, ([NSString stringWithFormat: @"%@%@%@", 
-                                      parentPath, path_separator(), lastPathComponent]));
-    } else {
-      ASSIGN (path, relativePath);
-    }
+          if ([parentPath isEqual: path_separator()])
+            {
+              parentPath = @"";
+            }
+          ASSIGN (path, ([NSString stringWithFormat: @"%@%@%@",
+                                   parentPath, path_separator(), lastPathComponent]));
+        }
+      else
+        {
+          ASSIGN (path, relativePath);
+        }
         
-    flags.readable = -1;
-    flags.writable = -1;
-    flags.executable = -1;
-    flags.deletable = -1;
-    flags.plain = -1;
-    flags.directory = -1;
-    flags.link = -1;
-    flags.socket = -1;
-    flags.charspecial = -1;
-    flags.blockspecial = -1;
-    flags.mountpoint = -1;
-    flags.application = -1;
-    flags.package = -1;
-    flags.unknown = -1;
+      flags.readable = -1;
+      flags.writable = -1;
+      flags.executable = -1;
+      flags.deletable = -1;
+      flags.plain = -1;
+      flags.directory = -1;
+      flags.link = -1;
+      flags.socket = -1;
+      flags.charspecial = -1;
+      flags.blockspecial = -1;
+      flags.mountpoint = -1;
+      flags.application = -1;
+      flags.package = -1;
+      flags.unknown = -1;
 
-    crDate = nil;
-    modDate = nil;
-    owner = nil;
-    ownerId = nil;
-    group = nil;
-    groupId = nil;
+      crDate = nil;
+      modDate = nil;
+      owner = nil;
+      ownerId = nil;
+      group = nil;
+      groupId = nil;
 
-    filesize = 0;
-    permissions = 0;
+      filesize = 0;
+      permissions = 0;
     
-    fileType = nil;    
-    typeDescription = nil;
+      fileType = nil;
+      typeDescription = nil;
     
-    application = nil;
+      application = nil;
                                       
-    attributes = [fm fileAttributesAtPath: path traverseLink: NO];
-    RETAIN (attributes);
+      attributes = [fm fileAttributesAtPath: path traverseLink: NO];
+      RETAIN (attributes);
 
-    /* we localize only directories which could be special */
-    if ([self isDirectory])
-      ASSIGN (name, NSLocalizedStringFromTableInBundle(lastPathComponent, nil, [NSBundle bundleForClass:[self class]], @""));
-    else
-      ASSIGN (name, lastPathComponent);
-  }
+      /* we localize only directories which could be special */
+      if ([self isDirectory])
+        ASSIGN (name, NSLocalizedStringFromTableInBundle(lastPathComponent, nil, [NSBundle bundleForClass:[self class]], @""));
+      else
+        ASSIGN (name, lastPathComponent);
+    }
     
   return self;
 }
@@ -154,9 +159,10 @@
 
 - (BOOL)isEqualToNode:(FSNode *)anode
 {
-  if (anode == self) {
-    return YES;
-  }
+  if (anode == self)
+    {
+      return YES;
+    }
   return [path isEqualToString: [anode path]];
 }
 
@@ -166,15 +172,16 @@
   NSMutableArray *nodes = [NSMutableArray array];
   NSArray *fnames = [fsnodeRep directoryContentsAtPath: path];
   NSUInteger i;
-  
-  for (i = 0; i < [fnames count]; i++) {
-    NSString *fname = [fnames objectAtIndex: i];
-    FSNode *node = [[FSNode alloc] initWithRelativePath: fname parent: self];
 
-    [nodes addObject: node];
-    RELEASE (node);
-  }
-  
+  for (i = 0; i < [fnames count]; i++)
+    {
+      NSString *fname = [fnames objectAtIndex: i];
+      FSNode *node = [[FSNode alloc] initWithRelativePath: fname parent: self];
+
+      [nodes addObject: node];
+      RELEASE (node);
+    }
+
   RETAIN (nodes);
   RELEASE (arp);
     
@@ -246,53 +253,58 @@
 + (NSArray *)nodeComponentsFromNode:(FSNode *)firstNode 
                              toNode:(FSNode *)secondNode
 {
-  if ([secondNode isSubnodeOfNode: firstNode]) {
-    CREATE_AUTORELEASE_POOL(arp);
-    NSString *p1 = [firstNode path];
-    NSString *p2 = [secondNode path];
-    NSUInteger index = ([p1 isEqual: path_separator()]) ? [p1 length] : ([p1 length] +1);
-    NSArray *pcomps = [[p2 substringFromIndex: index] pathComponents];
-    NSMutableArray *components = [NSMutableArray array];
-    FSNode *node;
-    NSUInteger i;
+  if ([secondNode isSubnodeOfNode: firstNode])
+    {
+      CREATE_AUTORELEASE_POOL(arp);
+      NSString *p1 = [firstNode path];
+      NSString *p2 = [secondNode path];
+      NSUInteger index = ([p1 isEqual: path_separator()]) ? [p1 length] : ([p1 length] +1);
+      NSArray *pcomps = [[p2 substringFromIndex: index] pathComponents];
+      NSMutableArray *components = [NSMutableArray array];
+      FSNode *node;
+      NSUInteger i;
     
-    node = [self nodeWithPath: p1];
-    [components addObject: node];
+      node = [self nodeWithPath: p1];
+      [components addObject: node];
     
-    for (i = 0; i < [pcomps count]; i++) {
-      FSNode *pnode = [components objectAtIndex: i];
-      NSString *rpath = [pcomps objectAtIndex: i];
+      for (i = 0; i < [pcomps count]; i++)
+        {
+          FSNode *pnode = [components objectAtIndex: i];
+          NSString *rpath = [pcomps objectAtIndex: i];
       
-      node = [self nodeWithRelativePath: rpath parent: pnode];
-      [components insertObject: node atIndex: [components count]];
+          node = [self nodeWithRelativePath: rpath parent: pnode];
+          [components insertObject: node atIndex: [components count]];
+        }
+    
+      RETAIN (components);
+      RELEASE (arp);
+    
+      return [[components autorelease] makeImmutableCopyOnFail: NO];
     }
-    
-    RETAIN (components);
-    RELEASE (arp);
-    
-    return [[components autorelease] makeImmutableCopyOnFail: NO];
-    
-  } else if ([secondNode isEqual: firstNode]) {
-    return [NSArray arrayWithObject: firstNode];
-  }
-  
+  else if ([secondNode isEqual: firstNode])
+    {
+      return [NSArray arrayWithObject: firstNode];
+    }
+
   return nil;
 }
 
 + (NSArray *)pathComponentsFromNode:(FSNode *)firstNode 
                              toNode:(FSNode *)secondNode
 {
-  if ([secondNode isSubnodeOfNode: firstNode]) {
-    NSString *p1 = [firstNode path];
-    NSString *p2 = [secondNode path];
-    int index = ([p1 isEqual: path_separator()]) ? [p1 length] : ([p1 length] +1);
+  if ([secondNode isSubnodeOfNode: firstNode])
+    {
+      NSString *p1 = [firstNode path];
+      NSString *p2 = [secondNode path];
+      int index = ([p1 isEqual: path_separator()]) ? [p1 length] : ([p1 length] +1);
     
-    return [[p2 substringFromIndex: index] pathComponents];
-    
-  } else if ([secondNode isEqual: firstNode]) {
-    return [NSArray arrayWithObject: [firstNode name]];
-  }
-  
+      return [[p2 substringFromIndex: index] pathComponents];
+    }
+  else if ([secondNode isEqual: firstNode])
+    {
+      return [NSArray arrayWithObject: [firstNode name]];
+    }
+
   return nil;
 }
 
@@ -341,7 +353,7 @@
 
   for (i = 0; i < [subnodes count]; i++) {
     FSNode *node = [subnodes objectAtIndex: i];
-    
+
     if ([node isValid] && [[node name] isEqual: aname]) {
       return node;
     }
@@ -355,13 +367,15 @@
 {
   NSUInteger i;
 
-  for (i = 0; i < [subnodes count]; i++) {
-    FSNode *node = [subnodes objectAtIndex: i];
-    
-    if ([node isValid] && [[node path] isEqual: apath]) {
-      return node;
+  for (i = 0; i < [subnodes count]; i++)
+    {
+      FSNode *node = [subnodes objectAtIndex: i];
+
+      if ([node isValid] && [[node path] isEqual: apath])
+        {
+          return node;
+        }
     }
-  }
   
   return nil;
 }
@@ -372,26 +386,31 @@
 {
   NSString *nodepath = [anode path];
   
-  if ([nodepath isEqual: apath]) {
+  if ([nodepath isEqual: apath])
     return YES;
-  
-  } else if (isSubpathOfPath(apath, nodepath)) {
-    NSUInteger i;
-    
-    if (files == nil) {
-      return YES;
-      
-    } else {
-      for (i = 0; i < [files count]; i++) {
-        NSString *fname = [files objectAtIndex: i];
-        NSString *fpath = [apath stringByAppendingPathComponent: fname];				
-				
-        if (([fpath isEqual: nodepath]) || (isSubpathOfPath(fpath, nodepath))) {
+
+  if (isSubpathOfPath(apath, nodepath))
+    {
+      NSUInteger i;
+
+      if (files == nil)
+        {
           return YES;
         }
-      }
+      else
+        {
+          for (i = 0; i < [files count]; i++)
+            {
+              NSString *fname = [files objectAtIndex: i];
+              NSString *fpath = [apath stringByAppendingPathComponent: fname];
+
+              if (([fpath isEqual: nodepath]) || (isSubpathOfPath(fpath, nodepath)))
+                {
+                  return YES;
+                }
+            }
+        }
     }
-  }
 
   return NO;
 }
@@ -946,44 +965,53 @@
   NSArray *files = [opinfo objectForKey: @"files"];    
   NSUInteger i;  	 
 
-  if ([operation isEqual: @"GWorkspaceRenameOperation"]) { 
-    files = [NSArray arrayWithObject: [source lastPathComponent]]; 
-    source = [source stringByDeletingLastPathComponent];            
-    destination = [destination stringByDeletingLastPathComponent];            
-  } 
-
-  if ([path isEqual: source] || [path isEqual: destination]) {
-    return YES;
-  }
-
-  if (isSubpathOfPath(source, path)) {
-    for (i = 0; i < [files count]; i++) {
-      NSString *fname = [files objectAtIndex: i];
-      NSString *fpath = [source stringByAppendingPathComponent: fname];				
-
-      if (([fpath isEqual: path]) || (isSubpathOfPath(fpath, path))) {
-        return YES;
-      }
+  if ([operation isEqual: @"GWorkspaceRenameOperation"])
+    {
+      files = [NSArray arrayWithObject: [source lastPathComponent]];
+      source = [source stringByDeletingLastPathComponent];
+      destination = [destination stringByDeletingLastPathComponent];
     }
-  }
-    
-  if ([operation isEqual: @"GWorkspaceRenameOperation"]) {
-    destination = [opinfo objectForKey: @"destination"];	 
-    files = [NSArray arrayWithObject: [destination lastPathComponent]]; 
-    destination = [destination stringByDeletingLastPathComponent];  
-  } 
-  
-  if (isSubpathOfPath(destination, path)) {
-    for (i = 0; i < [files count]; i++) {
-      NSString *fname = [files objectAtIndex: i];
-      NSString *fpath = [destination stringByAppendingPathComponent: fname];				
 
-      if (([fpath isEqual: path]) || (isSubpathOfPath(fpath, path))) {
-        return YES;
-      }
+  if ([path isEqual: source] || [path isEqual: destination])
+    {
+      return YES;
     }
-  }
-    
+
+  if (isSubpathOfPath(source, path))
+    {
+      for (i = 0; i < [files count]; i++)
+        {
+          NSString *fname = [files objectAtIndex: i];
+          NSString *fpath = [source stringByAppendingPathComponent: fname];
+
+          if (([fpath isEqual: path]) || (isSubpathOfPath(fpath, path)))
+            {
+              return YES;
+            }
+        }
+    }
+
+  if ([operation isEqual: @"GWorkspaceRenameOperation"])
+    {
+      destination = [opinfo objectForKey: @"destination"];
+      files = [NSArray arrayWithObject: [destination lastPathComponent]];
+      destination = [destination stringByDeletingLastPathComponent];
+    }
+
+  if (isSubpathOfPath(destination, path))
+    {
+      for (i = 0; i < [files count]; i++)
+        {
+          NSString *fname = [files objectAtIndex: i];
+          NSString *fpath = [destination stringByAppendingPathComponent: fname];
+
+          if (([fpath isEqual: path]) || (isSubpathOfPath(fpath, path)))
+            {
+              return YES;
+            }
+        }
+    }
+
   return NO;
 }
 
