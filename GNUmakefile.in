@@ -22,7 +22,6 @@ export PACKAGE_NAME
 include $(GNUSTEP_MAKEFILES)/common.make
 
 VERSION = @PACKAGE_VERSION@
-SVN_BASE_URL = svn+ssh://svn.gna.org/svn/gnustep/apps
 SVN_MODULE_NAME = gworkspace
 
 BUILD_GWMETADATA = @BUILD_GWMETADATA@

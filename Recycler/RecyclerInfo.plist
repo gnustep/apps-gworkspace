@@ -5,8 +5,8 @@
     ApplicationDescription = "Workspace Manager";
     ApplicationIcon = "Recycler.tiff";
     ApplicationName = "Recycler";
-    ApplicationRelease = "1.0.0";
-    NSBuildVersion = "12 2021";
+    ApplicationRelease = "1.1.0";
+    NSBuildVersion = "02 2025";
     CFBundleIdentifier = "org.gnustep.GWorkspace.Recycler";
     Authors = (
       "Riccardo Mottola",

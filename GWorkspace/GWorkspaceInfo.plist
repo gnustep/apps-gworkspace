@@ -2,8 +2,8 @@
     ApplicationName = "GWorkspace";
     ApplicationDescription = "GNUstep Workspace Manager";
     ApplicationIcon = "FileManager.tiff";
-    ApplicationRelease = "1.0.0";
-    NSBuildVersion = "12 2021";
+    ApplicationRelease = "1.1.0";
+    NSBuildVersion = "02 2025";
     CFBundleIdentifier = "org.gnustep.GWorkspace";
     Authors = (
       "Riccardo Mottola",
@@ -12,7 +12,7 @@
       "Dennis Leeuw <dleeuw@made-it.com>"
     );
     URL = "http://www.gnustep.org/experience/GWorkspace.html";
-    Copyright = "Copyright (C) 2003-2021 Free Software Foundation, Inc.";
+    Copyright = "Copyright (C) 2003-2025 Free Software Foundation, Inc.";
     CopyrightDescription = "Released under the GNU General Public License 2.0 or later";
     NSIcon = "FileManager.tiff";
     NSRole = "Viewer";
