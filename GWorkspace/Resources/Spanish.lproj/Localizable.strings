@@ -106,7 +106,7 @@
 /* GWorkspace.m */
 
 "GNUstep Workspace Manager" = "Gestor de Escritorio de GNUstep";
-"See http://www.gnustep.it/enrico/gworkspace" = "Vea http://www.gnustep.it/enrico/gworkspace";
+"See http://www.gnustep.it/enrico/gworkspace" = "Vea https://www.gnustep.org/experience/Gworkspace.html";
 "Released under the GNU General Public License 2.0" = "Publicado bajo la Licencia Pública General GNU 2.0";
 "Error" = "Error";
 "You have not write permission\nfor" = "No tiene permisos de escritura\npara";
