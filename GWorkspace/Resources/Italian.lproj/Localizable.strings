@@ -98,7 +98,7 @@
 /* GWorkspace.m */
 
 "GNUstep Workspace Manager" = "Workspace Manager per GNUstep";
-"See http://www.gnustep.it/enrico/gworkspace" = "Vai a http://www.gnustep.it/enrico/gworkspace";
+"See http://www.gnustep.it/enrico/gworkspace" = "Vai a https://www.gnustep.org/experience/Gworkspace.html";
 "Released under the GNU General Public License 2.0" = "Rilasciato sotto la GNU General Public License 2.0";
 
 "Error" = "Errore";
