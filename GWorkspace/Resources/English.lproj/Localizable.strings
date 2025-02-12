@@ -99,7 +99,7 @@
 /* GWorkspace.m */
 
 "GNUstep Workspace Manager" = "GNUstep Workspace Manager";
-"See http://www.gnustep.it/enrico/gworkspace" = "See https://www.gnustep.org/experience/Gworkspace.html";
+"See http://www.gnustep.it/enrico/gworkspace" = "See https://www.gnustep.org/experience/GWorkspace.html";
 "Released under the GNU General Public License 2.0" = "Released under the GNU General Public License 2.0";
 "Error" = "Error";
 "You have not write permission\nfor" = "You do not have write permission\nfor";
