@@ -37,8 +37,7 @@ env:
     libtiff-dev
     libpng-dev
     libicns-dev
-    libobjc-10-dev
-    libblocksruntime-dev
+    libobjc-dev
     gobjc
     gcc
 
@@ -55,6 +54,7 @@ jobs:
       matrix:
         include:
           - name: Ubuntu x64 GCC
+            library-combo: gnu-gnu-gnu
             CC: gcc
             CXX: g++
 
@@ -64,6 +64,7 @@ jobs:
       INSTALL_PATH: ${{ github.workspace }}/build
       CC: ${{ matrix.CC }}
       CXX: ${{ matrix.CXX }}
+      LIBRARY_COMBO: ${{ matrix.library-combo }}
 
     defaults:
       run:
@@ -78,6 +79,7 @@ jobs:
         run: |
           sudo apt-get -q -y update
           sudo apt-get -q -y install $APT_PACKAGES
+
       - name: Install dependencies
         env:
           TOOLS_MAKE_BRANCH: ${{github.event.inputs.tools_make_branch}}
