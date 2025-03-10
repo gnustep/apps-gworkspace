@@ -13,6 +13,10 @@ on:
         description: "libs-base branch"
         default: "master"
         required: true
+      libs_gui_branch:
+        description: "libs-gui branch"
+        default: "master"
+        required: true
       libs_back_branch:
         description: "libs-back branch"
         default: "master"
