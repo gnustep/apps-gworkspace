@@ -37,7 +37,7 @@ env:
     libtiff-dev
     libpng-dev
     libicns-dev
-    libobjc-dev
+    libobjc-10-dev
     gobjc
     gcc
 
