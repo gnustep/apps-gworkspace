@@ -46,7 +46,7 @@ install_gnustep_gui() {
 }
 
 install_gnustep_back() {
-    echo "::group::GNUstep Base"
+    echo "::group::GNUstep Back"
     cd $DEPS_PATH
     git clone -q -b ${LIBS_BACK_BRANCH:-master} https://github.com/gnustep/libs-back.git
     cd libs-back
