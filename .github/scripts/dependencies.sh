@@ -37,9 +37,8 @@ install_gnustep_base() {
 install_gnustep_gui() {
     echo "::group::GNUstep Gui"
     cd $DEPS_PATH
-    . $INSTALL_PATH/share/GNUstep/Makefiles/GNUstep.sh
-    git clone -q -b ${LIBS_BASE_BRANCH:-master} https://github.com/gnustep/libs-gui.git
-    cd libs-base
+    git clone -q -b ${LIBS_GUI_BRANCH:-master} https://github.com/gnustep/libs-gui.git
+    cd libs-gui
     ./configure
     make
     make install
@@ -49,9 +48,8 @@ install_gnustep_gui() {
 install_gnustep_back() {
     echo "::group::GNUstep Base"
     cd $DEPS_PATH
-    . $INSTALL_PATH/share/GNUstep/Makefiles/GNUstep.sh
-    git clone -q -b ${LIBS_BASE_BRANCH:-master} https://github.com/gnustep/libs-back.git
-    cd libs-base
+    git clone -q -b ${LIBS_BACK_BRANCH:-master} https://github.com/gnustep/libs-back.git
+    cd libs-back
     ./configure
     make
     make install
