@@ -44,6 +44,9 @@ env:
     libobjc-10-dev
     gobjc
     gcc
+    libxt-dev
+    libfreetype-dev
+    libcairo2-dev
 
 jobs:
   ########### Linux ###########
