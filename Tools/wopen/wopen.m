@@ -54,6 +54,7 @@ int main(int argc, char** argv, char **env_c)
       fullPath = fpath;
     } else {  
       fullPath = [basePath stringByAppendingPathComponent: fpath];
+      fullPath = [fullPath stringByStandardizingPath];
         
       if ([fm fileExistsAtPath: fullPath isDirectory: &isDir] == NO) {
         NSLog(@"%@ doesn't exist. exiting now.", fpath);
