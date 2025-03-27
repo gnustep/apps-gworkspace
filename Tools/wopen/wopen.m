@@ -2,7 +2,7 @@
  *  wopen.m: Implementation of the wopen tool 
  *  for the GNUstep GWorkspace application
  *
- *  Copyright (C) 2002-2011 Free Software Foundation, Inc.
+ *  Copyright (C) 2002-2025 Free Software Foundation, Inc.
  *
  *   Author: Enrico Sersale
  *   Date: September 2002
@@ -40,42 +40,47 @@ int main(int argc, char** argv, char **env_c)
   pool = [NSAutoreleasePool new];
   fm = [NSFileManager defaultManager];
   
-  if (argc < 2) {
-    NSLog(@"no arguments supplied. exiting now.");
-    [pool release];
-    exit(0);
-
-  } else {    
-    basePath = [fm currentDirectoryPath];
-    arguments = [[NSProcessInfo processInfo] arguments];
-    fpath = [arguments objectAtIndex: 1];
+  if (argc < 2)
+    {
+      NSLog(@"no arguments supplied. exiting now.");
+      [pool release];
+      exit(0);
+    }
+  else
+    {
+      basePath = [fm currentDirectoryPath];
+      arguments = [[NSProcessInfo processInfo] arguments];
+      fpath = [arguments objectAtIndex: 1];
         
-    if ([fpath isAbsolutePath] && [fm fileExistsAtPath: fpath isDirectory: &isDir]) {
-      fullPath = fpath;
-    } else {  
-      fullPath = [basePath stringByAppendingPathComponent: fpath];
-      fullPath = [fullPath stringByStandardizingPath];
-        
-      if ([fm fileExistsAtPath: fullPath isDirectory: &isDir] == NO) {
-        NSLog(@"%@ doesn't exist. exiting now.", fpath);
-        [pool release];
-        exit(0);
-      }
-    }    
+      if ([fpath isAbsolutePath] && [fm fileExistsAtPath: fpath isDirectory: &isDir])
+        {
+          fullPath = fpath;
+        }
+      else
+        {
+          fullPath = [basePath stringByAppendingPathComponent: fpath];
+          fullPath = [fullPath stringByStandardizingPath];
 
-	  gworkspace = [NSConnection rootProxyForConnectionWithRegisteredName: @"GWorkspace"  
-								          host: @""];
-      
-    if (gworkspace == nil)
-      {
-	NSLog(@"can't contact GWorkspace via %@. exiting now.", fpath);
-	[pool release];
-	exit(0);
-      } 
-    
-    [gworkspace application: gworkspace openFile: fullPath];    
-  }
-  
+          if ([fm fileExistsAtPath: fullPath isDirectory: &isDir] == NO)
+            {
+              NSLog(@"%@ doesn't exist. exiting now.", fpath);
+              [pool release];
+              exit(0);
+            }
+        }
+
+      gworkspace = [NSConnection rootProxyForConnectionWithRegisteredName: @"GWorkspace"
+                                                                     host: @""];
+      if (gworkspace == nil)
+        {
+          NSLog(@"can't contact GWorkspace via %@. exiting now.", fpath);
+          [pool release];
+          exit(0);
+        }
+
+      [gworkspace application: gworkspace openFile: fullPath];
+    }
+
   [pool release];
   exit(0);
 }
