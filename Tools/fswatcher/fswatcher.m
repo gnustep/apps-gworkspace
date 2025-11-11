@@ -788,7 +788,7 @@ static inline BOOL isDotFile(NSString *path)
         NSArray *newconts = [fm directoryContentsAtPath: watchedPath];
         NSMutableArray *diffFiles = [NSMutableArray array];
         BOOL contentsChanged = NO;
-        int i;
+        NSUInteger i;
 
         ASSIGN (date, moddate);
         ASSIGN (pathContents, newconts);
@@ -890,12 +890,12 @@ static inline BOOL isDotFile(NSString *path)
 
 - (NSString *)watchedPath
 {
-	return watchedPath;
+  return watchedPath;
 }
 
 - (BOOL)isOld
 {
-	return isOld;
+  return isOld;
 }
 
 - (NSTimer *)timer
@@ -914,58 +914,56 @@ int main(int argc, char** argv)
   BOOL subtask = YES;
 
   if ([[info arguments] containsObject: @"--auto"] == YES)
-  {
-    auto_stop = YES;
-  }
-    
+    {
+      auto_stop = YES;
+    }
+
   if ([[info arguments] containsObject: @"--daemon"])
-  {
-    subtask = NO;
-    is_daemon = YES;
-  }
+    {
+      subtask = NO;
+      is_daemon = YES;
+    }
 
   if (subtask)
-  {
-    NSTask *task;
-    
-    
-    task = [NSTask new];
-    
-    NS_DURING
-	    {
-	      [args removeObjectAtIndex: 0];
-	      [args addObject: @"--daemon"];
-	      [task setLaunchPath: [[NSBundle mainBundle] executablePath]];
-	      [task setArguments: args];
-	      [task setEnvironment: [info environment]];
-	      [task launch];
-	      DESTROY (task);
-	    }
-    NS_HANDLER
-	    {
-	      fprintf (stderr, "unable to launch the fswatcher task. exiting.\n");
-	      DESTROY (task);
-	    }
+    {
+      NSTask *task;
+
+      task = [NSTask new];
+
+      NS_DURING
+        {
+          [args removeObjectAtIndex: 0];
+          [args addObject: @"--daemon"];
+          [task setLaunchPath: [[NSBundle mainBundle] executablePath]];
+          [task setArguments: args];
+          [task setEnvironment: [info environment]];
+          [task launch];
+          DESTROY (task);
+        }
+      NS_HANDLER
+        {
+          fprintf (stderr, "unable to launch the fswatcher task. exiting.\n");
+          DESTROY (task);
+        }
     NS_ENDHANDLER
-      
-    exit(EXIT_FAILURE);
-  }
-  
+
+      exit(EXIT_FAILURE);
+    }
+
   RELEASE(pool);
 
   {
     CREATE_AUTORELEASE_POOL (pool);
     FSWatcher *fsw = [[FSWatcher alloc] init];
     RELEASE (pool);
-  
+
     if (fsw != nil)
-    {
-      CREATE_AUTORELEASE_POOL (pool);
-      [[NSRunLoop currentRunLoop] run];
-      RELEASE (pool);
-    }
+      {
+        CREATE_AUTORELEASE_POOL (pool);
+        [[NSRunLoop currentRunLoop] run];
+        RELEASE (pool);
+      }
   }
-    
+
   exit(EXIT_SUCCESS);
 }
-
