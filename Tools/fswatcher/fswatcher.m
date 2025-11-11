@@ -323,7 +323,7 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
                        @"err", @"extinfo", @"frag", @"la",
                        @"log", @"o", @"out", @"part",
                        @"sed", @"so", @"status", @"temp",
-                       @"tmp",
+                       @"tmp", @"gwdir",
                        nil];
     }
   
