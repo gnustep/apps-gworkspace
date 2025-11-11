@@ -45,36 +45,36 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 - (id)init
 {
   self = [super init];
-  
+
   if (self)
-  {
-    client = nil;
-    conn = nil;
-    wpaths = [[NSCountedSet alloc] initWithCapacity: 1];
-    global = NO;
-  }
+    {
+      client = nil;
+      conn = nil;
+      wpaths = [[NSCountedSet alloc] initWithCapacity: 1];
+      global = NO;
+    }
   
   return self;
 }
 
 - (void)setConnection:(NSConnection *)connection
 {
-	ASSIGN (conn, connection);
+  ASSIGN (conn, connection);
 }
 
 - (NSConnection *)connection
 {
-	return conn;
+  return conn;
 }
 
 - (void)setClient:(id <FSWClientProtocol>)clnt
 {
-	ASSIGN (client, clnt);
+  ASSIGN (client, clnt);
 }
 
 - (id <FSWClientProtocol>)client
 {
-	return client;
+  return client;
 }
 
 - (void)addWatchedPath:(NSString *)path
@@ -127,16 +127,17 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 		      object: connection];
 	}
     }
-  
-  if (conn) {
-    [nc removeObserver: self
-		              name: NSConnectionDidDieNotification
-		            object: conn];
-    DESTROY (conn);
-  }
-  
+
+  if (conn)
+    {
+      [nc removeObserver: self
+                    name: NSConnectionDidDieNotification
+                  object: conn];
+      DESTROY (conn);
+    }
+
   [dnc removeObserver: self];
-  
+
   RELEASE (clientsInfo);
   NSZoneFree (NSDefaultMallocZone(), (void *)watchers);
   freeTree(includePathsTree);
@@ -149,48 +150,47 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 - (id)init
 {
   self = [super init];
-  
+
   if (self)
-  {    
-    fm = [NSFileManager defaultManager];	
-    nc = [NSNotificationCenter defaultCenter];
-    dnc = [NSDistributedNotificationCenter defaultCenter];
-
-    conn = [NSConnection defaultConnection];
-    [conn setRootObject: self];
-    [conn setDelegate: self];
-
-    if ([conn registerName: @"fswatcher"] == NO)
     {
-      NSLog(@"unable to register with name server - quitting.");
-      DESTROY (self);
-      return self;
+      fm = [NSFileManager defaultManager];
+      nc = [NSNotificationCenter defaultCenter];
+      dnc = [NSDistributedNotificationCenter defaultCenter];
+
+      conn = [NSConnection defaultConnection];
+      [conn setRootObject: self];
+      [conn setDelegate: self];
+
+      if ([conn registerName: @"fswatcher"] == NO)
+        {
+          NSLog(@"unable to register with name server - quitting.");
+          DESTROY (self);
+          return self;
+        }
+
+      clientsInfo = [NSMutableArray new];
+
+      watchers = NSCreateMapTable(NSObjectMapKeyCallBacks,
+                                  NSObjectMapValueCallBacks, 0);
+
+      includePathsTree = newTreeWithIdentifier(@"incl_paths");
+      excludePathsTree = newTreeWithIdentifier(@"excl_paths");
+      excludedSuffixes = [[NSMutableSet alloc] initWithCapacity: 1];
+      [self setDefaultGlobalPaths];
+
+      [nc addObserver: self
+             selector: @selector(connectionBecameInvalid:)
+                 name: NSConnectionDidDieNotification
+               object: conn];
+      [dnc addObserver: self
+              selector: @selector(globalPathsChanged:)
+                  name: @"GSMetadataIndexedDirectoriesChanged"
+                object: nil];
     }
-    
-    clientsInfo = [NSMutableArray new]; 
-
-    watchers = NSCreateMapTable(NSObjectMapKeyCallBacks,
-	                                        NSObjectMapValueCallBacks, 0);
-      
-    includePathsTree = newTreeWithIdentifier(@"incl_paths");
-    excludePathsTree = newTreeWithIdentifier(@"excl_paths");
-    excludedSuffixes = [[NSMutableSet alloc] initWithCapacity: 1];
-    [self setDefaultGlobalPaths];  
-
-    [nc addObserver: self
-           selector: @selector(connectionBecameInvalid:)
-	             name: NSConnectionDidDieNotification
-	           object: conn];
-    [dnc addObserver: self
-            selector: @selector(globalPathsChanged:)
-	              name: @"GSMetadataIndexedDirectoriesChanged"
-	            object: nil];
-  }
   return self;    
 }
 
-- (BOOL)connection:(NSConnection *)ancestor
-            shouldMakeNewConnection:(NSConnection *)newConn;
+- (BOOL)connection:(NSConnection *)ancestor shouldMakeNewConnection:(NSConnection *)newConn
 {
   FSWClientInfo *info = [FSWClientInfo new];
 	      
@@ -202,9 +202,9 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
          selector: @selector(connectionBecameInvalid:)
 	           name: NSConnectionDidDieNotification
 	         object: newConn];
-           
+
   [newConn setDelegate: self];
-  
+
   return YES;
 }
 
@@ -213,47 +213,47 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
   id connection = [notification object];
 
   [nc removeObserver: self
-	              name: NSConnectionDidDieNotification
-	            object: connection];
+                name: NSConnectionDidDieNotification
+              object: connection];
 
   NSLog(@"Connection became invalid");
   if (connection == conn)
-  {
-    NSLog(@"argh - fswatcher server root connection has been destroyed.");
-    exit(EXIT_FAILURE);
-    
-  } else
-  {
-    FSWClientInfo *info = [self clientInfoWithConnection: connection];
-	
-    if (info)
     {
-      NSSet *wpaths = [info watchedPaths];
-      NSEnumerator *enumerator = [wpaths objectEnumerator];
-      NSString *wpath;
-      
-      while ((wpath = [enumerator nextObject]))
-      {
-        Watcher *watcher = [self watcherForPath: wpath];
-      
-        if (watcher)
-	{
-          [watcher removeListener];
-        }      
-      }
-      
-      [clientsInfo removeObject: info];
+      NSLog(@"argh - fswatcher server root connection has been destroyed.");
+      exit(EXIT_FAILURE);
     }
+  else
+    {
+      FSWClientInfo *info = [self clientInfoWithConnection: connection];
 
-    if (auto_stop == YES && [clientsInfo count] <= 1)
-      {
-	/* If there is nothing else using this process, and this is not
-	 * a daemon, then we can quietly terminate.
-	 */
-        NSLog(@"No more clients, shutting down.");
-        exit(EXIT_SUCCESS);
-      }
-  }
+      if (info)
+        {
+          NSSet *wpaths = [info watchedPaths];
+          NSEnumerator *enumerator = [wpaths objectEnumerator];
+          NSString *wpath;
+
+          while ((wpath = [enumerator nextObject]))
+            {
+              Watcher *watcher = [self watcherForPath: wpath];
+
+              if (watcher)
+                {
+                  [watcher removeListener];
+                }
+            }
+
+          [clientsInfo removeObject: info];
+        }
+
+      if (auto_stop == YES && [clientsInfo count] <= 1)
+        {
+          /* If there is nothing else using this process, and this is not
+           * a daemon, then we can quietly terminate.
+           */
+          NSLog(@"No more clients, shutting down.");
+          exit(EXIT_SUCCESS);
+        }
+    }
 }
 
 - (void)setDefaultGlobalPaths
@@ -266,56 +266,66 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 
   entry = [defaults arrayForKey: @"GSMetadataIndexablePaths"];
   
-  if (entry) {
-    for (i = 0; i < [entry count]; i++) {
-      insertComponentsOfPath([entry objectAtIndex: i], includePathsTree);
+  if (entry)
+    {
+      for (i = 0; i < [entry count]; i++)
+        {
+          insertComponentsOfPath([entry objectAtIndex: i], includePathsTree);
+        }
     }
-  
-  } else {
-    insertComponentsOfPath(NSHomeDirectory(), includePathsTree);
+  else
+    {
+      insertComponentsOfPath(NSHomeDirectory(), includePathsTree);
 
-    entry = NSSearchPathForDirectoriesInDomains(NSAllApplicationsDirectory, 
-                                                        NSAllDomainsMask, YES);
-    for (i = 0; i < [entry count]; i++) {
-      insertComponentsOfPath([entry objectAtIndex: i], includePathsTree);
+      entry = NSSearchPathForDirectoriesInDomains(NSAllApplicationsDirectory,
+                                                  NSAllDomainsMask, YES);
+      for (i = 0; i < [entry count]; i++)
+        {
+          insertComponentsOfPath([entry objectAtIndex: i], includePathsTree);
+        }
+
+      entry = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,
+                                                  NSAllDomainsMask, YES);
+      for (i = 0; i < [entry count]; i++)
+        {
+          NSString *dir = [entry objectAtIndex: i];
+          NSString *path = [dir stringByAppendingPathComponent: @"Headers"];
+
+          if ([fm fileExistsAtPath: path])
+            {
+              insertComponentsOfPath(path, includePathsTree);
+            }
+
+          path = [dir stringByAppendingPathComponent: @"Documentation"];
+
+          if ([fm fileExistsAtPath: path])
+            {
+              insertComponentsOfPath(path, includePathsTree);
+            }
+        }
     }
-    
-    entry = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, 
-                                                      NSAllDomainsMask, YES);
-    for (i = 0; i < [entry count]; i++) {
-      NSString *dir = [entry objectAtIndex: i];
-      NSString *path = [dir stringByAppendingPathComponent: @"Headers"];
-
-      if ([fm fileExistsAtPath: path]) {
-        insertComponentsOfPath(path, includePathsTree);
-      }
-      
-      path = [dir stringByAppendingPathComponent: @"Documentation"];
-      
-      if ([fm fileExistsAtPath: path]) {
-        insertComponentsOfPath(path, includePathsTree);
-      }
-    }  
-  }
 
   entry = [defaults arrayForKey: @"GSMetadataExcludedPaths"];
 
-  if (entry) {
-    for (i = 0; i < [entry count]; i++) {
-      insertComponentsOfPath([entry objectAtIndex: i], excludePathsTree);
+  if (entry)
+    {
+      for (i = 0; i < [entry count]; i++)
+        {
+          insertComponentsOfPath([entry objectAtIndex: i], excludePathsTree);
+        }
     }
-  }
-  
+
   entry = [defaults arrayForKey: @"GSMetadataExcludedSuffixes"];
   
-  if (entry == nil) {
-    entry = [NSArray arrayWithObjects: @"a", @"d", @"dylib", @"er1", 
-                                       @"err", @"extinfo", @"frag", @"la", 
-                                       @"log", @"o", @"out", @"part", 
-                                       @"sed", @"so", @"status", @"temp",
-                                       @"tmp",  
-                                       nil];
-  } 
+  if (entry == nil)
+    {
+      entry = [NSArray arrayWithObjects: @"a", @"d", @"dylib", @"er1",
+                       @"err", @"extinfo", @"frag", @"la",
+                       @"log", @"o", @"out", @"part",
+                       @"sed", @"so", @"status", @"temp",
+                       @"tmp",
+                       nil];
+    }
   
   [excludedSuffixes addObjectsFromArray: entry];
 }
@@ -326,21 +336,21 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
   NSArray *indexable = [info objectForKey: @"GSMetadataIndexablePaths"];
   NSArray *excluded = [info objectForKey: @"GSMetadataExcludedPaths"];
   NSArray *suffixes = [info objectForKey: @"GSMetadataExcludedSuffixes"];
-  
+
   NSUInteger i;
 
   emptyTreeWithBase(includePathsTree);
-  
-  for (i = 0; i < [indexable count]; i++) {
-    insertComponentsOfPath([indexable objectAtIndex: i], includePathsTree);
-  }
+  for (i = 0; i < [indexable count]; i++)
+    {
+      insertComponentsOfPath([indexable objectAtIndex: i], includePathsTree);
+    }
 
   emptyTreeWithBase(excludePathsTree);
-  
-  for (i = 0; i < [excluded count]; i++) {
-    insertComponentsOfPath([excluded objectAtIndex: i], excludePathsTree);
-  }
-  
+  for (i = 0; i < [excluded count]; i++)
+    {
+      insertComponentsOfPath([excluded objectAtIndex: i], excludePathsTree);
+    }
+
   [excludedSuffixes removeAllObjects];
   [excludedSuffixes addObjectsFromArray: suffixes];
 }
@@ -358,52 +368,55 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
     }
 
   if ([info client] != nil)
-    { 
+    {
       [NSException raise: NSInternalInconsistencyException
 		  format: @"registration with registered client"];
     }
 
   if ([(id)client isProxy] == YES)
-  {
-    [(id)client setProtocolForProxy: @protocol(FSWClientProtocol)];
-    [info setClient: client];  
-    [info setGlobal: global];
-  }
+    {
+      [(id)client setProtocolForProxy: @protocol(FSWClientProtocol)];
+      [info setClient: client];
+      [info setGlobal: global];
+    }
   NSLog(@"register client %lu", (unsigned long)[clientsInfo count]);
 }
 
 - (oneway void)unregisterClient:(id <FSWClientProtocol>)client
 {
-	NSConnection *connection = [(NSDistantObject *)client connectionForProxy];
+  NSConnection *connection = [(NSDistantObject *)client connectionForProxy];
   FSWClientInfo *info = [self clientInfoWithConnection: connection];
   NSSet *wpaths;
   NSEnumerator *enumerator;
   NSString *wpath;
 
-  if (info == nil) {
-    [NSException raise: NSInternalInconsistencyException
-		            format: @"unregistration with unknown connection"];
-  }
+  if (info == nil)
+    {
+      [NSException raise: NSInternalInconsistencyException
+                  format: @"unregistration with unknown connection"];
+    }
 
-  if ([info client] == nil) { 
-    [NSException raise: NSInternalInconsistencyException
-                format: @"unregistration with unregistered client"];
-  }
+  if ([info client] == nil)
+    {
+      [NSException raise: NSInternalInconsistencyException
+                  format: @"unregistration with unregistered client"];
+    }
 
   wpaths = [info watchedPaths];
   enumerator = [wpaths objectEnumerator];
-  
-  while ((wpath = [enumerator nextObject])) {
-    Watcher *watcher = [self watcherForPath: wpath];
-  
-    if (watcher) {
-      [watcher removeListener];
-    }  
-  }
-  
+  while ((wpath = [enumerator nextObject]))
+    {
+      Watcher *watcher = [self watcherForPath: wpath];
+
+      if (watcher)
+        {
+          [watcher removeListener];
+        }
+    }
+
   [nc removeObserver: self
-	              name: NSConnectionDidDieNotification
-	            object: connection];
+                name: NSConnectionDidDieNotification
+              object: connection];
 
   [clientsInfo removeObject: info];
 
@@ -423,10 +436,9 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
   for (i = 0; i < [clientsInfo count]; i++)
     {
       FSWClientInfo *info = [clientsInfo objectAtIndex: i];
-  
+
       if ([info connection] == connection)
 	return info;
-		
     }
 
   return nil;
@@ -439,7 +451,7 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
   for (i = 0; i < [clientsInfo count]; i++)
     {
       FSWClientInfo *info = [clientsInfo objectAtIndex: i];
-      
+
       if ([info client] == remote)
 	return info;
     }
@@ -450,58 +462,66 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 - (oneway void)client:(id <FSWClientProtocol>)client
                               addWatcherForPath:(NSString *)path
 {
-	NSConnection *connection = [(NSDistantObject *)client connectionForProxy];
+  NSConnection *connection = [(NSDistantObject *)client connectionForProxy];
   FSWClientInfo *info = [self clientInfoWithConnection: connection];
   Watcher *watcher = [self watcherForPath: path];
 
-	if (info == nil) {
-    [NSException raise: NSInternalInconsistencyException
-		            format: @"adding watcher from unknown connection"];
-  }
-
-  if ([info client] == nil) { 
-    [NSException raise: NSInternalInconsistencyException
-                format: @"adding watcher for unregistered client"];
-  }
-  
-  if (watcher) {
-    GWDebugLog(@"watcher found; adding listener for: %@", path);
-    [info addWatchedPath: path];
-    [watcher addListener]; 
-        
-  } else {
-    if ([fm fileExistsAtPath: path]) {
-      GWDebugLog(@"add watcher for: %@", path);     
-      [info addWatchedPath: path];
-  	  watcher = [[Watcher alloc] initWithWatchedPath: path fswatcher: self];      
-      NSMapInsert (watchers, path, watcher);
-  	  RELEASE (watcher);  
+  if (info == nil)
+    {
+      [NSException raise: NSInternalInconsistencyException
+                  format: @"adding watcher from unknown connection"];
     }
-  }
+
+  if ([info client] == nil)
+    {
+      [NSException raise: NSInternalInconsistencyException
+                  format: @"adding watcher for unregistered client"];
+    }
+
+  if (watcher)
+    {
+      GWDebugLog(@"watcher found; adding listener for: %@", path);
+      [info addWatchedPath: path];
+      [watcher addListener];
+    }
+  else
+    {
+      if ([fm fileExistsAtPath: path])
+        {
+          GWDebugLog(@"add watcher for: %@", path);
+          [info addWatchedPath: path];
+          watcher = [[Watcher alloc] initWithWatchedPath: path fswatcher: self];
+          NSMapInsert (watchers, path, watcher);
+          RELEASE (watcher);
+        }
+    }
 }
 
 - (oneway void)client:(id <FSWClientProtocol>)client
                                 removeWatcherForPath:(NSString *)path
 {
-	NSConnection *connection = [(NSDistantObject *)client connectionForProxy];
+  NSConnection *connection = [(NSDistantObject *)client connectionForProxy];
   FSWClientInfo *info = [self clientInfoWithConnection: connection];
   Watcher *watcher = [self watcherForPath: path];
-  
-	if (info == nil) {
-    [NSException raise: NSInternalInconsistencyException
-		            format: @"removing watcher from unknown connection"];
-  }
 
-  if ([info client] == nil) { 
-    [NSException raise: NSInternalInconsistencyException
-                format: @"removing watcher for unregistered client"];
-  }  
-    
-  if (watcher && ([watcher isOld] == NO)) {
-    GWDebugLog(@"remove listener for: %@", path);
-    [info removeWatchedPath: path];
-  	[watcher removeListener];  
-  }
+  if (info == nil)
+    {
+      [NSException raise: NSInternalInconsistencyException
+                  format: @"removing watcher from unknown connection"];
+    }
+
+  if ([info client] == nil)
+    {
+      [NSException raise: NSInternalInconsistencyException
+                  format: @"removing watcher for unregistered client"];
+    }
+
+  if (watcher && ([watcher isOld] == NO))
+    {
+      GWDebugLog(@"remove listener for: %@", path);
+      [info removeWatchedPath: path];
+      [watcher removeListener];
+    }
 }
 
 - (Watcher *)watcherForPath:(NSString *)path
@@ -513,24 +533,28 @@ static BOOL	auto_stop = NO;		/* Should we shut down when unused? */
 {
   Watcher *watcher = (Watcher *)[sender userInfo];
 
-  if ([watcher isOld]) {
-    [self removeWatcher: watcher];
-  } else {
-    [watcher watchFile];
-  }
+  if ([watcher isOld])
+    {
+      [self removeWatcher: watcher];
+    }
+  else
+    {
+      [watcher watchFile];
+    }
 }
 
 - (void)removeWatcher:(Watcher *)watcher
 {
   NSString *path = [watcher watchedPath];
-	NSTimer *timer = [watcher timer];
+  NSTimer *timer = [watcher timer];
 
-	if (timer && [timer isValid]) {
-		[timer invalidate];
-	}
-  
+  if (timer && [timer isValid])
+    {
+      [timer invalidate];
+    }
+
   GWDebugLog(@"removed watcher for: %@", path);
-  
+
   RETAIN (path);
   NSMapRemove(watchers, path);  
   RELEASE (path);
@@ -594,7 +618,7 @@ static inline BOOL isDotFile(NSString *path)
   for (i = 0; i < [clientsInfo count]; i++)
     {
       FSWClientInfo *clinfo = [clientsInfo objectAtIndex: i];
-  
+
       if ([clinfo isWatchingPath: path])
 	{
 	  [[clinfo client] watchedPathDidChange: data];
@@ -655,7 +679,7 @@ static inline BOOL isDotFile(NSString *path)
 	  }      
 	}      
     }
-  
+
   RELEASE (pool);  
 }
 
@@ -666,7 +690,7 @@ static inline BOOL isDotFile(NSString *path)
   for (i = 0; i < [clientsInfo count]; i++)
     {
       FSWClientInfo *clinfo = [clientsInfo objectAtIndex: i];
-      
+
       if ([clinfo isGlobal])
 	[[clinfo client] globalWatchedPathDidChange: info];
     }
@@ -681,7 +705,7 @@ static inline BOOL isDotFile(NSString *path)
 { 
   if (timer && [timer isValid])
     [timer invalidate];
- 
+
   RELEASE (watchedPath);  
   RELEASE (pathContents);
   RELEASE (date);  
@@ -698,30 +722,33 @@ static inline BOOL isDotFile(NSString *path)
       NSDictionary *attributes;
       NSString *type;
     		
-    ASSIGN (watchedPath, path);    
-		fm = [NSFileManager defaultManager];	
-    attributes = [fm fileAttributesAtPath: path traverseLink: YES];
-    type = [attributes fileType];
-		ASSIGN (date, [attributes fileModificationDate]);		
+      ASSIGN (watchedPath, path);
+      fm = [NSFileManager defaultManager];
+      attributes = [fm fileAttributesAtPath: path traverseLink: YES];
+      type = [attributes fileType];
+      ASSIGN (date, [attributes fileModificationDate]);
     
-    if (type == NSFileTypeDirectory) {
-		  ASSIGN (pathContents, ([fm directoryContentsAtPath: watchedPath]));
-      isdir = YES;
-    } else {
-      isdir = NO;
+      if (type == NSFileTypeDirectory)
+        {
+          ASSIGN (pathContents, ([fm directoryContentsAtPath: watchedPath]));
+          isdir = YES;
+        }
+      else
+        {
+          isdir = NO;
+        }
+
+      fswatcher = fsw;
+      listeners = 1;
+      isOld = NO;
+
+      timer = [NSTimer scheduledTimerWithTimeInterval: 1.0
+                                               target: fswatcher
+                                             selector: @selector(watcherTimeOut:)
+                                             userInfo: self
+                                              repeats: YES];
     }
-        
-    fswatcher = fsw;    
-    listeners = 1;
-		isOld = NO;
-        
-    timer = [NSTimer scheduledTimerWithTimeInterval: 1.0 
-												                     target: fswatcher 
-                                           selector: @selector(watcherTimeOut:) 
-										                       userInfo: self 
-                                            repeats: YES];
-  }
-  
+
   return self;
 }
 
@@ -737,97 +764,109 @@ static inline BOOL isDotFile(NSString *path)
       RELEASE (pool);  
       return;
     }
-	
+
   attributes = [fm fileAttributesAtPath: watchedPath traverseLink: YES];
 
-  if (attributes == nil) {
-    notifdict = [NSMutableDictionary dictionary];
-    [notifdict setObject: watchedPath forKey: @"path"];
-    [notifdict setObject: @"GWWatchedPathDeleted" forKey: @"event"];
-    [fswatcher notifyClients: notifdict];              
-		isOld = YES;
-    RELEASE (pool);  
-    return;
-  }
-  	
+  if (attributes == nil)
+    {
+      notifdict = [NSMutableDictionary dictionary];
+      [notifdict setObject: watchedPath forKey: @"path"];
+      [notifdict setObject: @"GWWatchedPathDeleted" forKey: @"event"];
+      [fswatcher notifyClients: notifdict];
+      isOld = YES;
+      RELEASE (pool);
+      return;
+    }
+
   moddate = [attributes fileModificationDate];
 
-  if ([date isEqualToDate: moddate] == NO) {
-    if (isdir) {
-      NSArray *oldconts = [pathContents copy];
-      NSArray *newconts = [fm directoryContentsAtPath: watchedPath];	
-      NSMutableArray *diffFiles = [NSMutableArray array];
-      BOOL contentsChanged = NO;
-      int i;
+  if ([date isEqualToDate: moddate] == NO)
+    {
+    if (isdir)
+      {
+        NSArray *oldconts = [pathContents copy];
+        NSArray *newconts = [fm directoryContentsAtPath: watchedPath];
+        NSMutableArray *diffFiles = [NSMutableArray array];
+        BOOL contentsChanged = NO;
+        int i;
 
-      ASSIGN (date, moddate);	
-      ASSIGN (pathContents, newconts);
+        ASSIGN (date, moddate);
+        ASSIGN (pathContents, newconts);
 
-      notifdict = [NSMutableDictionary dictionary];
-      [notifdict setObject: watchedPath forKey: @"path"];
-
-		  /* if there is an error in fileAttributesAtPath */
-		  /* or watchedPath doesn't exist anymore         */
-		  if (newconts == nil) {	
-        [notifdict setObject: @"GWWatchedPathDeleted" forKey: @"event"];
-        [fswatcher notifyClients: notifdict];
-        RELEASE (oldconts);
-			  isOld = YES;
-        RELEASE (pool);  
-    	  return;
-		  }
-
-      for (i = 0; i < [oldconts count]; i++) {
-        NSString *fname = [oldconts objectAtIndex: i];
-        if ([newconts containsObject: fname] == NO) {
-          [diffFiles addObject: fname];
-        }
-      }
-
-      if ([diffFiles count] > 0) {
-        contentsChanged = YES;
-        [notifdict setObject: @"GWFileDeletedInWatchedDirectory" forKey: @"event"];
-        [notifdict setObject: diffFiles forKey: @"files"];
-        [fswatcher notifyClients: notifdict];
-      }
-
-      [diffFiles removeAllObjects];
-
-      for (i = 0; i < [newconts count]; i++) {
-        NSString *fname = [newconts objectAtIndex: i];
-        if ([oldconts containsObject: fname] == NO) {   
-          [diffFiles addObject: fname];
-        }
-      }
-
-      if ([diffFiles count] > 0) {
-        contentsChanged = YES;
+        notifdict = [NSMutableDictionary dictionary];
         [notifdict setObject: watchedPath forKey: @"path"];
-        [notifdict setObject: @"GWFileCreatedInWatchedDirectory" forKey: @"event"];
-        [notifdict setObject: diffFiles forKey: @"files"];
-        [fswatcher notifyClients: notifdict];
+
+        /* if there is an error in fileAttributesAtPath */
+        /* or watchedPath doesn't exist anymore         */
+        if (newconts == nil)
+          {
+            [notifdict setObject: @"GWWatchedPathDeleted" forKey: @"event"];
+            [fswatcher notifyClients: notifdict];
+            RELEASE (oldconts);
+            isOld = YES;
+            RELEASE (pool);
+            return;
+          }
+
+        for (i = 0; i < [oldconts count]; i++)
+          {
+            NSString *fname = [oldconts objectAtIndex: i];
+            if ([newconts containsObject: fname] == NO)
+              {
+                [diffFiles addObject: fname];
+              }
+          }
+
+        if ([diffFiles count] > 0)
+          {
+            contentsChanged = YES;
+            [notifdict setObject: @"GWFileDeletedInWatchedDirectory" forKey: @"event"];
+            [notifdict setObject: diffFiles forKey: @"files"];
+            [fswatcher notifyClients: notifdict];
+          }
+
+        [diffFiles removeAllObjects];
+
+        for (i = 0; i < [newconts count]; i++)
+          {
+            NSString *fname = [newconts objectAtIndex: i];
+            if ([oldconts containsObject: fname] == NO)
+              {
+                [diffFiles addObject: fname];
+              }
+          }
+
+        if ([diffFiles count] > 0)
+          {
+            contentsChanged = YES;
+            [notifdict setObject: watchedPath forKey: @"path"];
+            [notifdict setObject: @"GWFileCreatedInWatchedDirectory" forKey: @"event"];
+            [notifdict setObject: diffFiles forKey: @"files"];
+            [fswatcher notifyClients: notifdict];
+          }
+
+        RELEASE (oldconts);
+
+        if (contentsChanged == NO)
+          {
+            [notifdict setObject: @"GWWatchedFileModified" forKey: @"event"];
+            [fswatcher notifyClients: notifdict];
+          }
       }
-
-      RELEASE (oldconts);	
-
-      if (contentsChanged == NO) {
+    else
+      {  // isdir == NO
+        ASSIGN (date, moddate);
+      
+        notifdict = [NSMutableDictionary dictionary];
+      
+        [notifdict setObject: watchedPath forKey: @"path"];
         [notifdict setObject: @"GWWatchedFileModified" forKey: @"event"];
+
         [fswatcher notifyClients: notifdict];
       }
-      	
-	  } else {  // isdir == NO
-      ASSIGN (date, moddate);	
-      
-      notifdict = [NSMutableDictionary dictionary];
-      
-      [notifdict setObject: watchedPath forKey: @"path"];
-      [notifdict setObject: @"GWWatchedFileModified" forKey: @"event"];
-                    
-      [fswatcher notifyClients: notifdict];
     }
-  }
 
-  RELEASE (pool);   
+  RELEASE (pool);
 }
 
 - (void)addListener
@@ -838,9 +877,10 @@ static inline BOOL isDotFile(NSString *path)
 - (void)removeListener
 { 
   listeners--;
-  if (listeners <= 0) { 
-		isOld = YES;
-  } 
+  if (listeners <= 0)
+    {
+      isOld = YES;
+    }
 }
 
 - (BOOL)isWatchingPath:(NSString *)apath
