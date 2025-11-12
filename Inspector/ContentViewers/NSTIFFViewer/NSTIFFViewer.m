@@ -42,66 +42,67 @@
 {
   self = [super initWithFrame: frameRect];
   
-  if(self) {
-    NSRect r = [self bounds];
-    
-    r.origin.y += 30;
-    r.size.height -= 30;
-    
-    imview = [[NSImageView alloc] initWithFrame: r];
-    [imview setEditable: NO];
-    [imview setImageFrameStyle: NSImageFrameGrayBezel];
-    [imview setImageAlignment: NSImageAlignCenter];
-    [self addSubview: imview]; 
-    
-    r.origin.x = 10;
-    r.origin.y -= 20;
-    r.size.width = 90;
-    r.size.height = 20;
-    widthLabel = [[NSTextField alloc] initWithFrame: r];	
-    [widthLabel setBackgroundColor: [NSColor windowBackgroundColor]];
-    [widthLabel setBezeled: NO];
-    [widthLabel setEditable: NO];
-    [widthLabel setSelectable: NO];
-    [widthLabel setStringValue: @""];
-    [self addSubview: widthLabel]; 
-    RELEASE (widthLabel);
+  if(self)
+    {
+      NSRect r = [self bounds];
 
-    r.origin.x = 160;
-    heightLabel = [[NSTextField alloc] initWithFrame: r];	
-    [heightLabel setBackgroundColor: [NSColor windowBackgroundColor]];
-    [heightLabel setBezeled: NO];
-    [heightLabel setEditable: NO];
-    [heightLabel setSelectable: NO];
-    [heightLabel setAlignment: NSRightTextAlignment];
-    [heightLabel setStringValue: @""];
-    [self addSubview: heightLabel]; 
-    RELEASE (heightLabel);
+      r.origin.y += 30;
+      r.size.height -= 30;
 
-    r.origin.x = 2;
-    r.origin.y = 170;
-    r.size.width = [self bounds].size.width - 4;
-    r.size.height = 25;
-    errLabel = [[NSTextField alloc] initWithFrame: r];	
-    [errLabel setFont: [NSFont systemFontOfSize: 18]];
-    [errLabel setAlignment: NSCenterTextAlignment];
-    [errLabel setBackgroundColor: [NSColor windowBackgroundColor]];
-    [errLabel setTextColor: [NSColor darkGrayColor]];	
-    [errLabel setBezeled: NO];
-    [errLabel setEditable: NO];
-    [errLabel setSelectable: NO];
-    [errLabel setStringValue: NSLocalizedString(@"Invalid Contents", @"")];
+      imview = [[NSImageView alloc] initWithFrame: r];
+      [imview setEditable: NO];
+      [imview setImageFrameStyle: NSImageFrameGrayBezel];
+      [imview setImageAlignment: NSImageAlignCenter];
+      [self addSubview: imview];
 
-    inspector = insp;
-    valid = YES;
-    
-    ASSIGN (typeDescriprion, NSLocalizedString(@"Image data", @""));
-    ASSIGN (icon, [NSImage imageNamed: @"tiffPboard"]);
+      r.origin.x = 10;
+      r.origin.y -= 20;
+      r.size.width = 90;
+      r.size.height = 20;
+      widthLabel = [[NSTextField alloc] initWithFrame: r];
+      [widthLabel setBackgroundColor: [NSColor windowBackgroundColor]];
+      [widthLabel setBezeled: NO];
+      [widthLabel setEditable: NO];
+      [widthLabel setSelectable: NO];
+      [widthLabel setStringValue: @""];
+      [self addSubview: widthLabel];
+      RELEASE (widthLabel);
+
+      r.origin.x = 160;
+      heightLabel = [[NSTextField alloc] initWithFrame: r];
+      [heightLabel setBackgroundColor: [NSColor windowBackgroundColor]];
+      [heightLabel setBezeled: NO];
+      [heightLabel setEditable: NO];
+      [heightLabel setSelectable: NO];
+      [heightLabel setAlignment: NSRightTextAlignment];
+      [heightLabel setStringValue: @""];
+      [self addSubview: heightLabel];
+      RELEASE (heightLabel);
+
+      r.origin.x = 2;
+      r.origin.y = 170;
+      r.size.width = [self bounds].size.width - 4;
+      r.size.height = 25;
+      errLabel = [[NSTextField alloc] initWithFrame: r];
+      [errLabel setFont: [NSFont systemFontOfSize: 18]];
+      [errLabel setAlignment: NSCenterTextAlignment];
+      [errLabel setBackgroundColor: [NSColor windowBackgroundColor]];
+      [errLabel setTextColor: [NSColor darkGrayColor]];
+      [errLabel setBezeled: NO];
+      [errLabel setEditable: NO];
+      [errLabel setSelectable: NO];
+      [errLabel setStringValue: NSLocalizedString(@"Invalid Contents", @"")];
+
+      inspector = insp;
+      valid = YES;
+
+      ASSIGN (typeDescriprion, NSLocalizedString(@"Image data", @""));
+      ASSIGN (icon, [NSImage imageNamed: @"tiffPboard"]);
   
-    [self setContextHelp];
-  }
-	
-	return self;
+      [self setContextHelp];
+    }
+
+  return self;
 }
 
 - (void)displayPath:(NSString *)path
@@ -113,49 +114,57 @@
 {
   NSImage *image = [[NSImage alloc] initWithData: data];
 
-  if ([self superview]) { 
-    [inspector dataContentsReadyForType: typeDescriprion useIcon: icon];
-  }
-
-  if (image) {
-    NSSize is = [image size];
-    float width = is.width;
-    float height = is.height;
-    NSSize rs = [imview bounds].size;
-    NSString *str;
-
-    if (valid == NO) {
-      valid = YES;
-      [errLabel removeFromSuperview];
-      [self addSubview: imview]; 
-    }
-    
-    if ((width <= rs.width) && (height <= rs.height)) {
-      [imview setImageScaling: NSScaleNone];
-    } else {
-      [imview setImageScaling: NSScaleProportionally];
+  if ([self superview])
+    {
+      [inspector dataContentsReadyForType: typeDescriprion useIcon: icon];
     }
 
-    [imview setImage: image];
-    RELEASE (image);
-    
-    str = NSLocalizedString(@"Width:", @"");
-    str = [NSString stringWithFormat: @"%@ %.0f", str, width];
-    [widthLabel setStringValue: str];
+  if (image)
+    {
+      NSSize is = [image size];
+      float width = is.width;
+      float height = is.height;
+      NSSize rs = [imview bounds].size;
+      NSString *str;
 
-    str = NSLocalizedString(@"Height:", @"");
-    str = [NSString stringWithFormat: @"%@ %.0f", str, height];
-    [heightLabel setStringValue: str];
+      if (valid == NO)
+        {
+          valid = YES;
+          [errLabel removeFromSuperview];
+          [self addSubview: imview];
+        }
 
-  } else {
-    if (valid == YES) {
-      valid = NO;
-      [imview removeFromSuperview];
-			[self addSubview: errLabel];
-      [widthLabel setStringValue: @""];
-      [heightLabel setStringValue: @""];
+      if ((width <= rs.width) && (height <= rs.height))
+        {
+          [imview setImageScaling: NSScaleNone];
+        }
+      else
+        {
+          [imview setImageScaling: NSScaleProportionally];
+        }
+
+      [imview setImage: image];
+      RELEASE (image);
+
+      str = NSLocalizedString(@"Width:", @"");
+      str = [NSString stringWithFormat: @"%@ %.0f", str, width];
+      [widthLabel setStringValue: str];
+
+      str = NSLocalizedString(@"Height:", @"");
+      str = [NSString stringWithFormat: @"%@ %.0f", str, height];
+      [heightLabel setStringValue: str];
     }
-  }
+  else
+    {
+      if (valid == YES)
+        {
+          valid = NO;
+          [imview removeFromSuperview];
+          [self addSubview: errLabel];
+          [widthLabel setStringValue: @""];
+          [heightLabel setStringValue: @""];
+        }
+    }
 }
 
 - (NSString *)path
@@ -179,12 +188,12 @@
 
 - (NSString *)winname
 {
-	return NSLocalizedString(@"NSTIFF Inspector", @"");	
+  return NSLocalizedString(@"NSTIFF Inspector", @"");
 }
 
 - (NSString *)description
 {
-	return NSLocalizedString(@"This Inspector allow you view NSTIFF pasteboard data", @"");	
+  return NSLocalizedString(@"This Inspector allow you view NSTIFF pasteboard data", @"");
 }
 
 - (void)setContextHelp
@@ -194,23 +203,26 @@
   NSString *resPath = [bpath stringByAppendingPathComponent: @"Resources"];
   NSArray *languages = [NSUserDefaults userLanguages];
   unsigned i;
-     
-  for (i = 0; i < [languages count]; i++) {
-    NSString *language = [languages objectAtIndex: i];
-    NSString *langDir = [NSString stringWithFormat: @"%@.lproj", language];  
-    NSString *helpPath = [langDir stringByAppendingPathComponent: @"Help.rtfd"];
+
+  for (i = 0; i < [languages count]; i++)
+    {
+      NSString *language = [languages objectAtIndex: i];
+      NSString *langDir = [NSString stringWithFormat: @"%@.lproj", language];
+      NSString *helpPath = [langDir stringByAppendingPathComponent: @"Help.rtfd"];
   
-    helpPath = [resPath stringByAppendingPathComponent: helpPath];
+      helpPath = [resPath stringByAppendingPathComponent: helpPath];
   
-    if ([fm fileExistsAtPath: helpPath]) {
-      NSAttributedString *help = [[NSAttributedString alloc] initWithPath: helpPath
-                                                       documentAttributes: NULL];
-      if (help) {
-        [[NSHelpManager sharedHelpManager] setContextHelp: help forObject: self];
-        RELEASE (help);
-      }
+      if ([fm fileExistsAtPath: helpPath])
+        {
+          NSAttributedString *help = [[NSAttributedString alloc] initWithPath: helpPath
+                                                           documentAttributes: NULL];
+          if (help)
+            {
+              [[NSHelpManager sharedHelpManager] setContextHelp: help forObject: self];
+              RELEASE (help);
+            }
+        }
     }
-  }
 }
 
 @end

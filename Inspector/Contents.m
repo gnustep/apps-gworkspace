@@ -134,7 +134,7 @@ static NSString *nibName = @"Contents";
             }
         }
 
-    // We reorter viewers and put the ImageViewer at the end, so that specialized viewers,
+    // We reorder viewers and put the ImageViewer at the end, so that specialized viewers,
     // e.g. PDF Viewer, can take precedence
     // String comparison, so no class import is needed
     for (i = 0; i < [viewers count]; i++)
@@ -183,7 +183,7 @@ static NSString *nibName = @"Contents";
     {
       NSImage *icon = [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: ICNSIZE];
       NSString *items;
-    
+
       items = [NSString stringWithFormat: @"%lu %@",
                         (unsigned long)[paths count],
                         NSLocalizedString(@"Items", @"")];
@@ -192,12 +192,13 @@ static NSString *nibName = @"Contents";
     
       [viewersBox setContentView: noContsView];
       currentViewer = noContsView;
-    
-      if (currentPath) {
-        [inspector removeWatcherForPath: currentPath];
-        DESTROY (currentPath);
-      }    
-	
+
+      if (currentPath)
+        {
+          [inspector removeWatcherForPath: currentPath];
+          DESTROY (currentPath);
+        }
+
       [[inspector win] setTitle: [self winname]];
     }
 }
@@ -217,9 +218,9 @@ static NSString *nibName = @"Contents";
       if ([vwr canDisplayPath: path])
         {
           return vwr;
-        }				
+        }
     }
-  
+
   return nil;
 }
 
@@ -276,7 +277,7 @@ static NSString *nibName = @"Contents";
 	  currentViewer = viewer;
 	  winName = [viewer winname];
 	  [viewersBox setContentView: viewer];
-    
+
 	  [viewer displayPath: path];
 	}
       else
@@ -350,38 +351,43 @@ static NSString *nibName = @"Contents";
 - (void)showData:(NSData *)data 
           ofType:(NSString *)type
 {
-	NSString *winName;
-	id viewer;
+  NSString *winName;
+  id viewer;
 
-  if (currentViewer) {
-    if ([currentViewer respondsToSelector: @selector(stopTasks)]) {
+  if (currentViewer)
+    {
+    if ([currentViewer respondsToSelector: @selector(stopTasks)])
+      {
       [currentViewer stopTasks]; 
     }
-  }   
+  }
 
-  if (currentPath) {
+  if (currentPath)
+    {
     [inspector removeWatcherForPath: currentPath];
     DESTROY (currentPath);
   }
-  
+
   viewer = [self viewerForDataOfType: type];
   
-	if (viewer) {   
-    currentViewer = viewer;
-    winName = [viewer winname];
-    [viewersBox setContentView: viewer];
-    [viewer displayData: data ofType: type];
+  if (viewer)
+    {
+      currentViewer = viewer;
+      winName = [viewer winname];
+      [viewersBox setContentView: viewer];
+      [viewer displayData: data ofType: type];
+    }
+  else
+    {
+      [iconView setImage: pboardImage];
+      [titleField setStringValue: @""];
+      [viewersBox setContentView: noContsView];
+      currentViewer = noContsView;
+      winName = NSLocalizedString(@"Data Inspector", @"");
+    }
 
-	} else {	   
-    [iconView setImage: pboardImage];
-    [titleField setStringValue: @""];  
-    [viewersBox setContentView: noContsView];
-    currentViewer = noContsView;
-	  winName = NSLocalizedString(@"Data Inspector", @"");
-  }
-	
-	[[inspector win] setTitle: winName];
-	[viewersBox setNeedsDisplay: YES];
+  [[inspector win] setTitle: winName];
+  [viewersBox setNeedsDisplay: YES];
 }
 
 - (BOOL)isShowingData
@@ -401,20 +407,27 @@ static NSString *nibName = @"Contents";
   NSString *path = [info objectForKey: @"path"];
   NSString *event = [info objectForKey: @"event"];
 
-  if (currentPath && [currentPath isEqual: path]) {
-    if ([event isEqual: @"GWWatchedPathDeleted"]) {
-      [self showContentsAt: nil];
-
-    } else if ([event isEqual: @"GWWatchedFileModified"]) {
-      if (currentViewer) {
-        if ([currentViewer respondsToSelector: @selector(displayPath:)]) {
-          [currentViewer displayPath: currentPath];
-        } else if (currentViewer == textViewer) {
-          [currentViewer tryToDisplayPath: currentPath];
+  if (currentPath && [currentPath isEqual: path])
+    {
+      if ([event isEqual: @"GWWatchedPathDeleted"])
+        {
+          [self showContentsAt: nil];
         }
-      }
+      else if ([event isEqual: @"GWWatchedFileModified"])
+        {
+          if (currentViewer)
+            {
+              if ([currentViewer respondsToSelector: @selector(displayPath:)])
+                {
+                  [currentViewer displayPath: currentPath];
+                }
+              else if (currentViewer == textViewer)
+                {
+                  [currentViewer tryToDisplayPath: currentPath];
+                }
+            }
+        }
     }
-  }
 }
 
 - (id)inspector
@@ -440,57 +453,57 @@ static NSString *nibName = @"Contents";
   
   if (self)
     {
-    NSRect r = [self bounds];
+      NSRect r = [self bounds];
 
-    r.origin.y += 45;
-    r.size.height -= 45;
-    scrollView = [[NSScrollView alloc] initWithFrame: r];
-    [scrollView setBorderType: NSBezelBorder];
-    [scrollView setHasHorizontalScroller: NO];
-    [scrollView setHasVerticalScroller: YES]; 
-    [scrollView setAutoresizingMask: NSViewHeightSizable | NSViewWidthSizable];
-    [[scrollView contentView] setAutoresizingMask: NSViewHeightSizable | NSViewWidthSizable];
-    [[scrollView contentView] setAutoresizesSubviews: YES];
-    [self addSubview: scrollView]; 
-    RELEASE (scrollView);
+      r.origin.y += 45;
+      r.size.height -= 45;
+      scrollView = [[NSScrollView alloc] initWithFrame: r];
+      [scrollView setBorderType: NSBezelBorder];
+      [scrollView setHasHorizontalScroller: NO];
+      [scrollView setHasVerticalScroller: YES];
+      [scrollView setAutoresizingMask: NSViewHeightSizable | NSViewWidthSizable];
+      [[scrollView contentView] setAutoresizingMask: NSViewHeightSizable | NSViewWidthSizable];
+      [[scrollView contentView] setAutoresizesSubviews: YES];
+      [self addSubview: scrollView];
+      RELEASE (scrollView);
     
-    r = [[scrollView contentView] bounds];
-    textView = [[NSTextView alloc] initWithFrame: r];
-    [textView setBackgroundColor: [NSColor whiteColor]];
-    [textView setRichText: YES];
-    [textView setEditable: NO];
-    [textView setSelectable: NO];
-    [textView setHorizontallyResizable: NO];
-    [textView setVerticallyResizable: YES];
-    [textView setMinSize: NSMakeSize (0, 0)];
-    [textView setMaxSize: NSMakeSize (1E7, 1E7)];
-    [textView setAutoresizingMask: NSViewHeightSizable | NSViewWidthSizable];
-    [[textView textContainer] setContainerSize: NSMakeSize(r.size.width, 1e7)];
-    [[textView textContainer] setWidthTracksTextView: YES];
-    [textView setUsesRuler: NO];
-    [scrollView setDocumentView: textView];
-    RELEASE (textView);
+      r = [[scrollView contentView] bounds];
+      textView = [[NSTextView alloc] initWithFrame: r];
+      [textView setBackgroundColor: [NSColor whiteColor]];
+      [textView setRichText: YES];
+      [textView setEditable: NO];
+      [textView setSelectable: NO];
+      [textView setHorizontallyResizable: NO];
+      [textView setVerticallyResizable: YES];
+      [textView setMinSize: NSMakeSize (0, 0)];
+      [textView setMaxSize: NSMakeSize (1E7, 1E7)];
+      [textView setAutoresizingMask: NSViewHeightSizable | NSViewWidthSizable];
+      [[textView textContainer] setContainerSize: NSMakeSize(r.size.width, 1e7)];
+      [[textView textContainer] setWidthTracksTextView: YES];
+      [textView setUsesRuler: NO];
+      [scrollView setDocumentView: textView];
+      RELEASE (textView);
     
-    r.origin.x = 141;
-    r.origin.y = 10;
-    r.size.width = 115;
-    r.size.height = 25;
-	  editButt = [[NSButton alloc] initWithFrame: r];
-	  [editButt setButtonType: NSMomentaryLight];
-    [editButt setImage: [NSImage imageNamed: @"common_ret.tiff"]];
-    [editButt setImagePosition: NSImageRight];
-	  [editButt setTitle: NSLocalizedString(@"Edit", @"")];
-	  [editButt setTarget: self];
-	  [editButt setAction: @selector(editFile:)];	
-    [editButt setEnabled: NO];		
-		[self addSubview: editButt]; 
-    RELEASE (editButt);
+      r.origin.x = 141;
+      r.origin.y = 10;
+      r.size.width = 115;
+      r.size.height = 25;
+      editButt = [[NSButton alloc] initWithFrame: r];
+      [editButt setButtonType: NSMomentaryLight];
+      [editButt setImage: [NSImage imageNamed: @"common_ret.tiff"]];
+      [editButt setImagePosition: NSImageRight];
+      [editButt setTitle: NSLocalizedString(@"Edit", @"")];
+      [editButt setTarget: self];
+      [editButt setAction: @selector(editFile:)];
+      [editButt setEnabled: NO];
+      [self addSubview: editButt];
+      RELEASE (editButt);
     
-    contsinsp = insp;
-    editPath = nil;
-    ws = [NSWorkspace sharedWorkspace];
-  }
-	
+      contsinsp = insp;
+      editPath = nil;
+      ws = [NSWorkspace sharedWorkspace];
+    }
+
   return self;
 }
 
