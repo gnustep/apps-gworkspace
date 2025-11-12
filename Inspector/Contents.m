@@ -249,7 +249,7 @@ static NSString *nibName = @"Contents";
   NSString *winName;
 
   // No change in selection? leave current path
-  if (currentPath && [currentPath isEqual:path])
+  if (currentPath && [currentPath isEqualToString:path])
     {
       NSLog(@"trying to redisplay %@", path);
       return;
