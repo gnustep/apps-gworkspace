@@ -83,8 +83,6 @@
 - (void)showData:(NSData *)data 
           ofType:(NSString *)type;
 
-- (BOOL)isShowingData;
-
 - (void)dataContentsReadyForType:(NSString *)typeDescr
                          useIcon:(NSImage *)icon;
 

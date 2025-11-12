@@ -390,11 +390,6 @@ static NSString *nibName = @"Contents";
   [viewersBox setNeedsDisplay: YES];
 }
 
-- (BOOL)isShowingData
-{
-  return (currentPath == nil);
-}
-
 - (void)dataContentsReadyForType:(NSString *)typeDescr
                          useIcon:(NSImage *)icon
 {
