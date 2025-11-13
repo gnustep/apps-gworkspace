@@ -32,7 +32,7 @@
 NSString *relativePathFit(id container, NSString *fullPath)
 {
   NSArray *pathcomps;
-  float cntwidth;
+  CGFloat cntwidth;
   NSFont *font;	
   NSString *path;
   NSString *relpath = nil;		
