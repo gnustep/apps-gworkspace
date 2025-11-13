@@ -122,8 +122,8 @@
   if (image)
     {
       NSSize is = [image size];
-      float width = is.width;
-      float height = is.height;
+      CGFloat width = is.width;
+      CGFloat height = is.height;
       NSSize rs = [imview bounds].size;
       NSString *str;
 
@@ -147,11 +147,11 @@
       RELEASE (image);
 
       str = NSLocalizedString(@"Width:", @"");
-      str = [NSString stringWithFormat: @"%@ %.0f", str, width];
+      str = [NSString stringWithFormat: @"%@ %.0f", str, (float)width];
       [widthLabel setStringValue: str];
 
       str = NSLocalizedString(@"Height:", @"");
-      str = [NSString stringWithFormat: @"%@ %.0f", str, height];
+      str = [NSString stringWithFormat: @"%@ %.0f", str, (float)height];
       [heightLabel setStringValue: str];
     }
   else
@@ -202,7 +202,7 @@
   NSString *bpath = [[NSBundle bundleForClass: [self class]] bundlePath];
   NSString *resPath = [bpath stringByAppendingPathComponent: @"Resources"];
   NSArray *languages = [NSUserDefaults userLanguages];
-  unsigned i;
+  NSUInteger i;
 
   for (i = 0; i < [languages count]; i++)
     {
