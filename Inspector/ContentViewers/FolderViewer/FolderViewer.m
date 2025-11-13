@@ -48,8 +48,8 @@
 
   if (self)
     {
-      id cell;
-      id label;
+      NSButtonCell *cell;
+      NSTextField *label;
 
       sortBox = [[NSBox alloc] initWithFrame: NSMakeRect(57, 125, 137, 135)];
       [sortBox setBorderType: NSGrooveBorder];
@@ -133,21 +133,23 @@
 
 - (void)displayPath:(NSString *)path
 {
-	BOOL writable;
-  int i;
+  BOOL writable;
+  NSInteger i;
   
-  if ([self superview]) {      
-    [inspector contentsReadyAt: path];
-  }
+  if ([self superview])
+    {
+      [inspector contentsReadyAt: path];
+    }
 
   ASSIGN (currentPath, path);    
   writable = [fm isWritableFileAtPath: currentPath];
   
-  for (i = 0; i < STYPES; i++) {
-    [[matrix cellAtRow: i column: 0] setEnabled: writable];
-  }
+  for (i = 0; i < STYPES; i++)
+    {
+      [[matrix cellAtRow: i column: 0] setEnabled: writable];
+    }
 
-	[matrix selectCellAtRow: [self sortTypeForPath: path] column: 0];
+  [matrix selectCellAtRow: [self sortTypeForPath: path] column: 0];
 }
 
 - (void)displayData:(NSData *)data 
@@ -180,12 +182,12 @@
 
 - (NSString *)winname
 {
-	return NSLocalizedString(@"Folder Inspector", @"");
+  return NSLocalizedString(@"Folder Inspector", @"");
 }
 
 - (NSString *)description
 {
-	return NSLocalizedString(@"This Inspector allow you to sort the contents of a Folder", @"");	
+  return NSLocalizedString(@"This Inspector allow you to sort the contents of a Folder", @"");	
 }
 
 - (int)sortTypeForPath:(NSString *)path
@@ -229,7 +231,7 @@
   NSString *bpath = [[NSBundle bundleForClass: [self class]] bundlePath];
   NSString *resPath = [bpath stringByAppendingPathComponent: @"Resources"];
   NSArray *languages = [NSUserDefaults userLanguages];
-  unsigned i;
+  NSUInteger i;
 
   for (i = 0; i < [languages count]; i++) {
     NSString *language = [languages objectAtIndex: i];
