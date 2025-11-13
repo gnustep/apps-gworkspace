@@ -171,11 +171,12 @@ static const int posy[4]  = { 1, 13, 29, 38 };
   NSSize s; 
   NSPoint p;
   CGFloat h;
-	
-  if (maskImage == nil) {
-    return;
-  }
-  
+
+  if (maskImage == nil)
+    {
+      return;
+    }
+
   s = [maskImage size];
   h = s.height;
   r = NSInsetRect(rect, (rect.size.width - s.width)/2, 
@@ -183,7 +184,7 @@ static const int posy[4]  = { 1, 13, 29, 38 };
   p = NSMakePoint(r.origin.x, r.origin.y);
   [maskImage compositeToPoint: NSMakePoint(0, 13) 
                     operation: NSCompositeSourceOver];
-  
+
   //
   // hour
   //
@@ -194,7 +195,7 @@ static const int posy[4]  = { 1, 13, 29, 38 };
   [hour2Image compositeToPoint: p operation: NSCompositeSourceOver];
   p.x = tf_posx[2];
   [hour3Image compositeToPoint: p operation: NSCompositeSourceOver];
-  
+
   //
   // minute
   //
@@ -209,7 +210,7 @@ static const int posy[4]  = { 1, 13, 29, 38 };
   p.x = tf_posx[6];
   p.y = h - posy[1];
   [dayweekImage compositeToPoint: p operation: NSCompositeSourceOver];
-  
+
   //
   // dayOfMonth
   //
@@ -218,14 +219,17 @@ static const int posy[4]  = { 1, 13, 29, 38 };
   [daymont1Image compositeToPoint: p operation: NSCompositeSourceOver];
   p.x = tf_posx[9];
   [daymont2Image compositeToPoint: p operation: NSCompositeSourceOver];
-  
+
   //
   // month
   //
   p.x = tf_posx[10];
   p.y = h - posy[3];
   [monthImage compositeToPoint: p operation: NSCompositeSourceOver];
-  
+
+  //
+  // year
+  //
   [yearlabel drawInteriorWithFrame: NSMakeRect(0, 0, rect.size.width, 12)
                             inView: self];
 }
