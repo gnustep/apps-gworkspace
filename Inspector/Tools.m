@@ -58,14 +58,14 @@ static NSString *nibName = @"Tools";
     {
       NSRect r;
       id cell;
-  
+
       if ([NSBundle loadNibNamed: nibName owner: self] == NO)
         {
           NSLog(@"failed to load %@!", nibName);
           DESTROY (self);
           return self;
-        } 
-    
+        }
+
       RETAIN (mainBox);
       RETAIN (toolsBox);
       RELEASE (win); 
@@ -132,7 +132,7 @@ static NSString *nibName = @"Tools";
 - (void)activateForPaths:(NSArray *)paths
 {
   BOOL toolsOK = YES;
-  NSInteger i;
+  NSUInteger i;
 
   if (paths == nil)
     {
@@ -161,7 +161,7 @@ static NSString *nibName = @"Tools";
       [titleField setStringValue: items];  
       [iconView setImage: icon];
     }
-   
+
   for (i = 0; i < [paths count]; i++)
     {
       FSNode *node = [FSNode nodeWithPath: [paths objectAtIndex: i]];
@@ -193,7 +193,8 @@ static NSString *nibName = @"Tools";
   NSString *s;
   NSCell *cell;
   BOOL appsforext;
-  NSInteger i, count;
+  NSUInteger i;
+  NSUInteger count;
 
   ASSIGN (insppaths, paths);
 
@@ -220,7 +221,7 @@ static NSString *nibName = @"Tools";
               NSMutableArray *appsnames = [NSMutableArray arrayWithCapacity: 1];
               [appsnames addObjectsFromArray: [extinfo allKeys]];
               [extensionsAndApps setObject: appsnames forKey: ext];
-              [extensions addObject: ext];				
+              [extensions addObject: ext];
             }
           else
             {
@@ -232,26 +233,27 @@ static NSString *nibName = @"Tools";
   if (!appsforext)
     return NO;
 
-  if ([extensions count] == 1) {
-    NSString *ext = [extensions objectAtIndex: 0];
-    commonApps = [NSMutableArray arrayWithArray: [extensionsAndApps objectForKey: ext]];    
-    currentApp = [ws getBestAppInRole: nil forExtension: ext];
-    RETAIN (currentApp);			
-		
-  }
+  if ([extensions count] == 1)
+    {
+      NSString *ext = [extensions objectAtIndex: 0];
+      commonApps = [NSMutableArray arrayWithArray: [extensionsAndApps objectForKey: ext]];
+      currentApp = [ws getBestAppInRole: nil forExtension: ext];
+      RETAIN (currentApp);
+    }
   else
     {
-      NSInteger j, n;
-		
+      NSUInteger j;
+
       for (i = 0; i < [extensions count]; i++)
         {
           NSString *ext1 = [extensions objectAtIndex: i];
           NSMutableArray *a1 = [extensionsAndApps objectForKey: ext1];			
-			
+
           for (j = 0; j < [extensions count]; j++)
             {
               NSString *ext2 = [extensions objectAtIndex: j];
               NSMutableArray *a2 = [extensionsAndApps objectForKey: ext2];
+              NSInteger n;
 				
               count = [a1 count];			
               for (n = 0; n < count; n++) {
