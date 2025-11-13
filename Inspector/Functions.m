@@ -29,34 +29,6 @@
 #import "Functions.h"
 
 
-static NSString *fix_path(NSString *s, const char *c)
-{
-  static NSFileManager *mgr = nil;
-  const char *ptr = c;
-  unsigned len;
-
-  if (mgr == nil) {
-    mgr = [NSFileManager defaultManager];
-    RETAIN (mgr);
-  }
-  
-  if (ptr == 0) {
-    if (s == nil) {
-	    return nil;
-	  }
-    ptr = [s cString];
-  }
-  
-  len = strlen(ptr);
-
-  return [mgr stringWithFileSystemRepresentation: ptr length: len]; 
-}
-
-NSString *fixpath(NSString *s, const char *c)
-{
-  return fix_path(s, c);
-}
-
 NSString *relativePathFit(id container, NSString *fullPath)
 {
   NSArray *pathcomps;
