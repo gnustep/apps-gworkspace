@@ -46,7 +46,7 @@ static NSString *nibName = @"Annotations";
   RELEASE (noContsView);
   RELEASE (mainBox);
   RELEASE (toolsBox);
-      
+
   [super dealloc];
 }
 
@@ -68,7 +68,7 @@ static NSString *nibName = @"Annotations";
       RETAIN (mainBox);
       RETAIN (toolsBox);
       RELEASE (win);
-    
+
       inspector = insp;
       [iconView setInspector: inspector];
       desktopApp = [inspector desktopApp];
@@ -116,7 +116,7 @@ static NSString *nibName = @"Annotations";
           [noContsView removeFromSuperview];
           [[mainBox contentView] addSubview: toolsBox];
         }
-    
+
       [textView setString: @""];
 
       if (([desktopApp ddbdactive] == NO) && ([desktopApp terminating] == NO))
@@ -141,10 +141,10 @@ static NSString *nibName = @"Annotations";
         }
     }
   else
-    {
+    { // more than one path
       NSImage *icon = [[FSNodeRep sharedInstance] multipleSelectionIconOfSize: ICNSIZE];
       NSString *items;
-    
+
       items = [NSString stringWithFormat: @"%lu %@",
                         (unsigned long)[paths count],
                         NSLocalizedString(@"Items", @"")];
@@ -156,7 +156,7 @@ static NSString *nibName = @"Annotations";
           [toolsBox removeFromSuperview];
           [[mainBox contentView] addSubview: noContsView];
         }
-    
+
       if (currentPath)
         {
           [inspector removeWatcherForPath: currentPath];
@@ -179,7 +179,7 @@ static NSString *nibName = @"Annotations";
 {
   NSString *path = [info objectForKey: @"path"];
 
-  if (currentPath && [currentPath isEqual: path])
+  if (currentPath && [currentPath isEqualToString: path])
     {
       if ([[info objectForKey: @"event"] isEqual: @"GWWatchedPathDeleted"])
         {
@@ -191,9 +191,9 @@ static NSString *nibName = @"Annotations";
               [toolsBox removeFromSuperview];
               [[mainBox contentView] addSubview: noContsView];
             }
-      
+
           [inspector removeWatcherForPath: currentPath];
-            
+
           DESTROY (currentPath);
         }
     }
