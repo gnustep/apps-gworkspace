@@ -192,18 +192,21 @@
 
 - (int)sortTypeForPath:(NSString *)path
 {
-  if ([fm isWritableFileAtPath: path]) {
-    NSString *dictPath = [path stringByAppendingPathComponent: @".gwsort"];
-    
-    if ([fm fileExistsAtPath: dictPath]) {
-      NSDictionary *sortDict = [NSDictionary dictionaryWithContentsOfFile: dictPath];
-       
-      if (sortDict) {
-        return [[sortDict objectForKey: @"sort"] intValue];
-      }   
+  if ([fm isWritableFileAtPath: path])
+    {
+      NSString *dictPath = [path stringByAppendingPathComponent: @".gwsort"];
+
+      if ([fm fileExistsAtPath: dictPath])
+        {
+          NSDictionary *sortDict = [NSDictionary dictionaryWithContentsOfFile: dictPath];
+
+          if (sortDict)
+            {
+              return [[sortDict objectForKey: @"sort"] intValue];
+            }
+        }
     }
-  } 
-  
+
   return byname;
 }
 
@@ -211,19 +214,20 @@
 {
   sortType = [[sender selectedCell] tag];
 
-  if ([fm isWritableFileAtPath: currentPath]) {
-    NSString *sortstr = [NSString stringWithFormat: @"%i", sortType];
-    NSDictionary *dict = [NSDictionary dictionaryWithObject: sortstr 
-                                                     forKey: @"sort"];
+  if ([fm isWritableFileAtPath: currentPath])
+    {
+      NSString *sortstr = [NSString stringWithFormat: @"%i", sortType];
+      NSDictionary *dict = [NSDictionary dictionaryWithObject: sortstr
+                                                       forKey: @"sort"];
 
-    [dict writeToFile: [currentPath stringByAppendingPathComponent: @".gwsort"] 
-           atomically: YES];
+      [dict writeToFile: [currentPath stringByAppendingPathComponent: @".gwsort"]
+             atomically: YES];
 
-    [[NSDistributedNotificationCenter defaultCenter]
+      [[NSDistributedNotificationCenter defaultCenter]
           postNotificationName: @"GWSortTypeDidChangeNotification"
                         object: currentPath
                       userInfo: dict];
-  }	
+    }
 }
 
 - (void)setContextHelp
@@ -233,22 +237,25 @@
   NSArray *languages = [NSUserDefaults userLanguages];
   NSUInteger i;
 
-  for (i = 0; i < [languages count]; i++) {
-    NSString *language = [languages objectAtIndex: i];
-    NSString *langDir = [NSString stringWithFormat: @"%@.lproj", language];  
-    NSString *helpPath = [langDir stringByAppendingPathComponent: @"Help.rtfd"];
-  
-    helpPath = [resPath stringByAppendingPathComponent: helpPath];
-  
-    if ([fm fileExistsAtPath: helpPath]) {
-      NSAttributedString *help = [[NSAttributedString alloc] initWithPath: helpPath
-                                                       documentAttributes: NULL];
-      if (help) {
-        [[NSHelpManager sharedHelpManager] setContextHelp: help forObject: self];
-        RELEASE (help);
-      }
+  for (i = 0; i < [languages count]; i++)
+    {
+      NSString *language = [languages objectAtIndex: i];
+      NSString *langDir = [NSString stringWithFormat: @"%@.lproj", language];
+      NSString *helpPath = [langDir stringByAppendingPathComponent: @"Help.rtfd"];
+
+      helpPath = [resPath stringByAppendingPathComponent: helpPath];
+
+      if ([fm fileExistsAtPath: helpPath])
+        {
+          NSAttributedString *help = [[NSAttributedString alloc] initWithPath: helpPath
+                                                           documentAttributes: NULL];
+          if (help)
+            {
+              [[NSHelpManager sharedHelpManager] setContextHelp: help forObject: self];
+              RELEASE (help);
+            }
+        }
     }
-  }
 }
 
 @end
