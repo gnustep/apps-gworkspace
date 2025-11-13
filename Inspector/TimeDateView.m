@@ -78,12 +78,12 @@ static const int posy[4]  = { 1, 13, 29, 38 };
   month = [adate monthOfYear];
 
   bundle = [NSBundle bundleForClass: [Inspector class]];
-  
+
   imagepath = [bundle pathForResource: @"Mask" ofType: @"tiff"];
   image = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
-	ASSIGN (maskImage, image);
+  ASSIGN (maskImage, image);
   RELEASE (image);
- 
+
   //
   // hour
   //
@@ -93,14 +93,14 @@ static const int posy[4]  = { 1, 13, 29, 38 };
   image = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
   ASSIGN (hour1Image, image);
   RELEASE (image);
-	
+
   n = hour%10;		
   imgName = [NSString stringWithFormat: @"LED-%d", n];
   imagepath = [bundle pathForResource: imgName ofType: @"tiff"];
   image = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
   ASSIGN (hour2Image, image);
   RELEASE (image);
-  
+
   imagepath = [bundle pathForResource: @"LED-Colon" ofType: @"tiff"];
   image = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
   ASSIGN (hour3Image, image);
@@ -115,7 +115,7 @@ static const int posy[4]  = { 1, 13, 29, 38 };
   image = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
   ASSIGN (minute1Image, image);
   RELEASE (image);
-  
+
   n = minute%10;
   imgName = [NSString stringWithFormat: @"LED-%d", n];
   imagepath = [bundle pathForResource: imgName ofType: @"tiff"];
@@ -158,7 +158,7 @@ static const int posy[4]  = { 1, 13, 29, 38 };
   image = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
   ASSIGN (monthImage, image);
   RELEASE (image);
-  
+
   [yearlabel setStringValue: [NSString stringWithFormat: @"%li", (long int)[adate yearOfCommonEra]]];
 
   RELEASE (pool);
