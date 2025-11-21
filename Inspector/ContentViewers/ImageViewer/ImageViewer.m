@@ -137,13 +137,25 @@
   return self;
 }
 
+- (void)_readImage
+{
+  NSLog(@"ImageViewer - _readImage: %@", imagePath);
+  NSSize imsize = [imview bounds].size;
+
+  imsize.width -= 4;
+  imsize.height -= 4;
+  [self addSubview: progView];
+  [progView start];
+  [resizer readImageAtPath: imagePath setSize: imsize];
+}
+
 - (void)displayPath:(NSString *)path
 {
   DESTROY (editPath);
   [editButt setEnabled: NO];		
   [widthLabel setStringValue: @""];
   [heightLabel setStringValue: @""];
-  
+
   ASSIGN (imagePath, path);
   if (conn == nil)
     {
@@ -159,35 +171,32 @@
 
       [NSThread detachNewThreadSelector: @selector(connectWithPorts:)
                                toTarget: [ImageResizer class]
-                             withObject: [NSArray arrayWithObjects: p2, p1, nil]];   
+                             withObject: [NSArray arrayWithObjects: p2, p1, nil]];
+      // Resizer will call setResizer when ready
     }
-  
-  if (!(resizer == nil))
+  else // connection existing
     {
-      NSSize imsize = [imview bounds].size;
-
-      imsize.width -= 4;
-      imsize.height -= 4;
-      [self addSubview: progView]; 
-      [progView start];
-      [resizer readImageAtPath: imagePath setSize: imsize];
+      if (resizer != nil)
+        {
+          NSLog(@"ImageViewer - displayPath - readImage");
+          [self _readImage];
+        }
+      else
+        {
+          NSLog(@"unexpected: connection started, but resizer not set");
+        }
     }
 }
 
 
 - (oneway void)setResizer:(id)anObject
 {
-    NSSize imsize = [imview bounds].size;
+  [anObject setProtocolForProxy: @protocol(ImageResizerProtocol)];
+  resizer = (ImageResizer *)anObject;
+  RETAIN (resizer);
+  [resizer setProxy: self];
 
-    imsize.width -= 4;
-    imsize.height -= 4;
-    [anObject setProtocolForProxy: @protocol(ImageResizerProtocol)];
-    resizer = (ImageResizer *)anObject;
-    RETAIN (resizer);
-    [resizer setProxy: self];
-    [self addSubview: progView]; 
-    [progView start];    
-    [resizer readImageAtPath: imagePath setSize: imsize];
+  [self _readImage];
 }
 
 
@@ -210,11 +219,24 @@
       imgdata = [imginfo objectForKey:@"imgdata"];
 
       // since resizing is async, we check if we still need the generated image
-      if ([imagePath isEqualToString:[imginfo objectForKey: @"imgpath"]] == NO)
-	{
-	  NSLog(@"ImageViewer: trying to display inconsistent image");
-	  return;
-	}
+      if (imagePath)
+        { // resizing was in progress
+          if ([imagePath isEqualToString:[imginfo objectForKey: @"imgpath"]] == NO)
+            {
+              NSLog(@"ImageViewer: trying to display inconsistent image");
+              NSLog(@"%@ vs %@", imagePath, [imginfo objectForKey: @"imgpath"]);
+              return;
+            }
+        }
+      else if (editPath)
+        { // image displayed completed
+          if ([editPath isEqualToString:[imginfo objectForKey: @"imgpath"]] == YES)
+            {
+              NSLog(@"ImageViewer: trying to display existing image: %@", editPath);
+              return;
+            }
+          NSLog(@"anomalous condition: imagePath %@ - editPath %@", imagePath, editPath);
+        }
     }
   else
     {
