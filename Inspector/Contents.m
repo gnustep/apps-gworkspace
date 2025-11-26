@@ -177,6 +177,7 @@ static NSString *nibName = @"Contents";
 {
   if ([paths count] == 1)
     {
+      NSLog(@"Contents : activateForPaths");
       [self showContentsAt: [paths objectAtIndex: 0]];
     }
   else
@@ -248,10 +249,11 @@ static NSString *nibName = @"Contents";
 {
   NSString *winName;
 
+  NSLog(@"Contents: showContentsAt");
   // No change in selection? leave current path
   if (currentPath && [currentPath isEqualToString:path])
     {
-      NSLog(@"trying to redisplay %@", path);
+      NSLog(@"Contents: trying to redisplay %@", path);
       return;
     }
 
@@ -402,6 +404,7 @@ static NSString *nibName = @"Contents";
   NSString *path = [info objectForKey: @"path"];
   NSString *event = [info objectForKey: @"event"];
 
+  NSLog(@"Contents: watchedPathDidChange");
   if (currentPath && [currentPath isEqual: path])
     {
       if ([event isEqual: @"GWWatchedPathDeleted"])
