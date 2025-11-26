@@ -164,6 +164,9 @@
   NSString *appPath, *appName;
   GWLaunchedApp *app;
   id application;
+  BOOL isDir = NO;
+  BOOL isBundle = NO;
+  BOOL exists = NO;
 
   if (loggingout) {
     NSRunAlertPanel(nil, 
@@ -173,16 +176,26 @@
                   nil);  
     return NO;
   }
+
+  exists = [[NSFileManager defaultManager] fileExistsAtPath: fullPath isDirectory: &isDir];
+
       
-  if (appname == nil) {
-    NSString *ext = [[fullPath pathExtension] lowercaseString];
-    
-    appname = [ws getBestAppInRole: nil forExtension: ext];
-    
-    if (appname == nil) {
-      appname = defEditor;      
+  if (appname == nil)
+    {
+      NSString *ext = [[fullPath pathExtension] lowercaseString];
+
+      if (exists && isDir)
+        {
+          [self openFile: fullPath];
+          return YES;
+        }
+
+      appname = [ws getBestAppInRole: nil forExtension: ext];
+
+      if (appname == nil) {
+        appname = defEditor;
+      }
     }
-  }
 
   [self applicationName: &appName andPath: &appPath forName: appname];
   
