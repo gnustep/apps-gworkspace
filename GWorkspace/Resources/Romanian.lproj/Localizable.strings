@@ -6,12 +6,12 @@
 	"Preferences..." = "Preferințe...";
 	"Help..." = "Ajutor...";
 
-"File" = "Fiºier";
+"File" = "Fişier";
 	"Open" = "Deschide";
 	"Open as Folder" = "Deschide ca Dosar";
-	"Edit File" = "Editeazã Fiºier";
+	"Edit File" = "Editeazã Fişer";
 	"New Folder" = "Nou Dosar";
-	"New File" = "Nou Fiºier";
+	"New File" = "Nou Fişier";
 	"Duplicate" = "Duplicheazã";	
 	"Destroy" = "Distruge";
 	"Empty Recycler" = "Goleºte Coºul";
@@ -94,11 +94,11 @@
 "Linking" = "Leg";
 "Duplicating" = "Duplichez";
 "Destroying" = "ªterg";
-"File Operation Completed" = "Operazie Terminatã";
+"File Operation Completed" = "Operazie Terminată";
 "Backgrounder connection died!" = "Conexiunea cu Backgrounder-ul a cãzut!";
 "Some items have the same name;\ndo you want to replace them?" = "Anumite elemente au acelaºi nume;\nvrei sã le înlocuieºti?";
 "Error" = "Eroare";
-"File Operation Error!" = "Eroare în operaþia pe fiºiere!";
+"File Operation Error!" = "Eroare în operaþia pe fişiere!";
 "Only older" = "Mai vechi";
 
 /* ColumnIcon.m */
