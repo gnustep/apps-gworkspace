@@ -123,6 +123,7 @@
 "Some items have the same name;\ndo you want to replace them?" = "Noe gjenstand har det samme navnet;\nskal de erstattes?";
 "Error" = "Feil";
 "File Operation Error!" = "Feil ved filoperasjon.";
+"Only older" = "Bare eldre";
 
 
 /* ColumnIcon.m */

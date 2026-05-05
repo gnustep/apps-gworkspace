@@ -105,7 +105,7 @@
 "Some items have the same name;\ndo you want to replace them?" = "Enkele elementen hebben dezelfde naam;\nwil je ze vervangen?";
 "Error" = "Fout";
 "File Operation Error!" = "Fout bij Bestandmanipulatie!";
-
+"Only older" = "Alleen oudere";
 
 /* ColumnIcon.m */
 

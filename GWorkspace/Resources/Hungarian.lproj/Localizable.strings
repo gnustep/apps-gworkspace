@@ -103,7 +103,7 @@
 "Some items have the same name;\ndo you want to replace them?" = "Egyes elemeknek azonos a nevük;\nmeg akarja változtatni?";
 "Error" = "Hiba";
 "File Operation Error!" = "Hiba a fájlm?velet során!";
-
+"Only older" = "Csak idősebb";
 
 /* ColumnIcon.m */
 

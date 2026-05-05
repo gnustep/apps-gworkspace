@@ -145,7 +145,7 @@
 "Backgrounder connection died!" = "Background connection died!";
 "Some items have the same name;\ndo you want to replace them?" = "Some items have the same name;\ndo you want to replace them?";
 "File Operation Error!" = "File Operation Error!";
-
+"Only older" = "Only older";
 
 /* ColumnIcon.m */
 

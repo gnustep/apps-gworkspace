@@ -145,7 +145,7 @@
 "Backgrounder connection died!" = "Background connection died!";
 "Some items have the same name;\ndo you want to replace them?" = "同じ名前の商品がいくつかあります。\nそれらを置き換えますか？";
 "File Operation Error!" = "File Operation Error!";
-
+"Only older" = "年上の人だけ";
 
 /* ColumnIcon.m */
 

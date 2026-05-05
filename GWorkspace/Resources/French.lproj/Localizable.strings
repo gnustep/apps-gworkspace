@@ -150,7 +150,7 @@
 "Backgrounder connection died!" = "Interruption de la connexion !";
 "Some items have the same name;\ndo you want to replace them?" = "Des éléments ont le même nom ;\nvoulez-vous en remplacer le nom ?";
 "File Operation Error!" = "Erreur de manipulation de fichier !";
-
+"Only older" = "Plus âgés";
 
 /* ColumnIcon.m */
 

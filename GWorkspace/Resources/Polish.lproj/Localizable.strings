@@ -145,7 +145,7 @@
 "Backgrounder connection died!" = "Połącznie z Backgrounderem zostało niespodziewanie zakończone!";
 "Some items have the same name;\ndo you want to replace them?" = "Niektóre elementy mają taką samą nazwę;\nczy chcesz je zastąpić?";
 "File Operation Error!" = "Wystąpił błąd operacji na pliku!";
-
+"Only older" = "Tylko starsi";
 
 /* ColumnIcon.m */
 
