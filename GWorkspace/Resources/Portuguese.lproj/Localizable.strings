@@ -100,7 +100,7 @@
 "Destroying" = "Destruindo";
 "File Operation Completed" = "Operação com Arquivo Finalizada";
 "Backgrounder connection died!" = "Conexão em segundo plano morreu!"; /* R// */
-"Some items have the same name;\ndo you want to substitute them?" = "Alguns itens possuem o mesmo \nnome; você deseja substituí-los?";
+"Some items have the same name;\ndo you want to replace them?" = "Alguns itens possuem o mesmo \nnome; você deseja substituí-los?";
 "Error" = "Erro";
 "File Operation Error!" = "Erro na Operação com Arquivos!";
 

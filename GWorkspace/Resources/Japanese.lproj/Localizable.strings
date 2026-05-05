@@ -143,7 +143,7 @@
 "Destroying" = "削除中";
 "File Operation Completed" = "File Operation Completed";
 "Backgrounder connection died!" = "Background connection died!";
-"Some items have the same name;\ndo you want to substitute them?" = "Some items have the same name;\ndo you want to substitute them?";
+"Some items have the same name;\ndo you want to replace them?" = "同じ名前の商品がいくつかあります。\nそれらを置き換えますか？";
 "File Operation Error!" = "File Operation Error!";
 
 

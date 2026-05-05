@@ -211,7 +211,7 @@
 "Destroying" = "Detruante";
 "File Operation Completed" = "Dosiera operacio plenumiĝis.";
 "Backgrounder connection died!" = "Fona konekto mortis.";
-"Some items have the same name;\ndo you want to sobstitute them?" = "Kelkaj anoj havas la saman nomon;\nĉu vi volas substitui ilin?";
+"Some items have the same name;\ndo you want to replace them?" = "Kelkaj anoj havas la saman nomon;\nĉu vi volas substitui ilin?";
 "Error" = "Eraro";
 "File Operation Error!" = "Eraro apud dosiera operacio.";
 

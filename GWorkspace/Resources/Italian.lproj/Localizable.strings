@@ -143,7 +143,7 @@
 "Destroying" = "Cancellazione";
 "File Operation Completed" = "Operazione Terminata";
 "Backgrounder connection died!" = "La connessione con Backgrounder è terminata!";
-"Some items have the same name;\ndo you want to sobstitute them?" = "Alcuni elementi hanno lo stesso nome;\nSostituirli?";
+"Some items have the same name;\ndo you want to replace them?" = "Alcuni elementi hanno lo stesso nome;\nSostituirli?";
 "File Operation Error!" = "Errore nell'operazione sui files!";
 
 

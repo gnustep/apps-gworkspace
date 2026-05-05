@@ -102,7 +102,7 @@
 "Destroying" = "Bezig met Verwijderen";
 "File Operation Completed" = "Bestandoperatie Afgewerkt";
 "Backgrounder connection died!" = "Verbinding Verbroken!";
-"Some items have the same name;\ndo you want to substitute them?" = "Enkele elementen hebben dezelfde naam;\nwil je ze vervangen?";
+"Some items have the same name;\ndo you want to replace them?" = "Enkele elementen hebben dezelfde naam;\nwil je ze vervangen?";
 "Error" = "Fout";
 "File Operation Error!" = "Fout bij Bestandmanipulatie!";
 

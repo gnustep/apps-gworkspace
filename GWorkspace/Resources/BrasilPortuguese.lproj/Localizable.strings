@@ -100,7 +100,7 @@
 "Destroying" = "Apagando";
 "File Operation Completed" = "Operação de Arquivos Completada";
 "Backgrounder connection died!" = "Conexção de segundo plano interrompida"; /* R// Jarl */
-"Some items have the same name;\ndo you want to substitute them?" = "Alguns ítens têm o mesmo\nnome; Deseja substituí-los?";
+"Some items have the same name;\ndo you want to replace them?" = "Alguns ítens têm o mesmo\nnome; Deseja substituí-los?";
 "Error" = "Erro";
 "File Operation Error!" = "Erro na Operação de Arquivos!";
 

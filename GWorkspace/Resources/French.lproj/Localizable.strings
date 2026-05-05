@@ -148,7 +148,7 @@
 "Destroying" = "Suppression en cours";
 "File Operation Completed" = "Opération sur fichier terminée";
 "Backgrounder connection died!" = "Interruption de la connexion !";
-"Some items have the same name;\ndo you want to sobstitute them?" = "Des éléments ont le même nom ;\nvoulez-vous en remplacer le nom ?";
+"Some items have the same name;\ndo you want to replace them?" = "Des éléments ont le même nom ;\nvoulez-vous en remplacer le nom ?";
 "File Operation Error!" = "Erreur de manipulation de fichier !";
 
 

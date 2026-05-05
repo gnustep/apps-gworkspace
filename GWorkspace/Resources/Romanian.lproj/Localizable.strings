@@ -96,7 +96,7 @@
 "Destroying" = "ªterg";
 "File Operation Completed" = "Operazie Terminatã";
 "Backgrounder connection died!" = "Conexiunea cu Backgrounder-ul a cãzut!";
-"Some items have the same name;\ndo you want to sobstitute them?" = "Anumite elemente au acelaºi nume;\nvrei sã le înlocuieºti?";
+"Some items have the same name;\ndo you want to replace them?" = "Anumite elemente au acelaºi nume;\nvrei sã le înlocuieºti?";
 "Error" = "Eroare";
 "File Operation Error!" = "Eroare în operaþia pe fiºiere!";
 

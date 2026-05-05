@@ -120,7 +120,7 @@
 "Destroying" = "Ãdelegger";
 "File Operation Completed" = "Filoperasjon komplett utfÃ¸rt";
 "Backgrounder connection died!" = "Bakgrunn-forbindelse drept.";
-"Some items have the same name;\ndo you want to sobstitute them?" = "Noe gjenstand har det samme navnet;\nskal de erstattes?";
+"Some items have the same name;\ndo you want to replace them?" = "Noe gjenstand har det samme navnet;\nskal de erstattes?";
 "Error" = "Feil";
 "File Operation Error!" = "Feil ved filoperasjon.";
 
