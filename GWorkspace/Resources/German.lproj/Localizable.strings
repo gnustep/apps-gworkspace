@@ -75,8 +75,8 @@
 		"Rename Current Tab" = "Aktuelle Lascheumbenennen";
 		"Add Tab..." = "Lasche hinzufügen...";
 	"Terminal" = "Terminal";
-	"Show Desktop" = "Arbeitsfläche anzeigen";
-	"Hide Desktop" = "Arbeitsfläche ausblenden";
+	"Show Desktop" = "Schreibtisch anzeigen";
+	"Hide Desktop" = "Schreibtisch ausblenden";
 	"Show Recycler" = "Papierkorb anzeigen";
 	"Hide Recycler" = "Papierkorb ausblenden";
 	"Check for disks" = "Nach Medien prüfen";
