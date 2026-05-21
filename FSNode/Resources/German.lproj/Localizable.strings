@@ -19,13 +19,13 @@ add comments above this one
 /* Flag: untranslated */
 /* File: ../FSNIcon.m:817 */
 /* Flag: untranslated */
-"elements" = "elements";
+"elements" = "Elemente";
 
 /* File: ../FSNBrowserColumn.m:1616 */
 /* Flag: untranslated */
 /* File: ../FSNIcon.m:1581 */
 /* Flag: untranslated */
-"error" = "error";
+"error" = "Fehler";
 
 /* File: ../FSNBrowserColumn.m:1618 */
 /* Flag: untranslated */
@@ -53,7 +53,7 @@ add comments above this one
 /* Flag: untranslated */
 /* File: ../FSNFunctions.m:189 */
 /* Flag: untranslated */
-"Error" = "Error";
+"Error" = "Fehler";
 
 /* File: ../FSNFunctions.m:147 */
 /* Flag: untranslated */
