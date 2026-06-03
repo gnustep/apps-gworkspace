@@ -1120,21 +1120,21 @@ enum {
   MDKQuery *leftSibling = [self leftSibling];
   NSMutableString *sqlstr;
   
-  sqlstr = [NSString stringWithFormat: @"CREATE TEMP TABLE %@ "
+  sqlstr = [[NSString stringWithFormat: @"CREATE TEMP TABLE %@ "
                                    @"(id INTEGER UNIQUE ON CONFLICT IGNORE, "
                                    @"path TEXT UNIQUE ON CONFLICT IGNORE, "
                                    @"words_count INTEGER, "
-                                   @"score REAL); ", destTable];
+                                   @"score REAL); ", destTable] mutableCopy];
   
   [root appendSQLToPreStatements: sqlstr checkExisting: YES];
 
-  sqlstr = [NSString stringWithFormat: @"CREATE TEMP TRIGGER %@_trigger "
+  sqlstr = [[NSString stringWithFormat: @"CREATE TEMP TRIGGER %@_trigger "
                @"BEFORE INSERT ON %@ "
                @"BEGIN "
                @"UPDATE %@ "
                @"SET score = (score + new.score) "
                @"WHERE id = new.id; "
-               @"END;", destTable, destTable, destTable];
+               @"END;", destTable, destTable, destTable] mutableCopy];
 
   [root appendSQLToPreStatements: sqlstr checkExisting: YES];
 
@@ -1397,21 +1397,21 @@ enum {
   MDKQuery *leftSibling = [self leftSibling];  
   NSMutableString *sqlstr;
 
-  sqlstr = [NSString stringWithFormat: @"CREATE TEMP TABLE %@ "
+  sqlstr = [[NSString stringWithFormat: @"CREATE TEMP TABLE %@ "
                                    @"(id INTEGER UNIQUE ON CONFLICT IGNORE, "
                                    @"path TEXT UNIQUE ON CONFLICT IGNORE, "
                                    @"words_count INTEGER, "
-                                   @"score REAL); ", destTable];
+                                   @"score REAL); ", destTable] mutableCopy];
   
   [root appendSQLToPreStatements: sqlstr checkExisting: YES];
   
-  sqlstr = [NSString stringWithFormat: @"CREATE TEMP TRIGGER %@_trigger "
+  sqlstr = [[NSString stringWithFormat: @"CREATE TEMP TRIGGER %@_trigger "
                @"BEFORE INSERT ON %@ "
                @"BEGIN "
                @"UPDATE %@ "
                @"SET score = (score + new.score) "
                @"WHERE id = new.id; "
-               @"END;", destTable, destTable, destTable];
+               @"END;", destTable, destTable, destTable] mutableCopy];
 
   [root appendSQLToPreStatements: sqlstr checkExisting: YES];
 
