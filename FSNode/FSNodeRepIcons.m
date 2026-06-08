@@ -1,9 +1,9 @@
 /* FSNodeRepIcons.m
  *  
- * Copyright (C) 2005-2018 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2026 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
- *         Riccardo Mottola
+ * Author: Enrico Sersale
+ *         Riccardo Mottola <rm@gnu.org>
  * Date: March 2005
  *
  * This file is part of the GNUstep FSNode framework
@@ -481,153 +481,6 @@ static unsigned char darkerLUT[256] = {
   return AUTORELEASE (newIcon);  
 }
 
-/*
-// using nearest neighbour algorithm
-
-#define MIX_LIM 16
-
-- (NSImage *)resizedIcon:(NSImage *)icon 
-                  ofSize:(int)size
-{
-  CREATE_AUTORELEASE_POOL(arp);
-  NSData *tiffdata = [icon TIFFRepresentation];
-  NSBitmapImageRep *rep = [NSBitmapImageRep imageRepWithData: tiffdata];
-  int spp = [rep samplesPerPixel];
-  int bitsPerPixel = [rep bitsPerPixel];
-  int bpp = bitsPerPixel / 8;
-  NSImage *newIcon = nil;
-
-	if (((spp == 3) && (bitsPerPixel == 24)) 
-        || ((spp == 4) && (bitsPerPixel == 32))
-        || ((spp == 1) && (bitsPerPixel == 8))
-        || ((spp == 2) && (bitsPerPixel == 16))) {
-    NSSize icnsize = [icon size];
-    float fact = (icnsize.width >= icnsize.height) ? (icnsize.width / size) : (icnsize.height / size);
-    NSSize newsize = NSMakeSize(floor(icnsize.width / fact + 0.5), floor(icnsize.height / fact + 0.5));	
-    float xratio = icnsize.width / newsize.width;
-    float yratio = icnsize.height / newsize.height;
-    BOOL hasAlpha = [rep hasAlpha];
-    BOOL isColor = hasAlpha ? (spp > 2) : (spp > 1);
-    NSString *colorSpaceName = isColor ? NSCalibratedRGBColorSpace : NSCalibratedWhiteColorSpace;      
-    NSBitmapImageRep *newrep;
-    unsigned char *srcData;
-    unsigned char *dstData;    
-    unsigned x, y;
-
-    newIcon = [[NSImage alloc] initWithSize: newsize];
-
-    newrep = [[NSBitmapImageRep alloc] initWithBitmapDataPlanes: NULL
-                                pixelsWide: (int)newsize.width
-                                pixelsHigh: (int)newsize.height
-                                bitsPerSample: 8
-                                samplesPerPixel: (isColor ? 4 : 2)
-                                hasAlpha: YES
-                                isPlanar: NO
-                                colorSpaceName: colorSpaceName
-                                bytesPerRow: 0
-                                bitsPerPixel: 0];
-
-    [newIcon addRepresentation: newrep];
-    RELEASE (newrep); 
-
-    srcData = [rep bitmapData];
-    dstData = [newrep bitmapData];
-
-    for (y = 0; y < (int)(newsize.height); y++) {
-      int px[2], py[2]; 
-
-      py[0] = floor(y * yratio);
-      py[1] = ceil((y + 1) * yratio);
-      py[1] = ((py[1] > icnsize.height) ? (int)(icnsize.height) : py[1]);
-
-      for (x = 0; x < (int)(newsize.width); x++) {
-        int expos = (int)(bpp * (floor(y * yratio) * icnsize.width + floor(x * xratio)));        
-        unsigned expix[4] = { 0, 0, 0, 0 };      
-        unsigned pix[4] = { 0, 0, 0, 0 };
-        int count = 0;
-        unsigned char c;
-        int i, j;
-
-        expix[0] = srcData[expos];
-        
-        if (isColor) {
-          expix[1] = srcData[expos + 1];
-          expix[2] = srcData[expos + 2];
-          expix[3] = (hasAlpha ? srcData[expos + 3] : 255);
-        } else {
-          expix[1] = (hasAlpha ? srcData[expos + 1] : 255);
-        }
-
-        px[0] = floor(x * xratio);
-        px[1] = ceil((x + 1) * xratio);
-        px[1] = ((px[1] > icnsize.width) ? (int)(icnsize.width) : px[1]);
-
-        for (i = px[0]; i < px[1]; i++) {
-          for (j = py[0]; j < py[1]; j++) {
-            int pos = (int)(bpp * (j * icnsize.width + i));
-
-            pix[0] += srcData[pos];
-
-            if (isColor) {
-              pix[1] += srcData[pos + 1];
-              pix[2] += srcData[pos + 2];
-              pix[3] += (hasAlpha ? srcData[pos + 3] : 255);
-            } else {
-              pix[1] += (hasAlpha ? srcData[pos + 1] : 255);
-            }
-            
-            count++;
-          }
-        }
-
-        c = (unsigned char)(pix[0] / count);
-        *dstData++ = ((abs(c - expix[0]) < MIX_LIM) ? (unsigned char)expix[0] : c);
-        
-        if (isColor) {
-          c = (unsigned char)(pix[1] / count);
-          *dstData++ = ((abs(c - expix[1]) < MIX_LIM) ? (unsigned char)expix[1] : c);
-
-          c = (unsigned char)(pix[2] / count);
-          *dstData++ = ((abs(c - expix[2]) < MIX_LIM) ? (unsigned char)expix[2] : c);
-
-          c = (unsigned char)(pix[3] / count);
-          *dstData++ = ((abs(c - expix[3]) < MIX_LIM) ? (unsigned char)expix[3] : c);
-        
-        } else {
-          c = (unsigned char)(pix[1] / count);
-          *dstData++ = ((abs(c - expix[1]) < MIX_LIM) ? (unsigned char)expix[1] : c);
-        }
-      }
-    }
-
-  } else {
-    NSSize icnsize = [icon size];
-    NSRect srcr = NSMakeRect(0, 0, icnsize.width, icnsize.height);
-    float fact = (icnsize.width >= icnsize.height) ? (icnsize.width / size) : (icnsize.height / size);
-    NSSize newsize = NSMakeSize(floor(icnsize.width / fact + 0.5), floor(icnsize.height / fact + 0.5));	
-    NSRect dstr = NSMakeRect(0, 0, newsize.width, newsize.height);
-    NSBitmapImageRep *rep = nil;
-    
-    newIcon = [[NSImage alloc] initWithSize: newsize];
-    [newIcon lockFocus];
-
-    [icon drawInRect: dstr 
-            fromRect: srcr 
-           operation: NSCompositeSourceOver 
-            fraction: 1.0];
-
-    rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect: dstr];
-    [newIcon addRepresentation: rep];
-    RELEASE (rep);
-    
-    [newIcon unlockFocus];
-  }
-
-  RELEASE (arp);
-
-  return AUTORELEASE (newIcon);  
-}
-*/
 
 - (NSImage *)lighterIcon:(NSImage *)icon
 {
@@ -804,32 +657,3 @@ static unsigned char darkerLUT[256] = {
 }
 
 @end
-
-
-/*
-    // original nearest neighbour algorithm
-    
-    for (y = 0; y < (int)newsize.height; y++) {
-      for (x = 0; x < (int)newsize.width; x++) {
-        int pos = (int)(bpp * (floor(y * yratio) * icnsize.width + floor(x * xratio)));
-
-        *dstData++ = srcData[pos];
-        
-        if (isColor) {
-          *dstData++ = srcData[pos + 1];
-          *dstData++ = srcData[pos + 2];
-        }
-        
-        if (hasAlpha) {
-          if (isColor) {
-            *dstData++ = srcData[pos + 3];
-          } else {
-            *dstData++ = srcData[pos + 1];
-          }
-        } else {
-          *dstData++ = 255;
-        }
-      }
-    }    
-    
-*/    
