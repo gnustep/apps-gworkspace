@@ -1,6 +1,6 @@
 /* FSNBrowserColumn.m
  *
- * Copyright (C) 2004-2024 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2026 Free Software Foundation, Inc.
  *
  * Authors: Enrico Sersale
  *          Riccardo Mottola <rm@gnu.org>
@@ -264,7 +264,8 @@ static id <DesktopApplication> desktopApp = nil;
 	  NSUInteger i;
 	  NSInteger count = [visibleNodes count];
 
-	  for (i = 0; i < count; i++)
+          i = 0;
+	  while (i < count)
 	    {
 	      FSNode *node = [visibleNodes objectAtIndex: i];
 
@@ -272,8 +273,9 @@ static id <DesktopApplication> desktopApp = nil;
 		{
 		  [visibleNodes removeObjectAtIndex: i];
 		  count--;
-		  i--;
+                  continue;
 		}
+              i++;
 	    }
 
 	  if ([visibleNodes count])
@@ -493,9 +495,9 @@ static id <DesktopApplication> desktopApp = nil;
 	}
       else
 	{
-	  if (index != 0)
+	  if (index > 0)
 	    {
-	      if ((index - 1) >= [browser firstVisibleColumn])
+	      if (index >= [browser firstVisibleColumn] + 1) // (index - 1) >= [browser firstVisibleColumn]
 		{
 		  col = [browser columnBeforeColumn: self];
 		  cell = [col cellWithPath: [shownNode parentPath]];

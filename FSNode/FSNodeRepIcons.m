@@ -765,7 +765,7 @@ static unsigned char darkerLUT[256] = {
 
     if (tdict) {
       NSArray *keys = [tdict allKeys];
-      int i;
+      NSUInteger i;
 
       for (i = 0; i < [keys count]; i++) {
         NSString *key = [keys objectAtIndex: i];
