@@ -49,90 +49,90 @@
 {
   self = [super initWithFrame: frameRect];
   
-  if(self) {
-    NSRect r = [self bounds];
-    
-    r.origin.y += 60;
-    r.size.height -= 60;
-    
-    imview = [[NSImageView alloc] initWithFrame: r];
-    [imview setEditable: NO];
-    [imview setImageFrameStyle: NSImageFrameGrayBezel];
-    [imview setImageAlignment: NSImageAlignCenter];
-    [imview setImageScaling: NSScaleNone];
-    [self addSubview: imview];
-    
-    r.origin.x = 10;
-    r.origin.y -= 20;
-    r.size.width = 90;
-    r.size.height = 20;
-    widthLabel = [[NSTextField alloc] initWithFrame: r];	
-    [widthLabel setBackgroundColor: [NSColor windowBackgroundColor]];
-    [widthLabel setBezeled: NO];
-    [widthLabel setEditable: NO];
-    [widthLabel setSelectable: NO];
-    [widthLabel setStringValue: @""];
-    [self addSubview: widthLabel]; 
-    RELEASE (widthLabel);
+  if(self)
+    {
+      NSRect r = [self bounds];
 
-    r.origin.x = 160;
-    heightLabel = [[NSTextField alloc] initWithFrame: r];	
-    [heightLabel setBackgroundColor: [NSColor windowBackgroundColor]];
-    [heightLabel setBezeled: NO];
-    [heightLabel setEditable: NO];
-    [heightLabel setSelectable: NO];
-    [heightLabel setAlignment: NSRightTextAlignment];
-    [heightLabel setStringValue: @""];
-    [self addSubview: heightLabel];
-    RELEASE (heightLabel);
+      r.origin.y += 60;
+      r.size.height -= 60;
 
-    r.origin.x = 2;
-    r.origin.y = 170;
-    r.size.width = [self bounds].size.width - 4;
-    r.size.height = 25;
-    errLabel = [[NSTextField alloc] initWithFrame: r];	
-    [errLabel setFont: [NSFont systemFontOfSize: 18]];
-    [errLabel setAlignment: NSCenterTextAlignment];
-    [errLabel setBackgroundColor: [NSColor windowBackgroundColor]];
-    [errLabel setTextColor: [NSColor darkGrayColor]];	
-    [errLabel setBezeled: NO];
-    [errLabel setEditable: NO];
-    [errLabel setSelectable: NO];
-    [errLabel setStringValue: NSLocalizedString(@"Invalid Contents", @"")];
+      imview = [[NSImageView alloc] initWithFrame: r];
+      [imview setEditable: NO];
+      [imview setImageFrameStyle: NSImageFrameGrayBezel];
+      [imview setImageAlignment: NSImageAlignCenter];
+      [imview setImageScaling: NSScaleNone];
+      [self addSubview: imview];
 
-    r.origin.x = 6;
-    r.origin.y = 16;
-    r.size.width = 16;
-    r.size.height = 16;
-    progView = [[ProgressView alloc] initWithFrame: r refreshInterval: 0.05];
+      r.origin.x = 10;
+      r.origin.y -= 20;
+      r.size.width = 90;
+      r.size.height = 20;
+      widthLabel = [[NSTextField alloc] initWithFrame: r];
+      [widthLabel setBackgroundColor: [NSColor windowBackgroundColor]];
+      [widthLabel setBezeled: NO];
+      [widthLabel setEditable: NO];
+      [widthLabel setSelectable: NO];
+      [widthLabel setStringValue: @""];
+      [self addSubview: widthLabel];
+      RELEASE (widthLabel);
 
-    r.origin.x = 141;
-    r.origin.y = 10;
-    r.size.width = 115;
-    r.size.height = 25;
-    editButt = [[NSButton alloc] initWithFrame: r];
-    [editButt setButtonType: NSMomentaryLight];
-    [editButt setImage: [NSImage imageNamed: @"common_ret.tiff"]];
-    [editButt setImagePosition: NSImageRight];
-    [editButt setTitle: NSLocalizedString(@"Edit", @"")];
-    [editButt setTarget: self];
-    [editButt setAction: @selector(editFile:)];
-    [editButt setEnabled: NO];
-    [self addSubview: editButt];
-    RELEASE (editButt);
+      r.origin.x = 160;
+      heightLabel = [[NSTextField alloc] initWithFrame: r];
+      [heightLabel setBackgroundColor: [NSColor windowBackgroundColor]];
+      [heightLabel setBezeled: NO];
+      [heightLabel setEditable: NO];
+      [heightLabel setSelectable: NO];
+      [heightLabel setAlignment: NSRightTextAlignment];
+      [heightLabel setStringValue: @""];
+      [self addSubview: heightLabel];
+      RELEASE (heightLabel);
 
-    inspector = insp;
-    ws = [NSWorkspace sharedWorkspace];
+      r.origin.x = 2;
+      r.origin.y = 170;
+      r.size.width = [self bounds].size.width - 4;
+      r.size.height = 25;
+      errLabel = [[NSTextField alloc] initWithFrame: r];
+      [errLabel setFont: [NSFont systemFontOfSize: 18]];
+      [errLabel setAlignment: NSCenterTextAlignment];
+      [errLabel setBackgroundColor: [NSColor windowBackgroundColor]];
+      [errLabel setTextColor: [NSColor darkGrayColor]];
+      [errLabel setBezeled: NO];
+      [errLabel setEditable: NO];
+      [errLabel setSelectable: NO];
+      [errLabel setStringValue: NSLocalizedString(@"Invalid Contents", @"")];
 
-    valid = YES;
+      r.origin.x = 6;
+      r.origin.y = 16;
+      r.size.width = 16;
+      r.size.height = 16;
+      progView = [[ProgressView alloc] initWithFrame: r refreshInterval: 0.05];
 
-    resizer = nil;
-    imagePath = nil;
-    editPath = nil;
-    image = nil;
+      r.origin.x = 141;
+      r.origin.y = 10;
+      r.size.width = 115;
+      r.size.height = 25;
+      editButt = [[NSButton alloc] initWithFrame: r];
+      [editButt setButtonType: NSMomentaryLight];
+      [editButt setImage: [NSImage imageNamed: @"common_ret.tiff"]];
+      [editButt setImagePosition: NSImageRight];
+      [editButt setTitle: NSLocalizedString(@"Edit", @"")];
+      [editButt setTarget: self];
+      [editButt setAction: @selector(editFile:)];
+      [editButt setEnabled: NO];
+      [self addSubview: editButt];
+      RELEASE (editButt);
 
-    [self setContextHelp];
-  }
+      inspector = insp;
+      ws = [NSWorkspace sharedWorkspace];
+
+      valid = YES;
+      resizer = nil;
+      imagePath = nil;
+      editPath = nil;
+      image = nil;
+
+      [self setContextHelp];
+    }
 	
   return self;
 }
