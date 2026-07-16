@@ -1,6 +1,6 @@
 /* Contents.m
  *  
- * Copyright (C) 2004-2024 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2026 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale
  * Author: Riccardo Mottola <rm@gnu.org>
@@ -204,10 +204,10 @@ static NSString *nibName = @"Contents";
     }
 }
 
-- (id)viewerForPath:(NSString *)path
+- (NSView *)viewerForPath:(NSString *)path
 {
   NSInteger i;
-  
+
   if ((path == nil) || ([fm fileExistsAtPath: path] == NO))
     {
       return nil;
@@ -215,31 +215,34 @@ static NSString *nibName = @"Contents";
     
   for (i = 0; i < [viewers count]; i++)
     {
-      id vwr = [viewers objectAtIndex: i];		
-      if ([vwr canDisplayPath: path])
+      NSView *vwr = [viewers objectAtIndex: i];
+      if ([vwr conformsToProtocol: @protocol(ContentViewersProtocol)])
         {
-          return vwr;
+          if ([(NSView <ContentViewersProtocol> *)vwr canDisplayPath: path])
+            {
+              return vwr;
+            }
         }
     }
 
   return nil;
 }
 
-- (id)viewerForDataOfType:(NSString *)type
+- (NSView *)viewerForDataOfType:(NSString *)type
 {
   NSUInteger i;
-  
+
   for (i = 0; i < [viewers count]; i++)
     {
-      id vwr = [viewers objectAtIndex: i];		
-      
-      if ([vwr respondsToSelector: @selector(canDisplayDataOfType:)])
+      NSView *vwr = [viewers objectAtIndex: i];
+
+      if ([vwr conformsToProtocol: @protocol(ContentViewersProtocol)])
         {
-          if ([vwr canDisplayDataOfType: type])
+          if ([(NSView <ContentViewersProtocol> *)vwr canDisplayDataOfType: type])
             {
               return vwr;
             }
-        } 				
+        }
     }
   
   return nil;
@@ -259,9 +262,9 @@ static NSString *nibName = @"Contents";
 
   // we change content to new path or to nil
   // stop current work (e.g. resizing)
-  if (currentViewer && [currentViewer respondsToSelector: @selector(stopTasks)])
+  if (currentViewer && [currentViewer  conformsToProtocol: @protocol(ContentViewersProtocol)])
     {
-      [currentViewer stopTasks];
+      [(NSView <ContentViewersProtocol> *)currentViewer stopTasks];
     }
 
   // stop watching the displayed content, since we change it
@@ -356,22 +359,19 @@ static NSString *nibName = @"Contents";
   NSString *winName;
   id viewer;
 
-  if (currentViewer)
+  if (currentViewer && [currentViewer  conformsToProtocol: @protocol(ContentViewersProtocol)])
     {
-    if ([currentViewer respondsToSelector: @selector(stopTasks)])
-      {
-      [currentViewer stopTasks]; 
+      [(NSView <ContentViewersProtocol> *)currentViewer stopTasks];
     }
-  }
 
   if (currentPath)
     {
-    [inspector removeWatcherForPath: currentPath];
-    DESTROY (currentPath);
-  }
+      [inspector removeWatcherForPath: currentPath];
+      DESTROY (currentPath);
+    }
 
   viewer = [self viewerForDataOfType: type];
-  
+
   if (viewer)
     {
       currentViewer = viewer;
@@ -415,13 +415,13 @@ static NSString *nibName = @"Contents";
         {
           if (currentViewer)
             {
-              if ([currentViewer respondsToSelector: @selector(displayPath:)])
+              if ([currentViewer conformsToProtocol: @protocol(ContentViewersProtocol)])
                 {
-                  [currentViewer displayPath: currentPath];
+                  [(NSView <ContentViewersProtocol> *)currentViewer displayPath: currentPath];
                 }
               else if (currentViewer == textViewer)
                 {
-                  [currentViewer tryToDisplayPath: currentPath];
+                  [(TextViewer *)currentViewer tryToDisplayPath: currentPath];
                 }
             }
         }

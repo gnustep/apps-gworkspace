@@ -35,6 +35,8 @@
 @class NSTextField;
 @class NSButton;
 
+@protocol ContentViewersProtocol;
+
 @interface Contents : NSObject
 {
   IBOutlet id win;
@@ -48,7 +50,7 @@
   GenericView *genericView;
 
   NSMutableArray *viewers;
-  id currentViewer;
+  NSView *currentViewer;
   
   TextViewer *textViewer;
   
@@ -70,9 +72,9 @@
 
 - (void)activateForPaths:(NSArray *)paths;
 
-- (id)viewerForPath:(NSString *)path;
+- (NSView *)viewerForPath:(NSString *)path;
 
-- (id)viewerForDataOfType:(NSString *)type;
+- (NSView *)viewerForDataOfType:(NSString *)type;
 
 - (void)showContentsAt:(NSString *)path;
 
