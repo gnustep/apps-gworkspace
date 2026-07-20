@@ -109,7 +109,7 @@
 - (id)initWithFrame:(NSRect)frameRect
        forInspector:(id)insp;
 
-- (BOOL)tryToDisplayPath:(NSString *)path;
+- (BOOL)canDisplayPath:(NSString *)path;
 
 - (NSData *)textContentsAtPath:(NSString *)path 
                 withAttributes:(NSDictionary *)attributes;

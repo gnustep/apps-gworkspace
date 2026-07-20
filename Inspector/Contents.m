@@ -293,11 +293,11 @@ static NSString *nibName = @"Contents";
 	  [iconView setImage: icon];
 	  [titleField setStringValue: [node name]];
 
-	  if ([textViewer tryToDisplayPath: path])
+	  if ([textViewer canDisplayPath: path])
 	    {
 	      [viewersBox setContentView: textViewer];
 	      currentViewer = textViewer;
-	      winName = NSLocalizedString(@"Text Inspector", @"");
+              winName = [viewer winname];
 	      if (currentPath == nil)
 		{
 		  ASSIGN (currentPath, path);
@@ -309,7 +309,7 @@ static NSString *nibName = @"Contents";
 	      [viewersBox setContentView: genericView];
 	      currentViewer = genericView;
 	      [genericView showInfoOfPath: path];
-	      winName = NSLocalizedString(@"Contents Inspector", @"");
+              winName = [viewer winname];
 	    }
 	}
     }
@@ -421,7 +421,7 @@ static NSString *nibName = @"Contents";
                 }
               else if (currentViewer == textViewer)
                 {
-                  [(TextViewer *)currentViewer tryToDisplayPath: currentPath];
+                  [(TextViewer *)currentViewer canDisplayPath: currentPath];
                 }
             }
         }
@@ -505,7 +505,12 @@ static NSString *nibName = @"Contents";
   return self;
 }
 
-- (BOOL)tryToDisplayPath:(NSString *)path
+- (NSString *)winname
+{
+  return NSLocalizedString(@"Text Inspector", @"");
+}
+
+- (BOOL)canDisplayPath:(NSString *)path
 {
   NSFileManager *fm = [NSFileManager defaultManager];
   NSDictionary *attributes = [fm fileAttributesAtPath: path traverseLink: YES];
@@ -647,6 +652,11 @@ static NSString *nibName = @"Contents";
   }
 
   return self;
+}
+
+- (NSString *)winname
+{
+  return NSLocalizedString(@"Contents Inspector", @"");
 }
 
 - (void)showInfoOfPath:(NSString *)path
