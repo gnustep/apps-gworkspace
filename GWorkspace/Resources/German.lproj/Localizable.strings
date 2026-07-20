@@ -209,6 +209,10 @@ which ends in "kann <the file> nicht umbenennen"
 "Group" = "Gruppe";
 "Others" = "Andere";
 
+"Text Inspector" = "Text-Inspektor";
+
+"Application Inspector" = "Anwendungs-Inspektor";
+
 /* ContentsPanel.m */
 
 "Contents Inspector" = "Inhalts-Inspektor";

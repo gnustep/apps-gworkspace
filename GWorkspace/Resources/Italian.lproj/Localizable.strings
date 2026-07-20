@@ -191,6 +191,11 @@
 "Group" = "Gruppo";
 "Other" = "Altri";
 
+
+"Text Inspector" = "Ispettore Testo";
+
+"Application Inspector" = "Ispettore Applicazione";
+
 /* ContentsPanel.m */
 
 "Contents Inspector" = "Ispettore Contenuti";
