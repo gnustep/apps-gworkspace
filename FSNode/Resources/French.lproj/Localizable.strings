@@ -1,5 +1,6 @@
 ﻿/***
 French.lproj/Localizable.strings
+Fix 'Downloads' issue
 updated by make_strings 2016-01-22 00:30:18 +0100
 add comments above this one
 ***/
@@ -176,6 +177,6 @@ add comments above this one
 "Music"="Musique";
 "Images"="Images";
 "Documents"="Documents";
-"Downloads"="Téléchargement";
+"Downloads"="Téléchargements";
 "Applications"="Applications";
 "Tools"="Outils";
