@@ -117,8 +117,18 @@
 	  for (i = 0; i < [indexes count]; i++)
 	    {
 	      NSNumber *index = [indexes objectAtIndex: i];
-	      NSString *name = [[appsdict objectForKey: index] stringByDeletingPathExtension];
-	      NSString *path = [ws fullPathForApplication: name];
+	      NSString *path = [appsdict objectForKey: index];
+	      NSString *name = nil;
+
+	      if ([path isAbsolutePath])
+		{
+		  name = [[path lastPathComponent] stringByDeletingPathExtension];
+		}
+	      else
+		{
+		  name = [path stringByDeletingPathExtension];
+	          path = [ws fullPathForApplication: name];
+		}
         
 	      if (path)
 		{
@@ -567,7 +577,7 @@
 
       if (([icon isSpecialIcon] == NO) && [icon isDocked])
 	{
-	  [dict setObject: [icon appName] forKey: [[NSNumber numberWithInt: i] stringValue]];
+	  [dict setObject: [icon path] forKey: [[NSNumber numberWithInt: i] stringValue]];
 	  [manager removeWatcherForPath: [[icon node] path]];
 	}
 
