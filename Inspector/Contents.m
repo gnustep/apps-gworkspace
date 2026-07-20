@@ -619,37 +619,40 @@ static NSString *nibName = @"Contents";
 - (id)initWithFrame:(NSRect)frameRect
 {
   self = [super initWithFrame: frameRect];
-	
-  if (self) {	
-    NSString *comm;
-    NSRect r;
-          
-    shComm = nil;      
-    fileComm = nil;  
-        
-    comm = [NSString stringWithCString: SHPATH];
-    if ([comm isEqual: @"none"] == NO) {
-      ASSIGN (shComm, comm);
-    } 
-    comm = [NSString stringWithCString: FILEPATH];
-    if ([comm isEqual: @"none"] == NO) {
-      ASSIGN (fileComm, comm);
+
+  if (self)
+    {
+      NSString *comm;
+      NSRect r;
+
+      shComm = nil;
+      fileComm = nil;
+
+      comm = [NSString stringWithCString: SHPATH];
+      if ([comm isEqual: @"none"] == NO)
+        {
+          ASSIGN (shComm, comm);
+        }
+      comm = [NSString stringWithCString: FILEPATH];
+      if ([comm isEqual: @"none"] == NO)
+        {
+          ASSIGN (fileComm, comm);
+        }
+
+      nc = [NSNotificationCenter defaultCenter];
+
+      r = NSMakeRect(0, 60, frameRect.size.width, 140);
+      textview = [[NSTextView alloc] initWithFrame: r];
+      [[textview textContainer] setContainerSize: [textview bounds].size];
+      [textview setDrawsBackground: NO];
+      [textview setRichText: NO];
+      [textview setSelectable: NO];
+      [textview setVerticallyResizable: NO];
+      [textview setHorizontallyResizable: NO];
+
+      [self addSubview: textview];
+      RELEASE (textview);
     }
-    
-    nc = [NSNotificationCenter defaultCenter];
-    
-    r = NSMakeRect(0, 60, frameRect.size.width, 140);
-    textview = [[NSTextView alloc] initWithFrame: r];
-    [[textview textContainer] setContainerSize: [textview bounds].size];
-		[textview setDrawsBackground: NO];
-    [textview setRichText: NO];
-    [textview setSelectable: NO];
-    [textview setVerticallyResizable: NO];
-    [textview setHorizontallyResizable: NO];
-    
-    [self addSubview: textview];
-    RELEASE (textview);
-  }
 
   return self;
 }
@@ -670,31 +673,31 @@ static NSString *nibName = @"Contents";
       NSFileHandle *handle;
 
       [nc removeObserver: self];
-          if (task && [task isRunning])
-            {
-              [task terminate];
-            }
-          DESTROY (task);		
-    
-          task = [NSTask new]; 
-          [task setLaunchPath: shComm];
-          str = [NSString stringWithFormat: @"%@ -b \"%@\"", fileComm, path];
-          [task setArguments: [NSArray arrayWithObjects: @"-c", str, nil]];
-          ASSIGN (pipe, [NSPipe pipe]);
-          [task setStandardOutput: pipe];
+      if (task && [task isRunning])
+        {
+          [task terminate];
+        }
+      DESTROY (task);
 
-          handle = [pipe fileHandleForReading];
-          [nc addObserver: self
-                 selector: @selector(dataFromTask:)
-                     name: NSFileHandleReadToEndOfFileCompletionNotification
-                   object: handle];
+      task = [NSTask new];
+      [task setLaunchPath: shComm];
+      str = [NSString stringWithFormat: @"%@ -b \"%@\"", fileComm, path];
+      [task setArguments: [NSArray arrayWithObjects: @"-c", str, nil]];
+      ASSIGN (pipe, [NSPipe pipe]);
+      [task setStandardOutput: pipe];
 
-          [handle readToEndOfFileInBackgroundAndNotify];    
+      handle = [pipe fileHandleForReading];
+      [nc addObserver: self
+             selector: @selector(dataFromTask:)
+                 name: NSFileHandleReadToEndOfFileCompletionNotification
+               object: handle];
 
-          [task launch];   
-       
-          RELEASE (pool);   
-  }
+      [handle readToEndOfFileInBackgroundAndNotify];
+
+      [task launch];
+
+      RELEASE (pool);
+    }
   else
     {  
       [self showString: NSLocalizedString(@"No Contents Inspector", @"")];
@@ -707,7 +710,7 @@ static NSString *nibName = @"Contents";
   NSDictionary *userInfo = [notif userInfo];
   NSData *data = [userInfo objectForKey: NSFileHandleNotificationDataItem];
   NSString *str;
-  
+
   if (data && [data length])
     {
       str = [[NSString alloc] initWithData: data 
@@ -717,9 +720,9 @@ static NSString *nibName = @"Contents";
     {
       str = [[NSString alloc] initWithString: NSLocalizedString(@"No Contents Inspector", @"")];
     }
-  
+
   [self showString: str];
-  
+
   RELEASE (str);
   RELEASE (pool);   
 }
@@ -731,16 +734,16 @@ static NSString *nibName = @"Contents";
   NSRange range = NSMakeRange(0, [attrstr length]);
   NSTextStorage *storage = [textview textStorage];
   NSMutableParagraphStyle *style = [NSMutableParagraphStyle new];
-  
+
   [storage setAttributedString: attrstr];
-  
+
   [style setParagraphStyle: [NSParagraphStyle defaultParagraphStyle]];   
   [style setAlignment: NSCenterTextAlignment];
   
   [storage addAttribute: NSParagraphStyleAttributeName 
                   value: style 
                   range: range];
-  
+
   [storage addAttribute: NSFontAttributeName 
                   value: [NSFont systemFontOfSize: 18] 
                   range: range];
