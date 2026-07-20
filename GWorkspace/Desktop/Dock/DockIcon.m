@@ -1,8 +1,8 @@
 /* DockIcon.m
  *  
- * Copyright (C) 2005-2021 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2026 Free Software Foundation, Inc.
  *
- * Authors: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale
  *          Riccardo Mottola <rm@gnu.org>
  * Date: January 2005
  *
@@ -87,6 +87,11 @@
   }
 
   return self;
+}
+
+- (NSString *)path
+{
+  return [node path];
 }
 
 - (NSString *)appName
@@ -278,7 +283,7 @@
   if ([theEvent clickCount] >= minimumLaunchClicks) {
     if ([self isSpecialIcon] == NO) {
       if (launched == NO) {
-        [ws launchApplication: appName];
+        [ws launchApplication: [node path]];
       } else if (apphidden) {
         [[GWorkspace gworkspace] unhideAppWithPath: [node path] andName: appName];
       } else {
@@ -337,7 +342,9 @@
 - (NSMenu *)menuForEvent:(NSEvent *)theEvent
 {
   if ([self isSpecialIcon] == NO) {
-    NSString *appPath = [ws fullPathForApplication: appName];
+    NSString *appPath;
+
+    appPath = [self path];
     
     if (appPath) {
       CREATE_AUTORELEASE_POOL(arp);

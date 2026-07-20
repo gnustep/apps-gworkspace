@@ -113,6 +113,7 @@
 "Continue" = "Fortfahren";
 
 "File Viewer" = "Dateibetrachter";
+"Show In File Viewer" = "In Dateibetrachter anzeigen";
 
 "Quit!" = "Beenden";
 "Do you really want to quit?" = "Wollen Sie GWorkspace wirklich beenden?";

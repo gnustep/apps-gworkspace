@@ -1,8 +1,9 @@
 /* Dock.h
  *  
- * Copyright (C) 2005-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2026 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: January 2005
  *
  * This file is part of the GNUstep GWorkspace application
@@ -53,7 +54,7 @@ typedef enum DockStyle
   DockIcon *dndSourceIcon;
   BOOL isDragTarget;
   int dragdelay;
-  int targetIndex;
+  NSInteger targetIndex;
   NSRect targetRect;
   
   GWDesktopManager *manager; 
@@ -70,14 +71,14 @@ typedef enum DockStyle
 
 - (DockIcon *)addIconForApplicationAtPath:(NSString *)path
                                  withName:(NSString *)name
-                                  atIndex:(int)index;
+                                  atIndex:(NSInteger)index;
 
 - (void)addDraggedIcon:(NSData *)icondata
-               atIndex:(int)index;
+               atIndex:(NSInteger)index;
 
 - (void)removeIcon:(DockIcon *)icon;
 
-- (DockIcon *)iconForApplicationName:(NSString *)name;
+- (DockIcon *)iconForApplicationPath:(NSString *)path;
 
 - (DockIcon *)workspaceAppIcon;
 
@@ -93,11 +94,14 @@ typedef enum DockStyle
 - (void)appDidLaunch:(NSString *)appPath
              appName:(NSString *)appName;
 
-- (void)appTerminated:(NSString *)appName;
+- (void)appTerminated:(NSString *)appPath
+	      appName:(NSString *)appName;
 
-- (void)appDidHide:(NSString *)appName;
+- (void)appDidHide:(NSString *)appPath
+	   appName:(NSString *)appName;
 
-- (void)appDidUnhide:(NSString *)appName;
+- (void)appDidUnhide:(NSString *)appPath
+	     appName:(NSString *)appName;
 
 - (void)iconMenuAction:(id)sender;
 
