@@ -36,7 +36,7 @@
 #define MIN_ICN_SIZE 16
 #define ICN_INCR 4
 
-/* small category to access NSNUmericSearch through a selector */
+/* small category to access NSNumericSearch through a selector */
 
 @interface NSString (NumericSort)
 - (NSComparisonResult)numericCompare:(NSString *)s;
@@ -143,10 +143,11 @@
   NSString *path;
   FSNode *node;
   DockIcon *icon;
-  
-  if (wsname == nil) {
-    wsname = [gw gworkspaceProcessName];
-  }
+
+  if (wsname == nil)
+    {
+      wsname = [gw gworkspaceProcessName];
+    }
 
   path = [ws fullPathForApplication: wsname];
   node = [FSNode nodeWithPath: path];
@@ -184,33 +185,38 @@
                                  withName:(NSString *)name
                                   atIndex:(int)index
 {
-  if ([fm fileExistsAtPath: path]) {
-    FSNode *node = [FSNode nodeWithPath: path];
-    
-    if ([node isApplication]) {
-      int icnindex;
-      DockIcon *icon = [[DockIcon alloc] initForNode: node 
-                                             appName: name
-                                            iconSize: iconSize];
+  if ([fm fileExistsAtPath: path])
+    {
+      FSNode *node = [FSNode nodeWithPath: path];
 
-      if (index == -1) {
-        icnindex = ([icons count]) ? ([icons count] - 1) : 0;
-      } else {
-        icnindex = (index < [icons count]) ? (index + 1) : [icons count];
-      }
+      if ([node isApplication])
+	{
+	  NSInteger icnindex;
+	  DockIcon *icon = [[DockIcon alloc] initForNode: node
+						 appName: name
+						iconSize: iconSize];
 
-      [icon setHighlightColor: backColor];
-      [icons insertObject: icon atIndex: icnindex];
-      [icon setSingleClickLaunch: singleClickLaunch];
-      [self addSubview: icon];
-      RELEASE (icon);
-      
-      [manager addWatcherForPath: [node path]];
-      
-      return icon;
+	  if (index == -1)
+	    {
+	      icnindex = ([icons count]) ? ([icons count] - 1) : 0;
+	    }
+	  else
+	    {
+	      icnindex = (index < [icons count]) ? (index + 1) : [icons count];
+	    }
+
+	  [icon setHighlightColor: backColor];
+	  [icons insertObject: icon atIndex: icnindex];
+	  [icon setSingleClickLaunch: singleClickLaunch];
+	  [self addSubview: icon];
+	  RELEASE (icon);
+
+	  [manager addWatcherForPath: [node path]];
+
+	  return icon;
+	}
     }
-  }
-  
+
   return nil;
 }
 
@@ -482,58 +488,67 @@
   icnrect.size.height = icnrect.size.width;
     
   rect.size.height = [icons count] * icnrect.size.height;
-  if (targetIndex != -1) {
-    rect.size.height += icnrect.size.height;
-  }
+  if (targetIndex != -1)
+    {
+      rect.size.height += icnrect.size.height;
+    }
   
   maxheight -= (icnrect.size.height * 2);  
   
-  while (rect.size.height > maxheight) {
-    iconSize -= ICN_INCR;
-    icnrect.size.height = ceil(iconSize / 3 * 4);
-    icnrect.size.width = icnrect.size.height;
-    rect.size.height = [icons count] * icnrect.size.height;
+  while (rect.size.height > maxheight)
+    {
+      iconSize -= ICN_INCR;
+      icnrect.size.height = ceil(iconSize / 3 * 4);
+      icnrect.size.width = icnrect.size.height;
+      rect.size.height = [icons count] * icnrect.size.height;
 
-    if (targetIndex != -1) {
-      rect.size.height += icnrect.size.height;
-    }
+      if (targetIndex != -1)
+	{
+	  rect.size.height += icnrect.size.height;
+	}
       
-    if (iconSize <= MIN_ICN_SIZE) {
-      break;
+      if (iconSize <= MIN_ICN_SIZE)
+	{
+	  break;
+	}
     }
-  }
 
   rect.size.width = icnrect.size.width;
   rect.origin.x = (position == DockPositionLeft) ? 0 : scrrect.size.width - rect.size.width;
   rect.origin.y = ceil((scrrect.size.height - rect.size.height) / 2);
   
-  if (view) {
-    [view setNeedsDisplayInRect: [self frame]];
-  }
+  if (view)
+    {
+      [view setNeedsDisplayInRect: [self frame]];
+    }
   [self setFrame: rect];
-  
+
   icnrect.origin.y = rect.size.height;
-  
-  for (i = 0; i < [icons count]; i++) {
-    DockIcon *icon = [icons objectAtIndex: i];
-  
-    if (oldIcnSize != iconSize) {
-      [icon setIconSize: iconSize];
-    }
-    
-    icnrect.origin.y -= icnrect.size.height;
-    [icon setFrame: icnrect];
-    
-    if ((targetIndex != -1) && (targetIndex == i)) {
+
+  for (i = 0; i < [icons count]; i++)
+    {
+      DockIcon *icon = [icons objectAtIndex: i];
+
+      if (oldIcnSize != iconSize)
+	{
+	  [icon setIconSize: iconSize];
+	}
+
       icnrect.origin.y -= icnrect.size.height;
-      targetRect = icnrect;
+      [icon setFrame: icnrect];
+
+      if ((targetIndex != -1) && (targetIndex == i))
+	{
+	  icnrect.origin.y -= icnrect.size.height;
+	  targetRect = icnrect;
+	}
     }
-  } 
-  
+
   [self setNeedsDisplay: YES];
-  if (view) {
-    [view setNeedsDisplayInRect: [self frame]];
-  }
+  if (view)
+    {
+      [view setNeedsDisplayInRect: [self frame]];
+    }
 }
 
 - (void)updateDefaults
@@ -560,7 +575,7 @@
     }
 
   [defaults setObject: dict forKey: @"applications"];
-  
+
   [manager removeWatcherForPath: [manager trashPath]];
 }
 
@@ -568,9 +583,10 @@
 {
   DockIcon *icon = (DockIcon *)[sender userInfo];
   
-  if ([[icon node] isValid] == NO) {
-    [self removeIcon: icon];
-  }
+  if ([[icon node] isValid] == NO)
+    {
+      [self removeIcon: icon];
+    }
 }
 
 - (void)drawRect:(NSRect)rect
@@ -670,22 +686,24 @@
     {
       NSUInteger i;
 
-      for (i = 0; i < [icons count]; i++) {
-	DockIcon *icon = [icons objectAtIndex: i];
+      for (i = 0; i < [icons count]; i++)
+	{
+	  DockIcon *icon = [icons objectAtIndex: i];
       
-	if ([icon isSpecialIcon] == NO) {
-	  FSNode *node = [icon node];
+	  if ([icon isSpecialIcon] == NO)
+	    {
+	      FSNode *node = [icon node];
         
-	  if ([path isEqual: [node path]]) {
-	    [NSTimer scheduledTimerWithTimeInterval: 1.0
-					     target: self
-					   selector: @selector(checkRemovedApp:)
-					   userInfo: icon
-					    repeats: NO];
-	  }
+	      if ([path isEqual: [node path]])
+		{
+		  [NSTimer scheduledTimerWithTimeInterval: 1.0
+						   target: self
+						 selector: @selector(checkRemovedApp:)
+						 userInfo: icon
+						  repeats: NO];
+		}
+	    }
 	}
-      }
-    
     }
   else if ([event isEqual: @"GWFileDeletedInWatchedDirectory"])
     {
@@ -702,18 +720,19 @@
 	    {
 	      DockIcon *icon = [icons objectAtIndex:j];
 
-	      if ([icon isSpecialIcon] == NO) {
-		FSNode *node = [icon node];
+	      if ([icon isSpecialIcon] == NO)
+		{
+		  FSNode *node = [icon node];
 
-		if ([fullpath isEqual: [node path]])
-		  {
-		    [NSTimer scheduledTimerWithTimeInterval: 1.0
-						     target: self
-						   selector: @selector(checkRemovedApp:)
-						   userInfo: icon
-						    repeats: NO];
-		  }
-	      }
+		  if ([fullpath isEqual: [node path]])
+		    {
+		      [NSTimer scheduledTimerWithTimeInterval: 1.0
+						       target: self
+						     selector: @selector(checkRemovedApp:)
+						     userInfo: icon
+						      repeats: NO];
+		    }
+		}
 	    }
 	}
     
@@ -725,17 +744,19 @@
 	  int count = [subNodes count];
 	  int i;
 
-	  for (i = 0; i < [subNodes count]; i++) {
-	    if ([[subNodes objectAtIndex: i] isReserved]) {
-	      count --;
+	  for (i = 0; i < [subNodes count]; i++)
+	    {
+	      if ([[subNodes objectAtIndex: i] isReserved])
+		{
+		  count --;
+		}
 	    }
-	  }
-      
-	  if (count == 0) {
-	    [icon setTrashFull: NO];
-	  }
+
+	  if (count == 0)
+	    {
+	      [icon setTrashFull: NO];
+	    }
 	}
-    
     }
   else if ([event isEqual: @"GWFileCreatedInWatchedDirectory"])
     {
@@ -756,7 +777,7 @@
 	    }
 	}
     }
-  
+
   RELEASE (arp);
 }
 
@@ -764,13 +785,15 @@
 {
   NSUInteger i;
   
-  for (i = 0; i < [icons count]; i++) {
-    DockIcon *icon = [icons objectAtIndex: i];    
+  for (i = 0; i < [icons count]; i++)
+    {
+      DockIcon *icon = [icons objectAtIndex: i];
 
-    if (icon != arep) {
-      [icon unselect];
+      if (icon != arep)
+	{
+	  [icon unselect];
+	}
     }
-  }
 }
 
 - (FSNSelectionMask)selectionMask
@@ -782,14 +805,17 @@
 {
   NSColor *hlgtcolor = [acolor highlightWithLevel: 0.2];
   NSUInteger i;
-  
+
   for (i = 0; i < [icons count]; i++)
-    [[icons objectAtIndex: i] setHighlightColor: hlgtcolor];
-  
+    {
+      [[icons objectAtIndex: i] setHighlightColor: hlgtcolor];
+    }
+
   ASSIGN (backColor, hlgtcolor);
-  if ([self superview]) {
-    [self tile];
-  }
+  if ([self superview])
+    {
+      [self tile];
+    }
 }
 
 - (NSColor *)backgroundColor
@@ -828,52 +854,65 @@
   if (icon) {
     NSUInteger index = [icons indexOfObjectIdenticalTo: icon];
         
-    if (dndSourceIcon && ([sender draggingSource] == dndSourceIcon)) {
-      if (icon != dndSourceIcon) {
-        RETAIN (dndSourceIcon);
-        [icons removeObject: dndSourceIcon];
-        [icons insertObject: dndSourceIcon atIndex: index];
-        RELEASE (dndSourceIcon);
-        [self tile];  
-        return NSDragOperationMove;    
+    if (dndSourceIcon && ([sender draggingSource] == dndSourceIcon))
+      {
+	if (icon != dndSourceIcon)
+	  {
+	    RETAIN (dndSourceIcon);
+	    [icons removeObject: dndSourceIcon];
+	    [icons insertObject: dndSourceIcon atIndex: index];
+	    RELEASE (dndSourceIcon);
+	    [self tile];
+	    return NSDragOperationMove;
+	  }
       }
-
-    } else {
-      NSPasteboard *pb = [sender draggingPasteboard];
+    else
+      {
+	NSPasteboard *pb = [sender draggingPasteboard];
       
-      if ([[pb types] containsObject: @"DockIconPboardType"]) {
-        if ([icon isTrashIcon] == NO) {
-          targetIndex = index;        
-          return NSDragOperationMove;
-        }
-        
-      } else if ([[pb types] containsObject: NSFilenamesPboardType]) {
-        NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
-        NSString *path = [sourcePaths objectAtIndex: 0];
-        FSNode *node = [FSNode nodeWithPath: path];
+	if ([[pb types] containsObject: @"DockIconPboardType"])
+	  {
+	    if ([icon isTrashIcon] == NO)
+	      {
+		targetIndex = index;
+		return NSDragOperationMove;
+	      }
+	  }
+	else if ([[pb types] containsObject: NSFilenamesPboardType])
+	  {
+	    NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
+	    NSString *path = [sourcePaths objectAtIndex: 0];
+	    FSNode *node = [FSNode nodeWithPath: path];
       
-        if ([node isApplication] && ([icon isSpecialIcon] == NO)) {
-          NSUInteger i;
+	    if ([node isApplication] && ([icon isSpecialIcon] == NO))
+	      {
+		NSUInteger i;
           
-          for (i = 0; i < [icons count]; i++) {
-            if ([[[icons objectAtIndex: i] node] isEqualToNode: node]) {
-              isDragTarget = NO;
-              return NSDragOperationNone;
-            }
-          }
+		for (i = 0; i < [icons count]; i++)
+		  {
+		    if ([[[icons objectAtIndex: i] node] isEqualToNode: node])
+		      {
+			isDragTarget = NO;
+			return NSDragOperationNone;
+		      }
+		  }
           
-          targetIndex = index;
-          return NSDragOperationMove;
-          
-        } else {
-          if ([icon acceptsDraggedPaths: sourcePaths]) {
-            return NSDragOperationMove;
-          } else {
-            [icon unselect];
-          }
-        }
+		targetIndex = index;
+		return NSDragOperationMove;
+	      }
+	    else
+	      {
+		if ([icon acceptsDraggedPaths: sourcePaths])
+		  {
+		    return NSDragOperationMove;
+		  }
+		else
+		  {
+		    [icon unselect];
+		  }
+	      }
+	  }
       }
-    }
   }
 
   isDragTarget = NO;    
@@ -884,84 +923,103 @@
 {
   NSPoint location;
   DockIcon *icon;
- 
-  if (dragdelay < 2) {
-    dragdelay++;
-    return NSDragOperationNone;
-  }
-  
+
+  if (dragdelay < 2)
+    {
+      dragdelay++;
+      return NSDragOperationNone;
+    }
+
   isDragTarget = YES;  
   location = [sender draggingLocation];  
   icon = [self iconContainingPoint: location];
- 
-  if (targetIndex != -1) {
-    if (NSEqualRects(targetRect, NSZeroRect)) {
-      [self tile];
-      return NSDragOperationMove;
-    }
-  }
 
-  if (targetIndex != -1) {
-    if (NSPointInRect(location, NSInsetRect(targetRect, 0.0, 2.0))) {
-      return NSDragOperationMove;
+  if (targetIndex != -1)
+    {
+      if (NSEqualRects(targetRect, NSZeroRect))
+	{
+	  [self tile];
+	  return NSDragOperationMove;
+	}
     }
-  }
+
+  if (targetIndex != -1)
+    {
+      if (NSPointInRect(location, NSInsetRect(targetRect, 0.0, 2.0)))
+	{
+	  return NSDragOperationMove;
+	}
+    }
   
   location = [self convertPoint: location fromView: nil];
   
-  if (NSPointInRect(location, NSInsetRect(targetRect, 0.0, 2.0))) {
-    return NSDragOperationMove;
-  }
-  
-  if (icon == nil) {
-    icon = [self iconContainingPoint: location];
-  }
-    
-  if (icon) {
-    NSUInteger index = [icons indexOfObjectIdenticalTo: icon];
-
-    if (dndSourceIcon && ([sender draggingSource] == dndSourceIcon)) {
-      if ((icon != dndSourceIcon) && ([icon isSpecialIcon] == NO)) {
-        RETAIN (dndSourceIcon);
-        [icons removeObject: dndSourceIcon];
-        [icons insertObject: dndSourceIcon atIndex: index];
-        RELEASE (dndSourceIcon);
-        [self tile];
-      } 
-      
+  if (NSPointInRect(location, NSInsetRect(targetRect, 0.0, 2.0)))
+    {
       return NSDragOperationMove;
-    
-    } else {
-      NSPasteboard *pb = [sender draggingPasteboard];
+    }
+  
+  if (icon == nil)
+    {
+      icon = [self iconContainingPoint: location];
+    }
 
-      if (pb && [[pb types] containsObject: @"DockIconPboardType"]) {
-        if ((targetIndex != index) && ([icon isTrashIcon] == NO)) {
-          targetIndex = index;
-          [self tile];
-          return NSDragOperationMove;
-        }
+  if (icon)
+    {
+      NSUInteger index = [icons indexOfObjectIdenticalTo: icon];
 
-      } else if (pb && [[pb types] containsObject: NSFilenamesPboardType]) {
-        NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType]; 
-        NSString *path = [sourcePaths objectAtIndex: 0];
-        FSNode *node = [FSNode nodeWithPath: path];
+      if (dndSourceIcon && ([sender draggingSource] == dndSourceIcon))
+	{
+	  if ((icon != dndSourceIcon) && ([icon isSpecialIcon] == NO))
+	    {
+	    RETAIN (dndSourceIcon);
+	    [icons removeObject: dndSourceIcon];
+	    [icons insertObject: dndSourceIcon atIndex: index];
+	    RELEASE (dndSourceIcon);
+	    [self tile];
+	  }
 
-        if (([node isApplication] == NO) 
-                          || ([node isApplication] && [icon isTrashIcon])) {
-          if ([icon acceptsDraggedPaths: sourcePaths]) {
-            return NSDragOperationMove;
-          } else {
-            [icon unselect];
-          }
+	  return NSDragOperationMove;
+	}
+      else
+	{
+	  NSPasteboard *pb = [sender draggingPasteboard];
 
-        } else if ((targetIndex != index) && ([icon isTrashIcon] == NO)) {
-          targetIndex = index;
-          [self tile]; 
-          return NSDragOperationMove;
-        } 
-      }
-    }   
-  }
+	  if (pb && [[pb types] containsObject: @"DockIconPboardType"])
+	    {
+	      if ((targetIndex != index) && ([icon isTrashIcon] == NO))
+		{
+		  targetIndex = index;
+		  [self tile];
+		  return NSDragOperationMove;
+		}
+	    }
+	  else if (pb && [[pb types] containsObject: NSFilenamesPboardType])
+	    {
+	      NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
+	      NSString *path = [sourcePaths objectAtIndex: 0];
+	      FSNode *node = [FSNode nodeWithPath: path];
+
+	      if (([node isApplication] == NO)
+		  || ([node isApplication] && [icon isTrashIcon]))
+		{
+		  if ([icon acceptsDraggedPaths: sourcePaths])
+		    {
+		      return NSDragOperationMove;
+		    }
+		  else
+		    {
+		      [icon unselect];
+		    }
+		}
+	      else if ((targetIndex != index) && ([icon isTrashIcon] == NO))
+		{
+		  targetIndex = index;
+		  [self tile];
+		  return NSDragOperationMove;
+		}
+	    }
+	}
+    }
 
   return NSDragOperationNone;
 }
@@ -970,18 +1028,20 @@
 {
   isDragTarget = NO;  
   dragdelay = 0;
-  
+
   [self unselectOtherReps: nil];
-      
-  if (dndSourceIcon && [dndSourceIcon superview]) {
-    [self removeIcon: dndSourceIcon];
-    [self setDndSourceIcon: nil];
-  }
-  if (targetIndex != -1) {
-    targetIndex = -1;
-    targetRect = NSZeroRect;
-    [self tile];
-  }
+
+  if (dndSourceIcon && [dndSourceIcon superview])
+    {
+      [self removeIcon: dndSourceIcon];
+      [self setDndSourceIcon: nil];
+    }
+  if (targetIndex != -1)
+    {
+      targetIndex = -1;
+      targetRect = NSZeroRect;
+      [self tile];
+    }
 }
 
 - (BOOL)prepareForDragOperation:(id <NSDraggingInfo>)sender
@@ -998,69 +1058,81 @@
 {
   [self unselectOtherReps: nil];
 
-  if (dndSourceIcon && ([sender draggingSource] == dndSourceIcon)) {
-    [dndSourceIcon setIsDndSourceIcon: NO];
-    [self setDndSourceIcon: nil];
-
-  } else {
-    NSPasteboard *pb = [sender draggingPasteboard];
-
-    if ([[pb types] containsObject: @"DockIconPboardType"]) { 
-      [self addDraggedIcon: [pb dataForType: @"DockIconPboardType"] 
-                   atIndex: targetIndex];
-
-    } else if ([[pb types] containsObject: NSFilenamesPboardType]) {
-      NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
-      NSPoint location = [sender draggingLocation];
-      DockIcon *icon;
-      BOOL concluded = NO;
-
-      location = [self convertPoint: location fromView: nil];
-      icon = [self iconContainingPoint: location];
-
-      if ([sourcePaths count] == 1) {
-        NSString *path = [sourcePaths objectAtIndex: 0];
-        FSNode *node = [FSNode nodeWithPath: path];
-        NSString *appName = [[node name] stringByDeletingPathExtension];
-        
-        if ([node isApplication]) {
-          if ((icon == nil) || (icon && ([icon isTrashIcon] == NO))) {
-            BOOL duplicate = NO;
-            NSUInteger i;
-
-            for (i = 0; i < [icons count]; i++) {
-              DockIcon *icon = [icons objectAtIndex: i];
-
-              if ([[icon node] isEqual: node] 
-                          && [[icon appName] isEqual: appName]) {
-                RETAIN (icon);
-                [icons removeObject: icon];
-                [icons insertObject: icon atIndex: targetIndex];
-                RELEASE (icon);
-                duplicate = YES;      
-                break;
-              }
-            }
-
-            if (duplicate == NO) {
-              DockIcon *icon = [self addIconForApplicationAtPath: path
-                                                        withName: appName 
-                                                         atIndex: targetIndex];
-              [icon setDocked: YES];
-            }
-
-            concluded = YES;
-          }
-        }
-      } 
-      
-      if (concluded == NO) {
-        if (icon) {
-          [icon setDraggedPaths: sourcePaths];
-        }
-      }    
+  if (dndSourceIcon && ([sender draggingSource] == dndSourceIcon))
+    {
+      [dndSourceIcon setIsDndSourceIcon: NO];
+      [self setDndSourceIcon: nil];
     }
-  }
+  else
+    {
+      NSPasteboard *pb = [sender draggingPasteboard];
+
+      if ([[pb types] containsObject: @"DockIconPboardType"])
+	{
+	  [self addDraggedIcon: [pb dataForType: @"DockIconPboardType"]
+		       atIndex: targetIndex];
+	}
+      else if ([[pb types] containsObject: NSFilenamesPboardType])
+	{
+	  NSArray *sourcePaths = [pb propertyListForType: NSFilenamesPboardType];
+	  NSPoint location = [sender draggingLocation];
+	  DockIcon *icon;
+	  BOOL concluded = NO;
+
+	  location = [self convertPoint: location fromView: nil];
+	  icon = [self iconContainingPoint: location];
+
+	  if ([sourcePaths count] == 1)
+	    {
+	      NSString *path = [sourcePaths objectAtIndex: 0];
+	      FSNode *node = [FSNode nodeWithPath: path];
+	      NSString *appName = [[node name] stringByDeletingPathExtension];
+        
+	      if ([node isApplication])
+		{
+		  if ((icon == nil) || (icon && ([icon isTrashIcon] == NO)))
+		    {
+		      BOOL duplicate = NO;
+		      NSUInteger i;
+
+		      for (i = 0; i < [icons count]; i++)
+			{
+			  DockIcon *icon = [icons objectAtIndex: i];
+
+			  if ([[icon node] isEqual: node]
+			      && [[icon appName] isEqual: appName])
+			    {
+			      RETAIN (icon);
+			      [icons removeObject: icon];
+			      [icons insertObject: icon atIndex: targetIndex];
+			      RELEASE (icon);
+			      duplicate = YES;
+			      break;
+			    }
+			}
+
+		      if (duplicate == NO)
+			{
+			  DockIcon *icon = [self addIconForApplicationAtPath: path
+								    withName: appName
+								     atIndex: targetIndex];
+			  [icon setDocked: YES];
+			}
+
+		      concluded = YES;
+		    }
+		}
+	    }
+
+	  if (concluded == NO)
+	    {
+	      if (icon)
+		{
+		  [icon setDraggedPaths: sourcePaths];
+		}
+	    }
+	}
+    }
 
   isDragTarget = NO;
   targetIndex = -1;
