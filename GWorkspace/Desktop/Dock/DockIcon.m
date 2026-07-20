@@ -342,7 +342,9 @@
 - (NSMenu *)menuForEvent:(NSEvent *)theEvent
 {
   if ([self isSpecialIcon] == NO) {
-    NSString *appPath = [ws fullPathForApplication: appName];
+    NSString *appPath;
+
+    appPath = [self path];
     
     if (appPath) {
       CREATE_AUTORELEASE_POOL(arp);
