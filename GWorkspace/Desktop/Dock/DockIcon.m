@@ -1,8 +1,8 @@
 /* DockIcon.m
  *  
- * Copyright (C) 2005-2021 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2026 Free Software Foundation, Inc.
  *
- * Authors: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale
  *          Riccardo Mottola <rm@gnu.org>
  * Date: January 2005
  *
@@ -87,6 +87,11 @@
   }
 
   return self;
+}
+
+- (NSString *)path
+{
+  return [node path];
 }
 
 - (NSString *)appName
