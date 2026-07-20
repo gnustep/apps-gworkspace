@@ -183,7 +183,7 @@
 
 - (DockIcon *)addIconForApplicationAtPath:(NSString *)path
                                  withName:(NSString *)name
-                                  atIndex:(int)index
+                                  atIndex:(NSInteger)index
 {
   if ([fm fileExistsAtPath: path])
     {
@@ -221,7 +221,7 @@
 }
 
 - (void)addDraggedIcon:(NSData *)icondata
-               atIndex:(int)index
+               atIndex:(NSInteger)index
 {
   NSDictionary *dict = [NSUnarchiver unarchiveObjectWithData: icondata];
   NSString *name = [dict objectForKey: @"name"];

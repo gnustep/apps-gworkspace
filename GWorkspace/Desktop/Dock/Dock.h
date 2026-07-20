@@ -53,7 +53,7 @@ typedef enum DockStyle
   DockIcon *dndSourceIcon;
   BOOL isDragTarget;
   int dragdelay;
-  int targetIndex;
+  NSInteger targetIndex;
   NSRect targetRect;
   
   GWDesktopManager *manager; 
@@ -70,10 +70,10 @@ typedef enum DockStyle
 
 - (DockIcon *)addIconForApplicationAtPath:(NSString *)path
                                  withName:(NSString *)name
-                                  atIndex:(int)index;
+                                  atIndex:(NSInteger)index;
 
 - (void)addDraggedIcon:(NSData *)icondata
-               atIndex:(int)index;
+               atIndex:(NSInteger)index;
 
 - (void)removeIcon:(DockIcon *)icon;
 
