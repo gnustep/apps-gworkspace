@@ -116,6 +116,8 @@
 
 - (void)editFile:(id)sender;
 
+- (NSString *)winname;
+
 @end
 
 

@@ -297,7 +297,7 @@ static NSString *nibName = @"Contents";
 	    {
 	      [viewersBox setContentView: textViewer];
 	      currentViewer = textViewer;
-              winName = [viewer winname];
+              winName = [textViewer winname];
 	      if (currentPath == nil)
 		{
 		  ASSIGN (currentPath, path);
