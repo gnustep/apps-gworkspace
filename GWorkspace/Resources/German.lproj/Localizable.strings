@@ -393,8 +393,9 @@ which ends in "kann <the file> nicht umbenennen"
 "General"="Generell";
 "Color:" = "Farbe:";
 "center" = "Zentriert";
-"fit" = "Skaliert";
+"fit" = "Angepasst";
 "tile" = "Gekachelt";
+"scale" = "Skaliert";
 "Use image" = "Bild verwenden";
 "Dock" = "Dock";
 "General" = "Allgemein";
