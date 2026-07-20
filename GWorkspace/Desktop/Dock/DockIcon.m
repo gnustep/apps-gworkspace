@@ -278,7 +278,7 @@
   if ([theEvent clickCount] >= minimumLaunchClicks) {
     if ([self isSpecialIcon] == NO) {
       if (launched == NO) {
-        [ws launchApplication: appName];
+        [ws launchApplication: [node path]];
       } else if (apphidden) {
         [[GWorkspace gworkspace] unhideAppWithPath: [node path] andName: appName];
       } else {
