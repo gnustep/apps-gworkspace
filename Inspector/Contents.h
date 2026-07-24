@@ -137,5 +137,7 @@
 
 - (void)showString:(NSString *)str;
 
+- (NSString *)winname;
+
 @end
 

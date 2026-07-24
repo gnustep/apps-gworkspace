@@ -309,7 +309,7 @@ static NSString *nibName = @"Contents";
 	      [viewersBox setContentView: genericView];
 	      currentViewer = genericView;
 	      [genericView showInfoOfPath: path];
-              winName = [viewer winname];
+              winName = [(GenericView*) currentViewer winname];
 	    }
 	}
     }
