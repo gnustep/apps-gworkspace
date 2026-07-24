@@ -44,6 +44,7 @@
 @interface AppViewer : NSView <ContentViewersProtocol>
 {
   NSString *currentPath;
+  NSString *appName;
 
   NSMatrix *matrix;
   NSScrollView *scroll;

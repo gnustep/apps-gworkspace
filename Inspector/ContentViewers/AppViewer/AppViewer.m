@@ -107,7 +107,7 @@
       [errLabel setBezeled: NO];
       [errLabel setEditable: NO];
       [errLabel setSelectable: NO];
-      [errLabel setStringValue: NSLocalizedString(@"Invalid Contents", @"")];
+      [errLabel setStringValue: @""];
 
       currentPath = nil;
 
@@ -127,6 +127,8 @@
   BOOL infoIsOk;
   
   ASSIGN (currentPath, path);
+
+  appName = [path lastPathComponent];
 
   if ([self superview])      
     [inspector contentsReadyAt: currentPath];
@@ -235,6 +237,7 @@
           [scroll removeFromSuperview];
           [self addSubview: errLabel];
         }
+      [errLabel setStringValue: appName];
     }
 }
 
