@@ -1,8 +1,8 @@
 /* Dock.m
  *  
- * Copyright (C) 2005-2021 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2026 Free Software Foundation, Inc.
  *
- * Authors: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale
  *          Riccardo Mottola <rm@gnu.org>
  * Date: January 2005
  *
@@ -117,8 +117,18 @@
 	  for (i = 0; i < [indexes count]; i++)
 	    {
 	      NSNumber *index = [indexes objectAtIndex: i];
-	      NSString *name = [[appsdict objectForKey: index] stringByDeletingPathExtension];
-	      NSString *path = [ws fullPathForApplication: name];
+	      NSString *path = [appsdict objectForKey: index];
+	      NSString *name = nil;
+
+	      if ([path isAbsolutePath])
+		{
+		  name = [[path lastPathComponent] stringByDeletingPathExtension];
+		}
+	      else
+		{
+		  name = [path stringByDeletingPathExtension];
+	          path = [ws fullPathForApplication: name];
+		}
         
 	      if (path)
 		{
@@ -183,7 +193,7 @@
 
 - (DockIcon *)addIconForApplicationAtPath:(NSString *)path
                                  withName:(NSString *)name
-                                  atIndex:(int)index
+                                  atIndex:(NSInteger)index
 {
   if ([fm fileExistsAtPath: path])
     {
@@ -221,7 +231,7 @@
 }
 
 - (void)addDraggedIcon:(NSData *)icondata
-               atIndex:(int)index
+               atIndex:(NSInteger)index
 {
   NSDictionary *dict = [NSUnarchiver unarchiveObjectWithData: icondata];
   NSString *name = [dict objectForKey: @"name"];
@@ -249,14 +259,17 @@
   [self tile];
 }
 
-- (DockIcon *)iconForApplicationName:(NSString *)name
+- (DockIcon *)iconForApplicationPath:(NSString *)path
 {
   NSUInteger i;
   
   for (i = 0; i < [icons count]; i++) {
     DockIcon *icon = [icons objectAtIndex: i];
     
-    if ([[icon appName] isEqual: name]) {
+    if ([[icon path] isEqual: path]) {
+      return icon;
+    }
+    if ([[[icon path] stringByResolvingSymlinksInPath] isEqual: path]) {
       return icon;
     }
   }
@@ -319,8 +332,8 @@
               appName:(NSString *)appName
 {
   if ([appName isEqual: [gw gworkspaceProcessName]] == NO) {
-    DockIcon *icon = [self iconForApplicationName: appName];
-  
+    DockIcon *icon = [self iconForApplicationPath: appPath];
+
     if (icon == nil) {
       icon = [self addIconForApplicationAtPath: appPath
                                       withName: appName
@@ -336,7 +349,7 @@
              appName:(NSString *)appName
 {
   if ([appName isEqual: [gw gworkspaceProcessName]] == NO) {
-    DockIcon *icon = [self iconForApplicationName: appName];
+    DockIcon *icon = [self iconForApplicationPath: appPath];
 
     if (icon == nil) {
       icon = [self addIconForApplicationAtPath: appPath
@@ -349,10 +362,11 @@
   }
 }
 
-- (void)appTerminated:(NSString *)appName
+- (void)appTerminated:(NSString *)appPath
+	      appName:(NSString *)appName
 {
   if ([appName isEqual: [gw gworkspaceProcessName]] == NO) {
-    DockIcon *icon = [self iconForApplicationName: appName];
+    DockIcon *icon = [self iconForApplicationPath: appPath];
 
     if (icon) {
       if (([icon isDocked] == NO) && ([icon isSpecialIcon] == NO)) {
@@ -365,10 +379,11 @@
   }
 }
 
-- (void)appDidHide:(NSString *)appName
+- (void)appDidHide:(NSString *)appPath
+	   appName:(NSString *)appName
 {
   if ([appName isEqual: [gw gworkspaceProcessName]] == NO) {
-    DockIcon *icon = [self iconForApplicationName: appName];
+    DockIcon *icon = [self iconForApplicationPath: appPath];
 
     if (icon) {
       [icon setAppHidden: YES];
@@ -376,10 +391,11 @@
   }
 }
 
-- (void)appDidUnhide:(NSString *)appName
+- (void)appDidUnhide:(NSString *)appPath
+	   appName:(NSString *)appName
 {
   if ([appName isEqual: [gw gworkspaceProcessName]] == NO) {
-    DockIcon *icon = [self iconForApplicationName: appName];
+    DockIcon *icon = [self iconForApplicationPath: appPath];
 
     if (icon) {
       [icon setAppHidden: NO];
@@ -567,7 +583,7 @@
 
       if (([icon isSpecialIcon] == NO) && [icon isDocked])
 	{
-	  [dict setObject: [icon appName] forKey: [[NSNumber numberWithInt: i] stringValue]];
+	  [dict setObject: [icon path] forKey: [[NSNumber numberWithInt: i] stringValue]];
 	  [manager removeWatcherForPath: [[icon node] path]];
 	}
 

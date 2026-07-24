@@ -105,7 +105,8 @@
 "You have not write permission\nfor" = "Non hai permesso di scrittura\nper";
 "Continue" = "Continua";
 
-"File Viewer" = "File Viewer";
+"File Viewer" = "Vista Archivio";
+"Show In File Viewer" = "Mostrare nella Vista Archivio";
 
 "Quit!" = "Termina!";
 "Do you really want to quit?" = "Terminare veramente?";

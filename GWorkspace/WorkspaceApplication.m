@@ -1,8 +1,9 @@
 /* WorkspaceApplication.m
  *  
- * Copyright (C) 2006-2016 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2026 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: January 2006
  *
  * This file is part of the GNUstep GWorkspace application
@@ -445,10 +446,10 @@
   NSString *host;
 
   path = [ws locateApplicationBinary: appname];
-  
-  if (path == nil) {
-	  return NO;
-	}
+  if (path == nil)
+    {
+      return NO;
+    }
 
   /*
   * Try to ensure that apps we launch display in this workspace
@@ -476,16 +477,20 @@
     }
 	}
 
-  [self applicationName: &appName andPath: &appPath forName: appname];
-  
-  if (appPath == nil) {
-    [ws findApplications];
-    [self applicationName: &appName andPath: &appPath forName: appname];
-  }
-
-  if (appPath == nil && [appname isAbsolutePath] == YES)
+  if ([appname isAbsolutePath])
     {
       appPath = appname;
+      appName = [[appname lastPathComponent] stringByDeletingPathExtension];
+    }
+  else
+    {
+      [self applicationName: &appName andPath: &appPath forName: appname];
+
+      if (appPath == nil)
+	{
+	  [ws findApplications];
+	  [self applicationName: &appName andPath: &appPath forName: appname];
+	}
     }
   
   userinfo = [NSDictionary dictionaryWithObjectsAndKeys: appName, 
@@ -521,7 +526,7 @@
   NSDictionary *info = [notif userInfo];
   NSString *path = [info objectForKey: @"NSApplicationPath"];
   NSString *name = [info objectForKey: @"NSApplicationName"];
-  
+
   if (path && name) {
     [[dtopManager dock] appWillLaunch: path appName: name];
     GWDebugLog(@"appWillLaunch: \"%@\" %@", name, path);
@@ -634,7 +639,7 @@
    
   if (app) {
     [app setHidden: YES];
-    [[dtopManager dock] appDidHide: name];
+    [[dtopManager dock] appDidHide: path appName: name];
   } else {
     GWDebugLog(@"appDidHide: \"%@\" unknown running application.", name);
   }
@@ -649,7 +654,7 @@
     
   if (app) {
     [app setHidden: NO];
-    [[dtopManager dock] appDidUnhide: name];
+    [[dtopManager dock] appDidUnhide: path appName: name];
     GWDebugLog(@"\"%@\" appDidUnhide", name);
   } else {
     GWDebugLog(@"appDidUnhide: \"%@\" unknown running application.", name);
@@ -673,7 +678,7 @@
     activeApplication = nil;
   }
   
-  [[dtopManager dock] appTerminated: [app name]];
+  [[dtopManager dock] appTerminated: [app path] appName:[app name]];
   GWDebugLog(@"\"%@\" applicationTerminated", [app name]);  
   [launchedApps removeObject: app];  
   
@@ -890,7 +895,7 @@
           
                   if (hidden)
                     {
-                      [[dtopManager dock] appDidHide: name];
+                      [[dtopManager dock] appDidHide: path appName: name];
                     }
           
                 }

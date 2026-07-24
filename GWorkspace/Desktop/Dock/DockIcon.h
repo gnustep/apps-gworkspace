@@ -1,8 +1,9 @@
 /* DockIcon.h
  *  
- * Copyright (C) 2005-2012 Free Software Foundation, Inc.
+ * Copyright (C) 2005-2026 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale
+ *          Riccardo Mottola <rm@gnu.org>
  * Date: January 2005
  *
  * This file is part of the GNUstep GWorkspace application
@@ -62,6 +63,8 @@
 - (id)initForNode:(FSNode *)anode
           appName:(NSString *)aname
          iconSize:(int)isize;
+
+- (NSString *)path;
 
 - (NSString *)appName;
         
