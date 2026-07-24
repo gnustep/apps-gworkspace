@@ -1,6 +1,6 @@
 /* AppViewer.m
  *  
- * Copyright (C) 2004-2025 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2026 Free Software Foundation, Inc.
  *
  * Authors: Enrico Sersale
  *          Riccardo Mottola <rm@gnu.org>
@@ -113,8 +113,6 @@
 
       inspector = insp;
       ws = [NSWorkspace sharedWorkspace];
-				
-      valid = YES;
     
       [self setContextHelp];
     }
@@ -211,23 +209,32 @@
 	    }
 	  [matrix sizeToCells];
       
-	  if (valid == NO)
-	    {
-	      [errLabel removeFromSuperview]; 
-	      [self addSubview: explField];       
-	      [self addSubview: scroll];       
-	      valid = YES;
-	    }
           infoIsOk = YES;
 	}
     }
-  
-  if (infoIsOk == NO && valid == YES)
+
+  // do we have a valid document type list to display?
+  if (infoIsOk)
     {
-      [explField removeFromSuperview]; 
-      [scroll removeFromSuperview]; 
-      [self addSubview: errLabel];       
-      valid = NO;
+      // check if we are displaying the error label,
+      // in case swap it with the document type list
+      if ([errLabel superview] != nil)
+        {
+          [errLabel removeFromSuperview];
+          [self addSubview: explField];
+          [self addSubview: scroll];
+        }
+    }
+  else
+    {
+      // check if we are displaying the document type list,
+      // in case swap it with error label
+      if ([explField superview] != nil)
+        {
+          [explField removeFromSuperview];
+          [scroll removeFromSuperview];
+          [self addSubview: errLabel];
+        }
     }
 }
 

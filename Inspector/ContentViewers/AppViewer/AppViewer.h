@@ -1,8 +1,9 @@
 /* AppViewer.h
  *  
- * Copyright (C) 2004 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2026 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Authors: Enrico Sersale
+ *          Riccardo Mottola
  * Date: January 2004
  *
  * This file is part of the GNUstep Inspector application
@@ -43,7 +44,6 @@
 @interface AppViewer : NSView <ContentViewersProtocol>
 {
   NSString *currentPath;
-  BOOL valid;
 
   NSMatrix *matrix;
   NSScrollView *scroll;
