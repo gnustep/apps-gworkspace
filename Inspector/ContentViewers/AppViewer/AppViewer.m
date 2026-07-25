@@ -47,9 +47,9 @@
       NSRect r, vr;
       CGFloat x, y, w, h;
       NSButtonCell *cell;
-    
+
       r = [self bounds];
-    
+
       x = 5;
       y = r.origin.y + 182;
       w = r.size.width - 10;
@@ -66,7 +66,7 @@
       [explField setSelectable: NO];
       [explField setStringValue: NSLocalizedString(@"Open these kinds of documents:", @"")];
       [self addSubview: explField];
-		
+
       w = 196;    
       h = 94;
       x = (r.size.width - w) / 2;
@@ -77,11 +77,11 @@
       [scroll setHasHorizontalScroller: YES];
       [scroll setHasVerticalScroller: NO]; 
       [self addSubview: scroll]; 
-		
+
       cell = [NSButtonCell new];
       [cell setButtonType: NSPushOnPushOffButton];
       [cell setImagePosition: NSImageAbove]; 
-				
+
       matrix = [[NSMatrix alloc] initWithFrame: NSZeroRect
 					  mode: NSRadioModeMatrix prototype: cell
 				  numberOfRows: 0 numberOfColumns: 0];
@@ -262,7 +262,7 @@
   [ws getInfoForFile: path 
          application: &defApp 
                 type: &fileType];
-	
+
   return (fileType && [fileType isEqual: NSApplicationFileType]);
 }
 
@@ -288,23 +288,26 @@
   NSString *resPath = [bpath stringByAppendingPathComponent: @"Resources"];
   NSArray *languages = [NSUserDefaults userLanguages];
   unsigned i;
-     
-  for (i = 0; i < [languages count]; i++) {
-    NSString *language = [languages objectAtIndex: i];
-    NSString *langDir = [NSString stringWithFormat: @"%@.lproj", language];  
-    NSString *helpPath = [langDir stringByAppendingPathComponent: @"Help.rtfd"];
-  
-    helpPath = [resPath stringByAppendingPathComponent: helpPath];
-  
-    if ([fm fileExistsAtPath: helpPath]) {
-      NSAttributedString *help = [[NSAttributedString alloc] initWithPath: helpPath
-                                                       documentAttributes: NULL];
-      if (help) {
-        [[NSHelpManager sharedHelpManager] setContextHelp: help forObject: self];
-        RELEASE (help);
-      }
+
+  for (i = 0; i < [languages count]; i++)
+    {
+      NSString *language = [languages objectAtIndex: i];
+      NSString *langDir = [NSString stringWithFormat: @"%@.lproj", language];
+      NSString *helpPath = [langDir stringByAppendingPathComponent: @"Help.rtfd"];
+
+      helpPath = [resPath stringByAppendingPathComponent: helpPath];
+
+      if ([fm fileExistsAtPath: helpPath])
+        {
+          NSAttributedString *help = [[NSAttributedString alloc] initWithPath: helpPath
+                                                           documentAttributes: NULL];
+          if (help)
+            {
+              [[NSHelpManager sharedHelpManager] setContextHelp: help forObject: self];
+              RELEASE (help);
+            }
+        }
     }
-  }
 }
 
 @end
