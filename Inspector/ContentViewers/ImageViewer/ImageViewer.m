@@ -37,7 +37,7 @@
   RELEASE (_pathToDisplay);
   RELEASE (image);
   RELEASE (editPath);
-  RELEASE (imview);
+  RELEASE (imageView);
   RELEASE (errLabel);
   RELEASE (progView);
   DESTROY (conn);
@@ -56,12 +56,12 @@
       r.origin.y += 60;
       r.size.height -= 60;
 
-      imview = [[NSImageView alloc] initWithFrame: r];
-      [imview setEditable: NO];
-      [imview setImageFrameStyle: NSImageFrameGrayBezel];
-      [imview setImageAlignment: NSImageAlignCenter];
-      [imview setImageScaling: NSScaleNone];
-      [self addSubview: imview];
+      imageView = [[NSImageView alloc] initWithFrame: r];
+      [imageView setEditable: NO];
+      [imageView setImageFrameStyle: NSImageFrameGrayBezel];
+      [imageView setImageAlignment: NSImageAlignCenter];
+      [imageView setImageScaling: NSScaleNone];
+      [self addSubview: imageView];
 
       r.origin.x = 10;
       r.origin.y -= 20;
@@ -140,7 +140,7 @@
 - (void)_readImage
 {
   NSLog(@"ImageViewer - _readImage: %@", _pathToDisplay);
-  NSSize imsize = [imview bounds].size;
+  NSSize imsize = [imageView bounds].size;
 
   imsize.width -= 4;
   imsize.height -= 4;
@@ -247,7 +247,7 @@
     {
       NSImageRep *imgRep;
 
-      [imview setImage: image];
+      [imageView setImage: image];
       DESTROY (image);
       image = [[NSImage alloc] initWithData: imgdata];
 
@@ -255,12 +255,12 @@
       if ([imgRep isKindOfClass:[NSBitmapImageRep class]])
 	{
 	  // Bitmap Images are scaled inside Resizer
-	  [imview setImageScaling:NSScaleNone];
+	  [imageView setImageScaling:NSScaleNone];
 	}
       else
 	{
 	  // others, e.g. PDFs are just returned as-is from the Resizer
-	  [imview setImageScaling:NSScaleProportionally];
+	  [imageView setImageScaling:NSScaleProportionally];
 	}
 
       if (image)
@@ -274,10 +274,10 @@
             {
               valid = YES;
               [errLabel removeFromSuperview];
-              [self addSubview: imview];
+              [self addSubview: imageView];
             }
 
-          [imview setImage: image];
+          [imageView setImage: image];
 
           str = NSLocalizedString(@"Width:", @"");
           str = [NSString stringWithFormat: @"%@ %.0f", str, width];
@@ -301,7 +301,7 @@
   if (imgok == NO)
     {
       valid = NO;
-      [imview removeFromSuperview];
+      [imageView removeFromSuperview];
       [self addSubview: errLabel];
       [widthLabel setStringValue: @""];
       [heightLabel setStringValue: @""];
@@ -324,7 +324,7 @@
 
 - (void)stopTasks
 {
-  [imview setImage: nil];
+  [imageView setImage: nil];
 }
 
 - (BOOL)canDisplayPath:(NSString *)path

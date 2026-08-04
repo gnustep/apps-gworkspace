@@ -58,7 +58,7 @@
   NSArray *extsarr;
   BOOL valid;	
   
-  NSImageView *imview;
+  NSImageView *imageView;
   NSImage *image;
   NSTextField *errLabel;
   NSTextField *widthLabel;
