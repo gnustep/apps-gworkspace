@@ -34,7 +34,7 @@
 - (void)dealloc
 {
   DESTROY (resizer);
-  RELEASE (imagePath);
+  RELEASE (_pathToDisplay);
   RELEASE (image);
   RELEASE (editPath);
   RELEASE (imview);
@@ -127,7 +127,7 @@
 
       valid = YES;
       resizer = nil;
-      imagePath = nil;
+      _pathToDisplay = nil;
       editPath = nil;
       image = nil;
 
@@ -139,14 +139,14 @@
 
 - (void)_readImage
 {
-  NSLog(@"ImageViewer - _readImage: %@", imagePath);
+  NSLog(@"ImageViewer - _readImage: %@", _pathToDisplay);
   NSSize imsize = [imview bounds].size;
 
   imsize.width -= 4;
   imsize.height -= 4;
   [self addSubview: progView];
   [progView start];
-  [resizer readImageAtPath: imagePath setSize: imsize];
+  [resizer readImageAtPath: _pathToDisplay setSize: imsize];
 }
 
 - (void)displayPath:(NSString *)path
@@ -156,7 +156,7 @@
   [widthLabel setStringValue: @""];
   [heightLabel setStringValue: @""];
 
-  ASSIGN (imagePath, path);
+  ASSIGN (_pathToDisplay, path);
   if (conn == nil)
     {
       NSPort *p1;
@@ -212,19 +212,19 @@
   // whether we have or not read an image, we declare the content is ready
   // at most we won't display it, otherwise other data does not update
   if ([self superview])
-    [inspector contentsReadyAt: imagePath];
+    [inspector contentsReadyAt: _pathToDisplay];
 
   if (nil != imginfo)
     {
       imgdata = [imginfo objectForKey:@"imgdata"];
 
       // since resizing is async, we check if we still need the generated image
-      if (imagePath)
+      if (_pathToDisplay)
         { // resizing was in progress
-          if ([imagePath isEqualToString:[imginfo objectForKey: @"imgpath"]] == NO)
+          if ([_pathToDisplay isEqualToString:[imginfo objectForKey: @"imgpath"]] == NO)
             {
               NSLog(@"ImageViewer: trying to display inconsistent image");
-              NSLog(@"%@ vs %@", imagePath, [imginfo objectForKey: @"imgpath"]);
+              NSLog(@"%@ vs %@", _pathToDisplay, [imginfo objectForKey: @"imgpath"]);
               return;
             }
         }
@@ -235,7 +235,7 @@
               NSLog(@"ImageViewer: trying to display existing image: %@", editPath);
               return;
             }
-          NSLog(@"anomalous condition: imagePath %@ - editPath %@", imagePath, editPath);
+          NSLog(@"anomalous condition: _pathToDisplay %@ - editPath %@", _pathToDisplay, editPath);
         }
     }
   else
@@ -287,10 +287,10 @@
           str = [NSString stringWithFormat: @"%@ %.0f", str, height];
           [heightLabel setStringValue: str];
 
-          ASSIGN (editPath, imagePath);
+          ASSIGN (editPath, _pathToDisplay);
           [editButt setEnabled: YES];		
           [[self window] makeFirstResponder: editButt];
-	  DESTROY (imagePath);
+	  DESTROY (_pathToDisplay);
         }
       else
 	{

@@ -66,7 +66,7 @@
   ProgressView *progView;
   NSButton *editButt;
   
-  NSString *imagePath;
+  NSString *_pathToDisplay;
   NSString *editPath;
   
   NSConnection *conn;  
