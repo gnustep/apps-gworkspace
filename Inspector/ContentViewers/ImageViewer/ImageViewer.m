@@ -246,6 +246,8 @@
   if (imgdata)
     {
       NSImageRep *imgRep;
+
+      [imview setImage: image];
       DESTROY (image);
       image = [[NSImage alloc] initWithData: imgdata];
 
