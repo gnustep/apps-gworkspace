@@ -245,8 +245,21 @@
 
   if (imgdata)
     {
+      NSImageRep *imgRep;
       DESTROY (image);
       image = [[NSImage alloc] initWithData: imgdata];
+
+      imgRep = [[image representations] objectAtIndex:0];
+      if ([imgRep isKindOfClass:[NSBitmapImageRep class]])
+	{
+	  // Bitmap Images are scaled inside Resizer
+	  [imview setImageScaling:NSScaleNone];
+	}
+      else
+	{
+	  // others, e.g. PDFs are just returned as-is from the Resizer
+	  [imview setImageScaling:NSScaleProportionally];
+	}
 
       if (image)
         {
