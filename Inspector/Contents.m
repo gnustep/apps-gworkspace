@@ -177,7 +177,6 @@ static NSString *nibName = @"Contents";
 {
   if ([paths count] == 1)
     {
-      NSLog(@"Contents : activateForPaths");
       [self showContentsAt: [paths objectAtIndex: 0]];
     }
   else
@@ -252,7 +251,7 @@ static NSString *nibName = @"Contents";
 {
   NSString *winName;
 
-  NSLog(@"Contents: showContentsAt");
+  NSLog(@"Contents: showContentsAt %@", path);
   // No change in selection? leave current path
   if (currentPath && [currentPath isEqualToString:path])
     {

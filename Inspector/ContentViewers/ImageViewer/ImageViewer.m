@@ -1,8 +1,8 @@
 /* ImageViewer.m
  *  
- * Copyright (C) 2004-2024 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2026 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Author: Enrico Sersale
  *         Riccardo Mottola <rm@gnu.org>
  * Date: January 2004
  *
@@ -139,7 +139,6 @@
 
 - (void)_readImage
 {
-  NSLog(@"ImageViewer - _readImage: %@", _pathToDisplay);
   NSSize imsize = [imageView bounds].size;
 
   imsize.width -= 4;
@@ -212,12 +211,13 @@
       NSData *imgdata = [imginfo objectForKey:@"imgdata"];
       NSString *imgPath = [imginfo objectForKey: @"imgpath"];
 
+      NSLog(@"imageReady for: %@", imgPath);
       // since resizing is async, we check if we still need the generated image
       if (_pathToDisplay)
         { // resizing was in progress
           if ([_pathToDisplay isEqualToString:imgPath] == YES)
 	    {
-	      // is he inspector still an ImageViewer inspector ?
+	      // is the inspector still an ImageViewer inspector ?
 	      if ([self superview])
 		{
 		  [inspector contentsReadyAt: _pathToDisplay];
@@ -227,42 +227,51 @@
             {
               NSLog(@"ImageViewer: trying to display inconsistent image");
               NSLog(@"%@ vs %@", _pathToDisplay, imgPath);
-	      return;
+	      imgdata = nil;
 	    }
 	}
       else if (editPath)
 	{ // image displayed completed
+	  NSLog(@"we have editPath %@", editPath);
 	  if ([editPath isEqualToString:imgPath] == YES)
 	    {
 	      NSLog(@"ImageViewer: trying to display existing image: %@", editPath);
-	      return;
 	    }
+	  else
+	    {
+	      NSLog(@"ImageViewer: image ready of non-current path");
+	    }
+	  // we remove image data, but we say the image is OK
+	  // so current content is not changed
+	  imgdata = nil;
+	  imgok = YES;
 	}
 
       if (imgdata)
 	{
-	  NSImageRep *imgRep;
-
-	  [imageView setImage: image];
+	  [imageView setImage: nil];
 	  DESTROY (image);
 	  image = [[NSImage alloc] initWithData: imgdata];
-	  imgRep = [[image representations] objectAtIndex:0];
-	  if ([imgRep isKindOfClass:[NSBitmapImageRep class]])
-	    {
-	      // Bitmap Images are scaled inside Resizer
-	      [imageView setImageScaling:NSScaleNone];
-	    }
-	  else
-	    {
-	      // others, e.g. PDFs are just returned as-is from the Resizer
-	      [imageView setImageScaling:NSScaleProportionally];
-	    }
 
 	  if (image)
 	    {
+	      NSImageRep *imgRep;
+	      NSString *str;
+
+	      imgRep = [[image representations] objectAtIndex:0];
+	      if ([imgRep isKindOfClass:[NSBitmapImageRep class]])
+		{
+		  // Bitmap Images are scaled inside Resizer
+		  [imageView setImageScaling:NSScaleNone];
+		}
+	      else
+		{
+		  // others, e.g. PDFs are just returned as-is from the Resizer
+		  [imageView setImageScaling:NSScaleProportionally];
+		}
+
 	      float width = [[imginfo objectForKey: @"width"] floatValue];
 	      float height = [[imginfo objectForKey: @"height"] floatValue];
-	      NSString *str;
 
 	      imgok = YES;
 	      if (valid == NO)
