@@ -80,6 +80,7 @@
   if (srcImage && [srcImage isValid])
     {
       NSBitmapImageRep *srcImageRep;
+      NSPDFImageRep *pdfImageRep;
       NSInteger srcSizeW;
       NSInteger srcSizeH;
       NSEnumerator *repEnum;
@@ -89,21 +90,36 @@
 
       repEnum = [[srcImage representations] objectEnumerator];
       srcImageRep = nil;
+      pdfImageRep = nil;
       imgRep = nil;
+      srcSizeW = 0;
+      srcSizeH = 0;
+
       while (srcImageRep == nil && (imgRep = [repEnum nextObject]))
         {
           if ([imgRep isKindOfClass:[NSBitmapImageRep class]])
             srcImageRep = (NSBitmapImageRep *)imgRep;
+	  else if ([imgRep isKindOfClass:[NSPDFImageRep class]])
+	    pdfImageRep = (NSPDFImageRep *)imgRep;
         }
-      
-      srcSizeW = [srcImageRep pixelsWide];
-      srcSizeH = [srcImageRep pixelsHigh];
-      
+
+      if (srcImageRep != nil)
+	{
+	  srcSizeW = [srcImageRep pixelsWide];
+	  srcSizeH = [srcImageRep pixelsHigh];
+	}
+      else if (pdfImageRep != nil)
+	{
+	  [info setObject: [pdfImageRep PDFRepresentation] forKey:@"imgdata"];
+	  srcSizeW = [pdfImageRep size].width;
+	  srcSizeH = [pdfImageRep size].height;
+	}
+
       [info setObject: [NSNumber numberWithFloat: (float)srcSizeW] forKey: @"width"];
       [info setObject: [NSNumber numberWithFloat: (float)srcSizeH] forKey: @"height"];
       [info setObject: path forKey: @"imgpath"];
-      
-      if ((imsize.width < srcSizeW) || (imsize.height < srcSizeH))
+
+      if (srcImageRep != nil && ((imsize.width < srcSizeW) || (imsize.height < srcSizeH)))
         {
 	  NSInteger srcSamplesPerPixel;
           NSInteger destSamplesPerPixel;

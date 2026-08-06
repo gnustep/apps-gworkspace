@@ -1,8 +1,8 @@
 /* ImageViewer.m
  *  
- * Copyright (C) 2004-2024 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2026 Free Software Foundation, Inc.
  *
- * Author: Enrico Sersale <enrico@imago.ro>
+ * Author: Enrico Sersale
  *         Riccardo Mottola <rm@gnu.org>
  * Date: January 2004
  *
@@ -34,10 +34,10 @@
 - (void)dealloc
 {
   DESTROY (resizer);
-  RELEASE (imagePath);
+  RELEASE (_pathToDisplay);
   RELEASE (image);
   RELEASE (editPath);
-  RELEASE (imview);
+  RELEASE (imageView);
   RELEASE (errLabel);
   RELEASE (progView);
   DESTROY (conn);
@@ -56,12 +56,12 @@
       r.origin.y += 60;
       r.size.height -= 60;
 
-      imview = [[NSImageView alloc] initWithFrame: r];
-      [imview setEditable: NO];
-      [imview setImageFrameStyle: NSImageFrameGrayBezel];
-      [imview setImageAlignment: NSImageAlignCenter];
-      [imview setImageScaling: NSScaleNone];
-      [self addSubview: imview];
+      imageView = [[NSImageView alloc] initWithFrame: r];
+      [imageView setEditable: NO];
+      [imageView setImageFrameStyle: NSImageFrameGrayBezel];
+      [imageView setImageAlignment: NSImageAlignCenter];
+      [imageView setImageScaling: NSScaleNone];
+      [self addSubview: imageView];
 
       r.origin.x = 10;
       r.origin.y -= 20;
@@ -127,7 +127,7 @@
 
       valid = YES;
       resizer = nil;
-      imagePath = nil;
+      _pathToDisplay = nil;
       editPath = nil;
       image = nil;
 
@@ -139,14 +139,13 @@
 
 - (void)_readImage
 {
-  NSLog(@"ImageViewer - _readImage: %@", imagePath);
-  NSSize imsize = [imview bounds].size;
+  NSSize imsize = [imageView bounds].size;
 
   imsize.width -= 4;
   imsize.height -= 4;
   [self addSubview: progView];
   [progView start];
-  [resizer readImageAtPath: imagePath setSize: imsize];
+  [resizer readImageAtPath: _pathToDisplay setSize: imsize];
 }
 
 - (void)displayPath:(NSString *)path
@@ -156,7 +155,7 @@
   [widthLabel setStringValue: @""];
   [heightLabel setStringValue: @""];
 
-  ASSIGN (imagePath, path);
+  ASSIGN (_pathToDisplay, path);
   if (conn == nil)
     {
       NSPort *p1;
@@ -203,90 +202,122 @@
 
 - (oneway void)imageReady:(NSDictionary *)imginfo
 {
-  NSData *imgdata;
   BOOL imgok;
 
   imgok = NO;
-  imgdata = nil;
-
-  // whether we have or not read an image, we declare the content is ready
-  // at most we won't display it, otherwise other data does not update
-  if ([self superview])
-    [inspector contentsReadyAt: imagePath];
 
   if (nil != imginfo)
     {
-      imgdata = [imginfo objectForKey:@"imgdata"];
+      NSData *imgdata = [imginfo objectForKey:@"imgdata"];
+      NSString *imgPath = [imginfo objectForKey: @"imgpath"];
 
+      NSLog(@"imageReady for: %@", imgPath);
       // since resizing is async, we check if we still need the generated image
-      if (imagePath)
+      if (_pathToDisplay)
         { // resizing was in progress
-          if ([imagePath isEqualToString:[imginfo objectForKey: @"imgpath"]] == NO)
+          if ([_pathToDisplay isEqualToString:imgPath] == YES)
+	    {
+	      // is the inspector still an ImageViewer inspector ?
+	      if ([self superview])
+		{
+		  [inspector contentsReadyAt: _pathToDisplay];
+		}
+	    }
+	  else
             {
               NSLog(@"ImageViewer: trying to display inconsistent image");
-              NSLog(@"%@ vs %@", imagePath, [imginfo objectForKey: @"imgpath"]);
-              return;
-            }
-        }
+              NSLog(@"%@ vs %@", _pathToDisplay, imgPath);
+	      imgdata = nil;
+	    }
+	}
       else if (editPath)
-        { // image displayed completed
-          if ([editPath isEqualToString:[imginfo objectForKey: @"imgpath"]] == YES)
-            {
-              NSLog(@"ImageViewer: trying to display existing image: %@", editPath);
-              return;
-            }
-          NSLog(@"anomalous condition: imagePath %@ - editPath %@", imagePath, editPath);
-        }
+	{ // image displayed completed
+	  NSLog(@"we have editPath %@", editPath);
+	  if ([editPath isEqualToString:imgPath] == YES)
+	    {
+	      NSLog(@"ImageViewer: trying to display existing image: %@", editPath);
+	    }
+	  else
+	    {
+	      NSLog(@"ImageViewer: image ready of non-current path");
+	    }
+	  // we remove image data, but we say the image is OK
+	  // so current content is not changed
+	  imgdata = nil;
+	  imgok = YES;
+	}
+
+      if (imgdata)
+	{
+	  [imageView setImage: nil];
+	  DESTROY (image);
+	  image = [[NSImage alloc] initWithData: imgdata];
+
+	  if (image)
+	    {
+	      NSImageRep *imgRep;
+	      NSString *str;
+
+	      imgRep = [[image representations] objectAtIndex:0];
+	      if ([imgRep isKindOfClass:[NSBitmapImageRep class]])
+		{
+		  // Bitmap Images are scaled inside Resizer
+		  [imageView setImageScaling:NSScaleNone];
+		}
+	      else
+		{
+		  // others, e.g. PDFs are just returned as-is from the Resizer
+		  [imageView setImageScaling:NSScaleProportionally];
+		}
+
+	      float width = [[imginfo objectForKey: @"width"] floatValue];
+	      float height = [[imginfo objectForKey: @"height"] floatValue];
+
+	      imgok = YES;
+	      if (valid == NO)
+		{
+		  valid = YES;
+		  [errLabel removeFromSuperview];
+		  [self addSubview: imageView];
+		}
+
+	      [imageView setImage: image];
+
+	      str = NSLocalizedString(@"Width:", @"");
+	      str = [NSString stringWithFormat: @"%@ %.0f", str, width];
+	      [widthLabel setStringValue: str];
+
+	      str = NSLocalizedString(@"Height:", @"");
+	      str = [NSString stringWithFormat: @"%@ %.0f", str, height];
+	      [heightLabel setStringValue: str];
+
+	      ASSIGN (editPath, _pathToDisplay);
+	      [editButt setEnabled: YES];
+	      [[self window] makeFirstResponder: editButt];
+	      DESTROY (_pathToDisplay);
+	    }
+	  else
+	    {
+	      NSLog(@"no image returned");
+	    }
+	}
     }
   else
     {
       NSLog(@"imageReady without imginfo");
-    }
 
-  if (imgdata)
-    {
-      DESTROY (image);
-      image = [[NSImage alloc] initWithData: imgdata];
-
-      if (image)
-        {
-          float width = [[imginfo objectForKey: @"width"] floatValue];
-          float height = [[imginfo objectForKey: @"height"] floatValue];
-          NSString *str;
-
-	  imgok = YES;
-          if (valid == NO)
-            {
-              valid = YES;
-              [errLabel removeFromSuperview];
-              [self addSubview: imview];
-            }
-
-          [imview setImage: image];
-
-          str = NSLocalizedString(@"Width:", @"");
-          str = [NSString stringWithFormat: @"%@ %.0f", str, width];
-          [widthLabel setStringValue: str];
-
-          str = NSLocalizedString(@"Height:", @"");
-          str = [NSString stringWithFormat: @"%@ %.0f", str, height];
-          [heightLabel setStringValue: str];
-
-          ASSIGN (editPath, imagePath);
-          [editButt setEnabled: YES];		
-          [[self window] makeFirstResponder: editButt];
-	  DESTROY (imagePath);
-        }
-      else
+      // whether we have or not read an image, we declare the content is ready
+      // at most we won't display it, otherwise other data does not update
+      if ([self superview])
 	{
-	  NSLog(@"no image returned");
+	  [inspector contentsReadyAt: _pathToDisplay];
 	}
     }
 
   if (imgok == NO)
     {
       valid = NO;
-      [imview removeFromSuperview];
+      [imageView removeFromSuperview];
       [self addSubview: errLabel];
       [widthLabel setStringValue: @""];
       [heightLabel setStringValue: @""];
@@ -309,7 +340,7 @@
 
 - (void)stopTasks
 {
-  [imview setImage: nil];
+  [imageView setImage: nil];
 }
 
 - (BOOL)canDisplayPath:(NSString *)path
