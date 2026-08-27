@@ -2255,7 +2255,7 @@ static void GWHighlightFrameRect(NSRect aRect)
 	{
 	  operation = NSWorkspaceCopyOperation;
 	}
-      else if (sourceDragMask / NSDragOperationLink)
+      else if (sourceDragMask & NSDragOperationLink)
 	{
 	  operation = NSWorkspaceLinkOperation;
 	}

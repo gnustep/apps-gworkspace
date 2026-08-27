@@ -2675,6 +2675,13 @@ NSComparisonResult sortSubviews(id view1, id view2, void *context)
       [self setAllowsMultipleSelection: YES];
       [self setRowHeight: CELLS_HEIGHT];
       [self setIntercellSpacing: NSZeroSize];
+      /* GNUstep tracks source operation masks separately for drags
+       * inside this app and drags to other apps.  Set both so file
+       * drags advertise the same allowed operations in either case. */
+      [self setDraggingSourceOperationMask: NSDragOperationEvery
+				  forLocal: YES];
+      [self setDraggingSourceOperationMask: NSDragOperationEvery
+				  forLocal: NO];
 
       dsource = [[dsclass alloc] initForListView: self];
 
