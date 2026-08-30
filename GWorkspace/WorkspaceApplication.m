@@ -23,7 +23,10 @@
  * Foundation, Inc., 31 Milk Street #960789 Boston, MA 02196 USA.
  */
 
+#include <errno.h>
 #include <math.h>
+#include <signal.h>
+#include <sys/types.h>
 
 #import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
@@ -39,6 +42,34 @@
 #import "GWViewersManager.h"
 #import "Operation.h"
 #import "StartAppWin.h"
+
+static BOOL
+processExists(NSNumber *identifier)
+{
+  pid_t pid;
+
+  if (identifier == nil) {
+    return NO;
+  }
+
+  pid = (pid_t)[identifier intValue];
+
+  if (pid <= 0) {
+    return NO;
+  }
+
+#if defined(_WIN32)
+  return YES;
+#else
+  errno = 0;
+
+  if (kill(pid, 0) == 0) {
+    return YES;
+  }
+
+  return (errno == EPERM);
+#endif
+}
 
 @implementation GWorkspace (WorkspaceApplication)
 
@@ -880,14 +911,19 @@
     
           if (name && path && ident)
             {
+              /*
+               * Do not try to obtain the application's root proxy unless the
+               * stored process still exists.  NSConnection can wait for its
+               * full reply timeout when old session state points at a dead app.
+               */
               GWLaunchedApp *app = [GWLaunchedApp appWithApplicationPath: path
                                                          applicationName: name
                                                        processIdentifier: ident
-                                                            checkRunning: YES];
+                                                            checkRunning: NO];
         
-              if ((app != nil) && [app isRunning])
+              if ((app != nil) && processExists(ident))
                 {
-                  BOOL hidden = [app isApplicationHidden];
+                  BOOL hidden = NO;
           
                   [launchedApps addObject: app];
                   [app setHidden: hidden];
@@ -1290,7 +1326,15 @@
 
 - (BOOL)isRunning
 {
-  return (application != nil);
+  if (application != nil) {
+    return YES;
+  }
+
+  if (task != nil) {
+    return [task isRunning];
+  }
+
+  return processExists(identifier);
 }
 
 - (void)terminateApplication 
@@ -1452,4 +1496,3 @@
 }
 
 @end
-
