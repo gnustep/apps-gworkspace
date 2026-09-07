@@ -108,69 +108,72 @@ static FSNodeRep *shared = nil;
 - (id)initSharedInstance
 {    
   self = [super init];
-    
-  if (self) {
-    NSBundle *bundle = [NSBundle bundleForClass: [FSNodeRep class]];
-    NSString *imagepath;
-    BOOL isdir;
-    NSString *libraryDir;
-    NSNotificationCenter *nc;
-    
-    fm = [NSFileManager defaultManager];
-    nc = [NSNotificationCenter defaultCenter];
-          
-    labelWFactor = LABEL_W_FACT;
 
-    /* images coming form GSTheme */
-    [self cacheIcons];
+  if (self)
+    {
+      NSBundle *bundle = [NSBundle bundleForClass: [FSNodeRep class]];
+      NSString *imagepath;
+      BOOL isdir;
+      NSString *libraryDir;
+      NSNotificationCenter *nc;
 
-    /* images for which we provide our own resources */
-    imagepath = [bundle pathForImageResource: @"FolderOpen"];
-    openFolderIcon = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
-    imagepath = [bundle pathForImageResource: @"HardDisk"];
-    hardDiskIcon = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
-    imagepath = [bundle pathForImageResource: @"HardDiskOpen"];
-    openHardDiskIcon = [[NSImage alloc] initWithContentsOfFile: imagepath]; 
-    
-    iconsCache = [NSMutableDictionary new];
-    rootPath = path_separator();
-    RETAIN (rootPath);
-    
-    libraryDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
-    if (([fm fileExistsAtPath: libraryDir isDirectory: &isdir] && isdir) == NO)
-      {
-        if ([fm createDirectoryAtPath: libraryDir attributes: nil] == NO)
-          {
-            NSLog(@"Unable to create the Library directory. Quitting now");
-            [NSApp terminate: self];
-          }
-      }
-    thumbnailDir = [libraryDir stringByAppendingPathComponent: @"Thumbnails"];
-    RETAIN (thumbnailDir);
-    
-    if (([fm fileExistsAtPath: thumbnailDir isDirectory: &isdir] && isdir) == NO) {
-      if ([fm createDirectoryAtPath: thumbnailDir attributes: nil] == NO) {
-        NSLog(@"Unable to create the thumbnails directory. Quitting now");
-        [NSApp terminate: self];
-      }
+      fm = [NSFileManager defaultManager];
+      nc = [NSNotificationCenter defaultCenter];
+
+      labelWFactor = LABEL_W_FACT;
+
+      /* images coming form GSTheme */
+      [self cacheIcons];
+
+      /* images for which we provide our own resources */
+      imagepath = [bundle pathForImageResource: @"FolderOpen"];
+      openFolderIcon = [[NSImage alloc] initWithContentsOfFile: imagepath];
+      imagepath = [bundle pathForImageResource: @"HardDisk"];
+      hardDiskIcon = [[NSImage alloc] initWithContentsOfFile: imagepath];
+      imagepath = [bundle pathForImageResource: @"HardDiskOpen"];
+      openHardDiskIcon = [[NSImage alloc] initWithContentsOfFile: imagepath];
+
+      iconsCache = [NSMutableDictionary new];
+      rootPath = path_separator();
+      RETAIN (rootPath);
+
+      libraryDir = [NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES) lastObject];
+      if (([fm fileExistsAtPath: libraryDir isDirectory: &isdir] && isdir) == NO)
+        {
+          if ([fm createDirectoryAtPath: libraryDir attributes: nil] == NO)
+            {
+              NSLog(@"Unable to create the Library directory. Quitting now");
+              [NSApp terminate: self];
+            }
+        }
+      thumbnailDir = [libraryDir stringByAppendingPathComponent: @"Thumbnails"];
+      RETAIN (thumbnailDir);
+
+      if (([fm fileExistsAtPath: thumbnailDir isDirectory: &isdir] && isdir) == NO)
+        {
+          if ([fm createDirectoryAtPath: thumbnailDir attributes: nil] == NO)
+            {
+              NSLog(@"Unable to create the thumbnails directory. Quitting now");
+              [NSApp terminate: self];
+            }
+        }
+
+      defSortOrder = FSNInfoNameType;
+      hideSysFiles = NO;
+      usesThumbnails = NO;
+
+      lockedPaths = [NSMutableArray new];
+      hiddenPaths = [NSArray new];
+      volumes = [[NSMutableSet alloc] initWithCapacity: 1];
+      [self setVolumes:[[NSWorkspace sharedWorkspace] mountedRemovableMedia]];
+      reservedNames = [[NSMutableSet alloc] initWithCapacity: 1];
+
+      [self loadExtendedInfoModules];
+
+      /* we observe a theme change to re-cache icons */
+      [nc addObserver:self selector:@selector(themeDidActivate:) name:GSThemeDidActivateNotification object:nil];
     }
-    
-    defSortOrder = FSNInfoNameType;
-    hideSysFiles = NO;
-    usesThumbnails = NO;
-      
-    lockedPaths = [NSMutableArray new];	
-    hiddenPaths = [NSArray new];
-    volumes = [[NSMutableSet alloc] initWithCapacity: 1];
-    [self setVolumes:[[NSWorkspace sharedWorkspace] mountedRemovableMedia]];
-    reservedNames = [[NSMutableSet alloc] initWithCapacity: 1];
-    
-    [self loadExtendedInfoModules];
 
-    /* we observe a theme change to re-cache icons */
-    [nc addObserver:self selector:@selector(themeDidActivate:) name:GSThemeDidActivateNotification object:nil];
-  }
-    
   return self;
 }
 
@@ -181,7 +184,7 @@ static FSNodeRep *shared = nil;
   NSEnumerator *enumerator;
   NSMutableArray *loaded;
   NSUInteger i;
-  
+
   bundlesPaths = [NSMutableArray array];
 
   enumerator = [NSSearchPathForDirectoriesInDomains
@@ -189,44 +192,49 @@ static FSNodeRep *shared = nil;
   while ((bundlesDir = [enumerator nextObject]) != nil)
     {
       bundlesDir = [bundlesDir stringByAppendingPathComponent: @"Bundles"];
-      [bundlesPaths addObjectsFromArray:
-	[self bundlesWithExtension: @"extinfo" inPath: bundlesDir]];
+      [bundlesPaths addObjectsFromArray: [self bundlesWithExtension: @"extinfo" inPath: bundlesDir]];
     }
-
+  
   loaded = [NSMutableArray array];
-  
-  for (i = 0; i < [bundlesPaths count]; i++) {
-    NSString *bpath = [bundlesPaths objectAtIndex: i];
-    NSBundle *bundle = [NSBundle bundleWithPath: bpath];
-     
-    if (bundle) {
-			Class principalClass = [bundle principalClass];
 
-			if ([principalClass conformsToProtocol: @protocol(ExtendedInfo)]) {	
-	      CREATE_AUTORELEASE_POOL (pool);
-        id module = [[principalClass alloc] init];
-	  		NSString *name = [module menuName];
-        BOOL exists = NO;	
-        int j;
-        			
-				for (j = 0; j < [loaded count]; j++) {
-					if ([name isEqual: [[loaded objectAtIndex: j] menuName]]) {
-            NSLog(@"duplicate module \"%@\" at %@", name, bpath);
-						exists = YES;
-						break;
-					}
-				}
+  for (i = 0; i < [bundlesPaths count]; i++)
+    {
+      NSString *bpath = [bundlesPaths objectAtIndex: i];
+      NSBundle *bundle = [NSBundle bundleWithPath: bpath];
 
-				if (exists == NO) {
-          [loaded addObject: module];
+      if (bundle)
+        {
+          Class principalClass = [bundle principalClass];
+
+          if ([principalClass conformsToProtocol: @protocol(ExtendedInfo)])
+            {
+              CREATE_AUTORELEASE_POOL (pool);
+              id module = [[principalClass alloc] init];
+              NSString *name = [module menuName];
+              BOOL exists = NO;
+              NSUInteger j;
+
+              for (j = 0; j < [loaded count]; j++)
+                {
+                  if ([name isEqual: [[loaded objectAtIndex: j] menuName]])
+                    {
+                      NSLog(@"duplicate module \"%@\" at %@", name, bpath);
+                      exists = YES;
+                      break;
+                    }
+                }
+
+              if (exists == NO)
+                {
+                  [loaded addObject: module];
+                }
+
+              RELEASE ((id)module);
+              RELEASE (pool);
+            }
         }
-
-	  		RELEASE ((id)module);			
-        RELEASE (pool);		
-			}
     }
-  }
-  
+
   ASSIGN (extInfoModules, loaded);
 }
 
@@ -237,18 +245,21 @@ static FSNodeRep *shared = nil;
   NSEnumerator *enumerator;
   NSString *dir;
   BOOL isDir;
-  
-  if ((([fm fileExistsAtPath: path isDirectory: &isDir]) && isDir) == NO) {
-		return nil;
-  }
-	  
+
+  if ((([fm fileExistsAtPath: path isDirectory: &isDir]) && isDir) == NO)
+    {
+      return nil;
+    }
+
   enumerator = [[fm directoryContentsAtPath: path] objectEnumerator];
-  while ((dir = [enumerator nextObject])) {
-    if ([[dir pathExtension] isEqualToString: extension]) {
-			[bundleList addObject: [path stringByAppendingPathComponent: dir]];
-		}
-  }
-  
+  while ((dir = [enumerator nextObject]))
+    {
+      if ([[dir pathExtension] isEqualToString: extension])
+        {
+          [bundleList addObject: [path stringByAppendingPathComponent: dir]];
+        }
+    }
+
   return bundleList;
 }
 
@@ -281,7 +292,7 @@ static FSNodeRep *shared = nil;
   RELEASE (openHardDiskIcon);
   RELEASE (trashIcon);
   RELEASE (trashFullIcon);
-        
+
   [super dealloc];
 }
 
@@ -302,7 +313,6 @@ static FSNodeRep *shared = nil;
 
   if ([fm fileExistsAtPath: hdnFilePath])
     hiddenNames = [[NSString stringWithContentsOfFile: hdnFilePath] componentsSeparatedByString: @"\n"];
- 
 
   if (hiddenNames || hideSysFiles || [hiddenPaths count])
     {
@@ -314,22 +324,22 @@ static FSNodeRep *shared = nil;
 	  NSString *fname = [fnames objectAtIndex: i];
 	  NSString *fpath = [path stringByAppendingPathComponent: fname];
 	  BOOL hidden = NO;
-    
+
 	  if ([fname hasPrefix: @"."] && hideSysFiles)
 	    hidden = YES;  
-    
+
 	  if (hiddenNames && [hiddenNames containsObject: fname])
 	    hidden = YES;  
 
 	  if ([hiddenPaths containsObject: fpath])
 	    hidden = YES;  
-      
+
 	  if (hidden == NO)
 	    {
 	      [filteredNames addObject: fname];
 	    }
 	}
-  
+
       return filteredNames;
     }
   
@@ -376,7 +386,8 @@ static FSNodeRep *shared = nil;
 {
   SEL compareSel;
 
-  switch(defSortOrder) {
+  switch(defSortOrder)
+    {
     case FSNInfoNameType:
       compareSel = @selector(compareAccordingToName:);
       break;
@@ -395,25 +406,28 @@ static FSNodeRep *shared = nil;
     default:
       compareSel = @selector(compareAccordingToName:);
       break;
-  }
+    }
 
   return compareSel;
 }
 
 - (unsigned int)sortOrderForDirectory:(NSString *)dirpath
 {
-  if ([fm isWritableFileAtPath: dirpath]) {
-    NSString *dictPath = [dirpath stringByAppendingPathComponent: @".gwsort"];
-    
-    if ([fm fileExistsAtPath: dictPath]) {
-      NSDictionary *sortDict = [NSDictionary dictionaryWithContentsOfFile: dictPath];
-       
-      if (sortDict) {
-        return [[sortDict objectForKey: @"sort"] intValue];
-      }   
+  if ([fm isWritableFileAtPath: dirpath])
+    {
+      NSString *dictPath = [dirpath stringByAppendingPathComponent: @".gwsort"];
+
+      if ([fm fileExistsAtPath: dictPath])
+        {
+          NSDictionary *sortDict = [NSDictionary dictionaryWithContentsOfFile: dictPath];
+
+          if (sortDict)
+            {
+              return [[sortDict objectForKey: @"sort"] intValue];
+            }
+        }
     }
-  } 
-  
+
   return defSortOrder;
 }
 
@@ -422,7 +436,8 @@ static FSNodeRep *shared = nil;
   int order = [self sortOrderForDirectory: dirpath];
   SEL compareSel;
 
-  switch(order) {
+  switch(order)
+    {
     case FSNInfoNameType:
       compareSel = @selector(compareAccordingToName:);
       break;
@@ -441,7 +456,7 @@ static FSNodeRep *shared = nil;
     default:
       compareSel = @selector(compareAccordingToName:);
       break;
-  }
+    }
 
   return compareSel;
 }
@@ -487,11 +502,11 @@ static FSNodeRep *shared = nil;
 - (void)lockNodes:(NSArray *)nodes
 {
   NSUInteger i;
-	  
+
   for (i = 0; i < [nodes count]; i++)
     {
       NSString *path = [[nodes objectAtIndex: i] path];
-    
+
       if ([lockedPaths containsObject: path] == NO)
 	{
 	  [lockedPaths addObject: path];
@@ -502,7 +517,7 @@ static FSNodeRep *shared = nil;
 - (void)lockPaths:(NSArray *)paths
 {
   NSUInteger i;
-	  
+
   for (i = 0; i < [paths count]; i++)
     {
       NSString *path = [paths objectAtIndex: i];
@@ -535,7 +550,7 @@ static FSNodeRep *shared = nil;
 - (void)unlockNodes:(NSArray *)nodes
 {
   NSUInteger i;
-	  
+
   for (i = 0; i < [nodes count]; i++)
     {
       NSString *path = [[nodes objectAtIndex: i] path];
@@ -550,7 +565,7 @@ static FSNodeRep *shared = nil;
 - (void)unlockPaths:(NSArray *)paths
 {
   NSUInteger i;
-	  
+
   for (i = 0; i < [paths count]; i++)
     {
       NSString *path = [paths objectAtIndex: i];
@@ -565,38 +580,39 @@ static FSNodeRep *shared = nil;
 - (BOOL)isNodeLocked:(FSNode *)node
 {
   NSString *path = [node path];
-  NSUInteger i;  
-  
+  NSUInteger i;
+
   if ([lockedPaths containsObject: path])
     return YES;
-	
+
   for (i = 0; i < [lockedPaths count]; i++)
     {
       NSString *lpath = [lockedPaths objectAtIndex: i];
-      
-      if (isSubpathOfPath(lpath, path)) {
-        return YES;
-      }
+
+      if (isSubpathOfPath(lpath, path))
+        {
+          return YES;
+        }
     }
-  
+
   return NO;
 }
 
 - (BOOL)isPathLocked:(NSString *)path
 {
-  NSUInteger i;  
-  
+  NSUInteger i;
+
   if ([lockedPaths containsObject: path])
     return YES;
-  
+
   for (i = 0; i < [lockedPaths count]; i++)
     {
       NSString *lpath = [lockedPaths objectAtIndex: i];
-      
+
       if (isSubpathOfPath(lpath, path))
         return YES;
     }
-  
+
   return NO;
 }
 
@@ -641,12 +657,13 @@ static FSNodeRep *shared = nil;
 - (void)setUseThumbnails:(BOOL)value
 {
   NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];  
-    
+
   usesThumbnails = value;
-  
-  if (usesThumbnails) {
-    [self prepareThumbnailsCache];
-  }
+
+  if (usesThumbnails)
+    {
+      [self prepareThumbnailsCache];
+    }
   
   [defaults setBool: usesThumbnails forKey: @"use_thumbnails"];
 }
@@ -662,62 +679,70 @@ static FSNodeRep *shared = nil;
   NSArray *created = [info objectForKey: @"created"];	
   NSUInteger i;
 
-  if (usesThumbnails == NO) {
-    return;
-  }
-  
-  if ([deleted count]) {
-    for (i = 0; i < [deleted count]; i++) {
-      [tumbsCache removeObjectForKey: [deleted objectAtIndex: i]];
+  if (usesThumbnails == NO)
+    {
+      return;
     }
-  }
-  
-  if ([created count]) {
-    NSString *dictName = @"thumbnails.plist";
-    NSString *dictPath = [thumbnailDir stringByAppendingPathComponent: dictName];
-    
-    if ([fm fileExistsAtPath: dictPath]) {
-      NSDictionary *tdict = [NSDictionary dictionaryWithContentsOfFile: dictPath];
 
-      for (i = 0; i < [created count]; i++) {
-        NSString *key = [created objectAtIndex: i];
-        NSString *tumbname = [tdict objectForKey: key];
-        NSString *tumbpath = [thumbnailDir stringByAppendingPathComponent: tumbname]; 
-
-        if ([fm fileExistsAtPath: tumbpath]) {
-          NSImage *tumb = nil;
-        
-          NS_DURING
-            {
-          tumb = [[NSImage alloc] initWithContentsOfFile: tumbpath];
-          
-          if (tumb) {
-            [tumbsCache setObject: tumb forKey: key];
-            RELEASE (tumb);
-          }
-            }
-          NS_HANDLER
-            {
-          NSLog(@"BAD IMAGE '%@'", tumbpath);
-            }
-          NS_ENDHANDLER
+  if ([deleted count])
+    {
+      for (i = 0; i < [deleted count]; i++)
+        {
+          [tumbsCache removeObjectForKey: [deleted objectAtIndex: i]];
         }
-      }    
-    }  
-  }
+    }
+
+  if ([created count])
+    {
+      NSString *dictName = @"thumbnails.plist";
+      NSString *dictPath = [thumbnailDir stringByAppendingPathComponent: dictName];
+
+      if ([fm fileExistsAtPath: dictPath])
+        {
+          NSDictionary *tdict = [NSDictionary dictionaryWithContentsOfFile: dictPath];
+
+          for (i = 0; i < [created count]; i++)
+            {
+              NSString *key = [created objectAtIndex: i];
+              NSString *tumbname = [tdict objectForKey: key];
+              NSString *tumbpath = [thumbnailDir stringByAppendingPathComponent: tumbname];
+
+              if ([fm fileExistsAtPath: tumbpath])
+                {
+                  NSImage *tumb = nil;
+
+                  NS_DURING
+                    {
+                      tumb = [[NSImage alloc] initWithContentsOfFile: tumbpath];
+
+                      if (tumb)
+                        {
+                          [tumbsCache setObject: tumb forKey: key];
+                          RELEASE (tumb);
+                        }
+                    }
+                  NS_HANDLER
+                    {
+                      NSLog(@"BAD IMAGE '%@'", tumbpath);
+                    }
+                  NS_ENDHANDLER
+                    }
+            }
+        }
+    }
 }
 
 - (NSArray *)availableExtendedInfoNames
 {
   NSMutableArray *names = [NSMutableArray array];
   NSUInteger i;
-  
+
   for (i = 0; i < [extInfoModules count]; i++)
     {
       id module = [extInfoModules objectAtIndex: i];
       [names addObject: [module menuName]];
     }
-  
+
   return names;
 }
 
@@ -730,15 +755,14 @@ static FSNodeRep *shared = nil;
     {
       id module = [extInfoModules objectAtIndex: i];
       NSString *mname = [module menuName];
-      
+
       if ([mname isEqual: type])
         {
           return [module extendedInfoForNode: anode];
         }
     }
-  
+
   return nil;
 }
 
 @end
-
