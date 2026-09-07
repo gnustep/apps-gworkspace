@@ -75,7 +75,7 @@
   FSNodeRep *fsnodeRep;
   NSNotificationCenter *nc;
   NSFileManager *fm;
-  id ws;
+  NSWorkspace *ws;
 }
 
 + (FSNode *)nodeWithPath:(NSString *)apath;
