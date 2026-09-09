@@ -133,9 +133,107 @@
 
       /* we localize only directories which could be special */
       if ([self isDirectory])
-        ASSIGN (name, NSLocalizedStringFromTableInBundle(lastPathComponent, nil, [NSBundle bundleForClass:[self class]], @""));
-      else
-        ASSIGN (name, lastPathComponent);
+        {
+          NSArray *documentDir;
+          NSArray *libraryDirs;
+          NSArray *sysAppDir;
+          NSArray *appDirs;
+          NSArray *downloadDir;
+          NSArray *desktopDir;
+          NSArray *picDir;
+          NSArray *musicDir;
+          NSArray *videoDir;
+          NSString *sysDir;
+          NSMutableArray *specialDirs;
+          unsigned i;
+
+          specialDirs = [NSMutableArray arrayWithCapacity:10];
+
+          /* get special directories. This code closely follows [NSWorkspace init] */
+          documentDir = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,
+                                                            NSUserDomainMask, YES);
+          downloadDir = NSSearchPathForDirectoriesInDomains(NSDownloadsDirectory,
+                                                            NSUserDomainMask, YES);
+          desktopDir = NSSearchPathForDirectoriesInDomains(NSDesktopDirectory,
+                                                           NSUserDomainMask, YES);
+          libraryDirs = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,
+                                                            NSAllDomainsMask, YES);
+          sysAppDir = NSSearchPathForDirectoriesInDomains(NSApplicationDirectory,
+                                                          NSSystemDomainMask, YES);
+          appDirs = NSSearchPathForDirectoriesInDomains(NSApplicationDirectory,
+                                                        NSAllDomainsMask, YES);
+          picDir = NSSearchPathForDirectoriesInDomains(NSPicturesDirectory,
+                                                       NSUserDomainMask, YES);
+          musicDir = NSSearchPathForDirectoriesInDomains(NSMusicDirectory,
+                                                         NSUserDomainMask, YES);
+          videoDir = NSSearchPathForDirectoriesInDomains(NSMoviesDirectory,
+                                                         NSUserDomainMask, YES);
+
+          /* we try to guess a System directory and check if looks like one */
+          sysDir = nil;
+          if ([sysAppDir count] > 0)
+            {
+              sysDir = [[sysAppDir objectAtIndex: 0] stringByDeletingLastPathComponent];
+              if (![[sysDir lastPathComponent] isEqualToString: @"System"])
+                {
+                  sysDir = nil;
+                }
+            }
+
+          if (sysDir != nil)
+            {
+              [specialDirs addObject: [sysDir stringByResolvingSymlinksInPath]];
+            }
+
+          [specialDirs addObject: [NSHomeDirectory() stringByResolvingSymlinksInPath]];
+
+          for (i = 0; i < [libraryDirs count]; i++)
+            {
+              [specialDirs addObject: [[libraryDirs objectAtIndex: i] stringByResolvingSymlinksInPath]];
+            }
+          for (i = 0; i < [appDirs count]; i++)
+            {
+              [specialDirs addObject: [[appDirs objectAtIndex: i] stringByResolvingSymlinksInPath]];
+            }
+          for (i = 0; i < [documentDir count]; i++)
+            {
+              [specialDirs addObject: [[documentDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
+            }
+          for (i = 0; i < [downloadDir count]; i++)
+            {
+              [specialDirs addObject: [[downloadDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
+            }
+          for (i = 0; i < [desktopDir count]; i++)
+            {
+              [specialDirs addObject: [[desktopDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
+            }
+          for (i = 0; i < [picDir count]; i++)
+            {
+              [specialDirs addObject: [[picDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
+            }
+          for (i = 0; i < [musicDir count]; i++)
+            {
+              [specialDirs addObject: [[musicDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
+            }
+          for (i = 0; i < [videoDir count]; i++)
+            {
+              [specialDirs addObject: [[videoDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
+            }
+
+
+          if ([specialDirs indexOfObject:[path stringByResolvingSymlinksInPath]] != NSNotFound)
+            {
+              ASSIGN (name, NSLocalizedStringFromTableInBundle(lastPathComponent, nil, [NSBundle bundleForClass:[self class]], @""));
+            }
+          else // untranslated
+            {
+              ASSIGN (name, lastPathComponent);
+            }
+        }
+      else // untranslated
+        {
+          ASSIGN (name, lastPathComponent);
+        }
     }
     
   return self;
