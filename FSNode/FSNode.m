@@ -144,7 +144,7 @@
           NSArray *musicDir;
           NSArray *videoDir;
           NSString *sysDir;
-          NSMutableArray *specialDirs;
+          NSMutableSet *specialDirs;
           unsigned i;
           NSSet *localizedUserDirs;
           NSString *normalizedPath;
@@ -153,7 +153,7 @@
 
           localizedUserDirs = GSLocalizedUserDirs();
 
-          specialDirs = [NSMutableArray arrayWithCapacity:10];
+          specialDirs = [[NSMutableSet alloc] initWithCapacity:10];
 
           /* get special directories. This code closely follows [NSWorkspace init] */
           documentDir = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,
@@ -226,8 +226,9 @@
               [specialDirs addObject: [[videoDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
             }
 
-
-          if (([specialDirs indexOfObject:normalizedPath] != NSNotFound)
+          // If the path is in the special directories but it is not already localized,
+          // translate it
+          if (([specialDirs containsObject:normalizedPath])
               && ![localizedUserDirs containsObject:normalizedPath])
             {
               ASSIGN (name, NSLocalizedStringFromTableInBundle(lastPathComponent, nil, [NSBundle bundleForClass:[self class]], @""));
@@ -236,13 +237,14 @@
             {
               ASSIGN (name, lastPathComponent);
             }
+          RELEASE(specialDirs);
         }
       else // untranslated
         {
           ASSIGN (name, lastPathComponent);
         }
     }
-    
+
   return self;
 }
 
