@@ -146,6 +146,12 @@
           NSString *sysDir;
           NSMutableArray *specialDirs;
           unsigned i;
+          NSSet *localizedUserDirs;
+          NSString *normalizedPath;
+
+          normalizedPath = [path stringByResolvingSymlinksInPath];
+
+          localizedUserDirs = GSLocalizedUserDirs();
 
           specialDirs = [NSMutableArray arrayWithCapacity:10];
 
@@ -221,7 +227,8 @@
             }
 
 
-          if ([specialDirs indexOfObject:[path stringByResolvingSymlinksInPath]] != NSNotFound)
+          if (([specialDirs indexOfObject:normalizedPath] != NSNotFound)
+              && ![localizedUserDirs containsObject:normalizedPath])
             {
               ASSIGN (name, NSLocalizedStringFromTableInBundle(lastPathComponent, nil, [NSBundle bundleForClass:[self class]], @""));
             }
