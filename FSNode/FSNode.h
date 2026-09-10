@@ -1,6 +1,6 @@
 /* FSNode.h
  *  
- * Copyright (C) 2004-2025 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2026 Free Software Foundation, Inc.
  *
  * Author: Enrico Sersale
  *         Riccardo Mottola

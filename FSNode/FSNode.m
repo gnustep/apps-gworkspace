@@ -1,6 +1,6 @@
 /* FSNode.m
  *  
- * Copyright (C) 2004-2025 Free Software Foundation, Inc.
+ * Copyright (C) 2004-2026 Free Software Foundation, Inc.
  *
  * Authors: Enrico Sersale
  *          Riccardo Mottola
@@ -30,6 +30,8 @@
 #import "FSNodeRep.h"
 #import "FSNFunctions.h"
 
+static NSMutableSet *specialDirs; // cache of special directories in domains
+static NSMutableSet *localizedUserDirs; // cache of already localized directories
 
 @implementation FSNode
 
@@ -144,86 +146,100 @@
           NSArray *musicDir;
           NSArray *videoDir;
           NSString *sysDir;
-          NSMutableSet *specialDirs;
           unsigned i;
-          NSSet *localizedUserDirs;
+
           NSString *normalizedPath;
 
           normalizedPath = [path stringByResolvingSymlinksInPath];
 
-          localizedUserDirs = GSLocalizedUserDirs();
-
-          specialDirs = [[NSMutableSet alloc] initWithCapacity:10];
-
-          /* get special directories. This code closely follows [NSWorkspace init] */
-          documentDir = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,
-                                                            NSUserDomainMask, YES);
-          downloadDir = NSSearchPathForDirectoriesInDomains(NSDownloadsDirectory,
-                                                            NSUserDomainMask, YES);
-          desktopDir = NSSearchPathForDirectoriesInDomains(NSDesktopDirectory,
-                                                           NSUserDomainMask, YES);
-          libraryDirs = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,
-                                                            NSAllDomainsMask, YES);
-          sysAppDir = NSSearchPathForDirectoriesInDomains(NSApplicationDirectory,
-                                                          NSSystemDomainMask, YES);
-          appDirs = NSSearchPathForDirectoriesInDomains(NSApplicationDirectory,
-                                                        NSAllDomainsMask, YES);
-          picDir = NSSearchPathForDirectoriesInDomains(NSPicturesDirectory,
-                                                       NSUserDomainMask, YES);
-          musicDir = NSSearchPathForDirectoriesInDomains(NSMusicDirectory,
-                                                         NSUserDomainMask, YES);
-          videoDir = NSSearchPathForDirectoriesInDomains(NSMoviesDirectory,
-                                                         NSUserDomainMask, YES);
-
-          /* we try to guess a System directory and check if looks like one */
-          sysDir = nil;
-          if ([sysAppDir count] > 0)
+          if (localizedUserDirs == nil)
             {
-              sysDir = [[sysAppDir objectAtIndex: 0] stringByDeletingLastPathComponent];
-              if (![[sysDir lastPathComponent] isEqualToString: @"System"])
+              NSSet *lu;
+              NSEnumerator *e;
+              NSString *p;
+
+              lu  = GSLocalizedUserDirs();
+              e = [lu objectEnumerator];
+              while ((p = (NSString*)[e nextObject]))
                 {
-                  sysDir = nil;
+                  [localizedUserDirs addObject: [p stringByResolvingSymlinksInPath]];
                 }
             }
 
-          if (sysDir != nil)
+          if (specialDirs == nil)
             {
-              [specialDirs addObject: [sysDir stringByResolvingSymlinksInPath]];
-            }
+              specialDirs = [[NSMutableSet alloc] initWithCapacity:10];
 
-          [specialDirs addObject: [NSHomeDirectory() stringByResolvingSymlinksInPath]];
+              /* get special directories. This code closely follows [NSWorkspace init] */
+              documentDir = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,
+                                                                NSUserDomainMask, YES);
+              downloadDir = NSSearchPathForDirectoriesInDomains(NSDownloadsDirectory,
+                                                                NSUserDomainMask, YES);
+              desktopDir = NSSearchPathForDirectoriesInDomains(NSDesktopDirectory,
+                                                               NSUserDomainMask, YES);
+              libraryDirs = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory,
+                                                                NSAllDomainsMask, YES);
+              sysAppDir = NSSearchPathForDirectoriesInDomains(NSApplicationDirectory,
+                                                              NSSystemDomainMask, YES);
+              appDirs = NSSearchPathForDirectoriesInDomains(NSApplicationDirectory,
+                                                            NSAllDomainsMask, YES);
+              picDir = NSSearchPathForDirectoriesInDomains(NSPicturesDirectory,
+                                                           NSUserDomainMask, YES);
+              musicDir = NSSearchPathForDirectoriesInDomains(NSMusicDirectory,
+                                                             NSUserDomainMask, YES);
+              videoDir = NSSearchPathForDirectoriesInDomains(NSMoviesDirectory,
+                                                             NSUserDomainMask, YES);
 
-          for (i = 0; i < [libraryDirs count]; i++)
-            {
-              [specialDirs addObject: [[libraryDirs objectAtIndex: i] stringByResolvingSymlinksInPath]];
-            }
-          for (i = 0; i < [appDirs count]; i++)
-            {
-              [specialDirs addObject: [[appDirs objectAtIndex: i] stringByResolvingSymlinksInPath]];
-            }
-          for (i = 0; i < [documentDir count]; i++)
-            {
-              [specialDirs addObject: [[documentDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
-            }
-          for (i = 0; i < [downloadDir count]; i++)
-            {
-              [specialDirs addObject: [[downloadDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
-            }
-          for (i = 0; i < [desktopDir count]; i++)
-            {
-              [specialDirs addObject: [[desktopDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
-            }
-          for (i = 0; i < [picDir count]; i++)
-            {
-              [specialDirs addObject: [[picDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
-            }
-          for (i = 0; i < [musicDir count]; i++)
-            {
-              [specialDirs addObject: [[musicDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
-            }
-          for (i = 0; i < [videoDir count]; i++)
-            {
-              [specialDirs addObject: [[videoDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
+              /* we try to guess a System directory and check if looks like one */
+              sysDir = nil;
+              if ([sysAppDir count] > 0)
+                {
+                  sysDir = [[sysAppDir objectAtIndex: 0] stringByDeletingLastPathComponent];
+                  if (![[sysDir lastPathComponent] isEqualToString: @"System"])
+                    {
+                      sysDir = nil;
+                    }
+                }
+
+              if (sysDir != nil)
+                {
+                  [specialDirs addObject: [sysDir stringByResolvingSymlinksInPath]];
+                }
+
+              [specialDirs addObject: [NSHomeDirectory() stringByResolvingSymlinksInPath]];
+
+              for (i = 0; i < [libraryDirs count]; i++)
+                {
+                  [specialDirs addObject: [[libraryDirs objectAtIndex: i] stringByResolvingSymlinksInPath]];
+                }
+              for (i = 0; i < [appDirs count]; i++)
+                {
+                  [specialDirs addObject: [[appDirs objectAtIndex: i] stringByResolvingSymlinksInPath]];
+                }
+              for (i = 0; i < [documentDir count]; i++)
+                {
+                  [specialDirs addObject: [[documentDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
+                }
+              for (i = 0; i < [downloadDir count]; i++)
+                {
+                  [specialDirs addObject: [[downloadDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
+                }
+              for (i = 0; i < [desktopDir count]; i++)
+                {
+                  [specialDirs addObject: [[desktopDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
+                }
+              for (i = 0; i < [picDir count]; i++)
+                {
+                  [specialDirs addObject: [[picDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
+                }
+              for (i = 0; i < [musicDir count]; i++)
+                {
+                  [specialDirs addObject: [[musicDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
+                }
+              for (i = 0; i < [videoDir count]; i++)
+                {
+                  [specialDirs addObject: [[videoDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
+                }
             }
 
           // If the path is in the special directories but it is not already localized,
@@ -237,7 +253,6 @@
             {
               ASSIGN (name, lastPathComponent);
             }
-          RELEASE(specialDirs);
         }
       else // untranslated
         {
