@@ -31,7 +31,6 @@
 #import "FSNFunctions.h"
 
 static NSMutableSet *specialDirs; // cache of special directories in domains
-static NSMutableSet *localizedUserDirs; // cache of already localized directories
 
 @implementation FSNode
 
@@ -145,21 +144,9 @@ static NSMutableSet *localizedUserDirs; // cache of already localized directorie
           NSArray *musicDir;
           NSArray *videoDir;
           NSString *sysDir;
-          unsigned i;
+          NSSet *localizedUserDirs;
 
-          if (localizedUserDirs == nil)
-            {
-              NSSet *lu;
-              NSEnumerator *e;
-              NSString *p;
-
-              lu  = GSLocalizedUserDirs();
-              e = [lu objectEnumerator];
-              while ((p = (NSString*)[e nextObject]))
-                {
-                  [localizedUserDirs addObject: p];
-                }
-            }
+          localizedUserDirs = GSLocalizedUserDirs();
 
           if (specialDirs == nil)
             {
