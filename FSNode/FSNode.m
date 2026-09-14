@@ -31,7 +31,6 @@
 #import "FSNFunctions.h"
 
 static NSMutableSet *specialDirs; // cache of special directories in domains
-static NSMutableSet *localizedUserDirs; // cache of already localized directories
 
 @implementation FSNode
 
@@ -56,20 +55,24 @@ static NSMutableSet *localizedUserDirs; // cache of already localized directorie
   [super dealloc];
 }
 
-+ (FSNode *)nodeWithPath:(NSString *)apath
++ (FSNode *)nodeWithPath:(NSString *)aPath
 {
-  return AUTORELEASE ([[FSNode alloc] initWithRelativePath: apath parent: nil]);
+  return AUTORELEASE ([[FSNode alloc] initWithRelativePath: aPath parent: nil]);
 }
 
-+ (FSNode *)nodeWithRelativePath:(NSString *)rpath
-                          parent:(FSNode *)aparent
++ (FSNode *)nodeWithRelativePath:(NSString *)rPath
+                          parent:(FSNode *)aParent
 {
-  return AUTORELEASE ([[FSNode alloc] initWithRelativePath: rpath 
-                                                    parent: aparent]);
+  return AUTORELEASE ([[FSNode alloc] initWithRelativePath: rPath
+                                                    parent: aParent]);
 }
 
-- (id)initWithRelativePath:(NSString *)rpath
-                    parent:(FSNode *)aparent
+/*
+  We assume rpath and aparent are not normalized (symlink not resolved)
+  So that the user-navigated path is preserved.
+ */
+- (id)initWithRelativePath:(NSString *)rPath
+                    parent:(FSNode *)aParent
 {    
   self = [super init];
     
@@ -79,27 +82,20 @@ static NSMutableSet *localizedUserDirs; // cache of already localized directorie
       fm = [NSFileManager defaultManager];
       ws = [NSWorkspace sharedWorkspace];
 
-      parent = aparent;
-      ASSIGN (relativePath, rpath);
-      lastPathComponent = [[relativePath lastPathComponent] retain];
+      parent = aParent;
+      ASSIGN (relativePath, rPath);
+      ASSIGN (lastPathComponent, [relativePath lastPathComponent]);
       name = nil;
     
       if (parent)
         {
-          NSString *parentPath = [parent path];
-      
-          if ([parentPath isEqual: path_separator()])
-            {
-              parentPath = @"";
-            }
-          ASSIGN (path, ([NSString stringWithFormat: @"%@%@%@",
-                                   parentPath, path_separator(), lastPathComponent]));
+          ASSIGN (path, [[parent path] stringByAppendingPathComponent: relativePath]);
         }
       else
         {
           ASSIGN (path, relativePath);
         }
-        
+
       flags.readable = -1;
       flags.writable = -1;
       flags.executable = -1;
@@ -146,25 +142,9 @@ static NSMutableSet *localizedUserDirs; // cache of already localized directorie
           NSArray *musicDir;
           NSArray *videoDir;
           NSString *sysDir;
-          unsigned i;
+          NSSet *localizedUserDirs;
 
-          NSString *normalizedPath;
-
-          normalizedPath = [path stringByResolvingSymlinksInPath];
-
-          if (localizedUserDirs == nil)
-            {
-              NSSet *lu;
-              NSEnumerator *e;
-              NSString *p;
-
-              lu  = GSLocalizedUserDirs();
-              e = [lu objectEnumerator];
-              while ((p = (NSString*)[e nextObject]))
-                {
-                  [localizedUserDirs addObject: [p stringByResolvingSymlinksInPath]];
-                }
-            }
+          localizedUserDirs = GSLocalizedUserDirs();
 
           if (specialDirs == nil)
             {
@@ -203,49 +183,25 @@ static NSMutableSet *localizedUserDirs; // cache of already localized directorie
 
               if (sysDir != nil)
                 {
-                  [specialDirs addObject: [sysDir stringByResolvingSymlinksInPath]];
+                  [specialDirs addObject: sysDir];
                 }
 
-              [specialDirs addObject: [NSHomeDirectory() stringByResolvingSymlinksInPath]];
+              [specialDirs addObject: NSHomeDirectory()];
 
-              for (i = 0; i < [libraryDirs count]; i++)
-                {
-                  [specialDirs addObject: [[libraryDirs objectAtIndex: i] stringByResolvingSymlinksInPath]];
-                }
-              for (i = 0; i < [appDirs count]; i++)
-                {
-                  [specialDirs addObject: [[appDirs objectAtIndex: i] stringByResolvingSymlinksInPath]];
-                }
-              for (i = 0; i < [documentDir count]; i++)
-                {
-                  [specialDirs addObject: [[documentDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
-                }
-              for (i = 0; i < [downloadDir count]; i++)
-                {
-                  [specialDirs addObject: [[downloadDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
-                }
-              for (i = 0; i < [desktopDir count]; i++)
-                {
-                  [specialDirs addObject: [[desktopDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
-                }
-              for (i = 0; i < [picDir count]; i++)
-                {
-                  [specialDirs addObject: [[picDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
-                }
-              for (i = 0; i < [musicDir count]; i++)
-                {
-                  [specialDirs addObject: [[musicDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
-                }
-              for (i = 0; i < [videoDir count]; i++)
-                {
-                  [specialDirs addObject: [[videoDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
-                }
+              [specialDirs addObjectsFromArray: libraryDirs];
+              [specialDirs addObjectsFromArray: appDirs];
+              [specialDirs addObjectsFromArray: documentDir];
+              [specialDirs addObjectsFromArray: downloadDir];
+              [specialDirs addObjectsFromArray: desktopDir];
+              [specialDirs addObjectsFromArray: picDir];
+              [specialDirs addObjectsFromArray: musicDir];
+              [specialDirs addObjectsFromArray: videoDir];
             }
 
           // If the path is in the special directories but it is not already localized,
           // translate it
-          if (([specialDirs containsObject:normalizedPath])
-              && ![localizedUserDirs containsObject:normalizedPath])
+          if (([specialDirs containsObject:path])
+              && ![localizedUserDirs containsObject:path])
             {
               ASSIGN (name, NSLocalizedStringFromTableInBundle(lastPathComponent, nil, [NSBundle bundleForClass:[self class]], @""));
             }
@@ -270,22 +226,25 @@ static NSMutableSet *localizedUserDirs; // cache of already localized directorie
 
 - (BOOL)isEqual:(id)other
 {
-  if (other == self) {
-    return YES;
-  }
-  if ([other isKindOfClass: [FSNode class]]) {
-    return [self isEqualToNode: (FSNode *)other];
-  }
-  return NO;
-}
-
-- (BOOL)isEqualToNode:(FSNode *)anode
-{
-  if (anode == self)
+  if (other == self)
     {
       return YES;
     }
-  return [path isEqualToString: [anode path]];
+
+  if ([other isKindOfClass: [FSNode class]])
+    {
+    return [self isEqualToNode: (FSNode *)other];
+    }
+  return NO;
+}
+
+- (BOOL)isEqualToNode:(FSNode *)aNode
+{
+  if (aNode == self)
+    {
+      return YES;
+    }
+  return [path isEqualToString: [aNode path]];
 }
 
 - (NSArray *)subNodes 
@@ -322,22 +281,24 @@ static NSMutableSet *localizedUserDirs; // cache of already localized directorie
   NSArray *fnames = [fsnodeRep directoryContentsAtPath: [self parentPath]];
   FSNode *pnd = nil;
   NSUInteger i;
-  
-  if (parent != nil) {
-    pnd = [parent parent];
-  }
-  
-  for (i = 0; i < [fnames count]; i++) {
-    NSString *fname = [fnames objectAtIndex: i];
-    FSNode *node = [[FSNode alloc] initWithRelativePath: fname parent: pnd];
 
-    [nodes addObject: node];
-    RELEASE (node);
-  }
+  if (parent != nil)
+    {
+      pnd = [parent parent];
+    }
+
+  for (i = 0; i < [fnames count]; i++)
+    {
+      NSString *fname = [fnames objectAtIndex: i];
+      FSNode *node = [[FSNode alloc] initWithRelativePath: fname parent: pnd];
+
+      [nodes addObject: node];
+      RELEASE (node);
+    }
   
   RETAIN (nodes);
   RELEASE (arp);
-    
+
   return [[nodes autorelease] makeImmutableCopyOnFail: NO];
 }
 
@@ -623,95 +584,134 @@ static NSMutableSet *localizedUserDirs; // cache of already localized directorie
   flags.package = 0;
   flags.unknown = 0;
 
-  if (fileType == nil) {
-    [self fileType];
-  }
+  if (fileType == nil)
+    {
+      [self fileType];
+    }
   
-  if (fileType) {
-    if (fileType == NSFileTypeRegular) {
-      flags.plain = 1;
+  if (fileType)
+    {
+      if (fileType == NSFileTypeRegular)
+        {
+          flags.plain = 1;
+        }
+      else if (fileType == NSFileTypeDirectory)
+        {
+          NSString *defApp = nil, *type = nil;
 
-    } else if (fileType == NSFileTypeDirectory) {
-	    NSString *defApp = nil, *type = nil;
+          [ws getInfoForFile: path application: &defApp type: &type]; 
+          if (defApp)
+            {
+              ASSIGN (application, defApp);
+            }
 
-	    [ws getInfoForFile: path application: &defApp type: &type]; 
-      
-      if (defApp) {
-        ASSIGN (application, defApp);
-      }
-      
-      flags.directory = 1;
+          flags.directory = 1;
 
-	    if (type == NSApplicationFileType) {
-        flags.application = 1;
-        flags.package = 1;
-	    } else if (type == NSPlainFileType) {
-        flags.package = 1;
-      }
+          if (type == NSApplicationFileType)
+            {
+              flags.application = 1;
+              flags.package = 1;
+	    }
+          else if (type == NSPlainFileType)
+            {
+              flags.package = 1;
+            }
+          else if (type == NSFilesystemFileType)
+            {
+              flags.mountpoint = 1;
+            }
+        }
+      else if (fileType == NSFileTypeSymbolicLink)
+        {
+          NSDictionary *attrs = [fm fileAttributesAtPath: path traverseLink: YES];
 
-    } else if (fileType == NSFileTypeSymbolicLink) {
-      NSDictionary *attrs = [fm fileAttributesAtPath: path traverseLink: YES];
+          if (attrs)
+            {
+              [self setFlagsForSymLink: attrs];
+            }
 
-      if (attrs) {
-        [self setFlagsForSymLink: attrs];
-      }
-
-      flags.link = 1;
-    } else if (fileType == NSFileTypeSocket) {
-      flags.socket = 1;
-    } else if (fileType == NSFileTypeCharacterSpecial) {
-      flags.charspecial = 1;
-    } else if (fileType == NSFileTypeBlockSpecial) {
-      flags.blockspecial = 1;
-    } else {
+          flags.link = 1;
+        }
+      else if (fileType == NSFileTypeSocket)
+        {
+          flags.socket = 1;
+        }
+      else if (fileType == NSFileTypeCharacterSpecial)
+        {
+          flags.charspecial = 1;
+        }
+      else if (fileType == NSFileTypeBlockSpecial)
+        {
+          flags.blockspecial = 1;
+        }
+      else
+        {
+          flags.unknown = 1;
+        }
+    }
+  else
+    {
       flags.unknown = 1;
-    } 
-  } else {
-    flags.unknown = 1;
-  }
+    }
 }
 
 - (void)setFlagsForSymLink:(NSDictionary *)attrs
 {  
   NSString *ftype = [attrs fileType];
 
-  if (ftype == NSFileTypeRegular) {
-    flags.plain = 1;
-
-  } else if (ftype == NSFileTypeDirectory) {
-	  NSString *defApp = nil, *type = nil;
-
-	  [ws getInfoForFile: path application: &defApp type: &type]; 
-      
-    if (defApp) {
-      ASSIGN (application, defApp);
+  if (ftype == NSFileTypeRegular)
+    {
+      flags.plain = 1;
     }
-    
-    flags.directory = 1;
+  else if (ftype == NSFileTypeDirectory)
+    {
+      NSString *defApp = nil, *type = nil;
 
-	  if (type == NSApplicationFileType) {
-      flags.application = 1;
-      flags.package = 1;
-	  } else if (type == NSPlainFileType) {
-      flags.package = 1;
-    } else if (type == NSFilesystemFileType) {
-      flags.mountpoint = 1;
+      [ws getInfoForFile: path application: &defApp type: &type]; 
+      if (defApp)
+        {
+          ASSIGN (application, defApp);
+        }
+
+      flags.directory = 1;
+      if (type == NSApplicationFileType)
+        {
+          flags.application = 1;
+          flags.package = 1;
+        }
+      else if (type == NSPlainFileType)
+        {
+          flags.package = 1;
+        }
+      else if (type == NSFilesystemFileType)
+        {
+          flags.mountpoint = 1;
+        } 
+    }
+  else if (ftype == NSFileTypeSymbolicLink)
+    {
+      attrs = [fm fileAttributesAtPath: path traverseLink: YES];
+      if (attrs)
+        {
+          [self setFlagsForSymLink: attrs];
+        }
+    }
+  else if (ftype == NSFileTypeSocket)
+    {
+      flags.socket = 1;
+    }
+  else if (ftype == NSFileTypeCharacterSpecial)
+    {
+      flags.charspecial = 1;
+    }
+  else if (ftype == NSFileTypeBlockSpecial)
+    {
+      flags.blockspecial = 1;
+    }
+  else
+    {
+      flags.unknown = 1;
     } 
-
-  } else if (ftype == NSFileTypeSymbolicLink) {
-    attrs = [fm fileAttributesAtPath: path traverseLink: YES];
-    if (attrs) {
-      [self setFlagsForSymLink: attrs];
-    }
-  } else if (ftype == NSFileTypeSocket) {
-    flags.socket = 1;
-  } else if (ftype == NSFileTypeCharacterSpecial) {
-    flags.charspecial = 1;
-  } else if (ftype == NSFileTypeBlockSpecial) {
-    flags.blockspecial = 1;
-  } else {
-    flags.unknown = 1;
-  } 
 
   ASSIGN (typeDescription, NSLocalizedStringFromTableInBundle(@"symbolic link", nil, [NSBundle bundleForClass:[self class]], @""));
 }
@@ -749,9 +749,10 @@ static NSMutableSet *localizedUserDirs; // cache of already localized directorie
 
 - (NSDate *)creationDate
 {
-  if (attributes && (crDate == nil)) {
-    ASSIGN (crDate, [attributes fileCreationDate]);
-  }
+  if (attributes && (crDate == nil))
+    {
+      ASSIGN (crDate, [attributes fileCreationDate]);
+    }
   return (crDate ? crDate : (NSDate *)[NSDate date]);
 }
 
@@ -826,25 +827,28 @@ static NSMutableSet *localizedUserDirs; // cache of already localized directorie
 
 - (NSNumber *)ownerId
 {
-  if (attributes && (ownerId == nil)) {
-    ASSIGN (ownerId, [attributes objectForKey: NSFileOwnerAccountID]);
-  }
+  if (attributes && (ownerId == nil))
+    {
+      ASSIGN (ownerId, [attributes objectForKey: NSFileOwnerAccountID]);
+    }
   return (ownerId ? ownerId : [NSNumber numberWithInt: 0]);
 }
 
 - (NSString *)group
 {
-  if (attributes && (group == nil)) {
-    ASSIGN (group, [attributes fileGroupOwnerAccountName]);
-  }
+  if (attributes && (group == nil))
+    {
+      ASSIGN (group, [attributes fileGroupOwnerAccountName]);
+    }
   return (group ? group : (NSString *)[NSString string]);
 }
 
 - (NSNumber *)groupId
 {
-  if (attributes && (groupId == nil)) {
-    ASSIGN (groupId, [attributes objectForKey: NSFileGroupOwnerAccountID]);
-  }
+  if (attributes && (groupId == nil))
+    {
+      ASSIGN (groupId, [attributes objectForKey: NSFileGroupOwnerAccountID]);
+    }
   return (groupId ? groupId : [NSNumber numberWithInt: 0]);
 }
 
