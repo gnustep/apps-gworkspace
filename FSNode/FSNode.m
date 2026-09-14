@@ -203,38 +203,14 @@ static NSMutableSet *localizedUserDirs; // cache of already localized directorie
 
               [specialDirs addObject: NSHomeDirectory()];
 
-              for (i = 0; i < [libraryDirs count]; i++)
-                {
-                  [specialDirs addObject: [libraryDirs objectAtIndex: i]];
-                }
-              for (i = 0; i < [appDirs count]; i++)
-                {
-                  [specialDirs addObject: [appDirs objectAtIndex: i]];
-                }
-              for (i = 0; i < [documentDir count]; i++)
-                {
-                  [specialDirs addObject: [documentDir objectAtIndex: i]];
-                }
-              for (i = 0; i < [downloadDir count]; i++)
-                {
-                  [specialDirs addObject: [downloadDir objectAtIndex: i]];
-                }
-              for (i = 0; i < [desktopDir count]; i++)
-                {
-                  [specialDirs addObject: [desktopDir objectAtIndex: i]];
-                }
-              for (i = 0; i < [picDir count]; i++)
-                {
-                  [specialDirs addObject: [picDir objectAtIndex: i]];
-                }
-              for (i = 0; i < [musicDir count]; i++)
-                {
-                  [specialDirs addObject: [musicDir objectAtIndex: i]];
-                }
-              for (i = 0; i < [videoDir count]; i++)
-                {
-                  [specialDirs addObject: [videoDir objectAtIndex: i]];
-                }
+              [specialDirs addObjectsFromArray: libraryDirs];
+              [specialDirs addObjectsFromArray: appDirs];
+              [specialDirs addObjectsFromArray: documentDir];
+              [specialDirs addObjectsFromArray: downloadDir];
+              [specialDirs addObjectsFromArray: desktopDir];
+              [specialDirs addObjectsFromArray: picDir];
+              [specialDirs addObjectsFromArray: musicDir];
+              [specialDirs addObjectsFromArray: videoDir];
             }
 
           // If the path is in the special directories but it is not already localized,
