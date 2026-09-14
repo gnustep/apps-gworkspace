@@ -68,6 +68,10 @@ static NSMutableSet *localizedUserDirs; // cache of already localized directorie
                                                     parent: aparent]);
 }
 
+/*
+  We assume rpath and aparent are not normalized (symlink not resolved)
+  So that the user-navigated path is preserved.
+ */
 - (id)initWithRelativePath:(NSString *)rpath
                     parent:(FSNode *)aparent
 {    
@@ -99,7 +103,9 @@ static NSMutableSet *localizedUserDirs; // cache of already localized directorie
         {
           ASSIGN (path, relativePath);
         }
-        
+
+      NSLog(@"init FSNode relPath: %@ - path: %@ [%@]", rpath, path, [path stringByResolvingSymlinksInPath]);
+
       flags.readable = -1;
       flags.writable = -1;
       flags.executable = -1;
@@ -148,10 +154,6 @@ static NSMutableSet *localizedUserDirs; // cache of already localized directorie
           NSString *sysDir;
           unsigned i;
 
-          NSString *normalizedPath;
-
-          normalizedPath = [path stringByResolvingSymlinksInPath];
-
           if (localizedUserDirs == nil)
             {
               NSSet *lu;
@@ -162,7 +164,7 @@ static NSMutableSet *localizedUserDirs; // cache of already localized directorie
               e = [lu objectEnumerator];
               while ((p = (NSString*)[e nextObject]))
                 {
-                  [localizedUserDirs addObject: [p stringByResolvingSymlinksInPath]];
+                  [localizedUserDirs addObject: p];
                 }
             }
 
@@ -203,49 +205,49 @@ static NSMutableSet *localizedUserDirs; // cache of already localized directorie
 
               if (sysDir != nil)
                 {
-                  [specialDirs addObject: [sysDir stringByResolvingSymlinksInPath]];
+                  [specialDirs addObject: sysDir];
                 }
 
-              [specialDirs addObject: [NSHomeDirectory() stringByResolvingSymlinksInPath]];
+              [specialDirs addObject: NSHomeDirectory()];
 
               for (i = 0; i < [libraryDirs count]; i++)
                 {
-                  [specialDirs addObject: [[libraryDirs objectAtIndex: i] stringByResolvingSymlinksInPath]];
+                  [specialDirs addObject: [libraryDirs objectAtIndex: i]];
                 }
               for (i = 0; i < [appDirs count]; i++)
                 {
-                  [specialDirs addObject: [[appDirs objectAtIndex: i] stringByResolvingSymlinksInPath]];
+                  [specialDirs addObject: [appDirs objectAtIndex: i]];
                 }
               for (i = 0; i < [documentDir count]; i++)
                 {
-                  [specialDirs addObject: [[documentDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
+                  [specialDirs addObject: [documentDir objectAtIndex: i]];
                 }
               for (i = 0; i < [downloadDir count]; i++)
                 {
-                  [specialDirs addObject: [[downloadDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
+                  [specialDirs addObject: [downloadDir objectAtIndex: i]];
                 }
               for (i = 0; i < [desktopDir count]; i++)
                 {
-                  [specialDirs addObject: [[desktopDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
+                  [specialDirs addObject: [desktopDir objectAtIndex: i]];
                 }
               for (i = 0; i < [picDir count]; i++)
                 {
-                  [specialDirs addObject: [[picDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
+                  [specialDirs addObject: [picDir objectAtIndex: i]];
                 }
               for (i = 0; i < [musicDir count]; i++)
                 {
-                  [specialDirs addObject: [[musicDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
+                  [specialDirs addObject: [musicDir objectAtIndex: i]];
                 }
               for (i = 0; i < [videoDir count]; i++)
                 {
-                  [specialDirs addObject: [[videoDir objectAtIndex: i] stringByResolvingSymlinksInPath]];
+                  [specialDirs addObject: [videoDir objectAtIndex: i]];
                 }
             }
 
           // If the path is in the special directories but it is not already localized,
           // translate it
-          if (([specialDirs containsObject:normalizedPath])
-              && ![localizedUserDirs containsObject:normalizedPath])
+          if (([specialDirs containsObject:path])
+              && ![localizedUserDirs containsObject:path])
             {
               ASSIGN (name, NSLocalizedStringFromTableInBundle(lastPathComponent, nil, [NSBundle bundleForClass:[self class]], @""));
             }
