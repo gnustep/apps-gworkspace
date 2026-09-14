@@ -616,6 +616,10 @@ static NSMutableSet *specialDirs; // cache of special directories in domains
             {
               flags.package = 1;
             }
+          else if (type == NSFilesystemFileType)
+            {
+              flags.mountpoint = 1;
+            }
         }
       else if (fileType == NSFileTypeSymbolicLink)
         {
