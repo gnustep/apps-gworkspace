@@ -90,14 +90,7 @@ static NSMutableSet *localizedUserDirs; // cache of already localized directorie
     
       if (parent)
         {
-          NSString *parentPath = [parent path];
-      
-          if ([parentPath isEqual: path_separator()])
-            {
-              parentPath = @"";
-            }
-          ASSIGN (path, ([NSString stringWithFormat: @"%@%@%@",
-                                   parentPath, path_separator(), lastPathComponent]));
+          ASSIGN (path, [[parent path] stringByAppendingPathComponent: relativePath]);
         }
       else
         {
