@@ -96,8 +96,6 @@ static NSMutableSet *specialDirs; // cache of special directories in domains
           ASSIGN (path, relativePath);
         }
 
-      NSLog(@"init FSNode relPath: %@ - path: %@ [%@]", rPath, path, [path stringByResolvingSymlinksInPath]);
-
       flags.readable = -1;
       flags.writable = -1;
       flags.executable = -1;
