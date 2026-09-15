@@ -99,6 +99,26 @@
   return appName;
 }
 
+- (NSInteger) processIdentifier
+{
+  return pid;
+}
+
+- (void) setProcessIdentifier:(NSInteger)aPid
+{
+  pid = aPid;
+}
+
+- (NSImage *)appIcon
+{
+  return appIcon;
+}
+
+- (void)setAppIcon: (NSImage *)anIcon
+{
+  ASSIGN(appIcon, anIcon);
+}
+
 - (void)setWsIcon:(BOOL)value
 {
   isWsIcon = value;
@@ -468,7 +488,7 @@ NSRectFill(NSMakeRect(x + 2, y + 1, 1, 1)); \
 x += 6; \
 } \
 }
- 	
+
   if (isSelected || launching) {
     [highlightColor set];
     NSRectFill(rect);
@@ -485,7 +505,14 @@ x += 6; \
   
   if (isDndSourceIcon == NO) {
     if (isTrashIcon == NO) {
-      [icon compositeToPoint: icnPoint operation: NSCompositeSourceOver];
+      if (nil != appIcon)
+        {
+          [appIcon compositeToPoint: icnPoint operation: NSCompositeSourceOver];
+        }
+      else
+        {
+          [icon compositeToPoint: icnPoint operation: NSCompositeSourceOver];
+        }
     } else {
       if (trashFull) {
         [trashFullIcon compositeToPoint: icnPoint operation: NSCompositeSourceOver];

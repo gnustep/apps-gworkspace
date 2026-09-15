@@ -34,6 +34,7 @@
 @interface DockIcon : FSNIcon
 {
   NSString *appName;
+  NSInteger pid;
 
   BOOL isWsIcon;
   BOOL isTrashIcon;
@@ -46,7 +47,8 @@
   BOOL appactive;  
   float dissFract;
   int minimumLaunchClicks;
-    
+
+  NSImage *appIcon;
   NSColor *darkerColor;
   NSColor *highlightColor;
   NSImage *highlightImage;
@@ -67,6 +69,12 @@
 - (NSString *)path;
 
 - (NSString *)appName;
+
+- (NSInteger) processIdentifier;
+- (void) setProcessIdentifier:(NSInteger)pid;
+
+- (NSImage *)appIcon;
+- (void)setAppIcon: (NSImage *)icon;
         
 - (void)setWsIcon:(BOOL)value;
 

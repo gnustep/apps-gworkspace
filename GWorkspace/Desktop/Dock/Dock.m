@@ -53,9 +53,15 @@
 
 - (void)dealloc
 {
+  if (_iconManagerConnection != nil)
+    {
+      [_iconManagerConnection invalidate];
+      RELEASE (_iconManagerConnection);
+    }
+
   RELEASE (icons);
   RELEASE (backColor);
-  
+
   [super dealloc];
 }
 
@@ -141,6 +147,8 @@
 	}
 
       [self createTrashIcon];
+
+      [self registerIconManager];
     }
 
   return self;  
@@ -347,7 +355,10 @@
 
 - (void)appDidLaunch:(NSString *)appPath
              appName:(NSString *)appName
+   processIdentifier:(NSNumber *)identifier
 {
+  NSInteger pid = [identifier integerValue];
+
   if ([appName isEqual: [gw gworkspaceProcessName]] == NO) {
     DockIcon *icon = [self iconForApplicationPath: appPath];
 
@@ -359,6 +370,7 @@
     } 
   
     [icon setLaunched: YES];
+    [icon setProcessIdentifier: pid];
   }
 }
 
@@ -374,6 +386,7 @@
       } else {
         [icon setAppHidden: NO];
         [icon setLaunched: NO];
+        [icon setAppIcon: nil];
       }
     }
   }
@@ -615,6 +628,57 @@
 
 @end
 
+@implementation Dock (GSIconManager)
+
+- (void) registerIconManager
+{
+  _iconManagerConnection = [NSConnection new];
+  [_iconManagerConnection setRootObject:self];
+  if (![_iconManagerConnection registerName:@"GSIconManager"])
+    {
+      NSLog(@"Unable to register GSIconManager; GNUstep app icon windows will not be retrieved and updated.");
+      DESTROY(_iconManagerConnection);
+    }
+}
+
+
+- (void) setApplicationIconData: (NSData *)data
+                      badgeText: (NSString *)badgeText
+                   appProcessId: (int)aProcessId
+{
+  NSImage *iconImage;
+
+  if (data)
+    {
+      NSUInteger i;
+
+      iconImage = [[NSImage alloc] initWithData: data];
+      for (i = 0; i < [icons count]; i++)
+        {
+          DockIcon *di = [icons objectAtIndex: i];
+          if ([di processIdentifier] == aProcessId)
+            {
+              [di setAppIcon: iconImage];
+              [self setNeedsDisplay:YES];
+            }
+        }
+      [iconImage release];
+    }
+}
+
+- (void) requestUserAttention: (NSInteger)requestType
+                 appProcessId: (int)aProcessId
+{
+  NSLog(@"requestUserAttention");
+}
+
+- (void) cancelUserAttentionRequest: (NSInteger)request
+                       appProcessId: (int)aProcessId
+{
+  NSLog(@"cancelUserAttention");
+}
+
+@end
 
 @implementation Dock (NodeRepContainer)
 

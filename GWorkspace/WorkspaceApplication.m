@@ -592,7 +592,7 @@ processExists(NSNumber *identifier)
   }
 
   if (app && [app application]) {
-    [[dtopManager dock] appDidLaunch: path appName: name];
+    [[dtopManager dock] appDidLaunch: path appName: name processIdentifier:ident];
     GWDebugLog(@"\"%@\" appDidLaunch (%@)", name, path);
   }
 }
@@ -927,7 +927,7 @@ processExists(NSNumber *identifier)
           
                   [launchedApps addObject: app];
                   [app setHidden: hidden];
-                  [[dtopManager dock] appDidLaunch: path appName: name];
+                  [[dtopManager dock] appDidLaunch: path appName: name processIdentifier: ident];
           
                   if (hidden)
                     {
