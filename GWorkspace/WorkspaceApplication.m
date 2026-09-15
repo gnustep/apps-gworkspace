@@ -197,21 +197,20 @@ processExists(NSNumber *identifier)
   GWLaunchedApp *app;
   id application;
   BOOL isDir = NO;
-  BOOL isBundle = NO;
   BOOL exists = NO;
 
-  if (loggingout) {
-    NSRunAlertPanel(nil, 
-                  NSLocalizedString(@"GWorkspace is logging out!", @""),
-					        NSLocalizedString(@"Ok", @""), 
-                  nil, 
-                  nil);  
-    return NO;
-  }
+  if (loggingout)
+    {
+      NSRunAlertPanel(nil,
+		      NSLocalizedString(@"GWorkspace is logging out!", @""),
+		      NSLocalizedString(@"Ok", @""),
+		      nil,
+		      nil);
+      return NO;
+    }
 
   exists = [[NSFileManager defaultManager] fileExistsAtPath: fullPath isDirectory: &isDir];
 
-      
   if (appname == nil)
     {
       NSString *ext = [[fullPath pathExtension] lowercaseString];
@@ -224,61 +223,60 @@ processExists(NSNumber *identifier)
 
       appname = [ws getBestAppInRole: nil forExtension: ext];
 
-      if (appname == nil) {
-        appname = defEditor;
-      }
+      if (appname == nil)
+	{
+	  appname = defEditor;
+	}
     }
 
   [self applicationName: &appName andPath: &appPath forName: appname];
-  
+
   app = [self launchedAppWithPath: appPath andName: appName];
-  
-  if (app == nil) {
+  if (app == nil)
+    {
     NSArray *args = [NSArray arrayWithObjects: @"-GSFilePath", fullPath, nil];
     
     return [self launchApplication: appname arguments: args];
-  
-  } else {  
-    NSDate *delay = [NSDate dateWithTimeIntervalSinceNow: 0.1];
+  }
+
+  /*
+   * If we are opening many files together and our app is a wrapper,
+   * we must wait a little for the last launched task to terminate.
+   * Else we'd end waiting two seconds in -connectApplication.
+   */
+  [[NSRunLoop currentRunLoop] runUntilDate: [NSDate dateWithTimeIntervalSinceNow: 0.1]];
     
-    /*
-    * If we are opening many files together and our app is a wrapper,
-    * we must wait a little for the last launched task to terminate.
-    * Else we'd end waiting two seconds in -connectApplication.
-    */
-    [[NSRunLoop currentRunLoop] runUntilDate: delay];
+  application = [app application];
     
-    application = [app application];
-    
-    if (application == nil) {
+  if (application == nil)
+    {
       NSArray *args = [NSArray arrayWithObjects: @"-GSFilePath", fullPath, nil];
       
       [self applicationTerminated: app];
       
       return [self launchApplication: appname arguments: args];
-
-    } else {
-      NS_DURING
-	      {
-	    if (flag == NO) {
-	      [application application: NSApp openFileWithoutUI: fullPath];
-      } else {
-	      [application application: NSApp openFile: fullPath];
-	    }
-	      }
-      NS_HANDLER
-	      {
-      [self applicationTerminated: app]; 
-	    NSWarnLog(@"Failed to contact '%@' to open file", appName);
-	    return NO;
-	      }
-      NS_ENDHANDLER
     }
-  }
-  
-  if (flag) {
-    [NSApp deactivate];
-  }
+
+  NS_DURING
+    {
+      if (flag == NO) {
+	[application application: NSApp openFileWithoutUI: fullPath];
+      } else {
+	[application application: NSApp openFile: fullPath];
+      }
+    }
+  NS_HANDLER
+    {
+      [self applicationTerminated: app]; 
+      NSWarnLog(@"Failed to contact '%@' to open file", appName);
+      return NO;
+    }
+  NS_ENDHANDLER
+
+    if (flag)
+      {
+	[NSApp deactivate];
+      }
 
   return YES;
 }
