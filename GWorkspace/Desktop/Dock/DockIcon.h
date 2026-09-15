@@ -30,6 +30,7 @@
 
 @class NSColor;
 @class NSImage;
+@class NSWorkspace;
 
 @interface DockIcon : FSNIcon
 {
@@ -59,7 +60,7 @@
 
   NSFileManager *fm;
   NSNotificationCenter *nc; 
-  id ws;
+  NSWorkspace *ws;
 }
 
 - (id)initForNode:(FSNode *)anode
