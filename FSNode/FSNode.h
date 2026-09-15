@@ -30,6 +30,7 @@
 
 @class NSImage;
 @class NSBezierPath;
+@class NSWorkspace;
 @class FSNodeRep;
 
 @interface FSNode : NSObject 
