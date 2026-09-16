@@ -33,6 +33,7 @@
 #import "Dock.h"
 #import "GWDesktopManager.h"
 #import "GWorkspace.h"
+#import "FSNFunctions.h"
 
 @implementation DockIcon
 
@@ -117,6 +118,7 @@
 - (void)setAppIcon: (NSImage *)anIcon
 {
   ASSIGN(appIcon, anIcon);
+  [self tile];
 }
 
 - (void)setWsIcon:(BOOL)value
@@ -275,6 +277,48 @@
     isDndSourceIcon = value;
     [self setNeedsDisplay: YES];
   }
+}
+
+- (void)tile
+{
+  NSRect frameRect = [self bounds];
+  NSSize sz = [icon size];
+  int lblmargin = [fsnodeRep labelMargin];
+  BOOL hasinfo = ([[infolabel stringValue] length] > 0);
+
+  if (nil != appIcon)
+    {
+      sz = [appIcon size];
+    }
+
+  if (selectable)
+    {
+      float hlx = myrintf((frameRect.size.width - hlightRect.size.width) / 2);
+      float hly = myrintf((frameRect.size.height - hlightRect.size.height) / 2);
+
+      if ((hlightRect.origin.x != hlx) || (hlightRect.origin.y != hly))
+        {
+          NSAffineTransform *transform = [NSAffineTransform transform];
+
+          [transform translateXBy: hlx - hlightRect.origin.x
+                              yBy: hly - hlightRect.origin.y];
+
+          [highlightPath transformUsingAffineTransform: transform];
+
+          hlightRect.origin.x = hlx;
+          hlightRect.origin.y = hly;
+        }
+    }
+
+  icnBounds.origin.x = (frameRect.size.width - iconSize) / 2;
+  icnBounds.origin.y = (frameRect.size.height - iconSize) / 2;
+  icnBounds = NSIntegralRect(icnBounds);
+
+  icnPoint.x = myrintf((frameRect.size.width - sz.width) / 2);
+  icnPoint.y = myrintf((frameRect.size.height - sz.height) / 2);
+
+
+  [self setNeedsDisplay: YES];
 }
 
 - (void)setIconSize:(int)isize

@@ -659,7 +659,6 @@
           if ([di processIdentifier] == aProcessId)
             {
               [di setAppIcon: iconImage];
-              [self setNeedsDisplay:YES];
             }
         }
       [iconImage release];
