@@ -30,10 +30,12 @@
 
 @class NSColor;
 @class NSImage;
+@class NSWorkspace;
 
 @interface DockIcon : FSNIcon
 {
   NSString *appName;
+  NSInteger pid;
 
   BOOL isWsIcon;
   BOOL isTrashIcon;
@@ -46,7 +48,8 @@
   BOOL appactive;  
   float dissFract;
   int minimumLaunchClicks;
-    
+
+  NSImage *appIcon;
   NSColor *darkerColor;
   NSColor *highlightColor;
   NSImage *highlightImage;
@@ -57,7 +60,7 @@
 
   NSFileManager *fm;
   NSNotificationCenter *nc; 
-  id ws;
+  NSWorkspace *ws;
 }
 
 - (id)initForNode:(FSNode *)anode
@@ -67,6 +70,12 @@
 - (NSString *)path;
 
 - (NSString *)appName;
+
+- (NSInteger) processIdentifier;
+- (void) setProcessIdentifier:(NSInteger)pid;
+
+- (NSImage *)appIcon;
+- (void)setAppIcon: (NSImage *)icon;
         
 - (void)setWsIcon:(BOOL)value;
 

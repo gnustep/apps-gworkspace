@@ -61,6 +61,8 @@ typedef enum DockStyle
   GWorkspace *gw;
   NSFileManager *fm; 
   id ws;
+
+  NSConnection *_iconManagerConnection;
 }
 
 - (id)initForManager:(id)mngr;
@@ -92,7 +94,8 @@ typedef enum DockStyle
               appName:(NSString *)appName;
 
 - (void)appDidLaunch:(NSString *)appPath
-             appName:(NSString *)appName;
+             appName:(NSString *)appName
+   processIdentifier:(NSNumber *)identifier;
 
 - (void)appTerminated:(NSString *)appPath
 	      appName:(NSString *)appName;
@@ -120,6 +123,20 @@ typedef enum DockStyle
 - (void)updateDefaults;
 
 - (void)checkRemovedApp:(id)sender;
+
+@end
+
+@interface Dock (GSIconmanager)
+
+- (void) registerIconManager;
+
+- (void) setApplicationIconData: (NSData *)data
+badgeText: (NSString *)badgeText
+appProcessId: (int)aProcessId;
+- (void) requestUserAttention: (NSInteger)requestType
+appProcessId: (int)aProcessId;
+- (void) cancelUserAttentionRequest: (NSInteger)request
+appProcessId: (int)aProcessId;
 
 @end
 
