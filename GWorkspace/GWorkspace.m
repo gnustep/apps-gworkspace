@@ -166,7 +166,7 @@ static GWorkspace *gworkspace = nil;
     	
   // Info
   menuItem = [mainMenu addItemWithTitle:_(@"Info") action:NULL keyEquivalent:@""];
-  menu = AUTORELEASE ([NSMenu new]);
+  menu = AUTORELEASE ([[NSMenu alloc] initWithTitle:_(@"Info")]);
   [mainMenu setSubmenu: menu forItem: menuItem];	
   [menu addItemWithTitle: _(@"Info Panel...") action:@selector(showInfo:) keyEquivalent:@""];
   [menu addItemWithTitle: _(@"Preferences...") action:@selector(showPreferences:) keyEquivalent:@""];
@@ -175,7 +175,7 @@ static GWorkspace *gworkspace = nil;
 	 
   // File
   menuItem = [mainMenu addItemWithTitle:_(@"File") action:NULL keyEquivalent:@""];
-  menu = AUTORELEASE ([NSMenu new]);
+  menu = AUTORELEASE ([[NSMenu alloc] initWithTitle:_(@"File")]);
   [mainMenu setSubmenu: menu forItem: menuItem];		
   [menu addItemWithTitle:_(@"Open") action:@selector(openSelection:) keyEquivalent:@"o"];
   [menu addItemWithTitle:_(@"Open With...")  action:@selector(openWith:) keyEquivalent:@""];
@@ -189,7 +189,7 @@ static GWorkspace *gworkspace = nil;
   
   // Edit
   menuItem = [mainMenu addItemWithTitle:_(@"Edit") action:NULL keyEquivalent:@""];
-  menu = AUTORELEASE ([NSMenu new]);
+  menu = AUTORELEASE ([[NSMenu alloc] initWithTitle:_(@"Edit")]);
   [mainMenu setSubmenu: menu forItem: menuItem];	
   [menu addItemWithTitle:_(@"Cut") action:@selector(cut:) keyEquivalent:@"x"];
   [menu addItemWithTitle:_(@"Copy") action:@selector(copy:) keyEquivalent:@"c"];
@@ -198,7 +198,7 @@ static GWorkspace *gworkspace = nil;
 
   // View
   menuItem = [mainMenu addItemWithTitle:_(@"View") action:NULL keyEquivalent:@""];
-  menu = AUTORELEASE ([NSMenu new]);
+  menu = AUTORELEASE ([[NSMenu alloc] initWithTitle:_(@"View")]);
   [mainMenu setSubmenu: menu forItem: menuItem];
   menuItem = [[NSMenuItem alloc] initWithTitle:_(@"Browser") action:@selector(setViewerType:) keyEquivalent:@"b"];
   [menuItem setTag:GWViewTypeBrowser];
@@ -214,7 +214,7 @@ static GWorkspace *gworkspace = nil;
   [menu addItem:menuItem];
 	
   menuItem = [menu addItemWithTitle:_(@"Show") action:NULL keyEquivalent:@""];
-  subMenu = AUTORELEASE ([NSMenu new]);
+  subMenu = AUTORELEASE ([[NSMenu alloc] initWithTitle:_(@"Show")]);
   [menu setSubmenu: subMenu forItem: menuItem];
   [subMenu addItemWithTitle:_(@"Name only") action:@selector(setShownType:) keyEquivalent:@""];
   [subMenu addItemWithTitle:_(@"Type") action:@selector(setShownType:) keyEquivalent:@""];
@@ -223,7 +223,7 @@ static GWorkspace *gworkspace = nil;
   [subMenu addItemWithTitle:_(@"Owner") action:@selector(setShownType:) keyEquivalent:@""];
       
   menuItem = [menu addItemWithTitle:_(@"Icon Size") action:NULL keyEquivalent:@""];
-  subMenu = AUTORELEASE ([NSMenu new]);
+  subMenu = AUTORELEASE ([[NSMenu alloc] initWithTitle:_(@"Icon Size")]);
   [menu setSubmenu: subMenu forItem: menuItem];	
   [subMenu addItemWithTitle:_(@"24") action:@selector(setIconsSize:) keyEquivalent:@""];
   [subMenu addItemWithTitle:_(@"28") action:@selector(setIconsSize:) keyEquivalent:@""];
@@ -234,19 +234,19 @@ static GWorkspace *gworkspace = nil;
   [subMenu addItemWithTitle:_(@"64") action:@selector(setIconsSize:) keyEquivalent:@""];
       
   menuItem = [menu  addItemWithTitle:_(@"Icon Position") action:NULL keyEquivalent:@""];
-  subMenu = AUTORELEASE ([NSMenu new]);
+  subMenu = AUTORELEASE ([[NSMenu alloc] initWithTitle:_(@"Icon Position")]);
   [menu setSubmenu: subMenu forItem: menuItem];	
   [subMenu addItemWithTitle:_(@"Up") action:@selector(setIconsPosition:) keyEquivalent:@""];
   [subMenu addItemWithTitle:_(@"Left") action:@selector(setIconsPosition:) keyEquivalent:@""];
 
   menuItem = [menu addItemWithTitle:_(@"Thumbnails") action:NULL keyEquivalent:@""];
-  subMenu = AUTORELEASE ([NSMenu new]);
+  subMenu = AUTORELEASE ([[NSMenu alloc] initWithTitle:_(@"Thumbnails")]);
   [menu setSubmenu: subMenu forItem: menuItem];	
   [subMenu addItemWithTitle:_(@"Make thumbnail(s)") action:@selector(makeThumbnails:) keyEquivalent:@""];
   [subMenu addItemWithTitle:_(@"Remove thumbnail(s)") action:@selector(removeThumbnails:) keyEquivalent:@""];
 
   menuItem = [menu addItemWithTitle:_(@"Label Size") action:NULL keyEquivalent:@""];
-  subMenu = AUTORELEASE ([NSMenu new]);
+  subMenu = AUTORELEASE ([[NSMenu alloc] initWithTitle:_(@"Label Size")]);
   [menu setSubmenu: subMenu forItem: menuItem];
   [subMenu addItemWithTitle:_(@"10") action:@selector(setLabelSize:) keyEquivalent:@""];
   [subMenu addItemWithTitle:_(@"11") action:@selector(setLabelSize:) keyEquivalent:@""];
@@ -260,11 +260,11 @@ static GWorkspace *gworkspace = nil;
             
   // Tools
   menuItem = [mainMenu addItemWithTitle:_(@"Tools") action:NULL keyEquivalent:@""];
-  menu = AUTORELEASE ([NSMenu new]);
+  menu = AUTORELEASE ([[NSMenu alloc] initWithTitle:_(@"Tools")]);
   [mainMenu setSubmenu: menu forItem: menuItem];	
 		
   menuItem = [menu addItemWithTitle:_(@"Inspectors") action:NULL keyEquivalent:@""];
-  subMenu = AUTORELEASE ([NSMenu new]);
+  subMenu = AUTORELEASE ([[NSMenu alloc] initWithTitle:_(@"Inspectors")]);
   [menu setSubmenu: subMenu forItem: menuItem];	
   [subMenu addItemWithTitle:_(@"Show Inspectors") action:NULL keyEquivalent:@""];
   [subMenu addItemWithTitle:_(@"Attributes") action:@selector(showAttributesInspector:) keyEquivalent:@"1"];
@@ -275,11 +275,11 @@ static GWorkspace *gworkspace = nil;
   [menu addItemWithTitle:_(@"Finder") action:@selector(showFinder:) keyEquivalent:@"f"];
 
   menuItem = [menu addItemWithTitle:_(@"Fiend") action:NULL keyEquivalent:@""];
-  subMenu = AUTORELEASE ([NSMenu new]);
+  subMenu = AUTORELEASE ([[NSMenu alloc] initWithTitle:_(@"Fiend")]);
   [menu setSubmenu: subMenu forItem: menuItem];
 
   menuItem = [menu addItemWithTitle:_(@"Tabbed Shelf") action:NULL keyEquivalent:@""];
-  subMenu = AUTORELEASE ([NSMenu new]);
+  subMenu = AUTORELEASE ([[NSMenu alloc] initWithTitle:_(@"Tabbed Shelf")]);
   [menu setSubmenu: subMenu forItem: menuItem];    
   [subMenu addItemWithTitle:_(@"Show Tabbed Shelf") action:@selector(showTShelf:) keyEquivalent:@"s"];
   [subMenu addItemWithTitle:_(@"Remove Current Tab") action:@selector(removeTShelfTab:) keyEquivalent:@""];
@@ -290,7 +290,7 @@ static GWorkspace *gworkspace = nil;
   [menu addItemWithTitle:_(@"Run...") action:@selector(runCommand:) keyEquivalent:@""];  
 
   menuItem = [menu addItemWithTitle:_(@"History") action:NULL keyEquivalent:@""];
-  subMenu = AUTORELEASE ([NSMenu new]);
+  subMenu = AUTORELEASE ([[NSMenu alloc] initWithTitle:_(@"History")]);
   [menu setSubmenu: subMenu forItem: menuItem];
   [subMenu addItemWithTitle:_(@"Show History") action:@selector(showHistory:) keyEquivalent:@""];
   [subMenu addItemWithTitle:_(@"Go backward") action:@selector(goBackwardInHistory:) keyEquivalent:@""];
@@ -303,7 +303,7 @@ static GWorkspace *gworkspace = nil;
 	
   // Windows
   menuItem = [mainMenu addItemWithTitle:_(@"Windows") action:NULL keyEquivalent:@""];
-  windows = AUTORELEASE ([NSMenu new]);
+  windows = AUTORELEASE ([[NSMenu alloc] initWithTitle:_(@"Windows")]);
   [mainMenu setSubmenu: windows forItem: menuItem];		
   [windows addItemWithTitle:_(@"Arrange in Front") action:@selector(arrangeInFront:) keyEquivalent:@""];
   [windows addItemWithTitle:_(@"Miniaturize Window") action:@selector(performMiniaturize:) keyEquivalent:@"m"];
@@ -311,7 +311,7 @@ static GWorkspace *gworkspace = nil;
 
   // Services 
   menuItem = [mainMenu addItemWithTitle:_(@"Services") action:NULL keyEquivalent:@""];
-  services = AUTORELEASE ([NSMenu new]);
+  services = AUTORELEASE ([[NSMenu alloc] initWithTitle:_(@"Services")]);
   [mainMenu setSubmenu: services forItem: menuItem];		
 
   // Hide
