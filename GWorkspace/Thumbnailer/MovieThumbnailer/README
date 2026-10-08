@@ -1,0 +1,18 @@
+MovieThumbnailer uses the optional ffmpegthumbnailer executable found by
+NSTask's tool lookup. Install ffmpegthumbnailer, enable GWorkspace's
+thumbnail display, and browse a movie folder. Missing thumbnails are generated
+in the background as file icons are requested. Conversions run one at a time;
+failed conversions are retried when the source changes or GWorkspace restarts.
+Thumbnails > Make thumbnail(s) remains available for explicit regeneration.
+The normal GWorkspace build/install includes
+this .thumb bundle; no FFmpeg headers or libraries are needed to build it.
+
+The helper's -m option prefers embedded artwork and falls back to a video
+frame. Output preserves aspect ratio and fits the existing 64-pixel thumbnail
+size. Missing helpers, failed conversions and conversions exceeding 15 seconds
+produce no thumbnail. Temporary output is private to each conversion and is
+removed afterward. This bundle adds no codec linkage or libs-gui changes.
+
+Run the integration tests with:
+  sh Tests/run.sh
+The tests require GNUstep development tools, ffmpeg and ffmpegthumbnailer.

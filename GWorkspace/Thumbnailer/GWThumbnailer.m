@@ -81,6 +81,8 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
       DESTROY (conn);
       DESTROY (dictLock);
       RELEASE (pathsInProcessing);
+      RELEASE (generationQueue);
+      RELEASE (automaticAttempts);
       sharedThumbnailerInstance = nil;
       [super dealloc];
     }
@@ -99,6 +101,12 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
       dictLock = [[NSLock alloc] init];
 
     pathsInProcessing = [[NSMutableArray alloc] init];
+    generationQueue = [NSOperationQueue new];
+    [generationQueue setMaxConcurrentOperationCount: 1];
+    automaticAttempts = [NSMutableDictionary new];
+    [[NSNotificationCenter defaultCenter] addObserver: self
+      selector: @selector(thumbnailRequested:)
+      name: @"GWThumbnailRequestedNotification" object: nil];
 
     fm = [NSFileManager defaultManager];
     extProviders = [NSMutableDictionary new];
@@ -106,7 +114,9 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
 
     entry = [defaults objectForKey: @"thumbref"];
     if (entry) {
-      thumbref = [(NSNumber *)entry longValue];
+      /* Defaults written by the defaults tool may be strings. Both NSString
+         and NSNumber support longLongValue, unlike longValue. */
+      thumbref = (long)[entry longLongValue];
     } else {
       thumbref = 0;
     }
@@ -305,6 +315,61 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
   return [NSString stringWithFormat: @"%lx", thumbref];
 }
 
+/* Icon lookups request only missing thumbnails. Remember failed attempts until
+   the source changes, and serialize conversions with the explicit menu actions. */
+- (void)thumbnailRequested:(NSNotification *)notification
+{
+  NSString *path = [notification object];
+  NSDictionary *attributes;
+  NSArray *signature;
+  NSInvocationOperation *operation;
+
+  if ([self thumbnailerForPath: path] == nil)
+    return;
+  attributes = [fm fileAttributesAtPath: path traverseLink: YES];
+  if ([attributes objectForKey: NSFileModificationDate] == nil)
+    return;
+  signature = [NSArray arrayWithObjects:
+    [attributes objectForKey: NSFileModificationDate],
+    [attributes objectForKey: NSFileSize], nil];
+  @synchronized (automaticAttempts)
+    {
+      if ([[automaticAttempts objectForKey: path] isEqual: signature])
+        return;
+      [automaticAttempts setObject: signature forKey: path];
+    }
+  operation = [[NSInvocationOperation alloc] initWithTarget: self
+    selector: @selector(generateMissingThumbnail:) object: path];
+  [generationQueue addOperation: operation];
+  [operation release];
+}
+
+- (void)generateMissingThumbnail:(NSString *)path
+{
+  NSAutoreleasePool *pool = [NSAutoreleasePool new];
+  NSString *cached = [thumbsDict objectForKey: path];
+  if (cached == nil || ![fm fileExistsAtPath:
+                            [thumbnailDir stringByAppendingPathComponent: cached]])
+    {
+      id<TMBProtocol> provider = [self thumbnailerForPath: path];
+      NSData *data = [provider makeThumbnailForPath: path];
+      if (data && [self registerThumbnailData: data forPath: path
+                         nameExtension: [provider fileNameExtension]])
+        {
+          NSDictionary *info = [NSDictionary dictionaryWithObject:
+            [NSArray arrayWithObject: path] forKey: @"created"];
+          NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+          [defaults setObject: [NSNumber numberWithLong: thumbref] forKey: @"thumbref"];
+          [defaults synchronize];
+          [self writeDictToFile];
+          [[NSDistributedNotificationCenter defaultCenter]
+            postNotificationName: GWThumbnailsDidChangeNotification
+                          object: nil userInfo: info];
+        }
+    }
+  [pool drain];
+}
+
 - (void)_makeThumbnails:(NSString *)path
 {
   NSData *data;
@@ -358,16 +423,26 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
 	object: nil 
 	userInfo: info];
     }
-  [pathsInProcessing removeObject:path];
+  @synchronized (pathsInProcessing)
+    {
+      [pathsInProcessing removeObject: path];
+    }
   [arp drain];
 }
 
 - (void)makeThumbnails:(NSString *)path
 {
-  if ([pathsInProcessing containsObject:path])
-    return;
-  [pathsInProcessing addObject:path];
-  [NSThread detachNewThreadSelector:@selector(_makeThumbnails:) toTarget:self withObject:path];
+  NSInvocationOperation *operation;
+  @synchronized (pathsInProcessing)
+    {
+      if ([pathsInProcessing containsObject: path])
+        return;
+      [pathsInProcessing addObject: path];
+    }
+  operation = [[NSInvocationOperation alloc] initWithTarget: self
+    selector: @selector(_makeThumbnails:) object: path];
+  [generationQueue addOperation: operation];
+  [operation release];
 }
 
 - (void)_removeThumbnails:(NSString *)path
@@ -380,9 +455,6 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
   arp = [NSAutoreleasePool new];
 
   
-    if ((thumbsDict == nil) || ([thumbsDict count] == 0)) {
-      return;
-    }
     
     deleted = [NSMutableArray array];
     
@@ -421,17 +493,27 @@ static NSString *GWThumbnailsDidChangeNotification = @"GWThumbnailsDidChangeNoti
                         userInfo: info];
       }
 
-  [pathsInProcessing removeObject:path];
+  @synchronized (pathsInProcessing)
+    {
+      [pathsInProcessing removeObject: path];
+    }
   [arp drain];
 }
 
 
 - (void)removeThumbnails:(NSString *)path
 {
-  if ([pathsInProcessing containsObject:path])
-    return;
-  [pathsInProcessing addObject:path];
-  [NSThread detachNewThreadSelector:@selector(_removeThumbnails:) toTarget:self withObject:path];
+  NSInvocationOperation *operation;
+  @synchronized (pathsInProcessing)
+    {
+      if ([pathsInProcessing containsObject: path])
+        return;
+      [pathsInProcessing addObject: path];
+    }
+  operation = [[NSInvocationOperation alloc] initWithTarget: self
+    selector: @selector(_removeThumbnails:) object: path];
+  [generationQueue addOperation: operation];
+  [operation release];
 }
 
 - (BOOL)registerThumbnailData:(NSData *)data 
