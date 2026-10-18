@@ -18,7 +18,12 @@ fi
 if test "$CXX" = ""; then
   CXX=`gnustep-config --variable=CXX`
 fi
+# Autoconf may append a language-standard flag to CC.  GNUstep make
+# supplies the build compiler, so retain its command for our checks and
+# recursive configure scripts.
+gw_configure_cc="$CC"
 AC_PROG_CC
+CC="$gw_configure_cc"
 AC_PROG_CPP
 
 MAKECC=`gnustep-config --variable=CC`
