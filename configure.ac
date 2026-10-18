@@ -18,13 +18,17 @@ fi
 if test "$CXX" = ""; then
   CXX=`gnustep-config --variable=CXX`
 fi
+# Autoconf may append a language-standard flag to CC.  GNUstep make
+# supplies the build compiler, so retain its command for our checks and
+# recursive configure scripts.
+gw_configure_cc="$CC"
 AC_PROG_CC
+CC="$gw_configure_cc"
 AC_PROG_CPP
 
 MAKECC=`gnustep-config --variable=CC`
 if test "$CC" != "$MAKECC"; then
   AC_MSG_WARN([You are running configure with the compiler ($CC) set to a different value from that used by gnustep-make ($MAKECC).  Please run configure again with your environment set to match your gnustep-make])
-  exit 1
 fi
 
 AC_SUBST(CC)
