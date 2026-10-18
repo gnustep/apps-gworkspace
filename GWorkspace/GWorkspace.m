@@ -41,6 +41,7 @@
 #import "FSNodeRep.h"
 #import "FSNFunctions.h"
 #import "GWorkspace.h"
+#import "Thumbnailer/GWThumbnailer.h"
 #import "Dialogs.h"
 #import "OpenWithController.h"
 #import "RunExternalController.h"
@@ -434,6 +435,7 @@ static GWorkspace *gworkspace = nil;
   
   dontWarnOnQuit = [defaults boolForKey: @"NoWarnOnQuit"];
 
+  [Thumbnailer sharedThumbnailer];
   boolentry = [defaults boolForKey: @"use_thumbnails"];
   [fsnodeRep setUseThumbnails: boolentry];
   

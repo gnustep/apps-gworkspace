@@ -55,7 +55,7 @@ static NSString *nibName = @"IconsPref";
      
       gw = [GWorkspace gworkspace];
   
-      [thumbCheck setState: [defaults boolForKey: @"usesthumbnails"] ? NSOnState : NSOffState];  
+      [thumbCheck setState: [defaults boolForKey: @"use_thumbnails"] ? NSOnState : NSOffState];
       
       /* Internationalization */
       [thumbbox setTitle: NSLocalizedString(@"Thumbnails", @"")];
@@ -82,7 +82,7 @@ static NSString *nibName = @"IconsPref";
   unsigned int state = [sender state];
 
   [defaults setBool: ((state == NSOnState) ? YES : NO) 
-             forKey: @"usesthumbnails"];
+             forKey: @"use_thumbnails"];
   [defaults synchronize];  
   
   [gw setUsesThumbnails: ((state == NSOnState) ? YES : NO)];

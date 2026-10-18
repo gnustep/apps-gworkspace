@@ -651,7 +651,13 @@ static unsigned char darkerLUT[256] = {
 - (NSImage *)thumbnailForPath:(NSString *)apath
 {
   if (usesThumbnails && tumbsCache) {
-    return [tumbsCache objectForKey: apath];
+    NSImage *thumbnail = [tumbsCache objectForKey: apath];
+    if (thumbnail == nil)
+      {
+        [[NSNotificationCenter defaultCenter]
+          postNotificationName: @"GWThumbnailRequestedNotification" object: apath];
+      }
+    return thumbnail;
   }
   return nil;
 }

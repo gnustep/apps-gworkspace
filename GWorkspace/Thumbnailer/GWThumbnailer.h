@@ -53,6 +53,8 @@
   NSFileManager *fm;
   NSLock *dictLock;
   NSMutableArray *pathsInProcessing;
+  NSOperationQueue *generationQueue;
+  NSMutableDictionary *automaticAttempts;
 }
 
 + (Thumbnailer *)sharedThumbnailer;
