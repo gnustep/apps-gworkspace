@@ -63,6 +63,7 @@ typedef enum DockStyle
   id ws;
 
   NSConnection *_iconManagerConnection;
+  NSMutableDictionary *_pendingApplicationIcons;
 }
 
 - (id)initForManager:(id)mngr;
@@ -129,6 +130,8 @@ typedef enum DockStyle
 @interface Dock (GSIconmanager)
 
 - (void) registerIconManager;
+
+- (void) discardPendingApplicationIcon: (NSNotification *)notification;
 
 - (void) setApplicationIconData: (NSData *)data
 badgeText: (NSString *)badgeText

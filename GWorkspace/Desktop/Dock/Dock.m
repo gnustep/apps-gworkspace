@@ -59,6 +59,8 @@
       RELEASE (_iconManagerConnection);
     }
 
+  [[ws notificationCenter] removeObserver: self];
+  RELEASE (_pendingApplicationIcons);
   RELEASE (icons);
   RELEASE (backColor);
 
@@ -92,6 +94,12 @@
       ws = [NSWorkspace sharedWorkspace];
 
       icons = [NSMutableArray new];
+      _pendingApplicationIcons = [NSMutableDictionary new];
+      [[ws notificationCenter]
+        addObserver: self
+           selector: @selector(discardPendingApplicationIcon:)
+               name: NSWorkspaceDidTerminateApplicationNotification
+             object: nil];
       iconSize = MAX_ICN_SIZE;
                                 
       dndSourceIcon = nil;
@@ -371,6 +379,17 @@
   
     [icon setLaunched: YES];
     [icon setProcessIdentifier: pid];
+
+    /* Icon updates can arrive before the distributed launch notification. */
+    if (icon != nil && pid > 0) {
+      NSNumber *processKey = [NSNumber numberWithInteger: pid];
+      NSImage *pendingIcon = [_pendingApplicationIcons objectForKey: processKey];
+
+      if (pendingIcon != nil) {
+        [icon setAppIcon: pendingIcon];
+        [_pendingApplicationIcons removeObjectForKey: processKey];
+      }
+    }
   }
 }
 
@@ -381,6 +400,9 @@
     DockIcon *icon = [self iconForApplicationPath: appPath];
 
     if (icon) {
+      [_pendingApplicationIcons removeObjectForKey:
+        [NSNumber numberWithInteger: [icon processIdentifier]]];
+      [icon setProcessIdentifier: 0];
       if (([icon isDocked] == NO) && ([icon isSpecialIcon] == NO)) {
         [self removeIcon: icon];
       } else {
@@ -642,27 +664,58 @@
 }
 
 
+- (void) discardPendingApplicationIcon: (NSNotification *)notification
+{
+  NSNumber *processKey = [[notification userInfo]
+    objectForKey: @"NSApplicationProcessIdentifier"];
+
+  if (processKey != nil)
+    {
+      [_pendingApplicationIcons removeObjectForKey: processKey];
+    }
+}
+
 - (void) setApplicationIconData: (NSData *)data
                       badgeText: (NSString *)badgeText
                    appProcessId: (int)aProcessId
 {
   NSImage *iconImage;
+  NSNumber *processKey;
+  NSUInteger i;
+  BOOL applied = NO;
 
-  if (data)
+  if (data == nil || aProcessId <= 0)
     {
-      NSUInteger i;
-
-      iconImage = [[NSImage alloc] initWithData: data];
-      for (i = 0; i < [icons count]; i++)
-        {
-          DockIcon *di = [icons objectAtIndex: i];
-          if ([di processIdentifier] == aProcessId)
-            {
-              [di setAppIcon: iconImage];
-            }
-        }
-      [iconImage release];
+      return;
     }
+  iconImage = [[NSImage alloc] initWithData: data];
+  if (iconImage == nil)
+    {
+      return;
+    }
+
+  processKey = [NSNumber numberWithInt: aProcessId];
+  for (i = 0; i < [icons count]; i++)
+    {
+      DockIcon *di = [icons objectAtIndex: i];
+      if ([di processIdentifier] == aProcessId)
+        {
+          [di setAppIcon: iconImage];
+          applied = YES;
+        }
+    }
+
+  if (applied)
+    {
+      [_pendingApplicationIcons removeObjectForKey: processKey];
+    }
+  else
+    {
+      /* libs-gui renders the badge into the image, including badge removal.
+       * Keep only the latest image until the application is registered. */
+      [_pendingApplicationIcons setObject: iconImage forKey: processKey];
+    }
+  RELEASE(iconImage);
 }
 
 - (void) requestUserAttention: (NSInteger)requestType
