@@ -3710,7 +3710,6 @@ MAKECC=`gnustep-config --variable=CC`
 if test "$CC" != "$MAKECC"; then
   { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: You are running configure with the compiler ($CC) set to a different value from that used by gnustep-make ($MAKECC).  Please run configure again with your environment set to match your gnustep-make" >&5
 printf '%s\n' "$as_me: WARNING: You are running configure with the compiler ($CC) set to a different value from that used by gnustep-make ($MAKECC).  Please run configure again with your environment set to match your gnustep-make" >&2;}
-  exit 1
 fi
 
 
