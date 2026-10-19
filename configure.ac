@@ -1,5 +1,5 @@
-AC_PREREQ(2.71)
 AC_INIT(gworkspace, 1.1.0)
+AC_PREREQ(2.71)
 
 if test -z "$GNUSTEP_MAKEFILES"; then
   AC_MSG_ERROR([You must run the GNUstep initialization script first!])
@@ -66,7 +66,7 @@ else
 fi
 AC_SUBST(BUILD_GWMETADATA)
 
-AC_CONFIG_HEADER([GWorkspace/config.h])
+AC_CONFIG_HEADERS([GWorkspace/config.h])
 
 
 #--------------------------------------------------------------------

@@ -1,5 +1,5 @@
-AC_PREREQ(2.52)
 AC_INIT
+AC_PREREQ(2.71)
 
 if test -z "$GNUSTEP_MAKEFILES"; then
   AC_MSG_ERROR([You must run the GNUstep initialization script first!])
@@ -9,7 +9,7 @@ fi
 # Find the compiler
 #--------------------------------------------------------------------
 # we expect the compiler to be present in the environment and consistent with the rest of GWorkspace
-AC_MSG_NOTICE(["Using compiler $CC"])
+AC_MSG_NOTICE([Using compiler $CC])
 
 #--------------------------------------------------------------------
 # Use config.guess, config.sub and install-sh provided by gnustep-make
@@ -53,7 +53,7 @@ fi
 
 AC_DEFINE_UNQUOTED([GW_DEBUG_LOG], [$GW_DEBUG_LOG], [debug logging])
 
-AC_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADERS([config.h])
 
 
 AC_OUTPUT

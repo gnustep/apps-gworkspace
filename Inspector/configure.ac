@@ -1,5 +1,5 @@
-AC_PREREQ(2.52)
 AC_INIT
+AC_PREREQ(2.71)
 
 if test -z "$GNUSTEP_MAKEFILES"; then
   AC_MSG_ERROR([You must set GNUSTEP_MAKEFILES or run the GNUstep initialization script first!])
@@ -18,7 +18,7 @@ AC_CHECK_HEADERS(dir.h unistd.h)
 AC_CHECK_FUNCS(getpwnam getpwuid geteuid getlogin)
 
 AC_CONFIG_AUX_DIR([$GNUSTEP_MAKEFILES])
-AC_CONFIG_HEADER([config.h])
+AC_CONFIG_HEADERS([config.h])
 
 
 #--------------------------------------------------------------------
