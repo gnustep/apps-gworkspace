@@ -1,38 +1,46 @@
-AC_PREREQ(2.52)
 AC_INIT(gworkspace, 1.1.0)
+AC_PREREQ(2.71)
 
 if test -z "$GNUSTEP_MAKEFILES"; then
   AC_MSG_ERROR([You must run the GNUstep initialization script first!])
 fi
 
-
 #--------------------------------------------------------------------
 # Find the compiler
 #--------------------------------------------------------------------
+MAKECC=`gnustep-config --variable=CC`
+MAKECPP=`gnustep-config --variable=CPP`
+MAKECXX=`gnustep-config --variable=CXX`
 if test "$CC" = ""; then
-  CC=`gnustep-config --variable=CC`
+  CC=$MAKECC
+  export CC
+else
+  if test "$CC" != "$MAKECC"; then
+    AC_MSG_WARN([You are running configure with the compiler ($CC) set to a different value from that used by gnustep-make ($MAKECC).  To avoid conflicts/problems, reconfigure/reinstall gnustep-make to use CC=$CC or run the gnustep-base configure again with your CC environment variable set to $MAKECC])
+  fi
 fi
 if test "$CPP" = ""; then
-  CPP=`gnustep-config --variable=CPP`
+  CPP=$MAKECPP
+  export CPP
+else
+  if test "$CPP" != "$MAKECPP"; then
+    AC_MSG_WARN([You are running configure with the preprocessor ($CPP) set to a different value from that used by gnustep-make ($MAKECPP).  To avoid conflicts/problems, reconfigure/reinstall gnustep-make to use CPP=$CPP or run the gnustep-base configure again with your CPP environment variable set to $MAKECPP])
+  fi
 fi
 if test "$CXX" = ""; then
-  CXX=`gnustep-config --variable=CXX`
+  CXX=$MAKECXX
+  export CXX
+else
+  if test "$CXX" != "$MAKECXX"; then
+    AC_MSG_WARN([You are running configure with the compiler ($CXX) set to a different value from that used by gnustep-make ($MAKECXX).  To avoid conflicts/problems, reconfigure/reinstall gnustep-make to use CXX=$CXX or run the gnustep-base configure again with your CXX environment variable set to $MAKECXX])
+  fi
 fi
 AC_PROG_CC
 AC_PROG_CPP
 
-MAKECC=`gnustep-config --variable=CC`
-if test "$CC" != "$MAKECC"; then
-  AC_MSG_WARN([You are running configure with the compiler ($CC) set to a different value from that used by gnustep-make ($MAKECC).  Please run configure again with your environment set to match your gnustep-make])
-  exit 1
-fi
-
 AC_SUBST(CC)
 AC_SUBST(CPP)
 AC_SUBST(CXX)
-export CC
-export CPP
-export CXX
 
 #--------------------------------------------------------------------
 # Use config.guess, config.sub and install-sh provided by gnustep-make
@@ -58,7 +66,7 @@ else
 fi
 AC_SUBST(BUILD_GWMETADATA)
 
-AC_CONFIG_HEADER([GWorkspace/config.h])
+AC_CONFIG_HEADERS([GWorkspace/config.h])
 
 
 #--------------------------------------------------------------------
