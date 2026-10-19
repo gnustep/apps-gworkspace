@@ -64,7 +64,7 @@ fi
 if test "$have_sqlite" = yes; then
   sqlite_version_ok=yes
   
-  AC_TRY_RUN([
+  AC_RUN_IFELSE([AC_LANG_SOURCE([
     #include <stdio.h>
     #include <stdlib.h>
     #include <string.h>
@@ -77,7 +77,7 @@ int main ()
   printf("sqlite3 version number %d\n", vnum);
   return !(vnum >= 3002006);
 }
-  ],, sqlite_version_ok=no,[echo "wrong sqlite3 version"])
+  ])],, sqlite_version_ok=no,[echo "wrong sqlite3 version"])
 
   if test "$have_sqlite" = yes; then
     SQLITE_LIB_DIRS="$with_sqlite_library -lsqlite3"
