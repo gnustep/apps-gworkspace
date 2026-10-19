@@ -6,6 +6,12 @@ if test -z "$GNUSTEP_MAKEFILES"; then
 fi
 
 #--------------------------------------------------------------------
+# Find the compiler
+#--------------------------------------------------------------------
+# we expect the compiler to be present in the environment and consistent with the rest of GWorkspace
+AC_MSG_NOTICE(["Using compiler $CC"])
+
+#--------------------------------------------------------------------
 # Use config.guess, config.sub and install-sh provided by gnustep-make
 #--------------------------------------------------------------------
 AC_CHECK_HEADERS(dir.h unistd.h)

@@ -8,23 +8,8 @@ fi
 #--------------------------------------------------------------------
 # Find the compiler
 #--------------------------------------------------------------------
-if test "$CC" = ""; then
-  CC=`gnustep-config --variable=CC`
-fi
-if test "$CPP" = ""; then
-  CPP=`gnustep-config --variable=CPP`
-fi
-if test "$CXX" = ""; then
-  CXX=`gnustep-config --variable=CXX`
-fi
-AC_PROG_CC
-AC_PROG_CPP
-
-MAKECC=`gnustep-config --variable=CC`
-if test "$CC" != "$MAKECC"; then
-  AC_MSG_WARN([You are running configure with the compiler ($CC) set to a different value from that used by gnustep-make ($MAKECC).  Please run configure again with your environment set to match your gnustep-make])
-  exit 1
-fi
+# we expect the compiler to be present in the environment and consistent with the rest of GWorkspace
+AC_MSG_NOTICE([Using compiler ($CC)])
 
 #--------------------------------------------------------------------
 # Use config.guess, config.sub and install-sh provided by gnustep-make
