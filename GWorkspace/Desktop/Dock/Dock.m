@@ -642,9 +642,9 @@
 }
 
 
-- (void) setApplicationIconData: (NSData *)data
-                      badgeText: (NSString *)badgeText
-                   appProcessId: (int)aProcessId
+- (oneway void) setApplicationIconData: (NSData *)data
+			     badgeText: (NSString *)badgeText
+			  appProcessId: (int)aProcessId
 {
   NSImage *iconImage;
 
@@ -665,14 +665,14 @@
     }
 }
 
-- (void) requestUserAttention: (NSInteger)requestType
-                 appProcessId: (int)aProcessId
+- (oneway void) requestUserAttention: (NSInteger)requestType
+			appProcessId: (int)aProcessId
 {
   NSLog(@"requestUserAttention");
 }
 
-- (void) cancelUserAttentionRequest: (NSInteger)request
-                       appProcessId: (int)aProcessId
+- (oneway void) cancelUserAttentionRequest: (NSInteger)request
+			      appProcessId: (int)aProcessId
 {
   NSLog(@"cancelUserAttention");
 }
