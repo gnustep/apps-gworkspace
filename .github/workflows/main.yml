@@ -41,7 +41,7 @@ env:
     libtiff-dev
     libpng-dev
     libicns-dev
-    libobjc-dev
+    libobjc-15-dev
     gobjc
     gcc
     libxt-dev
